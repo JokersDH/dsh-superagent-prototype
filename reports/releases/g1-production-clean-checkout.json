@@ -1,0 +1,39 @@
+{
+  "status": "PASS_CLEAN_CHECKOUT_PRODUCTION_STORE_CONTROLLED_PROCESS_SLICE",
+  "tests": 5,
+  "contractIdentity": {
+    "version": "1.0.0",
+    "schemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d"
+  },
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "recordedAt": "2026-11-07T14:16:00.211Z",
+  "results": [
+    {
+      "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/orchestrator-core --filter @personal-agent/effects --filter @personal-agent/storage -r run build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm exec tsc -p tests/integration/tsconfig.runtime.json",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:production",
+      "status": "PASS"
+    }
+  ],
+  "notProven": [
+    "Full G1 crash/reconnect/durable journal admission",
+    "Per-attempt resource/authority invariants assigned to Agent A next batch",
+    "Strict question/answer fixture coverage and persistent replay assigned to Agent B next batch",
+    "Vendor Driver compatibility, real native permissions or model task",
+    "Usable UI/HTTP personal-assistant product"
+  ],
+  "sourceCommit": "402c3bfa22e1a57ac1fca3d787763791e5143aef",
+  "frozenInstallChangedLock": false
+}
