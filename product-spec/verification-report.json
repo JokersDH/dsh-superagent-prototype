@@ -1,0 +1,272 @@
+{
+  "result": "PASS_SPEC_STATIC_ONLY",
+  "checkedAt": "2026-11-07T07:34:20.638Z",
+  "taskCount": 17,
+  "acceptanceRequirementCount": 83,
+  "runtimeTestsExecutedByThisVerifier": 0,
+  "localLinksChecked": 305,
+  "checks": [
+    "unique IDs",
+    "start/accept/combined dependency DAGs",
+    "non-overlapping owned paths",
+    "case coverage",
+    "generated catalog consistency",
+    "task prompts",
+    "markdown fences",
+    "local links",
+    "UX/learning/runtime requirement mapping"
+  ],
+  "limitations": "Does not prove implementation, native compatibility, durability, performance, security or learning benefit. TypeScript compilation is a separate command.",
+  "artifacts": [
+    {
+      "path": "01-product-and-experience.zh-CN.md",
+      "bytes": 15810,
+      "sha256": "2c1dc6a14f1f36fc07592275635a9f119d1c93fcc68e129dfa408f9f2a03d24b"
+    },
+    {
+      "path": "02-architecture-and-reuse.zh-CN.md",
+      "bytes": 23982,
+      "sha256": "c047ace7aab6d7f11f043b32ec3905c9def8296bb2ca5060fe7aa2f525dd7d7f"
+    },
+    {
+      "path": "03-contracts-and-data.zh-CN.md",
+      "bytes": 20549,
+      "sha256": "1513f93befb88ed0a041f754483049c63789bc78a8c69133b47da9e2ed1bb577"
+    },
+    {
+      "path": "04-agent-runtime-and-extension.zh-CN.md",
+      "bytes": 21966,
+      "sha256": "ad45ed3254c7ed9f4c58fd76903a4f6156f66332f99429aec4710c1d1c477b0f"
+    },
+    {
+      "path": "05-reliability-and-operations.zh-CN.md",
+      "bytes": 11214,
+      "sha256": "a103b4e2a69c10ff658a9d336ebe43e5cb686982d93ad583770795e6ef4bac63"
+    },
+    {
+      "path": "06-learning-and-evaluation.zh-CN.md",
+      "bytes": 16093,
+      "sha256": "d4968fc196a2abf870c4dfcffa05d64e35a1f062cb39f5c30166508f71b2c4bc"
+    },
+    {
+      "path": "07-implementation-and-acceptance.zh-CN.md",
+      "bytes": 10501,
+      "sha256": "53217ddb08fdad11d1105cdc1a915932984c34ecf30314e50e6d064659797b04"
+    },
+    {
+      "path": "08-multi-agent-development.zh-CN.md",
+      "bytes": 6706,
+      "sha256": "ce9ef8224e25029fa7481d5881f66fce2203bb21081ded5010c0ed7e0700c5e5"
+    },
+    {
+      "path": "09-technology-and-evidence.zh-CN.md",
+      "bytes": 9532,
+      "sha256": "058d019106151ddbdc71bca7402b5b52d8bbc7f50c7b1ac4fd61a80da158778e"
+    },
+    {
+      "path": "FULL-BLUEPRINT.zh-CN.md",
+      "bytes": 145894,
+      "sha256": "cc94f136445281fa1357cf3824eabe1cca6925fe99f267e0ee19186d1f0040ce"
+    },
+    {
+      "path": "README.md",
+      "bytes": 9208,
+      "sha256": "d5ca22a848951da43c6dd11168da0f34c0ce5da34d749d882e87db3f18e9ec33"
+    },
+    {
+      "path": "acceptance-catalog.json",
+      "bytes": 33507,
+      "sha256": "78e8338fd8c6565ef1329b600cb1ebd7058e4afe0dc180a66b4b00beb4511237"
+    },
+    {
+      "path": "contracts/contracts.ts",
+      "bytes": 15297,
+      "sha256": "55e10172dbfb02af01e0b70b1eb0e635b088514c25cd53e5e703b1a04e92fcd7"
+    },
+    {
+      "path": "contracts/fixtures.ts",
+      "bytes": 3402,
+      "sha256": "8e74a8bbda71b8d7540a8c21b8d5016bec6b61cee0e72b6c017cfb914686eb32"
+    },
+    {
+      "path": "research/README.md",
+      "bytes": 1994,
+      "sha256": "5a37a2757103deef957b81875c942f9ee084d933a8600cc70861efe1e76b5a53"
+    },
+    {
+      "path": "research/observations.json",
+      "bytes": 1781,
+      "sha256": "ae12467d5f5526f07302f0ea95aedb64914bade02d0665514b7639aeffc09fe9"
+    },
+    {
+      "path": "reviews/core-reuse-review.md",
+      "bytes": 3917,
+      "sha256": "e5ea929c8687dcff7f3ea18bd7f9b45fe66f206af3820d306eb9e4ca2af503a9"
+    },
+    {
+      "path": "reviews/integrated-design-review.md",
+      "bytes": 2876,
+      "sha256": "dc74a9645fc3affc9a3afc46a4a13259a55232186f817055ba71d63966c2f25d"
+    },
+    {
+      "path": "reviews/runtime-review.md",
+      "bytes": 2574,
+      "sha256": "11417ac49cd6eb86540518d0d885242c441b64a61b7448d573936c9be025bf51"
+    },
+    {
+      "path": "tasks/README.md",
+      "bytes": 2676,
+      "sha256": "28a93ddaa376c1b4b490c83f058e4ec17009e87e866a85fb636b52bfae24c46b"
+    },
+    {
+      "path": "tasks/WP-00.md",
+      "bytes": 7264,
+      "sha256": "7ae69e46036c6739fc7b6b0f0af32a5e47c2cf915440b625c91f0c94f77bfd8f"
+    },
+    {
+      "path": "tasks/WP-01.md",
+      "bytes": 7695,
+      "sha256": "ad395f9d36d3ef9a7f5cff1c2a753d961d68f1ec585e6f9527c4fef4fb20b646"
+    },
+    {
+      "path": "tasks/WP-02.md",
+      "bytes": 7976,
+      "sha256": "fe5a0ca3f455d42195cda6f1eca45f13d9336979f1aadee1c5ae549e90f3018e"
+    },
+    {
+      "path": "tasks/WP-03.md",
+      "bytes": 8347,
+      "sha256": "1781efe3f159aa8ac8b435ddcfcccfca804fbe07a9e7b89d3fd1857020f428cd"
+    },
+    {
+      "path": "tasks/WP-04.md",
+      "bytes": 7190,
+      "sha256": "617bbfc5d6d5827d256884086e02764ed697cb7f13eb180e6e8984daba7cedd7"
+    },
+    {
+      "path": "tasks/WP-05.md",
+      "bytes": 7320,
+      "sha256": "9b5dac95ab898b757bf3c565af8d6ee984da735a02c8c3fd61c9b6441a4e8778"
+    },
+    {
+      "path": "tasks/WP-06.md",
+      "bytes": 7169,
+      "sha256": "389aa88ff439945529c911d1729f2fb99760ae8276c1e73916ce5c487285b5d6"
+    },
+    {
+      "path": "tasks/WP-07.md",
+      "bytes": 7226,
+      "sha256": "357fe1828ae21ffe9d4306eae0c6dde4c08edd6774b524ff3685f75d0bb8243d"
+    },
+    {
+      "path": "tasks/WP-08.md",
+      "bytes": 7389,
+      "sha256": "07c2d5194a50c7cb12789ccdd9d72a8b5ffb5267ccb145f30be01ae3493f833d"
+    },
+    {
+      "path": "tasks/WP-09.md",
+      "bytes": 7256,
+      "sha256": "e0947b27282b7333b983a90876060cd12dfa757ca7fd11ee2005635cd5b39945"
+    },
+    {
+      "path": "tasks/WP-10.md",
+      "bytes": 8131,
+      "sha256": "6f7eebf670fd1a9727a661bbd638666abd1f27128159704891ca436b9253c978"
+    },
+    {
+      "path": "tasks/WP-11.md",
+      "bytes": 7593,
+      "sha256": "5e098eb36d2b28ac43ca23d26832411298d60605a9b1608f14a513bcd5bd3c3d"
+    },
+    {
+      "path": "tasks/WP-12.md",
+      "bytes": 7375,
+      "sha256": "44ecc3eaf14e629ea0b6288745b38c03e77a91d6036c6b497414423ca6a3bd45"
+    },
+    {
+      "path": "tasks/WP-13.md",
+      "bytes": 7499,
+      "sha256": "72211755d035bce43ee11d19a105f2c288863e347ae4f88c2fe17c3492214b79"
+    },
+    {
+      "path": "tasks/WP-14.md",
+      "bytes": 8160,
+      "sha256": "b1fdf4f07b9fa95acce97c219d13e104be766a7e79c0c5cb1752ee7c1e868e45"
+    },
+    {
+      "path": "tasks/WP-15.md",
+      "bytes": 7178,
+      "sha256": "e4a77c1f39fcb8c67b2510c84d5bb7fc55fd291fdb50574883e444b653c0171c"
+    },
+    {
+      "path": "tasks/WP-16.md",
+      "bytes": 9197,
+      "sha256": "ece52497f6b03b38f6dd5463026be38c1a1fadabac9d90843adeec3f985e0757"
+    },
+    {
+      "path": "three-agent-dispatch.zh-CN.md",
+      "bytes": 10120,
+      "sha256": "bf860f5f646bcf66d32c745363f155b8ea9dc85b10bdc28e331200f82e43f80f"
+    },
+    {
+      "path": "tools/acceptance-source.mjs",
+      "bytes": 19990,
+      "sha256": "fd308c53e85454e3c5373975b04efa9e135f05c88598bf3027d6ba2627e34f02"
+    },
+    {
+      "path": "tools/generate-spec.mjs",
+      "bytes": 8502,
+      "sha256": "e3e0be44cc8b498b7febeb8f0f202c4e43c97c21308b96f0fb3c90d50c32d4fe"
+    },
+    {
+      "path": "tools/spec-structure.mjs",
+      "bytes": 403,
+      "sha256": "6591764968edcc1e08d7cb013809d5b82ee1a98281a5892a369c5d117ae23ee9"
+    },
+    {
+      "path": "tools/task-source.mjs",
+      "bytes": 29717,
+      "sha256": "3193f666a948302346e546ac0d251c2f8462a3595e1d04842511d080c9637e34"
+    },
+    {
+      "path": "tools/verify-spec.mjs",
+      "bytes": 7791,
+      "sha256": "0366aa5b108a537b61ee6d06cbdcb71c1b1911ed3ce1039ef6832b41fe615a39"
+    },
+    {
+      "path": "work-packages.json",
+      "bytes": 40741,
+      "sha256": "5eccf0a28d200154e05789b3e657662106e00cb46908df4b4c4c08644ba121e0"
+    },
+    {
+      "path": "../README.md",
+      "bytes": 3250,
+      "sha256": "0f3ba14e7a276c8817acc9ab7efec2a91d5097b87b3c70fc1ac56fac255b3d2f"
+    },
+    {
+      "path": "../AGENTS.md",
+      "bytes": 3592,
+      "sha256": "6ce70ddd5bbe2f4eff30bdb778e30b4de9bf226b4b593ea0d97fc0b823629950"
+    },
+    {
+      "path": "../START-HERE.zh-CN.md",
+      "bytes": 6691,
+      "sha256": "fe18741f0e0621ad7d867aef5df7870a336ba9a5076984e832290a0dec742672"
+    },
+    {
+      "path": "../agent-tasks/main.md",
+      "bytes": 1214,
+      "sha256": "cff82ff1c4cdf47a3bceba04c0b206ed4877746fdb26b589ed300f0b2411564b"
+    },
+    {
+      "path": "../agent-tasks/agent-a.md",
+      "bytes": 3061,
+      "sha256": "315af5a4142cfb54d4c948bd1772bd71cd4fd7baf78109d0793757194fef457e"
+    },
+    {
+      "path": "../agent-tasks/agent-b.md",
+      "bytes": 3365,
+      "sha256": "cafbcec93c4ca0f0c70ccdac277e08b0007f8b65f39ff03e6c8cfcf4de9ee1c5"
+    }
+  ]
+}

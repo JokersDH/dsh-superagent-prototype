@@ -3,3 +3,6 @@ lib/
 .artifacts/
 .env
 coverage/
+.DS_Store
+.local-state/
+product-spec/research/sources/

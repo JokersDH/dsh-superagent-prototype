@@ -1,0 +1,37 @@
+{
+  "asOf": "2026-11-07",
+  "scope": "Read-only metadata/source research. No native model task, app-server or production coordinator started.",
+  "referenceCoreCommit": "8c32a9dc5d72c033816c6a8110b37f40cf94fba4",
+  "referenceTests": {
+    "command": "./node_modules/.bin/vitest run tests/core-engine.spec.ts tests/stage.spec.ts",
+    "filesPassed": 2,
+    "testsPassed": 144,
+    "proves": "reference repository baseline only",
+    "doesNotProve": "independent extraction, native compatibility, product implementation or learning benefit"
+  },
+  "installed": {
+    "node": { "version": "24.21.0", "builtinSqliteObserved": "3.53.4" },
+    "codex": { "version": "0.164.0", "schemaFilesExported": 320, "nativeCompatibility": "NOT_TESTED" },
+    "dsh": { "version": "0.2.1-rc.2", "nativeCompatibility": "NOT_TESTED" },
+    "zcode": { "version": "0.16.5", "nativeCompatibility": "NOT_TESTED" }
+  },
+  "proposedNotInstalledOrTested": {
+    "node": "24.22.2",
+    "sqliteBinding": "better-sqlite3@13.0.3",
+    "pnpm": "11.7.0",
+    "minimumActualSqlite": "3.51.3"
+  },
+  "zcodePublicSource": {
+    "repository": "https://github.com/zai-org/ZCode",
+    "commit": "aac4755666d09fdcd70272fcf063c077a639015f",
+    "sourceCliPackageVersion": "0.1.0",
+    "moduleName": "zcode-protocol-v4",
+    "wireConstant": 3,
+    "projectionVersion": 1,
+    "status": "draft_unfrozen",
+    "matchesInstalled": "NOT_ESTABLISHED"
+  },
+  "acp": { "sdkSnapshot": "2.4.0", "defaultWire": "stable_v1", "v2": "separate_experimental_entrypoint", "registryIsProof": false, "tckIsCertification": false },
+  "cacLatestSubTeam": "source_unavailable_not_verified",
+  "noChanges": ["no credentials read", "no native profiles reset", "no dependencies installed", "no runtimes upgraded", "no production implementation"]
+}

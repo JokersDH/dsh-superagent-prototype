@@ -1,0 +1,1031 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-11-07",
+  "statusMeaning": "All cases are NOT_TESTED implementation requirements. Static spec verification is separate.",
+  "cases": [
+    {
+      "id": "CORE-01",
+      "layer": "core",
+      "gates": [
+        "G0"
+      ],
+      "given": "固定上游 commit 的最小 core 和两个测试文件",
+      "when": "在独立 package 运行并检查 runtime/type import graph",
+      "expected": "144-test baseline 保留且无 DSH 宿主依赖；MIT/来源齐全",
+      "evidence": "独立命令/lock/import graph/测试报告，不接受原仓报告替代",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "CORE-02",
+      "layer": "core",
+      "gates": [
+        "G1"
+      ],
+      "given": "个人模式 Ticket 没有 follows，worker 给出候选/ready",
+      "when": "尚无可信 Verification/必要人工接受",
+      "expected": "Ticket 不完成；legacy 模式保持原规则；正式通知不先宣称完成",
+      "evidence": "legacy 与个人模式对照测试及 Ticket/effect 快照",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "CORE-03",
+      "layer": "integration",
+      "gates": [
+        "G1",
+        "G2"
+      ],
+      "given": "候选已在验证，旧接受按钮仍可用",
+      "when": "新业务输入、原生恢复答案或新结果/重试竞争到达",
+      "expected": "同事务失效 generation；旧验证/接受被拒绝；答案不额外产生 core Input",
+      "evidence": "竞争调度测试、generation/effect/答案单次投递记录",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "CORE-04",
+      "layer": "integration",
+      "gates": [
+        "G1",
+        "G2"
+      ],
+      "given": "机器条件失败/缺失或人工条件未确认",
+      "when": "提交 CompletionProposal，包括空 criteria/全 optional/未登记 check",
+      "expected": "无空集合成功；必需验证和接受有真实路径，只有可信当前候选可完成",
+      "evidence": "schema 负例、失败验证、假 worker completion 和 gate 测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "CORE-05",
+      "layer": "core",
+      "gates": [
+        "G1"
+      ],
+      "given": "A1 已重试为 A2",
+      "when": "A1 report 到达并尝试走 legacy ticket-only 入口",
+      "expected": "产品入口拒绝旧 Assignment 修改 A2，审计仍保留",
+      "evidence": "带绑定新入口测试及旧 report fixture",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "CORE-06",
+      "layer": "integration",
+      "gates": [
+        "G1"
+      ],
+      "given": "旧 revision Ticket 已 ended，stop 对它 no-op",
+      "when": "旧 Thread/attach/resume 或旧 peer 消息到达",
+      "expected": "Source/Policy/完成入口拒绝旧版本复活，新版合同不受影响",
+      "evidence": "旧 ended/completed/stopped Ticket 矩阵与 intake 记录",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "CORE-07",
+      "layer": "core",
+      "gates": [
+        "G1"
+      ],
+      "given": "模型或 worker 文本声称用户授权",
+      "when": "试图创建 human Trigger/扩大 Mandate",
+      "expected": "可信 actor 不从正文获取；未授权新工作不接受",
+      "evidence": "provenance/gate 负例测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "CORE-08",
+      "layer": "integration",
+      "gates": [
+        "G1"
+      ],
+      "given": "core retry 创建新 pending Assignment，旧 writer 仍活",
+      "when": "新 launch effect 被执行",
+      "expected": "core 仍为唯一生命周期，新 begin 等待物理屏障",
+      "evidence": "core/lease/effect 时序报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "CORE-09",
+      "layer": "integration",
+      "gates": [
+        "G1",
+        "G2"
+      ],
+      "given": "同一 Work 提交新目标",
+      "when": "保存 v2、撤销 v1 后协调器重启",
+      "expected": "WorkId 保持、Mandate 不原地修改；屏障后才 intake 新 Ticket",
+      "evidence": "合同/Trigger/transition 可重入记录",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "CORE-10",
+      "layer": "integration",
+      "gates": [
+        "G1",
+        "G4"
+      ],
+      "given": "新增 Driver 和重建投影",
+      "when": "检查依赖/权威写入并重放事件",
+      "expected": "无第二 Work engine、vendor core 分支或 projection 回写 phase",
+      "evidence": "import/ownership 检查和删除缓存重建测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "DATA-01",
+      "layer": "schema",
+      "gates": [
+        "G0"
+      ],
+      "given": "公共 schema/类型/hash 和合法非法 fixtures",
+      "when": "生成并编译 TS/JSON，旧消费者读取",
+      "expected": "单一来源、身份/版本/required criteria 完整，旧消费者行为明确",
+      "evidence": "生成差异、typecheck、schema 负例和兼容报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "DATA-02",
+      "layer": "storage",
+      "gates": [
+        "G1"
+      ],
+      "given": "一次 create/revise/answer 命令",
+      "when": "在事务任一步失败或进程退出",
+      "expected": "core、索引、receipt、effect、event 全部提交或全部回滚",
+      "evidence": "真实 binding/子进程逐故障窗口数据库快照",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "DATA-03",
+      "layer": "storage",
+      "gates": [
+        "G1"
+      ],
+      "given": "相同 commandId/factId 重送和同 ID 不同 payload",
+      "when": "多次接收",
+      "expected": "语义相同去重，冲突拒绝；不重复派工/答案/事实",
+      "evidence": "receipt 唯一索引与重复/冲突集成测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "DATA-04",
+      "layer": "storage",
+      "gates": [
+        "G1"
+      ],
+      "given": "嵌套 core/product repository 调用",
+      "when": "内层/外层 rollback 与 afterCommit",
+      "expected": "使用同连接 savepoint；回滚 effect 不外发，afterCommit 仅正确提交触发",
+      "evidence": "连接身份/SQL/port 观察测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "DATA-05",
+      "layer": "storage",
+      "gates": [
+        "G1"
+      ],
+      "given": "artifact 写文件与 DB 引用跨失败窗口",
+      "when": "rename 前后崩溃、运行 GC",
+      "expected": "引用不指向半文件，活跃/备份引用不被删，orphan 宽限期清理",
+      "evidence": "文件 digest/引用/GC 测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "DATA-06",
+      "layer": "storage",
+      "gates": [
+        "G1"
+      ],
+      "given": "迁移有 checksum 和原子性定义",
+      "when": "重复/中断/损坏迁移输入",
+      "expected": "拒绝不一致，不误开旧应用 DB，不跳过失败迁移",
+      "evidence": "迁移矩阵、完整性报告和恢复步骤",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "DATA-07",
+      "layer": "integration",
+      "gates": [
+        "G1",
+        "G2"
+      ],
+      "given": "问题、答案、answer effect 与候选已存在",
+      "when": "提交答案并在 commit/派发间退出",
+      "expected": "答案先持久且至多一条合法投递通路，恢复后逐 target 状态准确",
+      "evidence": "Broker/DB/effects 故障注入证据",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "DATA-08",
+      "layer": "integration",
+      "gates": [
+        "G1",
+        "G3"
+      ],
+      "given": "UI/snapshot 与 events 并发",
+      "when": "在读取期间写入并删除投影缓存",
+      "expected": "一致 cursor、无事件缺口；Work 执行投影可由核心和物理事实重建",
+      "evidence": "并发 snapshot/SSE 和 projection rebuild 测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "RT-01",
+      "layer": "subprocess",
+      "gates": [
+        "G1"
+      ],
+      "given": "A1 retry 后 A2 当前",
+      "when": "旧 A1/epoch fact 迟到",
+      "expected": "不改变 A2；保留诊断事实",
+      "evidence": "子进程迟到事件和原子 fence 报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "RT-02",
+      "layer": "subprocess",
+      "gates": [
+        "G1",
+        "G2"
+      ],
+      "given": "policy 未准备或 fingerprint 不匹配",
+      "when": "收到 begin",
+      "expected": "业务不执行；cancel/诊断仍可处理",
+      "evidence": "native 请求计数和 gate evidence",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "RT-03",
+      "layer": "subprocess",
+      "gates": [
+        "G1",
+        "G2"
+      ],
+      "given": "模型等待或用户未答",
+      "when": "发 cancel",
+      "expected": "控制 pump 响应，不等待业务 Promise 完成",
+      "evidence": "带时间戳的独立控制通道测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "RT-04",
+      "layer": "subprocess",
+      "gates": [
+        "G1",
+        "G2"
+      ],
+      "given": "native 已受理但 ACK 丢失",
+      "when": "effect handler 遇到 EOF/超时后恢复",
+      "expected": "indeterminate/reconcile，不重复 begin/副作用",
+      "evidence": "原生计数器和持久 dispatch receipt",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "RT-05",
+      "layer": "subprocess",
+      "gates": [
+        "G1",
+        "G2"
+      ],
+      "given": "旧连接原生问题已回答",
+      "when": "新连接出现且旧答案迟到",
+      "expected": "不复用旧 RPC ID；numeric/string ID 无损区分，权限不自动重放",
+      "evidence": "connection epoch、43/\"43\"及精度拒绝/无损 fixtures",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "RT-06",
+      "layer": "subprocess",
+      "gates": [
+        "G1",
+        "G2"
+      ],
+      "given": "core stopped，writer 仍活",
+      "when": "收到 cancel ACK、迟到静止事实或停止超时",
+      "expected": "停止中直到物理证据；物理事实仍可更新，不复用写资源",
+      "evidence": "lease/进程身份/UI 投影时序",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "RT-07",
+      "layer": "subprocess",
+      "gates": [
+        "G1"
+      ],
+      "given": "progress 洪峰和 critical 队列压力",
+      "when": "同时有问题、结束和 cancel",
+      "expected": "关键事实有持久 receipt/保留容量，进度有界，无控制饥饿",
+      "evidence": "负载/内存/丢帧分类与延迟报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "RT-08",
+      "layer": "subprocess",
+      "gates": [
+        "G1",
+        "G4"
+      ],
+      "given": "binary 版本不变但 HMR/config 改变",
+      "when": "下一业务输入到来",
+      "expected": "准备失效，暂停业务派发并核对；不静默扩权",
+      "evidence": "fingerprint/version 对照测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "RT-09",
+      "layer": "subprocess",
+      "gates": [
+        "G2",
+        "G4"
+      ],
+      "given": "共享 service 上有两个 session",
+      "when": "取消本产品一个 session",
+      "expected": "只影响拥有资源，其他 session/service 存活",
+      "evidence": "ownership/取消/后台资源观察",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "RT-10",
+      "layer": "subprocess",
+      "gates": [
+        "G2"
+      ],
+      "given": "native end_turn 事件到达",
+      "when": "Driver 规范化并交 ingress",
+      "expected": "仅运行事实/候选，不能绕验证完成 Ticket",
+      "evidence": "native event/core gate 集成报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "API-01",
+      "layer": "integration",
+      "gates": [
+        "G2"
+      ],
+      "given": "讨论、明确委托、模型伪造用户分别到达",
+      "when": "调用 chat/create_work",
+      "expected": "讨论不自动启动建议，授权从可信入口取得，项目/anchor 固定",
+      "evidence": "Application/Reasoner proposal/gate tests",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "API-02",
+      "layer": "integration",
+      "gates": [
+        "G2"
+      ],
+      "given": "Reasoner 超时/离线",
+      "when": "用户查询、答问题、停止/暂停/接受",
+      "expected": "确定性入口可用且不等待模型",
+      "evidence": "故障 Reasoner 的 HTTP/CLI/E2E 测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "API-03",
+      "layer": "integration",
+      "gates": [
+        "G2"
+      ],
+      "given": "多个项目和相同标题 Work",
+      "when": "切换项目并回复锚定工作",
+      "expected": "不广播；anchor 冲突明确处理；历史消息保留发送时上下文",
+      "evidence": "并发项目切换/路由测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "API-04",
+      "layer": "integration",
+      "gates": [
+        "G2"
+      ],
+      "given": "原生问题被正常回答",
+      "when": "Application/Broker/Source 接线",
+      "expected": "只发结构化 answer，一份展示消息不产生重复 generic Input",
+      "evidence": "native delivery 计数和 provenance assertions",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "API-05",
+      "layer": "integration",
+      "gates": [
+        "G2",
+        "G3"
+      ],
+      "given": "本地恶意 Origin、任意路径、伪 actor 或过期版本",
+      "when": "提交写命令/下载 artifact",
+      "expected": "拒绝并给稳定错误，无敏感信息/路径逃逸",
+      "evidence": "Host/Origin/CSRF/path/schema 负例测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "API-06",
+      "layer": "integration",
+      "gates": [
+        "G3"
+      ],
+      "given": "主对话/决定有历史，Work 有候选或失败且尚无候选",
+      "when": "刷新、重开、SSE 重连/cursor_expired、分页后接受/重试/暂停或撤销决定",
+      "expected": "恢复消息/决定/操作上下文；旧 token/候选拒绝，无候选也可合法重试；不重新派发原任务",
+      "evidence": "snapshot/message/knowledge paging/SSE/action context 端到端报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-01",
+      "layer": "fault",
+      "gates": [
+        "G1"
+      ],
+      "given": "事务提交前后两个退出窗口",
+      "when": "kill coordinator 后重启同 command",
+      "expected": "未提交不半接单，已提交继续原 effect 而非重建工作",
+      "evidence": "故障矩阵与真实 DB",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-02",
+      "layer": "fault",
+      "gates": [
+        "G1"
+      ],
+      "given": "effect claim 和外部 dispatch 之间退出",
+      "when": "恢复队列",
+      "expected": "可证 not_sent 才重发；未知先 reconcile，不无界付费重试",
+      "evidence": "原生计数/receipt/queue 状态",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-03",
+      "layer": "fault",
+      "gates": [
+        "G1"
+      ],
+      "given": "同 state 第二实例和 PID 复用",
+      "when": "并发启动/陈旧锁恢复",
+      "expected": "唯一 writer；PID/租约过期不冒充死亡证明",
+      "evidence": "锁/nonce/启动身份/DB 连接报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-04",
+      "layer": "fault",
+      "gates": [
+        "G1"
+      ],
+      "given": "coordinator 崩溃但 Runner/native 还活",
+      "when": "新 coordinator 恢复",
+      "expected": "重新核对绑定，不重复 start，不无条件 assignmentInterrupted",
+      "evidence": "runner/service 存活和业务计数",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-05",
+      "layer": "fault",
+      "gates": [
+        "G1"
+      ],
+      "given": "Runner journal 存在 gap 或容量耗尽",
+      "when": "恢复 critical 流",
+      "expected": "只声明收到的事实，缺口 unknown；容量不足停止新受理",
+      "evidence": "journal/ring/disk-limit 测试",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-06",
+      "layer": "fault",
+      "gates": [
+        "G1"
+      ],
+      "given": "旧 writer 不明，新 revision 等待",
+      "when": "尝试新目录继续写远端",
+      "expected": "禁止重复外部写，仅受证实限制的只读/patch-only 可接续",
+      "evidence": "资源/外部动作计数与 gate 拒绝证据",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-07",
+      "layer": "fault",
+      "gates": [
+        "G1"
+      ],
+      "given": "协议拆帧/UTF-8/未知通知/大帧/EOF",
+      "when": "在真实子进程流中注入",
+      "expected": "有界解析，稳定错误，不把 stderr 文本当业务事实",
+      "evidence": "framing/size/exit/timeout fixtures",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-08",
+      "layer": "performance",
+      "gates": [
+        "G1"
+      ],
+      "given": "固定硬件2项目4 attempts，合成进度峰值",
+      "when": "测控制记录/问题投影/队列",
+      "expected": "达到校准预算或明确未达；关键事实不丢、内存/队列有上限",
+      "evidence": "p50/p95/硬件/负载/内存/限制报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-09",
+      "layer": "integration",
+      "gates": [
+        "G2"
+      ],
+      "given": "用户 dirty 工作区和共享 git metadata",
+      "when": "创建/冻结/释放 scratch workspace",
+      "expected": "不 reset 用户内容；worktree 不被宣称安全沙箱",
+      "evidence": "原目录内容/diff 与 resource manifest",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-10",
+      "layer": "integration",
+      "gates": [
+        "G2"
+      ],
+      "given": "候选验证中被修改或子任务成功集成失败",
+      "when": "执行必需检查/用户接受",
+      "expected": "不以旧摘要完成；产物/criteria/environment digest 对齐",
+      "evidence": "失败/竞争/缺依赖验证报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-11",
+      "layer": "soak",
+      "gates": [
+        "G3"
+      ],
+      "given": "48h 固定场景循环且含关闭/重启/取消",
+      "when": "测未决问题、资源、重复执行、增长",
+      "expected": "无静默丢关键状态/无重复业务；报告所有失败和增长",
+      "evidence": "soak 场景/时间序列/版本/故障日志",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "REL-12",
+      "layer": "release",
+      "gates": [
+        "G3"
+      ],
+      "given": "磁盘不足、登录失效、模型不可用",
+      "when": "继续读/答/停并导出诊断",
+      "expected": "有界降级、保留已接工作、原生登录路径明确、不泄露材料",
+      "evidence": "降级/E2E/日志脱敏报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "OPS-01",
+      "layer": "release",
+      "gates": [
+        "G0",
+        "G3"
+      ],
+      "given": "锁定 Node/binding/pnpm/OS/arch 组合",
+      "when": "加载 native binding、查询 engine、安装/启动",
+      "expected": "实际版本满足 admission，prebuild 真可用；不静默切 binding",
+      "evidence": "release manifest、native-load/SQLite 检查",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "OPS-02",
+      "layer": "release",
+      "gates": [
+        "G3"
+      ],
+      "given": "网页关闭或 daemon/CLI stop",
+      "when": "重开/退出并核对资源",
+      "expected": "网页不拥有后台生命；stop 超时如实报告未静止资源",
+      "evidence": "CLI/进程/浏览器 E2E",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "OPS-03",
+      "layer": "release",
+      "gates": [
+        "G3"
+      ],
+      "given": "WAL 活跃且 artifact 被引用",
+      "when": "backup 到新目录 restore 后 reconcile",
+      "expected": "一致快照完整、integrity/foreign_key 通过、不自动重发业务",
+      "evidence": "备份 manifest/hash/恢复演练",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "OPS-04",
+      "layer": "release",
+      "gates": [
+        "G3"
+      ],
+      "given": "升级前后 schema 和新数据",
+      "when": "迁移失败/旧二进制回滚",
+      "expected": "限制说明明确，备份恢复可行，不覆盖升级后数据冒充无损",
+      "evidence": "迁移矩阵、rollback rehearsal、数据对账",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "OPS-05",
+      "layer": "release",
+      "gates": [
+        "G3"
+      ],
+      "given": "模拟 secrets/headers/私有正文在诊断输入",
+      "when": "导出并检查日志",
+      "expected": "默认脱敏/限定范围、raw wire 关闭、不自动上传",
+      "evidence": "redaction fixtures 和导出预览",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "OPS-06",
+      "layer": "release",
+      "gates": [
+        "G3"
+      ],
+      "given": "产品安装与可选自动启动",
+      "when": "升级/卸载/保留状态",
+      "expected": "只管理本产品登记项，用户项目和原生 agent 数据不被删",
+      "evidence": "安装矩阵与路径/服务变更报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "NATIVE-01",
+      "layer": "native",
+      "gates": [
+        "G2",
+        "G4"
+      ],
+      "given": "锁定 Codex profile/CLI/Driver/schema/config/OS",
+      "when": "跑 identity/auth/policy/turn/question/permission/decline/cancel/recovery/EOF smoke",
+      "expected": "required cases 全有原生证据；写出与消费区分，未测不算支持",
+      "evidence": "semantic-map/source-lock/goldens/native.json/recovery.md/费用",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "NATIVE-02",
+      "layer": "native",
+      "gates": [
+        "G2",
+        "G4"
+      ],
+      "given": "锁定 ACP SDK stable v1 与 DSH profile/runtime/config",
+      "when": "跑协商/问题/权限/拒绝/取消/恢复及 HMR smoke",
+      "expected": "不将 SDK JSON-RPC 当 ACP，不 reset profile；required 能力真实通过",
+      "evidence": "SDK入口/profile/bundle/patch manifest、native 报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "NATIVE-03",
+      "layer": "native",
+      "gates": [
+        "G2",
+        "G4"
+      ],
+      "given": "ZCode 安装版与 source/schema 对齐或有明确缺口",
+      "when": "跑 projection/interaction/policy/stop/background/recovery smoke",
+      "expected": "准备原生权限后 begin；未对齐保持实验，不宣称稳定兼容",
+      "evidence": "安装身份/wire/projection/schema/source-lock 与 native 报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "EXT-01",
+      "layer": "integration",
+      "gates": [
+        "G4"
+      ],
+      "given": "能力 advertised true 但 test FAIL，配置有漂移",
+      "when": "选择该 agent 执行要求该能力的任务",
+      "expected": "required gate 拒绝，UI 精确呈现 readiness，不静默豁免",
+      "evidence": "Catalog/应用/UI 能力矩阵",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "EXT-02",
+      "layer": "integration",
+      "gates": [
+        "G4",
+        "G6"
+      ],
+      "given": "新增真实不同协议 Driver",
+      "when": "接入完整任务并回归已有目标",
+      "expected": "core/Broker/UI 无厂商分支；契约变化走 RFC；按实际改动报告成本",
+      "evidence": "修改路径、工时、RFC、contract/native/E2E 回归",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "EXT-03",
+      "layer": "integration",
+      "gates": [
+        "G4"
+      ],
+      "given": "同协议另一个真实产品 Profile",
+      "when": "用已有 Driver 接入并检验 required features",
+      "expected": "主要以 Profile/fixtures 扩展，协议差异不伪装 JSON 配置",
+      "evidence": "Profile diff 与真实能力报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "EXT-04",
+      "layer": "native",
+      "gates": [
+        "G6"
+      ],
+      "given": "CAC 实际 interface 可获得且父授权可验证",
+      "when": "sub-team 派工、ask-user、取消和越界消息",
+      "expected": "主内核唯一，peer 不伪造 human，子范围/问题/取消可追溯",
+      "evidence": "CAC source-lock、授权负例和真实子团队报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-01",
+      "layer": "e2e",
+      "gates": [
+        "G2"
+      ],
+      "given": "主对话讨论和明确委托",
+      "when": "分别发送",
+      "expected": "建议不被自动全量执行，委托可形成目标/范围",
+      "evidence": "用户流程录制和命令/Ticket 记录",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-02",
+      "layer": "e2e",
+      "gates": [
+        "G2"
+      ],
+      "given": "Reasoner 不可用",
+      "when": "查询、回答、停止",
+      "expected": "仍可确定性完成，不依赖模型",
+      "evidence": "故障 Reasoner Playwright/CLI 报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-03",
+      "layer": "e2e",
+      "gates": [
+        "G2"
+      ],
+      "given": "工作修订且有旧 Ticket",
+      "when": "刷新和重建投影",
+      "expected": "WorkId 稳定，phase 来自核心/物理事实",
+      "evidence": "revision/Ticket/投影映射",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-04",
+      "layer": "e2e",
+      "gates": [
+        "G2"
+      ],
+      "given": "两项目同名工作",
+      "when": "切换/回复/清除 anchor",
+      "expected": "不串台，归属可见且可纠正",
+      "evidence": "路由 assertions 与界面截图",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-05",
+      "layer": "e2e",
+      "gates": [
+        "G2"
+      ],
+      "given": "澄清、权限、认证和未知 review",
+      "when": "主入口回答和复用",
+      "expected": "业务答案有条件共享，原生授权逐请求；表单无品牌解析",
+      "evidence": "QuestionPresentation/逐 target 记录",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-06",
+      "layer": "e2e",
+      "gates": [
+        "G2"
+      ],
+      "given": "旧 writer 不静止",
+      "when": "修订/停止/暂停后续派工",
+      "expected": "不假报已切换/已停；pause 不假装暂停当前工具",
+      "evidence": "UI/lease/core 对照时序",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-07",
+      "layer": "e2e",
+      "gates": [
+        "G2"
+      ],
+      "given": "子任务成功但整体检查失败",
+      "when": "查看结果/接受",
+      "expected": "显示未通过，过期候选不能交付完成",
+      "evidence": "Verification 与 UI 同步证据",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-08",
+      "layer": "e2e",
+      "gates": [
+        "G3"
+      ],
+      "given": "无知识库/学习且只一个合格执行器",
+      "when": "首次配置到第一项真实任务",
+      "expected": "正常交付；不要求全库导入/实验设置",
+      "evidence": "首次使用 native E2E 和人工主动用时",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-09",
+      "layer": "e2e",
+      "gates": [
+        "G3"
+      ],
+      "given": "安装、认证、兼容、能力状态不相同",
+      "when": "查看/选择执行器",
+      "expected": "分别呈现，不用一个绿灯替代，不让不合格目标 begin",
+      "evidence": "状态矩阵与截图",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-10",
+      "layer": "e2e",
+      "gates": [
+        "G3"
+      ],
+      "given": "讨论/输入/问题/结果已保存",
+      "when": "重开/重启后回答旧问题",
+      "expected": "恢复主对话和结果，旧答案不唤醒停止工作",
+      "evidence": "message paging/SSE/native binding E2E",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-11",
+      "layer": "e2e",
+      "gates": [
+        "G3",
+        "G5"
+      ],
+      "given": "明确决定与推断策略并存",
+      "when": "记录、查看、暂停/撤回",
+      "expected": "决定即时有范围，推断变化可控且不冒充决定",
+      "evidence": "来源/版本/控制命令/UI 证据",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-UX-12",
+      "layer": "e2e",
+      "gates": [
+        "G3"
+      ],
+      "given": "桌面/笔记本/390宽窄屏，长文本/错误",
+      "when": "键盘委托/回答并接收进度",
+      "expected": "无重叠溢出，焦点不被抢，屏幕阅读不重复播报",
+      "evidence": "Playwright 截图/键盘/可访问性报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-01",
+      "layer": "integration",
+      "gates": [
+        "G3",
+        "G5"
+      ],
+      "given": "明确长期声明和一次人工编辑",
+      "when": "记录、重启、分页查看、撤销并构建上下文",
+      "expected": "前者立即规范生效且可恢复/撤销，后者不自动全局化",
+      "evidence": "可信来源/范围/候选与决定、KnowledgePage 和撤销对照",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-02",
+      "layer": "integration",
+      "gates": [
+        "G3",
+        "G5"
+      ],
+      "given": "原始介入和解释 v1",
+      "when": "解释被纠正成 v2",
+      "expected": "原输入和前后目标/产物引用不被覆盖",
+      "evidence": "不可变记录/provenance tests",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-03",
+      "layer": "evaluation",
+      "gates": [
+        "G3",
+        "G5"
+      ],
+      "given": "混合纠错/增需求和未知反馈",
+      "when": "解释并选择长期处理",
+      "expected": "允许多标签/unknown，证据不足不强制推广",
+      "evidence": "反例集与解释/推广记录",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-04",
+      "layer": "evaluation",
+      "gates": [
+        "G3",
+        "G5"
+      ],
+      "given": "旧目标正确，用户改新要求",
+      "when": "比较旧新目标下结果",
+      "expected": "不把旧方案因新目标记错，真实修订走应用屏障",
+      "evidence": "配对目标/标注/应用动作报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-05",
+      "layer": "evaluation",
+      "gates": [
+        "G5"
+      ],
+      "given": "git fork 但工具/服务未恢复",
+      "when": "做反事实重放及原动作对照",
+      "expected": "不标完整恢复；R0–R3 与 placebo/限制真实报告",
+      "evidence": "环境 manifest、重复匹配/原动作结果",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-06",
+      "layer": "integration",
+      "gates": [
+        "G3",
+        "G5"
+      ],
+      "given": "candidate/testing/shadow 和 active 策略",
+      "when": "构建真实上下文/动作",
+      "expected": "前三者零影响，仅有效 active 可进入；shadow 只记录假设",
+      "evidence": "ContextBuilder/action selection 负例及字节/引用差异",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-07",
+      "layer": "integration",
+      "gates": [
+        "G3",
+        "G5"
+      ],
+      "given": "活动 Assignment 与策略升级/撤回",
+      "when": "创建新执行和暂停学习",
+      "expected": "当前快照冻结，后续采用受控，规范变化走修订；撤回不声称消除已发生副作用",
+      "evidence": "policy snapshot/控制/影响记录",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-08",
+      "layer": "integration",
+      "gates": [
+        "G2",
+        "G5"
+      ],
+      "given": "多个 worker 等待同一业务决定和另一个权限请求",
+      "when": "联合提问/答案复用",
+      "expected": "逐 target 可见且不合并授权；总人工成本包含返工",
+      "evidence": "Broker delivery 与团队评测轨迹",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-09",
+      "layer": "evaluation",
+      "gates": [
+        "G5"
+      ],
+      "given": "新方法和不学习/局部/规则/研究强基线",
+      "when": "固定反馈/actor/工具/预算比较",
+      "expected": "复现与启发改编区分，无额外反馈/算力不公平",
+      "evidence": "预声明 baseline/预算/配置/完整结果",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-10",
+      "layer": "evaluation",
+      "gates": [
+        "G5"
+      ],
+      "given": "低误推广但几乎不学的方案",
+      "when": "比较质量/覆盖/伤害/费用",
+      "expected": "不单凭低误推广获胜，负迁移和风险覆盖同时报告",
+      "evidence": "risk-coverage/质量/成本及反例报告",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-11",
+      "layer": "evaluation",
+      "gates": [
+        "G5"
+      ],
+      "given": "人同时管理多个并行任务",
+      "when": "计算人工/墙钟/等待/返工/费用",
+      "expected": "人工区间并集不重复，未知费用不计零，代理误差说明",
+      "evidence": "时间区间样例、统计脚本和校准研究",
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "AC-LRN-12",
+      "layer": "evaluation",
+      "gates": [
+        "G3",
+        "G5"
+      ],
+      "given": "按项目/任务族/时间划分材料，含私有内容",
+      "when": "生成候选与评分",
+      "expected": "隐藏测试不可被候选改动，采集范围受限，缺失证据 unknown",
+      "evidence": "数据/权限/留出 manifest 与审计记录",
+      "status": "NOT_TESTED"
+    }
+  ]
+}
