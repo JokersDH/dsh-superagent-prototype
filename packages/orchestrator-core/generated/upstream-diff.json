@@ -1,0 +1,154 @@
+{
+  "upstream": "https://github.com/deepseek-ai/dsh-superagent-prototype",
+  "commit": "8c32a9dc5d72c033816c6a8110b37f40cf94fba4",
+  "files": [
+    {
+      "path": "LICENSE",
+      "upstreamSha256": "6d66f91815b720e18cfb2b3552043a0359236aec9a1a6917787900546f6ce550",
+      "currentSha256": "6d66f91815b720e18cfb2b3552043a0359236aec9a1a6917787900546f6ce550",
+      "treatment": "verbatim",
+      "reason": "Unmodified upstream source/test/license."
+    },
+    {
+      "path": "src/core/assignments.ts",
+      "upstreamSha256": "6acf4b858b35d95c875680e39b1e3c41557bbe6d39f65031bb26927289327065",
+      "currentSha256": "f0896da17c224dab2ecb086ca65c91947fdb88b05eeafc9113ee5687784b4e55",
+      "treatment": "adapted",
+      "reason": "Scoped reports/read ACKs, candidate lifecycle and verified-mode ready behavior."
+    },
+    {
+      "path": "src/core/engine.ts",
+      "upstreamSha256": "bd9a4caff834859877d1a08ccddebc990d0e1ca568674b80f9d59ce5adcac827",
+      "currentSha256": "90984519dcf57aef0c427ec883a10bf097ff77517e5e34ba9fd801777ad17337",
+      "treatment": "adapted",
+      "reason": "Additive scoped facts/completion entry points and frozen runtime facade."
+    },
+    {
+      "path": "src/core/errors.ts",
+      "upstreamSha256": "aa7532a2d1f8c443608683ef1231bf3d81b842f67a87d9b77742b5c76d515009",
+      "currentSha256": "5d9169f5cb52ee3fe132c2f796992154c60fde44fa6cb11d0cff77f42686c1ab",
+      "treatment": "adapted",
+      "reason": "Stable errors for scoped execution, stale candidates and failed verification."
+    },
+    {
+      "path": "src/core/evals.ts",
+      "upstreamSha256": "38916de24ec6e1a27118dd5d7a7efa67bf7a2dfdbab26fb59d377516269e2fc8",
+      "currentSha256": "38916de24ec6e1a27118dd5d7a7efa67bf7a2dfdbab26fb59d377516269e2fc8",
+      "treatment": "verbatim",
+      "reason": "Unmodified upstream source/test/license."
+    },
+    {
+      "path": "src/core/ids.ts",
+      "upstreamSha256": "bc4bc6fd43ea1377087ff2815706c57f0200666aeb4a7711a40489c377f141ab",
+      "currentSha256": "bc4bc6fd43ea1377087ff2815706c57f0200666aeb4a7711a40489c377f141ab",
+      "treatment": "verbatim",
+      "reason": "Unmodified upstream source/test/license."
+    },
+    {
+      "path": "src/core/index.ts",
+      "upstreamSha256": "a5a1cf43f02eafaf520a5bfaf5e76b71ba521d04ee648cfcf12b3843cc474a3e",
+      "currentSha256": "d9ee781f30fefc2a60c88c733431660206f1463fb4f0ccccf1eaee7cd7334d2a",
+      "treatment": "adapted",
+      "reason": "Public completion ports/digest helpers and scoped roles."
+    },
+    {
+      "path": "src/core/intake.ts",
+      "upstreamSha256": "323aadefea69436ba23ed2de3bdbaad673d61915be9e239f3233ecf551a74179",
+      "currentSha256": "b0e43a4860463a1f974a713a3955d9c76e2d6b693e1e9329d5e87276ead0230b",
+      "treatment": "adapted",
+      "reason": "Do not fan out to ended, retired or stale personal tickets."
+    },
+    {
+      "path": "src/core/memory.ts",
+      "upstreamSha256": "36cefca987a4e533369a414e52e3fb4754945ae942bb021f8e5cf23c186cf536",
+      "currentSha256": "36cefca987a4e533369a414e52e3fb4754945ae942bb021f8e5cf23c186cf536",
+      "treatment": "verbatim",
+      "reason": "Unmodified upstream source/test/license."
+    },
+    {
+      "path": "src/core/model.ts",
+      "upstreamSha256": "982155fe6a03c887a7ac4475c6d1592d12aa23c5fe3698403c93bbfd6469d44a",
+      "currentSha256": "45750f82aea49a48a4a35a3ddcb10c976c658fa2f8f92859d36bc22b29684388",
+      "treatment": "adapted",
+      "reason": "Optional personal completion lifecycle metadata; legacy fields preserved."
+    },
+    {
+      "path": "src/core/part.ts",
+      "upstreamSha256": "437c4f4bcc05e836c056cdb45bbf451e55242d62b602b489f4df902be112e73e",
+      "currentSha256": "3a6853ebe470db22c50967d70ef7dab12ba71c8ad6dc4419944b867dd2ca0666",
+      "treatment": "adapted",
+      "reason": "Trusted completion ports, current-contract owner filtering and candidate invalidation."
+    },
+    {
+      "path": "src/core/ports.ts",
+      "upstreamSha256": "0b44f1cd716d64776b0e3ea74a158cf0effd92e763b1b13c7705e766e9225a43",
+      "currentSha256": "68fc92efcba0c874a82f8703ec074c0ba17d0d8146d6725281a36aa85a425c15",
+      "treatment": "adapted",
+      "reason": "Additive completion/retirement domain events; Repositories/Executor stay compatible."
+    },
+    {
+      "path": "src/core/reasons.ts",
+      "upstreamSha256": "dc29e0c3c52e4ffd6e8f27a618cbe704a83fdbd9c5a1b99a1e0c4184d5c33af4",
+      "currentSha256": "dc29e0c3c52e4ffd6e8f27a618cbe704a83fdbd9c5a1b99a1e0c4184d5c33af4",
+      "treatment": "verbatim",
+      "reason": "Unmodified upstream source/test/license."
+    },
+    {
+      "path": "src/core/replies.ts",
+      "upstreamSha256": "5a8821a1b9d951d2255709543e0be762c6d3204bca07a77ff17c7bfe82ba66f4",
+      "currentSha256": "c56b9037275ccc310104bc0a84c5d0d7860792894d486a4005909fa0e86c9639",
+      "treatment": "adapted",
+      "reason": "Only verified personal results can be formally delivered; retain withdrawal IDs."
+    },
+    {
+      "path": "src/core/stage.ts",
+      "upstreamSha256": "b935012a654d2a68ca20cb27909ddc8dceafb704b56a16a23a08036a546141df",
+      "currentSha256": "ce4f9d0334360ef96da29ac37896e139154720e55625c3537b0b7578bf96431e",
+      "treatment": "adapted",
+      "reason": "Retired personal tickets cannot be retried."
+    },
+    {
+      "path": "src/core/tickets.ts",
+      "upstreamSha256": "1d9f964ad34b54cbb0403bde16af58851e5e80111177ce73a27b6034e9af940e",
+      "currentSha256": "eb604bd1a107ccd6158fcc0ab52faa4062f59ef4ff168774114e2d38906de640",
+      "treatment": "adapted",
+      "reason": "Opt-in creation, invalidation, personal resume restrictions and completion defense."
+    },
+    {
+      "path": "tests/core-engine.spec.ts",
+      "upstreamSha256": "e29358c139a2dbb1a2877e980e043f34cf39bca1905fb10ee14e0b4866bc1a6b",
+      "currentSha256": "e29358c139a2dbb1a2877e980e043f34cf39bca1905fb10ee14e0b4866bc1a6b",
+      "treatment": "verbatim",
+      "reason": "Unmodified upstream source/test/license."
+    },
+    {
+      "path": "tests/stage.spec.ts",
+      "upstreamSha256": "3df130eae87d70643f0c924caf66fbca8cb27ced50467e0c7283dee0a39436be",
+      "currentSha256": "3df130eae87d70643f0c924caf66fbca8cb27ced50467e0c7283dee0a39436be",
+      "treatment": "verbatim",
+      "reason": "Unmodified upstream source/test/license."
+    }
+  ],
+  "added": [
+    {
+      "path": "src/core/completion-model.ts",
+      "sha256": "9228aede0b781e1861698ae546c394f77383d86ca4c04141282a0333a2ee6947"
+    },
+    {
+      "path": "src/core/completion-state.ts",
+      "sha256": "0309064ed844e1c153ca5e50571c1ba1259a6f4896f8891368a124a74029f987"
+    },
+    {
+      "path": "src/core/completion.ts",
+      "sha256": "1e62cf92f05e0e052c08082d676de67384e02430e8bd09e0a39de3ec874c44ae"
+    },
+    {
+      "path": "src/core/personal.ts",
+      "sha256": "c6d736d42844a7cabb5dc8973ee95af4dee1dec18ef1f640b86590ce761ab883"
+    },
+    {
+      "path": "src/index.ts",
+      "sha256": "edd7af5fb984a215a73e63dbf9f203aaf9e8a736dbe50e1ae0134e8a6d5a2f6e"
+    }
+  ]
+}

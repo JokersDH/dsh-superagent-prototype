@@ -1,0 +1,51 @@
+{
+  "status": "PASS_CORE_AND_CONTRACTS_ONLY",
+  "contractIdentity": {
+    "version": "1.0.0",
+    "schemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d"
+  },
+  "coreTests": 178,
+  "originalBaselineTests": 144,
+  "newCoreTests": 34,
+  "dependencies": {
+    "status": "PASS",
+    "runtimeFiles": [
+      "core/assignments.js",
+      "core/completion-state.js",
+      "core/completion.js",
+      "core/engine.js",
+      "core/errors.js",
+      "core/evals.js",
+      "core/ids.js",
+      "core/index.js",
+      "core/intake.js",
+      "core/memory.js",
+      "core/model.js",
+      "core/part.js",
+      "core/personal.js",
+      "core/ports.js",
+      "core/reasons.js",
+      "core/replies.js",
+      "core/stage.js",
+      "core/tickets.js",
+      "index.js"
+    ],
+    "runtimeExternals": [
+      "node:crypto"
+    ],
+    "typeFilesChecked": 290,
+    "productContractTypes": true,
+    "dshHostTypes": false,
+    "parser": "typescript@6.0.3"
+  },
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "arch": "arm64",
+  "recordedAt": "2026-11-07T09:22:24.219Z",
+  "pending": [
+    "WP-02 real storage/effect integration",
+    "WP-03 actual subprocess/writer barriers and recovery integration",
+    "A complete G1 gate report",
+    "Native agent compatibility and product E2E"
+  ]
+}

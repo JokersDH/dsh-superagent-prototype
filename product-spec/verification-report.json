@@ -1,10 +1,10 @@
 {
   "result": "PASS_SPEC_STATIC_ONLY",
-  "checkedAt": "2026-11-07T08:20:59.468Z",
+  "checkedAt": "2026-11-07T09:58:00.193Z",
   "taskCount": 17,
   "acceptanceRequirementCount": 83,
   "runtimeTestsExecutedByThisVerifier": 0,
-  "localLinksChecked": 316,
+  "localLinksChecked": 326,
   "checks": [
     "unique IDs",
     "start/accept/combined dependency DAGs",
@@ -25,8 +25,8 @@
     },
     {
       "path": "02-architecture-and-reuse.zh-CN.md",
-      "bytes": 24306,
-      "sha256": "5852efb9e047b3c55b66f757a597eb613539920ea918ae471f54208e65c077bb"
+      "bytes": 24599,
+      "sha256": "fe6ae37aff507bd0c522f86aca8d66ba96dc646f16ee048ea83f8d4b6d88ed53"
     },
     {
       "path": "03-contracts-and-data.zh-CN.md",
@@ -65,13 +65,13 @@
     },
     {
       "path": "FULL-BLUEPRINT.zh-CN.md",
-      "bytes": 147408,
-      "sha256": "a9b81f4a189fe10997710b8d0308f8bb74c634515a5c4169199ca379f9c1482a"
+      "bytes": 148307,
+      "sha256": "aa92b48e116397e20bb078e91cf63ce92a676e0a92abde0a0656a05a0e1b86b7"
     },
     {
       "path": "README.md",
-      "bytes": 9539,
-      "sha256": "9ac7d24e7be498925238ba720f264c23058d47da15e84af9f137d93c17817335"
+      "bytes": 10145,
+      "sha256": "410df90c28e8f22cc9cc7e0710e3ba6af24f6a0c3d69ad82ce9595849d7d4b87"
     },
     {
       "path": "acceptance-catalog.json",
@@ -245,13 +245,13 @@
     },
     {
       "path": "../AGENTS.md",
-      "bytes": 4637,
-      "sha256": "6f646ca2d381c0f9ea3a7f7c4a69b97c3a003b826146455b75867a53470f2d29"
+      "bytes": 5157,
+      "sha256": "9535e23b07be1fb5d70b69645827556af184c372fe13450983f6fe40f3f2e830"
     },
     {
       "path": "../START-HERE.zh-CN.md",
-      "bytes": 7083,
-      "sha256": "80c277c75ab1a1f910b51e3d9d41a88ec46c8245c8bea37c904c77a5510917d5"
+      "bytes": 7786,
+      "sha256": "95bb98c4893e9f0426fbb949dfb93040d193fb194236b3dfb3da3d8604d22a43"
     },
     {
       "path": "../agent-tasks/main.md",

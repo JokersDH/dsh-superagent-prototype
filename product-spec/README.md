@@ -92,7 +92,11 @@ pa start / pa status / pa doctor / pa backup / pa stop
 
 设计调研阶段运行的原仓 144 个测试仅作为 reference baseline。随后 G0 已完成：Agent A 的独立提取/144 测试和 AST 复核，主 Agent 的单一来源契约包/183 测试/独立构建，Agent B 在打包补正后的 darwin-arm64 目标组合/30 探针与独立复验。当前 G0 结论和范围见 [交接报告](../docs/adr/bootstrap/g0-main-report.md)。
 
-尚未实现生产协调器、核心完成/fence 扩展、正式 Store/Runner，也未启动原生 agent 模型任务或学习实验。原生产品版本/协议调研依然不代表接入通过，其他平台保持 NOT_TESTED。
+G1 已交付正式 core 的候选/可信完成、Assignment-scoped report/read、当前版本/退役守卫，以及共享 workspace/检查入口；见 [G1 交接](../docs/adr/core/g1-core-handoff.md)。core 178 项和契约 183 项测试通过，真实 Store/Runner 联调尚未通过，因此整体 G1 仍在进行。
+
+尚未实现完整产品协调器，也未运行原生 agent 模型任务或学习实验。原生产品版本/协议调研依然不代表接入通过，未实际执行的平台能力保持 NOT_TESTED。
+
+A/B 首批交付的联调补测已开始：真实 SQLite 的 core 回放 178 项通过；7 项锁、异步事务、命令身份和停止保证未通过，见 [验收记录](../docs/adr/core/g1-integration-review.md)。未将这些失败当作整体 G1 通过，修复仍由原模块 owner 在其分支完成。
 
 文档一致性检查：`node product-spec/tools/verify-spec.mjs`。公共类型检查命令见 07。这些检查只证明规格内部一致和草案可编译，不证明产品稳定性或学习收益。
 
