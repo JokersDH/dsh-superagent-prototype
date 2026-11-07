@@ -27,7 +27,7 @@ const report = {
   status: 'PASS_PRODUCTION_STORAGE_AND_CONTROLLED_FAKE_PROCESS_SLICE', tests,
   contractIdentity: { version: identity.version, schemaHash: identity.schemaHash },
   node: process.version, platform: process.platform, architecture: process.arch, recordedAt: new Date().toISOString(), results,
-  notProven: ['Full G1 crash/reconnect/durable journal admission', 'Per-attempt resource/authority invariants assigned to Agent A next batch', 'Strict question/answer fixture coverage and persistent replay assigned to Agent B next batch', 'Vendor Driver compatibility, real native permissions or model task', 'Usable UI/HTTP personal-assistant product'],
+  notProven: ['Full G1 crash/reconnect/durable journal admission', 'IPC-authenticated reconnect to an independent live Runner', 'Complete resource-barrier and external-side-effect reconciliation', 'Vendor Driver compatibility, real native permissions or model task', 'Usable UI/HTTP personal-assistant product'],
 };
 mkdirSync(resolve(root, 'reports/releases'), { recursive: true });
 writeFileSync(resolve(root, 'reports/releases/g1-production-runtime.json'), JSON.stringify(report, null, 2) + '\n');

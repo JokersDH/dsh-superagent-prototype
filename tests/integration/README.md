@@ -48,3 +48,9 @@ Tests include current/known Runner identity, full tuple, immutable kind/value pa
 `pnpm check:g1-production` builds the actual product packages, strictly typechecks runtime source/tests, and runs `production-runtime.case.mjs`. It connects a disposable real fake-Agent process through Runner/Supervisor and the strict bound ingress to actual binding history, content-addressed payloads, event/fact receipts and core. No `review_ingress_*` schema is used in this suite.
 
 Five cases cover fact ACK/reopen/no duplicate begin, logical-stop-before-physical-cleanup with late exit retention, atomic config-drift candidate invalidation/hold/reconcile, rollback on the final receipt write, and current policy revocation despite an enabled contract. Initial intake/resource registration/prepared policy are explicit fixtures; this is not vendor permission proof or complete G1 crash recovery. See the production handoff for pending owner tasks.
+
+## Fact Recovery
+
+`pnpm check:g1-recovery` runs the five production cases, seven recovery cases and two real SIGKILL windows. The recovery worker uses one real fake-Agent child, a synced test decoder snapshot and actual SQLite. Restoring missing payloads precedes authoritative record admission; no second begin is issued. The tests explicitly do not certify the candidate Journal writer or reconnect to an independent live Runner.
+
+To examine candidate file-format interoperability separately, use `node tools/bootstrap/check-journal-interop.mjs --runtime /clean/candidate/checkout --record`. To review its durability/integrity/receipt admission, use `node tools/bootstrap/review-journal.mjs --runtime /clean/candidate/checkout --record`; this currently exits nonzero for four owner fixes. The two reports have different scopes and cannot substitute for one another.

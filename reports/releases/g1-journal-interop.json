@@ -1,0 +1,25 @@
+{
+  "status": "PASS_VALID_SNAPSHOT_INTEROP_ONLY",
+  "runtimeCommit": "24b4449bd9c09097c3144e345fb0ac939cf99f91",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "cases": [
+    {
+      "case": "actual candidate journal format restores missing payload then reuses the committed receipt",
+      "status": "PASS"
+    },
+    {
+      "case": "historical physical evidence survives while late business is refused",
+      "status": "PASS"
+    },
+    {
+      "case": "main preflight refuses the candidate writer same-ID conflict before admission",
+      "status": "PASS"
+    }
+  ],
+  "limitations": [
+    "Does not approve FileCriticalJournal durability/corrupt append/ACK semantics",
+    "Uses candidate writer only in a disposable review environment",
+    "No native command, process reconnect or complete G1 admission"
+  ]
+}

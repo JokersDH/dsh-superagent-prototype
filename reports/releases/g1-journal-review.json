@@ -1,0 +1,49 @@
+{
+  "status": "BLOCKED_JOURNAL_ADMISSION",
+  "runtimeCommit": "24b4449bd9c09097c3144e345fb0ac939cf99f91",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "cases": [
+    {
+      "id": "JOURNAL-DURABLE-APPEND",
+      "passesInvariant": false,
+      "observed": {
+        "fsyncCallsBeforeAppendReturned": 0
+      }
+    },
+    {
+      "id": "JOURNAL-CORRUPT-APPEND",
+      "passesInvariant": false,
+      "observed": {
+        "corruptAt": 0,
+        "appendRefused": false,
+        "recoveredFactIdsAfterAppend": []
+      }
+    },
+    {
+      "id": "JOURNAL-SAME-ID-CONFLICT",
+      "passesInvariant": false,
+      "observed": {
+        "conflictRefused": false,
+        "replay": {
+          "replayed": 1,
+          "duplicates": 1,
+          "refused": 0,
+          "failures": []
+        }
+      }
+    },
+    {
+      "id": "JOURNAL-AUTHORITATIVE-ACK",
+      "passesInvariant": false,
+      "observed": {
+        "receiptRefused": false,
+        "returnedReceipt": {
+          "factId": "fact-1",
+          "persisted": false,
+          "seq": 1
+        }
+      }
+    }
+  ]
+}

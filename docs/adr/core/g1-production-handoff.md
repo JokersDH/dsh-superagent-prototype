@@ -2,6 +2,8 @@
 
 Date: 2026-11-07. **The reviewed fixes and this integration slice pass. Full G1 recovery admission is still pending the next A/B batches.**
 
+Later update: A `247339b` and B's strict payload/isolation batch are integrated, and main's fact recovery plus two SIGKILL windows pass. B's separate Journal candidate has four remaining admission failures. See [g1-recovery-handoff.md](g1-recovery-handoff.md); the below counts preserve this earlier handoff's scope.
+
 ## Current Acceptance
 
 Inputs reviewed independently: A `a8d7f10` (already integrated as `dee7fb5`), B `40ae102` (now merged for integration). Both initial and follow-up reproduction scripts pass at those revisions. No A/B active worktree was edited.
