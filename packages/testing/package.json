@@ -1,0 +1,22 @@
+{
+  "name": "@personal-agent/testing",
+  "version": "0.0.0-g1",
+  "private": true,
+  "type": "module",
+  "description": "G1/WP-03 test doubles: programmable fake native agent, reference fake Driver, in-memory stores and fixtures. Not a vendor compatibility claim.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/driver-kit": "workspace:*",
+    "@personal-agent/execution": "workspace:*"
+  }
+}

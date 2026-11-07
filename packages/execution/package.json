@@ -1,0 +1,21 @@
+{
+  "name": "@personal-agent/execution",
+  "version": "0.0.0-g1",
+  "private": true,
+  "type": "module",
+  "description": "G1/WP-03 execution orchestration: AttemptSupervisor, resource leases, fenced critical-fact ingress. Core/storage wiring is deliberately out of scope for this batch.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/driver-kit": "workspace:*"
+  }
+}
