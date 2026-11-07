@@ -1,0 +1,10 @@
+{
+  "extends": "../../apps/coordinator/tsconfig.json",
+  "compilerOptions": { "noEmit": true },
+  "include": [
+    "../../packages/driver-kit/src/**/*.ts", "../../packages/driver-kit/test/**/*.ts",
+    "../../packages/execution/src/**/*.ts", "../../packages/execution/test/**/*.ts",
+    "../../packages/testing/src/**/*.ts", "../../packages/testing/test/**/*.ts",
+    "../../apps/runner/src/**/*.ts", "../../apps/runner/test/**/*.ts"
+  ]
+}

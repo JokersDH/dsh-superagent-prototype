@@ -96,7 +96,7 @@ G1 已交付正式 core 的候选/可信完成、Assignment-scoped report/read�
 
 尚未实现完整产品协调器，也未运行原生 agent 模型任务或学习实验。原生产品版本/协议调研依然不代表接入通过，未实际执行的平台能力保持 NOT_TESTED。
 
-A/B 首批交付的原始 7 项阻断复现现已通过；后续新增的 5 项边界仍未通过。主 Agent 已交付严格事实入口，18 项确定性和 7 项真实 SQLite 测试通过，见 [交接](../docs/adr/core/g1-ingress-handoff.md)。生产 binding/IPC/恢复仍待接线，不代表整体 G1 通过；原模块 owner 继续处理补充修复。
+两轮阻断复现现已通过。最新 A 存储 54 项、B 运行时 98 项测试通过；事实入口 25 项及生产仓储＋受控假子进程的 5 项集成测试通过，见 [最新交接](../docs/adr/core/g1-production-handoff.md)。下一批 A 做运行状态/当前授权/资源观察，B 做严格载荷/每 attempt 隔离/持久 Journal。完整 G1 的崩溃重连和资源恢复仍未完成，不将这些局部结果作为产品完成。
 
 文档一致性检查：`node product-spec/tools/verify-spec.mjs`。公共类型检查命令见 07。这些检查只证明规格内部一致和草案可编译，不证明产品稳定性或学习收益。
 

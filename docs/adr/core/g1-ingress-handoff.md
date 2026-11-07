@@ -2,6 +2,8 @@
 
 Date: 2026-11-07. **Ingress interface and review-fixture scope accepted; full G1 remains pending production wiring and follow-up owner fixes.**
 
+Later update: owner fixes in A `a8d7f10` / B `40ae102` now pass both reproduction suites; the first actual production-store/controlled-process adapter is implemented. See [g1-production-handoff.md](g1-production-handoff.md) for the current acceptance and next tasks. The below text preserves the earlier version-scoped review.
+
 ## Main-Agent Delivery
 
 `apps/coordinator/runtime-ingress.ts` implements the authoritative admission module described by ADR 0004. It consumes a trusted bound Runner identity, validates the immutable kind/value payload and SHA-256, and applies known/current binding, Assignment/contract/authority and receipt checks inside one synchronous outer transaction.

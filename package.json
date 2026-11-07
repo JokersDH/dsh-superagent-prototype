@@ -54,7 +54,8 @@
     "check:spec": "node product-spec/tools/verify-spec.mjs --check",
     "check:g0": "node tools/bootstrap/freeze-g0.mjs --check",
     "check:g1-core": "node tools/bootstrap/check-g1-core.mjs",
-    "check:g1-ingress": "node tools/bootstrap/check-g1-ingress.mjs"
+    "check:g1-ingress": "node tools/bootstrap/check-g1-ingress.mjs",
+    "check:g1-production": "node tools/bootstrap/check-g1-production.mjs"
   },
   "engines": {
     "node": "^22.19.0 || >=24.0.0",

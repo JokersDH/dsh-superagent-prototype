@@ -6,7 +6,7 @@
 
 G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契约 183 项测试通过；[G1 核心交接](docs/adr/core/g1-core-handoff.md) 明确接口与剩余联调。整体 G1 尚未通过，等待 A 的存储和 B 的运行时接线。
 
-最新验收：core 已通过真实 SQLite 的 178 项回放；事实入口新增 25 项测试通过，其中 7 项使用真实 SQLite。A/B 的原先 7 项阻断复现已通过，另有 5 项边界仍未通过。当前任务见 [补充修复指令](agent-tasks/g1-followup-review.md)，交接范围见 [事实入口交接](docs/adr/core/g1-ingress-handoff.md)。未通过的执行路径没有启用为产品。
+最新验收：两轮阻断复现均已通过；A 存储 54 项、B 运行时 98 项、事实入口 25 项，以及新的真实存储＋受控假进程 5 项测试通过。整体 G1 仍待持久 Journal/崩溃重连/资源状态恢复，见 [最新交接](docs/adr/core/g1-production-handoff.md)。当前分别执行 [A 下一批](agent-tasks/g1-agent-a-runtime-state.md) 和 [B 下一批](agent-tasks/g1-agent-b-durable-runner.md)。
 
 [JokersDH/dsh-superagent-prototype](https://github.com/JokersDH/dsh-superagent-prototype) 是后续方案 B 的交付仓库。架构、试验和正式实现都提交到这个仓库。
 
@@ -32,6 +32,7 @@ G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契
 | `tools/reuse-spike/platform/` | Agent B 的运行时/SQLite 探针和报告 | 补齐漏交 helper 后，G0 平台探针独立复核通过 |
 | `packages/contracts/` | 公共运行时 schema/生成类型/JSON Schema/版本哈希 | G0 v1 已实现，183 项测试和独立 package 检查通过 |
 | `apps/coordinator/runtime-ingress.ts` | 事实严格准入、身份/去重和单事务 interface | 已通过 25 项测试；生产 binding/IPC 仍待接线 |
+| `apps/coordinator/stored-ingress.ts` | 实际仓储/事实回执/core 的组合适配 | 新增 5 项受控进程集成测试通过；完整恢复待下一批 |
 | `packages/orchestrator-core/` | 正式提取及最小扩展后的 core | 已实现第一批：legacy 144 + 新守卫 34 项测试 |
 | `packages/storage/`、`effects/`、`execution/` 等 | 新产品各后端模块（均位于 packages 下） | 按后续任务包实现 |
 | `apps/coordinator/`、`apps/runner/`、`apps/console/`、`apps/cli/` | 新产品后台、受控 Runner、网页、CLI | 按后续任务包实现 |

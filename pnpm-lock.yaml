@@ -132,6 +132,9 @@ importers:
       '@personal-agent/orchestrator-core':
         specifier: workspace:*
         version: link:../../packages/orchestrator-core
+      '@personal-agent/storage':
+        specifier: workspace:*
+        version: link:../../packages/storage
     devDependencies:
       '@types/node':
         specifier: 24.10.0
@@ -139,6 +142,18 @@ importers:
       typescript:
         specifier: 6.0.3
         version: 6.0.3
+
+  apps/runner:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@personal-agent/driver-kit':
+        specifier: workspace:*
+        version: link:../../packages/driver-kit
+      '@personal-agent/execution':
+        specifier: workspace:*
+        version: link:../../packages/execution
 
   packages/contracts:
     dependencies:
@@ -159,6 +174,12 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
 
+  packages/driver-kit:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+
   packages/effects:
     devDependencies:
       '@types/node':
@@ -167,6 +188,15 @@ importers:
       typescript:
         specifier: 6.0.3
         version: 6.0.3
+
+  packages/execution:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@personal-agent/driver-kit':
+        specifier: workspace:*
+        version: link:../driver-kit
 
   packages/orchestrator-core:
     dependencies:
@@ -208,6 +238,18 @@ importers:
       typescript:
         specifier: 6.0.3
         version: 6.0.3
+
+  packages/testing:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@personal-agent/driver-kit':
+        specifier: workspace:*
+        version: link:../driver-kit
+      '@personal-agent/execution':
+        specifier: workspace:*
+        version: link:../execution
 
 packages:
 

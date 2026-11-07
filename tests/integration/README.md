@@ -35,8 +35,16 @@ node tools/bootstrap/review-g1-followup.mjs --storage /absolute/storage-review -
 
 That command intentionally fails while the follow-up issues remain. The process-group review fixture cleans its owned resources; it never runs a vendor agent/model. A passing positive suite does not erase new safety failures.
 
+The follow-up suite now passes on A `a8d7f10` and B `40ae102`; its report records those exact reviewed inputs. Future failures must stay visible rather than being overwritten with an earlier passing revision's result.
+
 ## Authoritative Fact Ingress
 
 `pnpm check:g1-ingress` builds contracts/core/effects/storage, strictly typechecks the composition module, and executes its deterministic and native SQLite ingress suites. The SQLite tests create only `review_ingress_*` fixture tables in temporary databases. They use real core, UnitOfWork, FactReceipts, EventLog and effect queue; production runtime binding/history/resources/migrations are still storage-owner work.
 
 Tests include current/known Runner identity, full tuple, immutable kind/value payload digests, exact replay after restart/revocation, same-ID conflict, stale bindings during async payload reads, physical observations after retirement and receipt-INSERT failure rolling back core/observations/effects/event. This does not enable the runtime under review or claim full G1/IPC/native compatibility.
+
+## Actual Production Repositories And Controlled Child
+
+`pnpm check:g1-production` builds the actual product packages, strictly typechecks runtime source/tests, and runs `production-runtime.case.mjs`. It connects a disposable real fake-Agent process through Runner/Supervisor and the strict bound ingress to actual binding history, content-addressed payloads, event/fact receipts and core. No `review_ingress_*` schema is used in this suite.
+
+Five cases cover fact ACK/reopen/no duplicate begin, logical-stop-before-physical-cleanup with late exit retention, atomic config-drift candidate invalidation/hold/reconcile, rollback on the final receipt write, and current policy revocation despite an enabled contract. Initial intake/resource registration/prepared policy are explicit fixtures; this is not vendor permission proof or complete G1 crash recovery. See the production handoff for pending owner tasks.
