@@ -19,6 +19,8 @@ import {
 import type { FactSink } from '../../../packages/execution/src/contracts.ts'
 import { BoundedJournal, StderrRing, journalCoverage } from './journal.ts'
 import type { FileCriticalJournal } from './file-journal.ts'
+import { factDigest } from './file-journal.ts'
+import { DurableReceiptSchema } from '../../../packages/contracts/src/schemas.ts'
 import { ProcessHost, type ProcessHostOptions } from './process-host.ts'
 
 export type RunnerOptions = {
@@ -195,10 +197,12 @@ export class AttemptRunner {
       }
     }
 
-    // 2. Authoritative ACK. A receipt is only propagated once the sink reports persisted.
+    // 2. Authoritative ACK. A receipt is only propagated once the sink proves persistence for
+    //    exactly this fact; a local spool is not platform acceptance.
     const receipt = await this.#factSink.record(fact)
+    const validated = validateReceipt(receipt, fact.factId)
     this.journal.commitCritical(fact.factId, fact.kind)
-    return receipt
+    return validated
   }
 }
 
@@ -238,14 +242,20 @@ export type ReplayResult = {
 
 export async function replayJournal(spool: FileCriticalJournal, sink: FactSink): Promise<ReplayResult> {
   const result: ReplayResult = { replayed: 0, duplicates: 0, refused: 0, failures: [] }
-  const seen = new Set<string>()
+  const seen = new Map<string, string>()
   for (const entry of spool.entries()) {
-    if (seen.has(entry.fact.factId)) {
-      // The same factId written twice in the spool is one immutable fact.
+    const identity = factDigest(entry.fact, entry.payload)
+    const known = seen.get(entry.fact.factId)
+    if (known !== undefined) {
+      if (known !== identity) {
+        // Same id, different body: facts are immutable, so this is a failure, not a duplicate.
+        result.failures.push({ factId: entry.fact.factId, reason: 'fact_conflict' })
+        continue
+      }
       result.duplicates += 1
       continue
     }
-    seen.add(entry.fact.factId)
+    seen.set(entry.fact.factId, identity)
     try {
       await sink.record(entry.fact)
       result.replayed += 1
@@ -261,4 +271,20 @@ export async function replayJournal(spool: FileCriticalJournal, sink: FactSink):
     }
   }
   return result
+}
+
+/**
+ * A sink receipt is authoritative only when the frozen schema accepts it, it names the same fact and
+ * it claims persistence. Anything else (including `persisted: false`) is refused, never propagated.
+ */
+export function validateReceipt(receipt: unknown, factId: string): DurableReceipt {
+  const parsed = DurableReceiptSchema.safeParse(receipt)
+  if (!parsed.success) {
+    throw new DriverError('state_indeterminate', 'invalid_receipt', `Sink returned an invalid receipt for ${factId}: ${parsed.error.message}`)
+  }
+  if (parsed.data.factId !== factId) {
+    throw new DriverError('state_indeterminate', 'invalid_receipt', `Sink receipt names ${parsed.data.factId}, expected ${factId}`)
+  }
+  // `persisted` is a literal `true` in the schema, so reaching here already proves it.
+  return parsed.data
 }

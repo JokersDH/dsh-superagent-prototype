@@ -102,7 +102,7 @@ test('journal: a corrupt record stops recovery and is reported with its offset',
 test('journal: capacity exhaustion refuses the fact instead of dropping it', async () => {
   const dir = await tempDir()
   // One record is a few hundred bytes; this bound fits a couple and then refuses.
-  const journal = new FileCriticalJournal({ path: join(dir, 'critical.journal'), maxBytes: 900 })
+  const journal = new FileCriticalJournal({ path: join(dir, 'critical.journal'), maxBytes: 900, maxRecordBytes: 900 })
   await journal.open()
   let appended = 0
   let rejected: DriverError | undefined
@@ -120,7 +120,7 @@ test('journal: capacity exhaustion refuses the fact instead of dropping it', asy
   assert.equal(rejected.reason, 'journal_capacity_exhausted')
   assert.ok(appended > 0)
   // Everything that was accepted must still be readable.
-  const reopened = new FileCriticalJournal({ path: journal.path, maxBytes: 900 })
+  const reopened = new FileCriticalJournal({ path: journal.path, maxBytes: 900, maxRecordBytes: 900 })
   const recovery = await reopened.open()
   assert.equal(recovery.entries.length, appended)
   reopened.close()
@@ -161,21 +161,39 @@ test('replay: resends only facts and is idempotent across repeated replays', asy
   reopened.close()
 })
 
-test('replay: a duplicate factId inside the spool is sent once', async () => {
+test('replay: an exact duplicate factId is de-duplicated at append and sent once', async () => {
+  const dir = await tempDir()
+  const journal = new FileCriticalJournal({ path: join(dir, 'critical.journal') })
+  await journal.open()
+  const first = journal.append(fact('f1'), payload('f1'))
+  const second = journal.append(fact('f1'), payload('f1'))
+  journal.close()
+
+  assert.equal(first.duplicate, false)
+  assert.equal(second.duplicate, true, 'an identical body is idempotent, not a second record')
+  assert.equal(second.seq, first.seq)
+
+  const reopened = new FileCriticalJournal({ path: journal.path })
+  const recovery = await reopened.open()
+  assert.equal(recovery.entries.length, 1, 'only one immutable record exists on disk')
+  const sink = new InMemoryFactLedger()
+  const result = await replayJournal(reopened, sink)
+  assert.equal(result.replayed, 1)
+  assert.equal(sink.count, 1)
+  reopened.close()
+})
+
+test('replay: a conflicting body under one factId is a failure, never a silent duplicate', async () => {
   const dir = await tempDir()
   const journal = new FileCriticalJournal({ path: join(dir, 'critical.journal') })
   await journal.open()
   journal.append(fact('f1'), payload('f1'))
-  journal.append(fact('f1'), payload('f1'))
+  // A different body under the same id is refused: a factId names one immutable body.
+  assert.throws(
+    () => journal.append(fact('f1'), { ...payload('f1'), value: { ...(payload('f1').value as object), nativeTurnRef: 'different' } }),
+    error => (error as { reason?: string }).reason === 'journal_fact_conflict',
+  )
   journal.close()
-
-  const reopened = new FileCriticalJournal({ path: journal.path })
-  await reopened.open()
-  const sink = new InMemoryFactLedger()
-  const result = await replayJournal(reopened, sink)
-  assert.equal(result.duplicates, 1)
-  assert.equal(sink.count, 1)
-  reopened.close()
 })
 
 test('replay: a stale-epoch fact is refused as business, not retried', async () => {

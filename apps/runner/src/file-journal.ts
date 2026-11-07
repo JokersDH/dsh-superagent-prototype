@@ -1,25 +1,34 @@
 /**
- * FileCriticalJournal — a bounded, crash-safe on-disk spool for critical facts (WP-03 batch 2).
+ * FileCriticalJournal — a bounded, crash-safe on-disk spool for critical facts (WP-03).
  *
- * Format: append-only JSON Lines, one record per line, each prefixed with a length and checksum so a
- * torn tail is detectable and repairable:
+ * Record framing (one record per line):
+ *   `<8 hex length> <space> <16 hex digest> <space> <json> <\n>`
  *
- *   <8 hex length> <16 hex crc-ish checksum> <json>\n
+ * Durability:
+ * - every append performs a **complete write loop** (short writes are retried until the whole
+ *   record is on the file) followed by `fsync` on the file descriptor before it returns;
+ * - creating the file and repairing a torn tail also `fsync` the file and, when the directory entry
+ *   is new, the containing directory, so the record and its metadata reach stable storage together.
+ *   This is a same-machine durability guarantee, not a claim about power-loss behaviour that was
+ *   never measured.
  *
- * Recovery rules:
- * - a record whose prefix or body is incomplete (crash mid-write) is a **partial tail**; it is
- *   truncated on open and reported, never replayed;
- * - a record whose checksum does not match is corrupt: recovery stops at it and reports the offset;
- * - the file is bounded by `maxBytes`; when the next append would exceed it, `append()` fails with
- *   `journal_capacity_exhausted` so the Runner can stop accepting business input instead of silently
- *   dropping a critical fact.
+ * Integrity and fail-closed rules:
+ * - a record whose prefix/body is incomplete is a **partial tail**: it is truncated on open (and the
+ *   directory synced) and reported, never replayed;
+ * - a record whose digest does not match is **corruption**: `open()` reports `corruptAt` and the
+ *   journal becomes permanently **read-only**, because appending after an unreadable record would
+ *   silently extend a broken prefix and make `bytes`/`seq` disagree with the file;
+ * - all sizes are bounded: a record larger than `maxRecordBytes`, a length prefix beyond the file, or
+ *   a file larger than `maxBytes` fails instead of allocating.
  *
- * The journal stores the fact **and its immutable payload**, so a fact can be replayed with the same
- * `factId`/`payloadRef`/identity after a crash without any in-memory state.
+ * Immutability:
+ * - a `factId` names exactly one immutable body. Appending the same id with a different identity,
+ *   `payloadRef` or payload is a conflict. Only an exact duplicate is de-duplicated (and reported).
+ *   The same rule is applied when recovering an existing file and when replaying.
  */
+import { closeSync, existsSync, fsyncSync, openSync, readSync, statSync, truncateSync, writeSync } from 'node:fs'
+import { mkdir, open as openAsync, stat } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
-import { closeSync, existsSync, openSync, readSync, statSync, truncateSync, writeSync } from 'node:fs'
-import { mkdir, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { CriticalFact } from '../../../packages/contracts/src/types.ts'
 import { DriverError } from '../../../packages/driver-kit/src/index.ts'
@@ -40,6 +49,8 @@ export type JournalRecovery = {
   partialTailBytes: number
   /** Offset of the first corrupt record, when one was found. */
   corruptAt: number | null
+  /** True when the journal refused to enter append mode (corruption or size limit). */
+  readOnly: boolean
   /** Largest sequence recovered; a new append continues from here (never restarts at 1). */
   lastSeq: number
   bytes: number
@@ -48,26 +59,53 @@ export type JournalRecovery = {
 
 export type FileJournalOptions = {
   path: string
+  /** Maximum file size. Default 8 MiB. */
   maxBytes?: number
+  /** Maximum size of a single record. Default 1 MiB. */
+  maxRecordBytes?: number
   now?: () => string
 }
 
-const PREFIX_LENGTH = 8 + 1 + 16 + 1 // "<len> <sum> "
+const PREFIX_LENGTH = 8 + 1 + 16 + 1 // "<len> <digest> "
 const DEFAULT_MAX_BYTES = 8 * 1024 * 1024
+const DEFAULT_MAX_RECORD_BYTES = 1024 * 1024
+
+/** Stable identity of a fact body: everything except the mutable-looking bookkeeping is included. */
+export function factDigest(fact: CriticalFact, payload: unknown): string {
+  const canonical = JSON.stringify({ fact: sortKeys(fact), payload: sortKeys(payload) })
+  return createHash('sha256').update(canonical).digest('hex')
+}
+
+function sortKeys(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sortKeys)
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .filter(([, item]) => item !== undefined)
+      .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+    return Object.fromEntries(entries.map(([key, item]) => [key, sortKeys(item)]))
+  }
+  return value
+}
 
 export class FileCriticalJournal {
   readonly #path: string
   readonly #maxBytes: number
+  readonly #maxRecordBytes: number
   readonly #now: () => string
+  readonly #identities = new Map<string, string>()
   #fd: number | undefined
   #seq = 0
   #bytes = 0
+  #readOnly = false
   #closed = false
 
   constructor(options: FileJournalOptions) {
     this.#path = options.path
     this.#maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES
+    this.#maxRecordBytes = options.maxRecordBytes ?? DEFAULT_MAX_RECORD_BYTES
     this.#now = options.now ?? (() => new Date().toISOString())
+    if (this.#maxBytes <= 0) throw new RangeError('maxBytes must be positive')
+    if (this.#maxRecordBytes <= 0 || this.#maxRecordBytes > this.#maxBytes) throw new RangeError('maxRecordBytes must be positive and <= maxBytes')
   }
 
   get path(): string {
@@ -82,29 +120,73 @@ export class FileCriticalJournal {
     return this.#maxBytes
   }
 
+  get maxRecordBytes(): number {
+    return this.#maxRecordBytes
+  }
+
   get lastSeq(): number {
     return this.#seq
   }
 
+  get readOnly(): boolean {
+    return this.#readOnly
+  }
+
   /** Open (or create) the journal, recovering entries and repairing a partial tail. */
   async open(): Promise<JournalRecovery> {
+    const existed = existsSync(this.#path)
     await mkdir(dirname(this.#path), { recursive: true })
-    const recovery = existsSync(this.#path) ? await recoverFile(this.#path, this.#maxBytes) : emptyRecovery(this.#maxBytes)
-    this.#fd = openSync(this.#path, 'a')
+    const recovery = existed ? await this.#recover() : emptyRecovery(this.#maxBytes)
+    for (const entry of recovery.entries) this.#identities.set(entry.fact.factId, factDigest(entry.fact, entry.payload))
     this.#seq = recovery.lastSeq
     this.#bytes = recovery.bytes
+    this.#readOnly = recovery.readOnly
+
+    this.#fd = openSync(this.#path, this.#readOnly ? 'r' : 'a')
+    if (!existed) {
+      // A newly created file: its directory entry must be durable before records are appended.
+      fsyncSync(this.#fd)
+      await syncDirectory(dirname(this.#path))
+    }
     return recovery
   }
 
   /**
-   * Append one critical fact with its payload. A failed append never advances the sequence, so a
-   * retry writes the same logical record.
+   * Append one critical fact with its payload.
+   *
+   * Returns the stored entry. Throws (never silently drops) when:
+   * - the journal is read-only because of corruption;
+   * - the same `factId` already maps to a different body;
+   * - the record or the file would exceed its bound.
+   *
+   * An exact duplicate of an already stored fact is a no-op reported via `duplicate: true`, so a
+   * retry of the same logical write stays idempotent.
    */
-  append(fact: CriticalFact, payload: unknown): JournalEntry {
+  append(fact: CriticalFact, payload: unknown): JournalEntry & { duplicate: boolean } {
     if (this.#closed) throw new DriverError('state_indeterminate', 'journal_closed', 'Journal is closed')
     if (this.#fd === undefined) throw new DriverError('state_indeterminate', 'journal_not_open', 'Journal is not open')
+    if (this.#readOnly) {
+      throw new DriverError('state_indeterminate', 'journal_corrupt_read_only', 'Journal contains a corrupt record; appending would extend a broken prefix')
+    }
+
+    const identity = factDigest(fact, payload)
+    const known = this.#identities.get(fact.factId)
+    if (known !== undefined) {
+      if (known !== identity) {
+        throw new DriverError(
+          'state_indeterminate',
+          'journal_fact_conflict',
+          `factId ${fact.factId} already names a different body; facts are immutable`,
+        )
+      }
+      return { fact, payload, seq: this.#seq, at: this.#now(), duplicate: true }
+    }
+
     const entry: JournalEntry = { fact, payload, seq: this.#seq + 1, at: this.#now() }
     const line = encodeRecord(entry)
+    if (line.length > this.#maxRecordBytes) {
+      throw new DriverError('state_indeterminate', 'journal_record_too_large', `Record of ${line.length} bytes exceeds ${this.#maxRecordBytes}`)
+    }
     if (this.#bytes + line.length > this.#maxBytes) {
       throw new DriverError(
         'state_indeterminate',
@@ -112,66 +194,126 @@ export class FileCriticalJournal {
         `Journal holds ${this.#bytes} of ${this.#maxBytes} bytes; refusing to drop a critical fact`,
       )
     }
-    writeSync(this.#fd, line)
+
+    writeAll(this.#fd, line)
+    // Durable before returning: the caller may ACK the fact immediately after this call.
+    fsyncSync(this.#fd)
+
     this.#seq = entry.seq
     this.#bytes += line.length
-    return entry
+    this.#identities.set(fact.factId, identity)
+    return { ...entry, duplicate: false }
   }
 
   /** Read every intact entry (used by replay and by tests). */
   entries(): JournalEntry[] {
-    return this.#fd === undefined ? [] : readEntriesSync(this.#path, this.#maxBytes).entries
+    return this.#fd === undefined ? [] : readEntriesSync(this.#path, this.#maxBytes, this.#maxRecordBytes).entries
   }
 
   close(): void {
     if (this.#closed) return
     this.#closed = true
     if (this.#fd !== undefined) {
+      try {
+        fsyncSync(this.#fd)
+      } catch {
+        // closing a read-only handle needs no sync
+      }
       closeSync(this.#fd)
       this.#fd = undefined
     }
   }
+
+  async #recover(): Promise<JournalRecovery> {
+    const size = (await stat(this.#path)).size
+    if (size === 0) return emptyRecovery(this.#maxBytes)
+    if (size > this.#maxBytes) {
+      // Never allocate an unbounded buffer from a file that claims to be bounded.
+      return { entries: [], partialTailBytes: 0, corruptAt: 0, readOnly: true, lastSeq: 0, bytes: size, capacityBytes: this.#maxBytes }
+    }
+    const buffer = Buffer.alloc(size)
+    const fd = openSync(this.#path, 'r')
+    try {
+      readAll(fd, buffer)
+    } finally {
+      closeSync(fd)
+    }
+
+    const result = decodeBuffer(buffer, { maxBytes: this.#maxBytes, maxRecordBytes: this.#maxRecordBytes })
+    if (result.partialTailBytes > 0 && result.corruptAt === null) {
+      truncateSync(this.#path, result.bytes)
+      const syncFd = openSync(this.#path, 'r+')
+      try {
+        fsyncSync(syncFd)
+      } finally {
+        closeSync(syncFd)
+      }
+      await syncDirectory(dirname(this.#path))
+      result.bytes = result.bytes
+      result.readOnly = false
+    }
+    return result
+  }
 }
 
-/** Encode one record: `<len> <checksum> <json>\n`, where checksum covers the JSON bytes. */
+/** Encode one record: `<len> <digest> <json>\n`, where the digest covers the JSON bytes. */
 export function encodeRecord(entry: JournalEntry): Buffer {
   const body = Buffer.from(JSON.stringify(entry), 'utf8')
-  const checksum = digest(body)
+  const checksum = bodyDigest(body)
   const prefix = Buffer.from(`${body.length.toString(16).padStart(8, '0')} ${checksum} `, 'utf8')
   return Buffer.concat([prefix, body, Buffer.from('\n')])
 }
 
-function digest(bytes: Buffer): string {
+function bodyDigest(bytes: Buffer): string {
   return createHash('sha256').update(bytes).digest('hex').slice(0, 16)
 }
 
 function emptyRecovery(capacityBytes: number): JournalRecovery {
-  return { entries: [], partialTailBytes: 0, corruptAt: null, lastSeq: 0, bytes: 0, capacityBytes }
+  return { entries: [], partialTailBytes: 0, corruptAt: null, readOnly: false, lastSeq: 0, bytes: 0, capacityBytes }
 }
 
-async function recoverFile(path: string, capacityBytes: number): Promise<JournalRecovery> {
-  const size = (await stat(path)).size
-  if (size === 0) return emptyRecovery(capacityBytes)
+/** Write the whole buffer, retrying short writes. */
+function writeAll(fd: number, bytes: Buffer): void {
+  let offset = 0
+  while (offset < bytes.length) {
+    const written = writeSync(fd, bytes, offset, bytes.length - offset)
+    if (written <= 0) throw new DriverError('state_indeterminate', 'journal_write_failed', 'Write made no progress')
+    offset += written
+  }
+}
 
-  const buffer = Buffer.alloc(size)
-  const fd = openSync(path, 'r')
+function readAll(fd: number, bytes: Buffer): void {
+  let offset = 0
+  while (offset < bytes.length) {
+    const read = readSync(fd, bytes, offset, bytes.length - offset, offset)
+    if (read <= 0) break
+    offset += read
+  }
+}
+
+async function syncDirectory(directory: string): Promise<void> {
+  // Directory fsync makes a newly created or truncated entry durable. Unsupported on some
+  // platforms (Windows); there the file fsync is the best available guarantee.
   try {
-    readSync(fd, buffer, 0, size, 0)
-  } finally {
-    closeSync(fd)
+    const handle = await openAsync(directory, 'r')
+    try {
+      await handle.sync()
+    } finally {
+      await handle.close()
+    }
+  } catch {
+    // Directory handles are not syncable everywhere; the file itself was already synced.
   }
-
-  const result = decodeBuffer(buffer, capacityBytes)
-  if (result.partialTailBytes > 0) {
-    // Repair: drop the torn tail so the next append starts on a record boundary.
-    truncateSync(path, result.bytes)
-  }
-  return result
 }
+
+export type DecodeOptions = { maxBytes?: number; maxRecordBytes?: number }
 
 /** Pure decoder used by both recovery and tests (no I/O). */
-export function decodeBuffer(buffer: Buffer, capacityBytes = DEFAULT_MAX_BYTES): JournalRecovery {
+export function decodeBuffer(buffer: Buffer, options: DecodeOptions = {}): JournalRecovery {
+  const capacityBytes = options.maxBytes ?? DEFAULT_MAX_BYTES
+  const maxRecordBytes = options.maxRecordBytes ?? DEFAULT_MAX_RECORD_BYTES
   const entries: JournalEntry[] = []
+  const seen = new Map<string, string>()
   let offset = 0
   let partialTailBytes = 0
   let corruptAt: number | null = null
@@ -181,51 +323,79 @@ export function decodeBuffer(buffer: Buffer, capacityBytes = DEFAULT_MAX_BYTES):
       partialTailBytes = buffer.length - offset
       break
     }
-    const lengthText = buffer.subarray(offset, offset + 8).toString('utf8')
-    const length = Number.parseInt(lengthText, 16)
-    if (!Number.isFinite(length) || length < 0) {
+    const prefix = buffer.subarray(offset, offset + PREFIX_LENGTH).toString('utf8')
+    if (!/^[0-9a-f]{8} [0-9a-f]{16} $/.test(prefix)) {
+      // A broken prefix is corruption, not a torn tail: the tail path only applies at end of file.
       corruptAt = offset
       break
     }
-    const checksum = buffer.subarray(offset + 9, offset + 25).toString('utf8')
+    const length = Number.parseInt(prefix.slice(0, 8), 16)
+    if (length > maxRecordBytes) {
+      corruptAt = offset
+      break
+    }
+    const checksum = prefix.slice(9, 25)
     const bodyStart = offset + PREFIX_LENGTH
     const bodyEnd = bodyStart + length
     if (bodyEnd + 1 > buffer.length) {
-      // Incomplete record: the process died mid-write.
       partialTailBytes = buffer.length - offset
       break
     }
     const body = buffer.subarray(bodyStart, bodyEnd)
-    if (digest(body) !== checksum) {
+    if (bodyDigest(body) !== checksum) {
       corruptAt = offset
       break
     }
+    let entry: JournalEntry
     try {
-      entries.push(JSON.parse(body.toString('utf8')) as JournalEntry)
+      entry = JSON.parse(body.toString('utf8')) as JournalEntry
     } catch {
       corruptAt = offset
       break
     }
+    if (!Number.isInteger(entry?.seq) || entry.seq < 1) {
+      corruptAt = offset
+      break
+    }
+    const identity = factDigest(entry.fact, entry.payload)
+    const known = seen.get(entry.fact.factId)
+    if (known !== undefined && known !== identity) {
+      // Two different bodies under one id: the prefix is not trustworthy after this point.
+      corruptAt = offset
+      break
+    }
+    seen.set(entry.fact.factId, identity)
+    entries.push(entry)
     offset = bodyEnd + 1 // skip the trailing newline
   }
 
-  const intact = corruptAt === null && partialTailBytes === 0
-  const bytes = intact ? buffer.length : corruptAt ?? buffer.length - partialTailBytes
+  const intact = corruptAt === null
+  const bytes = corruptAt !== null ? corruptAt : buffer.length - partialTailBytes
   const lastSeq = entries.reduce((highest, entry) => Math.max(highest, entry.seq), 0)
-  return { entries, partialTailBytes, corruptAt, lastSeq, bytes, capacityBytes }
+  return {
+    entries,
+    partialTailBytes: corruptAt === null ? partialTailBytes : 0,
+    corruptAt,
+    // Corruption is fail-closed: the journal stays read-only rather than extending a broken prefix.
+    readOnly: corruptAt !== null,
+    lastSeq,
+    bytes,
+    capacityBytes,
+  }
 }
 
-function readEntriesSync(path: string, capacityBytes: number): JournalRecovery {
+function readEntriesSync(path: string, maxBytes: number, maxRecordBytes: number): JournalRecovery {
   const size = statSyncSafe(path)
-  if (size === 0) return emptyRecovery(capacityBytes)
+  if (size === 0) return emptyRecovery(maxBytes)
+  if (size > maxBytes) return { entries: [], partialTailBytes: 0, corruptAt: 0, readOnly: true, lastSeq: 0, bytes: size, capacityBytes: maxBytes }
   const buffer = Buffer.alloc(size)
   const fd = openSync(path, 'r')
   try {
-    readSync(fd, buffer, 0, size, 0)
+    readAll(fd, buffer)
   } finally {
     closeSync(fd)
   }
-  return decodeBuffer(buffer, capacityBytes)
+  return decodeBuffer(buffer, { maxBytes, maxRecordBytes })
 }
 
 function statSyncSafe(path: string): number {

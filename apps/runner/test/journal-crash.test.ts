@@ -167,7 +167,8 @@ test('sink unavailable produces no DurableReceipt claiming persisted', async () 
 test('journal capacity exhaustion stops new business input but keeps control available', async () => {
   const dir = await tempDir()
   // A spool that cannot hold even one record: the first recorded fact must fail, not be dropped.
-  const spool = new FileCriticalJournal({ path: join(dir, 'critical.journal'), maxBytes: 1 })
+  // Both bounds are explicit: a 1-byte file can never hold a record.
+  const spool = new FileCriticalJournal({ path: join(dir, 'critical.journal'), maxBytes: 1, maxRecordBytes: 1 })
   await spool.open()
   const host = new ProcessHost()
   const runner = new AttemptRunner({
