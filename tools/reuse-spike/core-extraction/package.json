@@ -1,0 +1,22 @@
+{
+  "name": "core-extraction-spike",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "G0-A isolated extraction of the dsh-superagent domain core: runs the 144-test baseline without the DSH host. Not a product package.",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "graph": "node scripts/import-graph.mjs",
+    "extract": "node scripts/extract.mjs"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "packageManager": "pnpm@11.7.0",
+  "devDependencies": {
+    "@types/node": "22.20.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.8"
+  }
+}

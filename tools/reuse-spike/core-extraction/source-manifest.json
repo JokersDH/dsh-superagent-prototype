@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "purpose": "G0-A isolated core extraction provenance",
+  "upstream": {
+    "commit": "8c32a9dc5d72c033816c6a8110b37f40cf94fba4",
+    "repository": "https://github.com/deepseek-ai/dsh-superagent-prototype.git",
+    "license": "MIT — Copyright (c) 2026 DeepSeek Harness Team (LICENSE copied verbatim)",
+    "extractedAt": "2026-11-07T07:57:21.031Z",
+    "extractionCommand": "node scripts/extract.mjs --write",
+    "verificationCommand": "node scripts/extract.mjs"
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "upstreamPath": "LICENSE",
+      "sha256": "6d66f91815b720e18cfb2b3552043a0359236aec9a1a6917787900546f6ce550",
+      "bytes": 1078,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/assignments.ts",
+      "upstreamPath": "src/core/assignments.ts",
+      "sha256": "6acf4b858b35d95c875680e39b1e3c41557bbe6d39f65031bb26927289327065",
+      "bytes": 8959,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/engine.ts",
+      "upstreamPath": "src/core/engine.ts",
+      "sha256": "bd9a4caff834859877d1a08ccddebc990d0e1ca568674b80f9d59ce5adcac827",
+      "bytes": 16310,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/errors.ts",
+      "upstreamPath": "src/core/errors.ts",
+      "sha256": "aa7532a2d1f8c443608683ef1231bf3d81b842f67a87d9b77742b5c76d515009",
+      "bytes": 5722,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/evals.ts",
+      "upstreamPath": "src/core/evals.ts",
+      "sha256": "38916de24ec6e1a27118dd5d7a7efa67bf7a2dfdbab26fb59d377516269e2fc8",
+      "bytes": 21810,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/ids.ts",
+      "upstreamPath": "src/core/ids.ts",
+      "sha256": "bc4bc6fd43ea1377087ff2815706c57f0200666aeb4a7711a40489c377f141ab",
+      "bytes": 266,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/index.ts",
+      "upstreamPath": "src/core/index.ts",
+      "sha256": "a5a1cf43f02eafaf520a5bfaf5e76b71ba521d04ee648cfcf12b3843cc474a3e",
+      "bytes": 713,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/intake.ts",
+      "upstreamPath": "src/core/intake.ts",
+      "sha256": "323aadefea69436ba23ed2de3bdbaad673d61915be9e239f3233ecf551a74179",
+      "bytes": 3799,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/memory.ts",
+      "upstreamPath": "src/core/memory.ts",
+      "sha256": "36cefca987a4e533369a414e52e3fb4754945ae942bb021f8e5cf23c186cf536",
+      "bytes": 2863,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/model.ts",
+      "upstreamPath": "src/core/model.ts",
+      "sha256": "982155fe6a03c887a7ac4475c6d1592d12aa23c5fe3698403c93bbfd6469d44a",
+      "bytes": 19758,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/part.ts",
+      "upstreamPath": "src/core/part.ts",
+      "sha256": "437c4f4bcc05e836c056cdb45bbf451e55242d62b602b489f4df902be112e73e",
+      "bytes": 4753,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/ports.ts",
+      "upstreamPath": "src/core/ports.ts",
+      "sha256": "0b44f1cd716d64776b0e3ea74a158cf0effd92e763b1b13c7705e766e9225a43",
+      "bytes": 7260,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/reasons.ts",
+      "upstreamPath": "src/core/reasons.ts",
+      "sha256": "dc29e0c3c52e4ffd6e8f27a618cbe704a83fdbd9c5a1b99a1e0c4184d5c33af4",
+      "bytes": 2233,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/replies.ts",
+      "upstreamPath": "src/core/replies.ts",
+      "sha256": "5a8821a1b9d951d2255709543e0be762c6d3204bca07a77ff17c7bfe82ba66f4",
+      "bytes": 6772,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/stage.ts",
+      "upstreamPath": "src/core/stage.ts",
+      "sha256": "b935012a654d2a68ca20cb27909ddc8dceafb704b56a16a23a08036a546141df",
+      "bytes": 1684,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "src/core/tickets.ts",
+      "upstreamPath": "src/core/tickets.ts",
+      "sha256": "1d9f964ad34b54cbb0403bde16af58851e5e80111177ce73a27b6034e9af940e",
+      "bytes": 27013,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "tests/core-engine.spec.ts",
+      "upstreamPath": "tests/core-engine.spec.ts",
+      "sha256": "e29358c139a2dbb1a2877e980e043f34cf39bca1905fb10ee14e0b4866bc1a6b",
+      "bytes": 106908,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    },
+    {
+      "path": "tests/stage.spec.ts",
+      "upstreamPath": "tests/stage.spec.ts",
+      "sha256": "3df130eae87d70643f0c924caf66fbca8cb27ced50467e0c7283dee0a39436be",
+      "bytes": 5625,
+      "modification": "verbatim — byte-identical to the upstream commit; spike layout mirrors upstream paths, so imports stay unchanged"
+    }
+  ],
+  "hostFiles": {
+    "note": "Spike-owned test-host files, not extracted from upstream",
+    "paths": [
+      ".gitignore",
+      "package.json",
+      "tsconfig.json",
+      "vitest.config.ts",
+      "scripts/extract.mjs",
+      "scripts/import-graph.mjs",
+      "README.md",
+      "report.md",
+      "reports/"
+    ]
+  }
+}
