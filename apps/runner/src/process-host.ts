@@ -210,27 +210,43 @@ export class ProcessHost implements OwnedProcessHost {
       await sleep(Math.min(20, Math.max(1, killDeadline - this.#now())))
     }
 
-    const alive = this.#liveMembers(group)
-    evidence.push(`still-alive:${alive.length}`, ...alive.slice(0, 5).map(member => `member:${member.pid}:${member.state}`))
+    const observation = this.#observeGroup(group)
+    if (observation.kind === 'unobservable') {
+      evidence.push(`group-unobservable:${observation.why}`)
+      return { quiescence: 'indeterminate', evidenceRefs: evidence }
+    }
+    evidence.push(`still-alive:${observation.live.length}`, ...observation.live.slice(0, 5).map(member => `member:${member.pid}:${member.state}`))
     return { quiescence: 'indeterminate', evidenceRefs: evidence }
   }
 
   /**
-   * A group is quiescent when the leader has exited and no non-zombie member remains.
-   * `ps -o pgid=` is used rather than `kill(0)` so a zombie is not mistaken for a live writer.
+   * A group is quiescent when the leader has exited, the group could be **observed**, and no
+   * non-zombie member remains. An observation failure is never treated as "empty": an unreadable
+   * `ps` (missing tool, permission, parse error) yields `unknown`, which keeps the stop indeterminate.
    */
   async #groupQuiescent(handle: Handle, group: number): Promise<boolean> {
     if (!handle.exited.done) return false
-    return this.#liveMembers(group).length === 0
+    const observation = this.#observeGroup(group)
+    return observation.kind === 'observed' && observation.live.length === 0
   }
 
-  #liveMembers(group: number): Array<{ pid: number; state: string }> {
+  /**
+   * Observe a process group. Returns:
+   * - `observed` with the live (non-zombie) members, possibly none — a *positive* observation;
+   * - `unobservable` when `ps` cannot be run or its output cannot be trusted (ESRCH is the one
+   *   failure that does prove the group has no members on this platform).
+   */
+  #observeGroup(group: number): { kind: 'observed'; live: Array<{ pid: number; state: string }> } | { kind: 'unobservable'; why: string } {
     let text: string
     try {
       text = execFileSync('ps', ['-o', 'pid=,stat=,pgid=', '-g', String(group)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
-    } catch {
-      // `ps -g` exits non-zero when the group has no processes at all.
-      return []
+    } catch (error) {
+      const code = (error as { code?: string } | null)?.code
+      // ESRCH (or a signal-terminated ps) means the group has no members at all.
+      if (code === 'ESRCH' || code === 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER' || (error as { status?: number }).status === 1) {
+        return { kind: 'observed', live: [] }
+      }
+      return { kind: 'unobservable', why: code ?? 'ps_failed' }
     }
     const members: Array<{ pid: number; state: string }> = []
     for (const line of text.split('\n')) {
@@ -243,7 +259,12 @@ export class ProcessHost implements OwnedProcessHost {
       if (base.startsWith('Z')) continue
       members.push({ pid, state })
     }
-    return members
+    return { kind: 'observed', live: members }
+  }
+
+  /** Distinct from "no members": used for evidence when a stop cannot observe the group. */
+  #observationFailed(group: number): boolean {
+    return this.#observeGroup(group).kind === 'unobservable'
   }
 
   /** Stop every owned resource; confirmed only when all are proven quiescent. */
@@ -333,10 +354,14 @@ function defaultStartMarker(pid: number): string | null {
   }
 }
 
+/**
+ * Referenced sleep. It is deliberately **not** unref'd: `stopOwned()`'s completion is part of the
+ * caller's awaited work, so a top-level `await stop(...)` must keep the event loop alive until the
+ * stop resolves. Relying on some other unrelated handle to exist made the process exit early (13).
+ */
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => {
-    const timer = setTimeout(resolve, ms)
-    if (typeof (timer as { unref?: () => void }).unref === 'function') (timer as { unref: () => void }).unref()
+    setTimeout(resolve, ms)
   })
 }
 

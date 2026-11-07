@@ -25,6 +25,7 @@
  * Still NOT_TESTED until core/storage are wired: a durable receipt from a real transaction, an
  * atomic fence decided by core, and crash recovery of live bindings (RFC-0002).
  */
+import { createHash } from 'node:crypto'
 import type { AgentDriverV1 } from '../../contracts/src/ports.ts'
 import type { AttemptSpec, CriticalFact, DurableReceipt, RunnerCommand, ServeExit } from '../../contracts/src/types.ts'
 import { RunnerCommandSchema } from '../../contracts/src/schemas.ts'
@@ -77,9 +78,13 @@ export type StartInput = AttemptTuple & {
   initialInputRef: string
 }
 
+/**
+ * The complete logical command. Every field that changes what actually goes on the wire belongs
+ * here, so the identity below is derived from the full payload — not from a delimiter-joined string.
+ */
 export type CommandKey =
-  | { kind: 'begin'; inputRef: string }
-  | { kind: 'deliver'; inputRef: string }
+  | { kind: 'begin'; inputRef: string; preparedPolicyRef: string }
+  | { kind: 'deliver'; inputRef: string; expectedTurnRef?: string }
   | { kind: 'answer'; answerRef: string; nativeBindingRef: string }
   | { kind: 'cancel'; reason: string }
   | { kind: 'pause_at_boundary' }
@@ -105,6 +110,12 @@ export class AttemptSupervisor {
   readonly #now: () => number
   readonly #driver: AgentDriverV1 | undefined
   readonly #attempts = new Map<string, RunningAttempt>()
+  /** Highest epoch ever observed per ticket; epochs are monotonic even after a binding ends. */
+  readonly #epochs = new Map<string, number>()
+  /** Attempt ids that were ever launched for a ticket; reuse is refused (B-ENDED-EPOCH-REUSE). */
+  readonly #usedAttempts = new Map<string, Set<string>>()
+  /** In-flight launches, so a stop during launch can veto the begin and clean up the new handle. */
+  readonly #launching = new Map<string, { attemptId: string; fenceEpoch: number; cancelled: boolean }>()
   readonly #facts: CriticalFact[] = []
   #factSeq = 0
 
@@ -134,11 +145,22 @@ export class AttemptSupervisor {
   async start(input: StartInput): Promise<{ binding: AttemptBinding; attempt: RunningAttempt }> {
     assertStartInput(input)
 
+    // Epochs are monotonic per ticket and attempt ids are single-use, whether or not the previous
+    // binding is still active (B-ENDED-EPOCH-REUSE).
+    const highest = this.#epochs.get(input.ticketId) ?? 0
     const existing = this.#bindings.current(input.ticketId)
+    const knownAttempts = this.#usedAttempts.get(input.ticketId) ?? new Set<string>()
+    if (knownAttempts.has(input.attemptId) || existing?.attemptId === input.attemptId) {
+      throw new DriverError('state_indeterminate', 'attempt_id_reused', `Attempt ${input.attemptId} was already used for ${input.ticketId}`)
+    }
+    if (existing && existing.fenceEpoch >= input.fenceEpoch) {
+      throw new DriverError('state_indeterminate', 'stale_start', `Epoch ${input.fenceEpoch} does not supersede ${existing.fenceEpoch}`)
+    }
+    if (highest >= input.fenceEpoch) {
+      throw new DriverError('state_indeterminate', 'stale_start', `Epoch ${input.fenceEpoch} does not supersede the historical high-water mark ${highest}`)
+    }
+
     if (existing && existing.state !== 'ended') {
-      if (existing.fenceEpoch >= input.fenceEpoch) {
-        throw new DriverError('state_indeterminate', 'stale_start', `Epoch ${input.fenceEpoch} does not supersede ${existing.fenceEpoch}`)
-      }
       const stopped = await this.stop(input.ticketId, 'superseded_by_new_epoch')
       if (stopped.quiescence !== 'confirmed') {
         // B-UNKNOWN-STOP: an unproven previous writer must keep blocking the resource.
@@ -150,6 +172,10 @@ export class AttemptSupervisor {
       }
     }
 
+    this.#epochs.set(input.ticketId, input.fenceEpoch)
+    knownAttempts.add(input.attemptId)
+    this.#usedAttempts.set(input.ticketId, knownAttempts)
+
     const binding: AttemptBinding = {
       ticketId: input.ticketId,
       assignmentId: input.assignmentId,
@@ -160,10 +186,29 @@ export class AttemptSupervisor {
     }
     this.#bindings.save(binding)
 
-    const attempt = await this.#runner.launch(input.spec)
+    // The launch is awaited; a stop may arrive meanwhile. Track it so the begin can be vetoed.
+    const launchToken = { attemptId: input.attemptId, fenceEpoch: input.fenceEpoch, cancelled: false }
+    this.#launching.set(input.ticketId, launchToken)
+    let attempt: RunningAttempt
+    try {
+      attempt = await this.#runner.launch(input.spec)
+    } finally {
+      this.#launching.delete(input.ticketId)
+    }
     this.#attempts.set(input.attemptId, attempt)
 
-    const begin = this.#command(binding, { kind: 'begin', inputRef: input.initialInputRef }, {
+    // Re-check authorization and the current binding *after* the await (B-CANCEL-DURING-LAUNCH).
+    const now = this.#bindings.current(input.ticketId)
+    const stillMine = now?.attemptId === input.attemptId && now.fenceEpoch === input.fenceEpoch && now.state === 'active'
+    if (launchToken.cancelled || !stillMine) {
+      this.#attempts.delete(input.attemptId)
+      await attempt.stop(this.#stopDeadlineMs).catch(() => undefined)
+      throw new DriverError('state_indeterminate', 'start_cancelled', 'The attempt was stopped while it was launching; no begin was sent')
+    }
+
+    const begin = this.#command(binding, {
+      kind: 'begin',
+      inputRef: input.initialInputRef,
       preparedPolicyRef: this.#preparedPolicyRef,
     })
     await attempt.feed(begin)
@@ -173,7 +218,9 @@ export class AttemptSupervisor {
   /** Deliver an input to a running attempt. */
   async deliver(ticketId: string, inputRef: string, expectedTurnRef?: string): Promise<CommandResult> {
     const binding = this.#requireActive(ticketId)
-    const command = this.#command(binding, { kind: 'deliver', inputRef }, {
+    const command = this.#command(binding, {
+      kind: 'deliver',
+      inputRef,
       ...(expectedTurnRef === undefined ? {} : { expectedTurnRef }),
     })
     return this.#feed(binding, command)
@@ -210,6 +257,12 @@ export class AttemptSupervisor {
 
     const stopping: AttemptBinding = binding.state === 'stopping' ? binding : { ...binding, state: 'stopping' }
     this.#bindings.save(stopping)
+
+    // A stop during an awaited launch must veto the pending begin and retire the new handle.
+    const launching = this.#launching.get(binding.ticketId)
+    if (launching && launching.attemptId === binding.attemptId && launching.fenceEpoch === binding.fenceEpoch) {
+      launching.cancelled = true
+    }
 
     const attempt = this.#attempts.get(binding.attemptId)
     if (!attempt) {
@@ -273,25 +326,24 @@ export class AttemptSupervisor {
     return { status: report.status, retry: 'reconcile_first' }
   }
 
-  /** Stable command id: kind plus the business identity it carries, never just attempt+kind. */
+  /**
+   * Deterministic command id over the attempt tuple and the complete logical payload.
+   *
+   * Uses canonical JSON (sorted keys, `JSON.stringify` escaping) and a SHA-256 prefix, so:
+   * - no unescaped delimiter can make `{binding:'a:b', answer:'c'}` collide with `{binding:'a', answer:'b:c'}`;
+   * - any field that changes the sent bytes changes the id (e.g. `expectedTurnRef`);
+   * - an identical logical retry keeps the same id.
+   *
+   * The digest is not a uniqueness *claim* in the cryptographic sense for adversarial inputs; it is
+   * a stable, collision-resistant key over structured data, per the review guidance.
+   */
   static commandId(tuple: Pick<AttemptTuple, 'attemptId' | 'fenceEpoch'>, key: CommandKey): string {
-    const subject =
-      key.kind === 'begin'
-        ? `begin:${key.inputRef}`
-        : key.kind === 'deliver'
-          ? `deliver:${key.inputRef}`
-          : key.kind === 'answer'
-            ? `answer:${key.nativeBindingRef}:${key.answerRef}`
-            : key.kind === 'cancel'
-              ? `cancel:${key.reason}`
-              : 'pause'
-    const raw = `cmd-${tuple.attemptId}-${tuple.fenceEpoch}-${subject}`
-    // Contract ids allow [A-Za-z0-9._:-] up to 128 chars; collapse any other character.
-    const safe = raw.replace(/[^A-Za-z0-9._:-]/g, '-')
-    if (safe.length <= COMMAND_ID_MAX) return safe
-    // Keep the identity readable and collapse the excess deterministically.
-    const digest = shortHash(safe)
-    return `${safe.slice(0, COMMAND_ID_MAX - digest.length - 1)}-${digest}`
+    const digest = createHash('sha256').update(canonicalCommandKey(tuple, key), 'utf8').digest('hex')
+    // Contract Id charset is [A-Za-z0-9._:-], max 128. Keep a readable prefix and the digest.
+    const kind = key.kind.replace(/_/g, '-')
+    const readable = `cmd-${tuple.attemptId}-${tuple.fenceEpoch}-${kind}`.replace(/[^A-Za-z0-9._:-]/g, '-')
+    const room = COMMAND_ID_MAX - digest.length - 1
+    return `${readable.slice(0, Math.max(8, room))}-${digest}`
   }
 
   /**
@@ -301,7 +353,7 @@ export class AttemptSupervisor {
    * includes `ticketId/assignmentId/attemptId/fenceEpoch/contract`. Every field is emitted here and
    * the result is parsed — never cast — so a missing or renamed field fails loudly (B-FROZEN-COMMAND).
    */
-  #command(binding: AttemptBinding, key: CommandKey, extra: Record<string, string> = {}): RunnerCommand {
+  #command(binding: AttemptBinding, key: CommandKey): RunnerCommand {
     const base = {
       id: AttemptSupervisor.commandId(binding, key),
       ticketId: binding.ticketId,
@@ -311,11 +363,13 @@ export class AttemptSupervisor {
       contract: binding.contract,
       kind: key.kind,
     }
+    // The wire command is derived from the same logical key that produced the id, so the id and the
+    // sent bytes can never disagree.
     const candidate =
       key.kind === 'begin'
-        ? { ...base, inputRef: key.inputRef, preparedPolicyRef: extra.preparedPolicyRef }
+        ? { ...base, inputRef: key.inputRef, preparedPolicyRef: key.preparedPolicyRef }
         : key.kind === 'deliver'
-          ? { ...base, inputRef: key.inputRef, ...(extra.expectedTurnRef === undefined ? {} : { expectedTurnRef: extra.expectedTurnRef }) }
+          ? { ...base, inputRef: key.inputRef, ...(key.expectedTurnRef === undefined ? {} : { expectedTurnRef: key.expectedTurnRef }) }
           : key.kind === 'answer'
             ? { ...base, nativeBindingRef: key.nativeBindingRef, answerRef: key.answerRef }
             : base
@@ -372,12 +426,33 @@ function invalid(message: string): DriverError {
   return new DriverError('protocol_error', 'invalid_start_input', message)
 }
 
-/** Small deterministic hash so over-long ids stay unique without a dependency. */
-function shortHash(value: string): string {
-  let hash = 0x811c9dc5
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index)
-    hash = Math.imul(hash, 0x01000193) >>> 0
+/**
+ * Canonical, unambiguous encoding of a logical command: sorted keys, JSON string escaping, explicit
+ * absence markers. Two different logical commands cannot produce the same text.
+ */
+/** Payload field names per command kind: absent fields are encoded explicitly, never dropped. */
+const COMMAND_FIELDS: Readonly<Record<CommandKey['kind'], readonly string[]>> = Object.freeze({
+  begin: ['inputRef', 'preparedPolicyRef'],
+  deliver: ['inputRef', 'expectedTurnRef'],
+  answer: ['nativeBindingRef', 'answerRef'],
+  cancel: ['reason'],
+  pause_at_boundary: [],
+})
+
+export function canonicalCommandKey(tuple: Pick<AttemptTuple, 'attemptId' | 'fenceEpoch'>, key: CommandKey): string {
+  const record = key as unknown as Record<string, unknown>
+  const parts: string[] = [`attemptId=${JSON.stringify(tuple.attemptId)}`, `fenceEpoch=${tuple.fenceEpoch}`, `kind=${JSON.stringify(key.kind)}`]
+  // Walk the *declared* field list so a missing field is encoded as `<absent>` rather than omitted.
+  for (const name of [...COMMAND_FIELDS[key.kind]].sort()) {
+    const value = record[name]
+    parts.push(`${name}=${value === undefined ? '<absent>' : JSON.stringify(value)}`)
   }
-  return hash.toString(16).padStart(8, '0')
+  // Any unexpected extra field still participates, so future kinds cannot silently collide.
+  for (const name of Object.keys(record).sort()) {
+    if (name === 'kind' || COMMAND_FIELDS[key.kind].includes(name)) continue
+    parts.push(`extra.${name}=${JSON.stringify(record[name])}`)
+  }
+  return parts.join('\n')
 }
+
+export { canonicalCommandKey as encodeCanonicalCommandKey }
