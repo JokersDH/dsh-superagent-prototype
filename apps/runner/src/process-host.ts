@@ -147,50 +147,103 @@ export class ProcessHost implements OwnedProcessHost {
     await this.#write(handle, frame)
   }
 
+  /**
+   * Stop an owned process and prove that **everything in its group** is gone.
+   *
+   * A parent exit is not enough: a same-group descendant (a tool the agent spawned) can keep
+   * running and holding resources. The stop is confirmed only when
+   *   (a) the group leader exited, **and**
+   *   (b) no live (non-zombie) member of the group remains (B-PROCESS-GROUP).
+   *
+   * Identity cannot be confirmed when the recorded start marker is missing (B-START-MARKER): the
+   * host then fails closed and refuses to signal, because a reused PID may now own that group.
+   */
   async stopOwned(resourceRef: string, deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
     const handle = this.#handles.get(resourceRef)
     if (!handle) return { quiescence: 'indeterminate', evidenceRefs: ['unknown-resource'] }
     const evidence: string[] = []
-    if (handle.exited.done) {
-      this.#handles.delete(resourceRef)
-      return { quiescence: 'confirmed', evidenceRefs: ['already-exited', exitEvidence(handle)] }
-    }
+    const group = handle.identity.groupId
 
+    // Identity gate: a missing or drifted marker means we cannot prove this group is ours.
+    if (!handle.identity.startMarker) {
+      return { quiescence: 'indeterminate', evidenceRefs: ['identity-unconfirmed:no-start-marker'] }
+    }
     const observedMarker = this.#readStartMarker(handle.identity.pid)
-    if (handle.identity.startMarker && observedMarker && observedMarker !== handle.identity.startMarker) {
-      // PID was reused: never signal a process we cannot prove we own.
+    if (!observedMarker) {
+      // The leader is already gone. Its group may still hold descendants we cannot attribute.
+      evidence.push('leader-gone-without-marker')
+    } else if (observedMarker !== handle.identity.startMarker) {
       return { quiescence: 'indeterminate', evidenceRefs: ['identity-mismatch'] }
     }
 
+    // Signal the whole group; a gone leader does not mean the group is empty.
     try {
-      process.kill(-handle.identity.groupId, 'SIGTERM')
+      process.kill(-group, 'SIGTERM')
       evidence.push('sigterm-group')
     } catch (error) {
-      if (isMissingProcess(error)) {
-        evidence.push('sigterm-esrch')
-      } else {
-        evidence.push('sigterm-failed')
-      }
+      evidence.push(isMissingProcess(error) ? 'sigterm-esrch' : 'sigterm-failed')
     }
-    if (await raceExit(handle.exitPromise, Math.max(0, deadlineMs))) {
-      evidence.push(`exit-observed:${exitEvidence(handle)}`)
-      this.#handles.delete(resourceRef)
-      return { quiescence: 'confirmed', evidenceRefs: evidence }
+    const deadline = this.#now() + Math.max(0, deadlineMs)
+    while (this.#now() < deadline) {
+      if (await this.#groupQuiescent(handle, group)) {
+        evidence.push('group-quiescent', `leader:${exitEvidence(handle)}`)
+        this.#handles.delete(resourceRef)
+        return { quiescence: 'confirmed', evidenceRefs: evidence }
+      }
+      await sleep(Math.min(20, Math.max(1, deadline - this.#now())))
     }
 
+    // Escalate on the next round-trip that is still attributable to this group.
     try {
-      process.kill(-handle.identity.groupId, 'SIGKILL')
+      process.kill(-group, 'SIGKILL')
       evidence.push('sigkill-group')
     } catch (error) {
       evidence.push(isMissingProcess(error) ? 'sigkill-esrch' : 'sigkill-failed')
     }
-    if (await raceExit(handle.exitPromise, this.#killGraceMs)) {
-      evidence.push(`sigkill-exit:${exitEvidence(handle)}`)
-      this.#handles.delete(resourceRef)
-      return { quiescence: 'confirmed', evidenceRefs: evidence }
+    const killDeadline = this.#now() + this.#killGraceMs
+    while (this.#now() < killDeadline) {
+      if (await this.#groupQuiescent(handle, group)) {
+        evidence.push('group-quiescent-after-sigkill', `leader:${exitEvidence(handle)}`)
+        this.#handles.delete(resourceRef)
+        return { quiescence: 'confirmed', evidenceRefs: evidence }
+      }
+      await sleep(Math.min(20, Math.max(1, killDeadline - this.#now())))
     }
-    evidence.push('still-alive-after-sigkill')
+
+    const alive = this.#liveMembers(group)
+    evidence.push(`still-alive:${alive.length}`, ...alive.slice(0, 5).map(member => `member:${member.pid}:${member.state}`))
     return { quiescence: 'indeterminate', evidenceRefs: evidence }
+  }
+
+  /**
+   * A group is quiescent when the leader has exited and no non-zombie member remains.
+   * `ps -o pgid=` is used rather than `kill(0)` so a zombie is not mistaken for a live writer.
+   */
+  async #groupQuiescent(handle: Handle, group: number): Promise<boolean> {
+    if (!handle.exited.done) return false
+    return this.#liveMembers(group).length === 0
+  }
+
+  #liveMembers(group: number): Array<{ pid: number; state: string }> {
+    let text: string
+    try {
+      text = execFileSync('ps', ['-o', 'pid=,stat=,pgid=', '-g', String(group)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
+    } catch {
+      // `ps -g` exits non-zero when the group has no processes at all.
+      return []
+    }
+    const members: Array<{ pid: number; state: string }> = []
+    for (const line of text.split('\n')) {
+      const [pidText, state] = line.trim().split(/\s+/)
+      if (!pidText || !state) continue
+      const pid = Number(pidText)
+      if (!Number.isFinite(pid)) continue
+      // Z = zombie (already dead, waiting to be reaped); Z+ is the same with session-leader flag.
+      const base = state.replace('+', '')
+      if (base.startsWith('Z')) continue
+      members.push({ pid, state })
+    }
+    return members
   }
 
   /** Stop every owned resource; confirmed only when all are proven quiescent. */
@@ -278,6 +331,13 @@ function defaultStartMarker(pid: number): string | null {
   } catch {
     return null
   }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => {
+    const timer = setTimeout(resolve, ms)
+    if (typeof (timer as { unref?: () => void }).unref === 'function') (timer as { unref: () => void }).unref()
+  })
 }
 
 function exitEvidence(handle: Handle): string {

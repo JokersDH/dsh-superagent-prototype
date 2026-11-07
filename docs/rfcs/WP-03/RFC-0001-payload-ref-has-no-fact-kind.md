@@ -1,6 +1,6 @@
 # RFC-0001：AttemptIO payload 引用缺少 fact kind 与 generation，ingress 无法自证 payload 合法
 
-- 状态：Proposed
+- 状态：**Accepted（按主 Agent 决议，2026-11-07）** — 不修改冻结 ports；authoritative ingress 无条件严格解析 `{kind,value}` 并核对 fact.kind；payload 引用不可变/内容寻址；同 factId 内容变化视为冲突，不引入 generation
 - 提出者：Agent B（WP-03）
 - 影响包：`packages/contracts`（只读，归主 Agent）、`packages/execution`、`apps/runner`、后续 `packages/storage`
 - 关联验收：REL-05、RT-07、RT-10、DATA-01（既有契约）、OPS 无关

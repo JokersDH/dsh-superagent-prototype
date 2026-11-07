@@ -1,6 +1,6 @@
 # RFC-0002：Supervisor 的 fenced ingress 需要 core/storage 提供一个原子入口
 
-- 状态：Proposed
+- 状态：**Accepted（按主 Agent 决议，2026-11-07）** — 采纳单一事务入口；权威裁决属组合根 runtime/core/storage bridge，纯领域内核不持有 runtime 表；Supervisor 本地预检仅诊断。接线待 WP-02 binding/lease 表
 - 提出者：Agent B（WP-03）
 - 影响包：`packages/orchestrator-core`（WP-01，归主 Agent）、`packages/storage`（WP-02，归 Agent A）、`packages/execution`（WP-03）
 - 关联验收：RT-01、RT-04、RT-06、REL-04、REL-05、REL-06

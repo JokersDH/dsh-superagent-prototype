@@ -65,7 +65,9 @@ test('stopOwned confirms quiescence for a live child and records exit evidence',
   const stopped = await host.stopOwned(resource.resourceRef, 2000)
   assert.equal(stopped.quiescence, 'confirmed')
   assert.ok(stopped.evidenceRefs.some(ref => ref.startsWith('sigterm-group')), JSON.stringify(stopped.evidenceRefs))
-  assert.ok(stopped.evidenceRefs.some(ref => ref.includes('exit-observed')), JSON.stringify(stopped.evidenceRefs))
+  // A parent exit alone is not quiescence: the host now proves the whole group is empty.
+  assert.ok(stopped.evidenceRefs.includes('group-quiescent'), JSON.stringify(stopped.evidenceRefs))
+  assert.ok(stopped.evidenceRefs.some(ref => ref.startsWith('leader:')), JSON.stringify(stopped.evidenceRefs))
   assert.deepEqual(host.resources(), [], 'a confirmed stop releases the handle')
 })
 

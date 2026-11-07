@@ -51,6 +51,8 @@ export function makeCommand(
     assignmentId: 'assignment-1',
     attemptId: 'attempt-1',
     fenceEpoch: 1,
+    // AttemptRef requires the contract; a fixture without it cannot express a real RunnerCommand.
+    contract: { workId: 'work-1', revision: 1, digest: FIXTURE_DIGEST },
   }
   switch (kind) {
     case 'begin':

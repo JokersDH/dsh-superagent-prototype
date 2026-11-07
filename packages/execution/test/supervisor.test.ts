@@ -39,16 +39,18 @@ function supervisor(options: { stopBehavior?: FakeStopBehavior } = {}) {
   return { sup, runner, ledger, bindings, clock }
 }
 
-const startInput = (overrides: { attemptId?: string; fenceEpoch?: number } = {}) => {
+const startInput = (overrides: { attemptId?: string; fenceEpoch?: number; initialInputRef?: string } = {}) => {
   const attemptId = overrides.attemptId ?? 'attempt-1'
   const fenceEpoch = overrides.fenceEpoch ?? 1
+  const spec = makeAttemptSpec({ attemptId, fenceEpoch })
   return {
-    ticketId: 'ticket-1',
-    assignmentId: 'assignment-1',
+    ticketId: spec.ticketId,
+    assignmentId: spec.assignmentId,
     attemptId,
     fenceEpoch,
-    contract: { workId: 'work-1', revision: 1, digest: 'a'.repeat(64) },
-    spec: makeAttemptSpec({ attemptId, fenceEpoch }),
+    contract: spec.contract,
+    spec,
+    initialInputRef: overrides.initialInputRef ?? 'input-initial-1',
   }
 }
 
@@ -60,7 +62,10 @@ test('start launches one attempt and queues begin with the prepared policy ref',
   const commands = runner.last()!.commands
   assert.equal(commands.length, 1)
   assert.equal(commands[0]!.kind, 'begin')
-  assert.equal((commands[0] as { preparedPolicyRef: string }).preparedPolicyRef, 'prepared-1')
+  const begin = commands[0] as Extract<typeof commands[number], { kind: 'begin' }>
+  assert.equal(begin.preparedPolicyRef, 'prepared-1')
+  assert.equal(begin.inputRef, 'input-initial-1', 'begin must carry the initial ExecutionInput, not the policy snapshot')
+  assert.notEqual(begin.inputRef, runner.specs[0]!.policySnapshotRef)
 })
 
 test('deliver and answer are forwarded only while the binding is active', async () => {
@@ -163,8 +168,13 @@ test('a start that fails to launch leaves the binding active but no attempt hand
   await assert.rejects(() => sup.start(startInput()))
   // The Supervisor must not silently pretend the attempt is running.
   const stopped = await sup.stop('ticket-1', 'launch_failed')
-  assert.equal(stopped.quiescence, 'indeterminate')
+  assert.equal(stopped.state, 'stopping')
+  assert.equal(stopped.quiescence, 'unknown')
   assert.ok(stopped.evidenceRefs.includes('no-attempt-handle'), JSON.stringify(stopped.evidenceRefs))
+  // B-UNKNOWN-STOP: repeated calls must not turn that into a confirmed end.
+  const again = await sup.stop('ticket-1', 'launch_failed')
+  assert.equal(again.state, 'stopping')
+  assert.equal(again.quiescence, 'unknown')
 })
 
 test('an unknown send is reconciled first and never retried as same-key safe (RT-04)', async () => {
@@ -183,11 +193,14 @@ test('an unknown send is reconciled first and never retried as same-key safe (RT
   assert.equal(result.status, 'indeterminate')
 })
 
-test('stop on a ticket without a binding is a no-op success with evidence', async () => {
+test('stop on a ticket without a binding stays unknown, never a clean end', async () => {
   const { sup } = supervisor()
-  const stopped = await sup.stop('ticket-none', 'user_requested')
-  assert.equal(stopped.state, 'ended')
-  assert.deepEqual([...stopped.evidenceRefs], ['no-active-binding'])
+  const first = await sup.stop('ticket-none', 'user_requested')
+  const second = await sup.stop('ticket-none', 'user_requested')
+  assert.equal(first.state, 'stopping')
+  assert.equal(first.quiescence, 'unknown')
+  assert.equal(second.state, 'stopping', 'a repeated stop must not become confirmed')
+  assert.equal(second.quiescence, 'unknown')
 })
 
 test('the payload store keeps critical and diagnostic refs apart and bounds capacity', async () => {

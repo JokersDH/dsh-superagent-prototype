@@ -60,8 +60,9 @@ test('a real attempt runs begin -> turn end through every layer', async () => {
     assignmentId: 'assignment-1',
     attemptId: 'attempt-1',
     fenceEpoch: 1,
-    contract: { workId: 'work-1', revision: 1, digest: 'a'.repeat(64) },
+    contract: spec().contract,
     spec: spec(),
+    initialInputRef: 'input-initial-1',
   }
   await supervisor.start(input)
   const exit = await supervisor.waitExit('ticket-1')
@@ -81,8 +82,9 @@ test('stop while waiting for the user proves physical quiescence', async () => {
     assignmentId: 'assignment-1',
     attemptId: 'attempt-1',
     fenceEpoch: 1,
-    contract: { workId: 'work-1', revision: 1, digest: 'a'.repeat(64) },
+    contract: spec().contract,
     spec: spec(),
+    initialInputRef: 'input-initial-1',
   })
 
   const deadline = Date.now() + 5000
@@ -95,7 +97,8 @@ test('stop while waiting for the user proves physical quiescence', async () => {
   assert.equal(stopped.quiescence, 'confirmed', JSON.stringify(stopped.evidenceRefs))
   assert.equal(stopped.state, 'ended')
   assert.equal(bindings.current('ticket-1')?.state, 'ended')
-  assert.ok(stopped.evidenceRefs.some(ref => ref.includes('exit-observed')), JSON.stringify(stopped.evidenceRefs))
+  // Physical evidence must name the group state, not merely a leader exit.
+  assert.ok(stopped.evidenceRefs.includes('group-quiescent'), JSON.stringify(stopped.evidenceRefs))
 })
 
 test('an attempt that frames garbage fails without producing business facts', async () => {
@@ -105,8 +108,9 @@ test('an attempt that frames garbage fails without producing business facts', as
     assignmentId: 'assignment-1',
     attemptId: 'attempt-1',
     fenceEpoch: 1,
-    contract: { workId: 'work-1', revision: 1, digest: 'a'.repeat(64) },
+    contract: spec().contract,
     spec: spec(),
+    initialInputRef: 'input-initial-1',
   })
   const exit = await supervisor.waitExit('ticket-1')
   assert.equal(exit.reason, 'error')
@@ -121,8 +125,9 @@ test('a fact recorded twice keeps one durable receipt (idempotent factId)', asyn
     assignmentId: 'assignment-1',
     attemptId: 'attempt-1',
     fenceEpoch: 1,
-    contract: { workId: 'work-1', revision: 1, digest: 'a'.repeat(64) },
+    contract: spec().contract,
     spec: spec(),
+    initialInputRef: 'input-initial-1',
   })
   await supervisor.waitExit('ticket-1')
 
