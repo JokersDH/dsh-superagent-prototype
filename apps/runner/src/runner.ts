@@ -18,6 +18,7 @@ import {
 } from '../../../packages/driver-kit/src/index.ts'
 import type { FactSink } from '../../../packages/execution/src/contracts.ts'
 import { BoundedJournal, StderrRing, journalCoverage } from './journal.ts'
+import type { FileCriticalJournal } from './file-journal.ts'
 import { ProcessHost, type ProcessHostOptions } from './process-host.ts'
 
 export type RunnerOptions = {
@@ -27,6 +28,12 @@ export type RunnerOptions = {
   processHostOptions?: ProcessHostOptions
   journal?: BoundedJournal
   stderrRing?: StderrRing
+  /**
+   * Crash-safe on-disk spool. When present, every critical fact and its payload are written here
+   * **before** the sink is asked, so a crash between the two can be replayed with the original
+   * factId/payloadRef/identity.
+   */
+  spool?: FileCriticalJournal
   progressIntervalMs?: number
   commandCapacity?: number
 }
@@ -44,6 +51,7 @@ export class AttemptRunner {
   readonly commands: CommandQueue
   readonly journal: BoundedJournal
   readonly stderrRing: StderrRing
+  readonly spool: FileCriticalJournal | undefined
   readonly #payloads: AttemptIO['payloads']
   readonly #factSink: FactSink
   readonly #processHost: ProcessHost
@@ -56,6 +64,7 @@ export class AttemptRunner {
     this.#factSink = options.factSink
     this.journal = options.journal ?? new BoundedJournal()
     this.stderrRing = options.stderrRing ?? new StderrRing()
+    this.spool = options.spool
     this.#processHost =
       options.processHost ??
       new ProcessHost({ stderrRing: this.stderrRing, ...options.processHostOptions })
@@ -68,6 +77,15 @@ export class AttemptRunner {
 
   get capacityExhausted(): boolean {
     return this.#capacityExhausted
+  }
+
+  /**
+   * The smallest useful record is well above 1 byte; treating "some bytes left" as capacity would
+   * start a native writer that cannot durably keep even one critical fact.
+   */
+  spoolCanAccept(minimumRecordBytes = 256): boolean {
+    if (!this.spool) return true
+    return this.spool.maxBytes - this.spool.bytes >= minimumRecordBytes
   }
 
   get spec(): AttemptSpec | undefined {
@@ -104,6 +122,12 @@ export class AttemptRunner {
   async launch(spec: AttemptSpec, driver: AgentDriverV1): Promise<RunnerResult> {
     if (this.#spec) throw new DriverError('state_indeterminate', 'runner_reused', 'AttemptRunner runs one attempt')
     assertAttemptSpec(spec)
+    // A spool that cannot accept a record must stop the attempt before a native writer exists;
+    // otherwise the process would run with no way to durably keep its critical facts.
+    if (!this.spoolCanAccept()) {
+      this.#capacityExhausted = true
+      throw new DriverError('state_indeterminate', 'journal_capacity_exhausted', 'Journal cannot hold another record')
+    }
     this.#spec = spec
 
     const io: AttemptIO = createAttemptIO({
@@ -152,7 +176,26 @@ export class AttemptRunner {
       this.#capacityExhausted = true
       throw error
     }
-    // Durable ACK only after the sink resolves; the fake sink is not durable (NOT_TESTED).
+
+    // 1. Local durable spool first: after this line the fact can be replayed with its original
+    //    identity even if the process dies before (or while) the sink acknowledges it.
+    if (this.spool) {
+      let payload: unknown
+      try {
+        payload = await this.#payloads.read(fact.payloadRef)
+      } catch (error) {
+        throw new DriverError('state_indeterminate', 'payload_unavailable', `Cannot spool fact ${fact.factId}: ${(error as Error).message}`)
+      }
+      try {
+        this.spool.append(fact, payload)
+      } catch (error) {
+        // Capacity exhaustion stops new business input; it never drops a critical fact silently.
+        this.#capacityExhausted = true
+        throw error
+      }
+    }
+
+    // 2. Authoritative ACK. A receipt is only propagated once the sink reports persisted.
     const receipt = await this.#factSink.record(fact)
     this.journal.commitCritical(fact.factId, fact.kind)
     return receipt
@@ -172,4 +215,50 @@ function assertCommandIdentity(command: RunnerCommand, spec: AttemptSpec): void 
   if (left.workId !== right.workId || left.revision !== right.revision || left.digest !== right.digest) {
     throw new DriverError('state_indeterminate', 'command_identity_mismatch', 'Command contract differs from the attempt contract')
   }
+}
+
+/**
+ * Replay spooled critical facts to a sink (WP-03 batch 2).
+ *
+ * Rules enforced here:
+ * - only facts are re-sent; no begin/deliver/answer/tool action is ever issued by a replay;
+ * - known/duplicate facts must return their original receipt from the sink, so a second replay does
+ *   not create a second business effect;
+ * - a fact whose epoch is no longer current must be refused as business and may only be retained as a
+ *   physical observation — that decision belongs to the authoritative sink, so this function never
+ *   widens what a fact may do;
+ * - a native execution state that is unknown is never "recovered" by starting a new attempt.
+ */
+export type ReplayResult = {
+  replayed: number
+  duplicates: number
+  refused: number
+  failures: { factId: string; reason: string }[]
+}
+
+export async function replayJournal(spool: FileCriticalJournal, sink: FactSink): Promise<ReplayResult> {
+  const result: ReplayResult = { replayed: 0, duplicates: 0, refused: 0, failures: [] }
+  const seen = new Set<string>()
+  for (const entry of spool.entries()) {
+    if (seen.has(entry.fact.factId)) {
+      // The same factId written twice in the spool is one immutable fact.
+      result.duplicates += 1
+      continue
+    }
+    seen.add(entry.fact.factId)
+    try {
+      await sink.record(entry.fact)
+      result.replayed += 1
+    } catch (error) {
+      const reason = (error as { reason?: string }).reason ?? (error as Error).message
+      if (reason === 'not_active' || reason === 'stale_epoch' || reason === 'stale_assignment' || reason === 'attempt_mismatch') {
+        // The authoritative sink may still keep such facts as physical evidence; replay does not
+        // retry them as business work.
+        result.refused += 1
+      } else {
+        result.failures.push({ factId: entry.fact.factId, reason })
+      }
+    }
+  }
+  return result
 }
