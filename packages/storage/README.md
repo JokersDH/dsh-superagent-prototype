@@ -37,11 +37,15 @@ This package is a member of the root pnpm workspace (`packages/*`). From the rep
 pnpm install
 pnpm --dir packages/contracts run build
 pnpm --dir packages/orchestrator-core run build
-pnpm --dir packages/effects run test
+pnpm --dir packages/effects run build
 pnpm --dir packages/storage run typecheck
 pnpm --dir packages/storage run test
 pnpm --dir packages/storage run build
 ```
+
+Workspace packages export built `dist/`, so contracts → core → effects must be built before the
+storage typecheck/tests resolve them (a missing effects `dist` fails the two storage test files
+that import the queue algorithm).
 
 Measured environment for the WP-02 evidence: Node v24.21.0, pnpm 11.7.0, darwin/arm64,
 better-sqlite3 13.0.3, SQLite 3.53.4. 44/44 storage tests and 8/8 effects tests pass; the official
