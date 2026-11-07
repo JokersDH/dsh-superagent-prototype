@@ -18,6 +18,11 @@ root — never derived from worker text. A changed frozen artifact (checked befo
 or an unregistered check refuses verification entirely. The runner never calls the core completion
 gate and never finishes a Ticket.
 
+| `CompletionEvidenceStore` (batch 2) | Implements the core `CompletionVerifier` port: immutable Verification/quiescence/acceptance records in the WP-04 migration tables (`schema v6`). `recordQuiescence` re-checks the runtime observation store and requires explicit `observed_quiescent` writer facts per resource — exits, cancel ACKs, timeouts or missing PIDs never qualify. `resolve` is read-only, synchronous and same-connection, and returns `undefined` for any stale (generation/artifact/contract) or missing record. |
+
+Documents stay patch/branch based: the runner does not merge, deploy or touch the user's original
+worktree (see `@personal-agent/workspaces`).
+
 ## Run
 
 ```sh
@@ -27,3 +32,6 @@ pnpm --dir packages/verification run build
 ```
 
 Contracts, core, storage and workspaces must be built first (workspace `dist` exports).
+
+WP-04 uses the storage owner's migration entry (`schema v6`, completion evidence tables); v1–v5
+checksums are unchanged. See `report.md` for acceptance evidence and the main-agent wiring steps.

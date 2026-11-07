@@ -1,8 +1,8 @@
 $ node --test test/*.case.ts
-✔ reserve creates a detached attempt worktree and leaves the user worktree untouched (245.954875ms)
-✔ freeze records a manifest whose digest changes when the attempt worktree changes (365.669833ms)
-✔ release removes only the attempt worktree; the user worktree and history stay intact (296.77125ms)
-✔ reserve refuses a duplicate attempt, an invalid id, and an attempt root inside the project (225.185834ms)
+✔ reserve creates a detached attempt worktree and leaves the user worktree untouched (223.837084ms)
+✔ freeze records a manifest whose digest changes when the attempt worktree changes (352.800291ms)
+✔ release removes only the attempt worktree; the user worktree and history stay intact (314.517542ms)
+✔ reserve refuses a duplicate attempt, an invalid id, and an attempt root inside the project (222.077375ms)
 ℹ tests 4
 ℹ suites 0
 ℹ pass 4
@@ -10,4 +10,4 @@ $ node --test test/*.case.ts
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 1209.339791
+ℹ duration_ms 1184.132041
