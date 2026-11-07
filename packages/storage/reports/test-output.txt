@@ -1,0 +1,43 @@
+$ node --test test/*.case.ts
+✔ a written artifact is complete before its reference exists, and reads back digest-verified (65.608917ms)
+✔ a reference never points at a half file: the database row exists only after the rename (16.813125ms)
+✔ GC removes unreferenced and temporary files only after the grace period, never referenced ones (53.049875ms)
+✔ backup while WAL is active restores a consistent snapshot, and opening it dispatches nothing (34.710375ms)
+✔ killed before commit: nothing was accepted, and replaying the same command applies it exactly once (100.1425ms)
+✔ killed after commit: the receipt and queued effect survived, and a replay does not rebuild work (71.902542ms)
+✔ a new or not_sent send proceeds; written and indeterminate block for reconcile (9.038834ms)
+✔ an unknown send parks its queue row while the ledger records indeterminate, and neither is retried (7.737125ms)
+✔ aggregates round-trip through their tables unchanged (37.469ms)
+✔ generated working-set columns expose active tickets and threads only (7.272417ms)
+✔ saving a trigger re-indexes the threads it belongs to (6.022834ms)
+✔ list order matches the upstream store: tickets newest first, threads in insertion order (6.485833ms)
+✔ a fresh database applies the registered migrations and records every checksum; reopening is a no-op (25.720292ms)
+✔ an edited migration body is refused after it was applied (21.096334ms)
+✔ a gap in applied migrations and a schema newer than this build are refused (2.905ms)
+✔ a foreign database with tables but no product schema is refused, and the upstream application database is named (2.609291ms)
+✔ a failed migration aborts the open unchanged and the same number retries, never skipped (3.026583ms)
+✔ channel receipts are idempotent, settle once, and withdraw only pending messages (16.294167ms)
+✔ the weak FIFO holds a later message behind an earlier pending one of the same ticket and conversation (6.338375ms)
+✔ an answer is recorded once per ID and each native target has exactly one delivery row (9.361042ms)
+✔ queue rows enqueued inside a transaction disappear with it (12.338833ms)
+✔ the SQLite queue coalesces by kind and key, keeping position and payload generation (6.55ms)
+✔ the Effects algorithm over SQLite dispatches, retries Later, and parks an unknown send across a restart (23.36ms)
+✔ completing a replaced row leaves the newer payload for a later dispatch (10.61ms)
+✔ the same command ID and payload digest records once and replays without re-applying (32.96675ms)
+✔ the same command ID with a different payload digest is refused and never overwrites the receipt (13.782209ms)
+✔ fact receipts deduplicate by ID and digest and return the recorded sequence (9.958792ms)
+✔ the event cursor is gap-free: a rolled-back transaction consumes no sequence number (5.9275ms)
+✔ inner rollback preserves the outer write and its afterCommit fires once (6.982083ms)
+✔ outer rollback discards nested writes and every queued callback (3.923125ms)
+✔ afterCommit runs immediately outside a transaction (2.401625ms)
+✔ every store shares the same connection and joins one transaction (2.835625ms)
+✔ a fresh state directory acquires the lock, a second instance is refused, and release frees it (9.564417ms)
+✔ a killed holder is taken over; a live PID with an unknown nonce is suspected PID reuse and never taken over (63.291291ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 338.128125

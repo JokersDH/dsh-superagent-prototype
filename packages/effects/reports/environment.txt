@@ -1,0 +1,4 @@
+node v24.21.0
+pnpm 11.7.0
+os Darwin arm64
+typescript 6.0.3
