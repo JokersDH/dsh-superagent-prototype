@@ -10,7 +10,7 @@ import { initialTicket, binding, producer } from './runtime-ingress-fixture.ts'
 export function recoveryRecord(payload, id = 'fact-1') {
   return { fact: { ...producer.attempt, factId: id, source: producer.source, kind: payload.kind, payloadRef: `payload:${jsonDigest(payload)}` }, payload }
 }
-export function openRecoveryFixture(directory) {
+export function openRecoveryFixture(directory, runtimeBinding = binding) {
   const store = new ProductStore({ path: join(directory, 'state.sqlite'), artifactsRoot: join(directory, 'artifacts') })
   const policy = () => ({ version: 'v1', paused: false, evalTimeoutMs: 1000, gate: () => ({ admissible: false, reason: 'fixture' }), revalidate: () => true, admitsInferred: () => false })
   const core = createPersonalEngine({ repo: bindCoreRepositories(store), policy, scope: { scope: () => ({ listened: true, observed: false }) }, assessor: { request: () => {} }, executor: { start: () => { throw new Error('Recovery must not start work') }, deliver: () => { throw new Error('Recovery must not deliver business') }, stop: () => {} }, outbox: { send: () => {}, withdraw: () => {}, status: () => undefined }, completionPolicy: () => { throw new Error('Preseeded fixture') }, isCurrentContract: ref => store.authority.isCurrent(ref) })
@@ -18,7 +18,7 @@ export function openRecoveryFixture(directory) {
   if (!store.domain.tickets.get(binding.ticketId)) {
     store.uow.atomic(() => {
       store.domain.tickets.save(initialTicket()); store.authority.enable(binding.contract)
-      store.bindings.record(binding); store.bindings.setCurrent(binding.ticketId, binding.attemptId)
+      store.bindings.record(runtimeBinding); store.bindings.setCurrent(binding.ticketId, binding.attemptId)
     })
   }
   return { store, core, ingress, close: () => store.close(), run: (records, integrity = 'verified_snapshot') => recoverStoredFacts({ integrity, records }, producer, store, ingress) }

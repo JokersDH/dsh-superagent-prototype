@@ -56,7 +56,8 @@
     "check:g1-core": "node tools/bootstrap/check-g1-core.mjs",
     "check:g1-ingress": "node tools/bootstrap/check-g1-ingress.mjs",
     "check:g1-production": "node tools/bootstrap/check-g1-production.mjs",
-    "check:g1-recovery": "node tools/bootstrap/check-g1-recovery.mjs"
+    "check:g1-recovery": "node tools/bootstrap/check-g1-recovery.mjs",
+    "check:g1-runner-link": "node tools/bootstrap/check-g1-runner-link.mjs"
   },
   "engines": {
     "node": "^22.19.0 || >=24.0.0",

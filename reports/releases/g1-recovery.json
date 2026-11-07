@@ -5,7 +5,7 @@
   "node": "v24.22.2",
   "platform": "darwin",
   "architecture": "arm64",
-  "checkedAt": "2026-11-07T15:45:13.029Z",
+  "checkedAt": "2026-11-07T16:16:05.047Z",
   "results": [
     {
       "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/orchestrator-core --filter @personal-agent/effects --filter @personal-agent/storage -r run build",
@@ -29,8 +29,8 @@
     }
   ],
   "pending": [
-    "Candidate Journal writer admission (see g1-journal-review.json)",
-    "IPC-authenticated reconnect to an independent live Runner",
+    "Candidate Journal writer admission (see g1-journal-followup.json)",
+    "Production AttemptRunner recovery backend and durable launcher registration (local fixture slice passes separately in g1-runner-link.json)",
     "Whole resource-barrier/reconciliation workflow",
     "Full G1, vendor compatibility and usable product release"
   ],
