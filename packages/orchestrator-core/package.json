@@ -13,6 +13,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "build": "tsc -p tsconfig.build.json",
     "smoke:built": "node tools/smoke-built.mjs",
+    "check:dependencies": "node tools/dependencies.mjs",
     "check:provenance": "node tools/provenance.mjs --check",
     "check": "node tools/check.mjs"
   },

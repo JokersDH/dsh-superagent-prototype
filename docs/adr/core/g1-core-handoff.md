@@ -25,6 +25,8 @@ The first core interface was published in commit `56bba3e`; current source adds 
 | Provenance | 18 source/test/license files accounted for; each adapted/new file hashed |
 | Root prototype after workspace adoption | 1197/1197, typecheck and original build pass |
 | Shared check | `pnpm check:g1-core`, result at `reports/releases/g1-core.json` |
+| Clean checkout / target Node 24.22.2 | Frozen filtered install, 176 core + 183 contracts tests, builds and public built-ESM smoke pass |
+| Runtime/type dependency audit | 19 built runtime files use only node:crypto; 290 compiled type files contain no DSH host dependency |
 
 `pnpm peers check` still reports two existing upstream DSH peer mismatches (cordis-plugin-include/group). Existing dependency versions were retained; root lock changes add product importers/dependencies. The independent core does not import these peers. No claim of original DSH runtime/native compatibility follows from passing tests.
 

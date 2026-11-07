@@ -47,4 +47,6 @@ Only the original Tickets.end writes final lifecycle state and queues the stop e
 
 The original 144-test legacy baseline plus focused new tests cover domain rules. MemoryRepositories rolls back its own maps only; fake port arrays are not durable transactional effects. Real SQLite, inbox/effect atomicity, physical stop and recovery need WP-02/WP-03 integration. This package does not implement a Work engine, native Driver, UI or production verifier.
 
+The check also loads the built public ESM package and audits its runtime import closure plus the compiler's type graph. Runtime imports are local files/node:crypto; product contract imports are type-only, and no DSH application types are permitted.
+
 The interface decision and exact scope are in `docs/adr/core/0002-personal-completion-and-ports.md` at repository root.

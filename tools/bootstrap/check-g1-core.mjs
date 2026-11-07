@@ -12,6 +12,7 @@ for (const name of ['@personal-agent/contracts', '@personal-agent/orchestrator-c
 }
 const own = resolve(root, 'packages/orchestrator-core');
 const results = JSON.parse(readFileSync(resolve(own, 'reports/test-results.json'), 'utf8'));
+const dependencies = JSON.parse(readFileSync(resolve(own, 'reports/dependencies.json'), 'utf8'));
 assert.equal(results.success, true);
 assert.equal(results.numFailedTests, 0);
 const original = results.testResults.filter(result => /(?:core-engine|stage)\.spec\.ts$/.test(result.name));
@@ -20,7 +21,7 @@ assert.equal(baseline, 144);
 const identity = JSON.parse(readFileSync(resolve(root, 'packages/contracts/generated/manifest.json'), 'utf8'));
 const report = {
   status: 'PASS_CORE_AND_CONTRACTS_ONLY', contractIdentity: { version: identity.version, schemaHash: identity.schemaHash },
-  coreTests: results.numPassedTests, originalBaselineTests: baseline, newCoreTests: results.numPassedTests - baseline,
+  coreTests: results.numPassedTests, originalBaselineTests: baseline, newCoreTests: results.numPassedTests - baseline, dependencies,
   node: process.version, platform: process.platform, arch: process.arch, recordedAt: new Date().toISOString(),
   pending: ['WP-02 real storage/effect integration', 'WP-03 actual subprocess/writer barriers and recovery integration', 'A complete G1 gate report', 'Native agent compatibility and product E2E'],
 };
