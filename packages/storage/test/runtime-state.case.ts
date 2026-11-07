@@ -126,10 +126,10 @@ test('migrations v1–v3 checksums stay frozen', () => {
   assert.equal(migrationChecksum(MIGRATIONS[0]!), '6658f4334eaecdf265008e01c349223c4fab857697a21c1ca57c278b375f02cd')
   assert.equal(migrationChecksum(MIGRATIONS[1]!), 'a6555fed118d6c12fe8d3c92cd4f5bb5667e0dec3f7ef749adb5375903a9b1ab')
   assert.equal(migrationChecksum(MIGRATIONS[2]!), '8dc5bac776324f5d052fb26eb01c3f68327630b32542f98bdcce9a6e04ed1be6')
-  assert.equal(PRODUCT_SCHEMA_VERSION, 4)
+  assert.equal(PRODUCT_SCHEMA_VERSION, MIGRATIONS[MIGRATIONS.length - 1]!.version)
 })
 
-test('a v3 database upgrades to v4 with its data intact and the new invariants enforced', () => {
+test('a v3 database upgrades to the current schema with its data intact and the new invariants enforced', () => {
   const dir = tempDir()
   const path = join(dir, 'v3.sqlite')
   try {
@@ -145,7 +145,7 @@ test('a v3 database upgrades to v4 with its data intact and the new invariants e
 
     const upgraded = new ProductStore({ path })
     try {
-      assert.equal(upgraded.database.productSchema, 4)
+      assert.equal(upgraded.database.productSchema, PRODUCT_SCHEMA_VERSION)
       assert.equal(upgraded.bindings.binding('attempt-1')?.attemptId, 'attempt-1', 'v3 binding data survives')
       assert.equal(upgraded.bindings.current('ticket-1')?.attemptId, 'attempt-1', 'v3 pointer survives')
       assert.equal(upgraded.authority.isCurrent(contract), true, 'v3 enabled authority survives')

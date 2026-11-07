@@ -94,6 +94,18 @@ the domain SQL, the savepoint transaction model, and the effect queue algorithm;
     satisfy `isCurrent` again without an explicit re-enable. A pre-v4 database with conflicting
     authority rows fails the upgrade instead of silently choosing one.
 
+13. **Runtime observations** (migration v5): the ingress leaves append-only evidence behind every
+    accepted fact. One `runtime_observations` row carries the attempt/assignment/contract identity,
+    the strict payload kind, the disposition, the original `factId`/`payloadRef`, the host-recorded
+    payload SHA-256 and a normalized non-authoritative detail; physical payloads additionally leave
+    `resource_observations` rows per reported resource (exit code/signal or writer status).
+    `record` must run inside the ingress transaction, so evidence commits or rolls back with the
+    fact receipt, the core mutation and the enqueued events/effects. `RuntimeObservations.summarize`
+    is the composition root's read/reduce interface: cancel acknowledgement, process exit and
+    writer quiescence stay independent, `observed_quiescent` appears only when a writer observation
+    explicitly reports it, and the storage layer has no release API — it never manufactures physical
+    success from timeouts, missing PIDs or the coexistence of other facts.
+
 ## Consequences
 
 - Migration v3 extends the same owned migration entry (v1 domain/product tables, v2 writer claim,

@@ -127,8 +127,33 @@ const V4: Migration = {
   ],
 }
 
+/**
+ * v5: runtime observations. Every accepted runtime fact leaves one attempt-level observation row
+ * (identity, contract, kind, disposition, original fact/payload references and the normalized
+ * non-authoritative detail) and, for physical payloads, one row per resource it reports. Rows are
+ * append-only evidence: nothing here releases resources, changes the current pointer or grants
+ * authorization; cancel ACK, exit and writer facts stay independent.
+ */
+const V5: Migration = {
+  version: 5,
+  name: 'runtime-observations',
+  statements: [
+    `CREATE TABLE runtime_observations (fact_id TEXT PRIMARY KEY, ticket_id TEXT NOT NULL, assignment_id TEXT NOT NULL,
+      attempt_id TEXT NOT NULL, fence_epoch INTEGER NOT NULL, contract TEXT NOT NULL, kind TEXT NOT NULL,
+      disposition TEXT NOT NULL, payload_ref TEXT NOT NULL, payload_sha256 TEXT NOT NULL, detail TEXT NOT NULL,
+      observed_at TEXT NOT NULL)`,
+    `CREATE INDEX runtime_observations_attempt ON runtime_observations (attempt_id, observed_at)`,
+    `CREATE INDEX runtime_observations_ticket ON runtime_observations (ticket_id, observed_at)`,
+    `CREATE TABLE resource_observations (fact_id TEXT NOT NULL REFERENCES runtime_observations (fact_id),
+      attempt_id TEXT NOT NULL, resource_ref TEXT NOT NULL, ownership TEXT NOT NULL, kind TEXT NOT NULL,
+      status TEXT, exit_code INTEGER, signal TEXT, observed_at TEXT NOT NULL, PRIMARY KEY (fact_id, resource_ref))`,
+    `CREATE INDEX resource_observations_resource ON resource_observations (resource_ref, observed_at)`,
+    `CREATE INDEX resource_observations_attempt ON resource_observations (attempt_id, resource_ref)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>

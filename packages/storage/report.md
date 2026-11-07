@@ -46,6 +46,34 @@
 
 本轮结果：storage **60/60**（原 54 项全部保留），typecheck/build 通过。
 
+## 0.4 批次 2（g1-agent-a-runtime-state.md）：运行观察与可恢复证据
+
+输入同上；迁移号 **v5**。
+
+**对外接口**（组合根使用，无需私有 SQL）：
+
+```ts
+store.observations.record({ fact, payload, disposition, payloadSha256 })   // 必须在 ingress 事务内
+store.observations.get(factId)
+store.observations.forAttempt(attemptId, limit?)        // 事实级证据，按提交顺序
+store.observations.forResource(resourceRef, limit?)      // 资源级证据（审计）
+store.observations.summarize(attemptId): AttemptObservationSummary
+// { attemptId, observations, last?, cancel: { observed, acknowledged },
+//   resources: [{ resourceRef, observations, last, exit: { observed, exitCode?, signal? },
+//                 writer: { observed, status? }, quiescence: 'observed_quiescent' | 'unknown' }] }
+```
+
+| 要求 | 实现 | 证据 |
+| --- | --- | --- |
+| 持久化 RuntimeObservation/ResourceObservation，消费严格 RuntimeFactPayload 与原 factId/payloadRef | `record` 接收 contracts 的 `CriticalFact` + `RuntimeFactPayload`（由 `parseRuntimeFactPayload` 解析），保存 factId/payloadRef/宿主记录的 payload SHA-256/合同/epoch/disposition/规范化 detail；物理 payload（`runtime.exited`、`writer.observed`）按资源落行 | `test/observations.case.ts`：业务事实一行、无资源行；`get/forAttempt/forResource` |
+| 与 FactReceipts/core mutation/events/effects 共用 UnitOfWork | `record` 断言 `nesting ≥ 1`（必须在 ingress 事务内）；失败事务用例中 pointer/授权/receipt/observation/event/effect 一起回滚 | `observations must be recorded inside the ingress transaction and roll back with it` |
+| 按 attempt/resource 记录观察与来源；cancel ACK、parent exit、writer quiescence 分开，不能互相推断 | 事实行带 provenance；`summarize` 把 cancel（dispatch 级）、exit（每资源）、writer（每资源）独立暴露；`quiescence` 仅在最新 writer.observed 显式 `quiescent` 时为 `observed_quiescent`，exit 或 cancel 后仍为 `unknown`；后续非 quiescent 观察会撤销该状态 | `cancel acknowledgement, process exit and writer quiescence stay independent facts` |
+| 旧/ended attempt 的物理观察可保存，但不能改变新 attempt 的资源或恢复授权 | 观察只写观察表，不触碰 bindings/current/authority；用例在旧 attempt ended、新 attempt current 后记录旧物理观察，断言 current、资源集与授权不变，且新 attempt 摘要不含旧事实 | `an old attempt physical observation is stored without touching the new attempt, pointer or authority` |
+| 提供组合根读取/归约接口，不让主 Agent 用私有 SQL | `summarize/forAttempt/forResource/get` 为公开 API；生产字段归本包，wire 数据来自 contracts | `composition fixture: the public ports accept one fact transaction and reduce its evidence`（演示 stored-ingress 的调用形状与幂等重放） |
+| 不按超时/缺 PID 释放资源，不制造物理成功 | 库层没有任何 release API；只记录与归约；未知 attempt/未登记资源/ownership 不符一律拒绝（fail closed） | 分离用例 + `physical observations refuse an unknown attempt or an unregistered or differently-owned resource` |
+
+本轮结果：storage **66/66**（批 1 的 60 项全部保留）、effects 8/8、core-on-SQLite 178/178、ingress 18/18 与 7/7、跟进复现脚本 5/5 仍 PASS。主 Agent 接线方式：在 `stored-ingress.ts` 的 `applyBusiness/applyPhysical` 中把现有的 `events.append` 观察替换为 `store.observations.record({ fact: input, payload, disposition, payloadSha256: payloadDigest })`（`payloadDigest` 即 ingress 已计算的 canonical 载荷摘要）；读取用 `store.observations.summarize(attemptId)`。
+
 ## 1. 交付物
 
 | 交付物 | 位置 |
