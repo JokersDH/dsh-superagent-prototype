@@ -1,0 +1,166 @@
+{
+  "status": "PASS",
+  "reviewedCommit": "df2a632e8c20880200ddc9961f5cc985bd42e47f",
+  "upstream": "8c32a9dc5d72c033816c6a8110b37f40cf94fba4",
+  "sourceFilesVerified": 18,
+  "parser": "typescript@6.0.3 AST + module resolver",
+  "assertions": [
+    {
+      "entry": "src/core/index.ts",
+      "mode": "runtime",
+      "files": [
+        "src/core/assignments.ts",
+        "src/core/engine.ts",
+        "src/core/errors.ts",
+        "src/core/evals.ts",
+        "src/core/ids.ts",
+        "src/core/index.ts",
+        "src/core/intake.ts",
+        "src/core/memory.ts",
+        "src/core/model.ts",
+        "src/core/part.ts",
+        "src/core/ports.ts",
+        "src/core/reasons.ts",
+        "src/core/replies.ts",
+        "src/core/stage.ts",
+        "src/core/tickets.ts"
+      ],
+      "externals": [
+        "node:crypto"
+      ]
+    },
+    {
+      "entry": "src/core/index.ts",
+      "mode": "runtime_and_type",
+      "files": [
+        "src/core/assignments.ts",
+        "src/core/engine.ts",
+        "src/core/errors.ts",
+        "src/core/evals.ts",
+        "src/core/ids.ts",
+        "src/core/index.ts",
+        "src/core/intake.ts",
+        "src/core/memory.ts",
+        "src/core/model.ts",
+        "src/core/part.ts",
+        "src/core/ports.ts",
+        "src/core/reasons.ts",
+        "src/core/replies.ts",
+        "src/core/stage.ts",
+        "src/core/tickets.ts"
+      ],
+      "externals": [
+        "node:crypto"
+      ]
+    },
+    {
+      "entry": "tests/core-engine.spec.ts",
+      "mode": "runtime",
+      "files": [
+        "src/core/assignments.ts",
+        "src/core/engine.ts",
+        "src/core/errors.ts",
+        "src/core/evals.ts",
+        "src/core/ids.ts",
+        "src/core/index.ts",
+        "src/core/intake.ts",
+        "src/core/memory.ts",
+        "src/core/model.ts",
+        "src/core/part.ts",
+        "src/core/ports.ts",
+        "src/core/reasons.ts",
+        "src/core/replies.ts",
+        "src/core/stage.ts",
+        "src/core/tickets.ts",
+        "tests/core-engine.spec.ts"
+      ],
+      "externals": [
+        "node:crypto",
+        "vitest"
+      ]
+    },
+    {
+      "entry": "tests/core-engine.spec.ts",
+      "mode": "runtime_and_type",
+      "files": [
+        "src/core/assignments.ts",
+        "src/core/engine.ts",
+        "src/core/errors.ts",
+        "src/core/evals.ts",
+        "src/core/ids.ts",
+        "src/core/index.ts",
+        "src/core/intake.ts",
+        "src/core/memory.ts",
+        "src/core/model.ts",
+        "src/core/part.ts",
+        "src/core/ports.ts",
+        "src/core/reasons.ts",
+        "src/core/replies.ts",
+        "src/core/stage.ts",
+        "src/core/tickets.ts",
+        "tests/core-engine.spec.ts"
+      ],
+      "externals": [
+        "node:crypto",
+        "vitest"
+      ]
+    },
+    {
+      "entry": "tests/stage.spec.ts",
+      "mode": "runtime",
+      "files": [
+        "src/core/assignments.ts",
+        "src/core/engine.ts",
+        "src/core/errors.ts",
+        "src/core/evals.ts",
+        "src/core/ids.ts",
+        "src/core/index.ts",
+        "src/core/intake.ts",
+        "src/core/memory.ts",
+        "src/core/model.ts",
+        "src/core/part.ts",
+        "src/core/ports.ts",
+        "src/core/reasons.ts",
+        "src/core/replies.ts",
+        "src/core/stage.ts",
+        "src/core/tickets.ts",
+        "tests/stage.spec.ts"
+      ],
+      "externals": [
+        "node:crypto",
+        "vitest"
+      ]
+    },
+    {
+      "entry": "tests/stage.spec.ts",
+      "mode": "runtime_and_type",
+      "files": [
+        "src/core/assignments.ts",
+        "src/core/engine.ts",
+        "src/core/errors.ts",
+        "src/core/evals.ts",
+        "src/core/ids.ts",
+        "src/core/index.ts",
+        "src/core/intake.ts",
+        "src/core/memory.ts",
+        "src/core/model.ts",
+        "src/core/part.ts",
+        "src/core/ports.ts",
+        "src/core/reasons.ts",
+        "src/core/replies.ts",
+        "src/core/stage.ts",
+        "src/core/tickets.ts",
+        "tests/stage.spec.ts"
+      ],
+      "externals": [
+        "node:crypto",
+        "vitest"
+      ]
+    }
+  ],
+  "limitations": [
+    "This proves the fixed extracted slice only",
+    "Does not implement completion/fence/DB/native behavior"
+  ],
+  "reviewedAt": "2026-11-07T08:08:00.269Z"
+}
