@@ -40,6 +40,8 @@ The receipt scope is deliberately `registered_owned_resources_only`. It does **n
 
 `pnpm check:g1-runner-link`: **17/17**, strict coordinator typecheck, Node **24.22.2**, darwin/arm64. Report: `reports/releases/g1-runner-link.json`.
 
+A clean detached checkout of source `1668468` installed from the frozen lockfile and independently passed **17 + 14 = 31** integration cases and spec checks on the same target runtime. Only generated report timestamps changed. Evidence: `reports/releases/g1-runner-link-clean.json`.
+
 Sixteen guards cover authentication/full identity, pinned inode, no business endpoint, once-only cancel, cached unknown outcome, private credentials, existing-file preservation, forged/stale/mutated proof refusal, partial/unknown/open/unevidenced inventories, manifest changes, receipt rollback, secret exclusion, bounds/timeouts, old-attempt cleanup and zero-resource handling.
 
 The seventeenth scenario starts an independent fixture Runner and one real owned child. One coordinator process opens actual SQLite and inspects it, then is **SIGKILLed**. The owned child keeps writing. A new coordinator process opens the same store, connects to the same pinned Runner, cancels the original child and records the barrier. The test verifies one original begin, one cancellation, physical exit, persisted observations, ended binding and an open Ticket. Owned fixture services/processes are cleaned up.

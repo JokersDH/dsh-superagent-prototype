@@ -9,6 +9,7 @@
     "storage": { "testsPassed": 66, "independentTargetNode": "24.22.2" },
     "mainProductionAndFactRecovery": { "testsPassed": 14, "realSigkillWindows": 2, "report": "reports/releases/g1-recovery.json" },
     "mainLocalRunnerRecoveryAndOwnedBarrier": { "testsPassed": 17, "realCoordinatorSigkillWindows": 1, "node": "24.22.2", "report": "reports/releases/g1-runner-link.json", "productionRunnerDaemonAdmitted": false },
+    "mainCleanCheckout": { "sourceCommit": "1668468", "testsPassed": 31, "realSigkillWindows": 3, "report": "reports/releases/g1-runner-link-clean.json" },
     "candidateJournalFormatInterop": { "casesPassed": 3, "writerAdmissionProven": false, "report": "reports/releases/g1-journal-interop.json" },
     "candidateRuntimeBranch": { "testsPassed": 136, "testsFailed": 0, "suiteNode": "24.21.0", "reviewedCommit": "32540a3b1b7c7907c644deb708cf486ecd3781aa", "originalAdmissionCasesPassed": 4, "followupCasesFailed": 3, "followupReport": "reports/releases/g1-journal-followup.json", "merged": false },
     "candidateWorkspacesVerification": { "testsPassed": 19, "testsFailed": 0, "suiteNode": "24.21.0", "reviewedCommit": "d1be401b3f10ac0a297440e6e9f99bf4d5a608c4", "admissionCasesFailed": 6, "report": "reports/releases/g2-wp04-review.json", "merged": false }

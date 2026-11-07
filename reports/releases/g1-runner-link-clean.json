@@ -1,0 +1,22 @@
+{
+  "status": "PASS_CLEAN_CHECKOUT_LOCAL_RECOVERY_SLICE",
+  "sourceCommit": "1668468cd78c7dc1c89f3022f48358404b0359ff",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "install": "pnpm install --offline --frozen-lockfile --ignore-scripts",
+  "results": [
+    { "command": "pnpm check:g1-runner-link", "status": "PASS", "tests": 17 },
+    { "command": "pnpm check:g1-recovery", "status": "PASS", "tests": 14 },
+    { "command": "pnpm check:spec", "status": "PASS", "runtimeTests": 0 }
+  ],
+  "totalIntegrationTests": 31,
+  "realSigkillWindows": 3,
+  "trackedSourceUnchangedAfterChecks": true,
+  "onlyGeneratedReportTimestampsChanged": true,
+  "limits": [
+    "The independent Runner endpoint registry and service are test fixtures around the accepted ProcessHost",
+    "Journal and WP-04 candidates are not merged or admitted",
+    "No full G1, production daemon/UI, native vendor or power-loss certification"
+  ]
+}
