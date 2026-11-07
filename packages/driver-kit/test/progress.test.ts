@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { ProgressCoalescer, type Scheduler } from '../src/index.ts'
+import type { ProgressUpdate } from '../../contracts/src/types.ts'
 import { makeProgress } from '../../testing/src/fixtures.ts'
 
 function manualScheduler(): Scheduler & { fire(): void } {
@@ -24,7 +25,7 @@ function manualScheduler(): Scheduler & { fire(): void } {
 }
 
 test('coalesces a burst to the newest update per window', () => {
-  const published = []
+  const published: ProgressUpdate[] = []
   const scheduler = manualScheduler()
   const coalescer = new ProgressCoalescer({ publish: update => published.push(update), scheduler, windowMs: 100 })
   coalescer.push(makeProgress({ text: 'one' }))
@@ -34,7 +35,7 @@ test('coalesces a burst to the newest update per window', () => {
   assert.deepEqual(coalescer.stats(), { received: 3, published: 0, coalesced: 2, rejected: 0, pending: 1, lastPublishAt: null })
   scheduler.fire()
   assert.equal(published.length, 1)
-  assert.equal(published[0].text, 'three')
+  assert.equal(published[0]?.text, 'three')
   const after = coalescer.stats()
   assert.equal(after.received, 3)
   assert.equal(after.published, 1)
@@ -44,7 +45,7 @@ test('coalesces a burst to the newest update per window', () => {
 })
 
 test('flush publishes immediately and cancels the pending timer', () => {
-  const published = []
+  const published: ProgressUpdate[] = []
   const scheduler = manualScheduler()
   const coalescer = new ProgressCoalescer({ publish: update => published.push(update), scheduler })
   coalescer.push(makeProgress({ text: 'latest' }))
@@ -56,7 +57,7 @@ test('flush publishes immediately and cancels the pending timer', () => {
 })
 
 test('does nothing when there is no pending progress', () => {
-  const published = []
+  const published: ProgressUpdate[] = []
   const coalescer = new ProgressCoalescer({ publish: update => published.push(update), scheduler: manualScheduler() })
   coalescer.flush()
   assert.deepEqual(published, [])

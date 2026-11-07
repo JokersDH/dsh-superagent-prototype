@@ -218,7 +218,7 @@ export class FakeDriver implements AgentDriverV1 {
             }
           }
           const startedAt = this.#now()
-          await io.runtime.write(resource.resourceRef, encodeFrame({ type: command.kind, id: command.id, ...command }))
+          await io.runtime.write(resource.resourceRef, encodeFrame({ ...command, type: command.kind, id: command.id }))
           nativeRequests.push(command.kind)
           if (command.kind === 'cancel') controlLatencies.push(this.#now() - startedAt)
         }
@@ -262,7 +262,7 @@ export class FakeDriver implements AgentDriverV1 {
         case 'question':
           await recordFact('question.opened', {
             questionId: String(value.questionId ?? 'q-1'),
-            nativeRequestId: value.nativeRequestId ?? null,
+            nativeRequestId: value.nativeRequestId === undefined || value.nativeRequestId === null ? null : String(value.nativeRequestId),
             attemptId: spec.attemptId,
           }, String(value.questionId ?? 'q-1'))
           diagnostics.push(evidence('question-open'))

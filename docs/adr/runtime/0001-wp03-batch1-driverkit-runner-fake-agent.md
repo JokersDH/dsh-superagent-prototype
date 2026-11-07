@@ -115,7 +115,7 @@ stdin：`{type:'begin'|'deliver'|'answer'|'cancel'|'shutdown'}`；stdout：`read
 3. **崩溃恢复**：coordinator 崩溃后重连 Runner、重新核对绑定、避免重复 start —— 需要 Runner journal 落盘与恢复流程，本批未实现（REL-04 只测了进程内新 epoch）。
 4. **真实 Driver / 真实原生进程**：`FakeDriver` 不是任何厂商协议，`FakeAgent` 不是 Codex/ACP/ZCode。**mock 通过不代表原生兼容**。
 5. **共享服务 session**：只实现 `spawned_process` 所有权；`shared_service_session` 的控制隔离（RT-09）未做。
-6. **类型检查**：仓库未在本分支安装 TypeScript 依赖（根 lock 由主 Agent 拥有），因此只做了 Node 类型擦除执行 + 模块解析校验，**未跑 `tsc --noEmit`**。
+6. ~~类型检查~~ **已补做**：见 §7.1（在仓库外副本中用 TypeScript 6.0.3 + zod 4.4.3 完成严格模式类型检查，含测试文件，0 错误）。
 7. **macOS 之外的平台**：`ProcessHost` 用 `ps -o lstart=` 做启动身份；Linux 需验证，Windows 完全未测。
 8. **性能预算**（REL-08）：未测。
 
@@ -151,6 +151,29 @@ cd apps/runner         && node --test test/*.test.ts     # 23 pass / 0 fail
 ```
 
 运行时：macOS 26.6 / arm64，Node v24.21.0（本机观察值；G0 的拟锁组合是 24.22.2，本批未用拟锁 Node 重跑，属于 NOT_TESTED 范围）。
+
+### 7.1 严格类型检查（仓库外副本，不产生受版本管理的文件）
+
+根 workspace 尚未激活，本分支不安装根依赖。为验证真实类型（而非仅类型擦除执行），把
+`packages/contracts`、`packages/driver-kit`、`packages/execution`、`packages/testing`、`apps/runner`
+复制到 `/tmp` 下的临时工作区，软链一份隔离的 `node_modules`（TypeScript 6.0.3、zod 4.4.3、@types/node 24.10.0），
+用与 `packages/contracts/tsconfig.json` 一致的编译选项检查：
+
+```sh
+/tmp/g1-typecheck/node_modules/.bin/tsc -p /tmp/g1-check-work/tsconfig.check.json
+# exit 0 — strict + noUncheckedIndexedAccess + verbatimModuleSyntax，源码与测试全覆盖
+```
+
+首轮发现 6 个真实类型错误（全部在本批新增代码内，已修复）：
+
+| 位置 | 问题 |
+| --- | --- |
+| `packages/testing/src/fake-driver.ts` | `encodeFrame` 里 `id` 被展开覆盖（TS2783） |
+| `packages/testing/src/fake-driver.ts` | 原生 request id 是 `unknown`，不能直接当 JSON（TS2345） |
+| `packages/driver-kit/test/progress.test.ts` | `published` 隐式 `any[]`（TS7034/7005） |
+| `packages/execution/test/supervisor.test.ts` | 条件类型写坏导致参数类型不可赋值（TS2344/2322） |
+
+这属于本批自检发现并修复的真实缺陷，不是外部模块问题；`packages/contracts` 未作任何修改。
 
 ---
 

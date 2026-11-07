@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { AttemptSupervisor } from '../src/supervisor.ts'
 import type { AttemptBinding } from '../src/contracts.ts'
+import type { FakeStopBehavior } from '../../testing/src/fakes.ts'
 import {
   FakeClock,
   FakeRunnerHost,
@@ -22,7 +23,7 @@ class MemoryBindings {
   }
 }
 
-function supervisor(options: { stopBehavior?: Parameters<typeof FakeRunnerHost>[0] extends never ? never : { quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] } } = {}) {
+function supervisor(options: { stopBehavior?: FakeStopBehavior } = {}) {
   const runner = new FakeRunnerHost({ stopBehavior: options.stopBehavior ?? { quiescence: 'confirmed', evidenceRefs: ['fake-stop'] } })
   const ledger = new InMemoryFactLedger()
   const bindings = new MemoryBindings()
