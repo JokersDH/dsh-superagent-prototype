@@ -12,7 +12,7 @@
     {
       "path": "src/core/assignments.ts",
       "upstreamSha256": "6acf4b858b35d95c875680e39b1e3c41557bbe6d39f65031bb26927289327065",
-      "currentSha256": "32ee1215ff5238ed52657886a20076ded5aa2f5c99795202c6fd050d4c72be78",
+      "currentSha256": "f0896da17c224dab2ecb086ca65c91947fdb88b05eeafc9113ee5687784b4e55",
       "treatment": "adapted",
       "reason": "Scoped reports/read ACKs, candidate lifecycle and verified-mode ready behavior."
     },

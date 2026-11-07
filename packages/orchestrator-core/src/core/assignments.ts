@@ -93,7 +93,11 @@ export class Assignments extends EnginePart {
     if (!ticket || !running) return
     const report = running.report
     const busy = !!running.deliveredAt && !!report && running.deliveredAt >= report.at
-    const settled = !!report && ['waiting', 'ready', 'blocked', 'failed'].includes(report.state) && !busy
+    const completion = ticket.completion
+    const candidate = completion?.candidate
+    const settledCandidate = report?.state === 'ready' && candidate?.assignmentId === running.id && candidate.candidateGeneration === completion?.generation
+      && ticket.undelivered.length === 0 && !ticket.inputs.some(input => input.kind === 'trigger' && input.deliveredTo === running.id && input.readAt === null)
+    const settled = settledCandidate || (!!report && ['waiting', 'ready', 'blocked', 'failed'].includes(report.state) && !busy)
     if (!settled) this.tickets.restart(ticket, running, 'hostRestarted', RECOVERY_NOTE)
     else if (ticket.undelivered.length) this.options.executor.deliver(ticket, running)
   }

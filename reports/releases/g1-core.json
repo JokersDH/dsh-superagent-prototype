@@ -4,9 +4,9 @@
     "version": "1.0.0",
     "schemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d"
   },
-  "coreTests": 177,
+  "coreTests": 178,
   "originalBaselineTests": 144,
-  "newCoreTests": 33,
+  "newCoreTests": 34,
   "dependencies": {
     "status": "PASS",
     "runtimeFiles": [
@@ -41,7 +41,7 @@
   "node": "v24.22.2",
   "platform": "darwin",
   "arch": "arm64",
-  "recordedAt": "2026-11-07T09:18:48.477Z",
+  "recordedAt": "2026-11-07T09:22:24.219Z",
   "pending": [
     "WP-02 real storage/effect integration",
     "WP-03 actual subprocess/writer barriers and recovery integration",

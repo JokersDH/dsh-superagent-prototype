@@ -301,4 +301,13 @@ describe('personal completion gate', () => {
     h.report(ticket); h.engine.confirmCompletion(h.proof(ticket).proposal)
     expect(h.repo.threads.get('local:thread-1')!.pending).not.toContain('consumed-input')
   })
+  it('does not restart a causally settled personal candidate when delivery/report timestamps tie', () => {
+    const h = harness('verified', {}, true), ticket = h.create(), assignmentId = latestAssignment(ticket)!.id
+    h.receive('settled-input'); const ids = h.repo.tickets.get(ticket.id)!.undelivered
+    h.engine.inputsDelivered(ticket.id, assignmentId, ids); h.engine.inputsReadAssignment(ticket.id, assignmentId, ids)
+    h.report(ticket); const candidate = h.engine.completionCandidate(ticket.id)
+    h.engine.assignmentInterrupted(ticket.id, assignmentId)
+    expect(h.repo.tickets.get(ticket.id)!.assignments).toHaveLength(1)
+    expect(h.engine.completionCandidate(ticket.id)).toEqual(candidate)
+  })
 })

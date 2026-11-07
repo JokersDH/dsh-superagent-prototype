@@ -20,7 +20,7 @@ The first core interface was published in commit `56bba3e`; current source adds 
 | Check | Result |
 | --- | --- |
 | Original copied core baseline | 144/144, test files byte-identical to upstream |
-| New personal core rules | 33/33; total core 177/177 |
+| New personal core rules | 34/34; total core 178/178 |
 | Contracts | 183/183, typecheck/build/generated identity unchanged |
 | Provenance | 18 source/test/license files accounted for; each adapted/new file hashed |
 | Root prototype after workspace adoption | 1197/1197, typecheck and original build pass |
