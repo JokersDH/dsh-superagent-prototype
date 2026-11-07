@@ -1,21 +1,21 @@
 {
-  "status": "BLOCKED_REPRODUCED_INVARIANTS",
-  "storageCommit": "8a02f02bb01a862a801c1aeea5400c13bd45f7b6",
-  "runtimeCommit": "b4111ed14af548f824ab47b14682a6d88a53eff7",
-  "node": "v24.22.2",
+  "status": "PASS",
+  "storageCommit": "cdde91b408aec2abd880bdbb27743c01b7be9f25",
+  "runtimeCommit": "d213d9472b76335ec00997fc3ac79ca412c56957",
+  "node": "v24.21.0",
   "platform": "darwin",
   "cases": [
     {
       "id": "A-LOCK-INITIALIZATION",
-      "passesInvariant": false,
-      "observed": "A second owner stole an empty in-flight lock file"
+      "passesInvariant": true,
+      "observed": "Refused unknown ownership"
     },
     {
       "id": "A-ASYNC-TRANSACTION",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "rejectedSynchronously": false,
-        "persistedRowsAfterFailure": 1
+        "rejectedSynchronously": true,
+        "persistedRowsAfterFailure": 0
       }
     },
     {
@@ -28,57 +28,60 @@
     },
     {
       "id": "B-FROZEN-COMMAND",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "hasContract": false,
-        "inputRef": "policy-snapshot-1",
+        "hasContract": true,
+        "inputRef": "input-initial-1",
         "policySnapshotRef": "policy-snapshot-1"
       }
     },
     {
       "id": "B-ASSIGNMENT-FENCE",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "accepted": true
+        "accepted": false,
+        "reason": "assignment_mismatch"
       }
     },
     {
       "id": "B-COMMAND-IDENTITY",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "deliveryIds": [
-          "cmd-attempt-1-deliver",
-          "cmd-attempt-1-deliver"
+          "cmd-attempt-1-1-deliver:input-1",
+          "cmd-attempt-1-1-deliver:input-2"
         ]
       }
     },
     {
       "id": "B-UNKNOWN-STOP",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "first": {
-          "state": "ended",
-          "quiescence": "indeterminate",
+          "state": "stopping",
+          "quiescence": "unknown",
           "evidenceRefs": [
-            "no-attempt-handle"
+            "no-attempt-handle",
+            "reason:recover"
           ]
         },
         "second": {
-          "state": "ended",
-          "quiescence": "confirmed",
+          "state": "stopping",
+          "quiescence": "unknown",
           "evidenceRefs": [
-            "no-active-binding"
+            "no-attempt-handle",
+            "reason:recover"
           ]
         }
       }
     },
     {
       "id": "B-PROCESS-GROUP",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "stop": "confirmed",
-        "descendantState": "S",
-        "descendantStillActive": true
+        "descendantState": "missing",
+        "descendantStillActive": false
       }
     }
   ]
