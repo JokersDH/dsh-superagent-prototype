@@ -2,6 +2,8 @@
 
 ## 1. 唯一交付仓库
 
+最新阶段：G0 已按 darwin/arm64 的限定范围验收通过，详见 [G0 主 Agent 交接](docs/adr/bootstrap/g0-main-report.md)。下表的首轮工作目录/分支用于追溯 G0；下一轮各自从集成 main 新开 G1 分支，A 转 WP-02，B 转 WP-03，主 Agent 转 WP-01/16。
+
 [JokersDH/dsh-superagent-prototype](https://github.com/JokersDH/dsh-superagent-prototype) 是后续方案 B 的交付仓库。架构、试验和正式实现都提交到这个仓库。
 
 - `origin`：你的 fork，用于 fetch/push。
@@ -22,9 +24,9 @@
 | `docs/`、`prompts/`、`skills/` | 上游原型文档和模型资产 | 已有 |
 | `product-spec/` | 完整架构、契约草案、17 个任务包、83 条验收要求 | 已有设计，不等于产品已实现 |
 | `agent-tasks/` | 当前三人的直接开工指令 | 已有 |
-| `tools/reuse-spike/core-extraction/` | Agent A 的隔离提取源码、测试、lock、报告 | Agent A 开工后创建 |
-| `tools/reuse-spike/platform/` | Agent B 的运行时/SQLite 探针和报告 | Agent B 开工后创建 |
-| `packages/contracts/` | 正式公共运行时 schema/生成类型 | 主 Agent 在 G0 实现 |
+| `tools/reuse-spike/core-extraction/` | Agent A 的隔离提取源码、测试、lock、报告 | CORE-01 已独立复核通过 |
+| `tools/reuse-spike/platform/` | Agent B 的运行时/SQLite 探针和报告 | 补齐漏交 helper 后，G0 平台探针独立复核通过 |
+| `packages/contracts/` | 公共运行时 schema/生成类型/JSON Schema/版本哈希 | G0 v1 已实现，183 项测试和独立 package 检查通过 |
 | `packages/orchestrator-core/` | 正式提取及最小扩展后的 core | G0 通过后实现 |
 | `packages/storage/`、`effects/`、`execution/` 等 | 新产品各后端模块（均位于 packages 下） | 按后续任务包实现 |
 | `apps/coordinator/`、`apps/runner/`、`apps/console/`、`apps/cli/` | 新产品后台、受控 Runner、网页、CLI | 按后续任务包实现 |

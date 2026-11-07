@@ -109,7 +109,8 @@ pnpm test:release
 
 ```sh
 node product-spec/tools/verify-spec.mjs
-./node_modules/.bin/tsc --ignoreConfig --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext --skipLibCheck --types node product-spec/contracts/contracts.ts product-spec/contracts/fixtures.ts
+pnpm check:contracts
+pnpm check:bootstrap
 ```
 
 原仓 reference baseline 命令为 `./node_modules/.bin/vitest run tests/core-engine.spec.ts tests/stage.spec.ts`，已由本轮运行通过。它不属于已经完成的 G0 提取结果。

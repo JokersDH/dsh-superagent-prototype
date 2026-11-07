@@ -98,7 +98,9 @@ pa start / pa status / pa doctor / pa backup / pa stop
 
 ## 8. 当前证据与检查
 
-已运行原仓两个核心测试文件：144 个测试通过，作为 reference baseline。尚未提取 core、安装拟议依赖、启动原生 agent 模型任务或实现生产协调器。三个本机产品版本和协议材料是只读调研证据，不是运行兼容证明。
+设计调研阶段运行的原仓 144 个测试仅作为 reference baseline。随后 G0 已完成：Agent A 的独立提取/144 测试和 AST 复核，主 Agent 的单一来源契约包/183 测试/独立构建，Agent B 在打包补正后的 darwin-arm64 目标组合/30 探针与独立复验。当前 G0 结论和范围见 [交接报告](../docs/adr/bootstrap/g0-main-report.md)。
+
+尚未实现生产协调器、核心完成/fence 扩展、正式 Store/Runner，也未启动原生 agent 模型任务或学习实验。原生产品版本/协议调研依然不代表接入通过，其他平台保持 NOT_TESTED。
 
 文档一致性检查：`node product-spec/tools/verify-spec.mjs`。公共类型检查命令见 07。这些检查只证明规格内部一致和草案可编译，不证明产品稳定性或学习收益。
 
@@ -355,7 +357,9 @@ ZCode 源码可见不等于安装版已兼容；DSH 的 profile/SDK 版本分别
 
 # 02 架构、代码复用与唯一状态来源
 
-日期：2026-11-07。本文是方案 B 的实施蓝图，不代表已经完成源码提取或生产实现。
+日期：2026-11-07。本文是方案 B 的实施蓝图并补充 G0 进度；正式产品内核及生产实现仍未完成。
+
+阶段更新：蓝图之后，G0-A 的隔离 core 提取已通过独立验收，详见 [复核记录](../docs/adr/bootstrap/reviews/g0-agent-a.md)。正式产品包及以下必要 core 扩展仍未实现；本文原有“原仓 reference baseline”与后来“独立提取通过”的证据不可混用。
 
 ## 1. 最终选择
 
@@ -650,7 +654,7 @@ pnpm check
 
 # 03 公共契约、数据和关键时序
 
-版本 `B-1.0-draft`。实现前由 WP-00 冻结为 contracts v1；[contracts.ts](contracts/contracts.ts) 是单一可编译草案，不是已经发布的 SDK。core 原有领域类型继续从提取内核导出，不在产品 types 中重定义。
+版本 `B-1.0-draft`。G0 主 Agent 已实现 [packages/contracts](../packages/contracts/README.md) 的 v1 契约，类型、运行时校验、JSON Schema 和哈希来自单一来源。[contracts.ts](contracts/contracts.ts) 仅为类型重导出，不再维护字段副本。G0 已结合独立提取和平台复验证据通过，范围见 [交接](../docs/adr/bootstrap/g0-main-report.md)；契约通过本身不等于产品实现或 native 兼容。core 原有领域类型继续从提取内核导出。
 
 ## 1. 术语与权威
 
@@ -860,6 +864,10 @@ CLI 是同一 ApplicationService 的客户端，不直接开 DB 写入。网页�
 contracts 有 API major 与 schema hash；Driver 只支持它声明的 major。可选字段添加须有旧消费者 fixture；改变语义、枚举或删除字段需新版本与迁移。未知协议字段可保留受限诊断，但未知权限/批准类型默认进入 review，不能宽松执行。
 
 完整 schema validation 使用 Zod 从单一声明生成 wire schema/TS，或由一个经过测试的生成流程生成；不能维护互不校验的 TS、JSON Schema 和 Driver 私有副本。本草案 TypeScript 先固定语义，WP-00 选择生成方向并记录 ADR。
+
+G0 已选择 Zod 4.4.3 单一来源并记录 [ADR 0001](../docs/adr/bootstrap/0001-contract-source-and-g0-workspace.md)。JSON Schema 2020-12 只负责结构和可表达约束；关键入口必须使用导出的 Zod/contextual parsers。schemaHash 同时覆盖结构、语义校验和 ports 源哈希，不能通过只改 validator 绕过版本身份。旧草案示例不是 native 兼容报告。
+
+CriticalFact 的 payloadRef 解析为统一 RuntimeFactPayload `{ kind, value }`，覆盖全部 RuntimeFactKind；不允许 Driver 自行定义另一份载荷。Runner begin/deliver 的 inputRef 使用 ExecutionInput，answerRef 使用 NativeAnswerPayload，preparedPolicyRef 使用 PreparedExecutionPolicy。解析和 binding 对齐不代替 ingress 同事务 freshness fence。
 
 ## 11. 验收映射
 
@@ -1663,7 +1671,8 @@ pnpm test:release
 
 ```sh
 node product-spec/tools/verify-spec.mjs
-./node_modules/.bin/tsc --ignoreConfig --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext --skipLibCheck --types node product-spec/contracts/contracts.ts product-spec/contracts/fixtures.ts
+pnpm check:contracts
+pnpm check:bootstrap
 ```
 
 原仓 reference baseline 命令为 `./node_modules/.bin/vitest run tests/core-engine.spec.ts tests/stage.spec.ts`，已由本轮运行通过。它不属于已经完成的 G0 提取结果。

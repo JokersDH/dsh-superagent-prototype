@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "gate": "DATA-01_G0_CONTRACT_SLICE",
+  "apiMajor": 1,
+  "version": "1.0.0",
+  "schemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "schemaCount": 76,
+  "executedTests": 183,
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "results": [
+    {
+      "script": "check:generated",
+      "status": "PASS",
+      "startedAt": "2026-11-07T08:19:52.235Z",
+      "completedAt": "2026-11-07T08:19:52.525Z"
+    },
+    {
+      "script": "typecheck",
+      "status": "PASS",
+      "startedAt": "2026-11-07T08:19:52.525Z",
+      "completedAt": "2026-11-07T08:19:53.279Z"
+    },
+    {
+      "script": "test",
+      "status": "PASS",
+      "startedAt": "2026-11-07T08:19:53.279Z",
+      "completedAt": "2026-11-07T08:19:53.757Z"
+    },
+    {
+      "script": "build",
+      "status": "PASS",
+      "startedAt": "2026-11-07T08:19:53.757Z",
+      "completedAt": "2026-11-07T08:19:54.351Z"
+    }
+  ],
+  "limitations": [
+    "No native/model execution",
+    "No core lifecycle, product DB, API or full end-to-end implementation validated"
+  ]
+}

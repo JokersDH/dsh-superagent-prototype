@@ -1,6 +1,6 @@
 # 03 公共契约、数据和关键时序
 
-版本 `B-1.0-draft`。实现前由 WP-00 冻结为 contracts v1；[contracts.ts](contracts/contracts.ts) 是单一可编译草案，不是已经发布的 SDK。core 原有领域类型继续从提取内核导出，不在产品 types 中重定义。
+版本 `B-1.0-draft`。G0 主 Agent 已实现 [packages/contracts](../packages/contracts/README.md) 的 v1 契约，类型、运行时校验、JSON Schema 和哈希来自单一来源。[contracts.ts](contracts/contracts.ts) 仅为类型重导出，不再维护字段副本。G0 已结合独立提取和平台复验证据通过，范围见 [交接](../docs/adr/bootstrap/g0-main-report.md)；契约通过本身不等于产品实现或 native 兼容。core 原有领域类型继续从提取内核导出。
 
 ## 1. 术语与权威
 
@@ -210,6 +210,10 @@ CLI 是同一 ApplicationService 的客户端，不直接开 DB 写入。网页�
 contracts 有 API major 与 schema hash；Driver 只支持它声明的 major。可选字段添加须有旧消费者 fixture；改变语义、枚举或删除字段需新版本与迁移。未知协议字段可保留受限诊断，但未知权限/批准类型默认进入 review，不能宽松执行。
 
 完整 schema validation 使用 Zod 从单一声明生成 wire schema/TS，或由一个经过测试的生成流程生成；不能维护互不校验的 TS、JSON Schema 和 Driver 私有副本。本草案 TypeScript 先固定语义，WP-00 选择生成方向并记录 ADR。
+
+G0 已选择 Zod 4.4.3 单一来源并记录 [ADR 0001](../docs/adr/bootstrap/0001-contract-source-and-g0-workspace.md)。JSON Schema 2020-12 只负责结构和可表达约束；关键入口必须使用导出的 Zod/contextual parsers。schemaHash 同时覆盖结构、语义校验和 ports 源哈希，不能通过只改 validator 绕过版本身份。旧草案示例不是 native 兼容报告。
+
+CriticalFact 的 payloadRef 解析为统一 RuntimeFactPayload `{ kind, value }`，覆盖全部 RuntimeFactKind；不允许 Driver 自行定义另一份载荷。Runner begin/deliver 的 inputRef 使用 ExecutionInput，answerRef 使用 NativeAnswerPayload，preparedPolicyRef 使用 PreparedExecutionPolicy。解析和 binding 对齐不代替 ingress 同事务 freshness fence。
 
 ## 11. 验收映射
 

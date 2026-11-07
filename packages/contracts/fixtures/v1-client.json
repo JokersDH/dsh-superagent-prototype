@@ -1,0 +1,7 @@
+{
+  "commandId": "client-v1-command",
+  "conversationId": "conversation-1",
+  "kind": "chat",
+  "text": "Discuss CSV export.",
+  "projectId": "project-1"
+}

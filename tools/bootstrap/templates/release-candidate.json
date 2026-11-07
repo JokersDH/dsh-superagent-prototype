@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "status": "PROPOSED_NOT_RELEASE_APPROVED",
+  "product": "personal-agent-scheme-b",
+  "sourceRepository": "https://github.com/JokersDH/dsh-superagent-prototype",
+  "referenceCoreCommit": "8c32a9dc5d72c033816c6a8110b37f40cf94fba4",
+  "targetRuntime": { "node": "24.22.2", "pnpm": "11.7.0", "sqliteBinding": "better-sqlite3@13.0.3", "minimumActualSqlite": "3.51.3" },
+  "platforms": [
+    { "os": "darwin", "arch": "arm64", "status": "NOT_TESTED" },
+    { "os": "darwin", "arch": "x64", "status": "NOT_TESTED" }
+  ],
+  "g0Evidence": { "coreExtraction": "PENDING_AGENT_A", "nativeBinding": "PENDING_AGENT_B", "contracts": "SEE_PACKAGES_CONTRACTS_REPORT" },
+  "limitations": ["No native model jobs executed by this template", "No production database, coordinator, installer or full recovery validated", "Do not promote a release from a template status"]
+}

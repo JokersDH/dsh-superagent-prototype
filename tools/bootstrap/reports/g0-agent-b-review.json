@@ -1,0 +1,33 @@
+{
+  "status": "PASS_OPS_01_G0_DARWIN_ARM64",
+  "reviewedCommit": "ad24d87b5cef6a72c14945568a0de8720eed07c1",
+  "originalAgentCommit": "87deffb",
+  "packagingCorrectionCommit": "ad24d87",
+  "helperDigest": "9467fe6facdaaf8865be6ef298b55277648c70ea7d1500f7bd8689adb1a263d1",
+  "correction": "The helper was copied byte-identically from Agent B original local file; root lib/ ignore became /lib/. Agent B worktree was not changed.",
+  "independentProbes": 30,
+  "runtime": {
+    "node": "v24.22.2",
+    "pnpm": "11.7.0",
+    "binding": "13.0.3",
+    "sqlite": "3.53.4",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "nodeArchiveSha256": "aa9549349e47dffaa42dcf95d6e06ade8c4bdafc980979883b88767670df385a",
+  "prebuildSha256": "98e0e8acd01c632fe5615243e1296af0372826f8783b18fc31c506f73c47459c",
+  "evidence": {
+    "evidence/install/install.json": "5daf8b5ae206982f2bdb3ce8ebae42891ce55db56d58854bce55575083cdc353",
+    "evidence/release-proposed/env.json": "2c92df74bf38e3f074656ee204eff63aa4a592fc0436f72090ce63ef9f90dbd0",
+    "evidence/release-proposed/tx.json": "658c9be9c2335365b3b9da9ebabe02698ee40cab781b3fc7f497239342027dc0",
+    "evidence/release-proposed/backup.json": "198c88e91117f523787cb5c5abbb8a7e808e297e3efed30aedad1be00d5c5453",
+    "evidence/release-proposed/crash.json": "f024852b042b353ceea8b45a2b4262e951a30bc0f58c76b36ab649e01a21a06c",
+    "evidence/release-proposed/summary.json": "24e2961fe7ac1d99516337d74ceefa4bc09971df1baf54255dbcf81cb8b01956"
+  },
+  "recordedAt": "2026-11-07T08:17:01.837Z",
+  "limitations": [
+    "Only the G0 native-load/SQLite probe scope is accepted",
+    "No product Store, afterCommit, queue, writer lease, artifact backup or end-to-end recovery validated",
+    "All other platforms remain NOT_TESTED"
+  ]
+}

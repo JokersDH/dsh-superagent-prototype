@@ -1,0 +1,4365 @@
+{
+  "$defs": {
+    "AgentProfile": {
+      "$id": "urn:personal-agent:contracts:1.0.0:AgentProfile",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "argv": {
+          "items": {
+            "maxLength": 4096,
+            "type": "string"
+          },
+          "maxItems": 128,
+          "readOnly": true,
+          "type": "array"
+        },
+        "credentialReference": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "driverApiMajor": {
+          "const": 1,
+          "type": "number"
+        },
+        "driverId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "driverRelease": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "executable": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "expectedVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "nativeConfigRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "permissionPolicyRevision": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "requiredFeatures": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "revision": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "driverId",
+        "driverApiMajor",
+        "driverRelease",
+        "executable",
+        "argv",
+        "expectedVersion",
+        "nativeConfigRef",
+        "permissionPolicyRevision",
+        "requiredFeatures"
+      ],
+      "type": "object"
+    },
+    "AnswerDelivery": {
+      "$id": "urn:personal-agent:contracts:1.0.0:AnswerDelivery",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "answerId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "status": {
+          "enum": [
+            "local_recorded",
+            "response_written",
+            "native_applied",
+            "indeterminate",
+            "expired"
+          ],
+          "type": "string"
+        },
+        "targetBindingId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "answerId",
+        "targetBindingId",
+        "status",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "AppError": {
+      "$id": "urn:personal-agent:contracts:1.0.0:AppError",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:AppErrorCode"
+        },
+        "evidenceRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:EvidenceRef"
+        },
+        "message": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "retry": {
+          "enum": [
+            "safe",
+            "reconcile",
+            "user_action",
+            "none"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retry"
+      ],
+      "type": "object"
+    },
+    "AppErrorCode": {
+      "$id": "urn:personal-agent:contracts:1.0.0:AppErrorCode",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "enum": [
+        "conflict",
+        "stale_contract",
+        "stale_candidate",
+        "stale_binding",
+        "unsupported_capability",
+        "auth_required",
+        "policy_unprepared",
+        "writer_indeterminate",
+        "verification_failed",
+        "cursor_expired",
+        "storage_unavailable",
+        "budget_exceeded",
+        "invalid_request",
+        "question_expired",
+        "schema_mismatch",
+        "forbidden",
+        "state_in_use"
+      ],
+      "type": "string"
+    },
+    "AssignmentRef": {
+      "$id": "urn:personal-agent:contracts:1.0.0:AssignmentRef",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract"
+      ],
+      "type": "object"
+    },
+    "AttemptRef": {
+      "$id": "urn:personal-agent:contracts:1.0.0:AttemptRef",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "attemptId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "fenceEpoch": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract",
+        "attemptId",
+        "fenceEpoch"
+      ],
+      "type": "object"
+    },
+    "AttemptSpec": {
+      "$id": "urn:personal-agent:contracts:1.0.0:AttemptSpec",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "attemptId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "budgetRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "fenceEpoch": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "policySnapshotRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "profile": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:AgentProfile"
+        },
+        "resourceLeaseRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "workspaceRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract",
+        "attemptId",
+        "fenceEpoch",
+        "profile",
+        "workspaceRef",
+        "resourceLeaseRef",
+        "policySnapshotRef",
+        "budgetRef"
+      ],
+      "type": "object"
+    },
+    "CancelObservedPayload": {
+      "$id": "urn:personal-agent:contracts:1.0.0:CancelObservedPayload",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "acknowledged": {
+          "type": "boolean"
+        },
+        "dispatch": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:NativeDispatch"
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "dispatch",
+        "acknowledged",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "CandidateObservedPayload": {
+      "$id": "urn:personal-agent:contracts:1.0.0:CandidateObservedPayload",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "artifactRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "summaryRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "artifactRefs",
+        "summaryRef",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "CandidateRef": {
+      "$id": "urn:personal-agent:contracts:1.0.0:CandidateRef",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "candidateGeneration": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract",
+        "candidateGeneration"
+      ],
+      "type": "object"
+    },
+    "CapabilityObservation": {
+      "$id": "urn:personal-agent:contracts:1.0.0:CapabilityObservation",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "advertised": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Json"
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "feature": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "observed": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Json"
+        },
+        "policy": {
+          "enum": [
+            "allowed",
+            "blocked",
+            "requires_review"
+          ],
+          "type": "string"
+        },
+        "test": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:TestStatus"
+        }
+      },
+      "required": [
+        "feature",
+        "advertised",
+        "observed",
+        "test",
+        "policy",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "Change": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Change",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "entityRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "payload": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Json"
+        },
+        "seq": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "topic": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "seq",
+        "topic",
+        "entityRef",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "CommandReceipt": {
+      "$id": "urn:personal-agent:contracts:1.0.0:CommandReceipt",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "entityRefs": {
+              "additionalProperties": false,
+              "properties": {
+                "decisionId": {
+                  "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+                },
+                "policyId": {
+                  "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+                },
+                "questionId": {
+                  "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+                }
+              },
+              "type": "object"
+            },
+            "seq": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "status": {
+              "const": "recorded",
+              "type": "string"
+            },
+            "workId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "commandId",
+            "seq",
+            "status"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "entityRefs": {
+              "additionalProperties": false,
+              "properties": {
+                "decisionId": {
+                  "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+                },
+                "policyId": {
+                  "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+                },
+                "questionId": {
+                  "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+                }
+              },
+              "type": "object"
+            },
+            "error": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:AppError"
+            },
+            "seq": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "status": {
+              "const": "rejected",
+              "type": "string"
+            },
+            "workId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "commandId",
+            "seq",
+            "status",
+            "error"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "CompatibilityIdentity": {
+      "$id": "urn:personal-agent:contracts:1.0.0:CompatibilityIdentity",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "architecture": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "configStability": {
+          "enum": [
+            "frozen",
+            "watched",
+            "unverified"
+          ],
+          "type": "string"
+        },
+        "driverApiMajor": {
+          "const": 1,
+          "type": "number"
+        },
+        "driverRelease": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "executableDigest": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "nativeVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "permissionPolicyRevision": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "platform": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "profileId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "profileRevision": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "resolvedConfigFingerprint": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "runtimeVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "schemaDigest": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "sdkEntrypoint": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "sdkVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "wireVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "profileId",
+        "profileRevision",
+        "executableDigest",
+        "nativeVersion",
+        "driverRelease",
+        "driverApiMajor",
+        "wireVersion",
+        "schemaDigest",
+        "resolvedConfigFingerprint",
+        "permissionPolicyRevision",
+        "configStability",
+        "platform",
+        "architecture",
+        "runtimeVersion"
+      ],
+      "type": "object"
+    },
+    "CompletionProposal": {
+      "$id": "urn:personal-agent:contracts:1.0.0:CompletionProposal",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "artifactDigest": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "candidateGeneration": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "humanAcceptanceRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "verificationId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract",
+        "candidateGeneration",
+        "verificationId",
+        "artifactDigest"
+      ],
+      "type": "object"
+    },
+    "ConfigChangedPayload": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ConfigChangedPayload",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "detection": {
+          "enum": [
+            "watch",
+            "handshake",
+            "identity"
+          ],
+          "type": "string"
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "observedFingerprint": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "previousFingerprint": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        }
+      },
+      "required": [
+        "previousFingerprint",
+        "observedFingerprint",
+        "detection",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "ContractIdentity": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ContractIdentity",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "apiMajor": {
+          "const": 1,
+          "type": "number"
+        },
+        "schemaHash": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "version": {
+          "const": "1.0.0",
+          "type": "string"
+        }
+      },
+      "required": [
+        "apiMajor",
+        "version",
+        "schemaHash"
+      ],
+      "type": "object"
+    },
+    "ContractRef": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ContractRef",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "revision": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "workId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "workId",
+        "revision",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "ContractRevision": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ContractRevision",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authorityRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "createdAt": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "criteria": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:RequiredCriteria"
+        },
+        "digest": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "goal": {
+          "maxLength": 16384,
+          "minLength": 1,
+          "type": "string"
+        },
+        "revision": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "scope": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Scope"
+        },
+        "workId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "workId",
+        "revision",
+        "digest",
+        "goal",
+        "scope",
+        "criteria",
+        "authorityRef",
+        "createdAt"
+      ],
+      "type": "object"
+    },
+    "ConversationMessage": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ConversationMessage",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "anchor": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ReplyAnchor"
+        },
+        "conversationId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "createdAt": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "projectId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "provenance": {
+          "enum": [
+            "trusted_user",
+            "reasoner_reply",
+            "question_answer_display",
+            "application_notice"
+          ],
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "user",
+            "assistant",
+            "system"
+          ],
+          "type": "string"
+        },
+        "selectedProfileId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "sequence": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "sourceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "text": {
+          "maxLength": 65536,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "conversationId",
+        "sequence",
+        "role",
+        "provenance",
+        "text",
+        "sourceRefs",
+        "createdAt"
+      ],
+      "type": "object"
+    },
+    "ConversationPage": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ConversationPage",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "beforeCursor": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "conversationId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "hasMore": {
+          "type": "boolean"
+        },
+        "messages": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:ConversationMessage"
+          },
+          "maxItems": 200,
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "required": [
+        "conversationId",
+        "messages",
+        "hasMore"
+      ],
+      "type": "object"
+    },
+    "Criterion": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Criterion",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "checkDefinitionRef": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "description": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "machine",
+              "type": "string"
+            },
+            "required": {
+              "const": true,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "description",
+            "kind",
+            "required",
+            "checkDefinitionRef"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "checkDefinitionRef": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "description": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "machine",
+              "type": "string"
+            },
+            "required": {
+              "const": false,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "description",
+            "kind",
+            "required"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "human",
+              "type": "string"
+            },
+            "required": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "description",
+            "kind",
+            "required"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "CriticalFact": {
+      "$id": "urn:personal-agent:contracts:1.0.0:CriticalFact",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "attemptId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "factId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "fenceEpoch": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:RuntimeFactKind"
+        },
+        "nativeRef": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "payloadRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "source": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract",
+        "attemptId",
+        "fenceEpoch",
+        "factId",
+        "source",
+        "kind",
+        "payloadRef"
+      ],
+      "type": "object"
+    },
+    "Digest": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Digest",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "DriverErrorCode": {
+      "$id": "urn:personal-agent:contracts:1.0.0:DriverErrorCode",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "enum": [
+        "executable_missing",
+        "version_mismatch",
+        "auth_required",
+        "unsupported_capability",
+        "protocol_error",
+        "rate_limited",
+        "transport_lost",
+        "process_exited",
+        "budget_exceeded",
+        "state_indeterminate"
+      ],
+      "type": "string"
+    },
+    "DurableReceipt": {
+      "$id": "urn:personal-agent:contracts:1.0.0:DurableReceipt",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "factId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "persisted": {
+          "const": true,
+          "type": "boolean"
+        },
+        "seq": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "factId",
+        "persisted",
+        "seq"
+      ],
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "$id": "urn:personal-agent:contracts:1.0.0:EvidenceRef",
+      "$ref": "urn:personal-agent:contracts:1.0.0:Id",
+      "$schema": "https://json-schema.org/draft/2020-12/schema"
+    },
+    "ExecutionInput": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ExecutionInput",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "contextRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "inputId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "provenance": {
+          "enum": [
+            "authorized_work_input",
+            "user_supplement"
+          ],
+          "type": "string"
+        },
+        "sourceMessageRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "text": {
+          "maxLength": 131072,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "inputId",
+        "contract",
+        "text",
+        "contextRefs",
+        "sourceMessageRefs",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "Id": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Id",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+      "type": "string"
+    },
+    "InspectQuery": {
+      "$id": "urn:personal-agent:contracts:1.0.0:InspectQuery",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "beforeMessageCursor": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "conversationId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "includeLearning": {
+          "type": "boolean"
+        },
+        "knowledgeCursor": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "knowledgeProjectId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "limit": {
+          "maximum": 200,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "workId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "type": "object"
+    },
+    "Interpretation": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Interpretation",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "hypothesisRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "interventionId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "labels": {
+          "items": {
+            "enum": [
+              "execution_violation",
+              "goal_change",
+              "temporary_environment",
+              "explicit_preference",
+              "mixed",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "readOnly": true,
+          "type": "array"
+        },
+        "revision": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "interventionId",
+        "revision",
+        "labels",
+        "evidenceRefs",
+        "hypothesisRef"
+      ],
+      "type": "object"
+    },
+    "InterventionRecord": {
+      "$id": "urn:personal-agent:contracts:1.0.0:InterventionRecord",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "actorRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "afterArtifactRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "afterContractRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "assignmentRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "beforeArtifactRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "beforeContractRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "environmentRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "occurredAt": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "projectId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "rawFeedbackRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "source": {
+          "enum": [
+            "direct_message",
+            "question_answer",
+            "manual_edit",
+            "explicit_override"
+          ],
+          "type": "string"
+        },
+        "ticketRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "workId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "id",
+        "projectId",
+        "ticketRefs",
+        "assignmentRefs",
+        "actorRef",
+        "source",
+        "environmentRef",
+        "rawFeedbackRef",
+        "occurredAt"
+      ],
+      "type": "object"
+    },
+    "Json": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Json"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Json"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "KnowledgePage": {
+      "$id": "urn:personal-agent:contracts:1.0.0:KnowledgePage",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "decisions": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:UserDecision"
+          },
+          "maxItems": 200,
+          "readOnly": true,
+          "type": "array"
+        },
+        "nextCursor": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:KnowledgeSourceView"
+          },
+          "maxItems": 200,
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "required": [
+        "decisions",
+        "sources"
+      ],
+      "type": "object"
+    },
+    "KnowledgeSourceView": {
+      "$id": "urn:personal-agent:contracts:1.0.0:KnowledgeSourceView",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "locationRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "projectId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "title": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "validity": {
+          "enum": [
+            "current",
+            "stale",
+            "missing"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "projectId",
+        "locationRef",
+        "validity",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "LearningView": {
+      "$id": "urn:personal-agent:contracts:1.0.0:LearningView",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "globallyPaused": {
+          "type": "boolean"
+        },
+        "policies": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:PolicyRevision"
+          },
+          "maxItems": 200,
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "required": [
+        "globallyPaused",
+        "policies"
+      ],
+      "type": "object"
+    },
+    "NativeAnswerPayload": {
+      "$id": "urn:personal-agent:contracts:1.0.0:NativeAnswerPayload",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "answer": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:QuestionAnswer"
+        },
+        "answerId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "authorityRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "nativeBinding": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:NativeQuestionBinding"
+        },
+        "questionId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "questionVersion": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "answerId",
+        "questionId",
+        "questionVersion",
+        "nativeBinding",
+        "answer",
+        "authorityRef"
+      ],
+      "type": "object"
+    },
+    "NativeDispatch": {
+      "$id": "urn:personal-agent:contracts:1.0.0:NativeDispatch",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "commandId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "delivery": {
+          "enum": [
+            "not_sent",
+            "written",
+            "native_accepted",
+            "indeterminate"
+          ],
+          "type": "string"
+        },
+        "error": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:DriverErrorCode"
+            },
+            "message": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "type": "object"
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "nativeRef": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "retry": {
+          "enum": [
+            "same_key_safe",
+            "reconcile_first",
+            "user_action",
+            "none"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "commandId",
+        "delivery",
+        "retry",
+        "evidenceRefs"
+      ],
+      "type": "object",
+      "x-runtime-rules": [
+        "no-safe-replay-for-indeterminate-send"
+      ]
+    },
+    "NativeQuestionBinding": {
+      "$id": "urn:personal-agent:contracts:1.0.0:NativeQuestionBinding",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "attemptId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "connectionEpoch": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "fenceEpoch": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "nativeMethod": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "nativeRequestId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:WireRequestId"
+        },
+        "provenanceRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract",
+        "attemptId",
+        "fenceEpoch",
+        "id",
+        "connectionEpoch",
+        "nativeRequestId",
+        "nativeMethod",
+        "provenanceRef"
+      ],
+      "type": "object"
+    },
+    "Ownership": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Ownership",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "enum": [
+        "spawned_process",
+        "shared_service_session"
+      ],
+      "type": "string"
+    },
+    "PolicyRevision": {
+      "$id": "urn:personal-agent:contracts:1.0.0:PolicyRevision",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "contentRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "deployment": {
+          "enum": [
+            "candidate",
+            "testing",
+            "shadow",
+            "active",
+            "suspended",
+            "revoked",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "experimentRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "requiredFeatures": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "revision": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "scope": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Scope"
+        },
+        "sourceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "scope",
+        "sourceRefs",
+        "requiredFeatures",
+        "experimentRefs",
+        "deployment",
+        "contentRef"
+      ],
+      "type": "object"
+    },
+    "PreparedExecutionPolicy": {
+      "$id": "urn:personal-agent:contracts:1.0.0:PreparedExecutionPolicy",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "attemptId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "effectiveConfigFingerprint": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "enforcement": {
+          "enum": [
+            "enforced",
+            "approval_guarded",
+            "advisory"
+          ],
+          "type": "string"
+        },
+        "evidenceRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:EvidenceRef"
+        },
+        "fenceEpoch": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "nativeAppliedSettingsRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "requestedPolicyRevision": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "verification": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_tested"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract",
+        "attemptId",
+        "fenceEpoch",
+        "requestedPolicyRevision",
+        "nativeAppliedSettingsRef",
+        "effectiveConfigFingerprint",
+        "enforcement",
+        "verification",
+        "evidenceRef"
+      ],
+      "type": "object"
+    },
+    "ProbeReport": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ProbeReport",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:CapabilityObservation"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array"
+        },
+        "checkedAt": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "identity": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:CompatibilityIdentity"
+        },
+        "readiness": {
+          "enum": [
+            "missing",
+            "needs_setup",
+            "needs_auth",
+            "incompatible",
+            "inspection_passed",
+            "native_test_passed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "capabilities",
+        "readiness",
+        "checkedAt",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "ProcessSpec": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ProcessSpec",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "argv": {
+          "items": {
+            "maxLength": 4096,
+            "type": "string"
+          },
+          "maxItems": 128,
+          "readOnly": true,
+          "type": "array"
+        },
+        "cwdRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "environmentRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "executable": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "executable",
+        "argv",
+        "cwdRef",
+        "environmentRef"
+      ],
+      "type": "object"
+    },
+    "ProgressUpdate": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ProgressUpdate",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "attemptId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "fenceEpoch": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "observedAt": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "text": {
+          "maxLength": 8192,
+          "type": "string"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract",
+        "attemptId",
+        "fenceEpoch",
+        "text",
+        "observedAt"
+      ],
+      "type": "object"
+    },
+    "QuestionAnswer": {
+      "$id": "urn:personal-agent:contracts:1.0.0:QuestionAnswer",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "choices",
+              "type": "string"
+            },
+            "optionIds": {
+              "items": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+              },
+              "maxItems": 128,
+              "minItems": 1,
+              "readOnly": true,
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "optionIds"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "form",
+              "type": "string"
+            },
+            "values": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "maxLength": 16384,
+                    "type": "string"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "items": {
+                      "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+                    },
+                    "maxItems": 128,
+                    "readOnly": true,
+                    "type": "array"
+                  }
+                ]
+              },
+              "propertyNames": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+              },
+              "type": "object"
+            }
+          },
+          "required": [
+            "kind",
+            "values"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "free_text",
+              "type": "string"
+            },
+            "text": {
+              "maxLength": 16384,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "text"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "enum": [
+                "open",
+                "cancel"
+              ],
+              "type": "string"
+            },
+            "kind": {
+              "const": "url_action",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "action"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "defer",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "QuestionField": {
+      "$id": "urn:personal-agent:contracts:1.0.0:QuestionField",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "text",
+              "type": "string"
+            },
+            "label": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "required": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "required",
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "boolean",
+              "type": "string"
+            },
+            "label": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "required": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "required",
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "single",
+              "type": "string"
+            },
+            "label": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "options": {
+              "items": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:QuestionOption"
+              },
+              "maxItems": 128,
+              "minItems": 1,
+              "readOnly": true,
+              "type": "array"
+            },
+            "required": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "required",
+            "kind",
+            "options"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "multiple",
+              "type": "string"
+            },
+            "label": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "options": {
+              "items": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:QuestionOption"
+              },
+              "maxItems": 128,
+              "minItems": 1,
+              "readOnly": true,
+              "type": "array"
+            },
+            "required": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "required",
+            "kind",
+            "options"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "QuestionOption": {
+      "$id": "urn:personal-agent:contracts:1.0.0:QuestionOption",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "label": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "semantic": {
+          "enum": [
+            "allow_once",
+            "deny",
+            "cancel",
+            "business_choice",
+            "native_other"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "semantic"
+      ],
+      "type": "object"
+    },
+    "QuestionPresentation": {
+      "$id": "urn:personal-agent:contracts:1.0.0:QuestionPresentation",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "choices",
+              "type": "string"
+            },
+            "multiple": {
+              "type": "boolean"
+            },
+            "options": {
+              "items": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:QuestionOption"
+              },
+              "maxItems": 128,
+              "minItems": 1,
+              "readOnly": true,
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "options",
+            "multiple"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "fields": {
+              "items": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:QuestionField"
+              },
+              "maxItems": 64,
+              "minItems": 1,
+              "readOnly": true,
+              "type": "array"
+            },
+            "kind": {
+              "const": "form",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "fields"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "free_text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "url_flow",
+              "type": "string"
+            },
+            "purpose": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            "statusRef": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "vettedUrl": {
+              "format": "uri",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "vettedUrl",
+            "purpose",
+            "statusRef"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "review",
+              "type": "string"
+            },
+            "options": {
+              "items": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:QuestionOption"
+              },
+              "maxItems": 128,
+              "minItems": 1,
+              "readOnly": true,
+              "type": "array"
+            },
+            "summary": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "summary",
+            "options"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "ReasonerProposal": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ReasonerProposal",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "reply",
+              "type": "string"
+            },
+            "sourceRefs": {
+              "items": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+              },
+              "maxItems": 1024,
+              "readOnly": true,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "text": {
+              "maxLength": 32768,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "text",
+            "sourceRefs"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "goal": {
+              "maxLength": 16384,
+              "minLength": 1,
+              "type": "string"
+            },
+            "kind": {
+              "const": "propose_work",
+              "type": "string"
+            },
+            "projectId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "sourceMessageId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "kind",
+            "goal",
+            "projectId",
+            "sourceMessageId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "expected": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+            },
+            "kind": {
+              "const": "propose_revision",
+              "type": "string"
+            },
+            "rationale": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            "sourceMessageId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "kind",
+            "expected",
+            "rationale",
+            "sourceMessageId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "content": {
+              "maxLength": 16384,
+              "minLength": 1,
+              "type": "string"
+            },
+            "kind": {
+              "const": "propose_decision",
+              "type": "string"
+            },
+            "scope": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Scope"
+            },
+            "sourceMessageId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "kind",
+            "content",
+            "scope",
+            "sourceMessageId"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "ReconcileReport": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ReconcileReport",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "nativeCursor": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "running",
+            "terminal",
+            "missing",
+            "indeterminate"
+          ],
+          "type": "string"
+        },
+        "writer": {
+          "enum": [
+            "active",
+            "quiescent",
+            "indeterminate"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "writer",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "ReplyAnchor": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ReplyAnchor",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "messageId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "questionId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "workId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "type": "object"
+    },
+    "RequiredCriteria": {
+      "$id": "urn:personal-agent:contracts:1.0.0:RequiredCriteria",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "contains": {
+        "properties": {
+          "required": {
+            "const": true
+          }
+        },
+        "required": [
+          "required"
+        ],
+        "type": "object"
+      },
+      "items": {
+        "$ref": "urn:personal-agent:contracts:1.0.0:Criterion"
+      },
+      "maxItems": 128,
+      "minContains": 1,
+      "minItems": 1,
+      "readOnly": true,
+      "type": "array",
+      "x-runtime-rules": [
+        "unique-criterion-ids",
+        "registered-checks-verified-by-application"
+      ]
+    },
+    "RunnerCommand": {
+      "$id": "urn:personal-agent:contracts:1.0.0:RunnerCommand",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "assignmentId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "attemptId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "contract": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+            },
+            "fenceEpoch": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "inputRef": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "begin",
+              "type": "string"
+            },
+            "preparedPolicyRef": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "ticketId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "attemptId",
+            "fenceEpoch",
+            "id",
+            "kind",
+            "inputRef",
+            "preparedPolicyRef"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "assignmentId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "attemptId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "contract": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+            },
+            "expectedTurnRef": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "fenceEpoch": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "inputRef": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "deliver",
+              "type": "string"
+            },
+            "ticketId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "attemptId",
+            "fenceEpoch",
+            "id",
+            "kind",
+            "inputRef"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "answerRef": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "assignmentId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "attemptId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "contract": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+            },
+            "fenceEpoch": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "answer",
+              "type": "string"
+            },
+            "nativeBindingRef": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "ticketId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "attemptId",
+            "fenceEpoch",
+            "id",
+            "kind",
+            "nativeBindingRef",
+            "answerRef"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "assignmentId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "attemptId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "contract": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+            },
+            "fenceEpoch": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "cancel",
+              "type": "string"
+            },
+            "ticketId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "attemptId",
+            "fenceEpoch",
+            "id",
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "assignmentId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "attemptId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "contract": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+            },
+            "fenceEpoch": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "id": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "pause_at_boundary",
+              "type": "string"
+            },
+            "ticketId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "attemptId",
+            "fenceEpoch",
+            "id",
+            "kind"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "RuntimeErrorPayload": {
+      "$id": "urn:personal-agent:contracts:1.0.0:RuntimeErrorPayload",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:DriverErrorCode"
+        },
+        "dispatch": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:NativeDispatch"
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "message": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "RuntimeExitedPayload": {
+      "$id": "urn:personal-agent:contracts:1.0.0:RuntimeExitedPayload",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "exitCode": {
+          "anyOf": [
+            {
+              "maximum": 2147483647,
+              "minimum": -2147483648,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resourceRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "signal": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "resourceRef",
+        "exitCode",
+        "signal",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "RuntimeFactKind": {
+      "$id": "urn:personal-agent:contracts:1.0.0:RuntimeFactKind",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "enum": [
+        "policy.prepared",
+        "dispatch.observed",
+        "question.opened",
+        "answer.observed",
+        "turn.ended",
+        "candidate.observed",
+        "cancel.observed",
+        "writer.observed",
+        "runtime.exited",
+        "config.changed",
+        "usage.observed",
+        "runtime.error"
+      ],
+      "type": "string"
+    },
+    "RuntimeFactPayload": {
+      "$id": "urn:personal-agent:contracts:1.0.0:RuntimeFactPayload",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "policy.prepared",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:PreparedExecutionPolicy"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "dispatch.observed",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:NativeDispatch"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "question.opened",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:UserQuestion"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "answer.observed",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:AnswerDelivery"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "turn.ended",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:TurnEndedPayload"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "candidate.observed",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:CandidateObservedPayload"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "cancel.observed",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:CancelObservedPayload"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "writer.observed",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:WriterObservedPayload"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "runtime.exited",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:RuntimeExitedPayload"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "config.changed",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ConfigChangedPayload"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "usage.observed",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:UsageObservedPayload"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "runtime.error",
+              "type": "string"
+            },
+            "value": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:RuntimeErrorPayload"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "RuntimeReference": {
+      "$id": "urn:personal-agent:contracts:1.0.0:RuntimeReference",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "attemptId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "connectionEpoch": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "fenceEpoch": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "journalRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "nativeRunRef": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "nativeSessionRef": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "ownership": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Ownership"
+        },
+        "runnerIdentityRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract",
+        "attemptId",
+        "fenceEpoch",
+        "ownership",
+        "runnerIdentityRef",
+        "connectionEpoch"
+      ],
+      "type": "object"
+    },
+    "Scope": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Scope",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "allowedPaths": {
+          "items": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 256,
+          "minItems": 1,
+          "readOnly": true,
+          "type": "array"
+        },
+        "excludedPaths": {
+          "items": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 256,
+          "readOnly": true,
+          "type": "array"
+        },
+        "expiresAt": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "externalActions": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "projectId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "projectId",
+        "allowedPaths",
+        "excludedPaths",
+        "externalActions"
+      ],
+      "type": "object",
+      "x-runtime-rules": [
+        "project-relative-paths"
+      ]
+    },
+    "ServeExit": {
+      "$id": "urn:personal-agent:contracts:1.0.0:ServeExit",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "reason": {
+          "enum": [
+            "terminal",
+            "cancelled",
+            "disconnected",
+            "error"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "Snapshot": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Snapshot",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "conversation": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ConversationPage"
+        },
+        "cursor": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "knowledge": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:KnowledgePage"
+        },
+        "learning": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:LearningView"
+        },
+        "questions": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:UserQuestion"
+          },
+          "maxItems": 200,
+          "readOnly": true,
+          "type": "array"
+        },
+        "works": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:WorkView"
+          },
+          "maxItems": 200,
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "required": [
+        "cursor",
+        "works",
+        "questions"
+      ],
+      "type": "object"
+    },
+    "TestStatus": {
+      "$id": "urn:personal-agent:contracts:1.0.0:TestStatus",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "SKIPPED",
+        "NOT_TESTED"
+      ],
+      "type": "string"
+    },
+    "TicketLink": {
+      "$id": "urn:personal-agent:contracts:1.0.0:TicketLink",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authorityRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "role": {
+          "enum": [
+            "primary",
+            "child"
+          ],
+          "type": "string"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "contract",
+        "ticketId",
+        "role",
+        "authorityRef"
+      ],
+      "type": "object"
+    },
+    "Timestamp": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Timestamp",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "TrustedActor": {
+      "$id": "urn:personal-agent:contracts:1.0.0:TrustedActor",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authorityRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "source": {
+          "enum": [
+            "local_ui",
+            "local_cli",
+            "explicit_rule"
+          ],
+          "type": "string"
+        },
+        "userId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "userId",
+        "authorityRef",
+        "source"
+      ],
+      "type": "object"
+    },
+    "TurnEndedPayload": {
+      "$id": "urn:personal-agent:contracts:1.0.0:TurnEndedPayload",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "candidateAvailable": {
+          "type": "boolean"
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "nativeTurnRef": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "completed",
+            "cancelled",
+            "failed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "nativeTurnRef",
+        "outcome",
+        "candidateAvailable",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "UsageObservedPayload": {
+      "$id": "urn:personal-agent:contracts:1.0.0:UsageObservedPayload",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "completeness": {
+          "enum": [
+            "observed",
+            "partial",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "cost": {
+          "additionalProperties": false,
+          "properties": {
+            "amount": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "currency": {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "currency",
+            "amount"
+          ],
+          "type": "object"
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "inputTokens": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "outputTokens": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "completeness",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "UserCommand": {
+      "$id": "urn:personal-agent:contracts:1.0.0:UserCommand",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "anchor": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ReplyAnchor"
+            },
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "chat",
+              "type": "string"
+            },
+            "projectId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "selectedProfileId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "text": {
+              "maxLength": 32768,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "text",
+            "projectId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "criteria": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:RequiredCriteria"
+            },
+            "goal": {
+              "maxLength": 16384,
+              "minLength": 1,
+              "type": "string"
+            },
+            "kind": {
+              "const": "create_work",
+              "type": "string"
+            },
+            "profileId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "projectId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "scope": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Scope"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "projectId",
+            "goal",
+            "scope",
+            "criteria",
+            "profileId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "criteria": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:RequiredCriteria"
+            },
+            "expected": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+            },
+            "goal": {
+              "maxLength": 16384,
+              "minLength": 1,
+              "type": "string"
+            },
+            "kind": {
+              "const": "revise_work",
+              "type": "string"
+            },
+            "scope": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Scope"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "expected",
+            "goal",
+            "scope",
+            "criteria"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "stop_work",
+              "type": "string"
+            },
+            "workId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "workId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "expected": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+            },
+            "expectedHoldRevision": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "kind": {
+              "const": "pause_dispatch",
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "expected",
+            "expectedHoldRevision"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "expected": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+            },
+            "expectedHoldRevision": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "kind": {
+              "const": "resume_dispatch",
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "expected",
+            "expectedHoldRevision"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "actionToken": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "expected": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:AssignmentRef"
+            },
+            "kind": {
+              "const": "retry_assignment",
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "expected",
+            "actionToken"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "expected": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+            },
+            "kind": {
+              "const": "continue_work",
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "expected"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "answer": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:QuestionAnswer"
+            },
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "expectedVersion": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "kind": {
+              "const": "answer_question",
+              "type": "string"
+            },
+            "questionId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "questionId",
+            "expectedVersion",
+            "answer"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "candidate": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:CandidateRef"
+            },
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "accept_candidate",
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "candidate"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "content": {
+              "maxLength": 16384,
+              "minLength": 1,
+              "type": "string"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "record_decision",
+              "type": "string"
+            },
+            "scope": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Scope"
+            },
+            "sourceMessageId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "content",
+            "scope",
+            "sourceMessageId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "decisionId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "expectedVersion": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "kind": {
+              "const": "revoke_decision",
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "decisionId",
+            "expectedVersion"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "kind": {
+              "const": "set_learning_paused",
+              "type": "string"
+            },
+            "paused": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "paused"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "enum": [
+                "suspend",
+                "revoke",
+                "request_evaluation"
+              ],
+              "type": "string"
+            },
+            "commandId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "conversationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "expectedRevision": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "kind": {
+              "const": "control_policy",
+              "type": "string"
+            },
+            "policyId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "commandId",
+            "conversationId",
+            "kind",
+            "policyId",
+            "expectedRevision",
+            "action"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "UserDecision": {
+      "$id": "urn:personal-agent:contracts:1.0.0:UserDecision",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authorityRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "content": {
+          "maxLength": 16384,
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "revokedAt": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "scope": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Scope"
+        },
+        "supersedes": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "version": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "content",
+        "scope",
+        "authorityRef"
+      ],
+      "type": "object"
+    },
+    "UserQuestion": {
+      "$id": "urn:personal-agent:contracts:1.0.0:UserQuestion",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "decisionDeadline": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "decisionKey": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "expiresAt": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "kind": {
+          "enum": [
+            "clarification",
+            "permission",
+            "authentication",
+            "review"
+          ],
+          "type": "string"
+        },
+        "nativePayloadRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "openedAt": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "presentation": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:QuestionPresentation"
+        },
+        "prompt": {
+          "maxLength": 16384,
+          "minLength": 1,
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Scope"
+        },
+        "targets": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:NativeQuestionBinding"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "readOnly": true,
+          "type": "array"
+        },
+        "validity": {
+          "enum": [
+            "open",
+            "answered",
+            "expired",
+            "cancelled"
+          ],
+          "type": "string"
+        },
+        "version": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "kind",
+        "contract",
+        "scope",
+        "prompt",
+        "nativePayloadRef",
+        "presentation",
+        "targets",
+        "openedAt",
+        "validity"
+      ],
+      "type": "object",
+      "x-runtime-rules": [
+        "question-kind-presentation",
+        "matching-contract-targets",
+        "single-target-native-authorization"
+      ]
+    },
+    "Verification": {
+      "$id": "urn:personal-agent:contracts:1.0.0:Verification",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "artifactDigest": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "assignmentId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "candidateGeneration": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRef"
+        },
+        "criteriaDigest": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Digest"
+        },
+        "environmentRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "results": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "criterionId": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+              },
+              "evidenceRefs": {
+                "items": {
+                  "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+                },
+                "maxItems": 1024,
+                "readOnly": true,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "outcome": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "SKIPPED",
+                  "NOT_TESTED",
+                  "NOT_APPLICABLE"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "criterionId",
+              "outcome",
+              "evidenceRefs"
+            ],
+            "type": "object"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "readOnly": true,
+          "type": "array"
+        },
+        "ticketId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "verifierIdentityRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        }
+      },
+      "required": [
+        "ticketId",
+        "assignmentId",
+        "contract",
+        "candidateGeneration",
+        "id",
+        "artifactDigest",
+        "criteriaDigest",
+        "environmentRef",
+        "results",
+        "verifierIdentityRef"
+      ],
+      "type": "object"
+    },
+    "WireRequestId": {
+      "$id": "urn:personal-agent:contracts:1.0.0:WireRequestId",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "string",
+              "type": "string"
+            },
+            "value": {
+              "maxLength": 1024,
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "decimal": {
+              "maxLength": 20,
+              "pattern": "^(?:0|-?[1-9][0-9]*)$",
+              "type": "string"
+            },
+            "kind": {
+              "const": "integer",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "decimal"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "WorkRecord": {
+      "$id": "urn:personal-agent:contracts:1.0.0:WorkRecord",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "conversationId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "createdAt": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Timestamp"
+        },
+        "id": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "projectId": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "title": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "projectId",
+        "conversationId",
+        "title",
+        "createdAt"
+      ],
+      "type": "object"
+    },
+    "WorkView": {
+      "$id": "urn:personal-agent:contracts:1.0.0:WorkView",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "actions": {
+          "additionalProperties": false,
+          "properties": {
+            "available": {
+              "items": {
+                "enum": [
+                  "pause_dispatch",
+                  "resume_dispatch",
+                  "retry_assignment",
+                  "continue_work",
+                  "stop_work",
+                  "accept_candidate"
+                ],
+                "type": "string"
+              },
+              "maxItems": 6,
+              "readOnly": true,
+              "type": "array"
+            },
+            "currentAssignment": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:AssignmentRef"
+            },
+            "currentCandidate": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:CandidateRef"
+            },
+            "currentVerificationId": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            },
+            "dispatchHold": {
+              "additionalProperties": false,
+              "properties": {
+                "paused": {
+                  "type": "boolean"
+                },
+                "revision": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "paused",
+                "revision"
+              ],
+              "type": "object"
+            },
+            "retryActionToken": {
+              "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+            }
+          },
+          "required": [
+            "dispatchHold",
+            "available"
+          ],
+          "type": "object"
+        },
+        "artifactIds": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "contract": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:ContractRevision"
+        },
+        "coreSnapshotRef": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+        },
+        "evidenceRefs": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "links": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:TicketLink"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array"
+        },
+        "openQuestionIds": {
+          "items": {
+            "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "phase": {
+          "enum": [
+            "evaluating",
+            "queued",
+            "working",
+            "needs_user",
+            "verifying",
+            "switching",
+            "stopping",
+            "delivered",
+            "ended",
+            "uncertain"
+          ],
+          "type": "string"
+        },
+        "resourceStatus": {
+          "enum": [
+            "quiescent",
+            "active",
+            "indeterminate"
+          ],
+          "type": "string"
+        },
+        "work": {
+          "$ref": "urn:personal-agent:contracts:1.0.0:WorkRecord"
+        }
+      },
+      "required": [
+        "work",
+        "contract",
+        "links",
+        "phase",
+        "coreSnapshotRef",
+        "openQuestionIds",
+        "artifactIds",
+        "resourceStatus",
+        "evidenceRefs",
+        "actions"
+      ],
+      "type": "object",
+      "x-runtime-rules": [
+        "current-work-contract-action-context"
+      ]
+    },
+    "WriterObservedPayload": {
+      "$id": "urn:personal-agent:contracts:1.0.0:WriterObservedPayload",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "resources": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "evidenceRefs": {
+                "items": {
+                  "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+                },
+                "maxItems": 1024,
+                "readOnly": true,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "ownership": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:Ownership"
+              },
+              "resourceRef": {
+                "$ref": "urn:personal-agent:contracts:1.0.0:Id"
+              },
+              "status": {
+                "enum": [
+                  "active",
+                  "quiescent",
+                  "indeterminate"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "resourceRef",
+              "ownership",
+              "status",
+              "evidenceRefs"
+            ],
+            "type": "object"
+          },
+          "maxItems": 1024,
+          "minItems": 1,
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "required": [
+        "resources"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:contracts:1.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-api-major": 1,
+  "x-runtime-validation": "Use the package Zod parsers for cross-field, registration and contextual answer rules."
+}

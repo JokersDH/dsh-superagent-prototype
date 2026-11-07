@@ -1,0 +1,26 @@
+{
+  "name": "@personal-agent/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Versioned product wire contracts and local runtime ports for Scheme B.",
+  "license": "MIT",
+  "engines": { "node": ">=24.21.0 <25" },
+  "packageManager": "pnpm@11.7.0",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./schema": "./generated/contracts.schema.json",
+    "./manifest": "./generated/manifest.json"
+  },
+  "files": ["dist", "generated", "README.md"],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test test/*.case.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "generate": "node tools/generate.ts",
+    "check:generated": "node tools/generate.ts --check",
+    "check": "node tools/check.mjs"
+  },
+  "dependencies": { "zod": "4.4.3" },
+  "devDependencies": { "@types/node": "24.10.0", "ajv": "8.20.0", "ajv-formats": "3.0.1", "typescript": "6.0.3" }
+}

@@ -1,10 +1,10 @@
 {
   "result": "PASS_SPEC_STATIC_ONLY",
-  "checkedAt": "2026-11-07T07:34:20.638Z",
+  "checkedAt": "2026-11-07T08:20:59.468Z",
   "taskCount": 17,
   "acceptanceRequirementCount": 83,
   "runtimeTestsExecutedByThisVerifier": 0,
-  "localLinksChecked": 305,
+  "localLinksChecked": 316,
   "checks": [
     "unique IDs",
     "start/accept/combined dependency DAGs",
@@ -25,13 +25,13 @@
     },
     {
       "path": "02-architecture-and-reuse.zh-CN.md",
-      "bytes": 23982,
-      "sha256": "c047ace7aab6d7f11f043b32ec3905c9def8296bb2ca5060fe7aa2f525dd7d7f"
+      "bytes": 24306,
+      "sha256": "5852efb9e047b3c55b66f757a597eb613539920ea918ae471f54208e65c077bb"
     },
     {
       "path": "03-contracts-and-data.zh-CN.md",
-      "bytes": 20549,
-      "sha256": "1513f93befb88ed0a041f754483049c63789bc78a8c69133b47da9e2ed1bb577"
+      "bytes": 21584,
+      "sha256": "150128b15f235dc7dc7a50b16e1ebdc015fecbb083f1c097af3de9b273d64a33"
     },
     {
       "path": "04-agent-runtime-and-extension.zh-CN.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "07-implementation-and-acceptance.zh-CN.md",
-      "bytes": 10501,
-      "sha256": "53217ddb08fdad11d1105cdc1a915932984c34ecf30314e50e6d064659797b04"
+      "bytes": 10325,
+      "sha256": "036864afc50cb96a922cf12ae5c41dd2e586dc95bb5366d07dae942a0327e951"
     },
     {
       "path": "08-multi-agent-development.zh-CN.md",
@@ -65,13 +65,13 @@
     },
     {
       "path": "FULL-BLUEPRINT.zh-CN.md",
-      "bytes": 145894,
-      "sha256": "cc94f136445281fa1357cf3824eabe1cca6925fe99f267e0ee19186d1f0040ce"
+      "bytes": 147408,
+      "sha256": "a9b81f4a189fe10997710b8d0308f8bb74c634515a5c4169199ca379f9c1482a"
     },
     {
       "path": "README.md",
-      "bytes": 9208,
-      "sha256": "d5ca22a848951da43c6dd11168da0f34c0ce5da34d749d882e87db3f18e9ec33"
+      "bytes": 9539,
+      "sha256": "9ac7d24e7be498925238ba720f264c23058d47da15e84af9f137d93c17817335"
     },
     {
       "path": "acceptance-catalog.json",
@@ -80,8 +80,8 @@
     },
     {
       "path": "contracts/contracts.ts",
-      "bytes": 15297,
-      "sha256": "55e10172dbfb02af01e0b70b1eb0e635b088514c25cd53e5e703b1a04e92fcd7"
+      "bytes": 156,
+      "sha256": "18ff21c74baf0c990902b6535663ddea84020d75c545e393a13c4c804147be50"
     },
     {
       "path": "contracts/fixtures.ts",
@@ -105,8 +105,8 @@
     },
     {
       "path": "reviews/integrated-design-review.md",
-      "bytes": 2876,
-      "sha256": "dc74a9645fc3affc9a3afc46a4a13259a55232186f817055ba71d63966c2f25d"
+      "bytes": 3047,
+      "sha256": "2eb12fad4231c30941694ed96da67fca8115fd0a8781a5a3ff1f6062f3fdacaa"
     },
     {
       "path": "reviews/runtime-review.md",
@@ -245,13 +245,13 @@
     },
     {
       "path": "../AGENTS.md",
-      "bytes": 3592,
-      "sha256": "6ce70ddd5bbe2f4eff30bdb778e30b4de9bf226b4b593ea0d97fc0b823629950"
+      "bytes": 4637,
+      "sha256": "6f646ca2d381c0f9ea3a7f7c4a69b97c3a003b826146455b75867a53470f2d29"
     },
     {
       "path": "../START-HERE.zh-CN.md",
-      "bytes": 6691,
-      "sha256": "fe18741f0e0621ad7d867aef5df7870a336ba9a5076984e832290a0dec742672"
+      "bytes": 7083,
+      "sha256": "80c277c75ab1a1f910b51e3d9d41a88ec46c8245c8bea37c904c77a5510917d5"
     },
     {
       "path": "../agent-tasks/main.md",

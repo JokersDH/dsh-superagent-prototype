@@ -1,0 +1,64 @@
+{
+  "gate": "G0",
+  "status": "PASS_FOR_G1_DARWIN_ARM64",
+  "scope": "Independent core reuse, common contracts and the measured platform probe only; not product release approval.",
+  "contractIdentity": {
+    "apiMajor": 1,
+    "version": "1.0.0",
+    "schemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d"
+  },
+  "checks": {
+    "CORE-01": {
+      "status": "PASS",
+      "commit": "df2a632e8c20880200ddc9961f5cc985bd42e47f",
+      "tests": 144,
+      "sourceFiles": 18,
+      "independentAstAudit": true,
+      "evidence": "docs/adr/bootstrap/reviews/g0-agent-a.md"
+    },
+    "DATA-01": {
+      "status": "PASS",
+      "schemas": 76,
+      "tests": 183,
+      "standalonePackage": true,
+      "evidence": "packages/contracts/reports/g0-contracts.json"
+    },
+    "OPS-01_G0": {
+      "status": "PASS",
+      "originalCommit": "87deffb",
+      "correctionCommit": "ad24d87",
+      "independentProbes": 30,
+      "targetRuntimeTests": 4,
+      "localRuntimeTests": 4,
+      "runtime": {
+        "node": "v24.22.2",
+        "pnpm": "11.7.0",
+        "binding": "13.0.3",
+        "sqlite": "3.53.4",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "evidence": "docs/adr/bootstrap/reviews/g0-agent-b.md"
+    }
+  },
+  "next": {
+    "main": [
+      "WP-01",
+      "WP-16"
+    ],
+    "agentA": [
+      "WP-02"
+    ],
+    "agentB": [
+      "WP-03"
+    ]
+  },
+  "notProven": [
+    "Core completion/report extensions",
+    "Production Store/effects/afterCommit/migrations",
+    "Physical writer fencing and business recovery",
+    "Native agent compatibility and product E2E",
+    "Non-darwin-arm64 platforms",
+    "Learning benefit or product release readiness"
+  ]
+}

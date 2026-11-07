@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "checkedAt": "2026-11-07T08:10:13.118Z",
+  "isolation": "Temporary standalone package outside the repository; no original root dependencies copied",
+  "results": [
+    {
+      "command": "pnpm install --ignore-workspace --frozen-lockfile",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm run check",
+      "status": "PASS"
+    },
+    {
+      "command": "Built ESM package self-import and runtime parse",
+      "status": "PASS"
+    }
+  ],
+  "limitations": [
+    "No native binding/runtime or product integration was exercised"
+  ]
+}

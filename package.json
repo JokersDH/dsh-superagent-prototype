@@ -48,7 +48,11 @@
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check": "pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm typecheck && pnpm test && pnpm build",
+    "check:contracts": "pnpm --dir packages/contracts run check",
+    "check:bootstrap": "node tools/bootstrap/validate.mjs",
+    "check:spec": "node product-spec/tools/verify-spec.mjs --check",
+    "check:g0": "node tools/bootstrap/freeze-g0.mjs --check"
   },
   "engines": {
     "node": "^22.19.0 || >=24.0.0",

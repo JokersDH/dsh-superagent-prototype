@@ -90,7 +90,9 @@ pa start / pa status / pa doctor / pa backup / pa stop
 
 ## 8. 当前证据与检查
 
-已运行原仓两个核心测试文件：144 个测试通过，作为 reference baseline。尚未提取 core、安装拟议依赖、启动原生 agent 模型任务或实现生产协调器。三个本机产品版本和协议材料是只读调研证据，不是运行兼容证明。
+设计调研阶段运行的原仓 144 个测试仅作为 reference baseline。随后 G0 已完成：Agent A 的独立提取/144 测试和 AST 复核，主 Agent 的单一来源契约包/183 测试/独立构建，Agent B 在打包补正后的 darwin-arm64 目标组合/30 探针与独立复验。当前 G0 结论和范围见 [交接报告](../docs/adr/bootstrap/g0-main-report.md)。
+
+尚未实现生产协调器、核心完成/fence 扩展、正式 Store/Runner，也未启动原生 agent 模型任务或学习实验。原生产品版本/协议调研依然不代表接入通过，其他平台保持 NOT_TESTED。
 
 文档一致性检查：`node product-spec/tools/verify-spec.mjs`。公共类型检查命令见 07。这些检查只证明规格内部一致和草案可编译，不证明产品稳定性或学习收益。
 

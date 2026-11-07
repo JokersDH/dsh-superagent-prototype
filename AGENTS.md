@@ -17,6 +17,15 @@
 - Each experiment may have its own package manifest and lock inside its owned directory. Agents A/B must not change root manifests/lockfiles, shared contracts, migrations, other agents' paths, or generated product-spec files.
 - The main agent reviews and integrates commits. Agents A/B push only their assigned branch; they do not merge or push `main`.
 
+## G1 Handoff
+
+- G0 acceptance is recorded in `docs/adr/bootstrap/g0-status.json`; its PASS only allows G1 work, not a product release.
+- The assignments above describe the completed G0 branches. When assigned the next wave, start a new branch from integrated `origin/main`; do not reuse G0 as unlimited ownership.
+- G1 Agent A: `codex/g1-storage-effects`, WP-02, owns `packages/storage/`, `packages/effects/`, `docs/adr/storage/`, `docs/rfcs/WP-02/`.
+- G1 Agent B: `codex/g1-runtime`, WP-03, owns `packages/execution/`, `packages/driver-kit/`, `packages/testing/`, `apps/runner/`, `docs/adr/runtime/`, `docs/rfcs/WP-03/`.
+- Main agent keeps WP-01 core, shared contracts, root configuration and WP-16 integration ownership. Follow each task packet's start/accept dependencies and submit RFCs for missing shared semantics.
+- The root pnpm workspace is still a validated template until the main agent activates/consolidates it. Other agents must not rewrite root locks; use the agreed temporary package setup or ask for the integration baseline.
+
 ## Architecture Invariants
 
 - Ticket/Assignment in the extracted superagent core are the only execution lifecycle. Work stores identity, immutable contract revisions, links, and derived views.
