@@ -1,0 +1,4 @@
+node v24.21.0
+pnpm 11.7.0
+os Darwin arm64
+git git version 2.54.0 (Apple Git-157)

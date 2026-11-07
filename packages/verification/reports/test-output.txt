@@ -1,0 +1,17 @@
+$ node --test test/*.case.ts
+✔ the registry is immutable per revision and refuses unregistered or invalid checks (8.532042ms)
+✔ a passing check and a failing check produce real exit results (84.197833ms)
+✔ a deadline and the output budget bound a check instead of buffering without limit (182.23225ms)
+✔ a missing executable is NOT_TESTED and an unregistered check refuses verification (7.013167ms)
+✔ trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results (26.939458ms)
+✔ a changed frozen artifact refuses verification before and during the run (26.455833ms)
+✔ a verification binds the candidate, artifact and core criteria digest (54.852916ms)
+✔ the runner refuses a workspace modified after freeze (WorkspaceManager integration) (444.924291ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 953.557

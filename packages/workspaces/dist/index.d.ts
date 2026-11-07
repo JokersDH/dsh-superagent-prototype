@@ -1,0 +1,2 @@
+export { WorkspaceManager, WorkspaceConflict, type AssignmentIdentity, type UserWorktreeSnapshot, type ReservedWorkspace, type FrozenArtifact, type ReserveOptions, } from './workspace.ts';
+//# sourceMappingURL=index.d.ts.map

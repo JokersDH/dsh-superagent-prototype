@@ -1,0 +1,21 @@
+{
+  "name": "@personal-agent/workspaces",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Controlled git worktrees for attempts (WP-04): reserve a detached worktree from the user's project, record the user's dirty worktree as audit evidence without touching it, freeze a content-addressed artifact manifest with its environment, and release only the attempt's own worktree.",
+  "engines": { "node": ">=24.21.0 <25" },
+  "packageManager": "pnpm@11.7.0",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test test/*.case.ts",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0",
+    "typescript": "6.0.3"
+  }
+}
