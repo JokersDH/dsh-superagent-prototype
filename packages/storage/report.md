@@ -30,6 +30,22 @@
 | **生产 ingress 存储**（RFC 0001：A 提供 binding/history/resource/immutable payload 存储） | 迁移 **v3** 新增 `runtime_bindings`（按 attempt 的完整 binding JSON 历史）、`runtime_current`（ticket→当前 attempt，和历史分离）、`runtime_authority`（启用的合同版本，供 current-authorization）、`ingress_payloads`（内容寻址的不可变 JSON 载荷）。`RuntimeBindings` 强制 binding 身份不可变、ended 不可复活；`ImmutablePayloads` 以 canonical JSON 写入 ArtifactStore（文件与记录先于返回完成），读取时校验 artifact 与记录摘要；`canonicalJson/canonicalDigest` 与 coordinator 的 `jsonDigest` 一致 | `test/ingress-stores.case.ts`（历史/current/重开、身份不可变、ended 终态、authority 启停、payload 不可变与摘要）；`test/ingress-compat.case.ts`（与主 Agent 的 `IngressBinding`/`ImmutablePayloadReader` 类型兼容 + digest 一致性，含 unicode/嵌套/数组/null） |
 | 本轮结果 | storage **54/54**（原 44 个保留）、effects **8/8**、typecheck/build 通过；官方跟进脚本 **PASS_FOLLOWUP_INVARIANTS**（A 与 B 共 5 项全 PASS）；原评审脚本 A-LOCK-INITIALIZATION / A-ASYNC-TRANSACTION / MAIN-SYNC-BRIDGE 仍 PASS | `reports/` 下 test/typecheck/两个复现脚本原文 |
 
+## 0.3 批次 1（g1-agent-a-runtime-state.md）：绑定与当前授权不变量
+
+输入：`agent-tasks/g1-agent-a-runtime-state.md`（base `5281e84`）。迁移号 **v4**。
+
+| 要求 | 实现 | 证据 |
+| --- | --- | --- |
+| `setCurrent` 拒绝别的 Ticket 的绑定 | 读取 binding 校验 `ticketId` 严格相等 | `test/runtime-state.case.ts`：跨 Ticket 指针拒绝（含反向） |
+| current 不能回退旧 epoch、不能复活 ended | 与当前指针尝试比较 `fenceEpoch`：更低 → 拒绝；相同但不同 attempt → 拒绝（歧义）；相同 attempt → 幂等 no-op；ended → 拒绝成为 current | 旧 epoch 回退、同 epoch 歧义、ended 目标、幂等重试用例 |
+| 每 Ticket epoch 单调、状态单调 | state 只允许 active→stopping→ended；stopping 不得回 active；ended 终态（ended→ended 幂等） | 状态矩阵用例 |
+| 资源只能追加、identity/ownership 不可替换或删除 | 更新时已登记资源必须仍以相同 ownership 出现；允许追加 | 追加/删除/改 ownership 三例 |
+| 同 Work 只能一个有效合同；切换需同事务禁旧启新；同 Work/revision 不同 digest 冲突 | `enable` 先判 re-issue digest 冲突，再判同 Work 已有 enabled revision（要求同事务先 disable）；DB 层加唯一部分索引与 (work_id,revision) 唯一索引；`disable` 保留历史；新增 `current(workId)`/`history(workId)` 读取 | 双合同拒绝、同事务切换、撤销后 reopen 仍 false、历史读取 |
+| 用新 migration，v1–v3 checksum 不改写，升级兼容 | v4 仅新增两个唯一索引；测试锁定 v1–v3 checksum 常量，并用 `applyMigrations(registry=v1..v3)` 造 v3 库再以 ProductStore 升级，验证数据保留且新不变量生效 | checksum 冻结用例；v3→v4 升级用例（integrity 通过） |
+| 失败事务中 pointer/授权一起回滚 | 所有方法在调用者事务内执行；失败事务用例 | `a failed transaction rolls the current pointer and authority back together` |
+
+本轮结果：storage **60/60**（原 54 项全部保留），typecheck/build 通过。
+
 ## 1. 交付物
 
 | 交付物 | 位置 |

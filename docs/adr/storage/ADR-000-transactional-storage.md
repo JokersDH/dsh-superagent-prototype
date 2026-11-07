@@ -83,6 +83,17 @@ the domain SQL, the savepoint transaction model, and the effect queue algorithm;
     the authenticated Runner context) stays in the composition bridge; storage never defines the
     public ingress interface and a compatibility fixture proves the shapes match.
 
+12. **Runtime-state invariants** (migration v4): the current pointer only moves within its own
+    ticket and only forward in `fenceEpoch` (a different attempt at the same epoch is ambiguous and
+    refused; re-pointing at the same attempt is idempotent), and an ended attempt can never become
+    current. A binding's state only advances active → stopping → ended; registered resources may
+    only be appended with unchanged ownership. `RuntimeAuthority` allows exactly one enabled
+    revision per Work (unique partial index), one digest per Work/revision (unique index; a
+    re-issued revision with different content conflicts), requires disabling the old revision in
+    the same transaction before enabling a new one, and keeps revoked rows as history that never
+    satisfy `isCurrent` again without an explicit re-enable. A pre-v4 database with conflicting
+    authority rows fails the upgrade instead of silently choosing one.
+
 ## Consequences
 
 - Migration v3 extends the same owned migration entry (v1 domain/product tables, v2 writer claim,

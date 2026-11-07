@@ -111,8 +111,24 @@ const V3: Migration = {
   ],
 }
 
+/**
+ * v4: runtime-state invariants. At most one enabled contract revision per Work (the current
+ * authorization), and one digest per Work/revision (a re-issued revision with different content is
+ * a conflict). The unique indexes are the database-level backstop for the storage invariants; the
+ * application methods report the conflict explicitly. A pre-v4 database that already holds
+ * conflicting authority rows fails to upgrade rather than silently choosing one.
+ */
+const V4: Migration = {
+  version: 4,
+  name: 'runtime-state-invariants',
+  statements: [
+    `CREATE UNIQUE INDEX runtime_authority_one_enabled ON runtime_authority (work_id) WHERE enabled = 1`,
+    `CREATE UNIQUE INDEX runtime_authority_revision ON runtime_authority (work_id, revision)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2, V3]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>

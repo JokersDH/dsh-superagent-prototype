@@ -6,7 +6,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { rmSync } from 'node:fs'
 import { join } from 'node:path'
-import { BindingConflict, canonicalDigest, ProductStore } from '../src/index.ts'
+import { AuthorityConflict, BindingConflict, canonicalDigest, ProductStore } from '../src/index.ts'
 import { makeStore, tempDir, withStore } from './helpers.ts'
 
 const contract = { workId: 'work-1', revision: 2, digest: 'digest-1' }
@@ -68,16 +68,21 @@ test('the current pointer and history survive a reopen', async () => {
   } finally { rmSync(context.dir, { recursive: true, force: true }) }
 })
 
-test('authority enables and disables the current contract revision', async () => {
+test('authority allows one enabled contract revision per Work and keeps revocation history', async () => {
   await withStore(({ store }) => {
     assert.equal(store.authority.isCurrent(contract), false)
     store.authority.enable(contract)
     assert.equal(store.authority.isCurrent(contract), true)
-    store.authority.enable({ ...contract, revision: 3 })
+    assert.deepEqual(store.authority.current(contract.workId), contract)
+    // A second enabled revision of the same Work must wait for the old one to be disabled in the same transaction.
+    assert.throws(() => store.authority.enable({ ...contract, revision: 3 }), AuthorityConflict)
+    store.uow.atomic(() => {
+      store.authority.disable(contract)
+      store.authority.enable({ ...contract, revision: 3 })
+    })
+    assert.equal(store.authority.isCurrent(contract), false, 'the revoked revision is not current')
     assert.equal(store.authority.isCurrent({ ...contract, revision: 3 }), true)
-    store.authority.disable(contract)
-    assert.equal(store.authority.isCurrent(contract), false)
-    assert.equal(store.authority.isCurrent({ ...contract, revision: 3 }), true, 'other revisions are independent')
+    assert.deepEqual(store.authority.history(contract.workId).map(row => [row.revision, row.enabled]), [[3, true], [2, false]])
   })
 })
 

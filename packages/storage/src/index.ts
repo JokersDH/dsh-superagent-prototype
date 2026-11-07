@@ -114,7 +114,7 @@ export { ChannelReceipts, CHANNEL_SEND_KIND, type ChannelReceipt, type OutboundM
 export { Answers, AnswerConflict, type DeliveryStatus, type RecordedAnswer } from './answers.ts'
 export { ArtifactStore, ensureArtifactRoot, artifactRoot, stateDirOf, type ArtifactRecord, type WrittenArtifact, type GcResult } from './artifacts.ts'
 export {
-  RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict,
+  RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict, AuthorityConflict,
   canonicalJson, canonicalDigest, type BindingIdentity,
 } from './ingress.ts'
 export { backupDatabase, verifyDatabase, type BackupResult, type VerifyResult } from './backup.ts'
