@@ -11,8 +11,11 @@ From the repository root after `pnpm install --frozen-lockfile`, build/check the
 pnpm check:g1-core
 pnpm --filter @personal-agent/coordinator typecheck
 pnpm --filter @personal-agent/coordinator test
+pnpm check:g1-ingress
 ```
 
 The deterministic ingress tests use a transactional in-memory fixture and the built real core. They check strict wire parsing, trusted producer/full binding, immutable payload/body digests, once-only receipts, post-await freshness, physical-only observations, rollback and no ACK before the outer commit. The fixture never claims its in-memory receipts are production durability evidence.
 
-`createRuntimeIngress` does not create runtime DB tables or implement authentication, process reconciliation, native permissions or verification. Production repositories/Runner wiring wait for the owning modules and the pending review fixes. Do not feed a successful fixture result into overall G1/product readiness.
+`pnpm check:g1-ingress` also builds the storage dependencies and runs seven real SQLite tests in addition to the 18 deterministic tests. It tests actual UnitOfWork/FactReceipts/core/effects with explicitly test-only binding/observation tables, including rollback of every write when the last receipt INSERT fails and duplicate receipt preservation after reopening.
+
+`createRuntimeIngress` does not create production runtime DB tables or implement authentication, process reconciliation, native permissions or verification. Production repositories/Runner wiring wait for the owning modules and the pending review fixes. Do not feed a successful fixture result into overall G1/product readiness.

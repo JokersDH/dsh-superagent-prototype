@@ -1,10 +1,10 @@
 {
   "status": "PASS_INGRESS_INTERFACE_AND_SQLITE_FIXTURE_ONLY",
   "tests": 25,
-  "node": "v24.21.0",
+  "node": "v24.22.2",
   "platform": "darwin",
   "architecture": "arm64",
-  "checkedAt": "2026-11-07T13:04:51.312Z",
+  "checkedAt": "2026-11-07T13:05:29.601Z",
   "results": [
     {
       "command": "pnpm --filter @personal-agent/contracts build",
