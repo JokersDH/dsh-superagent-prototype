@@ -1,0 +1,46 @@
+{
+  "ranAt": "2026-11-07T08:08:05.269Z",
+  "command": "v24.22.2 <PLATFORM_ROOT>/.cache/runtimes/pnpm-11.7.0/bin/pnpm.cjs install --store-dir <PLATFORM_ROOT>/.cache/pnpm-store --reporter=append-only",
+  "exitCode": 0,
+  "node": {
+    "reported": "v24.22.2",
+    "archiveSha256": "aa9549349e47dffaa42dcf95d6e06ade8c4bdafc980979883b88767670df385a"
+  },
+  "pnpm": {
+    "reported": "11.7.0",
+    "tarballIntegrity": "sha512-GcyFLBIMcSV2DyRD7mvgyltA+fUFmN4aCaHxd1A+AQ5Xwjx3ZG4B52HeWb+HT7IqM5jDOrlpH8E+uUa28PTWIA=="
+  },
+  "storeDir": ".cache/pnpm-store",
+  "buildPolicy": {
+    "file": "pnpm-workspace.yaml",
+    "allowBuilds": false,
+    "note": "pnpm 11 asks about dependency build scripts; the local config declines them because better-sqlite3 ships prebuilt N-API binaries and needs no compile."
+  },
+  "logPath": "evidence/install/pnpm-install.log",
+  "logBytes": 52,
+  "ignoredBuildScriptsWarning": false,
+  "betterSqlite3": {
+    "packageVersion": "13.0.3",
+    "main": "lib/index.js",
+    "lifecycleScripts": [],
+    "prebuildsShippedInTarball": [
+      "darwin-arm64.node",
+      "darwin-x64.node",
+      "linux-arm64.node",
+      "linux-x64.node",
+      "linuxmusl-arm64.node",
+      "linuxmusl-x64.node",
+      "win32-arm64.node",
+      "win32-x64.node"
+    ],
+    "hostPrebuild": "<PLATFORM_ROOT>/node_modules/better-sqlite3/prebuilds/darwin-arm64.node",
+    "hostPrebuildPresent": true,
+    "hostPrebuildBytes": 1980736,
+    "hostPrebuildSha256": "98e0e8acd01c632fe5615243e1296af0372826f8783b18fc31c506f73c47459c",
+    "nodeGypBuildDirectoryPresent": false
+  },
+  "interpretation": {
+    "buildApproval": "pnpm 11 flags better-sqlite3 as an unapproved builder; --config.strict-dep-builds=false keeps install non-interactive. The package declares no install script, so no local compile was requested.",
+    "prebuildOnly": "The binding used at runtime is prebuilds/<platform>-<arch>.node from the npm tarball; no build/Release output exists."
+  }
+}

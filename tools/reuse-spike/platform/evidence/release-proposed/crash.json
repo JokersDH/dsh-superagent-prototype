@@ -1,0 +1,80 @@
+{
+  "profile": "release-proposed",
+  "probe": "crash",
+  "ranAt": "2026-11-07T08:08:05.392Z",
+  "runtime": {
+    "node": "v24.22.2",
+    "execPath": "<PLATFORM_ROOT>/.cache/runtimes/node-v24.22.2-darwin-arm64/bin/node",
+    "platform": "darwin",
+    "arch": "arm64",
+    "napi": "10"
+  },
+  "id": "crash",
+  "ok": true,
+  "checks": [
+    {
+      "id": "crash.kill-observed",
+      "status": "PASS",
+      "detail": "commit case signal=SIGKILL, begin case signal=SIGKILL"
+    },
+    {
+      "id": "crash.committed-write-survives",
+      "status": "PASS",
+      "detail": "[{\"id\":\"committed-before-crash\",\"note\":\"committed\"}]"
+    },
+    {
+      "id": "crash.open-transaction-rolled-back",
+      "status": "PASS",
+      "detail": "0 row(s) from the killed open transaction"
+    },
+    {
+      "id": "crash.integrity-after-recovery",
+      "status": "PASS",
+      "detail": "committed=ok uncommitted=ok"
+    }
+  ],
+  "facts": {
+    "childExecutable": "<PLATFORM_ROOT>/.cache/runtimes/node-v24.22.2-darwin-arm64/bin/node",
+    "committedCase": {
+      "child": {
+        "mode": "commit-then-die",
+        "status": null,
+        "signal": "SIGKILL",
+        "stderr": ""
+      },
+      "walBeforeReopen": {
+        "walPresent": true,
+        "walBytes": 20632,
+        "shmPresent": true
+      },
+      "recoveredRows": [
+        {
+          "id": "committed-before-crash",
+          "note": "committed"
+        }
+      ],
+      "integrity": "ok",
+      "journalModeAfterRecovery": "wal"
+    },
+    "uncommittedCase": {
+      "child": {
+        "mode": "begin-then-die",
+        "status": null,
+        "signal": "SIGKILL",
+        "stderr": ""
+      },
+      "walBeforeReopen": {
+        "walPresent": true,
+        "walBytes": 12392,
+        "shmPresent": true
+      },
+      "recoveredRows": [],
+      "integrity": "ok"
+    },
+    "limitations": [
+      "Minimal single-table write, not a product transaction or the real Store schema.",
+      "Only SIGKILL is exercised; power loss, filesystem failure and network filesystems are NOT_TESTED.",
+      "This does not cover Runner/native-process crash recovery or business-level reconciliation (OPS-02 and later)."
+    ]
+  }
+}

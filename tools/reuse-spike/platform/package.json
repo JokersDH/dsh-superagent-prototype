@@ -1,0 +1,21 @@
+{
+  "name": "g0-platform-validation",
+  "version": "0.0.0-g0",
+  "private": true,
+  "type": "module",
+  "description": "G0-B spike: isolated release-combination + SQLite transaction/backup validation (OPS-01). Throwaway probe package, not a product module.",
+  "license": "MIT",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "fetch-runtime": "node scripts/fetch-runtime.mjs",
+    "install-proposed": "node scripts/install-deps.mjs",
+    "probes": "node scripts/run-probes.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "better-sqlite3": "13.0.3"
+  }
+}

@@ -1,0 +1,25 @@
+# Local ignore for the G0-B platform experiment.
+# Anything produced by running the probes stays out of Git: temp databases, WAL/SHM side files,
+# downloaded runtimes and package-manager caches, installed dependencies and build outputs.
+
+node_modules/
+.cache/
+tmp/
+evidence/tmp/
+
+# SQLite databases and their side files (probes use the OS temp dir, this is defence in depth).
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+# Logs are evidence only where explicitly kept.
+*.log
+!evidence/install/*.log
+
+# Build outputs.
+dist/
+build/
+*.node

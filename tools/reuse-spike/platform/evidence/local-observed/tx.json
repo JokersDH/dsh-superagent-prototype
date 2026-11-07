@@ -1,0 +1,119 @@
+{
+  "profile": "local-observed",
+  "probe": "tx",
+  "ranAt": "2026-11-07T08:08:05.433Z",
+  "runtime": {
+    "node": "v24.21.0",
+    "execPath": "<HOME>/.nvm/versions/node/v24.21.0/bin/node",
+    "platform": "darwin",
+    "arch": "arm64",
+    "napi": "10"
+  },
+  "id": "tx",
+  "ok": true,
+  "checks": [
+    {
+      "id": "tx.wal-mode",
+      "status": "PASS",
+      "detail": "journal_mode=wal"
+    },
+    {
+      "id": "tx.foreign-keys-on",
+      "status": "PASS",
+      "detail": "foreign_keys=1"
+    },
+    {
+      "id": "tx.synchronous-full",
+      "status": "PASS",
+      "detail": "synchronous=2 (FULL)"
+    },
+    {
+      "id": "tx.foreign-key-enforced",
+      "status": "PASS",
+      "detail": "error code SQLITE_CONSTRAINT_FOREIGNKEY"
+    },
+    {
+      "id": "tx.unique-enforced",
+      "status": "PASS",
+      "detail": "error code SQLITE_CONSTRAINT_UNIQUE"
+    },
+    {
+      "id": "tx.rollback",
+      "status": "PASS",
+      "detail": "row absent after ROLLBACK"
+    },
+    {
+      "id": "tx.nested-savepoint",
+      "status": "PASS",
+      "detail": "{\"kept\":1,\"dropped\":0,\"after\":1}"
+    },
+    {
+      "id": "tx.state-effect-receipt-commit",
+      "status": "PASS",
+      "detail": "{\"ticket\":1,\"effect\":1,\"receipt\":1}"
+    },
+    {
+      "id": "tx.breakpoint-rolls-back-all",
+      "status": "PASS",
+      "detail": "{\"injected\":\"injected rollback breakpoint\",\"ticket\":0,\"effect\":0,\"receipt\":0}"
+    },
+    {
+      "id": "tx.reader-sees-committed-only",
+      "status": "PASS",
+      "detail": "{\"committedTicket\":1,\"rolledBackTicket\":0}"
+    },
+    {
+      "id": "tx.integrity-check",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "id": "tx.foreign-key-check",
+      "status": "PASS",
+      "detail": "0 violations"
+    }
+  ],
+  "facts": {
+    "databaseFile": "<TMPDIR>/g0b-probes-QhVU3t/tx/tx.db",
+    "pragmas": {
+      "journalMode": "wal",
+      "foreignKeys": 1,
+      "synchronous": 2,
+      "busyTimeout": 5000
+    },
+    "sideFiles": {
+      "walPresent": true,
+      "walBytes": 119512,
+      "shmPresent": true
+    },
+    "checkpointResult": [
+      {
+        "busy": 0,
+        "log": 0,
+        "checkpointed": 0
+      }
+    ],
+    "integrityCheck": "ok",
+    "foreignKeyViolations": 0,
+    "committed": {
+      "ticket": 1,
+      "effect": 1,
+      "receipt": 1
+    },
+    "rolledBackAtBreakpoint": {
+      "ticket": 0,
+      "effect": 0,
+      "receipt": 0
+    },
+    "nested": {
+      "kept": 1,
+      "dropped": 0,
+      "after": 1
+    },
+    "limitations": [
+      "This is a throwaway schema, not the product Store or its migrations.",
+      "Only one process/one connection writes; multi-process fencing is covered by separate product work.",
+      "afterCommit ordering is a product wrapper concept and is not exercised here."
+    ]
+  }
+}
