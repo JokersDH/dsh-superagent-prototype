@@ -84,7 +84,7 @@ test('cancel acknowledgement, process exit and writer quiescence stay independen
     store.uow.atomic(() => store.observations.record(observation('attempt-1', rawExit('resource-1', 0), 'fact-exit')))
     summary = store.observations.summarize('attempt-1')
     const one = summary.resources.find(resource => resource.resourceRef === 'resource-1')!
-    assert.deepEqual(one.exit, { observed: true, exitCode: 0, signal: null })
+    assert.deepEqual(one.exit, { observed: true, exitCode: 0, signal: null, factId: 'fact-exit' })
     assert.deepEqual(one.writer, { observed: false })
     assert.equal(one.quiescence, 'unknown', 'an exit alone is not quiescence')
     assert.equal(summary.resources.find(resource => resource.resourceRef === 'resource-2'), undefined)
@@ -193,7 +193,7 @@ test('composition fixture: the public ports accept one fact transaction and redu
     assert.equal(observedEvent?.entityRef, 'fact-exit-3', 'the observation event is committed in the same transaction')
     const summary = store.observations.summarize('attempt-1')
     assert.equal(summary.observations, 1)
-    assert.deepEqual(summary.resources[0]!.exit, { observed: true, exitCode: 3, signal: null })
+    assert.deepEqual(summary.resources[0]!.exit, { observed: true, exitCode: 3, signal: null, factId: 'fact-exit-3' })
     assert.equal(summary.resources[0]!.quiescence, 'unknown')
   })
 })

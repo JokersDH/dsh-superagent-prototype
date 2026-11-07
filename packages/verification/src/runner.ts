@@ -4,15 +4,24 @@
  * artifact digest and `completionCriteriaDigest(criteria)`. It never calls the core completion gate
  * and never finishes a Ticket: a failure, timeout, missing dependency, skip or not-applicable stays
  * an explicit non-PASS result for the gate to judge.
+ *
+ * Isolation and boundedness: every check runs in its own process group (`detached`) off the
+ * coordinator's event loop. A deadline sends SIGTERM to the group, a short grace then SIGKILL, and a
+ * hard cleanup bound resolves the check as NOT_TESTED (`cleanup_unproven`) if the child cannot be
+ * proven gone. Stragglers left in the group are reaped after the leader exits, and captured pipes
+ * are destroyed so descendants cannot hold the coordinator. Process groups are not a sandbox.
+ *
+ * The frozen-artifact guard is mandatory and fail-closed: `verifyArtifact` must return exactly
+ * `true` before and after the checks; a missing guard, a false result or a throw refuses to produce
+ * a Verification.
  */
-import { spawnSync } from 'node:child_process'
-import { realpathSync } from 'node:fs'
+import { spawn } from 'node:child_process'
 import { createHash, randomUUID } from 'node:crypto'
+import { realpathSync } from 'node:fs'
 import { resolve, relative, isAbsolute, sep } from 'node:path'
 import { VerificationSchema } from '@personal-agent/contracts'
 import type { CandidateRef, Criterion, TestStatus, Verification } from '@personal-agent/contracts'
 import { completionCriteriaDigest } from '@personal-agent/orchestrator-core'
-import { UnknownCheck } from './checks.ts'
 import type { CheckDefinition, CheckRegistry } from './checks.ts'
 
 /** The frozen candidate could not be verified as frozen (changed artifact, unregistered check, bad cwd). */
@@ -27,10 +36,13 @@ export interface VerificationPlan {
   workspacePath: string
   environmentRef: string
   verifierIdentityRef?: string
+  /**
+   * Mandatory fail-closed guard: called before the first check and after the last. It must return
+   * exactly `true`; a false/undefined result or a throw refuses verification.
+   */
+  verifyArtifact: () => boolean
   /** Trusted exclusions decided by the composition root (for example a platform the check cannot target). */
   exclusions?: readonly { criterionId: string; outcome: 'SKIPPED' | 'NOT_APPLICABLE'; reason: string }[]
-  /** Run before the first check and after the last; throw when the frozen artifact changed. */
-  verifyArtifact?: () => void
   /** Host environment values; only names declared by a check definition are passed through. */
   environment?: Readonly<Record<string, string | undefined>>
 }
@@ -47,6 +59,7 @@ export interface CheckEvidence {
   durationMs: number
   timedOut: boolean
   missingDependency: boolean
+  cleanupUnproven?: boolean
   outputDigest: string
   outputExcerpt: string
   reason?: string
@@ -59,9 +72,17 @@ export interface VerificationRun {
 
 const sha256 = (data: string | Buffer): string => createHash('sha256').update(data).digest('hex')
 const EXCERPT_LIMIT = 2000
+/** How long a SIGKILLed group may take to prove it exited before the check is indeterminate. */
+const CLEANUP_BOUND_MS = 2000
+const TERM_GRACE_MS = 200
 const inside = (parent: string, child: string): boolean => {
   const rel = relative(parent, child)
   return rel === '' || (!rel.startsWith('..') && !rel.startsWith(`..${sep}`) && !isAbsolute(rel))
+}
+
+interface Executed {
+  evidence: Omit<CheckEvidence, 'criterionId' | 'checkDefinitionRef' | 'definitionRevision'>
+  evidenceRef: string
 }
 
 export class VerificationRunner {
@@ -78,11 +99,12 @@ export class VerificationRunner {
 
   /**
    * Runs the registered checks for a frozen candidate. Exclusions are recorded as explicit
-   * SKIPPED/NOT_APPLICABLE results; everything else runs with its definition's deadline and output
-   * budget. A changed artifact or an unregistered check refuses to produce a Verification at all.
+   * SKIPPED/NOT_APPLICABLE results; everything else runs in an owned process group with its
+   * definition's deadline and output budget. A changed artifact or an unregistered check refuses to
+   * produce a Verification at all.
    */
-  run(plan: VerificationPlan): VerificationRun {
-    this.checkFrozen(plan)
+  async run(plan: VerificationPlan): Promise<VerificationRun> {
+    this.assertFrozen(plan, 'before')
     const root = resolve(plan.workspacePath)
     const exclusions = new Map((plan.exclusions ?? []).map(item => [item.criterionId, item]))
     const evidence: CheckEvidence[] = []
@@ -105,11 +127,11 @@ export class VerificationRunner {
       const realRoot = realpathSync(root)
       const realCwd = realpathSync(cwd)
       if (!inside(root, cwd) || !inside(realRoot, realCwd)) throw new VerificationUnavailable(`Check ${definition.id} working directory escapes the workspace: ${definition.cwd}`)
-      const run = this.execute(definition, cwd)
+      const run = await this.execute(definition, cwd)
       evidence.push({ ...run.evidence, criterionId: criterion.id, checkDefinitionRef: definition.id, definitionRevision: definition.revision })
       results.push({ criterionId: criterion.id, outcome: run.evidence.outcome, evidenceRefs: [run.evidenceRef] })
     }
-    this.checkFrozen(plan)
+    this.assertFrozen(plan, 'after')
     const verification = VerificationSchema.parse({
       ...plan.candidate,
       id: `verification:${randomUUID()}`,
@@ -122,57 +144,119 @@ export class VerificationRunner {
     return { verification, evidence }
   }
 
-  private checkFrozen(plan: VerificationPlan): void {
+  private assertFrozen(plan: VerificationPlan, phase: 'before' | 'after'): void {
+    let confirmed: unknown
     try {
-      plan.verifyArtifact?.()
+      confirmed = plan.verifyArtifact()
     } catch (error) {
-      throw new VerificationUnavailable(`The frozen artifact changed during verification: ${String(error)}`)
+      throw new VerificationUnavailable(`The frozen artifact guard failed ${phase} verification: ${String(error)}`)
     }
+    if (confirmed !== true) throw new VerificationUnavailable(`The frozen artifact guard did not confirm the artifact ${phase} verification`)
   }
 
-  private execute(definition: Readonly<CheckDefinition>, cwd: string): { evidence: Omit<CheckEvidence, 'criterionId' | 'checkDefinitionRef' | 'definitionRevision'>; evidenceRef: string } {
-    const env: Record<string, string> = {}
-    const path = this.environment.PATH ?? '/usr/bin:/bin'
-    env.PATH = path
-    for (const name of definition.allowedEnvironment ?? []) {
-      const value = this.environment[name]
-      if (value !== undefined) env[name] = value
-    }
-    const started = this.now()
-    const result = spawnSync(definition.executable, [...definition.argv], {
-      cwd, env, timeout: definition.deadlineMs, maxBuffer: definition.outputLimitBytes, encoding: 'buffer', stdio: ['ignore', 'pipe', 'pipe'],
+  /** Runs one check in its own process group with bounded time, output and cleanup. */
+  private execute(definition: Readonly<CheckDefinition>, cwd: string): Promise<Executed> {
+    return new Promise<Executed>(resolvePromise => {
+      const env: Record<string, string> = { PATH: this.environment.PATH ?? '/usr/bin:/bin' }
+      for (const name of definition.allowedEnvironment ?? []) {
+        const value = this.environment[name]
+        if (value !== undefined) env[name] = value
+      }
+      const started = this.now()
+      const child = spawn(definition.executable, [...definition.argv], { cwd, env, detached: true, stdio: ['ignore', 'pipe', 'pipe'] })
+      let stdout: Buffer = Buffer.alloc(0)
+      let stderr: Buffer = Buffer.alloc(0)
+      let oversized = false
+      let timedOut = false
+      let cleanupUnproven = false
+      let settled = false
+      let exitCode: number | null = null
+      let exitSignal: string | null = null
+      const timers: ReturnType<typeof setTimeout>[] = []
+
+      const killGroup = (signal: NodeJS.Signals): void => {
+        try { if (child.pid) process.kill(-child.pid, signal) } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ESRCH') throw error }
+      }
+      const settle = (): void => {
+        if (settled) return
+        settled = true
+        for (const timer of timers) clearTimeout(timer)
+        child.stdout?.destroy()
+        child.stderr?.destroy()
+        const output = Buffer.concat([stdout, stderr])
+        const durationMs = this.now() - started
+        // A leader exit does not prove the group is gone: reap stragglers in our own group.
+        killGroup('SIGKILL')
+        const outcome: CheckOutcome = cleanupUnproven ? 'NOT_TESTED'
+          : timedOut || exitSignal !== null || oversized || exitCode !== 0 ? 'FAIL'
+            : 'PASS'
+        const reason = cleanupUnproven ? 'cleanup_unproven'
+          : oversized ? 'output_limit'
+            : timedOut ? 'deadline_exceeded'
+              : exitSignal !== null ? `signal:${exitSignal}`
+                : exitCode !== 0 ? `exit:${String(exitCode)}`
+                  : undefined
+        const evidence: Omit<CheckEvidence, 'criterionId' | 'checkDefinitionRef' | 'definitionRevision'> = {
+          outcome,
+          exitCode,
+          signal: exitSignal,
+          durationMs,
+          timedOut,
+          missingDependency: false,
+          ...(cleanupUnproven ? { cleanupUnproven: true } : {}),
+          outputDigest: sha256(output),
+          outputExcerpt: output.toString('utf8').slice(0, EXCERPT_LIMIT),
+          ...(reason ? { reason } : {}),
+        }
+        resolvePromise({ evidence, evidenceRef: `check:${definition.id}:r${definition.revision}:${sha256(output)}` })
+      }
+      const capture = (current: Buffer, chunk: Buffer): Buffer => {
+        if (oversized) return current
+        const next = Buffer.concat([current, chunk])
+        if (next.byteLength > definition.outputLimitBytes) {
+          oversized = true
+          killGroup('SIGKILL')
+          return next.subarray(0, definition.outputLimitBytes)
+        }
+        return next
+      }
+      child.stdout?.on('data', (chunk: Buffer) => { stdout = capture(stdout, chunk) })
+      child.stderr?.on('data', (chunk: Buffer) => { stderr = capture(stderr, chunk) })
+      child.once('error', (error: NodeJS.ErrnoException) => {
+        // Spawn failure (typically ENOENT): nothing ran.
+        if (error.code === 'ENOENT') {
+          if (settled) return
+          settled = true
+          for (const timer of timers) clearTimeout(timer)
+          child.stdout?.destroy()
+          child.stderr?.destroy()
+          resolvePromise({
+            evidence: { outcome: 'NOT_TESTED', exitCode: null, signal: null, durationMs: this.now() - started, timedOut: false, missingDependency: true,
+              outputDigest: sha256(''), outputExcerpt: '', reason: 'missing_dependency' },
+            evidenceRef: `check:${definition.id}:r${definition.revision}:${sha256('')}`,
+          })
+          return
+        }
+        settle()
+      })
+      child.once('exit', (code, signal) => {
+        exitCode = code
+        exitSignal = signal
+        settle()
+      })
+      timers.push(setTimeout(() => {
+        timedOut = true
+        killGroup('SIGTERM')
+        timers.push(setTimeout(() => killGroup('SIGKILL'), TERM_GRACE_MS))
+      }, definition.deadlineMs))
+      // Hard bound: if the group still cannot be proven exited, resolve as indeterminate rather
+      // than holding the coordinator forever.
+      timers.push(setTimeout(() => {
+        if (settled) return
+        cleanupUnproven = true
+        killGroup('SIGKILL')
+        settle()
+      }, definition.deadlineMs + TERM_GRACE_MS + CLEANUP_BOUND_MS))
     })
-    const durationMs = this.now() - started
-    const stdout = result.stdout instanceof Buffer ? result.stdout : Buffer.alloc(0)
-    const stderr = result.stderr instanceof Buffer ? result.stderr : Buffer.alloc(0)
-    const output = Buffer.concat([stdout, stderr])
-    const outputDigest = sha256(output)
-    const outputExcerpt = output.toString('utf8').slice(0, EXCERPT_LIMIT)
-    const error = result.error as (NodeJS.ErrnoException & { code?: string }) | undefined
-    const timedOut = error?.code === 'ETIMEDOUT'
-    const missingDependency = error?.code === 'ENOENT'
-    const oversized = error?.code === 'ENOBUFS'
-    const outcome: CheckOutcome = missingDependency ? 'NOT_TESTED'
-      : timedOut || result.signal !== null || oversized || result.status !== 0 ? 'FAIL'
-        : 'PASS'
-    const reason = missingDependency ? 'missing_dependency'
-      : timedOut ? 'deadline_exceeded'
-        : oversized ? 'output_limit'
-          : result.signal !== null ? `signal:${result.signal}`
-            : result.status !== 0 ? `exit:${String(result.status)}`
-              : undefined
-    const evidence = {
-      outcome,
-      exitCode: result.status,
-      signal: result.signal,
-      durationMs,
-      timedOut,
-      missingDependency,
-      outputDigest,
-      outputExcerpt,
-      ...(reason ? { reason } : {}),
-    }
-    return { evidence, evidenceRef: `check:${definition.id}:r${definition.revision}:${outputDigest}` }
   }
 }
-

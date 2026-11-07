@@ -10,15 +10,23 @@ self-report can never become an arbitrary shell command.
 | --- | --- |
 | `CheckRegistry.register(definition)` | Immutable per `(id, revision)`; a changed body must use a new revision; validates executable, deadline (1 s–10 min), output budget (1 B–1 MB), environment allowlist and a workspace-relative `cwd`. |
 | `CheckRegistry.require(id)` | Newest revision of a registered check; an unregistered ref is refused. |
-| `VerificationRunner.run(plan)` | Executes the registered checks for a frozen candidate with `spawnSync` (deadline, output budget, allowlisted environment), records real exit/signal/duration/output digest + bounded excerpt, and returns a contract `Verification` bound to the candidate, artifact digest and `completionCriteriaDigest(criteria)`. |
+| `VerificationRunner.run(plan)` | Async; executes each registered check in its own process group off the event loop, with deadline, output budget and allowlisted environment. Records real exit/signal/duration/output digest + bounded excerpt, and returns a contract `Verification` bound to the candidate, artifact digest and `completionCriteriaDigest(criteria)`. |
 
 Outcomes are explicit: `PASS` (exit 0), `FAIL` (non-zero, signal, timeout, output limit), `NOT_TESTED`
-(missing executable), and trusted `SKIPPED`/`NOT_APPLICABLE` exclusions supplied by the composition
-root — never derived from worker text. A changed frozen artifact (checked before and after the run)
-or an unregistered check refuses verification entirely. The runner never calls the core completion
+(missing executable, or a child that could not be proven gone), and trusted `SKIPPED`/`NOT_APPLICABLE`
+exclusions supplied by the composition root — never derived from worker text.
+
+**Frozen-artifact guard is mandatory and fail-closed.** `plan.verifyArtifact` is required and must
+return exactly `true` before the first check and after the last. A missing guard, `false`/`undefined`,
+or a throw refuses verification (`VerificationUnavailable`); there is no default that returns true.
+
+**Bounded liveness.** A deadline sends SIGTERM to the check's process group, then SIGKILL after a
+short grace. If the group cannot be proven exited within a hard cleanup bound, the check is
+`NOT_TESTED` with `cleanupUnproven` — never PASS. Captured pipes are destroyed so descendants cannot
+hold the coordinator; a process group is not a sandbox. The runner never calls the core completion
 gate and never finishes a Ticket.
 
-| `CompletionEvidenceStore` (batch 2) | Implements the core `CompletionVerifier` port: immutable Verification/quiescence/acceptance records in the WP-04 migration tables (`schema v6`). `recordQuiescence` re-checks the runtime observation store and requires explicit `observed_quiescent` writer facts per resource — exits, cancel ACKs, timeouts or missing PIDs never qualify. `resolve` is read-only, synchronous and same-connection, and returns `undefined` for any stale (generation/artifact/contract) or missing record. |
+| `CompletionEvidenceStore` (batch 2) | Implements the core `CompletionVerifier` port: immutable Verification/quiescence/acceptance records in the WP-04 migration tables (`schema v6`). `recordQuiescence` takes the **trusted barrier receipt** (scope, attempt, proofRef, resource-manifest digest, confirmed event seq, writer fact) and re-verifies binding state, full registered-resource coverage, event identity and per-resource quiescent facts; the proving `factId`s are stored. `resolve` is read-only, synchronous and same-connection, re-checks the barrier against the current records, and returns `undefined` for any stale (generation/artifact/contract) or missing record, so a late resource change invalidates it. |
 
 Documents stay patch/branch based: the runner does not merge, deploy or touch the user's original
 worktree (see `@personal-agent/workspaces`).

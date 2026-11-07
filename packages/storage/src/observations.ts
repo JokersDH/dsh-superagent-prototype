@@ -71,9 +71,9 @@ export interface ResourceObservationSummary {
   observations: number
   last: ResourceObservationRow
   /** A process exit was observed; it says nothing about other resources or group quiescence. */
-  exit: { observed: boolean; exitCode?: number | null; signal?: string | null }
+  exit: { observed: boolean; exitCode?: number | null; signal?: string | null; factId?: string }
   /** The latest writer observation for this resource, kept separate from exits and cancels. */
-  writer: { observed: boolean; status?: WriterStatus }
+  writer: { observed: boolean; status?: WriterStatus; factId?: string }
   /** `observed_quiescent` only when a writer observation explicitly reported `quiescent`; never inferred. */
   quiescence: 'observed_quiescent' | 'unknown'
 }
@@ -169,6 +169,12 @@ export class RuntimeObservations {
       .map(row => this.resourceRow(row))
   }
 
+  /** The per-resource rows one fact reported (used to verify a trusted barrier receipt). */
+  forFact(factId: string): ResourceObservationRow[] {
+    return (this.db.prepare('SELECT * FROM resource_observations WHERE fact_id = ? ORDER BY rowid').all(factId) as Row[])
+      .map(row => this.resourceRow(row))
+  }
+
   /**
    * Read-only reduction for the composition root: separate cancel/exit/writer facts per attempt and
    * resource. It never releases a resource or claims group quiescence; only an explicit
@@ -196,9 +202,9 @@ export class RuntimeObservations {
         observations: observations.length,
         last,
         exit: lastExit
-          ? { observed: true, exitCode: lastExit.exitCode ?? null, signal: lastExit.signal ?? null }
+          ? { observed: true, exitCode: lastExit.exitCode ?? null, signal: lastExit.signal ?? null, factId: lastExit.factId }
           : { observed: false },
-        writer: lastWriter?.status ? { observed: true, status: lastWriter.status } : { observed: false },
+        writer: lastWriter?.status ? { observed: true, status: lastWriter.status, factId: lastWriter.factId } : { observed: false },
         quiescence: lastWriter?.status === 'quiescent' ? 'observed_quiescent' : 'unknown',
       }
     })

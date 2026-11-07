@@ -5,6 +5,6 @@ export {
   VerificationRunner, VerificationUnavailable, type VerificationPlan, type VerificationRun, type CheckEvidence, type CheckOutcome,
 } from './runner.ts'
 export {
-  CompletionEvidenceStore, EvidenceConflict, QuiescenceUnavailable,
-  type QuiescenceInput, type AcceptanceInput,
+  CompletionEvidenceStore, EvidenceConflict, InvalidEvidence, QuiescenceUnavailable, manifestDigest,
+  type QuiescenceInput, type AcceptanceInput, type BarrierReceipt,
 } from './evidence.ts'

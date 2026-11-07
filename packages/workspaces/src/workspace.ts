@@ -10,7 +10,7 @@
  */
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 
 /** The attempt an attempt-worktree belongs to; the Assignment identity is recorded, never invented. */
@@ -48,6 +48,8 @@ export interface FrozenArtifact {
   headCommit: string
   artifactDigest: string
   manifestPath: string
+  /** Content-addressed diff of the attempt worktree against its base commit (includes deletions). */
+  patchPath: string
   files: number
   dirty: boolean
   environment: Readonly<Record<string, string>>
@@ -62,6 +64,14 @@ export interface ReserveOptions {
 }
 
 export class WorkspaceConflict extends Error {}
+
+interface ManifestEntry {
+  path: string
+  kind: 'file' | 'symlink' | 'deleted' | 'other'
+  sha256: string
+  bytes: number
+  executable?: boolean
+}
 
 const ATTEMPT_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/
 
@@ -168,38 +178,67 @@ export class WorkspaceManager {
   }
 
   /**
-   * Freezes the attempt worktree: a manifest of every regular file (and symlink) with its digest,
-   * the base/head commits and the worktree's dirty status. The returned digest is the artifact
-   * identity the verification binds to; later changes make it differ.
+   * Freezes the attempt worktree: a content-addressed manifest of every tracked/untracked path with
+   * its identity. Deleted tracked files are recorded as `deleted` (a legitimate deliverable) and the
+   * attempt's diff is captured, including that deletion; the user's tree is never touched. Symlinks
+   * hash their link text (never the target's contents or a dangling target), regular files include
+   * their executable bit, and the manifest is addressed by its digest so re-freezing never overwrites
+   * an earlier audit manifest.
    */
   freeze(ref: { attemptId: string }): FrozenArtifact {
-    const record = this.record(ref.attemptId)
-    const path = this.attemptPath(ref.attemptId)
-    if (!existsSync(path)) throw new WorkspaceConflict(`Attempt ${ref.attemptId} has no workspace to freeze`)
-    const headCommit = git(path, ['rev-parse', 'HEAD'])
-    const status = statusEntries(gitBuffer(path, ['status', '--porcelain=v1', '-z']).toString('utf8'))
-    const listed = gitBuffer(path, ['ls-files', '-z']).toString('utf8').split('\0').filter(Boolean)
-    const untracked = gitBuffer(path, ['ls-files', '-z', '--others', '--exclude-standard']).toString('utf8').split('\0').filter(Boolean)
-    const files = [...new Set([...listed, ...untracked])].sort().map(file => {
-      const absolute = join(path, file)
-      const stat = lstatSync(absolute)
-      if (stat.isSymbolicLink()) {
-        return { path: file, kind: 'symlink' as const, sha256: sha256(Buffer.concat([Buffer.from('symlink:'), Buffer.from(readFileSync(absolute, 'utf8'))])), bytes: stat.size }
-      }
-      if (!stat.isFile()) return { path: file, kind: 'other' as const, sha256: digestOfOther(file), bytes: stat.size }
-      const data = readFileSync(absolute)
-      return { path: file, kind: 'file' as const, sha256: sha256(data), bytes: data.byteLength }
-    })
-    const environment: Record<string, string> = { node: process.version, platform: process.platform, arch: process.arch }
-    const artifactDigest = sha256(JSON.stringify({ baseCommit: record.baseCommit, headCommit, status, files, environment }))
-    const manifestPath = join(this.manifestRoot, `${ref.attemptId}.json`)
+    const frozen = this.computeManifest(ref.attemptId)
+    const manifestPath = join(this.manifestRoot, `${frozen.artifactDigest}.json`)
+    const patchPath = join(this.manifestRoot, `${frozen.artifactDigest}.patch`)
     mkdirSync(this.manifestRoot, { recursive: true, mode: 0o700 })
-    writeFileSync(manifestPath, `${JSON.stringify({ attemptId: ref.attemptId, baseCommit: record.baseCommit, headCommit, status, files, environment, artifactDigest }, null, 2)}\n`, { mode: 0o600 })
-    return { attemptId: ref.attemptId, baseCommit: record.baseCommit, headCommit, artifactDigest, manifestPath, files: files.length, dirty: status.length > 0, environment }
+    if (!existsSync(manifestPath)) {
+      writeFileSync(manifestPath, `${JSON.stringify({ attemptId: ref.attemptId, baseCommit: frozen.baseCommit, headCommit: frozen.headCommit,
+        status: frozen.status, files: frozen.entries, patchSha256: frozen.patchSha256, environment: frozen.environment, artifactDigest: frozen.artifactDigest }, null, 2)}\n`, { mode: 0o600 })
+    }
+    if (!existsSync(patchPath)) writeFileSync(patchPath, frozen.patch, { mode: 0o600 })
+    return { attemptId: ref.attemptId, baseCommit: frozen.baseCommit, headCommit: frozen.headCommit, artifactDigest: frozen.artifactDigest,
+      manifestPath, patchPath, files: frozen.entries.length, dirty: frozen.status.length > 0, environment: frozen.environment }
   }
 
-  /** Recomputes the artifact digest of the attempt worktree, for staleness checks before and after verification. */
-  digest(ref: { attemptId: string }): string { return this.freeze(ref).artifactDigest }
+  /** Recomputes the artifact digest without writing anything, so an audit manifest is preserved. */
+  digest(ref: { attemptId: string }): string { return this.computeManifest(ref.attemptId).artifactDigest }
+
+  private computeManifest(attemptId: string): {
+    baseCommit: string; headCommit: string; status: { status: string; path: string }[]
+    entries: ManifestEntry[]; patch: Buffer; patchSha256: string
+    environment: Record<string, string>; artifactDigest: string
+  } {
+    const record = this.record(attemptId)
+    const path = this.attemptPath(attemptId)
+    if (!existsSync(path)) throw new WorkspaceConflict(`Attempt ${attemptId} has no workspace to freeze`)
+    const headCommit = git(path, ['rev-parse', 'HEAD'])
+    const status = statusEntries(gitBuffer(path, ['status', '--porcelain=v1', '-z']).toString('utf8'))
+    const deleted = new Set(status.filter(entry => entry.status.includes('D')).map(entry => entry.path))
+    const listed = gitBuffer(path, ['ls-files', '-z']).toString('utf8').split('\0').filter(Boolean)
+    const untracked = gitBuffer(path, ['ls-files', '-z', '--others', '--exclude-standard']).toString('utf8').split('\0').filter(Boolean)
+    const entries: ManifestEntry[] = [...new Set([...listed, ...untracked])].sort().map(file => {
+      const absolute = join(path, file)
+      let stat
+      try { stat = lstatSync(absolute) } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT' && deleted.has(file)) {
+          return { path: file, kind: 'deleted', sha256: sha256(`deleted:${file}`), bytes: 0 }
+        }
+        throw error
+      }
+      if (stat.isSymbolicLink()) {
+        // The link text is the content; never resolve (or read) a dangling/outside target.
+        const target = readlinkSync(absolute)
+        return { path: file, kind: 'symlink', sha256: sha256(`symlink:${target}`), bytes: Buffer.byteLength(target) }
+      }
+      if (!stat.isFile()) return { path: file, kind: 'other', sha256: sha256(`other:${file}`), bytes: stat.size }
+      const data = readFileSync(absolute)
+      return { path: file, kind: 'file', sha256: sha256(data), bytes: data.byteLength, executable: (stat.mode & 0o111) !== 0 }
+    })
+    const patch = gitBuffer(path, ['diff', 'HEAD'])
+    const patchSha256 = sha256(patch)
+    const environment: Record<string, string> = { node: process.version, platform: process.platform, arch: process.arch }
+    const artifactDigest = sha256(JSON.stringify({ baseCommit: record.baseCommit, headCommit, status, entries, patchSha256, environment }))
+    return { baseCommit: record.baseCommit, headCommit, status, entries, patch, patchSha256, environment, artifactDigest }
+  }
 
   /** Removes the attempt's own worktree; the user's project worktree is untouched and the manifest stays for audit. */
   release(ref: { attemptId: string }): void {
@@ -220,4 +259,3 @@ export class WorkspaceManager {
   }
 }
 
-const digestOfOther = (file: string): string => sha256(Buffer.from(`other:${file}`))

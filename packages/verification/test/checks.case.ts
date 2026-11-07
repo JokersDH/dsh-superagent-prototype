@@ -1,11 +1,12 @@
 /**
  * WP-04 verification: registered-check execution with real processes, bounded time/output, explicit
- * non-PASS outcomes, and refusal to verify a changed frozen artifact.
+ * non-PASS outcomes, a mandatory fail-closed frozen-artifact guard, and isolated process groups that
+ * are cleaned up even when a check ignores SIGTERM.
  */
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { completionCriteriaDigest } from '@personal-agent/orchestrator-core'
@@ -28,7 +29,8 @@ const registryWith = (definition: { id: string; revision: number; executable: st
   return registry
 }
 const plan = (workspacePath: string, overrides: Record<string, unknown> = {}) => ({
-  candidate, criteria, artifactDigest: 'b'.repeat(64), workspacePath, environmentRef: 'env-1', verifierIdentityRef: 'verifier:test', ...overrides,
+  candidate, criteria, artifactDigest: 'b'.repeat(64), workspacePath, environmentRef: 'env-1', verifierIdentityRef: 'verifier:test',
+  verifyArtifact: () => true, ...overrides,
 })
 
 test('the registry is immutable per revision and refuses unregistered or invalid checks', () => {
@@ -44,70 +46,86 @@ test('the registry is immutable per revision and refuses unregistered or invalid
   assert.throws(() => registry.register({ id: 'bad', revision: 1, ...script(''), deadlineMs: 1000, outputLimitBytes: 1024, allowedEnvironment: ['BAD-NAME'] }), InvalidCheck)
 })
 
-test('a passing check and a failing check produce real exit results', () => {
+test('a passing check and a failing check produce real exit results', async () => {
   const dir = workspace()
   try {
     const runner = new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script('process.exit(0)') }))
-    const passed = runner.run(plan(dir))
+    const passed = await runner.run(plan(dir))
     assert.equal(passed.verification.results[0]!.outcome, 'PASS')
     assert.equal(passed.evidence[0]!.exitCode, 0)
     assert.match(passed.evidence[0]!.outputDigest, /^[0-9a-f]{64}$/)
     assert.deepEqual(passed.verification.results.map(result => result.criterionId), ['unit'], 'human criteria are not machine results')
 
     const failing = new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script('process.exit(3)') }))
-    const failed = failing.run(plan(dir))
+    const failed = await failing.run(plan(dir))
     assert.equal(failed.verification.results[0]!.outcome, 'FAIL')
     assert.equal(failed.evidence[0]!.exitCode, 3)
     assert.equal(failed.evidence[0]!.reason, 'exit:3')
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 
-test('a deadline and the output budget bound a check instead of buffering without limit', () => {
+test('a deadline and the output budget bound a check instead of buffering without limit', async () => {
   const dir = workspace()
   try {
     const slow = new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script('setTimeout(() => {}, 5000)'), deadlineMs: 150 }))
     const started = Date.now()
-    const timed = slow.run(plan(dir))
+    const timed = await slow.run(plan(dir))
     assert.equal(timed.verification.results[0]!.outcome, 'FAIL')
     assert.equal(timed.evidence[0]!.timedOut, true)
     assert.equal(timed.evidence[0]!.reason, 'deadline_exceeded')
     assert.ok(Date.now() - started < 3_000, 'the deadline bounds the run')
 
     const loud = new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script("process.stdout.write('x'.repeat(100000))"), outputLimitBytes: 512 }))
-    const bounded = loud.run(plan(dir))
+    const bounded = await loud.run(plan(dir))
     assert.equal(bounded.verification.results[0]!.outcome, 'FAIL')
     assert.equal(bounded.evidence[0]!.reason, 'output_limit')
     assert.ok(bounded.evidence[0]!.outputExcerpt.length <= 2000, 'the captured excerpt is bounded')
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 
-test('a missing executable is NOT_TESTED and an unregistered check refuses verification', () => {
+test('a check that ignores SIGTERM is killed as a group and does not hang the runner', async () => {
+  const dir = workspace()
+  try {
+    const stubborn = new VerificationRunner(registryWith({
+      id: 'unit-check', revision: 1, deadlineMs: 150,
+      ...script("process.on('SIGTERM', () => {}); setInterval(() => {}, 1000)"),
+    }))
+    const started = Date.now()
+    const run = await stubborn.run(plan(dir))
+    assert.equal(run.verification.results[0]!.outcome, 'FAIL')
+    assert.equal(run.evidence[0]!.timedOut, true)
+    assert.equal(run.evidence[0]!.cleanupUnproven, undefined, 'the group was proven gone')
+    assert.ok(Date.now() - started < 2_500, 'SIGKILL and the cleanup bound finish the check')
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('a missing executable is NOT_TESTED and an unregistered check refuses verification', async () => {
   const dir = workspace()
   try {
     const missing = new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, executable: 'definitely-not-a-real-binary-xyz', argv: [] }))
-    const run = missing.run(plan(dir))
+    const run = await missing.run(plan(dir))
     assert.equal(run.verification.results[0]!.outcome, 'NOT_TESTED')
     assert.equal(run.evidence[0]!.missingDependency, true)
 
-    assert.throws(() => new VerificationRunner(new CheckRegistry()).run(plan(dir)), VerificationUnavailable)
-    assert.throws(() => new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script('') })).run(plan(dir, { criteria: [{ id: 'x', kind: 'machine', description: 'x', required: true }] })), VerificationUnavailable)
+    await assert.rejects(new VerificationRunner(new CheckRegistry()).run(plan(dir)), VerificationUnavailable)
+    await assert.rejects(new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script('') })).run(plan(dir, { criteria: [{ id: 'x', kind: 'machine', description: 'x', required: true }] })), VerificationUnavailable)
     // A symlink inside the workspace that points outside is still refused (real-path containment).
     const outside = mkdtempSync(join(tmpdir(), 'wp04-outside-'))
     try {
       writeFileSync(join(outside, 'marker.txt'), 'outside')
       execFileSync('ln', ['-s', outside, join(dir, 'escape')])
-      assert.throws(() => new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script(''), cwd: 'escape' })).run(plan(dir)), VerificationUnavailable)
+      await assert.rejects(new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script(''), cwd: 'escape' })).run(plan(dir)), VerificationUnavailable)
     } finally { rmSync(outside, { recursive: true, force: true }) }
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 
-test('trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results', () => {
+test('trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results', async () => {
   const dir = workspace()
   try {
     const registry = new CheckRegistry()
     registry.register({ id: 'unit-check', revision: 1, ...script('process.exit(0)'), deadlineMs: 5_000, outputLimitBytes: 64_000 })
     const runner = new VerificationRunner(registry)
-    const run = runner.run(plan(dir, {
+    const run = await runner.run(plan(dir, {
       criteria: [
         { id: 'unit', kind: 'machine', description: 'Unit checks pass.', required: true, checkDefinitionRef: 'unit-check' },
         { id: 'skip', kind: 'machine', description: 'Needs a service.', required: true, checkDefinitionRef: 'service-check' },
@@ -124,22 +142,29 @@ test('trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results', () => {
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 
-test('a changed frozen artifact refuses verification before and during the run', () => {
+test('the frozen-artifact guard is mandatory and only an explicit true passes', async () => {
   const dir = workspace()
   try {
     const runner = new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script('process.exit(0)') }))
-    assert.throws(() => runner.run(plan(dir, { verifyArtifact: () => { throw new Error('digest changed') } })), (error: unknown) =>
-      error instanceof VerificationUnavailable && /artifact changed/.test((error as Error).message))
+    await assert.rejects(runner.run(plan(dir, { verifyArtifact: () => false })), (error: unknown) =>
+      error instanceof VerificationUnavailable && /did not confirm/.test((error as Error).message))
+    await assert.rejects(runner.run(plan(dir, { verifyArtifact: () => undefined })), VerificationUnavailable)
+    await assert.rejects(runner.run(plan(dir, { verifyArtifact: () => { throw new Error('digest changed') } })), (error: unknown) =>
+      error instanceof VerificationUnavailable && /guard failed/.test((error as Error).message))
+    // A missing guard (JS caller) fails closed too.
+    const missing = { ...plan(dir) } as Record<string, unknown>
+    delete missing.verifyArtifact
+    await assert.rejects(runner.run(missing as never), VerificationUnavailable)
     let calls = 0
-    assert.throws(() => runner.run(plan(dir, { verifyArtifact: () => { if (++calls > 1) throw new Error('changed while running') } })), VerificationUnavailable)
+    await assert.rejects(runner.run(plan(dir, { verifyArtifact: () => { if (++calls > 1) throw new Error('changed while running'); return true } })), VerificationUnavailable)
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 
-test('a verification binds the candidate, artifact and core criteria digest', () => {
+test('a verification binds the candidate, artifact and core criteria digest', async () => {
   const dir = workspace()
   try {
     const runner = new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script("process.stdout.write('ok')") }))
-    const run = runner.run(plan(dir))
+    const run = await runner.run(plan(dir))
     assert.equal(run.verification.ticketId, candidate.ticketId)
     assert.equal(run.verification.assignmentId, candidate.assignmentId)
     assert.equal(run.verification.candidateGeneration, candidate.candidateGeneration)
@@ -151,7 +176,7 @@ test('a verification binds the candidate, artifact and core criteria digest', ()
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 
-test('the runner refuses a workspace modified after freeze (WorkspaceManager integration)', () => {
+test('the runner refuses a workspace modified after freeze (WorkspaceManager integration)', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'wp04-freeze-'))
   const projectRoot = join(dir, 'project')
   mkdirSync(projectRoot)
@@ -164,16 +189,11 @@ test('the runner refuses a workspace modified after freeze (WorkspaceManager int
   try {
     const reserved = manager.reserve({ projectPath: projectRoot, assignment: attempt })
     const frozen = manager.freeze({ attemptId: attempt.attemptId })
+    const guard = (): boolean => manager.digest({ attemptId: attempt.attemptId }) === frozen.artifactDigest
     const runner = new VerificationRunner(registryWith({ id: 'unit-check', revision: 1, ...script('process.exit(0)') }))
-    const run = runner.run(plan(reserved.path, {
-      artifactDigest: frozen.artifactDigest,
-      verifyArtifact: () => { if (manager.digest({ attemptId: attempt.attemptId }) !== frozen.artifactDigest) throw new Error('workspace changed') },
-    }))
+    const run = await runner.run(plan(reserved.path, { artifactDigest: frozen.artifactDigest, verifyArtifact: guard }))
     assert.equal(run.verification.results[0]!.outcome, 'PASS')
     writeFileSync(join(reserved.path, 'a.txt'), 'modified after freeze\n')
-    assert.throws(() => runner.run(plan(reserved.path, {
-      artifactDigest: frozen.artifactDigest,
-      verifyArtifact: () => { if (manager.digest({ attemptId: attempt.attemptId }) !== frozen.artifactDigest) throw new Error('workspace changed') },
-    })), VerificationUnavailable)
+    await assert.rejects(runner.run(plan(reserved.path, { artifactDigest: frozen.artifactDigest, verifyArtifact: guard })), VerificationUnavailable)
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })

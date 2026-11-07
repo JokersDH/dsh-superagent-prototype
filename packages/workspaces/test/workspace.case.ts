@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdirSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { mkdtempSync } from 'node:fs'
@@ -106,5 +106,75 @@ test('reserve refuses a duplicate attempt, an invalid id, and an attempt root in
     const inside = new WorkspaceManager(join(fixture.root, 'attempts'))
     assert.throws(() => inside.reserve({ projectPath: fixture.root, assignment: { ...assignment, attemptId: 'attempt-2' } }), /must not contain each other/)
     assert.throws(() => manager.freeze({ attemptId: 'unknown' }), WorkspaceConflict)
+  } finally { rmSync(fixture.dir, { recursive: true, force: true }) }
+})
+
+test('a tracked deletion freezes as a deleted entry with the deletion in the attempt patch', () => {
+  const fixture = project()
+  const manager = new WorkspaceManager(join(fixture.dir, 'state'))
+  try {
+    const reserved = manager.reserve({ projectPath: fixture.root, assignment })
+    unlinkSync(join(reserved.path, 'tracked.txt'))
+    const frozen = manager.freeze({ attemptId: assignment.attemptId })
+    const manifest = JSON.parse(readFileSync(frozen.manifestPath, 'utf8'))
+    const deleted = manifest.files.find((file: { path: string }) => file.path === 'tracked.txt')
+    assert.equal(deleted?.kind, 'deleted', 'a deleted tracked file is a legitimate manifest entry')
+    assert.match(readFileSync(frozen.patchPath, 'utf8'), /deleted file mode|tracked\.txt/, 'the attempt patch records the real deletion')
+    assert.equal(readFileSync(join(fixture.root, 'tracked.txt'), 'utf8'), 'user dirty change\n', 'the user worktree is untouched')
+    assert.equal(run(fixture.root, 'status', '--porcelain=v1'), fixture.status)
+  } finally { rmSync(fixture.dir, { recursive: true, force: true }) }
+})
+
+test('a symlink is identified by its link text, not by equal target content, and dangling links freeze', () => {
+  const fixture = project()
+  const manager = new WorkspaceManager(join(fixture.dir, 'state'))
+  try {
+    const reserved = manager.reserve({ projectPath: fixture.root, assignment })
+    writeFileSync(join(reserved.path, 'target-a'), 'same')
+    writeFileSync(join(reserved.path, 'target-b'), 'same')
+    symlinkSync('target-a', join(reserved.path, 'link'))
+    const toA = manager.freeze({ attemptId: assignment.attemptId })
+    unlinkSync(join(reserved.path, 'link'))
+    symlinkSync('target-b', join(reserved.path, 'link'))
+    const toB = manager.freeze({ attemptId: assignment.attemptId })
+    assert.notEqual(toA.artifactDigest, toB.artifactDigest, 'equal target content must not mask a different link target')
+    const manifest = JSON.parse(readFileSync(toB.manifestPath, 'utf8'))
+    assert.equal(manifest.files.find((file: { path: string }) => file.path === 'link')?.kind, 'symlink')
+    // A dangling symlink still freezes from its link text.
+    unlinkSync(join(reserved.path, 'link'))
+    symlinkSync('missing-target', join(reserved.path, 'link'))
+    const dangling = manager.freeze({ attemptId: assignment.attemptId })
+    assert.notEqual(dangling.artifactDigest, toB.artifactDigest)
+  } finally { rmSync(fixture.dir, { recursive: true, force: true }) }
+})
+
+test('the executable bit participates in the artifact identity', () => {
+  const fixture = project()
+  const manager = new WorkspaceManager(join(fixture.dir, 'state'))
+  try {
+    const reserved = manager.reserve({ projectPath: fixture.root, assignment })
+    const plain = manager.freeze({ attemptId: assignment.attemptId })
+    chmodSync(join(reserved.path, 'other.txt'), 0o755)
+    const executable = manager.freeze({ attemptId: assignment.attemptId })
+    assert.notEqual(plain.artifactDigest, executable.artifactDigest, 'a mode change is a different artifact')
+    const manifest = JSON.parse(readFileSync(executable.manifestPath, 'utf8'))
+    assert.equal(manifest.files.find((file: { path: string }) => file.path === 'other.txt')?.executable, true)
+  } finally { rmSync(fixture.dir, { recursive: true, force: true }) }
+})
+
+test('digest() recomputes without overwriting the original audit manifest', () => {
+  const fixture = project()
+  const manager = new WorkspaceManager(join(fixture.dir, 'state'))
+  try {
+    const reserved = manager.reserve({ projectPath: fixture.root, assignment })
+    const frozen = manager.freeze({ attemptId: assignment.attemptId })
+    const original = readFileSync(frozen.manifestPath, 'utf8')
+    writeFileSync(join(reserved.path, 'other.txt'), 'changed later\n')
+    const next = manager.digest({ attemptId: assignment.attemptId })
+    assert.notEqual(next, frozen.artifactDigest)
+    assert.equal(readFileSync(frozen.manifestPath, 'utf8'), original, 'digest() does not rewrite the manifest')
+    const second = manager.freeze({ attemptId: assignment.attemptId })
+    assert.notEqual(second.manifestPath, frozen.manifestPath, 'manifests are content-addressed')
+    assert.equal(readFileSync(frozen.manifestPath, 'utf8'), original, 'the earlier manifest stays byte-identical')
   } finally { rmSync(fixture.dir, { recursive: true, force: true }) }
 })
