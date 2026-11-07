@@ -30,6 +30,7 @@ no DSH imports, better-sqlite3 instead of `node:sqlite`.
 | `RuntimeBindings` (`store.bindings`) | Attempt binding history (complete JSON: ticket/assignment/attempt/epoch/contract, runner identity/source, state, resources) plus the current-by-ticket pointer; immutable identity, ended attempts never reactivate. |
 | `RuntimeAuthority` (`store.authority`) | Enabled contract revisions (`workId`/`revision`/`digest`) for the ingress current-authorization check. |
 | `ImmutablePayloads` (`store.payloads`) | Canonical-JSON content-addressed payloads: file + record complete before return; reads verify the artifact and the recorded SHA-256. `canonicalJson`/`canonicalDigest` match the coordinator's `jsonDigest`. |
+| `RuntimeObservations` (`store.observations`) | Append-only attempt-level evidence and per-resource observations for accepted strict facts (`factId`/`payloadRef` preserved), recorded inside the ingress transaction. `summarize(attemptId)` is a read-only reducer: cancel ACK, exit and writer quiescence stay separate; no release API and no inferred physical success. |
 | `applyMigrations`, `MIGRATIONS` | The single migration entry; checksums recorded in `schema_meta`; refuses upstream/unknown databases and drift/gap/future versions. |
 
 ## Run

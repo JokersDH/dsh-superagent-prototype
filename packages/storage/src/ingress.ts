@@ -37,20 +37,28 @@ export interface BindingIdentity {
   resources: readonly { ref: string; ownership: 'spawned_process' | 'shared_service_session' }[]
 }
 
-/** A binding update would rewrite its immutable identity or revive an ended attempt. */
+/** A binding update would rewrite its immutable identity, revive a stopped attempt, roll back its epoch pointer, or drop a registered resource. */
 export class BindingConflict extends Error {}
 /** A payload reference exists with different content (never expected for content-addressed refs). */
 export class PayloadConflict extends Error {}
+/** A contract revision is re-issued with a different digest, or another revision of the Work is already enabled. */
+export class AuthorityConflict extends Error {}
 
 const sameContract = (a: ContractRef, b: ContractRef): boolean =>
   a.workId === b.workId && a.revision === b.revision && a.digest === b.digest
+const STATE_ORDER: Record<'active' | 'stopping' | 'ended', number> = { active: 0, stopping: 1, ended: 2 }
+type BindingState = keyof typeof STATE_ORDER
 
 /** Known bindings by attempt (history) plus the current binding by ticket; ended attempts never reactivate. */
 export class RuntimeBindings {
   private readonly db: Database.Database
   constructor(db: Database.Database) { this.db = db }
 
-  /** Records or updates one attempt's binding; full JSON (resources included) is preserved. */
+  /**
+   * Records or updates one attempt's binding; full JSON (resources included) is preserved.
+   * Immutable identity fields must match; the state only moves active → stopping → ended; registered
+   * resources may only be appended with unchanged ownership.
+   */
   record<T extends BindingIdentity>(binding: T): void {
     const existing = this.row(binding.attemptId)
     if (!existing) {
@@ -66,8 +74,19 @@ export class RuntimeBindings {
       || current.runnerIdentityRef !== binding.runnerIdentityRef
       || current.source !== binding.source
     if (identityChanged) throw new BindingConflict(`Attempt ${binding.attemptId} already has a different immutable binding identity`)
-    if (current.state === 'ended' && binding.state !== 'ended') {
-      throw new BindingConflict(`Attempt ${binding.attemptId} has ended and cannot return to ${binding.state}`)
+    if (STATE_ORDER[binding.state] < STATE_ORDER[current.state]) {
+      throw new BindingConflict(`Attempt ${binding.attemptId} cannot move from ${current.state} back to ${binding.state}`)
+    }
+    const registered = new Map(current.resources.map(resource => [resource.ref, resource.ownership]))
+    for (const resource of binding.resources) {
+      const ownership = registered.get(resource.ref)
+      if (ownership !== undefined && ownership !== resource.ownership) {
+        throw new BindingConflict(`Resource ${resource.ref} of attempt ${binding.attemptId} cannot change ownership from ${ownership} to ${resource.ownership}`)
+      }
+    }
+    for (const [ref, ownership] of registered) {
+      const kept = binding.resources.some(resource => resource.ref === ref && resource.ownership === ownership)
+      if (!kept) throw new BindingConflict(`Resource ${ref} of attempt ${binding.attemptId} cannot be removed`)
     }
     this.db.prepare('UPDATE runtime_bindings SET state = ?, value = ? WHERE attempt_id = ?')
       .run(binding.state, JSON.stringify(binding), binding.attemptId)
@@ -86,9 +105,33 @@ export class RuntimeBindings {
     return row ? JSON.parse(String(row.value)) as T : undefined
   }
 
-  /** Points a ticket at its current attempt; the binding must exist (no pointer to an unknown attempt). */
+  /**
+   * Points a ticket at its current attempt. The binding must exist and belong to the same ticket;
+   * an ended attempt can never become current; the pointer only moves forward in fenceEpoch (a
+   * different attempt at the same epoch is ambiguous and refused); re-pointing at the same attempt
+   * is an idempotent no-op.
+   */
   setCurrent(ticketId: string, attemptId: string): void {
-    if (!this.row(attemptId)) throw new BindingConflict(`Unknown attempt ${attemptId} cannot become current for ${ticketId}`)
+    const row = this.row(attemptId)
+    if (!row) throw new BindingConflict(`Unknown attempt ${attemptId} cannot become current for ${ticketId}`)
+    const binding = JSON.parse(String(row.value)) as BindingIdentity
+    if (binding.ticketId !== ticketId) throw new BindingConflict(`Attempt ${attemptId} belongs to ticket ${binding.ticketId}, not ${ticketId}`)
+    if (binding.state === 'ended') throw new BindingConflict(`Ended attempt ${attemptId} cannot become current`)
+    const pointer = this.db.prepare('SELECT attempt_id FROM runtime_current WHERE ticket_id = ?').get(ticketId) as Row | undefined
+    if (pointer) {
+      const currentAttemptId = String(pointer.attempt_id)
+      if (currentAttemptId === attemptId) return
+      const currentRow = this.row(currentAttemptId)
+      const currentBinding = currentRow ? JSON.parse(String(currentRow.value)) as BindingIdentity : undefined
+      if (currentBinding) {
+        if (binding.fenceEpoch < currentBinding.fenceEpoch) {
+          throw new BindingConflict(`Attempt ${attemptId} (epoch ${binding.fenceEpoch}) cannot replace the newer current epoch ${currentBinding.fenceEpoch}`)
+        }
+        if (binding.fenceEpoch === currentBinding.fenceEpoch) {
+          throw new BindingConflict(`Attempt ${attemptId} shares epoch ${binding.fenceEpoch} with the current attempt ${currentAttemptId}`)
+        }
+      }
+    }
     this.db.prepare('INSERT INTO runtime_current (ticket_id, attempt_id) VALUES (?, ?) ON CONFLICT(ticket_id) DO UPDATE SET attempt_id = excluded.attempt_id')
       .run(ticketId, attemptId)
   }
@@ -109,22 +152,48 @@ export class RuntimeBindings {
   }
 }
 
-/** Enabled contract revisions for the current-authorization check; a disabled revision is refused. */
+/**
+ * Enabled contract revisions for the current-authorization check. A Work has at most one enabled
+ * revision: switching versions means disabling the old one and enabling the new one in the same
+ * transaction. Re-issuing a revision with a different digest is a conflict. Disabled rows stay as
+ * revocation history and never satisfy `isCurrent` again unless explicitly re-enabled.
+ */
 export class RuntimeAuthority {
   private readonly db: Database.Database
   constructor(db: Database.Database) { this.db = db }
 
+  /** Enables a contract revision; refuses a second enabled revision of the same Work or a re-issued revision digest. */
   enable(ref: ContractRef): void {
+    const sameRevision = this.db.prepare('SELECT digest FROM runtime_authority WHERE work_id = ? AND revision = ?').get(ref.workId, ref.revision) as Row | undefined
+    if (sameRevision && String(sameRevision.digest) !== ref.digest) {
+      throw new AuthorityConflict(`Work ${ref.workId} revision ${ref.revision} was issued with digest ${String(sameRevision.digest)}; refusing a different digest`)
+    }
+    const enabled = this.current(ref.workId)
+    if (enabled && !sameContract(enabled, ref)) {
+      throw new AuthorityConflict(`Work ${ref.workId} already has enabled revision ${enabled.revision}; disable it in the same transaction before enabling revision ${ref.revision}`)
+    }
     this.db.prepare(`INSERT INTO runtime_authority (work_id, revision, digest, enabled) VALUES (?, ?, ?, 1)
       ON CONFLICT(work_id, revision, digest) DO UPDATE SET enabled = 1`).run(ref.workId, ref.revision, ref.digest)
   }
+  /** Revokes a revision; the row stays as history with `enabled = 0`. */
   disable(ref: ContractRef): void {
     this.db.prepare('UPDATE runtime_authority SET enabled = 0 WHERE work_id = ? AND revision = ? AND digest = ?')
       .run(ref.workId, ref.revision, ref.digest)
   }
+  /** Whether this exact revision is the enabled current authorization of its Work. */
   isCurrent(ref: ContractRef): boolean {
     return !!this.db.prepare('SELECT 1 FROM runtime_authority WHERE work_id = ? AND revision = ? AND digest = ? AND enabled = 1')
       .get(ref.workId, ref.revision, ref.digest)
+  }
+  /** The single enabled revision of a Work, if any. */
+  current(workId: string): ContractRef | undefined {
+    const row = this.db.prepare('SELECT work_id, revision, digest FROM runtime_authority WHERE work_id = ? AND enabled = 1').get(workId) as Row | undefined
+    return row ? { workId: String(row.work_id), revision: Number(row.revision), digest: String(row.digest) } : undefined
+  }
+  /** Enabled and revoked revisions of a Work, newest revision first (revocation history included). */
+  history(workId: string): { revision: number; digest: string; enabled: boolean }[] {
+    return (this.db.prepare('SELECT revision, digest, enabled FROM runtime_authority WHERE work_id = ? ORDER BY revision DESC').all(workId) as Row[])
+      .map(row => ({ revision: Number(row.revision), digest: String(row.digest), enabled: Number(row.enabled) === 1 }))
   }
 }
 

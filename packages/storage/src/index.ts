@@ -15,6 +15,7 @@ import { ChannelReceipts } from './outbox.ts'
 import { Answers } from './answers.ts'
 import { ArtifactStore } from './artifacts.ts'
 import { ImmutablePayloads, RuntimeAuthority, RuntimeBindings } from './ingress.ts'
+import { RuntimeObservations } from './observations.ts'
 import { UnitOfWork } from './uow.ts'
 import { type LockContent, type LockRegistry } from './writer-lock.ts'
 
@@ -44,6 +45,8 @@ export class ProductStore {
   readonly bindings: RuntimeBindings
   readonly authority: RuntimeAuthority
   readonly payloads: ImmutablePayloads
+  /** Append-only runtime observations and the read-only reducer for the composition root. */
+  readonly observations: RuntimeObservations
 
   constructor(options: ProductStoreOptions) {
     this.database = new ProductDatabase(options.path, options.report ? { report: options.report } : {})
@@ -61,6 +64,7 @@ export class ProductStore {
     this.bindings = new RuntimeBindings(this.db)
     this.authority = new RuntimeAuthority(this.db)
     this.payloads = new ImmutablePayloads(this.db, this.artifacts)
+    this.observations = new RuntimeObservations(this.db, this.uow, this.bindings)
   }
 
   close(): void { this.database.close() }
@@ -114,9 +118,14 @@ export { ChannelReceipts, CHANNEL_SEND_KIND, type ChannelReceipt, type OutboundM
 export { Answers, AnswerConflict, type DeliveryStatus, type RecordedAnswer } from './answers.ts'
 export { ArtifactStore, ensureArtifactRoot, artifactRoot, stateDirOf, type ArtifactRecord, type WrittenArtifact, type GcResult } from './artifacts.ts'
 export {
-  RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict,
+  RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict, AuthorityConflict,
   canonicalJson, canonicalDigest, type BindingIdentity,
 } from './ingress.ts'
+export {
+  RuntimeObservations, ObservationConflict, type ObservationDisposition, type ObservationInput,
+  type RuntimeObservationRow, type ResourceObservationRow, type ResourceObservationSummary,
+  type AttemptObservationSummary, type WriterStatus,
+} from './observations.ts'
 export { backupDatabase, verifyDatabase, type BackupResult, type VerifyResult } from './backup.ts'
 export { WriterLock, WriterLockHeld, type LockContent, type LockProbe, type LockRegistry, type LockVerdict } from './writer-lock.ts'
 export {

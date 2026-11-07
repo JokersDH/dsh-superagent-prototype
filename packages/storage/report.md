@@ -30,6 +30,50 @@
 | **生产 ingress 存储**（RFC 0001：A 提供 binding/history/resource/immutable payload 存储） | 迁移 **v3** 新增 `runtime_bindings`（按 attempt 的完整 binding JSON 历史）、`runtime_current`（ticket→当前 attempt，和历史分离）、`runtime_authority`（启用的合同版本，供 current-authorization）、`ingress_payloads`（内容寻址的不可变 JSON 载荷）。`RuntimeBindings` 强制 binding 身份不可变、ended 不可复活；`ImmutablePayloads` 以 canonical JSON 写入 ArtifactStore（文件与记录先于返回完成），读取时校验 artifact 与记录摘要；`canonicalJson/canonicalDigest` 与 coordinator 的 `jsonDigest` 一致 | `test/ingress-stores.case.ts`（历史/current/重开、身份不可变、ended 终态、authority 启停、payload 不可变与摘要）；`test/ingress-compat.case.ts`（与主 Agent 的 `IngressBinding`/`ImmutablePayloadReader` 类型兼容 + digest 一致性，含 unicode/嵌套/数组/null） |
 | 本轮结果 | storage **54/54**（原 44 个保留）、effects **8/8**、typecheck/build 通过；官方跟进脚本 **PASS_FOLLOWUP_INVARIANTS**（A 与 B 共 5 项全 PASS）；原评审脚本 A-LOCK-INITIALIZATION / A-ASYNC-TRANSACTION / MAIN-SYNC-BRIDGE 仍 PASS | `reports/` 下 test/typecheck/两个复现脚本原文 |
 
+## 0.3 批次 1（g1-agent-a-runtime-state.md）：绑定与当前授权不变量
+
+输入：`agent-tasks/g1-agent-a-runtime-state.md`（base `5281e84`）。迁移号 **v4**。
+
+| 要求 | 实现 | 证据 |
+| --- | --- | --- |
+| `setCurrent` 拒绝别的 Ticket 的绑定 | 读取 binding 校验 `ticketId` 严格相等 | `test/runtime-state.case.ts`：跨 Ticket 指针拒绝（含反向） |
+| current 不能回退旧 epoch、不能复活 ended | 与当前指针尝试比较 `fenceEpoch`：更低 → 拒绝；相同但不同 attempt → 拒绝（歧义）；相同 attempt → 幂等 no-op；ended → 拒绝成为 current | 旧 epoch 回退、同 epoch 歧义、ended 目标、幂等重试用例 |
+| 每 Ticket epoch 单调、状态单调 | state 只允许 active→stopping→ended；stopping 不得回 active；ended 终态（ended→ended 幂等） | 状态矩阵用例 |
+| 资源只能追加、identity/ownership 不可替换或删除 | 更新时已登记资源必须仍以相同 ownership 出现；允许追加 | 追加/删除/改 ownership 三例 |
+| 同 Work 只能一个有效合同；切换需同事务禁旧启新；同 Work/revision 不同 digest 冲突 | `enable` 先判 re-issue digest 冲突，再判同 Work 已有 enabled revision（要求同事务先 disable）；DB 层加唯一部分索引与 (work_id,revision) 唯一索引；`disable` 保留历史；新增 `current(workId)`/`history(workId)` 读取 | 双合同拒绝、同事务切换、撤销后 reopen 仍 false、历史读取 |
+| 用新 migration，v1–v3 checksum 不改写，升级兼容 | v4 仅新增两个唯一索引；测试锁定 v1–v3 checksum 常量，并用 `applyMigrations(registry=v1..v3)` 造 v3 库再以 ProductStore 升级，验证数据保留且新不变量生效 | checksum 冻结用例；v3→v4 升级用例（integrity 通过） |
+| 失败事务中 pointer/授权一起回滚 | 所有方法在调用者事务内执行；失败事务用例 | `a failed transaction rolls the current pointer and authority back together` |
+
+本轮结果：storage **60/60**（原 54 项全部保留），typecheck/build 通过。
+
+## 0.4 批次 2（g1-agent-a-runtime-state.md）：运行观察与可恢复证据
+
+输入同上；迁移号 **v5**。
+
+**对外接口**（组合根使用，无需私有 SQL）：
+
+```ts
+store.observations.record({ fact, payload, disposition, payloadSha256 })   // 必须在 ingress 事务内
+store.observations.get(factId)
+store.observations.forAttempt(attemptId, limit?)        // 事实级证据，按提交顺序
+store.observations.forResource(resourceRef, limit?)      // 资源级证据（审计）
+store.observations.summarize(attemptId): AttemptObservationSummary
+// { attemptId, observations, last?, cancel: { observed, acknowledged },
+//   resources: [{ resourceRef, observations, last, exit: { observed, exitCode?, signal? },
+//                 writer: { observed, status? }, quiescence: 'observed_quiescent' | 'unknown' }] }
+```
+
+| 要求 | 实现 | 证据 |
+| --- | --- | --- |
+| 持久化 RuntimeObservation/ResourceObservation，消费严格 RuntimeFactPayload 与原 factId/payloadRef | `record` 接收 contracts 的 `CriticalFact` + `RuntimeFactPayload`（由 `parseRuntimeFactPayload` 解析），保存 factId/payloadRef/宿主记录的 payload SHA-256/合同/epoch/disposition/规范化 detail；物理 payload（`runtime.exited`、`writer.observed`）按资源落行 | `test/observations.case.ts`：业务事实一行、无资源行；`get/forAttempt/forResource` |
+| 与 FactReceipts/core mutation/events/effects 共用 UnitOfWork | `record` 断言 `nesting ≥ 1`（必须在 ingress 事务内）；失败事务用例中 pointer/授权/receipt/observation/event/effect 一起回滚 | `observations must be recorded inside the ingress transaction and roll back with it` |
+| 按 attempt/resource 记录观察与来源；cancel ACK、parent exit、writer quiescence 分开，不能互相推断 | 事实行带 provenance；`summarize` 把 cancel（dispatch 级）、exit（每资源）、writer（每资源）独立暴露；`quiescence` 仅在最新 writer.observed 显式 `quiescent` 时为 `observed_quiescent`，exit 或 cancel 后仍为 `unknown`；后续非 quiescent 观察会撤销该状态 | `cancel acknowledgement, process exit and writer quiescence stay independent facts` |
+| 旧/ended attempt 的物理观察可保存，但不能改变新 attempt 的资源或恢复授权 | 观察只写观察表，不触碰 bindings/current/authority；用例在旧 attempt ended、新 attempt current 后记录旧物理观察，断言 current、资源集与授权不变，且新 attempt 摘要不含旧事实 | `an old attempt physical observation is stored without touching the new attempt, pointer or authority` |
+| 提供组合根读取/归约接口，不让主 Agent 用私有 SQL | `summarize/forAttempt/forResource/get` 为公开 API；生产字段归本包，wire 数据来自 contracts | `composition fixture: the public ports accept one fact transaction and reduce its evidence`（演示 stored-ingress 的调用形状与幂等重放） |
+| 不按超时/缺 PID 释放资源，不制造物理成功 | 库层没有任何 release API；只记录与归约；未知 attempt/未登记资源/ownership 不符一律拒绝（fail closed） | 分离用例 + `physical observations refuse an unknown attempt or an unregistered or differently-owned resource` |
+
+本轮结果：storage **66/66**（批 1 的 60 项全部保留）、effects 8/8、core-on-SQLite 178/178、ingress 18/18 与 7/7、跟进复现脚本 5/5 仍 PASS。主 Agent 接线方式：在 `stored-ingress.ts` 的 `applyBusiness/applyPhysical` 中把现有的 `events.append` 观察替换为 `store.observations.record({ fact: input, payload, disposition, payloadSha256: payloadDigest })`（`payloadDigest` 即 ingress 已计算的 canonical 载荷摘要）；读取用 `store.observations.summarize(attemptId)`。
+
 ## 1. 交付物
 
 | 交付物 | 位置 |
