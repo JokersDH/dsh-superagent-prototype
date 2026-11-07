@@ -1,0 +1,12 @@
+$ vitest run
+
+ RUN  v4.1.8 /Users/hh/Desktop/joker/superagent-agent-a/tools/reuse-spike/core-extraction
+
+ ✓ tests/stage.spec.ts (31 tests) 2ms
+ ✓ tests/core-engine.spec.ts (113 tests) 59ms
+
+ Test Files  2 passed (2)
+      Tests  144 passed (144)
+   Start at  15:59:15
+   Duration  210ms (transform 124ms, setup 0ms, import 157ms, tests 61ms, environment 0ms)
+

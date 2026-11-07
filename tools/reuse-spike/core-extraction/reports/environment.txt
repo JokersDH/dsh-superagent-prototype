@@ -1,0 +1,6 @@
+node v24.21.0
+pnpm 11.7.0
+os Darwin arm64
+branch codex/g0-core-extraction
+base HEAD f5c5754ec979fbee1d51c187cf0a5b7198e27477
+upstream commit under test: 8c32a9dc5d72c033816c6a8110b37f40cf94fba4
