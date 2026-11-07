@@ -20,12 +20,12 @@ The first core interface was published in commit `56bba3e`; current source adds 
 | Check | Result |
 | --- | --- |
 | Original copied core baseline | 144/144, test files byte-identical to upstream |
-| New personal core rules | 32/32; total core 176/176 |
+| New personal core rules | 33/33; total core 177/177 |
 | Contracts | 183/183, typecheck/build/generated identity unchanged |
 | Provenance | 18 source/test/license files accounted for; each adapted/new file hashed |
 | Root prototype after workspace adoption | 1197/1197, typecheck and original build pass |
 | Shared check | `pnpm check:g1-core`, result at `reports/releases/g1-core.json` |
-| Clean checkout / target Node 24.22.2 | Frozen filtered install, 176 core + 183 contracts tests, builds and public built-ESM smoke pass |
+| Target Node 24.22.2 | Core/contracts tests, builds and public ESM smoke verified; clean-checkout commits/counts are recorded separately in `reports/releases/g1-core-clean-checkout.json` |
 | Runtime/type dependency audit | 19 built runtime files use only node:crypto; 290 compiled type files contain no DSH host dependency |
 
 `pnpm peers check` still reports two existing upstream DSH peer mismatches (cordis-plugin-include/group). Existing dependency versions were retained; root lock changes add product importers/dependencies. The independent core does not import these peers. No claim of original DSH runtime/native compatibility follows from passing tests.
@@ -41,6 +41,8 @@ Core repository calls, current-contract lookup, proof lookup, domain events, com
 ## Runtime Handoff
 
 Use `engine.personalExecutor()` rather than casting the full Engine to a narrow type. Ingress must atomically validate ticket/assignment/attempt/epoch/contract, persist/dedupe the fact and invoke the scoped core fact. Keep physical cancellation/quiescence observations after core authorization ends. Native turn end is not ready; new pending Assignments wait for old-writer quiescence.
+
+A new writer attempt or changed config under the same Assignment must invalidate the old candidate in the binding/effect transaction, via a scoped progress/blocked report or the coordinator's narrow invalidation port. A new epoch must not leave an old ready candidate valid merely because the Assignment ID stayed unchanged. Checker IDs must resolve to immutable approved definition revisions, not arbitrary worker-edited commands.
 
 Runtime payloads and schemas remain in contracts. Missing shared semantics go through RFC; no private type/schema fork. Module fixtures may be accepted independently, but their ACKs do not become real durability evidence until storage is wired.
 

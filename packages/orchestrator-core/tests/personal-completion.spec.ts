@@ -292,4 +292,13 @@ describe('personal completion gate', () => {
     expect(resolve).not.toHaveBeenCalled()
     expect(h.executor.stop).not.toHaveBeenCalled()
   })
+  it('does not requeue an input read before a verified result in the same millisecond', () => {
+    const h = harness('verified', {}, true), ticket = h.create(), assignmentId = latestAssignment(ticket)!.id
+    h.receive('consumed-input')
+    const ids = h.repo.tickets.get(ticket.id)!.undelivered
+    h.engine.inputsDelivered(ticket.id, assignmentId, ids)
+    h.engine.inputsReadAssignment(ticket.id, assignmentId, ids)
+    h.report(ticket); h.engine.confirmCompletion(h.proof(ticket).proposal)
+    expect(h.repo.threads.get('local:thread-1')!.pending).not.toContain('consumed-input')
+  })
 })

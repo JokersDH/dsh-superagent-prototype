@@ -1,6 +1,6 @@
 {
   "result": "PASS_SPEC_STATIC_ONLY",
-  "checkedAt": "2026-11-07T09:05:04.935Z",
+  "checkedAt": "2026-11-07T09:18:48.720Z",
   "taskCount": 17,
   "acceptanceRequirementCount": 83,
   "runtimeTestsExecutedByThisVerifier": 0,
@@ -66,12 +66,12 @@
     {
       "path": "FULL-BLUEPRINT.zh-CN.md",
       "bytes": 147995,
-      "sha256": "70a54061706e5fa442bf30957c7af3037eeefe555d3b7caca703443171b82b87"
+      "sha256": "34d231f2e458935fad53357e24cca75a37baacbf04c1aee0e99d14383c3831cf"
     },
     {
       "path": "README.md",
       "bytes": 9833,
-      "sha256": "72edaf0d5eef9911b1abfe5d0538bcf4ab240af3866e17ebeff7d3564ff9d398"
+      "sha256": "da42dc94656fe3206779247869b0e5bc8816eb32129a8d93958ce5bee5be11e2"
     },
     {
       "path": "acceptance-catalog.json",
@@ -251,7 +251,7 @@
     {
       "path": "../START-HERE.zh-CN.md",
       "bytes": 7381,
-      "sha256": "6ad68140fd44bf12db35eaa447c13044603df1d39f4ae219a23595fa93065e56"
+      "sha256": "10f7d874ab3d5cf8f91a342f66a54775b32ca057b6b58f2c598edd56f94b82cf"
     },
     {
       "path": "../agent-tasks/main.md",

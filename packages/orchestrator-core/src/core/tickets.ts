@@ -370,9 +370,11 @@ export class Tickets extends EnginePart {
     const stopping = ticket.assignments.filter(assignment => assignment.state !== 'ended')
     const why = reason && reason !== outcome ? { reason } : {}
     const until = readUntil(ticket)
+    // Personal candidate generations establish causal read order even when clock timestamps tie.
+    const verifiedRead = (input: Extract<TicketInput, { kind: 'trigger' }>) => outcome === 'completed' && !!ticket.completion?.confirmed && !!input.readAt
     const waiting = this.triggersOf(ticket, ticket.undelivered)
     const left = this.untaken(ticket, ticket.inputs.flatMap(input => input.kind === 'trigger'
-      && (!readBefore(input, until) || ticket.undelivered.includes(input.id)) ? [input.id] : []))
+      && ((!readBefore(input, until) && !verifiedRead(input)) || ticket.undelivered.includes(input.id)) ? [input.id] : []))
     // An end dated earlier, such as a PR's merge, does not move the ticket's last change back.
     ticket.ended = { at, by, outcome, ...why }; ticket.undelivered = []; ticket.updatedAt = this.now()
     delete ticket.attention; delete ticket.delivery
