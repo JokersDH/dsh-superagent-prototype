@@ -47,6 +47,8 @@ Barrier v2 deduplicates by immutable attempt identity plus complete resource man
 
 `pnpm check:g1-registered-recovery` builds real dependencies, strictly typechecks coordinator/runtime and runs:
 
+Clean checkout of source `97ba30d` independently installed from the frozen lockfile and passed the same **56** cases plus spec checks on Node 24.22.2. Only the generated report timestamp changed. Evidence: `reports/releases/g1-registered-recovery-clean.json`.
+
 | Suite | Passed |
 | --- | --- |
 | Existing link/barrier/independent Runner reconnect | 17 |

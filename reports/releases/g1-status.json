@@ -11,7 +11,7 @@
     "mainProductionAndFactRecovery": { "testsPassed": 14, "realSigkillWindows": 2, "report": "reports/releases/g1-recovery.json" },
     "mainLocalRunnerRecoveryAndOwnedBarrier": { "testsPassed": 17, "realCoordinatorSigkillWindows": 1, "node": "24.22.2", "report": "reports/releases/g1-runner-link.json", "productionRunnerDaemonAdmitted": false },
     "mainRegisteredRecoveryAndQueue": { "testsPassed": 56, "realSigkillWindows": 6, "node": "24.22.2", "report": "reports/releases/g1-registered-recovery.json", "productionRunnerDaemonAdmitted": false },
-    "mainCleanCheckout": { "sourceCommit": "1668468", "testsPassed": 31, "realSigkillWindows": 3, "report": "reports/releases/g1-runner-link-clean.json" },
+    "mainCleanCheckout": { "sourceCommit": "97ba30d", "testsPassed": 56, "realSigkillWindows": 6, "report": "reports/releases/g1-registered-recovery-clean.json" },
     "candidateJournalFormatInterop": { "casesPassed": 3, "writerAdmissionProven": false, "report": "reports/releases/g1-journal-interop.json" },
     "candidateRuntimeBranch": { "testsPassed": 148, "testsFailed": 0, "suiteNode": "24.22.2", "reviewedCommit": "74a3068165ca08b0e1802bd35c552bc1695b8319", "originalAdmissionCasesPassed": 4, "followupCasesPassed": 3, "integrityCasesFailed": 3, "integrityReport": "reports/releases/g1-journal-integrity.json", "journalMerged": false },
     "candidateWorkspacesVerification": { "testsPassed": 27, "testsFailed": 0, "storageTestsPassed": 66, "suiteNode": "24.22.2", "reviewedCommit": "fcf32739eaa51bc44b3941c9051f1d36c295ea8c", "priorAdmissionCasesPassed": 6, "runtimeBoundaryCasesFailed": 2, "report": "reports/releases/g2-completion-runtime-review.json", "merged": false }
