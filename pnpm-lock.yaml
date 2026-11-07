@@ -124,6 +124,22 @@ importers:
         specifier: 4.1.8
         version: 4.1.8(@types/node@22.20.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@22.20.0)(yaml@2.9.1))
 
+  apps/coordinator:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@personal-agent/orchestrator-core':
+        specifier: workspace:*
+        version: link:../../packages/orchestrator-core
+    devDependencies:
+      '@types/node':
+        specifier: 24.10.0
+        version: 24.10.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+
   packages/contracts:
     dependencies:
       zod:
