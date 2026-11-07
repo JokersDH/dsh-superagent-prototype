@@ -238,21 +238,27 @@ export class ProcessHost implements OwnedProcessHost {
   #observeGroup(group: number): { kind: 'observed'; live: Array<{ pid: number; state: string }> } | { kind: 'unobservable'; why: string } {
     let text: string
     try {
-      text = execFileSync('ps', ['-o', 'pid=,stat=,pgid=', '-g', String(group)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
+      // `ps -g` is unreliable across platforms (it exits 1 even for an existing group on macOS), so
+      // enumerate every process with its group and filter here: a successful listing is a positive
+      // observation, and an empty filtered set genuinely means "no members".
+      text = execFileSync('ps', ['-A', '-o', 'pid=,stat=,pgid='], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        // A bounded buffer: output overflow is an observation failure, never "no members".
+        maxBuffer: 8 * 1024 * 1024,
+      })
     } catch (error) {
       const code = (error as { code?: string } | null)?.code
-      // ESRCH (or a signal-terminated ps) means the group has no members at all.
-      if (code === 'ESRCH' || code === 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER' || (error as { status?: number }).status === 1) {
-        return { kind: 'observed', live: [] }
-      }
+      // A failed or truncated listing cannot prove absence; only a successful one can.
       return { kind: 'unobservable', why: code ?? 'ps_failed' }
     }
     const members: Array<{ pid: number; state: string }> = []
     for (const line of text.split('\n')) {
-      const [pidText, state] = line.trim().split(/\s+/)
-      if (!pidText || !state) continue
+      const [pidText, state, pgidText] = line.trim().split(/\s+/)
+      if (!pidText || !state || !pgidText) continue
       const pid = Number(pidText)
-      if (!Number.isFinite(pid)) continue
+      const pgid = Number(pgidText)
+      if (!Number.isFinite(pid) || pgid !== group) continue
       // Z = zombie (already dead, waiting to be reaped); Z+ is the same with session-leader flag.
       const base = state.replace('+', '')
       if (base.startsWith('Z')) continue

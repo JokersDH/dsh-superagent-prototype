@@ -257,7 +257,10 @@ export async function replayJournal(spool: FileCriticalJournal, sink: FactSink):
     }
     seen.set(entry.fact.factId, identity)
     try {
-      await sink.record(entry.fact)
+      const receipt = await sink.record(entry.fact)
+      // Same frozen validation as the live path: a receipt that is not a persisted receipt for this
+      // exact fact must never be counted as replayed.
+      validateReceipt(receipt, entry.fact.factId)
       result.replayed += 1
     } catch (error) {
       const reason = (error as { reason?: string }).reason ?? (error as Error).message
@@ -267,6 +270,9 @@ export async function replayJournal(spool: FileCriticalJournal, sink: FactSink):
         result.refused += 1
       } else {
         result.failures.push({ factId: entry.fact.factId, reason })
+        // An unexpected persistence failure must stop the batch: continuing would advance past a
+        // gap and make the remaining replay order unverifiable.
+        break
       }
     }
   }

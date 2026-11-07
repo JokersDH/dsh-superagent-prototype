@@ -98,6 +98,8 @@ export class FileCriticalJournal {
   #bytes = 0
   #readOnly = false
   #closed = false
+  /** Set when an append failed part-way; this handle must not write again until reopened. */
+  #poisoned: string | undefined
 
   constructor(options: FileJournalOptions) {
     this.#path = options.path
@@ -130,6 +132,11 @@ export class FileCriticalJournal {
 
   get readOnly(): boolean {
     return this.#readOnly
+  }
+
+  /** Reason this handle refuses further appends after an uncertain I/O failure, if any. */
+  get poisoned(): string | undefined {
+    return this.#poisoned
   }
 
   /** Open (or create) the journal, recovering entries and repairing a partial tail. */
@@ -168,6 +175,14 @@ export class FileCriticalJournal {
     if (this.#readOnly) {
       throw new DriverError('state_indeterminate', 'journal_corrupt_read_only', 'Journal contains a corrupt record; appending would extend a broken prefix')
     }
+    if (this.#poisoned !== undefined) {
+      // After an uncertain write we cannot know how much reached the disk: never extrapolate a prefix.
+      throw new DriverError(
+        'state_indeterminate',
+        'journal_writer_poisoned',
+        `Journal handle refused after an I/O failure (${this.#poisoned}); reopen to recover`,
+      )
+    }
 
     const identity = factDigest(fact, payload)
     const known = this.#identities.get(fact.factId)
@@ -195,9 +210,20 @@ export class FileCriticalJournal {
       )
     }
 
-    writeAll(this.#fd, line)
-    // Durable before returning: the caller may ACK the fact immediately after this call.
-    fsyncSync(this.#fd)
+    try {
+      writeAll(this.#fd, line)
+      // Durable before returning: the caller may ACK the fact immediately after this call.
+      fsyncSync(this.#fd)
+    } catch (error) {
+      // The bytes may be partially persisted. Do not truncate, retry or reset counters: mark this
+      // handle unusable and leave the evidence on disk for recovery to judge.
+      this.#poisoned = (error as { code?: string }).code ?? (error as Error).message
+      throw new DriverError(
+        'state_indeterminate',
+        'journal_write_failed',
+        `Journal write failed (${this.#poisoned}); the handle is now refusing further appends`,
+      )
+    }
 
     this.#seq = entry.seq
     this.#bytes += line.length
@@ -354,6 +380,25 @@ export function decodeBuffer(buffer: Buffer, options: DecodeOptions = {}): Journ
       break
     }
     if (!Number.isInteger(entry?.seq) || entry.seq < 1) {
+      corruptAt = offset
+      break
+    }
+    // The journal's sequence must be contiguous and monotonic from 1. A gap, a backward step or a
+    // duplicate (other than an exact re-append of the same body) makes the prefix untrustworthy:
+    // the coordinator must not treat a gapped prefix as a verified recovery snapshot.
+    const expectedSeq = entries.length + 1
+    if (entry.seq !== expectedSeq) {
+      if (entry.seq < expectedSeq) {
+        const earlier = entries[entry.seq - 1]
+        const sameBody = earlier !== undefined && factDigest(earlier.fact, earlier.payload) === factDigest(entry.fact, entry.payload)
+        if (!sameBody) {
+          corruptAt = offset
+          break
+        }
+        // An exact duplicate of an earlier record is not a new fact; it is dropped from the prefix.
+        offset = bodyEnd + 1
+        continue
+      }
       corruptAt = offset
       break
     }
