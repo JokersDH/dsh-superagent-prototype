@@ -1,10 +1,10 @@
 {
   "status": "PASS_CLEAN_CHECKOUT_CORE_CONTRACTS_ONLY",
-  "sourceCommit": "5e46f7acad906708e1cc37552e04450b9891c919",
+  "sourceCommit": "92327cf139c22a7acc999fcda528cce8d0f918cb",
   "node": "v24.22.2",
   "platform": "darwin",
   "arch": "arm64",
-  "coreTests": 177,
+  "coreTests": 178,
   "contractTests": 183,
   "dependencies": {
     "status": "PASS",
