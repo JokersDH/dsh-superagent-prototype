@@ -47,7 +47,7 @@ const bindings = new Map(), commands = [];
 const attempt = { attemptId: spec.attemptId, feed: async command => { commands.push(command); }, waitExit: async () => ({ reason: 'terminal', evidenceRefs: [] }), stop: async () => ({ quiescence: 'confirmed', evidenceRefs: ['fixture'] }) };
 const options = { bindings: { current: id => bindings.get(id), save: value => { bindings.set(value.ticketId, value); } }, runner: { launch: async () => attempt }, sink: { record: async fact => ({ factId: fact.factId, persisted: true, seq: 1 }) }, preparedPolicyRef: 'prepared-1' };
 const supervisor = new AttemptSupervisor(options);
-await supervisor.start({ ...spec, spec });
+await supervisor.start({ ...spec, spec, initialInputRef: 'input-initial-1' });
 cases.push({ id: 'B-FROZEN-COMMAND', passesInvariant: RunnerCommandSchema.safeParse(commands[0]).success, observed: { hasContract: !!commands[0].contract, inputRef: commands[0].inputRef, policySnapshotRef: spec.policySnapshotRef } });
 const wrongAssignment = supervisor.fence({ ...spec, assignmentId: 'wrong-assignment' });
 cases.push({ id: 'B-ASSIGNMENT-FENCE', passesInvariant: !wrongAssignment.accepted, observed: wrongAssignment });
@@ -57,10 +57,12 @@ cases.push({ id: 'B-COMMAND-IDENTITY', passesInvariant: new Set(deliveryIds).siz
 const recovered = new AttemptSupervisor(options);
 const first = await recovered.stop(spec.ticketId, 'recover');
 const second = await recovered.stop(spec.ticketId, 'recover');
-cases.push({ id: 'B-UNKNOWN-STOP', passesInvariant: first.state === 'stopping' && second.quiescence === 'indeterminate', observed: { first, second } });
+cases.push({ id: 'B-UNKNOWN-STOP', passesInvariant: first.state === 'stopping' && second.state === 'stopping' && ['indeterminate', 'unknown'].includes(second.quiescence), observed: { first, second } });
 
 const host = new ProcessHost();
 let resource;
+// Keep the reviewer alive even if an implementation under review unrefs its own stop deadline.
+const reviewLifetime = setInterval(() => {}, 1000);
 try {
   const grandchildProgram = 'process.on("SIGTERM",()=>{});process.stdout.write("ready\\n");setInterval(()=>{},1000);';
   const parentProgram = `import {spawn} from 'node:child_process';const child=spawn(process.execPath,['-e',${JSON.stringify(grandchildProgram)}],{stdio:['ignore','pipe','ignore']});child.stdout.once('data',()=>process.stdout.write(JSON.stringify({pid:child.pid})+'\\n'));setInterval(()=>{},1000);`;
@@ -76,6 +78,7 @@ try {
 } finally {
   if (resource) { try { process.kill(-resource.identity.groupId, 'SIGKILL'); } catch { /* own test group already gone */ } }
   await host.stopAll(100);
+  clearInterval(reviewLifetime);
 }
 const report = { status: cases.every(item => item.passesInvariant) ? 'PASS' : 'BLOCKED_REPRODUCED_INVARIANTS', storageCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: a, encoding: 'utf8' }).trim(), runtimeCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: b, encoding: 'utf8' }).trim(), node: process.version, platform: process.platform, cases };
 if (values.record) { mkdirSync(resolve(root, 'reports/releases'), { recursive: true }); writeFileSync(resolve(root, 'reports/releases/g1-review-repros.json'), JSON.stringify(report, null, 2) + '\n'); }

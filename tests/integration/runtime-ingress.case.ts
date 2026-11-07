@@ -58,6 +58,12 @@ test('known Runner identity is checked even when fact fields otherwise match', a
   const h = memoryIngressFixture(), input = h.add(turnPayload)
   assert.deepEqual(await h.ingress.recordFenced(input, { ...producer, runnerIdentityRef: 'other-runner' }), { accepted: false, reason: 'producer_mismatch' })
 })
+test('a replaced current Runner identity cannot be bypassed through a retained old binding', async () => {
+  const h = memoryIngressFixture(), input = h.add(turnPayload)
+  h.store.current = () => ({ ...binding, runnerIdentityRef: 'new-runner' })
+  assert.deepEqual(await h.ingress.recordFenced(input, producer), { accepted: false, reason: 'producer_mismatch' })
+  assert.equal(h.receipts.size, 0)
+})
 test('binding/epoch/Assignment/contract freshness is decided after asynchronous payload resolution', async () => {
   const h = memoryIngressFixture(), input = h.add(turnPayload)
   let release!: () => void

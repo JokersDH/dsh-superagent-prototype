@@ -113,6 +113,7 @@ export function createRuntimeIngress(store: RuntimeIngressStore, payloads: Immut
         if (!current || current.attemptId !== fact.attemptId) return { accepted: false, reason: 'attempt_mismatch' }
         if (current.fenceEpoch !== fact.fenceEpoch) return { accepted: false, reason: 'stale_epoch' }
         if (!sameAttempt(current, fact)) return { accepted: false, reason: 'attempt_mismatch' }
+        if (current.runnerIdentityRef !== producer.runnerIdentityRef || current.source !== producer.source) return { accepted: false, reason: 'producer_mismatch' }
         if (known.state !== 'active' || current.state !== 'active') return { accepted: false, reason: 'not_active' }
         const ticket = synchronous(() => store.ticket(fact.ticketId))
         if (!ticket || ticket.ended || !ticket.completion || ticket.completion.retired || !sameContract(ticket.completion.contract, fact.contract)

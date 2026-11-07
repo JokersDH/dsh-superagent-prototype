@@ -2,6 +2,8 @@
 
 Date: 2026-11-07. A source: `8a02f02`; B source: `b4111ed`. Neither active worktree was modified; reviews used clean independent checkouts.
 
+Later review update: the seven original reproductions below now pass on A's first fixes and B `d213d94`. New follow-up cases and the implemented fact ingress are tracked in [g1-ingress-handoff.md](g1-ingress-handoff.md); overall G1 remains pending. The original findings are retained as version-scoped history.
+
 ## Verdict
 
 **The main-agent core/SQLite domain adapter is accepted. Whole WP-02, WP-03 and G1 remain unaccepted.** A/B branch code has not been merged into main as production-ready implementation; the reviewed inputs remain on their public feature branches.

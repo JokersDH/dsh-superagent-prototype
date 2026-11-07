@@ -1,11 +1,88 @@
-G1 review repros — observed with the official tools/bootstrap/review-g1-repros.mjs
-repro status: BLOCKED_REPRODUCED_INVARIANTS (B cases are the runtime owner's scope and remain unfinished)
-
-A-LOCK-INITIALIZATION: PASS — "Refused unknown ownership"
-A-ASYNC-TRANSACTION: PASS — {"rejectedSynchronously": true, "persistedRowsAfterFailure": 0}
-MAIN-SYNC-BRIDGE: PASS — {"bridgeRefused": true, "bodyStarted": false}
-B-FROZEN-COMMAND: FAIL — {"hasContract": false, "inputRef": "policy-snapshot-1", "policySnapshotRef": "policy-snapshot-1"}
-B-ASSIGNMENT-FENCE: FAIL — {"accepted": true}
-B-COMMAND-IDENTITY: FAIL — {"deliveryIds": ["cmd-attempt-1-deliver", "cmd-attempt-1-deliver"]}
-B-UNKNOWN-STOP: FAIL — {"first": {"state": "ended", "quiescence": "indeterminate", "evidenceRefs": ["no-attempt-handle"]}, "second": {"state": "ended", "quiescence": "confirmed", "evi
-B-PROCESS-GROUP: FAIL — {"stop": "confirmed", "descendantState": "S", "descendantStillActive": true}
+{
+  "status": "PASS",
+  "storageCommit": "d85531db3b03062e913a84cccba5601563cf913b",
+  "runtimeCommit": "40ae10213410af99c1f8093183ee64c9eadf2357",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "cases": [
+    {
+      "id": "A-LOCK-INITIALIZATION",
+      "passesInvariant": true,
+      "observed": "Refused unknown ownership"
+    },
+    {
+      "id": "A-ASYNC-TRANSACTION",
+      "passesInvariant": true,
+      "observed": {
+        "rejectedSynchronously": true,
+        "persistedRowsAfterFailure": 0
+      }
+    },
+    {
+      "id": "MAIN-SYNC-BRIDGE",
+      "passesInvariant": true,
+      "observed": {
+        "bridgeRefused": true,
+        "bodyStarted": false
+      }
+    },
+    {
+      "id": "B-FROZEN-COMMAND",
+      "passesInvariant": true,
+      "observed": {
+        "hasContract": true,
+        "inputRef": "input-initial-1",
+        "policySnapshotRef": "policy-snapshot-1"
+      }
+    },
+    {
+      "id": "B-ASSIGNMENT-FENCE",
+      "passesInvariant": true,
+      "observed": {
+        "accepted": false,
+        "reason": "assignment_mismatch"
+      }
+    },
+    {
+      "id": "B-COMMAND-IDENTITY",
+      "passesInvariant": true,
+      "observed": {
+        "deliveryIds": [
+          "cmd-attempt-1-1-deliver-c9c84848659412102cfe39110af0a00713fecf3cdb5572c5ca3280f9f849c734",
+          "cmd-attempt-1-1-deliver-346f0f4a0454dfa6a61204857c21f8ebc6bebdf2c0af531e54dac14e95d1b84e"
+        ]
+      }
+    },
+    {
+      "id": "B-UNKNOWN-STOP",
+      "passesInvariant": true,
+      "observed": {
+        "first": {
+          "state": "stopping",
+          "quiescence": "unknown",
+          "evidenceRefs": [
+            "no-attempt-handle",
+            "reason:recover"
+          ]
+        },
+        "second": {
+          "state": "stopping",
+          "quiescence": "unknown",
+          "evidenceRefs": [
+            "no-attempt-handle",
+            "reason:recover"
+          ]
+        }
+      }
+    },
+    {
+      "id": "B-PROCESS-GROUP",
+      "passesInvariant": true,
+      "observed": {
+        "stop": "confirmed",
+        "descendantState": "missing",
+        "descendantStillActive": false
+      }
+    }
+  ]
+}

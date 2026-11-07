@@ -19,6 +19,17 @@
 
 本轮实际结果：storage **44/44**、effects **8/8**、两包 typecheck/build 通过、core-on-SQLite **178/178**；官方复现脚本的 A/MAIN 三项全 PASS，B 五项 FAIL 属 runtime owner 范围（`reports/g1-review-repros-observed.txt`）。旧 34 个测试全部保留且通过。
 
+## 0.2 修复轮 2（G1 跟进评审，2026-11-07）
+
+跟进输入：`agent-tasks/g1-followup-review.md`、`tools/bootstrap/review-g1-followup.mjs`、`docs/rfcs/WP-01/0001-runtime-ingress-store.md`。
+
+| 评审项 | 修复 | 证据 |
+| --- | --- | --- |
+| **A-ASYNC-AFTER-AWAIT**：async 函数在 await 后仍写库（`rowsWrittenAfterRollback=1`） | `UnitOfWork.atomic` 在**调用之前**拒绝原生 async 函数（`[object AsyncFunction]`，含 bound/double-bound async），函数体根本不启动，因此没有 await 后的续段；保留“普通函数返回 thenable → 同步抛错 + 回滚”的防御；JSDoc 明确“把异步工作藏在闭包里”是禁止用法，且不能宣称回滚能取消已运行的 continuation | `test/uow.case.ts`：native async 未启动（`began=false`）、bound async 同样拒绝、plain-thenable 同步写入回滚；官方跟进脚本 **A-ASYNC-AFTER-AWAIT = PASS**（`{"rejectedSynchronously":true,"callbackBegan":false,"rowsWrittenAfterRollback":0}`） |
+| **SAVEPOINT 抛错时 nesting/回调栈清理** | `SAVEPOINT` 成功后才递增 depth/占用回调槽；打开失败不改变任何状态；失败路径统一恢复 depth、丢弃该层回调；回调异常不掩盖原始错误 | `test/uow.case.ts` 故障注入用例（首次 SAVEPOINT 抛错 → `nesting=0`，随后事务正常且 afterCommit 只触发一次） |
+| **生产 ingress 存储**（RFC 0001：A 提供 binding/history/resource/immutable payload 存储） | 迁移 **v3** 新增 `runtime_bindings`（按 attempt 的完整 binding JSON 历史）、`runtime_current`（ticket→当前 attempt，和历史分离）、`runtime_authority`（启用的合同版本，供 current-authorization）、`ingress_payloads`（内容寻址的不可变 JSON 载荷）。`RuntimeBindings` 强制 binding 身份不可变、ended 不可复活；`ImmutablePayloads` 以 canonical JSON 写入 ArtifactStore（文件与记录先于返回完成），读取时校验 artifact 与记录摘要；`canonicalJson/canonicalDigest` 与 coordinator 的 `jsonDigest` 一致 | `test/ingress-stores.case.ts`（历史/current/重开、身份不可变、ended 终态、authority 启停、payload 不可变与摘要）；`test/ingress-compat.case.ts`（与主 Agent 的 `IngressBinding`/`ImmutablePayloadReader` 类型兼容 + digest 一致性，含 unicode/嵌套/数组/null） |
+| 本轮结果 | storage **54/54**（原 44 个保留）、effects **8/8**、typecheck/build 通过；官方跟进脚本 **PASS_FOLLOWUP_INVARIANTS**（A 与 B 共 5 项全 PASS）；原评审脚本 A-LOCK-INITIALIZATION / A-ASYNC-TRANSACTION / MAIN-SYNC-BRIDGE 仍 PASS | `reports/` 下 test/typecheck/两个复现脚本原文 |
+
 ## 1. 交付物
 
 | 交付物 | 位置 |

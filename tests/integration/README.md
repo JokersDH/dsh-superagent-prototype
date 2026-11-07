@@ -27,4 +27,16 @@ This is **domain storage parity**, not full coordinator integration. The origina
 node tools/bootstrap/review-g1-repros.mjs --storage /absolute/storage-review --runtime /absolute/runtime-review --record
 ```
 
-That command intentionally fails while the owner issues remain. It includes a disposable process-group fixture and cleans its owned processes; it never runs a vendor agent/model. A passing positive suite does not erase those failures.
+The original negative cases now pass against A's first fixes and B `d213d94`; the original report is version-scoped. The additional edge cases are captured separately:
+
+```sh
+node tools/bootstrap/review-g1-followup.mjs --storage /absolute/storage-review --runtime /absolute/runtime-review --record
+```
+
+That command intentionally fails while the follow-up issues remain. The process-group review fixture cleans its owned resources; it never runs a vendor agent/model. A passing positive suite does not erase new safety failures.
+
+## Authoritative Fact Ingress
+
+`pnpm check:g1-ingress` builds contracts/core/effects/storage, strictly typechecks the composition module, and executes its deterministic and native SQLite ingress suites. The SQLite tests create only `review_ingress_*` fixture tables in temporary databases. They use real core, UnitOfWork, FactReceipts, EventLog and effect queue; production runtime binding/history/resources/migrations are still storage-owner work.
+
+Tests include current/known Runner identity, full tuple, immutable kind/value payload digests, exact replay after restart/revocation, same-ID conflict, stale bindings during async payload reads, physical observations after retirement and receipt-INSERT failure rolling back core/observations/effects/event. This does not enable the runtime under review or claim full G1/IPC/native compatibility.

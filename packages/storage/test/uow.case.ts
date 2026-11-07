@@ -51,28 +51,73 @@ test('afterCommit runs immediately outside a transaction', async () => {
   })
 })
 
-test('an async callback is rejected synchronously and leaves no committed half', async () => {
+test('a native async callback is refused before it starts, leaving nothing committed', async () => {
   await withStore(async ({ store }) => {
     store.db.exec('CREATE TABLE async_probe (id INTEGER PRIMARY KEY)')
+    let began = false
     let rejected = false
-    let failure: unknown
     try {
       store.uow.atomic(async () => {
+        began = true
         store.db.prepare('INSERT INTO async_probe VALUES (1)').run()
         await Promise.resolve()
-        throw new Error('after-await failure')
+        store.db.prepare('INSERT INTO async_probe VALUES (2)').run()
       })
     } catch (error) {
       rejected = true
-      failure = error
+      assert.ok(error instanceof TypeError)
+      assert.match((error as Error).message, /native async function/)
     }
-    // Let the async continuation settle; its rejection is observed, its write already rolled back.
     await new Promise(resolve => setTimeout(resolve, 10))
-    assert.equal(rejected, true, 'the rejection happens at the call site, not on a later microtask')
-    assert.ok(failure instanceof TypeError)
-    assert.match((failure as Error).message, /synchronous callback/)
-    const count = (store.db.prepare('SELECT COUNT(*) AS n FROM async_probe').get() as { n: number }).n
-    assert.equal(count, 0, 'the write inside the async callback did not survive the rejected transaction')
+    assert.equal(rejected, true, 'the rejection happens at the call site')
+    assert.equal(began, false, 'the async function body never started')
+    assert.equal((store.db.prepare('SELECT COUNT(*) AS n FROM async_probe').get() as { n: number }).n, 0)
+    assert.equal(store.uow.nesting, 0)
+  })
+})
+
+test('a bound async callback is refused before it starts as well', async () => {
+  await withStore(async ({ store }) => {
+    let began = false
+    const callback = (async () => { began = true }) as () => Promise<void>
+    assert.throws(() => store.uow.atomic(callback.bind(null)), (error: unknown) => error instanceof TypeError && /native async function/.test((error as Error).message))
+    assert.equal(began, false)
+  })
+})
+
+test('a plain callback returning a thenable is rejected and its synchronous writes roll back', async () => {
+  await withStore(async ({ store }) => {
+    store.db.exec('CREATE TABLE thenable_probe (id INTEGER PRIMARY KEY)')
+    let began = false
+    assert.throws(() => store.uow.atomic(() => {
+      began = true
+      store.db.prepare('INSERT INTO thenable_probe VALUES (1)').run()
+      return Promise.resolve() as never
+    }), (error: unknown) => error instanceof TypeError && /Promise\/thenable/.test((error as Error).message))
+    assert.equal(began, true, 'a plain callback is invoked; only its returned thenable is refused')
+    assert.equal((store.db.prepare('SELECT COUNT(*) AS n FROM thenable_probe').get() as { n: number }).n, 0, 'the savepoint rolled back')
+    assert.equal(store.uow.nesting, 0)
+  })
+})
+
+test('a savepoint failure leaves no nesting or queued callbacks behind', async () => {
+  await withStore(async ({ store }) => {
+    const original = store.db.exec.bind(store.db)
+    let injected = false
+    store.db.exec = ((sql: string) => {
+      if (!injected && String(sql).startsWith('SAVEPOINT')) {
+        injected = true
+        throw new Error('savepoint unavailable')
+      }
+      return original(sql)
+    }) as typeof store.db.exec
+    assert.throws(() => store.uow.atomic(() => 1), /savepoint unavailable/)
+    assert.equal(store.uow.nesting, 0, 'the failed open left no depth behind')
+    store.db.exec = original as typeof store.db.exec
+    // The UnitOfWork is still usable and no afterCommit action from the failed attempt leaked.
+    let committed = 0
+    assert.equal(store.uow.atomic(() => { store.uow.afterCommit(() => { committed++ }); return 2 }), 2)
+    assert.equal(committed, 1)
     assert.equal(store.uow.nesting, 0)
   })
 })

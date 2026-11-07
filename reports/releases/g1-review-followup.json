@@ -1,0 +1,65 @@
+{
+  "status": "BLOCKED_FOLLOWUP_INVARIANTS",
+  "storageSourceCommit": "cdde91b408aec2abd880bdbb27743c01b7be9f25",
+  "runtimeSourceCommit": "d213d9472b76335ec00997fc3ac79ca412c56957",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "cases": [
+    {
+      "id": "A-ASYNC-AFTER-AWAIT",
+      "passesInvariant": false,
+      "observed": {
+        "rejectedSynchronously": true,
+        "callbackBegan": true,
+        "rowsWrittenAfterRollback": 1
+      }
+    },
+    {
+      "id": "B-COMMAND-DELIMITER",
+      "passesInvariant": false,
+      "observed": {
+        "ids": [
+          "cmd-attempt-1-1-answer:a:b:c",
+          "cmd-attempt-1-1-answer:a:b:c"
+        ]
+      }
+    },
+    {
+      "id": "B-COMMAND-EXPECTED-TURN",
+      "passesInvariant": false,
+      "observed": {
+        "ids": [
+          "cmd-attempt-1-1-deliver:same-input",
+          "cmd-attempt-1-1-deliver:same-input"
+        ],
+        "turns": [
+          "turn-1",
+          "turn-2"
+        ]
+      }
+    },
+    {
+      "id": "B-ENDED-EPOCH-REUSE",
+      "passesInvariant": false,
+      "observed": {
+        "refusedSameAttemptEpochAfterEnd": false
+      }
+    },
+    {
+      "id": "B-CANCEL-DURING-LAUNCH",
+      "passesInvariant": false,
+      "observed": {
+        "startRejected": false,
+        "stop": {
+          "state": "stopping",
+          "quiescence": "unknown",
+          "evidenceRefs": [
+            "no-attempt-handle",
+            "reason:cancel-during-launch"
+          ]
+        },
+        "beginSentAfterStop": true
+      }
+    }
+  ]
+}
