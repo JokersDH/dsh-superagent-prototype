@@ -1,5 +1,5 @@
 export * from './fixtures.ts'
 export * from './fakes.ts'
 export * from './harness.ts'
-export { FakeDriver, FAKE_AGENT_PATH } from './fake-driver.ts'
+export { FakeDriver, FAKE_AGENT_PATH, fakeQuestion, fakeAnswerDelivery } from './fake-driver.ts'
 export type { FakeDriverOptions } from './fake-driver.ts'

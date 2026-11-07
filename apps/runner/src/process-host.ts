@@ -65,7 +65,6 @@ export class ProcessHost implements OwnedProcessHost {
   readonly #resolveEnv: (ref: string) => NodeJS.ProcessEnv
   readonly #readStartMarker: (pid: number) => string | null
   readonly #stderrRing: StderrRing | undefined
-  #cleanupInstalled = false
 
   constructor(options: ProcessHostOptions = {}) {
     this.#now = options.now ?? Date.now
@@ -319,16 +318,27 @@ export class ProcessHost implements OwnedProcessHost {
     })
   }
 
+  /**
+   * Register best-effort cleanup once per process, not once per host: a listener per host would
+   * accumulate across tests and keep the event loop alive.
+   */
   #installCleanup(): void {
-    if (this.#cleanupInstalled) return
-    this.#cleanupInstalled = true
+    const registry = (globalThis as { __g1ProcessHostRegistry?: Set<ProcessHost> }).__g1ProcessHostRegistry
+    if (registry) {
+      registry.add(this)
+      return
+    }
+    const hosts = new Set<ProcessHost>([this])
+    ;(globalThis as { __g1ProcessHostRegistry?: Set<ProcessHost> }).__g1ProcessHostRegistry = hosts
     process.once('exit', () => {
-      for (const handle of this.#handles.values()) {
-        if (handle.exited.done) continue
-        try {
-          process.kill(-handle.identity.groupId, 'SIGKILL')
-        } catch {
-          // best-effort cleanup on host exit
+      for (const host of hosts) {
+        for (const handle of host.#handles.values()) {
+          if (handle.exited.done) continue
+          try {
+            process.kill(-handle.identity.groupId, 'SIGKILL')
+          } catch {
+            // best-effort cleanup on process exit
+          }
         }
       }
     })

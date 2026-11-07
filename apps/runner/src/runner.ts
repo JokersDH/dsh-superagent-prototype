@@ -8,6 +8,7 @@
  */
 import type { AgentDriverV1, AttemptIO } from '../../../packages/contracts/src/ports.ts'
 import type { AttemptSpec, CriticalFact, DurableReceipt, RunnerCommand, ServeExit } from '../../../packages/contracts/src/types.ts'
+import { RunnerCommandSchema } from '../../../packages/contracts/src/schemas.ts'
 import {
   CommandQueue,
   DriverError,
@@ -73,8 +74,22 @@ export class AttemptRunner {
     return this.#spec
   }
 
-  /** Queue a command; capacity exhaustion refuses new business input but keeps control available. */
+  /**
+   * Queue a command; capacity exhaustion refuses new business input but keeps control available.
+   *
+   * The frozen `RunnerCommandSchema` is applied at this boundary too, and a command whose ticket,
+   * assignment, attempt, epoch or contract differs from the launched attempt is rejected **before**
+   * anything can reach the native process.
+   */
   feed(command: RunnerCommand): void {
+    // A command may be queued before launch (the Supervisor does exactly that); when the attempt is
+    // known, the full tuple must match it.
+    const parsed = RunnerCommandSchema.safeParse(command)
+    if (!parsed.success) {
+      const issues = parsed.error.issues.map(issue => `${issue.path.join('.') || '<root>'}: ${issue.message}`).join('; ')
+      throw new DriverError('protocol_error', 'invalid_runner_command', `Not a valid RunnerCommand: ${issues}`)
+    }
+    if (this.#spec) assertCommandIdentity(parsed.data, this.#spec)
     const business = command.kind === 'begin' || command.kind === 'deliver'
     if (business && (this.#capacityExhausted || this.journal.criticalFull)) {
       // REL-05: if the critical reserve cannot take another fact, stop accepting new business input.
@@ -141,5 +156,20 @@ export class AttemptRunner {
     const receipt = await this.#factSink.record(fact)
     this.journal.commitCritical(fact.factId, fact.kind)
     return receipt
+  }
+}
+
+/** The command's frozen attempt tuple must equal the attempt this runner launched. */
+function assertCommandIdentity(command: RunnerCommand, spec: AttemptSpec): void {
+  if (command.ticketId !== spec.ticketId || command.assignmentId !== spec.assignmentId) {
+    throw new DriverError('state_indeterminate', 'command_identity_mismatch', 'Command belongs to another ticket or assignment')
+  }
+  if (command.attemptId !== spec.attemptId || command.fenceEpoch !== spec.fenceEpoch) {
+    throw new DriverError('state_indeterminate', 'command_identity_mismatch', 'Command belongs to another attempt or epoch')
+  }
+  const left = command.contract
+  const right = spec.contract
+  if (left.workId !== right.workId || left.revision !== right.revision || left.digest !== right.digest) {
+    throw new DriverError('state_indeterminate', 'command_identity_mismatch', 'Command contract differs from the attempt contract')
   }
 }

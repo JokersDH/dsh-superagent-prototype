@@ -30,14 +30,18 @@ class MemoryBindings {
 function wire(scenario: string) {
   const ledger = new InMemoryFactLedger()
   const payloads = new InMemoryPayloadStore()
+  // Per-attempt factory: each attempt gets its own runner context (journal, stderr ring, process host).
   const host = new ControlledRunnerHost(
-    {
-      payloads,
-      factSink: ledger,
-      processHost: new ProcessHost(),
-      journal: new BoundedJournal(),
-      progressIntervalMs: 10,
-    },
+    spec => ({
+      spec,
+      options: {
+        payloads,
+        factSink: ledger,
+        processHost: new ProcessHost(),
+        journal: new BoundedJournal(),
+        progressIntervalMs: 10,
+      },
+    }),
     () => new FakeDriver({ scenario }),
   )
   const bindings = new MemoryBindings()
