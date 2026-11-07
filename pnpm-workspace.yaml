@@ -1,0 +1,6 @@
+packages:
+  - 'packages/*'
+  - 'packages/drivers/*'
+  - 'apps/*'
+allowBuilds:
+  better-sqlite3: false

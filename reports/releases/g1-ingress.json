@@ -1,0 +1,44 @@
+{
+  "status": "PASS_INGRESS_INTERFACE_AND_SQLITE_FIXTURE_ONLY",
+  "tests": 25,
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "checkedAt": "2026-11-07T13:05:29.601Z",
+  "results": [
+    {
+      "command": "pnpm --filter @personal-agent/contracts build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/orchestrator-core build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/effects build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/storage build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:sqlite",
+      "status": "PASS"
+    }
+  ],
+  "limitations": [
+    "SQLite runtime-binding tables/reducers are review fixtures, not production repositories",
+    "No IPC authentication implementation or durable Runner journal tested",
+    "No native agent/model task executed",
+    "Does not approve overall G1 or the remaining runtime safety findings"
+  ]
+}

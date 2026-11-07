@@ -1,0 +1,32 @@
+name: Core And Contracts
+on:
+  push:
+    branches: [main, 'codex/g1-*']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  core-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.22.2
+          cache: pnpm
+      - run: pnpm --filter @personal-agent/contracts --filter @personal-agent/orchestrator-core install --frozen-lockfile
+      - run: pnpm check:g1-core
+      - run: pnpm check:spec
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: core-contracts-results
+          path: |
+            reports/releases/g1-core.json
+            packages/orchestrator-core/reports/test-results.json

@@ -24,7 +24,8 @@
 - G1 Agent A: `codex/g1-storage-effects`, WP-02, owns `packages/storage/`, `packages/effects/`, `docs/adr/storage/`, `docs/rfcs/WP-02/`.
 - G1 Agent B: `codex/g1-runtime`, WP-03, owns `packages/execution/`, `packages/driver-kit/`, `packages/testing/`, `apps/runner/`, `docs/adr/runtime/`, `docs/rfcs/WP-03/`.
 - Main agent keeps WP-01 core, shared contracts, root configuration and WP-16 integration ownership. Follow each task packet's start/accept dependencies and submit RFCs for missing shared semantics.
-- The root pnpm workspace is still a validated template until the main agent activates/consolidates it. Other agents must not rewrite root locks; use the agreed temporary package setup or ask for the integration baseline.
+- Root workspace is active for `packages/*`, `packages/drivers/*`, and `apps/*`. Root lock changes remain main-agent owned. Use `workspace:*` for sibling product packages and request lock integration; do not edit shared manifests/locks or copy private types. G0 spikes remain outside this workspace and use their independent install instructions with `--ignore-workspace` when needed.
+- Dependency-install exception: in a feature worktree, pnpm may generate a temporary root lock diff while resolving a newly owned package. Do not hand-edit, stage or commit that root lock; report the dependency request and the main agent regenerates the authoritative integration lock. This exception permits local compilation, not a second lockfile owner.
 
 ## Architecture Invariants
 

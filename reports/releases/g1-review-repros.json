@@ -1,0 +1,88 @@
+{
+  "status": "PASS",
+  "storageCommit": "cdde91b408aec2abd880bdbb27743c01b7be9f25",
+  "runtimeCommit": "d213d9472b76335ec00997fc3ac79ca412c56957",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "cases": [
+    {
+      "id": "A-LOCK-INITIALIZATION",
+      "passesInvariant": true,
+      "observed": "Refused unknown ownership"
+    },
+    {
+      "id": "A-ASYNC-TRANSACTION",
+      "passesInvariant": true,
+      "observed": {
+        "rejectedSynchronously": true,
+        "persistedRowsAfterFailure": 0
+      }
+    },
+    {
+      "id": "MAIN-SYNC-BRIDGE",
+      "passesInvariant": true,
+      "observed": {
+        "bridgeRefused": true,
+        "bodyStarted": false
+      }
+    },
+    {
+      "id": "B-FROZEN-COMMAND",
+      "passesInvariant": true,
+      "observed": {
+        "hasContract": true,
+        "inputRef": "input-initial-1",
+        "policySnapshotRef": "policy-snapshot-1"
+      }
+    },
+    {
+      "id": "B-ASSIGNMENT-FENCE",
+      "passesInvariant": true,
+      "observed": {
+        "accepted": false,
+        "reason": "assignment_mismatch"
+      }
+    },
+    {
+      "id": "B-COMMAND-IDENTITY",
+      "passesInvariant": true,
+      "observed": {
+        "deliveryIds": [
+          "cmd-attempt-1-1-deliver:input-1",
+          "cmd-attempt-1-1-deliver:input-2"
+        ]
+      }
+    },
+    {
+      "id": "B-UNKNOWN-STOP",
+      "passesInvariant": true,
+      "observed": {
+        "first": {
+          "state": "stopping",
+          "quiescence": "unknown",
+          "evidenceRefs": [
+            "no-attempt-handle",
+            "reason:recover"
+          ]
+        },
+        "second": {
+          "state": "stopping",
+          "quiescence": "unknown",
+          "evidenceRefs": [
+            "no-attempt-handle",
+            "reason:recover"
+          ]
+        }
+      }
+    },
+    {
+      "id": "B-PROCESS-GROUP",
+      "passesInvariant": true,
+      "observed": {
+        "stop": "confirmed",
+        "descendantState": "missing",
+        "descendantStillActive": false
+      }
+    }
+  ]
+}
