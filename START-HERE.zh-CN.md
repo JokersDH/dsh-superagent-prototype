@@ -6,6 +6,8 @@
 
 G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契约 183 项测试通过；[G1 核心交接](docs/adr/core/g1-core-handoff.md) 明确接口与剩余联调。整体 G1 尚未通过，等待 A 的存储和 B 的运行时接线。
 
+最新验收：core 已通过真实 SQLite 的 178 项回放；A/B 首批提交另有 7 项可复现阻断问题，见 [联调验收记录](docs/adr/core/g1-integration-review.md)。请分别将 [A 修复任务](agent-tasks/g1-agent-a-review.md) 和 [B 修复任务](agent-tasks/g1-agent-b-review.md) 交给对应 Agent，继续原分支修复。当前没有将未通过的执行路径启用为产品。
+
 [JokersDH/dsh-superagent-prototype](https://github.com/JokersDH/dsh-superagent-prototype) 是后续方案 B 的交付仓库。架构、试验和正式实现都提交到这个仓库。
 
 - `origin`：你的 fork，用于 fetch/push。

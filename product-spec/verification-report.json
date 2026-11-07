@@ -1,10 +1,10 @@
 {
   "result": "PASS_SPEC_STATIC_ONLY",
-  "checkedAt": "2026-11-07T09:23:30.872Z",
+  "checkedAt": "2026-11-07T09:58:00.193Z",
   "taskCount": 17,
   "acceptanceRequirementCount": 83,
   "runtimeTestsExecutedByThisVerifier": 0,
-  "localLinksChecked": 321,
+  "localLinksChecked": 326,
   "checks": [
     "unique IDs",
     "start/accept/combined dependency DAGs",
@@ -65,13 +65,13 @@
     },
     {
       "path": "FULL-BLUEPRINT.zh-CN.md",
-      "bytes": 147995,
-      "sha256": "c8408572973fd9b17cbccc60492fd93ffc33ae7822e5714af97919ed2fc342db"
+      "bytes": 148307,
+      "sha256": "aa92b48e116397e20bb078e91cf63ce92a676e0a92abde0a0656a05a0e1b86b7"
     },
     {
       "path": "README.md",
-      "bytes": 9833,
-      "sha256": "fdfcb94c191e30c811c8725d400e377ef83ade06eff2dc03098f7437977d4719"
+      "bytes": 10145,
+      "sha256": "410df90c28e8f22cc9cc7e0710e3ba6af24f6a0c3d69ad82ce9595849d7d4b87"
     },
     {
       "path": "acceptance-catalog.json",
@@ -250,8 +250,8 @@
     },
     {
       "path": "../START-HERE.zh-CN.md",
-      "bytes": 7381,
-      "sha256": "0ebe18a4fb4d23504df65b8ee8e457e0394040cccc206245cd7c8208811adbf9"
+      "bytes": 7786,
+      "sha256": "95bb98c4893e9f0426fbb949dfb93040d193fb194236b3dfb3da3d8604d22a43"
     },
     {
       "path": "../agent-tasks/main.md",

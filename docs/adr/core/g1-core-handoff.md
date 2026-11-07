@@ -2,6 +2,8 @@
 
 Status: **core/contracts slice accepted; overall G1 pending WP-02/WP-03 integration**.
 
+Review update: A/B delivered initial commits; SQLite binding passes all 178 core tests, but seven additional negative invariants fail. Whole G1 is blocked pending owner fixes. See `g1-integration-review.md` and the owner task files under `agent-tasks/`.
+
 The first core interface was published in commit `56bba3e`; current source adds the required product factory and active workspace. Contracts remain v1.0.0, schema hash `74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d`.
 
 ## Delivered

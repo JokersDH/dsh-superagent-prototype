@@ -104,6 +104,8 @@ G1 已交付正式 core 的候选/可信完成、Assignment-scoped report/read�
 
 尚未实现完整产品协调器，也未运行原生 agent 模型任务或学习实验。原生产品版本/协议调研依然不代表接入通过，未实际执行的平台能力保持 NOT_TESTED。
 
+A/B 首批交付的联调补测已开始：真实 SQLite 的 core 回放 178 项通过；7 项锁、异步事务、命令身份和停止保证未通过，见 [验收记录](../docs/adr/core/g1-integration-review.md)。未将这些失败当作整体 G1 通过，修复仍由原模块 owner 在其分支完成。
+
 文档一致性检查：`node product-spec/tools/verify-spec.mjs`。公共类型检查命令见 07。这些检查只证明规格内部一致和草案可编译，不证明产品稳定性或学习收益。
 
 整合时发现的接口与依赖问题及修正见 [复核记录](reviews/integrated-design-review.md)，可作为后续架构评审和回归依据。

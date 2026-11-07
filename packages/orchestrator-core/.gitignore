@@ -2,3 +2,4 @@ node_modules/
 dist/
 reports/test-results.json
 reports/dependencies.json
+reports/sqlite-test-results.json
