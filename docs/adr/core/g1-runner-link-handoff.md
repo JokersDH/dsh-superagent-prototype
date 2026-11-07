@@ -2,6 +2,8 @@
 
 Date: 2026-11-08. Base: `db6ea7d`. Main branch: `codex/g1-runner-reconnect`.
 
+Latest follow-up: [registered recovery and queue composition](g1-registered-recovery-handoff.md) passes 56 cases. Database registration, v2 barrier idempotence and the current owner reviews supersede pending items below; this document preserves the earlier 17-case scope.
+
 **The local recovery transport and registered-owned-resource barrier slice pass. Full G1 and WP-04 admission remain blocked. There is no usable product daemon/UI yet.**
 
 ## Implemented Interfaces

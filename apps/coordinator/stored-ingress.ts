@@ -30,7 +30,7 @@ export function createStoredRuntimeIngress(store: ProductStore, core: Pick<Engin
         core.invalidateCandidate({ ticketId: input.ticketId, assignmentId: input.assignmentId, contract: input.contract })
         const binding = store.bindings.binding<IngressBinding>(input.attemptId)!
         store.bindings.record({ ...binding, state: 'stopping' })
-        store.queue.enqueue('runtime.reconcile', input.attemptId, input.payloadRef, store.queue.maxSeq() + 1, 0, new Date().toISOString())
+        store.queue.enqueue('runtime.reconcile', input.attemptId, JSON.stringify(input.payloadRef), store.queue.maxSeq() + 1, 0, new Date().toISOString())
       }
       // Candidate, questions and approvals remain observations until their trusted owners apply them.
       observe(input, payload, 'business')

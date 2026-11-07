@@ -11,7 +11,7 @@ export class ResourceBarrierError extends Error {
   readonly code: 'not_quiescent' | 'resource_manifest_changed' | 'identity_mismatch' | 'invalid_transaction'
   constructor(code: ResourceBarrierError['code'], message: string) { super(message); this.code = code }
 }
-function manifest(resources: readonly { ref: string; ownership: string }[]): string {
+export function ownedResourceManifestDigest(resources: readonly { ref: string; ownership: string }[]): string {
   return jsonDigest(resources.map(resource => ({ ref: resource.ref, ownership: resource.ownership })).sort((a, b) => a.ref < b.ref ? -1 : a.ref > b.ref ? 1 : 0))
 }
 function currentBinding(store: ProductStore, value: RunnerInspection): IngressBinding {
@@ -20,7 +20,7 @@ function currentBinding(store: ProductStore, value: RunnerInspection): IngressBi
   if (!binding || binding.ticketId !== attempt.ticketId || binding.assignmentId !== attempt.assignmentId || binding.fenceEpoch !== attempt.fenceEpoch
     || binding.contract.workId !== attempt.contract.workId || binding.contract.revision !== attempt.contract.revision || binding.contract.digest !== attempt.contract.digest
     || binding.runnerIdentityRef !== value.runnerIdentityRef || binding.source !== value.source) throw new ResourceBarrierError('identity_mismatch', 'Inspection does not match the registered execution identity')
-  if (manifest(binding.resources) !== manifest(value.resources)) throw new ResourceBarrierError('resource_manifest_changed', 'Inspect again after resource registration changes')
+  if (ownedResourceManifestDigest(binding.resources) !== ownedResourceManifestDigest(value.resources)) throw new ResourceBarrierError('resource_manifest_changed', 'Inspect again after resource registration changes')
   return binding
 }
 export type OwnedQuiescenceReceipt = {
@@ -39,18 +39,20 @@ export function confirmOwnedQuiescence(store: ProductStore, proof: VerifiedRunne
   if (value.state !== 'terminated' || value.admission !== 'closed' || value.coverage !== 'complete_owned_resources'
     || value.resources.some(resource => resource.writer !== 'quiescent' || resource.evidence.length === 0)) throw new ResourceBarrierError('not_quiescent', 'Runner must close business admission and prove every owned resource quiescent')
   currentBinding(store, value)
-  // Write proof files before the database transaction. Credentials never enter the proof payload.
+  const resourceManifestDigest = ownedResourceManifestDigest(value.resources)
+  const commandId = key('confirm-owned-quiescence/v2', value.attempt.attemptId, resourceManifestDigest)
+  const bodyDigest = jsonDigest(JsonSchema.parse({ attempt: value.attempt, runnerIdentityRef: value.runnerIdentityRef, source: value.source, resourceManifestDigest, scope: 'registered_owned_resources_only' }))
+  // Fresh inspections of an irreversible closed inventory reuse its first receipt and proof.
+  const existing = store.commands.get(commandId)
   const evidence: Json = JsonSchema.parse({ protocol: 'runner-owned-quiescence/1', inspection: value, socketIdentity: endpoint.socketIdentity })
-  const proofRef = store.payloads.write(evidence).ref
-  const resourceManifestDigest = manifest(value.resources)
-  const writerPayload = value.resources.length ? RuntimeFactPayloadSchema.parse({ kind: 'writer.observed', value: { resources: value.resources.map(resource => ({ resourceRef: resource.ref, ownership: resource.ownership, status: 'quiescent', evidenceRefs: [proofRef] })) } }) : undefined
+  const proofRef = existing ? undefined : store.payloads.write(evidence).ref
+  const writerPayload = proofRef && value.resources.length ? RuntimeFactPayloadSchema.parse({ kind: 'writer.observed', value: { resources: value.resources.map(resource => ({ resourceRef: resource.ref, ownership: resource.ownership, status: 'quiescent', evidenceRefs: [proofRef] })) } }) : undefined
   const writerRef = writerPayload ? store.payloads.write(JsonSchema.parse(writerPayload)).ref : undefined
-  const commandId = key('confirm-owned-quiescence', value.attempt.attemptId, proofRef)
-  const bodyDigest = jsonDigest({ proofRef, resourceManifestDigest })
   return store.uow.atomic(() => {
     verifiedRunnerInspection(proof, maxAgeMs)
     const binding = currentBinding(store, value)
     return store.commands.record<OwnedQuiescenceReceipt>(commandId, bodyDigest, () => {
+      if (!proofRef) throw new Error('Stored barrier receipt disappeared during confirmation')
       let writerFactId: string | undefined
       if (writerPayload && writerRef) {
         writerFactId = key('host-writer-proof', binding.attemptId, proofRef)
@@ -63,7 +65,7 @@ export function confirmOwnedQuiescence(store: ProductStore, proof: VerifiedRunne
       }
       store.bindings.end(binding.attemptId)
       const confirmedEventSeq = store.events.append({ topic: 'runtime.barrier.confirmed', entityRef: binding.attemptId,
-        payload: { proofRef, resourceManifestDigest, runnerIdentityRef: binding.runnerIdentityRef, contract: binding.contract, scope: 'registered_owned_resources_only' } })
+        payload: { barrierCommandId: commandId, attempt: value.attempt, source: value.source, writerFactId: writerFactId ?? null, proofRef, resourceManifestDigest, runnerIdentityRef: binding.runnerIdentityRef, contract: binding.contract, scope: 'registered_owned_resources_only' } })
       return { scope: 'registered_owned_resources_only', attemptId: binding.attemptId, proofRef, resourceManifestDigest, confirmedEventSeq, ...(writerFactId ? { writerFactId } : {}) }
     })
   })

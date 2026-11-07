@@ -6,7 +6,7 @@
 
 G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契约 183 项测试通过；[G1 核心交接](docs/adr/core/g1-core-handoff.md) 明确接口与剩余联调。整体 G1 尚未通过，等待 A 的存储和 B 的运行时接线。
 
-最新验收（2026-11-08）：主线新增独立 Runner 恢复连接和资源屏障 **17 项通过**，含 Coordinator 真正 SIGKILL 后重连同一 Runner；原事实恢复 **14 项**保持通过。见 [最新恢复连接交接](docs/adr/core/g1-runner-link-handoff.md)。A 的 WP-04 既有 19 项测试通过，但 6 项新入场探针失败；B 新版 136 项通过、旧四项已修复，但 3 项新 Journal 探针失败。两个候选均未合入。下一轮 A 处理 [WP-04 入场修复](agent-tasks/g2-agent-a-wp04-admission-fixes.md)，B 处理 [Journal 后续修复](agent-tasks/g1-agent-b-journal-followup.md)。整体 G1 仍未通过，尚无可用产品 UI/daemon。
+最新验收（2026-11-08）：主线持久登记、恢复编排和队列接线 **56 项通过**，累计含 6 个真实 SIGKILL 窗口。恢复从数据库找到原 Runner；取消前持久化控制 ID，重复检查复用原屏障回执。见 [最新登记恢复交接](docs/adr/core/g1-registered-recovery-handoff.md)。A 的旧六项和 B 的旧三项修复均通过；A 新候选 27 项、B 148 项测试通过，但仍有 2 项完成权威、3 项 Journal 完整性边界失败。A/WP-04 与 B/Journal 暂未合入，B 的独立进程观察修复已接入。下一轮继续 [A 任务单](agent-tasks/g2-agent-a-wp04-admission-fixes.md) 和 [B 任务单](agent-tasks/g1-agent-b-journal-followup.md)。整体 G1 仍未通过，尚无可用产品 UI/daemon。
 
 [JokersDH/dsh-superagent-prototype](https://github.com/JokersDH/dsh-superagent-prototype) 是后续方案 B 的交付仓库。架构、试验和正式实现都提交到这个仓库。
 
@@ -35,6 +35,7 @@ G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契
 | `apps/coordinator/stored-ingress.ts` | 实际仓储/事实回执/core 的组合适配 | 新增 5 项受控进程集成测试通过；完整恢复待下一批 |
 | `apps/coordinator/recover-facts.ts` | 原载荷恢复、严格预检、幂等事实重放 | 恢复 9 项通过（含两个 SIGKILL）；不重启原生业务 |
 | `apps/coordinator/runner-link.ts`、`resource-barrier.ts` | 本机认证查询/取消，可信完整资源清单与事务屏障 | 17 项通过（含独立进程重连）；生产 Runner daemon/注册仍待接线 |
+| `apps/coordinator/runner-registry.ts`、`reconcile-runner.ts`、`recovery-effects.ts` | 持久可信登记、稳定取消意图、恢复编排、现有队列接线 | 合计 56 项通过，含 6 个 SIGKILL；实际 AttemptRunner daemon 接入待完成 |
 | `packages/orchestrator-core/` | 正式提取及最小扩展后的 core | 已实现第一批：legacy 144 + 新守卫 34 项测试 |
 | `packages/storage/`、`effects/`、`execution/` 等 | 新产品各后端模块（均位于 packages 下） | 按后续任务包实现 |
 | `apps/coordinator/`、`apps/runner/`、`apps/console/`、`apps/cli/` | 新产品后台、受控 Runner、网页、CLI | 按后续任务包实现 |

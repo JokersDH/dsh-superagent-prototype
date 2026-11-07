@@ -1,6 +1,6 @@
-# Agent B: Journal I/O, Replay And Sequence Admission
+# Agent B: Complete-File Journal Integrity Admission
 
-Date: 2026-11-08. Continue `codex/g1-runtime`. Reviewed candidate: `32540a3`. Existing runtime suites **136/136** and strict runtime typecheck pass in a clean checkout on Node 24.21.0. The original four admission failures are fixed. Journal is still **not admitted/merged** because the three new cases below fail.
+Date: 2026-11-08. Continue `codex/g1-runtime`. Latest reviewed candidate: **`74a3068`**. Independent Node 24.22.2 results: **148/148**, strict runtime typecheck, original four plus follow-up three admission probes all pass. I/O poisoning, replay ACK and sequence fixes are verified. Main integrates only your byte-identical ProcessHost observation file. Journal remains unmerged because three previously requested step-3 boundaries still fail.
 
 Keep original Runner/DriverKit/execution/testing/docs ownership. Main owns coordinator composition and the new local recovery helper; A owns storage schemas. Fetch the updated `origin/main` after this packet lands. Do not change contracts, root dependencies/lock or weaken review probes.
 
@@ -9,17 +9,26 @@ Keep original Runner/DriverKit/execution/testing/docs ownership. Main owns coord
 ```sh
 node tools/bootstrap/review-journal.mjs --runtime /absolute/clean/checkout
 node tools/bootstrap/review-journal-followup.mjs --runtime /absolute/clean/checkout
+node tools/bootstrap/review-journal-integrity.mjs --runtime /absolute/clean/checkout
 ```
 
-The first passes 4/4 against `32540a3`. The follow-up fails 3/3; evidence is `reports/releases/g1-journal-followup.json`.
+The first two pass 4 + 3 cases on `74a3068`. The third fails all three cases; evidence is `reports/releases/g1-journal-integrity.json`.
 
-## Required Fixes
+## Current Remaining Work
+
+1. **Record terminator.** Changing the required final newline to `x` still accepts the record with `corruptAt=null/readOnly=false`. A full wrong terminator is corruption, not a torn tail; preserve damaged evidence and refuse append/replay.
+2. **Strict envelope/schema validation.** A valid checksum around `{ seq:1, fact:{}, payload:... }` is accepted. Validate the entry/timestamp, frozen CriticalFact, strict kind/value payload and matching identity before accessing IDs. Invalid envelopes must yield bounded corruption, not admission or an uncontrolled TypeError. Preserve record/file bounds and exact duplicate semantics; correct loose fixtures rather than relaxing contracts.
+3. **Whole-file integrity before replay.** One intact frame followed by a corrupt frame opens read-only correctly, but `entries()` hides that and `replayJournal` applies fact-1 and reports success. Refuse before the first sink call unless the entire bounded snapshot is verified. Audit-only prefix salvage must be explicit and cannot enter ordinary replay. Recheck externally changed files and poisoned handles; stale flags are insufficient. Preserve strict ACKs, original IDs/refs and stop-on-persistence-failure. No native business commands in recovery.
+
+Read `docs/adr/core/g1-registered-recovery-handoff.md`: main now has persisted registration, pre-wire cancel intent, physical recovery and the existing durable queue adapter (56 tests, six SIGKILL windows). Actual AttemptRunner backend/daemon remains a later owner integration task. Keep all 148 tests plus seven prior probes, add the three integrity regressions and related poisoned/external-corruption cases, and make all three review scripts pass. Continue the same ownership/branch; no root lock or private schema changes.
+
+## Previous Fixes (Verified)
 
 1. **Poison writer after uncertain I/O.** The probe writes 20 bytes then injects EIO. append throws, but the next append reports success; reopening recovers none of the second fact (`corruptAt=0`). On any append write/fsync failure, permanently refuse further append for this handle until explicit reopen/recovery establishes a valid prefix. Do not silently truncate a possibly persisted record, reset counters, retry native effects, or overwrite evidence. Also test fsync failure after a full write and capacity/sequence accounting after reopen.
 2. **Validate replay ACKs.** `AttemptRunner.record` now validates DurableReceipt, but `replayJournal` discards the sink's return and increments `replayed` for `persisted:false`. Apply the same frozen schema/same-fact validation on every recovery ACK. Invalid/refused receipts must never count as replayed; unexpected persistence failure must stop advancing the batch. Keep original IDs/payload refs, and do not issue begin/deliver/answer. Authoritative stale-business refusal and old physical retention stay ingress-owned.
 3. **Validate sequence/record structure.** The decoder accepts frames with sequences `[1,3]` as intact/read-write. Require the journal's contiguous monotonic sequence (and define exact duplicate semantics), actual terminators and valid record envelopes before claiming integrity. Reject gaps/backward/duplicate sequence conflicts and malformed fact/payload without uncontrolled allocation or accidental promotion to repairable tail. `entries()/replayJournal` must not hide integrity failures by returning a successful prefix. Give the coordinator decoder an explicit integrity result; never label an unchecked/gapped prefix a verified recovery snapshot.
 
-Additional runtime review before full resource-barrier admission: `ProcessHost.#observeGroup` currently treats `ERR_CHILD_PROCESS_STDIO_MAXBUFFER` as an empty group. Output overflow/parse/observation failures must be indeterminate; only positively observed absence can prove quiescence. Preserve refusal to signal unproven/reused identities. Record targeted evidence and unsupported descendant/platform limits.
+The additional ProcessHost observation review is fixed in `74a3068` and its byte-identical file is integrated by main. Preserve the new fail-closed inventory behavior and unsupported descendant/platform limits.
 
 ## Next Integration Boundary
 
