@@ -1,5 +1,0 @@
-# Local temporary package root for this G1 package (root workspace activation belongs to the main agent).
-# better-sqlite3 13.0.3 ships its darwin-arm64 prebuild inside the tarball; no install script must run,
-# matching the validated G0-B release combination.
-allowBuilds:
-  better-sqlite3: false

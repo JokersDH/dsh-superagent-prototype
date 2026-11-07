@@ -1,0 +1,85 @@
+{
+  "status": "BLOCKED_REPRODUCED_INVARIANTS",
+  "storageCommit": "c0235e8760e7f6893255b57d1efe086a99016cc6",
+  "runtimeCommit": "b4111ed14af548f824ab47b14682a6d88a53eff7",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "cases": [
+    {
+      "id": "A-LOCK-INITIALIZATION",
+      "passesInvariant": true,
+      "observed": "Refused unknown ownership"
+    },
+    {
+      "id": "A-ASYNC-TRANSACTION",
+      "passesInvariant": true,
+      "observed": {
+        "rejectedSynchronously": true,
+        "persistedRowsAfterFailure": 0
+      }
+    },
+    {
+      "id": "MAIN-SYNC-BRIDGE",
+      "passesInvariant": true,
+      "observed": {
+        "bridgeRefused": true,
+        "bodyStarted": false
+      }
+    },
+    {
+      "id": "B-FROZEN-COMMAND",
+      "passesInvariant": false,
+      "observed": {
+        "hasContract": false,
+        "inputRef": "policy-snapshot-1",
+        "policySnapshotRef": "policy-snapshot-1"
+      }
+    },
+    {
+      "id": "B-ASSIGNMENT-FENCE",
+      "passesInvariant": false,
+      "observed": {
+        "accepted": true
+      }
+    },
+    {
+      "id": "B-COMMAND-IDENTITY",
+      "passesInvariant": false,
+      "observed": {
+        "deliveryIds": [
+          "cmd-attempt-1-deliver",
+          "cmd-attempt-1-deliver"
+        ]
+      }
+    },
+    {
+      "id": "B-UNKNOWN-STOP",
+      "passesInvariant": false,
+      "observed": {
+        "first": {
+          "state": "ended",
+          "quiescence": "indeterminate",
+          "evidenceRefs": [
+            "no-attempt-handle"
+          ]
+        },
+        "second": {
+          "state": "ended",
+          "quiescence": "confirmed",
+          "evidenceRefs": [
+            "no-active-binding"
+          ]
+        }
+      }
+    },
+    {
+      "id": "B-PROCESS-GROUP",
+      "passesInvariant": false,
+      "observed": {
+        "stop": "confirmed",
+        "descendantState": "S",
+        "descendantStillActive": true
+      }
+    }
+  ]
+}

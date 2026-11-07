@@ -69,3 +69,38 @@ test('list order matches the upstream store: tickets newest first, threads in in
     assert.deepEqual(store.domain.threads.list().map(thread => thread.key), ['chat:a', 'chat:b'])
   })
 })
+
+test('a personal Ticket keeps every field, including completion and unknown future fields', async () => {
+  await withStore(({ store }) => {
+    const ticket = {
+      id: 't-personal',
+      title: 'Deliver the CSV export',
+      decisionId: 'd1',
+      mandate: { strength: 'explicit', policyVersion: 'v1', basis: { via: 'addressed', addressed: 'mention' }, actor: { source: 'chat', id: 'alice' }, scope: 's' },
+      channels: [],
+      assignments: [{
+        id: 'a1', state: 'ended', createdAt: 'now',
+        completion: { candidateGeneration: 4, readyAt: 'now', headReportAt: 'now' },
+      }],
+      inputs: [],
+      undelivered: [],
+      createdAt: 'now',
+      updatedAt: 'now',
+      origin: { triggerId: 'e1', triggerIds: ['e1'] },
+      completion: {
+        mode: 'personal',
+        candidateGeneration: 4,
+        currentCandidate: { assignmentId: 'a1', attemptId: 'at1', candidateGeneration: 4, contract: { workId: 'w1', revision: 2, digest: 'digest' } },
+        verificationRef: 'v1',
+        humanAcceptanceRef: 'h1',
+      },
+      someFutureField: { nested: ['kept', 1, true] },
+    }
+    store.domain.tickets.save(ticket)
+    assert.deepEqual(store.domain.tickets.get('t-personal'), ticket, 'no unknown field was stripped')
+    // The generated columns still read the same JSON paths with completion present.
+    store.domain.tickets.save({ ...ticket, id: 't-personal-active', undelivered: ['i1'] })
+    assert.deepEqual(store.domain.tickets.active().map(item => item.id).sort(), ['t-personal-active'])
+    assert.deepEqual(store.domain.tickets.open().map(item => item.id).sort(), ['t-personal', 't-personal-active'])
+  })
+})

@@ -1,0 +1,11 @@
+G1 review repros — observed with the official tools/bootstrap/review-g1-repros.mjs
+repro status: BLOCKED_REPRODUCED_INVARIANTS (B cases are the runtime owner's scope and remain unfinished)
+
+A-LOCK-INITIALIZATION: PASS — "Refused unknown ownership"
+A-ASYNC-TRANSACTION: PASS — {"rejectedSynchronously": true, "persistedRowsAfterFailure": 0}
+MAIN-SYNC-BRIDGE: PASS — {"bridgeRefused": true, "bodyStarted": false}
+B-FROZEN-COMMAND: FAIL — {"hasContract": false, "inputRef": "policy-snapshot-1", "policySnapshotRef": "policy-snapshot-1"}
+B-ASSIGNMENT-FENCE: FAIL — {"accepted": true}
+B-COMMAND-IDENTITY: FAIL — {"deliveryIds": ["cmd-attempt-1-deliver", "cmd-attempt-1-deliver"]}
+B-UNKNOWN-STOP: FAIL — {"first": {"state": "ended", "quiescence": "indeterminate", "evidenceRefs": ["no-attempt-handle"]}, "second": {"state": "ended", "quiescence": "confirmed", "evi
+B-PROCESS-GROUP: FAIL — {"stop": "confirmed", "descendantState": "S", "descendantStillActive": true}

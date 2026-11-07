@@ -1,12 +1,12 @@
 $ node --test test/*.case.ts
-✔ dispatch runs a due row once and removes it (2.56625ms)
-✔ coalescing keeps queue position and replaces the payload of the waiting row (0.307625ms)
-✔ a row replaced while running keeps its newer payload for the next start (0.352708ms)
-✔ Later reschedules without counting a failure (0.145167ms)
-✔ failures back off, record the message, and reach health error at the threshold (0.453667ms)
-✔ an ordered kind blocks behind its head row until that row completes (0.234417ms)
-✔ an unknown native send parks its row instead of retrying (0.39675ms)
-✔ drain leaves waiting rows for the next start (0.090791ms)
+✔ dispatch runs a due row once and removes it (3.083375ms)
+✔ coalescing keeps queue position and replaces the payload of the waiting row (0.322167ms)
+✔ a row replaced while running keeps its newer payload for the next start (0.359375ms)
+✔ Later reschedules without counting a failure (0.131458ms)
+✔ failures back off, record the message, and reach health error at the threshold (0.643167ms)
+✔ an ordered kind blocks behind its head row until that row completes (0.345542ms)
+✔ an unknown native send parks its row instead of retrying (0.493083ms)
+✔ drain leaves waiting rows for the next start (0.083333ms)
 ℹ tests 8
 ℹ suites 0
 ℹ pass 8
@@ -14,4 +14,4 @@ $ node --test test/*.case.ts
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 56.541625
+ℹ duration_ms 62.379542

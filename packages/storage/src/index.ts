@@ -58,13 +58,34 @@ export class ProductStore {
   close(): void { this.database.close() }
 }
 
-/** The database-backed registry WriterLock reads for its nonce/liveness cross-check. */
+/** The database-backed registry WriterLock uses for its atomic claim and nonce/liveness cross-check. */
 export class InstanceRegistry implements LockRegistry {
   private readonly db: Database.Database
   constructor(db: Database.Database) { this.db = db }
+  current(): LockContent | undefined {
+    const row = this.db.prepare('SELECT nonce, pid, started_at FROM writer_claim WHERE id = 1').get() as Record<string, unknown> | undefined
+    return row ? { nonce: String(row.nonce), pid: Number(row.pid), startedAt: String(row.started_at) } : undefined
+  }
   has(nonce: string): boolean {
     return !!this.db.prepare('SELECT 1 FROM coordinator_instances WHERE nonce = ?').get(nonce)
   }
+  /** Atomic claim: one statement decides between every concurrent acquirer. */
+  claim(entry: LockContent): boolean {
+    const result = this.db.prepare('INSERT OR IGNORE INTO writer_claim (id, nonce, pid, started_at) VALUES (1, ?, ?, ?)')
+      .run(entry.nonce, entry.pid, entry.startedAt)
+    return Number(result.changes) === 1
+  }
+  /** Atomic stale takeover: only the taker that observed the same dead nonce can replace it. */
+  takeOver(observedNonce: string, entry: LockContent): boolean {
+    const result = this.db.prepare('UPDATE writer_claim SET nonce = ?, pid = ?, started_at = ? WHERE id = 1 AND nonce = ?')
+      .run(entry.nonce, entry.pid, entry.startedAt, observedNonce)
+    return Number(result.changes) === 1
+  }
+  /** Atomic conditional release: a holder taken over meanwhile matches no row. */
+  release(nonce: string): boolean {
+    return Number(this.db.prepare('DELETE FROM writer_claim WHERE id = 1 AND nonce = ?').run(nonce).changes) === 1
+  }
+  /** Audit row for instance history; never grants ownership. */
   register(entry: LockContent): void {
     this.db.prepare('INSERT OR REPLACE INTO coordinator_instances (nonce, pid, started_at, heartbeat_at) VALUES (?, ?, ?, ?)')
       .run(entry.nonce, entry.pid, entry.startedAt, new Date().toISOString())

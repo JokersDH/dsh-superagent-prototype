@@ -1,71 +1,49 @@
-# RFC-01: Binding the core domain types to the storage repositories (WP-02 → WP-01)
+# RFC-01: Core domain type binding (WP-02 → WP-01) — RESOLVED
 
-- Status: proposed (open)
+- Status: **resolved** (main agent's G1 RFC resolution, 2026-11-07)
 - From: WP-02 (Agent A)
 - To: WP-01 (main agent, `packages/orchestrator-core/`)
-- Date: 2026-11-07
 - Related acceptance: DATA-02, DATA-04, CORE-01
 
-## Situation
+## Resolution
 
-WP-02 ships `DomainStore` over five tables whose SQL, generated columns, and indexes are extracted
-from the upstream store: trigger, disposition, thread, ticket, decision, plus the trigger/thread
-index. The public method surface matches the core `Repositories` port method-for-method
-(`get/save/list/active/disposition/saveDisposition/byThread`).
+The main agent resolved this without a second domain-model package. The formal core
+(`packages/orchestrator-core`) owns `Repositories`, `Ticket`, `Thread`, `Trigger`, `Decision`, and
+`TriggerDisposition`. The composition root (`apps/coordinator/main.ts`, main-agent integration)
+maps them to `DomainStore`'s generic JSON methods over the same `UnitOfWork`; storage's
+`DomainStore` remains generic and defines no parallel domain types.
 
-However the core's aggregate types (`Ticket`, `Thread`, `Trigger`, `Decision`,
-`TriggerDisposition`) still live only in the G0 extraction spike
-(`tools/reuse-spike/core-extraction/src/core/`), because `packages/orchestrator-core/` is WP-01's
-deliverable and `packages/contracts/` deliberately excludes core domain types. WP-02 therefore
-keeps `DomainStore` structural over JSON: it never defines a parallel `Ticket` interface and only
-types the fields its SQL reads (`id`, `key`, `at`, `human`, `threads[]`).
+`packages/storage/test/core-binding.case.ts` now asserts, against the public core types, that:
 
-## The seam
+1. `DomainStore` structurally satisfies the core `Repositories` port (compile-time assignment of
+   the same adapter shape the composition root publishes).
+2. Saving through the core-typed port preserves the complete aggregate JSON — every field,
+   including personal `completion` metadata and unknown future fields, with no stripping.
+3. The core's transactional `atomic` runs a synchronous savepoint through the same connection.
 
-`DomainStore` methods are generic over the JSON document (`get<T>`, `list<T>`, `active<T>`), and
-the write side requires only the identity field plus, for triggers, the `threads`/`at`/`human`
-fields the index reads. A binding in WP-01 would look like:
+Additionally, the main agent's `tools/bootstrap/check-core-sqlite.mjs` runs the complete core suite
+over the actual `ProductStore`: **178/178 tests pass** (144 byte-identical upstream tests + 34
+personal completion tests), and the typed binding check passes.
 
-```ts
-// packages/orchestrator-core (WP-01), sketch only
-const repositories: Repositories = {
-  atomic: work => store.uow.atomic(work),
-  triggers: {
-    get: id => store.domain.triggers.get<Trigger>(id),
-    save: trigger => store.domain.triggers.save(trigger),          // Trigger satisfies TriggerIndexInput
-    disposition: id => store.domain.triggers.disposition<TriggerDisposition>(id),
-    saveDisposition: (id, value) => store.domain.triggers.saveDisposition(id, value),
-  },
-  threads: { get: key => store.domain.threads.get<Thread>(key), save: t => store.domain.threads.save(t), ... },
-  tickets: { ... },
-  decisions: { ... },
-}
-```
+## Original proposal (historical)
 
-## Failure scenarios that need a test
+The request below asked for a binding decision; it is kept for context.
+
+The core's aggregate types live in `packages/orchestrator-core`; `DomainStore` is generic over the
+aggregate JSON (`get<T>`, `list<T>`, `active<T>`) and types only the fields its SQL reads (`id`,
+`key`, `at`, `human`, `threads[]`). Failure scenarios that need a test (all now covered by the
+core suite run over SQLite and by `core-binding.case.ts`):
 
 1. A core field rename that changes a generated-column JSON path (`ended`, `undelivered`,
    `assignments[#-1].state`, `pending`, `evaluating`, `subscriptions`) must fail a test, not a
-   production scan. Proposal: WP-01 runs the extracted 144-test core suite against
-   `DomainStore`-backed repositories (the suite already uses the `Repositories` port), or adds a
-   parity test comparing `MemoryRepositories` and SQLite results for the engine flows.
-2. A new aggregate field that the active queries should consider must be added to the migration
-   (storage owner) — not silently to one implementation.
-3. `tickets.list()` order (newest first via rowid DESC) is observable; the core's `MemoryRepositories`
-   reverses insertion order. The SQLite store must keep matching semantics.
-
-## Request
-
-- WP-01 owns the core `Repositories` type and should publish the binding (structural casts are
-  acceptable; no private type copies). If the main agent prefers a shared domain-model package
-  instead of structural binding, this storage package needs a one-line import switch, not a schema
-  change.
-- WP-03/WP-05/WP-10 must not open their own database writer; schema needs for
-  `runtime_bindings`, `writer_leases`, `questions`, `works`, and `contracts` tables come to WP-02
-  as a migration request with fixtures.
+   production scan.
+2. A new aggregate field that the active queries should consider must be added by the storage
+   owner as a migration.
+3. `tickets.list()` order (newest first via rowid DESC) must keep matching the core memory
+   implementation's semantics.
 
 ## Impact
 
-No change to the frozen wire contracts; no change to the schema; no change to acceptance IDs.
-Until WP-01 publishes the binding, this RFC stays open and the storage report marks the
-type-binding scenario as NOT_TESTED.
+No change to the frozen wire contracts; no schema change for this RFC. Storage remains the single
+migration owner; other packages submit schema requests (the v2 `writer_claim` migration in this
+round is the storage owner's own REL-03 change).

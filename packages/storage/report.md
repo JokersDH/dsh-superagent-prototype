@@ -1,10 +1,23 @@
 # WP-02 报告：事务存储、Effects、Outbox 与数据迁移
 
 - **分支**：`codex/g1-storage-effects`（本报告随本轮 commit 提交；commit 见 `git log -1`）
-- **Base**：`700c0dd`（`feat(g0): freeze shared contracts and accept integrated bootstrap`）
+- **Base**：`700c0dd`（`feat(g0): freeze shared contracts and accept integrated bootstrap`）；修复轮已合入 `origin/main` 至 `2cf047a`
 - **拥有路径**：`packages/storage/`、`packages/effects/`、`docs/adr/storage/`、`docs/rfcs/WP-02/`
 - **契约身份**：`@personal-agent/contracts` v1.0.0，apiMajor 1，schemaHash `74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d`（G0 冻结）
 - **环境**：`reports/environment.txt` — Node v24.21.0、pnpm 11.7.0、darwin/arm64、better-sqlite3 13.0.3、SQLite 3.53.4
+
+## 0. 修复轮（主 Agent G1 评审反馈，2026-11-07）
+
+评审输入：`agent-tasks/g1-agent-a-review.md`、`docs/adr/core/g1-integration-review.md`。三项阻断项已修复，并用主 Agent 的官方复现脚本验证：
+
+| 评审项 | 修复 | 证据 |
+| --- | --- | --- |
+| **A-LOCK-INITIALIZATION**：空锁文件被第二实例抢走；stale 接管存在 probe→unlink→create 竞争 | 所有权改为数据库单行 `writer_claim` 的原子 claim / CAS takeover / 条件 release（迁移 v2）；锁文件降级为**建议性面包屑**，以“完整内容 + `link`”原子创建、由 claim 胜者原子 rename 替换；空/损坏/未知内容一律 fail closed（`unknown` verdict），不再当作死亡证据；无 registry 时不接管；成功后置失败（注册/面包屑）会释放 claim | `test/writer-lock.case.ts` 8 个用例（含空文件窗口、两个并发 stale 接管者、旧持有者 release 不删新锁、注册失败清理）；官方复现脚本 **A-LOCK-INITIALIZATION = PASS**（"Refused unknown ownership"） |
+| **A-ASYNC-TRANSACTION**：`atomic` 接受 Promise，RELEASE 早于其完成 | `atomic` 检测 thenable 后在 call site **同步抛 TypeError**，先回滚 savepoint 再抛出；异步续段的 rejection 被观察（不产生 unhandled rejection）；导出 `SyncOperation<T>` 供类型化调用点约束（泛型 `Repositories.atomic` 适配器无法在类型层加 Promise 禁令而不误伤泛型透传，运行时拒绝是硬保证） | `test/uow.case.ts` 异步负例（`rejectedSynchronously=true`、残留行 0）；官方复现脚本 **A-ASYNC-TRANSACTION = PASS**（`{"rejectedSynchronously": true, "persistedRowsAfterFailure": 0}`） |
+| **接口与归属**：接入公共 core 类型、保留完整 JSON（尤其 completion）、不剥离未知字段 | `DomainStore` 保持对聚合 JSON 的泛型；新增 `test/core-binding.case.ts` 用**公共** `@personal-agent/orchestrator-core` 的 `Repositories/Ticket/Thread/Trigger/Decision` 类型做编译期结构绑定 + 运行时 completion/未知字段完整往返；RFC-01 标记 **RESOLVED**（主 Agent 结构适配器，无第二 domain-model 包） | `core-binding.case.ts`；主 Agent `check-core-sqlite.mjs`：**178/178** core 测试在真实 `ProductStore` 上通过（144 原始 + 34 personal），typed binding 通过 |
+| 归属与依赖 | 公共兄弟包改为 `workspace:*`（contracts/effects），新增 core devDependency；删除局部分包 lock 与嵌套 `pnpm-workspace.yaml`；根 lock 更新作为 main 集成步骤（不写入功能分支提交） | `packages/storage/package.json`；根 workspace 安装后各包可独立 typecheck/test/build |
+
+本轮实际结果：storage **44/44**、effects **8/8**、两包 typecheck/build 通过、core-on-SQLite **178/178**；官方复现脚本的 A/MAIN 三项全 PASS，B 五项 FAIL 属 runtime owner 范围（`reports/g1-review-repros-observed.txt`）。旧 34 个测试全部保留且通过。
 
 ## 1. 交付物
 

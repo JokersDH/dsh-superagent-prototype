@@ -51,6 +51,32 @@ test('afterCommit runs immediately outside a transaction', async () => {
   })
 })
 
+test('an async callback is rejected synchronously and leaves no committed half', async () => {
+  await withStore(async ({ store }) => {
+    store.db.exec('CREATE TABLE async_probe (id INTEGER PRIMARY KEY)')
+    let rejected = false
+    let failure: unknown
+    try {
+      store.uow.atomic(async () => {
+        store.db.prepare('INSERT INTO async_probe VALUES (1)').run()
+        await Promise.resolve()
+        throw new Error('after-await failure')
+      })
+    } catch (error) {
+      rejected = true
+      failure = error
+    }
+    // Let the async continuation settle; its rejection is observed, its write already rolled back.
+    await new Promise(resolve => setTimeout(resolve, 10))
+    assert.equal(rejected, true, 'the rejection happens at the call site, not on a later microtask')
+    assert.ok(failure instanceof TypeError)
+    assert.match((failure as Error).message, /synchronous callback/)
+    const count = (store.db.prepare('SELECT COUNT(*) AS n FROM async_probe').get() as { n: number }).n
+    assert.equal(count, 0, 'the write inside the async callback did not survive the rejected transaction')
+    assert.equal(store.uow.nesting, 0)
+  })
+})
+
 test('every store shares the same connection and joins one transaction', async () => {
   await withStore(({ store }) => {
     const identity = store.db

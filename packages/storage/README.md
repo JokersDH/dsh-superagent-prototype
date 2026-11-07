@@ -26,23 +26,27 @@ no DSH imports, better-sqlite3 instead of `node:sqlite`.
 | `Answers` (`store.answers`) | One delivery row per native target (`PRIMARY KEY (answer_id, target_binding_id)`); contracts' delivery states. |
 | `ArtifactStore` (`store.artifacts`) | Content-addressed files: temp → fsync → rename → reference; digest-verified reads; grace-period orphan GC. |
 | `backupDatabase`, `verifyDatabase` | SQLite online backup with WAL; integrity and `foreign_key_check`; restore opens without dispatching business. |
-| `WriterLock` | Lockfile + nonce + database registry; stale takeover only for a verifiably dead holder; suspected PID reuse is refused. |
+| `WriterLock` | Atomic database claim (`writer_claim`: claim / CAS takeover / conditional release) plus an advisory breadcrumb lockfile written with its full content atomically. Empty/corrupt content fails closed; takeover needs a verifiably dead holder and the registry; suspected PID reuse is refused; a post-claim failure releases the claim. |
 | `applyMigrations`, `MIGRATIONS` | The single migration entry; checksums recorded in `schema_meta`; refuses upstream/unknown databases and drift/gap/future versions. |
 
 ## Run
 
+This package is a member of the root pnpm workspace (`packages/*`). From the repository root:
+
 ```sh
 pnpm install
-pnpm typecheck
-pnpm test
-pnpm build
+pnpm --dir packages/contracts run build
+pnpm --dir packages/orchestrator-core run build
+pnpm --dir packages/effects run test
+pnpm --dir packages/storage run typecheck
+pnpm --dir packages/storage run test
+pnpm --dir packages/storage run build
 ```
 
-`pnpm install` uses the local `pnpm-workspace.yaml` (`allowBuilds: better-sqlite3: false`), so the
-tarball prebuild is used and no compiler runs (the validated G0-B release combination).
-
 Measured environment for the WP-02 evidence: Node v24.21.0, pnpm 11.7.0, darwin/arm64,
-better-sqlite3 13.0.3, SQLite 3.53.4. 34/34 tests pass; see `report.md` and `reports/`.
+better-sqlite3 13.0.3, SQLite 3.53.4. 44/44 storage tests and 8/8 effects tests pass; the official
+G1 review repros report A-LOCK-INITIALIZATION, A-ASYNC-TRANSACTION, and MAIN-SYNC-BRIDGE as PASS.
+See `report.md` and `reports/`.
 
 ## Boundaries
 

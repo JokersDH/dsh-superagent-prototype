@@ -80,8 +80,20 @@ const V1: Migration = {
   ],
 }
 
+/**
+ * v2: the single-row writer claim. Ownership is decided by atomic INSERT/CAS/DELETE on this one
+ * row, so two concurrent acquirers or stale takers can never both become owner (REL-03).
+ */
+const V2: Migration = {
+  version: 2,
+  name: 'writer-claim',
+  statements: [
+    `CREATE TABLE writer_claim (id INTEGER PRIMARY KEY CHECK (id = 1), nonce TEXT NOT NULL, pid INTEGER NOT NULL, started_at TEXT NOT NULL)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1]
+export const MIGRATIONS: readonly Migration[] = [V1, V2]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>

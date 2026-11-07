@@ -15,11 +15,12 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "@personal-agent/contracts": "file:../contracts",
-    "@personal-agent/effects": "file:../effects",
+    "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/effects": "workspace:*",
     "better-sqlite3": "13.0.3"
   },
   "devDependencies": {
+    "@personal-agent/orchestrator-core": "workspace:*",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "24.10.0",
     "typescript": "6.0.3"
