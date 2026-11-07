@@ -267,6 +267,7 @@ export class Tickets extends EnginePart {
    */
   wake(ticketId: string): void {
     const ticket = this.repo.tickets.get(ticketId)
+    if (ticket && this.options.requirePersonalCompletion && !ticket.completion) throw new UserError('completionUnconfigured')
     if (!ticket || liveTicket(ticket) || ticket.ended?.by === 'human' || !ticket.undelivered.length) return
     if (ticket.completion) return
     const policy = this.policy()

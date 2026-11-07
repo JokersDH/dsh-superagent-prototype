@@ -29,9 +29,11 @@ export function initializeCompletion(configuration: CompletionConfiguration): Pe
 }
 
 export function completionIsCurrent(options: EngineOptions, ticket: Ticket): boolean {
+  if (options.requirePersonalCompletion && !ticket.completion) return false
   return !ticket.completion || (!ticket.completion.retired && options.isCurrentContract?.(ticket.completion.contract) === true && options.policy().revalidate(ticket.mandate))
 }
 export function assertCompletionCurrent(options: EngineOptions, ticket: Ticket): void {
+  if (options.requirePersonalCompletion && !ticket.completion) throw new UserError('completionUnconfigured')
   if (!ticket.completion) return
   if (!options.isCurrentContract) throw new UserError('completionUnconfigured')
   if (!options.policy().revalidate(ticket.mandate)) throw new UserError('mandateRevoked')

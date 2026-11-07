@@ -8,6 +8,10 @@ The existing `Repositories` synchronous port stays compatible. Storage persists 
 
 Personal Ticket creation is opt-in through trusted `EngineOptions.completionPolicy(ticket, outcome) -> { mode, contract }`. `contract` is the immutable validated product ContractRevision. `isCurrentContract(ref)` is required for personal work and reads the Work index on the same transaction connection. An absent/stale guard fails closed. Legacy tickets keep their existing rules.
 
+B assembly must use `createPersonalEngine`, which requires both callbacks and rejects a policy that returns no configuration. Direct `new Engine` stays available for upstream legacy compatibility, not as an implicit B product default.
+
+The factory requires personal completion metadata on loaded Tickets too. A storage adapter that strips the extension fails before launch/report instead of silently downgrading to legacy completion. Persist full Ticket data; importing legacy records needs a deliberate migration.
+
 Additive methods:
 
 - `reportAssignment(ticketId, assignmentId, report)` checks the current pending/running assignment. Personal `ready` requires running and creates a candidate. Ticket-only legacy `report` is refused for personal tickets.

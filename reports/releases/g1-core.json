@@ -1,0 +1,20 @@
+{
+  "status": "PASS_CORE_AND_CONTRACTS_ONLY",
+  "contractIdentity": {
+    "version": "1.0.0",
+    "schemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d"
+  },
+  "coreTests": 176,
+  "originalBaselineTests": 144,
+  "newCoreTests": 32,
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "recordedAt": "2026-11-07T08:55:39.157Z",
+  "pending": [
+    "WP-02 real storage/effect integration",
+    "WP-03 actual subprocess/writer barriers and recovery integration",
+    "A complete G1 gate report",
+    "Native agent compatibility and product E2E"
+  ]
+}

@@ -4,24 +4,24 @@ This is the formal WP-01 package derived from DeepSeek superagent commit `8c32a9
 
 ## Check
 
-For the transitional standalone package setup, build/install contracts first, then install here:
+From the repository root, use the shared workspace and its root lock:
 
 ```sh
-pnpm --dir ../contracts install --ignore-workspace --frozen-lockfile
-pnpm --dir ../contracts build
-pnpm install --ignore-workspace --frozen-lockfile
-pnpm run check
+pnpm install --frozen-lockfile
+pnpm check:g1-core
 ```
 
-The contracts dependency uses its public built entry. This will become a workspace dependency when the main agent activates the shared root workspace. Root lock/workspace changes are not owned by storage or runtime authors.
+The contracts dependency uses its public built entry and `workspace:*`; the check builds contracts before checking core. Root lock/workspace changes are owned by the main agent. Original G0 spike/package locks are retained as historical independent evidence; reproduce those with explicit `--ignore-workspace` where needed, rather than treating them as the live G1 lock.
 
 ## Legacy And Personal Modes
 
-Legacy behavior remains the default. Product assembly opts in per Ticket through `completionPolicy`, returning `{ mode: 'verified' | 'human_review', contract }`; `isCurrentContract(ref)` must be configured and match the current immutable Work contract. Both callbacks execute inside the core transaction. No model or worker may select its own mode or mutate the contract.
+Legacy behavior remains the default for the reusable Engine. B product assembly uses `createPersonalEngine(options)`, requiring `completionPolicy` and `isCurrentContract`; an absent per-ticket configuration cannot silently downgrade to legacy behavior. `completionPolicy` returns `{ mode: 'verified' | 'human_review', contract }`, and `isCurrentContract(ref)` matches the current immutable Work contract. Both callbacks execute inside the core transaction. No model or worker may select its own mode or mutate the contract.
 
 Personal ready reports create a logical CandidateRef and remain open. New Inputs, actual delivery/read, retries/restarts, non-ready reports and explicit Broker invalidation invalidate a candidate. Repeated Input IDs do not. A generation is never a timestamp.
 
 Personal ended tickets never auto-resume. A new explicitly authorized contract/Ticket is the application continuation path. `retireTicket` records supersession even when stopping an already-ended Ticket would be a no-op, withdraws pending result messages, and preserves historical evidence.
+
+The product factory also refuses stored Tickets that lost `completion`. Storage must persist the entire optional core extension; stripping unknown JSON fields must not silently reactivate legacy completion. Legacy records need an explicit migration/import decision, not a fallback inside a personal Engine.
 
 ## Execution Port
 

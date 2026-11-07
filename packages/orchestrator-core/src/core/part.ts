@@ -19,6 +19,8 @@ export interface EngineOptions {
   completionPolicy?: (ticket: Ticket, outcome: Extract<AssessmentOutcome, { kind: 'accept' }>) => CompletionConfiguration | undefined
   isCurrentContract?: (contract: ContractRef) => boolean
   completionVerifier?: CompletionVerifier
+  /** Product assembly refuses a missing completion record instead of falling back to legacy behavior. */
+  requirePersonalCompletion?: boolean
   now?: () => string
   emit?: (event: DomainEvent) => void
 }
@@ -81,7 +83,12 @@ export abstract class EnginePart {
   protected emit<K extends keyof DomainEvents>(type: K, data: DomainEvents[K]): void {
     this.options.emit?.({ type, at: this.now(), data } as DomainEvent)
   }
-  protected require(ticketId: string): Ticket { const ticket = this.repo.tickets.get(ticketId); if (!ticket) throw new UserError('unknownTicket'); return ticket }
+  protected require(ticketId: string): Ticket {
+    const ticket = this.repo.tickets.get(ticketId)
+    if (!ticket) throw new UserError('unknownTicket')
+    if (this.options.requirePersonalCompletion && !ticket.completion) throw new UserError('completionUnconfigured')
+    return ticket
+  }
   /** Returns the stored Thread or an unsaved empty Thread aggregate. */
   protected thread(ref: ThreadRef): Thread {
     const k = threadKey(ref)

@@ -9,12 +9,13 @@
   "packageManager": "pnpm@11.7.0",
   "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run --reporter=default --reporter=json --outputFile=reports/test-results.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "build": "tsc -p tsconfig.build.json",
+    "smoke:built": "node tools/smoke-built.mjs",
     "check:provenance": "node tools/provenance.mjs --check",
     "check": "node tools/check.mjs"
   },
-  "dependencies": { "@personal-agent/contracts": "file:../contracts" },
+  "dependencies": { "@personal-agent/contracts": "workspace:*" },
   "devDependencies": { "@types/node": "24.10.0", "typescript": "6.0.3", "vitest": "4.1.8" }
 }

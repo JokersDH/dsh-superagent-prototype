@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from 'vitest'
-import { Engine, MemoryRepositories, latestAssignment, completionCriteriaDigest } from '../src/core/index.ts'
+import { Engine, MemoryRepositories, latestAssignment, completionCriteriaDigest, createPersonalEngine } from '../src/core/index.ts'
+import type { PersonalEngineOptions } from '../src/core/index.ts'
 import type { Candidate, EngineOptions, Executor, OutboundMessage, Policy, Ticket, Trigger } from '../src/core/index.ts'
 import type { CompletionEvidence } from '../src/core/completion-model.ts'
 import type { CandidateRef, CompletionProposal, ContractRevision } from '@personal-agent/contracts'
 
 const digest = 'a'.repeat(64)
 const contract: ContractRevision = { workId: 'work-1', revision: 1, digest, goal: 'Implement CSV.', scope: { projectId: 'project-1', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }, criteria: [{ id: 'test-1', description: 'Tests pass.', kind: 'machine', required: true, checkDefinitionRef: 'check-1' }], authorityRef: 'authority-1', createdAt: '2026-11-07T00:00:00Z' }
-function harness(mode: 'verified' | 'human_review' = 'verified', overrides: Partial<EngineOptions> = {}) {
+function harness(mode: 'verified' | 'human_review' = 'verified', overrides: Partial<EngineOptions> = {}, personalFactory = false) {
   const repo = new MemoryRepositories()
   const requests: Candidate[] = []
   const messages = new Map<string, OutboundMessage>()
@@ -21,7 +22,7 @@ function harness(mode: 'verified' | 'human_review' = 'verified', overrides: Part
     completionPolicy: () => ({ mode, contract }), isCurrentContract: ref => ref.workId === contract.workId && ref.revision === current && ref.digest === digest,
     completionVerifier: { resolve: proposal => proofs.get(proposal.verificationId) }, ...overrides,
   }
-  const engine = new Engine(options)
+  const engine = personalFactory ? createPersonalEngine(options as PersonalEngineOptions) : new Engine(options)
   const receive = (id: string, thread = 'thread-1', human = true) => engine.receive({ id, source: 'local', threads: [{ source: 'local', id: thread }], actor: { source: 'local', id: human ? 'user-1' : 'peer-1' }, human, at: '2026-11-07T00:00:00Z', text: id, channel: { source: 'local', thread, address: {} }, meta: {} } satisfies Trigger)
   function create() {
     receive('request-1'); engine.evaluateDue()
@@ -46,6 +47,36 @@ function harness(mode: 'verified' | 'human_review' = 'verified', overrides: Part
 }
 
 describe('personal completion gate', () => {
+  it('requires policy/current-contract ports at personal assembly time', () => {
+    expect(() => harness('verified', { completionPolicy: undefined }, true)).toThrow()
+    expect(() => harness('verified', { isCurrentContract: undefined }, true)).toThrow()
+  })
+  it('does not silently downgrade a personal product ticket if its policy returns undefined', () => {
+    const h = harness('verified', { completionPolicy: () => undefined }, true)
+    expect(() => h.create()).toThrow()
+    expect(h.repo.tickets.list()).toEqual([])
+    expect(h.executor.start).not.toHaveBeenCalled()
+  })
+  it('assembles a personal engine with the same verified lifecycle', () => {
+    const h = harness('verified', {}, true), ticket = h.create()
+    h.report(ticket)
+    expect(h.repo.tickets.get(ticket.id)!.ended).toBeUndefined()
+    expect(h.engine.confirmCompletion(h.proof(ticket).proposal).ended?.outcome).toBe('completed')
+  })
+  it('refuses a stored personal ticket that lost its completion metadata', () => {
+    const h = harness('verified', {}, true), ticket = h.create()
+    const corrupt = h.repo.tickets.get(ticket.id)!; delete corrupt.completion; h.repo.tickets.save(corrupt)
+    expect(() => h.engine.reportAssignment(ticket.id, latestAssignment(ticket)!.id, { state: 'ready', summary: 'unsafe fallback' })).toThrow()
+    expect(h.repo.tickets.get(ticket.id)!.ended).toBeUndefined()
+  })
+  it('rolls creation back if the repository strips personal lifecycle fields', () => {
+    const h = harness('verified', {}, true)
+    const save = h.repo.tickets.save
+    h.repo.tickets.save = ticket => { const copy = structuredClone(ticket); delete copy.completion; save(copy) }
+    expect(() => h.create()).toThrow()
+    expect(h.repo.tickets.list()).toEqual([])
+    expect(h.executor.start).not.toHaveBeenCalled()
+  })
   it('holds a ready result open and refuses the ticket-only report entry', () => {
     const h = harness(), ticket = h.create()
     expect(() => h.engine.report(ticket.id, { state: 'ready', summary: 'bypass' })).toThrow()

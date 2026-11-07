@@ -100,7 +100,9 @@ pa start / pa status / pa doctor / pa backup / pa stop
 
 设计调研阶段运行的原仓 144 个测试仅作为 reference baseline。随后 G0 已完成：Agent A 的独立提取/144 测试和 AST 复核，主 Agent 的单一来源契约包/183 测试/独立构建，Agent B 在打包补正后的 darwin-arm64 目标组合/30 探针与独立复验。当前 G0 结论和范围见 [交接报告](../docs/adr/bootstrap/g0-main-report.md)。
 
-尚未实现生产协调器、核心完成/fence 扩展、正式 Store/Runner，也未启动原生 agent 模型任务或学习实验。原生产品版本/协议调研依然不代表接入通过，其他平台保持 NOT_TESTED。
+G1 已交付正式 core 的候选/可信完成、Assignment-scoped report/read、当前版本/退役守卫，以及共享 workspace/检查入口；见 [G1 交接](../docs/adr/core/g1-core-handoff.md)。core 176 项和契约 183 项测试通过，真实 Store/Runner 联调尚未通过，因此整体 G1 仍在进行。
+
+尚未实现完整产品协调器，也未运行原生 agent 模型任务或学习实验。原生产品版本/协议调研依然不代表接入通过，未实际执行的平台能力保持 NOT_TESTED。
 
 文档一致性检查：`node product-spec/tools/verify-spec.mjs`。公共类型检查命令见 07。这些检查只证明规格内部一致和草案可编译，不证明产品稳定性或学习收益。
 
@@ -357,9 +359,11 @@ ZCode 源码可见不等于安装版已兼容；DSH 的 profile/SDK 版本分别
 
 # 02 架构、代码复用与唯一状态来源
 
-日期：2026-11-07。本文是方案 B 的实施蓝图并补充 G0 进度；正式产品内核及生产实现仍未完成。
+日期：2026-11-07。本文是方案 B 的实施蓝图并补充 G0/G1 进度；整体产品实现和 G1 跨模块验收仍未完成。
 
-阶段更新：蓝图之后，G0-A 的隔离 core 提取已通过独立验收，详见 [复核记录](../docs/adr/bootstrap/reviews/g0-agent-a.md)。正式产品包及以下必要 core 扩展仍未实现；本文原有“原仓 reference baseline”与后来“独立提取通过”的证据不可混用。
+阶段更新：蓝图之后，G0-A 的隔离 core 提取已通过独立验收，详见 [复核记录](../docs/adr/bootstrap/reviews/g0-agent-a.md)。本文原有“原仓 reference baseline”与后来“独立提取通过”的证据不可混用；正式扩展的后续进展见下一段。
+
+后续 G1 更新：`packages/orchestrator-core` 及完成/报告/候选/退役扩展已实现第一批，见 [G1 核心交接](../docs/adr/core/g1-core-handoff.md)。以下设计门槛仍用于后续真实存储和运行时验收，不能将纯核心测试替代物理停止/事务接线证据。
 
 ## 1. 最终选择
 

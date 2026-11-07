@@ -47,7 +47,7 @@
     {
       "path": "src/core/index.ts",
       "upstreamSha256": "a5a1cf43f02eafaf520a5bfaf5e76b71ba521d04ee648cfcf12b3843cc474a3e",
-      "currentSha256": "38ce706e6f9ca5d09b3af821a3882f757c0ffd9052e753b053edc6a71732688d",
+      "currentSha256": "d9ee781f30fefc2a60c88c733431660206f1463fb4f0ccccf1eaee7cd7334d2a",
       "treatment": "adapted",
       "reason": "Public completion ports/digest helpers and scoped roles."
     },
@@ -75,7 +75,7 @@
     {
       "path": "src/core/part.ts",
       "upstreamSha256": "437c4f4bcc05e836c056cdb45bbf451e55242d62b602b489f4df902be112e73e",
-      "currentSha256": "c720e2c84843d5f8e4ffb19d728d5b84e8cf122a039209034ac9a71b3f836aa4",
+      "currentSha256": "3a6853ebe470db22c50967d70ef7dab12ba71c8ad6dc4419944b867dd2ca0666",
       "treatment": "adapted",
       "reason": "Trusted completion ports, current-contract owner filtering and candidate invalidation."
     },
@@ -110,7 +110,7 @@
     {
       "path": "src/core/tickets.ts",
       "upstreamSha256": "1d9f964ad34b54cbb0403bde16af58851e5e80111177ce73a27b6034e9af940e",
-      "currentSha256": "d77b6f62a082a434d293694c352facc7b097aed4161191130927ba3c353e98bd",
+      "currentSha256": "88be7e4915001cfcee6ce340734331ad67cad665953d8f22158c459b2b6049c0",
       "treatment": "adapted",
       "reason": "Opt-in creation, invalidation, personal resume restrictions and completion defense."
     },
@@ -136,11 +136,15 @@
     },
     {
       "path": "src/core/completion-state.ts",
-      "sha256": "c4355707e90c6b836e0cb319ec5b6e6c2c9043a61ee79900aa71b94d47faad4e"
+      "sha256": "0309064ed844e1c153ca5e50571c1ba1259a6f4896f8891368a124a74029f987"
     },
     {
       "path": "src/core/completion.ts",
       "sha256": "1e62cf92f05e0e052c08082d676de67384e02430e8bd09e0a39de3ec874c44ae"
+    },
+    {
+      "path": "src/core/personal.ts",
+      "sha256": "c6d736d42844a7cabb5dc8973ee95af4dee1dec18ef1f640b86590ce761ab883"
     },
     {
       "path": "src/index.ts",
