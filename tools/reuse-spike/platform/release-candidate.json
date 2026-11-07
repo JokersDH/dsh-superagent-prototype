@@ -1,0 +1,179 @@
+{
+  "schema": "g0b-release-candidate/1",
+  "generatedAt": "2026-11-07T08:08:27.146Z",
+  "status": "PASS",
+  "scope": "Only darwin/arm64 was executed. Other OS/arch are NOT_TESTED and must not inherit this PASS.",
+  "baseCommit": "f5c5754ec979fbee1d51c187cf0a5b7198e27477",
+  "branch": "codex/g0-platform-validation",
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "kernel": "Darwin 25.6.0",
+    "productVersion": "macOS 26.6",
+    "cpu": "Apple Silicon (RELEASE_ARM64_T8142)"
+  },
+  "components": {
+    "node": {
+      "version": "24.22.2",
+      "reported": "v24.22.2",
+      "platformTag": "darwin-arm64",
+      "url": "https://nodejs.org/dist/v24.22.2/node-v24.22.2-darwin-arm64.tar.gz",
+      "sha256": "aa9549349e47dffaa42dcf95d6e06ade8c4bdafc980979883b88767670df385a",
+      "checksumSource": "https://nodejs.org/dist/v24.22.2/SHASUMS256.txt",
+      "napi": "10",
+      "modules": "137",
+      "v8": "13.6.233.17-node.63",
+      "installedTo": ".cache/runtimes/node-v24.22.2-darwin-arm64"
+    },
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.7.0",
+      "url": "https://registry.npmjs.org/pnpm/-/pnpm-11.7.0.tgz",
+      "integrity": "sha512-GcyFLBIMcSV2DyRD7mvgyltA+fUFmN4aCaHxd1A+AQ5Xwjx3ZG4B52HeWb+HT7IqM5jDOrlpH8E+uUa28PTWIA==",
+      "installedTo": ".cache/runtimes/pnpm-11.7.0"
+    },
+    "binding": {
+      "name": "better-sqlite3",
+      "version": "13.0.3",
+      "registryIntegrity": "sha512-RbOBxmLBG8uvFUc15X9+9SFemKcQ0WBuISBVkpuiaUB2qblC8UWlHEjdWVoZ8AdhSwmoEgsiXKfopX0CQxaACQ==",
+      "abi": "N-API (prebuilt)",
+      "lifecycleScripts": [],
+      "localCompileHappened": false,
+      "buildDirectoryPresent": false,
+      "prebuildUsed": "node_modules/better-sqlite3/prebuilds/darwin-arm64.node",
+      "prebuildSha256": "98e0e8acd01c632fe5615243e1296af0372826f8783b18fc31c506f73c47459c",
+      "prebuildBytes": 1980736,
+      "prebuildsShipped": [
+        "darwin-arm64.node",
+        "darwin-x64.node",
+        "linux-arm64.node",
+        "linux-x64.node",
+        "linuxmusl-arm64.node",
+        "linuxmusl-x64.node",
+        "win32-arm64.node",
+        "win32-x64.node"
+      ]
+    },
+    "sqlite": {
+      "version": "3.53.4",
+      "sourceId": "2026-07-24 19:02:57 bf7c7f30031888f4e796e429ab3978879485813aaca6f641c7b33e4e09459bcc",
+      "minimumVersion": "3.51.3",
+      "admission": "PASS",
+      "compileOptionsCount": 59,
+      "journalMode": "WAL",
+      "foreignKeys": 1,
+      "synchronous": 2,
+      "busyTimeoutMs": 5000
+    }
+  },
+  "buildPolicy": {
+    "file": "pnpm-workspace.yaml",
+    "allowBuilds": {
+      "better-sqlite3": false
+    },
+    "reason": "better-sqlite3 13.0.3 declares no install/postinstall script and ships prebuilt N-API binaries; pnpm 11 otherwise blocks the install with ERR_PNPM_IGNORED_BUILDS. Declining the build keeps the install non-interactive and provably compile-free.",
+    "equivalentAlternative": "pnpm install --config.strict-dep-builds=false (less explicit; not used in this candidate)"
+  },
+  "manifests": {
+    "packageJson": "6eeeb8dd1be539bc3392a8d41f6852968669e589b21c78b903d8243eb50dd5a9",
+    "pnpmLock": "d9e9f415450feddb03d0b57988d98702a32ed0574dc466342a50a53750555851",
+    "pnpmWorkspace": "591f1dcd74fb86351b7e81bcbeacfd45e2b0eedc4e43dbbac7539c6cc9c3e472"
+  },
+  "evidence": {
+    "install": {
+      "facts": "evidence/install/install.json",
+      "factsSha256": "bb032da592dd94aef37ac1ef6037c79880c2dd08bd5a3fc908e61cb822dfef77",
+      "log": "evidence/install/pnpm-install.log",
+      "logSha256": "98e8bd68d6a2f20d75c6a5fc6a91e617d1c0c7f81b32d5c05fb5829fd7e0ba26",
+      "exitCode": 0,
+      "logBytes": 52
+    },
+    "release-proposed": {
+      "env": "evidence/release-proposed/env.json",
+      "envSha256": "76d5b6ad4d8c025d7f52e8005ca2fd1790e7e8c6455a788332a27e7aad9b9b64",
+      "tx": "evidence/release-proposed/tx.json",
+      "txSha256": "2baa7ba5fb51ea2158c8cdeba2c78e61211a0cd1367f75095f657bedaa97a2fa",
+      "backup": "evidence/release-proposed/backup.json",
+      "backupSha256": "55690ecd9f5091b005c7b524ab355b6113adc74d6894f011d08bb7797e49eb87",
+      "crash": "evidence/release-proposed/crash.json",
+      "crashSha256": "9573ed837c7fe1f03e278460d1a428b54ebed3a51442c4f115d5bb4322f76276",
+      "summary": "evidence/release-proposed/summary.json",
+      "summarySha256": "47493d0ca32375b59d6b01fbca57d111d086acad9c9f3cf11f6b95854b83ab0a"
+    },
+    "local-observed": {
+      "summary": "evidence/local-observed/summary.json",
+      "summarySha256": "eec04b70c48a7924dcf3c25860b4c6f13dee806b80a6cdcfb6953366f1fb743e",
+      "node": "v24.21.0",
+      "overall": "PASS"
+    }
+  },
+  "reproduction": {
+    "commands": [
+      "node scripts/fetch-runtime.mjs",
+      "node scripts/install-deps.mjs",
+      ".cache/runtimes/node-v24.22.2-darwin-arm64/bin/node scripts/run-probes.mjs --profile release-proposed",
+      "node scripts/run-probes.mjs --profile local-observed",
+      ".cache/runtimes/node-v24.22.2-darwin-arm64/bin/node --test test/probes.test.mjs",
+      "node --test test/probes.test.mjs"
+    ],
+    "isolatedCaches": [
+      ".cache/pnpm-store",
+      ".cache/npm-cache",
+      ".cache/downloads",
+      ".cache/runtimes"
+    ]
+  },
+  "tested": [
+    "clean dependency install from the committed lockfile with pnpm 11.7.0 on Node 24.22.2 (exit 0, no compiler)",
+    "native binding load + SELECT sqlite_version() (3.53.4)",
+    "explicit load of the shipped prebuild via nativeBinding",
+    "WAL mode, foreign_keys=ON, synchronous=FULL, busy_timeout=5000",
+    "foreign-key enforcement, unique constraint enforcement",
+    "explicit rollback, nested savepoints (inner rollback)",
+    "same-transaction commit of state + effect + receipt",
+    "injected rollback breakpoint: all three records rolled back",
+    "reader connection sees committed rows only",
+    "integrity_check and foreign_key_check on the probe database",
+    "online backup from a live WAL database to a new directory, with one concurrent writer commit",
+    "restore: integrity_check=ok, foreign_key_check=0, schema digest identical, seeded rows present",
+    "SIGKILL after commit: committed row survives",
+    "SIGKILL before COMMIT: open transaction is rolled back",
+    "node:test suites under Node 24.21.0 and 24.22.2 (4/4 each)"
+  ],
+  "notTested": [
+    "any OS/arch other than darwin/arm64",
+    "Node versions other than 24.21.0 and 24.22.2",
+    "large databases, long-running WAL growth, backup throughput under load",
+    "power loss, filesystem failure, NFS or sync-folder state directories",
+    "multi-process writers, writer lease, product Store schema and migrations",
+    "afterCommit ordering, queue/effect implementation, business-level recovery (OPS-02, REL-*)",
+    "product artifact files, Runner journals, native agent processes",
+    "macOS code signing, notarization and universal binaries",
+    "node:sqlite as an alternative binding (no ADR; deliberately not switched)"
+  ],
+  "blockers": [
+    {
+      "id": "R1",
+      "severity": "medium",
+      "summary": "pnpm 11 blocks install of better-sqlite3 as an unapproved builder although the package has no build scripts.",
+      "mitigation": "Explicit allowBuilds: better-sqlite3: false in the local pnpm-workspace.yaml; re-run this probe whenever the binding version changes."
+    },
+    {
+      "id": "R2",
+      "severity": "medium",
+      "summary": "The proposed Node 24.22.2 is not the machine default; bootstrap must provision it (or a CI image must pin it).",
+      "mitigation": "Use the checksum-locked download in this candidate, or preinstall the same version."
+    },
+    {
+      "id": "R3",
+      "severity": "high",
+      "summary": "Only darwin/arm64 was executed; other platforms have no evidence.",
+      "mitigation": "Run the same scripts on each target OS/arch and record a per-machine matrix; do not inherit this PASS."
+    }
+  ],
+  "fallbacks": [
+    "Node 24.21.0 with the same better-sqlite3 13.0.3 (observed PASS here, but must be re-pinned and re-recorded)",
+    "If a platform lacks a shipped prebuild: treat it as an explicit local-compile lane, allow the build and record compiler identity; never switch silently",
+    "node:sqlite only after its own ADR and equivalent transaction/backup/crash tests"
+  ]
+}

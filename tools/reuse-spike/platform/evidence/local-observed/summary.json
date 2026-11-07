@@ -1,0 +1,43 @@
+{
+  "profile": "local-observed",
+  "startedAt": "2026-11-07T08:08:05.426Z",
+  "finishedAt": "2026-11-07T08:08:05.507Z",
+  "runtime": {
+    "node": "v24.21.0",
+    "execPath": "<HOME>/.nvm/versions/node/v24.21.0/bin/node",
+    "platform": "darwin",
+    "arch": "arm64",
+    "napi": "10",
+    "nodeBuiltinSqlite": "3.53.4"
+  },
+  "workdir": "<TMPDIR>/g0b-probes-QhVU3t",
+  "probes": {
+    "env": {
+      "status": "PASS",
+      "checks": 8,
+      "failed": []
+    },
+    "tx": {
+      "status": "PASS",
+      "checks": 12,
+      "failed": []
+    },
+    "backup": {
+      "status": "PASS",
+      "checks": 6,
+      "failed": []
+    },
+    "crash": {
+      "status": "PASS",
+      "checks": 4,
+      "failed": []
+    }
+  },
+  "overall": "PASS",
+  "evidenceDir": "evidence/local-observed",
+  "limitations": [
+    "Probe schemas are throwaway; they are not the product Store, migrations or Queue.",
+    "Only this host OS/arch and the Node binary that ran the probes are covered.",
+    "A schema export or an upstream test result is not native/product compatibility evidence."
+  ]
+}

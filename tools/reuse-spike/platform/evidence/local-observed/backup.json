@@ -1,0 +1,82 @@
+{
+  "profile": "local-observed",
+  "probe": "backup",
+  "ranAt": "2026-11-07T08:08:05.438Z",
+  "runtime": {
+    "node": "v24.21.0",
+    "execPath": "<HOME>/.nvm/versions/node/v24.21.0/bin/node",
+    "platform": "darwin",
+    "arch": "arm64",
+    "napi": "10"
+  },
+  "id": "backup",
+  "ok": true,
+  "checks": [
+    {
+      "id": "backup.file-created",
+      "status": "PASS",
+      "detail": "40960 bytes in <TMPDIR>/g0b-probes-QhVU3t/backup/restored"
+    },
+    {
+      "id": "backup.integrity-check",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "id": "backup.foreign-keys-clean",
+      "status": "PASS",
+      "detail": "0 violations"
+    },
+    {
+      "id": "backup.schema-identical",
+      "status": "PASS",
+      "detail": "source=59122cb4f18e9dff… restored=59122cb4f18e9dff…"
+    },
+    {
+      "id": "backup.seeded-rows-present",
+      "status": "PASS",
+      "detail": "parents=221 children=220"
+    },
+    {
+      "id": "backup.child-rows-reference-present-parents",
+      "status": "PASS",
+      "detail": "foreign_key_check is empty, so every restored child has its parent"
+    }
+  ],
+  "facts": {
+    "backupApi": "better-sqlite3 Database#backup (SQLite online backup API), destination in a new directory",
+    "backupMs": 2,
+    "source": {
+      "path": "<TMPDIR>/g0b-probes-QhVU3t/backup/source.db",
+      "bytes": 40960,
+      "walBytes": 70072,
+      "parents": 221,
+      "children": 220,
+      "userVersion": 0
+    },
+    "restored": {
+      "path": "<TMPDIR>/g0b-probes-QhVU3t/backup/restored/copy.db",
+      "bytes": 40960,
+      "parents": 221,
+      "children": 220,
+      "userVersion": 0,
+      "integrity": "ok",
+      "foreignKeyViolations": 0,
+      "schemaSha256": "59122cb4f18e9dff7fa5c5826df99145dfcee0328b9665836d6dadbd1eff8e3c",
+      "parentDigest": "5233ecc5db4e4d8417f06172cde8d0ee470ef0276eaedfee0af7a5fcebd923ce",
+      "childDigest": "097c3e47f86e86f96a38ec73ab61a5d9e64a4ac69a0de1cc0235a60704fed210",
+      "journalMode": "wal"
+    },
+    "concurrentWrites": {
+      "attempted": 1,
+      "committed": 1,
+      "busy": 0
+    },
+    "restoredSha256": "62dc68e6a7ec6f5e0bbf5d1d8f92a827049e1b43b7c6f67f4ee628240fc82755",
+    "limitations": [
+      "Database snapshot only: product artifact files, Runner state, journals and full business recovery are not included.",
+      "Restore was verified by opening the copy and running integrity/foreign_key checks; no production migration was run against it.",
+      "Concurrent writes were attempted through a second connection to prove the snapshot stays consistent, not to measure backup throughput under load."
+    ]
+  }
+}

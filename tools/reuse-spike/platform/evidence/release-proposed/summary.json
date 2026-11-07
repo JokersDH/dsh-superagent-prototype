@@ -1,0 +1,43 @@
+{
+  "profile": "release-proposed",
+  "startedAt": "2026-11-07T08:08:05.310Z",
+  "finishedAt": "2026-11-07T08:08:05.392Z",
+  "runtime": {
+    "node": "v24.22.2",
+    "execPath": "<PLATFORM_ROOT>/.cache/runtimes/node-v24.22.2-darwin-arm64/bin/node",
+    "platform": "darwin",
+    "arch": "arm64",
+    "napi": "10",
+    "nodeBuiltinSqlite": "3.53.4"
+  },
+  "workdir": "<TMPDIR>/g0b-probes-C8ZX8H",
+  "probes": {
+    "env": {
+      "status": "PASS",
+      "checks": 8,
+      "failed": []
+    },
+    "tx": {
+      "status": "PASS",
+      "checks": 12,
+      "failed": []
+    },
+    "backup": {
+      "status": "PASS",
+      "checks": 6,
+      "failed": []
+    },
+    "crash": {
+      "status": "PASS",
+      "checks": 4,
+      "failed": []
+    }
+  },
+  "overall": "PASS",
+  "evidenceDir": "evidence/release-proposed",
+  "limitations": [
+    "Probe schemas are throwaway; they are not the product Store, migrations or Queue.",
+    "Only this host OS/arch and the Node binary that ran the probes are covered.",
+    "A schema export or an upstream test result is not native/product compatibility evidence."
+  ]
+}
