@@ -1,0 +1,27 @@
+{
+  "gate": "G1",
+  "status": "IN_PROGRESS_JOURNAL_ADMISSION_BLOCKED",
+  "acceptedInputs": {
+    "storageRuntimeStateAndObservations": "247339baa8e8a9c6586036e37ae8fc28d17b707f",
+    "strictPayloadAndAttemptIsolation": "906a23d"
+  },
+  "scopedEvidence": {
+    "storage": { "testsPassed": 66, "independentTargetNode": "24.22.2" },
+    "mainProductionAndFactRecovery": { "testsPassed": 14, "realSigkillWindows": 2, "report": "reports/releases/g1-recovery.json" },
+    "candidateJournalFormatInterop": { "casesPassed": 3, "writerAdmissionProven": false, "report": "reports/releases/g1-journal-interop.json" },
+    "candidateRuntimeBranch": { "testsPassed": 125, "testsFailed": 1, "reviewedCommit": "24b4449bd9c09097c3144e345fb0ac939cf99f91", "remainingAssertion": "oversize frame reason differs by stream chunking" }
+  },
+  "blocked": [
+    "Journal append persistence synchronization",
+    "Fail-closed corrupt-journal append/recovery",
+    "Same-factId conflicting content detection",
+    "Authoritative ACK validation"
+  ],
+  "remaining": [
+    "Authenticated independent-Runner IPC reconnect",
+    "Complete resource barrier and external-side-effect reconciliation",
+    "Full gate coverage and calibrated load/performance evidence"
+  ],
+  "notClaimed": ["Full G1 passed", "Vendor native compatibility", "Power-loss durability", "Usable personal-assistant product or release"],
+  "nextAssignments": { "agentA": "agent-tasks/g2-agent-a-workspaces-verification.md", "agentB": "agent-tasks/g1-journal-acceptance.md", "main": "Recovery/production composition and gate review" }
+}

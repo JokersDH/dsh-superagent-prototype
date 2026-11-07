@@ -64,7 +64,7 @@ function fixture(t, scenario = 'happy') {
     }
   }
   const processes = new RegisteredProcessHost({ resolveCwd: () => directory, resolveEnv: () => ({ ...process.env, FAKE_AGENT_RECEIPTS: receiptsPath }) })
-  const host = new ControlledRunnerHost({ payloads: storedAttemptPayloads(store), factSink: sink, processHost: processes }, () => new FakeDriver({ scenario, preparedPolicyRef }))
+  const host = new ControlledRunnerHost(requested => ({ spec: requested, options: { payloads: storedAttemptPayloads(store), factSink: sink, processHost: processes } }), () => new FakeDriver({ scenario, preparedPolicyRef }))
   const supervisor = new AttemptSupervisor({
     runner: host, sink, preparedPolicyRef, stopDeadlineMs: 500,
     bindings: {
@@ -72,7 +72,7 @@ function fixture(t, scenario = 'happy') {
       save: value => store.uow.atomic(() => {
         const known = store.bindings.binding(value.attemptId)
         store.bindings.record({ ...value, runnerIdentityRef: producer.runnerIdentityRef, source: producer.source, resources: known?.resources ?? [] })
-        store.bindings.setCurrent(value.ticketId, value.attemptId)
+        if (store.bindings.current(value.ticketId)?.attemptId !== value.attemptId) store.bindings.setCurrent(value.ticketId, value.attemptId)
       }),
     },
   })
@@ -93,6 +93,9 @@ test('production tables + controlled fake child persist strict turn/exit facts a
   assert.ok(h.observedFacts.some(input => input.kind === 'turn.ended'))
   assert.ok(h.observedFacts.some(input => input.kind === 'runtime.exited'))
   for (const receipt of h.observedReceipts) assert.equal(h.store.facts.get(receipt.factId).seq, receipt.seq)
+  const summary = h.store.observations.summarize(h.spec.attemptId)
+  assert.equal(summary.resources[0].exit.observed, true)
+  assert.equal(summary.resources[0].quiescence, 'unknown')
   assert.equal(h.store.domain.tickets.get(h.spec.ticketId).ended, undefined)
   assert.equal(h.core.completionCandidate(h.spec.ticketId), undefined)
   assert.equal(h.frames().filter(frame => frame.type === 'begin.accepted').length, 1)
@@ -139,6 +142,7 @@ test('refusing the last receipt write rolls production core, binding, queued rec
   assert.equal(h.store.bindings.current(binding.ticketId).state, 'active')
   assert.equal(h.store.queue.dueRows('runtime.reconcile', 0, 10).length, 0)
   assert.equal(h.store.events.cursor(), cursor)
+  assert.equal(h.store.observations.get(input.factId), undefined)
 })
 test('an enabled contract does not override current Policy revocation', async t => {
   const h = fixture(t)

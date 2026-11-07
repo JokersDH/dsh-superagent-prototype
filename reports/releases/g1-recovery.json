@@ -1,0 +1,42 @@
+{
+  "status": "PASS_FACT_RECOVERY_AND_PROCESS_CRASH_SLICE",
+  "tests": 14,
+  "realSigkillWindows": 2,
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "checkedAt": "2026-11-07T15:45:13.029Z",
+  "results": [
+    {
+      "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/orchestrator-core --filter @personal-agent/effects --filter @personal-agent/storage -r run build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm exec tsc -p tests/integration/tsconfig.runtime.json",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:production",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:recovery",
+      "status": "PASS"
+    }
+  ],
+  "pending": [
+    "Candidate Journal writer admission (see g1-journal-review.json)",
+    "IPC-authenticated reconnect to an independent live Runner",
+    "Whole resource-barrier/reconciliation workflow",
+    "Full G1, vendor compatibility and usable product release"
+  ],
+  "limitations": [
+    "Crash snapshots are fsynced test decoder exports, not the unaccepted Journal writer",
+    "SIGKILL/reopen does not prove power-loss behavior",
+    "No replay issues new begin/deliver/answer/native commands"
+  ]
+}

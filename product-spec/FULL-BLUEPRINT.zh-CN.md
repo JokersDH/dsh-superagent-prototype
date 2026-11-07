@@ -106,6 +106,8 @@ G1 已交付正式 core 的候选/可信完成、Assignment-scoped report/read�
 
 两轮阻断复现现已通过。最新 A 存储 54 项、B 运行时 98 项测试通过；事实入口 25 项及生产仓储＋受控假子进程的 5 项集成测试通过，见 [最新交接](../docs/adr/core/g1-production-handoff.md)。下一批 A 做运行状态/当前授权/资源观察，B 做严格载荷/每 attempt 隔离/持久 Journal。完整 G1 的崩溃重连和资源恢复仍未完成，不将这些局部结果作为产品完成。
 
+恢复批次更新：A 仓储已到 66 项通过，运行观察接入主线；main 的生产接线/事实恢复共 14 项通过，包括两个真实 SIGKILL 窗口。B 的严格载荷和 context factory 已集成，Journal 写入器仍因四项实测失败留在候选分支。当前分工和限制见 [恢复交接](../docs/adr/core/g1-recovery-handoff.md)，整体 G1 仍未通过。
+
 文档一致性检查：`node product-spec/tools/verify-spec.mjs`。公共类型检查命令见 07。这些检查只证明规格内部一致和草案可编译，不证明产品稳定性或学习收益。
 
 整合时发现的接口与依赖问题及修正见 [复核记录](reviews/integrated-design-review.md)，可作为后续架构评审和回归依据。

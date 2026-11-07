@@ -2,7 +2,7 @@ import { JsonSchema } from '@personal-agent/contracts'
 import type { AttemptIO, Json, RuntimeFactPayload } from '@personal-agent/contracts'
 import type { Engine, Policy } from '@personal-agent/orchestrator-core'
 import type { ProductStore } from '@personal-agent/storage'
-import { createRuntimeIngress } from './runtime-ingress.ts'
+import { createRuntimeIngress, jsonDigest } from './runtime-ingress.ts'
 import type { IngressBinding, RuntimeIngressStore } from './runtime-ingress.ts'
 
 /** Compose production storage ports without private SQL or a second domain lifecycle. */
@@ -10,6 +10,7 @@ export function createStoredRuntimeIngress(store: ProductStore, core: Pick<Engin
   if (typeof policy !== 'function') throw new TypeError('Stored runtime ingress requires the current trusted policy')
   const facts = core.personalExecutor()
   const observe: (input: Parameters<RuntimeIngressStore['applyBusiness']>[0], payload: RuntimeFactPayload, disposition: 'business' | 'physical_only') => void = (input, payload, disposition) => {
+    store.observations.record({ fact: input, payload, disposition, payloadSha256: jsonDigest(JsonSchema.parse(payload)) })
     store.events.append({
       topic: 'runtime.observed', entityRef: input.attemptId,
       payload: { factId: input.factId, ticketId: input.ticketId, assignmentId: input.assignmentId, attemptId: input.attemptId, fenceEpoch: input.fenceEpoch, contract: input.contract, kind: payload.kind, payloadRef: input.payloadRef, disposition },
