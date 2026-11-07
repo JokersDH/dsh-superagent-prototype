@@ -3,4 +3,5 @@ pnpm 11.7.0
 os Darwin arm64
 better-sqlite3 13.0.3
 sqlite 3.53.4
-workspace packages/*: storage+effects are workspace members; root lock update is an integration step
+product schema: v3 (domain/product, writer_claim, runtime-ingress storage)
+evidence: storage 54/54, effects 8/8, ingress 18+7, core-on-SQLite 178/178, both official repro scripts PASS

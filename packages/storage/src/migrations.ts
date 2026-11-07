@@ -92,8 +92,27 @@ const V2: Migration = {
   ],
 }
 
+/**
+ * v3: production runtime-ingress storage (WP-01 ingress store request). Bindings are retained by
+ * attempt for history, with a separate current-by-ticket pointer; `runtime_authority` holds the
+ * enabled contract revisions used for the current-authorization check; `ingress_payloads` records
+ * immutable, content-addressed payload references. Normalized observation reducers stay in the
+ * composition bridge; this owner supplies the durable pieces.
+ */
+const V3: Migration = {
+  version: 3,
+  name: 'runtime-ingress-storage',
+  statements: [
+    `CREATE TABLE runtime_bindings (attempt_id TEXT PRIMARY KEY, ticket_id TEXT NOT NULL, state TEXT NOT NULL, value TEXT NOT NULL)`,
+    `CREATE INDEX runtime_bindings_ticket ON runtime_bindings (ticket_id)`,
+    `CREATE TABLE runtime_current (ticket_id TEXT PRIMARY KEY, attempt_id TEXT NOT NULL)`,
+    `CREATE TABLE runtime_authority (work_id TEXT NOT NULL, revision INTEGER NOT NULL, digest TEXT NOT NULL, enabled INTEGER NOT NULL, PRIMARY KEY (work_id, revision, digest))`,
+    `CREATE TABLE ingress_payloads (ref TEXT PRIMARY KEY, sha256 TEXT NOT NULL, artifact_id TEXT NOT NULL, bytes INTEGER NOT NULL, created_at TEXT NOT NULL)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>

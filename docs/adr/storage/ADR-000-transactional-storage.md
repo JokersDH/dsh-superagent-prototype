@@ -71,8 +71,22 @@ the domain SQL, the savepoint transaction model, and the effect queue algorithm;
     (audit insert or breadcrumb write) releases the claim and breadcrumb. Without a registry only a
     free state is acquired; stale takeover fails closed. (REL-03, review A-LOCK-INITIALIZATION.)
 
+11. **Runtime-ingress storage (WP-01 ingress store request)**: migration v3 adds `runtime_bindings`
+    (attempt history with complete binding JSON: ticket/assignment/attempt/epoch/contract, runner
+    identity/source, state, resources), `runtime_current` (the current-by-ticket pointer, distinct
+    from history), `runtime_authority` (enabled contract revisions for the current-authorization
+    check) and `ingress_payloads` (immutable content-addressed JSON payload references).
+    `RuntimeBindings` enforces the immutable binding identity and never lets an ended attempt
+    reactivate; `ImmutablePayloads` writes canonical JSON through `ArtifactStore` (file and record
+    complete before returning) and reads back value + host-recorded canonical SHA-256 after
+    verifying both the artifact and the record. The composed `RuntimeIngressStore` (reducers and
+    the authenticated Runner context) stays in the composition bridge; storage never defines the
+    public ingress interface and a compatibility fixture proves the shapes match.
+
 ## Consequences
 
+- Migration v3 extends the same owned migration entry (v1 domain/product tables, v2 writer claim,
+  v3 runtime-ingress tables); an existing v2 database applies v3 on the next open.
 - Migration v2 (`writer_claim`, a single-row table) is part of the same owned migration entry; it
   applies to databases created at v1 on the next open, and archive/audit rows in
   `coordinator_instances` remain append-only.

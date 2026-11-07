@@ -14,6 +14,7 @@ import { DispatchLedger } from './dispatch.ts'
 import { ChannelReceipts } from './outbox.ts'
 import { Answers } from './answers.ts'
 import { ArtifactStore } from './artifacts.ts'
+import { ImmutablePayloads, RuntimeAuthority, RuntimeBindings } from './ingress.ts'
 import { UnitOfWork } from './uow.ts'
 import { type LockContent, type LockRegistry } from './writer-lock.ts'
 
@@ -39,6 +40,10 @@ export class ProductStore {
   readonly channels: ChannelReceipts
   readonly answers: Answers
   readonly artifacts: ArtifactStore
+  /** Runtime-ingress storage: binding history/current, enabled-contract authority, immutable payloads. */
+  readonly bindings: RuntimeBindings
+  readonly authority: RuntimeAuthority
+  readonly payloads: ImmutablePayloads
 
   constructor(options: ProductStoreOptions) {
     this.database = new ProductDatabase(options.path, options.report ? { report: options.report } : {})
@@ -53,6 +58,9 @@ export class ProductStore {
     this.channels = new ChannelReceipts(this.db)
     this.answers = new Answers(this.db, this.uow)
     this.artifacts = new ArtifactStore(this.db, options.artifactsRoot ?? dirname(options.path))
+    this.bindings = new RuntimeBindings(this.db)
+    this.authority = new RuntimeAuthority(this.db)
+    this.payloads = new ImmutablePayloads(this.db, this.artifacts)
   }
 
   close(): void { this.database.close() }
@@ -105,6 +113,10 @@ export { DispatchLedger, type DeliveryState, type DispatchRecord } from './dispa
 export { ChannelReceipts, CHANNEL_SEND_KIND, type ChannelReceipt, type OutboundMessage, type ReplyStatus, type DropReason, type ChannelRef } from './outbox.ts'
 export { Answers, AnswerConflict, type DeliveryStatus, type RecordedAnswer } from './answers.ts'
 export { ArtifactStore, ensureArtifactRoot, artifactRoot, stateDirOf, type ArtifactRecord, type WrittenArtifact, type GcResult } from './artifacts.ts'
+export {
+  RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict,
+  canonicalJson, canonicalDigest, type BindingIdentity,
+} from './ingress.ts'
 export { backupDatabase, verifyDatabase, type BackupResult, type VerifyResult } from './backup.ts'
 export { WriterLock, WriterLockHeld, type LockContent, type LockProbe, type LockRegistry, type LockVerdict } from './writer-lock.ts'
 export {

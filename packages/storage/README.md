@@ -27,6 +27,9 @@ no DSH imports, better-sqlite3 instead of `node:sqlite`.
 | `ArtifactStore` (`store.artifacts`) | Content-addressed files: temp → fsync → rename → reference; digest-verified reads; grace-period orphan GC. |
 | `backupDatabase`, `verifyDatabase` | SQLite online backup with WAL; integrity and `foreign_key_check`; restore opens without dispatching business. |
 | `WriterLock` | Atomic database claim (`writer_claim`: claim / CAS takeover / conditional release) plus an advisory breadcrumb lockfile written with its full content atomically. Empty/corrupt content fails closed; takeover needs a verifiably dead holder and the registry; suspected PID reuse is refused; a post-claim failure releases the claim. |
+| `RuntimeBindings` (`store.bindings`) | Attempt binding history (complete JSON: ticket/assignment/attempt/epoch/contract, runner identity/source, state, resources) plus the current-by-ticket pointer; immutable identity, ended attempts never reactivate. |
+| `RuntimeAuthority` (`store.authority`) | Enabled contract revisions (`workId`/`revision`/`digest`) for the ingress current-authorization check. |
+| `ImmutablePayloads` (`store.payloads`) | Canonical-JSON content-addressed payloads: file + record complete before return; reads verify the artifact and the recorded SHA-256. `canonicalJson`/`canonicalDigest` match the coordinator's `jsonDigest`. |
 | `applyMigrations`, `MIGRATIONS` | The single migration entry; checksums recorded in `schema_meta`; refuses upstream/unknown databases and drift/gap/future versions. |
 
 ## Run
