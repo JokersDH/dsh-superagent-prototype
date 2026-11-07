@@ -21,9 +21,12 @@ import type {
   ServeExit,
 } from '../../contracts/src/types.ts'
 import { DriverError, JsonLineDecoder, attemptIdentity, criticalFact, encodeFrame, factIdFor } from '../../driver-kit/src/index.ts'
+import { parseRuntimeFactPayload } from '../../contracts/src/validation.ts'
 import { CONTRACT_IDENTITY } from '../../contracts/src/identity.ts'
 
 export const FAKE_AGENT_PATH = fileURLToPath(new URL('./fake-agent.ts', import.meta.url))
+/** Placeholder used only to build a fact for validation; replaced by the real store reference. */
+const PENDING_PAYLOAD_REF = 'pending-payload'
 
 export type FakeDriverOptions = {
   scenario?: string
@@ -85,6 +88,8 @@ export class FakeDriver implements AgentDriverV1 {
     })
 
     // Drain stderr immediately: it is diagnostic only (REL-07) and must never fill the pipe.
+    // The drain must not outlive the serve: a killed process can leave stderr unclosed, so it is
+    // bounded by the same exit the outcome waits for, never awaited unconditionally.
     let stderrBytes = 0
     const stderrDrain = (async () => {
       try {
@@ -108,17 +113,26 @@ export class FakeDriver implements AgentDriverV1 {
     })
 
     const evidence = (suffix: string): string => `fake-${spec.attemptId}-${suffix}`
-    const recordFact = async (kind: RuntimeFactKind, payload: Json, nativeRef?: string): Promise<void> => {
-      const payloadRef = await io.payloads.store({ kind, value: payload }, 'critical')
+    /**
+     * Every critical fact is validated with the frozen `parseRuntimeFactPayload` *before* it is
+     * stored or recorded, so the fake Driver cannot smuggle a simplified object past the
+     * authoritative ingress (it would be rejected there anyway; failing here keeps the fixture honest).
+     */
+    const recordFact = async (kind: RuntimeFactKind, value: unknown, nativeRef?: string): Promise<void> => {
       factSeq += 1
-      const fact: CriticalFact = criticalFact(spec, {
-        factId: factIdFor(spec.attemptId, factSeq),
-        source: 'fake-driver',
-        kind,
-        payloadRef,
-        ...(nativeRef === undefined ? {} : { nativeRef }),
-      })
-      await io.record(fact)
+      const factId = factIdFor(spec.attemptId, factSeq)
+      const pending = criticalFact(spec, { factId, source: 'fake-driver', kind, payloadRef: PENDING_PAYLOAD_REF, ...(nativeRef === undefined ? {} : { nativeRef }) })
+      let parsed: ReturnType<typeof parseRuntimeFactPayload>
+      try {
+        parsed = parseRuntimeFactPayload(pending, { kind, value })
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        if (process.env.FAKE_DRIVER_DEBUG) process.stderr.write(`[fake-driver] payload ${kind} rejected: ${message}\n`)
+        throw new DriverError('protocol_error', 'invalid_fact_payload', `Fact ${kind} does not match the frozen payload schema: ${message}`)
+      }
+      // Payloads are JSON: deep-copy away the readonly markers the schema types carry.
+      const payloadRef = await io.payloads.store(JSON.parse(JSON.stringify(parsed)) as Json, 'critical')
+      await io.record({ ...pending, payloadRef })
     }
 
     const finish = (reason: ServeExit['reason'], extra: string[]): void => {
@@ -260,15 +274,11 @@ export class FakeDriver implements AgentDriverV1 {
           })
           break
         case 'question':
-          await recordFact('question.opened', {
-            questionId: String(value.questionId ?? 'q-1'),
-            nativeRequestId: value.nativeRequestId === undefined || value.nativeRequestId === null ? null : String(value.nativeRequestId),
-            attemptId: spec.attemptId,
-          }, String(value.questionId ?? 'q-1'))
+          await recordFact('question.opened', fakeQuestion(spec, value), String(value.questionId ?? 'q-1'))
           diagnostics.push(evidence('question-open'))
           break
         case 'answer_observed':
-          await recordFact('answer.observed', { answerRef: String(value.answerRef ?? 'unknown'), evidenceRefs: [evidence('answer')] })
+          await recordFact('answer.observed', fakeAnswerDelivery(value), String(value.answerRef ?? 'unknown'))
           break
         case 'cancel_observed':
           await recordFact('cancel.observed', {
@@ -306,7 +316,10 @@ export class FakeDriver implements AgentDriverV1 {
     if (terminal) await io.runtime.stopOwned(resource.resourceRef, 1000).catch(() => undefined)
     const exit = await Promise.race([
       resource.exited,
-      new Promise<{ code: number | null; signal: string | null }>(resolve => setTimeout(() => resolve({ code: null, signal: null }), 3000)),
+      new Promise<{ code: number | null; signal: string | null }>(resolve => {
+        const timer = setTimeout(() => resolve({ code: null, signal: null }), 3000)
+        if (typeof (timer as { unref?: () => void }).unref === 'function') (timer as { unref: () => void }).unref()
+      }),
     ])
     exitInfo = exit
     if (!terminal) {
@@ -319,11 +332,106 @@ export class FakeDriver implements AgentDriverV1 {
       await pump.catch(() => undefined)
     }
     const finalExit = await outcome
-    await stderrDrain.catch(() => undefined)
+    // Never block the serve on an unclosed stderr pipe; give it a bounded grace period only.
+    await Promise.race([
+      stderrDrain.catch(() => undefined),
+      new Promise(resolve => {
+        const timer = setTimeout(resolve, 250)
+        if (typeof (timer as { unref?: () => void }).unref === 'function') (timer as { unref: () => void }).unref()
+      }),
+    ])
     return { ...finalExit, evidenceRefs: [...finalExit.evidenceRefs, evidence(`stderr-bytes-${stderrBytes}`)] }
   }
 }
 
 function sameAttempt(command: RunnerCommand, spec: AttemptSpec): boolean {
   return command.attemptId === spec.attemptId && command.fenceEpoch === spec.fenceEpoch && command.assignmentId === spec.assignmentId && command.ticketId === spec.ticketId
+}
+
+/**
+ * A schema-complete `UserQuestion` for the fake native protocol.
+ *
+ * The frozen schema requires contract/scope/presentation/targets with a `NativeQuestionBinding`
+ * carrying a lossless `WireRequestId`, so a "simplified" object cannot pass the authoritative
+ * ingress. Options are fixed so `permission` questions keep their exact native choices.
+ */
+export function fakeQuestion(spec: AttemptSpec, frame: Record<string, unknown>): {
+  id: string
+  version: number
+  kind: 'permission'
+  contract: AttemptSpec['contract']
+  scope: {
+    projectId: string
+    allowedPaths: string[]
+    excludedPaths: string[]
+    externalActions: string[]
+  }
+  prompt: string
+  nativePayloadRef: string
+  presentation: { kind: 'choices'; options: Array<{ id: string; label: string; semantic: 'allow_once' | 'deny' }>; multiple: boolean }
+  targets: Array<{
+    ticketId: string
+    assignmentId: string
+    attemptId: string
+    fenceEpoch: number
+    contract: AttemptSpec['contract']
+    id: string
+    connectionEpoch: number
+    nativeRequestId: { kind: 'string'; value: string }
+    nativeMethod: string
+    provenanceRef: string
+  }>
+  openedAt: string
+  validity: 'open'
+} {
+  const questionId = String(frame.questionId ?? 'q-1')
+  const nativeId = String(frame.nativeRequestId ?? 'req-1')
+  return {
+    id: questionId,
+    version: 1,
+    kind: 'permission',
+    contract: spec.contract,
+    scope: { projectId: 'project-1', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
+    prompt: `Approve ${String(frame.prompt ?? 'the requested native action')}?`,
+    nativePayloadRef: 'native-question-1',
+    presentation: {
+      kind: 'choices',
+      options: [
+        { id: 'allow', label: 'Allow once', semantic: 'allow_once' },
+        { id: 'deny', label: 'Deny', semantic: 'deny' },
+      ],
+      multiple: false,
+    },
+    targets: [
+      {
+        ticketId: spec.ticketId,
+        assignmentId: spec.assignmentId,
+        attemptId: spec.attemptId,
+        fenceEpoch: spec.fenceEpoch,
+        contract: spec.contract,
+        id: `binding-${spec.attemptId}-${nativeId}`,
+        connectionEpoch: 1,
+        nativeRequestId: { kind: 'string', value: nativeId },
+        nativeMethod: 'question/ask',
+        provenanceRef: 'native-question-1',
+      },
+    ],
+    openedAt: '2026-11-07T00:00:00.000Z',
+    validity: 'open',
+  }
+}
+
+/** A schema-complete `AnswerDelivery` for the fake native protocol. */
+export function fakeAnswerDelivery(frame: Record<string, unknown>): {
+  answerId: string
+  targetBindingId: string
+  status: 'local_recorded' | 'response_written' | 'native_applied' | 'indeterminate' | 'expired'
+  evidenceRefs: string[]
+} {
+  return {
+    answerId: String(frame.answerRef ?? 'answer-1'),
+    targetBindingId: String(frame.targetBindingId ?? 'binding-1'),
+    status: 'native_applied',
+    evidenceRefs: ['fake-answer-evidence'],
+  }
 }
