@@ -1,36 +1,36 @@
 {
-  "status": "BLOCKED_FOLLOWUP_INVARIANTS",
-  "storageSourceCommit": "cdde91b408aec2abd880bdbb27743c01b7be9f25",
-  "runtimeSourceCommit": "d213d9472b76335ec00997fc3ac79ca412c56957",
-  "node": "v24.21.0",
+  "status": "PASS_FOLLOWUP_INVARIANTS",
+  "storageSourceCommit": "dee7fb51862e9d5a502b58cc96f2f15618fd8a3f",
+  "runtimeSourceCommit": "40ae10213410af99c1f8093183ee64c9eadf2357",
+  "node": "v24.22.2",
   "platform": "darwin",
   "cases": [
     {
       "id": "A-ASYNC-AFTER-AWAIT",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "rejectedSynchronously": true,
-        "callbackBegan": true,
-        "rowsWrittenAfterRollback": 1
+        "callbackBegan": false,
+        "rowsWrittenAfterRollback": 0
       }
     },
     {
       "id": "B-COMMAND-DELIMITER",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "ids": [
-          "cmd-attempt-1-1-answer:a:b:c",
-          "cmd-attempt-1-1-answer:a:b:c"
+          "cmd-attempt-1-1-answer-8c9a4337c81eded392942a78c33bdba62aae29830a537ff3a4be00adf9c2c11e",
+          "cmd-attempt-1-1-answer-0981f37fc1fda5a861bf9b9cff3d4a69a4c14e35a4851254f0ce8f83d529e76d"
         ]
       }
     },
     {
       "id": "B-COMMAND-EXPECTED-TURN",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "ids": [
-          "cmd-attempt-1-1-deliver:same-input",
-          "cmd-attempt-1-1-deliver:same-input"
+          "cmd-attempt-1-1-deliver-d1604e8c0501787cc9848d8a99fec4ba033c4929960a099d003b4880f570c0ea",
+          "cmd-attempt-1-1-deliver-1178b1acdfd571eb9757d8edea9ce1b95bc215315dd76dd54a3756ca715f82fd"
         ],
         "turns": [
           "turn-1",
@@ -40,16 +40,16 @@
     },
     {
       "id": "B-ENDED-EPOCH-REUSE",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "refusedSameAttemptEpochAfterEnd": false
+        "refusedSameAttemptEpochAfterEnd": true
       }
     },
     {
       "id": "B-CANCEL-DURING-LAUNCH",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "startRejected": false,
+        "startRejected": true,
         "stop": {
           "state": "stopping",
           "quiescence": "unknown",
@@ -58,7 +58,7 @@
             "reason:cancel-during-launch"
           ]
         },
-        "beginSentAfterStop": true
+        "beginSentAfterStop": false
       }
     }
   ]
