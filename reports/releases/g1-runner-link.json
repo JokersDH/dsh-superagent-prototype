@@ -1,0 +1,39 @@
+{
+  "status": "PASS_LOCAL_RECOVERY_TRANSPORT_AND_OWNED_RESOURCE_BARRIER_SLICE",
+  "tests": 17,
+  "realCoordinatorSigkillWindows": 1,
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "checkedAt": "2026-11-07T16:15:29.615Z",
+  "results": [
+    {
+      "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/orchestrator-core --filter @personal-agent/effects --filter @personal-agent/storage -r run build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:runner-link",
+      "status": "PASS"
+    }
+  ],
+  "proven": [
+    "Authenticated private Unix socket; pinned endpoint and full attempt identity",
+    "Recovery API limited to inspection/cancellation",
+    "Real coordinator SIGKILL leaves the independent fixture Runner and its owned process alive",
+    "New coordinator cancels the original process without a second begin",
+    "Fresh peer inspection + exact registered manifest + closed admission + complete quiescence",
+    "Same-transaction observation/binding/barrier event/receipt; rollback on receipt failure"
+  ],
+  "limitations": [
+    "Fixture service wraps the accepted ProcessHost, not the complete production AttemptRunner daemon",
+    "Endpoint registry is a private test launcher manifest; durable product registration still pending",
+    "Same-user local transport only, not isolation against malicious same-UID code",
+    "ProcessHost quiescence is limited to tracked process groups; escaped descendants and external effects need additional reconciliation",
+    "Barrier receipt covers registered owned resources only; it is not candidate/artifact-bound completion evidence",
+    "No certification of candidate durable Journal, native vendors, power-loss behavior, full G1 or usable product release"
+  ]
+}

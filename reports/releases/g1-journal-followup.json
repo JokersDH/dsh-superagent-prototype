@@ -1,0 +1,40 @@
+{
+  "status": "BLOCKED_JOURNAL_FOLLOWUP",
+  "runtimeCommit": "32540a3b1b7c7907c644deb708cf486ecd3781aa",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "cases": [
+    {
+      "id": "JOURNAL-IO-FAILURE-POISONS-WRITER",
+      "passesInvariant": false,
+      "observed": {
+        "failed": true,
+        "subsequentRefused": false,
+        "recoveredIds": [],
+        "corruptAt": 0
+      }
+    },
+    {
+      "id": "JOURNAL-REPLAY-VALIDATES-ACK",
+      "passesInvariant": false,
+      "observed": {
+        "replayed": 1,
+        "duplicates": 0,
+        "refused": 0,
+        "failures": []
+      }
+    },
+    {
+      "id": "JOURNAL-SEQUENCE-GAP",
+      "passesInvariant": false,
+      "observed": {
+        "corruptAt": null,
+        "readOnly": false,
+        "sequences": [
+          1,
+          3
+        ]
+      }
+    }
+  ]
+}
