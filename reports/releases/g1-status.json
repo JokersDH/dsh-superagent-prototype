@@ -1,6 +1,6 @@
 {
   "gate": "G1",
-  "status": "IN_PROGRESS_JOURNAL_ADMISSION_BLOCKED",
+  "status": "IN_PROGRESS_JOURNAL_AND_VERIFICATION_ADMISSION_BLOCKED",
   "acceptedInputs": {
     "storageRuntimeStateAndObservations": "247339baa8e8a9c6586036e37ae8fc28d17b707f",
     "strictPayloadAndAttemptIsolation": "906a23d"
@@ -8,20 +8,24 @@
   "scopedEvidence": {
     "storage": { "testsPassed": 66, "independentTargetNode": "24.22.2" },
     "mainProductionAndFactRecovery": { "testsPassed": 14, "realSigkillWindows": 2, "report": "reports/releases/g1-recovery.json" },
+    "mainLocalRunnerRecoveryAndOwnedBarrier": { "testsPassed": 17, "realCoordinatorSigkillWindows": 1, "node": "24.22.2", "report": "reports/releases/g1-runner-link.json", "productionRunnerDaemonAdmitted": false },
     "candidateJournalFormatInterop": { "casesPassed": 3, "writerAdmissionProven": false, "report": "reports/releases/g1-journal-interop.json" },
-    "candidateRuntimeBranch": { "testsPassed": 125, "testsFailed": 1, "reviewedCommit": "24b4449bd9c09097c3144e345fb0ac939cf99f91", "remainingAssertion": "oversize frame reason differs by stream chunking" }
+    "candidateRuntimeBranch": { "testsPassed": 136, "testsFailed": 0, "suiteNode": "24.21.0", "reviewedCommit": "32540a3b1b7c7907c644deb708cf486ecd3781aa", "originalAdmissionCasesPassed": 4, "followupCasesFailed": 3, "followupReport": "reports/releases/g1-journal-followup.json", "merged": false },
+    "candidateWorkspacesVerification": { "testsPassed": 19, "testsFailed": 0, "suiteNode": "24.21.0", "reviewedCommit": "d1be401b3f10ac0a297440e6e9f99bf4d5a608c4", "admissionCasesFailed": 6, "report": "reports/releases/g2-wp04-review.json", "merged": false }
   },
   "blocked": [
-    "Journal append persistence synchronization",
-    "Fail-closed corrupt-journal append/recovery",
-    "Same-factId conflicting content detection",
-    "Authoritative ACK validation"
+    "Journal must poison the writer after partial-write/fsync failure",
+    "Journal replay must validate authoritative ACKs",
+    "Journal decoder must refuse sequence gaps",
+    "WP-04 deletion/symlink artifact identity and mandatory frozen guard",
+    "WP-04 bounded checks resistant to ignored SIGTERM",
+    "WP-04 full trusted resource evidence and full-body record immutability"
   ],
   "remaining": [
-    "Authenticated independent-Runner IPC reconnect",
+    "Production AttemptRunner recovery backend and durable trusted launcher registration",
     "Complete resource barrier and external-side-effect reconciliation",
     "Full gate coverage and calibrated load/performance evidence"
   ],
   "notClaimed": ["Full G1 passed", "Vendor native compatibility", "Power-loss durability", "Usable personal-assistant product or release"],
-  "nextAssignments": { "agentA": "agent-tasks/g2-agent-a-workspaces-verification.md", "agentB": "agent-tasks/g1-journal-acceptance.md", "main": "Recovery/production composition and gate review" }
+  "nextAssignments": { "agentA": "agent-tasks/g2-agent-a-wp04-admission-fixes.md", "agentB": "agent-tasks/g1-agent-b-journal-followup.md", "main": "Review owner fixes, compose production recovery/barrier/current-candidate verification" }
 }

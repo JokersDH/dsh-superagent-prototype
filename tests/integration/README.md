@@ -53,4 +53,12 @@ Five cases cover fact ACK/reopen/no duplicate begin, logical-stop-before-physica
 
 `pnpm check:g1-recovery` runs the five production cases, seven recovery cases and two real SIGKILL windows. The recovery worker uses one real fake-Agent child, a synced test decoder snapshot and actual SQLite. Restoring missing payloads precedes authoritative record admission; no second begin is issued. The tests explicitly do not certify the candidate Journal writer or reconnect to an independent live Runner.
 
-To examine candidate file-format interoperability separately, use `node tools/bootstrap/check-journal-interop.mjs --runtime /clean/candidate/checkout --record`. To review its durability/integrity/receipt admission, use `node tools/bootstrap/review-journal.mjs --runtime /clean/candidate/checkout --record`; this currently exits nonzero for four owner fixes. The two reports have different scopes and cannot substitute for one another.
+To examine candidate file-format interoperability separately, use `node tools/bootstrap/check-journal-interop.mjs --runtime /clean/candidate/checkout --record`. To review its durability/integrity/receipt admission, use `node tools/bootstrap/review-journal.mjs --runtime /clean/candidate/checkout --record`; its first review failed four cases, fixed in the latest candidate below. The two reports have different scopes and cannot substitute for one another.
+
+## Independent Runner Recovery
+
+`pnpm check:g1-runner-link` runs 16 protocol/barrier guards and one real independent-process reconnect case. It uses private AF_UNIX HTTP with bearer authentication and pinned socket identity. A coordinator opens actual SQLite and is SIGKILLed; the independent fixture Runner and its owned child keep working. A new coordinator reconnects, cancels that original child and commits a fresh full-manifest owned-resource barrier, without another begin. The Ticket remains open. No production endpoint-registration schema or full Runner daemon is introduced.
+
+See `docs/adr/core/g1-runner-link-handoff.md` for trust requirements and measured limits. A persisted inspection file is audit evidence, never fresh proof. A successful barrier does not itself satisfy candidate/artifact completion or remote side-effect reconciliation.
+
+Latest owner review: B `32540a3` now passes the original four Journal cases; `review-journal-followup.mjs` records three additional failures. `review-wp04.mjs --runtime /clean/WP04/snapshot --commit SOURCE_SHA` records A's six admission failures. These scripts intentionally exit nonzero until fixed; the candidate suites passing 136 and 19 tests respectively do not waive the negative probes. Do not build/write in another agent's active worktree.

@@ -1,0 +1,58 @@
+{
+  "status": "BLOCKED_WP04_ADMISSION",
+  "sourceCommit": "d1be401b3f10ac0a297440e6e9f99bf4d5a608c4",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "cases": [
+    {
+      "id": "FREEZE-DELETED-TRACKED-FILE",
+      "passesInvariant": false,
+      "observed": {
+        "deletedFrozen": false,
+        "deletionError": "ENOENT"
+      }
+    },
+    {
+      "id": "FREEZE-SYMLINK-TARGET",
+      "passesInvariant": false,
+      "observed": {
+        "digestChanged": false
+      }
+    },
+    {
+      "id": "VERIFY-FALSE-FROZEN-GUARD",
+      "passesInvariant": false,
+      "observed": {
+        "falseGuardRefused": false
+      }
+    },
+    {
+      "id": "CHECK-DEADLINE-IGNORING-SIGTERM",
+      "passesInvariant": false,
+      "observed": {
+        "deadlineMs": 150,
+        "watchdogMs": 1500,
+        "watchdogKilled": true,
+        "probeExit": null,
+        "probeStderr": ""
+      }
+    },
+    {
+      "id": "QUIESCENCE-REQUIRES-ALL-REGISTERED-RESOURCES",
+      "passesInvariant": false,
+      "observed": {
+        "subsetRefused": false,
+        "bindingState": "active",
+        "registeredResources": 2,
+        "observedResources": 1
+      }
+    },
+    {
+      "id": "ACCEPTANCE-ID-IMMUTABILITY",
+      "passesInvariant": false,
+      "observed": {
+        "changedBodyRefused": false
+      }
+    }
+  ]
+}

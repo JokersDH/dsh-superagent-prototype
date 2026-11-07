@@ -100,6 +100,8 @@ G1 已交付正式 core 的候选/可信完成、Assignment-scoped report/read�
 
 恢复批次更新：A 仓储已到 66 项通过，运行观察接入主线；main 的生产接线/事实恢复共 14 项通过，包括两个真实 SIGKILL 窗口。B 的严格载荷和 context factory 已集成，Journal 写入器仍因四项实测失败留在候选分支。当前分工和限制见 [恢复交接](../docs/adr/core/g1-recovery-handoff.md)，整体 G1 仍未通过。
 
+2026-11-08 更新：主线新增独立 Runner 认证恢复/资源屏障 17 项通过，原事实恢复 14 项保持通过；B 已修复上述四项，但三项新 Journal 入场探针失败。A 的 WP-04 候选既有 19 项通过，六项新入场探针失败。两者尚未合入。最新分工、复现命令及可信完成边界见 [恢复连接交接](../docs/adr/core/g1-runner-link-handoff.md)，尚无可用 UI/产品 daemon。
+
 文档一致性检查：`node product-spec/tools/verify-spec.mjs`。公共类型检查命令见 07。这些检查只证明规格内部一致和草案可编译，不证明产品稳定性或学习收益。
 
 整合时发现的接口与依赖问题及修正见 [复核记录](reviews/integrated-design-review.md)，可作为后续架构评审和回归依据。

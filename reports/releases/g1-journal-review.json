@@ -1,33 +1,33 @@
 {
-  "status": "BLOCKED_JOURNAL_ADMISSION",
-  "runtimeCommit": "24b4449bd9c09097c3144e345fb0ac939cf99f91",
-  "node": "v24.22.2",
+  "status": "PASS_JOURNAL_ADMISSION_CASES",
+  "runtimeCommit": "32540a3b1b7c7907c644deb708cf486ecd3781aa",
+  "node": "v24.21.0",
   "platform": "darwin",
   "cases": [
     {
       "id": "JOURNAL-DURABLE-APPEND",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "fsyncCallsBeforeAppendReturned": 0
+        "fsyncCallsBeforeAppendReturned": 1
       }
     },
     {
       "id": "JOURNAL-CORRUPT-APPEND",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "corruptAt": 0,
-        "appendRefused": false,
+        "appendRefused": true,
         "recoveredFactIdsAfterAppend": []
       }
     },
     {
       "id": "JOURNAL-SAME-ID-CONFLICT",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "conflictRefused": false,
+        "conflictRefused": true,
         "replay": {
           "replayed": 1,
-          "duplicates": 1,
+          "duplicates": 0,
           "refused": 0,
           "failures": []
         }
@@ -35,14 +35,9 @@
     },
     {
       "id": "JOURNAL-AUTHORITATIVE-ACK",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "receiptRefused": false,
-        "returnedReceipt": {
-          "factId": "fact-1",
-          "persisted": false,
-          "seq": 1
-        }
+        "receiptRefused": true
       }
     }
   ]

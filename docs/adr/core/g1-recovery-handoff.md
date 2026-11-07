@@ -2,6 +2,8 @@
 
 Date: 2026-11-07. **Production observations and the bounded fact-recovery adapter pass their measured scope. Journal writer admission and full G1 remain blocked.**
 
+2026-11-08 update: main's separate authenticated independent-Runner recovery slice now passes 17 cases. B `32540a3` fixes the four historical failures below, but three new Journal follow-up cases block admission; A's WP-04 candidate also needs fixes. Read [the current handoff](g1-runner-link-handoff.md). The dated measurements below remain historical evidence.
+
 ## Reviewed Inputs
 
 - Agent A `247339b`: 66/66 storage tests and strict typecheck independently pass on Node 24.22.2. Migrations v4/v5 add current runtime/authority invariants and append-only observations. Integrated into main.
