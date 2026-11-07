@@ -1,0 +1,20 @@
+{
+  "name": "@personal-agent/driver-kit",
+  "version": "0.0.0-g1",
+  "private": true,
+  "type": "module",
+  "description": "G1/WP-03 DriverKit: local framing, command priority pump, bounded progress and AttemptIO helpers. Built on the frozen @personal-agent/contracts ports; no vendor wire types.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@personal-agent/contracts": "workspace:*"
+  }
+}

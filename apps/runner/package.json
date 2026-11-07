@@ -1,0 +1,22 @@
+{
+  "name": "@personal-agent/runner",
+  "version": "0.0.0-g1",
+  "private": true,
+  "type": "module",
+  "description": "G1/WP-03 controlled Runner: owned process host, bounded journal, framing and control-priority attempt execution.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/driver-kit": "workspace:*",
+    "@personal-agent/execution": "workspace:*"
+  }
+}
