@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 import { z } from 'zod'
 import {
@@ -102,11 +103,27 @@ export class ProductCompletion implements CompletionReviewPort {
       environmentRef: key('environment', attemptId),
       verifyArtifact: () => this.workspaces.digest({ attemptId }) === frozen.artifactDigest,
     })
+    const output = readFileSync(join(this.workspaces.attemptPath(attemptId), 'src/product-output.txt'))
+    // Workspace content addresses may be shared; delivery metadata belongs to this exact candidate.
+    const manifest = {
+      kind: 'controlled-product-artifact/1',
+      candidate,
+      attemptId,
+      artifactDigest: frozen.artifactDigest,
+      baseCommit: frozen.baseCommit,
+      headCommit: frozen.headCommit,
+      environment: frozen.environment,
+      output: {
+        path: 'src/product-output.txt',
+        bytes: output.byteLength,
+        sha256: createHash('sha256').update(output).digest('hex'),
+      },
+    }
     const files = [
-      frozen.manifestPath,
-      frozen.patchPath,
-      join(this.workspaces.attemptPath(attemptId), 'src/product-output.txt'),
-    ].map((path) => this.store.artifacts.write(readFileSync(path)))
+      this.store.artifacts.write(Buffer.from(JSON.stringify(manifest, null, 2))),
+      this.store.artifacts.write(readFileSync(frozen.patchPath)),
+      this.store.artifacts.write(output),
+    ]
     if (this.workspaces.digest({ attemptId }) !== frozen.artifactDigest)
       throw new ApplicationFault('verification_failed', 'Artifact changed while collecting delivery bytes')
     const checkEvidence = this.store.artifacts.write(Buffer.from(JSON.stringify(run.evidence, null, 2)))

@@ -66,7 +66,7 @@ Agent A's current console defaults to `profile-codex-local` and other fixture ch
 - Verification starts after the physical barrier and guards the artifact before/after checking and while collecting bytes. Acceptance preflight reads immutable files outside the command transaction; the transaction rechecks current candidate and evidence. Delivered artifact references survive refresh/reopen.
 - Verification intents contain their committed barrier reference and can finish after reopen without relaunching a native process. A SIGKILL with an unproven live writer instead stays uncertain and cannot retry.
 
-The generic WP-04 Git patch currently omits untracked file contents. This controlled composition additionally publishes its fixed output bytes, alongside manifest, patch and check evidence. Generalizing delivery to arbitrary new files requires Agent A's package-level fix and acceptance; this is not a generic archive implementation.
+The generic WP-04 Git patch currently omits untracked file contents, and its content-addressed workspace manifest can retain an earlier attempt ID when two attempts produce identical content. This controlled composition publishes its fixed output bytes and a current-candidate delivery manifest, alongside patch and check evidence. Generalizing delivery to arbitrary new files requires Agent A's package-level fix and acceptance; this is not a generic archive implementation.
 
 ## Measured Scope
 

@@ -629,5 +629,17 @@ test(
     assert.equal(await artifact.text(), 'approved product output\n')
     const denied = await http.request(`http://127.0.0.1/v1/artifacts/${ready.artifactIds[2]}`)
     assert.equal(denied.status, 401)
+    const second = await h.create('pass', false)
+    const next = await until(
+      () => h.view(second.workId),
+      (value) => value.actions.available.includes('accept_candidate'),
+    )
+    const manifest = await http.request(`http://127.0.0.1/v1/artifacts/${next.artifactIds[0]}`, { headers })
+    const body = await manifest.json()
+    assert.deepEqual(body.candidate, next.actions.currentCandidate)
+    assert.equal(body.attemptId, h.store.bindings.current(next.actions.currentCandidate.ticketId).attemptId)
+    assert.equal(body.output.sha256, next.artifactIds[2])
+    assert.notEqual(next.artifactIds[0], ready.artifactIds[0])
+    assert.equal(next.artifactIds[2], ready.artifactIds[2])
   },
 )
