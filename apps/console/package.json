@@ -1,0 +1,30 @@
+{
+  "name": "@personal-agent/console",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Wave-02 WP-11 console: main conversation, works, questions, dispatch controls and candidate acceptance over the public Snapshot/UserCommand/CommandReceipt/Change schema. Ships an isolated fixture adapter; the HTTP transport consumes the product API once published.",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "vite build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test test/*.case.ts",
+    "e2e": "node e2e/run.mjs"
+  },
+  "dependencies": {
+    "@personal-agent/contracts": "workspace:*",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "6.0.3",
+    "vite": "8.2.2"
+  }
+}
