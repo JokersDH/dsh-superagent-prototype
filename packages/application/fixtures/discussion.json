@@ -1,0 +1,7 @@
+{
+  "kind": "chat",
+  "commandId": "example-discussion-1",
+  "conversationId": "conversation-main",
+  "projectId": "project-atlas",
+  "text": "Discuss the approach before creating work"
+}

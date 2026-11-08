@@ -1,0 +1,62 @@
+{
+  "status": "PASS_APPLICATION_BROKER_HTTP_SLICE",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "checkedAt": "2026-11-08T14:05:27.350Z",
+  "tests": 90,
+  "results": [
+    {
+      "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/orchestrator-core --filter @personal-agent/effects --filter @personal-agent/storage --filter @personal-agent/questions --filter @personal-agent/application -r build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/questions --filter @personal-agent/application -r typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator typecheck:http",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/questions --filter @personal-agent/application -r test",
+      "status": "PASS",
+      "tests": 25
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:http",
+      "status": "PASS",
+      "tests": 9
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:runner-link",
+      "status": "PASS",
+      "tests": 17
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:registered-recovery",
+      "status": "PASS",
+      "tests": 25
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:production",
+      "status": "PASS",
+      "tests": 5
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:recovery",
+      "status": "PASS",
+      "tests": 9
+    }
+  ],
+  "limitations": [
+    "Product repositories are integrated from A a6bb40a; full verification/console packages have separate acceptance",
+    "Completion review port is trusted/injected; module tests use a controlled verifier and do not certify a full artifact pipeline",
+    "HTTP API sandbox retains execution intents; actual independent Runner/native adapter composition remains pending",
+    "No full G1/G2, vendor, power-loss, load/soak or usable full product certification"
+  ]
+}
