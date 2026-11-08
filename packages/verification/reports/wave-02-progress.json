@@ -3,13 +3,14 @@
   "branch": "codex/g2-workspaces-verification",
   "baseMainCommit": "5ac39b5",
   "mergeCommit": "093dc60",
-  "testedSourceCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
+  "testedSourceCommit": "7d7ec60732e0c75fa82e4121e2c673815976ae97",
   "backendCheckpointCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
-  "updatedAt": "2026-11-08T12:30:00.000Z",
+  "consoleDeliveryCommit": "7d7ec60732e0c75fa82e4121e2c673815976ae97",
+  "updatedAt": "2026-11-08T12:55:00.000Z",
   "phases": {
     "A1": {
       "status": "PASS",
-      "scope": "WP-04 admission fixes plus adjacent completion boundaries: freeze deletion/symlink link-text/executable bit/content-addressed immutable manifests and read-only digest; mandatory explicit-true frozen-artifact guard; bounded process-group check execution with TERM/KILL/cleanup_unproven; quiescence consumes the host barrier receipt with current-by-ticket pointer, topic, producer, committed barrier command result, full registered-resource coverage and proving fact ids; full-body immutability and strict Verification intake; evidence writes join the caller UoW.",
+      "scope": "WP-04 admission fixes plus adjacent completion boundaries: deletion/symlink/executable freeze identity and immutable content-addressed manifests; mandatory explicit-true frozen guard; bounded process-group checks with TERM/KILL/cleanup_unproven; quiescence requires the host barrier receipt with current-by-ticket pointer, topic, complete producer, committed barrier command result and full registered-resource writer fact; full-body immutability; strict Verification intake; evidence writes join the caller UoW.",
       "evidence": [
         "packages/verification/reports/wave-02/probe-wp04.json",
         "packages/verification/reports/wave-02/probe-completion-runtime.json",
@@ -38,23 +39,52 @@
       }
     },
     "A3": {
-      "status": "IN_PROGRESS",
-      "scope": "apps/console: HTTP transport + isolated fixture adapter over public Snapshot/UserCommand/CommandReceipt/Change/AppError; main conversation, work detail, questions, answers per target, dispatch controls, verification/acceptance; SSE/reconnect/cursor-expired; Playwright desktop/narrow/keyboard/long text/error/refresh.",
-      "evidence": [],
+      "status": "PASS_FIXTURE",
+      "scope": "apps/console React 18/Vite workbench: HTTP transport plus isolated schema-validated fixture adapter; main conversation with project/anchor; work list/detail/creation; concentrated questions (choices/form/free_text/url_flow/review) with per-target delivery states; stop/pause/continue/retry; verification and current-candidate acceptance; SSE dedupe/reconnect/cursor-expired refetch; refresh persistence; offline model; executor AgentProfile/ProbeReport fixture.",
+      "interface": "docs/rfcs/WP-11/0001-console-fixture-boundary.md",
+      "devServer": "http://127.0.0.1:5173/ (Vite 8.2.2, fixture mode default)",
+      "evidence": [
+        "apps/console/e2e/report.json",
+        "apps/console/e2e/screenshots/desktop-main.png",
+        "apps/console/e2e/screenshots/desktop-work.png",
+        "apps/console/e2e/screenshots/desktop-new-work.png",
+        "apps/console/e2e/screenshots/narrow-main.png",
+        "apps/console/report.md"
+      ],
+      "results": {
+        "typecheck": "PASS",
+        "fixtureContractTests": "8/8",
+        "playwright": "PASS_CONSOLE_FIXTURE 20/20",
+        "productionBuild": "PASS"
+      },
       "notWired": [
-        "real product HTTP/SSE server (main owns transport)",
-        "live core/ApplicationService snapshot behind the adapter",
-        "production Catalog/profile read entry (main publishes schema/route)"
+        "real product HTTP/SSE server and authenticated actor production (main owns transport)",
+        "verification-detail and per-target-delivery read routes",
+        "production Catalog/AgentProfile read entry",
+        "decision/learning control views (AC-UX-11 NOT_TESTED)",
+        "native Driver compatibility (G2-Native-Preview NOT_TESTED)"
       ]
     }
   },
+  "regression": {
+    "storage": "75/75",
+    "effects": "8/8",
+    "verification": "22/22",
+    "workspaces": "8/8",
+    "coreOnSQLite": "178/178"
+  },
   "dependencies": {
-    "new": [],
-    "notes": "No new runtime dependency; storage already depends on @personal-agent/contracts. Console dependencies (React 18, Vite, Playwright) will be declared in apps/console/package.json; root lock changes stay main-owned and the temporary install diff is not committed."
+    "new": [
+      "apps/console: react 18.3.1, react-dom 18.3.1",
+      "apps/console dev: vite 8.2.2, typescript 6.0.3, @playwright/test 1.65.0, @types/react, @types/react-dom"
+    ],
+    "rootLock": "Temporary install diff only; not committed. Main regenerates the authoritative root lock.",
+    "browser": "Chromium headless shell 1254 downloaded to the user's Playwright cache for local evidence."
   },
   "limitations": [
-    "Probe results are fixture/package-level; no full G1 or native compatibility claim.",
+    "A1 probes are package/fixture-level; no full G1 or native compatibility claim.",
     "Process-group isolation is not a sandbox; cleanup_unproven means unproven quiescence, not a stopped resource.",
-    "Real backend HTTP/SSE and production Catalog wiring remain NOT_TESTED until main publishes them."
+    "A3 is fixture-level PASS: the HTTP transport is implemented but not tested against a live product server; Catalog, verification-detail and delivery routes remain main-owned.",
+    "AC-UX-11 and real native driver behavior are NOT_TESTED; no paid native smoke was run."
   ]
 }
