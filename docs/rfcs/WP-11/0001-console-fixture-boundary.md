@@ -1,6 +1,6 @@
 # RFC-0001: Console fixture boundary and the routes still owned by main
 
-- Status: implemented (console fixture lane); production wiring requested from the main agent
+- Status: implemented and integrated with the main HTTP checkpoint; Catalog read entry still requested
 - From: A (wave-02, WP-11 first version)
 - Date: 2026-11-08
 
@@ -21,23 +21,32 @@ verification result details, per-target answer deliveries, and the Catalog/profi
 | `snapshot(InspectQuery)` | `GET /v1/snapshot` | `SnapshotSchema`; the same view carries `cursor`. |
 | `messages(conversationId, {before,limit})` | `GET /v1/conversations/:id/messages` | `ConversationPageSchema`; `before` is exclusive and returns ascending messages. |
 | `changes(after)` | SSE `/v1/events` with `Last-Event-ID` | `ChangeSchema` per frame; `cursor_expired` is an error event → UI refetches the snapshot. |
-| `verification?(id)` | fixture only | Optional. HTTP omits it and the panel says the detail route is not wired. |
-| `deliveries?(questionId)` | fixture only | Optional. Per-target status comes from the backend once a route exists. |
+| `verification?(id)` | fixture or `GET /v1/verifications/:id` | `VerificationSchema`; a missing reader/route yields no detail, never fabricated data. |
+| `deliveries?(questionId)` | fixture or `GET /v1/questions/:id/deliveries` | `AnswerDelivery` array; local/native statuses stay distinct. |
 | `executors?()` | fixture only | `AgentProfile`/`ProbeReport` fixtures; production Catalog is main-owned. |
 
 All adapters validate with the public schemas. Fixture state lives in `sessionStorage` for the tab and
 is never read by production code.
 
-## Request to main
+## Integration status (wave-02 main checkpoint `cd09395`)
 
-1. Publish the read routes for verification detail, per-target answer deliveries, and the Catalog
-   profile/probe entry, or fold them into existing `Snapshot`/application ports through the versioned
-   contract process. The console will consume them through the optional methods above; no
-   `Snapshot.profiles` field should be added privately.
-2. Publish the authenticated HTTP/SSE server (status/error envelope, `cursor_expired` event, `Last-Event-ID`).
-   Until then HTTP mode is implemented but **NOT_TESTED**.
-3. Decide whether dispatch/pause expected revisions and candidate acceptance use the existing
-   `expectedHoldRevision`/`CandidateRef` fields as assumed; the UI passes exactly those.
+- Implemented and verified against the main loopback sandbox: `POST/GET/DELETE /v1/session` bootstrap
+  with the private token, HttpOnly cookie, server-generated actor; snapshot, messages, SSE, commands,
+  verification and delivery readers. `PASS_CONSOLE_HTTP_DEMO` 8/8.
+- `VITE_CONVERSATION_ID` selects the product conversation; the main demo uses `conversation-main`
+  while the fixture lane keeps `conv-main`.
+- Commands send only the frozen `UserCommand` shapes. Pause/resume/continue use `ContractRef` (not a
+  full contract revision) and the WorkView's `dispatchHold.revision`; the live application accepted the
+  CAS.
+
+## Remaining request to main
+
+1. Publish the Catalog profile/probe read entry for console browsing; until then HTTP mode shows
+   "Catalog 尚未接线". Do not add a private `Snapshot.profiles` field.
+2. Keep the loopback sandbox's execution intents undelivered until the accepted Runner is composed;
+   the console reports empty question/verification panels as NOT_TESTED rather than faking them.
+3. Confirm that production acceptance keeps using `CandidateRef` and that stale candidates disappear
+   from `actions.available`; the console also keeps its own stale-verification guard.
 
 ## Recovery semantics the console relies on
 

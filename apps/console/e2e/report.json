@@ -3,48 +3,48 @@
   "mode": "fixture",
   "base": "http://127.0.0.1:5173/",
   "node": "v24.21.0",
-  "testedAt": "2026-11-08T12:37:16.494Z",
+  "testedAt": "2026-11-08T14:59:18.232Z",
   "cases": [
     {
       "id": "MAIN-RENDER",
       "status": "PASS",
-      "ms": 56,
+      "ms": 54,
       "detail": "works/questions/conversation rendered and SSE is live"
     },
     {
       "id": "EXECUTOR-FIXTURE",
       "status": "PASS",
-      "ms": 4,
+      "ms": 6,
       "detail": "AgentProfile/ProbeReport fixture renders without inventing production Catalog data"
     },
     {
       "id": "CHAT-SEND",
       "status": "PASS",
-      "ms": 81,
+      "ms": 75,
       "detail": "message dispatch appends a persisted conversation message"
     },
     {
       "id": "QUESTION-ANSWER-PER-TARGET",
       "status": "PASS",
-      "ms": 301,
+      "ms": 288,
       "detail": "choice/review/url questions answered; local recording never claims native application"
     },
     {
       "id": "VERIFICATION-AND-ACCEPT",
       "status": "PASS",
-      "ms": 266,
+      "ms": 248,
       "detail": "current candidate with passing verification is accepted"
     },
     {
       "id": "STALE-CANDIDATE-BLOCKED",
       "status": "PASS",
-      "ms": 41,
+      "ms": 42,
       "detail": "expired candidate cannot be accepted"
     },
     {
       "id": "STOPPING-UNKNOWN-WRITER",
       "status": "PASS",
-      "ms": 31,
+      "ms": 30,
       "detail": "stopping work shows an indeterminate writer, not success"
     },
     {
@@ -62,61 +62,61 @@
     {
       "id": "NO-OVERFLOW-DESKTOP",
       "status": "PASS",
-      "ms": 48,
+      "ms": 52,
       "detail": "long text wraps without horizontal overflow"
     },
     {
       "id": "OFFLINE-READ-ANSWER-STOP",
       "status": "PASS",
-      "ms": 200,
+      "ms": 197,
       "detail": "offline model blocks chat only; query and answers still work"
     },
     {
       "id": "RECOVER-AND-SEND",
       "status": "PASS",
-      "ms": 74,
+      "ms": 72,
       "detail": "recovery allows the next message"
     },
     {
       "id": "SSE-RECONNECT",
       "status": "PASS",
-      "ms": 60,
+      "ms": 61,
       "detail": "dropped event stream reconnects without losing the page"
     },
     {
       "id": "CURSOR-EXPIRY-REFETCH",
       "status": "PASS",
-      "ms": 284,
+      "ms": 287,
       "detail": "expired cursor triggers a snapshot refetch and resumes live updates"
     },
     {
       "id": "RELOAD-PERSISTENCE",
       "status": "PASS",
-      "ms": 598,
+      "ms": 601,
       "detail": "page refresh restores conversation and delivered work"
     },
     {
       "id": "CREATE-WORK",
       "status": "PASS",
-      "ms": 164,
+      "ms": 181,
       "detail": "a user can create a work from the console and see its queued state"
     },
     {
       "id": "KEYBOARD-SEND-AND-FOCUS",
       "status": "PASS",
-      "ms": 26,
+      "ms": 15,
       "detail": "Ctrl+Enter sends and keyboard focus stays visible"
     },
     {
       "id": "NARROW-NO-HORIZONTAL-OVERFLOW",
       "status": "PASS",
-      "ms": 23,
+      "ms": 34,
       "detail": "narrow layout has no horizontal overflow"
     },
     {
       "id": "NARROW-QUESTION-FORM",
       "status": "PASS",
-      "ms": 49,
+      "ms": 63,
       "detail": "question form is usable on a narrow viewport"
     },
     {

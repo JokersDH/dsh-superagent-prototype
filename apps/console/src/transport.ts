@@ -4,7 +4,7 @@
  * frozen runtime schemas, so a fixture cannot smuggle a shape the real product would reject.
  */
 import {
-  ChangeSchema, CommandReceiptSchema, ConversationPageSchema, SnapshotSchema,
+  AnswerDeliverySchema, ChangeSchema, CommandReceiptSchema, ConversationPageSchema, SnapshotSchema, VerificationSchema,
 } from '@personal-agent/contracts'
 import type { AgentProfile, Change, CommandReceipt, ConversationPage, InspectQuery, ProbeReport, Snapshot, UserCommand } from '@personal-agent/contracts'
 
@@ -31,11 +31,14 @@ export interface ConsoleTransport {
   snapshot(query: InspectQuery): Promise<Snapshot>
   messages(conversationId: string, options?: { before?: number; limit?: number }): Promise<ConversationPage>
   changes(after: number, signal?: AbortSignal): AsyncIterable<Change>
-  /** Fixture-only evidence surfaces; a real transport may omit them until the product publishes routes. */
+  /** Detail readers: the fixture lane and the product HTTP routes both provide them; a transport may omit them. */
   verification?(id: string): Promise<VerificationDetail | undefined>
   deliveries?(questionId: string): Promise<readonly TargetDelivery[]>
   /** AgentProfile/ProbeReport fixture until the main transport publishes the Catalog read entry. */
   executors?(): Promise<readonly ExecutorSnapshot[]>
+  /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
+  session?(): Promise<boolean>
+  bootstrap?(bootstrapToken: string): Promise<void>
 }
 
 export class TransportError extends Error {
@@ -64,7 +67,7 @@ export class HttpTransport implements ConsoleTransport {
   private async request(path: string, init?: RequestInit): Promise<unknown> {
     let response: Response
     try {
-      response = await fetch(`${this.base}${path}`, { ...init, headers: { accept: 'application/json', ...(init?.body ? { 'content-type': 'application/json' } : {}) } })
+      response = await fetch(`${this.base}${path}`, { ...init, credentials: 'include', headers: { accept: 'application/json', ...(init?.body ? { 'content-type': 'application/json' } : {}) } })
     } catch (error) {
       throw new TransportError('storage_unavailable', `无法连接产品服务：${String(error)}`, 'safe')
     }
@@ -94,6 +97,52 @@ export class HttpTransport implements ConsoleTransport {
     return parsed.data
   }
 
+  async session(): Promise<boolean> {
+    try {
+      await this.request('/v1/session')
+      return true
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'auth_required') return false
+      throw error
+    }
+  }
+
+  async bootstrap(bootstrapToken: string): Promise<void> {
+    await this.request('/v1/session', { method: 'POST', body: JSON.stringify({ bootstrapToken }) })
+  }
+
+  async verification(id: string): Promise<VerificationDetail | undefined> {
+    let body: unknown
+    try {
+      body = await this.request(`/v1/verifications/${encodeURIComponent(id)}`)
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+    const parsed = VerificationSchema.safeParse(body)
+    if (!parsed.success) throw new TransportError('schema_mismatch', '验证记录不符合公共 schema', 'user_action')
+    return {
+      id: parsed.data.id,
+      artifactDigest: parsed.data.artifactDigest,
+      results: parsed.data.results,
+      stale: false,
+      note: '产品验证记录（过期判定以当前候选与可用动作为准）',
+    }
+  }
+
+  async deliveries(questionId: string): Promise<readonly TargetDelivery[]> {
+    let body: unknown
+    try {
+      body = await this.request(`/v1/questions/${encodeURIComponent(questionId)}/deliveries`)
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return []
+      throw error
+    }
+    const parsed = AnswerDeliverySchema.array().safeParse(body)
+    if (!parsed.success) throw new TransportError('schema_mismatch', '投递记录不符合公共 schema', 'user_action')
+    return parsed.data.map(delivery => ({ targetBindingId: delivery.targetBindingId, status: delivery.status }))
+  }
+
   async messages(conversationId: string, options: { before?: number; limit?: number } = {}): Promise<ConversationPage> {
     const params = new URLSearchParams()
     if (options.before !== undefined) params.set('before', String(options.before))
@@ -120,6 +169,13 @@ export class HttpTransport implements ConsoleTransport {
       } catch { fail(new TransportError('schema_mismatch', '事件不是 JSON', 'user_action')) }
     }
     source.addEventListener('cursor_expired', () => fail(new TransportError('cursor_expired', '事件游标已过期，请重新获取快照', 'safe')))
+    source.addEventListener('error', event => {
+      try {
+        const parsed = JSON.parse((event as MessageEvent).data) as { error?: { code?: string; message?: string; retry?: string } }
+        const code = parsed.error?.code ?? 'storage_unavailable'
+        fail(new TransportError(code, parsed.error?.message ?? '事件流不可用', (parsed.error?.retry as TransportError['retry']) ?? 'safe'))
+      } catch { fail(new TransportError('storage_unavailable', '事件流不可用', 'safe')) }
+    })
     source.onerror = () => { if (!ended) fail(new TransportError('storage_unavailable', '事件流断开', 'safe')) }
     const abort = (): void => { ended = true; source.close(); wake?.() }
     signal?.addEventListener('abort', abort)

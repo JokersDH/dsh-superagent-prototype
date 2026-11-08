@@ -1,0 +1,69 @@
+{
+  "status": "PASS_CONSOLE_HTTP_DEMO",
+  "mode": "product-http-demo-fixture",
+  "base": "http://127.0.0.1:5174/",
+  "apiState": "/tmp/pa-http-demo",
+  "testedAt": "2026-11-08T14:59:07.224Z",
+  "cases": [
+    {
+      "id": "SESSION-GATE-WRONG-TOKEN",
+      "status": "PASS",
+      "ms": 130,
+      "detail": "the private bootstrap credential is required; a wrong token is refused without losing the page"
+    },
+    {
+      "id": "SESSION-BOOTSTRAP",
+      "status": "PASS",
+      "ms": 60,
+      "detail": "HttpOnly session cookie authenticates snapshot and SSE; the browser never sends an actor"
+    },
+    {
+      "id": "CREATE-WORK-VIA-PRODUCT",
+      "status": "PASS",
+      "ms": 277,
+      "detail": "create_work goes through ApplicationService/core/SQLite and its actions render"
+    },
+    {
+      "id": "CHAT-AND-MESSAGE-RELOAD",
+      "status": "PASS",
+      "ms": 94,
+      "detail": "chat is a real product command; no assistant text is fabricated by the sandbox"
+    },
+    {
+      "id": "PAUSE-DISPATCH-LIVE",
+      "status": "PASS",
+      "ms": 101,
+      "detail": "pause_dispatch CAS is accepted by the live application"
+    },
+    {
+      "id": "STOP-WORK-LIVE",
+      "status": "PASS",
+      "ms": 137,
+      "detail": "stop_work is accepted by the live application; the ended ticket is shown as ended, not delivered"
+    },
+    {
+      "id": "RELOAD-PERSISTENCE-LIVE",
+      "status": "PASS",
+      "ms": 654,
+      "detail": "session cookie and product SQLite persist the work across page reload"
+    },
+    {
+      "id": "NO-CONSOLE-ERRORS",
+      "status": "PASS",
+      "ms": 0,
+      "detail": "no page or console errors"
+    }
+  ],
+  "failures": [],
+  "screenshots": [
+    "screenshots/http-gate.png",
+    "screenshots/http-work.png",
+    "screenshots/http-stopped.png",
+    "screenshots/http-after-reload.png"
+  ],
+  "limitations": [
+    "The loopback API sandbox queues execution intents and does not dispatch a Runner or vendor model; a stopped ticket therefore ends without a physical writer to observe.",
+    "No question/verification artifacts were produced by the sandbox, so those live panels remain empty/NOT_TESTED.",
+    "This is not G2-Native-Preview and makes no vendor compatibility claim."
+  ]
+}

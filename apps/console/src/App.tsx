@@ -12,8 +12,7 @@ import type {
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
 import type { FixtureAdapter } from './fixture.ts'
-
-const conversationId = 'conv-main'
+import { conversationId } from './config.ts'
 const phaseLabel: Record<WorkView['phase'], string> = {
   evaluating: '评估中', queued: '已排队', working: '执行中', needs_user: '待你决定', verifying: '验证中',
   switching: '切换中', stopping: '停止中', delivered: '已交付', ended: '已结束', uncertain: '状态不确定',
@@ -32,6 +31,7 @@ const questionKindLabel: Record<UserQuestion['kind'], string> = {
   clarification: '澄清', permission: '权限', authentication: '认证', review: '验收',
 }
 const newId = (prefix: string): string => `${prefix}-${crypto.randomUUID()}`
+const contractRef = (contract: WorkView['contract']): ContractRef => ({ workId: contract.workId, revision: contract.revision, digest: contract.digest })
 
 interface Problem { code: string; message: string; retry: 'safe' | 'reconcile' | 'user_action' | 'none' }
 
@@ -52,6 +52,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [projectFilter, setProjectFilter] = useState<string | undefined>(undefined)
   const [offline, setOffline] = useState<boolean>(() => fixture?.modelOffline() ?? false)
   const [createOpen, setCreateOpen] = useState(false)
+  const [auth, setAuth] = useState<'checking' | 'required' | 'ready'>(transport.session ? 'checking' : 'ready')
   const [verification, setVerification] = useState<VerificationDetail | undefined>(undefined)
   const [deliveries, setDeliveries] = useState<Record<string, readonly TargetDelivery[]>>({})
   const lastSeq = useRef(0)
@@ -76,9 +77,19 @@ export function App({ transport }: { transport: ConsoleTransport }) {
         setDeliveries(Object.fromEntries(entries))
       }
     } catch (error) {
-      setProblem(problemOf(error))
+      const failure = problemOf(error)
+      if (failure.code === 'auth_required') setAuth('required')
+      setProblem(failure)
       setLoading(false)
     }
+  }, [transport])
+
+  useEffect(() => {
+    if (!transport.session) return
+    let cancelled = false
+    void transport.session().then(authenticated => { if (!cancelled) setAuth(authenticated ? 'ready' : 'required') })
+      .catch(() => { if (!cancelled) setAuth('required') })
+    return () => { cancelled = true }
   }, [transport])
 
   const scheduleRefresh = useCallback((): void => {
@@ -87,6 +98,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   }, [refresh])
 
   useEffect(() => {
+    if (auth !== 'ready') return
     let closed = false
     const controller = new AbortController()
     let failures = 0
@@ -135,7 +147,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
       controller.abort()
       if (refreshTimer.current) clearTimeout(refreshTimer.current)
     }
-  }, [transport, refresh, scheduleRefresh])
+  }, [transport, refresh, scheduleRefresh, auth])
 
   // Refresh when the tab becomes visible again; a hidden page can miss SSE frames.
   useEffect(() => {
@@ -222,9 +234,16 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           <button type="button" className="quiet" onClick={() => setNotice(undefined)}>关闭</button>
         </div>
       )}
-      {problem && <ErrorPanel problem={problem} onRefresh={() => void refresh()} onDismiss={() => setProblem(undefined)} />}
+      {problem && auth === 'ready' && <ErrorPanel problem={problem} onRefresh={() => void refresh()} onDismiss={() => setProblem(undefined)} />}
+      {auth !== 'ready' && (
+        <SessionGate
+          checking={auth === 'checking'}
+          bootstrap={transport.bootstrap ? token => transport.bootstrap!(token) : undefined}
+          onAuthenticated={() => { setAuth('ready'); setProblem(undefined) }}
+        />
+      )}
 
-      <main className="layout">
+      {auth === 'ready' && <main className="layout">
         <aside className="sidebar" aria-label="工作列表">
           <div className="section-head">
             <h2>工作</h2>
@@ -246,7 +265,10 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 const receipt = await send({
                   commandId: newId('cmd-work'), conversationId, kind: 'create_work', projectId, goal,
                   scope: { projectId, allowedPaths: [allowedPath], excludedPaths: [], externalActions: [] },
-                  criteria: [{ id: 'review', kind: 'human', description: '用户验收结果', required: true }],
+                  criteria: [
+                    { id: 'unit', kind: 'machine', description: '单元检查通过', required: true, checkDefinitionRef: 'check:unit' },
+                    { id: 'review', kind: 'human', description: '用户验收结果', required: true },
+                  ],
                   profileId: 'profile-codex-local',
                 }, 'create_work')
                 if (receipt?.status === 'recorded' && receipt.workId) {
@@ -313,7 +335,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             onPause={async work => {
               const command: UserCommand = {
                 commandId: newId('cmd-pause'), conversationId, kind: work.actions.dispatchHold.paused ? 'resume_dispatch' : 'pause_dispatch',
-                expected: work.contract, expectedHoldRevision: work.actions.dispatchHold.revision,
+                expected: contractRef(work.contract), expectedHoldRevision: work.actions.dispatchHold.revision,
               }
               await send(command, 'dispatch')
             }}
@@ -344,8 +366,51 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             }}
           />
         </aside>
-      </main>
+      </main>}
     </div>
+  )
+}
+
+function SessionGate({ checking, bootstrap, onAuthenticated }: {
+  checking: boolean
+  bootstrap: ((token: string) => Promise<void>) | undefined
+  onAuthenticated: () => void
+}) {
+  const [token, setToken] = useState('')
+  const [pending, setPending] = useState(false)
+  const [failure, setFailure] = useState<string | undefined>(undefined)
+  return (
+    <section className="session-gate" aria-label="本地 API 登录">
+      <div className="session-card">
+        <h2>连接本地 API</h2>
+        {checking && <p className="empty">正在检查本地会话…</p>}
+        {!checking && !bootstrap && <p className="empty">该 transport 不支持会话登录。</p>}
+        {!checking && bootstrap && (
+          <form onSubmit={async event => {
+            event.preventDefault()
+            setPending(true)
+            try {
+              setFailure(undefined)
+              await bootstrap(token.trim())
+              onAuthenticated()
+            } catch (error) {
+              setFailure(problemOf(error).message)
+            } finally { setPending(false) }
+          }}>
+            <label htmlFor="bootstrap-token">Bootstrap token（本地私钥文件，不会写入浏览器存储）</label>
+            <input
+              id="bootstrap-token" type="password" autoComplete="off" required value={token}
+              onChange={event => setToken(event.target.value)}
+            />
+            {failure && <p className="warn-text" role="alert">{failure}</p>}
+            <div className="actions">
+              <button type="submit" disabled={pending || !token.trim()}>{pending ? '连接中…' : '建立本地会话'}</button>
+            </div>
+            <p className="note">令牌来自本地 demo 的 <code>bootstrap.key</code>；后端生成 TrustedActor，浏览器不发送角色或 actor 字段。</p>
+          </form>
+        )}
+      </div>
+    </section>
   )
 }
 
@@ -366,9 +431,11 @@ function NewWorkForm({ projects, pending, onCreate, onCancel }: {
     }}>
       <label><span>目标</span><textarea rows={3} required value={goal} onChange={event => setGoal(event.target.value)} /></label>
       <label><span>项目</span>
-        <select value={project} onChange={event => setProject(event.target.value)}>
-          {projects.map(item => <option key={item} value={item}>{item}</option>)}
-        </select>
+        {projects.length
+          ? <select value={project} onChange={event => setProject(event.target.value)}>
+              {projects.map(item => <option key={item} value={item}>{item}</option>)}
+            </select>
+          : <input type="text" required value={project} onChange={event => setProject(event.target.value)} placeholder="project-atlas" />}
       </label>
       <label><span>允许路径</span><input type="text" required value={allowedPath} onChange={event => setAllowedPath(event.target.value)} /></label>
       <div className="actions">
@@ -394,7 +461,7 @@ function ExecutorPanel({ transport }: { transport: ConsoleTransport }) {
   }
   return (
     <section className="panel" aria-label="执行器连接">
-      <div className="section-head"><h2>执行器连接</h2><span className="mini">fixture</span></div>
+      <div className="section-head"><h2>执行器连接</h2>{transport.executors && <span className="mini">fixture</span>}</div>
       {!transport.executors && <p className="empty">执行器 Catalog 尚未接线（等待主 Agent 发布生产读取入口）。</p>}
       {failed && <p className="empty">执行器探针读取失败。</p>}
       {items?.map(({ profile, report }) => (
@@ -412,7 +479,7 @@ function ExecutorPanel({ transport }: { transport: ConsoleTransport }) {
           </ul>
         </div>
       ))}
-      <p className="note">fixture 场景；生产 Catalog 由主线统一接线。未测能力不显示为通过。</p>
+      {transport.executors && <p className="note">fixture 场景；生产 Catalog 由主线统一接线。未测能力不显示为通过。</p>}
     </section>
   )
 }

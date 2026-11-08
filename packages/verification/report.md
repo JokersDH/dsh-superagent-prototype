@@ -60,7 +60,7 @@
 | 真实失败 / 缺依赖 / SKIPPED / NOT_APPLICABLE | **PASS** | `checks.case.ts`：exit 3 → FAIL；缺失可执行 → NOT_TESTED；显式 exclusions → SKIPPED/NOT_APPLICABLE |
 | dirty 用户内容不被 reset | **PASS** | 同上 REL-09 用例 |
 
-本轮结果：workspaces **8/8**、verification **22/22**；storage **75/75**、effects **8/8**、ingress deterministic **18/18**、ingress SQLite **7/7**、core-on-SQLite **178/178**、G1 followup **5/5** 无回归。官方准入 probe `PASS_WP04_ADMISSION`（6/6）与完成运行时 probe `PASS_COMPLETION_RUNTIME_BOUNDARY`（2/2），原始输出见 `reports/wp04-admission-probe.json`；测试输出见 `packages/workspaces/reports/test-output.txt` 与 `packages/verification/reports/test-output.txt`。
+本轮结果：workspaces **8/8**、verification **22/22**；storage **75/75**、effects **8/8**、ingress deterministic **18/18**、ingress SQLite **7/7**、core-on-SQLite **178/178**、G1 followup **5/5** 无回归。迁移测试已随 v7 更新为“v6 完成证据 + v7 产品记录追加、v1–v5 checksum 不变”；官方准入 probe `PASS_WP04_ADMISSION`（6/6）与完成运行时 probe `PASS_COMPLETION_RUNTIME_BOUNDARY`（2/2），原始输出见 `reports/wp04-admission-probe.json`；测试输出见 `packages/workspaces/reports/test-output.txt` 与 `packages/verification/reports/test-output.txt`。
 
 ## 3.5 准入修复（6 类）
 

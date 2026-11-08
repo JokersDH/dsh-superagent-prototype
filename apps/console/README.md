@@ -10,10 +10,12 @@ authentication.
 | Mode | Selection | Purpose |
 | --- | --- | --- |
 | Fixture (default) | `VITE_CONSOLE_MODE` unset | Isolated, schema-valid scenario in the development adapter; state persists in `sessionStorage` for the tab. Never a production business-state source. |
-| HTTP | `VITE_CONSOLE_MODE=http` | `HttpTransport` against `/v1`: `POST /v1/commands`, `GET /v1/snapshot`, `GET /v1/conversations/:id/messages`, SSE `GET /v1/events?after=`. Vite proxies `/v1` to `127.0.0.1:8787`. |
+| HTTP | `VITE_CONSOLE_MODE=http` | `HttpTransport` against `/v1`: session bootstrap/check, commands, snapshot, messages, SSE, verification and delivery detail routes. Vite proxies `/v1` to `VITE_API_TARGET` (default `127.0.0.1:8787`). |
 
-The HTTP path is implemented but **NOT_TESTED** against a live server: the product transport belongs
-to the main agent and was not published in this round.
+The HTTP lane is verified against the main-owned loopback sandbox (`apps/coordinator/http/demo.ts`):
+`PASS_CONSOLE_HTTP_DEMO` 8/8 on the real ApplicationService/core/SQLite path. The sandbox queues
+execution intents and dispatches no Runner or vendor model, so question/verification panels stay
+empty there; that is reported as NOT_TESTED, not faked.
 
 ## What the UI covers
 
@@ -36,6 +38,8 @@ to the main agent and was not published in this round.
 
 ## Run
 
+Fixture lane (default, no backend):
+
 ```sh
 pnpm install                                   # root workspace; lock changes are main-owned
 pnpm --dir packages/contracts run build        # console imports the built schema/types
@@ -44,6 +48,28 @@ pnpm --dir apps/console run test               # fixture adapter contract tests 
 pnpm --dir apps/console run dev                # http://127.0.0.1:5173/
 pnpm --dir apps/console run build
 ```
+
+Live product lane (main-owned API sandbox):
+
+```sh
+# 1) build application deps if needed, then start the loopback sandbox
+pnpm --filter @personal-agent/questions --filter @personal-agent/application run build
+pnpm --filter @personal-agent/coordinator dev:api --port 8788 \
+  --state /tmp/pa-http-demo --console-origin http://127.0.0.1:5174
+
+# 2) start the console against it (different port keeps the fixture lane intact)
+VITE_CONSOLE_MODE=http VITE_API_TARGET=http://127.0.0.1:8788 \
+  VITE_CONVERSATION_ID=conversation-main \
+  pnpm --dir apps/console run dev -- --port 5174
+
+# 3) live acceptance (reads /tmp/pa-http-demo/bootstrap.key)
+node apps/console/e2e/http-demo.mjs
+```
+
+Open the console, paste the private `bootstrap.key` from the sandbox state directory into the session
+gate, and create a work. The backend sets the HttpOnly session cookie and constructs the
+`TrustedActor`; the browser never supplies either. `VITE_CONVERSATION_ID` selects the product
+conversation for the demo (default `conv-main`, which is the fixture conversation).
 
 Playwright evidence needs a browser for the installed package:
 
@@ -58,11 +84,12 @@ The e2e runner expects the dev server at `CONSOLE_URL` (default `http://127.0.0.
 
 ## Boundaries and unwired pieces
 
-- Fixture-only transport methods (`verification`, `deliveries`, `executors`) are optional extension
-  points. The HTTP transport omits them until the main transport publishes matching read routes; the
-  UI then shows "尚未从产品路由读取" instead of inventing data.
+- `verification` and `deliveries` are implemented on both lanes; HTTP consumes
+  `/v1/verifications/:id` and `/v1/questions/:id/deliveries`. `executors` remains fixture-only until
+  the main Catalog read entry exists; HTTP mode shows "Catalog 尚未接线" instead of inventing profiles.
 - No new Snapshot field, no vendor `if/else` in pages, no private wire types: every returned document
   is parsed with `@personal-agent/contracts`.
 - Closing the browser cannot stop the daemon; nothing here writes product SQLite or native profiles.
-- Real HTTP/SSE, authenticated actor production, and live Catalog wiring are **NOT_TESTED**.
+- Real HTTP/SSE and authenticated actor flow are verified against the local sandbox; live Catalog,
+  Runner dispatch and native Driver behavior remain **NOT_TESTED**.
 - See `docs/rfcs/WP-11/0001-console-fixture-boundary.md` and `report.md` for acceptance evidence.

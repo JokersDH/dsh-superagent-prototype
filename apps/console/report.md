@@ -28,26 +28,38 @@ node apps/console/e2e/run.mjs                # PASS_CONSOLE_FIXTURE, 20/20
 
 证据：`apps/console/e2e/report.json`、`apps/console/e2e/screenshots/*.png`。
 
-## 3. 验收映射（fixture 级）
+## 2.5 真实 HTTP 演示（主线的 loopback sandbox）
+
+```sh
+# sandbox: apps/coordinator/http/demo.ts --port 8788 --state /tmp/pa-http-demo --console-origin http://127.0.0.1:5174
+# console: VITE_CONSOLE_MODE=http VITE_API_TARGET=http://127.0.0.1:8788 VITE_CONVERSATION_ID=conversation-main pnpm --dir apps/console run dev -- --port 5174
+node apps/console/e2e/http-demo.mjs          # PASS_CONSOLE_HTTP_DEMO, 8/8
+```
+
+覆盖：bootstrap 错误令牌就地拒绝；正确令牌换取 HttpOnly cookie 后 snapshot/SSE 建立；`create_work` 经 ApplicationService/core/真实 SQLite 入库并按 `actions.available` 渲染暂停/停止；聊天消息持久化；`pause_dispatch` CAS 成功；停止后如实显示“已结束”且不宣称交付；刷新后工作与会话仍在；登录后的 console 无错误。证据：`apps/console/e2e/report-http.json` 与 `screenshots/http-*.png`。
+
+sandbox 只排队执行 intent，不启动 Runner/模型，因此该轮没有生成问题、验证或 native 证据；这些面板保持空态并标为 NOT_TESTED，不使用 fake 结果。
+
+## 3. 验收映射（fixture + 真实 HTTP 演示）
 
 | ID | 结果 | 证据/说明 |
 | --- | --- | --- |
 | AC-UX-01 | **PASS（fixture）** | 建议不自动执行；`create_work` 表单提交目标/范围/标准后才出现新工作。模型建议路径未接真实 reasoner。 |
 | AC-UX-02 | **PASS（fixture）** | 新建、继续、停止、回答问题均确定性完成，不依赖模型；离线时仍可用。 |
-| AC-UX-03 | **PASS（fixture）** | WorkId 由后端回执给出，phase 只来自 `WorkView`；UI 不维护状态机。真实 core 投影 NOT_TESTED。 |
+| AC-UX-03 | **PASS（fixture + HTTP）** | WorkId 由后端回执给出，phase 只来自 `WorkView`；HTTP 演示中 phase 来自真实 core/SQLite 投影，UI 不维护状态机。 |
 | AC-UX-04 | **PASS（fixture）** | project/anchor 上下文可见，工作列表按项目筛选，不串台。 |
 | AC-UX-05 | **PASS（fixture）** | 认证/审核使用独立原生选项表单；答案记录为本地状态。真实 native 授权 NOT_TESTED。 |
-| AC-UX-06 | **PASS（fixture）** | 停止显示“停止中 + 写者状态未知（不能视为已停止）”；暂停只改派工开关，不宣称暂停当前工具。 |
+| AC-UX-06 | **PASS（fixture + HTTP）** | fixture 覆盖“停止中 + 写者状态未知”；HTTP sandbox 无 Runner，停止如实显示“已结束”且绝不显示“已交付”；暂停只改派工开关，不宣称暂停当前工具。 |
 | AC-UX-07 | **PASS（fixture）** | 过期候选的接受按钮禁用并说明原因；直接提交返回 `stale_candidate`，工作保持验证中。 |
 | AC-UX-08 | **PASS（fixture）** | 当前候选验证通过后接受，工作进入“已交付”。 |
 | AC-UX-09 | **PASS（fixture）** | 验证按 criterion 分行，投递按 target 分行，不用单一绿灯代替；真实 Driver 结果 NOT_TESTED。 |
-| AC-UX-10 | **PASS（fixture）** | 刷新后对话、已交付工作、待决定问题恢复；旧答案不会唤醒已停止工作（fixture 停止后无动作）。真实恢复链路 NOT_TESTED。 |
+| AC-UX-10 | **PASS（fixture + HTTP）** | fixture 刷新恢复对话/已交付工作/问题；HTTP 刷新后 cookie 会话、已结束工作与聊天仍在。真实 Runner 恢复链路 NOT_TESTED。 |
 | AC-UX-11 | **NOT_TESTED** | 决定/学习控制视图不在本包首批页面；`record_decision` 等命令返回 `unsupported_capability`。 |
 | AC-UX-12 | **PASS（部分）** | 桌面/窄屏无重叠或横向溢出；键盘有可见焦点；未做完整屏幕阅读器人工审计。 |
 
 ## 4. 未接线与限制
 
-- 生产 HTTP/SSE、认证后 actor、真实 Snapshot/Command 路由由主 Agent 提供；当前 HTTP transport 已实现但未连活服务。
-- 验证详情、逐 target 投递、执行器 Catalog 使用 fixture-only 可选方法；主线发布读路由后接入，见 `docs/rfcs/WP-11/0001-console-fixture-boundary.md`。
+- HTTP/SSE、session bootstrap、认证后 actor 已对接主线 loopback sandbox；验证/投递详情消费 `/v1/verifications/:id` 与 `/v1/questions/:id/deliveries`。执行器 Catalog 仍未发布读取入口（HTTP 模式明确显示未接线）。
+- sandbox 不派发 Runner，因此真实问题、验证、接受与 native 投递在该轮为 NOT_TESTED；fixture 场景提供这些交互的 UI 证据。
 - 不新增 Snapshot 字段，不在页面写 vendor 分支；worker/浏览器不声明 human 授权。
 - 关闭页面不停止 daemon；不写产品 SQLite 或 native profile；未执行付费 native smoke。
