@@ -1,0 +1,28 @@
+$ node --test test/*.case.ts
+✔ the registry is immutable per revision and refuses unregistered or invalid checks (4.994458ms)
+✔ a passing check and a failing check produce real exit results (66.928167ms)
+✔ a deadline and the output budget bound a check instead of buffering without limit (183.035875ms)
+✔ a check that ignores SIGTERM is killed as a group and does not hang the runner (356.485292ms)
+✔ a missing executable is NOT_TESTED and an unregistered check refuses verification (8.862792ms)
+✔ trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results (29.432667ms)
+✔ the frozen-artifact guard is mandatory and only an explicit true passes (28.007167ms)
+✔ a verification binds the candidate, artifact and core criteria digest (28.379208ms)
+✔ the runner refuses a workspace modified after freeze (WorkspaceManager integration) (390.332625ms)
+✔ the evidence store resolves only matching candidate/artifact records, read-only (57.741834ms)
+✔ quiescence requires a trusted complete-inventory barrier, never a caller subset or plain observations (7.517792ms)
+✔ the core gate completes only a fully proven candidate (41.641292ms)
+✔ a machine FAIL cannot be overridden by human acceptance (37.123708ms)
+✔ a SKIPPED required machine check cannot be overridden by human acceptance either (5.993375ms)
+✔ an old generation or a different artifact cannot be completed (35.39975ms)
+✔ a late resource append invalidates the recorded completion evidence (35.168583ms)
+✔ acceptance and quiescence records are immutable over their full body (35.323292ms)
+✔ Verification intake is strictly validated (6.35075ms)
+✔ the WP-04 migration is appended without rewriting v1–v5 (0.806ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1254.098375

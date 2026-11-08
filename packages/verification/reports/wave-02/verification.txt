@@ -1,0 +1,30 @@
+✔ the registry is immutable per revision and refuses unregistered or invalid checks (1.750209ms)
+✔ a passing check and a failing check produce real exit results (53.689375ms)
+✔ a deadline and the output budget bound a check instead of buffering without limit (179.4685ms)
+✔ a check that ignores SIGTERM is killed as a group and does not hang the runner (356.0275ms)
+✔ a missing executable is NOT_TESTED and an unregistered check refuses verification (8.1755ms)
+✔ trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results (23.346125ms)
+✔ the frozen-artifact guard is mandatory and only an explicit true passes (24.289ms)
+✔ a verification binds the candidate, artifact and core criteria digest (24.618334ms)
+✔ the runner refuses a workspace modified after freeze (WorkspaceManager integration) (336.670917ms)
+✔ the evidence store resolves only matching candidate/artifact records, read-only (44.601208ms)
+✔ quiescence requires a trusted complete-inventory barrier, never a caller subset or plain observations (5.05875ms)
+✔ the core gate completes only a fully proven candidate (30.516125ms)
+✔ a machine FAIL cannot be overridden by human acceptance (27.927958ms)
+✔ a SKIPPED required machine check cannot be overridden by human acceptance either (6.064333ms)
+✔ an old generation or a different artifact cannot be completed (27.718375ms)
+✔ a late resource append invalidates the recorded completion evidence (31.03025ms)
+✔ acceptance and quiescence records are immutable over their full body (30.390291ms)
+✔ quiescence requires the current pointer, the barrier topic, the producer identity and a committed command result (5.5255ms)
+✔ an empty registered manifest completes only without a writer fact (4.510666ms)
+✔ moving the current pointer after recording invalidates the resolved evidence (30.414333ms)
+✔ Verification intake is strictly validated (4.501958ms)
+✔ the WP-04 migration is appended without rewriting v1–v5 (0.561ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1154.984

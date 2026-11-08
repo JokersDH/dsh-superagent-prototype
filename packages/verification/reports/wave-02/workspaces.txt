@@ -1,0 +1,17 @@
+$ node --test packages/workspaces/test/*.case.ts
+✔ reserve creates a detached attempt worktree and leaves the user worktree untouched (184.536958ms)
+✔ freeze records a manifest whose digest changes when the attempt worktree changes (328.878042ms)
+✔ release removes only the attempt worktree; the user worktree and history stay intact (258.105791ms)
+✔ reserve refuses a duplicate attempt, an invalid id, and an attempt root inside the project (175.057334ms)
+✔ a tracked deletion freezes as a deleted entry with the deletion in the attempt patch (232.658417ms)
+✔ a symlink is identified by its link text, not by equal target content, and dangling links freeze (324.215458ms)
+✔ the executable bit participates in the artifact identity (261.582875ms)
+✔ digest() recomputes without overwriting the original audit manifest (313.505875ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2145.673958

@@ -1,0 +1,26 @@
+{
+  "status": "PASS_COMPLETION_RUNTIME_BOUNDARY",
+  "sourceCommit": "473d0ba82abfc256a9bac1dec47b41d4be12c8bb",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "cases": [
+    {
+      "id": "active-new-epoch",
+      "passesInvariant": true,
+      "observed": {
+        "stillResolves": false,
+        "completionRefused": true,
+        "currentAttemptState": "active"
+      }
+    },
+    {
+      "id": "wrong-event-topic",
+      "passesInvariant": true,
+      "observed": {
+        "stillResolves": false,
+        "completionRefused": true,
+        "currentAttemptState": "ended"
+      }
+    }
+  ]
+}

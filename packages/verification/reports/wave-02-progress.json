@@ -1,0 +1,99 @@
+{
+  "package": "wave-02-agent-a",
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "cd09395",
+  "mergeCommit": "e10167a",
+  "testedSourceCommit": "473d0ba82abfc256a9bac1dec47b41d4be12c8bb",
+  "backendCheckpointCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
+  "consoleDeliveryCommit": "7d7ec60732e0c75fa82e4121e2c673815976ae97",
+  "httpIntegrationCommit": "473d0ba82abfc256a9bac1dec47b41d4be12c8bb",
+  "updatedAt": "2026-11-08T23:10:00.000Z",
+  "phases": {
+    "A1": {
+      "status": "PASS",
+      "scope": "WP-04 admission fixes plus adjacent completion boundaries. Probes re-run at the integrated source commit.",
+      "evidence": [
+        "packages/verification/reports/wave-02/probe-wp04.json",
+        "packages/verification/reports/wave-02/probe-completion-runtime.json",
+        "packages/verification/reports/wave-02/probe-g1-followup.json",
+        "packages/verification/reports/wave-02/verification.txt",
+        "packages/verification/reports/wave-02/workspaces.txt"
+      ],
+      "results": {
+        "PASS_WP04_ADMISSION": "6/6",
+        "PASS_COMPLETION_RUNTIME_BOUNDARY": "2/2",
+        "PASS_FOLLOWUP_INVARIANTS": "5/5",
+        "verificationSuite": "22/22 (migration test now asserts v6+v7 append and frozen v1-v5 checksums)"
+      }
+    },
+    "A2": {
+      "status": "PASS",
+      "scope": "Product records in packages/storage (migration v7) integrated by main at 4a09ce4; A revalidated after the cd09395 merge.",
+      "interface": "docs/rfcs/WP-02/0002-product-record-repositories.md",
+      "evidence": [
+        "packages/storage/test/product.case.ts",
+        "packages/storage/test/outbox-answers.case.ts",
+        "packages/verification/reports/wave-02/storage.txt"
+      ],
+      "results": {
+        "storage": "75/75",
+        "mainApplicationSlice": "90/90 (pnpm check:g2-application over actual core/storage/questions/application/HTTP)"
+      }
+    },
+    "A3": {
+      "status": "PASS_FIXTURE_AND_HTTP_DEMO",
+      "scope": "Console workbench connected to the main HTTP checkpoint: session bootstrap/check with the private local token, cookie auth, snapshot/messages/SSE, commands, verification and per-question delivery readers; fixture lane retained for questions/verification/acceptance flows.",
+      "interface": "docs/rfcs/WP-11/0001-console-fixture-boundary.md",
+      "servers": {
+        "fixtureConsole": "http://127.0.0.1:5173/",
+        "httpConsole": "http://127.0.0.1:5174/",
+        "apiSandbox": "http://127.0.0.1:8788 (apps/coordinator/http/demo.ts, mode=fixture)"
+      },
+      "evidence": [
+        "apps/console/e2e/report.json",
+        "apps/console/e2e/report-http.json",
+        "apps/console/e2e/screenshots/desktop-work.png",
+        "apps/console/e2e/screenshots/narrow-main.png",
+        "apps/console/e2e/screenshots/http-gate.png",
+        "apps/console/e2e/screenshots/http-work.png",
+        "apps/console/e2e/screenshots/http-stopped.png",
+        "apps/console/e2e/screenshots/http-after-reload.png",
+        "apps/console/report.md"
+      ],
+      "results": {
+        "typecheck": "PASS",
+        "fixtureContractTests": "8/8",
+        "fixturePlaywright": "PASS_CONSOLE_FIXTURE 20/20",
+        "httpDemoPlaywright": "PASS_CONSOLE_HTTP_DEMO 8/8",
+        "productionBuild": "PASS"
+      },
+      "httpDemoCovered": [
+        "wrong bootstrap token refused in place; correct token creates an HttpOnly session cookie",
+        "create_work through ApplicationService/core/SQLite with backend actions rendered",
+        "chat message persisted; pause_dispatch CAS accepted",
+        "stop_work shows the ended ticket honestly without a delivery claim",
+        "page reload keeps the session, work and conversation"
+      ],
+      "notWired": [
+        "execution intents are queued by the sandbox and no Runner/vendor model is dispatched",
+        "live questions/verification/acceptance and native delivery remain NOT_TESTED in the HTTP lane (covered only by the fixture lane)",
+        "production Catalog/AgentProfile read entry is still main-owned",
+        "AC-UX-11 decision/learning views remain NOT_TESTED"
+      ]
+    }
+  },
+  "dependencies": {
+    "new": [
+      "apps/console: react 18.3.1, react-dom 18.3.1",
+      "apps/console dev: vite 8.2.2, typescript 6.0.3, @playwright/test 1.65.0, @types/react, @types/react-dom"
+    ],
+    "rootLock": "Temporary install diff only; not committed. Main regenerates the authoritative root lock.",
+    "browser": "Chromium headless shell 1254 downloaded to the user's Playwright cache for local evidence.",
+    "buildNote": "packages/questions and packages/application were built locally with the updated storage dist for the demo; their sources are main-owned and unmodified."
+  },
+  "limitations": [
+    "The live HTTP demo is an API sandbox: no Runner, no vendor model, no questions/verification artifacts, no native compatibility claim.",
+    "Fixture-level UI acceptance is not a product E2E replacement; G2-Demo-Fake still needs main to compose the accepted Runner.",
+    "Process-group isolation is not a sandbox; cleanup_unproven means unproven quiescence, not a stopped resource."
+  ]
+}
