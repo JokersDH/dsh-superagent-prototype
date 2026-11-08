@@ -1,0 +1,16 @@
+{
+  "status": "PASS_CLEAN_CHECKOUT_APPLICATION_BROKER_HTTP_SLICE",
+  "sourceCommit": "d5cfdc12767c2c5b01bb707b19615882ddd8a954",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "install": "pnpm install --offline --frozen-lockfile --ignore-scripts",
+  "results": [
+    { "command": "pnpm check:g2-application", "status": "PASS", "tests": 90 },
+    { "command": "node product-spec/tools/verify-spec.mjs --check", "status": "PASS", "runtimeTests": 0 }
+  ],
+  "trackedSourceUnchangedAfterChecks": true,
+  "onlyGeneratedReportTimestampChanged": true,
+  "apiSandboxSmoke": { "status": "PASS_LOOPBACK_API_SANDBOX", "url": "http://127.0.0.1:8787/v1/health", "sourceRefreshRestarted": true, "vendorCalls": 0 },
+  "notClaimed": ["Complete G1/G2 product E2E", "Installed vendor/model compatibility", "Full console/runtime/verifier integration", "Power-loss/load/soak certification"]
+}

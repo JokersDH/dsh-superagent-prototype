@@ -4,6 +4,8 @@
   "baseMainCommit": "5ac39b5",
   "storageIntegrationCommit": "4a09ce4",
   "storageSourceCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
+  "testedSourceCommit": "d5cfdc12767c2c5b01bb707b19615882ddd8a954",
+  "cleanCheckoutReport": "reports/releases/g2-application-clean.json",
   "stages": {
     "M1": { "status": "IMPLEMENTED_INTERFACE_CHECKPOINT", "interface": "docs/rfcs/WP-16/0002-main-application-checkpoint.md", "businessContractChanged": false },
     "M2": { "status": "PASS_REAL_SQLITE_MODULE", "scope": "Question intake/strict answers/expiry/reuse/per-target delivery; native transport remains injected", "tests": 14 },

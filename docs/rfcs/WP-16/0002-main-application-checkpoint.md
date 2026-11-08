@@ -49,6 +49,8 @@ The application host provides a current native-connection fence; unknown/stale c
 - A storage checkpoint: **75/75**, independently executed on Node 24.22.2. Workspaces 8 pass; verification suite has **21 passing / 1 failing** due `MIGRATIONS.length === 6` against v7. Both existing completion-boundary probes now pass. Verification/console were not imported by the storage-only integration.
 - Actual sandbox process on loopback: `smoke-g2-api.mjs` creates/reads/stops work and returns the original durable receipt for duplicate command; it invokes no vendor/model.
 
+Clean checkout of source `d5cfdc1` installed offline from the frozen lockfile and independently passed the same **90** cases and spec checks on Node 24.22.2. Only the generated report timestamp changed. Evidence: `reports/releases/g2-application-clean.json`. The sandbox was refreshed to this source and passed the live HTTP smoke again.
+
 Reports: `reports/releases/g2-application.json`, `g1-core-sqlite.json`, `g2-completion-runtime-review.json` and the main wave-02 progress file. No UI screenshot/native evidence is substituted for product E2E.
 
 ## Pending Integration, Collected Once
