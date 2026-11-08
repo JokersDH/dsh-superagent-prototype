@@ -152,8 +152,63 @@ const V5: Migration = {
   ],
 }
 
+/**
+ * v6: trusted completion evidence (WP-04). Immutable records the core CompletionVerifier reads on
+ * the same connection: a Verification bound to the candidate/artifact/criteria digest, candidate-bound
+ * quiescence whose evidence is derived from runtime observations at record time, and a human
+ * acceptance record. Nothing here decides completion; the core gate judges these records.
+ */
+const V6: Migration = {
+  version: 6,
+  name: 'completion-evidence',
+  statements: [
+    `CREATE TABLE completion_verifications (id TEXT PRIMARY KEY, ticket_id TEXT NOT NULL, assignment_id TEXT NOT NULL,
+      candidate_generation INTEGER NOT NULL, contract TEXT NOT NULL, artifact_digest TEXT NOT NULL,
+      criteria_digest TEXT NOT NULL, environment_ref TEXT NOT NULL, verifier_identity_ref TEXT NOT NULL,
+      results TEXT NOT NULL, created_at TEXT NOT NULL)`,
+    `CREATE INDEX completion_verifications_candidate ON completion_verifications (ticket_id, assignment_id, candidate_generation)`,
+    `CREATE TABLE completion_quiescence (id TEXT PRIMARY KEY, ticket_id TEXT NOT NULL, assignment_id TEXT NOT NULL,
+      candidate_generation INTEGER NOT NULL, contract TEXT NOT NULL, artifact_digest TEXT NOT NULL,
+      attempt_id TEXT NOT NULL, resource_refs TEXT NOT NULL, evidence TEXT NOT NULL, observed_at TEXT NOT NULL)`,
+    `CREATE INDEX completion_quiescence_candidate ON completion_quiescence (ticket_id, assignment_id, candidate_generation)`,
+    `CREATE TABLE completion_acceptances (id TEXT PRIMARY KEY, ticket_id TEXT NOT NULL, assignment_id TEXT NOT NULL,
+      candidate_generation INTEGER NOT NULL, contract TEXT NOT NULL, artifact_digest TEXT NOT NULL,
+      criterion_ids TEXT NOT NULL, actor_ref TEXT NOT NULL, accepted_at TEXT NOT NULL)`,
+    `CREATE INDEX completion_acceptances_candidate ON completion_acceptances (ticket_id, assignment_id, candidate_generation)`,
+  ],
+}
+
+/**
+ * v7: product records for the application/Broker (wave-02 A2). Frozen Work identity, contract
+ * revisions, contract↔Ticket links (one primary per revision), persisted conversation messages with
+ * a per-conversation sequence, user questions with a validity/version CAS, and the manual dispatch
+ * switch. Status/phase transitions stay with core and the Broker; these tables only hold records.
+ */
+const V7: Migration = {
+  version: 7,
+  name: 'product-records',
+  statements: [
+    `CREATE TABLE works (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, conversation_id TEXT NOT NULL, value TEXT NOT NULL, created_at TEXT NOT NULL)`,
+    `CREATE INDEX works_project ON works (project_id, created_at DESC, id)`,
+    `CREATE TABLE contract_revisions (work_id TEXT NOT NULL, revision INTEGER NOT NULL, digest TEXT NOT NULL,
+      authority_ref TEXT NOT NULL, value TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (work_id, revision, digest))`,
+    `CREATE INDEX contract_revisions_work ON contract_revisions (work_id, revision DESC)`,
+    `CREATE TABLE ticket_links (work_id TEXT NOT NULL, revision INTEGER NOT NULL, digest TEXT NOT NULL, ticket_id TEXT NOT NULL,
+      role TEXT NOT NULL, authority_ref TEXT NOT NULL, value TEXT NOT NULL, created_at TEXT NOT NULL,
+      PRIMARY KEY (work_id, revision, digest, ticket_id))`,
+    `CREATE UNIQUE INDEX ticket_links_primary ON ticket_links (work_id, revision, digest) WHERE role = 'primary'`,
+    `CREATE INDEX ticket_links_work ON ticket_links (work_id, revision DESC)`,
+    `CREATE TABLE conversation_messages (conversation_id TEXT NOT NULL, sequence INTEGER NOT NULL, id TEXT NOT NULL UNIQUE,
+      value TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (conversation_id, sequence))`,
+    `CREATE TABLE user_questions (id TEXT PRIMARY KEY, version INTEGER NOT NULL, work_id TEXT NOT NULL, revision INTEGER NOT NULL,
+      digest TEXT NOT NULL, validity TEXT NOT NULL, opened_at TEXT NOT NULL, value TEXT NOT NULL)`,
+    `CREATE INDEX user_questions_open ON user_questions (validity, work_id, opened_at DESC)`,
+    `CREATE TABLE dispatch_controls (scope TEXT PRIMARY KEY, paused INTEGER NOT NULL, revision INTEGER NOT NULL, updated_at TEXT NOT NULL)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>
