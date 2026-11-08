@@ -63,6 +63,7 @@ interface TestResource { ref: string; ownership: 'spawned_process' | 'shared_ser
 /** Records a test-side barrier exactly the way the host barrier writes it (public repositories only). */
 function confirmBarrier(store: ProductStore, candidate: CandidateRef, attemptId: string, quiescent: readonly TestResource[] = resources, registered: readonly TestResource[] = resources): BarrierReceipt {
   const manifest = manifestDigest(registered)
+  const commandId = `confirm-owned-quiescence/v2:${attemptId}:${manifest}`
   let confirmedEventSeq = 0
   let writerFactId: string | undefined
   store.uow.atomic(() => {
@@ -82,8 +83,13 @@ function confirmBarrier(store: ProductStore, candidate: CandidateRef, attemptId:
     }
     store.bindings.end(attemptId)
     confirmedEventSeq = store.events.append({ topic: 'runtime.barrier.confirmed', entityRef: attemptId, payload: {
-      proofRef, resourceManifestDigest: manifest, scope: 'registered_owned_resources_only', contract: candidate.contract,
+      barrierCommandId: commandId, proofRef, resourceManifestDigest: manifest, scope: 'registered_owned_resources_only',
+      writerFactId: writerFactId ?? null, runnerIdentityRef: 'runner-1', source: 'codex', contract: candidate.contract,
+      attempt: { attemptId, ticketId: candidate.ticketId, assignmentId: candidate.assignmentId, fenceEpoch: 1, contract: candidate.contract },
     } })
+    const receipt: BarrierReceipt = { scope: 'registered_owned_resources_only', attemptId, proofRef, resourceManifestDigest: manifest, confirmedEventSeq,
+      ...(writerFactId ? { writerFactId } : {}) }
+    store.commands.record(commandId, canonicalDigest({ attemptId, manifest, scope: receipt.scope } as Json), () => receipt)
   })
   return { scope: 'registered_owned_resources_only', attemptId, proofRef, resourceManifestDigest: manifest, confirmedEventSeq,
     ...(writerFactId ? { writerFactId } : {}) }
@@ -95,6 +101,7 @@ const seedBinding = (store: ProductStore, candidate: CandidateRef, registered: r
       ticketId: candidate.ticketId, assignmentId: candidate.assignmentId, attemptId, fenceEpoch: 1, contract: candidate.contract,
       runnerIdentityRef: 'runner-1', source: 'codex', state: 'active', resources: registered,
     })
+    store.bindings.setCurrent(candidate.ticketId, attemptId)
   })
 }
 
@@ -261,7 +268,7 @@ test('acceptance and quiescence records are immutable over their full body', asy
   const workspacePath = mkdtempSync(join(tmpdir(), 'wp04-immutable-'))
   try {
     const evidence = new CompletionEvidenceStore(context.store)
-    const { candidate } = await prepare(context.store, evidence, workspacePath, 'process.exit(0)')
+    const { candidate, barrier } = await prepare(context.store, evidence, workspacePath, 'process.exit(0)')
     const accepted = { id: 'a1', candidate, artifactDigest: artifact, criterionIds: ['review'], actorRef: 'user-1' }
     evidence.recordAcceptance(accepted)
     assert.throws(() => evidence.recordAcceptance({ ...accepted, actorRef: 'actor-2' }), EvidenceConflict, 'a different actor conflicts')
@@ -269,10 +276,94 @@ test('acceptance and quiescence records are immutable over their full body', asy
     assert.throws(() => evidence.recordAcceptance({ ...accepted, candidate: { ...candidate, candidateGeneration: candidate.candidateGeneration + 1 } }), EvidenceConflict)
     assert.throws(() => evidence.recordAcceptance({ ...accepted, criterionIds: ['other'] }), EvidenceConflict)
 
-    const barrier = confirmBarrier(context.store, candidate, 'attempt-1')
     evidence.recordQuiescence({ id: 'q2', candidate, artifactDigest: artifact, attemptId: 'attempt-1', barrier })
     assert.throws(() => evidence.recordQuiescence({ id: 'q2', candidate, artifactDigest: 'd'.repeat(64), attemptId: 'attempt-1', barrier }), EvidenceConflict)
     assert.throws(() => evidence.recordQuiescence({ id: 'q2', candidate, artifactDigest: artifact, attemptId: 'attempt-1', barrier: { ...barrier, confirmedEventSeq: barrier.confirmedEventSeq + 1 } }), QuiescenceUnavailable)
+  } finally {
+    context.store.close()
+    rmSync(context.dir, { recursive: true, force: true })
+    rmSync(workspacePath, { recursive: true, force: true })
+  }
+})
+
+test('quiescence requires the current pointer, the barrier topic, the producer identity and a committed command result', async () => {
+  const context = makeStore()
+  try {
+    const evidence = new CompletionEvidenceStore(context.store)
+    const candidate: CandidateRef = { ticketId: 'ticket-1', assignmentId: 'assignment-1', contract, candidateGeneration: 1 }
+    seedBinding(context.store, candidate)
+    const barrier = confirmBarrier(context.store, candidate, 'attempt-1')
+    const event = context.store.events.after(barrier.confirmedEventSeq - 1, 1)[0]!
+    const payload = event.payload as Record<string, unknown>
+    const commandId = String(payload.barrierCommandId)
+    const record = (id: string) => evidence.recordQuiescence({ id, candidate, artifactDigest: artifact, attemptId: 'attempt-1', barrier })
+    const restorePayload = (value: Record<string, unknown>) => context.store.db.prepare('UPDATE event_log SET payload = ? WHERE seq = ?')
+      .run(JSON.stringify(value), barrier.confirmedEventSeq)
+
+    context.store.db.prepare('UPDATE event_log SET topic = ? WHERE seq = ?').run('unrelated.observation', barrier.confirmedEventSeq)
+    assert.throws(() => record('q-topic'), QuiescenceUnavailable, 'an unrelated event topic is not a host barrier')
+    context.store.db.prepare('UPDATE event_log SET topic = ? WHERE seq = ?').run('runtime.barrier.confirmed', barrier.confirmedEventSeq)
+
+    context.store.db.prepare('DELETE FROM command_receipts WHERE command_id = ?').run(commandId)
+    assert.throws(() => record('q-command'), QuiescenceUnavailable, 'an uncommitted barrier command result is not proof')
+    context.store.commands.record(commandId, 'a'.repeat(64), () => barrier)
+
+    restorePayload({ ...payload, runnerIdentityRef: 'runner-other' })
+    assert.throws(() => record('q-producer'), QuiescenceUnavailable, 'another producer identity cannot confirm this barrier')
+    restorePayload({ ...payload, source: 'other-source' })
+    assert.throws(() => record('q-source'), QuiescenceUnavailable)
+    restorePayload(payload)
+
+    assert.doesNotThrow(() => record('q-good'))
+    // A newer current epoch invalidates the attempt even though its own binding remains ended.
+    context.store.uow.atomic(() => {
+      context.store.bindings.record({
+        ticketId: candidate.ticketId, assignmentId: candidate.assignmentId, attemptId: 'attempt-2', fenceEpoch: 2, contract,
+        runnerIdentityRef: 'runner-1', source: 'codex', state: 'active', resources: [],
+      })
+      context.store.bindings.setCurrent(candidate.ticketId, 'attempt-2')
+    })
+    assert.throws(() => record('q-late'), QuiescenceUnavailable, 'the barrier attempt is no longer the current registration')
+  } finally {
+    context.store.close()
+    rmSync(context.dir, { recursive: true, force: true })
+  }
+})
+
+test('an empty registered manifest completes only without a writer fact', async () => {
+  const context = makeStore()
+  try {
+    const evidence = new CompletionEvidenceStore(context.store)
+    const candidate: CandidateRef = { ticketId: 'ticket-1', assignmentId: 'assignment-1', contract, candidateGeneration: 1 }
+    seedBinding(context.store, candidate, [])
+    const barrier = confirmBarrier(context.store, candidate, 'attempt-1', [], [])
+    assert.equal(barrier.writerFactId, undefined)
+    assert.throws(() => evidence.recordQuiescence({ id: 'q-empty-bad', candidate, artifactDigest: artifact, attemptId: 'attempt-1',
+      barrier: { ...barrier, writerFactId: 'fact-forged' } }), QuiescenceUnavailable)
+    evidence.recordQuiescence({ id: 'q-empty', candidate, artifactDigest: artifact, attemptId: 'attempt-1', barrier })
+  } finally {
+    context.store.close()
+    rmSync(context.dir, { recursive: true, force: true })
+  }
+})
+
+test('moving the current pointer after recording invalidates the resolved evidence', async () => {
+  const context = makeStore()
+  const workspacePath = mkdtempSync(join(tmpdir(), 'wp04-pointer-'))
+  try {
+    const evidence = new CompletionEvidenceStore(context.store)
+    const { engine, candidate, proposal } = await prepare(context.store, evidence, workspacePath, 'process.exit(0)')
+    assert.ok(evidence.resolve(proposal))
+    context.store.uow.atomic(() => {
+      context.store.bindings.record({
+        ticketId: candidate.ticketId, assignmentId: candidate.assignmentId, attemptId: 'attempt-2', fenceEpoch: 2, contract,
+        runnerIdentityRef: 'runner-2', source: 'codex', state: 'active', resources: [{ ref: 'active-writer-2', ownership: 'spawned_process' }],
+      })
+      context.store.bindings.setCurrent(candidate.ticketId, 'attempt-2')
+    })
+    assert.equal(evidence.resolve(proposal), undefined, 'a newer current attempt invalidates the prior barrier')
+    assert.throws(() => engine.confirmCompletion(proposal), (error: unknown) => error instanceof UserError && error.code === 'verificationUnavailable')
+    assert.equal(context.store.domain.tickets.get<{ ended?: unknown }>('ticket-1')?.ended, undefined)
   } finally {
     context.store.close()
     rmSync(context.dir, { recursive: true, force: true })

@@ -1,0 +1,31 @@
+$ node --test packages/verification/test/*.case.ts
+✔ the registry is immutable per revision and refuses unregistered or invalid checks (1.947291ms)
+✔ a passing check and a failing check produce real exit results (50.76225ms)
+✔ a deadline and the output budget bound a check instead of buffering without limit (176.454959ms)
+✔ a check that ignores SIGTERM is killed as a group and does not hang the runner (354.9615ms)
+✔ a missing executable is NOT_TESTED and an unregistered check refuses verification (7.172458ms)
+✔ trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results (27.729958ms)
+✔ the frozen-artifact guard is mandatory and only an explicit true passes (24.474875ms)
+✔ a verification binds the candidate, artifact and core criteria digest (26.26125ms)
+✔ the runner refuses a workspace modified after freeze (WorkspaceManager integration) (315.084958ms)
+✔ the evidence store resolves only matching candidate/artifact records, read-only (36.481916ms)
+✔ quiescence requires a trusted complete-inventory barrier, never a caller subset or plain observations (4.743833ms)
+✔ the core gate completes only a fully proven candidate (31.2755ms)
+✔ a machine FAIL cannot be overridden by human acceptance (26.981667ms)
+✔ a SKIPPED required machine check cannot be overridden by human acceptance either (5.677833ms)
+✔ an old generation or a different artifact cannot be completed (26.238625ms)
+✔ a late resource append invalidates the recorded completion evidence (28.275416ms)
+✔ acceptance and quiescence records are immutable over their full body (28.6265ms)
+✔ quiescence requires the current pointer, the barrier topic, the producer identity and a committed command result (5.903583ms)
+✔ an empty registered manifest completes only without a writer fact (4.122709ms)
+✔ moving the current pointer after recording invalidates the resolved evidence (27.321ms)
+✔ Verification intake is strictly validated (4.382458ms)
+✔ the WP-04 migration is appended without rewriting v1–v5 (0.985667ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1095.423

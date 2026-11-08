@@ -70,7 +70,7 @@
 | 符号链接/可执行位身份错误 | 符号链接按 `readlink` 文本计算摘要（悬空链接也可冻结），从不读取目标内容；文件记录可执行位；manifest 内容寻址（`<digest>.json`/`.patch`），`digest()` 只读复算不覆盖审计文件 | `workspace.case.ts` symlink/executable/digest 三例；probe `FREEZE-SYMLINK-TARGET` |
 | 冻结门禁可被跳过或默认通过 | `verifyArtifact` 为必填；运行前后必须精确返回 `true`；缺失/false/undefined/抛错 → `VerificationUnavailable` | `checks.case.ts` 强制门禁用例；probe `VERIFY-FALSE-FROZEN-GUARD` |
 | 检查可能卡死在协调进程里 | `spawn(detached)` 独立进程组、异步执行；deadline → 组 SIGTERM → grace → SIGKILL；硬清理上界内无法证明退出 → `NOT_TESTED`/`cleanupUnproven`；销毁管道、清理残留 | `checks.case.ts` "ignores SIGTERM…"；probe `CHECK-DEADLINE-IGNORING-SIGTERM`（watchdog 未被触发、probe 自行正常退出） |
-| 静止证明可被普通观察冒充 | `recordQuiescence` 只接受宿主 barrier receipt，并要求 binding `ended`、manifest 覆盖**全部**注册资源、`runtime.barrier.confirmed` 事件、宿主 writer 事实逐资源 `quiescent`；保存证明 `factId`；resolve 时重核，晚到追加使证据失效 | `evidence.case.ts` 完整清单/子集/无 barrier/错 manifest/他 attempt/晚到追加用例；probe `QUIESCENCE-REQUIRES-ALL-REGISTERED-RESOURCES` |
+| 静止证明可被普通观察冒充 | `recordQuiescence` 只接受宿主 barrier receipt，并要求 binding `ended`、**当前 by-ticket pointer 仍是该 attempt**、manifest 覆盖**全部**注册资源、`runtime.barrier.confirmed` 事件 topic、完整 producer 身份（attempt/epoch/runner/source/contract）、**已提交的 barrier command result**、宿主 writer 事实逐资源 `quiescent`；保存证明 `factId`；resolve 时重核整条链，晚到资源或新 epoch 使证据失效 | `evidence.case.ts` 完整清单/子集/无 barrier/错 topic/缺命令回执/错 producer/指针移动/零资源用例；probe `QUIESCENCE-REQUIRES-ALL-REGISTERED-RESOURCES` + `review-completion-runtime.mjs` |
 | 记录正文不可变性与 Verification 入口校验不足 | acceptance/quiescence 正文全字段比较，任何字段变化 `EvidenceConflict`；Verification 先经严格 `VerificationSchema.parse`，非法正文 `InvalidEvidence` | `evidence.case.ts` immutability + strict intake；probe `ACCEPTANCE-ID-IMMUTABILITY` |
 
 

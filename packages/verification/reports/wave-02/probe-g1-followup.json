@@ -1,0 +1,65 @@
+{
+  "status": "PASS_FOLLOWUP_INVARIANTS",
+  "storageSourceCommit": "093dc602a739377b0373f986fb8e47b406e81d6a",
+  "runtimeSourceCommit": "093dc602a739377b0373f986fb8e47b406e81d6a",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "cases": [
+    {
+      "id": "A-ASYNC-AFTER-AWAIT",
+      "passesInvariant": true,
+      "observed": {
+        "rejectedSynchronously": true,
+        "callbackBegan": false,
+        "rowsWrittenAfterRollback": 0
+      }
+    },
+    {
+      "id": "B-COMMAND-DELIMITER",
+      "passesInvariant": true,
+      "observed": {
+        "ids": [
+          "cmd-attempt-1-1-answer-8c9a4337c81eded392942a78c33bdba62aae29830a537ff3a4be00adf9c2c11e",
+          "cmd-attempt-1-1-answer-0981f37fc1fda5a861bf9b9cff3d4a69a4c14e35a4851254f0ce8f83d529e76d"
+        ]
+      }
+    },
+    {
+      "id": "B-COMMAND-EXPECTED-TURN",
+      "passesInvariant": true,
+      "observed": {
+        "ids": [
+          "cmd-attempt-1-1-deliver-d1604e8c0501787cc9848d8a99fec4ba033c4929960a099d003b4880f570c0ea",
+          "cmd-attempt-1-1-deliver-1178b1acdfd571eb9757d8edea9ce1b95bc215315dd76dd54a3756ca715f82fd"
+        ],
+        "turns": [
+          "turn-1",
+          "turn-2"
+        ]
+      }
+    },
+    {
+      "id": "B-ENDED-EPOCH-REUSE",
+      "passesInvariant": true,
+      "observed": {
+        "refusedSameAttemptEpochAfterEnd": true
+      }
+    },
+    {
+      "id": "B-CANCEL-DURING-LAUNCH",
+      "passesInvariant": true,
+      "observed": {
+        "startRejected": true,
+        "stop": {
+          "state": "stopping",
+          "quiescence": "unknown",
+          "evidenceRefs": [
+            "no-attempt-handle",
+            "reason:cancel-during-launch"
+          ]
+        },
+        "beginSentAfterStop": false
+      }
+    }
+  ]
+}

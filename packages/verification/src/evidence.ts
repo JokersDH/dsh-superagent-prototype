@@ -68,11 +68,14 @@ interface StoredQuiescenceEvidence {
 }
 
 interface BindingView {
+  attemptId: string
   ticketId: string
   assignmentId: string
   contract: ContractRef
   state: string
   fenceEpoch: number
+  runnerIdentityRef: string
+  source: string
   resources: readonly { ref: string; ownership: string }[]
 }
 
@@ -121,24 +124,29 @@ export class CompletionEvidenceStore implements CompletionVerifier {
     this.db = store.db
   }
 
-  /** Records a Verification immutably; strict validation on intake; an identical replay is a no-op. */
+  /**
+   * Records a Verification immutably; strict validation on intake; an identical replay is a no-op.
+   * The write joins the caller's UnitOfWork, so a receipt/event/effect and this record commit together.
+   */
   recordVerification(verification: Verification): void {
     let valid: Verification
     try { valid = VerificationSchema.parse(verification) } catch (error) {
       throw new InvalidEvidence(`Verification ${String(verification?.id)} failed strict contract validation: ${String(error)}`)
     }
-    const existing = row(this.db, 'SELECT * FROM completion_verifications WHERE id = ?', valid.id)
-    if (existing) {
-      if (digestOf(verificationOf(existing)) !== digestOf(valid)) throw new EvidenceConflict(`Verification ${valid.id} already exists with a different body`)
-      return
-    }
-    this.db.prepare(`INSERT INTO completion_verifications
-      (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, criteria_digest,
-       environment_ref, verifier_identity_ref, results, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      valid.id, valid.ticketId, valid.assignmentId, valid.candidateGeneration, JSON.stringify(valid.contract),
-      valid.artifactDigest, valid.criteriaDigest, valid.environmentRef, valid.verifierIdentityRef,
-      JSON.stringify(valid.results), new Date().toISOString(),
-    )
+    this.store.uow.atomic(() => {
+      const existing = row(this.db, 'SELECT * FROM completion_verifications WHERE id = ?', valid.id)
+      if (existing) {
+        if (digestOf(verificationOf(existing)) !== digestOf(valid)) throw new EvidenceConflict(`Verification ${valid.id} already exists with a different body`)
+        return
+      }
+      this.db.prepare(`INSERT INTO completion_verifications
+        (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, criteria_digest,
+         environment_ref, verifier_identity_ref, results, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+        valid.id, valid.ticketId, valid.assignmentId, valid.candidateGeneration, JSON.stringify(valid.contract),
+        valid.artifactDigest, valid.criteriaDigest, valid.environmentRef, valid.verifierIdentityRef,
+        JSON.stringify(valid.results), new Date().toISOString(),
+      )
+    })
   }
 
   /**
@@ -157,14 +165,15 @@ export class CompletionEvidenceStore implements CompletionVerifier {
       throw new QuiescenceUnavailable('The barrier receipt does not belong to the candidate assignment/contract')
     }
     if (binding.state !== 'ended') throw new QuiescenceUnavailable('The barrier receipt requires the attempt binding to be ended')
+    const current = this.store.bindings.current<BindingView>(input.candidate.ticketId)
+    if (!current || current.attemptId !== barrier.attemptId) throw new QuiescenceUnavailable('The barrier attempt is not the current registration for this ticket')
     if (manifestDigest(binding.resources) !== barrier.resourceManifestDigest) throw new QuiescenceUnavailable('The barrier manifest no longer matches the registered resources')
     const event = this.eventAt(barrier.confirmedEventSeq)
-    if (!event || event.entityRef !== barrier.attemptId || event.payload.proofRef !== barrier.proofRef
-      || event.payload.resourceManifestDigest !== barrier.resourceManifestDigest || event.payload.scope !== barrier.scope
-      || !sameContract(event.payload.contract as ContractRef, input.candidate.contract)) {
-      throw new QuiescenceUnavailable('The barrier event does not match the receipt, manifest or contract')
+    if (!event || !this.barrierEventValid(event, barrier.attemptId, barrier, binding, input.candidate.contract)) {
+      throw new QuiescenceUnavailable('The barrier event does not match the receipt, producer, command result or contract')
     }
     const resources: { resourceRef: string; factId: string }[] = []
+    if (!binding.resources.length && barrier.writerFactId) throw new QuiescenceUnavailable('An empty registered manifest cannot cite a writer fact')
     if (binding.resources.length) {
       if (!barrier.writerFactId) throw new QuiescenceUnavailable('A non-empty resource manifest needs the host-derived writer fact')
       const fact = this.store.facts.get(barrier.writerFactId)
@@ -184,19 +193,21 @@ export class CompletionEvidenceStore implements CompletionVerifier {
       ...(barrier.writerFactId ? { writerFactId: barrier.writerFactId } : {}), resources,
     }
     const existing = this.quiescenceById(input.id)
-    if (existing) {
-      if (digestOf(existing) !== digestOf({ candidate: input.candidate, artifactDigest: input.artifactDigest, attemptId: barrier.attemptId, evidence })) {
-        throw new EvidenceConflict(`Quiescence ${input.id} already exists with a different body`)
+    this.store.uow.atomic(() => {
+      if (existing) {
+        if (digestOf(existing) !== digestOf({ candidate: input.candidate, artifactDigest: input.artifactDigest, attemptId: barrier.attemptId, evidence })) {
+          throw new EvidenceConflict(`Quiescence ${input.id} already exists with a different body`)
+        }
+        return
       }
-      return
-    }
-    this.db.prepare(`INSERT INTO completion_quiescence
-      (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, attempt_id, resource_refs, evidence, observed_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      input.id, input.candidate.ticketId, input.candidate.assignmentId, input.candidate.candidateGeneration,
-      JSON.stringify(input.candidate.contract), input.artifactDigest, barrier.attemptId,
-      JSON.stringify(binding.resources.map(resource => resource.ref)), JSON.stringify(evidence), new Date().toISOString(),
-    )
+      this.db.prepare(`INSERT INTO completion_quiescence
+        (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, attempt_id, resource_refs, evidence, observed_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+        input.id, input.candidate.ticketId, input.candidate.assignmentId, input.candidate.candidateGeneration,
+        JSON.stringify(input.candidate.contract), input.artifactDigest, barrier.attemptId,
+        JSON.stringify(binding.resources.map(resource => resource.ref)), JSON.stringify(evidence), new Date().toISOString(),
+      )
+    })
   }
 
   /** Records a trusted user's acceptance of the candidate's required human criteria. */
@@ -205,18 +216,20 @@ export class CompletionEvidenceStore implements CompletionVerifier {
     if (!input.actorRef.trim()) throw new InvalidEvidence('Acceptance needs an authenticated actor')
     if (!/^[a-f0-9]{64}$/.test(input.artifactDigest)) throw new InvalidEvidence('Acceptance must bind a frozen artifact digest')
     const body = { candidate: input.candidate, artifactDigest: input.artifactDigest, criterionIds: [...input.criterionIds], actorRef: input.actorRef }
-    const existing = this.acceptanceById(input.id)
-    if (existing) {
-      if (digestOf(existing) !== digestOf(body)) throw new EvidenceConflict(`Acceptance ${input.id} already exists with a different body`)
-      return
-    }
-    this.db.prepare(`INSERT INTO completion_acceptances
-      (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, criterion_ids, actor_ref, accepted_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      input.id, input.candidate.ticketId, input.candidate.assignmentId, input.candidate.candidateGeneration,
-      JSON.stringify(input.candidate.contract), input.artifactDigest, JSON.stringify(input.criterionIds),
-      input.actorRef, new Date().toISOString(),
-    )
+    this.store.uow.atomic(() => {
+      const existing = this.acceptanceById(input.id)
+      if (existing) {
+        if (digestOf(existing) !== digestOf(body)) throw new EvidenceConflict(`Acceptance ${input.id} already exists with a different body`)
+        return
+      }
+      this.db.prepare(`INSERT INTO completion_acceptances
+        (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, criterion_ids, actor_ref, accepted_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+        input.id, input.candidate.ticketId, input.candidate.assignmentId, input.candidate.candidateGeneration,
+        JSON.stringify(input.candidate.contract), input.artifactDigest, JSON.stringify(input.criterionIds),
+        input.actorRef, new Date().toISOString(),
+      )
+    })
   }
 
   /**
@@ -224,6 +237,10 @@ export class CompletionEvidenceStore implements CompletionVerifier {
    * the proposal's complete candidate identity (ticket/assignment/generation/contract) and artifact;
    * the quiescence barrier is re-verified against the current binding manifest and event so a late
    * resource/epoch/contract change invalidates it.
+   *
+   * The core gate calls this inside its own completion transaction; a caller checking evidence
+   * outside the gate must wrap the call in `store.uow.atomic(() => ...)` so records and the current
+   * binding/event rows come from one snapshot. Record methods above join the caller's transaction.
    */
   resolve(proposal: CompletionProposal): CompletionEvidence | undefined {
     const verification = row(this.db, 'SELECT * FROM completion_verifications WHERE id = ?', proposal.verificationId)
@@ -254,16 +271,21 @@ export class CompletionEvidenceStore implements CompletionVerifier {
     return evidence
   }
 
-  /** Re-checks the barrier against the current binding, manifest and event (late changes invalidate). */
+  /** Re-checks the barrier against the current pointer, binding manifest, event/producer/command result and fact. */
   private barrierStillValid(candidate: CandidateRef, attemptId: string, evidence: StoredQuiescenceEvidence): boolean {
     const binding = this.store.bindings.binding<BindingView>(attemptId)
     if (!binding) return false
     if (binding.ticketId !== candidate.ticketId || binding.assignmentId !== candidate.assignmentId || !sameContract(binding.contract, candidate.contract)) return false
     if (binding.state !== 'ended') return false
+    const current = this.store.bindings.current<BindingView>(candidate.ticketId)
+    if (!current || current.attemptId !== attemptId) return false
     if (manifestDigest(binding.resources) !== evidence.manifestDigest) return false
     const event = this.eventAt(evidence.confirmedEventSeq)
-    if (!event || event.entityRef !== attemptId || event.payload.proofRef !== evidence.proofRef
-      || event.payload.resourceManifestDigest !== evidence.manifestDigest || !sameContract(event.payload.contract as ContractRef, candidate.contract)) return false
+    if (!event || !this.barrierEventValid(event, attemptId, {
+      scope: 'registered_owned_resources_only', proofRef: evidence.proofRef, resourceManifestDigest: evidence.manifestDigest,
+      ...(evidence.writerFactId ? { writerFactId: evidence.writerFactId } : {}),
+    }, binding, candidate.contract)) return false
+    if (!binding.resources.length && evidence.writerFactId) return false
     if (binding.resources.length) {
       if (!evidence.writerFactId) return false
       const rows = this.store.observations.forFact(evidence.writerFactId)
@@ -272,11 +294,46 @@ export class CompletionEvidenceStore implements CompletionVerifier {
     return true
   }
 
-  private eventAt(seq: number): { entityRef: string; payload: Record<string, unknown> } | undefined {
+  /**
+   * The event must be a host barrier for this attempt: right topic/entity, the same receipt/manifest/scope/
+   * contract, the binding's producer identity, the full attempt identity, the matching writer fact, and a
+   * committed barrier command result for the same receipt.
+   */
+  private barrierEventValid(
+    event: { seq: number; topic: string; entityRef: string; payload: Record<string, unknown> },
+    attemptId: string,
+    receipt: { scope: string; proofRef: string; resourceManifestDigest: string; writerFactId?: string },
+    binding: BindingView,
+    contract: ContractRef,
+  ): boolean {
+    if (event.topic !== 'runtime.barrier.confirmed' || event.entityRef !== attemptId) return false
+    const payload = event.payload
+    if (payload.proofRef !== receipt.proofRef || payload.resourceManifestDigest !== receipt.resourceManifestDigest || payload.scope !== receipt.scope) return false
+    if (!sameContract(payload.contract as ContractRef, contract)) return false
+    if (payload.runnerIdentityRef !== binding.runnerIdentityRef || payload.source !== binding.source) return false
+    const attempt = payload.attempt as Record<string, unknown> | undefined
+    if (!attempt || attempt.attemptId !== attemptId || attempt.ticketId !== binding.ticketId || attempt.assignmentId !== binding.assignmentId
+      || attempt.fenceEpoch !== binding.fenceEpoch || !sameContract(attempt.contract as ContractRef, binding.contract)) return false
+    const writerFactId = payload.writerFactId
+    if (!(writerFactId === null || typeof writerFactId === 'string')) return false
+    if (receipt.writerFactId ? writerFactId !== receipt.writerFactId : writerFactId !== null) return false
+    const commandId = payload.barrierCommandId
+    if (typeof commandId !== 'string' || !commandId) return false
+    const command = this.store.commands.get(commandId)
+    if (!command || command.status !== 'recorded') return false
+    const result = command.result as Partial<BarrierReceipt> | undefined
+    if (!result || result.scope !== receipt.scope || result.attemptId !== attemptId || result.proofRef !== receipt.proofRef
+      || result.resourceManifestDigest !== receipt.resourceManifestDigest) return false
+    if (result.confirmedEventSeq !== undefined && result.confirmedEventSeq !== event.seq) return false
+    if ((result.writerFactId ?? null) !== writerFactId) return false
+    return true
+  }
+
+  private eventAt(seq: number): { seq: number; topic: string; entityRef: string; payload: Record<string, unknown> } | undefined {
     if (!Number.isSafeInteger(seq) || seq < 1) return undefined
     const event = this.store.events.after(seq - 1, 1)[0]
     if (!event || event.seq !== seq) return undefined
-    return { entityRef: event.entityRef, payload: (event.payload ?? {}) as Record<string, unknown> }
+    return { seq: event.seq, topic: event.topic, entityRef: event.entityRef, payload: (event.payload ?? {}) as Record<string, unknown> }
   }
 
   private quiescenceById(id: string): { candidate: CandidateRef; artifactDigest: string; attemptId: string; evidence: StoredQuiescenceEvidence } | undefined {
