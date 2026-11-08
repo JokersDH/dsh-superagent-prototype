@@ -1,0 +1,20 @@
+{
+  "status": "PASS_CLEAN_CHECKOUT_REGISTERED_RECOVERY_SLICE",
+  "sourceCommit": "97ba30da8ba96d51a8369dd4d240ae9137c4f0c5",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "install": "pnpm install --offline --frozen-lockfile --ignore-scripts",
+  "results": [
+    { "command": "pnpm check:g1-registered-recovery", "status": "PASS", "tests": 56 },
+    { "command": "node product-spec/tools/verify-spec.mjs --check", "status": "PASS", "runtimeTests": 0 }
+  ],
+  "realSigkillWindows": 6,
+  "trackedSourceUnchangedAfterChecks": true,
+  "onlyGeneratedReportTimestampChanged": true,
+  "limits": [
+    "Actual AttemptRunner backend/daemon and vendor integration remain pending",
+    "Journal and WP-04 candidates remain unmerged on their independently recorded boundary failures",
+    "No full G1, usable UI/product or power-loss certification"
+  ]
+}

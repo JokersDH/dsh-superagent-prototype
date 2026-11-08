@@ -1,0 +1,28 @@
+{
+  "status": "BLOCKED_COMPLETION_RUNTIME_BOUNDARY",
+  "sourceCommit": "fcf32739eaa51bc44b3941c9051f1d36c295ea8c",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "cases": [
+    {
+      "id": "active-new-epoch",
+      "passesInvariant": false,
+      "observed": {
+        "stillResolves": true,
+        "completionRefused": false,
+        "ended": "completed",
+        "currentAttemptState": "active"
+      }
+    },
+    {
+      "id": "wrong-event-topic",
+      "passesInvariant": false,
+      "observed": {
+        "stillResolves": true,
+        "completionRefused": false,
+        "ended": "completed",
+        "currentAttemptState": "ended"
+      }
+    }
+  ]
+}

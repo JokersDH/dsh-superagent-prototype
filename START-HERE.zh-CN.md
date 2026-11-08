@@ -1,20 +1,23 @@
 # 从这里开始：仓库、代码位置和三 Agent 开发
 
+**当前派工入口：[第二轮整包排程](agent-tasks/wave-02/README.zh-CN.md)。** A 连续交付可信验证、产品仓储和工作台；B 连续交付独立运行时、Catalog/策略准备和首个 Driver；主 Agent 做问题中心、应用 API 和纵向集成。每人一个早期接口检查点、一次整包交付，不再每修一项就重新派工。
+
 ## 1. 唯一交付仓库
 
 最新阶段：G0 已按 darwin/arm64 的限定范围验收通过，详见 [G0 主 Agent 交接](docs/adr/bootstrap/g0-main-report.md)。下表的首轮工作目录/分支用于追溯 G0；下一轮各自从集成 main 新开 G1 分支，A 转 WP-02，B 转 WP-03，主 Agent 转 WP-01/16。
 
 G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契约 183 项测试通过；[G1 核心交接](docs/adr/core/g1-core-handoff.md) 明确接口与剩余联调。整体 G1 尚未通过，等待 A 的存储和 B 的运行时接线。
 
-最新验收（2026-11-08）：主线新增独立 Runner 恢复连接和资源屏障 **17 项通过**，含 Coordinator 真正 SIGKILL 后重连同一 Runner；原事实恢复 **14 项**保持通过。见 [最新恢复连接交接](docs/adr/core/g1-runner-link-handoff.md)。A 的 WP-04 既有 19 项测试通过，但 6 项新入场探针失败；B 新版 136 项通过、旧四项已修复，但 3 项新 Journal 探针失败。两个候选均未合入。下一轮 A 处理 [WP-04 入场修复](agent-tasks/g2-agent-a-wp04-admission-fixes.md)，B 处理 [Journal 后续修复](agent-tasks/g1-agent-b-journal-followup.md)。整体 G1 仍未通过，尚无可用产品 UI/daemon。
+最新验收（2026-11-08）：主线持久登记、恢复编排和队列接线 **56 项通过**，累计含 6 个真实 SIGKILL 窗口。恢复从数据库找到原 Runner；取消前持久化控制 ID，重复检查复用原屏障回执。见 [最新登记恢复交接](docs/adr/core/g1-registered-recovery-handoff.md)。A 的旧六项和 B 的旧三项修复均通过；A 新候选 27 项、B 148 项测试通过，但仍有 2 项完成权威、3 项 Journal 完整性边界失败。A/WP-04 与 B/Journal 暂未合入，B 的独立进程观察修复已接入。下一轮继续 [A 任务单](agent-tasks/g2-agent-a-wp04-admission-fixes.md) 和 [B 任务单](agent-tasks/g1-agent-b-journal-followup.md)。整体 G1 仍未通过，尚无可用产品 UI/daemon。
 
 [JokersDH/dsh-superagent-prototype](https://github.com/JokersDH/dsh-superagent-prototype) 是后续方案 B 的交付仓库。架构、试验和正式实现都提交到这个仓库。
 
 - `origin`：你的 fork，用于 fetch/push。
 - `upstream`：DeepSeek 官方仓库，仅用于跟踪原型更新。
 - `main`：主 Agent review 后集成的基线。
-- `codex/g0-core-extraction`：Agent A 首轮分支。
-- `codex/g0-platform-validation`：Agent B 首轮分支。
+- `codex/g2-workspaces-verification`：Agent A 当前开发分支。
+- `codex/g1-runtime`：Agent B 当前开发分支。
+- 两个 `codex/g0-*` 分支保留为历史试验证据，不作为当前开发入口。
 
 分支是同一仓库的开发线；本机 worktree 是各开发线的独立目录。它们共享 Git 对象和远程地址，各有自己的工作文件。修改不会自动出现在另一个目录，必须通过 commit 和集成流转。
 
@@ -35,19 +38,23 @@ G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契
 | `apps/coordinator/stored-ingress.ts` | 实际仓储/事实回执/core 的组合适配 | 新增 5 项受控进程集成测试通过；完整恢复待下一批 |
 | `apps/coordinator/recover-facts.ts` | 原载荷恢复、严格预检、幂等事实重放 | 恢复 9 项通过（含两个 SIGKILL）；不重启原生业务 |
 | `apps/coordinator/runner-link.ts`、`resource-barrier.ts` | 本机认证查询/取消，可信完整资源清单与事务屏障 | 17 项通过（含独立进程重连）；生产 Runner daemon/注册仍待接线 |
+| `apps/coordinator/runner-registry.ts`、`reconcile-runner.ts`、`recovery-effects.ts` | 持久可信登记、稳定取消意图、恢复编排、现有队列接线 | 合计 56 项通过，含 6 个 SIGKILL；实际 AttemptRunner daemon 接入待完成 |
 | `packages/orchestrator-core/` | 正式提取及最小扩展后的 core | 已实现第一批：legacy 144 + 新守卫 34 项测试 |
-| `packages/storage/`、`effects/`、`execution/` 等 | 新产品各后端模块（均位于 packages 下） | 按后续任务包实现 |
-| `apps/coordinator/`、`apps/runner/`、`apps/console/`、`apps/cli/` | 新产品后台、受控 Runner、网页、CLI | 按后续任务包实现 |
+| `packages/storage/`、`effects/`、`execution/`、`driver-kit/`、`testing/` | 持久化、队列、运行时基础与受控测试 | 已有实现与分范围验收；完整运行时/产品数据仍在推进 |
+| `packages/workspaces/`、`verification/` | 可信交付模块 | 在 A 候选分支，尚未合入；本轮先收拢完成权威边界 |
+| `packages/questions/`、`application/`、`catalog/`、`policy-preparation/`、`drivers/` | 产品业务与执行器接入 | 本轮对应 owner 的待交付模块，不能当已实现接口 |
+| `apps/coordinator/`、`apps/runner/` | 新产品组合适配与受控运行基础 | 组合模块已实现；真实产品进程入口本轮接线 |
+| `apps/console/`、`apps/cli/` | 网页工作台、CLI | 工作台本轮启动；CLI/发行后续推进 |
 
 **落点已确定：新产品在这个仓库根目录增加 `packages/`、`apps/`、`tools/`，不再另建产品仓库。** 根 workspace/package 配置由主 Agent 单独集成；G0 试验使用自己的子目录 package，不先改原插件运行方式。
 
 ## 3. 本机三个工作目录
 
-| 角色 | 本机目录 | 分支 | 首轮任务 |
+| 角色 | 本机目录 | 当前分支/目标 | 当前整包 |
 | --- | --- | --- | --- |
-| 主 Agent（当前会话） | `/Users/hh/Desktop/joker/superagent` | `main`（集成基线） | 公共契约、bootstrap、G0 汇总与 review |
-| Agent A | `/Users/hh/Desktop/joker/superagent-agent-a` | `codex/g0-core-extraction` | core 提取和独立测试 |
-| Agent B | `/Users/hh/Desktop/joker/superagent-agent-b` | `codex/g0-platform-validation` | 隔离运行组合、SQLite 事务与备份探针 |
+| 主 Agent（当前会话） | `/Users/hh/Desktop/joker/superagent` | `main` 为集成目标，实施用 `codex/*` | 问题中心、确定性应用/API、独立集成 |
+| Agent A | `/Users/hh/Desktop/joker/superagent-agent-a` | `codex/g2-workspaces-verification` | 可信交付、产品仓储、工作台 |
+| Agent B | `/Users/hh/Desktop/joker/superagent-agent-b` | `codex/g1-runtime` | 独立 Runner、Catalog/策略、首个 Driver |
 
 这三个是同一个 fork 的三个 checkout。没有把你的 CAC 仓库搬进来，也没有将本机的 node_modules、凭据或模型会话作为共享材料。
 
@@ -56,54 +63,46 @@ G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契
 在 Agent A 的工具里打开 `/Users/hh/Desktop/joker/superagent-agent-a` 作为项目/工作目录，然后发送：
 
 ```text
-你负责这个 fork 的 G0-A。工作目录是 /Users/hh/Desktop/joker/superagent-agent-a。
-读取 AGENTS.md、START-HERE.zh-CN.md 和 agent-tasks/agent-a.md，按任务文件实施。
-先核对当前分支为 codex/g0-core-extraction；只编辑 tools/reuse-spike/core-extraction/。
-完成后测试、只提交自己的文件，push 到 origin 的同名分支，报告 commit、命令、结果和证据路径。
-不要改公共契约、根依赖和其他人的目录，不要合并或推送 main。
+继续本轮 Agent A 整包。工作目录是 /Users/hh/Desktop/joker/superagent-agent-a，分支 codex/g2-workspaces-verification。
+保留已有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、agent-tasks/wave-02/README.zh-CN.md 和 agent-tasks/wave-02/agent-a.zh-CN.md。
+连续完成可信交付、产品仓储和工作台，不在旧修复后停下。提交一次后端接口检查点后继续 UI，最后统一交付。
+只提交拥有路径并 push 自己分支；根 lock、公共 schema 和 main 由主 Agent 管理。
 ```
 
 在 Agent B 的工具里打开 `/Users/hh/Desktop/joker/superagent-agent-b`，然后发送：
 
 ```text
-你负责这个 fork 的 G0-B。工作目录是 /Users/hh/Desktop/joker/superagent-agent-b。
-读取 AGENTS.md、START-HERE.zh-CN.md 和 agent-tasks/agent-b.md，按任务文件实施。
-先核对当前分支为 codex/g0-platform-validation；只编辑 tools/reuse-spike/platform/。
-完成后测试、只提交自己的文件，push 到 origin 的同名分支，报告 commit、命令、结果和证据路径。
-不要改公共契约、根依赖和其他人的目录，不要合并或推送 main。
+继续本轮 Agent B 整包。工作目录是 /Users/hh/Desktop/joker/superagent-agent-b，分支 codex/g1-runtime。
+保留已有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、agent-tasks/wave-02/README.zh-CN.md 和 agent-tasks/wave-02/agent-b.zh-CN.md。
+连续完成 Journal、实际 Runner 服务、Catalog/策略和首个 Driver，不在旧修复后停下。提交一次运行时接口检查点后继续后续步骤，最后统一交付。
+只提交拥有路径和明确提取例外并 push 自己分支；根 lock、公共 schema 和 main 由主 Agent 管理。
 ```
 
-两个工作可以立即并行，不依赖尚未冻结的生产契约。主 Agent 同时按 [主 Agent 任务](agent-tasks/main.md) 推进公共部分。你只需要选对目录并发出对应任务，不需要把整段历史对话再发给他们。
+两人可立即并行；未通过部分的生产验收仍保留，fixture 下游开发不等待完整上线。主 Agent 按 [整包任务](agent-tasks/wave-02/main.zh-CN.md) 推进公共部分。转发任务入口即可，无需复制历史对话。
 
 ## 5. 每个人怎么上传
 
-Agent A 在自己的目录执行：
+每人按实际改动显式暂存拥有文件，提交前用 `git diff --cached --name-only` 核对范围。不要将根 lock 的临时安装差异、凭据、DB、依赖和未交接代码带入提交。Agent A 只 push：
 
 ```sh
-git add -- tools/reuse-spike/core-extraction/
-git commit -m "test(g0): validate independent core extraction"
-git push -u origin codex/g0-core-extraction
+git push -u origin codex/g2-workspaces-verification
 ```
 
-Agent B 在自己的目录执行：
+Agent B 只 push：
 
 ```sh
-git add -- tools/reuse-spike/platform/
-git commit -m "test(g0): validate isolated runtime and sqlite"
-git push -u origin codex/g0-platform-validation
+git push -u origin codex/g1-runtime
 ```
 
-提交前检查 staged files，临时 DB、依赖、原生会话和凭据不能提交。每个 Agent 应给自己的目录增加合适的局部 ignore 规则或将临时文件放在系统临时目录。命令是交付流程，不能在没有实现时制造空提交。
+主 Agent 消费检查点 commit，复验后分段集成 main。A/B 提交检查点后继续各自整包内的独立工作，不等待每个小修复的确认，也不自行合并彼此分支或改别人路径。
 
-主 Agent fetch 两个分支，review commit 和证据，再选择性集成到 main；通过后 push main。A/B 不自行合并彼此分支，也不在等待期间修改别人的路径。
+## 6. 本轮交付出口
 
-## 6. 本轮完成标准
+- A：可信完成边界与应用仓储可集成，工作台的委托/问题/停止/交付/恢复场景可操作。
+- B：实际独立 AttemptRunner、verified Journal、接入与策略 gate、首个 Driver 协议 fixture 可集成。
+- 主 Agent：问题中心、应用/HTTP 与统一 G2-Demo-Fake 纵向验收；有真实环境和授权预算后才升级 native preview。
 
-- A：独立 core/test package 可运行，原 144-test baseline 在提取目录执行，runtime/type import graph 不依赖 DSH 宿主，保留 MIT/provenance。
-- B：拟议组合在隔离环境实际加载，SQLite 版本、事务/savepoint/回滚/备份恢复有真实结果；未测 OS/arch 不算通过。
-- 主 Agent：公共 schema 单一来源、合法/非法 fixtures、生成类型和版本锁，汇总真实证据，给出 G0 结论。
-
-G0 通过后：主 Agent 转 WP-01/16，A 转 WP-02，B 转 WP-03。后续完整顺序见 [三人排程](product-spec/three-agent-dispatch.zh-CN.md)。
+完整要求、接口、检查点和后续范围见 [本轮排程](agent-tasks/wave-02/README.zh-CN.md)。旧 G0 材料在 [bootstrap 交接](docs/adr/bootstrap/g0-main-report.md)；历史设计分工保留在 product-spec，不再作为本轮开工模板。
 
 ## 7. 其他机器上的 Agent
 
@@ -112,7 +111,7 @@ G0 通过后：主 Agent 转 WP-01/16，A 转 WP-02，B 转 WP-03。后续完整
 ```sh
 git clone https://github.com/JokersDH/dsh-superagent-prototype.git
 cd dsh-superagent-prototype
-git switch --track origin/codex/g0-core-extraction
+git switch --track origin/codex/g2-workspaces-verification
 ```
 
-Agent B 使用 `origin/codex/g0-platform-validation`。提交/push 需要该机器有你授予的正常 GitHub 权限；不把本机 token 复制进仓库。
+Agent B 使用 `origin/codex/g1-runtime`。已有 checkout 保留当前工作并合并 main，不重新执行示例 checkout 覆盖工作。提交/push 使用该机器自己的正常 GitHub 权限，不复制本机 token。

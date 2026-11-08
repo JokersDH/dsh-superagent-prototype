@@ -1,7 +1,7 @@
 {
   "status": "PASS_JOURNAL_ADMISSION_CASES",
-  "runtimeCommit": "32540a3b1b7c7907c644deb708cf486ecd3781aa",
-  "node": "v24.21.0",
+  "runtimeCommit": "74a3068165ca08b0e1802bd35c552bc1695b8319",
+  "node": "v24.22.2",
   "platform": "darwin",
   "cases": [
     {

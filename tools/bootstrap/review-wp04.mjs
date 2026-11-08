@@ -42,16 +42,16 @@ try {
 
   const registry = new CheckRegistry()
   registry.register({ id: 'check-1', revision: 1, executable: process.execPath, argv: ['-e', 'process.exit(0)'], deadlineMs: 100, outputLimitBytes: 1024 })
-  const plan = { candidate, criteria: [{ id: 'criterion-1', kind: 'machine', description: 'fixture', required: true, checkDefinitionRef: 'check-1' }], artifactDigest: first.artifactDigest, workspacePath: workspace.path, environmentRef: 'env-1' }
+  const plan = { candidate, criteria: [{ id: 'criterion-1', kind: 'machine', description: 'fixture', required: true, checkDefinitionRef: 'check-1' }], artifactDigest: first.artifactDigest, workspacePath: workspace.path, environmentRef: 'env-1', verifyArtifact: () => true }
   let falseGuardRefused = false
-  try { new VerificationRunner(registry).run({ ...plan, verifyArtifact: () => false }) } catch { falseGuardRefused = true }
+  try { await new VerificationRunner(registry).run({ ...plan, verifyArtifact: () => false }) } catch { falseGuardRefused = true }
   cases.push({ id: 'VERIFY-FALSE-FROZEN-GUARD', passesInvariant: falseGuardRefused, observed: { falseGuardRefused } })
 
   const probeCode = `
     import { CheckRegistry, VerificationRunner } from ${JSON.stringify(pathToFileURL(join(runtime, 'packages/verification/src/index.ts')).href)};
     const registry = new CheckRegistry();
     registry.register({ id: 'check-1', revision: 1, executable: process.execPath, argv: ['-e', "process.on('SIGTERM', () => {}); setInterval(() => {}, 1000)"], deadlineMs: 150, outputLimitBytes: 1024 });
-    new VerificationRunner(registry).run(${JSON.stringify(plan)});
+    await new VerificationRunner(registry).run({ ...${JSON.stringify(plan)}, verifyArtifact: () => true });
   `
   const probe = spawn(process.execPath, ['--input-type=module', '-e', probeCode], { detached: true, stdio: ['ignore', 'ignore', 'pipe'] })
   let watchdogKilled = false, probeStderr = ''

@@ -1,8 +1,19 @@
-# Agent A: WP-04 Admission Fixes
+# Agent A: Current Runtime Authority And Host Proof Provenance
 
-Date: 2026-11-08. Continue `codex/g2-workspaces-verification`, reviewed candidate `d1be401`. Main's new recovery code is additive; fetch the latest `origin/main` after this packet is integrated. Do not change main-owned contracts, root dependencies/lock, coordinator code or review probes to hide failures.
+Current assignment: [Wave-02 complete package](wave-02/agent-a.zh-CN.md). This file is its A1 regression checklist. After these fixes, continue product repositories and console; do not stop for another small-task dispatch.
 
-Existing clean-snapshot tests pass: workspaces 4/4, verification 15/15. WP-04 is **not admitted**: `reports/releases/g2-wp04-review.json` records six failing probes. Own the fix under the original workspace/verification/storage migration boundaries.
+Date: 2026-11-08. Continue `codex/g2-workspaces-verification`, latest reviewed candidate **`fcf3273`**. Fetch/merge updated `origin/main` after this packet lands. Keep workspace/verification/storage ownership; do not change root contracts/lock/coordinator or weaken probes.
+
+The prior six fixes now independently pass on Node 24.22.2. Clean suites: workspaces **8/8**, verification **19/19**, storage **66/66**. The main probe was adapted only to await the intentional async verifier and provide the required guard. **WP-04 is not admitted:** two production-core boundary probes still complete a Ticket incorrectly.
+
+## Current Remaining Work
+
+Run `node tools/bootstrap/review-completion-runtime.mjs --runtime /absolute/clean/checkout`. The report is `reports/releases/g2-completion-runtime-review.json`. It uses a genuine main-host barrier, actual ProductStore and personal core; it does not use the package's hand-built barrier helper.
+
+1. **Current runtime pointer/epoch.** A valid barrier for attempt-1 remains accepted after attempt-2 in the same assignment/contract becomes current/active at epoch 2. `resolve` still succeeds and core ends the Ticket as completed. Both recording and resolution must check the current binding's full attempt/assignment/contract/epoch identity and ended state against the proved attempt. A historical ended binding or missing pointer is insufficient. Update fixtures to include actual pointer semantics; preserve candidate/artifact/criteria/human checks and old cleanup history.
+2. **Committed host provenance.** `eventAt` discards topic, so a matching payload under an unrelated event authorizes completion. Require `runtime.barrier.confirmed`, full producer identity, scope, manifest, and the exact host writer fact named by that event. Main v2 events now include `barrierCommandId`, full `attempt`, `source`, and `writerFactId` (null for no resources). Read the matching committed command receipt and compare its result with the supplied barrier. Keep resolution synchronous/read-only; do not import coordinator source or duplicate its private ID algorithm. Older unreleased events need an explicit compatibility policy, not missing-field trust.
+
+Read `docs/adr/core/g1-registered-recovery-handoff.md`. The returned barrier shape is unchanged; fresh repeated terminal proofs reuse the first receipt. Preserve all six fixes below, add current-epoch/event-provenance regressions, and run both independent probes. Also keep process cleanup claims precise: sending SIGKILL does not by itself prove a group absent. Push your same owned branch; main reviews/integrates.
 
 ## Reproduce
 
@@ -14,7 +25,7 @@ node tools/bootstrap/review-wp04.mjs --runtime /absolute/clean/checkout --commit
 
 The deadline probe uses a disposable isolated process group and an external watchdog. Never try the hanging case directly in the production coordinator process.
 
-## Required Fixes
+## Previous Fixes (Verified)
 
 1. **Deletion-aware freeze.** A tracked file deleted in an attempt is a legitimate deliverable. Current `ls-files` includes it and `lstat` throws ENOENT. Encode deleted state in the manifest and verify a real deletion patch without modifying the user's tree.
 2. **Symlink and executable identity.** Hash symlink link text with `readlink`, not the target's contents; do not follow dangling/outside symlinks. The repro switches between two dirty, same-length, equal-content targets, so porcelain status is identical and cannot mask the bug. Include executable mode changes. Keep freeze manifests immutable/content-addressed; `digest()` must not overwrite the original audit manifest.

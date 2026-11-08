@@ -1,0 +1,44 @@
+{
+  "asOfLocalDate": "2026-11-08",
+  "timezone": "Asia/Shanghai",
+  "assessment": "G1_FOUNDATION_IN_ACCEPTANCE_G2_USABLE_LOOP_NOT_YET_DELIVERED",
+  "sourceMainCommit": "57fd8ed5bb81f7246dd0c4b1c5ec67edfc5af373",
+  "lastReviewedCandidates": {
+    "agentA": "fcf32739eaa51bc44b3941c9051f1d36c295ea8c",
+    "agentB": "74a3068165ca08b0e1802bd35c552bc1695b8319"
+  },
+  "evidencePolicy": "This planning audit reads committed code, git refs and prior independent reports; runtime tests were not rerun by this documentation change. Overlapping suite counts are not additive and do not measure product completion percentage.",
+  "verifiedFoundation": {
+    "coreTestsHistorical": 178,
+    "storageTestsHistorical": 66,
+    "mainIntegrationTests": 56,
+    "realSigkillWindows": 6,
+    "node": "24.22.2",
+    "platform": "darwin-arm64",
+    "report": "reports/releases/g1-registered-recovery-clean.json"
+  },
+  "unacceptedCandidates": {
+    "agentA": { "ownedTestsPassed": 27, "previousAdmissionCasesPassed": 6, "remainingCasesFailed": 2, "report": "reports/releases/g2-completion-runtime-review.json" },
+    "agentB": { "testsPassed": 148, "previousAdmissionCasesPassed": 7, "remainingCasesFailed": 3, "report": "reports/releases/g1-journal-integrity.json", "processHostObservationFileOnlyIntegrated": true }
+  },
+  "notYetDelivered": [
+    "Actual independent AttemptRunner product service and its trusted coordinator bridge",
+    "Product Work/contract/conversation/question repositories",
+    "QuestionBroker and deterministic ApplicationService/HTTP/SSE entry",
+    "Agent Catalog/native policy preparation and first native Driver compatibility",
+    "Usable console connected to product backend",
+    "CLI/release operations, further native protocols, knowledge and innovation experiments"
+  ],
+  "nextWave": {
+    "status": "TASK_FILES_PREPARED_FOR_USER_DISPATCH",
+    "externalAgentMessagesSent": false,
+    "plan": "agent-tasks/wave-02/README.zh-CN.md",
+    "integrationBoundaries": "docs/rfcs/WP-16/0001-wave-02-integration-boundaries.md",
+    "agentA": { "task": "agent-tasks/wave-02/agent-a.zh-CN.md", "branch": "codex/g2-workspaces-verification", "outcome": "Trusted delivery, product persistence and usable console", "checkpoints": ["backend-surface", "complete-package"] },
+    "agentB": { "task": "agent-tasks/wave-02/agent-b.zh-CN.md", "branch": "codex/g1-runtime", "outcome": "Recoverable runtime, Catalog/policy platform and first Driver", "checkpoints": ["runtime-host", "complete-package"] },
+    "main": { "task": "agent-tasks/wave-02/main.zh-CN.md", "outcome": "QuestionBroker, deterministic application/API and independent vertical acceptance" },
+    "targets": ["G2-Demo-Fake", "G2-Native-Preview only with actual authorized native evidence"]
+  },
+  "releaseGateChanged": false,
+  "notClaimed": ["Full G1 pass", "Product ready", "Native vendor compatibility", "Power-loss or load/soak certification", "Innovation benefits validated"]
+}
