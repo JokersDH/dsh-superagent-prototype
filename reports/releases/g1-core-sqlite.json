@@ -1,13 +1,13 @@
 {
   "status": "PASS_CORE_DOMAIN_SQLITE_ONLY",
-  "storageCommit": "8a02f02bb01a862a801c1aeea5400c13bd45f7b6",
+  "storageCommit": "4a09ce49b64e7928f4bb4ca4e3580497b9674d92",
   "typedStorageBinding": true,
   "coreTests": 178,
   "originalBaselineTests": 144,
   "personalCoreTests": 34,
-  "node": "v24.22.2",
+  "node": "v24.21.0",
   "platform": "darwin",
-  "recordedAt": "2026-11-07T09:52:16.921Z",
+  "recordedAt": "2026-11-08T13:58:25.526Z",
   "limitations": [
     "One SQLite store per core test; no concurrent coordinator startup",
     "Writer lock and direct async UnitOfWork cases are blocked in the separate review report",

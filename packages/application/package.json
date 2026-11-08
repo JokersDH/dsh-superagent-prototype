@@ -1,0 +1,9 @@
+{
+  "name": "@personal-agent/application", "version": "0.1.0", "private": true, "type": "module", "license": "MIT",
+  "description": "Deterministic personal-agent application commands, projections and event cursors.",
+  "engines": { "node": ">=24.21.0 <25" },
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "scripts": { "build": "tsc -p tsconfig.build.json", "typecheck": "tsc -p tsconfig.json", "test": "node --test test/*.case.ts" },
+  "dependencies": { "@personal-agent/contracts": "workspace:*", "@personal-agent/orchestrator-core": "workspace:*", "@personal-agent/questions": "workspace:*", "@personal-agent/storage": "workspace:*" },
+  "devDependencies": { "@types/node": "24.10.0", "typescript": "6.0.3" }
+}

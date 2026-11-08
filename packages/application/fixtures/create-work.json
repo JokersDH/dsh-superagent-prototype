@@ -1,0 +1,10 @@
+{
+  "kind": "create_work",
+  "commandId": "example-create-1",
+  "conversationId": "conversation-main",
+  "projectId": "project-atlas",
+  "goal": "Implement the change in the configured scratch project",
+  "scope": { "projectId": "project-atlas", "allowedPaths": ["src/"], "excludedPaths": [], "externalActions": [] },
+  "criteria": [{ "id": "unit", "kind": "machine", "description": "Configured unit check passes", "required": true, "checkDefinitionRef": "check:unit" }],
+  "profileId": "profile-codex-local"
+}
