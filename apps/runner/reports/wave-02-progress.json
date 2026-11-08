@@ -1,7 +1,7 @@
 {
   "package": "wave-02 / Agent B",
   "branch": "codex/g1-runtime",
-  "updatedAt": "2026-11-08T13:05:00.000Z",
+  "updatedAt": "2026-11-08T15:25:00.000Z",
   "stages": {
     "B1": {
       "status": "PASS",
@@ -22,14 +22,15 @@
       "limitations": [
         "No power-loss verification: same-machine fsync plus reopen and SIGKILL only.",
         "Driver factId continuation is not implemented; recovery replays original facts and never re-serves the same attempt."
-      ]
+      ],
+      "checkpointNote": "Record envelope validation now uses the frozen CriticalFactSchema plus parseRuntimeFactPayload (kind/value identity rules), not a local approximation."
     },
     "B2": {
-      "status": "CHECKPOINT",
-      "scope": "An actual AttemptRunner in an independent process behind a versioned bridge (protocol v1): spawn -> bootstrap -> ready -> command -> exited, with coordinator-owned authoritative receipts.",
+      "status": "PASS",
+      "scope": "Independent per-attempt Runner process behind a versioned bridge (protocol v1), proven across a coordinator SIGKILL, plus an end-to-end demo.",
       "interfaceCheckpoint": {
         "protocol": 1,
-        "frames": {
+        "framesMarkdown": {
           "upstream": [
             "bootstrap",
             "command",
@@ -51,55 +52,50 @@
           "apps/runner/src/bridge-protocol.ts": "versioned envelope derived from frozen contract types",
           "apps/runner/src/runner-service.ts": "per-attempt service state machine",
           "apps/runner/src/runner-service-entry.ts": "spawned stdio entry",
-          "apps/runner/src/runner-link-client.ts": "coordinator-side link (fixture coordinator port)"
+          "apps/runner/src/runner-link-client.ts": "coordinator-side link",
+          "apps/runner/scripts/demo-wave02.ts": "end-to-end fixture demo (11 steps)"
         }
       },
       "tests": {
-        "runner": 89,
-        "total": 159
+        "runner": 93,
+        "demoSteps": 11
       },
       "tested": [
-        "one independent process per attempt becomes ready before any command",
-        "begin runs the attempt and facts arrive as coordinator receipts",
-        "question can be answered across the bridge while control stays free",
-        "cancel ends the attempt within a bounded close",
-        "critical facts are spooled to the Runner's own journal",
-        "no fact appears without a begin command (recovery never starts business work)",
-        "facts carry the full attempt identity",
-        "a refused fact never yields a receipt; the refusal is surfaced as a bounded diagnostic"
+        "one independent process per attempt, ready before any command",
+        "begin once; facts reach the coordinator and only its receipt is an ACK",
+        "question answered across the bridge; cancel bounded",
+        "COORDINATOR SIGKILL: Runner and its native child survive; journal keeps unacknowledged facts",
+        "orphaned Runner group is attributable via ps and killable",
+        "a new epoch is blocked while the orphaned writer is unproven (resource barrier)",
+        "replay after the coordinator dies sends facts only, never begin/deliver/answer",
+        "demo: catalog -> policy gate -> runner -> bridge -> journal -> replay (11/11)"
       ],
       "notTested": [
-        "Main-line coordinator adapter wiring (RecoveryRunnerPort, registration proof, barrier)",
-        "Crash windows across coordinator SIGKILL and Runner loss",
-        "Real vendor agents and native protocols",
-        "Cross-machine or power-loss durability"
-      ],
-      "dependencyRequests": []
+        "Production coordinator adapter wiring (main-owned)",
+        "Cross-machine durability",
+        "Real vendor agents"
+      ]
     },
     "B3": {
       "status": "PASS",
-      "scope": "WP-06 catalog (readiness closed set, capability evidence, drift invalidation) and prepared-policy gate (attempt/epoch/fingerprint/permission admission).",
+      "scope": "WP-06 catalog, draft profiles for Codex/DSH/ZCode and the prepared-policy gate.",
       "packages": [
         "packages/catalog",
         "packages/policy-preparation"
       ],
       "documentation": "docs/rfcs/WP-06/0001-catalog-and-policy-preparation.md",
       "tests": {
-        "catalog": 13,
+        "catalog": 17,
         "policy-preparation": 9
       },
       "notTested": [
-        "Real executable probing of installed Codex/DSH/ZCode binaries",
-        "Draft profiles and fixtures for the three agents",
-        "Catalog exposure to UI (needs a main-agent derived Snapshot schema)"
-      ],
-      "dependencyRequests": [
-        "If UI must list profiles, main publishes the derived Snapshot schema first"
+        "Real executable probing of installed agents",
+        "Catalog exposure to UI (main-owned derived Snapshot schema)"
       ]
     },
     "B4": {
       "status": "PARTIAL",
-      "scope": "Codex app-server protocol layer and AgentDriverV1 implementation: lossless ids, connection epochs, thread/turn/item/request identity chain, cancel, usage and config-changed facts, per-request approval questions.",
+      "scope": "Codex app-server protocol layer and AgentDriverV1 implementation against a fake app-server.",
       "packages": [
         "packages/drivers/codex-native"
       ],
@@ -107,27 +103,30 @@
       "tests": {
         "codex-native": 16
       },
-      "tested": [
-        "initialize -> thread -> turn identity chain",
-        "approval request becomes a question with exact options",
-        "cancel interrupts the turn and records cancel.observed",
-        "duplicate begin does not start a second turn",
-        "initialize failure ends the attempt",
-        "no answer is sent without a human decision",
-        "string vs integer ids stay distinct; ids never reused across connections"
-      ],
       "notTested": [
         "Compatibility with an installed Codex binary",
         "Installed-version schema goldens",
         "Real model smoke (no authorised scratch budget used)",
-        "DSH and ZCode protocols (deferred)",
-        "End-to-end through the independent Runner service with a real driver"
+        "DSH and ZCode protocols (deferred)"
       ]
     }
   },
   "nativeCompatibility": "NOT_TESTED \u2014 no vendor agent was contacted; all evidence is fixture/fake-native based.",
   "totals": {
-    "tests": 197,
-    "packages": 7
+    "tests": 205,
+    "packages": 7,
+    "probes": {
+      "review-journal": "PASS_JOURNAL_ADMISSION_CASES",
+      "review-journal-followup": "PASS_JOURNAL_FOLLOWUP_CASES",
+      "review-journal-integrity": "PASS_JOURNAL_INTEGRITY_BOUNDARY"
+    },
+    "typecheck": "PASS"
+  },
+  "base": "cd09395",
+  "checkpoint": "docs/rfcs/WP-16/0002-main-application-checkpoint.md",
+  "demo": {
+    "command": "node apps/runner/scripts/demo-wave02.ts",
+    "result": "DEMO PASS 11/11",
+    "scope": "fixture lane only"
   }
 }

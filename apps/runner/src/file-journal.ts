@@ -31,6 +31,8 @@ import { mkdir, open as openAsync, stat } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { dirname } from 'node:path'
 import type { CriticalFact } from '../../../packages/contracts/src/types.ts'
+import { CriticalFactSchema } from '../../../packages/contracts/src/schemas.ts'
+import { parseRuntimeFactPayload } from '../../../packages/contracts/src/validation.ts'
 import { DriverError } from '../../../packages/driver-kit/src/index.ts'
 
 export type JournalEntry = {
@@ -456,20 +458,17 @@ export function isValidRecordEnvelope(entry: unknown): entry is JournalEntry {
   const record = entry as Partial<JournalEntry>
   if (typeof record.at !== 'string' || Number.isNaN(Date.parse(record.at))) return false
   if (!Number.isInteger(record.seq) || (record.seq as number) < 1) return false
-  const fact = record.fact as Record<string, unknown> | undefined
-  if (!fact || typeof fact !== 'object') return false
-  for (const field of ['ticketId', 'assignmentId', 'attemptId', 'factId', 'source'] as const) {
-    if (typeof fact[field] !== 'string' || (fact[field] as string).length === 0) return false
+
+  // The fact must satisfy the frozen CriticalFact schema, not a local approximation of it.
+  const fact = CriticalFactSchema.safeParse(record.fact)
+  if (!fact.success) return false
+  // And the payload must satisfy the frozen kind/value union for exactly this fact's kind,
+  // including every cross-field rule (attempt targets, prepared-policy identity, ...).
+  try {
+    parseRuntimeFactPayload(fact.data, record.payload)
+  } catch {
+    return false
   }
-  if (!Number.isInteger(fact.fenceEpoch) || (fact.fenceEpoch as number) < 1) return false
-  const contract = fact.contract as Record<string, unknown> | undefined
-  if (!contract || typeof contract !== 'object') return false
-  if (typeof contract.workId !== 'string' || !Number.isInteger(contract.revision) || typeof contract.digest !== 'string') return false
-  if (typeof fact.kind !== 'string' || fact.kind.length === 0) return false
-  if (typeof fact.payloadRef !== 'string' || fact.payloadRef.length === 0) return false
-  const payload = record.payload as Record<string, unknown> | undefined
-  if (!payload || typeof payload !== 'object' || payload.kind !== fact.kind) return false
-  if (!('value' in payload)) return false
   return true
 }
 

@@ -191,6 +191,11 @@ export class CodexNativeDriver implements AgentDriverV1 {
       await handleNotification(next.method, next.params)
     }
 
+    // Release the control channel: a pending command waiter would otherwise keep the process alive
+    // after the attempt has ended.
+    if (typeof (io.commands as { close?: unknown }).close === 'function') {
+      ;(io.commands as unknown as { close(reason?: string): void }).close('attempt_ended')
+    }
     connection.close('serve-ended')
     transport.close()
     return exit
