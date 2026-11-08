@@ -1,0 +1,60 @@
+{
+  "package": "wave-02 / Agent B",
+  "branch": "codex/g1-runtime",
+  "updatedAt": "2026-11-08T12:45:00.000Z",
+  "stages": {
+    "B1": {
+      "status": "PASS",
+      "scope": "Journal integrity boundary: terminator, strict record envelope, verified-snapshot gating of replay; plus the earlier I/O poisoning, replay ACK validation and contiguous-sequence rules.",
+      "testedSourceCommit": "78b36bf",
+      "probes": {
+        "review-journal": "PASS_JOURNAL_ADMISSION_CASES",
+        "review-journal-followup": "PASS_JOURNAL_FOLLOWUP_CASES",
+        "review-journal-integrity": "PASS_JOURNAL_INTEGRITY_BOUNDARY"
+      },
+      "tests": { "driver-kit": 18, "testing": 8, "execution": 44, "runner": 78, "total": 148 },
+      "limitations": [
+        "No power-loss verification: same-machine fsync plus reopen and SIGKILL only.",
+        "Driver factId continuation is not implemented; recovery replays original facts and never re-serves the same attempt."
+      ]
+    },
+    "B2": {
+      "status": "CHECKPOINT",
+      "scope": "An actual AttemptRunner in an independent process behind a versioned bridge (protocol v1): spawn -> bootstrap -> ready -> command -> exited, with coordinator-owned authoritative receipts.",
+      "interfaceCheckpoint": {
+        "protocol": 1,
+        "frames": {
+          "upstream": ["bootstrap", "command", "payload", "ack-failed", "shutdown"],
+          "downstream": ["ready", "receipt", "progress", "payload-read", "fact", "exited", "error"]
+        },
+        "modules": {
+          "apps/runner/src/bridge-protocol.ts": "versioned envelope derived from frozen contract types",
+          "apps/runner/src/runner-service.ts": "per-attempt service state machine",
+          "apps/runner/src/runner-service-entry.ts": "spawned stdio entry",
+          "apps/runner/src/runner-link-client.ts": "coordinator-side link (fixture coordinator port)"
+        }
+      },
+      "tests": { "runner": 89, "total": 159 },
+      "tested": [
+        "one independent process per attempt becomes ready before any command",
+        "begin runs the attempt and facts arrive as coordinator receipts",
+        "question can be answered across the bridge while control stays free",
+        "cancel ends the attempt within a bounded close",
+        "critical facts are spooled to the Runner's own journal",
+        "no fact appears without a begin command (recovery never starts business work)",
+        "facts carry the full attempt identity",
+        "a refused fact never yields a receipt; the refusal is surfaced as a bounded diagnostic"
+      ],
+      "notTested": [
+        "Main-line coordinator adapter wiring (RecoveryRunnerPort, registration proof, barrier)",
+        "Crash windows across coordinator SIGKILL and Runner loss",
+        "Real vendor agents and native protocols",
+        "Cross-machine or power-loss durability"
+      ],
+      "dependencyRequests": []
+    },
+    "B3": { "status": "NOT_STARTED", "scope": "Catalog/Profile/PolicyPreparation (WP-06)" },
+    "B4": { "status": "NOT_STARTED", "scope": "Codex native protocol Driver (WP-07); real model smoke NOT_TESTED" }
+  },
+  "nativeCompatibility": "NOT_TESTED — no vendor agent was contacted; all evidence is fixture/fake-native based."
+}
