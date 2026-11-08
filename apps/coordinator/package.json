@@ -11,8 +11,9 @@
     "test:sqlite": "node --test ../../tests/integration/runtime-ingress-sqlite.case.mjs",
     "test:production": "node --test ../../tests/integration/production-runtime.case.mjs",
     "test:recovery": "node --test ../../tests/integration/recovery-facts.case.mjs ../../tests/integration/recovery-crash.case.mjs",
-    "test:runner-link": "node --test ../../tests/integration/runner-link.case.mjs ../../tests/integration/runner-reconnect.case.mjs"
+    "test:runner-link": "node --test ../../tests/integration/runner-link.case.mjs ../../tests/integration/runner-reconnect.case.mjs",
+    "test:registered-recovery": "node --test ../../tests/integration/registered-recovery.case.mjs ../../tests/integration/registered-recovery-crash.case.mjs"
   },
-  "dependencies": { "@personal-agent/contracts": "workspace:*", "@personal-agent/orchestrator-core": "workspace:*", "@personal-agent/storage": "workspace:*", "zod": "4.4.3" },
+  "dependencies": { "@personal-agent/contracts": "workspace:*", "@personal-agent/effects": "workspace:*", "@personal-agent/orchestrator-core": "workspace:*", "@personal-agent/storage": "workspace:*", "zod": "4.4.3" },
   "devDependencies": { "@types/node": "24.10.0", "typescript": "6.0.3" }
 }

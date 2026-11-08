@@ -129,6 +129,9 @@ importers:
       '@personal-agent/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@personal-agent/effects':
+        specifier: workspace:*
+        version: link:../../packages/effects
       '@personal-agent/orchestrator-core':
         specifier: workspace:*
         version: link:../../packages/orchestrator-core

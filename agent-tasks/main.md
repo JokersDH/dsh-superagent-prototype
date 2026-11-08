@@ -1,5 +1,7 @@
 # 主 Agent：G0 公共契约、仓库与集成
 
+当前执行 [第二轮主 Agent 整包任务](wave-02/main.zh-CN.md)：问题中心、确定性应用入口与纵向集成。下文保留原 G0 职责用于追溯，当前分工以根 AGENTS 和 wave-02 为准。
+
 主目录：`/Users/hh/Desktop/joker/superagent`。交付仓库为用户 fork，main 是 review 后的集成基线。
 
 当前职责：

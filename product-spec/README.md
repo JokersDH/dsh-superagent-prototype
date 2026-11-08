@@ -56,6 +56,8 @@ pa start / pa status / pa doctor / pa backup / pa stop
 
 当前有主 Agent 加两个额外 Agent 时，按 [三 Agent 分工与首轮指令](three-agent-dispatch.zh-CN.md) 执行：先在 WP-00 内并行完成契约、core 提取、平台验证，再进入正式模块开发。
 
+当前实施已进入 [第二轮整包排程](../agent-tasks/wave-02/README.zh-CN.md)。该入口记录真实进度及大块任务；生成目录中的 PLANNED 表示规格，不代表实际实现状态。A/B 先完成各自已有阻断，再连续交付完整子系统，不再逐个缺陷重新派工。
+
 ## 4. 关键决定
 
 | 决定 | 原因与约束 |
@@ -101,6 +103,8 @@ G1 已交付正式 core 的候选/可信完成、Assignment-scoped report/read�
 恢复批次更新：A 仓储已到 66 项通过，运行观察接入主线；main 的生产接线/事实恢复共 14 项通过，包括两个真实 SIGKILL 窗口。B 的严格载荷和 context factory 已集成，Journal 写入器仍因四项实测失败留在候选分支。当前分工和限制见 [恢复交接](../docs/adr/core/g1-recovery-handoff.md)，整体 G1 仍未通过。
 
 2026-11-08 更新：主线新增独立 Runner 认证恢复/资源屏障 17 项通过，原事实恢复 14 项保持通过；B 已修复上述四项，但三项新 Journal 入场探针失败。A 的 WP-04 候选既有 19 项通过，六项新入场探针失败。两者尚未合入。最新分工、复现命令及可信完成边界见 [恢复连接交接](../docs/adr/core/g1-runner-link-handoff.md)，尚无可用 UI/产品 daemon。
+
+同日后续：主线持久登记/恢复编排/现有队列接线已到 **56 项通过、6 个 SIGKILL 窗口**，见 [最新交接](../docs/adr/core/g1-registered-recovery-handoff.md)。A 的旧六项、B 的旧三项均已复验通过；A 新候选 27 项、B 148 项测试通过，但 2 项当前运行权威、3 项 Journal 完整性边界仍失败。仅 B 的独立进程观察修复合入，WP-04/Journal 暂不启用。整体 G1、实际 Runner daemon、原生兼容及可用产品仍待后续验收。
 
 文档一致性检查：`node product-spec/tools/verify-spec.mjs`。公共类型检查命令见 07。这些检查只证明规格内部一致和草案可编译，不证明产品稳定性或学习收益。
 

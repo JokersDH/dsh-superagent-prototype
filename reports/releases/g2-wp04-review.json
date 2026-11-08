@@ -1,47 +1,46 @@
 {
-  "status": "BLOCKED_WP04_ADMISSION",
-  "sourceCommit": "d1be401b3f10ac0a297440e6e9f99bf4d5a608c4",
+  "status": "PASS_WP04_ADMISSION",
+  "sourceCommit": "fcf32739eaa51bc44b3941c9051f1d36c295ea8c",
   "node": "v24.22.2",
   "platform": "darwin",
   "cases": [
     {
       "id": "FREEZE-DELETED-TRACKED-FILE",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "deletedFrozen": false,
-        "deletionError": "ENOENT"
+        "deletedFrozen": true
       }
     },
     {
       "id": "FREEZE-SYMLINK-TARGET",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "digestChanged": false
+        "digestChanged": true
       }
     },
     {
       "id": "VERIFY-FALSE-FROZEN-GUARD",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "falseGuardRefused": false
+        "falseGuardRefused": true
       }
     },
     {
       "id": "CHECK-DEADLINE-IGNORING-SIGTERM",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "deadlineMs": 150,
         "watchdogMs": 1500,
-        "watchdogKilled": true,
-        "probeExit": null,
+        "watchdogKilled": false,
+        "probeExit": 0,
         "probeStderr": ""
       }
     },
     {
       "id": "QUIESCENCE-REQUIRES-ALL-REGISTERED-RESOURCES",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "subsetRefused": false,
+        "subsetRefused": true,
         "bindingState": "active",
         "registeredResources": 2,
         "observedResources": 1
@@ -49,9 +48,9 @@
     },
     {
       "id": "ACCEPTANCE-ID-IMMUTABILITY",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "changedBodyRefused": false
+        "changedBodyRefused": true
       }
     }
   ]

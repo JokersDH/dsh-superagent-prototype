@@ -1,0 +1,59 @@
+{
+  "status": "PASS_REGISTERED_LOCAL_RECOVERY_AND_DURABLE_QUEUE_SLICE",
+  "tests": 56,
+  "realSigkillWindows": 6,
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "checkedAt": "2026-11-07T17:53:11.868Z",
+  "results": [
+    {
+      "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/orchestrator-core --filter @personal-agent/effects --filter @personal-agent/storage -r run build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm exec tsc -p tests/integration/tsconfig.runtime.json",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:runner-link",
+      "status": "PASS",
+      "tests": 17
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:registered-recovery",
+      "status": "PASS",
+      "tests": 25
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:production",
+      "status": "PASS",
+      "tests": 5
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:recovery",
+      "status": "PASS",
+      "tests": 9
+    }
+  ],
+  "proven": [
+    "Trusted launcher registration uses existing immutable command receipts and events, survives SQLite reopen, and rejects endpoint replacement",
+    "Recovery discovers the peer from the database without launcher manifests",
+    "Cancellation identity commits before peer I/O and survives real coordinator SIGKILL",
+    "Fresh repeated terminal inspections reuse the first complete-inventory barrier receipt without new proof files or observations",
+    "Configuration-drift facts feed the existing durable Effects queue with correctly encoded JSON",
+    "Held recovery survives reopen with bounded retry; coalesced queue generations are preserved"
+  ],
+  "limitations": [
+    "The actual AttemptRunner recovery backend/daemon is still owner integration work; independent service is a ProcessHost fixture",
+    "No candidate Journal writer admission, vendor compatibility, power-loss durability, full G1 or usable product claim",
+    "Registry uses the existing single-writer command receipt ledger; a future dedicated storage index must preserve these identities and receipts",
+    "Recovery retries only inspection and the same pinned cancellation ID; this does not permit business/native-send replay",
+    "Daemon heartbeat must kick the existing Effects scheduler; this helper adds no background process or polling timer",
+    "Legacy unreleased raw-reference recovery queue rows require explicit re-enqueue; no automatic database rewrite is performed"
+  ]
+}
