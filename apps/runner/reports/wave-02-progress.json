@@ -1,7 +1,7 @@
 {
   "package": "wave-02 / Agent B",
   "branch": "codex/g1-runtime",
-  "updatedAt": "2026-11-08T12:45:00.000Z",
+  "updatedAt": "2026-11-08T13:05:00.000Z",
   "stages": {
     "B1": {
       "status": "PASS",
@@ -12,7 +12,13 @@
         "review-journal-followup": "PASS_JOURNAL_FOLLOWUP_CASES",
         "review-journal-integrity": "PASS_JOURNAL_INTEGRITY_BOUNDARY"
       },
-      "tests": { "driver-kit": 18, "testing": 8, "execution": 44, "runner": 78, "total": 148 },
+      "tests": {
+        "driver-kit": 18,
+        "testing": 8,
+        "execution": 44,
+        "runner": 78,
+        "total": 148
+      },
       "limitations": [
         "No power-loss verification: same-machine fsync plus reopen and SIGKILL only.",
         "Driver factId continuation is not implemented; recovery replays original facts and never re-serves the same attempt."
@@ -24,8 +30,22 @@
       "interfaceCheckpoint": {
         "protocol": 1,
         "frames": {
-          "upstream": ["bootstrap", "command", "payload", "ack-failed", "shutdown"],
-          "downstream": ["ready", "receipt", "progress", "payload-read", "fact", "exited", "error"]
+          "upstream": [
+            "bootstrap",
+            "command",
+            "payload",
+            "ack-failed",
+            "shutdown"
+          ],
+          "downstream": [
+            "ready",
+            "receipt",
+            "progress",
+            "payload-read",
+            "fact",
+            "exited",
+            "error"
+          ]
         },
         "modules": {
           "apps/runner/src/bridge-protocol.ts": "versioned envelope derived from frozen contract types",
@@ -34,7 +54,10 @@
           "apps/runner/src/runner-link-client.ts": "coordinator-side link (fixture coordinator port)"
         }
       },
-      "tests": { "runner": 89, "total": 159 },
+      "tests": {
+        "runner": 89,
+        "total": 159
+      },
       "tested": [
         "one independent process per attempt becomes ready before any command",
         "begin runs the attempt and facts arrive as coordinator receipts",
@@ -53,8 +76,58 @@
       ],
       "dependencyRequests": []
     },
-    "B3": { "status": "NOT_STARTED", "scope": "Catalog/Profile/PolicyPreparation (WP-06)" },
-    "B4": { "status": "NOT_STARTED", "scope": "Codex native protocol Driver (WP-07); real model smoke NOT_TESTED" }
+    "B3": {
+      "status": "PASS",
+      "scope": "WP-06 catalog (readiness closed set, capability evidence, drift invalidation) and prepared-policy gate (attempt/epoch/fingerprint/permission admission).",
+      "packages": [
+        "packages/catalog",
+        "packages/policy-preparation"
+      ],
+      "documentation": "docs/rfcs/WP-06/0001-catalog-and-policy-preparation.md",
+      "tests": {
+        "catalog": 13,
+        "policy-preparation": 9
+      },
+      "notTested": [
+        "Real executable probing of installed Codex/DSH/ZCode binaries",
+        "Draft profiles and fixtures for the three agents",
+        "Catalog exposure to UI (needs a main-agent derived Snapshot schema)"
+      ],
+      "dependencyRequests": [
+        "If UI must list profiles, main publishes the derived Snapshot schema first"
+      ]
+    },
+    "B4": {
+      "status": "PARTIAL",
+      "scope": "Codex app-server protocol layer and AgentDriverV1 implementation: lossless ids, connection epochs, thread/turn/item/request identity chain, cancel, usage and config-changed facts, per-request approval questions.",
+      "packages": [
+        "packages/drivers/codex-native"
+      ],
+      "documentation": "docs/adr/runtime/0008-wave02-driver-and-catalog.md",
+      "tests": {
+        "codex-native": 16
+      },
+      "tested": [
+        "initialize -> thread -> turn identity chain",
+        "approval request becomes a question with exact options",
+        "cancel interrupts the turn and records cancel.observed",
+        "duplicate begin does not start a second turn",
+        "initialize failure ends the attempt",
+        "no answer is sent without a human decision",
+        "string vs integer ids stay distinct; ids never reused across connections"
+      ],
+      "notTested": [
+        "Compatibility with an installed Codex binary",
+        "Installed-version schema goldens",
+        "Real model smoke (no authorised scratch budget used)",
+        "DSH and ZCode protocols (deferred)",
+        "End-to-end through the independent Runner service with a real driver"
+      ]
+    }
   },
-  "nativeCompatibility": "NOT_TESTED — no vendor agent was contacted; all evidence is fixture/fake-native based."
+  "nativeCompatibility": "NOT_TESTED \u2014 no vendor agent was contacted; all evidence is fixture/fake-native based.",
+  "totals": {
+    "tests": 197,
+    "packages": 7
+  }
 }
