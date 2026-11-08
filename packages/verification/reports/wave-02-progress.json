@@ -1,0 +1,60 @@
+{
+  "package": "wave-02-agent-a",
+  "branch": "codex/g2-workspaces-verification",
+  "baseMainCommit": "5ac39b5",
+  "mergeCommit": "093dc60",
+  "testedSourceCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
+  "backendCheckpointCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
+  "updatedAt": "2026-11-08T12:30:00.000Z",
+  "phases": {
+    "A1": {
+      "status": "PASS",
+      "scope": "WP-04 admission fixes plus adjacent completion boundaries: freeze deletion/symlink link-text/executable bit/content-addressed immutable manifests and read-only digest; mandatory explicit-true frozen-artifact guard; bounded process-group check execution with TERM/KILL/cleanup_unproven; quiescence consumes the host barrier receipt with current-by-ticket pointer, topic, producer, committed barrier command result, full registered-resource coverage and proving fact ids; full-body immutability and strict Verification intake; evidence writes join the caller UoW.",
+      "evidence": [
+        "packages/verification/reports/wave-02/probe-wp04.json",
+        "packages/verification/reports/wave-02/probe-completion-runtime.json",
+        "packages/verification/reports/wave-02/probe-g1-followup.json",
+        "packages/verification/reports/wave-02/verification.txt",
+        "packages/verification/reports/wave-02/workspaces.txt"
+      ],
+      "results": {
+        "PASS_WP04_ADMISSION": "6/6",
+        "PASS_COMPLETION_RUNTIME_BOUNDARY": "2/2",
+        "PASS_FOLLOWUP_INVARIANTS": "5/5"
+      }
+    },
+    "A2": {
+      "status": "PASS",
+      "scope": "Product records in packages/storage (migration v7): works, contract revisions, ticket links, conversation messages/pages, user questions with validity/version CAS, dispatch switch. All writes join the shared UnitOfWork; runtime schemas validate intake; answer deliveries move forward only. v6 databases upgrade and reopen with completion rows preserved.",
+      "interface": "docs/rfcs/WP-02/0002-product-record-repositories.md",
+      "evidence": [
+        "packages/storage/test/product.case.ts",
+        "packages/storage/test/outbox-answers.case.ts",
+        "packages/verification/reports/wave-02/storage.txt"
+      ],
+      "results": {
+        "storage": "75/75",
+        "coreOnSQLite": "178/178 (144 original + 34 personal core)"
+      }
+    },
+    "A3": {
+      "status": "IN_PROGRESS",
+      "scope": "apps/console: HTTP transport + isolated fixture adapter over public Snapshot/UserCommand/CommandReceipt/Change/AppError; main conversation, work detail, questions, answers per target, dispatch controls, verification/acceptance; SSE/reconnect/cursor-expired; Playwright desktop/narrow/keyboard/long text/error/refresh.",
+      "evidence": [],
+      "notWired": [
+        "real product HTTP/SSE server (main owns transport)",
+        "live core/ApplicationService snapshot behind the adapter",
+        "production Catalog/profile read entry (main publishes schema/route)"
+      ]
+    }
+  },
+  "dependencies": {
+    "new": [],
+    "notes": "No new runtime dependency; storage already depends on @personal-agent/contracts. Console dependencies (React 18, Vite, Playwright) will be declared in apps/console/package.json; root lock changes stay main-owned and the temporary install diff is not committed."
+  },
+  "limitations": [
+    "Probe results are fixture/package-level; no full G1 or native compatibility claim.",
+    "Process-group isolation is not a sandbox; cleanup_unproven means unproven quiescence, not a stopped resource.",
+    "Real backend HTTP/SSE and production Catalog wiring remain NOT_TESTED until main publishes them."
+  ]
+}
