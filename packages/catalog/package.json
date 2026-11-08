@@ -1,0 +1,14 @@
+{
+  "name": "@personal-agent/catalog",
+  "version": "0.0.0-g2",
+  "private": true,
+  "type": "module",
+  "description": "WP-06 Agent catalog: read-only profile inspection, capability observations and compatibility evidence. Exposes public ports only; no vendor-specific parsing here.",
+  "license": "MIT",
+  "engines": { "node": ">=24.21.0 <25" },
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "node --test test/*.test.ts" },
+  "dependencies": {
+    "@personal-agent/contracts": "workspace:*"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@personal-agent/drivers-codex-native",
+  "version": "0.0.0-g2",
+  "private": true,
+  "type": "module",
+  "description": "WP-07 Codex app-server native Driver: JSON-RPC over stdio with lossless request ids, thread/turn/item identity chain, per-request permission scope. Native compatibility with a real installation is NOT_TESTED.",
+  "license": "MIT",
+  "engines": { "node": ">=24.21.0 <25" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./protocol": "./src/protocol.ts"
+  },
+  "scripts": { "test": "node --test test/*.test.ts" },
+  "dependencies": {
+    "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/driver-kit": "workspace:*",
+    "@personal-agent/catalog": "workspace:*"
+  }
+}

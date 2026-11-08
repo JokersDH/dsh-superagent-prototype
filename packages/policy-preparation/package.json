@@ -1,0 +1,14 @@
+{
+  "name": "@personal-agent/policy-preparation",
+  "version": "0.0.0-g2",
+  "private": true,
+  "type": "module",
+  "description": "WP-06 PreparedExecutionPolicy gate: attempt/epoch/fingerprint admission before business work. Advisory or untested policies never silently obtain execution eligibility.",
+  "license": "MIT",
+  "engines": { "node": ">=24.21.0 <25" },
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "node --test test/*.test.ts" },
+  "dependencies": {
+    "@personal-agent/contracts": "workspace:*"
+  }
+}
