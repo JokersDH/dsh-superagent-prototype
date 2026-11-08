@@ -51,6 +51,8 @@ export interface ProjectConfiguration {
 }
 export interface CompletionReviewPort {
   verifier: CompletionVerifier
+  /** Read immutable artifact bytes outside the command transaction, then return a synchronous freshness guard. */
+  preflight?(candidate: CandidateRef): Promise<() => void>
   current(
     candidate: CandidateRef,
   ): { proposal: CompletionProposal; verification: Verification; artifactIds: readonly string[] } | undefined
@@ -84,7 +86,7 @@ const expectedFailure = (error: unknown): AppError | undefined => {
   if (error instanceof ProductConflict || error instanceof DispatchConflict || error instanceof CommandConflict)
     return { code: 'conflict', message: 'State changed; reload the current record', retry: 'user_action' }
   if (error instanceof UserError) {
-    const text = String(error)
+    const text = error.code
     const code: AppError['code'] = /staleCandidate|completionBusy/.test(text)
       ? 'stale_candidate'
       : /staleContract|ticketRetired|mandateRevoked/.test(text)
@@ -409,6 +411,16 @@ class LocalApplication implements ProductApplication {
     if (this.store.uow.nesting)
       throw new ApplicationFault('invalid_request', 'Application dispatch owns the outer commit', 'none')
     const digest = digestOf({ command, actor })
+    let completionGuard: (() => void) | undefined
+    let preflightError: AppError | undefined
+    if (command.kind === 'accept_candidate' && !this.store.commands.get(command.commandId)) {
+      try {
+        completionGuard = await this.options.completion?.preflight?.(command.candidate)
+      } catch (error) {
+        preflightError = expectedFailure(error)
+        if (!preflightError) throw error
+      }
+    }
     return this.store.uow.atomic(() => {
       const prior = this.store.commands.get(command.commandId)
       if (prior) {
@@ -420,7 +432,11 @@ class LocalApplication implements ProductApplication {
         | Omit<Extract<CommandReceipt, { status: 'recorded' }>, 'commandId' | 'seq'>
         | Omit<Extract<CommandReceipt, { status: 'rejected' }>, 'commandId' | 'seq'>
       try {
-        result = this.store.uow.atomic(() => ({ status: 'recorded' as const, ...this.execute(command, actor) }))
+        result = this.store.uow.atomic(() => {
+          if (preflightError) return { status: 'rejected' as const, error: preflightError }
+          completionGuard?.()
+          return { status: 'recorded' as const, ...this.execute(command, actor) }
+        })
       } catch (error) {
         const appError = expectedFailure(error)
         if (!appError) throw error
@@ -556,13 +572,14 @@ class LocalApplication implements ProductApplication {
       const review = this.options.completion?.current(candidate)
       if (!review) throw new ApplicationFault('verification_failed', 'Trusted verification is unavailable')
       const acceptanceId = key('acceptance', command.commandId)
-      this.options.completion!.accept(
-        review.proposal,
-        actor,
-        current.contract.criteria.filter((item) => item.kind === 'human' && item.required).map((item) => item.id),
-        acceptanceId,
-      )
-      this.core.confirmCompletion({ ...review.proposal, humanAcceptanceRef: acceptanceId })
+      const humanCriteria = current.contract.criteria
+        .filter((item) => item.kind === 'human' && item.required)
+        .map((item) => item.id)
+      if (humanCriteria.length) this.options.completion!.accept(review.proposal, actor, humanCriteria, acceptanceId)
+      this.core.confirmCompletion({
+        ...review.proposal,
+        ...(humanCriteria.length ? { humanAcceptanceRef: acceptanceId } : {}),
+      })
       this.emit(workId)
       return { workId }
     }
@@ -627,13 +644,24 @@ class LocalApplication implements ProductApplication {
             .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))
             .slice(0, query.limit ?? 200)
       const visible = new Set(works.map((work) => work.id))
-      const questions = this.store.product.questions
-        .listOpen({ limit: 200 })
-        .filter(
-          (question) =>
-            visible.has(question.contract.workId) &&
-            (!question.expiresAt || Date.parse(question.expiresAt) > Date.parse(this.now())),
-        )
+      const questions = this.store.product.questions.listOpen({ limit: 200 }).filter(
+        (question) =>
+          visible.has(question.contract.workId) &&
+          this.authorizedContract(question.contract) &&
+          question.targets.every((target) => {
+            const ticket = this.store.domain.tickets.get<Ticket>(target.ticketId)
+            const binding = this.store.bindings.current(target.ticketId)
+            return (
+              !!ticket &&
+              !ticket.ended &&
+              latestAssignment(ticket)?.id === target.assignmentId &&
+              binding?.state === 'active' &&
+              binding.attemptId === target.attemptId &&
+              binding.fenceEpoch === target.fenceEpoch
+            )
+          }) &&
+          (!question.expiresAt || Date.parse(question.expiresAt) > Date.parse(this.now())),
+      )
       const views = works.map((work) => this.view(work.id, questions))
       return SnapshotSchema.parse({
         cursor: this.store.events.cursor(),
@@ -666,7 +694,8 @@ class LocalApplication implements ProductApplication {
     const activeGrant = this.authorizedContract(refOf(contract))
     const assignment = latestAssignment(ticket),
       candidate = activeGrant && !ticket.ended && !ticket.completion?.retired ? ticket.completion?.candidate : undefined
-    const review = candidate && this.options.completion?.current(candidate)
+    const reviewCandidate = candidate ?? ticket.completion?.confirmed?.proposal
+    const review = reviewCandidate && this.options.completion?.current(reviewCandidate)
     const hold = this.store.product.dispatchControls.get(workId) ?? { paused: false, revision: 0 }
     const open = questions.filter(
       (question) =>
@@ -702,7 +731,7 @@ class LocalApplication implements ProductApplication {
         : 'working'
     if (!ticket.ended && ticketStage(ticket).stage === 'person') phase = 'needs_user'
     if (candidate) phase = review ? 'needs_user' : 'verifying'
-    if (open.length) phase = 'needs_user'
+    if (open.length && !ticket.ended) phase = 'needs_user'
     if (busy.some((item) => item.link.ticketId !== ticket.id)) phase = 'switching'
     else if (busy.some((item) => item.binding.state === 'stopping')) phase = 'stopping'
     else if (missingProof) phase = 'uncertain'

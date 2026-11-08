@@ -147,6 +147,12 @@ importers:
       '@personal-agent/storage':
         specifier: workspace:*
         version: link:../../packages/storage
+      '@personal-agent/verification':
+        specifier: workspace:*
+        version: link:../../packages/verification
+      '@personal-agent/workspaces':
+        specifier: workspace:*
+        version: link:../../packages/workspaces
       hono:
         specifier: 4.13.17
         version: 4.13.17
@@ -312,6 +318,40 @@ importers:
       '@personal-agent/execution':
         specifier: workspace:*
         version: link:../execution
+
+  packages/verification:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@personal-agent/orchestrator-core':
+        specifier: workspace:*
+        version: link:../orchestrator-core
+      '@personal-agent/storage':
+        specifier: workspace:*
+        version: link:../storage
+    devDependencies:
+      '@personal-agent/workspaces':
+        specifier: workspace:*
+        version: link:../workspaces
+      '@types/better-sqlite3':
+        specifier: ^7.6.12
+        version: 7.6.13
+      '@types/node':
+        specifier: 24.10.0
+        version: 24.10.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+
+  packages/workspaces:
+    devDependencies:
+      '@types/node':
+        specifier: 24.10.0
+        version: 24.10.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
 packages:
 

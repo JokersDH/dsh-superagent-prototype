@@ -1,38 +1,78 @@
 import { JsonSchema } from '@personal-agent/contracts'
-import type { AttemptIO, Json, RuntimeFactPayload } from '@personal-agent/contracts'
+import type { AttemptIO, CriticalFact, Json, RuntimeFactPayload } from '@personal-agent/contracts'
 import type { Engine, Policy } from '@personal-agent/orchestrator-core'
 import type { ProductStore } from '@personal-agent/storage'
 import { createRuntimeIngress, jsonDigest } from './runtime-ingress.ts'
 import type { IngressBinding, RuntimeIngressStore } from './runtime-ingress.ts'
 
 /** Compose production storage ports without private SQL or a second domain lifecycle. */
-export function createStoredRuntimeIngress(store: ProductStore, core: Pick<Engine, 'personalExecutor' | 'invalidateCandidate'>, policy: () => Pick<Policy, 'revalidate'>) {
+export function createStoredRuntimeIngress(
+  store: ProductStore,
+  core: Pick<Engine, 'personalExecutor' | 'invalidateCandidate'>,
+  policy: () => Pick<Policy, 'revalidate'>,
+  reducers: { business?(fact: CriticalFact, payload: RuntimeFactPayload): void } = {},
+) {
   if (typeof policy !== 'function') throw new TypeError('Stored runtime ingress requires the current trusted policy')
   const facts = core.personalExecutor()
-  const observe: (input: Parameters<RuntimeIngressStore['applyBusiness']>[0], payload: RuntimeFactPayload, disposition: 'business' | 'physical_only') => void = (input, payload, disposition) => {
-    store.observations.record({ fact: input, payload, disposition, payloadSha256: jsonDigest(JsonSchema.parse(payload)) })
+  const observe: (
+    input: Parameters<RuntimeIngressStore['applyBusiness']>[0],
+    payload: RuntimeFactPayload,
+    disposition: 'business' | 'physical_only',
+  ) => void = (input, payload, disposition) => {
+    store.observations.record({
+      fact: input,
+      payload,
+      disposition,
+      payloadSha256: jsonDigest(JsonSchema.parse(payload)),
+    })
     store.events.append({
-      topic: 'runtime.observed', entityRef: input.attemptId,
-      payload: { factId: input.factId, ticketId: input.ticketId, assignmentId: input.assignmentId, attemptId: input.attemptId, fenceEpoch: input.fenceEpoch, contract: input.contract, kind: payload.kind, payloadRef: input.payloadRef, disposition },
+      topic: 'runtime.observed',
+      entityRef: input.attemptId,
+      payload: {
+        factId: input.factId,
+        ticketId: input.ticketId,
+        assignmentId: input.assignmentId,
+        attemptId: input.attemptId,
+        fenceEpoch: input.fenceEpoch,
+        contract: input.contract,
+        kind: payload.kind,
+        payloadRef: input.payloadRef,
+        disposition,
+      },
     })
   }
   const ports: RuntimeIngressStore = {
     nesting: () => store.uow.nesting,
-    atomic: work => store.uow.atomic(work),
-    binding: id => store.bindings.binding<IngressBinding>(id),
-    current: id => store.bindings.current<IngressBinding>(id),
-    ticket: id => store.domain.tickets.get(id),
-    authorized: ticket => !!ticket.completion && store.authority.isCurrent(ticket.completion.contract) && policy().revalidate(ticket.mandate) === true,
-    facts: { get: id => store.facts.get(id), record: (id, digest, apply) => store.facts.record(id, digest, apply) },
+    atomic: (work) => store.uow.atomic(work),
+    binding: (id) => store.bindings.binding<IngressBinding>(id),
+    current: (id) => store.bindings.current<IngressBinding>(id),
+    ticket: (id) => store.domain.tickets.get(id),
+    authorized: (ticket) =>
+      !!ticket.completion &&
+      store.authority.isCurrent(ticket.completion.contract) &&
+      policy().revalidate(ticket.mandate) === true,
+    facts: { get: (id) => store.facts.get(id), record: (id, digest, apply) => store.facts.record(id, digest, apply) },
     applyBusiness: (input, payload) => {
       if (payload.kind === 'turn.ended') facts.turnEnded(input.ticketId, input.assignmentId)
       if (payload.kind === 'config.changed') {
-        core.invalidateCandidate({ ticketId: input.ticketId, assignmentId: input.assignmentId, contract: input.contract })
+        core.invalidateCandidate({
+          ticketId: input.ticketId,
+          assignmentId: input.assignmentId,
+          contract: input.contract,
+        })
         const binding = store.bindings.binding<IngressBinding>(input.attemptId)!
         store.bindings.record({ ...binding, state: 'stopping' })
-        store.queue.enqueue('runtime.reconcile', input.attemptId, JSON.stringify(input.payloadRef), store.queue.maxSeq() + 1, 0, new Date().toISOString())
+        store.queue.enqueue(
+          'runtime.reconcile',
+          input.attemptId,
+          JSON.stringify(input.payloadRef),
+          store.queue.maxSeq() + 1,
+          0,
+          new Date().toISOString(),
+        )
       }
-      // Candidate, questions and approvals remain observations until their trusted owners apply them.
+      // Optional trusted application reducers join this exact fact/receipt transaction.
+      reducers.business?.(input, payload)
       observe(input, payload, 'business')
     },
     applyPhysical: (input, payload) => {
@@ -46,7 +86,7 @@ export function createStoredRuntimeIngress(store: ProductStore, core: Pick<Engin
 /** Runner-local references reuse the host's immutable payloads; no transaction may contain file I/O. */
 export function storedAttemptPayloads(store: ProductStore): AttemptIO['payloads'] {
   return {
-    read: async ref => {
+    read: async (ref) => {
       if (store.uow.nesting) throw new Error('Read immutable payloads outside the database transaction')
       return JsonSchema.parse((await store.payloads.read(ref)).value)
     },

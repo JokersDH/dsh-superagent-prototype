@@ -2,7 +2,7 @@
 
 **当前派工入口：[第二轮整包排程](agent-tasks/wave-02/README.zh-CN.md)。** A 连续交付可信验证、产品仓储和工作台；B 连续交付独立运行时、Catalog/策略准备和首个 Driver；主 Agent 做问题中心、应用 API 和纵向集成。每人一个早期接口检查点、一次整包交付，不再每修一项就重新派工。
 
-主线应用检查点：已集成 A 的产品仓储（75 项通过），新增 `packages/questions/`、`packages/application/` 和认证 HTTP/SSE，新增 34 项加原恢复 56 项共 **90 项通过**。API 沙箱见 [HTTP 说明](apps/coordinator/http/README.md)，接口/未接线项见 [当前检查点](docs/rfcs/WP-16/0002-main-application-checkpoint.md)。它保留执行待办但不调用真实 agent；完整产品路径继续 M4 验收。
+主线最新检查点：已接入 A 的工作区和验收后端，并实现真实受控子进程的“委托 → 提问 → 回答 → 产物冻结 → 检查 → 接受交付”API 闭环。`pnpm check:g2-product` 覆盖原有 90 项、WP-04 的 30 项及新增 14 项，共 **134 项**；实际结果见 [产品检查报告](reports/releases/g2-product.json)。启动、代码位置、A/B 接线参数见 [受控产品入口](apps/coordinator/product/README.md) 和 [集成交接](docs/rfcs/WP-16/0003-controlled-product-integration.md)。本机 API 默认 8791；fixture 子进程不调用模型。浏览器产品验收、独立 Runner 重连及真实 agent 接入仍分开验收。
 
 ## 1. 唯一交付仓库
 
@@ -10,7 +10,7 @@
 
 G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契约 183 项测试通过；[G1 核心交接](docs/adr/core/g1-core-handoff.md) 明确接口与剩余联调。整体 G1 尚未通过，等待 A 的存储和 B 的运行时接线。
 
-最新验收（2026-11-08）：主线持久登记、恢复编排和队列接线 **56 项通过**，累计含 6 个真实 SIGKILL 窗口。恢复从数据库找到原 Runner；取消前持久化控制 ID，重复检查复用原屏障回执。见 [最新登记恢复交接](docs/adr/core/g1-registered-recovery-handoff.md)。A 的旧六项和 B 的旧三项修复均通过；A 新候选 27 项、B 148 项测试通过，但仍有 2 项完成权威、3 项 Journal 完整性边界失败。A/WP-04 与 B/Journal 暂未合入，B 的独立进程观察修复已接入。下一轮继续 [A 任务单](agent-tasks/g2-agent-a-wp04-admission-fixes.md) 和 [B 任务单](agent-tasks/g1-agent-b-journal-followup.md)。整体 G1 仍未通过，尚无可用产品 UI/daemon。
+历史恢复检查点（2026-11-08）：主线持久登记、恢复编排和队列接线 **56 项通过**，含 6 个真实 SIGKILL 窗口。其完整范围见 [登记恢复交接](docs/adr/core/g1-registered-recovery-handoff.md)。本轮已进一步复验并接入 A/WP-04，旧任务单仅保留历史追溯；当前仍执行 wave-02 整包。新增产品 SIGKILL 场景证明“不重复 begin、保留不确定状态”，没有将其当成独立 Runner 存活重连证据。
 
 [JokersDH/dsh-superagent-prototype](https://github.com/JokersDH/dsh-superagent-prototype) 是后续方案 B 的交付仓库。架构、试验和正式实现都提交到这个仓库。
 
@@ -43,8 +43,10 @@ G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契
 | `apps/coordinator/runner-registry.ts`、`reconcile-runner.ts`、`recovery-effects.ts` | 持久可信登记、稳定取消意图、恢复编排、现有队列接线 | 合计 56 项通过，含 6 个 SIGKILL；实际 AttemptRunner daemon 接入待完成 |
 | `packages/orchestrator-core/` | 正式提取及最小扩展后的 core | 已实现第一批：legacy 144 + 新守卫 34 项测试 |
 | `packages/storage/`、`effects/`、`execution/`、`driver-kit/`、`testing/` | 持久化、队列、运行时基础与受控测试 | 已有实现与分范围验收；完整运行时/产品数据仍在推进 |
-| `packages/workspaces/`、`verification/` | 可信交付模块 | 在 A 候选分支，尚未合入；本轮先收拢完成权威边界 |
-| `packages/questions/`、`application/`、`catalog/`、`policy-preparation/`、`drivers/` | 产品业务与执行器接入 | 本轮对应 owner 的待交付模块，不能当已实现接口 |
+| `packages/workspaces/`、`verification/` | 可信交付模块 | A `8f1e60a` 后端已复验并接入；30 项测试及既有准入探针通过 |
+| `packages/questions/`、`application/` | 问题中心和确定性应用 | 已有 SQLite/API 接线和受控产品集成；分别 14/11 项模块测试 |
+| `packages/catalog/`、`policy-preparation/`、`drivers/` | 执行器接入 | B 候选独立验收；不能将协议 fixture 当作已安装原生 agent 兼容证据 |
+| `apps/coordinator/product/` | 真实受控子进程、问题和验收组合入口 | 新增 14 项集成场景；真实 loopback HTTP 可通过 smoke 脚本执行 |
 | `apps/coordinator/`、`apps/runner/` | 新产品组合适配与受控运行基础 | 组合模块已实现；真实产品进程入口本轮接线 |
 | `apps/console/`、`apps/cli/` | 网页工作台、CLI | 工作台本轮启动；CLI/发行后续推进 |
 

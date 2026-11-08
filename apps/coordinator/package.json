@@ -17,7 +17,10 @@
     "test:registered-recovery": "node --test ../../tests/integration/registered-recovery.case.mjs ../../tests/integration/registered-recovery-crash.case.mjs",
     "typecheck:http": "tsc -p tsconfig.http.json --noEmit",
     "test:http": "node --test ../../tests/integration/application-http.case.mjs",
-    "dev:api": "node http/demo.ts"
+    "dev:api": "node http/demo.ts",
+    "typecheck:product": "tsc -p tsconfig.product.json --noEmit",
+    "test:product": "node --test ../../tests/integration/product-execution.case.mjs",
+    "dev:product": "node product/demo.ts"
   },
   "dependencies": {
     "@hono/node-server": "2.1.6",
@@ -27,6 +30,8 @@
     "@personal-agent/orchestrator-core": "workspace:*",
     "@personal-agent/questions": "workspace:*",
     "@personal-agent/storage": "workspace:*",
+    "@personal-agent/verification": "workspace:*",
+    "@personal-agent/workspaces": "workspace:*",
     "hono": "4.13.17",
     "zod": "4.4.3"
   },
