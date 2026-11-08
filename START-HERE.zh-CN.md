@@ -2,6 +2,8 @@
 
 **当前派工入口：[第二轮整包排程](agent-tasks/wave-02/README.zh-CN.md)。** A 连续交付可信验证、产品仓储和工作台；B 连续交付独立运行时、Catalog/策略准备和首个 Driver；主 Agent 做问题中心、应用 API 和纵向集成。每人一个早期接口检查点、一次整包交付，不再每修一项就重新派工。
 
+主线应用检查点：已集成 A 的产品仓储（75 项通过），新增 `packages/questions/`、`packages/application/` 和认证 HTTP/SSE，新增 34 项加原恢复 56 项共 **90 项通过**。API 沙箱见 [HTTP 说明](apps/coordinator/http/README.md)，接口/未接线项见 [当前检查点](docs/rfcs/WP-16/0002-main-application-checkpoint.md)。它保留执行待办但不调用真实 agent；完整产品路径继续 M4 验收。
+
 ## 1. 唯一交付仓库
 
 最新阶段：G0 已按 darwin/arm64 的限定范围验收通过，详见 [G0 主 Agent 交接](docs/adr/bootstrap/g0-main-report.md)。下表的首轮工作目录/分支用于追溯 G0；下一轮各自从集成 main 新开 G1 分支，A 转 WP-02，B 转 WP-03，主 Agent 转 WP-01/16。

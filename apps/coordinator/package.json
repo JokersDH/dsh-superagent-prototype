@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "G1 composition adapters; no product daemon or HTTP server yet.",
-  "engines": { "node": ">=24.21.0 <25" },
+  "description": "Recovery composition and authenticated local product HTTP; native product integration remains staged.",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --test ../../tests/integration/runtime-ingress.case.ts",
@@ -12,8 +14,24 @@
     "test:production": "node --test ../../tests/integration/production-runtime.case.mjs",
     "test:recovery": "node --test ../../tests/integration/recovery-facts.case.mjs ../../tests/integration/recovery-crash.case.mjs",
     "test:runner-link": "node --test ../../tests/integration/runner-link.case.mjs ../../tests/integration/runner-reconnect.case.mjs",
-    "test:registered-recovery": "node --test ../../tests/integration/registered-recovery.case.mjs ../../tests/integration/registered-recovery-crash.case.mjs"
+    "test:registered-recovery": "node --test ../../tests/integration/registered-recovery.case.mjs ../../tests/integration/registered-recovery-crash.case.mjs",
+    "typecheck:http": "tsc -p tsconfig.http.json --noEmit",
+    "test:http": "node --test ../../tests/integration/application-http.case.mjs",
+    "dev:api": "node http/demo.ts"
   },
-  "dependencies": { "@personal-agent/contracts": "workspace:*", "@personal-agent/effects": "workspace:*", "@personal-agent/orchestrator-core": "workspace:*", "@personal-agent/storage": "workspace:*", "zod": "4.4.3" },
-  "devDependencies": { "@types/node": "24.10.0", "typescript": "6.0.3" }
+  "dependencies": {
+    "@hono/node-server": "2.1.6",
+    "@personal-agent/application": "workspace:*",
+    "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/effects": "workspace:*",
+    "@personal-agent/orchestrator-core": "workspace:*",
+    "@personal-agent/questions": "workspace:*",
+    "@personal-agent/storage": "workspace:*",
+    "hono": "4.13.17",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0",
+    "typescript": "6.0.3"
+  }
 }

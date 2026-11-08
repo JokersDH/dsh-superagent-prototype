@@ -1,8 +1,8 @@
 # G1 Coordinator Composition
 
-This directory is a main-agent composition module. It is **not yet a running daemon, HTTP server or usable personal assistant**.
+Current follow-up: [local HTTP interface](http/README.md) and `docs/rfcs/WP-16/0002-main-application-checkpoint.md`. Authenticated application/Broker/HTTP and an API sandbox now exist; actual native product composition/full workbench remain pending. The sections below preserve the earlier G1 adapter scopes.
 
-- `main.ts`: structural adapter between the formal core Repositories and the storage DomainStore. It preserves full aggregate JSON and uses the same UnitOfWork.
+- `main.ts`: compatibility export of the structural binder now in `packages/application/src/core-repositories.ts`. It preserves full aggregate JSON and uses the same UnitOfWork.
 - `runtime-ingress.ts`: authoritative data/identity/fact admission and outer transaction interface. Read ADR 0004 and `docs/rfcs/WP-01/0001-runtime-ingress-store.md`.
 - `stored-ingress.ts`: actual ProductStore adapter with mandatory current Policy revalidation, immutable payload references, atomic config-drift hold and reconciliation request. It does not complete work or release resources from an exit observation.
 - `recover-facts.ts`: bounded all-record preflight, original payload restoration and fact-only replay. Trusted decoder integrity and archived producer context are required; no native business restart interface exists here.

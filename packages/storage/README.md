@@ -31,6 +31,7 @@ no DSH imports, better-sqlite3 instead of `node:sqlite`.
 | `RuntimeAuthority` (`store.authority`) | Enabled contract revisions (`workId`/`revision`/`digest`) for the ingress current-authorization check. |
 | `ImmutablePayloads` (`store.payloads`) | Canonical-JSON content-addressed payloads: file + record complete before return; reads verify the artifact and the recorded SHA-256. `canonicalJson`/`canonicalDigest` match the coordinator's `jsonDigest`. |
 | `RuntimeObservations` (`store.observations`) | Append-only attempt-level evidence and per-resource observations for accepted strict facts (`factId`/`payloadRef` preserved), recorded inside the ingress transaction. `summarize(attemptId)` is a read-only reducer: cancel ACK, exit and writer quiescence stay separate; no release API and no inferred physical success. |
+| `ProductRecords` (`store.product`) | Wave-02 product records beside the core rows: `works` (frozen Work identity), `contracts` (append-only revisions by full ref), `links` (one primary Ticket link per revision), `messages` (per-conversation sequence, exclusive `before` paging, replay idempotent), `questions` (frozen, validity/version CAS), `dispatchControls` (`{paused, revision}` CAS only). See RFC-02. |
 | `applyMigrations`, `MIGRATIONS` | The single migration entry; checksums recorded in `schema_meta`; refuses upstream/unknown databases and drift/gap/future versions. |
 
 ## Run
@@ -52,7 +53,7 @@ storage typecheck/tests resolve them (a missing effects `dist` fails the two sto
 that import the queue algorithm).
 
 Measured environment for the WP-02 evidence: Node v24.21.0, pnpm 11.7.0, darwin/arm64,
-better-sqlite3 13.0.3, SQLite 3.53.4. 44/44 storage tests and 8/8 effects tests pass; the official
+better-sqlite3 13.0.3, SQLite 3.53.4. 75/75 storage tests and 8/8 effects tests pass; the official
 G1 review repros report A-LOCK-INITIALIZATION, A-ASYNC-TRANSACTION, and MAIN-SYNC-BRIDGE as PASS.
 See `report.md` and `reports/`.
 
@@ -60,7 +61,8 @@ See `report.md` and `reports/`.
 
 - This package does not start the effect queue on open; recovery is a deliberate reconcile-mode
   startup by the application (WP-10).
-- `Work`, `ContractRevision`, questions, runtime bindings, and writer-lease rows belong to other
-  packages; they submit schema requests to the storage owner (WP-02) for a later migration number.
+- `ProductRecords` stores records only. Work phases, question semantics, answers and delivery
+  classification stay with core, the Broker and the runtime; `dispatchControls` is a manual pause
+  switch with CAS, never a second Work lifecycle.
 - Native send classification wiring is proven here; real native Driver behaviour is
   NOT_TESTED (WP-03/WP-07).

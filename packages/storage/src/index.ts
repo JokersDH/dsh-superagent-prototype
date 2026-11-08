@@ -16,6 +16,7 @@ import { Answers } from './answers.ts'
 import { ArtifactStore } from './artifacts.ts'
 import { ImmutablePayloads, RuntimeAuthority, RuntimeBindings } from './ingress.ts'
 import { RuntimeObservations } from './observations.ts'
+import { ProductRecords } from './product.ts'
 import { UnitOfWork } from './uow.ts'
 import { type LockContent, type LockRegistry } from './writer-lock.ts'
 
@@ -47,6 +48,8 @@ export class ProductStore {
   readonly payloads: ImmutablePayloads
   /** Append-only runtime observations and the read-only reducer for the composition root. */
   readonly observations: RuntimeObservations
+  /** Frozen application/Broker records: works, contracts, links, messages, questions, dispatch switch. */
+  readonly product: ProductRecords
 
   constructor(options: ProductStoreOptions) {
     this.database = new ProductDatabase(options.path, options.report ? { report: options.report } : {})
@@ -65,6 +68,7 @@ export class ProductStore {
     this.authority = new RuntimeAuthority(this.db)
     this.payloads = new ImmutablePayloads(this.db, this.artifacts)
     this.observations = new RuntimeObservations(this.db, this.uow, this.bindings)
+    this.product = new ProductRecords(this.db, this.uow)
   }
 
   close(): void { this.database.close() }
@@ -116,6 +120,10 @@ export { EventLog, type EventInput, type EventRow } from './events.ts'
 export { DispatchLedger, type DeliveryState, type DispatchRecord } from './dispatch.ts'
 export { ChannelReceipts, CHANNEL_SEND_KIND, type ChannelReceipt, type OutboundMessage, type ReplyStatus, type DropReason, type ChannelRef } from './outbox.ts'
 export { Answers, AnswerConflict, type DeliveryStatus, type RecordedAnswer } from './answers.ts'
+export {
+  ProductRecords, ProductWorks, ProductContracts, ProductLinks, ProductMessages, ProductQuestions, ProductDispatchControls,
+  ProductConflict, DispatchConflict, type NewConversationMessage, type DispatchControl,
+} from './product.ts'
 export { ArtifactStore, ensureArtifactRoot, artifactRoot, stateDirOf, type ArtifactRecord, type WrittenArtifact, type GcResult } from './artifacts.ts'
 export {
   RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict, AuthorityConflict,

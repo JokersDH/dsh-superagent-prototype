@@ -126,6 +126,12 @@ importers:
 
   apps/coordinator:
     dependencies:
+      '@hono/node-server':
+        specifier: 2.1.6
+        version: 2.1.6(hono@4.13.17)
+      '@personal-agent/application':
+        specifier: workspace:*
+        version: link:../../packages/application
       '@personal-agent/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -135,9 +141,15 @@ importers:
       '@personal-agent/orchestrator-core':
         specifier: workspace:*
         version: link:../../packages/orchestrator-core
+      '@personal-agent/questions':
+        specifier: workspace:*
+        version: link:../../packages/questions
       '@personal-agent/storage':
         specifier: workspace:*
         version: link:../../packages/storage
+      hono:
+        specifier: 4.13.17
+        version: 4.13.17
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -160,6 +172,28 @@ importers:
       '@personal-agent/execution':
         specifier: workspace:*
         version: link:../../packages/execution
+
+  packages/application:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@personal-agent/orchestrator-core':
+        specifier: workspace:*
+        version: link:../orchestrator-core
+      '@personal-agent/questions':
+        specifier: workspace:*
+        version: link:../questions
+      '@personal-agent/storage':
+        specifier: workspace:*
+        version: link:../storage
+    devDependencies:
+      '@types/node':
+        specifier: 24.10.0
+        version: 24.10.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   packages/contracts:
     dependencies:
@@ -219,6 +253,28 @@ importers:
       vitest:
         specifier: 4.1.8
         version: 4.1.8(@types/node@24.10.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.10.0)(yaml@2.9.1))
+
+  packages/questions:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@personal-agent/orchestrator-core':
+        specifier: workspace:*
+        version: link:../orchestrator-core
+      '@personal-agent/storage':
+        specifier: workspace:*
+        version: link:../storage
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/node':
+        specifier: 24.10.0
+        version: 24.10.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   packages/storage:
     dependencies:
@@ -941,6 +997,12 @@ packages:
       '@noble/hashes':
         optional: true
 
+  '@hono/node-server@2.1.6':
+    resolution: {integrity: sha512-p/KH9MnfNcsm3sR6x4lNgm5j+QN4Et8srKredl9DZfXiyZ1UQ3aQ2YVpFLbqktYN5JI+DB+VZFKM2PqE5hLKjQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      hono: ^4 || ^5.0.0-0
+
   '@jridgewell/sourcemap-codec@1.6.0':
     resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
@@ -1423,6 +1485,10 @@ packages:
 
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+
+  hono@4.13.17:
+    resolution: {integrity: sha512-vZIcbkvjOR5hHRWERbGkr8fGfF0GGM1ooYkuH448iO3b2AdVEr3AXZSw4Z3Kn+1L5z0CVoVeyV29VGYmFh05kQ==}
+    engines: {node: '>=16.9.0'}
 
   hookable@6.1.1:
     resolution: {integrity: sha512-U9LYDy1CwhMCnprUfeAZWZGByVbhd54hwepegYTK7Pi5NvqEj63ifz5z+xukznehT7i6NIZRu89Ay1AZmRsLEQ==}
@@ -2697,6 +2763,10 @@ snapshots:
 
   '@exodus/bytes@1.15.1': {}
 
+  '@hono/node-server@2.1.6(hono@4.13.17)':
+    dependencies:
+      hono: 4.13.17
+
   '@jridgewell/sourcemap-codec@1.6.0': {}
 
   '@oxc-project/types@0.148.0': {}
@@ -3032,6 +3102,8 @@ snapshots:
       resolve-pkg-maps: 1.0.0
 
   graceful-fs@4.2.11: {}
+
+  hono@4.13.17: {}
 
   hookable@6.1.1: {}
 

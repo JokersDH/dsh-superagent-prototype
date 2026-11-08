@@ -71,3 +71,20 @@ test('an answer is recorded once per ID and each native target has exactly one d
     assert.equal(recovered.length, 2)
   })
 })
+
+test('delivery status moves forward only; terminal and earlier states cannot be overwritten', async () => {
+  await withStore(({ store }) => {
+    store.answers.record('a1', { questionId: 'q1', expectedVersion: 1, digest: 'd', answer: {} })
+    store.answers.upsertDelivery('a1', 'target-1', 'local_recorded')
+    store.answers.upsertDelivery('a1', 'target-1', 'indeterminate')
+    store.answers.upsertDelivery('a1', 'target-1', 'native_applied', 'ev-terminal')
+    assert.throws(() => store.answers.upsertDelivery('a1', 'target-1', 'response_written'), AnswerConflict)
+    assert.throws(() => store.answers.upsertDelivery('a1', 'target-1', 'expired'), AnswerConflict)
+    assert.equal(store.answers.deliveries('a1')[0]!.status, 'native_applied')
+
+    store.answers.upsertDelivery('a1', 'target-2', 'local_recorded')
+    store.answers.upsertDelivery('a1', 'target-2', 'expired')
+    assert.throws(() => store.answers.upsertDelivery('a1', 'target-2', 'native_applied'), AnswerConflict)
+    assert.equal(store.answers.deliveries('a1').find(delivery => delivery.targetBindingId === 'target-2')!.status, 'expired')
+  })
+})

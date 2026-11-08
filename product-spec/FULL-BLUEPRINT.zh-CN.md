@@ -66,6 +66,8 @@ pa start / pa status / pa doctor / pa backup / pa stop
 
 当前实施已进入 [第二轮整包排程](../agent-tasks/wave-02/README.zh-CN.md)。该入口记录真实进度及大块任务；生成目录中的 PLANNED 表示规格，不代表实际实现状态。A/B 先完成各自已有阻断，再连续交付完整子系统，不再逐个缺陷重新派工。
 
+主线应用检查点已实现：产品仓储已集成（75 项独立复验），QuestionBroker、确定性 ApplicationService 与认证 HTTP/SSE 新增 34 项，加原恢复共 90 项通过。API 沙箱与接口见 [检查点说明](../docs/rfcs/WP-16/0002-main-application-checkpoint.md)。实际 Runner、可信交付及 console 仍需跨模块接线，尚未声明完整 G2 或原生兼容。
+
 ## 4. 关键决定
 
 | 决定 | 原因与约束 |

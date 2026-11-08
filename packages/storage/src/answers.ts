@@ -18,6 +18,15 @@ type Row = Record<string, unknown>
 
 export interface RecordedAnswer { alreadyRecorded: boolean }
 
+/** Allowed forward transitions; `native_applied` and `expired` are terminal. */
+const STATUS_TRANSITIONS: Readonly<Record<DeliveryStatus, readonly DeliveryStatus[]>> = {
+  local_recorded: ['response_written', 'native_applied', 'indeterminate', 'expired'],
+  response_written: ['native_applied', 'indeterminate', 'expired'],
+  indeterminate: ['native_applied', 'expired'],
+  native_applied: [],
+  expired: [],
+}
+
 export class Answers {
   private readonly db: Database.Database
   private readonly uow: UnitOfWork
@@ -53,11 +62,23 @@ export class Answers {
     }
   }
 
-  /** Upserts the single delivery row of one target; status only moves forward through the contracts' states. */
+  /**
+   * Upserts the single delivery row of one target. The status only moves forward: a local record can
+   * become written/native/indeterminate/expired, and written/indeterminate can still become native or
+   * expired; `native_applied` and `expired` are terminal. Repeating the same status only refreshes
+   * evidence. A backwards or post-terminal transition is refused instead of silently overwriting.
+   */
   upsertDelivery(answerId: string, targetBindingId: string, status: DeliveryStatus, evidence?: string): void {
-    this.db.prepare(`INSERT INTO answer_deliveries (answer_id, target_binding_id, status, evidence, updated_at) VALUES (?, ?, ?, ?, ?)
-      ON CONFLICT(answer_id, target_binding_id) DO UPDATE SET status = excluded.status, evidence = excluded.evidence, updated_at = excluded.updated_at`)
-      .run(answerId, targetBindingId, status, evidence ?? null, new Date().toISOString())
+    this.uow.atomic(() => {
+      const existing = this.db.prepare('SELECT status FROM answer_deliveries WHERE answer_id = ? AND target_binding_id = ?')
+        .get(answerId, targetBindingId) as Row | undefined
+      if (existing && String(existing.status) !== status && !STATUS_TRANSITIONS[String(existing.status) as DeliveryStatus].includes(status)) {
+        throw new AnswerConflict(`Delivery ${answerId}/${targetBindingId} cannot move from ${String(existing.status)} back to ${status}`)
+      }
+      this.db.prepare(`INSERT INTO answer_deliveries (answer_id, target_binding_id, status, evidence, updated_at) VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(answer_id, target_binding_id) DO UPDATE SET status = excluded.status, evidence = excluded.evidence, updated_at = excluded.updated_at`)
+        .run(answerId, targetBindingId, status, evidence ?? null, new Date().toISOString())
+    })
   }
 
   deliveries(answerId: string): AnswerDelivery[] {

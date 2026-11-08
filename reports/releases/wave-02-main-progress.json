@@ -1,0 +1,27 @@
+{
+  "package": "wave-02-main",
+  "branch": "codex/g2-application-broker",
+  "baseMainCommit": "5ac39b5",
+  "storageIntegrationCommit": "4a09ce4",
+  "storageSourceCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
+  "testedSourceCommit": "d5cfdc12767c2c5b01bb707b19615882ddd8a954",
+  "cleanCheckoutReport": "reports/releases/g2-application-clean.json",
+  "stages": {
+    "M1": { "status": "IMPLEMENTED_INTERFACE_CHECKPOINT", "interface": "docs/rfcs/WP-16/0002-main-application-checkpoint.md", "businessContractChanged": false },
+    "M2": { "status": "PASS_REAL_SQLITE_MODULE", "scope": "Question intake/strict answers/expiry/reuse/per-target delivery; native transport remains injected", "tests": 14 },
+    "M3": { "status": "PASS_DETERMINISTIC_APPLICATION_HTTP_SLICE", "applicationTests": 11, "httpTests": 9, "realLoopbackHttpTest": true },
+    "M4": { "status": "PENDING_CROSS_MODULE_PRODUCT_INTEGRATION", "scope": "Actual recoverable Runner, workspace/verifier and browser product path; native lane remains NOT_TESTED" }
+  },
+  "validation": {
+    "applicationAndRecovery": { "testsPassed": 90, "node": "24.22.2", "report": "reports/releases/g2-application.json" },
+    "coreOnSqlite": { "testsPassed": 178, "node": "24.21.0", "report": "reports/releases/g1-core-sqlite.json" },
+    "storage": { "testsPassed": 75, "node": "24.22.2", "source": "Agent A a6bb40a, storage files only" },
+    "countsAreSeparateScopesNotProductCompletionPercentage": true
+  },
+  "apiSandbox": { "url": "http://127.0.0.1:8787/v1/health", "mode": "fixture", "state": ".local-state/http-demo", "vendorCalls": 0, "executionIntentsDispatched": false },
+  "unacceptedUpstreams": {
+    "agentA": "Verification suite 21/22 at backend snapshot: total migration count assertion expects 6 while source is v7; console fixture report is not real HTTP product acceptance",
+    "agentB": "New B1-B4 checkpoint is pending independent review; its report marks real reconnect/SIGKILL/main adapter and installed-vendor tests NOT_TESTED"
+  },
+  "limitations": ["No complete G1/G2 product acceptance", "No installed vendor/model call", "API sandbox is not a full workbench", "No power-loss/load/soak certification"]
+}
