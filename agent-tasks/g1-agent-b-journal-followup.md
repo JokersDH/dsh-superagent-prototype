@@ -1,5 +1,7 @@
 # Agent B: Complete-File Journal Integrity Admission
 
+Current assignment: [Wave-02 complete package](wave-02/agent-b.zh-CN.md). This file is its B1 regression checklist. After these fixes, continue actual Runner service, Catalog/policy preparation and first Driver; do not stop at the old request to propose later work.
+
 Date: 2026-11-08. Continue `codex/g1-runtime`. Latest reviewed candidate: **`74a3068`**. Independent Node 24.22.2 results: **148/148**, strict runtime typecheck, original four plus follow-up three admission probes all pass. I/O poisoning, replay ACK and sequence fixes are verified. Main integrates only your byte-identical ProcessHost observation file. Journal remains unmerged because three previously requested step-3 boundaries still fail.
 
 Keep original Runner/DriverKit/execution/testing/docs ownership. Main owns coordinator composition and the new local recovery helper; A owns storage schemas. Fetch the updated `origin/main` after this packet lands. Do not change contracts, root dependencies/lock or weaken review probes.

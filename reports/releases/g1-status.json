@@ -28,5 +28,6 @@
     "Full gate coverage and calibrated load/performance evidence"
   ],
   "notClaimed": ["Full G1 passed", "Vendor native compatibility", "Power-loss durability", "Usable personal-assistant product or release"],
-  "nextAssignments": { "agentA": "agent-tasks/g2-agent-a-wp04-admission-fixes.md", "agentB": "agent-tasks/g1-agent-b-journal-followup.md", "main": "Review owner fixes, compose production recovery/barrier/current-candidate verification" }
+  "nextAssignments": { "agentA": "agent-tasks/wave-02/agent-a.zh-CN.md", "agentB": "agent-tasks/wave-02/agent-b.zh-CN.md", "main": "agent-tasks/wave-02/main.zh-CN.md" },
+  "nextWavePlan": "agent-tasks/wave-02/README.zh-CN.md"
 }

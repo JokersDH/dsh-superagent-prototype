@@ -1,5 +1,7 @@
 # Agent A: Current Runtime Authority And Host Proof Provenance
 
+Current assignment: [Wave-02 complete package](wave-02/agent-a.zh-CN.md). This file is its A1 regression checklist. After these fixes, continue product repositories and console; do not stop for another small-task dispatch.
+
 Date: 2026-11-08. Continue `codex/g2-workspaces-verification`, latest reviewed candidate **`fcf3273`**. Fetch/merge updated `origin/main` after this packet lands. Keep workspace/verification/storage ownership; do not change root contracts/lock/coordinator or weaken probes.
 
 The prior six fixes now independently pass on Node 24.22.2. Clean suites: workspaces **8/8**, verification **19/19**, storage **66/66**. The main probe was adapted only to await the intentional async verifier and provide the required guard. **WP-04 is not admitted:** two production-core boundary probes still complete a Ticket incorrectly.

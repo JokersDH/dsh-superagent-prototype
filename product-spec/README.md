@@ -56,6 +56,8 @@ pa start / pa status / pa doctor / pa backup / pa stop
 
 当前有主 Agent 加两个额外 Agent 时，按 [三 Agent 分工与首轮指令](three-agent-dispatch.zh-CN.md) 执行：先在 WP-00 内并行完成契约、core 提取、平台验证，再进入正式模块开发。
 
+当前实施已进入 [第二轮整包排程](../agent-tasks/wave-02/README.zh-CN.md)。该入口记录真实进度及大块任务；生成目录中的 PLANNED 表示规格，不代表实际实现状态。A/B 先完成各自已有阻断，再连续交付完整子系统，不再逐个缺陷重新派工。
+
 ## 4. 关键决定
 
 | 决定 | 原因与约束 |
