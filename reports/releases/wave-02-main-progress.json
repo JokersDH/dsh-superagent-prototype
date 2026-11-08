@@ -1,27 +1,39 @@
 {
   "package": "wave-02-main",
-  "branch": "codex/g2-application-broker",
-  "baseMainCommit": "5ac39b5",
+  "branch": "codex/g2-execution-integration",
+  "baseMainCommit": "cd093959f8344f36b550dd580382d446ac24ee40",
   "storageIntegrationCommit": "4a09ce4",
   "storageSourceCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
-  "testedSourceCommit": "d5cfdc12767c2c5b01bb707b19615882ddd8a954",
-  "cleanCheckoutReport": "reports/releases/g2-application-clean.json",
+  "workspaceVerificationIntegrationCommit": "7fa2bb0f5cad2661d724df576d51ac56e50fd034",
+  "workspaceVerificationSourceCommit": "8f1e60a10b259b3b6b95ec681161ed335e863f42",
+  "testedSourceCommit": "2e566f8da65d56078b4182b9a4b3358bac34e556",
+  "cleanCheckoutReport": "reports/releases/g2-product.json",
+  "liveHttpReport": "reports/releases/g2-product-loopback.json",
   "stages": {
-    "M1": { "status": "IMPLEMENTED_INTERFACE_CHECKPOINT", "interface": "docs/rfcs/WP-16/0002-main-application-checkpoint.md", "businessContractChanged": false },
-    "M2": { "status": "PASS_REAL_SQLITE_MODULE", "scope": "Question intake/strict answers/expiry/reuse/per-target delivery; native transport remains injected", "tests": 14 },
+    "M1": { "status": "IMPLEMENTED_CONTROLLED_PRODUCT_CHECKPOINT", "interface": "docs/rfcs/WP-16/0003-controlled-product-integration.md", "businessContractChanged": false },
+    "M2": { "status": "PASS_REAL_SQLITE_AND_CONTROLLED_SUBPROCESS", "scope": "Original native bindings, per-target answer transport, actual stdio writes and committed consumption facts", "moduleTests": 14 },
     "M3": { "status": "PASS_DETERMINISTIC_APPLICATION_HTTP_SLICE", "applicationTests": 11, "httpTests": 9, "realLoopbackHttpTest": true },
-    "M4": { "status": "PENDING_CROSS_MODULE_PRODUCT_INTEGRATION", "scope": "Actual recoverable Runner, workspace/verifier and browser product path; native lane remains NOT_TESTED" }
+    "M4": { "status": "PASS_CONTROLLED_PRODUCT_API_SLICE", "productIntegrationTests": 14, "scope": "Real scratch subprocess, original questions, complete owned-resource barrier, freeze/check/accept, exact receipt and verification recovery, conservative SIGKILL no-replay", "browserProduct": "PENDING_AGENT_A_INTEGRATION", "independentRunnerProductRecovery": "PENDING_AGENT_B_INTEGRATION", "installedNativeAgents": "NOT_TESTED" }
   },
   "validation": {
+    "combinedControlledProductCheck": { "testsPassed": 134, "node": "24.22.2", "platform": "darwin/arm64", "sourceWorktreeClean": true, "report": "reports/releases/g2-product.json" },
     "applicationAndRecovery": { "testsPassed": 90, "node": "24.22.2", "report": "reports/releases/g2-application.json" },
     "coreOnSqlite": { "testsPassed": 178, "node": "24.21.0", "report": "reports/releases/g1-core-sqlite.json" },
     "storage": { "testsPassed": 75, "node": "24.22.2", "source": "Agent A a6bb40a, storage files only" },
+    "workspaces": { "testsPassed": 8, "additionalAdmissionProbesPassed": 6 },
+    "verification": { "testsPassed": 22, "additionalCurrentRuntimeAndProvenanceProbesPassed": 2 },
+    "liveHttp": { "status": "PASS_REAL_LOOPBACK_CONTROLLED_PRODUCT", "report": "reports/releases/g2-product-loopback.json" },
     "countsAreSeparateScopesNotProductCompletionPercentage": true
   },
-  "apiSandbox": { "url": "http://127.0.0.1:8787/v1/health", "mode": "fixture", "state": ".local-state/http-demo", "vendorCalls": 0, "executionIntentsDispatched": false },
+  "apiSandbox": { "url": "http://127.0.0.1:8791/v1/health", "mode": "fixture", "state": ".local-state/product-demo", "vendorCalls": 0, "executionIntentsDispatched": true, "scratchProjectOnly": true },
   "unacceptedUpstreams": {
-    "agentA": "Verification suite 21/22 at backend snapshot: total migration count assertion expects 6 while source is v7; console fixture report is not real HTTP product acceptance",
-    "agentB": "New B1-B4 checkpoint is pending independent review; its report marks real reconnect/SIGKILL/main adapter and installed-vendor tests NOT_TESTED"
+    "agentA": "Console product HTTP/browser wiring remains separate. Generic workspace delivery needs untracked bytes and attempt metadata fixes; the controlled lane publishes fixed output bytes and its own current-candidate manifest.",
+    "agentB": "Independent AttemptRunner, Journal, Catalog/policy and installed-vendor candidates require separate review; this lane does not certify their recovery or compatibility."
   },
-  "limitations": ["No complete G1/G2 product acceptance", "No installed vendor/model call", "API sandbox is not a full workbench", "No power-loss/load/soak certification"]
+  "nextConsumers": {
+    "agentA": "Continue the already assigned browser integration package with explicit fixture project/profile/scope/check values in apps/coordinator/product/README.md; keep fixture and real HTTP evidence separate.",
+    "agentB": "Continue the already assigned authenticated independent Runner/recovery and native package; preserve original bindings, durable ACKs and complete resource barriers.",
+    "main": "Consume accepted committed A/B packages through the same application/fact/effect path and retain separate browser, independent Runner and native gates."
+  },
+  "limitations": ["No complete G1/G2 product release", "No installed vendor/model call", "API entry is not the browser workbench", "Controlled host does not survive coordinator SIGKILL; uncertainty is retained", "No generic project security sandbox or power-loss/load/soak certification"]
 }
