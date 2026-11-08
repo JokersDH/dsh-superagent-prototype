@@ -100,6 +100,7 @@ export class FileCriticalJournal {
   #closed = false
   /** Set when an append failed part-way; this handle must not write again until reopened. */
   #poisoned: string | undefined
+  #recovery: JournalRecovery | undefined
 
   constructor(options: FileJournalOptions) {
     this.#path = options.path
@@ -139,12 +140,18 @@ export class FileCriticalJournal {
     return this.#poisoned
   }
 
+  /** The snapshot produced by the last successful `open()`; `undefined` before opening. */
+  get recovery(): JournalRecovery | undefined {
+    return this.#recovery
+  }
+
   /** Open (or create) the journal, recovering entries and repairing a partial tail. */
   async open(): Promise<JournalRecovery> {
     const existed = existsSync(this.#path)
     await mkdir(dirname(this.#path), { recursive: true })
     const recovery = existed ? await this.#recover() : emptyRecovery(this.#maxBytes)
     for (const entry of recovery.entries) this.#identities.set(entry.fact.factId, factDigest(entry.fact, entry.payload))
+    this.#recovery = recovery
     this.#seq = recovery.lastSeq
     this.#bytes = recovery.bytes
     this.#readOnly = recovery.readOnly
@@ -367,6 +374,11 @@ export function decodeBuffer(buffer: Buffer, options: DecodeOptions = {}): Journ
       partialTailBytes = buffer.length - offset
       break
     }
+    // The terminator is part of the frame: a missing/edited newline is corruption, not a tail.
+    if (buffer[bodyEnd] !== 0x0a) {
+      corruptAt = offset
+      break
+    }
     const body = buffer.subarray(bodyStart, bodyEnd)
     if (bodyDigest(body) !== checksum) {
       corruptAt = offset
@@ -380,6 +392,10 @@ export function decodeBuffer(buffer: Buffer, options: DecodeOptions = {}): Journ
       break
     }
     if (!Number.isInteger(entry?.seq) || entry.seq < 1) {
+      corruptAt = offset
+      break
+    }
+    if (!isValidRecordEnvelope(entry)) {
       corruptAt = offset
       break
     }
@@ -427,6 +443,34 @@ export function decodeBuffer(buffer: Buffer, options: DecodeOptions = {}): Journ
     bytes,
     capacityBytes,
   }
+}
+
+/**
+ * A record envelope must carry a complete, well-typed fact and payload.
+ *
+ * This rejects a structurally broken record (missing identity, unknown kind, non-object payload) as
+ * corruption instead of letting it through as a "successful prefix" that later code must re-validate.
+ */
+export function isValidRecordEnvelope(entry: unknown): entry is JournalEntry {
+  if (entry === null || typeof entry !== 'object') return false
+  const record = entry as Partial<JournalEntry>
+  if (typeof record.at !== 'string' || Number.isNaN(Date.parse(record.at))) return false
+  if (!Number.isInteger(record.seq) || (record.seq as number) < 1) return false
+  const fact = record.fact as Record<string, unknown> | undefined
+  if (!fact || typeof fact !== 'object') return false
+  for (const field of ['ticketId', 'assignmentId', 'attemptId', 'factId', 'source'] as const) {
+    if (typeof fact[field] !== 'string' || (fact[field] as string).length === 0) return false
+  }
+  if (!Number.isInteger(fact.fenceEpoch) || (fact.fenceEpoch as number) < 1) return false
+  const contract = fact.contract as Record<string, unknown> | undefined
+  if (!contract || typeof contract !== 'object') return false
+  if (typeof contract.workId !== 'string' || !Number.isInteger(contract.revision) || typeof contract.digest !== 'string') return false
+  if (typeof fact.kind !== 'string' || fact.kind.length === 0) return false
+  if (typeof fact.payloadRef !== 'string' || fact.payloadRef.length === 0) return false
+  const payload = record.payload as Record<string, unknown> | undefined
+  if (!payload || typeof payload !== 'object' || payload.kind !== fact.kind) return false
+  if (!('value' in payload)) return false
+  return true
 }
 
 function readEntriesSync(path: string, maxBytes: number, maxRecordBytes: number): JournalRecovery {

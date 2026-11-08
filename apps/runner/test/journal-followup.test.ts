@@ -207,9 +207,9 @@ test('sequence: a gap makes the prefix untrustworthy and the journal read-only',
 })
 
 test('sequence: a backward step is corruption', () => {
-  const one = encodeRecord({ fact: factOf('f1'), payload: payloadOf('f1'), seq: 1, at: 'x' })
-  const two = encodeRecord({ fact: factOf('f2'), payload: payloadOf('f2'), seq: 2, at: 'x' })
-  const bad = encodeRecord({ fact: factOf('f3'), payload: payloadOf('f3'), seq: 1, at: 'x' })
+  const one = encodeRecord({ fact: factOf('f1'), payload: payloadOf('f1'), seq: 1, at: '2026-11-08T00:00:00.000Z' })
+  const two = encodeRecord({ fact: factOf('f2'), payload: payloadOf('f2'), seq: 2, at: '2026-11-08T00:00:00.000Z' })
+  const bad = encodeRecord({ fact: factOf('f3'), payload: payloadOf('f3'), seq: 1, at: '2026-11-08T00:00:00.000Z' })
   const result = decodeBuffer(Buffer.concat([one, two, bad]))
   assert.notEqual(result.corruptAt, null)
   assert.equal(result.readOnly, true)
@@ -217,15 +217,15 @@ test('sequence: a backward step is corruption', () => {
 })
 
 test('sequence: an exact duplicate record is dropped rather than promoted to a gap', () => {
-  const one = encodeRecord({ fact: factOf('f1'), payload: payloadOf('f1'), seq: 1, at: 'x' })
+  const one = encodeRecord({ fact: factOf('f1'), payload: payloadOf('f1'), seq: 1, at: '2026-11-08T00:00:00.000Z' })
   const result = decodeBuffer(Buffer.concat([one, one]))
   assert.equal(result.corruptAt, null)
   assert.deepEqual(result.entries.map(entry => entry.seq), [1])
 })
 
 test('sequence: a duplicate id with a different body is corruption', () => {
-  const one = encodeRecord({ fact: factOf('f1'), payload: payloadOf('f1'), seq: 1, at: 'x' })
-  const conflict = encodeRecord({ fact: factOf('f1'), payload: payloadOf('other'), seq: 2, at: 'x' })
+  const one = encodeRecord({ fact: factOf('f1'), payload: payloadOf('f1'), seq: 1, at: '2026-11-08T00:00:00.000Z' })
+  const conflict = encodeRecord({ fact: factOf('f1'), payload: payloadOf('other'), seq: 2, at: '2026-11-08T00:00:00.000Z' })
   const result = decodeBuffer(Buffer.concat([one, conflict]))
   assert.notEqual(result.corruptAt, null)
   assert.equal(result.readOnly, true)
@@ -234,8 +234,8 @@ test('sequence: a duplicate id with a different body is corruption', () => {
 test('sequence: entries() and replay never hide an integrity failure', async () => {
   const dir = await tempDir()
   const path = join(dir, 'c.journal')
-  const one = encodeRecord({ fact: factOf('f1'), payload: payloadOf('f1'), seq: 1, at: 'x' })
-  const gap = encodeRecord({ fact: factOf('f3'), payload: payloadOf('f3'), seq: 3, at: 'x' })
+  const one = encodeRecord({ fact: factOf('f1'), payload: payloadOf('f1'), seq: 1, at: '2026-11-08T00:00:00.000Z' })
+  const gap = encodeRecord({ fact: factOf('f3'), payload: payloadOf('f3'), seq: 3, at: '2026-11-08T00:00:00.000Z' })
   await import('node:fs/promises').then(fs => fs.writeFile(path, Buffer.concat([one, gap])))
 
   const journal = new FileCriticalJournal({ path })

@@ -242,6 +242,25 @@ export type ReplayResult = {
 
 export async function replayJournal(spool: FileCriticalJournal, sink: FactSink): Promise<ReplayResult> {
   const result: ReplayResult = { replayed: 0, duplicates: 0, refused: 0, failures: [] }
+
+  // Whole-file integrity gates every replay: a corrupt or unverified snapshot must not produce a
+  // single sink call, because a "successful prefix" of a damaged journal is not a verified batch.
+  if (spool.readOnly) {
+    throw new DriverError('state_indeterminate', 'journal_snapshot_unverified', 'Journal snapshot carries corruption; replay is refused')
+  }
+  const snapshot = spool.recovery
+  if (!snapshot || snapshot.corruptAt !== null || snapshot.readOnly) {
+    throw new DriverError('state_indeterminate', 'journal_snapshot_unverified', 'Journal snapshot was not verified by open()')
+  }
+  // Appends made after open() are expected (the live path writes continuously); what must not change
+  // is the *verified prefix*: every fact open() validated must still be present and identical.
+  const current = spool.entries()
+  for (const [index, verified] of snapshot.entries.entries()) {
+    const now = current[index]
+    if (!now || now.fact.factId !== verified.fact.factId || now.seq !== verified.seq) {
+      throw new DriverError('state_indeterminate', 'journal_snapshot_changed', 'Verified prefix changed since open(); reopen before replaying')
+    }
+  }
   const seen = new Map<string, string>()
   for (const entry of spool.entries()) {
     const identity = factDigest(entry.fact, entry.payload)
