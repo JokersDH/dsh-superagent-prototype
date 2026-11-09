@@ -1,11 +1,10 @@
-import { randomBytes } from 'node:crypto'
-import { closeSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, writeSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 import { parseArgs } from 'node:util'
 import { createProductApplication } from '@personal-agent/application'
 import { InstanceRegistry, ProductStore, WriterLock } from '@personal-agent/storage'
 import { createLocalHttpApp } from './app.ts'
 import { listenLocalHttp } from './server.ts'
+import { localCredentials } from './local-state.ts'
 
 const { values } = parseArgs({
   options: {
@@ -16,31 +15,7 @@ const { values } = parseArgs({
 })
 const port = Number(values.port),
   state = resolve(values.state!)
-mkdirSync(state, { recursive: true, mode: 0o700 })
-const directory = lstatSync(state)
-if (!directory.isDirectory() || directory.isSymbolicLink() || (directory.mode & 0o077) !== 0 || (process.getuid && directory.uid!==process.getuid()))
-  throw new Error('HTTP demo state requires a private owned directory')
-function credential(name: string): string {
-  const path = join(state, name)
-  try {
-    const fd = openSync(path, 'wx', 0o600)
-    try {
-      const bytes = Buffer.from(randomBytes(32).toString('hex'))
-      for (let offset = 0; offset < bytes.length; ) offset += writeSync(fd, bytes, offset)
-      fsyncSync(fd)
-    } finally {
-      closeSync(fd)
-    }
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
-  }
-  const stat = lstatSync(path)
-  if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== 64 || (stat.mode & 0o077) !== 0 || (process.getuid && stat.uid!==process.getuid()))
-    throw new Error('Invalid local credential file')
-  const value = readFileSync(path, 'utf8')
-  if (!/^[a-f0-9]{64}$/.test(value)) throw new Error('Invalid local credential encoding')
-  return value
-}
+const credential = localCredentials(state)
 const store = new ProductStore({ path: join(state, 'state.sqlite'), artifactsRoot: join(state, 'artifacts') })
 const lock = new WriterLock(state, new InstanceRegistry(store.db))
 try {
