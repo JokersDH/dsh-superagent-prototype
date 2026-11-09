@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2026-11-09T11:07:59.927Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "B3 fixture",
+    "nativeLane": false
+  },
+  "totals": {
+    "cases": 6,
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "B3-IDEMPOTENT",
+      "title": "same commandId replays the original receipt",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "replay returned workId=fcafcdd03976299f7e6cf47e722f6d1b seq=149"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B3-CONFLICT",
+      "title": "same commandId with a different payload is refused",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "refused with code=conflict (HTTP 409)"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B3-CONCURRENT",
+      "title": "concurrent replay does not create a second work",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "both requests name one work: a44386a56e3a3b8010f6763db77405c7"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B3-CURSOR",
+      "title": "an expired events cursor is reported, not silently ignored",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "expired cursor reported: 409 {\"error\":{\"code\":\"cursor_expired\",\"message\":\"Event cursor is"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B3-ISOLATION",
+      "title": "two conversations keep work/command identity separate",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "each work keeps its own conversation"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B3-QUESTION",
+      "title": "a stale question version cannot be answered",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "stale/unknown question refused (HTTP 400, code invalid_request)"
+      ],
+      "evidence": [],
+      "entities": []
+    }
+  ]
+}

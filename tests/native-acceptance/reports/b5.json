@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-11-09T11:08:09.556Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "B5 soak",
+    "cycles": 5
+  },
+  "totals": {
+    "cases": 1,
+    "PASS": 1,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "B5-SOAK",
+      "title": "5 controlled cycles within 2700s",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "5 cycles, completed cycles; listeners 1 -> 1, rssKb 119200 -> 119264"
+      ],
+      "evidence": [
+        {
+          "before": {
+            "listeners": 1,
+            "rssKb": 119200,
+            "stateKb": 5156
+          }
+        },
+        {
+          "after": {
+            "listeners": 1,
+            "rssKb": 119264,
+            "stateKb": 5348
+          },
+          "completed": 5,
+          "stoppedReason": "completed cycles",
+          "latencies": {
+            "p50": 3,
+            "p95": 3,
+            "max": 3
+          }
+        }
+      ],
+      "entities": []
+    }
+  ]
+}

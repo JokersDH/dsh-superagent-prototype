@@ -1,9 +1,13 @@
 {
-  "phase": "B2",
+  "phase": "B5",
   "branch": "codex/g1-runtime",
   "base": "5bbd892",
   "commit": "2c1f604",
-  "modelTasks": { "limit": 4, "used": 2, "accounting": "one per continue_work attempt that reached a native turn" },
+  "modelTasks": {
+    "limit": 4,
+    "used": 2,
+    "accounting": "one per continue_work attempt that reached a native turn"
+  },
   "phases": {
     "B1": {
       "status": "passed",
@@ -15,7 +19,11 @@
         "authentication proven on a protected route; loopback-only credential use",
         "--require-native exits non-zero when a required native case did not execute (verified exit 1)"
       ],
-      "evidence": { "selftest": "14/14", "readonlyAgainstNativeInstance": "5/5 PASS", "strictExit": "exit 1 with BLOCKED" }
+      "evidence": {
+        "selftest": "14/14",
+        "readonlyAgainstNativeInstance": "5/5 PASS",
+        "strictExit": "exit 1 with BLOCKED"
+      }
     },
     "B2": {
       "status": "partially_passed",
@@ -38,8 +46,36 @@
         "NATIVE-CHECK-FAIL",
         "NATIVE-QUESTION (on-request policy did not raise a question in these runs)"
       ]
+    },
+    "B3": {
+      "status": "passed",
+      "cases": "6/6 PASS",
+      "scope": "deterministic matrix on the controlled fixture entry (no model task)",
+      "passed": [
+        "same commandId replays the original receipt (workId+seq identical)",
+        "same commandId with a different payload is refused with code=conflict (HTTP 409)",
+        "concurrent replay yields exactly one work",
+        "an expired events cursor is reported as 409 cursor_expired",
+        "two works keep their own conversation identity",
+        "an unknown/stale question is refused"
+      ],
+      "note": "fixture results are labelled fixture; they are not native compatibility evidence"
+    },
+    "B5": {
+      "status": "passed",
+      "evidence": {
+        "cycles": 5,
+        "listenersBefore": 1,
+        "listenersAfter": 1,
+        "rssKbBefore": 119200,
+        "rssKbAfter": 119264,
+        "stateKbBefore": 5156,
+        "stateKbAfter": 5348,
+        "p50LatencyMs": 3
+      },
+      "note": "bounded soak stops at the first unexplained invariant break; no owned process left behind"
     }
   },
-  "next": "B3 deterministic failure matrix on the controlled fixture entry (no model budget), then B4 browser, B5 soak, B6 conformance",
+  "next": "B4 browser regression, then B6 conformance entry; B2 native gaps stay blocked on BLOCKER-1",
   "blockers": "tests/native-acceptance/reports/blockers.md"
 }
