@@ -1,7 +1,8 @@
-import { existsSync, rmSync } from 'node:fs'
+import { existsSync, readdirSync, rmSync } from 'node:fs'
 import { canonical, inside } from './paths.ts'
 import { inspectWorkspace } from './project.ts'
 import { scanInstalledTree } from './installed.ts'
+import { inspectPnpmWorkspace, scanWorkspaceInstalled } from './workspace.ts'
 import {
   identityMatches, loadAuthority, ownedPath, readReceipt, removeReceipt, type OwnedPath, type ReceiptBody,
 } from './authority.ts'
@@ -38,6 +39,24 @@ export function verifyPreparedEnvironment(ref: EnvironmentRef): EnvironmentVerif
   if (!existsSync(body.workspaceReal) || canonical(body.workspaceReal) !== canonical(ref.workspacePath))
     return blocked('workspace_replaced', 'The private workspace no longer exists or has been replaced.', diagnostics)
   const workspace = canonical(body.workspaceReal)
+  if (body.mode === 'pnpm_workspace') {
+    const ws = inspectPnpmWorkspace(workspace)
+    if (!ws.ok) return blocked('environment_inputs_invalid', ws.problem?.message ?? 'Workspace layout is invalid.', diagnostics)
+    if (ws.workspaceDigest !== body.workspaceDigest
+      || JSON.stringify(ws.manifests) !== JSON.stringify(body.manifests)
+      || JSON.stringify(ws.lockFiles) !== JSON.stringify(body.lockFiles)
+      || JSON.stringify(ws.dependencies) !== JSON.stringify(body.dependencies))
+      return blocked('environment_inputs_changed', 'Workspace manifests, lock or dependencies changed after preparation.', diagnostics)
+    for (const entry of body.ownedPaths)
+      if (!inside(workspace, entry.real) || !identityMatches(entry)) return blocked('ownership_changed', `Owned environment path was replaced or removed: ${entry.relative}`, diagnostics)
+    const scan = scanWorkspaceInstalled(workspace, body.modulesDirs ?? [])
+    if (scan.problem) return blocked(scan.problem.code, scan.problem.message, diagnostics)
+    if (scan.digest !== body.installedDigest) return blocked('environment_drift', 'The installed workspace dependency tree no longer matches the prepared fingerprint.', diagnostics)
+    return {
+      status: 'valid', ref, fingerprint: body.fingerprint, environment: body.environment,
+      excludedPaths: body.excludedPaths, ownedPaths: canonicalOwned(body), diagnostics,
+    }
+  }
   const inspection = inspectWorkspace(workspace)
   if (inspection.blocked) return blocked('environment_inputs_invalid', inspection.blocked.message, diagnostics)
   if (inspection.packageJsonDigest !== body.packageJsonDigest)
@@ -92,3 +111,22 @@ export async function cleanupPreparedEnvironment(ref: EnvironmentRef): Promise<T
 /** Re-export for tests/tools that need the signed receipt shape without importing authority internals. */
 export type { ReceiptBody, OwnedPath }
 export { ownedPath }
+
+/** Enumerates signed ready receipts so a restarted caller can recover after losing its ref. */
+export function listPreparedEnvironments(authorityRoot: string): EnvironmentRef[] {
+  const authority = loadAuthority(authorityRoot)
+  const refs: EnvironmentRef[] = []
+  let names: string[]
+  try { names = readdirSync(authority.receiptsDir) } catch { return refs }
+  for (const name of names.sort()) {
+    const id = name.replace(/\.json$/, '')
+    const stored = readReceipt(authority, id)
+    if (!stored.ok) continue
+    refs.push({
+      protocol: 'environment-ref/2', authorityRoot: authority.root, receiptId: id,
+      requestId: stored.receipt.body.requestId, fingerprint: stored.receipt.body.fingerprint,
+      workspacePath: stored.receipt.body.workspaceReal,
+    })
+  }
+  return refs
+}

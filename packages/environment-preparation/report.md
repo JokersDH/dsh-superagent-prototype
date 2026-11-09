@@ -1,66 +1,79 @@
-# Environment preparation report
+# Environment preparation: native MVP round-two delivery
 
 - Package: `packages/environment-preparation/` (branch `codex/g2-workspaces-verification`)
-- Base: `cef31c4` (merge `66e75ad`; main-owned `apps/console/` kept as origin/main)
-- Interface checkpoint: exported port in `src/types.ts` / `src/index.ts` (`prepareEnvironment`,
-  `PreparedEnvironment`/`ReadyEnvironment` + `BlockedEnvironment`, `EnvironmentPreparationError`,
-  `EnvironmentExclusionPort`).
-- Environment: Node v24.21.0, pnpm 11.7.0 (Corepack cached; network disabled in children),
-  darwin/arm64.
+- Base: `5bbd892` (merge `7baeb67`; main-owned workspaces/console kept from origin/main)
+- Stable API checkpoint: `8dcbdce`; final source commit is recorded in
+  `reports/execution-status.json`.
+- Environment: Node v24.21.0, pnpm 11.7.0 via Corepack cache, darwin/arm64; no model calls and no
+  networked install.
 
-## Results
+## Phase results (A1–A6)
 
-| Requirement | Result | Evidence |
+| Phase | Result | Evidence |
 | --- | --- | --- |
-| Dependency-free Node project ready + real `node --test` | **PASS** | `dependency-free Node project...` test; `reports/test-output.txt` |
-| Real pnpm project, cache present, frozen/offline/ignore-scripts install, real test | **PASS** | offline fixture with local tarball + offline store; `node --test` runs `dep-ok`; postinstall marker absent |
-| Original project/index/lock/dependency tree unchanged | **PASS** | git status/ls-files/index digest before/after; module snapshot check blocks `project_modified` |
-| No cache / wrong lock / missing manager / version mismatch | **PASS** | real frozen-lock mismatch; fake manager for offline-cache error; missing executable; declared version mismatch |
-| Dangerous external links / monorepo / yarn / ambiguous locks | **PASS** | `file:../…` escape, symlink node_modules escape, `workspaces`, yarn/bun lock, dual locks |
-| Cancellation, timeout, output-limit, lifecycle-script attempt, bad symlink never pollute original | **PASS** | fake sleeping/ignoring-TERM manager and flooding manager; PIDs dead; owned paths removed; user project clean |
-| Fingerprint binds lock/version/policy; same request idempotent; changed input not reused | **PASS** | reuse marker untouched; changed request clears/reinstalls; package/policy changes change fingerprint |
-| Complete business patch excludes environment/dependency paths | **PASS** | real Git fixture; only `.product-environment`/`node_modules` untracked; exclusion port; tracked diff empty |
-| No online install / no package-manager upgrade | **PASS** | `--offline --frozen-lockfile --ignore-scripts`; `COREPACK_ENABLE_NETWORK=0`; no online fallback |
+| A1 five admission failures | **PASS** | `node <primary>/tools/bootstrap/review-environment-preparation.mjs --environment $PWD` → `PASS_ENVIRONMENT_ADMISSION`; regression tests for each case |
+| A2 receipts/verify/trusted cleanup | **PASS** | HMAC-signed receipts under caller-owned `authorityRoot`; cross-process verify/cleanup; forged receipt, replaced owned path, drift, changed package/lock, corrupt key all refused |
+| A3 process port/cancel/concurrency/bounds | **PASS** | injectable `EnvironmentProcessPort` with explicit quiescence; workspace lock (live pid blocks, only ESRCH stale removal); interrupted marker not reused; cancellation in probe/install; output/time/disk budgets with cleanup |
+| A4 read-only inspection | **PASS** | `inspectEnvironment` + runtime parser; no environment/install/git/hook writes; Chinese code/message/suggestions; cache sufficiency explicitly `unknown`; stable blocked codes |
+| A5 recipes/consumer/recovery/performance | **PASS** | `plain-js` and `dev-deps` offline recipes install and run real node tests; consumer prepare → second-process verify → trusted cleanup; receipt enumeration after lost ref; performance report |
+| A6 restricted pnpm workspace | **PASS (package-local)** | one root/one lock, `app workspace:* lib`, offline install, app test calls lib, verify covers all manifests; external links/unknown targets/symlink members/bad globs/peer blocked; business patch includes only member source |
 
-Commands actually run:
+Original 12 tests are preserved; the package now has **31/31** tests.
+
+## Actual commands
 
 ```sh
 cd packages/environment-preparation
-pnpm run typecheck     # PASS
-pnpm run test          # 12/12 PASS
-pnpm run build         # PASS (dist/index.js importable)
+pnpm run typecheck          # PASS
+pnpm run test               # 31/31 PASS
+pnpm run build              # PASS (dist importable)
+node recipes/build-recipes.mjs --out /tmp/pa-env-recipes   # RECIPES_BUILT
+node ../../tools/bootstrap/review-environment-preparation.mjs --environment "$PWD"  # run from primary for the official probe
 ```
 
-Evidence: `reports/test-output.txt`, `reports/environment.txt`, this report, package-local tests and
-fixtures generated at test time under the OS temp directory.
+Performance measured in `reports/performance.json`: a 10-file installed tree prepared in 2 ms,
+verified in 0 ms, cleaned in 1 ms; a 1,000-file tree prepared in 7 ms, verified in 6 ms, cleaned in
+0 ms (darwin/arm64, local fixture; these are measurements, not release thresholds).
 
-## Interface and integration notes
+## Interface summary
 
-- Port input: authorized `projectPath`, private `workspacePath`, stable `requestId`, `AbortSignal`,
-  explicit `existing_only`/`offline_install`, optional `storeDir`/limits/manager command.
-- Ready output: `fingerprint`, manager/node identity, policy, allowlisted `environment`, `excludedPaths`,
-  diagnostics/evidence, `cleanup()`. Blocked output: explicit `code`/`message`, diagnostics/evidence and
-  a cleanup handle; never `ready`.
-- `cleanup()` removes only owned `.product-environment` and the `node_modules` it created, after
-  realpath containment checks; it does not touch the original project. A group that cannot be proven
-  gone yields `cleanup_unproven`.
-- Environment exclusion port proposal: `RFC-environment-exclusion.md`. The workspace owner/main must
-  pass `excludedPaths` into freeze/patch generation; this package's Git fixture proves the intended
-  behaviour but the product is **not** integrated yet.
+```ts
+prepareEnvironment(input): ReadyEnvironment | BlockedEnvironment
+verifyPreparedEnvironment(ref): EnvironmentVerificationResult
+cleanupPreparedEnvironment(ref): TrustedCleanupResult
+listPreparedEnvironments(authorityRoot): EnvironmentRef[]
+inspectEnvironment(input): EnvironmentInspection
+parseEnvironmentInspection(value): EnvironmentInspection
+```
 
-## Dependency request
+`ready` carries `fingerprint`, manager/node identity, policy, allowlisted environment, signed
+`environmentRef`, truly owned `ownedPaths`, diagnostics/evidence and `cleanup()`. Inputs include
+authorized project/workspace, stable request id, AbortSignal, explicit policy, optional authorized
+offline store, authorityRoot, injected process port and `mode: 'single' | 'pnpm_workspace'`.
+Workspace markers are never deletion/reuse authority. Receipts bind manifests/locks/dependencies,
+installed layout, policy, Node/manager versions, and owned path device/inode identity.
 
-- Package manifest dev dependencies: `typescript@6.0.3`, `@types/node@24.10.0` (no runtime deps).
-  Root `pnpm-lock.yaml` importer must be regenerated by the main agent; this branch does not commit a
-  root lock change.
-- No new shared contract, migration, product DB or workspace-file change.
+## Integration notes for main
+
+1. Create a private caller-owned `authorityRoot` outside project/workspace; persist the returned
+   `environmentRef` (JSON) alongside the attempt.
+2. Before native start, verification checks and acceptance, call `verifyPreparedEnvironment`; treat
+   `blocked` as non-ready (drift/inputs changed/ownership changed/forged receipt).
+3. Pass `ownedPaths`/`excludedPaths` into the workspace freeze/patch integration; only these paths are
+   environment state. Member source files stay in the business patch (A6 fixture proves it).
+4. Supply the coordinator's owned-process adapter as `processPort`; it must return explicit
+   quiescence. Release owned paths with `cleanupPreparedEnvironment` during workspace release; an
+   `indeterminate` / `cleanup_unproven` result must remain visible, never treated as cleaned.
+5. New root-lock request: `semver`, `yaml` runtime deps and `@types/semver` dev dependency; this
+   branch does not commit the root lock.
 
 ## Limitations / NOT_TESTED
 
-- pnpm offline installation only; npm projects are detected for `existing_only`, npm offline install is
-  blocked. Monorepo/workspace layouts, yarn/bun, and native builds/lifecycle scripts are unsupported by
-  design.
-- Offline cache must be warmed outside this module by an authorized operator; the module never performs
-  a networked install or manager upgrade.
-- Not integrated into workspaces/verification/coordinator/console; no real vendor/model or native
-  compatibility is claimed. Package-local fixtures only.
+- Coordinator/workspaces/console/Runner/native vendor integration is **NOT_TESTED** here; this is a
+  package-local port plus real Git/offline-pnpm fixtures.
+- Offline cache must be warmed by an authorized operator; the module never performs a networked
+  install or manager upgrade. npm offline install, arbitrary monorepos, native builds and lifecycle
+  scripts are unsupported by design (blocked with stable codes).
+- A6 workspace support is intentionally narrow: literal members and one-level `prefix/*`; peer/catalog
+  and external links are blocked. Independent Runner recovery and installed-vendor compatibility remain
+  separate lanes.

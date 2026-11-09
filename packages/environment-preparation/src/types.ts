@@ -110,6 +110,8 @@ export interface EnvironmentPreparationInput {
   authorityRoot?: string
   /** Optional injected process runner (e.g. the coordinator's OwnedProcessHost adapter). */
   processPort?: EnvironmentProcessPort
+  /** Explicit opt-in: default single package; pnpm_workspace supports one root, one lock, local workspace links. */
+  mode?: 'single' | 'pnpm_workspace'
 }
 
 export interface EnvironmentManager {

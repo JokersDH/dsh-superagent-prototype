@@ -9,7 +9,8 @@ import {
 } from './types.ts'
 import { canonical, directoryBytes, inside, isDirectory, projectSnapshot, realInside, samePath, sha256 } from './paths.ts'
 import { dependencyDigest, inspectWorkspace, versionsEqual, type WorkspaceInspection } from './project.ts'
-import { scanInstalledTree } from './installed.ts'
+import { scanInstalledTree, scanNodeModules } from './installed.ts'
+import { inspectPnpmWorkspace, scanWorkspaceInstalled, type PnpmWorkspaceInspection } from './workspace.ts'
 import { runOwned, standaloneProcessPort } from './process.ts'
 import { acquireWorkspaceLock, ensureAuthority, ownedPath, writeReceipt, type Authority, type ReceiptBody } from './authority.ts'
 import { cleanupPreparedEnvironment } from './verify.ts'
@@ -214,10 +215,15 @@ function finishReady(
     packageJsonDigest: string
     lockFiles: readonly { name: string; digest: string }[]
     dependencies: readonly { name: string; spec: string }[]
+    mode?: 'single' | 'pnpm_workspace'
+    workspaceDigest?: string
+    manifests?: readonly { relative: string; digest: string }[]
+    modulesDirs?: readonly string[]
+    excludedPaths?: readonly string[]
     legacyCleanup: () => Promise<CleanupResult>
   },
 ): ReadyEnvironment {
-  const excludedPaths = (input.exclusion ?? defaultEnvironmentExclusions).excludedPaths(ctx.workspace)
+  const excludedPaths = values.excludedPaths ?? (input.exclusion ?? defaultEnvironmentExclusions).excludedPaths(ctx.workspace)
   const entries = values.ownedRelatives
     .map(relative => ownedPath(ctx.workspace, relative))
     .filter((entry): entry is NonNullable<typeof entry> => entry !== undefined)
@@ -229,7 +235,10 @@ function finishReady(
       inputFingerprint: values.inputFingerprint, fingerprint: values.fingerprint, installedDigest: values.installedDigest,
       workspaceReal: ctx.workspace, projectReal: ctx.project, manager: values.manager, nodeVersion: process.versions.node,
       policy: input.policy, environment: values.environment, excludedPaths: [...excludedPaths], ownedPaths: entries,
-      packageJsonDigest: values.packageJsonDigest, lockFiles: [...values.lockFiles], dependencies: [...values.dependencies],
+      mode: values.mode ?? 'single', packageJsonDigest: values.packageJsonDigest, lockFiles: [...values.lockFiles], dependencies: [...values.dependencies],
+      ...(values.workspaceDigest ? { workspaceDigest: values.workspaceDigest } : {}),
+      ...(values.manifests ? { manifests: [...values.manifests] } : {}),
+      ...(values.modulesDirs ? { modulesDirs: [...values.modulesDirs] } : {}),
       phase: 'ready', createdAt: new Date().toISOString(),
     }
     const { id } = writeReceipt(authority, body)
@@ -261,6 +270,8 @@ async function prepareEnvironmentInner(input: EnvironmentPreparationInput, autho
   const ctx = contextFor(input, project, workspace)
   const cleanup = cleanupHandle(ctx)
   const processPort = input.processPort ?? standaloneProcessPort
+  if ((input.mode ?? 'single') === 'pnpm_workspace')
+    return preparePnpmWorkspace(input, project, workspace, authority, ctx, cleanup, processPort)
   if (input.signal.aborted) {
     diagnostic(ctx, 'cancelled', 'Preparation was cancelled before inspection.', 'warning')
     return blockedResult(input, ctx, 'cancelled', 'Preparation was cancelled before inspection.')
@@ -453,6 +464,115 @@ async function prepareEnvironmentInner(input: EnvironmentPreparationInput, autho
     fingerprint, inputFingerprint, installedDigest: scan.digest, manager, environment,
     ownedRelatives: ['.product-environment', 'node_modules'],
     packageJsonDigest: inspection.packageJsonDigest, lockFiles: inspection.lockFiles, dependencies: inspection.dependencies,
+    legacyCleanup: cleanup,
+  })
+}
+
+async function preparePnpmWorkspace(
+  input: EnvironmentPreparationInput,
+  project: string,
+  workspace: string,
+  authority: Authority | undefined,
+  ctx: Context,
+  cleanup: () => Promise<CleanupResult>,
+  processPort: EnvironmentProcessPort,
+): Promise<PreparationResult> {
+  const projectBefore = projectSnapshot(project)
+  const ws: PnpmWorkspaceInspection = inspectPnpmWorkspace(workspace)
+  if (!ws.ok) return blockedResult(input, ctx, ws.problem?.code ?? 'unsupported_workspace', ws.problem?.message ?? 'Unsupported pnpm workspace.')
+  if (input.policy !== 'offline_install') return blockedResult(input, ctx, 'workspace_requires_offline', 'pnpm_workspace mode requires offline_install.')
+  if (ws.unsupportedProjectFiles.length)
+    return blockedResult(input, ctx, 'project_hooks_unsupported', `Workspace hook/config is unsupported: ${ws.unsupportedProjectFiles.join(', ')}`)
+  const store = storeProblem(input, project, workspace)
+  if (store) return blockedResult(input, ctx, store.code, store.message)
+  const command = input.managerCommand ?? 'pnpm'
+  const probe = await probeManager(command, ctx, processPort, input.signal)
+  if (input.signal.aborted) return blockedResult(input, ctx, 'cancelled', 'Preparation was cancelled during the manager probe.')
+  if (!probe.version) return blockedResult(input, ctx, 'manager_missing', `The package manager could not be executed (${command}): ${probe.error ?? 'unknown error'}`)
+  const declaredVersion = input.authorityRoot ? undefined : undefined
+  void declaredVersion
+  const actualVersion = probe.version
+  const manager: EnvironmentManager = { name: 'pnpm', actualVersion }
+  const inputFingerprint = sha256(JSON.stringify({
+    protocol: PROTOCOL, mode: 'pnpm_workspace', policy: input.policy, node: process.version,
+    manager: { name: 'pnpm', actualVersion }, workspaceDigest: ws.workspaceDigest,
+  }))
+  const marker = readMarker(ctx.markerPath)
+  const modulesDirsNow = ['node_modules', ...ws.members.filter(member => member.relative).map(member => `${member.relative}/node_modules`)]
+    .filter(dir => existsSync(join(workspace, dir)))
+  const modulesExist = modulesDirsNow.length > 0
+  const environmentExists = existsSync(ctx.envRoot)
+  if (environmentExists && marker?.owned !== true)
+    return blockedResult(input, ctx, 'workspace_environment_untrusted', 'A .product-environment exists without a trusted ownership marker.', inputFingerprint)
+  if (modulesExist && marker?.owned !== true)
+    return blockedResult(input, ctx, 'workspace_has_dependencies', 'Workspace node_modules exists but is not owned by this module.', inputFingerprint)
+  if (marker?.owned === true) {
+    if (marker.phase === 'preparing') return blockedResult(input, ctx, 'interrupted_preparation', 'A previous workspace preparation is marked in progress.', inputFingerprint)
+    if (marker.requestId === input.requestId && marker.inputFingerprint === inputFingerprint && marker.phase === 'ready') {
+      const scan = scanWorkspaceInstalled(workspace, ws.modulesDirs)
+      if (scan.problem) return blockedResult(input, ctx, scan.problem.code, scan.problem.message, marker.fingerprint)
+      const fingerprint = environmentFingerprint(inputFingerprint, scan.digest)
+      if (marker.installedDigest !== scan.digest || marker.fingerprint !== fingerprint)
+        return blockedResult(input, ctx, 'environment_drift', 'The installed workspace dependency tree no longer matches its fingerprint.', marker.fingerprint)
+      return finishReady(ctx, input, authority, {
+        fingerprint, inputFingerprint, installedDigest: scan.digest, manager,
+        environment: environmentFor(ctx, 'offline_install'),
+        ownedRelatives: ['.product-environment', ...modulesDirsNow],
+        packageJsonDigest: ws.manifests.find(item => item.relative === 'package.json')!.digest,
+        lockFiles: ws.lockFiles, dependencies: ws.dependencies, mode: 'pnpm_workspace',
+        workspaceDigest: ws.workspaceDigest, manifests: ws.manifests, modulesDirs: modulesDirsNow,
+        excludedPaths: ['.product-environment', 'node_modules', ...ws.members.filter(member => member.relative).map(member => `${member.relative}/node_modules`)],
+        legacyCleanup: cleanup,
+      })
+    }
+    const cleared = await cleanup()
+    if (cleared.leftovers.length) return blockedResult(input, ctx, 'cleanup_unproven', `Could not remove the previous workspace environment: ${cleared.leftovers.join(', ')}`, inputFingerprint)
+  }
+  mkdirSync(ctx.envRoot, { recursive: true, mode: 0o700 })
+  const preparing: Marker = {
+    protocol: PROTOCOL, requestId: input.requestId, inputFingerprint, fingerprint: inputFingerprint, installedDigest: '',
+    owned: true, phase: 'preparing', manager, policy: input.policy,
+    workspaceReal: workspace, projectReal: project, createdAt: new Date().toISOString(),
+  }
+  writeFileSync(ctx.markerPath, `${JSON.stringify(preparing, null, 2)}\n`, { mode: 0o600 })
+  const environment = environmentFor(ctx, 'offline_install')
+  const result = await processPort.run(command, [
+    'install', '--offline', '--frozen-lockfile', '--ignore-scripts', '--reporter=append-only', '--store-dir', canonical(input.storeDir!),
+  ], {
+    cwd: workspace, env: environment, signal: input.signal,
+    timeoutMs: input.timeoutMs ?? DEFAULTS.timeoutMs, maxOutputBytes: input.maxOutputBytes ?? DEFAULTS.maxOutputBytes,
+  })
+  const fail = async (code: string, message: string): Promise<BlockedEnvironment> => {
+    diagnostic(ctx, code, message, 'error')
+    await cleanup()
+    return blockedResult(input, ctx, code, message, inputFingerprint)
+  }
+  if (result.cancelled || input.signal.aborted) return fail('cancelled', 'Preparation was cancelled; owned workspace state was cleaned.')
+  if (result.timedOut) return fail('timeout', 'Workspace installation timed out.')
+  if (result.outputLimited) return fail('output_limit', 'Workspace installation exceeded the output budget.')
+  if (result.quiescence !== 'confirmed') return fail('cleanup_unproven', 'Workspace installer quiescence is not confirmed.')
+  if (result.spawnError) return fail('manager_missing', `The package manager could not be executed: ${result.spawnError}`)
+  if (result.code !== 0) {
+    const mapped = mapInstallError(`${result.stdout}\n${result.stderr}`)
+    return fail(mapped.code, `${mapped.message} ${String(result.stderr).slice(-600)}`)
+  }
+  const modulesDirs = ['node_modules', ...ws.members.filter(member => member.relative).map(member => `${member.relative}/node_modules`)]
+    .filter(dir => existsSync(join(workspace, dir)))
+  const scan = scanWorkspaceInstalled(workspace, modulesDirs)
+  if (scan.problem) return fail(scan.problem.code, scan.problem.message)
+  const bytes = directoryBytes(workspace, input.maxWorkspaceBytes ?? DEFAULTS.maxWorkspaceBytes)
+  if (bytes.truncated) return fail('disk_limit', 'Prepared workspace exceeds the disk budget.')
+  if (projectSnapshot(project) !== projectBefore) return fail('project_modified', 'The original project changed during workspace preparation.')
+  const fingerprint = environmentFingerprint(inputFingerprint, scan.digest)
+  writeFileSync(ctx.markerPath, `${JSON.stringify({ ...preparing, phase: 'ready', fingerprint, installedDigest: scan.digest }, null, 2)}\n`, { mode: 0o600 })
+  evidence(ctx, `environment:installed:${scan.digest}`, `workspace installed layout (${scan.entries} entries)`)
+  return finishReady(ctx, input, authority, {
+    fingerprint, inputFingerprint, installedDigest: scan.digest, manager,
+    environment, ownedRelatives: ['.product-environment', ...modulesDirs],
+    packageJsonDigest: ws.manifests.find(item => item.relative === 'package.json')!.digest,
+    lockFiles: ws.lockFiles, dependencies: ws.dependencies, mode: 'pnpm_workspace',
+    workspaceDigest: ws.workspaceDigest, manifests: ws.manifests, modulesDirs,
+    excludedPaths: ['.product-environment', 'node_modules', ...ws.members.filter(member => member.relative).map(member => `${member.relative}/node_modules`)],
     legacyCleanup: cleanup,
   })
 }

@@ -34,7 +34,12 @@ export interface ReceiptBody {
   environment: Record<string, string>
   excludedPaths: string[]
   ownedPaths: OwnedPath[]
+  mode: 'single' | 'pnpm_workspace'
   packageJsonDigest: string
+  /** Present for pnpm_workspace receipts. */
+  workspaceDigest?: string
+  manifests?: { relative: string; digest: string }[]
+  modulesDirs?: string[]
   lockFiles: { name: string; digest: string }[]
   dependencies: { name: string; spec: string }[]
   phase: 'ready'

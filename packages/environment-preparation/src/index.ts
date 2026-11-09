@@ -5,7 +5,8 @@
  * reproducible fingerprint, allowlisted environment, diagnostic evidence and an owned cleanup handle.
  */
 export { prepareEnvironment } from './prepare.ts'
-export { verifyPreparedEnvironment, cleanupPreparedEnvironment } from './verify.ts'
+export { verifyPreparedEnvironment, cleanupPreparedEnvironment, listPreparedEnvironments } from './verify.ts'
+export { inspectEnvironment, parseEnvironmentInspection, type EnvironmentInspection, type EnvironmentInspectionInput } from './inspect.ts'
 export { standaloneProcessPort } from './process.ts'
 export { inspectWorkspace, nodeRangeSatisfied, versionsEqual } from './project.ts'
 export { runOwned } from './process.ts'

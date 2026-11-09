@@ -1,21 +1,40 @@
 $ node --test test/*.case.ts
-✔ a dependency-free Node project is ready and runs the real node test runner (75.947041ms)
-✔ existing_only refuses missing dependencies and escaping node_modules links (7.255ms)
-✔ unsupported layouts, external links and ambiguous managers are blocked (4.368ms)
-✔ a real pnpm project installs offline/frozen/ignore-scripts and passes its own test (1902.704542ms)
-✔ the same request reuses its environment; a changed request or lock does not (2233.877042ms)
-✔ a changed lock is refused under frozen-lockfile policy and leaves no partial environment (1438.387542ms)
-✔ manager mismatch, missing manager and missing offline cache are explicit blocked states (1482.051458ms)
-✔ timeout and cancellation kill the owned process group and clean the workspace (2872.107708ms)
-✔ an output-flooding manager is killed at the output budget and cleaned (1852.219417ms)
-✔ environment paths are excluded from the business patch while source stays tracked (1479.7085ms)
-✔ the fingerprint changes with package content and policy (1.988ms)
-✔ invalid requests are refused before touching either directory (1.532083ms)
-ℹ tests 12
+✔ both offline recipes prepare, install and run their real tests (10575.541ms)
+✔ consumer examples prepare in one process and verify/cleanup in a second (6267.126959ms)
+✔ a restarted caller recovers receipts, replays are refused and cleanup/rebuild is possible (7566.822791ms)
+✔ a corrupted authority key denies verification and cleanup without deleting owned paths (5181.033583ms)
+✔ performance measurements are recorded for a small and a thousand-file dependency tree (428.158291ms)
+✔ inspection is read-only for a dependency-free project and the port may be parsed (4.177042ms)
+✔ inspection reports a real installed dependency tree without running install (14076.839209ms)
+✔ inspection blocks bad JSON, monorepo, hooks and escaping links with Chinese suggestions (10536.161209ms)
+✔ inspection blocks a declared manager mismatch without installing (6533.806458ms)
+✔ a dependency-free Node project is ready and runs the real node test runner (392.224208ms)
+✔ existing_only refuses missing dependencies and escaping node_modules links (16.362708ms)
+✔ unsupported layouts, external links and ambiguous managers are blocked (33.446125ms)
+✔ a real pnpm project installs offline/frozen/ignore-scripts and passes its own test (7548.429041ms)
+✔ the same request reuses its environment; a changed request or lock does not (7845.924959ms)
+✔ a changed lock is refused under frozen-lockfile policy and leaves no partial environment (5582.093666ms)
+✔ manager mismatch, missing manager and missing offline cache are explicit blocked states (4947.456959ms)
+✔ timeout and cancellation kill the owned process group and clean the workspace (5849.728333ms)
+✔ an output-flooding manager is killed at the output budget and cleaned (3934.94625ms)
+✔ environment paths are excluded from the business patch while source stays tracked (3564.260042ms)
+✔ the fingerprint changes with package content and policy (6.888458ms)
+✔ invalid requests are refused before touching either directory (2.68475ms)
+✔ a signed receipt verifies and cleans from a second Node process (6595.287958ms)
+✔ tampered receipts, replaced owned paths and dependency drift are refused (5076.895167ms)
+✔ changing package.json after preparation invalidates the receipt (5186.229417ms)
+✔ one live installer per workspace; stale ESRCH locks are recoverable (7094.514209ms)
+✔ an interrupted marker or an old v1 marker never authorizes reuse or cleanup (4679.377292ms)
+✔ an injected process port controls version/install execution and indeterminate quiescence blocks (4812.64525ms)
+✔ cancellation during the manager probe and disk-budget monitoring are bounded (4684.494917ms)
+✔ authority roots inside project/workspace are refused before preparation (2219.384875ms)
+✔ a pnpm workspace installs offline, runs the app test and enters only business files in a patch (5646.251792ms)
+✔ unsupported workspace links, globs, unknown workspace targets and symlink members are blocked (2792.533209ms)
+ℹ tests 31
 ℹ suites 0
-ℹ pass 12
+ℹ pass 31
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 13428.804417
+ℹ duration_ms 40882.080833

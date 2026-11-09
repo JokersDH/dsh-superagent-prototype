@@ -1,0 +1,60 @@
+{
+  "status": "PASS_ENVIRONMENT_ADMISSION",
+  "checkedAt": "2026-11-09T11:16:26.507Z",
+  "reviewerCommit": "8dcbdce7aab9dd6b9fd6a545d2bf6cff2f12e05d",
+  "candidateCommit": "8dcbdce7aab9dd6b9fd6a545d2bf6cff2f12e05d",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "cases": [
+    {
+      "id": "ENV-CLEANUP-PRESERVES-UNOWNED-PATH",
+      "passesInvariant": true,
+      "observed": {
+        "status": "ready",
+        "preExistingContentPreserved": true
+      }
+    },
+    {
+      "id": "ENV-REJECTS-NESTED-DEPENDENCY-ESCAPE",
+      "passesInvariant": true,
+      "observed": {
+        "status": "blocked",
+        "code": "unsafe_link",
+        "nestedEntryEscapesWorkspace": true
+      }
+    },
+    {
+      "id": "ENV-INSTALLED-VERSION-DRIFT-NOT-REUSED",
+      "passesInvariant": true,
+      "observed": {
+        "declaredVersion": "1.0.0",
+        "installedVersion": "9.0.0",
+        "status": "ready",
+        "sameFingerprint": false
+      }
+    },
+    {
+      "id": "ENV-VALID-NODE-ENGINE-OR-RANGE",
+      "passesInvariant": true,
+      "observed": {
+        "node": "24.21.0",
+        "engine": "^22.19.0 || >=24.0.0",
+        "status": "ready",
+        "code": null
+      }
+    },
+    {
+      "id": "ENV-OFFLINE-INSTALL-DOES-NOT-EXECUTE-PNPMFILE",
+      "passesInvariant": true,
+      "observed": {
+        "status": "blocked",
+        "code": "project_hooks_unsupported",
+        "hookExecutedOutsideWorkspace": false,
+        "modelCalls": 0,
+        "fixturePolicy": "local tarball, pnpm offline, no network request in hook"
+      }
+    }
+  ],
+  "scope": "Private temporary files/local offline package fixture only; no vendor/model/account/user-project operation"
+}

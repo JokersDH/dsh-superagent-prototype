@@ -28,8 +28,18 @@ export function scanInstalledTree(
   dependencies: readonly { name: string }[],
   limits: ScanLimits = {},
 ): InstalledScan {
+  return scanNodeModules(workspacePath, 'node_modules', dependencies, limits)
+}
+
+/** Scans one node_modules directory relative to the workspace (used by pnpm workspace packages). */
+export function scanNodeModules(
+  workspacePath: string,
+  modulesRelative: string,
+  dependencies: readonly { name: string }[],
+  limits: ScanLimits = {},
+): InstalledScan {
   const workspace = canonical(workspacePath)
-  const modules = join(workspace, 'node_modules')
+  const modules = join(workspace, modulesRelative)
   const maxEntries = limits.maxEntries ?? DEFAULT_MAX_ENTRIES
   const maxDepth = limits.maxDepth ?? DEFAULT_MAX_DEPTH
   const entries: unknown[] = []
