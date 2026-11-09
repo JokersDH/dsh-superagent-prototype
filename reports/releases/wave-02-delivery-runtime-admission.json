@@ -1,0 +1,94 @@
+{
+  "status": "BLOCKED_WAVE02_DELIVERY_RUNTIME_ADMISSION",
+  "checkedAt": "2026-11-09T02:49:20.076Z",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "reviewerCommit": "4468e7b09c98d8c4e4b67fe97e46c06b6878a369",
+  "workspaceSource": "a517635db1d1c7e723c0bd7d4f8ca8047f7f5554",
+  "runnerSource": "96cbe4edc662e514caf18c2bd8a44df38d1e06f4",
+  "cases": [
+    {
+      "owner": "A",
+      "id": "PATCH-MIXED-STAGED-AND-UNTRACKED",
+      "passesInvariant": false,
+      "observed": {
+        "stagedRestored": false,
+        "untrackedRestored": true,
+        "indexUnchanged": true
+      }
+    },
+    {
+      "owner": "A",
+      "id": "PATCH-INCLUDES-COMMITS-SINCE-RESERVE-BASE",
+      "passesInvariant": false,
+      "observed": {
+        "baseDiffersFromHead": true,
+        "patchBytes": 0
+      }
+    },
+    {
+      "owner": "B",
+      "id": "DIRECT-MAIN-CLIENT-RECOVERY-CREDENTIAL",
+      "passesInvariant": false,
+      "observed": {
+        "credentialBytes": 65,
+        "expectedBytes": 64,
+        "error": "auth_failed"
+      }
+    },
+    {
+      "owner": "B",
+      "id": "ACTUAL-SERVICE-LIVE-INVENTORY",
+      "passesInvariant": false,
+      "observed": {
+        "credentialAdapterUsed": true,
+        "nativeAlive": true,
+        "registeredResources": 0,
+        "reportedState": "terminated",
+        "includesActualChild": false
+      }
+    },
+    {
+      "owner": "B",
+      "id": "INDETERMINATE-CLEANUP-CANNOT-MINT-BARRIER",
+      "passesInvariant": false,
+      "observed": {
+        "nativeAlive": true,
+        "cleanupCalled": true,
+        "writerStillWriting": true,
+        "reportedState": "terminated",
+        "coverage": "complete_owned_resources",
+        "registeredResources": 0,
+        "barrierAccepted": true
+      }
+    },
+    {
+      "owner": "B",
+      "id": "CLOSED-RECOVERY-ADMISSION-CLOSES-BUSINESS-PUMP",
+      "passesInvariant": false,
+      "observed": {
+        "admission": "closed",
+        "deliverReachedDriver": true
+      }
+    },
+    {
+      "owner": "B",
+      "id": "RECOVERY-CANCEL-REQUIRES-FULL-ATTEMPT-IDENTITY",
+      "passesInvariant": false,
+      "observed": {
+        "httpStatus": 200,
+        "wrongTupleReachedStop": true
+      }
+    },
+    {
+      "owner": "B",
+      "id": "JOURNAL-CORRUPTION-AFTER-OPEN-REFUSES-ALL-REPLAY",
+      "passesInvariant": false,
+      "observed": {
+        "refused": false,
+        "sinkCalls": 1
+      }
+    }
+  ],
+  "scope": "Committed candidates only; private temporary projects, real harmless child, injected unproven stop, real main barrier; no vendor/model/user-project operation"
+}

@@ -1,0 +1,59 @@
+{
+  "status": "PASS_MAIN_CONTROLLED_BROWSER",
+  "testedAt": "2026-11-09T07:11:14.666Z",
+  "sourceCommit": "4e984fa71a0dc62e63fdc4a670a50daf1d152312",
+  "consoleURL": "http://127.0.0.1:5180",
+  "conversationId": "browser-test-80342ab0-8dec-4e7a-aa9d-2764c6b12afd",
+  "cases": [
+    {
+      "id": "AUTOMATIC-LOCAL-SESSION",
+      "status": "PASS"
+    },
+    {
+      "id": "CREATE-REAL-QUESTION",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTIVE-REFRESH-KEEPS-QUESTION",
+      "status": "PASS"
+    },
+    {
+      "id": "ANSWER-AND-VERIFY",
+      "status": "PASS"
+    },
+    {
+      "id": "READ-VERIFIED-OUTPUT",
+      "status": "PASS"
+    },
+    {
+      "id": "ACCEPT-AND-RELOAD",
+      "status": "PASS"
+    },
+    {
+      "id": "MACHINE-FAIL-CANNOT-DELIVER",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-AND-NARROW-LAYOUT",
+      "status": "PASS"
+    },
+    {
+      "id": "SAFE-MODEL-SETTINGS",
+      "status": "PASS"
+    },
+    {
+      "id": "USAGE-GUIDE",
+      "status": "PASS"
+    },
+    {
+      "id": "NEW-CONVERSATION-SURVIVES-REFRESH",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "limitations": [
+    "Controlled work execution; no paid model requests in this browser suite",
+    "Independent Runner and native compatibility remain unaccepted",
+    "Real model response and Markdown rendering are verified separately by manual smoke"
+  ]
+}

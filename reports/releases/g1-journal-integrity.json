@@ -1,44 +1,36 @@
 {
-  "status": "BLOCKED_JOURNAL_INTEGRITY_BOUNDARY",
-  "runtimeCommit": "74a3068165ca08b0e1802bd35c552bc1695b8319",
+  "status": "PASS_JOURNAL_INTEGRITY_BOUNDARY",
+  "runtimeCommit": "96cbe4edc662e514caf18c2bd8a44df38d1e06f4",
   "node": "v24.22.2",
   "platform": "darwin",
   "cases": [
     {
       "id": "JOURNAL-RECORD-TERMINATOR",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "entries": 1,
-        "corruptAt": null,
-        "readOnly": false
+        "entries": 0,
+        "corruptAt": 0,
+        "readOnly": true
       }
     },
     {
       "id": "JOURNAL-STRICT-RECORD-ENVELOPE",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "invalidThrew": false,
-        "entries": 1,
-        "corruptAt": null,
-        "readOnly": false
+        "entries": 0,
+        "corruptAt": 0,
+        "readOnly": true
       }
     },
     {
       "id": "JOURNAL-CORRUPT-PREFIX-REPLAY",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "corruptAt": 526,
         "readOnly": true,
-        "applied": [
-          "fact-1"
-        ],
-        "replayFailed": false,
-        "replay": {
-          "replayed": 1,
-          "duplicates": 0,
-          "refused": 0,
-          "failures": []
-        }
+        "applied": [],
+        "replayFailed": true
       }
     }
   ]

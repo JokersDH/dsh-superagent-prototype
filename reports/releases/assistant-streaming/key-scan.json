@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "sourceCommit": "4e984fa71a0dc62e63fdc4a670a50daf1d152312",
+  "checkedFiles": 804,
+  "matches": 0,
+  "paths": [],
+  "scope": "Tracked and nonignored untracked files plus apps/console/dist; the private key is never printed"
+}

@@ -3,8 +3,8 @@
   "node": "v24.22.2",
   "platform": "darwin",
   "architecture": "arm64",
-  "checkedAt": "2026-11-09T01:51:36.074Z",
-  "tests": 91,
+  "checkedAt": "2026-11-09T07:09:53.604Z",
+  "tests": 96,
   "results": [
     {
       "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/orchestrator-core --filter @personal-agent/effects --filter @personal-agent/storage --filter @personal-agent/questions --filter @personal-agent/application -r build",
@@ -26,7 +26,7 @@
     {
       "command": "pnpm --filter @personal-agent/coordinator test:http",
       "status": "PASS",
-      "tests": 9
+      "tests": 14
     },
     {
       "command": "pnpm --filter @personal-agent/coordinator typecheck",

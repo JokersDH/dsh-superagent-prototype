@@ -1,0 +1,38 @@
+{
+  "status": "PASS_ASSISTANT_STREAM_BROWSER",
+  "sourceCommit": "4e984fa71a0dc62e63fdc4a670a50daf1d152312",
+  "testedAt": "2026-11-09T07:11:12.304Z",
+  "cases": [
+    {
+      "id": "ACTIONABLE-TASK-TEMPLATE",
+      "status": "PASS"
+    },
+    {
+      "id": "REAL-SDK-SSE-BROWSER-INCREMENT",
+      "status": "PASS"
+    },
+    {
+      "id": "STREAMING-DESKTOP-AND-MOBILE",
+      "status": "PASS"
+    },
+    {
+      "id": "RELOAD-RECOVERS-PARTIAL-WITHOUT-RECHARGE",
+      "status": "PASS"
+    },
+    {
+      "id": "COMPLETE-COMMIT-AND-MARKDOWN-EXPORT",
+      "status": "PASS"
+    },
+    {
+      "id": "NEW-CONVERSATION-ISOLATES-PRIOR-STREAM",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelRequests": 1,
+  "vendorRequests": 0,
+  "limitations": [
+    "Actual SDK, HTTP/SSE, SQLite/effect and console; model content comes from an isolated local SSE fixture",
+    "Native coding and Runner admission remain separate"
+  ]
+}

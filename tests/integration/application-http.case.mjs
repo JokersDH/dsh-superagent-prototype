@@ -38,6 +38,124 @@ test('health is public but data and commands require local credentials', async (
   assert.equal(denied.status, 401)
   assert.equal((await denied.json()).error.code, 'auth_required')
 })
+test('local development access opens directly without a token, cookie or browser storage', async (t) => {
+  const h = setup(t, { localDevelopmentAccess: true })
+  assert.equal((await h.request('/v1/session')).status, 200)
+  assert.equal((await h.request('/v1/snapshot')).status, 200)
+  const response = await h.command(createCommand(), { origin: BASE })
+  assert.equal((await response.json()).status, 'recorded')
+  assert.equal(h.store.domain.tickets.list()[0].mandate.actor.source, 'local_ui')
+  assert.equal((await h.request('/v1/session')).headers.get('set-cookie'), null)
+})
+test('local development access keeps Origin, Host and actor checks and is fixture-only', async (t) => {
+  const h = setup(t, { localDevelopmentAccess: true })
+  assert.equal((await h.command(createCommand(), {})).status, 403)
+  assert.equal((await h.command(createCommand(), { origin: 'http://evil.invalid' })).status, 403)
+  assert.equal((await h.request('/v1/snapshot', { headers: { host: 'evil.invalid' } })).status, 403)
+  assert.equal((await h.request('/v1/session', { headers: { 'sec-fetch-site': 'cross-site' } })).status, 403)
+  assert.equal((await h.command({ ...createCommand(), actor: { userId: 'forged' } }, { origin: BASE })).status, 400)
+  assert.equal((await h.command(createCommand(), { authorization: 'Bearer runner-secret', origin: BASE })).status, 401)
+  assert.throws(() => setup(t, { mode: 'product', localDevelopmentAccess: true }), /fixture/)
+})
+test('model settings expose a safe status and accept only a model selection command', async (t) => {
+  const status = {
+    protocol: 'assistant-provider/1',
+    configured: true,
+    baseURL: 'http://127.0.0.1/v1',
+    model: 'model-1',
+    models: ['model-1'],
+    state: 'configured',
+    secureTransport: false,
+  }
+  let selected
+  const h = setup(t, {
+    read: {
+      assistant: async () => status,
+      selectModel: async (model) => {
+        selected = model
+        return status
+      },
+    },
+  })
+  assert.equal((await h.request('/v1/assistant')).status, 401)
+  assert.deepEqual(
+    await (await h.request('/v1/assistant', { headers: { authorization: `Bearer ${API}` } })).json(),
+    status,
+  )
+  const response = await h.request('/v1/assistant/model', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${API}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ model: 'model-1' }),
+  })
+  assert.equal(response.status, 200)
+  assert.equal(selected, 'model-1')
+  assert.equal(
+    (
+      await h.request('/v1/assistant/model', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${API}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ model: 'model-1', apiKey: 'forged' }),
+      })
+    ).status,
+    400,
+  )
+})
+test('a model status containing credentials is rejected without disclosing them', async (t) => {
+  const h = setup(t, { read: { assistant: async () => ({ apiKey: 'private-provider-key' }) } })
+  const response = await h.request('/v1/assistant', { headers: { authorization: `Bearer ${API}` } })
+  assert.equal(response.status, 400)
+  assert.doesNotMatch(await response.text(), /private-provider-key/)
+})
+test('assistant SSE is authenticated and forwards text before the producer finishes', async (t) => {
+  let release
+  const gate = new Promise((resolve) => {
+    release = resolve
+  })
+  t.after(() => release())
+  const update = {
+    protocol: 'assistant-stream/1',
+    messageId: 'message-1',
+    conversationId: 'conversation-1',
+    projectId: 'project-1',
+    replyId: 'reply-1',
+    model: 'model-1',
+    revision: 1,
+    phase: 'streaming',
+    text: '第一段',
+  }
+  const h = setup(t, {
+    read: {
+      assistantStream: async function* (conversationId) {
+        assert.equal(conversationId, update.conversationId)
+        yield update
+        await gate
+        yield { ...update, revision: 2, phase: 'complete', text: '第一段第二段' }
+      },
+    },
+  })
+  assert.equal((await h.request('/v1/assistant/stream?conversationId=conversation-1')).status, 401)
+  const headers = { authorization: `Bearer ${API}` }
+  assert.equal(
+    (await h.request('/v1/assistant/stream?conversationId=conversation-1&apiKey=forged', { headers })).status,
+    400,
+  )
+  const response = await h.request('/v1/assistant/stream?conversationId=conversation-1', { headers })
+  assert.equal(response.status, 200)
+  assert.match(response.headers.get('content-type'), /text\/event-stream/)
+  const reader = response.body.getReader(),
+    decoder = new TextDecoder()
+  const first = decoder.decode((await reader.read()).value)
+  assert.match(first, /第一段/)
+  assert.doesNotMatch(first, /第二段/)
+  release()
+  let rest = ''
+  for (;;) {
+    const { value, done } = await reader.read()
+    if (done) break
+    rest += decoder.decode(value)
+  }
+  assert.match(rest, /第一段第二段/)
+})
 test('a bearer command uses a server-generated actor and returns the original durable receipt on replay', async (t) => {
   const h = setup(t),
     command = createCommand(),

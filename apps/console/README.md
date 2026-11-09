@@ -5,6 +5,16 @@ Wave-02 WP-11 operating console. It is a real browser workbench over the public 
 mock. The browser never sends a `TrustedActor`; identity is produced by the backend after
 authentication.
 
+For personal use, run `pnpm start` from the repository root and open `http://127.0.0.1:5180`.
+See [the Chinese usage guide](../../docs/ASSISTANT-GUIDE.zh-CN.md). The integrated workbench adds
+private model dialogue, Markdown, independent conversation URLs and a safe model selector. Its light
+layout keeps the conversation central and opens work/model details on demand. Execution remains
+controlled; model replies have no repository or terminal tools. Model replies stream through a separate
+authenticated display channel; partial text is not durable authority. Refresh recovers the active partial
+reply. Work-anchored records are shown only in work context. Task templates prepare editable drafts;
+copy/Markdown export lets the user hand the result to their own coding agent. The imported A checkpoint evidence
+below describes that checkpoint; current main acceptance is in `reports/releases/`.
+
 ## Modes
 
 | Mode | Selection | Purpose |
@@ -36,7 +46,7 @@ it is no longer the browser acceptance lane.
 - Rejected receipts and transport errors surface `code`/`message`/`retry` with recoverable actions.
 - Executor panel consumes `AgentProfile`/`ProbeReport` fixtures (readiness and capability rows); it
   states that production Catalog wiring belongs to the main agent.
-- Responsive single-column layout under 960px; no horizontal overflow; visible keyboard focus.
+- Responsive navigation and detail drawers on narrow screens; no horizontal overflow; visible keyboard focus.
 
 ## Run
 

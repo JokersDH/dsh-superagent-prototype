@@ -10,6 +10,9 @@ import {
   AnswerDeliverySchema,
   AppErrorSchema,
   ApplicationConfigurationSchema,
+  AssistantProviderStatusSchema,
+  AssistantModelSelectionSchema,
+  AssistantStreamUpdateSchema,
   ChangeSchema,
   CommandReceiptSchema,
   ConversationPageSchema,
@@ -24,6 +27,8 @@ import {
 import type {
   AnswerDelivery,
   ApplicationConfiguration,
+  AssistantProviderStatus,
+  AssistantStreamUpdate,
   AppError,
   ApplicationService,
   TrustedActor,
@@ -66,8 +71,14 @@ export interface LocalHttpOptions {
   allowedOrigins: readonly string[]
   sessionTtlMs?: number
   mode: 'fixture' | 'product'
+  /** Explicit loopback-only fixture convenience; normal entries still require credentials. */
+  localDevelopmentAccess?: boolean
   now?: () => number
   read?: {
+    assistant?(): Promise<AssistantProviderStatus>
+    assistantStream?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
+    selectModel?(model: string): Promise<AssistantProviderStatus>
+    guide?(): Promise<string>
     configuration?(): Promise<ApplicationConfiguration>
     verification?(id: string): Promise<Verification | undefined>
     deliveries?(questionId: string): Promise<readonly AnswerDelivery[]>
@@ -77,6 +88,8 @@ export interface LocalHttpOptions {
 
 /** The HTTP module owns identity. Request bodies never contain actor or direct core/native access. */
 export function createLocalHttpApp(options: LocalHttpOptions) {
+  if (options.localDevelopmentAccess && options.mode !== 'fixture')
+    throw new TypeError('Automatic local access is restricted to the fixture entry')
   for (const secret of [options.bootstrapToken, options.apiToken])
     if (!/^[a-f0-9]{64}$/.test(secret)) throw new TypeError('Local HTTP credentials need 256 random bits')
   const actorBase = {
@@ -144,8 +157,19 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
         ),
     }),
   )
-  app.get('/v1/health', (c) => c.json({ status: 'ok', mode: options.mode }))
+  app.get('/v1/health', (c) =>
+    c.json({
+      status: 'ok',
+      mode: options.mode,
+      ...(options.localDevelopmentAccess ? { access: 'local-development' } : {}),
+    }),
+  )
   app.post('/v1/session', async (c) => {
+    if (options.localDevelopmentAccess) {
+      if (!origins.has(c.req.header('origin') ?? ''))
+        throw new ApplicationFault('forbidden', 'Local writes require the console Origin', 'none')
+      return c.json({ status: 'authenticated' })
+    }
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json'))
       throw new ApplicationFault('invalid_request', 'Session bootstrap needs JSON', 'none')
     const body = sessionInput.parse(await c.req.json())
@@ -166,6 +190,16 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
       return
     }
     if (bearer) throw new ApplicationFault('auth_required', 'Invalid local API credential', 'user_action')
+    if (options.localDevelopmentAccess) {
+      if (
+        c.req.header('sec-fetch-site') === 'cross-site' ||
+        (!['GET', 'HEAD', 'OPTIONS'].includes(c.req.method) && !origins.has(c.req.header('origin') ?? ''))
+      )
+        throw new ApplicationFault('forbidden', 'Local requests must come from the configured console', 'none')
+      c.set('actor', TrustedActorSchema.parse({ ...actorBase, source: 'local_ui' }))
+      await next()
+      return
+    }
     const id = getCookie(c, COOKIE),
       expiry = id && sessions.get(id)
     if (!id || !expiry || expiry <= now()) {
@@ -185,6 +219,49 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!options.read?.configuration)
       throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
     return c.json(ApplicationConfigurationSchema.parse(await options.read.configuration()))
+  })
+  app.get('/v1/assistant', async (c) => {
+    if (!options.read?.assistant)
+      throw new ApplicationFault('unsupported_capability', 'Model conversation is not configured')
+    return c.json(AssistantProviderStatusSchema.parse(await options.read.assistant()))
+  })
+  app.get('/v1/guide', async (c) => {
+    if (!options.read?.guide) throw new ApplicationFault('unsupported_capability', 'Guide is not connected')
+    c.header('content-type', 'text/markdown; charset=utf-8')
+    c.header('content-disposition', 'attachment; filename="assistant-guide.zh-CN.md"')
+    return c.body(await options.read.guide())
+  })
+  app.get('/v1/assistant/stream', (c) => {
+    const { conversationId } = z.strictObject({ conversationId: IdSchema }).parse(c.req.query())
+    if (!options.read?.assistantStream)
+      throw new ApplicationFault('unsupported_capability', 'Assistant streaming is not connected')
+    const controller = new AbortController()
+    const updates = options.read.assistantStream(conversationId, controller.signal)
+    c.header('x-accel-buffering', 'no')
+    return streamSSE(c, async (stream) => {
+      stream.onAbort(() => controller.abort())
+      const heartbeat = setInterval(() => {
+        void stream.writeSSE({ event: 'heartbeat', data: '{}' }).catch(() => controller.abort())
+      }, 20000)
+      try {
+        for await (const value of updates) {
+          const update = AssistantStreamUpdateSchema.parse(value)
+          if (update.conversationId !== conversationId) throw new Error('Assistant stream identity mismatch')
+          await stream.writeSSE({ event: 'assistant_update', data: JSON.stringify(update) })
+        }
+      } finally {
+        clearInterval(heartbeat)
+        controller.abort()
+      }
+    })
+  })
+  app.post('/v1/assistant/model', async (c) => {
+    if (!c.req.header('content-type')?.startsWith('application/json'))
+      throw new ApplicationFault('invalid_request', 'Model selection requires JSON')
+    if (!options.read?.selectModel)
+      throw new ApplicationFault('unsupported_capability', 'Model selection is not configured')
+    const input = AssistantModelSelectionSchema.parse(await c.req.json())
+    return c.json(AssistantProviderStatusSchema.parse(await options.read.selectModel(input.model)))
   })
   app.delete('/v1/session', (c) => {
     const id = getCookie(c, COOKIE)

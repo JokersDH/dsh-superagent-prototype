@@ -1,0 +1,33 @@
+{
+  "status": "PASS_PERSONAL_DIALOGUE_MANUAL_SMOKE",
+  "date": "2026-11-09",
+  "sourceCommit": "029a0bcd7ceeb67431ed03f520e9523014d6c598",
+  "baseCommit": "8acccbc6ca9679d08a320bb3aacc5c55700a1917",
+  "consoleCheckpoint": "8e302b4",
+  "provider": {
+    "baseURL": "http://113.46.219.251/v1",
+    "model": "DeepSeek-V4.1-Flash-1017",
+    "modelDiscovery": "PASS_AUTHENTICATED_MODELS",
+    "minimalCompletion": "PASS_REAL_VENDOR_REPLY",
+    "workbenchCompletion": "PASS_REAL_VENDOR_REPLY_PERSISTED",
+    "restartAndReload": { "status": "PASS", "messages": 2, "reasonerReplies": 1 },
+    "secureTransport": false,
+    "glmCompletion": "NOT_TESTED"
+  },
+  "visualChecks": [
+    { "viewport": "1440x960", "status": "PASS", "screenshot": "desktop-chat.jpg" },
+    { "viewport": "390x844", "status": "PASS", "screenshot": "mobile-model.jpg" }
+  ],
+  "keyScan": {
+    "status": "PASS",
+    "checkedFiles": 796,
+    "matches": 0,
+    "scope": "Git tracked and nonignored untracked files plus apps/console/dist; configured private key never printed"
+  },
+  "limitations": [
+    "Manual vendor smoke is separate from repeatable mock SDK tests",
+    "Native coding execution and independent Runner remain unaccepted",
+    "The configured gateway uses unencrypted HTTP",
+    "The GLM models were discovered but no GLM completion was charged"
+  ]
+}

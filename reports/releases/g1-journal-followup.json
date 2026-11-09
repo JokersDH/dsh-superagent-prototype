@@ -1,6 +1,6 @@
 {
   "status": "PASS_JOURNAL_FOLLOWUP_CASES",
-  "runtimeCommit": "74a3068165ca08b0e1802bd35c552bc1695b8319",
+  "runtimeCommit": "96cbe4edc662e514caf18c2bd8a44df38d1e06f4",
   "node": "v24.22.2",
   "platform": "darwin",
   "cases": [
