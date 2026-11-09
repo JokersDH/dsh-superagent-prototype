@@ -3,36 +3,36 @@
   "mode": "fixture",
   "base": "http://127.0.0.1:5173/",
   "node": "v24.21.0",
-  "testedAt": "2026-11-08T14:59:18.232Z",
+  "testedAt": "2026-11-09T01:37:49.709Z",
   "cases": [
     {
       "id": "MAIN-RENDER",
       "status": "PASS",
-      "ms": 54,
+      "ms": 64,
       "detail": "works/questions/conversation rendered and SSE is live"
     },
     {
       "id": "EXECUTOR-FIXTURE",
       "status": "PASS",
-      "ms": 6,
+      "ms": 5,
       "detail": "AgentProfile/ProbeReport fixture renders without inventing production Catalog data"
     },
     {
       "id": "CHAT-SEND",
       "status": "PASS",
-      "ms": 75,
+      "ms": 57,
       "detail": "message dispatch appends a persisted conversation message"
     },
     {
       "id": "QUESTION-ANSWER-PER-TARGET",
       "status": "PASS",
-      "ms": 288,
+      "ms": 287,
       "detail": "choice/review/url questions answered; local recording never claims native application"
     },
     {
       "id": "VERIFICATION-AND-ACCEPT",
       "status": "PASS",
-      "ms": 248,
+      "ms": 250,
       "detail": "current candidate with passing verification is accepted"
     },
     {
@@ -74,49 +74,49 @@
     {
       "id": "RECOVER-AND-SEND",
       "status": "PASS",
-      "ms": 72,
+      "ms": 73,
       "detail": "recovery allows the next message"
     },
     {
       "id": "SSE-RECONNECT",
       "status": "PASS",
-      "ms": 61,
+      "ms": 60,
       "detail": "dropped event stream reconnects without losing the page"
     },
     {
       "id": "CURSOR-EXPIRY-REFETCH",
       "status": "PASS",
-      "ms": 287,
+      "ms": 285,
       "detail": "expired cursor triggers a snapshot refetch and resumes live updates"
     },
     {
       "id": "RELOAD-PERSISTENCE",
       "status": "PASS",
-      "ms": 601,
+      "ms": 602,
       "detail": "page refresh restores conversation and delivered work"
     },
     {
       "id": "CREATE-WORK",
       "status": "PASS",
-      "ms": 181,
+      "ms": 163,
       "detail": "a user can create a work from the console and see its queued state"
     },
     {
       "id": "KEYBOARD-SEND-AND-FOCUS",
       "status": "PASS",
-      "ms": 15,
+      "ms": 25,
       "detail": "Ctrl+Enter sends and keyboard focus stays visible"
     },
     {
       "id": "NARROW-NO-HORIZONTAL-OVERFLOW",
       "status": "PASS",
-      "ms": 34,
+      "ms": 26,
       "detail": "narrow layout has no horizontal overflow"
     },
     {
       "id": "NARROW-QUESTION-FORM",
       "status": "PASS",
-      "ms": 63,
+      "ms": 64,
       "detail": "question form is usable on a narrow viewport"
     },
     {

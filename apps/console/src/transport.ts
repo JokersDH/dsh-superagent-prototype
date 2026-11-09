@@ -36,6 +36,8 @@ export interface ConsoleTransport {
   deliveries?(questionId: string): Promise<readonly TargetDelivery[]>
   /** AgentProfile/ProbeReport fixture until the main transport publishes the Catalog read entry. */
   executors?(): Promise<readonly ExecutorSnapshot[]>
+  /** Approved artifact bytes through the product reader (returns undefined when no reader is wired). */
+  artifact?(id: string): Promise<{ contentType: string; text: string } | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -141,6 +143,22 @@ export class HttpTransport implements ConsoleTransport {
     const parsed = AnswerDeliverySchema.array().safeParse(body)
     if (!parsed.success) throw new TransportError('schema_mismatch', '投递记录不符合公共 schema', 'user_action')
     return parsed.data.map(delivery => ({ targetBindingId: delivery.targetBindingId, status: delivery.status }))
+  }
+
+  async artifact(id: string): Promise<{ contentType: string; text: string } | undefined> {
+    let response: Response
+    try {
+      response = await fetch(`${this.base}/v1/artifacts/${encodeURIComponent(id)}`, { credentials: 'include', headers: { accept: 'text/plain, application/json, */*' } })
+    } catch (error) {
+      throw new TransportError('storage_unavailable', `无法读取产物：${String(error)}`, 'safe')
+    }
+    if (response.status === 422) return undefined
+    if (!response.ok) {
+      let body: unknown
+      try { body = await response.json() } catch { body = undefined }
+      throw errorOf(response.status, body)
+    }
+    return { contentType: response.headers.get('content-type') ?? 'application/octet-stream', text: await response.text() }
   }
 
   async messages(conversationId: string, options: { before?: number; limit?: number } = {}): Promise<ConversationPage> {

@@ -71,6 +71,26 @@ gate, and create a work. The backend sets the HttpOnly session cookie and constr
 `TrustedActor`; the browser never supplies either. `VITE_CONVERSATION_ID` selects the product
 conversation for the demo (default `conv-main`, which is the fixture conversation).
 
+Controlled product lane (real question, registered check, trusted verification and artifacts):
+
+```sh
+pnpm --filter @personal-agent/coordinator dev:product -- \
+  --port 8792 --state /tmp/pa-product-demo --console-origin http://127.0.0.1:5174
+
+VITE_CONSOLE_MODE=http VITE_API_TARGET=http://127.0.0.1:8792 \
+  VITE_PROFILE_IDS=profile-fixture-question,profile-fixture-pass,profile-fixture-fail,profile-fixture-slow \
+  VITE_DEFAULT_PROFILE=profile-fixture-question \
+  VITE_CHECK_DEFINITION=check-fixture-output VITE_CHECK_CRITERION_ID=output \
+  pnpm --dir apps/console run dev -- --port 5174
+
+node apps/console/e2e/controlled-demo.mjs    # PASS_CONSOLE_CONTROLLED_PRODUCT 8/8
+```
+
+The create-work form offers only the configured profile IDs. Keep the scope at `src/` and project at
+`project-atlas` for the controlled composition. The browser reads the published delivery manifest,
+patch, output and check evidence through `/v1/artifacts/:id`; acceptance uses only
+`actions.currentCandidate`.
+
 Playwright evidence needs a browser for the installed package:
 
 ```sh

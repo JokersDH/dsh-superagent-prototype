@@ -40,19 +40,31 @@ node apps/console/e2e/http-demo.mjs          # PASS_CONSOLE_HTTP_DEMO, 8/8
 
 sandbox 只排队执行 intent，不启动 Runner/模型，因此该轮没有生成问题、验证或 native 证据；这些面板保持空态并标为 NOT_TESTED，不使用 fake 结果。
 
-## 3. 验收映射（fixture + 真实 HTTP 演示）
+## 2.6 受控产品浏览器验收（真实问题/检查/产物）
+
+```sh
+# controlled product: apps/coordinator/product/demo.ts --port 8792 --state /tmp/pa-product-demo --console-origin http://127.0.0.1:5174
+# console: VITE_CONSOLE_MODE=http VITE_API_TARGET=http://127.0.0.1:8792 VITE_PROFILE_IDS=... VITE_CHECK_DEFINITION=check-fixture-output ...
+node apps/console/e2e/controlled-demo.mjs    # PASS_CONSOLE_CONTROLLED_PRODUCT, 8/8
+```
+
+覆盖：`profile-fixture-question` 新建工作 → 真实原生权限问题（Allow once/Deny）→ 结构化答案经 QuestionBroker → 注册检查 `check-fixture-output` → 可信 PASS 候选；浏览器经 `/v1/artifacts/:id` 读取**当前候选交付清单**（`controlled-product-artifact/1`，含 candidate/attemptId/artifactDigest）与固定输出字节；接受当前候选后进入已交付且产物引用保留；刷新后会话、交付与产物仍在；`profile-fixture-fail` 产生 FAIL 验证且不提供接受。证据：`apps/console/e2e/report-controlled.json` 与 `screenshots/controlled-*.png`。
+
+产物问题同时在工作区包修复：交付/审计 patch 现包含新增与二进制文件内容；内容寻址 manifest 不再写入 attemptId，改为尝试独立的 per-attempt `manifestRefPath`，两个相同内容的 attempt 共享 manifest 而不会残留旧 attempt 标识（workspaces 10/10）。
+
+## 3. 验收映射（fixture + 真实 HTTP/受控产品演示）
 
 | ID | 结果 | 证据/说明 |
 | --- | --- | --- |
-| AC-UX-01 | **PASS（fixture）** | 建议不自动执行；`create_work` 表单提交目标/范围/标准后才出现新工作。模型建议路径未接真实 reasoner。 |
+| AC-UX-01 | **PASS（fixture + 受控产品）** | 建议不自动执行；受控产品中 `create_work` 才触发执行，权限问题回到浏览器等待用户决定。真实 reasoner 建议路径 NOT_TESTED。 |
 | AC-UX-02 | **PASS（fixture）** | 新建、继续、停止、回答问题均确定性完成，不依赖模型；离线时仍可用。 |
 | AC-UX-03 | **PASS（fixture + HTTP）** | WorkId 由后端回执给出，phase 只来自 `WorkView`；HTTP 演示中 phase 来自真实 core/SQLite 投影，UI 不维护状态机。 |
 | AC-UX-04 | **PASS（fixture）** | project/anchor 上下文可见，工作列表按项目筛选，不串台。 |
-| AC-UX-05 | **PASS（fixture）** | 认证/审核使用独立原生选项表单；答案记录为本地状态。真实 native 授权 NOT_TESTED。 |
+| AC-UX-05 | **PASS（fixture + 受控产品）** | 受控产品展示真实权限问题与逐 target 选项，答案经 QuestionBroker 写回；fixture 另覆盖认证/审核表单。安装的 vendor 原生授权 NOT_TESTED。 |
 | AC-UX-06 | **PASS（fixture + HTTP）** | fixture 覆盖“停止中 + 写者状态未知”；HTTP sandbox 无 Runner，停止如实显示“已结束”且绝不显示“已交付”；暂停只改派工开关，不宣称暂停当前工具。 |
 | AC-UX-07 | **PASS（fixture）** | 过期候选的接受按钮禁用并说明原因；直接提交返回 `stale_candidate`，工作保持验证中。 |
-| AC-UX-08 | **PASS（fixture）** | 当前候选验证通过后接受，工作进入“已交付”。 |
-| AC-UX-09 | **PASS（fixture）** | 验证按 criterion 分行，投递按 target 分行，不用单一绿灯代替；真实 Driver 结果 NOT_TESTED。 |
+| AC-UX-08 | **PASS（fixture + 受控产品）** | 受控产品完成问题→检查→可信验证→当前候选接受→已交付，交付清单/输出/检查证据可读。 |
+| AC-UX-09 | **PASS（fixture + 受控产品）** | 验证按 criterion 分行；受控 PASS 与 FAIL profile 分别呈现，FAIL 无接受入口。安装的 vendor Driver 结果 NOT_TESTED。 |
 | AC-UX-10 | **PASS（fixture + HTTP）** | fixture 刷新恢复对话/已交付工作/问题；HTTP 刷新后 cookie 会话、已结束工作与聊天仍在。真实 Runner 恢复链路 NOT_TESTED。 |
 | AC-UX-11 | **NOT_TESTED** | 决定/学习控制视图不在本包首批页面；`record_decision` 等命令返回 `unsupported_capability`。 |
 | AC-UX-12 | **PASS（部分）** | 桌面/窄屏无重叠或横向溢出；键盘有可见焦点；未做完整屏幕阅读器人工审计。 |
@@ -60,6 +72,6 @@ sandbox 只排队执行 intent，不启动 Runner/模型，因此该轮没有生
 ## 4. 未接线与限制
 
 - HTTP/SSE、session bootstrap、认证后 actor 已对接主线 loopback sandbox；验证/投递详情消费 `/v1/verifications/:id` 与 `/v1/questions/:id/deliveries`。执行器 Catalog 仍未发布读取入口（HTTP 模式明确显示未接线）。
-- sandbox 不派发 Runner，因此真实问题、验证、接受与 native 投递在该轮为 NOT_TESTED；fixture 场景提供这些交互的 UI 证据。
+- 受控产品已覆盖真实问题、注册检查、验证、产物读取与接受；其 subprocess 是固定 fixture profile，不代表已安装 vendor 兼容性，独立 Runner 恢复仍 NOT_TESTED。
 - 不新增 Snapshot 字段，不在页面写 vendor 分支；worker/浏览器不声明 human 授权。
 - 关闭页面不停止 daemon；不写产品 SQLite 或 native profile；未执行付费 native smoke。

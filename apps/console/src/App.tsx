@@ -12,7 +12,7 @@ import type {
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
 import type { FixtureAdapter } from './fixture.ts'
-import { conversationId } from './config.ts'
+import { checkCriterionId, checkDefinitionRef, conversationId, defaultProfileId, profileIds } from './config.ts'
 const phaseLabel: Record<WorkView['phase'], string> = {
   evaluating: '评估中', queued: '已排队', working: '执行中', needs_user: '待你决定', verifying: '验证中',
   switching: '切换中', stopping: '停止中', delivered: '已交付', ended: '已结束', uncertain: '状态不确定',
@@ -259,17 +259,19 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           {createOpen && (
             <NewWorkForm
               projects={projects}
+              profiles={profileIds}
+              initialProfile={defaultProfileId}
               pending={pending === 'create_work'}
               onCancel={() => setCreateOpen(false)}
-              onCreate={async (goal, projectId, allowedPath) => {
+              onCreate={async (goal, projectId, allowedPath, profileId) => {
                 const receipt = await send({
                   commandId: newId('cmd-work'), conversationId, kind: 'create_work', projectId, goal,
                   scope: { projectId, allowedPaths: [allowedPath], excludedPaths: [], externalActions: [] },
                   criteria: [
-                    { id: 'unit', kind: 'machine', description: '单元检查通过', required: true, checkDefinitionRef: 'check:unit' },
+                    { id: checkCriterionId, kind: 'machine', description: '已注册输出检查通过', required: true, checkDefinitionRef },
                     { id: 'review', kind: 'human', description: '用户验收结果', required: true },
                   ],
-                  profileId: 'profile-codex-local',
+                  profileId,
                 }, 'create_work')
                 if (receipt?.status === 'recorded' && receipt.workId) {
                   setCreateOpen(false)
@@ -331,6 +333,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           <WorkDetail
             work={selectedWork}
             verification={verification}
+            artifactReader={transport.artifact ? id => transport.artifact!(id) : undefined}
             pending={pending}
             onPause={async work => {
               const command: UserCommand = {
@@ -414,20 +417,63 @@ function SessionGate({ checking, bootstrap, onAuthenticated }: {
   )
 }
 
-function NewWorkForm({ projects, pending, onCreate, onCancel }: {
+function Artifacts({ ids, reader }: {
+  ids: readonly string[]
+  reader: ((id: string) => Promise<{ contentType: string; text: string } | undefined>) | undefined
+}) {
+  const [preview, setPreview] = useState<{ id: string; text: string; contentType: string } | undefined>(undefined)
+  const [failure, setFailure] = useState<string | undefined>(undefined)
+  if (!ids.length) return <p className="empty">当前候选还没有已发布的产物。</p>
+  return (
+    <div className="artifacts">
+      <ul>
+        {ids.map((id, index) => (
+          <li key={id}>
+            <code>{id.slice(0, 18)}…</code>
+            <span className="mini">产物 {index + 1}</span>
+            <span className="artifact-actions">
+              {reader && <button type="button" className="quiet" onClick={async () => {
+                setFailure(undefined)
+                try {
+                  const value = await reader(id)
+                  if (!value) setFailure('该产物没有已接线的读取入口。')
+                  else setPreview({ id, text: value.text, contentType: value.contentType })
+                } catch (error) { setFailure(String((error as Error).message ?? error)) }
+              }}>查看</button>}
+              <a href={`/v1/artifacts/${encodeURIComponent(id)}`} target="_blank" rel="noreferrer">下载</a>
+            </span>
+          </li>
+        ))}
+      </ul>
+      {failure && <p className="warn-text" role="alert">{failure}</p>}
+      {preview && (
+        <div className="artifact-preview">
+          <p className="context-line">产物 <code>{preview.id}</code> · {preview.contentType}</p>
+          <pre className="artifact-text">{preview.text.length > 8000 ? `${preview.text.slice(0, 8000)}\n…` : preview.text}</pre>
+          <button type="button" className="quiet" onClick={() => setPreview(undefined)}>关闭预览</button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function NewWorkForm({ projects, profiles, initialProfile, pending, onCreate, onCancel }: {
   projects: readonly string[]
+  profiles: readonly string[]
+  initialProfile: string
   pending: boolean
-  onCreate: (goal: string, projectId: string, allowedPath: string) => Promise<unknown>
+  onCreate: (goal: string, projectId: string, allowedPath: string, profileId: string) => Promise<unknown>
   onCancel: () => void
 }) {
   const [goal, setGoal] = useState('')
   const [project, setProject] = useState(projects[0] ?? 'project-atlas')
   const [allowedPath, setAllowedPath] = useState('src/')
+  const [profile, setProfile] = useState(initialProfile)
   return (
     <form className="new-work" onSubmit={async event => {
       event.preventDefault()
       if (!goal.trim()) return
-      await onCreate(goal.trim(), project, allowedPath.trim() || 'src/')
+      await onCreate(goal.trim(), project, allowedPath.trim() || 'src/', profile)
     }}>
       <label><span>目标</span><textarea rows={3} required value={goal} onChange={event => setGoal(event.target.value)} /></label>
       <label><span>项目</span>
@@ -438,6 +484,11 @@ function NewWorkForm({ projects, pending, onCreate, onCancel }: {
           : <input type="text" required value={project} onChange={event => setProject(event.target.value)} placeholder="project-atlas" />}
       </label>
       <label><span>允许路径</span><input type="text" required value={allowedPath} onChange={event => setAllowedPath(event.target.value)} /></label>
+      <label><span>执行器 Profile</span>
+        <select value={profile} onChange={event => setProfile(event.target.value)}>
+          {profiles.map(item => <option key={item} value={item}>{item}</option>)}
+        </select>
+      </label>
       <div className="actions">
         <button type="submit" disabled={pending || !goal.trim()}>{pending ? '创建中…' : '创建委托'}</button>
         <button type="button" className="quiet" onClick={onCancel}>取消</button>
@@ -695,9 +746,10 @@ function QuestionCard({ question, deliveries, pending, onAnswer }: {
   )
 }
 
-function WorkDetail({ work, verification, pending, onPause, onStop, onRetry, onContinue, onAccept }: {
+function WorkDetail({ work, verification, artifactReader, pending, onPause, onStop, onRetry, onContinue, onAccept }: {
   work: WorkView | undefined
   verification: VerificationDetail | undefined
+  artifactReader: ((id: string) => Promise<{ contentType: string; text: string } | undefined>) | undefined
   pending: string | undefined
   onPause: (work: WorkView) => Promise<unknown>
   onStop: (work: WorkView) => Promise<unknown>
@@ -754,6 +806,8 @@ function WorkDetail({ work, verification, pending, onPause, onStop, onRetry, onC
           {stale && <p className="warn-text" role="alert">该候选已过期，不能接受为完成结果。</p>}
         </div>
       )}
+      <h4>当前候选产物</h4>
+      <Artifacts ids={work.artifactIds} reader={artifactReader} />
       <h4>可用动作</h4>
       <div className="actions">
         {available.includes('accept_candidate') && work.actions.currentCandidate && (

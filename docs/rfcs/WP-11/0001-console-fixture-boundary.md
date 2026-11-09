@@ -38,6 +38,15 @@ is never read by production code.
 - Commands send only the frozen `UserCommand` shapes. Pause/resume/continue use `ContractRef` (not a
   full contract revision) and the WorkView's `dispatchHold.revision`; the live application accepted the
   CAS.
+- Controlled product lane: the console offers only configured profile IDs
+  (`VITE_PROFILE_IDS`, default from `VITE_DEFAULT_PROFILE`) and a configured registered check
+  (`VITE_CHECK_DEFINITION`/`VITE_CHECK_CRITERION_ID`). The controlled demo uses
+  `profile-fixture-{question,pass,fail,slow}`, `check-fixture-output`, `project-atlas` and `src/`.
+  `PASS_CONSOLE_CONTROLLED_PRODUCT` 8/8 covers question → answer → verification → delivery-manifest
+  and output reading via `/v1/artifacts/:id` → acceptance → reload, plus a FAIL profile with no
+  acceptance path.
+- The artifact panel lists `WorkView.artifactIds` with approved download links and an inline text
+  preview; a transport without an artifact reader says so instead of fabricating bytes.
 
 ## Remaining request to main
 
