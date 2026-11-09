@@ -1,5 +1,5 @@
 {
-  "phase": "B6",
+  "phase": "final",
   "branch": "codex/g1-runtime",
   "base": "5bbd892",
   "commit": "2c1f604",
@@ -102,5 +102,25 @@
     }
   },
   "next": "only BLOCKER-1 (artifact diff/location) and BLOCKER-3 (browser driver) prevent further independent progress",
-  "blockers": "tests/native-acceptance/reports/blockers.md"
+  "blockers": "tests/native-acceptance/reports/blockers.md",
+  "finalRegression": {
+    "selftest": "14/14",
+    "acceptanceReadOnly": "5/12 PASS (7 native NOT_TESTED without --run-native)",
+    "strictMode": "exit 1 with BLOCKED for 6 required native cases"
+  },
+  "deliverables": {
+    "entry": "node tests/native-acceptance/run.mjs [--url --state] [--run-native] [--require-native] [--record] [--native-timeout-ms]",
+    "selftest": "node --test tests/native-acceptance/selftest.mjs",
+    "b3": "node tests/native-acceptance/b3-deterministic.mjs --url ... --state ...",
+    "b5": "node tests/native-acceptance/b5-soak.mjs --url ... --state ... --soak 5",
+    "b6": "node tests/native-acceptance/b6-conformance.mjs --url ... --state ..."
+  },
+  "summary": {
+    "B1": "passed",
+    "B2": "partially_passed (blocked on BLOCKER-1)",
+    "B3": "passed",
+    "B4": "blocked (BLOCKER-3)",
+    "B5": "passed",
+    "B6": "passed"
+  }
 }

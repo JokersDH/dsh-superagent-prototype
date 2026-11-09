@@ -30,7 +30,7 @@ export const ACCEPTANCE_ROOT = here
 // --- argument parsing --------------------------------------------------------
 
 export function parseArgs(argv) {
-  const options = { url: 'http://127.0.0.1:8796', runNative: false, requireNative: false, record: undefined, state: undefined, project: undefined, timeoutMs: 30_000 }
+  const options = { url: 'http://127.0.0.1:8796', runNative: false, requireNative: false, record: undefined, state: undefined, project: undefined, timeoutMs: 30_000, nativeTimeoutMs: 900_000 }
   for (let index = 0; index < argv.length; index += 1) {
     const flag = argv[index]
     const next = argv[index + 1]
@@ -46,6 +46,7 @@ export function parseArgs(argv) {
     else if (flag === '--state') options.state = next, index += 1
     else if (flag === '--project') options.project = next, index += 1
     else if (flag === '--timeout-ms') options.timeoutMs = Number(next), index += 1
+    else if (flag === '--native-timeout-ms') options.nativeTimeoutMs = Number(next), index += 1
     else if (flag === '--help' || flag === '-h') options.help = true
     else throw new Error(`Unknown argument: ${flag}`)
   }
