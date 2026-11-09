@@ -1,0 +1,7 @@
+{
+  "protocol": "assistant-provider/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "20036b56d1bde5abb03db074fef4e5e11d41cddb85dbaee86d6e62e01362d06d",
+  "sourceHash": "f42676452f548d5ddd07173f0c2929feadf3c970d92d4ef7a974ed399038e3ee"
+}

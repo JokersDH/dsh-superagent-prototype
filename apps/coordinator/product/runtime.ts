@@ -1,5 +1,6 @@
 import { join } from 'node:path'
-import { createProductApplication } from '@personal-agent/application'
+import { readFileSync } from 'node:fs'
+import { ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
 import type { NativeQuestionBinding, Scope } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
@@ -11,6 +12,9 @@ import type { LocalHttpOptions } from '../http/app.ts'
 import { ProductCompletion } from './completion.ts'
 import { FIXTURE_PROFILES, ProductExecution } from './execution.ts'
 import { applicationConfiguration } from './configuration.ts'
+import { handleAssistantReplies } from './assistant-replies.ts'
+import type { PrivateModelProvider } from './model-provider.ts'
+import { ModelProviderError } from './model-provider.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -18,6 +22,7 @@ export function createControlledProduct(
   options: Omit<ApplicationOptions, 'completion' | 'nativeFence' | 'profileIds' | 'registeredChecks'> & {
     stateRoot: string
     scratchProject: string
+    assistantProvider?: PrivateModelProvider
   },
 ) {
   options = {
@@ -58,6 +63,7 @@ export function createControlledProduct(
     profileIds: FIXTURE_PROFILES,
     registeredChecks: checks.ids(),
     completion,
+    assistantReplies: options.assistantProvider !== undefined,
     nativeFence: (target: NativeQuestionBinding) => execution?.nativeFence(target) ?? 'unknown',
   })
   execution = new ProductExecution(
@@ -70,7 +76,26 @@ export function createControlledProduct(
     options.principal,
   )
   const { store } = options
+  if (options.assistantProvider) handleAssistantReplies(execution.effects, store, options.assistantProvider)
   const read: NonNullable<LocalHttpOptions['read']> = {
+    guide: async () => readFileSync(new URL('../../../docs/ASSISTANT-GUIDE.zh-CN.md', import.meta.url), 'utf8'),
+    ...(options.assistantProvider
+      ? {
+          assistant: async () => options.assistantProvider!.status(),
+          selectModel: async (model: string) => {
+            try {
+              return options.assistantProvider!.selectModel(model)
+            } catch (error) {
+              if (error instanceof ModelProviderError)
+                throw new ApplicationFault(
+                  error.code === 'unsupported_model' ? 'unsupported_capability' : 'storage_unavailable',
+                  error.message,
+                )
+              throw error
+            }
+          },
+        }
+      : {}),
     configuration: async () =>
       applicationConfiguration({
         projects: options.projects.map((project) => ({
@@ -89,7 +114,7 @@ export function createControlledProduct(
         profiles: FIXTURE_PROFILES.map((id) => ({
           id,
           revision: 1,
-          displayName: `Controlled Fixture: ${id.slice('profile-fixture-'.length)}`,
+          displayName: `受控验证 · ${{ question: '权限提问', pass: '检查通过', fail: '检查失败', slow: '延时任务' }[id.slice('profile-fixture-'.length)] ?? id}`,
           driverId: 'controlled-product-fixture',
           kind: 'controlled_fixture',
           readiness: 'fixture_ready',

@@ -5,11 +5,12 @@
  * page session; it is never a production business-state source.
  */
 import {
-  AgentProfileSchema, ChangeSchema, CommandReceiptSchema, ConversationPageSchema, ProbeReportSchema, SnapshotSchema,
+  AgentProfileSchema, ApplicationConfigurationSchema, ChangeSchema, CommandReceiptSchema, ConversationPageSchema,
+  ProbeReportSchema, SnapshotSchema,
 } from '@personal-agent/contracts'
 import type {
-  AgentProfile, Change, CommandReceipt, ContractRef, ConversationMessage, ConversationPage, Criterion, InspectQuery, ProbeReport,
-  Scope, Snapshot, UserCommand, UserQuestion, WorkView,
+  AgentProfile, ApplicationConfiguration, Change, CommandReceipt, ContractRef, ConversationMessage, ConversationPage, Criterion,
+  InspectQuery, ProbeReport, Scope, Snapshot, UserCommand, UserQuestion, WorkView,
 } from '@personal-agent/contracts'
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
@@ -223,6 +224,31 @@ export const seedState = (): FixtureState => {
   }
 }
 
+export const fixtureConfiguration = (): ApplicationConfiguration => {
+  const project = (id: string): ApplicationConfiguration['projects'][number] => ({
+    id,
+    displayName: id === 'project-atlas' ? 'Atlas 项目' : 'Labs 项目',
+    scope: { projectId: id, allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
+    profileIds: ['profile-codex-local'],
+    defaultProfileId: 'profile-codex-local',
+    defaultCriteria: [
+      { id: 'unit', kind: 'machine', description: '单元检查通过', required: true, checkDefinitionRef: 'check:unit' },
+      { id: 'review', kind: 'human', description: '用户验收结果', required: true },
+    ],
+    dispatchAllowed: true,
+  })
+  return ApplicationConfigurationSchema.parse({
+    protocol: 'application-configuration/1',
+    revision: digest('c'),
+    projects: [project('project-atlas'), project('project-labs')],
+    profiles: [{
+      id: 'profile-codex-local', revision: 1, displayName: 'Fixture local profile', driverId: 'fixture-local',
+      kind: 'controlled_fixture', readiness: 'fixture_ready', dispatchAllowed: true,
+    }],
+    checks: [{ id: 'check:unit', revision: 1, displayName: 'Fixture unit check' }],
+  })
+}
+
 type Listener = { push: (change: Change) => void; fail: (error: TransportError) => void }
 const pageOf = (messages: readonly ConversationMessage[], conversationId: string, before?: number, limit = 50): ConversationPage => {
   const eligible = messages.filter(message => message.conversationId === conversationId && message.sequence < (before ?? Number.MAX_SAFE_INTEGER))
@@ -305,6 +331,10 @@ export class FixtureAdapter implements ConsoleTransport {
 
   async executors(): Promise<readonly ExecutorSnapshot[]> {
     return structuredClone(executorFixture())
+  }
+
+  async configuration(): Promise<ApplicationConfiguration | undefined> {
+    return structuredClone(fixtureConfiguration())
   }
 
   async dispatch(command: UserCommand): Promise<CommandReceipt> {

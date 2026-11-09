@@ -57,6 +57,55 @@ test('local development access keeps Origin, Host and actor checks and is fixtur
   assert.equal((await h.command(createCommand(), { authorization: 'Bearer runner-secret', origin: BASE })).status, 401)
   assert.throws(() => setup(t, { mode: 'product', localDevelopmentAccess: true }), /fixture/)
 })
+test('model settings expose a safe status and accept only a model selection command', async (t) => {
+  const status = {
+    protocol: 'assistant-provider/1',
+    configured: true,
+    baseURL: 'http://127.0.0.1/v1',
+    model: 'model-1',
+    models: ['model-1'],
+    state: 'configured',
+    secureTransport: false,
+  }
+  let selected
+  const h = setup(t, {
+    read: {
+      assistant: async () => status,
+      selectModel: async (model) => {
+        selected = model
+        return status
+      },
+    },
+  })
+  assert.equal((await h.request('/v1/assistant')).status, 401)
+  assert.deepEqual(
+    await (await h.request('/v1/assistant', { headers: { authorization: `Bearer ${API}` } })).json(),
+    status,
+  )
+  const response = await h.request('/v1/assistant/model', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${API}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ model: 'model-1' }),
+  })
+  assert.equal(response.status, 200)
+  assert.equal(selected, 'model-1')
+  assert.equal(
+    (
+      await h.request('/v1/assistant/model', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${API}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ model: 'model-1', apiKey: 'forged' }),
+      })
+    ).status,
+    400,
+  )
+})
+test('a model status containing credentials is rejected without disclosing them', async (t) => {
+  const h = setup(t, { read: { assistant: async () => ({ apiKey: 'private-provider-key' }) } })
+  const response = await h.request('/v1/assistant', { headers: { authorization: `Bearer ${API}` } })
+  assert.equal(response.status, 400)
+  assert.doesNotMatch(await response.text(), /private-provider-key/)
+})
 test('a bearer command uses a server-generated actor and returns the original durable receipt on replay', async (t) => {
   const h = setup(t),
     command = createCommand(),

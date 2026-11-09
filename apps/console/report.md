@@ -44,11 +44,13 @@ sandbox 只排队执行 intent，不启动 Runner/模型，因此该轮没有生
 
 ```sh
 # controlled product: apps/coordinator/product/demo.ts --port 8792 --state /tmp/pa-product-demo --console-origin http://127.0.0.1:5174
-# console: VITE_CONSOLE_MODE=http VITE_API_TARGET=http://127.0.0.1:8792 VITE_PROFILE_IDS=... VITE_CHECK_DEFINITION=check-fixture-output ...
-node apps/console/e2e/controlled-demo.mjs    # PASS_CONSOLE_CONTROLLED_PRODUCT, 8/8
+# console: VITE_CONSOLE_MODE=http VITE_API_TARGET=http://127.0.0.1:8792 pnpm --dir apps/console run dev -- --port 5174
+node apps/console/e2e/controlled-demo.mjs    # PASS_CONSOLE_CONTROLLED_PRODUCT, 13/13
 ```
 
-覆盖：`profile-fixture-question` 新建工作 → 真实原生权限问题（Allow once/Deny）→ 结构化答案经 QuestionBroker → 注册检查 `check-fixture-output` → 可信 PASS 候选；浏览器经 `/v1/artifacts/:id` 读取**当前候选交付清单**（`controlled-product-artifact/1`，含 candidate/attemptId/artifactDigest）与固定输出字节；接受当前候选后进入已交付且产物引用保留；刷新后会话、交付与产物仍在；`profile-fixture-fail` 产生 FAIL 验证且不提供接受。证据：`apps/console/e2e/report-controlled.json` 与 `screenshots/controlled-*.png`。
+登录后 `GET /v1/configuration` 初始化项目（`project-atlas`）、四个 `profile-fixture-*`、`src/` scope 与 `fixed-output`/`review-output` 标准，表单不再含硬编码项目/profile/check。覆盖：配置驱动新建 → 真实权限问题与答案 → `check-fixture-output` PASS/FAIL → 交付清单与输出预览/**认证下载** → 接受交付 → 刷新 → 停止 → 修订（新合同 revision，旧候选拒绝）→ 旧问题版本拒绝 → SSE 离线重连 → 配置读取失败/执行器不可调度（禁用新委托、保留草稿、既有工作仍可查询/回答/停止）→ 390px 窄屏与键盘焦点。证据：`apps/console/e2e/report-controlled.json` 与 `screenshots/controlled-*.png`。
+
+配置失败或执行器不可调度只禁用**新建委托**：读取失败显示传输错误并可重试，`dispatchAllowed=false` 显示 `blockedReason`；草稿保存在表单中，工作列表、问题回答与停止动作不受影响。已有工作继续使用其原执行器，不因配置刷新切换。
 
 产物问题同时在工作区包修复：交付/审计 patch 现包含新增与二进制文件内容；内容寻址 manifest 不再写入 attemptId，改为尝试独立的 per-attempt `manifestRefPath`，两个相同内容的 attempt 共享 manifest 而不会残留旧 attempt 标识（workspaces 10/10）。
 
@@ -56,14 +58,14 @@ node apps/console/e2e/controlled-demo.mjs    # PASS_CONSOLE_CONTROLLED_PRODUCT, 
 
 | ID | 结果 | 证据/说明 |
 | --- | --- | --- |
-| AC-UX-01 | **PASS（fixture + 受控产品）** | 建议不自动执行；受控产品中 `create_work` 才触发执行，权限问题回到浏览器等待用户决定。真实 reasoner 建议路径 NOT_TESTED。 |
+| AC-UX-01 | **PASS（fixture + 受控产品）** | 委托表单由 `/v1/configuration` 的项目/profile/scope/标准驱动，提交后才触发执行；权限问题回到浏览器等待决定。真实 reasoner 建议路径 NOT_TESTED。 |
 | AC-UX-02 | **PASS（fixture）** | 新建、继续、停止、回答问题均确定性完成，不依赖模型；离线时仍可用。 |
 | AC-UX-03 | **PASS（fixture + HTTP）** | WorkId 由后端回执给出，phase 只来自 `WorkView`；HTTP 演示中 phase 来自真实 core/SQLite 投影，UI 不维护状态机。 |
 | AC-UX-04 | **PASS（fixture）** | project/anchor 上下文可见，工作列表按项目筛选，不串台。 |
 | AC-UX-05 | **PASS（fixture + 受控产品）** | 受控产品展示真实权限问题与逐 target 选项，答案经 QuestionBroker 写回；fixture 另覆盖认证/审核表单。安装的 vendor 原生授权 NOT_TESTED。 |
 | AC-UX-06 | **PASS（fixture + HTTP）** | fixture 覆盖“停止中 + 写者状态未知”；HTTP sandbox 无 Runner，停止如实显示“已结束”且绝不显示“已交付”；暂停只改派工开关，不宣称暂停当前工具。 |
-| AC-UX-07 | **PASS（fixture）** | 过期候选的接受按钮禁用并说明原因；直接提交返回 `stale_candidate`，工作保持验证中。 |
-| AC-UX-08 | **PASS（fixture + 受控产品）** | 受控产品完成问题→检查→可信验证→当前候选接受→已交付，交付清单/输出/检查证据可读。 |
+| AC-UX-07 | **PASS（fixture + 受控产品）** | 过期候选的接受被拒并显示“候选已过期”，工作不交付；受控产品中修订后旧候选同样被拒。 |
+| AC-UX-08 | **PASS（fixture + 受控产品）** | 受控产品完成问题→检查→可信验证→当前候选接受→已交付，交付清单/输出/检查证据可读、可下载。 |
 | AC-UX-09 | **PASS（fixture + 受控产品）** | 验证按 criterion 分行；受控 PASS 与 FAIL profile 分别呈现，FAIL 无接受入口。安装的 vendor Driver 结果 NOT_TESTED。 |
 | AC-UX-10 | **PASS（fixture + HTTP）** | fixture 刷新恢复对话/已交付工作/问题；HTTP 刷新后 cookie 会话、已结束工作与聊天仍在。真实 Runner 恢复链路 NOT_TESTED。 |
 | AC-UX-11 | **NOT_TESTED** | 决定/学习控制视图不在本包首批页面；`record_decision` 等命令返回 `unsupported_capability`。 |

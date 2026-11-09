@@ -3,12 +3,12 @@
   "mode": "fixture",
   "base": "http://127.0.0.1:5173/",
   "node": "v24.21.0",
-  "testedAt": "2026-11-09T01:37:49.709Z",
+  "testedAt": "2026-11-09T02:27:41.389Z",
   "cases": [
     {
       "id": "MAIN-RENDER",
       "status": "PASS",
-      "ms": 64,
+      "ms": 57,
       "detail": "works/questions/conversation rendered and SSE is live"
     },
     {
@@ -20,13 +20,13 @@
     {
       "id": "CHAT-SEND",
       "status": "PASS",
-      "ms": 57,
+      "ms": 54,
       "detail": "message dispatch appends a persisted conversation message"
     },
     {
       "id": "QUESTION-ANSWER-PER-TARGET",
       "status": "PASS",
-      "ms": 287,
+      "ms": 301,
       "detail": "choice/review/url questions answered; local recording never claims native application"
     },
     {
@@ -38,19 +38,19 @@
     {
       "id": "STALE-CANDIDATE-BLOCKED",
       "status": "PASS",
-      "ms": 42,
+      "ms": 44,
       "detail": "expired candidate cannot be accepted"
     },
     {
       "id": "STOPPING-UNKNOWN-WRITER",
       "status": "PASS",
-      "ms": 30,
+      "ms": 29,
       "detail": "stopping work shows an indeterminate writer, not success"
     },
     {
       "id": "PAUSE-DISPATCH-CAS",
       "status": "PASS",
-      "ms": 195,
+      "ms": 194,
       "detail": "dispatch hold is updated through CAS, and continue resumes work"
     },
     {
@@ -86,37 +86,37 @@
     {
       "id": "CURSOR-EXPIRY-REFETCH",
       "status": "PASS",
-      "ms": 285,
+      "ms": 287,
       "detail": "expired cursor triggers a snapshot refetch and resumes live updates"
     },
     {
       "id": "RELOAD-PERSISTENCE",
       "status": "PASS",
-      "ms": 602,
+      "ms": 606,
       "detail": "page refresh restores conversation and delivered work"
     },
     {
       "id": "CREATE-WORK",
       "status": "PASS",
-      "ms": 163,
+      "ms": 159,
       "detail": "a user can create a work from the console and see its queued state"
     },
     {
       "id": "KEYBOARD-SEND-AND-FOCUS",
       "status": "PASS",
-      "ms": 25,
+      "ms": 22,
       "detail": "Ctrl+Enter sends and keyboard focus stays visible"
     },
     {
       "id": "NARROW-NO-HORIZONTAL-OVERFLOW",
       "status": "PASS",
-      "ms": 26,
+      "ms": 41,
       "detail": "narrow layout has no horizontal overflow"
     },
     {
       "id": "NARROW-QUESTION-FORM",
       "status": "PASS",
-      "ms": 64,
+      "ms": 59,
       "detail": "question form is usable on a narrow viewport"
     },
     {

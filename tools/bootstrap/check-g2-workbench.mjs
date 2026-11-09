@@ -21,19 +21,26 @@ for (const args of commands) {
   process.stdout.write(output)
   const count = [...output.matchAll(/(?:ℹ\s*)?tests (\d+)/g)].reduce((sum, match) => sum + Number(match[1]), 0)
   tests += count
-  results.push({ command: `pnpm ${args.join(' ')}`, status: 'PASS', ...(count ? { tests: count } : {}) })
+  results.push({
+    command: `pnpm ${args.join(' ')}`,
+    status: 'PASS',
+    ...(count ? { tests: count } : {}),
+  })
 }
-assert.ok(tests >= 338)
+assert.ok(tests >= 350)
 const report = {
   status: 'PASS_CONTROLLED_WORKBENCH_MODULES',
-  sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),
+  sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8',
+  }).trim(),
   checkedAt: new Date().toISOString(),
   node: process.version,
   tests,
   results,
   browserCheck: 'pnpm check:g2-browser against an explicitly started dev:workbench instance',
   limitations: [
-    'Controlled fixture only',
+    'Controlled work execution and mocked model dialogue; real model smoke evidence is separate',
     'Browser acceptance has a separate report',
     'A generic workspace candidate and B independent runtime remain blocked by dedicated admission probes',
   ],

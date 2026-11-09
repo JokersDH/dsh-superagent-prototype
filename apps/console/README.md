@@ -5,6 +5,13 @@ Wave-02 WP-11 operating console. It is a real browser workbench over the public 
 mock. The browser never sends a `TrustedActor`; identity is produced by the backend after
 authentication.
 
+For personal use, run `pnpm start` from the repository root and open `http://127.0.0.1:5180`.
+See [the Chinese usage guide](../../docs/ASSISTANT-GUIDE.zh-CN.md). The integrated workbench adds
+private model dialogue, Markdown, independent conversation URLs and a safe model selector. Its light
+layout keeps the conversation central and opens work/model details on demand. Execution remains
+controlled; model replies have no repository or terminal tools. The imported A checkpoint evidence
+below describes that checkpoint; current main acceptance is in `reports/releases/`.
+
 ## Modes
 
 | Mode | Selection | Purpose |
@@ -12,10 +19,12 @@ authentication.
 | Fixture (default) | `VITE_CONSOLE_MODE` unset | Isolated, schema-valid scenario in the development adapter; state persists in `sessionStorage` for the tab. Never a production business-state source. |
 | HTTP | `VITE_CONSOLE_MODE=http` | `HttpTransport` against `/v1`: session bootstrap/check, commands, snapshot, messages, SSE, verification and delivery detail routes. Vite proxies `/v1` to `VITE_API_TARGET` (default `127.0.0.1:8787`). |
 
-The HTTP lane is verified against the main-owned loopback sandbox (`apps/coordinator/http/demo.ts`):
-`PASS_CONSOLE_HTTP_DEMO` 8/8 on the real ApplicationService/core/SQLite path. The sandbox queues
-execution intents and dispatches no Runner or vendor model, so question/verification panels stay
-empty there; that is reported as NOT_TESTED, not faked.
+The HTTP lane is verified against the controlled product (`apps/coordinator/product/demo.ts`):
+`PASS_CONSOLE_CONTROLLED_PRODUCT` 13/13 covering configuration-driven delegation, question/answer,
+PASS/FAIL verification, delivery manifest and output download, acceptance, stop, revision, stale
+question/candidate rejection, refresh, SSE reconnect and configuration failure/blocked states. The
+older queue-only sandbox has no configuration port, so new delegation is correctly disabled there;
+it is no longer the browser acceptance lane.
 
 ## What the UI covers
 
@@ -34,7 +43,7 @@ empty there; that is reported as NOT_TESTED, not faked.
 - Rejected receipts and transport errors surface `code`/`message`/`retry` with recoverable actions.
 - Executor panel consumes `AgentProfile`/`ProbeReport` fixtures (readiness and capability rows); it
   states that production Catalog wiring belongs to the main agent.
-- Responsive single-column layout under 960px; no horizontal overflow; visible keyboard focus.
+- Responsive navigation and detail drawers on narrow screens; no horizontal overflow; visible keyboard focus.
 
 ## Run
 
@@ -78,18 +87,19 @@ pnpm --filter @personal-agent/coordinator dev:product -- \
   --port 8792 --state /tmp/pa-product-demo --console-origin http://127.0.0.1:5174
 
 VITE_CONSOLE_MODE=http VITE_API_TARGET=http://127.0.0.1:8792 \
-  VITE_PROFILE_IDS=profile-fixture-question,profile-fixture-pass,profile-fixture-fail,profile-fixture-slow \
-  VITE_DEFAULT_PROFILE=profile-fixture-question \
-  VITE_CHECK_DEFINITION=check-fixture-output VITE_CHECK_CRITERION_ID=output \
   pnpm --dir apps/console run dev -- --port 5174
 
-node apps/console/e2e/controlled-demo.mjs    # PASS_CONSOLE_CONTROLLED_PRODUCT 8/8
+node apps/console/e2e/controlled-demo.mjs    # PASS_CONSOLE_CONTROLLED_PRODUCT 13/13
 ```
 
-The create-work form offers only the configured profile IDs. Keep the scope at `src/` and project at
-`project-atlas` for the controlled composition. The browser reads the published delivery manifest,
-patch, output and check evidence through `/v1/artifacts/:id`; acceptance uses only
-`actions.currentCandidate`.
+After session bootstrap the console fetches `GET /v1/configuration` and initializes the project,
+profile, scope and default-criteria controls from it; there are no hard-coded project/profile/check
+values in HTTP mode. Only `dispatchAllowed` projects/profiles can be selected. A configuration read
+failure or an unschedulable executor disables new delegation with the transport/blocked reason while
+keeping the draft; query, answer and stop remain available, and existing works keep their executor.
+The browser reads the published delivery manifest, patch, output and check evidence through
+`/v1/artifacts/:id`; acceptance uses only `actions.currentCandidate`. Revision uses the current
+contract scope/criteria and creates a new revision, invalidating old candidates.
 
 Playwright evidence needs a browser for the installed package:
 

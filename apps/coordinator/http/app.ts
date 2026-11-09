@@ -10,6 +10,8 @@ import {
   AnswerDeliverySchema,
   AppErrorSchema,
   ApplicationConfigurationSchema,
+  AssistantProviderStatusSchema,
+  AssistantModelSelectionSchema,
   ChangeSchema,
   CommandReceiptSchema,
   ConversationPageSchema,
@@ -24,6 +26,7 @@ import {
 import type {
   AnswerDelivery,
   ApplicationConfiguration,
+  AssistantProviderStatus,
   AppError,
   ApplicationService,
   TrustedActor,
@@ -70,6 +73,9 @@ export interface LocalHttpOptions {
   localDevelopmentAccess?: boolean
   now?: () => number
   read?: {
+    assistant?(): Promise<AssistantProviderStatus>
+    selectModel?(model: string): Promise<AssistantProviderStatus>
+    guide?(): Promise<string>
     configuration?(): Promise<ApplicationConfiguration>
     verification?(id: string): Promise<Verification | undefined>
     deliveries?(questionId: string): Promise<readonly AnswerDelivery[]>
@@ -210,6 +216,25 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!options.read?.configuration)
       throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
     return c.json(ApplicationConfigurationSchema.parse(await options.read.configuration()))
+  })
+  app.get('/v1/assistant', async (c) => {
+    if (!options.read?.assistant)
+      throw new ApplicationFault('unsupported_capability', 'Model conversation is not configured')
+    return c.json(AssistantProviderStatusSchema.parse(await options.read.assistant()))
+  })
+  app.get('/v1/guide', async (c) => {
+    if (!options.read?.guide) throw new ApplicationFault('unsupported_capability', 'Guide is not connected')
+    c.header('content-type', 'text/markdown; charset=utf-8')
+    c.header('content-disposition', 'attachment; filename="assistant-guide.zh-CN.md"')
+    return c.body(await options.read.guide())
+  })
+  app.post('/v1/assistant/model', async (c) => {
+    if (!c.req.header('content-type')?.startsWith('application/json'))
+      throw new ApplicationFault('invalid_request', 'Model selection requires JSON')
+    if (!options.read?.selectModel)
+      throw new ApplicationFault('unsupported_capability', 'Model selection is not configured')
+    const input = AssistantModelSelectionSchema.parse(await c.req.json())
+    return c.json(AssistantProviderStatusSchema.parse(await options.read.selectModel(input.model)))
   })
   app.delete('/v1/session', (c) => {
     const id = getCookie(c, COOKIE)

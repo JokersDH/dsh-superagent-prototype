@@ -127,6 +127,7 @@ async function main() {
       stateRoot,
       '--console-origin',
       consoleURL,
+      '--assistant',
       ...(!values['require-login'] ? ['--local-access'] : []),
     ],
     root,

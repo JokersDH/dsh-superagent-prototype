@@ -1,0 +1,94 @@
+{
+  "$defs": {
+    "AssistantModelSelection": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "maxLength": 160,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "model"
+      ],
+      "type": "object"
+    },
+    "AssistantProviderStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "baseURL": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "configured": {
+          "type": "boolean"
+        },
+        "lastResponseAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "models": {
+          "items": {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "readOnly": true,
+          "type": "array"
+        },
+        "protocol": {
+          "const": "assistant-provider/1",
+          "type": "string"
+        },
+        "secureTransport": {
+          "type": "boolean"
+        },
+        "state": {
+          "enum": [
+            "not_configured",
+            "configured",
+            "responding",
+            "available",
+            "error"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "configured",
+        "baseURL",
+        "model",
+        "models",
+        "state",
+        "secureTransport"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:assistant-provider:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -2,9 +2,9 @@
 
 **当前派工入口：[第二轮整包排程](agent-tasks/wave-02/README.zh-CN.md)。** A 连续交付可信验证、产品仓储和工作台；B 连续交付独立运行时、Catalog/策略准备和首个 Driver；主 Agent 做问题中心、应用 API 和纵向集成。每人一个早期接口检查点、一次整包交付，不再每修一项就重新派工。
 
-**受控工作台已接入：** 双击 `start.command` 或运行 `pnpm start`，打开 `http://127.0.0.1:5180` 即可使用，无需手动令牌。停止用 `stop.command`/`pnpm stop`，重启用 `pnpm restart`。它组合实际产品 API、SQLite、固定 scratch 子进程、原生问题与验证交付，见 [试用说明](docs/WORKBENCH.zh-CN.md)。A/B 候选准入仍分开验证，见 [最新交接](docs/rfcs/WP-16/0005-candidate-admission-and-workbench.md)；不代表原生兼容或完整 G2 通过。
+**个人助理工作台已接入：** 双击 `start.command` 或运行 `pnpm start`，打开 `http://127.0.0.1:5180` 即可使用，无需手动令牌。真实模型主对话、本机记录和模型切换已开放，见 [助手简介](docs/ASSISTANT-GUIDE.zh-CN.md)。停止用 `stop.command`/`pnpm stop`，重启用 `pnpm restart`。工作执行仍使用固定 scratch 子进程、原生问题与验证交付，见 [试用说明](docs/WORKBENCH.zh-CN.md)。A/B 候选准入仍分开验证，见 [最新交接](docs/rfcs/WP-16/0005-candidate-admission-and-workbench.md)；不代表任意仓库自动编码、原生兼容或完整 G2 通过。
 
-主线最新检查点：已实现真实受控子进程的“委托 → 提问 → 回答 → 产物冻结 → 检查 → 接受交付”API 闭环，并新增认证的 `GET /v1/configuration`，供工作台读取真实项目、执行器与验收默认值。`pnpm check:g2-product` 现在覆盖 **188 项契约 + 140 项产品相关测试**，实际结果见 [产品检查报告](reports/releases/g2-product.json)。A/B 新接口接线见 [配置查询约定](docs/rfcs/WP-16/0004-application-configuration.md)，启动和代码位置见 [受控产品入口](apps/coordinator/product/README.md)。默认 API 8791；当前配置接口联调另开 8793，保留既有服务。fixture 子进程不调用模型；浏览器产品、独立 Runner 重连和真实 agent 仍分开验收。
+主线最新检查点：已实现真实受控子进程的“委托 → 提问 → 回答 → 产物冻结 → 检查 → 接受交付”API 闭环，认证的 `GET /v1/configuration` 供工作台读取真实项目、执行器与验收默认值，`GET /v1/assistant` 只返回安全的模型连接状态。`pnpm check:g2-product` 覆盖 **188 项契约 + 154 项产品及模型适配测试**，实际结果见 [产品检查报告](reports/releases/g2-product.json)。接线见 [配置查询约定](docs/rfcs/WP-16/0004-application-configuration.md)，启动和代码位置见 [产品入口](apps/coordinator/product/README.md)。fixture 子进程不调用模型；主对话独立使用私有模型配置。浏览器产品、独立 Runner 重连和真实 agent 仍分开验收。
 
 ## 1. 唯一交付仓库
 
