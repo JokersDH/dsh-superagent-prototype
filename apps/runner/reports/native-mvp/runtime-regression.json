@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "sourceCommit": "cef31c449a637bb856ea7a4883201088e1fcb181",
+  "sourceHash": "02ebd8c2e52d09353f502f4b164ef54c6ab4ef53bae76f28f856c1268d6e1c74",
+  "sourceGroups": [
+    "apps/runner",
+    "packages/drivers/codex-native",
+    "packages/driver-kit",
+    "packages/execution",
+    "packages/testing",
+    "packages/catalog",
+    "packages/policy-preparation"
+  ],
+  "sourceFiles": 83,
+  "testedAt": "2026-11-09T08:50:55.962Z",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "tests": 262,
+  "command": "TMPDIR=/tmp node --test --test-concurrency=2 --test-timeout=40000 apps/runner/test/*.test.ts packages/drivers/codex-native/test/*.test.ts packages/driver-kit/test/*.test.ts packages/execution/test/*.test.ts packages/testing/test/*.test.ts packages/catalog/test/*.test.ts packages/policy-preparation/test/*.test.ts",
+  "limitations": [
+    "All model/protocol cases in this repeatable suite use fixtures; installed native safety has a separate zero-model probe",
+    "Actual approval/clarification/steering model turns, power loss and cross-machine recovery remain NOT_TESTED"
+  ]
+}

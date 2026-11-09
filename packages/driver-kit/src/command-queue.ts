@@ -69,10 +69,11 @@ export class CommandQueue implements AsyncIterable<RunnerCommand> {
   }
 
   /** Stop accepting commands; pending ones are still drained before the iterator ends. */
-  close(reason = 'runner_stopped'): void {
+  close(reason = 'runner_stopped', discardPending = false): void {
     if (this.#closed) return
     this.#closed = true
     this.#closedReason = reason
+    if (discardPending) this.#entries = []
     this.#wake()
   }
 

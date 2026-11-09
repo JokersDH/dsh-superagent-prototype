@@ -13,6 +13,8 @@ import {
   AssistantProviderStatusSchema,
   AssistantModelSelectionSchema,
   AssistantStreamUpdateSchema,
+  ProjectRegistrationInputSchema,
+  WorkLocationSchema,
   ChangeSchema,
   CommandReceiptSchema,
   ConversationPageSchema,
@@ -29,6 +31,8 @@ import type {
   ApplicationConfiguration,
   AssistantProviderStatus,
   AssistantStreamUpdate,
+  ProjectRegistrationInput,
+  WorkLocation,
   AppError,
   ApplicationService,
   TrustedActor,
@@ -70,7 +74,7 @@ export interface LocalHttpOptions {
   apiToken: string
   allowedOrigins: readonly string[]
   sessionTtlMs?: number
-  mode: 'fixture' | 'product'
+  mode: 'fixture' | 'product' | 'personal'
   /** Explicit loopback-only fixture convenience; normal entries still require credentials. */
   localDevelopmentAccess?: boolean
   now?: () => number
@@ -79,6 +83,8 @@ export interface LocalHttpOptions {
     assistantStream?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
     selectModel?(model: string): Promise<AssistantProviderStatus>
     guide?(): Promise<string>
+    registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
+    workLocation?(workId: string): Promise<WorkLocation>
     configuration?(): Promise<ApplicationConfiguration>
     verification?(id: string): Promise<Verification | undefined>
     deliveries?(questionId: string): Promise<readonly AnswerDelivery[]>
@@ -88,8 +94,8 @@ export interface LocalHttpOptions {
 
 /** The HTTP module owns identity. Request bodies never contain actor or direct core/native access. */
 export function createLocalHttpApp(options: LocalHttpOptions) {
-  if (options.localDevelopmentAccess && options.mode !== 'fixture')
-    throw new TypeError('Automatic local access is restricted to the fixture entry')
+  if (options.localDevelopmentAccess && !['fixture', 'personal'].includes(options.mode))
+    throw new TypeError('Automatic local access is restricted to fixture/personal loopback entries')
   for (const secret of [options.bootstrapToken, options.apiToken])
     if (!/^[a-f0-9]{64}$/.test(secret)) throw new TypeError('Local HTTP credentials need 256 random bits')
   const actorBase = {
@@ -224,6 +230,19 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!options.read?.assistant)
       throw new ApplicationFault('unsupported_capability', 'Model conversation is not configured')
     return c.json(AssistantProviderStatusSchema.parse(await options.read.assistant()))
+  })
+  app.post('/v1/projects', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json'))
+      throw new ApplicationFault('invalid_request', 'Project registration requires JSON')
+    if (!options.read?.registerProject)
+      throw new ApplicationFault('unsupported_capability', 'Project registration is not connected')
+    const input = ProjectRegistrationInputSchema.parse(await c.req.json())
+    return c.json(ApplicationConfigurationSchema.parse(await options.read.registerProject(input)))
+  })
+  app.get('/v1/works/:id/location', async (c) => {
+    if (!options.read?.workLocation)
+      throw new ApplicationFault('unsupported_capability', 'Work location is not connected')
+    return c.json(WorkLocationSchema.parse(await options.read.workLocation(IdSchema.parse(c.req.param('id')))))
   })
   app.get('/v1/guide', async (c) => {
     if (!options.read?.guide) throw new ApplicationFault('unsupported_capability', 'Guide is not connected')

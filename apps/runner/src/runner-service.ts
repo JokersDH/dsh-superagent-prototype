@@ -28,6 +28,7 @@ import { FileCriticalJournal } from './file-journal.ts'
 import { AttemptArtifactManifest } from './artifact-manifest.ts'
 import { serveRecoveryEndpoint, endpointDirectory, type RecoveryEndpoint } from './recovery-endpoint.ts'
 import { ProcessHost } from './process-host.ts'
+import { RunnerPayloadStore, LocalPayloadMissing } from './payload-store.ts'
 import { AttemptRunner } from './runner.ts'
 import {
   RUNNER_BRIDGE_PROTOCOL,
@@ -42,7 +43,9 @@ export type RunnerServiceOptions = {
   /** Downstream sink (runner -> coordinator). */
   write: (frame: BridgeFrame | Record<string, unknown>) => void
   /** Driver for this attempt; injected so tests use a fake and integration a real one. */
-  createDriver: (spec: AttemptSpec) => AgentDriverV1
+  createDriver: (spec: AttemptSpec, hooks: { beforeNativeWrite(command: RunnerCommand): Promise<void> }) => AgentDriverV1
+  /** Native metadata/policy preparation may run before the first business begin. */
+  eagerPrepare?: boolean
   /** Payload store the coordinator owns; the Runner only asks for references. */
   payloads: { read(reference: string): Promise<Json> }
   /**
@@ -113,24 +116,54 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   let running: Promise<unknown> | undefined
   let began = false
   let payloadRoot = ''
-  let localPayloadSeq = 0
+  let localPayloads: RunnerPayloadStore | undefined
   let recoveryEndpoint: RecoveryEndpoint | undefined
   const artifacts = new AttemptArtifactManifest()
   let closed = false
+  let businessClosed = false
+  let physicallyStopped = false
+  const processHost = options.processHost ?? new ProcessHost()
+  const closeAdmission = () => {
+    businessClosed = true; processHost.closeAdmission(); runner?.closeAdmission()
+    for (const waiters of [factWaiters, payloadWaiters, writeWaiters]) {
+      for (const waiter of waiters.values()) waiter.reject(new Error('Attempt admission is closed'))
+      waiters.clear()
+    }
+  }
+  const stopPhysical = async () => {
+    closeAdmission()
+    const stopped = await runner?.stopPhysical(2000)
+    physicallyStopped = stopped?.quiescence === 'confirmed' && processHost.inventory().every(item => item.writer === 'quiescent')
+  }
   const receipts = new Map<string, DurableReceipt>()
   /** Facts awaiting the coordinator's authoritative receipt. */
   const factWaiters = new Map<string, { resolve: (value: DurableReceipt) => void; reject: (error: Error) => void }>()
   const readLocal = async (reference: string): Promise<Json> => {
-    const text = await readFile(join(payloadRoot, `${reference}.json`), 'utf8')
-    return (JSON.parse(text) as { payload: Json }).payload
+    if (!localPayloads) throw new LocalPayloadMissing('Payload store is not ready')
+    return localPayloads.read(reference)
   }
   /** Outstanding payload reads the coordinator owes us, keyed by request id. */
   const payloadWaiters = new Map<string, { resolve: (value: Json) => void; reject: (error: Error) => void }>()
+  const writeWaiters = new Map<string, { resolve: () => void; reject: (error: Error) => void }>()
+  const hooks = { beforeNativeWrite: (command: RunnerCommand) => new Promise<void>((resolve, reject) => {
+    if (businessClosed || command.kind !== 'answer') { reject(new Error('Native write admission is closed')); return }
+    writeWaiters.set(command.id, { resolve, reject })
+    write({ type: 'native-write-intent', id: command.id, command })
+  }) }
   let payloadSeq = 0
 
   const finish = (): void => {
     closed = true
     notify()
+  }
+  const launch = () => {
+    if (!spec || !runner || running) throw new Error('Attempt driver cannot be launched twice')
+    running = runner.launch(spec, options.createDriver(spec, hooks))
+    void running.then(async result => {
+      await stopPhysical()
+      write({ type: 'exited', id: spec!.attemptId, exit: (result as { exit: unknown }).exit })
+      finish()
+    }).catch(error => { closeAdmission(); write({ type: 'error', id: spec!.attemptId, ...toBridgeFailure(error) }); finish() })
   }
 
   try {
@@ -164,6 +197,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
           spec = frame.spec
           payloadRoot = frame.payloadRoot
           await mkdir(payloadRoot, { recursive: true })
+          localPayloads = new RunnerPayloadStore(payloadRoot)
           journal = new FileCriticalJournal({ path: frame.journalPath })
           const recovery = await journal.open()
           runner = new AttemptRunner({
@@ -171,7 +205,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               read: reference => {
                 // Ask the coordinator for the immutable payload; the Runner has no store of its own.
                 // Local first: a reference this Runner wrote, or one the coordinator supplies.
-                return readLocal(reference).catch(() => {
+                return readLocal(reference).catch((error) => {
+                  if (!(error instanceof LocalPayloadMissing)) throw error
                   const requestId = `payload-${++payloadSeq}`
                   return new Promise((resolve, reject) => {
                     payloadWaiters.set(requestId, { resolve, reject })
@@ -183,14 +218,12 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               // replayed with its original reference; the coordinator copies into its immutable
               // store when it acknowledges the fact.
               store: async (payload: Json, classification: 'critical' | 'diagnostic') => {
-                const reference = `payload-${String(++localPayloadSeq).padStart(6, '0')}`
-                const file = join(payloadRoot, `${reference}.json`)
-                await writeFile(file, JSON.stringify({ classification, payload }), 'utf8')
-                return reference
+                return localPayloads!.write(payload, classification)
               },
             },
             factSink: {
               record: async (fact: CriticalFact) => {
+                if (businessClosed) throw new Error('Attempt fact channel is closed')
                 const receipt = options.sink
                   ? await options.sink.record(fact)
                   : await new Promise<DurableReceipt>((resolve, reject) => {
@@ -202,27 +235,20 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 return receipt
               },
             },
-            processHost: options.processHost ?? new ProcessHost(),
+            processHost,
             spool: journal,
           })
           if (options.recoveryRoot) {
-            const processHost = options.processHost ?? new ProcessHost()
             recoveryEndpoint = await serveRecoveryEndpoint({
               directory: endpointDirectory(options.recoveryRoot, spec.attemptId),
               spec,
-              runnerIdentityRef: `runner-${spec.attemptId}`,
-              source: 'attempt-runner',
-              resources: () =>
-                (processHost as unknown as { resources?: () => Array<{ ref: string }> }).resources?.().map(item => ({
-                  ref: item.ref,
-                  ownership: 'spawned_process' as const,
-                  writer: 'active' as const,
-                  evidence: ['spawn-observed'],
-                })) ?? [],
-              state: () => (running === undefined ? 'serving' : 'terminated'),
+              runnerIdentityRef: frame.producer.runnerIdentityRef,
+              source: frame.producer.source,
+              resources: () => processHost.inventory(),
+              state: () => physicallyStopped ? 'terminated' : businessClosed ? 'unknown' : 'serving',
               cancel: async command => {
                 // Cancel closes admission first (the endpoint does that) and then stops owned work.
-                await runner?.stopPhysical(2000).catch(() => undefined)
+                await stopPhysical()
                 void command
               },
             })
@@ -235,6 +261,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
             journalPath: journal.path,
             protocol: RUNNER_BRIDGE_PROTOCOL,
           })
+          if (options.eagerPrepare) launch()
           // A previously interrupted attempt may have facts that were never acknowledged.
           if (recovery.entries.length > 0) {
             write({ type: 'progress', id: 'recovery', text: `recovered ${recovery.entries.length} spooled facts`, observedAt: new Date().toISOString() })
@@ -248,6 +275,10 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
             break
           }
           const command: RunnerCommand = frame.command
+          if (businessClosed) {
+            write({ type: 'error', id: frame.id, code: 'state_indeterminate', reason: 'admission_closed', message: 'Attempt admission is closed' })
+            break
+          }
           if (command.kind === 'begin') {
             if (began) {
               write({ type: 'error', id: frame.id, code: 'protocol_error', reason: 'duplicate_begin', message: 'begin is accepted at most once per attempt' })
@@ -262,17 +293,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               write({ type: 'error', id: frame.id, ...toBridgeFailure(error) })
               break
             }
-            running = runner.launch(spec, options.createDriver(spec))
-            void running
-              .then(result => {
-                const exit = (result as { exit: { reason: string; evidenceRefs: string[] } }).exit
-                write({ type: 'exited', id: spec?.attemptId ?? 'attempt', exit: exit as never })
-                finish()
-              })
-              .catch(error => {
-                write({ type: 'error', id: frame.id, ...toBridgeFailure(error) })
-                finish()
-              })
+            if (!running) launch()
             break
           }
           try {
@@ -300,6 +321,11 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
           }
           break
         }
+        case 'write-admission': {
+          const waiter = writeWaiters.get(frame.id)
+          if (waiter) { writeWaiters.delete(frame.id); if (frame.allowed && !businessClosed) waiter.resolve(); else waiter.reject(new Error('Coordinator refused native write')) }
+          break
+        }
 
         case 'ack-failed': {
           // The coordinator could not persist the fact: keep it spooled and fail the in-flight
@@ -319,6 +345,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
         }
 
         case 'shutdown': {
+          closeAdmission()
           finish()
           break
         }
@@ -332,9 +359,10 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   }
 
   const shutdown = async (): Promise<void> => {
+    closeAdmission()
     finish()
     await recoveryEndpoint?.close().catch(() => undefined)
-    await runner?.stopPhysical(2000).catch(() => undefined)
+    await stopPhysical().catch(() => undefined)
     journal?.close()
   }
 

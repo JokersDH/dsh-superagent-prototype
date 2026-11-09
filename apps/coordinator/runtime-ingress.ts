@@ -3,7 +3,8 @@ import { AttemptRefSchema, CriticalFactSchema, DurableReceiptSchema, IdSchema, J
 import type { AttemptRef, CriticalFact, DurableReceipt, Json, RuntimeFactPayload } from '@personal-agent/contracts'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 
-export type RuntimeProducer = { attempt: AttemptRef; runnerIdentityRef: string; source: string }
+import type { RuntimeProducer } from '../../packages/execution/src/contracts.ts'
+export type { RuntimeProducer } from '../../packages/execution/src/contracts.ts'
 /** Physical execution records, not a second Ticket lifecycle. Owned by the storage/runtime bridge. */
 export type IngressBinding = AttemptRef & {
   runnerIdentityRef: string

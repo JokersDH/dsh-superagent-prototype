@@ -28,6 +28,7 @@ export type RpcError = { code: number; message: string; data?: JsonValue }
 export type RpcRequest = { jsonrpc: '2.0'; id: LosslessId; method: string; params?: JsonValue }
 export type RpcNotification = { jsonrpc: '2.0'; method: string; params?: JsonValue }
 export type RpcResponse = { jsonrpc: '2.0'; id: LosslessId; result?: JsonValue; error?: RpcError }
+const integerTokens = new WeakSet<object>()
 
 export class CodexProtocolError extends Error {
   readonly code = 'protocol_error'
@@ -44,147 +45,37 @@ export class CodexProtocolError extends Error {
  * silently rounded by `JSON.parse`.
  */
 export function parseLossless(text: string): JsonValue {
-  // A minimal recursive-descent pass over the already-validated text: only number tokens change.
-  let index = 0
-  const ws = (): void => {
-    while (index < text.length && /\s/.test(text[index]!)) index += 1
+  try {
+    const parse = JSON.parse as (
+      text: string,
+      reviver: (key: string, value: unknown, context: { source?: string }) => unknown,
+    ) => JsonValue
+    return parse(text, (key, value, context) => {
+      if ((key === 'id' || key === 'requestId') && typeof value === 'number' && !Number.isSafeInteger(value)) {
+        if (
+          !context.source ||
+          !/^-?\d{1,19}$/.test(context.source) ||
+          BigInt(context.source) < -9223372036854775808n ||
+          BigInt(context.source) > 9223372036854775807n
+        )
+          throw new Error('Invalid integer request id')
+        const token = { kind: 'integer', decimal: context.source }
+        integerTokens.add(token)
+        return token
+      }
+      return value
+    })
+  } catch {
+    throw new CodexProtocolError('invalid_json', 'Invalid native JSON message')
   }
-  const value = (): JsonValue => {
-    ws()
-    const char = text[index]
-    if (char === '{') {
-      index += 1
-      const object: Record<string, JsonValue> = {}
-      ws()
-      if (text[index] === '}') {
-        index += 1
-        return object
-      }
-      for (;;) {
-        ws()
-        const key = string()
-        ws()
-        if (text[index] !== ':') throw new CodexProtocolError('invalid_json', 'Expected ":" in object')
-        index += 1
-        object[key] = value()
-        ws()
-        if (text[index] === ',') {
-          index += 1
-          continue
-        }
-        if (text[index] === '}') {
-          index += 1
-          return object
-        }
-        throw new CodexProtocolError('invalid_json', 'Expected "," or "}" in object')
-      }
-    }
-    if (char === '[') {
-      index += 1
-      const array: JsonValue[] = []
-      ws()
-      if (text[index] === ']') {
-        index += 1
-        return array
-      }
-      for (;;) {
-        array.push(value())
-        ws()
-        if (text[index] === ',') {
-          index += 1
-          continue
-        }
-        if (text[index] === ']') {
-          index += 1
-          return array
-        }
-        throw new CodexProtocolError('invalid_json', 'Expected "," or "]" in array')
-      }
-    }
-    if (char === '"') return string()
-    if (text.startsWith('true', index)) {
-      index += 4
-      return true
-    }
-    if (text.startsWith('false', index)) {
-      index += 5
-      return false
-    }
-    if (text.startsWith('null', index)) {
-      index += 4
-      return null
-    }
-    const match = /^-?\d+(\.\d+)?([eE][+-]?\d+)?/.exec(text.slice(index))
-    if (!match) throw new CodexProtocolError('invalid_json', `Unexpected token at ${index}`)
-    index += match[0].length
-    // Integers are surfaced as a lossless integer id-like object so precision survives.
-    return Number.isInteger(Number(match[0])) && match[0] === String(Number(match[0]))
-      ? (Number(match[0]) as JsonValue)
-      : Number(match[0])
-  }
-  const string = (): string => {
-    if (text[index] !== '"') throw new CodexProtocolError('invalid_json', 'Expected a string')
-    let out = ''
-    index += 1
-    while (index < text.length) {
-      const char = text[index]!
-      if (char === '"') {
-        index += 1
-        return out
-      }
-      if (char === '\\') {
-        const next = text[index + 1]
-        index += 2
-        switch (next) {
-          case '"':
-            out += '"'
-            break
-          case '\\':
-            out += '\\'
-            break
-          case '/':
-            out += '/'
-            break
-          case 'b':
-            out += '\b'
-            break
-          case 'f':
-            out += '\f'
-            break
-          case 'n':
-            out += '\n'
-            break
-          case 'r':
-            out += '\r'
-            break
-          case 't':
-            out += '\t'
-            break
-          case 'u': {
-            out += String.fromCharCode(Number.parseInt(text.slice(index, index + 4), 16))
-            index += 4
-            break
-          }
-          default:
-            throw new CodexProtocolError('invalid_json', 'Invalid escape')
-        }
-        continue
-      }
-      out += char
-      index += 1
-    }
-    throw new CodexProtocolError('invalid_json', 'Unterminated string')
-  }
-  const result = value()
-  ws()
-  if (index !== text.length) throw new CodexProtocolError('invalid_json', 'Trailing characters')
-  return result
 }
 
 /** Read an id without losing its type or precision. */
 export function losslessId(raw: unknown): LosslessId {
   if (typeof raw === 'string') return { kind: 'string', value: raw }
-  if (typeof raw === 'number' && Number.isInteger(raw)) return { kind: 'integer', decimal: String(raw) }
+  if (typeof raw === 'number' && Number.isSafeInteger(raw)) return { kind: 'integer', decimal: String(raw) }
+  if (raw && typeof raw === 'object' && integerTokens.has(raw) && 'decimal' in raw && typeof raw.decimal === 'string')
+    return { kind: 'integer', decimal: raw.decimal }
   throw new CodexProtocolError('invalid_id', `Unsupported JSON-RPC id: ${JSON.stringify(raw)}`)
 }
 
@@ -194,13 +85,19 @@ export function idKey(id: LosslessId): string {
 }
 
 /** Serialize an id back to the wire without changing its type. */
-export function idToWire(id: LosslessId): string | number {
+export function idToWire(id: LosslessId): JsonValue {
   if (id.kind === 'string') return id.value
+  if (
+    !/^-?\d{1,19}$/.test(id.decimal) ||
+    BigInt(id.decimal) < -9223372036854775808n ||
+    BigInt(id.decimal) > 9223372036854775807n
+  )
+    throw new CodexProtocolError('invalid_id', 'Native integer request id is outside int64')
   const asNumber = Number(id.decimal)
   // Only emit a bare number when the value round-trips exactly.
   return BigInt(id.decimal) <= BigInt(Number.MAX_SAFE_INTEGER) && BigInt(id.decimal) >= BigInt(Number.MIN_SAFE_INTEGER)
     ? asNumber
-    : id.decimal
+    : (JSON as unknown as { rawJSON(value: string): JsonValue }).rawJSON(id.decimal)
 }
 
 export type SessionState = 'uninitialized' | 'initialized' | 'closed'
@@ -220,11 +117,24 @@ export class CodexConnection {
   readonly #epoch = ++connectionSeq
   /** Server-initiated requests this connection is still allowed to answer. */
   readonly #serverRequests = new Map<string, LosslessId>()
-  readonly #open = new Map<string, { method: string; resolve: (value: JsonValue) => void; reject: (error: Error) => void }>()
-  readonly #decoder = new JsonLineDecoder({ maxFrameBytes: 16 * 1024 * 1024, maxBufferedBytes: 32 * 1024 * 1024 })
+  readonly #open = new Map<
+    string,
+    {
+      method: string
+      resolve: (value: JsonValue) => void
+      reject: (error: Error) => void
+      timer: ReturnType<typeof setTimeout>
+    }
+  >()
+  readonly #decoder = new JsonLineDecoder({
+    maxFrameBytes: 16 * 1024 * 1024,
+    maxBufferedBytes: 32 * 1024 * 1024,
+    parse: parseLossless,
+  })
   readonly #send: (bytes: Uint8Array) => void
   readonly #requests: Array<{ method: string; params?: JsonValue }> = []
   readonly #notifications: Array<{ method: string; params?: JsonValue; id?: JsonValue }> = []
+  #notificationBytes = 0
 
   constructor(send: (bytes: Uint8Array) => void) {
     this.#send = send
@@ -251,10 +161,15 @@ export class CodexConnection {
   receivedNotifications(): ReadonlyArray<{ method: string; params?: JsonValue; id?: JsonValue }> {
     return this.#notifications
   }
+  drainNotifications() {
+    this.#notificationBytes = 0
+    return this.#notifications.splice(0)
+  }
 
   /** `initialize` then `initialized`; the connection becomes usable only afterwards. */
   async initialize(clientInfo: { name: string; version: string }, capabilities: JsonValue = {}): Promise<JsonValue> {
-    if (this.#state !== 'uninitialized') throw new CodexProtocolError('bad_state', `Cannot initialize from ${this.#state}`)
+    if (this.#state !== 'uninitialized')
+      throw new CodexProtocolError('bad_state', `Cannot initialize from ${this.#state}`)
     const result = await this.request('initialize', { clientInfo, capabilities })
     this.notify('initialized', {})
     this.#state = 'initialized'
@@ -264,14 +179,32 @@ export class CodexConnection {
   /** Send a request and resolve with its result; the id is allocated by this connection only. */
   request(method: string, params?: JsonValue): Promise<JsonValue> {
     if (this.#state === 'closed') throw new CodexProtocolError('connection_closed', 'Connection is closed')
+    if (this.#open.size >= 256) throw new CodexProtocolError('request_capacity', 'Too many native requests')
     // A global counter (not per connection) so a stale reply can never collide with a new request.
     const id: LosslessId = { kind: 'integer', decimal: String(++idSeq) }
     const key = idKey(id)
-    const frame: RpcRequest = { jsonrpc: '2.0', id: idToWire(id) as never, method, ...(params === undefined ? {} : { params }) }
+    const frame: RpcRequest = {
+      jsonrpc: '2.0',
+      id: idToWire(id) as never,
+      method,
+      ...(params === undefined ? {} : { params }),
+    }
     this.#requests.push({ method, ...(params === undefined ? {} : { params }) })
+    if (this.#requests.length > 256) this.#requests.shift()
     return new Promise<JsonValue>((resolve, reject) => {
-      this.#open.set(key, { method, resolve, reject })
-      this.#send(encodeFrame(frame))
+      const timer = setTimeout(() => {
+        this.#open.delete(key)
+        reject(new CodexProtocolError('request_timeout', `Native ${method} request timed out`))
+      }, 30000)
+      timer.unref()
+      this.#open.set(key, { method, resolve, reject, timer })
+      try {
+        this.#send(encodeFrame(frame))
+      } catch (error) {
+        clearTimeout(timer)
+        this.#open.delete(key)
+        reject(error as Error)
+      }
     })
   }
 
@@ -287,14 +220,25 @@ export class CodexConnection {
    * received it, so a stale binding from an older connection is refused rather than replayed.
    */
   trackServerRequest(id: LosslessId): void {
+    if (this.#serverRequests.has(idKey(id)))
+      throw new CodexProtocolError('duplicate_server_request', 'Native request id was reused while pending')
+    if (this.#serverRequests.size >= 256)
+      throw new CodexProtocolError('request_capacity', 'Too many native server requests')
     this.#serverRequests.set(idKey(id), id)
   }
 
   /** Claim a tracked server request for an answer; throws when this connection never received it. */
-  claimServerRequest(nativeBindingRef: string): LosslessId {
-    const claimed = this.#serverRequests.get(`string:${nativeBindingRef}`) ?? this.#serverRequests.get(`integer:${nativeBindingRef}`)
+  claimServerRequest(nativeBindingRef: string | LosslessId): LosslessId {
+    const claimed =
+      typeof nativeBindingRef === 'string'
+        ? (this.#serverRequests.get(`string:${nativeBindingRef}`) ??
+          this.#serverRequests.get(`integer:${nativeBindingRef}`))
+        : this.#serverRequests.get(idKey(nativeBindingRef))
     if (!claimed) {
-      throw new CodexProtocolError('stale_server_request', 'No such server request on this connection; it is stale or belongs to another connection')
+      throw new CodexProtocolError(
+        'stale_server_request',
+        'No such server request on this connection; it is stale or belongs to another connection',
+      )
     }
     return claimed
   }
@@ -304,7 +248,10 @@ export class CodexConnection {
     if (this.#state === 'closed') throw new CodexProtocolError('connection_closed', 'Connection is closed')
     const key = idKey(id)
     if (!this.#serverRequests.has(key)) {
-      throw new CodexProtocolError('stale_server_request', `Server request ${key} was already answered or never received`)
+      throw new CodexProtocolError(
+        'stale_server_request',
+        `Server request ${key} was already answered or never received`,
+      )
     }
     this.#serverRequests.delete(key)
     this.#send(encodeFrame({ jsonrpc: '2.0', id: idToWire(id) as never, result }))
@@ -317,28 +264,38 @@ export class CodexConnection {
 
   /** Feed a chunk from the child; responses settle their requests, notifications are recorded. */
   receive(chunk: Uint8Array): void {
+    if (this.#state === 'closed') return
     for (const frame of this.#decoder.push(chunk)) {
-      const message = parseLossless(JSON.stringify(frame.value)) as Record<string, JsonValue>
+      const message = frame.value as Record<string, JsonValue>
+      if (!message || typeof message !== 'object' || Array.isArray(message))
+        throw new CodexProtocolError('invalid_frame', 'Native frame must be an object')
       if (message.error !== undefined && message.id !== undefined) {
         const id = losslessId(message.id)
         const entry = this.#open.get(idKey(id))
         if (!entry) continue // a reply to a request this connection no longer owns
         this.#open.delete(idKey(id))
+        clearTimeout(entry.timer)
         const error = message.error as unknown as RpcError
         entry.reject(new CodexProtocolError('rpc_error', `${error.code}: ${error.message}`))
         continue
       }
       // A server *request* also carries an `id`, but it is neither a result nor an error: it has a
       // `method` and must be recorded as an incoming request, not treated as a reply.
-      if (message.id !== undefined && message.method === undefined && (message.result !== undefined || message.error === undefined)) {
+      if (message.id !== undefined && message.method === undefined) {
+        if (message.result === undefined)
+          throw new CodexProtocolError('invalid_response', 'Native response needs a result or error')
         const id = losslessId(message.id)
         const entry = this.#open.get(idKey(id))
         if (!entry) continue
         this.#open.delete(idKey(id))
+        clearTimeout(entry.timer)
         entry.resolve(message.result ?? null)
         continue
       }
       if (typeof message.method === 'string') {
+        this.#notificationBytes += frame.bytes
+        if (this.#notifications.length >= 4096 || this.#notificationBytes > 8 * 1024 * 1024)
+          throw new CodexProtocolError('notification_capacity', 'Native notification backlog exceeded its bound')
         // A server-initiated request keeps its top-level id; a plain notification has none.
         this.#notifications.push({
           method: message.method,
@@ -353,7 +310,13 @@ export class CodexConnection {
   close(reason = 'closed'): void {
     if (this.#state === 'closed') return
     this.#state = 'closed'
-    for (const entry of this.#open.values()) entry.reject(new CodexProtocolError('connection_closed', reason))
+    for (const entry of this.#open.values()) {
+      clearTimeout(entry.timer)
+      entry.reject(new CodexProtocolError('connection_closed', reason))
+    }
     this.#open.clear()
+    this.#serverRequests.clear()
+    this.#notifications.splice(0)
+    this.#notificationBytes = 0
   }
 }

@@ -24,6 +24,7 @@ export const RUNNER_BRIDGE_PROTOCOL = 1 as const
 
 /** Server -> client frames. */
 export type BridgeDownstream =
+  | { v: 1; type: 'native-write-intent'; id: string; command: RunnerCommand }
   /** Sent once, after spawn/bootstrap and before any command is accepted. */
   | { v: 1; type: 'ready'; id: string; attemptId: string; pid: number; journalPath: string; protocol: 1 }
   /** A durable receipt for a critical fact (only after the sink persisted it). */
@@ -34,6 +35,7 @@ export type BridgeDownstream =
 
 /** Client -> server frames. */
 export type BridgeUpstream =
+  | { v: 1; type: 'write-admission'; id: string; allowed: boolean }
   /** Bootstrap: the structured spec, payload roots and the owner of the attempt. */
   | {
       v: 1

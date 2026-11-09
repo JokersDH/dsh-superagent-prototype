@@ -60,6 +60,7 @@ export class AttemptRunner {
   readonly #progress: ProgressCoalescer
   #spec: AttemptSpec | undefined
   #capacityExhausted = false
+  #admissionClosed = false
 
   constructor(options: RunnerOptions) {
     this.#payloads = options.payloads
@@ -102,6 +103,7 @@ export class AttemptRunner {
    * anything can reach the native process.
    */
   feed(command: RunnerCommand): void {
+    if (this.#admissionClosed) throw new DriverError('state_indeterminate', 'admission_closed', 'Attempt command admission is closed')
     // A command may be queued before launch (the Supervisor does exactly that); when the attempt is
     // known, the full tuple must match it.
     const parsed = RunnerCommandSchema.safeParse(command)
@@ -152,6 +154,11 @@ export class AttemptRunner {
   }
 
   /** Physical stop: signal owned resources and return only proven quiescence. */
+  closeAdmission(): void {
+    this.#admissionClosed = true
+    this.commands.close('admission_closed', true)
+    this.#processHost.closeAdmission()
+  }
   stopPhysical(deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
     return this.#processHost.stopAll(deadlineMs)
   }

@@ -29,6 +29,10 @@ export type RunnerLinkOptions = {
   /** Directory for the journal and payload roots; a temp dir is created when omitted. */
   stateRoot?: string
   env?: Record<string, string>
+  payloads?: { read(reference: string): Promise<Json> }
+  beforeNativeWrite?: (command: RunnerCommand) => Promise<void>
+  onProgress?: (text: string) => void
+  producer?: { source: string; runnerIdentityRef: string }
 }
 
 export type SpawnedRunner = {
@@ -76,7 +80,7 @@ export class RunnerLink {
     const child: ChildProcessWithoutNullStreams = spawn(
       this.#options.executable,
       [this.#options.entry, ...(this.#options.args ?? [])],
-      { stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, ...this.#options.env } },
+      { stdio: ['pipe', 'pipe', 'pipe'], detached: true, env: { ...process.env, ...this.#options.env } },
     ) as ChildProcessWithoutNullStreams
 
     const decoder = new JsonLineDecoder({ maxFrameBytes: 8 * 1024 * 1024, maxBufferedBytes: 16 * 1024 * 1024 })
@@ -112,6 +116,12 @@ export class RunnerLink {
     let ready = false
     let coordinatorSink: ((fact: CriticalFact) => Promise<DurableReceipt>) | undefined
     const handle = (frame: BridgeDownstream | Record<string, unknown>): void => {
+      if (frame.type === 'native-write-intent') {
+        const incoming = frame as { id: string; command: RunnerCommand }
+        void this.#options.beforeNativeWrite?.(incoming.command).then(() => write({ type: 'write-admission', id: incoming.id, allowed: true })).catch(() => write({ type: 'write-admission', id: incoming.id, allowed: false }))
+        if (!this.#options.beforeNativeWrite) write({ type: 'write-admission', id: incoming.id, allowed: false })
+        return
+      }
       // A fact crosses the bridge so the coordinator's authoritative ingress decides its receipt.
       if ((frame as { type?: string }).type === 'fact') {
         const incoming = frame as unknown as { id: string; fact: CriticalFact }
@@ -130,12 +140,11 @@ export class RunnerLink {
       // The Runner asks for payloads; only the coordinator holds the immutable store.
       if ((frame as { type?: string }).type === 'payload-read') {
         const request = frame as { requestId: string; reference: string }
-        const value = this.#payloads.get(request.reference)
-        if (value === undefined) {
-          stderr += `\nmissing payload reference ${request.reference}`
-          return
-        }
-        write({ type: 'payload', id: request.requestId, requestId: request.requestId, value })
+        void (async () => {
+          const value = this.#payloads.get(request.reference) ?? await this.#options.payloads?.read(request.reference)
+          if (value === undefined) throw new Error('Missing payload')
+          write({ type: 'payload', id: request.requestId, requestId: request.requestId, value })
+        })().catch(() => { stderr += '\nmissing immutable payload'; child.kill('SIGTERM') })
         return
       }
       const downstream = frame as BridgeDownstream
@@ -148,6 +157,7 @@ export class RunnerLink {
           break
         case 'progress':
           progress.push(downstream.text)
+          this.#options.onProgress?.(downstream.text)
           break
         case 'exited':
           exitFrame = downstream
@@ -176,7 +186,7 @@ export class RunnerLink {
       spec,
       payloadRoot: join(stateRoot, 'payloads'),
       journalPath,
-      producer: { source: 'runner-link', runnerIdentityRef: `runner-${spec.attemptId}` },
+      producer: this.#options.producer ?? { source: 'runner-link', runnerIdentityRef: `runner-${spec.attemptId}` },
     })
     await new Promise<void>((resolve, reject) => {
       let settled = false
@@ -208,6 +218,7 @@ export class RunnerLink {
       close: async () => {
         try {
           write({ type: 'shutdown' })
+          child.stdin.end()
         } catch {
           // stdin may already be closed
         }

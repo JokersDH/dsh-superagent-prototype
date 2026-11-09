@@ -69,6 +69,9 @@ test('stopOwned confirms quiescence for a live child and records exit evidence',
   assert.ok(stopped.evidenceRefs.includes('group-quiescent'), JSON.stringify(stopped.evidenceRefs))
   assert.ok(stopped.evidenceRefs.some(ref => ref.startsWith('leader:')), JSON.stringify(stopped.evidenceRefs))
   assert.deepEqual(host.resources(), [], 'a confirmed stop releases the handle')
+  const repeated = await host.stopOwned(resource.resourceRef, 100)
+  assert.equal(repeated.quiescence, 'confirmed', 'confirmed ownership evidence must not downgrade after releasing the handle')
+  assert.deepEqual(repeated.evidenceRefs, stopped.evidenceRefs)
 })
 
 test('a stale start marker is treated as a reused pid and never signalled', async () => {

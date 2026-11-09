@@ -1,0 +1,75 @@
+{
+  "$defs": {
+    "ProjectRegistrationInput": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "check": {
+          "enum": [
+            "node_test",
+            "pnpm_test",
+            "npm_test"
+          ],
+          "type": "string"
+        },
+        "displayName": {
+          "maxLength": 160,
+          "minLength": 1,
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "check"
+      ],
+      "type": "object"
+    },
+    "WorkLocation": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "baseCommit": {
+          "anyOf": [
+            {
+              "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "projectPath": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "workspacePath": {
+          "anyOf": [
+            {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "projectPath",
+        "workspacePath",
+        "baseCommit"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:project-configuration:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

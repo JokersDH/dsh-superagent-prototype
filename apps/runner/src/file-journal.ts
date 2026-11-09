@@ -242,7 +242,11 @@ export class FileCriticalJournal {
 
   /** Read every intact entry (used by replay and by tests). */
   entries(): JournalEntry[] {
-    return this.#fd === undefined ? [] : readEntriesSync(this.#path, this.#maxBytes, this.#maxRecordBytes).entries
+    if (this.#fd === undefined) return []
+    const snapshot = readEntriesSync(this.#path, this.#maxBytes, this.#maxRecordBytes)
+    if (snapshot.corruptAt !== null || snapshot.readOnly || snapshot.partialTailBytes)
+      throw new DriverError('state_indeterminate', 'journal_snapshot_unverified', 'Whole-file journal verification failed before replay')
+    return snapshot.entries
   }
 
   close(): void {

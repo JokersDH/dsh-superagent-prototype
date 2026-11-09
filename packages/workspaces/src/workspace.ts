@@ -10,7 +10,8 @@
  */
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 
 /** The attempt an attempt-worktree belongs to; the Assignment identity is recorded, never invented. */
@@ -47,8 +48,11 @@ export interface FrozenArtifact {
   baseCommit: string
   headCommit: string
   artifactDigest: string
+  /** Attempt-neutral, content-addressed manifest of the frozen content. */
   manifestPath: string
-  /** Content-addressed diff of the attempt worktree against its base commit (includes deletions). */
+  /** Per-attempt index that maps this attempt to the content-addressed manifest/patch. */
+  manifestRefPath: string
+  /** Content-addressed diff of the attempt worktree against its base commit (includes deletions and untracked contents). */
   patchPath: string
   files: number
   dirty: boolean
@@ -75,11 +79,35 @@ interface ManifestEntry {
 
 const ATTEMPT_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/
 
+const MAX_GIT_BUFFER = 64 * 1024 * 1024
 const git = (cwd: string, args: readonly string[]): string =>
-  execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+  execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: MAX_GIT_BUFFER }).trim()
 
 const gitBuffer = (cwd: string, args: readonly string[]): Buffer =>
-  execFileSync('git', args, { cwd, stdio: ['ignore', 'pipe', 'pipe'] })
+  execFileSync('git', args, { cwd, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: MAX_GIT_BUFFER })
+
+const gitBufferWithIndex = (cwd: string, args: readonly string[], indexFile: string): Buffer =>
+  execFileSync('git', args, { cwd, env: { ...process.env, GIT_INDEX_FILE: indexFile }, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: MAX_GIT_BUFFER })
+
+/**
+ * Working-tree patch against a base commit that includes the contents of untracked files. Git's
+ * real index is untouched: a temporary index is seeded from the base, the untracked paths are marked
+ * intent-to-add there, and `git diff --binary <base>` renders tracked changes plus new files (text,
+ * binary, symlink and executable modes) without modifying the user's tree or index.
+ */
+function workingTreePatch(cwd: string, base: string, untracked: readonly string[]): Buffer {
+  if (!untracked.length) return gitBuffer(cwd, ['diff', '--binary', base])
+  const directory = mkdtempSync(join(tmpdir(), 'pa-worktree-patch-'))
+  try {
+    const indexFile = join(directory, 'index')
+    const actualIndex = resolve(cwd, git(cwd, ['rev-parse', '--git-path', 'index']))
+    copyFileSync(actualIndex, indexFile)
+    gitBufferWithIndex(cwd, ['add', '-A', '--', '.'], indexFile)
+    return gitBufferWithIndex(cwd, ['diff', '--cached', '--binary', base], indexFile)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+}
 
 const sha256 = (data: string | Buffer): string => createHash('sha256').update(data).digest('hex')
 
@@ -135,6 +163,10 @@ export class WorkspaceManager {
   private recordPath(attemptId: string): string { return join(this.rootDir, 'attempt-records', `${attemptId}.json`) }
   private patchPath(attemptId: string): string { return join(this.rootDir, 'attempt-records', `${attemptId}.user.patch`) }
   attemptPath(attemptId: string): string { return join(this.attemptRoot, attemptId) }
+  location(ref: { attemptId: string }): { projectPath: string; path: string; baseCommit: string } {
+    const record = this.record(ref.attemptId)
+    return { projectPath: record.projectPath, path: this.attemptPath(ref.attemptId), baseCommit: record.baseCommit }
+  }
 
   /**
    * Reserves a detached worktree for an attempt at the project's base commit. The user's dirty
@@ -161,7 +193,8 @@ export class WorkspaceManager {
     const status = statusEntries(gitBuffer(projectRoot, ['status', '--porcelain=v1', '-z']).toString('utf8'))
     const changedFiles = status.filter(entry => !entry.status.includes('?')).map(entry => entry.path).sort()
     const untrackedFiles = status.filter(entry => entry.status === '??').map(entry => entry.path).sort()
-    const patch = changedFiles.length ? gitBuffer(projectRoot, ['diff', 'HEAD']) : Buffer.alloc(0)
+    // The audit patch is the complete user delta at reserve time, including untracked new files.
+    const patch = workingTreePatch(projectRoot, 'HEAD', untrackedFiles)
     const patchPath = this.patchPath(assignment.attemptId)
     writeFileSync(patchPath, patch, { mode: 0o600 })
     const userWorktree: UserWorktreeSnapshot = { baseCommit, patchPath, changedFiles, untrackedFiles }
@@ -189,14 +222,23 @@ export class WorkspaceManager {
     const frozen = this.computeManifest(ref.attemptId)
     const manifestPath = join(this.manifestRoot, `${frozen.artifactDigest}.json`)
     const patchPath = join(this.manifestRoot, `${frozen.artifactDigest}.patch`)
+    const refDir = join(this.manifestRoot, 'attempts')
+    const manifestRefPath = join(refDir, `${ref.attemptId}.${frozen.artifactDigest}.json`)
     mkdirSync(this.manifestRoot, { recursive: true, mode: 0o700 })
+    mkdirSync(refDir, { recursive: true, mode: 0o700 })
+    // The content-addressed manifest must not claim an attempt: an identical later attempt shares
+    // the same bytes. Attempt identity lives in its own (attempt, digest) index instead.
     if (!existsSync(manifestPath)) {
-      writeFileSync(manifestPath, `${JSON.stringify({ attemptId: ref.attemptId, baseCommit: frozen.baseCommit, headCommit: frozen.headCommit,
+      writeFileSync(manifestPath, `${JSON.stringify({ baseCommit: frozen.baseCommit, headCommit: frozen.headCommit,
         status: frozen.status, files: frozen.entries, patchSha256: frozen.patchSha256, environment: frozen.environment, artifactDigest: frozen.artifactDigest }, null, 2)}\n`, { mode: 0o600 })
     }
     if (!existsSync(patchPath)) writeFileSync(patchPath, frozen.patch, { mode: 0o600 })
+    if (!existsSync(manifestRefPath)) {
+      writeFileSync(manifestRefPath, `${JSON.stringify({ attemptId: ref.attemptId, artifactDigest: frozen.artifactDigest, manifestPath, patchPath,
+        frozenAt: new Date().toISOString() }, null, 2)}\n`, { mode: 0o600 })
+    }
     return { attemptId: ref.attemptId, baseCommit: frozen.baseCommit, headCommit: frozen.headCommit, artifactDigest: frozen.artifactDigest,
-      manifestPath, patchPath, files: frozen.entries.length, dirty: frozen.status.length > 0, environment: frozen.environment }
+      manifestPath, manifestRefPath, patchPath, files: frozen.entries.length, dirty: frozen.status.length > 0, environment: frozen.environment }
   }
 
   /** Recomputes the artifact digest without writing anything, so an audit manifest is preserved. */
@@ -233,7 +275,8 @@ export class WorkspaceManager {
       const data = readFileSync(absolute)
       return { path: file, kind: 'file', sha256: sha256(data), bytes: data.byteLength, executable: (stat.mode & 0o111) !== 0 }
     })
-    const patch = gitBuffer(path, ['diff', 'HEAD'])
+    // The delivery patch must reproduce new/untracked files as well as tracked changes/deletions.
+    const patch = workingTreePatch(path, record.baseCommit, untracked)
     const patchSha256 = sha256(patch)
     const environment: Record<string, string> = { node: process.version, platform: process.platform, arch: process.arch }
     const artifactDigest = sha256(JSON.stringify({ baseCommit: record.baseCommit, headCommit, status, entries, patchSha256, environment }))

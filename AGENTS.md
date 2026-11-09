@@ -8,7 +8,16 @@
 - Original prototype code is in `src/`, `tests/`, `prompts/`, `skills/`, and `docs/`. Preserve upstream MIT attribution.
 - New product directories are `packages/` and `apps/` at this repository root. G0 experiments belong in `tools/reuse-spike/`. Do not create another nested Git repository or an unrelated product checkout.
 
-## Current Three-Agent Assignments
+## Native MVP Assignments (2026-11-09)
+
+- Current external task packets are `agent-tasks/native-mvp-02/README.zh-CN.md` and its A/B files. They supersede native-mvp round 1 and the wave-02 path assignments for new work; prior ownership/results below remain historical acceptance context.
+- The user expanded this round for continuous execution while away. Read `agent-tasks/native-mvp-02/extended-run.zh-CN.md` and continue A1-A6, B1-B6, or M1-M6 after the first stable checkpoint without per-item approval. Ownership stays unchanged. On a cross-module blocker, publish an owned minimal repro and continue an independent queued phase. Native model budgets remain bounded; do not keep busy through unlimited retries or polling.
+- External A continues its existing worktree/branch and owns only `packages/environment-preparation/` for the next package. External B continues its existing worktree/branch and owns only `tests/native-acceptance/` for independent native product and recovery acceptance.
+- Main published the console/Codex/Runner MVP at `1f3229f` (implementation `252bf70`). Those product paths remain main-integration owned; external A/B must merge current main and must not overwrite admitted implementations with older candidates.
+- A `f1d4b1f` passes 12 package tests but fails five independent environment admission probes. B `0e62a3d` passes eight harness selftests and five current-main read-only probes, but its native lane remains unimplemented. Neither result expands the published native MVP scope. Read `docs/rfcs/WP-16/0009-native-followup-review.md` for evidence and next-round gates.
+- Contracts, root lock/config, application/HTTP/coordinator, workspaces/verification/console and cross-module integration remain main-owned. Architecture invariants and delivery/credential rules below are unchanged. Main follows `agent-tasks/native-mvp-02/main-integration.zh-CN.md`; the measured native MVP limits remain in `docs/rfcs/WP-16/0008-native-mvp-integration.md`.
+
+## Prior Wave-02 Assignments
 
 - Current execution plan: `agent-tasks/wave-02/README.zh-CN.md`. These outcome-based packages supersede the old G0 and small-fix stopping instructions; old task files remain reference/acceptance checklists.
 - Main agent works in the primary checkout and owns contracts/core, `packages/questions/`, `packages/application/`, deterministic application/HTTP/coordinator composition, root configuration/lock and cross-module integration. Read `agent-tasks/wave-02/main.zh-CN.md`.

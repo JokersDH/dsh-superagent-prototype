@@ -13,21 +13,26 @@
 import { serveRunner } from './runner-service.ts'
 import { FakeDriver } from '../../../packages/testing/src/fake-driver.ts'
 import { CodexNativeDriver } from '../../../packages/drivers/codex-native/src/index.ts'
+import { CodexProductDriver } from '../../../packages/drivers/codex-native/src/native.ts'
 import { createFakeAppServer } from '../../../packages/drivers/codex-native/src/fake-app-server.ts'
 import { ProcessHost } from './process-host.ts'
 import { encodeFrame } from '../../../packages/driver-kit/src/index.ts'
 
 const scenario = process.argv[2] ?? 'happy'
+let detached = false
+process.stdout.on('error', error => { if ((error as NodeJS.ErrnoException).code === 'EPIPE') detached = true; else throw error })
 
 const handle = await serveRunner({
   input: (async function* (): AsyncGenerator<Uint8Array> {
     for await (const chunk of process.stdin) yield chunk as Uint8Array
   })(),
   write: frame => {
-    process.stdout.write(encodeFrame(frame))
+    if (!detached) process.stdout.write(encodeFrame(frame))
   },
-  createDriver: () =>
-    scenario.startsWith('codex-fake')
+  eagerPrepare: scenario === 'codex-native',
+  ...(process.env.PA_RUNNER_RECOVERY_ROOT ? { recoveryRoot: process.env.PA_RUNNER_RECOVERY_ROOT } : {}),
+  createDriver: (_spec, hooks) =>
+    scenario === 'codex-native' ? new CodexProductDriver({ beforeAnswerWrite: hooks.beforeNativeWrite }) : scenario.startsWith('codex-fake')
       ? new CodexNativeDriver({
           // `codex-fake` completes a plain turn; `codex-fake-approval` emits an approval first.
           connect: async () => createFakeAppServer({ approval: scenario === 'codex-fake-approval' }).transport(),
@@ -38,7 +43,7 @@ const handle = await serveRunner({
     read: async (reference: string) => JSON.parse(reference) as never,
   },
   // No local sink: facts are forwarded over the bridge and the coordinator's reply is the receipt.
-  processHost: new ProcessHost(),
+  processHost: new ProcessHost({ resolveCwd: () => process.env.PA_RUNNER_CWD ?? process.cwd() }),
 })
 
 await handle.done

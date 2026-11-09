@@ -13,6 +13,8 @@ import {
   VerificationSchema,
   AssistantProviderStatusSchema,
   AssistantStreamUpdateSchema,
+  ProjectRegistrationInputSchema,
+  WorkLocationSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -26,6 +28,8 @@ import type {
   ProbeReport,
   Snapshot,
   UserCommand,
+  ProjectRegistrationInput,
+  WorkLocation,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -67,6 +71,8 @@ export interface ConsoleTransport {
   assistant?(): Promise<AssistantProviderStatus | undefined>
   assistantChanges?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
   selectModel?(model: string): Promise<AssistantProviderStatus>
+  registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
+  workLocation?(workId: string): Promise<WorkLocation | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -209,6 +215,21 @@ export class HttpTransport implements ConsoleTransport {
   async assistant(): Promise<AssistantProviderStatus | undefined> {
     try {
       return AssistantProviderStatusSchema.parse(await this.request('/v1/assistant'))
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async registerProject(input: ProjectRegistrationInput): Promise<ApplicationConfiguration> {
+    const body = await this.request('/v1/projects', {
+      method: 'POST',
+      body: JSON.stringify(ProjectRegistrationInputSchema.parse(input)),
+    })
+    return ApplicationConfigurationSchema.parse(body)
+  }
+  async workLocation(workId: string): Promise<WorkLocation | undefined> {
+    try {
+      return WorkLocationSchema.parse(await this.request(`/v1/works/${encodeURIComponent(workId)}/location`))
     } catch (error) {
       if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
       throw error

@@ -59,6 +59,9 @@ type Handle = {
 
 export class ProcessHost implements OwnedProcessHost {
   readonly #handles = new Map<string, Handle>()
+  readonly #inventory = new Map<string, { ref: string; ownership: 'spawned_process'; writer: 'active' | 'quiescent' | 'indeterminate'; evidence: string[] }>()
+  readonly #spawning = new Set<Promise<OwnedProcess>>()
+  #admissionClosed = false
   readonly #now: () => number
   readonly #killGraceMs: number
   readonly #resolveCwd: (ref: string) => string
@@ -78,8 +81,16 @@ export class ProcessHost implements OwnedProcessHost {
   resources(): readonly string[] {
     return [...this.#handles.keys()]
   }
+  inventory() { return [...this.#inventory.values()].map(item => structuredClone(item)) }
+  closeAdmission(): void { this.#admissionClosed = true }
 
   async spawn(spec: ProcessSpec): Promise<OwnedProcess> {
+    if (this.#admissionClosed) throw new DriverError('state_indeterminate', 'admission_closed', 'Process admission is closed')
+    const pending = this.#spawn(spec)
+    this.#spawning.add(pending)
+    try { return await pending } finally { this.#spawning.delete(pending) }
+  }
+  async #spawn(spec: ProcessSpec): Promise<OwnedProcess> {
     validateSpec(spec)
     this.#installCleanup()
     const child = spawn(spec.executable, [...spec.argv], {
@@ -126,10 +137,15 @@ export class ProcessHost implements OwnedProcessHost {
     })
     const handle: Handle = { child, identity, resourceRef, exited, exitPromise }
     this.#handles.set(resourceRef, handle)
+    this.#inventory.set(resourceRef, { ref: resourceRef, ownership: 'spawned_process', writer: 'active', evidence: ['owned-process-spawn'] })
     child.once('exit', () => {
       // Keep the handle until stopOwned observes the exit, so late evidence stays addressable.
     })
 
+    if (this.#admissionClosed) {
+      await this.stopOwned(resourceRef, 1500)
+      throw new DriverError('state_indeterminate', 'admission_closed', 'Process admission closed during spawn')
+    }
     return {
       resourceRef,
       identity,
@@ -158,6 +174,14 @@ export class ProcessHost implements OwnedProcessHost {
    * host then fails closed and refuses to signal, because a reused PID may now own that group.
    */
   async stopOwned(resourceRef: string, deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
+    const previous = this.#inventory.get(resourceRef)
+    if (previous?.writer === 'quiescent') return { quiescence: 'confirmed', evidenceRefs: [...previous.evidence] }
+    const result = await this.#stopOwned(resourceRef, deadlineMs)
+    if (this.#inventory.has(resourceRef)) this.#inventory.set(resourceRef, { ref: resourceRef, ownership: 'spawned_process',
+      writer: result.quiescence === 'confirmed' ? 'quiescent' : 'indeterminate', evidence: [...result.evidenceRefs].slice(0, 32) })
+    return result
+  }
+  async #stopOwned(resourceRef: string, deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
     const handle = this.#handles.get(resourceRef)
     if (!handle) return { quiescence: 'indeterminate', evidenceRefs: ['unknown-resource'] }
     const evidence: string[] = []
@@ -274,6 +298,7 @@ export class ProcessHost implements OwnedProcessHost {
 
   /** Stop every owned resource; confirmed only when all are proven quiescent. */
   async stopAll(deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
+    await Promise.allSettled([...this.#spawning])
     const refs = [...this.#handles.keys()]
     if (refs.length === 0) return { quiescence: 'confirmed', evidenceRefs: ['no-owned-resources'] }
     const evidence: string[] = []
@@ -305,6 +330,7 @@ export class ProcessHost implements OwnedProcessHost {
   }
 
   async #write(handle: Handle, frame: Uint8Array): Promise<void> {
+    if (this.#admissionClosed) throw new DriverError('state_indeterminate', 'admission_closed', 'Native write admission is closed')
     if (handle.exited.done) throw new DriverError('transport_lost', 'process_exited', 'Cannot write to an exited process')
     const stdin = handle.child.stdin
     if (!stdin || stdin.destroyed || stdin.writableEnded) {

@@ -27,7 +27,7 @@ for (const args of commands) {
     ...(count ? { tests: count } : {}),
   })
 }
-assert.ok(tests >= 358)
+assert.ok(tests >= 367)
 const report = {
   status: 'PASS_CONTROLLED_WORKBENCH_MODULES',
   sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], {
@@ -42,7 +42,7 @@ const report = {
   limitations: [
     'Controlled work execution and mocked model dialogue; real model smoke evidence is separate',
     'Browser acceptance has a separate report',
-    'A generic workspace candidate and B independent runtime remain blocked by dedicated admission probes',
+    'Native model tasks are a separate explicitly executed lane; general G2, soak and power-loss certification remain separate',
   ],
 }
 writeFileSync(

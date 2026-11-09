@@ -45,6 +45,7 @@ const SERVER_REQUEST_METHODS = [
 ]
 
 export * from './protocol.ts'
+export * from './native.ts'
 
 export type CodexDriverOptions = {
   /** Build a connection for this attempt (real spawn or a fake transport). */

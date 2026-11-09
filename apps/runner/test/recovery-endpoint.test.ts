@@ -130,9 +130,9 @@ test('only a cancel command is accepted on the cancel route', async () => {
   const { endpoint, token } = await open()
   try {
     const begin = await call(endpoint.socketPath, 'POST', '/v1/cancel', token, makeCommand('begin', { inputRef: 'i', preparedPolicyRef: 'prepared-1' }))
-    assert.equal(begin.status, 400)
+    assert.equal(begin.status, 403)
     const malformed = await call(endpoint.socketPath, 'POST', '/v1/cancel', token, { kind: 'nonsense' })
-    assert.equal(malformed.status, 400)
+    assert.equal(malformed.status, 503)
   } finally {
     await endpoint.close()
   }
@@ -177,4 +177,17 @@ test('an existing socket is never reused', async () => {
   } finally {
     await endpoint.close()
   }
+})
+test('a long macOS temporary root gets a private short socket reference without weakening auth', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'long-native-endpoint-'))
+  const spec = makeAttemptSpec()
+  const directory = endpointDirectory(join(root, 'nested-'.repeat(20)), spec.attemptId)
+  assert.ok(Buffer.byteLength(`${directory}/runner.sock`) <= 90)
+  const endpoint = await serveRecoveryEndpoint({ directory, spec, source: 'attempt-runner', runnerIdentityRef: 'long-runner', resources: () => [], state: () => 'serving', cancel: async () => undefined })
+  try {
+    assert.equal(statSync(directory).mode & 0o777, 0o700)
+    assert.equal(readFileSync(endpoint.credentialPath).length, 64)
+    assert.equal((await call(endpoint.socketPath, 'GET', '/v1/inspection', 'wrong-key')).status, 401)
+    assert.equal((await call(endpoint.socketPath, 'GET', '/v1/inspection', readFileSync(endpoint.credentialPath, 'utf8'))).status, 200)
+  } finally { await endpoint.close() }
 })
