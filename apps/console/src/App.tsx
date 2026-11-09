@@ -6,13 +6,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ConversationMessageSchema } from '@personal-agent/contracts'
 import type {
-  AssignmentRef, CandidateRef, CommandReceipt, ContractRef, ConversationMessage, Criterion, QuestionAnswer,
-  Snapshot, UserCommand, UserQuestion, WorkView,
+  ApplicationConfiguration, AssignmentRef, CandidateRef, CommandReceipt, ConfiguredProjectView, ContractRef,
+  ConversationMessage, Criterion, QuestionAnswer, Snapshot, UserCommand, UserQuestion, WorkView,
 } from '@personal-agent/contracts'
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
 import type { FixtureAdapter } from './fixture.ts'
-import { checkCriterionId, checkDefinitionRef, conversationId, defaultProfileId, profileIds } from './config.ts'
+import { conversationId } from './config.ts'
 const phaseLabel: Record<WorkView['phase'], string> = {
   evaluating: '评估中', queued: '已排队', working: '执行中', needs_user: '待你决定', verifying: '验证中',
   switching: '切换中', stopping: '停止中', delivered: '已交付', ended: '已结束', uncertain: '状态不确定',
@@ -33,7 +33,12 @@ const questionKindLabel: Record<UserQuestion['kind'], string> = {
 const newId = (prefix: string): string => `${prefix}-${crypto.randomUUID()}`
 const contractRef = (contract: WorkView['contract']): ContractRef => ({ workId: contract.workId, revision: contract.revision, digest: contract.digest })
 
-interface Problem { code: string; message: string; retry: 'safe' | 'reconcile' | 'user_action' | 'none' }
+interface Problem {
+  code: string
+  message: string
+  retry: 'safe' | 'reconcile' | 'user_action' | 'none'
+  context?: 'question' | 'candidate' | 'work'
+}
 
 const problemOf = (error: unknown): Problem => {
   if (error instanceof TransportError) return { code: error.code, message: error.message, retry: error.retry }
@@ -53,12 +58,42 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [offline, setOffline] = useState<boolean>(() => fixture?.modelOffline() ?? false)
   const [createOpen, setCreateOpen] = useState(false)
   const [auth, setAuth] = useState<'checking' | 'required' | 'ready'>(transport.session ? 'checking' : 'ready')
+  const [configuration, setConfiguration] = useState<ApplicationConfiguration | undefined>(undefined)
+  const [configState, setConfigState] = useState<'loading' | 'ready' | 'unavailable' | 'failed'>(transport.configuration ? 'loading' : 'unavailable')
+  const [configProblem, setConfigProblem] = useState<Problem | undefined>(undefined)
   const [verification, setVerification] = useState<VerificationDetail | undefined>(undefined)
   const [deliveries, setDeliveries] = useState<Record<string, readonly TargetDelivery[]>>({})
   const lastSeq = useRef(0)
   const detailRef = useRef<HTMLElement | null>(null)
   const seen = useRef(new Set<number>())
   const refreshTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  const refreshConfiguration = useCallback(async (): Promise<void> => {
+    if (!transport.configuration) {
+      setConfigState('unavailable')
+      setConfigProblem({ code: 'unsupported_capability', message: '该入口未提供应用配置读取，不能新建委托；已有工作仍可继续查询、回答和停止。', retry: 'user_action' })
+      return
+    }
+    setConfigState(previous => previous === 'ready' ? 'ready' : 'loading')
+    try {
+      const next = await transport.configuration()
+      if (!next) {
+        setConfigState('unavailable')
+        setConfigProblem({ code: 'unsupported_capability', message: '该入口未提供应用配置读取，不能新建委托；已有工作仍可继续查询、回答和停止。', retry: 'user_action' })
+        return
+      }
+      setConfiguration(next)
+      setConfigState('ready')
+      setConfigProblem(undefined)
+    } catch (error) {
+      setConfigState('failed')
+      setConfigProblem(problemOf(error))
+    }
+  }, [transport])
+
+  useEffect(() => {
+    if (auth === 'ready') void refreshConfiguration()
+  }, [auth, refreshConfiguration])
 
   const refresh = useCallback(async (query: { workId?: string } = {}): Promise<void> => {
     try {
@@ -171,7 +206,11 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     try {
       const receipt = await transport.dispatch(command)
       if (receipt.status === 'rejected') {
-        setProblem({ code: receipt.error.code, message: receipt.error.message, retry: receipt.error.retry })
+        setProblem({
+          code: receipt.error.code, message: receipt.error.message, retry: receipt.error.retry,
+          ...(command.kind === 'answer_question' ? { context: 'question' as const } : {}),
+          ...(command.kind === 'accept_candidate' ? { context: 'candidate' as const } : {}),
+        })
       } else {
         const reference = command.kind === 'answer_question' ? command.questionId : undefined
         if (reference && transport.deliveries) {
@@ -258,20 +297,17 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           </div>
           {createOpen && (
             <NewWorkForm
-              projects={projects}
-              profiles={profileIds}
-              initialProfile={defaultProfileId}
+              configuration={configuration}
+              state={configState}
+              problem={configProblem}
               pending={pending === 'create_work'}
+              onReload={() => void refreshConfiguration()}
               onCancel={() => setCreateOpen(false)}
-              onCreate={async (goal, projectId, allowedPath, profileId) => {
+              onCreate={async (goal, project: ConfiguredProjectView, profileId) => {
+                if (!project.dispatchAllowed) return
                 const receipt = await send({
-                  commandId: newId('cmd-work'), conversationId, kind: 'create_work', projectId, goal,
-                  scope: { projectId, allowedPaths: [allowedPath], excludedPaths: [], externalActions: [] },
-                  criteria: [
-                    { id: checkCriterionId, kind: 'machine', description: '已注册输出检查通过', required: true, checkDefinitionRef },
-                    { id: 'review', kind: 'human', description: '用户验收结果', required: true },
-                  ],
-                  profileId,
+                  commandId: newId('cmd-work'), conversationId, kind: 'create_work', projectId: project.id, goal,
+                  scope: project.scope, criteria: project.defaultCriteria, profileId,
                 }, 'create_work')
                 if (receipt?.status === 'recorded' && receipt.workId) {
                   setCreateOpen(false)
@@ -353,6 +389,13 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             }}
             onAccept={async (candidate: CandidateRef) => {
               await send({ commandId: newId('cmd-accept'), conversationId, kind: 'accept_candidate', candidate }, 'accept')
+            }}
+            onRevise={async (work, goal) => {
+              const receipt = await send({
+                commandId: newId('cmd-revise'), conversationId, kind: 'revise_work',
+                expected: contractRef(work.contract), goal, scope: work.contract.scope, criteria: work.contract.criteria,
+              }, 'revise')
+              return receipt?.status === 'recorded'
             }}
           />
           <ExecutorPanel transport={transport} />
@@ -457,40 +500,70 @@ function Artifacts({ ids, reader }: {
   )
 }
 
-function NewWorkForm({ projects, profiles, initialProfile, pending, onCreate, onCancel }: {
-  projects: readonly string[]
-  profiles: readonly string[]
-  initialProfile: string
+const blockedLabel = (reason?: string): string => {
+  if (reason === 'stale_contract') return '项目授权已过期'
+  if (reason === 'unsupported_capability') return '执行器不可调度'
+  if (reason === 'auth_required') return '需要重新认证'
+  if (reason === 'budget_exceeded') return '预算或会话受限'
+  return reason ? `暂不可调度（${reason}）` : '暂不可调度'
+}
+
+function NewWorkForm({ configuration, state, problem, pending, onReload, onCreate, onCancel }: {
+  configuration: ApplicationConfiguration | undefined
+  state: 'loading' | 'ready' | 'unavailable' | 'failed'
+  problem: Problem | undefined
   pending: boolean
-  onCreate: (goal: string, projectId: string, allowedPath: string, profileId: string) => Promise<unknown>
+  onReload: () => void
+  onCreate: (goal: string, project: ConfiguredProjectView, profileId: string) => Promise<unknown>
   onCancel: () => void
 }) {
   const [goal, setGoal] = useState('')
-  const [project, setProject] = useState(projects[0] ?? 'project-atlas')
-  const [allowedPath, setAllowedPath] = useState('src/')
-  const [profile, setProfile] = useState(initialProfile)
+  const [projectChoice, setProjectChoice] = useState('')
+  const [profileChoice, setProfileChoice] = useState('')
+  const projects = configuration?.projects ?? []
+  const project = projects.find(item => item.id === projectChoice) ?? projects.find(item => item.dispatchAllowed) ?? projects[0]
+  const profiles = (configuration?.profiles ?? []).filter(profile => profile.dispatchAllowed && project?.profileIds.includes(profile.id))
+  const profile = profiles.find(item => item.id === profileChoice) ?? profiles.find(item => item.id === project?.defaultProfileId) ?? profiles[0]
+  const usable = state === 'ready' && project?.dispatchAllowed === true && profile !== undefined && !pending
   return (
     <form className="new-work" onSubmit={async event => {
       event.preventDefault()
-      if (!goal.trim()) return
-      await onCreate(goal.trim(), project, allowedPath.trim() || 'src/', profile)
+      if (!usable || !project || !profile || !goal.trim()) return
+      await onCreate(goal.trim(), project, profile.id)
     }}>
+      <div className="config-line">
+        <span>应用配置</span>
+        {state === 'ready' && configuration ? <span className="mini">revision {configuration.revision.slice(0, 10)}…</span> : <span className="mini warn">{state === 'loading' ? '读取中' : '不可用'}</span>}
+        <button type="button" className="quiet" onClick={onReload}>刷新配置</button>
+      </div>
+      {state === 'loading' && <p className="empty">正在读取项目、Profile 与检查配置…</p>}
+      {state !== 'loading' && state !== 'ready' && problem && (
+        <p className="warn-text" role="alert">{problem.message}
+          <button type="button" className="quiet" onClick={onReload}>重试</button>
+        </p>
+      )}
+      {state === 'ready' && project && !project.dispatchAllowed && (
+        <p className="warn-text" role="alert">新委托已禁用：{blockedLabel(project.blockedReason)}。查询、回答和停止仍可用。</p>
+      )}
       <label><span>目标</span><textarea rows={3} required value={goal} onChange={event => setGoal(event.target.value)} /></label>
       <label><span>项目</span>
-        {projects.length
-          ? <select value={project} onChange={event => setProject(event.target.value)}>
-              {projects.map(item => <option key={item} value={item}>{item}</option>)}
-            </select>
-          : <input type="text" required value={project} onChange={event => setProject(event.target.value)} placeholder="project-atlas" />}
-      </label>
-      <label><span>允许路径</span><input type="text" required value={allowedPath} onChange={event => setAllowedPath(event.target.value)} /></label>
-      <label><span>执行器 Profile</span>
-        <select value={profile} onChange={event => setProfile(event.target.value)}>
-          {profiles.map(item => <option key={item} value={item}>{item}</option>)}
+        <select value={project?.id ?? ''} disabled={!configuration || !projects.length} onChange={event => { setProjectChoice(event.target.value); setProfileChoice('') }}>
+          {projects.map(item => <option key={item.id} value={item.id}>{item.displayName}{item.dispatchAllowed ? '' : '（不可调度）'}</option>)}
         </select>
       </label>
+      <label><span>执行器 Profile</span>
+        <select value={profile?.id ?? ''} disabled={!profiles.length} onChange={event => setProfileChoice(event.target.value)}>
+          {profiles.map(item => <option key={item.id} value={item.id} title={`${item.displayName} (${item.id})`}>{item.displayName}</option>)}
+        </select>
+      </label>
+      {project && (
+        <div className="config-summary">
+          <p><span>允许路径</span><code>{project.scope.allowedPaths.join(', ') || '—'}</code></p>
+          <p><span>初始标准</span>{project.defaultCriteria.map(criterion => `${criterion.description}（${criterion.kind === 'machine' ? '机器' : '人工'}${criterion.required ? ' · 必需' : ''}）`).join('；')}</p>
+        </div>
+      )}
       <div className="actions">
-        <button type="submit" disabled={pending || !goal.trim()}>{pending ? '创建中…' : '创建委托'}</button>
+        <button type="submit" disabled={!usable || !goal.trim()}>{pending ? '创建中…' : '创建委托'}</button>
         <button type="button" className="quiet" onClick={onCancel}>取消</button>
       </div>
     </form>
@@ -536,10 +609,16 @@ function ExecutorPanel({ transport }: { transport: ConsoleTransport }) {
 }
 
 function ErrorPanel({ problem, onRefresh, onDismiss }: { problem: Problem; onRefresh: () => void; onDismiss: () => void }) {
+  const title =
+    problem.code === 'stale_candidate' || problem.context === 'candidate'
+      ? '候选已过期'
+      : problem.context === 'question' || problem.code === 'question_expired'
+        ? '问题已过期或已变化，请刷新后重试'
+        : '操作未完成'
   return (
     <div className="error-panel" role="alert">
       <div>
-        <strong>{problem.code === 'stale_candidate' ? '候选已过期' : problem.code === 'question_expired' ? '问题已过期' : '操作未完成'}</strong>
+        <strong>{title}</strong>
         <p>{problem.message}</p>
         <span className="retry-note">可恢复方式：{problem.retry === 'safe' ? '刷新后重试' : problem.retry === 'reconcile' ? '先核对原生状态' : problem.retry === 'user_action' ? '请调整输入或操作' : '不可重试'}</span>
       </div>
@@ -746,7 +825,7 @@ function QuestionCard({ question, deliveries, pending, onAnswer }: {
   )
 }
 
-function WorkDetail({ work, verification, artifactReader, pending, onPause, onStop, onRetry, onContinue, onAccept }: {
+function WorkDetail({ work, verification, artifactReader, pending, onPause, onStop, onRetry, onContinue, onAccept, onRevise }: {
   work: WorkView | undefined
   verification: VerificationDetail | undefined
   artifactReader: ((id: string) => Promise<{ contentType: string; text: string } | undefined>) | undefined
@@ -756,7 +835,10 @@ function WorkDetail({ work, verification, artifactReader, pending, onPause, onSt
   onRetry: (assignment: AssignmentRef, token: string) => Promise<unknown>
   onContinue: (contract: ContractRef) => Promise<unknown>
   onAccept: (candidate: CandidateRef) => Promise<unknown>
+  onRevise: (work: WorkView, goal: string) => Promise<boolean>
 }) {
+  const [reviseOpen, setReviseOpen] = useState(false)
+  const [revisionGoal, setRevisionGoal] = useState('')
   if (!work) {
     return (
       <section className="panel">
@@ -832,8 +914,25 @@ function WorkDetail({ work, verification, artifactReader, pending, onPause, onSt
         {available.includes('stop_work') && (
           <button type="button" className="danger" disabled={pending === 'stop'} onClick={() => void onStop(work)}>停止工作</button>
         )}
+        {!['ended', 'delivered', 'stopping', 'switching'].includes(work.phase) && (
+          <button type="button" className="quiet" disabled={pending === 'revise'} onClick={() => { setReviseOpen(!reviseOpen); setRevisionGoal(work.contract.goal) }}>修订合同</button>
+        )}
         {available.length === 0 && <p className="empty">后端当前没有为这个工作提供可用动作。</p>}
       </div>
+      {reviseOpen && (
+        <form className="revise-form" onSubmit={async event => {
+          event.preventDefault()
+          if (!revisionGoal.trim()) return
+          if (await onRevise(work, revisionGoal.trim())) setReviseOpen(false)
+        }}>
+          <label><span>修订目标</span><textarea rows={2} value={revisionGoal} onChange={event => setRevisionGoal(event.target.value)} /></label>
+          <p className="context-line">沿用当前范围 {work.contract.scope.allowedPaths.join(', ')} 与完成标准；修订会生成新的合同 revision，旧候选随之失效。</p>
+          <div className="actions">
+            <button type="submit" disabled={pending === 'revise' || !revisionGoal.trim()}>{pending === 'revise' ? '提交中…' : '提交修订'}</button>
+            <button type="button" className="quiet" onClick={() => setReviseOpen(false)}>取消</button>
+          </div>
+        </form>
+      )}
       <p className="context-line hold">派工控制 revision {work.actions.dispatchHold.revision} · {work.actions.dispatchHold.paused ? '已暂停' : '未暂停'}</p>
     </section>
   )

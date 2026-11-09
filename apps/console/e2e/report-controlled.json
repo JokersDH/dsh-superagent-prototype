@@ -1,70 +1,107 @@
 {
   "status": "PASS_CONSOLE_CONTROLLED_PRODUCT",
-  "mode": "controlled-product-http",
+  "mode": "controlled-product-http-configuration",
   "base": "http://127.0.0.1:5174/",
   "apiState": "/tmp/pa-product-demo",
-  "testedAt": "2026-11-09T01:37:38.617Z",
+  "testedAt": "2026-11-09T02:27:28.561Z",
   "cases": [
     {
-      "id": "CONTROLLED-SESSION",
+      "id": "CONFIG-DRIVEN-FORM",
       "status": "PASS",
-      "ms": 106,
-      "detail": "authenticated session against the controlled product API"
+      "ms": 630,
+      "detail": "create form is initialized from /v1/configuration and creates a real work"
     },
     {
-      "id": "CREATE-QUESTION-WORK",
+      "id": "ANSWER-VERIFY-ARTIFACTS",
       "status": "PASS",
-      "ms": 456,
-      "detail": "create_work with profile-fixture-question surfaces the native question"
+      "ms": 1046,
+      "detail": "answer, registered check and trusted PASS candidate"
     },
     {
-      "id": "ANSWER-AND-VERIFY",
+      "id": "ARTIFACT-PREVIEW-AND-DOWNLOAD",
       "status": "PASS",
-      "ms": 1019,
-      "detail": "the structured answer triggers the registered check and a trusted PASS candidate"
+      "ms": 168,
+      "detail": "manifest/output preview and authenticated artifact download"
     },
     {
-      "id": "ARTIFACT-READING",
+      "id": "ACCEPT-DELIVERED-RELOAD",
       "status": "PASS",
-      "ms": 135,
-      "detail": "browser reads the current-candidate delivery manifest and output through /v1/artifacts"
+      "ms": 871,
+      "detail": "acceptance delivers and reload keeps work plus artifacts"
     },
     {
-      "id": "ACCEPT-DELIVERED",
+      "id": "FAIL-PROFILE",
       "status": "PASS",
-      "ms": 214,
-      "detail": "current candidate acceptance delivers and keeps its artifacts"
+      "ms": 1093,
+      "detail": "machine FAIL offers no acceptance"
     },
     {
-      "id": "RELOAD-PERSISTENCE",
+      "id": "REVISE-AND-STALE-CANDIDATE",
       "status": "PASS",
-      "ms": 669,
-      "detail": "session, delivered work and artifact references survive reload"
+      "ms": 2949,
+      "detail": "revise creates a new contract revision and rejects the old candidate"
     },
     {
-      "id": "FAILING-PROFILE-BLOCKED",
+      "id": "STALE-QUESTION",
       "status": "PASS",
-      "ms": 1050,
-      "detail": "profile-fixture-fail produces a FAIL verification with no acceptance path"
+      "ms": 2919,
+      "detail": "answering an already-answered question version is rejected"
     },
     {
-      "id": "NO-CONSOLE-ERRORS",
+      "id": "STOP-WORK",
+      "status": "PASS",
+      "ms": 307,
+      "detail": "stop is accepted and never shown as delivered"
+    },
+    {
+      "id": "CONFIG-FAILURE-PRESERVES-DRAFT",
+      "status": "PASS",
+      "ms": 902,
+      "detail": "configuration failure disables only new delegation and keeps the draft"
+    },
+    {
+      "id": "UNSCHEDULED-EXECUTOR-DISABLED",
+      "status": "PASS",
+      "ms": 897,
+      "detail": "unscheduled executor disables new delegation with an explicit reason"
+    },
+    {
+      "id": "SSE-RECONNECT",
+      "status": "PASS",
+      "ms": 12,
+      "detail": "offline/reconnect resumes the event stream"
+    },
+    {
+      "id": "NARROW-KEYBOARD",
+      "status": "PASS",
+      "ms": 806,
+      "detail": "narrow layout and keyboard focus work with configuration"
+    },
+    {
+      "id": "NO-PAGE-ERRORS",
       "status": "PASS",
       "ms": 0,
-      "detail": "no console/page errors after login"
+      "detail": "no uncaught page errors"
     }
   ],
   "failures": [],
   "screenshots": [
-    "screenshots/controlled-question.png",
+    "screenshots/controlled-config-form.png",
+    "screenshots/controlled-form-question.png",
     "screenshots/controlled-verified.png",
     "screenshots/controlled-delivered.png",
     "screenshots/controlled-after-reload.png",
-    "screenshots/controlled-fail.png"
+    "screenshots/controlled-fail.png",
+    "screenshots/controlled-stale-candidate.png",
+    "screenshots/controlled-stale-question.png",
+    "screenshots/controlled-stopped.png",
+    "screenshots/controlled-config-error.png",
+    "screenshots/controlled-config-blocked.png",
+    "screenshots/controlled-narrow.png"
   ],
   "limitations": [
     "Controlled fixture profiles only: no installed vendor/model compatibility is claimed.",
-    "The coordinator hosts the controlled subprocess; independent Runner reconnect and power-loss behavior remain separate lanes.",
-    "Only the fixed profile scratch operation is exercised (no arbitrary user code execution)."
+    "Configuration failure/blocked scenarios are injected browser-side against the real endpoint; the backend still revalidates every command.",
+    "Independent Runner reconnect, power loss and vendor-native authorization remain separate gates."
   ]
 }

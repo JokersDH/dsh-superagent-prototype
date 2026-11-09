@@ -4,9 +4,12 @@
  * frozen runtime schemas, so a fixture cannot smuggle a shape the real product would reject.
  */
 import {
-  AnswerDeliverySchema, ChangeSchema, CommandReceiptSchema, ConversationPageSchema, SnapshotSchema, VerificationSchema,
+  AnswerDeliverySchema, ApplicationConfigurationSchema, ChangeSchema, CommandReceiptSchema, ConversationPageSchema,
+  SnapshotSchema, VerificationSchema,
 } from '@personal-agent/contracts'
-import type { AgentProfile, Change, CommandReceipt, ConversationPage, InspectQuery, ProbeReport, Snapshot, UserCommand } from '@personal-agent/contracts'
+import type {
+  AgentProfile, ApplicationConfiguration, Change, CommandReceipt, ConversationPage, InspectQuery, ProbeReport, Snapshot, UserCommand,
+} from '@personal-agent/contracts'
 
 export interface VerificationDetail {
   id: string
@@ -38,6 +41,8 @@ export interface ConsoleTransport {
   executors?(): Promise<readonly ExecutorSnapshot[]>
   /** Approved artifact bytes through the product reader (returns undefined when no reader is wired). */
   artifact?(id: string): Promise<{ contentType: string; text: string } | undefined>
+  /** Trusted startup configuration for the create-work form; undefined when the entry has no config port. */
+  configuration?(): Promise<ApplicationConfiguration | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -143,6 +148,19 @@ export class HttpTransport implements ConsoleTransport {
     const parsed = AnswerDeliverySchema.array().safeParse(body)
     if (!parsed.success) throw new TransportError('schema_mismatch', '投递记录不符合公共 schema', 'user_action')
     return parsed.data.map(delivery => ({ targetBindingId: delivery.targetBindingId, status: delivery.status }))
+  }
+
+  async configuration(): Promise<ApplicationConfiguration | undefined> {
+    let body: unknown
+    try {
+      body = await this.request('/v1/configuration')
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+    const parsed = ApplicationConfigurationSchema.safeParse(body)
+    if (!parsed.success) throw new TransportError('schema_mismatch', '应用配置不符合公共 schema', 'user_action')
+    return parsed.data
   }
 
   async artifact(id: string): Promise<{ contentType: string; text: string } | undefined> {

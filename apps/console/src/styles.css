@@ -198,3 +198,16 @@ code { background: #eef0f3; border-radius: 4px; padding: 1px 5px; overflow-wrap:
 .artifact-actions a { color: var(--accent); font-size: 12px; }
 .artifact-preview { margin-top: 8px; border-top: 1px dashed var(--line); padding-top: 8px; }
 .artifact-text { max-height: 220px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #f7f8fa; border: 1px solid var(--line); border-radius: 7px; padding: 8px; font-size: 11px; }
+
+.config-line { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.config-line > span:first-child { flex-shrink: 0; }
+.config-line .mini { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.config-line .quiet { margin-left: auto; flex-shrink: 0; padding: 4px 8px; }
+.new-work select { min-width: 0; max-width: 100%; }
+.config-summary { display: flex; flex-direction: column; gap: 3px; font-size: 11px; color: var(--muted); }
+.config-summary p { overflow-wrap: anywhere; }
+.config-summary span { font-weight: 600; margin-right: 6px; }
+
+.revise-form { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.revise-form label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
+.revise-form textarea { border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; font: inherit; resize: vertical; }

@@ -28,7 +28,7 @@ verification result details, per-target answer deliveries, and the Catalog/profi
 All adapters validate with the public schemas. Fixture state lives in `sessionStorage` for the tab and
 is never read by production code.
 
-## Integration status (wave-02 main checkpoint `cd09395`)
+## Integration status (wave-02 main checkpoints `cd09395`/`d7f3401` + application configuration)
 
 - Implemented and verified against the main loopback sandbox: `POST/GET/DELETE /v1/session` bootstrap
   with the private token, HttpOnly cookie, server-generated actor; snapshot, messages, SSE, commands,
@@ -38,13 +38,19 @@ is never read by production code.
 - Commands send only the frozen `UserCommand` shapes. Pause/resume/continue use `ContractRef` (not a
   full contract revision) and the WorkView's `dispatchHold.revision`; the live application accepted the
   CAS.
-- Controlled product lane: the console offers only configured profile IDs
-  (`VITE_PROFILE_IDS`, default from `VITE_DEFAULT_PROFILE`) and a configured registered check
-  (`VITE_CHECK_DEFINITION`/`VITE_CHECK_CRITERION_ID`). The controlled demo uses
-  `profile-fixture-{question,pass,fail,slow}`, `check-fixture-output`, `project-atlas` and `src/`.
-  `PASS_CONSOLE_CONTROLLED_PRODUCT` 8/8 covers question → answer → verification → delivery-manifest
-  and output reading via `/v1/artifacts/:id` → acceptance → reload, plus a FAIL profile with no
-  acceptance path.
+- Configuration-driven create form: after session bootstrap the console fetches
+  `GET /v1/configuration` (authenticated, no-store) and initializes projects, `scope`,
+  `defaultCriteria`, admitted profiles and the project default profile from that projection. HTTP
+  mode has no hard-coded project/profile/check. Only `dispatchAllowed` entries are selectable; the
+  project's `defaultCriteria` are submitted unchanged. The fixture adapter supplies an equivalent
+  isolated projection.
+- Configuration read failure or an unscheduled executor disables new delegation and shows the
+  transport/`blockedReason`; the draft, snapshot, answers and stop remain usable, and an existing work
+  keeps its executor. A configuration refresh never rewrites an existing work's executor.
+- `PASS_CONSOLE_CONTROLLED_PRODUCT` 13/13 on the live controlled product: configuration form,
+  question/answer, PASS/FAIL, delivery manifest/output preview and authenticated download,
+  acceptance, reload, stop, revision + stale candidate rejection, stale question rejection, SSE
+  reconnect, configuration failure/unscheduled executor, narrow layout and keyboard focus.
 - The artifact panel lists `WorkView.artifactIds` with approved download links and an inline text
   preview; a transport without an artifact reader says so instead of fabricating bytes.
 
@@ -52,8 +58,8 @@ is never read by production code.
 
 1. Publish the Catalog profile/probe read entry for console browsing; until then HTTP mode shows
    "Catalog 尚未接线". Do not add a private `Snapshot.profiles` field.
-2. Keep the loopback sandbox's execution intents undelivered until the accepted Runner is composed;
-   the console reports empty question/verification panels as NOT_TESTED rather than faking them.
+2. Compose the accepted independent Runner into G2-Demo-Fake; the controlled fixture profiles remain
+   the only browser evidence, and installed-vendor/independent-Runner behavior stays NOT_TESTED.
 3. Confirm that production acceptance keeps using `CandidateRef` and that stale candidates disappear
    from `actions.available`; the console also keeps its own stale-verification guard.
 
