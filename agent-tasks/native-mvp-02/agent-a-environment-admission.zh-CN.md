@@ -2,6 +2,8 @@
 
 工作目录 `/Users/hh/Desktop/joker/superagent-agent-a`，继续 `codex/g2-workspaces-verification`。保留所有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、本轮 README、原环境任务及本文件。当前主线已包含旧 workspace/console 功能及其准入修复；合并冲突保留已验收的 main 实现与旧提交历史，不重复改产品路径。
 
+**持续执行：** 同时读取 [扩展队列](extended-run.zh-CN.md)。下文原三个阶段对应 A1–A3；通过后提交检查点，继续 A4–A6，不在原“最终验收”后停止。依然只拥有本包。
+
 ## 出口与归属
 
 将 `packages/environment-preparation/` 从包内可运行实现交付为主线可以安全接入的深模块：授权输入 → 受控准备 → 可信 ready 凭证 → 复验 → 仅清理本模块拥有的资源。
@@ -50,3 +52,34 @@ node /Users/hh/Desktop/joker/superagent/tools/bootstrap/review-environment-prepa
 原测试、主线五项复现、nested links/ownership forgery、并发/旧进程/取消、坏元数据、真实 pnpm 离线准备与测试均有明确 PASS/FAIL；原项目/index/lock/依赖摘要保持。准备产物可复验，未证实清理不准 ready，环境路径不进业务 patch。
 
 不运行模型、不联网准备、不升级全局运行时。交 branch/commit/base、owned paths、命令/证据、接口消费样例、依赖请求和剩余限制，push 自己分支。主线未接入的部分保持 NOT_TESTED。完成整个包再统一报告。
+
+## A4 / P1：只读预检与易用性
+
+交付可供主线 UI/doctor 消费的 `inspectEnvironment` 或同等只读 API。复用已有解析/检查逻辑；检查不能创建 `.product-environment`、安装依赖、修改 Git/index、触发项目钩子或隐式读取用户配置。
+
+- 输出项目形态、声明/实际 Node 与 manager、lock 摘要、依赖是否已有/可复验、离线缓存授权是否足够，以及支持能力。预检可准备不等于实际 ready；缓存判断无法证明时输出 unknown，不能运行安装来“探测”。
+- 稳定 code 配合面向用户的中文说明和结构化建议：缓存未授权/缺包、lock 不一致、版本不支持、钩子配置、依赖逃逸、环境漂移、清理不确定。建议是数据，不是模块自动执行 shell 或联网的授权。
+- 把原始 stderr、绝对本机路径与可公开诊断分开；受限 evidence 可保存摘要，公共输出不含环境变量值、.npmrc 凭据或账号路径。没有证据不报“安全”。
+- 提供包内命令入口或消费样例，默认只 inspect。prepare/cleanup 必须显式动作和可信输入；不要新增全局 CLI、根 scripts 或私有产品 HTTP。
+
+验收：带依赖/无依赖/坏 JSON/错误 lock/缺缓存/不支持形态均有真实 fixture，inspect 前后原项目与 workspace 内容/index 摘要相同，未启动 installer，输出经包内 runtime parser 验证。
+
+## A5 / P1：集成样例、恢复与规模测量
+
+1. 交付两个可重建的离线项目 recipe：普通 JS/pnpm 单包、包含开发依赖和实际测试构建的单包。复用 pnpm 自身 lock/install，依赖来自私有本地 tarball；不提交 node_modules/store。B 可通过说明重建，不要求从测试 helper 偷用内部权限。
+2. 包内 consumer 示例从调用方生成 authorityRoot，经注入 process port 准备，序列化 ref；第二个真实 Node 进程重新加载并 verify/inspect，最后按可信归属清理。返回值、失败和取消都能被普通调用方消费，不依赖进程内闭包或私有全局 Map。
+3. 覆盖 prepare 进程中断、准备完成但调用方未记录、持久凭证损坏、旧凭证重放、同 workspace 不同 request、清理后重建和工作区被替换。unknown 留证据，不偷删后重装。只在自己 fixture 上发信号，确认 PID/进程组归属。
+4. 测量首次准备、同输入复验、依赖树扫描和清理的 wall time/文件数/字节；给出一个小型与一个千级文件树的合成负载，不凭空规定性能 PASS 数字。只针对实测瓶颈优化，fingerprint 不能用 mtime/marker 存在替代内容证明；给取消和扫描设置有界工作量。
+5. 提供公开接口的消费测试和兼容说明，把新依赖/类型导出/错误 code 一次汇总给主线。缓存仍是显式授权的离线 store，不新增共享缓存写服务或自动垃圾回收用户目录。
+
+验收证据分开写 package-local、independent consumer 和尚未 product-integrated；主线真实接线到达后，使用公开接口复验一遍受影响路径，不重做无关矩阵。
+
+## A6 / P2：受限 pnpm workspace 增量
+
+仅在 A1–A5 稳定、检查点已提交后开始，不让新功能阻塞单包交付。新增显式 opt-in 能力：一个 Git 根、一个 pnpm lock、两个工作包，`packages/app` 通过 `workspace:*` 引用 `packages/lib`，无外部 file/link、项目钩子或生命周期安装脚本。用标准 YAML parser 和 pnpm 命令完成解析/解析依赖，不自建 resolver。
+
+工作包必须真实位于同一 workspace 边界内；忽略/危险路径、逃逸 symlink、坏 glob、锁与包不一致均在执行前拒绝。准备和复验覆盖根及所有实际工作包的 manifests/依赖，所有环境目录排除仍绑定可信归属；workspace package 的业务源码绝不能被当成依赖目录排除。
+
+用本地 tarball/store 实际离线安装，从 app 执行测试并调用 lib；两包业务改动都应进入完整 patch，依赖不进入，原 Git/index/源码保持。未支持的 monorepo/peer/catalog 形态给稳定 blocked，不扩大到任意 monorepo。
+
+若本阶段需要未就绪主线接口，交包内实现/真实 Git fixture 与 RFC，主线产品 lane 保持 NOT_TESTED；不要转改 workspaces/console/公共 schema。最终汇总 A1–A6 的执行状态与下一消费者步骤。

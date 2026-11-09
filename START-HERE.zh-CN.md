@@ -2,6 +2,8 @@
 
 **当前派工入口：[Native MVP 第二轮整包](agent-tasks/native-mvp-02/README.zh-CN.md)。** A 负责环境准备准入，B 负责可执行的真实原生与故障验收，主线负责环境、验证及工作台集成。两人保留原目录和分支，先合并最新 main。native-mvp 首轮及 wave-02 仅作历史参考。
 
+**持续执行扩展：[A1–A6 / B1–B6 / M1–M6 队列](agent-tasks/native-mvp-02/extended-run.zh-CN.md)。** 用户离开期间，提交稳定检查点后继续下一阶段；遇阻先留复现，再做独立任务，不逐项等回复。A 增加只读诊断/恢复样例/受限 workspace，B 增加故障矩阵/浏览器/有界稳定性/接入工具，主线继续产品接线与自助诊断。
+
 **本机 Codex MVP 已接入：** 双击 `start.command` 或运行 `pnpm start`，打开 `http://127.0.0.1:5180`。从工作台导入本地 Git 项目，在对话输入目标，点击“委托执行”确认后，真实 Codex 会在独立 worktree 改代码、运行注册检查，供审阅完整 patch 并接受当前交付。无需手动令牌，原项目不自动覆盖。见 [使用指南](docs/ASSISTANT-GUIDE.zh-CN.md) 与 [工作台说明](docs/WORKBENCH.zh-CN.md)。本轮实际范围为 macOS arm64 / Codex 0.164.0 / Node 项目；不是完整 G2 或其它执行器的兼容声明。
 
 最新事实：首次真实 Codex 后端五场景和浏览器六场景通过，完成真实代码、既有测试、当前候选接受、产物下载及重开保留；原 A/B 八项准入阻断已修复。主线回归 367 项、内部运行时回归 262 项及原生零模型安全探针 3 项通过。证据见 [native MVP](reports/releases/native-mvp/) 与 [集成约定](docs/rfcs/WP-16/0008-native-mvp-integration.md)。真实模型审批、澄清、运行中 steer、完整故障矩阵、长期 soak 与依赖准备仍按单列范围推进。以下 G0/G1 历史段落按记录日期阅读，不取代本段最新事实。
@@ -74,6 +76,7 @@ G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契
 继续 Native MVP 第二轮 Agent A 整包。工作目录 /Users/hh/Desktop/joker/superagent-agent-a，分支 codex/g2-workspaces-verification。
 保留已有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、agent-tasks/native-mvp-02/README.zh-CN.md 和 agent-tasks/native-mvp-02/agent-a-environment-admission.zh-CN.md。
 仅修改 packages/environment-preparation/：修复五项主线复现，交付可信环境凭证、复验/清理、进程注入接口和离线 pnpm 验收。先交稳定接口检查点，然后连续完成整包。
+再读取 agent-tasks/native-mvp-02/extended-run.zh-CN.md，继续 A4–A6 的只读诊断、跨进程恢复/样例和受限 pnpm workspace，不在首个交接点停止。
 不要重交旧 workspace/console/Runner 实现；只提交拥有路径并 push 自己分支，根 lock 和公共接口由主线集成。
 ```
 
@@ -84,6 +87,7 @@ G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契
 保留已有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、agent-tasks/native-mvp-02/README.zh-CN.md 和 agent-tasks/native-mvp-02/agent-b-native-acceptance.zh-CN.md。
 仅修改 tests/native-acceptance/：修正共享契约和严格退出，实现真实 native 分支，在私有实例完成交付、机器失败、停止和重启四组验收。按任务限制最多四个模型任务，不操作用户正在使用的服务。
 先交可执行检查点，再连续完成整包；产品缺陷给主线复现，不改产品或降低期望，只 push 自己分支。
+再读取 agent-tasks/native-mvp-02/extended-run.zh-CN.md，继续 B3–B6 的故障矩阵、浏览器、有界稳定性和新执行器验收工具；总模型任务上限仍为四个。
 ```
 
 两人可立即并行。B 先验无依赖真实项目，无需等待 A；主线按 [环境产品化与独立验收消费](agent-tasks/native-mvp-02/main-integration.zh-CN.md) 推进接线，A 准入通过后再启用依赖准备。转发任务入口即可，无需复制历史对话。
