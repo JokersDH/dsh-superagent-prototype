@@ -1,12 +1,13 @@
 {
   "package": "wave-02-main",
   "branch": "codex/g2-execution-integration",
-  "baseMainCommit": "d7f3401",
+  "baseMainCommit": "caaded5",
   "storageIntegrationCommit": "4a09ce4",
   "storageSourceCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
   "workspaceVerificationIntegrationCommit": "7fa2bb0f5cad2661d724df576d51ac56e50fd034",
   "workspaceVerificationSourceCommit": "8f1e60a10b259b3b6b95ec681161ed335e863f42",
-  "testedSourceCommit": "4468e7b09c98d8c4e4b67fe97e46c06b6878a369",
+  "testedSourceCommit": "3c093232ebc24012a5130fc6a7a9744aa1a01fa6",
+  "localStartReport": "reports/releases/workbench-local-start.json",
   "consoleSourceCommit": "a517635db1d1c7e723c0bd7d4f8ca8047f7f5554",
   "consoleImport": "apps/console and WP-11 docs byte-identical; generic workspace candidate not imported",
   "cleanCheckoutReport": "reports/releases/g2-product.json",
@@ -17,16 +18,17 @@
   "stages": {
     "M1": { "status": "IMPLEMENTED_CONFIGURATION_READ_CHECKPOINT", "interface": "docs/rfcs/WP-16/0004-application-configuration.md", "businessContractChanged": false, "additiveReadProtocol": "application-configuration/1" },
     "M2": { "status": "PASS_REAL_SQLITE_AND_CONTROLLED_SUBPROCESS", "scope": "Original native bindings, per-target answer transport, actual stdio writes and committed consumption facts", "moduleTests": 14 },
-    "M3": { "status": "PASS_DETERMINISTIC_APPLICATION_HTTP_CONFIGURATION_SLICE", "applicationTests": 12, "httpTests": 9, "configurationHttpAndProjectionTests": 5, "realLoopbackHttpTest": true },
+    "M3": { "status": "PASS_DETERMINISTIC_APPLICATION_HTTP_CONFIGURATION_SLICE", "applicationTests": 12, "httpTests": 11, "configurationHttpAndProjectionTests": 5, "realLoopbackHttpTest": true, "defaultWorkbenchLogin": "AUTOMATIC_LOCAL_FIXTURE_ONLY" },
     "M4": { "status": "PASS_CONTROLLED_WORKBENCH_PREVIEW", "productIntegrationTests": 14, "controlledBrowserCases": 8, "scope": "Actual browser plus admitted same-process controlled host, native question, active refresh, verification/output/accept/reload and machine FAIL", "browserProduct": "PASS_CONTROLLED_HOST_ONLY", "directDynamicConfigurationTransport": "PENDING_AGENT_A", "independentRunnerProductRecovery": "BLOCKED_ADMISSION_B_96cbe4e", "installedNativeAgents": "NOT_TESTED", "fullG2": "NOT_PASSED" }
   },
   "validation": {
-    "combinedControlledProductCheck": { "testsPassed": 328, "contracts": 188, "productRelated": 140, "node": "24.22.2", "platform": "darwin/arm64", "sourceWorktreeClean": true, "report": "reports/releases/g2-product.json" },
-    "workbenchModules": { "testsPassed": 336, "includesProduct328": true, "consoleModuleTests": 8, "typecheckAndBuild": "PASS", "report": "reports/releases/g2-workbench.json" },
-    "controlledBrowser": { "casesPassed": 8, "report": "reports/releases/workbench-browser/report.json", "screenshots": ["reports/releases/workbench-browser/desktop.png", "reports/releases/workbench-browser/narrow.png"], "runAfterBuild": true },
+    "combinedControlledProductCheck": { "testsPassed": 330, "contracts": 188, "productRelated": 142, "node": "24.22.2", "platform": "darwin/arm64", "sourceWorktreeClean": true, "report": "reports/releases/g2-product.json" },
+    "workbenchModules": { "testsPassed": 338, "includesProduct330": true, "consoleModuleTests": 8, "typecheckAndBuild": "PASS", "report": "reports/releases/g2-workbench.json" },
+    "controlledBrowser": { "casesPassed": 8, "historicalSourceCommit": "4468e7b09c98d8c4e4b67fe97e46c06b6878a369", "report": "reports/releases/workbench-browser/report.json", "screenshots": ["reports/releases/workbench-browser/desktop.png", "reports/releases/workbench-browser/narrow.png"], "runAfterBuild": true },
+    "automaticLocalStart": { "actualInAppBrowserVerified": true, "freshRefreshWithoutToken": "PASS", "doesNotSetCookieOrRequireBrowserStorage": true, "repeatStartReusesInstance": true, "report": "reports/releases/workbench-local-start.json" },
     "launcherLifecycle": { "gracefulStopReleasesApiAndConsolePorts": true, "restartWithExistingState": "PASS", "existingAgentServersTouched": false },
     "candidateAdmission": { "workspaceSource": "a517635", "runnerSource": "96cbe4e", "ordinaryModuleTests": { "A": 40, "B": 222 }, "additionalFailures": { "A": 2, "B": 6 }, "status": "BLOCKED_CANDIDATE_SCOPES", "report": "reports/releases/wave-02-delivery-runtime-admission.json" },
-    "applicationAndRecovery": { "testsPassed": 91, "node": "24.22.2", "report": "reports/releases/g2-application.json" },
+    "applicationAndRecovery": { "testsPassed": 93, "node": "24.22.2", "report": "reports/releases/g2-application.json" },
     "configuration": { "contractTests": 5, "httpAndProjectionTests": 5, "runtimeContractSchemaHashUnchanged": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d" },
     "coreOnSqlite": { "testsPassed": 178, "node": "24.21.0", "report": "reports/releases/g1-core-sqlite.json" },
     "storage": { "testsPassed": 75, "node": "24.22.2", "source": "Agent A a6bb40a, storage files only" },
@@ -36,7 +38,7 @@
     "countsAreSeparateScopesNotProductCompletionPercentage": true
   },
   "apiSandbox": { "url": "http://127.0.0.1:8793/v1/health", "configurationPath": "/v1/configuration", "mode": "fixture", "state": ".local-state/configuration-demo", "vendorCalls": 0, "executionIntentsDispatched": true, "scratchProjectOnly": true, "prior8791ServiceWasNotRestartedInThisBatch": true },
-  "workbench": { "url": "http://127.0.0.1:5180", "api": "http://127.0.0.1:8796", "state": ".local-state/workbench", "command": "pnpm dev:workbench", "loginCredentialReference": ".local-state/workbench/bootstrap.key", "mode": "controlled-fixture", "vendorCalls": 0, "knownUiFollowup": "Narrow send button label wraps; A owns the remaining responsive/configuration pass" },
+  "workbench": { "url": "http://127.0.0.1:5180", "api": "http://127.0.0.1:8796", "state": ".local-state/workbench", "command": "pnpm start", "stopCommand": "pnpm stop", "restartCommand": "pnpm restart", "shortcut": "start.command", "login": "AUTOMATIC_LOCAL_DEVELOPMENT", "mode": "controlled-fixture", "vendorCalls": 0, "knownUiFollowup": "Narrow send button label wraps; A owns the remaining responsive/configuration pass" },
   "unacceptedUpstreams": {
     "agentA": "Console a517635 is admitted for the controlled preview. Generic workspace candidate remains blocked: mixed staged/untracked file loss and missing committed changes since reserve base. Direct configuration transport and visual follow-through remain A-owned.",
     "agentB": "96cbe4e modules pass 222 fixture tests but six new admission cases fail: credential length, actual inventory/state, false empty barrier after indeterminate stop, admission/business pump split, wrong-tuple cancellation and Journal corruption after open. No B service or Journal candidate is enabled."

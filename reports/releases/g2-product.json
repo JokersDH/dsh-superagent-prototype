@@ -1,12 +1,12 @@
 {
   "status": "PASS_CONTROLLED_PRODUCT_API_SLICE",
-  "sourceCommit": "4468e7b09c98d8c4e4b67fe97e46c06b6878a369",
+  "sourceCommit": "3c093232ebc24012a5130fc6a7a9744aa1a01fa6",
   "sourceWorktreeClean": true,
-  "checkedAt": "2026-11-09T02:49:51.942Z",
+  "checkedAt": "2026-11-09T03:33:31.766Z",
   "node": "v24.22.2",
   "platform": "darwin",
   "architecture": "arm64",
-  "tests": 328,
+  "tests": 330,
   "results": [
     {
       "command": "pnpm check:contracts",
@@ -16,7 +16,7 @@
     {
       "command": "pnpm check:g2-application",
       "status": "PASS",
-      "tests": 91
+      "tests": 93
     },
     {
       "command": "pnpm --filter @personal-agent/workspaces --filter @personal-agent/verification -r build",
@@ -48,7 +48,7 @@
   ],
   "scopes": {
     "contracts": 188,
-    "applicationAndRecovery": 91,
+    "applicationAndRecovery": 93,
     "workspaces": 8,
     "verification": 22,
     "actualControlledProduct": 14,

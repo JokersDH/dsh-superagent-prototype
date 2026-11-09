@@ -1,0 +1,26 @@
+{
+  "status": "PASS_SIMPLE_LOCAL_START",
+  "sourceCommit": "3c093232ebc24012a5130fc6a7a9744aa1a01fa6",
+  "checkedAt": "2026-11-09T03:36:38.117Z",
+  "url": "http://127.0.0.1:5180",
+  "reproduction": {
+    "malformedManualToken": 400,
+    "validPrivateToken": 200
+  },
+  "automaticSession": {
+    "withoutCredentials": 200,
+    "setsCookie": false
+  },
+  "actualInAppBrowser": {
+    "refreshed": true,
+    "layoutVisible": true,
+    "loginFormVisible": false,
+    "liveConnection": true
+  },
+  "startup": {
+    "freshBuildAndStart": true,
+    "reusesExistingInstance": true,
+    "stopCommandVerified": true
+  },
+  "scope": "Explicit loopback fixture convenience; token defaults, Host/Origin/actor and Runner auth remain enforced"
+}
