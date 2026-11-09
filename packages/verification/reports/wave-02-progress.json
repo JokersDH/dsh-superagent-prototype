@@ -1,94 +1,100 @@
 {
   "package": "wave-02-agent-a",
   "branch": "codex/g2-workspaces-verification",
-  "mainBaseCommit": "4ecb4c5",
-  "mergeCommit": "62db605",
-  "testedSourceCommit": "6c8dfc8eaeecff2c57927cfb01fbb1a4fc049cb5",
-  "backendCheckpointCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
-  "consoleDeliveryCommit": "7d7ec60732e0c75fa82e4121e2c673815976ae97",
-  "httpIntegrationCommit": "473d0ba82abfc256a9bac1dec47b41d4be12c8bb",
-  "controlledBrowserCommit": "6c8dfc8eaeecff2c57927cfb01fbb1a4fc049cb5",
-  "updatedAt": "2026-11-09T01:55:00.000Z",
+  "mainBaseCommit": "d7f3401",
+  "mergeCommit": "c0d0fd0",
+  "testedSourceCommit": "0bd8d152f736a037f4109612147f35e1386db2c0",
+  "previousCheckpoints": {
+    "backend": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
+    "console": "7d7ec60732e0c75fa82e4121e2c673815976ae97",
+    "httpIntegration": "473d0ba82abfc256a9bac1dec47b41d4be12c8bb",
+    "controlledBrowser": "6c8dfc8eaeecff2c57927cfb01fbb1a4fc049cb5",
+    "artifactFixes": "a517635"
+  },
+  "configurationIntegrationCommit": "0bd8d152f736a037f4109612147f35e1386db2c0",
+  "updatedAt": "2026-11-09T02:35:00.000Z",
   "phases": {
     "A1": {
       "status": "PASS",
-      "scope": "WP-04 admission fixes plus adjacent completion boundaries; probes re-run at the controlled-product source commit.",
+      "scope": "WP-04 boundaries and generic delivery artifacts fixed earlier; probes re-run at the configuration-driven source.",
       "evidence": [
         "packages/verification/reports/wave-02/probe-wp04.json",
         "packages/verification/reports/wave-02/probe-completion-runtime.json",
         "packages/verification/reports/wave-02/probe-g1-followup.json",
-        "packages/verification/reports/wave-02/verification.txt",
-        "packages/verification/reports/wave-02/workspaces.txt"
+        "packages/verification/reports/wave-02/workspaces.txt",
+        "packages/verification/reports/wave-02/verification.txt"
       ],
       "results": {
         "PASS_WP04_ADMISSION": "6/6",
         "PASS_COMPLETION_RUNTIME_BOUNDARY": "2/2",
         "PASS_FOLLOWUP_INVARIANTS": "5/5",
-        "workspaces": "10/10 (untracked/binary delivery patch, attempt-neutral manifest reuse)",
-        "verification": "22/22 (v6+v7 append, frozen v1-v5 checksums)"
+        "workspaces": "10/10",
+        "verification": "22/22"
       }
     },
     "A2": {
       "status": "PASS",
-      "scope": "Product records (migration v7) integrated by main; revalidated with the controlled product composition.",
+      "scope": "Product records (migration v7) integrated by main; controlled product check passes with the configuration endpoint.",
       "interface": "docs/rfcs/WP-02/0002-product-record-repositories.md",
       "results": {
         "storage": "75/75",
-        "g2ProductCheck": "PASS (136 cases: prior 90 + WP-04 30 + 14 controlled product + 2 new workspace cases)"
+        "g2ProductCheck": "PASS (main checkpoint total 328 incl. 188 configuration/contract cases; browser is a separate lane)"
       }
     },
     "A3": {
-      "status": "PASS_FIXTURE_HTTP_CONTROLLED_BROWSER",
-      "scope": "Console is wired to the controlled product HTTP entry end to end: session bootstrap, configured profile/check selection, real native question/answer, registered check, trusted verification, delivery manifest/output artifacts via /v1/artifacts/:id, current-candidate acceptance and reload persistence. Fixture lane remains the isolated UI scenario.",
+      "status": "PASS_CONFIGURATION_DRIVEN_BROWSER",
+      "scope": "Console fetches GET /v1/configuration after session bootstrap and initializes project, scope, default criteria and admitted profile/default from the projection. No HTTP-mode hard-coded project/profile/check. Configuration failure or dispatchAllowed=false disables only new delegation, preserves the draft and leaves query/answer/stop and existing executors usable. Revision, stale question/candidate states and artifact download are wired.",
       "interface": "docs/rfcs/WP-11/0001-console-fixture-boundary.md",
       "servers": {
         "fixtureConsole": "http://127.0.0.1:5173/",
         "controlledConsole": "http://127.0.0.1:5174/",
-        "controlledProductApi": "http://127.0.0.1:8792 (apps/coordinator/product/demo.ts, mode=fixture profiles)"
+        "controlledProductApi": "http://127.0.0.1:8792 (apps/coordinator/product/demo.ts, mode=fixture profiles, configuration enabled)"
       },
       "configuration": {
-        "conversation": "conv-main",
+        "source": "GET /v1/configuration (application-configuration/1)",
         "project": "project-atlas",
         "scope": "src/",
         "profiles": ["profile-fixture-question", "profile-fixture-pass", "profile-fixture-fail", "profile-fixture-slow"],
         "defaultProfile": "profile-fixture-question",
-        "check": "check-fixture-output"
+        "criteria": ["fixed-output (check-fixture-output)", "review-output (human)"]
       },
       "evidence": [
         "apps/console/e2e/report-controlled.json",
-        "apps/console/e2e/screenshots/controlled-question.png",
+        "apps/console/e2e/screenshots/controlled-config-form.png",
+        "apps/console/e2e/screenshots/controlled-form-question.png",
         "apps/console/e2e/screenshots/controlled-verified.png",
         "apps/console/e2e/screenshots/controlled-delivered.png",
-        "apps/console/e2e/screenshots/controlled-after-reload.png",
-        "apps/console/e2e/screenshots/controlled-fail.png",
+        "apps/console/e2e/screenshots/controlled-stale-candidate.png",
+        "apps/console/e2e/screenshots/controlled-stale-question.png",
+        "apps/console/e2e/screenshots/controlled-stopped.png",
+        "apps/console/e2e/screenshots/controlled-config-error.png",
+        "apps/console/e2e/screenshots/controlled-config-blocked.png",
+        "apps/console/e2e/screenshots/controlled-narrow.png",
         "apps/console/e2e/report.json",
-        "apps/console/e2e/report-http.json",
         "apps/console/report.md"
       ],
       "results": {
         "typecheck": "PASS",
         "fixtureContractTests": "8/8",
         "fixturePlaywright": "PASS_CONSOLE_FIXTURE 20/20",
-        "httpSandboxPlaywright": "PASS_CONSOLE_HTTP_DEMO 8/8 (previous checkpoint source)",
-        "controlledBrowserPlaywright": "PASS_CONSOLE_CONTROLLED_PRODUCT 8/8",
+        "controlledBrowserPlaywright": "PASS_CONSOLE_CONTROLLED_PRODUCT 13/13",
         "productionBuild": "PASS"
       },
       "controlledBrowserCovered": [
-        "session bootstrap with the private token and HttpOnly cookie",
-        "create_work with profile-fixture-question and the configured check",
-        "real native permission question answered in the browser",
-        "trusted PASS verification and four published artifacts (manifest, patch, output, check evidence)",
-        "delivery manifest and fixed output read through /v1/artifacts/:id",
-        "current-candidate acceptance delivers and artifacts survive reload",
-        "profile-fixture-fail yields FAIL verification with no acceptance action"
-      ],
-      "genericArtifactFixes": [
-        "audit and delivery patches include new/untracked and binary file bytes without touching the user index/worktree",
-        "content-addressed manifests are attempt-neutral; per-attempt manifestRefPath prevents stale attempt identity when content is reused"
+        "configuration-driven form: project-atlas, src/, four profiles, default fixed-output/review-output",
+        "create work, native permission question and answer",
+        "machine PASS verification, delivery manifest/output preview and authenticated download",
+        "current-candidate acceptance and reload persistence",
+        "profile-fixture-fail: FAIL verification with no acceptance",
+        "revision creates a new contract revision and rejects the stale candidate",
+        "answering an already-answered question version is rejected",
+        "stop ends the work without a delivery claim",
+        "configuration read failure and dispatchAllowed=false disable new delegation, keep the draft and leave existing work actions usable",
+        "SSE offline/reconnect, narrow viewport without overflow, visible keyboard focus"
       ],
       "notWired": [
-        "production Catalog/AgentProfile read entry is still main-owned",
-        "independent Runner reconnect/survival and installed-vendor compatibility remain separate lanes",
+        "production Catalog/AgentProfile browsing remains main-owned (configuration lists admitted profiles but no native diagnostics)",
+        "independent Runner reconnect/survival, power loss and installed-vendor compatibility remain separate gates",
         "AC-UX-11 decision/learning views remain NOT_TESTED"
       ]
     }
@@ -99,12 +105,11 @@
       "apps/console dev: vite 8.2.2, typescript 6.0.3, @playwright/test 1.65.0, @types/react, @types/react-dom"
     ],
     "rootLock": "Temporary install diff only; not committed. Main regenerates the authoritative root lock.",
-    "browser": "Chromium headless shell 1254 in the user's Playwright cache for local evidence.",
-    "buildNote": "application/questions/workspaces/verification dist were rebuilt locally after the main merge; sources are unmodified except the owned workspace/console changes."
+    "browser": "Chromium headless shell 1254 in the user's Playwright cache for local evidence."
   },
   "limitations": [
     "Controlled fixture profiles only; no installed vendor/model compatibility claim.",
-    "The controlled host runs inside the coordinator; independent Runner reconnect, power loss and load behavior remain NOT_TESTED.",
-    "Fixture-level UI acceptance is not a replacement for the full G2-Demo-Fake with the accepted independent Runner."
+    "Configuration failure/blocked states are injected browser-side against the real endpoint; backend still revalidates commands.",
+    "The controlled host runs inside the coordinator; independent Runner reconnect, power loss and load behavior remain NOT_TESTED."
   ]
 }
