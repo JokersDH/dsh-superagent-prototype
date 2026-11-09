@@ -1,12 +1,12 @@
 {
   "status": "PASS_CONTROLLED_PRODUCT_API_SLICE",
-  "sourceCommit": "3c093232ebc24012a5130fc6a7a9744aa1a01fa6",
+  "sourceCommit": "029a0bcd7ceeb67431ed03f520e9523014d6c598",
   "sourceWorktreeClean": true,
-  "checkedAt": "2026-11-09T03:33:31.766Z",
+  "checkedAt": "2026-11-09T04:55:29.342Z",
   "node": "v24.22.2",
   "platform": "darwin",
   "architecture": "arm64",
-  "tests": 330,
+  "tests": 342,
   "results": [
     {
       "command": "pnpm check:contracts",
@@ -16,7 +16,7 @@
     {
       "command": "pnpm check:g2-application",
       "status": "PASS",
-      "tests": 93
+      "tests": 95
     },
     {
       "command": "pnpm --filter @personal-agent/workspaces --filter @personal-agent/verification -r build",
@@ -44,20 +44,27 @@
       "command": "pnpm --filter @personal-agent/coordinator test:configuration",
       "status": "PASS",
       "tests": 5
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:assistant",
+      "status": "PASS",
+      "tests": 10
     }
   ],
   "scopes": {
     "contracts": 188,
-    "applicationAndRecovery": 93,
+    "applicationAndRecovery": 95,
     "workspaces": 8,
     "verification": 22,
     "actualControlledProduct": 14,
-    "configuration": 5
+    "configuration": 5,
+    "assistantDialogue": 10
   },
-  "implementation": "SQLite application + real scratch subprocess + original native questions + trusted owned-resource barrier + registered verification + candidate acceptance",
+  "implementation": "SQLite application + real scratch subprocess + native questions + trusted resource barrier + verification + candidate acceptance + durable model dialogue with local mock SDK endpoint",
   "limitations": [
     "This is the controlled product API lane; browser product acceptance is separate",
-    "Fixture profiles execute a fixed scratch operation; installed Codex/ZCode/DeepSeek Harness and model calls are NOT_TESTED",
+    "Fixture profiles execute a fixed scratch operation; installed Codex/ZCode/DeepSeek Harness are NOT_TESTED",
+    "Assistant tests use a local mock SDK endpoint; the separate manual model smoke is not part of this repeatable no-vendor suite",
     "The controlled host lives in the coordinator process; SIGKILL proves conservative no-replay behavior, not live independent Runner reconnect",
     "The imported workspace patch omits untracked file bytes; the controlled lane explicitly publishes its fixed output bytes as an additional immutable artifact",
     "No complete G1/G2 release, generic user-project security sandbox, power-loss or load/soak certification"

@@ -1,14 +1,14 @@
 {
   "status": "PASS_CONTROLLED_WORKBENCH_MODULES",
-  "sourceCommit": "3c093232ebc24012a5130fc6a7a9744aa1a01fa6",
-  "checkedAt": "2026-11-09T03:33:34.419Z",
+  "sourceCommit": "029a0bcd7ceeb67431ed03f520e9523014d6c598",
+  "checkedAt": "2026-11-09T04:55:31.060Z",
   "node": "v24.22.2",
-  "tests": 338,
+  "tests": 350,
   "results": [
     {
       "command": "pnpm check:g2-product",
       "status": "PASS",
-      "tests": 330
+      "tests": 342
     },
     {
       "command": "pnpm --filter @personal-agent/console typecheck",
@@ -26,7 +26,7 @@
   ],
   "browserCheck": "pnpm check:g2-browser against an explicitly started dev:workbench instance",
   "limitations": [
-    "Controlled fixture only",
+    "Controlled work execution and mocked model dialogue; real model smoke evidence is separate",
     "Browser acceptance has a separate report",
     "A generic workspace candidate and B independent runtime remain blocked by dedicated admission probes"
   ]
