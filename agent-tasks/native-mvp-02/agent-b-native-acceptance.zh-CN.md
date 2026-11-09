@@ -4,6 +4,8 @@
 
 **持续执行：** 同时读取 [扩展队列](extended-run.zh-CN.md)。下文契约修正对应 B1，原生四组对应 B2；交可执行检查点后继续 B3–B6，不在原报告阶段停止。仍只拥有本测试目录，本轮原生模型任务总上限保持四个。
 
+**最新准入：** `e392fc5` 尚未通过。先读 [扩展复核](../../docs/rfcs/WP-16/0011-extended-checkpoint-review.md)，关闭 NATIVE-LINK 过早 PASS/非法 continue，使用真实 patch 产物和已安装的 `apps/console` Playwright，补实际执行的 B3/B5/Driver conformance。14 项自测和 profile 配置不能代替整包完成；已用两个原生任务，剩余额度不自动增加。
+
 ## 出口与归属
 
 仅拥有 `tests/native-acceptance/`。把 `0e62a3d` 的只读框架交付为可以执行的独立原生验收工具，给主线可靠的故障复现；不能通过改产品或降预期解决失败。

@@ -2,8 +2,9 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { execFileSync, spawn } from 'node:child_process'
 import { once } from 'node:events'
+import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { key } from '../../packages/orchestrator-core/dist/index.js'
@@ -162,6 +163,11 @@ test(
     ).view
     assert.equal(ready.resourceStatus, 'quiescent')
     assert.equal(ready.artifactIds.length, 4)
+    const location = await h.product.read.workLocation(created.workId)
+    assert.ok(location.workspacePath, 'the reviewed work retains its physical workspace location')
+    assert.ok(location.baseCommit)
+    assert.equal(location.projectPath, realpathSync(h.scratchProject))
+    assert.ok(existsSync(location.workspacePath))
     const deliveries = h.product.application.questions.currentDeliveries(question.id)
     assert.equal(deliveries[0].status, 'native_applied')
     const accepted = await h.command({ kind: 'accept_candidate', candidate: ready.actions.currentCandidate })
@@ -174,6 +180,8 @@ test(
     assert.equal(h.frames().filter((frame) => frame.type === 'deliver').length, 0)
     assert.ok((await h.product.read.artifact(ready.artifactIds[1])).body)
     assert.equal(await h.product.read.artifact('0'.repeat(64)), undefined)
+    await h.reopen()
+    assert.deepEqual(await h.product.read.workLocation(created.workId), location)
   },
 )
 
@@ -663,6 +671,19 @@ test(
     assert.deepEqual(body.candidate, next.actions.currentCandidate)
     assert.equal(body.attemptId, h.store.bindings.current(next.actions.currentCandidate.ticketId).attemptId)
     assert.equal(body.output.sha256, next.artifactIds[2])
+    assert.equal(body.patch.artifactId, next.artifactIds[1])
+    assert.equal(body.patch.format, 'git-binary-diff/1')
+    const patchResponse = await http.request(`http://127.0.0.1/v1/artifacts/${body.patch.artifactId}`, { headers })
+    assert.equal(patchResponse.status, 200)
+    const patch = Buffer.from(await patchResponse.arrayBuffer())
+    assert.equal(patch.byteLength, body.patch.bytes)
+    assert.equal(createHash('sha256').update(patch).digest('hex'), body.patch.sha256)
+    assert.equal(body.baseCommit, body.headCommit, 'an uncommitted worktree still has a complete patch')
+    const clone = join(h.root, 'patch-clone')
+    execFileSync('git', ['clone', '-q', h.scratchProject, clone], { stdio: 'pipe' })
+    execFileSync('git', ['apply', '--check', '-'], { cwd: clone, input: patch, stdio: 'pipe' })
+    execFileSync('git', ['apply', '-'], { cwd: clone, input: patch, stdio: 'pipe' })
+    assert.equal(readFileSync(join(clone, 'src/product-output.txt'), 'utf8'), 'approved product output\n')
     assert.notEqual(next.artifactIds[0], ready.artifactIds[0])
     assert.equal(next.artifactIds[2], ready.artifactIds[2])
   },

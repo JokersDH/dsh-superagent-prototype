@@ -1,0 +1,28 @@
+{
+  "status": "BLOCKED_NATIVE_ACCEPTANCE_ADMISSION",
+  "checkedAt": "2026-11-09T11:27:54.260Z",
+  "candidateCommit": "e392fc5fdf77f4a20b92eb6d8958c89af992a727",
+  "reviewerCommit": "04871fbd0a88aec88b0630c58d6c7585aff1b3f0",
+  "sourceArchiveSha256": "79a640b9225fa72d410cc1114e340f861202185997c07f4d2e7936a74c4499c5",
+  "cases": [
+    {
+      "id": "NATIVE-NO-CANDIDATE-MUST-NOT-PASS",
+      "passesInvariant": false,
+      "observed": {
+        "nativeLinkStatus": "PASS",
+        "realCandidatePresent": false,
+        "returnedModelTasks": 1
+      }
+    },
+    {
+      "id": "CONTINUE-COMMAND-MUST-SATISFY-SHARED-SCHEMA",
+      "passesInvariant": false,
+      "observed": {
+        "sent": true,
+        "schemaValid": false
+      }
+    }
+  ],
+  "modelCalls": 0,
+  "scope": "Immutable candidate archive, valid shared configuration and an in-memory fake client only; no HTTP/native/model/project operation"
+}

@@ -4,6 +4,8 @@
 
 **持续执行：** 同时读取 [扩展队列](extended-run.zh-CN.md)。下文原三个阶段对应 A1–A3；通过后提交检查点，继续 A4–A6，不在原“最终验收”后停止。依然只拥有本包。
 
+**最新准入：** `b6dd261` 尚未通过。先读 [扩展复核](../../docs/rfcs/WP-16/0011-extended-checkpoint-review.md)，修复新增三项 blocked cleanup 伪造归属、进程观察未知和合并输出预算；保留已做的 A4–A6。复验脚本已扩展为八项，可用 `--candidate <commit>` 检查不可变快照。
+
 ## 出口与归属
 
 将 `packages/environment-preparation/` 从包内可运行实现交付为主线可以安全接入的深模块：授权输入 → 受控准备 → 可信 ready 凭证 → 复验 → 仅清理本模块拥有的资源。

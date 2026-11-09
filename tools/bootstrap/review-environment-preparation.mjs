@@ -1,14 +1,28 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
 
-const { values } = parseArgs({ options: { environment: { type: 'string' }, record: { type: 'boolean', default: false } } })
+const { values } = parseArgs({ options: { environment: { type: 'string' }, candidate: { type: 'string' }, report: { type: 'string' }, record: { type: 'boolean', default: false } } })
 if (!values.environment) throw new Error('Provide --environment <committed candidate checkout>')
-const candidate = resolve(values.environment)
-const { prepareEnvironment } = await import(pathToFileURL(join(candidate, 'packages/environment-preparation/src/index.ts')))
+const checkout = resolve(values.environment)
+let candidate = checkout
+let candidateCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: checkout, encoding: 'utf8' }).trim()
+let sourceArchiveSha256
+if (values.candidate) {
+  if (!/^[a-f0-9]{7,40}$/.test(values.candidate)) throw new Error('--candidate must be a commit hash')
+  candidateCommit = execFileSync('git', ['rev-parse', '--verify', values.candidate + '^{commit}'], { cwd: checkout, encoding: 'utf8' }).trim()
+  const archive = execFileSync('git', ['archive', candidateCommit, 'packages/environment-preparation'], { cwd: checkout, maxBuffer: 4 * 1024 * 1024 })
+  sourceArchiveSha256 = createHash('sha256').update(archive).digest('hex')
+  candidate = mkdtempSync('/tmp/pa-env-review-source-')
+  process.once('exit', () => rmSync(candidate, { recursive: true, force: true }))
+  execFileSync('tar', ['-x', '-C', candidate], { input: archive })
+  symlinkSync(join(checkout, 'packages/environment-preparation/node_modules'), join(candidate, 'packages/environment-preparation/node_modules'))
+}
+const { prepareEnvironment, standaloneProcessPort } = await import(pathToFileURL(join(candidate, 'packages/environment-preparation/src/index.ts')))
 const { makePnpmFixture, copies } = await import(pathToFileURL(join(candidate, 'packages/environment-preparation/test/helpers.ts')))
 const cases = []
 const json = (path, value) => writeFileSync(path, JSON.stringify(value) + '\n')
@@ -87,12 +101,49 @@ await check('ENV-OFFLINE-INSTALL-DOES-NOT-EXECUTE-PNPMFILE', async () => {
     return { passesInvariant: !executed, observed: { status: result.status, code: result.code ?? null, hookExecutedOutsideWorkspace: executed, modelCalls: 0, fixturePolicy: 'local tarball, pnpm offline, no network request in hook' } }
   } finally { if (h) rmSync(h.root, { recursive: true, force: true }) }
 })
+await check('ENV-TRUSTED-BLOCKED-CLEANUP-PRESERVES-UNOWNED', async () => {
+  const h = fixture()
+  try {
+    mkdirSync(join(h.workspace, '.product-environment'))
+    mkdirSync(join(h.workspace, 'node_modules'))
+    const note = join(h.workspace, 'node_modules/user-note.txt')
+    writeFileSync(note, 'pre-existing foreign content\n')
+    json(join(h.workspace, '.product-environment/state.json'), { protocol: 'environment-preparation/2', owned: true, fingerprint: 'forged-marker' })
+    writeFileSync(join(h.workspace, 'package.json'), '{invalid-json')
+    const result = await prepareEnvironment({ ...input(h), authorityRoot: join(h.root, 'authority') })
+    await result.cleanup()
+    const preserved = existsSync(note) && readFileSync(note, 'utf8') === 'pre-existing foreign content\n'
+    return { passesInvariant: preserved, observed: { status: result.status, code: result.code ?? null, unownedContentPreserved: preserved } }
+  } finally { rmSync(h.root, { recursive: true, force: true }) }
+})
+await check('ENV-PROCESS-OBSERVATION-UNKNOWN-IS-NOT-CONFIRMED', async () => {
+  const h = fixture()
+  const kill = process.kill
+  try {
+    process.kill = (pid, signal) => {
+      if (pid < 0 && signal === 0) throw Object.assign(new Error('controlled observation failure'), { code: 'EPERM' })
+      return kill(pid, signal)
+    }
+    const result = await standaloneProcessPort.run(process.execPath, ['-e', 'process.exit(0)'], { cwd: h.workspace, env: { PATH: process.env.PATH ?? '' }, timeoutMs: 1000, maxOutputBytes: 100 })
+    return { passesInvariant: result.quiescence !== 'confirmed', observed: { quiescence: result.quiescence, observation: 'controlled EPERM only for process-group liveness probe; real child exited normally' } }
+  } finally { process.kill = kill; rmSync(h.root, { recursive: true, force: true }) }
+})
+await check('ENV-COMBINED-STDOUT-STDERR-LIMIT', async () => {
+  const h = fixture()
+  try {
+    const result = await standaloneProcessPort.run(process.execPath, ['-e', 'process.stdout.write("a".repeat(15));process.stderr.write("b".repeat(15))'], { cwd: h.workspace, env: { PATH: process.env.PATH ?? '' }, timeoutMs: 1000, maxOutputBytes: 20 })
+    const capturedBytes = Buffer.byteLength(result.stdout) + Buffer.byteLength(result.stderr)
+    return { passesInvariant: result.outputLimited && capturedBytes <= 20, observed: { capturedBytes, limit: 20, outputLimited: result.outputLimited } }
+  } finally { rmSync(h.root, { recursive: true, force: true }) }
+})
 const report = { status: cases.every(item => item.passesInvariant) ? 'PASS_ENVIRONMENT_ADMISSION' : 'BLOCKED_ENVIRONMENT_ADMISSION', checkedAt: new Date().toISOString(),
-  reviewerCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), candidateCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: candidate, encoding: 'utf8' }).trim(),
+  reviewerCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), candidateCommit,
+  ...(sourceArchiveSha256 ? { sourceArchiveSha256, sourceMode: 'immutable git archive; candidate dependency links reused read-only' } : { sourceMode: 'candidate checkout' }),
   node: process.version, platform: process.platform, architecture: process.arch, cases, scope: 'Private temporary files/local offline package fixture only; no vendor/model/account/user-project operation' }
-if (values.record) {
-  mkdirSync('reports/releases/native-followup', { recursive: true })
-  writeFileSync('reports/releases/native-followup/environment-admission.json', JSON.stringify(report, null, 2) + '\n')
+if (values.record || values.report) {
+  const path = values.report ?? 'reports/releases/native-followup/environment-admission.json'
+  mkdirSync(dirname(path), { recursive: true })
+  writeFileSync(path, JSON.stringify(report, null, 2) + '\n')
 }
 console.log(JSON.stringify(report, null, 2))
 if (!cases.every(item => item.passesInvariant)) process.exitCode = 1
