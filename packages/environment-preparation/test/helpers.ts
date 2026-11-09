@@ -106,7 +106,7 @@ export function projectState(project: string): { status: string; files: string; 
   }
 }
 
-export function writeFakeManager(path: string, version: string, mode: 'sleep' | 'offline-error' | 'flood'): string {
+export function writeFakeManager(path: string, version: string, mode: 'sleep' | 'offline-error' | 'flood' | 'probe-sleep' | 'disk'): string {
   const pidFile = join(path, '..', 'fake-manager.pid')
   const header = `#!/bin/sh
 if [ "$1" = "--version" ]; then echo "${version}"; exit 0; fi
@@ -117,13 +117,25 @@ mkdir -p node_modules/fake .product-environment
 trap '' TERM
 sleep 30
 `
-    : mode === 'flood'
-      ? `${header}echo $$ > ${JSON.stringify(pidFile)}
+    : mode === 'probe-sleep'
+      ? `#!/bin/sh
+if [ "$1" = "--version" ]; then sleep 30; fi
+exit 1
+`
+      : mode === 'disk'
+        ? `${header}echo $$ > ${JSON.stringify(pidFile)}
+mkdir -p node_modules/big .product-environment
+head -c 500000 /dev/zero > node_modules/big/file
+trap '' TERM
+sleep 30
+`
+        : mode === 'flood'
+          ? `${header}echo $$ > ${JSON.stringify(pidFile)}
 mkdir -p node_modules/fake .product-environment
 trap '' TERM
 yes "flood-output-line-for-the-environment-output-limit"
 `
-      : `${header}mkdir -p .product-environment
+          : `${header}mkdir -p .product-environment
 echo "ERR_PNPM_NO_OFFLINE_META No metadata for package" >&2
 exit 1
 `

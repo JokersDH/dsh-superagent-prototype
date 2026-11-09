@@ -1,12 +1,21 @@
 import { createHash } from 'node:crypto'
 import { existsSync, lstatSync, readFileSync, readlinkSync, readdirSync, realpathSync, statSync } from 'node:fs'
-import { join, relative, resolve, sep } from 'node:path'
+import { basename, dirname, join, relative, resolve, sep } from 'node:path'
 
 export const sha256 = (data: string | Buffer): string => createHash('sha256').update(data).digest('hex')
 
 /** Canonical path with symlinked ancestors resolved. */
 export function canonical(path: string): string {
-  try { return realpathSync(resolve(path)) } catch { return resolve(path) }
+  let current = resolve(path)
+  const rest: string[] = []
+  while (!existsSync(current)) {
+    const parent = dirname(current)
+    if (parent === current) break
+    rest.unshift(basename(current))
+    current = parent
+  }
+  try { current = realpathSync(current) } catch { /* keep the resolved ancestor */ }
+  return rest.length ? join(current, ...rest) : current
 }
 
 export function inside(parent: string, child: string): boolean {

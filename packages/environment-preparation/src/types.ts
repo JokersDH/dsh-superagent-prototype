@@ -25,6 +25,69 @@ export interface EnvironmentExclusionPort {
   excludedPaths(workspacePath: string): readonly string[]
 }
 
+export interface EnvironmentProcessResult {
+  code: number | null
+  signal: string | null
+  stdout: string
+  stderr: string
+  timedOut: boolean
+  cancelled: boolean
+  outputLimited: boolean
+  /** confirmed only when the owned process group is proven gone. */
+  quiescence: 'confirmed' | 'indeterminate' | 'unknown'
+  spawnError?: string
+}
+
+export interface EnvironmentProcessPort {
+  run(
+    command: string,
+    args: readonly string[],
+    options: {
+      cwd: string
+      env: Record<string, string>
+      signal?: AbortSignal
+      timeoutMs: number
+      maxOutputBytes: number
+    },
+  ): Promise<EnvironmentProcessResult>
+}
+
+export interface EnvironmentRef {
+  protocol: 'environment-ref/2'
+  authorityRoot: string
+  receiptId: string
+  requestId: string
+  fingerprint: string
+  workspacePath: string
+}
+
+export interface VerifiedEnvironment {
+  status: 'valid'
+  ref: EnvironmentRef
+  fingerprint: string
+  environment: Readonly<Record<string, string>>
+  excludedPaths: readonly string[]
+  ownedPaths: readonly string[]
+  diagnostics: readonly EnvironmentDiagnostic[]
+}
+
+export interface FailedEnvironmentVerification {
+  status: 'blocked'
+  code: string
+  message: string
+  diagnostics: readonly EnvironmentDiagnostic[]
+}
+
+export type EnvironmentVerificationResult = VerifiedEnvironment | FailedEnvironmentVerification
+
+export interface TrustedCleanupResult {
+  status: 'cleaned' | 'blocked'
+  code?: string
+  message?: string
+  removed: readonly string[]
+  leftovers: readonly string[]
+}
+
 export interface EnvironmentPreparationInput {
   /** Authorized original project; this module only reads it. */
   projectPath: string
@@ -43,6 +106,10 @@ export interface EnvironmentPreparationInput {
   maxWorkspaceBytes?: number
   /** Allows tests/integration to supply the same exclusion port the workspace would use. */
   exclusion?: EnvironmentExclusionPort
+  /** Caller-owned private directory outside project/workspace for signed receipts, liveness lock and authority key. */
+  authorityRoot?: string
+  /** Optional injected process runner (e.g. the coordinator's OwnedProcessHost adapter). */
+  processPort?: EnvironmentProcessPort
 }
 
 export interface EnvironmentManager {
@@ -64,6 +131,10 @@ export interface ReadyEnvironment {
   excludedPaths: readonly string[]
   diagnostics: readonly EnvironmentDiagnostic[]
   evidence: readonly EnvironmentEvidence[]
+  /** Signed, serializable receipt reference for cross-process verification/cleanup. */
+  environmentRef?: EnvironmentRef
+  /** Absolute paths this environment truly owns; empty for existing_only. */
+  ownedPaths?: readonly string[]
   cleanup(): Promise<CleanupResult>
 }
 

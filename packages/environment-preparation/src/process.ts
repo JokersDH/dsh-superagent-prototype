@@ -118,3 +118,24 @@ export async function runOwned(
     })
   })
 }
+
+import type { EnvironmentProcessPort, EnvironmentProcessResult } from './types.ts'
+
+/** Safe default port: detached group, bounded output/time, group-quiescence verification. */
+export const standaloneProcessPort: EnvironmentProcessPort = {
+  async run(command, args, options): Promise<EnvironmentProcessResult> {
+    const result = await runOwned(command, args, {
+      cwd: options.cwd,
+      env: options.env,
+      timeoutMs: options.timeoutMs,
+      maxOutputBytes: options.maxOutputBytes,
+      ...(options.signal ? { signal: options.signal } : {}),
+    })
+    return {
+      code: result.code, signal: result.signal, stdout: result.stdout, stderr: result.stderr,
+      timedOut: result.timedOut, cancelled: result.cancelled, outputLimited: result.outputLimited,
+      quiescence: result.groupAlive ? 'indeterminate' : 'confirmed',
+      ...(result.spawnError ? { spawnError: result.spawnError } : {}),
+    }
+  },
+}

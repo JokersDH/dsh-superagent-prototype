@@ -17,6 +17,8 @@ const result = await prepareEnvironment({
   policy: 'existing_only' | 'offline_install',
   signal,                 // AbortSignal; cancellation cleans owned state
   storeDir,               // required for offline_install when dependencies exist
+  authorityRoot,          // caller-owned private dir outside project/workspace (signed receipts + lock)
+  processPort,            // optional injected process runner (default: safe standalone port)
   timeoutMs, maxOutputBytes, maxWorkspaceBytes,
 })
 if (result.status === 'ready') {
@@ -26,7 +28,25 @@ if (result.status === 'ready') {
 // result.status === 'blocked': { code, message, diagnostics, evidence, cleanup }
 ```
 
-`ready` contains `fingerprint`, manager/node identity, policy, diagnostics, evidence and `cleanup()`.
+`ready` contains `fingerprint`, manager/node identity, policy, diagnostics, evidence, an optional signed
+`environmentRef`, truly owned `ownedPaths`, and `cleanup()`. With `authorityRoot`, `cleanup()` delegates
+to the trusted receipt-bound cleanup; without it a warning marks the legacy in-process mode and no
+cross-process receipt exists.
+
+```ts
+import { verifyPreparedEnvironment, cleanupPreparedEnvironment } from '@personal-agent/environment-preparation'
+const verified = verifyPreparedEnvironment(ref) // serializable ref from another process
+const cleaned = await cleanupPreparedEnvironment(ref)
+```
+
+The signed receipt lives under `authorityRoot/receipts/<id>.json` (HMAC-SHA256 with a 0600
+`authority.key`), outside project/workspace. Workspace markers are never deletion/reuse authority.
+Verification rechecks package/lock/dependency identity, owned-path inode identity and the installed
+tree digest; replacement, drift, forged/missing receipts block. Trusted cleanup deletes only
+identity-matched signed owned paths and removes the receipt only after full cleanup. A live workspace
+lock prevents a second installer; stale locks are removed only after explicit ESRCH evidence.
+`processPort` lets the coordinator supply its owned-process implementation; it must return explicit
+quiescence (`confirmed|indeterminate|unknown`) and the module never treats unproven quiescence as ready.
 `blocked` always means no environment may be used; a blocked result still carries `cleanup()` so a
 caller can assert leftovers. `EnvironmentPreparationError` is thrown only for an invalid request
 (unsafe path containment, invalid requestId, missing AbortSignal) before any filesystem write.

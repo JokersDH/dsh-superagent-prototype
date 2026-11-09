@@ -5,11 +5,15 @@
  * reproducible fingerprint, allowlisted environment, diagnostic evidence and an owned cleanup handle.
  */
 export { prepareEnvironment } from './prepare.ts'
-export { inspectWorkspace, nodeRangeSatisfied } from './project.ts'
+export { verifyPreparedEnvironment, cleanupPreparedEnvironment } from './verify.ts'
+export { standaloneProcessPort } from './process.ts'
+export { inspectWorkspace, nodeRangeSatisfied, versionsEqual } from './project.ts'
 export { runOwned } from './process.ts'
 export {
   EnvironmentPreparationError, defaultEnvironmentExclusions,
   type BlockedEnvironment, type CleanupResult, type DiagnosticSeverity, type EnvironmentDiagnostic,
-  type EnvironmentEvidence, type EnvironmentExclusionPort, type EnvironmentManager,
-  type EnvironmentPreparationInput, type PreparationPolicy, type PreparationResult, type ReadyEnvironment,
+  type EnvironmentEvidence, type EnvironmentExclusionPort, type EnvironmentManager, type EnvironmentProcessPort,
+  type EnvironmentProcessResult, type EnvironmentPreparationInput, type EnvironmentRef,
+  type EnvironmentVerificationResult, type FailedEnvironmentVerification, type PreparationPolicy,
+  type PreparationResult, type ReadyEnvironment, type TrustedCleanupResult, type VerifiedEnvironment,
 } from './types.ts'
