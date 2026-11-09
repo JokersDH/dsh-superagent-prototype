@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2026-11-09T11:08:29.762Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "B6 conformance",
+    "nativeLane": false
+  },
+  "totals": {
+    "cases": 6,
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "B6-SHAPE",
+      "title": "every published profile has the required fields",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "5 profile(s) complete"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B6-ADMISSION",
+      "title": "dispatchAllowed and blockedReason never disagree",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "admission state is coherent"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B6-NATIVE-GATE",
+      "title": "native dispatch requires native_test_passed",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "no native profile is admitted without a native test"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B6-FIXTURE-HONESTY",
+      "title": "controlled fixtures are labelled fixture_ready",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "every fixture reports fixture_ready"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B6-PROJECT-REFERENCES",
+      "title": "projects only reference published, admitted profiles",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "all project profile references resolve to admitted profiles"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B6-UNKNOWN-CAPABILITY",
+      "title": "an unknown capability is refused explicitly",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "refused with HTTP 200"
+      ],
+      "evidence": [],
+      "entities": []
+    }
+  ]
+}

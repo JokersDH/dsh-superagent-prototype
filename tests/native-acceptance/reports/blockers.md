@@ -70,3 +70,17 @@ separate `continue_work` command is sent.
 product handoff: a UI that only shows "delegated" after `create_work` would mislead the operator.
 
 **API needed:** none; document the two-step contract (or accept `autoContinue` in `create_work`).
+
+---
+
+## BLOCKER-3 (owner: main / environment) — Playwright is not installed
+
+**Observed:** `require.resolve('playwright')` fails in this worktree; there is no `playwright`
+binary in `node_modules/.bin`. `apps/console/e2e/*.mjs` exist but cannot run.
+
+**Impact:** B4 (real browser regression at 1440×900 and 390×844, download roundtrip through the
+same-origin proxy, SSE reconnect) is **NOT_TESTED**. Installing a browser dependency is a root
+lockfile change, which is main-owned, so this cannot be resolved from the acceptance directory.
+
+**Needed:** main adds `playwright` (or provides an existing browser driver) and states the launch
+command for the console dev server; the acceptance harness then drives the published UI.

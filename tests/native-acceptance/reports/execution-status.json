@@ -1,5 +1,5 @@
 {
-  "phase": "B5",
+  "phase": "B6",
   "branch": "codex/g1-runtime",
   "base": "5bbd892",
   "commit": "2c1f604",
@@ -74,8 +74,33 @@
         "p50LatencyMs": 3
       },
       "note": "bounded soak stops at the first unexplained invariant break; no owned process left behind"
+    },
+    "B6": {
+      "status": "passed",
+      "cases": "6/6 PASS",
+      "scope": "conformance entry applied to every published profile (no model task)",
+      "passed": [
+        "every profile has the required fields",
+        "dispatchAllowed and blockedReason never disagree",
+        "no native profile is admitted without native_test_passed",
+        "fixtures report fixture_ready only",
+        "project profile references resolve to admitted profiles",
+        "an unknown capability is refused/behaves explicitly"
+      ],
+      "note": "same assertion set judges a future executor; a missing capability is refused, not downgraded"
+    },
+    "B4": {
+      "status": "blocked",
+      "reason": "Playwright is not installed in this worktree (BLOCKER-3)",
+      "notTested": [
+        "desktop 1440x900 flow",
+        "narrow 390x844 flow",
+        "patch download roundtrip through the same-origin proxy",
+        "SSE disconnect/reconnect UI state",
+        "keyboard reachability and focus return"
+      ]
     }
   },
-  "next": "B4 browser regression, then B6 conformance entry; B2 native gaps stay blocked on BLOCKER-1",
+  "next": "only BLOCKER-1 (artifact diff/location) and BLOCKER-3 (browser driver) prevent further independent progress",
   "blockers": "tests/native-acceptance/reports/blockers.md"
 }
