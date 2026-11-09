@@ -1,9 +1,9 @@
 {
   "status": "PASS_MAIN_CONTROLLED_BROWSER",
-  "testedAt": "2026-11-09T07:11:14.666Z",
-  "sourceCommit": "4e984fa71a0dc62e63fdc4a670a50daf1d152312",
+  "testedAt": "2026-11-09T09:31:01.035Z",
+  "sourceCommit": "252bf707d2c5362d49c55e5f7ed8b4f6b571dfe8",
   "consoleURL": "http://127.0.0.1:5180",
-  "conversationId": "browser-test-80342ab0-8dec-4e7a-aa9d-2764c6b12afd",
+  "conversationId": "browser-test-dc200e9f-c0e1-48f4-a293-f4171a0ae69b",
   "cases": [
     {
       "id": "AUTOMATIC-LOCAL-SESSION",
@@ -53,7 +53,7 @@
   "errors": [],
   "limitations": [
     "Controlled work execution; no paid model requests in this browser suite",
-    "Independent Runner and native compatibility remain unaccepted",
+    "Independent Runner and native compatibility are measured in the separate native MVP lane",
     "Real model response and Markdown rendering are verified separately by manual smoke"
   ]
 }

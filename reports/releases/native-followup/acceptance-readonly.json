@@ -1,0 +1,200 @@
+{
+  "generatedAt": "2026-11-09T10:31:54.104Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "apiUrl": "http://127.0.0.1:8796",
+    "nativeLaneExecuted": false,
+    "nativeLaneReason": "lane not requested",
+    "configurationRevision": "23f00e013adb51ade8f13ac6e9729f18236a9d15e39853825f2a909c00c224f6"
+  },
+  "totals": {
+    "cases": 12,
+    "PASS": 5,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 7
+  },
+  "lane": "read-only",
+  "profileIds": [
+    {
+      "id": "profile-codex-native",
+      "kind": "native",
+      "readiness": "native_test_passed"
+    },
+    {
+      "id": "profile-fixture-question",
+      "kind": "controlled_fixture",
+      "readiness": "fixture_ready"
+    },
+    {
+      "id": "profile-fixture-pass",
+      "kind": "controlled_fixture",
+      "readiness": "fixture_ready"
+    },
+    {
+      "id": "profile-fixture-fail",
+      "kind": "controlled_fixture",
+      "readiness": "fixture_ready"
+    },
+    {
+      "id": "profile-fixture-slow",
+      "kind": "controlled_fixture",
+      "readiness": "fixture_ready"
+    }
+  ],
+  "cases": [
+    {
+      "id": "HARNESS-AUTH",
+      "title": "the acceptance harness can authenticate against the running product",
+      "lane": "read-only",
+      "status": "PASS",
+      "detail": [
+        "session established from the private bootstrap token",
+        "GET /v1/health 200"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "CONFIG-READ",
+      "title": "GET /v1/configuration is available and never cached",
+      "lane": "read-only",
+      "status": "PASS",
+      "detail": [
+        "authenticated read with no-store"
+      ],
+      "evidence": [
+        {
+          "status": 200,
+          "revision": "23f00e013adb51ade8f13ac6e9729f18236a9d15e39853825f2a909c00c224f6",
+          "cacheControl": "no-store"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "CONFIG-NATIVE-ADMISSION",
+      "title": "the configuration states exactly which profiles may dispatch",
+      "lane": "read-only",
+      "status": "PASS",
+      "detail": [
+        "native profile profile-codex-native is admitted (readiness native_test_passed)"
+      ],
+      "evidence": [
+        {
+          "profile": {
+            "id": "profile-codex-native",
+            "revision": 1,
+            "displayName": "Codex · 本机开发",
+            "driverId": "codex-native",
+            "kind": "native",
+            "readiness": "native_test_passed",
+            "dispatchAllowed": true
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "CONFIG-NO-RAW-IDENTITY",
+      "title": "the configuration never exposes executable/argv/native config",
+      "lane": "read-only",
+      "status": "PASS",
+      "detail": [
+        "no backend-only identity fields in the response"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "CONFIG-FIXTURE-NOT-NATIVE",
+      "title": "fixture profiles are never presented as tested vendors",
+      "lane": "read-only",
+      "status": "PASS",
+      "detail": [
+        "4 fixture profile(s) are declared controlled_fixture"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-LINK",
+      "title": "delegate to the real Codex on a private scratch project and reach a verified candidate",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "native lane was not requested (pass --run-native)"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-STOP",
+      "title": "stop ends the actual process tree, not merely the native ACK",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "native lane was not requested (pass --run-native)"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-REOPEN",
+      "title": "browser/reopen does not resend begin and the executor is preserved",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "native lane was not requested (pass --run-native)"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-RESTART",
+      "title": "coordinator restart does not start a second physical writer",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "native lane was not requested (pass --run-native)"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-STALE-CANDIDATE",
+      "title": "a modified current candidate cannot be accepted",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "native lane was not requested (pass --run-native)"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-CHECK-FAIL",
+      "title": "a required machine FAIL cannot be bypassed by human acceptance",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "native lane was not requested (pass --run-native)"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-QUESTION",
+      "title": "a real question is answered per request/attempt/epoch/contract",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "native lane was not requested (pass --run-native)"
+      ],
+      "evidence": [],
+      "entities": []
+    }
+  ]
+}

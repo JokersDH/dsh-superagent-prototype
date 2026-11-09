@@ -17,6 +17,7 @@
   "dependencies": {
     "@personal-agent/contracts": "workspace:*",
     "@personal-agent/driver-kit": "workspace:*",
-    "@personal-agent/execution": "workspace:*"
+    "@personal-agent/execution": "workspace:*",
+    "@personal-agent/drivers-codex-native": "workspace:*"
   }
 }

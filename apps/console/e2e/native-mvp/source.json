@@ -1,0 +1,19 @@
+{
+  "baseCommit": "cef31c449a637bb856ea7a4883201088e1fcb181",
+  "sourceWorktreeClean": false,
+  "ownedPaths": [
+    "apps/console/src/App.tsx",
+    "apps/console/src/transport.ts",
+    "apps/console/src/workbench.css",
+    "apps/console/test/native-transport.case.ts",
+    "apps/console/e2e/native-workbench.mjs"
+  ],
+  "sha256": {
+    "apps/console/src/App.tsx": "bda7108269c38d10c54022f621cd39b8edfd27d3f9589b1a74baccb45867c507",
+    "apps/console/src/transport.ts": "8a856d40de248ac36be4ecf93e66a4ce9634d7b39e069914df47fdf337b07aee",
+    "apps/console/src/workbench.css": "65e4be5e82dccf9704971c190b88f5836ec62d7d87bbc4decb75cf6b71e13342",
+    "apps/console/test/native-transport.case.ts": "b8d6432d437aa61074f3957dca1baf7eccbcc753d0748450d1e0f6dcd20c5de3",
+    "apps/console/e2e/native-workbench.mjs": "0a79583bbb59eb27458655fa4913ac889ffc91100e078915f265f92cf944ad92"
+  },
+  "scope": "Uncommitted shared-checkout console implementation; no native/model compatibility claim"
+}

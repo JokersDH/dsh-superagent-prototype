@@ -91,11 +91,19 @@ test('malformed UTF-8 from the child fails the attempt with a stable protocol er
 })
 
 test('an oversized frame from the child fails the attempt instead of buffering (REL-07)', async () => {
+  // The error *class* must be stable even though the exact framing reason depends on how the OS
+  // happens to chunk the child's 2 MiB write: a frame over the limit may be detected as
+  // `frame_too_large` (newline arrived) or `buffer_limit` (buffer cap hit first). Both are the same
+  // safe protocol rejection, and neither may ever be a business fact.
   const { runner, ledger } = makeRunner()
   runner.feed(makeCommand('begin'))
   const result = await runner.launch(makeAttemptSpec(), new FakeDriver({ scenario: 'oversize' }))
+
   assert.equal(result.exit.reason, 'error')
-  assert.ok(ledger.records.some(record => record.kind === 'runtime.error'))
+  const errorFact = ledger.records.find(record => record.kind === 'runtime.error')
+  assert.ok(errorFact, `kinds=${JSON.stringify(ledger.records.map(r => r.kind))}`)
+  // No business fact may be produced from a stream the framing rejected.
+  assert.equal(ledger.records.some(record => record.kind === 'turn.ended'), false)
 })
 
 test('stdout EOF with a live process is reported as disconnected, not terminal', async () => {

@@ -289,6 +289,22 @@ export class FakeDriver implements AgentDriverV1 {
           diagnostics.push(evidence('cancel-ack'))
           finish('cancelled', [])
           break
+        case 'candidate': {
+          // The fake agent produced files; publish their references as a real candidate.
+          const artifacts = Array.isArray(value.artifacts) ? (value.artifacts as Array<{ ref: string }>) : []
+          const artifactRefs = artifacts.map(item => item.ref).filter(ref => typeof ref === 'string')
+          if (artifactRefs.length === 0) {
+            await recordFact('runtime.error', { code: 'protocol_error', message: 'candidate without artifacts', evidenceRefs: [evidence('candidate-empty')] })
+            break
+          }
+          await recordFact('candidate.observed', {
+            artifactRefs,
+            summaryRef: String(value.summaryRef ?? `summary-${spec.attemptId}`),
+            evidenceRefs: [evidence('candidate')],
+          })
+          diagnostics.push(evidence('candidate-observed'))
+          break
+        }
         case 'turn_ended':
           await recordFact('turn.ended', {
             nativeTurnRef: String(value.nativeTurnRef ?? 'turn'),

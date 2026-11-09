@@ -38,6 +38,9 @@ import { createStoredRuntimeIngress } from '../stored-ingress.ts'
 import { producerForBinding } from '../runner-registry.ts'
 import type { IngressBinding } from '../runtime-ingress.ts'
 import { ControlledProductAttempt } from './controlled-attempt.ts'
+import { NativeProductAttempt } from './native-attempt.ts'
+import type { NativeProductConfiguration } from './native-config.ts'
+import { NativeCodexSettingsSchema } from '../../../packages/drivers/codex-native/src/native.ts'
 import type { ProductCompletion } from './completion.ts'
 
 const IntentSchema = z.strictObject({
@@ -62,7 +65,7 @@ const StartSchema = z.strictObject({
   spec: AttemptSpecSchema,
   initialInputRef: IdSchema,
   preparedPolicyRef: IdSchema,
-  mode: z.enum(['question', 'pass', 'fail', 'slow']),
+  mode: z.enum(['question', 'pass', 'fail', 'slow', 'native']),
 })
 const CommandIndexSchema = z.strictObject({
   command: RunnerCommandSchema,
@@ -90,7 +93,7 @@ export const FIXTURE_PROFILES = [
 /** Consumes core intents after commit. Durable receipts fence every possible physical begin. */
 export class ProductExecution {
   readonly effects: Effects
-  private readonly attempts = new Map<string, ControlledProductAttempt>()
+  private readonly attempts = new Map<string, ControlledProductAttempt | NativeProductAttempt>()
   private readonly pendingBegins = new Map<string, RunnerCommand>()
   private readonly runs = new Set<Promise<void>>()
   private readonly waiters = new Map<string, (dispatch: NativeDispatch) => void>()
@@ -104,6 +107,7 @@ export class ProductExecution {
   private readonly scratchProject: string
   private readonly stateRoot: string
   private readonly principal: { userId: string }
+  private readonly native: NativeProductConfiguration | undefined
   constructor(
     store: ProductStore,
     application: ProductApplication,
@@ -112,6 +116,7 @@ export class ProductExecution {
     scratchProject: string,
     stateRoot: string,
     principal: { userId: string },
+    native?: NativeProductConfiguration,
   ) {
     this.store = store
     this.application = application
@@ -119,6 +124,7 @@ export class ProductExecution {
     this.scratchProject = scratchProject
     this.stateRoot = stateRoot
     this.principal = principal
+    this.native = native
     this.effects = new Effects(store.queue)
     this.ingress = createStoredRuntimeIngress(
       store,
@@ -191,7 +197,11 @@ export class ProductExecution {
     this.store.uow.atomic(() => {
       for (const ticket of this.store.domain.tickets.list<Ticket>()) {
         const binding = this.store.bindings.current<IngressBinding>(ticket.id)
-        if (binding?.source === 'controlled-product-fixture' && binding.state !== 'ended') {
+        if (
+          binding &&
+          ['controlled-product-fixture', 'codex-native'].includes(binding.source) &&
+          binding.state !== 'ended'
+        ) {
           this.store.bindings.record({ ...binding, state: 'stopping' })
           this.enqueue('runtime.reconcile', binding.attemptId, ticket.id)
         }
@@ -259,13 +269,19 @@ export class ProductExecution {
       this.store.commands.record(commandIndex(command.id), canonicalDigest(JsonSchema.parse(value)), () => value)
     })
   }
-  private async send(runtime: ControlledProductAttempt, command: RunnerCommand): Promise<NativeDispatch> {
+  private async send(
+    runtime: ControlledProductAttempt | NativeProductAttempt,
+    command: RunnerCommand,
+  ): Promise<NativeDispatch> {
     if (this.waiters.has(command.id)) throw new UnknownSend('An earlier native write is unresolved', 'write_pending')
     let timer: ReturnType<typeof setTimeout> | undefined
     try {
       const observation = new Promise<NativeDispatch>((resolve, reject) => {
         this.waiters.set(command.id, resolve)
-        timer = setTimeout(() => reject(new UnknownSend('No committed native write fact', 'write_unknown')), 2500)
+        timer = setTimeout(
+          () => reject(new UnknownSend('No committed native write fact', 'write_unknown')),
+          runtime instanceof NativeProductAttempt ? 15000 : 2500,
+        )
       })
       await runtime.feed(command)
       return await observation
@@ -362,16 +378,20 @@ export class ProductExecution {
     }
     const trigger = this.store.domain.triggers.get<Trigger>(ticket.origin.triggerId)!
     const profileId = String(trigger.meta.profileId)
-    if (!FIXTURE_PROFILES.includes(profileId as (typeof FIXTURE_PROFILES)[number]))
+    const nativeProfile = this.native?.profile.id === profileId ? this.native.profile : undefined
+    if (!nativeProfile && !FIXTURE_PROFILES.includes(profileId as (typeof FIXTURE_PROFILES)[number]))
       throw new UnknownSend('Only explicit fixture profiles are enabled', 'unsupported_profile')
-    const mode = z.enum(['question', 'pass', 'fail', 'slow']).parse(profileId.slice('profile-fixture-'.length))
+    const mode = nativeProfile
+      ? 'native'
+      : z.enum(['question', 'pass', 'fail', 'slow']).parse(profileId.slice('profile-fixture-'.length))
     const contract = this.store.product.contracts.getByRef(intent.contract)!
     const scope = contract.scope
     if (
-      scope.allowedPaths.length !== 1 ||
-      scope.allowedPaths[0] !== 'src/' ||
-      scope.excludedPaths.length ||
-      scope.externalActions.length
+      !nativeProfile &&
+      (scope.allowedPaths.length !== 1 ||
+        scope.allowedPaths[0] !== 'src/' ||
+        scope.excludedPaths.length ||
+        scope.externalActions.length)
     )
       throw new UnknownSend('This fixture only supports its fixed src/ scratch grant', 'unsupported_scope')
     const previous = this.store.bindings.current<IngressBinding>(ticket.id)
@@ -382,32 +402,52 @@ export class ProductExecution {
       attemptId: `attempt-${randomUUID()}`,
       fenceEpoch: (previous?.fenceEpoch ?? 0) + 1,
     })
-    const workspace = this.workspaces.reserve({ projectPath: this.scratchProject, assignment: attempt })
+    const nativeProject =
+      nativeProfile && this.native?.projects.find((project) => project.id === contract.scope.projectId)
+    if (nativeProfile && !nativeProject)
+      throw new UnknownSend('Native project is not registered', 'unsupported_project')
+    const workspace = this.workspaces.reserve({
+      projectPath: nativeProject ? nativeProject.path : this.scratchProject,
+      assignment: attempt,
+    })
     const initialInputRef = this.input(ticket, [...ticket.undelivered], true)
     const policySnapshotRef = this.store.payloads.write(
-      JsonSchema.parse({
-        kind: 'fixed-scratch-fixture-policy/1',
-        scope,
-        executable: process.execPath,
-        userTextIsExecutable: false,
-      }),
-    ).ref
-    const preparedPolicyRef = this.store.payloads.write(
       JsonSchema.parse(
-        PreparedExecutionPolicySchema.parse({
-          ...attempt,
-          requestedPolicyRevision: 'fixed-scratch-policy-1',
-          nativeAppliedSettingsRef: policySnapshotRef,
-          effectiveConfigFingerprint: canonicalDigest(JsonSchema.parse(scope)),
-          enforcement: 'advisory',
-          verification: 'passed',
-          evidenceRef: policySnapshotRef,
-        }),
+        nativeProfile
+          ? NativeCodexSettingsSchema.parse({
+              kind: 'codex-native-settings/1',
+              workspacePath: workspace.path,
+              scope,
+              approvalPolicy: this.native!.approvalPolicy,
+              ...(this.native!.model ? { model: this.native!.model } : {}),
+              timeoutMs: 600000,
+            })
+          : {
+              kind: 'fixed-scratch-fixture-policy/1',
+              scope,
+              executable: process.execPath,
+              userTextIsExecutable: false,
+            },
       ),
     ).ref
+    const preparedPolicyRef = nativeProfile
+      ? policySnapshotRef
+      : this.store.payloads.write(
+          JsonSchema.parse(
+            PreparedExecutionPolicySchema.parse({
+              ...attempt,
+              requestedPolicyRevision: 'fixed-scratch-policy-1',
+              nativeAppliedSettingsRef: policySnapshotRef,
+              effectiveConfigFingerprint: canonicalDigest(JsonSchema.parse(scope)),
+              enforcement: 'advisory',
+              verification: 'passed',
+              evidenceRef: policySnapshotRef,
+            }),
+          ),
+        ).ref
     const spec = AttemptSpecSchema.parse({
       ...attempt,
-      profile: {
+      profile: nativeProfile ?? {
         id: profileId,
         revision: 1,
         driverId: 'controlled-product-fixture',
@@ -423,16 +463,16 @@ export class ProductExecution {
       workspaceRef: key('workspace', attempt.attemptId),
       resourceLeaseRef: key('lease', attempt.attemptId),
       policySnapshotRef,
-      budgetRef: 'fixture-fixed-operation',
+      budgetRef: nativeProfile ? 'native-bounded-work' : 'fixture-fixed-operation',
     })
     const binding: IngressBinding = {
       ...attempt,
-      runnerIdentityRef: key('controlled-host', attempt.attemptId),
-      source: 'controlled-product-fixture',
+      runnerIdentityRef: key(nativeProfile ? 'native-host' : 'controlled-host', attempt.attemptId),
+      source: nativeProfile ? 'codex-native' : 'controlled-product-fixture',
       state: 'active',
       resources: [],
     }
-    const command = this.command(spec, { kind: 'begin', inputRef: initialInputRef, preparedPolicyRef })
+    let command = this.command(spec, { kind: 'begin', inputRef: initialInputRef, preparedPolicyRef })
     // File preparation precedes the transaction; launch always follows its durable checkpoint.
     this.store.uow.atomic(() => {
       if (!this.readyToDispatch(intent)) throw new Later('Work changed during preparation')
@@ -443,7 +483,7 @@ export class ProductExecution {
       )
       this.store.bindings.record(binding)
       this.store.bindings.setCurrent(ticket.id, attempt.attemptId)
-      this.index(command, [...ticket.undelivered])
+      if (!nativeProfile) this.index(command, [...ticket.undelivered])
       this.store.events.append({
         topic: 'application.execution.prepared',
         entityRef: intent.contract.workId,
@@ -452,21 +492,40 @@ export class ProductExecution {
     })
     const producer = producerForBinding(binding)
     mkdirSync(join(this.stateRoot, 'receipts'), { recursive: true, mode: 0o700 })
-    const runtime = new ControlledProductAttempt(
-      spec,
-      this.store,
-      contract,
-      mode,
-      preparedPolicyRef,
-      workspace.path,
-      join(this.stateRoot, 'receipts', `${attempt.attemptId}.jsonl`),
-      producer,
-      this.ingress.bind(producer),
-      () => !!this.current(attempt),
-    )
+    const runtime = nativeProfile
+      ? new NativeProductAttempt(
+          spec,
+          this.store,
+          workspace.path,
+          join(this.stateRoot, 'runners', attempt.attemptId),
+          producer,
+          this.ingress.bind(producer),
+          () => !!this.current(attempt),
+        )
+      : new ControlledProductAttempt(
+          spec,
+          this.store,
+          contract,
+          mode,
+          preparedPolicyRef,
+          workspace.path,
+          join(this.stateRoot, 'receipts', `${attempt.attemptId}.jsonl`),
+          producer,
+          this.ingress.bind(producer),
+          () => !!this.current(attempt),
+        )
     this.attempts.set(attempt.attemptId, runtime)
     try {
       const running = await runtime.launch()
+      if (runtime instanceof NativeProductAttempt) {
+        if (!runtime.preparedPolicyRef) throw new Error('Native policy preparation has no committed proof')
+        command = this.command(spec, {
+          kind: 'begin',
+          inputRef: initialInputRef,
+          preparedPolicyRef: runtime.preparedPolicyRef,
+        })
+        this.index(command, [...ticket.undelivered])
+      }
       const run = (async () => {
         try {
           const exit = await running.waitExit()
@@ -477,13 +536,13 @@ export class ProductExecution {
             if (exit.reason !== 'terminal' || current.undelivered.length) {
               this.application.core.reportAssignment(ticket.id, intent.assignmentId, {
                 state: 'failed',
-                summary: 'Controlled attempt ended without a fully consumed candidate',
+                summary: '执行结束，未形成输入已完整消费的当前候选',
               })
               return
             }
             this.application.core.reportAssignment(ticket.id, intent.assignmentId, {
               state: 'ready',
-              summary: 'Controlled scratch artifact awaits trusted verification',
+              summary: '当前变更已停止写入，等待注册检查与人工审阅',
             })
             const candidate = this.application.core.completionCandidate(ticket.id)
             if (candidate) this.enqueue('application.verify', attempt.attemptId, { candidate, barrier })
@@ -512,7 +571,11 @@ export class ProductExecution {
       throw new UnknownSend(`Controlled begin requires reconciliation: ${String(error)}`, 'begin_unknown')
     }
   }
-  private async begin(runtime: ControlledProductAttempt, command: RunnerCommand, intent: Intent): Promise<void> {
+  private async begin(
+    runtime: ControlledProductAttempt | NativeProductAttempt,
+    command: RunnerCommand,
+    intent: Intent,
+  ): Promise<void> {
     if (!this.readyToDispatch(intent)) return
     // Only a live in-memory command proven not yet fed may wait through a dispatch hold.
     this.pendingBegins.delete(command.attemptId)

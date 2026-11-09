@@ -1,0 +1,21 @@
+{
+  "name": "@personal-agent/drivers-codex-native",
+  "version": "0.0.0-g2",
+  "private": true,
+  "type": "module",
+  "description": "WP-07 Codex app-server adapters: isolated protocol fixtures and a separately validated native MVP path with lossless ids, policy preparation and per-request write admission.",
+  "license": "MIT",
+  "engines": { "node": ">=24.21.0 <25" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./protocol": "./src/protocol.ts"
+  },
+  "scripts": { "test": "node --test test/*.test.ts" },
+  "dependencies": {
+    "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/driver-kit": "workspace:*",
+    "@personal-agent/catalog": "workspace:*",
+    "@personal-agent/policy-preparation": "workspace:*",
+    "zod": "4.4.3"
+  }
+}

@@ -9,6 +9,7 @@ type Project = {
   scope: Scope
   defaultScope?: Scope
   defaultCriteria: readonly Criterion[]
+  profileIds?: readonly string[]
 }
 type Profile = Omit<ExecutionProfileView, 'dispatchAllowed' | 'blockedReason'> & {
   blockedReason?: ExecutionProfileView['blockedReason']
@@ -43,16 +44,19 @@ export function applicationConfiguration(source: ConfigurationSource, now = Date
     if (project.id !== project.scope.projectId || !scopeWithin(scope, project.scope))
       throw new Error('Published project defaults exceed the configured grant')
     const expired = [scope.expiresAt, project.scope.expiresAt].some((value) => value && Date.parse(value) <= now)
-    const dispatchAllowed = !expired && enabledIds.length > 0
+    const projectProfiles = project.profileIds
+      ? enabledIds.filter((id) => project.profileIds!.includes(id))
+      : enabledIds
+    const dispatchAllowed = !expired && projectProfiles.length > 0
     return {
       id: project.id,
       displayName: project.displayName ?? project.id,
       scope,
       defaultCriteria: project.defaultCriteria,
-      profileIds: enabledIds,
+      profileIds: projectProfiles,
       dispatchAllowed,
       ...(dispatchAllowed
-        ? { defaultProfileId: enabledIds[0] }
+        ? { defaultProfileId: projectProfiles[0] }
         : { blockedReason: expired ? ('stale_contract' as const) : ('unsupported_capability' as const) }),
     }
   })

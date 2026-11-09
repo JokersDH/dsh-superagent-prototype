@@ -1,5 +1,12 @@
 # Controlled Product API
 
+The fixture API below remains available for regression. The default personal workbench now passes
+`--native --assistant --local-access` and uses `createProductRuntime`: imported Git projects, the real
+Codex 0.164.0 Driver on an independent Runner, applied native policy, registered checks, complete patch
+delivery and current-candidate acceptance. See [the current user guide](../../../docs/ASSISTANT-GUIDE.zh-CN.md)
+and [native MVP integration](../../../docs/rfcs/WP-16/0008-native-mvp-integration.md). `createControlledProduct`
+is retained as a compatibility alias; omitting `native` still selects only the controlled lane.
+
 This development entry consumes the real core execution queue. It launches an actual fixed scratch subprocess, routes a structured native question through the SQLite QuestionBroker, freezes the artifact after an authenticated owned-resource barrier, runs the registered check, and accepts only the current verified candidate.
 
 By default it calls no vendor or model. `--assistant` optionally enables durable model dialogue through a private local configuration; the workbench launcher enables this option. Every execution profile is explicitly named `profile-fixture-*`. The subprocess only performs a fixed scratch-file operation; user text is data and is never evaluated as code or a shell command. The controlled host runs inside the coordinator, so coordinator SIGKILL leaves its prior writer uncertain. Independent Runner reconnect remains a separate integration lane.
@@ -59,6 +66,9 @@ Optional assistant endpoints are authenticated: `GET /v1/assistant` returns safe
 | `demo.ts` | Local HTTP process, private credentials and writer lock |
 | `model-provider.ts` | Private model configuration, safe status and single OpenAI-compatible SDK completion |
 | `assistant-replies.ts` | Durable reply intent, bounded conversation context and no automatic repeat billing after uncertain results |
+| `native-attempt.ts` | Independent Runner launch, authenticated registration, immutable payload transfer and original answer-write gate |
+| `native-startup.ts` | Locally admitted Codex version, native project defaults and private worktree root |
+| `project-registry.ts` | Explicit local Git import and registered check presets, private durable configuration |
 
 ## Safety And Recovery
 

@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "sourceCommit": "cef31c449a637bb856ea7a4883201088e1fcb181",
+  "sourceHash": "02ebd8c2e52d09353f502f4b164ef54c6ab4ef53bae76f28f856c1268d6e1c74",
+  "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --noUncheckedIndexedAccess --exactOptionalPropertyTypes --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --skipLibCheck --types node apps/runner/src/runner-service-entry.ts packages/drivers/codex-native/src/native.ts packages/drivers/codex-native/test/native.test.ts apps/runner/test/native-write-admission.test.ts",
+  "scope": "Independent service entry and its runtime imports, production native Driver, and new production-Driver/write-admission tests; legacy fixtures are executed by the separate runtime suite",
+  "node": "v24.22.2"
+}

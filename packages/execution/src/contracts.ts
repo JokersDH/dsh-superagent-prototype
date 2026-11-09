@@ -7,7 +7,9 @@
  * importing storage or the legacy core. Until that wiring exists, durable ACK, atomic fence and
  * recovery are NOT_TESTED (see docs/adr/runtime/g1-wp03-report.md).
  */
-import type { AttemptSpec, CriticalFact, DurableReceipt, RunnerCommand, ServeExit } from '../../contracts/src/types.ts'
+import type { AttemptRef, AttemptSpec, CriticalFact, DurableReceipt, RunnerCommand, ServeExit } from '../../contracts/src/types.ts'
+
+export type RuntimeProducer = { attempt: AttemptRef; runnerIdentityRef: string; source: string }
 
 /** What the Supervisor believes about the current execution for one ticket. */
 export type AttemptBinding = {

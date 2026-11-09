@@ -1,5 +1,7 @@
 # 真实 MVP：外部 A/B 大任务
 
+**历史首轮任务。当前执行 [Native MVP 第二轮整包](../native-mvp-02/README.zh-CN.md)，下文保留原派工和测量范围。**
+
 本轮主线已在 primary checkout 启动两个内部并行子任务，分别收尾 `apps/console/` 和 Codex/Runner。原来两个独立窗口不要重复改这些文件；各自执行下面的新包。
 
 - 外部 Agent A：[真实项目环境准备](agent-a-environment.zh-CN.md)。落点 `packages/environment-preparation/`，让已有依赖的真实 Node/pnpm 项目能在隔离 worktree 检查。

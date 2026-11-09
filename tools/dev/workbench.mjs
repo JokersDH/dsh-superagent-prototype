@@ -16,6 +16,7 @@ const { values } = parseArgs({
     state: { type: 'string', default: join(root, '.local-state/workbench') },
     'require-login': { type: 'boolean', default: false },
     open: { type: 'boolean', default: false },
+    fixture: { type: 'boolean', default: false },
   },
 })
 const port = (name) => {
@@ -128,6 +129,7 @@ async function main() {
       '--console-origin',
       consoleURL,
       '--assistant',
+      ...(!values.fixture ? ['--native'] : []),
       ...(!values['require-login'] ? ['--local-access'] : []),
     ],
     root,
@@ -140,12 +142,12 @@ async function main() {
   if (!response.ok) throw new Error('The product configuration is not available')
   const configuration = ApplicationConfigurationSchema.parse(await response.json())
   const project = configuration.projects.find((project) => project.dispatchAllowed)
-  if (!project) throw new Error('No controlled project is available')
+  if (!project) throw new Error('No admitted project is available')
   const profiles = configuration.profiles.filter(
     (profile) => profile.dispatchAllowed && project.profileIds.includes(profile.id),
   )
-  if (!profiles.length || profiles.some((profile) => profile.kind !== 'controlled_fixture'))
-    throw new Error('This development entry requires controlled fixture profiles')
+  if (!profiles.length || (values.fixture && profiles.some((profile) => profile.kind !== 'controlled_fixture')))
+    throw new Error('No compatible admitted executor is available')
   const check = project.defaultCriteria.find((criterion) => criterion.kind === 'machine' && criterion.required)
   const environment = Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.startsWith('VITE_')))
   // Compatibility projection for the admitted console checkpoint; A owns its direct configuration transport.

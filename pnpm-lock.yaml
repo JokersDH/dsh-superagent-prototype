@@ -215,6 +215,9 @@ importers:
       '@personal-agent/driver-kit':
         specifier: workspace:*
         version: link:../../packages/driver-kit
+      '@personal-agent/drivers-codex-native':
+        specifier: workspace:*
+        version: link:../../packages/drivers/codex-native
       '@personal-agent/execution':
         specifier: workspace:*
         version: link:../../packages/execution
@@ -241,6 +244,12 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
 
+  packages/catalog:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+
   packages/contracts:
     dependencies:
       zod:
@@ -266,6 +275,24 @@ importers:
         specifier: workspace:*
         version: link:../contracts
 
+  packages/drivers/codex-native:
+    dependencies:
+      '@personal-agent/catalog':
+        specifier: workspace:*
+        version: link:../../catalog
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../../contracts
+      '@personal-agent/driver-kit':
+        specifier: workspace:*
+        version: link:../../driver-kit
+      '@personal-agent/policy-preparation':
+        specifier: workspace:*
+        version: link:../../policy-preparation
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+
   packages/effects:
     devDependencies:
       '@types/node':
@@ -283,6 +310,9 @@ importers:
       '@personal-agent/driver-kit':
         specifier: workspace:*
         version: link:../driver-kit
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
 
   packages/orchestrator-core:
     dependencies:
@@ -299,6 +329,12 @@ importers:
       vitest:
         specifier: 4.1.8
         version: 4.1.8(@types/node@24.10.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.10.0)(yaml@2.9.1))
+
+  packages/policy-preparation:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
 
   packages/questions:
     dependencies:

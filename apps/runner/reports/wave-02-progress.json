@@ -1,0 +1,168 @@
+{
+  "package": "wave-02 / Agent B",
+  "branch": "codex/g1-runtime",
+  "updatedAt": "2026-11-09T03:00:00.000Z",
+  "stages": {
+    "B1": {
+      "status": "PASS",
+      "scope": "Journal integrity boundary: terminator, strict record envelope, verified-snapshot gating of replay; plus the earlier I/O poisoning, replay ACK validation and contiguous-sequence rules.",
+      "testedSourceCommit": "78b36bf",
+      "probes": {
+        "review-journal": "PASS_JOURNAL_ADMISSION_CASES",
+        "review-journal-followup": "PASS_JOURNAL_FOLLOWUP_CASES",
+        "review-journal-integrity": "PASS_JOURNAL_INTEGRITY_BOUNDARY"
+      },
+      "tests": {
+        "driver-kit": 18,
+        "testing": 8,
+        "execution": 44,
+        "runner": 78,
+        "total": 148
+      },
+      "limitations": [
+        "No power-loss verification: same-machine fsync plus reopen and SIGKILL only.",
+        "Driver factId continuation is not implemented; recovery replays original facts and never re-serves the same attempt."
+      ],
+      "checkpointNote": "Record envelope validation now uses the frozen CriticalFactSchema plus parseRuntimeFactPayload (kind/value identity rules), not a local approximation."
+    },
+    "B2": {
+      "status": "PASS",
+      "scope": "Stable RunnerHost/launch/recovery surface with a runnable wiring example; recovery semantics verified end to end; Codex protocol flow executed on an actual independent Runner process.",
+      "interfaceCheckpoint": {
+        "protocol": 1,
+        "entry": "apps/runner/src/index.ts",
+        "wiringExample": "apps/runner/scripts/wiring-example.ts",
+        "launchOrder": [
+          "spec-resolved",
+          "spawned",
+          "ready",
+          "resources-registered",
+          "begun"
+        ],
+        "scenarios": [
+          "happy",
+          "waiting-user",
+          "ignore-cancel",
+          "codex-fake",
+          "codex-fake-approval"
+        ]
+      },
+      "tests": {
+        "runner": 117,
+        "codexOnRunner": 7
+      },
+      "tested": [
+        "launch order enforced: begin only after ready and resource registration",
+        "payload/ref preserved through journal and replay",
+        "cross-attempt isolation (separate runner/journal/host)",
+        "persistent ACK only for persisted:true on the same fact",
+        "authenticated reconnect: bearer credential required, wrong credential 401",
+        "coordinator SIGKILL: Runner and native child survive, journal durable, orphan group attributable and killable",
+        "complete owned-resource inventory and stop barrier blocking a new epoch",
+        "recovery never repeats begin/deliver/answer",
+        "Codex protocol turn/approval/answer/cancel executed on the independent Runner process"
+      ],
+      "notTested": [
+        "Production coordinator adapter (main-owned)",
+        "Real installed Codex protocol execution",
+        "Cross-machine durability"
+      ]
+    },
+    "B3": {
+      "status": "PASS",
+      "scope": "Catalog readiness/drift, prepared-policy gate, and a safe projection into the main-owned ExecutionProfileView.",
+      "packages": [
+        "packages/catalog",
+        "packages/policy-preparation"
+      ],
+      "tests": {
+        "catalog": 27,
+        "policy-preparation": 9
+      },
+      "provenanceExport": "packages/catalog/src/projection.ts",
+      "notTested": [
+        "Real executable probing on CI (probe is manual and read-only)",
+        "HTTP wiring (main-owned)"
+      ]
+    },
+    "B4": {
+      "status": "PARTIAL",
+      "scope": "Codex app-server protocol layer and AgentDriverV1 implementation, corrected against the installed 0.164.0 schema.",
+      "packages": [
+        "packages/drivers/codex-native"
+      ],
+      "probe": "packages/drivers/codex-native/scripts/probe-installed.mjs",
+      "probeEvidence": "packages/drivers/codex-native/fixtures/installed-codex-probe.json",
+      "installedVersion": "codex-cli 0.164.0",
+      "protocolEvidence": {
+        "requestId": [
+          "string",
+          "integer"
+        ],
+        "schemaFiles": 37,
+        "schemaBytes": 1933218,
+        "schemaDigest": "ac2c4019cb6e39f870b7faa368c948ba6d83c1674cf4a8cc435fbb6d94c9e8a3",
+        "methods": 191,
+        "hasAnswerMethod": false,
+        "hasServerRequestResolved": true
+      },
+      "realDefectsFixed": [
+        "the Driver invented an `answer` client method; the installed protocol resolves a server request by replying on its id",
+        "receive() discarded server requests because they carry an id"
+      ],
+      "tests": {
+        "codex-native": 18
+      },
+      "notTested": [
+        "Real model turn (no login, no scratch/budget authorisation)",
+        "Actual installed Codex protocol execution",
+        "Installed-version behaviour goldens (only method names verified)",
+        "DSH and ZCode protocols"
+      ]
+    }
+  },
+  "nativeCompatibility": "NOT_TESTED \u2014 no vendor agent was contacted; all evidence is fixture/fake-native based.",
+  "totals": {
+    "tests": 233,
+    "packages": 7,
+    "typecheck": "PASS",
+    "probes": {
+      "review-journal": "PASS_JOURNAL_ADMISSION_CASES",
+      "review-journal-followup": "PASS_JOURNAL_FOLLOWUP_CASES",
+      "review-journal-integrity": "PASS_JOURNAL_INTEGRITY_BOUNDARY"
+    },
+    "demo": "DEMO PASS 11/11",
+    "wiringExample": "WIRING EXAMPLE DONE"
+  },
+  "base": "d7f3401",
+  "checkpoint": "docs/rfcs/WP-16/0003-controlled-product-integration.md",
+  "demo": {
+    "command": "node apps/runner/scripts/demo-wave02.ts",
+    "result": "DEMO PASS 11/11",
+    "scope": "fixture lane only"
+  },
+  "artifactFixes": {
+    "manifest": "apps/runner/src/artifact-manifest.ts",
+    "rules": [
+      "content addressed",
+      "immutable",
+      "idempotent",
+      "bounded",
+      "candidate requires artifacts"
+    ],
+    "tests": 6
+  },
+  "dependencyRequests": [
+    "pnpm install was run to resolve workspace links; the resulting pnpm-lock.yaml diff is NOT committed and is left to the main agent"
+  ],
+  "round": "wave-02 / round 3: runtime delivery consumable by main",
+  "reproduce": [
+    "node apps/runner/scripts/wiring-example.ts",
+    "node apps/runner/scripts/demo-wave02.ts",
+    "node packages/drivers/codex-native/scripts/probe-installed.mjs",
+    "node tools/bootstrap/review-journal.mjs --runtime .",
+    "node tools/bootstrap/review-journal-followup.mjs --runtime .",
+    "node tools/bootstrap/review-journal-integrity.mjs --runtime .",
+    "(cd apps/runner && node --test --test-timeout=40000 test/*.test.ts)"
+  ]
+}

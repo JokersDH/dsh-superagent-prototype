@@ -1,10 +1,14 @@
 # 从这里开始：仓库、代码位置和三 Agent 开发
 
-**当前派工入口：[第二轮整包排程](agent-tasks/wave-02/README.zh-CN.md)。** A 连续交付可信验证、产品仓储和工作台；B 连续交付独立运行时、Catalog/策略准备和首个 Driver；主 Agent 做问题中心、应用 API 和纵向集成。每人一个早期接口检查点、一次整包交付，不再每修一项就重新派工。
+**当前派工入口：[Native MVP 第二轮整包](agent-tasks/native-mvp-02/README.zh-CN.md)。** A 负责环境准备准入，B 负责可执行的真实原生与故障验收，主线负责环境、验证及工作台集成。两人保留原目录和分支，先合并最新 main。native-mvp 首轮及 wave-02 仅作历史参考。
 
-**个人助理工作台已接入：** 双击 `start.command` 或运行 `pnpm start`，打开 `http://127.0.0.1:5180` 即可使用，无需手动令牌。真实模型主对话、本机记录和模型切换已开放，见 [助手简介](docs/ASSISTANT-GUIDE.zh-CN.md)。停止用 `stop.command`/`pnpm stop`，重启用 `pnpm restart`。工作执行仍使用固定 scratch 子进程、原生问题与验证交付，见 [试用说明](docs/WORKBENCH.zh-CN.md)。A/B 候选准入仍分开验证，见 [最新交接](docs/rfcs/WP-16/0005-candidate-admission-and-workbench.md)；不代表任意仓库自动编码、原生兼容或完整 G2 通过。
+**持续执行扩展：[A1–A6 / B1–B6 / M1–M6 队列](agent-tasks/native-mvp-02/extended-run.zh-CN.md)。** 用户离开期间，提交稳定检查点后继续下一阶段；遇阻先留复现，再做独立任务，不逐项等回复。A 增加只读诊断/恢复样例/受限 workspace，B 增加故障矩阵/浏览器/有界稳定性/接入工具，主线继续产品接线与自助诊断。
 
-主线最新检查点：已实现真实受控子进程的“委托 → 提问 → 回答 → 产物冻结 → 检查 → 接受交付”API 闭环，认证的 `GET /v1/configuration` 供工作台读取真实项目、执行器与验收默认值，`GET /v1/assistant` 只返回安全的模型连接状态。`pnpm check:g2-product` 覆盖 **188 项契约 + 162 项产品及模型适配测试**，实际结果见 [产品检查报告](reports/releases/g2-product.json)。主对话现支持真实流式回复、模板和导出；工作记录与聊天上下文隔离，浏览器测试使用独立会话。接线见 [配置查询约定](docs/rfcs/WP-16/0004-application-configuration.md)，启动和代码位置见 [产品入口](apps/coordinator/product/README.md)。fixture 子进程不调用模型；主对话独立使用私有模型配置。浏览器产品、独立 Runner 重连和真实 agent 仍分开验收。
+**本机 Codex MVP 已接入：** 双击 `start.command` 或运行 `pnpm start`，打开 `http://127.0.0.1:5180`。从工作台导入本地 Git 项目，在对话输入目标，点击“委托执行”确认后，真实 Codex 会在独立 worktree 改代码、运行注册检查，供审阅完整 patch 并接受当前交付。无需手动令牌，原项目不自动覆盖。见 [使用指南](docs/ASSISTANT-GUIDE.zh-CN.md) 与 [工作台说明](docs/WORKBENCH.zh-CN.md)。本轮实际范围为 macOS arm64 / Codex 0.164.0 / Node 项目；不是完整 G2 或其它执行器的兼容声明。
+
+最新事实：首次真实 Codex 后端五场景和浏览器六场景通过，完成真实代码、既有测试、当前候选接受、产物下载及重开保留；原 A/B 八项准入阻断已修复。主线回归 367 项、内部运行时回归 262 项及原生零模型安全探针 3 项通过。证据见 [native MVP](reports/releases/native-mvp/) 与 [集成约定](docs/rfcs/WP-16/0008-native-mvp-integration.md)。真实模型审批、澄清、运行中 steer、完整故障矩阵、长期 soak 与依赖准备仍按单列范围推进。以下 G0/G1 历史段落按记录日期阅读，不取代本段最新事实。
+
+2026-11-09 外部交付复核：A `f1d4b1f` 包内 12 项及构建通过，但五项新增环境准入均失败，尚不启用项目依赖安装。B `0e62a3d` 框架八项通过，当前主线只读五项通过，原生七项仍未执行；其 native 分支仍是固定跳过。下一轮从这些实测缺口继续，见 [复核与接线边界](docs/rfcs/WP-16/0009-native-followup-review.md)，不影响上述已验证的无依赖 MVP。
 
 ## 1. 唯一交付仓库
 
@@ -59,8 +63,8 @@ G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契
 | 角色 | 本机目录 | 当前分支/目标 | 当前整包 |
 | --- | --- | --- | --- |
 | 主 Agent（当前会话） | `/Users/hh/Desktop/joker/superagent` | `main` 为集成目标，实施用 `codex/*` | 问题中心、确定性应用/API、独立集成 |
-| Agent A | `/Users/hh/Desktop/joker/superagent-agent-a` | `codex/g2-workspaces-verification` | 可信交付、产品仓储、工作台 |
-| Agent B | `/Users/hh/Desktop/joker/superagent-agent-b` | `codex/g1-runtime` | 独立 Runner、Catalog/策略、首个 Driver |
+| Agent A | `/Users/hh/Desktop/joker/superagent-agent-a` | `codex/g2-workspaces-verification` | `packages/environment-preparation/` 环境准备准入 |
+| Agent B | `/Users/hh/Desktop/joker/superagent-agent-b` | `codex/g1-runtime` | `tests/native-acceptance/` 真实原生和故障验收 |
 
 这三个是同一个 fork 的三个 checkout。没有把你的 CAC 仓库搬进来，也没有将本机的 node_modules、凭据或模型会话作为共享材料。
 
@@ -69,22 +73,24 @@ G1 进度：正式 core/公共契约和 workspace 已交付，core 178 项及契
 在 Agent A 的工具里打开 `/Users/hh/Desktop/joker/superagent-agent-a` 作为项目/工作目录，然后发送：
 
 ```text
-继续本轮 Agent A 整包。工作目录是 /Users/hh/Desktop/joker/superagent-agent-a，分支 codex/g2-workspaces-verification。
-保留已有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、agent-tasks/wave-02/README.zh-CN.md 和 agent-tasks/wave-02/agent-a.zh-CN.md。
-连续完成可信交付、产品仓储和工作台，不在旧修复后停下。提交一次后端接口检查点后继续 UI，最后统一交付。
-只提交拥有路径并 push 自己分支；根 lock、公共 schema 和 main 由主 Agent 管理。
+继续 Native MVP 第二轮 Agent A 整包。工作目录 /Users/hh/Desktop/joker/superagent-agent-a，分支 codex/g2-workspaces-verification。
+保留已有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、agent-tasks/native-mvp-02/README.zh-CN.md 和 agent-tasks/native-mvp-02/agent-a-environment-admission.zh-CN.md。
+仅修改 packages/environment-preparation/：修复五项主线复现，交付可信环境凭证、复验/清理、进程注入接口和离线 pnpm 验收。先交稳定接口检查点，然后连续完成整包。
+再读取 agent-tasks/native-mvp-02/extended-run.zh-CN.md，继续 A4–A6 的只读诊断、跨进程恢复/样例和受限 pnpm workspace，不在首个交接点停止。
+不要重交旧 workspace/console/Runner 实现；只提交拥有路径并 push 自己分支，根 lock 和公共接口由主线集成。
 ```
 
 在 Agent B 的工具里打开 `/Users/hh/Desktop/joker/superagent-agent-b`，然后发送：
 
 ```text
-继续本轮 Agent B 整包。工作目录是 /Users/hh/Desktop/joker/superagent-agent-b，分支 codex/g1-runtime。
-保留已有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、agent-tasks/wave-02/README.zh-CN.md 和 agent-tasks/wave-02/agent-b.zh-CN.md。
-连续完成 Journal、实际 Runner 服务、Catalog/策略和首个 Driver，不在旧修复后停下。提交一次运行时接口检查点后继续后续步骤，最后统一交付。
-只提交拥有路径和明确提取例外并 push 自己分支；根 lock、公共 schema 和 main 由主 Agent 管理。
+继续 Native MVP 第二轮 Agent B 整包。工作目录 /Users/hh/Desktop/joker/superagent-agent-b，分支 codex/g1-runtime。
+保留已有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、agent-tasks/native-mvp-02/README.zh-CN.md 和 agent-tasks/native-mvp-02/agent-b-native-acceptance.zh-CN.md。
+仅修改 tests/native-acceptance/：修正共享契约和严格退出，实现真实 native 分支，在私有实例完成交付、机器失败、停止和重启四组验收。按任务限制最多四个模型任务，不操作用户正在使用的服务。
+先交可执行检查点，再连续完成整包；产品缺陷给主线复现，不改产品或降低期望，只 push 自己分支。
+再读取 agent-tasks/native-mvp-02/extended-run.zh-CN.md，继续 B3–B6 的故障矩阵、浏览器、有界稳定性和新执行器验收工具；总模型任务上限仍为四个。
 ```
 
-两人可立即并行；未通过部分的生产验收仍保留，fixture 下游开发不等待完整上线。主 Agent 按 [整包任务](agent-tasks/wave-02/main.zh-CN.md) 推进公共部分。转发任务入口即可，无需复制历史对话。
+两人可立即并行。B 先验无依赖真实项目，无需等待 A；主线按 [环境产品化与独立验收消费](agent-tasks/native-mvp-02/main-integration.zh-CN.md) 推进接线，A 准入通过后再启用依赖准备。转发任务入口即可，无需复制历史对话。
 
 ## 5. 每个人怎么上传
 
@@ -104,11 +110,11 @@ git push -u origin codex/g1-runtime
 
 ## 6. 本轮交付出口
 
-- A：可信完成边界与应用仓储可集成，工作台的委托/问题/停止/交付/恢复场景可操作。
-- B：实际独立 AttemptRunner、verified Journal、接入与策略 gate、首个 Driver 协议 fixture 可集成。
-- 主 Agent：问题中心、应用/HTTP 与统一 G2-Demo-Fake 纵向验收；有真实环境和授权预算后才升级 native preview。
+- A：环境准入复现闭合，准备结果可跨重开复验，清理有可信归属，受控安装进程可接入现有 Runner。
+- B：真实原生流程可执行，交付、检查失败、停止和重启有独立证据，未执行必需用例不能绿色退出。
+- 主 Agent：真实带依赖单包项目从 UI 导入，经环境准备、Codex 编码、检查到完整 patch 和接受/重开；保留现有无依赖 MVP。
 
-完整要求、接口、检查点和后续范围见 [本轮排程](agent-tasks/wave-02/README.zh-CN.md)。旧 G0 材料在 [bootstrap 交接](docs/adr/bootstrap/g0-main-report.md)；历史设计分工保留在 product-spec，不再作为本轮开工模板。
+完整要求、接口、检查点和后续范围见 [本轮排程](agent-tasks/native-mvp-02/README.zh-CN.md)。旧 G0 材料在 [bootstrap 交接](docs/adr/bootstrap/g0-main-report.md)；历史设计分工保留在 product-spec，不再作为本轮开工模板。
 
 ## 7. 其他机器上的 Agent
 

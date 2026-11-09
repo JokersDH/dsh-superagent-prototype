@@ -1,0 +1,42 @@
+{
+  "status": "PASS_REAL_NATIVE_WORKBENCH",
+  "sourceCommit": "252bf707d2c5362d49c55e5f7ed8b4f6b571dfe8",
+  "checkedAt": "2026-11-09T09:23:08.504Z",
+  "nativeVersion": "codex-cli 0.164.0",
+  "root": "/tmp/pa-native-browser-ojK8R2",
+  "workId": "36916d6023ebe5ab5fbc3f21073f2164",
+  "conversationId": "native-browser-15714eca-2f32-424f-80ba-5d0c0490f0d4",
+  "attemptId": "attempt-bb25d5ae-566a-4d43-a7f9-a8071bb7a3bc",
+  "cases": [
+    {
+      "id": "IMPORT-REAL-PROJECT-THROUGH-UI",
+      "status": "PASS"
+    },
+    {
+      "id": "EXPLICIT-CHAT-DELEGATION-CONFIRMATION",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL-CODEX-CODE-AND-REGISTERED-VERIFICATION",
+      "status": "PASS"
+    },
+    {
+      "id": "LOCATION-AND-COMPLETE-PATCH-EXPORT",
+      "status": "PASS"
+    },
+    {
+      "id": "ACCEPT-CURRENT-NATIVE-CANDIDATE",
+      "status": "PASS"
+    },
+    {
+      "id": "RESTART-PRESERVES-PROJECT-DELIVERY-WITHOUT-BEGIN",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "nativeTasksStartedThisRun": 1,
+  "limitations": [
+    "One real Codex task; no auto-answer of native questions in this happy-path lane",
+    "Private scratch project retained; no user repository changed; dependency preparation is a separate package"
+  ]
+}

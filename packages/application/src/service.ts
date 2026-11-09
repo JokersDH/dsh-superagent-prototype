@@ -7,6 +7,8 @@ import {
   SnapshotSchema,
   TrustedActorSchema,
   UserCommandSchema,
+  IdSchema,
+  ScopeSchema,
 } from '@personal-agent/contracts'
 import type {
   AppError,
@@ -69,11 +71,13 @@ export interface ApplicationOptions {
   nativeFence(target: NativeQuestionBinding): 'current' | 'stale' | 'unknown'
   completion?: CompletionReviewPort
   assistantReplies?: boolean
+  projectPreflight?: (projectId: string) => Promise<void>
   now?: () => string
 }
 export interface ProductApplication extends ApplicationService {
   readonly core: Engine
   readonly questions: QuestionBroker
+  registerProject(project: ProjectConfiguration, registeredChecks: readonly string[]): void
 }
 const SOURCE = 'personal-local'
 const digestOf = (value: unknown): string => canonicalDigest(JSON.parse(JSON.stringify(value)))
@@ -111,7 +115,7 @@ class LocalApplication implements ProductApplication {
   readonly core: Engine
   readonly questions: QuestionBroker
   private readonly store: ProductStore
-  private readonly projects: readonly ProjectConfiguration[]
+  private projects: readonly ProjectConfiguration[]
   private readonly actionSecret: Buffer
   private readonly options: ApplicationOptions
   constructor(options: ApplicationOptions) {
@@ -250,6 +254,23 @@ class LocalApplication implements ProductApplication {
   }
   private now(): string {
     return this.options.now?.() ?? new Date().toISOString()
+  }
+  /** Trusted operator configuration, separate from user/agent execution commands and immutable at each grant. */
+  registerProject(project: ProjectConfiguration, registeredChecks: readonly string[]): void {
+    if (this.store.uow.nesting) throw new Error('Project configuration must be prepared outside a command transaction')
+    const parsed = {
+      id: IdSchema.parse(project.id),
+      scope: ScopeSchema.parse(project.scope),
+      ...(project.displayName ? { displayName: project.displayName } : {}),
+    }
+    const checks = registeredChecks.map((id) => IdSchema.parse(id))
+    if (parsed.scope.projectId !== parsed.id)
+      throw new ApplicationFault('invalid_request', 'Project identity differs from its grant')
+    const existing = this.project(parsed.id)
+    if (existing && !equal(existing, parsed))
+      throw new ApplicationFault('conflict', 'An existing project grant cannot be replaced while work may be active')
+    if (!existing) this.projects = [...this.projects, structuredClone(parsed)]
+    this.options.registeredChecks = [...new Set([...this.options.registeredChecks, ...checks])]
   }
   private authorizedContract(ref: ContractRef): boolean {
     const contract = this.store.product.contracts.getByRef(ref)
@@ -423,6 +444,14 @@ class LocalApplication implements ProductApplication {
     const digest = digestOf({ command, actor })
     let completionGuard: (() => void) | undefined
     let preflightError: AppError | undefined
+    if (command.kind === 'create_work' && !this.store.commands.get(command.commandId)) {
+      try {
+        await this.options.projectPreflight?.(command.projectId)
+      } catch (error) {
+        preflightError = expectedFailure(error)
+        if (!preflightError) throw error
+      }
+    }
     if (command.kind === 'accept_candidate' && !this.store.commands.get(command.commandId)) {
       try {
         completionGuard = await this.options.completion?.preflight?.(command.candidate)

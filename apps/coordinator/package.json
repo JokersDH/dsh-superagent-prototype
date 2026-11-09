@@ -21,6 +21,7 @@
     "typecheck:product": "tsc -p tsconfig.product.json --noEmit",
     "test:product": "node --test ../../tests/integration/product-execution.case.mjs",
     "test:configuration": "node --test ../../tests/integration/application-configuration.case.mjs",
+    "test:projects": "node --test ../../tests/integration/project-registration.case.mjs",
     "test:assistant": "node --test ../../tests/integration/assistant-replies.case.mjs ../../tests/integration/model-provider.case.mjs",
     "dev:product": "node product/demo.ts"
   },

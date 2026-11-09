@@ -16,6 +16,7 @@ import { Buffer } from 'node:buffer'
 import { FramingError } from './errors.ts'
 
 export type JsonLineDecoderOptions = {
+  parse?: (text: string) => unknown
   /** Maximum bytes in one line, excluding the newline. Default 1 MiB. */
   maxFrameBytes?: number
   /** Maximum bytes buffered while waiting for a newline. Default 4 MiB. */
@@ -46,8 +47,10 @@ export class JsonLineDecoder {
   #stats: DecoderStats = { frames: 0, blankLines: 0, bytes: 0, bufferedBytes: 0 }
   readonly #maxFrameBytes: number
   readonly #maxBufferedBytes: number
+  readonly #parse: (text: string) => unknown
 
   constructor(options: JsonLineDecoderOptions = {}) {
+    this.#parse = options.parse ?? JSON.parse
     this.#maxFrameBytes = positiveInteger(options.maxFrameBytes, DEFAULTS.maxFrameBytes, 'maxFrameBytes')
     this.#maxBufferedBytes = positiveInteger(options.maxBufferedBytes, DEFAULTS.maxBufferedBytes, 'maxBufferedBytes')
   }
@@ -73,7 +76,7 @@ export class JsonLineDecoder {
       if (isBlank(line)) {
         this.#stats.blankLines += 1
       } else {
-        frames.push({ seq: ++this.#seq, bytes: line.length, value: decodeJson(line) })
+        frames.push({ seq: ++this.#seq, bytes: line.length, value: decodeJson(line, this.#parse) })
         this.#stats.frames += 1
       }
       newline = this.#buffer.indexOf(0x0a)
@@ -140,7 +143,7 @@ export async function* decodeJsonLines(
   decoder.end()
 }
 
-function decodeJson(line: Buffer): unknown {
+function decodeJson(line: Buffer, parse: (text: string) => unknown): unknown {
   let text: string
   try {
     text = new TextDecoder('utf-8', { fatal: true }).decode(line)
@@ -148,7 +151,7 @@ function decodeJson(line: Buffer): unknown {
     throw new FramingError('invalid_utf8', 'Frame is not valid UTF-8', { bytes: line.length })
   }
   try {
-    return JSON.parse(text)
+    return parse(text)
   } catch (error) {
     throw new FramingError('invalid_json', `Frame is not valid JSON: ${(error as Error).message}`, {
       bytes: line.length,

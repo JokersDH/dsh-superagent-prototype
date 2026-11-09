@@ -1,14 +1,14 @@
 {
   "status": "PASS_CONTROLLED_WORKBENCH_MODULES",
-  "sourceCommit": "4e984fa71a0dc62e63fdc4a670a50daf1d152312",
-  "checkedAt": "2026-11-09T07:10:11.709Z",
+  "sourceCommit": "cef31c449a637bb856ea7a4883201088e1fcb181",
+  "checkedAt": "2026-11-09T09:13:18.502Z",
   "node": "v24.22.2",
-  "tests": 358,
+  "tests": 367,
   "results": [
     {
       "command": "pnpm check:g2-product",
       "status": "PASS",
-      "tests": 350
+      "tests": 355
     },
     {
       "command": "pnpm --filter @personal-agent/console typecheck",
@@ -17,7 +17,7 @@
     {
       "command": "pnpm --filter @personal-agent/console test",
       "status": "PASS",
-      "tests": 8
+      "tests": 12
     },
     {
       "command": "pnpm --filter @personal-agent/console build",
@@ -28,6 +28,6 @@
   "limitations": [
     "Controlled work execution and mocked model dialogue; real model smoke evidence is separate",
     "Browser acceptance has a separate report",
-    "A generic workspace candidate and B independent runtime remain blocked by dedicated admission probes"
+    "Native model tasks are a separate explicitly executed lane; general G2, soak and power-loss certification remain separate"
   ]
 }

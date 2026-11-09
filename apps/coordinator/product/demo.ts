@@ -5,9 +5,10 @@ import { InstanceRegistry, ProductStore, WriterLock } from '@personal-agent/stor
 import { createLocalHttpApp } from '../http/app.ts'
 import { localCredentials } from '../http/local-state.ts'
 import { listenLocalHttp } from '../http/server.ts'
-import { createControlledProduct } from './runtime.ts'
+import { createProductRuntime } from './runtime.ts'
 import { ensureScratchProject } from './scratch.ts'
 import { PrivateModelProvider } from './model-provider.ts'
+import { nativeStartup } from './native-startup.ts'
 
 const { values } = parseArgs({
   options: {
@@ -19,6 +20,7 @@ const { values } = parseArgs({
     'console-origin': { type: 'string', default: 'http://127.0.0.1:5174' },
     'local-access': { type: 'boolean', default: false },
     assistant: { type: 'boolean', default: false },
+    native: { type: 'boolean', default: false },
   },
 })
 const stateRoot = resolve(values.state!),
@@ -36,15 +38,17 @@ const principal = {
   userId: 'local-demo-user',
   authorityRef: 'local-demo-authority',
 }
-const product = createControlledProduct({
+const native = values.native ? nativeStartup(stateRoot) : undefined
+const product = createProductRuntime({
   store,
   principal,
   stateRoot,
   scratchProject: ensureScratchProject(stateRoot),
   projects: [
+    ...(native?.projects ?? []),
     {
       id: 'project-atlas',
-      displayName: '本地验证项目',
+      displayName: '流程测试项目',
       scope: {
         projectId: 'project-atlas',
         allowedPaths: ['src/'],
@@ -55,6 +59,7 @@ const product = createControlledProduct({
   ],
   actionSecret: Buffer.from(credential('action.key'), 'hex'),
   ...(values.assistant ? { assistantProvider: new PrivateModelProvider() } : {}),
+  ...(native ? { native: native.native, projectRegistry: native.registry, workspaceRoot: native.workspaceRoot } : {}),
 })
 const http = createLocalHttpApp({
   application: product.application,
@@ -62,7 +67,7 @@ const http = createLocalHttpApp({
   apiToken: credential('api.key'),
   bootstrapToken: credential('bootstrap.key'),
   allowedOrigins: [`http://127.0.0.1:${port}`, values['console-origin']!],
-  mode: 'fixture',
+  mode: values.native ? 'personal' : 'fixture',
   localDevelopmentAccess: values['local-access'] === true,
   read: product.read,
 })
@@ -92,10 +97,12 @@ process.once('SIGINT', () => {
   void shutdown()
 })
 server.once('listening', () => {
-  console.log(`Controlled product API: http://127.0.0.1:${port}/v1/health`)
+  console.log(`Personal product API: http://127.0.0.1:${port}/v1/health`)
   console.log(`Private state/credential references: ${stateRoot}`)
   console.log(
-    values.assistant
+    values.native
+      ? 'Native Codex MVP enabled: isolated worktrees, registered checks and reviewed patch delivery.'
+      : values.assistant
       ? 'Model dialogue enabled when privately configured; work execution uses controlled scratch profiles.'
       : 'Real scratch subprocess, questions and artifact verification; fixture profiles only; zero vendor calls.',
   )

@@ -10,7 +10,7 @@
  */
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 
@@ -100,9 +100,10 @@ function workingTreePatch(cwd: string, base: string, untracked: readonly string[
   const directory = mkdtempSync(join(tmpdir(), 'pa-worktree-patch-'))
   try {
     const indexFile = join(directory, 'index')
-    gitBufferWithIndex(cwd, ['read-tree', base], indexFile)
-    gitBufferWithIndex(cwd, ['add', '-N', '--', ...untracked], indexFile)
-    return gitBufferWithIndex(cwd, ['diff', '--binary', base], indexFile)
+    const actualIndex = resolve(cwd, git(cwd, ['rev-parse', '--git-path', 'index']))
+    copyFileSync(actualIndex, indexFile)
+    gitBufferWithIndex(cwd, ['add', '-A', '--', '.'], indexFile)
+    return gitBufferWithIndex(cwd, ['diff', '--cached', '--binary', base], indexFile)
   } finally {
     rmSync(directory, { recursive: true, force: true })
   }
@@ -162,6 +163,10 @@ export class WorkspaceManager {
   private recordPath(attemptId: string): string { return join(this.rootDir, 'attempt-records', `${attemptId}.json`) }
   private patchPath(attemptId: string): string { return join(this.rootDir, 'attempt-records', `${attemptId}.user.patch`) }
   attemptPath(attemptId: string): string { return join(this.attemptRoot, attemptId) }
+  location(ref: { attemptId: string }): { projectPath: string; path: string; baseCommit: string } {
+    const record = this.record(ref.attemptId)
+    return { projectPath: record.projectPath, path: this.attemptPath(ref.attemptId), baseCommit: record.baseCommit }
+  }
 
   /**
    * Reserves a detached worktree for an attempt at the project's base commit. The user's dirty
@@ -271,7 +276,7 @@ export class WorkspaceManager {
       return { path: file, kind: 'file', sha256: sha256(data), bytes: data.byteLength, executable: (stat.mode & 0o111) !== 0 }
     })
     // The delivery patch must reproduce new/untracked files as well as tracked changes/deletions.
-    const patch = workingTreePatch(path, 'HEAD', untracked)
+    const patch = workingTreePatch(path, record.baseCommit, untracked)
     const patchSha256 = sha256(patch)
     const environment: Record<string, string> = { node: process.version, platform: process.platform, arch: process.arch }
     const artifactDigest = sha256(JSON.stringify({ baseCommit: record.baseCommit, headCommit, status, entries, patchSha256, environment }))
