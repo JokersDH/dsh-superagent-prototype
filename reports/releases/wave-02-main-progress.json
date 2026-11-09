@@ -1,37 +1,38 @@
 {
   "package": "wave-02-main",
   "branch": "codex/g2-execution-integration",
-  "baseMainCommit": "cd093959f8344f36b550dd580382d446ac24ee40",
+  "baseMainCommit": "4ecb4c5d2be760bbda1fed6e0d184568106aaa50",
   "storageIntegrationCommit": "4a09ce4",
   "storageSourceCommit": "a6bb40a67ab16df038540b178aa8e3d23412e1a6",
   "workspaceVerificationIntegrationCommit": "7fa2bb0f5cad2661d724df576d51ac56e50fd034",
   "workspaceVerificationSourceCommit": "8f1e60a10b259b3b6b95ec681161ed335e863f42",
-  "testedSourceCommit": "2e566f8da65d56078b4182b9a4b3358bac34e556",
+  "testedSourceCommit": "2cd58b82cc75c7ec11b2bd61b253f5e4a1c10b60",
   "cleanCheckoutReport": "reports/releases/g2-product.json",
-  "liveHttpReport": "reports/releases/g2-product-loopback.json",
+  "liveHttpReport": "reports/releases/g2-configuration-loopback.json",
   "stages": {
-    "M1": { "status": "IMPLEMENTED_CONTROLLED_PRODUCT_CHECKPOINT", "interface": "docs/rfcs/WP-16/0003-controlled-product-integration.md", "businessContractChanged": false },
+    "M1": { "status": "IMPLEMENTED_CONFIGURATION_READ_CHECKPOINT", "interface": "docs/rfcs/WP-16/0004-application-configuration.md", "businessContractChanged": false, "additiveReadProtocol": "application-configuration/1" },
     "M2": { "status": "PASS_REAL_SQLITE_AND_CONTROLLED_SUBPROCESS", "scope": "Original native bindings, per-target answer transport, actual stdio writes and committed consumption facts", "moduleTests": 14 },
-    "M3": { "status": "PASS_DETERMINISTIC_APPLICATION_HTTP_SLICE", "applicationTests": 11, "httpTests": 9, "realLoopbackHttpTest": true },
+    "M3": { "status": "PASS_DETERMINISTIC_APPLICATION_HTTP_CONFIGURATION_SLICE", "applicationTests": 12, "httpTests": 9, "configurationHttpAndProjectionTests": 5, "realLoopbackHttpTest": true },
     "M4": { "status": "PASS_CONTROLLED_PRODUCT_API_SLICE", "productIntegrationTests": 14, "scope": "Real scratch subprocess, original questions, complete owned-resource barrier, freeze/check/accept, exact receipt and verification recovery, conservative SIGKILL no-replay", "browserProduct": "PENDING_AGENT_A_INTEGRATION", "independentRunnerProductRecovery": "PENDING_AGENT_B_INTEGRATION", "installedNativeAgents": "NOT_TESTED" }
   },
   "validation": {
-    "combinedControlledProductCheck": { "testsPassed": 134, "node": "24.22.2", "platform": "darwin/arm64", "sourceWorktreeClean": true, "report": "reports/releases/g2-product.json" },
-    "applicationAndRecovery": { "testsPassed": 90, "node": "24.22.2", "report": "reports/releases/g2-application.json" },
+    "combinedControlledProductCheck": { "testsPassed": 328, "contracts": 188, "productRelated": 140, "node": "24.22.2", "platform": "darwin/arm64", "sourceWorktreeClean": true, "report": "reports/releases/g2-product.json" },
+    "applicationAndRecovery": { "testsPassed": 91, "node": "24.22.2", "report": "reports/releases/g2-application.json" },
+    "configuration": { "contractTests": 5, "httpAndProjectionTests": 5, "runtimeContractSchemaHashUnchanged": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d" },
     "coreOnSqlite": { "testsPassed": 178, "node": "24.21.0", "report": "reports/releases/g1-core-sqlite.json" },
     "storage": { "testsPassed": 75, "node": "24.22.2", "source": "Agent A a6bb40a, storage files only" },
     "workspaces": { "testsPassed": 8, "additionalAdmissionProbesPassed": 6 },
     "verification": { "testsPassed": 22, "additionalCurrentRuntimeAndProvenanceProbesPassed": 2 },
-    "liveHttp": { "status": "PASS_REAL_LOOPBACK_CONTROLLED_PRODUCT", "report": "reports/releases/g2-product-loopback.json" },
+    "liveHttp": { "status": "PASS_REAL_LOOPBACK_CONTROLLED_PRODUCT", "configurationReadBeforeWork": true, "report": "reports/releases/g2-configuration-loopback.json" },
     "countsAreSeparateScopesNotProductCompletionPercentage": true
   },
-  "apiSandbox": { "url": "http://127.0.0.1:8791/v1/health", "mode": "fixture", "state": ".local-state/product-demo", "vendorCalls": 0, "executionIntentsDispatched": true, "scratchProjectOnly": true },
+  "apiSandbox": { "url": "http://127.0.0.1:8793/v1/health", "configurationPath": "/v1/configuration", "mode": "fixture", "state": ".local-state/configuration-demo", "vendorCalls": 0, "executionIntentsDispatched": true, "scratchProjectOnly": true, "prior8791ServiceWasNotRestartedInThisBatch": true },
   "unacceptedUpstreams": {
     "agentA": "Console product HTTP/browser wiring remains separate. Generic workspace delivery needs untracked bytes and attempt metadata fixes; the controlled lane publishes fixed output bytes and its own current-candidate manifest.",
     "agentB": "Independent AttemptRunner, Journal, Catalog/policy and installed-vendor candidates require separate review; this lane does not certify their recovery or compatibility."
   },
   "nextConsumers": {
-    "agentA": "Continue the already assigned browser integration package with explicit fixture project/profile/scope/check values in apps/coordinator/product/README.md; keep fixture and real HTTP evidence separate.",
+    "agentA": "Continue the assigned browser package; consume authenticated GET /v1/configuration for project/profile/scope/default criteria. See docs/rfcs/WP-16/0004-application-configuration.md; keep fixture and real product HTTP evidence separate.",
     "agentB": "Continue the already assigned authenticated independent Runner/recovery and native package; preserve original bindings, durable ACKs and complete resource barriers.",
     "main": "Consume accepted committed A/B packages through the same application/fact/effect path and retain separate browser, independent Runner and native gates."
   },
