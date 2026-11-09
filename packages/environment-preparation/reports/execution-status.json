@@ -1,0 +1,47 @@
+{
+  "role": "A",
+  "package": "packages/environment-preparation",
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "5bbd892",
+  "mergeCommit": "7baeb67",
+  "stableApiCheckpoint": "8dcbdce",
+  "testedSourceCommit": "8a5ded364fbc29ccc33ad72a8be46ec06a5d87e5",
+  "updatedAt": "2026-11-09T11:30:00.000Z",
+  "phases": [
+    { "phase": "A1", "priority": "P0", "status": "passed", "evidence": ["reports/admission-probe.json", "pkg-test:31/31"], "note": "five main admission cases PASS; nested links, drift fingerprint, hooks, semver and unowned cleanup regression-covered" },
+    { "phase": "A2", "priority": "P0", "status": "passed", "evidence": ["pkg-test: signed receipt/verify/cleanup cases", "reports/report.md"], "note": "HMAC authority receipts, cross-process verify/cleanup, forged/replaced/drift refusal; v1 markers never trusted" },
+    { "phase": "A3", "priority": "P0", "status": "passed", "evidence": ["pkg-test: process port/lock/cancel/disk cases"], "note": "one installer lock with ESRCH-only stale recovery, injected port quiescence, probe/install cancellation, disk monitoring, interrupted state blocked" },
+    { "phase": "A4", "priority": "P1", "status": "passed", "evidence": ["pkg-test: inspect cases", "src/inspect.ts"], "note": "read-only inspect + parser, Chinese codes/suggestions, cache sufficiency unknown, no installer/hooks/writes" },
+    { "phase": "A5", "priority": "P1", "status": "passed", "evidence": ["recipes/", "examples/", "reports/performance.json"], "note": "plain-js/dev-deps offline recipes, consumer prepare/verify/cleanup in two processes, lost-ref recovery, performance measurements" },
+    { "phase": "A6", "priority": "P2", "status": "passed_package_local", "evidence": ["pkg-test: workspace cases"], "note": "restricted pnpm workspace app workspace:* lib: offline install/test/verify; external links, globs, symlink members and peer blocked; business patch excludes only env dirs" }
+  ],
+  "commands": [
+    "node <primary>/tools/bootstrap/review-environment-preparation.mjs --environment $PWD",
+    "pnpm run typecheck",
+    "pnpm run test",
+    "pnpm run build",
+    "node recipes/build-recipes.mjs --out <dir>",
+    "node examples/prepare-consumer.mjs ...",
+    "node examples/verify-consumer.mjs --ref <ref> [--cleanup]"
+  ],
+  "results": {
+    "packageTests": "31/31",
+    "admissionProbe": "PASS_ENVIRONMENT_ADMISSION",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "performance": "reports/performance.json"
+  },
+  "blockers": [],
+  "notTested": [
+    "coordinator/workspaces/console/Runner/native vendor integration",
+    "authenticated independent Runner execution of installed checks",
+    "npm offline install and arbitrary monorepos"
+  ],
+  "mainNextSteps": [
+    "pass a private authorityRoot outside project/workspace and persist environmentRef with the attempt",
+    "call verifyPreparedEnvironment before native start, before/after checks and before acceptance; blocked never becomes ready",
+    "pass ownedPaths/excludedPaths into workspace freeze/patch; do not alter user ignore/Git config",
+    "supply an OwnedProcessHost-compatible processPort with explicit quiescence",
+    "regenerate the root lock for semver/yaml/@types/semver"
+  ]
+}

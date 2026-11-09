@@ -1,8 +1,8 @@
 {
   "status": "PASS_ENVIRONMENT_ADMISSION",
-  "checkedAt": "2026-11-09T11:16:26.507Z",
-  "reviewerCommit": "8dcbdce7aab9dd6b9fd6a545d2bf6cff2f12e05d",
-  "candidateCommit": "8dcbdce7aab9dd6b9fd6a545d2bf6cff2f12e05d",
+  "checkedAt": "2026-11-09T11:16:43.819Z",
+  "reviewerCommit": "8a5ded364fbc29ccc33ad72a8be46ec06a5d87e5",
+  "candidateCommit": "8a5ded364fbc29ccc33ad72a8be46ec06a5d87e5",
   "node": "v24.21.0",
   "platform": "darwin",
   "architecture": "arm64",
