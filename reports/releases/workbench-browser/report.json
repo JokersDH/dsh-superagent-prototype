@@ -1,0 +1,46 @@
+{
+  "status": "PASS_MAIN_CONTROLLED_BROWSER",
+  "testedAt": "2026-11-09T02:53:59.416Z",
+  "sourceCommit": "4468e7b09c98d8c4e4b67fe97e46c06b6878a369",
+  "consoleURL": "http://127.0.0.1:5180",
+  "cases": [
+    {
+      "id": "AUTHENTICATED-WORKBENCH",
+      "status": "PASS"
+    },
+    {
+      "id": "CREATE-REAL-QUESTION",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTIVE-REFRESH-KEEPS-QUESTION",
+      "status": "PASS"
+    },
+    {
+      "id": "ANSWER-AND-VERIFY",
+      "status": "PASS"
+    },
+    {
+      "id": "READ-VERIFIED-OUTPUT",
+      "status": "PASS"
+    },
+    {
+      "id": "ACCEPT-AND-RELOAD",
+      "status": "PASS"
+    },
+    {
+      "id": "MACHINE-FAIL-CANNOT-DELIVER",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-AND-NARROW-LAYOUT",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "limitations": [
+    "Controlled fixture only",
+    "Independent Runner and native compatibility remain unaccepted",
+    "Direct dynamic configuration transport remains with Agent A"
+  ]
+}
