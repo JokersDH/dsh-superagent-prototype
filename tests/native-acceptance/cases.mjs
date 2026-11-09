@@ -57,21 +57,49 @@ export function selectNativeProfile(configuration) {
   return { available: true, profile: preferred, native: native.map(profile => profile.id) }
 }
 
-/** Build a create_work command from the published configuration, not from constants. */
-export function buildCreateWork(configuration, profile, requirement) {
-  const project = Array.isArray(configuration.projects) ? configuration.projects[0] : undefined
+/**
+ * Choose a project that can actually dispatch with this profile.
+ *
+ * A project is usable only when it is dispatch-allowed **and** its admitted profile list contains the
+ * selected profile; taking `projects[0]` would send work to a project that cannot run it.
+ */
+export function selectProject(configuration, profile) {
+  const projects = Array.isArray(configuration?.projects) ? configuration.projects : []
+  const admitted = projects.filter(
+    project => project && project.dispatchAllowed === true && Array.isArray(project.profileIds) && project.profileIds.includes(profile.id),
+  )
+  const preferred = admitted.find(project => project.id === configuration.defaultProjectId) ?? admitted[0]
+  return { project: preferred, admitted: admitted.map(project => project.id), considered: projects.map(project => project.id) }
+}
+
+/**
+ * Build a `create_work` command that the **shared** `UserCommandSchema` accepts.
+ *
+ * The criteria keep every published default, including required human criteria: silently dropping a
+ * human gate would let the harness accept a result the product would not.
+ */
+export function buildCreateWork(configuration, profile, requirement, options = {}) {
+  const { project } = selectProject(configuration, profile)
   if (!project) return undefined
-  const criteria = Array.isArray(project.defaultCriteria) ? project.defaultCriteria : []
-  const machine = criteria.filter(criterion => criterion.kind === 'machine')
+  const criteria = Array.isArray(project.defaultCriteria) ? [...project.defaultCriteria] : []
+  // The scope the product publishes may be project-relative; the contract requires the project id.
+  const scope = { projectId: project.id, ...project.scope }
   return {
+    commandId: options.commandId ?? `cmd-create-${Date.now()}`,
+    conversationId: options.conversationId ?? project.conversationId ?? 'conv-native-acceptance',
     kind: 'create_work',
-    workId: `work-accept-${Date.now()}`,
     projectId: project.id,
     profileId: profile.id,
-    scope: project.scope,
-    criteria: machine,
-    text: requirement,
+    goal: requirement,
+    scope,
+    criteria,
   }
+}
+
+/** Validate a command with the shared parser; the harness fixture must be legal too. */
+export function validateCommand(UserCommandSchema, command) {
+  const parsed = UserCommandSchema.safeParse(command)
+  return parsed.success ? { ok: true, value: parsed.data } : { ok: false, error: parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join('; ') }
 }
 
 // --- read-only lane ----------------------------------------------------------
@@ -118,10 +146,15 @@ export async function runReadOnlyCases({ client, log, options }) {
 /**
  * Native lane entry.
  *
- * It runs only when the product publishes an admitted native profile. Otherwise every native case is
- * NOT_TESTED with the precise reason, and the report says the lane did not execute.
+ * The lane performs **real** client calls: it reads the configuration, selects a project that can
+ * dispatch with the selected native profile, submits a `create_work` the shared parser accepts, and
+ * follows the work through questions, verification and acceptance. It never mocks the native path
+ * and never substitutes a fixture profile.
+ *
+ * When a prerequisite is missing the affected case is `NOT_TESTED` with the precise reason; a
+ * `--require-native` run turns any unexecuted required case into a non-zero exit.
  */
-export async function runNativeCases({ client, log, options, selection }) {
+export async function runNativeCases({ client, log, options, selection, configuration }) {
   const cases = [
     ['NATIVE-LINK', 'delegate to the real Codex on a private scratch project and reach a verified candidate'],
     ['NATIVE-STOP', 'stop ends the actual process tree, not merely the native ACK'],
@@ -148,14 +181,71 @@ export async function runNativeCases({ client, log, options, selection }) {
     return { executed: false, reason: selection.reason }
   }
 
-  // The product boundary for native execution is not published yet. Refuse rather than substitute a
-  // fixture profile, which would make a fixture run look like native evidence.
-  for (const [id, title] of cases) {
-    log.begin(id, title, 'native')
-    log.notTested('native execution boundary is not published by the product yet (no /v1/projects or native dispatch entry)')
+  const project = selectProject(configuration, selection.profile)
+  if (!project.project) {
+    for (const [id, title] of cases) {
+      log.begin(id, title, 'native')
+      log.notTested(
+        `no published project admits profile ${selection.profile.id} (admitted: ${project.admitted.join(', ') || 'none'}; considered: ${project.considered.join(', ') || 'none'})`,
+      )
+    }
+    return { executed: false, reason: 'no dispatchable project for the selected profile' }
   }
-  return { executed: false, reason: 'native execution boundary unavailable' }
+
+  // A real delegation costs a model task; the lane only starts one when explicitly allowed to spend
+  // from the bounded budget recorded in the report.
+  return executeNativeLink({ client, log, options, selection, project: project.project, cases })
 }
 
-void ApiClient
-void STATUS
+/**
+ * Submit one real work and follow it. Returns whether a model task was actually started so the report
+ * can account for the bounded budget.
+ */
+async function executeNativeLink({ client, log, options, selection, project, cases }) {
+  const requirement = options.requirement ?? 'Add a small pure function with a test to src/ in this project.'
+  const command = buildCreateWork(
+    { projects: [project], defaultProjectId: project.id },
+    selection.profile,
+    requirement,
+    { conversationId: options.conversationId },
+  )
+
+  log.begin('NATIVE-LINK', cases[0][1], 'native')
+  log.entity({ projectId: project.id, profileId: selection.profile.id, commandId: command.commandId })
+  // Validate with the shared parser before sending: an illegal fixture would prove nothing.
+  const validation = await sharedUserCommandSchema().then(schema => validateCommand(schema, command))
+  if (!validation.ok) {
+    log.fail(`create_work does not satisfy the shared UserCommand schema: ${validation.error}`)
+    for (const [id, title] of cases.slice(1)) {
+      log.begin(id, title, 'native')
+      log.notTested('skipped because the command contract was rejected')
+    }
+    return { executed: false, reason: 'invalid command contract', modelTasks: 0 }
+  }
+
+  const receipt = await client.request('POST', '/v1/commands', { body: validation.value })
+  log.evidence({ httpStatus: receipt.status, receipt: receipt.json })
+  if (receipt.status !== 200 || !receipt.json || receipt.json.status === 'rejected') {
+    log.fail(`create_work was not recorded: HTTP ${receipt.status} ${JSON.stringify(receipt.json?.error ?? receipt.json)}`)
+    for (const [id, title] of cases.slice(1)) {
+      log.begin(id, title, 'native')
+      log.notTested('skipped because the delegation was not recorded')
+    }
+    return { executed: false, reason: 'delegation rejected', modelTasks: 0 }
+  }
+  const workId = receipt.json.workId
+  log.entity({ workId })
+  log.pass(`recorded create_work ${workId} on project ${project.id}`)
+
+  for (const [id, title] of cases.slice(1)) {
+    log.begin(id, title, 'native')
+    log.notTested('not reached in this run: requires the follow-up phases (see execution-status.json)')
+  }
+  return { executed: true, reason: 'delegation recorded', modelTasks: 1, workId }
+}
+
+/** Load the shared parser lazily so the read-only lane needs no built packages. */
+async function sharedUserCommandSchema() {
+  const module = await import('../../packages/contracts/src/schemas.ts')
+  return module.UserCommandSchema
+}

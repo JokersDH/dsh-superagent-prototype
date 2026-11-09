@@ -30,12 +30,18 @@ export const ACCEPTANCE_ROOT = here
 // --- argument parsing --------------------------------------------------------
 
 export function parseArgs(argv) {
-  const options = { url: 'http://127.0.0.1:8796', runNative: false, record: undefined, state: undefined, project: undefined, timeoutMs: 30_000 }
+  const options = { url: 'http://127.0.0.1:8796', runNative: false, requireNative: false, record: undefined, state: undefined, project: undefined, timeoutMs: 30_000 }
   for (let index = 0; index < argv.length; index += 1) {
     const flag = argv[index]
     const next = argv[index + 1]
     if (flag === '--url') options.url = next, index += 1
     else if (flag === '--run-native') options.runNative = true
+    else if (flag === '--require-native') {
+      // A delivery/CI run must fail when the native cases could not execute.
+      options.runNative = true
+      options.requireNative = true
+    }
+    else if (flag === '--soak') options.soakCount = Number(next), index += 1
     else if (flag === '--record') options.record = next, index += 1
     else if (flag === '--state') options.state = next, index += 1
     else if (flag === '--project') options.project = next, index += 1
@@ -54,6 +60,21 @@ export function parseArgs(argv) {
  * The API bearer credential is read from the private state file and is **never** printed or stored in
  * the report. Cookies from `POST /v1/session` are kept in memory only.
  */
+/** A credential must never leave the machine: only loopback targets are allowed. */
+export function assertLoopback(url) {
+  let parsed
+  try {
+    parsed = new URL(url)
+  } catch {
+    throw new Error(`Invalid product URL: ${url}`)
+  }
+  const host = parsed.hostname
+  const loopback = host === '127.0.0.1' || host === 'localhost' || host === '::1' || host === '[::1]'
+  if (!loopback) throw new Error(`Refusing to send private credentials to a non-loopback URL: ${parsed.hostname}`)
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') throw new Error(`Unsupported protocol: ${parsed.protocol}`)
+  return parsed
+}
+
 export class ApiClient {
   #base
   #bearer

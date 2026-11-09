@@ -5,7 +5,7 @@
  * Read-only by default. The real native lane requires `--run-native` and refuses to substitute a
  * fixture profile. See README.md for scope and ownership.
  */
-import { ApiClient, CaseLog, environmentIdentity, parseArgs, writeReport } from './harness.mjs'
+import { ApiClient, CaseLog, assertLoopback, environmentIdentity, parseArgs, writeReport } from './harness.mjs'
 import { runNativeCases, runReadOnlyCases } from './cases.mjs'
 
 const options = parseArgs(process.argv.slice(2))
@@ -27,6 +27,9 @@ if (options.help) {
   process.exit(0)
 }
 
+// Never read or transmit a private credential to a non-loopback target.
+assertLoopback(options.url)
+
 const log = new CaseLog()
 const { client, bearerAvailable } = ApiClient.fromState({
   url: options.url,
@@ -44,9 +47,17 @@ if (bootstrapToken) {
   if (sessionEstablished) log.note('session established from the private bootstrap token')
 }
 if (bearerAvailable || sessionEstablished) {
-  const health = await client.request('GET', '/v1/health', { anonymous: true }).catch(error => ({ status: 0, text: String(error) }))
-  if (health.status === 200) log.pass(`GET /v1/health ${health.status}`)
-  else log.fail(`GET /v1/health returned ${health.status}: ${String(health.text).slice(0, 200)}`)
+  // Prove authentication on a *protected* route; a public health 200 proves nothing.
+  const protectedProbe = await client.request('GET', '/v1/configuration')
+  const anonymousProbe = await client.request('GET', '/v1/configuration', { anonymous: true })
+  log.evidence({ authenticated: protectedProbe.status, anonymous: anonymousProbe.status })
+  if (protectedProbe.status === 200 && anonymousProbe.status === 401) {
+    log.pass('protected route returns 200 when authenticated and 401 when not')
+  } else if (protectedProbe.status === 200) {
+    log.fail(`protected route did not reject an anonymous request (got ${anonymousProbe.status})`)
+  } else {
+    log.fail(`authenticated request to a protected route returned ${protectedProbe.status}`)
+  }
 } else {
   log.fail('no API credential or bootstrap token found; pass --state <product state dir>')
 }
@@ -99,4 +110,10 @@ process.stdout.write(
 if (options.record) process.stdout.write(`report: ${options.record}\n`)
 
 const failed = report.cases.filter(item => item.status === 'FAIL')
-process.exit(failed.length === 0 ? 0 : 1)
+const notExecutedRequired = options.requireNative
+  ? report.cases.filter(item => item.lane === 'native' && item.status !== 'PASS')
+  : []
+if (notExecutedRequired.length > 0) {
+  process.stdout.write(`\nBLOCKED: ${notExecutedRequired.length} required native case(s) did not execute or did not pass\n`)
+}
+process.exit(failed.length === 0 && notExecutedRequired.length === 0 ? 0 : 1)
