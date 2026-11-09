@@ -2,7 +2,7 @@
 
 **当前派工入口：[第二轮整包排程](agent-tasks/wave-02/README.zh-CN.md)。** A 连续交付可信验证、产品仓储和工作台；B 连续交付独立运行时、Catalog/策略准备和首个 Driver；主 Agent 做问题中心、应用 API 和纵向集成。每人一个早期接口检查点、一次整包交付，不再每修一项就重新派工。
 
-主线最新检查点：已接入 A 的工作区和验收后端，并实现真实受控子进程的“委托 → 提问 → 回答 → 产物冻结 → 检查 → 接受交付”API 闭环。`pnpm check:g2-product` 覆盖原有 90 项、WP-04 的 30 项及新增 14 项，共 **134 项**；实际结果见 [产品检查报告](reports/releases/g2-product.json)。启动、代码位置、A/B 接线参数见 [受控产品入口](apps/coordinator/product/README.md) 和 [集成交接](docs/rfcs/WP-16/0003-controlled-product-integration.md)。本机 API 默认 8791；fixture 子进程不调用模型。浏览器产品验收、独立 Runner 重连及真实 agent 接入仍分开验收。
+主线最新检查点：已实现真实受控子进程的“委托 → 提问 → 回答 → 产物冻结 → 检查 → 接受交付”API 闭环，并新增认证的 `GET /v1/configuration`，供工作台读取真实项目、执行器与验收默认值。`pnpm check:g2-product` 现在覆盖 **188 项契约 + 140 项产品相关测试**，实际结果见 [产品检查报告](reports/releases/g2-product.json)。A/B 新接口接线见 [配置查询约定](docs/rfcs/WP-16/0004-application-configuration.md)，启动和代码位置见 [受控产品入口](apps/coordinator/product/README.md)。默认 API 8791；当前配置接口联调另开 8793，保留既有服务。fixture 子进程不调用模型；浏览器产品、独立 Runner 重连和真实 agent 仍分开验收。
 
 ## 1. 唯一交付仓库
 

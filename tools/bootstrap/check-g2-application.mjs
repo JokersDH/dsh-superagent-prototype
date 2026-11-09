@@ -47,7 +47,7 @@ for (const args of commands) {
   if (count) assert.doesNotMatch(output, /(?:ℹ\s*)?fail [1-9]/)
   results.push({ command: `pnpm ${args.join(' ')}`, status: 'PASS', ...(count ? { tests: count } : {}) })
 }
-assert.ok(tests >= 90, 'Question/application/HTTP and all previous registered recovery scopes must execute')
+assert.ok(tests >= 91, 'Question/application/HTTP, immutable startup grants and previous recovery scopes must execute')
 const report = {
   status: 'PASS_APPLICATION_BROKER_HTTP_SLICE',
   node: process.version,

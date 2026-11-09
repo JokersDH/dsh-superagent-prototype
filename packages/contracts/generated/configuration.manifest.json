@@ -1,0 +1,7 @@
+{
+  "protocol": "application-configuration/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "adaa6dca9e84a406410c895a307daae241762646d8ad9a4a9665039c377140b9",
+  "sourceHash": "a230ef2b643a8a6835ef84f036eafcbe564713dc69f7e5463450010f9089b1db"
+}

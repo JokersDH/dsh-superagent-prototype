@@ -34,22 +34,20 @@ const command = (value) =>
     method: 'POST',
     body: JSON.stringify({ commandId: `smoke-${randomUUID()}`, conversationId: 'conv-main', ...value }),
   })
+const configuration = await request('/v1/configuration')
+assert.equal(configuration.protocol, 'application-configuration/1')
+const project = configuration.projects.find((project) => project.dispatchAllowed)
+assert.ok(project, 'A dispatchable controlled scratch project is required')
+const profile = configuration.profiles.find((profile) => profile.id === project.defaultProfileId)
+assert.equal(profile?.kind, 'controlled_fixture', 'This smoke never dispatches a vendor agent')
+assert.equal(profile?.dispatchAllowed, true)
 const created = await command({
   kind: 'create_work',
-  projectId: 'project-atlas',
-  profileId: 'profile-fixture-question',
+  projectId: project.id,
+  profileId: profile.id,
   goal: 'Produce a reviewed scratch artifact',
-  scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
-  criteria: [
-    {
-      id: 'fixed-output',
-      kind: 'machine',
-      required: true,
-      description: 'Output matches the registered check',
-      checkDefinitionRef: 'check-fixture-output',
-    },
-    { id: 'review-output', kind: 'human', required: true, description: 'Review the frozen output' },
-  ],
+  scope: project.scope,
+  criteria: project.defaultCriteria,
 })
 assert.equal(created.status, 'recorded')
 async function until(read, predicate) {
@@ -101,6 +99,7 @@ const report = {
   checkedAt: new Date().toISOString(),
   node: process.version,
   url: url.origin,
+  configurationRevision: configuration.revision,
   workId: created.workId,
   questionId: question.id,
   verificationId: verification.id,

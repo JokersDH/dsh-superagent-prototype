@@ -1,17 +1,22 @@
 {
   "status": "PASS_CONTROLLED_PRODUCT_API_SLICE",
-  "sourceCommit": "2e566f8da65d56078b4182b9a4b3358bac34e556",
+  "sourceCommit": "2cd58b82cc75c7ec11b2bd61b253f5e4a1c10b60",
   "sourceWorktreeClean": true,
-  "checkedAt": "2026-11-08T15:52:31.180Z",
+  "checkedAt": "2026-11-09T01:51:51.459Z",
   "node": "v24.22.2",
   "platform": "darwin",
   "architecture": "arm64",
-  "tests": 134,
+  "tests": 328,
   "results": [
+    {
+      "command": "pnpm check:contracts",
+      "status": "PASS",
+      "tests": 188
+    },
     {
       "command": "pnpm check:g2-application",
       "status": "PASS",
-      "tests": 90
+      "tests": 91
     },
     {
       "command": "pnpm --filter @personal-agent/workspaces --filter @personal-agent/verification -r build",
@@ -34,13 +39,20 @@
       "command": "pnpm --filter @personal-agent/coordinator test:product",
       "status": "PASS",
       "tests": 14
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:configuration",
+      "status": "PASS",
+      "tests": 5
     }
   ],
   "scopes": {
-    "applicationAndRecovery": 90,
+    "contracts": 188,
+    "applicationAndRecovery": 91,
     "workspaces": 8,
     "verification": 22,
-    "actualControlledProduct": 14
+    "actualControlledProduct": 14,
+    "configuration": 5
   },
   "implementation": "SQLite application + real scratch subprocess + original native questions + trusted owned-resource barrier + registered verification + candidate acceptance",
   "limitations": [

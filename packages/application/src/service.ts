@@ -47,6 +47,7 @@ import { changes } from './events.ts'
 
 export interface ProjectConfiguration {
   id: string
+  displayName?: string
   scope: Scope
 }
 export interface CompletionReviewPort {
@@ -113,7 +114,15 @@ class LocalApplication implements ProductApplication {
   private readonly actionSecret: Buffer
   private readonly options: ApplicationOptions
   constructor(options: ApplicationOptions) {
-    this.options = options
+    // Trusted configuration is a startup snapshot; mutating a caller-owned array cannot grant access.
+    this.options = {
+      ...options,
+      principal: structuredClone(options.principal),
+      projects: structuredClone(options.projects),
+      profileIds: [...options.profileIds],
+      registeredChecks: [...options.registeredChecks],
+    }
+    options = this.options
     this.store = options.store
     this.projects = structuredClone(options.projects)
     this.actionSecret = Buffer.from(options.actionSecret)

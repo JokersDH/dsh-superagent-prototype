@@ -1,0 +1,384 @@
+{
+  "$id": "urn:personal-agent:application-configuration:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "checks": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "displayName": {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          "id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "revision": {
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "revision",
+          "displayName"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "readOnly": true,
+      "type": "array"
+    },
+    "profiles": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "blockedReason": {
+            "enum": [
+              "conflict",
+              "stale_contract",
+              "stale_candidate",
+              "stale_binding",
+              "unsupported_capability",
+              "auth_required",
+              "policy_unprepared",
+              "writer_indeterminate",
+              "verification_failed",
+              "cursor_expired",
+              "storage_unavailable",
+              "budget_exceeded",
+              "invalid_request",
+              "question_expired",
+              "schema_mismatch",
+              "forbidden",
+              "state_in_use"
+            ],
+            "type": "string"
+          },
+          "dispatchAllowed": {
+            "type": "boolean"
+          },
+          "displayName": {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          "driverId": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "controlled_fixture",
+              "native"
+            ],
+            "type": "string"
+          },
+          "readiness": {
+            "enum": [
+              "fixture_ready",
+              "not_tested",
+              "missing",
+              "needs_setup",
+              "needs_auth",
+              "incompatible",
+              "inspection_passed",
+              "native_test_passed"
+            ],
+            "type": "string"
+          },
+          "revision": {
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "revision",
+          "displayName",
+          "driverId",
+          "kind",
+          "readiness",
+          "dispatchAllowed"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "readOnly": true,
+      "type": "array"
+    },
+    "projects": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "blockedReason": {
+            "enum": [
+              "conflict",
+              "stale_contract",
+              "stale_candidate",
+              "stale_binding",
+              "unsupported_capability",
+              "auth_required",
+              "policy_unprepared",
+              "writer_indeterminate",
+              "verification_failed",
+              "cursor_expired",
+              "storage_unavailable",
+              "budget_exceeded",
+              "invalid_request",
+              "question_expired",
+              "schema_mismatch",
+              "forbidden",
+              "state_in_use"
+            ],
+            "type": "string"
+          },
+          "defaultCriteria": {
+            "contains": {
+              "properties": {
+                "required": {
+                  "const": true
+                }
+              },
+              "required": [
+                "required"
+              ],
+              "type": "object"
+            },
+            "items": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "checkDefinitionRef": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "description": {
+                      "maxLength": 4096,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "id": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "const": "machine",
+                      "type": "string"
+                    },
+                    "required": {
+                      "const": true,
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "description",
+                    "kind",
+                    "required",
+                    "checkDefinitionRef"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "checkDefinitionRef": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "description": {
+                      "maxLength": 4096,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "id": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "const": "machine",
+                      "type": "string"
+                    },
+                    "required": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "description",
+                    "kind",
+                    "required"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "description": {
+                      "maxLength": 4096,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "id": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "const": "human",
+                      "type": "string"
+                    },
+                    "required": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "description",
+                    "kind",
+                    "required"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "maxItems": 128,
+            "minContains": 1,
+            "minItems": 1,
+            "readOnly": true,
+            "type": "array",
+            "x-runtime-rules": [
+              "unique-criterion-ids",
+              "registered-checks-verified-by-application"
+            ]
+          },
+          "defaultProfileId": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "dispatchAllowed": {
+            "type": "boolean"
+          },
+          "displayName": {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          "id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "profileIds": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "maxItems": 128,
+            "readOnly": true,
+            "type": "array"
+          },
+          "scope": {
+            "additionalProperties": false,
+            "properties": {
+              "allowedPaths": {
+                "items": {
+                  "maxLength": 1024,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 256,
+                "minItems": 1,
+                "readOnly": true,
+                "type": "array"
+              },
+              "excludedPaths": {
+                "items": {
+                  "maxLength": 1024,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 256,
+                "readOnly": true,
+                "type": "array"
+              },
+              "expiresAt": {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string"
+              },
+              "externalActions": {
+                "items": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "maxItems": 1024,
+                "readOnly": true,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "projectId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "projectId",
+              "allowedPaths",
+              "excludedPaths",
+              "externalActions"
+            ],
+            "type": "object",
+            "x-runtime-rules": [
+              "project-relative-paths"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "displayName",
+          "scope",
+          "profileIds",
+          "defaultCriteria",
+          "dispatchAllowed"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "readOnly": true,
+      "type": "array"
+    },
+    "protocol": {
+      "const": "application-configuration/1",
+      "type": "string"
+    },
+    "revision": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "protocol",
+    "revision",
+    "projects",
+    "profiles",
+    "checks"
+  ],
+  "type": "object",
+  "x-runtime-rules": [
+    "unique-configuration-ids",
+    "enabled-project-profile-references",
+    "registered-default-checks"
+  ],
+  "x-runtime-validation": "Use ApplicationConfigurationSchema for reference and readiness rules."
+}
