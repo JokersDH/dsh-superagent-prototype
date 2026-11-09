@@ -1,0 +1,33 @@
+{
+  "status": "PASS_CONTROLLED_WORKBENCH_MODULES",
+  "sourceCommit": "4e984fa71a0dc62e63fdc4a670a50daf1d152312",
+  "checkedAt": "2026-11-09T07:10:11.709Z",
+  "node": "v24.22.2",
+  "tests": 358,
+  "results": [
+    {
+      "command": "pnpm check:g2-product",
+      "status": "PASS",
+      "tests": 350
+    },
+    {
+      "command": "pnpm --filter @personal-agent/console typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/console test",
+      "status": "PASS",
+      "tests": 8
+    },
+    {
+      "command": "pnpm --filter @personal-agent/console build",
+      "status": "PASS"
+    }
+  ],
+  "browserCheck": "pnpm check:g2-browser against an explicitly started dev:workbench instance",
+  "limitations": [
+    "Controlled work execution and mocked model dialogue; real model smoke evidence is separate",
+    "Browser acceptance has a separate report",
+    "A generic workspace candidate and B independent runtime remain blocked by dedicated admission probes"
+  ]
+}

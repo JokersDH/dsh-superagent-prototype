@@ -68,6 +68,7 @@ export interface ApplicationOptions {
   actionSecret: Uint8Array
   nativeFence(target: NativeQuestionBinding): 'current' | 'stale' | 'unknown'
   completion?: CompletionReviewPort
+  assistantReplies?: boolean
   now?: () => string
 }
 export interface ProductApplication extends ApplicationService {
@@ -640,6 +641,17 @@ class LocalApplication implements ProductApplication {
       this.emit(workId)
     }
     this.message(command, command.text, command.projectId, workId)
+    this.store.events.append({
+      topic: 'application.message.appended',
+      entityRef: command.conversationId,
+      payload: { conversationId: command.conversationId, messageId: key('message', command.commandId) },
+    })
+    if (this.options.assistantReplies && !workId)
+      this.enqueue('application.assistant.reply', command.commandId, {
+        messageId: key('message', command.commandId),
+        conversationId: command.conversationId,
+        projectId: command.projectId,
+      })
     return workId ? { workId } : {}
   }
   async inspect(input: InspectQuery): Promise<Snapshot> {

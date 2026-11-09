@@ -1,0 +1,107 @@
+{
+  "status": "PASS_CONSOLE_CONTROLLED_PRODUCT",
+  "mode": "controlled-product-http-configuration",
+  "base": "http://127.0.0.1:5174/",
+  "apiState": "/tmp/pa-product-demo",
+  "testedAt": "2026-11-09T02:27:28.561Z",
+  "cases": [
+    {
+      "id": "CONFIG-DRIVEN-FORM",
+      "status": "PASS",
+      "ms": 630,
+      "detail": "create form is initialized from /v1/configuration and creates a real work"
+    },
+    {
+      "id": "ANSWER-VERIFY-ARTIFACTS",
+      "status": "PASS",
+      "ms": 1046,
+      "detail": "answer, registered check and trusted PASS candidate"
+    },
+    {
+      "id": "ARTIFACT-PREVIEW-AND-DOWNLOAD",
+      "status": "PASS",
+      "ms": 168,
+      "detail": "manifest/output preview and authenticated artifact download"
+    },
+    {
+      "id": "ACCEPT-DELIVERED-RELOAD",
+      "status": "PASS",
+      "ms": 871,
+      "detail": "acceptance delivers and reload keeps work plus artifacts"
+    },
+    {
+      "id": "FAIL-PROFILE",
+      "status": "PASS",
+      "ms": 1093,
+      "detail": "machine FAIL offers no acceptance"
+    },
+    {
+      "id": "REVISE-AND-STALE-CANDIDATE",
+      "status": "PASS",
+      "ms": 2949,
+      "detail": "revise creates a new contract revision and rejects the old candidate"
+    },
+    {
+      "id": "STALE-QUESTION",
+      "status": "PASS",
+      "ms": 2919,
+      "detail": "answering an already-answered question version is rejected"
+    },
+    {
+      "id": "STOP-WORK",
+      "status": "PASS",
+      "ms": 307,
+      "detail": "stop is accepted and never shown as delivered"
+    },
+    {
+      "id": "CONFIG-FAILURE-PRESERVES-DRAFT",
+      "status": "PASS",
+      "ms": 902,
+      "detail": "configuration failure disables only new delegation and keeps the draft"
+    },
+    {
+      "id": "UNSCHEDULED-EXECUTOR-DISABLED",
+      "status": "PASS",
+      "ms": 897,
+      "detail": "unscheduled executor disables new delegation with an explicit reason"
+    },
+    {
+      "id": "SSE-RECONNECT",
+      "status": "PASS",
+      "ms": 12,
+      "detail": "offline/reconnect resumes the event stream"
+    },
+    {
+      "id": "NARROW-KEYBOARD",
+      "status": "PASS",
+      "ms": 806,
+      "detail": "narrow layout and keyboard focus work with configuration"
+    },
+    {
+      "id": "NO-PAGE-ERRORS",
+      "status": "PASS",
+      "ms": 0,
+      "detail": "no uncaught page errors"
+    }
+  ],
+  "failures": [],
+  "screenshots": [
+    "screenshots/controlled-config-form.png",
+    "screenshots/controlled-form-question.png",
+    "screenshots/controlled-verified.png",
+    "screenshots/controlled-delivered.png",
+    "screenshots/controlled-after-reload.png",
+    "screenshots/controlled-fail.png",
+    "screenshots/controlled-stale-candidate.png",
+    "screenshots/controlled-stale-question.png",
+    "screenshots/controlled-stopped.png",
+    "screenshots/controlled-config-error.png",
+    "screenshots/controlled-config-blocked.png",
+    "screenshots/controlled-narrow.png"
+  ],
+  "limitations": [
+    "Controlled fixture profiles only: no installed vendor/model compatibility is claimed.",
+    "Configuration failure/blocked scenarios are injected browser-side against the real endpoint; the backend still revalidates every command.",
+    "Independent Runner reconnect, power loss and vendor-native authorization remain separate gates."
+  ]
+}

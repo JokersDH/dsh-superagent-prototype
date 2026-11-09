@@ -2,7 +2,7 @@
 
 This development entry consumes the real core execution queue. It launches an actual fixed scratch subprocess, routes a structured native question through the SQLite QuestionBroker, freezes the artifact after an authenticated owned-resource barrier, runs the registered check, and accepts only the current verified candidate.
 
-It calls no vendor or model. Every profile is explicitly named `profile-fixture-*`. The subprocess only performs a fixed scratch-file operation; user text is data and is never evaluated as code or a shell command. The controlled host runs inside the coordinator, so coordinator SIGKILL leaves its prior writer uncertain. Independent Runner reconnect remains a separate integration lane.
+By default it calls no vendor or model. `--assistant` optionally enables durable model dialogue through a private local configuration; the workbench launcher enables this option. Every execution profile is explicitly named `profile-fixture-*`. The subprocess only performs a fixed scratch-file operation; user text is data and is never evaluated as code or a shell command. The controlled host runs inside the coordinator, so coordinator SIGKILL leaves its prior writer uncertain. Independent Runner reconnect remains a separate integration lane.
 
 ## Run
 
@@ -40,7 +40,9 @@ It reads the private API credential locally, creates one fixed scratch work in `
 
 The HTTP command and snapshot schemas are unchanged. Authenticated `/v1/configuration` now publishes supported projects, selectable fixture profiles and registered default criteria; use it before constructing a work command. Existing `/v1/commands`, `/v1/snapshot`, `/v1/works/:id`, `/v1/events`, `/v1/questions/:id/deliveries`, `/v1/verifications/:id`, and `/v1/artifacts/:id` serve this composition.
 
-Agent A's console product integration should consume `/v1/configuration` in place of hard-coded profile/check defaults. See [the shared read interface](../../../docs/rfcs/WP-16/0004-application-configuration.md). A successful fixture console report alone does not show that this backend was used. Native Catalog/backend admission remains separate.
+The integrated console consumes `/v1/configuration` in place of hard-coded profile/check defaults. See [the shared read interface](../../../docs/rfcs/WP-16/0004-application-configuration.md). A successful fixture console report alone does not show that this backend was used. Native Catalog/backend admission remains separate.
+
+Optional assistant endpoints are authenticated: `GET /v1/assistant` returns safe status, `POST /v1/assistant/model` accepts only a configured model ID, and `GET /v1/guide` downloads the usage guide. Keys and gateway changes remain private local configuration, never browser DTOs. See [the user guide](../../../docs/ASSISTANT-GUIDE.zh-CN.md).
 
 ## Code Map
 
@@ -55,6 +57,8 @@ Agent A's console product integration should consume `/v1/configuration` in plac
 | `completion.ts` | Immutable artifact bytes, trusted WP-04 evidence, read-only review index and acceptance preflight |
 | `scratch.ts` | Creates the disposable scratch project outside the product repository |
 | `demo.ts` | Local HTTP process, private credentials and writer lock |
+| `model-provider.ts` | Private model configuration, safe status and single OpenAI-compatible SDK completion |
+| `assistant-replies.ts` | Durable reply intent, bounded conversation context and no automatic repeat billing after uncertain results |
 
 ## Safety And Recovery
 
@@ -71,6 +75,8 @@ The generic WP-04 Git patch currently omits untracked file contents, and its con
 
 ## Measured Scope
 
-`pnpm check:g2-product` validates 188 contract cases plus 140 product cases: 91 application/Broker/HTTP/recovery cases, 8 workspace cases, 22 verification cases, 14 controlled product integration cases and 5 configuration/HTTP cases. See `reports/releases/g2-product.json` for the actual run and environment.
+`pnpm check:g2-product` validates 188 contract cases plus 162 product cases: 96 application/Broker/HTTP/recovery cases, 8 workspace cases, 22 verification cases, 14 controlled product integration cases, 5 configuration/HTTP cases and 17 assistant cases. Assistant tests use a local mock SDK endpoint; actual provider connectivity is a separate manual smoke. See `reports/releases/g2-product.json` for the actual run and environment.
+
+The model SDK uses streaming completions. Authenticated `GET /v1/assistant/stream?conversationId=...` publishes bounded in-memory cumulative display snapshots. Refresh can resume a live partial reply without restarting inference; the final message is committed only after completion. Shutdown aborts pending inference, and uncertain requests are never automatically charged again. Work-anchored text is excluded from ordinary model context. `pnpm check:assistant-browser` verifies the full SDK/effect/SSE/UI path with an isolated local model fixture.
 
 The 14 new cases include real subprocess I/O, question/answer, duplicate native IDs across attempts, supplements, machine FAIL/PASS, human acceptance, pause during asynchronous launch, stop/revise, receipt rollback, artifact mutation, receipt/verification recovery, authenticated HTTP and one real coordinator SIGKILL window. The SIGKILL case proves no duplicate begin and truthful uncertainty, not independent Runner survival. Browser product acceptance, installed vendors, power loss and load/soak are not certified.

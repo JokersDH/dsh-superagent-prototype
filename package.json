@@ -45,6 +45,9 @@
     "manifestVersion": 1
   },
   "scripts": {
+    "start": "node tools/dev/start.mjs",
+    "stop": "node tools/dev/start.mjs --stop",
+    "restart": "node tools/dev/start.mjs --restart",
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -60,7 +63,11 @@
     "check:g1-runner-link": "node tools/bootstrap/check-g1-runner-link.mjs",
     "check:g1-registered-recovery": "node tools/bootstrap/check-g1-registered-recovery.mjs",
     "check:g2-application": "node tools/bootstrap/check-g2-application.mjs",
-    "check:g2-product": "node tools/bootstrap/check-g2-product.mjs"
+    "check:g2-product": "node tools/bootstrap/check-g2-product.mjs",
+    "dev:workbench": "node tools/dev/workbench.mjs",
+    "check:g2-workbench": "node tools/bootstrap/check-g2-workbench.mjs",
+    "check:g2-browser": "node tests/integration/workbench-browser.mjs",
+    "check:assistant-browser": "node tests/integration/assistant-browser.mjs"
   },
   "engines": {
     "node": "^22.19.0 || >=24.0.0",

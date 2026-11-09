@@ -7,12 +7,18 @@ import { localCredentials } from '../http/local-state.ts'
 import { listenLocalHttp } from '../http/server.ts'
 import { createControlledProduct } from './runtime.ts'
 import { ensureScratchProject } from './scratch.ts'
+import { PrivateModelProvider } from './model-provider.ts'
 
 const { values } = parseArgs({
   options: {
     port: { type: 'string', default: '8791' },
-    state: { type: 'string', default: fileURLToPath(new URL('../../../.local-state/product-demo', import.meta.url)) },
+    state: {
+      type: 'string',
+      default: fileURLToPath(new URL('../../../.local-state/product-demo', import.meta.url)),
+    },
     'console-origin': { type: 'string', default: 'http://127.0.0.1:5174' },
+    'local-access': { type: 'boolean', default: false },
+    assistant: { type: 'boolean', default: false },
   },
 })
 const stateRoot = resolve(values.state!),
@@ -26,7 +32,10 @@ try {
   store.close()
   throw error
 }
-const principal = { userId: 'local-demo-user', authorityRef: 'local-demo-authority' }
+const principal = {
+  userId: 'local-demo-user',
+  authorityRef: 'local-demo-authority',
+}
 const product = createControlledProduct({
   store,
   principal,
@@ -35,10 +44,17 @@ const product = createControlledProduct({
   projects: [
     {
       id: 'project-atlas',
-      scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
+      displayName: '本地验证项目',
+      scope: {
+        projectId: 'project-atlas',
+        allowedPaths: ['src/'],
+        excludedPaths: [],
+        externalActions: [],
+      },
     },
   ],
   actionSecret: Buffer.from(credential('action.key'), 'hex'),
+  ...(values.assistant ? { assistantProvider: new PrivateModelProvider() } : {}),
 })
 const http = createLocalHttpApp({
   application: product.application,
@@ -47,6 +63,7 @@ const http = createLocalHttpApp({
   bootstrapToken: credential('bootstrap.key'),
   allowedOrigins: [`http://127.0.0.1:${port}`, values['console-origin']!],
   mode: 'fixture',
+  localDevelopmentAccess: values['local-access'] === true,
   read: product.read,
 })
 const server = listenLocalHttp(http, port)
@@ -77,5 +94,9 @@ process.once('SIGINT', () => {
 server.once('listening', () => {
   console.log(`Controlled product API: http://127.0.0.1:${port}/v1/health`)
   console.log(`Private state/credential references: ${stateRoot}`)
-  console.log('Real scratch subprocess, questions and artifact verification; fixture profiles only; zero vendor calls.')
+  console.log(
+    values.assistant
+      ? 'Model dialogue enabled when privately configured; work execution uses controlled scratch profiles.'
+      : 'Real scratch subprocess, questions and artifact verification; fixture profiles only; zero vendor calls.',
+  )
 })
