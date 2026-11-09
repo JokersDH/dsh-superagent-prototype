@@ -1,0 +1,51 @@
+Scope: all 12 workspace projects
+? Verifying lockfile against supply-chain policies (295 entries)...
+Progress: resolved 1, reused 0, downloaded 0, added 0
+
+   ╭───────────────────────────────────────────────╮
+   │                                               │
+   │      Update available! 11.7.0 → 12.18.0.      │
+   │     Changelog: https://pnpm.io/v/12.18.0      │
+   │   To update, run: corepack use pnpm@12.18.0   │
+   │                                               │
+   ╰───────────────────────────────────────────────╯
+
+Progress: resolved 287, reused 233, downloaded 0, added 0
+[WARN] 24 deprecated subdependencies found: @yuku-codegen/binding-android-arm64@0.8.7, @yuku-codegen/binding-darwin-arm64@0.8.7, @yuku-codegen/binding-darwin-x64@0.8.7, @yuku-codegen/binding-freebsd-x64@0.8.7, @yuku-codegen/binding-linux-arm-gnu@0.8.7, @yuku-codegen/binding-linux-arm-musl@0.8.7, @yuku-codegen/binding-linux-arm64-gnu@0.8.7, @yuku-codegen/binding-linux-arm64-musl@0.8.7, @yuku-codegen/binding-linux-x64-gnu@0.8.7, @yuku-codegen/binding-linux-x64-musl@0.8.7, @yuku-codegen/binding-win32-arm64@0.8.7, @yuku-codegen/binding-win32-x64@0.8.7, @yuku-parser/binding-android-arm64@0.8.7, @yuku-parser/binding-darwin-arm64@0.8.7, @yuku-parser/binding-darwin-x64@0.8.7, @yuku-parser/binding-freebsd-x64@0.8.7, @yuku-parser/binding-linux-arm-gnu@0.8.7, @yuku-parser/binding-linux-arm-musl@0.8.7, @yuku-parser/binding-linux-arm64-gnu@0.8.7, @yuku-parser/binding-linux-arm64-musl@0.8.7, @yuku-parser/binding-linux-x64-gnu@0.8.7, @yuku-parser/binding-linux-x64-musl@0.8.7, @yuku-parser/binding-win32-arm64@0.8.7, @yuku-parser/binding-win32-x64@0.8.7
+Already up to date
+Progress: resolved 295, reused 241, downloaded 0, added 0, done
+✓ Lockfile passes supply-chain policies (295 entries in 1.2s)
+[WARN] Issues with peer dependencies found. Run "pnpm peers check" to list them.
+
+Done in 1.4s using pnpm v11.7.0
+
+ RUN  v4.1.8 /Users/hh/Desktop/joker/superagent-agent-a/packages/orchestrator-core
+
+ ✓ tests/core-engine.spec.ts (113 tests) 747ms
+ ✓ tests/personal-completion.spec.ts (34 tests) 192ms
+ ✓ tests/stage.spec.ts (31 tests) 4ms
+
+ Test Files  3 passed (3)
+      Tests  178 passed (178)
+   Start at  20:23:34
+   Duration  1.36s (transform 146ms, setup 26ms, import 203ms, tests 943ms, environment 0ms)
+
+JSON report written to /Users/hh/Desktop/joker/superagent-agent-a/packages/orchestrator-core/reports/sqlite-test-results.json
+{
+  "status": "PASS_CORE_DOMAIN_SQLITE_ONLY",
+  "storageCommit": "093dc602a739377b0373f986fb8e47b406e81d6a",
+  "typedStorageBinding": true,
+  "coreTests": 178,
+  "originalBaselineTests": 144,
+  "personalCoreTests": 34,
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "recordedAt": "2026-11-08T12:23:36.129Z",
+  "limitations": [
+    "One SQLite store per core test; no concurrent coordinator startup",
+    "Writer lock and direct async UnitOfWork cases are blocked in the separate review report",
+    "Original fake callbacks are not durable effect/outbox evidence",
+    "No production runtime bindings/leases or real fenced ingress wired",
+    "No native agent compatibility or full G1 acceptance"
+  ]
+}

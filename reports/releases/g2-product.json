@@ -1,0 +1,53 @@
+{
+  "status": "PASS_CONTROLLED_PRODUCT_API_SLICE",
+  "sourceCommit": "2e566f8da65d56078b4182b9a4b3358bac34e556",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-08T15:52:31.180Z",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "tests": 134,
+  "results": [
+    {
+      "command": "pnpm check:g2-application",
+      "status": "PASS",
+      "tests": 90
+    },
+    {
+      "command": "pnpm --filter @personal-agent/workspaces --filter @personal-agent/verification -r build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/workspaces --filter @personal-agent/verification -r typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator typecheck:product",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/workspaces --filter @personal-agent/verification -r test",
+      "status": "PASS",
+      "tests": 30
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:product",
+      "status": "PASS",
+      "tests": 14
+    }
+  ],
+  "scopes": {
+    "applicationAndRecovery": 90,
+    "workspaces": 8,
+    "verification": 22,
+    "actualControlledProduct": 14
+  },
+  "implementation": "SQLite application + real scratch subprocess + original native questions + trusted owned-resource barrier + registered verification + candidate acceptance",
+  "limitations": [
+    "This is the controlled product API lane; browser product acceptance is separate",
+    "Fixture profiles execute a fixed scratch operation; installed Codex/ZCode/DeepSeek Harness and model calls are NOT_TESTED",
+    "The controlled host lives in the coordinator process; SIGKILL proves conservative no-replay behavior, not live independent Runner reconnect",
+    "The imported workspace patch omits untracked file bytes; the controlled lane explicitly publishes its fixed output bytes as an additional immutable artifact",
+    "No complete G1/G2 release, generic user-project security sandbox, power-loss or load/soak certification"
+  ]
+}

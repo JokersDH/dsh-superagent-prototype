@@ -1,0 +1,18 @@
+{
+  "status": "PASS_REAL_LOOPBACK_CONTROLLED_PRODUCT",
+  "checkedAt": "2026-11-08T15:53:32.784Z",
+  "node": "v24.22.2",
+  "url": "http://127.0.0.1:8791",
+  "workId": "85ddd6d8c9a3915bd95d0f05ec1309b2",
+  "questionId": "ca44bf2519462e864647348c4c69ee60",
+  "verificationId": "verification:f70b51aa-6f44-484f-b049-d39b8f045283",
+  "phase": "delivered",
+  "resourceStatus": "quiescent",
+  "artifactIds": [
+    "299d737e5acdccaebeb47e4f05718214940263ac5bd675e4fdfb26c2b190e722",
+    "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+    "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+    "2b71243c12c5a4277cb0448ce74034bd75fc4f479519443b9c87ad8f000c9e6f"
+  ],
+  "vendorCalls": 0
+}
