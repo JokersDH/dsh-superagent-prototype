@@ -6,6 +6,7 @@ import type { ProductStore } from '@personal-agent/storage'
 import type { Effects } from '@personal-agent/effects'
 import { ModelProviderError } from './model-provider.ts'
 import type { AssistantModelPort } from './model-provider.ts'
+import type { AssistantStreams } from './assistant-streams.ts'
 
 const Intent = z.strictObject({ messageId: IdSchema, conversationId: IdSchema, projectId: IdSchema })
 const SYSTEM =
@@ -15,6 +16,7 @@ export function handleAssistantReplies(
   effects: Pick<Effects, 'handle'>,
   store: ProductStore,
   provider: AssistantModelPort,
+  streams?: AssistantStreams,
 ) {
   const append = (input: z.infer<typeof Intent>, id: string, text: string, notice = false) =>
     store.uow.atomic(() => {
@@ -47,6 +49,7 @@ export function handleAssistantReplies(
         !user ||
         user.role !== 'user' ||
         user.provenance !== 'trusted_user' ||
+        user.anchor ||
         user.conversationId !== input.conversationId ||
         user.projectId !== input.projectId
       )
@@ -61,6 +64,7 @@ export function handleAssistantReplies(
         (message) =>
           message.role === 'user' &&
           message.provenance === 'trusted_user' &&
+          !message.anchor &&
           message.sequence <= user.sequence &&
           message.projectId === input.projectId,
       )
@@ -106,9 +110,17 @@ export function handleAssistantReplies(
         })
       })
       let result
+      const signal = streams?.start({ ...input, replyId, model })
       try {
-        result = await provider.reply([{ role: 'system', content: SYSTEM }, ...messages])
+        result = await provider.reply(
+          [{ role: 'system', content: SYSTEM }, ...messages],
+          (text) => {
+            streams?.append(input.messageId, text)
+          },
+          signal,
+        )
       } catch (error) {
+        streams?.finish(input.messageId, 'interrupted')
         append(
           input,
           noticeId,
@@ -117,7 +129,13 @@ export function handleAssistantReplies(
         )
         return
       }
-      append(input, replyId, result.text)
+      try {
+        append(input, replyId, result.text)
+        streams?.finish(input.messageId, 'complete')
+      } catch (error) {
+        streams?.finish(input.messageId, 'interrupted')
+        throw error
+      }
     },
     { ordered: true, retry: [1000, 10000] },
   )

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { TimestampSchema } from './schemas.ts'
+import { IdSchema, TimestampSchema } from './schemas.ts'
 
 export const AssistantProviderStatusSchema = z.strictObject({
   protocol: z.literal('assistant-provider/1'),
@@ -13,3 +13,15 @@ export const AssistantProviderStatusSchema = z.strictObject({
 })
 export const AssistantModelSelectionSchema = z.strictObject({ model: z.string().trim().min(1).max(160) })
 export type AssistantProviderStatus = z.infer<typeof AssistantProviderStatusSchema>
+export const AssistantStreamUpdateSchema = z.strictObject({
+  protocol: z.literal('assistant-stream/1'),
+  messageId: IdSchema,
+  conversationId: IdSchema,
+  projectId: IdSchema,
+  replyId: IdSchema,
+  model: z.string().max(160).nullable(),
+  revision: z.number().int().positive().safe(),
+  phase: z.enum(['streaming', 'complete', 'interrupted']),
+  text: z.string().max(32768),
+})
+export type AssistantStreamUpdate = z.infer<typeof AssistantStreamUpdateSchema>

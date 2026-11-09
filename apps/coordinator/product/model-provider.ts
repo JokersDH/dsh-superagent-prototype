@@ -51,6 +51,8 @@ export interface AssistantModelPort {
   status(): AssistantProviderStatus
   reply(
     messages: readonly { role: 'system' | 'user' | 'assistant'; content: string }[],
+    onDelta?: (text: string) => void,
+    signal?: AbortSignal,
   ): Promise<{ text: string; model: string }>
 }
 
@@ -137,7 +139,11 @@ export class PrivateModelProvider implements AssistantModelPort {
     this.lastResponseAt = undefined
     return this.status()
   }
-  async reply(messages: readonly { role: 'system' | 'user' | 'assistant'; content: string }[]) {
+  async reply(
+    messages: readonly { role: 'system' | 'user' | 'assistant'; content: string }[],
+    onDelta?: (text: string) => void,
+    signal?: AbortSignal,
+  ) {
     const config = this.read()
     const client = new OpenAI({
       apiKey: config.apiKey,
@@ -149,20 +155,61 @@ export class PrivateModelProvider implements AssistantModelPort {
     })
     this.busy++
     this.failed = false
+    let abortStream: (() => void) | undefined
+    const requestAbort = new AbortController()
+    const abort = () => {
+      requestAbort.abort()
+      abortStream?.()
+    }
+    signal?.addEventListener('abort', abort, { once: true })
+    if (signal?.aborted) abort()
+    const deadline = setTimeout(abort, 45000)
     try {
-      const result = await client.chat.completions.create({
-        model: config.model,
-        messages: [...messages],
-        max_tokens: config.maxOutputTokens,
-        stream: false,
-      })
-      const text = result.choices[0]?.message.content?.trim()
-      if (!text || text.length > 32768)
-        throw new ModelProviderError('empty_response', '模型没有返回可显示的回复，请重试。')
+      const result = await client.chat.completions.create(
+        {
+          model: config.model,
+          messages: [...messages],
+          max_tokens: config.maxOutputTokens,
+          stream: true,
+        },
+        { signal: requestAbort.signal },
+      )
+      abortStream = () => result.controller.abort()
+      let text = '',
+        pending = '',
+        finished = false
+      const emit = (value: string) => {
+        if (!value) return
+        text += value
+        if (text.length > 32768)
+          throw new ModelProviderError('response_limit', '模型回复超过显示上限，请缩小问题范围。')
+        onDelta?.(value)
+      }
+      // Hold a possible key prefix across chunks, so a split credential never reaches the browser.
+      const redact = (chunk: string, final = false) => {
+        pending = (pending + chunk).split(config.apiKey).join('[密钥已隐藏]')
+        let held = final ? 0 : Math.min(pending.length, config.apiKey.length - 1)
+        while (held && !config.apiKey.startsWith(pending.slice(-held))) held--
+        emit(pending.slice(0, pending.length - held))
+        pending = held ? pending.slice(-held) : ''
+      }
+      for await (const chunk of result) {
+        const choice = chunk.choices[0]
+        if (!choice) continue
+        if (choice.delta.content) redact(choice.delta.content)
+        if (choice.finish_reason === 'stop' || choice.finish_reason === 'length') finished = true
+      }
+      if (!finished) throw new ModelProviderError('stream_interrupted', '模型回复中断，未自动重发。请重新发送后再试。')
+      redact('', true)
+      if (!text.trim()) throw new ModelProviderError('empty_response', '模型没有返回可显示的回复，请重试。')
       this.lastResponseAt = new Date().toISOString()
-      return { text: text.split(config.apiKey).join('[密钥已隐藏]'), model: config.model }
+      return { text: text.trim(), model: config.model }
     } catch (error) {
       this.failed = true
+      if (signal?.aborted) {
+        this.failed = false
+        throw new ModelProviderError('cancelled', '本机服务正在关闭，模型生成已停止，未自动重发。')
+      }
       if (error instanceof ModelProviderError) throw error
       const status = error instanceof OpenAI.APIError ? error.status : undefined
       throw new ModelProviderError(
@@ -174,6 +221,9 @@ export class PrivateModelProvider implements AssistantModelPort {
             : '模型暂时未能完成回复，请稍后重新发送。',
       )
     } finally {
+      clearTimeout(deadline)
+      signal?.removeEventListener('abort', abort)
+      abortStream?.()
       this.busy--
     }
   }

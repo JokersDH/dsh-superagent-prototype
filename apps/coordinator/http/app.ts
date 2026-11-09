@@ -12,6 +12,7 @@ import {
   ApplicationConfigurationSchema,
   AssistantProviderStatusSchema,
   AssistantModelSelectionSchema,
+  AssistantStreamUpdateSchema,
   ChangeSchema,
   CommandReceiptSchema,
   ConversationPageSchema,
@@ -27,6 +28,7 @@ import type {
   AnswerDelivery,
   ApplicationConfiguration,
   AssistantProviderStatus,
+  AssistantStreamUpdate,
   AppError,
   ApplicationService,
   TrustedActor,
@@ -74,6 +76,7 @@ export interface LocalHttpOptions {
   now?: () => number
   read?: {
     assistant?(): Promise<AssistantProviderStatus>
+    assistantStream?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
     selectModel?(model: string): Promise<AssistantProviderStatus>
     guide?(): Promise<string>
     configuration?(): Promise<ApplicationConfiguration>
@@ -227,6 +230,30 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     c.header('content-type', 'text/markdown; charset=utf-8')
     c.header('content-disposition', 'attachment; filename="assistant-guide.zh-CN.md"')
     return c.body(await options.read.guide())
+  })
+  app.get('/v1/assistant/stream', (c) => {
+    const { conversationId } = z.strictObject({ conversationId: IdSchema }).parse(c.req.query())
+    if (!options.read?.assistantStream)
+      throw new ApplicationFault('unsupported_capability', 'Assistant streaming is not connected')
+    const controller = new AbortController()
+    const updates = options.read.assistantStream(conversationId, controller.signal)
+    c.header('x-accel-buffering', 'no')
+    return streamSSE(c, async (stream) => {
+      stream.onAbort(() => controller.abort())
+      const heartbeat = setInterval(() => {
+        void stream.writeSSE({ event: 'heartbeat', data: '{}' }).catch(() => controller.abort())
+      }, 20000)
+      try {
+        for await (const value of updates) {
+          const update = AssistantStreamUpdateSchema.parse(value)
+          if (update.conversationId !== conversationId) throw new Error('Assistant stream identity mismatch')
+          await stream.writeSSE({ event: 'assistant_update', data: JSON.stringify(update) })
+        }
+      } finally {
+        clearInterval(heartbeat)
+        controller.abort()
+      }
+    })
   })
   app.post('/v1/assistant/model', async (c) => {
     if (!c.req.header('content-type')?.startsWith('application/json'))

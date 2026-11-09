@@ -9,7 +9,10 @@ For personal use, run `pnpm start` from the repository root and open `http://127
 See [the Chinese usage guide](../../docs/ASSISTANT-GUIDE.zh-CN.md). The integrated workbench adds
 private model dialogue, Markdown, independent conversation URLs and a safe model selector. Its light
 layout keeps the conversation central and opens work/model details on demand. Execution remains
-controlled; model replies have no repository or terminal tools. The imported A checkpoint evidence
+controlled; model replies have no repository or terminal tools. Model replies stream through a separate
+authenticated display channel; partial text is not durable authority. Refresh recovers the active partial
+reply. Work-anchored records are shown only in work context. Task templates prepare editable drafts;
+copy/Markdown export lets the user hand the result to their own coding agent. The imported A checkpoint evidence
 below describes that checkpoint; current main acceptance is in `reports/releases/`.
 
 ## Modes

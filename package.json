@@ -66,7 +66,8 @@
     "check:g2-product": "node tools/bootstrap/check-g2-product.mjs",
     "dev:workbench": "node tools/dev/workbench.mjs",
     "check:g2-workbench": "node tools/bootstrap/check-g2-workbench.mjs",
-    "check:g2-browser": "node tests/integration/workbench-browser.mjs"
+    "check:g2-browser": "node tests/integration/workbench-browser.mjs",
+    "check:assistant-browser": "node tests/integration/assistant-browser.mjs"
   },
   "engines": {
     "node": "^22.19.0 || >=24.0.0",

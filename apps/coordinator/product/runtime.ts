@@ -15,6 +15,7 @@ import { applicationConfiguration } from './configuration.ts'
 import { handleAssistantReplies } from './assistant-replies.ts'
 import type { PrivateModelProvider } from './model-provider.ts'
 import { ModelProviderError } from './model-provider.ts'
+import { AssistantStreams } from './assistant-streams.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -76,12 +77,16 @@ export function createControlledProduct(
     options.principal,
   )
   const { store } = options
-  if (options.assistantProvider) handleAssistantReplies(execution.effects, store, options.assistantProvider)
+  const assistantStreams = new AssistantStreams()
+  if (options.assistantProvider)
+    handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams)
   const read: NonNullable<LocalHttpOptions['read']> = {
     guide: async () => readFileSync(new URL('../../../docs/ASSISTANT-GUIDE.zh-CN.md', import.meta.url), 'utf8'),
     ...(options.assistantProvider
       ? {
           assistant: async () => options.assistantProvider!.status(),
+          assistantStream: (conversationId: string, signal: AbortSignal) =>
+            assistantStreams.changes(conversationId, signal),
           selectModel: async (model: string) => {
             try {
               return options.assistantProvider!.selectModel(model)
@@ -160,6 +165,9 @@ export function createControlledProduct(
     checks,
     read,
     start: () => execution!.start(),
-    close: () => execution!.close(),
+    close: () => {
+      assistantStreams.close()
+      return execution!.close()
+    },
   }
 }

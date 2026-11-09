@@ -2,6 +2,6 @@
   "protocol": "assistant-provider/1",
   "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
   "runtimeValidationRequired": true,
-  "schemaHash": "20036b56d1bde5abb03db074fef4e5e11d41cddb85dbaee86d6e62e01362d06d",
-  "sourceHash": "f42676452f548d5ddd07173f0c2929feadf3c970d92d4ef7a974ed399038e3ee"
+  "schemaHash": "7229fe3d1346dabbd95b710e70274b0468af5d7df4f226185073b07db3a0f1e9",
+  "sourceHash": "6477d3c8104d3e48e9f6747e5196985e755390da81c02f55004918cd59d7834c"
 }

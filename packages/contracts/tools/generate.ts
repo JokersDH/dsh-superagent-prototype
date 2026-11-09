@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { CONTRACT_API_MAJOR, CONTRACT_VERSION, wireSchemas } from '../src/schemas.ts';
 import { ApplicationConfigurationSchema, CONFIGURATION_PROTOCOL } from '../src/configuration.ts';
-import { AssistantProviderStatusSchema, AssistantModelSelectionSchema } from '../src/assistant.ts';
+import { AssistantProviderStatusSchema, AssistantModelSelectionSchema, AssistantStreamUpdateSchema } from '../src/assistant.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -35,7 +35,7 @@ const outputs = new Map<string, string>([
 const configurationText = canonical({ ...z.toJSONSchema(ApplicationConfigurationSchema, { target: 'draft-2020-12', io: 'input' }), $id: 'urn:personal-agent:application-configuration:1', 'x-runtime-validation': 'Use ApplicationConfigurationSchema for reference and readiness rules.' });
 outputs.set('generated/configuration.schema.json', configurationText);
 outputs.set('generated/configuration.manifest.json', canonical({ protocol: CONFIGURATION_PROTOCOL, schemaHash: digest(configurationText), sourceHash: digest(readFileSync(resolve(root, 'src/configuration.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
-const assistantText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:assistant-provider:1', $defs: { AssistantProviderStatus: z.toJSONSchema(AssistantProviderStatusSchema, { target: 'draft-2020-12', io: 'input' }), AssistantModelSelection: z.toJSONSchema(AssistantModelSelectionSchema, { target: 'draft-2020-12', io: 'input' }) } });
+const assistantText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:assistant-provider:1', $defs: { AssistantProviderStatus: z.toJSONSchema(AssistantProviderStatusSchema, { target: 'draft-2020-12', io: 'input' }), AssistantModelSelection: z.toJSONSchema(AssistantModelSelectionSchema, { target: 'draft-2020-12', io: 'input' }), AssistantStreamUpdate: z.toJSONSchema(AssistantStreamUpdateSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/assistant.schema.json', assistantText);
 outputs.set('generated/assistant.manifest.json', canonical({ protocol: 'assistant-provider/1', schemaHash: digest(assistantText), sourceHash: digest(readFileSync(resolve(root, 'src/assistant.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [path, content] of outputs) {

@@ -87,6 +87,72 @@
         "secureTransport"
       ],
       "type": "object"
+    },
+    "AssistantStreamUpdate": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "conversationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "messageId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "phase": {
+          "enum": [
+            "streaming",
+            "complete",
+            "interrupted"
+          ],
+          "type": "string"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "assistant-stream/1",
+          "type": "string"
+        },
+        "replyId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "revision": {
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991,
+          "type": "integer"
+        },
+        "text": {
+          "maxLength": 32768,
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "messageId",
+        "conversationId",
+        "projectId",
+        "replyId",
+        "model",
+        "revision",
+        "phase",
+        "text"
+      ],
+      "type": "object"
     }
   },
   "$id": "urn:personal-agent:assistant-provider:1",

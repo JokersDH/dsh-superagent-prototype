@@ -12,11 +12,13 @@ import {
   SnapshotSchema,
   VerificationSchema,
   AssistantProviderStatusSchema,
+  AssistantStreamUpdateSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
   ApplicationConfiguration,
   AssistantProviderStatus,
+  AssistantStreamUpdate,
   Change,
   CommandReceipt,
   ConversationPage,
@@ -63,6 +65,7 @@ export interface ConsoleTransport {
   /** Trusted startup configuration for the create-work form; undefined when the entry has no config port. */
   configuration?(): Promise<ApplicationConfiguration | undefined>
   assistant?(): Promise<AssistantProviderStatus | undefined>
+  assistantChanges?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
   selectModel?(model: string): Promise<AssistantProviderStatus>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
@@ -215,6 +218,45 @@ export class HttpTransport implements ConsoleTransport {
     return AssistantProviderStatusSchema.parse(
       await this.request('/v1/assistant/model', { method: 'POST', body: JSON.stringify({ model }) }),
     )
+  }
+  async *assistantChanges(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate> {
+    if (signal.aborted) return
+    const source = new EventSource(`${this.base}/v1/assistant/stream?${new URLSearchParams({ conversationId })}`)
+    const queue = new Map<string, AssistantStreamUpdate>()
+    let wake: (() => void) | undefined
+    source.addEventListener('assistant_update', (event) => {
+      try {
+        const update = AssistantStreamUpdateSchema.parse(JSON.parse((event as MessageEvent).data))
+        if (update.conversationId !== conversationId) return
+        queue.set(update.messageId, update)
+        wake?.()
+      } catch {
+        /* Display updates are advisory; the authenticated snapshot remains authoritative. */
+      }
+    })
+    const abort = () => {
+      source.close()
+      wake?.()
+    }
+    signal.addEventListener('abort', abort)
+    try {
+      while (!signal.aborted) {
+        const next = queue.entries().next()
+        if (!next.done) {
+          queue.delete(next.value[0])
+          yield next.value[1]
+          continue
+        }
+        await new Promise<void>((resolve) => {
+          wake = resolve
+        }).finally(() => {
+          wake = undefined
+        })
+      }
+    } finally {
+      signal.removeEventListener('abort', abort)
+      source.close()
+    }
   }
   async artifact(id: string): Promise<{ contentType: string; text: string } | undefined> {
     let response: Response

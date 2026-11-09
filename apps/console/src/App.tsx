@@ -11,7 +11,10 @@ import {
   Check,
   ChevronRight,
   CircleHelp,
+  Copy,
+  Download,
   Folder,
+  ListTodo,
   MessageSquare,
   PanelRightClose,
   PanelRightOpen,
@@ -26,6 +29,7 @@ import remarkGfm from 'remark-gfm'
 import type {
   ApplicationConfiguration,
   AssistantProviderStatus,
+  AssistantStreamUpdate,
   AssignmentRef,
   CandidateRef,
   CommandReceipt,
@@ -81,6 +85,20 @@ const questionKindLabel: Record<UserQuestion['kind'], string> = {
   review: '验收',
 }
 const newId = (prefix: string): string => `${prefix}-${crypto.randomUUID()}`
+const taskTemplates = [
+  {
+    title: '拆解开发需求',
+    text: '我要开发：\n目标用户：\n必须具备的功能：\n技术约束：\n\n请给出第一版范围、可独立验收的任务、依赖顺序和主要风险。',
+  },
+  {
+    title: '分析代码或报错',
+    text: '我遇到的问题：\n预期行为：\n实际行为：\n相关代码或报错：\n\n请先定位可能原因，再给出最小修改和验证步骤。不确定的地方请明确说明。',
+  },
+  {
+    title: '生成 Agent 任务单',
+    text: '需要实现的需求或已有计划：\n代码仓库与技术栈：\n可用的 Agent 数量：\n\n请生成可直接交给编码 Agent 的任务单，每份包含目标、输入、负责路径、实施步骤、接口约束、验收命令及交付内容，并明确任务依赖。',
+  },
+]
 const contractRef = (contract: WorkView['contract']): ContractRef => ({
   workId: contract.workId,
   revision: contract.revision,
@@ -109,6 +127,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [workspaceOpen, setWorkspaceOpen] = useState(false)
   const [assistant, setAssistant] = useState<AssistantProviderStatus | undefined>()
   const [waitingAfter, setWaitingAfter] = useState<number | undefined>()
+  const [streamReplies, setStreamReplies] = useState<readonly AssistantStreamUpdate[]>([])
   const fixture =
     typeof (transport as FixtureAdapter).setModelOffline === 'function' ? (transport as FixtureAdapter) : undefined
   const [snapshot, setSnapshot] = useState<Snapshot | undefined>(undefined)
@@ -212,6 +231,31 @@ export function App({ transport }: { transport: ConsoleTransport }) {
       }
     }
   }, [transport])
+  useEffect(() => {
+    setStreamReplies([])
+    if (auth !== 'ready' || !assistant?.configured || !transport.assistantChanges) return
+    const controller = new AbortController()
+    void (async () => {
+      try {
+        for await (const update of transport.assistantChanges!(conversationId, controller.signal)) {
+          if (controller.signal.aborted || conversationRef.current !== conversationId) break
+          setStreamReplies((previous) => [
+            ...previous.filter((reply) => reply.messageId !== update.messageId).slice(-63),
+            update,
+          ])
+          if (update.phase !== 'streaming') {
+            if (refreshTimer.current) clearTimeout(refreshTimer.current)
+            refreshTimer.current = setTimeout(() => {
+              void refresh()
+            }, 40)
+          }
+        }
+      } catch {
+        /* Reopen/refresh still reads the durable conversation through the main transport. */
+      }
+    })()
+    return () => controller.abort()
+  }, [auth, assistant?.configured, conversationId, transport, refresh])
   useEffect(() => {
     if (auth === 'ready') void refreshAssistant()
   }, [auth, snapshot?.cursor, refreshAssistant])
@@ -471,7 +515,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           >
             <Folder size={18} />
           </button>
-          <a className="icon-button secondary-tool" href="/v1/guide" title="使用指南" aria-label="使用指南">
+          <a className="icon-button" href="/v1/guide" title="使用指南" aria-label="使用指南">
             <CircleHelp size={18} />
           </a>
           <button
@@ -698,6 +742,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               offline={offline}
               assistant={assistant}
               waiting={waitingAfter !== undefined}
+              streamReplies={streamReplies}
               onSend={async (text, useWorkContext) => {
                 const command: UserCommand = {
                   commandId: newId('cmd-chat'),
@@ -1321,6 +1366,7 @@ function Conversation({
   offline,
   assistant,
   waiting,
+  streamReplies,
   onSend,
   onLoadOlder,
 }: {
@@ -1331,17 +1377,42 @@ function Conversation({
   offline: boolean
   assistant: AssistantProviderStatus | undefined
   waiting: boolean
+  streamReplies: readonly AssistantStreamUpdate[]
   onSend: (text: string, useWorkContext: boolean) => Promise<boolean>
   onLoadOlder: (before: number) => Promise<void>
 }) {
   const [draft, setDraft] = useState('')
   const [useWorkContext, setUseWorkContext] = useState(false)
+  const templateRef = useRef<HTMLDetailsElement | null>(null)
+  const inputRef = useRef<HTMLTextAreaElement | null>(null)
+  const applyTemplate = (text: string) => {
+    setDraft(text)
+    setUseWorkContext(false)
+    if (templateRef.current) templateRef.current.open = false
+    inputRef.current?.focus()
+  }
   const endRef = useRef<HTMLDivElement | null>(null)
   const page = snapshot?.conversation
-  const messages = page?.messages ?? []
+  const messages = (page?.messages ?? []).filter((message) =>
+    useWorkContext && selectedWork ? message.anchor?.workId === selectedWork.work.id : !message.anchor,
+  )
+  const drafts = useWorkContext
+    ? []
+    : streamReplies.filter(
+        (reply) =>
+          page?.messages.some((message) => message.id === reply.messageId) &&
+          !page?.messages.some(
+            (message) =>
+              message.id === reply.replyId ||
+              (message.provenance === 'application_notice' && message.sourceRefs.includes(reply.messageId)),
+          ),
+      )
+  const streaming = drafts.some((reply) => reply.phase === 'streaming')
+  const scrollRef = useRef<HTMLDivElement | null>(null)
+  const followReply = useRef(true)
   useEffect(() => {
-    endRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-  }, [messages.length, waiting])
+    if (followReply.current) endRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [messages.length, waiting, streamReplies])
   return (
     <div className="conversation-inner">
       <div className="conversation-head">
@@ -1353,7 +1424,17 @@ function Conversation({
         </div>
         {offline && <span className="badge warn">模型离线：查询、回答与停止仍可用</span>}
       </div>
-      <div className="messages" role="log" aria-live="polite" aria-label="对话消息">
+      <div
+        className="messages"
+        ref={scrollRef}
+        role="log"
+        aria-live="polite"
+        aria-label="对话消息"
+        onScroll={() => {
+          const element = scrollRef.current
+          if (element) followReply.current = element.scrollHeight - element.clientHeight - element.scrollTop < 120
+        }}
+      >
         {page?.hasMore && (
           <button type="button" className="load-older" onClick={() => void onLoadOlder(page.beforeCursor!)}>
             加载更早消息
@@ -1381,26 +1462,34 @@ function Conversation({
                   hour12: false,
                 })}
               </time>
+              {message.provenance === 'reasoner_reply' && <ReplyActions text={message.text} />}
             </header>
-            <div className="text markdown">
-              <Markdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  img: ({ src, alt }) => (
-                    <a href={src} target="_blank" rel="noreferrer">
-                      {alt || '图片链接'}
-                    </a>
-                  ),
-                  a: ({ children, ...props }) => (
-                    <a {...props} target="_blank" rel="noreferrer">
-                      {children}
-                    </a>
-                  ),
-                }}
-              >
-                {message.text}
-              </Markdown>
-            </div>
+            <MessageText text={message.text} />
+          </article>
+        ))}
+        {drafts.map((reply) => (
+          <article
+            key={reply.messageId}
+            className="message role-assistant streaming-reply"
+            data-phase={reply.phase}
+            aria-busy={reply.phase === 'streaming'}
+          >
+            <header>
+              <span className="role">
+                <Bot size={16} />
+                个人助理
+              </span>
+              <span className="stream-status">
+                {reply.phase === 'streaming'
+                  ? reply.text
+                    ? '正在生成'
+                    : '正在思考'
+                  : reply.phase === 'complete'
+                    ? '正在保存'
+                    : '回复中断'}
+              </span>
+            </header>
+            <MessageText text={reply.text} />
           </article>
         ))}
         {!messages.length && (
@@ -1410,16 +1499,16 @@ function Conversation({
             </span>
             <h3>今天想一起处理什么？</h3>
             <div className="quick-prompts">
-              {['梳理一个开发需求', '比较技术方案', '整理一份项目计划'].map((text) => (
-                <button type="button" key={text} onClick={() => setDraft(text)}>
-                  {text}
+              {taskTemplates.map((template) => (
+                <button type="button" key={template.title} onClick={() => applyTemplate(template.text)}>
+                  {template.title}
                   <ChevronRight size={14} />
                 </button>
               ))}
             </div>
           </div>
         )}
-        {waiting && (
+        {waiting && !drafts.length && (
           <div className="assistant-pending" role="status">
             <Bot size={17} />
             <span>正在思考</span>
@@ -1433,7 +1522,8 @@ function Conversation({
         onSubmit={async (event) => {
           event.preventDefault()
           const text = draft.trim()
-          if (!text || pending || waiting) return
+          if (!text || pending || waiting || streaming) return
+          followReply.current = true
           if (await onSend(text, useWorkContext && !!selectedWork)) setDraft('')
         }}
       >
@@ -1442,6 +1532,7 @@ function Conversation({
         </label>
         <textarea
           id="composer-input"
+          ref={inputRef}
           rows={3}
           value={draft}
           placeholder={useWorkContext ? '补充当前工作的要求…' : '发消息给个人助理…'}
@@ -1452,6 +1543,30 @@ function Conversation({
         />
         <div className="composer-actions">
           <div className="composer-context" role="group" aria-label="消息上下文">
+            <details
+              className="task-templates"
+              ref={templateRef}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape' && templateRef.current) templateRef.current.open = false
+              }}
+            >
+              <summary className="icon-button" aria-label="任务模板" title="任务模板">
+                <ListTodo size={17} />
+              </summary>
+              <div className="template-menu" role="menu" aria-label="任务模板">
+                {taskTemplates.map((template) => (
+                  <button
+                    key={template.title}
+                    role="menuitem"
+                    type="button"
+                    onClick={() => applyTemplate(template.text)}
+                  >
+                    {template.title}
+                    <ChevronRight size={14} />
+                  </button>
+                ))}
+              </div>
+            </details>
             <button
               type="button"
               className={!useWorkContext ? 'context-mode active' : 'context-mode'}
@@ -1476,7 +1591,7 @@ function Conversation({
           <button
             className="send-button"
             type="submit"
-            disabled={pending || waiting || !draft.trim()}
+            disabled={pending || waiting || streaming || !draft.trim()}
             aria-label="发送消息"
             title="发送"
           >
@@ -1485,6 +1600,72 @@ function Conversation({
         </div>
       </form>
     </div>
+  )
+}
+
+function MessageText({ text }: { text: string }) {
+  return (
+    <div className="text markdown">
+      <Markdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          img: ({ src, alt }) => (
+            <a href={src} target="_blank" rel="noreferrer">
+              {alt || '图片链接'}
+            </a>
+          ),
+          a: ({ children, ...props }) => (
+            <a {...props} target="_blank" rel="noreferrer">
+              {children}
+            </a>
+          ),
+        }}
+      >
+        {text}
+      </Markdown>
+    </div>
+  )
+}
+
+function ReplyActions({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  const [failed, setFailed] = useState(false)
+  return (
+    <span className="reply-actions">
+      <button
+        type="button"
+        className="icon-button"
+        title={failed ? '复制失败，请导出回复' : copied ? '已复制' : '复制回复'}
+        aria-label="复制回复"
+        onClick={() => {
+          void navigator.clipboard
+            .writeText(text)
+            .then(() => {
+              setCopied(true)
+              setFailed(false)
+            })
+            .catch(() => setFailed(true))
+        }}
+      >
+        {copied ? <Check size={14} /> : <Copy size={14} />}
+      </button>
+      <button
+        type="button"
+        className="icon-button"
+        title="导出 Markdown"
+        aria-label="导出 Markdown"
+        onClick={() => {
+          const url = URL.createObjectURL(new Blob([text], { type: 'text/markdown;charset=utf-8' }))
+          const link = document.createElement('a')
+          link.href = url
+          link.download = `assistant-${new Date().toISOString().slice(0, 10)}.md`
+          link.click()
+          setTimeout(() => URL.revokeObjectURL(url), 1000)
+        }}
+      >
+        <Download size={14} />
+      </button>
+    </span>
   )
 }
 

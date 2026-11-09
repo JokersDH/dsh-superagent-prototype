@@ -43,9 +43,10 @@ pnpm dev:workbench --port 5181 --api-port 8797 --state /absolute/private/workben
 ```sh
 pnpm check:g2-workbench
 pnpm check:g2-browser
+pnpm check:assistant-browser
 ```
 
-第一条覆盖 342 项契约/产品/模型适配测试，加工作台 8 项模块测试及类型检查、构建。模型测试使用本地 mock SDK 服务，不产生模型费用。第二条需要已启动的工作台，使用 Playwright 覆盖受控工作流的实际浏览器场景，包含无需令牌直接进入，截图和报告保存在 `reports/releases/workbench-browser/`。
+第一条覆盖 350 项契约/产品/模型适配测试，加工作台 8 项模块测试及类型检查、构建。模型测试使用本地 mock SDK 服务，不产生模型费用。第二条在独立会话中验证受控工作流的 11 个浏览器场景，截图和报告保存在 `reports/releases/workbench-browser/`；不会写入默认个人对话。第三条使用临时 SQLite、实际 SDK/HTTP/SSE 与本地模型 fixture 验证流式展示、刷新不重发、导出和对话隔离，证据在 `reports/releases/assistant-streaming/`。两条浏览器检查均需要工作台前端已启动，不调用付费网关。
 
 工作台已导入 A `8e302b4` 的配置驱动 console 检查点，并在主线增加对话优先布局、图标工具栏、Markdown、独立对话、模型设置及桌面/窄屏适配。它直接消费动态配置，不再依赖固定的执行器表单默认值。
 

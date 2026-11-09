@@ -27,7 +27,7 @@ for (const args of commands) {
     ...(count ? { tests: count } : {}),
   })
 }
-assert.ok(tests >= 350)
+assert.ok(tests >= 358)
 const report = {
   status: 'PASS_CONTROLLED_WORKBENCH_MODULES',
   sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], {

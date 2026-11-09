@@ -35,8 +35,8 @@ for (const args of commands) {
   })
 }
 assert.ok(
-  tests >= 342,
-  'Run contracts 188, application/recovery 95, WP-04 30, product 14, configuration 5 and assistant 10 cases',
+  tests >= 350,
+  'Run contracts 188, application/recovery 96, WP-04 30, product 14, configuration 5 and assistant 17 cases',
 )
 const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], {
   cwd: root,
@@ -60,12 +60,12 @@ const report = {
   results,
   scopes: {
     contracts: 188,
-    applicationAndRecovery: 95,
+    applicationAndRecovery: 96,
     workspaces: 8,
     verification: 22,
     actualControlledProduct: 14,
     configuration: 5,
-    assistantDialogue: 10,
+    assistantDialogue: 17,
   },
   implementation:
     'SQLite application + real scratch subprocess + native questions + trusted resource barrier + verification + candidate acceptance + durable model dialogue with local mock SDK endpoint',

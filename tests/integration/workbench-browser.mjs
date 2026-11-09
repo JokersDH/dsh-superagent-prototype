@@ -35,9 +35,12 @@ const step = async (id, action) => {
   }
 }
 const goal = `Controlled browser work ${Date.now()}`
+const conversationId = `browser-test-${crypto.randomUUID()}`
+const conversationURL = new URL(values.url)
+conversationURL.searchParams.set('conversation', conversationId)
 try {
   await step('AUTOMATIC-LOCAL-SESSION', async () => {
-    await page.goto(values.url)
+    await page.goto(conversationURL.href)
     await page.waitForSelector('.layout')
     assert.equal(await page.locator('.session-gate').count(), 0)
   })
@@ -49,13 +52,15 @@ try {
     assert.match(await page.locator('.question-card').first().innerText(), /Allow the controlled fixture/)
   })
   await step('ACTIVE-REFRESH-KEEPS-QUESTION', async () => {
-    const before = await (await context.request.get(`${values.url}/v1/snapshot`)).json()
+    const before = await (
+      await context.request.get(`${values.url}/v1/snapshot?conversationId=${conversationId}`)
+    ).json()
     const question = before.questions[0]
     assert.ok(question)
     await page.reload()
     await page.locator('.work-card').filter({ hasText: goal }).click()
     await page.waitForSelector('.question-card')
-    const after = await (await context.request.get(`${values.url}/v1/snapshot`)).json()
+    const after = await (await context.request.get(`${values.url}/v1/snapshot?conversationId=${conversationId}`)).json()
     assert.deepEqual(after.questions.find((item) => item.id === question.id)?.targets, question.targets)
   })
   await step('ANSWER-AND-VERIFY', async () => {
@@ -93,6 +98,11 @@ try {
     assert.equal(await page.getByRole('button', { name: '接受当前候选' }).count(), 0)
   })
   await step('DESKTOP-AND-NARROW-LAYOUT', async () => {
+    assert.equal(
+      await page.locator('.messages .role-user').count(),
+      0,
+      'work goals must not masquerade as personal chat',
+    )
     await page.screenshot({
       path: join(directory, 'desktop.png'),
       fullPage: true,
@@ -145,6 +155,7 @@ try {
       encoding: 'utf8',
     }).trim(),
     consoleURL: values.url,
+    conversationId,
     cases,
     errors,
     limitations: [
