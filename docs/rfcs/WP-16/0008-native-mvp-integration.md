@@ -29,3 +29,5 @@
 当前按本机单执行器 MVP 提供，不升级完整 G2：真实模型审批/澄清/运行中 steer、对抗性脱离进程树、全 SIGKILL 窗口、依赖准备、跨平台、断电与长期 soak 保持单列 NOT_TESTED/后续范围。原生安全探针仅证明所测正常 managed command 的停止与 sandbox。用户项目通过独立 worktree 和 patch 交付，接受后不自动合并或覆盖。
 
 原来两个外部窗口的新分工见 `agent-tasks/native-mvp/`，不重复改本轮内部 console/Codex 源码。A 负责项目环境准备，B 负责独立真实产品和故障验收。主线负责公共 schema、锁、应用/HTTP 和跨模块验收。
+
+最终源码提交 `252bf70` 上又以一个全新的真实 Codex 任务完整运行六项浏览器验收，全部 PASS，非恢复/拼接结果；见 `reports/releases/native-mvp/browser/report.json`。同一提交的八项候选准入探针全部通过。旧内核 178 项回归也通过。完整 G2 的未测范围仍按上文保留。

@@ -136,7 +136,7 @@ try {
     const response = await context.request.get(`${values.url}/v1/guide`)
     assert.equal(response.status(), 200)
     assert.match(response.headers()['content-disposition'], /attachment/)
-    assert.match(await response.text(), /一分钟开始/)
+    assert.match(await response.text(), /个人开发助手 MVP.*使用指南/)
   })
   await step('NEW-CONVERSATION-SURVIVES-REFRESH', async () => {
     await page.getByRole('button', { name: '新对话', exact: true }).first().click()
@@ -166,7 +166,7 @@ try {
     errors,
     limitations: [
       'Controlled work execution; no paid model requests in this browser suite',
-      'Independent Runner and native compatibility remain unaccepted',
+      'Independent Runner and native compatibility are measured in the separate native MVP lane',
       'Real model response and Markdown rendering are verified separately by manual smoke',
     ],
   }

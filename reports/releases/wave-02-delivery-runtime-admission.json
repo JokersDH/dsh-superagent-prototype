@@ -1,18 +1,18 @@
 {
-  "status": "BLOCKED_WAVE02_DELIVERY_RUNTIME_ADMISSION",
-  "checkedAt": "2026-11-09T02:49:20.076Z",
+  "status": "PASS_WAVE02_DELIVERY_RUNTIME_ADMISSION",
+  "checkedAt": "2026-11-09T09:22:33.848Z",
   "node": "v24.22.2",
   "platform": "darwin",
-  "reviewerCommit": "4468e7b09c98d8c4e4b67fe97e46c06b6878a369",
-  "workspaceSource": "a517635db1d1c7e723c0bd7d4f8ca8047f7f5554",
-  "runnerSource": "96cbe4edc662e514caf18c2bd8a44df38d1e06f4",
+  "reviewerCommit": "252bf707d2c5362d49c55e5f7ed8b4f6b571dfe8",
+  "workspaceSource": "252bf707d2c5362d49c55e5f7ed8b4f6b571dfe8",
+  "runnerSource": "252bf707d2c5362d49c55e5f7ed8b4f6b571dfe8",
   "cases": [
     {
       "owner": "A",
       "id": "PATCH-MIXED-STAGED-AND-UNTRACKED",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "stagedRestored": false,
+        "stagedRestored": true,
         "untrackedRestored": true,
         "indexUnchanged": true
       }
@@ -20,73 +20,72 @@
     {
       "owner": "A",
       "id": "PATCH-INCLUDES-COMMITS-SINCE-RESERVE-BASE",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "baseDiffersFromHead": true,
-        "patchBytes": 0
+        "patchBytes": 158
       }
     },
     {
       "owner": "B",
       "id": "DIRECT-MAIN-CLIENT-RECOVERY-CREDENTIAL",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "credentialBytes": 65,
-        "expectedBytes": 64,
-        "error": "auth_failed"
+        "credentialBytes": 64,
+        "expectedBytes": 64
       }
     },
     {
       "owner": "B",
       "id": "ACTUAL-SERVICE-LIVE-INVENTORY",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "credentialAdapterUsed": true,
+        "credentialAdapterUsed": false,
         "nativeAlive": true,
-        "registeredResources": 0,
-        "reportedState": "terminated",
-        "includesActualChild": false
+        "registeredResources": 1,
+        "reportedState": "serving",
+        "includesActualChild": true
       }
     },
     {
       "owner": "B",
       "id": "INDETERMINATE-CLEANUP-CANNOT-MINT-BARRIER",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "nativeAlive": true,
         "cleanupCalled": true,
         "writerStillWriting": true,
-        "reportedState": "terminated",
+        "reportedState": "unknown",
         "coverage": "complete_owned_resources",
-        "registeredResources": 0,
-        "barrierAccepted": true
+        "registeredResources": 1,
+        "barrierAccepted": false
       }
     },
     {
       "owner": "B",
       "id": "CLOSED-RECOVERY-ADMISSION-CLOSES-BUSINESS-PUMP",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
         "admission": "closed",
-        "deliverReachedDriver": true
+        "deliverReachedDriver": false
       }
     },
     {
       "owner": "B",
       "id": "RECOVERY-CANCEL-REQUIRES-FULL-ATTEMPT-IDENTITY",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "httpStatus": 200,
-        "wrongTupleReachedStop": true
+        "httpStatus": 409,
+        "wrongTupleReachedStop": false
       }
     },
     {
       "owner": "B",
       "id": "JOURNAL-CORRUPTION-AFTER-OPEN-REFUSES-ALL-REPLAY",
-      "passesInvariant": false,
+      "passesInvariant": true,
       "observed": {
-        "refused": false,
-        "sinkCalls": 1
+        "refused": true,
+        "sinkCalls": 0
       }
     }
   ],

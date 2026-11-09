@@ -1,0 +1,38 @@
+{
+  "status": "PASS_LOCAL_CODEX_MVP",
+  "sourceCommit": "252bf707d2c5362d49c55e5f7ed8b4f6b571dfe8",
+  "scope": "macOS arm64 / Codex 0.164.0 / local Node projects / independent Runner / registered verification / reviewed patch delivery",
+  "completeG2": false,
+  "actualNativeProduct": {
+    "status": "PASS",
+    "cases": 5,
+    "evidence": "native-product.json"
+  },
+  "actualNativeBrowser": {
+    "status": "PASS",
+    "cases": 6,
+    "freshNativeTask": true,
+    "evidence": "browser/report.json"
+  },
+  "regressions": {
+    "workbenchModules": { "status": "PASS", "tests": 367, "evidence": "../g2-workbench.json" },
+    "runtimeModules": { "status": "PASS", "tests": 262, "evidence": "../../../apps/runner/reports/native-mvp/runtime-regression.json" },
+    "legacyAndPersonalCore": { "status": "PASS", "tests": 178 },
+    "candidateAdmission": { "status": "PASS", "cases": 8, "evidence": "../wave-02-delivery-runtime-admission.json" },
+    "controlledBrowser": { "status": "PASS", "cases": 11, "evidence": "../workbench-browser/report.json" },
+    "consoleHttpFixture": { "status": "PASS", "cases": 7, "evidence": "../../../apps/console/e2e/native-mvp/report.json" },
+    "nativeSafetyWithoutModelTurns": { "status": "PASS", "cases": 3, "evidence": "../../../apps/runner/reports/native-mvp/native-safety.json" }
+  },
+  "nextOwners": {
+    "externalAgentA": "packages/environment-preparation/",
+    "externalAgentB": "tests/native-acceptance/",
+    "main": "contracts, application, coordinator, native composition and release integration"
+  },
+  "limitations": [
+    "Dependency preparation is not automatic; the validated first path is a dependency-free Node project",
+    "Real model approval, clarification and in-flight steer branches remain separately NOT_TESTED despite protocol fixtures",
+    "The native safety probe covers the measured managed command and sandbox, not adversarial daemonization or arbitrary escaped process trees",
+    "No full G2, cross-platform, power-loss, backup/restore or long-soak certification",
+    "Human acceptance publishes the verified current candidate and patch; it does not overwrite, merge, commit or push the original repository"
+  ]
+}

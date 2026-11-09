@@ -97,10 +97,12 @@ process.once('SIGINT', () => {
   void shutdown()
 })
 server.once('listening', () => {
-  console.log(`Controlled product API: http://127.0.0.1:${port}/v1/health`)
+  console.log(`Personal product API: http://127.0.0.1:${port}/v1/health`)
   console.log(`Private state/credential references: ${stateRoot}`)
   console.log(
-    values.assistant
+    values.native
+      ? 'Native Codex MVP enabled: isolated worktrees, registered checks and reviewed patch delivery.'
+      : values.assistant
       ? 'Model dialogue enabled when privately configured; work execution uses controlled scratch profiles.'
       : 'Real scratch subprocess, questions and artifact verification; fixture profiles only; zero vendor calls.',
   )

@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "sourceCommit": "252bf707d2c5362d49c55e5f7ed8b4f6b571dfe8",
+  "checkedFiles": 891,
+  "matches": 0,
+  "paths": [],
+  "scope": "Tracked/nonignored workspace files and console dist; configured key never printed"
+}

@@ -1,0 +1,34 @@
+{
+  "status": "PASS_REAL_NATIVE_PRODUCT",
+  "checkedAt": "2026-11-09T08:13:22.795Z",
+  "sourceCommit": "98dfbc9f380537dd541e1253a93a40d9d61beab9",
+  "profileVersion": "codex-cli 0.164.0",
+  "root": "/tmp/pa-native-product-GRxeYA",
+  "elapsedMs": 32437,
+  "cases": [
+    {
+      "id": "NATIVE-DELEGATION",
+      "status": "PASS"
+    },
+    {
+      "id": "REAL-CODE-AND-REGISTERED-CHECK",
+      "status": "PASS"
+    },
+    {
+      "id": "USER-WORKTREE-AND-ACCEPTANCE-PRESERVED",
+      "status": "PASS"
+    },
+    {
+      "id": "VERIFIED-CANDIDATE-HUMAN-ACCEPTANCE",
+      "status": "PASS"
+    },
+    {
+      "id": "REOPEN-DELIVERY-AND-RECEIPT",
+      "status": "PASS"
+    }
+  ],
+  "limitations": [
+    "Real Codex and SQLite/core verification; UI and approval cases are separate",
+    "Private scratch project retained for inspection; no user repository modified"
+  ]
+}
