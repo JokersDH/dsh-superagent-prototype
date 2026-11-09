@@ -29,7 +29,7 @@ for (const args of commands) {
   assert.doesNotMatch(output, /(?:ℹ\s*)?fail [1-9]/)
   results.push({ command: `pnpm ${args.join(' ')}`, status: 'PASS', ...(count ? { tests: count } : {}) })
 }
-assert.ok(tests >= 328, 'Run contracts 188, application/recovery 91, WP-04 30, product 14 and configuration 5 cases')
+assert.ok(tests >= 330, 'Run contracts 188, application/recovery 93, WP-04 30, product 14 and configuration 5 cases')
 const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim()
 const sourceWorktreeClean =
   execFileSync(
@@ -49,7 +49,7 @@ const report = {
   results,
   scopes: {
     contracts: 188,
-    applicationAndRecovery: 91,
+    applicationAndRecovery: 93,
     workspaces: 8,
     verification: 22,
     actualControlledProduct: 14,

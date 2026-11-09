@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { createRequire } from 'node:module'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 import { parseArgs } from 'node:util'
 
@@ -13,8 +13,7 @@ const { values } = parseArgs({
 })
 const { chromium } = createRequire(new URL('../../apps/console/package.json', import.meta.url))('@playwright/test')
 const directory = resolve('reports/releases/workbench-browser')
-const bootstrapToken = readFileSync(join(resolve(values.state), 'bootstrap.key'), 'utf8')
-const redact = (value) => String(value).split(bootstrapToken).join('[redacted]')
+const redact = (value) => String(value)
 mkdirSync(directory, { recursive: true })
 const browser = await chromium.launch()
 const context = await browser.newContext({ viewport: { width: 1440, height: 960 }, locale: 'zh-CN' })
@@ -34,11 +33,10 @@ const step = async (id, action) => {
 }
 const goal = `Controlled browser work ${Date.now()}`
 try {
-  await step('AUTHENTICATED-WORKBENCH', async () => {
+  await step('AUTOMATIC-LOCAL-SESSION', async () => {
     await page.goto(values.url)
-    await page.locator('#bootstrap-token').fill(bootstrapToken)
-    await page.getByRole('button', { name: '建立本地会话' }).click()
     await page.waitForSelector('.layout')
+    assert.equal(await page.locator('.session-gate').count(), 0)
   })
   await step('CREATE-REAL-QUESTION', async () => {
     await page.getByRole('button', { name: '新建委托' }).click()

@@ -13,6 +13,7 @@ const { values } = parseArgs({
     port: { type: 'string', default: '8791' },
     state: { type: 'string', default: fileURLToPath(new URL('../../../.local-state/product-demo', import.meta.url)) },
     'console-origin': { type: 'string', default: 'http://127.0.0.1:5174' },
+    'local-access': { type: 'boolean', default: false },
   },
 })
 const stateRoot = resolve(values.state!),
@@ -47,6 +48,7 @@ const http = createLocalHttpApp({
   bootstrapToken: credential('bootstrap.key'),
   allowedOrigins: [`http://127.0.0.1:${port}`, values['console-origin']!],
   mode: 'fixture',
+  localDevelopmentAccess: values['local-access'] === true,
   read: product.read,
 })
 const server = listenLocalHttp(http, port)

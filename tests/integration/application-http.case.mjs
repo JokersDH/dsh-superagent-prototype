@@ -38,6 +38,25 @@ test('health is public but data and commands require local credentials', async (
   assert.equal(denied.status, 401)
   assert.equal((await denied.json()).error.code, 'auth_required')
 })
+test('local development access opens directly without a token, cookie or browser storage', async (t) => {
+  const h = setup(t, { localDevelopmentAccess: true })
+  assert.equal((await h.request('/v1/session')).status, 200)
+  assert.equal((await h.request('/v1/snapshot')).status, 200)
+  const response = await h.command(createCommand(), { origin: BASE })
+  assert.equal((await response.json()).status, 'recorded')
+  assert.equal(h.store.domain.tickets.list()[0].mandate.actor.source, 'local_ui')
+  assert.equal((await h.request('/v1/session')).headers.get('set-cookie'), null)
+})
+test('local development access keeps Origin, Host and actor checks and is fixture-only', async (t) => {
+  const h = setup(t, { localDevelopmentAccess: true })
+  assert.equal((await h.command(createCommand(), {})).status, 403)
+  assert.equal((await h.command(createCommand(), { origin: 'http://evil.invalid' })).status, 403)
+  assert.equal((await h.request('/v1/snapshot', { headers: { host: 'evil.invalid' } })).status, 403)
+  assert.equal((await h.request('/v1/session', { headers: { 'sec-fetch-site': 'cross-site' } })).status, 403)
+  assert.equal((await h.command({ ...createCommand(), actor: { userId: 'forged' } }, { origin: BASE })).status, 400)
+  assert.equal((await h.command(createCommand(), { authorization: 'Bearer runner-secret', origin: BASE })).status, 401)
+  assert.throws(() => setup(t, { mode: 'product', localDevelopmentAccess: true }), /fixture/)
+})
 test('a bearer command uses a server-generated actor and returns the original durable receipt on replay', async (t) => {
   const h = setup(t),
     command = createCommand(),

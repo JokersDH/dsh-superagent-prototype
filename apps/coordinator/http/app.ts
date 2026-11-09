@@ -66,6 +66,8 @@ export interface LocalHttpOptions {
   allowedOrigins: readonly string[]
   sessionTtlMs?: number
   mode: 'fixture' | 'product'
+  /** Explicit loopback-only fixture convenience; normal entries still require credentials. */
+  localDevelopmentAccess?: boolean
   now?: () => number
   read?: {
     configuration?(): Promise<ApplicationConfiguration>
@@ -77,6 +79,8 @@ export interface LocalHttpOptions {
 
 /** The HTTP module owns identity. Request bodies never contain actor or direct core/native access. */
 export function createLocalHttpApp(options: LocalHttpOptions) {
+  if (options.localDevelopmentAccess && options.mode !== 'fixture')
+    throw new TypeError('Automatic local access is restricted to the fixture entry')
   for (const secret of [options.bootstrapToken, options.apiToken])
     if (!/^[a-f0-9]{64}$/.test(secret)) throw new TypeError('Local HTTP credentials need 256 random bits')
   const actorBase = {
@@ -144,8 +148,19 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
         ),
     }),
   )
-  app.get('/v1/health', (c) => c.json({ status: 'ok', mode: options.mode }))
+  app.get('/v1/health', (c) =>
+    c.json({
+      status: 'ok',
+      mode: options.mode,
+      ...(options.localDevelopmentAccess ? { access: 'local-development' } : {}),
+    }),
+  )
   app.post('/v1/session', async (c) => {
+    if (options.localDevelopmentAccess) {
+      if (!origins.has(c.req.header('origin') ?? ''))
+        throw new ApplicationFault('forbidden', 'Local writes require the console Origin', 'none')
+      return c.json({ status: 'authenticated' })
+    }
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json'))
       throw new ApplicationFault('invalid_request', 'Session bootstrap needs JSON', 'none')
     const body = sessionInput.parse(await c.req.json())
@@ -166,6 +181,16 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
       return
     }
     if (bearer) throw new ApplicationFault('auth_required', 'Invalid local API credential', 'user_action')
+    if (options.localDevelopmentAccess) {
+      if (
+        c.req.header('sec-fetch-site') === 'cross-site' ||
+        (!['GET', 'HEAD', 'OPTIONS'].includes(c.req.method) && !origins.has(c.req.header('origin') ?? ''))
+      )
+        throw new ApplicationFault('forbidden', 'Local requests must come from the configured console', 'none')
+      c.set('actor', TrustedActorSchema.parse({ ...actorBase, source: 'local_ui' }))
+      await next()
+      return
+    }
     const id = getCookie(c, COOKIE),
       expiry = id && sessions.get(id)
     if (!id || !expiry || expiry <= now()) {

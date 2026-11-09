@@ -45,6 +45,9 @@
     "manifestVersion": 1
   },
   "scripts": {
+    "start": "node tools/dev/start.mjs",
+    "stop": "node tools/dev/start.mjs --stop",
+    "restart": "node tools/dev/start.mjs --restart",
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

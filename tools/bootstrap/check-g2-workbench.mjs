@@ -23,7 +23,7 @@ for (const args of commands) {
   tests += count
   results.push({ command: `pnpm ${args.join(' ')}`, status: 'PASS', ...(count ? { tests: count } : {}) })
 }
-assert.ok(tests >= 336)
+assert.ok(tests >= 338)
 const report = {
   status: 'PASS_CONTROLLED_WORKBENCH_MODULES',
   sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),

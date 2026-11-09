@@ -14,6 +14,8 @@ const { values } = parseArgs({
     port: { type: 'string', default: '5180' },
     'api-port': { type: 'string', default: '8796' },
     state: { type: 'string', default: join(root, '.local-state/workbench') },
+    'require-login': { type: 'boolean', default: false },
+    open: { type: 'boolean', default: false },
   },
 })
 const port = (name) => {
@@ -125,6 +127,7 @@ async function main() {
       stateRoot,
       '--console-origin',
       consoleURL,
+      ...(!values['require-login'] ? ['--local-access'] : []),
     ],
     root,
   )
@@ -172,13 +175,16 @@ async function main() {
         apiURL,
         configurationRevision: configuration.revision,
         mode: 'controlled-fixture',
+        access: values['require-login'] ? 'token' : 'local-development',
       },
       null,
       2,
     ) + '\n',
     { mode: 0o600 },
   )
-  process.stdout.write(`Workbench: ${consoleURL}\nPrivate login credential: ${join(stateRoot, 'bootstrap.key')}\n`)
+  process.stdout.write(`Workbench: ${consoleURL}\n`)
+  if (values['require-login']) process.stdout.write(`Private login credential: ${join(stateRoot, 'bootstrap.key')}\n`)
+  if (values.open && process.platform === 'darwin') spawn('open', [consoleURL], { stdio: 'ignore' }).unref()
 }
 main().catch(async (error) => {
   console.error(error.message)
