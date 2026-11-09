@@ -9,6 +9,7 @@ import { z, ZodError } from 'zod'
 import {
   AnswerDeliverySchema,
   AppErrorSchema,
+  ApplicationConfigurationSchema,
   ChangeSchema,
   CommandReceiptSchema,
   ConversationPageSchema,
@@ -22,6 +23,7 @@ import {
 } from '@personal-agent/contracts'
 import type {
   AnswerDelivery,
+  ApplicationConfiguration,
   AppError,
   ApplicationService,
   TrustedActor,
@@ -66,6 +68,7 @@ export interface LocalHttpOptions {
   mode: 'fixture' | 'product'
   now?: () => number
   read?: {
+    configuration?(): Promise<ApplicationConfiguration>
     verification?(id: string): Promise<Verification | undefined>
     deliveries?(questionId: string): Promise<readonly AnswerDelivery[]>
     artifact?(id: string): Promise<{ body: ReadableStream<Uint8Array>; contentType: string } | undefined>
@@ -176,6 +179,13 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     await next()
   })
   app.get('/v1/session', (c) => c.json({ status: 'authenticated' }))
+  app.get('/v1/configuration', async (c) => {
+    if (Object.keys(c.req.query()).length)
+      throw new ApplicationFault('invalid_request', 'Configuration does not accept query parameters')
+    if (!options.read?.configuration)
+      throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
+    return c.json(ApplicationConfigurationSchema.parse(await options.read.configuration()))
+  })
   app.delete('/v1/session', (c) => {
     const id = getCookie(c, COOKIE)
     if (id) sessions.delete(id)

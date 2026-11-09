@@ -2,7 +2,56 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { completionCriteriaDigest } from '@personal-agent/orchestrator-core'
+import { createProductApplication } from '@personal-agent/application'
 import { actor, contractRef, createCommand, fixture, scope } from './helpers.ts'
+
+test('mutating startup profile, check or principal objects cannot expand application authority', async (t) => {
+  const h = fixture(t)
+  const profileIds = ['profile-codex-local'],
+    registeredChecks = ['check:unit'],
+    principal = { userId: actor.userId, authorityRef: actor.authorityRef }
+  const application = createProductApplication({
+    store: h.store,
+    principal,
+    projects: [{ id: scope.projectId, scope }],
+    profileIds,
+    registeredChecks,
+    actionSecret: Buffer.alloc(32, 1),
+    nativeFence: () => 'unknown',
+  })
+  profileIds.push('profile-forged')
+  registeredChecks.push('check-forged')
+  principal.userId = 'forged-user'
+  assert.equal(
+    (await application.dispatch({ ...createCommand('forged-profile'), profileId: 'profile-forged' }, actor)).status,
+    'rejected',
+  )
+  assert.equal(
+    (
+      await application.dispatch(
+        {
+          ...createCommand('forged-check'),
+          criteria: [
+            {
+              id: 'forged',
+              kind: 'machine',
+              required: true,
+              description: 'Forged check',
+              checkDefinitionRef: 'check-forged',
+            },
+          ],
+        },
+        actor,
+      )
+    ).status,
+    'rejected',
+  )
+  await assert.rejects(
+    application.dispatch(createCommand('forged-actor'), { ...actor, userId: 'forged-user' }),
+    /configured local principal/,
+  )
+  assert.equal((await application.dispatch(createCommand('original-config'), actor)).status, 'recorded')
+})
 
 test('create is one real core lifecycle, persisted product records and queued effects; reopen replays the original receipt', async (t) => {
   const h = fixture(t),

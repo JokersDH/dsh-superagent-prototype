@@ -20,6 +20,7 @@
     "dev:api": "node http/demo.ts",
     "typecheck:product": "tsc -p tsconfig.product.json --noEmit",
     "test:product": "node --test ../../tests/integration/product-execution.case.mjs",
+    "test:configuration": "node --test ../../tests/integration/application-configuration.case.mjs",
     "dev:product": "node product/demo.ts"
   },
   "dependencies": {
