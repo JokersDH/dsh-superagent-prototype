@@ -77,7 +77,14 @@ if (bearerAvailable || sessionEstablished) {
   }
 }
 
-const native = await runNativeCases({ client, log, options, selection: readOnly.selection })
+const native = await runNativeCases({
+  client,
+  log,
+  options,
+  selection: readOnly.selection,
+  // The native lane builds its work from the same published configuration the console reads.
+  configuration: readOnly.configuration,
+})
 
 const environment = environmentIdentity({
   apiUrl: options.url,

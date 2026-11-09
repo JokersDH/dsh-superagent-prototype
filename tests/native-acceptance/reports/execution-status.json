@@ -1,0 +1,45 @@
+{
+  "phase": "B2",
+  "branch": "codex/g1-runtime",
+  "base": "5bbd892",
+  "commit": "2c1f604",
+  "modelTasks": { "limit": 4, "used": 2, "accounting": "one per continue_work attempt that reached a native turn" },
+  "phases": {
+    "B1": {
+      "status": "passed",
+      "commit": "2c1f604",
+      "deliverables": [
+        "create_work builds a command the shared UserCommandSchema accepts (commandId/conversationId/projectId/goal/scope.projectId) and keeps required human criteria",
+        "project selection requires dispatchAllowed and that the project admits the selected profile",
+        "the native lane performs real client calls instead of hard-coded NOT_TESTED",
+        "authentication proven on a protected route; loopback-only credential use",
+        "--require-native exits non-zero when a required native case did not execute (verified exit 1)"
+      ],
+      "evidence": { "selftest": "14/14", "readonlyAgainstNativeInstance": "5/5 PASS", "strictExit": "exit 1 with BLOCKED" }
+    },
+    "B2": {
+      "status": "partially_passed",
+      "commit": "pending",
+      "passed": [
+        "read-only 5/5 against a private native instance (mode: personal)",
+        "profile-codex-native admitted with readiness native_test_passed",
+        "NATIVE-LINK: create_work + continue_work recorded; real Codex executed; machine check PASS (2 tests, exit 0); work reached needs_user with 3 artifacts",
+        "two native model tasks completed (work 3f8f54da..., work 9b4f3168...)"
+      ],
+      "blocked": [
+        "patch roundtrip: artifact baseCommit == headCommit and no diff field (BLOCKER-1)",
+        "/v1/works/:id/location returns null workspacePath/baseCommit (BLOCKER-1)"
+      ],
+      "notTested": [
+        "NATIVE-STOP (real running-process stop observation)",
+        "NATIVE-REOPEN",
+        "NATIVE-RESTART (coordinator SIGKILL)",
+        "NATIVE-STALE-CANDIDATE",
+        "NATIVE-CHECK-FAIL",
+        "NATIVE-QUESTION (on-request policy did not raise a question in these runs)"
+      ]
+    }
+  },
+  "next": "B3 deterministic failure matrix on the controlled fixture entry (no model budget), then B4 browser, B5 soak, B6 conformance",
+  "blockers": "tests/native-acceptance/reports/blockers.md"
+}

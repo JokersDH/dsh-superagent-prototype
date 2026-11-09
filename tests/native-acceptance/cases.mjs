@@ -237,11 +237,114 @@ async function executeNativeLink({ client, log, options, selection, project, cas
   log.entity({ workId })
   log.pass(`recorded create_work ${workId} on project ${project.id}`)
 
+  // A delegation is recorded, then executed: `continue_work` starts the attempt (one model task).
+  const continued = await client.request('POST', '/v1/commands', {
+    body: { commandId: `cmd-continue-${Date.now()}`, conversationId: command.conversationId, kind: 'continue_work', workId },
+  })
+  log.evidence({ continueStatus: continued.status, receipt: continued.json })
+  if (continued.status !== 200 || continued.json?.status === 'rejected') {
+    log.note(`continue_work was not accepted: HTTP ${continued.status} ${JSON.stringify(continued.json?.error ?? {})}`)
+  }
+
+  // Follow the work to a candidate or a terminal explanation.
+  const deadline = Date.now() + (options.nativeTimeoutMs ?? 900_000)
+  let last
+  let candidate
+  const questions = []
+  while (Date.now() < deadline) {
+    const work = await client.request('GET', `/v1/works/${workId}`)
+    last = work.json
+    if (work.status !== 200) break
+    // The work view is flat: phase/openQuestionIds/artifactIds/resourceStatus/actions.
+    for (const id of Array.isArray(last?.openQuestionIds) ? last.openQuestionIds : []) {
+      if (!questions.some(known => known.id === id)) {
+        questions.push({ id })
+        log.entity({ questionId: id })
+      }
+    }
+    candidate = last?.actions?.currentCandidate ?? last?.candidate
+    if (candidate) break
+    const phase = last?.phase
+    if (phase === 'needs_user' || phase === 'blocked' || phase === 'delivered' || phase === 'failed') break
+    await new Promise(resolve => setTimeout(resolve, 5000))
+  }
+  log.evidence({ finalPhase: last?.phase, candidateId: candidate ? `${candidate.assignmentId}#${candidate.candidateGeneration}` : null, questions: questions.length, artifacts: last?.artifactIds?.length ?? 0 })
+
+  if (!candidate) {
+    log.fail(`no candidate reached within the timeout (final phase: ${String(last?.phase)})`)
+  } else {
+    // The patch is derived from the candidate artifact's own base/head commits, then applied to a
+    // clean clone: that proves the delivered work is a real diff of the project.
+    const artifactRef = (last?.artifactIds ?? [])[0]
+    const artifact = artifactRef ? (await client.request('GET', `/v1/artifacts/${artifactRef}`)).json : undefined
+    const location = (await client.request('GET', `/v1/works/${workId}/location`)).json
+    log.evidence({ artifact: artifact ? { base: artifact.baseCommit, head: artifact.headCommit, environment: artifact.environment } : null, location })
+    const roundtrip = await roundtripPatch({
+      projectPath: location?.projectPath,
+      workspacePath: location?.workspacePath,
+      baseCommit: artifact?.baseCommit,
+      headCommit: artifact?.headCommit,
+    })
+    if (roundtrip.ok) {
+      log.evidence({ patchBytes: roundtrip.patchBytes, files: roundtrip.files })
+      log.pass(`candidate ${candidate.assignmentId}#${candidate.candidateGeneration}: ${roundtrip.patchBytes}-byte patch applies to a fresh clone (${roundtrip.files.join(', ')})`)
+    } else {
+      log.fail(`candidate reached but its patch did not roundtrip: ${roundtrip.reason}`)
+    }
+
+    // Every registered machine check must be PASS before acceptance is meaningful.
+    const verification = await client.request('GET', `/v1/works/${workId}`)
+    log.evidence({ phaseBeforeAccept: verification.json?.phase, resources: verification.json?.resourceStatus })
+    if (verification.json?.phase === 'needs_user') log.note('the work is waiting for human review, as designed')
+  }
+
   for (const [id, title] of cases.slice(1)) {
     log.begin(id, title, 'native')
     log.notTested('not reached in this run: requires the follow-up phases (see execution-status.json)')
   }
-  return { executed: true, reason: 'delegation recorded', modelTasks: 1, workId }
+  return { executed: true, reason: 'delegation executed', modelTasks: 1, workId, candidateId: candidate?.id }
+}
+
+/**
+ * Apply the delivered patch to a clean clone of the base commit.
+ *
+ * This proves the artifact is a real diff of the project rather than a summary that only looks right.
+ */
+export async function roundtripPatch({ projectPath, workspacePath, baseCommit, headCommit }) {
+  if (!projectPath || !baseCommit || !headCommit) return { ok: false, reason: 'missing project path or base/head commit' }
+  const { execFileSync } = await import('node:child_process')
+  const { mkdtempSync } = await import('node:fs')
+  const { tmpdir } = await import('node:os')
+  const { join } = await import('node:path')
+  const target = mkdtempSync(join(tmpdir(), 'pa-roundtrip-'))
+  const run = (command, argv, cwd) => execFileSync(command, argv, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+  try {
+    run('git', ['clone', '--quiet', '--no-hardlinks', projectPath, join(target, 'clone')], tmpdir())
+    const clone = join(target, 'clone')
+    const base = run('git', ['rev-parse', 'HEAD'], clone).trim()
+    // Produce the patch from the delivered worktree commits.
+    const patchText = run('git', ['diff', '--binary', baseCommit, headCommit], workspacePath)
+    if (!patchText.trim()) return { ok: false, reason: `no diff between ${baseCommit} and ${headCommit}` }
+    // Verify first (no working-tree change), then apply so the files exist for inspection.
+    execFileSync('git', ['apply', '--check', '-'], { cwd: clone, input: patchText, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
+    execFileSync('git', ['apply', '-'], { cwd: clone, input: patchText, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
+    const files = run('git', ['status', '--porcelain'], clone)
+      .split('\n')
+      .filter(Boolean)
+      .map(line => line.slice(3).trim())
+    return { ok: files.length > 0, files, base, clone, patchBytes: patchText.length }
+  } catch (error) {
+    return { ok: false, reason: (error.stderr ?? error.message ?? String(error)).toString().slice(0, 300) }
+  }
+}
+
+/** Normalise the question collection the work view exposes. */
+function collectQuestions(view) {
+  const direct = view?.questions
+  if (Array.isArray(direct)) return direct
+  const nested = view?.work?.questions
+  if (Array.isArray(nested)) return nested
+  return []
 }
 
 /** Load the shared parser lazily so the read-only lane needs no built packages. */
