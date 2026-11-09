@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@personal-agent/contracts": "workspace:*",
-    "@personal-agent/driver-kit": "workspace:*"
+    "@personal-agent/driver-kit": "workspace:*",
+    "zod": "4.4.3"
   }
 }

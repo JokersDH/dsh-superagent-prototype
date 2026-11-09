@@ -133,6 +133,103 @@ button:disabled {
   margin-left: auto;
   gap: 2px;
 }
+.composer-submit-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.delegate-button {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #edf3ff;
+  color: #3268ce;
+  border: 1px solid #d9e4fa;
+}
+.delegate-button:hover:not(:disabled) {
+  background: #e1ebfd;
+}
+.project-import {
+  flex-shrink: 0;
+  padding: 12px 0 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+.project-import .section-head h3 {
+  margin: 0;
+  font-size: 13px;
+}
+.project-import label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #5f6d80;
+}
+.project-import input,
+.project-import select {
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid #dbe3ed;
+  border-radius: 5px;
+  font-size: 12px;
+}
+.project-import .actions {
+  margin-top: 14px;
+}
+.project-import .actions button {
+  width: 100%;
+}
+.work-location {
+  min-width: 0;
+}
+.work-location dl {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 10px 8px;
+  font-size: 11px;
+}
+.work-location dt {
+  padding-top: 3px;
+  color: #5f6d80;
+}
+.work-location dd {
+  margin: 0;
+  min-width: 0;
+}
+.path-value {
+  display: flex;
+  align-items: start;
+  gap: 4px;
+  min-width: 0;
+}
+.path-value code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 1.65;
+  background: transparent;
+  padding: 2px 0;
+}
+.path-value .icon-button {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+}
+.artifact-name {
+  min-width: 0;
+  color: #52647b;
+  font-size: 11px;
+}
 .task-templates {
   position: relative;
 }
@@ -239,7 +336,8 @@ button:disabled {
   padding: 20px 12px 12px;
   border-right: 1px solid var(--line);
   gap: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   min-width: 0;
 }
 .new-conversation {
@@ -283,6 +381,15 @@ button:disabled {
 .section-head .icon-button {
   margin-left: auto;
 }
+.section-tools {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 2px;
+}
+.section-tools .icon-button {
+  margin-left: 0;
+}
 .count {
   background: #edf0f4;
   color: #6b7888;
@@ -311,6 +418,12 @@ button:disabled {
   padding: 0;
   overflow-y: auto;
   gap: 3px;
+}
+.sidebar:has(.new-work) .work-list,
+.sidebar:has(.project-import) .work-list {
+  flex: 0 0 auto;
+  max-height: none;
+  overflow: visible;
 }
 .work-card {
   display: grid;
@@ -822,6 +935,7 @@ button:disabled {
   font-size: 11px;
 }
 .new-work {
+  flex-shrink: 0;
   margin-bottom: 12px;
   padding: 11px;
   border-radius: 6px;

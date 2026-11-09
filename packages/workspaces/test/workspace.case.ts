@@ -49,7 +49,9 @@ test('reserve creates a detached attempt worktree and leaves the user worktree u
     assert.equal(readFileSync(join(reserved.path, 'tracked.txt'), 'utf8'), 'committed\n', 'the attempt starts from the committed base, not the dirty tree')
     assert.deepEqual(reserved.userWorktree.changedFiles, ['tracked.txt'])
     assert.deepEqual(reserved.userWorktree.untrackedFiles, ['untracked.txt'])
-    assert.match(readFileSync(reserved.userWorktree.patchPath, 'utf8'), /user dirty change/)
+    const auditPatch = readFileSync(reserved.userWorktree.patchPath, 'utf8')
+    assert.match(auditPatch, /user dirty change/)
+    assert.match(auditPatch, /new file mode 100644[\s\S]*user scratch/, 'the audit patch carries untracked file contents')
     // The user's worktree is byte-for-byte what it was: dirty content kept, same status.
     assert.equal(run(fixture.root, 'status', '--porcelain=v1'), fixture.status)
     assert.equal(readFileSync(join(fixture.root, 'tracked.txt'), 'utf8'), 'user dirty change\n')
@@ -77,6 +79,45 @@ test('freeze records a manifest whose digest changes when the attempt worktree c
     const second = manager.freeze({ attemptId: assignment.attemptId })
     assert.notEqual(second.artifactDigest, first.artifactDigest, 'a post-freeze modification changes the artifact digest')
     assert.equal(second.dirty, true)
+  } finally { rmSync(fixture.dir, { recursive: true, force: true }) }
+})
+
+test('freeze includes new and binary attempt files in the delivery patch', () => {
+  const fixture = project()
+  const manager = new WorkspaceManager(join(fixture.dir, 'state'))
+  try {
+    const reserved = manager.reserve({ projectPath: fixture.root, assignment })
+    writeFileSync(join(reserved.path, 'new-file.txt'), 'brand new deliverable\n')
+    writeFileSync(join(reserved.path, 'binary.bin'), Buffer.from([0, 1, 2, 255, 10]))
+    const frozen = manager.freeze({ attemptId: assignment.attemptId })
+    const patch = readFileSync(frozen.patchPath, 'utf8')
+    assert.match(patch, /new file mode 100644[\s\S]*brand new deliverable/)
+    assert.match(patch, /GIT binary patch[\s\S]*binary\.bin|binary\.bin[\s\S]*GIT binary patch/)
+    const manifest = JSON.parse(readFileSync(frozen.manifestPath, 'utf8'))
+    assert.deepEqual(manifest.files.map((file: { path: string }) => file.path), ['binary.bin', 'new-file.txt', 'other.txt', 'tracked.txt'])
+    assert.equal(manager.digest({ attemptId: assignment.attemptId }), frozen.artifactDigest)
+  } finally { rmSync(fixture.dir, { recursive: true, force: true }) }
+})
+
+test('identical content across attempts shares one neutral manifest and keeps per-attempt refs', () => {
+  const fixture = project()
+  const manager = new WorkspaceManager(join(fixture.dir, 'state'))
+  try {
+    const second = { ...assignment, attemptId: 'attempt-2' }
+    manager.reserve({ projectPath: fixture.root, assignment })
+    manager.reserve({ projectPath: fixture.root, assignment: second })
+    const first = manager.freeze({ attemptId: assignment.attemptId })
+    const other = manager.freeze({ attemptId: second.attemptId })
+    assert.equal(other.artifactDigest, first.artifactDigest, 'identical content has one artifact identity')
+    assert.equal(other.manifestPath, first.manifestPath)
+    const manifest = JSON.parse(readFileSync(first.manifestPath, 'utf8'))
+    assert.equal('attemptId' in manifest, false, 'a shared content manifest never claims an attempt')
+    assert.notEqual(other.manifestRefPath, first.manifestRefPath)
+    const firstRef = JSON.parse(readFileSync(first.manifestRefPath, 'utf8'))
+    const secondRef = JSON.parse(readFileSync(other.manifestRefPath, 'utf8'))
+    assert.equal(firstRef.attemptId, assignment.attemptId)
+    assert.equal(secondRef.attemptId, second.attemptId)
+    assert.equal(secondRef.artifactDigest, first.artifactDigest)
   } finally { rmSync(fixture.dir, { recursive: true, force: true }) }
 })
 

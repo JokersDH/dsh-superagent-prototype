@@ -46,6 +46,11 @@ try {
   })
   await step('CREATE-REAL-QUESTION', async () => {
     await page.getByRole('button', { name: '新建委托' }).click()
+    await page.locator('.new-work').getByRole('combobox', { name: '项目', exact: true }).selectOption('project-atlas')
+    await page
+      .locator('.new-work')
+      .getByRole('combobox', { name: '开发执行器', exact: true })
+      .selectOption('profile-fixture-question')
     await page.locator('.new-work textarea').fill(goal)
     await page.locator('.new-work').getByRole('button', { name: '创建委托' }).click()
     await page.waitForSelector('.question-card', { timeout: 10000 })
@@ -88,6 +93,7 @@ try {
   await step('MACHINE-FAIL-CANNOT-DELIVER', async () => {
     const failedGoal = `${goal} failing`
     await page.getByRole('button', { name: '新建委托' }).click()
+    await page.locator('.new-work').getByRole('combobox', { name: '项目', exact: true }).selectOption('project-atlas')
     await page.locator('.new-work textarea').fill(failedGoal)
     await page.locator('.new-work select').last().selectOption('profile-fixture-fail')
     await page.locator('.new-work').getByRole('button', { name: '创建委托' }).click()

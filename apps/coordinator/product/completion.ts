@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, existsSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 import { z } from 'zod'
@@ -49,7 +49,7 @@ export class ProductCompletion implements CompletionReviewPort {
     this.store = store
     this.workspaces = workspaces
     this.verifier = new CompletionEvidenceStore(store)
-    this.runner = new VerificationRunner(checks, { identity: 'verifier:controlled-product-fixture' })
+    this.runner = new VerificationRunner(checks, { identity: 'verifier:personal-agent' })
   }
   current(candidate: CandidateRef) {
     const stored = this.store.commands.get(reviewId(candidate))
@@ -103,26 +103,34 @@ export class ProductCompletion implements CompletionReviewPort {
       environmentRef: key('environment', attemptId),
       verifyArtifact: () => this.workspaces.digest({ attemptId }) === frozen.artifactDigest,
     })
-    const output = readFileSync(join(this.workspaces.attemptPath(attemptId), 'src/product-output.txt'))
+    const outputPath = join(this.workspaces.attemptPath(attemptId), 'src/product-output.txt')
+    const output =
+      this.store.bindings.binding(attemptId)?.source === 'controlled-product-fixture' && existsSync(outputPath)
+        ? readFileSync(outputPath)
+        : undefined
     // Workspace content addresses may be shared; delivery metadata belongs to this exact candidate.
     const manifest = {
-      kind: 'controlled-product-artifact/1',
+      kind: output ? 'controlled-product-artifact/1' : 'product-artifact/1',
       candidate,
       attemptId,
       artifactDigest: frozen.artifactDigest,
       baseCommit: frozen.baseCommit,
       headCommit: frozen.headCommit,
       environment: frozen.environment,
-      output: {
-        path: 'src/product-output.txt',
-        bytes: output.byteLength,
-        sha256: createHash('sha256').update(output).digest('hex'),
-      },
+      ...(output
+        ? {
+            output: {
+              path: 'src/product-output.txt',
+              bytes: output.byteLength,
+              sha256: createHash('sha256').update(output).digest('hex'),
+            },
+          }
+        : {}),
     }
     const files = [
       this.store.artifacts.write(Buffer.from(JSON.stringify(manifest, null, 2))),
       this.store.artifacts.write(readFileSync(frozen.patchPath)),
-      this.store.artifacts.write(output),
+      ...(output ? [this.store.artifacts.write(output)] : []),
     ]
     if (this.workspaces.digest({ attemptId }) !== frozen.artifactDigest)
       throw new ApplicationFault('verification_failed', 'Artifact changed while collecting delivery bytes')

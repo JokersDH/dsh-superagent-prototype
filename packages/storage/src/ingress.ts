@@ -12,17 +12,12 @@ import { createHash } from 'node:crypto'
 import type Database from 'better-sqlite3'
 import type { ContractRef, Json } from '@personal-agent/contracts'
 import { ArtifactStore } from './artifacts.ts'
+import { canonicalJson, canonicalDigest } from '@personal-agent/contracts/canonical'
+export { canonicalJson, canonicalDigest } from '@personal-agent/contracts/canonical'
 
 type Row = Record<string, unknown>
 
 /** Canonical JSON with sorted object keys, as the coordinator ingress uses for payload digests. */
-export function canonicalJson(value: Json): string {
-  if (value === null || typeof value !== 'object') return JSON.stringify(value)
-  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`
-  return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonicalJson(value[key]!)}`).join(',')}}`
-}
-/** SHA-256 of the canonical JSON form — the host-recorded payload digest. */
-export const canonicalDigest = (value: Json): string => createHash('sha256').update(canonicalJson(value)).digest('hex')
 
 /** The identity fields of a binding: indexed, immutable per attempt and enforced on every update. */
 export interface BindingIdentity {

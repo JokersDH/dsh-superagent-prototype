@@ -15,6 +15,35 @@ reply. Work-anchored records are shown only in work context. Task templates prep
 copy/Markdown export lets the user hand the result to their own coding agent. The imported A checkpoint evidence
 below describes that checkpoint; current main acceptance is in `reports/releases/`.
 
+## Native MVP Interface
+
+The console now supports importing a local Git project through `POST /v1/projects`, reading the
+project's registered check and admitted execution profiles, and opening an explicit delegation draft
+from the conversation composer. Selecting a native profile and confirming `create_work` is the
+execution authorization; ordinary model text never dispatches work. Model settings are labeled as
+conversation settings, separately from the development executor.
+
+After native delegation, the selected work context opens. Work detail reads
+`GET /v1/works/:id/location` for the original project, isolated worktree and baseline commit. Native
+three-artifact delivery is labeled manifest / complete patch / check evidence; controlled four-artifact
+delivery retains its output-file label. Patch preview is complete up to the bounded display limit,
+and download provides the full file. Import failures preserve the draft. An unavailable native
+project stays visibly blocked rather than silently choosing a controlled profile.
+
+Repeatable console interface acceptance (no vendor/model calls):
+
+```sh
+node apps/console/e2e/native-workbench.mjs
+```
+
+Run from the repository root against the HTTP-mode Vite workbench, default
+`http://127.0.0.1:5180`; set `CONSOLE_URL` to override. All product endpoints are routed to an isolated
+interface fixture, including a live local SSE heartbeat. Seven scenarios cover native defaults,
+import rejection/retry, explicit delegation, location and a patch larger than 8 KB, desktop/narrow
+layout, explicit controlled-profile selection and blocked native authentication. Evidence is in
+`apps/console/e2e/native-mvp/`. This proves the browser interface, not installed-vendor execution;
+the main native-product and real-browser acceptance remain separate.
+
 ## Modes
 
 | Mode | Selection | Purpose |

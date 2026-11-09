@@ -13,12 +13,15 @@ import {
   CircleHelp,
   Copy,
   Download,
+  Eye,
   Folder,
+  FolderPlus,
   ListTodo,
   MessageSquare,
   PanelRightClose,
   PanelRightOpen,
   Plus,
+  Play,
   RefreshCw,
   Settings2,
   Sparkles,
@@ -42,6 +45,8 @@ import type {
   UserCommand,
   UserQuestion,
   WorkView,
+  WorkLocation,
+  ProjectRegistrationInput,
 } from '@personal-agent/contracts'
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
@@ -142,6 +147,11 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [projectFilter, setProjectFilter] = useState<string | undefined>(undefined)
   const [offline, setOffline] = useState<boolean>(() => fixture?.modelOffline() ?? false)
   const [createOpen, setCreateOpen] = useState(false)
+  const [createDraft, setCreateDraft] = useState({ id: '', goal: '', projectId: '' })
+  const [projectImportOpen, setProjectImportOpen] = useState(false)
+  const [activateWorkId, setActivateWorkId] = useState<string | undefined>()
+  const [workLocation, setWorkLocation] = useState<WorkLocation | undefined>()
+  const [locationFailure, setLocationFailure] = useState<string | undefined>()
   const [auth, setAuth] = useState<'checking' | 'required' | 'ready'>(transport.session ? 'checking' : 'ready')
   const [configuration, setConfiguration] = useState<ApplicationConfiguration | undefined>(undefined)
   const [configState, setConfigState] = useState<'loading' | 'ready' | 'unavailable' | 'failed'>(
@@ -281,6 +291,9 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     setInspectorOpen(false)
     setModelPanelOpen(false)
     setWorkspaceOpen(false)
+    setCreateOpen(false)
+    setProjectImportOpen(false)
+    setActivateWorkId(undefined)
     setLoading(true)
   }
   useEffect(() => {
@@ -453,11 +466,46 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     detailRef.current?.scrollTo({ top: 0 })
   }, [selectedWorkId])
 
+  useEffect(() => {
+    setWorkLocation(undefined)
+    setLocationFailure(undefined)
+    if (!selectedWorkId || !transport.workLocation || !inspectorOpen || modelPanelOpen) return
+    let cancelled = false
+    void transport
+      .workLocation(selectedWorkId)
+      .then((value) => {
+        if (!cancelled) setWorkLocation(value)
+      })
+      .catch(() => {
+        if (!cancelled) setLocationFailure('工作目录暂时无法读取。')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [selectedWorkId, snapshot?.cursor, inspectorOpen, modelPanelOpen, transport])
+
+  const openWorkDraft = (goal = '', projectId = projectFilter ?? '') => {
+    setCreateDraft({ id: newId('draft'), goal, projectId })
+    setCreateOpen(true)
+    setProjectImportOpen(false)
+    setWorkspaceOpen(true)
+    setInspectorOpen(false)
+    setModelPanelOpen(false)
+  }
+
   const works = useMemo(
     () => (snapshot?.works ?? []).filter((work) => !projectFilter || work.work.projectId === projectFilter),
     [snapshot, projectFilter],
   )
-  const projects = useMemo(() => [...new Set((snapshot?.works ?? []).map((work) => work.work.projectId))], [snapshot])
+  const projects = useMemo(
+    () => [
+      ...new Set([
+        ...(configuration?.projects.map((project) => project.id) ?? []),
+        ...(snapshot?.works ?? []).map((work) => work.work.projectId),
+      ]),
+    ],
+    [snapshot, configuration],
+  )
   const selectedWork =
     works.find((work) => work.work.id === selectedWorkId) ??
     (snapshot?.works ?? []).find((work) => work.work.id === selectedWorkId)
@@ -509,7 +557,11 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           <button
             type="button"
             className="icon-button mobile-only"
-            onClick={() => setWorkspaceOpen(!workspaceOpen)}
+            onClick={() => {
+              setWorkspaceOpen(!workspaceOpen)
+              setInspectorOpen(false)
+              setModelPanelOpen(false)
+            }}
             title="工作空间"
             aria-label="工作空间"
           >
@@ -625,15 +677,31 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             <div className="section-head">
               <h2>工作空间</h2>
               <span className="count">{works.length}</span>
-              <button
-                type="button"
-                className="icon-button"
-                onClick={() => setCreateOpen(!createOpen)}
-                title="新建委托"
-                aria-label="新建委托"
-              >
-                <Plus size={17} />
-              </button>
+              <span className="section-tools">
+                <button
+                  type="button"
+                  className="icon-button"
+                  onClick={() => (createOpen ? setCreateOpen(false) : openWorkDraft())}
+                  title="新建委托"
+                  aria-label="新建委托"
+                >
+                  <Plus size={17} />
+                </button>
+                {transport.registerProject && (
+                  <button
+                    type="button"
+                    className="icon-button"
+                    title="导入项目"
+                    aria-label="导入项目"
+                    onClick={() => {
+                      setProjectImportOpen(!projectImportOpen)
+                      setCreateOpen(false)
+                    }}
+                  >
+                    <FolderPlus size={17} />
+                  </button>
+                )}
+              </span>
             </div>
             <div className="project-filter" role="group" aria-label="按项目筛选">
               <button
@@ -656,8 +724,26 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 </button>
               ))}
             </div>
+            {projectImportOpen && transport.registerProject && (
+              <ProjectImportForm
+                onCancel={() => setProjectImportOpen(false)}
+                onImport={async (input) => {
+                  const previousIds = new Set(configuration?.projects.map((project) => project.id) ?? [])
+                  const next = await transport.registerProject!(input)
+                  setConfiguration(next)
+                  setConfigState('ready')
+                  setConfigProblem(undefined)
+                  const imported = next.projects.find((project) => !previousIds.has(project.id))
+                  if (imported) setProjectFilter(imported.id)
+                  openWorkDraft('', imported?.id)
+                }}
+              />
+            )}
             {createOpen && (
               <NewWorkForm
+                key={createDraft.id}
+                initialGoal={createDraft.goal}
+                initialProjectId={createDraft.projectId}
                 configuration={configuration}
                 state={configState}
                 problem={configProblem}
@@ -682,9 +768,12 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                   if (receipt?.status === 'recorded' && receipt.workId) {
                     setCreateOpen(false)
                     setSelectedWorkId(receipt.workId)
+                    setProjectFilter(project.id)
                     setInspectorOpen(true)
                     setModelPanelOpen(false)
                     setWorkspaceOpen(false)
+                    if (configuration?.profiles.find((profile) => profile.id === profileId)?.kind === 'native')
+                      setActivateWorkId(receipt.workId)
                   }
                 }}
               />
@@ -743,6 +832,9 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               assistant={assistant}
               waiting={waitingAfter !== undefined}
               streamReplies={streamReplies}
+              activateWorkId={activateWorkId}
+              canDelegate={configuration?.projects.some((project) => project.dispatchAllowed) === true}
+              onDelegate={(text) => openWorkDraft(text)}
               onSend={async (text, useWorkContext) => {
                 const command: UserCommand = {
                   commandId: newId('cmd-chat'),
@@ -802,6 +894,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             <div className="work-panels" hidden={modelPanelOpen}>
               <WorkDetail
                 work={selectedWork}
+                location={workLocation}
+                locationFailure={locationFailure}
                 verification={verification}
                 artifactReader={transport.artifact ? (id) => transport.artifact!(id) : undefined}
                 pending={pending}
@@ -917,7 +1011,7 @@ function ModelPanel({
       <div className="section-head">
         <h2>
           <Sparkles size={17} />
-          模型连接
+          对话模型
         </h2>
         <button className="icon-button" type="button" onClick={onClose} aria-label="关闭模型设置" title="关闭">
           <X size={16} />
@@ -1058,12 +1152,20 @@ function Artifacts({
         {ids.map((id, index) => (
           <li key={id}>
             <code>{id.slice(0, 18)}…</code>
-            <span className="mini">产物 {index + 1}</span>
+            <span className="artifact-name">
+              {(ids.length === 3
+                ? ['交付清单', '完整变更补丁', '检查证据']
+                : ids.length === 4
+                  ? ['交付清单', '完整变更补丁', '输出文件', '检查证据']
+                  : [])[index] ?? `产物 ${index + 1}`}
+            </span>
             <span className="artifact-actions">
               {reader && (
                 <button
                   type="button"
-                  className="quiet"
+                  className="icon-button"
+                  aria-label="查看"
+                  title="查看"
                   onClick={async () => {
                     setFailure(undefined)
                     try {
@@ -1080,11 +1182,25 @@ function Artifacts({
                     }
                   }}
                 >
-                  查看
+                  <Eye size={14} />
                 </button>
               )}
-              <a href={`/v1/artifacts/${encodeURIComponent(id)}`} target="_blank" rel="noreferrer">
-                下载
+              <a
+                className="icon-button"
+                aria-label="下载"
+                title="下载"
+                href={`/v1/artifacts/${encodeURIComponent(id)}`}
+                download={
+                  index === 1
+                    ? 'changes.patch'
+                    : index === 0
+                      ? 'delivery-manifest.json'
+                      : ids.length === 4 && index === 2
+                        ? 'product-output.txt'
+                        : 'check-evidence.json'
+                }
+              >
+                <Download size={14} />
               </a>
             </span>
           </li>
@@ -1101,8 +1217,9 @@ function Artifacts({
             产物 <code>{preview.id}</code> · {preview.contentType}
           </p>
           <pre className="artifact-text">
-            {preview.text.length > 8000 ? `${preview.text.slice(0, 8000)}\n…` : preview.text}
+            {preview.text.length > 1000000 ? `${preview.text.slice(0, 1000000)}\n…` : preview.text}
           </pre>
+          {preview.text.length > 1000000 && <p className="context-line">预览已截断。</p>}
           <button type="button" className="quiet" onClick={() => setPreview(undefined)}>
             关闭预览
           </button>
@@ -1120,7 +1237,105 @@ const blockedLabel = (reason?: string): string => {
   return reason ? `暂不可调度（${reason}）` : '暂不可调度'
 }
 
+function ProjectImportForm({
+  onImport,
+  onCancel,
+}: {
+  onImport: (input: ProjectRegistrationInput) => Promise<void>
+  onCancel: () => void
+}) {
+  const [path, setPath] = useState('')
+  const [displayName, setDisplayName] = useState('')
+  const [check, setCheck] = useState<ProjectRegistrationInput['check']>('node_test')
+  const [pending, setPending] = useState(false)
+  const [failure, setFailure] = useState<string | undefined>()
+  return (
+    <form
+      className="project-import"
+      aria-label="导入本地项目"
+      onSubmit={async (event) => {
+        event.preventDefault()
+        if (!path.trim() || pending) return
+        setPending(true)
+        setFailure(undefined)
+        try {
+          await onImport({
+            path: path.trim(),
+            check,
+            ...(displayName.trim() ? { displayName: displayName.trim() } : {}),
+          })
+        } catch (error) {
+          setFailure(problemOf(error).message)
+        } finally {
+          setPending(false)
+        }
+      }}
+    >
+      <div className="section-head">
+        <h3>导入本地项目</h3>
+        <button
+          type="button"
+          className="icon-button"
+          aria-label="取消导入"
+          title="取消"
+          disabled={pending}
+          onClick={onCancel}
+        >
+          <X size={15} />
+        </button>
+      </div>
+      <label>
+        <span>Git 仓库根目录</span>
+        <input
+          name="project-path"
+          value={path}
+          onChange={(event) => setPath(event.target.value)}
+          required
+          maxLength={4096}
+          autoComplete="off"
+          placeholder="/Users/you/projects/my-app"
+        />
+      </label>
+      <label>
+        <span>项目名称</span>
+        <input
+          name="project-name"
+          value={displayName}
+          onChange={(event) => setDisplayName(event.target.value)}
+          maxLength={160}
+          autoComplete="off"
+        />
+      </label>
+      <label>
+        <span>验收命令</span>
+        <select
+          name="project-check"
+          aria-label="验收命令"
+          value={check}
+          onChange={(event) => setCheck(event.target.value as ProjectRegistrationInput['check'])}
+        >
+          <option value="node_test">node --test</option>
+          <option value="pnpm_test">pnpm test</option>
+          <option value="npm_test">npm test</option>
+        </select>
+      </label>
+      {failure && (
+        <p role="alert" className="warn-text">
+          {failure}
+        </p>
+      )}
+      <div className="actions">
+        <button type="submit" disabled={pending || !path.trim()}>
+          {pending ? '导入中…' : '导入项目'}
+        </button>
+      </div>
+    </form>
+  )
+}
+
 function NewWorkForm({
+  initialGoal = '',
+  initialProjectId = '',
   configuration,
   state,
   problem,
@@ -1129,6 +1344,8 @@ function NewWorkForm({
   onCreate,
   onCancel,
 }: {
+  initialGoal?: string
+  initialProjectId?: string
   configuration: ApplicationConfiguration | undefined
   state: 'loading' | 'ready' | 'unavailable' | 'failed'
   problem: Problem | undefined
@@ -1137,12 +1354,15 @@ function NewWorkForm({
   onCreate: (goal: string, project: ConfiguredProjectView, profileId: string) => Promise<unknown>
   onCancel: () => void
 }) {
-  const [goal, setGoal] = useState('')
-  const [projectChoice, setProjectChoice] = useState('')
+  const [goal, setGoal] = useState(initialGoal)
+  const [projectChoice, setProjectChoice] = useState(initialProjectId)
   const [profileChoice, setProfileChoice] = useState('')
   const projects = configuration?.projects ?? []
-  const project =
-    projects.find((item) => item.id === projectChoice) ?? projects.find((item) => item.dispatchAllowed) ?? projects[0]
+  const nativeProfiles = new Set(
+    configuration?.profiles.filter((profile) => profile.kind === 'native').map((profile) => profile.id) ?? [],
+  )
+  const nativeProject = projects.find((item) => item.profileIds.some((id) => nativeProfiles.has(id)))
+  const project = projects.find((item) => item.id === projectChoice) ?? nativeProject ?? projects[0]
   const profiles = (configuration?.profiles ?? []).filter(
     (profile) => profile.dispatchAllowed && project?.profileIds.includes(profile.id),
   )
@@ -1193,6 +1413,7 @@ function NewWorkForm({
       <label>
         <span>项目</span>
         <select
+          aria-label="项目"
           value={project?.id ?? ''}
           disabled={!configuration || !projects.length}
           onChange={(event) => {
@@ -1209,8 +1430,9 @@ function NewWorkForm({
         </select>
       </label>
       <label>
-        <span>执行器 Profile</span>
+        <span>开发执行器</span>
         <select
+          aria-label="开发执行器"
           value={profile?.id ?? ''}
           disabled={!profiles.length}
           onChange={(event) => setProfileChoice(event.target.value)}
@@ -1228,6 +1450,12 @@ function NewWorkForm({
             <span>允许路径</span>
             <code>{project.scope.allowedPaths.join(', ') || '—'}</code>
           </p>
+          {project.scope.excludedPaths.length > 0 && (
+            <p>
+              <span>排除路径</span>
+              <code>{project.scope.excludedPaths.join(', ')}</code>
+            </p>
+          )}
           <p>
             <span>初始标准</span>
             {project.defaultCriteria
@@ -1367,6 +1595,9 @@ function Conversation({
   assistant,
   waiting,
   streamReplies,
+  activateWorkId,
+  canDelegate,
+  onDelegate,
   onSend,
   onLoadOlder,
 }: {
@@ -1378,11 +1609,20 @@ function Conversation({
   assistant: AssistantProviderStatus | undefined
   waiting: boolean
   streamReplies: readonly AssistantStreamUpdate[]
+  activateWorkId: string | undefined
+  canDelegate: boolean
+  onDelegate: (text: string) => void
   onSend: (text: string, useWorkContext: boolean) => Promise<boolean>
   onLoadOlder: (before: number) => Promise<void>
 }) {
   const [draft, setDraft] = useState('')
   const [useWorkContext, setUseWorkContext] = useState(false)
+  useEffect(() => {
+    if (activateWorkId && selectedWork?.work.id === activateWorkId) {
+      setUseWorkContext(true)
+      setDraft('')
+    } else setUseWorkContext(false)
+  }, [activateWorkId, selectedWork?.work.id])
   const templateRef = useRef<HTMLDetailsElement | null>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const applyTemplate = (text: string) => {
@@ -1417,7 +1657,7 @@ function Conversation({
     <div className="conversation-inner">
       <div className="conversation-head">
         <div>
-          <h2>主对话</h2>
+          <h2>{useWorkContext && selectedWork ? '当前工作' : '主对话'}</h2>
           <p className="context-line">
             {useWorkContext && selectedWork ? selectedWork.work.title : (assistant?.model ?? '个人工作区')}
           </p>
@@ -1588,15 +1828,29 @@ function Conversation({
               </button>
             )}
           </div>
-          <button
-            className="send-button"
-            type="submit"
-            disabled={pending || waiting || streaming || !draft.trim()}
-            aria-label="发送消息"
-            title="发送"
-          >
-            <ArrowUp size={20} />
-          </button>
+          <div className="composer-submit-actions" role="group" aria-label="发送与委托">
+            {canDelegate && (
+              <button
+                type="button"
+                className="delegate-button"
+                title="委托执行"
+                aria-label="委托执行"
+                disabled={pending || waiting || streaming || !draft.trim()}
+                onClick={() => onDelegate(draft.trim())}
+              >
+                <Play size={17} />
+              </button>
+            )}
+            <button
+              className="send-button"
+              type="submit"
+              disabled={pending || waiting || streaming || !draft.trim()}
+              aria-label="发送消息"
+              title={useWorkContext ? '补充当前工作' : '发送到对话模型'}
+            >
+              <ArrowUp size={20} />
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -1888,6 +2142,8 @@ function QuestionCard({
 
 function WorkDetail({
   work,
+  location,
+  locationFailure,
   verification,
   artifactReader,
   pending,
@@ -1899,6 +2155,8 @@ function WorkDetail({
   onRevise,
 }: {
   work: WorkView | undefined
+  location: WorkLocation | undefined
+  locationFailure: string | undefined
   verification: VerificationDetail | undefined
   artifactReader: ((id: string) => Promise<{ contentType: string; text: string } | undefined>) | undefined
   pending: string | undefined
@@ -1925,7 +2183,11 @@ function WorkDetail({
   const stale = verification?.stale ?? false
   const failed =
     verification?.results.some(
-      (result) => result.outcome === 'FAIL' || result.outcome === 'SKIPPED' || result.outcome === 'NOT_TESTED',
+      (result) =>
+        work.contract.criteria.some(
+          (criterion) => criterion.id === result.criterionId && criterion.kind === 'machine' && criterion.required,
+        ) &&
+        (result.outcome === 'FAIL' || result.outcome === 'SKIPPED' || result.outcome === 'NOT_TESTED'),
     ) ?? false
   return (
     <section className="panel" aria-label="工作详情">
@@ -1949,6 +2211,40 @@ function WorkDetail({
         {work.resourceStatus === 'indeterminate' ? '（不能视为已停止）' : ''}
       </p>
       <p className="goal">{work.contract.goal}</p>
+      {(location || locationFailure) && (
+        <section className="work-location" aria-label="代码位置">
+          <h4>代码位置</h4>
+          {location && (
+            <dl>
+              <dt>原项目</dt>
+              <dd>
+                <PathValue value={location.projectPath} />
+              </dd>
+              <dt>工作区</dt>
+              <dd>
+                {location.workspacePath ? (
+                  <PathValue value={location.workspacePath} />
+                ) : (
+                  <span className="context-line">准备中</span>
+                )}
+              </dd>
+              <dt>基线</dt>
+              <dd>
+                {location.baseCommit ? (
+                  <code title={location.baseCommit}>{location.baseCommit.slice(0, 12)}</code>
+                ) : (
+                  <span className="context-line">准备中</span>
+                )}
+              </dd>
+            </dl>
+          )}
+          {locationFailure && (
+            <p className="warn-text" role="status">
+              {locationFailure}
+            </p>
+          )}
+        </section>
+      )}
       <h4>完成标准</h4>
       <ul className="criteria">
         {work.contract.criteria.map((criterion: Criterion) => (
@@ -2086,5 +2382,32 @@ function WorkDetail({
         {work.actions.dispatchHold.paused ? '已暂停' : '未暂停'}
       </p>
     </section>
+  )
+}
+
+function PathValue({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false)
+  const [failed, setFailed] = useState(false)
+  return (
+    <span className="path-value">
+      <code>{value}</code>
+      <button
+        type="button"
+        className="icon-button"
+        title={failed ? '复制失败' : copied ? '已复制路径' : '复制路径'}
+        aria-label="复制路径"
+        onClick={() => {
+          void navigator.clipboard
+            .writeText(value)
+            .then(() => {
+              setCopied(true)
+              setFailed(false)
+            })
+            .catch(() => setFailed(true))
+        }}
+      >
+        {copied ? <Check size={13} /> : <Copy size={13} />}
+      </button>
+    </span>
   )
 }

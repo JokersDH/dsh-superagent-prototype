@@ -1,6 +1,6 @@
-# 个人助理工作台试用
+# 本机 Codex 开发工作台
 
-这是可操作的本机预览：主对话已接入真实模型，实际 HTTP、SQLite、子进程、原生提问、产物验证及接受交付均已接线。工作 profile 仍执行固定 scratch 操作，不执行输入文本中的任意代码。独立 Runner 和真实 Codex/DSH/ZCode 尚未准入。
+当前默认入口已接入真实 Codex：确认项目与目标后，在独立 Git worktree 改代码、运行注册检查、审阅完整 patch 并接受当前交付。现有 macOS arm64/Codex 0.164.0 的实际后端与浏览器闭环通过；这是本机单执行器 MVP，完整 G2、其它原生分支和长期稳定性仍单独验收。
 
 首次使用先看 [助手简介与使用指南](ASSISTANT-GUIDE.zh-CN.md)，工作台顶部帮助图标也可下载该指南。
 
@@ -12,13 +12,13 @@
 pnpm start
 ```
 
-默认工作台：`http://127.0.0.1:5180`；产品 API：`http://127.0.0.1:8796`。启动器会先启动产品 API，工作台从认证的 `/v1/configuration` 读取项目、profile 和验收默认值。它不重启已有 A/B 服务，不切换分支，不访问原生账号。主对话只有在你发送消息且本机模型已配置时才请求模型；启动和受控工作本身不调用模型。
+默认工作台：`http://127.0.0.1:5180`；产品 API：`http://127.0.0.1:8796`。工作台读取认证的 `/v1/configuration`，原生项目选择实际 Codex，固定测试项目只能选择 fixture。主对话网关与开发执行器认证分开，执行器使用本机既有 Codex 配置。启动本身不开始模型任务；确认委托才开始实际开发。
 
 默认本机试用打开即用，无需输入令牌。启动会自动构建必要模块；已有实例运行时直接复用。首次取得仓库才需要先运行 `pnpm install --frozen-lockfile --ignore-scripts`。推荐 Node 24.22.2、pnpm 11.7.0。
 
 双击 `stop.command` 或运行 `pnpm stop` 可关闭本工作台；修改后端代码后运行 `pnpm restart` 可重启。状态和产物会保留。
 
-自动访问只由此 loopback fixture 启动器显式开启，保留 Host、Origin、JSON 和服务端 actor 检查。普通 API 与 Runner 恢复认证不变；需要手动登录时可用 `pnpm dev:workbench --require-login`。
+自动访问由此 loopback personal 入口显式开启，保留 Host、Origin、JSON 和服务端 actor 检查。普通 product API 仍严格认证，Runner 恢复仍使用私有凭据；需要手动登录时可用 `pnpm dev:workbench --require-login`。
 
 端口占用时可指定另一组端口和私有状态目录：
 
@@ -26,17 +26,17 @@ pnpm start
 pnpm dev:workbench --port 5181 --api-port 8797 --state /absolute/private/workbench-state
 ```
 
-在启动器终端按 Ctrl+C 会关闭它自己的 API 和 Vite 进程。关闭浏览器页面不会终止后台工作。当前 scratch 项目在 `/tmp/pa-project-*`，其引用在私有状态目录中；本入口用于开发验收，不是正式 daemon/备份/发行方案。
+关闭浏览器页面不会终止后台工作。默认真实项目在 `~/.local/share/superagent-personal/projects/starter`，原生工作区在同一私有根的 `workspaces/`。导入项目和每项工作的实际路径可在工作台查看。CLI 管理服务；正式备份、发行和长期 soak 属于后续出口。
 
-## 试用流程
+## 真实开发流程
 
-1. 新建委托，默认选择 `profile-fixture-question`。
-2. 在主入口回答真实子进程提出的权限问题。
-3. 等待已注册检查完成，查看清单、patch、输出和检查证据。
-4. 接受当前候选后，工作显示已交付；刷新仍保留产物。
-5. 选择 `profile-fixture-fail` 可验证机器检查失败时不允许接受交付。
+1. 使用默认开发项目，或导入干净且已有提交的 Git 根目录。
+2. 在对话输入目标，点击“委托执行”，确认真实项目、Codex 和验收标准，再创建工作。
+3. 查看执行状态和需要你决定的问题，等待注册检查。
+4. 检查通过后查看原项目/工作区/基线、完整 patch 与证据，再接受当前候选。
+5. 原项目保持不变；审阅下载的 patch 后由你集成。失败的机器检查不能用人工接受覆盖。
 
-这些是固定 fixture 的真实数据流验收，不代表模型理解或通用自动开发能力已完成。
+只测固定流程时显式使用 `pnpm dev:workbench --fixture --port 5181 --api-port 8797 --state /tmp/pa-fixture-workbench`。真实 MVP 不自动回退到 fixture；有依赖的项目目前需要先具备可用隔离环境，环境准备包由外部 A 继续推进。
 
 ## 复验
 
@@ -46,8 +46,8 @@ pnpm check:g2-browser
 pnpm check:assistant-browser
 ```
 
-第一条覆盖 350 项契约/产品/模型适配测试，加工作台 8 项模块测试及类型检查、构建。模型测试使用本地 mock SDK 服务，不产生模型费用。第二条在独立会话中验证受控工作流的 11 个浏览器场景，截图和报告保存在 `reports/releases/workbench-browser/`；不会写入默认个人对话。第三条使用临时 SQLite、实际 SDK/HTTP/SSE 与本地模型 fixture 验证流式展示、刷新不重发、导出和对话隔离，证据在 `reports/releases/assistant-streaming/`。两条浏览器检查均需要工作台前端已启动，不调用付费网关。
+第一条覆盖契约、确定性产品、项目导入、模型适配与工作台模块，并运行类型检查和构建；以 `g2-workbench.json` 的实际计数为准。第二条显式选择 fixture 项目/执行器，在独立会话验证 11 个受控流程场景。第三条使用实际 SDK/SQLite/HTTP/SSE 和临时本地模型 fixture 验证流式对话。它们不调用付费网关。
 
 工作台已导入 A `8e302b4` 的配置驱动 console 检查点，并在主线增加对话优先布局、图标工具栏、Markdown、独立对话、模型设置及桌面/窄屏适配。它直接消费动态配置，不再依赖固定的执行器表单默认值。
 
-本次未导入 A 的通用 workspace patch 候选和 B 的独立运行时。它们的新准入失败、修复责任和复现命令见 [候选准入交接](rfcs/WP-16/0005-candidate-admission-and-workbench.md)。
+原 A/B 的八项准入阻断已在本轮主线修复；旧报告保留历史结论。最新代码范围、原生证据与限制见 [MVP 集成](rfcs/WP-16/0008-native-mvp-integration.md) 和 `reports/releases/native-mvp/`。`pnpm check:native-product` 与 `pnpm check:native-browser` 是显式真实模型验收命令，日常 CI 不自动运行它们。

@@ -8,7 +8,14 @@
 - Original prototype code is in `src/`, `tests/`, `prompts/`, `skills/`, and `docs/`. Preserve upstream MIT attribution.
 - New product directories are `packages/` and `apps/` at this repository root. G0 experiments belong in `tools/reuse-spike/`. Do not create another nested Git repository or an unrelated product checkout.
 
-## Current Three-Agent Assignments
+## Native MVP Assignments (2026-11-09)
+
+- Current external task packets are `agent-tasks/native-mvp/README.zh-CN.md` and its A/B files. They supersede the wave-02 path assignments for new work; prior ownership/results below remain historical acceptance context.
+- External A continues its existing worktree/branch and owns only `packages/environment-preparation/` for the next package. External B continues its existing worktree/branch and owns only `tests/native-acceptance/` for independent native product and recovery acceptance.
+- Main has integrated the console/Codex/Runner batch with scoped internal workers in the primary checkout. Those paths are now main-integration owned until the current native MVP is published; external A/B must not overwrite them with older candidates.
+- Contracts, root lock/config, application/HTTP/coordinator and cross-module integration remain main-owned. Architecture invariants and delivery/credential rules below are unchanged. Read `docs/rfcs/WP-16/0008-native-mvp-integration.md` for this integration window and measured limits.
+
+## Prior Wave-02 Assignments
 
 - Current execution plan: `agent-tasks/wave-02/README.zh-CN.md`. These outcome-based packages supersede the old G0 and small-fix stopping instructions; old task files remain reference/acceptance checklists.
 - Main agent works in the primary checkout and owns contracts/core, `packages/questions/`, `packages/application/`, deterministic application/HTTP/coordinator composition, root configuration/lock and cross-module integration. Read `agent-tasks/wave-02/main.zh-CN.md`.

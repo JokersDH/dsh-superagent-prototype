@@ -1,10 +1,10 @@
 # 从这里开始：仓库、代码位置和三 Agent 开发
 
-**当前派工入口：[第二轮整包排程](agent-tasks/wave-02/README.zh-CN.md)。** A 连续交付可信验证、产品仓储和工作台；B 连续交付独立运行时、Catalog/策略准备和首个 Driver；主 Agent 做问题中心、应用 API 和纵向集成。每人一个早期接口检查点、一次整包交付，不再每修一项就重新派工。
+**当前派工入口：[真实 MVP 外部 A/B 大任务](agent-tasks/native-mvp/README.zh-CN.md)。** 原外部 A 继续项目环境准备，原外部 B 做独立真实验收；主线已并行完成本轮工作台和 Codex/Runner 接线。第二轮历史分工保留在 wave-02。
 
-**个人助理工作台已接入：** 双击 `start.command` 或运行 `pnpm start`，打开 `http://127.0.0.1:5180` 即可使用，无需手动令牌。真实模型主对话、本机记录和模型切换已开放，见 [助手简介](docs/ASSISTANT-GUIDE.zh-CN.md)。停止用 `stop.command`/`pnpm stop`，重启用 `pnpm restart`。工作执行仍使用固定 scratch 子进程、原生问题与验证交付，见 [试用说明](docs/WORKBENCH.zh-CN.md)。A/B 候选准入仍分开验证，见 [最新交接](docs/rfcs/WP-16/0005-candidate-admission-and-workbench.md)；不代表任意仓库自动编码、原生兼容或完整 G2 通过。
+**本机 Codex MVP 已接入：** 双击 `start.command` 或运行 `pnpm start`，打开 `http://127.0.0.1:5180`。从工作台导入本地 Git 项目，在对话输入目标，点击“委托执行”确认后，真实 Codex 会在独立 worktree 改代码、运行注册检查，供审阅完整 patch 并接受当前交付。无需手动令牌，原项目不自动覆盖。见 [使用指南](docs/ASSISTANT-GUIDE.zh-CN.md) 与 [工作台说明](docs/WORKBENCH.zh-CN.md)。本轮实际范围为 macOS arm64 / Codex 0.164.0 / Node 项目；不是完整 G2 或其它执行器的兼容声明。
 
-主线最新检查点：已实现真实受控子进程的“委托 → 提问 → 回答 → 产物冻结 → 检查 → 接受交付”API 闭环，认证的 `GET /v1/configuration` 供工作台读取真实项目、执行器与验收默认值，`GET /v1/assistant` 只返回安全的模型连接状态。`pnpm check:g2-product` 覆盖 **188 项契约 + 162 项产品及模型适配测试**，实际结果见 [产品检查报告](reports/releases/g2-product.json)。主对话现支持真实流式回复、模板和导出；工作记录与聊天上下文隔离，浏览器测试使用独立会话。接线见 [配置查询约定](docs/rfcs/WP-16/0004-application-configuration.md)，启动和代码位置见 [产品入口](apps/coordinator/product/README.md)。fixture 子进程不调用模型；主对话独立使用私有模型配置。浏览器产品、独立 Runner 重连和真实 agent 仍分开验收。
+最新事实：首次真实 Codex 后端五场景和浏览器六场景通过，完成真实代码、既有测试、当前候选接受、产物下载及重开保留；原 A/B 八项准入阻断已修复。主线回归 367 项、内部运行时回归 262 项及原生零模型安全探针 3 项通过。证据见 [native MVP](reports/releases/native-mvp/) 与 [集成约定](docs/rfcs/WP-16/0008-native-mvp-integration.md)。真实模型审批、澄清、运行中 steer、完整故障矩阵、长期 soak 与依赖准备仍按单列范围推进。以下 G0/G1 历史段落按记录日期阅读，不取代本段最新事实。
 
 ## 1. 唯一交付仓库
 

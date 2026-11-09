@@ -15,6 +15,7 @@ const commands = [
   ['--filter', '@personal-agent/coordinator', 'test:product'],
   ['--filter', '@personal-agent/coordinator', 'test:configuration'],
   ['--filter', '@personal-agent/coordinator', 'test:assistant'],
+  ['--filter', '@personal-agent/coordinator', 'test:projects'],
 ]
 let tests = 0
 const results = []
@@ -35,8 +36,8 @@ for (const args of commands) {
   })
 }
 assert.ok(
-  tests >= 350,
-  'Run contracts 188, application/recovery 96, WP-04 30, product 14, configuration 5 and assistant 17 cases',
+  tests >= 355,
+  'Run contracts 188, application/recovery 96, WP-04 32, product 14, configuration 5, assistant 17 and projects 3 cases',
 )
 const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], {
   cwd: root,
@@ -61,11 +62,12 @@ const report = {
   scopes: {
     contracts: 188,
     applicationAndRecovery: 96,
-    workspaces: 8,
+    workspaces: 10,
     verification: 22,
     actualControlledProduct: 14,
     configuration: 5,
     assistantDialogue: 17,
+    projectRegistration: 3,
   },
   implementation:
     'SQLite application + real scratch subprocess + native questions + trusted resource barrier + verification + candidate acceptance + durable model dialogue with local mock SDK endpoint',
@@ -74,7 +76,7 @@ const report = {
     'Fixture profiles execute a fixed scratch operation; installed Codex/ZCode/DeepSeek Harness are NOT_TESTED',
     'Assistant tests use a local mock SDK endpoint; the separate manual model smoke is not part of this repeatable no-vendor suite',
     'The controlled host lives in the coordinator process; SIGKILL proves conservative no-replay behavior, not live independent Runner reconnect',
-    'The imported workspace patch omits untracked file bytes; the controlled lane explicitly publishes its fixed output bytes as an additional immutable artifact',
+    'Generic workspace patch now includes staged/untracked files and commits since reserve; the separate native lane verifies actual code delivery',
     'No complete G1/G2 release, generic user-project security sandbox, power-loss or load/soak certification',
   ],
 }

@@ -1,0 +1,37 @@
+{
+  "status": "PASS_CONSOLE_NATIVE_INTERFACE_FIXTURE",
+  "checkedAt": "2026-11-09T08:37:52.256Z",
+  "cases": [
+    {
+      "id": "NATIVE-PROJECT-PREFERRED",
+      "status": "PASS"
+    },
+    {
+      "id": "IMPORT-ERROR-KEEPS-DRAFT-AND-RETRY",
+      "status": "PASS"
+    },
+    {
+      "id": "CHAT-TO-EXPLICIT-DELEGATION",
+      "status": "PASS"
+    },
+    {
+      "id": "NATIVE-LOCATION-AND-COMPLETE-PATCH",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-AND-NARROW",
+      "status": "PASS"
+    },
+    {
+      "id": "EXPLICIT-FIXTURE-PROJECT-REMAINS-USABLE",
+      "status": "PASS"
+    },
+    {
+      "id": "BLOCKED-NATIVE-DOES-NOT-FALL-BACK-TO-FIXTURE",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "scope": "Browser and HTTP interface fixture only; actual native execution belongs to main acceptance"
+}
