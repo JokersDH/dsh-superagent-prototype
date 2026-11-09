@@ -1,0 +1,21 @@
+$ node --test test/*.case.ts
+✔ a dependency-free Node project is ready and runs the real node test runner (75.947041ms)
+✔ existing_only refuses missing dependencies and escaping node_modules links (7.255ms)
+✔ unsupported layouts, external links and ambiguous managers are blocked (4.368ms)
+✔ a real pnpm project installs offline/frozen/ignore-scripts and passes its own test (1902.704542ms)
+✔ the same request reuses its environment; a changed request or lock does not (2233.877042ms)
+✔ a changed lock is refused under frozen-lockfile policy and leaves no partial environment (1438.387542ms)
+✔ manager mismatch, missing manager and missing offline cache are explicit blocked states (1482.051458ms)
+✔ timeout and cancellation kill the owned process group and clean the workspace (2872.107708ms)
+✔ an output-flooding manager is killed at the output budget and cleaned (1852.219417ms)
+✔ environment paths are excluded from the business patch while source stays tracked (1479.7085ms)
+✔ the fingerprint changes with package content and policy (1.988ms)
+✔ invalid requests are refused before touching either directory (1.532083ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13428.804417

@@ -1,0 +1,5 @@
+node v24.21.0
+pnpm 11.7.0
+platform Darwin arm64
+package @personal-agent/environment-preparation
+policy default existing_only/offline_install; no network; no lifecycle scripts
