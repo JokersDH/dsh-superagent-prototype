@@ -10,10 +10,11 @@
 
 ## Native MVP Assignments (2026-11-09)
 
-- Current external task packets are `agent-tasks/native-mvp/README.zh-CN.md` and its A/B files. They supersede the wave-02 path assignments for new work; prior ownership/results below remain historical acceptance context.
+- Current external task packets are `agent-tasks/native-mvp-02/README.zh-CN.md` and its A/B files. They supersede native-mvp round 1 and the wave-02 path assignments for new work; prior ownership/results below remain historical acceptance context.
 - External A continues its existing worktree/branch and owns only `packages/environment-preparation/` for the next package. External B continues its existing worktree/branch and owns only `tests/native-acceptance/` for independent native product and recovery acceptance.
-- Main has integrated the console/Codex/Runner batch with scoped internal workers in the primary checkout. Those paths are now main-integration owned until the current native MVP is published; external A/B must not overwrite them with older candidates.
-- Contracts, root lock/config, application/HTTP/coordinator and cross-module integration remain main-owned. Architecture invariants and delivery/credential rules below are unchanged. Read `docs/rfcs/WP-16/0008-native-mvp-integration.md` for this integration window and measured limits.
+- Main published the console/Codex/Runner MVP at `1f3229f` (implementation `252bf70`). Those product paths remain main-integration owned; external A/B must merge current main and must not overwrite admitted implementations with older candidates.
+- A `f1d4b1f` passes 12 package tests but fails five independent environment admission probes. B `0e62a3d` passes eight harness selftests and five current-main read-only probes, but its native lane remains unimplemented. Neither result expands the published native MVP scope. Read `docs/rfcs/WP-16/0009-native-followup-review.md` for evidence and next-round gates.
+- Contracts, root lock/config, application/HTTP/coordinator, workspaces/verification/console and cross-module integration remain main-owned. Architecture invariants and delivery/credential rules below are unchanged. Main follows `agent-tasks/native-mvp-02/main-integration.zh-CN.md`; the measured native MVP limits remain in `docs/rfcs/WP-16/0008-native-mvp-integration.md`.
 
 ## Prior Wave-02 Assignments
 

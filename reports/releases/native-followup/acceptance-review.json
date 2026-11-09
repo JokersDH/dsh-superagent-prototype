@@ -1,0 +1,91 @@
+{
+  "status": "PARTIAL_ACCEPTANCE_HARNESS",
+  "checkedAt": "2026-11-09T10:22:47.798Z",
+  "reviewerCommit": "1f3229f82d0df6c68465aaf200e74a696e12964c",
+  "candidateCommit": "0e62a3dc0a449546de4e8eddf1e8d8e86f76e96c",
+  "liveNativeAvailable": true,
+  "cases": [
+    {
+      "id": "SHARED-CREATE-WORK-SCHEMA",
+      "passesInvariant": false,
+      "observed": {
+        "issues": [
+          {
+            "path": [
+              "goal"
+            ],
+            "code": "invalid_type"
+          },
+          {
+            "path": [],
+            "code": "unrecognized_keys"
+          }
+        ]
+      }
+    },
+    {
+      "id": "PROJECT-SUPPORTS-SELECTED-PROFILE",
+      "passesInvariant": false,
+      "observed": {
+        "selectedProject": "project-atlas",
+        "expectedProject": "project-39d1110c23d2418691a720e0"
+      }
+    },
+    {
+      "id": "REQUIRED-HUMAN-CRITERIA-PRESERVED",
+      "passesInvariant": false,
+      "observed": {
+        "requiredCriteria": [
+          "project-tests",
+          "review-output"
+        ],
+        "builtCriteria": [
+          "project-tests"
+        ]
+      }
+    },
+    {
+      "id": "NATIVE-AVAILABLE-PATH-IMPLEMENTED",
+      "passesInvariant": false,
+      "observed": {
+        "clientCalls": 0,
+        "nativeResult": {
+          "executed": false,
+          "reason": "native execution boundary unavailable"
+        },
+        "nativeCases": [
+          {
+            "id": "NATIVE-LINK",
+            "status": "NOT_TESTED"
+          },
+          {
+            "id": "NATIVE-STOP",
+            "status": "NOT_TESTED"
+          },
+          {
+            "id": "NATIVE-REOPEN",
+            "status": "NOT_TESTED"
+          },
+          {
+            "id": "NATIVE-RESTART",
+            "status": "NOT_TESTED"
+          },
+          {
+            "id": "NATIVE-STALE-CANDIDATE",
+            "status": "NOT_TESTED"
+          },
+          {
+            "id": "NATIVE-CHECK-FAIL",
+            "status": "NOT_TESTED"
+          },
+          {
+            "id": "NATIVE-QUESTION",
+            "status": "NOT_TESTED"
+          }
+        ]
+      }
+    }
+  ],
+  "modelCalls": 0,
+  "scope": "Shared-contract builders and a fake client only; native lane in this candidate is a confirmed stub; no native job or user project operation"
+}
