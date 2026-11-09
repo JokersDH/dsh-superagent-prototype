@@ -20,11 +20,14 @@ Node `24.21.0` and pnpm `11.7.0` were used for the initial checks. The product's
 - `src/schemas.ts`: the only data-field definitions, bounds, strict object schemas and cross-field rules. Zod `4.4.3` is the only runtime dependency.
 - `src/validation.ts`: contextual question-answer and runtime fact checks; trusted registered check validation.
 - `src/ports.ts`: local TypeScript Driver/Application/host interfaces. Functions, streams and process handles are not JSON wire data.
+- `src/configuration.ts`: independently versioned `application-configuration/1` HTTP read projection; safe project/profile/check metadata. It adds no fields to the frozen Runner/data contract.
 - `src/types.ts`: generated `z.infer` aliases. There is no independently edited product type model.
 - `generated/contracts.schema.json`: JSON Schema 2020-12, checked with AJV for every exported schema.
 - `generated/manifest.json` and `src/identity.ts`: version, API major, schema hash, validator/port source hashes, and JSON digest.
 
 Regenerate with `pnpm run generate`. CI/downstream checks use `pnpm run check:generated` and fail if artifacts are stale. Do not edit generated files.
+
+The generator also writes `generated/configuration.schema.json` and `generated/configuration.manifest.json`. Their identity is separate from the frozen runtime manifest and records that manifest as a dependency. Consumers import `ApplicationConfigurationSchema`/`ApplicationConfiguration` from the package root. The resource excludes executable paths, argv, native config and credential references; readiness/registered-check/project-profile constraints require the runtime parser. See [the application configuration interface](../../docs/rfcs/WP-16/0004-application-configuration.md).
 
 The schema hash covers the canonical JSON Schema plus the exact schema, contextual validator and port source hashes. A validator-only change therefore invalidates the identity even if the structural JSON fields did not change. Source formatting/comments can conservatively invalidate it too. Compare versions/hashes before using a frozen Driver/Profile snapshot.
 

@@ -33,7 +33,7 @@ async function until(read, predicate, timeout = 7000) {
   }
   throw new Error(`Product condition timed out: ${JSON.stringify(latest)}`)
 }
-function fixture(t) {
+function fixture(t, projectScope = scope) {
   const root = mkdtempSync(join(tmpdir(), 'pa-product-test-'))
   const stateRoot = join(root, 'state'),
     scratchProject = join(root, 'project')
@@ -57,7 +57,7 @@ function fixture(t) {
   const options = {
     store,
     principal,
-    projects: [{ id: scope.projectId, scope }],
+    projects: [{ id: scope.projectId, scope: projectScope }],
     actionSecret: Buffer.alloc(32, 1),
     stateRoot,
     scratchProject,
@@ -585,7 +585,7 @@ test(
   'authenticated HTTP commands drive the actual child and expose only published artifacts',
   { timeout: 15000 },
   async (t) => {
-    const h = fixture(t)
+    const h = fixture(t, { ...scope, allowedPaths: ['src/', 'tests/'] })
     h.product.start()
     const token = 'a'.repeat(64)
     const http = createLocalHttpApp({
@@ -598,6 +598,30 @@ test(
       read: h.product.read,
     })
     const headers = { authorization: `Bearer ${token}`, 'content-type': 'application/json' }
+    const configurationResponse = await http.request('http://127.0.0.1/v1/configuration', { headers })
+    assert.equal(configurationResponse.status, 200)
+    const configuration = await configurationResponse.json()
+    const project = configuration.projects[0]
+    assert.deepEqual(project.scope.allowedPaths, ['src/'])
+    const profile = configuration.profiles.find((profile) => profile.id === 'profile-fixture-pass')
+    assert.equal(profile.dispatchAllowed, true)
+    assert.equal(profile.kind, 'controlled_fixture')
+    assert.ok(project.profileIds.includes(profile.id))
+    const broader = await http.request('http://127.0.0.1/v1/commands', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        commandId: 'http-broader-scope',
+        conversationId: 'conversation-product',
+        kind: 'create_work',
+        projectId: project.id,
+        goal: 'Broader scope is not supported by the fixed operation',
+        profileId: profile.id,
+        scope: { ...project.scope, allowedPaths: ['src/', 'tests/'] },
+        criteria: project.defaultCriteria,
+      }),
+    })
+    assert.equal((await broader.json()).error.code, 'forbidden')
     const response = await http.request('http://127.0.0.1/v1/commands', {
       method: 'POST',
       headers,
@@ -605,11 +629,11 @@ test(
         commandId: 'http-create',
         conversationId: 'conversation-product',
         kind: 'create_work',
-        projectId: scope.projectId,
+        projectId: project.id,
         goal: 'Fixed scratch from HTTP',
-        profileId: 'profile-fixture-pass',
-        scope,
-        criteria,
+        profileId: profile.id,
+        scope: project.scope,
+        criteria: project.defaultCriteria,
       }),
     })
     assert.equal(response.status, 200)
