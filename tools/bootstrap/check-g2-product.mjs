@@ -36,8 +36,8 @@ for (const args of commands) {
   })
 }
 assert.ok(
-  tests >= 355,
-  'Run contracts 188, application/recovery 96, WP-04 32, product 14, configuration 5, assistant 17 and projects 3 cases',
+  tests >= 363,
+  'Run contracts 188, application/recovery 96, WP-04 40, product 14, configuration 5, assistant 17 and projects 3 cases',
 )
 const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], {
   cwd: root,
@@ -62,7 +62,7 @@ const report = {
   scopes: {
     contracts: 188,
     applicationAndRecovery: 96,
-    workspaces: 10,
+    workspaces: 18,
     verification: 22,
     actualControlledProduct: 14,
     configuration: 5,

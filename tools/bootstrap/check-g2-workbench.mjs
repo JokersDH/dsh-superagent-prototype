@@ -9,6 +9,7 @@ const commands = [
   ['--filter', '@personal-agent/console', 'typecheck'],
   ['--filter', '@personal-agent/console', 'test'],
   ['--filter', '@personal-agent/console', 'build'],
+  ['check:operations'],
 ]
 const results = []
 let tests = 0
@@ -27,7 +28,7 @@ for (const args of commands) {
     ...(count ? { tests: count } : {}),
   })
 }
-assert.ok(tests >= 367)
+assert.ok(tests >= 387)
 const report = {
   status: 'PASS_CONTROLLED_WORKBENCH_MODULES',
   sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], {

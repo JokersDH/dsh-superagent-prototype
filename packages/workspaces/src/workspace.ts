@@ -67,6 +67,18 @@ export interface ReserveOptions {
   baseCommit?: string
 }
 
+export interface WorkspaceEnvironment {
+  /** Opaque operator reference, never a local authority path or a worker-provided marker. */
+  reference: string
+  fingerprint: string
+  excludedPaths: readonly string[]
+}
+
+export interface WorkspaceEnvironmentPort {
+  /** Reverify the caller's private receipt on every freeze/digest; throw on drift or unavailable proof. */
+  current(input: { assignment: AssignmentIdentity; workspacePath: string }): WorkspaceEnvironment | undefined
+}
+
 export class WorkspaceConflict extends Error {}
 
 interface ManifestEntry {
@@ -95,14 +107,14 @@ const gitBufferWithIndex = (cwd: string, args: readonly string[], indexFile: str
  * intent-to-add there, and `git diff --binary <base>` renders tracked changes plus new files (text,
  * binary, symlink and executable modes) without modifying the user's tree or index.
  */
-function workingTreePatch(cwd: string, base: string, untracked: readonly string[]): Buffer {
+function workingTreePatch(cwd: string, base: string, untracked: readonly string[], excluded: readonly string[] = []): Buffer {
   if (!untracked.length) return gitBuffer(cwd, ['diff', '--binary', base])
   const directory = mkdtempSync(join(tmpdir(), 'pa-worktree-patch-'))
   try {
     const indexFile = join(directory, 'index')
     const actualIndex = resolve(cwd, git(cwd, ['rev-parse', '--git-path', 'index']))
     copyFileSync(actualIndex, indexFile)
-    gitBufferWithIndex(cwd, ['add', '-A', '--', '.'], indexFile)
+    gitBufferWithIndex(cwd, ['add', '-A', '--', '.', ...excluded.map(path => `:(top,exclude,literal)${path}`)], indexFile)
     return gitBufferWithIndex(cwd, ['diff', '--cached', '--binary', base], indexFile)
   } finally {
     rmSync(directory, { recursive: true, force: true })
@@ -154,8 +166,10 @@ interface AttemptRecord {
 
 export class WorkspaceManager {
   private readonly rootDir: string
-  constructor(rootDir: string) {
+  private readonly environment: WorkspaceEnvironmentPort | undefined
+  constructor(rootDir: string, options: { environment?: WorkspaceEnvironmentPort } = {}) {
     this.rootDir = canonical(rootDir)
+    this.environment = options.environment
   }
 
   get attemptRoot(): string { return join(this.rootDir, 'attempts') }
@@ -253,10 +267,14 @@ export class WorkspaceManager {
     const path = this.attemptPath(attemptId)
     if (!existsSync(path)) throw new WorkspaceConflict(`Attempt ${attemptId} has no workspace to freeze`)
     const headCommit = git(path, ['rev-parse', 'HEAD'])
-    const status = statusEntries(gitBuffer(path, ['status', '--porcelain=v1', '-z']).toString('utf8'))
+    const prepared = this.preparedEnvironment(record.assignment, path, record.baseCommit, headCommit)
+    const excluded = prepared?.excludedPaths ?? []
+    const pathspec = excluded.length ? ['--', '.', ...excluded.map(entry => `:(top,exclude,literal)${entry}`)] : []
+    const included = (file: string): boolean => !excluded.some(prefix => file === prefix || file.startsWith(prefix + '/'))
+    const status = statusEntries(gitBuffer(path, ['status', '--porcelain=v1', '-z', ...pathspec]).toString('utf8')).filter(entry => included(entry.path))
     const deleted = new Set(status.filter(entry => entry.status.includes('D')).map(entry => entry.path))
-    const listed = gitBuffer(path, ['ls-files', '-z']).toString('utf8').split('\0').filter(Boolean)
-    const untracked = gitBuffer(path, ['ls-files', '-z', '--others', '--exclude-standard']).toString('utf8').split('\0').filter(Boolean)
+    const listed = gitBuffer(path, ['ls-files', '-z']).toString('utf8').split('\0').filter(file => file && included(file))
+    const untracked = gitBuffer(path, ['ls-files', '-z', '--others', '--exclude-standard', ...pathspec]).toString('utf8').split('\0').filter(file => file && included(file))
     const entries: ManifestEntry[] = [...new Set([...listed, ...untracked])].sort().map(file => {
       const absolute = join(path, file)
       let stat
@@ -276,11 +294,54 @@ export class WorkspaceManager {
       return { path: file, kind: 'file', sha256: sha256(data), bytes: data.byteLength, executable: (stat.mode & 0o111) !== 0 }
     })
     // The delivery patch must reproduce new/untracked files as well as tracked changes/deletions.
-    const patch = workingTreePatch(path, record.baseCommit, untracked)
+    const patch = workingTreePatch(path, record.baseCommit, untracked, excluded)
     const patchSha256 = sha256(patch)
     const environment: Record<string, string> = { node: process.version, platform: process.platform, arch: process.arch }
+    if (prepared) {
+      environment.preparedEnvironmentRef = prepared.reference
+      environment.preparedEnvironmentFingerprint = prepared.fingerprint
+      environment.excludedPaths = JSON.stringify(excluded)
+      environment.exclusionPolicy = 'workspace-environment/1'
+    }
     const artifactDigest = sha256(JSON.stringify({ baseCommit: record.baseCommit, headCommit, status, entries, patchSha256, environment }))
     return { baseCommit: record.baseCommit, headCommit, status, entries, patch, patchSha256, environment, artifactDigest }
+  }
+
+  private preparedEnvironment(assignment: AssignmentIdentity, path: string, base: string, head: string): WorkspaceEnvironment | undefined {
+    let prepared: WorkspaceEnvironment | undefined
+    try { prepared = this.environment?.current({ assignment: structuredClone(assignment), workspacePath: path }) }
+    catch { throw new WorkspaceConflict('The trusted prepared environment could not be verified') }
+    if (prepared === undefined) return undefined
+    if (!prepared || typeof prepared.reference !== 'string' || typeof prepared.fingerprint !== 'string' ||
+        !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$/.test(prepared.reference) ||
+        !/^[a-f0-9]{64}$/.test(prepared.fingerprint) || !Array.isArray(prepared.excludedPaths) || prepared.excludedPaths.length > 128 ||
+        prepared.excludedPaths.some(entry => typeof entry !== 'string'))
+      throw new WorkspaceConflict('Invalid trusted environment attachment')
+    const excludedPaths = [...new Set(prepared.excludedPaths)].sort()
+    for (const entry of excludedPaths) {
+      if (typeof entry !== 'string' || entry.length > 1024 || entry.includes('\\') ||
+          entry.split('/').some(part => !part || ['.', '..', '.git'].includes(part)) ||
+          !(entry === '.product-environment' || entry.split('/').at(-1) === 'node_modules'))
+        throw new WorkspaceConflict('Only verified environment directories can be excluded')
+      let current = path
+      for (const part of entry.split('/')) {
+        current = join(current, part)
+        let stat
+        try { stat = lstatSync(current) } catch { throw new WorkspaceConflict('An attached environment directory is unavailable') }
+        if (!stat.isDirectory() || stat.isSymbolicLink()) throw new WorkspaceConflict('Environment exclusions cannot traverse symbolic links')
+      }
+      if (!inside(realpathSync(path), realpathSync(current))) throw new WorkspaceConflict('An environment directory escapes the workspace')
+    }
+    if (excludedPaths.length) {
+      const tracked = [
+        gitBuffer(path, ['ls-files', '-z']),
+        gitBuffer(path, ['ls-tree', '-r', '--name-only', '-z', base]),
+        gitBuffer(path, ['ls-tree', '-r', '--name-only', '-z', head]),
+      ].flatMap(bytes => bytes.toString('utf8').split('\0').filter(Boolean))
+      if (tracked.some(file => excludedPaths.some(prefix => file === prefix || file.startsWith(prefix + '/'))))
+        throw new WorkspaceConflict('Tracked business content cannot be hidden by an environment exclusion')
+    }
+    return { reference: prepared.reference, fingerprint: prepared.fingerprint, excludedPaths }
   }
 
   /** Removes the attempt's own worktree; the user's project worktree is untouched and the manifest stays for audit. */

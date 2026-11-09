@@ -59,6 +59,7 @@
 pnpm start      # 启动本机原生 MVP；已有实例则复用
 pnpm stop       # 停止服务，保留配置、工作及产物
 pnpm restart    # 后端改动后重启
+pnpm doctor     # 只读核对服务、项目、执行器和恢复阻断
 ```
 
 `stop.command` 可用于停止。需要只验证固定流程时，可用另一个端口/私有 state：
@@ -66,5 +67,9 @@ pnpm restart    # 后端改动后重启
 ```sh
 pnpm dev:workbench --fixture --port 5181 --api-port 8797 --state /tmp/pa-fixture-workbench
 ```
+
+遇到无法打开、启动记录不符或工作停在恢复核对时，先运行 `pnpm doctor`。它核对真实进程、监听端口和已认证的只读接口，不安装依赖、不调用模型，也不自动修复或结束进程。固定流程、原生执行和未接入的环境准备会分别标注；诊断通过只代表本次观察到的范围。
+
+需要保存可分享的诊断摘要时，使用 `pnpm doctor --json --output /tmp/pa-diagnosis.json`；输出文件必须尚不存在，权限为 600，不包含 key、会话原文或数据库。诊断其它私有实例时增加 `--state /tmp/pa-fixture-workbench`。任一阻断会使诊断命令以非零退出。
 
 固定 profile 只执行 scratch 流程。真实 MVP 的检查与证据见 `reports/releases/native-mvp/`；`pnpm check:native-product`、`pnpm check:native-browser` 会执行真实模型任务，属于显式原生验收，日常自动回归使用本地 fixture。
