@@ -1,7 +1,7 @@
 {
   "package": "wave-02 / Agent B",
   "branch": "codex/g1-runtime",
-  "updatedAt": "2026-11-08T15:25:00.000Z",
+  "updatedAt": "2026-11-09T02:05:00.000Z",
   "stages": {
     "B1": {
       "status": "PASS",
@@ -27,7 +27,7 @@
     },
     "B2": {
       "status": "PASS",
-      "scope": "Independent per-attempt Runner process behind a versioned bridge (protocol v1), proven across a coordinator SIGKILL, plus an end-to-end demo.",
+      "scope": "Independent per-attempt Runner process behind a versioned bridge, a real authenticated recovery endpoint matching main's runner-link wire contract, coordinator SIGKILL proof and an end-to-end demo.",
       "interfaceCheckpoint": {
         "protocol": 1,
         "framesMarkdown": {
@@ -57,7 +57,7 @@
         }
       },
       "tests": {
-        "runner": 93,
+        "runner": 110,
         "demoSteps": 11
       },
       "tested": [
@@ -68,7 +68,10 @@
         "orphaned Runner group is attributable via ps and killable",
         "a new epoch is blocked while the orphaned writer is unproven (resource barrier)",
         "replay after the coordinator dies sends facts only, never begin/deliver/answer",
-        "demo: catalog -> policy gate -> runner -> bridge -> journal -> replay (11/11)"
+        "demo: catalog -> policy gate -> runner -> bridge -> journal -> replay (11/11)",
+        "recovery endpoint: private socket/credential, 401 without auth, cancel closes admission irreversibly",
+        "no route that starts business work (begin/command/deliver/answer are 404)",
+        "interop with a client built from main runner-link RunnerInspectionSchema: inspect, cancel, wrong credential refused"
       ],
       "notTested": [
         "Production coordinator adapter wiring (main-owned)",
@@ -113,20 +116,28 @@
   },
   "nativeCompatibility": "NOT_TESTED \u2014 no vendor agent was contacted; all evidence is fixture/fake-native based.",
   "totals": {
-    "tests": 205,
-    "packages": 7,
-    "probes": {
-      "review-journal": "PASS_JOURNAL_ADMISSION_CASES",
-      "review-journal-followup": "PASS_JOURNAL_FOLLOWUP_CASES",
-      "review-journal-integrity": "PASS_JOURNAL_INTEGRITY_BOUNDARY"
-    },
-    "typecheck": "PASS"
+    "tests": 222,
+    "packages": 7
   },
-  "base": "cd09395",
-  "checkpoint": "docs/rfcs/WP-16/0002-main-application-checkpoint.md",
+  "base": "4ecb4c5",
+  "checkpoint": "docs/rfcs/WP-16/0003-controlled-product-integration.md",
   "demo": {
     "command": "node apps/runner/scripts/demo-wave02.ts",
     "result": "DEMO PASS 11/11",
     "scope": "fixture lane only"
-  }
+  },
+  "artifactFixes": {
+    "manifest": "apps/runner/src/artifact-manifest.ts",
+    "rules": [
+      "content addressed",
+      "immutable",
+      "idempotent",
+      "bounded",
+      "candidate requires artifacts"
+    ],
+    "tests": 6
+  },
+  "dependencyRequests": [
+    "pnpm install was run to resolve workspace links; the resulting pnpm-lock.yaml diff is NOT committed and is left to the main agent"
+  ]
 }

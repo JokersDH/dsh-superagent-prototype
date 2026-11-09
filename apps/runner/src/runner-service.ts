@@ -25,6 +25,8 @@ import type { AgentDriverV1 } from '../../../packages/contracts/src/ports.ts'
 import type { AttemptSpec, CriticalFact, DurableReceipt, Json, RunnerCommand } from '../../../packages/contracts/src/types.ts'
 import { JsonLineDecoder, encodeFrame } from '../../../packages/driver-kit/src/index.ts'
 import { FileCriticalJournal } from './file-journal.ts'
+import { AttemptArtifactManifest } from './artifact-manifest.ts'
+import { serveRecoveryEndpoint, endpointDirectory, type RecoveryEndpoint } from './recovery-endpoint.ts'
 import { ProcessHost } from './process-host.ts'
 import { AttemptRunner } from './runner.ts'
 import {
@@ -50,6 +52,8 @@ export type RunnerServiceOptions = {
   sink?: { record(fact: CriticalFact): Promise<DurableReceipt> }
   processHost?: ProcessHost
   now?: () => number
+  /** When set, publish an authenticated recovery endpoint for this attempt. */
+  recoveryRoot?: string
 }
 
 export type RunnerServiceHandle = {
@@ -110,6 +114,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   let began = false
   let payloadRoot = ''
   let localPayloadSeq = 0
+  let recoveryEndpoint: RecoveryEndpoint | undefined
+  const artifacts = new AttemptArtifactManifest()
   let closed = false
   const receipts = new Map<string, DurableReceipt>()
   /** Facts awaiting the coordinator's authoritative receipt. */
@@ -132,6 +138,21 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
       const frame = await next()
       if (!frame) break
       if (closed) break
+
+      // Artifact registration is an upstream extension handled before the typed dispatch.
+      if ((frame as { type: string }).type === 'artifact') {
+        const incoming = frame as unknown as { id: string; path?: string; content?: string }
+        try {
+          const entry = artifacts.register({
+            path: String(incoming.path ?? 'unknown'),
+            bytes: Buffer.from(String(incoming.content ?? ''), 'utf8'),
+          })
+          write({ type: 'artifact-registered', id: incoming.id, requestId: incoming.id, ref: entry.ref, digest: entry.digest } as never)
+        } catch (error) {
+          write({ type: 'error', id: incoming.id, ...toBridgeFailure(error) })
+        }
+        continue
+      }
 
       switch (frame.type) {
         case 'bootstrap': {
@@ -184,6 +205,28 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
             processHost: options.processHost ?? new ProcessHost(),
             spool: journal,
           })
+          if (options.recoveryRoot) {
+            const processHost = options.processHost ?? new ProcessHost()
+            recoveryEndpoint = await serveRecoveryEndpoint({
+              directory: endpointDirectory(options.recoveryRoot, spec.attemptId),
+              spec,
+              runnerIdentityRef: `runner-${spec.attemptId}`,
+              source: 'attempt-runner',
+              resources: () =>
+                (processHost as unknown as { resources?: () => Array<{ ref: string }> }).resources?.().map(item => ({
+                  ref: item.ref,
+                  ownership: 'spawned_process' as const,
+                  writer: 'active' as const,
+                  evidence: ['spawn-observed'],
+                })) ?? [],
+              state: () => (running === undefined ? 'serving' : 'terminated'),
+              cancel: async command => {
+                // Cancel closes admission first (the endpoint does that) and then stops owned work.
+                await runner?.stopPhysical(2000).catch(() => undefined)
+                void command
+              },
+            })
+          }
           write({
             type: 'ready',
             id: frame.id,
@@ -290,6 +333,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
 
   const shutdown = async (): Promise<void> => {
     finish()
+    await recoveryEndpoint?.close().catch(() => undefined)
     await runner?.stopPhysical(2000).catch(() => undefined)
     journal?.close()
   }
