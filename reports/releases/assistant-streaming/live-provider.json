@@ -1,0 +1,51 @@
+{
+  "status": "PASS_REAL_PROVIDER_STREAM",
+  "sourceCommit": "4e984fa71a0dc62e63fdc4a670a50daf1d152312",
+  "checkedAt": "2026-11-09T07:11:59.348Z",
+  "conversationId": "conversation-stream-live-1794208312550",
+  "model": "DeepSeek-V4.1-Flash-1017",
+  "commandsSent": 1,
+  "firstTextMs": 5934,
+  "completedMs": 6799,
+  "partialSnapshots": 8,
+  "firstPartialBeforeCommit": true,
+  "replyCharacters": 198,
+  "samples": [
+    {
+      "elapsedMs": 5934,
+      "characters": 1
+    },
+    {
+      "elapsedMs": 6161,
+      "characters": 37
+    },
+    {
+      "elapsedMs": 6237,
+      "characters": 69
+    },
+    {
+      "elapsedMs": 6314,
+      "characters": 96
+    },
+    {
+      "elapsedMs": 6392,
+      "characters": 119
+    },
+    {
+      "elapsedMs": 6467,
+      "characters": 140
+    },
+    {
+      "elapsedMs": 6544,
+      "characters": 166
+    },
+    {
+      "elapsedMs": 6621,
+      "characters": 176
+    }
+  ],
+  "limitations": [
+    "One short real-model completion; no repository files or native tools were provided",
+    "Browser streaming and reload have a separate isolated full-path fixture report"
+  ]
+}
