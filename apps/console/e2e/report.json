@@ -1,0 +1,146 @@
+{
+  "status": "PASS_CONSOLE_FIXTURE",
+  "mode": "fixture",
+  "base": "http://127.0.0.1:5173/",
+  "node": "v24.21.0",
+  "testedAt": "2026-11-09T01:37:49.709Z",
+  "cases": [
+    {
+      "id": "MAIN-RENDER",
+      "status": "PASS",
+      "ms": 64,
+      "detail": "works/questions/conversation rendered and SSE is live"
+    },
+    {
+      "id": "EXECUTOR-FIXTURE",
+      "status": "PASS",
+      "ms": 5,
+      "detail": "AgentProfile/ProbeReport fixture renders without inventing production Catalog data"
+    },
+    {
+      "id": "CHAT-SEND",
+      "status": "PASS",
+      "ms": 57,
+      "detail": "message dispatch appends a persisted conversation message"
+    },
+    {
+      "id": "QUESTION-ANSWER-PER-TARGET",
+      "status": "PASS",
+      "ms": 287,
+      "detail": "choice/review/url questions answered; local recording never claims native application"
+    },
+    {
+      "id": "VERIFICATION-AND-ACCEPT",
+      "status": "PASS",
+      "ms": 250,
+      "detail": "current candidate with passing verification is accepted"
+    },
+    {
+      "id": "STALE-CANDIDATE-BLOCKED",
+      "status": "PASS",
+      "ms": 42,
+      "detail": "expired candidate cannot be accepted"
+    },
+    {
+      "id": "STOPPING-UNKNOWN-WRITER",
+      "status": "PASS",
+      "ms": 30,
+      "detail": "stopping work shows an indeterminate writer, not success"
+    },
+    {
+      "id": "PAUSE-DISPATCH-CAS",
+      "status": "PASS",
+      "ms": 195,
+      "detail": "dispatch hold is updated through CAS, and continue resumes work"
+    },
+    {
+      "id": "STOP-WORK",
+      "status": "PASS",
+      "ms": 118,
+      "detail": "stop reports stopping with an unknown physical writer"
+    },
+    {
+      "id": "NO-OVERFLOW-DESKTOP",
+      "status": "PASS",
+      "ms": 52,
+      "detail": "long text wraps without horizontal overflow"
+    },
+    {
+      "id": "OFFLINE-READ-ANSWER-STOP",
+      "status": "PASS",
+      "ms": 197,
+      "detail": "offline model blocks chat only; query and answers still work"
+    },
+    {
+      "id": "RECOVER-AND-SEND",
+      "status": "PASS",
+      "ms": 73,
+      "detail": "recovery allows the next message"
+    },
+    {
+      "id": "SSE-RECONNECT",
+      "status": "PASS",
+      "ms": 60,
+      "detail": "dropped event stream reconnects without losing the page"
+    },
+    {
+      "id": "CURSOR-EXPIRY-REFETCH",
+      "status": "PASS",
+      "ms": 285,
+      "detail": "expired cursor triggers a snapshot refetch and resumes live updates"
+    },
+    {
+      "id": "RELOAD-PERSISTENCE",
+      "status": "PASS",
+      "ms": 602,
+      "detail": "page refresh restores conversation and delivered work"
+    },
+    {
+      "id": "CREATE-WORK",
+      "status": "PASS",
+      "ms": 163,
+      "detail": "a user can create a work from the console and see its queued state"
+    },
+    {
+      "id": "KEYBOARD-SEND-AND-FOCUS",
+      "status": "PASS",
+      "ms": 25,
+      "detail": "Ctrl+Enter sends and keyboard focus stays visible"
+    },
+    {
+      "id": "NARROW-NO-HORIZONTAL-OVERFLOW",
+      "status": "PASS",
+      "ms": 26,
+      "detail": "narrow layout has no horizontal overflow"
+    },
+    {
+      "id": "NARROW-QUESTION-FORM",
+      "status": "PASS",
+      "ms": 64,
+      "detail": "question form is usable on a narrow viewport"
+    },
+    {
+      "id": "NO-CONSOLE-ERRORS",
+      "status": "PASS",
+      "ms": 0,
+      "detail": "no page or console errors"
+    }
+  ],
+  "failures": [],
+  "screenshots": [
+    "screenshots/desktop-main.png",
+    "screenshots/desktop-question.png",
+    "screenshots/desktop-work.png",
+    "screenshots/desktop-longtext.png",
+    "screenshots/desktop-offline-error.png",
+    "screenshots/desktop-after-reload.png",
+    "screenshots/desktop-new-work.png",
+    "screenshots/narrow-main.png",
+    "screenshots/narrow-question.png"
+  ],
+  "limitations": [
+    "Fixture-level acceptance only: no live product HTTP/SSE server was available.",
+    "Verification detail and per-target deliveries use fixture-only transport methods until the main transport publishes routes.",
+    "No native Driver was exercised; delivery statuses remain local_recorded and are never shown as native_applied."
+  ]
+}

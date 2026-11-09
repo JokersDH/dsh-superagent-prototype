@@ -1,5 +1,7 @@
 # Agent A：可信交付、产品持久化与工作台
 
+最新准入补充（2026-11-09）：主线已复验 `6c8dfc8/a517635`，接入 console，但通用 workspace 候选还有“暂存新增 + 未跟踪新增”漏文件、reserve 后已提交变更缺 patch 两项失败。复现和当前整包收尾见 [准入交接](../../docs/rfcs/WP-16/0005-candidate-admission-and-workbench.md)。将这些与动态配置/浏览器工作一并完成，不另开零散修复轮次，不改主线断言。
+
 本轮目标是交付一个完整子系统。工作目录 `/Users/hh/Desktop/joker/superagent-agent-a`，继续 `codex/g2-workspaces-verification`。先读 [整包排程](README.zh-CN.md)、[集成约定](../../docs/rfcs/WP-16/0001-wave-02-integration-boundaries.md) 和原 WP-02/04/11。当前候选基线 `fcf3273`，主线基线 `57fd8ed`；开始时保留改动并合并最新 main。当前临时根 lock 差异属于安装产物，不可顺手丢弃或提交。
 
 ## 范围与所有权

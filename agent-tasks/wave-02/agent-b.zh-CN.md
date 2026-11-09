@@ -1,5 +1,7 @@
 # Agent B：可恢复运行时、接入平台与首个 Driver
 
+最新准入补充（2026-11-09）：`96cbe4e` 的 222 项模块测试通过，但实际主线 client/AttemptRunner 联测新增六项失败，涉及 key 长度、真实 inventory/state、停止失败时的假空清单屏障、关闭 admission 后仍投递、错身份取消及打开后损坏 Journal 重放。证据、独立复现和整包收尾见 [准入交接](../../docs/rfcs/WP-16/0005-candidate-admission-and-workbench.md)。纳入当前运行时大包持续修复；不弱化主线协议/证明，不以独立存活或私有替代 client 代替实际主线兼容。
+
 工作目录 `/Users/hh/Desktop/joker/superagent-agent-b`，继续 `codex/g1-runtime`。读 [整包排程](README.zh-CN.md)、[集成约定](../../docs/rfcs/WP-16/0001-wave-02-integration-boundaries.md)、原 WP-03/06/07。候选基线 `74a3068`、主线基线 `57fd8ed`；先保留已有工作并合并最新 main。完成旧三项之后直接推进整个包。
 
 ## 范围与所有权

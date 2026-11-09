@@ -1,0 +1,70 @@
+{
+  "status": "PASS_CONSOLE_CONTROLLED_PRODUCT",
+  "mode": "controlled-product-http",
+  "base": "http://127.0.0.1:5174/",
+  "apiState": "/tmp/pa-product-demo",
+  "testedAt": "2026-11-09T01:37:38.617Z",
+  "cases": [
+    {
+      "id": "CONTROLLED-SESSION",
+      "status": "PASS",
+      "ms": 106,
+      "detail": "authenticated session against the controlled product API"
+    },
+    {
+      "id": "CREATE-QUESTION-WORK",
+      "status": "PASS",
+      "ms": 456,
+      "detail": "create_work with profile-fixture-question surfaces the native question"
+    },
+    {
+      "id": "ANSWER-AND-VERIFY",
+      "status": "PASS",
+      "ms": 1019,
+      "detail": "the structured answer triggers the registered check and a trusted PASS candidate"
+    },
+    {
+      "id": "ARTIFACT-READING",
+      "status": "PASS",
+      "ms": 135,
+      "detail": "browser reads the current-candidate delivery manifest and output through /v1/artifacts"
+    },
+    {
+      "id": "ACCEPT-DELIVERED",
+      "status": "PASS",
+      "ms": 214,
+      "detail": "current candidate acceptance delivers and keeps its artifacts"
+    },
+    {
+      "id": "RELOAD-PERSISTENCE",
+      "status": "PASS",
+      "ms": 669,
+      "detail": "session, delivered work and artifact references survive reload"
+    },
+    {
+      "id": "FAILING-PROFILE-BLOCKED",
+      "status": "PASS",
+      "ms": 1050,
+      "detail": "profile-fixture-fail produces a FAIL verification with no acceptance path"
+    },
+    {
+      "id": "NO-CONSOLE-ERRORS",
+      "status": "PASS",
+      "ms": 0,
+      "detail": "no console/page errors after login"
+    }
+  ],
+  "failures": [],
+  "screenshots": [
+    "screenshots/controlled-question.png",
+    "screenshots/controlled-verified.png",
+    "screenshots/controlled-delivered.png",
+    "screenshots/controlled-after-reload.png",
+    "screenshots/controlled-fail.png"
+  ],
+  "limitations": [
+    "Controlled fixture profiles only: no installed vendor/model compatibility is claimed.",
+    "The coordinator hosts the controlled subprocess; independent Runner reconnect and power-loss behavior remain separate lanes.",
+    "Only the fixed profile scratch operation is exercised (no arbitrary user code execution)."
+  ]
+}
