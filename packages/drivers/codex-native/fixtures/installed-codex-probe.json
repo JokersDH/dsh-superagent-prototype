@@ -1,0 +1,40 @@
+{
+  "status": "PROBE_OK",
+  "inspectedAt": "2026-11-09T02:17:03.182Z",
+  "executable": "/opt/homebrew/bin/codex",
+  "version": "codex-cli 0.164.0",
+  "hasAppServer": true,
+  "requestId": [
+    "string",
+    "integer"
+  ],
+  "protocolSchema": {
+    "files": 37,
+    "bytes": 1933218,
+    "digest": "ac2c4019cb6e39f870b7faa368c948ba6d83c1674cf4a8cc435fbb6d94c9e8a3"
+  },
+  "modelCalls": "NOT_TESTED",
+  "credentialsRead": false,
+  "nativeHomeModified": false,
+  "driverMethodsPresent": {
+    "initialize": true,
+    "thread/start": true,
+    "turn/start": true,
+    "turn/steer": true,
+    "turn/interrupt": true,
+    "turn/completed": true
+  },
+  "driverMethodsMissing": [],
+  "approvalSurface": {
+    "hasServerRequestResolved": true,
+    "hasAnswerMethod": false
+  },
+  "methodCount": 191,
+  "appServerCommands": [
+    "daemon",
+    "proxy",
+    "generate-ts",
+    "generate-json-schema",
+    "help"
+  ]
+}

@@ -218,11 +218,13 @@ let idSeq = 0
 export class CodexConnection {
   #state: SessionState = 'uninitialized'
   readonly #epoch = ++connectionSeq
+  /** Server-initiated requests this connection is still allowed to answer. */
+  readonly #serverRequests = new Map<string, LosslessId>()
   readonly #open = new Map<string, { method: string; resolve: (value: JsonValue) => void; reject: (error: Error) => void }>()
   readonly #decoder = new JsonLineDecoder({ maxFrameBytes: 16 * 1024 * 1024, maxBufferedBytes: 32 * 1024 * 1024 })
   readonly #send: (bytes: Uint8Array) => void
   readonly #requests: Array<{ method: string; params?: JsonValue }> = []
-  readonly #notifications: Array<{ method: string; params?: JsonValue }> = []
+  readonly #notifications: Array<{ method: string; params?: JsonValue; id?: JsonValue }> = []
 
   constructor(send: (bytes: Uint8Array) => void) {
     this.#send = send
@@ -246,7 +248,7 @@ export class CodexConnection {
     return this.#requests
   }
 
-  receivedNotifications(): ReadonlyArray<{ method: string; params?: JsonValue }> {
+  receivedNotifications(): ReadonlyArray<{ method: string; params?: JsonValue; id?: JsonValue }> {
     return this.#notifications
   }
 
@@ -278,6 +280,41 @@ export class CodexConnection {
     this.#send(encodeFrame({ jsonrpc: '2.0', method, ...(params === undefined ? {} : { params }) }))
   }
 
+  /**
+   * Record a server-initiated request (an approval or user-input prompt) this connection may answer.
+   *
+   * The request id is stored losslessly; a later `answer` can only succeed on the connection that
+   * received it, so a stale binding from an older connection is refused rather than replayed.
+   */
+  trackServerRequest(id: LosslessId): void {
+    this.#serverRequests.set(idKey(id), id)
+  }
+
+  /** Claim a tracked server request for an answer; throws when this connection never received it. */
+  claimServerRequest(nativeBindingRef: string): LosslessId {
+    const claimed = this.#serverRequests.get(`string:${nativeBindingRef}`) ?? this.#serverRequests.get(`integer:${nativeBindingRef}`)
+    if (!claimed) {
+      throw new CodexProtocolError('stale_server_request', 'No such server request on this connection; it is stale or belongs to another connection')
+    }
+    return claimed
+  }
+
+  /** Send the reply to a server request, then forget it (each request is answered at most once). */
+  replyToServerRequest(id: LosslessId, result: JsonValue): void {
+    if (this.#state === 'closed') throw new CodexProtocolError('connection_closed', 'Connection is closed')
+    const key = idKey(id)
+    if (!this.#serverRequests.has(key)) {
+      throw new CodexProtocolError('stale_server_request', `Server request ${key} was already answered or never received`)
+    }
+    this.#serverRequests.delete(key)
+    this.#send(encodeFrame({ jsonrpc: '2.0', id: idToWire(id) as never, result }))
+  }
+
+  /** Server requests still awaiting an answer on this connection. */
+  pendingServerRequests(): string[] {
+    return [...this.#serverRequests.keys()]
+  }
+
   /** Feed a chunk from the child; responses settle their requests, notifications are recorded. */
   receive(chunk: Uint8Array): void {
     for (const frame of this.#decoder.push(chunk)) {
@@ -291,7 +328,9 @@ export class CodexConnection {
         entry.reject(new CodexProtocolError('rpc_error', `${error.code}: ${error.message}`))
         continue
       }
-      if (message.id !== undefined && (message.result !== undefined || message.error === undefined)) {
+      // A server *request* also carries an `id`, but it is neither a result nor an error: it has a
+      // `method` and must be recorded as an incoming request, not treated as a reply.
+      if (message.id !== undefined && message.method === undefined && (message.result !== undefined || message.error === undefined)) {
         const id = losslessId(message.id)
         const entry = this.#open.get(idKey(id))
         if (!entry) continue
@@ -300,7 +339,12 @@ export class CodexConnection {
         continue
       }
       if (typeof message.method === 'string') {
-        this.#notifications.push({ method: message.method, ...(message.params === undefined ? {} : { params: message.params }) })
+        // A server-initiated request keeps its top-level id; a plain notification has none.
+        this.#notifications.push({
+          method: message.method,
+          ...(message.params === undefined ? {} : { params: message.params }),
+          ...(message.id === undefined ? {} : { id: message.id }),
+        })
       }
     }
   }

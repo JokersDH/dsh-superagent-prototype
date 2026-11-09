@@ -25,7 +25,24 @@ import type {
   ServeExit,
 } from '../../../contracts/src/types.ts'
 import { DriverError, attemptIdentity, criticalFact, factIdFor } from '../../../driver-kit/src/index.ts'
-import { CodexConnection, CodexProtocolError, type JsonValue } from './protocol.ts'
+import { CodexConnection, CodexProtocolError, losslessId, type JsonValue, type LosslessId } from './protocol.ts'
+
+/**
+ * Server-initiated methods observed in the installed protocol (codex-cli 0.164.0 schema export):
+ * command/file/patch/permission approvals and the experimental `request_user_input` prompt.
+ */
+function isServerRequest(method: string): boolean {
+  return SERVER_REQUEST_METHODS.some(name => method.includes(name)) || /requestApproval|requestUserInput/i.test(method)
+}
+
+const SERVER_REQUEST_METHODS = [
+  'CommandExecutionRequestApproval',
+  'FileChangeRequestApproval',
+  'PermissionsRequestApproval',
+  'ApplyPatchApproval',
+  'ToolRequestUserInput',
+  'ExecCommandApproval',
+]
 
 export * from './protocol.ts'
 
@@ -188,7 +205,7 @@ export class CodexNativeDriver implements AgentDriverV1 {
       }
       const next = pending[nextReadIndex]!
       nextReadIndex += 1
-      await handleNotification(next.method, next.params)
+      await handleNotification(next.method, next.params, next.id)
     }
 
     // Release the control channel: a pending command waiter would otherwise keep the process alive
@@ -200,7 +217,7 @@ export class CodexNativeDriver implements AgentDriverV1 {
     transport.close()
     return exit
 
-    async function handleNotification(method: string, params: JsonValue | undefined): Promise<void> {
+    async function handleNotification(method: string, params: JsonValue | undefined, frameId?: JsonValue): Promise<void> {
       const value = (params ?? {}) as Record<string, JsonValue>
       if (method === 'item/started' || method === 'item/updated' || method === 'item/completed') {
         const item = value.item as Record<string, JsonValue> | undefined
@@ -237,9 +254,15 @@ export class CodexNativeDriver implements AgentDriverV1 {
         }).catch(() => undefined)
         return
       }
-      if (method.endsWith('/requestApproval') || method === 'requestUserInput') {
-        // A native request is a question; it is never auto-answered.
-        await record('question.opened', codexQuestion(spec, method, value), String(value.requestId ?? 'request'))
+      if (isServerRequest(method)) {
+        // A native request is a question; it is never auto-answered. The request id is what an answer
+        // must name, and it is only answerable on this connection.
+        // The server request id lives on the frame, not inside params.
+        const rawId = (frameId ?? value.id ?? value.requestId) as unknown
+        const requestId = losslessId(rawId)
+        connection.trackServerRequest(requestId)
+        const bindingRef = requestId.kind === 'string' ? requestId.value : requestId.decimal
+        await record('question.opened', codexQuestion(spec, method, value, bindingRef, requestId), bindingRef)
         evidence.push('question-opened')
       }
     }
@@ -250,8 +273,8 @@ export class CodexNativeDriver implements AgentDriverV1 {
   }
 }
 
-function codexQuestion(spec: AttemptSpec, method: string, params: Record<string, JsonValue>) {
-  const requestId = String(params.requestId ?? 'request-1')
+function codexQuestion(spec: AttemptSpec, method: string, params: Record<string, JsonValue>, bindingRef: string, lossless: LosslessId) {
+  const requestId = bindingRef
   return {
     id: `q-${spec.attemptId}-${requestId}`.slice(0, 128),
     version: 1,
@@ -277,7 +300,9 @@ function codexQuestion(spec: AttemptSpec, method: string, params: Record<string,
         contract: spec.contract,
         id: `binding-${spec.attemptId}-${requestId}`.slice(0, 128),
         connectionEpoch: 1,
-        nativeRequestId: { kind: 'integer' as const, decimal: '1' },
+        // The native request id is preserved losslessly: a string stays a string, an integer stays
+        // an integer, so an answer can never be matched to the wrong request on type coercion alone.
+        nativeRequestId: lossless.kind === 'string' ? { kind: 'string' as const, value: lossless.value } : { kind: 'integer' as const, decimal: lossless.decimal },
         nativeMethod: method.slice(0, 256),
         provenanceRef: `native-${requestId}`.slice(0, 128),
       },
@@ -303,7 +328,17 @@ async function startTurn(connection: CodexConnection, threadId: string, inputRef
   return id
 }
 
+/**
+ * Reply to a server-initiated request (an approval or `request_user_input`).
+ *
+ * Verified against the *installed* protocol (codex-cli 0.164.0): the v2 surface has **no** `answer`
+ * method. A server request is resolved by answering the original JSON-RPC request id directly, which
+ * the app-server reports back as the `serverRequest/resolved` notification. The Driver therefore
+ * replies on the request object rather than inventing a client method name, and keeps the original
+ * id so a stale reply cannot land on a newer connection.
+ */
 async function answer(connection: CodexConnection, nativeBindingRef: string, answerRef: string): Promise<void> {
-  // The answer names the exact request it replies to; a stale binding is refused, never guessed.
-  await connection.request('answer', { requestId: nativeBindingRef, answer: answerRef })
+  // The binding names the exact server request id (lossless string or integer).
+  const requestId = connection.claimServerRequest(nativeBindingRef)
+  connection.replyToServerRequest(requestId, { decision: answerRef, ...(answerRef === 'approve' ? {} : {}) })
 }

@@ -91,7 +91,7 @@ test('a native approval request becomes a question with its exact options', asyn
   const { running, queue, ledger } = serveWith(server, 'question')
   queue.push({ id: 'c1', ticketId: 'ticket-1', assignmentId: 'assignment-1', attemptId: 'attempt-1', fenceEpoch: 1, contract: makeAttemptSpec().contract, kind: 'begin', inputRef: 'input-1', preparedPolicyRef: 'prepared-1' })
   await new Promise(resolve => setTimeout(resolve, 30))
-  server.emit({ jsonrpc: '2.0', method: 'execCommandApproval/requestApproval', params: { requestId: 'req-7', reason: 'run tests' } })
+  server.emit({ jsonrpc: '2.0', id: 7, method: 'ExecCommandApproval/requestApproval', params: { reason: 'run tests' } })
 
   const deadline = Date.now() + 3000
   while (!ledger.records.some(record => record.kind === 'question.opened') && Date.now() < deadline) {
@@ -163,9 +163,48 @@ test('the Driver never auto-answers a native request', async () => {
   const { running, queue } = serveWith(server, 'question')
   queue.push({ id: 'c1', ticketId: 'ticket-1', assignmentId: 'assignment-1', attemptId: 'attempt-1', fenceEpoch: 1, contract: makeAttemptSpec().contract, kind: 'begin', inputRef: 'input-1', preparedPolicyRef: 'prepared-1' })
   await new Promise(resolve => setTimeout(resolve, 30))
-  server.emit({ jsonrpc: '2.0', method: 'execCommandApproval/requestApproval', params: { requestId: 'req-9', reason: 'run' } })
+  server.emit({ jsonrpc: '2.0', id: 9, method: 'ExecCommandApproval/requestApproval', params: { reason: 'run' } })
   await new Promise(resolve => setTimeout(resolve, 100))
   assert.equal(server.received.some(message => message.method === 'answer'), false, 'no answer may be sent without a human decision')
   queue.push({ id: 'c2', ticketId: 'ticket-1', assignmentId: 'assignment-1', attemptId: 'attempt-1', fenceEpoch: 1, contract: makeAttemptSpec().contract, kind: 'cancel' })
+  await running
+})
+
+test('an answer for a request this connection never received is refused', async () => {
+  const server = fakeAppServer()
+  const { running, queue, ledger } = serveWith(server, 'question')
+  queue.push({ id: 'c1', ticketId: 'ticket-1', assignmentId: 'assignment-1', attemptId: 'attempt-1', fenceEpoch: 1, contract: makeAttemptSpec().contract, kind: 'begin', inputRef: 'input-1', preparedPolicyRef: 'prepared-1' })
+  await new Promise(resolve => setTimeout(resolve, 30))
+  // No approval was ever emitted on this connection.
+  queue.push({ id: 'c2', ticketId: 'ticket-1', assignmentId: 'assignment-1', attemptId: 'attempt-1', fenceEpoch: 1, contract: makeAttemptSpec().contract, kind: 'answer', nativeBindingRef: 'never-received', answerRef: 'approve' })
+  const deadline = Date.now() + 3000
+  while (!ledger.records.some(record => record.kind === 'runtime.error') && Date.now() < deadline) {
+    await new Promise(resolve => setTimeout(resolve, 10))
+  }
+  const stale = ledger.records.find(record => record.kind === 'runtime.error')
+  assert.ok(stale, 'a stale answer must produce a protocol error, not a silent send')
+  // The protocol error ends the attempt; no reply frame may have been sent for that request.
+  const exit = await running
+  assert.ok(['error', 'cancelled', 'terminal'].includes(exit.reason), exit.reason)
+  assert.equal(server.received.some(message => message.result !== undefined), false, 'no reply frame may be sent for a stale request')
+})
+
+test('an approval is answered on its own request id and only once', async () => {
+  const server = fakeAppServer()
+  const { running, queue, ledger } = serveWith(server, 'question')
+  queue.push({ id: 'c1', ticketId: 'ticket-1', assignmentId: 'assignment-1', attemptId: 'attempt-1', fenceEpoch: 1, contract: makeAttemptSpec().contract, kind: 'begin', inputRef: 'input-1', preparedPolicyRef: 'prepared-1' })
+  await new Promise(resolve => setTimeout(resolve, 30))
+  server.emit({ jsonrpc: '2.0', id: 42, method: 'ExecCommandApproval/requestApproval', params: { reason: 'run' } })
+  const deadline = Date.now() + 3000
+  while (!ledger.records.some(record => record.kind === 'question.opened') && Date.now() < deadline) {
+    await new Promise(resolve => setTimeout(resolve, 10))
+  }
+  queue.push({ id: 'c2', ticketId: 'ticket-1', assignmentId: 'assignment-1', attemptId: 'attempt-1', fenceEpoch: 1, contract: makeAttemptSpec().contract, kind: 'answer', nativeBindingRef: '42', answerRef: 'approve' })
+  await new Promise(resolve => setTimeout(resolve, 60))
+  // The reply is a response frame carrying the original id, not a made-up client method.
+  const reply = server.received.find(message => message.id === 42 && message.result !== undefined)
+  assert.ok(reply, `expected a reply on request id 42, got ${JSON.stringify(server.received.map(m => m.method ?? m.id))}`)
+  assert.equal(server.received.some(message => message.method === 'answer'), false, 'the installed protocol has no answer method')
+  queue.push({ id: 'c3', ticketId: 'ticket-1', assignmentId: 'assignment-1', attemptId: 'attempt-1', fenceEpoch: 1, contract: makeAttemptSpec().contract, kind: 'cancel' })
   await running
 })
