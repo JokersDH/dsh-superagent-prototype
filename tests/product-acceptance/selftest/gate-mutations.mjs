@@ -60,6 +60,16 @@ const evidenceFor = (key) => {
       return { id: 'fixture', path: '/dev/null', sha256: DIGEST }
     case 'verificationRecovery':
       return { blockedId: 'blocked-1', retried: true, accepted: true }
+    case 'reviewTiming':
+      return {
+        candidateReadyAt: '2026-11-10T00:00:00.000Z',
+        acceptedAt: '2026-11-10T00:00:01.000Z',
+        readyToAcceptanceMs: 1000,
+        activeReviewMs: 500,
+        activeReviewSource: 'ui_visibility_proxy',
+        activeReviewCompleteness: 'partial',
+        acceptedEvents: 1,
+      }
     case 'attention':
       return {
         projects: 2,
