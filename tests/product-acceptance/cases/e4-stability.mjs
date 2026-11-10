@@ -282,7 +282,19 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
             const newAttempts = finalRuntime.attempts.length - baselineRuntime.attempts.length
             const newBegins = finalRuntime.begins - baselineRuntime.begins
             assert('ATTEMPTS_MATCH_CYCLES', newAttempts === withAttempt, `${newAttempts} attempts for ${withAttempt} started works`)
-            assert('BEGINS_MATCH_ATTEMPTS', newBegins === newAttempts, `${newBegins} begin ACKs for ${newAttempts} attempts`)
+            // A work stopped before begin may register a binding without a begin ACK; completed
+            // cycles must each have one, and no attempt may receive more than one begin.
+            const completedAttempts = observations.filter((item) => item.mode !== 'slow' && item.hadAttempt).length
+            assert(
+              'BEGINS_AT_LEAST_COMPLETED',
+              newBegins >= completedAttempts,
+              `${newBegins} begin ACKs for ${completedAttempts} completed attempts`,
+            )
+            assert(
+              'BEGINS_NOT_MORE_THAN_ATTEMPTS',
+              newBegins <= newAttempts,
+              `${newBegins} begin ACKs for ${newAttempts} attempts`,
+            )
             // dispatch.observed also covers deliver/answer/cancel, so it must be at least one per
             // attempt; equality with attempts would be an incorrect assumption.
             assert(
