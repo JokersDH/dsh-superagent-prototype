@@ -1,0 +1,28 @@
+{
+  "status": "PASS_ACCEPTANCE_GUARDS_ONLY",
+  "checkedAt": "2026-11-10T02:07:43.101Z",
+  "candidateCommit": "2d71382f57dc6dc133b308cbb3b9450a61fc8352",
+  "reviewerCommit": "f2ca26cf2390d3af9cb38a0e653dc641ee7c37af",
+  "sourceArchiveSha256": "43f138759f70b381d3bba6af618bc9ddb4a4aadde50bcf743ba3cb5b81a67bb4",
+  "cases": [
+    {
+      "id": "NATIVE-NO-CANDIDATE-MUST-NOT-PASS",
+      "passesInvariant": true,
+      "observed": {
+        "nativeLinkStatus": "FAIL",
+        "realCandidatePresent": false,
+        "returnedModelTasks": 1
+      }
+    },
+    {
+      "id": "CONTINUE-COMMAND-MUST-SATISFY-SHARED-SCHEMA",
+      "passesInvariant": true,
+      "observed": {
+        "sent": false,
+        "schemaValid": null
+      }
+    }
+  ],
+  "modelCalls": 0,
+  "scope": "Immutable candidate archive, valid shared configuration and an in-memory fake client only; no HTTP/native/model/project operation"
+}

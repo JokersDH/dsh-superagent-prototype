@@ -1,5 +1,7 @@
 # Agent B：执行真实原生验收与故障矩阵
 
+**主线消费更新：** 最新 main 的实施 `76ca85e` 已发布单包环境准备与 `GET /v1/works/:id/environment`，网页导入支持 `environment: {policy:'offline_install',storeDir}`。你的 `2d71382` 两项工具准入已复验通过；现在可继续 B-R4 的独立产品/浏览器正反例，不再以环境未接入阻断。使用自己的临时实例/项目，保留已用三个模型任务的记录，仅在已核对剩余额度内执行；主线已另用完自己的两个任务。参考 [0012](../../docs/rfcs/WP-16/0012-environment-product-integration.md)，真实 active native 停止/问题仍不因 happy path 通过而升级。
+
 **当前优先级（2026-11-10）：按 [收尾批次 B-R1–B-R4](release-closure.zh-CN.md) 连续执行。** 先消除工具误报、补真实交付/停止/重启及无模型浏览器/执行矩阵，再交精确发布范围；不以旧 final 文件或配置断言结束整包，不重置已用模型额度。
 
 工作目录 `/Users/hh/Desktop/joker/superagent-agent-b`，继续 `codex/g1-runtime`。保留所有修改，fetch 并合并最新 origin/main，读取 AGENTS.md、本轮 README、原验收任务和本文件。真实 MVP 已在 `1f3229f` 发布；旧分支/README 的“native 接口尚未公布”不再适用。合并时保留 main 已验收的 Runner/Driver/workspaces，不重新提交旧实现。

@@ -37,6 +37,8 @@ ready 不是文件名或 workspace marker 的结论。主线验证计划、完�
 
 本批受控回归不依赖模型。真实 native lane 使用显式命令，模型预算本扩展轮总计最多两个；各运行报告分别记录实际开始数、是否复用候选和源码身份。最终冷启动复验如已执行，以 `browser/report.json` 为准，不把恢复拼接结果称为一次全新任务通过。
 
+最终冷启动复验已完成：干净实施提交 `76ca85e` 上新建真实 Codex 任务，六项浏览器/产品场景全通过，没有 resume；`sourceWorktreeClean=true`。本批主线共两个模型任务，首次任务恢复没有追加 begin，第二任务从头成功。最终汇总见 [integration.json](../../../reports/releases/environment-mvp/integration.json)；434 项受控工作台、132 项 Runner 和原生六项是不同范围，不能相加当作全 native 认证。最终一轮未额外截图，目录里的桌面/窄屏图来自已复用候选的验收。
+
 ## 运行与下一消费者
 
 ```sh

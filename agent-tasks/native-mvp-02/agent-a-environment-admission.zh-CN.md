@@ -1,5 +1,7 @@
 # Agent A：环境准备准入与完整交付
 
+**主线消费更新：** `c005820` 已按包集成到 `76ca85e`，八项准入和 37 项包测试独立通过，单包真实产品闭环也已验证。后续合并最新 main，按 A-R4 做接口兼容和范围交接；无需重做或覆盖主线产品接线，旧失败段落仅追溯历史。详见 [0012](../../docs/rfcs/WP-16/0012-environment-product-integration.md)。
+
 **当前优先级（2026-11-10）：按 [收尾批次 A-R1–A-R4](release-closure.zh-CN.md) 连续执行。** 先关闭三项新失败、交可消费检查点，再完成单包恢复/消费/集成回归；已有 workspace 增量保留，暂缓扩大支持形态。以下仍为细节参考。
 
 工作目录 `/Users/hh/Desktop/joker/superagent-agent-a`，继续 `codex/g2-workspaces-verification`。保留所有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、本轮 README、原环境任务及本文件。当前主线已包含旧 workspace/console 功能及其准入修复；合并冲突保留已验收的 main 实现与旧提交历史，不重复改产品路径。

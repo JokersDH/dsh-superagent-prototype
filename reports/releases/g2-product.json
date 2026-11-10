@@ -1,22 +1,22 @@
 {
   "status": "PASS_CONTROLLED_PRODUCT_API_SLICE",
-  "sourceCommit": "04871fbd0a88aec88b0630c58d6c7585aff1b3f0",
+  "sourceCommit": "f2ca26cf2390d3af9cb38a0e653dc641ee7c37af",
   "sourceWorktreeClean": false,
-  "checkedAt": "2026-11-09T11:28:29.032Z",
+  "checkedAt": "2026-11-10T02:21:37.768Z",
   "node": "v24.22.2",
   "platform": "darwin",
   "architecture": "arm64",
-  "tests": 363,
+  "tests": 410,
   "results": [
     {
       "command": "pnpm check:contracts",
       "status": "PASS",
-      "tests": 188
+      "tests": 190
     },
     {
       "command": "pnpm check:g2-application",
       "status": "PASS",
-      "tests": 96
+      "tests": 98
     },
     {
       "command": "pnpm --filter @personal-agent/workspaces --filter @personal-agent/verification -r build",
@@ -33,7 +33,7 @@
     {
       "command": "pnpm --filter @personal-agent/workspaces --filter @personal-agent/verification -r test",
       "status": "PASS",
-      "tests": 40
+      "tests": 42
     },
     {
       "command": "pnpm --filter @personal-agent/coordinator test:product",
@@ -53,18 +53,37 @@
     {
       "command": "pnpm --filter @personal-agent/coordinator test:projects",
       "status": "PASS",
+      "tests": 4
+    },
+    {
+      "command": "pnpm --filter @personal-agent/environment-preparation typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/environment-preparation test",
+      "status": "PASS",
+      "tests": 37
+    },
+    {
+      "command": "pnpm --filter @personal-agent/environment-preparation build",
+      "status": "PASS"
+    },
+    {
+      "command": "pnpm --filter @personal-agent/coordinator test:environment",
+      "status": "PASS",
       "tests": 3
     }
   ],
   "scopes": {
-    "contracts": 188,
-    "applicationAndRecovery": 96,
-    "workspaces": 18,
-    "verification": 22,
+    "contracts": 190,
+    "applicationAndRecovery": 98,
+    "workspaces": 19,
+    "verification": 23,
     "actualControlledProduct": 14,
     "configuration": 5,
     "assistantDialogue": 17,
-    "projectRegistration": 3
+    "projectRegistration": 4,
+    "environmentPreparation": "Authoritative package checks and independent Runner composition; see command results"
   },
   "implementation": "SQLite application + real scratch subprocess + native questions + trusted resource barrier + verification + candidate acceptance + durable model dialogue with local mock SDK endpoint",
   "limitations": [

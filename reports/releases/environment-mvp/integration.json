@@ -1,0 +1,42 @@
+{
+  "status": "PASS_LOCAL_SINGLE_PACKAGE_ENVIRONMENT_PREVIEW",
+  "recordedAt": "2026-11-10T02:26:58.550Z",
+  "implementationCommit": "76ca85eb59d40c55faa418bdd02ec5ca71b23dc7",
+  "integrationBase": "f2ca26cf2390d3af9cb38a0e653dc641ee7c37af",
+  "agentACandidate": "c0058207aeb2fb7baf7a7738448e3fdbae19429e",
+  "agentBGuardCandidate": "2d71382f57dc6dc133b308cbb3b9450a61fc8352",
+  "platform": "darwin/arm64",
+  "nativeVersion": "codex-cli 0.164.0",
+  "nodeVersionsObserved": ["24.21.0", "24.22.2"],
+  "packageManager": "pnpm@11.7.0",
+  "preview": {
+    "consoleURL": "http://127.0.0.1:5181",
+    "apiURL": "http://127.0.0.1:8797",
+    "state": ".local-state/environment-preview",
+    "existingUserInstancePreserved": true
+  },
+  "results": [
+    { "command": "pnpm check:g2-workbench", "status": "PASS", "tests": 434, "scope": "Controlled workbench, contracts, recovery, project settings, authoritative environment package and independent Runner composition; report recorded while implementation was based on f2ca26c before commit", "evidence": "../g2-workbench.json" },
+    { "command": "pnpm --filter @personal-agent/runner test", "status": "PASS", "tests": 132, "scope": "Real owned subprocesses, independent bridge/recovery, command bounds and preparation admission; fake/native-protocol fixtures, zero vendor tasks" },
+    { "command": "review-environment-preparation.mjs --candidate c005820", "status": "PASS", "cases": 8, "scope": "Immutable package source archive and private offline fixtures", "evidence": "../native-followup/environment-closure-review.json" },
+    { "command": "review-native-acceptance.mjs --candidate 2d71382", "status": "PASS", "cases": 2, "scope": "Acceptance guard checks only; no full B package admission", "evidence": "../native-followup/acceptance-closure-review.json" },
+    { "command": "node tests/integration/native-workbench.mjs --execute --environment --no-screenshots", "status": "PASS", "cases": 6, "scope": "One fresh real Codex task on clean implementation commit 76ca85e; full single-package offline dependency UI delivery and reopen", "evidence": "browser/report.json" },
+    { "command": "pnpm doctor --state .local-state/environment-preview --json", "status": "PASS_WITH_SCOPED_LIMITS", "scope": "Read-only owned launcher/listener/API verification; fresh preview has no user work yet" }
+  ],
+  "mainModelBudget": {
+    "limit": 2,
+    "used": 2,
+    "runs": [
+      { "evidence": "browser/first-run-report.json", "nativeTasks": 1, "status": "FAIL_FROZEN_PATCH_IGNORED_PATHSPEC", "note": "Real code and environment completed; verification intent retained. Fixed literal business path staging and added a real Git regression." },
+      { "evidence": "browser/resumed-candidate-report.json", "nativeTasks": 0, "status": "PASS_REUSED_EXISTING_CANDIDATE", "note": "Same work/attempt resumed; no native begin replay. Desktop/mobile screenshots belong to this task." },
+      { "evidence": "browser/report.json", "nativeTasks": 1, "status": "PASS_FRESH_CLEAN_COMMIT", "note": "Six cases passed from a new project on the committed implementation without resume; no additional visual polishing round." }
+    ]
+  },
+  "limitations": [
+    "Single local macOS arm64 Codex 0.164.0 executor, ordinary pnpm single-package offline cache scope only",
+    "No npm offline installation, arbitrary monorepo product admission, second harness or cross-platform certification",
+    "Controlled command/installer cancellation is proven; real active native writer stop and native question/approval branches remain separately unproven",
+    "No complete crash matrix, power-loss test, adversarial escaped-process proof, long soak or full G2 claim",
+    "Some deterministic verification errors retain their original intent and retry without a unified user recovery action"
+  ]
+}
