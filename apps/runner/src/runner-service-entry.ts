@@ -17,6 +17,7 @@ import { CodexProductDriver } from '../../../packages/drivers/codex-native/src/n
 import { createFakeAppServer } from '../../../packages/drivers/codex-native/src/fake-app-server.ts'
 import { ProcessHost } from './process-host.ts'
 import { encodeFrame } from '../../../packages/driver-kit/src/index.ts'
+import { prepareRunnerEnvironment } from './environment-preparation.ts'
 
 const scenario = process.argv[2] ?? 'happy'
 let detached = false
@@ -30,6 +31,9 @@ const handle = await serveRunner({
     if (!detached) process.stdout.write(encodeFrame(frame))
   },
   eagerPrepare: scenario === 'codex-native',
+  ...(scenario === 'codex-native' && process.env.PA_RUNNER_ENVIRONMENT_PLAN
+    ? { prepare: (spec, context) => prepareRunnerEnvironment(process.env.PA_RUNNER_ENVIRONMENT_PLAN!, spec, context) }
+    : {}),
   ...(process.env.PA_RUNNER_RECOVERY_ROOT ? { recoveryRoot: process.env.PA_RUNNER_RECOVERY_ROOT } : {}),
   createDriver: (_spec, hooks) =>
     scenario === 'codex-native' ? new CodexProductDriver({ beforeAnswerWrite: hooks.beforeNativeWrite }) : scenario.startsWith('codex-fake')

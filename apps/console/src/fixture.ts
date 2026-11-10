@@ -307,7 +307,7 @@ export class FixtureAdapter implements ConsoleTransport {
     const limit = query.limit ?? 50
     const snapshot = SnapshotSchema.parse({
       cursor: this.state.cursor,
-      works,
+      works: works.map(work => ({ ...work, openQuestionIds: open.filter(question => question.contract.workId === work.work.id).map(question => question.id) })),
       questions: open,
       conversation: query.conversationId
         ? pageOf(this.state.messages, query.conversationId, query.beforeMessageCursor, limit)

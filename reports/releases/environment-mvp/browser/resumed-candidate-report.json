@@ -1,0 +1,46 @@
+{
+  "status": "PASS_REAL_NATIVE_WORKBENCH",
+  "sourceCommit": "f2ca26cf2390d3af9cb38a0e653dc641ee7c37af",
+  "checkedAt": "2026-11-10T02:14:07.822Z",
+  "nativeVersion": "codex-cli 0.164.0",
+  "environmentLane": true,
+  "environmentStore": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/environment-pnpm-4p77V2/store",
+  "root": "/tmp/pa-native-browser-I3CeeR",
+  "workId": "f59d05e94ab37cb73fef3088e0fb11c2",
+  "conversationId": "native-browser-000d50f7-2968-4f20-bfbb-9e1ea5a36729",
+  "attemptId": "attempt-73becad3-5053-422d-83cf-8df0aa4f36b5",
+  "cases": [
+    {
+      "id": "IMPORT-REAL-PROJECT-THROUGH-UI",
+      "status": "PASS"
+    },
+    {
+      "id": "EXPLICIT-CHAT-DELEGATION-CONFIRMATION",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL-CODEX-CODE-AND-REGISTERED-VERIFICATION",
+      "status": "PASS"
+    },
+    {
+      "id": "LOCATION-AND-COMPLETE-PATCH-EXPORT",
+      "status": "PASS"
+    },
+    {
+      "id": "ACCEPT-CURRENT-NATIVE-CANDIDATE",
+      "status": "PASS"
+    },
+    {
+      "id": "RESTART-PRESERVES-PROJECT-DELIVERY-WITHOUT-BEGIN",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "nativeTasksStartedThisRun": 0,
+  "resumedExistingVerifiedCandidate": true,
+  "nativeSourceCommit": "f2ca26cf2390d3af9cb38a0e653dc641ee7c37af",
+  "limitations": [
+    "One real Codex task; no auto-answer of native questions in this happy-path lane",
+    "Single-package pnpm offline fixture with local tarball; no online install or package lifecycle scripts"
+  ]
+}

@@ -175,6 +175,9 @@ importers:
       '@personal-agent/effects':
         specifier: workspace:*
         version: link:../../packages/effects
+      '@personal-agent/environment-preparation':
+        specifier: workspace:*
+        version: link:../../packages/environment-preparation
       '@personal-agent/orchestrator-core':
         specifier: workspace:*
         version: link:../../packages/orchestrator-core
@@ -218,9 +221,15 @@ importers:
       '@personal-agent/drivers-codex-native':
         specifier: workspace:*
         version: link:../../packages/drivers/codex-native
+      '@personal-agent/environment-preparation':
+        specifier: workspace:*
+        version: link:../../packages/environment-preparation
       '@personal-agent/execution':
         specifier: workspace:*
         version: link:../../packages/execution
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
 
   packages/application:
     dependencies:
@@ -298,6 +307,25 @@ importers:
       '@types/node':
         specifier: 24.10.0
         version: 24.10.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+
+  packages/environment-preparation:
+    dependencies:
+      semver:
+        specifier: ^7.8.5
+        version: 7.8.5
+      yaml:
+        specifier: ^2.9.1
+        version: 2.9.1
+    devDependencies:
+      '@types/node':
+        specifier: 24.10.0
+        version: 24.10.0
+      '@types/semver':
+        specifier: ^7.8.0
+        version: 7.8.0
       typescript:
         specifier: 6.0.3
         version: 6.0.3
@@ -1287,6 +1315,9 @@ packages:
 
   '@types/retry@0.12.5':
     resolution: {integrity: sha512-3xSjTp3v03X/lSQLkczaN9UIEwJMoMCA1+Nb5HfbJEQWogdeQIyVtTvxPXDQjZ5zws8rFQfVfRdz03ARihPJgw==}
+
+  '@types/semver@7.8.0':
+    resolution: {integrity: sha512-1mAINjtQCXXeLkJ9ehXkwOcBpqtLxiVtKhpUf83DdRNdQKV0iXZpaHYqRr7nj+wvxuJzoAmAwXI+sCNMv1CzLQ==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -3366,6 +3397,8 @@ snapshots:
       csstype: 3.2.3
 
   '@types/retry@0.12.5': {}
+
+  '@types/semver@7.8.0': {}
 
   '@types/tough-cookie@4.0.5': {}
 

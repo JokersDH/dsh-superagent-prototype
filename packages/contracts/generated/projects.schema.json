@@ -17,6 +17,42 @@
           "minLength": 1,
           "type": "string"
         },
+        "environment": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "policy": {
+                  "const": "existing_only",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "policy"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "policy": {
+                  "const": "offline_install",
+                  "type": "string"
+                },
+                "storeDir": {
+                  "maxLength": 4096,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "policy",
+                "storeDir"
+              ],
+              "type": "object"
+            }
+          ]
+        },
         "path": {
           "maxLength": 4096,
           "minLength": 1,
@@ -26,6 +62,52 @@
       "required": [
         "path",
         "check"
+      ],
+      "type": "object"
+    },
+    "WorkEnvironment": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "pattern": "^[a-z_]{1,100}$",
+          "type": "string"
+        },
+        "fingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "policy": {
+          "enum": [
+            "existing_only",
+            "offline_install"
+          ],
+          "type": "string"
+        },
+        "protocol": {
+          "const": "work-environment/1",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "not_configured",
+            "waiting",
+            "preparing",
+            "ready",
+            "blocked"
+          ],
+          "type": "string"
+        },
+        "workId": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "workId",
+        "status"
       ],
       "type": "object"
     },

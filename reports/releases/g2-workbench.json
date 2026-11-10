@@ -1,14 +1,14 @@
 {
   "status": "PASS_CONTROLLED_WORKBENCH_MODULES",
-  "sourceCommit": "04871fbd0a88aec88b0630c58d6c7585aff1b3f0",
-  "checkedAt": "2026-11-09T11:28:33.716Z",
+  "sourceCommit": "f2ca26cf2390d3af9cb38a0e653dc641ee7c37af",
+  "checkedAt": "2026-11-10T02:21:42.828Z",
   "node": "v24.22.2",
-  "tests": 387,
+  "tests": 434,
   "results": [
     {
       "command": "pnpm check:g2-product",
       "status": "PASS",
-      "tests": 363
+      "tests": 410
     },
     {
       "command": "pnpm --filter @personal-agent/console typecheck",

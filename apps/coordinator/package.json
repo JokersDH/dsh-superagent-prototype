@@ -22,6 +22,7 @@
     "test:product": "node --test ../../tests/integration/product-execution.case.mjs",
     "test:configuration": "node --test ../../tests/integration/application-configuration.case.mjs",
     "test:projects": "node --test ../../tests/integration/project-registration.case.mjs",
+    "test:environment": "node --test ../../tests/integration/environment-product.case.mjs",
     "test:assistant": "node --test ../../tests/integration/assistant-replies.case.mjs ../../tests/integration/model-provider.case.mjs",
     "dev:product": "node product/demo.ts"
   },
@@ -30,6 +31,7 @@
     "@personal-agent/application": "workspace:*",
     "@personal-agent/contracts": "workspace:*",
     "@personal-agent/effects": "workspace:*",
+    "@personal-agent/environment-preparation": "workspace:*",
     "@personal-agent/orchestrator-core": "workspace:*",
     "@personal-agent/questions": "workspace:*",
     "@personal-agent/storage": "workspace:*",

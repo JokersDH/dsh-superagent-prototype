@@ -2,7 +2,15 @@
 
 当前已接通本机 Codex：从网页确认开发委托，执行器在独立 Git worktree 实现代码，运行注册的检查，再由你审阅当前 patch 并接受交付。主对话用于讨论需求；真正执行以明确确认的委托为准。
 
-当前原生范围为本机 macOS arm64、Codex 0.164.0，先支持普通 Node 项目的闭环。它不是三个执行器全部可用或完整 G2 稳定版本的声明。
+当前原生范围为本机 macOS arm64、Codex 0.164.0，支持无依赖 Node 项目及使用授权离线缓存的普通单包 pnpm 项目。它不是三个执行器全部可用或完整 G2 稳定版本的声明。
+
+## 新版工作台
+
+新版使用主对话、工作与交付、待我决定、执行器连接四个视图。左侧保留项目筛选和当前对话的工作；选择工作后，阶段条显示工作名称、执行阶段和待决定数量，右侧查看目标、问题、检查和产物。切换视图保留尚未发送的对话草稿。
+
+工作目录的搜索/状态筛选作用于当前对话，尚不代表服务端全部历史会话已可搜索。原生执行器与固定流程测试分别呈现；目录中的“已准入”也不表示所有原生操作和平台都已认证。手机端使用底部导航和互斥的项目/详情抽屉。
+
+会话目录、项目设置版本化、助理读上下文与提案、明确决定、可操作恢复和本机发行正在按 [第三轮任务](../../agent-tasks/product-wave-03/README.zh-CN.md) 分包实施；当前界面不会把这些待办显示成已完成能力。
 
 ## 第一次使用
 
@@ -37,7 +45,9 @@
 
 导入时可选择 `node --test`、`pnpm test` 或 `npm test`，它们注册为服务端检查；模型不能把回复中的任意命令变成验收命令。机器检查失败不能被人工接受绕过。
 
-当前先完成不依赖外部安装的 Node 闭环。有依赖的项目需要其隔离工作区具备可用依赖；当前不自动联网安装、升级包管理器或运行安装脚本。依赖准备不足会导致检查不能通过，环境准备模块由独立任务继续扩展。
+普通单包 pnpm 项目可以在导入时选择“从授权缓存离线准备”，填写项目之外已预热的 pnpm store 根目录，并选择 `pnpm test`。该目录应是预热时 `--store-dir` 指定的根目录，不能指向原项目的 node_modules。准备由独立 Runner 执行，先核对 Node/包管理器、锁文件和依赖，再开始 Codex 工作；不联网、不升级包管理器、不执行安装生命周期脚本或项目安装钩子。项目中不支持的安装配置会明确阻断。
+
+“仅验证已有依赖”检查的是本次隔离工作区，不能借用或链接原项目的 node_modules；新工作区缺依赖时会受阻。“不准备依赖”保留原有 Node 流程。工作详情显示依赖环境的等待、准备、复验或阻断状态。依赖、package.json、lockfile 或归属变化后，旧环境凭证不能用于验证和接受。环境目录不会进入业务 patch。npm 离线安装和任意 monorepo 尚未准入。
 
 “暂停派工”用于尚未开始的工作；“停止”要求确认实际 owned 资源停止。仅收到 native ACK 或进程退出不足以释放屏障，未知状态会继续阻止新写入。修订、继续和重试仅在当前版本允许时提供。
 
@@ -62,6 +72,14 @@ pnpm restart    # 后端改动后重启
 pnpm doctor     # 只读核对服务、项目、执行器和恢复阻断
 ```
 
+2026-11-10 的带依赖预览实例使用 `http://127.0.0.1:5181/` 与独立状态目录，原 5180 实例继续保留。可使用以下入口复用、诊断或停止新版实例：
+
+```sh
+pnpm start --port 5181 --api-port 8797 --state .local-state/environment-preview
+pnpm doctor --state .local-state/environment-preview
+pnpm stop --state .local-state/environment-preview
+```
+
 `stop.command` 可用于停止。需要只验证固定流程时，可用另一个端口/私有 state：
 
 ```sh
@@ -72,4 +90,4 @@ pnpm dev:workbench --fixture --port 5181 --api-port 8797 --state /tmp/pa-fixture
 
 需要保存可分享的诊断摘要时，使用 `pnpm doctor --json --output /tmp/pa-diagnosis.json`；输出文件必须尚不存在，权限为 600，不包含 key、会话原文或数据库。诊断其它私有实例时增加 `--state /tmp/pa-fixture-workbench`。任一阻断会使诊断命令以非零退出。
 
-固定 profile 只执行 scratch 流程。真实 MVP 的检查与证据见 `reports/releases/native-mvp/`；`pnpm check:native-product`、`pnpm check:native-browser` 会执行真实模型任务，属于显式原生验收，日常自动回归使用本地 fixture。
+固定 profile 只执行 scratch 流程。真实 MVP 的检查与证据见 `reports/releases/native-mvp/` 和 `reports/releases/environment-mvp/`；`pnpm check:native-product`、`pnpm check:native-browser`、`pnpm check:environment-native` 会执行真实模型任务，属于显式原生验收，日常自动回归使用本地 fixture。

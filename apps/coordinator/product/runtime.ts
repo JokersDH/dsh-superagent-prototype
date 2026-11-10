@@ -18,6 +18,7 @@ import { ModelProviderError } from './model-provider.ts'
 import { AssistantStreams } from './assistant-streams.ts'
 import type { NativeProductConfiguration } from './native-config.ts'
 import type { NativeProjectRegistry } from './project-registry.ts'
+import { ProductEnvironments } from './environments.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -56,7 +57,8 @@ export function createProductRuntime(
     projects: configuredProjects,
     ...(options.native ? { native: { ...options.native, projects: nativeProjects } } : {}),
   }
-  const workspaces = new WorkspaceManager(options.workspaceRoot ?? join(options.stateRoot, 'workspaces'))
+  const environments = new ProductEnvironments(options.store, options.stateRoot)
+  const workspaces = new WorkspaceManager(options.workspaceRoot ?? join(options.stateRoot, 'workspaces'), { environment: environments })
   const checks = new CheckRegistry()
   checks.register({
     id: FIXTURE_CHECK,
@@ -71,7 +73,12 @@ export function createProductRuntime(
     outputLimitBytes: 64 * 1024,
   })
   for (const project of options.native?.projects ?? []) checks.register(project.check)
-  const completion = new ProductCompletion(options.store, workspaces, checks)
+  const completion = new ProductCompletion(options.store, workspaces, checks, {
+    environment: attemptId => {
+      const binding = options.store.bindings.binding(attemptId)
+      return binding ? environments.checkEnvironment(binding) : undefined
+    },
+  })
   let execution: ProductExecution | undefined
   const application = createProductApplication({
     ...options,
@@ -82,7 +89,8 @@ export function createProductRuntime(
     projectPreflight: async (projectId) => {
       const record = options.projectRegistry?.list().find((project) => project.id === projectId)
       if (record)
-        options.projectRegistry!.prepare({ path: record.path, displayName: record.displayName, check: record.check })
+        options.projectRegistry!.prepare({ path: record.path, displayName: record.displayName, check: record.check,
+          ...(record.environment ? { environment: record.environment } : {}) })
     },
     nativeFence: (target: NativeQuestionBinding) => execution?.nativeFence(target) ?? 'unknown',
   })
@@ -95,6 +103,7 @@ export function createProductRuntime(
     options.stateRoot,
     options.principal,
     options.native,
+    environments,
   )
   const { store } = options
   const assistantStreams = new AssistantStreams()
@@ -119,7 +128,8 @@ export function createProductRuntime(
               checks.register(check)
               application.registerProject(project, [check.id])
               configuredProjects.unshift(project)
-              nativeProjects.unshift({ id: record.id, path: record.path, check })
+              nativeProjects.unshift({ id: record.id, path: record.path, check,
+                ...(record.environment ? { environment: options.projectRegistry!.environment(record)! } : {}) })
             }
             return await read.configuration!()
           },
@@ -141,6 +151,17 @@ export function createProductRuntime(
       } catch {
         return { projectPath, workspacePath: null, baseCommit: null }
       }
+    },
+    workEnvironment: async (workId) => {
+      const view = (await application.inspect({ workId })).works[0]
+      if (!view) throw new ApplicationFault('invalid_request', 'Unknown work')
+      const policy = options.native?.projects.find(project => project.id === view.work.projectId)?.environment?.policy
+      const link = view.links.find(link => link.role === 'primary' && link.contract.revision === view.contract.revision)
+      const binding = link && options.store.bindings.current(link.ticketId)
+      const status = policy ? binding ? environments.status(binding) : { status: 'waiting' as const } : { status: 'not_configured' as const }
+      const visible = status.status === 'preparing' && binding?.state !== 'active'
+        ? { status: 'blocked' as const, code: 'preparation_interrupted' } : status
+      return { protocol: 'work-environment/1' as const, workId, ...visible, ...(policy ? { policy } : {}) }
     },
     guide: async () => readFileSync(new URL('../../../docs/ASSISTANT-GUIDE.zh-CN.md', import.meta.url), 'utf8'),
     ...(options.assistantProvider

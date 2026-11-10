@@ -12,11 +12,11 @@ import {
   writeFileSync,
   writeSync,
 } from 'node:fs'
-import { basename, dirname, isAbsolute, join } from 'node:path'
+import { basename, dirname, isAbsolute, join, relative } from 'node:path'
 import { execFileSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
-import { IdSchema, ProjectRegistrationInputSchema } from '@personal-agent/contracts'
+import { IdSchema, JsonSchema, ProjectRegistrationInputSchema } from '@personal-agent/contracts'
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
 import type { ProjectRegistrationInput, Scope } from '@personal-agent/contracts'
 import type { CheckDefinition } from '@personal-agent/verification'
@@ -27,6 +27,7 @@ const ProjectRecordSchema = z.strictObject({
   path: z.string().min(1).max(4096),
   displayName: z.string().min(1).max(160),
   check: ProjectRegistrationInputSchema.shape.check,
+  environment: ProjectRegistrationInputSchema.shape.environment,
 })
 const RegistrySchema = z.strictObject({ version: z.literal(1), projects: z.array(ProjectRecordSchema).max(100) })
 export type RegisteredProject = z.infer<typeof ProjectRecordSchema>
@@ -78,14 +79,24 @@ export class NativeProjectRegistry {
     }
     if (git(path, ['status', '--porcelain=v1', '--untracked-files=normal']))
       throw new ApplicationFault('conflict', '项目有未提交的修改，请提交当前基线后再导入。')
+    let environment = input.environment
+    if (environment?.policy === 'offline_install') {
+      try {
+        const storeDir = realpathSync(environment.storeDir)
+        const rel = relative(path, storeDir)
+        if (!lstatSync(storeDir).isDirectory() || !(rel === '..' || rel.startsWith('../'))) throw new Error('unsafe store')
+        environment = { policy: 'offline_install', storeDir }
+      } catch { throw new ApplicationFault('invalid_request', '离线缓存必须是项目目录之外的已有目录。') }
+    }
     const record = ProjectRecordSchema.parse({
       id: `project-${canonicalDigest(path).slice(0, 24)}`,
       path,
       displayName: input.displayName ?? basename(path),
       check: input.check,
+      ...(environment ? { environment } : {}),
     })
     const existing = this.records.find((project) => project.id === record.id)
-    if (existing && canonicalDigest(existing) !== canonicalDigest(record))
+    if (existing && canonicalDigest(JsonSchema.parse(existing)) !== canonicalDigest(JsonSchema.parse(record)))
       throw new ApplicationFault('conflict', '该项目已使用另一份设置导入。')
     if (!existing && this.records.length >= 100)
       throw new ApplicationFault('budget_exceeded', '当前最多导入 100 个项目。')
@@ -131,7 +142,15 @@ export class NativeProjectRegistry {
       argv: record.check === 'node_test' ? ['--test'] : ['test'],
       deadlineMs: 120000,
       outputLimitBytes: 200000,
+      ...(record.environment ? { allowedEnvironment: ['HOME', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_DATA_HOME', 'PNPM_HOME', 'COREPACK_HOME', 'COREPACK_ENABLE_NETWORK', 'COREPACK_ENABLE_DOWNLOAD_PROMPT', 'CI'] } : {}),
     }
+  }
+  environment(record: RegisteredProject) {
+    return record.environment ? {
+      ...record.environment,
+      ...(record.environment.policy === 'offline_install'
+        ? { managerCommand: execFileSync('which', ['pnpm'], { encoding: 'utf8' }).trim() } : {}),
+    } : undefined
   }
 }
 

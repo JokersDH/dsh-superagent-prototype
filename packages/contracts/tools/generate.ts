@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { CONTRACT_API_MAJOR, CONTRACT_VERSION, wireSchemas } from '../src/schemas.ts';
 import { ApplicationConfigurationSchema, CONFIGURATION_PROTOCOL } from '../src/configuration.ts';
 import { AssistantProviderStatusSchema, AssistantModelSelectionSchema, AssistantStreamUpdateSchema } from '../src/assistant.ts';
-import { ProjectRegistrationInputSchema, WorkLocationSchema } from '../src/projects.ts';
+import { ProjectRegistrationInputSchema, WorkLocationSchema, WorkEnvironmentSchema } from '../src/projects.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -39,7 +39,7 @@ outputs.set('generated/configuration.manifest.json', canonical({ protocol: CONFI
 const assistantText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:assistant-provider:1', $defs: { AssistantProviderStatus: z.toJSONSchema(AssistantProviderStatusSchema, { target: 'draft-2020-12', io: 'input' }), AssistantModelSelection: z.toJSONSchema(AssistantModelSelectionSchema, { target: 'draft-2020-12', io: 'input' }), AssistantStreamUpdate: z.toJSONSchema(AssistantStreamUpdateSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/assistant.schema.json', assistantText);
 outputs.set('generated/assistant.manifest.json', canonical({ protocol: 'assistant-provider/1', schemaHash: digest(assistantText), sourceHash: digest(readFileSync(resolve(root, 'src/assistant.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
-const projectsText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:project-configuration:1', $defs: { ProjectRegistrationInput: z.toJSONSchema(ProjectRegistrationInputSchema, { target: 'draft-2020-12', io: 'input' }), WorkLocation: z.toJSONSchema(WorkLocationSchema, { target: 'draft-2020-12', io: 'input' }) } });
+const projectsText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:project-configuration:1', $defs: { ProjectRegistrationInput: z.toJSONSchema(ProjectRegistrationInputSchema, { target: 'draft-2020-12', io: 'input' }), WorkLocation: z.toJSONSchema(WorkLocationSchema, { target: 'draft-2020-12', io: 'input' }), WorkEnvironment: z.toJSONSchema(WorkEnvironmentSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/projects.schema.json', projectsText);
 outputs.set('generated/projects.manifest.json', canonical({ protocol: 'project-configuration/1', schemaHash: digest(projectsText), sourceHash: digest(readFileSync(resolve(root, 'src/projects.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [path, content] of outputs) {

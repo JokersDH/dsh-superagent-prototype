@@ -38,6 +38,7 @@ export class NativeProductAttempt {
   private child: SpawnedRunner | undefined
   private endpoint: RunnerEndpoint | undefined
   private disposed = false
+  private readonly environment: { planRef: string; capture(): void } | undefined
   constructor(
     spec: AttemptSpec,
     store: ProductStore,
@@ -46,6 +47,7 @@ export class NativeProductAttempt {
     producer: RuntimeProducer,
     sink: FactSink,
     current: () => boolean,
+    environment?: { planRef: string; capture(): void },
   ) {
     this.spec = spec
     this.store = store
@@ -54,6 +56,7 @@ export class NativeProductAttempt {
     this.producer = producer
     this.sink = sink
     this.current = current
+    this.environment = environment
   }
   private connection() {
     if (!this.endpoint) {
@@ -96,9 +99,16 @@ export class NativeProductAttempt {
       entry: fileURLToPath(new URL('../../runner/src/runner-service-entry.ts', import.meta.url)),
       args: ['codex-native'],
       stateRoot: this.stateRoot,
-      env: { PA_RUNNER_CWD: this.workspacePath, PA_RUNNER_RECOVERY_ROOT: this.recoveryRoot },
+      env: { PA_RUNNER_CWD: this.workspacePath, PA_RUNNER_RECOVERY_ROOT: this.recoveryRoot,
+        ...(this.environment ? { PA_RUNNER_ENVIRONMENT_PLAN: this.environment.planRef } : {}) },
       producer: { source: this.producer.source, runnerIdentityRef: this.producer.runnerIdentityRef },
-      payloads: storedAttemptPayloads(this.store),
+      payloads: { read: async reference => {
+        if (this.environment?.planRef === reference) {
+          await this.register()
+          if (!this.current() || this.store.bindings.binding(this.spec.attemptId)?.state !== 'active') throw new Error('Preparation authorization is no longer current')
+        }
+        return storedAttemptPayloads(this.store).read(reference)
+      } },
       beforeNativeWrite: async (command) => {
         RunnerCommandSchema.parse(command)
         const indexed = this.store.commands.get(key('product-command', command.id))?.result as
@@ -124,6 +134,7 @@ export class NativeProductAttempt {
       const restored = this.store.payloads.write(payload)
       if (restored.ref !== fact.payloadRef) throw new Error('Native immutable payload identity changed')
       await this.register()
+      if (fact.kind === 'policy.prepared') this.environment?.capture()
       const receipt = await this.sink.record(fact)
       if (fact.kind === 'policy.prepared') {
         const policy = PreparedExecutionPolicySchema.parse((payload as { value: unknown }).value)
@@ -156,6 +167,7 @@ export class NativeProductAttempt {
   }
   async feed(command: RunnerCommand) {
     if (!this.current() || !this.child) throw new Error('Native command has no current Runner')
+    if (command.kind === 'begin') this.environment?.capture()
     await this.child.command(command)
   }
   async quiesce() {

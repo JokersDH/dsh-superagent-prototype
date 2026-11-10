@@ -8,7 +8,7 @@ import { connectRunnerRecovery, RunnerLinkError, verifiedRunnerInspection } from
 import type { VerifiedRunnerInspection } from './runner-link.ts'
 import { confirmOwnedQuiescence, ownedResourceManifestDigest, ResourceBarrierError } from './resource-barrier.ts'
 import type { OwnedQuiescenceReceipt } from './resource-barrier.ts'
-import { loadRecoveryRunner, RunnerRegistrationError } from './runner-registry.ts'
+import { loadRecoveryRunner, adoptRegisteredRunnerResources, RunnerRegistrationError } from './runner-registry.ts'
 import type { RunnerRegistration } from './runner-registry.ts'
 
 type Barrier = { replayed: boolean; result: OwnedQuiescenceReceipt; seq: number }
@@ -58,9 +58,14 @@ export async function reconcileRegisteredRunner(store: ProductStore, inputAttemp
   assertOutsideTransaction(store)
 
   const finish = (inspection: VerifiedRunnerInspection): ReconciledRunner => {
-    try { return { status: 'quiescent', attemptId, barrier: confirmOwnedQuiescence(store, inspection) } }
+    try {
+      const value = verifiedRunnerInspection(inspection).value
+      if (value.coverage !== 'complete_owned_resources') return held('not_quiescent')
+      adoptRegisteredRunnerResources(store, inspection)
+      return { status: 'quiescent', attemptId, barrier: confirmOwnedQuiescence(store, inspection) }
+    }
     catch (error) {
-      if (error instanceof ResourceBarrierError || error instanceof RunnerLinkError) return held(error.code)
+      if (error instanceof ResourceBarrierError || error instanceof RunnerLinkError || error instanceof RunnerRegistrationError) return held(error.code)
       throw error
     }
   }

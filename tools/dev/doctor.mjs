@@ -68,8 +68,19 @@ export async function diagnose({ repositoryRoot = root, state } = {}) {
       checks.push(result('recovery', uncertain.length ? 'BLOCKED' : 'PASS', uncertain.length ? 'writer_indeterminate' : 'no_indeterminate_writer_in_snapshot',
         `${snapshot.works.length} 项工作中，${uncertain.length} 项资源状态待核对`,
         uncertain.length ? '打开对应工作查看恢复证据；物理资源未确认前不要重复委托。' : undefined))
-      checks.push(result('environment', 'NOT_TESTED', 'environment_preparation_not_integrated',
-        '独立环境模块仍待准入和产品接线。', '当前先使用不依赖外部安装的 Node 项目。'))
+      const environments = await Promise.all(snapshot.works.slice(0, 10).map(async work => {
+        try {
+          const value = contracts.WorkEnvironmentSchema.parse(await instance.read(`/v1/works/${encodeURIComponent(work.work.id)}/environment`))
+          return value.workId === work.work.id ? value : undefined
+        } catch { return undefined }
+      }))
+      const configured = environments.filter(value => value && value.status !== 'not_configured')
+      const blocked = configured.filter(value => value.status === 'blocked')
+      const readyCount = configured.filter(value => value.status === 'ready').length
+      checks.push(result('environment', blocked.length ? 'BLOCKED' : readyCount ? 'PASS' : 'NOT_TESTED',
+        blocked.length ? 'environment_blocked' : readyCount ? 'prepared_environment_verified' : 'prepared_environment_not_observed',
+        configured.length ? `抽样工作中，${readyCount} 项环境已复验，${blocked.length} 项受阻` : '当前抽样工作没有可确认的依赖准备记录。',
+        blocked.length ? '打开对应工作检查环境状态；依赖漂移或准备失败不能接受交付。' : undefined))
     } catch (error) {
       const code = error.code ?? 'invalid_product_response'
       checks.push(result('instance', 'BLOCKED', code, '无法完成当前实例核对。', guidance[code] ?? '核对启动终端、所选 state 和服务版本；诊断不会更改任何状态。'))

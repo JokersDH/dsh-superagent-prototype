@@ -1,0 +1,88 @@
+{
+  "status": "PASS_ENVIRONMENT_ADMISSION",
+  "checkedAt": "2026-11-10T02:07:38.914Z",
+  "reviewerCommit": "f2ca26cf2390d3af9cb38a0e653dc641ee7c37af",
+  "candidateCommit": "c0058207aeb2fb7baf7a7738448e3fdbae19429e",
+  "sourceArchiveSha256": "f85452fd4e8bb6c5253de03cabdfbaa3d0b2f9ee495868eb6743cc8a69fdff89",
+  "sourceMode": "immutable git archive; candidate dependency links reused read-only",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "cases": [
+    {
+      "id": "ENV-CLEANUP-PRESERVES-UNOWNED-PATH",
+      "passesInvariant": true,
+      "observed": {
+        "status": "ready",
+        "preExistingContentPreserved": true
+      }
+    },
+    {
+      "id": "ENV-REJECTS-NESTED-DEPENDENCY-ESCAPE",
+      "passesInvariant": true,
+      "observed": {
+        "status": "blocked",
+        "code": "unsafe_link",
+        "nestedEntryEscapesWorkspace": true
+      }
+    },
+    {
+      "id": "ENV-INSTALLED-VERSION-DRIFT-NOT-REUSED",
+      "passesInvariant": true,
+      "observed": {
+        "declaredVersion": "1.0.0",
+        "installedVersion": "9.0.0",
+        "status": "ready",
+        "sameFingerprint": false
+      }
+    },
+    {
+      "id": "ENV-VALID-NODE-ENGINE-OR-RANGE",
+      "passesInvariant": true,
+      "observed": {
+        "node": "24.22.2",
+        "engine": "^22.19.0 || >=24.0.0",
+        "status": "ready",
+        "code": null
+      }
+    },
+    {
+      "id": "ENV-OFFLINE-INSTALL-DOES-NOT-EXECUTE-PNPMFILE",
+      "passesInvariant": true,
+      "observed": {
+        "status": "blocked",
+        "code": "project_hooks_unsupported",
+        "hookExecutedOutsideWorkspace": false,
+        "modelCalls": 0,
+        "fixturePolicy": "local tarball, pnpm offline, no network request in hook"
+      }
+    },
+    {
+      "id": "ENV-TRUSTED-BLOCKED-CLEANUP-PRESERVES-UNOWNED",
+      "passesInvariant": true,
+      "observed": {
+        "status": "blocked",
+        "code": "invalid_package_json",
+        "unownedContentPreserved": true
+      }
+    },
+    {
+      "id": "ENV-PROCESS-OBSERVATION-UNKNOWN-IS-NOT-CONFIRMED",
+      "passesInvariant": true,
+      "observed": {
+        "quiescence": "unknown",
+        "observation": "controlled EPERM only for process-group liveness probe; real child exited normally"
+      }
+    },
+    {
+      "id": "ENV-COMBINED-STDOUT-STDERR-LIMIT",
+      "passesInvariant": true,
+      "observed": {
+        "capturedBytes": 20,
+        "limit": 20,
+        "outputLimited": true
+      }
+    }
+  ],
+  "scope": "Private temporary files/local offline package fixture only; no vendor/model/account/user-project operation"
+}

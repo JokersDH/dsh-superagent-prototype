@@ -42,6 +42,7 @@ import { NativeProductAttempt } from './native-attempt.ts'
 import type { NativeProductConfiguration } from './native-config.ts'
 import { NativeCodexSettingsSchema } from '../../../packages/drivers/codex-native/src/native.ts'
 import type { ProductCompletion } from './completion.ts'
+import type { ProductEnvironments } from './environments.ts'
 
 const IntentSchema = z.strictObject({
   kind: z.enum(['start', 'deliver']),
@@ -108,6 +109,7 @@ export class ProductExecution {
   private readonly stateRoot: string
   private readonly principal: { userId: string }
   private readonly native: NativeProductConfiguration | undefined
+  private readonly environments: ProductEnvironments | undefined
   constructor(
     store: ProductStore,
     application: ProductApplication,
@@ -117,6 +119,7 @@ export class ProductExecution {
     stateRoot: string,
     principal: { userId: string },
     native?: NativeProductConfiguration,
+    environments?: ProductEnvironments,
   ) {
     this.store = store
     this.application = application
@@ -125,6 +128,7 @@ export class ProductExecution {
     this.stateRoot = stateRoot
     this.principal = principal
     this.native = native
+    this.environments = environments
     this.effects = new Effects(store.queue)
     this.ingress = createStoredRuntimeIngress(
       store,
@@ -491,6 +495,9 @@ export class ProductExecution {
       })
     })
     const producer = producerForBinding(binding)
+    const environmentPlan = nativeProject && nativeProject.environment
+      ? this.environments!.plan(attempt, nativeProject.path, workspace.path, nativeProject.environment)
+      : undefined
     mkdirSync(join(this.stateRoot, 'receipts'), { recursive: true, mode: 0o700 })
     const runtime = nativeProfile
       ? new NativeProductAttempt(
@@ -501,6 +508,7 @@ export class ProductExecution {
           producer,
           this.ingress.bind(producer),
           () => !!this.current(attempt),
+          environmentPlan ? { planRef: environmentPlan, capture: () => this.environments!.capture(attempt) } : undefined,
         )
       : new ControlledProductAttempt(
           spec,
