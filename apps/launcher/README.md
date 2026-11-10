@@ -13,6 +13,12 @@ node apps/launcher/bin/pa.mjs build   # 每次源码更新后执行一次
 node apps/launcher/bin/pa.mjs start   # 打印本机网页地址
 node apps/launcher/bin/pa.mjs doctor  # 只读诊断
 node apps/launcher/bin/pa.mjs stop
+
+# 完整备份 / 迁移
+node apps/launcher/bin/pa.mjs backup --out ~/backups/state.pab
+node apps/launcher/bin/pa.mjs verify-backup --bundle ~/backups/state.pab
+node apps/launcher/bin/pa.mjs restore --bundle ~/backups/state.pab --to ~/pa-restored
+node apps/launcher/bin/pa.mjs rollback --target ~/pa-restored   # 用最近已验证快照
 ```
 
 运行时不启动 Vite dev server、不重编译整仓；`start` 只消费 `pa build` 记录的 release manifest。
@@ -44,6 +50,27 @@ node apps/launcher/bin/pa.mjs stop
 - `stop` 只对已验证实例发 SIGTERM；超时返回 `stop_timeout_resources_alive` 与非零码，不假装已静止。
 - 网页关闭不影响 daemon；模型 key 只经已认证本机网页设置提交，CLI/日志/发行清单不回显、不存储。
 - 不复制他人在账号 home 中的 native 认证；不升级全局 Node/agent。
+
+## 恢复/回滚语义
+
+- `restore` 先完整校验 bundle，再解包到目标同级的私有 staging、逐项再哈希、写
+  `restore-report.json`，最后原子 rename 到目标；目标必须不存在或为空，活跃 state 永不被覆盖。
+- 路径只在显式 `--map-path /old=/new` 时重写；其余进入 `pendingRebind`。旧 native 环境/认证/
+  签名 receipt/进程身份不会变成新机器权限，恢复后必须重新核对 `requiresRevalidation`。
+- `restore` **不启动 daemon、不消费队列、不重发 begin/deliver/answer**；启动恢复实例是操作者
+  显式 `pa start`，并与 main/A 的恢复启动模式（RFC GAP-D2）衔接。
+- `rollback` 先验证快照，再把当前 state 改名为 `<state>.failed-<时间>` 保留现场，恢复失败会把
+  原目录放回；不把 rename 成功当已回滚。
+- token 访问模式：`start --require-login`，用 `<data>/bootstrap.key` 在网页登录（不回显、不写
+  localStorage）。
+
+## 零模型 smoke
+
+```sh
+node tools/distribution/smoke.mjs          # 28 步：build/first-run/start/static/proxy/status/reuse/
+                                            # backup/verify/stop/restore/import/login/rollback/再启动
+node tools/distribution/smoke-install.mjs  # 安装层：build + first-run + doctor
+```
 
 ## 已知限制（NOT_TESTED）
 

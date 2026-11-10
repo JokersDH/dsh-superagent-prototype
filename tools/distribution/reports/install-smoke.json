@@ -1,16 +1,16 @@
 {
   "case": "DIST-INSTALL-01",
   "status": "PASS",
-  "startedAt": "2026-11-10T04:37:59.715Z",
+  "startedAt": "2026-11-10T04:59:17.730Z",
   "steps": [
     {
       "id": "build",
       "status": "PASS",
       "result": {
-        "buildId": "c6152ddc168586d3",
+        "buildId": "40ca46f9846cc933",
         "artifacts": {
-          "count": 269,
-          "bytes": 4208579
+          "count": 285,
+          "bytes": 4319110
         }
       }
     },
@@ -18,8 +18,8 @@
       "id": "release-manifest",
       "status": "PASS",
       "result": {
-        "buildId": "c6152ddc168586d3",
-        "artifacts": 269
+        "buildId": "40ca46f9846cc933",
+        "artifacts": 285
       }
     },
     {
@@ -32,7 +32,7 @@
           "logs",
           "workspace"
         ],
-        "configFile": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-install-smoke-VG0wYg/config/launcher.json"
+        "configFile": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-install-smoke-6eKz7V/config/launcher.json"
       }
     },
     {
@@ -59,5 +59,5 @@
     "exitCode": 1,
     "checks": 10
   },
-  "finishedAt": "2026-11-10T04:38:04.846Z"
+  "finishedAt": "2026-11-10T04:59:23.272Z"
 }

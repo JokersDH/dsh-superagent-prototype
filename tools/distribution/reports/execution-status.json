@@ -1,175 +1,135 @@
 {
-  "package": "product-wave-03 / D",
+  "package": "product-wave-03 / D：本机发行、完整备份与迁移",
   "owner": "agent-d",
   "branch": "codex/g3-local-distribution",
   "baseCommit": "3957e30",
   "auditedBaseline": "c3f018e",
-  "updatedAt": "2026-11-10T04:55:00.000Z",
-  "modelBudget": {
-    "allocated": 0,
-    "used": 0,
-    "note": "No native/model task is dispatched; all smoke paths are controlled/fixture."
+  "updatedAt": "2026-11-10T05:02:00.000Z",
+  "modelBudget": { "allocated": 0, "used": 0, "note": "No native or model task was dispatched; every path is controlled/fixture." },
+  "platformMatrix": {
+    "measured": "darwin/arm64, Node 24.21.0, SQLite 3.53.4 (better-sqlite3 13.0.3, ABI 137)",
+    "notTested": ["macOS/x64", "Linux x64/arm64", "Windows", "cross-machine install", "personal native start (depends on main/B native admission)"]
+  },
+  "commits": {
+    "checkpoint": "5d32b30",
+    "d2": "8035492",
+    "d3": "84d407f",
+    "d4": "e4ab959",
+    "handoff": "this status file is committed as the final handoff commit; hash recorded in the handoff message"
   },
   "phases": [
     {
       "id": "D1",
       "status": "DONE",
       "delivered": [
-        "docs/rfcs/WP-12/0001-local-distribution-rfc.zh-CN.md",
-        "packages/portability roots + pa-backup/1 manifest + safe-path validation",
-        "apps/launcher first-run/build/doctor/status with instance-record identity rules",
-        "tools/distribution build + pa-release/1 manifest + install smoke"
+        "docs/rfcs/WP-12/0001-local-distribution-rfc.zh-CN.md (build layout/platform matrix/roots/first-run/backup scope/main+A ports)",
+        "packages/portability: product roots contract, pa-backup/1 manifest, safe path validation",
+        "apps/launcher: first-run/build/doctor/status + instance-record identity rules",
+        "tools/distribution: build + pa-release/1 manifest + zero-model install smoke"
       ],
-      "checks": [
-        {
-          "id": "portability-typecheck",
-          "command": "pnpm --dir packages/portability typecheck",
-          "result": "PASS"
-        },
-        {
-          "id": "portability-tests",
-          "command": "node --test packages/portability/test/*.case.ts",
-          "result": "PASS (14)"
-        },
-        {
-          "id": "launcher-tests",
-          "command": "node --test apps/launcher/test/*.case.mjs",
-          "result": "PASS (5)"
-        },
-        {
-          "id": "distribution-build",
-          "command": "node tools/distribution/build.mjs --install-root . --config-root <tmp> --json",
-          "result": "PASS (269 artifacts, buildId c6152ddc168586d3)"
-        },
-        {
-          "id": "install-smoke",
-          "command": "node tools/distribution/smoke-install.mjs",
-          "result": "PASS (doctor DEGRADED: no running instance yet)"
-        }
+      "commands": [
+        { "command": "pnpm --dir packages/portability typecheck", "result": "PASS" },
+        { "command": "node --test packages/portability/test/*.case.ts", "result": "PASS (14 at D1)" },
+        { "command": "node --test apps/launcher/test/*.case.mjs", "result": "PASS (5 at D1)" },
+        { "command": "node tools/distribution/build.mjs --install-root . --config-root <tmp> --json", "result": "PASS (269 artifacts, self-checked digests)" },
+        { "command": "node tools/distribution/smoke-install.mjs", "result": "PASS" }
       ],
-      "evidence": [
-        "tools/distribution/reports/install-smoke.json"
-      ],
-      "blockers": []
+      "evidence": ["tools/distribution/reports/install-smoke.json"]
     },
     {
       "id": "D2",
       "status": "DONE",
       "delivered": [
-        "apps/launcher static console server + transparent /v1 reverse proxy (same-origin, no product routes)",
-        "start/reuse/stop/status over the existing apps/coordinator/product/demo.ts entry",
-        "real process identity: pid + process start + cwd + launcher command + uid + listeners + health; zombies treated as exited",
-        "bounded redacted daemon log; honest stop timeout reporting; no Vite dev server or whole-repo rebuild at runtime",
-        "zero-model start/reuse/stop smoke with isolated temp roots/ports"
+        "static console server + transparent /v1 loopback reverse proxy (no product routes, same-origin)",
+        "start/reuse/stop/status over the existing apps/coordinator/product/demo.ts entry; no Vite dev server or whole-repo rebuild at runtime",
+        "real process identity (pid + process start + cwd + launcher command + uid + listeners + health), zombies treated as exited, honest stop timeout",
+        "bounded redacted daemon log, zero-model start/reuse/stop smoke"
       ],
-      "checks": [
-        {
-          "id": "launcher-tests",
-          "command": "node --test apps/launcher/test/*.case.mjs",
-          "result": "PASS (12)"
-        },
-        {
-          "id": "zero-model-smoke",
-          "command": "node tools/distribution/smoke.mjs",
-          "result": "PASS (build/first-run/start/static/health/config/status/reuse/stop 203ms/clean exit/resources released/doctor)"
-        }
+      "commands": [
+        { "command": "node --test apps/launcher/test/*.case.mjs", "result": "PASS (12 at D2)" },
+        { "command": "node tools/distribution/smoke.mjs", "result": "PASS (start/static/health/configuration/reuse/stop 203ms/resources released)" }
       ],
-      "evidence": [
-        "tools/distribution/reports/zero-model-smoke.json"
-      ],
-      "blockers": [
-        "GAP-D1 (main): static serving/first-run in the production HTTP entry; interim proxy is documented"
-      ],
-      "limitations": [
-        "fixture mode only; personal mode needs the native admission owned by main/B",
-        "darwin/arm64 only measured candidate"
-      ]
+      "evidence": ["tools/distribution/reports/zero-model-smoke.json"]
     },
     {
       "id": "D3",
       "status": "DONE",
       "delivered": [
-        "deterministic ustar+gzip bundle archive with fail-closed reader limits/checksum/path/duplicate/type checks",
-        "consistent state snapshot through A's storage backupDatabase/verifyDatabase port (readonly source connection)",
+        "deterministic ustar+gzip bundle IO; reader fails closed on checksum/path/absolute/duplicate/entry-type/decompression-bomb/truncation",
+        "consistent snapshot through A's storage backupDatabase/verifyDatabase port from a read-only source connection",
         "referenced content-addressed artifacts copied and re-hashed; missing/corrupt artifacts fail the backup",
-        "non-secret project bindings + path map; credentials/runtime records/environment receipts/worktrees/unclassified files excluded with reasons",
-        "pa backup / pa verify-backup entrypoints + private backup index"
+        "non-secret project bindings + path map; credentials/runtime records/environment authority/worktrees/unclassified files excluded with reasons",
+        "pa backup / pa verify-backup + private backup index"
       ],
-      "checks": [
-        {
-          "id": "portability-tests",
-          "command": "node --test packages/portability/test/*.case.ts",
-          "result": "PASS (24, includes archive safety, live-writer consistency, negative bundle cases)"
-        },
-        {
-          "id": "zero-model-smoke",
-          "command": "node tools/distribution/smoke.mjs",
-          "result": "PASS (adds backup-live + verify-backup-live + verify-backup-offline)"
-        }
+      "commands": [
+        { "command": "node --test packages/portability/test/*.case.ts", "result": "PASS (24 at D3; live-writer consistency + negative bundles)" },
+        { "command": "node tools/distribution/smoke.mjs", "result": "PASS (backup-live + verify-backup-live + offline verify)" }
       ],
-      "evidence": [
-        "tools/distribution/reports/zero-model-smoke.json"
-      ],
-      "blockers": [
-        "GAP-D3 (A): public referenced-artifact read port; interim read-only SELECT is labelled in RFC and code"
-      ],
-      "limitations": [
-        "continuous unbounded writes can make SQLite's online backup restart; bounded-write consistency is tested",
-        "no restore/rollback yet (D4)"
-      ]
+      "evidence": ["tools/distribution/reports/zero-model-smoke.json"]
     },
     {
       "id": "D4",
-      "status": "NEXT",
-      "delivered": [],
-      "checks": [],
-      "evidence": [],
-      "blockers": []
+      "status": "DONE",
+      "delivered": [
+        "restoreBundle: verify-first, private staging, per-entry re-hash, atomic rename into a new directory; active state never overwritten",
+        "explicit --map-path rewriting of project bindings, pendingRebind/unmatched accounting, restore-report.json with requiresRevalidation",
+        "import-bundle into managed private backups; restore from managed id",
+        "rollback: verify snapshot first, keep failed state directory, restore prior snapshot, put the original back on failure",
+        "no daemon start and no begin/deliver/answer replay by restore; restored queue preserved"
+      ],
+      "commands": [
+        { "command": "node --test packages/portability/test/*.case.ts", "result": "PASS (28; restore roundtrip/remap/refusals)" },
+        { "command": "node --test apps/launcher/test/*.case.mjs", "result": "PASS (15; restore/import/rollback refusals)" },
+        { "command": "node tools/distribution/smoke.mjs", "result": "PASS (restore-new-directory, refuses non-empty/corrupted, import, start restored, rollback rehearsal, start after rollback)" }
+      ],
+      "evidence": ["tools/distribution/reports/zero-model-smoke.json"]
     },
     {
       "id": "D5",
-      "status": "NEXT",
-      "delivered": [],
-      "checks": [],
-      "evidence": [],
-      "blockers": []
+      "status": "DONE",
+      "delivered": [
+        "repeatable zero-model local-trial smoke (28 steps) with isolated temp roots/ports",
+        "docs/rfcs/WP-12/0002-consumption-guide.zh-CN.md for main/E/internal trial",
+        "launcher/portability/distribution README updates and release manifest evidence",
+        "explicit NOT_TESTED boundaries and lock regeneration request"
+      ],
+      "commands": [
+        { "command": "node tools/distribution/smoke-install.mjs", "result": "PASS (4 steps)" },
+        { "command": "node tools/distribution/smoke.mjs", "result": "PASS (28 steps, ~11.5s)" },
+        { "command": "pnpm --dir packages/portability build && pnpm --dir packages/portability typecheck", "result": "PASS" }
+      ],
+      "evidence": ["tools/distribution/reports/install-smoke.json", "tools/distribution/reports/zero-model-smoke.json"]
     }
   ],
+  "finalVerification": {
+    "portabilityBuild": "PASS",
+    "portabilityTypecheck": "PASS",
+    "portabilityTests": "PASS (28/28)",
+    "launcherTests": "PASS (15/15)",
+    "installSmoke": "PASS",
+    "fullTrialSmoke": "PASS (28/28 steps)",
+    "unexpectedModifiedPaths": "none; only owned paths + uncommitted pnpm-lock.yaml (root lock owner = main)",
+    "userServicesTouched": "none (isolated temp roots and ephemeral high ports)"
+  },
   "crossModuleRequests": [
-    {
-      "id": "GAP-D1",
-      "owner": "main",
-      "request": "Same-origin static console + first-run/config HTTP interface; interim launcher static server + /v1 reverse proxy."
-    },
-    {
-      "id": "GAP-D2",
-      "owner": "main/A",
-      "request": "Recovery startup mode that opens a restored state without consuming the queue or resending begin/deliver/answer."
-    },
-    {
-      "id": "GAP-D3",
-      "owner": "A",
-      "request": "Public read port for referenced artifacts and current writer/instance facts; interim read-only SELECT is labelled."
-    },
-    {
-      "id": "GAP-D4",
-      "owner": "main",
-      "request": "Freeze one local-instance semantic if tools/dev and the launcher converge."
-    },
-    {
-      "id": "GAP-D5",
-      "owner": "main",
-      "request": "Regenerate the root pnpm-lock.yaml for the new packages/portability and apps/launcher importers (local lock diff is not committed)."
-    }
+    { "id": "GAP-D1", "owner": "main", "request": "Same-origin static console + first-run/config HTTP interface; interim launcher static server + /v1 proxy is documented and removable.", "status": "OPEN" },
+    { "id": "GAP-D2", "owner": "main/A", "request": "Recovery startup mode that opens a restored state without consuming the queue or resending begin/deliver/answer.", "status": "OPEN" },
+    { "id": "GAP-D3", "owner": "A", "request": "Public read port for referenced artifacts + current writer/instance facts; interim read-only SELECT is labelled in code/RFC.", "status": "OPEN" },
+    { "id": "GAP-D4", "owner": "main", "request": "Freeze one local-instance semantic if tools/dev and the launcher converge.", "status": "OPEN" },
+    { "id": "GAP-D5", "owner": "main", "request": "Regenerate root pnpm-lock.yaml for packages/portability and apps/launcher importers (local diff intentionally not committed).", "status": "OPEN" }
   ],
   "limitations": [
     "Only darwin/arm64 + Node 24.21.x is a measured candidate; macOS x64/Linux/Windows are NOT_TESTED.",
     "Same-machine install model: node_modules and the native SQLite binding are not cross-machine portability evidence.",
-    "Backup bundle and restore/rollback are still D3/D4; the trial smoke currently covers build/first-run/start/stop only.",
-    "Personal (native) start is NOT_TESTED here; fixture mode proves the distribution composition with zero model calls."
+    "Personal (native) start is NOT_TESTED here; fixture mode proves the distribution composition with zero model calls.",
+    "Continuous unbounded DB writes can make SQLite's online backup restart; bounded-write consistency is tested.",
+    "Real browser visual/interaction acceptance remains Agent E's independent scope.",
+    "Restored native environment/authentication/policy must be re-probed; restore never converts old authority into new permission."
   ],
   "nextConsumerSteps": [
-    "A/main: review docs/rfcs/WP-12/0001-local-distribution-rfc.zh-CN.md GAP-D1..D5; regenerate the root lock for the two new importers.",
-    "E: do not run installation acceptance yet; D2-D5 entrypoints are still landing."
+    "main: regenerate root lock for the two new importers; review GAP-D1..D5; integrate checkpoint 5d32b30 and D2 8035492, D3 84d407f, D4 e4ab959 + final handoff commit.",
+    "E: consume §5 of docs/rfcs/WP-12/0002-consumption-guide.zh-CN.md with independent PA_*_ROOT; do not weaken assertions; native/cross-machine stays NOT_TESTED.",
+    "A: preferred follow-up is GAP-D3 public referenced-artifact/writer read port; bundle format already consumes the current port through a labelled interim adapter.",
+    "All: do not treat fixture-mode smoke as native compatibility; native/model budget remains 0 for this package."
   ]
 }

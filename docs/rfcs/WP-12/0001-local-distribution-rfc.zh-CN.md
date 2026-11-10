@@ -137,3 +137,19 @@ Node 版本不在 `engines` 内、原生 binding 加载失败、SQLite 版本不
 | D5 | 重复零模型 smoke（build→first-run→start→backup→stop→verify→restore→start→rollback→stop）；release manifest；`tools/distribution/reports/execution-status.json` |
 
 所有命令记录实际输入/退出码/证据路径；未执行平台/原生项明确 NOT_TESTED。E 独立在新目录消费同一命令；D 不改 E 断言。
+
+## 8. 实施状态（2026-11-10，D 包交付）
+
+日志：检查点 `5d32b30`（D1）→ `8035492`（D2）→ `84d407f`（D3）→ D4/D5 见分支后续提交。所有实测在同一 darwin/arm64、Node 24.21.0、SQLite 3.53.4 上完成，模型任务 0。
+
+| 阶段 | 已交付 | 实际证据 |
+| --- | --- | --- |
+| D1 | roots 契约、`pa-backup/1` manifest、build/release manifest、`first-run`、`doctor`、install smoke | `node --test packages/portability/test/*.case.ts`（roots/manifest）；`tools/distribution/reports/install-smoke.json` |
+| D2 | 静态 console + `/v1` 反向代理、真实进程身份、start/reuse/stop/status、有界脱敏日志 | launcher 15 项测试；`reports/zero-model-smoke.json` 中 static/health/config/status/reuse/stop/clean-exit |
+| D3 | 确定性 tar.gz、一致快照（A port）、引用 artifact 复制校验、排除清单、backup/verify | portability 28 项测试（含恶意 archive、并发写一致性、缺/坏 artifact 负例）；smoke 中 backup-live/verify |
+| D4 | 新目录恢复、显式路径映射、restore-report、import-bundle、rollback（保留失败现场） | portability restore 测试 4 项；launcher restore 测试 3 项；smoke restore/import/rollback/再启动 |
+| D5 | 可重复零模型试用 smoke、发行清单、消费说明、状态报告 | `reports/zero-model-smoke.json`（28 步全 PASS）；本 RFC + `0002-consumption-guide` |
+
+未测/边界（不宣称）：个人 native 启动路径（依赖 main/B 的原生准入）、跨机器/跨账户安装、Linux/macOS x64/Windows、真实浏览器视觉回归（E 独立执行）、恢复后自动去重/重放（按设计从不自动重放）。
+
+待接入 port 仍为 §6 的 GAP-D1（main 同源静态/first-run）、GAP-D2（恢复启动模式）、GAP-D3（A 的引用 artifact 读 port；当前 interim 只读 SELECT 已在代码注释标注）、GAP-D5（main 重新生成 root lock）。D 未修改共享契约/迁移/root 锁/他人代码。

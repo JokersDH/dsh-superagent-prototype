@@ -11,8 +11,9 @@ node tools/distribution/build.mjs --install-root . --config-root <私有一致�
 # 零模型安装 smoke：build → first-run → doctor（不启动 daemon）
 node tools/distribution/smoke-install.mjs
 
-# 完整内部试用 smoke：build → first-run → start → 静态页+健康 → backup → stop → verify →
-# restore 到新目录 → start 恢复实例 → rollback 演练（后续阶段交付）
+# 完整内部试用 smoke（28 步）：build → first-run → start → 静态页/健康/配置/status/reuse →
+# live backup → verify → stop → offline verify → restore 到新目录 → 拒绝非空/损坏 →
+# import → 从导入 id 恢复 → token 登录门禁 → 启动/停止恢复实例 → rollback 演练 → 再启动 → stop
 node tools/distribution/smoke.mjs
 ```
 
@@ -30,8 +31,9 @@ node tools/distribution/smoke.mjs
 ## 证据
 
 - `reports/install-smoke.json`：最近一次零模型安装 smoke 的 case/步骤/退出码/平台。
-- `reports/zero-model-smoke.json`：完整试用 smoke（后续阶段）。
-- `reports/execution-status.json`：D 包阶段、commit/base、实际命令、证据、阻断。
+- `reports/zero-model-smoke.json`：完整试用 smoke（28 步全 PASS，含 backup/restore/rollback/login）。
+- `reports/execution-status.json`：D 包阶段、commit/base、实际命令、证据、阻断、下一消费者步骤。
+- 每个 smoke 使用隔离临时 roots/端口；不触碰用户 5180/8796、5181/8797 服务，不发模型请求。
 
 平台矩阵：darwin/arm64 为实测候选；macOS x64、Linux、Windows 全部 NOT_TESTED。同机安装模型
 （checkout + frozen install + 一次 build）见 WP-12 RFC。
