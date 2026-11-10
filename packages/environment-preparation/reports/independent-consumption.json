@@ -1,7 +1,7 @@
 {
   "protocol": "environment-consumption-matrix/1",
   "scope": "package-local; public exports + second Node process; local temporary fixtures and offline store only; no model/account/network install/user project",
-  "sourceCommit": "e4574c2969e8f559328e445be372af3c27270dd6",
+  "sourceCommit": "221ead7137ca8cedc317acf1196b21ac1501f0f3",
   "node": "v24.21.0",
   "pnpm": "11.7.0",
   "platform": "darwin",

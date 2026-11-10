@@ -1,7 +1,7 @@
 # Environment preparation: release-closure delivery
 
 - Package: `packages/environment-preparation/` (branch `codex/g2-workspaces-verification`)
-- Main base: `f2ca26c`; branch merge: `f35fa29`; source checkpoint tested here: `e4574c2`
+- Main base: `f2ca26c`; branch merge: `f35fa29`; source checkpoint tested here: `221ead7`
 - Environment: Node v24.21.0, pnpm 11.7.0 via Corepack cache, darwin/arm64. No model calls,
   no networked install, no account/user-project operation.
 - Scope: package-local preparation/verification/cleanup and controlled process port. Main
@@ -11,7 +11,7 @@
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| A-R1 three new failures | **PASS** | Official 8-case probe at `e4574c2`; regressions for forged-marker cleanup in both authoritative and legacy modes, EPERM/unknown observation, merged stdout+stderr budget |
+| A-R1 three new failures | **PASS** | Official 8-case probe at `221ead7`; regressions for forged-marker cleanup in both authoritative and legacy modes, EPERM/unknown observation, merged stdout+stderr budget |
 | A-R1 original five | **PASS** | Same probe; unowned-path preservation, nested escape, drift reuse, Node range, pnpmfile refusal |
 | A-R2 production interface | **PASS (package-local)** | mandatory `authorityRoot` entry, parser-validated ref/results, signed-receipt ownership, workspace inode binding, actual exclusions |
 | A-R3 independent consumption | **PASS (package-local)** | `reports/independent-consumption.json` 7/7 through public exports and a second Node process |
@@ -34,7 +34,7 @@ node recipes/build-recipes.mjs --out /tmp/pa-env-recipes-verify
 
 # from the primary checkout; immutable archive of the committed candidate
 node /Users/hh/Desktop/joker/superagent/tools/bootstrap/review-environment-preparation.mjs \
-  --environment /Users/hh/Desktop/joker/superagent-agent-a --candidate e4574c2
+  --environment /Users/hh/Desktop/joker/superagent-agent-a --candidate 221ead7
                                                     # PASS_ENVIRONMENT_ADMISSION 8/8
 ```
 

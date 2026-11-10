@@ -1,9 +1,9 @@
 {
   "status": "PASS_ENVIRONMENT_ADMISSION",
-  "checkedAt": "2026-11-10T01:51:06.654Z",
-  "reviewerCommit": "e4574c2969e8f559328e445be372af3c27270dd6",
-  "candidateCommit": "e4574c2969e8f559328e445be372af3c27270dd6",
-  "sourceArchiveSha256": "cf26ffd583bff91125b55e336db270e44900afd62ecb4c45b279cd414cbe5ac4",
+  "checkedAt": "2026-11-10T01:53:23.854Z",
+  "reviewerCommit": "221ead7137ca8cedc317acf1196b21ac1501f0f3",
+  "candidateCommit": "221ead7137ca8cedc317acf1196b21ac1501f0f3",
+  "sourceArchiveSha256": "e5fef82fe1e7944ac63b225d09f8a23d72b0ab765730fa07c9eb56744c3267ba",
   "sourceMode": "immutable git archive; candidate dependency links reused read-only",
   "node": "v24.21.0",
   "platform": "darwin",
