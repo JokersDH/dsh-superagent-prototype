@@ -8,9 +8,20 @@
 - Original prototype code is in `src/`, `tests/`, `prompts/`, `skills/`, and `docs/`. Preserve upstream MIT attribution.
 - New product directories are `packages/` and `apps/` at this repository root. G0 experiments belong in `tools/reuse-spike/`. Do not create another nested Git repository or an unrelated product checkout.
 
-## Product Wave-04 Assignments (2026-11-10)
+## Product Wave-05 Assignments (2026-11-10)
 
-- Current new work follows `agent-tasks/product-wave-04/README.zh-CN.md` and each role's packet. It supersedes wave-03 scheduling while preserving all historical test scope, budgets, branches and path ownership. A–E continue existing checkouts, preserve their own changes, and merge current origin/main.
+- Current new work follows `agent-tasks/product-wave-05/README.zh-CN.md` and the role packet. The user approved moving into evidence-based advice plus a real second-protocol read-only review. It supersedes new wave-04 scheduling while retaining all measured scope, unresolved integration fixes and old budget ledgers.
+- Main owns contracts/application/questions/coordinator/console/root lock and integration. Shared records and the sync `RoutingEvidencePort` are in `packages/contracts/src/routing-review.ts`; read `docs/rfcs/WP-16/0020-wave-05-dispatch-and-shared-inputs.md` first. Frozen Runner/data wire stays unchanged.
+- A owns storage/workflows, routing/review/outcome persistence and the sole append-only production migration sequence. C owns context/proposals/knowledge and new `packages/routing/`; it first closes the real-store decision replay and synchronous decision commit gap, then implements eligibility/advice/review validity without a new LLM loop or SQL writer.
+- B explicitly owns execution/catalog/policy-preparation/driver-kit/testing, apps/runner, drivers and native-acceptance in this wave. Main does not concurrently edit those sources. B selects one actual available ZCode/DeepSeek Harness protocol, reuses the official SDK when applicable, proves readonly policy and preserves the accepted Codex/control/recovery path. B does not edit coordinator/console/contracts/root lock.
+- D owns launcher/distribution/portability; consume main's fixed restored-project readonly startup and continue the actual staged install/diagnostic/backup/restore path. E owns only product-acceptance and independent negative/product/installation/equal-budget evaluation; other agents do not change E's assertions.
+- Review execution uses a distinct existing Work/Ticket/Assignment linked by immutable subject; it never takes the author's current assignment/candidate. No same-contract writer racing, confidence auto-acceptance, dynamic Ticket DAG, auto-merge/deploy, or online learned routing is included.
+- Main/A/C/D/E model tasks remain zero. B gets no new allowance: preserve the existing wave03-b-native limit4 and all actual used/unknown reservations plus historical ledgers; direct CLI/SDK calls also reserve before possible native/model send. Proposed large-sample benefit experiments stay zero-model tooling until separately budgeted.
+- Preserve all five existing agent worktrees and user services 5180/8796, 5181/8797, 5182/8798 and 5183/8799. Use isolated resources. A-E publish early stable checkpoints and continue their complete five-stage packages, pushing only their own branch; main independently admits source/evidence before integration.
+
+## Historical Product Wave-04 Assignments (2026-11-10)
+
+- Prior work follows `agent-tasks/product-wave-04/README.zh-CN.md` and each role's packet. Its unfinished integration fixes carry into wave-05, preserving all historical test scope, budgets, branches and ownership except the explicit B/C additions above.
 - Main has published `packages/contracts/src/assistant-state.ts` for synchronous A persistence/C domain consumers and the restored-state `recovery_readonly` startup entry. Read `docs/rfcs/WP-16/0016-wave-04-interfaces-and-admission.md` before implementing those boundaries.
 - A owns storage/workflows and append-only v11+ migrations, including decision provenance/proposal persistence and catalog indexes; C owns domain fixes and prepare/commit consumers, no SQL. Main owns deterministic application/HTTP/provider/UI composition and root lock.
 - B must first fix false-PASS matrix branches and real-entry budget accounting, then validate production control/recovery. Existing wave-03 budget and historical attempts persist; no new model allowance is created by the new packet.

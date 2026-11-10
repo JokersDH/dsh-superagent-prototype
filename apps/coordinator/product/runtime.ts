@@ -31,13 +31,14 @@ export function createProductRuntime(
     native?: NativeProductConfiguration
     projectRegistry?: NativeProjectRegistry
     workspaceRoot?: string
+    startupMode?: 'normal' | 'recovery_readonly'
   },
 ) {
   options = {
     ...options,
     principal: structuredClone(options.principal),
     projects: options.projects.map((project) => {
-      if (options.native?.projects.some((native) => native.id === project.id)) return structuredClone(project)
+      if (options.startupMode === 'recovery_readonly' || options.native?.projects.some((native) => native.id === project.id)) return structuredClone(project)
       const grant = structuredClone(project.scope)
       const scope: Scope = {
         projectId: project.id,
@@ -313,7 +314,11 @@ export function createProductRuntime(
     projectSettings,
     operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor),
       ...(projectSettings ? { projectSettings: (command: ProjectSettingsCommand, actor: TrustedActor) => projectSettings.dispatch(command, actor) } : {}) },
-    start: () => execution!.start(),
+    start: () => {
+      if (options.startupMode === 'recovery_readonly')
+        throw new ApplicationFault('unsupported_capability', 'Recovery read-only cannot start business effects', 'none')
+      execution!.start()
+    },
     close: () => {
       assistantStreams.close()
       return execution!.close()

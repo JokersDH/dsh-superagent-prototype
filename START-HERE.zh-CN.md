@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**当前派工：[第五轮证据路由与第二执行器只读复核](agent-tasks/product-wave-05/README.zh-CN.md)。** A证据存储，B真实第二协议/readonly证明，C决定接线与推荐规则，D个人发行迁移，E独立验收与等预算评估，main统一产品接线。公共记录和恢复项目绑定修复已交；先读 [0020稳定输入](docs/rfcs/WP-16/0020-wave-05-dispatch-and-shared-inputs.md)。沿用原目录/分支，旧缺口先闭合，不竞速、不自动接受、不刷新模型预算。
+
 **A/C第四轮源码已继续集成：** 会话目录改用持久成员索引；C原三项准入问题已通过。实际SQLite提案/决定联调6项通过、同一决定重放1项失败，完整助理功能保持关闭；详见 [0018联调](docs/rfcs/WP-16/0018-assistant-storage-consumer.md) 与 [C接线补充](agent-tasks/product-wave-04/c-integration-followup.zh-CN.md)。
 
 **新项目设置预览：[http://127.0.0.1:5183/](http://127.0.0.1:5183/)。** 主线已接通项目名称/检查/离线缓存策略的版本化编辑、历史与归档/恢复，旧任务按原合同检查和环境快照执行，设置不会改写在途工作。使用独立`.local-state/project-settings-preview`；原三个实例保留。见 [0017设置接线](docs/rfcs/WP-16/0017-versioned-project-settings.md)。
