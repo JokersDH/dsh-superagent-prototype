@@ -4,141 +4,135 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "006b4af9c2f127ae39f4b1d8efa26cc3f0efefae",
   "mergedMain": "8c736f2",
-  "checkpoint": "D1 recovery admission + active rollback fixes",
-  "ownedPaths": [
-    "apps/launcher/",
-    "tools/distribution/",
-    "packages/portability/"
-  ],
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate evidence only. Not internal-trial admission, not a product release, no cross-machine/ABI claim.",
+  "ownedPaths": ["apps/launcher/", "tools/distribution/", "packages/portability/"],
   "modelBudget": {
     "allocated": 0,
     "used": 0,
-    "unknownSends": 0,
-    "note": "All checks are controlled fixture / local DB probes; no native or model call."
+    "unknownNativeSends": 0,
+    "note": "All checks are controlled fixture/local database probes. No native agent, model provider or user service was used."
+  },
+  "commits": {
+    "d1Checkpoint": "2ce8dcd",
+    "d2": "f99b420",
+    "d3d4": "dcc866a",
+    "d5": "see branch head"
   },
   "phases": [
     {
       "id": "D1",
-      "status": "CHECKPOINT_COMMITTED",
+      "status": "DONE",
       "fixed": [
         "destructive rollback refuses active/unknown state (writer claim, OS file holders, managed instance record) before any rename",
         "restored first start is explicitly requested and verified as recovery_readonly; marker never deleted; no bypass switch",
-        "instance reuse compares requested install/state/mode/access/ports/build/startupMode before reuse; stable instance_conflict"
-      ],
-      "commands": [
-        {
-          "command": "pnpm --dir packages/portability typecheck",
-          "status": "PASS"
-        },
-        {
-          "command": "node --test packages/portability/test/*.case.ts",
-          "status": "PASS",
-          "tests": 33
-        },
-        {
-          "command": "node --test apps/launcher/test/*.case.mjs",
-          "status": "PASS",
-          "tests": 17
-        },
-        {
-          "command": "node tools/distribution/smoke.mjs",
-          "status": "PASS",
-          "steps": 33,
-          "durationMs": 13966
-        }
-      ],
-      "evidence": [
-        "tools/distribution/reports/zero-model-smoke.json"
-      ],
-      "notTested": [
-        "personal native startup (main/B admission)",
-        "physical byte-for-byte readonly SQLite file (main 0016 scope: not claimed)",
-        "cross-machine/ABI, macOS x64, Linux, Windows"
+        "instance reuse compares requested install/state/mode/access/ports/build/startupMode before reuse"
       ]
     },
     {
       "id": "D2",
       "status": "DONE",
       "fixed": [
-        "requested identity (install/state/mode/access/ports/buildId/startupMode) parsed before reuse; stable instance_conflict",
-        "API child recorded with start time, uid, exact argv and verified against listener/ppid/cwd/health; launcher argv token-compared with canonical script path",
-        "startup serialized by private start.lock: concurrent start has exactly one winner; dead breadcrumb replaced, live holder refused (start_in_progress)",
-        "stale record/orphan: killed-launcher record is UNVERIFIED; stop verifies exact orphan identity (argv/start/uid/cwd/listener) before SIGTERM; foreign live PID never signalled; record cleaned only after verified stop"
-      ],
-      "commands": [
-        {
-          "command": "node --test apps/launcher/test/*.case.mjs",
-          "status": "PASS",
-          "tests": 22
-        },
-        {
-          "command": "node --test packages/portability/test/*.case.ts",
-          "status": "PASS",
-          "tests": 33
-        },
-        {
-          "command": "node tools/distribution/smoke.mjs",
-          "status": "PASS",
-          "steps": 35,
-          "includes": "concurrent-start-single-winner, orphan-record-recovery"
-        }
-      ],
-      "evidence": [
-        "tools/distribution/reports/zero-model-smoke.json"
-      ],
-      "notTested": [
-        "personal native startup",
-        "cross-machine/ABI"
+        "exact launcher/API child identity: argv tokens (--state exact token), process start, uid, ppid, cwd, listener, health",
+        "startup serialized by atomic start.lock: exactly one winner; live holder start_in_progress, dead breadcrumb replaced, unreadable lock fails closed",
+        "killed-launcher record is UNVERIFIED; stop verifies the orphan before SIGTERM; foreign live PID never signalled"
       ]
     },
     {
       "id": "D3",
-      "status": "NEXT",
-      "scope": "versioned relocatable staged install closure; startup verifies actual executed sha256; consoleMode from real build"
+      "status": "DONE",
+      "fixed": [
+        "versioned staged install closure (pa-install/1): executed coordinator/launcher/runner sources, all workspace src+dist, flat runtime dependency closure with licenses, console HTTP dist, release copy, bin/pa wrapper, 6435-file digest inventory, atomic promotion and self-check",
+        "startup verifies actual executed sha256 (same-length drift refused), runtime dependency package digests, console HTTP build stamp+digest",
+        "--output now produces the full closure (release-only output moved to --release-output); consoleMode derived from actual build; --skip-console refuses non-HTTP/drifted bundles",
+        "relocated closure proof: 516 runtime module URLs all inside the moved install, 0 checkout references"
+      ]
     },
     {
       "id": "D4",
-      "status": "NEXT",
-      "scope": "adopt A public readArtifactRegistry/WorkflowSnapshots, remove interim private SQL, full delivery artifact roundtrip after restore"
+      "status": "DONE",
+      "fixed": [
+        "adopted A public readArtifactRegistry in portability snapshot; no private artifacts-table SQL; backupDatabase/verifyDatabase remain the public primitives",
+        "completed controlled delivery -> backup -> new-dir restore -> re-download artifact bytes/sha256 roundtrip in read-only recovery mode",
+        "restore default read-only with old queue/answers/parked/uncertain writer unchanged; explicit --map-path preserves entity id and leaves unmapped environment stores pending; old writer claim is not revived as authority",
+        "rollback verifies the snapshot before any rename; failure keeps the original directory and writes rollback diagnostics"
+      ]
     },
     {
       "id": "D5",
-      "status": "NEXT",
-      "scope": "install→configure→start→reuse→stop→doctor→backup→readonly restore→rebind/allow→upgrade rollback zero-model smoke; E entry"
+      "status": "DONE_WITH_MAIN_BLOCKED_STEP",
+      "fixed": [
+        "single zero-model smoke covers build/stage/relocate, first-run, doctor, start, reuse, conflicts, concurrent start, orphan recovery, backup, restore, read-only recovery, explicit rebind, delivery bytes roundtrip, upgrade rollback, tampered bytes/console gates",
+        "E consumption steps and BLOCKED step are documented with the exact main port named"
+      ]
     }
+  ],
+  "commands": [
+    { "command": "pnpm --dir packages/portability build && pnpm --dir packages/portability typecheck", "status": "PASS" },
+    { "command": "node --test packages/portability/test/*.case.ts", "status": "PASS", "tests": 33 },
+    { "command": "node --test apps/launcher/test/*.case.mjs", "status": "PASS", "tests": 25 },
+    { "command": "node tools/distribution/smoke.mjs", "status": "PASS", "steps": 45, "runs": 3, "durationMsRange": [35202, 37320] },
+    { "command": "node tools/distribution/repro-recovery-project-binding.mjs", "status": "REPRODUCED", "exit": 0, "evidence": "tools/distribution/reports/wave04-blockers/recovery-project-bindings.json" },
+    { "command": "node tools/distribution/build.mjs --install-root . --config-root <tmp> --output <tmp-install> --json", "status": "PASS", "artifacts": 385, "dependencies": 8, "stagedFiles": 6435 }
+  ],
+  "evidence": [
+    "tools/distribution/reports/zero-model-smoke.json",
+    "tools/distribution/reports/wave04-blockers/recovery-project-bindings.json",
+    "docs/rfcs/WP-12/0003-wave-04-recovery-admission-checkpoint.zh-CN.md",
+    "docs/rfcs/WP-12/0004-wave-04-identity-closure-migration.zh-CN.md",
+    "docs/rfcs/WP-12/0002-consumption-guide.zh-CN.md"
+  ],
+  "smokeSteps": [
+    "build", "stage-closure", "first-run", "doctor-before-start", "static-console", "instance-marker",
+    "api-health-direct", "api-health-via-proxy", "product-configuration", "console-asset", "status-running",
+    "reuse-verified-instance", "completed-delivery-fixture", "backup-live", "verify-backup-live",
+    "rollback-refuses-active-state", "reuse-requires-matching-identity", "concurrent-start-single-winner",
+    "stop-primary", "verify-backup-offline", "orphan-record-recovery", "restore-new-directory",
+    "restore-refuses-non-empty", "restore-refuses-corrupted", "import-managed-bundle", "restore-managed-import",
+    "restore-rebind-preserves-identity", "restored-first-start-readonly", "stop-recovery-readonly",
+    "recovery-keeps-old-business", "restore-does-not-revive-old-authority", "login-gated-session",
+    "stop-login-instance", "start-restored", "restored-delivery-bytes-roundtrip", "stop-restored",
+    "rollback-verifies-snapshot-before-move", "rollback-rehearsal", "start-after-rollback", "stop-after-rollback",
+    "stage-closure-start", "stage-closure-stop", "startup-verifies-executed-bytes",
+    "skip-console-refuses-tampered-http-bundle", "doctor-after-stop"
   ],
   "blockers": [
     {
-      "id": "D2-IDENTITY",
-      "owner": "D",
-      "note": "in progress"
-    },
-    {
-      "id": "D3-CLOSURE",
-      "owner": "D",
-      "note": "in progress; no main dependency for staging itself"
-    },
-    {
-      "id": "D4-A-PORT",
-      "owner": "A",
-      "status": "AVAILABLE",
-      "note": "readArtifactRegistry exported by storage; WorkflowSnapshots available; D will adopt"
-    },
-    {
-      "id": "D5-MAIN-AUTH",
+      "id": "RECOVERY-PROJECT-BINDINGS",
       "owner": "main",
       "status": "OPEN",
-      "note": "explicit rebind/revalidation and new-execution authorization after recovery is main scope; D will mark those smoke steps BLOCKED with the exact port instead of auto-running"
+      "summary": "A restored state carrying native-projects.json cannot start recovery_readonly: main's createProductRuntime throws 'Controlled fixture projects require the fixed src/ scratch grant' because restored project scope is '.'.",
+      "minimalRepro": "node tools/distribution/repro-recovery-project-binding.mjs",
+      "evidence": "tools/distribution/reports/wave04-blockers/recovery-project-bindings.json",
+      "impact": "D's recovery smoke uses a restored queue/answers/parked/uncertain-writer state without project bindings; path rebinding is proven offline. D does not patch coordinator recovery composition.",
+      "requestedPort": "main: accept restored project bindings with a read-only scope, or ignore the project list in recovery_readonly without granting execution.",
+      "d5StepStatus": "BLOCKED_RECOVERY_PROJECTS"
+    },
+    {
+      "id": "ROOT-LOCK",
+      "owner": "main",
+      "status": "KNOWN",
+      "summary": "Root pnpm lock regeneration stays main-owned; local pnpm-lock.yaml diff is intentionally not staged or committed."
     }
   ],
+  "limitations": {
+    "tested": ["darwin/arm64", "Node 24.21.0", "better-sqlite3 13.0.3 / SQLite 3.53.4 / ABI 137", "controlled fixture mode"],
+    "notTested": [
+      "personal native startup (main/B admission)",
+      "cross-machine or cross-ABI closure copying; macOS x64, Linux, Windows",
+      "physical byte-for-byte readonly SQLite file (main WP-16/0016 scope: not claimed)",
+      "post-recovery rebinding/revalidation and new execution authorization (main scope; D has no bypass)"
+    ]
+  },
   "nextConsumerSteps": [
-    "main: re-run review-wave04-admission probes against D branch head; D1/D2 reproduced blockers now fail closed. Continue D3 staged closure.",
-    "E: consume the launcher entry in docs/rfcs/WP-12/0002-consumption-guide.zh-CN.md on an isolated root; restored states are read-only until main authorization.",
-    "A: no new port request from D1; D4 adoption of readArtifactRegistry is planned from the existing public export."
+    "main: fix RECOVERY-PROJECT-BINDINGS or explicitly ignore project bindings in recovery_readonly; then re-run review-wave04-admission probes against D branch head.",
+    "main/E: consume the staged closure via <install>/bin/pa first-run/doctor/start/stop; verify startup digest/console/dependency gates and relocated module provenance.",
+    "E: run the wave-04 consumption steps in docs/rfcs/WP-12/0002 §8.4; keep the recovery-with-project-bindings step BLOCKED with the main port named; do not rewrite failed steps to PASS.",
+    "A: no new port required for D4; readArtifactRegistry/verifyDatabase/backupDatabase are consumed as published."
   ],
   "preservedHistory": [
-    "wave-03 reports/execution-status.json and 28-step smoke evidence remain unchanged",
-    "all wave-03 commits and branch history preserved; merge commit 006b4af only"
-  ],
-  "updatedAt": "2026-11-10T07:36:00.000Z"
+    "wave-03 reports/execution-status.json and earlier smoke evidence remain unchanged",
+    "wave-03 commits 5d32b30/8035492/84d407f/e4ab959/ef07ad1/73cafed and wave-04 D1/D2 checkpoints are preserved in branch history",
+    "no shared contract, migration, root lock, other-agent code or user service was modified"
+  ]
 }

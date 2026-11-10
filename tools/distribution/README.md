@@ -5,8 +5,13 @@ Owner：Agent D。这里是无依赖（仅 Node 标准库 + 仓库内 pnpm 脚�
 ## 命令
 
 ```sh
-# 构建 console 静态产物 + 运行时包 dist，写 <config-root>/release.json（pa-release/1）
+# 构建 console 静态产物 + 运行时包 dist + 执行入口，写 <config-root>/release.json（pa-release/1）
 node tools/distribution/build.mjs --install-root . --config-root <私有一致目录>
+
+# 构建并产出可搬迁 staged install 闭包（install.json + bin/pa + app/ + var/）
+node tools/distribution/build.mjs --install-root . --config-root <私有一致目录> --output <新安装目录>
+# 仅导出 release manifest（兼容旧行为）
+node tools/distribution/build.mjs --install-root . --config-root <私有一致目录> --release-output <目录>
 
 # 零模型安装 smoke：build → first-run → doctor（不启动 daemon）
 node tools/distribution/smoke-install.mjs
@@ -20,6 +25,22 @@ node tools/distribution/smoke.mjs
 `build.mjs` 的 stdout 只输出机器可读摘要（`--json`），pnpm/vite 日志走 stderr。它校验 Node
 `>=24.21.0 <25`、加载原生 SQLite binding、记录平台/ABI/SQLite/commit/artifact 摘要，并在写盘后
 自检全部 artifact 摘要。
+
+## staged install 闭包 `pa-install/1`
+
+`stage.mjs`（由 `--output`/`pa stage` 调用）复制真正执行的字节：coordinator/launcher/runner 源码、
+所有 workspace 包 `src+dist+package.json`、flat 运行依赖（含本机 ABI 的 better-sqlite3 与
+license）、console HTTP dist、`var/config/release.json`；写 `install.json` 记录 6000+ 文件 sha256、
+依赖版本/digest/license、平台/Node/ABI、入口与限制，并自检后原子 rename。`--output` 不再只写
+release.json。闭包移动后 `<dir>/bin/pa first-run/doctor/start/stop` 可用，默认 roots 在闭包
+`var/`；跨机器/跨 ABI 不声明。
+
+- consoleMode 由构建证明：构建写 `.pa-console-build.json`（mode=http + 文件集合 digest）；
+  `--skip-console` 只允许复用 stamp 与磁盘完全一致的 HTTP build，否则构建失败。
+- startup 校验 release artifacts 实际 sha256 + 运行依赖 digest + console stamp；同长度漂移/旧
+  fixture bundle 均 BLOCKED。
+- 跨模块阻断：`repro-recovery-project-binding.mjs` 复现 main 恢复只读 + 恢复项目绑定的 grant
+  错误，证据在 `reports/wave04-blockers/`。
 
 ## 发行清单 `pa-release/1`
 

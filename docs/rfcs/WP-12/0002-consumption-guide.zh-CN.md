@@ -76,3 +76,50 @@ $PA rollback --bundle <file> --target <state 目录>  # 或省略 --bundle 使�
 - `tools/distribution/reports/install-smoke.json`：安装层 smoke。
 - `tools/distribution/reports/execution-status.json`：阶段、commit/base、命令、结果、阻断。
 - 限制：仅 darwin/arm64 实测；同机安装模型；个人 native 路径 NOT_TESTED；真实浏览器视觉验收由 E 独立完成；连续无界写入可能使 SQLite 在线备份重启（已测有界并发写）。
+
+---
+
+## 8. 第四轮增补：staged install、恢复门禁与身份（2026-11-10）
+
+### 8.1 可搬迁 staged install 闭包
+
+```sh
+PA="node apps/launcher/bin/pa.mjs"
+$PA build --config-root <config> --output <新安装目录>   # 构建 + 产出闭包
+# 或 $PA stage --output <新安装目录>
+```
+
+闭包结构：`install.json`（版本化文件/依赖 digest/许可/平台清单）、`bin/pa` wrapper、`app/`（coordinator/launcher/runner 源码、workspace src+dist、flat 运行依赖、console HTTP dist）、`var/config/release.json`。
+普通同事在新目录：
+
+```sh
+<安装目录>/bin/pa first-run
+<安装目录>/bin/pa doctor          # READY/DEGRADED/BLOCKED；不是 ADMISSION
+<安装目录>/bin/pa start           # 默认 roots 在 <安装目录>/var，可用 PA_*_ROOT 覆盖
+<安装目录>/bin/pa stop
+```
+
+- 闭包可整体移动/复制后运行（已测：移动后 516 个运行模块全部来自闭包，checkout 引用 0）；**不得跨 OS/架构/ABI 或跨 Node 版本复制后宣称可用**。`install.json` 记录 Node/SQLite/ABI。
+- 闭包内 `pa build` 不可用（预构建闭包）；升级=构建/产出新闭包，再按 §3 备份→恢复→回滚流程迁移。
+- startup 校验：release artifacts 实际 sha256、运行时依赖 package digest、console HTTP build stamp+digest；任一同长度漂移/旧 fixture console 都 BLOCKED（`release_artifact_missing`/`dependency_digest_mismatch`/`console_mode_mismatch`）。
+
+### 8.2 实例身份与并发
+
+- `pa start` 解析期望 `install/state/mode/access/ports/buildId/startupMode` 后才复用；不同请求返回 `instance_conflict`（列出 differences），先 `pa stop` 再切换。
+- 同一 config 下并发 start 只有一个赢家；输家 `start_in_progress`（或 `instance_conflict`）。
+- launcher/API 子进程按精确 argv、启动时间、uid、ppid、cwd、监听与 health 校验；launcher 被 SIGKILL 后 `status=UNVERIFIED`，`stop` 只结束可核实的孤儿；陌生活 PID 不发送信号。
+
+### 8.3 恢复只读与重绑定/新授权（main 负责解除）
+
+- 恢复产物带 `restore-report.json`；launcher 检测后显式请求并核对 `recovery_readonly`，marker 不删除、无“允许续跑”开关。恢复库含 queued begin/deliver、pending answer、assistant reply、parked verification、死亡 writer claim 时首次启动仍不消费队列（已测）。
+- 显式 `restore --map-path /old=/new` 保留实体 id 并记录 `applied/pendingRebind/requiresRevalidation`；未映射路径不自动改写。
+- **BLOCKED（main `RECOVERY-PROJECT-BINDINGS`）**：带 `native-projects.json` 的恢复库当前无法只读打开（恢复组合对恢复项目 scope `.` 抛 `Controlled fixture projects require the fixed src/ scratch grant`）。最小复现：`node tools/distribution/repro-recovery-project-binding.mjs`，证据 `tools/distribution/reports/wave04-blockers/recovery-project-bindings.json`。main 修复前：恢复库只用于无项目绑定的历史/诊断；不要删除 marker、不要自建执行授权。
+- 恢复后的“重新绑定/重新验证/允许新执行”由 main 的恢复授权完成；D 不实现该开关。
+
+### 8.4 E 的第四轮消费步骤
+
+1. 在独立临时 root 运行 `$PA build --output <stage>`，移动 `<stage>` 到新路径（保留原 checkout 存在但不应被引用）；
+2. 用 `<stage>/bin/pa first-run`/`doctor`/`start --fixture`/`status`/`stop`，记录 `install.json`、`startupMode`、真实命令与退出码；
+3. 用 `NODE_DEBUG=esm` 或等价证据检查运行模块均来自安装目录；篡改执行文件/console bundle 必须 BLOCKED；
+4. 按 §5 做 backup→verify→restore（只读）→显式 rebind→rollback；带项目绑定的恢复库当前标 BLOCKED（main port），不得把失败改成 PASS；
+5. 真实 native/跨机器保持 NOT_TESTED；不修改 D 的断言或产品实现。

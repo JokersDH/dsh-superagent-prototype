@@ -28,7 +28,8 @@ node apps/launcher/bin/pa.mjs rollback --target ~/pa-restored   # 用最近已�
 | 命令 | 作用 | 退出码 |
 | --- | --- | --- |
 | `first-run` | 创建私有根、写非秘密 launcher 配置、只读探测执行器 | 0 |
-| `build` | 构建运行时包 `dist` + console 静态产物，写 `pa-release/1` manifest | 0 / 2 |
+| `build` | 构建运行时包 `dist` + console 静态产物 + 执行入口，写 `pa-release/1`；`--output` 产出 staged install 闭包 | 0 / 2 |
+| `stage` | 构建并产出可搬迁的版本化 staged install 闭包（`install.json`+`bin/pa`+`app/`+`var/`） | 0 / 2 |
 | `start` | 启动或复用本机实例，打印网页地址 | 0 / 2 |
 | `status` | 实例记录 + 真实进程身份 | 0 运行且已验证 / 1 记录存在但不可信 / 2 未运行 |
 | `stop` | 按已验证身份优雅停止；超时如实报告未静止资源 | 0 / 1 / 2 |
@@ -50,6 +51,23 @@ node apps/launcher/bin/pa.mjs rollback --target ~/pa-restored   # 用最近已�
 - `stop` 只对已验证实例发 SIGTERM；超时返回 `stop_timeout_resources_alive` 与非零码，不假装已静止。
 - 网页关闭不影响 daemon；模型 key 只经已认证本机网页设置提交，CLI/日志/发行清单不回显、不存储。
 - 不复制他人在账号 home 中的 native 认证；不升级全局 Node/agent。
+
+## 第四轮增补（身份、闭包、恢复门禁）
+
+- **身份**：`start` 先解析期望 `install/state/mode/access/ports/buildId/startupMode`；不一致返回
+  `instance_conflict`（列出差异），先 `pa stop` 再切换。并发 start 由 `start.lock` 串行化，只有一个
+  赢家（输家 `start_in_progress`）。launcher/API 子进程按精确 argv（`--state` 精确 token，不做子串
+  匹配）、启动时间、uid、ppid、cwd、监听与 health 校验；launcher 被 SIGKILL 后 `status=UNVERIFIED`，
+  `stop` 只结束可核实孤儿，陌生活 PID 不发送信号。
+- **staged install**：`pa build --output <dir>` / `pa stage --output <dir>` 产出闭包；`<dir>/bin/pa`
+  默认 roots 在 `<dir>/var`。闭包 startup 校验实际执行字节 sha256、运行依赖 digest、console HTTP
+  stamp；同长度篡改或旧 fixture console 均 BLOCKED。迁移后（原路径删除）已测 516 个运行模块全部来自
+  闭包；跨 OS/架构/ABI 不声明。
+- **恢复只读**：检测 `restore-report.json` 后显式请求并核对 `recovery_readonly`；marker 不删除、无
+  绕过开关；恢复库旧队列/答案/parked/死亡 writer claim 在首次启动后逐行不变。
+  BLOCKED：当前 main 恢复组合遇到恢复库 `native-projects.json` 会抛 controlled-fixture grant 错误
+  （见 `docs/rfcs/WP-12/0004` 与 `tools/distribution/repro-recovery-project-binding.mjs`）；修复前
+  带项目绑定的恢复库不能只读打开，D 不改 main 代码。
 
 ## 恢复/回滚语义
 
