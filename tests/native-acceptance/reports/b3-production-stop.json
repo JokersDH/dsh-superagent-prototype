@@ -1,0 +1,144 @@
+{
+  "generatedAt": "2026-11-10T07:12:55.543Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "B3 production stop (controlled)",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 6,
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "B3-INVENTORY",
+      "title": "spawned resources appear in the trusted inventory",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "inventory reports res-26875-c0cbb9335451 as active (1 owned)"
+      ],
+      "evidence": [
+        {
+          "ref": "res-26875-c0cbb9335451",
+          "inventory": [
+            {
+              "ref": "res-26875-c0cbb9335451",
+              "writer": "active"
+            }
+          ]
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-ACTIVE",
+      "title": "the writer is proven to be writing before the stop",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "writing (207 bytes)"
+      ],
+      "evidence": [
+        {
+          "bytes": 207
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-PRODUCTION-STOP",
+      "title": "stopOwned stops the group and reports its verdict",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "quiescence=confirmed; the writer stopped growing"
+      ],
+      "evidence": [
+        {
+          "verdict": {
+            "quiescence": "confirmed",
+            "evidenceRefs": [
+              "sigterm-group",
+              "group-quiescent",
+              "leader:code=0;signal=null"
+            ]
+          },
+          "grewAfter": false,
+          "inventoryAfter": [
+            {
+              "ref": "res-26875-c0cbb9335451",
+              "writer": "quiescent"
+            }
+          ]
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-ESCALATION",
+      "title": "a TERM-ignoring writer is escalated before confirmation",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "escalated and confirmed (sigterm-group,sigkill-group,group-quiescent-after-sigkill,leader:code=null;signal=SIGKILL)"
+      ],
+      "evidence": [
+        {
+          "verdict": {
+            "quiescence": "confirmed",
+            "evidenceRefs": [
+              "sigterm-group",
+              "sigkill-group",
+              "group-quiescent-after-sigkill",
+              "leader:code=null;signal=SIGKILL"
+            ]
+          },
+          "grewAfter": false
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-UNKNOWN-OWNER",
+      "title": "an unknown owner cannot be reported as stopped",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "unknown owner reported indeterminate"
+      ],
+      "evidence": [
+        {
+          "unknown": {
+            "quiescence": "indeterminate",
+            "evidenceRefs": [
+              "unknown-resource"
+            ]
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-CLOSED-ADMISSION",
+      "title": "a closed admission refuses new writers",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "new writers refused; the inventory is still readable for recovery"
+      ],
+      "evidence": [
+        {
+          "refused": true,
+          "inventoryStillReadable": true
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
