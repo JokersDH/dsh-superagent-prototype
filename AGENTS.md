@@ -8,9 +8,19 @@
 - Original prototype code is in `src/`, `tests/`, `prompts/`, `skills/`, and `docs/`. Preserve upstream MIT attribution.
 - New product directories are `packages/` and `apps/` at this repository root. G0 experiments belong in `tools/reuse-spike/`. Do not create another nested Git repository or an unrelated product checkout.
 
-## Product Wave-03 Assignments (2026-11-10)
+## Product Wave-04 Assignments (2026-11-10)
 
-- Current execution plan is `agent-tasks/product-wave-03/README.zh-CN.md`; it supersedes the old path assignments below for new work. The user has five external developers A/B/C/D/E. Prior measured results remain scoped evidence, not whole-product admission.
+- Current new work follows `agent-tasks/product-wave-04/README.zh-CN.md` and each role's packet. It supersedes wave-03 scheduling while preserving all historical test scope, budgets, branches and path ownership. A–E continue existing checkouts, preserve their own changes, and merge current origin/main.
+- Main has published `packages/contracts/src/assistant-state.ts` for synchronous A persistence/C domain consumers and the restored-state `recovery_readonly` startup entry. Read `docs/rfcs/WP-16/0016-wave-04-interfaces-and-admission.md` before implementing those boundaries.
+- A owns storage/workflows and append-only v11+ migrations, including decision provenance/proposal persistence and catalog indexes; C owns domain fixes and prepare/commit consumers, no SQL. Main owns deterministic application/HTTP/provider/UI composition and root lock.
+- B must first fix false-PASS matrix branches and real-entry budget accounting, then validate production control/recovery. Existing wave-03 budget and historical attempts persist; no new model allowance is created by the new packet.
+- D must first close active-state rollback, restored first-start replay, requested-instance matching and content-digest gaps, then deliver an actual relocatable runtime closure. D may consume main's recovery mode but cannot delete restore markers or self-authorize old native work.
+- E must first harden its full-product layer/source/evidence gate, then independently test the integrated catalog/recheck/assistant/distribution flows. Main does not edit E's tests. No full-product release is admitted by the current B/D/E candidate reports.
+- Main/A/C/D/E have zero model tasks for this wave. B may only use the verified remainder of its previous grant after pre-send reservation/unknown-send reconciliation. Preserve user services 5180/8796, 5181/8797 and 5182/8798; all probes use isolated resources.
+
+## Historical Product Wave-03 Assignments (2026-11-10)
+
+- Prior execution plan was `agent-tasks/product-wave-03/README.zh-CN.md`; its ownership below is retained by wave-04. The user has five external developers A/B/C/D/E. Prior measured results remain scoped evidence, not whole-product admission.
 - Main owns `apps/console/`, `packages/contracts/`, `packages/application/`, `packages/questions/`, `apps/coordinator/`, root configuration/lock and cross-module integration. Main is redesigning the conversation-first graphite/white/evergreen workbench and integrating deterministic product behavior.
 - A keeps its current checkout/branch and owns `packages/storage/` plus `packages/workflows/`, including the only production SQL migration ownership. Read `agent-tasks/product-wave-03/agent-a-workflows.zh-CN.md`. Old environment candidates remain preserved; submit any narrow compatibility fixes explicitly.
 - B keeps its current checkout/branch and owns `apps/runner/`, `packages/drivers/codex-native/`, `packages/driver-kit/`, `packages/testing/` and `tests/native-acceptance/`. Main must not edit those regions concurrently. Read `agent-tasks/product-wave-03/agent-b-runtime.zh-CN.md`.

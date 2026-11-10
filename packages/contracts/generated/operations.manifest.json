@@ -1,0 +1,7 @@
+{
+  "protocol": "work-verification/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "3a8484c69cba019646cde5c1e829574fe1108538f34baa94be05b5f1978aeaf7",
+  "sourceHash": "23b21d295863db31ce9bbb0365990ce91721403e57271b925caf0afd8ccda105"
+}

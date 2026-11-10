@@ -3,3 +3,4 @@ export type { ProductApplication, ApplicationOptions, CompletionReviewPort, Proj
 export { ApplicationFault } from './errors.ts'
 export { bindCoreRepositories } from './core-repositories.ts'
 export type { CoreStorePort } from './core-repositories.ts'
+export { ApplicationConversations } from './conversations.ts'

@@ -1,0 +1,72 @@
+{
+  "status": "PASS_SCOPED_VERIFICATION_RECOVERY",
+  "date": "2026-11-10",
+  "branch": "codex/g2-execution-integration",
+  "baseCommit": "3957e30cbbaa3cd86a672fb4583922eba8364fc8",
+  "implementationCommit": "ff27a875c05b56cdf4c9ab4153b6f8dd99fac3ce",
+  "sourceCommit": "befe7a66b41e6cf3585099434bb976a35583e224",
+  "integrationTarget": "origin/main",
+  "applicationModelCalls": 0,
+  "ownedPaths": [
+    "packages/contracts/src/operations.ts and its exports, generator, generated schema and tests",
+    "packages/application/src/service.ts",
+    "apps/coordinator/http/app.ts",
+    "apps/coordinator/product/execution.ts, runtime.ts and demo.ts",
+    "apps/console/src/App.tsx, transport.ts and native-transport tests",
+    "tests/integration/product-execution.case.mjs and verification-recovery-browser.mjs",
+    "Root verification-recovery script, shared checkpoint/guide/roadmap and this release evidence"
+  ],
+  "verification": [
+    { "command": "pnpm --filter @personal-agent/contracts test", "status": "PASS", "tests": 192 },
+    { "command": "pnpm --filter @personal-agent/application test", "status": "PASS", "tests": 12 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:product", "status": "PASS", "tests": 19 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:http", "status": "PASS", "tests": 14 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:environment", "status": "PASS", "tests": 3 },
+    { "command": "pnpm --filter @personal-agent/console test", "status": "PASS", "tests": 14 },
+    { "command": "pnpm --filter @personal-agent/coordinator typecheck:product", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/console typecheck", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/application -r build", "status": "PASS" },
+    { "command": "env VITE_CONSOLE_MODE=http pnpm --filter @personal-agent/console build", "status": "PASS", "scope": "HTTP transport selected explicitly; this is not an installer or release admission" },
+    { "command": "pnpm --filter @personal-agent/contracts check:generated", "status": "PASS", "runtimeSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d" },
+    { "command": "node product-spec/tools/verify-spec.mjs --check", "status": "PASS", "scope": "Specification consistency only" },
+    { "command": "node tests/integration/verification-recovery-browser.mjs --no-capture", "status": "PASS", "tests": 3, "evidence": "browser-report.json", "sourceCommit": "befe7a66b41e6cf3585099434bb976a35583e224", "sourceWorktreeClean": true }
+  ],
+  "testSourceScope": "Module, HTTP, product and environment checks ran on the implementation working tree before ff27a87. The optional-route compatibility tests, typecheck and explicit HTTP build ran before befe7a6. The three browser flows ran against committed befe7a6 with clean source paths.",
+  "coverage": [
+    "Infrastructure verification failures stop after three attempts and remain parked across reopen",
+    "Invalid candidate/environment/proof stops automatic verification immediately",
+    "Authenticated HTTP reads and explicit recovery commands with server-owned actor",
+    "Same command replay, changed payload conflict, stale generation, wrong conversation and forged actor",
+    "Atomic rollback retains the original block when enqueue fails",
+    "Fresh block identity prevents old recovery actions from resuming a later failure",
+    "Changed resource manifest, retired candidate and expired authorization refuse recovery",
+    "Machine non-PASS verification stays immutable and cannot be accepted or replaced by recovery",
+    "Desktop and narrow browser state, reloading, real recheck button, acceptance and delivered reopen",
+    "Exactly one controlled begin across verification failure, recheck, acceptance and reopen",
+    "Old local backend may omit the optional HTTP route; auth and malformed responses remain errors"
+  ],
+  "evidence": {
+    "browser": "browser-report.json",
+    "desktop": "desktop-blocked.png",
+    "mobile": "mobile-blocked.png",
+    "captureScope": "Screenshots captured from the implementation candidate before ff27a87; final committed functional rerun did not overwrite them",
+    "handoff": "docs/rfcs/WP-16/0014-verification-recovery-checkpoint.md"
+  },
+  "nextConsumers": {
+    "A": "Continue workflow/storage package; no schema migration was added here. Publish workflow and index ports for main integration.",
+    "B": "Continue original native control/recovery package; Runner and native wire are unchanged and this is not native compatibility evidence.",
+    "C": "Continue bounded context/proposal/decision package and publish its interface checkpoint; this recovery command is not a reasoner tool grant.",
+    "D": "Consume product.read and product.operations for the actual HTTP composition. Do not replay old physical authority on migration.",
+    "E": "Independently test the public schemas and two work-verification endpoints from latest main; do not substitute these producer tests for independent acceptance.",
+    "main": "Consume A workflow/project-setting and C assistant-domain checkpoints; integrate B runtime controls and D production launcher as their admitted interfaces arrive. Keep E acceptance independent."
+  },
+  "limitations": [
+    "Controlled child/HTTP/SQLite and isolated offline preparation only; no new native or model compatibility task",
+    "No full G2/G3 or internal distribution admission, no overall completion percentage",
+    "Only original local-state reopen was tested, not another machine or migrated resource authority",
+    "Environment re-preparation and replacing a completed immutable verification are separate work",
+    "A/B/C/D/E external worktrees and user ARCHITECTURE-NOTES.zh-CN.md were not modified",
+    "Existing user services 5180/8796 and 5181/8797 were not restarted; new backend endpoints become available on a normal restart",
+    "All self-created browser API/frontend services and controlled processes were closed after tests"
+  ]
+}

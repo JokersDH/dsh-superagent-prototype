@@ -7,6 +7,8 @@ import { CONTRACT_API_MAJOR, CONTRACT_VERSION, wireSchemas } from '../src/schema
 import { ApplicationConfigurationSchema, CONFIGURATION_PROTOCOL } from '../src/configuration.ts';
 import { AssistantProviderStatusSchema, AssistantModelSelectionSchema, AssistantStreamUpdateSchema } from '../src/assistant.ts';
 import { ProjectRegistrationInputSchema, WorkLocationSchema, WorkEnvironmentSchema } from '../src/projects.ts';
+import { WorkVerificationStatusSchema, VerificationRetryCommandSchema } from '../src/operations.ts';
+import { ConversationSummarySchema, ConversationCatalogQuerySchema, ConversationCatalogSchema, ConversationCommandSchema } from '../src/conversations.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -42,6 +44,12 @@ outputs.set('generated/assistant.manifest.json', canonical({ protocol: 'assistan
 const projectsText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:project-configuration:1', $defs: { ProjectRegistrationInput: z.toJSONSchema(ProjectRegistrationInputSchema, { target: 'draft-2020-12', io: 'input' }), WorkLocation: z.toJSONSchema(WorkLocationSchema, { target: 'draft-2020-12', io: 'input' }), WorkEnvironment: z.toJSONSchema(WorkEnvironmentSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/projects.schema.json', projectsText);
 outputs.set('generated/projects.manifest.json', canonical({ protocol: 'project-configuration/1', schemaHash: digest(projectsText), sourceHash: digest(readFileSync(resolve(root, 'src/projects.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const operationsText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:work-verification:1', $defs: { WorkVerificationStatus: z.toJSONSchema(WorkVerificationStatusSchema, { target: 'draft-2020-12', io: 'input' }), VerificationRetryCommand: z.toJSONSchema(VerificationRetryCommandSchema, { target: 'draft-2020-12', io: 'input' }) } });
+outputs.set('generated/operations.schema.json', operationsText);
+outputs.set('generated/operations.manifest.json', canonical({ protocol: 'work-verification/1', schemaHash: digest(operationsText), sourceHash: digest(readFileSync(resolve(root, 'src/operations.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const conversationsText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:conversation-catalog:1', $defs: { ConversationSummary: z.toJSONSchema(ConversationSummarySchema, { target: 'draft-2020-12', io: 'input' }), ConversationCatalogQuery: z.toJSONSchema(ConversationCatalogQuerySchema, { target: 'draft-2020-12', io: 'input' }), ConversationCatalog: z.toJSONSchema(ConversationCatalogSchema, { target: 'draft-2020-12', io: 'input' }), ConversationCommand: z.toJSONSchema(ConversationCommandSchema, { target: 'draft-2020-12', io: 'input' }) } });
+outputs.set('generated/conversations.schema.json', conversationsText);
+outputs.set('generated/conversations.manifest.json', canonical({ protocol: 'conversation-catalog/1', schemaHash: digest(conversationsText), sourceHash: digest(readFileSync(resolve(root, 'src/conversations.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [path, content] of outputs) {
   const target = resolve(root, path);
   if (check) {
