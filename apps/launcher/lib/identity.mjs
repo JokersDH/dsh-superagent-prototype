@@ -1,0 +1,133 @@
+/**
+ * Instance identity helpers shared by start, status, stop, doctor and stale-record cleanup.
+ *
+ * Identity is compared field-by-field: install/state/mode/access/build/startupMode/ports. The
+ * coordinator child is verified by its exact argv array (not a substring), start time, uid, parent,
+ * cwd, listener and health projection. A recorded breadcrumb is never evidence that a process is
+ * gone; a live but unmatched PID is never signalled.
+ */
+import { realpathSync } from 'node:fs'
+import { basename, isAbsolute, join, resolve } from 'node:path'
+
+export const STARTUP_MODES = ['normal', 'recovery_readonly']
+export const MODES = ['fixture', 'personal']
+export const ACCESS_MODES = ['local-development', 'token']
+
+export function canonicalPath(path) {
+  try {
+    return realpathSync(path)
+  } catch {
+    return resolve(path)
+  }
+}
+
+/** Fields that must match before an existing instance may be reused. */
+export function identityDifferences(record, desired) {
+  const differences = []
+  const compare = (field, expected, actual) => {
+    if (expected !== actual) differences.push({ field, expected, actual })
+  }
+  compare('install', desired.install, canonicalPath(record.install))
+  compare('state', desired.state, canonicalPath(record.state))
+  compare('mode', desired.mode, record.mode)
+  compare('access', desired.access, record.access)
+  compare('buildId', desired.buildId, record.buildId)
+  compare('startupMode', desired.startupMode, record.startupMode ?? 'normal')
+  compare('consoleURL', desired.consoleURL, record.consoleURL)
+  compare('apiURL', desired.apiURL, record.apiURL)
+  return differences
+}
+
+/** The expected coordinator argv recorded on an instance. */
+export function expectedDaemonArgv(record) {
+  const argv = [
+    join(record.install, 'apps/coordinator/product/demo.ts'),
+    '--port',
+    String(new URL(record.apiURL).port),
+    '--state',
+    record.state,
+    '--console-origin',
+    record.consoleURL,
+    '--startup-mode',
+    record.startupMode ?? 'normal',
+  ]
+  if ((record.startupMode ?? 'normal') !== 'recovery_readonly') {
+    argv.push('--assistant')
+    if (record.mode === 'personal') argv.push('--native')
+  }
+  if (record.access === 'local-development') argv.push('--local-access')
+  return argv
+}
+
+/** Split an OS command line into tokens. Quoting is not reconstructed; exact recorded argv wins. */
+export function commandTokens(command) {
+  if (typeof command !== 'string') return []
+  return command.trim().split(/\s+/).filter(Boolean)
+}
+
+/**
+ * Parse the coordinator command line structurally: the state value must be the exact token after
+ * `--state` (never a substring match), the port and console origin must match, and the script must
+ * be the recorded coordinator entry.
+ */
+export function parseDaemonInvocation(tokens) {
+  if (!Array.isArray(tokens) || tokens.length < 2) return null
+  const [executable, script, ...rest] = tokens
+  const options = {}
+  for (let index = 0; index < rest.length; index += 1) {
+    const token = rest[index]
+    if (!token.startsWith('--')) continue
+    const equals = token.indexOf('=')
+    if (equals > 2) {
+      options[token.slice(2, equals)] = token.slice(equals + 1)
+      continue
+    }
+    const name = token.slice(2)
+    const next = rest[index + 1]
+    if (next !== undefined && !next.startsWith('--')) {
+      options[name] = next
+      index += 1
+    } else options[name] = true
+  }
+  return { executable, script, options }
+}
+
+export function daemonInvocationMismatches(record, tokens) {
+  const parsed = parseDaemonInvocation(tokens)
+  if (parsed === null) return ['unparseable_command']
+  const mismatches = []
+  const expectedScript = join(record.install, 'apps/coordinator/product/demo.ts')
+  if (parsed.script !== expectedScript) mismatches.push('script')
+  if (parsed.options.port !== String(new URL(record.apiURL).port)) mismatches.push('port')
+  if (parsed.options.state !== record.state) mismatches.push('state')
+  if (parsed.options['console-origin'] !== record.consoleURL) mismatches.push('console_origin')
+  if ((parsed.options['startup-mode'] ?? 'normal') !== (record.startupMode ?? 'normal')) mismatches.push('startup_mode')
+  return mismatches
+}
+
+/**
+ * A recorded argv array and the exact OS command line must agree token-for-token. `ps` may print the
+ * executable as its basename (`node`), so argv[0] is compared flexibly; every other token must be
+ * identical (this is what prevents `foo` from matching `foo-other`).
+ */
+export function argvMatchesCommand(argv, command, options = {}) {
+  if (!Array.isArray(argv) || argv.length < 2 || typeof command !== 'string') return false
+  const tokens = commandTokens(command)
+  if (tokens.length !== argv.length) return false
+  const executable = argv[0]
+  const executableOk =
+    tokens[0] === executable ||
+    basename(executable) === tokens[0] ||
+    tokens[0].endsWith(`/${basename(executable)}`)
+  if (!executableOk) return false
+  for (let index = 1; index < argv.length; index += 1) {
+    if (index === 1 && typeof options.baseDir === 'string') {
+      // The OS may print the script as invoked (relative) while Node records an absolute argv[1].
+      const observed = isAbsolute(tokens[index]) ? tokens[index] : join(options.baseDir, tokens[index])
+      if (canonicalPath(observed) !== canonicalPath(argv[index])) return false
+      continue
+    }
+    if (tokens[index] !== argv[index]) return false
+  }
+  return true
+}

@@ -8,6 +8,7 @@ import { execFile } from 'node:child_process'
 import { closeSync, fsyncSync, lstatSync, openSync, readFileSync, renameSync, unlinkSync, writeSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { promisify } from 'node:util'
+import { argvMatchesCommand, commandTokens, daemonInvocationMismatches } from './identity.mjs'
 
 const execute = promisify(execFile)
 export const INSTANCE_PROTOCOL = 'personal-product-instance/1'
@@ -25,6 +26,15 @@ export class InstanceError extends Error {
 }
 
 const isRecord = (value) => typeof value === 'object' && value !== null && !Array.isArray(value)
+const optionalArgv = (value, field) => {
+  if (value === undefined) return undefined
+  if (!Array.isArray(value) || value.length === 0 || value.length > 64) throw new InstanceError('invalid_instance_record', `Instance ${field} is invalid`)
+  for (const entry of value) {
+    if (typeof entry !== 'string' || entry.length === 0 || entry.length > 4096) throw new InstanceError('invalid_instance_record', `Instance ${field} entry is invalid`)
+  }
+  return [...value]
+}
+
 const pid = (value, field) => {
   if (!Number.isSafeInteger(value) || value <= 1) throw new InstanceError('invalid_instance_record', `Instance field ${field} is not a pid`)
   return value
@@ -57,6 +67,24 @@ export function validateInstanceRecord(value) {
     mode: ['fixture', 'personal'].includes(value.mode) ? value.mode : (() => { throw new InstanceError('invalid_instance_record', 'Instance mode is invalid') })(),
     access: ['local-development', 'token'].includes(value.access) ? value.access : (() => { throw new InstanceError('invalid_instance_record', 'Instance access mode is invalid') })(),
     startupMode: value.startupMode === undefined ? 'normal' : ['normal', 'recovery_readonly'].includes(value.startupMode) ? value.startupMode : (() => { throw new InstanceError('invalid_instance_record', 'Instance startup mode is invalid') })(),
+    ...(optionalArgv(value.launcherArgv, 'launcherArgv') === undefined ? {} : { launcherArgv: optionalArgv(value.launcherArgv, 'launcherArgv') }),
+    ...(optionalArgv(value.apiArgv, 'apiArgv') === undefined ? {} : { apiArgv: optionalArgv(value.apiArgv, 'apiArgv') }),
+    ...(value.apiProcessStart === undefined
+      ? {}
+      : {
+          apiProcessStart:
+            typeof value.apiProcessStart === 'string' && value.apiProcessStart.length > 0 && value.apiProcessStart.length <= 128
+              ? value.apiProcessStart
+              : (() => { throw new InstanceError('invalid_instance_record', 'Instance apiProcessStart is invalid') })(),
+        }),
+    ...(value.apiUid === undefined
+      ? {}
+      : {
+          apiUid:
+            Number.isSafeInteger(value.apiUid) && value.apiUid >= 0
+              ? value.apiUid
+              : (() => { throw new InstanceError('invalid_instance_record', 'Instance apiUid is invalid') })(),
+        }),
     startedAt: typeof value.startedAt === 'string' && !Number.isNaN(Date.parse(value.startedAt)) ? value.startedAt : (() => { throw new InstanceError('invalid_instance_record', 'Instance startedAt is invalid') })(),
   }
   return record
@@ -119,6 +147,15 @@ export async function processStart(pidValue = process.pid) {
   return command('ps', ['-p', String(pidValue), '-o', 'lstart='])
 }
 
+/** Capture the start time and uid of an owned child for later identity comparison. */
+export async function captureProcessFacts(pidValue) {
+  const [start, uid] = await Promise.all([
+    processStart(pidValue),
+    command('ps', ['-p', String(pidValue), '-o', 'uid=']),
+  ])
+  return { processStart: start, uid: uid === null ? null : Number(uid) }
+}
+
 export async function processAlive(pidValue) {
   try {
     process.kill(pidValue, 0)
@@ -136,6 +173,12 @@ export async function processAlive(pidValue) {
  * When the launcher is gone, prove the recorded API child is still the coordinator process for this
  * exact private state before signalling it. A reused PID or a different command line is refused.
  */
+/**
+ * When the launcher is gone, prove the recorded coordinator child is still the same process for this
+ * exact private state before signalling it. The recorded argv is compared token-for-token (never a
+ * substring), together with start time, uid, cwd and listener. A reused PID or a different command
+ * line is refused, and a removed breadcrumb is not treated as proof that the process disappeared.
+ */
 export async function verifyCoordinatorProcess(record) {
   const checks = []
   const failures = []
@@ -148,12 +191,24 @@ export async function verifyCoordinatorProcess(record) {
     return { ok: false, checks, failures }
   }
   record0('api_alive', true)
-  const [argv, uid] = await Promise.all([
+  const [commandLine, uid, start, cwd] = await Promise.all([
     command('ps', ['-ww', '-p', String(record.apiPid), '-o', 'command=']),
     command('ps', ['-p', String(record.apiPid), '-o', 'uid=']),
+    processStart(record.apiPid),
+    command('lsof', ['-a', '-p', String(record.apiPid), '-d', 'cwd', '-Fn']),
   ])
-  record0('api_command', argv !== null && /apps\/coordinator\/product\/demo\.ts/.test(argv) && argv.includes(`--state ${record.state}`), argv === null ? 'unavailable' : 'checked')
-  record0('api_owner', uid !== null && (!process.getuid || Number(uid) === process.getuid()))
+  const argvExact = record.apiArgv !== undefined && argvMatchesCommand(record.apiArgv, commandLine ?? '', { baseDir: record.install })
+  const structural = record.apiArgv === undefined ? daemonInvocationMismatches(record, commandTokens(commandLine ?? '')) : []
+  record0('api_argv', commandLine !== null && (record.apiArgv !== undefined ? argvExact : structural.length === 0), {
+    exact: record.apiArgv !== undefined ? argvExact : null,
+    mismatches: structural,
+  })
+  record0('api_process_start', record.apiProcessStart === undefined || start === record.apiProcessStart, {
+    expected: record.apiProcessStart ?? null,
+    observed: start,
+  })
+  record0('api_owner', uid !== null && (!process.getuid || Number(uid) === process.getuid()) && (record.apiUid === undefined || Number(uid) === record.apiUid))
+  record0('api_cwd', cwd !== null && cwd.split('\n').includes(`n${resolve(record.install)}`))
   const apiPort = new URL(record.apiURL).port
   const listener = await command('lsof', ['-a', '-p', String(record.apiPid), '-iTCP:' + apiPort, '-sTCP:LISTEN', '-Fn'])
   record0('api_listener', listener !== null && listener.split('\n').includes(`p${record.apiPid}`))
@@ -191,14 +246,17 @@ export async function verifyInstance(record, options = {}) {
   }
   const alive = await processAlive(record.pid)
   if (!record0('launcher_alive', alive)) return { ok: false, checks, failures }
-  const [start, argv, uid, cwd] = await Promise.all([
+  const [start, commandLine, uid, cwd] = await Promise.all([
     processStart(record.pid),
     command('ps', ['-ww', '-p', String(record.pid), '-o', 'command=']),
     command('ps', ['-p', String(record.pid), '-o', 'uid=']),
     command('lsof', ['-a', '-p', String(record.pid), '-d', 'cwd', '-Fn']),
   ])
   record0('process_start', start !== null && start === record.processStart, start ?? 'unavailable')
-  record0('launcher_command', argv !== null && LAUNCHER_COMMAND.test(argv), argv === null ? 'unavailable' : 'matches_launcher')
+  const launcherMatches = record.launcherArgv !== undefined
+    ? commandLine !== null && argvMatchesCommand(record.launcherArgv, commandLine, { baseDir: record.install })
+    : commandLine !== null && LAUNCHER_COMMAND.test(commandLine)
+  record0('launcher_command', launcherMatches, record.launcherArgv !== undefined ? 'exact_argv' : 'legacy_pattern')
   record0('owner', uid !== null && (!process.getuid || Number(uid) === process.getuid()))
   const canonicalInstall = options.installRoot ?? record.install
   record0(
@@ -207,6 +265,30 @@ export async function verifyInstance(record, options = {}) {
     cwd === null ? 'unavailable' : 'cwd_checked',
   )
   record0('install_identity', resolve(canonicalInstall) === record.install)
+
+  // The API child is verified by exact argv (or structural parse for legacy records), start time,
+  // uid, parent, cwd and listener — not by a listening port alone.
+  const [apiCommand, apiUid, apiParent, apiStart, apiCwd] = await Promise.all([
+    command('ps', ['-ww', '-p', String(record.apiPid), '-o', 'command=']),
+    command('ps', ['-p', String(record.apiPid), '-o', 'uid=']),
+    command('ps', ['-p', String(record.apiPid), '-o', 'ppid=']),
+    processStart(record.apiPid),
+    command('lsof', ['-a', '-p', String(record.apiPid), '-d', 'cwd', '-Fn']),
+  ])
+  const apiArgvExact = record.apiArgv !== undefined && argvMatchesCommand(record.apiArgv, apiCommand ?? '', { baseDir: record.install })
+  const apiStructural = record.apiArgv === undefined ? daemonInvocationMismatches(record, commandTokens(apiCommand ?? '')) : []
+  record0('api_argv', apiCommand !== null && (record.apiArgv !== undefined ? apiArgvExact : apiStructural.length === 0), {
+    exact: record.apiArgv !== undefined ? apiArgvExact : null,
+    mismatches: apiStructural,
+  })
+  record0('api_process_start', record.apiProcessStart === undefined || apiStart === record.apiProcessStart, {
+    expected: record.apiProcessStart ?? null,
+    observed: apiStart,
+  })
+  record0('api_owner', apiUid !== null && (!process.getuid || Number(apiUid) === process.getuid()) && (record.apiUid === undefined || Number(apiUid) === record.apiUid))
+  record0('api_parent', apiParent !== null && Number(apiParent) === record.pid)
+  record0('api_cwd', apiCwd !== null && apiCwd.split('\n').includes(`n${resolve(record.install)}`))
+
   const listeners = await Promise.all(
     [
       [record.apiPid, new URL(record.apiURL).port],

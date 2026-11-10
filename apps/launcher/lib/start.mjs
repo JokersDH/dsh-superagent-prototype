@@ -9,13 +9,14 @@
  */
 import { spawn } from 'node:child_process'
 import { createServer } from 'node:net'
-import { realpathSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { join } from 'node:path'
 import { ensureRoots } from '@personal-agent/portability'
 import { EXIT } from './cli.mjs'
 import { readLauncherConfig } from './config.mjs'
-import { spawnDaemon } from './daemon.mjs'
-import { processStart, readInstanceRecord, removeInstanceRecord, verifyInstance, writeInstanceRecord } from './instance.mjs'
+import { daemonArgv, spawnDaemon } from './daemon.mjs'
+import { canonicalPath, identityDifferences } from './identity.mjs'
+import { captureProcessFacts, processStart, readInstanceRecord, removeInstanceRecord, verifyInstance, writeInstanceRecord } from './instance.mjs'
+import { StartLockHeld, acquireStartLock } from './start-lock.mjs'
 import { expectedStartupMode, recoverySummary } from './recovery.mjs'
 import { httpGet } from './http-probe.mjs'
 import { consoleIndexPath, readRelease, statFile, verifyReleaseArtifacts } from './release.mjs'
@@ -35,39 +36,34 @@ function freePort(port) {
   })
 }
 
-const canonicalPath = (path) => {
-  try {
-    return realpathSync(path)
-  } catch {
-    return resolve(path)
-  }
-}
-
-/**
- * Fields that must match before an existing instance may be reused. Reuse is never inferred from a
- * listening port alone: a different state/mode/access/build/startup mode/port is a stable conflict.
- */
-function identityDifferences(record, desired) {
-  const differences = []
-  const compare = (field, expected, actual) => {
-    if (expected !== actual) differences.push({ field, expected, actual })
-  }
-  compare('install', desired.install, canonicalPath(record.install))
-  compare('state', desired.state, canonicalPath(record.state))
-  compare('mode', desired.mode, record.mode)
-  compare('access', desired.access, record.access)
-  compare('buildId', desired.buildId, record.buildId)
-  compare('startupMode', desired.startupMode, record.startupMode ?? 'normal')
-  compare('consoleURL', desired.consoleURL, record.consoleURL)
-  compare('apiURL', desired.apiURL, record.apiURL)
-  return differences
-}
-
 /**
  * Executes the start flow. Returns either a reuse result (the existing instance stays attached) or a
  * running result with `wait` resolving to the launcher exit code once the owned process is gone.
  */
-export async function startInstance({ installRoot, roots, values, log = (line) => process.stdout.write(`${line}\n`) }) {
+/**
+ * Serialize startup: exactly one launcher may pass identity checks and write the instance record.
+ * A live startup lock yields `start_in_progress`; a dead breadcrumb is removed and retried.
+ */
+export async function startInstance(args) {
+  const config = readLauncherConfig(args.roots.config)
+  if (config === null)
+    return blocked('first_run_required', '本机尚未初始化私有根目录与 launcher 配置', { config: args.roots.config }, '先运行 `pa first-run`。')
+  let lock
+  try {
+    lock = await acquireStartLock(args.roots.config)
+  } catch (error) {
+    if (error instanceof StartLockHeld)
+      return blocked('start_in_progress', '另一个 `pa start` 正在进行', { holder: error.holder }, '等待其结束或运行 `pa status`/`pa doctor`；不会并发启动第二个实例。')
+    throw error
+  }
+  try {
+    return await startInstanceLocked(args)
+  } finally {
+    lock.release()
+  }
+}
+
+async function startInstanceLocked({ installRoot, roots, values, log = (line) => process.stdout.write(`${line}\n`) }) {
   const config = readLauncherConfig(roots.config)
   if (config === null)
     return blocked('first_run_required', '本机尚未初始化私有根目录与 launcher 配置', { config: roots.config }, '先运行 `pa first-run`。')
@@ -97,6 +93,8 @@ export async function startInstance({ installRoot, roots, values, log = (line) =
     return blocked('console_assets_missing', '静态网页产物缺失', { root: release.build.consoleRoot }, '重新运行 `pa build`。')
 
   const ensured = ensureRoots(roots)
+  const canonicalInstall = canonicalPath(installRoot)
+  const canonicalState = canonicalPath(ensured.roots.data)
   const consolePort = values.port === undefined ? DEFAULT_CONSOLE_PORT : Number(values.port)
   const apiPort = values['api-port'] === undefined ? DEFAULT_API_PORT : Number(values['api-port'])
   for (const [name, value] of [
@@ -109,11 +107,11 @@ export async function startInstance({ installRoot, roots, values, log = (line) =
   if (consolePort === apiPort) return blocked('invalid_port', '网页与接口端口不能相同')
   const mode = values.fixture === true ? 'fixture' : 'personal'
   const access = values['require-login'] === true ? 'token' : 'local-development'
-  const startupMode = expectedStartupMode(ensured.roots.data)
-  const recovery = recoverySummary(ensured.roots.data)
+  const startupMode = expectedStartupMode(canonicalState)
+  const recovery = recoverySummary(canonicalState)
   const desired = {
-    install: canonicalPath(installRoot),
-    state: canonicalPath(ensured.roots.data),
+    install: canonicalInstall,
+    state: canonicalState,
     mode,
     access,
     buildId: release.buildId,
@@ -160,16 +158,25 @@ export async function startInstance({ installRoot, roots, values, log = (line) =
   const consoleURL = desired.consoleURL
   const apiURL = desired.apiURL
   const server = createDistributionServer({
-    staticRoot: join(installRoot, release.build.consoleRoot),
+    staticRoot: join(canonicalInstall, release.build.consoleRoot),
     apiOrigin: apiURL,
     buildId: release.buildId,
   })
   await listenDistributionServer(server, consolePort)
 
-  const daemon = spawnDaemon({
-    installRoot,
+  const expectedArgv = daemonArgv({
+    installRoot: canonicalInstall,
     apiPort,
-    state: ensured.roots.data,
+    state: canonicalState,
+    consoleURL,
+    mode,
+    access,
+    startupMode,
+  })
+  const daemon = spawnDaemon({
+    installRoot: canonicalInstall,
+    apiPort,
+    state: canonicalState,
     consoleURL,
     apiURL,
     mode,
@@ -228,16 +235,21 @@ export async function startInstance({ installRoot, roots, values, log = (line) =
     return blocked('console_unavailable', '静态网页未能通过自检', { log: daemon.logPath }, '重新运行 `pa build` 并检查日志。')
   }
 
+  const apiFacts = await captureProcessFacts(daemon.apiPid)
   const record = {
     protocol: 'personal-product-instance/1',
     pid: process.pid,
     processStart: await processStart(process.pid),
+    launcherArgv: process.argv,
     apiPid: daemon.apiPid,
     consolePid: process.pid,
+    apiArgv: [process.execPath, ...expectedArgv],
+    apiProcessStart: apiFacts.processStart,
+    apiUid: apiFacts.uid ?? (process.getuid ? process.getuid() : 0),
     apiURL,
     consoleURL,
-    state: ensured.roots.data,
-    install: canonicalPath(installRoot),
+    state: canonicalState,
+    install: canonicalInstall,
     buildId: release.buildId,
     mode,
     access,

@@ -15,7 +15,7 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { createServer } from 'node:net'
-import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { closeSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -307,12 +307,102 @@ try {
   if (conflictPorts.json?.code !== 'instance_conflict') throw new Error(`different port reuse expected instance_conflict, got ${conflictPorts.json?.code}`)
   step('reuse-requires-matching-identity', 'PASS', { state: conflictState.json.code, ports: conflictPorts.json.code })
 
+  // Concurrent start: exactly one launcher may pass the startup lock and record the instance.
+  const raceRoot = join(root, 'race')
+  const race = {
+    config: join(raceRoot, 'config'),
+    data: join(raceRoot, 'data'),
+    cache: join(raceRoot, 'cache'),
+    logs: join(raceRoot, 'logs'),
+    workspaces: join(raceRoot, 'workspaces'),
+  }
+  mkdirSync(race.config, { recursive: true, mode: 0o700 })
+  copyFileSync(join(roots.config, 'release.json'), join(race.config, 'release.json'))
+  const raceArgs = [
+    '--install', REPO_ROOT,
+    '--config-root', race.config,
+    '--data-root', race.data,
+    '--cache-root', race.cache,
+    '--logs-root', race.logs,
+    '--workspace-root', race.workspaces,
+  ]
+  const raceFirstRun = runPa(['first-run', '--json', ...raceArgs], { allowExit: [0] })
+  if (raceFirstRun.json?.status !== 'OK') throw new Error('race config first-run failed')
+  const racePort = await freePort()
+  const raceApiPort = await freePort()
+  const raceOtherPort = await freePort()
+  const raceOtherApiPort = await freePort()
+  const spawnStart = (port, apiPort) =>
+    spawn(process.execPath, [PA, 'start', '--fixture', '--json', '--port', String(port), '--api-port', String(apiPort), ...raceArgs], {
+      cwd: REPO_ROOT,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+  const first = spawnStart(racePort, raceApiPort)
+  const second = spawnStart(raceOtherPort, raceOtherApiPort)
+  const collect = (child) => {
+    let stdout = ''
+    let stderr = ''
+    child.stdout.setEncoding('utf8')
+    child.stderr.setEncoding('utf8')
+    child.stdout.on('data', (chunk) => { stdout += chunk })
+    child.stderr.on('data', (chunk) => { stderr += chunk })
+    const exited = new Promise((resolvePromise) => child.once('exit', (code, signal) => resolvePromise({ code, signal, stdout, stderr })))
+    return exited
+  }
+  const firstExit = collect(first)
+  const secondExit = collect(second)
+  await new Promise((resolvePromise) => setTimeout(resolvePromise, 5000))
+  const exitedChildren = [first, second].filter((child) => child.exitCode !== null || child.signalCode !== null)
+  const winner = [first, second].find((child) => !exitedChildren.includes(child))
+  if (exitedChildren.length !== 1 || !winner) throw new Error('concurrent start did not settle to exactly one winner')
+  const loser = exitedChildren[0]
+  const loserExit = await (loser === first ? firstExit : secondExit)
+  let loserJson = null
+  try { loserJson = JSON.parse(loserExit.stdout) } catch { loserJson = null }
+  if (loserExit.code !== 2 || !['start_in_progress', 'instance_conflict'].includes(loserJson?.code))
+    throw new Error(`concurrent start loser did not fail closed: ${JSON.stringify(loserExit).slice(0, 500)}`)
+  const raceRunning = runPa(['status', '--json', ...raceArgs], { allowExit: [0] })
+  if (raceRunning.json?.status !== 'RUNNING') throw new Error('concurrent start did not leave exactly one running instance')
+  const raceStop = runPa(['stop', '--json', ...raceArgs], { allowExit: [0] })
+  if (raceStop.json?.status !== 'STOPPED') throw new Error('concurrent winner did not stop cleanly')
+  const winnerExit = await Promise.race([winner === first ? firstExit : secondExit, new Promise((resolvePromise) => setTimeout(() => resolvePromise('timeout'), 15000))])
+  if (winnerExit === 'timeout') throw new Error('concurrent start winner did not exit after stop')
+  step('concurrent-start-single-winner', 'PASS', { loserCode: loserJson?.code, winnerExit: winnerExit.code })
+
   const primaryStop = await stopTrial(primary, { label: 'primary' })
   step('stop-primary', 'PASS', { stopMs: primaryStop.stopMs })
 
   const verifyOffline = runPa(['verify-backup', '--json', '--bundle', backupPath, ...stateArgs()], { allowExit: [0] })
   if (verifyOffline.json?.status !== 'VERIFIED') throw new Error('offline verify-backup did not report VERIFIED')
   step('verify-backup-offline', 'PASS', { manifestDigest: verifyOffline.json.manifestDigest })
+
+  // Orphan recovery: SIGKILL the launcher while the API child survives. A breadcrumb is not proof
+  // the process is gone; only the verified orphan may be stopped, and an unknown PID is left alone.
+  const orphanPort = await freePort()
+  let orphanApiPort = await freePort()
+  if (orphanApiPort === orphanPort) orphanApiPort = await freePort()
+  const orphanState = join(root, 'orphan-state')
+  const orphanRestore = runPa(['restore', '--json', '--bundle', backupPath, '--to', orphanState, ...stateArgs()], { allowExit: [0] })
+  if (orphanRestore.json?.status !== 'RESTORED') throw new Error('orphan fixture restore failed')
+  const orphanTrial = await startTrial(orphanState, { label: 'orphan', consolePort: orphanPort, apiPort: orphanApiPort })
+  orphanTrial.dataRoot = orphanState
+  const orphanApiPid = orphanTrial.status.instance.apiPid
+  process.kill(orphanTrial.child.pid, 'SIGKILL')
+  await Promise.race([orphanTrial.exited, new Promise((resolvePromise) => setTimeout(resolvePromise, 5000))])
+  closeLogFds(orphanTrial)
+  activeTrials.delete(orphanTrial)
+  const orphanStatus = runPa(['status', '--json', ...stateArgs(orphanState)], { allowExit: [0, 1, 2] })
+  if (orphanStatus.json?.status !== 'UNVERIFIED') throw new Error(`killed-launcher record expected UNVERIFIED, got ${orphanStatus.json?.status}`)
+  const orphanStop = runPa(['stop', '--json', ...stateArgs(orphanState)], { allowExit: [0] })
+  if (orphanStop.json?.status !== 'STOPPED_ORPHAN') throw new Error(`orphan stop expected STOPPED_ORPHAN, got ${JSON.stringify(orphanStop.json).slice(0, 400)}`)
+  if (existsSync(join(roots.config, 'instance.json'))) throw new Error('orphan stop left an instance record')
+  const orphanPortClosed = await new Promise((resolvePromise) => {
+    fetch(`http://127.0.0.1:${orphanApiPort}/v1/health`, { signal: AbortSignal.timeout(1000) })
+      .then(() => resolvePromise(false))
+      .catch(() => resolvePromise(true))
+  })
+  if (!orphanPortClosed) throw new Error(`orphan API child ${orphanApiPid} was not stopped`)
+  step('orphan-record-recovery', 'PASS', { killedLauncherPid: orphanTrial.child.pid, stoppedApiPid: orphanApiPid, status: orphanStop.json.status })
 
   const restore = runPa(['restore', '--json', '--bundle', backupPath, '--to', restoredData, ...stateArgs()], { allowExit: [0] })
   if (restore.json?.status !== 'RESTORED') throw new Error(`restore did not report RESTORED: ${JSON.stringify(restore.json).slice(0, 600)}`)

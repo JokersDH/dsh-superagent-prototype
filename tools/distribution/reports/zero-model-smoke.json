@@ -1,13 +1,13 @@
 {
   "case": "DIST-TRIAL-01",
   "status": "PASS",
-  "startedAt": "2026-11-10T07:25:04.036Z",
+  "startedAt": "2026-11-10T07:33:24.213Z",
   "steps": [
     {
       "id": "build",
       "status": "PASS",
       "detail": {
-        "buildId": "8250af85d855073a",
+        "buildId": "249928131129dac8",
         "artifacts": {
           "count": 307,
           "bytes": 4519624
@@ -37,14 +37,14 @@
       "id": "static-console",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:50129"
+        "url": "http://127.0.0.1:55629"
       }
     },
     {
       "id": "instance-marker",
       "status": "PASS",
       "detail": {
-        "buildId": "8250af85d855073a"
+        "buildId": "249928131129dac8"
       }
     },
     {
@@ -85,22 +85,22 @@
       "id": "status-running",
       "status": "PASS",
       "detail": {
-        "pid": 67993,
-        "checks": 9
+        "pid": 17748,
+        "checks": 14
       }
     },
     {
       "id": "reuse-verified-instance",
       "status": "PASS",
       "detail": {
-        "pid": 67993
+        "pid": 17748
       }
     },
     {
       "id": "backup-live",
       "status": "PASS",
       "detail": {
-        "archiveSha256": "08a6ddd3de7de19575fc80383528138a16a6c5ebfbace06244d48a09e3abfcb3",
+        "archiveSha256": "19ba45c369e6097e6b50269ae2c5e66d1746f1cc6dabba33c241a2a4743d94a8",
         "counts": {
           "entries": 1,
           "artifacts": 0,
@@ -117,7 +117,7 @@
       "id": "verify-backup-live",
       "status": "PASS",
       "detail": {
-        "manifestDigest": "35249a1a0b01081fe06dab7c9a10cd14cd2b3b305498f95fad5afaab8f24bebe",
+        "manifestDigest": "8aa6a27cb12f0e84fd751cbdede5111eb978614161535d6be35fa30fbd0faa40",
         "entries": 1
       }
     },
@@ -137,24 +137,41 @@
       }
     },
     {
+      "id": "concurrent-start-single-winner",
+      "status": "PASS",
+      "detail": {
+        "loserCode": "start_in_progress",
+        "winnerExit": 0
+      }
+    },
+    {
       "id": "stop-primary",
       "status": "PASS",
       "detail": {
-        "stopMs": 226
+        "stopMs": 385
       }
     },
     {
       "id": "verify-backup-offline",
       "status": "PASS",
       "detail": {
-        "manifestDigest": "35249a1a0b01081fe06dab7c9a10cd14cd2b3b305498f95fad5afaab8f24bebe"
+        "manifestDigest": "8aa6a27cb12f0e84fd751cbdede5111eb978614161535d6be35fa30fbd0faa40"
+      }
+    },
+    {
+      "id": "orphan-record-recovery",
+      "status": "PASS",
+      "detail": {
+        "killedLauncherPid": 21496,
+        "stoppedApiPid": 21511,
+        "status": "STOPPED_ORPHAN"
       }
     },
     {
       "id": "restore-new-directory",
       "status": "PASS",
       "detail": {
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-1x4M1B/restored",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8yvMOy/restored",
         "pendingRebind": 0
       }
     },
@@ -176,14 +193,14 @@
       "id": "import-managed-bundle",
       "status": "PASS",
       "detail": {
-        "importId": "08a6ddd3de7de19575fc80383528138a16a6c5ebfbace06244d48a09e3abfcb3"
+        "importId": "19ba45c369e6097e6b50269ae2c5e66d1746f1cc6dabba33c241a2a4743d94a8"
       }
     },
     {
       "id": "restore-managed-import",
       "status": "PASS",
       "detail": {
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-1x4M1B/restored-imported"
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8yvMOy/restored-imported"
       }
     },
     {
@@ -199,7 +216,7 @@
       "id": "stop-recovery-readonly",
       "status": "PASS",
       "detail": {
-        "stopMs": 232
+        "stopMs": 264
       }
     },
     {
@@ -226,14 +243,14 @@
       "id": "stop-login-instance",
       "status": "PASS",
       "detail": {
-        "stopMs": 225
+        "stopMs": 295
       }
     },
     {
       "id": "start-restored",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:50217",
+        "url": "http://127.0.0.1:56059",
         "health": {
           "status": "ok",
           "mode": "fixture",
@@ -247,29 +264,29 @@
       "id": "stop-restored",
       "status": "PASS",
       "detail": {
-        "stopMs": 228
+        "stopMs": 284
       }
     },
     {
       "id": "rollback-rehearsal",
       "status": "PASS",
       "detail": {
-        "failedDir": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-1x4M1B/restored.failed-2026-11-10T07-25-16-671Z",
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-1x4M1B/restored"
+        "failedDir": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8yvMOy/restored.failed-2026-11-10T07-33-46-696Z",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8yvMOy/restored"
       }
     },
     {
       "id": "start-after-rollback",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:50239"
+        "url": "http://127.0.0.1:56120"
       }
     },
     {
       "id": "stop-after-rollback",
       "status": "PASS",
       "detail": {
-        "stopMs": 262
+        "stopMs": 343
       }
     },
     {
@@ -286,10 +303,10 @@
     "The trial instance ran on isolated temporary roots/ports; user services were not touched.",
     "Native authentication/environment is not migrated; restored state must be revalidated before real execution."
   ],
-  "durationMs": 13966,
-  "finishedAt": "2026-11-10T07:25:18.002Z",
+  "durationMs": 24211,
+  "finishedAt": "2026-11-10T07:33:48.424Z",
   "outputs": {
-    "backupArchiveSha256": "08a6ddd3de7de19575fc80383528138a16a6c5ebfbace06244d48a09e3abfcb3",
-    "importId": "08a6ddd3de7de19575fc80383528138a16a6c5ebfbace06244d48a09e3abfcb3"
+    "backupArchiveSha256": "19ba45c369e6097e6b50269ae2c5e66d1746f1cc6dabba33c241a2a4743d94a8",
+    "importId": "19ba45c369e6097e6b50269ae2c5e66d1746f1cc6dabba33c241a2a4743d94a8"
   }
 }
