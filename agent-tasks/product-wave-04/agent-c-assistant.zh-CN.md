@@ -1,5 +1,7 @@
 # Agent C：有来源的助理能力与原子提案决定
 
+主线后续已消费A/C并做实际SQLite联调，补充修复见 [C接线补充](c-integration-followup.zh-CN.md)。三项原准入已通过；当前先闭合真实存储决定重放及决定同步commit入口，不重复旧整包。
+
 沿用 C 目录/分支，拥有 context/proposals/knowledge。旧 `2441281` 已集成模块，53 项包内测试保留范围，生产能力未开启。先读本轮 README、0016 和 shared assistant-state。目标是交 main 能直接接线的真实存储消费者，减少只在内存 fixture 里完成的模块。
 
 ## C1 修复三个准入失败

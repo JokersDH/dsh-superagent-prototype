@@ -1,0 +1,419 @@
+{
+  "$defs": {
+    "ProjectSettingsCommand": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "check": {
+              "enum": [
+                "node_test",
+                "pnpm_test",
+                "npm_test"
+              ],
+              "type": "string"
+            },
+            "commandId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "displayName": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "environment": {
+              "oneOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "policy": {
+                      "const": "existing_only",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "policy"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "policy": {
+                      "const": "offline_install",
+                      "type": "string"
+                    },
+                    "storeDir": {
+                      "maxLength": 4096,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "policy",
+                    "storeDir"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "expectedRevision": {
+              "exclusiveMinimum": 0,
+              "maximum": 99,
+              "type": "integer"
+            },
+            "kind": {
+              "const": "update_project_settings",
+              "type": "string"
+            },
+            "projectId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "projectId",
+            "kind",
+            "expectedRevision",
+            "displayName",
+            "check",
+            "environment"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "archived": {
+              "type": "boolean"
+            },
+            "commandId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "expectedArchiveRevision": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "kind": {
+              "const": "archive_project",
+              "type": "string"
+            },
+            "projectId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "projectId",
+            "kind",
+            "expectedArchiveRevision",
+            "archived"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "ProjectSettingsPage": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "current": {
+          "additionalProperties": false,
+          "properties": {
+            "archiveRevision": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "archived": {
+              "type": "boolean"
+            },
+            "check": {
+              "enum": [
+                "node_test",
+                "pnpm_test",
+                "npm_test"
+              ],
+              "type": "string"
+            },
+            "checkDefinitionRef": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "createdAt": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            },
+            "digest": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "displayName": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "environment": {
+              "oneOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "policy": {
+                      "const": "existing_only",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "policy"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "policy": {
+                      "const": "offline_install",
+                      "type": "string"
+                    },
+                    "storeDir": {
+                      "maxLength": 4096,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "policy",
+                    "storeDir"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "projectId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "revision": {
+              "exclusiveMinimum": 0,
+              "maximum": 100,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "projectId",
+            "revision",
+            "digest",
+            "displayName",
+            "check",
+            "environment",
+            "checkDefinitionRef",
+            "createdAt",
+            "archiveRevision",
+            "archived"
+          ],
+          "type": "object"
+        },
+        "history": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "check": {
+                "enum": [
+                  "node_test",
+                  "pnpm_test",
+                  "npm_test"
+                ],
+                "type": "string"
+              },
+              "checkDefinitionRef": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "createdAt": {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string"
+              },
+              "digest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "displayName": {
+                "maxLength": 160,
+                "minLength": 1,
+                "type": "string"
+              },
+              "environment": {
+                "oneOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "policy": {
+                        "const": "existing_only",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "policy"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "policy": {
+                        "const": "offline_install",
+                        "type": "string"
+                      },
+                      "storeDir": {
+                        "maxLength": 4096,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "policy",
+                      "storeDir"
+                    ],
+                    "type": "object"
+                  }
+                ]
+              },
+              "projectId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "revision": {
+                "exclusiveMinimum": 0,
+                "maximum": 100,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "projectId",
+              "revision",
+              "digest",
+              "displayName",
+              "check",
+              "environment",
+              "checkDefinitionRef",
+              "createdAt"
+            ],
+            "type": "object"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "readOnly": true,
+          "type": "array"
+        },
+        "protocol": {
+          "const": "project-settings/1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "current",
+        "history"
+      ],
+      "type": "object"
+    },
+    "ProjectSettingsVersion": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "check": {
+          "enum": [
+            "node_test",
+            "pnpm_test",
+            "npm_test"
+          ],
+          "type": "string"
+        },
+        "checkDefinitionRef": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "displayName": {
+          "maxLength": 160,
+          "minLength": 1,
+          "type": "string"
+        },
+        "environment": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "policy": {
+                  "const": "existing_only",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "policy"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "policy": {
+                  "const": "offline_install",
+                  "type": "string"
+                },
+                "storeDir": {
+                  "maxLength": 4096,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "policy",
+                "storeDir"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "revision": {
+          "exclusiveMinimum": 0,
+          "maximum": 100,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "projectId",
+        "revision",
+        "digest",
+        "displayName",
+        "check",
+        "environment",
+        "checkDefinitionRef",
+        "createdAt"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:project-settings:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

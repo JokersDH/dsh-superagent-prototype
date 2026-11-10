@@ -1,0 +1,59 @@
+{
+  "status": "READY_FOR_FIVE_AGENT_EXECUTION_NOT_PRODUCT_ADMISSION",
+  "date": "2026-11-10",
+  "baseCommit": "21b9eefc61a408a724d1afe63d55ff2d35a8a72b",
+  "sourceCommit": "ed966205a378a399e3fb45e71b2f9540e10583fb",
+  "branch": "codex/g2-execution-integration",
+  "taskIndex": "agent-tasks/product-wave-05/README.zh-CN.md",
+  "sharedCheckpoint": "docs/rfcs/WP-16/0020-wave-05-dispatch-and-shared-inputs.md",
+  "applicationModelCalls": 0,
+  "verification": [
+    { "command": "pnpm --filter @personal-agent/contracts test", "status": "PASS", "tests": 202 },
+    { "command": "pnpm --filter @personal-agent/contracts build", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts typecheck", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts check:generated", "status": "PASS", "runtimeSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d" },
+    { "command": "pnpm --filter @personal-agent/coordinator typecheck:product", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/coordinator test:http", "status": "PASS", "tests": 16 },
+    { "command": "node --test tests/integration/recovery-startup.case.mjs", "status": "PASS", "tests": 2, "scope": "Restored state with and without real native project bindings: readonly, project visibility, no business queue consumption" },
+    { "command": "node product-spec/tools/verify-spec.mjs --check", "status": "PASS_SPEC_ONLY" },
+    { "command": "Wave05 packet/link verification", "status": "PASS", "scope": "Five role packets with five continuous stages, main packet and valid local task links" },
+    { "command": "node tools/bootstrap/review-wave04-admission.mjs --acceptance-root /Users/hh/Desktop/joker/superagent-agent-e --output reports/releases/product-wave-05/previous-gates.json", "status": "PASS_FOUR_ADMISSION_PROBES", "evidence": "previous-gates.json", "scope": "C three original domain failures fixed; E rejects the known fake full-product report. Does not certify all E product/native/install cases" },
+    { "command": "node tools/bootstrap/review-persisted-assistant.mjs --output reports/releases/product-wave-05/previous-sql.json", "status": "FAIL_SQLITE_ASSISTANT_CONSUMER", "passed": 6, "failed": 1, "exitCode": 1, "evidence": "previous-sql.json", "owner": "C", "scope": "Existing decision replay adapter mismatch is assigned to C1, not waived" }
+  ],
+  "verificationSourceScope": "Positive module, HTTP and recovery startup checks ran on the final implementation working tree before sourceCommit. The previous C/E gate and SQL-consumer probes were rerun against committed sourceCommit. These are zero-model checks only.",
+  "inspectedCandidates": {
+    "A": "1dddee9",
+    "B": "56b1e61",
+    "C": "45bf9de",
+    "D": "bf85594",
+    "E": "9257d76"
+  },
+  "mainDeliveredInputs": [
+    "Single shared parser/type source for exact execution-profile references, cold-start advice, review subject/report/evidence and outcome observations",
+    "Synchronous append-only RoutingEvidencePort for A and pure C consumers",
+    "Restored native-project scopes remain visible in recovery_readonly; runtime start refuses business effects",
+    "Task ownership, prerequisites, five stages, handoff evidence and budget boundaries for each existing external agent"
+  ],
+  "assignments": {
+    "A": { "task": "agent-tasks/product-wave-05/agent-a-evidence.zh-CN.md", "directory": "/Users/hh/Desktop/joker/superagent-agent-a", "branch": "codex/g2-workspaces-verification", "result": "Immutable advice/review/outcome persistence, source and timeline indexes, complete snapshots" },
+    "B": { "task": "agent-tasks/product-wave-05/agent-b-second-driver.zh-CN.md", "directory": "/Users/hh/Desktop/joker/superagent-agent-b", "branch": "codex/g1-runtime", "result": "Version-bound multi-profile resolver, a real second protocol, verified read-only review and controlled/native recovery evidence" },
+    "C": { "task": "agent-tasks/product-wave-05/agent-c-routing.zh-CN.md", "directory": "/Users/hh/Desktop/joker/superagent-agent-c", "branch": "codex/g3-assistant-context", "result": "Decision integration closure, eligibility/fixed-rule advice and review-currentness rules" },
+    "D": { "task": "agent-tasks/product-wave-05/agent-d-trial.zh-CN.md", "directory": "/Users/hh/Desktop/joker/superagent-agent-d", "branch": "codex/g3-local-distribution", "result": "Current staged install, first-run/doctor and complete recovery/migration consumption" },
+    "E": { "task": "agent-tasks/product-wave-05/agent-e-evaluation.zh-CN.md", "directory": "/Users/hh/Desktop/joker/superagent-agent-e", "branch": "codex/g3-product-acceptance", "result": "Independent negative/product/install tiers and zero-model equal-budget evaluation tooling" },
+    "main": { "task": "agent-tasks/product-wave-05/main.zh-CN.md", "result": "Trusted commands, multi-profile product composition, advice/review/assistant HTTP and workbench integration" }
+  },
+  "dispatchMode": "Published task packets for the user's existing external agents; no claim of automatic delivery or startup",
+  "budget": {
+    "main_A_C_D_E": "0 model/native tasks",
+    "B": "No new grant: retain original wave03-b-native limit4, actual used/unknown reservations and all historical ledgers. Reported wave04 use0 is not an instruction to overwrite actual accounting.",
+    "benefitExperiment": "Tooling only in this package; large real-model evaluation requires a separate explicit budget"
+  },
+  "limitations": [
+    "Advice/review parsers and ports do not prove production routing, actual second-driver compatibility, native readonly enforcement or empirical benefit",
+    "B/D/E final delivery claims remain candidate evidence pending main integration and independent product validation",
+    "Decision replay and synchronous decision commit remain C integration work, despite the original three C probes passing",
+    "No same-contract writer race, confidence auto-acceptance, online learned routing, dynamic Ticket DAG, automatic merge/deploy or CAC integration is enabled",
+    "No external agent worktree, existing user service, original architecture review or ARCHITECTURE-NOTES file was modified",
+    "No global runtime/account/native profile was upgraded or reset; no model request was sent"
+  ]
+}

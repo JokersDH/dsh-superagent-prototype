@@ -1,0 +1,30 @@
+{
+  "status": "PASS_SETTINGS_HTTP_BROWSER",
+  "sourceCommit": "2e7db8916ab3243d418d599721be721a6a4b21ee",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-10T07:32:42.262Z",
+  "cases": [
+    {
+      "id": "EDIT-SETTINGS-AND-PERSIST-HISTORY",
+      "status": "PASS"
+    },
+    {
+      "id": "ARCHIVE-AND-RESTORE-ACTUAL-CONFIGURATION",
+      "status": "PASS"
+    },
+    {
+      "id": "CONCURRENT-EDIT-REFUSES-STALE-PAGE-WITHOUT-LOSING-INPUT",
+      "status": "PASS"
+    },
+    {
+      "id": "MOBILE-DIALOG-CACHE-VALIDATION-AND-KEYBOARD",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "limitations": [
+    "Real HTTP and SQLite with a configuration-only profile fixture; the execution runtime is deliberately not started",
+    "No native task, dependency installation, full product or installer admission"
+  ]
+}

@@ -1,0 +1,1034 @@
+{
+  "$defs": {
+    "ExecutionOutcome": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "acceptance": {
+          "enum": [
+            "not_requested",
+            "accepted",
+            "rejected",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "acceptanceRef": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "artifactDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "attempt": {
+          "additionalProperties": false,
+          "properties": {
+            "assignmentId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "attemptId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "contract": {
+              "additionalProperties": false,
+              "properties": {
+                "digest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "revision": {
+                  "maximum": 9007199254740991,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "workId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "workId",
+                "revision",
+                "digest"
+              ],
+              "type": "object"
+            },
+            "fenceEpoch": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "ticketId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "attemptId",
+            "fenceEpoch"
+          ],
+          "type": "object"
+        },
+        "candidate": {
+          "additionalProperties": false,
+          "properties": {
+            "assignmentId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "candidateGeneration": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "contract": {
+              "additionalProperties": false,
+              "properties": {
+                "digest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "revision": {
+                  "maximum": 9007199254740991,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "workId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "workId",
+                "revision",
+                "digest"
+              ],
+              "type": "object"
+            },
+            "ticketId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "candidateGeneration"
+          ],
+          "type": "object"
+        },
+        "durationMs": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "evidenceRefs": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 128,
+          "readOnly": true,
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "layer": {
+          "enum": [
+            "actual_native",
+            "controlled",
+            "protocol_fixture",
+            "schema",
+            "operator_note"
+          ],
+          "type": "string"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "profileRef": {
+          "additionalProperties": false,
+          "properties": {
+            "identityDigest": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "profileId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "revision": {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "profileId",
+            "revision",
+            "identityDigest"
+          ],
+          "type": "object"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "execution-outcome/1",
+          "type": "string"
+        },
+        "reviewTiming": {
+          "additionalProperties": false,
+          "properties": {
+            "acceptedAt": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "activeReviewCompleteness": {
+              "enum": [
+                "partial",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            "activeReviewMs": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "activeReviewSource": {
+              "enum": [
+                "ui_visibility_proxy",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            "candidateReadyAt": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidenceRefs": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "maxItems": 128,
+              "readOnly": true,
+              "type": "array"
+            },
+            "readyToAcceptanceMs": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "candidateReadyAt",
+            "acceptedAt",
+            "readyToAcceptanceMs",
+            "activeReviewMs",
+            "activeReviewSource",
+            "activeReviewCompleteness",
+            "evidenceRefs"
+          ],
+          "type": "object"
+        },
+        "usage": {
+          "additionalProperties": false,
+          "properties": {
+            "completeness": {
+              "enum": [
+                "observed",
+                "partial",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            "cost": {
+              "additionalProperties": false,
+              "properties": {
+                "amount": {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "currency": {
+                  "pattern": "^[A-Z]{3}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "currency",
+                "amount"
+              ],
+              "type": "object"
+            },
+            "evidenceRefs": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "maxItems": 1024,
+              "readOnly": true,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "inputTokens": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "outputTokens": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "completeness",
+            "evidenceRefs"
+          ],
+          "type": "object"
+        },
+        "verificationRef": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "id",
+        "projectId",
+        "attempt",
+        "profileRef",
+        "acceptance",
+        "evidenceRefs",
+        "layer",
+        "usage",
+        "observedAt"
+      ],
+      "type": "object"
+    },
+    "ExecutionProfileRef": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "identityDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "profileId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "revision": {
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profileId",
+        "revision",
+        "identityDigest"
+      ],
+      "type": "object"
+    },
+    "ReviewEvidence": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "disposition": {
+          "enum": [
+            "findings",
+            "no_findings",
+            "inconclusive"
+          ],
+          "type": "string"
+        },
+        "evidenceRefs": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 128,
+          "readOnly": true,
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "inputDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "isolation": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "capsuleManifestDigest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "const": "sealed_copy",
+                  "type": "string"
+                },
+                "proofRef": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "proofRef",
+                "capsuleManifestDigest"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "native_read_only",
+                  "type": "string"
+                },
+                "proofRef": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "proofRef"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "layer": {
+          "enum": [
+            "actual_native",
+            "controlled",
+            "protocol_fixture",
+            "schema",
+            "operator_note"
+          ],
+          "type": "string"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "review-evidence/1",
+          "type": "string"
+        },
+        "readOnlyProofRef": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "reportArtifactRef": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "reportDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "reviewAttempt": {
+          "additionalProperties": false,
+          "properties": {
+            "assignmentId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "attemptId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "contract": {
+              "additionalProperties": false,
+              "properties": {
+                "digest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "revision": {
+                  "maximum": 9007199254740991,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "workId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "workId",
+                "revision",
+                "digest"
+              ],
+              "type": "object"
+            },
+            "fenceEpoch": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "ticketId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "attemptId",
+            "fenceEpoch"
+          ],
+          "type": "object"
+        },
+        "reviewerProfileRef": {
+          "additionalProperties": false,
+          "properties": {
+            "identityDigest": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "profileId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "revision": {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "profileId",
+            "revision",
+            "identityDigest"
+          ],
+          "type": "object"
+        },
+        "subject": {
+          "additionalProperties": false,
+          "properties": {
+            "artifactDigest": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "baseCommit": {
+              "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$",
+              "type": "string"
+            },
+            "candidate": {
+              "additionalProperties": false,
+              "properties": {
+                "assignmentId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "candidateGeneration": {
+                  "maximum": 9007199254740991,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "contract": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "digest": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "revision": {
+                      "maximum": 9007199254740991,
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "workId": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "workId",
+                    "revision",
+                    "digest"
+                  ],
+                  "type": "object"
+                },
+                "ticketId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "ticketId",
+                "assignmentId",
+                "contract",
+                "candidateGeneration"
+              ],
+              "type": "object"
+            },
+            "checkPolicyRef": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "environmentRef": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "candidate",
+            "artifactDigest",
+            "baseCommit",
+            "environmentRef",
+            "checkPolicyRef"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "protocol",
+        "id",
+        "projectId",
+        "subject",
+        "reviewerProfileRef",
+        "reviewAttempt",
+        "inputDigest",
+        "reportDigest",
+        "reportArtifactRef",
+        "evidenceRefs",
+        "layer",
+        "disposition",
+        "observedAt"
+      ],
+      "type": "object"
+    },
+    "ReviewReport": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "disposition": {
+          "enum": [
+            "findings",
+            "no_findings",
+            "inconclusive"
+          ],
+          "type": "string"
+        },
+        "findings": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "claim": {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              },
+              "line": {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer"
+              },
+              "path": {
+                "maxLength": 1024,
+                "minLength": 1,
+                "type": "string"
+              },
+              "reproduction": {
+                "maxLength": 8192,
+                "type": "string"
+              },
+              "severity": {
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "severity",
+              "claim"
+            ],
+            "type": "object"
+          },
+          "maxItems": 128,
+          "readOnly": true,
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "maxLength": 1024,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "readOnly": true,
+          "type": "array"
+        },
+        "protocol": {
+          "const": "review-report/1",
+          "type": "string"
+        },
+        "subjectDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "summary": {
+          "maxLength": 8192,
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "subjectDigest",
+        "disposition",
+        "summary",
+        "findings",
+        "limitations"
+      ],
+      "type": "object"
+    },
+    "ReviewSubject": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "artifactDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "baseCommit": {
+          "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$",
+          "type": "string"
+        },
+        "candidate": {
+          "additionalProperties": false,
+          "properties": {
+            "assignmentId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "candidateGeneration": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "contract": {
+              "additionalProperties": false,
+              "properties": {
+                "digest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "revision": {
+                  "maximum": 9007199254740991,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "workId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "workId",
+                "revision",
+                "digest"
+              ],
+              "type": "object"
+            },
+            "ticketId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "candidateGeneration"
+          ],
+          "type": "object"
+        },
+        "checkPolicyRef": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "environmentRef": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate",
+        "artifactDigest",
+        "baseCommit",
+        "environmentRef",
+        "checkPolicyRef"
+      ],
+      "type": "object"
+    },
+    "RouteAdvice": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "enum": [
+            "none_eligible",
+            "only_eligible",
+            "operator_default",
+            "fixed_rule"
+          ],
+          "type": "string"
+        },
+        "catalogRevision": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "eligibleProfileRefs": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "identityDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "profileId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "revision": {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "profileId",
+              "revision",
+              "identityDigest"
+            ],
+            "type": "object"
+          },
+          "maxItems": 64,
+          "readOnly": true,
+          "type": "array"
+        },
+        "evidenceRefs": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 128,
+          "readOnly": true,
+          "type": "array"
+        },
+        "excluded": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "evidenceRefs": {
+                "items": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "maxItems": 128,
+                "readOnly": true,
+                "type": "array"
+              },
+              "profileRef": {
+                "additionalProperties": false,
+                "properties": {
+                  "identityDigest": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "profileId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  },
+                  "revision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "profileId",
+                  "revision",
+                  "identityDigest"
+                ],
+                "type": "object"
+              },
+              "reason": {
+                "enum": [
+                  "not_admitted",
+                  "evidence_missing",
+                  "identity_drift",
+                  "scope_denied",
+                  "budget_unavailable",
+                  "read_only_unproven",
+                  "unsupported_capability"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "profileRef",
+              "reason",
+              "evidenceRefs"
+            ],
+            "type": "object"
+          },
+          "maxItems": 128,
+          "readOnly": true,
+          "type": "array"
+        },
+        "expiresAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "policyRevision": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "route-advice/1",
+          "type": "string"
+        },
+        "reviewSuggested": {
+          "type": "boolean"
+        },
+        "sourceRef": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "suggestedProfileRef": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "identityDigest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "profileId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "revision": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "profileId",
+                "revision",
+                "identityDigest"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "taskContextDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "id",
+        "projectId",
+        "sourceRef",
+        "taskContextDigest",
+        "catalogRevision",
+        "policyRevision",
+        "eligibleProfileRefs",
+        "suggestedProfileRef",
+        "excluded",
+        "basis",
+        "evidenceRefs",
+        "reviewSuggested",
+        "createdAt",
+        "expiresAt"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:routing-review:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

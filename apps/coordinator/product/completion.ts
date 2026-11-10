@@ -41,6 +41,7 @@ const reviewId = (candidate: CandidateRef) => key('product-review', canonicalDig
 
 /** Indexes trusted WP-04 evidence; the core remains the only completion authority. */
 export class ProductCompletion implements CompletionReviewPort {
+  onAccepted?: (candidate: CandidateRef, actor: TrustedActor, acceptedAt: string) => void
   readonly verifier: CompletionEvidenceStore
   private readonly runner: VerificationRunner
   private readonly store: ProductStore
@@ -62,6 +63,12 @@ export class ProductCompletion implements CompletionReviewPort {
     if (!parsed.success || !same(candidateOf(parsed.data.proposal), candidateOf(candidate))) return undefined
     // The current resource manifest and trusted host provenance are rechecked on every read.
     return this.verifier.resolve(parsed.data.proposal) ? parsed.data : undefined
+  }
+  metadata(candidate: CandidateRef): { readyAt: string; eventCursor: number; verificationId: string } | undefined {
+    const stored = this.store.commands.get(reviewId(candidate))
+    const review = stored && ReviewSchema.safeParse(stored.result)
+    if (!stored || !review?.success || !same(candidateOf(review.data.proposal), candidateOf(candidate))) return undefined
+    return { readyAt: stored.recordedAt, eventCursor: stored.seq, verificationId: review.data.verification.id }
   }
   async preflight(candidate: CandidateRef): Promise<() => void> {
     const review = this.store.uow.atomic(() => this.current(candidate))
