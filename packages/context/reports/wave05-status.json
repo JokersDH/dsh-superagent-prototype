@@ -1,0 +1,66 @@
+{
+  "role": "C",
+  "branch": "codex/g3-assistant-context",
+  "mainBaseCommit": "a70db20",
+  "mergeCommit": "9aab1c8",
+  "stableCheckpoint": "027c305",
+  "updatedAt": "2026-11-10T12:40:00.000Z",
+  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "phases": [
+    {
+      "phase": "C1",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave05-assistant-probe.json",
+        "packages/context/reports/wave05-c1-verification.txt",
+        "packages/knowledge/test/real-store.case.ts",
+        "packages/knowledge/test/decision-transaction.case.ts",
+        "packages/knowledge/reports/decision-transaction-run.json",
+        "commit 027c305"
+      ],
+      "results": {
+        "realSqliteProbe": "PASS_SQLITE_ASSISTANT_CONSUMER (7/7; DECISION-DOMAIN-REPLAY-OVER-STORAGE PASS)",
+        "knowledgeTests": "35/35",
+        "contextTests": "34/34",
+        "proposalTests": "18/18",
+        "decisionExample": "PASS (real temporary SQLite, 0 model/network)"
+      },
+      "note": "Adapter maps create/same-version/old-version/successor explicitly; old replay returns the current revoked/superseded head. DecisionTransactionService provides read-only prepare plus sync commit/revoke with actor/grant/scope/source/supersession re-checks."
+    },
+    { "phase": "C2", "status": "pending", "note": "packages/routing rankAttention/grouping pure module and fixtures." },
+    { "phase": "C2B", "status": "pending", "note": "Pure Eligibility over admitted profiles/capabilities/authorization/budget/isolation." },
+    { "phase": "C3", "status": "pending", "note": "Cold-start RouteAdvice and pre-confirmation revalidation." },
+    { "phase": "C4", "status": "pending", "note": "ReviewReport parsing and ReviewEvidence validity; no_findings is not PASS." },
+    { "phase": "C5", "status": "pending", "note": "A RoutingEvidencePort consumer/fixture, examples, status and handoff." }
+  ],
+  "commands": [
+    "git fetch origin && git merge origin/main",
+    "pnpm --filter @personal-agent/{orchestrator-core,effects,storage,workflows,contracts,proposals,knowledge,context} build",
+    "pnpm --filter @personal-agent/context typecheck && test && build",
+    "pnpm --filter @personal-agent/proposals typecheck && test && build",
+    "pnpm --filter @personal-agent/knowledge typecheck && test && build",
+    "node tools/bootstrap/review-persisted-assistant.mjs",
+    "node packages/knowledge/examples/decision-transaction.mjs"
+  ],
+  "blockers": [
+    {
+      "id": "C-A-routing-evidence",
+      "owner": "A",
+      "status": "external_pending",
+      "input": "createWorkflowPorts(store).routingEvidence implementing the shared sync RoutingEvidencePort.",
+      "expected": "Sync put/get/list for advice/reviews/outcomes on the existing UnitOfWork; same-body replay idempotent, changed body conflict.",
+      "actual": "packages/contracts/src/routing-review.ts exists; no storage/workflows implementation on main.",
+      "continue": "C2-C4 pure modules and C5 consumer use an in-memory reference port with the same interface; real SQL evidence must be re-run when A lands."
+    }
+  ],
+  "notTested": [
+    "Real SQLite RoutingEvidencePort (A-owned, not present on main)",
+    "Main HTTP/provider/UI wiring for attention, advice, review evidence",
+    "Any real model or native task (budget 0)"
+  ],
+  "mainNextSteps": [
+    "Re-run review-persisted-assistant.mjs against this branch; all seven real-SQLite cases pass.",
+    "Consume DecisionTransactionService in the existing UnitOfWork for record/revoke commands."
+  ]
+}
