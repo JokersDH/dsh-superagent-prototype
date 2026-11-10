@@ -60,6 +60,13 @@ const evidenceFor = (key) => {
       return { id: 'fixture', path: '/dev/null', sha256: DIGEST }
     case 'verificationRecovery':
       return { blockedId: 'blocked-1', retried: true, accepted: true }
+    case 'recovery':
+      return {
+        startupMode: 'recovery_readonly',
+        rowsBefore: { effect: 1 },
+        rowsAfter: { effect: 1 },
+        rejectedStatuses: [422, 422],
+      }
     case 'assistant':
       return { configured: true, model: 'mock-model', mockAttempts: 1 }
     case 'layouts':
