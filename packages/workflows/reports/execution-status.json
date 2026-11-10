@@ -8,7 +8,7 @@
   "mainBaseCommit": "3957e30",
   "mergeCommit": "382d2e8",
   "stableInterfaceCheckpoint": "c3e007b",
-  "updatedAt": "2026-11-10T00:00:00.000Z",
+  "updatedAt": "2026-11-10T01:00:00.000Z",
   "migrations": [
     8,
     9,
@@ -97,5 +97,6 @@
     "surface archived conversations with unresolved questions and attention",
     "let C consume ReadIndexPort/DecisionLedgerPort and D consume WorkflowSnapshots; no direct SQL",
     "regenerate root lock for the new workspace importer"
-  ]
+  ],
+  "testedSourceCommit": "9174c61"
 }
