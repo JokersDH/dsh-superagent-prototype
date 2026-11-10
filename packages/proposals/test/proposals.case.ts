@@ -152,7 +152,7 @@ test('confirmation returns only a typed intent and never an actor or command id'
   assert.equal(Object.hasOwn(confirmed.intent, 'scope'), false)
 })
 
-test('confirmation revalidates actor, version, payload digest and physical barrier', () => {
+test('confirmation revalidates actor, version, digest, current authorization and physical barrier', () => {
   const proposals = registry()
   const record = proposals.create({ proposalId: 'p1', payload: work(), trusted: trusted() })
   const base = { expectedVersion: record.version, expectedDigest: record.payloadDigest, actorRef: 'user-1' }
@@ -162,6 +162,10 @@ test('confirmation revalidates actor, version, payload digest and physical barri
     error instanceof ProposalError && error.code === 'proposal_stale')
   assert.throws(() => proposals.confirm('p1', { ...base, expectedDigest: '0'.repeat(64) }), (error: unknown) =>
     error instanceof ProposalError && error.code === 'proposal_mutated')
+  assert.throws(
+    () => proposals.confirm('p1', { ...base, revalidate: () => ({ ok: false, code: 'source_stale' }) }),
+    (error: unknown) => error instanceof ProposalError && error.code === 'stale_authorization',
+  )
   assert.throws(
     () => proposals.confirm('p1', { ...base, barrier: () => ({ ok: false, detail: 'writer_active' }) }),
     (error: unknown) => error instanceof ProposalError && error.code === 'barrier_blocked',
@@ -173,16 +177,55 @@ test('confirmation revalidates actor, version, payload digest and physical barri
   assert.equal(again.idempotent, true)
 })
 
+test('a confirmed replay still authenticates the actor and current authorization', () => {
+  const proposals = registry()
+  const record = proposals.create({ proposalId: 'p1', payload: work(), trusted: trusted() })
+  const base = { expectedVersion: record.version, expectedDigest: record.payloadDigest, actorRef: 'user-1' }
+  proposals.confirm('p1', base)
+  assert.throws(() => proposals.confirm('p1', { ...base, actorRef: 'foreign-user' }), (error: unknown) =>
+    error instanceof ProposalError && error.code === 'forbidden')
+  assert.throws(
+    () => proposals.confirm('p1', { ...base, revalidate: () => ({ ok: false, code: 'grant_revoked' }) }),
+    (error: unknown) => error instanceof ProposalError && error.code === 'stale_authorization',
+  )
+  assert.equal(proposals.confirm('p1', base).status, 'already_confirmed')
+})
+
+test('stored proposals and returned records are independent immutable snapshots', () => {
+  const mutableScope = { projectId: 'project-1', allowedPaths: ['src'], excludedPaths: [], externalActions: [] }
+  const proposals = registry()
+  const record = proposals.create({
+    proposalId: 'p1',
+    payload: work(),
+    trusted: { ...trusted(), grant: { grantId: 'grant-1', scope: mutableScope } },
+  })
+  mutableScope.allowedPaths.push('private/')
+  assert.deepEqual(record.grantScope.allowedPaths, ['src'])
+
+  assert.throws(() => {
+    ;(record.grantScope.allowedPaths as string[]).push('other')
+  })
+  const reread = proposals.get('p1')
+  assert.deepEqual(reread?.grantScope.allowedPaths, ['src'])
+
+  const listed = proposals.list()[0]
+  assert.ok(listed)
+  assert.throws(() => {
+    ;(listed!.grantScope.allowedPaths as string[]).push('other')
+  })
+  assert.deepEqual(proposals.get('p1')?.grantScope.allowedPaths, ['src'])
+})
+
 test('rejected, superseded and expired proposals cannot be confirmed', () => {
   const proposals = registry()
   const rejected = proposals.create({ proposalId: 'p1', payload: work(), trusted: trusted() })
-  proposals.reject('p1', { expectedVersion: rejected.version, reason: 'not what I want' })
+  proposals.reject('p1', { expectedVersion: rejected.version, reason: 'not what I want', actorRef: 'user-1' })
   assert.throws(() => proposals.confirm('p1', { expectedVersion: 1, expectedDigest: rejected.payloadDigest, actorRef: 'user-1' }), (error: unknown) =>
     error instanceof ProposalError && error.code === 'proposal_not_pending')
 
   const older = proposals.create({ proposalId: 'p2', payload: work({ goal: 'Older' }), trusted: trusted() })
   proposals.create({ proposalId: 'p3', payload: work({ goal: 'Newer' }), trusted: trusted() })
-  proposals.supersede('p2', 'p3')
+  proposals.supersede('p2', 'p3', 'user-1')
   assert.throws(() => proposals.confirm('p2', { expectedVersion: older.version, expectedDigest: older.payloadDigest, actorRef: 'user-1' }), (error: unknown) =>
     error instanceof ProposalError && error.code === 'proposal_not_pending')
 })

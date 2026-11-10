@@ -205,6 +205,7 @@ test(
     assert.equal(accepted.status, 'rejected')
     assert.equal(accepted.error.code, 'verification_failed')
     assert.notEqual((await h.view(created.workId)).phase, 'delivered')
+    assert.equal(h.store.events.after(0, 1000).filter(event => event.topic === 'application.candidate.accepted').length, 0)
   },
 )
 
@@ -216,13 +217,18 @@ test('a machine-only contract completes without creating empty human acceptance'
     () => h.view(created.workId),
     (value) => value?.actions.available.includes('accept_candidate'),
   )
-  assert.equal(
-    (await h.command({ kind: 'accept_candidate', candidate: ready.actions.currentCandidate })).status,
-    'recorded',
-  )
+  const acceptCommand = { commandId: 'timed-acceptance', conversationId: 'conversation-product', kind: 'accept_candidate', candidate: ready.actions.currentCandidate }
+  const accepted = await h.product.application.dispatch(acceptCommand, actor)
+  assert.equal(accepted.status, 'recorded')
+  assert.deepEqual(await h.product.application.dispatch(acceptCommand, actor), accepted)
   const ticket = h.store.domain.tickets.get(ready.actions.currentCandidate.ticketId)
   assert.equal(ticket.ended.outcome, 'completed')
   assert.equal(ticket.completion.confirmed.proposal.humanAcceptanceRef, undefined)
+  const timing = h.store.events.after(0, 1000).find(event => event.topic === 'application.candidate.accepted' && event.entityRef === created.workId)?.payload.reviewTiming
+  assert.ok(timing)
+  assert.ok(timing.readyToAcceptanceMs >= 0)
+  assert.equal(timing.activeReviewMs, null, 'No UI activity is unknown rather than fabricated zero')
+  assert.equal(h.store.events.after(0, 1000).filter(event => event.topic === 'application.candidate.accepted' && event.entityRef === created.workId).length, 1)
 })
 
 test(

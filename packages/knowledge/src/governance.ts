@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { UserDecisionSchema } from '@personal-agent/contracts'
 import type { KnowledgePage, KnowledgeSourceView, Scope, UserDecision } from '@personal-agent/contracts'
 import { DecisionError } from './errors.ts'
+import { snapshot } from './snapshot.ts'
 import type {
   AutomaticPromotionVerdict,
   DecisionActor,
@@ -41,7 +42,8 @@ export interface DecisionGovernanceOptions {
 /**
  * Domain rules for explicit user decisions. It consumes storage through `DecisionStorePort` and
  * message provenance through `DecisionSourcePort`; it creates no database, no migration and no
- * automatic learning. Only a user's explicit, trusted message can become reusable knowledge.
+ * automatic learning. Only a user's explicit, trusted message can become reusable knowledge, and
+ * effectiveness is re-derived from the current source on every read.
  */
 export class DecisionGovernance {
   private readonly store: DecisionStorePort
@@ -106,6 +108,8 @@ export class DecisionGovernance {
     const result = await this.store.append({
       decision,
       sourceMessageId: input.sourceMessageId,
+      sourceConversationId: source.conversationId,
+      sourceTextDigest: source.textDigest,
       actorRef: actor.actorRef,
       recordedAt: now.toISOString(),
     })
@@ -128,7 +132,7 @@ export class DecisionGovernance {
     return { record: this.withExpiry(result.record, now), idempotent: result.idempotent }
   }
 
-  /** Effective, project-scoped knowledge page for the workbench; revoked/expired content is excluded. */
+  /** Effective, project-scoped knowledge page for the workbench; revoked/expired/invalidated content is excluded. */
   async page(
     projectId: string,
     options: { readonly cursor?: string; readonly limit?: number; readonly now?: Date } = {},
@@ -151,8 +155,9 @@ export class DecisionGovernance {
       for (const record of page.decisions) {
         if (decisions.length >= limit) break
         if (!this.isEffectiveRecord(record, now)) continue
-        decisions.push(record.decision)
         const source = await this.sources.getMessage(record.sourceMessageId)
+        if (!source || this.sourceStateFrom(record, source) !== 'current') continue
+        decisions.push(record.decision)
         const view = this.sourceView(record, source)
         sources.set(view.id, view)
       }
@@ -182,7 +187,9 @@ export class DecisionGovernance {
       })
       for (const record of page.decisions) {
         if (records.length >= max) break
-        if (this.isEffectiveRecord(record, now)) records.push(this.withExpiry(record, now))
+        if (!this.isEffectiveRecord(record, now)) continue
+        if ((await this.sourceState(record)) !== 'current') continue
+        records.push(this.withExpiry(record, now))
       }
       if (!page.nextCursor) break
       cursor = page.nextCursor
@@ -190,9 +197,18 @@ export class DecisionGovernance {
     return records
   }
 
+  /** Current source validity is part of effectiveness, not only a record-time check. */
   async isEffective(decisionId: string, now: Date = this.now()): Promise<boolean> {
     const record = await this.store.get(decisionId)
-    return record !== undefined && this.isEffectiveRecord(record, now)
+    if (!record || !this.isEffectiveRecord(record, now)) return false
+    return (await this.sourceState(record)) === 'current'
+  }
+
+  /** Audit projection: missing/stale sources remain stored but are not effective knowledge. */
+  async decisionSourceState(decisionId: string): Promise<'current' | 'missing' | 'stale' | 'unknown'> {
+    const record = await this.store.get(decisionId)
+    if (!record) return 'unknown'
+    return this.sourceState(record)
   }
 
   /**
@@ -218,9 +234,26 @@ export class DecisionGovernance {
     return expiresAt === undefined || Date.parse(expiresAt) > now.getTime()
   }
 
+  private async sourceState(record: DecisionRecord): Promise<'current' | 'missing' | 'stale'> {
+    return this.sourceStateFrom(record, await this.sources.getMessage(record.sourceMessageId))
+  }
+
+  private sourceStateFrom(
+    record: DecisionRecord,
+    source: DecisionSource | undefined,
+  ): 'current' | 'missing' | 'stale' {
+    if (!source) return 'missing'
+    if (source.projectId !== record.decision.scope.projectId) return 'stale'
+    if (source.conversationId !== record.sourceConversationId) return 'stale'
+    if (source.textDigest !== record.sourceTextDigest) return 'stale'
+    if (source.role !== 'user' || source.provenance !== 'trusted_user') return 'stale'
+    if (source.questionKind === 'permission' || source.questionKind === 'authentication') return 'stale'
+    return 'current'
+  }
+
   private withExpiry(record: DecisionRecord, now: Date): DecisionRecord {
     if (this.isEffectiveRecord(record, now)) return record
-    if (record.status === 'active') return { ...record, status: 'expired' }
+    if (record.status === 'active') return snapshot({ ...record, status: 'expired' })
     return record
   }
 

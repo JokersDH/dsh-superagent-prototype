@@ -21,11 +21,15 @@ export interface DecisionRecord {
   readonly recordedAt: string
   readonly actorRef: string
   readonly sourceMessageId: string
+  readonly sourceConversationId: string
+  readonly sourceTextDigest: string
 }
 
 export interface AppendDecisionInput {
   readonly decision: UserDecision
   readonly sourceMessageId: string
+  readonly sourceConversationId: string
+  readonly sourceTextDigest: string
   readonly actorRef: string
   readonly recordedAt: string
 }

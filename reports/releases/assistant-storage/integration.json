@@ -1,0 +1,68 @@
+{
+  "status": "PASS_INDEXED_CATALOG_ASSISTANT_CONSUMER_PARTIALLY_BLOCKED",
+  "date": "2026-11-10",
+  "sourceCommit": "12c45a9e1dd682fd4d1aa83dbd480561b5e8010b",
+  "baseCommit": "639daca",
+  "integratedSources": {
+    "A": ["68852c0", "a1748c1", "1dddee9"],
+    "C": ["ed9d553", "a59fcef", "928d55f", "45bf9de"]
+  },
+  "applicationModelCalls": 0,
+  "productAssistantEnabled": false,
+  "verification": [
+    { "command": "pnpm --filter @personal-agent/storage test", "status": "PASS_PACKAGE", "tests": 75 },
+    { "command": "pnpm --filter @personal-agent/workflows test", "status": "PASS_PACKAGE", "tests": 15 },
+    { "command": "pnpm --filter @personal-agent/context test", "status": "PASS_PACKAGE", "tests": 34 },
+    { "command": "pnpm --filter @personal-agent/proposals test", "status": "PASS_PACKAGE", "tests": 18 },
+    { "command": "pnpm --filter @personal-agent/knowledge test", "status": "PASS_PACKAGE", "tests": 26 },
+    { "command": "pnpm --filter @personal-agent/application test", "status": "PASS", "tests": 16 },
+    { "command": "pnpm --filter @personal-agent/verification test", "status": "PASS", "tests": 23 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:product", "status": "PASS_CONTROLLED", "tests": 19 },
+    { "command": "node --test tests/integration/project-settings.case.mjs", "status": "PASS", "tests": 5 },
+    { "command": "pnpm --filter @personal-agent/coordinator typecheck:product", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/storage --filter @personal-agent/workflows --filter @personal-agent/application --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge -r build", "status": "PASS" },
+    { "command": "node tools/bootstrap/review-wave04-admission.mjs --output reports/releases/assistant-storage/domain-admission.json", "status": "PASS_C_DOMAIN_PROBES", "tests": 3, "evidence": "domain-admission.json" },
+    { "command": "node tools/bootstrap/review-persisted-assistant.mjs", "status": "FAIL_SQLITE_ASSISTANT_CONSUMER", "passed": 6, "failed": 1, "exitCode": 1, "evidence": "admission.json" },
+    { "command": "node tests/integration/conversation-catalog-browser.mjs --no-capture", "status": "PASS_CONTROLLED_BROWSER", "tests": 4, "evidence": "catalog-browser-report.json" }
+  ],
+  "verificationScope": "Package/module/product checks ran on the integration working tree. The three domain probes and seven real-SQLite consumer cases were rerun on committed sourceCommit. The final catalog browser report binds sourceCommit and clean application/package source paths. No model or native business was started.",
+  "passedSQLConsumerCases": [
+    "Pending proposal persisted through A's actual AssistantStatePort",
+    "Proposal confirmation and command receipt roll back together on receipt failure",
+    "Confirmed proposal and fixture command receipt survive database reopen and replay",
+    "Explicit decision source metadata persists and effective reading works",
+    "Revocation survives database reopen and removes effectiveness",
+    "Missing provenance excludes effective decision while preserving the audit record"
+  ],
+  "blockers": [
+    {
+      "id": "C-A-DECISION-DOMAIN-REPLAY",
+      "owner": "C",
+      "actual": "AssistantDecisionStore.append sends decision version 1 with expectedVersion 1 on repeated governance.record; A correctly rejects it as not the next revision",
+      "error": "WorkflowConflict: A decision update must advance exactly one version",
+      "expected": "Valid repeated same-decision request is idempotent without another revision; changed content/source/actor and revoked resurrection stay refused",
+      "task": "agent-tasks/product-wave-04/c-integration-followup.zh-CN.md"
+    },
+    {
+      "id": "C-DECISION-SYNCHRONOUS-COMMIT",
+      "owner": "C/main",
+      "actual": "Proposal prepare/commit is consumable; decision governance/adapter remains async and lacks a read-only preparation plus synchronous transactional commit interface",
+      "expected": "Decision state and deterministic command receipt/event commit in one existing synchronous UnitOfWork, with source/grant/actor revalidation"
+    }
+  ],
+  "catalogIntegration": {
+    "emptyProjectScope": "No access, never implicit global discovery",
+    "membership": "Persisted conversation_members index from A; primary project plus all members checked against current configured projects",
+    "removed": "Per-page 10000-message membership scans and the sequence cache",
+    "preserved": "Encrypted query-bound continuation, mixed-project refusal, legacy chat visibility and archived attention"
+  },
+  "handoff": "docs/rfcs/WP-16/0018-assistant-storage-consumer.md",
+  "limitations": [
+    "Passing C's 78 package tests does not override the real A/C persistence adapter failure",
+    "No assistant HTTP/provider/UI production enablement or full Alpha admission",
+    "Proposal consumer writes a fixture receipt; no coding/model/business task runs",
+    "Existing 5183 personal preview remains the admitted project-settings backend; its normal restart will load newer A/C modules",
+    "No external agent checkout, existing user service or user ARCHITECTURE-NOTES.zh-CN.md was modified",
+    "Root lock did not need a new dependency change for these A/C commits"
+  ]
+}

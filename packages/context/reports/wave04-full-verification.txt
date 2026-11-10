@@ -1,0 +1,71 @@
+# Agent C wave-04 full verification (2026-11-10T07:20:54Z)
+
+## @personal-agent/context
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ baseline capturedAt is stable and content digests are source identities (0.094708ms)
+✔ invalid cursors are refused instead of silently restarting (0.217166ms)
+✔ an unknown but valid cursor produces an explicit empty page (0.073292ms)
+✔ source descriptors are not trusted blindly: a port cannot smuggle a foreign project (0.069542ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 554.635917
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/proposals
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ rejected, superseded and expired proposals cannot be confirmed (0.212583ms)
+✔ expiry is enforced at confirmation and by the sweep (0.202917ms)
+✔ decision and revision proposals keep their exact scope and current contract (0.247084ms)
+✔ the shared ReasonerProposal schema is the only accepted proposal shape (0.076208ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 177.281
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/knowledge
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ zero-model vertical: context -> mock proposal -> pending -> confirm -> receipt -> decision -> restart -> revoke (24.008583ms)
+✔ commit failures leave the pending proposal and produce no receipt (0.914292ms)
+✔ duplicate confirmation, same-id payload changes, foreign actors and cross-project input are refused (1.247333ms)
+✔ supersession and source disappearance govern later decision reads (7.036959ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 365.7205
+### build
+$ tsc -p tsconfig.build.json
+
+## admission probe (C cases)
+  "status": "PASS_ADMISSION_PROBES",
+      "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+      "status": "PASS",
+      "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+      "status": "PASS",
+      "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+      "status": "PASS",
+## offline consumer
+{"status":"PASS","modelCalls":3,"networkCalls":0,"executedIntents":0,"absoluteRootLeaked":false,"decisionsBeforeRevoke":1,"decisionsAfterRevoke":0}
+## persisted consumer
+{"status":"PASS","modelCalls":0,"networkCalls":0,"realSqlAdapter":"NOT_TESTED (A-owned AssistantStatePort not present on main)"}

@@ -1,0 +1,77 @@
+✔ mutating startup profile, check or principal objects cannot expand application authority (18.847416ms)
+✔ create is one real core lifecycle, persisted product records and queued effects; reopen replays the original receipt (13.806416ms)
+✔ unauthorized actor, changed command body and unregistered machine checks cannot grant execution (9.19175ms)
+✔ last receipt failure rolls core, product index, messages, events and queued execution back together (9.76125ms)
+✔ discussion never creates work; explicit anchored supplement reaches only its original work and invalidates the candidate (16.028ms)
+✔ stop is logical first and schedules physical reconciliation; late chat cannot resume stopped work (9.45775ms)
+✔ revision preserves work identity and old records, revokes the previous grant and shows switching while its writer is live (13.958834ms)
+✔ pause uses CAS, changes only future dispatch and rejects stale revisions (10.250625ms)
+✔ retry action token fences the current assignment and old writers; successful retry invalidates the old token (11.859458ms)
+✔ only current trusted verification can complete a candidate; machine failure is not overridden by acceptance (9.727417ms)
+✔ stream exposes only public notifications, handles future cursor and closes while idle (9.097083ms)
+✔ scope expiry removes execution actions while deterministic stop remains available (7.862042ms)
+✖ catalog commands keep CAS, replay, actor and transaction boundaries across reopen (15.68725ms)
+✖ message-only legacy and mixed-project catalogs are scoped by all persisted messages (8.430083ms)
+✖ catalog paging is encrypted, query-bound, and keeps archived active work visible (8.3285ms)
+✔ placeholder title follows the first user message without overwriting an explicit rename (11.587375ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 13
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 258.433792
+
+✖ failing tests:
+
+test at test/conversations.case.ts:6:1
+✖ catalog commands keep CAS, replay, actor and transaction boundaries across reopen (15.68725ms)
+  TypeError: Cannot read properties of undefined (reading 'title')
+      at TestContext.<anonymous> (file:///Users/hh/Desktop/joker/superagent-agent-a/packages/application/test/conversations.case.ts:21:73)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at test/conversations.case.ts:33:1
+✖ message-only legacy and mixed-project catalogs are scoped by all persisted messages (8.430083ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///Users/hh/Desktop/joker/superagent-agent-a/packages/application/test/conversations.case.ts:41:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/conversations.case.ts:54:1
+✖ catalog paging is encrypted, query-bound, and keeps archived active work visible (8.3285ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///Users/hh/Desktop/joker/superagent-agent-a/packages/application/test/conversations.case.ts:59:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

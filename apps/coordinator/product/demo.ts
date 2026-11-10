@@ -50,6 +50,7 @@ const product = createProductRuntime({
   store,
   principal,
   stateRoot,
+  startupMode: recovery ? 'recovery_readonly' : 'normal',
   scratchProject: ensureScratchProject(stateRoot),
   projects: [
     ...(native?.projects ?? []),

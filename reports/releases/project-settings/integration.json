@@ -1,0 +1,68 @@
+{
+  "status": "PASS_SCOPED_VERSIONED_PROJECT_SETTINGS",
+  "date": "2026-11-10",
+  "branch": "codex/g2-execution-integration",
+  "baseCommit": "8c736f2e40c572ae5cda0c21fc777b72ec0457eb",
+  "sourceCommit": "2e7db8916ab3243d418d599721be721a6a4b21ee",
+  "applicationModelCalls": 0,
+  "preview": {
+    "url": "http://127.0.0.1:5183/",
+    "apiPort": 8799,
+    "state": ".local-state/project-settings-preview",
+    "mode": "personal",
+    "status": "PASS_READONLY_PERSONAL_SETTINGS_PREVIEW",
+    "scope": "Actual personal backend configuration and settings modal checked; no saved setting change, delegation or model task in the user preview",
+    "initialLaunch": "Node 24.21.0 raised setTypeOfService EINVAL during launcher HTTP readiness. Both orphan children were identified by exact state/port/cwd/start time and stopped; retry started a verified launcher successfully. No global runtime was upgraded or patched. The underlying intermittent Node error is not claimed resolved."
+  },
+  "verification": [
+    { "command": "node --test tests/integration/project-settings.case.mjs", "status": "PASS", "tests": 5 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:projects", "status": "PASS", "tests": 4 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:configuration", "status": "PASS", "tests": 5 },
+    { "command": "pnpm --filter @personal-agent/application test", "status": "PASS", "tests": 16 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:product", "status": "PASS_CONTROLLED", "tests": 19 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:environment", "status": "PASS_ISOLATED_OFFLINE", "tests": 3 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:http", "status": "PASS", "tests": 16 },
+    { "command": "node --test tests/integration/recovery-startup.case.mjs", "status": "PASS", "tests": 1 },
+    { "command": "pnpm --filter @personal-agent/contracts test", "status": "PASS", "tests": 198 },
+    { "command": "pnpm --filter @personal-agent/console test", "status": "PASS", "tests": 16 },
+    { "command": "pnpm --filter @personal-agent/coordinator typecheck:product", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/console typecheck", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/application -r build", "status": "PASS" },
+    { "command": "env VITE_CONSOLE_MODE=http pnpm --filter @personal-agent/console build", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts check:generated", "status": "PASS", "scope": "Runner/data identity unchanged; additive settings/configuration schema generated" },
+    { "command": "node product-spec/tools/verify-spec.mjs --check", "status": "PASS_SPEC_ONLY" },
+    { "command": "node tests/integration/project-settings-browser.mjs --no-capture", "status": "PASS_SETTINGS_HTTP_BROWSER", "tests": 4, "evidence": "browser-report.json", "sourceCommit": "2e7db8916ab3243d418d599721be721a6a4b21ee", "sourceWorktreeClean": true }
+  ],
+  "verificationScope": "Module and regression checks ran on the implementation working tree before sourceCommit. Final four browser flows were repeated against committed sourceCommit with clean source paths. Desktop/mobile fixture screenshots predate that commit; final no-capture run preserved them. The personal-preview screenshot was taken read-only against sourceCommit.",
+  "publicInterfaces": [
+    "GET /v1/projects/:id/settings",
+    "POST /v1/projects/:id/settings",
+    "ProjectSettingsVersion / ProjectSettingsPage / ProjectSettingsCommand",
+    "ConfiguredProjectView.settingsAvailable",
+    "product.read.projectSettings / product.operations.projectSettings"
+  ],
+  "evidence": {
+    "browser": "browser-report.json",
+    "desktop": "desktop.png",
+    "mobile": "mobile.png",
+    "personalPreview": "personal-preview.png",
+    "handoff": "docs/rfcs/WP-16/0017-versioned-project-settings.md"
+  },
+  "nextConsumers": {
+    "A": "Uses existing projects.current/history/append/setArchived and ArtifactStore ports without a storage migration. Preserve sourceRef snapshot artifacts in complete backup. Wave04 candidate 1dddee9 was observed but not merged in this settings slice.",
+    "C": "Project setting edits are not user decisions or upload grants. Wave04 candidate 45bf9de was observed but not admitted in this slice; main will next review its persistent assistant consumer with A.",
+    "B": "Runner/Driver source and frozen native wire were unchanged; configuration-only fixture profiles do not prove native compatibility.",
+    "D": "Include referenced project settings snapshots in backup; copied old path/environment identity cannot authorize resumed native work on a new machine. Recovery remains read-only.",
+    "E": "Independently cover stale settings commands, archived new authorization, old queued contract environment, replay/conflict/rollback, configuration revision, and mobile modal/focus behavior."
+  },
+  "limitations": [
+    "The new settings browser fixture deliberately does not start its execution consumer or invoke a vendor model; real native runtime compatibility remains separately measured",
+    "No automatic dependency preparation occurs on save; installation still belongs to a subsequently authorized work",
+    "Existing registered project roots stay fixed; arbitrary executable/argv changes and monorepo check authoring are outside this API",
+    "Per-project settings history is bounded at 100 revisions, with explicit rejection/disabled UI at the limit",
+    "No cross-machine restore, full personal Alpha, internal distribution or CAC admission is claimed",
+    "Existing user services 5180/8796, 5181/8797 and 5182/8798 were not restarted; 5183 uses independent state without copying their history",
+    "All five external agent checkouts and user ARCHITECTURE-NOTES.zh-CN.md were preserved",
+    "Temporary QA API/frontend and fixture resources were closed; only the user-facing 5183 preview is intentionally left running"
+  ]
+}

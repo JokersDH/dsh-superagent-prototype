@@ -38,7 +38,8 @@ test('message-only legacy and mixed-project catalogs are scoped by all persisted
   h.store.product.messages.append({ id: 'old-message', conversationId: 'old-chat', role: 'user', provenance: 'trusted_user',
     projectId: 'project-atlas', text: '纯聊天迁移记录', sourceRefs: [], createdAt: '2026-11-08T10:00:00.000Z' })
   h.store.db.prepare('UPDATE conversations SET project_id = NULL WHERE id = ?').run('old-chat')
-  assert.equal(h.store.workflows.conversations.list({ projectIds: ['project-atlas'] }).conversations.length, 0)
+  assert.equal(h.store.workflows.conversations.list({ projectIds: ['project-atlas'] }).conversations.length, 1,
+    'indexed membership preserves a legacy conversation even when its primary project column is missing')
   assert.equal(catalog.list({ query: '迁移' }).conversations[0]!.id, 'old-chat')
   h.store.product.messages.append({ id: 'foreign-message', conversationId: 'old-chat', role: 'user', provenance: 'trusted_user',
     projectId: 'project-other', text: '另一个项目的数据', sourceRefs: [], createdAt: '2026-11-08T10:01:00.000Z' })

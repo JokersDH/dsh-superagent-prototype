@@ -1,5 +1,5 @@
 import { ApplicationConfigurationSchema, CONFIGURATION_PROTOCOL } from '@personal-agent/contracts'
-import type { ApplicationConfiguration, Criterion, ExecutionProfileView, Scope } from '@personal-agent/contracts'
+import type { ApplicationConfiguration, Criterion, ExecutionProfileView, Scope, AppError } from '@personal-agent/contracts'
 import { canonicalDigest } from '@personal-agent/storage'
 import { scopeWithin } from '@personal-agent/questions'
 
@@ -10,6 +10,8 @@ type Project = {
   defaultScope?: Scope
   defaultCriteria: readonly Criterion[]
   profileIds?: readonly string[]
+  blockedReason?: AppError['code']
+  settingsAvailable?: boolean
 }
 type Profile = Omit<ExecutionProfileView, 'dispatchAllowed' | 'blockedReason'> & {
   blockedReason?: ExecutionProfileView['blockedReason']
@@ -19,6 +21,7 @@ export interface ConfigurationSource {
   profiles: readonly Profile[]
   checks: ApplicationConfiguration['checks']
   enabledProfileIds: readonly string[]
+  reviewActivityAvailable?: boolean
 }
 
 /** The runtime supplies the actual admission list; a probe result alone never grants dispatch. */
@@ -47,19 +50,21 @@ export function applicationConfiguration(source: ConfigurationSource, now = Date
     const projectProfiles = project.profileIds
       ? enabledIds.filter((id) => project.profileIds!.includes(id))
       : enabledIds
-    const dispatchAllowed = !expired && projectProfiles.length > 0
+    const dispatchAllowed = !expired && !project.blockedReason && projectProfiles.length > 0
     return {
       id: project.id,
       displayName: project.displayName ?? project.id,
       scope,
       defaultCriteria: project.defaultCriteria,
+      ...(project.settingsAvailable !== undefined ? { settingsAvailable: project.settingsAvailable } : {}),
       profileIds: projectProfiles,
       dispatchAllowed,
       ...(dispatchAllowed
         ? { defaultProfileId: projectProfiles[0] }
-        : { blockedReason: expired ? ('stale_contract' as const) : ('unsupported_capability' as const) }),
+        : { blockedReason: expired ? ('stale_contract' as const) : project.blockedReason ?? ('unsupported_capability' as const) }),
     }
   })
-  const body = { protocol: CONFIGURATION_PROTOCOL, projects, profiles, checks: source.checks }
+  const body = { protocol: CONFIGURATION_PROTOCOL, projects, profiles, checks: source.checks,
+    ...(source.reviewActivityAvailable !== undefined ? { reviewActivityAvailable: source.reviewActivityAvailable } : {}) }
   return ApplicationConfigurationSchema.parse({ ...body, revision: canonicalDigest(JSON.parse(JSON.stringify(body))) })
 }
