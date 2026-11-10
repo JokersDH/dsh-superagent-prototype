@@ -26,6 +26,21 @@ node tools/distribution/smoke.mjs
 `>=24.21.0 <25`、加载原生 SQLite binding、记录平台/ABI/SQLite/commit/artifact 摘要，并在写盘后
 自检全部 artifact 摘要。
 
+## 第五轮增补：自检诊断、证据覆盖与支持矩阵
+
+- staged install 自检从“launcher 能加载”升级为“staged `bin/pa doctor` 必须通过
+  `release_manifest`/`runtime_abi`/`console_mode`/`runtime_dependencies`”，失败不提升输出；
+  `install.json` 记录 entrypoints、workspacePackages、supportMatrix（measured/notTested）以及
+  全部文件 sha256。
+- 备份 manifest 记录 evidence 摘要（公共只读端口读取 project settings/policy/works/contracts/
+  decisions/assistant/artifacts），restore 重读并 fail-closed；routing/review 持久化未进 main 时
+  显式 `unavailable`，不宣称已覆盖。
+- 启动/doctor 稳定诊断：`runtime_incompatible`、`author_executor_unavailable`、
+  `author_auth_unavailable`、`port_in_use`、`review_executor`（默认 WARN/实验关闭，
+  fixture 仅诊断）。
+- 支持矩阵与可复制流程见 `docs/rfcs/WP-12/0002` §9；wave-05 证据在
+  `tools/distribution/reports/wave05-status.json` 与 `reports/wave05/`。
+
 ## staged install 闭包 `pa-install/1`
 
 `stage.mjs`（由 `--output`/`pa stage` 调用）复制真正执行的字节：coordinator/launcher/runner 源码、

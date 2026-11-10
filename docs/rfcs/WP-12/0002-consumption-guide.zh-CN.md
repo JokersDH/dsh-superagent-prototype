@@ -123,3 +123,59 @@ $PA build --config-root <config> --output <新安装目录>   # 构建 + 产出�
 3. 用 `NODE_DEBUG=esm` 或等价证据检查运行模块均来自安装目录；篡改执行文件/console bundle 必须 BLOCKED；
 4. 按 §5 做 backup→verify→restore（只读）→显式 rebind→rollback；带项目绑定的恢复库当前标 BLOCKED（main port），不得把失败改成 PASS；
 5. 真实 native/跨机器保持 NOT_TESTED；不修改 D 的断言或产品实现。
+
+---
+
+## 9. 第五轮增补：运行诊断、证据覆盖与支持矩阵（2026-11-10）
+
+### 9.1 可复制流程（同一安装物）
+
+```sh
+# 构建并产出闭包（build 同时完成 console HTTP 构建与依赖摘要）
+node tools/distribution/build.mjs --install-root . --config-root <config> --output <install>
+# 或
+node apps/launcher/bin/pa.mjs stage --output <install>
+
+<install>/bin/pa first-run
+<install>/bin/pa doctor          # READY/DEGRADED/BLOCKED（不是准入）
+<install>/bin/pa start --fixture # 受控链路；个人模式需已准入作者执行器
+<install>/bin/pa status
+<install>/bin/pa backup --out <bundle>
+<install>/bin/pa verify-backup --bundle <bundle>
+<install>/bin/pa restore --bundle <bundle> --to <new-state>
+<install>/bin/pa rollback --bundle <bundle> --target <state>
+<install>/bin/pa stop
+```
+
+### 9.2 诊断/稳定错误码
+
+| 场景 | code | 行为 |
+| --- | --- | --- |
+| Node/平台/ABI/SQLite binding 不匹配 | `runtime_incompatible` | 启动前拒绝；不回退 fixture、不替换 binding |
+| 作者执行器缺失/版本不符 | `author_executor_unavailable` / `author_executor_version_mismatch` | 个人模式启动前拒绝；fixture 不受影响 |
+| 作者私有认证缺失 | `author_auth_unavailable` | 只报告存在性/权限，不读取或回显内容 |
+| 默认/显式端口占用 | `port_in_use` | 不停止未知进程，换端口 |
+| 必需复核但缺 reviewer | doctor `review_executor=FAIL`/BLOCKED | 作者路径仍可用；不伪造复核完成 |
+| 第二执行器接口未发布 | doctor `review_executor=WARN(no_executor_interface)` | 复核入口保持实验、默认关闭 |
+
+### 9.3 证据覆盖（bundle/restore）
+
+- bundle manifest 新增 `evidence`：`personal-evidence` digest + counts + `routingEvidence` 能力；
+- restore 从恢复库重读 project settings/policy 快照、works、contracts/links、decisions、assistant
+  state、artifact registry，与 manifest 逐类比较；不一致 → `evidence_mismatch`（目标不激活）；
+- 旧 bundle 无 evidence → 报告 `not_recorded`，不补造 0；
+- 路由建议/复核报告/执行结果当前无持久化（A `RoutingEvidencePort` 仅契约），manifest 标
+  `routingEvidence.status=unavailable` 并列出所需端口（见 0005）。
+
+### 9.4 支持矩阵
+
+| 维度 | measured | NOT_TESTED |
+| --- | --- | --- |
+| 平台/架构 | darwin/arm64 | linux、win32、darwin-x64、其他机器 |
+| Node | 24.21.x | 其他 Node 版本/ABI |
+| SQLite | ABI 137、SQLite 3.53.4 | 其他 ABI/版本 |
+| 执行器 | 受控 fixture；作者 Codex 存在性/版本/认证文件诊断 | 个人 native 端到端、第二执行器复核 |
+| 恢复 | 新目录只读、证据逐字节/摘要校验、显式 rebind | 恢复后重新授权（main） |
+
+安装物摘要：`tools/distribution/reports/wave05/install-summary.json`；完整证据：
+`tools/distribution/reports/wave05-status.json`、`reports/wave05/`。

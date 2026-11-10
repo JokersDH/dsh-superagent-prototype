@@ -52,6 +52,22 @@ node apps/launcher/bin/pa.mjs rollback --target ~/pa-restored   # 用最近已�
 - 网页关闭不影响 daemon；模型 key 只经已认证本机网页设置提交，CLI/日志/发行清单不回显、不存储。
 - 不复制他人在账号 home 中的 native 认证；不升级全局 Node/agent。
 
+## 第五轮增补（运行诊断、证据覆盖、执行器入口）
+
+- `doctor` 增加零模型预检：`runtime_abi`（Node/平台/ABI/SQLite binding）、`ports`（默认/实例端口）、
+  `support_matrix`、增强的 `executor_codex`（版本、准入 evidence、私有 auth 文件存在性与权限位，
+  不回显内容）以及 `review_executor`。默认 `review_executor=WARN(no_executor_interface)`：第二执行器
+  接口未发布时复核入口保持实验、默认关闭；`--executors-fixture <json>` 仅用于诊断 fixture，
+  `requiredReview=true` 且缺 reviewer → BLOCKED，非必需缺失 → WARN 且作者路径可用。
+- `start` 在 spawn 前做同样预检：Node/ABI/SQLite 不匹配 `runtime_incompatible`；个人模式缺作者执行器/
+  私有认证 `author_executor_unavailable`/`author_auth_unavailable`（稳定 code，绝不回退 fixture、
+  不安装/升级/重置账号）；端口占用 `port_in_use`。
+- 备份 manifest 记录 evidence 覆盖摘要（project settings/policy 快照、works、contracts/links、
+  decisions、assistant state、artifact registry），restore 逐类重读并 fail-closed；路由建议/复核报告因
+  A 持久化未进 main 而显式 `unavailable`（见 `docs/rfcs/WP-12/0005`）。
+- staged install 增加 entrypoints/workspacePackages/supportMatrix，并在提升前用 staged `bin/pa doctor`
+  自检 release/ABI/console/dependency 门禁；闭包不含凭据/运行记录。
+
 ## 第四轮增补（身份、闭包、恢复门禁）
 
 - **身份**：`start` 先解析期望 `install/state/mode/access/ports/buildId/startupMode`；不一致返回

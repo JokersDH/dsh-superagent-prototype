@@ -1,8 +1,8 @@
 {
   "case": "RECOVERY-PROJECT-BINDINGS",
   "previousBlocker": "wave-04 reported a controlled-fixture grant error for restored project scope \".\"",
-  "checkedAt": "2026-11-10T12:27:55.872Z",
-  "sourceCommit": "f04ceb8e0e91796129bea03515566d0d43a3fb72",
+  "checkedAt": "2026-11-10T12:40:55.815Z",
+  "sourceCommit": "a8ffc81329faa135570b28ecdaebd3e73a58b04f",
   "status": "PASS_RECOVERY_PROJECT_BINDINGS",
   "modelCalls": 0,
   "withoutProjects": {
@@ -21,8 +21,8 @@
     "markerPresent": true,
     "exit": 0,
     "logs": [
-      "Personal product API: http://127.0.0.1:55379/v1/health",
-      "Private state/credential references: /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-repro-recovery-projects-HuiXBQ/without-projects",
+      "Personal product API: http://127.0.0.1:58557/v1/health",
+      "Private state/credential references: /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-repro-recovery-projects-zbnJXp/without-projects",
       "Recovery read-only: business queues and model providers are disabled; local revalidation is required."
     ]
   },
@@ -42,8 +42,8 @@
     "markerPresent": true,
     "exit": 0,
     "logs": [
-      "Personal product API: http://127.0.0.1:55399/v1/health",
-      "Private state/credential references: /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-repro-recovery-projects-HuiXBQ/with-projects",
+      "Personal product API: http://127.0.0.1:58637/v1/health",
+      "Private state/credential references: /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-repro-recovery-projects-zbnJXp/with-projects",
       "Recovery read-only: business queues and model providers are disabled; local revalidation is required."
     ]
   },

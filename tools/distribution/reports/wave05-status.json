@@ -2,53 +2,204 @@
   "package": "product-wave-05 / D：个人试用发行与第二执行器诊断",
   "owner": "agent-d",
   "branch": "codex/g3-local-distribution",
-  "baseCommit": "f04ceb8e0e91796129bea03515566d0d43a3fb72",
+  "baseCommit": "f04ceb8",
   "mergedMain": "a70db20",
-  "status": "CHECKPOINT_D1",
+  "sourceCommit": "a8ffc81329faa135570b28ecdaebd3e73a58b04f",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate evidence; not main/E admission, not a product release, no cross-machine/ABI claim.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
   "modelBudget": {
     "allocated": 0,
     "used": 0,
     "unknownNativeSends": 0,
-    "note": "Zero-model fixture/local probes only."
+    "note": "All probes are local/controlled; no native executor task or model provider call."
   },
   "commits": {
     "wave04Final": "bf85594",
-    "wave05Checkpoint": "pending",
-    "wave05Final": "pending"
+    "wave05Checkpoint": "a8ffc81",
+    "wave05Final": "see branch head"
   },
-  "d1": {
-    "status": "DONE",
-    "recoveryProjectBindings": "PASS_RECOVERY_PROJECT_BINDINGS (main fixed; probe updated to assert read-only start, readable project, 422 command, unchanged old business)",
-    "evidence": [
-      "tools/distribution/repro-recovery-project-binding.mjs",
-      "tools/distribution/reports/wave05/recovery-project-bindings.json"
-    ],
-    "wave04Regression": {
-      "command": "node tools/distribution/smoke.mjs",
-      "status": "PASS",
-      "steps": 45,
-      "durationMs": 46343
+  "phases": {
+    "d1": {
+      "status": "DONE",
+      "summary": "Main recovery-project fix re-verified: restored state with project bindings starts recovery_readonly, project readable, business POST 422, old queue/answers/parked unchanged, marker preserved. Wave-04 gates re-run unchanged (smoke).",
+      "commands": [
+        "node tools/distribution/repro-recovery-project-binding.mjs",
+        "node tools/distribution/smoke.mjs"
+      ],
+      "evidence": [
+        "tools/distribution/reports/wave05/recovery-project-bindings.json"
+      ]
+    },
+    "d2": {
+      "status": "DONE",
+      "summary": "Staged closure rebuilt on latest main; 6477 files, 8 dependency packages, 20 workspace packages, entrypoints/supportMatrix recorded; staged doctor must pass release/ABI/console/dependency gates before promotion; relocated closure serves with 525 runtime modules all inside install, 0 checkout refs. Stable diagnostics: runtime_incompatible (unit), port_in_use, author_executor_unavailable, author_auth_unavailable.",
+      "evidence": [
+        "tools/distribution/reports/wave05/install-summary.json"
+      ]
+    },
+    "d3": {
+      "status": "DONE_WITH_B_MAIN_INTERFACE_GAP",
+      "summary": "doctor exposes author executor version/admission evidence/auth-file presence (no content), support matrix, ports; review_executor defaults to WARN no_executor_interface (experimental/disabled), required-review fixture is BLOCKED with required_reviewer_missing, optional missing reviewer is WARN and author path remains available. No second secret store or HTTP/account proxy added; consumption RFC 0005 published.",
+      "evidence": [
+        "docs/rfcs/WP-12/0005-wave-05-d-consumption-ports.zh-CN.md"
+      ]
+    },
+    "d4": {
+      "status": "DONE_WITH_A_PERSISTENCE_GAP",
+      "summary": "Backup manifest records personal-evidence digest/counts over public read ports (project settings/policy snapshots, works, contracts/links, decisions, assistant state, artifact registry); restore re-reads every class and fails closed on mismatch; legacy bundles report not_recorded; routing advice/review reports/outcomes remain unavailable (A RoutingEvidencePort has no storage implementation) and are explicitly excluded, not claimed.",
+      "evidence": [
+        "packages/portability/test/evidence.case.ts"
+      ]
+    },
+    "d5": {
+      "status": "DONE_WITH_MAIN_BLOCKED_AUTHORIZATION",
+      "summary": "Versioned install summary, support matrix and copyable flow published; smoke covers install/stage/relocate/first-run/doctor/start/reuse/conflicts/concurrency/orphan/backup/evidence-verified restore/read-only recovery/rebind/delivery bytes/rollback/tamper gates. Recovery-new-authorization and second-executor default enablement remain main/B blockers and are named, not faked.",
+      "evidence": [
+        "tools/distribution/reports/wave05/install-summary.json",
+        "docs/rfcs/WP-12/0002-consumption-guide.zh-CN.md"
+      ]
     }
   },
-  "d2": {
-    "status": "PENDING"
+  "testLayers": {
+    "package": {
+      "portability": {
+        "command": "node --test packages/portability/test/*.case.ts",
+        "tests": 36,
+        "status": "PASS"
+      },
+      "launcher": {
+        "command": "node --test apps/launcher/test/*.case.mjs",
+        "tests": 29,
+        "status": "PASS"
+      }
+    },
+    "smoke": {
+      "command": "node tools/distribution/smoke.mjs",
+      "steps": 47,
+      "status": "PASS",
+      "durationMs": 45832,
+      "evidence": "tools/distribution/reports/zero-model-smoke.json",
+      "details": {
+        "stageFiles": 6477,
+        "stageDependencies": 8,
+        "workspacePackages": 20,
+        "relocatedModules": 525,
+        "checkoutReferences": 0,
+        "evidenceDigest": "6c390e71ce6214839d5a70b7ffa0c897958650f6dc3f72be04a119ffc1180087"
+      }
+    },
+    "repro": {
+      "command": "node tools/distribution/repro-recovery-project-binding.mjs",
+      "status": "PASS_RECOVERY_PROJECT_BINDINGS",
+      "evidence": "tools/distribution/reports/wave05/recovery-project-bindings.json"
+    },
+    "install": {
+      "command": "node tools/distribution/build.mjs --install-root . --config-root <tmp> --output <dir> --json",
+      "status": "PASS",
+      "files": 6477,
+      "bytes": 65405376,
+      "buildId": "b0ef2dc37c1f4a49",
+      "dependencies": 8,
+      "supportMatrix": {
+        "measured": [
+          "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+        ],
+        "node": ">=24.21.0 <25",
+        "abi": "137",
+        "sqlite": ">=3.53.4",
+        "notTested": [
+          "linux",
+          "win32",
+          "darwin-x64",
+          "other Node ABIs",
+          "other machines",
+          "personal native execution"
+        ]
+      }
+    }
   },
-  "d3": {
-    "status": "PENDING"
+  "supportMatrix": {
+    "measured": [
+      "darwin/arm64",
+      "Node 24.21.x",
+      "SQLite 3.53.4 / ABI 137",
+      "controlled fixture",
+      "author Codex CLI presence/version/auth-file diagnostics"
+    ],
+    "notTested": [
+      "linux",
+      "win32",
+      "darwin-x64",
+      "other Node ABIs/machines",
+      "personal native end-to-end",
+      "second executor review execution",
+      "post-recovery rebinding/revalidation and new execution authorization (main)"
+    ]
   },
-  "d4": {
-    "status": "PENDING"
-  },
-  "d5": {
-    "status": "PENDING"
-  },
-  "evidence": [
-    "tools/distribution/reports/wave05/recovery-project-bindings.json",
-    "tools/distribution/reports/zero-model-smoke.json"
+  "blockers": [
+    {
+      "id": "EXECUTOR-CAPABILITY-INTERFACE",
+      "owner": "B/main",
+      "status": "OPEN",
+      "summary": "No public machine-readable executor capability/first-run input yet; D doctor supports a diagnostic fixture only and keeps review disabled by default. RFC 0005 §3.",
+      "impact": "Required review mode cannot be configured as a product feature; author path remains usable."
+    },
+    {
+      "id": "ROUTING-EVIDENCE-PERSISTENCE",
+      "owner": "A",
+      "status": "OPEN",
+      "summary": "RoutingEvidencePort exists as contract but has no storage implementation; route advice/review reports/outcomes are not persisted and therefore not covered by bundle evidence. RFC 0005 §2.",
+      "impact": "Evidence digest explicitly records unavailable; restore does not claim those classes."
+    },
+    {
+      "id": "RECOVERY-AUTHORIZATION",
+      "owner": "main",
+      "status": "OPEN",
+      "summary": "Re-binding/revalidation and allowing new execution after read-only restore is main scope; D provides CLI/diagnostics only and does not delete markers or add bypass switches.",
+      "impact": "End-to-end personal Alpha step stays BLOCKED_RECOVERY_AUTHORIZATION, not reported as complete."
+    },
+    {
+      "id": "ROOT-LOCK",
+      "owner": "main",
+      "status": "KNOWN",
+      "summary": "pnpm-lock.yaml diff is local only and intentionally not staged/committed; no new external dependency was added in wave-05."
+    }
   ],
-  "limitations": [
-    "darwin/arm64 + Node 24.21.x measured candidate only",
-    "Package-scoped candidate; not main/E admission or product release",
-    "Second executor install/review mode remains gated by amendment-01 pilot and B/main interfaces"
+  "blockedSteps": [
+    {
+      "step": "restore -> main rebind/revalidate -> allow new authorized execution",
+      "owner": "main",
+      "status": "BLOCKED_RECOVERY_AUTHORIZATION"
+    },
+    {
+      "step": "required second-executor review mode as a default product path",
+      "owner": "B/main",
+      "status": "BLOCKED_EXECUTOR_INTERFACE"
+    }
+  ],
+  "eConsumption": [
+    "Use the same install artifact in its own fresh root; do not modify D assertions.",
+    "Run <install>/bin/pa first-run; doctor must show release_manifest/runtime_abi/console_mode/runtime_dependencies PASS and review_executor WARN(no_executor_interface) by default.",
+    "Run start --fixture, then backup -> restore to a new state -> verify report.evidence.status=verified and digest match; do not auto-enable review or bypass recovery authorization.",
+    "Treat personal native, second-executor review execution and post-recovery authorization as NOT_TESTED/BLOCKED with the owner named; do not rewrite them to PASS.",
+    "Evidence for E: tools/distribution/reports/wave05/install-summary.json, wave05-status.json, zero-model-smoke.json, recovery-project-bindings.json, docs/rfcs/WP-12/0002 §9."
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave05-status.json",
+    "tools/distribution/reports/zero-model-smoke.json",
+    "tools/distribution/reports/wave05/install-summary.json",
+    "tools/distribution/reports/wave05/recovery-project-bindings.json",
+    "docs/rfcs/WP-12/0002-consumption-guide.zh-CN.md",
+    "docs/rfcs/WP-12/0005-wave-05-d-consumption-ports.zh-CN.md"
+  ],
+  "preservedHistory": [
+    "wave-03/04 reports and commits unchanged",
+    "no shared contract/migration/root lock/other-agent code/user service was modified",
+    "no restore marker deleted, no authorization bypass added"
   ]
 }
