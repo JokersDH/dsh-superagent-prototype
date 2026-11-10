@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-10T07:38:05.770Z",
+  "checkedAt": "2026-11-10T12:49:26.002Z",
   "source": {
-    "commit": "702d2027a0a95f79513e85c443941b2d9e88c76c",
+    "commit": "fea14dfdf9ee26b5c9439b7886bea2f3e8a16b3f",
     "dirty": false
   },
-  "expectedSource": "702d2027a0a95f79513e85c443941b2d9e88c76c",
+  "expectedSource": "fea14dfdf9ee26b5c9439b7886bea2f3e8a16b3f",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -261,6 +261,81 @@
       "status": "PASS"
     },
     {
+      "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-OVERLAP",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-EXPIRED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-DISPOSITION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-VERSION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-BUDGET",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E2-CONFIGURATION",
       "required": true,
       "status": "PASS"
@@ -322,6 +397,36 @@
     },
     {
       "id": "E2-CONVERSATION-CATALOG",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-ATTENTION-SIGNAL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-REVIEW-TIMING",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-ROUTE-FIXTURE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-REVIEW-FIXTURES",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-SEALED-COPY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-REVIEW-ACTIVITY-UI",
       "required": true,
       "status": "PASS"
     },
@@ -490,7 +595,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-10T07:36:21.968Z",
+    "decidedAt": "2026-11-10T12:48:03.640Z",
     "failureCodes": []
   },
   "notes": [

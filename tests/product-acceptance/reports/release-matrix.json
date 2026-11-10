@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "702d2027a0a95f79513e85c443941b2d9e88c76c",
+    "commit": "fea14dfdf9ee26b5c9439b7886bea2f3e8a16b3f",
     "dirty": false
   },
   "environment": {
@@ -11,17 +11,17 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-10T07:36:21.955Z",
+  "checkedAt": "2026-11-10T12:48:03.628Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 78,
+    "PASS": 100,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 7,
+    "NOT_TESTED": 10,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
@@ -334,6 +334,100 @@
         "E2-CONVERSATION-CATALOG",
         "E3-CONVERSATION-UI"
       ]
+    },
+    {
+      "id": "attention-signal",
+      "capability": "待办注意信号：未结束工作、归档可见、交付后清除",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "跨项目/期限/等待排序的注意力工作台尚未交付。"
+      ],
+      "evidence": [
+        "E2-ATTENTION-SIGNAL"
+      ]
+    },
+    {
+      "id": "attention-workbench",
+      "capability": "跨项目注意力工作台：期限/等待排序与分组",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "Owner main/C；本轮未见聚合读取、期限排序或分组 UI，仅有每会话 attention 布尔值。"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "review-timing",
+      "capability": "验收等待与 UI 活动代理（unknown 不填 0）",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "多 tab 重叠区间并集未直接测量；活动是可见/聚焦代理，不是人工思考时间。"
+      ],
+      "evidence": [
+        "E2-REVIEW-TIMING",
+        "E3-REVIEW-ACTIVITY-UI"
+      ]
+    },
+    {
+      "id": "route-advice",
+      "capability": "推荐建议只在显式实验入口；默认路径关闭",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "PASS",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "C 的 packages/routing 与 main 的 HTTP/UI 入口未交付；0/1/多候选、身份漂移、旧政策等产品负例无法执行。"
+      ],
+      "evidence": [
+        "E2-ROUTE-FIXTURE"
+      ]
+    },
+    {
+      "id": "controlled-review",
+      "capability": "冻结候选 + 独立复核 + sealed copy + 人工审阅",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "PASS",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "无 review Work/HTTP/证据发布入口；E3-REVIEW-PIPELINE 未执行。"
+      ],
+      "evidence": [
+        "E3-REVIEW-FIXTURES",
+        "E3-SEALED-COPY"
+      ]
+    },
+    {
+      "id": "heterogeneous-review",
+      "capability": "真实不同协议复核（版本/身份/预算/隔离/主题）",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "第二协议未实现，独立试点 preflight 为 BLOCKED；不能把替换模型或 fixture 当异构。"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "independent-review-pilot",
+      "capability": "独立会话复核价值试点（24 turn / 20万 token / 5 USD）",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "Preflight BLOCKED（pricing_unavailable），0/24 turn；未产生价值结论。"
+      ],
+      "evidence": []
     },
     {
       "id": "project-settings-version",
