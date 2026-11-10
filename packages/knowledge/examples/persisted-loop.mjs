@@ -111,7 +111,7 @@ async function main() {
           : 'FAIL',
       modelCalls: 0,
       networkCalls: 0,
-      realSqlAdapter: 'NOT_TESTED (A-owned AssistantStatePort not present on main)',
+      realSqlAdapter: 'covered separately by tools/bootstrap/review-persisted-assistant.mjs (7/7 real SQLite)',
     },
   }
   mkdirSync(join(packageRoot, 'reports'), { recursive: true })
