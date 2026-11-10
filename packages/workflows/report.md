@@ -2,8 +2,7 @@
 
 - Branch: `codex/g2-workspaces-verification`
 - Main base: `3957e30`; merge checkpoint: `382d2e8`
-- Stable interface checkpoint: `c3e007b` (final source commit is recorded in
-  `reports/execution-status.json`)
+- Stable interface checkpoint: `c3e007b`; delivery source: `9174c61`.
 - Owned paths: `packages/storage/`, `packages/workflows/` and their package-local docs/tests/reports
 - Environment: Node 24.21.0, pnpm 11.7.0, darwin/arm64. Native model tasks: **0**. No account,
   `.env`, model call, network install, user service or user project operation.
