@@ -1,0 +1,107 @@
+{
+  "generatedAt": "2026-11-10T04:56:49.901Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "B4 recovery (controlled)",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 4,
+    "PASS": 3,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 1
+  },
+  "cases": [
+    {
+      "id": "B4-WINDOW-IDLE",
+      "title": "a restart before begin starts no work",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "restarted with 0 work(s); no begin was created by the restart"
+      ],
+      "evidence": [
+        {
+          "worksAfterIdleRestart": 0
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B4-WINDOW-RUNNING",
+      "title": "a restart during a run produces no second begin or writer",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "assignment preserved (5627a2517a0d7f8c0977876f4da51e27); stop recorded"
+      ],
+      "evidence": [
+        {
+          "noSecondBegin": true,
+          "stopStatus": 200,
+          "stopBody": {
+            "commandId": "cmd-b4-stop-1794286608799",
+            "workId": "76f59bf6437e2307e549fb94dde19d93",
+            "seq": 26,
+            "status": "recorded"
+          }
+        }
+      ],
+      "entities": [
+        {
+          "workId": "76f59bf6437e2307e549fb94dde19d93",
+          "assignmentBefore": "5627a2517a0d7f8c0977876f4da51e27",
+          "phase": "queued"
+        },
+        {
+          "assignmentAfter": "5627a2517a0d7f8c0977876f4da51e27",
+          "phaseAfter": "verifying",
+          "resources": "quiescent"
+        }
+      ]
+    },
+    {
+      "id": "B4-WINDOW-QUESTION",
+      "title": "a restart in the answer window keeps the question and admits no stale answer",
+      "lane": "fixture",
+      "status": "NOT_TESTED",
+      "detail": [
+        "no question was visible before the kill, so the answer window was not exercised"
+      ],
+      "evidence": [
+        {
+          "questionWorkStatus": 200,
+          "questionPhase": "needs_user"
+        }
+      ],
+      "entities": [
+        {
+          "workId": "a597e58b208c2ba11107ff54c735a254",
+          "questionId": "6dde525a5e74ea985b418ba9d9ec7e68",
+          "survived": false
+        }
+      ]
+    },
+    {
+      "id": "B4-CAPABILITIES",
+      "title": "the observed capability matrix is reported, not assumed",
+      "lane": "readonly",
+      "status": "PASS",
+      "detail": [
+        "questions=true fixtures=4 nativeAdmitted=1 environmentPolicy=false"
+      ],
+      "evidence": [
+        {
+          "questions": true,
+          "fixtures": 4,
+          "nativeAdmitted": 1,
+          "environmentPolicy": false
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
