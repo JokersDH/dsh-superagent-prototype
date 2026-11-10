@@ -4,107 +4,88 @@
   "branch": "codex/g2-workspaces-verification",
   "mainBaseCommit": "f2ca26c",
   "mergeCommit": "f35fa29",
-  "stableApiCheckpoint": "8dcbdce",
-  "testedSourceCommit": "f8272ac",
-  "updatedAt": "2026-11-09T22:05:00.000Z",
+  "stableApiCheckpoint": "9550286",
+  "testedSourceCommit": "9550286",
+  "updatedAt": "2026-11-09T23:40:00.000Z",
   "phases": [
-    {
-      "phase": "A1",
-      "priority": "P0",
-      "status": "passed",
-      "evidence": [
-        "reports/admission-probe.json",
-        "pkg-test:31/31"
-      ],
-      "note": "five main admission cases PASS; nested links, drift fingerprint, hooks, semver and unowned cleanup regression-covered"
-    },
-    {
-      "phase": "A2",
-      "priority": "P0",
-      "status": "passed",
-      "evidence": [
-        "pkg-test: signed receipt/verify/cleanup cases",
-        "reports/report.md"
-      ],
-      "note": "HMAC authority receipts, cross-process verify/cleanup, forged/replaced/drift refusal; v1 markers never trusted"
-    },
-    {
-      "phase": "A3",
-      "priority": "P0",
-      "status": "passed",
-      "evidence": [
-        "pkg-test: process port/lock/cancel/disk cases"
-      ],
-      "note": "one installer lock with ESRCH-only stale recovery, injected port quiescence, probe/install cancellation, disk monitoring, interrupted state blocked"
-    },
-    {
-      "phase": "A4",
-      "priority": "P1",
-      "status": "passed",
-      "evidence": [
-        "pkg-test: inspect cases",
-        "src/inspect.ts"
-      ],
-      "note": "read-only inspect + parser, Chinese codes/suggestions, cache sufficiency unknown, no installer/hooks/writes"
-    },
-    {
-      "phase": "A5",
-      "priority": "P1",
-      "status": "passed",
-      "evidence": [
-        "recipes/",
-        "examples/",
-        "reports/performance.json"
-      ],
-      "note": "plain-js/dev-deps offline recipes, consumer prepare/verify/cleanup in two processes, lost-ref recovery, performance measurements"
-    },
-    {
-      "phase": "A6",
-      "priority": "P2",
-      "status": "passed_package_local",
-      "evidence": [
-        "pkg-test: workspace cases"
-      ],
-      "note": "restricted pnpm workspace app workspace:* lib: offline install/test/verify; external links, globs, symlink members and peer blocked; business patch excludes only env dirs"
-    },
     {
       "phase": "A-R1",
       "priority": "P0",
       "status": "passed",
       "evidence": [
         "reports/admission-probe.json",
-        "pkg-test:34/34"
+        "pkg-test:37/37",
+        "test: forged marker/EPERM/merged-output/descendants"
       ],
-      "note": "blocked/stale/reuse cleanup only from signed receipts or in-process captured identities; EPERM/other group observation stays unknown; merged stdout+stderr byte budget clips whole UTF-8 characters; 8 official admission cases PASS at f8272ac"
+      "note": "8/8 official cases PASS at 9550286; marker never authorizes deletion; only ESRCH confirms group gone; stdout+stderr share one UTF-8-safe budget"
+    },
+    {
+      "phase": "A-R2",
+      "priority": "P0",
+      "status": "passed_package_local",
+      "evidence": [
+        "src/prepare.ts: prepareAuthoritativeEnvironment",
+        "src/verify.ts: parsers/projectWorkspaceEnvironment",
+        "README.md",
+        "report.md"
+      ],
+      "note": "authorityRoot mandatory for production entry; serialized parser-validated ref; receipt binds workspace inode/request/inputs/deps/versions/ownership; exclusions only existing dirs"
+    },
+    {
+      "phase": "A-R3",
+      "priority": "P0",
+      "status": "passed_package_local",
+      "evidence": [
+        "reports/independent-consumption.json",
+        "examples/consumption-matrix.mjs",
+        "reports/recipe-build.json",
+        "test: consumer/recipe cross-process"
+      ],
+      "note": "7/7 independent matrix through second Node process: valid flow, forged marker/receipt, replacement, manifest/lock/drift, missing cache, hooks, concurrency, old preparing, cancellation; two offline recipes rebuildable"
+    },
+    {
+      "phase": "A-R4",
+      "priority": "P0",
+      "status": "blocked_external_main",
+      "evidence": [
+        "origin/main f2ca26c",
+        "docs/rfcs/WP-16/0010-main-environment-operations-checkpoint.md"
+      ],
+      "note": "latest main has no newer WorkspaceEnvironmentPort consumer after f35fa29; no main integration or product acceptance claimed; independent diagnostics/recovery work completed instead"
     }
   ],
   "commands": [
-    "node <primary>/tools/bootstrap/review-environment-preparation.mjs --environment $PWD",
     "pnpm run typecheck",
     "pnpm run test",
     "pnpm run build",
-    "node recipes/build-recipes.mjs --out <dir>",
-    "node examples/prepare-consumer.mjs ...",
-    "node examples/verify-consumer.mjs --ref <ref> [--cleanup]"
+    "node examples/consumption-matrix.mjs --out reports/independent-consumption.json",
+    "node recipes/build-recipes.mjs --out /tmp/pa-env-recipes-verify",
+    "node <primary>/tools/bootstrap/review-environment-preparation.mjs --environment /Users/hh/Desktop/joker/superagent-agent-a --candidate 9550286"
   ],
   "results": {
-    "packageTests": "34/34",
-    "admissionProbe": "PASS_ENVIRONMENT_ADMISSION (8/8 at f8272ac)",
+    "packageTests": "37/37",
+    "admissionProbe": "PASS_ENVIRONMENT_ADMISSION (8/8 at 9550286)",
+    "independentConsumption": "PASS_INDEPENDENT_CONSUMPTION (7/7)",
     "typecheck": "PASS",
     "build": "PASS",
+    "recipes": "RECIPES_BUILT; both recipes install and run real tests",
     "performance": "reports/performance.json"
   },
   "blockers": [],
   "notTested": [
-    "coordinator/workspaces/console/Runner/native vendor integration",
-    "authenticated independent Runner execution of installed checks",
-    "npm offline install and arbitrary monorepos"
+    "main coordinator/workspaces/Runner/console/native vendor integration and independent Runner install",
+    "npm offline install, arbitrary monorepos, native builds/lifecycle scripts, real network stores",
+    "multi-manager support and product acceptance of restricted pnpm_workspace mode"
   ],
   "mainNextSteps": [
-    "pass a private authorityRoot outside project/workspace and persist environmentRef with the attempt",
-    "call verifyPreparedEnvironment before native start, before/after checks and before acceptance; blocked never becomes ready",
-    "pass ownedPaths/excludedPaths into workspace freeze/patch; do not alter user ignore/Git config",
-    "supply an OwnedProcessHost-compatible processPort with explicit quiescence",
-    "regenerate the root lock for semver/yaml/@types/semver"
+    "persist a private durable authorityRoot and parser-validated environmentRef with the attempt; use prepareAuthoritativeEnvironment, not legacy prepareEnvironment",
+    "before native start, checks and acceptance verify via verifyPreparedEnvironment/projectWorkspaceEnvironment; a missing credential must throw",
+    "pass parser-validated excludedPaths to workspace freeze/patch before staging; do not edit user index/ignore/config",
+    "supply the Runner owned-process adapter as processPort with explicit quiescence; main owns inventory/intent/barrier",
+    "cleanup only via cleanupPreparedEnvironment during workspace release and surface leftovers/blocked codes",
+    "regenerate the authoritative root lock for semver/yaml/@types/semver"
+  ],
+  "dependencyRequests": [
+    "root lock must include semver and yaml runtime dependencies and @types/semver dev dependency; this branch does not commit the root lock"
   ]
 }

@@ -182,8 +182,8 @@ pnpm --dir packages/environment-preparation run test
 pnpm --dir packages/environment-preparation run build
 ```
 
-Measured: Node 24.21.0, pnpm 11.7.0 via Corepack cache, darwin/arm64; package tests are recorded in
-`reports/execution-status.json` and `reports/test-output.txt`. Offline install
+Measured: Node 24.21.0, pnpm 11.7.0 via Corepack cache, darwin/arm64; 37/37 package tests are
+recorded in `reports/test-output.txt` and `reports/execution-status.json`. Offline install
 fixtures are generated locally from a tarball dependency with `--offline` only; no registry/network
 call is made. Package-manager choice is exercised against the installed pnpm; a fake manager fixture
 covers timeout/cancel/output-limit/offline-error paths.

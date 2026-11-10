@@ -24,8 +24,8 @@
     "test": "node --test test/*.case.ts",
     "build": "tsc -p tsconfig.build.json",
     "inspect": "node examples/inspect.mjs",
-    "prepare": "node examples/prepare-consumer.mjs",
-    "verify": "node examples/verify-consumer.mjs"
+    "verify": "node examples/verify-consumer.mjs",
+    "prepare:consumer": "node examples/prepare-consumer.mjs"
   },
   "devDependencies": {
     "@types/node": "24.10.0",

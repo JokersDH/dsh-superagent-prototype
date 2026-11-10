@@ -7,7 +7,7 @@
  *
  * Usage: node examples/consumption-matrix.mjs [--out <report.json>]
  */
-import { spawnSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -21,6 +21,7 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url))
 const verifyCli = join(here, 'verify-consumer.mjs')
+const sourceCommit = (() => { try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: join(here, '..'), encoding: 'utf8' }).trim() } catch { return undefined } })()
 const { values } = parseArgs({ options: { out: { type: 'string' } } })
 const cases = []
 const json = (path, value) => writeFileSync(path, JSON.stringify(value) + '\n')
@@ -242,6 +243,7 @@ await check('concurrency-preparing-cancel-are-bounded', value => value.concurren
 const report = {
   protocol: 'environment-consumption-matrix/1',
   scope: 'package-local; public exports + second Node process; local temporary fixtures and offline store only; no model/account/network install/user project',
+  ...(sourceCommit ? { sourceCommit } : {}),
   node: process.version, pnpm: pnpmVersion(), platform: process.platform, architecture: process.arch,
   commands: [
     'node examples/consumption-matrix.mjs --out reports/independent-consumption.json',

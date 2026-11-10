@@ -1,79 +1,141 @@
-# Environment preparation: native MVP round-two delivery
+# Environment preparation: release-closure delivery
 
 - Package: `packages/environment-preparation/` (branch `codex/g2-workspaces-verification`)
-- Base: `5bbd892` (merge `7baeb67`; main-owned workspaces/console kept from origin/main)
-- Stable API checkpoint: `8dcbdce`; final source commit is recorded in
-  `reports/execution-status.json`.
-- Environment: Node v24.21.0, pnpm 11.7.0 via Corepack cache, darwin/arm64; no model calls and no
-  networked install.
+- Main base: `f2ca26c`; branch merge: `f35fa29`; source checkpoint tested here: `9550286`
+- Environment: Node v24.21.0, pnpm 11.7.0 via Corepack cache, darwin/arm64. No model calls,
+  no networked install, no account/user-project operation.
+- Scope: package-local preparation/verification/cleanup and controlled process port. Main
+  workspace/Runner/UI integration remains NOT_TESTED.
 
-## Phase results (A1–A6)
+## Results
 
-| Phase | Result | Evidence |
+| Gate | Result | Evidence |
 | --- | --- | --- |
-| A1 five admission failures | **PASS** | `node <primary>/tools/bootstrap/review-environment-preparation.mjs --environment $PWD` → `PASS_ENVIRONMENT_ADMISSION`; regression tests for each case |
-| A2 receipts/verify/trusted cleanup | **PASS** | HMAC-signed receipts under caller-owned `authorityRoot`; cross-process verify/cleanup; forged receipt, replaced owned path, drift, changed package/lock, corrupt key all refused |
-| A3 process port/cancel/concurrency/bounds | **PASS** | injectable `EnvironmentProcessPort` with explicit quiescence; workspace lock (live pid blocks, only ESRCH stale removal); interrupted marker not reused; cancellation in probe/install; output/time/disk budgets with cleanup |
-| A4 read-only inspection | **PASS** | `inspectEnvironment` + runtime parser; no environment/install/git/hook writes; Chinese code/message/suggestions; cache sufficiency explicitly `unknown`; stable blocked codes |
-| A5 recipes/consumer/recovery/performance | **PASS** | `plain-js` and `dev-deps` offline recipes install and run real node tests; consumer prepare → second-process verify → trusted cleanup; receipt enumeration after lost ref; performance report |
-| A6 restricted pnpm workspace | **PASS (package-local)** | one root/one lock, `app workspace:* lib`, offline install, app test calls lib, verify covers all manifests; external links/unknown targets/symlink members/bad globs/peer blocked; business patch includes only member source |
+| A-R1 three new failures | **PASS** | Official 8-case probe at `9550286`; regressions for forged-marker cleanup, EPERM/unknown observation, merged stdout+stderr budget |
+| A-R1 original five | **PASS** | Same probe; unowned-path preservation, nested escape, drift reuse, Node range, pnpmfile refusal |
+| A-R2 production interface | **PASS (package-local)** | mandatory `authorityRoot` entry, parser-validated ref/results, signed-receipt ownership, workspace inode binding, actual exclusions |
+| A-R3 independent consumption | **PASS (package-local)** | `reports/independent-consumption.json` 7/7 through public exports and a second Node process |
+| A-R4 main integration | **BLOCKED_EXTERNAL** | latest `origin/main` is `f2ca26c`; no newer main consumer/merge point after `f35fa29`, so no main integration verification is claimed |
+| Package tests | **37/37 PASS** | `reports/test-output.txt` |
+| Typecheck/build | **PASS** | `pnpm run typecheck`, `pnpm run build` |
+| Offline recipes | **PASS** | `plain-js` and `dev-deps` rebuild/install/run their real tests; `reports/recipe-build.json` |
 
-Original 12 tests are preserved; the package now has **31/31** tests.
-
-## Actual commands
+## Actual commands and observed results
 
 ```sh
 cd packages/environment-preparation
-pnpm run typecheck          # PASS
-pnpm run test               # 31/31 PASS
-pnpm run build              # PASS (dist importable)
-node recipes/build-recipes.mjs --out /tmp/pa-env-recipes   # RECIPES_BUILT
-node ../../tools/bootstrap/review-environment-preparation.mjs --environment "$PWD"  # run from primary for the official probe
+pnpm run typecheck                                  # PASS
+pnpm run test                                       # 37/37 PASS
+pnpm run build                                      # PASS
+node examples/consumption-matrix.mjs --out reports/independent-consumption.json
+                                                    # PASS_INDEPENDENT_CONSUMPTION 7/7
+node recipes/build-recipes.mjs --out /tmp/pa-env-recipes-verify
+                                                    # RECIPES_BUILT (pnpm 11.7.0)
+
+# from the primary checkout; immutable archive of the committed candidate
+node /Users/hh/Desktop/joker/superagent/tools/bootstrap/review-environment-preparation.mjs \
+  --environment /Users/hh/Desktop/joker/superagent-agent-a --candidate 9550286
+                                                    # PASS_ENVIRONMENT_ADMISSION 8/8
 ```
 
-Performance measured in `reports/performance.json`: a 10-file installed tree prepared in 2 ms,
-verified in 0 ms, cleaned in 1 ms; a 1,000-file tree prepared in 7 ms, verified in 6 ms, cleaned in
-0 ms (darwin/arm64, local fixture; these are measurements, not release thresholds).
+The official probe validates all eight admission invariants; it does not substitute for the
+independent-consumption or main integration gates. Package tests use local tarball fixtures, a real
+offline store and real child processes; no registry request is made.
+
+## A-R1 fixes
+
+- **Cleanup ownership**: blocked/early results never delete anything from a workspace marker.
+  With an authority root only signed receipts for that exact workspace, plus device/inode identities
+  captured by this preparation before failure cleanup, authorize deletion. Stale/reuse/re-prepare
+  paths require a signed receipt; an owned-looking marker without one is blocked as
+  `environment_state_untrusted` and preserved. A marker is no longer a claim/delete capability.
+- **Process observation**: group liveness is three-state. Only `ESRCH` confirms `gone`; `EPERM` and
+  every other observation failure return `unknown`, never `confirmed`. Output-limit, timeout and
+  cancellation paths still TERM→KILL the detached group and report `indeterminate`/`unknown` when
+  quiescence is unproven. Normal descendants are covered by cancellation/timeout tests.
+- **Merged output budget**: stdout and stderr share one `maxOutputBytes` budget in arrival order;
+  clipping counts whole UTF-8 code points, sets `outputLimited`, terminates the group, and the
+  returned stdout+stderr byte length never exceeds the declared limit.
+
+## A-R2 production interface
+
+- `prepareAuthoritativeEnvironment(input)` requires an absolute caller-owned `authorityRoot` and
+  blocks `authority_root_required` before any write; `prepareEnvironment` remains the explicitly
+  documented legacy/compatibility surface, not a production credential mode.
+- `parsePreparationResult`, `parseEnvironmentRef`, `parseEnvironmentVerification`,
+  `parseTrustedCleanupResult` validate protocol/status/identity fields at the consumer boundary.
+  Examples use them instead of trusting ad-hoc JSON.
+- `projectWorkspaceEnvironment(ref)` verifies synchronously and projects
+  `{ reference, fingerprint, excludedPaths }` for main's `WorkspaceEnvironmentPort`. `reference` is
+  the opaque receipt id (no host path); a missing/forged/drifted receipt throws, never `undefined`.
+- Receipts bind workspace real path **and device/inode**, project, request, input fingerprint,
+  installed digest, manager/Node versions, policy, lock/manifest digests, dependencies, owned paths
+  and exclusion list. Replacement at the same path now blocks `workspace_replaced`. New receipts
+  supersede older receipts for the workspace; missing/corrupt records never recover to ready and are
+  never auto-deleted.
+- Exclusions contain only paths that exist; `.product-environment` is excluded only when this
+  preparation owns it, so a foreign/absent directory is never presented as owned state.
+- Process-port semantics are stable: argv-only detached groups, signal cancellation/output/time
+  bounds, numeric exit/signal, `outputLimited`, and explicit `quiescence` enum. Main owns process
+  inventory, durable intent and barriers; this package has no product state machine.
+
+## A-R3 independent consumption
+
+`reports/independent-consumption.json` records seven cases using only public exports and a second
+Node process for verify/cleanup:
+
+1. prepare → serialized ref → second-process verify → trusted cleanup; workspace cleared, project
+   test source unchanged.
+2. forged workspace marker does not replace the signed reference; second-process verify/cleanup still
+   use only the receipt.
+3. forged receipt blocks both verify and cleanup with owned content preserved.
+4. workspace directory replacement (same path, new inode) blocks verify and cleanup.
+5. manifest, lock and installed-tree drift block verification (and cleanup remains fail-closed).
+6. controlled offline-error manager reports `offline_cache_missing`; `.pnpmfile.cjs` is refused with
+   `project_hooks_unsupported` and never executed.
+7. same-workspace concurrency blocks `workspace_busy`, mid-flight cancellation reports `cancelled`
+   and kills the group, and a crash-left `preparing` marker is preserved and blocks
+   `interrupted_preparation`.
+
+Recipes are rebuildable from local tarballs; source names/versions (`env-dep@1.0.0`,
+`env-dev-dep@1.0.0`), test commands, store construction and the no-network policy are documented in
+`recipes/README.md`. No dependencies, store or cache are committed.
 
 ## Interface summary
 
 ```ts
-prepareEnvironment(input): ReadyEnvironment | BlockedEnvironment
+prepareAuthoritativeEnvironment(input): PreparationResult   // authorityRoot required
+prepareEnvironment(input): PreparationResult                 // explicit legacy compatibility
 verifyPreparedEnvironment(ref): EnvironmentVerificationResult
 cleanupPreparedEnvironment(ref): TrustedCleanupResult
 listPreparedEnvironments(authorityRoot): EnvironmentRef[]
+projectWorkspaceEnvironment(ref): { reference, fingerprint, excludedPaths }
 inspectEnvironment(input): EnvironmentInspection
-parseEnvironmentInspection(value): EnvironmentInspection
+parsePreparationResult / parseEnvironmentRef / parseEnvironmentVerification /
+parseTrustedCleanupResult / parseEnvironmentInspection
 ```
 
-`ready` carries `fingerprint`, manager/node identity, policy, allowlisted environment, signed
-`environmentRef`, truly owned `ownedPaths`, diagnostics/evidence and `cleanup()`. Inputs include
-authorized project/workspace, stable request id, AbortSignal, explicit policy, optional authorized
-offline store, authorityRoot, injected process port and `mode: 'single' | 'pnpm_workspace'`.
-Workspace markers are never deletion/reuse authority. Receipts bind manifests/locks/dependencies,
-installed layout, policy, Node/manager versions, and owned path device/inode identity.
+## Main handoff
 
-## Integration notes for main
+1. Create a private durable `authorityRoot` outside project/workspace; use
+   `prepareAuthoritativeEnvironment`, persist the parser-validated `environmentRef` with the attempt.
+2. Re-verify via `verifyPreparedEnvironment` (or `projectWorkspaceEnvironment`) before native start,
+   before/after checks and before acceptance. Treat every blocked code as non-ready; a required but
+   missing credential must throw, never become `undefined`.
+3. Pass `excludedPaths` to workspace freeze/patch before staging; only actual environment dirs are
+   excluded. Do not edit user `.gitignore`/index/config.
+4. Supply the Runner's owned-process adapter as `processPort`; preserve explicit quiescence and do
+   not treat `indeterminate`/`unknown` as stopped. Main owns inventory/durable intent/barrier.
+5. Cleanup only via `cleanupPreparedEnvironment` during workspace release; surface leftovers and
+   blocked codes. Regenerate the root lock for `semver`, `yaml`, `@types/semver` (not committed here).
 
-1. Create a private caller-owned `authorityRoot` outside project/workspace; persist the returned
-   `environmentRef` (JSON) alongside the attempt.
-2. Before native start, verification checks and acceptance, call `verifyPreparedEnvironment`; treat
-   `blocked` as non-ready (drift/inputs changed/ownership changed/forged receipt).
-3. Pass `ownedPaths`/`excludedPaths` into the workspace freeze/patch integration; only these paths are
-   environment state. Member source files stay in the business patch (A6 fixture proves it).
-4. Supply the coordinator's owned-process adapter as `processPort`; it must return explicit
-   quiescence. Release owned paths with `cleanupPreparedEnvironment` during workspace release; an
-   `indeterminate` / `cleanup_unproven` result must remain visible, never treated as cleaned.
-5. New root-lock request: `semver`, `yaml` runtime deps and `@types/semver` dev dependency; this
-   branch does not commit the root lock.
+## NOT_TESTED / limitations
 
-## Limitations / NOT_TESTED
-
-- Coordinator/workspaces/console/Runner/native vendor integration is **NOT_TESTED** here; this is a
-  package-local port plus real Git/offline-pnpm fixtures.
-- Offline cache must be warmed by an authorized operator; the module never performs a networked
-  install or manager upgrade. npm offline install, arbitrary monorepos, native builds and lifecycle
-  scripts are unsupported by design (blocked with stable codes).
-- A6 workspace support is intentionally narrow: literal members and one-level `prefix/*`; peer/catalog
-  and external links are blocked. Independent Runner recovery and installed-vendor compatibility remain
-  separate lanes.
+- Main coordinator/workspaces/Runner/console/native vendor integration and an independent Runner
+  installing through this port are **NOT_TESTED**.
+- npm offline install, arbitrary monorepos, native builds/lifecycle scripts, real network stores and
+  multi-manager support remain unsupported or untested; the restricted `pnpm_workspace` mode is
+  package-local and intentionally narrow.
+- Offline cache warming and credential/account policy are operator/main concerns. The package uses
+  the existing Corepack cache read-only and never downloads a manager.
+- A-R4 is blocked on a newer main interface consumer; no main-owned path was modified.
