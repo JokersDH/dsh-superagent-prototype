@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-10T04:33:18.083Z",
+  "generatedAt": "2026-11-10T05:09:50.094Z",
   "environment": {
     "platform": "darwin/arm64",
     "node": "v24.21.0",
     "acceptanceCheckpoint": "tests/native-acceptance",
     "lane": "B2 stop matrix (controlled)",
     "modelCalls": 0,
-    "workRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-b2-stop-TyCcoT"
+    "workRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-b2-stop-a0bCfG"
   },
   "totals": {
     "cases": 6,
@@ -22,11 +22,11 @@
       "lane": "controlled",
       "status": "PASS",
       "detail": [
-        "writing (207 bytes) under pid 56148"
+        "writing (207 bytes) under pid 48683"
       ],
       "evidence": [
         {
-          "pid": 56148,
+          "pid": 48683,
           "bytesBefore": 207
         }
       ],
@@ -42,7 +42,7 @@
       ],
       "evidence": [
         {
-          "pid": 56148,
+          "pid": 48683,
           "sizeAfterTerm": 207,
           "grewAfter": false,
           "groupAlive": false
@@ -60,9 +60,9 @@
       ],
       "evidence": [
         {
-          "parentPid": 56160,
+          "parentPid": 48686,
           "childActive": true,
-          "childBytes": 102,
+          "childBytes": 104,
           "stillGrowing": false
         }
       ],
