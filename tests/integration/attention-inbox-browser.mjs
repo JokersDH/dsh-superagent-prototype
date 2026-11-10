@@ -114,7 +114,7 @@ try {
     await page.locator('.question-card').waitFor()
     await page.reload()
     await page.locator('.question-card').waitFor()
-    assert.equal(await page.locator('.detail h2').textContent(), '支付接口确认')
+    assert.equal(await page.locator('.detail-title').textContent(), '支付接口确认')
     assert.equal(accepted().length, 0)
   })
   await check('SEQUENTIAL-REVIEW-NAVIGATES-WITHOUT-BULK-ACCEPTANCE', async () => {
@@ -138,7 +138,7 @@ try {
     await inbox()
     await typeTab(/^全部/)
     await open('缓存一致性检查')
-    await page.getByText('FAIL', { exact: true }).waitFor()
+    await page.locator('.detail .outcome-FAIL').getByText('未通过', { exact: true }).waitFor()
     assert.equal(await page.getByRole('button', { name: '接受当前候选', exact: true }).count(), 0)
     assert.equal(accepted().length, 2)
   })

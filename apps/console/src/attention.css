@@ -10,6 +10,7 @@
 .attention-search:focus-within { outline: 2px solid var(--focus, #408f75); outline-offset: 2px; }
 .attention-search svg { flex-shrink: 0; }
 .attention-project { display: flex; flex: 0 1 240px; align-items: center; gap: 8px; min-width: 0; font-size: 12px; color: var(--muted); }
+.attention-project > span { flex-shrink: 0; white-space: nowrap; }
 .attention-project select { width: 100%; min-width: 0; min-height: 34px; padding: 5px 8px; font-size: 12px; }
 .attention-tabs { display: flex; align-items: center; flex-wrap: wrap; gap: 3px; padding: 0 32px; border-bottom: 1px solid var(--line); }
 .attention-tabs button { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 10px; border: 0; border-radius: 0; background: transparent; color: var(--muted); font-size: 12px; }
