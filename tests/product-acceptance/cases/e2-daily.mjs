@@ -3,7 +3,7 @@ import { createServer } from 'node:http'
 import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { runCase, LAYERS } from '../lib/status.mjs'
+import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient, rawProbe } from '../lib/http-client.mjs'
 import { readPrivateCredential, sha256 } from '../lib/evidence.mjs'
 import { cleanup, pickPort, startProduct, stateSizeKb, tempState } from '../lib/instance.mjs'
@@ -633,6 +633,37 @@ export async function runE2({ root, runDirectory, keep = false }) {
         }
       },
     )
+
+    // Context/proposal/decision governance belongs to Agent C. Record the observed absence instead
+    // of implying coverage; the command is schema-valid and the product refuses it explicitly.
+    const decision = await client.dispatch({
+      commandId: commandId('record-decision'),
+      conversationId: 'conv-e2-decisions',
+      kind: 'record_decision',
+      content: 'E2 观察：决定治理是否已接线',
+      scope: facts.project.scope,
+      sourceMessageId: 'message-e2-decision',
+    })
+    const decisionsCase = notTested(
+      define(
+        'E2-CONTEXT-PROPOSALS-NOT-TESTED',
+        'Context, proposal and decision governance is not wired into this product build',
+        {
+          limitations: [
+            'Agent C owns packages/context, packages/proposals and packages/knowledge; they are absent here.',
+            'No confirm-before-execute, duplicate-confirm or revocation-effect case can run.',
+          ],
+        },
+      ),
+      `record_decision returned ${decision.receipt.status} (${decision.receipt.error?.code ?? 'no error'}); ` +
+        'proposal confirmation and revocation have no public entry in this checkout.',
+    )
+    decisionsCase.evidence.decision = {
+      httpStatus: decision.status,
+      receiptStatus: decision.receipt.status,
+      errorCode: decision.receipt.error?.code ?? null,
+    }
+    cases.push(decisionsCase)
 
     await push(
       define('E2-REOPEN-PERSISTENCE', 'A restart preserves delivery, conversation and artifacts without reopening work'),

@@ -167,7 +167,11 @@ const CAPABILITIES = [
   {
     id: 'context-proposals-decisions',
     label: '上下文、提案与明确决定治理',
-    notTested: ['C 的 packages/context、proposals、knowledge 未交付；确认前不执行无法端到端验证。'],
+    readonly: ['E2-CONTEXT-PROPOSALS-NOT-TESTED'],
+    notTested: [
+      'C 的 packages/context、proposals、knowledge 未交付；确认前不执行、重复确认幂等、撤销后失效无法端到端验证。',
+      '本次仅记录 record_decision 的显式拒绝（见 E2-CONTEXT-PROPOSALS-NOT-TESTED）。',
+    ],
   },
   {
     id: 'actual-native',

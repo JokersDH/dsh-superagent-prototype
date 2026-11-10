@@ -38,6 +38,9 @@ for (const suite of requested)
   if (!KNOWN.has(suite)) throw new Error(`Unknown suite ${suite}. Known: ${[...KNOWN].join(', ')}`)
 
 const only = values.only ? new Set(values.only.split(',').map((item) => item.trim())) : undefined
+// Source identity is captured before any evidence is written, so the harness's own reports cannot
+// make the product source look modified.
+const source = gitSource(root, { ignoreUntrackedPrefixes: ['tests/product-acceptance/reports/'] })
 const run = createRun({ reportsRoot, suites: requested, label: values.label })
 const startedAt = new Date().toISOString()
 const artifacts = { runDirectory: run.directory, screenshots: [] }
@@ -91,7 +94,6 @@ await collect('e4', async () => {
 })
 
 const finishedAt = new Date().toISOString()
-const source = gitSource(root)
 const report = {
   schema: REPORT_SCHEMA,
   suites: requested,

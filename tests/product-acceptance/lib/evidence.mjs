@@ -51,11 +51,19 @@ export function readPrivateCredential(stateDir, name = 'api.key') {
   return value
 }
 
-export function gitSource(root) {
+export function gitSource(root, { ignoreUntrackedPrefixes = [] } = {}) {
   const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim()
-  const dirty =
-    execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }).trim() !== ''
-  return { commit, dirty }
+  const lines = execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' })
+    .split('\n')
+    .filter(Boolean)
+  // Evidence written by this harness must not make the product source look modified. Only untracked
+  // paths under the named prefixes are ignored; tracked edits and other untracked files still count.
+  const relevant = lines.filter((line) => {
+    const path = line.slice(3)
+    if (!line.startsWith('??')) return true
+    return !ignoreUntrackedPrefixes.some((prefix) => path.startsWith(prefix))
+  })
+  return { commit, dirty: relevant.length > 0 }
 }
 
 export function branchName(root) {
