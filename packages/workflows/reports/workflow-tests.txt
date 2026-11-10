@@ -1,0 +1,17 @@
+✔ conversation catalog, search, archive and message identity survive reopen (13.182792ms)
+✔ unresolved work/questions remain visible as attention after archive (6.389042ms)
+✔ project settings are append-only, CAS-protected and archive only visibility (7.613709ms)
+✔ explicit decision versions append and revoke without inferred rules (5.739875ms)
+✔ read index is bounded, scoped and never invents a current setting or authority (6.208334ms)
+✔ a snapshot includes the database and digest-verified artifacts; missing bytes block it (59.802958ms)
+✔ a v7 database backfills the conversation catalog on upgrade and keeps message identity (7.706417ms)
+✔ catalog pagination, long/empty titles and message paging keep identity and bounds (18.157208ms)
+✔ a second Node process consumes the public workflow ports and snapshot verifier (132.897209ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 356.279292
