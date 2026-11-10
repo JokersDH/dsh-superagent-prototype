@@ -1,0 +1,10 @@
+{
+  "protocol": "acceptance-fixture/1",
+  "id": "bundle-checklist-no-rollback",
+  "type": "bundle-checklist",
+  "data": {
+    "version": "0.1.0",
+    "files": [{ "path": "state/state.sqlite", "sha256": "4444444444444444444444444444444444444444444444444444444444444444", "bytes": 4096 }],
+    "rollback": { "supported": false, "restoresVersion": null }
+  }
+}

@@ -1,0 +1,895 @@
+{
+  "schema": "product-acceptance/1",
+  "suites": [
+    "selftest"
+  ],
+  "branch": "codex/g3-product-acceptance",
+  "source": {
+    "commit": "3957e30cbbaa3cd86a672fb4583922eba8364fc8",
+    "dirty": true
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "os": "Darwin 25.6.0"
+  },
+  "startedAt": "2026-11-10T04:34:36.184Z",
+  "finishedAt": "2026-11-10T04:34:36.191Z",
+  "checkedAt": "2026-11-10T04:34:36.191Z",
+  "counts": {
+    "PASS": 21,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0,
+    "BLOCKED": 0,
+    "UNKNOWN": 0
+  },
+  "artifacts": {
+    "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T04-34-36-182Z",
+    "screenshots": []
+  },
+  "cases": [
+    {
+      "id": "E1-GATE-CONTROL",
+      "title": "A complete, source-bound bundle aggregates as PASS",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "ACCEPTS_VALID",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.184Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 1
+    },
+    {
+      "id": "E1-GATE-REJECT-MISSING-CASE",
+      "title": "Absent required case cannot be treated as covered",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+      "title": "Unknown/undefined status is rejected, not coerced",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+      "title": "An uncertain acceptance never aggregates as delivery",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-STALE-REPORT",
+      "title": "An old report that claims PASS is rejected as stale",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "STALE",
+          "ok": true
+        },
+        {
+          "id": "SELF_CLAIM",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+      "title": "Evidence from another commit is rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-NO-CANDIDATE",
+      "title": "Acceptance without a recorded candidate is rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-VACUOUS",
+      "title": "A pass with no assertions is not evidence",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+      "title": "A PASS case carrying a failed assertion is rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+      "title": "A required evidence reference must exist",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-DUPLICATE",
+      "title": "Duplicate case identity is rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-BAD-PATCH",
+      "title": "A patch whose recorded digest differs from the downloaded bytes is rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+      "title": "A patch that did not apply is rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+      "title": "A malformed patch digest is rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+      "title": "A native case that never executed cannot pass",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "UNEXECUTED",
+          "ok": true
+        },
+        {
+          "id": "LAYER",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+      "title": "An unknown/invalid response consumed by a passing case is rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+      "title": "Case evidence bound to another commit is stale",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+      "title": "Fixture bytes changed after the case ran are rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-GATE-REJECT-SCHEMA",
+      "title": "A report without the acceptance schema is rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REJECTED",
+          "ok": true
+        },
+        {
+          "id": "CODE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.185Z",
+      "durationMs": 0
+    },
+    {
+      "id": "E1-FIXTURE-STRICT",
+      "title": "Illegal command fixtures are refused by the loader",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "ACCEPTS_VALID",
+          "ok": true
+        },
+        {
+          "id": "REJECT_protocol",
+          "ok": true
+        },
+        {
+          "id": "REJECT_unknown_field",
+          "ok": true
+        },
+        {
+          "id": "REJECT_type",
+          "ok": true
+        },
+        {
+          "id": "REJECT_id",
+          "ok": true
+        },
+        {
+          "id": "REJECT_inside_grant",
+          "ok": true
+        },
+        {
+          "id": "REJECT_absolute",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.185Z",
+      "finishedAt": "2026-11-10T04:34:36.189Z",
+      "durationMs": 4
+    },
+    {
+      "id": "E1-FIXTURE-PORTABILITY-STRICT",
+      "title": "Portability checklists reject traversal, duplicates and bad digests",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "ACCEPTS_VALID",
+          "ok": true
+        },
+        {
+          "id": "REJECT_traversal",
+          "ok": true
+        },
+        {
+          "id": "REJECT_duplicate",
+          "ok": true
+        },
+        {
+          "id": "REJECT_digest",
+          "ok": true
+        },
+        {
+          "id": "REJECT_bytes",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "kind": "gate-selftest"
+      },
+      "limitations": [
+        "In-memory evidence bundles; proves the aggregator, not a product workflow"
+      ],
+      "startedAt": "2026-11-10T04:34:36.189Z",
+      "finishedAt": "2026-11-10T04:34:36.191Z",
+      "durationMs": 2
+    }
+  ],
+  "declaredGaps": [],
+  "release": {
+    "schema": "product-acceptance-release/1",
+    "tier": "controlled-product-internal-trial",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-10T04:34:36.238Z",
+    "source": {
+      "commit": "3957e30cbbaa3cd86a672fb4583922eba8364fc8",
+      "dirty": true
+    },
+    "expectedSource": "3957e30cbbaa3cd86a672fb4583922eba8364fc8",
+    "requirements": [
+      {
+        "id": "E1-GATE-CONTROL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-REPORT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-NO-CANDIDATE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-BAD-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-FIXTURE-STRICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-FIXTURE-PORTABILITY-STRICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-CONFIGURATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-DAILY-VERTICAL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ARTIFACT-ROUNDTRIP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REOPEN-PERSISTENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REPLAY-AND-CONFLICT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-SESSION-ISOLATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-STALE-BUSINESS-REJECTION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-MACHINE-FAIL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ONE-WRITER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-AUTH-AND-ORIGIN",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ASSISTANT-SDK-MOCK",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "MISSING"
+      }
+    ],
+    "failures": [
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-CONFIGURATION is absent",
+        "caseId": "E2-CONFIGURATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-DAILY-VERTICAL is absent",
+        "caseId": "E2-DAILY-VERTICAL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ARTIFACT-ROUNDTRIP is absent",
+        "caseId": "E2-ARTIFACT-ROUNDTRIP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REOPEN-PERSISTENCE is absent",
+        "caseId": "E2-REOPEN-PERSISTENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REPLAY-AND-CONFLICT is absent",
+        "caseId": "E2-REPLAY-AND-CONFLICT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-SESSION-ISOLATION is absent",
+        "caseId": "E2-SESSION-ISOLATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-STALE-BUSINESS-REJECTION is absent",
+        "caseId": "E2-STALE-BUSINESS-REJECTION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-MACHINE-FAIL is absent",
+        "caseId": "E2-MACHINE-FAIL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ONE-WRITER is absent",
+        "caseId": "E2-ONE-WRITER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-SCOPE-AND-PROFILE-GUARDS is absent",
+        "caseId": "E2-SCOPE-AND-PROFILE-GUARDS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-AUTH-AND-ORIGIN is absent",
+        "caseId": "E2-AUTH-AND-ORIGIN"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ASSISTANT-SDK-MOCK is absent",
+        "caseId": "E2-ASSISTANT-SDK-MOCK"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-DESKTOP-GEOMETRY is absent",
+        "caseId": "E3-DESKTOP-GEOMETRY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-NOTEBOOK-GEOMETRY is absent",
+        "caseId": "E3-NOTEBOOK-GEOMETRY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-MOBILE-GEOMETRY is absent",
+        "caseId": "E3-MOBILE-GEOMETRY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-QUESTION-FORM is absent",
+        "caseId": "E3-QUESTION-FORM"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-ACCEPT-AND-DOWNLOAD is absent",
+        "caseId": "E3-ACCEPT-AND-DOWNLOAD"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-OFFLINE-AND-ERROR is absent",
+        "caseId": "E3-OFFLINE-AND-ERROR"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-KEYBOARD-AND-SCROLL is absent",
+        "caseId": "E3-KEYBOARD-AND-SCROLL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-BOUNDED-CYCLES is absent",
+        "caseId": "E4-BOUNDED-CYCLES"
+      }
+    ],
+    "claimedBy": null,
+    "notes": [
+      "Controlled fixture and SDK mock evidence never substitute for actual-native execution.",
+      "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability."
+    ]
+  },
+  "claim": {
+    "status": "FAIL",
+    "tier": "controlled-product-internal-trial",
+    "decidedAt": "2026-11-10T04:34:36.238Z",
+    "failureCodes": [
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case"
+    ]
+  }
+}

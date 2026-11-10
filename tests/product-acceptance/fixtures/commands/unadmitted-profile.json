@@ -1,0 +1,31 @@
+{
+  "protocol": "acceptance-fixture/1",
+  "id": "unadmitted-profile",
+  "type": "command",
+  "data": {
+    "expect": "receipt_status",
+    "command": {
+      "commandId": "fixture-unadmitted-profile-0001",
+      "conversationId": "conv-fixture-negative",
+      "kind": "create_work",
+      "projectId": "project-atlas",
+      "profileId": "profile-not-admitted",
+      "goal": "This profile is not configured",
+      "scope": {
+        "projectId": "project-atlas",
+        "allowedPaths": ["src/"],
+        "excludedPaths": [],
+        "externalActions": []
+      },
+      "criteria": [
+        {
+          "id": "fixed-output",
+          "kind": "machine",
+          "required": true,
+          "description": "Output matches the registered check",
+          "checkDefinitionRef": "check-fixture-output"
+        }
+      ]
+    }
+  }
+}

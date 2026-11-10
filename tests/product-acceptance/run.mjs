@@ -1,0 +1,136 @@
+#!/usr/bin/env node
+/**
+ * Independent product acceptance runner (Agent E).
+ *
+ * It collects cases from one or more suites, binds the report to the current source commit, applies a
+ * fail-closed release gate and exits nonzero when the claim is not supported. It never mutates product
+ * code, shared manifests or another agent's directory.
+ */
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { parseArgs } from 'node:util'
+import { STATUS } from './lib/status.mjs'
+import { environmentIdentity, gitSource, branchName } from './lib/evidence.mjs'
+import { evaluateRelease, REPORT_SCHEMA, applyReleaseVerdict } from './lib/release.mjs'
+import { createRun, printSummary, summarize, writeJson } from './lib/report.mjs'
+import { resolveFixtureDigest } from './lib/fixtures.mjs'
+import { tier } from './lib/release-requirements.mjs'
+
+const here = dirname(fileURLToPath(import.meta.url))
+export const root = resolve(here, '../..')
+const reportsRoot = resolve(here, 'reports')
+
+const { values } = parseArgs({
+  options: {
+    suites: { type: 'string', default: 'selftest' },
+    tier: { type: 'string' },
+    record: { type: 'boolean', default: false },
+    keep: { type: 'boolean', default: false },
+    cycles: { type: 'string' },
+    only: { type: 'string' },
+    label: { type: 'string' },
+  },
+})
+
+const requested = values.suites.split(',').map((item) => item.trim()).filter(Boolean)
+const KNOWN = new Set(['selftest', 'e2', 'e3', 'e4'])
+for (const suite of requested)
+  if (!KNOWN.has(suite)) throw new Error(`Unknown suite ${suite}. Known: ${[...KNOWN].join(', ')}`)
+
+const only = values.only ? new Set(values.only.split(',').map((item) => item.trim())) : undefined
+const run = createRun({ reportsRoot, suites: requested, label: values.label })
+const startedAt = new Date().toISOString()
+const artifacts = { runDirectory: run.directory, screenshots: [] }
+const cases = []
+
+async function collect(suite, loader) {
+  if (!requested.includes(suite)) return
+  try {
+    const produced = await loader()
+    const list = Array.isArray(produced) ? produced : produced.cases
+    if (!Array.isArray(list)) throw new Error(`Suite ${suite} returned no case list`)
+    if (produced?.artifacts) {
+      artifacts.screenshots.push(...(produced.artifacts.screenshots ?? []))
+      Object.assign(artifacts, produced.artifacts, {
+        runDirectory: run.directory,
+        screenshots: artifacts.screenshots,
+      })
+    }
+    for (const item of list) if (!only || only.has(item.id)) cases.push(item)
+  } catch (error) {
+    cases.push({
+      id: `SUITE-${suite.toUpperCase()}-LOAD`,
+      title: `Suite ${suite} failed to load`,
+      layer: 'readonly',
+      status: STATUS.BLOCKED,
+      reason: String(error?.message ?? error).slice(0, 1200),
+      assertions: [],
+      evidence: {},
+      limitations: [],
+    })
+  }
+}
+
+await collect('selftest', async () => (await import('./selftest/gate.mjs')).gateSelftestCases())
+await collect('e2', async () => {
+  const module = await import('./cases/e2-daily.mjs')
+  return module.runE2({ root, runDirectory: run.directory, keep: values.keep === true, cycles: 0 })
+})
+await collect('e3', async () => {
+  const module = await import('./cases/e3-browser.mjs')
+  return module.runE3({ root, runDirectory: run.directory, keep: values.keep === true })
+})
+await collect('e4', async () => {
+  const module = await import('./cases/e4-stability.mjs')
+  return module.runE4({
+    root,
+    runDirectory: run.directory,
+    keep: values.keep === true,
+    cycles: values.cycles ? Number(values.cycles) : 10,
+  })
+})
+
+const finishedAt = new Date().toISOString()
+const source = gitSource(root)
+const report = {
+  schema: REPORT_SCHEMA,
+  suites: requested,
+  branch: branchName(root),
+  source,
+  environment: environmentIdentity(),
+  startedAt,
+  finishedAt,
+  checkedAt: finishedAt,
+  counts: summarize(cases),
+  artifacts,
+  cases,
+  declaredGaps: cases
+    .filter((item) => item.status !== STATUS.PASS)
+    .map((item) => ({ id: item.id, status: item.status, reason: item.reason ?? null })),
+}
+
+const requirementName =
+  values.tier ?? (values.record ? 'controlled-product-internal-trial' : 'harness-only')
+const requirement = tier(requirementName)
+const verdict = evaluateRelease({
+  report,
+  requirement,
+  expectedSource: source.commit,
+  resolveFixture: resolveFixtureDigest,
+})
+const finalReport = applyReleaseVerdict(report, verdict)
+writeJson(run.directory, 'report.json', finalReport)
+writeJson(run.directory, 'release.json', verdict)
+writeJson(reportsRoot, 'latest.json', {
+  runDirectory: run.directory,
+  tier: verdict.tier,
+  status: verdict.status,
+  source,
+  checkedAt: finalReport.checkedAt,
+  counts: finalReport.counts,
+  failureCodes: verdict.failures.map((item) => item.code),
+})
+
+printSummary({ report: finalReport, release: verdict })
+process.stdout.write(`evidence: ${run.directory}\n`)
+process.exitCode = verdict.ok && cases.every((item) => item.status === STATUS.PASS) ? 0 : 1

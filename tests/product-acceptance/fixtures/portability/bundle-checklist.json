@@ -1,0 +1,14 @@
+{
+  "protocol": "acceptance-fixture/1",
+  "id": "bundle-checklist",
+  "type": "bundle-checklist",
+  "data": {
+    "version": "0.1.0",
+    "files": [
+      { "path": "state/state.sqlite", "sha256": "1111111111111111111111111111111111111111111111111111111111111111", "bytes": 4096 },
+      { "path": "state/artifacts/index.json", "sha256": "2222222222222222222222222222222222222222222222222222222222222222", "bytes": 512 },
+      { "path": "web/index.html", "sha256": "3333333333333333333333333333333333333333333333333333333333333333", "bytes": 1024 }
+    ],
+    "rollback": { "supported": true, "restoresVersion": "0.0.9" }
+  }
+}

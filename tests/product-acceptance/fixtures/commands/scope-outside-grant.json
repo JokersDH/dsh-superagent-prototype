@@ -1,0 +1,14 @@
+{
+  "protocol": "acceptance-fixture/1",
+  "id": "scope-outside-grant",
+  "type": "scope-outside-grant",
+  "data": {
+    "projectId": "project-atlas",
+    "scope": {
+      "projectId": "project-atlas",
+      "allowedPaths": ["docs/"],
+      "excludedPaths": [],
+      "externalActions": []
+    }
+  }
+}

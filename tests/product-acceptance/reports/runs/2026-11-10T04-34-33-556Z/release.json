@@ -1,0 +1,125 @@
+{
+  "schema": "product-acceptance-release/1",
+  "tier": "harness-only",
+  "status": "PASS",
+  "ok": true,
+  "checkedAt": "2026-11-10T04:34:33.613Z",
+  "source": {
+    "commit": "3957e30cbbaa3cd86a672fb4583922eba8364fc8",
+    "dirty": true
+  },
+  "expectedSource": "3957e30cbbaa3cd86a672fb4583922eba8364fc8",
+  "requirements": [
+    {
+      "id": "E1-GATE-CONTROL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-MISSING-CASE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-STALE-REPORT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-NO-CANDIDATE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-VACUOUS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-DUPLICATE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-BAD-PATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-SCHEMA",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-FIXTURE-STRICT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-FIXTURE-PORTABILITY-STRICT",
+      "required": true,
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "claimedBy": null,
+  "notes": [
+    "Controlled fixture and SDK mock evidence never substitute for actual-native execution.",
+    "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability."
+  ]
+}
