@@ -62,6 +62,6 @@ HTTP `POST /v1/works/:id/review-activity`只接受认证local_ui和精确当前�
 
 ## 7. 验证与下一消费者
 
-本次验证分为共享schema、HTTP/真实SQLite受控执行、UI活动采集浏览器链路；不包含原生复核或收益测量。精确命令及结果将保存在reports/releases/wave05-amendment-01/，不覆盖既有发布证据。
+本次验证分为共享schema、HTTP/真实SQLite受控执行、UI活动采集浏览器链路；不包含原生复核或收益测量。精确命令及结果见 [限定交接](../../../reports/releases/wave05-amendment-01/README.zh-CN.md) 与 [integration.json](../../../reports/releases/wave05-amendment-01/integration.json)，不覆盖既有发布证据。共享契约204、后端38、前端16及固定提交浏览器4项通过；计时是部分UI活动代理，不能冒称实际人工耗时。
 
 A消费accepted事件及ReviewTiming；B提供当前Codex可核对的session/checkpoint、有界预算和胶囊宿主约束；C先交注意力排序和旧决定事务闭环；D继续个人发行/恢复；E先冻结试点并核对可运行性，同时验证R0及默认入口。各角色仍在原工作目录/分支，不能覆盖他人修改。
