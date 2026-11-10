@@ -1,89 +1,171 @@
 import { LAYERS } from './status.mjs'
 
-/**
- * Release tiers are explicit lists of case identities. Adding a capability to a tier is a deliberate
- * act; a case that merely exists never widens a claim.
- */
+const case_ = (id, extra = {}) => ({ id, required: true, ...extra })
+
+/** The acceptance tool's own rejection proofs. Every release tier must keep these. */
+export const SAFETY_CASES = [
+  'E1-GATE-CONTROL',
+  'E1-GATE-REJECT-MISSING-CASE',
+  'E1-GATE-REJECT-UNKNOWN-STATUS',
+  'E1-GATE-REJECT-UNCERTAIN-ACCEPT',
+  'E1-GATE-REJECT-STALE-REPORT',
+  'E1-GATE-REJECT-SOURCE-MISMATCH',
+  'E1-GATE-REJECT-NO-CANDIDATE',
+  'E1-GATE-REJECT-VACUOUS',
+  'E1-GATE-REJECT-FAILED-ASSERTION',
+  'E1-GATE-REJECT-MISSING-EVIDENCE',
+  'E1-GATE-REJECT-DUPLICATE',
+  'E1-GATE-REJECT-BAD-PATCH',
+  'E1-GATE-REJECT-UNAPPLIED-PATCH',
+  'E1-GATE-REJECT-MALFORMED-PATCH',
+  'E1-GATE-REJECT-UNEXECUTED-NATIVE',
+  'E1-GATE-REJECT-INVALID-RESPONSE',
+  'E1-GATE-REJECT-STALE-CASE-BINDING',
+  'E1-GATE-REJECT-FIXTURE-DRIFT',
+  'E1-GATE-REJECT-SCHEMA',
+  'E1-FIXTURE-STRICT',
+  'E1-FIXTURE-PORTABILITY-STRICT',
+  'E1-MUTATE-WRONG-LAYER',
+  'E1-MUTATE-DIRTY-SOURCE',
+  'E1-MUTATE-MISSING-SOURCE',
+  'E1-MUTATE-STALE-REPORT',
+  'E1-MUTATE-CROSS-COMMIT',
+  'E1-MUTATE-UNBOUND-CASE',
+  'E1-MUTATE-EMPTY-EVIDENCE',
+  'E1-MUTATE-EMPTY-OBJECT-EVIDENCE',
+  'E1-MUTATE-MISSING-CASE',
+  'E1-MUTATE-FAILED-ASSERTION',
+  'E1-MUTATE-NO-DOWNLOAD-BYTES',
+  'E1-MUTATE-DOWNLOAD-DIGEST',
+  'E1-MUTATE-PATCH-NOT-APPLIED',
+  'E1-MUTATE-PATCH-DIGEST',
+  'E1-MUTATE-DUPLICATE-ID',
+  'E1-MUTATE-UNKNOWN-STATUS',
+  'E1-MUTATE-UNKNOWN-LAYER',
+  'E1-MUTATE-NATIVE-NOT-EXECUTED',
+  'E1-MUTATE-NATIVE-NO-VERSION',
+  'E1-MUTATE-NATIVE-NO-ATTEMPT',
+  'E1-MUTATE-NATIVE-NO-EVIDENCE',
+  'E1-MUTATE-NATIVE-NO-MODEL-TASKS',
+  'E1-MUTATE-INSTALL-NOT-STAGED',
+  'E1-MUTATE-INSTALL-NOT-INDEPENDENT',
+  'E1-MUTATE-NOT-TESTED',
+  'E1-MUTATE-SELF-CLAIM',
+  'E1-MUTATE-ADMISSION-PROBE',
+  'E1-STRUCTURE-TIER-SUPERSET',
+  'E1-STRUCTURE-NO-ALLOW-GAP',
+].map((id) => case_(id, { layers: [LAYERS.READONLY] }))
+
+/** Product workflow evidence from the controlled lane. */
+export const CONTROLLED_CASES = [
+  case_('E2-CONFIGURATION', { layers: [LAYERS.CONTROLLED], evidence: ['configurationRevision'] }),
+  case_('E2-DAILY-VERTICAL', { layers: [LAYERS.CONTROLLED], evidence: ['workId', 'verificationId', 'artifact', 'patch'] }),
+  case_('E2-ARTIFACT-ROUNDTRIP', { layers: [LAYERS.CONTROLLED], evidence: ['artifact'] }),
+  case_('E2-REOPEN-PERSISTENCE', { layers: [LAYERS.CONTROLLED], evidence: ['workId', 'conversation'] }),
+  case_('E2-REPLAY-AND-CONFLICT', { layers: [LAYERS.CONTROLLED] }),
+  case_('E2-SESSION-ISOLATION', { layers: [LAYERS.CONTROLLED] }),
+  case_('E2-STALE-BUSINESS-REJECTION', { layers: [LAYERS.CONTROLLED] }),
+  case_('E2-MACHINE-FAIL', { layers: [LAYERS.CONTROLLED] }),
+  case_('E2-ONE-WRITER', { layers: [LAYERS.CONTROLLED] }),
+  case_('E2-SCOPE-AND-PROFILE-GUARDS', { layers: [LAYERS.CONTROLLED], evidence: ['fixture'] }),
+  case_('E2-AUTH-AND-ORIGIN', { layers: [LAYERS.CONTROLLED] }),
+  case_('E2-ASSISTANT-SDK-MOCK', { layers: [LAYERS.SDK_MOCK], evidence: ['assistant'] }),
+  case_('E2-CONVERSATION-CATALOG', { layers: [LAYERS.CONTROLLED], evidence: ['catalog'] }),
+  case_('E3-DESKTOP-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
+  case_('E3-NOTEBOOK-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
+  case_('E3-MOBILE-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
+  case_('E3-QUESTION-FORM', { layers: [LAYERS.CONTROLLED] }),
+  case_('E3-ACCEPT-AND-DOWNLOAD', { layers: [LAYERS.CONTROLLED], evidence: ['download'] }),
+  case_('E3-OFFLINE-AND-ERROR', { layers: [LAYERS.CONTROLLED] }),
+  case_('E3-KEYBOARD-AND-SCROLL', { layers: [LAYERS.CONTROLLED] }),
+  case_('E4-BOUNDED-CYCLES', { layers: [LAYERS.CONTROLLED], evidence: ['cycles'] }),
+  case_('E4-PORTABILITY-CHECKLIST', { layers: [LAYERS.READONLY], evidence: ['fixture'] }),
+  case_('E2-VERIFICATION-RECOVERY', { layers: [LAYERS.CONTROLLED], evidence: ['verificationRecovery'] }),
+]
+
+/** Staged installation outside the development checkout. */
+export const INSTALL_CASES = [
+  case_('E4-INSTALL-FIRST-RUN', { layers: [LAYERS.INSTALLED], evidence: ['installation'] }),
+  case_('E4-BACKUP-RESTORE', { layers: [LAYERS.INSTALLED], evidence: ['installation'] }),
+  case_('E4-UPGRADE-ROLLBACK', { layers: [LAYERS.INSTALLED], evidence: ['installation'] }),
+]
+
+/** Real vendor execution, with an executed/version/attempt/command/evidence proof. */
+export const NATIVE_CASES = [
+  case_('E5-NATIVE-DELIVERY', { layers: [LAYERS.NATIVE], evidence: ['native', 'acceptance'] }),
+  case_('E5-NATIVE-CONTROL', { layers: [LAYERS.NATIVE], evidence: ['native'] }),
+]
+
+const controlled = {
+  tier: 'controlled-product-workflow',
+  description:
+    'Controlled product workflow, negative cases, browser interaction and bounded stability. ' +
+    'Excludes portable installation and native execution, so it is not an internal-trial or release claim.',
+  maxAgeMs: 6 * 60 * 60 * 1000,
+  allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY],
+  requireCleanSource: true,
+  requireCaseSource: true,
+  cases: [...SAFETY_CASES, ...CONTROLLED_CASES],
+}
+
 export const TIERS = {
   'harness-only': {
     tier: 'harness-only',
     description: 'The acceptance tool itself rejects bad evidence. No product claim.',
     maxAgeMs: 30 * 60 * 1000,
     allowedLayers: [LAYERS.READONLY, LAYERS.CONTROLLED, LAYERS.SDK_MOCK],
-    cases: [
-      'E1-GATE-CONTROL',
-      'E1-GATE-REJECT-MISSING-CASE',
-      'E1-GATE-REJECT-UNKNOWN-STATUS',
-      'E1-GATE-REJECT-UNCERTAIN-ACCEPT',
-      'E1-GATE-REJECT-STALE-REPORT',
-      'E1-GATE-REJECT-SOURCE-MISMATCH',
-      'E1-GATE-REJECT-NO-CANDIDATE',
-      'E1-GATE-REJECT-VACUOUS',
-      'E1-GATE-REJECT-FAILED-ASSERTION',
-      'E1-GATE-REJECT-MISSING-EVIDENCE',
-      'E1-GATE-REJECT-DUPLICATE',
-      'E1-GATE-REJECT-BAD-PATCH',
-      'E1-GATE-REJECT-UNAPPLIED-PATCH',
-      'E1-GATE-REJECT-MALFORMED-PATCH',
-      'E1-GATE-REJECT-UNEXECUTED-NATIVE',
-      'E1-GATE-REJECT-INVALID-RESPONSE',
-      'E1-GATE-REJECT-STALE-CASE-BINDING',
-      'E1-GATE-REJECT-FIXTURE-DRIFT',
-      'E1-GATE-REJECT-SCHEMA',
-      'E1-FIXTURE-STRICT',
-      'E1-FIXTURE-PORTABILITY-STRICT',
-    ].map((id) => ({ id, required: true })),
+    requireCleanSource: false,
+    requireCaseSource: false,
+    cases: SAFETY_CASES,
   },
-  'controlled-product-internal-trial': {
-    tier: 'controlled-product-internal-trial',
-    description:
-      'Controlled product workflow, negative cases, browser interaction and bounded stability. ' +
-      'Excludes native execution and portable installation.',
+  'e2-controlled-workflow': {
+    tier: 'e2-controlled-workflow',
+    description: 'E2 controlled workflow and negative cases only.',
     maxAgeMs: 6 * 60 * 60 * 1000,
-    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY],
-    cases: [
-      ...['E1-GATE-CONTROL', 'E1-GATE-REJECT-MISSING-CASE', 'E1-GATE-REJECT-UNCERTAIN-ACCEPT',
-        'E1-GATE-REJECT-STALE-REPORT', 'E1-GATE-REJECT-NO-CANDIDATE', 'E1-GATE-REJECT-BAD-PATCH',
-        'E1-GATE-REJECT-UNEXECUTED-NATIVE', 'E1-GATE-REJECT-INVALID-RESPONSE',
-        'E1-FIXTURE-STRICT', 'E1-FIXTURE-PORTABILITY-STRICT'].map((id) => ({ id, required: true })),
-      { id: 'E2-CONFIGURATION', required: true, evidence: ['configurationRevision'] },
-      { id: 'E2-DAILY-VERTICAL', required: true, evidence: ['workId', 'verificationId', 'artifact'] },
-      { id: 'E2-ARTIFACT-ROUNDTRIP', required: true, evidence: ['artifact'] },
-      { id: 'E2-REOPEN-PERSISTENCE', required: true, evidence: ['workId', 'conversation'] },
-      { id: 'E2-REPLAY-AND-CONFLICT', required: true },
-      { id: 'E2-SESSION-ISOLATION', required: true },
-      { id: 'E2-STALE-BUSINESS-REJECTION', required: true },
-      { id: 'E2-MACHINE-FAIL', required: true },
-      { id: 'E2-ONE-WRITER', required: true },
-      { id: 'E2-SCOPE-AND-PROFILE-GUARDS', required: true },
-      { id: 'E2-AUTH-AND-ORIGIN', required: true },
-      { id: 'E2-ASSISTANT-SDK-MOCK', required: true, evidence: ['assistant'] },
-      { id: 'E3-DESKTOP-GEOMETRY', required: true, evidence: ['layouts'] },
-      { id: 'E3-NOTEBOOK-GEOMETRY', required: true, evidence: ['layouts'] },
-      { id: 'E3-MOBILE-GEOMETRY', required: true, evidence: ['layouts'] },
-      { id: 'E3-QUESTION-FORM', required: true },
-      { id: 'E3-ACCEPT-AND-DOWNLOAD', required: true, evidence: ['download'] },
-      { id: 'E3-OFFLINE-AND-ERROR', required: true },
-      { id: 'E3-KEYBOARD-AND-SCROLL', required: true },
-      { id: 'E4-BOUNDED-CYCLES', required: true, evidence: ['cycles'] },
-    ],
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: CONTROLLED_CASES.filter((item) => item.id.startsWith('E2-')),
+  },
+  'e3-browser-ui': {
+    tier: 'e3-browser-ui',
+    description: 'Independent browser/geometry/interaction acceptance only.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.CONTROLLED],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: CONTROLLED_CASES.filter((item) => item.id.startsWith('E3-')),
+  },
+  'e4-bounded-stability': {
+    tier: 'e4-bounded-stability',
+    description: 'Bounded mixed cycles and portability checklist rules; installation stays excluded.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.READONLY],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: CONTROLLED_CASES.filter((item) => item.id.startsWith('E4-')),
+  },
+  'controlled-product-workflow': controlled,
+  'local-alpha': {
+    tier: 'local-alpha',
+    description:
+      'Controlled workflow plus a real staged installation in a fresh directory. Native execution is excluded.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY, LAYERS.INSTALLED],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: [...SAFETY_CASES, ...CONTROLLED_CASES, ...INSTALL_CASES],
   },
   'full-product': {
     tier: 'full-product',
     description:
-      'Internal-trial package plus portable installation/rollback and real native execution. ' +
-      'Native cases must come from a real vendor agent run with a separately granted budget.',
+      'Every lower-tier safety case, the controlled workflow, a staged installation and real native ' +
+      'execution. Missing native, installation, download or patch proof makes this tier fail.',
     maxAgeMs: 6 * 60 * 60 * 1000,
-    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY, LAYERS.NATIVE],
-    cases: [
-      { id: 'E2-DAILY-VERTICAL', required: true, evidence: ['workId', 'verificationId', 'artifact'] },
-      { id: 'E3-DESKTOP-GEOMETRY', required: true, evidence: ['layouts'] },
-      { id: 'E4-BOUNDED-CYCLES', required: true, evidence: ['cycles'] },
-      { id: 'E4-INSTALL-FIRST-RUN', required: true, evidence: ['installation'] },
-      { id: 'E4-BACKUP-RESTORE', required: true, evidence: ['installation'] },
-      { id: 'E4-UPGRADE-ROLLBACK', required: true, evidence: ['installation'] },
-      { id: 'E5-NATIVE-DELIVERY', required: true, evidence: ['native'] },
-    ],
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY, LAYERS.INSTALLED, LAYERS.NATIVE],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: [...SAFETY_CASES, ...CONTROLLED_CASES, ...INSTALL_CASES, ...NATIVE_CASES],
   },
 }
 
@@ -91,54 +173,4 @@ export function tier(name) {
   const requirement = TIERS[name]
   if (!requirement) throw new Error(`Unknown tier ${name}. Known: ${Object.keys(TIERS).join(', ')}`)
   return requirement
-}
-
-const E2_REQUIRED = [
-  { id: 'E2-CONFIGURATION', required: true, evidence: ['configurationRevision'] },
-  { id: 'E2-DAILY-VERTICAL', required: true, evidence: ['workId', 'verificationId', 'artifact'] },
-  { id: 'E2-ARTIFACT-ROUNDTRIP', required: true, evidence: ['artifact'] },
-  { id: 'E2-REOPEN-PERSISTENCE', required: true, evidence: ['workId', 'conversation'] },
-  { id: 'E2-REPLAY-AND-CONFLICT', required: true },
-  { id: 'E2-SESSION-ISOLATION', required: true },
-  { id: 'E2-STALE-BUSINESS-REJECTION', required: true },
-  { id: 'E2-MACHINE-FAIL', required: true },
-  { id: 'E2-ONE-WRITER', required: true },
-  { id: 'E2-SCOPE-AND-PROFILE-GUARDS', required: true, evidence: ['fixture'] },
-  { id: 'E2-AUTH-AND-ORIGIN', required: true },
-  { id: 'E2-ASSISTANT-SDK-MOCK', required: true, evidence: ['assistant'] },
-]
-
-TIERS['e2-controlled-workflow'] = {
-  tier: 'e2-controlled-workflow',
-  description: 'Daily controlled product workflow and negative cases only.',
-  maxAgeMs: 6 * 60 * 60 * 1000,
-  allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK],
-  cases: E2_REQUIRED,
-}
-
-TIERS['e3-browser-ui'] = {
-  tier: 'e3-browser-ui',
-  description: 'Independent browser/geometry/interaction acceptance only.',
-  maxAgeMs: 6 * 60 * 60 * 1000,
-  allowedLayers: [LAYERS.CONTROLLED],
-  cases: [
-    { id: 'E3-DESKTOP-GEOMETRY', required: true, evidence: ['layouts'] },
-    { id: 'E3-NOTEBOOK-GEOMETRY', required: true, evidence: ['layouts'] },
-    { id: 'E3-MOBILE-GEOMETRY', required: true, evidence: ['layouts'] },
-    { id: 'E3-QUESTION-FORM', required: true },
-    { id: 'E3-ACCEPT-AND-DOWNLOAD', required: true, evidence: ['download'] },
-    { id: 'E3-OFFLINE-AND-ERROR', required: true },
-    { id: 'E3-KEYBOARD-AND-SCROLL', required: true },
-  ],
-}
-
-TIERS['e4-bounded-stability'] = {
-  tier: 'e4-bounded-stability',
-  description: 'Bounded mixed execution cycles and portability checklist checks.',
-  maxAgeMs: 6 * 60 * 60 * 1000,
-  allowedLayers: [LAYERS.CONTROLLED, LAYERS.READONLY],
-  cases: [
-    { id: 'E4-BOUNDED-CYCLES', required: true, evidence: ['cycles'] },
-    { id: 'E4-PORTABILITY-CHECKLIST', required: true, evidence: ['fixture'] },
-  ],
 }

@@ -74,7 +74,13 @@ async function collect(suite, loader) {
   }
 }
 
-await collect('selftest', async () => (await import('./selftest/gate.mjs')).gateSelftestCases())
+await collect('selftest', async () => {
+  const [base, mutations] = await Promise.all([
+    import('./selftest/gate.mjs'),
+    import('./selftest/gate-mutations.mjs'),
+  ])
+  return [...(await base.gateSelftestCases()), ...(await mutations.gateMutationCases())]
+})
 await collect('e2', async () => {
   const module = await import('./cases/e2-daily.mjs')
   return module.runE2({ root, runDirectory: run.directory, keep: values.keep === true, cycles: 0 })
@@ -92,6 +98,10 @@ await collect('e4', async () => {
     cycles: values.cycles ? Number(values.cycles) : 10,
   })
 })
+
+// Bind every case to the commit it executed against. A case that arrives with another binding is left
+// untouched so the gate can reject it rather than the runner silently rewriting evidence.
+for (const item of cases) if (!item.source) item.source = { commit: source.commit }
 
 const finishedAt = new Date().toISOString()
 const report = {
@@ -111,7 +121,11 @@ const report = {
     .map((item) => ({ id: item.id, status: item.status, reason: item.reason ?? null })),
 }
 
-const requirementName = values.tier ?? (requested.length === 1 ? { selftest: 'harness-only', e2: 'e2-controlled-workflow', e3: 'e3-browser-ui', e4: 'e4-bounded-stability' }[requested[0]] : 'controlled-product-internal-trial')
+const requirementName =
+  values.tier ??
+  (requested.length === 1
+    ? { selftest: 'harness-only', e2: 'e2-controlled-workflow', e3: 'e3-browser-ui', e4: 'e4-bounded-stability' }[requested[0]]
+    : 'controlled-product-workflow')
 const requirement = tier(requirementName)
 const verdict = evaluateRelease({
   report,

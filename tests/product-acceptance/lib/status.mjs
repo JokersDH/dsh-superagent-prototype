@@ -12,6 +12,7 @@ export const LAYERS = Object.freeze({
   CONTROLLED: 'controlled-fixture',
   SDK_MOCK: 'sdk-mock',
   READONLY: 'readonly',
+  INSTALLED: 'installed',
   NATIVE: 'actual-native',
   NOT_TESTED: 'not-tested',
 })

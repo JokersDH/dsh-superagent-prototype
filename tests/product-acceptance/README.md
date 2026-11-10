@@ -37,6 +37,7 @@ Every case declares exactly one layer, and a release tier lists the layers it ma
 - `controlled-fixture` — real product/SQLite/controlled scratch subprocess; zero vendor calls.
 - `sdk-mock` — real product + local mock OpenAI-compatible endpoint on loopback; zero external calls.
 - `readonly` — inspect-only commands/files; no writes.
+- `installed` — a staged bundle executed outside the development checkout.
 - `actual-native` — a real vendor agent (Codex) executed. Budget-gated; not run by default.
 - `not-tested` — declared gap, no execution.
 
@@ -80,18 +81,24 @@ process that owns it and are never printed, logged or written into a report.
 
 | Tier | Requires |
 | --- | --- |
-| `harness-only` | The gate self-tests only. No product claim. |
+| `harness-only` | The 50 gate self-tests only. No product claim. |
 | `e2-controlled-workflow` | The controlled product vertical, negative cases and loopback SDK chat. |
 | `e3-browser-ui` | The independent browser suite. |
 | `e4-bounded-stability` | Bounded cycles and portability checklist rules. Installation stays NOT_TESTED. |
-| `controlled-product-internal-trial` | All of the above; the whole-package claim. |
-| `full-product` | Additionally requires portable installation and real native execution. It fails today by design. |
+| `controlled-product-workflow` | All workflow/safety cases; excludes installation and native. |
+| `local-alpha` | Workflow plus a staged installation outside the checkout; native excluded. |
+| `full-product` | Every lower tier plus staged installation and real native execution. It fails today by design. |
+
+`full-product` is a strict superset of the lower tiers by construction, and a required case that is
+`NOT_TESTED` fails it. There is no allow-gap switch.
 
 ## What each suite asserts
 
-- `selftest/` — 21 bundles prove the gate rejects missing cases, unknown status, uncertain
-  acceptance, stale reports, missing candidates, corrupt/unapplied patches, unexecuted native
-  evidence, invalid responses, fixture drift and illegal fixtures.
+- `selftest/` — 50 bundles prove the gate rejects missing cases, unknown status/layer, uncertain
+  acceptance, stale reports, dirty/missing/cross-commit source, unbound cases, empty evidence,
+  missing candidates, corrupt/unapplied patches, byte-mismatched downloads, unexecuted or incomplete
+  native proof, installation that is not staged, invalid responses, fixture drift and illegal
+  fixtures. The exact wave-04 false pass is reproduced and must stay rejected.
 - `cases/e2-daily.mjs` — real SQLite, real scratch subprocess, real verification through
   authenticated loopback HTTP: question/answer/delivery, machine PASS and FAIL, patch application to
   the recorded base commit, artifact byte roundtrip, replay/conflict, stale contract/candidate/answer,

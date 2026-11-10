@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { gateSelftestCases } from './gate.mjs'
+import { gateMutationCases } from './gate-mutations.mjs'
 import { STATUS } from '../lib/status.mjs'
 
 /**
@@ -9,12 +10,12 @@ import { STATUS } from '../lib/status.mjs'
  * red/green loop possible without writing a report.
  */
 test('release gate rejects every constructed defect', async () => {
-  const cases = await gateSelftestCases()
+  const cases = [...(await gateSelftestCases()), ...(await gateMutationCases())]
   const failed = cases.filter((item) => item.status !== STATUS.PASS)
   assert.deepEqual(
     failed.map((item) => `${item.id}: ${item.reason ?? 'unknown'}`),
     [],
     `${cases.length} gate self-tests must all pass`,
   )
-  assert.ok(cases.length >= 20, 'The gate self-test set must stay broad')
+  assert.ok(cases.length >= 50, 'The gate self-test set must stay broad')
 })

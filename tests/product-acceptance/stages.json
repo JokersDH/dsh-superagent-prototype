@@ -2,8 +2,8 @@
   "schema": "product-acceptance-stages/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "3957e30cbbaa3cd86a672fb4583922eba8364fc8",
-  "checkpoint": "835d663",
+  "base": "8c736f2",
+  "checkpoint": null,
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -15,8 +15,8 @@
       "title": "Fail-closed independent harness and checkpoint",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only",
       "notes": [
-        "21 self-tests prove the gate rejects missing cases, unknown status, uncertain acceptance, stale reports, missing candidates, corrupt patches, unexecuted native evidence and illegal fixtures.",
-        "A run of the release tier with only selftests exits nonzero with 20 missing_required_case failures."
+        "Wave-04 hardened gate: 21 original rejections plus 29 independent mutation cases (wrong layer, dirty/missing/cross-commit source, unbound case, empty evidence, missing case, failed assertion, download bytes/digest, patch apply/digest, duplicate/unknown ids, native executed/version/attempt/evidence/model-tasks, installation staged/independence, NOT_TESTED, self-claim, exact reproduced admission probe, tier superset, no allow-gap).",
+        "full-product is now a strict superset of every lower tier; full runs fail on missing install/native evidence instead of passing on controlled cases."
       ]
     },
     {
@@ -56,5 +56,6 @@
         "A full-product claim is rejected by the gate while native and installation evidence are absent."
       ]
     }
-  ]
+  ],
+  "taskPackage": "agent-tasks/product-wave-04/README.zh-CN.md"
 }
