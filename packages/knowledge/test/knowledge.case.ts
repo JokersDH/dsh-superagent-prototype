@@ -174,6 +174,17 @@ test('expired decisions never enter new knowledge and cannot be recorded already
   )
 })
 
+test('a revoked decision can be reopened as a new explicit decision', async () => {
+  const { governance } = fixture()
+  await record(governance)
+  await governance.revoke('decision-1', 1, actor())
+  await record(governance, { decisionId: 'decision-2', content: 'Use Chinese UI copy' })
+  const page = await governance.page('project-1')
+  assert.deepEqual(page.decisions.map((decision) => decision.id), ['decision-2'])
+  assert.equal(await governance.isEffective('decision-1'), false)
+  assert.equal(await governance.isEffective('decision-2'), true)
+})
+
 test('a disappeared source is shown as missing while the audit record remains', async () => {
   const { governance, sources } = fixture()
   await record(governance)
