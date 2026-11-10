@@ -43,7 +43,7 @@ export function AttentionInbox({ transport, configuration, active, revision, fal
     return () => { cancelled = true; clearTimeout(timer) }
   }, [active, transport, query, revision, reload])
   useEffect(() => { setVisible(50) }, [kind, search, query])
-  if (unavailable || !transport.attention) return <div className="workspace-view"><div className="view-header"><h2 className="view-title">待我决定</h2></div><div className="view-content"><p className="attention-scope">当前对话</p>{fallback}</div></div>
+  if (unavailable || !transport.attention) return active ? <div className="workspace-view"><div className="view-header"><h2 className="view-title">待我决定</h2></div><div className="view-content"><p className="attention-scope">当前对话</p>{fallback}</div></div> : null
   const byId = new Map(page?.items.map(item => [item.id, item]) ?? [])
   const ordered = page?.ranks.map(rank => byId.get(rank.id)!).filter(Boolean) ?? []
   const titleFor = (id: string) => configuration?.projects.find(project => project.id === id)?.displayName ?? id
