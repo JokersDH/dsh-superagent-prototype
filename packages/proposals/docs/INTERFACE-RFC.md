@@ -70,3 +70,21 @@ contract and physical barrier. `ProposalIntent` contains no actor, command id or
    back to a normal reply, not an executable guess.
 3. **Main**: physical-barrier implementation and command revalidation are outside this package.
 4. Proposal delivery over HTTP/SSE DTOs is main-owned.
+
+## Wave-04 C2 — persisted prepare/commit
+
+`AssistantProposalService` consumes the shared synchronous `AssistantStatePort.proposals`:
+
+- `prepare` is read-only: structured parse, trusted source/project/contract/scope binding, immutable
+  candidate with conversation id and source text digest.
+- `persistPending` writes version 1 `pending` in main's UnitOfWork.
+- `commit` synchronously re-checks actor, expected version/digest, persisted source identity,
+  expiry, optional current-authorization `revalidate` and physical barrier, then writes version 2
+  `confirmed` with the main-owned `effectCommandId`. The command/receipt/event must commit in the
+  same transaction.
+- Same effect command replay is idempotent; another effect command/actor/payload conflicts.
+- `reject`/`expire`/`supersede` append version 2 with the corresponding state.
+
+`InMemoryAssistantState` is the reference port fixture. Real SQL persistence is A-owned and
+**NOT_TESTED** here; the shared persisted proposal has no rejection-reason field, so the reason stays
+caller-side audit.

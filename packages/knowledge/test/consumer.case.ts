@@ -217,7 +217,7 @@ test('offline assistant loop: context -> mock reasoner -> proposal -> confirmati
       sourceMessageId: 'msg-1',
     },
   })
-  proposals.reject(rejectProposal.proposalId, { expectedVersion: rejectProposal.version, reason: 'Keep Chinese copy' })
+  proposals.reject(rejectProposal.proposalId, { expectedVersion: rejectProposal.version, reason: 'Keep Chinese copy', actorRef: 'user-1' })
 
   const source: DecisionSource = {
     messageId: 'msg-1',
@@ -276,7 +276,7 @@ test('a rejected proposal never records a decision', async () => {
       sourceMessageId: 'msg-1',
     },
   })
-  proposals.reject(proposal.proposalId, { expectedVersion: proposal.version, reason: 'No' })
+  proposals.reject(proposal.proposalId, { expectedVersion: proposal.version, reason: 'No', actorRef: 'user-1' })
   const store = new InMemoryDecisionStore()
   assert.equal((await store.list({ projectId: 'project-1' })).decisions.length, 0)
 })

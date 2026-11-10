@@ -37,13 +37,17 @@ Rules:
 
 States: `pending → confirmed | rejected | expired | superseded`. Rules:
 
-- confirmation requires explicit `expectedVersion` + `expectedDigest`, the same actor and an
-  optional physical-barrier callback (`ok: false` blocks confirmation);
+- every confirmation path, including an idempotent replay of a confirmed proposal, authenticates the
+  owning actor before any state-specific branch;
+- confirmation requires explicit `expectedVersion` + `expectedDigest`, the same actor and optional
+  `revalidate`/physical-barrier callbacks (`ok: false` blocks or refuses);
 - repeated confirmation with the same version/digest is idempotent and returns the original intent;
 - old, rejected, superseded or expired proposals are refused;
 - a proposal id is idempotent for the same payload and conflicts when the payload/bindings change.
 
-`ProposalIntent` is the only output and deliberately omits actor, command id and work scope. Main
+`ProposalIntent` is the only output and deliberately omits actor, command id and work scope. Stored
+records and every returned `create`/`get`/`list`/`confirm` value are independent deep-frozen
+snapshots, so a caller cannot mutate an already-reviewed grant, scope or payload. Main
 builds the deterministic `UserCommand` and re-checks actor/project/scope/contract/barrier.
 
 ## Commands
@@ -57,6 +61,26 @@ pnpm --filter @personal-agent/proposals build
 All tests are no-model: structured/plain/invalid output, forged identity/tool/scope, cross-project,
 same-id changed payload, stale contract, duplicate confirmation, rejection, supersession and expiry.
 No execution occurs before confirmation.
+
+## Persisted prepare/commit (wave-04 C2)
+
+`AssistantProposalService` consumes the shared synchronous `AssistantStatePort.proposals`:
+
+1. `prepare` is async but read-only: parse + trusted binding + immutable source/grant/contract/payload snapshot.
+2. `persistPending` writes version 1 pending inside main's UnitOfWork.
+3. `commit` is synchronous, checks actor/version/digest/source, optional current-authorization `revalidate`
+   and physical barrier, then writes version 2 confirmed with the main-owned `effectCommandId`.
+4. Same effect command replay is idempotent; another effect command, actor, payload or state conflicts.
+   `reject`/`expire`/`supersede` append version 2 with the corresponding state.
+
+`InMemoryAssistantState` is the reference port fixture; real SQL persistence is A-owned and
+**NOT_TESTED** here.
+
+## Wave-04 checkpoint
+
+The confirmed-replay authorization bypass and the shared-grant mutation are fixed; current
+source/grant/contract/scope can be revalidated through `revalidate` on both pending and confirmed
+paths. Persisted `AssistantStatePort` prepare/commit is the next stage.
 
 ## Limits
 

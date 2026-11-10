@@ -4,6 +4,7 @@
  * deliveries. Every write joins the shared UnitOfWork; this module never creates a second writer,
  * never changes the core execution lifecycle, and never infers a user decision.
  */
+import { createHash } from 'node:crypto'
 import type Database from 'better-sqlite3'
 import { ConversationMessageSchema, UserDecisionSchema } from '@personal-agent/contracts'
 import type {
@@ -12,8 +13,11 @@ import type {
 import { UnitOfWork } from './uow.ts'
 import { canonicalDigest } from './ingress.ts'
 import { ArtifactStore, type ArtifactRecord } from './artifacts.ts'
+import { AssistantState } from './assistant-state.ts'
 
-export class WorkflowConflict extends Error {}
+import { WorkflowConflict } from './workflow-errors.ts'
+export { WorkflowConflict } from './workflow-errors.ts'
+
 
 type Row = Record<string, unknown>
 const limitOf = (value: number | undefined, fallback: number, max: number): number =>
@@ -45,6 +49,8 @@ const parseCursor = (cursor: string | undefined): { at: string; id: string } | u
 export interface Conversation {
   id: string
   projectId?: string
+  /** Full persisted membership; a conversation may be referenced by multiple projects. */
+  projectIds: readonly string[]
   title: string
   titleRevision: number
   createdAt: string
@@ -82,14 +88,19 @@ const conversationSelect = `
     (SELECT COALESCE(MAX(m.sequence), 0) FROM conversation_messages m WHERE m.conversation_id = c.id) AS last_sequence,
     (SELECT COUNT(*) FROM works w WHERE w.conversation_id = c.id) AS work_count,
     (SELECT COUNT(*) FROM works w JOIN user_questions q ON q.work_id = w.id
-      WHERE w.conversation_id = c.id AND q.validity = 'open') AS open_question_count
+      WHERE w.conversation_id = c.id AND q.validity = 'open') AS open_question_count,
+    (SELECT json_group_array(m.project_id) FROM conversation_members m
+      WHERE m.conversation_id = c.id) AS project_ids
   FROM conversations c`
 
 const conversationOf = (row: Row): Conversation => {
   const openQuestionCount = Number(row.open_question_count)
+  let projectIds: string[] = []
+  try { projectIds = json<string[]>(row.project_ids) } catch { projectIds = [] }
   return {
     id: text(row.id),
     ...(row.project_id === null ? {} : { projectId: text(row.project_id) }),
+    projectIds,
     title: text(row.title),
     titleRevision: Number(row.title_revision),
     createdAt: text(row.created_at),
@@ -129,6 +140,8 @@ export class ProductConversations {
       this.db.prepare(`INSERT INTO conversations
         (id, project_id, title, title_revision, created_at, updated_at, archived_at, archive_revision)
         VALUES (?, ?, ?, 1, ?, ?, NULL, 0)`).run(conversationId, projectId ?? null, title, at, at)
+      if (projectId) this.db.prepare('INSERT OR IGNORE INTO conversation_members (conversation_id, project_id) VALUES (?, ?)')
+        .run(conversationId, projectId)
       this.indexTitle(conversationId, title)
       return { created: true, conversation: this.get(conversationId)! }
     })
@@ -146,11 +159,15 @@ export class ProductConversations {
           VALUES (?, ?, ?, 1, ?, ?, NULL, 0)`).run(
           input.conversationId, input.projectId ?? null, title, input.createdAt, input.createdAt,
         )
+        if (input.projectId) this.db.prepare('INSERT OR IGNORE INTO conversation_members (conversation_id, project_id) VALUES (?, ?)')
+          .run(input.conversationId, input.projectId)
         this.indexTitle(input.conversationId, title)
       } else {
         const projectId = existing.project_id === null ? input.projectId ?? null : String(existing.project_id)
         this.db.prepare('UPDATE conversations SET project_id = ?, updated_at = MAX(updated_at, ?) WHERE id = ?')
           .run(projectId, input.createdAt, input.conversationId)
+        if (input.projectId) this.db.prepare('INSERT OR IGNORE INTO conversation_members (conversation_id, project_id) VALUES (?, ?)')
+          .run(input.conversationId, input.projectId)
         if (!this.db.prepare("SELECT 1 FROM conversation_search WHERE conversation_id = ? AND message_id = ''").get(input.conversationId))
           this.indexTitle(input.conversationId, String(existing.title))
       }
@@ -204,16 +221,27 @@ export class ProductConversations {
     })
   }
 
-  /** Bounded catalog, newest update first; project IDs are an explicit isolation scope. */
-  list(input: { projectIds?: readonly string[]; includeArchived?: boolean; limit?: number; cursor?: string } = {}): ConversationPage {
+  /** Bounded catalog, newest update first. An empty project scope is explicitly empty. */
+  list(input: { projectIds: readonly string[]; includeArchived?: boolean; limit?: number; cursor?: string }): ConversationPage {
+    return this.page(true, input)
+  }
+
+  /** Explicit all-discovery used only by a trusted composition that still filters each row. */
+  discoverPage(input: { includeArchived?: boolean; limit?: number; cursor?: string } = {}): ConversationPage {
+    return this.page(false, input)
+  }
+
+  private page(scoped: boolean, input: { projectIds?: readonly string[]; includeArchived?: boolean; limit?: number; cursor?: string }): ConversationPage {
     const limit = limitOf(input.limit, 30, 100)
     const cursor = parseCursor(input.cursor)
-    const projects = input.projectIds?.map(project => id(project, 'project id')) ?? []
+    const projects = scoped ? (input.projectIds ?? []).map(project => id(project, 'project id')) : []
+    if (scoped && !projects.length) return { conversations: [], hasMore: false }
     const clauses: string[] = []
     const args: unknown[] = []
     if (!input.includeArchived) clauses.push('c.archived_at IS NULL')
     if (projects.length) {
-      clauses.push(`c.project_id IN (${projects.map(() => '?').join(', ')})`)
+      clauses.push(`EXISTS (SELECT 1 FROM conversation_members m WHERE m.conversation_id = c.id
+        AND m.project_id IN (${projects.map(() => '?').join(', ')}))`)
       args.push(...projects)
     }
     if (cursor) {
@@ -233,20 +261,30 @@ export class ProductConversations {
 
   /**
    * Bounded substring search over titles and message text. FTS5 trigram is used for queries of at
-   * least three characters; shorter/unsupported queries fall back to parameterized LIKE. Project
-   * scope is mandatory for the public workflow port; storage also accepts an omitted scope for
-   * internal callers. Results are conversation-level and bounded.
+   * least three characters; shorter/unsupported queries fall back to parameterized LIKE. The public
+   * scoped search accepts only an explicit non-empty project membership scope.
    */
-  search(input: { query: string; projectIds?: readonly string[]; includeArchived?: boolean; limit?: number; cursor?: string }): ConversationSearchPage {
+  search(input: { query: string; projectIds: readonly string[]; includeArchived?: boolean; limit?: number; cursor?: string }): ConversationSearchPage {
+    return this.searchPage(true, input)
+  }
+
+  /** Explicit all-discovery search; the caller remains responsible for per-row visibility. */
+  discoverSearch(input: { query: string; includeArchived?: boolean; limit?: number; cursor?: string }): ConversationSearchPage {
+    return this.searchPage(false, input)
+  }
+
+  private searchPage(scoped: boolean, input: { query: string; projectIds?: readonly string[]; includeArchived?: boolean; limit?: number; cursor?: string }): ConversationSearchPage {
     const query = nonEmpty(input.query, 'search query', 200)
     const limit = limitOf(input.limit, 20, 50)
     const cursor = parseCursor(input.cursor)
-    const projects = input.projectIds?.map(project => id(project, 'project id')) ?? []
+    const projects = scoped ? (input.projectIds ?? []).map(project => id(project, 'project id')) : []
+    if (scoped && !projects.length) return { hits: [], hasMore: false }
     const where: string[] = []
     const args: unknown[] = []
     if (!input.includeArchived) where.push('c.archived_at IS NULL')
     if (projects.length) {
-      where.push(`c.project_id IN (${projects.map(() => '?').join(', ')})`)
+      where.push(`EXISTS (SELECT 1 FROM conversation_members m WHERE m.conversation_id = c.id
+        AND m.project_id IN (${projects.map(() => '?').join(', ')}))`)
       args.push(...projects)
     }
     if (cursor) {
@@ -532,6 +570,30 @@ export class ProductDecisions {
   }
 }
 
+export interface SourceMessageMetadata {
+  id: string
+  conversationId: string
+  projectId?: string
+  sequence: number
+  role: 'user' | 'assistant' | 'system'
+  provenance: string
+  textDigest: string
+  textLength: number
+  createdAt: string
+}
+
+export interface WorkflowStateFacts {
+  protocol: 'workflow-state/1'
+  productSchema: number | null
+  writerClaim: { nonce: string; pid: number; startedAt: string } | null
+  instanceCount: number
+  queue: { waiting: number; parked: number }
+  artifacts: number
+  openQuestions: number
+  pendingProposals: number
+  observedAt: string
+}
+
 export interface WorkIndexEntry {
   work: WorkRecord
   authority: ContractRef | undefined
@@ -685,6 +747,52 @@ export class WorkflowIndex {
     }
   }
 
+  /** Source-message metadata/digest for C/main revalidation; no raw history dump. */
+  sourceMessage(messageId: string, projectIds: readonly string[]): SourceMessageMetadata | undefined {
+    const value = id(messageId, 'message id')
+    const projects = new Set(projectIds)
+    if (!projects.size) return undefined
+    const row = this.db.prepare('SELECT value FROM conversation_messages WHERE id = ?').get(value) as Row | undefined
+    if (!row) return undefined
+    const message = json<ConversationMessage>(row.value)
+    if (message.projectId && !projects.has(message.projectId)) return undefined
+    if (!message.projectId) {
+      const members = this.db.prepare('SELECT project_id FROM conversation_members WHERE conversation_id = ?').all(message.conversationId) as Row[]
+      if (!members.some(member => projects.has(text(member.project_id)))) return undefined
+    }
+    return {
+      id: message.id, conversationId: message.conversationId,
+      ...(message.projectId ? { projectId: message.projectId } : {}),
+      sequence: message.sequence, role: message.role, provenance: message.provenance,
+      textDigest: createHash('sha256').update(message.text).digest('hex'), textLength: message.text.length, createdAt: message.createdAt,
+    }
+  }
+
+  /**
+   * Read-only state/instance facts for D's preflight. A writer claim or PID is an observation, not a
+   * trusted stop proof; only the existing barrier receipts may establish quiescence.
+   */
+  stateFacts(): WorkflowStateFacts {
+    const meta = this.db.prepare("SELECT value FROM schema_meta WHERE key = 'product_schema'").get() as Row | undefined
+    const writer = this.db.prepare('SELECT nonce, pid, started_at FROM writer_claim WHERE id = 1').get() as Row | undefined
+    const instances = this.db.prepare('SELECT COUNT(*) AS n FROM coordinator_instances').get() as Row
+    const queue = this.db.prepare(`SELECT COUNT(*) FILTER (WHERE parked_at IS NULL) AS waiting,
+      COUNT(*) FILTER (WHERE parked_at IS NOT NULL) AS parked FROM effect`).get() as Row
+    const artifacts = this.db.prepare('SELECT COUNT(*) AS n FROM artifacts').get() as Row
+    const questions = this.db.prepare("SELECT COUNT(*) AS n FROM user_questions WHERE validity = 'open'").get() as Row
+    const proposals = this.db.prepare(`SELECT COUNT(*) AS n FROM assistant_proposal_versions p WHERE p.state = 'pending'
+      AND p.version = (SELECT MAX(x.version) FROM assistant_proposal_versions x WHERE x.proposal_id = p.proposal_id)`).get() as Row
+    return {
+      protocol: 'workflow-state/1',
+      productSchema: meta ? Number(JSON.parse(String(meta.value))) : null,
+      writerClaim: writer ? { nonce: text(writer.nonce), pid: Number(writer.pid), startedAt: text(writer.started_at) } : null,
+      instanceCount: Number(instances.n),
+      queue: { waiting: Number(queue.waiting), parked: Number(queue.parked) },
+      artifacts: Number(artifacts.n), openQuestions: Number(questions.n), pendingProposals: Number(proposals.n),
+      observedAt: new Date().toISOString(),
+    }
+  }
+
   listArtifacts(input: { limit?: number; before?: string } = {}): { artifacts: ArtifactRecord[]; nextCursor?: string; hasMore: boolean } {
     return this.artifacts.list(input)
   }
@@ -695,11 +803,13 @@ export class WorkflowRecords {
   readonly conversations: ProductConversations
   readonly projects: ProductProjects
   readonly decisions: ProductDecisions
+  readonly assistant: AssistantState
   readonly index: WorkflowIndex
   constructor(db: Database.Database, uow: UnitOfWork, artifacts: ArtifactStore) {
     this.conversations = new ProductConversations(db, uow)
     this.projects = new ProductProjects(db, uow)
     this.decisions = new ProductDecisions(db, uow)
+    this.assistant = new AssistantState(db, uow, this.decisions)
     this.index = new WorkflowIndex(db, artifacts, this.projects)
   }
 }

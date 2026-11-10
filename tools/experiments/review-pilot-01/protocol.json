@@ -1,0 +1,51 @@
+{
+  "protocol": "independent-review-pilot/1",
+  "status": "AUTHORIZED_BOUNDED_PILOT_NOT_EXECUTED",
+  "grantId": "wave05-independent-review-pilot-01",
+  "owner": "E",
+  "sponsor": "main",
+  "question": "Does a fresh-session reviewer add value over same-session self-review for the same frozen candidate under the same budget ceiling?",
+  "prerequisiteFor": "New second-protocol production reviewer development beyond zero-model discovery/interface work",
+  "cases": { "total": 8, "seededDefective": 4, "clean": 4, "selection": "Fixed synthetic cases and hidden oracle committed and hashed before any model run; no private user project data" },
+  "arms": [
+    { "id": "no_review", "reviewTurnStartsPerCase": 0, "authorHistory": "Original frozen candidate; no new review report is invented" },
+    { "id": "same_session_self_review", "reviewTurnStartsPerCase": 1, "authorHistory": "Continue the actual author session, independently from the immutable author checkpoint; no fabricated history" },
+    { "id": "fresh_session_review", "reviewTurnStartsPerCase": 1, "authorHistory": "New verified session; only the same task/spec and sealed candidate material, with no author transcript or reviewer answers" }
+  ],
+  "budget": {
+    "maxAuthorTurnStarts": 8,
+    "maxReviewTurnStarts": 16,
+    "maxTotalTurnStarts": 24,
+    "maxTotalBillableTokens": 200000,
+    "maxTotalCostUSD": 5,
+    "stopAtFirstLimit": true,
+    "oneInFlightTurn": true,
+    "accounting": "A native turn can contain multiple underlying inference calls; count all observed billable input/output/reasoning/cache tokens and use a conservative pre-send upper-bound reservation",
+    "grantIsolation": "Separate from B's wave03-b-native and all previous model budgets; never transfer, reset, or silently top up",
+    "unknownSend": "Consumes its reservation until reconciled under the same identity; no automatic resend or replacement case",
+    "preflight": "BLOCKED if pricing/usage including reasoning cannot be bounded, or a turn cannot be bounded/stopped under the remaining reservation; subscription access is not proof of zero cost"
+  },
+  "fairness": {
+    "budgetDefinition": "Equal per-case/per-arm ceilings with the same shared author checkpoint cost; not equal actual consumption. The no-review arm intentionally spends zero additional review tokens.",
+    "selfReviewAndFreshReview": "Same model/version, task, frozen input digest, tool scope, output allowance, timeout and monetary/token ceiling; preserve and report history-token overhead rather than giving self-review extra budget",
+    "authorCost": "Generate one author checkpoint per case and share it analytically across arms; do not triple-charge actual author calls",
+    "seededDefects": "If defects are injected after authoring, inject the identical mutation into all frozen material copies and mark the result synthetic, not a measured native author failure rate",
+    "order": "Randomize and precommit arm order; reviewer reports scored blinded to arm/session identity",
+    "oracle": "Ground-truth labels, mutation recipes and independent hidden tests are inaccessible to author/reviewer tools; no reviewer edits scoring standards"
+  },
+  "material": {
+    "default": "Disposable sealed copy, no shared .git objects, remotes, hooks, symlinks or hard links into the author checkout",
+    "allowedWrites": "Scratch writes confined to the disposable capsule; no candidate or user-project writes; discard every changed file",
+    "reportIntegrity": "Bind report to the original subject and manifest; input mutation or scope escape is a protocol invalidation, not a valid review result",
+    "hostControls": "Filesystem/tool/network/credential/data-egress limits still required; a plain temporary directory is not a sandbox"
+  },
+  "metrics": ["defects detected and missed against the hidden oracle", "false positives on clean candidates", "actionable reproducible findings", "actual model tokens/cost and unknown usage", "wall time", "blinded report audit time proxy"],
+  "screeningDecision": {
+    "promising": "Fresh-session review detects at least one more seeded defect than same-session self-review, produces no more clean-case false positives than self-review and at most one of four clean-case false positives, within all common ceilings",
+    "no_go_for_current_recipe": "Valid complete pilot does not meet the predeclared promising rule; pause new second-driver implementation by default and retain current product/stability/attention work",
+    "inconclusive": "Missing valid arms, unbounded/unknown usage, invalid checkpoint/session identity, scope or input integrity failure, or insufficient valid cases; do not silently replace cases or call it negative efficacy evidence",
+    "scope": "Eight cases are mechanism screening only, not statistical proof, product admission or a logical disproof of possible cross-model/protocol benefits"
+  },
+  "requiredArtifacts": ["source and protocol/case-manifest digests", "pseudonymized author/reviewer session identities and checkpoint proof", "per-turn pre-send reservation and actual usage ledger", "frozen input/hidden-oracle separation proof", "all case/arm results including failures and attrition", "blinded scores and go/no-go/inconclusive decision"],
+  "rawTracePolicy": "Native session dumps, credentials and account homes stay private and out of Git; no hidden model reasoning is requested or exposed"
+}

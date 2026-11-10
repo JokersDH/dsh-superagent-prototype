@@ -65,7 +65,7 @@ export class NativeProjectRegistry {
   list(): RegisteredProject[] {
     return structuredClone(this.records)
   }
-  prepare(input: ProjectRegistrationInput): RegisteredProject {
+  prepare(input: ProjectRegistrationInput, options: { allowSettingsChange?: boolean } = {}): RegisteredProject {
     input = ProjectRegistrationInputSchema.parse(input)
     if (!isAbsolute(input.path)) throw new ApplicationFault('invalid_request', '请选择 Git 仓库的绝对路径。')
     let path: string
@@ -96,7 +96,7 @@ export class NativeProjectRegistry {
       ...(environment ? { environment } : {}),
     })
     const existing = this.records.find((project) => project.id === record.id)
-    if (existing && canonicalDigest(JsonSchema.parse(existing)) !== canonicalDigest(JsonSchema.parse(record)))
+    if (existing && !options.allowSettingsChange && canonicalDigest(JsonSchema.parse(existing)) !== canonicalDigest(JsonSchema.parse(record)))
       throw new ApplicationFault('conflict', '该项目已使用另一份设置导入。')
     if (!existing && this.records.length >= 100)
       throw new ApplicationFault('budget_exceeded', '当前最多导入 100 个项目。')

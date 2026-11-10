@@ -62,6 +62,7 @@ export interface CompletionReviewPort {
     candidate: CandidateRef,
   ): { proposal: CompletionProposal; verification: Verification; artifactIds: readonly string[] } | undefined
   accept(proposal: CompletionProposal, actor: TrustedActor, criterionIds: readonly string[], acceptanceId: string): void
+  onAccepted?(candidate: CandidateRef, actor: TrustedActor, acceptedAt: string): void
 }
 export interface ApplicationOptions {
   store: ProductStore
@@ -74,6 +75,8 @@ export interface ApplicationOptions {
   completion?: CompletionReviewPort
   assistantReplies?: boolean
   projectPreflight?: (projectId: string) => Promise<void>
+  registeredCheck?: (id: string) => boolean
+  projectGrant?: (input: { projectId: string; profileId: string; criteria: ContractRevision['criteria']; newWork: boolean }) => void
   verificationRecovery?: {
     retry(candidate: CandidateRef, blockedId: string): void
     blocked?(candidate: CandidateRef): boolean
@@ -392,11 +395,12 @@ class LocalApplication implements ProductApplication {
     if (revision > 200) throw new ApplicationFault('budget_exceeded', 'Work revision limit reached', 'none')
     if (!this.options.profileIds.includes(profileId))
       throw new ApplicationFault('unsupported_capability', 'Unknown execution profile')
+    this.options.projectGrant?.({ projectId: work.projectId, profileId, criteria: command.criteria, newWork: command.kind === 'create_work' })
     if (
       !command.criteria.some((item) => item.kind === 'machine' && item.required) ||
       command.criteria.some(
         (item) =>
-          item.kind === 'machine' && item.required && !this.options.registeredChecks.includes(item.checkDefinitionRef),
+          item.kind === 'machine' && item.required && !(this.options.registeredCheck?.(item.checkDefinitionRef) ?? this.options.registeredChecks.includes(item.checkDefinitionRef)),
       )
     )
       throw new ApplicationFault(
@@ -629,6 +633,7 @@ class LocalApplication implements ProductApplication {
         ...review.proposal,
         ...(humanCriteria.length ? { humanAcceptanceRef: acceptanceId } : {}),
       })
+      this.options.completion?.onAccepted?.(candidate, actor, this.now())
       this.emit(workId)
       return { workId }
     }

@@ -71,3 +71,20 @@ not write, fetch, execute project code or grant model permissions.
 
 Until these land, main/A can consume the fixture ports and the same package-level interface; no
 private alternative implementation should be added to coordinator/console.
+
+## Wave-04 C3 — persisted read-index adapter and preview
+
+`ReadIndexContextPort` consumes A's public read index structurally (`project`, `listWorks`, `work`)
+plus an optional effective-decisions callback. It projects bounded JSON descriptors for project
+settings metadata, works and current contracts; logical refs are not filesystem paths. Contract
+currentness uses `contractState`/`authorityState`; a stale contract yields `contract_stale` before
+any work content is uploaded.
+
+`buildContextPreview(bundle, validation?)` returns the selected files, byte/token totals, omission
+reasons, injection flags, baseline and revalidation validity for main's preview/confirm UI. It is a
+pure projection over an existing bundle and cannot widen a grant or budget.
+
+Remaining gaps: the current read index has no separate verification/delivery detail port, so
+verification ids and acceptance flags are summarized inside the work projection; work listing uses
+one bounded page (`workLimit`) instead of a cursor; the effective-decisions callback must come from
+knowledge governance (main wires it) and only current-source decisions are returned.

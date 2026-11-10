@@ -53,6 +53,10 @@ export class ProductWorks {
       }
       this.db.prepare('INSERT INTO works (id, project_id, conversation_id, value, created_at) VALUES (?, ?, ?, ?, ?)')
         .run(valid.id, valid.projectId, valid.conversationId, JSON.stringify(valid), valid.createdAt)
+      // Work identity is also conversation membership even before its first message; this is a
+      // directory index, not an execution fact.
+      this.db.prepare('INSERT OR IGNORE INTO conversation_members (conversation_id, project_id) VALUES (?, ?)')
+        .run(valid.conversationId, valid.projectId)
       return { created: true }
     })
   }

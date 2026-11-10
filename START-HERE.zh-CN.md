@@ -1,5 +1,13 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**第五轮修订01优先：[价值试点、密封副本与注意力工作台](agent-tasks/product-wave-05/AMENDMENT-01.zh-CN.md)。** 先用当前Codex做不复核/续会话自查/全新会话复核三arm初筛；E独立小额grant不挤B，第二Driver投资等初筛结果。main/C先交无需模型的注意力视图；新推荐/复核在R0未准入前仅实验、默认关闭。采集代码开始记录候选等待和部分UI审阅活动代理，见 [0021](docs/rfcs/WP-16/0021-value-first-review-amendment.md)。
+
+**当前派工：[第五轮任务包](agent-tasks/product-wave-05/README.zh-CN.md)，先读上面的修订01。** A必要证据与计时，B现有控制/session/胶囊边界，C决定闭环与注意力规则，D个人发行迁移，E独立复核初筛和验收，main注意力UI与公共集成。公共记录和恢复项目绑定修复已交；接口见 [0020稳定输入](docs/rfcs/WP-16/0020-wave-05-dispatch-and-shared-inputs.md)。沿用原目录/分支，旧缺口先闭合；第二Driver等价值闸门，不竞速、不自动接受，旧预算不刷新。
+
+**A/C第四轮源码已继续集成：** 会话目录改用持久成员索引；C原三项准入问题已通过。实际SQLite提案/决定联调6项通过、同一决定重放1项失败，完整助理功能保持关闭；详见 [0018联调](docs/rfcs/WP-16/0018-assistant-storage-consumer.md) 与 [C接线补充](agent-tasks/product-wave-04/c-integration-followup.zh-CN.md)。
+
+**新项目设置预览：[http://127.0.0.1:5183/](http://127.0.0.1:5183/)。** 主线已接通项目名称/检查/离线缓存策略的版本化编辑、历史与归档/恢复，旧任务按原合同检查和环境快照执行，设置不会改写在途工作。使用独立`.local-state/project-settings-preview`；原三个实例保留。见 [0017设置接线](docs/rfcs/WP-16/0017-versioned-project-settings.md)。
+
 **下一轮开工：[第四轮 A–E 完整助理与发行准入](agent-tasks/product-wave-04/README.zh-CN.md)。** 五个Agent沿用原目录/分支，合并最新main后执行各自五阶段整包。主线已交A/C共用持久接口和恢复只读启动，C/B/D/E的独立准入缺陷与消费方式见 [0016](docs/rfcs/WP-16/0016-wave-04-interfaces-and-admission.md)。这替代第三轮新派工，不覆盖旧实测范围或刷新模型预算。
 
 **当前新后端预览：[http://127.0.0.1:5182/](http://127.0.0.1:5182/)。** 主线已接通持久会话管理：A 的存储/工作流和 C 的模块源码已进入 main；网页新增历史目录、搜索、重命名、归档/恢复及会话草稿隔离。四项实际 HTTP 网页闭环通过。该实例使用独立 `.local-state/workflow-preview`，没有自动迁移旧实例历史。C 的来源失效准入 probe 失败，生产上下文/决定保持未启用；A–E 实测状态与下一消费约定见 [会话集成检查点](docs/rfcs/WP-16/0015-workflow-catalog-integration.md)。

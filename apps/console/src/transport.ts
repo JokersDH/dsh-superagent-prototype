@@ -21,6 +21,9 @@ import {
   ConversationCatalogQuerySchema,
   ConversationCatalogSchema,
   ConversationCommandSchema,
+  ProjectSettingsPageSchema,
+  ProjectSettingsCommandSchema,
+  ReviewActivitySchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -42,6 +45,9 @@ import type {
   ConversationCatalog,
   ConversationCatalogQuery,
   ConversationCommand,
+  ProjectSettingsPage,
+  ProjectSettingsCommand,
+  ReviewActivity,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -90,6 +96,9 @@ export interface ConsoleTransport {
   retryVerification?(command: VerificationRetryCommand): Promise<CommandReceipt>
   conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog | undefined>
   conversationCommand?(command: ConversationCommand): Promise<CommandReceipt>
+  projectSettings?(projectId: string): Promise<ProjectSettingsPage>
+  projectSettingsCommand?(command: ProjectSettingsCommand): Promise<CommandReceipt>
+  reviewActivity?(activity: ReviewActivity): Promise<CommandReceipt>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -305,6 +314,25 @@ export class HttpTransport implements ConsoleTransport {
     const command = ConversationCommandSchema.parse(input)
     const receipt = CommandReceiptSchema.parse(await this.request('/v1/conversations/commands', { method: 'POST', body: JSON.stringify(command) }))
     if (receipt.commandId !== command.commandId) throw new TransportError('schema_mismatch', '会话回执身份不匹配')
+    return receipt
+  }
+  async projectSettings(projectId: string): Promise<ProjectSettingsPage> {
+    const value = ProjectSettingsPageSchema.parse(await this.request(`/v1/projects/${encodeURIComponent(projectId)}/settings`))
+    if (value.current.projectId !== projectId) throw new TransportError('schema_mismatch', '项目设置身份不匹配')
+    return value
+  }
+  async projectSettingsCommand(input: ProjectSettingsCommand): Promise<CommandReceipt> {
+    const command = ProjectSettingsCommandSchema.parse(input)
+    const receipt = CommandReceiptSchema.parse(await this.request(`/v1/projects/${encodeURIComponent(command.projectId)}/settings`, { method: 'POST', body: JSON.stringify(command) }))
+    if (receipt.commandId !== command.commandId) throw new TransportError('schema_mismatch', '项目设置回执身份不匹配')
+    return receipt
+  }
+  async reviewActivity(input: ReviewActivity): Promise<CommandReceipt> {
+    const activity = ReviewActivitySchema.parse(input)
+    const receipt = CommandReceiptSchema.parse(await this.request(`/v1/works/${encodeURIComponent(activity.candidate.contract.workId)}/review-activity`, {
+      method: 'POST', body: JSON.stringify(activity), signal: AbortSignal.timeout(1000),
+    }))
+    if (receipt.commandId !== activity.commandId) throw new TransportError('schema_mismatch', 'Review activity receipt identity mismatch')
     return receipt
   }
   async *assistantChanges(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate> {

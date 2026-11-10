@@ -8,8 +8,11 @@ import { join, resolve } from 'node:path'
 import { createServer } from 'node:net'
 import { ProductStore } from '../../packages/storage/dist/index.js'
 import { localCredentials } from '../../apps/coordinator/http/local-state.ts'
+import { NativeProjectRegistry, ensureStarterProject } from '../../apps/coordinator/product/project-registry.ts'
 
-test('a restored first start never consumes queued business, even when normal/native/assistant flags are supplied', { timeout: 15000 }, async t => {
+for (const withProjectBindings of [false, true]) test(withProjectBindings
+  ? 'restored native project bindings remain visible without authorizing or consuming business'
+  : 'a restored first start never consumes queued business, even when normal/native/assistant flags are supplied', { timeout: 15000 }, async t => {
   const root = mkdtempSync(join(tmpdir(), 'pa-recovery-startup-'))
   const credential = localCredentials(root)
   const store = new ProductStore({ path: join(root, 'state.sqlite') })
@@ -18,6 +21,12 @@ test('a restored first start never consumes queued business, even when normal/na
   store.queue.enqueue('question.answer', 'old-answer', '{}', 3, 0, new Date().toISOString())
   const before = ['application.execute', 'application.assistant.reply', 'question.answer'].map(kind => store.queue.dueRows(kind, Number.MAX_SAFE_INTEGER, 10))
   store.close()
+  let restoredProjectId
+  if (withProjectBindings) {
+    const project = join(root, 'source-project'); ensureStarterProject(project)
+    const registry = new NativeProjectRegistry(root), record = registry.prepare({ path: project, check: 'node_test' })
+    registry.save(record); restoredProjectId = record.id
+  }
   writeFileSync(join(root, 'restore-report.json'), '{"protocol":"personal-restore/1"}\n', { mode: 0o600 })
   const probe = createServer(); probe.listen(0, '127.0.0.1'); await once(probe, 'listening')
   const port = probe.address().port; await new Promise(resolve => probe.close(resolve))
@@ -43,6 +52,12 @@ test('a restored first start never consumes queued business, even when normal/na
     headers: { authorization: `Bearer ${credential('api.key')}` },
   })).json()
   assert.ok(configuration.projects.length > 0)
+  if (withProjectBindings) {
+    const restored = configuration.projects.find(project => project.id === restoredProjectId)
+    assert.ok(restored)
+    assert.deepEqual(restored.scope.allowedPaths, ['.'])
+    assert.deepEqual(restored.scope.excludedPaths, ['.git'])
+  }
   assert.ok(configuration.profiles.every(profile => !profile.dispatchAllowed))
   assert.ok(configuration.projects.every(project => !project.dispatchAllowed && project.profileIds.length === 0))
   const response = await fetch(`http://127.0.0.1:${port}/v1/commands`, { method: 'POST', headers: {
