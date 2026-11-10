@@ -36,6 +36,16 @@ export { StaticContextPort } from './static-port.ts'
 export type { StaticContextPortOptions, StaticContextSource } from './static-port.ts'
 export { CompositeContextPort } from './composite-port.ts'
 export { LocalProjectSourcePort } from './local-port.ts'
+export { ReadIndexContextPort } from './read-index-port.ts'
+export type {
+  ContextDecisionSource,
+  ReadIndexContextPortOptions,
+  ReadIndexProjectView,
+  ReadIndexWorkView,
+  WorkspaceReadIndex,
+} from './read-index-port.ts'
+export { buildContextPreview } from './preview.ts'
+export type { ContextPreview, ContextPreviewFile } from './preview.ts'
 export type { LocalProjectSourcePortOptions } from './local-port.ts'
 export { authorizeContextRequest, sourceAllowedByGrant } from './authorization.ts'
 export { detectInjectionPatterns } from './injection.ts'

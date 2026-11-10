@@ -62,6 +62,20 @@ All tests are no-model: structured/plain/invalid output, forged identity/tool/sc
 same-id changed payload, stale contract, duplicate confirmation, rejection, supersession and expiry.
 No execution occurs before confirmation.
 
+## Persisted prepare/commit (wave-04 C2)
+
+`AssistantProposalService` consumes the shared synchronous `AssistantStatePort.proposals`:
+
+1. `prepare` is async but read-only: parse + trusted binding + immutable source/grant/contract/payload snapshot.
+2. `persistPending` writes version 1 pending inside main's UnitOfWork.
+3. `commit` is synchronous, checks actor/version/digest/source, optional current-authorization `revalidate`
+   and physical barrier, then writes version 2 confirmed with the main-owned `effectCommandId`.
+4. Same effect command replay is idempotent; another effect command, actor, payload or state conflicts.
+   `reject`/`expire`/`supersede` append version 2 with the corresponding state.
+
+`InMemoryAssistantState` is the reference port fixture; real SQL persistence is A-owned and
+**NOT_TESTED** here.
+
 ## Wave-04 checkpoint
 
 The confirmed-replay authorization bypass and the shared-grant mutation are fixed; current

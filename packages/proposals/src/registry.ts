@@ -1,13 +1,12 @@
-import type { ReasonerProposal, Scope } from '@personal-agent/contracts'
 import { ProposalError } from './errors.ts'
-import { parseStructuredOutput, proposalDigest, sameContract, scopeWithin } from './parser.ts'
+import {
+  parseStructuredOutput,
+  proposalDigest,
+  proposalIntent,
+  validateProposalBindings,
+} from './parser.ts'
 import { snapshot } from './snapshot.ts'
-import type {
-  ConfirmResult,
-  ProposalIntent,
-  ProposalRecord,
-  ProposalTrustedContext,
-} from './types.ts'
+import type { ConfirmResult, ProposalRecord, ProposalTrustedContext } from './types.ts'
 
 const DEFAULT_TTL_MS = 15 * 60 * 1000
 
@@ -28,68 +27,6 @@ export interface ConfirmProposalInput {
   readonly now?: Date
 }
 
-function validateBindings(payload: ReasonerProposal, trusted: ProposalTrustedContext): void {
-  if (trusted.grant.scope.projectId !== trusted.projectId) {
-    throw new ProposalError('cross_project', 'Authorization grant belongs to another project')
-  }
-  if (payload.kind === 'reply') return
-  if (payload.sourceMessageId !== trusted.sourceMessageId) {
-    throw new ProposalError('source_mismatch', 'Proposal is bound to another source message')
-  }
-  if (payload.kind === 'propose_work') {
-    if (payload.projectId !== trusted.projectId) {
-      throw new ProposalError('cross_project', 'Proposal targets another project')
-    }
-    return
-  }
-  if (payload.kind === 'propose_revision') {
-    if (!trusted.contract || !sameContract(payload.expected, trusted.contract)) {
-      throw new ProposalError('contract_stale', 'Proposal does not reference the current contract')
-    }
-    return
-  }
-  if (payload.scope.projectId !== trusted.projectId) {
-    throw new ProposalError('cross_project', 'Decision scope targets another project')
-  }
-  if (!scopeWithin(payload.scope, trusted.grant.scope)) {
-    throw new ProposalError('scope_escalation', 'Decision scope exceeds the current authorization')
-  }
-}
-
-function buildIntent(record: ProposalRecord): ProposalIntent {
-  const payload = record.payload
-  switch (payload.kind) {
-    case 'reply':
-      return { kind: 'reply', text: payload.text, sourceRefs: [...payload.sourceRefs] }
-    case 'propose_work':
-      return {
-        kind: 'create_work',
-        projectId: payload.projectId,
-        goal: payload.goal,
-        sourceMessageId: payload.sourceMessageId,
-      }
-    case 'propose_revision':
-      return {
-        kind: 'revise_work',
-        expected: { ...payload.expected },
-        rationale: payload.rationale,
-        sourceMessageId: payload.sourceMessageId,
-      }
-    case 'propose_decision':
-      return {
-        kind: 'record_decision',
-        content: payload.content,
-        scope: payload.scope as Scope,
-        sourceMessageId: payload.sourceMessageId,
-      }
-  }
-}
-
-/**
- * In-memory proposal state machine. It produces a `ProposalIntent` only after explicit confirmation;
- * it has no executor, scheduler or command builder, so a pending proposal cannot act. Stored records
- * and returned values are independent immutable snapshots.
- */
 export class ProposalRegistry {
   private readonly records = new Map<string, ProposalRecord>()
   private readonly now: () => Date
@@ -107,7 +44,7 @@ export class ProposalRegistry {
         ...(parsed.issues === undefined ? {} : { issues: parsed.issues }),
       })
     }
-    validateBindings(parsed.proposal, input.trusted)
+    validateProposalBindings(parsed.proposal, input.trusted)
     const now = this.now()
     const expiresAt = input.trusted.expiresAt ?? new Date(now.getTime() + this.defaultTtlMs).toISOString()
     if (!Number.isFinite(Date.parse(expiresAt)) || Date.parse(expiresAt) <= now.getTime()) {
@@ -208,7 +145,7 @@ export class ProposalRegistry {
         detail: barrier.detail ?? 'not_quiescent',
       })
     }
-    const intent = snapshot(buildIntent(record))
+    const intent = snapshot(proposalIntent(record.payload))
     const confirmed: ProposalRecord = snapshot({
       ...record,
       state: 'confirmed',
