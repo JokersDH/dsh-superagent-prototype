@@ -1,0 +1,114 @@
+{
+  "status": "PASS_SCOPED_UI_CHECKPOINT",
+  "date": "2026-11-10",
+  "implementationCommit": "3d3c70d8b105baa3988064cb338ea9cf98ea0b47",
+  "planningCommit": "85922fdd7c5bbda520c2aa69e529fb4c6e8cdf8d",
+  "consoleURL": "http://127.0.0.1:5181/",
+  "applicationModelCallsThisWave": 0,
+  "verification": {
+    "consoleUnitTests": {
+      "status": "PASS",
+      "cases": 12,
+      "command": "pnpm --filter @personal-agent/console test",
+      "scope": "Run before the implementation commit on its working-tree contents"
+    },
+    "consoleTypecheck": {
+      "status": "PASS",
+      "command": "pnpm --filter @personal-agent/console typecheck",
+      "scope": "Run before the implementation commit on its working-tree contents"
+    },
+    "consoleBuild": {
+      "status": "PASS",
+      "command": "pnpm --filter @personal-agent/console build",
+      "scope": "Run before the implementation commit; design direction records absent from browser bundle"
+    },
+    "controlledUI": {
+      "status": "PASS",
+      "cases": 8,
+      "command": "node tests/integration/ui-workbench-v3.mjs",
+      "evidence": "report.json",
+      "scope": "Repeated against committed 3d3c70d without new screenshots; isolated browser fixture only"
+    },
+    "controlledHTTPProduct": {
+      "status": "PASS",
+      "cases": 11,
+      "command": "node tests/integration/workbench-browser.mjs --url http://127.0.0.1:5193 --state .local-state/ui-wave-03-http --no-capture",
+      "evidence": "product-flow-report.json",
+      "scope": "Repeated against committed 3d3c70d; actual product API, private SQLite state and controlled execution; no native compatibility claim"
+    },
+    "specAndLinks": {
+      "status": "PASS",
+      "command": "node product-spec/tools/verify-spec.mjs --check",
+      "scope": "Spec checks and five task-package/roadmap link checks passed before commit"
+    },
+    "designRecords": {
+      "status": "PASS",
+      "scope": "DESIGN.md YAML, design.json schemaVersion 2, eight component examples and CSS token values checked"
+    },
+    "visualReview": {
+      "status": "PASS_LISTED_FIXES",
+      "rounds": 2,
+      "initialDisposition": "fix",
+      "finalDisposition": "ship",
+      "resolvedFindings": 3,
+      "evidence": "design-review.md",
+      "captures": "screenshots/",
+      "scope": "Bounded review of the documented desktop, notebook, mobile and empty-preview surfaces; captures predate the commit and final mechanical heading tracking normalization"
+    },
+    "mechanicalDetector": {
+      "status": "ADVISORY",
+      "runs": 1,
+      "findings": ["Two overused-font advisories for locally served Inter, retained by design"]
+    },
+    "newNativeAcceptance": {
+      "status": "NOT_TESTED",
+      "scope": "No native or model task was started in this UI/planning wave; earlier native reports retain their original scope"
+    }
+  },
+  "parallelDevelopment": {
+    "dispatchStatus": "READY_FOR_USER_DISPATCH",
+    "main": {
+      "directory": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "task": "agent-tasks/product-wave-03/main.zh-CN.md"
+    },
+    "A": {
+      "directory": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "task": "agent-tasks/product-wave-03/agent-a-workflows.zh-CN.md",
+      "scope": "Persistent daily workflows, project settings and sole production migration ownership"
+    },
+    "B": {
+      "directory": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "task": "agent-tasks/product-wave-03/agent-b-runtime.zh-CN.md",
+      "scope": "Native controls, questions, resource proof and recovery acceptance"
+    },
+    "C": {
+      "directory": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "task": "agent-tasks/product-wave-03/agent-c-assistant.zh-CN.md",
+      "scope": "Bounded context, typed proposals and explicit decisions"
+    },
+    "D": {
+      "directory": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "task": "agent-tasks/product-wave-03/agent-d-delivery.zh-CN.md",
+      "scope": "Local distribution, first-run, full backup, restore and migration"
+    },
+    "E": {
+      "directory": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "task": "agent-tasks/product-wave-03/agent-e-acceptance.zh-CN.md",
+      "scope": "Independent product, browser, stability and installation acceptance"
+    }
+  },
+  "limitations": [
+    "This checkpoint improves an existing single-user, single-Codex scoped preview; it is not full G2, an internal distribution release or a product completion percentage",
+    "Server conversation directory, versioned settings, assistant context/proposals/decisions, additional native controls and distribution are assigned work, not accepted implementations",
+    "The local preview is a development server with the previously admitted environment backend, not a production installer",
+    "CAC and a second native protocol remain later work; no new CAC compatibility is claimed",
+    "C/D/E worktrees and remote branches are prepared; no claim that external agents were messaged or started",
+    "The nine screenshots preserve the two-round review evidence; final committed-code interaction reruns deliberately did not overwrite them"
+  ]
+}
