@@ -107,3 +107,14 @@ test('verification status refuses another work and recovery requires its matchin
   globalThis.fetch = async () => new Response(JSON.stringify({ status: 'recorded', commandId: 'wrong-command', seq: 1 }))
   await assert.rejects(new HttpTransport().retryVerification(command), error => error instanceof TransportError && error.code === 'schema_mismatch')
 })
+
+test('older backend may omit the optional status route, while malformed results and auth failures stay explicit', async (t) => {
+  const original = globalThis.fetch
+  t.after(() => { globalThis.fetch = original })
+  globalThis.fetch = async () => new Response('404 Not Found', { status: 404 })
+  assert.equal(await new HttpTransport().workVerification('work-one'), undefined)
+  globalThis.fetch = async () => new Response('', { status: 200 })
+  await assert.rejects(new HttpTransport().workVerification('work-one'))
+  globalThis.fetch = async () => new Response(JSON.stringify({ error: { code: 'auth_required', message: 'Sign in', retry: 'user_action' } }), { status: 401 })
+  await assert.rejects(new HttpTransport().workVerification('work-one'), error => error instanceof TransportError && error.code === 'auth_required')
+})

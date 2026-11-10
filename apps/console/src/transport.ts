@@ -112,6 +112,7 @@ const errorOf = (status: number, body: unknown): TransportError => {
     'user_action',
   )
 }
+const missingOptionalResource = Symbol('missing optional product resource')
 
 /** Product HTTP transport: POST /v1/commands, GET /v1/snapshot, messages page and the SSE change stream. */
 export class HttpTransport implements ConsoleTransport {
@@ -120,7 +121,7 @@ export class HttpTransport implements ConsoleTransport {
     this.base = base
   }
 
-  private async request(path: string, init?: RequestInit): Promise<unknown> {
+  private async request(path: string, init?: RequestInit, optionalResource = false): Promise<unknown> {
     let response: Response
     try {
       response = await fetch(`${this.base}${path}`, {
@@ -140,6 +141,7 @@ export class HttpTransport implements ConsoleTransport {
         body = undefined
       }
     }
+    if (optionalResource && response.status === 404 && body === undefined) return missingOptionalResource
     if (!response.ok) throw errorOf(response.status, body)
     return body
   }
@@ -261,7 +263,9 @@ export class HttpTransport implements ConsoleTransport {
   }
   async workVerification(workId: string): Promise<WorkVerificationStatus | undefined> {
     try {
-      const value = WorkVerificationStatusSchema.parse(await this.request(`/v1/works/${encodeURIComponent(workId)}/verification`))
+      const body = await this.request(`/v1/works/${encodeURIComponent(workId)}/verification`, undefined, true)
+      if (body === missingOptionalResource) return undefined
+      const value = WorkVerificationStatusSchema.parse(body)
       if (value.workId !== workId) throw new TransportError('schema_mismatch', '验证状态属于另一项工作')
       return value
     } catch (error) {
