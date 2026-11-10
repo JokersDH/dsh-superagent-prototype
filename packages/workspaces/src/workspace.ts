@@ -98,8 +98,8 @@ const git = (cwd: string, args: readonly string[]): string =>
 const gitBuffer = (cwd: string, args: readonly string[]): Buffer =>
   execFileSync('git', args, { cwd, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: MAX_GIT_BUFFER })
 
-const gitBufferWithIndex = (cwd: string, args: readonly string[], indexFile: string): Buffer =>
-  execFileSync('git', args, { cwd, env: { ...process.env, GIT_INDEX_FILE: indexFile }, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: MAX_GIT_BUFFER })
+const gitBufferWithIndex = (cwd: string, args: readonly string[], indexFile: string, input?: Buffer): Buffer =>
+  execFileSync('git', args, { cwd, env: { ...process.env, GIT_INDEX_FILE: indexFile }, stdio: ['pipe', 'pipe', 'pipe'], maxBuffer: MAX_GIT_BUFFER, ...(input ? { input } : {}) })
 
 /**
  * Working-tree patch against a base commit that includes the contents of untracked files. Git's
@@ -114,7 +114,12 @@ function workingTreePatch(cwd: string, base: string, untracked: readonly string[
     const indexFile = join(directory, 'index')
     const actualIndex = resolve(cwd, git(cwd, ['rev-parse', '--git-path', 'index']))
     copyFileSync(actualIndex, indexFile)
-    gitBufferWithIndex(cwd, ['add', '-A', '--', '.', ...excluded.map(path => `:(top,exclude,literal)${path}`)], indexFile)
+    const included = (file: string) => !excluded.some(prefix => file === prefix || file.startsWith(prefix + '/'))
+    const tracked = gitBuffer(cwd, ['ls-files', '-z']).toString('utf8').split('\0').filter(Boolean)
+    const paths = [...new Set([...tracked, ...untracked])].filter(included).sort()
+    // Literal positive paths avoid git add treating ignored exclusion directories as explicit adds.
+    if (paths.length) gitBufferWithIndex(cwd, ['add', '-A', '--pathspec-from-file=-', '--pathspec-file-nul'], indexFile,
+      Buffer.from(paths.map(path => `:(literal)${path}\0`).join('')))
     return gitBufferWithIndex(cwd, ['diff', '--cached', '--binary', base], indexFile)
   } finally {
     rmSync(directory, { recursive: true, force: true })

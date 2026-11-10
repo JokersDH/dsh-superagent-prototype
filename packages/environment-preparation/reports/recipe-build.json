@@ -1,0 +1,10 @@
+{
+  "status": "RECIPES_BUILT",
+  "out": "/tmp/pa-env-recipes-verify",
+  "store": "/tmp/pa-env-recipes-verify/store",
+  "pnpmVersion": "11.7.0",
+  "recipes": {
+    "plain": "/tmp/pa-env-recipes-verify/plain-js",
+    "dev": "/tmp/pa-env-recipes-verify/dev-deps"
+  }
+}

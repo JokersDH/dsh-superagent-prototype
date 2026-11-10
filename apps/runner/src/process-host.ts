@@ -34,6 +34,7 @@ export type OwnedProcess = {
   stderr: AsyncIterable<Uint8Array>
   exited: Promise<{ code: number | null; signal: string | null }>
   write(frame: Uint8Array): Promise<void>
+  closeOutput(): void
 }
 
 export type ProcessHostOptions = {
@@ -85,20 +86,36 @@ export class ProcessHost implements OwnedProcessHost {
   closeAdmission(): void { this.#admissionClosed = true }
 
   async spawn(spec: ProcessSpec): Promise<OwnedProcess> {
+    return this.#admitSpawn(spec)
+  }
+
+  /** Trusted Runner preparation commands share the same inventory and cancellation admission. */
+  async spawnCommand(
+    command: { executable: string; argv: readonly string[] },
+    context: { cwd: string; env: NodeJS.ProcessEnv },
+  ): Promise<OwnedProcess> {
+    const process = await this.#admitSpawn({ ...command, cwdRef: 'runner-command', environmentRef: 'runner-command' }, context)
+    const input = this.#handles.get(process.resourceRef)?.child.stdin
+    input?.once('error', () => undefined)
+    input?.end()
+    return process
+  }
+
+  async #admitSpawn(spec: ProcessSpec, context?: { cwd: string; env: NodeJS.ProcessEnv }): Promise<OwnedProcess> {
     if (this.#admissionClosed) throw new DriverError('state_indeterminate', 'admission_closed', 'Process admission is closed')
-    const pending = this.#spawn(spec)
+    const pending = this.#spawn(spec, context)
     this.#spawning.add(pending)
     try { return await pending } finally { this.#spawning.delete(pending) }
   }
-  async #spawn(spec: ProcessSpec): Promise<OwnedProcess> {
+  async #spawn(spec: ProcessSpec, context?: { cwd: string; env: NodeJS.ProcessEnv }): Promise<OwnedProcess> {
     validateSpec(spec)
     this.#installCleanup()
     const child = spawn(spec.executable, [...spec.argv], {
       shell: false,
       detached: true, // own process group; required for group stop and identity
       stdio: ['pipe', 'pipe', 'pipe'],
-      cwd: this.#resolveCwd(spec.cwdRef),
-      env: this.#resolveEnv(spec.environmentRef),
+      cwd: context?.cwd ?? this.#resolveCwd(spec.cwdRef),
+      env: context?.env ?? this.#resolveEnv(spec.environmentRef),
     })
     await new Promise<void>((resolve, reject) => {
       const onSpawn = (): void => {
@@ -153,6 +170,7 @@ export class ProcessHost implements OwnedProcessHost {
       stderr: this.#teeStderr(child.stderr),
       exited: exitPromise,
       write: (frame: Uint8Array) => this.#write(handle, frame),
+      closeOutput: () => { child.stdout.destroy(); child.stderr.destroy() },
     }
   }
 

@@ -58,6 +58,7 @@ test('a question answer records local deliveries per target and never claims nat
   assert.deepEqual(deliveries.map(item => item.status), ['local_recorded'])
   const after = await snapshotOf(adapter)
   assert.equal(after.questions.some(item => item.id === question.id), false, 'the answered question leaves the open list')
+  assert.equal(after.works.find(work => work.work.id === question.contract.workId)!.openQuestionIds.includes(question.id), false, 'work counters use the same open-question projection')
   const stale = CommandReceiptSchema.parse(await adapter.dispatch({ ...answer, commandId: 'cmd-answer-2' }))
   assert.equal(stale.status === 'rejected' ? stale.error.code : '', 'question_expired')
 })

@@ -50,7 +50,8 @@ export function nativeStartup(stateRoot: string) {
   const projects = registry.list()
   const native: NativeProductConfiguration = {
     profile,
-    projects: projects.map((project) => ({ id: project.id, path: project.path, check: registry.check(project) })),
+    projects: projects.map((project) => ({ id: project.id, path: project.path, check: registry.check(project),
+      ...(project.environment ? { environment: registry.environment(project)! } : {}) })),
     approvalPolicy: 'on-request',
   }
   return {

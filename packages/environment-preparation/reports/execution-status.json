@@ -1,0 +1,91 @@
+{
+  "role": "A",
+  "package": "packages/environment-preparation",
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "f2ca26c",
+  "mergeCommit": "f35fa29",
+  "stableApiCheckpoint": "9550286",
+  "testedSourceCommit": "e4574c2",
+  "updatedAt": "2026-11-10T00:05:00.000Z",
+  "phases": [
+    {
+      "phase": "A-R1",
+      "priority": "P0",
+      "status": "passed",
+      "evidence": [
+        "reports/admission-probe.json",
+        "pkg-test:37/37",
+        "test: forged marker/EPERM/merged-output/descendants"
+      ],
+      "note": "8/8 official cases PASS at e4574c2; marker never authorizes deletion; only ESRCH confirms group gone; stdout+stderr share one UTF-8-safe budget"
+    },
+    {
+      "phase": "A-R2",
+      "priority": "P0",
+      "status": "passed_package_local",
+      "evidence": [
+        "src/prepare.ts: prepareAuthoritativeEnvironment",
+        "src/verify.ts: parsers/projectWorkspaceEnvironment",
+        "README.md",
+        "report.md"
+      ],
+      "note": "authorityRoot mandatory for production entry; serialized parser-validated ref; receipt binds workspace inode/request/inputs/deps/versions/ownership; exclusions only existing dirs"
+    },
+    {
+      "phase": "A-R3",
+      "priority": "P0",
+      "status": "passed_package_local",
+      "evidence": [
+        "reports/independent-consumption.json",
+        "examples/consumption-matrix.mjs",
+        "reports/recipe-build.json",
+        "test: consumer/recipe cross-process"
+      ],
+      "note": "7/7 independent matrix through second Node process: valid flow, forged marker/receipt, replacement, manifest/lock/drift, missing cache, hooks, concurrency, old preparing, cancellation; two offline recipes rebuildable"
+    },
+    {
+      "phase": "A-R4",
+      "priority": "P0",
+      "status": "blocked_external_main",
+      "evidence": [
+        "origin/main f2ca26c",
+        "docs/rfcs/WP-16/0010-main-environment-operations-checkpoint.md"
+      ],
+      "note": "latest main has no newer WorkspaceEnvironmentPort consumer after f35fa29; no main integration or product acceptance claimed; independent diagnostics/recovery work completed instead"
+    }
+  ],
+  "commands": [
+    "pnpm run typecheck",
+    "pnpm run test",
+    "pnpm run build",
+    "node examples/consumption-matrix.mjs --out reports/independent-consumption.json",
+    "node recipes/build-recipes.mjs --out /tmp/pa-env-recipes-verify",
+    "node <primary>/tools/bootstrap/review-environment-preparation.mjs --environment /Users/hh/Desktop/joker/superagent-agent-a --candidate 9550286"
+  ],
+  "results": {
+    "packageTests": "37/37",
+    "admissionProbe": "PASS_ENVIRONMENT_ADMISSION (8/8 at e4574c2)",
+    "independentConsumption": "PASS_INDEPENDENT_CONSUMPTION (7/7)",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "recipes": "RECIPES_BUILT; both recipes install and run real tests",
+    "performance": "reports/performance.json"
+  },
+  "blockers": [],
+  "notTested": [
+    "main coordinator/workspaces/Runner/console/native vendor integration and independent Runner install",
+    "npm offline install, arbitrary monorepos, native builds/lifecycle scripts, real network stores",
+    "multi-manager support and product acceptance of restricted pnpm_workspace mode"
+  ],
+  "mainNextSteps": [
+    "persist a private durable authorityRoot and parser-validated environmentRef with the attempt; use prepareAuthoritativeEnvironment, not legacy prepareEnvironment",
+    "before native start, checks and acceptance verify via verifyPreparedEnvironment/projectWorkspaceEnvironment; a missing credential must throw",
+    "pass parser-validated excludedPaths to workspace freeze/patch before staging; do not edit user index/ignore/config",
+    "supply the Runner owned-process adapter as processPort with explicit quiescence; main owns inventory/intent/barrier",
+    "cleanup only via cleanupPreparedEnvironment during workspace release and surface leftovers/blocked codes",
+    "regenerate the authoritative root lock for semver/yaml/@types/semver"
+  ],
+  "dependencyRequests": [
+    "root lock must include semver and yaml runtime dependencies and @types/semver dev dependency; this branch does not commit the root lock"
+  ]
+}

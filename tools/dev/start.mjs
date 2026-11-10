@@ -1,12 +1,18 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import { parseArgs } from 'node:util'
 import { instanceState, probeInstance, readInstanceRecord, verifyLauncher } from './local-instance.mjs'
 
 const root = fileURLToPath(new URL('../../', import.meta.url))
 const args = process.argv.slice(2)
+const { values } = parseArgs({ args, options: {
+  stop: { type: 'boolean' }, restart: { type: 'boolean' }, open: { type: 'boolean' }, fixture: { type: 'boolean' },
+  'require-login': { type: 'boolean' }, state: { type: 'string' }, port: { type: 'string' }, 'api-port': { type: 'string' },
+} })
+const selectedState = instanceState(root, values.state)
 async function stopExisting() {
   let record
-  try { record = readInstanceRecord(instanceState(root)) }
+  try { record = readInstanceRecord(selectedState) }
   catch (error) {
     if (error.code === 'state_missing') return
     throw new Error('无法读取可信启动记录，请运行 pnpm doctor。')
@@ -41,14 +47,16 @@ async function start() {
     }
     process.argv = [...process.argv.slice(0, 2), ...args.filter((arg) => arg !== '--restart')]
   }
-  if (args.every((arg) => ['--open', '--restart'].includes(arg))) {
+  {
     try {
       const { ApplicationConfigurationSchema } = await import('../../packages/contracts/dist/index.js')
       const instance = await probeInstance({
-        root, state: instanceState(root), expectedMode: 'personal',
+        root, state: selectedState, expectedMode: values.fixture ? 'fixture' : 'personal',
         parseConfiguration: (value) => ApplicationConfigurationSchema.parse(value),
       })
-      if (instance.health.access === 'local-development') {
+      if ((values['require-login'] ? instance.health.access === undefined : instance.health.access === 'local-development') &&
+          (!values.port || new URL(instance.record.consoleURL).port === values.port) &&
+          (!values['api-port'] || new URL(instance.record.apiURL).port === values['api-port'])) {
         console.log(`Workbench: ${instance.record.consoleURL}`)
         if (args.includes('--open') && process.platform === 'darwin')
           spawn('open', [instance.record.consoleURL], { stdio: 'ignore' }).unref()
@@ -67,6 +75,7 @@ async function start() {
     'application',
     'workspaces',
     'verification',
+    'environment-preparation',
   ]
   const result = spawnSync(
     process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm',

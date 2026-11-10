@@ -45,9 +45,13 @@ export class ProductCompletion implements CompletionReviewPort {
   private readonly runner: VerificationRunner
   private readonly store: ProductStore
   private readonly workspaces: WorkspaceManager
-  constructor(store: ProductStore, workspaces: WorkspaceManager, checks: CheckRegistry) {
+  private readonly environment: ((attemptId: string) => { reference: string; values: Readonly<Record<string, string>> } | undefined) | undefined
+  constructor(store: ProductStore, workspaces: WorkspaceManager, checks: CheckRegistry, options: {
+    environment?: (attemptId: string) => { reference: string; values: Readonly<Record<string, string>> } | undefined
+  } = {}) {
     this.store = store
     this.workspaces = workspaces
+    this.environment = options.environment
     this.verifier = new CompletionEvidenceStore(store)
     this.runner = new VerificationRunner(checks, { identity: 'verifier:personal-agent' })
   }
@@ -95,12 +99,14 @@ export class ProductCompletion implements CompletionReviewPort {
   ): Promise<void> {
     if (this.store.commands.get(reviewId(candidate))) return
     const frozen = this.workspaces.freeze({ attemptId })
+    const environment = this.environment?.(attemptId)
     const run = await this.runner.run({
       candidate,
       criteria: contract.criteria,
       artifactDigest: frozen.artifactDigest,
       workspacePath: this.workspaces.attemptPath(attemptId),
-      environmentRef: key('environment', attemptId),
+      environmentRef: environment?.reference ?? key('environment', attemptId),
+      ...(environment ? { environment: environment.values } : {}),
       verifyArtifact: () => this.workspaces.digest({ attemptId }) === frozen.artifactDigest,
     })
     const outputPath = join(this.workspaces.attemptPath(attemptId), 'src/product-output.txt')

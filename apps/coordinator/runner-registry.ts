@@ -68,3 +68,24 @@ export function loadRecoveryRunner(store: ProductStore, attemptId: string): Runn
     || jsonDigest(JsonSchema.parse(event.payload)) !== jsonDigest(JsonSchema.parse({ producer: result.body.producer, registrationDigest: digest, proofRef: result.proofRef }))) throw new RunnerRegistrationError('invalid_registration', 'Runner registration lacks its committed matching event')
   return { ...result, commandId, digest, receiptSeq: receipt.seq }
 }
+
+/** A pinned launcher's fresh complete inventory can reveal children spawned after registration. */
+export function adoptRegisteredRunnerResources(store: ProductStore, proof: VerifiedRunnerInspection): void {
+  const { value, endpoint } = verifiedRunnerInspection(proof)
+  const registration = loadRecoveryRunner(store, value.attempt.attemptId)
+  if (!registration || value.coverage !== 'complete_owned_resources' ||
+      jsonDigest(JsonSchema.parse(registration.body.endpoint)) !== jsonDigest(JsonSchema.parse(endpoint)))
+    throw new RunnerRegistrationError('invalid_registration', 'Inventory must come from the exact registered endpoint')
+  store.uow.atomic(() => {
+    verifiedRunnerInspection(proof)
+    const binding = matchBinding(store, registration.body.producer)
+    if (binding.state === 'ended') return
+    const resources = new Map(binding.resources.map(resource => [resource.ref, resource]))
+    for (const resource of value.resources) {
+      const known = resources.get(resource.ref)
+      if (known && known.ownership !== resource.ownership) throw new RunnerRegistrationError('identity_mismatch', 'Known resource ownership cannot change')
+      resources.set(resource.ref, { ref: resource.ref, ownership: resource.ownership })
+    }
+    store.bindings.record({ ...binding, resources: [...resources.values()] })
+  })
+}

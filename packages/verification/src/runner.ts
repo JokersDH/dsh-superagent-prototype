@@ -127,7 +127,7 @@ export class VerificationRunner {
       const realRoot = realpathSync(root)
       const realCwd = realpathSync(cwd)
       if (!inside(root, cwd) || !inside(realRoot, realCwd)) throw new VerificationUnavailable(`Check ${definition.id} working directory escapes the workspace: ${definition.cwd}`)
-      const run = await this.execute(definition, cwd)
+      const run = await this.execute(definition, cwd, plan.environment ?? this.environment)
       evidence.push({ ...run.evidence, criterionId: criterion.id, checkDefinitionRef: definition.id, definitionRevision: definition.revision })
       results.push({ criterionId: criterion.id, outcome: run.evidence.outcome, evidenceRefs: [run.evidenceRef] })
     }
@@ -155,11 +155,11 @@ export class VerificationRunner {
   }
 
   /** Runs one check in its own process group with bounded time, output and cleanup. */
-  private execute(definition: Readonly<CheckDefinition>, cwd: string): Promise<Executed> {
+  private execute(definition: Readonly<CheckDefinition>, cwd: string, environment: Readonly<Record<string, string | undefined>>): Promise<Executed> {
     return new Promise<Executed>(resolvePromise => {
-      const env: Record<string, string> = { PATH: this.environment.PATH ?? '/usr/bin:/bin' }
+      const env: Record<string, string> = { PATH: environment.PATH ?? '/usr/bin:/bin' }
       for (const name of definition.allowedEnvironment ?? []) {
-        const value = this.environment[name]
+        const value = environment[name]
         if (value !== undefined) env[name] = value
       }
       const started = this.now()

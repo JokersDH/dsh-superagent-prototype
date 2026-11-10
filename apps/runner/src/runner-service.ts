@@ -21,7 +21,7 @@
 import { fileURLToPath } from 'node:url'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import type { AgentDriverV1 } from '../../../packages/contracts/src/ports.ts'
+import type { AgentDriverV1, AttemptIO } from '../../../packages/contracts/src/ports.ts'
 import type { AttemptSpec, CriticalFact, DurableReceipt, Json, RunnerCommand } from '../../../packages/contracts/src/types.ts'
 import { JsonLineDecoder, encodeFrame } from '../../../packages/driver-kit/src/index.ts'
 import { FileCriticalJournal } from './file-journal.ts'
@@ -46,6 +46,8 @@ export type RunnerServiceOptions = {
   createDriver: (spec: AttemptSpec, hooks: { beforeNativeWrite(command: RunnerCommand): Promise<void> }) => AgentDriverV1
   /** Native metadata/policy preparation may run before the first business begin. */
   eagerPrepare?: boolean
+  /** Trusted host preparation runs inside this Runner before the native driver may spawn. */
+  prepare?: (spec: AttemptSpec, context: { io: AttemptIO; processHost: ProcessHost; signal: AbortSignal }) => Promise<void>
   /** Payload store the coordinator owns; the Runner only asks for references. */
   payloads: { read(reference: string): Promise<Json> }
   /**
@@ -122,8 +124,10 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   let closed = false
   let businessClosed = false
   let physicallyStopped = false
+  const preparation = new AbortController()
   const processHost = options.processHost ?? new ProcessHost()
   const closeAdmission = () => {
+    preparation.abort()
     businessClosed = true; processHost.closeAdmission(); runner?.closeAdmission()
     for (const waiters of [factWaiters, payloadWaiters, writeWaiters]) {
       for (const waiter of waiters.values()) waiter.reject(new Error('Attempt admission is closed'))
@@ -158,12 +162,26 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   }
   const launch = () => {
     if (!spec || !runner || running) throw new Error('Attempt driver cannot be launched twice')
-    running = runner.launch(spec, options.createDriver(spec, hooks))
+    const driver = options.createDriver(spec, hooks)
+    running = runner.launch(spec, {
+      inspect: (profile, host) => driver.inspect(profile, host),
+      reconcile: (ref, host) => driver.reconcile(ref, host),
+      serve: async (attempt, io) => {
+        await options.prepare?.(attempt, { io, processHost, signal: preparation.signal })
+        if (preparation.signal.aborted || businessClosed) throw new Error('Attempt closed during host preparation')
+        return driver.serve(attempt, io)
+      },
+    })
     void running.then(async result => {
       await stopPhysical()
       write({ type: 'exited', id: spec!.attemptId, exit: (result as { exit: unknown }).exit })
       finish()
-    }).catch(error => { closeAdmission(); write({ type: 'error', id: spec!.attemptId, ...toBridgeFailure(error) }); finish() })
+    }).catch(async error => {
+      await stopPhysical()
+      write({ type: 'error', id: spec!.attemptId, ...toBridgeFailure(error) })
+      write({ type: 'exited', id: spec!.attemptId, exit: { reason: 'error', evidenceRefs: ['runner-preparation-or-driver-failed'] } })
+      finish()
+    })
   }
 
   try {

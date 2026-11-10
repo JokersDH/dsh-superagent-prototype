@@ -6,6 +6,8 @@
  */
 export { ProcessHost } from './process-host.ts'
 export type { OwnedProcess, ProcessHostOptions, ProcessIdentity } from './process-host.ts'
+export { RunnerCommandProcess } from './command-process.ts'
+export type { CommandProcessOptions, CommandProcessResult } from './command-process.ts'
 export { BoundedJournal, StderrRing, journalCoverage } from './journal.ts'
 export type { CriticalEntry, DiagnosticEntry, JournalSnapshot } from './journal.ts'
 export { AttemptRunner } from './runner.ts'

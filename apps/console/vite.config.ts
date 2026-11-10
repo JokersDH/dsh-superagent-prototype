@@ -10,6 +10,9 @@ export default defineConfig({
   root: '.',
   build: { outDir: 'dist', sourcemap: true },
   server: {
+    fs: {
+      deny: ['.env', '.env.*', '*.{crt,pem,key}', '**/.git/**', '**/.local-state/**', '**/.impeccable/**', '**/PRODUCT.md', '**/DESIGN.md'],
+    },
     proxy: {
       '/v1': { target: apiTarget, changeOrigin: true },
     },
