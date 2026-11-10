@@ -23,7 +23,7 @@
 - D 使用 `/Users/hh/Desktop/joker/superagent-agent-d` / `codex/g3-local-distribution`。
 - E 使用 `/Users/hh/Desktop/joker/superagent-agent-e` / `codex/g3-product-acceptance`。
 
-C/D/E 的 worktree 由主线在派工文档检查点提交后，从最新 `origin/main` 创建。上述是已确定的目标位置，不表示本文编写时已创建；目录就绪后在各自目录打开 Agent 按任务执行。不要自行在 primary 或他人目录开工，也不要为准备 worktree 改动其它分支。
+C/D/E 的 worktree 已由主线从派工检查点 `85922fd` 创建，并已 push 同名远程分支、设置各自 upstream。目录可直接打开；开工时仍先合并最新 `origin/main`，以消费后续 UI/公共接口。A/B 原目录及现有改动保留。不要自行在 primary 或他人目录开工，也不要为准备 worktree 改动其它分支。
 
 每人先保存当前自己的改动，再 `git fetch origin`、合并最新 `origin/main`。不 reset、clean、force-push，不切换其它 worktree 的分支。合并主线已验收产品路径时不得把旧候选覆盖回来。包内新增依赖请求交主线生成唯一 root lock；安装产生的临时锁差异不提交。
 

@@ -7,8 +7,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ConversationMessageSchema, IdSchema } from '@personal-agent/contracts'
 import {
   ArrowUp,
+  ArrowUpRight,
   Bot,
   Check,
+  CheckCheck,
   ChevronRight,
   CircleHelp,
   Copy,
@@ -16,6 +18,7 @@ import {
   Eye,
   Folder,
   FolderPlus,
+  Layers3,
   ListTodo,
   MessageSquare,
   PanelRightClose,
@@ -23,8 +26,10 @@ import {
   Plus,
   Play,
   RefreshCw,
+  Search,
   Settings2,
   Sparkles,
+  SquarePen,
   X,
 } from 'lucide-react'
 import Markdown from 'react-markdown'
@@ -131,6 +136,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [inspectorOpen, setInspectorOpen] = useState(false)
   const [modelPanelOpen, setModelPanelOpen] = useState(false)
   const [workspaceOpen, setWorkspaceOpen] = useState(false)
+  const [workspaceView, setWorkspaceView] = useState<'conversation' | 'works' | 'decisions' | 'executors'>('conversation')
   const [assistant, setAssistant] = useState<AssistantProviderStatus | undefined>()
   const [waitingAfter, setWaitingAfter] = useState<number | undefined>()
   const [streamReplies, setStreamReplies] = useState<readonly AssistantStreamUpdate[]>([])
@@ -168,6 +174,17 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const detailRef = useRef<HTMLElement | null>(null)
   const seen = useRef(new Set<number>())
   const refreshTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => {
+    const closeDrawers = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented || (!workspaceOpen && !inspectorOpen && !modelPanelOpen)) return
+      setWorkspaceOpen(false)
+      setInspectorOpen(false)
+      setModelPanelOpen(false)
+      document.querySelector<HTMLButtonElement>('button[aria-label="工作详情"]')?.focus()
+    }
+    window.addEventListener('keydown', closeDrawers)
+    return () => window.removeEventListener('keydown', closeDrawers)
+  }, [workspaceOpen, inspectorOpen, modelPanelOpen])
 
   const refreshConfiguration = useCallback(async (): Promise<void> => {
     if (!transport.configuration) {
@@ -282,6 +299,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
       setWaitingAfter(undefined)
   }, [snapshot, waitingAfter])
   const newConversation = () => {
+    setWorkspaceView('conversation')
     const id = `conversation-${crypto.randomUUID()}`
     const url = new URL(window.location.href)
     url.searchParams.set('conversation', id)
@@ -491,6 +509,9 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   }, [selectedWorkId, snapshot?.cursor, inspectorOpen, modelPanelOpen, transport])
 
   const openWorkDraft = (goal = '', projectId = projectFilter ?? '') => {
+    setWorkspaceOpen(true)
+    setInspectorOpen(false)
+    setModelPanelOpen(false)
     setCreateDraft({ id: newId('draft'), goal, projectId })
     setCreateOpen(true)
     setProjectImportOpen(false)
@@ -515,7 +536,33 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const selectedWork =
     works.find((work) => work.work.id === selectedWorkId) ??
     (snapshot?.works ?? []).find((work) => work.work.id === selectedWorkId)
-  const openQuestions = snapshot?.questions ?? []
+  const openQuestions = (snapshot?.questions ?? []).filter(question => !projectFilter ||
+    snapshot?.works.some(work => work.work.id === question.contract.workId && work.work.projectId === projectFilter))
+  const selectedQuestions = selectedWork ? openQuestions.filter(question => question.contract.workId === selectedWork.work.id) : openQuestions
+  const activeWorks = works.filter(work => ['evaluating', 'queued', 'working', 'verifying', 'switching'].includes(work.phase))
+  const projectName = projectFilter
+    ? configuration?.projects.find(project => project.id === projectFilter)?.displayName ?? projectFilter
+    : '个人工作区'
+  const openView = (view: typeof workspaceView) => {
+    setWorkspaceView(view)
+    setWorkspaceOpen(false)
+    setModelPanelOpen(false)
+    setInspectorOpen(false)
+  }
+  const selectWork = (work: WorkView) => {
+    setSelectedWorkId(work.work.id)
+    setProjectFilter(undefined)
+    setInspectorOpen(true)
+    setModelPanelOpen(false)
+    setWorkspaceOpen(false)
+  }
+  const answerQuestion = async (question: UserQuestion, answer: QuestionAnswer) => {
+    const command: UserCommand = {
+      commandId: newId('cmd-answer'), conversationId, kind: 'answer_question',
+      questionId: question.id, expectedVersion: question.version, answer,
+    }
+    await send(command, `answer:${question.id}`)
+  }
 
   return (
     <div
@@ -528,12 +575,13 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           </span>
           <h1>个人 Agent 工作台</h1>
         </div>
+        <div className="topbar-context"><span>工作区</span><ChevronRight size={12} /><strong>{projectName}</strong></div>
         <div className="status-cluster" aria-live="polite">
           {assistant?.configured && (
             <button
               type="button"
               className="model-switch"
-              onClick={() => setModelPanelOpen(!modelPanelOpen)}
+              onClick={() => { setWorkspaceOpen(false); setModelPanelOpen(!modelPanelOpen) }}
               title="模型设置"
             >
               <Sparkles size={15} />
@@ -570,6 +618,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             }}
             title="工作空间"
             aria-label="工作空间"
+            aria-expanded={workspaceOpen}
+            aria-controls="work-navigation"
           >
             <Folder size={18} />
           </button>
@@ -591,7 +641,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           <button
             type="button"
             className="icon-button"
-            onClick={() => setModelPanelOpen(!modelPanelOpen)}
+            onClick={() => { setWorkspaceOpen(false); setModelPanelOpen(!modelPanelOpen) }}
             title="模型设置"
             aria-label="模型设置"
           >
@@ -602,11 +652,14 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             className="icon-button"
             onClick={() => {
               const open = inspectorOpen || modelPanelOpen
+              setWorkspaceOpen(false)
               setInspectorOpen(!open)
               setModelPanelOpen(false)
             }}
             title="工作详情"
             aria-label="工作详情"
+            aria-expanded={inspectorOpen || modelPanelOpen}
+            aria-controls="work-inspector"
           >
             {inspectorOpen || modelPanelOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}
           </button>
@@ -671,17 +724,36 @@ export function App({ transport }: { transport: ConsoleTransport }) {
 
       {auth === 'ready' && (
         <main className="layout">
-          <aside className="sidebar" aria-label="工作列表">
+          <nav className="workspace-rail" aria-label="工作台导航">
+            <div className="rail-top">
+              <button type="button" className={`rail-button${workspaceView === 'conversation' ? ' active' : ''}`}
+                aria-current={workspaceView === 'conversation' ? 'page' : undefined} title="主对话" aria-label="主对话视图" onClick={() => openView('conversation')}><MessageSquare size={19} /></button>
+              <button type="button" className={`rail-button${workspaceView === 'works' ? ' active' : ''}`}
+                aria-current={workspaceView === 'works' ? 'page' : undefined} title="工作与交付" aria-label="工作与交付" onClick={() => openView('works')}><Layers3 size={19} /></button>
+              <button type="button" className={`rail-button${workspaceView === 'decisions' ? ' active' : ''}`}
+                aria-current={workspaceView === 'decisions' ? 'page' : undefined} title="待我决定" aria-label="待我决定" onClick={() => openView('decisions')}>
+                <CircleHelp size={19} />{openQuestions.length > 0 && <span className="rail-badge">{openQuestions.length}</span>}
+              </button>
+              <button type="button" className={`rail-button${workspaceView === 'executors' ? ' active' : ''}`}
+                aria-current={workspaceView === 'executors' ? 'page' : undefined} title="执行器连接" aria-label="执行器目录" onClick={() => openView('executors')}><Bot size={19} /></button>
+            </div>
+            <div className="rail-bottom">
+              <button type="button" className="rail-button" title="偏好设置" aria-label="偏好设置" onClick={() => { setModelPanelOpen(true); setWorkspaceOpen(false) }}><Settings2 size={19} /></button>
+            </div>
+          </nav>
+          <aside id="work-navigation" className="sidebar" aria-label="工作列表">
+            <div className="sidebar-heading"><span><Layers3 size={15} />工作区</span><button type="button" className="icon-button drawer-close" title="关闭工作列表" aria-label="关闭工作列表" onClick={() => setWorkspaceOpen(false)}><X size={17} /></button></div>
             <button type="button" className="new-conversation" onClick={newConversation}>
-              <Plus size={17} />
+              <SquarePen size={16} />
               <span>新对话</span>
             </button>
-            <div className="sidebar-current">
+            <button type="button" className="sidebar-current" onClick={() => openView('conversation')}>
               <MessageSquare size={16} />
               <span>主对话</span>
-            </div>
+              <span className="mini">当前</span>
+            </button>
             <div className="section-head">
-              <h2>工作空间</h2>
+              <h2>项目与工作</h2>
               <span className="count">{works.length}</span>
               <span className="section-tools">
                 <button
@@ -716,7 +788,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 aria-pressed={!projectFilter}
                 onClick={() => setProjectFilter(undefined)}
               >
-                全部
+                <Layers3 size={14} /><span>全部项目</span>
               </button>
               {projects.map((project) => (
                 <button
@@ -725,8 +797,9 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                   className={projectFilter === project ? 'chip active' : 'chip'}
                   aria-pressed={projectFilter === project}
                   onClick={() => setProjectFilter(project)}
+                  title={configuration?.projects.find((item) => item.id === project)?.displayName ?? project}
                 >
-                  {configuration?.projects.find((item) => item.id === project)?.displayName ?? project}
+                  <Folder size={14} /><span>{configuration?.projects.find((item) => item.id === project)?.displayName ?? project}</span>
                 </button>
               ))}
             </div>
@@ -784,6 +857,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 }}
               />
             )}
+            <div className="sidebar-section-label"><span>当前对话的工作</span><span>{works.length}</span></div>
             <ul className="work-list">
               {works.map((work) => (
                 <li key={work.work.id}>
@@ -791,13 +865,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                     type="button"
                     className={`work-card${selectedWorkId === work.work.id ? ' selected' : ''}`}
                     aria-current={selectedWorkId === work.work.id ? 'true' : undefined}
-                    onClick={() => {
-                      setSelectedWorkId(work.work.id)
-                      setProjectFilter(undefined)
-                      setInspectorOpen(true)
-                      setModelPanelOpen(false)
-                      setWorkspaceOpen(false)
-                    }}
+                    onClick={() => selectWork(work)}
                   >
                     <span className={`work-icon phase-icon-${work.phase}`} aria-hidden="true">
                       {work.phase === 'delivered' ? <Check size={16} /> : <Folder size={16} />}
@@ -820,14 +888,19 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             <div className="sidebar-footer">
               <span className="avatar-mark">本</span>
               <span>
-                <strong>本地工作区</strong>
-                <small>{assistant?.configured ? '模型对话已配置' : '模型未配置'}</small>
+                <strong>个人工作区</strong>
+                <small>{assistant?.configured ? assistant.model : '对话模型未配置'}</small>
               </span>
               <span className="local-dot" />
             </div>
           </aside>
 
           <section className="conversation" aria-label="主对话">
+            {workspaceView === 'works' && <WorkDirectory works={works} loading={loading} configuration={configuration} onSelect={selectWork} onCreate={() => { openWorkDraft(); setWorkspaceOpen(true) }} />}
+            {workspaceView === 'decisions' && <div className="workspace-view"><div className="view-header"><div><h2 className="view-title">待我决定</h2><p className="view-description">{loading ? '正在读取问题' : `当前对话 · ${openQuestions.length} 项待处理`}</p></div><CircleHelp size={20} /></div><div className="view-content">{loading ? <p className="empty" role="status">正在读取问题…</p> : <Questions questions={openQuestions} deliveries={deliveries} pending={pending} onAnswer={answerQuestion} />}</div></div>}
+            {workspaceView === 'executors' && <ExecutorDirectory configuration={configuration} state={configState} onReload={() => void refreshConfiguration()} />}
+            <div className="conversation-surface" hidden={workspaceView !== 'conversation'}>
+            <div className="workspace-summary" aria-label="当前对话工作概况"><span><span className="summary-count">{activeWorks.length}</span>进行中</span><button type="button" onClick={() => openView('decisions')}><span className="summary-count">{openQuestions.length}</span>待决定</button><span><CheckCheck size={13} /><span className="summary-count">{works.filter(work => work.phase === 'delivered').length}</span>已交付</span></div>
             <Conversation
               key={conversationId}
               snapshot={snapshot}
@@ -841,6 +914,10 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               activateWorkId={activateWorkId}
               canDelegate={configuration?.projects.some((project) => project.dispatchAllowed) === true}
               onDelegate={(text) => openWorkDraft(text)}
+              selectedProjectName={projectName}
+              selectedQuestionCount={selectedQuestions.length}
+              onInspectWork={() => { setWorkspaceOpen(false); setInspectorOpen(true); setModelPanelOpen(false) }}
+              onDecisions={() => openView('decisions')}
               onSend={async (text, useWorkContext) => {
                 const command: UserCommand = {
                   commandId: newId('cmd-chat'),
@@ -885,9 +962,11 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 )
               }}
             />
+            </div>
           </section>
 
-          <aside className="detail" aria-label="决定与工作详情" ref={detailRef}>
+          <aside id="work-inspector" className="detail" aria-label="决定与工作详情" ref={detailRef}>
+            <div className="detail-heading"><span>工作上下文</span><button className="icon-button" type="button" aria-label="关闭工作详情" title="关闭工作详情" onClick={() => { setInspectorOpen(false); setModelPanelOpen(false) }}><X size={17} /></button></div>
             {modelPanelOpen && (
               <ModelPanel
                 status={assistant}
@@ -977,29 +1056,83 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                   return receipt?.status === 'recorded'
                 }}
               />
-              {fixture && <ExecutorPanel transport={transport} />}
-              <Questions
-                questions={openQuestions}
+              {workspaceView !== 'decisions' && <Questions
+                questions={selectedQuestions}
                 deliveries={deliveries}
                 pending={pending}
-                onAnswer={async (question, answer) => {
-                  const command: UserCommand = {
-                    commandId: newId('cmd-answer'),
-                    conversationId,
-                    kind: 'answer_question',
-                    questionId: question.id,
-                    expectedVersion: question.version,
-                    answer,
-                  }
-                  await send(command, `answer:${question.id}`)
-                }}
-              />
+                onAnswer={answerQuestion}
+              />}
             </div>
           </aside>
+          {(workspaceOpen || inspectorOpen || modelPanelOpen) && <button type="button" className="drawer-backdrop" aria-label="关闭侧栏" onClick={() => { setWorkspaceOpen(false); setInspectorOpen(false); setModelPanelOpen(false) }} />}
         </main>
       )}
     </div>
   )
+}
+
+function WorkDirectory({ works, loading, configuration, onSelect, onCreate }: {
+  works: readonly WorkView[]
+  loading: boolean
+  configuration: ApplicationConfiguration | undefined
+  onSelect: (work: WorkView) => void
+  onCreate: () => void
+}) {
+  const [filter, setFilter] = useState('all')
+  const [query, setQuery] = useState('')
+  const project = (id: string) => configuration?.projects.find(item => item.id === id)?.displayName ?? id
+  const shown = works.filter(work => {
+    const matches = filter === 'all' || (filter === 'active' && ['evaluating', 'queued', 'working', 'verifying', 'switching'].includes(work.phase)) ||
+      (filter === 'decisions' && work.phase === 'needs_user') || (filter === 'delivered' && work.phase === 'delivered')
+    return matches && `${work.work.title} ${work.contract.goal} ${project(work.work.projectId)}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+  })
+  return <div className="workspace-view">
+    <div className="view-header"><div><h2 className="view-title">工作与交付</h2><p className="view-description">当前对话 · {works.length} 项工作</p></div><button type="button" className="view-command" onClick={onCreate}><Plus size={15} />新建委托</button></div>
+    <div className="view-filters">
+      <div className="view-tabs" role="group" aria-label="工作状态筛选">{[['all', '全部'], ['active', '进行中'], ['decisions', '待决定'], ['delivered', '已交付']].map(([value, label]) => <button key={value} type="button" className={filter === value ? 'active' : ''} aria-pressed={filter === value} onClick={() => setFilter(value!)}>{label}</button>)}</div>
+      <label className="work-search"><Search size={15} /><input aria-label="搜索当前对话的工作" placeholder="搜索工作" value={query} onChange={event => setQuery(event.target.value)} /></label>
+    </div>
+    <div className="view-content"><div className="work-table" aria-label="工作列表与交付">
+      {shown.map(work => <button type="button" key={work.work.id} className="work-row" onClick={() => onSelect(work)}>
+        <span className={`work-icon phase-icon-${work.phase}`}>{work.phase === 'delivered' ? <CheckCheck size={18} /> : <Layers3 size={18} />}</span>
+        <span className="work-row-main"><strong>{work.work.title}</strong><span className="work-row-meta">{project(work.work.projectId)}<span>合同 {work.contract.revision}</span>{work.artifactIds.length > 0 && <span>{work.artifactIds.length} 项产物</span>}</span></span>
+        <span className="work-row-status"><span className={`phase phase-${work.phase}`}>{phaseLabel[work.phase]}</span><ArrowUpRight size={15} /></span>
+      </button>)}
+      {!shown.length && <div className="empty-view"><Search size={23} /><h3>{loading ? '正在读取工作…' : query || filter !== 'all' ? '没有匹配的工作' : '还没有工作'}</h3>{!loading && (query || filter !== 'all') && <button type="button" className="quiet" onClick={() => { setQuery(''); setFilter('all') }}>清除筛选</button>}</div>}
+    </div></div>
+  </div>
+}
+
+function ExecutorDirectory({ configuration, state, onReload }: {
+  configuration: ApplicationConfiguration | undefined
+  state: 'loading' | 'ready' | 'unavailable' | 'failed'
+  onReload: () => void
+}) {
+  const profiles = configuration?.profiles ?? []
+  const native = profiles.filter(profile => profile.kind === 'native')
+  const controlled = profiles.filter(profile => profile.kind === 'controlled_fixture')
+  const row = (profile: ApplicationConfiguration['profiles'][number]) => <div className="executor-row" key={profile.id}>
+    <span className="executor-icon"><Bot size={22} /></span>
+    <div className="executor-info"><h3>{profile.displayName}</h3><p>{profile.driverId}<span>配置 {profile.revision}</span></p></div>
+    <div className="executor-readiness"><span className={`phase ${profile.dispatchAllowed ? 'phase-delivered' : 'phase-uncertain'}`}>{profile.kind === 'controlled_fixture' ? '固定流程' : profile.dispatchAllowed ? '已准入' : blockedLabel(profile.blockedReason)}</span><span>{configuration?.projects.filter(project => project.profileIds.includes(profile.id)).length ?? 0} 个项目</span></div>
+  </div>
+  return <div className="workspace-view"><div className="view-header"><div><h2 className="view-title">执行器连接</h2><p className="view-description">{native.length} 个原生执行器 · {native.filter(profile => profile.dispatchAllowed).length} 个已准入</p></div><button type="button" className="icon-button" title="刷新执行器" aria-label="刷新执行器" onClick={onReload}><RefreshCw size={17} /></button></div>
+    <div className="view-content"><div className="executor-directory">{native.map(row)}
+      {state === 'loading' && <p className="empty">正在读取执行器…</p>}
+      {state === 'failed' && <p className="warn-text" role="alert">执行器配置读取失败。</p>}
+      {state === 'unavailable' && <p className="empty">执行器信息暂不可用。</p>}
+      {state === 'ready' && !native.length && <div className="empty-view"><Bot size={26} /><h3>暂无已连接的原生执行器</h3></div>}
+      {controlled.length > 0 && <details className="test-profiles"><summary>固定流程测试 <span>{controlled.length}</span></summary>{controlled.map(row)}</details>}
+    </div></div>
+  </div>
+}
+
+function WorkStageStrip({ work, questionCount, onInspect, onDecisions }: { work: WorkView; questionCount: number; onInspect: () => void; onDecisions: () => void }) {
+  const index = work.phase === 'delivered' ? 3 : work.phase === 'needs_user' && questionCount > 0 ? 1 : work.phase === 'verifying' || (work.phase === 'needs_user' && work.actions.currentCandidate) ? 2
+    : work.phase === 'working' || work.phase === 'needs_user' ? 1 : ['uncertain', 'stopping', 'ended'].includes(work.phase) ? -1 : 0
+  return <div className="work-stage-strip" aria-label="当前工作阶段"><div className="stage-context"><button type="button" className="stage-work" title={work.work.title} onClick={onInspect}><Layers3 size={13} /><span>{work.work.title}</span><ArrowUpRight size={13} /></button>{questionCount > 0 && <button type="button" className="stage-pending" title="打开待决定列表" onClick={onDecisions}><CircleHelp size={12} />{questionCount} 项待决定</button>}</div><div className="stage-steps">{['已委托', '执行', '验证', '交付'].map((label, position) => <span key={label} className={`stage-step${position === index ? ' active' : ''}${position < index || work.phase === 'delivered' ? ' complete' : ''}`}>
+    <span className="stage-dot">{position < index || work.phase === 'delivered' ? <Check size={10} /> : null}</span>{label}
+  </span>)}{index === -1 && <span className={`phase phase-${work.phase}`}>{phaseLabel[work.phase]}</span>}</div></div>
 }
 
 function ModelPanel({
@@ -1618,6 +1751,10 @@ function Conversation({
   snapshot,
   projectFilter,
   selectedWork,
+  selectedProjectName,
+  selectedQuestionCount,
+  onInspectWork,
+  onDecisions,
   pending,
   offline,
   assistant,
@@ -1632,6 +1769,10 @@ function Conversation({
   snapshot: Snapshot | undefined
   projectFilter: string | undefined
   selectedWork: WorkView | undefined
+  selectedProjectName: string
+  selectedQuestionCount: number
+  onInspectWork: () => void
+  onDecisions: () => void
   pending: boolean
   offline: boolean
   assistant: AssistantProviderStatus | undefined
@@ -1684,14 +1825,17 @@ function Conversation({
   return (
     <div className="conversation-inner">
       <div className="conversation-head">
-        <div>
+        <div className="conversation-heading">
+          <span className="section-icon"><MessageSquare size={17} /></span><div>
           <h2>{useWorkContext && selectedWork ? '当前工作' : '主对话'}</h2>
           <p className="context-line">
-            {useWorkContext && selectedWork ? selectedWork.work.title : (assistant?.model ?? '个人工作区')}
+            {useWorkContext && selectedWork ? selectedWork.work.title : selectedProjectName}
           </p>
+          </div>
         </div>
-        {offline && <span className="badge warn">模型离线：查询、回答与停止仍可用</span>}
+        <div className="conversation-head-tools">{offline ? <span className="badge warn">模型离线</span> : <span className="context-line">{assistant?.configured ? assistant.model : '本地会话'}</span>}</div>
       </div>
+      {selectedWork && <WorkStageStrip work={selectedWork} questionCount={selectedQuestionCount} onInspect={onInspectWork} onDecisions={onDecisions} />}
       <div
         className="messages"
         ref={scrollRef}
@@ -1765,7 +1909,7 @@ function Conversation({
             <span className="empty-bot">
               <Bot size={34} />
             </span>
-            <h3>今天想一起处理什么？</h3>
+            <h3>开始新的工作</h3>
             <div className="quick-prompts">
               {taskTemplates.map((template) => (
                 <button type="button" key={template.title} onClick={() => applyTemplate(template.text)}>

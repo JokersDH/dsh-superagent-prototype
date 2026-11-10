@@ -14,6 +14,8 @@
 
 复用已有前端 build 和 coordinator 组合入口，产出普通同事可启动的本机包：运行时不依赖 Vite dev server 或每次构建全仓。不要自建产品 HTTP 主入口；必要启动/config interface 交 main RFC，由主线接入。
 
+现有 console build 的默认模式可能是 controlled fixture。发行必须明确使用生产 HTTP transport（构建配置或经验证的启动配置），验证主入口不会因缺设置静默切到 fixture、显示合成会话或伪执行；构建成功本身不等于发行模式正确。
+
 首次运行收集明确的本地路径/模型设置和执行器状态，不读取/复制他人账号，不强制升级全局 Node/agent。缺 Node/ABI/版本/认证/端口时给稳定可操作诊断。配置和状态在 checkout 之外、可重定位且私有；密钥不进入只读浏览器响应、URL、日志或发行 archive。显式的模型设置输入只能经已认证本机入口提交，保存后不回显，也不写前端持久存储。
 
 启动、复用、停止、doctor、干净退出支持实际选定的 state；按真实进程身份操作，不结束同名/陌生 PID。桌面壳只留薄 launcher 接口，业务不依赖 Electron/Tauri API。

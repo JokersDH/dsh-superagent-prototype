@@ -9,6 +9,7 @@ const { values } = parseArgs({
   options: {
     url: { type: 'string', default: 'http://127.0.0.1:5180' },
     state: { type: 'string', default: '.local-state/workbench' },
+    'no-capture': { type: 'boolean', default: false },
   },
 })
 const { chromium } = createRequire(new URL('../../apps/console/package.json', import.meta.url))('@playwright/test')
@@ -109,15 +110,9 @@ try {
       0,
       'work goals must not masquerade as personal chat',
     )
-    await page.screenshot({
-      path: join(directory, 'desktop.png'),
-      fullPage: true,
-    })
+    if (!values['no-capture']) await page.screenshot({ path: join(directory, 'desktop.png'), fullPage: true })
     await page.setViewportSize({ width: 390, height: 844 })
-    await page.screenshot({
-      path: join(directory, 'narrow.png'),
-      fullPage: true,
-    })
+    if (!values['no-capture']) await page.screenshot({ path: join(directory, 'narrow.png'), fullPage: true })
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)
     assert.equal(overflow, false)
     assert.equal(errors.length, 0, errors.join('\n'))
