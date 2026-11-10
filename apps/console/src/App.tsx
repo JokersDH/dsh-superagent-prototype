@@ -63,6 +63,7 @@ import type {
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
 import { ProjectSettings } from './ProjectSettings.tsx'
+import { useReviewActivity } from './useReviewActivity.ts'
 import type { FixtureAdapter } from './fixture.ts'
 import { conversationId as defaultConversationId } from './config.ts'
 const phaseLabel: Record<WorkView['phase'], string> = {
@@ -578,6 +579,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const openQuestions = (snapshot?.questions ?? []).filter(question => !projectFilter ||
     snapshot?.works.some(work => work.work.id === question.contract.workId && work.work.projectId === projectFilter))
   const selectedQuestions = selectedWork ? openQuestions.filter(question => question.contract.workId === selectedWork.work.id) : openQuestions
+  const flushReviewActivity = useReviewActivity(transport, selectedWork?.actions.currentCandidate,
+    !!configuration?.reviewActivityAvailable && inspectorOpen && !modelPanelOpen && !!selectedWork?.actions.currentVerificationId)
   const activeWorks = works.filter(work => ['evaluating', 'queued', 'working', 'verifying', 'switching'].includes(work.phase))
   const projectName = projectFilter
     ? configuration?.projects.find(project => project.id === projectFilter)?.displayName ?? projectFilter
@@ -1085,6 +1088,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                   )
                 }}
                 onAccept={async (candidate: CandidateRef) => {
+                  await flushReviewActivity.current()
                   await send(
                     {
                       commandId: newId('cmd-accept'),

@@ -189,6 +189,92 @@
           "const": "execution-outcome/1",
           "type": "string"
         },
+        "reviewTiming": {
+          "additionalProperties": false,
+          "properties": {
+            "acceptedAt": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "activeReviewCompleteness": {
+              "enum": [
+                "partial",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            "activeReviewMs": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "activeReviewSource": {
+              "enum": [
+                "ui_visibility_proxy",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            "candidateReadyAt": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidenceRefs": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "maxItems": 128,
+              "readOnly": true,
+              "type": "array"
+            },
+            "readyToAcceptanceMs": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "candidateReadyAt",
+            "acceptedAt",
+            "readyToAcceptanceMs",
+            "activeReviewMs",
+            "activeReviewSource",
+            "activeReviewCompleteness",
+            "evidenceRefs"
+          ],
+          "type": "object"
+        },
         "usage": {
           "additionalProperties": false,
           "properties": {
@@ -317,6 +403,51 @@
         "inputDigest": {
           "pattern": "^[a-f0-9]{64}$",
           "type": "string"
+        },
+        "isolation": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "capsuleManifestDigest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "const": "sealed_copy",
+                  "type": "string"
+                },
+                "proofRef": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "proofRef",
+                "capsuleManifestDigest"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "native_read_only",
+                  "type": "string"
+                },
+                "proofRef": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "proofRef"
+              ],
+              "type": "object"
+            }
+          ]
         },
         "layer": {
           "enum": [
@@ -520,7 +651,6 @@
         "inputDigest",
         "reportDigest",
         "reportArtifactRef",
-        "readOnlyProofRef",
         "evidenceRefs",
         "layer",
         "disposition",

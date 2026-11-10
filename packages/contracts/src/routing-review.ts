@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { AttemptRefSchema, CandidateRefSchema, DigestSchema, EvidenceRefSchema, IdSchema, ScopeSchema, TimestampSchema, UsageObservedPayloadSchema } from './schemas.ts'
+import { ReviewTimingSchema } from './review-timing.ts'
 
 export const ExecutionProfileRefSchema = z.strictObject({ profileId: IdSchema, revision: z.number().int().positive().safe(), identityDigest: DigestSchema })
 const refKey = (ref: z.infer<typeof ExecutionProfileRefSchema>) => JSON.stringify([ref.profileId, ref.revision, ref.identityDigest])
@@ -41,11 +42,19 @@ export const RouteAdviceSchema = z.strictObject({
 /** A review never becomes a verification PASS or a human acceptance record. */
 export const ReviewEvidenceSchema = z.strictObject({ protocol: z.literal('review-evidence/1'), id: IdSchema,
   projectId: IdSchema, subject: ReviewSubjectSchema, reviewerProfileRef: ExecutionProfileRefSchema, reviewAttempt: AttemptRefSchema,
-  inputDigest: DigestSchema, reportDigest: DigestSchema, reportArtifactRef: IdSchema, readOnlyProofRef: EvidenceRefSchema,
+  inputDigest: DigestSchema, reportDigest: DigestSchema, reportArtifactRef: IdSchema,
+  /** Legacy native-readonly proof. New disposable capsules use isolation.kind=sealed_copy. */
+  readOnlyProofRef: EvidenceRefSchema.optional(),
+  isolation: z.discriminatedUnion('kind', [
+    z.strictObject({ kind: z.literal('sealed_copy'), proofRef: EvidenceRefSchema, capsuleManifestDigest: DigestSchema }),
+    z.strictObject({ kind: z.literal('native_read_only'), proofRef: EvidenceRefSchema }),
+  ]).optional(),
   evidenceRefs: refs, layer: EvidenceLayerSchema, disposition: z.enum(['findings', 'no_findings', 'inconclusive']), observedAt: TimestampSchema,
 }).refine(value => value.subject.candidate.contract.workId !== value.reviewAttempt.contract.workId &&
   value.subject.candidate.ticketId !== value.reviewAttempt.ticketId && value.subject.candidate.assignmentId !== value.reviewAttempt.assignmentId,
   'Review execution must not become the author candidate assignment')
+  .refine(value => (value.readOnlyProofRef !== undefined) !== (value.isolation !== undefined),
+    'Review needs exactly one isolation proof; a disposable copy does not claim native readonly enforcement')
 
 /** Observation references have one trusted producer; schema-valid JSON alone does not prove native execution. */
 export const ExecutionOutcomeSchema = z.strictObject({ protocol: z.literal('execution-outcome/1'), id: IdSchema,
@@ -53,6 +62,7 @@ export const ExecutionOutcomeSchema = z.strictObject({ protocol: z.literal('exec
   verificationRef: IdSchema.optional(), artifactDigest: DigestSchema.optional(), acceptance: z.enum(['not_requested', 'accepted', 'rejected', 'unknown']),
   acceptanceRef: EvidenceRefSchema.optional(), evidenceRefs: refs, layer: EvidenceLayerSchema, usage: UsageObservedPayloadSchema,
   durationMs: z.number().int().nonnegative().safe().optional(), observedAt: TimestampSchema,
+  reviewTiming: ReviewTimingSchema.optional(),
 }).superRefine((value, ctx) => {
   if (value.candidate && (value.candidate.assignmentId !== value.attempt.assignmentId || value.candidate.ticketId !== value.attempt.ticketId ||
     value.candidate.contract.workId !== value.attempt.contract.workId || value.candidate.contract.revision !== value.attempt.contract.revision ||

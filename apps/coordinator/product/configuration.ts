@@ -21,6 +21,7 @@ export interface ConfigurationSource {
   profiles: readonly Profile[]
   checks: ApplicationConfiguration['checks']
   enabledProfileIds: readonly string[]
+  reviewActivityAvailable?: boolean
 }
 
 /** The runtime supplies the actual admission list; a probe result alone never grants dispatch. */
@@ -63,6 +64,7 @@ export function applicationConfiguration(source: ConfigurationSource, now = Date
         : { blockedReason: expired ? ('stale_contract' as const) : project.blockedReason ?? ('unsupported_capability' as const) }),
     }
   })
-  const body = { protocol: CONFIGURATION_PROTOCOL, projects, profiles, checks: source.checks }
+  const body = { protocol: CONFIGURATION_PROTOCOL, projects, profiles, checks: source.checks,
+    ...(source.reviewActivityAvailable !== undefined ? { reviewActivityAvailable: source.reviewActivityAvailable } : {}) }
   return ApplicationConfigurationSchema.parse({ ...body, revision: canonicalDigest(JSON.parse(JSON.stringify(body))) })
 }

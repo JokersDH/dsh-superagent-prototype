@@ -26,6 +26,9 @@ test('review evidence cannot become the author assignment or carry an acceptance
   const attempt = record.reviewAttempt
   const valid = { ...record, reviewAttempt: attempt }
   assert.equal(ReviewEvidenceSchema.safeParse(valid).success, true)
+  const { readOnlyProofRef: _, ...capsule } = valid
+  assert.equal(ReviewEvidenceSchema.safeParse({ ...capsule, isolation: { kind: 'sealed_copy', proofRef: 'capsule-proof', capsuleManifestDigest: '3'.repeat(64) } }).success, true)
+  assert.equal(ReviewEvidenceSchema.safeParse({ ...valid, isolation: { kind: 'sealed_copy', proofRef: 'capsule-proof', capsuleManifestDigest: '3'.repeat(64) } }).success, false)
   for (const change of [{ disposition: 'PASS' }, { humanAcceptanceRef: 'forged' }, { readOnlyProofRef: undefined },
     { reviewAttempt: { ...attempt, contract } }]) assert.equal(ReviewEvidenceSchema.safeParse({ ...valid, ...change }).success, false)
 })

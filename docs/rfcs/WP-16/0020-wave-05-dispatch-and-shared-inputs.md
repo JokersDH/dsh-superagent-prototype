@@ -1,5 +1,7 @@
 # 第五轮派工与稳定消费输入
 
+**修订01优先：** [0021](0021-value-first-review-amendment.md) 与 [任务修订](../../../agent-tasks/product-wave-05/AMENDMENT-01.zh-CN.md) 将独立会话价值试点前置、单列E预算、密封副本设为默认、main/C先交注意力能力，并明确R0默认入口闸门。下文预算0、第二Driver先行及native只读硬前提仅记录原派工，不再覆盖新决定；其他共享接口与已测范围保留。
+
 日期2026-11-10。基线`21b9eef`。用户要求按修正后的架构方向继续安排A–E；本轮实施入口为 [product-wave-05](../../../agent-tasks/product-wave-05/README.zh-CN.md)，它将0019的“推荐＋只读复核”窄路径转成任务，不批准竞速、自动接受或新增模型额度。
 
 ## 1. 已检查的上一轮交付
@@ -24,8 +26,8 @@
 | RouteAdvice | project/source/task/catalog/policy绑定，eligible/excluded、精确建议、原因、时间/到期；仅none_eligible/only_eligible/operator_default/fixed_rule，无模型概率或measured_history |
 | ReviewSubject | author candidate＋artifactDigest＋baseCommit＋environmentRef＋checkPolicyRef |
 | ReviewReport | subjectDigest、findings/no_findings/inconclusive、summary、范围内path/line/severity/claim/reproduction、limitations；不是PASS，内容不变工具授权 |
-| ReviewEvidence | subject、reviewer profile、独立reviewAttempt、input/report摘要和reportArtifact、readonly proof/出处/layer；不接受humanAcceptance或作者assignment复用 |
-| ExecutionOutcome | attempt/profile/candidate与验证/接受引用、layer、usage完整性与可选duration；accepted需候选/产物/验证/接受/出处，不含“模型自评分正确率” |
+| ReviewEvidence | subject、reviewer profile、独立reviewAttempt、input/report摘要和reportArtifact、isolation/出处/layer；默认sealed_copy，兼容native_read_only或旧readonly proof；不接受humanAcceptance或作者assignment复用 |
+| ExecutionOutcome | attempt/profile/candidate与验证/接受引用、layer、usage完整性与可选duration/reviewTiming；accepted需候选/产物/验证/接受/出处，不含“模型自评分正确率” |
 | RoutingEvidencePort | advice/reviews/outcomes的同步put/get/list；project必需、有界cursor，review可按完整subject过滤、outcome可按精确profile过滤 |
 
 Schema拒绝重复/交叉eligible与excluded、选择未准入候选、虚假单候选basis、无出处的推荐、失效时间、把review变PASS/接受及错attempt的outcome。数据写入仍只由main可信producer或自有隔离fixture调用A port；不增加任意客户端写证据入口。

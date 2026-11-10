@@ -1,5 +1,7 @@
 # Agent D：个人试用发行与第二执行器诊断
 
+**先读 [修订01](AMENDMENT-01.zh-CN.md)。** 当前个人版发行/恢复继续；第二Driver安装平台等pilot后再扩。支持一次性无共享Git/链接的材料副本，默认不备份运行scratch或凭据；最终report/原始manifest来源按A引用清单保存。未过R0的推荐/复核只能显式实验入口、默认关闭，安装物不得静默启用。
+
 沿用D目录/分支，拥有launcher/distribution/portability。最终候选`bf85594`自报45步smoke仍是候选，尚未经main整包准入。模型预算0。先合并main并读取第五轮README/0020。
 
 ## D1 关闭恢复项目绑定阻断并复验旧整改

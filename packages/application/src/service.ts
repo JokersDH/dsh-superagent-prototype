@@ -62,6 +62,7 @@ export interface CompletionReviewPort {
     candidate: CandidateRef,
   ): { proposal: CompletionProposal; verification: Verification; artifactIds: readonly string[] } | undefined
   accept(proposal: CompletionProposal, actor: TrustedActor, criterionIds: readonly string[], acceptanceId: string): void
+  onAccepted?(candidate: CandidateRef, actor: TrustedActor, acceptedAt: string): void
 }
 export interface ApplicationOptions {
   store: ProductStore
@@ -632,6 +633,7 @@ class LocalApplication implements ProductApplication {
         ...review.proposal,
         ...(humanCriteria.length ? { humanAcceptanceRef: acceptanceId } : {}),
       })
+      this.options.completion?.onAccepted?.(candidate, actor, this.now())
       this.emit(workId)
       return { workId }
     }

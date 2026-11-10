@@ -2,9 +2,11 @@
 
 日期2026-11-10，输入基线`21b9eef`及本轮main检查点；开工合并最新`origin/main`。用户已要求按修正后的方向继续分工。本轮是正式实施包，取代wave-04的新派工；保留历史测试范围、剩余缺口和所有模型账本。
 
+**修订01优先：先读 [价值试点与注意力修订](AMENDMENT-01.zh-CN.md)。** 当前Codex的独立新会话价值试点先于新增第二Driver；一次性密封副本默认；main/C先交跨项目注意力工作台。未过R0准入的推荐/复核默认关闭，只走显式实验入口。下文第二协议阶段都受该闸门约束。
+
 ## 本轮用户可见出口
 
-主对话描述目标 → 看推荐执行器/排除理由及是否附加复核 → 明确确认 → 原Agent开发和注册检查 → 停止并冻结候选 → 第二真实协议在证明的只读权限下复核 → 展示发现/依据/不足 → 按原合同人工接受。
+本轮首出口：普通个人版闭环＋跨项目待办/截止/批量审阅＋独立会话复核价值初筛。初筛promising后，后续可扩展为主对话目标 → 推荐/确认 → 原Agent开发/检查/冻结 → 密封副本复核 → 人工审阅；第二真实协议是后续兼容能力，不是价值初筛前提，也不自动进入默认路径。
 
 首版推荐基于准入和固定规则，不是学习型“最优路由”。只一个合格执行器就明确only_eligible；只有受控数据就标controlled。复核没有发现不等于证明正确，机器FAIL和必需人工条款不被复核意见覆盖。
 
@@ -18,7 +20,7 @@
 | B | [第二执行器与只读运行](agent-b-second-driver.zh-CN.md) | execution/driver-kit/testing/catalog/policy-preparation、runner、drivers、native-acceptance；最小真实协议＋运行证明 |
 | C | [推荐和复核规则](agent-c-routing.zh-CN.md) | context/proposals/knowledge及新packages/routing；先闭合决定接线，再做纯推荐和证据有效性 |
 | D | [可迁移发行与诊断](agent-d-trial.zh-CN.md) | launcher/distribution/portability；当前发行准入、第二执行器打包/doctor和新目录试用 |
-| E | [独立验收与收益评估](agent-e-evaluation.zh-CN.md) | 只拥有product-acceptance；负例/产品纵向/安装和等预算评估工具 |
+| E | [独立验收与前置价值试点](agent-e-evaluation.zh-CN.md) | 只拥有product-acceptance；先独立会话三组小额试点，再负例/产品/安装/评估 |
 | 主线 | [集成](main.zh-CN.md) | contracts/application/questions/coordinator/console/root lock；公共接口、权限、唯一调度与产品接线 |
 
 B本轮显式接手catalog、policy-preparation、execution及新增协议Driver路径；main不并发修改这些源码。B不能改coordinator/console/contracts。C不能改Catalog准入事实或SQL。E不改生产代码，其他人不改E断言。
@@ -55,8 +57,8 @@ B本轮显式接手catalog、policy-preparation、execution及新增协议Driver
 
 ## 阶段依赖与持续工作
 
-1. A先交证据port；B先交版本绑定的profile/driver消费接口与协议/只读证据探针；C先交决定接线修复。三者发布源码checkpoint后直接继续整包。
-2. C可立即用同schema的fixture实现推荐/有效性；E可立即实现独立反例；D先消费main恢复修复并验证已交发行物，不必等新Driver才工作。
+1. E先准备并执行协议允许的小额独立会话价值试点；main/C同时交注意力视图，A只补必要计时/出处，B先提供现有Codex session/checkpoint和材料隔离消费入口，C原事务缺口仍先闭合。
+2. 第二协议先零模型发现/接口，新增Driver实现等promising闸门；C推荐只做有界fixture，不扩学习/平台。D继续个人发行，E验R0和注意力不等新Driver。
 3. main消费checkpoint逐段接线；B的真实第二协议和D安装由E在已提交产物上验，功能未到就明确NOT_TESTED，不修改断言或造生产替代实现。
 4. 每包五个连续阶段，不逐缺陷等用户批准。遇缺口交最小复现/RFC/owner后继续独立项。全部可执行项完成或仅剩明确外部依赖时统一交接，不无限轮询/空转。
 
@@ -64,8 +66,8 @@ B本轮显式接手catalog、policy-preparation、execution及新增协议Driver
 
 ## 模型与费用边界
 
-main/A/C/D/E模型任务0；受控/mock只用本机。B不新增额度：沿用原`wave03-b-native` limit4，报告used0、历史其它批次used3分别保留，开工按实际ledger/unknown重新核对。所有会触发模型的直接Driver/SDK/CLI入口也要先持久预留。
+main/A/C/D日常开发模型任务0；E除单独`wave05-independent-review-pilot-01`外仍为0。该grant上限24个有界turn、20万计费token、5美元，三者任一先到停，价格/用量无法有界核算就BLOCKED，详见预注册protocol.json。它独立于B，不自动补失败样本；本次真实调用0。
 
-B在核实剩余原额度且安全前置检查通过后，优先分配给一次当前Codex控制缺口、一次真实第二协议只读复核、一次第二协议只读拒写/停止目标；最多使用原剩余量，未知发送先核对，不能换ID重跑；余量不是必须花完。此任务包不刷新日期/phase预算，不让E代跑，不增设新grant。额度或本机条件不足时继续交完整受控实现并标真实路径NOT_TESTED。
+B仍不新增额度，只保留并核对原wave03 grant及全部used/unknown/历史账。pilot前可用原剩余量关闭已有Codex控制缺口，但不得用B额度执行独立价值试点或提前铺第二Driver。pilot后若需第二协议实测，仍只能按已核实的原余额和相应前置检查执行，不刷新日期/phase，不借E新试点额度。
 
-收益实验此轮先交固定预算、数据隔离和负例工具。大样本实际模型对照需另立预算，不能以“创新验证”名义隐式开启。
+小额三组初筛本轮前置，大样本实际模型对照仍另立预算。初筛不是统计证明，缺arm/usage/隔离证据不能伪造结论；新Driver投入按AMENDMENT-01明确go/no-go/inconclusive。

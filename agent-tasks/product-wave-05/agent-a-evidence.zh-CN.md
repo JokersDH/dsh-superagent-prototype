@@ -1,5 +1,7 @@
 # Agent A：路由、复核与结果的证据持久层
 
+**先读 [修订01](AMENDMENT-01.zh-CN.md)。** 先补R0及当前观测所需最小计时/来源，关联main新`application.candidate.accepted`中的ReviewTiming；等待时长和UI代理分开，unknown保留null。pilot闸门前不扩通用历史reward/分析仓库；新ReviewEvidence支持sealed_copy隔离，不能沿用仅readOnlyProofRef的硬过滤。
+
 沿用A目录/分支，拥有storage/workflows和唯一迁移。先合并main，读取第五轮README/0020和contracts routing-review。旧v11/v12已集成，不重复实现AssistantState或成员索引。模型任务0。
 
 ## A1 稳定证据port与追加迁移

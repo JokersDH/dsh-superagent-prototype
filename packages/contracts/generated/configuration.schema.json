@@ -365,6 +365,9 @@
       "const": "application-configuration/1",
       "type": "string"
     },
+    "reviewActivityAvailable": {
+      "type": "boolean"
+    },
     "revision": {
       "pattern": "^[a-f0-9]{64}$",
       "type": "string"

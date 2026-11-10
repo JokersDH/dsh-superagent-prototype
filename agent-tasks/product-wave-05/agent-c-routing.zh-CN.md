@@ -1,5 +1,7 @@
 # Agent C：完整决定事务、解释型推荐与复核有效性
 
+**先读 [修订01](AMENDMENT-01.zh-CN.md)。** C1修事务后，C2优先交无需模型的注意力排序/分组给main；完整路由/第二协议规则仅做有界fixture，等独立价值试点结果后决定继续。不要把sealed_copy误判为“缺native禁写能力”。
+
 沿用C目录/分支，拥有context/proposals/knowledge及新`packages/routing/`。先合并main，读第五轮README/0020/0019；shared routing-review是唯一记录parser/type。模型预算0；不自建LLM循环、SQL或执行器。
 
 ## C1 先闭合真实存储接线
@@ -8,11 +10,15 @@
 
 交决定只读prepare＋同步commit/revoke消费入口，main同步UnitOfWork里可与receipt/event原子提交。prepare不写，commit重验来源digest/conversation、actor/project/grant/scope和版本；不能在事务里await或事务外先写后补回执。先交该checkpoint后继续C2–C5。
 
-## C2 EvidenceEligibility纯模块
+## C2 注意力排序先交，准入过滤保持纯模块
+
+提供`rankAttention`纯接口与fixture：跨项目问题/候选接受/故障阻断，按真实截止、阻塞关系、等待年龄和问题类别排序，并给可解释原因。缺业务deadline为unknown，不把expiresAt等同业务截止；已过期问题无可发送答案动作。main做聚合读取和工作台，不等pilot或第二Driver。
+
+批量审阅只分组和导航，不合并权限/认证授权或自动替用户作答。覆盖混合项目/另actor/旧问题与候选/截止过期/无截止/同分稳定排序，E可独立构造反例。交早期导出后继续纯Eligibility。
 
 新routing包提供小接口评估B已准入的精确profile、相关能力证明、当前project授权、预算/用途与配置指纹。输出eligible或稳定排除理由/证据；不修改Catalog准入，不读取凭据或调用模型。
 
-actual_native与mock层分开；单字段readiness/native品牌不能越过缺身份/过期/readonly证明。项目/政策/driver/native/model已知身份变化失效，缺证据返回unknown/排除，不推定低费用或低质量。缺可证明只读能力不能当reviewer。
+actual_native与mock层分开；native品牌不能越过身份/有效性/隔离证明。默认sealed_copy只要求实际胶囊/host范围证明，不要求native禁止写副本；native_read_only替代路径仍要证明。缺隔离/数据外发授权返回unknown/排除，不推定低费用或低质量。
 
 ## C3 RouteAdvisor冷启动建议
 

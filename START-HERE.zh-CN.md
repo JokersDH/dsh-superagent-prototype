@@ -1,6 +1,8 @@
 # 从这里开始：仓库、代码位置和并行开发
 
-**当前派工：[第五轮证据路由与第二执行器只读复核](agent-tasks/product-wave-05/README.zh-CN.md)。** A证据存储，B真实第二协议/readonly证明，C决定接线与推荐规则，D个人发行迁移，E独立验收与等预算评估，main统一产品接线。公共记录和恢复项目绑定修复已交；先读 [0020稳定输入](docs/rfcs/WP-16/0020-wave-05-dispatch-and-shared-inputs.md)。沿用原目录/分支，旧缺口先闭合，不竞速、不自动接受、不刷新模型预算。
+**第五轮修订01优先：[价值试点、密封副本与注意力工作台](agent-tasks/product-wave-05/AMENDMENT-01.zh-CN.md)。** 先用当前Codex做不复核/续会话自查/全新会话复核三arm初筛；E独立小额grant不挤B，第二Driver投资等初筛结果。main/C先交无需模型的注意力视图；新推荐/复核在R0未准入前仅实验、默认关闭。采集代码开始记录候选等待和部分UI审阅活动代理，见 [0021](docs/rfcs/WP-16/0021-value-first-review-amendment.md)。
+
+**当前派工：[第五轮任务包](agent-tasks/product-wave-05/README.zh-CN.md)，先读上面的修订01。** A必要证据与计时，B现有控制/session/胶囊边界，C决定闭环与注意力规则，D个人发行迁移，E独立复核初筛和验收，main注意力UI与公共集成。公共记录和恢复项目绑定修复已交；接口见 [0020稳定输入](docs/rfcs/WP-16/0020-wave-05-dispatch-and-shared-inputs.md)。沿用原目录/分支，旧缺口先闭合；第二Driver等价值闸门，不竞速、不自动接受，旧预算不刷新。
 
 **A/C第四轮源码已继续集成：** 会话目录改用持久成员索引；C原三项准入问题已通过。实际SQLite提案/决定联调6项通过、同一决定重放1项失败，完整助理功能保持关闭；详见 [0018联调](docs/rfcs/WP-16/0018-assistant-storage-consumer.md) 与 [C接线补充](agent-tasks/product-wave-04/c-integration-followup.zh-CN.md)。
 

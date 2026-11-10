@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
 import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
-import type { ConversationCommand, NativeQuestionBinding, ProjectSettingsCommand, Scope, TrustedActor } from '@personal-agent/contracts'
+import type { ConversationCommand, NativeQuestionBinding, ProjectSettingsCommand, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { CheckRegistry } from '@personal-agent/verification'
@@ -20,6 +20,7 @@ import type { NativeProductConfiguration } from './native-config.ts'
 import type { NativeProjectRegistry } from './project-registry.ts'
 import { ProductEnvironments } from './environments.ts'
 import { ProductProjectSettings } from './project-settings.ts'
+import { ProductReviewTiming } from './review-timing.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -125,6 +126,8 @@ export function createProductRuntime(
       : nativeProjects.find(project => project.id === contract.scope.projectId) : undefined,
   )
   const { store } = options
+  const reviewTiming = new ProductReviewTiming(store, application, completion, options.principal, () => configuredProjects.map(project => project.id))
+  completion.onAccepted = (candidate, actor, at) => reviewTiming.accepted(candidate, actor, at)
   const conversations = new ApplicationConversations(store, options.principal, () => configuredProjects.map(project => project.id), options.actionSecret)
   const assistantStreams = new AssistantStreams()
   if (options.assistantProvider)
@@ -271,6 +274,7 @@ export function createProductRuntime(
         checks: [...new Set([FIXTURE_CHECK, ...currentNative.map(project => project.check.id)])]
           .map((id) => ({ id, revision: checks.require(id).revision, displayName: checks.require(id).title ?? id })),
         enabledProfileIds: [...(options.native ? [options.native.profile.id] : []), ...FIXTURE_PROFILES],
+        reviewActivityAvailable: options.startupMode !== 'recovery_readonly',
       })
       return configuration
     },
@@ -313,6 +317,7 @@ export function createProductRuntime(
     read,
     projectSettings,
     operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor),
+      reviewActivity: async (activity: ReviewActivity, actor: TrustedActor) => reviewTiming.record(activity, actor),
       ...(projectSettings ? { projectSettings: (command: ProjectSettingsCommand, actor: TrustedActor) => projectSettings.dispatch(command, actor) } : {}) },
     start: () => {
       if (options.startupMode === 'recovery_readonly')

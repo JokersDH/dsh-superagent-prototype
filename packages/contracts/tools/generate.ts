@@ -11,6 +11,7 @@ import { WorkVerificationStatusSchema, VerificationRetryCommandSchema } from '..
 import { ConversationSummarySchema, ConversationCatalogQuerySchema, ConversationCatalogSchema, ConversationCommandSchema } from '../src/conversations.ts';
 import { ProjectSettingsVersionSchema, ProjectSettingsPageSchema, ProjectSettingsCommandSchema } from '../src/project-settings.ts';
 import { ExecutionProfileRefSchema, ReviewSubjectSchema, ReviewReportSchema, RouteAdviceSchema, ReviewEvidenceSchema, ExecutionOutcomeSchema } from '../src/routing-review.ts';
+import { ReviewTimingSchema, ReviewActivitySchema } from '../src/review-timing.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -58,6 +59,9 @@ outputs.set('generated/project-settings.manifest.json', canonical({ protocol: 'p
 const routingReviewText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:routing-review:1', $defs: { ExecutionProfileRef: z.toJSONSchema(ExecutionProfileRefSchema, { target: 'draft-2020-12', io: 'input' }), ReviewSubject: z.toJSONSchema(ReviewSubjectSchema, { target: 'draft-2020-12', io: 'input' }), ReviewReport: z.toJSONSchema(ReviewReportSchema, { target: 'draft-2020-12', io: 'input' }), RouteAdvice: z.toJSONSchema(RouteAdviceSchema, { target: 'draft-2020-12', io: 'input' }), ReviewEvidence: z.toJSONSchema(ReviewEvidenceSchema, { target: 'draft-2020-12', io: 'input' }), ExecutionOutcome: z.toJSONSchema(ExecutionOutcomeSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/routing-review.schema.json', routingReviewText);
 outputs.set('generated/routing-review.manifest.json', canonical({ protocol: 'routing-review/1', schemaHash: digest(routingReviewText), sourceHash: digest(readFileSync(resolve(root, 'src/routing-review.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const reviewTimingText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:review-timing:1', $defs: { ReviewTiming: z.toJSONSchema(ReviewTimingSchema, { target: 'draft-2020-12', io: 'input' }), ReviewActivity: z.toJSONSchema(ReviewActivitySchema, { target: 'draft-2020-12', io: 'input' }) } });
+outputs.set('generated/review-timing.schema.json', reviewTimingText);
+outputs.set('generated/review-timing.manifest.json', canonical({ protocol: 'review-timing/1', schemaHash: digest(reviewTimingText), sourceHash: digest(readFileSync(resolve(root, 'src/review-timing.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [path, content] of outputs) {
   const target = resolve(root, path);
   if (check) {
