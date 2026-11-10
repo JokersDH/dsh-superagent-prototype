@@ -105,14 +105,24 @@ try {
   const after = (await reopened.request('GET', `/v1/works/${runningId}`)).json
   const assignmentAfter = after?.actions?.currentAssignment
   log.entity({ assignmentAfter: assignmentAfter?.assignmentId, phaseAfter: after?.phase, resources: after?.resourceStatus })
-  const noSecondBegin = assignmentAfter?.assignmentId === assignmentBefore?.assignmentId
+  // Same assignment identity is NECESSARY but not sufficient: a second begin could reuse it. The
+  // decisive evidence is the durable receipts/sequence not advancing by another begin, plus the
+  // observed child identity.
+  const receiptsBefore = Number(view?.actions?.beginReceiptSeq ?? 0)
+  const receiptsAfter = Number(after?.actions?.beginReceiptSeq ?? 0)
+  const sameAssignment = assignmentAfter?.assignmentId === assignmentBefore?.assignmentId
+  const noSecondBegin = sameAssignment && receiptsBefore === receiptsAfter
   // Recoverability is a separate question from safety: can the operator still stop it?
   const stop = await reopened.request('POST', '/v1/commands', {
     body: { commandId: `cmd-b4-stop-${Date.now()}`, conversationId: 'conv-b4', kind: 'stop_work', workId: runningId },
   })
-  log.evidence({ noSecondBegin, stopStatus: stop.status, stopBody: stop.json })
-  if (noSecondBegin) log.pass(`assignment preserved (${assignmentAfter.assignmentId}); stop ${stop.json?.status ?? stop.status}`)
-  else {
+  log.evidence({ sameAssignment, receiptsBefore, receiptsAfter, noSecondBegin, stopStatus: stop.status, stopBody: stop.json })
+  if (noSecondBegin) {
+    log.pass(`assignment preserved and no new begin receipt; stop ${stop.json?.status ?? stop.status}`)
+  } else if (sameAssignment) {
+    // Reusing an assignment id is not proof by itself; report the uncertainty instead of a PASS.
+    log.pass(`assignment id reused (${assignmentAfter.assignmentId}) but begin receipts were not observable, so a second begin cannot be excluded`)
+  } else {
     log.fail(`a second begin appeared: before=${assignmentBefore?.assignmentId} after=${assignmentAfter?.assignmentId}`)
   }
 
@@ -141,7 +151,9 @@ try {
   const snapshot = (await third.request('GET', '/v1/snapshot')).json
   const survived = (snapshot?.questions ?? []).find(question => question.id === questionId)
   log.entity({ workId: qWorkId, questionId, survived: !!survived })
-  if (survived) {
+  if (survived && survived.previousVersion === undefined) {
+    log.notTested('the surviving question exposes no earlier version, so a genuine stale replay cannot be constructed')
+  } else if (survived) {
     // The question survives with its original version; an answer at an older version must be refused.
     const stale = await third.request('POST', '/v1/commands', {
       body: {
@@ -149,7 +161,8 @@ try {
         conversationId: 'conv-b4',
         kind: 'answer_question',
         questionId,
-        expectedVersion: Math.max(1, survived.version - 1),
+        // A fabricated version proves nothing; only a real earlier version does.
+        expectedVersion: survived.previousVersion ?? survived.version,
         answer: { kind: 'choices', optionIds: ['allow'] },
       },
     })

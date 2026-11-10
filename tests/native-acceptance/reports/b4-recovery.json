@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-10T04:56:49.901Z",
+  "generatedAt": "2026-11-10T07:20:11.222Z",
   "environment": {
     "platform": "darwin/arm64",
     "node": "v24.21.0",
@@ -36,30 +36,33 @@
       "lane": "fixture",
       "status": "PASS",
       "detail": [
-        "assignment preserved (5627a2517a0d7f8c0977876f4da51e27); stop recorded"
+        "assignment preserved and no new begin receipt; stop recorded"
       ],
       "evidence": [
         {
+          "sameAssignment": true,
+          "receiptsBefore": 0,
+          "receiptsAfter": 0,
           "noSecondBegin": true,
           "stopStatus": 200,
           "stopBody": {
-            "commandId": "cmd-b4-stop-1794286608799",
-            "workId": "76f59bf6437e2307e549fb94dde19d93",
-            "seq": 26,
+            "commandId": "cmd-b4-stop-1794295209588",
+            "workId": "e971137175f8932865b1e06111d4191c",
+            "seq": 12,
             "status": "recorded"
           }
         }
       ],
       "entities": [
         {
-          "workId": "76f59bf6437e2307e549fb94dde19d93",
-          "assignmentBefore": "5627a2517a0d7f8c0977876f4da51e27",
+          "workId": "e971137175f8932865b1e06111d4191c",
+          "assignmentBefore": "f1d199555306972a902dd7b56e303270",
           "phase": "queued"
         },
         {
-          "assignmentAfter": "5627a2517a0d7f8c0977876f4da51e27",
-          "phaseAfter": "verifying",
-          "resources": "quiescent"
+          "assignmentAfter": "f1d199555306972a902dd7b56e303270",
+          "phaseAfter": "stopping",
+          "resources": "indeterminate"
         }
       ]
     },
@@ -79,8 +82,8 @@
       ],
       "entities": [
         {
-          "workId": "a597e58b208c2ba11107ff54c735a254",
-          "questionId": "6dde525a5e74ea985b418ba9d9ec7e68",
+          "workId": "bcbe57367a5a3c10a86b882e98f0e605",
+          "questionId": "786bff8da239d69efc3c97adfbf216b4",
           "survived": false
         }
       ]
