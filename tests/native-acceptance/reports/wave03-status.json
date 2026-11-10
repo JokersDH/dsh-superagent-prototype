@@ -3,12 +3,56 @@
   "branch": "codex/g1-runtime",
   "base": "c3f018e",
   "ownedPaths": ["apps/runner/", "packages/drivers/codex-native/", "packages/driver-kit/", "packages/testing/", "tests/native-acceptance/"],
-  "modelBudget": { "grantId": "wave03-b-native", "limit": 4, "used": 0, "ledger": "tests/native-acceptance/reports/model-budget.json", "note": "historical rounds keep their own ledger; this grant does not grow on retry/date/phase change" },
+  "modelBudget": {
+    "grantId": "wave03-b-native",
+    "limit": 4,
+    "used": 0,
+    "ledger": "tests/native-acceptance/reports/model-budget.json",
+    "note": "this grant is untouched: every phase in this package ran with zero model calls; historical rounds keep their own ledgers"
+  },
   "phases": {
-    "B1": { "status": "passed", "commit": "pending", "deliverables": ["docs/rfcs/WP-03/0001-native-control-admission-interface.md", "tests/native-acceptance/b1-vertical.mjs", "tests/native-acceptance/budget.mjs"], "measured": "5/5 PASS, zero model calls" },
-    "B2": { "status": "pending" },
-    "B3": { "status": "pending" },
-    "B4": { "status": "pending" },
-    "B5": { "status": "pending" }
-  }
+    "B1": {
+      "status": "passed",
+      "commit": "7be040e",
+      "deliverables": ["docs/rfcs/WP-03/0001-native-control-admission-interface.md", "tests/native-acceptance/b1-vertical.mjs", "tests/native-acceptance/budget.mjs"],
+      "measured": "5/5 PASS, zero model calls",
+      "note": "admission facts, schema-400 vs business rejection separation, single assignment owning the candidate, stop reporting the owned-inventory verdict (including an honest indeterminate), and a budget ledger that refuses an over-limit task"
+    },
+    "B2": {
+      "status": "passed",
+      "commit": "29f7f4a",
+      "measured": "6/6 PASS, zero model calls",
+      "cases": ["B2-ACTIVE-WRITER", "B2-GROUP-STOP", "B2-DESCENDANT", "B2-IGNORES-TERM", "B2-UNKNOWN-IDENTITY", "B2-CLOSED-ADMISSION"],
+      "note": "no ACK/phase/port count is used as stop evidence; only observed group stillness plus the trusted inventory verdict counts"
+    },
+    "B3": {
+      "status": "passed",
+      "commit": "42667e7",
+      "measured": "6/6 PASS, zero model calls",
+      "cases": ["B3-QUESTION-CREATED", "B3-STALE-VERSION", "B3-LEGAL-ANSWER", "B3-DUPLICATE-ANSWER", "B3-STOPPED-WORK", "B3-UNKNOWN-TARGET"],
+      "note": "persisted (recorded + delivery record) is observed separately from applied; answers are built from the shared contract"
+    },
+    "B4": {
+      "status": "partially_passed",
+      "commit": "98db520",
+      "measured": "3 PASS / 1 NOT_TESTED, zero model calls",
+      "passed": ["B4-WINDOW-IDLE", "B4-WINDOW-RUNNING (assignment preserved across SIGKILL, stop still recorded)", "B4-CAPABILITIES"],
+      "notTested": ["B4-WINDOW-QUESTION: no question became visible before the kill on this instance"],
+      "note": "safety (no second begin/writer) and recoverability (stop still actionable) are reported separately"
+    },
+    "B5": {
+      "status": "passed",
+      "commit": "pending",
+      "regressions": { "driver-kit": 18, "testing": 8, "apps/runner": 132, "codex-native": 35, "total": 193, "fail": 0 },
+      "harness": { "selftest": "14/14", "reviewGuards": "PASS_ACCEPTANCE_GUARDS_ONLY" },
+      "matrices": { "b1Vertical": "5/5", "b2Stop": "6/6" }
+    }
+  },
+  "notTested": [
+    "real native active-writer stop (no native run was started in this package; the native budget is untouched)",
+    "native question/permission prompt (on-request policy raised none in the verifiable runs)",
+    "B4 question/answer restart window (no question visible before the kill)",
+    "environment policy projection (the published configuration reports environmentPolicy=false)"
+  ],
+  "blockers": "none outstanding for the owned scope; the environment policy projection is main-owned and not yet published"
 }
