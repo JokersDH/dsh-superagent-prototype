@@ -2,18 +2,81 @@
   "role": "A",
   "package": "packages/environment-preparation",
   "branch": "codex/g2-workspaces-verification",
-  "mainBaseCommit": "5bbd892",
-  "mergeCommit": "7baeb67",
+  "mainBaseCommit": "f2ca26c",
+  "mergeCommit": "f35fa29",
   "stableApiCheckpoint": "8dcbdce",
-  "testedSourceCommit": "8a5ded364fbc29ccc33ad72a8be46ec06a5d87e5",
-  "updatedAt": "2026-11-09T11:30:00.000Z",
+  "testedSourceCommit": "f8272ac",
+  "updatedAt": "2026-11-09T22:05:00.000Z",
   "phases": [
-    { "phase": "A1", "priority": "P0", "status": "passed", "evidence": ["reports/admission-probe.json", "pkg-test:31/31"], "note": "five main admission cases PASS; nested links, drift fingerprint, hooks, semver and unowned cleanup regression-covered" },
-    { "phase": "A2", "priority": "P0", "status": "passed", "evidence": ["pkg-test: signed receipt/verify/cleanup cases", "reports/report.md"], "note": "HMAC authority receipts, cross-process verify/cleanup, forged/replaced/drift refusal; v1 markers never trusted" },
-    { "phase": "A3", "priority": "P0", "status": "passed", "evidence": ["pkg-test: process port/lock/cancel/disk cases"], "note": "one installer lock with ESRCH-only stale recovery, injected port quiescence, probe/install cancellation, disk monitoring, interrupted state blocked" },
-    { "phase": "A4", "priority": "P1", "status": "passed", "evidence": ["pkg-test: inspect cases", "src/inspect.ts"], "note": "read-only inspect + parser, Chinese codes/suggestions, cache sufficiency unknown, no installer/hooks/writes" },
-    { "phase": "A5", "priority": "P1", "status": "passed", "evidence": ["recipes/", "examples/", "reports/performance.json"], "note": "plain-js/dev-deps offline recipes, consumer prepare/verify/cleanup in two processes, lost-ref recovery, performance measurements" },
-    { "phase": "A6", "priority": "P2", "status": "passed_package_local", "evidence": ["pkg-test: workspace cases"], "note": "restricted pnpm workspace app workspace:* lib: offline install/test/verify; external links, globs, symlink members and peer blocked; business patch excludes only env dirs" }
+    {
+      "phase": "A1",
+      "priority": "P0",
+      "status": "passed",
+      "evidence": [
+        "reports/admission-probe.json",
+        "pkg-test:31/31"
+      ],
+      "note": "five main admission cases PASS; nested links, drift fingerprint, hooks, semver and unowned cleanup regression-covered"
+    },
+    {
+      "phase": "A2",
+      "priority": "P0",
+      "status": "passed",
+      "evidence": [
+        "pkg-test: signed receipt/verify/cleanup cases",
+        "reports/report.md"
+      ],
+      "note": "HMAC authority receipts, cross-process verify/cleanup, forged/replaced/drift refusal; v1 markers never trusted"
+    },
+    {
+      "phase": "A3",
+      "priority": "P0",
+      "status": "passed",
+      "evidence": [
+        "pkg-test: process port/lock/cancel/disk cases"
+      ],
+      "note": "one installer lock with ESRCH-only stale recovery, injected port quiescence, probe/install cancellation, disk monitoring, interrupted state blocked"
+    },
+    {
+      "phase": "A4",
+      "priority": "P1",
+      "status": "passed",
+      "evidence": [
+        "pkg-test: inspect cases",
+        "src/inspect.ts"
+      ],
+      "note": "read-only inspect + parser, Chinese codes/suggestions, cache sufficiency unknown, no installer/hooks/writes"
+    },
+    {
+      "phase": "A5",
+      "priority": "P1",
+      "status": "passed",
+      "evidence": [
+        "recipes/",
+        "examples/",
+        "reports/performance.json"
+      ],
+      "note": "plain-js/dev-deps offline recipes, consumer prepare/verify/cleanup in two processes, lost-ref recovery, performance measurements"
+    },
+    {
+      "phase": "A6",
+      "priority": "P2",
+      "status": "passed_package_local",
+      "evidence": [
+        "pkg-test: workspace cases"
+      ],
+      "note": "restricted pnpm workspace app workspace:* lib: offline install/test/verify; external links, globs, symlink members and peer blocked; business patch excludes only env dirs"
+    },
+    {
+      "phase": "A-R1",
+      "priority": "P0",
+      "status": "passed",
+      "evidence": [
+        "reports/admission-probe.json",
+        "pkg-test:34/34"
+      ],
+      "note": "blocked/stale/reuse cleanup only from signed receipts or in-process captured identities; EPERM/other group observation stays unknown; merged stdout+stderr byte budget clips whole UTF-8 characters; 8 official admission cases PASS at f8272ac"
+    }
   ],
   "commands": [
     "node <primary>/tools/bootstrap/review-environment-preparation.mjs --environment $PWD",
@@ -25,8 +88,8 @@
     "node examples/verify-consumer.mjs --ref <ref> [--cleanup]"
   ],
   "results": {
-    "packageTests": "31/31",
-    "admissionProbe": "PASS_ENVIRONMENT_ADMISSION",
+    "packageTests": "34/34",
+    "admissionProbe": "PASS_ENVIRONMENT_ADMISSION (8/8 at f8272ac)",
     "typecheck": "PASS",
     "build": "PASS",
     "performance": "reports/performance.json"
