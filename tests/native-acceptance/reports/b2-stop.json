@@ -1,0 +1,123 @@
+{
+  "generatedAt": "2026-11-10T04:33:18.083Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "B2 stop matrix (controlled)",
+    "modelCalls": 0,
+    "workRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-b2-stop-TyCcoT"
+  },
+  "totals": {
+    "cases": 6,
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "B2-ACTIVE-WRITER",
+      "title": "a long-running writer is proven active before the stop",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "writing (207 bytes) under pid 56148"
+      ],
+      "evidence": [
+        {
+          "pid": 56148,
+          "bytesBefore": 207
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B2-GROUP-STOP",
+      "title": "the whole group stops and the file stops growing",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "group gone and the file stopped growing"
+      ],
+      "evidence": [
+        {
+          "pid": 56148,
+          "sizeAfterTerm": 207,
+          "grewAfter": false,
+          "groupAlive": false
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B2-DESCENDANT",
+      "title": "a normal descendant stops with the group",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "descendant stopped writing with the group"
+      ],
+      "evidence": [
+        {
+          "parentPid": 56160,
+          "childActive": true,
+          "childBytes": 102,
+          "stillGrowing": false
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B2-IGNORES-TERM",
+      "title": "a TERM-ignoring writer is escalated, not reported stopped",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "TERM ignored (not a stop), SIGKILL required and confirmed"
+      ],
+      "evidence": [
+        {
+          "survivedTerm": true,
+          "goneAfterKill": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B2-UNKNOWN-IDENTITY",
+      "title": "an unknown identity yields an indeterminate verdict",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "unknown resource reported as indeterminate"
+      ],
+      "evidence": [
+        {
+          "missing": {
+            "quiescence": "indeterminate",
+            "evidenceRefs": [
+              "unknown-resource"
+            ]
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B2-CLOSED-ADMISSION",
+      "title": "a closed admission refuses new writers",
+      "lane": "controlled",
+      "status": "PASS",
+      "detail": [
+        "admission closure is enforced (or not applicable)"
+      ],
+      "evidence": [
+        {
+          "refused": true
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
