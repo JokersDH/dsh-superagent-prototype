@@ -12,6 +12,7 @@ export type ProposalErrorCode =
   | 'proposal_mutated'
   | 'proposal_not_pending'
   | 'barrier_blocked'
+  | 'stale_authorization'
   | 'invalid_expiry'
 
 export class ProposalError extends Error {

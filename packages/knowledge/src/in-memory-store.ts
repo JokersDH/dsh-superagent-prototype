@@ -2,6 +2,7 @@ import { canonicalDigest } from '@personal-agent/contracts/canonical'
 import { UserDecisionSchema } from '@personal-agent/contracts'
 import type { Json, UserDecision } from '@personal-agent/contracts'
 import { DecisionConflict, DecisionError } from './errors.ts'
+import { snapshot } from './snapshot.ts'
 import type {
   AppendDecisionInput,
   DecisionPage,
@@ -18,6 +19,8 @@ interface DecisionEntry {
   readonly recordedAt: string
   readonly actorRef: string
   readonly sourceMessageId: string
+  readonly sourceConversationId: string
+  readonly sourceTextDigest: string
 }
 
 const digestOf = (decision: UserDecision): string => canonicalDigest(decision as unknown as Json)
@@ -48,7 +51,7 @@ export class InMemoryDecisionStore implements DecisionStorePort {
   private readonly history = new Map<string, DecisionEntry[]>()
 
   async append(input: AppendDecisionInput): Promise<{ record: DecisionRecord; idempotent: boolean }> {
-    const decision = UserDecisionSchema.parse(input.decision)
+    const decision = snapshot(UserDecisionSchema.parse(input.decision))
     const versions = this.history.get(decision.id)
     if (!versions) {
       if (decision.version !== 1) throw new DecisionConflict('invalid_version', 'A new decision must start at version 1')
@@ -58,6 +61,8 @@ export class InMemoryDecisionStore implements DecisionStorePort {
         recordedAt: input.recordedAt,
         actorRef: input.actorRef,
         sourceMessageId: input.sourceMessageId,
+        sourceConversationId: input.sourceConversationId,
+        sourceTextDigest: input.sourceTextDigest,
       }
       this.history.set(decision.id, [entry])
       return { record: this.toRecord(entry), idempotent: false }
@@ -77,15 +82,20 @@ export class InMemoryDecisionStore implements DecisionStorePort {
       decision.content !== current.decision.content ||
       canonicalDigest(decision.scope as unknown as Json) !== canonicalDigest(current.decision.scope as unknown as Json) ||
       decision.authorityRef !== current.decision.authorityRef ||
-      (decision.supersedes ?? null) !== (current.decision.supersedes ?? null)
+      (decision.supersedes ?? null) !== (current.decision.supersedes ?? null) ||
+      input.sourceMessageId !== current.sourceMessageId ||
+      input.sourceConversationId !== current.sourceConversationId ||
+      input.sourceTextDigest !== current.sourceTextDigest
     ) {
-      throw new DecisionConflict('immutable', 'Decision content and scope are immutable; record a new decision id')
+      throw new DecisionConflict('immutable', 'Decision content, scope and source are immutable; record a new decision id')
     }
     const entry: DecisionEntry = {
       decision,
       recordedAt: input.recordedAt,
       actorRef: input.actorRef,
       sourceMessageId: current.sourceMessageId,
+      sourceConversationId: current.sourceConversationId,
+      sourceTextDigest: current.sourceTextDigest,
     }
     versions.push(entry)
     return { record: this.toRecord(entry), idempotent: false }
@@ -141,10 +151,12 @@ export class InMemoryDecisionStore implements DecisionStorePort {
     }
     if (current.decision.revokedAt) return { record: this.toRecord(current), idempotent: true }
     const revoked: DecisionEntry = {
-      decision: { ...current.decision, version: current.decision.version + 1, revokedAt: input.revokedAt },
+      decision: snapshot({ ...current.decision, version: current.decision.version + 1, revokedAt: input.revokedAt }),
       recordedAt: input.revokedAt,
       actorRef: input.actorRef,
       sourceMessageId: current.sourceMessageId,
+      sourceConversationId: current.sourceConversationId,
+      sourceTextDigest: current.sourceTextDigest,
     }
     versions.push(revoked)
     return { record: this.toRecord(revoked), idempotent: false }
@@ -163,12 +175,14 @@ export class InMemoryDecisionStore implements DecisionStorePort {
     let status: DecisionStatus = 'active'
     if (entry.decision.revokedAt) status = 'revoked'
     else if (superseded.has(entry.decision.id)) status = 'superseded'
-    return {
+    return snapshot({
       decision: entry.decision,
       status,
       recordedAt: entry.recordedAt,
       actorRef: entry.actorRef,
       sourceMessageId: entry.sourceMessageId,
-    }
+      sourceConversationId: entry.sourceConversationId,
+      sourceTextDigest: entry.sourceTextDigest,
+    })
   }
 }
