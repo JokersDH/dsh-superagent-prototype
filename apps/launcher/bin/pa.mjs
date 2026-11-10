@@ -16,6 +16,8 @@ import { runDoctor } from '../lib/doctor.mjs'
 import { firstRun } from '../lib/first-run.mjs'
 import { readInstanceRecord, verifyInstance } from '../lib/instance.mjs'
 import { readRelease } from '../lib/release.mjs'
+import { startInstance } from '../lib/start.mjs'
+import { stopInstance } from '../lib/stop.mjs'
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url))
 const BUILD_SCRIPT = join(repoRoot, 'tools/distribution/build.mjs')
@@ -77,7 +79,7 @@ function commandSpecs() {
   return {
     help: {},
     version: { json: 'boolean' },
-    build: { ...COMMON, output: 'string' },
+    build: { ...COMMON, output: 'string', 'skip-packages': 'boolean', 'skip-console': 'boolean' },
     'first-run': COMMON,
     status: COMMON,
     doctor: { ...COMMON, deep: 'boolean' },
@@ -127,6 +129,9 @@ async function main(argv) {
   if (command === 'build') {
     const args = [BUILD_SCRIPT, '--install-root', installRoot, '--config-root', roots.config]
     if (values.output !== undefined) args.push('--output', values.output)
+    if (values['skip-packages'] === true) args.push('--skip-packages')
+    if (values['skip-console'] === true) args.push('--skip-console')
+    if (json) args.push('--json')
     const child = spawnSync(process.execPath, args, { cwd: installRoot, stdio: 'inherit' })
     return child.status ?? EXIT.BLOCKED
   }
@@ -181,6 +186,41 @@ async function main(argv) {
     const result = { status: 'UNVERIFIED', instance: record, checks: verification.checks, failures: verification.failures, installRoot, roots }
     printResult({ json: json ? result : null, human: `${printStatus(result)}\n  hint: run pa doctor; stop refuses to kill an unverified process` })
     return EXIT.DEGRADED
+  }
+
+  if (command === 'start') {
+    const result = await startInstance({ installRoot, roots, values, log: json ? () => {} : (line) => process.stdout.write(`${line}\n`) })
+    if (!result.ok) return fail({ json, code: result.code, message: result.message, detail: result.detail, hint: result.hint })
+    if (result.reused) {
+      const human = `Workbench: ${result.record.consoleURL}\n  mode: ${result.record.mode} access: ${result.record.access}\n  state: ${result.record.state}`
+      printResult({ json: json ? { status: 'REUSED', instance: result.record } : null, human })
+      return EXIT.OK
+    }
+    const { record } = result
+    if (json) process.stdout.write(`${JSON.stringify({ status: 'RUNNING', instance: record, log: result.daemon.logPath })}\n`)
+    else {
+      process.stdout.write(`Workbench: ${record.consoleURL}\n`)
+      process.stdout.write(`  api: ${record.apiURL}\n  mode: ${record.mode} access: ${record.access}\n  state: ${record.state}\n  build: ${record.buildId}\n`)
+      if (record.access === 'token') process.stdout.write(`  登录令牌文件: ${join(roots.data, 'bootstrap.key')}\n`)
+    }
+    if (values.open === true && process.platform === 'darwin') {
+      spawnSync('open', [record.consoleURL], { stdio: 'ignore' })
+    }
+    const exitCode = await result.wait
+    // Owned daemon and static server are closed by now; exit explicitly so no idle handle delays
+    // a clean stop. A failed shutdown already reports DEGRADED and never claims success.
+    process.exit(exitCode)
+  }
+
+  if (command === 'stop') {
+    const timeoutMs = intOption(values, 'timeout', { min: 1000, max: 60000, fallback: 8000 })
+    const result = await stopInstance({ roots, timeoutMs })
+    if (!result.ok) return fail({ json, code: result.code, message: result.message, detail: result.detail, hint: result.hint, exitCode: EXIT.DEGRADED })
+    printResult({
+      json: json ? result : null,
+      human: `stop: ${result.status}${result.message ? ` — ${result.message}` : ''}`,
+    })
+    return EXIT.OK
   }
 
   // Later stages wire the remaining commands; keep the failure explicit in the checkpoint.

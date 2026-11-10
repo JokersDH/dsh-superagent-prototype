@@ -1,6 +1,6 @@
 /** CLI parsing, release admission and instance-record rules that other stages depend on. */
 import assert from 'node:assert/strict'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { lstatSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -112,4 +112,84 @@ test('instance records round-trip privately and unverified processes are never r
     rmSync(configRoot, { recursive: true, force: true })
   }
   assert.equal(EXIT.BLOCKED, 2)
+})
+
+test('daemon output is redacted before it reaches the private log', async (t) => {
+  const { redact, createBoundedLog } = await import('../lib/daemon.mjs')
+  const token = 'a'.repeat(64)
+  assert.match(redact(`token=${token}`), /^token=\[redacted/)
+  const bearer = redact('authorization: Bearer abcdefghijklmnop')
+  assert.doesNotMatch(bearer, /abcdefghijklmnop/)
+  assert.match(bearer, /\[redacted\]/)
+  assert.match(redact('apiKey: "sk-live-abcdefghij"'), /\[redacted\]/)
+  assert.doesNotMatch(redact('apiKey: "sk-live-abcdefghij"'), /sk-live-abcdefghij/)
+  assert.equal(redact('plain log line'), 'plain log line')
+  const root = mkdtempSync(join(tmpdir(), 'pa-log-'))
+  try {
+    const log = createBoundedLog(root, 'build-1')
+    log.write('hello')
+    const { readFileSync } = await import('node:fs')
+    assert.match(readFileSync(log.path, 'utf8'), /hello/)
+    assert.equal(lstatSync(log.path).mode & 0o777, 0o600)
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test('stop refuses an unknown live process and cleans only a provably stale record', async (t) => {
+  const { stopInstance } = await import('../lib/stop.mjs')
+  const { ensureRoots, resolveRoots } = await import('@personal-agent/portability')
+  const base = mkdtempSync(join(tmpdir(), 'pa-stop-'))
+  mkdirSync(join(base, 'install'), { recursive: true })
+  try {
+    const roots = resolveRoots({
+      installRoot: join(base, 'install'),
+      home: base,
+      platform: 'darwin',
+      overrides: {
+        config: join(base, 'config'),
+        data: join(base, 'data'),
+        cache: join(base, 'cache'),
+        logs: join(base, 'logs'),
+        workspace: join(base, 'workspace'),
+      },
+    })
+    ensureRoots(roots)
+    const empty = await stopInstance({ roots, timeoutMs: 1000 })
+    assert.equal(empty.ok, true)
+    assert.equal(empty.status, 'STOPPED')
+
+    // A live process that is not the launcher for this install must never be signalled.
+    const record = {
+      protocol: 'personal-product-instance/1',
+      pid: process.pid,
+      processStart: 'unrelated',
+      apiPid: process.pid,
+      consolePid: process.pid,
+      apiURL: 'http://127.0.0.1:8790',
+      consoleURL: 'http://127.0.0.1:5190',
+      state: roots.data,
+      install: roots.install,
+      buildId: 'b',
+      mode: 'fixture',
+      access: 'local-development',
+      startedAt: new Date().toISOString(),
+    }
+    const { writeInstanceRecord } = await import('../lib/instance.mjs')
+    writeInstanceRecord(roots.config, record)
+    const refused = await stopInstance({ roots, timeoutMs: 1000 })
+    assert.equal(refused.ok, false)
+    assert.equal(refused.code, 'instance_identity_mismatch')
+    assert.equal(process.exitCode ?? 0, 0, 'the test process was not signalled')
+
+    // A stale record whose launcher pid no longer exists is cleaned without touching anything.
+    writeInstanceRecord(roots.config, { ...record, pid: 999_999, apiPid: 999_999 })
+    const cleaned = await stopInstance({ roots, timeoutMs: 1000 })
+    assert.equal(cleaned.ok, true)
+    assert.equal(cleaned.status, 'STALE_RECORD_CLEANED')
+    const { readInstanceRecord } = await import('../lib/instance.mjs')
+    assert.equal(readInstanceRecord(roots.config), null)
+  } finally {
+    rmSync(base, { recursive: true, force: true })
+  }
 })

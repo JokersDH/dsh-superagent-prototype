@@ -114,17 +114,65 @@ async function command(file, argv) {
   }
 }
 
-export async function processStart(pidValue) {
+export async function processStart(pidValue = process.pid) {
   return command('ps', ['-p', String(pidValue), '-o', 'lstart='])
 }
 
-async function processAlive(pidValue) {
+export async function processAlive(pidValue) {
   try {
     process.kill(pidValue, 0)
-    return true
   } catch (error) {
     return error.code === 'EPERM'
   }
+  // A child that already exited but has not been reaped by a blocked parent is a zombie: kill(0)
+  // still succeeds, but the process owns no resources and must not be reported as alive.
+  const stat = await command('ps', ['-p', String(pidValue), '-o', 'stat='])
+  if (stat === null) return false
+  return !stat.trim().toUpperCase().startsWith('Z')
+}
+
+/**
+ * When the launcher is gone, prove the recorded API child is still the coordinator process for this
+ * exact private state before signalling it. A reused PID or a different command line is refused.
+ */
+export async function verifyCoordinatorProcess(record) {
+  const checks = []
+  const failures = []
+  const record0 = (id, ok, detail) => {
+    checks.push({ id, ok, ...(detail === undefined ? {} : { detail }) })
+    if (!ok) failures.push(id)
+  }
+  if (!(await processAlive(record.apiPid))) {
+    record0('api_alive', false)
+    return { ok: false, checks, failures }
+  }
+  record0('api_alive', true)
+  const [argv, uid] = await Promise.all([
+    command('ps', ['-ww', '-p', String(record.apiPid), '-o', 'command=']),
+    command('ps', ['-p', String(record.apiPid), '-o', 'uid=']),
+  ])
+  record0('api_command', argv !== null && /apps\/coordinator\/product\/demo\.ts/.test(argv) && argv.includes(`--state ${record.state}`), argv === null ? 'unavailable' : 'checked')
+  record0('api_owner', uid !== null && (!process.getuid || Number(uid) === process.getuid()))
+  const apiPort = new URL(record.apiURL).port
+  const listener = await command('lsof', ['-a', '-p', String(record.apiPid), '-iTCP:' + apiPort, '-sTCP:LISTEN', '-Fn'])
+  record0('api_listener', listener !== null && listener.split('\n').includes(`p${record.apiPid}`))
+  return { ok: failures.length === 0, checks, failures }
+}
+
+export async function stopProcess(pidValue, { timeoutMs = 8000 } = {}) {
+  try {
+    process.kill(pidValue, 'SIGTERM')
+  } catch (error) {
+    if (error.code === 'ESRCH') return { stopped: true, stillAlive: false, code: null }
+    return { stopped: false, stillAlive: true, code: 'stop_signal_failed' }
+  }
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    if (!(await processAlive(pidValue))) return { stopped: true, stillAlive: false, code: null }
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 50))
+  }
+  const stillAlive = await processAlive(pidValue)
+  return { stopped: !stillAlive, stillAlive, code: stillAlive ? 'stop_timeout_resources_alive' : null }
 }
 
 /**
@@ -168,9 +216,11 @@ export async function verifyInstance(record, options = {}) {
         command('ps', ['-p', String(childPid), '-o', 'ppid=', '-o', 'uid=']),
       ])
       const [parent, childUid] = (identity ?? '').split(/\s+/).map(Number)
+      // The console listener lives in the launcher process itself; the API listener is its child.
+      const parentOk = childPid === record.pid || parent === record.pid
       return (
         output !== null && output.split('\n').includes(`p${childPid}`) &&
-        parent === record.pid &&
+        parentOk &&
         (!process.getuid || childUid === process.getuid())
       )
     }),
@@ -189,27 +239,9 @@ export async function verifyInstance(record, options = {}) {
 
 /** Stop only a verified instance; report honestly when the process outlives the deadline. */
 export async function stopVerifiedInstance(record, options = {}) {
-  const timeoutMs = options.timeoutMs ?? 8000
   const verification = await verifyInstance(record, options)
   if (!verification.ok)
     return { stopped: false, stillAlive: true, verification, code: 'instance_identity_mismatch' }
-  try {
-    process.kill(record.pid, 'SIGTERM')
-  } catch (error) {
-    if (error.code === 'ESRCH') return { stopped: true, stillAlive: false, verification, code: null }
-    return { stopped: false, stillAlive: true, verification, code: 'stop_signal_failed' }
-  }
-  const deadline = Date.now() + timeoutMs
-  while (Date.now() < deadline) {
-    if (!(await processAlive(record.pid)))
-      return { stopped: true, stillAlive: false, verification, code: null }
-    await new Promise((resolvePromise) => setTimeout(resolvePromise, 50))
-  }
-  const stillAlive = await processAlive(record.pid)
-  return {
-    stopped: !stillAlive,
-    stillAlive,
-    verification,
-    code: stillAlive ? 'stop_timeout_resources_alive' : null,
-  }
+  const result = await stopProcess(record.pid, { timeoutMs: options.timeoutMs ?? 8000 })
+  return { ...result, verification }
 }

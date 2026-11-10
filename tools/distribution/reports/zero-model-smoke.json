@@ -1,0 +1,138 @@
+{
+  "case": "DIST-TRIAL-01",
+  "status": "PASS",
+  "startedAt": "2026-11-10T04:46:58.119Z",
+  "steps": [
+    {
+      "id": "build",
+      "status": "PASS",
+      "detail": {
+        "buildId": "b534dd9d172f269d",
+        "artifacts": {
+          "count": 269,
+          "bytes": 4208579
+        }
+      }
+    },
+    {
+      "id": "first-run",
+      "status": "PASS",
+      "detail": {
+        "created": [
+          "data",
+          "cache",
+          "logs",
+          "workspace"
+        ]
+      }
+    },
+    {
+      "id": "doctor-before-start",
+      "status": "PASS",
+      "detail": {
+        "status": "DEGRADED"
+      }
+    },
+    {
+      "id": "static-console",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:58995",
+        "readyMs": 119
+      }
+    },
+    {
+      "id": "instance-marker",
+      "status": "PASS",
+      "detail": {
+        "buildId": "b534dd9d172f269d"
+      }
+    },
+    {
+      "id": "api-health-direct",
+      "status": "PASS",
+      "detail": {
+        "status": "ok",
+        "mode": "fixture",
+        "access": "local-development"
+      }
+    },
+    {
+      "id": "api-health-via-proxy",
+      "status": "PASS",
+      "detail": {
+        "status": "ok",
+        "mode": "fixture",
+        "access": "local-development"
+      }
+    },
+    {
+      "id": "product-configuration",
+      "status": "PASS",
+      "detail": {
+        "revision": "9b198a2b8b79c06dabca172295c0a9e8b56ef0bfe4223c59de253cc605ae65a6",
+        "projects": 1
+      }
+    },
+    {
+      "id": "console-asset",
+      "status": "PASS",
+      "detail": {
+        "path": "/assets/index-DKnMq5Q0.js",
+        "bytes": 472122
+      }
+    },
+    {
+      "id": "status-running",
+      "status": "PASS",
+      "detail": {
+        "pid": 3332,
+        "checks": 8
+      }
+    },
+    {
+      "id": "reuse-verified-instance",
+      "status": "PASS",
+      "detail": {
+        "pid": 3332
+      }
+    },
+    {
+      "id": "stop",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 203
+      }
+    },
+    {
+      "id": "supervisor-clean-exit",
+      "status": "PASS",
+      "detail": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "id": "resources-released",
+      "status": "PASS"
+    },
+    {
+      "id": "doctor-after-stop",
+      "status": "PASS",
+      "detail": {
+        "status": "DEGRADED"
+      }
+    }
+  ],
+  "limitations": [
+    "Fixture mode only: no vendor/model request, no native agent, no user project.",
+    "Only darwin/arm64 + Node 24.21.x is a measured candidate; other platforms remain NOT_TESTED.",
+    "The trial instance ran on isolated temporary roots/ports; user services were not touched."
+  ],
+  "durationMs": 6556,
+  "finishedAt": "2026-11-10T04:47:04.675Z",
+  "outputs": {
+    "consoleURL": "http://127.0.0.1:58995",
+    "apiURL": "http://127.0.0.1:58996"
+  }
+}
