@@ -26,6 +26,7 @@ import type {
   RuntimeFactPayload,
   WorkVerificationStatus,
   WorkView,
+  ContractRevision,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import type { ProductApplication } from '@personal-agent/application'
@@ -125,6 +126,7 @@ export class ProductExecution {
   private readonly principal: { userId: string }
   private readonly native: NativeProductConfiguration | undefined
   private readonly environments: ProductEnvironments | undefined
+  private readonly projectForContract: ((contract: ContractRevision) => NativeProductConfiguration['projects'][number] | undefined) | undefined
   constructor(
     store: ProductStore,
     application: ProductApplication,
@@ -135,6 +137,7 @@ export class ProductExecution {
     principal: { userId: string },
     native?: NativeProductConfiguration,
     environments?: ProductEnvironments,
+    projectForContract?: (contract: ContractRevision) => NativeProductConfiguration['projects'][number] | undefined,
   ) {
     this.store = store
     this.application = application
@@ -144,6 +147,7 @@ export class ProductExecution {
     this.principal = principal
     this.native = native
     this.environments = environments
+    this.projectForContract = projectForContract
     this.effects = new Effects(store.queue)
     this.ingress = createStoredRuntimeIngress(
       store,
@@ -497,7 +501,7 @@ export class ProductExecution {
       fenceEpoch: (previous?.fenceEpoch ?? 0) + 1,
     })
     const nativeProject =
-      nativeProfile && this.native?.projects.find((project) => project.id === contract.scope.projectId)
+      nativeProfile && (this.projectForContract ? this.projectForContract(contract) : this.native?.projects.find((project) => project.id === contract.scope.projectId))
     if (nativeProfile && !nativeProject)
       throw new UnknownSend('Native project is not registered', 'unsupported_project')
     const workspace = this.workspaces.reserve({

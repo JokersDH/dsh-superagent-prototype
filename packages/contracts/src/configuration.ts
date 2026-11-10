@@ -52,6 +52,7 @@ export const ConfiguredProjectViewSchema = z
     profileIds: ids,
     defaultProfileId: IdSchema.optional(),
     defaultCriteria: RequiredCriteriaSchema,
+    settingsAvailable: z.boolean().optional(),
     dispatchAllowed: z.boolean(),
     blockedReason: AppErrorCodeSchema.optional(),
   })
@@ -70,6 +71,7 @@ export const ApplicationConfigurationSchema = z
   .strictObject({
     protocol: z.literal(CONFIGURATION_PROTOCOL),
     revision: DigestSchema,
+    reviewActivityAvailable: z.boolean().optional(),
     projects: z.array(ConfiguredProjectViewSchema).max(128).readonly(),
     profiles: z.array(ExecutionProfileViewSchema).max(128).readonly(),
     checks: z.array(RegisteredCheckViewSchema).max(128).readonly(),

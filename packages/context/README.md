@@ -69,6 +69,16 @@ Tests use a real temporary Git/file fixture and fake read ports, including long 
 paths, symlinks, binary/oversized inputs, budgets, pagination, contract staleness, prompt injection,
 source disappearance and baseline changes. No model or network call is made.
 
+## Persisted index adapter and authorization preview (wave-04 C3)
+
+`ReadIndexContextPort` consumes A's public read index structurally (`project`, `listWorks`, `work`)
+and an optional effective-decisions callback. It projects bounded JSON metadata for project settings,
+works and current contracts; logical refs never become filesystem paths. Verification/delivery
+identifiers and acceptance flags are summarized inside the work projection because the current read
+index has no separate detail port. `buildContextPreview(bundle, validation?)` returns the selected
+files, byte/token totals, omission reasons, injection flags, baseline and revalidation validity that
+main needs before confirming a conversation upload.
+
 ## Limits
 
 - Relevance ranking is a deterministic lexical heuristic, not semantic retrieval.

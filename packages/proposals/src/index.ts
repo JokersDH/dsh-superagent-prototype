@@ -1,6 +1,16 @@
 export { ProposalRegistry } from './registry.ts'
 export type { ConfirmProposalInput, CreateProposalInput } from './registry.ts'
-export { parseStructuredOutput, proposalDigest, sameContract, scopeWithin } from './parser.ts'
+export { parseStructuredOutput, proposalDigest, proposalIntent, sameContract, scopeWithin, validateProposalBindings } from './parser.ts'
+export { AssistantStateConflict, InMemoryAssistantState } from './assistant-state-memory.ts'
+export type { AssistantStateConflictCode } from './assistant-state-memory.ts'
+export { AssistantProposalService } from './assistant-proposal-service.ts'
+export type {
+  AssistantProposalServiceOptions,
+  CommitProposalInput,
+  CommitProposalResult,
+  PrepareProposalInput,
+  PreparedProposal,
+} from './assistant-proposal-service.ts'
 export { ProposalError } from './errors.ts'
 export type { ProposalErrorCode } from './errors.ts'
 export type {

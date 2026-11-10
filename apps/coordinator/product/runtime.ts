@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
 import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
-import type { ConversationCommand, NativeQuestionBinding, Scope, TrustedActor } from '@personal-agent/contracts'
+import type { ConversationCommand, NativeQuestionBinding, ProjectSettingsCommand, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { CheckRegistry } from '@personal-agent/verification'
@@ -19,6 +19,8 @@ import { AssistantStreams } from './assistant-streams.ts'
 import type { NativeProductConfiguration } from './native-config.ts'
 import type { NativeProjectRegistry } from './project-registry.ts'
 import { ProductEnvironments } from './environments.ts'
+import { ProductProjectSettings } from './project-settings.ts'
+import { ProductReviewTiming } from './review-timing.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -30,13 +32,14 @@ export function createProductRuntime(
     native?: NativeProductConfiguration
     projectRegistry?: NativeProjectRegistry
     workspaceRoot?: string
+    startupMode?: 'normal' | 'recovery_readonly'
   },
 ) {
   options = {
     ...options,
     principal: structuredClone(options.principal),
     projects: options.projects.map((project) => {
-      if (options.native?.projects.some((native) => native.id === project.id)) return structuredClone(project)
+      if (options.startupMode === 'recovery_readonly' || options.native?.projects.some((native) => native.id === project.id)) return structuredClone(project)
       const grant = structuredClone(project.scope)
       const scope: Scope = {
         projectId: project.id,
@@ -72,7 +75,12 @@ export function createProductRuntime(
     deadlineMs: 2000,
     outputLimitBytes: 64 * 1024,
   })
-  for (const project of options.native?.projects ?? []) checks.register(project.check)
+  const versionedProjectIds = new Set(options.projectRegistry?.list().map(project => project.id) ?? [])
+  for (const project of options.native?.projects ?? []) if (!versionedProjectIds.has(project.id)) checks.register(project.check)
+  const projectSettings = options.native && options.projectRegistry
+    ? new ProductProjectSettings(options.store, options.projectRegistry, checks, options.principal, options.native.profile.id) : undefined
+  if (projectSettings) for (const record of options.projectRegistry!.list())
+    projectSettings.register(record, nativeProjects.find(project => project.id === record.id))
   const completion = new ProductCompletion(options.store, workspaces, checks, {
     environment: attemptId => {
       const binding = options.store.bindings.binding(attemptId)
@@ -84,6 +92,8 @@ export function createProductRuntime(
     ...options,
     profileIds: [...(options.native ? [options.native.profile.id] : []), ...FIXTURE_PROFILES],
     registeredChecks: checks.ids(),
+    registeredCheck: id => !!checks.latest(id),
+    projectGrant: input => projectSettings?.authorize(input.projectId, input.profileId, input.criteria, input.newWork),
     completion,
     verificationRecovery: {
       blocked: candidate => execution?.verificationBlocked(candidate) ?? false,
@@ -94,6 +104,7 @@ export function createProductRuntime(
     },
     assistantReplies: options.assistantProvider !== undefined,
     projectPreflight: async (projectId) => {
+      if (projectSettings?.has(projectId)) { projectSettings.preflight(projectId); return }
       const record = options.projectRegistry?.list().find((project) => project.id === projectId)
       if (record)
         options.projectRegistry!.prepare({ path: record.path, displayName: record.displayName, check: record.check,
@@ -111,8 +122,12 @@ export function createProductRuntime(
     options.principal,
     options.native,
     environments,
+    projectSettings ? contract => projectSettings.has(contract.scope.projectId) ? projectSettings.forContract(contract)
+      : nativeProjects.find(project => project.id === contract.scope.projectId) : undefined,
   )
   const { store } = options
+  const reviewTiming = new ProductReviewTiming(store, application, completion, options.principal, () => configuredProjects.map(project => project.id))
+  completion.onAccepted = (candidate, actor, at) => reviewTiming.accepted(candidate, actor, at)
   const conversations = new ApplicationConversations(store, options.principal, () => configuredProjects.map(project => project.id), options.actionSecret)
   const assistantStreams = new AssistantStreams()
   if (options.assistantProvider)
@@ -120,6 +135,7 @@ export function createProductRuntime(
       nativeExecution: !!options.native,
     })
   const read: NonNullable<LocalHttpOptions['read']> = {
+    ...(projectSettings ? { projectSettings: async (projectId: string) => projectSettings.read(projectId) } : {}),
     conversations: async query => conversations.list(query),
     conversation: async id => conversations.get(id),
     workVerification: async (workId) => {
@@ -140,11 +156,12 @@ export function createProductRuntime(
             const existing = configuredProjects.find((item) => item.id === project.id)
             if (!existing) {
               options.projectRegistry!.save(record)
-              checks.register(check)
+              if (!projectSettings) checks.register(check)
               application.registerProject(project, [check.id])
               configuredProjects.unshift(project)
               nativeProjects.unshift({ id: record.id, path: record.path, check,
                 ...(record.environment ? { environment: options.projectRegistry!.environment(record)! } : {}) })
+              projectSettings?.register(record, nativeProjects[0])
             }
             return await read.configuration!()
           },
@@ -170,7 +187,8 @@ export function createProductRuntime(
     workEnvironment: async (workId) => {
       const view = (await application.inspect({ workId })).works[0]
       if (!view) throw new ApplicationFault('invalid_request', 'Unknown work')
-      const policy = options.native?.projects.find(project => project.id === view.work.projectId)?.environment?.policy
+      const policy = (projectSettings?.has(view.work.projectId) ? projectSettings.forContract(view.contract)
+        : options.native?.projects.find(project => project.id === view.work.projectId))?.environment?.policy
       const link = view.links.find(link => link.role === 'primary' && link.contract.revision === view.contract.revision)
       const binding = link && options.store.bindings.current(link.ticketId)
       const status = policy ? binding ? environments.status(binding) : { status: 'waiting' as const } : { status: 'not_configured' as const }
@@ -198,10 +216,14 @@ export function createProductRuntime(
           },
         }
       : {}),
-    configuration: async () =>
-      applicationConfiguration({
+    configuration: async () => {
+      const currentNative = nativeProjects.map(project => projectSettings?.has(project.id) ? projectSettings.latest(project.id) : project)
+      const configuration = applicationConfiguration({
         projects: options.projects.map((project) => ({
           ...project,
+          ...(projectSettings?.has(project.id) ? { displayName: projectSettings.displayName(project.id) } : {}),
+          settingsAvailable: projectSettings?.has(project.id) ?? false,
+          ...(projectSettings?.has(project.id) && projectSettings.archived(project.id) ? { blockedReason: 'conflict' as const } : {}),
           profileIds: options.native?.projects.some((native) => native.id === project.id)
             ? [options.native.profile.id]
             : FIXTURE_PROFILES,
@@ -212,7 +234,7 @@ export function createProductRuntime(
                   kind: 'machine' as const,
                   required: true,
                   description: '项目注册的检查通过',
-                  checkDefinitionRef: options.native.projects.find((native) => native.id === project.id)!.check.id,
+                  checkDefinitionRef: currentNative.find((native) => native.id === project.id)!.check.id,
                 },
                 { id: 'review-output', kind: 'human' as const, required: true, description: '审阅并接受当前变更' },
               ]
@@ -249,11 +271,13 @@ export function createProductRuntime(
             readiness: 'fixture_ready' as const,
           })),
         ],
-        checks: checks
-          .ids()
+        checks: [...new Set([FIXTURE_CHECK, ...currentNative.map(project => project.check.id)])]
           .map((id) => ({ id, revision: checks.require(id).revision, displayName: checks.require(id).title ?? id })),
         enabledProfileIds: [...(options.native ? [options.native.profile.id] : []), ...FIXTURE_PROFILES],
-      }),
+        reviewActivityAvailable: options.startupMode !== 'recovery_readonly',
+      })
+      return configuration
+    },
     deliveries: async (id) => application.questions.currentDeliveries(id),
     verification: async (id) => {
       for (const ticket of store.domain.tickets.list<Ticket>()) {
@@ -291,8 +315,15 @@ export function createProductRuntime(
     workspaces,
     checks,
     read,
-    operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor) },
-    start: () => execution!.start(),
+    projectSettings,
+    operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor),
+      reviewActivity: async (activity: ReviewActivity, actor: TrustedActor) => reviewTiming.record(activity, actor),
+      ...(projectSettings ? { projectSettings: (command: ProjectSettingsCommand, actor: TrustedActor) => projectSettings.dispatch(command, actor) } : {}) },
+    start: () => {
+      if (options.startupMode === 'recovery_readonly')
+        throw new ApplicationFault('unsupported_capability', 'Recovery read-only cannot start business effects', 'none')
+      execution!.start()
+    },
     close: () => {
       assistantStreams.close()
       return execution!.close()

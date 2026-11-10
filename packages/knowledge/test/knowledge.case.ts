@@ -185,13 +185,52 @@ test('a revoked decision can be reopened as a new explicit decision', async () =
   assert.equal(await governance.isEffective('decision-2'), true)
 })
 
-test('a disappeared source is shown as missing while the audit record remains', async () => {
-  const { governance, sources } = fixture()
+test('a disappeared source is excluded from effective knowledge while the audit record remains', async () => {
+  const { governance, sources, store } = fixture()
   await record(governance)
   sources.markMissing('msg-1')
   const page = await governance.page('project-1')
-  assert.equal(page.decisions.length, 1)
-  assert.equal(page.sources[0]?.validity, 'missing')
+  assert.equal(page.decisions.length, 0)
+  assert.equal(await governance.isEffective('decision-1'), false)
+  assert.equal(await governance.decisionSourceState('decision-1'), 'missing')
+  const audit = await store.get('decision-1')
+  assert.ok(audit)
+  assert.equal(audit?.sourceMessageId, 'msg-1')
+})
+
+test('a source whose digest or conversation changed invalidates effectiveness', async () => {
+  const changed = fixture()
+  await record(changed.governance)
+  changed.sources.replace(message({ textDigest: 'b'.repeat(64) }))
+  assert.equal(await changed.governance.isEffective('decision-1'), false)
+  assert.equal(await changed.governance.decisionSourceState('decision-1'), 'stale')
+  assert.equal((await changed.governance.listEffective('project-1')).length, 0)
+
+  const moved = fixture()
+  await record(moved.governance)
+  moved.sources.replace(message({ conversationId: 'conv-2' }))
+  assert.equal(await moved.governance.isEffective('decision-1'), false)
+})
+
+test('stored decisions and returned records are independent immutable snapshots', async () => {
+  const { governance, store } = fixture()
+  const mutableScope = { projectId: 'project-1', allowedPaths: ['src'], excludedPaths: [], externalActions: [] }
+  const written = await governance.record(
+    { decisionId: 'decision-1', content: 'Use Chinese UI copy', scope: mutableScope, sourceMessageId: 'msg-1' },
+    actor({ grantScope: mutableScope }),
+  )
+  mutableScope.allowedPaths.push('private/')
+  assert.deepEqual(written.record.decision.scope.allowedPaths, ['src'])
+
+  const read = await store.get('decision-1')
+  assert.ok(read)
+  assert.throws(() => {
+    ;(read!.decision.scope.allowedPaths as string[]).push('other')
+  })
+  const again = await store.get('decision-1')
+  assert.deepEqual(again?.decision.scope.allowedPaths, ['src'])
+  assert.equal(written.record.sourceConversationId, 'conv-1')
+  assert.equal(written.record.sourceTextDigest, 'a'.repeat(64))
 })
 
 test('keyset pagination is bounded and does not duplicate decisions', async () => {
@@ -231,7 +270,7 @@ test('old-version replay is idempotent and a changed payload or stale version co
     scope: scope(),
     authorityRef: 'user-1',
   }
-  const input = { decision, sourceMessageId: 'msg-1', actorRef: 'user-1', recordedAt: NOW }
+  const input = { decision, sourceMessageId: 'msg-1', sourceConversationId: 'conv-1', sourceTextDigest: 'a'.repeat(64), actorRef: 'user-1', recordedAt: NOW }
   const first = await store.append(input)
   const replay = await store.append(input)
   assert.equal(first.idempotent, false)

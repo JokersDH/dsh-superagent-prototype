@@ -16,8 +16,8 @@ import { listenLocalHttp } from '../../apps/coordinator/http/server.ts'
 const require = createRequire(new URL('../../apps/console/package.json', import.meta.url))
 const { chromium } = require('@playwright/test')
 const { createServer: createViteServer } = await import(require.resolve('vite'))
-const { values } = parseArgs({ options: { 'no-capture': { type: 'boolean', default: false } } })
-const output = resolve('reports/releases/verification-recovery')
+const { values } = parseArgs({ options: { 'no-capture': { type: 'boolean', default: false }, output: { type: 'string' } } })
+const output = resolve(values.output ?? 'reports/releases/verification-recovery')
 mkdirSync(output, { recursive: true })
 const root = mkdtempSync(join(tmpdir(), 'pa-recheck-browser-'))
 const stateRoot = join(root, 'state'), scratchProject = join(root, 'project')
@@ -89,14 +89,49 @@ try {
     const accept = page.getByRole('button', { name: '接受当前候选', exact: true })
     await accept.waitFor()
     assert.equal(await page.getByRole('button', { name: '重新检查', exact: true }).count(), 0)
+    const configuration = await (await page.request.get(`${origin}/v1/configuration`)).json()
+    assert.equal(configuration.reviewActivityAvailable, true)
+    await page.bringToFront()
+    await page.waitForFunction(() => document.visibilityState === 'visible' && document.hasFocus())
+    await page.waitForTimeout(250)
     await accept.click()
     await page.waitForFunction(() => document.querySelector('.detail .phase')?.textContent === '已交付')
+    const observation = store.events.after(0, 5000).find(event => event.topic === 'application.candidate.accepted')
+    assert.ok(observation)
+    const timing = observation.payload.reviewTiming
+    assert.ok(timing.readyToAcceptanceMs > 0)
+    assert.ok(timing.activeReviewMs > 0 && timing.activeReviewMs <= timing.readyToAcceptanceMs)
+    assert.equal(timing.activeReviewSource, 'ui_visibility_proxy')
+    assert.equal(timing.activeReviewCompleteness, 'partial')
     const frames = readdirSync(join(stateRoot, 'receipts')).flatMap(file => readFileSync(join(stateRoot, 'receipts', file), 'utf8').trim().split('\n').filter(Boolean).map(line => JSON.parse(line)))
     assert.equal(frames.filter(frame => frame.type === 'begin').length, 1)
     await page.reload()
     await page.getByRole('button', { name: '工作空间', exact: true }).click()
     await page.locator('.work-card').filter({ hasText: '恢复验证浏览器任务' }).click()
     await page.waitForFunction(() => document.querySelector('.detail .phase')?.textContent === '已交付')
+    assert.deepEqual(errors, [])
+  })
+  await check('FAILED-ACTIVITY-TRANSPORT-DOES-NOT-BLOCK-ACCEPTANCE', async () => {
+    const rejectedRequests = []
+    await page.route('**/v1/works/*/review-activity', async route => { rejectedRequests.push(route.request().url()); await route.abort() })
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.getByRole('button', { name: '新建委托', exact: true }).click()
+    await page.locator('.new-work').getByRole('combobox', { name: '项目', exact: true }).selectOption('recovery-project')
+    await page.locator('.new-work select').last().selectOption('profile-fixture-pass')
+    await page.locator('.new-work textarea').fill('遥测失败仍可接受')
+    await page.locator('.new-work').getByRole('button', { name: '创建委托', exact: true }).click()
+    const accept = page.getByRole('button', { name: '接受当前候选', exact: true })
+    await accept.waitFor()
+    await page.bringToFront()
+    await page.waitForFunction(() => document.hasFocus())
+    await page.waitForTimeout(250)
+    await accept.click()
+    await page.waitForFunction(() => document.querySelector('.detail .phase')?.textContent === '已交付')
+    assert.ok(rejectedRequests.length > 0)
+    const observations = store.events.after(0, 5000).filter(event => event.topic === 'application.candidate.accepted')
+    assert.equal(observations.length, 2)
+    assert.equal(observations[1].payload.reviewTiming.activeReviewMs, null)
+    assert.equal(observations[1].payload.reviewTiming.activeReviewSource, 'unknown')
     assert.deepEqual(errors, [])
   })
 } finally {
@@ -106,12 +141,13 @@ try {
   await new Promise(resolve => api.close(resolve))
   await product.close()
   store.close()
-  const report = { status: cases.length === 3 && cases.every(value => value.status === 'PASS') ? 'PASS_CONTROLLED_VERIFICATION_RECOVERY_BROWSER' : 'FAIL',
+  const report = { status: cases.length === 4 && cases.every(value => value.status === 'PASS') ? 'PASS_CONTROLLED_VERIFICATION_RECOVERY_BROWSER' : 'FAIL',
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'package.json', 'tests/integration/verification-recovery-browser.mjs', 'tests/integration/product-execution.case.mjs'], { encoding: 'utf8' }).trim() === '',
     checkedAt: new Date().toISOString(), cases, errors, modelCalls: 0,
     limitations: ['Actual local HTTP/SQLite and controlled child; no native/model compatibility claim',
-      'Fault injected on the isolated completion port; no production fault-injection endpoint'] }
+      'Fault injected on the isolated completion port; no production fault-injection endpoint',
+      'Focused visible candidate detail is a partial activity proxy, not actual human thinking time'] }
   writeFileSync(join(output, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n')
   console.log(JSON.stringify(report, null, 2))
   rmSync(root, { recursive: true, force: true })

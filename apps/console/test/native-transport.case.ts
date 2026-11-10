@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import type { ConversationCommand, ProjectRegistrationInput, VerificationRetryCommand } from '@personal-agent/contracts'
+import type { ConversationCommand, ProjectRegistrationInput, ProjectSettingsCommand, VerificationRetryCommand } from '@personal-agent/contracts'
 import { HttpTransport, TransportError } from '../src/transport.ts'
 import { fixtureConfiguration } from '../src/fixture.ts'
 
@@ -138,4 +138,21 @@ test('conversation transport encodes filters, validates commands and preserves b
   assert.equal(await new HttpTransport().conversations({}), undefined)
   globalThis.fetch = async () => new Response('{}', { status: 200 })
   await assert.rejects(new HttpTransport().conversations({}))
+})
+
+test('project settings transport preserves immutable command identity and rejects misbound results', async t => {
+  const original = globalThis.fetch
+  t.after(() => { globalThis.fetch = original })
+  const version = { projectId: 'project-one', revision: 1, digest: 'a'.repeat(64), displayName: 'Project', check: 'node_test', environment: { policy: 'existing_only' }, checkDefinitionRef: 'check-one', createdAt: '2026-11-10T00:00:00.000Z' }
+  const page = { protocol: 'project-settings/1', current: { ...version, archived: false, archiveRevision: 0 }, history: [version] }
+  globalThis.fetch = async () => new Response(JSON.stringify(page))
+  assert.deepEqual(await new HttpTransport().projectSettings('project-one'), page)
+  await assert.rejects(new HttpTransport().projectSettings('project-other'))
+  const command: ProjectSettingsCommand = { kind: 'archive_project', commandId: 'archive-one', projectId: 'project-one', expectedArchiveRevision: 0, archived: true }
+  let requested = ''
+  globalThis.fetch = async (input, init) => { requested = String(input); assert.deepEqual(JSON.parse(String(init?.body)), command); return new Response(JSON.stringify({ commandId: command.commandId, seq: 1, status: 'recorded' })) }
+  assert.equal((await new HttpTransport().projectSettingsCommand(command)).status, 'recorded')
+  assert.equal(requested, '/v1/projects/project-one/settings')
+  globalThis.fetch = async () => new Response(JSON.stringify({ commandId: 'wrong-command', seq: 1, status: 'recorded' }))
+  await assert.rejects(new HttpTransport().projectSettingsCommand(command), error => error instanceof TransportError && error.code === 'schema_mismatch')
 })
