@@ -1,43 +1,65 @@
 {
   "role": "A",
-  "package": ["packages/storage", "packages/workflows"],
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
   "branch": "codex/g2-workspaces-verification",
   "mainBaseCommit": "a70db20",
   "mergeCommit": "c0b8316",
   "stableCheckpoint": "f26f2eb",
-  "testedSourceCommit": "f26f2eb",
-  "migrations": [13],
+  "testedSourceCommit": "1bd0996",
+  "migrations": [
+    13
+  ],
   "productSchema": 13,
   "phases": [
     {
       "phase": "A1",
       "status": "passed_package_local",
       "checkpoint": "f26f2eb",
-      "evidence": ["packages/storage/src/routing-evidence.ts", "v13 migration", "packages/workflows/test/routing.case.ts"],
+      "evidence": [
+        "packages/storage/src/routing-evidence.ts",
+        "v13 migration",
+        "packages/workflows/test/routing.case.ts"
+      ],
       "detail": "immutable advice/review/outcome port, shared parsers, replay/conflict and UnitOfWork rollback"
     },
     {
       "phase": "A2",
       "status": "passed_package_local",
-      "evidence": ["routing.case.ts scoped page tests", "reports/wave05-performance.json"],
+      "evidence": [
+        "routing.case.ts scoped page tests",
+        "reports/wave05-performance.json"
+      ],
       "detail": "project/time pages, exact subject/profile filters, stable cursors, empty project invalid"
     },
     {
       "phase": "A3",
       "status": "passed_package_local",
-      "evidence": ["routing sources test"],
+      "evidence": [
+        "routing sources test"
+      ],
       "detail": "attempt binding, verification, acceptance, observation sources; usage missing remains unknown; no artifact ownership inference"
     },
     {
       "phase": "A4",
       "status": "passed_package_local",
-      "evidence": ["timeline test", "snapshot missing/complete artifact test"],
+      "evidence": [
+        "timeline test",
+        "snapshot missing/complete artifact test"
+      ],
       "detail": "bounded work timeline with ReviewTiming; review report artifact references checked in snapshot; blocked missing/corrupt/IO"
     },
     {
       "phase": "A5",
       "status": "passed_package_local_with_external_consumer_gap",
-      "evidence": ["v12->v13 test", "second Node process test", "application 16/16", "verification 23/23"],
+      "evidence": [
+        "v12->v13 test",
+        "second Node process test",
+        "application 16/16",
+        "verification 23/23"
+      ],
       "detail": "preserves old records and reopens records; C routing module and main HTTP/UI composition not available"
     }
   ],
@@ -76,5 +98,7 @@
     "surface ReviewTiming without accepting it as quality proof; do not duplicate accepted event",
     "use WorkflowSnapshots and state facts for D; keep restore policy with D/main",
     "have C consume the shared port; no SQL writer or private routing DTO"
-  ]
+  ],
+  "deliveryCommit": "1bd0996",
+  "updatedAt": "2026-11-10T06:00:00.000Z"
 }
