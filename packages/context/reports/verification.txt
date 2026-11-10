@@ -1,0 +1,61 @@
+# Agent C verification (2026-11-10T04:40:41Z)
+
+## @personal-agent/context
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ baseline capturedAt is stable and content digests are source identities (0.237625ms)
+✔ invalid cursors are refused instead of silently restarting (0.926666ms)
+✔ an unknown but valid cursor produces an explicit empty page (0.677292ms)
+✔ source descriptors are not trusted blindly: a port cannot smuggle a foreign project (0.58175ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 431.52075
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/proposals
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ rejected, superseded and expired proposals cannot be confirmed (0.138791ms)
+✔ expiry is enforced at confirmation and by the sweep (0.130875ms)
+✔ decision and revision proposals keep their exact scope and current contract (0.163625ms)
+✔ the shared ReasonerProposal schema is the only accepted proposal shape (0.112209ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 120.0525
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/knowledge
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ keyset pagination is bounded and does not duplicate decisions (0.431083ms)
+✔ old-version replay is idempotent and a changed payload or stale version conflicts (0.442584ms)
+✔ automatic promotion stays closed and classifies one-off corrections (0.200625ms)
+✔ knowledge is project-scoped and revoked content is not returned to another project (0.146708ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 214.448792
+### build
+$ tsc -p tsconfig.build.json
+
+## C5 consumer
+{"status":"PASS","modelCalls":3,"networkCalls":0,"executedIntents":0,"absoluteRootLeaked":false,"decisionsBeforeRevoke":1,"decisionsAfterRevoke":0}
