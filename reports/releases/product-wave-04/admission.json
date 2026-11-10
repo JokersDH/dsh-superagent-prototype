@@ -1,0 +1,64 @@
+{
+  "status": "FAIL_ADMISSION_PROBES",
+  "sourceCommit": "0ebe9ff187fa901e40d7cbfc2dfb3e8469f46684",
+  "checkedAt": "2026-11-10T07:06:46.767Z",
+  "acceptanceCandidate": "6dee03f1a4185741b10048e51e8649eecbaa2577",
+  "modelCalls": 0,
+  "scope": "Read-only domain/gate probes; no service or native task",
+  "cases": [
+    {
+      "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+      "owner": "C",
+      "status": "FAIL",
+      "ok": false,
+      "actual": {
+        "effective": true,
+        "listCount": 1
+      },
+      "expected": {
+        "effective": false,
+        "listCount": 0
+      }
+    },
+    {
+      "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+      "owner": "C",
+      "status": "FAIL",
+      "ok": false,
+      "actual": {
+        "foreignActorRefused": false
+      },
+      "expected": {
+        "foreignActorRefused": true
+      }
+    },
+    {
+      "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+      "owner": "C",
+      "status": "FAIL",
+      "ok": false,
+      "actual": {
+        "callerChangedStoredGrant": true
+      },
+      "expected": {
+        "callerChangedStoredGrant": false
+      }
+    },
+    {
+      "id": "E-FULL-PRODUCT-REQUIRES-EXECUTED-NATIVE",
+      "owner": "E",
+      "status": "FAIL",
+      "ok": false,
+      "actual": {
+        "verdict": "PASS",
+        "dirtySource": true,
+        "executedNative": false,
+        "layer": "controlled-fixture",
+        "failures": []
+      },
+      "expected": {
+        "verdict": "non-PASS"
+      }
+    }
+  ]
+}

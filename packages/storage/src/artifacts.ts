@@ -91,6 +91,32 @@ export class ArtifactStore {
     }
   }
 
+  /** Bounded read-only registry list (newest first); does not read artifact bytes. */
+  list(options: { limit?: number; before?: string } = {}): { artifacts: ArtifactRecord[]; nextCursor?: string; hasMore: boolean } {
+    const limit = Math.max(1, Math.min(200, Math.trunc(options.limit ?? 50)))
+    const args: unknown[] = []
+    let where = ''
+    if (options.before) {
+      const separator = options.before.indexOf('\u0000')
+      if (separator < 1) throw new Error('Invalid artifact cursor')
+      const at = options.before.slice(0, separator), id = options.before.slice(separator + 1)
+      where = ' WHERE (created_at < ? OR (created_at = ? AND id < ?))'
+      args.push(at, at, id)
+    }
+    const rows = this.db.prepare(`SELECT id, digest, bytes, path, created_at FROM artifacts${where}
+      ORDER BY created_at DESC, id DESC LIMIT ?`).all(...args, limit + 1) as Record<string, unknown>[]
+    const records = rows.slice(0, limit).map(row => ({
+      id: String(row.id), digest: String(row.digest), bytes: Number(row.bytes),
+      path: String(row.path), createdAt: String(row.created_at),
+    }))
+    const last = records.at(-1)
+    return {
+      artifacts: records,
+      ...(rows.length > limit && last ? { nextCursor: `${last.createdAt}\u0000${last.id}` } : {}),
+      hasMore: rows.length > limit,
+    }
+  }
+
   /** Reads a referenced artifact back and verifies its digest. */
   read(id: string): { record: ArtifactRecord; data: Uint8Array } | undefined {
     const record = this.get(id)

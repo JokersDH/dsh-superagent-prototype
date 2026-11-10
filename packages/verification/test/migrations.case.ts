@@ -13,6 +13,6 @@ test('the WP-04/WP-02 migrations are appended without rewriting v1–v5', () => 
   assert.equal(MIGRATIONS[5]!.name, 'completion-evidence')
   assert.equal(MIGRATIONS[6]!.version, 7)
   assert.equal(MIGRATIONS[6]!.name, 'product-records')
-  assert.equal(PRODUCT_SCHEMA_VERSION, 7)
+  assert.ok(PRODUCT_SCHEMA_VERSION >= 7)
   assert.equal(PRODUCT_SCHEMA_VERSION, MIGRATIONS[MIGRATIONS.length - 1]!.version)
 })

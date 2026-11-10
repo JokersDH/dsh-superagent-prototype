@@ -16,6 +16,11 @@ import {
   ProjectRegistrationInputSchema,
   WorkLocationSchema,
   WorkEnvironmentSchema,
+  WorkVerificationStatusSchema,
+  VerificationRetryCommandSchema,
+  ConversationCatalogQuerySchema,
+  ConversationCatalogSchema,
+  ConversationCommandSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -32,6 +37,11 @@ import type {
   ProjectRegistrationInput,
   WorkLocation,
   WorkEnvironment,
+  WorkVerificationStatus,
+  VerificationRetryCommand,
+  ConversationCatalog,
+  ConversationCatalogQuery,
+  ConversationCommand,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -76,6 +86,10 @@ export interface ConsoleTransport {
   registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
   workLocation?(workId: string): Promise<WorkLocation | undefined>
   workEnvironment?(workId: string): Promise<WorkEnvironment | undefined>
+  workVerification?(workId: string): Promise<WorkVerificationStatus | undefined>
+  retryVerification?(command: VerificationRetryCommand): Promise<CommandReceipt>
+  conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog | undefined>
+  conversationCommand?(command: ConversationCommand): Promise<CommandReceipt>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -106,6 +120,7 @@ const errorOf = (status: number, body: unknown): TransportError => {
     'user_action',
   )
 }
+const missingOptionalResource = Symbol('missing optional product resource')
 
 /** Product HTTP transport: POST /v1/commands, GET /v1/snapshot, messages page and the SSE change stream. */
 export class HttpTransport implements ConsoleTransport {
@@ -114,7 +129,7 @@ export class HttpTransport implements ConsoleTransport {
     this.base = base
   }
 
-  private async request(path: string, init?: RequestInit): Promise<unknown> {
+  private async request(path: string, init?: RequestInit, optionalResource = false): Promise<unknown> {
     let response: Response
     try {
       response = await fetch(`${this.base}${path}`, {
@@ -134,6 +149,7 @@ export class HttpTransport implements ConsoleTransport {
         body = undefined
       }
     }
+    if (optionalResource && response.status === 404 && body === undefined) return missingOptionalResource
     if (!response.ok) throw errorOf(response.status, body)
     return body
   }
@@ -252,6 +268,44 @@ export class HttpTransport implements ConsoleTransport {
     return AssistantProviderStatusSchema.parse(
       await this.request('/v1/assistant/model', { method: 'POST', body: JSON.stringify({ model }) }),
     )
+  }
+  async workVerification(workId: string): Promise<WorkVerificationStatus | undefined> {
+    try {
+      const body = await this.request(`/v1/works/${encodeURIComponent(workId)}/verification`, undefined, true)
+      if (body === missingOptionalResource) return undefined
+      const value = WorkVerificationStatusSchema.parse(body)
+      if (value.workId !== workId) throw new TransportError('schema_mismatch', '验证状态属于另一项工作')
+      return value
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async retryVerification(input: VerificationRetryCommand): Promise<CommandReceipt> {
+    const command = VerificationRetryCommandSchema.parse(input)
+    const receipt = CommandReceiptSchema.parse(await this.request(`/v1/works/${encodeURIComponent(command.candidate.contract.workId)}/verification/retry`, {
+      method: 'POST', body: JSON.stringify(command),
+    }))
+    if (receipt.commandId !== command.commandId || (receipt.workId && receipt.workId !== command.candidate.contract.workId))
+      throw new TransportError('schema_mismatch', '验证恢复回执身份不匹配')
+    return receipt
+  }
+  async conversations(input: ConversationCatalogQuery): Promise<ConversationCatalog | undefined> {
+    const query = ConversationCatalogQuerySchema.parse(input), params = new URLSearchParams()
+    for (const [key, value] of Object.entries(query)) if (value !== undefined) params.set(key, String(value))
+    try {
+      const body = await this.request(`/v1/conversations?${params}`, undefined, true)
+      return body === missingOptionalResource ? undefined : ConversationCatalogSchema.parse(body)
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async conversationCommand(input: ConversationCommand): Promise<CommandReceipt> {
+    const command = ConversationCommandSchema.parse(input)
+    const receipt = CommandReceiptSchema.parse(await this.request('/v1/conversations/commands', { method: 'POST', body: JSON.stringify(command) }))
+    if (receipt.commandId !== command.commandId) throw new TransportError('schema_mismatch', '会话回执身份不匹配')
+    return receipt
   }
   async *assistantChanges(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate> {
     if (signal.aborted) return

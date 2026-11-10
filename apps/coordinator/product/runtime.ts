@@ -1,8 +1,8 @@
 import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
-import { ApplicationFault, createProductApplication } from '@personal-agent/application'
+import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
-import type { NativeQuestionBinding, Scope } from '@personal-agent/contracts'
+import type { ConversationCommand, NativeQuestionBinding, Scope, TrustedActor } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { CheckRegistry } from '@personal-agent/verification'
@@ -85,6 +85,13 @@ export function createProductRuntime(
     profileIds: [...(options.native ? [options.native.profile.id] : []), ...FIXTURE_PROFILES],
     registeredChecks: checks.ids(),
     completion,
+    verificationRecovery: {
+      blocked: candidate => execution?.verificationBlocked(candidate) ?? false,
+      retry: (candidate, blockedId) => {
+        if (!execution) throw new ApplicationFault('unsupported_capability', 'Verification recovery is not ready')
+        execution.retryVerification(candidate, blockedId)
+      },
+    },
     assistantReplies: options.assistantProvider !== undefined,
     projectPreflight: async (projectId) => {
       const record = options.projectRegistry?.list().find((project) => project.id === projectId)
@@ -106,12 +113,20 @@ export function createProductRuntime(
     environments,
   )
   const { store } = options
+  const conversations = new ApplicationConversations(store, options.principal, () => configuredProjects.map(project => project.id), options.actionSecret)
   const assistantStreams = new AssistantStreams()
   if (options.assistantProvider)
     handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams, {
       nativeExecution: !!options.native,
     })
   const read: NonNullable<LocalHttpOptions['read']> = {
+    conversations: async query => conversations.list(query),
+    conversation: async id => conversations.get(id),
+    workVerification: async (workId) => {
+      const work = (await application.inspect({ workId })).works[0]
+      if (!work) throw new ApplicationFault('invalid_request', 'Unknown work')
+      return execution!.verificationStatus(work)
+    },
     ...(options.native && options.projectRegistry
       ? {
           registerProject: async (input) => {
@@ -276,6 +291,7 @@ export function createProductRuntime(
     workspaces,
     checks,
     read,
+    operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor) },
     start: () => execution!.start(),
     close: () => {
       assistantStreams.close()

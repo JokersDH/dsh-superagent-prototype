@@ -9,6 +9,7 @@ import {
   UserCommandSchema,
   IdSchema,
   ScopeSchema,
+  VerificationRetryCommandSchema,
 } from '@personal-agent/contracts'
 import type {
   AppError,
@@ -29,6 +30,7 @@ import type {
   Verification,
   WorkRecord,
   WorkView,
+  VerificationRetryCommand,
 } from '@personal-agent/contracts'
 import {
   canRetry,
@@ -72,12 +74,17 @@ export interface ApplicationOptions {
   completion?: CompletionReviewPort
   assistantReplies?: boolean
   projectPreflight?: (projectId: string) => Promise<void>
+  verificationRecovery?: {
+    retry(candidate: CandidateRef, blockedId: string): void
+    blocked?(candidate: CandidateRef): boolean
+  }
   now?: () => string
 }
 export interface ProductApplication extends ApplicationService {
   readonly core: Engine
   readonly questions: QuestionBroker
   registerProject(project: ProjectConfiguration, registeredChecks: readonly string[]): void
+  retryVerification(command: VerificationRetryCommand, actor: TrustedActor): Promise<CommandReceipt>
 }
 const SOURCE = 'personal-local'
 const digestOf = (value: unknown): string => canonicalDigest(JSON.parse(JSON.stringify(value)))
@@ -361,6 +368,9 @@ class LocalApplication implements ProductApplication {
       sourceRefs: workId ? [key('trigger', command.commandId)] : [],
       createdAt: this.now(),
     })
+    const conversation = this.store.workflows.conversations.get(command.conversationId)
+    if (conversation?.title === '新对话' && conversation.titleRevision === 1 && conversation.messageCount === 1)
+      this.store.workflows.conversations.rename(conversation.id, 1, text.trim().split('\n')[0]!.slice(0, 120))
   }
   private validateScope(scope: Scope): void {
     const project = this.project(scope.projectId)
@@ -624,6 +634,47 @@ class LocalApplication implements ProductApplication {
     }
     throw new ApplicationFault('unsupported_capability', 'Command is not implemented')
   }
+  async retryVerification(input: VerificationRetryCommand, inputActor: TrustedActor): Promise<CommandReceipt> {
+    const command = VerificationRetryCommandSchema.parse(input), actor = TrustedActorSchema.parse(inputActor)
+    if (!this.actorAllowed(actor))
+      throw new ApplicationFault('forbidden', 'Caller is not the configured local principal', 'none')
+    if (this.store.uow.nesting)
+      throw new ApplicationFault('invalid_request', 'Application dispatch owns the outer commit', 'none')
+    const digest = digestOf({ command, actor })
+    return this.store.uow.atomic(() => {
+      const prior = this.store.commands.get(command.commandId)
+      if (prior) {
+        if (prior.payloadDigest !== digest)
+          throw new ApplicationFault('conflict', 'Command ID already names another immutable request')
+        return CommandReceiptSchema.parse({ ...(prior.result as object), commandId: command.commandId, seq: prior.seq })
+      }
+      let result: { status: 'recorded'; workId: string } | { status: 'rejected'; error: AppError }
+      try {
+        result = this.store.uow.atomic(() => {
+          const { work, ticket } = this.expect(command.candidate.contract)
+          this.checkConversation(work, command.conversationId)
+          if (!this.authorizedContract(command.candidate.contract))
+            throw new ApplicationFault('stale_contract', 'Authorization is no longer current')
+          const candidate = this.core.completionCandidate(ticket.id)
+          if (ticket.ended || !candidate || !equal(candidate, command.candidate))
+            throw new ApplicationFault('stale_candidate', 'Candidate changed')
+          if (!this.safeForNewWriter(work.id))
+            throw new ApplicationFault('writer_indeterminate', 'Writers are not proven quiescent', 'reconcile')
+          if (!this.options.verificationRecovery)
+            throw new ApplicationFault('unsupported_capability', 'Verification recovery is not connected')
+          this.options.verificationRecovery.retry(command.candidate, command.blockedId)
+          this.emit(work.id)
+          return { status: 'recorded' as const, workId: work.id }
+        })
+      } catch (error) {
+        const failure = expectedFailure(error)
+        if (!failure) throw error
+        result = { status: 'rejected', error: AppErrorSchema.parse(failure) }
+      }
+      const receipt = this.store.commands.record(command.commandId, digest, () => result, result.status)
+      return CommandReceiptSchema.parse({ ...receipt.result, commandId: command.commandId, seq: receipt.seq })
+    })
+  }
   private checkConversation(work: WorkRecord, conversationId: string): void {
     if (work.conversationId !== conversationId)
       throw new ApplicationFault('conflict', 'Work belongs to another conversation')
@@ -781,6 +832,7 @@ class LocalApplication implements ProductApplication {
         : 'working'
     if (!ticket.ended && ticketStage(ticket).stage === 'person') phase = 'needs_user'
     if (candidate) phase = review ? 'needs_user' : 'verifying'
+    if (candidate && this.options.verificationRecovery?.blocked?.(candidate)) phase = 'needs_user'
     if (open.length && !ticket.ended) phase = 'needs_user'
     if (busy.some((item) => item.link.ticketId !== ticket.id)) phase = 'switching'
     else if (busy.some((item) => item.binding.state === 'stopping')) phase = 'stopping'

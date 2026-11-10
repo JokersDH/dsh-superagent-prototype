@@ -1,0 +1,41 @@
+{
+  "protocol": "workflow-benchmark/1",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "dataset": {
+    "conversations": 120,
+    "messages": 1200,
+    "sameTimestampMessages": 60
+  },
+  "seed": {
+    "ms": 230.39
+  },
+  "catalog": {
+    "ms": 0.24,
+    "returned": 30
+  },
+  "search": {
+    "ms": 14.15,
+    "returned": 20
+  },
+  "shortSearch": {
+    "ms": 7.64,
+    "returned": 20
+  },
+  "reopen": {
+    "ms": 0.16,
+    "returned": 30
+  },
+  "artifact": {
+    "id": "add96b142ed74d852093d6f139dc83383b18c53840cea5761e4e93353ee5f836",
+    "bytes": 19
+  },
+  "snapshot": {
+    "ms": 25.8,
+    "status": "ok",
+    "artifacts": 1,
+    "verify": "ok"
+  },
+  "scope": "temporary state only; no model/account/network/user project"
+}
