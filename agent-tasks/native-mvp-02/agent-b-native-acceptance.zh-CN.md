@@ -1,5 +1,7 @@
 # Agent B：执行真实原生验收与故障矩阵
 
+**当前优先级（2026-11-10）：按 [收尾批次 B-R1–B-R4](release-closure.zh-CN.md) 连续执行。** 先消除工具误报、补真实交付/停止/重启及无模型浏览器/执行矩阵，再交精确发布范围；不以旧 final 文件或配置断言结束整包，不重置已用模型额度。
+
 工作目录 `/Users/hh/Desktop/joker/superagent-agent-b`，继续 `codex/g1-runtime`。保留所有修改，fetch 并合并最新 origin/main，读取 AGENTS.md、本轮 README、原验收任务和本文件。真实 MVP 已在 `1f3229f` 发布；旧分支/README 的“native 接口尚未公布”不再适用。合并时保留 main 已验收的 Runner/Driver/workspaces，不重新提交旧实现。
 
 **持续执行：** 同时读取 [扩展队列](extended-run.zh-CN.md)。下文契约修正对应 B1，原生四组对应 B2；交可执行检查点后继续 B3–B6，不在原报告阶段停止。仍只拥有本测试目录，本轮原生模型任务总上限保持四个。

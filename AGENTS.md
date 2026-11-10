@@ -10,6 +10,7 @@
 
 ## Native MVP Assignments (2026-11-09)
 
+- Current priority as of 2026-11-10 is `agent-tasks/native-mvp-02/release-closure.zh-CN.md`: A-R1-A-R4, B-R1-B-R4 and the main integration package. It narrows the extended queue to environment admission and a usable single-package product before more P2 features. Preserve earlier work and ownership; do not reset native model budgets because the date or task phase changed.
 - Current external task packets are `agent-tasks/native-mvp-02/README.zh-CN.md` and its A/B files. They supersede native-mvp round 1 and the wave-02 path assignments for new work; prior ownership/results below remain historical acceptance context.
 - The user expanded this round for continuous execution while away. Read `agent-tasks/native-mvp-02/extended-run.zh-CN.md` and continue A1-A6, B1-B6, or M1-M6 after the first stable checkpoint without per-item approval. Ownership stays unchanged. On a cross-module blocker, publish an owned minimal repro and continue an independent queued phase. Native model budgets remain bounded; do not keep busy through unlimited retries or polling.
 - External A continues its existing worktree/branch and owns only `packages/environment-preparation/` for the next package. External B continues its existing worktree/branch and owns only `tests/native-acceptance/` for independent native product and recovery acceptance.
