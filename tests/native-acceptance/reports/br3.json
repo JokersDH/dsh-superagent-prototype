@@ -1,0 +1,116 @@
+{
+  "generatedAt": "2026-11-10T01:44:03.935Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "BR3 lifecycle",
+    "nativeLane": false
+  },
+  "totals": {
+    "cases": 6,
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "BR3-PASS-LIFECYCLE",
+      "title": "a controlled work reaches a machine PASS candidate",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "1 machine check(s) PASS on work 4baf6806555687e117b92fd22fc0ee32"
+      ],
+      "evidence": [],
+      "entities": [
+        {
+          "workId": "4baf6806555687e117b92fd22fc0ee32",
+          "phase": "needs_user"
+        }
+      ]
+    },
+    {
+      "id": "BR3-CHECK-FAIL",
+      "title": "a required machine FAIL cannot be accepted",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "machine FAIL present (1) and acceptance refused (HTTP 400)"
+      ],
+      "evidence": [],
+      "entities": [
+        {
+          "failingWorkId": "9b4caff75f28a846f18f93218baf340d",
+          "failedChecks": 1,
+          "acceptStatus": 400,
+          "acceptBody": {
+            "error": {
+              "code": "invalid_request",
+              "message": "Request or response does not match the product schema",
+              "retry": "none"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "BR3-STOP",
+      "title": "stop_work settles an active work",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "stopped: phase=ended, resources=quiescent"
+      ],
+      "evidence": [],
+      "entities": [
+        {
+          "workId": "76dd99584696849657818391d0665118",
+          "stopStatus": 200,
+          "finalPhase": "ended",
+          "resources": "quiescent"
+        }
+      ]
+    },
+    {
+      "id": "BR3-RELOAD",
+      "title": "a reload re-reads the same identity without a new attempt",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "assignment and candidate identity are stable across reads"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "BR3-ISOLATION",
+      "title": "two conversations keep separate work identity",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "each work keeps its own conversation"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "BR3-RESOURCES",
+      "title": "this instance owns no leaked listener after the matrix",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "exactly one listener owns the port"
+      ],
+      "evidence": [
+        {
+          "listeners": 1,
+          "stateObserved": true,
+          "stateKb": 6224
+        }
+      ],
+      "entities": []
+    }
+  ]
+}

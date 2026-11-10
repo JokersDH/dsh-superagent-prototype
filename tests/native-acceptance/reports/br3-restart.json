@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-11-10T01:44:15.577Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "BR3 restart",
+    "nativeLane": false
+  },
+  "totals": {
+    "cases": 5,
+    "PASS": 5,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "BR3-RESTART-BOOT",
+      "title": "a private coordinator starts and is reachable",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "healthy on http://127.0.0.1:8911"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "BR3-RESTART-WORK",
+      "title": "a work is active before the kill",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "work 91851a1bb5526a15ccb0f062aa9f41d2 has assignment 972d0de2342d0a60af4bdeea970c646d"
+      ],
+      "evidence": [],
+      "entities": [
+        {
+          "workId": "91851a1bb5526a15ccb0f062aa9f41d2",
+          "phase": "queued",
+          "assignmentBefore": "972d0de2342d0a60af4bdeea970c646d"
+        }
+      ]
+    },
+    {
+      "id": "BR3-RESTART-KILL",
+      "title": "SIGKILL the private coordinator mid-work",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "the owned coordinator was killed with SIGKILL"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "BR3-RESTART-REOPEN",
+      "title": "restart on the same state preserves identity without a second begin",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "identity preserved (972d0de2342d0a60af4bdeea970c646d); phase=working resources=active"
+      ],
+      "evidence": [],
+      "entities": [
+        {
+          "phaseAfter": "working",
+          "assignmentAfter": "972d0de2342d0a60af4bdeea970c646d",
+          "resources": "active"
+        }
+      ]
+    },
+    {
+      "id": "BR3-RESTART-ACTIONABLE",
+      "title": "the operator can still act on the work after restart",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "stop_work was accepted after restart"
+      ],
+      "evidence": [],
+      "entities": []
+    }
+  ]
+}

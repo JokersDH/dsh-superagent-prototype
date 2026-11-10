@@ -1,107 +1,77 @@
 {
-  "phase": "final",
+  "phase": "B-R3",
   "branch": "codex/g1-runtime",
-  "base": "5bbd892",
+  "base": "f2ca26c",
   "commit": "2c1f604",
   "modelTasks": {
     "limit": 4,
-    "used": 2,
-    "accounting": "one per continue_work attempt that reached a native turn"
+    "used": 3,
+    "accounting": "one per create_work that reached a native attempt; verified by the work view candidate/attempt identity",
+    "note": "budget is not reset by the task phase change"
   },
   "phases": {
-    "B1": {
+    "B-R1": {
       "status": "passed",
-      "commit": "2c1f604",
-      "deliverables": [
-        "create_work builds a command the shared UserCommandSchema accepts (commandId/conversationId/projectId/goal/scope.projectId) and keeps required human criteria",
-        "project selection requires dispatchAllowed and that the project admits the selected profile",
-        "the native lane performs real client calls instead of hard-coded NOT_TESTED",
-        "authentication proven on a protected route; loopback-only credential use",
-        "--require-native exits non-zero when a required native case did not execute (verified exit 1)"
-      ],
-      "evidence": {
-        "selftest": "14/14",
-        "readonlyAgainstNativeInstance": "5/5 PASS",
-        "strictExit": "exit 1 with BLOCKED"
-      }
-    },
-    "B2": {
-      "status": "partially_passed",
-      "commit": "pending",
-      "passed": [
-        "read-only 5/5 against a private native instance (mode: personal)",
-        "profile-codex-native admitted with readiness native_test_passed",
-        "NATIVE-LINK: create_work + continue_work recorded; real Codex executed; machine check PASS (2 tests, exit 0); work reached needs_user with 3 artifacts",
-        "two native model tasks completed (work 3f8f54da..., work 9b4f3168...)"
-      ],
-      "blocked": [
-        "patch roundtrip: artifact baseCommit == headCommit and no diff field (BLOCKER-1)",
-        "/v1/works/:id/location returns null workspacePath/baseCommit (BLOCKER-1)"
-      ],
-      "notTested": [
-        "NATIVE-STOP (real running-process stop observation)",
-        "NATIVE-REOPEN",
-        "NATIVE-RESTART (coordinator SIGKILL)",
-        "NATIVE-STALE-CANDIDATE",
-        "NATIVE-CHECK-FAIL",
-        "NATIVE-QUESTION (on-request policy did not raise a question in these runs)"
-      ]
-    },
-    "B3": {
-      "status": "passed",
-      "cases": "6/6 PASS",
-      "scope": "deterministic matrix on the controlled fixture entry (no model task)",
-      "passed": [
-        "same commandId replays the original receipt (workId+seq identical)",
-        "same commandId with a different payload is refused with code=conflict (HTTP 409)",
-        "concurrent replay yields exactly one work",
-        "an expired events cursor is reported as 409 cursor_expired",
-        "two works keep their own conversation identity",
-        "an unknown/stale question is refused"
-      ],
-      "note": "fixture results are labelled fixture; they are not native compatibility evidence"
-    },
-    "B5": {
-      "status": "passed",
-      "evidence": {
-        "cycles": 5,
-        "listenersBefore": 1,
-        "listenersAfter": 1,
-        "rssKbBefore": 119200,
-        "rssKbAfter": 119264,
-        "stateKbBefore": 5156,
-        "stateKbAfter": 5348,
-        "p50LatencyMs": 3
+      "commit": "a73293f",
+      "cases": {
+        "NATIVE-NO-CANDIDATE-MUST-NOT-PASS": true,
+        "CONTINUE-COMMAND-MUST-SATISFY-SHARED-SCHEMA": true
       },
-      "note": "bounded soak stops at the first unexplained invariant break; no owned process left behind"
-    },
-    "B6": {
-      "status": "passed",
-      "cases": "6/6 PASS",
-      "scope": "conformance entry applied to every published profile (no model task)",
-      "passed": [
-        "every profile has the required fields",
-        "dispatchAllowed and blockedReason never disagree",
-        "no native profile is admitted without native_test_passed",
-        "fixtures report fixture_ready only",
-        "project profile references resolve to admitted profiles",
-        "an unknown capability is refused/behaves explicitly"
+      "deliverables": [
+        "NATIVE-LINK ends once and only after a real candidate, a patch reference or distinct base/head, machine checks PASS and a readable artifact",
+        "the illegal extra continue_work is removed (create_work already queues execution)",
+        "schema 400 and typed business rejection are distinct outcomes",
+        "strict mode also refuses a stale recorded report"
       ],
-      "note": "same assertion set judges a future executor; a missing capability is refused, not downgraded"
+      "probe": "review-native-acceptance.mjs -> PASS_ACCEPTANCE_GUARDS_ONLY"
     },
-    "B4": {
-      "status": "blocked",
-      "reason": "Playwright is not installed in this worktree (BLOCKER-3)",
-      "notTested": [
-        "desktop 1440x900 flow",
-        "narrow 390x844 flow",
-        "patch download roundtrip through the same-origin proxy",
-        "SSE disconnect/reconnect UI state",
-        "keyboard reachability and focus return"
+    "B-R2": {
+      "status": "passed",
+      "commit": "73f1d80",
+      "evidence": {
+        "machineChecks": 1,
+        "patchBytes": 803,
+        "patchFormat": "git-binary-diff/1",
+        "appliesTo": [
+          "src/index.mjs",
+          "test/sum.test.mjs"
+        ],
+        "clonePinnedAtBase": true
+      },
+      "note": "verification reads all three artifact shapes and enforces the declared byte count; the patch is applied to a clean clone, never the source tree"
+    },
+    "B-R3": {
+      "status": "passed",
+      "lifecycle": "6/6 PASS",
+      "restart": "5/5 PASS",
+      "browser": "4/4 PASS",
+      "lifecycleCases": [
+        "BR3-PASS-LIFECYCLE",
+        "BR3-CHECK-FAIL (machine FAIL present, acceptance refused HTTP 400)",
+        "BR3-STOP (phase ended, resources quiescent)",
+        "BR3-RELOAD",
+        "BR3-ISOLATION",
+        "BR3-RESOURCES"
+      ],
+      "restartCases": [
+        "BR3-RESTART-BOOT",
+        "BR3-RESTART-WORK",
+        "BR3-RESTART-KILL (SIGKILL of the owned child)",
+        "BR3-RESTART-REOPEN (identity preserved, no second begin)",
+        "BR3-RESTART-ACTIONABLE"
+      ],
+      "browserCases": [
+        "desktop 1440x900: 24 reachable buttons, no overlap, screenshot 55533B",
+        "narrow 390x844: 9 reachable buttons, no overlap, screenshot 28586B",
+        "keyboard focus reaches a control in both viewports"
       ]
+    },
+    "B-R4": {
+      "status": "blocked",
+      "reason": "environment integration not published; dependency-installation lane remains disabled pending A"
     }
   },
-  "next": "only BLOCKER-1 (artifact diff/location) and BLOCKER-3 (browser driver) prevent further independent progress",
+  "next": "only B-R4 remains, blocked on the main environment integration",
   "blockers": "tests/native-acceptance/reports/blockers.md",
   "finalRegression": {
     "selftest": "14/14",
@@ -122,5 +92,11 @@
     "B4": "blocked (BLOCKER-3)",
     "B5": "passed",
     "B6": "passed"
-  }
+  },
+  "round": "release-closure B-R1..B-R4",
+  "notTested": [
+    "real native question/recovery on the on-request policy (no question was raised in the verifiable runs)",
+    "native stop observed on a live native writer (the native works completed before a stop could be issued)",
+    "environment-dependent single-package install lane (B-R4)"
+  ]
 }

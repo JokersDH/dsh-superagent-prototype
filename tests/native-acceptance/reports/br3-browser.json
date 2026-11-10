@@ -1,0 +1,107 @@
+{
+  "generatedAt": "2026-11-10T01:47:36.702Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "BR3 browser",
+    "consoleUrl": "http://127.0.0.1:5180"
+  },
+  "totals": {
+    "cases": 4,
+    "PASS": 4,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "BR3-BROWSER-desktop-1440x900",
+      "title": "console loads and is operable at 1440x900",
+      "lane": "browser",
+      "status": "PASS",
+      "detail": [
+        "rendered 36 chars, 24 reachable buttons, no overlap, screenshot 55533B"
+      ],
+      "evidence": [
+        {
+          "httpStatus": 200
+        },
+        {
+          "screenshot": "/Users/hh/Desktop/joker/superagent-agent-b/tests/native-acceptance/reports/browser/desktop-1440x900.png",
+          "screenshotBytes": 55533,
+          "bodyChars": 36,
+          "consoleErrors": []
+        },
+        {
+          "visibleButtons": 24,
+          "overlapping": [],
+          "unreachable": 0
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "BR3-KEYBOARD-desktop-1440x900",
+      "title": "keyboard focus reaches an interactive control",
+      "lane": "browser",
+      "status": "PASS",
+      "detail": [
+        "focus on BUTTON \"DeepSeek-V4.1-Flash-1017\""
+      ],
+      "evidence": [
+        {
+          "focused": {
+            "tag": "BUTTON",
+            "label": "DeepSeek-V4.1-Flash-1017"
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "BR3-BROWSER-narrow-390x844",
+      "title": "console loads and is operable at 390x844",
+      "lane": "browser",
+      "status": "PASS",
+      "detail": [
+        "rendered 72 chars, 9 reachable buttons, no overlap, screenshot 28586B"
+      ],
+      "evidence": [
+        {
+          "httpStatus": 200
+        },
+        {
+          "screenshot": "/Users/hh/Desktop/joker/superagent-agent-b/tests/native-acceptance/reports/browser/narrow-390x844.png",
+          "screenshotBytes": 28586,
+          "bodyChars": 72,
+          "consoleErrors": []
+        },
+        {
+          "visibleButtons": 9,
+          "overlapping": [],
+          "unreachable": 0
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "BR3-KEYBOARD-narrow-390x844",
+      "title": "keyboard focus reaches an interactive control",
+      "lane": "browser",
+      "status": "PASS",
+      "detail": [
+        "focus on BUTTON \"\""
+      ],
+      "evidence": [
+        {
+          "focused": {
+            "tag": "BUTTON",
+            "label": ""
+          }
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
