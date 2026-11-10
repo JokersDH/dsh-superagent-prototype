@@ -387,6 +387,8 @@ test('a second Node process consumes the public workflow ports and snapshot veri
         projects: ports.index.listProjects({ projectIds: ['project-1'] }).projects.map(item => item.settings.sourceRef),
         conversations: ports.conversations.list({ projectIds: ['project-1'] }).conversations.map(item => item.title),
         search: ports.conversations.search({ query: '跨进程', projectIds: ['project-1'] }).hits.length,
+        sourceDigest: ports.index.sourceMessage('second-message', ['project-1'])?.textDigest,
+        stateSchema: ports.state.stateFacts().productSchema,
         snapshot: result.status,
         verify: snapshot.verify(${JSON.stringify(snapshot)}).status,
       }))
@@ -397,11 +399,13 @@ test('a second Node process consumes the public workflow ports and snapshot veri
     })
     assert.equal(child.status, 0, String(child.stderr))
     const observed = JSON.parse(child.stdout.trim()) as {
-      projects: string[]; conversations: string[]; search: number; snapshot: string; verify: string
+      projects: string[]; conversations: string[]; search: number; sourceDigest: string; stateSchema: number; snapshot: string; verify: string
     }
     assert.deepEqual(observed.projects, ['source:second'])
     assert.deepEqual(observed.conversations, ['第二进程会话'])
     assert.equal(observed.search, 1)
+    assert.equal(observed.sourceDigest, createHash('sha256').update('跨进程读取中文目录').digest('hex'))
+    assert.equal(observed.stateSchema, 12)
     assert.equal(observed.snapshot, 'ok')
     assert.equal(observed.verify, 'ok')
   } finally {

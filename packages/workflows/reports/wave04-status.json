@@ -1,0 +1,86 @@
+{
+  "role": "A",
+  "package": ["packages/storage", "packages/workflows"],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "8c736f2",
+  "mergeCommit": "10205bf",
+  "stableCheckpoint": "68852c0",
+  "testedSourceCommit": "68852c0",
+  "migrations": [11, 12],
+  "productSchema": 12,
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "passed_package_local",
+      "checkpoint": "68852c0",
+      "evidence": ["packages/storage/src/assistant-state.ts", "packages/storage/src/migrations.ts", "packages/workflows/src/ports.ts", "packages/workflows/test/workflows.case.ts"],
+      "detail": "AssistantStatePort synchronized over the shared UnitOfWork; v11 metadata/proposal tables; CAS/replay/legacy decisions; proposal immutable source/grant/payload; transaction rollback test"
+    },
+    {
+      "phase": "A2",
+      "status": "passed_package_local",
+      "evidence": ["v12 conversation_members", "workflow membership tests", "source/state tests"],
+      "detail": "indexed multi-project membership, v7/v10 backfill, scoped list/search before pagination, explicit discoverPage/discoverSearch; empty [] returns none"
+    },
+    {
+      "phase": "A3",
+      "status": "passed_package_local",
+      "evidence": ["ReadIndexPort.sourceMessage", "second Node process test"],
+      "detail": "bounded project/work/artifact/source-message reads, digest/provenance and explicit missing/stale states; no raw history or execution grant"
+    },
+    {
+      "phase": "A4",
+      "status": "passed_package_local",
+      "evidence": ["WorkflowSnapshots tests", "state facts test"],
+      "detail": "DB backup plus backup-derived artifact copy/digest manifest; missing/corrupt/IO blocked; observation-only writer/queue/question facts, no trusted stop claim"
+    },
+    {
+      "phase": "A5",
+      "status": "passed_package_local_with_main_consumer_gap",
+      "evidence": ["v10->v12 upgrade test", "assistant reopen test", "second-process consumer test", "reports/wave04-*.txt"],
+      "detail": "record -> proposal confirm -> valid read -> revoke -> reopen vertical; v10 legacy decisions preserved; main catalog consumer must stop using [] as discovery"
+    }
+  ],
+  "results": {
+    "storageTests": "75/75",
+    "workflowTests": "15/15",
+    "applicationRegression": "13/16 (3 catalog tests use the removed empty-array discovery convention)",
+    "verificationRegression": "23/23",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "upgrade": "v7/v10 -> v12; existing works/messages/decision bodies preserved",
+    "modelTasks": 0,
+    "unknownModelSends": 0
+  },
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "main-empty-array-discovery",
+      "detail": "packages/application/src/conversations.ts still calls workflows.conversations.list/search with projectIds: []. The wave-04 authorized-scope rule makes [] return no rows. Main must pass configured project IDs to scoped list/search or use discovery.discoverPage/discoverSearch plus explicit per-row visibility. Failing tests: packages/application/test/conversations.case.ts catalog commands, message-only/mixed-project, catalog paging."
+    },
+    {
+      "owner": "C/main",
+      "id": "assistant-http-governance",
+      "detail": "A exposes the synchronous AssistantStatePort; C's prepare/commit and main HTTP/command/proposal confirmation are not wired in this package. C's three domain admission failures remain C-owned."
+    },
+    {
+      "owner": "D/main",
+      "id": "restore-policy",
+      "detail": "D consumes WorkflowSnapshots/state facts; actual restore/rollback/new-directory policy is outside storage initialization."
+    }
+  ],
+  "notTested": [
+    "main HTTP/UI conversation catalog after its [] discovery fix",
+    "C context/proposal/decision governance and main confirmation composition",
+    "D restore/upgrade relocatable closure",
+    "native/Codex/model/browser/product acceptance and multi-user ACL"
+  ],
+  "mainNextSteps": [
+    "replace [] discovery calls with configured project IDs in ApplicationConversations; use discovery only for candidate pages and filter every row",
+    "keep conversation membership from Conversation.projectIds and avoid per-page message scans",
+    "consume createWorkflowPorts(store).assistant inside the main command transaction for C prepare/commit",
+    "pass sourceMessage metadata and assistant decision records to C; no direct SQL",
+    "have D consume WorkflowSnapshots plus state.stateFacts without treating writer/PID rows as stop proof",
+    "do not edit A storage/workflows or root lock; report any remaining contract gap as an RFC"
+  ]
+}
