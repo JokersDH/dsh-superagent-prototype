@@ -1,0 +1,61 @@
+{
+  "case": "RECOVERY-PROJECT-BINDINGS",
+  "previousBlocker": "wave-04 reported a controlled-fixture grant error for restored project scope \".\"",
+  "checkedAt": "2026-11-10T12:27:55.872Z",
+  "sourceCommit": "f04ceb8e0e91796129bea03515566d0d43a3fb72",
+  "status": "PASS_RECOVERY_PROJECT_BINDINGS",
+  "modelCalls": 0,
+  "withoutProjects": {
+    "withProjects": false,
+    "health": {
+      "status": "ok",
+      "mode": "fixture",
+      "startupMode": "recovery_readonly",
+      "access": "local-development"
+    },
+    "startupMode": "recovery_readonly",
+    "projectRead": false,
+    "commandStatus": 422,
+    "commandCode": "unsupported_capability",
+    "queueUnchanged": true,
+    "markerPresent": true,
+    "exit": 0,
+    "logs": [
+      "Personal product API: http://127.0.0.1:55379/v1/health",
+      "Private state/credential references: /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-repro-recovery-projects-HuiXBQ/without-projects",
+      "Recovery read-only: business queues and model providers are disabled; local revalidation is required."
+    ]
+  },
+  "withProjects": {
+    "withProjects": true,
+    "health": {
+      "status": "ok",
+      "mode": "fixture",
+      "startupMode": "recovery_readonly",
+      "access": "local-development"
+    },
+    "startupMode": "recovery_readonly",
+    "projectRead": true,
+    "commandStatus": 422,
+    "commandCode": "unsupported_capability",
+    "queueUnchanged": true,
+    "markerPresent": true,
+    "exit": 0,
+    "logs": [
+      "Personal product API: http://127.0.0.1:55399/v1/health",
+      "Private state/credential references: /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-repro-recovery-projects-HuiXBQ/with-projects",
+      "Recovery read-only: business queues and model providers are disabled; local revalidation is required."
+    ]
+  },
+  "fixed": true,
+  "owner": "main (fix) / D (probe)",
+  "limitations": [
+    "Temporary state only; no user services, credentials, native tasks or model calls were used.",
+    "darwin/arm64 + Node 24.21.x measured candidate only.",
+    "A 422 on the probe command does not prove every business route is rejected; the recovery smoke covers queue/answer/parked non-consumption."
+  ],
+  "nextConsumer": [
+    "E: use a restored state with project bindings in its installation test; expect read-only start, readable project, rejected business POST, unchanged old business.",
+    "main: keep recovery_readonly project-scope preservation and no-start-effects behaviour under test; do not remove the restore marker automatically."
+  ]
+}

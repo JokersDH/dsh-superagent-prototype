@@ -1,0 +1,54 @@
+{
+  "package": "product-wave-05 / D：个人试用发行与第二执行器诊断",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "f04ceb8e0e91796129bea03515566d0d43a3fb72",
+  "mergedMain": "a70db20",
+  "status": "CHECKPOINT_D1",
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "unknownNativeSends": 0,
+    "note": "Zero-model fixture/local probes only."
+  },
+  "commits": {
+    "wave04Final": "bf85594",
+    "wave05Checkpoint": "pending",
+    "wave05Final": "pending"
+  },
+  "d1": {
+    "status": "DONE",
+    "recoveryProjectBindings": "PASS_RECOVERY_PROJECT_BINDINGS (main fixed; probe updated to assert read-only start, readable project, 422 command, unchanged old business)",
+    "evidence": [
+      "tools/distribution/repro-recovery-project-binding.mjs",
+      "tools/distribution/reports/wave05/recovery-project-bindings.json"
+    ],
+    "wave04Regression": {
+      "command": "node tools/distribution/smoke.mjs",
+      "status": "PASS",
+      "steps": 45,
+      "durationMs": 46343
+    }
+  },
+  "d2": {
+    "status": "PENDING"
+  },
+  "d3": {
+    "status": "PENDING"
+  },
+  "d4": {
+    "status": "PENDING"
+  },
+  "d5": {
+    "status": "PENDING"
+  },
+  "evidence": [
+    "tools/distribution/reports/wave05/recovery-project-bindings.json",
+    "tools/distribution/reports/zero-model-smoke.json"
+  ],
+  "limitations": [
+    "darwin/arm64 + Node 24.21.x measured candidate only",
+    "Package-scoped candidate; not main/E admission or product release",
+    "Second executor install/review mode remains gated by amendment-01 pilot and B/main interfaces"
+  ]
+}
