@@ -1,0 +1,29 @@
+✔ routing evidence is immutable, project-scoped, replayable and cursor-bounded (15.918208ms)
+✔ routing evidence joins the caller transaction and rolls back every record on failure (7.186416ms)
+✔ source projection rebuilds attempt evidence without claiming artifact ownership (7.797709ms)
+✔ routing records re-open in a second process and review report artifacts are snapshot-complete (170.479709ms)
+✔ single-work timeline links persisted evidence without inventing causality (13.18875ms)
+✔ a v12 database upgrades to v13 while keeping old contracts, decisions and deliveries (12.155292ms)
+✔ conversation catalog, search, archive and message identity survive reopen (17.064084ms)
+✔ unresolved work/questions remain visible as attention after archive (9.087833ms)
+✔ project settings are append-only, CAS-protected and archive only visibility (8.60175ms)
+✔ explicit decision versions append and revoke without inferred rules (6.868ms)
+✔ read index is bounded, scoped and never invents a current setting or authority (13.056125ms)
+✔ a snapshot includes the database and digest-verified artifacts; missing bytes block it (85.932875ms)
+✔ a v7 database backfills the conversation catalog on upgrade and keeps message identity (8.150042ms)
+✔ catalog pagination, long/empty titles and message paging keep identity and bounds (21.468208ms)
+✔ a second Node process consumes the public workflow ports and snapshot verifier (145.863833ms)
+✔ AssistantState decisions are source-bound CAS records and legacy rows never become valid memory (8.218542ms)
+✔ AssistantState proposals preserve immutable source/grant and confirmation command identity (7.270792ms)
+✔ assistant persistence joins the caller transaction and rolls back all rows on failure (6.184375ms)
+✔ conversation membership is indexed across v7 chat, works without messages and new messages (7.75725ms)
+✔ source message metadata is scoped/digested and state facts stay observational (5.97925ms)
+✔ a v10 ledger upgrades to v13: old decisions stay auditable but missing-source, new assistant state reopens (10.207417ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 468.9195

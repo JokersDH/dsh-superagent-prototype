@@ -832,9 +832,13 @@ export class WorkflowIndex {
     const reviews = this.db.prepare(`SELECT id, observed_at, disposition, layer FROM review_evidence
       WHERE project_id = ? AND json_extract(subject_value, '$.candidate.contract.workId') = ?`).all(work.projectId, workId) as Row[]
     for (const row of reviews) entries.push({ at: text(row.observed_at), kind: 'review.recorded', sourceRef: text(row.id), detail: { disposition: text(row.disposition), layer: text(row.layer) } })
-    const outcomes = this.db.prepare(`SELECT id, observed_at, acceptance, layer FROM execution_outcome
+    const outcomes = this.db.prepare(`SELECT id, observed_at, acceptance, layer, value FROM execution_outcome
       WHERE project_id = ? AND json_extract(value, '$.attempt.contract.workId') = ?`).all(work.projectId, workId) as Row[]
-    for (const row of outcomes) entries.push({ at: text(row.observed_at), kind: 'execution.outcome', sourceRef: text(row.id), detail: { acceptance: text(row.acceptance), layer: text(row.layer) } })
+    for (const row of outcomes) {
+      const outcome = json<{ reviewTiming?: unknown }>(row.value)
+      entries.push({ at: text(row.observed_at), kind: 'execution.outcome', sourceRef: text(row.id),
+        detail: { acceptance: text(row.acceptance), layer: text(row.layer), ...(outcome.reviewTiming ? { reviewTiming: outcome.reviewTiming } : {}) } })
+    }
     entries.sort((a, b) => b.at.localeCompare(a.at) || a.kind.localeCompare(b.kind) || a.sourceRef.localeCompare(b.sourceRef))
     return { entries: entries.slice(0, limit), truncated: entries.length > limit }
   }
