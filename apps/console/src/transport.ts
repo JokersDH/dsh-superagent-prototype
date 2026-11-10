@@ -18,6 +18,9 @@ import {
   WorkEnvironmentSchema,
   WorkVerificationStatusSchema,
   VerificationRetryCommandSchema,
+  ConversationCatalogQuerySchema,
+  ConversationCatalogSchema,
+  ConversationCommandSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -36,6 +39,9 @@ import type {
   WorkEnvironment,
   WorkVerificationStatus,
   VerificationRetryCommand,
+  ConversationCatalog,
+  ConversationCatalogQuery,
+  ConversationCommand,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -82,6 +88,8 @@ export interface ConsoleTransport {
   workEnvironment?(workId: string): Promise<WorkEnvironment | undefined>
   workVerification?(workId: string): Promise<WorkVerificationStatus | undefined>
   retryVerification?(command: VerificationRetryCommand): Promise<CommandReceipt>
+  conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog | undefined>
+  conversationCommand?(command: ConversationCommand): Promise<CommandReceipt>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -280,6 +288,23 @@ export class HttpTransport implements ConsoleTransport {
     }))
     if (receipt.commandId !== command.commandId || (receipt.workId && receipt.workId !== command.candidate.contract.workId))
       throw new TransportError('schema_mismatch', '验证恢复回执身份不匹配')
+    return receipt
+  }
+  async conversations(input: ConversationCatalogQuery): Promise<ConversationCatalog | undefined> {
+    const query = ConversationCatalogQuerySchema.parse(input), params = new URLSearchParams()
+    for (const [key, value] of Object.entries(query)) if (value !== undefined) params.set(key, String(value))
+    try {
+      const body = await this.request(`/v1/conversations?${params}`, undefined, true)
+      return body === missingOptionalResource ? undefined : ConversationCatalogSchema.parse(body)
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async conversationCommand(input: ConversationCommand): Promise<CommandReceipt> {
+    const command = ConversationCommandSchema.parse(input)
+    const receipt = CommandReceiptSchema.parse(await this.request('/v1/conversations/commands', { method: 'POST', body: JSON.stringify(command) }))
+    if (receipt.commandId !== command.commandId) throw new TransportError('schema_mismatch', '会话回执身份不匹配')
     return receipt
   }
   async *assistantChanges(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate> {

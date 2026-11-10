@@ -8,6 +8,8 @@ import { ConversationMessageSchema, IdSchema } from '@personal-agent/contracts'
 import {
   ArrowUp,
   ArrowUpRight,
+  Archive,
+  ArchiveRestore,
   Bot,
   Check,
   CheckCheck,
@@ -55,6 +57,8 @@ import type {
   ProjectRegistrationInput,
   WorkVerificationStatus,
   VerificationRetryCommand,
+  ConversationCommand,
+  ConversationSummary,
 } from '@personal-agent/contracts'
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
@@ -139,6 +143,9 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [modelPanelOpen, setModelPanelOpen] = useState(false)
   const [workspaceOpen, setWorkspaceOpen] = useState(false)
   const [workspaceView, setWorkspaceView] = useState<'conversation' | 'works' | 'decisions' | 'executors'>('conversation')
+  const [conversationTitle, setConversationTitle] = useState('主对话')
+  const [catalogAvailable, setCatalogAvailable] = useState(false)
+  const conversationDrafts = useRef(new Map<string, string>())
   const [assistant, setAssistant] = useState<AssistantProviderStatus | undefined>()
   const [waitingAfter, setWaitingAfter] = useState<number | undefined>()
   const [streamReplies, setStreamReplies] = useState<readonly AssistantStreamUpdate[]>([])
@@ -302,13 +309,13 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     )
       setWaitingAfter(undefined)
   }, [snapshot, waitingAfter])
-  const newConversation = () => {
+  const selectConversation = (id: string, title: string) => {
     setWorkspaceView('conversation')
-    const id = `conversation-${crypto.randomUUID()}`
     const url = new URL(window.location.href)
     url.searchParams.set('conversation', id)
     window.history.pushState(null, '', url)
     setConversationId(id)
+    setConversationTitle(title)
     setSelectedWorkId(undefined)
     setSnapshot(undefined)
     setWaitingAfter(undefined)
@@ -320,10 +327,22 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     setActivateWorkId(undefined)
     setLoading(true)
   }
+  const newConversation = async () => {
+    if (pending === 'conversation') return
+    const id = `conversation-${crypto.randomUUID()}`
+    const projectId = projectFilter ?? configuration?.projects[0]?.id
+    if (catalogAvailable && projectId && transport.conversationCommand) {
+      const receipt = await send({ kind: 'create_conversation', commandId: newId('cmd-conversation'),
+        conversationId: id, projectId, title: '新对话' }, 'conversation')
+      if (receipt?.status !== 'recorded') return
+    }
+    selectConversation(id, '新对话')
+  }
   useEffect(() => {
     const restore = () => {
       const id = new URLSearchParams(window.location.search).get('conversation')
       setConversationId(id && IdSchema.safeParse(id).success ? id : defaultConversationId)
+      setConversationTitle('主对话')
       setSelectedWorkId(undefined)
       setSnapshot(undefined)
       setWaitingAfter(undefined)
@@ -430,12 +449,14 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   }
 
   const send = useCallback(
-    async (command: UserCommand | VerificationRetryCommand, label: string): Promise<CommandReceipt | undefined> => {
+    async (command: UserCommand | VerificationRetryCommand | ConversationCommand, label: string): Promise<CommandReceipt | undefined> => {
       setPending(label)
       setProblem(undefined)
       try {
         const receipt = command.kind === 'retry_verification'
           ? await (transport.retryVerification?.(command) ?? Promise.reject(new TransportError('unsupported_capability', '验证恢复尚未接通')))
+          : command.kind === 'create_conversation' || command.kind === 'rename_conversation' || command.kind === 'archive_conversation'
+          ? await (transport.conversationCommand?.(command) ?? Promise.reject(new TransportError('unsupported_capability', '会话管理尚未接通')))
           : await transport.dispatch(command)
         if (receipt.status === 'rejected') {
           setProblem({
@@ -760,10 +781,14 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           </nav>
           <aside id="work-navigation" className="sidebar" aria-label="工作列表">
             <div className="sidebar-heading"><span><Layers3 size={15} />工作区</span><button type="button" className="icon-button drawer-close" title="关闭工作列表" aria-label="关闭工作列表" onClick={() => setWorkspaceOpen(false)}><X size={17} /></button></div>
-            <button type="button" className="new-conversation" onClick={newConversation}>
+            <button type="button" className="new-conversation" disabled={pending === 'conversation'} onClick={() => void newConversation()}>
               <SquarePen size={16} />
               <span>新对话</span>
             </button>
+            {transport.conversations && <ConversationDirectory transport={transport} currentId={conversationId}
+              projectId={projectFilter} cursor={snapshot?.cursor} onAvailable={setCatalogAvailable} onTitle={setConversationTitle}
+              onSelect={entry => selectConversation(entry.id, entry.title)}
+              onCommand={command => send(command, 'conversation')} />}
             <button type="button" className="sidebar-current" onClick={() => openView('conversation')}>
               <MessageSquare size={16} />
               <span>主对话</span>
@@ -920,6 +945,9 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             <div className="workspace-summary" aria-label="当前对话工作概况"><span><span className="summary-count">{activeWorks.length}</span>进行中</span><button type="button" onClick={() => openView('decisions')}><span className="summary-count">{openQuestions.length}</span>待决定</button><span><CheckCheck size={13} /><span className="summary-count">{works.filter(work => work.phase === 'delivered').length}</span>已交付</span></div>
             <Conversation
               key={conversationId}
+              title={conversationTitle}
+              initialDraft={conversationDrafts.current.get(conversationId) ?? ''}
+              onDraftChange={text => conversationDrafts.current.set(conversationId, text)}
               snapshot={snapshot}
               projectFilter={projectFilter}
               selectedWork={selectedWork}
@@ -1093,6 +1121,86 @@ export function App({ transport }: { transport: ConsoleTransport }) {
       )}
     </div>
   )
+}
+
+function ConversationDirectory({ transport, currentId, projectId, cursor, onAvailable, onTitle, onSelect, onCommand }: {
+  transport: ConsoleTransport
+  currentId: string
+  projectId: string | undefined
+  cursor: number | undefined
+  onAvailable: (value: boolean) => void
+  onTitle: (value: string) => void
+  onSelect: (entry: ConversationSummary) => void
+  onCommand: (command: ConversationCommand) => Promise<CommandReceipt | undefined>
+}) {
+  const [items, setItems] = useState<readonly ConversationSummary[]>([])
+  const [query, setQuery] = useState('')
+  const [includeArchived, setIncludeArchived] = useState(false)
+  const [nextCursor, setNextCursor] = useState<string | undefined>()
+  const [supported, setSupported] = useState<boolean | undefined>()
+  const [loading, setLoading] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const [editing, setEditing] = useState<string | undefined>()
+  const [title, setTitle] = useState('')
+  const [busy, setBusy] = useState(false)
+  const request = useRef(0)
+  const load = useCallback(async (next?: string) => {
+    const sequence = ++request.current
+    setLoading(true)
+    setFailed(false)
+    try {
+      const page = await transport.conversations?.({ limit: 30, includeArchived,
+        ...(projectId ? { projectId } : {}), ...(query.trim() ? { query: query.trim() } : {}), ...(next ? { cursor: next } : {}) })
+      if (request.current !== sequence) return
+      setSupported(!!page)
+      onAvailable(!!page)
+      if (page) {
+        setItems(previous => next ? [...new Map([...previous, ...page.conversations].map(entry => [entry.id, entry])).values()] : page.conversations)
+        setNextCursor(page.nextCursor)
+      }
+    } catch { if (request.current === sequence) setFailed(true) }
+    finally { if (request.current === sequence) setLoading(false) }
+  }, [transport, includeArchived, projectId, query, onAvailable])
+  useEffect(() => {
+    const timer = setTimeout(() => { void load() }, 150)
+    return () => { clearTimeout(timer); request.current++ }
+  }, [load, cursor])
+  useEffect(() => {
+    const current = items.find(entry => entry.id === currentId)
+    if (current) onTitle(current.title)
+  }, [items, currentId, onTitle])
+  const mutate = async (command: ConversationCommand): Promise<boolean> => {
+    if (busy) return false
+    setBusy(true)
+    try {
+      const receipt = await onCommand(command)
+      if (receipt?.status !== 'recorded') return false
+      await load()
+      return true
+    } finally { setBusy(false) }
+  }
+  if (supported === false) return null
+  return <section className="conversation-directory" aria-label="历史对话">
+    <div className="sidebar-section-label"><span>对话</span><button type="button" className="icon-button" aria-label="刷新对话目录" title="刷新对话目录" disabled={loading} onClick={() => void load()}><RefreshCw size={13} /></button></div>
+    <div className="conversation-search"><Search size={14} /><input type="search" aria-label="搜索历史对话" placeholder="搜索对话" value={query} onChange={event => setQuery(event.target.value)} /></div>
+    <label className="conversation-archive-filter"><input type="checkbox" checked={includeArchived} onChange={event => setIncludeArchived(event.target.checked)} />包含归档</label>
+    {failed && <p className="warn-text" role="status">对话目录读取失败。</p>}
+    {loading && <p className="context-line" role="status">正在读取对话…</p>}
+    {!loading && !failed && !items.length && <p className="context-line">{query ? '没有匹配的对话' : '暂无历史对话'}</p>}
+    <ul className="conversation-list">
+      {items.map(entry => <li key={entry.id} className={entry.id === currentId ? 'current' : ''}>
+        {editing === entry.id ? <form className="conversation-rename" onSubmit={event => { event.preventDefault(); void mutate({ kind: 'rename_conversation', commandId: newId('cmd-rename'), conversationId: entry.id, expectedTitleRevision: entry.titleRevision, title: title.trim() }).then(ok => { if (ok) setEditing(undefined) }) }}>
+          <input autoFocus aria-label="对话名称" maxLength={512} value={title} onChange={event => setTitle(event.target.value)} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); setEditing(undefined) } }} />
+          <button type="submit" className="icon-button" disabled={busy || !title.trim()} title="保存对话名称" aria-label="保存对话名称"><Check size={14} /></button>
+          <button type="button" className="icon-button" disabled={busy} title="取消重命名" aria-label="取消重命名" onClick={() => setEditing(undefined)}><X size={14} /></button>
+        </form> : <><button type="button" className="conversation-select" aria-current={entry.id === currentId ? 'true' : undefined} title={entry.title} onClick={() => onSelect(entry)}><MessageSquare size={13} /><span>{entry.title}</span>{entry.attention && <i className="conversation-attention" title="有进行中工作或待办" />}{entry.archivedAt && <Archive size={12} />}</button>
+          <div className="conversation-tools"><button type="button" className="icon-button" disabled={busy} title={`重命名：${entry.title}`} aria-label={`重命名：${entry.title}`} onClick={() => { setEditing(entry.id); setTitle(entry.title) }}><SquarePen size={13} /></button>
+          <button type="button" className="icon-button" disabled={busy} title={entry.archivedAt ? `取消归档：${entry.title}` : `归档：${entry.title}`} aria-label={entry.archivedAt ? `取消归档：${entry.title}` : `归档：${entry.title}`} onClick={() => void mutate({ kind: 'archive_conversation', commandId: newId('cmd-archive'), conversationId: entry.id, expectedArchiveRevision: entry.archiveRevision, archived: !entry.archivedAt })}>{entry.archivedAt ? <ArchiveRestore size={13} /> : <Archive size={13} />}</button></div>
+        </>}
+      </li>)}
+    </ul>
+    {nextCursor && <button type="button" className="quiet catalog-more" disabled={loading} onClick={() => void load(nextCursor)}>加载更多</button>}
+  </section>
 }
 
 function WorkDirectory({ works, loading, configuration, onSelect, onCreate }: {
@@ -1772,6 +1880,9 @@ function ErrorPanel({
 }
 
 function Conversation({
+  title,
+  initialDraft,
+  onDraftChange,
   snapshot,
   projectFilter,
   selectedWork,
@@ -1790,6 +1901,9 @@ function Conversation({
   onSend,
   onLoadOlder,
 }: {
+  title: string
+  initialDraft: string
+  onDraftChange: (value: string) => void
   snapshot: Snapshot | undefined
   projectFilter: string | undefined
   selectedWork: WorkView | undefined
@@ -1808,7 +1922,8 @@ function Conversation({
   onSend: (text: string, useWorkContext: boolean) => Promise<boolean>
   onLoadOlder: (before: number) => Promise<void>
 }) {
-  const [draft, setDraft] = useState('')
+  const [draft, setDraft] = useState(initialDraft)
+  useEffect(() => { onDraftChange(draft) }, [draft, onDraftChange])
   const [useWorkContext, setUseWorkContext] = useState(false)
   useEffect(() => {
     if (activateWorkId && selectedWork?.work.id === activateWorkId) {
@@ -1851,7 +1966,7 @@ function Conversation({
       <div className="conversation-head">
         <div className="conversation-heading">
           <span className="section-icon"><MessageSquare size={17} /></span><div>
-          <h2>{useWorkContext && selectedWork ? '当前工作' : '主对话'}</h2>
+          <h2 title={useWorkContext && selectedWork ? '当前工作' : title}>{useWorkContext && selectedWork ? '当前工作' : title}</h2>
           <p className="context-line">
             {useWorkContext && selectedWork ? selectedWork.work.title : selectedProjectName}
           </p>

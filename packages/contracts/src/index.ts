@@ -5,5 +5,6 @@ export * from './configuration.ts';
 export * from './assistant.ts';
 export * from './projects.ts';
 export * from './operations.ts';
+export * from './conversations.ts';
 export type * from './types.ts';
 export type * from './ports.ts';

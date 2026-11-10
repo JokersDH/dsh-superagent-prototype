@@ -71,6 +71,7 @@
     "check:g2-browser": "node tests/integration/workbench-browser.mjs",
     "check:ui-v3": "node tests/integration/ui-workbench-v3.mjs",
     "check:verification-recovery": "node tests/integration/verification-recovery-browser.mjs",
+    "check:conversation-catalog": "node tests/integration/conversation-catalog-browser.mjs",
     "check:assistant-browser": "node tests/integration/assistant-browser.mjs",
     "check:native-product": "node tools/bootstrap/smoke-native-product.mjs --execute",
     "check:native-browser": "node tests/integration/native-workbench.mjs --execute",

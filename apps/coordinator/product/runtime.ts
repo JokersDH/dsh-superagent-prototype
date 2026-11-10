@@ -1,8 +1,8 @@
 import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
-import { ApplicationFault, createProductApplication } from '@personal-agent/application'
+import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
-import type { NativeQuestionBinding, Scope } from '@personal-agent/contracts'
+import type { ConversationCommand, NativeQuestionBinding, Scope, TrustedActor } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { CheckRegistry } from '@personal-agent/verification'
@@ -113,12 +113,15 @@ export function createProductRuntime(
     environments,
   )
   const { store } = options
+  const conversations = new ApplicationConversations(store, options.principal, () => configuredProjects.map(project => project.id), options.actionSecret)
   const assistantStreams = new AssistantStreams()
   if (options.assistantProvider)
     handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams, {
       nativeExecution: !!options.native,
     })
   const read: NonNullable<LocalHttpOptions['read']> = {
+    conversations: async query => conversations.list(query),
+    conversation: async id => conversations.get(id),
     workVerification: async (workId) => {
       const work = (await application.inspect({ workId })).works[0]
       if (!work) throw new ApplicationFault('invalid_request', 'Unknown work')
@@ -288,7 +291,7 @@ export function createProductRuntime(
     workspaces,
     checks,
     read,
-    operations: { retryVerification: application.retryVerification.bind(application) },
+    operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor) },
     start: () => execution!.start(),
     close: () => {
       assistantStreams.close()

@@ -5,6 +5,7 @@ import { listenLocalHttp } from '../../apps/coordinator/http/server.ts'
 import { fixture, actor, createCommand, scope } from '../../packages/application/test/helpers.ts'
 import { Effects } from '../../packages/effects/dist/index.js'
 import { handleQuestionAnswers } from '../../apps/coordinator/http/question-effects.ts'
+import { ApplicationConversations } from '../../packages/application/dist/index.js'
 
 const BASE = 'http://127.0.0.1:4318',
   API = 'a'.repeat(64),
@@ -37,6 +38,32 @@ test('health is public but data and commands require local credentials', async (
   const denied = await h.command(createCommand(), {})
   assert.equal(denied.status, 401)
   assert.equal((await denied.json()).error.code, 'auth_required')
+})
+test('conversation catalog is authenticated, scoped and uses immutable command receipts', async t => {
+  const h = fixture(t), catalog = new ApplicationConversations(h.store, actor, () => ['project-atlas'], Buffer.alloc(32, 1))
+  const server = createLocalHttpApp({ application: h.app, principal: actor, bootstrapToken: BOOT, apiToken: API,
+    allowedOrigins: [BASE], mode: 'fixture', read: { conversations: async query => catalog.list(query), conversation: async id => catalog.get(id) },
+    operations: { retryVerification: h.app.retryVerification.bind(h.app), conversation: async (command, trusted) => catalog.dispatch(command, trusted) } })
+  const headers = { authorization: `Bearer ${API}`, 'content-type': 'application/json' }
+  const request = (path, init = {}) => server.request(`${BASE}${path}`, init)
+  const command = { kind: 'create_conversation', commandId: 'http-catalog', conversationId: 'http-conversation', projectId: 'project-atlas', title: '持久对话' }
+  const post = value => request('/v1/conversations/commands', { method: 'POST', headers, body: JSON.stringify(value) })
+  assert.equal((await request('/v1/conversations')).status, 401)
+  assert.equal((await request('/v1/conversations/http-conversation')).status, 401)
+  assert.equal((await request('/v1/conversations/commands', { method: 'POST', body: '{}' })).status, 401)
+  assert.equal((await post({ ...command, actor })).status, 400)
+  const receipt = await (await post(command)).json()
+  assert.equal(receipt.status, 'recorded')
+  assert.deepEqual(await (await post(command)).json(), receipt)
+  assert.equal((await post({ ...command, title: 'Changed payload' })).status, 409)
+  const page = await (await request('/v1/conversations?limit=1&includeArchived=false', { headers })).json()
+  assert.equal(page.protocol, 'conversation-catalog/1')
+  assert.equal(page.conversations[0].title, '持久对话')
+  assert.equal((await request('/v1/conversations?projectId=project-other', { headers })).status, 403)
+  for (const query of ['includeArchived=1', 'limit=51', 'actor=forged'])
+    assert.equal((await request(`/v1/conversations?${query}`, { headers })).status, 400)
+  assert.equal((await request('/v1/conversations/http-conversation?unexpected=1', { headers })).status, 400)
+  assert.equal((await request('/v1/conversations/unknown-conversation', { headers })).status, 403)
 })
 test('local development access opens directly without a token, cookie or browser storage', async (t) => {
   const h = setup(t, { localDevelopmentAccess: true })

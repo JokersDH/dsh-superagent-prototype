@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import type { ProjectRegistrationInput, VerificationRetryCommand } from '@personal-agent/contracts'
+import type { ConversationCommand, ProjectRegistrationInput, VerificationRetryCommand } from '@personal-agent/contracts'
 import { HttpTransport, TransportError } from '../src/transport.ts'
 import { fixtureConfiguration } from '../src/fixture.ts'
 
@@ -117,4 +117,25 @@ test('older backend may omit the optional status route, while malformed results 
   await assert.rejects(new HttpTransport().workVerification('work-one'))
   globalThis.fetch = async () => new Response(JSON.stringify({ error: { code: 'auth_required', message: 'Sign in', retry: 'user_action' } }), { status: 401 })
   await assert.rejects(new HttpTransport().workVerification('work-one'), error => error instanceof TransportError && error.code === 'auth_required')
+})
+
+test('conversation transport encodes filters, validates commands and preserves backend capability errors', async t => {
+  const original = globalThis.fetch
+  t.after(() => { globalThis.fetch = original })
+  const requests: { input: string; init: RequestInit | undefined }[] = []
+  const command: ConversationCommand = { kind: 'rename_conversation', commandId: 'rename-one', conversationId: 'conversation-one', expectedTitleRevision: 1, title: '方案终稿' }
+  globalThis.fetch = async (input, init) => {
+    requests.push({ input: String(input), init })
+    return new Response(JSON.stringify(init?.method === 'POST' ? { status: 'recorded', commandId: command.commandId, seq: 1 }
+      : { protocol: 'conversation-catalog/1', conversations: [], hasMore: false }))
+  }
+  await new HttpTransport().conversations({ query: '方案', includeArchived: true, limit: 30 })
+  assert.equal(new URL(requests[0]!.input, 'http://localhost').searchParams.get('query'), '方案')
+  assert.equal(new URL(requests[0]!.input, 'http://localhost').searchParams.get('includeArchived'), 'true')
+  assert.equal((await new HttpTransport().conversationCommand(command)).status, 'recorded')
+  assert.deepEqual(JSON.parse(String(requests[1]!.init?.body)), command)
+  globalThis.fetch = async () => new Response('404 Not Found', { status: 404 })
+  assert.equal(await new HttpTransport().conversations({}), undefined)
+  globalThis.fetch = async () => new Response('{}', { status: 200 })
+  await assert.rejects(new HttpTransport().conversations({}))
 })

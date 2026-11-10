@@ -504,3 +504,24 @@ button.stage-pending:hover:not(:disabled) { border: 0; background: #f5e9d3; colo
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; transition: none !important; }
 }
+/* Conversation history remains a flat, bounded navigation list. */
+.conversation-directory { margin: 8px 0 18px; min-width: 0; }
+.conversation-directory .sidebar-section-label { margin: 6px 0; align-items: center; }
+.conversation-search { display: flex; align-items: center; gap: 7px; padding: 0 8px; height: 32px; background: var(--panel); border: 1px solid var(--line); border-radius: 5px; color: var(--muted); }
+.conversation-search input { min-width: 0; width: 100%; padding: 0; border: 0; background: transparent; font-size: 12px; }
+.conversation-archive-filter { display: flex; align-items: center; gap: 6px; margin: 8px 0; font-size: 11px; color: var(--muted); }
+.conversation-archive-filter input { width: 13px; height: 13px; margin: 0; accent-color: var(--accent); }
+.conversation-list { list-style: none; padding: 0; margin: 0; max-height: 222px; overflow-y: auto; }
+.conversation-list li { display: flex; align-items: center; min-height: 36px; border-radius: 4px; }
+.conversation-list li.current { background: var(--accent-soft); }
+.conversation-select { flex: 1; min-width: 0; display: flex; align-items: center; gap: 7px; padding: 7px 4px; border: 0; background: transparent; color: var(--ink); text-align: left; font-size: 12px; }
+.conversation-select span { flex: 1; min-width: 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.conversation-select svg { flex-shrink: 0; }
+.conversation-tools { display: flex; flex-shrink: 0; }
+.conversation-directory .icon-button { width: 25px; height: 27px; min-width: 25px; padding: 0; }
+.conversation-attention { width: 5px; height: 5px; flex-shrink: 0; border-radius: 50%; background: var(--warn); }
+.conversation-rename { display: flex; align-items: center; gap: 2px; width: 100%; }
+.conversation-rename input { min-width: 0; width: 100%; padding: 5px; font-size: 12px; }
+.catalog-more { width: 100%; margin-top: 6px; font-size: 12px; }
+.conversation-head h2 { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conversation-heading > div { min-width: 0; max-width: 100%; }

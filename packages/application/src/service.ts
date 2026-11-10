@@ -368,6 +368,9 @@ class LocalApplication implements ProductApplication {
       sourceRefs: workId ? [key('trigger', command.commandId)] : [],
       createdAt: this.now(),
     })
+    const conversation = this.store.workflows.conversations.get(command.conversationId)
+    if (conversation?.title === '新对话' && conversation.titleRevision === 1 && conversation.messageCount === 1)
+      this.store.workflows.conversations.rename(conversation.id, 1, text.trim().split('\n')[0]!.slice(0, 120))
   }
   private validateScope(scope: Scope): void {
     const project = this.project(scope.projectId)

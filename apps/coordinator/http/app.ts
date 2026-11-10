@@ -28,6 +28,10 @@ import {
   WorkViewSchema,
   VerificationRetryCommandSchema,
   WorkVerificationStatusSchema,
+  ConversationCatalogQuerySchema,
+  ConversationCatalogSchema,
+  ConversationSummarySchema,
+  ConversationCommandSchema,
 } from '@personal-agent/contracts'
 import type {
   AnswerDelivery,
@@ -44,6 +48,10 @@ import type {
   CommandReceipt,
   VerificationRetryCommand,
   WorkVerificationStatus,
+  ConversationCatalog,
+  ConversationCatalogQuery,
+  ConversationSummary,
+  ConversationCommand,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -87,8 +95,11 @@ export interface LocalHttpOptions {
   now?: () => number
   operations?: {
     retryVerification(command: VerificationRetryCommand, actor: TrustedActor): Promise<CommandReceipt>
+    conversation?(command: ConversationCommand, actor: TrustedActor): Promise<CommandReceipt>
   }
   read?: {
+    conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog>
+    conversation?(id: string): Promise<ConversationSummary>
     assistant?(): Promise<AssistantProviderStatus>
     assistantStream?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
     selectModel?(model: string): Promise<AssistantProviderStatus>
@@ -237,6 +248,31 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!options.read?.configuration)
       throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
     return c.json(ApplicationConfigurationSchema.parse(await options.read.configuration()))
+  })
+  app.get('/v1/conversations', async (c) => {
+    if (!options.read?.conversations) throw new ApplicationFault('unsupported_capability', 'Conversation catalog is not connected')
+    const raw = c.req.query(), input: Record<string, unknown> = { ...raw }
+    if (raw.limit !== undefined) input.limit = /^\d+$/.test(raw.limit) ? Number(raw.limit) : NaN
+    if (raw.includeArchived !== undefined) {
+      if (!['true', 'false'].includes(raw.includeArchived)) throw new ApplicationFault('invalid_request', 'Invalid archive filter')
+      input.includeArchived = raw.includeArchived === 'true'
+    }
+    return c.json(ConversationCatalogSchema.parse(await options.read.conversations(ConversationCatalogQuerySchema.parse(input))))
+  })
+  app.get('/v1/conversations/:id', async (c) => {
+    if (!options.read?.conversation) throw new ApplicationFault('unsupported_capability', 'Conversation reader is not connected')
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Conversation read does not accept query parameters')
+    const id = IdSchema.parse(c.req.param('id')), value = ConversationSummarySchema.parse(await options.read.conversation(id))
+    if (value.id !== id) throw new ApplicationFault('storage_unavailable', 'Conversation reader identity mismatch', 'none')
+    return c.json(value)
+  })
+  app.post('/v1/conversations/commands', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Conversation commands require JSON')
+    if (!options.operations?.conversation) throw new ApplicationFault('unsupported_capability', 'Conversation commands are not connected')
+    const command = ConversationCommandSchema.parse(await c.req.json())
+    const receipt = CommandReceiptSchema.parse(await options.operations.conversation(command, c.get('actor')))
+    if (receipt.commandId !== command.commandId) throw new ApplicationFault('storage_unavailable', 'Conversation receipt identity mismatch', 'none')
+    return c.json(receipt)
   })
   app.get('/v1/assistant', async (c) => {
     if (!options.read?.assistant)
