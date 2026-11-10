@@ -1,0 +1,361 @@
+{
+  "schema": "product-acceptance-matrix/1",
+  "agent": "E",
+  "source": {
+    "commit": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+    "dirty": false
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "os": "Darwin 25.6.0"
+  },
+  "checkedAt": "2026-11-10T05:07:20.305Z",
+  "release": {
+    "tier": "controlled-product-internal-trial",
+    "status": "PASS",
+    "failureCodes": []
+  },
+  "counts": {
+    "PASS": 42,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 4,
+    "BLOCKED": 0,
+    "UNKNOWN": 0
+  },
+  "rows": [
+    {
+      "id": "conversation-chat",
+      "capability": "主对话：普通消息持久化与重开",
+      "controlledFixture": "PASS",
+      "sdkMock": "PASS",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "真实模型回复与流式界面未在本轮执行；budget 0。"
+      ],
+      "evidence": [
+        "E2-REPLAY-AND-CONFLICT",
+        "E2-REOPEN-PERSISTENCE",
+        "E2-ASSISTANT-SDK-MOCK"
+      ]
+    },
+    {
+      "id": "explicit-delegation",
+      "capability": "明确委托到受控执行、验证与完成",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "真实 Codex 执行属于 B 的原生验收，E 未触发计费任务。"
+      ],
+      "evidence": [
+        "E2-DAILY-VERTICAL"
+      ]
+    },
+    {
+      "id": "question-answer",
+      "capability": "问题中心：打开、回答、投递与决策收件箱",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "真实原生权限/审批问题未执行；B 的原生证据未作为输入提供。"
+      ],
+      "evidence": [
+        "E2-DAILY-VERTICAL",
+        "E3-QUESTION-FORM"
+      ]
+    },
+    {
+      "id": "verification-completion",
+      "capability": "机器检查、完整 patch、artifact 字节与人工接受",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "原生注册检查与真实 deliverable 未在本轮复验。"
+      ],
+      "evidence": [
+        "E2-DAILY-VERTICAL",
+        "E2-ARTIFACT-ROUNDTRIP",
+        "E3-ACCEPT-AND-DOWNLOAD"
+      ]
+    },
+    {
+      "id": "machine-fail",
+      "capability": "必需机器检查失败不可被人工接受",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E2-MACHINE-FAIL"
+      ]
+    },
+    {
+      "id": "replay-conflict",
+      "capability": "同 commandId 幂等重放与冲突拒绝",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E2-REPLAY-AND-CONFLICT"
+      ]
+    },
+    {
+      "id": "stale-guards",
+      "capability": "旧合同/旧候选/旧回答按业务规则拒绝",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "旧提案与决定的撤销治理（C 未交付）"
+      ],
+      "evidence": [
+        "E2-STALE-BUSINESS-REJECTION"
+      ]
+    },
+    {
+      "id": "isolation",
+      "capability": "会话隔离与工作隔离",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "两个独立项目的隔离：受控 lane 只有一个项目。"
+      ],
+      "evidence": [
+        "E2-SESSION-ISOLATION"
+      ]
+    },
+    {
+      "id": "writer-identity",
+      "capability": "停止后继续使用新 ticket，不重用旧执行",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "真实原生写进程停止与物理资源屏障由 B 证明。"
+      ],
+      "evidence": [
+        "E2-ONE-WRITER",
+        "E4-BOUNDED-CYCLES"
+      ]
+    },
+    {
+      "id": "resource-recovery",
+      "capability": "重启后交付、消息与 artifact 保留",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "协调器 SIGKILL 后的原生恢复与重连（B 范围）。"
+      ],
+      "evidence": [
+        "E2-REOPEN-PERSISTENCE",
+        "E4-BOUNDED-CYCLES"
+      ]
+    },
+    {
+      "id": "scope-profile-auth",
+      "capability": "越权 scope、未知项目、未准入 profile、认证与 Origin",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E2-SCOPE-AND-PROFILE-GUARDS",
+        "E2-AUTH-AND-ORIGIN"
+      ]
+    },
+    {
+      "id": "ui-desktop",
+      "capability": "桌面 1440×900 主对话中心布局",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E3-DESKTOP-GEOMETRY"
+      ]
+    },
+    {
+      "id": "ui-notebook",
+      "capability": "笔记本 1280×800 布局",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E3-NOTEBOOK-GEOMETRY"
+      ]
+    },
+    {
+      "id": "ui-mobile",
+      "capability": "窄屏 390×844 抽屉、键盘与关闭",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E3-MOBILE-GEOMETRY",
+        "E3-KEYBOARD-AND-SCROLL"
+      ]
+    },
+    {
+      "id": "ui-states",
+      "capability": "加载/错误/离线与重连状态",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E3-OFFLINE-AND-ERROR"
+      ]
+    },
+    {
+      "id": "ui-download",
+      "capability": "完整 patch 预览与 artifact 下载字节校验",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "PASS",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E3-ACCEPT-AND-DOWNLOAD",
+        "E2-ARTIFACT-ROUNDTRIP"
+      ]
+    },
+    {
+      "id": "stability",
+      "capability": "有界混合周期稳定性（受控）",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "长时间 soak、负载与多实例并发。"
+      ],
+      "evidence": [
+        "E4-BOUNDED-CYCLES"
+      ]
+    },
+    {
+      "id": "portability-tooling",
+      "capability": "迁移清单验收规则（缺产物/坏 digest/无回滚拒绝）",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "PASS",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E4-PORTABILITY-CHECKLIST"
+      ]
+    },
+    {
+      "id": "install-first-run",
+      "capability": "新目录/新账户安装与 first-run",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "D 的 apps/launcher、tools/distribution、packages/portability 尚未交付。"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "backup-restore",
+      "capability": "完整备份、恢复与路径映射",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "无发行 bundle 与迁移 CLI。"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "upgrade-rollback",
+      "capability": "升级与回滚",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "无版本化发行产物。"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "session-catalog",
+      "capability": "会话目录、搜索与归档",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "公共 HTTP 尚无会话目录/搜索/归档接口（见 RFC-E-001 缺口 1）。"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "project-settings-version",
+      "capability": "项目设置版本化与归档",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "仅合同 revision 已验证；项目设置版本 API 未交付（RFC-E-001 缺口 2）。"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "context-proposals-decisions",
+      "capability": "上下文、提案与明确决定治理",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "C 的 packages/context、proposals、knowledge 未交付；确认前不执行、重复确认幂等、撤销后失效无法端到端验证。",
+        "本次仅记录 record_decision 的显式拒绝（见 E2-CONTEXT-PROPOSALS-NOT-TESTED）。"
+      ],
+      "evidence": [
+        "E2-CONTEXT-PROPOSALS-NOT-TESTED"
+      ]
+    },
+    {
+      "id": "actual-native",
+      "capability": "真实原生执行、停止、审批与恢复",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "B 的原生证据未作为已提交输入提供；E 未获单独预算，不触发模型任务。"
+      ],
+      "evidence": []
+    }
+  ]
+}

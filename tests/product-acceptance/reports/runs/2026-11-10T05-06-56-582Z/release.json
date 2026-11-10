@@ -1,0 +1,170 @@
+{
+  "schema": "product-acceptance-release/1",
+  "tier": "controlled-product-internal-trial",
+  "status": "PASS",
+  "ok": true,
+  "checkedAt": "2026-11-10T05:07:20.318Z",
+  "source": {
+    "commit": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+    "dirty": false
+  },
+  "expectedSource": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+  "requirements": [
+    {
+      "id": "E1-GATE-CONTROL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-MISSING-CASE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-STALE-REPORT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-NO-CANDIDATE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-BAD-PATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-FIXTURE-STRICT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-FIXTURE-PORTABILITY-STRICT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-CONFIGURATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-DAILY-VERTICAL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-ARTIFACT-ROUNDTRIP",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-REOPEN-PERSISTENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-REPLAY-AND-CONFLICT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-SESSION-ISOLATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-STALE-BUSINESS-REJECTION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-MACHINE-FAIL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-ONE-WRITER",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-AUTH-AND-ORIGIN",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-ASSISTANT-SDK-MOCK",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-DESKTOP-GEOMETRY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-NOTEBOOK-GEOMETRY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-MOBILE-GEOMETRY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-QUESTION-FORM",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-ACCEPT-AND-DOWNLOAD",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-OFFLINE-AND-ERROR",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-KEYBOARD-AND-SCROLL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-BOUNDED-CYCLES",
+      "required": true,
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "claimedBy": null,
+  "notes": [
+    "Controlled fixture and SDK mock evidence never substitute for actual-native execution.",
+    "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability."
+  ]
+}

@@ -1,40 +1,19 @@
 {
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T04-34-36-182Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z",
   "tier": "controlled-product-internal-trial",
-  "status": "FAIL",
+  "status": "PASS",
   "source": {
-    "commit": "3957e30cbbaa3cd86a672fb4583922eba8364fc8",
-    "dirty": true
+    "commit": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+    "dirty": false
   },
-  "checkedAt": "2026-11-10T04:34:36.191Z",
+  "checkedAt": "2026-11-10T05:07:20.305Z",
   "counts": {
-    "PASS": 21,
+    "PASS": 42,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 0,
+    "NOT_TESTED": 4,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
-  "failureCodes": [
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case",
-    "missing_required_case"
-  ]
+  "failureCodes": []
 }

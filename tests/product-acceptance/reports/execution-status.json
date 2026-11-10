@@ -1,0 +1,618 @@
+{
+  "schema": "agent-execution-status/1",
+  "agent": "E",
+  "branch": "codex/g3-product-acceptance",
+  "base": "3957e30cbbaa3cd86a672fb4583922eba8364fc8",
+  "checkpoint": "835d663",
+  "head": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+  "worktreeDirtyAtRun": false,
+  "checkedAt": "2026-11-10T05:07:20.305Z",
+  "budget": {
+    "modelTasks": 0,
+    "nativeRuns": 0,
+    "note": "No vendor model was called. The only model peer is a loopback OpenAI-compatible mock created by the E2 case."
+  },
+  "stages": [
+    {
+      "id": "E1",
+      "title": "Fail-closed independent harness and checkpoint",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only",
+      "notes": [
+        "21 self-tests prove the gate rejects missing cases, unknown status, uncertain acceptance, stale reports, missing candidates, corrupt patches, unexecuted native evidence and illegal fixtures.",
+        "A run of the release tier with only selftests exits nonzero with 20 missing_required_case failures."
+      ],
+      "result": "PASS",
+      "counts": {
+        "PASS": 21
+      },
+      "cases": [
+        {
+          "id": "E1-GATE-CONTROL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-MISSING-CASE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-STALE-REPORT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-NO-CANDIDATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-VACUOUS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-DUPLICATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-BAD-PATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-SCHEMA",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-FIXTURE-STRICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-FIXTURE-PORTABILITY-STRICT",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E2",
+      "title": "Daily product vertical and negative cases",
+      "command": "node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow",
+      "notes": [
+        "Real SQLite, real scratch subprocess and real verification through authenticated loopback HTTP.",
+        "Covers question/answer/delivery, machine PASS and FAIL, patch apply to the recorded base commit, artifact byte roundtrip, command replay/conflict, stale contract/candidate/answer, two-conversation isolation, stop/continue writer identity, scope/profile guards, restart persistence and a loopback SDK mock chat."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 12,
+        "NOT_TESTED": 1
+      },
+      "cases": [
+        {
+          "id": "E2-AUTH-AND-ORIGIN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONFIGURATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-DAILY-VERTICAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ARTIFACT-ROUNDTRIP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLAY-AND-CONFLICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-SESSION-ISOLATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-STALE-BUSINESS-REJECTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-MACHINE-FAIL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ONE-WRITER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONTEXT-PROPOSALS-NOT-TESTED",
+          "status": "NOT_TESTED",
+          "reason": "record_decision returned rejected (unsupported_capability); proposal confirmation and revocation have no public entry in this checkout."
+        },
+        {
+          "id": "E2-REOPEN-PERSISTENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ASSISTANT-SDK-MOCK",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E3",
+      "title": "Independent browser, visual geometry and interaction regression",
+      "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
+      "notes": [
+        "Packaged workbench at 1440x900, 1280x800 and 390x844; geometry/overflow/reachability rather than aesthetic scoring.",
+        "Covers the decision inbox, patch preview, byte-verified artifact download, UI acceptance, reopen, loading, error, SSE-offline, tab focus, long Chinese/path and list scrolling."
+      ],
+      "result": "PASS",
+      "counts": {
+        "PASS": 7
+      },
+      "cases": [
+        {
+          "id": "E3-DESKTOP-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-NOTEBOOK-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-MOBILE-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-QUESTION-FORM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ACCEPT-AND-DOWNLOAD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-OFFLINE-AND-ERROR",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-KEYBOARD-AND-SCROLL",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E4",
+      "title": "Bounded stability and portability boundaries",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12",
+      "notes": [
+        "Mixed question/complete/fail/stop cycles with a restart in the middle; process/FD/RSS/disk/receipt observations remain scoped to this instance.",
+        "Portable installation, first-run, backup/restore and upgrade rollback are declared NOT_TESTED because D's directories are absent in this checkout."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 2,
+        "NOT_TESTED": 3
+      },
+      "cases": [
+        {
+          "id": "E4-BOUNDED-CYCLES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-PORTABILITY-CHECKLIST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-FIRST-RUN",
+          "status": "NOT_TESTED",
+          "reason": "No portable distribution exists in this checkout (missing: launcher, distribution, portability). The developer workbench launcher is not an installation path."
+        },
+        {
+          "id": "E4-BACKUP-RESTORE",
+          "status": "NOT_TESTED",
+          "reason": "No portable distribution exists in this checkout (missing: launcher, distribution, portability). The developer workbench launcher is not an installation path."
+        },
+        {
+          "id": "E4-UPGRADE-ROLLBACK",
+          "status": "NOT_TESTED",
+          "reason": "No portable distribution exists in this checkout (missing: launcher, distribution, portability). The developer workbench launcher is not an installation path."
+        }
+      ]
+    },
+    {
+      "id": "E5",
+      "title": "Release matrix, re-verification and handoff",
+      "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
+      "notes": [
+        "Aggregates the recorded cases into a reproducible matrix bound to the source commit.",
+        "A full-product claim is rejected by the gate while native and installation evidence are absent."
+      ],
+      "result": "PASS",
+      "cases": []
+    }
+  ],
+  "release": {
+    "schema": "product-acceptance-release/1",
+    "tier": "controlled-product-internal-trial",
+    "status": "PASS",
+    "ok": true,
+    "checkedAt": "2026-11-10T05:07:20.318Z",
+    "source": {
+      "commit": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+      "dirty": false
+    },
+    "expectedSource": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+    "requirements": [
+      {
+        "id": "E1-GATE-CONTROL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-REPORT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-NO-CANDIDATE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-BAD-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-FIXTURE-STRICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-FIXTURE-PORTABILITY-STRICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-CONFIGURATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-DAILY-VERTICAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ARTIFACT-ROUNDTRIP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REOPEN-PERSISTENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLAY-AND-CONFLICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SESSION-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-STALE-BUSINESS-REJECTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-MACHINE-FAIL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ONE-WRITER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-AUTH-AND-ORIGIN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ASSISTANT-SDK-MOCK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "PASS"
+      }
+    ],
+    "failures": [],
+    "claimedBy": null,
+    "notes": [
+      "Controlled fixture and SDK mock evidence never substitute for actual-native execution.",
+      "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability."
+    ]
+  },
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z",
+  "evidence": {
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/release.json",
+    "screenshots": [
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/desktop-keyboard.png"
+    ],
+    "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
+    "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json"
+  },
+  "blockers": [],
+  "untested": [
+    {
+      "id": "conversation-chat",
+      "gaps": [
+        "真实模型回复与流式界面未在本轮执行；budget 0。"
+      ]
+    },
+    {
+      "id": "explicit-delegation",
+      "gaps": [
+        "真实 Codex 执行属于 B 的原生验收，E 未触发计费任务。"
+      ]
+    },
+    {
+      "id": "question-answer",
+      "gaps": [
+        "真实原生权限/审批问题未执行；B 的原生证据未作为输入提供。"
+      ]
+    },
+    {
+      "id": "verification-completion",
+      "gaps": [
+        "原生注册检查与真实 deliverable 未在本轮复验。"
+      ]
+    },
+    {
+      "id": "stale-guards",
+      "gaps": [
+        "旧提案与决定的撤销治理（C 未交付）"
+      ]
+    },
+    {
+      "id": "isolation",
+      "gaps": [
+        "两个独立项目的隔离：受控 lane 只有一个项目。"
+      ]
+    },
+    {
+      "id": "writer-identity",
+      "gaps": [
+        "真实原生写进程停止与物理资源屏障由 B 证明。"
+      ]
+    },
+    {
+      "id": "resource-recovery",
+      "gaps": [
+        "协调器 SIGKILL 后的原生恢复与重连（B 范围）。"
+      ]
+    },
+    {
+      "id": "stability",
+      "gaps": [
+        "长时间 soak、负载与多实例并发。"
+      ]
+    },
+    {
+      "id": "portability-tooling",
+      "gaps": []
+    },
+    {
+      "id": "install-first-run",
+      "gaps": [
+        "D 的 apps/launcher、tools/distribution、packages/portability 尚未交付。"
+      ]
+    },
+    {
+      "id": "backup-restore",
+      "gaps": [
+        "无发行 bundle 与迁移 CLI。"
+      ]
+    },
+    {
+      "id": "upgrade-rollback",
+      "gaps": [
+        "无版本化发行产物。"
+      ]
+    },
+    {
+      "id": "session-catalog",
+      "gaps": [
+        "公共 HTTP 尚无会话目录/搜索/归档接口（见 RFC-E-001 缺口 1）。"
+      ]
+    },
+    {
+      "id": "project-settings-version",
+      "gaps": [
+        "仅合同 revision 已验证；项目设置版本 API 未交付（RFC-E-001 缺口 2）。"
+      ]
+    },
+    {
+      "id": "context-proposals-decisions",
+      "gaps": [
+        "C 的 packages/context、proposals、knowledge 未交付；确认前不执行、重复确认幂等、撤销后失效无法端到端验证。",
+        "本次仅记录 record_decision 的显式拒绝（见 E2-CONTEXT-PROPOSALS-NOT-TESTED）。"
+      ]
+    },
+    {
+      "id": "actual-native",
+      "gaps": [
+        "B 的原生证据未作为已提交输入提供；E 未获单独预算，不触发模型任务。"
+      ]
+    }
+  ],
+  "next": [
+    "Main: relocate/consider RFC-E-001; E only consumes public entries and does not own production schema.",
+    "C: publish context/proposal/decision ports, then E adds the confirm-before-execute and revocation cases.",
+    "D: publish launcher/distribution/portability, then E runs install/first-run/backup/restore/rollback in a fresh directory.",
+    "B: hand off native evidence bound to commit/attempt with executed=true and model-task counts; a separately granted budget is required for E to re-run native."
+  ]
+}

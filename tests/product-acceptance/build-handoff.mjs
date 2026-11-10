@@ -9,6 +9,9 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { STATUS } from './lib/status.mjs'
+import { evaluateRelease } from './lib/release.mjs'
+import { tier as releaseTier } from './lib/release-requirements.mjs'
+import { resolveFixtureDigest } from './lib/fixtures.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../..')
@@ -53,7 +56,7 @@ const CAPABILITIES = [
     id: 'question-answer',
     label: '问题中心：打开、回答、投递与决策收件箱',
     controlled: ['E2-DAILY-VERTICAL', 'E3-QUESTION-FORM'],
-    native: ['NOT_TESTED', '真实原生审批/权限问题未执行'],
+    nativeReason: '真实原生权限/审批问题未执行；B 的原生证据未作为输入提供。',
   },
   {
     id: 'verification-completion',
@@ -231,17 +234,18 @@ const executionStatus = {
   checkedAt: report.checkedAt,
   budget: stages.budget,
   stages: stages.stages.map((stage) => {
-    const prefix = stage.id === 'E5' ? 'E1-' : `${stage.id}-`
+    if (stage.id === 'E5')
+      return { ...stage, result: report.release?.status === 'PASS' ? 'PASS' : 'SEE_RELEASE', cases: [] }
+    const prefix = `${stage.id}-`
     const relevant = report.cases.filter((item) => item.id.startsWith(prefix))
     const counts = {}
     for (const item of relevant) counts[item.status] = (counts[item.status] ?? 0) + 1
+    const blocking = relevant.filter((item) => ['FAIL', 'UNKNOWN', 'BLOCKED'].includes(item.status))
+    const result = relevant.length === 0 ? 'SEE_RUN' : blocking.length > 0 ? 'FAIL' : 'PASS_WITH_GAPS'
     return {
       ...stage,
-      result: relevant.length
-        ? Object.keys(counts).length === 1 && counts.PASS === relevant.length
-          ? 'PASS'
-          : 'MIXED'
-        : 'SEE_RUN',
+      result: counts.PASS === relevant.length ? 'PASS' : result,
+      counts,
       cases: relevant.map((item) => ({ id: item.id, status: item.status, reason: item.reason ?? null })),
     }
   }),
@@ -336,6 +340,19 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
+
+// Over-claim check: the same recorded evidence must fail the full-product tier while native and
+// installation evidence are absent. This is recorded, not asserted from the outside.
+const overclaim = evaluateRelease({
+  report,
+  requirement: releaseTier('full-product'),
+  expectedSource: report.source.commit,
+  resolveFixture: resolveFixtureDigest,
+})
+writeFileSync(join(reports, 'full-product-verdict.json'), JSON.stringify(overclaim, null, 2) + '\n')
+
 process.stdout.write(
-  `matrix rows ${rows.length}; release ${release.status}; wrote execution-status.json, release-matrix.json, handoff.zh-CN.md\n`,
+  `matrix rows ${rows.length}; release ${release.status}; full-product ${overclaim.status} ` +
+    `(${overclaim.failures.map((item) => item.code).join(', ')}); wrote execution-status.json, ` +
+    `release-matrix.json, handoff.zh-CN.md, full-product-verdict.json\n`,
 )

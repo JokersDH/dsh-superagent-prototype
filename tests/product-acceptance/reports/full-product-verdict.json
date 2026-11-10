@@ -1,0 +1,100 @@
+{
+  "schema": "product-acceptance-release/1",
+  "tier": "full-product",
+  "status": "FAIL",
+  "ok": false,
+  "checkedAt": "2026-11-10T05:09:28.390Z",
+  "source": {
+    "commit": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+    "dirty": false
+  },
+  "expectedSource": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+  "requirements": [
+    {
+      "id": "E2-DAILY-VERTICAL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-DESKTOP-GEOMETRY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-BOUNDED-CYCLES",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-INSTALL-FIRST-RUN",
+      "required": true,
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "E4-BACKUP-RESTORE",
+      "required": true,
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "E4-UPGRADE-ROLLBACK",
+      "required": true,
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "E5-NATIVE-DELIVERY",
+      "required": true,
+      "status": "MISSING"
+    }
+  ],
+  "failures": [
+    {
+      "code": "case_not_pass",
+      "detail": "Required case E4-INSTALL-FIRST-RUN is NOT_TESTED",
+      "caseId": "E4-INSTALL-FIRST-RUN"
+    },
+    {
+      "code": "layer_not_allowed",
+      "detail": "Layer not-tested is not admitted by full-product",
+      "caseId": "E4-INSTALL-FIRST-RUN"
+    },
+    {
+      "code": "case_not_pass",
+      "detail": "Required case E4-BACKUP-RESTORE is NOT_TESTED",
+      "caseId": "E4-BACKUP-RESTORE"
+    },
+    {
+      "code": "layer_not_allowed",
+      "detail": "Layer not-tested is not admitted by full-product",
+      "caseId": "E4-BACKUP-RESTORE"
+    },
+    {
+      "code": "case_not_pass",
+      "detail": "Required case E4-UPGRADE-ROLLBACK is NOT_TESTED",
+      "caseId": "E4-UPGRADE-ROLLBACK"
+    },
+    {
+      "code": "layer_not_allowed",
+      "detail": "Layer not-tested is not admitted by full-product",
+      "caseId": "E4-UPGRADE-ROLLBACK"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E5-NATIVE-DELIVERY is absent",
+      "caseId": "E5-NATIVE-DELIVERY"
+    },
+    {
+      "code": "self_declared_pass_rejected",
+      "detail": "Report declares release PASS while the gate found blocking evidence"
+    }
+  ],
+  "claimedBy": {
+    "status": "PASS",
+    "tier": "controlled-product-internal-trial",
+    "decidedAt": "2026-11-10T05:07:20.318Z",
+    "failureCodes": []
+  },
+  "notes": [
+    "Controlled fixture and SDK mock evidence never substitute for actual-native execution.",
+    "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability."
+  ]
+}
