@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-11-09T10:59:55.807Z",
+  "generatedAt": "2026-11-09T11:16:27.271Z",
   "environment": {
     "platform": "darwin/arm64",
     "node": "v24.21.0",
     "acceptanceCheckpoint": "tests/native-acceptance",
     "apiUrl": "http://127.0.0.1:8899",
-    "nativeLaneExecuted": false,
-    "nativeLaneReason": "no dispatchable project for the selected profile",
+    "nativeLaneExecuted": true,
+    "nativeLaneReason": "executed",
     "configurationRevision": "23f00e013adb51ade8f13ac6e9729f18236a9d15e39853825f2a909c00c224f6"
   },
   "totals": {
     "cases": 12,
-    "PASS": 5,
+    "PASS": 6,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 7
+    "NOT_TESTED": 6
   },
   "lane": "read-only + native",
   "profileIds": [
@@ -128,12 +128,31 @@
       "id": "NATIVE-LINK",
       "title": "delegate to the real Codex on a private scratch project and reach a verified candidate",
       "lane": "native",
-      "status": "NOT_TESTED",
+      "status": "PASS",
       "detail": [
-        "no published project admits profile profile-codex-native (admitted: none; considered: none)"
+        "recorded create_work 689f5ff7e6a917c91d1d6bece2d0a1b3 on project project-39d1110c23d2418691a720e0"
       ],
-      "evidence": [],
-      "entities": []
+      "evidence": [
+        {
+          "httpStatus": 200,
+          "receipt": {
+            "commandId": "cmd-create-1794222086254",
+            "workId": "689f5ff7e6a917c91d1d6bece2d0a1b3",
+            "seq": 24,
+            "status": "recorded"
+          }
+        }
+      ],
+      "entities": [
+        {
+          "projectId": "project-39d1110c23d2418691a720e0",
+          "profileId": "profile-codex-native",
+          "commandId": "cmd-create-1794222086254"
+        },
+        {
+          "workId": "689f5ff7e6a917c91d1d6bece2d0a1b3"
+        }
+      ]
     },
     {
       "id": "NATIVE-STOP",
@@ -141,7 +160,7 @@
       "lane": "native",
       "status": "NOT_TESTED",
       "detail": [
-        "no published project admits profile profile-codex-native (admitted: none; considered: none)"
+        "not reached in this run: requires the follow-up phases (see execution-status.json)"
       ],
       "evidence": [],
       "entities": []
@@ -152,7 +171,7 @@
       "lane": "native",
       "status": "NOT_TESTED",
       "detail": [
-        "no published project admits profile profile-codex-native (admitted: none; considered: none)"
+        "not reached in this run: requires the follow-up phases (see execution-status.json)"
       ],
       "evidence": [],
       "entities": []
@@ -163,7 +182,7 @@
       "lane": "native",
       "status": "NOT_TESTED",
       "detail": [
-        "no published project admits profile profile-codex-native (admitted: none; considered: none)"
+        "not reached in this run: requires the follow-up phases (see execution-status.json)"
       ],
       "evidence": [],
       "entities": []
@@ -174,7 +193,7 @@
       "lane": "native",
       "status": "NOT_TESTED",
       "detail": [
-        "no published project admits profile profile-codex-native (admitted: none; considered: none)"
+        "not reached in this run: requires the follow-up phases (see execution-status.json)"
       ],
       "evidence": [],
       "entities": []
@@ -185,7 +204,7 @@
       "lane": "native",
       "status": "NOT_TESTED",
       "detail": [
-        "no published project admits profile profile-codex-native (admitted: none; considered: none)"
+        "not reached in this run: requires the follow-up phases (see execution-status.json)"
       ],
       "evidence": [],
       "entities": []
@@ -196,7 +215,7 @@
       "lane": "native",
       "status": "NOT_TESTED",
       "detail": [
-        "no published project admits profile profile-codex-native (admitted: none; considered: none)"
+        "not reached in this run: requires the follow-up phases (see execution-status.json)"
       ],
       "evidence": [],
       "entities": []

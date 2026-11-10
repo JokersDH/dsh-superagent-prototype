@@ -47,6 +47,9 @@ export function parseArgs(argv) {
     else if (flag === '--project') options.project = next, index += 1
     else if (flag === '--timeout-ms') options.timeoutMs = Number(next), index += 1
     else if (flag === '--native-timeout-ms') options.nativeTimeoutMs = Number(next), index += 1
+    // Real writes on a private instance must be requested explicitly.
+    else if (flag === '--allow-writes') options.allowWrites = true
+    else if (flag === '--soak-budget-ms') options.soakBudgetMs = Number(next), index += 1
     else if (flag === '--help' || flag === '-h') options.help = true
     else throw new Error(`Unknown argument: ${flag}`)
   }
