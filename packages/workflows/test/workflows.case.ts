@@ -302,7 +302,7 @@ test('a v7 database backfills the conversation catalog on upgrade and keeps mess
 
     const store = new ProductStore({ path })
     try {
-      assert.equal(store.database.productSchema, 12)
+      assert.equal(store.database.productSchema, 13)
       const ports = createWorkflowPorts(store)
       const conversation = ports.conversations.get('conv-1')!
       assert.equal(conversation.title, 'Work work-1')
@@ -405,7 +405,7 @@ test('a second Node process consumes the public workflow ports and snapshot veri
     assert.deepEqual(observed.conversations, ['第二进程会话'])
     assert.equal(observed.search, 1)
     assert.equal(observed.sourceDigest, createHash('sha256').update('跨进程读取中文目录').digest('hex'))
-    assert.equal(observed.stateSchema, 12)
+    assert.equal(observed.stateSchema, 13)
     assert.equal(observed.snapshot, 'ok')
     assert.equal(observed.verify, 'ok')
   } finally {
@@ -562,7 +562,7 @@ test('source message metadata is scoped/digested and state facts stay observatio
     assert.equal(ports.index.sourceMessage('unknown', ['project-1']), undefined)
     const state = ports.state.stateFacts()
     assert.equal(state.protocol, 'workflow-state/1')
-    assert.equal(state.productSchema, 12)
+    assert.equal(state.productSchema, 13)
     assert.equal(state.writerClaim, null)
     assert.equal(state.queue.waiting, 0)
     assert.equal(state.queue.parked, 0)
@@ -590,7 +590,7 @@ test('a v10 ledger upgrades to v12: old decisions stay auditable but missing-sou
 
     let store = new ProductStore({ path })
     try {
-      assert.equal(store.database.productSchema, 12)
+      assert.equal(store.database.productSchema, 13)
       const ports = createWorkflowPorts(store)
       assert.equal(ports.assistant.decisions.get('legacy-v10'), undefined)
       assert.equal(ports.assistant.legacyDecisions({ projectId: 'project-1' }).records.length, 1)
