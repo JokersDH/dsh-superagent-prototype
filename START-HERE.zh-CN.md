@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**跨项目待办预览：[http://127.0.0.1:5184/](http://127.0.0.1:5184/)。** 原“待我决定”入口已增加跨项目/会话的问题、当前候选及明确阻断，支持筛选、分页、回原会话和逐项审阅；每项仍单独回答/接受。当前按本页等待时间排列，C优先级候选尚待准入。新实例使用独立`.local-state/attention-preview`，原5180–5183及其历史保留，未自动迁移。后端43、前端18及22条分范围浏览器场景通过，非模型/复核收益证据；详见 [0022消费说明](docs/rfcs/WP-16/0022-attention-inbox-consumer.md) 与 [限定交接](reports/releases/attention-inbox/README.zh-CN.md)。
+
 **第五轮修订01优先：[价值试点、密封副本与注意力工作台](agent-tasks/product-wave-05/AMENDMENT-01.zh-CN.md)。** 先用当前Codex做不复核/续会话自查/全新会话复核三arm初筛；E独立小额grant不挤B，第二Driver投资等初筛结果。main/C先交无需模型的注意力视图；新推荐/复核在R0未准入前仅实验、默认关闭。采集代码开始记录候选等待和部分UI审阅活动代理，见 [0021](docs/rfcs/WP-16/0021-value-first-review-amendment.md)。
 
 **当前派工：[第五轮任务包](agent-tasks/product-wave-05/README.zh-CN.md)，先读上面的修订01。** A必要证据与计时，B现有控制/session/胶囊边界，C决定闭环与注意力规则，D个人发行迁移，E独立复核初筛和验收，main注意力UI与公共集成。公共记录和恢复项目绑定修复已交；接口见 [0020稳定输入](docs/rfcs/WP-16/0020-wave-05-dispatch-and-shared-inputs.md)。沿用原目录/分支，旧缺口先闭合；第二Driver等价值闸门，不竞速、不自动接受，旧预算不刷新。
