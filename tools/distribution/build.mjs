@@ -10,10 +10,11 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
-import { closeSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, unlinkSync, writeSync } from 'node:fs'
+import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, unlinkSync, writeSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
+import { hashDirectory, resolveExternalClosure, stageFromRelease, workspacePackages } from './stage.mjs'
 
 const REPO_ROOT = fileURLToPath(new URL('../../', import.meta.url))
 const SUPPORTED_NODE = '>=24.21.0 <25'
@@ -35,6 +36,7 @@ const { values } = parseArgs({
     'install-root': { type: 'string' },
     'config-root': { type: 'string' },
     output: { type: 'string' },
+    'release-output': { type: 'string' },
     'skip-console': { type: 'boolean', default: false },
     'skip-packages': { type: 'boolean', default: false },
     'skip-self-check': { type: 'boolean', default: false },
@@ -77,12 +79,14 @@ function git(args) {
   return result.status === 0 ? result.stdout.trim() : null
 }
 
-function walkFiles(root, base = root) {
+function walkFiles(root, base = root, skipDirs = new Set(['node_modules'])) {
   const files = []
   for (const entry of readdirSync(root, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     const absolute = join(root, entry.name)
-    if (entry.isDirectory()) files.push(...walkFiles(absolute, base))
-    else if (entry.isFile()) files.push(relative(base, absolute).split('\\').join('/'))
+    if (entry.isDirectory()) {
+      if (skipDirs.has(entry.name)) continue
+      files.push(...walkFiles(absolute, base, skipDirs))
+    } else if (entry.isFile()) files.push(relative(base, absolute).split('\\').join('/'))
     else fail(`unexpected non-regular file in build output: ${absolute}`)
   }
   return files
@@ -142,15 +146,55 @@ if (!values['skip-packages']) {
     { label: 'package build' },
   )
 }
+const consoleRoot = 'apps/console/dist'
+const consoleStampPath = join(installRoot, consoleRoot, '.pa-console-build.json')
+
+/** Digest of the built console files excluding the stamp itself. */
+function consoleBundleDigest() {
+  const files = walkFiles(join(installRoot, consoleRoot)).filter((file) => file !== '.pa-console-build.json')
+  return sha256(files.map((file) => {
+    const bytes = readFileSync(join(installRoot, consoleRoot, file))
+    return `${file}\0${bytes.byteLength}\0${sha256(bytes)}`
+  }).join('\n'))
+}
+
 if (!values['skip-console']) {
   runPnpm(['--filter', '@personal-agent/console', 'build'], {
     label: 'console build',
     env: { ...process.env, VITE_CONSOLE_MODE: 'http', NODE_ENV: 'production' },
   })
+  const digest = consoleBundleDigest()
+  atomicWriteJson(consoleStampPath, {
+    protocol: 'personal-console-build/1',
+    mode: 'http',
+    digest,
+    createdAt: new Date().toISOString(),
+  })
+}
+// The console mode is derived from the actual build artifact, never assumed: `--skip-console` may
+// reuse only an HTTP build whose recorded digest still matches the files on disk.
+let consoleDigest
+try {
+  const stamp = JSON.parse(readFileSync(consoleStampPath, 'utf8'))
+  if (stamp.protocol !== 'personal-console-build/1' || stamp.mode !== 'http')
+    fail('console build stamp is not an HTTP build; rebuild without --skip-console')
+  const digest = consoleBundleDigest()
+  if (stamp.digest !== digest)
+    fail('console files do not match the recorded HTTP build digest; rebuild without --skip-console')
+  consoleDigest = digest
+} catch (error) {
+  if (error?.code === 'ENOENT' || /Unexpected token/.test(String(error))) fail('console build stamp is missing or unreadable; rebuild without --skip-console')
+  throw error
 }
 
 const packageDirs = []
 const artifacts = []
+const addDirectory = (directory, prefix, kind) => {
+  for (const file of walkFiles(join(installRoot, directory))) {
+    const bytes = readFileSync(join(installRoot, directory, file))
+    artifacts.push({ path: `${prefix}/${file}`, bytes: bytes.byteLength, sha256: sha256(bytes), kind })
+  }
+}
 for (const name of PACKAGES) {
   const dist = join(installRoot, 'packages', name, 'dist')
   try {
@@ -158,23 +202,63 @@ for (const name of PACKAGES) {
   } catch {
     fail(`package ${name} has no built dist directory`)
   }
-  packageDirs.push(`packages/${name}`)
-  for (const file of walkFiles(dist)) {
-    const absolute = join(dist, file)
-    const bytes = readFileSync(absolute)
-    artifacts.push({ path: `packages/${name}/dist/${file}`, bytes: bytes.byteLength, sha256: sha256(bytes), kind: 'runtime' })
+}
+// Every workspace package: manifest, source tree (some sibling source is imported directly by the
+// coordinator) and built dist when present.
+const workspace = workspacePackages(installRoot)
+for (const pkg of workspace) {
+  const relativeDirectory = pkg.relative
+  const manifestBytes = readFileSync(join(pkg.directory, 'package.json'))
+  artifacts.push({
+    path: `${relativeDirectory}/package.json`,
+    bytes: manifestBytes.byteLength,
+    sha256: sha256(manifestBytes),
+    kind: 'package',
+  })
+  for (const directory of ['src', 'dist']) {
+    const absolute = join(pkg.directory, directory)
+    if (existsSync(absolute)) addDirectory(`${relativeDirectory}/${directory}`, `${relativeDirectory}/${directory}`, 'runtime')
   }
+  packageDirs.push(relativeDirectory)
 }
-const consoleRoot = 'apps/console/dist'
-try {
-  if (!lstatSync(join(installRoot, consoleRoot)).isDirectory()) fail('console has no static dist output')
-} catch {
-  fail('console has no static dist output; run without --skip-console')
+// The executed runtime includes the coordinator TypeScript entry and the launcher, not only the
+// package dist trees. The static console build is listed in full.
+for (const app of ['apps/coordinator', 'apps/launcher', 'apps/runner']) addDirectory(app, app, 'runtime')
+addDirectory(consoleRoot, consoleRoot, 'console')
+const rootPackageJson = join(installRoot, 'package.json')
+if (existsSync(rootPackageJson)) {
+  const bytes = readFileSync(rootPackageJson)
+  artifacts.push({ path: 'package.json', bytes: bytes.byteLength, sha256: sha256(bytes), kind: 'package' })
 }
-for (const file of walkFiles(join(installRoot, consoleRoot))) {
-  const bytes = readFileSync(join(installRoot, consoleRoot, file))
-  artifacts.push({ path: `${consoleRoot}/${file}`, bytes: bytes.byteLength, sha256: sha256(bytes), kind: 'console' })
+const licensePath = join(installRoot, 'LICENSE')
+if (existsSync(licensePath)) {
+  const bytes = readFileSync(licensePath)
+  artifacts.push({ path: 'LICENSE', bytes: bytes.byteLength, sha256: sha256(bytes), kind: 'license' })
 }
+const nativeEvidence = 'reports/releases/native-mvp/native-product.json'
+if (existsSync(join(installRoot, nativeEvidence))) {
+  const bytes = readFileSync(join(installRoot, nativeEvidence))
+  artifacts.push({ path: nativeEvidence, bytes: bytes.byteLength, sha256: sha256(bytes), kind: 'resource' })
+}
+
+// Runtime dependency closure: package-level content digests (paths differ between a checkout and a
+// staged flat node_modules, bytes must not).
+const dependencyAnchors = [
+  join(installRoot, 'apps/coordinator/package.json'),
+  join(installRoot, 'apps/launcher/package.json'),
+  ...workspace.map((pkg) => join(pkg.directory, 'package.json')),
+]
+const LICENSE_FILE = /^(?:LICEN[CS]E|COPYING|NOTICE)(?:\..*)?$/i
+const dependencies = resolveExternalClosure(dependencyAnchors).map((dependency) => {
+  const hashed = hashDirectory(dependency.directory)
+  return {
+    name: dependency.name,
+    version: dependency.version,
+    digest: hashed.digest,
+    files: hashed.files.length,
+    licenseFiles: readdirSync(dependency.directory).filter((name) => LICENSE_FILE.test(name)).sort(),
+  }
+})
 artifacts.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))
 if (artifacts.length === 0) fail('no build artifacts were produced')
 
@@ -209,8 +293,9 @@ const release = {
     platform: process.platform,
     arch: process.arch,
   },
-  build: { consoleMode: 'http', consoleRoot, packageCount: PACKAGES.length },
+  build: { consoleMode: 'http', consoleRoot, consoleDigest, packageCount: PACKAGES.length },
   artifacts,
+  dependencies,
   admission: {
     node: SUPPORTED_NODE,
     platform: process.platform,
@@ -238,15 +323,32 @@ try {
 
 const configPath = join(configRoot, 'release.json')
 atomicWriteJson(configPath, release)
-if (values.output !== undefined) {
-  mkdirSync(values.output, { recursive: true, mode: 0o755 })
-  atomicWriteJson(join(values.output, 'release.json'), release)
+if (values['release-output'] !== undefined) {
+  mkdirSync(resolve(values['release-output']), { recursive: true, mode: 0o755 })
+  atomicWriteJson(join(resolve(values['release-output']), 'release.json'), release)
 }
 
 if (!values['skip-self-check']) {
-  const { verifyReleaseArtifacts } = await import('../../apps/launcher/lib/release.mjs')
+  const { verifyConsoleBuild, verifyReleaseArtifacts, verifyRuntimeDependencies } = await import('../../apps/launcher/lib/release.mjs')
   const check = verifyReleaseArtifacts(installRoot, release, { hash: true })
   if (!check.ok) fail(`release self-check failed: ${JSON.stringify(check.failures.slice(0, 10))}`)
+  const dependencyCheck = verifyRuntimeDependencies(installRoot, release)
+  if (!dependencyCheck.ok) fail(`dependency self-check failed: ${JSON.stringify(dependencyCheck.failures.slice(0, 10))}`)
+  const consoleCheck = verifyConsoleBuild(installRoot, release)
+  if (!consoleCheck.ok) fail(`console self-check failed: ${consoleCheck.reason}`)
+}
+
+let staged = null
+if (values.output !== undefined) {
+  try {
+    staged = stageFromRelease({
+      repoRoot: installRoot,
+      output: resolve(values.output),
+      releasePath: configPath,
+    })
+  } catch (error) {
+    fail(`staged install failed: ${error.code ?? 'error'} ${error.message}`)
+  }
 }
 
 const summary = {
@@ -254,9 +356,12 @@ const summary = {
   buildId,
   config: configPath,
   output: values.output ?? null,
+  staged: staged === null ? null : { path: staged.output, installManifest: staged.installPath },
   source: release.source,
   producer: { node: release.producer.node, sqlite, abi, platform: release.producer.platform, arch: release.producer.arch },
   artifacts: { count: artifacts.length, bytes: artifacts.reduce((sum, artifact) => sum + artifact.bytes, 0) },
+  dependencies: { count: dependencies.length, files: dependencies.reduce((sum, dependency) => sum + dependency.files, 0) },
+  console: { mode: 'http', digest: consoleDigest },
   limitations: release.limitations,
 }
 if (values.json) process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`)

@@ -12,10 +12,11 @@
  *
  * No model request is made, no native agent is dispatched, and no user project/account is touched.
  */
+import { createHash } from 'node:crypto'
 import { spawn, spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { createServer } from 'node:net'
-import { closeSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { closeSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -50,6 +51,8 @@ const roots = {
 }
 const restoredData = join(root, 'restored')
 const importedRestoreData = join(root, 'restored-imported')
+const stageBuild = join(root, 'stage-build')
+const stagedRoot = join(root, 'stage-relocated')
 const backupDir = join(root, 'backup')
 const backupPath = join(backupDir, 'state.pab')
 const recoverySource = join(root, 'recovery-source')
@@ -57,7 +60,12 @@ const recoveryRestored = join(root, 'recovery-restored')
 const recoveryBundle = join(backupDir, 'recovery.pab')
 let backupArchiveSha256 = null
 let importId = null
+const deliveryArtifacts = []
+let deliveredWorkId = null
 const activeTrials = new Set()
+const raceChildren = []
+let raceStopped = false
+let raceArgsCleanup = null
 
 // The staged/launcher runtime is plain Node; smoke helpers read the product database and build a
 // recovery fixture through the same public storage package the coordinator uses.
@@ -237,10 +245,22 @@ async function stopTrial(handle, { label }) {
 
 try {
   if (!values['skip-build']) {
-    const build = spawnSync(process.execPath, [BUILD, '--install-root', REPO_ROOT, '--config-root', roots.config, '--json'], { cwd: REPO_ROOT, encoding: 'utf8', timeout: 300000 })
+    const build = spawnSync(process.execPath, [BUILD, '--install-root', REPO_ROOT, '--config-root', roots.config, '--output', stageBuild, '--json'], { cwd: REPO_ROOT, encoding: 'utf8', timeout: 300000 })
     if (build.status !== 0) throw new Error(`build failed (exit ${build.status})\n${build.stderr}`)
     const summary = JSON.parse(build.stdout)
-    step('build', 'PASS', { buildId: summary.buildId, artifacts: summary.artifacts })
+    step('build', 'PASS', { buildId: summary.buildId, artifacts: summary.artifacts, dependencies: summary.dependencies, staged: summary.staged })
+    if (!existsSync(join(stageBuild, 'install.json'))) throw new Error('build --output did not produce a staged install closure')
+    renameSync(stageBuild, stagedRoot)
+    const install = JSON.parse(readFileSync(join(stagedRoot, 'install.json'), 'utf8'))
+    if (install.format !== 'pa-install' || install.formatVersion !== 1) throw new Error('unexpected install manifest format')
+    if (install.files.length < 1000 || !install.dependencies.some((dependency) => dependency.name === 'better-sqlite3'))
+      throw new Error('staged install manifest does not cover the runtime closure')
+    step('stage-closure', 'PASS', {
+      root: stagedRoot,
+      files: install.files.length,
+      dependencies: install.dependencies.length,
+      buildId: install.buildId,
+    })
   } else step('build', 'SKIPPED')
 
   const firstRun = runPa(['first-run', '--json', ...stateArgs()], { allowExit: [0] })
@@ -267,6 +287,37 @@ try {
   const reuse = runPa(['start', '--fixture', '--port', String(primaryPort), '--api-port', String(primaryApiPort), '--json', ...stateArgs()], { allowExit: [0] })
   if (reuse.json?.status !== 'REUSED') throw new Error(`second start expected REUSED, got ${reuse.json?.status}`)
   step('reuse-verified-instance', 'PASS', { pid: reuse.json.instance.pid })
+
+  // A completed controlled delivery (real patch/check artifacts, zero model calls) is created
+  // before the backup so the restore roundtrip can verify actual delivered bytes afterwards.
+  const productReportPath = join(root, 'product-delivery.json')
+  const productSmoke = spawnSync(
+    process.execPath,
+    [join(REPO_ROOT, 'tools/bootstrap/smoke-product-api.mjs'), '--url', primary.apiURL, '--state', roots.data, '--report', productReportPath],
+    { cwd: REPO_ROOT, encoding: 'utf8', timeout: 120000 },
+  )
+  if (productSmoke.status !== 0)
+    throw new Error(`completed-delivery fixture failed (exit ${productSmoke.status})\n${productSmoke.stdout}\n${productSmoke.stderr}`)
+  const delivery = JSON.parse(readFileSync(productReportPath, 'utf8'))
+  if (delivery.status !== 'PASS_REAL_LOOPBACK_CONTROLLED_PRODUCT' || delivery.artifactIds.length === 0)
+    throw new Error('completed-delivery fixture did not produce artifacts')
+  const primaryToken = readFileSync(join(roots.data, 'api.key'), 'utf8').trim()
+  for (const artifactId of delivery.artifactIds) {
+    const response = await fetch(`${primary.apiURL}/v1/artifacts/${encodeURIComponent(artifactId)}`, {
+      headers: { connection: 'close', authorization: `Bearer ${primaryToken}` },
+    })
+    if (!response.ok) throw new Error(`primary artifact download failed: ${artifactId} ${response.status}`)
+    const bytes = Buffer.from(await response.arrayBuffer())
+    const sha256 = createHash('sha256').update(bytes).digest('hex')
+    deliveryArtifacts.push({ id: artifactId, bytes, sha256 })
+  }
+  deliveredWorkId = delivery.workId
+  step('completed-delivery-fixture', 'PASS', {
+    workId: delivery.workId,
+    artifacts: deliveryArtifacts.length,
+    bytes: deliveryArtifacts.reduce((total, artifact) => total + artifact.bytes.byteLength, 0),
+    vendorCalls: delivery.vendorCalls ?? 0,
+  })
 
   mkdirSync(backupDir, { recursive: true, mode: 0o700 })
   const backup = runPa(['backup', '--json', '--out', backupPath, ...stateArgs()], { allowExit: [0] })
@@ -326,6 +377,7 @@ try {
     '--logs-root', race.logs,
     '--workspace-root', race.workspaces,
   ]
+  raceArgsCleanup = raceArgs
   const raceFirstRun = runPa(['first-run', '--json', ...raceArgs], { allowExit: [0] })
   if (raceFirstRun.json?.status !== 'OK') throw new Error('race config first-run failed')
   const racePort = await freePort()
@@ -339,6 +391,7 @@ try {
     })
   const first = spawnStart(racePort, raceApiPort)
   const second = spawnStart(raceOtherPort, raceOtherApiPort)
+  raceChildren.push(first, second)
   const collect = (child) => {
     let stdout = ''
     let stderr = ''
@@ -364,6 +417,7 @@ try {
   const raceRunning = runPa(['status', '--json', ...raceArgs], { allowExit: [0] })
   if (raceRunning.json?.status !== 'RUNNING') throw new Error('concurrent start did not leave exactly one running instance')
   const raceStop = runPa(['stop', '--json', ...raceArgs], { allowExit: [0] })
+  raceStopped = true
   if (raceStop.json?.status !== 'STOPPED') throw new Error('concurrent winner did not stop cleanly')
   const winnerExit = await Promise.race([winner === first ? firstExit : secondExit, new Promise((resolvePromise) => setTimeout(() => resolvePromise('timeout'), 15000))])
   if (winnerExit === 'timeout') throw new Error('concurrent start winner did not exit after stop')
@@ -436,6 +490,52 @@ try {
   if (importedRestore.json?.status !== 'RESTORED') throw new Error('restore from a managed import id did not report RESTORED')
   step('restore-managed-import', 'PASS', { target: importedRestoreData })
 
+  // Path rebinding is verified offline (no start): entity ids survive, only an explicit map
+  // rewrites the bound path, and unmapped environment stores stay pending revalidation.
+  const rebindSource = join(root, 'rebind-source')
+  mkdirSync(rebindSource, { recursive: true, mode: 0o700 })
+  const rebindStore = new ProductStore({ path: join(rebindSource, 'state.sqlite') })
+  rebindStore.close()
+  writeFileSync(
+    join(rebindSource, 'native-projects.json'),
+    JSON.stringify({
+      version: 1,
+      projects: [{
+        id: 'project-rebind-old',
+        path: '/old/recovery-repo',
+        displayName: 'old project',
+        check: 'node_test',
+        environment: { policy: 'offline_install', storeDir: '/old/recovery-store' },
+      }],
+    }),
+    { mode: 0o600 },
+  )
+  const rebindBundle = join(backupDir, 'rebind.pab')
+  const rebindBackup = runPa(['backup', '--json', '--out', rebindBundle, ...stateArgs(rebindSource)], { allowExit: [0] })
+  if (rebindBackup.json?.status !== 'CREATED') throw new Error('rebind source backup failed')
+  const rebindTarget = join(root, 'rebind-restored')
+  const rebound = runPa(
+    ['restore', '--json', '--bundle', rebindBundle, '--to', rebindTarget, '--map-path', '/old/recovery-repo=/tmp/recovery-rebound', ...stateArgs()],
+    { allowExit: [0] },
+  )
+  if (rebound.json?.status !== 'RESTORED') throw new Error('rebind restore failed')
+  const mapped = rebound.json.report.pathMappings.applied
+  if (!mapped.some((entry) => entry.from === '/old/recovery-repo' && entry.to === '/tmp/recovery-rebound'))
+    throw new Error('explicit path mapping was not applied on restore')
+  if (rebound.json.report.pathMappings.pendingRebind.includes('/old/recovery-repo'))
+    throw new Error('mapped project path still reported as pending')
+  const reboundProjects = JSON.parse(readFileSync(join(rebindTarget, 'native-projects.json'), 'utf8'))
+  if (reboundProjects.projects[0].id !== 'project-rebind-old' || reboundProjects.projects[0].path !== '/tmp/recovery-rebound')
+    throw new Error('restore did not preserve entity id while rebinding the explicit path')
+  if (reboundProjects.projects[0].environment?.storeDir !== '/old/recovery-store')
+    throw new Error('unmapped environment store should stay pending, not be silently rewritten')
+  step('restore-rebind-preserves-identity', 'PASS', {
+    entity: reboundProjects.projects[0].id,
+    applied: mapped.length,
+    pendingRebind: rebound.json.report.pathMappings.pendingRebind.length,
+    credentialsCarried: false,
+  })
+
   // Recovery gate: a restored state with old business must start read-only and never consume it.
   createRecoveryFixtureState(recoverySource)
   const recoveryBefore = readBusinessSnapshot(join(recoverySource, 'state.sqlite'))
@@ -444,6 +544,11 @@ try {
   if (recoveryBackup.json?.status !== 'CREATED') throw new Error('recovery fixture backup failed')
   const recoveryRestore = runPa(['restore', '--json', '--bundle', recoveryBundle, '--to', recoveryRestored, ...stateArgs()], { allowExit: [0] })
   if (recoveryRestore.json?.status !== 'RESTORED') throw new Error('recovery fixture restore failed')
+  if (!recoveryRestore.json.report.requiresRevalidation.some((line) => /Native authentication|environment/.test(line)))
+    throw new Error('restore report does not require native environment/authentication revalidation')
+  const restoredFilesBeforeStart = readdirSync(recoveryRestored)
+  if (restoredFilesBeforeStart.some((name) => name.endsWith('.key')) || restoredFilesBeforeStart.includes('coordinator.lock'))
+    throw new Error('restore carried credentials or a runtime lock')
   const recoveryPort = await freePort()
   let recoveryApiPort = await freePort()
   if (recoveryApiPort === recoveryPort) recoveryApiPort = await freePort()
@@ -473,6 +578,23 @@ try {
     throw new Error('recovery first start consumed or replayed queued business/answers')
   if (!existsSync(join(recoveryRestored, 'restore-report.json')))
     throw new Error('the launcher deleted the restore marker')
+  const oldClaim = (() => {
+    const db = new Database(join(recoveryRestored, 'state.sqlite'), { readonly: true })
+    try {
+      const claim = db.prepare('SELECT nonce, pid FROM writer_claim WHERE id = 1').get()
+      return claim ?? null
+    } finally {
+      db.close()
+    }
+  })()
+  if (oldClaim && Number(oldClaim.pid) === 999_999)
+    throw new Error('the restored instance kept the historical writer claim as current authority')
+  step('restore-does-not-revive-old-authority', 'PASS', {
+    oldWriterPid: 999999,
+    currentWriterPid: oldClaim ? Number(oldClaim.pid) : null,
+    credentialsCarried: false,
+    markerPreserved: true,
+  })
   step('recovery-keeps-old-business', 'PASS', {
     queued: recoveryAfter.queue.length,
     answers: recoveryAfter.answers.length,
@@ -520,8 +642,45 @@ try {
   restored.dataRoot = restoredData
   if (restored.health?.startupMode !== 'recovery_readonly') throw new Error('restored instance did not start read-only')
   step('start-restored', 'PASS', { url: restored.consoleURL, health: restored.health, startupMode: restored.health.startupMode })
+
+  // Read-only restored instance: downloaded delivery artifacts must match the pre-backup bytes and
+  // the delivered work must still be readable. No queue consumption occurs in recovery mode.
+  const restoredToken = readFileSync(join(restoredData, 'api.key'), 'utf8').trim()
+  const restoredDigests = []
+  for (const artifact of deliveryArtifacts) {
+    const response = await fetch(`${restored.apiURL}/v1/artifacts/${encodeURIComponent(artifact.id)}`, {
+      headers: { connection: 'close', authorization: `Bearer ${restoredToken}` },
+    })
+    if (!response.ok) throw new Error(`restored artifact download failed: ${artifact.id} ${response.status}`)
+    const bytes = Buffer.from(await response.arrayBuffer())
+    const sha256 = createHash('sha256').update(bytes).digest('hex')
+    if (sha256 !== artifact.sha256 || bytes.byteLength !== artifact.bytes.byteLength)
+      throw new Error(`restored artifact bytes differ for ${artifact.id}`)
+    restoredDigests.push(sha256)
+  }
+  const restoredWork = await fetch(`${restored.apiURL}/v1/works/${encodeURIComponent(deliveredWorkId)}`, {
+    headers: { connection: 'close', authorization: `Bearer ${restoredToken}` },
+  })
+  if (!restoredWork.ok) throw new Error(`restored work read failed: ${restoredWork.status}`)
+  const restoredWorkBody = await restoredWork.json()
+  if (restoredWorkBody.phase !== 'delivered') throw new Error(`restored work phase expected delivered, got ${restoredWorkBody.phase}`)
+  step('restored-delivery-bytes-roundtrip', 'PASS', {
+    workId: deliveredWorkId,
+    artifacts: restoredDigests.length,
+    digestsMatch: true,
+    phase: restoredWorkBody.phase,
+  })
   const restoredStop = await stopTrial(restored, { label: 'restored' })
   step('stop-restored', 'PASS', { stopMs: restoredStop.stopMs })
+
+  // A corrupted snapshot must fail verification before any directory is moved.
+  const preRollbackFailedDirs = readdirSync(root).filter((name) => name.startsWith('restored.failed-'))
+  const badRollback = runPa(['rollback', '--json', '--bundle', corrupted, '--target', restoredData, ...stateArgs()], { allowExit: [2] })
+  if (badRollback.json?.code !== 'archive_invalid') throw new Error(`corrupted rollback expected archive_invalid, got ${badRollback.json?.code}`)
+  if (!existsSync(join(restoredData, 'state.sqlite'))) throw new Error('failed rollback moved the current state')
+  if (readdirSync(root).filter((name) => name.startsWith('restored.failed-')).length !== preRollbackFailedDirs.length)
+    throw new Error('failed rollback created a moved/failed directory')
+  step('rollback-verifies-snapshot-before-move', 'PASS', { code: badRollback.json.code })
 
   const rollback = runPa(['rollback', '--json', '--bundle', backupPath, '--target', restoredData, ...stateArgs()], { allowExit: [0] })
   if (rollback.json?.status !== 'ROLLED_BACK') throw new Error(`rollback did not report ROLLED_BACK: ${JSON.stringify(rollback.json).slice(0, 600)}`)
@@ -538,6 +697,117 @@ try {
   const afterRollbackStop = await stopTrial(afterRollback, { label: 'after-rollback' })
   step('stop-after-rollback', 'PASS', { stopMs: afterRollbackStop.stopMs })
 
+  // Relocated staged closure: the checkout is not referenced; every loaded module must come from
+  // the moved install directory (NODE_DEBUG=esm records the resolved module URLs).
+  const stageLogs = join(stagedRoot, 'var/logs')
+  mkdirSync(stageLogs, { recursive: true, mode: 0o700 })
+  const stagedSupervisorOut = join(stageLogs, 'staged-smoke.out.log')
+  const stagedSupervisorErr = join(stageLogs, 'staged-smoke.err.log')
+  const wrapper = join(stagedRoot, 'bin', 'pa')
+  const wrapperRun = (args, options = {}) => {
+    const result = spawnSync(wrapper, args, { encoding: 'utf8', timeout: options.timeout ?? 120000, env: { ...process.env } })
+    if (options.allowExit !== undefined && !options.allowExit.includes(result.status))
+      throw new Error(`staged pa ${args[0]} exit ${result.status}\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`)
+    let json = null
+    try { json = JSON.parse(result.stdout) } catch { json = null }
+    return { exit: result.status, stdout: result.stdout, stderr: result.stderr, json }
+  }
+  const stagedFirstRun = wrapperRun(['first-run', '--json'], { allowExit: [0] })
+  if (stagedFirstRun.json?.status !== 'OK') throw new Error('staged first-run failed')
+  const stagedPort = await freePort()
+  let stagedApiPort = await freePort()
+  if (stagedApiPort === stagedPort) stagedApiPort = await freePort()
+  const stagedOutFd = openSync(stagedSupervisorOut, 'w', 0o600)
+  const stagedErrFd = openSync(stagedSupervisorErr, 'w', 0o600)
+  const stagedChild = spawn(
+    wrapper,
+    ['start', '--fixture', '--port', String(stagedPort), '--api-port', String(stagedApiPort)],
+    { cwd: stagedRoot, env: { ...process.env, NODE_DEBUG: 'esm' }, stdio: ['ignore', stagedOutFd, stagedErrFd] },
+  )
+  const stagedExited = new Promise((resolvePromise) => stagedChild.once('exit', (code, signal) => resolvePromise({ code, signal })))
+  const stagedConsole = `http://127.0.0.1:${stagedPort}`
+  const stagedApi = `http://127.0.0.1:${stagedApiPort}`
+  try {
+    await waitFor(`${stagedConsole}/`, (body) => typeof body === 'string' && body.includes('<div id="root">'), { child: stagedChild, label: 'staged console', timeoutMs: 45000 })
+    await waitFor(`${stagedApi}/v1/health`, (body) => body?.status === 'ok', { child: stagedChild, label: 'staged health', timeoutMs: 45000 })
+    const stagedStatus = await (async () => {
+      const deadline = Date.now() + 30000
+      while (Date.now() < deadline) {
+        if (stagedChild.exitCode !== null || stagedChild.signalCode !== null)
+          throw new Error(`staged supervisor exited before recording the instance (${stagedChild.exitCode ?? stagedChild.signalCode})`)
+        const status = wrapperRun(['status', '--json'], { allowExit: [0, 1, 2] })
+        if (status.json?.status === 'RUNNING') return status.json
+        await new Promise((resolvePromise) => setTimeout(resolvePromise, 150))
+      }
+      throw new Error('staged instance did not reach RUNNING')
+    })()
+    const moduleText = readFileSync(stagedSupervisorErr, 'utf8')
+    const modulePaths = [...new Set([...moduleText.matchAll(/file:\/\/([^'",\s)]+)/g)].map((match) => match[1]))]
+    const stagedReal = realpathSync(stagedRoot)
+    const outside = modulePaths.filter((path) => !path.startsWith(`${stagedReal}/app/`))
+    const checkoutReferences = modulePaths.filter((path) => path.startsWith(realpathSync(REPO_ROOT)))
+    if (modulePaths.length < 100 || outside.length > 0 || checkoutReferences.length > 0)
+      throw new Error(`staged closure module proof failed: total ${modulePaths.length}, outside ${outside.slice(0, 5)}, checkout ${checkoutReferences.slice(0, 5)}`)
+    step('stage-closure-start', 'PASS', {
+      url: stagedConsole,
+      modules: modulePaths.length,
+      outsideClosure: outside.length,
+      checkoutReferences: checkoutReferences.length,
+    })
+    const stagedStopStarted = Date.now()
+    const stagedStop = wrapperRun(['stop', '--json'], { allowExit: [0] })
+    if (stagedStop.json?.status !== 'STOPPED') throw new Error('staged stop did not report STOPPED')
+    const stagedExit = await Promise.race([stagedExited, new Promise((resolvePromise) => setTimeout(() => resolvePromise('timeout'), 20000))])
+    if (stagedExit === 'timeout' || stagedExit.code !== 0) throw new Error('staged supervisor did not exit cleanly')
+    step('stage-closure-stop', 'PASS', { stopMs: Date.now() - stagedStopStarted, status: stagedStatus.status })
+  } finally {
+    for (const fd of [stagedOutFd, stagedErrFd]) {
+      try { closeSync(fd) } catch { /* already closed */ }
+    }
+  }
+
+  // A same-length mutation of an executed coordinator file must fail the startup content-digest
+  // gate; the launcher must not execute or serve the drifted bytes.
+  const stagedDemo = join(stagedRoot, 'app/apps/coordinator/product/demo.ts')
+  const originalDemo = readFileSync(stagedDemo)
+  const tamperedDemo = Buffer.from(originalDemo)
+  tamperedDemo[0] = tamperedDemo[0] === 0x2f ? 0x21 : 0x2f
+  writeFileSync(stagedDemo, tamperedDemo)
+  const tamperPort = await freePort()
+  let tamperApiPort = await freePort()
+  if (tamperApiPort === tamperPort) tamperApiPort = await freePort()
+  const tamperedStart = wrapperRun(
+    ['start', '--fixture', '--json', '--port', String(tamperPort), '--api-port', String(tamperApiPort)],
+    { allowExit: [2] },
+  )
+  if (tamperedStart.json?.code !== 'release_artifact_missing')
+    throw new Error(`same-length staged drift was not refused: ${JSON.stringify(tamperedStart.json).slice(0, 400)}`)
+  writeFileSync(stagedDemo, originalDemo)
+  step('startup-verifies-executed-bytes', 'PASS', { code: tamperedStart.json.code, sameLength: tamperedDemo.length === originalDemo.length })
+
+  // `--skip-console` may only reuse a stamped HTTP build whose digest still matches the files.
+  const skipConfig = join(root, 'skip-console-config')
+  const skipBuild = (configRoot) =>
+    spawnSync(process.execPath, [BUILD, '--install-root', REPO_ROOT, '--config-root', configRoot, '--skip-packages', '--skip-console', '--json'], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+      timeout: 120000,
+    })
+  const reused = skipBuild(skipConfig)
+  if (reused.status !== 0) throw new Error(`--skip-console rejected a fresh HTTP build (exit ${reused.status})\n${reused.stderr}`)
+  const consoleDir = join(REPO_ROOT, 'apps/console/dist')
+  const consoleAsset = readdirSync(consoleDir).find((name) => name.endsWith('.html')) ?? 'index.html'
+  const consoleAssetPath = join(consoleDir, consoleAsset)
+  const originalConsole = readFileSync(consoleAssetPath)
+  const tamperedConsole = Buffer.from(originalConsole)
+  tamperedConsole[tamperedConsole.length - 1] = tamperedConsole[tamperedConsole.length - 1] ^ 1
+  writeFileSync(consoleAssetPath, tamperedConsole)
+  const rejected = skipBuild(skipConfig)
+  writeFileSync(consoleAssetPath, originalConsole)
+  if (rejected.status !== 2 || !/console files do not match/.test(String(rejected.stderr)))
+    throw new Error(`--skip-console did not reject a drifted console bundle (exit ${rejected.status})`)
+  step('skip-console-refuses-tampered-http-bundle', 'PASS', { exit: rejected.status })
+
   const doctorAfter = runPa(['doctor', '--json', ...stateArgs()], { allowExit: [0, 1] })
   if (doctorAfter.json.checks.some((check) => check.id === 'instance' && check.status === 'FAIL'))
     throw new Error('doctor still reports a broken instance after stop')
@@ -548,6 +818,20 @@ try {
   evidence.status = 'FAIL'
   evidence.error = { message: String(error.message ?? error) }
 } finally {
+  if (!raceStopped) {
+    for (const child of raceChildren) {
+      if (child.exitCode !== null || child.signalCode !== null) continue
+      try { runPa(['stop', '--json', ...(raceArgsCleanup ?? [])], { allowExit: [0, 1], timeout: 15000 }) } catch { /* best effort */ }
+    }
+  }
+  for (const child of raceChildren) {
+    if (child.exitCode !== null || child.signalCode !== null) continue
+    child.kill('SIGTERM')
+  }
+  await new Promise((resolvePromise) => setTimeout(resolvePromise, 1000))
+  for (const child of raceChildren) {
+    if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL')
+  }
   for (const handle of activeTrials) {
     try {
       runPa(['stop', '--json', ...stateArgs(handle.dataRoot)], { allowExit: [0, 1], timeout: 20000 })
@@ -576,7 +860,13 @@ try {
     ...(values['keep-root'] ? { backupPath } : {}),
   }
   writeFileSync(join(REPORTS, 'zero-model-smoke.json'), `${JSON.stringify(evidence, null, 2)}\n`)
-  if (!values['keep-root']) rmSync(root, { recursive: true, force: true })
+  if (!values['keep-root']) {
+    try {
+      rmSync(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 })
+    } catch (error) {
+      evidence.cleanup = { status: 'INCOMPLETE', code: error.code ?? null, path: root }
+    }
+  }
 }
 
 process.stdout.write(`${JSON.stringify(evidence, null, 2)}\n`)

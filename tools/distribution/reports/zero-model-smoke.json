@@ -1,17 +1,35 @@
 {
   "case": "DIST-TRIAL-01",
   "status": "PASS",
-  "startedAt": "2026-11-10T07:33:24.213Z",
+  "startedAt": "2026-11-10T08:03:23.867Z",
   "steps": [
     {
       "id": "build",
       "status": "PASS",
       "detail": {
-        "buildId": "249928131129dac8",
+        "buildId": "b7353c782fd710e2",
         "artifacts": {
-          "count": 307,
-          "bytes": 4519624
+          "count": 595,
+          "bytes": 6338380
+        },
+        "dependencies": {
+          "count": 8,
+          "files": 5803
+        },
+        "staged": {
+          "path": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-KRASs1/stage-build",
+          "installManifest": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-KRASs1/stage-build/install.json"
         }
+      }
+    },
+    {
+      "id": "stage-closure",
+      "status": "PASS",
+      "detail": {
+        "root": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-KRASs1/stage-relocated",
+        "files": 6436,
+        "dependencies": 8,
+        "buildId": "b7353c782fd710e2"
       }
     },
     {
@@ -37,14 +55,14 @@
       "id": "static-console",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:55629"
+        "url": "http://127.0.0.1:49812"
       }
     },
     {
       "id": "instance-marker",
       "status": "PASS",
       "detail": {
-        "buildId": "249928131129dac8"
+        "buildId": "b7353c782fd710e2"
       }
     },
     {
@@ -85,7 +103,7 @@
       "id": "status-running",
       "status": "PASS",
       "detail": {
-        "pid": 17748,
+        "pid": 97027,
         "checks": 14
       }
     },
@@ -93,23 +111,33 @@
       "id": "reuse-verified-instance",
       "status": "PASS",
       "detail": {
-        "pid": 17748
+        "pid": 97027
+      }
+    },
+    {
+      "id": "completed-delivery-fixture",
+      "status": "PASS",
+      "detail": {
+        "workId": "4e77c5ea16161e56845e991c44b97d8a",
+        "artifacts": 4,
+        "bytes": 1756,
+        "vendorCalls": 0
       }
     },
     {
       "id": "backup-live",
       "status": "PASS",
       "detail": {
-        "archiveSha256": "19ba45c369e6097e6b50269ae2c5e66d1746f1cc6dabba33c241a2a4743d94a8",
+        "archiveSha256": "9d9d0774f918fa22437d465698df98b763dcebf1a8d143ddeafea2632ccef06c",
         "counts": {
-          "entries": 1,
-          "artifacts": 0,
-          "excluded": 9
+          "entries": 21,
+          "artifacts": 20,
+          "excluded": 11
         },
         "database": {
           "integrity": "ok",
           "foreignKeyViolations": 0,
-          "eventSeq": 0
+          "eventSeq": 49
         }
       }
     },
@@ -117,8 +145,8 @@
       "id": "verify-backup-live",
       "status": "PASS",
       "detail": {
-        "manifestDigest": "8aa6a27cb12f0e84fd751cbdede5111eb978614161535d6be35fa30fbd0faa40",
-        "entries": 1
+        "manifestDigest": "b326e48f07f5a0286255932bc3fdda4a9d344863e4ba42196a9786440ea0244f",
+        "entries": 21
       }
     },
     {
@@ -148,22 +176,22 @@
       "id": "stop-primary",
       "status": "PASS",
       "detail": {
-        "stopMs": 385
+        "stopMs": 237
       }
     },
     {
       "id": "verify-backup-offline",
       "status": "PASS",
       "detail": {
-        "manifestDigest": "8aa6a27cb12f0e84fd751cbdede5111eb978614161535d6be35fa30fbd0faa40"
+        "manifestDigest": "b326e48f07f5a0286255932bc3fdda4a9d344863e4ba42196a9786440ea0244f"
       }
     },
     {
       "id": "orphan-record-recovery",
       "status": "PASS",
       "detail": {
-        "killedLauncherPid": 21496,
-        "stoppedApiPid": 21511,
+        "killedLauncherPid": 98581,
+        "stoppedApiPid": 98590,
         "status": "STOPPED_ORPHAN"
       }
     },
@@ -171,7 +199,7 @@
       "id": "restore-new-directory",
       "status": "PASS",
       "detail": {
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8yvMOy/restored",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-KRASs1/restored",
         "pendingRebind": 0
       }
     },
@@ -193,14 +221,24 @@
       "id": "import-managed-bundle",
       "status": "PASS",
       "detail": {
-        "importId": "19ba45c369e6097e6b50269ae2c5e66d1746f1cc6dabba33c241a2a4743d94a8"
+        "importId": "9d9d0774f918fa22437d465698df98b763dcebf1a8d143ddeafea2632ccef06c"
       }
     },
     {
       "id": "restore-managed-import",
       "status": "PASS",
       "detail": {
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8yvMOy/restored-imported"
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-KRASs1/restored-imported"
+      }
+    },
+    {
+      "id": "restore-rebind-preserves-identity",
+      "status": "PASS",
+      "detail": {
+        "entity": "project-rebind-old",
+        "applied": 1,
+        "pendingRebind": 1,
+        "credentialsCarried": false
       }
     },
     {
@@ -216,7 +254,17 @@
       "id": "stop-recovery-readonly",
       "status": "PASS",
       "detail": {
-        "stopMs": 264
+        "stopMs": 231
+      }
+    },
+    {
+      "id": "restore-does-not-revive-old-authority",
+      "status": "PASS",
+      "detail": {
+        "oldWriterPid": 999999,
+        "currentWriterPid": null,
+        "credentialsCarried": false,
+        "markerPreserved": true
       }
     },
     {
@@ -243,14 +291,14 @@
       "id": "stop-login-instance",
       "status": "PASS",
       "detail": {
-        "stopMs": 295
+        "stopMs": 226
       }
     },
     {
       "id": "start-restored",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:56059",
+        "url": "http://127.0.0.1:49953",
         "health": {
           "status": "ok",
           "mode": "fixture",
@@ -261,32 +309,82 @@
       }
     },
     {
+      "id": "restored-delivery-bytes-roundtrip",
+      "status": "PASS",
+      "detail": {
+        "workId": "4e77c5ea16161e56845e991c44b97d8a",
+        "artifacts": 4,
+        "digestsMatch": true,
+        "phase": "delivered"
+      }
+    },
+    {
       "id": "stop-restored",
       "status": "PASS",
       "detail": {
-        "stopMs": 284
+        "stopMs": 227
+      }
+    },
+    {
+      "id": "rollback-verifies-snapshot-before-move",
+      "status": "PASS",
+      "detail": {
+        "code": "archive_invalid"
       }
     },
     {
       "id": "rollback-rehearsal",
       "status": "PASS",
       "detail": {
-        "failedDir": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8yvMOy/restored.failed-2026-11-10T07-33-46-696Z",
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8yvMOy/restored"
+        "failedDir": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-KRASs1/restored.failed-2026-11-10T08-03-45-339Z",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-KRASs1/restored"
       }
     },
     {
       "id": "start-after-rollback",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:56120"
+        "url": "http://127.0.0.1:49994"
       }
     },
     {
       "id": "stop-after-rollback",
       "status": "PASS",
       "detail": {
-        "stopMs": 343
+        "stopMs": 227
+      }
+    },
+    {
+      "id": "stage-closure-start",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:50018",
+        "modules": 516,
+        "outsideClosure": 0,
+        "checkoutReferences": 0
+      }
+    },
+    {
+      "id": "stage-closure-stop",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 4378,
+        "status": "RUNNING"
+      }
+    },
+    {
+      "id": "startup-verifies-executed-bytes",
+      "status": "PASS",
+      "detail": {
+        "code": "release_artifact_missing",
+        "sameLength": true
+      }
+    },
+    {
+      "id": "skip-console-refuses-tampered-http-bundle",
+      "status": "PASS",
+      "detail": {
+        "exit": 2
       }
     },
     {
@@ -303,10 +401,10 @@
     "The trial instance ran on isolated temporary roots/ports; user services were not touched.",
     "Native authentication/environment is not migrated; restored state must be revalidated before real execution."
   ],
-  "durationMs": 24211,
-  "finishedAt": "2026-11-10T07:33:48.424Z",
+  "durationMs": 37320,
+  "finishedAt": "2026-11-10T08:04:01.187Z",
   "outputs": {
-    "backupArchiveSha256": "19ba45c369e6097e6b50269ae2c5e66d1746f1cc6dabba33c241a2a4743d94a8",
-    "importId": "19ba45c369e6097e6b50269ae2c5e66d1746f1cc6dabba33c241a2a4743d94a8"
+    "backupArchiveSha256": "9d9d0774f918fa22437d465698df98b763dcebf1a8d143ddeafea2632ccef06c",
+    "importId": "9d9d0774f918fa22437d465698df98b763dcebf1a8d143ddeafea2632ccef06c"
   }
 }

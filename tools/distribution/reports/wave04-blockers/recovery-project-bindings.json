@@ -1,0 +1,54 @@
+{
+  "status": "REPRODUCED",
+  "case": "RECOVERY-PROJECT-BINDINGS",
+  "createdAt": "2026-11-10T07:59:25.960Z",
+  "modelCalls": 0,
+  "withoutProjects": {
+    "withProjects": false,
+    "health": {
+      "status": "ok",
+      "mode": "fixture",
+      "startupMode": "recovery_readonly",
+      "access": "local-development"
+    },
+    "startupMode": "recovery_readonly",
+    "exit": 0,
+    "signal": null,
+    "controlledFixtureGrantError": false,
+    "logs": [
+      "Personal product API: http://127.0.0.1:63784/v1/health",
+      "Private state/credential references: /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-repro-recovery-projects-SiMWuy/without-projects",
+      "Recovery read-only: business queues and model providers are disabled; local revalidation is required."
+    ]
+  },
+  "withProjects": {
+    "withProjects": true,
+    "health": null,
+    "startupMode": null,
+    "exit": 1,
+    "signal": null,
+    "controlledFixtureGrantError": true,
+    "logs": [
+      "file:///Users/hh/Desktop/joker/superagent-agent-d/apps/coordinator/product/runtime.ts:49",
+      "        throw new TypeError('Controlled fixture projects require the fixed src/ scratch grant')",
+      "              ^",
+      "TypeError: Controlled fixture projects require the fixed src/ scratch grant",
+      "    at file:///Users/hh/Desktop/joker/superagent-agent-d/apps/coordinator/product/runtime.ts:49:15",
+      "    at Array.map (<anonymous>)",
+      "    at createProductRuntime (file:///Users/hh/Desktop/joker/superagent-agent-d/apps/coordinator/product/runtime.ts:38:32)",
+      "    at file:///Users/hh/Desktop/joker/superagent-agent-d/apps/coordinator/product/demo.ts:49:17",
+      "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+      "    at async node:internal/modules/esm/loader:647:26",
+      "    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)",
+      "Node.js v24.21.0"
+    ]
+  },
+  "reproduced": true,
+  "owner": "main",
+  "affectedScope": "A restored state that carries project bindings cannot be opened even read-only; restore+rebind cannot be consumed until recovery composition accepts restored project scopes (or ignores bindings in read-only mode).",
+  "note": "D does not patch coordinator recovery composition; smoke proves recovery for states without project bindings and proves offline rebinding separately.",
+  "limitations": [
+    "Temporary state only; no user services, credentials, native tasks or model calls were used.",
+    "darwin/arm64 + Node 24.21.x measured candidate only."
+  ]
+}

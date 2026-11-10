@@ -19,7 +19,7 @@ import { captureProcessFacts, processStart, readInstanceRecord, removeInstanceRe
 import { StartLockHeld, acquireStartLock } from './start-lock.mjs'
 import { expectedStartupMode, recoverySummary } from './recovery.mjs'
 import { httpGet } from './http-probe.mjs'
-import { consoleIndexPath, readRelease, statFile, verifyReleaseArtifacts } from './release.mjs'
+import { consoleIndexPath, readRelease, statFile, verifyConsoleBuild, verifyReleaseArtifacts, verifyRuntimeDependencies } from './release.mjs'
 import { createDistributionServer, listenDistributionServer } from './static-server.mjs'
 
 export const DEFAULT_CONSOLE_PORT = 5190
@@ -91,6 +91,17 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
     }, '重新运行 `pa build`；不要服务过期或被修改的字节。')
   if (!statFile(consoleIndexPath(installRoot, release))?.isFile())
     return blocked('console_assets_missing', '静态网页产物缺失', { root: release.build.consoleRoot }, '重新运行 `pa build`。')
+  // The console must be a verified HTTP build, not a stale fixture bundle marked as HTTP.
+  const consoleCheck = verifyConsoleBuild(installRoot, release)
+  if (!consoleCheck.ok)
+    return blocked('console_mode_mismatch', '静态 console 不是已验证的 HTTP 构建', consoleCheck, '重新运行 `pa build`（不要用 --skip-console 复用旧产物）。')
+  // Runtime dependencies that are actually resolved from this install must match the release digests.
+  const dependencyCheck = verifyRuntimeDependencies(installRoot, release)
+  if (!dependencyCheck.ok)
+    return blocked('dependency_digest_mismatch', '运行依赖与 release 记录不一致', {
+      failures: dependencyCheck.failures.slice(0, 20),
+      checked: dependencyCheck.checked,
+    }, '重新 `pa build`/`pa stage`；不要混用其它 checkout 或 node_modules。')
 
   const ensured = ensureRoots(roots)
   const canonicalInstall = canonicalPath(installRoot)
@@ -241,6 +252,7 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
     pid: process.pid,
     processStart: await processStart(process.pid),
     launcherArgv: process.argv,
+    launcherCwd: process.cwd(),
     apiPid: daemon.apiPid,
     consolePid: process.pid,
     apiArgv: [process.execPath, ...expectedArgv],

@@ -68,6 +68,14 @@ export function validateInstanceRecord(value) {
     access: ['local-development', 'token'].includes(value.access) ? value.access : (() => { throw new InstanceError('invalid_instance_record', 'Instance access mode is invalid') })(),
     startupMode: value.startupMode === undefined ? 'normal' : ['normal', 'recovery_readonly'].includes(value.startupMode) ? value.startupMode : (() => { throw new InstanceError('invalid_instance_record', 'Instance startup mode is invalid') })(),
     ...(optionalArgv(value.launcherArgv, 'launcherArgv') === undefined ? {} : { launcherArgv: optionalArgv(value.launcherArgv, 'launcherArgv') }),
+    ...(value.launcherCwd === undefined
+      ? {}
+      : {
+          launcherCwd:
+            typeof value.launcherCwd === 'string' && resolve(value.launcherCwd) === value.launcherCwd
+              ? value.launcherCwd
+              : (() => { throw new InstanceError('invalid_instance_record', 'Instance launcherCwd is invalid') })(),
+        }),
     ...(optionalArgv(value.apiArgv, 'apiArgv') === undefined ? {} : { apiArgv: optionalArgv(value.apiArgv, 'apiArgv') }),
     ...(value.apiProcessStart === undefined
       ? {}
@@ -258,13 +266,15 @@ export async function verifyInstance(record, options = {}) {
     : commandLine !== null && LAUNCHER_COMMAND.test(commandLine)
   record0('launcher_command', launcherMatches, record.launcherArgv !== undefined ? 'exact_argv' : 'legacy_pattern')
   record0('owner', uid !== null && (!process.getuid || Number(uid) === process.getuid()))
-  const canonicalInstall = options.installRoot ?? record.install
+  // A staged closure can be launched from any working directory; the recorded launcher cwd is the
+  // identity, while the install root stays the authority for what bytes are executed.
+  const expectedCwd = resolve(record.launcherCwd ?? options.installRoot ?? record.install)
   record0(
     'cwd',
-    cwd !== null && cwd.split('\n').includes(`n${resolve(canonicalInstall)}`),
+    cwd !== null && cwd.split('\n').includes(`n${expectedCwd}`),
     cwd === null ? 'unavailable' : 'cwd_checked',
   )
-  record0('install_identity', resolve(canonicalInstall) === record.install)
+  record0('install_identity', resolve(options.installRoot ?? record.install) === record.install)
 
   // The API child is verified by exact argv (or structural parse for legacy records), start time,
   // uid, parent, cwd and listener — not by a listening port alone.

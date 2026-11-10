@@ -32,7 +32,8 @@ const HELP = `pa — 本机个人 Agent 助理启动器
 
 命令:
   first-run              创建私有根目录、记录非秘密本机配置、只读探测执行器
-  build                  构建 console 静态产物与运行时包 dist，写 release manifest
+  build                  构建 console 静态产物、运行时包 dist 与执行入口，写 release manifest
+  stage                  构建并产出可搬迁的版本化 staged install 闭包
   start                  启动或复用本机实例（默认 fixture 关、个人模式）；打印网页地址
   status                 查询实例记录与真实进程身份
   stop                   按已验证进程身份优雅停止；超时如实报告未静止资源
@@ -87,7 +88,8 @@ function commandSpecs() {
   return {
     help: {},
     version: { json: 'boolean' },
-    build: { ...COMMON, output: 'string', 'skip-packages': 'boolean', 'skip-console': 'boolean' },
+    build: { ...COMMON, output: 'string', 'release-output': 'string', 'skip-packages': 'boolean', 'skip-console': 'boolean' },
+    stage: { ...COMMON, output: 'string', 'skip-packages': 'boolean', 'skip-console': 'boolean' },
     'first-run': COMMON,
     status: COMMON,
     doctor: { ...COMMON, deep: 'boolean' },
@@ -137,6 +139,17 @@ async function main(argv) {
   if (command === 'build') {
     const args = [BUILD_SCRIPT, '--install-root', installRoot, '--config-root', roots.config]
     if (values.output !== undefined) args.push('--output', values.output)
+    if (values['release-output'] !== undefined) args.push('--release-output', values['release-output'])
+    if (values['skip-packages'] === true) args.push('--skip-packages')
+    if (values['skip-console'] === true) args.push('--skip-console')
+    if (json) args.push('--json')
+    const child = spawnSync(process.execPath, args, { cwd: installRoot, stdio: 'inherit' })
+    return child.status ?? EXIT.BLOCKED
+  }
+
+  if (command === 'stage') {
+    if (values.output === undefined) return fail({ json, code: 'usage', message: 'stage 需要 --output <新的安装目录>', exitCode: EXIT.USAGE })
+    const args = [BUILD_SCRIPT, '--install-root', installRoot, '--config-root', roots.config, '--output', values.output]
     if (values['skip-packages'] === true) args.push('--skip-packages')
     if (values['skip-console'] === true) args.push('--skip-console')
     if (json) args.push('--json')

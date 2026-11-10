@@ -7,14 +7,23 @@
  * retried once; the caller then re-reads the instance record. Removing a breadcrumb is not proof a
  * process disappeared, so liveness always comes from the OS.
  */
-import { closeSync, fsyncSync, openSync, readFileSync, unlinkSync, writeSync } from 'node:fs'
+import { execFile } from 'node:child_process'
+import { closeSync, fsyncSync, linkSync, openSync, readFileSync, unlinkSync, writeSync } from 'node:fs'
 import { join } from 'node:path'
+import { promisify } from 'node:util'
 import { processStart } from './instance.mjs'
+
+const execute = promisify(execFile)
 
 export const START_LOCK_FILE = 'start.lock'
 
 const lockPath = (configRoot) => join(configRoot, START_LOCK_FILE)
 
+/**
+ * Liveness for startup serialization. `kill(0)` decides existence; a zombie is not a live launcher.
+ * If the process state cannot be inspected, treat the holder as alive (fail closed) instead of
+ * stealing a lock another starter may still own.
+ */
 async function alive(pid) {
   if (!Number.isSafeInteger(pid) || pid <= 1) return false
   try {
@@ -23,12 +32,10 @@ async function alive(pid) {
     return false
   }
   try {
-    const stat = await processStart(pid)
-    // A zombie is not alive; processStart returns a timestamp for zombies on some systems, so rely
-    // on the launcher identity check elsewhere. Here an existing timestamp is enough to conflict.
-    return stat !== null
+    const stat = (await execute('ps', ['-p', String(pid), '-o', 'stat='], { timeout: 2000, encoding: 'utf8' })).stdout.trim()
+    return stat !== '' && !stat.toUpperCase().startsWith('Z')
   } catch {
-    return false
+    return true
   }
 }
 
@@ -53,14 +60,23 @@ export async function acquireStartLock(configRoot) {
       processStart: await processStart(process.pid),
       startedAt: new Date().toISOString(),
     }
+    const temporary = `${path}.${process.pid}.tmp`
     try {
-      const fd = openSync(path, 'wx', 0o600)
+      // Write the complete content to a private temp file, then link it into place atomically. A
+      // concurrent starter can therefore never observe an empty/partial lock and mistake it for a
+      // dead holder (which would steal the lock).
+      const fd = openSync(temporary, 'w', 0o600)
       try {
         const bytes = Buffer.from(`${JSON.stringify(record)}\n`)
         for (let offset = 0; offset < bytes.length;) offset += writeSync(fd, bytes, offset)
         fsyncSync(fd)
       } finally {
         closeSync(fd)
+      }
+      try {
+        linkSync(temporary, path)
+      } finally {
+        try { unlinkSync(temporary) } catch { /* already gone */ }
       }
       let released = false
       return {
@@ -79,11 +95,12 @@ export async function acquireStartLock(configRoot) {
     try {
       holder = JSON.parse(readFileSync(path, 'utf8'))
     } catch {
-      holder = null
+      // Unreadable content proves nothing about the holder; fail closed instead of stealing it.
+      throw new StartLockHeld({ reason: 'unreadable_lock' })
     }
-    const holderPid = Number(holder?.pid)
-    if (Number.isSafeInteger(holderPid) && (await alive(holderPid))) throw new StartLockHeld(holder)
-    // Dead/invalid breadcrumb: a process that already exited leaves no authority behind.
+    if (typeof holder?.pid !== 'number' || !Number.isSafeInteger(holder.pid)) throw new StartLockHeld({ reason: 'invalid_lock' })
+    if (await alive(holder.pid)) throw new StartLockHeld(holder)
+    // A valid breadcrumb whose process is verifiably gone leaves no authority behind.
     try { unlinkSync(path) } catch { /* raced with another cleaner */ }
   }
   throw new StartLockHeld(null)

@@ -5,8 +5,9 @@
  * server or an unbuilt checkout.
  */
 import { createHash } from 'node:crypto'
-import { existsSync, lstatSync, readFileSync, statSync } from 'node:fs'
-import { isAbsolute, join, relative } from 'node:path'
+import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { dirname, isAbsolute, join, relative } from 'node:path'
 
 export const RELEASE_FORMAT = 'pa-release'
 export const RELEASE_FORMAT_VERSION = 1
@@ -87,6 +88,14 @@ export function validateRelease(value) {
       consoleMode: str(value.build?.consoleMode, 'build.consoleMode', 32),
       consoleRoot: str(value.build?.consoleRoot, 'build.consoleRoot'),
       packageCount: int(value.build?.packageCount, 'build.packageCount'),
+      ...(value.build?.consoleDigest === undefined
+        ? {}
+        : {
+            consoleDigest:
+              typeof value.build.consoleDigest === 'string' && /^[a-f0-9]{64}$/.test(value.build.consoleDigest)
+                ? value.build.consoleDigest
+                : (() => { throw new ReleaseError('release_invalid', 'Release console digest is invalid') })(),
+          }),
     },
     artifacts: parsed,
     admission: {
@@ -94,7 +103,25 @@ export function validateRelease(value) {
       platform: str(admission.platform, 'admission.platform', 64),
       arch: str(admission.arch, 'admission.arch', 64),
       sqlite: str(admission.sqlite, 'admission.sqlite', 64),
+      abi: admission.abi === undefined ? null : str(admission.abi, 'admission.abi', 32),
     },
+    dependencies: (() => {
+      if (value.dependencies === undefined) return []
+      if (!Array.isArray(value.dependencies) || value.dependencies.length > 1000)
+        throw new ReleaseError('release_invalid', 'Release dependencies must be a bounded array')
+      return value.dependencies.map((entry) => {
+        if (!isRecord(entry)) throw new ReleaseError('release_invalid', 'Release dependency is not an object')
+        return {
+          name: str(entry.name, 'dependencies[].name', 214),
+          version: str(entry.version, 'dependencies[].version', 128),
+          digest: str(entry.digest, 'dependencies[].digest', 64),
+          licenseFiles: Array.isArray(entry.licenseFiles)
+            ? entry.licenseFiles.filter((file) => typeof file === 'string').slice(0, 16)
+            : [],
+        }
+      })
+    })(),
+    consoleDigest: typeof value.build?.consoleDigest === 'string' ? value.build.consoleDigest : null,
     limitations: Array.isArray(value.limitations) ? value.limitations.map((entry) => str(entry, 'limitations[]', 2048)) : [],
   }
 }
@@ -163,4 +190,141 @@ export function statFile(path) {
   } catch {
     return null
   }
+}
+
+const LICENSE_FILE = /^(?:LICEN[CS]E|COPYING|NOTICE)(?:\..*)?$/i
+
+function walkFiles(root, base = root) {
+  const files = []
+  for (const entry of readdirSync(root, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+    const absolute = join(root, entry.name)
+    if (entry.isDirectory()) files.push(...walkFiles(absolute, base))
+    else if (entry.isFile()) files.push(relative(base, absolute).split('\\').join('/'))
+  }
+  return files
+}
+
+function hashDirectory(root) {
+  const hash = createHash('sha256')
+  for (const path of walkFiles(root)) {
+    const bytes = readFileSync(join(root, path))
+    hash.update(`${path}\0${bytes.byteLength}\0${createHash('sha256').update(bytes).digest('hex')}\n`)
+  }
+  return hash.digest('hex')
+}
+
+function packageRootOf(entryPath, name) {
+  let directory = dirname(entryPath)
+  for (let depth = 0; depth < 12; depth += 1) {
+    const packageJson = join(directory, 'package.json')
+    if (existsSync(packageJson)) {
+      try {
+        if (JSON.parse(readFileSync(packageJson, 'utf8')).name === name) return directory
+      } catch {
+        /* keep walking */
+      }
+    }
+    const parent = dirname(directory)
+    if (parent === directory) break
+    directory = parent
+  }
+  return null
+}
+
+function resolvePackageRoot(name, anchors) {
+  for (const anchor of anchors) {
+    let require
+    try {
+      require = createRequire(anchor)
+    } catch {
+      continue
+    }
+    for (const specifier of [name, `${name}/package.json`]) {
+      try {
+        const resolved = require.resolve(specifier)
+        const root = packageRootOf(resolved, name)
+        if (root !== null) return root
+      } catch {
+        /* try next */
+      }
+    }
+  }
+  return null
+}
+
+function dependencyAnchors(installRoot) {
+  const anchors = []
+  for (const path of ['apps/coordinator/package.json', 'apps/launcher/package.json']) {
+    const candidate = join(installRoot, path)
+    if (existsSync(candidate)) anchors.push(candidate)
+  }
+  const packagesRoot = join(installRoot, 'packages')
+  if (existsSync(packagesRoot)) {
+    for (const directory of readdirSync(packagesRoot).sort()) {
+      const candidate = join(packagesRoot, directory, 'package.json')
+      if (existsSync(candidate)) anchors.push(candidate)
+    }
+  }
+  return anchors
+}
+
+/**
+ * Verify that the runtime dependency closure actually used from this install matches the release
+ * digests. Paths may differ between a checkout (pnpm store) and a staged install (flat
+ * node_modules); package-level content digests must agree.
+ */
+export function verifyRuntimeDependencies(installRoot, release) {
+  if (!Array.isArray(release.dependencies) || release.dependencies.length === 0)
+    return { ok: false, checked: 0, failures: [{ reason: 'missing_dependency_manifest' }] }
+  const anchors = dependencyAnchors(installRoot)
+  const failures = []
+  let checked = 0
+  for (const dependency of release.dependencies) {
+    const root = resolvePackageRoot(dependency.name, anchors)
+    if (root === null) {
+      failures.push({ name: dependency.name, reason: 'unresolved' })
+      continue
+    }
+    // Transitive dependencies resolve from their parent package once it has been verified.
+    const packageJson = join(root, 'package.json')
+    if (!anchors.includes(packageJson)) anchors.push(packageJson)
+    let manifest
+    try {
+      manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
+    } catch {
+      failures.push({ name: dependency.name, reason: 'unreadable' })
+      continue
+    }
+    if (manifest.version !== dependency.version) {
+      failures.push({ name: dependency.name, reason: 'version_mismatch', expected: dependency.version, observed: manifest.version })
+      continue
+    }
+    const digest = hashDirectory(root)
+    if (digest !== dependency.digest) {
+      failures.push({ name: dependency.name, reason: 'digest_mismatch' })
+      continue
+    }
+    checked += 1
+  }
+  return { ok: failures.length === 0, checked, failures }
+}
+
+export const CONSOLE_STAMP_FILE = '.pa-console-build.json'
+
+/** The static console bundle must be an HTTP-mode build whose digest is recorded in the release. */
+export function verifyConsoleBuild(installRoot, release) {
+  const stampPath = join(installRoot, release.build.consoleRoot, CONSOLE_STAMP_FILE)
+  if (release.build.consoleMode !== 'http') return { ok: false, reason: 'console_mode_not_http', stampPath }
+  if (!release.build.consoleDigest) return { ok: false, reason: 'release_has_no_console_digest', stampPath }
+  let stamp
+  try {
+    stamp = JSON.parse(readFileSync(stampPath, 'utf8'))
+  } catch {
+    return { ok: false, reason: 'console_stamp_missing_or_invalid', stampPath }
+  }
+  if (stamp.protocol !== 'personal-console-build/1' || stamp.mode !== 'http')
+    return { ok: false, reason: 'console_stamp_not_http', stampPath, stamp: { protocol: stamp.protocol, mode: stamp.mode } }
+  if (stamp.digest !== release.build.consoleDigest)
+    return { ok: false, reason: 'console_digest_mismatch', stampPath, expected: release.build.consoleDigest, observed: stamp.digest }
+  return { ok: true, stampPath, digest: stamp.digest }
 }

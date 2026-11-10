@@ -16,7 +16,7 @@ import { closeSync, createReadStream, createWriteStream, existsSync, fsyncSync, 
 import { once } from 'node:events'
 import { basename, dirname, isAbsolute, join, relative } from 'node:path'
 import Database from 'better-sqlite3'
-import { artifactRoot, backupDatabase, verifyDatabase, type VerifyResult } from '@personal-agent/storage'
+import { artifactRoot, backupDatabase, readArtifactRegistry, verifyDatabase, type VerifyResult } from '@personal-agent/storage'
 import { PortabilityError } from './errors.ts'
 import type { DatabaseFacts, ExcludedEntry, PathBinding, WriterClaimFacts } from './manifest.ts'
 
@@ -220,18 +220,14 @@ export async function snapshotState(options: SnapshotOptions): Promise<SnapshotR
     throw new PortabilityError('database_verify_failed', 'Staged database copy does not match its snapshot')
 
   const artifactsRootDir = artifactRoot(stateDir)
-  const snapshotDb = new Database(stagedDatabase, { readonly: true, fileMustExist: true })
-  let artifactRows: { id: string; digest: string; bytes: number; path: string }[]
-  try {
-    artifactRows = snapshotDb.prepare('SELECT id, digest, bytes, path FROM artifacts ORDER BY id').all() as {
-      id: string
-      digest: string
-      bytes: number
-      path: string
-    }[]
-  } finally {
-    snapshotDb.close()
-  }
+  // A public read port reads the artifact registry from the consistent snapshot itself; the bundle
+  // no longer issues private SQL against a product table.
+  const artifactRows = readArtifactRegistry(stagedDatabase).map((row) => ({
+    id: row.id,
+    digest: row.digest,
+    bytes: row.bytes,
+    path: row.path,
+  }))
 
   const artifacts: (StagingFile & { id: string; digest: string })[] = []
   const stagedArtifactIds = new Set<string>()

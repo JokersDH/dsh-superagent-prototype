@@ -12,7 +12,15 @@ import { describeRoots, platformSupport } from '@personal-agent/portability'
 import { EXIT } from './cli.mjs'
 import { readInstanceRecord, verifyInstance } from './instance.mjs'
 import { recoverySummary } from './recovery.mjs'
-import { SUPPORTED_NODE, consoleIndexPath, readRelease, statFile, verifyReleaseArtifacts } from './release.mjs'
+import {
+  SUPPORTED_NODE,
+  consoleIndexPath,
+  readRelease,
+  statFile,
+  verifyConsoleBuild,
+  verifyReleaseArtifacts,
+  verifyRuntimeDependencies,
+} from './release.mjs'
 
 const execute = promisify(execFile)
 
@@ -112,6 +120,18 @@ export async function runDoctor({ installRoot, roots, deep = false }) {
       statFile(index)?.isFile()
         ? pass('console_assets', { root: release.build.consoleRoot })
         : fail('console_assets', { message: 'Static console entry is missing from the release', path: index }),
+    )
+    const consoleCheck = verifyConsoleBuild(installRoot, release)
+    checks.push(
+      consoleCheck.ok
+        ? pass('console_mode', { mode: 'http', digest: consoleCheck.digest })
+        : fail('console_mode', { reason: consoleCheck.reason, hint: 'Rebuild without --skip-console.' }),
+    )
+    const dependencyCheck = verifyRuntimeDependencies(installRoot, release)
+    checks.push(
+      dependencyCheck.ok
+        ? pass('runtime_dependencies', { checked: dependencyCheck.checked })
+        : fail('runtime_dependencies', { failures: dependencyCheck.failures.slice(0, 20) }),
     )
     checks.push(
       release.source.commit !== 'unknown' && release.source.dirty
