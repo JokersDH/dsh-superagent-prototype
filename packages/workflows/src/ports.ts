@@ -4,19 +4,32 @@
  * verification. It never opens a second SQLite writer and never grants execution authority.
  */
 import type {
-  Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, ProductStore, ProjectCurrent,
-  ProjectSettings, ProjectVersion, WorkIndexEntry,
+  AssistantState, Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, LegacyDecisionRecord,
+  ProductStore, ProjectCurrent, ProjectSettings, ProjectVersion, SourceMessageMetadata, WorkflowStateFacts, WorkIndexEntry,
 } from '@personal-agent/storage'
 import { WorkflowConflict as StorageWorkflowConflict } from '@personal-agent/storage'
-import type { WorkRecord } from '@personal-agent/contracts'
+import type {
+  AssistantStatePage, AssistantStatePort, AssistantStateQuery, PersistedDecision, PersistedProposal, WorkRecord,
+} from '@personal-agent/contracts'
 
 export { SnapshotError, WorkflowSnapshots } from './snapshot.ts'
 export type {
   SnapshotManifest, SnapshotArtifact, SnapshotResult, SnapshotVerification,
 } from './snapshot.ts'
 
-export type { Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, ProjectCurrent, ProjectSettings, ProjectVersion, WorkIndexEntry }
+export type { Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, ProjectCurrent, ProjectSettings, ProjectVersion, WorkIndexEntry, SourceMessageMetadata, WorkflowStateFacts }
 export { StorageWorkflowConflict as WorkflowConflict }
+
+export interface ConversationDiscoveryPort {
+  /** Explicit internal discovery; the caller must still enforce its own authorization per row. */
+  discoverPage(input?: { includeArchived?: boolean; limit?: number; cursor?: string }): ConversationPage
+  discoverSearch(input: { query: string; includeArchived?: boolean; limit?: number; cursor?: string }): ConversationSearchPage
+}
+
+export interface AssistantPort extends AssistantStatePort {
+  /** Old UserDecision ledger rows without source/actor metadata: auditable but not valid memory. */
+  legacyDecisions(query: AssistantStateQuery): { records: readonly LegacyDecisionRecord[]; nextCursor?: string }
+}
 
 export interface ConversationPort {
   create(input: { id: string; projectId?: string; title: string; createdAt?: string }): { created: boolean; conversation: Conversation }
@@ -47,22 +60,35 @@ export interface ReadIndexPort {
   listProjects(input?: { projectIds?: readonly string[]; includeArchived?: boolean; limit?: number; cursor?: string }): { projects: ProjectCurrent[]; nextCursor?: string; hasMore: boolean }
   listWorks(input: { projectIds: readonly string[]; query?: string; limit?: number; cursor?: string }): { works: WorkRecord[]; nextCursor?: string; hasMore: boolean }
   work(workId: string, projectIds: readonly string[]): WorkIndexEntry | undefined
+  sourceMessage(messageId: string, projectIds: readonly string[]): SourceMessageMetadata | undefined
   listArtifacts(input?: { limit?: number; before?: string }): { artifacts: { id: string; digest: string; bytes: number; path: string; createdAt: string }[]; nextCursor?: string; hasMore: boolean }
+}
+
+export interface StateFactsPort {
+  /** Observational facts only; a PID/writer row is not a trusted stop proof. */
+  stateFacts(): WorkflowStateFacts
 }
 
 export interface WorkflowPorts {
   conversations: ConversationPort
+  /** Explicit internal all-project discovery; never use an empty authorization array for this. */
+  discovery: ConversationDiscoveryPort
   projects: ProjectSettingsPort
   decisions: DecisionLedgerPort
+  assistant: AssistantPort
   index: ReadIndexPort
+  state: StateFactsPort
 }
 
 /** The only production composition: a facade over the storage owner's shared UnitOfWork. */
 export function createWorkflowPorts(store: ProductStore): WorkflowPorts {
   return {
     conversations: store.workflows.conversations,
+    discovery: store.workflows.conversations,
     projects: store.workflows.projects,
     decisions: store.workflows.decisions,
+    assistant: store.workflows.assistant,
     index: store.workflows.index,
+    state: store.workflows.index,
   }
 }
