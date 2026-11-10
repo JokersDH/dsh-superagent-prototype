@@ -8,7 +8,7 @@ import {
   type ContextReadPort,
   type ContextSourceDescriptor,
 } from '../src/index.ts'
-import { COMMIT, CONFIRMED, NOW, CountingPort, descriptor, makeGrant, makeRequest, staticPort } from './helpers.ts'
+import { COMMIT, CONFIRMED, NOW, CountingPort, descriptor, makeGrant, makeRequest, scope, staticPort } from './helpers.ts'
 
 const reader = new ContextReader({ now: () => new Date(NOW) })
 
@@ -53,6 +53,26 @@ test('metadata-only grants never pull source files by default', async () => {
   )
   assert.deepEqual(bundle.slices.map((slice) => slice.kind), ['project_metadata'])
   assert.ok(bundle.omitted.some((item) => item.reason === 'denied_kind' && item.path === 'src/app.ts'))
+})
+
+test('metadata, work, contract, verification, delivery and decision sources are usable without file roots', async () => {
+  const kinds = ['project_metadata', 'work', 'contract', 'verification', 'delivery', 'decision'] as const
+  const sources = kinds.map((kind, index) => ({
+    descriptor: descriptor(`${kind}/entry-${index}.json`, `{"kind":"${kind}"}`, { kind }),
+    content: `{"kind":"${kind}"}`,
+  }))
+  const bundle = await reader.read(
+    makeRequest({
+      grant: makeGrant({
+        sourceKinds: [...kinds],
+        // Logical refs for metadata/work/checks/deliveries/decisions are not file paths.
+        scope: scope({ allowedPaths: ['src'] }),
+      }),
+    }),
+    staticPort(sources),
+  )
+  assert.deepEqual(bundle.slices.map((slice) => slice.kind).sort(), [...kinds].sort())
+  assert.equal(bundle.status, 'sufficient')
 })
 
 test('omits cross-project, excluded, denied, binary, oversized, stale and missing sources explicitly', async () => {
