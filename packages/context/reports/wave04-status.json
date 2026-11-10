@@ -1,0 +1,63 @@
+{
+  "role": "C",
+  "branch": "codex/g3-assistant-context",
+  "mainBaseCommit": "8c736f2",
+  "mergeCommit": "7368c1f",
+  "stableCheckpoint": "ed9d553",
+  "updatedAt": "2026-11-10T07:20:00.000Z",
+  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge"],
+  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "phases": [
+    {
+      "phase": "C1",
+      "status": "passed",
+      "evidence": [
+        "packages/proposals/test/proposals.case.ts: confirmed replay authenticates actor; revalidate; immutable snapshots",
+        "packages/knowledge/test/knowledge.case.ts: missing/stale source ineffectiveness; immutable snapshots",
+        "packages/context/reports/wave04-admission-c.json",
+        "packages/context/reports/wave04-c1-verification.txt",
+        "commit ed9d553"
+      ],
+      "results": {
+        "admissionProbe": "PASS_ADMISSION_PROBES (3/3 C cases)",
+        "contextTests": "29/29",
+        "proposalTests": "12/12",
+        "knowledgeTests": "16/16",
+        "typecheck": "PASS",
+        "build": "PASS"
+      },
+      "note": "Missing/stale source invalidates effectiveness and is excluded from listEffective/page while audit revisions remain. Confirmed replay checks actor before any branch and accepts a current-authorization revalidate callback. Stored/returned grant, scope, payload and records are independent deep-frozen snapshots."
+    },
+    { "phase": "C2", "status": "pending", "note": "AssistantStatePort adapter + prepare/commit atomic service." },
+    { "phase": "C3", "status": "pending", "note": "Persisted read-index context port + authorization preview." },
+    { "phase": "C4", "status": "pending", "note": "Zero-model vertical over persisted ports; real SQLite A adapter blocked until A lands." },
+    { "phase": "C5", "status": "pending", "note": "Handoff examples, gap RFC and final evidence." }
+  ],
+  "commands": [
+    "git fetch origin && git merge origin/main",
+    "pnpm --filter @personal-agent/context typecheck && test && build",
+    "pnpm --filter @personal-agent/proposals typecheck && test && build",
+    "pnpm --filter @personal-agent/knowledge typecheck && test && build",
+    "node tools/bootstrap/review-wave04-admission.mjs --output packages/context/reports/wave04-admission-c.json"
+  ],
+  "blockers": [
+    {
+      "id": "C-A-assistant-state",
+      "owner": "A",
+      "status": "external_pending",
+      "input": "Persisted AssistantStatePort implementation on the shared UnitOfWork (decisions/proposals put/get/list/history with CAS/replay).",
+      "expected": "createWorkflowPorts(store).assistant exposes the contracts port; single writer; no second DB.",
+      "actual": "Only packages/contracts/src/assistant-state.ts exists on main; no storage/workflows implementation.",
+      "continue": "C2 will implement adapters and an in-memory port fixture; C4 real SQLite vertical cannot be claimed until A lands."
+    }
+  ],
+  "notTested": [
+    "Real SQLite AssistantStatePort persistence (A-owned, not present in main or A worktree yet)",
+    "Main HTTP/provider/UI wiring and product enablement of assistant capabilities",
+    "Any real model or native task (budget 0)"
+  ],
+  "mainNextSteps": [
+    "Consume commit ed9d553 for the three fixed admission blockers; re-run the read-only probe.",
+    "Keep assistant production disabled until C2/C3 adapters are delivered and A publishes the persisted port."
+  ]
+}
