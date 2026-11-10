@@ -14,6 +14,8 @@ node tools/bootstrap/review-persisted-assistant.mjs
 
 C修adapter对创建/同版本重放/合法后继版本的映射，不降低A的CAS规则。补真实AssistantStatePort消费者，不能仅在自己的InMemoryAssistantState上通过。还要覆盖撤销后重放旧record、同ID改正文/来源/actor、状态被替代、第二Node进程/重开；旧重放不能让revoked决定重新有效。
 
+重放的完整元数据也必须稳定：领域重试生成新的recordedAt时，A会按完整body拒绝。请在两个不同时间点复验合法重放，不能只把expectedVersion减一就认为修完。
+
 只改C拥有路径，独立probe由main保留；修复后交源码和该probe结果，主线复验。真实source/provenance与revocation的其余成功场景也要保持通过。
 
 ## 2. 补决定的prepare/commit消费入口
