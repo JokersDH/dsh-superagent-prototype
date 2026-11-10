@@ -132,8 +132,9 @@ export {
   WorkflowRecords, ProductConversations, ProductProjects, ProductDecisions, WorkflowIndex, WorkflowConflict,
   type Conversation, type ConversationPage, type ConversationSearchHit, type ConversationSearchPage,
   type ProjectCheck, type ProjectEnvironment, type ProjectSettings, type ProjectVersion, type ProjectCurrent,
-  type DecisionRecord, type WorkIndexEntry,
+  type DecisionRecord, type WorkIndexEntry, type SourceMessageMetadata, type WorkflowStateFacts,
 } from './workflows.ts'
+export { AssistantState, type LegacyDecisionRecord } from './assistant-state.ts'
 export { ArtifactStore, ensureArtifactRoot, artifactRoot, stateDirOf, type ArtifactRecord, type WrittenArtifact, type GcResult } from './artifacts.ts'
 export {
   RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict, AuthorityConflict,
