@@ -23,6 +23,15 @@ import type {
   CompatibilityIdentity,
   ProbeReport,
 } from '../../contracts/src/types.ts'
+import {
+  resolveProfileRef,
+  type ExecutionProfileRef,
+  type Resolution,
+  type ResolveOptions,
+} from './profile-ref.ts'
+
+export type { ExecutionProfileRef, Resolution, ResolveOptions, ResolutionRefusal, CapabilityClass } from './profile-ref.ts'
+export { CAPABILITY_CLASSES, capabilityClassOf, identityDigestOf, refFor, resolveProfileRef } from './profile-ref.ts'
 
 export type Readiness = ProbeReport['readiness']
 
@@ -213,11 +222,16 @@ export function driftBetween(previous: CatalogEntry | undefined, next: CatalogEn
 /** In-memory catalog: one entry per profile id, newest revision wins. */
 export class AgentCatalog {
   readonly #entries = new Map<string, CatalogEntry>()
+  /** Retained revisions per profile id, oldest first, so a pinned ref can be honoured exactly. */
+  readonly #history = new Map<string, CatalogEntry[]>()
 
   record(entry: CatalogEntry): { entry: CatalogEntry; drifted: boolean; reasons: string[] } {
     const previous = this.#entries.get(entry.profileId)
     const drift = driftBetween(previous, entry)
     this.#entries.set(entry.profileId, entry)
+    const history = this.#history.get(entry.profileId) ?? []
+    const withoutSame = history.filter(item => item.profileRevision !== entry.profileRevision)
+    this.#history.set(entry.profileId, [...withoutSame, entry].sort((a, b) => a.profileRevision - b.profileRevision))
     return { entry, ...drift }
   }
 
@@ -232,5 +246,28 @@ export class AgentCatalog {
   /** Profiles that may be dispatched; everything else needs an operator or a new probe. */
   schedulableProfiles(): CatalogEntry[] {
     return this.list().filter(schedulable)
+  }
+
+  /**
+   * Every retained revision for one profile id, oldest first.
+   *
+   * `get()` answers "what is current", which is not enough to honour an `ExecutionProfileRef`:
+   * a caller that pinned a revision needs that revision, or an explicit refusal. Retaining the
+   * history (bounded per id) lets `resolveProfileRef` distinguish "this exact revision drifted"
+   * from "this revision is gone" instead of collapsing both into the newest entry.
+   */
+  revisions(profileId: string): CatalogEntry[] {
+    return (this.#history.get(profileId) ?? []).slice()
+  }
+
+  /** Resolve an exact profile reference against this catalog's retained revisions. */
+  resolveRef(ref: ExecutionProfileRef, options: ResolveOptions = {}): Resolution {
+    return resolveProfileRef(this.#allRevisions(), ref, options)
+  }
+
+  #allRevisions(): CatalogEntry[] {
+    const all: CatalogEntry[] = []
+    for (const entries of this.#history.values()) all.push(...entries)
+    return all
   }
 }
