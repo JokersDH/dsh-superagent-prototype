@@ -23,6 +23,7 @@ export type PortabilityCode =
   | 'artifact_missing'
   | 'artifact_digest_mismatch'
   | 'writer_uncertain'
+  | 'state_in_use'
   | 'target_not_empty'
   | 'target_active'
   | 'target_invalid'

@@ -61,6 +61,16 @@ export {
   type VerifyBundleResult,
 } from './bundle.ts'
 export {
+  DATABASE_FILES,
+  assertStateInactive,
+  inspectStateActivity,
+  type StateActivity,
+  type StateActivityCheck,
+  type StateActivityOptions,
+  type StateHolder,
+  type WriterActivity,
+} from './state.ts'
+export {
   restoreBundle,
   readRestoreReport,
   writePrivateFile,

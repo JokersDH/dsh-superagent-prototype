@@ -1,0 +1,52 @@
+{
+  "package": "product-wave-04 / D：发行与恢复准入",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "006b4af9c2f127ae39f4b1d8efa26cc3f0efefae",
+  "mergedMain": "8c736f2",
+  "checkpoint": "D1 recovery admission + active rollback fixes",
+  "ownedPaths": ["apps/launcher/", "tools/distribution/", "packages/portability/"],
+  "modelBudget": { "allocated": 0, "used": 0, "unknownSends": 0, "note": "All checks are controlled fixture / local DB probes; no native or model call." },
+  "phases": [
+    {
+      "id": "D1",
+      "status": "CHECKPOINT_COMMITTED",
+      "fixed": [
+        "destructive rollback refuses active/unknown state (writer claim, OS file holders, managed instance record) before any rename",
+        "restored first start is explicitly requested and verified as recovery_readonly; marker never deleted; no bypass switch",
+        "instance reuse compares requested install/state/mode/access/ports/build/startupMode before reuse; stable instance_conflict"
+      ],
+      "commands": [
+        { "command": "pnpm --dir packages/portability typecheck", "status": "PASS" },
+        { "command": "node --test packages/portability/test/*.case.ts", "status": "PASS", "tests": 33 },
+        { "command": "node --test apps/launcher/test/*.case.mjs", "status": "PASS", "tests": 17 },
+        { "command": "node tools/distribution/smoke.mjs", "status": "PASS", "steps": 33, "durationMs": 13966 }
+      ],
+      "evidence": ["tools/distribution/reports/zero-model-smoke.json"],
+      "notTested": [
+        "personal native startup (main/B admission)",
+        "physical byte-for-byte readonly SQLite file (main 0016 scope: not claimed)",
+        "cross-machine/ABI, macOS x64, Linux, Windows"
+      ]
+    },
+    { "id": "D2", "status": "NEXT", "scope": "API child start identity/UID/exact argv/state, concurrent start single winner, PID reuse/stale socket/unknown orphan handling" },
+    { "id": "D3", "status": "NEXT", "scope": "versioned relocatable staged install closure; startup verifies actual executed sha256; consoleMode from real build" },
+    { "id": "D4", "status": "NEXT", "scope": "adopt A public readArtifactRegistry/WorkflowSnapshots, remove interim private SQL, full delivery artifact roundtrip after restore" },
+    { "id": "D5", "status": "NEXT", "scope": "install→configure→start→reuse→stop→doctor→backup→readonly restore→rebind/allow→upgrade rollback zero-model smoke; E entry" }
+  ],
+  "blockers": [
+    { "id": "D2-IDENTITY", "owner": "D", "note": "in progress" },
+    { "id": "D3-CLOSURE", "owner": "D", "note": "in progress; no main dependency for staging itself" },
+    { "id": "D4-A-PORT", "owner": "A", "status": "AVAILABLE", "note": "readArtifactRegistry exported by storage; WorkflowSnapshots available; D will adopt" },
+    { "id": "D5-MAIN-AUTH", "owner": "main", "status": "OPEN", "note": "explicit rebind/revalidation and new-execution authorization after recovery is main scope; D will mark those smoke steps BLOCKED with the exact port instead of auto-running" }
+  ],
+  "nextConsumerSteps": [
+    "main: re-run review-wave04-admission probes against D branch head; the two reproduced D blockers should now fail closed.",
+    "E: consume the launcher entry in docs/rfcs/WP-12/0002-consumption-guide.zh-CN.md on an isolated root; restored states are read-only until main authorization.",
+    "A: no new port request from D1; D4 adoption of readArtifactRegistry is planned from the existing public export."
+  ],
+  "preservedHistory": [
+    "wave-03 reports/execution-status.json and 28-step smoke evidence remain unchanged",
+    "all wave-03 commits and branch history preserved; merge commit 006b4af only"
+  ]
+}

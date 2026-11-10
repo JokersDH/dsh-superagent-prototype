@@ -11,6 +11,7 @@ import { promisify } from 'node:util'
 import { describeRoots, platformSupport } from '@personal-agent/portability'
 import { EXIT } from './cli.mjs'
 import { readInstanceRecord, verifyInstance } from './instance.mjs'
+import { recoverySummary } from './recovery.mjs'
 import { SUPPORTED_NODE, consoleIndexPath, readRelease, statFile, verifyReleaseArtifacts } from './release.mjs'
 
 const execute = promisify(execFile)
@@ -147,6 +148,20 @@ export async function runDoctor({ installRoot, roots, deep = false }) {
     checks.push(pass('state', { database: 'present' }))
   } else {
     checks.push(warn('state', { message: 'No product database yet; the first start creates a new private state.' }))
+  }
+  const recovery = recoverySummary(roots.data)
+  if (recovery.markerPresent) {
+    checks.push(
+      warn('recovery_marker', {
+        startupMode: 'recovery_readonly',
+        markerValid: recovery.markerValid,
+        pendingRebind: recovery.pendingRebind.length,
+        requiresRevalidation: recovery.requiresRevalidation.length,
+        message: recovery.warning,
+      }),
+    )
+  } else {
+    checks.push(pass('recovery_marker', { startupMode: 'normal' }))
   }
   checks.push(await checkExecutor())
 

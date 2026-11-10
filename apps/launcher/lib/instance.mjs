@@ -56,6 +56,7 @@ export function validateInstanceRecord(value) {
     buildId: typeof value.buildId === 'string' && value.buildId.length <= 128 ? value.buildId : (() => { throw new InstanceError('invalid_instance_record', 'Instance build id is invalid') })(),
     mode: ['fixture', 'personal'].includes(value.mode) ? value.mode : (() => { throw new InstanceError('invalid_instance_record', 'Instance mode is invalid') })(),
     access: ['local-development', 'token'].includes(value.access) ? value.access : (() => { throw new InstanceError('invalid_instance_record', 'Instance access mode is invalid') })(),
+    startupMode: value.startupMode === undefined ? 'normal' : ['normal', 'recovery_readonly'].includes(value.startupMode) ? value.startupMode : (() => { throw new InstanceError('invalid_instance_record', 'Instance startup mode is invalid') })(),
     startedAt: typeof value.startedAt === 'string' && !Number.isNaN(Date.parse(value.startedAt)) ? value.startedAt : (() => { throw new InstanceError('invalid_instance_record', 'Instance startedAt is invalid') })(),
   }
   return record
@@ -234,6 +235,12 @@ export async function verifyInstance(record, options = {}) {
     health = null
   }
   record0('health', health !== null && health.status === 'ok', health === null ? 'unreachable' : health.mode)
+  const observedStartupMode = health?.startupMode === 'recovery_readonly' ? 'recovery_readonly' : 'normal'
+  record0(
+    'startup_mode',
+    observedStartupMode === (record.startupMode ?? 'normal'),
+    { expected: record.startupMode ?? 'normal', observed: observedStartupMode },
+  )
   return { ok: failures.length === 0, checks, failures, health }
 }
 

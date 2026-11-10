@@ -1,6 +1,6 @@
 /** Restore/import/rollback entrypoints refuse ambiguous targets before touching any state. */
 import assert from 'node:assert/strict'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -78,4 +78,62 @@ test('rollback without a verified snapshot or a real target is refused, not fake
   } finally {
     rmSync(base, { recursive: true, force: true })
   }
+})
+
+test('rollback refuses an active state with a live writer before any rename', { timeout: 60_000 }, async (t) => {
+  const { createBundle } = await import('@personal-agent/portability')
+  const { InstanceRegistry, ProductStore, WriterLock } = await import('@personal-agent/storage')
+  const { readdirSync } = await import('node:fs')
+  const base = mkdtempSync(join(tmpdir(), 'pa-rollback-active-'))
+  mkdirSync(join(base, 'install'), { recursive: true })
+  const roots = resolveRoots({
+    installRoot: join(base, 'install'),
+    home: base,
+    platform: 'darwin',
+    overrides: {
+      config: join(base, 'config'),
+      data: join(base, 'data'),
+      cache: join(base, 'cache'),
+      logs: join(base, 'logs'),
+      workspace: join(base, 'workspace'),
+    },
+  })
+  ensureRoots(roots)
+  const stateDir = join(base, 'state')
+  mkdirSync(stateDir, { recursive: true, mode: 0o700 })
+  const store = new ProductStore({ path: join(stateDir, 'state.sqlite') })
+  const artifact = store.artifacts.write(Buffer.from('rollback evidence\n'))
+  store.artifacts.insert(artifact)
+  store.queue.enqueue('application.execute', 'attempt-1', JSON.stringify({ ticket: 't1' }), 1, 0, new Date().toISOString())
+  store.close()
+  const bundle = await createBundle({
+    stateDir,
+    outputPath: join(base, 'snapshot.pab'),
+    stagingRoot: roots.cache,
+    productVersion: '0.1.0',
+  })
+  const live = new ProductStore({ path: join(stateDir, 'state.sqlite') })
+  const lock = new WriterLock(stateDir, new InstanceRegistry(live.db))
+  try {
+    lock.acquire()
+    const refused = await rollbackState({ roots, values: { bundle: bundle.bundlePath, target: stateDir } })
+    assert.equal(refused.ok, false)
+    assert.ok(['state_in_use', 'writer_uncertain'].includes(refused.code), `unexpected code ${refused.code}`)
+    assert.ok(existsSync(join(stateDir, 'state.sqlite')), 'active state was not moved')
+    assert.deepEqual(readdirSync(base).filter((name) => name.includes('.failed-')), [], 'no failed directory was created')
+    assert.deepEqual(readdirSync(stateDir).filter((name) => name.includes('.failed-')), [])
+
+    const refusedRestore = await restoreState({ roots, values: { bundle: bundle.bundlePath, to: stateDir } })
+    assert.equal(refusedRestore.ok, false)
+    assert.equal(refusedRestore.code, 'state_in_use')
+  } finally {
+    lock.release()
+    live.close()
+  }
+  const rolled = await rollbackState({ roots, values: { bundle: bundle.bundlePath, target: stateDir } })
+  assert.equal(rolled.ok, true)
+  assert.equal(rolled.status, 'ROLLED_BACK')
+  assert.ok(existsSync(rolled.failedDir), 'the failed/pre-upgrade state directory is kept')
+  assert.ok(existsSync(join(stateDir, 'state.sqlite')), 'the snapshot was restored into place')
+  rmSync(base, { recursive: true, force: true })
 })

@@ -1,6 +1,6 @@
 /** CLI parsing, release admission and instance-record rules that other stages depend on. */
 import assert from 'node:assert/strict'
-import { lstatSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs'
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -96,6 +96,7 @@ test('instance records round-trip privately and unverified processes are never r
       buildId: 'abc123',
       mode: 'fixture',
       access: 'local-development',
+      startupMode: 'normal',
       startedAt: new Date().toISOString(),
     }
     writeInstanceRecord(configRoot, record)
@@ -112,6 +113,38 @@ test('instance records round-trip privately and unverified processes are never r
     rmSync(configRoot, { recursive: true, force: true })
   }
   assert.equal(EXIT.BLOCKED, 2)
+})
+
+test('restore markers force the expected startup mode without being deleted', async (t) => {
+  const { expectedStartupMode, readRestoreMarker, recoverySummary } = await import('../lib/recovery.mjs')
+  const stateDir = mkdtempSync(join(tmpdir(), 'pa-recovery-marker-'))
+  try {
+    assert.equal(expectedStartupMode(stateDir), 'normal')
+    assert.equal(readRestoreMarker(stateDir).present, false)
+    writeFileSync(
+      join(stateDir, 'restore-report.json'),
+      JSON.stringify({
+        protocol: 'personal-restore/1',
+        requiresRevalidation: ['native environment must be re-probed'],
+        pathMappings: { pendingRebind: ['/old/repo'] },
+      }),
+      { mode: 0o600 },
+    )
+    assert.equal(expectedStartupMode(stateDir), 'recovery_readonly')
+    const summary = recoverySummary(stateDir)
+    assert.equal(summary.startupMode, 'recovery_readonly')
+    assert.deepEqual(summary.pendingRebind, ['/old/repo'])
+    assert.deepEqual(summary.requiresRevalidation, ['native environment must be re-probed'])
+    // An unreadable marker is still authoritative and still read-only.
+    writeFileSync(join(stateDir, 'restore-report.json'), '{not-json', { mode: 0o600 })
+    assert.equal(expectedStartupMode(stateDir), 'recovery_readonly')
+    const broken = recoverySummary(stateDir)
+    assert.equal(broken.startupMode, 'recovery_readonly')
+    assert.equal(broken.markerValid, false)
+    assert.ok(existsSync(join(stateDir, 'restore-report.json')), 'marker is never deleted by the launcher')
+  } finally {
+    rmSync(stateDir, { recursive: true, force: true })
+  }
 })
 
 test('daemon output is redacted before it reaches the private log', async (t) => {
@@ -173,6 +206,7 @@ test('stop refuses an unknown live process and cleans only a provably stale reco
       buildId: 'b',
       mode: 'fixture',
       access: 'local-development',
+      startupMode: 'normal',
       startedAt: new Date().toISOString(),
     }
     const { writeInstanceRecord } = await import('../lib/instance.mjs')

@@ -15,6 +15,7 @@ import { readLauncherConfig } from '../lib/config.mjs'
 import { runDoctor } from '../lib/doctor.mjs'
 import { firstRun } from '../lib/first-run.mjs'
 import { readInstanceRecord, verifyInstance } from '../lib/instance.mjs'
+import { recoverySummary } from '../lib/recovery.mjs'
 import { readRelease } from '../lib/release.mjs'
 import { backupState, verifyBackup } from '../lib/backup.mjs'
 import { importBundle, restoreState, rollbackState } from '../lib/restore.mjs'
@@ -70,6 +71,11 @@ function printStatus(result) {
     lines.push(`  api: ${result.instance.apiURL}`)
     lines.push(`  mode: ${result.instance.mode} access: ${result.instance.access}`)
     lines.push(`  build: ${result.instance.buildId}`)
+    lines.push(`  startup: ${result.instance.startupMode ?? 'normal'}`)
+    if ((result.instance.startupMode ?? 'normal') === 'recovery_readonly') {
+      lines.push('  recovery: 只读（仅历史/诊断；重绑定/重验与执行授权由 main 完成）')
+      if (result.recovery) lines.push(`  pending rebind: ${result.recovery.pendingRebind.length}；requires revalidation: ${result.recovery.requiresRevalidation.length}`)
+    }
   }
   for (const check of result.checks ?? []) lines.push(`  ${check.id}: ${check.ok ? 'PASS' : 'FAIL'}`)
   lines.push(`  install: ${result.installRoot}`)
@@ -181,7 +187,8 @@ async function main(argv) {
     }
     const verification = await verifyInstance(record)
     if (verification.ok) {
-      const result = { status: 'RUNNING', instance: record, checks: verification.checks, installRoot, roots }
+      const recovery = recoverySummary(record.state)
+      const result = { status: 'RUNNING', instance: record, checks: verification.checks, recovery, installRoot, roots }
       printResult({ json: json ? result : null, human: printStatus(result) })
       return EXIT.OK
     }
@@ -194,16 +201,29 @@ async function main(argv) {
     const result = await startInstance({ installRoot, roots, values, log: json ? () => {} : (line) => process.stdout.write(`${line}\n`) })
     if (!result.ok) return fail({ json, code: result.code, message: result.message, detail: result.detail, hint: result.hint })
     if (result.reused) {
-      const human = `Workbench: ${result.record.consoleURL}\n  mode: ${result.record.mode} access: ${result.record.access}\n  state: ${result.record.state}`
-      printResult({ json: json ? { status: 'REUSED', instance: result.record } : null, human })
+      const recovery = recoverySummary(result.record.state)
+      const human = [
+        `Workbench: ${result.record.consoleURL}`,
+        `  mode: ${result.record.mode} access: ${result.record.access} startup: ${result.record.startupMode ?? 'normal'}`,
+        `  state: ${result.record.state}`,
+        ...(recovery.startupMode === 'recovery_readonly'
+          ? [`  ⚠ ${recovery.warning}`, `  pending rebind: ${recovery.pendingRebind.length}；requires revalidation: ${recovery.requiresRevalidation.length}`]
+          : []),
+      ].join('\n')
+      printResult({ json: json ? { status: 'REUSED', instance: result.record, recovery } : null, human })
       return EXIT.OK
     }
     const { record } = result
-    if (json) process.stdout.write(`${JSON.stringify({ status: 'RUNNING', instance: record, log: result.daemon.logPath })}\n`)
+    if (json) process.stdout.write(`${JSON.stringify({ status: 'RUNNING', instance: record, recovery: result.recovery, log: result.daemon.logPath })}\n`)
     else {
       process.stdout.write(`Workbench: ${record.consoleURL}\n`)
-      process.stdout.write(`  api: ${record.apiURL}\n  mode: ${record.mode} access: ${record.access}\n  state: ${record.state}\n  build: ${record.buildId}\n`)
+      process.stdout.write(`  api: ${record.apiURL}\n  mode: ${record.mode} access: ${record.access} startup: ${record.startupMode}\n  state: ${record.state}\n  build: ${record.buildId}\n`)
       if (record.access === 'token') process.stdout.write(`  登录令牌文件: ${join(roots.data, 'bootstrap.key')}\n`)
+      if (record.startupMode === 'recovery_readonly' && result.recovery) {
+        process.stdout.write(`  ⚠ ${result.recovery.warning}\n`)
+        process.stdout.write(`  pending rebind: ${result.recovery.pendingRebind.length}；requires revalidation: ${result.recovery.requiresRevalidation.length}\n`)
+        process.stdout.write('  业务动作已禁用；重新绑定/重新验证与新执行授权由 main 的恢复授权完成，本启动器不提供绕过开关。\n')
+      }
     }
     if (values.open === true && process.platform === 'darwin') {
       spawnSync('open', [record.consoleURL], { stdio: 'ignore' })

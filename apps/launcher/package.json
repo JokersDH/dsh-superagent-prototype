@@ -5,15 +5,26 @@
   "type": "module",
   "license": "MIT",
   "description": "Thin local launcher (`pa`) for one personal install: first-run roots, build manifest admission, start/reuse/stop/status/doctor over the existing coordinator product entry, static console serving with a /v1 reverse proxy, and backup/verify/restore/rollback entrypoints backed by @personal-agent/portability. It owns no product HTTP route and no database writer.",
-  "engines": { "node": ">=24.21.0 <25" },
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
   "packageManager": "pnpm@11.7.0",
-  "bin": { "pa": "./bin/pa.mjs" },
-  "files": ["bin", "lib", "README.md"],
+  "bin": {
+    "pa": "./bin/pa.mjs"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "README.md"
+  ],
   "scripts": {
     "doctor": "node bin/pa.mjs doctor",
     "test": "node --test test/*.case.mjs"
   },
   "dependencies": {
     "@personal-agent/portability": "workspace:*"
+  },
+  "devDependencies": {
+    "@personal-agent/storage": "workspace:*"
   }
 }

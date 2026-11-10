@@ -7,10 +7,78 @@
  * - rollback: keep the failed current state directory and restore a previously verified snapshot
  *   into its place; if the restore fails the original directory is put back.
  */
-import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, realpathSync, renameSync } from 'node:fs'
+import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, realpathSync, renameSync, writeFileSync } from 'node:fs'
 import { isAbsolute, join, resolve } from 'node:path'
-import { restoreBundle, verifyBundle } from '@personal-agent/portability'
+import { inspectStateActivity, restoreBundle, verifyBundle } from '@personal-agent/portability'
 import { appendBackupIndex, readBackupIndex } from './backup-index.mjs'
+import { readInstanceRecord, verifyInstance } from './instance.mjs'
+
+const canonicalPath = (path) => {
+  try {
+    return realpathSync(path)
+  } catch {
+    return resolve(path)
+  }
+}
+
+/**
+ * Prove a state directory may be moved/replaced: no verified managed instance may point at it, and
+ * no writer claim, live holder, or unknown writer claim may remain. A stop request is not proof of
+ * physical stop, so the writer lock and OS file handles are checked independently.
+ */
+async function assertStateMovable(roots, target) {
+  let record = null
+  try {
+    record = readInstanceRecord(roots.config)
+  } catch (error) {
+    return {
+      ok: false,
+      code: 'invalid_instance_record',
+      message: '实例记录不可信，拒绝移动 state',
+      detail: { cause: error.message, code: error.code },
+      hint: '运行 `pa doctor` 核对私有状态。',
+    }
+  }
+  if (!existsSync(target)) return { ok: true }
+  if (record !== null && canonicalPath(record.state) === canonicalPath(target)) {
+    const verification = await verifyInstance(record)
+    return {
+      ok: false,
+      code: 'target_active',
+      message: verification.ok
+        ? '目标 state 属于当前运行实例；停止请求不等于物理停止，拒绝回滚/移动'
+        : '目标 state 登记在未核实的实例记录中；先清理该记录',
+      detail: {
+        pid: record.pid,
+        verified: verification.ok,
+        failures: verification.ok ? [] : verification.failures,
+      },
+      hint: verification.ok ? '先运行 `pa stop`，确认进程与资源静止后再回滚。' : '运行 `pa stop` 或 `pa doctor`，不要直接移动目录。',
+    }
+  }
+  try {
+    const activity = await inspectStateActivity(target)
+    if (activity.status !== 'inactive')
+      return {
+        ok: false,
+        code: activity.status === 'active' ? 'state_in_use' : 'writer_uncertain',
+        message:
+          activity.status === 'active'
+            ? '目标 state 仍被进程/写者占用；停止请求不等于物理停止'
+            : '目标 state 存在已消失进程的 writer claim；需先和解，不能直接移动',
+        detail: {
+          reasons: activity.reasons,
+          holders: activity.holders,
+          writer: activity.writer?.claim ?? null,
+          status: activity.status,
+        },
+        hint: '先正常停止实例并核对进程/资源；不要按 PID 猜测或移动活跃目录。',
+      }
+  } catch (error) {
+    return asPortabilityFailure(error)
+  }
+  return { ok: true }
+}
 
 const asPortabilityFailure = (error) => {
   if (error && typeof error === 'object' && 'code' in error)
@@ -101,6 +169,8 @@ export async function restoreState({ roots, values }) {
       detail: { target },
       hint: '恢复到新的私有目录；活跃实例的 state 永不被覆盖。',
     }
+  const guard = await assertStateMovable(roots, target)
+  if (!guard.ok) return guard
   const mapped = parseMappings(values['map-path'])
   if (mapped.error) return { ok: false, code: 'usage', message: mapped.error }
   const bundlePath = resolveBundlePath(roots, values.bundle)
@@ -172,6 +242,10 @@ export async function rollbackState({ roots, values }) {
   if (!existsSync(join(target, 'state.sqlite')))
     return { ok: false, code: 'target_invalid', message: '回滚目标没有产品数据库', detail: { target } }
 
+  // A destructive rename needs proven inactivity before anything moves.
+  const movable = await assertStateMovable(roots, target)
+  if (!movable.ok) return movable
+
   // Verify the snapshot before moving the current state aside.
   try {
     await verifyBundle(bundlePath, { stagingRoot: roots.cache })
@@ -208,12 +282,39 @@ export async function rollbackState({ roots, values }) {
         restoredOriginal = false
       }
     }
+    let diagnosticsPath = null
+    try {
+      diagnosticsPath = join(roots.config, `rollback-diagnostics-${stamp}.json`)
+      writeFileSync(
+        diagnosticsPath,
+        `${JSON.stringify(
+          {
+            protocol: 'personal-rollback-diagnostics/1',
+            createdAt: new Date().toISOString(),
+            target,
+            failedDir,
+            bundlePath,
+            restoredOriginal,
+            error: { code: failure.code ?? 'rollback_failed', message: failure.message ?? 'restore failed' },
+            notes: [
+              'The failed/previous state directory is kept for inspection.',
+              'No business queue was replayed and no model/native work was started.',
+            ],
+          },
+          null,
+          2,
+        )}\n`,
+        { mode: 0o600 },
+      )
+    } catch {
+      diagnosticsPath = null
+    }
     return {
       ...failure,
       ok: false,
       code: failure.code ?? 'rollback_failed',
       message: `回滚失败：${failure.message ?? 'restore failed'}`,
-      detail: { ...failure.detail, failedDir, restoredOriginal },
+      detail: { ...failure.detail, failedDir, restoredOriginal, diagnosticsPath },
       hint: restoredOriginal
         ? '已把原目录放回，保持可启动状态；请检查 bundle 后重试。'
         : '原目录仍在 failed 路径中，需人工恢复；不要假报已回滚。',

@@ -63,7 +63,7 @@ export function createBoundedLog(logsRoot, buildId) {
   return { path, write }
 }
 
-export function daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access }) {
+export function daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access, startupMode = 'normal' }) {
   const argv = [
     join(installRoot, 'apps/coordinator/product/demo.ts'),
     '--port',
@@ -72,9 +72,15 @@ export function daemonArgv({ installRoot, apiPort, state, consoleURL, mode, acce
     state,
     '--console-origin',
     consoleURL,
-    '--assistant',
+    '--startup-mode',
+    startupMode,
   ]
-  if (mode === 'personal') argv.push('--native')
+  // Recovery read-only never starts a native executor or a model provider, and we do not ask for
+  // them either: the marker still forces read-only even if a caller passes normal/native/assistant.
+  if (startupMode !== 'recovery_readonly') {
+    argv.push('--assistant')
+    if (mode === 'personal') argv.push('--native')
+  }
   if (access === 'local-development') argv.push('--local-access')
   return argv
 }
@@ -100,10 +106,10 @@ export async function waitForHealth(apiURL, child, { timeoutMs = 30_000, childEx
  * and reports resources that outlive the deadline.
  */
 export function spawnDaemon(options) {
-  const { installRoot, apiPort, state, consoleURL, mode, access, logsRoot, buildId } = options
+  const { installRoot, apiPort, state, consoleURL, mode, access, logsRoot, buildId, startupMode = 'normal' } = options
   const log = createBoundedLog(logsRoot, buildId)
   const tail = []
-  const child = spawn(process.execPath, daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access }), {
+  const child = spawn(process.execPath, daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access, startupMode }), {
     cwd: installRoot,
     env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' },
     stdio: ['ignore', 'pipe', 'pipe'],

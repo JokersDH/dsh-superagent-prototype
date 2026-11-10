@@ -1,16 +1,16 @@
 {
   "case": "DIST-TRIAL-01",
   "status": "PASS",
-  "startedAt": "2026-11-10T04:59:23.347Z",
+  "startedAt": "2026-11-10T07:25:04.036Z",
   "steps": [
     {
       "id": "build",
       "status": "PASS",
       "detail": {
-        "buildId": "40ca46f9846cc933",
+        "buildId": "8250af85d855073a",
         "artifacts": {
-          "count": 285,
-          "bytes": 4319110
+          "count": 307,
+          "bytes": 4519624
         }
       }
     },
@@ -37,14 +37,14 @@
       "id": "static-console",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:61212"
+        "url": "http://127.0.0.1:50129"
       }
     },
     {
       "id": "instance-marker",
       "status": "PASS",
       "detail": {
-        "buildId": "40ca46f9846cc933"
+        "buildId": "8250af85d855073a"
       }
     },
     {
@@ -77,30 +77,30 @@
       "id": "console-asset",
       "status": "PASS",
       "detail": {
-        "path": "/assets/index-DKnMq5Q0.js",
-        "bytes": 472122
+        "path": "/assets/index-CjMyIihB.js",
+        "bytes": 484814
       }
     },
     {
       "id": "status-running",
       "status": "PASS",
       "detail": {
-        "pid": 22420,
-        "checks": 8
+        "pid": 67993,
+        "checks": 9
       }
     },
     {
       "id": "reuse-verified-instance",
       "status": "PASS",
       "detail": {
-        "pid": 22420
+        "pid": 67993
       }
     },
     {
       "id": "backup-live",
       "status": "PASS",
       "detail": {
-        "archiveSha256": "a2041464135368808a16a9c7e9788dbe5b80343d1ce2013f9f695b33d82a21cf",
+        "archiveSha256": "08a6ddd3de7de19575fc80383528138a16a6c5ebfbace06244d48a09e3abfcb3",
         "counts": {
           "entries": 1,
           "artifacts": 0,
@@ -117,29 +117,44 @@
       "id": "verify-backup-live",
       "status": "PASS",
       "detail": {
-        "manifestDigest": "ae8ab7130fd71085d844745fc7940f748be08b6777cc4d171465b7c22f6b54cd",
+        "manifestDigest": "35249a1a0b01081fe06dab7c9a10cd14cd2b3b305498f95fad5afaab8f24bebe",
         "entries": 1
+      }
+    },
+    {
+      "id": "rollback-refuses-active-state",
+      "status": "PASS",
+      "detail": {
+        "code": "target_active"
+      }
+    },
+    {
+      "id": "reuse-requires-matching-identity",
+      "status": "PASS",
+      "detail": {
+        "state": "instance_conflict",
+        "ports": "instance_conflict"
       }
     },
     {
       "id": "stop-primary",
       "status": "PASS",
       "detail": {
-        "stopMs": 239
+        "stopMs": 226
       }
     },
     {
       "id": "verify-backup-offline",
       "status": "PASS",
       "detail": {
-        "manifestDigest": "ae8ab7130fd71085d844745fc7940f748be08b6777cc4d171465b7c22f6b54cd"
+        "manifestDigest": "35249a1a0b01081fe06dab7c9a10cd14cd2b3b305498f95fad5afaab8f24bebe"
       }
     },
     {
       "id": "restore-new-directory",
       "status": "PASS",
       "detail": {
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Dg8PPa/restored",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-1x4M1B/restored",
         "pendingRebind": 0
       }
     },
@@ -161,14 +176,40 @@
       "id": "import-managed-bundle",
       "status": "PASS",
       "detail": {
-        "importId": "a2041464135368808a16a9c7e9788dbe5b80343d1ce2013f9f695b33d82a21cf"
+        "importId": "08a6ddd3de7de19575fc80383528138a16a6c5ebfbace06244d48a09e3abfcb3"
       }
     },
     {
       "id": "restore-managed-import",
       "status": "PASS",
       "detail": {
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Dg8PPa/restored-imported"
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-1x4M1B/restored-imported"
+      }
+    },
+    {
+      "id": "restored-first-start-readonly",
+      "status": "PASS",
+      "detail": {
+        "startupMode": "recovery_readonly",
+        "commandStatus": 422,
+        "errorCode": "unsupported_capability"
+      }
+    },
+    {
+      "id": "stop-recovery-readonly",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 232
+      }
+    },
+    {
+      "id": "recovery-keeps-old-business",
+      "status": "PASS",
+      "detail": {
+        "queued": 5,
+        "answers": 1,
+        "deliveries": 1,
+        "markerPreserved": true
       }
     },
     {
@@ -176,55 +217,59 @@
       "status": "PASS",
       "detail": {
         "beforeBootstrap": "auth_required",
-        "afterBootstrap": "authenticated"
+        "afterBootstrap": "authenticated",
+        "startupMode": "recovery_readonly",
+        "writeStatus": 422
       }
     },
     {
       "id": "stop-login-instance",
       "status": "PASS",
       "detail": {
-        "stopMs": 224
+        "stopMs": 225
       }
     },
     {
       "id": "start-restored",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:61263",
+        "url": "http://127.0.0.1:50217",
         "health": {
           "status": "ok",
           "mode": "fixture",
+          "startupMode": "recovery_readonly",
           "access": "local-development"
-        }
+        },
+        "startupMode": "recovery_readonly"
       }
     },
     {
       "id": "stop-restored",
       "status": "PASS",
       "detail": {
-        "stopMs": 223
+        "stopMs": 228
       }
     },
     {
       "id": "rollback-rehearsal",
       "status": "PASS",
       "detail": {
-        "failedDir": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Dg8PPa/restored.failed-2026-11-10T04-59-33-534Z",
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Dg8PPa/restored"
+        "failedDir": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-1x4M1B/restored.failed-2026-11-10T07-25-16-671Z",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-1x4M1B/restored"
       }
     },
     {
       "id": "start-after-rollback",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:61285"
+        "url": "http://127.0.0.1:50239"
       }
     },
     {
       "id": "stop-after-rollback",
       "status": "PASS",
       "detail": {
-        "stopMs": 254
+        "stopMs": 262
       }
     },
     {
@@ -241,10 +286,10 @@
     "The trial instance ran on isolated temporary roots/ports; user services were not touched.",
     "Native authentication/environment is not migrated; restored state must be revalidated before real execution."
   ],
-  "durationMs": 11478,
-  "finishedAt": "2026-11-10T04:59:34.825Z",
+  "durationMs": 13966,
+  "finishedAt": "2026-11-10T07:25:18.002Z",
   "outputs": {
-    "backupArchiveSha256": "a2041464135368808a16a9c7e9788dbe5b80343d1ce2013f9f695b33d82a21cf",
-    "importId": "a2041464135368808a16a9c7e9788dbe5b80343d1ce2013f9f695b33d82a21cf"
+    "backupArchiveSha256": "08a6ddd3de7de19575fc80383528138a16a6c5ebfbace06244d48a09e3abfcb3",
+    "importId": "08a6ddd3de7de19575fc80383528138a16a6c5ebfbace06244d48a09e3abfcb3"
   }
 }
