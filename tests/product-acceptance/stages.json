@@ -43,6 +43,7 @@
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12",
       "notes": [
         "Mixed question/complete/fail/stop cycles with a restart in the middle; process/FD/RSS/disk/receipt observations remain scoped to this instance.",
+        "Attempt identities, begin ACKs and dispatch facts are read read-only from runtime_bindings, dispatch_receipts and runtime_observations; a schema change yields UNKNOWN instead of a pass.",
         "Portable installation, first-run, backup/restore and upgrade rollback are declared NOT_TESTED because D's directories are absent in this checkout."
       ]
     },

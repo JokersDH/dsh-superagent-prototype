@@ -1,4 +1,5 @@
 import { existsSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
@@ -93,14 +94,17 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
           const deadline = startedAt + MAX_DURATION_MS
           const baseline = processSnapshot(server.child.pid)
           const baselineReceipts = countReceipts(state)
+          const baselineRuntime = readRuntimeState(state, root)
+          const seenAttempts = new Set((baselineRuntime?.attempts ?? []).map((item) => item.attemptId))
+          const seenTickets = new Set((baselineRuntime?.attempts ?? []).map((item) => item.ticketId))
           const observations = []
-          const attemptIds = new Set()
           const failures = []
           let reopened = false
 
           for (let cycle = 0; cycle < cyclic && Date.now() < deadline; cycle += 1) {
             if (!reopened && cycle === Math.ceil(cyclic / 2)) {
               const before = countReceipts(state)
+              const runtimeBefore = readRuntimeState(state, root)
               await server.stop()
               server = await startProduct({
                 root,
@@ -109,11 +113,20 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
                 consoleOrigin: `http://127.0.0.1:${consolePort}`,
               })
               const afterReceipts = countReceipts(state)
+              const runtimeAfter = readRuntimeState(state, root)
               assert(
                 'REOPEN_NO_NEW_NATIVE_WRITE',
                 afterReceipts === before,
                 `receipts ${before} -> ${afterReceipts} across a reopen`,
               )
+              if (runtimeBefore && runtimeAfter)
+                assert(
+                  'REOPEN_NO_NEW_BEGIN',
+                  runtimeAfter.begins === runtimeBefore.begins &&
+                    runtimeAfter.attempts.length === runtimeBefore.attempts.length,
+                  `begins ${runtimeBefore.begins}->${runtimeAfter.begins}, attempts ${runtimeBefore.attempts.length}->${runtimeAfter.attempts.length}`,
+                )
+              else note('runtime begin/attempt observation is UNKNOWN across the reopen')
               reopened = true
             }
             const mode = ['pass', 'question', 'fail', 'slow'][cycle % 4]
@@ -134,7 +147,6 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
               break
             }
             const workId = created.receipt.workId
-            let cycleAttempt
             try {
               if (mode === 'question') {
                 let view = await waitWork(client, workId, (work) => work.openQuestionIds.length === 1)
@@ -149,7 +161,6 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
                 })
                 assert('ANSWER', answered.receipt.status === 'recorded', JSON.stringify(answered.receipt))
                 view = await waitWork(client, workId, (work) => work.actions.available.includes('accept_candidate'))
-                cycleAttempt = view.actions.currentAssignment?.attemptId
                 await client.dispatch({
                   commandId: commandId('accept'),
                   conversationId: 'conv-e4',
@@ -161,7 +172,6 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
                 const view = await waitWork(client, workId, (work) =>
                   work.actions.available.includes('accept_candidate'),
                 )
-                cycleAttempt = view.actions.currentAssignment?.attemptId
                 const accepted = await client.dispatch({
                   commandId: commandId('accept'),
                   conversationId: 'conv-e4',
@@ -176,7 +186,6 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
                   workId,
                   (work) => work.actions.currentVerificationId !== undefined || ['ended', 'uncertain'].includes(work.phase),
                 )
-                cycleAttempt = view.actions.currentAssignment?.attemptId
                 const verification = await client.verification(view.actions.currentVerificationId)
                 assert(
                   'MACHINE_FAIL',
@@ -185,8 +194,15 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
                 )
                 assert('FAIL_NOT_DELIVERED', view.phase !== 'delivered')
               } else {
-                const started = await client.work(workId)
-                cycleAttempt = started.actions.currentAssignment?.attemptId
+                // Wait until the attempt is actually registered, then stop while it is still in its
+                // 1.5s write window, instead of stopping a work that never started.
+                const attemptsBefore = seenAttempts.size
+                const bindDeadline = Date.now() + 2_000
+                while (Date.now() < bindDeadline) {
+                  const observed = readRuntimeState(state, root)
+                  if (observed && observed.attempts.length > attemptsBefore) break
+                  await new Promise((resolveDelay) => setTimeout(resolveDelay, 50))
+                }
                 const stopped = await client.dispatch({
                   commandId: commandId('stop'),
                   conversationId: 'conv-e4',
@@ -200,10 +216,17 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
               }
 
               const view = await client.work(workId)
-              const attemptId = cycleAttempt ?? view.actions.currentAssignment?.attemptId
-              if (attemptId) {
-                assert('UNIQUE_ATTEMPT', !attemptIds.has(attemptId), `attempt ${attemptId} reused`)
-                attemptIds.add(attemptId)
+              const runtime = readRuntimeState(state, root)
+              const newAttempts = (runtime?.attempts ?? []).filter((item) => !seenAttempts.has(item.attemptId))
+              assert(
+                'AT_MOST_ONE_ATTEMPT_PER_CYCLE',
+                runtime === null || newAttempts.length <= 1,
+                `cycle ${cycle} created ${newAttempts.length} attempts`,
+              )
+              for (const attempt of newAttempts) {
+                assert('UNIQUE_TICKET', !seenTickets.has(attempt.ticketId), `ticket ${attempt.ticketId} reused`)
+                seenAttempts.add(attempt.attemptId)
+                seenTickets.add(attempt.ticketId)
               }
               const snapshot = processSnapshot(server.child.pid)
               observations.push({
@@ -211,12 +234,15 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
                 mode,
                 phase: view.phase,
                 resourceStatus: view.resourceStatus,
-                hadAttempt: Boolean(attemptId),
+                hadAttempt: newAttempts.length === 1,
+                attempt: newAttempts[0]?.attemptId ?? null,
                 durationMs: Date.now() - startedCycle,
                 rssKb: snapshot.rssKb,
                 openFds: snapshot.openFds,
                 children: snapshot.children?.length ?? null,
                 receipts: countReceipts(state),
+                begins: runtime?.begins ?? null,
+                dispatchObserved: runtime?.observed ?? null,
                 stateKb: stateSizeKb(state),
               })
             } catch (error) {
@@ -225,22 +251,41 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
             }
           }
 
+          const finalRuntime = readRuntimeState(state, root)
+          const withAttempt = observations.filter((item) => item.hadAttempt).length
           evidence.cycles = {
             requested: cyclic,
             completed: observations.length,
             durationMs: Date.now() - startedAt,
             baseline,
             baselineReceipts,
+            baselineRuntime,
             observations,
             failures,
-            attemptCount: attemptIds.size,
+            attemptCount: finalRuntime ? finalRuntime.attempts.length : null,
             finalReceipts: countReceipts(state),
+            finalBegins: finalRuntime?.begins ?? null,
+            finalObserved: finalRuntime?.observed ?? null,
             finalStateKb: stateSizeKb(state),
           }
           assert('NO_CYCLE_FAILURE', failures.length === 0, JSON.stringify(failures))
           assert('ALL_CYCLES_COMPLETED', observations.length === cyclic)
-          const withAttempt = observations.filter((item) => item.hadAttempt).length
-          assert('ATTEMPTS_UNIQUE', attemptIds.size === withAttempt, `${attemptIds.size} of ${withAttempt}`)
+          assert('ATTEMPTS_RECORDED', withAttempt >= 1, 'no cycle produced a physical attempt')
+          if (!baselineRuntime || !finalRuntime) {
+            note('runtime attempt/begin observation is UNKNOWN (schema unavailable)')
+          } else {
+            const newAttempts = finalRuntime.attempts.length - baselineRuntime.attempts.length
+            const newBegins = finalRuntime.begins - baselineRuntime.begins
+            assert('ATTEMPTS_MATCH_CYCLES', newAttempts === withAttempt, `${newAttempts} attempts for ${withAttempt} started works`)
+            assert('BEGINS_MATCH_ATTEMPTS', newBegins === newAttempts, `${newBegins} begin ACKs for ${newAttempts} attempts`)
+            // dispatch.observed also covers deliver/answer/cancel, so it must be at least one per
+            // attempt; equality with attempts would be an incorrect assumption.
+            assert(
+              'DISPATCH_OBSERVED_AT_LEAST_ATTEMPTS',
+              finalRuntime.observed - baselineRuntime.observed >= newAttempts,
+              `${finalRuntime.observed - baselineRuntime.observed} dispatch facts for ${newAttempts} attempts`,
+            )
+          }
 
           const last = observations.at(-1)
           assert('PROCESS_ALIVE', last !== null && last.rssKb !== null && last.rssKb !== undefined)
@@ -360,5 +405,46 @@ function countReceipts(stateRoot) {
     return readdirSync(directory).length
   } catch {
     return 0
+  }
+}
+
+/**
+ * Read-only observation of the product database. `runtime_bindings` names each physical attempt,
+ * `dispatch_receipts` records the begin delivery ACK and `runtime_observations` the dispatch fact.
+ * A schema change yields UNKNOWN (null) instead of a false pass.
+ */
+function readRuntimeState(stateRoot, root) {
+  try {
+    const require = createRequire(join(root, 'packages/storage/package.json'))
+    const Database = require('better-sqlite3')
+    const database = new Database(join(stateRoot, 'state.sqlite'), { readonly: true, fileMustExist: true })
+    try {
+      const attempts = database.prepare('SELECT attempt_id, ticket_id, state FROM runtime_bindings').all()
+      const begins = Number(
+        database
+          .prepare(
+            "SELECT COUNT(*) AS count FROM dispatch_receipts WHERE command_id LIKE '%-begin-%' AND delivery IN ('native_accepted', 'written')",
+          )
+          .get()?.count ?? 0,
+      )
+      const observed = Number(
+        database
+          .prepare("SELECT COUNT(*) AS count FROM runtime_observations WHERE kind = 'dispatch.observed'")
+          .get()?.count ?? 0,
+      )
+      return {
+        attempts: attempts.map((row) => ({
+          attemptId: row.attempt_id,
+          ticketId: row.ticket_id,
+          state: row.state,
+        })),
+        begins,
+        observed,
+      }
+    } finally {
+      database.close()
+    }
+  } catch {
+    return null
   }
 }
