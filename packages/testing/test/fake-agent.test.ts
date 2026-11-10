@@ -88,6 +88,12 @@ test('fake agent can emit malformed UTF-8, which the reader rejects stably', asy
 
 test('fake agent can emit an oversized frame, which the reader bounds', async () => {
   // Reader limit below what the child writes: the bound must fail the stream, not buffer it.
+  //
+  // Which bound fires first is a property of OS pipe chunking, not of the test's subject. The
+  // 2 MiB frame ends its line only at the very end, so an early chunk trips `buffer_limit`
+  // (128 KiB buffered with no newline yet) and a late chunk trips `frame_too_large`. Both are
+  // the reader refusing to buffer an unbounded frame, which is the behaviour under contract.
+  // Asserting one specific reason makes this test depend on pipe timing and flake under load.
   const session = await FakeAgentSession.start({ scenario: 'oversize', maxFrameBytes: 64 * 1024, maxBufferedBytes: 128 * 1024 })
   try {
     session.send({ type: 'begin', id: 'cmd-1', preparedPolicyRef: 'prepared-1' })
@@ -96,8 +102,19 @@ test('fake agent can emit an oversized frame, which the reader bounds', async ()
       await new Promise(resolve => setTimeout(resolve, 20))
     }
     assert.ok(session.decoderError, 'decoder should reject the oversized frame')
-    const reason = (session.decoderError as { reason?: string }).reason
-    assert.equal(reason, 'frame_too_large')
+    const error = session.decoderError as { code?: string; reason?: string }
+    assert.ok(
+      ['frame_too_large', 'buffer_limit'].includes(error.reason ?? ''),
+      `expected a size bound, got ${error.reason}`,
+    )
+    // Whatever the branch, the failure must stay a bounded protocol error rather than a crash.
+    assert.equal(error.code, 'protocol_error')
+    // The `ready` handshake legitimately precedes the payload; what must never appear is a frame
+    // decoded from the oversized line itself.
+    assert.ok(
+      session.frames.every(frame => frame.type === 'ready'),
+      `an oversized payload must not decode, got ${JSON.stringify(session.frames.map(frame => frame.type))}`,
+    )
   } finally {
     await session.shutdown()
   }
