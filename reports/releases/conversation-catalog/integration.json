@@ -1,0 +1,64 @@
+{
+  "status": "PASS_SCOPED_CONVERSATION_PRODUCT_ASSISTANT_ADMISSION_BLOCKED",
+  "date": "2026-11-10",
+  "branch": "codex/g2-execution-integration",
+  "baseCommit": "3319a43",
+  "sourceCommit": "081226e41a2e4c4280cd71fcce611b670dbfb001",
+  "preview": {
+    "url": "http://127.0.0.1:5182/",
+    "apiPort": 8798,
+    "state": ".local-state/workflow-preview",
+    "mode": "personal",
+    "status": "PASS_READONLY_PERSONAL_PREVIEW",
+    "scope": "Actual new catalog HTTP route and visible history region checked without starting a model task; independent fresh state, no old history imported"
+  },
+  "applicationModelCalls": 0,
+  "integratedCandidates": {
+    "A": { "source": ["c3e007b", "9174c61", "c74f2c6"], "main": ["aec47df", "5fc44ca", "3f28219"], "scope": "Storage and workflow packages, plus main-owned conversation product composition" },
+    "C": { "source": ["c3046c9", "4dbfc5f", "82d6a36", "2441281"], "main": ["cfa6d1e", "2fabc47", "abfe055", "76027bb"], "scope": "Package source and offline consumer only; production context/decisions are unconnected and admission is blocked" }
+  },
+  "verification": [
+    { "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge -r test", "status": "PASS_PACKAGE_SCOPE", "counts": { "storage": 75, "workflows": 9, "context": 29, "proposals": 10, "knowledge": 14 } },
+    { "command": "pnpm --filter @personal-agent/application test", "status": "PASS", "tests": 16 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:product", "status": "PASS_CONTROLLED", "tests": 19 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:http", "status": "PASS", "tests": 15 },
+    { "command": "pnpm --filter @personal-agent/verification test", "status": "PASS", "tests": 23 },
+    { "command": "pnpm --filter @personal-agent/contracts test", "status": "PASS", "tests": 194 },
+    { "command": "pnpm --filter @personal-agent/console test", "status": "PASS", "tests": 15 },
+    { "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/application --filter @personal-agent/console -r typecheck", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/coordinator typecheck:product", "status": "PASS" },
+    { "command": "env VITE_CONSOLE_MODE=http pnpm --filter @personal-agent/console build", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts check:generated", "status": "PASS", "scope": "Frozen Runner/data identity unchanged" },
+    { "command": "node product-spec/tools/verify-spec.mjs --check", "status": "PASS", "scope": "Specification consistency only" },
+    { "command": "node tests/integration/conversation-catalog-browser.mjs --no-capture", "status": "PASS_CONTROLLED", "tests": 4, "evidence": "browser-report.json", "sourceCommit": "081226e41a2e4c4280cd71fcce611b670dbfb001", "sourceWorktreeClean": true },
+    { "command": "node tools/bootstrap/review-assistant-domain.mjs", "status": "FAIL", "owner": "C", "expectedExit": 1, "evidence": "assistant-domain-admission.json", "scope": "Missing source still enters the effective decision list; remains outside production use" }
+  ],
+  "evidenceScope": "Module tests ran on the implementation working tree before 081226e. The final four browser cases and the independent C failure probe were run on committed 081226e; source paths were clean. Desktop/mobile screenshots were captured before that commit and were preserved during the final no-capture run.",
+  "publicInterfaces": [
+    "GET /v1/conversations",
+    "GET /v1/conversations/:id",
+    "POST /v1/conversations/commands",
+    "ConversationCatalogQuery / ConversationCatalog / ConversationSummary / ConversationCommand",
+    "product.read.conversations / product.read.conversation / product.operations.conversation"
+  ],
+  "handoff": "docs/rfcs/WP-16/0015-workflow-catalog-integration.md",
+  "nextConsumers": {
+    "A": "Consume the public catalog DTOs; consider an indexed conversation membership/active-work port replacing the bounded composition scan. Align decision metadata persistence with C without changing in-flight contracts.",
+    "B": "Continue the assigned native control and recovery matrix; this turn did not consume or certify B's mutable runtime candidates.",
+    "C": "Fix effective-decision source validity using the independent main probe. Align persistent sourceMessageId/actorRef/recordedAt with A, and provide a prepare/commit contract usable by the synchronous application transaction.",
+    "D": "A's public readArtifactRegistry and WorkflowSnapshots are now on main. Continue restore/rollback and distribution stages; no installer admission is claimed here.",
+    "E": "Consume the committed public catalog API in independent tests. Pending work remains visible after archive; source-invalid assistant context must remain blocked. Commit the acceptance package before its reports are used as release authority."
+  },
+  "limitations": [
+    "This is a scoped personal conversation-management checkpoint, not full G2/G3, an internal distribution or CAC admission",
+    "C's 53 passing package tests do not override the independent source-validity failure",
+    "Project settings, durable decision governance and model context/proposal production wiring remain incomplete",
+    "B/D/E evidence was inspected at the recorded checkpoint only, not reclassified as native/product PASS",
+    "The catalog uses bounded persisted-message membership scans and a small sequence cache; large histories can require smaller page sizes and a future indexed storage port",
+    "Archived attention is a conservative hint, not native question/permission/completion authority",
+    "Current-page drafts are in memory; reload does not persist drafts",
+    "Original user instances 5180/8796 and 5181/8797 and all five Agent worktrees were left unchanged",
+    "User ARCHITECTURE-NOTES.zh-CN.md remains untracked and untouched",
+    "Self-created QA servers and fixture processes were closed; the user-facing 5182 preview is intentionally left running"
+  ]
+}
