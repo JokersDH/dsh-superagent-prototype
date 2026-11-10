@@ -386,3 +386,26 @@ test('workspace projection is opaque and fails closed after replacement or drift
     assert.throws(() => projectWorkspaceEnvironment(ref), /receipt_missing/)
   } finally { clean(fixture.root, authorityRoot) }
 })
+
+
+test('legacy mode never trusts a marker it did not capture in this process', async () => {
+  const fixture = makePnpmFixture()
+  const { project, workspace } = copies(fixture)
+  try {
+    mkdirSync(join(workspace, '.product-environment'), { recursive: true })
+    writeJson(join(workspace, '.product-environment', 'state.json'), {
+      protocol: 'environment-preparation/2', requestId: 'foreign', inputFingerprint: 'a'.repeat(64),
+      fingerprint: 'b'.repeat(64), installedDigest: '', owned: true, phase: 'ready', manager: { name: 'pnpm' },
+      policy: 'offline_install', workspaceReal: workspace, projectReal: project, createdAt: new Date().toISOString(),
+    })
+    mkdirSync(join(workspace, 'node_modules'), { recursive: true })
+    writeFileSync(join(workspace, 'node_modules', 'user-note.txt'), 'foreign')
+    const result = await prepareEnvironment(input(project, workspace, 'offline_install', {
+      storeDir: fixture.store, requestId: 'legacy-untrusted',
+    }))
+    blockedCode(result, 'environment_state_untrusted')
+    const cleanup = await result.cleanup()
+    assert.deepEqual(cleanup.removed, [])
+    assert.equal(readFileSync(join(workspace, 'node_modules', 'user-note.txt'), 'utf8'), 'foreign')
+  } finally { clean(fixture.root) }
+})

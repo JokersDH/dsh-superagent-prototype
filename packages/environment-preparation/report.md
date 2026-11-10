@@ -11,12 +11,12 @@
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| A-R1 three new failures | **PASS** | Official 8-case probe at `e4574c2`; regressions for forged-marker cleanup, EPERM/unknown observation, merged stdout+stderr budget |
+| A-R1 three new failures | **PASS** | Official 8-case probe at `e4574c2`; regressions for forged-marker cleanup in both authoritative and legacy modes, EPERM/unknown observation, merged stdout+stderr budget |
 | A-R1 original five | **PASS** | Same probe; unowned-path preservation, nested escape, drift reuse, Node range, pnpmfile refusal |
 | A-R2 production interface | **PASS (package-local)** | mandatory `authorityRoot` entry, parser-validated ref/results, signed-receipt ownership, workspace inode binding, actual exclusions |
 | A-R3 independent consumption | **PASS (package-local)** | `reports/independent-consumption.json` 7/7 through public exports and a second Node process |
 | A-R4 main integration | **BLOCKED_EXTERNAL** | latest `origin/main` is `f2ca26c`; no newer main consumer/merge point after `f35fa29`, so no main integration verification is claimed |
-| Package tests | **37/37 PASS** | `reports/test-output.txt` |
+| Package tests | **38/38 PASS** | `reports/test-output.txt` |
 | Typecheck/build | **PASS** | `pnpm run typecheck`, `pnpm run build` |
 | Offline recipes | **PASS** | `plain-js` and `dev-deps` rebuild/install/run their real tests; `reports/recipe-build.json` |
 
@@ -25,7 +25,7 @@
 ```sh
 cd packages/environment-preparation
 pnpm run typecheck                                  # PASS
-pnpm run test                                       # 37/37 PASS
+pnpm run test                                       # 38/38 PASS
 pnpm run build                                      # PASS
 node examples/consumption-matrix.mjs --out reports/independent-consumption.json
                                                     # PASS_INDEPENDENT_CONSUMPTION 7/7

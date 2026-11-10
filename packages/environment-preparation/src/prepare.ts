@@ -19,6 +19,12 @@ const PROTOCOL = 'environment-preparation/2'
 const REQUEST_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
 const DEFAULTS = { timeoutMs: 120_000, maxOutputBytes: 256 * 1024, maxWorkspaceBytes: 1024 * 1024 * 1024 }
 
+/**
+ * Legacy/no-authority mode has no cross-process proof. It may clean only identities this same process
+ * captured, never a worker-writable marker; a restart therefore cannot claim or delete old state.
+ */
+const inProcessOwned = new Map<string, OwnedPath[]>()
+
 interface Marker {
   protocol: typeof PROTOCOL
   requestId: string
@@ -153,21 +159,16 @@ function cleanupHandle(ctx: Context, allowMarker: boolean): () => Promise<Cleanu
       return { removed: [...new Set(removed)], leftovers: [...new Set(leftovers)] }
     }
     if (!allowMarker) return { removed, leftovers }
-    const marker = readMarker(ctx.markerPath)
-    const targets: string[] = []
-    // Legacy in-process mode only: state created by this module is removable.
-    if (marker?.owned === true) {
-      targets.push(ctx.nodeModules)
-      if (existsSync(ctx.envRoot)) targets.push(ctx.envRoot)
+    const captured = ctx.captured?.length ? ctx.captured : inProcessOwned.get(ctx.workspace) ?? []
+    for (const entry of [...captured].sort((a, b) => b.real.length - a.real.length)) {
+      if (!identityMatches(entry)) { leftovers.push(entry.real); continue }
+      try { rmSync(entry.real, { recursive: true, force: true }) } catch { /* checked below */ }
+      if (existsSync(entry.real)) leftovers.push(entry.real)
+      else removed.push(entry.real)
     }
-    for (const target of targets) {
-      const { inside: contained } = realInside(ctx.workspace, target)
-      if (!contained) { leftovers.push(target); continue }
-      try { rmSync(target, { recursive: true, force: true }) } catch { /* checked below */ }
-      if (existsSync(target)) leftovers.push(target)
-      else removed.push(target)
-    }
-    return { removed, leftovers }
+    inProcessOwned.delete(ctx.workspace)
+    ctx.captured = []
+    return { removed: [...new Set(removed)], leftovers: [...new Set(leftovers)] }
   }
 }
 
@@ -300,6 +301,7 @@ function finishReady(
       return { removed: trusted.removed, leftovers: trusted.leftovers }
     }
   } else {
+    inProcessOwned.set(ctx.workspace, entries.map(entry => ({ ...entry })))
     diagnostic(ctx, 'authority_root_missing', 'No authorityRoot was supplied; the ready environment has no cross-process receipt and cleanup is only in-process.', 'warning')
   }
   return {
@@ -410,6 +412,9 @@ async function prepareEnvironmentInner(input: EnvironmentPreparationInput, autho
       'node_modules already exists but is not owned by this preparation module; refusing to purge it.', inputFingerprint)
 
   if (marker?.owned === true) {
+    if (!authority && !inProcessOwned.has(workspace))
+      return blockedResult(input, ctx, 'environment_state_untrusted',
+        'An owned environment marker exists without an in-process identity capture; legacy mode never claims or deletes it.', inputFingerprint)
     if (marker.phase === 'preparing')
       return blockedResult(input, ctx, 'interrupted_preparation',
         'A previous preparation is marked in progress; no second installer is started and the state is not cleaned automatically.', inputFingerprint)
@@ -560,6 +565,8 @@ async function preparePnpmWorkspace(
   if (modulesExist && marker?.owned !== true)
     return blockedResult(input, ctx, 'workspace_has_dependencies', 'Workspace node_modules exists but is not owned by this module.', inputFingerprint)
   if (marker?.owned === true) {
+    if (!authority && !inProcessOwned.has(workspace))
+      return blockedResult(input, ctx, 'environment_state_untrusted', 'A workspace marker exists without an in-process identity capture; legacy mode never claims or deletes it.', inputFingerprint)
     if (marker.phase === 'preparing') return blockedResult(input, ctx, 'interrupted_preparation', 'A previous workspace preparation is marked in progress.', inputFingerprint)
     if (authority && receiptsFor(authority, workspace).length === 0)
       return blockedResult(input, ctx, 'environment_state_untrusted', 'An owned workspace marker exists without a signed authority receipt; it is preserved.', inputFingerprint)

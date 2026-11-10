@@ -14,10 +14,10 @@
       "status": "passed",
       "evidence": [
         "reports/admission-probe.json",
-        "pkg-test:37/37",
+        "pkg-test:38/38",
         "test: forged marker/EPERM/merged-output/descendants"
       ],
-      "note": "8/8 official cases PASS at e4574c2; marker never authorizes deletion; only ESRCH confirms group gone; stdout+stderr share one UTF-8-safe budget"
+      "note": "8/8 official cases PASS at e4574c2; marker never authorizes deletion in authoritative or legacy mode; only ESRCH confirms group gone; stdout+stderr share one UTF-8-safe budget"
     },
     {
       "phase": "A-R2",
@@ -63,7 +63,7 @@
     "node <primary>/tools/bootstrap/review-environment-preparation.mjs --environment /Users/hh/Desktop/joker/superagent-agent-a --candidate 9550286"
   ],
   "results": {
-    "packageTests": "37/37",
+    "packageTests": "38/38",
     "admissionProbe": "PASS_ENVIRONMENT_ADMISSION (8/8 at e4574c2)",
     "independentConsumption": "PASS_INDEPENDENT_CONSUMPTION (7/7)",
     "typecheck": "PASS",

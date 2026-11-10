@@ -5,8 +5,8 @@
     {
       "label": "small",
       "files": 10,
-      "prepareMs": 2,
-      "verifyMs": 1,
+      "prepareMs": 4,
+      "verifyMs": 2,
       "cleanupMs": 0,
       "workspaceKb": 52,
       "fingerprint": "07dcce27ae5c7a9e6454e1c72c0e95ca94e8865ad6a4f5a6c70676cc353349ae",
@@ -15,8 +15,8 @@
     {
       "label": "large",
       "files": 1000,
-      "prepareMs": 9,
-      "verifyMs": 6,
+      "prepareMs": 14,
+      "verifyMs": 8,
       "cleanupMs": 1,
       "workspaceKb": 4012,
       "fingerprint": "47460312539f13932eb17415a7fde8d73d07d133887cfd4ed27b3fbd66c5e053",
