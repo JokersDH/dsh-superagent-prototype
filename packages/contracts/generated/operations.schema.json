@@ -1,0 +1,200 @@
+{
+  "$defs": {
+    "VerificationRetryCommand": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "blockedId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "candidate": {
+          "additionalProperties": false,
+          "properties": {
+            "assignmentId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "candidateGeneration": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "contract": {
+              "additionalProperties": false,
+              "properties": {
+                "digest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "revision": {
+                  "maximum": 9007199254740991,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "workId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "workId",
+                "revision",
+                "digest"
+              ],
+              "type": "object"
+            },
+            "ticketId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "candidateGeneration"
+          ],
+          "type": "object"
+        },
+        "commandId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "conversationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "kind": {
+          "const": "retry_verification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "commandId",
+        "conversationId",
+        "candidate",
+        "blockedId"
+      ],
+      "type": "object"
+    },
+    "WorkVerificationStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "candidate": {
+          "additionalProperties": false,
+          "properties": {
+            "assignmentId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "candidateGeneration": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "contract": {
+              "additionalProperties": false,
+              "properties": {
+                "digest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "revision": {
+                  "maximum": 9007199254740991,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "workId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "workId",
+                "revision",
+                "digest"
+              ],
+              "type": "object"
+            },
+            "ticketId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "ticketId",
+            "assignmentId",
+            "contract",
+            "candidateGeneration"
+          ],
+          "type": "object"
+        },
+        "failure": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "enum": [
+                "verification_failed",
+                "storage_unavailable"
+              ],
+              "type": "string"
+            },
+            "failureCount": {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            },
+            "id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "code",
+            "failureCount"
+          ],
+          "type": "object"
+        },
+        "protocol": {
+          "const": "work-verification/1",
+          "type": "string"
+        },
+        "retryAvailable": {
+          "type": "boolean"
+        },
+        "state": {
+          "enum": [
+            "not_ready",
+            "queued",
+            "running",
+            "retry_wait",
+            "blocked",
+            "finished"
+          ],
+          "type": "string"
+        },
+        "verificationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "workId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "workId",
+        "state",
+        "retryAvailable"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:work-verification:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

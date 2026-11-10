@@ -30,6 +30,8 @@ pnpm dev:workbench --port 5181 --api-port 8797 --state /absolute/private/workben
 
 ## 真实开发流程
 
+侧栏“对话”可搜索历史消息和标题，切换已有对话；每行图标可重命名或归档，勾选“包含归档”可找回并取消归档。有进行中任务或待办的归档对话仍会保留提示。新建对话和名称持久化，草稿仅在当前网页内按会话分别保留。
+
 1. 使用默认开发项目，或导入干净且已有提交的 Git 根目录。
 2. 在对话输入目标，点击“委托执行”，确认真实项目、Codex 和验收标准，再创建工作。
 3. 查看执行状态和需要你决定的问题，等待注册检查。
@@ -39,6 +41,10 @@ pnpm dev:workbench --port 5181 --api-port 8797 --state /absolute/private/workben
 只测固定流程时显式使用 `pnpm dev:workbench --fixture --port 5181 --api-port 8797 --state /tmp/pa-fixture-workbench`。真实 MVP 不自动回退到 fixture；有依赖的项目目前需要先具备可用隔离环境，环境准备包由外部 A 继续推进。
 
 ## 复验
+
+验证异常时，工作详情会显示原因；基础设施异常最多自动尝试三次，候选/环境失效则直接等待处理。恢复条件满足后可点击“重新检查”，仅运行当前合同已有的注册检查，不重新编码。已经产生的机器 FAIL 不能通过重新检查或人工接受覆盖；需要修改目标或实现时使用工作修订流程。关闭重开会保留故障与操作回执。
+
+恢复接口和独立浏览器验收见 [验证恢复检查点](rfcs/WP-16/0014-verification-recovery-checkpoint.md)，运行 `pnpm check:verification-recovery` 可在自建隔离实例验证，无需操作当前用户服务，也不会调用模型。
 
 ```sh
 pnpm check:g2-workbench

@@ -1,0 +1,71 @@
+{
+  "status": "READY_FOR_FIVE_AGENT_DISPATCH_NOT_PRODUCT_RELEASE",
+  "date": "2026-11-10",
+  "branch": "codex/g2-execution-integration",
+  "baseCommit": "a42924a16a5814276d1ef807a6dd8faea206e219",
+  "sourceCommit": "0ebe9ff187fa901e40d7cbfc2dfb3e8469f46684",
+  "taskIndex": "agent-tasks/product-wave-04/README.zh-CN.md",
+  "interfaceCheckpoint": "docs/rfcs/WP-16/0016-wave-04-interfaces-and-admission.md",
+  "applicationModelCalls": 0,
+  "verification": [
+    { "command": "pnpm --filter @personal-agent/contracts test", "status": "PASS", "tests": 196 },
+    { "command": "pnpm --filter @personal-agent/contracts build", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts typecheck", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts check:generated", "status": "PASS", "runtimeWireIdentity": "UNCHANGED" },
+    { "command": "pnpm --filter @personal-agent/coordinator typecheck:product", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/coordinator test:http", "status": "PASS", "tests": 16 },
+    { "command": "node --test tests/integration/recovery-startup.case.mjs", "status": "PASS", "tests": 1 },
+    { "command": "pnpm --filter @personal-agent/coordinator test:product", "status": "PASS_CONTROLLED", "tests": 19 },
+    { "command": "node product-spec/tools/verify-spec.mjs --check", "status": "PASS_SPEC_ONLY" },
+    { "command": "Task package structure/link verification", "status": "PASS", "scope": "Five role files have five continuous phases each, main packet and all task links exist" },
+    { "command": "node tools/bootstrap/review-wave04-admission.mjs --acceptance-root /Users/hh/Desktop/joker/superagent-agent-e", "status": "FAIL_ADMISSION_PROBES", "exitCode": 1, "cases": 4, "evidence": "admission.json", "scope": "Reproduced candidate defects; these failures prevent release admission and are assigned to C/E" }
+  ],
+  "verificationSourceScope": "Positive module/startup/HTTP/product checks ran on the final implementation working tree before sourceCommit. The four independent C/E negative probes were rerun against committed sourceCommit; no external agent source was modified.",
+  "independentReview": {
+    "runtimeAcceptance": {
+      "candidateB": "549c57b",
+      "candidateE": "6dee03f",
+      "performedBy": "Read-only parallel audit; no source changes, models or services",
+      "selftests": { "B": "14/14 PASS", "E": "21/21 PASS" },
+      "findings": [
+        "B matrix has invalid-field schema rejection, both-branches-PASS, zero-delivery and assignment-only no-second-begin assertions",
+        "B real native dispatch entry does not reserve the added persistent budget ledger",
+        "E full-product requirements omit lower-tier safety cases and do not require actual-native layer/executed proof/clean source"
+      ]
+    },
+    "distribution": {
+      "candidateD": "73cafed",
+      "performedBy": "Read-only parallel audit with isolated temporary-file/database probes; no external checkout edits or services",
+      "confirmedProbes": [
+        { "case": "rollback with ProductStore and WriterLock still open", "actual": { "writerStillOpen": true, "result": "ROLLED_BACK", "ok": true, "failedDirMoved": true }, "expected": "Reject before any live-state rename" },
+        { "case": "same-length asset mutation", "actual": "hash:false accepts; hash:true reports digest_mismatch", "expected": "Startup verifies actual content digest" }
+      ],
+      "additionalSourceFindings": [
+        "Restored normal start previously ignored restore-report and consumed ordinary queues; main now supplies readonly composition, D still must consume and verify it",
+        "Existing instance reuse ignores requested state/mode/access/build; API identity uses imprecise argv substring matching",
+        "Release executes checkout source not covered by the runtime artifact manifest; output is not a relocatable installation closure"
+      ]
+    }
+  },
+  "dispatch": {
+    "method": "Role-specific task files for the user's existing five external agents",
+    "status": "READY_NOT_AUTOMATICALLY_SENT",
+    "reason": "Available Codex thread inventory contained no matching A-E worktree conversations; no unrelated thread was messaged and no replacement threads were created",
+    "A": "agent-tasks/product-wave-04/agent-a-state.zh-CN.md",
+    "B": "agent-tasks/product-wave-04/agent-b-runtime.zh-CN.md",
+    "C": "agent-tasks/product-wave-04/agent-c-assistant.zh-CN.md",
+    "D": "agent-tasks/product-wave-04/agent-d-distribution.zh-CN.md",
+    "E": "agent-tasks/product-wave-04/agent-e-acceptance.zh-CN.md",
+    "main": "agent-tasks/product-wave-04/main.zh-CN.md"
+  },
+  "limitations": [
+    "Shared persistence schemas/port are implemented; A's production persistence and C's atomic domain consumption are assigned work, not completed functionality",
+    "Recovery readonly prevents business dispatch/queue processing, but normal credential/schema/lock/directory initialization still occurs",
+    "No production command lifts recovery quarantine yet; restored data cannot resume native work automatically",
+    "B/D/E final candidates remain unadmitted pending their assigned fixes and independent proof",
+    "No full personal Alpha, internal installer, CAC, second protocol or desktop-shell release was declared",
+    "No model/native task was started; B's prior grant/history are preserved without a new allowance",
+    "User instances on 5180, 5181 and 5182 and user ARCHITECTURE-NOTES.zh-CN.md were preserved",
+    "All five external worktrees were inspected read-only; no branch switch, reset or generated report write there"
+  ]
+}
