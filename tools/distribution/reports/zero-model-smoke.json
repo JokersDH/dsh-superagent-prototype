@@ -1,16 +1,16 @@
 {
   "case": "DIST-TRIAL-01",
   "status": "PASS",
-  "startedAt": "2026-11-10T04:53:28.801Z",
+  "startedAt": "2026-11-10T04:59:23.347Z",
   "steps": [
     {
       "id": "build",
       "status": "PASS",
       "detail": {
-        "buildId": "5a04b5e6eebee7ea",
+        "buildId": "40ca46f9846cc933",
         "artifacts": {
-          "count": 281,
-          "bytes": 4288282
+          "count": 285,
+          "bytes": 4319110
         }
       }
     },
@@ -37,15 +37,14 @@
       "id": "static-console",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:59661",
-        "readyMs": 121
+        "url": "http://127.0.0.1:61212"
       }
     },
     {
       "id": "instance-marker",
       "status": "PASS",
       "detail": {
-        "buildId": "5a04b5e6eebee7ea"
+        "buildId": "40ca46f9846cc933"
       }
     },
     {
@@ -86,7 +85,7 @@
       "id": "status-running",
       "status": "PASS",
       "detail": {
-        "pid": 7486,
+        "pid": 22420,
         "checks": 8
       }
     },
@@ -94,19 +93,23 @@
       "id": "reuse-verified-instance",
       "status": "PASS",
       "detail": {
-        "pid": 7486
+        "pid": 22420
       }
     },
     {
       "id": "backup-live",
       "status": "PASS",
       "detail": {
-        "bundle": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-919dN6/backup/state.pab",
-        "archiveSha256": "5a5cb2e5f2e0ae141dd33948a514532fbade408e0c6b1c93df5144f9910bcd66",
+        "archiveSha256": "a2041464135368808a16a9c7e9788dbe5b80343d1ce2013f9f695b33d82a21cf",
         "counts": {
           "entries": 1,
           "artifacts": 0,
           "excluded": 9
+        },
+        "database": {
+          "integrity": "ok",
+          "foreignKeyViolations": 0,
+          "eventSeq": 0
         }
       }
     },
@@ -114,34 +117,114 @@
       "id": "verify-backup-live",
       "status": "PASS",
       "detail": {
-        "manifestDigest": "ac0ef284b1fa5c658b5dcecda1cf54470df6e347d8aa87b7eab503ed18e02041",
+        "manifestDigest": "ae8ab7130fd71085d844745fc7940f748be08b6777cc4d171465b7c22f6b54cd",
         "entries": 1
       }
     },
     {
-      "id": "stop",
+      "id": "stop-primary",
       "status": "PASS",
       "detail": {
-        "stopMs": 221
+        "stopMs": 239
       }
-    },
-    {
-      "id": "supervisor-clean-exit",
-      "status": "PASS",
-      "detail": {
-        "code": 0,
-        "signal": null
-      }
-    },
-    {
-      "id": "resources-released",
-      "status": "PASS"
     },
     {
       "id": "verify-backup-offline",
       "status": "PASS",
       "detail": {
-        "manifestDigest": "ac0ef284b1fa5c658b5dcecda1cf54470df6e347d8aa87b7eab503ed18e02041"
+        "manifestDigest": "ae8ab7130fd71085d844745fc7940f748be08b6777cc4d171465b7c22f6b54cd"
+      }
+    },
+    {
+      "id": "restore-new-directory",
+      "status": "PASS",
+      "detail": {
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Dg8PPa/restored",
+        "pendingRebind": 0
+      }
+    },
+    {
+      "id": "restore-refuses-non-empty",
+      "status": "PASS",
+      "detail": {
+        "code": "target_not_empty"
+      }
+    },
+    {
+      "id": "restore-refuses-corrupted",
+      "status": "PASS",
+      "detail": {
+        "code": "archive_invalid"
+      }
+    },
+    {
+      "id": "import-managed-bundle",
+      "status": "PASS",
+      "detail": {
+        "importId": "a2041464135368808a16a9c7e9788dbe5b80343d1ce2013f9f695b33d82a21cf"
+      }
+    },
+    {
+      "id": "restore-managed-import",
+      "status": "PASS",
+      "detail": {
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Dg8PPa/restored-imported"
+      }
+    },
+    {
+      "id": "login-gated-session",
+      "status": "PASS",
+      "detail": {
+        "beforeBootstrap": "auth_required",
+        "afterBootstrap": "authenticated"
+      }
+    },
+    {
+      "id": "stop-login-instance",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 224
+      }
+    },
+    {
+      "id": "start-restored",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:61263",
+        "health": {
+          "status": "ok",
+          "mode": "fixture",
+          "access": "local-development"
+        }
+      }
+    },
+    {
+      "id": "stop-restored",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 223
+      }
+    },
+    {
+      "id": "rollback-rehearsal",
+      "status": "PASS",
+      "detail": {
+        "failedDir": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Dg8PPa/restored.failed-2026-11-10T04-59-33-534Z",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Dg8PPa/restored"
+      }
+    },
+    {
+      "id": "start-after-rollback",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:61285"
+      }
+    },
+    {
+      "id": "stop-after-rollback",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 254
       }
     },
     {
@@ -155,13 +238,13 @@
   "limitations": [
     "Fixture mode only: no vendor/model request, no native agent, no user project.",
     "Only darwin/arm64 + Node 24.21.x is a measured candidate; other platforms remain NOT_TESTED.",
-    "The trial instance ran on isolated temporary roots/ports; user services were not touched."
+    "The trial instance ran on isolated temporary roots/ports; user services were not touched.",
+    "Native authentication/environment is not migrated; restored state must be revalidated before real execution."
   ],
-  "durationMs": 7414,
-  "finishedAt": "2026-11-10T04:53:36.215Z",
+  "durationMs": 11478,
+  "finishedAt": "2026-11-10T04:59:34.825Z",
   "outputs": {
-    "consoleURL": "http://127.0.0.1:59661",
-    "apiURL": "http://127.0.0.1:59662",
-    "backupPath": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-919dN6/backup/state.pab"
+    "backupArchiveSha256": "a2041464135368808a16a9c7e9788dbe5b80343d1ce2013f9f695b33d82a21cf",
+    "importId": "a2041464135368808a16a9c7e9788dbe5b80343d1ce2013f9f695b33d82a21cf"
   }
 }

@@ -17,6 +17,7 @@ import { firstRun } from '../lib/first-run.mjs'
 import { readInstanceRecord, verifyInstance } from '../lib/instance.mjs'
 import { readRelease } from '../lib/release.mjs'
 import { backupState, verifyBackup } from '../lib/backup.mjs'
+import { importBundle, restoreState, rollbackState } from '../lib/restore.mjs'
 import { startInstance } from '../lib/start.mjs'
 import { stopInstance } from '../lib/stop.mjs'
 
@@ -97,8 +98,8 @@ function commandSpecs() {
     backup: { ...COMMON, out: 'string', label: 'string' },
     'verify-backup': { ...COMMON, bundle: 'string' },
     'import-bundle': { ...COMMON, bundle: 'string' },
-    restore: { ...COMMON, bundle: 'string', 'map-path': 'list' },
-    rollback: { ...COMMON, bundle: 'string', last: 'boolean' },
+    restore: { ...COMMON, bundle: 'string', to: 'string', 'map-path': 'list' },
+    rollback: { ...COMMON, bundle: 'string', target: 'string', last: 'boolean' },
     smoke: { ...COMMON },
   }
 }
@@ -254,6 +255,56 @@ async function main(argv) {
         `  producer: ${result.producer.product} ${result.producer.version} (${result.producer.platform}/${result.producer.arch}, node ${result.producer.node}, sqlite ${result.producer.sqlite})`,
         `  entries: ${result.counts.entries} (artifacts ${result.counts.artifacts})`,
         `  database: integrity=${result.database.integrity} foreignKeyViolations=${result.database.foreignKeyViolations} schema=${result.database.productSchema}`,
+      ].join('\n'),
+    })
+    return EXIT.OK
+  }
+
+  if (command === 'import-bundle') {
+    const result = await importBundle({ roots, values })
+    if (!result.ok) return fail({ json, code: result.code, message: result.message, detail: result.detail })
+    printResult({
+      json: json ? result : null,
+      human: [
+        `import-bundle: ${result.status}`,
+        `  bundle: ${result.bundlePath}`,
+        `  sha256: ${result.archiveSha256}`,
+        `  entries: ${result.counts.entries} (artifacts ${result.counts.artifacts})`,
+      ].join('\n'),
+    })
+    return EXIT.OK
+  }
+
+  if (command === 'restore') {
+    const result = await restoreState({ roots, values })
+    if (!result.ok) return fail({ json, code: result.code, message: result.message, detail: result.detail, hint: result.hint })
+    printResult({
+      json: json ? result : null,
+      human: [
+        `restore: ${result.status}`,
+        `  target: ${result.target}`,
+        `  report: ${result.reportPath}`,
+        `  entries: ${result.report.entries.count} (source state ${result.report.bundle.sourceStateName})`,
+        `  database: integrity=${result.report.database.integrity} schema=${result.report.database.productSchema}`,
+        `  pending rebind: ${result.report.pathMappings.pendingRebind.length}`,
+        '下一步:',
+        ...result.nextSteps.map((line) => `  ${line}`),
+      ].join('\n'),
+    })
+    return EXIT.OK
+  }
+
+  if (command === 'rollback') {
+    const result = await rollbackState({ roots, values })
+    if (!result.ok) return fail({ json, code: result.code, message: result.message, detail: result.detail, hint: result.hint })
+    printResult({
+      json: json ? result : null,
+      human: [
+        `rollback: ${result.status}`,
+        `  target: ${result.target}`,
+        `  failed state kept at: ${result.failedDir}`,
+        `  report: ${result.reportPath}`,
+        ...result.notes.map((line) => `  - ${line}`),
       ].join('\n'),
     })
     return EXIT.OK

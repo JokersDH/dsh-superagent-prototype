@@ -60,3 +60,12 @@ export {
   type VerifyBundleOptions,
   type VerifyBundleResult,
 } from './bundle.ts'
+export {
+  restoreBundle,
+  readRestoreReport,
+  writePrivateFile,
+  type RestoreOptions,
+  type RestorePathMapping,
+  type RestoreReport,
+  type RestoreResult,
+} from './restore.ts'
