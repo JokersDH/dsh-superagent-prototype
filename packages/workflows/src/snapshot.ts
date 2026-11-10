@@ -60,13 +60,23 @@ function writeDurable(path: string, data: Uint8Array): void {
 
 function copyDurable(source: string, destination: string, expected: { digest: string; bytes: number }): 'ok' | 'missing' | 'corrupt' {
   if (!existsSync(source)) return 'missing'
-  const data = readFileSync(source)
+  let data: Buffer
+  try {
+    data = readFileSync(source)
+  } catch {
+    // A permission/IO failure is not proof that the file is intact; keep the snapshot blocked.
+    return 'corrupt'
+  }
   if (data.byteLength !== expected.bytes || sha256(data) !== expected.digest) return 'corrupt'
-  mkdirSync(dirname(destination), { recursive: true, mode: 0o700 })
-  const temporary = `${destination}.${process.pid}.tmp`
-  writeDurable(temporary, data)
-  renameSync(temporary, destination)
-  return 'ok'
+  try {
+    mkdirSync(dirname(destination), { recursive: true, mode: 0o700 })
+    const temporary = `${destination}.${process.pid}.tmp`
+    writeDurable(temporary, data)
+    renameSync(temporary, destination)
+    return 'ok'
+  } catch (error) {
+    throw new SnapshotError(`Could not write snapshot artifact ${expected.digest}: ${String(error)}`)
+  }
 }
 
 /** Owns snapshot creation/verification; the caller supplies a new destination directory. */
@@ -168,6 +178,8 @@ export class WorkflowSnapshots {
     })
     const ok = manifest.complete && databaseSha === manifest.database.sha256 &&
       verified.integrity === 'ok' && verified.foreignKeyViolations === 0 &&
+      verified.productSchema === manifest.database.productSchema &&
+      manifest.database.integrity === 'ok' && manifest.database.foreignKeyViolations === 0 &&
       artifacts.every(item => item.status === 'ok')
     return {
       status: ok ? 'ok' : 'blocked',

@@ -1,0 +1,52 @@
+✔ the registry is immutable per revision and refuses unregistered or invalid checks (0.907208ms)
+✔ a passing check and a failing check produce real exit results (51.487417ms)
+✔ each verification uses its prepared environment while preserving registered variable permissions (25.541ms)
+✔ a deadline and the output budget bound a check instead of buffering without limit (177.987917ms)
+✔ a check that ignores SIGTERM is killed as a group and does not hang the runner (354.829375ms)
+✔ a missing executable is NOT_TESTED and an unregistered check refuses verification (9.815125ms)
+✔ trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results (33.689375ms)
+✔ the frozen-artifact guard is mandatory and only an explicit true passes (31.810042ms)
+✔ a verification binds the candidate, artifact and core criteria digest (24.433792ms)
+✔ the runner refuses a workspace modified after freeze (WorkspaceManager integration) (469.051542ms)
+✔ the evidence store resolves only matching candidate/artifact records, read-only (42.954375ms)
+✔ quiescence requires a trusted complete-inventory barrier, never a caller subset or plain observations (7.382375ms)
+✔ the core gate completes only a fully proven candidate (33.267584ms)
+✔ a machine FAIL cannot be overridden by human acceptance (29.3595ms)
+✔ a SKIPPED required machine check cannot be overridden by human acceptance either (6.972291ms)
+✔ an old generation or a different artifact cannot be completed (29.29225ms)
+✔ a late resource append invalidates the recorded completion evidence (30.934167ms)
+✔ acceptance and quiescence records are immutable over their full body (28.447833ms)
+✔ quiescence requires the current pointer, the barrier topic, the producer identity and a committed command result (9.021125ms)
+✔ an empty registered manifest completes only without a writer fact (5.833292ms)
+✔ moving the current pointer after recording invalidates the resolved evidence (31.136ms)
+✔ Verification intake is strictly validated (5.637167ms)
+✖ the WP-04/WP-02 migrations are appended without rewriting v1–v5 (1.832208ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 22
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1319.45425
+
+✖ failing tests:
+
+test at test/migrations.case.ts:6:1
+✖ the WP-04/WP-02 migrations are appended without rewriting v1–v5 (1.832208ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  10 !== 7
+  
+      at TestContext.<anonymous> (file:///Users/hh/Desktop/joker/superagent-agent-a/packages/verification/test/migrations.case.ts:16:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 10,
+    expected: 7,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

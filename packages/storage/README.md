@@ -32,6 +32,8 @@ no DSH imports, better-sqlite3 instead of `node:sqlite`.
 | `ImmutablePayloads` (`store.payloads`) | Canonical-JSON content-addressed payloads: file + record complete before return; reads verify the artifact and the recorded SHA-256. `canonicalJson`/`canonicalDigest` match the coordinator's `jsonDigest`. |
 | `RuntimeObservations` (`store.observations`) | Append-only attempt-level evidence and per-resource observations for accepted strict facts (`factId`/`payloadRef` preserved), recorded inside the ingress transaction. `summarize(attemptId)` is a read-only reducer: cancel ACK, exit and writer quiescence stay separate; no release API and no inferred physical success. |
 | `ProductRecords` (`store.product`) | Wave-02 product records beside the core rows: `works` (frozen Work identity), `contracts` (append-only revisions by full ref), `links` (one primary Ticket link per revision), `messages` (per-conversation sequence, exclusive `before` paging, replay idempotent), `questions` (frozen, validity/version CAS), `dispatchControls` (`{paused, revision}` CAS only). See RFC-02. |
+| `WorkflowRecords` (`store.workflows`) | Wave-03 workflows: conversation catalog/search/archive (`conversations`, FTS5 trigram index), versioned project settings with CAS current/archive, explicit `UserDecision` versions, and a bounded read-only index over works/contracts/questions/completion records/artifacts. See `packages/workflows/docs/RFC-0001-workflow-ports.md`. |
+| `readArtifactRegistry` | Reads artifact references from an existing database backup for the package-local consistent snapshot port; it never opens a live writer. |
 | `applyMigrations`, `MIGRATIONS` | The single migration entry; checksums recorded in `schema_meta`; refuses upstream/unknown databases and drift/gap/future versions. |
 
 ## Run
@@ -53,7 +55,8 @@ storage typecheck/tests resolve them (a missing effects `dist` fails the two sto
 that import the queue algorithm).
 
 Measured environment for the WP-02 evidence: Node v24.21.0, pnpm 11.7.0, darwin/arm64,
-better-sqlite3 13.0.3, SQLite 3.53.4. 75/75 storage tests and 8/8 effects tests pass; the official
+better-sqlite3 13.0.3, SQLite 3.53.4. 75/75 storage tests and 8/8 effects tests pass; wave-03
+workflow tests are recorded in `packages/workflows/reports/`; the official
 G1 review repros report A-LOCK-INITIALIZATION, A-ASYNC-TRANSACTION, and MAIN-SYNC-BRIDGE as PASS.
 See `report.md` and `reports/`.
 

@@ -76,6 +76,14 @@ same version retries, as the existing migration runner already guarantees. No ne
 dependency is required; the test suite uses the existing SQLite binding (main supplies the root lock
 importer for the new package).
 
+## Cross-module test update
+
+`packages/verification/test/migrations.case.ts` currently asserts `PRODUCT_SCHEMA_VERSION === 7`.
+That package is outside this round's owned paths; its owner/main must update the assertion to
+`PRODUCT_SCHEMA_VERSION` (while retaining the v1–v6 checksum checks) when integrating v8–v10. This is
+a test expectation change, not a production interface change. The storage suite itself is green at
+75/75.
+
 ## Consumption order
 
 1. Main publishes conversation/project/decision HTTP DTOs and command composition; it passes private
