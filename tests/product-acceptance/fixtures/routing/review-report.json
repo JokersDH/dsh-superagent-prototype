@@ -1,0 +1,10 @@
+{
+  "protocol": "review-report/1",
+  "subjectDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "disposition": "findings",
+  "summary": "One off-by-one finding in the frozen candidate.",
+  "findings": [
+    { "path": "src/index.js", "line": 3, "severity": "high", "claim": "Loop excludes the inclusive range end.", "reproduction": "sumRange(1,5) returns 10." }
+  ],
+  "limitations": ["Synthetic candidate; no native author failure rate measured."]
+}

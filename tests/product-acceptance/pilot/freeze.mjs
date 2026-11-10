@@ -4,7 +4,7 @@
  * oracle labels and the scoring-rule digest. `--check` verifies the committed manifest.
  */
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, lstatSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -21,7 +21,7 @@ function walk(directory) {
   const results = []
   for (const name of readdirSync(directory).sort()) {
     const path = join(directory, name)
-    const stat = statSync(path)
+    const stat = lstatSync(path)
     if (stat.isSymbolicLink()) throw new Error(`Symbolic link is not allowed in frozen inputs: ${path}`)
     if (stat.isDirectory()) results.push(...walk(path))
     else if (stat.isFile()) results.push(path)

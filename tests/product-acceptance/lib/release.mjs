@@ -188,6 +188,31 @@ export function heterogeneousReviewIssues(entry, sourceCommit) {
   return issues
 }
 
+export function reviewTimingIssues(timing) {
+  if (!timing || typeof timing !== 'object') return ['missing']
+  const issues = []
+  if (timing.candidateReadyAt !== null && !Number.isFinite(Date.parse(timing.candidateReadyAt))) issues.push('ready_at')
+  if (timing.acceptedAt !== null && !Number.isFinite(Date.parse(timing.acceptedAt))) issues.push('accepted_at')
+  if (timing.readyToAcceptanceMs !== null) {
+    if (timing.readyToAcceptanceMs < 0) issues.push('negative_delay')
+    else if (timing.candidateReadyAt && timing.acceptedAt &&
+      Date.parse(timing.acceptedAt) - Date.parse(timing.candidateReadyAt) !== timing.readyToAcceptanceMs)
+      issues.push('delay_mismatch')
+  }
+  if (timing.activeReviewMs === null) {
+    if (timing.activeReviewSource !== 'unknown' || timing.activeReviewCompleteness !== 'unknown')
+      issues.push('missing_activity_must_be_unknown')
+  } else if (!Number.isSafeInteger(timing.activeReviewMs) || timing.activeReviewMs <= 0) {
+    issues.push('activity_value')
+  } else if (timing.activeReviewSource !== 'ui_visibility_proxy' || timing.activeReviewCompleteness !== 'partial') {
+    issues.push('activity_source')
+  } else if (timing.readyToAcceptanceMs === null || timing.activeReviewMs > timing.readyToAcceptanceMs) {
+    issues.push('activity_exceeds_window')
+  }
+  if (!Number.isSafeInteger(timing.acceptedEvents) || timing.acceptedEvents < 1) issues.push('accept_event_missing')
+  return issues
+}
+
 function attentionIssues(attention) {
   if (!attention || typeof attention !== 'object') return ['missing']
   const issues = []
@@ -363,6 +388,10 @@ export function evaluateRelease({
       if (entry.evidence?.includes('heterogeneous')) {
         for (const issue of heterogeneousReviewIssues(result.evidence?.heterogeneous, report.source?.commit))
           failures.push(fail('heterogeneous_review_invalid', `Heterogeneous review ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('reviewTiming')) {
+        for (const issue of reviewTimingIssues(result.evidence?.reviewTiming))
+          failures.push(fail('review_timing_invalid', `Review timing ${issue}`, entry.id))
       }
       if (entry.evidence?.includes('attention')) {
         for (const issue of attentionIssues(result.evidence?.attention))

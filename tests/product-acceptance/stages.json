@@ -1,15 +1,19 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-04/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-05/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "8c736f2",
-  "checkpoint": "7754004",
+  "base": "a70db20",
+  "checkpoint": "ead7066",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
     "unknownSends": 0,
-    "note": "No vendor model was called. The only model peer is a loopback OpenAI-compatible mock created by the E2 case."
+    "pilotGrant": "wave05-independent-review-pilot-01",
+    "pilotTurnsUsed": 0,
+    "pilotTokensUsed": 0,
+    "pilotUsd": null,
+    "note": "Pilot preflight is BLOCKED on pricing_unavailable; zero model turns were started. No other model call occurred."
   },
   "stages": [
     {
@@ -17,8 +21,9 @@
       "title": "Release-tool counterexamples first",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only",
       "notes": [
-        "50 gate tests: 21 original rejections plus 29 independent mutation cases covering wrong layer, dirty/missing/cross-commit source, unbound case, empty evidence, missing case, failed assertion, download bytes/digest, patch apply/digest, duplicate/unknown ids, native executed/version/attempt/evidence/model-task proof, staged-install proof, NOT_TESTED, self-claim, the exact wave-04 admission bundle, tier superset and no allow-gap.",
-        "full-product is a strict superset of every lower tier; main's admission probe now reports the E case PASS (verdict non-PASS)."
+        "65 gate tests: the 50 wave-04 cases plus 15 routing/review mutations (advice entering the default path, eligible/excluded overlap, expired advice, missing evidence, review disposition mismatch, author-assignment reuse, missing sealed-copy isolation, malformed digest, heterogeneous same-protocol/unexecuted/missing version/budget/isolation/subject).",
+        "New tiers advisory-routing, controlled-review and actual-heterogeneous-review are strict supersets of the lower safety cases.",
+        "Pilot prepared and precommitted (8 synthetic cases, 4 seeded defects, hashed oracle/scoring); preflight BLOCKED on pricing_unavailable, so zero of 24 turns were used."
       ]
     },
     {
@@ -26,9 +31,9 @@
       "title": "Independent verification of the current main increment",
       "command": "node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow",
       "notes": [
-        "Conversation catalog: persistent list, message/title search, pagination, CAS rename, archive/restore, archived readability, restart persistence and draft isolation, all through public HTTP.",
-        "Verification recovery: blocked→explicit recheck→same-candidate PASS→human accept→reopen, with old blockedId, wrong work, changed payload, replay and machine-FAIL negatives. Schema 400s and business rejections are counted separately.",
-        "The blocked state is injected on the isolated completion port; every observable step uses the real application and HTTP API."
+        "Conversation catalog, verification recovery and assistant boundaries re-verified on the wave-05 main.",
+        "Attention signal (open work, archived visibility, clear after delivery) and acceptance timing (ready/accepted diff, unknown activity not zero, replay adds no event) verified through public HTTP and read-only SQLite.",
+        "Cross-project attention ordering, project settings, route advice and decisions remain NOT_TESTED because their producers/HTTP entries are absent."
       ]
     },
     {
@@ -36,9 +41,9 @@
       "title": "Assistant end-to-end and transaction-breaking negatives",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "Consumes main's read-only C domain probe and records the three unresolved defects with owner C.",
-        "Validates persisted decision/proposal fixtures against the single public contract and rejects illegal variants.",
-        "End-to-end decision/context/proposal/confirm/reject/transaction cases remain NOT_TESTED because main has no decision/proposal HTTP entry in this checkout."
+        "C's three independent domain probes now PASS in main; main has no decision/proposal HTTP entry, so the assistant end-to-end stays NOT_TESTED.",
+        "Review schema fixtures and the sealed-copy capsule (no .git/deps, refuses symlinks, no hardlinks) pass; UI visibility activity is recorded in the acceptance event.",
+        "Author→freeze→review→report pipeline remains NOT_TESTED; no public review Work/artefact entry exists."
       ]
     },
     {
@@ -46,8 +51,8 @@
       "title": "Installation and recovery acceptance",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12",
       "notes": [
-        "Recovery read-only startup is verified through HTTP: the marker forces recovery despite normal/native/assistant flags, business writes return 422, queues/events/bindings are unchanged and a second start stays read-only.",
-        "Portable installation, first-run, backup/restore and upgrade rollback stay NOT_TESTED because D's paths are absent from the merged source; planned negatives are recorded, including active-writer rollback, same-size drift, PID reuse and state-prefix collisions."
+        "Recovery read-only startup re-verified with a restored project binding: project visible, dispatch disabled, 422 business writes, queues unchanged, second start read-only.",
+        "Portable installation/first-run/backup/rollback stay NOT_TESTED because D's paths are absent; wave-05 negatives are recorded."
       ]
     },
     {
@@ -55,8 +60,8 @@
       "title": "Bounded cycles, final matrix and handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "Bounded mixed cycles (max 30 or 45 minutes) with attempt/begin/dispatch receipts and process observations; no port-count leak claim.",
-        "A full-product claim is rejected non-zero while native and installation evidence are absent."
+        "Bounded mixed cycles plus tier verdicts: advisory-routing, controlled-review and actual-heterogeneous-review are expected non-zero while their producers are absent.",
+        "Pilot result is BLOCKED (not executed), never reported as a value benefit."
       ]
     }
   ]

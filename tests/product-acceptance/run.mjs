@@ -82,30 +82,42 @@ await collect('selftest', async () => {
   return [...(await base.gateSelftestCases()), ...(await mutations.gateMutationCases())]
 })
 await collect('e2', async () => {
-  const [daily, wave04] = await Promise.all([
+  const [daily, wave04, wave05] = await Promise.all([
     import('./cases/e2-daily.mjs'),
     import('./cases/e2-wave04.mjs'),
+    import('./cases/e2-wave05.mjs'),
   ])
   const first = await daily.runE2({ root, runDirectory: run.directory, keep: values.keep === true, cycles: 0 })
   const second = await wave04.runWave04({ root, runDirectory: run.directory, keep: values.keep === true })
+  const third = await wave05.runWave05E2({ root, runDirectory: run.directory, keep: values.keep === true })
   return {
-    cases: [...first.cases, ...second.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases],
     artifacts: {
-      screenshots: [...(first.artifacts?.screenshots ?? []), ...(second.artifacts?.screenshots ?? [])],
+      screenshots: [
+        ...(first.artifacts?.screenshots ?? []),
+        ...(second.artifacts?.screenshots ?? []),
+        ...(third.artifacts?.screenshots ?? []),
+      ],
     },
   }
 })
 await collect('e3', async () => {
-  const [browser, assistant] = await Promise.all([
+  const [browser, assistant, wave05] = await Promise.all([
     import('./cases/e3-browser.mjs'),
     import('./cases/e3-assistant.mjs'),
+    import('./cases/e3-wave05.mjs'),
   ])
   const first = await browser.runE3({ root, runDirectory: run.directory, keep: values.keep === true })
   const second = await assistant.runAssistant({ root, runDirectory: run.directory, keep: values.keep === true })
+  const third = await wave05.runWave05E3({ root, runDirectory: run.directory, keep: values.keep === true })
   return {
-    cases: [...first.cases, ...second.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases],
     artifacts: {
-      screenshots: [...(first.artifacts?.screenshots ?? []), ...(second.artifacts?.screenshots ?? [])],
+      screenshots: [
+        ...(first.artifacts?.screenshots ?? []),
+        ...(second.artifacts?.screenshots ?? []),
+        ...(third.artifacts?.screenshots ?? []),
+      ],
     },
   }
 })

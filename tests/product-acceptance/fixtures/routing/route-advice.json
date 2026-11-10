@@ -1,0 +1,19 @@
+{
+  "protocol": "route-advice/1",
+  "id": "advice-fixture",
+  "projectId": "project-atlas",
+  "sourceRef": "source-fixture",
+  "taskContextDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "catalogRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "policyRevision": "policy-fixture",
+  "eligibleProfileRefs": [
+    { "profileId": "profile-fixture-pass", "revision": 1, "identityDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" }
+  ],
+  "suggestedProfileRef": { "profileId": "profile-fixture-pass", "revision": 1, "identityDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" },
+  "excluded": [],
+  "basis": "only_eligible",
+  "evidenceRefs": ["evidence-fixture-1"],
+  "reviewSuggested": true,
+  "createdAt": "2026-11-10T00:00:00.000Z",
+  "expiresAt": "2026-11-11T00:00:00.000Z"
+}

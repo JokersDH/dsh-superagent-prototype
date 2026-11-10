@@ -4,6 +4,7 @@ import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { countRows } from '../lib/product-db.mjs'
 import { cleanup, pickPort, startProduct, tempState } from '../lib/instance.mjs'
+import { scratchProject } from '../lib/fault-product.mjs'
 
 /**
  * Wave-04 recovery and distribution acceptance.
@@ -61,6 +62,28 @@ export async function runWave04E4({ root, runDirectory, keep = false }) {
         const tables = ['effect', 'event_log', 'runtime_bindings', 'answer_deliveries', 'works']
         const before = Object.fromEntries(tables.map((table) => [table, countRows(state, root, table)]))
         assert('ROWS_OBSERVED', tables.every((table) => before[table] !== null), JSON.stringify(before))
+        // A restored state may carry project bindings; recovery must keep them readable but disabled.
+        const bound = scratchProject()
+        writeFileSync(
+          join(state, 'native-projects.json'),
+          JSON.stringify(
+            {
+              version: 1,
+              projects: [
+                {
+                  id: 'project-bound',
+                  path: bound.project,
+                  displayName: '恢复绑定项目',
+                  check: 'node_test',
+                  environment: { policy: 'existing_only' },
+                },
+              ],
+            },
+            null,
+            2,
+          ) + '\n',
+          { mode: 0o600 },
+        )
         writeFileSync(join(state, 'restore-report.json'), '{"protocol":"personal-restore/1"}\n', { mode: 0o600 })
 
         // Normal/native/assistant flags are deliberately supplied; the marker must win.
@@ -83,6 +106,9 @@ export async function runWave04E4({ root, runDirectory, keep = false }) {
             readOnlyConfig.profiles.every((item) => item.dispatchAllowed === false),
           JSON.stringify(readOnlyConfig),
         )
+        const boundProject = readOnlyConfig.projects.find((item) => item.id === 'project-bound')
+        assert('BOUND_PROJECT_READABLE', boundProject !== undefined, JSON.stringify(readOnlyConfig.projects.map((item) => item.id)))
+        assert('BOUND_PROJECT_DISABLED', boundProject?.dispatchAllowed === false && boundProject?.profileIds.length === 0)
         const snapshot = await client.snapshot({ conversationId: 'conv-recovery-start' })
         const work = snapshot.works.find((item) => item.work.id === created.receipt.workId)
         assert('HISTORY_READABLE', work !== undefined, JSON.stringify(snapshot.works.map((item) => item.work.id)))
@@ -146,6 +172,7 @@ export async function runWave04E4({ root, runDirectory, keep = false }) {
           rejectedStatuses: rejected.map((item) => item.status),
           markerForcesRecovery: true,
           restartStaysReadOnly: true,
+          boundProjectVisible: true,
         }
       },
     )
@@ -177,10 +204,12 @@ export async function runWave04E4({ root, runDirectory, keep = false }) {
   cases.at(-1).evidence.distribution = {
     missing,
     plannedNegatives: [
+      'fresh-directory first-run and doctor, HTTP bundle instead of fixture fallback',
+      'dependency/version/ABI/port diagnosis and missing multi-profile executables',
+      'exact instance reuse, concurrent start/stop, PID reuse and state-prefix collisions',
+      'same-size content drift detected by digest, not byte count',
+      'complete backup, new-directory read-only recovery with native project bindings, upgrade rollback',
       'rollback with an active ProductStore/WriterLock refuses before moving any file',
-      'restored database with old queues starts read-only and sends zero business effects',
-      'same-size content drift is detected by digest, not byte count',
-      'PID reuse and state-prefix collisions do not select another instance',
       'keys, native home, session and sockets are not copied into the bundle',
       'corrupt, traversal, version-mismatched and failed-upgrade bundles fail explicitly',
       'a new directory alone is not a cross-machine PASS',

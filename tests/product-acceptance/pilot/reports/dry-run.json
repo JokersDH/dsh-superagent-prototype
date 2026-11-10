@@ -1,6 +1,49 @@
 {
   "schema": "review-pilot-dry-run/1",
   "status": "PASS_HARNESS_DRY_RUN",
+  "oracleChecks": [
+    {
+      "id": "case-01",
+      "expectedFailure": true,
+      "failed": true
+    },
+    {
+      "id": "case-02",
+      "expectedFailure": false,
+      "failed": false
+    },
+    {
+      "id": "case-03",
+      "expectedFailure": true,
+      "failed": true
+    },
+    {
+      "id": "case-04",
+      "expectedFailure": false,
+      "failed": false
+    },
+    {
+      "id": "case-05",
+      "expectedFailure": true,
+      "failed": true
+    },
+    {
+      "id": "case-06",
+      "expectedFailure": false,
+      "failed": false
+    },
+    {
+      "id": "case-07",
+      "expectedFailure": true,
+      "failed": true
+    },
+    {
+      "id": "case-08",
+      "expectedFailure": false,
+      "failed": false
+    }
+  ],
+  "oracleDiscriminates": true,
   "decision": "promising",
   "rationale": "Fresh review detected 4 vs self 3; clean false positives 1 vs 1.",
   "scored": {
@@ -72,6 +115,6 @@
     }
   ],
   "noModelCalls": true,
-  "checkedAt": "2026-11-10T12:31:55.858Z",
+  "checkedAt": "2026-11-10T12:42:32.721Z",
   "scope": "Synthetic reports validate the scoring/budget/refusal machinery; they are not pilot results."
 }

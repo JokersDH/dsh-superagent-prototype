@@ -36,6 +36,15 @@ export function readRuntimeState(stateRoot, root) {
   })
 }
 
+export function latestEvents(stateRoot, root, topic, limit = 20) {
+  return query(stateRoot, root, (database) =>
+    database
+      .prepare('SELECT seq, topic, payload FROM event_log WHERE topic = ? ORDER BY seq DESC LIMIT ?')
+      .all(topic, limit)
+      .map((row) => ({ seq: row.seq, topic: row.topic, payload: row.payload ? JSON.parse(row.payload) : null })),
+  )
+}
+
 export function countRows(stateRoot, root, table, where = '') {
   return query(stateRoot, root, (database) => {
     const row = database.prepare(`SELECT COUNT(*) AS count FROM ${table} ${where}`).get()

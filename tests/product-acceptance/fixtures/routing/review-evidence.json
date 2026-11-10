@@ -1,0 +1,33 @@
+{
+  "protocol": "review-evidence/1",
+  "id": "review-evidence-fixture",
+  "projectId": "project-atlas",
+  "subject": {
+    "candidate": {
+      "ticketId": "author-ticket",
+      "assignmentId": "author-assignment",
+      "contract": { "workId": "author-work", "revision": 1, "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" },
+      "candidateGeneration": 1
+    },
+    "artifactDigest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "baseCommit": "abcdef0123456789abcdef0123456789abcdef01",
+    "environmentRef": "environment-fixture",
+    "checkPolicyRef": "policy-fixture"
+  },
+  "reviewerProfileRef": { "profileId": "reviewer-profile", "revision": 1, "identityDigest": "1111111111111111111111111111111111111111111111111111111111111111" },
+  "reviewAttempt": {
+    "ticketId": "review-ticket",
+    "assignmentId": "review-assignment",
+    "contract": { "workId": "review-work", "revision": 1, "digest": "2222222222222222222222222222222222222222222222222222222222222222" },
+    "attemptId": "review-attempt",
+    "fenceEpoch": 1
+  },
+  "inputDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+  "reportDigest": "4444444444444444444444444444444444444444444444444444444444444444",
+  "reportArtifactRef": "artifact-report",
+  "isolation": { "kind": "sealed_copy", "proofRef": "capsule-proof", "capsuleManifestDigest": "5555555555555555555555555555555555555555555555555555555555555555" },
+  "evidenceRefs": ["evidence-review-1"],
+  "layer": "controlled",
+  "disposition": "findings",
+  "observedAt": "2026-11-10T00:00:00.000Z"
+}

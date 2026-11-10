@@ -12,10 +12,10 @@
  */
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, relative, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { scorePilot, PILOT_CAPS, ARMS } from './score.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -89,33 +89,38 @@ function pricingSchedule() {
   }
 }
 
-/** Copies one frozen candidate into a disposable capsule without .git, links or author state. */
-export function sealCase(caseId, destination) {
-  const source = join(here, 'cases', caseId)
-  if (!existsSync(source)) throw new Error(`Unknown case ${caseId}`)
+/**
+ * Copies a frozen tree into a disposable capsule. `.git`, dependency and build directories are
+ * excluded; symlinks are refused rather than followed, and no hard link is created.
+ */
+export function sealDirectory(source, destination) {
   mkdirSync(destination, { recursive: true })
   const files = []
+  const excluded = new Set(['.git', 'node_modules', 'dist', 'build', '.cache'])
   const walk = (directory) => {
     for (const name of readdirSync(directory).sort()) {
+      if (excluded.has(name)) continue
       const path = join(directory, name)
-      const stat = statSync(path)
+      const stat = lstatSync(path)
       if (stat.isSymbolicLink()) throw new Error(`Refusing to seal a symbolic link: ${path}`)
       if (stat.isDirectory()) walk(path)
       else if (stat.isFile()) {
         const target = join(destination, relative(source, path))
         cpSync(path, target, { dereference: false })
-        files.push({
-          path: relative(destination, target),
-          sha256: sha256(readFileSync(target)),
-          bytes: stat.size,
-        })
+        files.push({ path: relative(destination, target), sha256: sha256(readFileSync(target)), bytes: stat.size })
       }
     }
   }
   walk(source)
-  const manifest = { schema: 'review-capsule/1', caseId, files }
+  const manifest = { schema: 'review-capsule/1', source: relative(here, source), files }
   manifest.digest = sha256(Buffer.from(JSON.stringify(manifest.files)))
   return { capsulePath: destination, manifest }
+}
+
+export function sealCase(caseId, destination) {
+  const source = join(here, 'cases', caseId)
+  if (!existsSync(source)) throw new Error(`Unknown case ${caseId}`)
+  return sealDirectory(source, destination)
 }
 
 function preflight() {
@@ -227,6 +232,16 @@ function dryRun() {
     same_session_self_review: { turnStarts: 8, reports: self },
     fresh_session_review: { turnStarts: 8, reports: fresh },
   }
+  // Oracle tests must actually discriminate: defective cases fail, clean cases pass.
+  const oracleChecks = oracle.cases.map((entry) => {
+    const run = spawnSync(process.execPath, ['--test', join(here, 'hidden', entry.hiddenTest)], {
+      encoding: 'utf8',
+      timeout: 30_000,
+    })
+    return { id: entry.id, expectedFailure: entry.defective, failed: run.status !== 0 }
+  })
+  const oracleDiscriminates = oracleChecks.every((item) => item.failed === item.expectedFailure)
+
   const result = scorePilot({ manifest: frozen.manifest, oracle, arms, budgets, usage })
 
   const negatives = []
@@ -274,7 +289,12 @@ function dryRun() {
 
   const report = {
     schema: 'review-pilot-dry-run/1',
-    status: result.decision === 'promising' && negatives.every((item) => item.ok) ? 'PASS_HARNESS_DRY_RUN' : 'FAIL_HARNESS_DRY_RUN',
+    status:
+      result.decision === 'promising' && negatives.every((item) => item.ok) && oracleDiscriminates
+        ? 'PASS_HARNESS_DRY_RUN'
+        : 'FAIL_HARNESS_DRY_RUN',
+    oracleChecks,
+    oracleDiscriminates,
     decision: result.decision,
     rationale: result.rationale,
     scored: result.scored,
@@ -299,7 +319,10 @@ function execute() {
   throw new Error('Pilot execution is not enabled: pricing schedule or usage-bound proof is required by the protocol')
 }
 
-if (args.has('--freeze')) {
+const isMain = process.argv[1] !== undefined && import.meta.url === pathToFileURL(resolve(process.argv[1])).href
+if (!isMain) {
+  // Imported for sealDirectory/sealCase; do not run the CLI or set an exit code.
+} else if (args.has('--freeze')) {
   const result = spawnSync(process.execPath, [join(here, 'freeze.mjs')], { stdio: 'inherit' })
   process.exitCode = result.status ?? 1
 } else if (args.has('--preflight')) {

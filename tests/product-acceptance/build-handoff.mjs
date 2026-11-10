@@ -169,6 +169,45 @@ const CAPABILITIES = [
     controlled: ['E2-CONVERSATION-CATALOG', 'E3-CONVERSATION-UI'],
   },
   {
+    id: 'attention-signal',
+    label: '待办注意信号：未结束工作、归档可见、交付后清除',
+    controlled: ['E2-ATTENTION-SIGNAL'],
+    notTested: ['跨项目/期限/等待排序的注意力工作台尚未交付。'],
+  },
+  {
+    id: 'attention-workbench',
+    label: '跨项目注意力工作台：期限/等待排序与分组',
+    notTested: ['Owner main/C；本轮未见聚合读取、期限排序或分组 UI，仅有每会话 attention 布尔值。'],
+  },
+  {
+    id: 'review-timing',
+    label: '验收等待与 UI 活动代理（unknown 不填 0）',
+    controlled: ['E2-REVIEW-TIMING', 'E3-REVIEW-ACTIVITY-UI'],
+    notTested: ['多 tab 重叠区间并集未直接测量；活动是可见/聚焦代理，不是人工思考时间。'],
+  },
+  {
+    id: 'route-advice',
+    label: '推荐建议只在显式实验入口；默认路径关闭',
+    readonly: ['E2-ROUTE-FIXTURE'],
+    notTested: ['C 的 packages/routing 与 main 的 HTTP/UI 入口未交付；0/1/多候选、身份漂移、旧政策等产品负例无法执行。'],
+  },
+  {
+    id: 'controlled-review',
+    label: '冻结候选 + 独立复核 + sealed copy + 人工审阅',
+    readonly: ['E3-REVIEW-FIXTURES', 'E3-SEALED-COPY'],
+    notTested: ['无 review Work/HTTP/证据发布入口；E3-REVIEW-PIPELINE 未执行。'],
+  },
+  {
+    id: 'heterogeneous-review',
+    label: '真实不同协议复核（版本/身份/预算/隔离/主题）',
+    notTested: ['第二协议未实现，独立试点 preflight 为 BLOCKED；不能把替换模型或 fixture 当异构。'],
+  },
+  {
+    id: 'independent-review-pilot',
+    label: '独立会话复核价值试点（24 turn / 20万 token / 5 USD）',
+    notTested: ['Preflight BLOCKED（pricing_unavailable），0/24 turn；未产生价值结论。'],
+  },
+  {
     id: 'project-settings-version',
     label: '项目设置版本化与归档',
     notTested: ['仅合同 revision 已验证；项目设置版本 API 未交付（RFC-E-001 缺口 2）。'],
@@ -283,7 +322,8 @@ const executionStatus = {
     screenshots: report.artifacts?.screenshots ?? [],
     matrix: join(reports, 'release-matrix.json'),
     executionStatus: join(reports, 'execution-status.json'),
-    wave04Status: join(reports, 'wave04-status.json'),
+    wave05Status: join(reports, 'wave05-status.json'),
+    tierVerdicts: join(reports, 'tier-verdicts.json'),
   },
   blockers: rows.filter((row) => ['FAIL'].includes(row.controlledFixture) || row.actualNative === 'FAIL'),
   untested: rows
@@ -303,6 +343,16 @@ const executionStatus = {
   ],
 }
 
+const tierVerdicts = {}
+for (const name of ['advisory-routing', 'controlled-review', 'actual-heterogeneous-review', 'local-alpha', 'full-product']) {
+  tierVerdicts[name] = evaluateRelease({
+    report,
+    requirement: releaseTier(name),
+    expectedSource: report.source.commit,
+    resolveFixture: resolveFixtureDigest,
+  })
+}
+
 const stageSummary = (id) => {
   const entry = executionStatus.stages.find((item) => item.id === id)
   if (!entry?.counts) return entry?.result ?? 'SEE_RUN'
@@ -311,7 +361,7 @@ const stageSummary = (id) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 交付交接
+const handoff = `# Agent E 第五轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -342,6 +392,22 @@ ${rows
 
 完整数据见 \`release-matrix.json\`。
 
+## 独立复核价值试点
+
+- 预注册协议：\`tools/experiments/review-pilot-01/protocol.json\`（24 turn / 20万 token / 5 USD）。
+- 冻结输入：8 个合成候选（4 个预埋缺陷、4 个干净）、隐藏 oracle 测试、评分规则均已 hash；\`node tests/product-acceptance/pilot/harness.mjs --freeze --check\` 可复验。
+- 预检：**BLOCKED (pricing_unavailable)**。Codex 0.164.0 可用且为 API key 计量，但配置模型没有可核对的 USD 价格表；协议禁止把订阅/密钥访问当作零成本。**0/24 turn、0 token、USD unknown**。
+- 干跑：\`--dry-run\` 用合成报告验证评分/预算/拒绝机制（检出、误报、缺 usage、预算不一致、挑例、改 oracle、报告越权均被正确处理）；干跑不是收益结果。
+- 要解除阻断：由操作者提供 \`pilot/pricing.json\`（model、inputPerMillion、outputPerMillion、USD、source、observedAt），预检通过后才允许 \`--execute --confirm-grant\`。
+
+## Tier 判定（同一份证据）
+
+| tier | 结果 |
+| --- | --- |
+${Object.entries(tierVerdicts)
+  .map(([name, verdict]) => `| \`${name}\` | ${verdict.status}${verdict.failures.length ? `（${[...new Set(verdict.failures.map((item) => item.code))].join(', ')}）` : ''} |`)
+  .join('\n')}
+
 ## 明确未测
 
 ${rows
@@ -354,7 +420,9 @@ ${rows
 - 受控 fixture lane 的 \`native_applied\` 表示受控协议 ACK，不是真实厂商 agent 行为。
 - RSS/FD/磁盘是单实例观察；端口不变不能证明无进程泄漏。
 - 截图与几何断言只证明可达/不溢出/不重叠，不评价美观。
-- 安装与原生证据缺失，因此 \`full-product\` tier 会被 gate 以 \`case_not_pass\` 拒绝。
+- 推荐/复核仍只在实验入口；advisory/controlled-review/heterogeneous tier 因生产者缺失而非零。
+- 安装、第二协议与真实 native 证据缺失，因此 \`local-alpha\`、\`full-product\` 被 gate 拒绝。
+- 试点被预检阻断，不能把 harness 或干跑当作价值已验证。
 
 ## 下一消费者
 
@@ -381,8 +449,8 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
 writeFileSync(
-  join(reports, 'wave04-status.json'),
-  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave04-status/1', taskPackage: stages.taskPackage }, null, 2) + '\n',
+  join(reports, 'wave05-status.json'),
+  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave05-status/1', taskPackage: stages.taskPackage }, null, 2) + '\n',
 )
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 
@@ -395,6 +463,9 @@ const overclaim = evaluateRelease({
   resolveFixture: resolveFixtureDigest,
 })
 writeFileSync(join(reports, 'full-product-verdict.json'), JSON.stringify(overclaim, null, 2) + '\n')
+writeFileSync(join(reports, 'tier-verdicts.json'), JSON.stringify(tierVerdicts, null, 2) + '\n')
+
+writeFileSync(join(reports, 'tier-verdicts.json'), JSON.stringify(tierVerdicts, null, 2) + '\n')
 
 process.stdout.write(
   `matrix rows ${rows.length}; release ${release.status}; full-product ${overclaim.status} ` +
