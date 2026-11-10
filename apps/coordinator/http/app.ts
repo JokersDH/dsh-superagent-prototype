@@ -35,6 +35,8 @@ import {
   ProjectSettingsPageSchema,
   ProjectSettingsCommandSchema,
   ReviewActivitySchema,
+  AttentionPageSchema,
+  AttentionQuerySchema,
 } from '@personal-agent/contracts'
 import type {
   AnswerDelivery,
@@ -59,6 +61,8 @@ import type {
   ProjectSettingsPage,
   ProjectSettingsCommand,
   ReviewActivity,
+  AttentionPage,
+  AttentionQuery,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -112,6 +116,7 @@ export interface LocalHttpOptions {
     reviewActivity?(activity: ReviewActivity, actor: TrustedActor): Promise<CommandReceipt>
   }
   read?: {
+    attention?(query: AttentionQuery): Promise<AttentionPage>
     conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog>
     conversation?(id: string): Promise<ConversationSummary>
     projectSettings?(projectId: string): Promise<ProjectSettingsPage>
@@ -273,6 +278,15 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
       profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate' })),
       projects: value.projects.map(project => { const { defaultProfileId: _, ...rest } = project; return { ...rest, profileIds: [], dispatchAllowed: false, blockedReason: 'writer_indeterminate' } }),
     }) : value)
+  })
+  app.get('/v1/attention', async (c) => {
+    if (!options.read?.attention) throw new ApplicationFault('unsupported_capability', 'Attention reader is not connected')
+    const input = { ...c.req.query() } as Record<string, unknown>
+    if (typeof input.limit === 'string') {
+      if (!/^[1-9][0-9]*$/.test(input.limit)) throw new ApplicationFault('invalid_request', 'Invalid attention page size')
+      input.limit = Number(input.limit)
+    }
+    return c.json(AttentionPageSchema.parse(await options.read.attention(AttentionQuerySchema.parse(input))))
   })
   app.get('/v1/conversations', async (c) => {
     if (!options.read?.conversations) throw new ApplicationFault('unsupported_capability', 'Conversation catalog is not connected')

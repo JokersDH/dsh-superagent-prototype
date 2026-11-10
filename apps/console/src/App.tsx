@@ -8,6 +8,8 @@ import { ConversationMessageSchema, IdSchema } from '@personal-agent/contracts'
 import {
   ArrowUp,
   ArrowUpRight,
+  ArrowLeft,
+  ArrowRight,
   Archive,
   ArchiveRestore,
   Bot,
@@ -20,6 +22,7 @@ import {
   Eye,
   Folder,
   FolderPlus,
+  Inbox,
   Layers3,
   ListTodo,
   MessageSquare,
@@ -59,11 +62,13 @@ import type {
   VerificationRetryCommand,
   ConversationCommand,
   ConversationSummary,
+  AttentionItem,
 } from '@personal-agent/contracts'
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
 import { ProjectSettings } from './ProjectSettings.tsx'
 import { useReviewActivity } from './useReviewActivity.ts'
+import { AttentionInbox } from './AttentionInbox.tsx'
 import type { FixtureAdapter } from './fixture.ts'
 import { conversationId as defaultConversationId } from './config.ts'
 const phaseLabel: Record<WorkView['phase'], string> = {
@@ -141,7 +146,9 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     const query = new URLSearchParams(window.location.search).get('conversation')
     return query && IdSchema.safeParse(query).success ? query : defaultConversationId
   })
-  const [inspectorOpen, setInspectorOpen] = useState(false)
+  const initialWork = new URLSearchParams(window.location.search).get('work')
+  const validInitialWork = initialWork && IdSchema.safeParse(initialWork).success ? initialWork : undefined
+  const [inspectorOpen, setInspectorOpen] = useState(!!validInitialWork)
   const [modelPanelOpen, setModelPanelOpen] = useState(false)
   const [workspaceOpen, setWorkspaceOpen] = useState(false)
   const [workspaceView, setWorkspaceView] = useState<'conversation' | 'works' | 'decisions' | 'executors'>('conversation')
@@ -161,7 +168,13 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [problem, setProblem] = useState<Problem | undefined>(undefined)
   const [notice, setNotice] = useState<string | undefined>(undefined)
   const [pending, setPending] = useState<string | undefined>(undefined)
-  const [selectedWorkId, setSelectedWorkId] = useState<string | undefined>(undefined)
+  const [selectedWorkId, setSelectedWorkId] = useState<string | undefined>(validInitialWork)
+  const focusedWork = useRef<{ workId: string; conversationId: string } | undefined>(validInitialWork ? { workId: validInitialWork, conversationId } : undefined)
+  const attentionNavigation = useRef(0)
+  const attentionQuestion = useRef<string>()
+  const [reviewQueue, setReviewQueue] = useState<readonly AttentionItem[]>([])
+  const [reviewOpening, setReviewOpening] = useState(false)
+  const [attentionCount, setAttentionCount] = useState<{ count: number; partial: boolean }>()
   const [projectFilter, setProjectFilter] = useState<string | undefined>(undefined)
   const [offline, setOffline] = useState<boolean>(() => fixture?.modelOffline() ?? false)
   const [createOpen, setCreateOpen] = useState(false)
@@ -237,12 +250,23 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const refresh = useCallback(
     async (query: { workId?: string } = {}): Promise<void> => {
       try {
-        const next = await transport.snapshot({
+        let next = await transport.snapshot({
           conversationId,
           limit: 100,
           ...(query.workId ? { workId: query.workId } : {}),
         })
         if (conversationRef.current !== conversationId) return
+        const focused = focusedWork.current
+        if (!query.workId && focused?.conversationId === conversationId) {
+          const exact = await transport.snapshot({ conversationId, workId: focused.workId, limit: 100 })
+          if (conversationRef.current !== conversationId || focusedWork.current !== focused) return
+          const target = exact.works[0]
+          if (!target || target.work.conversationId !== conversationId)
+            throw new TransportError('schema_mismatch', '工作与原会话身份不匹配')
+          next = { ...next, cursor: Math.max(next.cursor, exact.cursor),
+            works: [...next.works.filter(work => work.work.id !== focused.workId), target],
+            questions: [...exact.questions, ...next.questions.filter(question => question.contract.workId !== focused.workId)].slice(0, 200) }
+        }
         setSnapshot(next)
         lastSeq.current = Math.max(lastSeq.current, next.cursor)
         setConnection('live')
@@ -312,9 +336,15 @@ export function App({ transport }: { transport: ConsoleTransport }) {
       setWaitingAfter(undefined)
   }, [snapshot, waitingAfter])
   const selectConversation = (id: string, title: string) => {
+    attentionNavigation.current += 1
+    focusedWork.current = undefined
+    attentionQuestion.current = undefined
+    setReviewQueue([])
+    conversationRef.current = id
     setWorkspaceView('conversation')
     const url = new URL(window.location.href)
     url.searchParams.set('conversation', id)
+    url.searchParams.delete('work')
     window.history.pushState(null, '', url)
     setConversationId(id)
     setConversationTitle(title)
@@ -342,17 +372,29 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   }
   useEffect(() => {
     const restore = () => {
+      attentionNavigation.current += 1
       const id = new URLSearchParams(window.location.search).get('conversation')
-      setConversationId(id && IdSchema.safeParse(id).success ? id : defaultConversationId)
+      const nextId = id && IdSchema.safeParse(id).success ? id : defaultConversationId
+      const work = new URLSearchParams(window.location.search).get('work')
+      const nextWork = work && IdSchema.safeParse(work).success ? work : undefined
+      focusedWork.current = nextWork ? { conversationId: nextId, workId: nextWork } : undefined
+      conversationRef.current = nextId
+      setConversationId(nextId)
       setConversationTitle('主对话')
-      setSelectedWorkId(undefined)
+      setSelectedWorkId(nextWork)
+      setInspectorOpen(!!nextWork)
+      setReviewQueue([])
       setSnapshot(undefined)
       setWaitingAfter(undefined)
       setLoading(true)
+      void transport.snapshot({ conversationId: nextId, ...(nextWork ? { workId: nextWork } : {}), limit: 100 }).then(next => {
+        if (conversationRef.current !== nextId || focusedWork.current?.workId !== nextWork) return
+        setSnapshot(next); setLoading(false)
+      }).catch(error => { if (conversationRef.current === nextId) { setProblem(problemOf(error)); setLoading(false) } })
     }
     window.addEventListener('popstate', restore)
     return () => window.removeEventListener('popstate', restore)
-  }, [])
+  }, [transport])
 
   useEffect(() => {
     if (!transport.session) return
@@ -514,6 +556,17 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   useEffect(() => {
     detailRef.current?.scrollTo({ top: 0 })
   }, [selectedWorkId])
+  useEffect(() => {
+    if (!inspectorOpen || !attentionQuestion.current) return
+    const heading = document.getElementById(`q-${attentionQuestion.current}`)
+    if (!heading) return
+    const frame = requestAnimationFrame(() => {
+      const card = heading.closest<HTMLElement>('.question-card')
+      card?.scrollIntoView({ block: 'nearest' }); card?.focus({ preventScroll: true })
+      attentionQuestion.current = undefined
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [selectedWorkId, snapshot?.cursor, inspectorOpen])
 
   useEffect(() => {
     setWorkVerification(undefined)
@@ -586,18 +639,42 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     ? configuration?.projects.find(project => project.id === projectFilter)?.displayName ?? projectFilter
     : '个人工作区'
   const openView = (view: typeof workspaceView) => {
+    attentionNavigation.current += 1
     setWorkspaceView(view)
     setWorkspaceOpen(false)
     setModelPanelOpen(false)
     setInspectorOpen(false)
   }
   const selectWork = (work: WorkView) => {
+    attentionNavigation.current += 1
+    focusedWork.current = undefined
+    setReviewQueue([])
     setSelectedWorkId(work.work.id)
     setProjectFilter(undefined)
     setInspectorOpen(true)
     setModelPanelOpen(false)
     setWorkspaceOpen(false)
   }
+  const openAttention = async (item: AttentionItem, queue?: readonly AttentionItem[]) => {
+    const request = ++attentionNavigation.current
+    setReviewOpening(true)
+    try {
+      const next = await transport.snapshot({ workId: item.contract.workId, conversationId: item.conversationId, limit: 100 })
+      if (attentionNavigation.current !== request) return
+      const work = next.works[0]
+      if (!work || work.work.id !== item.contract.workId || work.work.conversationId !== item.conversationId || work.work.projectId !== item.projectId)
+        throw new TransportError('schema_mismatch', '待办来源已变化')
+      selectConversation(item.conversationId, '工作会话')
+      focusedWork.current = { workId: work.work.id, conversationId: item.conversationId }
+      attentionQuestion.current = item.kind === 'question' ? item.questionId : undefined
+      const url = new URL(window.location.href)
+      url.searchParams.set('work', work.work.id); window.history.replaceState(null, '', url)
+      setSnapshot(next); setLoading(false); setProjectFilter(undefined); setSelectedWorkId(work.work.id)
+      setInspectorOpen(true); setReviewQueue(queue ?? []); setProblem(undefined)
+      lastSeq.current = Math.max(lastSeq.current, next.cursor)
+    } finally { setReviewOpening(false) }
+  }
+  const reviewIndex = reviewQueue.findIndex(item => item.contract.workId === selectedWorkId)
   const answerQuestion = async (question: UserQuestion, answer: QuestionAnswer) => {
     const command: UserCommand = {
       commandId: newId('cmd-answer'), conversationId, kind: 'answer_question',
@@ -774,7 +851,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 aria-current={workspaceView === 'works' ? 'page' : undefined} title="工作与交付" aria-label="工作与交付" onClick={() => openView('works')}><Layers3 size={19} /></button>
               <button type="button" className={`rail-button${workspaceView === 'decisions' ? ' active' : ''}`}
                 aria-current={workspaceView === 'decisions' ? 'page' : undefined} title="待我决定" aria-label="待我决定" onClick={() => openView('decisions')}>
-                <CircleHelp size={19} />{openQuestions.length > 0 && <span className="rail-badge">{openQuestions.length}</span>}
+                <Inbox size={19} />{(attentionCount?.count ?? openQuestions.length) > 0 && <span className="rail-badge">{attentionCount?.count ?? openQuestions.length}{attentionCount?.partial ? '+' : ''}</span>}
               </button>
               <button type="button" className={`rail-button${workspaceView === 'executors' ? ' active' : ''}`}
                 aria-current={workspaceView === 'executors' ? 'page' : undefined} title="执行器连接" aria-label="执行器目录" onClick={() => openView('executors')}><Bot size={19} /></button>
@@ -945,7 +1022,9 @@ export function App({ transport }: { transport: ConsoleTransport }) {
 
           <section className="conversation" aria-label="主对话">
             {workspaceView === 'works' && <WorkDirectory works={works} loading={loading} configuration={configuration} onSelect={selectWork} onCreate={() => { openWorkDraft(); setWorkspaceOpen(true) }} />}
-            {workspaceView === 'decisions' && <div className="workspace-view"><div className="view-header"><div><h2 className="view-title">待我决定</h2><p className="view-description">{loading ? '正在读取问题' : `当前对话 · ${openQuestions.length} 项待处理`}</p></div><CircleHelp size={20} /></div><div className="view-content">{loading ? <p className="empty" role="status">正在读取问题…</p> : <Questions questions={openQuestions} deliveries={deliveries} pending={pending} onAnswer={answerQuestion} />}</div></div>}
+            <div className="attention-surface" hidden={workspaceView !== 'decisions'}><AttentionInbox transport={transport} configuration={configuration}
+              active={workspaceView === 'decisions'} revision={snapshot?.cursor} onOpen={openAttention} onCount={setAttentionCount}
+              fallback={loading ? <p className="empty" role="status">正在读取问题…</p> : <Questions questions={openQuestions} deliveries={deliveries} pending={pending} onAnswer={answerQuestion} />} /></div>
             {workspaceView === 'executors' && <ExecutorDirectory configuration={configuration} state={configState} onReload={() => void refreshConfiguration()} />}
             <div className="conversation-surface" hidden={workspaceView !== 'conversation'}>
             <div className="workspace-summary" aria-label="当前对话工作概况"><span><span className="summary-count">{activeWorks.length}</span>进行中</span><button type="button" onClick={() => openView('decisions')}><span className="summary-count">{openQuestions.length}</span>待决定</button><span><CheckCheck size={13} /><span className="summary-count">{works.filter(work => work.phase === 'delivered').length}</span>已交付</span></div>
@@ -1028,6 +1107,14 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               />
             )}
             <div className="work-panels" hidden={modelPanelOpen}>
+              {reviewQueue.length > 0 && <div className="review-navigation" role="group" aria-label="逐项审阅队列">
+                <button type="button" className="icon-button" aria-label="返回待办" title="返回待办" onClick={() => openView('decisions')}><Inbox size={16} /></button>
+                <span>审阅队列 {reviewIndex + 1} / {reviewQueue.length}</span>
+                <button type="button" className="icon-button" aria-label="上一项交付" title="上一项交付" disabled={reviewIndex < 1 || reviewOpening || !!pending}
+                  onClick={() => void openAttention(reviewQueue[reviewIndex - 1]!, reviewQueue).catch(() => setNotice('交付暂时无法打开，请返回待办刷新。'))}><ArrowLeft size={16} /></button>
+                <button type="button" className="icon-button" aria-label="下一项交付" title="下一项交付" disabled={reviewIndex < 0 || reviewIndex >= reviewQueue.length - 1 || reviewOpening || !!pending}
+                  onClick={() => void openAttention(reviewQueue[reviewIndex + 1]!, reviewQueue).catch(() => setNotice('交付暂时无法打开，请返回待办刷新。'))}><ArrowRight size={16} /></button>
+              </div>}
               <WorkDetail
                 work={selectedWork}
                 location={workLocation}
@@ -2294,7 +2381,7 @@ function QuestionCard({
   }
 
   return (
-    <article className="question-card" aria-labelledby={`q-${question.id}`}>
+    <article className="question-card" aria-labelledby={`q-${question.id}`} tabIndex={-1}>
       <header>
         <span className={`kind kind-${question.kind}`}>{questionKindLabel[question.kind]}</span>
         <h3 id={`q-${question.id}`}>{question.prompt}</h3>
