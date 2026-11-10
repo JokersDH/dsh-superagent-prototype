@@ -66,6 +66,12 @@ const CAPABILITIES = [
     nativeReason: '原生注册检查与真实 deliverable 未在本轮复验。',
   },
   {
+    id: 'verification-recovery',
+    label: '验证阻断→明确重新检查→同一候选验证→接受→重开',
+    controlled: ['E2-VERIFICATION-RECOVERY', 'E2-VERIFICATION-FINISHED-STATES', 'E3-VERIFICATION-RECOVERY-UI'],
+    notTested: ['生产故障注入接口不存在；阻断由受控 completion port 注入，其余步骤走真实 HTTP。'],
+  },
+  {
     id: 'machine-fail',
     label: '必需机器检查失败不可被人工接受',
     controlled: ['E2-MACHINE-FAIL'],
@@ -159,8 +165,8 @@ const CAPABILITIES = [
   },
   {
     id: 'session-catalog',
-    label: '会话目录、搜索与归档',
-    notTested: ['公共 HTTP 尚无会话目录/搜索/归档接口（见 RFC-E-001 缺口 1）。'],
+    label: '会话目录、搜索、CAS 重命名、归档与恢复',
+    controlled: ['E2-CONVERSATION-CATALOG', 'E3-CONVERSATION-UI'],
   },
   {
     id: 'project-settings-version',
@@ -175,6 +181,26 @@ const CAPABILITIES = [
       'C 的 packages/context、proposals、knowledge 未交付；确认前不执行、重复确认幂等、撤销后失效无法端到端验证。',
       '本次仅记录 record_decision 的显式拒绝（见 E2-CONTEXT-PROPOSALS-NOT-TESTED）。',
     ],
+  },
+  {
+    id: 'recovery-readonly',
+    label: '恢复后首次启动只读、零业务发送',
+    controlled: ['E4-RECOVERY-READONLY'],
+    notTested: ['解除隔离后的新授权/环境重绑定未实现，不在本轮声明。'],
+  },
+  {
+    id: 'assistant-state',
+    label: '明确决定、授权上下文、结构化提案与事务消费',
+    readonly: ['E3-ASSISTANT-SCHEMA-FIXTURES'],
+    notTested: [
+      'C 的三项领域 probe 仍未修复；main 尚无决定/提案 HTTP 入口。',
+      '确认前不执行、撤销后失效、事务失败回滚与注入防护全部未执行。',
+    ],
+  },
+  {
+    id: 'distribution',
+    label: '可迁移发行、安装、备份恢复、升级回滚',
+    notTested: ['D 的 launcher/distribution/portability 未进入 main；无 staged bundle。'],
   },
   {
     id: 'actual-native',
@@ -257,16 +283,23 @@ const executionStatus = {
     screenshots: report.artifacts?.screenshots ?? [],
     matrix: join(reports, 'release-matrix.json'),
     executionStatus: join(reports, 'execution-status.json'),
+    wave04Status: join(reports, 'wave04-status.json'),
   },
   blockers: rows.filter((row) => ['FAIL'].includes(row.controlledFixture) || row.actualNative === 'FAIL'),
   untested: rows
     .filter((row) => row.gaps.length > 0 || row.controlledFixture === 'NOT_TESTED')
     .map((row) => ({ id: row.id, gaps: row.gaps })),
+  externalBlockers: [
+    { owner: 'C', detail: 'C-MISSING-SOURCE-EFFECTIVENESS, C-CONFIRMED-REPLAY-STILL-AUTHENTICATES and C-PROPOSAL-SNAPSHOTS-GRANT still fail in the merged source.' },
+    { owner: 'main', detail: 'No decision/proposal/context HTTP entry; assistant state cannot be exercised end to end.' },
+    { owner: 'D', detail: 'apps/launcher, tools/distribution and packages/portability are absent; no staged bundle or migration/recovery tooling.' },
+    { owner: 'B', detail: 'Native ledger/results are not supplied as input and E has no budget, so actual-native and native control evidence are absent.' },
+  ],
   next: [
-    'Main: relocate/consider RFC-E-001; E only consumes public entries and does not own production schema.',
-    'C: publish context/proposal/decision ports, then E adds the confirm-before-execute and revocation cases.',
-    'D: publish launcher/distribution/portability, then E runs install/first-run/backup/restore/rollback in a fresh directory.',
-    'B: hand off native evidence bound to commit/attempt with executed=true and model-task counts; a separately granted budget is required for E to re-run native.',
+    'Main: integrate the C fixes and publish the assistant state HTTP/command surface; E then adds confirm-before-execute, revocation-effect and transaction-failure cases.',
+    'D: publish a staged bundle and migration/recovery CLI; E runs install, first-run, backup/restore, upgrade/rollback in a fresh directory with the checkout unavailable.',
+    'B: hand off native evidence bound to commit/attempt/command with executed=true and model-task counts; only a separately granted budget lets E re-run native.',
+    'Main: treat controlled-product-workflow PASS as workflow evidence only; local-alpha and full-product remain non-zero until installation and native evidence exist.',
   ],
 }
 
@@ -339,6 +372,10 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
+writeFileSync(
+  join(reports, 'wave04-status.json'),
+  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave04-status/1', taskPackage: stages.taskPackage }, null, 2) + '\n',
+)
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 
 // Over-claim check: the same recorded evidence must fail the full-product tier while native and

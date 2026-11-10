@@ -17,7 +17,7 @@
 | `GET /v1/questions/:id/deliveries` | 已发布 | 回答投递状态（不得把 local_recorded 当原生已应用） |
 | `pnpm start` / `pnpm doctor` / `tools/dev/workbench.mjs --fixture` | 已发布 | 浏览器与安装验收的启动/只读诊断 |
 
-## 缺口 1：会话目录、搜索、归档（A / 主线）
+## 缺口 1：会话目录、搜索、归档（A / 主线）— 第四轮已关闭
 
 - 输入：现有 `snapshot` 只有当前 `conversation` 分页，没有会话列表或搜索。
 - 预期：`GET /v1/conversations?query=&archived=` 返回稳定 ID、标题、最近消息时间、活动/归档状态；
@@ -25,7 +25,10 @@
 - 实际：路由不存在（404 `Unknown product route`）。最小复现：
   `curl -H 'authorization: Bearer …' http://127.0.0.1:<port>/v1/conversations`
 - 需要语义：只读投影 + 一个幂等归档命令。归档不是删除，也不是第二个 Work 生命周期。
-- E 当前继续：E2 用现有单会话分页与两会话隔离验证持久化；目录/搜索/归档用例标记 NOT_TESTED。
+- 第四轮现状：已发布 `GET /v1/conversations`、`GET /v1/conversations/:id` 与 `POST /v1/conversations/commands`
+  （create/rename/archive，CAS）。E 已独立验证列表、消息/标题搜索、分页、CAS 冲突、归档/恢复、归档可读、
+  重启持久与浏览器操作。归档后仍允许写入，E 作为观察记录而非缺陷。
+- 剩余：未知项目过滤返回 403（授权前拒绝）已确认；多项目混合仍受单项目 demo 限制。
 
 ## 缺口 2：项目设置版本化与归档（A）
 
@@ -34,7 +37,7 @@
 - 实际：无对应路由/schema 字段。E 以 `revise_work` 的合同版本为替代，覆盖了「旧合同拒绝」，
   不等于「项目设置版本」。
 - 需要语义：设置版本标识与当前合同/候选的绑定关系。
-- E 当前继续：E2 验证合同 revision 递增与 stale 拒绝；设置版本化标 NOT_TESTED。
+- E 当前继续：E2 验证合同 revision 递增与 stale 拒绝；设置版本化标 NOT_TESTED（第四轮仍未交付）。
 
 ## 缺口 3：上下文、提案、明确决定（C）
 
@@ -44,7 +47,9 @@
   提示注入不得扩大 scope 或授权执行。
 - 实际：`record_decision`/`revoke_decision` 命令已存在，但知识/提案投影未接线到产品 HTTP。
 - 需要语义：提案确认是独立命令；确认前后都不得绕过 `create_work` 的显式合同。
-- E 当前继续：E2 用本地 mock SDK 验证「普通聊天不授权执行」；提案/决定链路标 NOT_TESTED。
+- 第四轮现状：C 三项独立 probe 仍失败（来源缺失仍生效、换 actor 仍取得确认 intent、调用者可改 grant scope）；
+  main 尚无决定/提案 HTTP 入口。E 已用公共 schema fixture 验证记录形状并记录 NOT_TESTED，未把领域 probe 当产品功能。
+- E 当前继续：等 C 修复与 main 接线后补「确认前不执行、重复确认幂等、撤销后失效、事务失败回滚、注入不扩权」。
 
 ## 缺口 4：发行 bundle 清单与迁移状态（D）
 
@@ -55,7 +60,9 @@
   但真实安装路径无法执行。
 - 需要语义：D 发布自己的清单格式；E 的 `acceptance-bundle-checklist/1` 只是验收侧检查表，
   不是产品协议，D 落地后按其实际格式适配一次。
-- E 当前继续：安装、first-run、备份、升级回滚、跨机器迁移全部标 NOT_TESTED。
+- 第四轮现状：D 的路径仍未进入 main；E 已记录安装/备份/升级/迁移 NOT_TESTED 与计划负例
+  （活跃回滚、同大小漂移、PID 复用、state 前缀碰撞、旧队列首次启动只读）。
+- 已独立验证 main 的恢复只读启动：marker 强制只读、422 拒绝业务写、队列/事件/binding 不变、二次启动仍只读。
 
 ## 缺口 5：原生验收证据交接（B）
 

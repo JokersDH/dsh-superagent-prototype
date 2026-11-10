@@ -1,0 +1,19 @@
+{
+  "decision": {
+    "id": "decision-fixture",
+    "version": 1,
+    "content": "保留现有错误码，不自动扩大权限。",
+    "scope": {
+      "projectId": "project-atlas",
+      "allowedPaths": ["src/"],
+      "excludedPaths": [],
+      "externalActions": []
+    },
+    "authorityRef": "authority-fixture"
+  },
+  "sourceMessageId": "message-fixture",
+  "sourceTextDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "conversationId": "conversation-fixture",
+  "actorRef": "actor-fixture",
+  "recordedAt": "2026-11-10T00:00:00.000Z"
+}

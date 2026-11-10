@@ -76,11 +76,16 @@ export const CONTROLLED_CASES = [
   case_('E3-MOBILE-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
   case_('E3-QUESTION-FORM', { layers: [LAYERS.CONTROLLED] }),
   case_('E3-ACCEPT-AND-DOWNLOAD', { layers: [LAYERS.CONTROLLED], evidence: ['download'] }),
+  case_('E3-ASSISTANT-SCHEMA-FIXTURES', { layers: [LAYERS.READONLY], evidence: ['fixture'] }),
+  case_('E3-CONVERSATION-UI', { layers: [LAYERS.CONTROLLED], evidence: ['catalog'] }),
+  case_('E3-VERIFICATION-RECOVERY-UI', { layers: [LAYERS.CONTROLLED], evidence: ['verificationRecovery'] }),
   case_('E3-OFFLINE-AND-ERROR', { layers: [LAYERS.CONTROLLED] }),
   case_('E3-KEYBOARD-AND-SCROLL', { layers: [LAYERS.CONTROLLED] }),
   case_('E4-BOUNDED-CYCLES', { layers: [LAYERS.CONTROLLED], evidence: ['cycles'] }),
   case_('E4-PORTABILITY-CHECKLIST', { layers: [LAYERS.READONLY], evidence: ['fixture'] }),
+  case_('E4-RECOVERY-READONLY', { layers: [LAYERS.CONTROLLED], evidence: ['recovery'] }),
   case_('E2-VERIFICATION-RECOVERY', { layers: [LAYERS.CONTROLLED], evidence: ['verificationRecovery'] }),
+  case_('E2-VERIFICATION-FINISHED-STATES', { layers: [LAYERS.CONTROLLED], evidence: ['verificationRecovery'] }),
 ]
 
 /** Staged installation outside the development checkout. */
@@ -131,7 +136,7 @@ export const TIERS = {
     tier: 'e3-browser-ui',
     description: 'Independent browser/geometry/interaction acceptance only.',
     maxAgeMs: 6 * 60 * 60 * 1000,
-    allowedLayers: [LAYERS.CONTROLLED],
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.READONLY],
     requireCleanSource: true,
     requireCaseSource: true,
     cases: CONTROLLED_CASES.filter((item) => item.id.startsWith('E3-')),

@@ -1,11 +1,11 @@
 import { existsSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
-import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { cleanup, pickPort, processSnapshot, startProduct, stateSizeKb, tempState } from '../lib/instance.mjs'
 import { FIXTURE_PROTOCOL, loadFixture } from '../lib/fixtures.mjs'
+import { readRuntimeState } from '../lib/product-db.mjs'
 
 const MAX_CYCLES = 30
 const MAX_DURATION_MS = 45 * 60 * 1000
@@ -38,6 +38,11 @@ function portabilityDecision(checklist, { requireRollback }) {
     return { ok: false, reason: 'missing_files' }
   const unlistedState = checklist.files.some((file) => file.bytes === 0)
   if (unlistedState) return { ok: false, reason: 'empty_artifact' }
+  // Same byte count is not enough: a verified digest that differs is content drift.
+  const drift = checklist.files.some(
+    (file) => file.verifiedSha256 !== undefined && file.verifiedSha256 !== file.sha256,
+  )
+  if (drift) return { ok: false, reason: 'content_drift' }
   if (requireRollback && (checklist.rollback?.supported !== true || !checklist.rollback?.restoresVersion))
     return { ok: false, reason: 'rollback_unsupported' }
   return { ok: true, reason: 'satisfied' }
@@ -335,6 +340,10 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
         assert('COMPLETE_ACCEPTED', portabilityDecision(complete.data, { requireRollback: true }).ok === true)
         const refusal = portabilityDecision(noRollback.data, { requireRollback: true })
         assert('ROLLBACK_REQUIRED', refusal.ok === false && refusal.reason === 'rollback_unsupported', refusal.reason)
+        const driftDocs = structuredClone(complete.data)
+        driftDocs.files[0].verifiedSha256 = '9'.repeat(64)
+        const drift = portabilityDecision(driftDocs, { requireRollback: true })
+        assert('SAME_SIZE_DRIFT_REJECTED', drift.ok === false && drift.reason === 'content_drift', drift.reason)
 
         const corrupt = mkdtempSync(join(tmpdir(), 'pa-bundle-'))
         try {
@@ -405,46 +414,5 @@ function countReceipts(stateRoot) {
     return readdirSync(directory).length
   } catch {
     return 0
-  }
-}
-
-/**
- * Read-only observation of the product database. `runtime_bindings` names each physical attempt,
- * `dispatch_receipts` records the begin delivery ACK and `runtime_observations` the dispatch fact.
- * A schema change yields UNKNOWN (null) instead of a false pass.
- */
-function readRuntimeState(stateRoot, root) {
-  try {
-    const require = createRequire(join(root, 'packages/storage/package.json'))
-    const Database = require('better-sqlite3')
-    const database = new Database(join(stateRoot, 'state.sqlite'), { readonly: true, fileMustExist: true })
-    try {
-      const attempts = database.prepare('SELECT attempt_id, ticket_id, state FROM runtime_bindings').all()
-      const begins = Number(
-        database
-          .prepare(
-            "SELECT COUNT(*) AS count FROM dispatch_receipts WHERE command_id LIKE '%-begin-%' AND delivery IN ('native_accepted', 'written')",
-          )
-          .get()?.count ?? 0,
-      )
-      const observed = Number(
-        database
-          .prepare("SELECT COUNT(*) AS count FROM runtime_observations WHERE kind = 'dispatch.observed'")
-          .get()?.count ?? 0,
-      )
-      return {
-        attempts: attempts.map((row) => ({
-          attemptId: row.attempt_id,
-          ticketId: row.ticket_id,
-          state: row.state,
-        })),
-        begins,
-        observed,
-      }
-    } finally {
-      database.close()
-    }
-  } catch {
-    return null
   }
 }

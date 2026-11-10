@@ -1,0 +1,27 @@
+{
+  "proposalId": "proposal-fixture",
+  "version": 1,
+  "state": "pending",
+  "projectId": "project-atlas",
+  "conversationId": "conversation-fixture",
+  "sourceMessageId": "message-fixture",
+  "sourceTextDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "actorRef": "actor-fixture",
+  "grantId": "grant-fixture",
+  "grantScope": {
+    "projectId": "project-atlas",
+    "allowedPaths": ["src/"],
+    "excludedPaths": [],
+    "externalActions": []
+  },
+  "payload": {
+    "kind": "propose_work",
+    "goal": "为受控输出补充一个注册检查",
+    "projectId": "project-atlas",
+    "sourceMessageId": "message-fixture"
+  },
+  "payloadDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "createdAt": "2026-11-10T00:00:00.000Z",
+  "expiresAt": "2026-11-11T00:00:00.000Z",
+  "updatedAt": "2026-11-10T00:00:00.000Z"
+}

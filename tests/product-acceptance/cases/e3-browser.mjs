@@ -4,6 +4,8 @@ import { runCase, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { sha256 } from '../lib/evidence.mjs'
 import { cleanup, pickPort, startWorkbench, tempState } from '../lib/instance.mjs'
+import { scratchProject, startFaultProduct } from '../lib/fault-product.mjs'
+import { createRequire } from 'node:module'
 import {
   VIEWPORTS,
   downloadBytes,
@@ -28,6 +30,25 @@ async function waitWork(client, workId, predicate, timeoutMs = 30_000) {
     await new Promise((resolveDelay) => setTimeout(resolveDelay, 120))
   }
   throw new Error(`work ${workId} never reached the expected state (last ${latest?.phase})`)
+}
+
+async function startConsoleServer({ root, port, apiURL }) {
+  const require = createRequire(join(root, 'apps/console/package.json'))
+  const { createServer } = await import(require.resolve('vite'))
+  const server = await createServer({
+    root: join(root, 'apps/console'),
+    configFile: join(root, 'apps/console/vite.config.ts'),
+    define: { 'import.meta.env.VITE_CONSOLE_MODE': JSON.stringify('http') },
+    server: {
+      host: '127.0.0.1',
+      port,
+      strictPort: true,
+      proxy: { '/v1': { target: apiURL, changeOrigin: true } },
+    },
+    logLevel: 'silent',
+  })
+  await server.listen()
+  return { url: `http://127.0.0.1:${port}/`, close: () => server.close() }
 }
 
 /**
@@ -273,6 +294,7 @@ export async function runE3({ root, runDirectory, keep = false }) {
         filename: download.suggestedFilename,
         bytes: downloaded.length,
         sha256: sha256(downloaded),
+        verifiedSha256: sha256(readFileSync(download.saved)),
         saved: download.saved,
       }
     })
@@ -327,8 +349,14 @@ export async function runE3({ root, runDirectory, keep = false }) {
       await context.route('**/v1/events*', (route) => route.abort())
       await page.reload({ waitUntil: 'domcontentloaded' })
       await page.locator('.workspace-rail').waitFor()
-      await page.getByText('连接中断').first().waitFor({ timeout: 15_000 })
-      assert('OFFLINE_BADGE', (await page.getByText('连接中断').count()) >= 1)
+      // The console optimistically flips to "live" before each reconnect attempt, so the offline
+      // badge is transient by design; observe that it does appear and that the notice stays visible.
+      let sawOffline = false
+      for (let attempt = 0; attempt < 150 && !sawOffline; attempt += 1) {
+        sawOffline = (await page.locator('.badge.status-offline').count()) > 0
+        if (!sawOffline) await page.waitForTimeout(100)
+      }
+      assert('OFFLINE_BADGE', sawOffline, 'offline badge never appeared while the event stream was blocked')
       assert('RECONNECT_NOTICE', (await page.getByText(/事件流断开，正在重连/).count()) >= 1)
       await screenshot(page, shots, 'desktop-offline')
       artifacts.screenshots.push(join(shots, 'desktop-offline.png'))
@@ -390,10 +418,194 @@ export async function runE3({ root, runDirectory, keep = false }) {
       artifacts.screenshots.push(join(shots, 'desktop-keyboard.png'))
       evidence.keyboard = { focus, messageOverflow, scroll, before, after }
     })
+    await push(define('E3-CONVERSATION-UI', 'Conversation search, rename, archive, restore and draft isolation are operable'), async ({ assert, evidence }) => {
+      await page.setViewportSize(VIEWPORTS.desktop)
+      const betaId = 'conv-e3-beta'
+      const createCommand = await client.json('/v1/conversations/commands', {
+        method: 'POST',
+        body: {
+          commandId: 'e3-conv-create',
+          conversationId: betaId,
+          kind: 'create_conversation',
+          projectId: project.id,
+          title: 'Beta 会话 UI',
+        },
+      })
+      assert('CREATE_RECORDED', createCommand.status === 'recorded', JSON.stringify(createCommand))
+      await page.reload({ waitUntil: 'domcontentloaded' })
+      await page.locator('.workspace-rail').waitFor()
+      const directory = page.locator('section.conversation-directory')
+      await directory.waitFor({ timeout: 20_000 })
+      await directory.locator('.conversation-select').first().waitFor({ timeout: 20_000 })
+      await page.waitForFunction(() => document.querySelectorAll('.conversation-select').length >= 2, undefined, {
+        timeout: 20_000,
+      })
+      assert('DIRECTORY_LISTED', (await directory.locator('.conversation-select').count()) >= 2)
+      assert('BETA_LISTED', (await directory.locator('.conversation-select').filter({ hasText: 'Beta 会话 UI' }).count()) === 1)
+
+      const search = page.getByRole('searchbox', { name: '搜索历史对话' })
+      await search.fill('Beta')
+      await page.waitForFunction(() => document.querySelectorAll('.conversation-select').length === 1, undefined, { timeout: 10_000 })
+      assert('SEARCH_FILTERS', (await directory.locator('.conversation-select').filter({ hasText: 'Beta 会话 UI' }).count()) === 1)
+      await search.fill('')
+      await page.waitForFunction(() => document.querySelectorAll('.conversation-select').length >= 2, undefined, { timeout: 10_000 })
+
+      await directory.getByRole('button', { name: '重命名：Beta 会话 UI' }).click()
+      const nameInput = page.getByRole('textbox', { name: '对话名称' })
+      await nameInput.fill('Beta 改名 UI')
+      await page.getByRole('button', { name: '保存对话名称' }).click()
+      await page.waitForFunction(() => document.body.innerText.includes('Beta 改名 UI'), undefined, { timeout: 10_000 })
+      const renamed = await client.json(`/v1/conversations/${betaId}`)
+      assert('RENAME_PERSISTED', renamed.title === 'Beta 改名 UI', JSON.stringify(renamed))
+
+      await directory.getByRole('button', { name: '归档：Beta 改名 UI' }).click()
+      await page.waitForFunction(
+        () => ![...document.querySelectorAll('.conversation-select')].some((item) => item.textContent?.includes('Beta 改名 UI')),
+        undefined,
+        { timeout: 10_000 },
+      )
+      const archived = await client.json(`/v1/conversations/${betaId}`)
+      assert('ARCHIVED', typeof archived.archivedAt === 'string', JSON.stringify(archived))
+      await page.getByRole('checkbox', { name: '包含归档' }).check()
+      await page.getByRole('button', { name: '取消归档：Beta 改名 UI' }).waitFor({ timeout: 10_000 })
+      assert('ARCHIVED_VISIBLE', (await directory.locator('.conversation-select').filter({ hasText: 'Beta 改名 UI' }).count()) === 1)
+      await page.getByRole('button', { name: '取消归档：Beta 改名 UI' }).click()
+      await page.waitForTimeout(700)
+      const restored = await client.json(`/v1/conversations/${betaId}`)
+      assert('RESTORED', restored.archivedAt === undefined, JSON.stringify(restored))
+
+      // A draft belongs to one conversation and must not follow a switch.
+      await page.locator('#composer-input').fill('main-conversation-draft')
+      await directory.locator('.conversation-select').filter({ hasText: 'Beta 改名 UI' }).click()
+      await page.waitForTimeout(400)
+      const betaDraft = await page.locator('#composer-input').inputValue()
+      assert('DRAFT_NOT_LEAKED', betaDraft === '', JSON.stringify(betaDraft))
+
+      await page.reload({ waitUntil: 'domcontentloaded' })
+      await page.locator('.workspace-rail').waitFor()
+      await page.locator('section.conversation-directory').waitFor()
+      await page.locator('.conversation-select').first().waitFor({ timeout: 20_000 })
+      await page.waitForFunction(
+        () => [...document.querySelectorAll('.conversation-select')].some((item) => item.textContent?.includes('Beta 改名 UI')),
+        undefined,
+        { timeout: 20_000 },
+      )
+      assert('RELOAD_PERSISTS_TITLE', (await page.locator('.conversation-select').filter({ hasText: 'Beta 改名 UI' }).count()) === 1)
+
+      await page.setViewportSize(VIEWPORTS.mobile)
+      await page.getByRole('button', { name: '工作空间', exact: true }).click()
+      await page.locator('section.conversation-directory').waitFor()
+      const mobileLayout = await layoutFacts(page)
+      assert('MOBILE_DIRECTORY', mobileLayout.horizontalOverflow === false, JSON.stringify(mobileLayout.overflowing))
+      assert('MOBILE_SEARCH', (await page.getByRole('searchbox', { name: '搜索历史对话' }).count()) === 1)
+      await screenshot(page, shots, 'mobile-conversations')
+      artifacts.screenshots.push(join(shots, 'mobile-conversations.png'))
+      evidence.catalog = {
+        conversations: 2,
+        renamed: true,
+        archivedRestored: true,
+        draftIsolated: true,
+        mobileOperable: true,
+      }
+    })
+
   } finally {
     await browserBundle?.close()
     await workbench?.stop()
     artifacts.cleaned = cleanup({ root: tempRoot, state }, { keep })
+  }
+
+
+  // Verification recovery in a real browser: a blocked status must expose a working recheck action.
+  {
+    const { root: recRoot, state: recState } = tempState('pa-e3-recheck-')
+    const { project: projectPath } = scratchProject()
+    const scope = { projectId: 'project-e3-recovery', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
+    const vitePort = await pickPort()
+    let runtime
+    let consoleServer
+    let recoveryBrowser
+    try {
+      runtime = await startFaultProduct({
+        stateRoot: recState,
+        projectPath,
+        scope,
+        allowedOrigins: [`http://127.0.0.1:${vitePort}`],
+        localDevelopmentAccess: true,
+      })
+      runtime.fault.active = true
+      consoleServer = await startConsoleServer({ root, port: vitePort, apiURL: `http://127.0.0.1:${runtime.port}` })
+      const client = runtime.client
+      const configuration = await client.configuration()
+      const machine = configuration.projects[0].defaultCriteria.find((item) => item.kind === 'machine' && item.required)
+      const created = await client.dispatch({
+        commandId: 'e3-recovery-work',
+        conversationId: 'conv-main',
+        kind: 'create_work',
+        projectId: scope.projectId,
+        profileId: 'profile-fixture-pass',
+        goal: 'UI 验证恢复：同一候选重新检查',
+        scope,
+        criteria: [machine],
+      })
+      let status
+      const deadline = Date.now() + 30_000
+      while (Date.now() < deadline) {
+        status = await client.json(`/v1/works/${created.receipt.workId}/verification`)
+        if (status.state === 'blocked') break
+        await new Promise((resolveDelay) => setTimeout(resolveDelay, 100))
+      }
+      if (status?.state !== 'blocked') throw new Error(`expected blocked verification, got ${status?.state}`)
+
+      recoveryBrowser = await openBrowser({ root, viewport: VIEWPORTS.desktop })
+      const page = recoveryBrowser.page
+      await gotoConsole(page, consoleServer.url)
+      await page.locator('.work-card').filter({ hasText: 'UI 验证恢复' }).first().click()
+      const detail = page.locator('#work-inspector')
+      await detail.waitFor()
+      await push(define('E3-VERIFICATION-RECOVERY-UI', 'A blocked verification exposes a working recheck and acceptance button'), async ({ assert, evidence }) => {
+        await detail.getByText('验证受阻').first().waitFor({ timeout: 15_000 })
+        const recheck = detail.getByRole('button', { name: '重新检查' })
+        await recheck.waitFor({ timeout: 15_000 })
+        assert('RECHECK_VISIBLE', await recheck.isEnabled())
+        await screenshot(page, shots, 'desktop-verification-blocked')
+        runtime.fault.active = false
+        await recheck.click()
+        await detail.locator('.outcome-PASS').first().waitFor({ timeout: 30_000 })
+        const finished = await client.json(`/v1/works/${created.receipt.workId}/verification`)
+        assert('RECHECK_FINISHED', finished.state === 'finished', JSON.stringify(finished))
+        await detail.getByRole('button', { name: '接受当前候选' }).click()
+        await page.waitForFunction(
+          () => document.querySelector('#work-inspector .phase')?.textContent === '已交付',
+          undefined,
+          { timeout: 25_000 },
+        )
+        const delivered = await client.work(created.receipt.workId)
+        assert('UI_DELIVERED', delivered.phase === 'delivered')
+        await page.reload({ waitUntil: 'domcontentloaded' })
+        await page.locator('.workspace-rail').waitFor()
+        await page.locator('.work-card').filter({ hasText: 'UI 验证恢复' }).first().click()
+        await page.locator('#work-inspector .phase').waitFor()
+        assert('REOPEN_DELIVERED', (await page.locator('#work-inspector .phase').first().textContent()) === '已交付')
+        await screenshot(page, shots, 'desktop-verification-recovered')
+        artifacts.screenshots.push(
+          join(shots, 'desktop-verification-blocked.png'),
+          join(shots, 'desktop-verification-recovered.png'),
+        )
+        evidence.verificationRecovery = {
+          blockedId: status.failure.id,
+          verificationId: finished.verificationId,
+          uiRecheck: true,
+          uiAccepted: true,
+        }
+      })
+    } finally {
+      await recoveryBrowser?.close()
+      await consoleServer?.close()
+      await runtime?.close()
+      runtime?.store?.close?.()
+      cleanup({ root: recRoot, state: recState }, { keep })
+    }
   }
 
   return { cases, artifacts }

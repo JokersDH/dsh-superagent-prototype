@@ -1,61 +1,63 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
+  "taskPackage": "agent-tasks/product-wave-04/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
   "base": "8c736f2",
-  "checkpoint": null,
+  "checkpoint": "7754004",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
+    "unknownSends": 0,
     "note": "No vendor model was called. The only model peer is a loopback OpenAI-compatible mock created by the E2 case."
   },
   "stages": [
     {
       "id": "E1",
-      "title": "Fail-closed independent harness and checkpoint",
+      "title": "Release-tool counterexamples first",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only",
       "notes": [
-        "Wave-04 hardened gate: 21 original rejections plus 29 independent mutation cases (wrong layer, dirty/missing/cross-commit source, unbound case, empty evidence, missing case, failed assertion, download bytes/digest, patch apply/digest, duplicate/unknown ids, native executed/version/attempt/evidence/model-tasks, installation staged/independence, NOT_TESTED, self-claim, exact reproduced admission probe, tier superset, no allow-gap).",
-        "full-product is now a strict superset of every lower tier; full runs fail on missing install/native evidence instead of passing on controlled cases."
+        "50 gate tests: 21 original rejections plus 29 independent mutation cases covering wrong layer, dirty/missing/cross-commit source, unbound case, empty evidence, missing case, failed assertion, download bytes/digest, patch apply/digest, duplicate/unknown ids, native executed/version/attempt/evidence/model-task proof, staged-install proof, NOT_TESTED, self-claim, the exact wave-04 admission bundle, tier superset and no allow-gap.",
+        "full-product is a strict superset of every lower tier; main's admission probe now reports the E case PASS (verdict non-PASS)."
       ]
     },
     {
       "id": "E2",
-      "title": "Daily product vertical and negative cases",
+      "title": "Independent verification of the current main increment",
       "command": "node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow",
       "notes": [
-        "Real SQLite, real scratch subprocess and real verification through authenticated loopback HTTP.",
-        "Covers question/answer/delivery, machine PASS and FAIL, patch apply to the recorded base commit, artifact byte roundtrip, command replay/conflict, stale contract/candidate/answer, two-conversation isolation, stop/continue writer identity, scope/profile guards, restart persistence and a loopback SDK mock chat."
+        "Conversation catalog: persistent list, message/title search, pagination, CAS rename, archive/restore, archived readability, restart persistence and draft isolation, all through public HTTP.",
+        "Verification recovery: blocked→explicit recheck→same-candidate PASS→human accept→reopen, with old blockedId, wrong work, changed payload, replay and machine-FAIL negatives. Schema 400s and business rejections are counted separately.",
+        "The blocked state is injected on the isolated completion port; every observable step uses the real application and HTTP API."
       ]
     },
     {
       "id": "E3",
-      "title": "Independent browser, visual geometry and interaction regression",
+      "title": "Assistant end-to-end and transaction-breaking negatives",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "Packaged workbench at 1440x900, 1280x800 and 390x844; geometry/overflow/reachability rather than aesthetic scoring.",
-        "Covers the decision inbox, patch preview, byte-verified artifact download, UI acceptance, reopen, loading, error, SSE-offline, tab focus, long Chinese/path and list scrolling."
+        "Consumes main's read-only C domain probe and records the three unresolved defects with owner C.",
+        "Validates persisted decision/proposal fixtures against the single public contract and rejects illegal variants.",
+        "End-to-end decision/context/proposal/confirm/reject/transaction cases remain NOT_TESTED because main has no decision/proposal HTTP entry in this checkout."
       ]
     },
     {
       "id": "E4",
-      "title": "Bounded stability and portability boundaries",
+      "title": "Installation and recovery acceptance",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12",
       "notes": [
-        "Mixed question/complete/fail/stop cycles with a restart in the middle; process/FD/RSS/disk/receipt observations remain scoped to this instance.",
-        "Attempt identities, begin ACKs and dispatch facts are read read-only from runtime_bindings, dispatch_receipts and runtime_observations; a schema change yields UNKNOWN instead of a pass.",
-        "Portable installation, first-run, backup/restore and upgrade rollback are declared NOT_TESTED because D's directories are absent in this checkout."
+        "Recovery read-only startup is verified through HTTP: the marker forces recovery despite normal/native/assistant flags, business writes return 422, queues/events/bindings are unchanged and a second start stays read-only.",
+        "Portable installation, first-run, backup/restore and upgrade rollback stay NOT_TESTED because D's paths are absent from the merged source; planned negatives are recorded, including active-writer rollback, same-size drift, PID reuse and state-prefix collisions."
       ]
     },
     {
       "id": "E5",
-      "title": "Release matrix, re-verification and handoff",
+      "title": "Bounded cycles, final matrix and handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "Aggregates the recorded cases into a reproducible matrix bound to the source commit.",
-        "A full-product claim is rejected by the gate while native and installation evidence are absent."
+        "Bounded mixed cycles (max 30 or 45 minutes) with attempt/begin/dispatch receipts and process observations; no port-count leak claim.",
+        "A full-product claim is rejected non-zero while native and installation evidence are absent."
       ]
     }
-  ],
-  "taskPackage": "agent-tasks/product-wave-04/README.zh-CN.md"
+  ]
 }

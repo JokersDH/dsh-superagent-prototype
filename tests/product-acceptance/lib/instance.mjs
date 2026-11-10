@@ -1,6 +1,6 @@
 import { spawn, execFileSync } from 'node:child_process'
 import { createServer } from 'node:net'
-import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
+import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -182,6 +182,11 @@ export async function startProduct({
     stream.on('data', (chunk) => {
       sink.push(chunk)
       if (sink.length > 400) sink.shift()
+      try {
+        appendFileSync(logFile, chunk)
+      } catch {
+        /* Diagnostics only. */
+      }
     })
   child.once('exit', (code) => {
     if (code !== 0 && !handle.stopping) sink.push(Buffer.from(`\n[exit ${code}]\n`))
@@ -225,6 +230,11 @@ export async function startWorkbench({ root, port, apiPort, stateRoot, env = {} 
     stream.on('data', (chunk) => {
       sink.push(chunk)
       if (sink.length > 400) sink.shift()
+      try {
+        appendFileSync(logFile, chunk)
+      } catch {
+        /* Diagnostics only. */
+      }
     })
   try {
     await waitForHttp(`http://127.0.0.1:${port}/`, { timeoutMs: 30_000 })
