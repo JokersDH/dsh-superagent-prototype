@@ -21,8 +21,10 @@ Only a trusted `user` message can be recorded. The following are refused:
 - scopes outside the current authorization;
 - already-expired scopes, blank/NUL/oversized content.
 
-Revocation appends a new revision (CAS on the expected version) and removes the decision from new
-knowledge. A new decision may supersede an older explicit decision of the same project when it covers
+Effectiveness is re-derived from the **current** source on every read: a missing message, a changed
+`textDigest`/conversation/project, or non-user/non-trusted provenance makes the decision ineffective
+while its append-only audit revisions remain stored. Revocation appends a new revision (CAS on the
+expected version) and removes the decision from new knowledge. A new decision may supersede an older explicit decision of the same project when it covers
 the old scope. Revoked, superseded and expired decisions never enter new context; the original source
 and revision history remain auditable, and a missing source is reported as `validity: 'missing'`.
 
@@ -53,6 +55,13 @@ pnpm --filter @personal-agent/knowledge test
 pnpm --filter @personal-agent/knowledge build
 node packages/knowledge/examples/assistant-loop.mjs
 ```
+
+## Wave-04 checkpoint
+
+The three independent admission failures are fixed: missing-source decisions are no longer effective
+or listed; confirmed proposal replay authenticates the actor first; stored/returned grants, scopes
+and records are independent deep-frozen snapshots (`test/knowledge.case.ts`). The persisted
+`AssistantStatePort` adapter and prepare/commit split are the next stage.
 
 ## Limits
 

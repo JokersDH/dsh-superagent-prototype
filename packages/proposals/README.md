@@ -37,13 +37,17 @@ Rules:
 
 States: `pending → confirmed | rejected | expired | superseded`. Rules:
 
-- confirmation requires explicit `expectedVersion` + `expectedDigest`, the same actor and an
-  optional physical-barrier callback (`ok: false` blocks confirmation);
+- every confirmation path, including an idempotent replay of a confirmed proposal, authenticates the
+  owning actor before any state-specific branch;
+- confirmation requires explicit `expectedVersion` + `expectedDigest`, the same actor and optional
+  `revalidate`/physical-barrier callbacks (`ok: false` blocks or refuses);
 - repeated confirmation with the same version/digest is idempotent and returns the original intent;
 - old, rejected, superseded or expired proposals are refused;
 - a proposal id is idempotent for the same payload and conflicts when the payload/bindings change.
 
-`ProposalIntent` is the only output and deliberately omits actor, command id and work scope. Main
+`ProposalIntent` is the only output and deliberately omits actor, command id and work scope. Stored
+records and every returned `create`/`get`/`list`/`confirm` value are independent deep-frozen
+snapshots, so a caller cannot mutate an already-reviewed grant, scope or payload. Main
 builds the deterministic `UserCommand` and re-checks actor/project/scope/contract/barrier.
 
 ## Commands
@@ -57,6 +61,12 @@ pnpm --filter @personal-agent/proposals build
 All tests are no-model: structured/plain/invalid output, forged identity/tool/scope, cross-project,
 same-id changed payload, stale contract, duplicate confirmation, rejection, supersession and expiry.
 No execution occurs before confirmation.
+
+## Wave-04 checkpoint
+
+The confirmed-replay authorization bypass and the shared-grant mutation are fixed; current
+source/grant/contract/scope can be revalidated through `revalidate` on both pending and confirmed
+paths. Persisted `AssistantStatePort` prepare/commit is the next stage.
 
 ## Limits
 
