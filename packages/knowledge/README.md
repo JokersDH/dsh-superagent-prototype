@@ -56,6 +56,18 @@ pnpm --filter @personal-agent/knowledge build
 node packages/knowledge/examples/assistant-loop.mjs
 ```
 
+## Persisted adapter (wave-04 C2)
+
+`AssistantDecisionStore` maps the shared synchronous `AssistantStatePort.decisions` to this domain
+port without opening SQL or a second database. It preserves source message, conversation and digest,
+append-only revisions, CAS revocation and bounded project scans for supersession. Effectiveness is
+still re-derived from `DecisionSourcePort` on every read; a missing/stale source excludes the
+decision while persisted revisions remain auditable.
+
+`InMemoryAssistantState` (proposals package) is the reference port fixture used by the vertical
+until storage publishes the real `createWorkflowPorts(store).assistant` implementation. The real
+temporary-SQLite vertical is **BLOCKED/NOT_TESTED** until that port lands.
+
 ## Wave-04 checkpoint
 
 The three independent admission failures are fixed: missing-source decisions are no longer effective
