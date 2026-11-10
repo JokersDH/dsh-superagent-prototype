@@ -39,6 +39,26 @@ test('health is public but data and commands require local credentials', async (
   assert.equal(denied.status, 401)
   assert.equal((await denied.json()).error.code, 'auth_required')
 })
+test('recovery read-only blocks business writes and removes action grants while preserving authenticated reads', async t => {
+  const h = fixture(t)
+  await h.app.dispatch(createCommand('restore-existing-work'), actor)
+  const server = createLocalHttpApp({ application: h.app, principal: actor, bootstrapToken: BOOT, apiToken: API,
+    allowedOrigins: [BASE], mode: 'fixture', startupMode: 'recovery_readonly' })
+  const headers = { authorization: `Bearer ${API}`, 'content-type': 'application/json' }
+  assert.equal((await (await server.request(`${BASE}/v1/health`)).json()).startupMode, 'recovery_readonly')
+  const snapshot = await (await server.request(`${BASE}/v1/snapshot`, { headers })).json()
+  assert.equal(snapshot.works.length, 1)
+  assert.deepEqual(snapshot.works[0].actions.available, [])
+  const work = await (await server.request(`${BASE}/v1/works/${snapshot.works[0].work.id}`, { headers })).json()
+  assert.deepEqual(work.actions.available, [])
+  for (const route of ['/v1/commands', '/v1/projects', '/v1/conversations/commands', '/v1/assistant/model', '/v1/works/work-one/verification/retry']) {
+    const response = await server.request(`${BASE}${route}`, { method: 'POST', headers, body: '{}' })
+    assert.equal(response.status, 422)
+    assert.equal((await response.json()).error.retry, 'none')
+  }
+  assert.equal(h.store.commands.get('restore-existing-work')?.status, 'recorded')
+  assert.equal(h.store.domain.tickets.list().length, 1)
+})
 test('conversation catalog is authenticated, scoped and uses immutable command receipts', async t => {
   const h = fixture(t), catalog = new ApplicationConversations(h.store, actor, () => ['project-atlas'], Buffer.alloc(32, 1))
   const server = createLocalHttpApp({ application: h.app, principal: actor, bootstrapToken: BOOT, apiToken: API,

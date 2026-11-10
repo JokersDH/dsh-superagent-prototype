@@ -52,6 +52,7 @@ import type {
   ConversationCatalogQuery,
   ConversationSummary,
   ConversationCommand,
+  WorkView,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -62,6 +63,10 @@ const sameSecret = (input: string | undefined, expected: string): boolean =>
   Buffer.byteLength(input) === Buffer.byteLength(expected) &&
   timingSafeEqual(Buffer.from(input), Buffer.from(expected))
 const sessionInput = z.strictObject({ bootstrapToken: z.string().regex(/^[a-f0-9]{64}$/) })
+const readonlyWork = (work: WorkView): WorkView => {
+  const { retryActionToken: _, ...actions } = work.actions
+  return { ...work, actions: { ...actions, available: [] } }
+}
 const statusOf = (error: AppError): 400 | 401 | 403 | 409 | 422 | 503 =>
   error.code === 'auth_required'
     ? 401
@@ -90,6 +95,7 @@ export interface LocalHttpOptions {
   allowedOrigins: readonly string[]
   sessionTtlMs?: number
   mode: 'fixture' | 'product' | 'personal'
+  startupMode?: 'normal' | 'recovery_readonly'
   /** Explicit loopback-only fixture convenience; normal entries still require credentials. */
   localDevelopmentAccess?: boolean
   now?: () => number
@@ -190,6 +196,7 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     c.json({
       status: 'ok',
       mode: options.mode,
+      ...(options.startupMode === 'recovery_readonly' ? { startupMode: options.startupMode } : {}),
       ...(options.localDevelopmentAccess ? { access: 'local-development' } : {}),
     }),
   )
@@ -242,12 +249,21 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     await next()
   })
   app.get('/v1/session', (c) => c.json({ status: 'authenticated' }))
+  app.use('/v1/*', async (c, next) => {
+    if (options.startupMode === 'recovery_readonly' && !['GET', 'HEAD', 'OPTIONS', 'DELETE'].includes(c.req.method))
+      throw new ApplicationFault('unsupported_capability', 'Restored state is read-only until explicit recovery and local revalidation', 'none')
+    await next()
+  })
   app.get('/v1/configuration', async (c) => {
     if (Object.keys(c.req.query()).length)
       throw new ApplicationFault('invalid_request', 'Configuration does not accept query parameters')
     if (!options.read?.configuration)
       throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
-    return c.json(ApplicationConfigurationSchema.parse(await options.read.configuration()))
+    const value = ApplicationConfigurationSchema.parse(await options.read.configuration())
+    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value,
+      profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate' })),
+      projects: value.projects.map(project => { const { defaultProfileId: _, ...rest } = project; return { ...rest, profileIds: [], dispatchAllowed: false, blockedReason: 'writer_indeterminate' } }),
+    }) : value)
   })
   app.get('/v1/conversations', async (c) => {
     if (!options.read?.conversations) throw new ApplicationFault('unsupported_capability', 'Conversation catalog is not connected')
@@ -311,7 +327,7 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     const value = WorkVerificationStatusSchema.parse(await options.read.workVerification(workId))
     if (value.workId !== workId)
       throw new ApplicationFault('storage_unavailable', 'Verification status identity mismatch', 'none')
-    return c.json(value)
+    return c.json(options.startupMode === 'recovery_readonly' ? { ...value, retryAvailable: false } : value)
   })
   app.post('/v1/works/:id/verification/retry', async (c) => {
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json'))
@@ -384,11 +400,13 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
         throw new ApplicationFault('invalid_request', 'Invalid includeLearning value')
       input.includeLearning = raw.includeLearning === 'true'
     }
-    return c.json(SnapshotSchema.parse(await options.application.inspect(InspectQuerySchema.parse(input))))
+    const value = SnapshotSchema.parse(await options.application.inspect(InspectQuerySchema.parse(input)))
+    return c.json(options.startupMode === 'recovery_readonly' ? { ...value, works: value.works.map(readonlyWork) } : value)
   })
   app.get('/v1/works/:id', async (c) => {
     const snapshot = await options.application.inspect({ workId: IdSchema.parse(c.req.param('id')) })
-    return c.json(WorkViewSchema.parse(snapshot.works[0]))
+    const value = WorkViewSchema.parse(snapshot.works[0])
+    return c.json(options.startupMode === 'recovery_readonly' ? readonlyWork(value) : value)
   })
   app.get('/v1/conversations/:id/messages', async (c) => {
     const id = IdSchema.parse(c.req.param('id')),
