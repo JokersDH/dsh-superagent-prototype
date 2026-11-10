@@ -5,8 +5,16 @@
   "mergeCommit": "7368c1f",
   "stableCheckpoint": "ed9d553",
   "updatedAt": "2026-11-10T08:05:00.000Z",
-  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge"],
-  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "ownedPaths": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge"
+  ],
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0,
+    "unknownSends": 0
+  },
   "phases": [
     {
       "phase": "C1",
@@ -18,7 +26,11 @@
         "packages/knowledge/test/knowledge.case.ts",
         "commit ed9d553"
       ],
-      "results": { "admission": "PASS_ADMISSION_PROBES (3/3 C)", "proposalTests": "12/12", "knowledgeTests": "16/16" },
+      "results": {
+        "admission": "PASS_ADMISSION_PROBES (3/3 C)",
+        "proposalTests": "12/12",
+        "knowledgeTests": "16/16"
+      },
       "note": "Missing/stale source invalidates effectiveness; confirmed replay authenticates actor first; grants/scopes/payloads/records are independent deep-frozen snapshots."
     },
     {
@@ -31,7 +43,10 @@
         "packages/knowledge/src/assistant-decision-store.ts",
         "packages/knowledge/test/assistant-store.case.ts"
       ],
-      "results": { "proposalTests": "18/18", "knowledgeTests": "22/22 at this stage" },
+      "results": {
+        "proposalTests": "18/18",
+        "knowledgeTests": "22/22 at this stage"
+      },
       "note": "Shared AssistantStatePort consumed through an in-memory reference port. prepare is read-only; persistPending writes version 1; commit writes version 2 confirmed with main-owned effectCommandId, CAS and current-authorization revalidate/barrier; reject/expire/supersede append revisions. Decision adapter retains source message/conversation/digest and CAS revoke."
     },
     {
@@ -131,5 +146,6 @@
   "aNextSteps": [
     "Publish createWorkflowPorts(store).assistant with the shared sync port, CAS/replay/history and single-writer semantics.",
     "Add verification/delivery context details and work cursor if main needs them."
-  ]
+  ],
+  "latestDeliveryCommit": "928d55f"
 }
