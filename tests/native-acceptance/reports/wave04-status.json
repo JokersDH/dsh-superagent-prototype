@@ -1,0 +1,106 @@
+{
+  "wave": "product-wave-04 / Agent B",
+  "branch": "codex/g1-runtime",
+  "base": "8c736f2",
+  "finalInput": "549c57b (wave-03)",
+  "ownedPaths": [
+    "apps/runner/",
+    "packages/drivers/codex-native/",
+    "packages/driver-kit/",
+    "packages/testing/",
+    "tests/native-acceptance/"
+  ],
+  "budget": {
+    "wave03Grant": {
+      "grantId": "wave03-b-native",
+      "limit": 4,
+      "used": 0,
+      "note": "no new allowance was created by wave-04; this grant is untouched"
+    },
+    "historical": {
+      "used": 3,
+      "note": "earlier rounds keep their own accounting; the two ledgers are reported separately and never merged into one number"
+    },
+    "wave04Usage": 0
+  },
+  "phases": {
+    "B1": {
+      "status": "passed",
+      "commit": "d285a1b",
+      "closed": [
+        "unknown-target now requires a business-layer refusal (a schema 400 fails)",
+        "duplicate replay reuses the same commandId/payload and must return the same receipt with one delivery",
+        "a legal answer must produce the original target delivery record (zero deliveries fails)",
+        "stopped work requires refusal AND no extra delivery AND accurate resources AND non-running phase",
+        "stale version needs a real v0->v1 bump; otherwise NOT_TESTED",
+        "missing stop port/admission/active writer is NOT_TESTED, never PASS"
+      ],
+      "evidence": {
+        "falsePass": "6/6",
+        "b3Questions": "5 PASS / 1 NOT_TESTED"
+      }
+    },
+    "B2": {
+      "status": "passed",
+      "commit": "b2e5a10",
+      "deliverables": [
+        "atomic pre-send reservation with an exclusive lock and stale-lock reclaim",
+        "reserved/sent/unknown consume capacity; only aborted frees a slot",
+        "settled reservations are immutable; taskId is idempotent",
+        "a larger limit request is refused, never silently applied",
+        "no credentials or session text in the ledger"
+      ],
+      "evidence": {
+        "budgetTests": "10/10"
+      }
+    },
+    "B3": {
+      "status": "passed",
+      "commit": "414a7d8",
+      "evidence": {
+        "productionStop": "6/6",
+        "command": "node tests/native-acceptance/b3-production-stop.mjs"
+      },
+      "note": "all stops go through the production ProcessHost (inventory/stopOwned/closeAdmission); the test never signals the unit under test"
+    },
+    "B4": {
+      "status": "partially_passed",
+      "commit": "55d4935",
+      "evidence": {
+        "idle": "PASS",
+        "running": "PASS (assignment preserved AND no new begin receipt)",
+        "questionWindow": "NOT_TESTED (no question visible before the kill)"
+      }
+    },
+    "B5": {
+      "status": "passed",
+      "commit": "pending",
+      "regressions": {
+        "driver-kit": 18,
+        "testing": 8,
+        "apps/runner": 132,
+        "codex-native": 35,
+        "total": 193,
+        "fail": 0
+      },
+      "harness": {
+        "falsePass": "6/6",
+        "budget": "10/10",
+        "selftest": "14/14",
+        "reviewGuards": "PASS_ACCEPTANCE_GUARDS_ONLY"
+      }
+    }
+  },
+  "compatMatrix": {
+    "actualVendor": "NOT_TESTED this wave (no model task started; the grant stays intact)",
+    "controlledProcess": "PASS (B3 production stop through ProcessHost)",
+    "protocolMock": "PASS (packages/drivers/codex-native 35 tests against the fake app-server)",
+    "schemaContract": "PASS (shared parser used to build every command; schema 400 separated from business rejection)"
+  },
+  "notTested": [
+    "actual vendor native active stop / question / approval (budget untouched this wave)",
+    "B4 question/answer crash window",
+    "environment policy projection (published configuration reports environmentPolicy=false)"
+  ],
+  "blockers": "none for the owned scope; environment policy projection is main-owned and not published"
+}
