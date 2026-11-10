@@ -10,7 +10,6 @@ import { ApplicationFault } from './errors.ts'
 
 /** Authenticated catalog composition over the storage owner's ports, without another SQL writer. */
 export class ApplicationConversations {
-  private readonly membership = new Map<string, { sequence: number; projects: readonly string[] }>()
   private readonly store: ProductStore
   private readonly principal: { userId: string; authorityRef: string }
   private readonly projectIds: () => readonly string[]
@@ -40,29 +39,11 @@ export class ApplicationConversations {
     } catch { throw new ApplicationFault('invalid_request', 'Catalog cursor expired or belongs to another query') }
   }
 
-  private projects(entry: Conversation, budget: { remaining: number }): readonly string[] {
-    const prior = this.membership.get(entry.id)
-    if (prior?.sequence === entry.lastSequence) return [...new Set([...(entry.projectId ? [entry.projectId] : []), ...prior.projects])]
-    // Legacy/mixed-project catalogs need the persisted message scope checked before revealing a title or search hit.
-    const projects = new Set<string>()
-    let before: number | undefined
-    for (;;) {
-      if (budget.remaining <= 0) throw new ApplicationFault('budget_exceeded', 'Conversation membership needs a smaller catalog page')
-      const page = this.store.product.messages.page(entry.id, { limit: Math.min(200, budget.remaining), ...(before ? { before } : {}) })
-      budget.remaining -= Math.max(1, page.messages.length)
-      for (const message of page.messages) if (message.projectId) projects.add(message.projectId)
-      if (!page.hasMore) break
-      if (!page.beforeCursor || page.beforeCursor === before)
-        throw new ApplicationFault('storage_unavailable', 'Conversation message cursor is unavailable', 'none')
-      before = page.beforeCursor
-    }
-    if (this.membership.size >= 512) this.membership.delete(this.membership.keys().next().value!)
-    this.membership.set(entry.id, { sequence: entry.lastSequence, projects: [...projects] })
-    if (entry.projectId) projects.add(entry.projectId)
-    return [...projects]
+  private projects(entry: Conversation): readonly string[] {
+    return [...new Set([...(entry.projectId ? [entry.projectId] : []), ...entry.projectIds])]
   }
-  private visible(entry: Conversation, allowed: ReadonlySet<string>, budget: { remaining: number }) {
-    const projects = this.projects(entry, budget)
+  private visible(entry: Conversation, allowed: ReadonlySet<string>) {
+    const projects = this.projects(entry)
     return projects.length && projects.every(id => allowed.has(id)) ? projects : undefined
   }
   private attention(): ReadonlySet<string> {
@@ -92,14 +73,14 @@ export class ApplicationConversations {
       query: query.query ?? null, includeArchived: query.includeArchived ?? false })
     const cursor = query.cursor ? this.cursor(query.cursor, cursorScope, true) : undefined
     return this.store.uow.atomic(() => {
-      // Empty project scope is an internal discovery read only; every result is filtered through visible() below.
+      // Storage selects candidates by indexed membership; mixed-project records still require every member below.
       const page = query.query
-        ? this.store.workflows.conversations.search({ query: query.query, projectIds: [], includeArchived: true, limit: query.limit ?? 30, ...(cursor ? { cursor } : {}) })
-        : this.store.workflows.conversations.list({ projectIds: [], includeArchived: true, limit: query.limit ?? 30, ...(cursor ? { cursor } : {}) })
+        ? this.store.workflows.conversations.search({ query: query.query, projectIds: [...allowed], includeArchived: true, limit: query.limit ?? 30, ...(cursor ? { cursor } : {}) })
+        : this.store.workflows.conversations.list({ projectIds: [...allowed], includeArchived: true, limit: query.limit ?? 30, ...(cursor ? { cursor } : {}) })
       const entries = 'hits' in page ? page.hits.map(hit => hit.conversation) : page.conversations
-      const attention = this.attention(), budget = { remaining: 10000 }
+      const attention = this.attention()
       const conversations = entries.flatMap(entry => {
-        const projects = this.visible(entry, allowed, budget)
+        const projects = this.visible(entry, allowed)
         if (!projects || (query.projectId && !projects.includes(query.projectId))) return []
         const value = this.summary(entry, projects, attention)
         return !value.archivedAt || query.includeArchived || value.attention ? [value] : []
@@ -111,7 +92,7 @@ export class ApplicationConversations {
   get(id: string): ConversationSummary {
     return this.store.uow.atomic(() => {
       const entry = this.store.workflows.conversations.get(id)
-      const projects = entry && this.visible(entry, new Set(this.projectIds()), { remaining: 10000 })
+      const projects = entry && this.visible(entry, new Set(this.projectIds()))
       if (!entry || !projects) throw new ApplicationFault('forbidden', 'Conversation is not in the configured projects', 'none')
       return this.summary(entry, projects, this.attention())
     })
