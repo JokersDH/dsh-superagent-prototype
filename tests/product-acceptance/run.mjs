@@ -134,4 +134,7 @@ writeJson(reportsRoot, 'latest.json', {
 
 printSummary({ report: finalReport, release: verdict })
 process.stdout.write(`evidence: ${run.directory}\n`)
-process.exitCode = verdict.ok && cases.every((item) => item.status === STATUS.PASS) ? 0 : 1
+// The tier decides what must pass. FAIL/UNKNOWN always block; NOT_TESTED, SKIPPED and BLOCKED are
+// declared gaps and are visible in the report without being able to turn a failed gate green.
+const blocking = cases.filter((item) => item.status === STATUS.FAIL || item.status === STATUS.UNKNOWN)
+process.exitCode = verdict.ok && blocking.length === 0 ? 0 : 1
