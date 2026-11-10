@@ -5,8 +5,17 @@
   "mergeCommit": "9aab1c8",
   "stableCheckpoint": "027c305",
   "updatedAt": "2026-11-10T13:10:00.000Z",
-  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
-  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "ownedPaths": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge",
+    "packages/routing"
+  ],
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0,
+    "unknownSends": 0
+  },
   "phases": [
     {
       "phase": "C1",
@@ -96,7 +105,10 @@
   "dependencyRequests": [
     {
       "package": "packages/knowledge",
-      "added": ["@personal-agent/storage (dev)", "@personal-agent/workflows (dev)"],
+      "added": [
+        "@personal-agent/storage (dev)",
+        "@personal-agent/workflows (dev)"
+      ],
       "reason": "Real temporary SQLite decision transaction test/example.",
       "rootLock": "pnpm-lock.yaml diff is uncommitted; main owns the authoritative lock."
     }
@@ -145,5 +157,6 @@
   "aNextSteps": [
     "Publish createWorkflowPorts(store).routingEvidence with sync append-only put/get/list and same-body replay.",
     "Optionally add a persisted review-subject/current-candidate index for efficient invalidation queries."
-  ]
+  ],
+  "latestDeliveryCommit": "b70a658"
 }
