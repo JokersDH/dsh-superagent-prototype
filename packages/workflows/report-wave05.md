@@ -2,7 +2,7 @@
 
 - Branch: `codex/g2-workspaces-verification`
 - Main base: `a70db20`; merge checkpoint: `c0b8316`
-- A1 stable checkpoint: `f26f2eb`
+- A1 stable checkpoint: `f26f2eb`; delivery source: `1bd0996`
 - Owned paths: `packages/storage/`, `packages/workflows/`
 - Model tasks: **0**; unknown sends: **0**. All tests use temporary SQLite state.
 
