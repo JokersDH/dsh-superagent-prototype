@@ -178,8 +178,8 @@ const CAPABILITIES = [
     label: '上下文、提案与明确决定治理',
     readonly: ['E2-CONTEXT-PROPOSALS-NOT-TESTED'],
     notTested: [
-      'C 的 packages/context、proposals、knowledge 未交付；确认前不执行、重复确认幂等、撤销后失效无法端到端验证。',
-      '本次仅记录 record_decision 的显式拒绝（见 E2-CONTEXT-PROPOSALS-NOT-TESTED）。',
+      'C 三项领域 probe 仍未修复；main 尚无决定/提案 HTTP 入口。',
+      '确认前不执行、重复确认幂等、撤销后失效、事务失败回滚与注入防护均未执行。',
     ],
   },
   {
@@ -303,6 +303,14 @@ const executionStatus = {
   ],
 }
 
+const stageSummary = (id) => {
+  const entry = executionStatus.stages.find((item) => item.id === id)
+  if (!entry?.counts) return entry?.result ?? 'SEE_RUN'
+  return Object.entries(entry.counts)
+    .map(([status, count]) => `${status} ${count}`)
+    .join(' + ')
+}
+
 const handoff = `# Agent E 交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
@@ -313,10 +321,10 @@ const handoff = `# Agent E 交付交接
 
 | 阶段 | 命令 | 结果 |
 | --- | --- | --- |
-| E1 | \`${stages.stages[0].command}\` | 21/21 self-test PASS；缺用例时 exit 1 |
-| E2 | \`${stages.stages[1].command}\` | 12/12 PASS |
-| E3 | \`${stages.stages[2].command}\` | 7/7 PASS |
-| E4 | \`${stages.stages[3].command}\` | 2 PASS + 3 NOT_TESTED |
+| E1 | \`${stages.stages[0].command}\` | ${stageSummary('E1')} |
+| E2 | \`${stages.stages[1].command}\` | ${stageSummary('E2')} |
+| E3 | \`${stages.stages[2].command}\` | ${stageSummary('E3')} |
+| E4 | \`${stages.stages[3].command}\` | ${stageSummary('E4')} |
 | E5 | \`${stages.stages[4].command}\` | 本文件与矩阵 |
 
 本次聚合：**${release.status}**（tier \`${release.tier}\`）。证据目录 \`${runDirectory}\`。

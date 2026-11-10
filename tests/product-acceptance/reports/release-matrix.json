@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "3a0abe28c5ef31fd72bba2ef9ff70c35e5545f36",
+    "commit": "702d2027a0a95f79513e85c443941b2d9e88c76c",
     "dirty": false
   },
   "environment": {
@@ -11,17 +11,17 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-10T05:16:29.030Z",
+  "checkedAt": "2026-11-10T07:36:21.955Z",
   "release": {
-    "tier": "controlled-product-internal-trial",
+    "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 42,
+    "PASS": 78,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 4,
+    "NOT_TESTED": 7,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
@@ -85,6 +85,22 @@
         "E2-DAILY-VERTICAL",
         "E2-ARTIFACT-ROUNDTRIP",
         "E3-ACCEPT-AND-DOWNLOAD"
+      ]
+    },
+    {
+      "id": "verification-recovery",
+      "capability": "验证阻断→明确重新检查→同一候选验证→接受→重开",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "生产故障注入接口不存在；阻断由受控 completion port 注入，其余步骤走真实 HTTP。"
+      ],
+      "evidence": [
+        "E2-VERIFICATION-RECOVERY",
+        "E2-VERIFICATION-FINISHED-STATES",
+        "E3-VERIFICATION-RECOVERY-UI"
       ]
     },
     {
@@ -308,15 +324,16 @@
     },
     {
       "id": "session-catalog",
-      "capability": "会话目录、搜索与归档",
-      "controlledFixture": "NOT_TESTED",
+      "capability": "会话目录、搜索、CAS 重命名、归档与恢复",
+      "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
-      "gaps": [
-        "公共 HTTP 尚无会话目录/搜索/归档接口（见 RFC-E-001 缺口 1）。"
-      ],
-      "evidence": []
+      "gaps": [],
+      "evidence": [
+        "E2-CONVERSATION-CATALOG",
+        "E3-CONVERSATION-UI"
+      ]
     },
     {
       "id": "project-settings-version",
@@ -338,12 +355,53 @@
       "readonly": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "C 的 packages/context、proposals、knowledge 未交付；确认前不执行、重复确认幂等、撤销后失效无法端到端验证。",
-        "本次仅记录 record_decision 的显式拒绝（见 E2-CONTEXT-PROPOSALS-NOT-TESTED）。"
+        "C 三项领域 probe 仍未修复；main 尚无决定/提案 HTTP 入口。",
+        "确认前不执行、重复确认幂等、撤销后失效、事务失败回滚与注入防护均未执行。"
       ],
       "evidence": [
         "E2-CONTEXT-PROPOSALS-NOT-TESTED"
       ]
+    },
+    {
+      "id": "recovery-readonly",
+      "capability": "恢复后首次启动只读、零业务发送",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "解除隔离后的新授权/环境重绑定未实现，不在本轮声明。"
+      ],
+      "evidence": [
+        "E4-RECOVERY-READONLY"
+      ]
+    },
+    {
+      "id": "assistant-state",
+      "capability": "明确决定、授权上下文、结构化提案与事务消费",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "PASS",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "C 的三项领域 probe 仍未修复；main 尚无决定/提案 HTTP 入口。",
+        "确认前不执行、撤销后失效、事务失败回滚与注入防护全部未执行。"
+      ],
+      "evidence": [
+        "E3-ASSISTANT-SCHEMA-FIXTURES"
+      ]
+    },
+    {
+      "id": "distribution",
+      "capability": "可迁移发行、安装、备份恢复、升级回滚",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "D 的 launcher/distribution/portability 未进入 main；无 staged bundle。"
+      ],
+      "evidence": []
     },
     {
       "id": "actual-native",

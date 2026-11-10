@@ -1,6 +1,6 @@
 # Agent E 交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `3957e30cbbaa3cd86a672fb4583922eba8364fc8`，检查点 `835d663`，本次证据源 `3a0abe28c5ef31fd72bba2ef9ff70c35e5545f36`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `8c736f2`，检查点 `7754004`，本次证据源 `702d2027a0a95f79513e85c443941b2d9e88c76c`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
 
@@ -8,13 +8,13 @@
 
 | 阶段 | 命令 | 结果 |
 | --- | --- | --- |
-| E1 | `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | 21/21 self-test PASS；缺用例时 exit 1 |
-| E2 | `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | 12/12 PASS |
-| E3 | `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | 7/7 PASS |
-| E4 | `node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12` | 2 PASS + 3 NOT_TESTED |
+| E1 | `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | PASS 50 |
+| E2 | `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | PASS 15 + NOT_TESTED 1 |
+| E3 | `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | PASS 10 + NOT_TESTED 2 |
+| E4 | `node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12` | PASS 3 + NOT_TESTED 4 |
 | E5 | `node tests/product-acceptance/build-handoff.mjs --run <run-directory>` | 本文件与矩阵 |
 
-本次聚合：**PASS**（tier `controlled-product-internal-trial`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-16-03-627Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T07-35-44-275Z`。
 
 ## 矩阵摘要
 
@@ -24,6 +24,7 @@
 | 明确委托到受控执行、验证与完成 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 问题中心：打开、回答、投递与决策收件箱 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 机器检查、完整 patch、artifact 字节与人工接受 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 验证阻断→明确重新检查→同一候选验证→接受→重开 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 必需机器检查失败不可被人工接受 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 同 commandId 幂等重放与冲突拒绝 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 旧合同/旧候选/旧回答按业务规则拒绝 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED |
@@ -41,9 +42,12 @@
 | 新目录/新账户安装与 first-run | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 完整备份、恢复与路径映射 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 升级与回滚 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 会话目录、搜索与归档 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 会话目录、搜索、CAS 重命名、归档与恢复 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 项目设置版本化与归档 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 上下文、提案与明确决定治理 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 恢复后首次启动只读、零业务发送 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 明确决定、授权上下文、结构化提案与事务消费 | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| 可迁移发行、安装、备份恢复、升级回滚 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 真实原生执行、停止、审批与恢复 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 
 完整数据见 `release-matrix.json`。
@@ -54,6 +58,7 @@
 - **明确委托到受控执行、验证与完成**：真实 Codex 执行属于 B 的原生验收，E 未触发计费任务。
 - **问题中心：打开、回答、投递与决策收件箱**：真实原生权限/审批问题未执行；B 的原生证据未作为输入提供。
 - **机器检查、完整 patch、artifact 字节与人工接受**：原生注册检查与真实 deliverable 未在本轮复验。
+- **验证阻断→明确重新检查→同一候选验证→接受→重开**：生产故障注入接口不存在；阻断由受控 completion port 注入，其余步骤走真实 HTTP。
 - **旧合同/旧候选/旧回答按业务规则拒绝**：旧提案与决定的撤销治理（C 未交付）
 - **会话隔离与工作隔离**：两个独立项目的隔离：受控 lane 只有一个项目。
 - **停止后继续使用新 ticket，不重用旧执行**：真实原生写进程停止与物理资源屏障由 B 证明。
@@ -62,9 +67,11 @@
 - **新目录/新账户安装与 first-run**：D 的 apps/launcher、tools/distribution、packages/portability 尚未交付。
 - **完整备份、恢复与路径映射**：无发行 bundle 与迁移 CLI。
 - **升级与回滚**：无版本化发行产物。
-- **会话目录、搜索与归档**：公共 HTTP 尚无会话目录/搜索/归档接口（见 RFC-E-001 缺口 1）。
 - **项目设置版本化与归档**：仅合同 revision 已验证；项目设置版本 API 未交付（RFC-E-001 缺口 2）。
-- **上下文、提案与明确决定治理**：C 的 packages/context、proposals、knowledge 未交付；确认前不执行、重复确认幂等、撤销后失效无法端到端验证。；本次仅记录 record_decision 的显式拒绝（见 E2-CONTEXT-PROPOSALS-NOT-TESTED）。
+- **上下文、提案与明确决定治理**：C 三项领域 probe 仍未修复；main 尚无决定/提案 HTTP 入口。；确认前不执行、重复确认幂等、撤销后失效、事务失败回滚与注入防护均未执行。
+- **恢复后首次启动只读、零业务发送**：解除隔离后的新授权/环境重绑定未实现，不在本轮声明。
+- **明确决定、授权上下文、结构化提案与事务消费**：C 的三项领域 probe 仍未修复；main 尚无决定/提案 HTTP 入口。；确认前不执行、撤销后失效、事务失败回滚与注入防护全部未执行。
+- **可迁移发行、安装、备份恢复、升级回滚**：D 的 launcher/distribution/portability 未进入 main；无 staged bundle。
 - **真实原生执行、停止、审批与恢复**：B 的原生证据未作为已提交输入提供；E 未获单独预算，不触发模型任务。
 
 ## 限制
