@@ -42,6 +42,8 @@ HTTP 创建输入示例：
 | D | 84d407f（D3） | D1–D3 有提交，D4/D5 尚在继续；发行/迁移未准入。A 的 readArtifactRegistry / WorkflowSnapshots 已随本批进入 main，可替代临时 SQL |
 | E | 835d663（E1）及其工作区后续未提交验收 | 看到产品/浏览器/有界稳定性运行证据，但源码仍 dirty，本批不把未提交验收纳入发布权威；不改 E 的用例 |
 
+收尾时再次观察到后续正式提交：B `549c57b`（B5，含 `98db520` B4），D `73cafed`（含 D4 `e4ab959`、D5 `ef07ad1`），E `6dee03f`（含 clean-commit evidence/handoff）。上表保留本批实际复核的起始检查点；这些新增提交进入下一批准入队列，尚未由主线复验，不能把提交标题当作整包 PASS。
+
 根锁已由主线生成 context/proposals/knowledge/workflows 四个 importer，未新增外部版本或改其它 Agent 锁文件。verification 的旧“当前 schema 必须是 7”断言改为“至少 7 且等于注册表末尾”，旧迁移校验仍保留；23 项验证模块测试通过。
 
 ## C 的明确准入失败与后续接口

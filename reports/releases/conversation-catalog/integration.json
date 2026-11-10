@@ -13,6 +13,11 @@
     "scope": "Actual new catalog HTTP route and visible history region checked without starting a model task; independent fresh state, no old history imported"
   },
   "applicationModelCalls": 0,
+  "laterObservedCandidatesNotYetReverified": {
+    "B": "549c57b (B5, including 98db520 B4)",
+    "D": "73cafed (including e4ab959 D4 and ef07ad1 D5)",
+    "E": "6dee03f (including clean-commit evidence/handoff)"
+  },
   "integratedCandidates": {
     "A": { "source": ["c3e007b", "9174c61", "c74f2c6"], "main": ["aec47df", "5fc44ca", "3f28219"], "scope": "Storage and workflow packages, plus main-owned conversation product composition" },
     "C": { "source": ["c3046c9", "4dbfc5f", "82d6a36", "2441281"], "main": ["cfa6d1e", "2fabc47", "abfe055", "76027bb"], "scope": "Package source and offline consumer only; production context/decisions are unconnected and admission is blocked" }
