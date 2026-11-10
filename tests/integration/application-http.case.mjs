@@ -51,7 +51,7 @@ test('recovery read-only blocks business writes and removes action grants while 
   assert.deepEqual(snapshot.works[0].actions.available, [])
   const work = await (await server.request(`${BASE}/v1/works/${snapshot.works[0].work.id}`, { headers })).json()
   assert.deepEqual(work.actions.available, [])
-  for (const route of ['/v1/commands', '/v1/projects', '/v1/conversations/commands', '/v1/assistant/model', '/v1/works/work-one/verification/retry']) {
+  for (const route of ['/v1/commands', '/v1/projects', '/v1/projects/project-one/settings', '/v1/conversations/commands', '/v1/assistant/model', '/v1/works/work-one/verification/retry']) {
     const response = await server.request(`${BASE}${route}`, { method: 'POST', headers, body: '{}' })
     assert.equal(response.status, 422)
     assert.equal((await response.json()).error.retry, 'none')

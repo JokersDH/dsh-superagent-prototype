@@ -525,3 +525,20 @@ button.stage-pending:hover:not(:disabled) { border: 0; background: #f5e9d3; colo
 .catalog-more { width: 100%; margin-top: 6px; font-size: 12px; }
 .conversation-head h2 { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .conversation-heading > div { min-width: 0; max-width: 100%; }
+.project-settings-dialog { width: min(470px, calc(100% - 32px)); max-height: calc(100dvh - 48px); overflow-y: auto; margin: auto; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); box-shadow: 0 18px 70px #17251e26; }
+.project-settings-dialog::backdrop { background: #17251e55; }
+.project-settings-dialog header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; }
+.project-settings-dialog h2 { margin: 0 0 4px; font-size: 17px; }
+.project-settings-dialog fieldset { display: flex; flex-direction: column; gap: 16px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.project-settings-dialog label { display: flex; flex-direction: column; gap: 7px; font-size: 12px; }
+.project-settings-dialog input:not([type=checkbox]), .project-settings-dialog select { width: 100%; min-width: 0; min-height: 36px; padding: 8px; border: 1px solid var(--line); border-radius: 5px; font-size: 13px; color: var(--ink); background: #fff; }
+.project-settings-dialog .settings-toggle { flex-direction: row; align-items: flex-start; gap: 8px; line-height: 1.6; }
+.settings-toggle input { width: 15px; height: 15px; flex: 0 0 15px; margin: 2px 0 0; accent-color: var(--accent); }
+.settings-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0; }
+.settings-actions button, .project-settings-dialog footer button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.settings-history { margin-top: 14px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12px; }
+.settings-history ol { display: flex; flex-direction: column; gap: 12px; padding: 0; list-style: none; }
+.settings-history li { display: flex; flex-direction: column; gap: 3px; overflow-wrap: anywhere; }
+.settings-notice { color: var(--ok); font-size: 12px; }
+.project-settings-dialog footer { display: flex; justify-content: flex-end; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 16px; }
+@media (max-width: 700px) { .project-settings-dialog { padding: 20px; } .project-settings-dialog input:not([type=checkbox]), .project-settings-dialog select { min-height: 40px; font-size: 16px; } }

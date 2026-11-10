@@ -62,6 +62,7 @@ import type {
 } from '@personal-agent/contracts'
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
+import { ProjectSettings } from './ProjectSettings.tsx'
 import type { FixtureAdapter } from './fixture.ts'
 import { conversationId as defaultConversationId } from './config.ts'
 const phaseLabel: Record<WorkView['phase'], string> = {
@@ -798,6 +799,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               <h2>项目与工作</h2>
               <span className="count">{works.length}</span>
               <span className="section-tools">
+                {projectFilter && configuration?.projects.find(project => project.id === projectFilter)?.settingsAvailable && transport.projectSettings && transport.projectSettingsCommand &&
+                  <ProjectSettings key={projectFilter} projectId={projectFilter} transport={transport} onOpen={() => setWorkspaceOpen(false)} onCommitted={async () => { await refreshConfiguration(); scheduleRefresh() }} />}
                 <button
                   type="button"
                   className="icon-button"

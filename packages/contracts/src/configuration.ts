@@ -52,6 +52,7 @@ export const ConfiguredProjectViewSchema = z
     profileIds: ids,
     defaultProfileId: IdSchema.optional(),
     defaultCriteria: RequiredCriteriaSchema,
+    settingsAvailable: z.boolean().optional(),
     dispatchAllowed: z.boolean(),
     blockedReason: AppErrorCodeSchema.optional(),
   })

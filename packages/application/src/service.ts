@@ -74,6 +74,8 @@ export interface ApplicationOptions {
   completion?: CompletionReviewPort
   assistantReplies?: boolean
   projectPreflight?: (projectId: string) => Promise<void>
+  registeredCheck?: (id: string) => boolean
+  projectGrant?: (input: { projectId: string; profileId: string; criteria: ContractRevision['criteria']; newWork: boolean }) => void
   verificationRecovery?: {
     retry(candidate: CandidateRef, blockedId: string): void
     blocked?(candidate: CandidateRef): boolean
@@ -392,11 +394,12 @@ class LocalApplication implements ProductApplication {
     if (revision > 200) throw new ApplicationFault('budget_exceeded', 'Work revision limit reached', 'none')
     if (!this.options.profileIds.includes(profileId))
       throw new ApplicationFault('unsupported_capability', 'Unknown execution profile')
+    this.options.projectGrant?.({ projectId: work.projectId, profileId, criteria: command.criteria, newWork: command.kind === 'create_work' })
     if (
       !command.criteria.some((item) => item.kind === 'machine' && item.required) ||
       command.criteria.some(
         (item) =>
-          item.kind === 'machine' && item.required && !this.options.registeredChecks.includes(item.checkDefinitionRef),
+          item.kind === 'machine' && item.required && !(this.options.registeredCheck?.(item.checkDefinitionRef) ?? this.options.registeredChecks.includes(item.checkDefinitionRef)),
       )
     )
       throw new ApplicationFault(

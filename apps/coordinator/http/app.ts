@@ -32,6 +32,8 @@ import {
   ConversationCatalogSchema,
   ConversationSummarySchema,
   ConversationCommandSchema,
+  ProjectSettingsPageSchema,
+  ProjectSettingsCommandSchema,
 } from '@personal-agent/contracts'
 import type {
   AnswerDelivery,
@@ -53,6 +55,8 @@ import type {
   ConversationSummary,
   ConversationCommand,
   WorkView,
+  ProjectSettingsPage,
+  ProjectSettingsCommand,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -102,10 +106,12 @@ export interface LocalHttpOptions {
   operations?: {
     retryVerification(command: VerificationRetryCommand, actor: TrustedActor): Promise<CommandReceipt>
     conversation?(command: ConversationCommand, actor: TrustedActor): Promise<CommandReceipt>
+    projectSettings?(command: ProjectSettingsCommand, actor: TrustedActor): Promise<CommandReceipt>
   }
   read?: {
     conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog>
     conversation?(id: string): Promise<ConversationSummary>
+    projectSettings?(projectId: string): Promise<ProjectSettingsPage>
     assistant?(): Promise<AssistantProviderStatus>
     assistantStream?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
     selectModel?(model: string): Promise<AssistantProviderStatus>
@@ -302,6 +308,22 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
       throw new ApplicationFault('unsupported_capability', 'Project registration is not connected')
     const input = ProjectRegistrationInputSchema.parse(await c.req.json())
     return c.json(ApplicationConfigurationSchema.parse(await options.read.registerProject(input)))
+  })
+  app.get('/v1/projects/:id/settings', async (c) => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Project settings do not accept query parameters')
+    if (!options.read?.projectSettings) throw new ApplicationFault('unsupported_capability', 'Project settings are not connected')
+    const id = IdSchema.parse(c.req.param('id')), value = ProjectSettingsPageSchema.parse(await options.read.projectSettings(id))
+    if (value.current.projectId !== id) throw new ApplicationFault('storage_unavailable', 'Project settings identity mismatch', 'none')
+    return c.json(value)
+  })
+  app.post('/v1/projects/:id/settings', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Project settings require JSON')
+    if (!options.operations?.projectSettings) throw new ApplicationFault('unsupported_capability', 'Project settings are not connected')
+    const id = IdSchema.parse(c.req.param('id')), command = ProjectSettingsCommandSchema.parse(await c.req.json())
+    if (command.projectId !== id) throw new ApplicationFault('invalid_request', 'Project settings command belongs to another project')
+    const receipt = CommandReceiptSchema.parse(await options.operations.projectSettings(command, c.get('actor')))
+    if (receipt.commandId !== command.commandId) throw new ApplicationFault('storage_unavailable', 'Project settings receipt identity mismatch', 'none')
+    return c.json(receipt)
   })
   app.get('/v1/works/:id/location', async (c) => {
     if (!options.read?.workLocation)
