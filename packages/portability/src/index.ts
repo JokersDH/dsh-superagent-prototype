@@ -1,0 +1,43 @@
+/**
+ * @personal-agent/portability — local distribution and migration support for one personal
+ * install. It resolves private product roots, defines the complete backup bundle format, and
+ * (in later stages) creates/verifies/restores bundles through the storage snapshot port. It never
+ * opens a second production writer and never dispatches business during backup/restore.
+ */
+export { PortabilityError, isPortabilityError, type PortabilityCode } from './errors.ts'
+export {
+  PRODUCT_ID,
+  ROOT_NAMES,
+  defaultRoots,
+  describeRoots,
+  ensureRoots,
+  makePrivateDirectory,
+  platformSupport,
+  resolveRoots,
+  type EnsuredRoots,
+  type PrivateRootName,
+  type ProductRoots,
+  type RootName,
+  type RootOptions,
+  type RootOverrides,
+  type RootReport,
+} from './roots.ts'
+export {
+  BUNDLE_FORMAT,
+  BUNDLE_FORMAT_VERSION,
+  BUNDLE_LIMITS,
+  DATABASE_ENTRY,
+  MANIFEST_ENTRY,
+  assertSafeEntryPath,
+  canonicalJson,
+  manifestDigest,
+  sha256Hex,
+  validateManifest,
+  type BackupManifest,
+  type BundleEntry,
+  type BundleEntryKind,
+  type DatabaseFacts,
+  type ExcludedEntry,
+  type PathBinding,
+  type WriterClaimFacts,
+} from './manifest.ts'

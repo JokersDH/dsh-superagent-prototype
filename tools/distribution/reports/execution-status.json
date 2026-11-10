@@ -1,0 +1,50 @@
+{
+  "package": "product-wave-03 / D",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "3957e30",
+  "auditedBaseline": "c3f018e",
+  "updatedAt": "2026-11-10T04:40:00.000Z",
+  "modelBudget": { "allocated": 0, "used": 0, "note": "No native/model task is dispatched; all smoke paths are controlled/fixture." },
+  "phases": [
+    {
+      "id": "D1",
+      "status": "IN_PROGRESS",
+      "delivered": [
+        "docs/rfcs/WP-12/0001-local-distribution-rfc.zh-CN.md",
+        "packages/portability roots + pa-backup/1 manifest + safe-path validation",
+        "apps/launcher first-run/build/doctor/status with instance-record identity rules",
+        "tools/distribution build + pa-release/1 manifest + install smoke"
+      ],
+      "checks": [
+        { "id": "portability-typecheck", "command": "pnpm --dir packages/portability typecheck", "result": "PASS" },
+        { "id": "portability-tests", "command": "node --test packages/portability/test/*.case.ts", "result": "PASS (14)" },
+        { "id": "launcher-tests", "command": "node --test apps/launcher/test/*.case.mjs", "result": "PASS (5)" },
+        { "id": "distribution-build", "command": "node tools/distribution/build.mjs --install-root . --config-root <tmp> --json", "result": "PASS (269 artifacts, buildId c6152ddc168586d3)" },
+        { "id": "install-smoke", "command": "node tools/distribution/smoke-install.mjs", "result": "PASS (doctor DEGRADED: no running instance yet)" }
+      ],
+      "evidence": ["tools/distribution/reports/install-smoke.json"],
+      "blockers": []
+    },
+    { "id": "D2", "status": "NEXT", "delivered": [], "checks": [], "evidence": [], "blockers": [] },
+    { "id": "D3", "status": "NEXT", "delivered": [], "checks": [], "evidence": [], "blockers": [] },
+    { "id": "D4", "status": "NEXT", "delivered": [], "checks": [], "evidence": [], "blockers": [] },
+    { "id": "D5", "status": "NEXT", "delivered": [], "checks": [], "evidence": [], "blockers": [] }
+  ],
+  "crossModuleRequests": [
+    { "id": "GAP-D1", "owner": "main", "request": "Same-origin static console + first-run/config HTTP interface; interim launcher static server + /v1 reverse proxy." },
+    { "id": "GAP-D2", "owner": "main/A", "request": "Recovery startup mode that opens a restored state without consuming the queue or resending begin/deliver/answer." },
+    { "id": "GAP-D3", "owner": "A", "request": "Public read port for referenced artifacts and current writer/instance facts; interim read-only SELECT is labelled." },
+    { "id": "GAP-D4", "owner": "main", "request": "Freeze one local-instance semantic if tools/dev and the launcher converge." },
+    { "id": "GAP-D5", "owner": "main", "request": "Regenerate the root pnpm-lock.yaml for the new packages/portability and apps/launcher importers (local lock diff is not committed)." }
+  ],
+  "limitations": [
+    "Only darwin/arm64 + Node 24.21.x is a measured candidate; macOS x64/Linux/Windows are NOT_TESTED.",
+    "Same-machine install model: node_modules and the native SQLite binding are not cross-machine portability evidence.",
+    "No daemon start, backup bundle or restore exists yet; those are D2-D4."
+  ],
+  "nextConsumerSteps": [
+    "A/main: review docs/rfcs/WP-12/0001-local-distribution-rfc.zh-CN.md GAP-D1..D5; regenerate the root lock for the two new importers.",
+    "E: do not run installation acceptance yet; D2-D5 entrypoints are still landing."
+  ]
+}
