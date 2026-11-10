@@ -1,0 +1,172 @@
+{
+  "generatedAt": "2026-11-10T04:34:12.462Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "B3 questions (fixture)",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 6,
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "B3-QUESTION-CREATED",
+      "title": "a question names its work, version, options and target",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "version 1, 2 option(s), target bound to the work"
+      ],
+      "evidence": [
+        {
+          "version": 1,
+          "kind": "permission",
+          "options": [
+            "allow",
+            "deny"
+          ],
+          "targets": 1
+        }
+      ],
+      "entities": [
+        {
+          "workId": "5bdf28d22113ce80569e85a9130b14ff",
+          "questionId": "1ca6f9a5860c2426e5417f994dc50d4e"
+        }
+      ]
+    },
+    {
+      "id": "B3-STALE-VERSION",
+      "title": "an answer with a stale version is refused",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "refused (HTTP 200) and the question version is unchanged"
+      ],
+      "evidence": [
+        {
+          "status": 200,
+          "body": {
+            "commandId": "cmd-ans-1794285251049-ebbb",
+            "seq": 545,
+            "status": "rejected",
+            "error": {
+              "code": "stale_binding",
+              "message": "Question version changed",
+              "retry": "user_action"
+            }
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-LEGAL-ANSWER",
+      "title": "a legal answer is persisted and its delivery state is observable",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "answer recorded (seq 549); 1 delivery record(s) visible"
+      ],
+      "evidence": [
+        {
+          "status": 200,
+          "receipt": {
+            "commandId": "cmd-ans-1794285251062-9db3",
+            "workId": "5bdf28d22113ce80569e85a9130b14ff",
+            "entityRefs": {
+              "questionId": "1ca6f9a5860c2426e5417f994dc50d4e"
+            },
+            "seq": 549,
+            "status": "recorded"
+          }
+        },
+        {
+          "deliveries": 1
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-DUPLICATE-ANSWER",
+      "title": "repeating an answer does not apply twice",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "second answer refused/ignored (HTTP 200)"
+      ],
+      "evidence": [
+        {
+          "status": 200,
+          "body": {
+            "commandId": "cmd-ans-1794285251067-68ce",
+            "seq": 550,
+            "status": "rejected",
+            "error": {
+              "code": "stale_binding",
+              "message": "Question version changed",
+              "retry": "user_action"
+            }
+          },
+          "questionStillPresent": false
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-STOPPED-WORK",
+      "title": "an answer after stop cannot reopen the writer",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "late answer did not reopen work (HTTP 200, phase=ended)"
+      ],
+      "evidence": [
+        {
+          "status": 200,
+          "body": {
+            "commandId": "cmd-ans-1794285252455-1d26",
+            "seq": 599,
+            "status": "rejected",
+            "error": {
+              "code": "stale_binding",
+              "message": "Question targets require current native bindings",
+              "retry": "reconcile"
+            }
+          },
+          "phase": "ended",
+          "resources": "quiescent"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-UNKNOWN-TARGET",
+      "title": "an answer for an unknown question is refused",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "refused (HTTP 400)"
+      ],
+      "evidence": [
+        {
+          "status": 400,
+          "body": {
+            "error": {
+              "code": "invalid_request",
+              "message": "Request or response does not match the product schema",
+              "retry": "none"
+            }
+          }
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
