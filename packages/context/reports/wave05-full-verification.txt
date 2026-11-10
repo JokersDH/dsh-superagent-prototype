@@ -1,0 +1,109 @@
+# Agent C wave-05 full verification (2026-11-10T12:35:19Z)
+
+## @personal-agent/context
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ an unknown but valid cursor produces an explicit empty page (0.071875ms)
+✔ source descriptors are not trusted blindly: a port cannot smuggle a foreign project (0.073875ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 492.937291
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/proposals
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ decision and revision proposals keep their exact scope and current contract (0.255708ms)
+✔ the shared ReasonerProposal schema is the only accepted proposal shape (0.086125ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 135.440041
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/knowledge
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ duplicate confirmation, same-id payload changes, foreign actors and cross-project input are refused (4.729916ms)
+✔ supersession and source disappearance govern later decision reads (11.876791ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 347.666792
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/routing
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ review reports parse strictly and never become executable text (3.382209ms)
+✔ evidence assembly uses the report disposition and requires exactly one isolation proof (3.157625ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 242.116042
+### build
+$ tsc -p tsconfig.build.json
+
+## real SQLite assistant probe
+  "status": "PASS_SQLITE_ASSISTANT_CONSUMER",
+      "id": "PENDING-PROPOSAL-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "CONFIRM-RECEIPT-FAILURE-ROLLS-BACK-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "CONFIRM-REOPEN-AND-REPLAY-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "DECISION-PROVENANCE-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "DECISION-DOMAIN-REPLAY-OVER-STORAGE",
+      "owner": "C",
+      "status": "PASS"
+      "id": "DECISION-REVOKE-AND-REOPEN-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "SOURCE-INVALIDATION-EXCLUDES-PERSISTED-DECISION",
+      "owner": "integration",
+      "status": "PASS"
+
+## wave-04 C admission regression
+  "status": "PASS_ADMISSION_PROBES",
+      "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+      "status": "PASS",
+      "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+      "status": "PASS",
+      "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+      "status": "PASS",
+
+## decision transaction example
+{"status":"PASS","modelCalls":0,"networkCalls":0,"sqlite":"real temporary SQLite via A ProductStore/AssistantStatePort"}
+## routing consumer example
+{"status":"PASS","modelCalls":0,"networkCalls":0,"attentionTop":["permission-1:deadline","clarify-1:expired"],"adviceBasis":"only_eligible","reviewState":"current","staleReason":"candidate_changed","realRoutingEvidencePort":"NOT_TESTED (A-owned RoutingEvidencePort not present on main)"}
+## persisted assistant example
+{"status":"PASS","modelCalls":0,"networkCalls":0,"realSqlAdapter":"NOT_TESTED (A-owned AssistantStatePort not present on main)"}

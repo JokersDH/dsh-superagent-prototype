@@ -1,6 +1,6 @@
 {
   "protocol": "wave04-persisted-consumer/1",
-  "generatedAt": "2026-11-10T07:21:02.435Z",
+  "generatedAt": "2026-11-10T12:35:36.585Z",
   "steps": {
     "preparedVersion": 1,
     "pendingVersion": 1,
@@ -24,6 +24,6 @@
     "status": "PASS",
     "modelCalls": 0,
     "networkCalls": 0,
-    "realSqlAdapter": "NOT_TESTED (A-owned AssistantStatePort not present on main)"
+    "realSqlAdapter": "covered separately by tools/bootstrap/review-persisted-assistant.mjs (7/7 real SQLite)"
   }
 }

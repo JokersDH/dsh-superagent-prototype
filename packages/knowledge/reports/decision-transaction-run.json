@@ -1,6 +1,6 @@
 {
   "protocol": "wave05-decision-transaction/1",
-  "generatedAt": "2026-11-10T12:29:10.939Z",
+  "generatedAt": "2026-11-10T12:35:29.959Z",
   "steps": {
     "prepareWroteNothing": true,
     "createdVersion": 1,
