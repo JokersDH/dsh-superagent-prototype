@@ -1,0 +1,14 @@
+{
+  "wave": "product-wave-03 / Agent B",
+  "branch": "codex/g1-runtime",
+  "base": "c3f018e",
+  "ownedPaths": ["apps/runner/", "packages/drivers/codex-native/", "packages/driver-kit/", "packages/testing/", "tests/native-acceptance/"],
+  "modelBudget": { "grantId": "wave03-b-native", "limit": 4, "used": 0, "ledger": "tests/native-acceptance/reports/model-budget.json", "note": "historical rounds keep their own ledger; this grant does not grow on retry/date/phase change" },
+  "phases": {
+    "B1": { "status": "passed", "commit": "pending", "deliverables": ["docs/rfcs/WP-03/0001-native-control-admission-interface.md", "tests/native-acceptance/b1-vertical.mjs", "tests/native-acceptance/budget.mjs"], "measured": "5/5 PASS, zero model calls" },
+    "B2": { "status": "pending" },
+    "B3": { "status": "pending" },
+    "B4": { "status": "pending" },
+    "B5": { "status": "pending" }
+  }
+}

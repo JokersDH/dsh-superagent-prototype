@@ -1,7 +1,7 @@
 {
   "phase": "complete-except-blocked",
   "branch": "codex/g1-runtime",
-  "base": "f2ca26c",
+  "base": "c3f018e",
   "commit": "2c1f604",
   "modelTasks": {
     "limit": 4,
@@ -10,65 +10,9 @@
     "note": "budget is not reset by the task phase change"
   },
   "phases": {
-    "B-R1": {
+    "B1": {
       "status": "passed",
-      "commit": "a73293f",
-      "cases": {
-        "NATIVE-NO-CANDIDATE-MUST-NOT-PASS": true,
-        "CONTINUE-COMMAND-MUST-SATISFY-SHARED-SCHEMA": true
-      },
-      "deliverables": [
-        "NATIVE-LINK ends once and only after a real candidate, a patch reference or distinct base/head, machine checks PASS and a readable artifact",
-        "the illegal extra continue_work is removed (create_work already queues execution)",
-        "schema 400 and typed business rejection are distinct outcomes",
-        "strict mode also refuses a stale recorded report"
-      ],
-      "probe": "review-native-acceptance.mjs -> PASS_ACCEPTANCE_GUARDS_ONLY"
-    },
-    "B-R2": {
-      "status": "passed",
-      "commit": "73f1d80",
-      "evidence": {
-        "machineChecks": 1,
-        "patchBytes": 803,
-        "patchFormat": "git-binary-diff/1",
-        "appliesTo": [
-          "src/index.mjs",
-          "test/sum.test.mjs"
-        ],
-        "clonePinnedAtBase": true
-      },
-      "note": "verification reads all three artifact shapes and enforces the declared byte count; the patch is applied to a clean clone, never the source tree"
-    },
-    "B-R3": {
-      "status": "passed",
-      "lifecycle": "6/6 PASS",
-      "restart": "5/5 PASS",
-      "browser": "4/4 PASS",
-      "lifecycleCases": [
-        "BR3-PASS-LIFECYCLE",
-        "BR3-CHECK-FAIL (machine FAIL present, acceptance refused HTTP 400)",
-        "BR3-STOP (phase ended, resources quiescent)",
-        "BR3-RELOAD",
-        "BR3-ISOLATION",
-        "BR3-RESOURCES"
-      ],
-      "restartCases": [
-        "BR3-RESTART-BOOT",
-        "BR3-RESTART-WORK",
-        "BR3-RESTART-KILL (SIGKILL of the owned child)",
-        "BR3-RESTART-REOPEN (identity preserved, no second begin)",
-        "BR3-RESTART-ACTIONABLE"
-      ],
-      "browserCases": [
-        "desktop 1440x900: 24 reachable buttons, no overlap, screenshot 55533B",
-        "narrow 390x844: 9 reachable buttons, no overlap, screenshot 28586B",
-        "keyboard focus reaches a control in both viewports"
-      ]
-    },
-    "B-R4": {
-      "status": "blocked",
-      "reason": "environment integration not published; dependency-installation lane remains disabled pending A"
+      "note": "interface RFC + controlled vertical checkpoint"
     }
   },
   "next": "only B-R4 remains, blocked on the main environment integration",
@@ -106,12 +50,6 @@
   "openBlockers": {
     "BLOCKER-4": "environment integration not published to the product entry (B-R4)"
   },
-  "finalReport": {
-    "B-R1": "passed",
-    "B-R2": "passed",
-    "B-R3": "passed",
-    "B-R4": "blocked (BLOCKER-4)"
-  },
   "commands": {
     "releaseGuards": "node tools/bootstrap/review-native-acceptance.mjs --acceptance . --candidate <commit>",
     "selftest": "node --test tests/native-acceptance/selftest.mjs",
@@ -123,5 +61,6 @@
     "deterministic": "node tests/native-acceptance/b3-deterministic.mjs --url <url> --state <dir>",
     "soak": "node tests/native-acceptance/b5-soak.mjs --url <url> --state <dir> --soak 5",
     "conformance": "node tests/native-acceptance/b6-conformance.mjs --url <url> --state <dir>"
-  }
+  },
+  "wave": "product-wave-03"
 }

@@ -1,0 +1,109 @@
+{
+  "generatedAt": "2026-11-10T04:32:24.708Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "lane": "B1 vertical (no model)",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 5,
+    "PASS": 5,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "B1-ADMISSION",
+      "title": "admission facts are explicit and separate inspection from native test",
+      "lane": "readonly",
+      "status": "PASS",
+      "detail": [
+        "1 native profile(s); none admitted without native_test_passed"
+      ],
+      "evidence": [
+        {
+          "natives": [
+            {
+              "id": "profile-codex-native",
+              "readiness": "native_test_passed",
+              "allowed": true
+            }
+          ],
+          "fixtures": 4
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B1-REJECTION-CLASSES",
+      "title": "business rejection and schema 400 are separated",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "schema 400 vs typed result (HTTP 200, code invalid_request)"
+      ],
+      "evidence": [
+        {
+          "malformedStatus": 400,
+          "businessStatus": 200,
+          "businessCode": "invalid_request"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B1-SINGLE-BEGIN",
+      "title": "a controlled work has exactly one begin and one candidate generation",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "one assignment bd6e565ee4e16c95e9441cfb6a1c64bc owns the candidate"
+      ],
+      "evidence": [],
+      "entities": [
+        {
+          "workId": "9322f68380693f74e22a54856526d59c",
+          "assignment": "bd6e565ee4e16c95e9441cfb6a1c64bc",
+          "candidate": "bd6e565ee4e16c95e9441cfb6a1c64bc"
+        }
+      ]
+    },
+    {
+      "id": "B1-STOP-QUIESCENCE",
+      "title": "stop reports a quiescence result from the owned inventory",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "stop proved quiescence from the owned inventory"
+      ],
+      "evidence": [
+        {
+          "stopStatus": 200,
+          "finalPhase": "ended",
+          "resources": "quiescent"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B1-BUDGET",
+      "title": "the model budget ledger refuses an over-limit task and keeps history",
+      "lane": "readonly",
+      "status": "PASS",
+      "detail": [
+        "over-limit refused; an uncertain send is still counted; history preserved"
+      ],
+      "evidence": [
+        {
+          "refused": true,
+          "remaining": 0,
+          "spent": 2
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
