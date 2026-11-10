@@ -9,7 +9,8 @@ import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync 
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
-  cleanupPreparedEnvironment, prepareEnvironment, standaloneProcessPort, verifyPreparedEnvironment,
+  cleanupPreparedEnvironment, parseEnvironmentRef, parsePreparationResult, parseTrustedCleanupResult, parseEnvironmentVerification,
+  prepareAuthoritativeEnvironment, prepareEnvironment, projectWorkspaceEnvironment, standaloneProcessPort, verifyPreparedEnvironment,
   type EnvironmentProcessPort, type EnvironmentRef, type PreparationResult,
 } from '../src/index.ts'
 import {
@@ -333,4 +334,55 @@ test('stdout and stderr share one interleaved byte budget without splitting char
     assert.equal(result.stdout.includes('\uFFFD'), false)
     assert.equal(result.stderr.includes('\uFFFD'), false)
   } finally { clean(cwd) }
+})
+
+
+test('the production entry requires an authority root and parsers reject malformed persisted data', async () => {
+  const fixture = makePnpmFixture()
+  const { project, workspace } = copies(fixture)
+  const authorityRoot = tempDir('environment-authority-')
+  try {
+    const missing = await prepareAuthoritativeEnvironment({ ...input(project, workspace, 'offline_install', {
+      storeDir: fixture.store,
+    }), authorityRoot: undefined } as never)
+    blockedCode(missing, 'authority_root_required')
+    assert.equal(existsSync(join(workspace, '.product-environment')), false)
+
+    const result = ready(await prepareAuthoritativeEnvironment({
+      ...input(project, workspace, 'offline_install', { storeDir: fixture.store, requestId: 'production-entry' }),
+      authorityRoot,
+    }))
+    const ref = parseEnvironmentRef(result.environmentRef)
+    assert.equal(parsePreparationResult(result).status, 'ready')
+    assert.throws(() => parsePreparationResult({ ...result, status: 'ready', fingerprint: 'short' }), /incomplete/)
+    assert.throws(() => parseEnvironmentRef({ ...ref, receiptId: 'not-a-receipt' }), /receiptId/)
+    assert.throws(() => parseEnvironmentRef({ ...ref, authorityRoot: 'relative' }), /absolute/)
+    const verified = parseEnvironmentVerification(verifyPreparedEnvironment(ref))
+    assert.equal(verified.status, 'valid')
+    const cleanup = parseTrustedCleanupResult(await cleanupPreparedEnvironment(ref))
+    assert.equal(cleanup.status, 'cleaned')
+    assert.throws(() => projectWorkspaceEnvironment(ref), /receipt_missing/)
+  } finally { clean(fixture.root, authorityRoot) }
+})
+
+test('workspace projection is opaque and fails closed after replacement or drift', async () => {
+  const fixture = makePnpmFixture()
+  const { project, workspace } = copies(fixture)
+  const authorityRoot = tempDir('environment-authority-')
+  try {
+    const result = ready(await prepareEnvironment(input(project, workspace, 'offline_install', {
+      storeDir: fixture.store, requestId: 'projection', authorityRoot,
+    })))
+    const ref = result.environmentRef!
+    const projected = projectWorkspaceEnvironment(ref)
+    assert.equal(projected.reference, ref.receiptId)
+    assert.equal(projected.reference.includes(workspace), false)
+    assert.equal(projected.fingerprint, result.fingerprint)
+    assert.deepEqual([...projected.excludedPaths].sort(), ['.product-environment', 'node_modules'])
+
+    writeJson(join(workspace, 'node_modules/env-dep/package.json'), { name: 'env-dep', version: '9.0.0', main: 'index.js' })
+    assert.throws(() => projectWorkspaceEnvironment(ref), /environment_drift/)
+    await cleanupPreparedEnvironment(ref)
+    assert.throws(() => projectWorkspaceEnvironment(ref), /receipt_missing/)
+  } finally { clean(fixture.root, authorityRoot) }
 })

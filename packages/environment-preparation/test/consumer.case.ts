@@ -24,7 +24,9 @@ const runTest = (cwd: string, env: Readonly<Record<string, string>>) =>
   spawnSync(process.execPath, ['--test'], { cwd, env: { ...env }, encoding: 'utf8', timeout: 30_000 })
 
 test('both offline recipes prepare, install and run their real tests', async () => {
-  const out = join(tempDir('environment-recipes-'), 'recipes')
+  const root = tempDir('environment-recipes-')
+  const out = join(root, 'recipes')
+  const authorityRoot = tempDir('environment-recipes-authority-')
   try {
     execFileSync(process.execPath, [join(packageRoot, 'recipes', 'build-recipes.mjs'), '--out', out], { stdio: 'ignore', timeout: 120_000 })
     const store = join(out, 'store')
@@ -34,15 +36,17 @@ test('both offline recipes prepare, install and run their real tests', async () 
       mkdirSync(project)
       writeJson(join(project, 'package.json'), { name: `original-${name}`, private: true })
       const prepared = ready(await prepareEnvironment(input(project, workspace, 'offline_install', {
-        storeDir: store, requestId: `recipe-${name}`,
+        storeDir: store, requestId: `recipe-${name}`, authorityRoot,
       })))
+      assert.ok(prepared.environmentRef, 'recipes use the production receipt path')
+      assert.equal(verifyPreparedEnvironment(prepared.environmentRef).status, 'valid')
       if (name === 'dev-deps') execFileSync(process.execPath, ['build.mjs'], { cwd: workspace })
       const run = runTest(workspace, prepared.environment as Readonly<Record<string, string>>)
       assert.equal(run.status, 0, `${name}: ${String(run.stdout)}\n${String(run.stderr)}`)
       await prepared.cleanup()
       assert.equal(existsSync(join(workspace, 'node_modules')), false)
     }
-  } finally { clean(join(out, '..')) }
+  } finally { clean(root, authorityRoot) }
 })
 
 test('consumer examples prepare in one process and verify/cleanup in a second', () => {
@@ -98,7 +102,7 @@ test('a restarted caller recovers receipts, replays are refused and cleanup/rebu
     cpSync(join(moved, 'vendor'), join(workspace, 'vendor'), { recursive: true })
     const replaced = verifyPreparedEnvironment(rebuilt.environmentRef!)
     assert.equal(replaced.status, 'blocked')
-    assert.ok(['ownership_changed', 'environment_inputs_changed'].includes(replaced.code), `replaced code: ${replaced.code}`)
+    assert.ok(['workspace_replaced', 'ownership_changed', 'environment_inputs_changed'].includes(replaced.code), `replaced code: ${replaced.code}`)
     await rebuilt.cleanup()
     rmSync(workspace, { recursive: true, force: true })
     renameSync(moved, workspace)

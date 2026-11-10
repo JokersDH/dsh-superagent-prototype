@@ -59,6 +59,23 @@ const suggestions: Record<string, readonly string[]> = {
   ambiguous_lock: ['请只保留一个 lockfile。'],
   network_dependency: ['请移除需要联网/git 的依赖，使用本地 tarball 或授权离线 store。'],
   workspace_environment_untrusted: ['请使用可信清理入口处理既有环境目录，不要伪造 marker。'],
+  environment_state_untrusted: ['工作区 marker 没有签名收据支持；保留现场，使用可信凭证或由所有者处理。'],
+  workspace_replaced: ['工作区目录已被替换；旧环境不得复用或清理，请重新准备。'],
+  authority_root_required: ['生产准备需要项目/工作区之外的私有 authorityRoot；不能使用无凭证模式。'],
+  authority_invalid: ['authorityRoot 必须存在、为当前用户私有目录且不在项目/工作区内。'],
+  authority_unavailable: ['authorityRoot 不可读取或已被破坏；缺失收据不能恢复成 ready。'],
+  receipt_missing: ['签收据已丢失；不能恢复为 ready，也不会自动删除环境。'],
+  receipt_forged: ['收据签名/内容不匹配；按不可信处理并保留现场。'],
+  receipt_mismatch: ['ref 与签名收据不一致；拒绝复用与清理。'],
+  ownership_changed: ['归属目录已被替换或删除；拒绝复用与清理。'],
+  cleanup_forbidden: ['归属 inode 已变化；不删除该目录。'],
+  cleanup_unproven: ['无法证明进程或目录已停止/清理；不得当作完成。'],
+  cancelled: ['准备已取消；仅清理本次拥有的状态。'],
+  timeout: ['准备超时；检查进程组是否停止后重试。'],
+  output_limit: ['输出超出合并字节预算；安装被终止。'],
+  disk_limit: ['工作区超出磁盘预算；安装被终止。'],
+  install_failed: ['离线安装失败；请查看受限诊断并修正输入。'],
+  manager_missing: ['包管理器不可执行；不会联网安装或升级。'],
 }
 const suggest = (code: string) => suggestions[code] ?? ['请根据诊断修正项目配置后重试。']
 const chinese = (code: string): string => {

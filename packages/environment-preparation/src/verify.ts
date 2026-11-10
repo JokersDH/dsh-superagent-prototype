@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, rmSync } from 'node:fs'
+import { existsSync, lstatSync, readdirSync, rmSync } from 'node:fs'
 import { canonical, inside } from './paths.ts'
 import { inspectWorkspace } from './project.ts'
 import { scanInstalledTree } from './installed.ts'
@@ -6,8 +6,10 @@ import { inspectPnpmWorkspace, scanWorkspaceInstalled } from './workspace.ts'
 import {
   identityMatches, loadAuthority, ownedPath, readReceipt, removeReceipt, type OwnedPath, type ReceiptBody,
 } from './authority.ts'
+import { EnvironmentPreparationError } from './types.ts'
 import type {
-  EnvironmentDiagnostic, EnvironmentRef, EnvironmentVerificationResult, FailedEnvironmentVerification, TrustedCleanupResult,
+  BlockedEnvironment, EnvironmentDiagnostic, EnvironmentRef, EnvironmentVerificationResult, FailedEnvironmentVerification,
+  PreparationResult, ReadyEnvironment, TrustedCleanupResult,
 } from './types.ts'
 
 const blocked = (code: string, message: string, diagnostics: EnvironmentDiagnostic[] = []): FailedEnvironmentVerification =>
@@ -27,6 +29,15 @@ function load(ref: EnvironmentRef, diagnostics: EnvironmentDiagnostic[]) {
 
 const canonicalOwned = (body: ReceiptBody): readonly string[] => body.ownedPaths.map(entry => entry.relative)
 
+/** The path can be recreated by another directory; a recorded dev/inode mismatch is a replacement. */
+function workspaceIdentityMatches(body: ReceiptBody, workspace: string): boolean {
+  if (!body.workspaceIdentity) return true
+  try {
+    const stat = lstatSync(workspace)
+    return Number(stat.dev) === body.workspaceIdentity.dev && Number(stat.ino) === body.workspaceIdentity.ino
+  } catch { return false }
+}
+
 /** Re-verifies a serialized environment reference in a new process without trusting workspace markers. */
 export function verifyPreparedEnvironment(ref: EnvironmentRef): EnvironmentVerificationResult {
   const diagnostics: EnvironmentDiagnostic[] = []
@@ -39,6 +50,8 @@ export function verifyPreparedEnvironment(ref: EnvironmentRef): EnvironmentVerif
   if (!existsSync(body.workspaceReal) || canonical(body.workspaceReal) !== canonical(ref.workspacePath))
     return blocked('workspace_replaced', 'The private workspace no longer exists or has been replaced.', diagnostics)
   const workspace = canonical(body.workspaceReal)
+  if (!workspaceIdentityMatches(body, workspace))
+    return blocked('workspace_replaced', 'The private workspace directory was replaced after preparation.', diagnostics)
   if (body.mode === 'pnpm_workspace') {
     const ws = inspectPnpmWorkspace(workspace)
     if (!ws.ok) return blocked('environment_inputs_invalid', ws.problem?.message ?? 'Workspace layout is invalid.', diagnostics)
@@ -92,6 +105,8 @@ export async function cleanupPreparedEnvironment(ref: EnvironmentRef): Promise<T
   const workspace = canonical(body.workspaceReal)
   if (!existsSync(workspace) || canonical(ref.workspacePath) !== workspace)
     return { status: 'blocked', code: 'workspace_replaced', message: 'The private workspace was replaced; no cleanup is performed.', removed: [], leftovers: [] }
+  if (!workspaceIdentityMatches(body, workspace))
+    return { status: 'blocked', code: 'workspace_replaced', message: 'The private workspace directory was replaced; no cleanup is performed.', removed: [], leftovers: [] }
   for (const entry of body.ownedPaths)
     if (!inside(workspace, entry.real) || !identityMatches(entry))
       return { status: 'blocked', code: 'cleanup_forbidden', message: `Owned path identity no longer matches: ${entry.relative}`, removed: [], leftovers: [] }
@@ -129,4 +144,94 @@ export function listPreparedEnvironments(authorityRoot: string): EnvironmentRef[
     })
   }
   return refs
+}
+
+
+/** Runtime parser for a serialized environment reference (JSON file / persisted attempt record). */
+export function parseEnvironmentRef(value: unknown): EnvironmentRef {
+  if (!value || typeof value !== 'object') throw new EnvironmentPreparationError('invalid_ref', 'Environment reference must be an object.')
+  const v = value as Record<string, unknown>
+  if (v.protocol !== 'environment-ref/2') throw new EnvironmentPreparationError('invalid_ref', 'Environment reference protocol is unsupported.')
+  if (typeof v.authorityRoot !== 'string' || !v.authorityRoot.startsWith('/'))
+    throw new EnvironmentPreparationError('invalid_ref', 'Environment reference authorityRoot must be absolute.')
+  if (typeof v.receiptId !== 'string' || !/^[a-f0-9]{64}$/.test(v.receiptId))
+    throw new EnvironmentPreparationError('invalid_ref', 'Environment reference receiptId is malformed.')
+  if (typeof v.requestId !== 'string' || typeof v.fingerprint !== 'string' || !/^[a-f0-9]{64}$/.test(v.fingerprint))
+    throw new EnvironmentPreparationError('invalid_ref', 'Environment reference requestId/fingerprint is malformed.')
+  if (typeof v.workspacePath !== 'string' || !v.workspacePath.startsWith('/'))
+    throw new EnvironmentPreparationError('invalid_ref', 'Environment reference workspacePath must be absolute.')
+  return value as EnvironmentRef
+}
+
+/** Runtime parser for verifyPreparedEnvironment output. */
+export function parseEnvironmentVerification(value: unknown): EnvironmentVerificationResult {
+  if (!value || typeof value !== 'object') throw new EnvironmentPreparationError('invalid_result', 'Verification result must be an object.')
+  const v = value as Record<string, unknown>
+  if (v.status !== 'valid' && v.status !== 'blocked') throw new EnvironmentPreparationError('invalid_result', 'Verification status is invalid.')
+  if (v.status === 'blocked') {
+    if (typeof v.code !== 'string' || typeof v.message !== 'string')
+      throw new EnvironmentPreparationError('invalid_result', 'Blocked verification result needs code/message.')
+    return value as EnvironmentVerificationResult
+  }
+  if (typeof v.fingerprint !== 'string' || !/^[a-f0-9]{64}$/.test(v.fingerprint))
+    throw new EnvironmentPreparationError('invalid_result', 'Valid verification result needs a fingerprint.')
+  if (!v.environment || typeof v.environment !== 'object' || !Array.isArray(v.excludedPaths) || !Array.isArray(v.ownedPaths))
+    throw new EnvironmentPreparationError('invalid_result', 'Valid verification result needs environment/excludedPaths/ownedPaths.')
+  return value as EnvironmentVerificationResult
+}
+
+/** Runtime parser for cleanupPreparedEnvironment output. */
+export function parseTrustedCleanupResult(value: unknown): TrustedCleanupResult {
+  if (!value || typeof value !== 'object') throw new EnvironmentPreparationError('invalid_result', 'Cleanup result must be an object.')
+  const v = value as Record<string, unknown>
+  if (v.status !== 'cleaned' && v.status !== 'blocked') throw new EnvironmentPreparationError('invalid_result', 'Cleanup status is invalid.')
+  if (!Array.isArray(v.removed) || !v.removed.every(item => typeof item === 'string')
+    || !Array.isArray(v.leftovers) || !v.leftovers.every(item => typeof item === 'string'))
+    throw new EnvironmentPreparationError('invalid_result', 'Cleanup removed/leftovers must be string arrays.')
+  if (v.status === 'blocked' && (typeof v.code !== 'string' || typeof v.message !== 'string'))
+    throw new EnvironmentPreparationError('invalid_result', 'Blocked cleanup result needs code/message.')
+  return value as TrustedCleanupResult
+}
+
+/** Projection expected by main's WorkspaceEnvironmentPort; an invalid/missing receipt throws, never undefined. */
+export interface WorkspaceEnvironmentProjection {
+  reference: string
+  fingerprint: string
+  excludedPaths: readonly string[]
+}
+
+/**
+ * Verify a persisted ref and project it to the main workspace port. `reference` is the opaque receipt
+ * id (no host path); a missing/blocked receipt throws so main cannot downgrade to "no environment".
+ */
+export function projectWorkspaceEnvironment(ref: EnvironmentRef): WorkspaceEnvironmentProjection {
+  const parsed = parseEnvironmentRef(ref)
+  const verified = parseEnvironmentVerification(verifyPreparedEnvironment(parsed))
+  if (verified.status !== 'valid')
+    throw new EnvironmentPreparationError(verified.code, `${verified.code}: ${verified.message}`)
+  return { reference: parsed.receiptId, fingerprint: verified.fingerprint, excludedPaths: verified.excludedPaths }
+}
+
+
+/** Runtime parser for a direct prepare result (not a JSON persistence format because cleanup is a function). */
+export function parsePreparationResult(value: unknown): PreparationResult {
+  if (!value || typeof value !== 'object') throw new EnvironmentPreparationError('invalid_result', 'Preparation result must be an object.')
+  const v = value as Record<string, unknown>
+  if (v.status !== 'ready' && v.status !== 'blocked') throw new EnvironmentPreparationError('invalid_result', 'Preparation status is invalid.')
+  if (typeof v.requestId !== 'string' || typeof v.cleanup !== 'function')
+    throw new EnvironmentPreparationError('invalid_result', 'Preparation result needs requestId and cleanup.')
+  if (!Array.isArray(v.diagnostics) || !Array.isArray(v.evidence))
+    throw new EnvironmentPreparationError('invalid_result', 'Preparation diagnostics/evidence must be arrays.')
+  if (v.status === 'blocked') {
+    if (typeof v.code !== 'string' || typeof v.message !== 'string')
+      throw new EnvironmentPreparationError('invalid_result', 'Blocked preparation result needs code/message.')
+    return value as BlockedEnvironment
+  }
+  if (typeof v.fingerprint !== 'string' || !/^[a-f0-9]{64}$/.test(v.fingerprint)
+    || typeof v.nodeVersion !== 'string' || typeof v.policy !== 'string'
+    || !v.manager || typeof v.manager !== 'object' || !v.environment || typeof v.environment !== 'object'
+    || !Array.isArray(v.excludedPaths) || !Array.isArray(v.ownedPaths))
+    throw new EnvironmentPreparationError('invalid_result', 'Ready preparation result is incomplete.')
+  if (v.environmentRef !== undefined) parseEnvironmentRef(v.environmentRef)
+  return value as ReadyEnvironment
 }

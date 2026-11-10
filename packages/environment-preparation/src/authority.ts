@@ -27,6 +27,8 @@ export interface ReceiptBody {
   fingerprint: string
   installedDigest: string
   workspaceReal: string
+  /** Device/inode of the actual workspace directory, so a replacement at the same path is detectable. */
+  workspaceIdentity?: { dev: number; ino: number }
   projectReal: string
   manager: EnvironmentManager
   nodeVersion: string

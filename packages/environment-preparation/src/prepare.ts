@@ -12,7 +12,7 @@ import { dependencyDigest, inspectWorkspace, versionsEqual, type WorkspaceInspec
 import { scanInstalledTree, scanNodeModules } from './installed.ts'
 import { inspectPnpmWorkspace, scanWorkspaceInstalled, type PnpmWorkspaceInspection } from './workspace.ts'
 import { runOwned, standaloneProcessPort } from './process.ts'
-import { acquireWorkspaceLock, ensureAuthority, identityMatches, ownedPath, writeReceipt, type Authority, type OwnedPath, type ReceiptBody } from './authority.ts'
+import { acquireWorkspaceLock, ensureAuthority, identityMatches, ownedPath, removeReceipt, writeReceipt, type Authority, type OwnedPath, type ReceiptBody } from './authority.ts'
 import { cleanupPreparedEnvironment, listPreparedEnvironments } from './verify.ts'
 
 const PROTOCOL = 'environment-preparation/2'
@@ -264,17 +264,23 @@ function finishReady(
     legacyCleanup: () => Promise<CleanupResult>
   },
 ): ReadyEnvironment {
-  const excludedPaths = values.excludedPaths ?? (input.exclusion ?? defaultEnvironmentExclusions).excludedPaths(ctx.workspace)
+  const proposedExclusions = values.excludedPaths ?? (input.exclusion ?? defaultEnvironmentExclusions).excludedPaths(ctx.workspace)
+  // A pre-existing/foreign `.product-environment` is not owned state and must not be excluded as ours.
+  const excludedPaths = proposedExclusions.filter(path => path !== '.product-environment' || values.ownedRelatives.includes('.product-environment'))
   const entries = values.ownedRelatives
     .map(relative => ownedPath(ctx.workspace, relative))
     .filter((entry): entry is NonNullable<typeof entry> => entry !== undefined)
   let environmentRef: EnvironmentRef | undefined
   let cleanup = values.legacyCleanup
   if (authority) {
+    // A new receipt supersedes older signed records for this exact workspace; this preparation now owns
+    // the same paths, so stale refs cannot race a later cleanup.
+    for (const oldRef of receiptsFor(authority, ctx.workspace)) removeReceipt(authority, oldRef.receiptId)
     const body: ReceiptBody = {
       protocol: 'environment-receipt/2', requestId: input.requestId,
       inputFingerprint: values.inputFingerprint, fingerprint: values.fingerprint, installedDigest: values.installedDigest,
-      workspaceReal: ctx.workspace, projectReal: ctx.project, manager: values.manager, nodeVersion: process.versions.node,
+      workspaceReal: ctx.workspace, workspaceIdentity: (() => { const stat = lstatSync(ctx.workspace); return { dev: Number(stat.dev), ino: Number(stat.ino) } })(),
+      projectReal: ctx.project, manager: values.manager, nodeVersion: process.versions.node,
       policy: input.policy, environment: values.environment, excludedPaths: [...excludedPaths], ownedPaths: entries,
       mode: values.mode ?? 'single', packageJsonDigest: values.packageJsonDigest, lockFiles: [...values.lockFiles], dependencies: [...values.dependencies],
       ...(values.workspaceDigest ? { workspaceDigest: values.workspaceDigest } : {}),
@@ -626,6 +632,24 @@ async function preparePnpmWorkspace(
     excludedPaths: ['.product-environment', 'node_modules', ...ws.members.filter(member => member.relative).map(member => `${member.relative}/node_modules`)],
     legacyCleanup: cleanup,
   })
+}
+
+/** Production input: a signed, serializable authority reference is mandatory; no legacy marker mode. */
+export type ProductionEnvironmentPreparationInput = EnvironmentPreparationInput & { authorityRoot: string }
+
+/**
+ * Production entry point for main/independent Runner consumers. It refuses a missing or relative
+ * authorityRoot before any filesystem write, so a caller cannot silently fall back to the credential-less
+ * in-process legacy mode; the normal `prepareEnvironment` remains the explicit compatibility surface.
+ */
+export async function prepareAuthoritativeEnvironment(input: ProductionEnvironmentPreparationInput): Promise<PreparationResult> {
+  if (!input || typeof input !== 'object' || typeof input.authorityRoot !== 'string' || !input.authorityRoot.startsWith('/'))
+    return {
+      status: 'blocked', requestId: typeof input?.requestId === 'string' ? input.requestId : 'invalid-request',
+      code: 'authority_root_required', diagnostics: [], evidence: [], cleanup: async () => ({ removed: [], leftovers: [] }),
+      message: 'Production preparation requires an absolute caller-owned authorityRoot; legacy marker-only mode is not accepted.',
+    }
+  return prepareEnvironment(input)
 }
 
 /**

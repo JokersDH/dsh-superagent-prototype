@@ -10,7 +10,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync,
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
-  defaultEnvironmentExclusions, prepareEnvironment, type EnvironmentPreparationInput, type PreparationResult,
+  defaultEnvironmentExclusions, prepareEnvironment, standaloneProcessPort, type EnvironmentPreparationInput, type PreparationResult,
 } from '../src/index.ts'
 import {
   clean, copies, input, makePnpmFixture, pnpmVersion, projectState, runNodeTest, tempDir, writeFakeManager, writeJson,
@@ -56,7 +56,7 @@ test('a dependency-free Node project is ready and runs the real node test runner
     const result = ready(await prepareEnvironment(input(fixture.project, fixture.workspace, 'existing_only')))
     assert.equal(result.manager.name, 'none')
     assert.match(result.fingerprint, /^[0-9a-f]{64}$/)
-    assert.deepEqual(result.excludedPaths, ['.product-environment', 'node_modules'])
+    assert.deepEqual(result.excludedPaths, [], 'an absent environment directory is not claimed as owned')
     assert.deepEqual(result.environment.PATH, process.env.PATH)
     assert.equal('HOME' in result.environment, false, 'existing-only does not pass a user HOME')
     const run = runNodeTest(fixture.workspace, result.environment)
@@ -285,4 +285,43 @@ test('invalid requests are refused before touching either directory', async () =
     await assert.rejects(() => prepareEnvironment({ ...input(fixture.project, fixture.workspace, 'existing_only'), signal: undefined as never }), /AbortSignal/)
     assert.equal(existsSync(join(fixture.workspace, '.product-environment')), false)
   } finally { clean(fixture.root) }
+})
+
+
+test('cancellation and timeout terminate normal descendants in the owned process group', async () => {
+  const root = tempDir('environment-descendants-')
+  const pidFile = join(root, 'descendant.pid')
+  const script = [
+    "const { spawn } = require('node:child_process')",
+    "const fs = require('node:fs')",
+    "const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' })",
+    `fs.writeFileSync(${JSON.stringify(pidFile)}, String(child.pid))`,
+    "setInterval(() => {}, 1000)",
+  ].join(';')
+  const waitForPid = async () => {
+    for (let attempt = 0; attempt < 100; attempt += 1) {
+      if (existsSync(pidFile)) return Number(readFileSync(pidFile, 'utf8').trim())
+      await new Promise(resolve => setTimeout(resolve, 50))
+    }
+    throw new Error('descendant pid was not written')
+  }
+  try {
+    const controller = new AbortController()
+    const pending = standaloneProcessPort.run(process.execPath, ['-e', script], {
+      cwd: root, env: { PATH: process.env.PATH ?? '' }, timeoutMs: 30_000, maxOutputBytes: 4096, signal: controller.signal,
+    })
+    const cancelledPid = await waitForPid()
+    controller.abort()
+    const cancelled = await pending
+    assert.equal(cancelled.cancelled, true)
+    assert.throws(() => process.kill(cancelledPid, 0), 'the cancelled descendant is gone')
+
+    rmSync(pidFile, { force: true })
+    const timed = await standaloneProcessPort.run(process.execPath, ['-e', script], {
+      cwd: root, env: { PATH: process.env.PATH ?? '' }, timeoutMs: 500, maxOutputBytes: 4096,
+    })
+    const timedPid = await waitForPid()
+    assert.equal(timed.timedOut, true)
+    assert.throws(() => process.kill(timedPid, 0), 'the timed-out descendant is gone')
+  } finally { clean(root) }
 })

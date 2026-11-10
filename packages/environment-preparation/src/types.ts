@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
+
 /** The package-local port for isolated dependency preparation. No product wire schema is added here. */
 export type PreparationPolicy = 'existing_only' | 'offline_install'
 
@@ -163,7 +166,12 @@ export class EnvironmentPreparationError extends Error {
   }
 }
 
-/** Default integration proposal: these workspace-relative paths are owned environment state. */
+/**
+ * Default integration proposal: only environment directories that actually exist in this workspace.
+ * An absent directory is never presented as owned state, and preparation further drops
+ * `.product-environment` unless this preparation created it.
+ */
 export const defaultEnvironmentExclusions: EnvironmentExclusionPort = {
-  excludedPaths: (): readonly string[] => ['.product-environment', 'node_modules'],
+  excludedPaths: (workspace: string): readonly string[] =>
+    ['.product-environment', 'node_modules'].filter(relative => existsSync(join(workspace, relative))),
 }

@@ -1,0 +1,85 @@
+{
+  "protocol": "environment-consumption-matrix/1",
+  "scope": "package-local; public exports + second Node process; local temporary fixtures and offline store only; no model/account/network install/user project",
+  "node": "v24.21.0",
+  "pnpm": "11.7.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "commands": [
+    "node examples/consumption-matrix.mjs --out reports/independent-consumption.json",
+    "node --test test/*.case.ts",
+    "node examples/prepare-consumer.mjs ...  # one-process prepare",
+    "node examples/verify-consumer.mjs --ref <ref> [--cleanup]  # second process"
+  ],
+  "status": "PASS_INDEPENDENT_CONSUMPTION",
+  "cases": [
+    {
+      "id": "prepare-ref-second-process-verify-cleanup",
+      "passesInvariant": true,
+      "observed": {
+        "verify": "valid",
+        "cleanup": "cleaned",
+        "removed": 2,
+        "secondProcess": true,
+        "workspaceEmptyAfterCleanup": true,
+        "pnpm": "11.7.0"
+      }
+    },
+    {
+      "id": "forged-marker-does-not-replace-signed-ref",
+      "passesInvariant": true,
+      "observed": {
+        "verify": "valid",
+        "cleanup": "cleaned",
+        "cleanupCode": null
+      }
+    },
+    {
+      "id": "forged-receipt-blocks-verify-and-delete",
+      "passesInvariant": true,
+      "observed": {
+        "verify": "receipt_forged",
+        "cleanup": "receipt_forged",
+        "preserved": true
+      }
+    },
+    {
+      "id": "workspace-replacement-blocks-verify-and-delete",
+      "passesInvariant": true,
+      "observed": {
+        "verify": "workspace_replaced",
+        "cleanup": "workspace_replaced",
+        "oldWorkspacePreserved": true
+      }
+    },
+    {
+      "id": "manifest-lock-and-installed-drift-block-verify",
+      "passesInvariant": true,
+      "observed": {
+        "manifest": "environment_inputs_changed",
+        "lock": "environment_inputs_changed",
+        "drift": "environment_drift"
+      }
+    },
+    {
+      "id": "missing-cache-and-project-hooks-block-before-install",
+      "passesInvariant": true,
+      "observed": {
+        "cache": "offline_cache_missing",
+        "hooks": "project_hooks_unsupported",
+        "hookExecuted": false,
+        "controlledManager": "offline-error fixture"
+      }
+    },
+    {
+      "id": "concurrency-preparing-cancel-are-bounded",
+      "passesInvariant": true,
+      "observed": {
+        "concurrent": "workspace_busy",
+        "cancelled": "cancelled",
+        "preparing": "interrupted_preparation",
+        "crashedMarkerPreserved": true
+      }
+    }
+  ]
+}

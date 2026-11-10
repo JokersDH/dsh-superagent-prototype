@@ -7,17 +7,22 @@ or product database is created here.
 
 ## Port
 
-```ts
-import { prepareEnvironment } from '@personal-agent/environment-preparation'
+Production consumers use the authoritative entry point; `authorityRoot` is mandatory and a missing or
+relative value is blocked with `authority_root_required` before any filesystem write. The older
+`prepareEnvironment` remains the explicit compatibility surface for in-process experiments and is
+not a production credential path.
 
-const result = await prepareEnvironment({
+```ts
+import { prepareAuthoritativeEnvironment } from '@personal-agent/environment-preparation'
+
+const result = await prepareAuthoritativeEnvironment({
   projectPath,            // authorized original project (read only)
   workspacePath,          // private attempt worktree (dependencies may be written here)
   requestId,              // stable idempotency key
   policy: 'existing_only' | 'offline_install',
   signal,                 // AbortSignal; cancellation cleans owned state
   storeDir,               // required for offline_install when dependencies exist
-  authorityRoot,          // caller-owned private dir outside project/workspace (signed receipts + lock)
+  authorityRoot,          // REQUIRED: caller-owned private dir outside project/workspace (signed receipts + lock)
   processPort,            // optional injected process runner (default: safe standalone port)
   timeoutMs, maxOutputBytes, maxWorkspaceBytes,
 })
@@ -28,23 +33,37 @@ if (result.status === 'ready') {
 // result.status === 'blocked': { code, message, diagnostics, evidence, cleanup }
 ```
 
-`ready` contains `fingerprint`, manager/node identity, policy, diagnostics, evidence, an optional signed
-`environmentRef`, truly owned `ownedPaths`, and `cleanup()`. With `authorityRoot`, `cleanup()` delegates
-to the trusted receipt-bound cleanup; without it a warning marks the legacy in-process mode and no
-cross-process receipt exists.
+`ready` contains `fingerprint`, manager/node identity, policy, diagnostics, evidence, `environmentRef`,
+truly owned `ownedPaths`, and `cleanup()`. In production the ref is always present and `cleanup()`
+delegates to receipt-bound cleanup. The compatibility entry without an authority root adds an
+`authority_root_missing` warning and is intentionally not accepted by `prepareAuthoritativeEnvironment`.
 
 ```ts
-import { verifyPreparedEnvironment, cleanupPreparedEnvironment } from '@personal-agent/environment-preparation'
-const verified = verifyPreparedEnvironment(ref) // serializable ref from another process
-const cleaned = await cleanupPreparedEnvironment(ref)
+import {
+  verifyPreparedEnvironment, cleanupPreparedEnvironment, parseEnvironmentRef,
+  parsePreparationResult, parseEnvironmentVerification, parseTrustedCleanupResult,
+  projectWorkspaceEnvironment,
+} from '@personal-agent/environment-preparation'
+const ref = parseEnvironmentRef(JSON.parse(readFileSync(refPath, 'utf8')))
+const result = parsePreparationResult(await prepareAuthoritativeEnvironment(input))
+const verified = parseEnvironmentVerification(verifyPreparedEnvironment(ref)) // second process
+const cleaned = parseTrustedCleanupResult(await cleanupPreparedEnvironment(ref))
+const portEntry = projectWorkspaceEnvironment(ref) // { reference, fingerprint, excludedPaths }
 ```
 
-The signed receipt lives under `authorityRoot/receipts/<id>.json` (HMAC-SHA256 with a 0600
-`authority.key`), outside project/workspace. Workspace markers are never deletion/reuse authority.
-Verification rechecks package/lock/dependency identity, owned-path inode identity and the installed
-tree digest; replacement, drift, forged/missing receipts block. Trusted cleanup deletes only
-identity-matched signed owned paths and removes the receipt only after full cleanup. A live workspace
-lock prevents a second installer; stale locks are removed only after explicit ESRCH evidence.
+The parsers validate protocol/status/identity fields before a UI, doctor or main adapter consumes a
+persisted ref/result. `projectWorkspaceEnvironment` verifies synchronously and throws on a
+missing/forged/drifted receipt; it never downgrades a required credential to `undefined`. The opaque
+`reference` is the receipt id and contains no host path, matching main's `WorkspaceEnvironmentPort`.
+
+The signed receipt lives under `authorityRoot/receipts/<id>.json` (atomic temp+rename, HMAC-SHA256
+with a 0600 `authority.key`), outside project/workspace; the authority root/key and receipts must be
+persisted on durable storage to reopen in another process. Workspace markers are never deletion/reuse
+authority. Verification rechecks package/lock/dependency identity, workspace directory device/inode,
+owned-path inode identity and the installed tree digest; replacement, drift, forged/missing receipts
+block. Trusted cleanup deletes only identity-matched signed owned paths and removes the receipt only
+after full cleanup. A live workspace lock prevents a second installer; stale locks are removed only
+after explicit ESRCH evidence. A new signed receipt supersedes older receipts for the same workspace.
 `processPort` lets the coordinator supply its owned-process implementation; it must return explicit
 quiescence (`confirmed|indeterminate|unknown`) and the module never treats unproven quiescence as ready.
 `blocked` always means no environment may be used; a blocked result still carries `cleanup()` so a
@@ -92,7 +111,9 @@ workspace, escaping node_modules), `dependency_source_missing`, `unsupported_wor
 - Every child is argv-only, detached in its own process group. Timeout, abort and output-limit paths
   send SIGTERM to the group, then SIGKILL after a short grace, and verify the group is gone. A group
   that cannot be proven gone yields `cleanup_unproven`, never `ready`.
-- Output is bounded (`maxOutputBytes`, default 256 KiB); the prepared workspace is bounded
+- stdout and stderr share one `maxOutputBytes` budget (default 256 KiB) in arrival order; multi-byte
+  UTF-8 characters are never split, overflow is reported as `outputLimited` and the group is terminated.
+- The prepared workspace is bounded
   (`maxWorkspaceBytes`, default 1 GiB, `.git` excluded from the size scan).
 - The original project's package/lock/git-index and a depth-limited dependency-tree summary are
   snapshotted before and after; any change blocks with `project_modified`.
@@ -104,9 +125,11 @@ workspace, escaping node_modules), `dependency_source_missing`, `unsupported_wor
 
 ## Environment files must not enter the business patch
 
-The prepared state is `.product-environment/` plus `node_modules/`. The package exports
-`defaultEnvironmentExclusions` (`EnvironmentExclusionPort`) returning those workspace-relative paths.
-The workspace freeze/patch integration must pass these exclusions; do **not** edit the user's
+The prepared state is `.product-environment/` plus `node_modules/` (and member `node_modules` in the
+explicit pnpm-workspace mode). `defaultEnvironmentExclusions` returns only paths that actually exist;
+preparation additionally drops `.product-environment` unless this preparation created it, so an
+absent/foreign directory never appears as owned state. The workspace freeze/patch integration must
+pass these exclusions; do **not** edit the user's
 `.gitignore`, shared `.git/info/exclude` or Git config to hide them. The proposed public port is in
 [RFC-environment-exclusion.md](./RFC-environment-exclusion.md); this package's tests use the same port
 with a real Git fixture. A business patch built with the port contains no dependency tree or local
@@ -134,8 +157,10 @@ links, manager/Node mismatch, missing dependencies/store and unproven cache.
   from local tarballs, one shared store, real lockfiles and real tests; no node_modules/store is
   committed. The preparation module installs them offline/frozen/ignore-scripts.
 - `examples/inspect.mjs`, `examples/prepare-consumer.mjs`, `examples/verify-consumer.mjs` show a
-  caller-owned authorityRoot, one-process prepare, serialized ref, second-process verify and trusted
-  cleanup. No process-global map or private closure is required.
+  caller-owned authorityRoot, one-process prepare, parser-validated serialized ref, second-process
+  verify and trusted cleanup. No process-global map or private closure is required.
+- `examples/consumption-matrix.mjs` reruns the package-local independent-consumption matrix and can
+  write `reports/independent-consumption.json`; it uses only public exports and a second Node process.
 
 Recipe/consumer and workspace preparations are package-local evidence; coordinator/product wiring is
 still owned by main and remains NOT_TESTED here.
@@ -157,7 +182,8 @@ pnpm --dir packages/environment-preparation run test
 pnpm --dir packages/environment-preparation run build
 ```
 
-Measured: Node 24.21.0, pnpm 11.7.0 via Corepack cache, darwin/arm64; 12/12 tests. Offline install
+Measured: Node 24.21.0, pnpm 11.7.0 via Corepack cache, darwin/arm64; package tests are recorded in
+`reports/execution-status.json` and `reports/test-output.txt`. Offline install
 fixtures are generated locally from a tarball dependency with `--offline` only; no registry/network
 call is made. Package-manager choice is exercised against the installed pnpm; a fake manager fixture
 covers timeout/cancel/output-limit/offline-error paths.
@@ -167,10 +193,12 @@ covers timeout/cancel/output-limit/offline-error paths.
 - Runtime dependencies: `semver` (validated Node/manager ranges, no hand-written resolver) and `yaml`
   (standard pnpm-workspace parser). Dev dependencies: `typescript`, `@types/node`, `@types/semver`.
   The root lock importer must be regenerated by the main agent; this branch does not commit it.
-- Workspace integration (owned by main): call `prepareEnvironment` after `reserve`, pass
+- Workspace integration (owned by main): call `prepareAuthoritativeEnvironment` after `reserve` with a
+  private authorityRoot, persist the parser-validated `environmentRef` with the attempt, pass
   `excludedPaths` to the freeze/patch logic, pass `result.environment` to registered checks, and call
-  `cleanup()` when the attempt/workspace is released. Existing works keep their environment until the
-  workspace is released.
+  `cleanupPreparedEnvironment` when the attempt/workspace is released. Existing works keep their
+  environment until the workspace is released. Main may project a verified ref with
+  `projectWorkspaceEnvironment`; expected credential failures throw rather than returning undefined.
 - Not a product integration proof: this package's fixtures are package-local; no coordinator, console,
   Runner or native vendor was exercised here. Workspace member packages, recipes and consumer examples
   are verified on real offline fixtures; product integration remains NOT_TESTED.

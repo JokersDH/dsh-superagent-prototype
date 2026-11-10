@@ -4,8 +4,12 @@
  * sources, prepare only inside the private workspace with offline/frozen/ignore-scripts, and return a
  * reproducible fingerprint, allowlisted environment, diagnostic evidence and an owned cleanup handle.
  */
-export { prepareEnvironment } from './prepare.ts'
-export { verifyPreparedEnvironment, cleanupPreparedEnvironment, listPreparedEnvironments } from './verify.ts'
+export { prepareEnvironment, prepareAuthoritativeEnvironment, type ProductionEnvironmentPreparationInput } from './prepare.ts'
+export {
+  verifyPreparedEnvironment, cleanupPreparedEnvironment, listPreparedEnvironments,
+  parsePreparationResult, parseEnvironmentRef, parseEnvironmentVerification, parseTrustedCleanupResult, projectWorkspaceEnvironment,
+  type WorkspaceEnvironmentProjection,
+} from './verify.ts'
 export { inspectEnvironment, parseEnvironmentInspection, type EnvironmentInspection, type EnvironmentInspectionInput } from './inspect.ts'
 export { standaloneProcessPort } from './process.ts'
 export { inspectWorkspace, nodeRangeSatisfied, versionsEqual } from './project.ts'
