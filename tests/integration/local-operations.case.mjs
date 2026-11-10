@@ -203,8 +203,11 @@ test('the real launcher records fixture identity and shuts down its own listener
   assert.equal(instance.record.mode, 'fixture')
   assert.equal(instance.identity.legacy, false)
   assert.equal(instance.configuration.profiles.some((profile) => profile.kind === 'native'), false)
+  const reused = await execute(process.execPath, ['tools/dev/start.mjs', '--fixture', '--state', state], { cwd: root })
+  assert.match(reused.stdout, new RegExp(`127\\.0\\.0\\.1:${consolePort}`))
+  assert.equal(readInstanceRecord(state).pid, child.pid)
   const exited = once(child, 'exit')
-  child.kill('SIGTERM')
+  await execute(process.execPath, ['tools/dev/start.mjs', '--stop', '--state', state], { cwd: root })
   await exited
   for (const pid of [instance.record.apiPid, instance.record.consolePid])
     assert.throws(() => process.kill(pid, 0), (error) => error.code === 'ESRCH')

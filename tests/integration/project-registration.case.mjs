@@ -39,6 +39,20 @@ test('project import refuses relative paths, subdirectories, uncommitted input a
   assert.throws(() => h.registry.prepare({ path: h.project, check: 'node_test' }))
   assert.equal(readFileSync(join(h.project, 'uncommitted.txt'), 'utf8'), 'preserve me')
 })
+test('explicit environment policy persists privately and only an existing external cache can be authorized', (t) => {
+  const h = fixture(t), store = join(h.root, 'offline-store')
+  mkdirSync(store)
+  assert.throws(() => h.registry.prepare({ path: h.project, check: 'pnpm_test', environment: { policy: 'offline_install', storeDir: './relative' } }))
+  assert.throws(() => h.registry.prepare({ path: h.project, check: 'pnpm_test', environment: { policy: 'offline_install', storeDir: h.project } }))
+  assert.throws(() => h.registry.prepare({ path: h.project, check: 'pnpm_test', environment: { policy: 'offline_install', storeDir: join(h.root, 'missing') } }))
+  assert.throws(() => h.registry.prepare({ path: h.project, check: 'pnpm_test', environment: { policy: 'offline_install', storeDir: store, managerCommand: '/untrusted/executable' } }))
+  const record = h.registry.prepare({ path: h.project, check: 'pnpm_test', environment: { policy: 'offline_install', storeDir: store } })
+  h.registry.save(record)
+  assert.deepEqual(new NativeProjectRegistry(h.state).list()[0].environment, { policy: 'offline_install', storeDir: realpathSync(store) })
+  assert.equal(h.registry.check(record).allowedEnvironment.includes('COREPACK_ENABLE_NETWORK'), true)
+  assert.ok(h.registry.environment(record).managerCommand.startsWith('/'))
+  assert.equal(execFileSync('git', ['status', '--porcelain'], { cwd: h.project, encoding: 'utf8' }), '')
+})
 test('authenticated project registration adds a grant/check and survives runtime reconstruction', async (t) => {
   const h = fixture(t),
     store = new ProductStore({ path: join(h.state, 'state.sqlite') })

@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, readFileSync, chmodSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { createRunnerCredential, serveRunnerRecovery, connectRunnerRecovery } from '../../apps/coordinator/runner-link.ts'
-import { registerRecoveryRunner, loadRecoveryRunner, runnerRegistrationId, RunnerRegistrationError } from '../../apps/coordinator/runner-registry.ts'
+import { registerRecoveryRunner, loadRecoveryRunner, runnerRegistrationId, adoptRegisteredRunnerResources, RunnerRegistrationError } from '../../apps/coordinator/runner-registry.ts'
 import { reconcileRegisteredRunner } from '../../apps/coordinator/reconcile-runner.ts'
 import { handleRunnerRecovery } from '../../apps/coordinator/recovery-effects.ts'
 import { Effects } from '../../packages/effects/dist/index.js'
@@ -135,6 +135,31 @@ test('a changed registered manifest remains held after peer cancellation', async
   const result = await h.reconcile()
   assert.equal(result.status, 'held'); assert.equal(result.reason, 'resource_manifest_changed')
   assert.equal(h.store.bindings.binding(binding.attemptId).state, 'stopping')
+})
+test('a pinned Runner inventory can add later preparation children before confirming a complete stop', async t => {
+  const h = await fixture(t); await h.register(); h.hold()
+  const late = { ref: 'late-preparation-process', ownership: 'spawned_process', writer: 'quiescent', evidence: ['owned-preparation-stopped'] }
+  h.setState({ ...stopped(), resources: [...stopped().resources, late] })
+  const result = await h.reconcile()
+  assert.equal(result.status, 'quiescent')
+  assert.ok(h.store.bindings.binding(binding.attemptId).resources.some(resource => resource.ref === late.ref))
+  assert.equal(h.cancelIds.length, 0)
+  h.reopen()
+  assert.equal((await h.reconcile()).barrier.replayed, true)
+})
+test('late inventory adoption rejects another endpoint and a known ownership replacement', async t => {
+  const h = await fixture(t); await h.register()
+  const credentialPath = join(h.directory, 'other-inventory.key'); createRunnerCredential(credentialPath)
+  const other = await serveRunnerRecovery({ credentialPath, socketPath: join(h.directory, 'other-inventory.sock') }, producer, { inspect: async () => stopped(), cancel: async () => stopped() })
+  try {
+    const proof = await connectRunnerRecovery(other.endpoint, producer).inspect()
+    assert.throws(() => adoptRegisteredRunnerResources(h.store, proof), error => error.code === 'invalid_registration')
+  } finally { await other.close() }
+  const original = h.store.bindings.binding(binding.attemptId)
+  h.setState({ ...stopped(), resources: stopped().resources.map(resource => ({ ...resource, ownership: resource.ownership === 'spawned_process' ? 'shared_service_session' : 'spawned_process' })) })
+  const proof = await h.client().inspect()
+  assert.throws(() => adoptRegisteredRunnerResources(h.store, proof), error => error.code === 'identity_mismatch')
+  assert.deepEqual(h.store.bindings.binding(binding.attemptId), original)
 })
 test('old registered cleanup preserves a newer current attempt and its authority', async t => {
   const h = await fixture(t); await h.register(); h.hold()

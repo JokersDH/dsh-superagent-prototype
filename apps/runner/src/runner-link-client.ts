@@ -94,6 +94,9 @@ export class RunnerLink {
       for (const item of wake) item()
     }
     let stderr = ''
+    let closing = false
+    let writeFailed = false
+    child.stdin.on('error', () => { writeFailed = true; notify() })
 
     const exitPromise = new Promise<BridgeDownstream & { type: 'exited' }>(resolve => {
       exited = resolve
@@ -109,8 +112,10 @@ export class RunnerLink {
       if (stderr.length < 65536) stderr += chunk.toString('utf8')
     })
 
-    const write = (frame: BridgeUpstream | Record<string, unknown>): void => {
+    const write = (frame: BridgeUpstream | Record<string, unknown>): boolean => {
+      if (closing || writeFailed || child.stdin.destroyed || child.stdin.writableEnded) return false
       child.stdin.write(encodeFrame({ v: RUNNER_BRIDGE_PROTOCOL, ...frame }))
+      return true
     }
 
     let ready = false
@@ -199,6 +204,7 @@ export class RunnerLink {
       }
       const timer = setInterval(() => {
         if (ready) settle()
+        else if (writeFailed) settle(new Error('Runner bootstrap transport closed'))
         else if (child.exitCode !== null) settle(new Error(`runner exited before ready: ${stderr}`))
       }, 10)
       const timeout = setTimeout(() => settle(new Error(`runner did not become ready within 10s: ${stderr}`)), 10_000)
@@ -212,12 +218,13 @@ export class RunnerLink {
       receipts,
       progress,
       command: async command => {
-        write({ type: 'command', id: command.id, command })
+        if (!write({ type: 'command', id: command.id, command })) throw new Error('Runner command transport is closed')
       },
       waitExit: () => exitPromise,
       close: async () => {
         try {
           write({ type: 'shutdown' })
+          closing = true
           child.stdin.end()
         } catch {
           // stdin may already be closed

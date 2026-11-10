@@ -15,6 +15,7 @@ import {
   AssistantStreamUpdateSchema,
   ProjectRegistrationInputSchema,
   WorkLocationSchema,
+  WorkEnvironmentSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -30,6 +31,7 @@ import type {
   UserCommand,
   ProjectRegistrationInput,
   WorkLocation,
+  WorkEnvironment,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -73,6 +75,7 @@ export interface ConsoleTransport {
   selectModel?(model: string): Promise<AssistantProviderStatus>
   registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
   workLocation?(workId: string): Promise<WorkLocation | undefined>
+  workEnvironment?(workId: string): Promise<WorkEnvironment | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -230,6 +233,16 @@ export class HttpTransport implements ConsoleTransport {
   async workLocation(workId: string): Promise<WorkLocation | undefined> {
     try {
       return WorkLocationSchema.parse(await this.request(`/v1/works/${encodeURIComponent(workId)}/location`))
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async workEnvironment(workId: string): Promise<WorkEnvironment | undefined> {
+    try {
+      const value = WorkEnvironmentSchema.parse(await this.request(`/v1/works/${encodeURIComponent(workId)}/environment`))
+      if (value.workId !== workId) throw new TransportError('schema_mismatch', '环境状态属于另一项工作')
+      return value
     } catch (error) {
       if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
       throw error

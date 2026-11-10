@@ -1,0 +1,4 @@
+node v24.21.0
+pnpm 11.7.0
+platform darwin/arm64
+deps semver/yaml; no network installs

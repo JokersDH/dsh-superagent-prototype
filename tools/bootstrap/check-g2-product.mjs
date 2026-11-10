@@ -16,6 +16,10 @@ const commands = [
   ['--filter', '@personal-agent/coordinator', 'test:configuration'],
   ['--filter', '@personal-agent/coordinator', 'test:assistant'],
   ['--filter', '@personal-agent/coordinator', 'test:projects'],
+  ['--filter', '@personal-agent/environment-preparation', 'typecheck'],
+  ['--filter', '@personal-agent/environment-preparation', 'test'],
+  ['--filter', '@personal-agent/environment-preparation', 'build'],
+  ['--filter', '@personal-agent/coordinator', 'test:environment'],
 ]
 let tests = 0
 const results = []
@@ -60,14 +64,15 @@ const report = {
   tests,
   results,
   scopes: {
-    contracts: 188,
-    applicationAndRecovery: 96,
-    workspaces: 18,
-    verification: 22,
+    contracts: 190,
+    applicationAndRecovery: 98,
+    workspaces: 19,
+    verification: 23,
     actualControlledProduct: 14,
     configuration: 5,
     assistantDialogue: 17,
-    projectRegistration: 3,
+    projectRegistration: 4,
+    environmentPreparation: 'Authoritative package checks and independent Runner composition; see command results',
   },
   implementation:
     'SQLite application + real scratch subprocess + native questions + trusted resource barrier + verification + candidate acceptance + durable model dialogue with local mock SDK endpoint',

@@ -15,6 +15,7 @@ import {
   AssistantStreamUpdateSchema,
   ProjectRegistrationInputSchema,
   WorkLocationSchema,
+  WorkEnvironmentSchema,
   ChangeSchema,
   CommandReceiptSchema,
   ConversationPageSchema,
@@ -33,6 +34,7 @@ import type {
   AssistantStreamUpdate,
   ProjectRegistrationInput,
   WorkLocation,
+  WorkEnvironment,
   AppError,
   ApplicationService,
   TrustedActor,
@@ -85,6 +87,7 @@ export interface LocalHttpOptions {
     guide?(): Promise<string>
     registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
     workLocation?(workId: string): Promise<WorkLocation>
+    workEnvironment?(workId: string): Promise<WorkEnvironment>
     configuration?(): Promise<ApplicationConfiguration>
     verification?(id: string): Promise<Verification | undefined>
     deliveries?(questionId: string): Promise<readonly AnswerDelivery[]>
@@ -249,6 +252,10 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     c.header('content-type', 'text/markdown; charset=utf-8')
     c.header('content-disposition', 'attachment; filename="assistant-guide.zh-CN.md"')
     return c.body(await options.read.guide())
+  })
+  app.get('/v1/works/:id/environment', async (c) => {
+    if (!options.read?.workEnvironment) throw new ApplicationFault('unsupported_capability', 'Environment read port is not connected')
+    return c.json(WorkEnvironmentSchema.parse(await options.read.workEnvironment(IdSchema.parse(c.req.param('id')))))
   })
   app.get('/v1/assistant/stream', (c) => {
     const { conversationId } = z.strictObject({ conversationId: IdSchema }).parse(c.req.query())

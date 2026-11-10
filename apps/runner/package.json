@@ -18,6 +18,8 @@
     "@personal-agent/contracts": "workspace:*",
     "@personal-agent/driver-kit": "workspace:*",
     "@personal-agent/execution": "workspace:*",
+    "@personal-agent/environment-preparation": "workspace:*",
+    "zod": "4.4.3",
     "@personal-agent/drivers-codex-native": "workspace:*"
   }
 }

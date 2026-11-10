@@ -63,6 +63,18 @@ test('a passing check and a failing check produce real exit results', async () =
     assert.equal(failed.evidence[0]!.reason, 'exit:3')
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
+test('each verification uses its prepared environment while preserving registered variable permissions', async () => {
+  const dir = workspace()
+  try {
+    const registry = registryWith({ id: 'unit-check', revision: 1,
+      ...script('process.exit(process.env.PREPARED_VALUE === "prepared" && process.env.UNGRANTED_VALUE === undefined ? 0 : 1)'),
+      allowedEnvironment: ['PREPARED_VALUE'],
+    })
+    const runner = new VerificationRunner(registry, { environment: { PREPARED_VALUE: 'wrong-host-value' } })
+    const result = await runner.run(plan(dir, { environment: { PREPARED_VALUE: 'prepared', UNGRANTED_VALUE: 'must-not-leak' } }))
+    assert.equal(result.verification.results[0]!.outcome, 'PASS')
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
 
 test('a deadline and the output budget bound a check instead of buffering without limit', async () => {
   const dir = workspace()

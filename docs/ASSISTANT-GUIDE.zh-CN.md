@@ -2,7 +2,7 @@
 
 当前已接通本机 Codex：从网页确认开发委托，执行器在独立 Git worktree 实现代码，运行注册的检查，再由你审阅当前 patch 并接受交付。主对话用于讨论需求；真正执行以明确确认的委托为准。
 
-当前原生范围为本机 macOS arm64、Codex 0.164.0，先支持普通 Node 项目的闭环。它不是三个执行器全部可用或完整 G2 稳定版本的声明。
+当前原生范围为本机 macOS arm64、Codex 0.164.0，支持无依赖 Node 项目及使用授权离线缓存的普通单包 pnpm 项目。它不是三个执行器全部可用或完整 G2 稳定版本的声明。
 
 ## 第一次使用
 
@@ -37,7 +37,9 @@
 
 导入时可选择 `node --test`、`pnpm test` 或 `npm test`，它们注册为服务端检查；模型不能把回复中的任意命令变成验收命令。机器检查失败不能被人工接受绕过。
 
-当前先完成不依赖外部安装的 Node 闭环。有依赖的项目需要其隔离工作区具备可用依赖；当前不自动联网安装、升级包管理器或运行安装脚本。依赖准备不足会导致检查不能通过，环境准备模块由独立任务继续扩展。
+普通单包 pnpm 项目可以在导入时选择“从授权缓存离线准备”，填写项目之外已预热的 pnpm store 根目录，并选择 `pnpm test`。该目录应是预热时 `--store-dir` 指定的根目录，不能指向原项目的 node_modules。准备由独立 Runner 执行，先核对 Node/包管理器、锁文件和依赖，再开始 Codex 工作；不联网、不升级包管理器、不执行安装生命周期脚本或项目安装钩子。项目中不支持的安装配置会明确阻断。
+
+“仅验证已有依赖”检查的是本次隔离工作区，不能借用或链接原项目的 node_modules；新工作区缺依赖时会受阻。“不准备依赖”保留原有 Node 流程。工作详情显示依赖环境的等待、准备、复验或阻断状态。依赖、package.json、lockfile 或归属变化后，旧环境凭证不能用于验证和接受。环境目录不会进入业务 patch。npm 离线安装和任意 monorepo 尚未准入。
 
 “暂停派工”用于尚未开始的工作；“停止”要求确认实际 owned 资源停止。仅收到 native ACK 或进程退出不足以释放屏障，未知状态会继续阻止新写入。修订、继续和重试仅在当前版本允许时提供。
 
@@ -62,6 +64,14 @@ pnpm restart    # 后端改动后重启
 pnpm doctor     # 只读核对服务、项目、执行器和恢复阻断
 ```
 
+2026-11-10 的带依赖预览实例使用 `http://127.0.0.1:5181/` 与独立状态目录，原 5180 实例继续保留。可使用以下入口复用、诊断或停止新版实例：
+
+```sh
+pnpm start --port 5181 --api-port 8797 --state .local-state/environment-preview
+pnpm doctor --state .local-state/environment-preview
+pnpm stop --state .local-state/environment-preview
+```
+
 `stop.command` 可用于停止。需要只验证固定流程时，可用另一个端口/私有 state：
 
 ```sh
@@ -72,4 +82,4 @@ pnpm dev:workbench --fixture --port 5181 --api-port 8797 --state /tmp/pa-fixture
 
 需要保存可分享的诊断摘要时，使用 `pnpm doctor --json --output /tmp/pa-diagnosis.json`；输出文件必须尚不存在，权限为 600，不包含 key、会话原文或数据库。诊断其它私有实例时增加 `--state /tmp/pa-fixture-workbench`。任一阻断会使诊断命令以非零退出。
 
-固定 profile 只执行 scratch 流程。真实 MVP 的检查与证据见 `reports/releases/native-mvp/`；`pnpm check:native-product`、`pnpm check:native-browser` 会执行真实模型任务，属于显式原生验收，日常自动回归使用本地 fixture。
+固定 profile 只执行 scratch 流程。真实 MVP 的检查与证据见 `reports/releases/native-mvp/` 和 `reports/releases/environment-mvp/`；`pnpm check:native-product`、`pnpm check:native-browser`、`pnpm check:environment-native` 会执行真实模型任务，属于显式原生验收，日常自动回归使用本地 fixture。

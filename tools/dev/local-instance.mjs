@@ -112,7 +112,7 @@ async function verifyListener(pid, origin, parentPid) {
 
 export async function localJson(origin, path, { bearer, timeoutMs = 2000, maxBytes = 262144 } = {}) {
   localOrigin(origin)
-  if (!/^\/v1\/[a-z]+$/.test(path)) throw new InstanceUnavailable('invalid_read_path')
+  if (!/^\/v1\/[a-z]+$/.test(path) && !/^\/v1\/works\/[A-Za-z0-9._:%-]{1,768}\/environment$/.test(path)) throw new InstanceUnavailable('invalid_read_path')
   const signal = AbortSignal.timeout(timeoutMs)
   let response
   try {

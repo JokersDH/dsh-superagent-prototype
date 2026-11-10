@@ -46,6 +46,7 @@ import type {
   UserQuestion,
   WorkView,
   WorkLocation,
+  WorkEnvironment,
   ProjectRegistrationInput,
 } from '@personal-agent/contracts'
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
@@ -151,6 +152,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [projectImportOpen, setProjectImportOpen] = useState(false)
   const [activateWorkId, setActivateWorkId] = useState<string | undefined>()
   const [workLocation, setWorkLocation] = useState<WorkLocation | undefined>()
+  const [workEnvironment, setWorkEnvironment] = useState<WorkEnvironment | undefined>()
   const [locationFailure, setLocationFailure] = useState<string | undefined>()
   const [auth, setAuth] = useState<'checking' | 'required' | 'ready'>(transport.session ? 'checking' : 'ready')
   const [configuration, setConfiguration] = useState<ApplicationConfiguration | undefined>(undefined)
@@ -468,9 +470,13 @@ export function App({ transport }: { transport: ConsoleTransport }) {
 
   useEffect(() => {
     setWorkLocation(undefined)
+    setWorkEnvironment(undefined)
     setLocationFailure(undefined)
     if (!selectedWorkId || !transport.workLocation || !inspectorOpen || modelPanelOpen) return
     let cancelled = false
+    if (transport.workEnvironment) void transport.workEnvironment(selectedWorkId)
+      .then(value => { if (!cancelled) setWorkEnvironment(value) })
+      .catch(() => { if (!cancelled) setLocationFailure('工作环境暂时无法读取。') })
     void transport
       .workLocation(selectedWorkId)
       .then((value) => {
@@ -895,6 +901,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               <WorkDetail
                 work={selectedWork}
                 location={workLocation}
+                environment={workEnvironment}
                 locationFailure={locationFailure}
                 verification={verification}
                 artifactReader={transport.artifact ? (id) => transport.artifact!(id) : undefined}
@@ -1247,6 +1254,8 @@ function ProjectImportForm({
   const [path, setPath] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [check, setCheck] = useState<ProjectRegistrationInput['check']>('node_test')
+  const [environmentPolicy, setEnvironmentPolicy] = useState<'none' | 'existing_only' | 'offline_install'>('none')
+  const [storeDir, setStoreDir] = useState('')
   const [pending, setPending] = useState(false)
   const [failure, setFailure] = useState<string | undefined>()
   return (
@@ -1262,6 +1271,8 @@ function ProjectImportForm({
           await onImport({
             path: path.trim(),
             check,
+            ...(environmentPolicy === 'existing_only' ? { environment: { policy: 'existing_only' as const } }
+              : environmentPolicy === 'offline_install' ? { environment: { policy: 'offline_install' as const, storeDir: storeDir.trim() } } : {}),
             ...(displayName.trim() ? { displayName: displayName.trim() } : {}),
           })
         } catch (error) {
@@ -1319,6 +1330,23 @@ function ProjectImportForm({
           <option value="npm_test">npm test</option>
         </select>
       </label>
+      <label>
+        <span>依赖准备</span>
+        <select name="environment-policy" aria-label="依赖准备" value={environmentPolicy}
+          onChange={event => setEnvironmentPolicy(event.target.value as typeof environmentPolicy)} disabled={pending}>
+          <option value="none">不准备依赖</option>
+          <option value="existing_only">仅验证已有依赖</option>
+          <option value="offline_install">从授权缓存离线准备</option>
+        </select>
+      </label>
+      {environmentPolicy === 'offline_install' && (
+        <label>
+          <span>授权 pnpm 缓存目录</span>
+          <input name="environment-store" aria-label="授权 pnpm 缓存目录" value={storeDir}
+            onChange={event => setStoreDir(event.target.value)} required maxLength={4096}
+            autoComplete="off" placeholder="/Users/you/.local/share/pnpm/store" disabled={pending} />
+        </label>
+      )}
       {failure && (
         <p role="alert" className="warn-text">
           {failure}
@@ -2143,6 +2171,7 @@ function QuestionCard({
 function WorkDetail({
   work,
   location,
+  environment,
   locationFailure,
   verification,
   artifactReader,
@@ -2156,6 +2185,7 @@ function WorkDetail({
 }: {
   work: WorkView | undefined
   location: WorkLocation | undefined
+  environment: WorkEnvironment | undefined
   locationFailure: string | undefined
   verification: VerificationDetail | undefined
   artifactReader: ((id: string) => Promise<{ contentType: string; text: string } | undefined>) | undefined
@@ -2211,6 +2241,23 @@ function WorkDetail({
         {work.resourceStatus === 'indeterminate' ? '（不能视为已停止）' : ''}
       </p>
       <p className="goal">{work.contract.goal}</p>
+      {environment && environment.status !== 'not_configured' && (
+        <section className="work-location" aria-label="依赖环境">
+          <h4>依赖环境</h4>
+          <p role="status" className={environment.status === 'blocked' ? 'warn-text' : 'context-line'}>
+            {{ waiting: '等待执行', preparing: '正在准备', ready: '已准备并复验', blocked: '准备受阻' }[environment.status]}
+            {' · '}{environment.policy === 'offline_install' ? '离线缓存' : '现有依赖'}
+          </p>
+          {environment.status === 'blocked' && <p className="context-line">
+            {environment.code === 'offline_cache_missing' ? '授权缓存缺少依赖，请补齐缓存后重新委托。'
+              : environment.code === 'dependencies_missing' ? '隔离工作区缺少依赖，请使用离线准备策略。'
+                : environment.code === 'project_hooks_unsupported' ? '项目安装钩子或配置暂不支持，请检查项目设置。'
+                  : environment.code === 'environment_drift' ? '依赖或项目声明已变化，当前环境不能用于交付。'
+                    : '环境未获确认，请检查项目设置与执行记录。'}
+          </p>}
+          {environment.fingerprint && <details className="technical-details"><summary>环境指纹</summary><code>{environment.fingerprint}</code></details>}
+        </section>
+      )}
       {(location || locationFailure) && (
         <section className="work-location" aria-label="代码位置">
           <h4>代码位置</h4>
@@ -2298,7 +2345,7 @@ function WorkDetail({
         {available.includes('accept_candidate') && work.actions.currentCandidate && (
           <button
             type="button"
-            disabled={pending === 'accept' || stale || failed}
+            disabled={pending === 'accept' || stale || failed || environment?.status === 'blocked'}
             title={stale ? '候选已过期，不能接受' : failed ? '存在未通过的必需检查，人工接受不能覆盖' : undefined}
             onClick={() => void onAccept(work.actions.currentCandidate!)}
           >
