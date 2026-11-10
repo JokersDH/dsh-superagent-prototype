@@ -84,3 +84,38 @@ lockfile change, which is main-owned, so this cannot be resolved from the accept
 
 **Needed:** main adds `playwright` (or provides an existing browser driver) and states the launch
 command for the console dev server; the acceptance harness then drives the published UI.
+
+---
+
+## BLOCKER-1 — RESOLVED (main `908c129`)
+
+The candidate artifact now carries `patch{artifactId,sha256,bytes,format}` and the patch bytes are
+readable, so B-R2 verified: 1 machine check PASS, an 803-byte `git-binary-diff/1` patch applying to
+`src/index.mjs` and `test/sum.test.mjs` in a clean clone pinned at the artifact base commit.
+
+Note for reviewers: `baseCommit === headCommit` on the artifact does **not** prove nothing changed —
+the change is carried by the patch artifact. Acceptance therefore verifies the patch bytes, not the
+commit interval.
+
+## BLOCKER-3 — RESOLVED
+
+`apps/console/node_modules/@playwright/test` is available, so the browser matrix runs without any new
+root dependency. Desktop 1440×900 and narrow 390×844 both pass with screenshots in
+`reports/browser/`.
+
+---
+
+## BLOCKER-4 (owner: main) — environment integration is not published to the product entry
+
+**Observed:** `apps/coordinator/product/demo.ts` starts the native MVP without a
+`WorkspaceEnvironmentPort` binding; `tools/dev/doctor.mjs` is read-only diagnostics. Neither the
+product HTTP surface nor `/v1/configuration` exposes an environment policy, preparation state or
+blocked reason, and dependency installation is intentionally disabled pending A's admission pass.
+
+**Impact:** B-R4 (rebuild the A recipe through the public interface, add no-model environment positive
+and negative cases) is **NOT_TESTED**. The dependency-installation lane cannot be exercised.
+
+**Needed to continue:** the main integration must publish (a) the environment policy/prepare entry in
+the product composition and (b) its projection in `/v1/configuration` (policy id, preparation state,
+blocked reason and a safe diagnostic reference). The acceptance harness then consumes only those
+public surfaces.

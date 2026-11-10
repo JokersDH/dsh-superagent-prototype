@@ -1,5 +1,5 @@
 {
-  "phase": "B-R3",
+  "phase": "complete-except-blocked",
   "branch": "codex/g1-runtime",
   "base": "f2ca26c",
   "commit": "2c1f604",
@@ -98,5 +98,30 @@
     "real native question/recovery on the on-request policy (no question was raised in the verifiable runs)",
     "native stop observed on a live native writer (the native works completed before a stop could be issued)",
     "environment-dependent single-package install lane (B-R4)"
-  ]
+  ],
+  "resolvedBlockers": {
+    "BLOCKER-1": "patch reference published in main 908c129",
+    "BLOCKER-3": "console Playwright available"
+  },
+  "openBlockers": {
+    "BLOCKER-4": "environment integration not published to the product entry (B-R4)"
+  },
+  "finalReport": {
+    "B-R1": "passed",
+    "B-R2": "passed",
+    "B-R3": "passed",
+    "B-R4": "blocked (BLOCKER-4)"
+  },
+  "commands": {
+    "releaseGuards": "node tools/bootstrap/review-native-acceptance.mjs --acceptance . --candidate <commit>",
+    "selftest": "node --test tests/native-acceptance/selftest.mjs",
+    "readonly": "node tests/native-acceptance/run.mjs --url <url> --state <dir>",
+    "strict": "node tests/native-acceptance/run.mjs --url <url> --state <dir> --require-native --native-timeout-ms 600000",
+    "lifecycle": "node tests/native-acceptance/br3-lifecycle.mjs --url <url> --state <dir> --allow-writes",
+    "restart": "node tests/native-acceptance/br3-restart.mjs",
+    "browser": "node tests/native-acceptance/br3-browser.mjs",
+    "deterministic": "node tests/native-acceptance/b3-deterministic.mjs --url <url> --state <dir>",
+    "soak": "node tests/native-acceptance/b5-soak.mjs --url <url> --state <dir> --soak 5",
+    "conformance": "node tests/native-acceptance/b6-conformance.mjs --url <url> --state <dir>"
+  }
 }
