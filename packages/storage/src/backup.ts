@@ -22,6 +22,28 @@ export interface VerifyResult {
   productSchema: number | null
 }
 
+export interface ArtifactRegistryRow {
+  id: string
+  digest: string
+  bytes: number
+  path: string
+  createdAt: string
+}
+
+/** Reads the artifact registry from a database snapshot without opening the live store. */
+export function readArtifactRegistry(databasePath: string): ArtifactRegistryRow[] {
+  const db = new Database(databasePath, { readonly: true, fileMustExist: true })
+  try {
+    const exists = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'artifacts'").get()
+    if (!exists) return []
+    return (db.prepare('SELECT id, digest, bytes, path, created_at FROM artifacts ORDER BY created_at, id').all() as Record<string, unknown>[])
+      .map(row => ({
+        id: String(row.id), digest: String(row.digest), bytes: Number(row.bytes),
+        path: String(row.path), createdAt: String(row.created_at),
+      }))
+  } finally { db.close() }
+}
+
 /** Runs integrity, foreign-key, and schema checks on a database file without starting any store. */
 export function verifyDatabase(path: string): VerifyResult {
   const db = new Database(path, { readonly: true, fileMustExist: true })

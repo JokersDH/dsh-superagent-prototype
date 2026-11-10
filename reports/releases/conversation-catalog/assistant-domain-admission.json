@@ -1,0 +1,17 @@
+{
+  "status": "FAIL_SOURCE_VALIDITY_ADMISSION",
+  "owner": "C",
+  "sourceCommit": "081226e41a2e4c4280cd71fcce611b670dbfb001",
+  "checkedAt": "2026-11-10T05:23:58.439Z",
+  "case": "Missing provenance remains auditable but must not enter effective decision context",
+  "actual": {
+    "isEffective": true,
+    "listCount": 1
+  },
+  "expected": {
+    "isEffective": false,
+    "listCount": 0
+  },
+  "modelCalls": 0,
+  "scope": "Independent domain probe only; production context/decision capability remains unconnected"
+}

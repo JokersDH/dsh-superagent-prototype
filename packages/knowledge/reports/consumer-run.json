@@ -1,0 +1,50 @@
+{
+  "protocol": "c5-consumer/1",
+  "generatedAt": "2026-11-10T04:42:20.847Z",
+  "branch": "codex/g3-assistant-context",
+  "steps": [
+    {
+      "step": "authorized-context",
+      "slices": [
+        "README.md",
+        "src/i18n.ts"
+      ],
+      "status": "sufficient"
+    },
+    {
+      "step": "plain-reply",
+      "executable": false
+    },
+    {
+      "step": "work-proposal",
+      "intent": "create_work",
+      "executed": 0
+    },
+    {
+      "step": "decision-proposal",
+      "intent": "record_decision",
+      "executed": 0
+    },
+    {
+      "step": "record-decision",
+      "status": "active"
+    },
+    {
+      "step": "context-with-decision",
+      "decisionSlice": "User-confirmed decision (decision-1):\nUse Chinese UI copy"
+    },
+    {
+      "step": "context-after-revoke",
+      "decisionSlice": null
+    }
+  ],
+  "result": {
+    "status": "PASS",
+    "modelCalls": 3,
+    "networkCalls": 0,
+    "executedIntents": 0,
+    "absoluteRootLeaked": false,
+    "decisionsBeforeRevoke": 1,
+    "decisionsAfterRevoke": 0
+  }
+}

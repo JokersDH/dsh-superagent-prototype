@@ -10,7 +10,7 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { ContractRevision, TicketLink, UserQuestion, WorkRecord } from '@personal-agent/contracts'
-import { applyMigrations, DispatchConflict, MIGRATIONS, ProductConflict, ProductStore } from '../src/index.ts'
+import { applyMigrations, DispatchConflict, MIGRATIONS, PRODUCT_SCHEMA_VERSION, ProductConflict, ProductStore } from '../src/index.ts'
 import type { NewConversationMessage } from '../src/index.ts'
 
 const at = '2026-11-08T00:00:00.000Z'
@@ -196,7 +196,7 @@ test('product writes join the caller transaction and roll back with it', async (
   }
 })
 
-test('a v6 database upgrades to v7, keeps completion tables, and reopens with product records', () => {
+test('a v6 database upgrades to the current schema, keeps completion tables, and reopens with product records', () => {
   const dir = freshDir()
   const path = join(dir, 'state.sqlite')
   try {
@@ -206,7 +206,7 @@ test('a v6 database upgrades to v7, keeps completion tables, and reopens with pr
 
     const store = new ProductStore({ path })
     try {
-      assert.equal(store.database.productSchema, 7)
+      assert.equal(store.database.productSchema, PRODUCT_SCHEMA_VERSION)
       const completion = store.db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE 'completion_%' ORDER BY name").all()
         .map(row => String((row as { name: string }).name))
       assert.deepEqual(completion, ['completion_acceptances', 'completion_quiescence', 'completion_verifications'])
@@ -218,7 +218,7 @@ test('a v6 database upgrades to v7, keeps completion tables, and reopens with pr
 
     const reopened = new ProductStore({ path })
     try {
-      assert.equal(reopened.database.productSchema, 7)
+      assert.equal(reopened.database.productSchema, PRODUCT_SCHEMA_VERSION)
       assert.equal(reopened.product.works.get('work-1')!.title, 'Work work-1')
       assert.equal(reopened.product.contracts.history('work-1').length, 1)
     } finally {
