@@ -56,11 +56,10 @@ export function gitSource(root, { ignoreUntrackedPrefixes = [] } = {}) {
   const lines = execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' })
     .split('\n')
     .filter(Boolean)
-  // Evidence written by this harness must not make the product source look modified. Only untracked
-  // paths under the named prefixes are ignored; tracked edits and other untracked files still count.
+  // Generated acceptance evidence must not make the product source look modified, whether it is
+  // tracked (a re-run rewrites it) or untracked (a fresh run writes it). Other edits still count.
   const relevant = lines.filter((line) => {
     const path = line.slice(3)
-    if (!line.startsWith('??')) return true
     return !ignoreUntrackedPrefixes.some((prefix) => path.startsWith(prefix))
   })
   return { commit, dirty: relevant.length > 0 }

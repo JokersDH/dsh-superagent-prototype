@@ -8,8 +8,8 @@
   ],
   "branch": "codex/g3-product-acceptance",
   "source": {
-    "commit": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
-    "dirty": false
+    "commit": "3c191bbc82053c191947709384a393c89a9ff5b6",
+    "dirty": true
   },
   "environment": {
     "node": "v24.21.0",
@@ -17,9 +17,9 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "startedAt": "2026-11-10T05:06:56.582Z",
-  "finishedAt": "2026-11-10T05:07:20.305Z",
-  "checkedAt": "2026-11-10T05:07:20.305Z",
+  "startedAt": "2026-11-10T05:13:45.978Z",
+  "finishedAt": "2026-11-10T05:14:11.026Z",
+  "checkedAt": "2026-11-10T05:14:11.026Z",
   "counts": {
     "PASS": 42,
     "FAIL": 0,
@@ -29,17 +29,17 @@
     "UNKNOWN": 0
   },
   "artifacts": {
-    "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z",
+    "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/desktop-keyboard.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z/screenshots/desktop-keyboard.png"
     ],
     "cleaned": {
       "kept": null
@@ -64,9 +64,9 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.583Z",
-      "finishedAt": "2026-11-10T05:06:56.583Z",
-      "durationMs": 0
+      "startedAt": "2026-11-10T05:13:45.979Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
+      "durationMs": 1
     },
     {
       "id": "E1-GATE-REJECT-MISSING-CASE",
@@ -89,8 +89,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.583Z",
-      "finishedAt": "2026-11-10T05:06:56.583Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -114,8 +114,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.583Z",
-      "finishedAt": "2026-11-10T05:06:56.583Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -139,8 +139,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.583Z",
-      "finishedAt": "2026-11-10T05:06:56.583Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -168,9 +168,9 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.583Z",
-      "finishedAt": "2026-11-10T05:06:56.584Z",
-      "durationMs": 1
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
+      "durationMs": 0
     },
     {
       "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
@@ -193,8 +193,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.584Z",
-      "finishedAt": "2026-11-10T05:06:56.584Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -218,8 +218,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.584Z",
-      "finishedAt": "2026-11-10T05:06:56.584Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -243,8 +243,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.584Z",
-      "finishedAt": "2026-11-10T05:06:56.584Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -268,8 +268,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.584Z",
-      "finishedAt": "2026-11-10T05:06:56.584Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -293,8 +293,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.584Z",
-      "finishedAt": "2026-11-10T05:06:56.584Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -318,8 +318,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.584Z",
-      "finishedAt": "2026-11-10T05:06:56.584Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -343,8 +343,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.584Z",
-      "finishedAt": "2026-11-10T05:06:56.584Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -368,8 +368,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.584Z",
-      "finishedAt": "2026-11-10T05:06:56.584Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -393,8 +393,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.584Z",
-      "finishedAt": "2026-11-10T05:06:56.584Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -422,9 +422,9 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.584Z",
-      "finishedAt": "2026-11-10T05:06:56.585Z",
-      "durationMs": 1
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
+      "durationMs": 0
     },
     {
       "id": "E1-GATE-REJECT-INVALID-RESPONSE",
@@ -447,8 +447,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.585Z",
-      "finishedAt": "2026-11-10T05:06:56.585Z",
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.980Z",
       "durationMs": 0
     },
     {
@@ -472,9 +472,9 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.585Z",
-      "finishedAt": "2026-11-10T05:06:56.585Z",
-      "durationMs": 0
+      "startedAt": "2026-11-10T05:13:45.980Z",
+      "finishedAt": "2026-11-10T05:13:45.981Z",
+      "durationMs": 1
     },
     {
       "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
@@ -497,8 +497,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.585Z",
-      "finishedAt": "2026-11-10T05:06:56.585Z",
+      "startedAt": "2026-11-10T05:13:45.981Z",
+      "finishedAt": "2026-11-10T05:13:45.981Z",
       "durationMs": 0
     },
     {
@@ -522,8 +522,8 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.585Z",
-      "finishedAt": "2026-11-10T05:06:56.585Z",
+      "startedAt": "2026-11-10T05:13:45.981Z",
+      "finishedAt": "2026-11-10T05:13:45.981Z",
       "durationMs": 0
     },
     {
@@ -567,9 +567,9 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.585Z",
-      "finishedAt": "2026-11-10T05:06:56.587Z",
-      "durationMs": 2
+      "startedAt": "2026-11-10T05:13:45.981Z",
+      "finishedAt": "2026-11-10T05:13:45.984Z",
+      "durationMs": 3
     },
     {
       "id": "E1-FIXTURE-PORTABILITY-STRICT",
@@ -604,9 +604,9 @@
       "limitations": [
         "In-memory evidence bundles; proves the aggregator, not a product workflow"
       ],
-      "startedAt": "2026-11-10T05:06:56.587Z",
-      "finishedAt": "2026-11-10T05:06:56.588Z",
-      "durationMs": 1
+      "startedAt": "2026-11-10T05:13:45.984Z",
+      "finishedAt": "2026-11-10T05:13:45.986Z",
+      "durationMs": 2
     },
     {
       "id": "E2-AUTH-AND-ORIGIN",
@@ -642,8 +642,8 @@
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
       ],
-      "startedAt": "2026-11-10T05:06:56.990Z",
-      "finishedAt": "2026-11-10T05:06:56.998Z",
+      "startedAt": "2026-11-10T05:13:46.328Z",
+      "finishedAt": "2026-11-10T05:13:46.336Z",
       "durationMs": 8
     },
     {
@@ -693,8 +693,8 @@
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
       ],
-      "startedAt": "2026-11-10T05:06:56.998Z",
-      "finishedAt": "2026-11-10T05:06:57.002Z",
+      "startedAt": "2026-11-10T05:13:46.336Z",
+      "finishedAt": "2026-11-10T05:13:46.340Z",
       "durationMs": 4
     },
     {
@@ -732,12 +732,12 @@
         {
           "id": "ANSWER_RECORDED",
           "ok": true,
-          "detail": "{\"commandId\":\"e2-answer-2\",\"workId\":\"31502a39c50a8f17cb576acae6a83265\",\"entityRefs\":{\"questionId\":\"7edc3ac23d43ecb7a36e40d99e164abe\"},\"seq\":23,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e2-answer-2\",\"workId\":\"31502a39c50a8f17cb576acae6a83265\",\"entityRefs\":{\"questionId\":\"d0ba6b20cf35d2c597a6501a92c41dc3\"},\"seq\":23,\"status\":\"recorded\"}"
         },
         {
           "id": "DELIVERY_APPLIED",
           "ok": true,
-          "detail": "[{\"answerId\":\"3f5be07a4a2f9923dfcc3e3eadc09593\",\"targetBindingId\":\"721b243193e1a419edaa6a44ec48fa95\",\"status\":\"native_applied\",\"evidenceRefs\":[\"payload:feb152cafb79cb41499abde90222e2980dc2fb3f646bc81b042adcb625b0475e\"]}]"
+          "detail": "[{\"answerId\":\"3f5be07a4a2f9923dfcc3e3eadc09593\",\"targetBindingId\":\"e01444d26cef1a9280d6712fbadb34b4\",\"status\":\"native_applied\",\"evidenceRefs\":[\"payload:42779f48f7ab384ea06ad9f00099e36e257bcce15b1851b2d62e86f380da3733\"]}]"
         },
         {
           "id": "LOCAL_THEN_APPLIED",
@@ -778,7 +778,7 @@
         {
           "id": "PATCH_APPLIES_TO_BASE",
           "ok": true,
-          "detail": "patch did not reproduce the output at 8116e7259ad309f8808fb7ed5977d93accd46237"
+          "detail": "patch did not reproduce the output at 142713b646315722388cb04bb3ea2acb68d83f0e"
         },
         {
           "id": "ACCEPT_RECORDED",
@@ -797,7 +797,7 @@
       "evidence": {
         "workId": "31502a39c50a8f17cb576acae6a83265",
         "conversationId": "conv-e2-daily",
-        "verificationId": "verification:ca0fdf0c-7803-43a3-9f1a-aec4d58aa876",
+        "verificationId": "verification:8905568a-4189-4278-9beb-1750230df754",
         "artifact": {
           "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
           "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
@@ -811,17 +811,17 @@
           "bytes": 213,
           "apply": {
             "ok": true,
-            "targetCommit": "8116e7259ad309f8808fb7ed5977d93accd46237",
-            "projectPath": "/private/tmp/pa-project-mBqhoK"
+            "targetCommit": "142713b646315722388cb04bb3ea2acb68d83f0e",
+            "projectPath": "/private/tmp/pa-project-LamG3w"
           }
         }
       },
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
       ],
-      "startedAt": "2026-11-10T05:06:57.002Z",
-      "finishedAt": "2026-11-10T05:06:57.856Z",
-      "durationMs": 854
+      "startedAt": "2026-11-10T05:13:46.340Z",
+      "finishedAt": "2026-11-10T05:13:47.211Z",
+      "durationMs": 871
     },
     {
       "id": "E2-ARTIFACT-ROUNDTRIP",
@@ -830,11 +830,11 @@
       "status": "PASS",
       "assertions": [
         {
-          "id": "BYTES_5932061b",
+          "id": "BYTES_d1eca6f6",
           "ok": true
         },
         {
-          "id": "DIGEST_5932061b",
+          "id": "DIGEST_d1eca6f6",
           "ok": true
         },
         {
@@ -854,11 +854,11 @@
           "ok": true
         },
         {
-          "id": "BYTES_c18f9612",
+          "id": "BYTES_e7a43365",
           "ok": true
         },
         {
-          "id": "DIGEST_c18f9612",
+          "id": "DIGEST_e7a43365",
           "ok": true
         },
         {
@@ -886,8 +886,8 @@
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
       ],
-      "startedAt": "2026-11-10T05:06:57.856Z",
-      "finishedAt": "2026-11-10T05:06:57.861Z",
+      "startedAt": "2026-11-10T05:13:47.211Z",
+      "finishedAt": "2026-11-10T05:13:47.216Z",
       "durationMs": 5
     },
     {
@@ -928,8 +928,8 @@
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
       ],
-      "startedAt": "2026-11-10T05:06:57.861Z",
-      "finishedAt": "2026-11-10T05:06:57.865Z",
+      "startedAt": "2026-11-10T05:13:47.216Z",
+      "finishedAt": "2026-11-10T05:13:47.220Z",
       "durationMs": 4
     },
     {
@@ -959,9 +959,9 @@
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
       ],
-      "startedAt": "2026-11-10T05:06:57.865Z",
-      "finishedAt": "2026-11-10T05:06:57.868Z",
-      "durationMs": 3
+      "startedAt": "2026-11-10T05:13:47.220Z",
+      "finishedAt": "2026-11-10T05:13:47.224Z",
+      "durationMs": 4
     },
     {
       "id": "E2-STALE-BUSINESS-REJECTION",
@@ -1024,9 +1024,9 @@
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
       ],
-      "startedAt": "2026-11-10T05:06:57.868Z",
-      "finishedAt": "2026-11-10T05:06:59.044Z",
-      "durationMs": 1176
+      "startedAt": "2026-11-10T05:13:47.224Z",
+      "finishedAt": "2026-11-10T05:13:48.422Z",
+      "durationMs": 1198
     },
     {
       "id": "E2-MACHINE-FAIL",
@@ -1055,7 +1055,7 @@
         {
           "id": "ACCEPT_REFUSED",
           "ok": true,
-          "detail": "{\"commandId\":\"e2-accept-failing-13\",\"seq\":182,\"status\":\"rejected\",\"error\":{\"code\":\"verification_failed\",\"message\":\"The current core state does not permit this operation\",\"retry\":\"user_action\"}}"
+          "detail": "{\"commandId\":\"e2-accept-failing-13\",\"seq\":183,\"status\":\"rejected\",\"error\":{\"code\":\"verification_failed\",\"message\":\"The current core state does not permit this operation\",\"retry\":\"user_action\"}}"
         },
         {
           "id": "ACCEPT_CODE",
@@ -1071,9 +1071,9 @@
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
       ],
-      "startedAt": "2026-11-10T05:06:59.044Z",
-      "finishedAt": "2026-11-10T05:06:59.959Z",
-      "durationMs": 915
+      "startedAt": "2026-11-10T05:13:48.422Z",
+      "finishedAt": "2026-11-10T05:13:49.322Z",
+      "durationMs": 900
     },
     {
       "id": "E2-ONE-WRITER",
@@ -1088,7 +1088,7 @@
         {
           "id": "STOP_RECORDED",
           "ok": true,
-          "detail": "{\"commandId\":\"e2-stop-15\",\"workId\":\"6105c7a3fccbf457020c16feb74c70fd\",\"seq\":198,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e2-stop-15\",\"workId\":\"6105c7a3fccbf457020c16feb74c70fd\",\"seq\":199,\"status\":\"recorded\"}"
         },
         {
           "id": "STOPPED",
@@ -1105,7 +1105,7 @@
         {
           "id": "CONTINUE_RECORDED",
           "ok": true,
-          "detail": "{\"commandId\":\"e2-continue-16\",\"workId\":\"6105c7a3fccbf457020c16feb74c70fd\",\"seq\":205,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e2-continue-16\",\"workId\":\"6105c7a3fccbf457020c16feb74c70fd\",\"seq\":206,\"status\":\"recorded\"}"
         },
         {
           "id": "NEW_CONTRACT_REVISION",
@@ -1115,13 +1115,13 @@
         {
           "id": "FRESH_TICKET",
           "ok": true,
-          "detail": "ticket 8ac915ec78a91f96d8929ae44d0b76fc was reused"
+          "detail": "ticket 30992918481b5baaf07cfe674d96e21d was reused"
         }
       ],
       "evidence": {
         "oneWriter": {
-          "originalTicket": "f582fc6bd889d00c78106d06773a52c7",
-          "resumedTicket": "8ac915ec78a91f96d8929ae44d0b76fc",
+          "originalTicket": "999beb8b3bcc4c4abe6af47bd1e9f927",
+          "resumedTicket": "30992918481b5baaf07cfe674d96e21d",
           "originalRevision": 1,
           "resumedRevision": 2,
           "phase": "needs_user"
@@ -1130,9 +1130,9 @@
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
       ],
-      "startedAt": "2026-11-10T05:06:59.959Z",
-      "finishedAt": "2026-11-10T05:07:02.255Z",
-      "durationMs": 2296
+      "startedAt": "2026-11-10T05:13:49.322Z",
+      "finishedAt": "2026-11-10T05:13:51.629Z",
+      "durationMs": 2307
     },
     {
       "id": "E2-SCOPE-AND-PROFILE-GUARDS",
@@ -1143,7 +1143,7 @@
         {
           "id": "SCOPE_REJECTED",
           "ok": true,
-          "detail": "{\"commandId\":\"e2-scope-outside-17\",\"seq\":233,\"status\":\"rejected\",\"error\":{\"code\":\"forbidden\",\"message\":\"Scope exceeds the configured project grant\",\"retry\":\"none\"}}"
+          "detail": "{\"commandId\":\"e2-scope-outside-17\",\"seq\":236,\"status\":\"rejected\",\"error\":{\"code\":\"forbidden\",\"message\":\"Scope exceeds the configured project grant\",\"retry\":\"none\"}}"
         },
         {
           "id": "SCOPE_CODE",
@@ -1162,7 +1162,7 @@
         {
           "id": "PROFILE_REJECTED",
           "ok": true,
-          "detail": "{\"commandId\":\"e2-unadmitted-19\",\"seq\":235,\"status\":\"rejected\",\"error\":{\"code\":\"unsupported_capability\",\"message\":\"Unknown execution profile\",\"retry\":\"user_action\"}}"
+          "detail": "{\"commandId\":\"e2-unadmitted-19\",\"seq\":238,\"status\":\"rejected\",\"error\":{\"code\":\"unsupported_capability\",\"message\":\"Unknown execution profile\",\"retry\":\"user_action\"}}"
         },
         {
           "id": "PROFILE_CODE",
@@ -1190,8 +1190,8 @@
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
       ],
-      "startedAt": "2026-11-10T05:07:02.255Z",
-      "finishedAt": "2026-11-10T05:07:02.258Z",
+      "startedAt": "2026-11-10T05:13:51.629Z",
+      "finishedAt": "2026-11-10T05:13:51.632Z",
       "durationMs": 3
     },
     {
@@ -1262,11 +1262,11 @@
       },
       "limitations": [
         "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent.",
-        "state before restart 5776 kB; fresh pid 43090"
+        "state before restart 5716 kB; fresh pid 59153"
       ],
-      "startedAt": "2026-11-10T05:07:02.259Z",
-      "finishedAt": "2026-11-10T05:07:02.539Z",
-      "durationMs": 280
+      "startedAt": "2026-11-10T05:13:51.633Z",
+      "finishedAt": "2026-11-10T05:13:51.910Z",
+      "durationMs": 277
     },
     {
       "id": "E2-ASSISTANT-SDK-MOCK",
@@ -1277,7 +1277,7 @@
         {
           "id": "ASSISTANT_CONFIGURED",
           "ok": true,
-          "detail": "{\"protocol\":\"assistant-provider/1\",\"configured\":true,\"baseURL\":\"http://127.0.0.1:62174\",\"model\":\"mock-model\",\"models\":[\"mock-model\"],\"state\":\"configured\",\"secureTransport\":false}"
+          "detail": "{\"protocol\":\"assistant-provider/1\",\"configured\":true,\"baseURL\":\"http://127.0.0.1:62883\",\"model\":\"mock-model\",\"models\":[\"mock-model\"],\"state\":\"configured\",\"secureTransport\":false}"
         },
         {
           "id": "MOCK_MODEL",
@@ -1286,7 +1286,7 @@
         {
           "id": "LOOPBACK_MODEL",
           "ok": true,
-          "detail": "http://127.0.0.1:62174"
+          "detail": "http://127.0.0.1:62883"
         },
         {
           "id": "WORK_RECORDED",
@@ -1339,9 +1339,9 @@
         "Streaming rendering is covered by the browser suite, not asserted here.",
         "mock replies: 1; provenance reasoner_reply"
       ],
-      "startedAt": "2026-11-10T05:07:02.869Z",
-      "finishedAt": "2026-11-10T05:07:03.308Z",
-      "durationMs": 439
+      "startedAt": "2026-11-10T05:13:52.241Z",
+      "finishedAt": "2026-11-10T05:13:52.437Z",
+      "durationMs": 196
     },
     {
       "id": "E3-DESKTOP-GEOMETRY",
@@ -1485,9 +1485,9 @@
         "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
         "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
       ],
-      "startedAt": "2026-11-10T05:07:07.244Z",
-      "finishedAt": "2026-11-10T05:07:07.298Z",
-      "durationMs": 54
+      "startedAt": "2026-11-10T05:13:56.408Z",
+      "finishedAt": "2026-11-10T05:13:56.458Z",
+      "durationMs": 50
     },
     {
       "id": "E3-NOTEBOOK-GEOMETRY",
@@ -1590,9 +1590,9 @@
         "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
         "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
       ],
-      "startedAt": "2026-11-10T05:07:07.298Z",
-      "finishedAt": "2026-11-10T05:07:07.479Z",
-      "durationMs": 181
+      "startedAt": "2026-11-10T05:13:56.459Z",
+      "finishedAt": "2026-11-10T05:13:56.653Z",
+      "durationMs": 194
     },
     {
       "id": "E3-MOBILE-GEOMETRY",
@@ -1819,8 +1819,8 @@
         "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
         "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
       ],
-      "startedAt": "2026-11-10T05:07:07.479Z",
-      "finishedAt": "2026-11-10T05:07:08.023Z",
+      "startedAt": "2026-11-10T05:13:56.654Z",
+      "finishedAt": "2026-11-10T05:13:57.198Z",
       "durationMs": 544
     },
     {
@@ -1840,12 +1840,12 @@
         {
           "id": "DELIVERY_RECORDED",
           "ok": true,
-          "detail": "[{\"answerId\":\"08de34f12eeee3ad6f4d36e9d1d030b5\",\"targetBindingId\":\"d163819e35e37b42b5412badbaa076de\",\"status\":\"native_applied\",\"evidenceRefs\":[\"payload:acb90dba3fc69331b035b9c8331df103dc94f6e757df2e2b530e577cac1de479\"]}]"
+          "detail": "[{\"answerId\":\"90e5b38f9398550f38d120457a5a180d\",\"targetBindingId\":\"404045287dea9f48cfc14df5c4dc73a7\",\"status\":\"native_applied\",\"evidenceRefs\":[\"payload:611f9991c23037b89c8c8b9ed00aec4972eadf26b6bf2fe52f234a98b94b6068\"]}]"
         }
       ],
       "evidence": {
         "question": {
-          "id": "61e50735efc7e57a7cbaa7b884485fd3",
+          "id": "48002124891c84301d0a331e527edc25",
           "option": "Allow once",
           "deliveries": [
             "native_applied"
@@ -1856,9 +1856,9 @@
         "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
         "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
       ],
-      "startedAt": "2026-11-10T05:07:08.023Z",
-      "finishedAt": "2026-11-10T05:07:08.195Z",
-      "durationMs": 172
+      "startedAt": "2026-11-10T05:13:57.198Z",
+      "finishedAt": "2026-11-10T05:13:57.540Z",
+      "durationMs": 342
     },
     {
       "id": "E3-ACCEPT-AND-DOWNLOAD",
@@ -1907,16 +1907,16 @@
           "filename": "product-output.txt",
           "bytes": 24,
           "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
-          "saved": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z/screenshots/product-output.txt"
+          "saved": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-13-45-978Z/screenshots/product-output.txt"
         }
       },
       "limitations": [
         "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
         "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
       ],
-      "startedAt": "2026-11-10T05:07:08.195Z",
-      "finishedAt": "2026-11-10T05:07:08.954Z",
-      "durationMs": 759
+      "startedAt": "2026-11-10T05:13:57.540Z",
+      "finishedAt": "2026-11-10T05:13:58.992Z",
+      "durationMs": 1452
     },
     {
       "id": "E3-OFFLINE-AND-ERROR",
@@ -1957,9 +1957,9 @@
         "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
         "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
       ],
-      "startedAt": "2026-11-10T05:07:08.954Z",
-      "finishedAt": "2026-11-10T05:07:12.661Z",
-      "durationMs": 3707
+      "startedAt": "2026-11-10T05:13:58.992Z",
+      "finishedAt": "2026-11-10T05:14:02.776Z",
+      "durationMs": 3784
     },
     {
       "id": "E3-KEYBOARD-AND-SCROLL",
@@ -2034,9 +2034,9 @@
         "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
         "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
       ],
-      "startedAt": "2026-11-10T05:07:12.661Z",
-      "finishedAt": "2026-11-10T05:07:12.942Z",
-      "durationMs": 281
+      "startedAt": "2026-11-10T05:14:02.776Z",
+      "finishedAt": "2026-11-10T05:14:03.041Z",
+      "durationMs": 265
     },
     {
       "id": "E4-BOUNDED-CYCLES",
@@ -2050,9 +2050,29 @@
           "detail": "{\"commandId\":\"e4-accept-2\",\"workId\":\"4a3ab14376b41dd15fbaf2d11e6e2900\",\"seq\":32,\"status\":\"recorded\"}"
         },
         {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 0 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket e4b4a10fe67119db1ee566bc28aa9f2e reused"
+        },
+        {
           "id": "ANSWER",
           "ok": true,
-          "detail": "{\"commandId\":\"e4-answer-4\",\"workId\":\"ebae7031275c1f45da3610ff00bcee18\",\"entityRefs\":{\"questionId\":\"4439d7541ddfa442aac8c09b9e607d53\"},\"seq\":55,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e4-answer-4\",\"workId\":\"ebae7031275c1f45da3610ff00bcee18\",\"entityRefs\":{\"questionId\":\"529c93584abfe51a9967842d8db43988\"},\"seq\":55,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 1 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 8195f15770cb061f44c9fc983e01f8b0 reused"
         },
         {
           "id": "MACHINE_FAIL",
@@ -2064,19 +2084,59 @@
           "ok": true
         },
         {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 2 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 624c6768b59d95a5c7de39127dc738db reused"
+        },
+        {
           "id": "STOP",
           "ok": true,
-          "detail": "{\"commandId\":\"e4-stop-8\",\"workId\":\"0e0496e6cc22cb3f0085178d070c5fd8\",\"seq\":117,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e4-stop-8\",\"workId\":\"0e0496e6cc22cb3f0085178d070c5fd8\",\"seq\":124,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 3 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 4283ae755ed467bb37e5724f7261dfab reused"
         },
         {
           "id": "ACCEPT",
           "ok": true,
-          "detail": "{\"commandId\":\"e4-accept-10\",\"workId\":\"316abc8990c8e3e3d5f56d89b74d8812\",\"seq\":149,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e4-accept-10\",\"workId\":\"316abc8990c8e3e3d5f56d89b74d8812\",\"seq\":161,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 4 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket cb9a838dfda84dc43058c7b1ec3ade06 reused"
         },
         {
           "id": "ANSWER",
           "ok": true,
-          "detail": "{\"commandId\":\"e4-answer-12\",\"workId\":\"b0e0b4923b877ac6bde353c2731e23c1\",\"entityRefs\":{\"questionId\":\"900cbb921b26c91ae89a5ab858cfe333\"},\"seq\":172,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e4-answer-12\",\"workId\":\"b0e0b4923b877ac6bde353c2731e23c1\",\"entityRefs\":{\"questionId\":\"b9363160d4bf0713029b0b91bcf1bf00\"},\"seq\":184,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 5 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket c45b7dd7b8d70213fe443b3dffffb75f reused"
         },
         {
           "id": "REOPEN_NO_NEW_NATIVE_WRITE",
@@ -2084,6 +2144,11 @@
           "detail": "receipts 5 -> 5 across a reopen"
         },
         {
+          "id": "REOPEN_NO_NEW_BEGIN",
+          "ok": true,
+          "detail": "begins 6->6, attempts 6->6"
+        },
+        {
           "id": "MACHINE_FAIL",
           "ok": true,
           "detail": "[{\"criterionId\":\"fixed-output\",\"outcome\":\"FAIL\",\"evidenceRefs\":[\"check:check-fixture-output:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"]}]"
@@ -2093,19 +2158,59 @@
           "ok": true
         },
         {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 6 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 2adc2820a4bb7e93fdf70031e5450c60 reused"
+        },
+        {
           "id": "STOP",
           "ok": true,
-          "detail": "{\"commandId\":\"e4-stop-16\",\"workId\":\"8e9bbc3ae6d957efdb9e4bb693912e0a\",\"seq\":234,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e4-stop-16\",\"workId\":\"8e9bbc3ae6d957efdb9e4bb693912e0a\",\"seq\":253,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 7 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 7544c454a2c7e269347a6799692f158c reused"
         },
         {
           "id": "ACCEPT",
           "ok": true,
-          "detail": "{\"commandId\":\"e4-accept-18\",\"workId\":\"08c46400e5547fedd6ced14d091843e7\",\"seq\":266,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e4-accept-18\",\"workId\":\"08c46400e5547fedd6ced14d091843e7\",\"seq\":290,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 8 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 5e55b960461db3293ca9d7cd3e0b9048 reused"
         },
         {
           "id": "ANSWER",
           "ok": true,
-          "detail": "{\"commandId\":\"e4-answer-20\",\"workId\":\"bbe4a1d6d4692f8ab32c11aea068faa2\",\"entityRefs\":{\"questionId\":\"07bf139c57d638585664418bdc0882ec\"},\"seq\":289,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e4-answer-20\",\"workId\":\"bbe4a1d6d4692f8ab32c11aea068faa2\",\"entityRefs\":{\"questionId\":\"257731754d5a88150953f8f9316e8e4d\"},\"seq\":313,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 9 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 4414ac5d7cd72491ab2925a34b96706b reused"
         },
         {
           "id": "MACHINE_FAIL",
@@ -2117,9 +2222,29 @@
           "ok": true
         },
         {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 10 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 68f3876fbb8ddf7701f12a9169bb4249 reused"
+        },
+        {
           "id": "STOP",
           "ok": true,
-          "detail": "{\"commandId\":\"e4-stop-24\",\"workId\":\"ac8a6fae2825dbf0c925d94bfb5bd779\",\"seq\":351,\"status\":\"recorded\"}"
+          "detail": "{\"commandId\":\"e4-stop-24\",\"workId\":\"ac8a6fae2825dbf0c925d94bfb5bd779\",\"seq\":382,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 11 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 255aafaefcc6fa5dda95b43c670523fe reused"
         },
         {
           "id": "NO_CYCLE_FAILURE",
@@ -2131,9 +2256,24 @@
           "ok": true
         },
         {
-          "id": "ATTEMPTS_UNIQUE",
+          "id": "ATTEMPTS_RECORDED",
           "ok": true,
-          "detail": "0 of 0"
+          "detail": "no cycle produced a physical attempt"
+        },
+        {
+          "id": "ATTEMPTS_MATCH_CYCLES",
+          "ok": true,
+          "detail": "12 attempts for 12 started works"
+        },
+        {
+          "id": "BEGINS_MATCH_ATTEMPTS",
+          "ok": true,
+          "detail": "12 begin ACKs for 12 attempts"
+        },
+        {
+          "id": "DISPATCH_OBSERVED_AT_LEAST_ATTEMPTS",
+          "ok": true,
+          "detail": "24 dispatch facts for 12 attempts"
         },
         {
           "id": "PROCESS_ALIVE",
@@ -2142,7 +2282,7 @@
         {
           "id": "CHILDREN_BOUNDED",
           "ok": true,
-          "detail": "children 0 vs baseline 0"
+          "detail": "children 1 vs baseline 0"
         },
         {
           "id": "FD_BOUNDED",
@@ -2162,31 +2302,39 @@
         "cycles": {
           "requested": 12,
           "completed": 12,
-          "durationMs": 6965,
+          "durationMs": 7557,
           "baseline": {
-            "pid": 45228,
-            "processStart": "Tue Nov 10 13:07:12 2026",
-            "observedAt": "2026-11-10T05:07:13.321Z",
-            "ppid": 41597,
-            "rssKb": 170752,
-            "elapsed": "00:01",
+            "pid": 61678,
+            "processStart": "Tue Nov 10 13:14:03 2026",
+            "observedAt": "2026-11-10T05:14:03.416Z",
+            "ppid": 57663,
+            "rssKb": 170112,
+            "elapsed": "00:00",
             "state": "Ss",
             "openFds": 0,
             "children": []
           },
           "baselineReceipts": 0,
+          "baselineRuntime": {
+            "attempts": [],
+            "begins": 0,
+            "observed": 0
+          },
           "observations": [
             {
               "cycle": 0,
               "mode": "pass",
               "phase": "delivered",
               "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 687,
-              "rssKb": 175856,
+              "hadAttempt": true,
+              "attempt": "attempt-59a391f4-27b9-4546-81cc-755a60394bb9",
+              "durationMs": 686,
+              "rssKb": 175296,
               "openFds": 0,
               "children": 0,
               "receipts": 1,
+              "begins": 1,
+              "dispatchObserved": 2,
               "stateKb": 1364
             },
             {
@@ -2194,160 +2342,195 @@
               "mode": "question",
               "phase": "delivered",
               "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 782,
-              "rssKb": 183840,
+              "hadAttempt": true,
+              "attempt": "attempt-2d44ce50-5f07-4908-871f-d2c529477532",
+              "durationMs": 798,
+              "rssKb": 190032,
               "openFds": 0,
               "children": 0,
               "receipts": 2,
-              "stateKb": 2664
+              "begins": 2,
+              "dispatchObserved": 5,
+              "stateKb": 2644
             },
             {
               "cycle": 2,
               "mode": "fail",
               "phase": "needs_user",
               "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 758,
-              "rssKb": 187808,
+              "hadAttempt": true,
+              "attempt": "attempt-2eb1d7d0-3692-4cba-9997-9e57617538d2",
+              "durationMs": 605,
+              "rssKb": 187280,
               "openFds": 0,
               "children": 0,
               "receipts": 3,
-              "stateKb": 3760
+              "begins": 3,
+              "dispatchObserved": 7,
+              "stateKb": 3740
             },
             {
               "cycle": 3,
               "mode": "slow",
-              "phase": "ended",
-              "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 88,
-              "rssKb": 187888,
+              "phase": "stopping",
+              "resourceStatus": "indeterminate",
+              "hadAttempt": true,
+              "attempt": "attempt-3e9ca49f-ed10-44fc-8501-3e0477c9fdc9",
+              "durationMs": 227,
+              "rssKb": 187440,
               "openFds": 0,
               "children": 0,
               "receipts": 3,
-              "stateKb": 3760
+              "begins": 4,
+              "dispatchObserved": 8,
+              "stateKb": 4796
             },
             {
               "cycle": 4,
               "mode": "pass",
               "phase": "delivered",
               "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 657,
-              "rssKb": 189360,
+              "hadAttempt": true,
+              "attempt": "attempt-c00ff71e-f29b-4879-8e78-61975e13fde2",
+              "durationMs": 769,
+              "rssKb": 192736,
               "openFds": 0,
               "children": 0,
               "receipts": 4,
-              "stateKb": 5412
+              "begins": 5,
+              "dispatchObserved": 10,
+              "stateKb": 5428
             },
             {
               "cycle": 5,
               "mode": "question",
               "phase": "delivered",
               "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 825,
-              "rssKb": 200944,
+              "hadAttempt": true,
+              "attempt": "attempt-b3def2b8-d3e3-4d40-8c05-e6d0269fd0ad",
+              "durationMs": 886,
+              "rssKb": 204464,
               "openFds": 0,
               "children": 0,
               "receipts": 5,
-              "stateKb": 5488
+              "begins": 6,
+              "dispatchObserved": 13,
+              "stateKb": 5504
             },
             {
               "cycle": 6,
               "mode": "fail",
               "phase": "needs_user",
               "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 617,
-              "rssKb": 173072,
+              "hadAttempt": true,
+              "attempt": "attempt-1b6df7fb-dc50-48e3-9c56-ac3e802a35c8",
+              "durationMs": 647,
+              "rssKb": 172080,
               "openFds": 0,
               "children": 0,
               "receipts": 6,
-              "stateKb": 1832
+              "begins": 7,
+              "dispatchObserved": 15,
+              "stateKb": 1908
             },
             {
               "cycle": 7,
               "mode": "slow",
-              "phase": "ended",
-              "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 66,
-              "rssKb": 173872,
+              "phase": "stopping",
+              "resourceStatus": "indeterminate",
+              "hadAttempt": true,
+              "attempt": "attempt-d20e1d52-448e-4d5b-bc5a-761f46cd4e26",
+              "durationMs": 231,
+              "rssKb": 173600,
               "openFds": 0,
               "children": 0,
               "receipts": 6,
-              "stateKb": 2072
+              "begins": 8,
+              "dispatchObserved": 16,
+              "stateKb": 2408
             },
             {
               "cycle": 8,
               "mode": "pass",
               "phase": "delivered",
               "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 613,
-              "rssKb": 181808,
+              "hadAttempt": true,
+              "attempt": "attempt-cf19775f-94ff-4ffc-8328-6e902e598d3d",
+              "durationMs": 703,
+              "rssKb": 186144,
               "openFds": 0,
               "children": 0,
               "receipts": 7,
-              "stateKb": 3800
+              "begins": 9,
+              "dispatchObserved": 18,
+              "stateKb": 3804
             },
             {
               "cycle": 9,
               "mode": "question",
               "phase": "delivered",
               "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 863,
-              "rssKb": 186160,
+              "hadAttempt": true,
+              "attempt": "attempt-a7bf5b54-529f-4033-9cec-edc9b4507ddf",
+              "durationMs": 778,
+              "rssKb": 184272,
               "openFds": 0,
               "children": 0,
               "receipts": 8,
-              "stateKb": 4900
+              "begins": 10,
+              "dispatchObserved": 21,
+              "stateKb": 4904
             },
             {
               "cycle": 10,
               "mode": "fail",
               "phase": "needs_user",
               "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 582,
-              "rssKb": 186800,
+              "hadAttempt": true,
+              "attempt": "attempt-de36b78e-4d5c-4682-815d-0052a93849f7",
+              "durationMs": 566,
+              "rssKb": 188720,
               "openFds": 0,
               "children": 0,
               "receipts": 9,
-              "stateKb": 4952
+              "begins": 11,
+              "dispatchObserved": 23,
+              "stateKb": 6176
             },
             {
               "cycle": 11,
               "mode": "slow",
-              "phase": "ended",
-              "resourceStatus": "quiescent",
-              "hadAttempt": false,
-              "durationMs": 65,
-              "rssKb": 187536,
+              "phase": "stopping",
+              "resourceStatus": "indeterminate",
+              "hadAttempt": true,
+              "attempt": "attempt-f6a2704a-70ba-434b-9221-cb43b6d13ab3",
+              "durationMs": 225,
+              "rssKb": 191392,
               "openFds": 0,
-              "children": 0,
+              "children": 1,
               "receipts": 9,
-              "stateKb": 5976
+              "begins": 12,
+              "dispatchObserved": 24,
+              "stateKb": 6208
             }
           ],
           "failures": [],
-          "attemptCount": 0,
+          "attemptCount": 12,
           "finalReceipts": 9,
-          "finalStateKb": 5976
+          "finalBegins": 12,
+          "finalObserved": 24,
+          "finalStateKb": 6208
         }
       },
       "limitations": [
         "Bounded local soak: mixed controlled cycles, not a long-running production soak.",
         "RSS/FD/disk are observations of this instance only; absence of a process leak is not proven by ports.",
         "Physical writer proof for real vendors is B-owned evidence and is not claimed here.",
-        "cycles 12/12; latency median 657ms; receipts 0->9; rss 170752->187536 kB; fds 0->0"
+        "cycles 12/12; latency median 686ms; receipts 0->9; rss 170112->191392 kB; fds 0->0"
       ],
-      "startedAt": "2026-11-10T05:07:13.317Z",
-      "finishedAt": "2026-11-10T05:07:20.285Z",
-      "durationMs": 6968
+      "startedAt": "2026-11-10T05:14:03.413Z",
+      "finishedAt": "2026-11-10T05:14:10.973Z",
+      "durationMs": 7560
     },
     {
       "id": "E4-PORTABILITY-CHECKLIST",
@@ -2403,8 +2586,8 @@
         "Acceptance-side checklist only; D has not published a real bundle manifest yet.",
         "No installation, first-run, backup or rollback was executed."
       ],
-      "startedAt": "2026-11-10T05:07:20.304Z",
-      "finishedAt": "2026-11-10T05:07:20.305Z",
+      "startedAt": "2026-11-10T05:14:11.025Z",
+      "finishedAt": "2026-11-10T05:14:11.026Z",
       "durationMs": 1
     },
     {
@@ -2516,12 +2699,12 @@
     "tier": "controlled-product-internal-trial",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-10T05:07:20.318Z",
+    "checkedAt": "2026-11-10T05:14:11.039Z",
     "source": {
-      "commit": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
-      "dirty": false
+      "commit": "3c191bbc82053c191947709384a393c89a9ff5b6",
+      "dirty": true
     },
-    "expectedSource": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+    "expectedSource": "3c191bbc82053c191947709384a393c89a9ff5b6",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2684,7 +2867,7 @@
   "claim": {
     "status": "PASS",
     "tier": "controlled-product-internal-trial",
-    "decidedAt": "2026-11-10T05:07:20.318Z",
+    "decidedAt": "2026-11-10T05:14:11.039Z",
     "failureCodes": []
   }
 }
