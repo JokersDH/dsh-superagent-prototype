@@ -92,3 +92,53 @@ export function tier(name) {
   if (!requirement) throw new Error(`Unknown tier ${name}. Known: ${Object.keys(TIERS).join(', ')}`)
   return requirement
 }
+
+const E2_REQUIRED = [
+  { id: 'E2-CONFIGURATION', required: true, evidence: ['configurationRevision'] },
+  { id: 'E2-DAILY-VERTICAL', required: true, evidence: ['workId', 'verificationId', 'artifact'] },
+  { id: 'E2-ARTIFACT-ROUNDTRIP', required: true, evidence: ['artifact'] },
+  { id: 'E2-REOPEN-PERSISTENCE', required: true, evidence: ['workId', 'conversation'] },
+  { id: 'E2-REPLAY-AND-CONFLICT', required: true },
+  { id: 'E2-SESSION-ISOLATION', required: true },
+  { id: 'E2-STALE-BUSINESS-REJECTION', required: true },
+  { id: 'E2-MACHINE-FAIL', required: true },
+  { id: 'E2-ONE-WRITER', required: true },
+  { id: 'E2-SCOPE-AND-PROFILE-GUARDS', required: true, evidence: ['fixture'] },
+  { id: 'E2-AUTH-AND-ORIGIN', required: true },
+  { id: 'E2-ASSISTANT-SDK-MOCK', required: true, evidence: ['assistant'] },
+]
+
+TIERS['e2-controlled-workflow'] = {
+  tier: 'e2-controlled-workflow',
+  description: 'Daily controlled product workflow and negative cases only.',
+  maxAgeMs: 6 * 60 * 60 * 1000,
+  allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK],
+  cases: E2_REQUIRED,
+}
+
+TIERS['e3-browser-ui'] = {
+  tier: 'e3-browser-ui',
+  description: 'Independent browser/geometry/interaction acceptance only.',
+  maxAgeMs: 6 * 60 * 60 * 1000,
+  allowedLayers: [LAYERS.CONTROLLED],
+  cases: [
+    { id: 'E3-DESKTOP-GEOMETRY', required: true, evidence: ['layouts'] },
+    { id: 'E3-NOTEBOOK-GEOMETRY', required: true, evidence: ['layouts'] },
+    { id: 'E3-MOBILE-GEOMETRY', required: true, evidence: ['layouts'] },
+    { id: 'E3-QUESTION-FORM', required: true },
+    { id: 'E3-ACCEPT-AND-DOWNLOAD', required: true, evidence: ['download'] },
+    { id: 'E3-OFFLINE-AND-ERROR', required: true },
+    { id: 'E3-KEYBOARD-AND-SCROLL', required: true },
+  ],
+}
+
+TIERS['e4-bounded-stability'] = {
+  tier: 'e4-bounded-stability',
+  description: 'Bounded mixed execution cycles and portability checklist checks.',
+  maxAgeMs: 6 * 60 * 60 * 1000,
+  allowedLayers: [LAYERS.CONTROLLED, LAYERS.READONLY],
+  cases: [
+    { id: 'E4-BOUNDED-CYCLES', required: true, evidence: ['cycles'] },
+    { id: 'E4-PORTABILITY-CHECKLIST', required: true, evidence: ['fixture'] },
+  ],
+}

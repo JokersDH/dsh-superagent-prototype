@@ -1,0 +1,59 @@
+{
+  "schema": "product-acceptance-stages/1",
+  "agent": "E",
+  "branch": "codex/g3-product-acceptance",
+  "base": "3957e30cbbaa3cd86a672fb4583922eba8364fc8",
+  "checkpoint": "835d663",
+  "budget": {
+    "modelTasks": 0,
+    "nativeRuns": 0,
+    "note": "No vendor model was called. The only model peer is a loopback OpenAI-compatible mock created by the E2 case."
+  },
+  "stages": [
+    {
+      "id": "E1",
+      "title": "Fail-closed independent harness and checkpoint",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only",
+      "notes": [
+        "21 self-tests prove the gate rejects missing cases, unknown status, uncertain acceptance, stale reports, missing candidates, corrupt patches, unexecuted native evidence and illegal fixtures.",
+        "A run of the release tier with only selftests exits nonzero with 20 missing_required_case failures."
+      ]
+    },
+    {
+      "id": "E2",
+      "title": "Daily product vertical and negative cases",
+      "command": "node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow",
+      "notes": [
+        "Real SQLite, real scratch subprocess and real verification through authenticated loopback HTTP.",
+        "Covers question/answer/delivery, machine PASS and FAIL, patch apply to the recorded base commit, artifact byte roundtrip, command replay/conflict, stale contract/candidate/answer, two-conversation isolation, stop/continue writer identity, scope/profile guards, restart persistence and a loopback SDK mock chat."
+      ]
+    },
+    {
+      "id": "E3",
+      "title": "Independent browser, visual geometry and interaction regression",
+      "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
+      "notes": [
+        "Packaged workbench at 1440x900, 1280x800 and 390x844; geometry/overflow/reachability rather than aesthetic scoring.",
+        "Covers the decision inbox, patch preview, byte-verified artifact download, UI acceptance, reopen, loading, error, SSE-offline, tab focus, long Chinese/path and list scrolling."
+      ]
+    },
+    {
+      "id": "E4",
+      "title": "Bounded stability and portability boundaries",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12",
+      "notes": [
+        "Mixed question/complete/fail/stop cycles with a restart in the middle; process/FD/RSS/disk/receipt observations remain scoped to this instance.",
+        "Portable installation, first-run, backup/restore and upgrade rollback are declared NOT_TESTED because D's directories are absent in this checkout."
+      ]
+    },
+    {
+      "id": "E5",
+      "title": "Release matrix, re-verification and handoff",
+      "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
+      "notes": [
+        "Aggregates the recorded cases into a reproducible matrix bound to the source commit.",
+        "A full-product claim is rejected by the gate while native and installation evidence are absent."
+      ]
+    }
+  ]
+}

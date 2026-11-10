@@ -69,12 +69,14 @@ export async function layoutFacts(page) {
       if (!element) continue
       const rect = element.getBoundingClientRect()
       const style = getComputedStyle(element)
+      const shown = rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none'
       boxes[name] = {
         x: Math.round(rect.x),
         y: Math.round(rect.y),
         width: Math.round(rect.width),
         height: Math.round(rect.height),
-        visible: rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none',
+        visible: shown,
+        onScreen: shown && rect.left < viewport.width - 2 && rect.right > 2,
       }
     }
     const overflowing = [...document.querySelectorAll('body *')]
@@ -99,7 +101,7 @@ export async function layoutFacts(page) {
 }
 
 export function intersect(a, b) {
-  if (!a || !b || !a.visible || !b.visible) return 0
+  if (!a || !b || !a.onScreen || !b.onScreen) return 0
   const width = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x)
   const height = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y)
   return width > 2 && height > 2 ? width * height : 0

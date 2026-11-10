@@ -109,8 +109,7 @@ const report = {
     .map((item) => ({ id: item.id, status: item.status, reason: item.reason ?? null })),
 }
 
-const requirementName =
-  values.tier ?? (values.record ? 'controlled-product-internal-trial' : 'harness-only')
+const requirementName = values.tier ?? (requested.length === 1 ? { selftest: 'harness-only', e2: 'e2-controlled-workflow', e3: 'e3-browser-ui', e4: 'e4-bounded-stability' }[requested[0]] : 'controlled-product-internal-trial')
 const requirement = tier(requirementName)
 const verdict = evaluateRelease({
   report,

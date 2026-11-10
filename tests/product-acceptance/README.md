@@ -49,27 +49,61 @@ From the repository root, after `pnpm install --frozen-lockfile --ignore-scripts
 
 ```sh
 # Tool can fail (fast, no server)
-node tests/product-acceptance/run.mjs --suites=selftest
+node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only
 
-# Daily product vertical, negative cases and reader observations
-node tests/product-acceptance/run.mjs --suites=e2
+# Daily product vertical, negative cases and a loopback SDK mock
+node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow
 
-# Independent browser/visual acceptance (needs Playwright Chromium)
-node tests/product-acceptance/run.mjs --suites=e3
+# Independent browser/geometry/interaction acceptance (Playwright Chromium)
+node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui
 
-# Bounded stability cycles plus portability fixtures
-node tests/product-acceptance/run.mjs --suites=e4 --cycles=12
+# Bounded mixed cycles plus portability checklist rules
+node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12
 
-# Everything executable here, then aggregate one release claim
+# Whole package, one fail-closed release claim
 node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
+
+# Turn the recorded run into the matrix, execution status and handoff
+node tests/product-acceptance/build-handoff.mjs
 ```
 
 `run.mjs` writes `reports/runs/<UTC timestamp>/report.json`, `release.json` and screenshots under
 this directory. A nonzero exit means the gate rejected the claim; the JSON always says why.
+`build-handoff.mjs` writes `reports/release-matrix.json`, `reports/execution-status.json` and
+`reports/handoff.zh-CN.md` from one recorded run.
 
 Every run prints the source commit, dirty state, Node/platform, the ports it used and the private
 state directories it created and removed. Credentials are read from the private state file by the
 process that owns it and are never printed, logged or written into a report.
+
+## Tiers
+
+| Tier | Requires |
+| --- | --- |
+| `harness-only` | The gate self-tests only. No product claim. |
+| `e2-controlled-workflow` | The controlled product vertical, negative cases and loopback SDK chat. |
+| `e3-browser-ui` | The independent browser suite. |
+| `e4-bounded-stability` | Bounded cycles and portability checklist rules. Installation stays NOT_TESTED. |
+| `controlled-product-internal-trial` | All of the above; the whole-package claim. |
+| `full-product` | Additionally requires portable installation and real native execution. It fails today by design. |
+
+## What each suite asserts
+
+- `selftest/` — 21 bundles prove the gate rejects missing cases, unknown status, uncertain
+  acceptance, stale reports, missing candidates, corrupt/unapplied patches, unexecuted native
+  evidence, invalid responses, fixture drift and illegal fixtures.
+- `cases/e2-daily.mjs` — real SQLite, real scratch subprocess, real verification through
+  authenticated loopback HTTP: question/answer/delivery, machine PASS and FAIL, patch application to
+  the recorded base commit, artifact byte roundtrip, replay/conflict, stale contract/candidate/answer,
+  conversation isolation, stop/continue ticket identity, scope/profile guards, restart persistence
+  and a loopback OpenAI-compatible mock chat.
+- `cases/e3-browser.mjs` — packaged workbench at 1440×900, 1280×800 and 390×844; conversation-centred
+  geometry, no horizontal overflow or cross-region overlap, design tokens, decision inbox, patch
+  preview, byte-verified download, UI acceptance and reopen, loading/error/SSE-offline states, tab
+  focus, long Chinese/path and list scrolling.
+- `cases/e4-stability.mjs` — mixed question/complete/fail/stop cycles with a restart in the middle,
+  bounded process/FD/RSS/disk/receipt observation, then portability checklist rules. Installation,
+  first-run, backup/restore and upgrade rollback are declared NOT_TESTED while D's paths are absent.
 
 ## Boundaries
 

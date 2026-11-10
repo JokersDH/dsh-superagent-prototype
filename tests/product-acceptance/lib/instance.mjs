@@ -147,7 +147,15 @@ class InstanceHandle {
  * Launches the real controlled product entry as a child process in a private state directory.
  * `--native` is never passed: this lane is deterministic fixtures only.
  */
-export async function startProduct({ root, port, stateRoot, consoleOrigin, env = {}, kind = 'product' }) {
+export async function startProduct({
+  root,
+  port,
+  stateRoot,
+  consoleOrigin,
+  env = {},
+  extraArgs = [],
+  kind = 'product',
+}) {
   const logFile = join(stateRoot, 'acceptance-server.log')
   const child = spawn(
     process.execPath,
@@ -159,6 +167,7 @@ export async function startProduct({ root, port, stateRoot, consoleOrigin, env =
       stateRoot,
       '--console-origin',
       consoleOrigin,
+      ...extraArgs,
     ],
     {
       cwd: root,
@@ -189,7 +198,7 @@ export async function startProduct({ root, port, stateRoot, consoleOrigin, env =
 }
 
 /** Launches the packaged fixture workbench (same-origin console + product API) for browser work. */
-export async function startWorkbench({ root, port, apiPort, stateRoot }) {
+export async function startWorkbench({ root, port, apiPort, stateRoot, env = {} }) {
   const logFile = join(stateRoot, 'acceptance-workbench.log')
   const child = spawn(
     process.execPath,
@@ -205,7 +214,7 @@ export async function startWorkbench({ root, port, apiPort, stateRoot }) {
     ],
     {
       cwd: root,
-      env: { ...process.env },
+      env: { ...process.env, ...env },
       detached: process.platform !== 'win32',
       stdio: ['ignore', 'pipe', 'pipe'],
     },
@@ -223,7 +232,15 @@ export async function startWorkbench({ root, port, apiPort, stateRoot }) {
     await handle.stop()
     throw new Error(`${error.message}\nWorkbench log:\n${sink.join('').slice(-4000)}`)
   }
-  const record = JSON.parse(readFileSync(join(stateRoot, 'workbench.json'), 'utf8'))
+  const recordPath = join(stateRoot, 'workbench.json')
+  const recordDeadline = Date.now() + 25_000
+  while (!existsSync(recordPath) && Date.now() < recordDeadline)
+    await new Promise((resolve) => setTimeout(resolve, 100))
+  if (!existsSync(recordPath)) {
+    await handle.stop()
+    throw new Error(`Workbench record was not published\nWorkbench log:\n${sink.join('').slice(-4000)}`)
+  }
+  const record = JSON.parse(readFileSync(recordPath, 'utf8'))
   handle.record = record
   handle.apiURL = record.apiURL
   return handle
