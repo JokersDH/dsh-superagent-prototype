@@ -1,6 +1,7 @@
 import { resolve, join } from 'node:path'
 import { parseArgs } from 'node:util'
 import { fileURLToPath } from 'node:url'
+import { existsSync } from 'node:fs'
 import { InstanceRegistry, ProductStore, WriterLock } from '@personal-agent/storage'
 import { createLocalHttpApp } from '../http/app.ts'
 import { localCredentials } from '../http/local-state.ts'
@@ -9,6 +10,7 @@ import { createProductRuntime } from './runtime.ts'
 import { ensureScratchProject } from './scratch.ts'
 import { PrivateModelProvider } from './model-provider.ts'
 import { nativeStartup } from './native-startup.ts'
+import { NativeProjectRegistry } from './project-registry.ts'
 
 const { values } = parseArgs({
   options: {
@@ -21,10 +23,13 @@ const { values } = parseArgs({
     'local-access': { type: 'boolean', default: false },
     assistant: { type: 'boolean', default: false },
     native: { type: 'boolean', default: false },
+    'startup-mode': { type: 'string', default: 'normal' },
   },
 })
 const stateRoot = resolve(values.state!),
   port = Number(values.port)
+if (!['normal', 'recovery_readonly'].includes(values['startup-mode']!)) throw new Error('Unsupported startup mode')
+const recovery = values['startup-mode'] === 'recovery_readonly' || existsSync(join(stateRoot, 'restore-report.json'))
 const credential = localCredentials(stateRoot)
 const store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
 const lock = new WriterLock(stateRoot, new InstanceRegistry(store.db))
@@ -38,7 +43,9 @@ const principal = {
   userId: 'local-demo-user',
   authorityRef: 'local-demo-authority',
 }
-const native = values.native ? nativeStartup(stateRoot) : undefined
+const native = values.native && !recovery ? nativeStartup(stateRoot) : undefined
+const restoredProjects = recovery ? new NativeProjectRegistry(stateRoot).list().map(project => ({ id: project.id,
+  displayName: project.displayName, scope: { projectId: project.id, allowedPaths: ['.'], excludedPaths: ['.git'], externalActions: [] } })) : []
 const product = createProductRuntime({
   store,
   principal,
@@ -46,6 +53,7 @@ const product = createProductRuntime({
   scratchProject: ensureScratchProject(stateRoot),
   projects: [
     ...(native?.projects ?? []),
+    ...restoredProjects.filter(project => project.id !== 'project-atlas'),
     {
       id: 'project-atlas',
       displayName: '流程测试项目',
@@ -58,7 +66,7 @@ const product = createProductRuntime({
     },
   ],
   actionSecret: Buffer.from(credential('action.key'), 'hex'),
-  ...(values.assistant ? { assistantProvider: new PrivateModelProvider() } : {}),
+  ...(values.assistant && !recovery ? { assistantProvider: new PrivateModelProvider() } : {}),
   ...(native ? { native: native.native, projectRegistry: native.registry, workspaceRoot: native.workspaceRoot } : {}),
 })
 const http = createLocalHttpApp({
@@ -68,11 +76,13 @@ const http = createLocalHttpApp({
   bootstrapToken: credential('bootstrap.key'),
   allowedOrigins: [`http://127.0.0.1:${port}`, values['console-origin']!],
   mode: values.native ? 'personal' : 'fixture',
+  startupMode: recovery ? 'recovery_readonly' : 'normal',
   localDevelopmentAccess: values['local-access'] === true,
   read: product.read,
+  operations: product.operations,
 })
 const server = listenLocalHttp(http, port)
-product.start()
+if (!recovery) product.start()
 const heartbeat = setInterval(() => lock.heartbeat(), 5000)
 let closing: Promise<void> | undefined
 const shutdown = () =>
@@ -100,7 +110,9 @@ server.once('listening', () => {
   console.log(`Personal product API: http://127.0.0.1:${port}/v1/health`)
   console.log(`Private state/credential references: ${stateRoot}`)
   console.log(
-    values.native
+    recovery
+      ? 'Recovery read-only: business queues and model providers are disabled; local revalidation is required.'
+      : values.native
       ? 'Native Codex MVP enabled: isolated worktrees, registered checks and reviewed patch delivery.'
       : values.assistant
       ? 'Model dialogue enabled when privately configured; work execution uses controlled scratch profiles.'

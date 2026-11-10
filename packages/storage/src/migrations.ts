@@ -207,8 +207,84 @@ const V7: Migration = {
   ],
 }
 
+
+/**
+ * v8: durable conversation catalog and bounded search. Conversations are identity/title/index rows;
+ * messages remain in `conversation_messages`. FTS5 trigram matches bounded substrings (including
+ * Chinese and short ASCII), while archive only changes catalog visibility. Backfill makes a v7
+ * database usable without rewriting message identities.
+ */
+const V8: Migration = {
+  version: 8,
+  name: 'conversation-catalog',
+  statements: [
+    `CREATE TABLE conversations (
+      id TEXT PRIMARY KEY, project_id TEXT, title TEXT NOT NULL, title_revision INTEGER NOT NULL,
+      created_at TEXT NOT NULL, updated_at TEXT NOT NULL, archived_at TEXT,
+      archive_revision INTEGER NOT NULL DEFAULT 0)`,
+    `CREATE INDEX conversations_catalog ON conversations (archived_at, updated_at DESC, id DESC)`,
+    `CREATE INDEX conversations_project ON conversations (project_id, archived_at, updated_at DESC, id DESC)`,
+    `CREATE VIRTUAL TABLE conversation_search USING fts5(
+      conversation_id UNINDEXED, message_id UNINDEXED, title, text, tokenize='trigram')`,
+    `INSERT OR IGNORE INTO conversations (id, project_id, title, title_revision, created_at, updated_at)
+      SELECT conversation_id, project_id, json_extract(value, '$.title'), 1, created_at, created_at FROM works`,
+    `INSERT OR IGNORE INTO conversations (id, project_id, title, title_revision, created_at, updated_at)
+      SELECT conversation_id, NULL, 'Conversation', 1, MIN(created_at), MAX(created_at)
+      FROM conversation_messages GROUP BY conversation_id`,
+    `UPDATE conversations SET project_id = COALESCE(project_id,
+      (SELECT project_id FROM works WHERE works.conversation_id = conversations.id ORDER BY created_at, id LIMIT 1))
+      WHERE project_id IS NULL`,
+    `UPDATE conversations SET title = COALESCE(NULLIF(
+      (SELECT substr(json_extract(value, '$.text'), 1, 120) FROM conversation_messages
+       WHERE conversation_id = conversations.id ORDER BY sequence LIMIT 1), ''), title)
+      WHERE title = 'Conversation'`,
+    `INSERT INTO conversation_search (conversation_id, message_id, title, text)
+      SELECT id, '', title, '' FROM conversations`,
+    `INSERT INTO conversation_search (conversation_id, message_id, title, text)
+      SELECT conversation_id, id, '', json_extract(value, '$.text') FROM conversation_messages`,
+  ],
+}
+
+/**
+ * v9: versioned project settings. Old settings stay as immutable history; a separate current row
+ * carries the active revision and archive CAS. It stores a source digest/reference, never a model
+ * credential or a second Work lifecycle.
+ */
+const V9: Migration = {
+  version: 9,
+  name: 'project-settings',
+  statements: [
+    `CREATE TABLE project_settings_versions (
+      project_id TEXT NOT NULL, revision INTEGER NOT NULL, display_name TEXT, path_digest TEXT NOT NULL,
+      check_kind TEXT NOT NULL, environment TEXT, source_ref TEXT NOT NULL, value TEXT NOT NULL,
+      digest TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (project_id, revision))`,
+    `CREATE INDEX project_settings_history ON project_settings_versions (project_id, revision DESC)`,
+    `CREATE TABLE project_settings_current (
+      project_id TEXT PRIMARY KEY, revision INTEGER NOT NULL, archived_at TEXT,
+      archive_revision INTEGER NOT NULL DEFAULT 0)`,
+  ],
+}
+
+/**
+ * v10: explicit user decisions. Versions are append-only; revocation appends a newer version with
+ * `revokedAt`, and scope/project/source are queryable. This table records decisions; it does not
+ * infer rules or grant execution authority.
+ */
+const V10: Migration = {
+  version: 10,
+  name: 'user-decisions',
+  statements: [
+    `CREATE TABLE user_decision_versions (
+      id TEXT NOT NULL, version INTEGER NOT NULL, project_id TEXT NOT NULL, content TEXT NOT NULL,
+      authority_ref TEXT NOT NULL, supersedes TEXT, revoked_at TEXT, value TEXT NOT NULL,
+      digest TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (id, version))`,
+    `CREATE INDEX user_decisions_project ON user_decision_versions (project_id, version DESC, id)`,
+    `CREATE INDEX user_decisions_current ON user_decision_versions (id, version DESC)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>

@@ -14,22 +14,29 @@ import {
   NativeQuestionBindingSchema,
   PreparedExecutionPolicySchema,
   RunnerCommandSchema,
+  WorkVerificationStatusSchema,
 } from '@personal-agent/contracts'
 import type {
   AttemptRef,
+  CandidateRef,
   CriticalFact,
   NativeDispatch,
   NativeQuestionBinding,
   RunnerCommand,
   RuntimeFactPayload,
+  WorkVerificationStatus,
+  WorkView,
 } from '@personal-agent/contracts'
+import { ApplicationFault } from '@personal-agent/application'
 import type { ProductApplication } from '@personal-agent/application'
 import { Effects, Later, UnknownSend } from '@personal-agent/effects'
 import { key, latestAssignment } from '@personal-agent/orchestrator-core'
 import type { Ticket, Trigger } from '@personal-agent/orchestrator-core'
 import { canonicalDigest } from '@personal-agent/storage'
 import type { ProductStore } from '@personal-agent/storage'
+import { WorkspaceConflict } from '@personal-agent/workspaces'
 import type { WorkspaceManager } from '@personal-agent/workspaces'
+import { EvidenceConflict, InvalidEvidence, QuiescenceUnavailable, VerificationUnavailable } from '@personal-agent/verification'
 import { AttemptSupervisor } from '../../../packages/execution/src/supervisor.ts'
 import type { CommandKey } from '../../../packages/execution/src/supervisor.ts'
 import { handleQuestionAnswers } from '../http/question-effects.ts'
@@ -37,6 +44,7 @@ import { handleRunnerRecovery } from '../recovery-effects.ts'
 import { createStoredRuntimeIngress } from '../stored-ingress.ts'
 import { producerForBinding } from '../runner-registry.ts'
 import type { IngressBinding } from '../runtime-ingress.ts'
+import { ownedResourceManifestDigest } from '../resource-barrier.ts'
 import { ControlledProductAttempt } from './controlled-attempt.ts'
 import { NativeProductAttempt } from './native-attempt.ts'
 import type { NativeProductConfiguration } from './native-config.ts'
@@ -84,6 +92,12 @@ const VerifyIntentSchema = z.strictObject({
     writerFactId: IdSchema.optional(),
   }),
 })
+const VerificationBlockSchema = z.strictObject({
+  protocol: z.literal('blocked-verification/1'),
+  id: IdSchema,
+  code: z.enum(['verification_failed', 'storage_unavailable']),
+  failureCount: z.number().int().positive().safe(),
+})
 export const FIXTURE_PROFILES = [
   'profile-fixture-question',
   'profile-fixture-pass',
@@ -98,6 +112,7 @@ export class ProductExecution {
   private readonly pendingBegins = new Map<string, RunnerCommand>()
   private readonly runs = new Set<Promise<void>>()
   private readonly waiters = new Map<string, (dispatch: NativeDispatch) => void>()
+  private readonly verifying = new Set<string>()
   private readonly ingress: ReturnType<typeof createStoredRuntimeIngress>
   private timer: ReturnType<typeof setInterval> | undefined
   private closing = false
@@ -154,10 +169,35 @@ export class ProductExecution {
         if (!candidate || !same(candidate, plan.candidate) || plan.barrier.attemptId !== attemptId) return
         const contract = store.product.contracts.getByRef(candidate.contract)!
         const { writerFactId, ...barrier } = plan.barrier
-        await completion.verify(candidate, contract, attemptId, {
-          ...barrier,
-          ...(writerFactId ? { writerFactId } : {}),
-        })
+        const row = this.verificationRows().find(row => row.key === attemptId)
+        if (!row) return
+        this.verifying.add(attemptId)
+        try {
+          if (!this.verificationBarrierCurrent(plan, binding))
+            throw new ApplicationFault('writer_indeterminate', 'The verification resource barrier changed', 'reconcile')
+          store.events.append({ topic: 'application.verification.started', entityRef: candidate.contract.workId,
+            payload: { workId: candidate.contract.workId } })
+          await completion.verify(candidate, contract, attemptId, {
+            ...barrier,
+            ...(writerFactId ? { writerFactId } : {}),
+          })
+        } catch (error) {
+          const invalid = error instanceof VerificationUnavailable || error instanceof WorkspaceConflict ||
+            error instanceof QuiescenceUnavailable || error instanceof InvalidEvidence || error instanceof EvidenceConflict ||
+            (error instanceof ApplicationFault && ['verification_failed', 'writer_indeterminate', 'stale_candidate', 'stale_contract'].includes(error.error.code))
+          // Infrastructure gets two automatic retries; invalid content/environment waits for the user immediately.
+          if (!invalid && row.attempts < 2) throw new Error('Verification temporarily unavailable')
+          const blocked = VerificationBlockSchema.parse({ protocol: 'blocked-verification/1',
+            id: `verification-block:${randomUUID()}`, code: invalid ? 'verification_failed' : 'storage_unavailable',
+            failureCount: row.attempts + 1 })
+          store.uow.atomic(() => {
+            store.queue.park('application.verify', row.key, row.seq, row.generation, JSON.stringify(blocked), new Date().toISOString())
+            store.events.append({ topic: 'application.verification.blocked', entityRef: candidate.contract.workId,
+              payload: { workId: candidate.contract.workId, ...blocked } })
+          })
+        } finally {
+          this.verifying.delete(attemptId)
+        }
       },
       { retry: [500, 5000] },
     )
@@ -192,6 +232,56 @@ export class ProductExecution {
     const binding = this.store.bindings.current<IngressBinding>(target.ticketId)
     if (!binding || !same(attemptOf(binding), attemptOf(target)) || binding.state !== 'active') return 'stale'
     return this.attempts.has(target.attemptId) && target.connectionEpoch === 1 ? 'current' : 'unknown'
+  }
+  private verificationRows() {
+    return this.store.queue.dueRows('application.verify', Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
+  }
+  private verificationBarrierCurrent(plan: z.infer<typeof VerifyIntentSchema>, binding: IngressBinding): boolean {
+    const digest = ownedResourceManifestDigest(binding.resources)
+    const receipt = this.store.commands.get(key('confirm-owned-quiescence/v2', binding.attemptId, digest))
+    return binding.state === 'ended' && plan.barrier.attemptId === binding.attemptId &&
+      digest === plan.barrier.resourceManifestDigest && !!receipt && same(receipt.result, plan.barrier)
+  }
+  verificationBlocked(candidate: CandidateRef): boolean {
+    return this.store.queue.parked('application.verify').some(row =>
+      same(VerifyIntentSchema.parse(JSON.parse(row.payload)).candidate, candidate))
+  }
+  verificationStatus(work: WorkView): WorkVerificationStatus {
+    const base = { protocol: 'work-verification/1' as const, workId: work.work.id, retryAvailable: false }
+    if (work.actions.currentVerificationId)
+      return WorkVerificationStatusSchema.parse({ ...base, state: 'finished', verificationId: work.actions.currentVerificationId })
+    const candidate = work.actions.currentCandidate
+    if (!candidate) return { ...base, state: 'not_ready' }
+    const binding = this.store.bindings.current(candidate.ticketId)
+    const matches = (row: { key: string; payload: string }) => {
+      const plan = VerifyIntentSchema.safeParse(JSON.parse(row.payload))
+      return plan.success && binding?.attemptId === row.key && same(plan.data.candidate, candidate)
+    }
+    const parked = this.store.queue.parked('application.verify').find(matches)
+    if (parked) {
+      const { protocol: _, ...failure } = VerificationBlockSchema.parse(JSON.parse(parked.parkedReason))
+      return WorkVerificationStatusSchema.parse({ ...base, state: 'blocked', candidate, failure,
+        retryAvailable: !!binding && this.verificationBarrierCurrent(VerifyIntentSchema.parse(JSON.parse(parked.payload)), binding) &&
+          work.resourceStatus === 'quiescent' && !this.verifying.has(parked.key) })
+    }
+    const row = this.verificationRows().find(matches)
+    return WorkVerificationStatusSchema.parse({ ...base, candidate,
+      state: binding && this.verifying.has(binding.attemptId) ? 'running' : row?.attempts ? 'retry_wait' : 'queued' })
+  }
+  retryVerification(candidate: CandidateRef, blockedId: string): void {
+    const binding = this.store.bindings.current(candidate.ticketId)
+    const parked = binding && this.store.queue.parked('application.verify').find(row => row.key === binding.attemptId)
+    if (!parked) throw new ApplicationFault('conflict', 'Verification is no longer blocked')
+    const plan = VerifyIntentSchema.parse(JSON.parse(parked.payload))
+    const blocked = VerificationBlockSchema.parse(JSON.parse(parked.parkedReason))
+    if (!same(plan.candidate, candidate) || blocked.id !== blockedId)
+      throw new ApplicationFault('stale_candidate', 'Verification recovery context changed')
+    if (!this.verificationBarrierCurrent(plan, binding) || this.verifying.has(binding.attemptId))
+      throw new ApplicationFault('writer_indeterminate', 'Verification resources are not quiescent', 'reconcile')
+    this.store.queue.cancel('application.verify', parked.key)
+    this.enqueue('application.verify', parked.key, plan)
+    this.store.events.append({ topic: 'application.verification.retry', entityRef: candidate.contract.workId,
+      payload: { workId: candidate.contract.workId, blockedId } })
   }
   start(): void {
     if (this.closing) throw new Error('A closed execution consumer cannot start')

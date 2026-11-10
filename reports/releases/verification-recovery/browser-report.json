@@ -1,0 +1,26 @@
+{
+  "status": "PASS_CONTROLLED_VERIFICATION_RECOVERY_BROWSER",
+  "sourceCommit": "befe7a66b41e6cf3585099434bb976a35583e224",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-10T04:48:39.444Z",
+  "cases": [
+    {
+      "id": "CREATE-AND-EXPOSE-PERSISTED-VERIFICATION-BLOCK",
+      "status": "PASS"
+    },
+    {
+      "id": "BLOCK-SURVIVES-RELOAD-AND-FITS-NARROW-DETAIL",
+      "status": "PASS"
+    },
+    {
+      "id": "RECHECK-VERIFIES-SAME-WRITER-AND-DELIVERS",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "limitations": [
+    "Actual local HTTP/SQLite and controlled child; no native/model compatibility claim",
+    "Fault injected on the isolated completion port; no production fault-injection endpoint"
+  ]
+}

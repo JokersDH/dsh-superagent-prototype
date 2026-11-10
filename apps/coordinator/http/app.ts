@@ -26,6 +26,12 @@ import {
   UserCommandSchema,
   VerificationSchema,
   WorkViewSchema,
+  VerificationRetryCommandSchema,
+  WorkVerificationStatusSchema,
+  ConversationCatalogQuerySchema,
+  ConversationCatalogSchema,
+  ConversationSummarySchema,
+  ConversationCommandSchema,
 } from '@personal-agent/contracts'
 import type {
   AnswerDelivery,
@@ -39,6 +45,14 @@ import type {
   ApplicationService,
   TrustedActor,
   Verification,
+  CommandReceipt,
+  VerificationRetryCommand,
+  WorkVerificationStatus,
+  ConversationCatalog,
+  ConversationCatalogQuery,
+  ConversationSummary,
+  ConversationCommand,
+  WorkView,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -49,6 +63,10 @@ const sameSecret = (input: string | undefined, expected: string): boolean =>
   Buffer.byteLength(input) === Buffer.byteLength(expected) &&
   timingSafeEqual(Buffer.from(input), Buffer.from(expected))
 const sessionInput = z.strictObject({ bootstrapToken: z.string().regex(/^[a-f0-9]{64}$/) })
+const readonlyWork = (work: WorkView): WorkView => {
+  const { retryActionToken: _, ...actions } = work.actions
+  return { ...work, actions: { ...actions, available: [] } }
+}
 const statusOf = (error: AppError): 400 | 401 | 403 | 409 | 422 | 503 =>
   error.code === 'auth_required'
     ? 401
@@ -77,10 +95,17 @@ export interface LocalHttpOptions {
   allowedOrigins: readonly string[]
   sessionTtlMs?: number
   mode: 'fixture' | 'product' | 'personal'
+  startupMode?: 'normal' | 'recovery_readonly'
   /** Explicit loopback-only fixture convenience; normal entries still require credentials. */
   localDevelopmentAccess?: boolean
   now?: () => number
+  operations?: {
+    retryVerification(command: VerificationRetryCommand, actor: TrustedActor): Promise<CommandReceipt>
+    conversation?(command: ConversationCommand, actor: TrustedActor): Promise<CommandReceipt>
+  }
   read?: {
+    conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog>
+    conversation?(id: string): Promise<ConversationSummary>
     assistant?(): Promise<AssistantProviderStatus>
     assistantStream?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
     selectModel?(model: string): Promise<AssistantProviderStatus>
@@ -88,6 +113,7 @@ export interface LocalHttpOptions {
     registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
     workLocation?(workId: string): Promise<WorkLocation>
     workEnvironment?(workId: string): Promise<WorkEnvironment>
+    workVerification?(workId: string): Promise<WorkVerificationStatus>
     configuration?(): Promise<ApplicationConfiguration>
     verification?(id: string): Promise<Verification | undefined>
     deliveries?(questionId: string): Promise<readonly AnswerDelivery[]>
@@ -170,6 +196,7 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     c.json({
       status: 'ok',
       mode: options.mode,
+      ...(options.startupMode === 'recovery_readonly' ? { startupMode: options.startupMode } : {}),
       ...(options.localDevelopmentAccess ? { access: 'local-development' } : {}),
     }),
   )
@@ -222,12 +249,46 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     await next()
   })
   app.get('/v1/session', (c) => c.json({ status: 'authenticated' }))
+  app.use('/v1/*', async (c, next) => {
+    if (options.startupMode === 'recovery_readonly' && !['GET', 'HEAD', 'OPTIONS', 'DELETE'].includes(c.req.method))
+      throw new ApplicationFault('unsupported_capability', 'Restored state is read-only until explicit recovery and local revalidation', 'none')
+    await next()
+  })
   app.get('/v1/configuration', async (c) => {
     if (Object.keys(c.req.query()).length)
       throw new ApplicationFault('invalid_request', 'Configuration does not accept query parameters')
     if (!options.read?.configuration)
       throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
-    return c.json(ApplicationConfigurationSchema.parse(await options.read.configuration()))
+    const value = ApplicationConfigurationSchema.parse(await options.read.configuration())
+    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value,
+      profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate' })),
+      projects: value.projects.map(project => { const { defaultProfileId: _, ...rest } = project; return { ...rest, profileIds: [], dispatchAllowed: false, blockedReason: 'writer_indeterminate' } }),
+    }) : value)
+  })
+  app.get('/v1/conversations', async (c) => {
+    if (!options.read?.conversations) throw new ApplicationFault('unsupported_capability', 'Conversation catalog is not connected')
+    const raw = c.req.query(), input: Record<string, unknown> = { ...raw }
+    if (raw.limit !== undefined) input.limit = /^\d+$/.test(raw.limit) ? Number(raw.limit) : NaN
+    if (raw.includeArchived !== undefined) {
+      if (!['true', 'false'].includes(raw.includeArchived)) throw new ApplicationFault('invalid_request', 'Invalid archive filter')
+      input.includeArchived = raw.includeArchived === 'true'
+    }
+    return c.json(ConversationCatalogSchema.parse(await options.read.conversations(ConversationCatalogQuerySchema.parse(input))))
+  })
+  app.get('/v1/conversations/:id', async (c) => {
+    if (!options.read?.conversation) throw new ApplicationFault('unsupported_capability', 'Conversation reader is not connected')
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Conversation read does not accept query parameters')
+    const id = IdSchema.parse(c.req.param('id')), value = ConversationSummarySchema.parse(await options.read.conversation(id))
+    if (value.id !== id) throw new ApplicationFault('storage_unavailable', 'Conversation reader identity mismatch', 'none')
+    return c.json(value)
+  })
+  app.post('/v1/conversations/commands', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Conversation commands require JSON')
+    if (!options.operations?.conversation) throw new ApplicationFault('unsupported_capability', 'Conversation commands are not connected')
+    const command = ConversationCommandSchema.parse(await c.req.json())
+    const receipt = CommandReceiptSchema.parse(await options.operations.conversation(command, c.get('actor')))
+    if (receipt.commandId !== command.commandId) throw new ApplicationFault('storage_unavailable', 'Conversation receipt identity mismatch', 'none')
+    return c.json(receipt)
   })
   app.get('/v1/assistant', async (c) => {
     if (!options.read?.assistant)
@@ -256,6 +317,31 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
   app.get('/v1/works/:id/environment', async (c) => {
     if (!options.read?.workEnvironment) throw new ApplicationFault('unsupported_capability', 'Environment read port is not connected')
     return c.json(WorkEnvironmentSchema.parse(await options.read.workEnvironment(IdSchema.parse(c.req.param('id')))))
+  })
+  app.get('/v1/works/:id/verification', async (c) => {
+    if (Object.keys(c.req.query()).length)
+      throw new ApplicationFault('invalid_request', 'Verification status does not accept query parameters')
+    if (!options.read?.workVerification)
+      throw new ApplicationFault('unsupported_capability', 'Verification status is not connected')
+    const workId = IdSchema.parse(c.req.param('id'))
+    const value = WorkVerificationStatusSchema.parse(await options.read.workVerification(workId))
+    if (value.workId !== workId)
+      throw new ApplicationFault('storage_unavailable', 'Verification status identity mismatch', 'none')
+    return c.json(options.startupMode === 'recovery_readonly' ? { ...value, retryAvailable: false } : value)
+  })
+  app.post('/v1/works/:id/verification/retry', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json'))
+      throw new ApplicationFault('invalid_request', 'Verification recovery requires JSON')
+    if (!options.operations?.retryVerification)
+      throw new ApplicationFault('unsupported_capability', 'Verification recovery is not connected')
+    const workId = IdSchema.parse(c.req.param('id'))
+    const command = VerificationRetryCommandSchema.parse(await c.req.json())
+    if (command.candidate.contract.workId !== workId)
+      throw new ApplicationFault('invalid_request', 'Recovery command belongs to another work')
+    const receipt = CommandReceiptSchema.parse(await options.operations.retryVerification(command, c.get('actor')))
+    if (receipt.commandId !== command.commandId || (receipt.workId && receipt.workId !== workId))
+      throw new ApplicationFault('storage_unavailable', 'Recovery receipt identity mismatch', 'none')
+    return c.json(receipt)
   })
   app.get('/v1/assistant/stream', (c) => {
     const { conversationId } = z.strictObject({ conversationId: IdSchema }).parse(c.req.query())
@@ -314,11 +400,13 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
         throw new ApplicationFault('invalid_request', 'Invalid includeLearning value')
       input.includeLearning = raw.includeLearning === 'true'
     }
-    return c.json(SnapshotSchema.parse(await options.application.inspect(InspectQuerySchema.parse(input))))
+    const value = SnapshotSchema.parse(await options.application.inspect(InspectQuerySchema.parse(input)))
+    return c.json(options.startupMode === 'recovery_readonly' ? { ...value, works: value.works.map(readonlyWork) } : value)
   })
   app.get('/v1/works/:id', async (c) => {
     const snapshot = await options.application.inspect({ workId: IdSchema.parse(c.req.param('id')) })
-    return c.json(WorkViewSchema.parse(snapshot.works[0]))
+    const value = WorkViewSchema.parse(snapshot.works[0])
+    return c.json(options.startupMode === 'recovery_readonly' ? readonlyWork(value) : value)
   })
   app.get('/v1/conversations/:id/messages', async (c) => {
     const id = IdSchema.parse(c.req.param('id')),

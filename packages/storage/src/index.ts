@@ -17,6 +17,7 @@ import { ArtifactStore } from './artifacts.ts'
 import { ImmutablePayloads, RuntimeAuthority, RuntimeBindings } from './ingress.ts'
 import { RuntimeObservations } from './observations.ts'
 import { ProductRecords } from './product.ts'
+import { WorkflowRecords } from './workflows.ts'
 import { UnitOfWork } from './uow.ts'
 import { type LockContent, type LockRegistry } from './writer-lock.ts'
 
@@ -50,6 +51,8 @@ export class ProductStore {
   readonly observations: RuntimeObservations
   /** Frozen application/Broker records: works, contracts, links, messages, questions, dispatch switch. */
   readonly product: ProductRecords
+  /** Wave-03 A: conversation catalog/search/archive, project settings, decisions and read index. */
+  readonly workflows: WorkflowRecords
 
   constructor(options: ProductStoreOptions) {
     this.database = new ProductDatabase(options.path, options.report ? { report: options.report } : {})
@@ -69,6 +72,7 @@ export class ProductStore {
     this.payloads = new ImmutablePayloads(this.db, this.artifacts)
     this.observations = new RuntimeObservations(this.db, this.uow, this.bindings)
     this.product = new ProductRecords(this.db, this.uow)
+    this.workflows = new WorkflowRecords(this.db, this.uow, this.artifacts)
   }
 
   close(): void { this.database.close() }
@@ -124,6 +128,12 @@ export {
   ProductRecords, ProductWorks, ProductContracts, ProductLinks, ProductMessages, ProductQuestions, ProductDispatchControls,
   ProductConflict, DispatchConflict, type NewConversationMessage, type DispatchControl,
 } from './product.ts'
+export {
+  WorkflowRecords, ProductConversations, ProductProjects, ProductDecisions, WorkflowIndex, WorkflowConflict,
+  type Conversation, type ConversationPage, type ConversationSearchHit, type ConversationSearchPage,
+  type ProjectCheck, type ProjectEnvironment, type ProjectSettings, type ProjectVersion, type ProjectCurrent,
+  type DecisionRecord, type WorkIndexEntry,
+} from './workflows.ts'
 export { ArtifactStore, ensureArtifactRoot, artifactRoot, stateDirOf, type ArtifactRecord, type WrittenArtifact, type GcResult } from './artifacts.ts'
 export {
   RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict, AuthorityConflict,
@@ -134,7 +144,7 @@ export {
   type RuntimeObservationRow, type ResourceObservationRow, type ResourceObservationSummary,
   type AttemptObservationSummary, type WriterStatus,
 } from './observations.ts'
-export { backupDatabase, verifyDatabase, type BackupResult, type VerifyResult } from './backup.ts'
+export { backupDatabase, verifyDatabase, readArtifactRegistry, type ArtifactRegistryRow, type BackupResult, type VerifyResult } from './backup.ts'
 export { WriterLock, WriterLockHeld, type LockContent, type LockProbe, type LockRegistry, type LockVerdict } from './writer-lock.ts'
 export {
   MIGRATIONS, PRODUCT_SCHEMA_VERSION, applyMigrations, migrationChecksum, refuseUnknownDatabase,

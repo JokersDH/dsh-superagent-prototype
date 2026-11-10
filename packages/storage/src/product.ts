@@ -21,6 +21,7 @@ import type {
 } from '@personal-agent/contracts'
 import { UnitOfWork } from './uow.ts'
 import { canonicalDigest } from './ingress.ts'
+import { ProductConversations } from './workflows.ts'
 
 /** A frozen/unique record already exists with a different body, or a CAS expectation is stale. */
 export class ProductConflict extends Error {}
@@ -153,7 +154,12 @@ export class ProductLinks {
 export class ProductMessages {
   private readonly db: Database.Database
   private readonly uow: UnitOfWork
-  constructor(db: Database.Database, uow: UnitOfWork) { this.db = db; this.uow = uow }
+  private readonly conversations: import('./workflows.ts').ProductConversations | undefined
+  constructor(db: Database.Database, uow: UnitOfWork, conversations?: import('./workflows.ts').ProductConversations) {
+    this.db = db
+    this.uow = uow
+    this.conversations = conversations
+  }
 
   /**
    * Appends a message with a transaction-assigned per-conversation sequence. A replay of the same
@@ -174,6 +180,15 @@ export class ProductMessages {
       const message = ConversationMessageSchema.parse({ ...input, sequence: Number(row.sequence) + 1 })
       this.db.prepare('INSERT INTO conversation_messages (conversation_id, sequence, id, value, created_at) VALUES (?, ?, ?, ?, ?)')
         .run(message.conversationId, message.sequence, message.id, JSON.stringify(message), message.createdAt)
+      // The catalog is a derived directory over the persisted message identity; it never rewrites
+      // the message, sequence or archive state. Existing callers need no extra write.
+      this.conversations?.ensureForMessage({
+        conversationId: message.conversationId,
+        ...(message.projectId ? { projectId: message.projectId } : {}),
+        text: message.text,
+        createdAt: message.createdAt,
+      })
+      this.conversations?.indexMessage(message)
       return message
     })
   }
@@ -306,7 +321,8 @@ export class ProductRecords {
     this.works = new ProductWorks(db, uow)
     this.contracts = new ProductContracts(db, uow)
     this.links = new ProductLinks(db, uow)
-    this.messages = new ProductMessages(db, uow)
+    const conversations = new ProductConversations(db, uow)
+    this.messages = new ProductMessages(db, uow, conversations)
     this.questions = new ProductQuestions(db, uow)
     this.dispatchControls = new ProductDispatchControls(db, uow)
   }

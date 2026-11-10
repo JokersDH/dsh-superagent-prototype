@@ -1,0 +1,172 @@
+{
+  "role": "C",
+  "packages": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge"
+  ],
+  "branch": "codex/g3-assistant-context",
+  "mainBaseCommit": "3957e30",
+  "mergeCommit": "3957e30",
+  "stableApiCheckpoint": "c3046c9",
+  "testedSourceCommit": "82d6a36",
+  "updatedAt": "2026-11-10T04:55:00.000Z",
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0
+  },
+  "phases": [
+    {
+      "phase": "C1",
+      "priority": "P1",
+      "status": "passed",
+      "evidence": [
+        "packages/context/docs/INTERFACE-RFC.md",
+        "packages/proposals/docs/INTERFACE-RFC.md",
+        "packages/knowledge/docs/DECISION-GOVERNANCE-RFC.md",
+        "packages/context/test/interface.case.ts",
+        "packages/proposals/test/proposals.case.ts",
+        "packages/knowledge/test/knowledge.case.ts",
+        "commit c3046c9"
+      ],
+      "note": "Three package-local RFCs state consumed shared schemas, required A/main ports and gaps. Exports and legal/illegal consumption fixtures pass; no private wire type replaces contracts."
+    },
+    {
+      "phase": "C2",
+      "priority": "P1",
+      "status": "passed_package_local",
+      "evidence": [
+        "packages/context/src/reader.ts",
+        "packages/context/src/local-port.ts",
+        "packages/context/test/reader.case.ts",
+        "packages/context/test/local-git.case.ts",
+        "pkg-test:29/29"
+      ],
+      "note": "Conversation-only grants, metadata-by-default, files/docs only with explicit sourceKinds, hard file/byte/token/time/slice budgets, pagination, provenance + baseline per slice, stale/missing/cross-project omission, injection flags, revalidation, denied account/credential/native-home/binary paths, real temp Git fixture and no project mutation. Non-file sources (metadata/work/contract/verification/delivery/decision) are covered explicitly."
+    },
+    {
+      "phase": "C3",
+      "priority": "P1",
+      "status": "passed_package_local",
+      "evidence": [
+        "packages/proposals/src/parser.ts",
+        "packages/proposals/src/registry.ts",
+        "packages/proposals/test/proposals.case.ts",
+        "pkg-test:10/10"
+      ],
+      "note": "Only structured ReasonerProposal output is executable; plain text/Markdown/fenced JSON stays a non-executable reply. Source/project/contract/scope binding, idempotent create/confirm, actor/version/digest/barrier revalidation, rejection/supersession/expiry, typed intent with no actor/command/scope."
+    },
+    {
+      "phase": "C4",
+      "priority": "P1",
+      "status": "passed_package_local",
+      "evidence": [
+        "packages/knowledge/src/governance.ts",
+        "packages/knowledge/src/in-memory-store.ts",
+        "packages/knowledge/test/knowledge.case.ts",
+        "pkg-test:12/12 unit"
+      ],
+      "note": "Explicit trusted-user decisions only; permission/authentication answers refused; cross-project/scope escalation refused; revoke/CAS/idempotency, supersession, expiry, missing source, bounded keyset pagination, old-version replay and concurrent conflict; automatic promotion remains closed. A revoked decision can be reopened only as a new explicit decision id."
+    },
+    {
+      "phase": "C5",
+      "priority": "P1",
+      "status": "passed_offline_consumer_pending_main_ports",
+      "evidence": [
+        "packages/knowledge/test/consumer.case.ts",
+        "packages/knowledge/examples/assistant-loop.mjs",
+        "packages/knowledge/reports/consumer-run.json",
+        "pkg-test:14/14 total (12 unit + 2 consumer)"
+      ],
+      "note": "Full offline loop passes: authorized context -> mock structured reasoner -> typed proposal -> confirmation/rejection -> decision record -> later context includes it -> revoke removes it. 3 mock calls, 0 network calls, 0 dispatched intents, no absolute root leak."
+    }
+  ],
+  "commands": [
+    "pnpm install --prefer-offline (temporary root lock diff; not committed)",
+    "pnpm --filter @personal-agent/contracts build",
+    "pnpm --filter @personal-agent/context typecheck",
+    "pnpm --filter @personal-agent/context test",
+    "pnpm --filter @personal-agent/context build",
+    "pnpm --filter @personal-agent/proposals typecheck",
+    "pnpm --filter @personal-agent/proposals test",
+    "pnpm --filter @personal-agent/proposals build",
+    "pnpm --filter @personal-agent/knowledge typecheck",
+    "pnpm --filter @personal-agent/knowledge test",
+    "pnpm --filter @personal-agent/knowledge build",
+    "node packages/knowledge/examples/assistant-loop.mjs"
+  ],
+  "results": {
+    "contextTests": "29/29",
+    "proposalTests": "10/10",
+    "knowledgeTests": "14/14",
+    "typecheck": "PASS (all three packages)",
+    "build": "PASS (all three packages)",
+    "offlineConsumer": "PASS (modelCalls=3, networkCalls=0, executedIntents=0, decisionsBeforeRevoke=1, decisionsAfterRevoke=0, absoluteRootLeaked=false)",
+    "verificationLog": "packages/context/reports/verification.txt"
+  },
+  "blockers": [
+    {
+      "id": "C-A-read-index",
+      "owner": "A",
+      "status": "external_pending",
+      "input": "Production ContextReadPort over persisted project metadata/works/checks/deliveries/decisions.",
+      "expected": "projectBaseline + bounded listSources descriptors with commit/contentDigest/digestScope/validity + readSource + optional workContext.",
+      "actual": "Only LocalProjectSourcePort (files) and StaticContextPort/CompositeContextPort (fixtures) exist in this package.",
+      "continue": "Reader/budgets/omission/revalidation and C5 consumer are complete against the same port; no adapter should be duplicated in coordinator."
+    },
+    {
+      "id": "C-A-decision-store",
+      "owner": "A",
+      "status": "external_pending",
+      "input": "Append-only decision migration and DecisionStorePort implementation.",
+      "expected": "Immutable revisions, CAS revoke(expectedVersion), keyset list, source/actor/timestamps/supersedes retention, old DB compatible.",
+      "actual": "InMemoryDecisionStore fixture only; no SQL/migration written by C (A owns migrations).",
+      "continue": "Governance rules and consumer are complete and reusable unchanged over the port."
+    },
+    {
+      "id": "C-main-context-dto",
+      "owner": "main",
+      "status": "external_pending",
+      "input": "Public context request/grant/bundle wire DTO and HTTP projection if the surface is exposed.",
+      "expected": "Contracts-owned schema mapped to ContextRequest; conversation gateway distinct from executor workspace; preview/confirm UI.",
+      "actual": "ContextRequest/ContextGrant are package-local service inputs by design.",
+      "continue": "Main can map its own DTO to the exported types without changing reader semantics."
+    },
+    {
+      "id": "C-main-model-adapter",
+      "owner": "main",
+      "status": "external_pending",
+      "input": "Existing reasoner/model provider structured-output flag and model selection.",
+      "expected": "Pass either parsed structured output or a normal reply; never scan prose for commands; supply trusted actor/project/grant/source/contract.",
+      "actual": "ProposalRegistry/parseStructuredOutput are ready; no model call made by C.",
+      "continue": "No generic LLM loop should be added; confirmation/barrier/command composition stays main-owned."
+    },
+    {
+      "id": "C-main-command-http",
+      "owner": "main",
+      "status": "external_pending",
+      "input": "record_decision/revoke_decision command projection, KnowledgePage projection and DecisionSourcePort.",
+      "expected": "Trusted actor + current grantScope, persisted user-message provenance, project-scoped page; no auto-record from agent replies.",
+      "actual": "DecisionGovernance and StaticDecisionSourcePort fixture are ready; production ports absent.",
+      "continue": "Main can wire commands to governance when A's store port and message provenance are available."
+    }
+  ],
+  "notTested": [
+    "Production persisted read index / decision store / SQL migration (A-owned)",
+    "HTTP/SSE DTO and console preview/confirm wiring (main-owned)",
+    "Real reasoner structured-output adapter and any native/model request (C budget is 0)",
+    "Semantic retrieval, PDF/binary extraction, cross-project memory inference, automatic rule promotion",
+    "Multi-process concurrency on a real database (in-memory CAS fixture only)"
+  ],
+  "mainNextSteps": [
+    "Consume @personal-agent/context, @personal-agent/proposals, @personal-agent/knowledge from this branch after independent re-verification.",
+    "Map public DTOs to ContextRequest/ContextGrant and keep conversation upload authorization separate from executor workspace authorization.",
+    "Supply trusted ProposalTrustedContext and DecisionActor values from authenticated state; do not accept actor/scope/command fields from model output.",
+    "Wire record_decision/revoke_decision to DecisionGovernance and project KnowledgePage only after A's DecisionStorePort lands."
+  ],
+  "aNextSteps": [
+    "Implement ContextReadPort over the persisted read index with baseline/content identity/validity.",
+    "Add append-only decision migration and DecisionStorePort with CAS revoke and keyset pagination; keep single-writer and root-lock ownership unchanged.",
+    "Expose message provenance for decision sources through main, not a second DB."
+  ]
+}
