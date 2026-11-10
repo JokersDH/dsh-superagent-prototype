@@ -1,13 +1,20 @@
 {
   "role": "C",
-  "packages": ["packages/context", "packages/proposals", "packages/knowledge"],
+  "packages": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge"
+  ],
   "branch": "codex/g3-assistant-context",
   "mainBaseCommit": "3957e30",
   "mergeCommit": "3957e30",
   "stableApiCheckpoint": "c3046c9",
-  "testedSourceCommit": "c3046c9",
-  "updatedAt": "2026-11-10T04:45:00.000Z",
-  "nativeModelBudget": { "allowed": 0, "used": 0 },
+  "testedSourceCommit": "82d6a36",
+  "updatedAt": "2026-11-10T04:55:00.000Z",
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0
+  },
   "phases": [
     {
       "phase": "C1",
@@ -33,9 +40,9 @@
         "packages/context/src/local-port.ts",
         "packages/context/test/reader.case.ts",
         "packages/context/test/local-git.case.ts",
-        "pkg-test:28/28"
+        "pkg-test:29/29"
       ],
-      "note": "Conversation-only grants, metadata-by-default, files/docs only with explicit sourceKinds, hard file/byte/token/time/slice budgets, pagination, provenance + baseline per slice, stale/missing/cross-project omission, injection flags, revalidation, denied account/credential/native-home/binary paths, real temp Git fixture and no project mutation."
+      "note": "Conversation-only grants, metadata-by-default, files/docs only with explicit sourceKinds, hard file/byte/token/time/slice budgets, pagination, provenance + baseline per slice, stale/missing/cross-project omission, injection flags, revalidation, denied account/credential/native-home/binary paths, real temp Git fixture and no project mutation. Non-file sources (metadata/work/contract/verification/delivery/decision) are covered explicitly."
     },
     {
       "phase": "C3",
@@ -57,9 +64,9 @@
         "packages/knowledge/src/governance.ts",
         "packages/knowledge/src/in-memory-store.ts",
         "packages/knowledge/test/knowledge.case.ts",
-        "pkg-test:11/11"
+        "pkg-test:12/12 unit"
       ],
-      "note": "Explicit trusted-user decisions only; permission/authentication answers refused; cross-project/scope escalation refused; revoke/CAS/idempotency, supersession, expiry, missing source, bounded keyset pagination, old-version replay and concurrent conflict; automatic promotion remains closed."
+      "note": "Explicit trusted-user decisions only; permission/authentication answers refused; cross-project/scope escalation refused; revoke/CAS/idempotency, supersession, expiry, missing source, bounded keyset pagination, old-version replay and concurrent conflict; automatic promotion remains closed. A revoked decision can be reopened only as a new explicit decision id."
     },
     {
       "phase": "C5",
@@ -69,7 +76,7 @@
         "packages/knowledge/test/consumer.case.ts",
         "packages/knowledge/examples/assistant-loop.mjs",
         "packages/knowledge/reports/consumer-run.json",
-        "pkg-test:13/13"
+        "pkg-test:14/14 total (12 unit + 2 consumer)"
       ],
       "note": "Full offline loop passes: authorized context -> mock structured reasoner -> typed proposal -> confirmation/rejection -> decision record -> later context includes it -> revoke removes it. 3 mock calls, 0 network calls, 0 dispatched intents, no absolute root leak."
     }
@@ -89,9 +96,9 @@
     "node packages/knowledge/examples/assistant-loop.mjs"
   ],
   "results": {
-    "contextTests": "28/28",
+    "contextTests": "29/29",
     "proposalTests": "10/10",
-    "knowledgeTests": "13/13",
+    "knowledgeTests": "14/14",
     "typecheck": "PASS (all three packages)",
     "build": "PASS (all three packages)",
     "offlineConsumer": "PASS (modelCalls=3, networkCalls=0, executedIntents=0, decisionsBeforeRevoke=1, decisionsAfterRevoke=0, absoluteRootLeaked=false)",
