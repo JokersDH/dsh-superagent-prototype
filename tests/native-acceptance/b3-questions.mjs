@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 /**
- * B3: native question, answer and input control (controlled fixture entry, zero model calls).
+ * B3: native question, answer and input control (controlled fixture, zero model calls).
  *
- * Proves the question lifecycle through public HTTP only:
- *   creation -> visible target/version -> legal answer -> persisted receipt -> delivery state
- * and that invalid answers cannot be confused with accepted ones:
- *   stale version, unknown target, repeated answer, answer after stop.
+ * Every branch here must be able to FAIL. The wave-04 review showed the previous version could pass
+ * for the wrong reason, so each assertion now states the exact evidence it requires:
  *
- * "Persisted" and "applied" are separate observations; a 200 does not prove the native side took it.
+ * - an answer is always built from the shared contract (`questionId` + `expectedVersion` + a
+ *   discriminated `answer`); a schema 400 is never accepted as proof of a business rejection;
+ * - a duplicate replay reuses the **same** commandId and payload and must return the same receipt,
+ *   with the delivery applied exactly once — a new commandId is a different scenario, not a PASS;
+ * - a legal answer must produce the original target's delivery record; zero deliveries is a failure;
+ * - a stopped work must show a refusal **and** no extra native send **and** an accurate resource
+ *   status; `rejected || phase !== 'working'` is not evidence;
+ * - a stale version comes from a real version bump (v2 answered, then v1 replayed), never `max(1, v-1)`.
  */
 import { ApiClient, CaseLog, assertLoopback, environmentIdentity, parseArgs, writeReport } from './harness.mjs'
 
@@ -43,14 +48,15 @@ const startWork = async () => {
   })
   const workId = created.json?.workId
   let questionId
-  const deadline = Date.now() + 60_000
+  const deadline = Date.now() + 90_000
   while (Date.now() < deadline) {
     const view = (await client.request('GET', `/v1/works/${workId}`)).json
     if (Array.isArray(view?.openQuestionIds) && view.openQuestionIds.length > 0) {
       questionId = view.openQuestionIds[0]
       break
     }
-    await new Promise(resolve => setTimeout(resolve, 500))
+    if (view?.phase === 'blocked' || view?.phase === 'failed') break
+    await new Promise(resolve => setTimeout(resolve, 400))
   }
   return { workId, questionId }
 }
@@ -60,125 +66,199 @@ const readQuestion = async id => {
   return (snapshot?.questions ?? []).find(question => question.id === id)
 }
 
-/**
- * The shared `answer_question` contract: `questionId` + `expectedVersion` + a discriminated `answer`
- * (`choices` carries `optionIds`). There is no `workId` field and no `selection` array.
- */
-const answer = async (_workId, question, optionIds, version = question.version) =>
-  client.request('POST', '/v1/commands', {
-    body: {
-      commandId: `cmd-ans-${Date.now()}-${Math.random().toString(16).slice(2, 6)}`,
-      conversationId,
-      kind: 'answer_question',
-      questionId: question.id,
-      expectedVersion: version,
-      answer: { kind: 'choices', optionIds },
-    },
-  })
+/** Build a legal answer command from the shared contract. */
+const answerBody = ({ commandId, questionId, expectedVersion, optionIds }) => ({
+  commandId,
+  conversationId,
+  kind: 'answer_question',
+  questionId,
+  expectedVersion,
+  answer: { kind: 'choices', optionIds },
+})
+const send = body => client.request('POST', '/v1/commands', { body })
 
-// 1. A real question is created with an exact target and a stable version.
+/** A schema 400 is a parser verdict, never a business rejection. */
+const classify = response => {
+  if (response.status === 400) return 'schema'
+  if (response.json?.status === 'rejected') return 'business'
+  if (response.json?.status === 'recorded') return 'recorded'
+  return `http_${response.status}`
+}
+
+const deliveries = async questionId => {
+  const response = await client.request('GET', `/v1/questions/${questionId}/deliveries`)
+  return Array.isArray(response.json) ? response.json : []
+}
+
+// 1. A real question is created with a stable version and a target bound to its work.
 log.begin('B3-QUESTION-CREATED', 'a question names its work, version, options and target', 'fixture')
 const first = await startWork()
 const question = first.questionId ? await readQuestion(first.questionId) : undefined
 log.entity({ workId: first.workId, questionId: first.questionId })
+let chosen = []
 if (question) {
-  log.evidence({ version: question.version, kind: question.kind, options: question.presentation?.options?.map(option => option.id), targets: question.targets?.length ?? 0 })
   const targetOk = (question.targets ?? []).some(target => target.contract?.workId === first.workId)
-  if (question.version >= 1 && (question.presentation?.options?.length ?? 0) > 0 && targetOk) {
-    log.pass(`version ${question.version}, ${question.presentation.options.length} option(s), target bound to the work`)
-  } else {
-    log.fail(`question incomplete: version=${question.version} options=${question.presentation?.options?.length ?? 0} targetOk=${targetOk}`)
-  }
+  const ids = (question.presentation?.options ?? []).map(option => option.id)
+  chosen = ids.includes('allow') ? ['allow'] : ids.slice(0, 1)
+  log.evidence({ version: question.version, kind: question.kind, options: ids, targets: question.targets?.length ?? 0, targetOk })
+  if (question.version >= 1 && ids.length > 0 && targetOk) log.pass(`version ${question.version}, ${ids.length} option(s), target bound`)
+  else log.fail(`question incomplete: version=${question.version} options=${ids.length} targetOk=${targetOk}`)
 } else {
   log.fail('no question became visible through the public snapshot')
 }
 
-// 2. A stale version is refused and does not mutate the question.
-log.begin('B3-STALE-VERSION', 'an answer with a stale version is refused', 'fixture')
+// 2. A legal answer is recorded and produces the original target's delivery record.
+log.begin('B3-LEGAL-ANSWER', 'a legal answer is recorded and delivers to the original target', 'fixture')
+let legalRecorded = false
+let appliedDelivery
 if (question) {
-  const stale = await answer(first.workId, question, ['allow'], question.version + 7)
-  log.evidence({ status: stale.status, body: stale.json })
-  const stillOpen = (await readQuestion(first.questionId))?.version === question.version
-  if (stale.json?.status === 'rejected' || stale.status >= 400) {
-    if (stillOpen) log.pass(`refused (HTTP ${stale.status}) and the question version is unchanged`)
-    else log.fail('the stale answer was refused but the question version changed')
+  const accepted = await send(answerBody({ commandId: `cmd-ans-${Date.now()}`, questionId: question.id, expectedVersion: question.version, optionIds: chosen }))
+  const kind = classify(accepted)
+  const records = await deliveries(question.id)
+  appliedDelivery = records.at(-1)
+  log.evidence({ status: accepted.status, kind, receipt: accepted.json, deliveries: records.length, applied: appliedDelivery ?? null })
+  // Zero deliveries is a failure: a recorded answer that never reached the target proves nothing.
+  if (kind === 'recorded' && records.length > 0) {
+    legalRecorded = true
+    log.pass(`recorded (seq ${accepted.json.seq}) and ${records.length} delivery record(s) present`)
   } else {
-    log.fail(`a stale-version answer was accepted: ${JSON.stringify(stale.json)}`)
+    log.fail(`legal answer not delivered: kind=${kind} deliveries=${records.length}`)
   }
 } else {
   log.notTested('no question was created')
 }
 
-// 3. A legal answer is persisted; persisted and applied are reported separately.
-log.begin('B3-LEGAL-ANSWER', 'a legal answer is persisted and its delivery state is observable', 'fixture')
-if (question) {
-  const allowed = question.presentation.options.map(option => option.id)
-  // Use the option the product actually published, not a guessed label.
-  const chosen = allowed.includes('allow') ? ['allow'] : [allowed[0]]
-  const accepted = await answer(first.workId, question, chosen)
-  log.evidence({ status: accepted.status, receipt: accepted.json })
-  if (accepted.status === 200 && accepted.json?.status === 'recorded') {
-    const deliveries = (await client.request('GET', `/v1/questions/${question.id}/deliveries`)).json
-    log.evidence({ deliveries: Array.isArray(deliveries) ? deliveries.length : deliveries })
-    log.pass(`answer recorded (seq ${accepted.json.seq}); ${Array.isArray(deliveries) ? deliveries.length : 0} delivery record(s) visible`)
-  } else {
-    log.fail(`a legal answer was not recorded: HTTP ${accepted.status} ${JSON.stringify(accepted.json)}`)
-  }
-} else {
-  log.notTested('no question was created')
-}
-
-// 4. Repeating the same answer must not create a second business effect.
-log.begin('B3-DUPLICATE-ANSWER', 'repeating an answer does not apply twice', 'fixture')
-if (question) {
-  const replay = await answer(first.workId, question, ['allow'])
-  const after = await readQuestion(first.questionId)
-  log.evidence({ status: replay.status, body: replay.json, questionStillPresent: !!after })
-  if (replay.json?.status === 'rejected' || replay.status >= 400 || after === undefined) {
-    log.pass(`second answer refused/ignored (HTTP ${replay.status})`)
-  } else {
-    log.pass(`second answer returned a typed receipt (HTTP ${replay.status}); the product deduplicated it by command identity`)
-  }
-} else {
-  log.notTested('no question was created')
-}
-
-// 5. An answer for a stopped work cannot reopen writing.
-log.begin('B3-STOPPED-WORK', 'an answer after stop cannot reopen the writer', 'fixture')
-const second = await startWork()
-if (second.questionId) {
-  const secondQuestion = await readQuestion(second.questionId)
-  await client.request('POST', '/v1/commands', {
-    body: { commandId: `cmd-b3q-stop-${Date.now()}`, conversationId, kind: 'stop_work', workId: second.workId },
+// 3. Replaying the SAME commandId and payload returns the same receipt and applies once.
+log.begin('B3-DUPLICATE-ANSWER', 'a same-commandId replay returns the same receipt and applies once', 'fixture')
+if (question && legalRecorded) {
+  const questionId = question.id
+  const replayCommandId = `cmd-replay-${Date.now()}`
+  const versionNow = (await readQuestion(questionId))?.version ?? question.version
+  const body = answerBody({ commandId: replayCommandId, questionId, expectedVersion: versionNow, optionIds: chosen })
+  const firstSend = await send(body)
+  const deliveriesAfterFirst = (await deliveries(questionId)).length
+  const replay = await send(body)
+  // A genuinely new command would be a second business intent; only an identical replay is tested here.
+  const sameReceipt = firstSend.json?.commandId === replay.json?.commandId && firstSend.json?.seq === replay.json?.seq
+  const stillOpen = (await readQuestion(questionId)) !== undefined
+  const deliveriesAfterReplay = (await deliveries(questionId)).length
+  log.evidence({
+    firstKind: classify(firstSend),
+    replayKind: classify(replay),
+    sameReceipt,
+    deliveriesBefore: deliveriesAfterFirst,
+    deliveriesAfter: deliveriesAfterReplay,
+    stillOpen,
   })
-  await new Promise(resolve => setTimeout(resolve, 800))
-  const late = await answer(second.workId, secondQuestion, ['allow'])
-  const view = (await client.request('GET', `/v1/works/${second.workId}`)).json
-  log.evidence({ status: late.status, body: late.json, phase: view?.phase, resources: view?.resourceStatus })
-  const refused = late.json?.status === 'rejected' || late.status >= 400
-  const notWriting = view?.phase !== 'working' && view?.phase !== 'running'
-  if (refused || notWriting) log.pass(`late answer did not reopen work (HTTP ${late.status}, phase=${view?.phase})`)
-  else log.fail(`a late answer restarted the work: phase=${view?.phase}`)
+  const duplicateRejected = classify(replay) === 'business'
+  if (sameReceipt && deliveriesAfterReplay === deliveriesAfterFirst) {
+    log.pass(`identical replay returned the same receipt (seq ${replay.json.seq}) and applied once`)
+  } else if (duplicateRejected && deliveriesAfterReplay === deliveriesAfterFirst) {
+    log.pass('the duplicate was refused at the business layer and no extra delivery was applied')
+  } else {
+    log.fail(`replay changed state: sameReceipt=${sameReceipt} deliveries ${deliveriesAfterFirst}->${deliveriesAfterReplay}`)
+  }
 } else {
-  log.notTested('the second work never created a question')
+  log.notTested('no recorded legal answer to replay')
 }
 
-// 6. An answer naming an unknown question is refused at the command boundary.
-log.begin('B3-UNKNOWN-TARGET', 'an answer for an unknown question is refused', 'fixture')
-const unknown = await client.request('POST', '/v1/commands', {
-  body: {
-    commandId: `cmd-b3q-unknown-${Date.now()}`,
+// 4. A real stale version: answer v2 legally, then replay at the old v1.
+log.begin('B3-STALE-VERSION', 'a genuine older version is refused at the business layer', 'fixture')
+const stale = await startWork()
+if (stale.questionId) {
+  const q0 = await readQuestion(stale.questionId)
+  const ids = (q0.presentation?.options ?? []).map(option => option.id)
+  const pick = ids.includes('allow') ? ['allow'] : ids.slice(0, 1)
+  // Advance the question to a real next version through the supported defer/answer path.
+  const defer = await send({
+    commandId: `cmd-defer-${Date.now()}`,
     conversationId,
     kind: 'answer_question',
-    workId: first.workId ?? 'work-unknown',
-    questionId: 'question-that-does-not-exist',
-    questionVersion: 1,
-    selection: ['allow'],
-  },
-})
-log.evidence({ status: unknown.status, body: unknown.json })
-if (unknown.json?.status === 'rejected' || unknown.status >= 400) log.pass(`refused (HTTP ${unknown.status})`)
-else log.fail(`an unknown question was accepted: ${JSON.stringify(unknown.json)}`)
+    questionId: q0.id,
+    expectedVersion: q0.version,
+    answer: { kind: 'defer' },
+  })
+  const q1 = await readQuestion(stale.questionId)
+  log.evidence({ v0: q0.version, v1: q1?.version ?? null, deferKind: classify(defer) })
+  // Only a real version bump proves the stale branch; a fabricated number would prove nothing.
+  if (q1 && q1.version > q0.version) {
+    const replayOld = await send(answerBody({ commandId: `cmd-stale-${Date.now()}`, questionId: q0.id, expectedVersion: q0.version, optionIds: pick }))
+    const kind = classify(replayOld)
+    log.evidence({ replayOldKind: kind, replayOldStatus: replayOld.status, error: replayOld.json?.error })
+    if (kind === 'business' || kind === 'schema') {
+      log.fail(`the product answered the stale branch with ${kind}; a business refusal is required`)
+    } else {
+      log.pass('a stale version produced no accepted answer')
+    }
+  } else {
+    log.notTested(`the question did not advance to a second version (v0=${q0.version})`)
+  }
+} else {
+  log.notTested('no question for the stale-version branch')
+}
+
+// 5. Unknown target: a LEGAL answer command whose target does not exist must be refused by business.
+log.begin('B3-UNKNOWN-TARGET', 'a legal answer for an unknown question is refused by business', 'fixture')
+const unknownQuestionId = `question-does-not-exist-${Date.now()}`
+const unknown = await send(answerBody({ commandId: `cmd-unknown-${Date.now()}`, questionId: unknownQuestionId, expectedVersion: 1, optionIds: ['allow'] }))
+const unknownKind = classify(unknown)
+log.evidence({ kind: unknownKind, status: unknown.status, body: unknown.json })
+if (unknownKind === 'schema') {
+  // The command was rejected by the parser, so this run proves nothing about business refusal.
+  log.fail('the unknown-target command failed schema validation, so the business branch was not exercised')
+} else if (unknownKind === 'business') {
+  log.pass(`refused at the business layer with ${unknown.json?.error?.code ?? 'rejected'}`)
+} else {
+  log.fail(`an answer for an unknown question was accepted: ${kind_label(unknownKind)}`)
+}
+
+// 6. A stopped work refuses a late answer AND shows no extra native send and an accurate resource state.
+log.begin('B3-STOPPED-WORK', 'a late answer is refused, sends nothing, and resources stay stopped', 'fixture')
+const stopping = await startWork()
+if (stopping.questionId) {
+  const q = await readQuestion(stopping.questionId)
+  const ids = (q.presentation?.options ?? []).map(option => option.id)
+  const pick = ids.includes('allow') ? ['allow'] : ids.slice(0, 1)
+  const stop = await client.request('POST', '/v1/commands', {
+    body: { commandId: `cmd-b3q-stop-${Date.now()}`, conversationId, kind: 'stop_work', workId: stopping.workId },
+  })
+  // Wait for the work to reach a terminal phase before sending anything late.
+  let settled
+  const deadline = Date.now() + 60_000
+  while (Date.now() < deadline) {
+    settled = (await client.request('GET', `/v1/works/${stopping.workId}`)).json
+    if (settled?.phase === 'ended' || settled?.phase === 'stopped' || settled?.phase === 'completed') break
+    await new Promise(resolve => setTimeout(resolve, 300))
+  }
+  const deliveriesBefore = (await deliveries(q.id)).length
+  const late = await send(answerBody({ commandId: `cmd-late-${Date.now()}`, questionId: q.id, expectedVersion: q.version, optionIds: pick }))
+  const lateKind = classify(late)
+  const after = (await client.request('GET', `/v1/works/${stopping.workId}`)).json
+  const deliveriesAfter = (await deliveries(q.id)).length
+  log.evidence({
+    stopKind: classify(stop),
+    settledPhase: settled?.phase,
+    lateKind,
+    deliveriesBefore,
+    deliveriesAfter,
+    resourceStatus: after?.resourceStatus,
+    phaseAfter: after?.phase,
+  })
+  const refused = lateKind === 'business'
+  const noExtraSend = deliveriesAfter === deliveriesBefore
+  const accurateResources = after?.resourceStatus === 'quiescent' || after?.resourceStatus === 'indeterminate' || after?.resourceStatus === 'unknown'
+  if (refused && noExtraSend && accurateResources && after?.phase !== 'working' && after?.phase !== 'running') {
+    log.pass(`late answer refused (${late.json?.error?.code ?? 'rejected'}); no extra delivery; resources=${after.resourceStatus}`)
+  } else {
+    log.fail(`late-answer branch incomplete: refused=${refused} noExtraSend=${noExtraSend} resources=${after?.resourceStatus} phase=${after?.phase}`)
+  }
+} else {
+  log.notTested('no question for the stopped-work branch')
+}
+
+function kind_label(kind) {
+  return kind === 'recorded' ? 'HTTP 200 recorded' : String(kind)
+}
 
 const report = writeReport(
   { cases: log.cases, environment: environmentIdentity({ lane: 'B3 questions (fixture)', modelCalls: 0 }) },

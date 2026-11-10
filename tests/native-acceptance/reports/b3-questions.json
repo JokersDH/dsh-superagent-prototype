@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-10T04:34:12.462Z",
+  "generatedAt": "2026-11-10T07:11:35.519Z",
   "environment": {
     "platform": "darwin/arm64",
     "node": "v24.21.0",
@@ -9,10 +9,10 @@
   },
   "totals": {
     "cases": 6,
-    "PASS": 6,
+    "PASS": 5,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 0
+    "NOT_TESTED": 1
   },
   "cases": [
     {
@@ -21,7 +21,7 @@
       "lane": "fixture",
       "status": "PASS",
       "detail": [
-        "version 1, 2 option(s), target bound to the work"
+        "version 1, 2 option(s), target bound"
       ],
       "evidence": [
         {
@@ -31,139 +31,129 @@
             "allow",
             "deny"
           ],
-          "targets": 1
+          "targets": 1,
+          "targetOk": true
         }
       ],
       "entities": [
         {
-          "workId": "5bdf28d22113ce80569e85a9130b14ff",
-          "questionId": "1ca6f9a5860c2426e5417f994dc50d4e"
+          "workId": "89d70a2fe32fb477bb361b2c705cde3b",
+          "questionId": "e88915622072348407729f5c3c515fe8"
         }
       ]
     },
     {
-      "id": "B3-STALE-VERSION",
-      "title": "an answer with a stale version is refused",
-      "lane": "fixture",
-      "status": "PASS",
-      "detail": [
-        "refused (HTTP 200) and the question version is unchanged"
-      ],
-      "evidence": [
-        {
-          "status": 200,
-          "body": {
-            "commandId": "cmd-ans-1794285251049-ebbb",
-            "seq": 545,
-            "status": "rejected",
-            "error": {
-              "code": "stale_binding",
-              "message": "Question version changed",
-              "retry": "user_action"
-            }
-          }
-        }
-      ],
-      "entities": []
-    },
-    {
       "id": "B3-LEGAL-ANSWER",
-      "title": "a legal answer is persisted and its delivery state is observable",
+      "title": "a legal answer is recorded and delivers to the original target",
       "lane": "fixture",
       "status": "PASS",
       "detail": [
-        "answer recorded (seq 549); 1 delivery record(s) visible"
+        "recorded (seq 649) and 1 delivery record(s) present"
       ],
       "evidence": [
         {
           "status": 200,
+          "kind": "recorded",
           "receipt": {
-            "commandId": "cmd-ans-1794285251062-9db3",
-            "workId": "5bdf28d22113ce80569e85a9130b14ff",
+            "commandId": "cmd-ans-1794294693577",
+            "workId": "89d70a2fe32fb477bb361b2c705cde3b",
             "entityRefs": {
-              "questionId": "1ca6f9a5860c2426e5417f994dc50d4e"
+              "questionId": "e88915622072348407729f5c3c515fe8"
             },
-            "seq": 549,
+            "seq": 649,
             "status": "recorded"
+          },
+          "deliveries": 1,
+          "applied": {
+            "answerId": "e626229d130a895de9e3845fdc26b6ad",
+            "targetBindingId": "d714fb5aba9f6e1ad65ddde2f4b87ba3",
+            "status": "local_recorded",
+            "evidenceRefs": []
           }
-        },
-        {
-          "deliveries": 1
         }
       ],
       "entities": []
     },
     {
       "id": "B3-DUPLICATE-ANSWER",
-      "title": "repeating an answer does not apply twice",
+      "title": "a same-commandId replay returns the same receipt and applies once",
       "lane": "fixture",
       "status": "PASS",
       "detail": [
-        "second answer refused/ignored (HTTP 200)"
+        "identical replay returned the same receipt (seq 655) and applied once"
       ],
       "evidence": [
         {
-          "status": 200,
-          "body": {
-            "commandId": "cmd-ans-1794285251067-68ce",
-            "seq": 550,
-            "status": "rejected",
-            "error": {
-              "code": "stale_binding",
-              "message": "Question version changed",
-              "retry": "user_action"
-            }
-          },
-          "questionStillPresent": false
+          "firstKind": "business",
+          "replayKind": "business",
+          "sameReceipt": true,
+          "deliveriesBefore": 1,
+          "deliveriesAfter": 1,
+          "stillOpen": false
         }
       ],
       "entities": []
     },
     {
-      "id": "B3-STOPPED-WORK",
-      "title": "an answer after stop cannot reopen the writer",
+      "id": "B3-STALE-VERSION",
+      "title": "a genuine older version is refused at the business layer",
       "lane": "fixture",
-      "status": "PASS",
+      "status": "NOT_TESTED",
       "detail": [
-        "late answer did not reopen work (HTTP 200, phase=ended)"
+        "the question did not advance to a second version (v0=1)"
       ],
       "evidence": [
         {
-          "status": 200,
-          "body": {
-            "commandId": "cmd-ans-1794285252455-1d26",
-            "seq": 599,
-            "status": "rejected",
-            "error": {
-              "code": "stale_binding",
-              "message": "Question targets require current native bindings",
-              "retry": "reconcile"
-            }
-          },
-          "phase": "ended",
-          "resources": "quiescent"
+          "v0": 1,
+          "v1": 1,
+          "deferKind": "recorded"
         }
       ],
       "entities": []
     },
     {
       "id": "B3-UNKNOWN-TARGET",
-      "title": "an answer for an unknown question is refused",
+      "title": "a legal answer for an unknown question is refused by business",
       "lane": "fixture",
       "status": "PASS",
       "detail": [
-        "refused (HTTP 400)"
+        "refused at the business layer with invalid_request"
       ],
       "evidence": [
         {
-          "status": 400,
+          "kind": "business",
+          "status": 200,
           "body": {
+            "commandId": "cmd-unknown-1794294694764",
+            "seq": 694,
+            "status": "rejected",
             "error": {
               "code": "invalid_request",
-              "message": "Request or response does not match the product schema",
-              "retry": "none"
+              "message": "Unknown question",
+              "retry": "user_action"
             }
           }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-STOPPED-WORK",
+      "title": "a late answer is refused, sends nothing, and resources stay stopped",
+      "lane": "fixture",
+      "status": "PASS",
+      "detail": [
+        "late answer refused (stale_binding); no extra delivery; resources=quiescent"
+      ],
+      "evidence": [
+        {
+          "stopKind": "recorded",
+          "settledPhase": "ended",
+          "lateKind": "business",
+          "deliveriesBefore": 0,
+          "deliveriesAfter": 0,
+          "resourceStatus": "quiescent",
+          "phaseAfter": "ended"
         }
       ],
       "entities": []
