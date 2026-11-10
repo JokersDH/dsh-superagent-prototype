@@ -108,6 +108,7 @@ export class ProductCompletion implements CompletionReviewPort {
       this.store.bindings.binding(attemptId)?.source === 'controlled-product-fixture' && existsSync(outputPath)
         ? readFileSync(outputPath)
         : undefined
+    const patch = this.store.artifacts.write(readFileSync(frozen.patchPath))
     // Workspace content addresses may be shared; delivery metadata belongs to this exact candidate.
     const manifest = {
       kind: output ? 'controlled-product-artifact/1' : 'product-artifact/1',
@@ -117,6 +118,12 @@ export class ProductCompletion implements CompletionReviewPort {
       baseCommit: frozen.baseCommit,
       headCommit: frozen.headCommit,
       environment: frozen.environment,
+      patch: {
+        artifactId: patch.id,
+        sha256: patch.digest,
+        bytes: patch.bytes,
+        format: 'git-binary-diff/1',
+      },
       ...(output
         ? {
             output: {
@@ -129,7 +136,7 @@ export class ProductCompletion implements CompletionReviewPort {
     }
     const files = [
       this.store.artifacts.write(Buffer.from(JSON.stringify(manifest, null, 2))),
-      this.store.artifacts.write(readFileSync(frozen.patchPath)),
+      patch,
       ...(output ? [this.store.artifacts.write(output)] : []),
     ]
     if (this.workspaces.digest({ attemptId }) !== frozen.artifactDigest)

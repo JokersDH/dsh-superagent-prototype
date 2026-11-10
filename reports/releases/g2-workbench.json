@@ -1,14 +1,14 @@
 {
   "status": "PASS_CONTROLLED_WORKBENCH_MODULES",
-  "sourceCommit": "cef31c449a637bb856ea7a4883201088e1fcb181",
-  "checkedAt": "2026-11-09T09:13:18.502Z",
+  "sourceCommit": "04871fbd0a88aec88b0630c58d6c7585aff1b3f0",
+  "checkedAt": "2026-11-09T11:28:33.716Z",
   "node": "v24.22.2",
-  "tests": 367,
+  "tests": 387,
   "results": [
     {
       "command": "pnpm check:g2-product",
       "status": "PASS",
-      "tests": 355
+      "tests": 363
     },
     {
       "command": "pnpm --filter @personal-agent/console typecheck",
@@ -22,6 +22,11 @@
     {
       "command": "pnpm --filter @personal-agent/console build",
       "status": "PASS"
+    },
+    {
+      "command": "pnpm check:operations",
+      "status": "PASS",
+      "tests": 12
     }
   ],
   "browserCheck": "pnpm check:g2-browser against an explicitly started dev:workbench instance",

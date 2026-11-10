@@ -8,6 +8,7 @@ Each attempt gets a detached worktree under the product's own state directory.
 
 | Export | Purpose |
 | --- | --- |
+| `new WorkspaceManager(root, { environment? })` | Optional trusted operator port for prepared-environment verification and dependency exclusions. The default has no exclusions. |
 | `WorkspaceManager.reserve({ projectPath, assignment, baseCommit? })` | Creates the attempt worktree at the base commit and records the user's dirty tracked changes as an audit patch plus the untracked list. |
 | `WorkspaceManager.freeze({ attemptId })` | Writes an attempt-neutral, content-addressed manifest + delivery patch (`manifests/<digest>.json` / `.patch`, never overwritten) plus a per-attempt `manifestRefPath`, and returns `artifactDigest`. The patch includes new/untracked and binary files. |
 | `WorkspaceManager.digest({ attemptId })` | Recomputes the artifact digest **without writing** for staleness checks before/after verification. |
@@ -33,6 +34,26 @@ attempt to the shared content identity, so audit and current-candidate manifests
 `freeze` writes the manifest and the user-patch audit copy under their digest, so re-freezing identical
 content is a no-op and two different candidates can never collide; `digest()` computes the same
 manifest in memory and writes nothing.
+
+## Prepared environments
+
+`WorkspaceEnvironmentPort.current({ assignment, workspacePath })` is synchronous and runs on every
+`freeze` and `digest`. The coordinator adapter must resolve a private, attempt-bound environment
+receipt and reverify its content/ownership through the environment module. It returns an opaque
+`reference`, a SHA-256 `fingerprint` and verified workspace-relative `excludedPaths`. If an expected
+receipt is missing, replaced or stale, it must throw. `undefined` means the attempt deliberately has
+no prepared environment. Worker messages and workspace marker files cannot implement this port.
+
+The manager additionally refuses arbitrary source paths, `.git`, traversal, missing directories,
+symbolic-link ancestors, and any exclusion tracked in the current index, base commit or later HEAD.
+Only `.product-environment` and directories named `node_modules` are eligible. Both the manifest
+and the delivery patch omit admitted directories, using literal exclusion pathspecs before the
+temporary index is staged. The environment reference, fingerprint, ordered paths and policy version
+participate in artifact identity. No user index, ignore file or Git configuration is changed.
+
+The port does not install dependencies, mint deletion rights or replace the caller's resource
+barrier. These module tests use a trusted fixture verifier; the production receipt/Runner adapter
+and dependency installation remain separate admission steps.
 
 ## Boundaries
 

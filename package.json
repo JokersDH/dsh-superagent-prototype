@@ -48,6 +48,8 @@
     "start": "node tools/dev/start.mjs",
     "stop": "node tools/dev/start.mjs --stop",
     "restart": "node tools/dev/start.mjs --restart",
+    "doctor": "node tools/dev/doctor.mjs",
+    "check:operations": "node --test tests/integration/local-operations.case.mjs",
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

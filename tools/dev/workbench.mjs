@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { ApplicationConfigurationSchema } from '../../packages/contracts/dist/index.js'
 import { localCredentials } from '../../apps/coordinator/http/local-state.ts'
+import { processStart } from './local-instance.mjs'
 
 const root = fileURLToPath(new URL('../../', import.meta.url))
 const { values } = parseArgs({
@@ -90,7 +91,9 @@ function launch(args, cwd, env = process.env) {
 async function freePort(value) {
   const socket = createServer()
   await new Promise((resolve, reject) => {
-    socket.once('error', reject)
+    socket.once('error', (error) => reject(error.code === 'EADDRINUSE'
+      ? new Error(`本机端口 ${value} 已被占用。请运行 pnpm doctor 核对已有服务，或使用 pnpm dev:workbench --port <其他网页端口> --api-port <其他接口端口> --state <独立状态目录>。`)
+      : error))
     socket.listen(value, '127.0.0.1', resolve)
   })
   await new Promise((resolve, reject) => socket.close((error) => (error ? reject(error) : resolve())))
@@ -171,13 +174,15 @@ async function main() {
     join(stateRoot, 'workbench.json'),
     JSON.stringify(
       {
+        protocol: 'personal-workbench/1',
         pid: process.pid,
+        processStart: await processStart(),
         apiPid: api.pid,
         consolePid: console.pid,
         consoleURL,
         apiURL,
         configurationRevision: configuration.revision,
-        mode: 'controlled-fixture',
+        mode: values.fixture ? 'fixture' : 'personal',
         access: values['require-login'] ? 'token' : 'local-development',
       },
       null,
