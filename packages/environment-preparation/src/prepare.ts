@@ -12,8 +12,8 @@ import { dependencyDigest, inspectWorkspace, versionsEqual, type WorkspaceInspec
 import { scanInstalledTree, scanNodeModules } from './installed.ts'
 import { inspectPnpmWorkspace, scanWorkspaceInstalled, type PnpmWorkspaceInspection } from './workspace.ts'
 import { runOwned, standaloneProcessPort } from './process.ts'
-import { acquireWorkspaceLock, ensureAuthority, ownedPath, writeReceipt, type Authority, type ReceiptBody } from './authority.ts'
-import { cleanupPreparedEnvironment } from './verify.ts'
+import { acquireWorkspaceLock, ensureAuthority, identityMatches, ownedPath, writeReceipt, type Authority, type OwnedPath, type ReceiptBody } from './authority.ts'
+import { cleanupPreparedEnvironment, listPreparedEnvironments } from './verify.ts'
 
 const PROTOCOL = 'environment-preparation/2'
 const REQUEST_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
@@ -42,6 +42,10 @@ interface Context {
   nodeModules: string
   diagnostics: EnvironmentDiagnostic[]
   evidence: EnvironmentEvidence[]
+  /** Present only when the caller supplied a cross-process authority root. */
+  authority?: Authority
+  /** Identity captured for state this preparation created itself, before any failure cleanup. */
+  captured?: OwnedPath[]
 }
 
 const diagnostic = (ctx: Context, code: string, message: string, severity: EnvironmentDiagnostic['severity'] = 'info'): void => {
@@ -108,22 +112,58 @@ function environmentFor(ctx: Context, policy: 'existing_only' | 'offline_install
   }
 }
 
-function cleanupHandle(ctx: Context): () => Promise<CleanupResult> {
+/** Signed receipts for exactly this workspace; the only authority for deleting an owned environment. */
+function receiptsFor(authority: Authority, workspace: string) {
+  return listPreparedEnvironments(authority.root)
+    .filter(ref => existsSync(ref.workspacePath) && canonical(ref.workspacePath) === workspace)
+}
+
+/** Captures this preparation's own inode identities so failure cleanup never trusts a marker or a path alone. */
+function captureOwned(ctx: Context): void {
+  const entries = ['.product-environment', 'node_modules']
+    .map(relative => ownedPath(ctx.workspace, relative))
+    .filter((entry): entry is OwnedPath => entry !== undefined)
+  ctx.captured = entries
+}
+
+/**
+ * Cleanup authority never comes from the worker-writable marker. With an authority root only signed
+ * receipts for the exact workspace authorize deletion; without one the legacy in-process marker path
+ * is retained solely for backward compatibility, and blocked/early results never delete anything.
+ */
+function cleanupHandle(ctx: Context, allowMarker: boolean): () => Promise<CleanupResult> {
   return async (): Promise<CleanupResult> => {
+    const removed: string[] = []
+    const leftovers: string[] = []
+    if (ctx.authority) {
+      for (const ref of receiptsFor(ctx.authority, ctx.workspace)) {
+        const result = await cleanupPreparedEnvironment(ref)
+        removed.push(...result.removed)
+        leftovers.push(...result.leftovers)
+        if (result.status === 'blocked') leftovers.push(result.code ?? 'cleanup_blocked')
+      }
+      // Only the identities captured by this process (before the failure) may be removed in addition.
+      for (const entry of [...(ctx.captured ?? [])].sort((a, b) => b.real.length - a.real.length)) {
+        if (!identityMatches(entry)) continue
+        try { rmSync(entry.real, { recursive: true, force: true }) } catch { /* checked below */ }
+        if (existsSync(entry.real)) leftovers.push(entry.real)
+        else removed.push(entry.real)
+      }
+      ctx.captured = []
+      return { removed: [...new Set(removed)], leftovers: [...new Set(leftovers)] }
+    }
+    if (!allowMarker) return { removed, leftovers }
     const marker = readMarker(ctx.markerPath)
     const targets: string[] = []
-    // Only state created by this module is removable. A pre-existing .product-environment without a
-    // trusted marker belongs to someone else and is preserved (or preparation refuses to use it).
+    // Legacy in-process mode only: state created by this module is removable.
     if (marker?.owned === true) {
       targets.push(ctx.nodeModules)
       if (existsSync(ctx.envRoot)) targets.push(ctx.envRoot)
     }
-    const removed: string[] = []
-    const leftovers: string[] = []
     for (const target of targets) {
       const { inside: contained } = realInside(ctx.workspace, target)
       if (!contained) { leftovers.push(target); continue }
-      try { rmSync(target, { recursive: true, force: true }) } catch { /* retry below */ }
+      try { rmSync(target, { recursive: true, force: true }) } catch { /* checked below */ }
       if (existsSync(target)) leftovers.push(target)
       else removed.push(target)
     }
@@ -134,7 +174,8 @@ function cleanupHandle(ctx: Context): () => Promise<CleanupResult> {
 function blockedResult(
   input: EnvironmentPreparationInput, ctx: Context, code: string, message: string, fingerprint?: string,
 ): BlockedEnvironment {
-  const cleanup = cleanupHandle(ctx)
+  // A blocked/early result has no signed receipt proving ownership, so it must not delete anything.
+  const cleanup = cleanupHandle(ctx, false)
   return {
     status: 'blocked', requestId: input.requestId, code, message,
     ...(fingerprint ? { fingerprint } : {}),
@@ -268,7 +309,8 @@ function finishReady(
 async function prepareEnvironmentInner(input: EnvironmentPreparationInput, authority?: Authority): Promise<PreparationResult> {
   const { project, workspace } = validateInput(input)
   const ctx = contextFor(input, project, workspace)
-  const cleanup = cleanupHandle(ctx)
+  if (authority) ctx.authority = authority
+  const cleanup = cleanupHandle(ctx, authority === undefined)
   const processPort = input.processPort ?? standaloneProcessPort
   if ((input.mode ?? 'single') === 'pnpm_workspace')
     return preparePnpmWorkspace(input, project, workspace, authority, ctx, cleanup, processPort)
@@ -365,6 +407,9 @@ async function prepareEnvironmentInner(input: EnvironmentPreparationInput, autho
     if (marker.phase === 'preparing')
       return blockedResult(input, ctx, 'interrupted_preparation',
         'A previous preparation is marked in progress; no second installer is started and the state is not cleaned automatically.', inputFingerprint)
+    if (authority && receiptsFor(authority, workspace).length === 0)
+      return blockedResult(input, ctx, 'environment_state_untrusted',
+        'An owned environment marker exists without a signed authority receipt; it is preserved and preparation refuses to replace it.', inputFingerprint)
     if (marker.requestId === input.requestId && marker.inputFingerprint === inputFingerprint && marker.phase === 'ready') {
       const scan = scanInstalledTree(workspace, inspection.dependencies)
       if (scan.problem) return blockedResult(input, ctx, scan.problem.code, scan.problem.message, marker.fingerprint)
@@ -394,6 +439,7 @@ async function prepareEnvironmentInner(input: EnvironmentPreparationInput, autho
     installedDigest: '', owned: true, phase: 'preparing', manager, policy: input.policy,
     workspaceReal: workspace, projectReal: project, createdAt: new Date().toISOString(),
   }
+  captureOwned(ctx)
   writeFileSync(ctx.markerPath, `${JSON.stringify(preparing, null, 2)}\n`, { mode: 0o600 })
   const environment = environmentFor(ctx, 'offline_install')
   const workspaceLimit = input.maxWorkspaceBytes ?? DEFAULTS.maxWorkspaceBytes
@@ -419,6 +465,7 @@ async function prepareEnvironmentInner(input: EnvironmentPreparationInput, autho
     clearInterval(monitor)
     input.signal.removeEventListener('abort', abortFromInput)
   }
+  captureOwned(ctx)
   const installOutput = `${result.stdout}\n${result.stderr}`
   diagnostic(ctx, 'install_command', `pnpm install offline/frozen/ignore-scripts exited ${String(result.code)} in ${Date.now() - started}ms.`)
   evidence(ctx, `environment:install-output:${sha256(installOutput)}`, installOutput.slice(-3200))
@@ -508,6 +555,8 @@ async function preparePnpmWorkspace(
     return blockedResult(input, ctx, 'workspace_has_dependencies', 'Workspace node_modules exists but is not owned by this module.', inputFingerprint)
   if (marker?.owned === true) {
     if (marker.phase === 'preparing') return blockedResult(input, ctx, 'interrupted_preparation', 'A previous workspace preparation is marked in progress.', inputFingerprint)
+    if (authority && receiptsFor(authority, workspace).length === 0)
+      return blockedResult(input, ctx, 'environment_state_untrusted', 'An owned workspace marker exists without a signed authority receipt; it is preserved.', inputFingerprint)
     if (marker.requestId === input.requestId && marker.inputFingerprint === inputFingerprint && marker.phase === 'ready') {
       const scan = scanWorkspaceInstalled(workspace, ws.modulesDirs)
       if (scan.problem) return blockedResult(input, ctx, scan.problem.code, scan.problem.message, marker.fingerprint)
@@ -534,6 +583,7 @@ async function preparePnpmWorkspace(
     owned: true, phase: 'preparing', manager, policy: input.policy,
     workspaceReal: workspace, projectReal: project, createdAt: new Date().toISOString(),
   }
+  captureOwned(ctx)
   writeFileSync(ctx.markerPath, `${JSON.stringify(preparing, null, 2)}\n`, { mode: 0o600 })
   const environment = environmentFor(ctx, 'offline_install')
   const result = await processPort.run(command, [
@@ -544,6 +594,7 @@ async function preparePnpmWorkspace(
   })
   const fail = async (code: string, message: string): Promise<BlockedEnvironment> => {
     diagnostic(ctx, code, message, 'error')
+    captureOwned(ctx)
     await cleanup()
     return blockedResult(input, ctx, code, message, inputFingerprint)
   }

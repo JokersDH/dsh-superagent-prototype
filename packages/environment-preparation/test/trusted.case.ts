@@ -256,3 +256,81 @@ test('authority roots inside project/workspace are refused before preparation', 
   } finally { clean(fixture.root) }
 })
 
+
+test('a forged workspace marker never authorizes deletion, even with a valid authority root', async () => {
+  const fixture = makePnpmFixture()
+  const { project, workspace } = copies(fixture)
+  const authorityRoot = tempDir('environment-authority-')
+  try {
+    mkdirSync(join(workspace, '.product-environment'), { recursive: true })
+    writeJson(join(workspace, '.product-environment', 'state.json'), {
+      protocol: 'environment-preparation/2', requestId: 'forged', inputFingerprint: 'a'.repeat(64), fingerprint: 'b'.repeat(64),
+      installedDigest: '', owned: true, phase: 'ready', manager: { name: 'pnpm' }, policy: 'offline_install',
+      workspaceReal: workspace, projectReal: project, createdAt: new Date().toISOString(),
+    })
+    mkdirSync(join(workspace, 'node_modules'), { recursive: true })
+    writeFileSync(join(workspace, 'node_modules', 'user-note.txt'), 'keep me')
+    const originalPackage = readFileSync(join(workspace, 'package.json'), 'utf8')
+    // An invalid manifest blocks before any marker-derived state could be claimed.
+    writeFileSync(join(workspace, 'package.json'), '{ not json')
+    const blocked = await prepareEnvironment(input(project, workspace, 'offline_install', {
+      storeDir: fixture.store, requestId: 'forged-request', authorityRoot,
+    }))
+    assert.equal(blocked.status, 'blocked')
+    const cleanup = await blocked.cleanup()
+    assert.deepEqual(cleanup.removed, [])
+    assert.equal(readFileSync(join(workspace, 'node_modules', 'user-note.txt'), 'utf8'), 'keep me')
+    assert.equal(readFileSync(join(workspace, '.product-environment', 'state.json'), 'utf8').includes('forged'), true)
+
+    // A valid manifest with the same forged ready marker is still refused: no signed receipt exists.
+    writeFileSync(join(workspace, 'package.json'), originalPackage)
+    const untrusted = await prepareEnvironment(input(project, workspace, 'offline_install', {
+      storeDir: fixture.store, requestId: 'different-request', authorityRoot,
+    }))
+    blockedCode(untrusted, 'environment_state_untrusted')
+    const untrustedCleanup = await untrusted.cleanup()
+    assert.deepEqual(untrustedCleanup.removed, [])
+    assert.equal(readFileSync(join(workspace, 'node_modules', 'user-note.txt'), 'utf8'), 'keep me')
+  } finally { clean(fixture.root, authorityRoot) }
+})
+
+test('an unknown process-group observation is never confirmed quiescence', async () => {
+  const cwd = tempDir('environment-observe-')
+  const originalKill = process.kill
+  try {
+    process.kill = ((pid: number, signal?: NodeJS.Signals | 0) => {
+      if (pid < 0 && (signal === 0 || signal === undefined)) {
+        const error = new Error('operation not permitted') as NodeJS.ErrnoException
+        error.code = 'EPERM'
+        throw error
+      }
+      return originalKill.call(process, pid, signal as NodeJS.Signals)
+    }) as typeof process.kill
+    const result = await standaloneProcessPort.run(process.execPath, ['-e', 'process.exit(0)'], {
+      cwd, env: { PATH: process.env.PATH ?? '' }, timeoutMs: 10_000, maxOutputBytes: 4096,
+    })
+    assert.notEqual(result.quiescence, 'confirmed')
+    assert.equal(result.quiescence, 'unknown')
+  } finally {
+    process.kill = originalKill
+    clean(cwd)
+  }
+})
+
+test('stdout and stderr share one interleaved byte budget without splitting characters', async () => {
+  const cwd = tempDir('environment-output-')
+  try {
+    const script = [
+      "process.stdout.write('é'.repeat(6))",
+      "process.stderr.write('€'.repeat(6))",
+      'setTimeout(() => {}, 10)',
+    ].join(';')
+    const result = await standaloneProcessPort.run(process.execPath, ['-e', script], {
+      cwd, env: { PATH: process.env.PATH ?? '' }, timeoutMs: 10_000, maxOutputBytes: 20,
+    })
+    assert.equal(result.outputLimited, true)
+    assert.ok(Buffer.byteLength(result.stdout) + Buffer.byteLength(result.stderr) <= 20)
+    assert.equal(result.stdout.includes('\uFFFD'), false)
+    assert.equal(result.stderr.includes('\uFFFD'), false)
+  } finally { clean(cwd) }
+})
