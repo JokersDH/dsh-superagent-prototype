@@ -2,8 +2,12 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { mkdtempSync, rmSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
+import { applyMigrations, MIGRATIONS } from '@personal-agent/storage'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import Database from 'better-sqlite3'
 import { ProductStore, canonicalDigest } from '@personal-agent/storage'
 import type {
   ExecutionOutcome, ReviewEvidence, RouteAdvice, ReviewSubject,
@@ -170,6 +174,19 @@ test('routing records re-open in a second process and review report artifacts ar
       const reopened = createWorkflowPorts(store).routingEvidence
       assert.equal(reopened.reviews.get('review-with-artifact')!.reportArtifactRef, report.id)
       assert.equal(reopened.outcomes.get('outcome-1')!.acceptance, 'accepted')
+      const entry = fileURLToPath(new URL('../src/index.ts', import.meta.url))
+      const code = `
+        import { ProductStore } from '@personal-agent/storage'
+        import { createWorkflowPorts } from ${JSON.stringify(entry)}
+        const store = new ProductStore({ path: ${JSON.stringify(join(dir, 'state.sqlite'))} })
+        const port = createWorkflowPorts(store).routingEvidence
+        console.log(JSON.stringify({ advice: port.advice.list({ projectId: 'project-1' }).records.length,
+          review: port.reviews.get('review-with-artifact')?.id, outcome: port.outcomes.get('outcome-1')?.acceptance }))
+        store.close()
+      `
+      const child = spawnSync(process.execPath, ['--input-type=module', '-e', code], { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8', timeout: 30_000 })
+      assert.equal(child.status, 0, String(child.stderr))
+      assert.deepEqual(JSON.parse(child.stdout.trim()), { advice: 1, review: 'review-with-artifact', outcome: 'accepted' })
       await assert.rejects(() => new WorkflowSnapshots(store).create({ destination }), /must not already exist/)
     } finally { store.close() }
   } finally {
@@ -194,7 +211,10 @@ test('single-work timeline links persisted evidence without inventing causality'
       })
       store.product.links.attach({ contract, ticketId: 'author-ticket', role: 'primary', authorityRef: 'authority-1' })
       ports.routingEvidence.reviews.put(review())
-      ports.routingEvidence.outcomes.put(outcome())
+      ports.routingEvidence.outcomes.put(outcome({ reviewTiming: {
+        candidateReadyAt: at, acceptedAt: '2026-11-10T00:10:00.000Z', readyToAcceptanceMs: 600000,
+        activeReviewMs: null, activeReviewSource: 'unknown', activeReviewCompleteness: 'unknown', evidenceRefs: [],
+      } }))
     })
     const timeline = ports.index.timeline({ workId: 'work-author', projectIds: ['project-1'], limit: 50 })!
     assert.equal(timeline.truncated, false)
@@ -202,10 +222,39 @@ test('single-work timeline links persisted evidence without inventing causality'
       'work.created', 'contract.revision', 'ticket.link', 'review.recorded', 'execution.outcome',
     ]))
     assert.equal(timeline.entries.some(item => item.kind === 'review.recorded' && item.sourceRef === 'review-1'), true)
+    const outcomeEntry = timeline.entries.find(item => item.kind === 'execution.outcome')!
+    assert.equal((outcomeEntry.detail as { reviewTiming: { readyToAcceptanceMs: number } }).reviewTiming.readyToAcceptanceMs, 600000)
     assert.equal(ports.index.timeline({ workId: 'work-author', projectIds: ['project-2'] }), undefined)
     assert.equal(ports.index.timeline({ workId: 'missing', projectIds: ['project-1'] }), undefined)
   } finally {
     store.close()
     rmSync(dir, { recursive: true, force: true })
   }
+})
+
+
+test('a v12 database upgrades to v13 while keeping old contracts, decisions and deliveries', () => {
+  const dir = tmp('routing-v12-upgrade-')
+  const path = join(dir, 'state.sqlite')
+  try {
+    const legacy = new Database(path)
+    applyMigrations(legacy, { registry: MIGRATIONS.slice(0, 12) })
+    legacy.prepare('INSERT INTO works (id, project_id, conversation_id, value, created_at) VALUES (?, ?, ?, ?, ?)')
+      .run('work-author', 'project-1', 'conversation-1', JSON.stringify({ id: 'work-author', projectId: 'project-1', conversationId: 'conversation-1', title: 'Old', createdAt: at }), at)
+    legacy.prepare('INSERT INTO contract_revisions (work_id, revision, digest, authority_ref, value, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+      .run('work-author', 1, contract.digest, 'authority-1', JSON.stringify({ ...contract, goal: 'old', scope, criteria: [], authorityRef: 'authority-1', createdAt: at }), at)
+    legacy.prepare('INSERT INTO runtime_authority (work_id, revision, digest, enabled) VALUES (?, ?, ?, 1)').run('work-author', 1, contract.digest)
+    legacy.prepare('INSERT INTO completion_verifications (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, criteria_digest, environment_ref, verifier_identity_ref, results, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .run('old-verification', 'author-ticket', 'author-assignment', 1, JSON.stringify(contract), 'd'.repeat(64), 'c'.repeat(64), 'env', 'verifier', '[]', at)
+    legacy.close()
+
+    const store = new ProductStore({ path })
+    try {
+      assert.equal(store.database.productSchema, 13)
+      assert.equal(store.product.contracts.getByRef(contract)!.goal, 'old')
+      assert.equal(store.authority.current('work-author')!.digest, contract.digest)
+      assert.equal((store.db.prepare("SELECT COUNT(*) AS n FROM completion_verifications WHERE id = 'old-verification'").get() as { n: number }).n, 1)
+      assert.equal((store.db.prepare("SELECT COUNT(*) AS n FROM route_advice").get() as { n: number }).n, 0)
+    } finally { store.close() }
+  } finally { rmSync(dir, { recursive: true, force: true }) }
 })

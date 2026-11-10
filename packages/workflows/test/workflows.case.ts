@@ -573,7 +573,7 @@ test('source message metadata is scoped/digested and state facts stay observatio
 })
 
 
-test('a v10 ledger upgrades to v12: old decisions stay auditable but missing-source, new assistant state reopens', () => {
+test('a v10 ledger upgrades to v13: old decisions stay auditable but missing-source, new assistant state reopens', () => {
   const dir = tmp('workflow-v10-upgrade-')
   const path = join(dir, 'state.sqlite')
   const legacyDecision = decision({ id: 'legacy-v10', content: 'Old decision with no source metadata' })
