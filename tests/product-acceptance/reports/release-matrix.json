@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+    "commit": "3a0abe28c5ef31fd72bba2ef9ff70c35e5545f36",
     "dirty": false
   },
   "environment": {
@@ -11,7 +11,7 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-10T05:07:20.305Z",
+  "checkedAt": "2026-11-10T05:16:29.030Z",
   "release": {
     "tier": "controlled-product-internal-trial",
     "status": "PASS",

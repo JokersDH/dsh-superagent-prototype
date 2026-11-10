@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-10T05:09:28.390Z",
+  "checkedAt": "2026-11-10T05:18:12.193Z",
   "source": {
-    "commit": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+    "commit": "3a0abe28c5ef31fd72bba2ef9ff70c35e5545f36",
     "dirty": false
   },
-  "expectedSource": "0ed336f26d15af521d039d4b2bf36f1b39ed950a",
+  "expectedSource": "3a0abe28c5ef31fd72bba2ef9ff70c35e5545f36",
   "requirements": [
     {
       "id": "E2-DAILY-VERTICAL",
@@ -90,7 +90,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-internal-trial",
-    "decidedAt": "2026-11-10T05:07:20.318Z",
+    "decidedAt": "2026-11-10T05:16:29.044Z",
     "failureCodes": []
   },
   "notes": [

@@ -1,6 +1,6 @@
 # Agent E 交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `3957e30cbbaa3cd86a672fb4583922eba8364fc8`，检查点 `835d663`，本次证据源 `0ed336f26d15af521d039d4b2bf36f1b39ed950a`。
+- 分支 `codex/g3-product-acceptance`，基线 `3957e30cbbaa3cd86a672fb4583922eba8364fc8`，检查点 `835d663`，本次证据源 `3a0abe28c5ef31fd72bba2ef9ff70c35e5545f36`。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
 
@@ -14,7 +14,7 @@
 | E4 | `node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12` | 2 PASS + 3 NOT_TESTED |
 | E5 | `node tests/product-acceptance/build-handoff.mjs --run <run-directory>` | 本文件与矩阵 |
 
-本次聚合：**PASS**（tier `controlled-product-internal-trial`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-06-56-582Z`。
+本次聚合：**PASS**（tier `controlled-product-internal-trial`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-10T05-16-03-627Z`。
 
 ## 矩阵摘要
 

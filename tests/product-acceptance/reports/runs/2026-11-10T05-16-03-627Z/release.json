@@ -3,12 +3,12 @@
   "tier": "controlled-product-internal-trial",
   "status": "PASS",
   "ok": true,
-  "checkedAt": "2026-11-10T05:14:11.039Z",
+  "checkedAt": "2026-11-10T05:16:29.044Z",
   "source": {
-    "commit": "3c191bbc82053c191947709384a393c89a9ff5b6",
-    "dirty": true
+    "commit": "3a0abe28c5ef31fd72bba2ef9ff70c35e5545f36",
+    "dirty": false
   },
-  "expectedSource": "3c191bbc82053c191947709384a393c89a9ff5b6",
+  "expectedSource": "3a0abe28c5ef31fd72bba2ef9ff70c35e5545f36",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
