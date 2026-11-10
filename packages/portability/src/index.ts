@@ -53,6 +53,15 @@ export {
 } from './archive.ts'
 export { snapshotState, type SnapshotOptions, type SnapshotResult, type StagingFile } from './snapshot.ts'
 export {
+  EVIDENCE_FORMAT,
+  EVIDENCE_FORMAT_VERSION,
+  readEvidenceSummary,
+  verifyEvidenceSummary,
+  type EvidenceProject,
+  type EvidenceSummary,
+  type EvidenceWork,
+} from './evidence.ts'
+export {
   createBundle,
   verifyBundle,
   type BundleResult,

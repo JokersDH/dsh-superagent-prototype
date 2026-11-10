@@ -18,6 +18,7 @@ import { basename, dirname, isAbsolute, join, relative } from 'node:path'
 import Database from 'better-sqlite3'
 import { artifactRoot, backupDatabase, readArtifactRegistry, verifyDatabase, type VerifyResult } from '@personal-agent/storage'
 import { PortabilityError } from './errors.ts'
+import { readEvidenceSummary, type EvidenceSummary } from './evidence.ts'
 import type { DatabaseFacts, ExcludedEntry, PathBinding, WriterClaimFacts } from './manifest.ts'
 
 export interface StagingFile {
@@ -39,6 +40,7 @@ export interface SnapshotResult {
   readonly sourceStateName: string
   readonly unreferencedArtifacts: number
   readonly sqliteVersion: string
+  readonly evidence: EvidenceSummary
 }
 
 export interface SnapshotOptions {
@@ -291,6 +293,8 @@ export async function snapshotState(options: SnapshotOptions): Promise<SnapshotR
       excluded.push({ path: 'artifacts', reason: `unreferenced-or-temporary-files:${unreferencedArtifacts}` })
   }
 
+  // Evidence coverage is read from the consistent snapshot itself through public storage ports.
+  const evidence = readEvidenceSummary(stagedDatabase)
   const databaseFacts: DatabaseFacts = {
     integrity: verified.integrity,
     foreignKeyViolations: verified.foreignKeyViolations,
@@ -309,5 +313,6 @@ export async function snapshotState(options: SnapshotOptions): Promise<SnapshotR
     sourceStateName: basename(stateDir),
     unreferencedArtifacts,
     sqliteVersion: facts.sqlite,
+    evidence,
   }
 }

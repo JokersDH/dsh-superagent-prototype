@@ -85,6 +85,7 @@ export async function backupState({ installRoot, roots, values }) {
     manifestDigest: entry.manifestDigest,
     bytes: entry.bytes,
     counts: bundle.manifest.counts,
+    evidence: bundle.manifest.evidence ?? null,
     database: entry.database,
     source: bundle.manifest.source,
     limitations: bundle.manifest.limitations,
@@ -107,6 +108,7 @@ export async function verifyBackup({ roots, values }) {
       producer: verified.manifest.producer,
       source: verified.manifest.source,
       counts: verified.manifest.counts,
+      evidence: verified.manifest.evidence ?? null,
       database: {
         integrity: verified.database.integrity,
         foreignKeyViolations: verified.database.foreignKeyViolations,

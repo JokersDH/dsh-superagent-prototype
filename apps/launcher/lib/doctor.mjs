@@ -5,11 +5,21 @@
  */
 import { execFile } from 'node:child_process'
 import { createRequire } from 'node:module'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { promisify } from 'node:util'
 import { describeRoots, platformSupport } from '@personal-agent/portability'
 import { EXIT } from './cli.mjs'
+import {
+  SUPPORTED_PLATFORM,
+  SUPPORTED_ARCH,
+  SUPPORTED_NODE as DIAGNOSTIC_NODE,
+  SUPPORTED_SQLITE,
+  probeAuthorExecutor,
+  probePorts,
+  probeRuntime,
+  readAuthorEvidence,
+} from './diagnostics.mjs'
 import { readInstanceRecord, verifyInstance } from './instance.mjs'
 import { recoverySummary } from './recovery.mjs'
 import {
@@ -69,21 +79,69 @@ async function checkSqlite(installRoot) {
   }
 }
 
-async function checkExecutor() {
-  try {
-    const which = await execute('which', ['codex'], { timeout: 2000, encoding: 'utf8' })
-    const executable = which.stdout.trim()
-    const version = await execute(executable, ['--version'], { timeout: 10000, encoding: 'utf8' })
-    return pass('executor_codex', { executable, version: version.stdout.trim() })
-  } catch {
-    return warn('executor_codex', {
-      message: 'No installed Codex CLI was found; native execution stays disabled.',
-      hint: 'Install and admit a native executor in your own account; this launcher never installs or upgrades it.',
-    })
+/**
+ * Author executor diagnostics. The Codex CLI is the currently admitted author; a missing binary or
+ * private auth file disables native execution but does not invent a fallback executor.
+ */
+async function checkAuthorExecutor(installRoot) {
+  const evidence = readAuthorEvidence(installRoot)
+  const probe = probeAuthorExecutor({
+    installRoot,
+    required: false,
+    expectedVersion: evidence?.profileVersion ?? null,
+  })
+  const detail = {
+    ...probe.facts,
+    evidence: evidence === null ? { status: 'unknown', note: 'No checked-in native product evidence in this install' } : {
+      status: evidence.status,
+      profileVersion: evidence.profileVersion,
+      sourceCommit: evidence.sourceCommit,
+    },
+    hint: 'Install and admit Codex CLI in your own account; this launcher never installs/upgrades it or reads credentials.',
   }
+  if (!probe.facts.available) return warn('executor_codex', { ...detail, message: probe.message })
+  if (probe.code === 'author_executor_version_mismatch') return warn('executor_codex', { ...detail, message: probe.message })
+  if (!probe.facts.authPresent) return warn('executor_codex', { ...detail, message: 'No private author auth file was found; native execution stays disabled.' })
+  return pass('executor_codex', detail)
 }
 
-export async function runDoctor({ installRoot, roots, deep = false }) {
+/**
+ * Reviewer (second executor) diagnostics. Until B/main publish an executor capability interface,
+ * the review entry stays unavailable/experimental; a fixture may describe diagnostic-only facts.
+ * This never writes a second secret configuration and never echoes credentials.
+ */
+function checkReviewExecutor(fixturePath) {
+  if (fixturePath !== null) {
+    let fixture
+    try {
+      fixture = JSON.parse(readFileSync(fixturePath, 'utf8'))
+    } catch (error) {
+      return fail('review_executor', { reason: 'fixture_unreadable', message: String(error?.message ?? error).slice(0, 300) })
+    }
+    const executors = Array.isArray(fixture.executors) ? fixture.executors : []
+    const reviewer = executors.find((executor) => executor.role === 'reviewer')
+    const required = fixture.requiredReview === true
+    if (!reviewer)
+      return required
+        ? fail('review_executor', { reason: 'required_reviewer_missing', message: 'Required review mode has no admitted reviewer executor.', executors: executors.map((e) => e.role) })
+        : warn('review_executor', { reason: 'reviewer_unavailable', message: 'No reviewer executor; author path stays usable and review stays unavailable.', executors: executors.map((e) => e.role) })
+    return pass('review_executor', {
+      role: 'reviewer',
+      profileId: reviewer.profileId ?? null,
+      version: reviewer.version ?? null,
+      capabilities: Array.isArray(reviewer.capabilities) ? reviewer.capabilities : [],
+      admitted: reviewer.admitted === true,
+      required,
+    })
+  }
+  return warn('review_executor', {
+    reason: 'no_executor_interface',
+    message: 'B/main have not published a second-executor capability interface; the review entry stays experimental and disabled by default.',
+    hint: 'Author execution remains available; required review mode is BLOCKED until an admitted reviewer is configured.',
+  })
+}
+
+export async function runDoctor({ installRoot, roots, deep = false, executorsFixture = null }) {
   const checks = []
   checks.push(
     satisfiesSupportedNode(process.versions.node)
@@ -138,6 +196,19 @@ export async function runDoctor({ installRoot, roots, deep = false }) {
         ? warn('source_identity', { commit: release.source.commit, dirty: release.source.dirty })
         : pass('source_identity', { commit: release.source.commit, dirty: release.source.dirty }),
     )
+    const runtime = probeRuntime({ installRoot, release })
+    checks.push(
+      runtime.ok
+        ? pass('runtime_abi', runtime.facts)
+        : fail('runtime_abi', { code: runtime.code, message: runtime.message, ...runtime.facts }),
+    )
+    checks.push(pass('support_matrix', {
+      measured: [`${SUPPORTED_PLATFORM}-${SUPPORTED_ARCH}`, 'node ' + DIAGNOSTIC_NODE],
+      node: DIAGNOSTIC_NODE,
+      abi: release.admission?.abi ?? process.versions.modules,
+      sqlite: `>=${SUPPORTED_SQLITE}`,
+      notTested: ['linux', 'win32', 'darwin-x64', 'other Node ABIs', 'other machines'],
+    }))
   }
 
   const rootReports = describeRoots(roots)
@@ -183,7 +254,19 @@ export async function runDoctor({ installRoot, roots, deep = false }) {
   } else {
     checks.push(pass('recovery_marker', { startupMode: 'normal' }))
   }
-  checks.push(await checkExecutor())
+  if (instanceRecord === null) {
+    const ports = await probePorts([['console', 5190], ['api', 8790]])
+    const busy = ports.filter((entry) => !entry.ok)
+    checks.push(
+      busy.length === 0
+        ? pass('ports', { checked: ports.map((entry) => `${entry.name}:${entry.port}`) })
+        : warn('ports', { busy, hint: 'Choose other --port/--api-port values; do not stop an unverified process.' }),
+    )
+  } else {
+    checks.push(pass('ports', { instance: instanceRecord.pid, consoleURL: instanceRecord.consoleURL, apiURL: instanceRecord.apiURL }))
+  }
+  checks.push(await checkAuthorExecutor(installRoot))
+  checks.push(checkReviewExecutor(executorsFixture))
 
   const status = checks.some((check) => check.status === 'FAIL')
     ? 'BLOCKED'

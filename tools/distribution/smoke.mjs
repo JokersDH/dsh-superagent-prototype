@@ -255,10 +255,30 @@ try {
     if (install.format !== 'pa-install' || install.formatVersion !== 1) throw new Error('unexpected install manifest format')
     if (install.files.length < 1000 || !install.dependencies.some((dependency) => dependency.name === 'better-sqlite3'))
       throw new Error('staged install manifest does not cover the runtime closure')
+    for (const entry of ['launcher', 'coordinator', 'runner', 'consoleEntry', 'nativeBinding']) {
+      const path = install.entrypoints?.[entry]
+      if (typeof path !== 'string' || !existsSync(join(stagedRoot, path))) throw new Error(`staged entrypoint ${entry} is missing`)
+    }
+    if (!Array.isArray(install.workspacePackages) || install.workspacePackages.length < 10)
+      throw new Error('staged install does not list the workspace packages')
+    if (install.supportMatrix?.abi !== null && install.supportMatrix?.abi !== undefined && String(install.supportMatrix.abi) !== process.versions.modules)
+      throw new Error('support matrix ABI does not match the producer')
+    for (const runtimeFile of [
+      'app/apps/coordinator/product/project-settings.ts',
+      'app/apps/coordinator/product/review-timing.ts',
+      'app/packages/contracts/src/routing-review.ts',
+    ]) {
+      if (!existsSync(join(stagedRoot, runtimeFile))) throw new Error(`staged closure is missing latest main runtime file ${runtimeFile}`)
+    }
+    const forbidden = install.files.filter((entry) => /(?:^|\/)(?:api\.key|auth\.json|\.env|instance\.json|launcher\.json|start\.lock)$/.test(entry.path))
+    if (forbidden.length > 0) throw new Error(`staged install carries non-closure secret/runtime material: ${forbidden.slice(0, 5).map((entry) => entry.path)}`)
     step('stage-closure', 'PASS', {
       root: stagedRoot,
       files: install.files.length,
       dependencies: install.dependencies.length,
+      workspacePackages: install.workspacePackages.length,
+      entrypoints: install.entrypoints,
+      supportMatrix: install.supportMatrix,
       buildId: install.buildId,
     })
   } else step('build', 'SKIPPED')
@@ -325,7 +345,13 @@ try {
   if (backup.json.database.integrity !== 'ok' || backup.json.database.foreignKeyViolations !== 0)
     throw new Error(`backup database facts are not clean: ${JSON.stringify(backup.json.database)}`)
   backupArchiveSha256 = backup.json.archiveSha256
-  step('backup-live', 'PASS', { archiveSha256: backupArchiveSha256, counts: backup.json.counts, database: backup.json.database })
+  const backupEvidence = backup.json.evidence
+  if (backupEvidence === undefined || backupEvidence.protocol !== 'personal-evidence')
+    throw new Error('backup manifest does not record evidence coverage')
+  if (backupEvidence.counts.artifacts < 1) throw new Error('backup evidence does not cover the delivered artifacts')
+  if (backupEvidence.routingEvidence.status !== 'unavailable')
+    throw new Error('this merge has no routing evidence persistence; manifest must say unavailable, not included')
+  step('backup-live', 'PASS', { archiveSha256: backupArchiveSha256, counts: backup.json.counts, database: backup.json.database, evidence: { digest: backupEvidence.digest, counts: backupEvidence.counts, routing: backupEvidence.routingEvidence.status } })
 
   const verifyLive = runPa(['verify-backup', '--json', '--bundle', backupPath, ...stateArgs()], { allowExit: [0] })
   if (verifyLive.json?.status !== 'VERIFIED' || verifyLive.json.database.integrity !== 'ok')
@@ -423,6 +449,40 @@ try {
   if (winnerExit === 'timeout') throw new Error('concurrent start winner did not exit after stop')
   step('concurrent-start-single-winner', 'PASS', { loserCode: loserJson?.code, winnerExit: winnerExit.code })
 
+  // Stable diagnostics for a busy port and a missing author executor: fail before any daemon.
+  const diagRoot = join(root, 'diag')
+  const diag = {
+    config: join(diagRoot, 'config'), data: join(diagRoot, 'data'), cache: join(diagRoot, 'cache'),
+    logs: join(diagRoot, 'logs'), workspaces: join(diagRoot, 'workspaces'),
+  }
+  mkdirSync(diag.config, { recursive: true, mode: 0o700 })
+  copyFileSync(join(roots.config, 'release.json'), join(diag.config, 'release.json'))
+  const diagArgs = ['--install', REPO_ROOT, '--config-root', diag.config, '--data-root', diag.data, '--cache-root', diag.cache, '--logs-root', diag.logs, '--workspace-root', diag.workspaces]
+  const diagFirstRun = runPa(['first-run', '--json', ...diagArgs], { allowExit: [0] })
+  if (diagFirstRun.json?.status !== 'OK') throw new Error('diagnostic config first-run failed')
+  const busyPort = runPa(['start', '--fixture', '--json', '--port', String(primaryPort), '--api-port', String(primaryApiPort), ...diagArgs], { allowExit: [2] })
+  if (busyPort.json?.code !== 'port_in_use') throw new Error(`busy port expected port_in_use, got ${busyPort.json?.code}`)
+  const missingAuthor = spawnSync(process.execPath, [PA, 'start', '--json', '--port', String(await freePort()), '--api-port', String(await freePort()), ...diagArgs], {
+    cwd: REPO_ROOT, encoding: 'utf8', timeout: 60000, env: { ...process.env, PA_CODEX_BIN: '/nonexistent/codex' },
+  })
+  const missingAuthorJson = (() => { try { return JSON.parse(missingAuthor.stdout) } catch { return null } })()
+  if (missingAuthor.status !== 2 || missingAuthorJson?.code !== 'author_executor_unavailable')
+    throw new Error(`missing author executor expected author_executor_unavailable, got ${missingAuthor.status} ${missingAuthorJson?.code}`)
+  if (existsSync(join(diag.config, 'instance.json'))) throw new Error('missing-executor probe wrote an instance record')
+  const fakeCodex = join(root, 'fake-codex')
+  writeFileSync(fakeCodex, '#!/bin/sh\necho "codex-cli 0.164.0"\nexit 0\n', { mode: 0o755 })
+  const emptyCodexHome = join(root, 'empty-codex-home')
+  mkdirSync(emptyCodexHome, { recursive: true, mode: 0o700 })
+  const missingAuth = spawnSync(process.execPath, [PA, 'start', '--json', '--port', String(await freePort()), '--api-port', String(await freePort()), ...diagArgs], {
+    cwd: REPO_ROOT, encoding: 'utf8', timeout: 60000,
+    env: { ...process.env, PA_CODEX_BIN: fakeCodex, CODEX_HOME: emptyCodexHome },
+  })
+  const missingAuthJson = (() => { try { return JSON.parse(missingAuth.stdout) } catch { return null } })()
+  if (missingAuth.status !== 2 || missingAuthJson?.code !== 'author_auth_unavailable')
+    throw new Error(`missing author auth expected author_auth_unavailable, got ${missingAuth.status} ${missingAuthJson?.code}`)
+  if (/auth\.json|token|secret/i.test(missingAuthJson?.detail?.cause ?? '')) throw new Error('author auth diagnostic leaked credential-like text')
+  step('start-stable-diagnostics', 'PASS', { busyPort: busyPort.json.code, missingAuthor: missingAuthorJson.code, missingAuth: missingAuthJson.code })
+
   const primaryStop = await stopTrial(primary, { label: 'primary' })
   step('stop-primary', 'PASS', { stopMs: primaryStop.stopMs })
 
@@ -462,7 +522,17 @@ try {
   if (restore.json?.status !== 'RESTORED') throw new Error(`restore did not report RESTORED: ${JSON.stringify(restore.json).slice(0, 600)}`)
   if (restore.json.report.database.integrity !== 'ok' || restore.json.report.database.foreignKeyViolations !== 0)
     throw new Error('restored database facts are not clean')
-  step('restore-new-directory', 'PASS', { target: restoredData, pendingRebind: restore.json.report.pathMappings.pendingRebind.length })
+  if (restore.json.report.evidence?.status !== 'verified')
+    throw new Error('restore did not verify evidence coverage')
+  if (restore.json.report.evidence.digest !== backupEvidence.digest)
+    throw new Error('restored evidence digest does not match the bundle manifest')
+  if (JSON.stringify(restore.json.report.evidence.counts) !== JSON.stringify(backupEvidence.counts))
+    throw new Error('restored evidence counts do not match the bundle manifest')
+  step('restore-new-directory', 'PASS', {
+    target: restoredData,
+    pendingRebind: restore.json.report.pathMappings.pendingRebind.length,
+    evidence: { status: restore.json.report.evidence.status, digest: restore.json.report.evidence.digest, counts: restore.json.report.evidence.counts },
+  })
 
   const nonEmpty = join(root, 'non-empty-target')
   mkdirSync(nonEmpty, { recursive: true, mode: 0o700 })
@@ -753,6 +823,41 @@ try {
       modules: modulePaths.length,
       outsideClosure: outside.length,
       checkoutReferences: checkoutReferences.length,
+    })
+    // Doctor inside the relocated closure: release/ABI/console/dependency gates must pass, and the
+    // second-executor interface is explicit about being unavailable by default.
+    const stagedDoctor = wrapperRun(['doctor', '--json'], { allowExit: [0, 1] })
+    const stagedDoctorCheck = (id) => stagedDoctor.json?.checks?.find((check) => check.id === id)
+    for (const id of ['release_manifest', 'runtime_abi', 'console_mode', 'runtime_dependencies']) {
+      if (stagedDoctorCheck(id)?.status !== 'PASS') throw new Error(`staged doctor gate ${id} did not pass: ${JSON.stringify(stagedDoctorCheck(id))}`)
+    }
+    if (stagedDoctorCheck('review_executor')?.status !== 'WARN' || stagedDoctorCheck('review_executor')?.detail?.reason !== 'no_executor_interface')
+      throw new Error('default doctor must report the review executor interface as unavailable, not configured')
+    const authorOnlyFixture = join(root, 'executors-author-only.json')
+    writeFileSync(authorOnlyFixture, JSON.stringify({ protocol: 'personal-executors-fixture/1', requiredReview: true, executors: [{ role: 'author', profileId: 'codex', version: 'codex-cli 0.164.0', admitted: true }] }))
+    const blockedReview = wrapperRun(['doctor', '--json', '--executors-fixture', authorOnlyFixture], { allowExit: [2] })
+    if (blockedReview.json?.status !== 'BLOCKED') throw new Error('required review without a reviewer executor must be BLOCKED')
+    if (blockedReview.json?.checks?.find((check) => check.id === 'review_executor')?.detail?.reason !== 'required_reviewer_missing')
+      throw new Error('required review block did not name the missing reviewer executor')
+    const reviewerFixture = join(root, 'executors-with-reviewer.json')
+    writeFileSync(reviewerFixture, JSON.stringify({ protocol: 'personal-executors-fixture/1', requiredReview: true, executors: [
+      { role: 'author', profileId: 'codex', version: 'codex-cli 0.164.0', admitted: true },
+      { role: 'reviewer', profileId: 'review-sealed', version: 'fixture-0', capabilities: ['sealed_copy'], admitted: true },
+    ] }))
+    const reviewerDoctor = wrapperRun(['doctor', '--json', '--executors-fixture', reviewerFixture], { allowExit: [0, 1] })
+    if (reviewerDoctor.json?.checks?.find((check) => check.id === 'review_executor')?.status !== 'PASS')
+      throw new Error('reviewer fixture did not produce a PASS review_executor check')
+    const authorOnlyOptional = join(root, 'executors-author-optional.json')
+    writeFileSync(authorOnlyOptional, JSON.stringify({ protocol: 'personal-executors-fixture/1', requiredReview: false, executors: [{ role: 'author', profileId: 'codex', admitted: true }] }))
+    const optionalDoctor = wrapperRun(['doctor', '--json', '--executors-fixture', authorOnlyOptional], { allowExit: [0, 1] })
+    if (optionalDoctor.json?.status === 'BLOCKED') throw new Error('a missing optional reviewer must not block the author path')
+    if (optionalDoctor.json?.checks?.find((check) => check.id === 'review_executor')?.status !== 'WARN')
+      throw new Error('optional missing reviewer must be WARN, not silently enabled')
+    step('doctor-executor-capabilities', 'PASS', {
+      defaultReview: stagedDoctorCheck('review_executor')?.detail?.reason,
+      requiredReviewBlocked: blockedReview.json.status,
+      authorPathWithoutReviewer: optionalDoctor.json.status,
+      reviewerCheck: 'PASS',
     })
     const stagedStopStarted = Date.now()
     const stagedStop = wrapperRun(['stop', '--json'], { allowExit: [0] })

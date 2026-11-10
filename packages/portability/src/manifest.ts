@@ -64,6 +64,27 @@ export interface DatabaseFacts {
   readonly writerClaim: WriterClaimFacts | null
 }
 
+export interface EvidenceReference {
+  readonly protocol: 'personal-evidence'
+  readonly formatVersion: 1
+  readonly digest: string
+  readonly productSchema: number | null
+  readonly counts: {
+    readonly projects: number
+    readonly works: number
+    readonly decisions: number
+    readonly assistantDecisions: number
+    readonly assistantProposals: number
+    readonly artifacts: number
+  }
+  readonly routingEvidence: {
+    readonly status: 'unavailable' | 'included'
+    readonly reason: string
+    readonly requiredPorts: readonly string[]
+  }
+  readonly limitations: readonly string[]
+}
+
 export interface BackupManifest {
   readonly format: typeof BUNDLE_FORMAT
   readonly formatVersion: typeof BUNDLE_FORMAT_VERSION
@@ -100,6 +121,8 @@ export interface BackupManifest {
   }[]
   readonly database: DatabaseFacts
   readonly counts: { readonly entries: number; readonly artifacts: number; readonly excluded: number }
+  /** Optional for legacy wave-04 bundles; new bundles always record it. */
+  readonly evidence?: EvidenceReference
   readonly limitations: readonly string[]
 }
 
@@ -298,6 +321,41 @@ export function validateManifest(input: unknown): BackupManifest {
   if (limitations.length > 1000) fail('Manifest limitations is too long')
   const limitationTexts = limitations.map((entry) => str(entry, 'limitations[]', 2048))
 
+  // Optional for legacy bundles. New bundles must carry a well-formed evidence reference.
+  let evidence: EvidenceReference | undefined
+  if (value.evidence !== undefined) {
+    const raw = isRecord(value.evidence) ? value.evidence : fail('Manifest evidence is invalid')
+    if (raw.protocol !== 'personal-evidence') fail('Manifest evidence protocol is unrecognized')
+    if (raw.formatVersion !== 1) fail('Manifest evidence format version is unsupported')
+    const digest = str(raw.digest, 'evidence.digest', 64)
+    if (!SHA256.test(digest)) fail('Manifest evidence digest is invalid')
+    const evidenceCounts = isRecord(raw.counts) ? raw.counts : fail('Manifest evidence.counts is missing')
+    const routing = isRecord(raw.routingEvidence) ? raw.routingEvidence : fail('Manifest evidence.routingEvidence is missing')
+    if (!['unavailable', 'included'].includes(String(routing.status))) fail('Manifest evidence.routingEvidence.status is invalid')
+    const requiredPorts = Array.isArray(routing.requiredPorts) ? routing.requiredPorts : fail('Manifest evidence.routingEvidence.requiredPorts is missing')
+    const evidenceLimitations = Array.isArray(raw.limitations) ? raw.limitations : fail('Manifest evidence.limitations is missing')
+    evidence = {
+      protocol: 'personal-evidence',
+      formatVersion: 1,
+      digest,
+      productSchema: raw.productSchema === null || raw.productSchema === undefined ? null : nonNegativeInt(raw.productSchema, 'evidence.productSchema'),
+      counts: {
+        projects: nonNegativeInt(evidenceCounts.projects, 'evidence.counts.projects'),
+        works: nonNegativeInt(evidenceCounts.works, 'evidence.counts.works'),
+        decisions: nonNegativeInt(evidenceCounts.decisions, 'evidence.counts.decisions'),
+        assistantDecisions: nonNegativeInt(evidenceCounts.assistantDecisions, 'evidence.counts.assistantDecisions'),
+        assistantProposals: nonNegativeInt(evidenceCounts.assistantProposals, 'evidence.counts.assistantProposals'),
+        artifacts: nonNegativeInt(evidenceCounts.artifacts, 'evidence.counts.artifacts'),
+      },
+      routingEvidence: {
+        status: routing.status as 'unavailable' | 'included',
+        reason: str(routing.reason, 'evidence.routingEvidence.reason', 2048),
+        requiredPorts: requiredPorts.map((entry) => str(entry, 'evidence.routingEvidence.requiredPorts[]', 512)),
+      },
+      limitations: evidenceLimitations.map((entry) => str(entry, 'evidence.limitations[]', 1024)),
+    }
+  }
+
   return {
     format: BUNDLE_FORMAT,
     formatVersion: BUNDLE_FORMAT_VERSION,
@@ -328,6 +386,7 @@ export function validateManifest(input: unknown): BackupManifest {
     artifactRefs,
     database: databaseFacts,
     counts: { entries: parsedEntries.length, artifacts: artifactRefs.length, excluded: excludedEntries.length },
+    ...(evidence === undefined ? {} : { evidence }),
     limitations: limitationTexts,
   }
 }

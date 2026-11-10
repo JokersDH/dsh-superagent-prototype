@@ -128,6 +128,15 @@ export async function createBundle(options: CreateBundleOptions): Promise<Bundle
       })),
       database: snapshot.databaseFacts,
       counts: { entries: entries.length, artifacts: snapshot.artifacts.length, excluded: snapshot.excluded.length },
+      evidence: {
+        protocol: snapshot.evidence.protocol,
+        formatVersion: snapshot.evidence.formatVersion,
+        digest: snapshot.evidence.digest,
+        productSchema: snapshot.evidence.productSchema,
+        counts: snapshot.evidence.counts,
+        routingEvidence: snapshot.evidence.routingEvidence,
+        limitations: snapshot.evidence.limitations,
+      },
       limitations: [
         ...LIMITATIONS,
         ...(snapshot.databaseFacts.writerClaim

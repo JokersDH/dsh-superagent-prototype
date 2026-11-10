@@ -12,6 +12,7 @@ import { chmodSync, closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, mkdt
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import Database from 'better-sqlite3'
 import { verifyDatabase } from '@personal-agent/storage'
+import { readEvidenceSummary, type EvidenceSummary } from './evidence.ts'
 import { PortabilityError } from './errors.ts'
 import { DATABASE_ENTRY, MANIFEST_ENTRY } from './manifest.ts'
 import { readTarGz } from './archive.ts'
@@ -55,6 +56,14 @@ export interface RestoreReport {
     readonly applied: readonly (RestorePathMapping & { readonly field: string })[]
     readonly pendingRebind: readonly string[]
     readonly unmatchedMappings: readonly string[]
+  }
+  /** Evidence coverage that was actually re-read from the restored database. */
+  readonly evidence: {
+    readonly status: 'verified' | 'not_recorded'
+    readonly digest: string | null
+    readonly counts: EvidenceSummary['counts'] | null
+    readonly routingEvidence: EvidenceSummary['routingEvidence'] | null
+    readonly reason: string | null
   }
   readonly requiresRevalidation: readonly string[]
   readonly excluded: readonly { path: string; reason: string }[]
@@ -248,6 +257,38 @@ export async function restoreBundle(options: RestoreOptions): Promise<RestoreRes
       db.close()
     }
 
+    // 3b. A readable database is not enough: every recorded evidence class must match the bundle.
+    let evidenceReport: RestoreReport['evidence']
+    if (manifest.evidence === undefined) {
+      evidenceReport = {
+        status: 'not_recorded',
+        digest: null,
+        counts: null,
+        routingEvidence: null,
+        reason: 'This bundle was produced before evidence coverage was recorded; evidence completeness is unknown.',
+      }
+    } else {
+      const actual = readEvidenceSummary(join(staging, 'state.sqlite'))
+      const expectedCounts = manifest.evidence.counts
+      const mismatches: string[] = []
+      if (actual.digest !== manifest.evidence.digest) mismatches.push('digest')
+      if (JSON.stringify(actual.counts) !== JSON.stringify(expectedCounts)) mismatches.push('counts')
+      if (actual.routingEvidence.status !== manifest.evidence.routingEvidence.status) mismatches.push('routing_capability')
+      if (mismatches.length > 0)
+        throw new PortabilityError('evidence_mismatch', 'Restored database evidence does not match the bundle manifest', {
+          mismatches,
+          expectedDigest: manifest.evidence.digest,
+          actualDigest: actual.digest,
+        })
+      evidenceReport = {
+        status: 'verified',
+        digest: actual.digest,
+        counts: actual.counts,
+        routingEvidence: actual.routingEvidence,
+        reason: actual.routingEvidence.status === 'unavailable' ? actual.routingEvidence.reason : null,
+      }
+    }
+
     // 4. Explicit path remapping only; everything else stays pending.
     const pathMappings = applyBindings(staging, mappings)
     const report: RestoreReport = {
@@ -277,12 +318,18 @@ export async function restoreBundle(options: RestoreOptions): Promise<RestoreRes
         eventSeq,
       },
       pathMappings,
+      evidence: evidenceReport,
       requiresRevalidation: [...REVALIDATION],
       excluded: manifest.selection.excluded,
       limitations: [
         ...manifest.limitations,
         'Restore does not start the daemon, consume the durable queue, or resend begin/deliver/answer.',
         'The restored instance has new local credentials; old runtime records and writer identity are not authority.',
+        ...(evidenceReport.status === 'not_recorded'
+          ? ['Legacy bundle has no evidence coverage; evidence completeness was not verified.']
+          : evidenceReport.routingEvidence?.status === 'unavailable'
+            ? ['Route advice/review report persistence was not present when this bundle was created; those evidence classes are not covered.']
+            : []),
       ],
     }
     const reportPath = join(staging, 'restore-report.json')

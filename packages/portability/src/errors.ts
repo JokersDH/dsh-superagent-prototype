@@ -22,6 +22,8 @@ export type PortabilityCode =
   | 'config_invalid'
   | 'artifact_missing'
   | 'artifact_digest_mismatch'
+  | 'evidence_mismatch'
+  | 'evidence_unreadable'
   | 'writer_uncertain'
   | 'state_in_use'
   | 'target_not_empty'

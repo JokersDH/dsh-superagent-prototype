@@ -14,6 +14,7 @@ import { ensureRoots } from '@personal-agent/portability'
 import { EXIT } from './cli.mjs'
 import { readLauncherConfig } from './config.mjs'
 import { daemonArgv, spawnDaemon } from './daemon.mjs'
+import { probeAuthorExecutor, probeRuntime, readAuthorEvidence } from './diagnostics.mjs'
 import { canonicalPath, identityDifferences } from './identity.mjs'
 import { captureProcessFacts, processStart, readInstanceRecord, removeInstanceRecord, verifyInstance, writeInstanceRecord } from './instance.mjs'
 import { StartLockHeld, acquireStartLock } from './start-lock.mjs'
@@ -102,6 +103,14 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
       failures: dependencyCheck.failures.slice(0, 20),
       checked: dependencyCheck.checked,
     }, '重新 `pa build`/`pa stage`；不要混用其它 checkout 或 node_modules。')
+  // Explain an incompatible Node/ABI/SQLite binding before spawning anything.
+  const runtime = probeRuntime({ installRoot, release })
+  if (!runtime.ok)
+    return blocked('runtime_incompatible', '当前 Node/平台/ABI 无法运行该构建', {
+      code: runtime.code,
+      message: runtime.message,
+      ...runtime.facts,
+    }, '使用构建该 release 的 Node 24.21.x 与 darwin/arm64；不要升级全局 runtime 或替换 native binding。')
 
   const ensured = ensureRoots(roots)
   const canonicalInstall = canonicalPath(installRoot)
@@ -164,6 +173,19 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
     const availability = await freePort(port)
     if (!availability.ok)
       return blocked('port_in_use', `本机端口 ${port} 已被占用`, { name, port, cause: availability.code }, '用 --port/--api-port 选择其它端口，或先运行 `pa doctor` 核对已有实例。')
+  }
+
+  if (mode === 'personal') {
+    const evidence = readAuthorEvidence(installRoot)
+    const expectedVersion = evidence?.status === 'PASS_REAL_NATIVE_PRODUCT' ? evidence.profileVersion : null
+    const executor = probeAuthorExecutor({ installRoot, required: true, expectedVersion })
+    if (!executor.ok)
+      return blocked(
+        executor.code ?? 'author_executor_unavailable',
+        '个人模式需要已准入的作者执行器与私有认证；不会回退到 fixture，也不会读取凭据内容',
+        { ...executor.facts, evidenceStatus: evidence?.status ?? 'unknown', evidenceProfileVersion: evidence?.profileVersion ?? null },
+        '在你自己的账号安装/登录已准入的 Codex CLI 0.164.0 后再启动；可用 --fixture 验证受控链路。本启动器不安装、不升级、不重置 native 账号。',
+      )
   }
 
   const consoleURL = desired.consoleURL

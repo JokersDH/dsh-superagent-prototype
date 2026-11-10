@@ -320,6 +320,26 @@ exec "\${PA_NODE:-node}" "$DIR/app/apps/launcher/bin/pa.mjs" "$@"
       entry: 'bin/pa',
       entryFile: 'app/apps/launcher/bin/pa.mjs',
       coordinatorEntry: 'app/apps/coordinator/product/demo.ts',
+      entrypoints: {
+        launcher: 'app/apps/launcher/bin/pa.mjs',
+        coordinator: 'app/apps/coordinator/product/demo.ts',
+        runner: 'app/apps/runner/src/index.ts',
+        consoleEntry: 'app/apps/console/dist/index.html',
+        nativeBinding: 'app/node_modules/better-sqlite3',
+      },
+      workspacePackages: workspace.map((pkg) => ({
+        name: pkg.name,
+        path: `app/${pkg.relative}`,
+        source: existsSync(join(pkg.directory, 'src')),
+        dist: existsSync(join(pkg.directory, 'dist')),
+      })),
+      supportMatrix: {
+        measured: ['darwin/arm64 + Node 24.21.x + SQLite ABI 137'],
+        node: '>=24.21.0 <25',
+        abi: release.admission?.abi ?? null,
+        sqlite: '>=3.53.4',
+        notTested: ['linux', 'win32', 'darwin-x64', 'other Node ABIs', 'other machines', 'personal native execution'],
+      },
       consoleRoot: 'app/apps/console/dist',
       releaseManifest: 'var/config/release.json',
       dependencies,
@@ -340,22 +360,33 @@ exec "\${PA_NODE:-node}" "$DIR/app/apps/launcher/bin/pa.mjs" "$@"
     }
     writeFileSync(join(staging, 'install.json'), `${JSON.stringify(install, null, 2)}\n`, { mode: 0o600 })
 
-    // 8. Self-check: every listed file must match, and the staged launcher must load.
+    // 8. Self-check: every listed file must match, and the staged install must pass its own
+    // release/ABI/console/dependency gates before it is promoted.
     for (const entry of entries) {
       if (entry.kind !== 'file') continue
       const bytes = readFileSync(join(staging, entry.path))
       if (bytes.byteLength !== entry.bytes || sha256(bytes) !== entry.sha256)
         throw new StageError('install_digest_mismatch', 'Staged file does not match its recorded digest', { path: entry.path })
     }
-    const load = spawnSync(process.execPath, [join(appRoot, 'apps/launcher/bin/pa.mjs'), 'version'], {
-      env: { ...process.env, PA_INSTALL_ROOT: appRoot },
+    const wrapperPath = join(staging, 'bin/pa')
+    const doctor = spawnSync(wrapperPath, ['doctor', '--json'], {
+      cwd: staging,
+      env: { ...process.env },
       encoding: 'utf8',
-      timeout: 30_000,
+      timeout: 120_000,
     })
-    if (load.status !== 0)
-      throw new StageError('install_load_failed', 'Staged launcher could not load its runtime', {
-        stderr: (load.stderr ?? '').slice(0, 4000),
+    let doctorResult = null
+    try { doctorResult = JSON.parse(doctor.stdout) } catch { doctorResult = null }
+    if (doctor.status === 2 || doctorResult === null)
+      throw new StageError('install_load_failed', 'Staged install failed its own doctor gate', {
+        exit: doctor.status,
+        stdout: (doctor.stdout ?? '').slice(0, 4000),
+        stderr: (doctor.stderr ?? '').slice(0, 4000),
       })
+    const requiredChecks = ['release_manifest', 'runtime_abi', 'console_mode', 'runtime_dependencies']
+    const failedChecks = requiredChecks.filter((id) => !(doctorResult.checks ?? []).some((check) => check.id === id && check.status === 'PASS'))
+    if (failedChecks.length > 0)
+      throw new StageError('install_gate_failed', 'Staged install did not pass required doctor gates', { failedChecks, status: doctorResult.status })
     // Promote only after the self-check succeeded; a failed stage leaves no partial output.
     if (existsSync(output)) rmdirSync(output)
     renameSync(staging, output)

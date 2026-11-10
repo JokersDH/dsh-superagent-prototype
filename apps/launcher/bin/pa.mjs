@@ -6,7 +6,7 @@
  */
 import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { PortabilityError } from '@personal-agent/portability'
 import { EXIT, UsageError, fail, intOption, parseArgs, printResult } from '../lib/cli.mjs'
@@ -92,7 +92,7 @@ function commandSpecs() {
     stage: { ...COMMON, output: 'string', 'skip-packages': 'boolean', 'skip-console': 'boolean' },
     'first-run': COMMON,
     status: COMMON,
-    doctor: { ...COMMON, deep: 'boolean' },
+    doctor: { ...COMMON, deep: 'boolean', 'executors-fixture': 'string' },
     start: {
       ...COMMON,
       port: 'string',
@@ -177,7 +177,12 @@ async function main(argv) {
   }
 
   if (command === 'doctor') {
-    const result = await runDoctor({ installRoot, roots, deep: values.deep === true })
+    const result = await runDoctor({
+      installRoot,
+      roots,
+      deep: values.deep === true,
+      executorsFixture: values['executors-fixture'] === undefined ? null : resolve(values['executors-fixture']),
+    })
     const human = [
       `doctor: ${result.status}`,
       ...result.checks.map((check) => {
