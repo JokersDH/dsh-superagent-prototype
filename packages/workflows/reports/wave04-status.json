@@ -1,43 +1,69 @@
 {
   "role": "A",
-  "package": ["packages/storage", "packages/workflows"],
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
   "branch": "codex/g2-workspaces-verification",
   "mainBaseCommit": "8c736f2",
   "mergeCommit": "10205bf",
   "stableCheckpoint": "68852c0",
   "testedSourceCommit": "68852c0",
-  "migrations": [11, 12],
+  "migrations": [
+    11,
+    12
+  ],
   "productSchema": 12,
   "phases": [
     {
       "phase": "A1",
       "status": "passed_package_local",
       "checkpoint": "68852c0",
-      "evidence": ["packages/storage/src/assistant-state.ts", "packages/storage/src/migrations.ts", "packages/workflows/src/ports.ts", "packages/workflows/test/workflows.case.ts"],
+      "evidence": [
+        "packages/storage/src/assistant-state.ts",
+        "packages/storage/src/migrations.ts",
+        "packages/workflows/src/ports.ts",
+        "packages/workflows/test/workflows.case.ts"
+      ],
       "detail": "AssistantStatePort synchronized over the shared UnitOfWork; v11 metadata/proposal tables; CAS/replay/legacy decisions; proposal immutable source/grant/payload; transaction rollback test"
     },
     {
       "phase": "A2",
       "status": "passed_package_local",
-      "evidence": ["v12 conversation_members", "workflow membership tests", "source/state tests"],
+      "evidence": [
+        "v12 conversation_members",
+        "workflow membership tests",
+        "source/state tests"
+      ],
       "detail": "indexed multi-project membership, v7/v10 backfill, scoped list/search before pagination, explicit discoverPage/discoverSearch; empty [] returns none"
     },
     {
       "phase": "A3",
       "status": "passed_package_local",
-      "evidence": ["ReadIndexPort.sourceMessage", "second Node process test"],
+      "evidence": [
+        "ReadIndexPort.sourceMessage",
+        "second Node process test"
+      ],
       "detail": "bounded project/work/artifact/source-message reads, digest/provenance and explicit missing/stale states; no raw history or execution grant"
     },
     {
       "phase": "A4",
       "status": "passed_package_local",
-      "evidence": ["WorkflowSnapshots tests", "state facts test"],
+      "evidence": [
+        "WorkflowSnapshots tests",
+        "state facts test"
+      ],
       "detail": "DB backup plus backup-derived artifact copy/digest manifest; missing/corrupt/IO blocked; observation-only writer/queue/question facts, no trusted stop claim"
     },
     {
       "phase": "A5",
       "status": "passed_package_local_with_main_consumer_gap",
-      "evidence": ["v10->v12 upgrade test", "assistant reopen test", "second-process consumer test", "reports/wave04-*.txt"],
+      "evidence": [
+        "v10->v12 upgrade test",
+        "assistant reopen test",
+        "second-process consumer test",
+        "reports/wave04-*.txt"
+      ],
       "detail": "record -> proposal confirm -> valid read -> revoke -> reopen vertical; v10 legacy decisions preserved; main catalog consumer must stop using [] as discovery"
     }
   ],
@@ -82,5 +108,7 @@
     "pass sourceMessage metadata and assistant decision records to C; no direct SQL",
     "have D consume WorkflowSnapshots plus state.stateFacts without treating writer/PID rows as stop proof",
     "do not edit A storage/workflows or root lock; report any remaining contract gap as an RFC"
-  ]
+  ],
+  "deliveryCommit": "a1748c1",
+  "updatedAt": "2026-11-10T03:30:00.000Z"
 }
