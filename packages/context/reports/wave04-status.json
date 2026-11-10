@@ -1,0 +1,151 @@
+{
+  "role": "C",
+  "branch": "codex/g3-assistant-context",
+  "mainBaseCommit": "8c736f2",
+  "mergeCommit": "7368c1f",
+  "stableCheckpoint": "ed9d553",
+  "updatedAt": "2026-11-10T08:05:00.000Z",
+  "ownedPaths": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge"
+  ],
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0,
+    "unknownSends": 0
+  },
+  "phases": [
+    {
+      "phase": "C1",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave04-admission-final.json",
+        "packages/context/reports/wave04-c1-verification.txt",
+        "packages/proposals/test/proposals.case.ts",
+        "packages/knowledge/test/knowledge.case.ts",
+        "commit ed9d553"
+      ],
+      "results": {
+        "admission": "PASS_ADMISSION_PROBES (3/3 C)",
+        "proposalTests": "12/12",
+        "knowledgeTests": "16/16"
+      },
+      "note": "Missing/stale source invalidates effectiveness; confirmed replay authenticates actor first; grants/scopes/payloads/records are independent deep-frozen snapshots."
+    },
+    {
+      "phase": "C2",
+      "status": "passed_package_local",
+      "evidence": [
+        "packages/proposals/src/assistant-state-memory.ts",
+        "packages/proposals/src/assistant-proposal-service.ts",
+        "packages/proposals/test/assistant-state.case.ts",
+        "packages/knowledge/src/assistant-decision-store.ts",
+        "packages/knowledge/test/assistant-store.case.ts"
+      ],
+      "results": {
+        "proposalTests": "18/18",
+        "knowledgeTests": "22/22 at this stage"
+      },
+      "note": "Shared AssistantStatePort consumed through an in-memory reference port. prepare is read-only; persistPending writes version 1; commit writes version 2 confirmed with main-owned effectCommandId, CAS and current-authorization revalidate/barrier; reject/expire/supersede append revisions. Decision adapter retains source message/conversation/digest and CAS revoke."
+    },
+    {
+      "phase": "C3",
+      "status": "passed_package_local",
+      "evidence": [
+        "packages/context/src/read-index-port.ts",
+        "packages/context/src/preview.ts",
+        "packages/context/test/read-index.case.ts",
+        "context test total 34/34"
+      ],
+      "note": "ReadIndexContextPort projects bounded project metadata/work/current contract JSON and an effective-decisions callback; stale contract returns contract_stale; archived/missing project is insufficient; preview exposes selected files, totals, omissions, injection flags and revalidation validity. Verification/delivery details remain summarized inside the work projection (no separate index port)."
+    },
+    {
+      "phase": "C4",
+      "status": "passed_package_local",
+      "evidence": [
+        "packages/knowledge/test/vertical.case.ts",
+        "packages/knowledge/test/assistant-store.case.ts",
+        "packages/knowledge/reports/persisted-consumer-run.json",
+        "knowledge test total 26/26"
+      ],
+      "note": "Zero-model vertical: real temp file context -> mock structured reasoner -> pending persisted proposal -> commit with effect command id/revalidate/barrier -> decision record -> new service instances (state reload) -> revoke/source disappearance. Commit failure leaves pending with no receipt; duplicate confirm replays; changed payload/foreign actor/cross-project/expired grant/supersession covered. Real temporary-SQLite adapter remains NOT_TESTED because A has not published AssistantStatePort."
+    },
+    {
+      "phase": "C5",
+      "status": "passed_pending_main_wiring",
+      "evidence": [
+        "packages/knowledge/examples/persisted-loop.mjs",
+        "packages/context/reports/wave04-full-verification.txt",
+        "packages/context/reports/wave04-admission-final.json",
+        "README/RFC wave-04 sections"
+      ],
+      "note": "Copyable prepare/persistPending/commit consumer and adapter mapping documented. Main still owns HTTP/provider/UI wiring and decision command composition; no product enablement is claimed."
+    }
+  ],
+  "commands": [
+    "git fetch origin && git merge origin/main",
+    "node tools/bootstrap/review-wave04-admission.mjs --output reports/releases/product-wave-04/admission.json",
+    "pnpm --filter @personal-agent/context typecheck && test && build",
+    "pnpm --filter @personal-agent/proposals typecheck && test && build",
+    "pnpm --filter @personal-agent/knowledge typecheck && test && build",
+    "node packages/knowledge/examples/assistant-loop.mjs",
+    "node packages/knowledge/examples/persisted-loop.mjs"
+  ],
+  "results": {
+    "contextTests": "34/34",
+    "proposalTests": "18/18",
+    "knowledgeTests": "26/26",
+    "typecheck": "PASS (all three packages)",
+    "build": "PASS (all three packages)",
+    "admission": "PASS_ADMISSION_PROBES (3/3 C; E remains E-owned)",
+    "offlineConsumer": "PASS (modelCalls=3, networkCalls=0, executedIntents=0)",
+    "persistedConsumer": "PASS over in-memory AssistantStatePort (modelCalls=0, networkCalls=0)"
+  },
+  "blockers": [
+    {
+      "id": "C-A-assistant-state",
+      "owner": "A",
+      "status": "external_pending",
+      "input": "Persisted sync AssistantStatePort implementation on the shared UnitOfWork (decisions/proposals put/get/list/history with CAS/replay).",
+      "expected": "createWorkflowPorts(store).assistant exposes the contracts port; single writer; no second DB.",
+      "actual": "Only packages/contracts/src/assistant-state.ts exists; no storage/workflows implementation on main or A worktree.",
+      "continue": "C2 adapters and C4 vertical pass over the in-memory reference port; real SQL/restart evidence must be re-run unchanged when A lands."
+    },
+    {
+      "id": "C-A-read-index-detail",
+      "owner": "A",
+      "status": "external_pending",
+      "input": "Verification/delivery detail and work cursor in the read index.",
+      "expected": "Bounded verification/delivery descriptors with digests/currentness and work pagination cursor.",
+      "actual": "Current ReadIndexPort exposes work summaries/ids/deliverables only; context projects them inside the work JSON.",
+      "continue": "ReadIndexContextPort and preview are complete; an extended port can add kinds without changing reader semantics."
+    },
+    {
+      "id": "C-main-wiring",
+      "owner": "main",
+      "status": "external_pending",
+      "input": "HTTP/provider/UI wiring and deterministic command composition.",
+      "expected": "Trusted ProposalTrustedContext/DecisionActor, effectCommandId written in the same UnitOfWork as command/receipt/event, conversation-upload preview/confirm UI, effective-decisions callback.",
+      "actual": "Main has not consumed C2/C3 adapters; assistant production remains disabled.",
+      "continue": "Use the exported services/adapters and examples; do not duplicate proposal/decision rules in coordinator."
+    }
+  ],
+  "notTested": [
+    "Real SQLite AssistantStatePort persistence and restart (A-owned; adapter and vertical are package-local)",
+    "Main HTTP/provider/UI end-to-end enablement",
+    "Any real model or native task (budget 0)",
+    "Verification/delivery context details beyond the work summary and work-list cursor"
+  ],
+  "mainNextSteps": [
+    "Re-run review-wave04-admission.mjs against this branch; the three C failures are fixed.",
+    "Wire AssistantProposalService.prepare/persistPending/commit and AssistantDecisionStore through A's port when published.",
+    "Render buildContextPreview for conversation-upload confirmation; keep executor grants out of the conversation provider.",
+    "Supply DecisionSourcePort freshness and effective-decisions callback; keep source-invalid decisions out of context."
+  ],
+  "aNextSteps": [
+    "Publish createWorkflowPorts(store).assistant with the shared sync port, CAS/replay/history and single-writer semantics.",
+    "Add verification/delivery context details and work cursor if main needs them."
+  ],
+  "latestDeliveryCommit": "928d55f"
+}

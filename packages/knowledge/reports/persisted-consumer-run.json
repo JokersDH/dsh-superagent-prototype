@@ -1,0 +1,29 @@
+{
+  "protocol": "wave04-persisted-consumer/1",
+  "generatedAt": "2026-11-10T07:21:02.435Z",
+  "steps": {
+    "preparedVersion": 1,
+    "pendingVersion": 1,
+    "confirmedVersion": 2,
+    "effectCommandId": "command-1",
+    "decisionStatus": "active",
+    "proposalHistory": [
+      "2:confirmed",
+      "1:pending"
+    ],
+    "decisionHistory": [
+      "2:revoked",
+      "1:active"
+    ],
+    "reloadedProposalState": "confirmed",
+    "replayReplayed": true,
+    "effectiveBeforeRevoke": true,
+    "effectiveAfterRevoke": false
+  },
+  "result": {
+    "status": "PASS",
+    "modelCalls": 0,
+    "networkCalls": 0,
+    "realSqlAdapter": "NOT_TESTED (A-owned AssistantStatePort not present on main)"
+  }
+}

@@ -7,12 +7,13 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import Database from 'better-sqlite3'
 import { existsSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { applyMigrations, MIGRATIONS, ProductStore } from '@personal-agent/storage'
-import type { ContractRevision, TicketLink, UserDecision, UserQuestion, WorkRecord } from '@personal-agent/contracts'
+import { applyMigrations, canonicalDigest, MIGRATIONS, ProductStore } from '@personal-agent/storage'
+import type { ContractRevision, PersistedDecision, PersistedProposal, TicketLink, UserDecision, UserQuestion, WorkRecord } from '@personal-agent/contracts'
 import {
   createWorkflowPorts, SnapshotError, WorkflowConflict, WorkflowSnapshots,
 } from '../src/index.ts'
@@ -57,6 +58,14 @@ test('conversation catalog, search, archive and message identity survive reopen'
       provenance: 'trusted_user', text: '请检查季度报告中的导出流程', sourceRefs: [], createdAt: at,
     })
     store.product.messages.append({
+      id: 'message-mixed', conversationId: 'conv-1', projectId: 'project-2', role: 'user',
+      provenance: 'trusted_user', text: 'mixed project membership', sourceRefs: [], createdAt: at,
+    })
+    assert.deepEqual([...ports.conversations.get('conv-1')!.projectIds].sort(), ['project-1', 'project-2'])
+    assert.equal(ports.conversations.list({ projectIds: [] }).conversations.length, 0, 'empty authorization never means all')
+    assert.equal(ports.discovery.discoverPage().conversations.length, 2)
+    assert.equal(ports.conversations.search({ query: 'mixed', projectIds: ['project-2'] }).hits.length, 1)
+    store.product.messages.append({
       id: 'message-2', conversationId: 'conv-2', projectId: 'project-2', role: 'user',
       provenance: 'trusted_user', text: 'unrelated private text', sourceRefs: [], createdAt: at,
     })
@@ -76,7 +85,7 @@ test('conversation catalog, search, archive and message identity survive reopen'
     assert.equal(ports.conversations.list({ projectIds: ['project-1'], includeArchived: true }).conversations.length, 1)
     assert.equal(ports.conversations.search({ query: '季度', projectIds: ['project-1'] }).hits.length, 0)
     assert.equal(ports.conversations.search({ query: '季度', projectIds: ['project-1'], includeArchived: true }).hits.length, 1)
-    assert.equal(store.product.messages.page('conv-1').messages.length, 1, 'archive does not delete messages')
+    assert.equal(store.product.messages.page('conv-1').messages.length, 2, 'archive does not delete messages')
     store.close()
 
     store = new ProductStore({ path })
@@ -84,7 +93,7 @@ test('conversation catalog, search, archive and message identity survive reopen'
       const reopened = createWorkflowPorts(store)
       const conversation = reopened.conversations.get('conv-1')!
       assert.equal(conversation.title, '季度报告终稿')
-      assert.equal(conversation.messageCount, 1)
+      assert.equal(conversation.messageCount, 2)
       assert.ok(conversation.archivedAt)
       assert.throws(() => reopened.conversations.rename('conv-1', 1, 'stale'), WorkflowConflict)
     } finally { store.close() }
@@ -225,11 +234,24 @@ test('a snapshot includes the database and digest-verified artifacts; missing by
   try {
     const written = store.artifacts.write(Buffer.from('delivery bytes\n'))
     store.artifacts.insert(written)
+    store.queue.enqueue('test.delivery', 'delivery-key', '{}', 1, 0, at)
+    const queued = store.queue.dueRows('test.delivery', Number.MAX_SAFE_INTEGER, 1)[0]!
+    store.queue.park('test.delivery', 'delivery-key', queued.seq, queued.generation, 'fixture', at)
+    store.product.questions.insert(question())
+    store.db.prepare(`INSERT INTO completion_verifications
+      (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, criteria_digest,
+       environment_ref, verifier_identity_ref, results, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run('snapshot-verification', 'ticket-1', 'assignment-1', 1, JSON.stringify(contract), written.digest,
+        'c'.repeat(64), 'environment-1', 'verifier-1', JSON.stringify([]), at)
     const snapshots = new WorkflowSnapshots(store)
     const destination = join(dir, 'snapshot')
     const result = await snapshots.create({ destination })
     assert.equal(result.status, 'ok', result.message)
     assert.equal(result.manifest.complete, true)
+    const state = createWorkflowPorts(store).state.stateFacts()
+    assert.deepEqual(state.queue, { waiting: 0, parked: 1 })
+    assert.equal(state.openQuestions, 1)
+    assert.equal(state.artifacts, 1)
     assert.equal(existsSync(join(destination, 'product.sqlite')), true)
     assert.equal(readFileSync(join(destination, 'artifacts', written.id), 'utf8'), 'delivery bytes\n')
     assert.equal(snapshots.verify(destination).status, 'ok')
@@ -280,11 +302,12 @@ test('a v7 database backfills the conversation catalog on upgrade and keeps mess
 
     const store = new ProductStore({ path })
     try {
-      assert.equal(store.database.productSchema, 10)
+      assert.equal(store.database.productSchema, 12)
       const ports = createWorkflowPorts(store)
       const conversation = ports.conversations.get('conv-1')!
       assert.equal(conversation.title, 'Work work-1')
       assert.equal(conversation.messageCount, 1)
+      assert.deepEqual(conversation.projectIds, ['project-1'])
       assert.equal(ports.conversations.search({ query: '中文消息', projectIds: ['project-1'] }).hits.length, 1)
       assert.equal(store.product.messages.page('conv-1').messages[0]!.id, 'message-1')
     } finally { store.close() }
@@ -364,6 +387,8 @@ test('a second Node process consumes the public workflow ports and snapshot veri
         projects: ports.index.listProjects({ projectIds: ['project-1'] }).projects.map(item => item.settings.sourceRef),
         conversations: ports.conversations.list({ projectIds: ['project-1'] }).conversations.map(item => item.title),
         search: ports.conversations.search({ query: '跨进程', projectIds: ['project-1'] }).hits.length,
+        sourceDigest: ports.index.sourceMessage('second-message', ['project-1'])?.textDigest,
+        stateSchema: ports.state.stateFacts().productSchema,
         snapshot: result.status,
         verify: snapshot.verify(${JSON.stringify(snapshot)}).status,
       }))
@@ -374,15 +399,215 @@ test('a second Node process consumes the public workflow ports and snapshot veri
     })
     assert.equal(child.status, 0, String(child.stderr))
     const observed = JSON.parse(child.stdout.trim()) as {
-      projects: string[]; conversations: string[]; search: number; snapshot: string; verify: string
+      projects: string[]; conversations: string[]; search: number; sourceDigest: string; stateSchema: number; snapshot: string; verify: string
     }
     assert.deepEqual(observed.projects, ['source:second'])
     assert.deepEqual(observed.conversations, ['第二进程会话'])
     assert.equal(observed.search, 1)
+    assert.equal(observed.sourceDigest, createHash('sha256').update('跨进程读取中文目录').digest('hex'))
+    assert.equal(observed.stateSchema, 12)
     assert.equal(observed.snapshot, 'ok')
     assert.equal(observed.verify, 'ok')
   } finally {
     store.close()
     rmSync(dir, { recursive: true, force: true })
   }
+})
+
+
+const persistedDecision = (version = 1, overrides: Partial<PersistedDecision['decision']> = {}): PersistedDecision => ({
+  decision: { id: 'assistant-decision', version, content: 'Use explicit source evidence.', scope, authorityRef: 'authority-1', ...overrides },
+  sourceMessageId: 'source-message', sourceTextDigest: 'b'.repeat(64), conversationId: 'assistant-conversation',
+  actorRef: 'actor-1', recordedAt: `2026-11-10T00:0${version}:00.000Z`,
+})
+const proposal = (version = 1, state: PersistedProposal['state'] = 'pending', extra: Partial<PersistedProposal> = {}): PersistedProposal => {
+  const payload = { kind: 'propose_decision' as const, content: 'Use the verified source.', scope, sourceMessageId: 'source-message' }
+  return {
+    proposalId: 'assistant-proposal', version, state, projectId: 'project-1', conversationId: 'assistant-conversation',
+    sourceMessageId: 'source-message', sourceTextDigest: 'b'.repeat(64), actorRef: 'actor-1', grantId: 'grant-1', grantScope: scope,
+    payload, payloadDigest: canonicalDigest(payload), createdAt: '2026-11-10T00:00:00.000Z',
+    expiresAt: '2026-11-10T01:00:00.000Z', updatedAt: `2026-11-10T00:0${version}:00.000Z`, ...extra,
+  }
+}
+
+test('AssistantState decisions are source-bound CAS records and legacy rows never become valid memory', () => {
+  const dir = tmp('workflow-assistant-decision-')
+  const store = new ProductStore({ path: join(dir, 'state.sqlite') })
+  try {
+    const assistant = createWorkflowPorts(store).assistant
+    const created = assistant.decisions.put(persistedDecision(), 0)
+    assert.equal(created.replayed, false)
+    assert.equal(created.record.decision.version, 1)
+    assert.equal(assistant.decisions.put(persistedDecision(), 0).replayed, true)
+    assert.throws(() => assistant.decisions.put(persistedDecision(1, { content: 'changed' }), 0), WorkflowConflict)
+    assert.throws(() => assistant.decisions.put(persistedDecision(2, { content: 'changed' }), 1), WorkflowConflict)
+    const revoked = assistant.decisions.put({ ...persistedDecision(2, { revokedAt: '2026-11-10T02:00:00.000Z' }), revokedBy: 'actor-2' }, 1)
+    assert.equal(revoked.record.decision.version, 2)
+    assert.equal(revoked.record.revokedBy, 'actor-2')
+    assert.equal(assistant.decisions.get('assistant-decision')!.decision.version, 2)
+    assert.equal(assistant.decisions.history('assistant-decision').length, 2)
+    assert.equal(assistant.decisions.list({ projectId: 'project-1' }).records.length, 1)
+    assert.equal(assistant.decisions.list({ projectId: 'project-2' }).records.length, 0)
+
+    // The old ledger remains auditable, but no metadata means no valid assistant memory.
+    store.workflows.decisions.append(decision({ id: 'legacy-decision' }))
+    assert.equal(assistant.decisions.get('legacy-decision'), undefined)
+    const legacy = assistant.legacyDecisions({ projectId: 'project-1' })
+    assert.equal(legacy.records.some(item => item.decision.id === 'legacy-decision'), true)
+    assert.equal(legacy.records.every(item => item.missingSource), true)
+  } finally {
+    store.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('AssistantState proposals preserve immutable source/grant and confirmation command identity', () => {
+  const dir = tmp('workflow-assistant-proposal-')
+  const store = new ProductStore({ path: join(dir, 'state.sqlite') })
+  try {
+    const assistant = createWorkflowPorts(store).assistant
+    const created = assistant.proposals.put(proposal(), 0)
+    assert.equal(created.record.version, 1)
+    assert.equal(assistant.proposals.put(proposal(), 0).replayed, true)
+    assert.throws(() => assistant.proposals.put({ ...proposal(), grantScope: { ...scope, projectId: 'project-2', allowedPaths: ['.'] } }, 0), WorkflowConflict)
+    assert.throws(() => assistant.proposals.put({ ...proposal(), payloadDigest: 'c'.repeat(64) }, 0), WorkflowConflict)
+    const confirmed = assistant.proposals.put(proposal(2, 'confirmed', { effectCommandId: 'command-1' }), 1)
+    assert.equal(confirmed.record.effectCommandId, 'command-1')
+    assert.throws(() => assistant.proposals.put(proposal(3, 'confirmed', { effectCommandId: 'command-2', grantScope: { ...scope, allowedPaths: ['other/'] } }), 2), WorkflowConflict)
+    assert.equal(assistant.proposals.get('assistant-proposal')!.state, 'confirmed')
+    assert.equal(assistant.proposals.history('assistant-proposal').length, 2)
+    assert.equal(assistant.proposals.list({ projectId: 'project-1' }).records.length, 1)
+    assert.equal(assistant.proposals.list({ projectId: 'project-2' }).records.length, 0)
+  } finally {
+    store.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('assistant persistence joins the caller transaction and rolls back all rows on failure', () => {
+  const dir = tmp('workflow-assistant-tx-')
+  const store = new ProductStore({ path: join(dir, 'state.sqlite') })
+  try {
+    const assistant = createWorkflowPorts(store).assistant
+    assert.throws(() => store.uow.atomic(() => {
+      assistant.decisions.put(persistedDecision(), 0)
+      store.events.append({ topic: 'assistant.decision.changed', entityRef: 'assistant-decision', payload: { ok: true } })
+      throw new Error('injected failure')
+    }), /injected failure/)
+    assert.equal(assistant.decisions.get('assistant-decision'), undefined)
+    assert.equal(store.events.after(0, 10).length, 0)
+    assert.equal((store.db.prepare('SELECT COUNT(*) AS n FROM assistant_decision_versions').get() as { n: number }).n, 0)
+    assert.equal((store.db.prepare('SELECT COUNT(*) AS n FROM user_decision_versions').get() as { n: number }).n, 0)
+  } finally {
+    store.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+
+test('conversation membership is indexed across v7 chat, works without messages and new messages', () => {
+  const dir = tmp('workflow-members-')
+  const store = new ProductStore({ path: join(dir, 'state.sqlite') })
+  try {
+    const ports = createWorkflowPorts(store)
+    // v7-style chat without a conversation project; the first message establishes membership.
+    store.workflows.conversations.create({ id: 'chat-only', title: '纯聊天' })
+    store.product.messages.append({
+      id: 'chat-message', conversationId: 'chat-only', projectId: 'project-1', role: 'user',
+      provenance: 'trusted_user', text: '无项目目录消息', sourceRefs: [], createdAt: at,
+    })
+    assert.deepEqual(ports.conversations.get('chat-only')!.projectIds, ['project-1'])
+    assert.equal(ports.conversations.list({ projectIds: ['project-1'] }).conversations.length, 1)
+
+    // A Work can establish membership before its first message.
+    ports.conversations.create({ id: 'work-conversation', projectId: 'project-2', title: '工作会话' })
+    store.uow.atomic(() => {
+      store.product.works.insert({ ...work('work-membership', 'work-conversation'), projectId: 'project-3' })
+    })
+    assert.deepEqual([...ports.conversations.get('work-conversation')!.projectIds].sort(), ['project-2', 'project-3'])
+    assert.equal(ports.conversations.list({ projectIds: ['project-3'] }).conversations.some(item => item.id === 'work-conversation'), true)
+
+    store.product.messages.append({
+      id: 'work-message', conversationId: 'work-conversation', projectId: 'project-4', role: 'user',
+      provenance: 'trusted_user', text: '新消息改变成员', sourceRefs: [], createdAt: at,
+    })
+    assert.equal(ports.conversations.list({ projectIds: ['project-4'] }).conversations.some(item => item.id === 'work-conversation'), true)
+    assert.equal(ports.conversations.list({ projectIds: ['project-5'] }).conversations.length, 0)
+    assert.equal(ports.conversations.list({ projectIds: [] }).conversations.length, 0)
+    assert.equal(ports.discovery.discoverPage().conversations.length, 2)
+    assert.equal(ports.conversations.search({ query: '改变成员', projectIds: ['project-4'] }).hits.length, 1)
+    assert.equal(ports.conversations.search({ query: '改变成员', projectIds: ['project-5'] }).hits.length, 0)
+  } finally {
+    store.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+
+test('source message metadata is scoped/digested and state facts stay observational', () => {
+  const dir = tmp('workflow-source-state-')
+  const store = new ProductStore({ path: join(dir, 'state.sqlite') })
+  try {
+    const ports = createWorkflowPorts(store)
+    ports.conversations.create({ id: 'source-conversation', projectId: 'project-1', title: 'Source' })
+    store.product.messages.append({
+      id: 'source-message', conversationId: 'source-conversation', projectId: 'project-1', role: 'user',
+      provenance: 'trusted_user', text: 'source text', sourceRefs: [], createdAt: at,
+    })
+    const source = ports.index.sourceMessage('source-message', ['project-1'])!
+    assert.equal(source.textDigest, createHash('sha256').update('source text').digest('hex'))
+    assert.equal(source.textLength, 11)
+    assert.equal(source.projectId, 'project-1')
+    assert.equal(ports.index.sourceMessage('source-message', ['project-2']), undefined)
+    assert.equal(ports.index.sourceMessage('unknown', ['project-1']), undefined)
+    const state = ports.state.stateFacts()
+    assert.equal(state.protocol, 'workflow-state/1')
+    assert.equal(state.productSchema, 12)
+    assert.equal(state.writerClaim, null)
+    assert.equal(state.queue.waiting, 0)
+    assert.equal(state.queue.parked, 0)
+  } finally {
+    store.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+
+test('a v10 ledger upgrades to v12: old decisions stay auditable but missing-source, new assistant state reopens', () => {
+  const dir = tmp('workflow-v10-upgrade-')
+  const path = join(dir, 'state.sqlite')
+  const legacyDecision = decision({ id: 'legacy-v10', content: 'Old decision with no source metadata' })
+  try {
+    const legacy = new Database(path)
+    applyMigrations(legacy, { registry: MIGRATIONS.slice(0, 10) })
+    legacy.prepare(`INSERT INTO user_decision_versions
+      (id, version, project_id, content, authority_ref, supersedes, revoked_at, value, digest, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+      legacyDecision.id, legacyDecision.version, legacyDecision.scope.projectId, legacyDecision.content,
+      legacyDecision.authorityRef, null, null, JSON.stringify(legacyDecision), canonicalDigest(JSON.parse(JSON.stringify(legacyDecision))), at,
+    )
+    legacy.close()
+
+    let store = new ProductStore({ path })
+    try {
+      assert.equal(store.database.productSchema, 12)
+      const ports = createWorkflowPorts(store)
+      assert.equal(ports.assistant.decisions.get('legacy-v10'), undefined)
+      assert.equal(ports.assistant.legacyDecisions({ projectId: 'project-1' }).records.length, 1)
+      ports.assistant.decisions.put(persistedDecision(), 0)
+      ports.assistant.proposals.put(proposal(), 0)
+      ports.assistant.proposals.put(proposal(2, 'confirmed', { effectCommandId: 'command-v10' }), 1)
+      store.close()
+
+      store = new ProductStore({ path })
+      try {
+        const reopened = createWorkflowPorts(store)
+        assert.equal(reopened.assistant.decisions.get('assistant-decision')!.decision.version, 1)
+        assert.equal(reopened.assistant.proposals.get('assistant-proposal')!.state, 'confirmed')
+        reopened.assistant.decisions.put({ ...persistedDecision(2, { revokedAt: '2026-11-10T02:00:00.000Z' }), revokedBy: 'actor-2' }, 1)
+        assert.equal(reopened.assistant.decisions.history('assistant-decision').length, 2)
+        assert.equal(reopened.assistant.decisions.list({ projectId: 'project-1' }).records.length, 1)
+      } finally { store.close() }
+    } finally { if (store.database.productSchema) store.close() }
+  } finally { rmSync(dir, { recursive: true, force: true }) }
 })

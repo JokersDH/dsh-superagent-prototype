@@ -68,3 +68,21 @@ questions, agent replies or UI display messages.
 4. Source validity refresh when conversation messages are archived/deleted is main-owned.
 5. Cross-project memory inference, automatic rule promotion and learning-effect claims are out of
    scope.
+
+## Wave-04 C2 — persisted decision adapter and vertical
+
+`AssistantDecisionStore` maps the shared synchronous `AssistantStatePort.decisions` to the decision
+port: append-only revisions, source message/conversation/digest retention, CAS revocation and
+bounded project scans for supersession. The real SQL implementation/migration is A-owned and
+**NOT_TESTED** until `createWorkflowPorts(store).assistant` exists.
+
+`test/vertical.case.ts` runs the zero-model vertical over the in-memory port fixture:
+real temp file context -> mock structured reasoner -> pending persisted proposal -> commit with
+effect command id, revalidate and barrier -> decision record -> new service instances (state reload)
+-> revoke and source disappearance. It also covers commit failure with no receipt, duplicate
+confirmation, changed payload, foreign actor, cross-project input, supersession and missing source.
+No model, network or SQL call is made.
+
+Remaining gaps: real SQLite adapter/migration (A), main HTTP/provider/UI wiring, a reverse
+supersession index for scale (the adapter scans at most 5x200 current project records), and the
+main-owned source-provenance freshness feed.

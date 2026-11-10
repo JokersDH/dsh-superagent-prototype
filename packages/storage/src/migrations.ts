@@ -283,8 +283,62 @@ const V10: Migration = {
   ],
 }
 
+
+/**
+ * v11: assistant-state persistence beside the existing decision ledger. Decision metadata references
+ * the same (id, version) UserDecision row, so this is not a second decision authority; proposals are
+ * append-only versions. Legacy decisions without metadata stay readable through the old ledger and
+ * are never presented as having verified source evidence.
+ */
+const V11: Migration = {
+  version: 11,
+  name: 'assistant-state',
+  statements: [
+    `CREATE TABLE assistant_decision_versions (
+      id TEXT NOT NULL, version INTEGER NOT NULL, project_id TEXT NOT NULL,
+      source_message_id TEXT NOT NULL, source_text_digest TEXT NOT NULL, conversation_id TEXT NOT NULL,
+      actor_ref TEXT NOT NULL, recorded_at TEXT NOT NULL, revoked_by TEXT, value_digest TEXT NOT NULL,
+      PRIMARY KEY (id, version),
+      FOREIGN KEY (id, version) REFERENCES user_decision_versions (id, version))`,
+    `CREATE INDEX assistant_decisions_project ON assistant_decision_versions (project_id, id, version DESC)`,
+    `CREATE TABLE assistant_proposal_versions (
+      proposal_id TEXT NOT NULL, version INTEGER NOT NULL, state TEXT NOT NULL,
+      project_id TEXT NOT NULL, conversation_id TEXT NOT NULL, source_message_id TEXT NOT NULL,
+      source_text_digest TEXT NOT NULL, actor_ref TEXT NOT NULL, grant_id TEXT NOT NULL,
+      payload_digest TEXT NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+      effect_command_id TEXT, superseded_by TEXT, value TEXT NOT NULL, digest TEXT NOT NULL,
+      PRIMARY KEY (proposal_id, version))`,
+    `CREATE INDEX assistant_proposals_project ON assistant_proposal_versions (project_id, proposal_id, version DESC)`,
+    `CREATE INDEX assistant_proposals_conversation ON assistant_proposal_versions (conversation_id, updated_at DESC)`,
+  ],
+}
+
+/**
+ * v12: indexed conversation membership. A conversation can be referenced by multiple projects
+ * through its messages/works; an empty authorized project list means no rows, never global discovery.
+ * The explicit discovery methods are separately named in the workflow port.
+ */
+const V12: Migration = {
+  version: 12,
+  name: 'conversation-members',
+  statements: [
+    `CREATE TABLE conversation_members (
+      conversation_id TEXT NOT NULL, project_id TEXT NOT NULL,
+      PRIMARY KEY (conversation_id, project_id))`,
+    `CREATE INDEX conversation_members_project ON conversation_members (project_id, conversation_id)`,
+    `CREATE INDEX works_conversation ON works (conversation_id, created_at DESC, id DESC)`,
+    `INSERT OR IGNORE INTO conversation_members (conversation_id, project_id)
+      SELECT id, project_id FROM conversations WHERE project_id IS NOT NULL`,
+    `INSERT OR IGNORE INTO conversation_members (conversation_id, project_id)
+      SELECT conversation_id, project_id FROM works WHERE project_id IS NOT NULL`,
+    `INSERT OR IGNORE INTO conversation_members (conversation_id, project_id)
+      SELECT conversation_id, json_extract(value, '$.projectId') FROM conversation_messages
+      WHERE json_extract(value, '$.projectId') IS NOT NULL`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>

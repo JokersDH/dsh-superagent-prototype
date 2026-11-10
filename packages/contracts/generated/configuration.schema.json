@@ -342,6 +342,9 @@
             "x-runtime-rules": [
               "project-relative-paths"
             ]
+          },
+          "settingsAvailable": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -361,6 +364,9 @@
     "protocol": {
       "const": "application-configuration/1",
       "type": "string"
+    },
+    "reviewActivityAvailable": {
+      "type": "boolean"
     },
     "revision": {
       "pattern": "^[a-f0-9]{64}$",

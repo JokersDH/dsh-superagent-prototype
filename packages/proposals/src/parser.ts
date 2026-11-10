@@ -1,7 +1,8 @@
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
 import { ReasonerProposalSchema } from '@personal-agent/contracts'
-import type { Json, ReasonerProposal } from '@personal-agent/contracts'
-import type { StructuredParseResult } from './types.ts'
+import type { Json, ReasonerProposal, Scope } from '@personal-agent/contracts'
+import { ProposalError } from './errors.ts'
+import type { ProposalIntent, ProposalTrustedContext, StructuredParseResult } from './types.ts'
 
 const MAX_REPLY_CHARS = 32768
 
@@ -60,4 +61,63 @@ export function scopeWithin(
     scope.externalActions.every((action) => grant.externalActions.includes(action)) &&
     (!grant.expiresAt || (!!scope.expiresAt && Date.parse(scope.expiresAt) <= Date.parse(grant.expiresAt)))
   )
+}
+
+
+/** Trusted source/project/contract/scope binding shared by the registry and persisted service. */
+export function validateProposalBindings(payload: ReasonerProposal, trusted: ProposalTrustedContext): void {
+  if (trusted.grant.scope.projectId !== trusted.projectId) {
+    throw new ProposalError('cross_project', 'Authorization grant belongs to another project')
+  }
+  if (payload.kind === 'reply') return
+  if (payload.sourceMessageId !== trusted.sourceMessageId) {
+    throw new ProposalError('source_mismatch', 'Proposal is bound to another source message')
+  }
+  if (payload.kind === 'propose_work') {
+    if (payload.projectId !== trusted.projectId) {
+      throw new ProposalError('cross_project', 'Proposal targets another project')
+    }
+    return
+  }
+  if (payload.kind === 'propose_revision') {
+    if (!trusted.contract || !sameContract(payload.expected, trusted.contract)) {
+      throw new ProposalError('contract_stale', 'Proposal does not reference the current contract')
+    }
+    return
+  }
+  if (payload.scope.projectId !== trusted.projectId) {
+    throw new ProposalError('cross_project', 'Decision scope targets another project')
+  }
+  if (!scopeWithin(payload.scope, trusted.grant.scope)) {
+    throw new ProposalError('scope_escalation', 'Decision scope exceeds the current authorization')
+  }
+}
+
+/** The only output of a confirmed proposal: no actor, command id or work-scope grant. */
+export function proposalIntent(payload: ReasonerProposal): ProposalIntent {
+  switch (payload.kind) {
+    case 'reply':
+      return { kind: 'reply', text: payload.text, sourceRefs: [...payload.sourceRefs] }
+    case 'propose_work':
+      return {
+        kind: 'create_work',
+        projectId: payload.projectId,
+        goal: payload.goal,
+        sourceMessageId: payload.sourceMessageId,
+      }
+    case 'propose_revision':
+      return {
+        kind: 'revise_work',
+        expected: { ...payload.expected },
+        rationale: payload.rationale,
+        sourceMessageId: payload.sourceMessageId,
+      }
+    case 'propose_decision':
+      return {
+        kind: 'record_decision',
+        content: payload.content,
+        scope: payload.scope as Scope,
+        sourceMessageId: payload.sourceMessageId,
+      }
+  }
 }

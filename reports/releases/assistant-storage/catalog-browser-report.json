@@ -1,0 +1,27 @@
+{
+  "status": "PASS_CONTROLLED_CONVERSATION_CATALOG",
+  "checkedAt": "2026-11-10T07:47:40.138Z",
+  "sourceCommit": "12c45a9e1dd682fd4d1aa83dbd480561b5e8010b",
+  "sourceWorktreeClean": true,
+  "cases": [
+    {
+      "id": "PERSISTED-DIRECTORY-AND-PER-CONVERSATION-DRAFTS",
+      "status": "PASS"
+    },
+    {
+      "id": "SEARCH-RENAME-AND-REFRESH",
+      "status": "PASS"
+    },
+    {
+      "id": "ARCHIVE-RESTORE-AND-PENDING-WORK-VISIBILITY",
+      "status": "PASS"
+    },
+    {
+      "id": "PERSISTED-NEW-CONVERSATION-AND-MOBILE-NAVIGATION",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "scope": "Actual local SQLite/HTTP and controlled child; no native compatibility or whole-product admission"
+}

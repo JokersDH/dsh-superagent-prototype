@@ -1,0 +1,61 @@
+{
+  "status": "PASS_SCOPED_AMENDMENT_AND_REVIEW_TIMING",
+  "branch": "codex/g2-execution-integration",
+  "baseCommit": "fbd0b79fee303e7a81dafe42fe65c098f3e3a0df",
+  "sourceCommit": "1b1a9ff8fe20aebf34842ae379a971bbf3a6a82d",
+  "environment": { "node": "v24.21.0", "pnpm": "11.7.0", "platform": "darwin-arm64" },
+  "ownedPaths": [
+    "packages/contracts/", "packages/application/src/service.ts", "apps/coordinator/", "apps/console/",
+    "tests/integration/", "agent-tasks/product-wave-05/", "docs/rfcs/WP-16/", "docs/roadmap/",
+    "docs/reviews/architecture-and-innovation-response.zh-CN.md", "AGENTS.md", "START-HERE.zh-CN.md",
+    "tools/experiments/review-pilot-01/protocol.json"
+  ],
+  "checks": [
+    { "command": "pnpm --dir packages/contracts test", "status": "PASS", "cases": 204 },
+    { "command": "node --test tests/integration/review-timing.case.mjs tests/integration/application-http.case.mjs tests/integration/product-execution.case.mjs", "status": "PASS", "cases": 38 },
+    { "command": "node --test tests/integration/review-timing.case.mjs tests/integration/product-execution.case.mjs", "status": "PASS", "cases": 22, "note": "Follow-up after adding stale-subject/path and acceptance-replay/non-PASS assertions; overlaps the 38-case scope, do not add the counts" },
+    { "command": "pnpm --dir apps/console test", "status": "PASS", "cases": 16 },
+    { "command": "pnpm --dir apps/console typecheck", "status": "PASS" },
+    { "command": "pnpm --dir apps/coordinator typecheck:product", "status": "PASS" },
+    { "command": "pnpm --dir apps/console build", "status": "PASS", "note": "Vite emits a non-fatal chunk-size warning; this change does not claim bundle optimization" },
+    { "command": "pnpm --dir packages/contracts check:generated", "status": "PASS", "schemas": 76 },
+    { "command": "node product-spec/tools/verify-spec.mjs --check", "status": "PASS_SPEC_STATIC_ONLY", "taskPackages": 17, "notTestedRequirements": 83, "localLinks": 364 },
+    { "command": "node tests/integration/verification-recovery-browser.mjs --output reports/releases/wave05-amendment-01/browser", "status": "PASS_CONTROLLED_VERIFICATION_RECOVERY_BROWSER", "cases": 4, "sourceWorktreeClean": true, "report": "browser/browser-report.json" },
+    { "command": "git diff --check", "status": "PASS" }
+  ],
+  "frozenRunnerDataHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "pilot": {
+    "status": "NOT_EXECUTED",
+    "grantId": "wave05-independent-review-pilot-01",
+    "owner": "E",
+    "protocolSha256": "4da03c784d4f61a4ea092cfb08406ca41e72b99b2336b54a430b004372344976",
+    "maxNativeTurnStarts": 24,
+    "maxBillableTokens": 200000,
+    "maxCostUSD": 5,
+    "preflight": "BLOCK sending until bounded pricing/usage/reasoning, genuine author continuation/fresh sessions and capsule host controls can be verified; freeze all case/oracle/order/material digests before calling models",
+    "valueMeasured": false
+  },
+  "modelCallsThisTurn": 0,
+  "implemented": [
+    "ReviewEvidence can name sealed-copy isolation separately from optional legacy native-readonly proof",
+    "ExecutionOutcome companion accepts ReviewTiming without changing frozen Runner/data wire",
+    "Authenticated current-candidate UI activity and idempotent observation receipts",
+    "Successful acceptance records persisted-ready delay and unioned partial UI-visibility proxy in the existing transaction",
+    "Browser activity collection with bounded flush, unknown missing values and no acceptance blocking on telemetry failure"
+  ],
+  "plannedNotDelivered": [
+    "Attention aggregation/UI and C rankAttention consumer",
+    "Disposable capsule runtime and actual host/network/credential isolation admission",
+    "E's actual independent-review value pilot",
+    "Second protocol production driver, routing and review product entrypoints",
+    "A's ExecutionOutcome/timeline projection consuming the accepted event"
+  ],
+  "limitations": [
+    "Unit, actual SQLite/HTTP and controlled child/browser evidence only; no native reviewer compatibility or measured review benefit",
+    "Visible focused detail is a partial client activity proxy, may include idle/other reading, and is not actual human thinking time or quality/permission authority",
+    "Observation scan is capped at 5000 events after verification; activity coverage is always partial or unknown",
+    "R0 admission and new-path authorization/isolation/budget/stale-evidence gates remain required; pilot promising never enables production by itself",
+    "No production migrations, native driver changes or root lock edits in this batch",
+    "Existing user services 5180-5183 were not restarted; collection takes effect on a normal deployment of the new code"
+  ]
+}

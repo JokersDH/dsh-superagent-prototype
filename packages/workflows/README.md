@@ -29,6 +29,12 @@ ports.index.project(projectId)
 ports.index.listWorks({ projectIds, query, limit })
 ports.index.work(workId, projectIds)
 ports.index.listArtifacts({ limit })
+ports.index.sourceMessage(messageId, projectIds)
+ports.state.stateFacts()
+ports.discovery.discoverPage()  // explicit internal all-discovery, never [] authorization
+ports.assistant.decisions.get(id) / .put(record, expectedVersion)
+ports.assistant.proposals.get(id) / .put(record, expectedVersion)
+ports.assistant.legacyDecisions({ projectId }) // audit-only, never valid memory
 
 const snapshots = new WorkflowSnapshots(store)
 await snapshots.create({ destination: '/private/new-snapshot-dir' })
@@ -67,12 +73,44 @@ snapshots.verify('/private/new-snapshot-dir')
   database hash, schema/integrity and every artifact. Restore is a deliberate caller action in a new
   state directory.
 
+## Wave-04 assistant state and membership
+
+- `createWorkflowPorts(store).assistant` implements the main-owned synchronous
+  `AssistantStatePort`. Decisions keep their body in the existing `user_decision_versions` ledger and
+  add source/actor metadata in `assistant_decision_versions` (v11); there is one decision authority.
+  `put` creates with expectedVersion 0/version 1, then requires strict CAS +1. Same revision/body is
+  idempotent; source/actor/grant/content changes conflict. A revision may only add revocation metadata
+  or move to a new decision ID. Old ledger rows without metadata are returned only by
+  `legacyDecisions` as `legacy/missingSource`, never as valid assistant memory.
+- Proposals use append-only `assistant_proposal_versions`; immutable source/grant/project/contract/
+  payload fields cannot change across versions. Confirmation records the same-transaction
+  `effectCommandId` but does not execute a command in storage.
+- Conversation membership is indexed in `conversation_members` (v12) from conversation project,
+  messages and Work identity. A conversation can belong to multiple projects. The scoped
+  `conversations.list/search` require a non-empty `projectIds` array and filter membership **before**
+  pagination; an empty array returns no rows. `discovery.discoverPage/discoverSearch` are the
+  separately named internal discovery paths; main must still apply per-row authorization.
+- Source-message metadata is read-only and digest-bound (`role`, `provenance`, `project`,
+  `conversation`, `sequence`, `textDigest`, `textLength`); wrong project scope is invisible. No raw
+  history dump or execution permission is added.
+- `state.stateFacts()` returns schema/writer/instance/queue/artifact/question/proposal observations for
+  D's preflight. A writer row/PID is not a trusted stop proof; D still needs the existing barrier
+  receipts.
+
+**Main migration required:** current `ApplicationConversations` passes `projectIds: []` as an
+internal discovery convention. That convention is removed. Main must pass the configured allowed
+projects to scoped list/search (now indexed by membership), or explicitly call `discovery` for a
+candidate page and still filter each row. The package-local application regression currently records
+three catalog tests failing for this reason; this is a main-owned composition update, not a storage
+writer failure.
+
 ## Migrations
 
-Storage appends v8 `conversation-catalog`, v9 `project-settings`, v10 `user-decisions`; v1–v7
-checksums and tables are untouched. A v7 database upgrades in one transaction, keeps all existing
-messages/works, and backfills conversation rows plus the FTS index. Unknown/upstream databases,
-drift, gaps and future schemas keep the existing fail-closed behavior.
+Storage appends v8 `conversation-catalog`, v9 `project-settings`, v10 `user-decisions`, v11
+`assistant-state`, v12 `conversation-members`; v1–v7 checksums and tables are untouched. A v7/v10
+database upgrades in one transaction, keeps existing messages/works/decision bodies, and backfills
+conversation rows, FTS, membership and assistant metadata absence. Unknown/upstream databases, drift,
+gaps and future schemas keep the existing fail-closed behavior.
 
 ## Boundaries
 

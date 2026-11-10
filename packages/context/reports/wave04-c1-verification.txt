@@ -1,0 +1,62 @@
+# Agent C wave-04 C1 verification (2026-11-10T07:14:36Z)
+
+## @personal-agent/context
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ an unknown but valid cursor produces an explicit empty page (0.090458ms)
+✔ source descriptors are not trusted blindly: a port cannot smuggle a foreign project (0.087708ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 602.483542
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/proposals
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ decision and revision proposals keep their exact scope and current contract (0.265792ms)
+✔ the shared ReasonerProposal schema is the only accepted proposal shape (0.083834ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 148.717958
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/knowledge
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ automatic promotion stays closed and classifies one-off corrections (0.097875ms)
+✔ knowledge is project-scoped and revoked content is not returned to another project (0.0965ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 248.1735
+### build
+$ tsc -p tsconfig.build.json
+
+## admission probe (C cases)
+  "status": "PASS_ADMISSION_PROBES",
+  "sourceCommit": "7368c1f5b9d4837137f0aa2c07d969edf1f2c448",
+      "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+      "status": "PASS",
+      "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+      "status": "PASS",
+      "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+      "status": "PASS",

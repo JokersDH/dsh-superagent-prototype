@@ -18,4 +18,10 @@ export class StaticDecisionSourcePort implements DecisionSourcePort {
   markMissing(messageId: string): void {
     this.missing.add(messageId)
   }
+
+  /** Simulates a source whose content/conversation changed after the decision was recorded. */
+  replace(message: DecisionSource): void {
+    this.messages.set(message.messageId, message)
+    this.missing.delete(message.messageId)
+  }
 }
