@@ -5,8 +5,8 @@
   "mainBaseCommit": "f2ca26c",
   "mergeCommit": "f35fa29",
   "stableApiCheckpoint": "9550286",
-  "testedSourceCommit": "9550286",
-  "updatedAt": "2026-11-09T23:40:00.000Z",
+  "testedSourceCommit": "e4574c2",
+  "updatedAt": "2026-11-10T00:05:00.000Z",
   "phases": [
     {
       "phase": "A-R1",
@@ -17,7 +17,7 @@
         "pkg-test:37/37",
         "test: forged marker/EPERM/merged-output/descendants"
       ],
-      "note": "8/8 official cases PASS at 9550286; marker never authorizes deletion; only ESRCH confirms group gone; stdout+stderr share one UTF-8-safe budget"
+      "note": "8/8 official cases PASS at e4574c2; marker never authorizes deletion; only ESRCH confirms group gone; stdout+stderr share one UTF-8-safe budget"
     },
     {
       "phase": "A-R2",
@@ -64,7 +64,7 @@
   ],
   "results": {
     "packageTests": "37/37",
-    "admissionProbe": "PASS_ENVIRONMENT_ADMISSION (8/8 at 9550286)",
+    "admissionProbe": "PASS_ENVIRONMENT_ADMISSION (8/8 at e4574c2)",
     "independentConsumption": "PASS_INDEPENDENT_CONSUMPTION (7/7)",
     "typecheck": "PASS",
     "build": "PASS",
