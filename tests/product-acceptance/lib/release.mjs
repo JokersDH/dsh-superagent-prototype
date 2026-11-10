@@ -86,6 +86,121 @@ export function installationIssues(installation) {
   return issues
 }
 
+const HEX64 = (value) => HEX.test(String(value ?? ''))
+
+/** Advice is data: no actor, probability, larger scope or default-path activation is acceptable. */
+export function routeAdviceIssues(advice) {
+  if (!advice || typeof advice !== 'object') return ['missing']
+  const issues = []
+  const key = (ref) => `${ref?.profileId}@${ref?.revision}`
+  if (advice.protocol !== 'route-advice/1') issues.push('protocol')
+  if (!isSubstantive(advice.id) || !isSubstantive(advice.projectId)) issues.push('identity')
+  if (!HEX64(advice.taskContextDigest) || !HEX64(advice.catalogRevision) || !isSubstantive(advice.policyRevision))
+    issues.push('binding')
+  const eligible = Array.isArray(advice.eligible) ? advice.eligible : []
+  const excluded = Array.isArray(advice.excluded) ? advice.excluded : []
+  if (new Set(eligible.map(key)).size !== eligible.length) issues.push('duplicate_eligible')
+  if (new Set(excluded.map((item) => key(item?.profileRef ?? item))).size !== excluded.length)
+    issues.push('duplicate_excluded')
+  if (eligible.some((ref) => !HEX64(ref?.identityDigest))) issues.push('identity_digest')
+  if (excluded.some((item) => eligible.some((ref) => key(ref) === key(item?.profileRef ?? item))))
+    issues.push('excluded_also_eligible')
+  if (advice.suggested && !eligible.some((ref) => key(ref) === key(advice.suggested))) issues.push('suggestion_not_eligible')
+  const basis = advice.basis
+  if (basis === 'none_eligible' && (eligible.length !== 0 || advice.suggested))
+    issues.push('false_none_eligible')
+  if (basis === 'only_eligible' && eligible.length !== 1) issues.push('false_only_eligible')
+  if (!['none_eligible', 'only_eligible', 'operator_default', 'fixed_rule'].includes(basis)) issues.push('basis')
+  if (eligible.length > 0 && (!Array.isArray(advice.evidenceRefs) || advice.evidenceRefs.length === 0))
+    issues.push('advice_without_evidence')
+  if (!(Date.parse(advice.expiresAt) > Date.parse(advice.createdAt))) issues.push('expired_or_invalid_window')
+  if (advice.defaultPath !== false) issues.push('advisory_must_not_enter_default_path')
+  if (advice.probability !== undefined || advice.confidence !== undefined) issues.push('fabricated_probability')
+  return issues
+}
+
+export function reviewReportIssues(report) {
+  if (!report || typeof report !== 'object') return ['missing']
+  const issues = []
+  if (report.protocol !== 'review-report/1') issues.push('protocol')
+  if (!HEX64(report.subjectDigest)) issues.push('subject_digest')
+  if (!['findings', 'no_findings', 'inconclusive'].includes(report.disposition)) issues.push('disposition')
+  const findings = Array.isArray(report.findings) ? report.findings : []
+  if (report.disposition === 'no_findings' && findings.length !== 0) issues.push('no_findings_with_findings')
+  if (report.disposition === 'findings' && findings.length === 0) issues.push('findings_without_findings')
+  for (const finding of findings) {
+    if (!isSubstantive(finding?.path) || String(finding.path).startsWith('/') || finding.path.includes('..'))
+      issues.push('finding_path')
+    if (!['high', 'medium', 'low'].includes(finding?.severity)) issues.push('finding_severity')
+    if (!isSubstantive(finding?.claim)) issues.push('finding_claim')
+  }
+  if (report.verdict !== undefined || report.acceptance !== undefined || report.pass !== undefined)
+    issues.push('review_cannot_claim_verification')
+  return issues
+}
+
+export function reviewEvidenceIssues(evidence) {
+  if (!evidence || typeof evidence !== 'object') return ['missing']
+  const issues = []
+  const subject = evidence.subject?.candidate
+  const attempt = evidence.reviewAttempt
+  if (!subject || !attempt) return ['missing_subject_or_attempt']
+  for (const field of ['workId', 'ticketId', 'assignmentId'])
+    if (subject[field] === attempt[field]) issues.push(`reuses_author_${field}`)
+  if (!HEX64(evidence.subject?.artifactDigest) || !COMMIT.test(String(evidence.subject?.baseCommit ?? '')))
+    issues.push('subject_binding')
+  if (!HEX64(evidence.inputDigest) || !HEX64(evidence.reportDigest)) issues.push('digests')
+  if (!isSubstantive(evidence.reportArtifactRef)) issues.push('report_artifact')
+  if (!isSubstantive(evidence.reviewerProfile?.profileId) || !HEX64(evidence.reviewerProfile?.identityDigest))
+    issues.push('reviewer_profile')
+  if (evidence.isolation?.kind !== 'sealed_copy' || !HEX64(evidence.isolation?.capsuleManifestDigest) ||
+      !isSubstantive(evidence.isolation?.proofRef))
+    issues.push('sealed_copy_proof')
+  if (!['controlled', 'actual_native'].includes(evidence.layer)) issues.push('layer')
+  if (!['findings', 'no_findings', 'inconclusive'].includes(evidence.disposition)) issues.push('disposition')
+  if (evidence.humanAcceptance !== undefined) issues.push('review_is_not_acceptance')
+  return issues
+}
+
+export function heterogeneousReviewIssues(entry, sourceCommit) {
+  if (!entry || typeof entry !== 'object') return ['missing']
+  const issues = []
+  if (!isSubstantive(entry.authorProtocol) || !isSubstantive(entry.reviewerProtocol)) issues.push('protocol_missing')
+  else if (entry.authorProtocol === entry.reviewerProtocol) issues.push('protocol_not_different')
+  if (entry.different !== true) issues.push('difference_not_proven')
+  if (entry.executed !== true) issues.push('not_executed')
+  if (!isSubstantive(entry.reviewerVersion)) issues.push('version_missing')
+  if (!HEX64(entry.reviewerProfileIdentityDigest)) issues.push('identity_missing')
+  const budget = entry.budget ?? {}
+  if (!isSubstantive(budget.grantId) || !Number.isSafeInteger(budget.maxTokens) || budget.maxTokens <= 0 ||
+      !Number.isSafeInteger(budget.usedTokens) || budget.usedTokens < 0 || budget.usedTokens > budget.maxTokens)
+    issues.push('budget_unbounded')
+  if (!(typeof budget.maxUSD === 'number' && budget.maxUSD > 0 && budget.maxUSD <= 5))
+    issues.push('usd_ceiling_missing')
+  if (entry.isolation?.kind !== 'sealed_copy' || !HEX64(entry.isolation?.capsuleManifestDigest) ||
+      !isSubstantive(entry.isolation?.proofRef))
+    issues.push('isolation_missing')
+  if (!HEX64(entry.subject?.artifactDigest) || !COMMIT.test(String(entry.subject?.baseCommit ?? '')))
+    issues.push('subject_missing')
+  if (!Array.isArray(entry.evidenceRefs) || entry.evidenceRefs.length === 0) issues.push('evidence_refs_missing')
+  if (entry.sourceCommit !== sourceCommit) issues.push('source_mismatch')
+  if (!Number.isSafeInteger(entry.reviewTurnStarts) || entry.reviewTurnStarts < 1) issues.push('no_review_turns')
+  return issues
+}
+
+function attentionIssues(attention) {
+  if (!attention || typeof attention !== 'object') return ['missing']
+  const issues = []
+  if (!Number.isSafeInteger(attention.projects) || attention.projects < 1) issues.push('no_projects')
+  if (!Number.isSafeInteger(attention.items) || attention.items < 1) issues.push('no_items')
+  if (!Array.isArray(attention.groups) || attention.groups.length === 0) issues.push('no_groups')
+  if (attention.groups?.some((group) => !isSubstantive(group?.projectId) || !isSubstantive(group?.reason)))
+    issues.push('group_provenance')
+  if (attention.expiredSent !== 0) issues.push('expired_answer_sent')
+  if (attention.batchGrantedPermissions === true) issues.push('batch_authorization')
+  return issues
+}
+
 function cycleIssues(cycles) {
   if (!cycles || typeof cycles !== 'object') return ['missing']
   const issues = []
@@ -232,6 +347,26 @@ export function evaluateRelease({
       if (entry.evidence?.includes('cycles')) {
         for (const issue of cycleIssues(result.evidence?.cycles))
           failures.push(fail('cycle_evidence_invalid', `Cycle proof ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('routeAdvice')) {
+        for (const issue of routeAdviceIssues(result.evidence?.routeAdvice))
+          failures.push(fail('route_advice_invalid', `Route advice ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('reviewReport')) {
+        for (const issue of reviewReportIssues(result.evidence?.reviewReport))
+          failures.push(fail('review_report_invalid', `Review report ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('reviewEvidence')) {
+        for (const issue of reviewEvidenceIssues(result.evidence?.reviewEvidence))
+          failures.push(fail('review_evidence_invalid', `Review evidence ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('heterogeneous')) {
+        for (const issue of heterogeneousReviewIssues(result.evidence?.heterogeneous, report.source?.commit))
+          failures.push(fail('heterogeneous_review_invalid', `Heterogeneous review ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('attention')) {
+        for (const issue of attentionIssues(result.evidence?.attention))
+          failures.push(fail('attention_evidence_invalid', `Attention ${issue}`, entry.id))
       }
     }
   }

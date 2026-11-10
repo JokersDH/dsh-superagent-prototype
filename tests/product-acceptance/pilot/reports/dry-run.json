@@ -1,0 +1,77 @@
+{
+  "schema": "review-pilot-dry-run/1",
+  "status": "PASS_HARNESS_DRY_RUN",
+  "decision": "promising",
+  "rationale": "Fresh review detected 4 vs self 3; clean false positives 1 vs 1.",
+  "scored": {
+    "no_review": {
+      "detected": 0,
+      "missed": 4,
+      "falsePositives": 0,
+      "note": "no additional review"
+    },
+    "same_session_self_review": {
+      "detected": 3,
+      "missed": 1,
+      "falsePositives": 1
+    },
+    "fresh_session_review": {
+      "detected": 4,
+      "missed": 0,
+      "falsePositives": 1
+    }
+  },
+  "totals": {
+    "turns": 16,
+    "tokens": 85000,
+    "costUSD": 1.7000000000000002,
+    "unknown": 0
+  },
+  "negatives": [
+    {
+      "code": "missing_usage",
+      "ok": true,
+      "expected": "unbounded_usage",
+      "actual": [
+        "unbounded_usage",
+        "unbounded_cost"
+      ]
+    },
+    {
+      "code": "budget_mismatch",
+      "ok": true,
+      "expected": "budget_mismatch",
+      "actual": [
+        "budget_mismatch"
+      ]
+    },
+    {
+      "code": "selective_cases",
+      "ok": true,
+      "expected": "selective_cases",
+      "actual": [
+        "selective_cases"
+      ]
+    },
+    {
+      "code": "oracle_changed",
+      "ok": true,
+      "expected": "oracle_changed",
+      "actual": [
+        "oracle_changed",
+        "case_mix"
+      ]
+    },
+    {
+      "code": "review_claims_authority",
+      "ok": true,
+      "expected": "review_claims_authority",
+      "actual": [
+        "review_claims_authority"
+      ]
+    }
+  ],
+  "noModelCalls": true,
+  "checkedAt": "2026-11-10T12:31:55.858Z",
+  "scope": "Synthetic reports validate the scoring/budget/refusal machinery; they are not pilot results."
+}

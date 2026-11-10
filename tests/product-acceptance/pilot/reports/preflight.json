@@ -1,0 +1,45 @@
+{
+  "schema": "review-pilot-preflight/1",
+  "protocol": "independent-review-pilot/1",
+  "grantId": "wave05-independent-review-pilot-01",
+  "status": "BLOCKED",
+  "reasons": [
+    {
+      "code": "pricing_unavailable",
+      "detail": "No operator-provided USD schedule; subscription access is not zero cost."
+    }
+  ],
+  "codex": {
+    "version": "codex-cli 0.164.0",
+    "available": true,
+    "authMode": "api_key",
+    "model": "gpt-6.1-sol",
+    "doctorStatus": 0
+  },
+  "pricing": null,
+  "frozen": {
+    "manifestDigest": "6ed1276a4a15e7c3470c8fbdd7718dd89ec4b1b0fee3e98d68c42a5ebf444cd7",
+    "protocolDigest": "4da03c784d4f61a4ea092cfb08406ca41e72b99b2336b54a430b004372344976",
+    "oracleDigest": "babbb67556c752c29e5ff6b26238555e5dda18df19985ecc2e6859c6c07cdd08",
+    "files": 49
+  },
+  "sealSelfTest": {
+    "caseId": "case-01",
+    "digest": "22c0baceb70ae674abafbb5f6c72262eb142767bccd9220b78fdc59a8723cafc"
+  },
+  "modelTurnsUsed": 0,
+  "reservation": {
+    "turns": 0,
+    "tokens": 0,
+    "unknownTurns": 0
+  },
+  "caps": {
+    "maxTotalTurnStarts": 24,
+    "maxAuthorTurnStarts": 8,
+    "maxReviewTurnStarts": 16,
+    "maxTotalBillableTokens": 200000,
+    "maxTotalCostUSD": 5
+  },
+  "checkedAt": "2026-11-10T12:32:08.703Z",
+  "note": "Preflight only. No model turn was started; the pilot was not executed in this round."
+}

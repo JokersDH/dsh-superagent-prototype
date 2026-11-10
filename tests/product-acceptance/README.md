@@ -81,11 +81,14 @@ process that owns it and are never printed, logged or written into a report.
 
 | Tier | Requires |
 | --- | --- |
-| `harness-only` | The 50 gate self-tests only. No product claim. |
+| `harness-only` | The 65 gate self-tests only. No product claim. |
 | `e2-controlled-workflow` | The controlled product vertical, negative cases and loopback SDK chat. |
 | `e3-browser-ui` | The independent browser suite. |
 | `e4-bounded-stability` | Bounded cycles and portability checklist rules. Installation stays NOT_TESTED. |
 | `controlled-product-workflow` | All workflow/safety cases; excludes installation and native. |
+| `advisory-routing` | Workflow plus advisory attention/route-advice records (experiment only, never the default path). |
+| `controlled-review` | Advisory routing plus a controlled independent review with sealed-copy isolation. |
+| `actual-heterogeneous-review` | Every lower tier plus a real review executed by a different protocol with version, identity, budget, isolation and subject proof. |
 | `local-alpha` | Workflow plus a staged installation outside the checkout; native excluded. |
 | `full-product` | Every lower tier plus staged installation and real native execution. It fails today by design. |
 
@@ -94,11 +97,15 @@ process that owns it and are never printed, logged or written into a report.
 
 ## What each suite asserts
 
-- `selftest/` — 50 bundles prove the gate rejects missing cases, unknown status/layer, uncertain
+- `selftest/` — 65 bundles prove the gate rejects missing cases, unknown status/layer, uncertain
   acceptance, stale reports, dirty/missing/cross-commit source, unbound cases, empty evidence,
   missing candidates, corrupt/unapplied patches, byte-mismatched downloads, unexecuted or incomplete
   native proof, installation that is not staged, invalid responses, fixture drift and illegal
-  fixtures. The exact wave-04 false pass is reproduced and must stay rejected.
+  fixtures. It also rejects advisory advice that enters the default path, overlaps eligibility,
+  lacks evidence or is expired, review dispositions that contradict their findings, review reuse of
+  the author assignment, missing sealed-copy isolation, and heterogeneous claims that are not a
+  different protocol or lack execution/version/identity/budget/subject proof. The exact wave-04
+  false pass is reproduced and must stay rejected.
 - `cases/e2-daily.mjs` — real SQLite, real scratch subprocess, real verification through
   authenticated loopback HTTP: question/answer/delivery, machine PASS and FAIL, patch application to
   the recorded base commit, artifact byte roundtrip, replay/conflict, stale contract/candidate/answer,
@@ -121,3 +128,28 @@ process that owns it and are never printed, logged or written into a report.
 - Playwright is loaded from `apps/console` (the product's own dependency); screenshots are evidence,
   not an aesthetic verdict. Visual comments record concrete geometry/overflow failures only.
 - The harness never "fixes" an expectation to make a failing product look green.
+
+
+## Independent review pilot (`pilot/`)
+
+The wave-05 task grants `wave05-independent-review-pilot-01` (24 native turns, 200k billable tokens,
+USD 5 total). The pilot is **prepared and precommitted but not executed**:
+
+```sh
+node tests/product-acceptance/pilot/build-cases.mjs --check   # 8 synthetic cases / 4 seeded defects
+node tests/product-acceptance/pilot/harness.mjs --freeze      # hash protocol, cases, oracle, scoring
+node tests/product-acceptance/pilot/harness.mjs --dry-run     # scoring/budget/refusal self-test, no model
+node tests/product-acceptance/pilot/harness.mjs --preflight   # exit 3 = BLOCKED
+```
+
+`pilot/cases/` holds four seeded-defect and four clean candidates; `pilot/hidden/` holds the hidden
+oracle tests (4 fail on the defective cases, 4 pass on the clean ones); `pilot/oracle.json` fixes the
+labels and keywords. `score.mjs` is hashed into the manifest, so editing the scoring rules after
+freezing is refused.
+
+Preflight is **BLOCKED (`pricing_unavailable`)**: Codex 0.164.0 is available and authenticated with
+an API key, but no operator-provided USD schedule exists for the configured model, and the protocol
+forbids treating subscription/key access as zero cost. Consequently **zero model turns were
+started**; `pilot/ledger.json` records 0 turns, 0 reservations and an unknown cost. To unblock, the
+operator supplies `pilot/pricing.json` (`model`, `inputPerMillion`, `outputPerMillion`,
+`currency: "USD"`, `source`, `observedAt`), then `--preflight` must PASS before `--execute`.

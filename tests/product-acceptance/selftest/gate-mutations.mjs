@@ -60,6 +60,84 @@ const evidenceFor = (key) => {
       return { id: 'fixture', path: '/dev/null', sha256: DIGEST }
     case 'verificationRecovery':
       return { blockedId: 'blocked-1', retried: true, accepted: true }
+    case 'attention':
+      return {
+        projects: 2,
+        items: 3,
+        groups: [{ projectId: 'project-atlas', reason: 'deadline' }],
+        expiredSent: 0,
+        batchGrantedPermissions: false,
+      }
+    case 'routeAdvice':
+      return {
+        protocol: 'route-advice/1',
+        id: 'advice-1',
+        projectId: 'project-atlas',
+        taskContextDigest: DIGEST,
+        catalogRevision: DIGEST,
+        policyRevision: 'policy-1',
+        eligible: [{ profileId: 'profile-a', revision: 1, identityDigest: DIGEST }],
+        suggested: { profileId: 'profile-a', revision: 1, identityDigest: DIGEST },
+        excluded: [],
+        basis: 'only_eligible',
+        evidenceRefs: ['evidence-advice-1'],
+        createdAt: '2026-11-10T00:00:00.000Z',
+        expiresAt: '2026-11-11T00:00:00.000Z',
+        defaultPath: false,
+      }
+    case 'reviewReport':
+      return {
+        protocol: 'review-report/1',
+        subjectDigest: DIGEST,
+        disposition: 'findings',
+        findings: [{ path: 'src/index.js', line: 3, severity: 'high', claim: 'off-by-one in range end' }],
+        limitations: [],
+      }
+    case 'reviewEvidence':
+      return {
+        protocol: 'review-evidence/1',
+        subject: {
+          candidate: {
+            workId: 'author-work',
+            ticketId: 'author-ticket',
+            assignmentId: 'author-assignment',
+            contract: { workId: 'author-work', revision: 1, digest: DIGEST },
+            candidateGeneration: 1,
+          },
+          artifactDigest: DIGEST,
+          baseCommit: COMMIT,
+        },
+        reviewAttempt: {
+          workId: 'review-work',
+          ticketId: 'review-ticket',
+          assignmentId: 'review-assignment',
+          contract: { workId: 'review-work', revision: 1, digest: DIGEST },
+          attemptId: 'attempt-review',
+          fenceEpoch: 1,
+        },
+        reviewerProfile: { profileId: 'reviewer-profile', revision: 1, identityDigest: DIGEST },
+        inputDigest: DIGEST,
+        reportDigest: DIGEST,
+        reportArtifactRef: 'artifact-review-report',
+        isolation: { kind: 'sealed_copy', proofRef: 'proof-sealed-1', capsuleManifestDigest: DIGEST },
+        layer: 'controlled',
+        disposition: 'findings',
+      }
+    case 'heterogeneous':
+      return {
+        authorProtocol: 'codex-native/1',
+        reviewerProtocol: 'acp/1',
+        different: true,
+        executed: true,
+        reviewerVersion: 'acp-0.1.0',
+        reviewerProfileIdentityDigest: DIGEST,
+        budget: { grantId: 'wave05-independent-review-pilot-01', maxTokens: 200000, usedTokens: 1200, maxUSD: 5 },
+        isolation: { kind: 'sealed_copy', proofRef: 'proof-capsule-1', capsuleManifestDigest: DIGEST },
+        subject: { artifactDigest: DIGEST, baseCommit: COMMIT },
+        evidenceRefs: ['evidence-hetero-1'],
+        sourceCommit: COMMIT,
+        reviewTurnStarts: 8,
+      }
     case 'recovery':
       return {
         startupMode: 'recovery_readonly',
@@ -89,6 +167,37 @@ const buildCase = (entry, overrides = {}) => ({
 })
 
 const fullProduct = tier('full-product')
+const heterogeneous = tier('actual-heterogeneous-review')
+
+const buildReportFor = (requirement, mutate = (report) => report) => {
+  const report = {
+    schema: REPORT_SCHEMA,
+    source: { commit: COMMIT, dirty: false },
+    checkedAt: new Date(NOW).toISOString(),
+    cases: requirement.cases.map((entry) => buildCase(entry)),
+    claim: { status: STATUS.PASS },
+  }
+  return mutate(report)
+}
+
+const gateFor = (requirement, report) =>
+  evaluateRelease({
+    report,
+    requirement,
+    expectedSource: COMMIT,
+    now: NOW,
+    resolveFixture: () => DIGEST,
+  })
+
+const rejectHeterogeneous = (assert, label, mutate, expected) => {
+  const result = gateFor(heterogeneous, buildReportFor(heterogeneous, mutate))
+  assert(`${label}_REJECTED`, result.ok === false, `gate accepted ${label}`)
+  assert(
+    `${label}_CODE`,
+    result.failures.map((item) => item.code).includes(expected),
+    `expected ${expected}, got ${[...new Set(result.failures.map((item) => item.code))].join(',')}`,
+  )
+}
 
 const buildReport = (mutate = (report) => report) => {
   const report = {
@@ -566,9 +675,235 @@ const CASES = [
   },
 ]
 
+const findIn = (report, id) => report.cases.find((item) => item.id === id)
+const ADVICE_ID = 'E2-ROUTE-ADVICE'
+const REPORT_ID = 'E3-REVIEW-REPORT'
+const EVIDENCE_ID = 'E3-REVIEW-ISOLATION'
+const HETERO_ID = 'E5-HETEROGENEOUS-REVIEW'
+
+const ROUTING_CASES = [
+  {
+    id: 'E1-MUTATE-ROUTE-NO-ELIGIBLE',
+    title: 'Advice claiming only_eligible with no eligible profile is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'ROUTE_NO_ELIGIBLE',
+        (report) => {
+          const advice = findIn(report, ADVICE_ID).evidence.routeAdvice
+          advice.eligible = []
+          advice.suggested = { profileId: 'ghost', revision: 1, identityDigest: DIGEST }
+          return report
+        },
+        'route_advice_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-ROUTE-OVERLAP',
+    title: 'A profile cannot be both eligible and excluded',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'ROUTE_OVERLAP',
+        (report) => {
+          const advice = findIn(report, ADVICE_ID).evidence.routeAdvice
+          advice.excluded = [{ profileId: 'profile-a', revision: 1, identityDigest: DIGEST, reason: 'not_admitted' }]
+          return report
+        },
+        'route_advice_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-ROUTE-EXPIRED',
+    title: 'Expired advice is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'ROUTE_EXPIRED',
+        (report) => {
+          const advice = findIn(report, ADVICE_ID).evidence.routeAdvice
+          advice.expiresAt = '2026-11-09T00:00:00.000Z'
+          return report
+        },
+        'route_advice_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-ROUTE-NO-EVIDENCE',
+    title: 'An eligible recommendation without evidence references is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'ROUTE_NO_EVIDENCE',
+        (report) => {
+          findIn(report, ADVICE_ID).evidence.routeAdvice.evidenceRefs = []
+          return report
+        },
+        'route_advice_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-ROUTE-DEFAULT-PATH',
+    title: 'Advisory advice cannot enter the default path',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'ROUTE_DEFAULT_PATH',
+        (report) => {
+          findIn(report, ADVICE_ID).evidence.routeAdvice.defaultPath = true
+          return report
+        },
+        'route_advice_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-REVIEW-DISPOSITION',
+    title: 'no_findings with findings is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'REVIEW_DISPOSITION',
+        (report) => {
+          const value = findIn(report, REPORT_ID).evidence.reviewReport
+          value.disposition = 'no_findings'
+          return report
+        },
+        'review_report_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-REVIEW-SAME-ASSIGNMENT',
+    title: 'Review execution cannot reuse the author assignment',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'REVIEW_SAME_ASSIGNMENT',
+        (report) => {
+          const value = findIn(report, EVIDENCE_ID).evidence.reviewEvidence
+          value.reviewAttempt.assignmentId = value.subject.candidate.assignmentId
+          return report
+        },
+        'review_evidence_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-REVIEW-NO-ISOLATION',
+    title: 'Review without sealed-copy isolation proof is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'REVIEW_NO_ISOLATION',
+        (report) => {
+          delete findIn(report, EVIDENCE_ID).evidence.reviewEvidence.isolation
+          return report
+        },
+        'review_evidence_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-REVIEW-BAD-DIGEST',
+    title: 'Review evidence with a malformed report digest is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'REVIEW_BAD_DIGEST',
+        (report) => {
+          findIn(report, EVIDENCE_ID).evidence.reviewEvidence.reportDigest = 'not-a-digest'
+          return report
+        },
+        'review_evidence_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-HETERO-SAME-PROTOCOL',
+    title: 'A reviewer on the same protocol is not heterogeneous',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'HETERO_SAME_PROTOCOL',
+        (report) => {
+          const value = findIn(report, HETERO_ID).evidence.heterogeneous
+          value.reviewerProtocol = value.authorProtocol
+          return report
+        },
+        'heterogeneous_review_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-HETERO-NOT-EXECUTED',
+    title: 'A heterogeneous review that never executed is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'HETERO_NOT_EXECUTED',
+        (report) => {
+          findIn(report, HETERO_ID).evidence.heterogeneous.executed = false
+          return report
+        },
+        'heterogeneous_review_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-HETERO-NO-VERSION',
+    title: 'Heterogeneous review without a reviewer version is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'HETERO_NO_VERSION',
+        (report) => {
+          findIn(report, HETERO_ID).evidence.heterogeneous.reviewerVersion = ''
+          return report
+        },
+        'heterogeneous_review_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-HETERO-NO-BUDGET',
+    title: 'Heterogeneous review without a bounded budget is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'HETERO_NO_BUDGET',
+        (report) => {
+          findIn(report, HETERO_ID).evidence.heterogeneous.budget.maxUSD = 0
+          return report
+        },
+        'heterogeneous_review_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-HETERO-NO-ISOLATION',
+    title: 'Heterogeneous review without sealed-copy isolation is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'HETERO_NO_ISOLATION',
+        (report) => {
+          delete findIn(report, HETERO_ID).evidence.heterogeneous.isolation
+          return report
+        },
+        'heterogeneous_review_invalid',
+      ),
+  },
+  {
+    id: 'E1-MUTATE-HETERO-NO-SUBJECT',
+    title: 'Heterogeneous review without subject binding is rejected',
+    check: ({ assert }) =>
+      rejectHeterogeneous(
+        assert,
+        'HETERO_NO_SUBJECT',
+        (report) => {
+          delete findIn(report, HETERO_ID).evidence.heterogeneous.subject
+          return report
+        },
+        'heterogeneous_review_invalid',
+      ),
+  },
+]
+
 export async function gateMutationCases() {
   const results = []
-  for (const definition of CASES)
+  for (const definition of [...CASES, ...ROUTING_CASES])
     results.push(
       await runCase(
         {

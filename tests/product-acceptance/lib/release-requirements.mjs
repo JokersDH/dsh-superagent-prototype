@@ -54,6 +54,21 @@ export const SAFETY_CASES = [
   'E1-MUTATE-ADMISSION-PROBE',
   'E1-STRUCTURE-TIER-SUPERSET',
   'E1-STRUCTURE-NO-ALLOW-GAP',
+  'E1-MUTATE-ROUTE-NO-ELIGIBLE',
+  'E1-MUTATE-ROUTE-OVERLAP',
+  'E1-MUTATE-ROUTE-EXPIRED',
+  'E1-MUTATE-ROUTE-NO-EVIDENCE',
+  'E1-MUTATE-ROUTE-DEFAULT-PATH',
+  'E1-MUTATE-REVIEW-DISPOSITION',
+  'E1-MUTATE-REVIEW-SAME-ASSIGNMENT',
+  'E1-MUTATE-REVIEW-NO-ISOLATION',
+  'E1-MUTATE-REVIEW-BAD-DIGEST',
+  'E1-MUTATE-HETERO-SAME-PROTOCOL',
+  'E1-MUTATE-HETERO-NOT-EXECUTED',
+  'E1-MUTATE-HETERO-NO-VERSION',
+  'E1-MUTATE-HETERO-NO-BUDGET',
+  'E1-MUTATE-HETERO-NO-ISOLATION',
+  'E1-MUTATE-HETERO-NO-SUBJECT',
 ].map((id) => case_(id, { layers: [LAYERS.READONLY] }))
 
 /** Product workflow evidence from the controlled lane. */
@@ -99,6 +114,19 @@ export const INSTALL_CASES = [
 export const NATIVE_CASES = [
   case_('E5-NATIVE-DELIVERY', { layers: [LAYERS.NATIVE], evidence: ['native', 'acceptance'] }),
   case_('E5-NATIVE-CONTROL', { layers: [LAYERS.NATIVE], evidence: ['native'] }),
+]
+
+/** Advisory routing and review stay experimental; these tiers are separate from product release. */
+export const ADVISORY_CASES = [
+  case_('E2-ATTENTION-WORKBENCH', { layers: [LAYERS.CONTROLLED], evidence: ['attention'] }),
+  case_('E2-ROUTE-ADVICE', { layers: [LAYERS.CONTROLLED], evidence: ['routeAdvice'] }),
+]
+export const CONTROLLED_REVIEW_CASES = [
+  case_('E3-REVIEW-REPORT', { layers: [LAYERS.CONTROLLED], evidence: ['reviewReport'] }),
+  case_('E3-REVIEW-ISOLATION', { layers: [LAYERS.CONTROLLED], evidence: ['reviewEvidence'] }),
+]
+export const HETEROGENEOUS_CASES = [
+  case_('E5-HETEROGENEOUS-REVIEW', { layers: [LAYERS.NATIVE], evidence: ['heterogeneous'] }),
 ]
 
 const controlled = {
@@ -151,6 +179,42 @@ export const TIERS = {
     cases: CONTROLLED_CASES.filter((item) => item.id.startsWith('E4-')),
   },
   'controlled-product-workflow': controlled,
+  'advisory-routing': {
+    tier: 'advisory-routing',
+    description:
+      'Controlled product workflow plus advisory attention/route-advice records. Advice is data only and never enters the default path.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: [...SAFETY_CASES, ...CONTROLLED_CASES, ...ADVISORY_CASES],
+  },
+  'controlled-review': {
+    tier: 'controlled-review',
+    description:
+      'Advisory routing plus a controlled independent review with sealed-copy isolation. Review is not verification or acceptance.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: [...SAFETY_CASES, ...CONTROLLED_CASES, ...ADVISORY_CASES, ...CONTROLLED_REVIEW_CASES],
+  },
+  'actual-heterogeneous-review': {
+    tier: 'actual-heterogeneous-review',
+    description:
+      'Every lower-tier safety case plus a real review executed by a different protocol with version, identity, budget, isolation and subject proof. A replacement model or fixture is not heterogeneity.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY, LAYERS.NATIVE],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: [
+      ...SAFETY_CASES,
+      ...CONTROLLED_CASES,
+      ...ADVISORY_CASES,
+      ...CONTROLLED_REVIEW_CASES,
+      ...HETEROGENEOUS_CASES,
+    ],
+  },
   'local-alpha': {
     tier: 'local-alpha',
     description:

@@ -1,0 +1,28 @@
+{
+  "schema": "review-pilot-ledger/1",
+  "grantId": "wave05-independent-review-pilot-01",
+  "caps": {
+    "maxTotalTurnStarts": 24,
+    "maxAuthorTurnStarts": 8,
+    "maxReviewTurnStarts": 16,
+    "maxTotalBillableTokens": 200000,
+    "maxTotalCostUSD": 5
+  },
+  "status": "BLOCKED_PREFLIGHT",
+  "reason": [
+    "pricing_unavailable"
+  ],
+  "reservation": {
+    "turns": 0,
+    "tokens": 0,
+    "unknownTurns": 0
+  },
+  "actual": {
+    "turns": 0,
+    "tokens": 0,
+    "costUSD": null,
+    "unknownTurns": 0
+  },
+  "reservations": [],
+  "turns": []
+}

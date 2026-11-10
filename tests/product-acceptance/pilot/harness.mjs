@@ -1,0 +1,316 @@
+#!/usr/bin/env node
+/**
+ * Independent-review pilot harness.
+ *
+ *   node harness.mjs --freeze       # (re)write the case manifest before any model call
+ *   node harness.mjs --preflight    # verify frozen inputs, model/usage preconditions and pricing
+ *   node harness.mjs --dry-run      # exercise scoring with synthetic reports; no model call
+ *   node harness.mjs --execute --confirm-grant
+ *
+ * The execute path is intentionally guarded: it refuses unless preflight PASSed and a pricing
+ * schedule exists, because the protocol forbids treating subscription access as zero cost.
+ */
+import { spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join, relative, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { scorePilot, PILOT_CAPS, ARMS } from './score.mjs'
+
+const here = dirname(fileURLToPath(import.meta.url))
+const root = resolve(here, '../../..')
+const reports = join(here, 'reports')
+const manifestPath = join(here, 'cases.manifest.json')
+const oraclePath = join(here, 'oracle.json')
+const ledgerPath = join(here, 'ledger.json')
+const pricingPath = join(here, 'pricing.json')
+const grantId = 'wave05-independent-review-pilot-01'
+const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex')
+const args = new Set(process.argv.slice(2))
+
+function ensureReports() {
+  mkdirSync(reports, { recursive: true })
+}
+
+function readJson(path) {
+  return JSON.parse(readFileSync(path, 'utf8'))
+}
+
+function verifyFrozen() {
+  if (!existsSync(manifestPath)) return { ok: false, code: 'manifest_missing' }
+  const manifest = readJson(manifestPath)
+  const mismatches = []
+  for (const file of manifest.files) {
+    const path = join(here, file.path)
+    if (!existsSync(path)) mismatches.push(`${file.path}:missing`)
+    else if (sha256(readFileSync(path)) !== file.sha256) mismatches.push(`${file.path}:digest`)
+  }
+  const protocolPath = join(root, manifest.protocolPath)
+  if (!existsSync(protocolPath) || sha256(readFileSync(protocolPath)) !== manifest.protocolDigest)
+    mismatches.push('protocol:digest')
+  const scoringDigest = sha256(readFileSync(join(here, 'score.mjs')))
+  if (scoringDigest !== manifest.scoringRuleDigest) mismatches.push('score.mjs:digest')
+  return { ok: mismatches.length === 0, manifest, mismatches }
+}
+
+function codexInfo() {
+  const version = spawnSync('codex', ['--version'], { encoding: 'utf8', timeout: 20_000 })
+  const doctor = spawnSync('codex', ['doctor'], { encoding: 'utf8', timeout: 60_000 })
+  const text = `${doctor.stdout ?? ''}${doctor.stderr ?? ''}`
+  const model = /(?:^|\n)\s*model\s+(\S+)/.exec(text)?.[1] ?? null
+  const authMode = /stored auth mode\s+(\S+)/.exec(text)?.[1] ?? null
+  return {
+    version: (version.stdout ?? '').trim() || null,
+    available: version.status === 0,
+    authMode,
+    model,
+    doctorStatus: doctor.status,
+  }
+}
+
+function pricingSchedule() {
+  if (!existsSync(pricingPath)) return { ok: false, reason: 'pricing_unavailable' }
+  try {
+    const value = readJson(pricingPath)
+    const valid =
+      typeof value.model === 'string' &&
+      value.model.length > 0 &&
+      typeof value.inputPerMillion === 'number' &&
+      value.inputPerMillion >= 0 &&
+      typeof value.outputPerMillion === 'number' &&
+      value.outputPerMillion >= 0 &&
+      value.currency === 'USD' &&
+      typeof value.source === 'string' &&
+      typeof value.observedAt === 'string'
+    return valid ? { ok: true, value } : { ok: false, reason: 'pricing_invalid' }
+  } catch {
+    return { ok: false, reason: 'pricing_invalid' }
+  }
+}
+
+/** Copies one frozen candidate into a disposable capsule without .git, links or author state. */
+export function sealCase(caseId, destination) {
+  const source = join(here, 'cases', caseId)
+  if (!existsSync(source)) throw new Error(`Unknown case ${caseId}`)
+  mkdirSync(destination, { recursive: true })
+  const files = []
+  const walk = (directory) => {
+    for (const name of readdirSync(directory).sort()) {
+      const path = join(directory, name)
+      const stat = statSync(path)
+      if (stat.isSymbolicLink()) throw new Error(`Refusing to seal a symbolic link: ${path}`)
+      if (stat.isDirectory()) walk(path)
+      else if (stat.isFile()) {
+        const target = join(destination, relative(source, path))
+        cpSync(path, target, { dereference: false })
+        files.push({
+          path: relative(destination, target),
+          sha256: sha256(readFileSync(target)),
+          bytes: stat.size,
+        })
+      }
+    }
+  }
+  walk(source)
+  const manifest = { schema: 'review-capsule/1', caseId, files }
+  manifest.digest = sha256(Buffer.from(JSON.stringify(manifest.files)))
+  return { capsulePath: destination, manifest }
+}
+
+function preflight() {
+  ensureReports()
+  const frozen = verifyFrozen()
+  const codex = codexInfo()
+  const pricing = pricingSchedule()
+  const reasons = []
+  if (!frozen.ok) reasons.push({ code: 'frozen_inputs_invalid', detail: frozen.code ?? frozen.mismatches })
+  if (!codex.available) reasons.push({ code: 'codex_unavailable', detail: codex })
+  if (!pricing.ok) reasons.push({ code: pricing.reason, detail: 'No operator-provided USD schedule; subscription access is not zero cost.' })
+  // Prove the sealing path itself works without any model call.
+  let seal
+  try {
+    const target = mkdtempSync(join(tmpdir(), 'pa-pilot-seal-'))
+    seal = sealCase('case-01', target)
+    rmSync(target, { recursive: true, force: true })
+  } catch (error) {
+    reasons.push({ code: 'seal_failed', detail: String(error?.message ?? error) })
+  }
+  const status = reasons.length === 0 ? 'PASS' : 'BLOCKED'
+  const result = {
+    schema: 'review-pilot-preflight/1',
+    protocol: 'independent-review-pilot/1',
+    grantId,
+    status,
+    reasons,
+    codex,
+    pricing: pricing.ok ? { ...pricing.value, currency: 'USD' } : null,
+    frozen: frozen.ok
+      ? {
+          manifestDigest: frozen.manifest.caseManifestDigest,
+          protocolDigest: frozen.manifest.protocolDigest,
+          oracleDigest: frozen.manifest.oracleDigest,
+          files: frozen.manifest.files.length,
+        }
+      : { ok: false, mismatches: frozen.mismatches },
+    sealSelfTest: seal ? { caseId: 'case-01', digest: seal.manifest.digest } : null,
+    modelTurnsUsed: 0,
+    reservation: { turns: 0, tokens: 0, unknownTurns: 0 },
+    caps: PILOT_CAPS,
+    checkedAt: new Date().toISOString(),
+    note: 'Preflight only. No model turn was started; the pilot was not executed in this round.',
+  }
+  writeFileSync(join(reports, 'preflight.json'), JSON.stringify(result, null, 2) + '\n')
+  writeFileSync(
+    ledgerPath,
+    JSON.stringify(
+      {
+        schema: 'review-pilot-ledger/1',
+        grantId,
+        caps: PILOT_CAPS,
+        status: status === 'PASS' ? 'READY_NOT_EXECUTED' : 'BLOCKED_PREFLIGHT',
+        reason: reasons.map((item) => item.code),
+        reservation: { turns: 0, tokens: 0, unknownTurns: 0 },
+        actual: { turns: 0, tokens: 0, costUSD: null, unknownTurns: 0 },
+        reservations: [],
+        turns: [],
+      },
+      null,
+      2,
+    ) + '\n',
+  )
+  process.stdout.write(`preflight ${status}: ${reasons.map((item) => item.code).join(', ') || 'ready'}\n`)
+  return result
+}
+
+function syntheticReports(oracle) {
+  const defective = oracle.cases.filter((item) => item.defective)
+  const clean = oracle.cases.filter((item) => !item.defective)
+  const self = {}
+  const fresh = {}
+  defective.forEach((item, index) => {
+    const finding = {
+      path: item.oracle.path,
+      line: item.oracle.line,
+      severity: 'high',
+      claim: `${item.oracle.keywords[0]} issue in the frozen candidate`,
+    }
+    // Self review misses the last defective case; fresh review detects all four.
+    self[item.id] = index === defective.length - 1 ? { subjectDigest: 'x', disposition: 'no_findings', findings: [] } : { disposition: 'findings', findings: [finding] }
+    fresh[item.id] = { disposition: 'findings', findings: [finding] }
+  })
+  clean.forEach((item, index) => {
+    self[item.id] = index === 0 ? { disposition: 'findings', findings: [{ path: 'src/index.js', line: 1, severity: 'low', claim: 'style only' }] } : { disposition: 'no_findings', findings: [] }
+    fresh[item.id] = index === 1 ? { disposition: 'findings', findings: [{ path: 'src/index.js', line: 1, severity: 'low', claim: 'style only' }] } : { disposition: 'no_findings', findings: [] }
+  })
+  return { self, fresh }
+}
+
+function dryRun() {
+  const frozen = verifyFrozen()
+  if (!frozen.ok) throw new Error('Frozen inputs are invalid; run --freeze and --check first')
+  const oracle = readJson(oraclePath)
+  const { self, fresh } = syntheticReports(oracle)
+  const budgets = Object.fromEntries(
+    ARMS.map((arm) => [
+      arm,
+      { model: 'preregistered-model', version: 'preregistered', tools: 'read-only', timeoutMs: 120000, maxTokens: 20000, maxUSD: 0.5 },
+    ]),
+  )
+  const usage = {
+    no_review: {},
+    same_session_self_review: { completeness: 'observed', tokens: 40000, usd: 0.8, unknownTurns: 0 },
+    fresh_session_review: { completeness: 'observed', tokens: 45000, usd: 0.9, unknownTurns: 0 },
+  }
+  const arms = {
+    no_review: { turnStarts: 0, reports: {} },
+    same_session_self_review: { turnStarts: 8, reports: self },
+    fresh_session_review: { turnStarts: 8, reports: fresh },
+  }
+  const result = scorePilot({ manifest: frozen.manifest, oracle, arms, budgets, usage })
+
+  const negatives = []
+  const pushNegative = (code, input, expected) => {
+    const value = scorePilot(input)
+    negatives.push({ code, ok: value.refusals.some((item) => item.code === expected), expected, actual: value.refusals.map((item) => item.code) })
+  }
+  pushNegative('missing_usage', {
+    manifest: frozen.manifest,
+    oracle,
+    arms,
+    budgets,
+    usage: { ...usage, fresh_session_review: {} },
+  }, 'unbounded_usage')
+  pushNegative('budget_mismatch', {
+    manifest: frozen.manifest,
+    oracle,
+    arms,
+    budgets: { ...budgets, fresh_session_review: { ...budgets.fresh_session_review, maxTokens: 30000 } },
+    usage,
+  }, 'budget_mismatch')
+  pushNegative('selective_cases', {
+    manifest: frozen.manifest,
+    oracle,
+    arms: { ...arms, fresh_session_review: { turnStarts: 8, reports: { [Object.keys(fresh)[0]]: fresh[Object.keys(fresh)[0]] } } },
+    budgets,
+    usage,
+  }, 'selective_cases')
+  const changedOracle = structuredClone(oracle)
+  changedOracle.cases[0].defective = !changedOracle.cases[0].defective
+  pushNegative('oracle_changed', { manifest: frozen.manifest, oracle: changedOracle, arms, budgets, usage }, 'oracle_changed')
+  pushNegative('review_claims_authority', {
+    manifest: frozen.manifest,
+    oracle,
+    arms: {
+      ...arms,
+      fresh_session_review: {
+        turnStarts: 8,
+        reports: { ...fresh, [Object.keys(fresh)[0]]: { ...fresh[Object.keys(fresh)[0]], verdict: 'PASS' } },
+      },
+    },
+    budgets,
+    usage,
+  }, 'review_claims_authority')
+
+  const report = {
+    schema: 'review-pilot-dry-run/1',
+    status: result.decision === 'promising' && negatives.every((item) => item.ok) ? 'PASS_HARNESS_DRY_RUN' : 'FAIL_HARNESS_DRY_RUN',
+    decision: result.decision,
+    rationale: result.rationale,
+    scored: result.scored,
+    totals: result.totals,
+    negatives,
+    noModelCalls: true,
+    checkedAt: new Date().toISOString(),
+    scope: 'Synthetic reports validate the scoring/budget/refusal machinery; they are not pilot results.',
+  }
+  ensureReports()
+  writeFileSync(join(reports, 'dry-run.json'), JSON.stringify(report, null, 2) + '\n')
+  process.stdout.write(`${report.status}: ${result.decision}; negatives ${negatives.map((item) => `${item.code}:${item.ok}`).join(', ')}\n`)
+  return report
+}
+
+function execute() {
+  if (!args.has('--confirm-grant')) throw new Error('Refusing to start model turns without --confirm-grant')
+  const pre = preflight()
+  if (pre.status !== 'PASS') throw new Error(`Preflight is ${pre.status}: ${pre.reasons.map((item) => item.code).join(', ')}`)
+  // The turn runner is deliberately minimal and has never been executed: the grant requires an
+  // operator-provided USD schedule before any send. See reports/preflight.json.
+  throw new Error('Pilot execution is not enabled: pricing schedule or usage-bound proof is required by the protocol')
+}
+
+if (args.has('--freeze')) {
+  const result = spawnSync(process.execPath, [join(here, 'freeze.mjs')], { stdio: 'inherit' })
+  process.exitCode = result.status ?? 1
+} else if (args.has('--preflight')) {
+  const result = preflight()
+  process.exitCode = result.status === 'PASS' ? 0 : 3
+} else if (args.has('--dry-run')) {
+  const result = dryRun()
+  process.exitCode = result.status === 'PASS_HARNESS_DRY_RUN' ? 0 : 1
+} else if (args.has('--execute')) {
+  execute()
+} else {
+  process.stdout.write('Use --freeze, --preflight, --dry-run or --execute --confirm-grant\n')
+  process.exitCode = 2
+}

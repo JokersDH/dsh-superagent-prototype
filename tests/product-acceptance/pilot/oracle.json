@@ -1,0 +1,102 @@
+{
+  "protocol": "review-pilot-oracle/1",
+  "note": "Synthetic candidates. Four seeded defects are verified by hidden tests; this is not a measured native author failure rate.",
+  "cases": [
+    {
+      "id": "case-01",
+      "defective": true,
+      "oracle": {
+        "path": "src/index.js",
+        "line": 3,
+        "keywords": [
+          "off-by-one",
+          "inclusive",
+          "exclusive",
+          "range",
+          "end"
+        ]
+      },
+      "visibleTask": "cases/case-01/task.md",
+      "hiddenTest": "case-01.test.mjs"
+    },
+    {
+      "id": "case-02",
+      "defective": false,
+      "oracle": null,
+      "visibleTask": "cases/case-02/task.md",
+      "hiddenTest": "case-02.test.mjs"
+    },
+    {
+      "id": "case-03",
+      "defective": true,
+      "oracle": {
+        "path": "src/index.js",
+        "line": 3,
+        "keywords": [
+          "nan",
+          "range",
+          "65535",
+          "validation",
+          "integer"
+        ]
+      },
+      "visibleTask": "cases/case-03/task.md",
+      "hiddenTest": "case-03.test.mjs"
+    },
+    {
+      "id": "case-04",
+      "defective": false,
+      "oracle": null,
+      "visibleTask": "cases/case-04/task.md",
+      "hiddenTest": "case-04.test.mjs"
+    },
+    {
+      "id": "case-05",
+      "defective": true,
+      "oracle": {
+        "path": "src/index.js",
+        "line": 2,
+        "keywords": [
+          "case",
+          "lowercase",
+          "punct",
+          "normal",
+          "regex"
+        ]
+      },
+      "visibleTask": "cases/case-05/task.md",
+      "hiddenTest": "case-05.test.mjs"
+    },
+    {
+      "id": "case-06",
+      "defective": false,
+      "oracle": null,
+      "visibleTask": "cases/case-06/task.md",
+      "hiddenTest": "case-06.test.mjs"
+    },
+    {
+      "id": "case-07",
+      "defective": true,
+      "oracle": {
+        "path": "src/index.js",
+        "line": 3,
+        "keywords": [
+          "exponential",
+          "double",
+          "cap",
+          "backoff",
+          "30000"
+        ]
+      },
+      "visibleTask": "cases/case-07/task.md",
+      "hiddenTest": "case-07.test.mjs"
+    },
+    {
+      "id": "case-08",
+      "defective": false,
+      "oracle": null,
+      "visibleTask": "cases/case-08/task.md",
+      "hiddenTest": "case-08.test.mjs"
+    }
+  ]
+}
