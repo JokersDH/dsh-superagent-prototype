@@ -16,6 +16,7 @@ import { runDoctor } from '../lib/doctor.mjs'
 import { firstRun } from '../lib/first-run.mjs'
 import { readInstanceRecord, verifyInstance } from '../lib/instance.mjs'
 import { readRelease } from '../lib/release.mjs'
+import { backupState, verifyBackup } from '../lib/backup.mjs'
 import { startInstance } from '../lib/start.mjs'
 import { stopInstance } from '../lib/stop.mjs'
 
@@ -93,7 +94,7 @@ function commandSpecs() {
       'no-build': 'boolean',
     },
     stop: { ...COMMON, timeout: 'string' },
-    backup: { ...COMMON, out: 'string', label: 'string', 'include-project-content': 'boolean' },
+    backup: { ...COMMON, out: 'string', label: 'string' },
     'verify-backup': { ...COMMON, bundle: 'string' },
     'import-bundle': { ...COMMON, bundle: 'string' },
     restore: { ...COMMON, bundle: 'string', 'map-path': 'list' },
@@ -219,6 +220,41 @@ async function main(argv) {
     printResult({
       json: json ? result : null,
       human: `stop: ${result.status}${result.message ? ` — ${result.message}` : ''}`,
+    })
+    return EXIT.OK
+  }
+
+  if (command === 'backup') {
+    const result = await backupState({ installRoot, roots, values })
+    if (!result.ok) return fail({ json, code: result.code, message: result.message, detail: result.detail, hint: result.hint })
+    printResult({
+      json: json ? result : null,
+      human: [
+        `backup: ${result.status}`,
+        `  bundle: ${result.bundlePath}`,
+        `  sha256: ${result.archiveSha256}`,
+        `  entries: ${result.counts.entries} (artifacts ${result.counts.artifacts}, excluded ${result.counts.excluded})`,
+        `  database: integrity=${result.database.integrity} foreignKeyViolations=${result.database.foreignKeyViolations}`,
+        '限制:',
+        ...result.limitations.map((item) => `  - ${item}`),
+      ].join('\n'),
+    })
+    return EXIT.OK
+  }
+
+  if (command === 'verify-backup') {
+    const result = await verifyBackup({ roots, values })
+    if (!result.ok) return fail({ json, code: result.code, message: result.message, detail: result.detail })
+    printResult({
+      json: json ? result : null,
+      human: [
+        `verify-backup: ${result.status}`,
+        `  bundle: ${result.bundlePath}`,
+        `  manifest: ${result.manifestDigest}`,
+        `  producer: ${result.producer.product} ${result.producer.version} (${result.producer.platform}/${result.producer.arch}, node ${result.producer.node}, sqlite ${result.producer.sqlite})`,
+        `  entries: ${result.counts.entries} (artifacts ${result.counts.artifacts})`,
+        `  database: integrity=${result.database.integrity} foreignKeyViolations=${result.database.foreignKeyViolations} schema=${result.database.productSchema}`,
+      ].join('\n'),
     })
     return EXIT.OK
   }

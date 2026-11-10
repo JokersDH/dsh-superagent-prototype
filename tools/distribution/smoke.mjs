@@ -115,6 +115,7 @@ const args = rootsArgs(roots)
 let startChild = null
 let consoleURL = null
 let apiURL = null
+let backupPath = null
 let startOutLog = null
 let startErrLog = null
 let startOutFd = null
@@ -188,6 +189,22 @@ try {
   if (reuse.json?.status !== 'REUSED') throw new Error(`second start expected REUSED, got ${reuse.json?.status}`)
   step('reuse-verified-instance', 'PASS', { pid: reuse.json.instance.pid })
 
+  // Complete backup while the instance is live: the SQLite online backup must yield a consistent
+  // snapshot (WAL active) and the manifest must list the referenced artifacts.
+  mkdirSync(join(root, 'backup'), { recursive: true, mode: 0o700 })
+  backupPath = join(root, 'backup', 'state.pab')
+  const backup = runPa(['backup', '--json', '--out', backupPath, ...args], { allowExit: [0] })
+  if (backup.json?.status !== 'CREATED') throw new Error(`backup did not report CREATED: ${JSON.stringify(backup.json).slice(0, 500)}`)
+  if (backup.json.database.integrity !== 'ok' || backup.json.database.foreignKeyViolations !== 0)
+    throw new Error(`backup database facts are not clean: ${JSON.stringify(backup.json.database)}`)
+  step('backup-live', 'PASS', { bundle: backupPath, archiveSha256: backup.json.archiveSha256, counts: backup.json.counts })
+
+  const verifyLive = runPa(['verify-backup', '--json', '--bundle', backupPath, ...args], { allowExit: [0] })
+  if (verifyLive.json?.status !== 'VERIFIED') throw new Error('verify-backup did not report VERIFIED')
+  if (verifyLive.json.database.integrity !== 'ok' || verifyLive.json.database.foreignKeyViolations !== 0)
+    throw new Error('verified bundle database facts are not clean')
+  step('verify-backup-live', 'PASS', { manifestDigest: verifyLive.json.manifestDigest, entries: verifyLive.json.counts.entries })
+
   const stopStarted = Date.now()
   const stop = runPa(['stop', '--json', ...args], { allowExit: [0] })
   if (stop.json?.status !== 'STOPPED') throw new Error(`stop expected STOPPED, got ${JSON.stringify(stop.json)}`)
@@ -207,6 +224,10 @@ try {
   if (!portClosed) throw new Error('console port still accepts connections after stop')
   if (existsSync(join(roots.config, 'instance.json'))) throw new Error('instance record still exists after a verified stop')
   step('resources-released', 'PASS')
+
+  const verifyOffline = runPa(['verify-backup', '--json', '--bundle', backupPath, ...args], { allowExit: [0] })
+  if (verifyOffline.json?.status !== 'VERIFIED') throw new Error('offline verify-backup did not report VERIFIED')
+  step('verify-backup-offline', 'PASS', { manifestDigest: verifyOffline.json.manifestDigest })
 
   const doctorAfter = runPa(['doctor', '--json', ...args], { allowExit: [0, 1] })
   if (doctorAfter.json.checks.some((check) => check.id === 'instance' && check.status === 'FAIL'))
@@ -242,7 +263,7 @@ try {
   }
   if (values['keep-root']) evidence.root = root
   mkdirSync(REPORTS, { recursive: true })
-  evidence.outputs = { consoleURL, apiURL }
+  evidence.outputs = { consoleURL, apiURL, ...(backupPath ? { backupPath } : {}) }
   writeFileSync(join(REPORTS, 'zero-model-smoke.json'), `${JSON.stringify(evidence, null, 2)}\n`)
   if (!values['keep-root']) rmSync(root, { recursive: true, force: true })
 }

@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "3957e30",
   "auditedBaseline": "c3f018e",
-  "updatedAt": "2026-11-10T04:50:00.000Z",
+  "updatedAt": "2026-11-10T04:55:00.000Z",
   "modelBudget": {
     "allocated": 0,
     "used": 0,
@@ -87,11 +87,36 @@
     },
     {
       "id": "D3",
-      "status": "NEXT",
-      "delivered": [],
-      "checks": [],
-      "evidence": [],
-      "blockers": []
+      "status": "DONE",
+      "delivered": [
+        "deterministic ustar+gzip bundle archive with fail-closed reader limits/checksum/path/duplicate/type checks",
+        "consistent state snapshot through A's storage backupDatabase/verifyDatabase port (readonly source connection)",
+        "referenced content-addressed artifacts copied and re-hashed; missing/corrupt artifacts fail the backup",
+        "non-secret project bindings + path map; credentials/runtime records/environment receipts/worktrees/unclassified files excluded with reasons",
+        "pa backup / pa verify-backup entrypoints + private backup index"
+      ],
+      "checks": [
+        {
+          "id": "portability-tests",
+          "command": "node --test packages/portability/test/*.case.ts",
+          "result": "PASS (24, includes archive safety, live-writer consistency, negative bundle cases)"
+        },
+        {
+          "id": "zero-model-smoke",
+          "command": "node tools/distribution/smoke.mjs",
+          "result": "PASS (adds backup-live + verify-backup-live + verify-backup-offline)"
+        }
+      ],
+      "evidence": [
+        "tools/distribution/reports/zero-model-smoke.json"
+      ],
+      "blockers": [
+        "GAP-D3 (A): public referenced-artifact read port; interim read-only SELECT is labelled in RFC and code"
+      ],
+      "limitations": [
+        "continuous unbounded writes can make SQLite's online backup restart; bounded-write consistency is tested",
+        "no restore/rollback yet (D4)"
+      ]
     },
     {
       "id": "D4",

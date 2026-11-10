@@ -41,3 +41,22 @@ export {
   type PathBinding,
   type WriterClaimFacts,
 } from './manifest.ts'
+export {
+  createHashingSink,
+  readTarGz,
+  writeTarGz,
+  type ArchiveEntry,
+  type ArchiveLimits,
+  type ArchiveSink,
+  type ArchiveSource,
+  type HashedEntry,
+} from './archive.ts'
+export { snapshotState, type SnapshotOptions, type SnapshotResult, type StagingFile } from './snapshot.ts'
+export {
+  createBundle,
+  verifyBundle,
+  type BundleResult,
+  type CreateBundleOptions,
+  type VerifyBundleOptions,
+  type VerifyBundleResult,
+} from './bundle.ts'

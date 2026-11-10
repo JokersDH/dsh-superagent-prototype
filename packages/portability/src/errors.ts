@@ -19,6 +19,7 @@ export type PortabilityCode =
   | 'bundle_digest_mismatch'
   | 'database_unavailable'
   | 'database_verify_failed'
+  | 'config_invalid'
   | 'artifact_missing'
   | 'artifact_digest_mismatch'
   | 'writer_uncertain'

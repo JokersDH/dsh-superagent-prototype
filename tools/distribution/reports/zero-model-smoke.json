@@ -1,16 +1,16 @@
 {
   "case": "DIST-TRIAL-01",
   "status": "PASS",
-  "startedAt": "2026-11-10T04:46:58.119Z",
+  "startedAt": "2026-11-10T04:53:28.801Z",
   "steps": [
     {
       "id": "build",
       "status": "PASS",
       "detail": {
-        "buildId": "b534dd9d172f269d",
+        "buildId": "5a04b5e6eebee7ea",
         "artifacts": {
-          "count": 269,
-          "bytes": 4208579
+          "count": 281,
+          "bytes": 4288282
         }
       }
     },
@@ -37,15 +37,15 @@
       "id": "static-console",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:58995",
-        "readyMs": 119
+        "url": "http://127.0.0.1:59661",
+        "readyMs": 121
       }
     },
     {
       "id": "instance-marker",
       "status": "PASS",
       "detail": {
-        "buildId": "b534dd9d172f269d"
+        "buildId": "5a04b5e6eebee7ea"
       }
     },
     {
@@ -86,7 +86,7 @@
       "id": "status-running",
       "status": "PASS",
       "detail": {
-        "pid": 3332,
+        "pid": 7486,
         "checks": 8
       }
     },
@@ -94,14 +94,35 @@
       "id": "reuse-verified-instance",
       "status": "PASS",
       "detail": {
-        "pid": 3332
+        "pid": 7486
+      }
+    },
+    {
+      "id": "backup-live",
+      "status": "PASS",
+      "detail": {
+        "bundle": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-919dN6/backup/state.pab",
+        "archiveSha256": "5a5cb2e5f2e0ae141dd33948a514532fbade408e0c6b1c93df5144f9910bcd66",
+        "counts": {
+          "entries": 1,
+          "artifacts": 0,
+          "excluded": 9
+        }
+      }
+    },
+    {
+      "id": "verify-backup-live",
+      "status": "PASS",
+      "detail": {
+        "manifestDigest": "ac0ef284b1fa5c658b5dcecda1cf54470df6e347d8aa87b7eab503ed18e02041",
+        "entries": 1
       }
     },
     {
       "id": "stop",
       "status": "PASS",
       "detail": {
-        "stopMs": 203
+        "stopMs": 221
       }
     },
     {
@@ -117,6 +138,13 @@
       "status": "PASS"
     },
     {
+      "id": "verify-backup-offline",
+      "status": "PASS",
+      "detail": {
+        "manifestDigest": "ac0ef284b1fa5c658b5dcecda1cf54470df6e347d8aa87b7eab503ed18e02041"
+      }
+    },
+    {
       "id": "doctor-after-stop",
       "status": "PASS",
       "detail": {
@@ -129,10 +157,11 @@
     "Only darwin/arm64 + Node 24.21.x is a measured candidate; other platforms remain NOT_TESTED.",
     "The trial instance ran on isolated temporary roots/ports; user services were not touched."
   ],
-  "durationMs": 6556,
-  "finishedAt": "2026-11-10T04:47:04.675Z",
+  "durationMs": 7414,
+  "finishedAt": "2026-11-10T04:53:36.215Z",
   "outputs": {
-    "consoleURL": "http://127.0.0.1:58995",
-    "apiURL": "http://127.0.0.1:58996"
+    "consoleURL": "http://127.0.0.1:59661",
+    "apiURL": "http://127.0.0.1:59662",
+    "backupPath": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-919dN6/backup/state.pab"
   }
 }

@@ -142,7 +142,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
  * Absolute paths, `..`, empty segments, backslashes, NUL, and over-deep/over-long paths are refused
  * so an archive can never write outside its staging directory.
  */
-export function assertSafeEntryPath(path: unknown, limits: typeof BUNDLE_LIMITS = BUNDLE_LIMITS): string {
+export function assertSafeEntryPath(
+  path: unknown,
+  limits: { readonly maxPathLength: number; readonly maxPathDepth: number } = BUNDLE_LIMITS,
+): string {
   if (typeof path !== 'string' || path.length === 0)
     throw new PortabilityError('archive_unsafe_path', 'Bundle entry path must be a non-empty string', { path })
   if (path.length > limits.maxPathLength)
