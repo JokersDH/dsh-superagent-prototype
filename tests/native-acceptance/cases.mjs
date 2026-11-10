@@ -318,25 +318,45 @@ async function executeNativeLink({ client, log, options, selection, project, cas
  */
 async function verifyCandidateArtifacts({ client, workId, artifactIds }) {
   const evidence = { artifactIds, artifacts: [], checks: [] }
+  // The project root is needed to clone at the artifact base commit for the patch roundtrip.
+  const location = await client.request('GET', `/v1/works/${workId}/location`)
+  evidence.projectPath = location.json?.projectPath
+  evidence.location = location.json
+  // Each artifact id may return an object (product artifact), an array (check results) or text
+  // (the patch). Keep the raw body so every shape is usable.
   const artifacts = []
   for (const id of artifactIds) {
     const response = await client.request('GET', `/v1/artifacts/${id}`)
-    if (response.status !== 200 || !response.json) continue
-    artifacts.push({ id, ...response.json })
+    if (response.status !== 200) continue
+    const body = response.json === undefined ? response.text : response.json
+    artifacts.push({ id, body })
   }
-  evidence.artifacts = artifacts.map(item => ({ id: item.id, kind: item.kind, baseCommit: item.baseCommit, headCommit: item.headCommit, patch: item.patch?.artifactId ?? null }))
+  evidence.artifacts = artifacts.map(item => ({
+    id: item.id,
+    shape: Array.isArray(item.body) ? 'array' : typeof item.body === 'string' ? 'text' : 'object',
+    kind: item.body?.kind ?? null,
+    baseCommit: item.body?.baseCommit ?? null,
+    headCommit: item.body?.headCommit ?? null,
+    patch: item.body?.patch?.artifactId ?? null,
+  }))
 
-  // 1. Every registered machine check must be PASS.
-  const checkResults = artifacts.filter(item => Array.isArray(item)).flatMap(item => item)
-  for (const item of checkResults) {
-    if (item && typeof item.outcome === 'string') evidence.checks.push({ outcome: item.outcome, exitCode: item.exitCode })
+  // 1. Every registered machine check must be PASS. A verification artifact is an array of results.
+  for (const item of artifacts) {
+    const results = Array.isArray(item.body) ? item.body : Array.isArray(item.body?.results) ? item.body.results : []
+    for (const result of results) {
+      if (result && typeof result.outcome === 'string') {
+        evidence.checks.push({ outcome: result.outcome, exitCode: result.exitCode, criterionId: result.criterionId })
+      }
+    }
   }
+  if (evidence.checks.length === 0) return { ok: false, reason: 'no registered machine check result accompanied the candidate', evidence }
   const failedCheck = evidence.checks.find(check => check.outcome !== 'PASS')
   if (failedCheck) return { ok: false, reason: `a registered machine check did not pass: ${JSON.stringify(failedCheck)}`, evidence }
 
   // 2. The candidate artifact must expose a real patch reference or a distinct base/head.
-  const candidateArtifact = artifacts.find(item => item.kind === 'product-artifact/1')
-  if (!candidateArtifact) return { ok: false, reason: 'no product artifact accompanies the candidate', evidence }
+  const candidateEntry = artifacts.find(item => item.body?.kind === 'product-artifact/1')
+  if (!candidateEntry) return { ok: false, reason: 'no product artifact accompanies the candidate', evidence }
+  const candidateArtifact = candidateEntry.body
   const patchRef = candidateArtifact.patch
   const distinctCommits = candidateArtifact.baseCommit && candidateArtifact.headCommit && candidateArtifact.baseCommit !== candidateArtifact.headCommit
   evidence.patchRef = patchRef ?? null
@@ -345,20 +365,60 @@ async function verifyCandidateArtifacts({ client, workId, artifactIds }) {
   if (patchRef && patchRef.artifactId) {
     const patch = await client.request('GET', `/v1/artifacts/${patchRef.artifactId}`)
     evidence.patchStatus = patch.status
-    if (patch.status === 200) {
-      return {
-        ok: true,
-        summary: `candidate verified: ${evidence.checks.length} machine check(s) PASS and a patch artifact ${patchRef.bytes ?? '?'} bytes (${patchRef.format ?? 'unknown'})`,
-        evidence,
-      }
+    if (patch.status !== 200) return { ok: false, reason: `the patch artifact could not be read (HTTP ${patch.status})`, evidence }
+    const patchText = typeof patch.text === 'string' ? patch.text : ''
+    evidence.patchBytesReturned = patchText.length
+    if (patchText.length === 0) return { ok: false, reason: 'the patch artifact is empty', evidence }
+    // The declared byte count must match what the product actually returns.
+    if (typeof patchRef.bytes === 'number' && patchRef.bytes !== patchText.length) {
+      return { ok: false, reason: `patch byte count mismatch: manifest ${patchRef.bytes}, returned ${patchText.length}`, evidence }
     }
-    return { ok: false, reason: `the patch artifact could not be read (HTTP ${patch.status})`, evidence }
+    // The patch must apply to a fresh clone pinned at the artifact's base commit.
+    const roundtrip = await roundtripPatch({ projectPath: evidence.projectPath, baseCommit: candidateArtifact.baseCommit, patchText })
+    evidence.roundtrip = { ok: roundtrip.ok, files: roundtrip.files, reason: roundtrip.reason }
+    if (!roundtrip.ok) return { ok: false, reason: `the patch did not apply to a clean clone: ${roundtrip.reason}`, evidence }
+    return {
+      ok: true,
+      summary: `candidate verified: ${evidence.checks.length} machine check(s) PASS, patch ${patchRef.bytes} bytes (${patchRef.format}), applies to ${roundtrip.files.join(', ')}`,
+      evidence,
+    }
   }
   if (distinctCommits) {
     // Legacy artifact shape: a real worktree commit interval exists, so a diff is derivable.
     return { ok: true, summary: `candidate verified: ${evidence.checks.length} machine check(s) PASS with base ${candidateArtifact.baseCommit} -> head ${candidateArtifact.headCommit}`, evidence }
   }
   return { ok: false, reason: 'the candidate exposes neither a patch reference nor a distinct base/head commit', evidence }
+}
+
+/**
+ * Apply a delivered patch to a clean clone pinned at the artifact's declared base commit.
+ *
+ * This proves the artifact is a real diff of the project rather than a summary that only looks right,
+ * and that the original project is untouched (a clone is used, never the source tree).
+ */
+export async function roundtripPatch({ projectPath, baseCommit, patchText }) {
+  if (!projectPath || !patchText) return { ok: false, reason: 'missing project path or patch text' }
+  const { execFileSync } = await import('node:child_process')
+  const { mkdtempSync } = await import('node:fs')
+  const { tmpdir } = await import('node:os')
+  const { join } = await import('node:path')
+  const root = mkdtempSync(join(tmpdir(), 'pa-roundtrip-'))
+  const clone = join(root, 'clone')
+  const run = (args, cwd) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+  try {
+    run(['clone', '--quiet', '--no-hardlinks', projectPath, clone], tmpdir())
+    if (baseCommit) run(['checkout', '--quiet', baseCommit], clone)
+    // Verify first (no working-tree change), then apply so the files exist for inspection.
+    execFileSync('git', ['apply', '--check', '-'], { cwd: clone, input: patchText, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
+    execFileSync('git', ['apply', '-'], { cwd: clone, input: patchText, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
+    const files = run(['status', '--porcelain'], clone)
+      .split('\n')
+      .filter(Boolean)
+      .map(line => line.slice(3).trim())
+    return { ok: files.length > 0, files, patchBytes: patchText.length, clone }
+  } catch (error) {
+    return { ok: false, reason: String(error.stderr ?? error.message ?? error).slice(0, 300) }
+  }
 }
 
 /** Normalise the question collection the work view exposes. */

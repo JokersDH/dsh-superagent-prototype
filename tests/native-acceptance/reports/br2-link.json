@@ -1,0 +1,294 @@
+{
+  "generatedAt": "2026-11-10T01:43:29.815Z",
+  "environment": {
+    "platform": "darwin/arm64",
+    "node": "v24.21.0",
+    "acceptanceCheckpoint": "tests/native-acceptance",
+    "apiUrl": "http://127.0.0.1:8901",
+    "nativeLaneExecuted": true,
+    "nativeLaneReason": "executed",
+    "configurationRevision": "23f00e013adb51ade8f13ac6e9729f18236a9d15e39853825f2a909c00c224f6"
+  },
+  "totals": {
+    "cases": 12,
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 6
+  },
+  "lane": "read-only + native",
+  "profileIds": [
+    {
+      "id": "profile-codex-native",
+      "kind": "native",
+      "readiness": "native_test_passed"
+    },
+    {
+      "id": "profile-fixture-question",
+      "kind": "controlled_fixture",
+      "readiness": "fixture_ready"
+    },
+    {
+      "id": "profile-fixture-pass",
+      "kind": "controlled_fixture",
+      "readiness": "fixture_ready"
+    },
+    {
+      "id": "profile-fixture-fail",
+      "kind": "controlled_fixture",
+      "readiness": "fixture_ready"
+    },
+    {
+      "id": "profile-fixture-slow",
+      "kind": "controlled_fixture",
+      "readiness": "fixture_ready"
+    }
+  ],
+  "cases": [
+    {
+      "id": "HARNESS-AUTH",
+      "title": "the acceptance harness can authenticate against the running product",
+      "lane": "read-only",
+      "status": "PASS",
+      "detail": [
+        "session established from the private bootstrap token",
+        "protected route returns 200 when authenticated and 401 when not"
+      ],
+      "evidence": [
+        {
+          "authenticated": 200,
+          "anonymous": 401
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "CONFIG-READ",
+      "title": "GET /v1/configuration is available and never cached",
+      "lane": "read-only",
+      "status": "PASS",
+      "detail": [
+        "authenticated read with no-store"
+      ],
+      "evidence": [
+        {
+          "status": 200,
+          "revision": "23f00e013adb51ade8f13ac6e9729f18236a9d15e39853825f2a909c00c224f6",
+          "cacheControl": "no-store"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "CONFIG-NATIVE-ADMISSION",
+      "title": "the configuration states exactly which profiles may dispatch",
+      "lane": "read-only",
+      "status": "PASS",
+      "detail": [
+        "native profile profile-codex-native is admitted (readiness native_test_passed)"
+      ],
+      "evidence": [
+        {
+          "profile": {
+            "id": "profile-codex-native",
+            "revision": 1,
+            "displayName": "Codex · 本机开发",
+            "driverId": "codex-native",
+            "kind": "native",
+            "readiness": "native_test_passed",
+            "dispatchAllowed": true
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "CONFIG-NO-RAW-IDENTITY",
+      "title": "the configuration never exposes executable/argv/native config",
+      "lane": "read-only",
+      "status": "PASS",
+      "detail": [
+        "no backend-only identity fields in the response"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "CONFIG-FIXTURE-NOT-NATIVE",
+      "title": "fixture profiles are never presented as tested vendors",
+      "lane": "read-only",
+      "status": "PASS",
+      "detail": [
+        "4 fixture profile(s) are declared controlled_fixture"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-LINK",
+      "title": "delegate to the real Codex on a private scratch project and reach a verified candidate",
+      "lane": "native",
+      "status": "PASS",
+      "detail": [
+        "candidate verified: 1 machine check(s) PASS, patch 803 bytes (git-binary-diff/1), applies to src/index.mjs, test/sum.test.mjs"
+      ],
+      "evidence": [
+        {
+          "httpStatus": 200,
+          "receipt": {
+            "commandId": "cmd-create-1794274979463",
+            "workId": "2271afd2fcec9983ff20e35178d2225c",
+            "seq": 93,
+            "status": "recorded"
+          }
+        },
+        {
+          "finalPhase": "needs_user",
+          "questionCount": 0,
+          "artifactCount": 3
+        },
+        {
+          "artifactIds": [
+            "a21357917fbc5c56a544a337eaedfa15a8462333b71208d10f97cde51c811d3c",
+            "0755029ea2265f6c2cc82393ed9999d1714efe4c5fb4b617ecc057d1a805ca7c",
+            "798c823476223b95066a1c9481598dbd44fe5eae4e22f9cc068df4395fd56886"
+          ],
+          "artifacts": [
+            {
+              "id": "a21357917fbc5c56a544a337eaedfa15a8462333b71208d10f97cde51c811d3c",
+              "shape": "object",
+              "kind": "product-artifact/1",
+              "baseCommit": "f82eb759f3cc7c19d4cef30c5c9e98acdb44c426",
+              "headCommit": "f82eb759f3cc7c19d4cef30c5c9e98acdb44c426",
+              "patch": "0755029ea2265f6c2cc82393ed9999d1714efe4c5fb4b617ecc057d1a805ca7c"
+            },
+            {
+              "id": "0755029ea2265f6c2cc82393ed9999d1714efe4c5fb4b617ecc057d1a805ca7c",
+              "shape": "text",
+              "kind": null,
+              "baseCommit": null,
+              "headCommit": null,
+              "patch": null
+            },
+            {
+              "id": "798c823476223b95066a1c9481598dbd44fe5eae4e22f9cc068df4395fd56886",
+              "shape": "array",
+              "kind": null,
+              "baseCommit": null,
+              "headCommit": null,
+              "patch": null
+            }
+          ],
+          "checks": [
+            {
+              "outcome": "PASS",
+              "exitCode": 0,
+              "criterionId": "project-tests"
+            }
+          ],
+          "projectPath": "/Users/hh/.local/share/superagent-personal/projects/starter",
+          "location": {
+            "projectPath": "/Users/hh/.local/share/superagent-personal/projects/starter",
+            "workspacePath": "/Users/hh/.local/share/superagent-personal/workspaces/6090b0e19590e8b220135c42/attempts/attempt-9849740e-7265-4cdd-ac77-349a97c1ca18",
+            "baseCommit": "f82eb759f3cc7c19d4cef30c5c9e98acdb44c426"
+          },
+          "patchRef": {
+            "artifactId": "0755029ea2265f6c2cc82393ed9999d1714efe4c5fb4b617ecc057d1a805ca7c",
+            "sha256": "0755029ea2265f6c2cc82393ed9999d1714efe4c5fb4b617ecc057d1a805ca7c",
+            "bytes": 803,
+            "format": "git-binary-diff/1"
+          },
+          "distinctCommits": false,
+          "patchStatus": 200,
+          "patchBytesReturned": 803,
+          "roundtrip": {
+            "ok": true,
+            "files": [
+              "src/index.mjs",
+              "test/sum.test.mjs"
+            ]
+          }
+        }
+      ],
+      "entities": [
+        {
+          "projectId": "project-39d1110c23d2418691a720e0",
+          "profileId": "profile-codex-native",
+          "commandId": "cmd-create-1794274979463"
+        },
+        {
+          "workId": "2271afd2fcec9983ff20e35178d2225c"
+        },
+        {
+          "candidate": "7cef0f22be3ebce6303ed13574fe7aea#1"
+        }
+      ]
+    },
+    {
+      "id": "NATIVE-STOP",
+      "title": "stop ends the actual process tree, not merely the native ACK",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "not reached in this run: requires its own dedicated phase"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-REOPEN",
+      "title": "browser/reopen does not resend begin and the executor is preserved",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "not reached in this run: requires its own dedicated phase"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-RESTART",
+      "title": "coordinator restart does not start a second physical writer",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "not reached in this run: requires its own dedicated phase"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-STALE-CANDIDATE",
+      "title": "a modified current candidate cannot be accepted",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "not reached in this run: requires its own dedicated phase"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-CHECK-FAIL",
+      "title": "a required machine FAIL cannot be bypassed by human acceptance",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "not reached in this run: requires its own dedicated phase"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "NATIVE-QUESTION",
+      "title": "a real question is answered per request/attempt/epoch/contract",
+      "lane": "native",
+      "status": "NOT_TESTED",
+      "detail": [
+        "not reached in this run: requires its own dedicated phase"
+      ],
+      "evidence": [],
+      "entities": []
+    }
+  ]
+}

@@ -6,6 +6,7 @@
  * fixture profile. See README.md for scope and ownership.
  */
 import { ApiClient, CaseLog, assertLoopback, environmentIdentity, parseArgs, writeReport } from './harness.mjs'
+import { existsSync, statSync } from 'node:fs'
 import { runNativeCases, runReadOnlyCases } from './cases.mjs'
 
 const options = parseArgs(process.argv.slice(2))
@@ -120,7 +121,15 @@ const failed = report.cases.filter(item => item.status === 'FAIL')
 const notExecutedRequired = options.requireNative
   ? report.cases.filter(item => item.lane === 'native' && item.status !== 'PASS')
   : []
+// A release claim must rest on the current source, not on a stale or absent report.
+const STALE_MS = 24 * 60 * 60 * 1000
+const staleReport = options.requireNative
+  ? options.record && existsSync(options.record)
+    ? Date.now() - statSync(options.record).mtimeMs > STALE_MS
+    : false
+  : false
 if (notExecutedRequired.length > 0) {
   process.stdout.write(`\nBLOCKED: ${notExecutedRequired.length} required native case(s) did not execute or did not pass\n`)
 }
-process.exit(failed.length === 0 && notExecutedRequired.length === 0 ? 0 : 1)
+if (staleReport) process.stdout.write('\nBLOCKED: the recorded report is older than the staleness bound\n')
+process.exit(failed.length === 0 && notExecutedRequired.length === 0 && !staleReport ? 0 : 1)
