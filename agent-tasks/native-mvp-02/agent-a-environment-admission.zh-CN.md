@@ -1,8 +1,12 @@
 # Agent A：环境准备准入与完整交付
 
+**当前优先级（2026-11-10）：按 [收尾批次 A-R1–A-R4](release-closure.zh-CN.md) 连续执行。** 先关闭三项新失败、交可消费检查点，再完成单包恢复/消费/集成回归；已有 workspace 增量保留，暂缓扩大支持形态。以下仍为细节参考。
+
 工作目录 `/Users/hh/Desktop/joker/superagent-agent-a`，继续 `codex/g2-workspaces-verification`。保留所有改动，fetch 并合并最新 origin/main，读取 AGENTS.md、本轮 README、原环境任务及本文件。当前主线已包含旧 workspace/console 功能及其准入修复；合并冲突保留已验收的 main 实现与旧提交历史，不重复改产品路径。
 
 **持续执行：** 同时读取 [扩展队列](extended-run.zh-CN.md)。下文原三个阶段对应 A1–A3；通过后提交检查点，继续 A4–A6，不在原“最终验收”后停止。依然只拥有本包。
+
+**最新准入：** `b6dd261` 尚未通过。先读 [扩展复核](../../docs/rfcs/WP-16/0011-extended-checkpoint-review.md)，修复新增三项 blocked cleanup 伪造归属、进程观察未知和合并输出预算；保留已做的 A4–A6。复验脚本已扩展为八项，可用 `--candidate <commit>` 检查不可变快照。
 
 ## 出口与归属
 

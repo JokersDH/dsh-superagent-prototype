@@ -1,8 +1,14 @@
 # 从这里开始：仓库、代码位置和三 Agent 开发
 
+**2026-11-10 当前派工：[带依赖项目收尾批次](agent-tasks/native-mvp-02/release-closure.zh-CN.md)。** A 继续环境模块准入与恢复/消费，B 继续验收工具修复与真实执行/浏览器/稳定性矩阵；主线负责环境进入独立 Runner、验证和工作台。先交单包可用预览，再继续扩展。目录和分支保持，下文旧派工消息改以该收尾批次的 A-R/B-R 优先级执行。
+
 **当前派工入口：[Native MVP 第二轮整包](agent-tasks/native-mvp-02/README.zh-CN.md)。** A 负责环境准备准入，B 负责可执行的真实原生与故障验收，主线负责环境、验证及工作台集成。两人保留原目录和分支，先合并最新 main。native-mvp 首轮及 wave-02 仅作历史参考。
 
 **持续执行扩展：[A1–A6 / B1–B6 / M1–M6 队列](agent-tasks/native-mvp-02/extended-run.zh-CN.md)。** 用户离开期间，提交稳定检查点后继续下一阶段；遇阻先留复现，再做独立任务，不逐项等回复。A 增加只读诊断/恢复样例/受限 workspace，B 增加故障矩阵/浏览器/有界稳定性/接入工具，主线继续产品接线与自助诊断。
+
+主线新增 [环境接口与自助诊断检查点](docs/rfcs/WP-16/0010-main-environment-operations-checkpoint.md)：`pnpm doctor` 可只读核对当前实例，启动复用会核对真实进程/监听和私有接口；可信环境排除 interface 已通过真实 Git 回归。整包受控回归 387 项通过，依赖准备的生产接线仍未启用，不把该 interface 当作安装已完成。
+
+本批交付清单新增完整 patch 的 artifactId/sha256/bytes/format，HTTP 下载后可直接验证并 apply 到基线 clone，无须依赖执行器 commit。A/B 最新提交的准入、可重跑证据和剩余修复见 [扩展复核](docs/rfcs/WP-16/0011-extended-checkpoint-review.md)：A 原五项已修好但三项仍失败，B 验收工具还有过早 PASS 与非法继续命令；两者未整包准入。当前服务不自动重启，后端新行为在下次正常重启后生效。
 
 **本机 Codex MVP 已接入：** 双击 `start.command` 或运行 `pnpm start`，打开 `http://127.0.0.1:5180`。从工作台导入本地 Git 项目，在对话输入目标，点击“委托执行”确认后，真实 Codex 会在独立 worktree 改代码、运行注册检查，供审阅完整 patch 并接受当前交付。无需手动令牌，原项目不自动覆盖。见 [使用指南](docs/ASSISTANT-GUIDE.zh-CN.md) 与 [工作台说明](docs/WORKBENCH.zh-CN.md)。本轮实际范围为 macOS arm64 / Codex 0.164.0 / Node 项目；不是完整 G2 或其它执行器的兼容声明。
 
