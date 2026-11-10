@@ -5,17 +5,28 @@
   "baseCommit": "3957e30",
   "auditedBaseline": "c3f018e",
   "updatedAt": "2026-11-10T05:02:00.000Z",
-  "modelBudget": { "allocated": 0, "used": 0, "note": "No native or model task was dispatched; every path is controlled/fixture." },
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "note": "No native or model task was dispatched; every path is controlled/fixture."
+  },
   "platformMatrix": {
     "measured": "darwin/arm64, Node 24.21.0, SQLite 3.53.4 (better-sqlite3 13.0.3, ABI 137)",
-    "notTested": ["macOS/x64", "Linux x64/arm64", "Windows", "cross-machine install", "personal native start (depends on main/B native admission)"]
+    "notTested": [
+      "macOS/x64",
+      "Linux x64/arm64",
+      "Windows",
+      "cross-machine install",
+      "personal native start (depends on main/B native admission)"
+    ]
   },
   "commits": {
     "checkpoint": "5d32b30",
     "d2": "8035492",
     "d3": "84d407f",
     "d4": "e4ab959",
-    "handoff": "this status file is committed as the final handoff commit; hash recorded in the handoff message"
+    "handoff": "ef07ad1",
+    "handoffNote": "final code/docs/status chain: 5d32b30 (D1) -> 8035492 (D2) -> 84d407f (D3) -> e4ab959 (D4) -> ef07ad1 (D5); this status update records the handoff commit."
   },
   "phases": [
     {
@@ -28,13 +39,30 @@
         "tools/distribution: build + pa-release/1 manifest + zero-model install smoke"
       ],
       "commands": [
-        { "command": "pnpm --dir packages/portability typecheck", "result": "PASS" },
-        { "command": "node --test packages/portability/test/*.case.ts", "result": "PASS (14 at D1)" },
-        { "command": "node --test apps/launcher/test/*.case.mjs", "result": "PASS (5 at D1)" },
-        { "command": "node tools/distribution/build.mjs --install-root . --config-root <tmp> --json", "result": "PASS (269 artifacts, self-checked digests)" },
-        { "command": "node tools/distribution/smoke-install.mjs", "result": "PASS" }
+        {
+          "command": "pnpm --dir packages/portability typecheck",
+          "result": "PASS"
+        },
+        {
+          "command": "node --test packages/portability/test/*.case.ts",
+          "result": "PASS (14 at D1)"
+        },
+        {
+          "command": "node --test apps/launcher/test/*.case.mjs",
+          "result": "PASS (5 at D1)"
+        },
+        {
+          "command": "node tools/distribution/build.mjs --install-root . --config-root <tmp> --json",
+          "result": "PASS (269 artifacts, self-checked digests)"
+        },
+        {
+          "command": "node tools/distribution/smoke-install.mjs",
+          "result": "PASS"
+        }
       ],
-      "evidence": ["tools/distribution/reports/install-smoke.json"]
+      "evidence": [
+        "tools/distribution/reports/install-smoke.json"
+      ]
     },
     {
       "id": "D2",
@@ -46,10 +74,18 @@
         "bounded redacted daemon log, zero-model start/reuse/stop smoke"
       ],
       "commands": [
-        { "command": "node --test apps/launcher/test/*.case.mjs", "result": "PASS (12 at D2)" },
-        { "command": "node tools/distribution/smoke.mjs", "result": "PASS (start/static/health/configuration/reuse/stop 203ms/resources released)" }
+        {
+          "command": "node --test apps/launcher/test/*.case.mjs",
+          "result": "PASS (12 at D2)"
+        },
+        {
+          "command": "node tools/distribution/smoke.mjs",
+          "result": "PASS (start/static/health/configuration/reuse/stop 203ms/resources released)"
+        }
       ],
-      "evidence": ["tools/distribution/reports/zero-model-smoke.json"]
+      "evidence": [
+        "tools/distribution/reports/zero-model-smoke.json"
+      ]
     },
     {
       "id": "D3",
@@ -62,10 +98,18 @@
         "pa backup / pa verify-backup + private backup index"
       ],
       "commands": [
-        { "command": "node --test packages/portability/test/*.case.ts", "result": "PASS (24 at D3; live-writer consistency + negative bundles)" },
-        { "command": "node tools/distribution/smoke.mjs", "result": "PASS (backup-live + verify-backup-live + offline verify)" }
+        {
+          "command": "node --test packages/portability/test/*.case.ts",
+          "result": "PASS (24 at D3; live-writer consistency + negative bundles)"
+        },
+        {
+          "command": "node tools/distribution/smoke.mjs",
+          "result": "PASS (backup-live + verify-backup-live + offline verify)"
+        }
       ],
-      "evidence": ["tools/distribution/reports/zero-model-smoke.json"]
+      "evidence": [
+        "tools/distribution/reports/zero-model-smoke.json"
+      ]
     },
     {
       "id": "D4",
@@ -78,11 +122,22 @@
         "no daemon start and no begin/deliver/answer replay by restore; restored queue preserved"
       ],
       "commands": [
-        { "command": "node --test packages/portability/test/*.case.ts", "result": "PASS (28; restore roundtrip/remap/refusals)" },
-        { "command": "node --test apps/launcher/test/*.case.mjs", "result": "PASS (15; restore/import/rollback refusals)" },
-        { "command": "node tools/distribution/smoke.mjs", "result": "PASS (restore-new-directory, refuses non-empty/corrupted, import, start restored, rollback rehearsal, start after rollback)" }
+        {
+          "command": "node --test packages/portability/test/*.case.ts",
+          "result": "PASS (28; restore roundtrip/remap/refusals)"
+        },
+        {
+          "command": "node --test apps/launcher/test/*.case.mjs",
+          "result": "PASS (15; restore/import/rollback refusals)"
+        },
+        {
+          "command": "node tools/distribution/smoke.mjs",
+          "result": "PASS (restore-new-directory, refuses non-empty/corrupted, import, start restored, rollback rehearsal, start after rollback)"
+        }
       ],
-      "evidence": ["tools/distribution/reports/zero-model-smoke.json"]
+      "evidence": [
+        "tools/distribution/reports/zero-model-smoke.json"
+      ]
     },
     {
       "id": "D5",
@@ -94,11 +149,23 @@
         "explicit NOT_TESTED boundaries and lock regeneration request"
       ],
       "commands": [
-        { "command": "node tools/distribution/smoke-install.mjs", "result": "PASS (4 steps)" },
-        { "command": "node tools/distribution/smoke.mjs", "result": "PASS (28 steps, ~11.5s)" },
-        { "command": "pnpm --dir packages/portability build && pnpm --dir packages/portability typecheck", "result": "PASS" }
+        {
+          "command": "node tools/distribution/smoke-install.mjs",
+          "result": "PASS (4 steps)"
+        },
+        {
+          "command": "node tools/distribution/smoke.mjs",
+          "result": "PASS (28 steps, ~11.5s)"
+        },
+        {
+          "command": "pnpm --dir packages/portability build && pnpm --dir packages/portability typecheck",
+          "result": "PASS"
+        }
       ],
-      "evidence": ["tools/distribution/reports/install-smoke.json", "tools/distribution/reports/zero-model-smoke.json"]
+      "evidence": [
+        "tools/distribution/reports/install-smoke.json",
+        "tools/distribution/reports/zero-model-smoke.json"
+      ]
     }
   ],
   "finalVerification": {
@@ -112,11 +179,36 @@
     "userServicesTouched": "none (isolated temp roots and ephemeral high ports)"
   },
   "crossModuleRequests": [
-    { "id": "GAP-D1", "owner": "main", "request": "Same-origin static console + first-run/config HTTP interface; interim launcher static server + /v1 proxy is documented and removable.", "status": "OPEN" },
-    { "id": "GAP-D2", "owner": "main/A", "request": "Recovery startup mode that opens a restored state without consuming the queue or resending begin/deliver/answer.", "status": "OPEN" },
-    { "id": "GAP-D3", "owner": "A", "request": "Public read port for referenced artifacts + current writer/instance facts; interim read-only SELECT is labelled in code/RFC.", "status": "OPEN" },
-    { "id": "GAP-D4", "owner": "main", "request": "Freeze one local-instance semantic if tools/dev and the launcher converge.", "status": "OPEN" },
-    { "id": "GAP-D5", "owner": "main", "request": "Regenerate root pnpm-lock.yaml for packages/portability and apps/launcher importers (local diff intentionally not committed).", "status": "OPEN" }
+    {
+      "id": "GAP-D1",
+      "owner": "main",
+      "request": "Same-origin static console + first-run/config HTTP interface; interim launcher static server + /v1 proxy is documented and removable.",
+      "status": "OPEN"
+    },
+    {
+      "id": "GAP-D2",
+      "owner": "main/A",
+      "request": "Recovery startup mode that opens a restored state without consuming the queue or resending begin/deliver/answer.",
+      "status": "OPEN"
+    },
+    {
+      "id": "GAP-D3",
+      "owner": "A",
+      "request": "Public read port for referenced artifacts + current writer/instance facts; interim read-only SELECT is labelled in code/RFC.",
+      "status": "OPEN"
+    },
+    {
+      "id": "GAP-D4",
+      "owner": "main",
+      "request": "Freeze one local-instance semantic if tools/dev and the launcher converge.",
+      "status": "OPEN"
+    },
+    {
+      "id": "GAP-D5",
+      "owner": "main",
+      "request": "Regenerate root pnpm-lock.yaml for packages/portability and apps/launcher importers (local diff intentionally not committed).",
+      "status": "OPEN"
+    }
   ],
   "limitations": [
     "Only darwin/arm64 + Node 24.21.x is a measured candidate; macOS x64/Linux/Windows are NOT_TESTED.",
@@ -127,7 +219,7 @@
     "Restored native environment/authentication/policy must be re-probed; restore never converts old authority into new permission."
   ],
   "nextConsumerSteps": [
-    "main: regenerate root lock for the two new importers; review GAP-D1..D5; integrate checkpoint 5d32b30 and D2 8035492, D3 84d407f, D4 e4ab959 + final handoff commit.",
+    "main: regenerate root lock for the two new importers; review GAP-D1..D5; integrate 5d32b30, 8035492, 84d407f, e4ab959 and ef07ad1 (D handoff).",
     "E: consume §5 of docs/rfcs/WP-12/0002-consumption-guide.zh-CN.md with independent PA_*_ROOT; do not weaken assertions; native/cross-machine stays NOT_TESTED.",
     "A: preferred follow-up is GAP-D3 public referenced-artifact/writer read port; bundle format already consumes the current port through a labelled interim adapter.",
     "All: do not treat fixture-mode smoke as native compatibility; native/model budget remains 0 for this package."
