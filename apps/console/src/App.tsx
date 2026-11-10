@@ -53,6 +53,8 @@ import type {
   WorkLocation,
   WorkEnvironment,
   ProjectRegistrationInput,
+  WorkVerificationStatus,
+  VerificationRetryCommand,
 } from '@personal-agent/contracts'
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
@@ -159,6 +161,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [activateWorkId, setActivateWorkId] = useState<string | undefined>()
   const [workLocation, setWorkLocation] = useState<WorkLocation | undefined>()
   const [workEnvironment, setWorkEnvironment] = useState<WorkEnvironment | undefined>()
+  const [workVerification, setWorkVerification] = useState<WorkVerificationStatus | undefined>()
+  const [verificationFailure, setVerificationFailure] = useState<string | undefined>()
   const [locationFailure, setLocationFailure] = useState<string | undefined>()
   const [auth, setAuth] = useState<'checking' | 'required' | 'ready'>(transport.session ? 'checking' : 'ready')
   const [configuration, setConfiguration] = useState<ApplicationConfiguration | undefined>(undefined)
@@ -426,11 +430,13 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   }
 
   const send = useCallback(
-    async (command: UserCommand, label: string): Promise<CommandReceipt | undefined> => {
+    async (command: UserCommand | VerificationRetryCommand, label: string): Promise<CommandReceipt | undefined> => {
       setPending(label)
       setProblem(undefined)
       try {
-        const receipt = await transport.dispatch(command)
+        const receipt = command.kind === 'retry_verification'
+          ? await (transport.retryVerification?.(command) ?? Promise.reject(new TransportError('unsupported_capability', '验证恢复尚未接通')))
+          : await transport.dispatch(command)
         if (receipt.status === 'rejected') {
           setProblem({
             code: receipt.error.code,
@@ -485,6 +491,17 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   useEffect(() => {
     detailRef.current?.scrollTo({ top: 0 })
   }, [selectedWorkId])
+
+  useEffect(() => {
+    setWorkVerification(undefined)
+    setVerificationFailure(undefined)
+    if (!selectedWorkId || !transport.workVerification || !inspectorOpen || modelPanelOpen) return
+    let cancelled = false
+    void transport.workVerification(selectedWorkId)
+      .then(value => { if (!cancelled) setWorkVerification(value) })
+      .catch(() => { if (!cancelled) setVerificationFailure('验证运行状态暂时无法读取。') })
+    return () => { cancelled = true }
+  }, [selectedWorkId, snapshot?.cursor, inspectorOpen, modelPanelOpen, transport])
 
   useEffect(() => {
     setWorkLocation(undefined)
@@ -983,8 +1000,15 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 environment={workEnvironment}
                 locationFailure={locationFailure}
                 verification={verification}
+                operationStatus={workVerification}
+                operationFailure={verificationFailure}
                 artifactReader={transport.artifact ? (id) => transport.artifact!(id) : undefined}
                 pending={pending}
+                onRecheck={async (status) => {
+                  if (!status.candidate || !status.failure || !status.retryAvailable) return
+                  await send({ kind: 'retry_verification', commandId: newId('cmd-recheck'), conversationId,
+                    candidate: status.candidate, blockedId: status.failure.id }, 'recheck')
+                }}
                 onPause={async (work) => {
                   const command: UserCommand = {
                     commandId: newId('cmd-pause'),
@@ -2318,11 +2342,14 @@ function WorkDetail({
   environment,
   locationFailure,
   verification,
+  operationStatus,
+  operationFailure,
   artifactReader,
   pending,
   onPause,
   onStop,
   onRetry,
+  onRecheck,
   onContinue,
   onAccept,
   onRevise,
@@ -2332,11 +2359,14 @@ function WorkDetail({
   environment: WorkEnvironment | undefined
   locationFailure: string | undefined
   verification: VerificationDetail | undefined
+  operationStatus: WorkVerificationStatus | undefined
+  operationFailure: string | undefined
   artifactReader: ((id: string) => Promise<{ contentType: string; text: string } | undefined>) | undefined
   pending: string | undefined
   onPause: (work: WorkView) => Promise<unknown>
   onStop: (work: WorkView) => Promise<unknown>
   onRetry: (assignment: AssignmentRef, token: string) => Promise<unknown>
+  onRecheck: (status: WorkVerificationStatus) => Promise<unknown>
   onContinue: (contract: ContractRef) => Promise<unknown>
   onAccept: (candidate: CandidateRef) => Promise<unknown>
   onRevise: (work: WorkView, goal: string) => Promise<boolean>
@@ -2449,6 +2479,22 @@ function WorkDetail({
         ))}
       </ul>
       <h4>验证结果</h4>
+      {operationFailure && <p className="warn-text" role="status">{operationFailure}</p>}
+      {operationStatus?.workId === work.work.id && operationStatus.state !== 'not_ready' && operationStatus.state !== 'finished' && (
+        <section className="work-location verification-operation" aria-label="验证运行状态">
+          <p role="status" className={operationStatus.state === 'blocked' ? 'warn-text' : 'context-line'}>
+            {{ queued: '等待验证', running: '正在运行注册检查', retry_wait: '验证暂时受阻，正在有限重试', blocked: '验证受阻，自动重试已停止' }[operationStatus.state]}
+          </p>
+          {operationStatus.failure && <>
+            <p className="context-line">{operationStatus.failure.code === 'verification_failed'
+              ? '请核对候选文件和依赖环境，修复后重新检查。'
+              : '请确认本地存储和磁盘可用，恢复后重新检查。'}</p>
+            {operationStatus.retryAvailable && <button type="button" className="quiet" disabled={!!pending}
+              onClick={() => void onRecheck(operationStatus)}><RefreshCw size={15} />{pending === 'recheck' ? '正在提交' : '重新检查'}</button>}
+            {!operationStatus.retryAvailable && <p className="context-line">当前资源状态不允许重新检查，请核对执行记录。</p>}
+          </>}
+        </section>
+      )}
       {!work.actions.currentVerificationId && <p className="empty">还没有当前候选的验证。</p>}
       {work.actions.currentVerificationId && (
         <div className={`verification${stale ? ' stale' : ''}`}>

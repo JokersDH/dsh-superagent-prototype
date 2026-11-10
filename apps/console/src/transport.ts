@@ -16,6 +16,8 @@ import {
   ProjectRegistrationInputSchema,
   WorkLocationSchema,
   WorkEnvironmentSchema,
+  WorkVerificationStatusSchema,
+  VerificationRetryCommandSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -32,6 +34,8 @@ import type {
   ProjectRegistrationInput,
   WorkLocation,
   WorkEnvironment,
+  WorkVerificationStatus,
+  VerificationRetryCommand,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -76,6 +80,8 @@ export interface ConsoleTransport {
   registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
   workLocation?(workId: string): Promise<WorkLocation | undefined>
   workEnvironment?(workId: string): Promise<WorkEnvironment | undefined>
+  workVerification?(workId: string): Promise<WorkVerificationStatus | undefined>
+  retryVerification?(command: VerificationRetryCommand): Promise<CommandReceipt>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -252,6 +258,25 @@ export class HttpTransport implements ConsoleTransport {
     return AssistantProviderStatusSchema.parse(
       await this.request('/v1/assistant/model', { method: 'POST', body: JSON.stringify({ model }) }),
     )
+  }
+  async workVerification(workId: string): Promise<WorkVerificationStatus | undefined> {
+    try {
+      const value = WorkVerificationStatusSchema.parse(await this.request(`/v1/works/${encodeURIComponent(workId)}/verification`))
+      if (value.workId !== workId) throw new TransportError('schema_mismatch', '验证状态属于另一项工作')
+      return value
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async retryVerification(input: VerificationRetryCommand): Promise<CommandReceipt> {
+    const command = VerificationRetryCommandSchema.parse(input)
+    const receipt = CommandReceiptSchema.parse(await this.request(`/v1/works/${encodeURIComponent(command.candidate.contract.workId)}/verification/retry`, {
+      method: 'POST', body: JSON.stringify(command),
+    }))
+    if (receipt.commandId !== command.commandId || (receipt.workId && receipt.workId !== command.candidate.contract.workId))
+      throw new TransportError('schema_mismatch', '验证恢复回执身份不匹配')
+    return receipt
   }
   async *assistantChanges(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate> {
     if (signal.aborted) return

@@ -26,6 +26,8 @@ import {
   UserCommandSchema,
   VerificationSchema,
   WorkViewSchema,
+  VerificationRetryCommandSchema,
+  WorkVerificationStatusSchema,
 } from '@personal-agent/contracts'
 import type {
   AnswerDelivery,
@@ -39,6 +41,9 @@ import type {
   ApplicationService,
   TrustedActor,
   Verification,
+  CommandReceipt,
+  VerificationRetryCommand,
+  WorkVerificationStatus,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -80,6 +85,9 @@ export interface LocalHttpOptions {
   /** Explicit loopback-only fixture convenience; normal entries still require credentials. */
   localDevelopmentAccess?: boolean
   now?: () => number
+  operations?: {
+    retryVerification(command: VerificationRetryCommand, actor: TrustedActor): Promise<CommandReceipt>
+  }
   read?: {
     assistant?(): Promise<AssistantProviderStatus>
     assistantStream?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
@@ -88,6 +96,7 @@ export interface LocalHttpOptions {
     registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
     workLocation?(workId: string): Promise<WorkLocation>
     workEnvironment?(workId: string): Promise<WorkEnvironment>
+    workVerification?(workId: string): Promise<WorkVerificationStatus>
     configuration?(): Promise<ApplicationConfiguration>
     verification?(id: string): Promise<Verification | undefined>
     deliveries?(questionId: string): Promise<readonly AnswerDelivery[]>
@@ -256,6 +265,31 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
   app.get('/v1/works/:id/environment', async (c) => {
     if (!options.read?.workEnvironment) throw new ApplicationFault('unsupported_capability', 'Environment read port is not connected')
     return c.json(WorkEnvironmentSchema.parse(await options.read.workEnvironment(IdSchema.parse(c.req.param('id')))))
+  })
+  app.get('/v1/works/:id/verification', async (c) => {
+    if (Object.keys(c.req.query()).length)
+      throw new ApplicationFault('invalid_request', 'Verification status does not accept query parameters')
+    if (!options.read?.workVerification)
+      throw new ApplicationFault('unsupported_capability', 'Verification status is not connected')
+    const workId = IdSchema.parse(c.req.param('id'))
+    const value = WorkVerificationStatusSchema.parse(await options.read.workVerification(workId))
+    if (value.workId !== workId)
+      throw new ApplicationFault('storage_unavailable', 'Verification status identity mismatch', 'none')
+    return c.json(value)
+  })
+  app.post('/v1/works/:id/verification/retry', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json'))
+      throw new ApplicationFault('invalid_request', 'Verification recovery requires JSON')
+    if (!options.operations?.retryVerification)
+      throw new ApplicationFault('unsupported_capability', 'Verification recovery is not connected')
+    const workId = IdSchema.parse(c.req.param('id'))
+    const command = VerificationRetryCommandSchema.parse(await c.req.json())
+    if (command.candidate.contract.workId !== workId)
+      throw new ApplicationFault('invalid_request', 'Recovery command belongs to another work')
+    const receipt = CommandReceiptSchema.parse(await options.operations.retryVerification(command, c.get('actor')))
+    if (receipt.commandId !== command.commandId || (receipt.workId && receipt.workId !== workId))
+      throw new ApplicationFault('storage_unavailable', 'Recovery receipt identity mismatch', 'none')
+    return c.json(receipt)
   })
   app.get('/v1/assistant/stream', (c) => {
     const { conversationId } = z.strictObject({ conversationId: IdSchema }).parse(c.req.query())

@@ -70,6 +70,7 @@ const http = createLocalHttpApp({
   mode: values.native ? 'personal' : 'fixture',
   localDevelopmentAccess: values['local-access'] === true,
   read: product.read,
+  operations: product.operations,
 })
 const server = listenLocalHttp(http, port)
 product.start()

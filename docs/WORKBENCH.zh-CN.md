@@ -40,6 +40,10 @@ pnpm dev:workbench --port 5181 --api-port 8797 --state /absolute/private/workben
 
 ## 复验
 
+验证异常时，工作详情会显示原因；基础设施异常最多自动尝试三次，候选/环境失效则直接等待处理。恢复条件满足后可点击“重新检查”，仅运行当前合同已有的注册检查，不重新编码。已经产生的机器 FAIL 不能通过重新检查或人工接受覆盖；需要修改目标或实现时使用工作修订流程。关闭重开会保留故障与操作回执。
+
+恢复接口和独立浏览器验收见 [验证恢复检查点](rfcs/WP-16/0014-verification-recovery-checkpoint.md)，运行 `pnpm check:verification-recovery` 可在自建隔离实例验证，无需操作当前用户服务，也不会调用模型。
+
 ```sh
 pnpm check:g2-workbench
 pnpm check:g2-browser

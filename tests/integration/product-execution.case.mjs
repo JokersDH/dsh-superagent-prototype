@@ -11,6 +11,7 @@ import { key } from '../../packages/orchestrator-core/dist/index.js'
 import { ProductStore } from '../../packages/storage/dist/index.js'
 import { createControlledProduct, FIXTURE_CHECK } from '../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../apps/coordinator/http/app.ts'
+import { ApplicationFault } from '../../packages/application/dist/index.js'
 
 const principal = { userId: 'local-product-user', authorityRef: 'local-product-authority' }
 const actor = { ...principal, source: 'local_cli' }
@@ -34,7 +35,7 @@ async function until(read, predicate, timeout = 7000) {
   }
   throw new Error(`Product condition timed out: ${JSON.stringify(latest)}`)
 }
-function fixture(t, projectScope = scope) {
+function fixture(t, projectScope = scope, applicationOptions = {}) {
   const root = mkdtempSync(join(tmpdir(), 'pa-product-test-'))
   const stateRoot = join(root, 'state'),
     scratchProject = join(root, 'project')
@@ -56,6 +57,7 @@ function fixture(t, projectScope = scope) {
   ])
   const store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
   const options = {
+    ...applicationOptions,
     store,
     principal,
     projects: [{ id: scope.projectId, scope: projectScope }],
@@ -588,6 +590,156 @@ test(
     )
   },
 )
+
+test('verification infrastructure failures stop after three tries and recover through authenticated idempotent HTTP', { timeout: 20000 }, async (t) => {
+  const h = fixture(t)
+  let calls = 0
+  h.product.completion.verify = async () => { calls++; throw new Error('private-debug-value') }
+  h.product.start()
+  const created = await h.create('pass')
+  const blocked = await until(() => h.product.read.workVerification(created.workId), value => value.state === 'blocked')
+  assert.equal(calls, 3)
+  assert.equal(blocked.failure.failureCount, 3)
+  assert.equal(blocked.failure.code, 'storage_unavailable')
+  assert.equal(blocked.retryAvailable, true)
+  assert.equal((await h.view(created.workId)).phase, 'needs_user')
+  assert.doesNotMatch(JSON.stringify(blocked), /private-debug-value/)
+  assert.equal(h.store.queue.dueRows('application.verify', Number.MAX_SAFE_INTEGER, 100).length, 0)
+  await h.reopen()
+  await h.product.execution.effects.idle('application.verify')
+  assert.deepEqual(await h.product.read.workVerification(created.workId), blocked)
+
+  const token = 'a'.repeat(64)
+  const http = createLocalHttpApp({ application: h.product.application, principal, apiToken: token,
+    bootstrapToken: 'b'.repeat(64), allowedOrigins: ['http://127.0.0.1:5173'], mode: 'fixture',
+    read: h.product.read, operations: h.product.operations })
+  const url = `http://127.0.0.1/v1/works/${created.workId}/verification`
+  const headers = { authorization: `Bearer ${token}`, 'content-type': 'application/json' }
+  assert.equal((await http.request(url)).status, 401)
+  assert.equal((await http.request(`${url}/retry`, { method: 'POST', body: '{}' })).status, 401)
+  assert.deepEqual(await (await http.request(url, { headers })).json(), blocked)
+  assert.equal((await http.request(`${url}?unknown=1`, { headers })).status, 400)
+  const command = { kind: 'retry_verification', commandId: 'http-recheck-1', conversationId: 'conversation-product',
+    candidate: blocked.candidate, blockedId: blocked.failure.id }
+  const post = value => http.request(`${url}/retry`, { method: 'POST', headers, body: JSON.stringify(value) })
+  assert.equal((await post({ ...command, actor: { userId: 'forged' } })).status, 400)
+  assert.equal((await http.request('http://127.0.0.1/v1/works/wrong-work/verification/retry', {
+    method: 'POST', headers, body: JSON.stringify(command) })).status, 400)
+  const [first, replay] = await Promise.all([post(command), post(command)])
+  const receipt = await first.json()
+  assert.equal(receipt.status, 'recorded')
+  assert.deepEqual(await replay.json(), receipt)
+  assert.equal((await post({ ...command, conversationId: 'another-conversation' })).status, 409)
+  const ready = await until(() => h.view(created.workId), value => value.actions.available.includes('accept_candidate'))
+  assert.equal((await h.product.read.workVerification(created.workId)).state, 'finished')
+  assert.equal(h.frames().filter(frame => frame.type === 'begin').length, 1)
+  assert.equal((await h.command({ kind: 'accept_candidate', candidate: ready.actions.currentCandidate })).status, 'recorded')
+  await h.reopen()
+  assert.deepEqual(await h.product.application.retryVerification(command, actor), receipt)
+  assert.equal((await h.view(created.workId)).phase, 'delivered')
+  assert.equal(h.frames().filter(frame => frame.type === 'begin').length, 1)
+})
+
+test('invalid verification blocks immediately; stale blocks and rolled-back recovery never enqueue work', { timeout: 15000 }, async (t) => {
+  const h = fixture(t)
+  const verify = h.product.completion.verify.bind(h.product.completion)
+  let calls = 0
+  h.product.completion.verify = async () => { calls++; throw new ApplicationFault('verification_failed', 'private-artifact-path') }
+  h.product.start()
+  const created = await h.create('pass')
+  const first = await until(() => h.product.read.workVerification(created.workId), value => value.state === 'blocked')
+  assert.equal(calls, 1)
+  assert.equal(first.failure.code, 'verification_failed')
+  const command = { kind: 'retry_verification', commandId: 'invalid-recheck-1', conversationId: 'conversation-product',
+    candidate: first.candidate, blockedId: first.failure.id }
+  await assert.rejects(h.product.application.retryVerification(command, { ...actor, userId: 'another-user' }),
+    error => error.error.code === 'forbidden')
+  const wrongConversation = await h.product.application.retryVerification({ ...command, commandId: 'wrong-conversation',
+    conversationId: 'another-conversation' }, actor)
+  assert.equal(wrongConversation.error.code, 'conflict')
+  const wrongGeneration = await h.product.application.retryVerification({ ...command, commandId: 'wrong-generation',
+    candidate: { ...command.candidate, candidateGeneration: command.candidate.candidateGeneration + 1 } }, actor)
+  assert.equal(wrongGeneration.error.code, 'stale_candidate')
+
+  const enqueue = h.store.queue.enqueue.bind(h.store.queue)
+  h.store.queue.enqueue = (...args) => {
+    if (args[0] === 'application.verify') throw new ApplicationFault('storage_unavailable', 'Injected enqueue failure')
+    return enqueue(...args)
+  }
+  const refused = await h.product.application.retryVerification({ ...command, commandId: 'rollback-recheck' }, actor)
+  h.store.queue.enqueue = enqueue
+  assert.equal(refused.error.code, 'storage_unavailable')
+  assert.deepEqual(await h.product.read.workVerification(created.workId), first)
+  assert.equal((await h.product.application.retryVerification(command, actor)).status, 'recorded')
+  const second = await until(() => h.product.read.workVerification(created.workId),
+    value => value.state === 'blocked' && value.failure.id !== first.failure.id)
+  assert.equal(calls, 2)
+  const old = await h.product.application.retryVerification({ ...command, commandId: 'old-block-recheck' }, actor)
+  assert.equal(old.error.code, 'stale_candidate')
+  assert.equal((await h.product.application.retryVerification(command, actor)).status, 'recorded')
+  assert.equal(calls, 2)
+  assert.equal((await h.product.read.workVerification(created.workId)).failure.id, second.failure.id)
+  h.product.completion.verify = verify
+  const resumed = await h.product.application.retryVerification({ ...command, commandId: 'recovered-recheck', blockedId: second.failure.id }, actor)
+  assert.equal(resumed.status, 'recorded')
+  await until(() => h.view(created.workId), value => value.actions.available.includes('accept_candidate'))
+  assert.equal(h.frames().filter(frame => frame.type === 'begin').length, 1)
+})
+
+test('changed resource proof and retired candidates cannot use a previously valid recovery action', { timeout: 15000 }, async (t) => {
+  const h = fixture(t)
+  h.product.completion.verify = async () => { throw new ApplicationFault('verification_failed', 'Injected unavailable candidate') }
+  h.product.start()
+  const created = await h.create('pass')
+  const status = await until(() => h.product.read.workVerification(created.workId), value => value.state === 'blocked')
+  const binding = h.store.bindings.current(status.candidate.ticketId)
+  h.store.bindings.record({ ...binding, resources: [...binding.resources,
+    { ref: 'new-unproven-resource', ownership: 'spawned_process' }] })
+  assert.equal((await h.product.read.workVerification(created.workId)).retryAvailable, false)
+  const command = { kind: 'retry_verification', commandId: 'changed-resource-proof', conversationId: 'conversation-product',
+    candidate: status.candidate, blockedId: status.failure.id }
+  const held = await h.product.application.retryVerification(command, actor)
+  assert.equal(held.error.code, 'writer_indeterminate')
+  await h.command({ kind: 'stop_work', workId: created.workId })
+  const stopped = await h.product.application.retryVerification({ ...command, commandId: 'retired-candidate' }, actor)
+  assert.equal(stopped.error.code, 'stale_candidate')
+  assert.equal(h.store.queue.dueRows('application.verify', Number.MAX_SAFE_INTEGER, 100).length, 0)
+  assert.equal(h.frames().filter(frame => frame.type === 'begin').length, 1)
+})
+
+test('a non-PASS machine result is immutable and cannot be converted into a recheck or acceptance', { timeout: 15000 }, async (t) => {
+  const h = fixture(t)
+  h.product.start()
+  const created = await h.create('fail')
+  const ready = await until(() => h.view(created.workId), value => !!value.actions.currentVerificationId)
+  const status = await h.product.read.workVerification(created.workId)
+  assert.equal(status.state, 'finished')
+  assert.equal(status.retryAvailable, false)
+  const denied = await h.product.application.retryVerification({ kind: 'retry_verification', commandId: 'cannot-recheck-fail',
+    conversationId: 'conversation-product', candidate: ready.actions.currentCandidate, blockedId: 'invented-block' }, actor)
+  assert.equal(denied.status, 'rejected')
+  assert.equal(ready.actions.available.includes('accept_candidate'), false)
+  assert.equal(h.store.queue.dueRows('application.verify', Number.MAX_SAFE_INTEGER, 100).length, 0)
+  assert.equal(h.frames().filter(frame => frame.type === 'begin').length, 1)
+})
+
+test('expired authorization removes recovery and refuses a schema-valid current candidate', { timeout: 15000 }, async (t) => {
+  let now = Date.now()
+  const expiringScope = { ...scope, expiresAt: new Date(now + 60000).toISOString() }
+  const h = fixture(t, expiringScope, { now: () => new Date(now).toISOString() })
+  h.product.completion.verify = async () => { throw new ApplicationFault('verification_failed', 'Injected unavailable candidate') }
+  h.product.start()
+  const created = await h.command({ kind: 'create_work', projectId: scope.projectId, scope: expiringScope,
+    goal: 'Candidate with expiring authorization', profileId: 'profile-fixture-pass', criteria })
+  const blocked = await until(() => h.product.read.workVerification(created.workId), value => value.state === 'blocked')
+  now += 120000
+  const status = await h.product.read.workVerification(created.workId)
+  assert.equal(status.retryAvailable, false)
+  const result = await h.product.application.retryVerification({ kind: 'retry_verification', commandId: 'expired-recheck',
+    conversationId: 'conversation-product', candidate: blocked.candidate, blockedId: blocked.failure.id }, actor)
+  assert.equal(result.error.code, 'stale_contract')
+  assert.equal(h.frames().filter(frame => frame.type === 'begin').length, 1)
+})
 
 test(
   'authenticated HTTP commands drive the actual child and expose only published artifacts',

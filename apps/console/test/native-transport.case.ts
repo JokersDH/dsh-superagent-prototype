@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import type { ProjectRegistrationInput } from '@personal-agent/contracts'
+import type { ProjectRegistrationInput, VerificationRetryCommand } from '@personal-agent/contracts'
 import { HttpTransport, TransportError } from '../src/transport.ts'
 import { fixtureConfiguration } from '../src/fixture.ts'
 
@@ -82,4 +82,28 @@ test('an unavailable location reader degrades but authentication failures remain
     new HttpTransport().workLocation('work-one'),
     (error) => error instanceof TransportError && error.code === 'auth_required',
   )
+})
+
+test('verification status refuses another work and recovery requires its matching receipt', async (t) => {
+  const original = globalThis.fetch
+  t.after(() => { globalThis.fetch = original })
+  const command: VerificationRetryCommand = { kind: 'retry_verification', commandId: 'recheck-one',
+    conversationId: 'conversation-one', candidate: { ticketId: 'ticket-one', assignmentId: 'assignment-one',
+      contract: { workId: 'work-one', revision: 1, digest: 'a'.repeat(64) }, candidateGeneration: 1 }, blockedId: 'block-one' }
+  const status = { protocol: 'work-verification/1', workId: 'work-one', state: 'blocked', candidate: command.candidate,
+    failure: { id: command.blockedId, code: 'storage_unavailable', failureCount: 3 }, retryAvailable: true }
+  globalThis.fetch = async () => new Response(JSON.stringify({ ...status, workId: 'another-work', candidate: undefined }))
+  await assert.rejects(new HttpTransport().workVerification('work-one'))
+  const requests: { input: string; init: RequestInit | undefined }[] = []
+  globalThis.fetch = async (input, init) => {
+    requests.push({ input: String(input), init })
+    return new Response(JSON.stringify(init?.method === 'POST'
+      ? { status: 'recorded', commandId: command.commandId, workId: 'work-one', seq: 1 } : status))
+  }
+  assert.deepEqual(await new HttpTransport().workVerification('work-one'), status)
+  assert.equal((await new HttpTransport().retryVerification(command)).status, 'recorded')
+  assert.equal(requests[1]?.input, '/v1/works/work-one/verification/retry')
+  assert.deepEqual(JSON.parse(String(requests[1]?.init?.body)), command)
+  globalThis.fetch = async () => new Response(JSON.stringify({ status: 'recorded', commandId: 'wrong-command', seq: 1 }))
+  await assert.rejects(new HttpTransport().retryVerification(command), error => error instanceof TransportError && error.code === 'schema_mismatch')
 })

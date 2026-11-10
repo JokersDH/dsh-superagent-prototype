@@ -85,6 +85,13 @@ export function createProductRuntime(
     profileIds: [...(options.native ? [options.native.profile.id] : []), ...FIXTURE_PROFILES],
     registeredChecks: checks.ids(),
     completion,
+    verificationRecovery: {
+      blocked: candidate => execution?.verificationBlocked(candidate) ?? false,
+      retry: (candidate, blockedId) => {
+        if (!execution) throw new ApplicationFault('unsupported_capability', 'Verification recovery is not ready')
+        execution.retryVerification(candidate, blockedId)
+      },
+    },
     assistantReplies: options.assistantProvider !== undefined,
     projectPreflight: async (projectId) => {
       const record = options.projectRegistry?.list().find((project) => project.id === projectId)
@@ -112,6 +119,11 @@ export function createProductRuntime(
       nativeExecution: !!options.native,
     })
   const read: NonNullable<LocalHttpOptions['read']> = {
+    workVerification: async (workId) => {
+      const work = (await application.inspect({ workId })).works[0]
+      if (!work) throw new ApplicationFault('invalid_request', 'Unknown work')
+      return execution!.verificationStatus(work)
+    },
     ...(options.native && options.projectRegistry
       ? {
           registerProject: async (input) => {
@@ -276,6 +288,7 @@ export function createProductRuntime(
     workspaces,
     checks,
     read,
+    operations: { retryVerification: application.retryVerification.bind(application) },
     start: () => execution!.start(),
     close: () => {
       assistantStreams.close()
