@@ -7,6 +7,8 @@ export {
   type Conversation, type ConversationPage, type ConversationSearchPage, type DecisionRecord,
   type ProjectCurrent, type ProjectSettings, type ProjectVersion, type WorkIndexEntry, type SourceMessageMetadata, type TimelineEntry, type WorkflowStateFacts, type EvidencePage,
 } from './ports.ts'
+export { recoveryTargetInventory, createRecoveryTargetInventoryReader } from '@personal-agent/storage'
+export type { RecoveryTargetInventory } from '@personal-agent/contracts'
 export {
   WorkflowSnapshots, SnapshotError, readSnapshotManifest, snapshotFileBytes,
   type SnapshotArtifact, type SnapshotManifest, type SnapshotResult, type SnapshotVerification,
