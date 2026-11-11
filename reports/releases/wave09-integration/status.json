@@ -1,0 +1,46 @@
+{
+  "status": "PASS_SCOPED_CONTEXT_AND_EVIDENCE_PRODUCT_CHECKPOINT",
+  "sourceCommit": "32fc7aee99b30b49030208d6bac95e843cc38d9c",
+  "baseCommit": "531c6b6",
+  "acceptedContextCandidate": "45f4a1b1da2a112a8c0d21ec769dc0697a8f505c",
+  "contextAdmissionCommit": "339ae56",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "measurements": [
+    { "command": "pnpm --filter @personal-agent/contracts test", "status": "PASS", "passed": 220, "exitCode": 0 },
+    { "command": "pnpm --filter @personal-agent/contracts check:generated", "status": "PASS", "exitCode": 0 },
+    { "command": "pnpm --filter @personal-agent/console test", "status": "PASS", "passed": 25, "exitCode": 0 },
+    { "command": "pnpm --filter @personal-agent/console build", "status": "PASS", "exitCode": 0, "note": "existing chunk over 500KB warning" },
+    { "command": "pnpm --filter @personal-agent/console typecheck", "status": "PASS", "exitCode": 0 },
+    { "command": "pnpm --filter @personal-agent/coordinator typecheck:product", "status": "PASS", "exitCode": 0 },
+    { "command": "pnpm --filter @personal-agent/coordinator typecheck:http", "status": "PASS", "exitCode": 0 },
+    { "command": "node --test tests/integration/context-preview.case.mjs tests/integration/evidence-history.case.mjs tests/integration/proposal-commands.case.mjs", "status": "PASS", "passed": 28, "exitCode": 0 },
+    { "command": "node --test tests/integration/context-preview.case.mjs tests/integration/product-execution.case.mjs", "status": "PASS", "passed": 34, "exitCode": 0 },
+    { "command": "node tests/integration/context-workbench-browser.mjs --no-capture", "status": "PASS", "passed": 6, "exitCode": 0, "evidence": "context-browser/browser-report.json" },
+    { "command": "node tests/integration/evidence-workbench-browser.mjs --no-capture", "status": "PASS", "passed": 8, "exitCode": 0, "evidence": "evidence-browser/browser-report.json" },
+    { "command": "node tools/bootstrap/probe-wave09-target-inventory.mjs /Users/hh/Desktop/joker/superagent-agent-a", "status": "FAIL", "passed": 1, "failed": 3, "exitCode": 1, "candidate": "7f7e83e0d82b26c33eace6a516cf791e4f970767", "evidence": "recovery-inventory-admission.json" }
+  ],
+  "wave09": {
+    "M1": "BLOCKED_A_INVENTORY_NEGATIVES_AND_D_PUBLISHED_MATERIALIZER",
+    "M2": "PASS_READONLY_CONTEXT_HTTP_AND_UI",
+    "M3": "PASS_EVIDENCE_HISTORY_HTTP_AND_UI",
+    "M4": "NOT_IMPLEMENTED_TARGET_ACTIVATION",
+    "M5": "NOT_ADMITTED_CURRENT_SOURCE_INSTALLATION",
+    "M6": "PARTIAL_CURRENT_SOURCE_DEVELOPMENT_PREVIEW"
+  },
+  "nextConsumers": {
+    "A": "Close missing table manifest, arbitrary FTS prefix and snapshot digest race negatives; rerun fixed probe",
+    "D": "Publish immutable wave09 RecoveryTargetMaterializer source before main consumption; preserve mode/resource fixes",
+    "E": "Consume exact32fc7ae HTTP/UI source for M2/M3 independently; installation/activation remain separate",
+    "main": "Admit A/D checkpoints then implement actual source-to-private-target authorization and activation"
+  },
+  "limitations": [
+    "Context is explicit metadata/discussion preview, without repository body scan or automatic model attachment",
+    "Concurrent committed events conservatively invalidate context preview and can require retry",
+    "History is per-read keyset observation, not a frozen cross-page snapshot",
+    "Review activity remains partial observational metadata",
+    "No target activation, new native/control admission, current-source installer or product-wide release admission",
+    "Screenshots predate clean-source no-capture replay and are labeled separately"
+  ]
+}

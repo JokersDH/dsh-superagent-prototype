@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "wave": "product-wave-10",
+  "date": "2026-11-11",
+  "status": "PLANNED_NOT_EXECUTED",
+  "reviewBaseline": "2caee2e68d5891ed7d2d3a4550087aaf2e91d3bd",
+  "interfaceCheckpoint": "677cf26",
+  "sharedBoundary": "docs/rfcs/WP-16/0033-wave-10-admission-and-product-closure.md",
+  "contextBindingContract": "packages/contracts/src/assistant-context.ts",
+  "targetContract": "packages/contracts/src/recovery-target.ts",
+  "newModelAllowance": 0,
+  "nativeModelsStartedByThisDispatch": 0,
+  "newDriverImplementation": false,
+  "studyState": "BLOCKED_CURRENT_RECIPE",
+  "pilotGatesProductAcceptance": false,
+  "normalInstallRequiresRecoveryActivation": false,
+  "preservedUserServices": [[5180,8796],[5181,8797],[5182,8798],[5183,8799],[5184,8800],[5185,8801],[5186,8802],[5187,8803]],
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a", "branch": "codex/g2-workspaces-verification",
+      "candidate": "7f7e83e0d82b26c33eace6a516cf791e4f970767",
+      "packet": "agent-tasks/product-wave-10/agent-a-storage.zh-CN.md",
+      "ownedPaths": ["packages/storage/", "packages/workflows/"],
+      "phases": ["A1","A2","A3","A4","A5","A6"], "budgetMode": "zero_native_model_tasks_this_wave",
+      "evidencePath": "packages/workflows/reports/wave10-status.json"
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b", "branch": "codex/g1-runtime",
+      "candidate": "1175053d1598cd981a1bb20812d56a61fd4be277",
+      "packet": "agent-tasks/product-wave-10/agent-b-runtime.zh-CN.md",
+      "ownedPaths": ["packages/execution/","packages/catalog/","packages/policy-preparation/","packages/driver-kit/","packages/testing/","packages/drivers/","apps/runner/","tests/native-acceptance/"],
+      "phases": ["B1","B2","B3","B4","B5","B6"], "budgetMode": "zero_native_model_tasks_this_wave",
+      "evidencePath": "tests/native-acceptance/reports/wave10-status.json",
+      "grantId": "wave03-b-native", "historicalLimit": 4, "remaining": "UNKNOWN_NOT_SPENDABLE", "resetLedger": false,
+      "newFeasibilityInvestigations": 0
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c", "branch": "codex/g3-assistant-context",
+      "candidate": "e58cf258351afc094adbb86e048b1ad48d2a1c54",
+      "packet": "agent-tasks/product-wave-10/agent-c-context.zh-CN.md",
+      "ownedPaths": ["packages/context/","packages/proposals/","packages/knowledge/","packages/routing/"],
+      "phases": ["C1","C2","C3","C4","C5","C6"], "budgetMode": "zero_native_model_tasks_this_wave",
+      "evidencePath": "packages/context/reports/wave10-status.json"
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d", "branch": "codex/g3-local-distribution",
+      "candidate": "25e564315d11432b7932ef336d2122df119f88c0",
+      "packet": "agent-tasks/product-wave-10/agent-d-distribution.zh-CN.md",
+      "ownedPaths": ["apps/launcher/","tools/distribution/","packages/portability/"],
+      "phases": ["D1","D2","D3","D4","D5","D6"], "budgetMode": "zero_native_model_tasks_this_wave",
+      "evidencePath": "tools/distribution/reports/wave10-status.json"
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e", "branch": "codex/g3-product-acceptance",
+      "candidate": "57f5d19daf033bbf021083440d56ff06979508bf",
+      "packet": "agent-tasks/product-wave-10/agent-e-acceptance.zh-CN.md",
+      "ownedPaths": ["tests/product-acceptance/"],
+      "phases": ["E1","E2","E3","E4","E5","E6"], "budgetMode": "zero_native_model_tasks_this_wave",
+      "evidencePath": "tests/product-acceptance/reports/wave10-status.json",
+      "grantId": "wave05-independent-review-pilot-01", "maxNativeTurnStarts": 24, "maxAuthorTurnStarts": 8, "maxReviewTurnStarts": 16,
+      "maxBillableTokens": 200000, "maxCostUSD": 5, "maxInFlight": 1,
+      "resetLedger": false, "reconcileActualLedgerBeforeSend": true, "unknownCostIsZero": false,
+      "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE", "cliFallbackAllowed": false
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent", "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-10/main.zh-CN.md",
+      "ownedPaths": ["packages/contracts/","packages/application/","packages/questions/","apps/coordinator/","apps/console/","agent-tasks/product-wave-10/","docs/rfcs/WP-16/"],
+      "phases": ["M1","M2","M3","M4","M5","M6"], "budgetMode": "zero_native_model_tasks_this_wave",
+      "evidencePath": "reports/releases/wave10-integration/status.json",
+      "additionalOwnership": ["root_configuration_and_lock","shared_docs","cross_module_integration"]
+    }
+  },
+  "checkpoints": {
+    "A-reader": { "owner": "A", "dependsOn": [] },
+    "A-binding": { "owner": "A", "dependsOn": [] },
+    "B-types": { "owner": "B", "dependsOn": [] },
+    "B-resource-consumer": { "owner": "B", "dependsOn": ["B-types"] },
+    "B-sender": { "owner": "B", "dependsOn": ["B-types"] },
+    "C-adapters": { "owner": "C", "dependsOn": [] },
+    "C-projection": { "owner": "C", "dependsOn": ["C-adapters"] },
+    "D-resources": { "owner": "D", "dependsOn": [] },
+    "D-material": { "owner": "D", "dependsOn": [] },
+    "D-install-source": { "owner": "D", "dependsOn": ["D-resources"] },
+    "E-current-ui": { "owner": "E", "dependsOn": [] },
+    "E-schema-parameters": { "owner": "E", "dependsOn": [] },
+    "M-target-prepare": { "owner": "main", "dependsOn": ["A-reader","D-material"] },
+    "M-context-use": { "owner": "main", "dependsOn": ["A-binding","C-projection"] },
+    "M-activation": { "owner": "main", "dependsOn": ["M-target-prepare","D-resources","B-resource-consumer"] },
+    "M-install-freeze": { "owner": "main", "dependsOn": ["D-install-source"] },
+    "D-install-bytes": { "owner": "D", "dependsOn": ["M-install-freeze"] },
+    "E-new-install": { "owner": "E", "dependsOn": ["D-install-bytes","E-schema-parameters"] },
+    "E-context-use": { "owner": "E", "dependsOn": ["M-context-use"] },
+    "E-activation": { "owner": "E", "dependsOn": ["M-activation"] },
+    "E-sender-refusal": { "owner": "E", "dependsOn": ["B-sender"] }
+  }
+}

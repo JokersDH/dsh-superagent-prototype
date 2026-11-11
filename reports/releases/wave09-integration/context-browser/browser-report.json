@@ -1,0 +1,39 @@
+{
+  "status": "PASS_CONTEXT_HTTP_BROWSER",
+  "sourceCommit": "32fc7aee99b30b49030208d6bac95e843cc38d9c",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-11T11:11:50.293Z",
+  "cases": [
+    {
+      "id": "EXPLICIT-PREVIEW-READS-REAL-SELECTED-SOURCES-WITHOUT-WRITES",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-MOBILE-SOURCE-AND-DIGEST-DETAIL-DO-NOT-OVERFLOW",
+      "status": "PASS"
+    },
+    {
+      "id": "SOURCE-SELECTION-EMPTY-STATE-AND-INVALID-BUDGET",
+      "status": "PASS"
+    },
+    {
+      "id": "PROJECT-CHANGE-CLEARS-PREVIEW-AND-PRESERVES-ORIGINAL-CONVERSATION",
+      "status": "PASS"
+    },
+    {
+      "id": "EXPIRED-PROJECT-DISABLES-PREVIEW-WITH-AN-ACTIONABLE-STATE",
+      "status": "PASS"
+    },
+    {
+      "id": "KEYBOARD-CLOSE-RESTORES-FOCUS-AND-NO-BUSINESS-EFFECTS",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "limitations": [
+    "Actual local HTTP/SQLite/A/C readers and UI; runtime effects deliberately not started",
+    "Expiry UI uses browser clock advancement over an actual server-issued expiry",
+    "No model/native/context attachment or restored target activation admission"
+  ]
+}

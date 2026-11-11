@@ -1,0 +1,444 @@
+{
+  "$defs": {
+    "ContextPreview": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "budget": {
+          "additionalProperties": false,
+          "properties": {
+            "maxBytes": {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            },
+            "maxFiles": {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            },
+            "maxTokens": {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "maxFiles",
+            "maxBytes",
+            "maxTokens"
+          ],
+          "type": "object"
+        },
+        "budgetClamped": {
+          "items": {
+            "enum": [
+              "maxFiles",
+              "maxBytes",
+              "maxTokens",
+              "maxSlices",
+              "maxDurationMs"
+            ],
+            "type": "string"
+          },
+          "maxItems": 5,
+          "readOnly": true,
+          "type": "array"
+        },
+        "contract": {
+          "additionalProperties": false,
+          "properties": {
+            "digest": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "revision": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "workId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "workId",
+            "revision",
+            "digest"
+          ],
+          "type": "object"
+        },
+        "conversationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "expiresAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "groups": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "enum": [
+                  "contract",
+                  "decisions",
+                  "project_facts",
+                  "conversation",
+                  "artifacts"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "included",
+                  "empty",
+                  "unavailable",
+                  "truncated"
+                ],
+                "type": "string"
+              },
+              "used": {
+                "additionalProperties": false,
+                "properties": {
+                  "bytes": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "files": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "tokens": {
+                    "minimum": 0,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "files",
+                  "bytes",
+                  "tokens"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "used"
+            ],
+            "type": "object"
+          },
+          "maxItems": 5,
+          "readOnly": true,
+          "type": "array"
+        },
+        "injectionFlags": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "patterns": {
+                "items": {
+                  "maxLength": 160,
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "type": "array"
+              },
+              "sourceId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "sourceId",
+              "patterns"
+            ],
+            "type": "object"
+          },
+          "maxItems": 64,
+          "readOnly": true,
+          "type": "array"
+        },
+        "issues": {
+          "items": {
+            "enum": [
+              "conversation_scan_incomplete",
+              "artifact_source_missing"
+            ],
+            "type": "string"
+          },
+          "maxItems": 2,
+          "readOnly": true,
+          "type": "array"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "omitted": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "maxLength": 1024,
+                "type": "string"
+              },
+              "reason": {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              "sourceId": {
+                "maxLength": 256,
+                "type": "string"
+              }
+            },
+            "required": [
+              "reason"
+            ],
+            "type": "object"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "context-preview/1",
+          "type": "string"
+        },
+        "requestId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "selections": {
+          "items": {
+            "enum": [
+              "work",
+              "decisions",
+              "project",
+              "conversation",
+              "artifacts"
+            ],
+            "type": "string"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "type": "array"
+        },
+        "sources": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "content": {
+                "maxLength": 262144,
+                "type": "string"
+              },
+              "estimatedTokens": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "kind": {
+                "enum": [
+                  "work",
+                  "contract",
+                  "verification",
+                  "delivery",
+                  "decision",
+                  "project_metadata",
+                  "conversation_message",
+                  "artifact"
+                ],
+                "type": "string"
+              },
+              "path": {
+                "maxLength": 1024,
+                "minLength": 1,
+                "type": "string"
+              },
+              "previewDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "sourceDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "sourceId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "title": {
+                "maxLength": 256,
+                "type": "string"
+              },
+              "truncated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "sourceId",
+              "kind",
+              "title",
+              "path",
+              "content",
+              "sourceDigest",
+              "previewDigest",
+              "bytes",
+              "estimatedTokens",
+              "truncated"
+            ],
+            "type": "object"
+          },
+          "maxItems": 64,
+          "readOnly": true,
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "sufficient",
+            "partial",
+            "insufficient"
+          ],
+          "type": "string"
+        },
+        "totals": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "files": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "tokens": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          "required": [
+            "files",
+            "bytes",
+            "tokens"
+          ],
+          "type": "object"
+        },
+        "trust": {
+          "const": "untrusted_data",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "requestId",
+        "projectId",
+        "conversationId",
+        "observedAt",
+        "expiresAt",
+        "status",
+        "trust",
+        "selections",
+        "sources",
+        "groups",
+        "omitted",
+        "injectionFlags",
+        "issues",
+        "budgetClamped",
+        "budget",
+        "totals"
+      ],
+      "type": "object"
+    },
+    "ContextPreviewInput": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "budget": {
+          "additionalProperties": false,
+          "properties": {
+            "maxBytes": {
+              "maximum": 4194304,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxFiles": {
+              "maximum": 64,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxTokens": {
+              "maximum": 500000,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "maxFiles",
+            "maxBytes",
+            "maxTokens"
+          ],
+          "type": "object"
+        },
+        "conversationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "query": {
+          "maxLength": 8192,
+          "type": "string"
+        },
+        "selections": {
+          "items": {
+            "enum": [
+              "work",
+              "decisions",
+              "project",
+              "conversation",
+              "artifacts"
+            ],
+            "type": "string"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "type": "array"
+        },
+        "workId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "projectId",
+        "conversationId",
+        "selections",
+        "budget"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:context-preview:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

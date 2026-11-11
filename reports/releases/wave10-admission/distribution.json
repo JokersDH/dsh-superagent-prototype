@@ -1,0 +1,119 @@
+{
+  "status": "FAIL_DISTRIBUTION_ADMISSION",
+  "command": [
+    "node",
+    "tools/bootstrap/probe-wave10-distribution.mjs",
+    "/Users/hh/Desktop/joker/superagent-agent-d"
+  ],
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-d",
+  "sourceCommit": "25e564315d11432b7932ef336d2122df119f88c0",
+  "sourceWorktreeClean": true,
+  "sourceHashes": {
+    "packages/portability/src/recovery-target.ts": "5c58ed14d20c820db962655dd2810feaf34f4d4cecaa79a340fb0725df89c949",
+    "apps/launcher/lib/upgrade.mjs": "f0ce492d939f182b520645c316059ddd8dca98d65e4c4000c02fb4611f2190c3"
+  },
+  "checkedAt": "2026-11-11T13:22:25.633Z",
+  "exitCode": 1,
+  "cases": [
+    {
+      "id": "MAIN_BOUND_INPUT_AND_REPEAT_POSITIVE_CONTROL",
+      "status": "PASS",
+      "observation": {
+        "inputValid": true,
+        "idempotent": true,
+        "startupAvailable": false
+      }
+    },
+    {
+      "id": "MATERIAL_OUTPUT_MATCHES_ACTUAL_SHARED_SCHEMA",
+      "status": "FAIL",
+      "message": "Material from a valid main-bound input is rejected by the shared output schema",
+      "observation": {
+        "intentDigest": "sha256:1414cd4f87fafc9a5c5e9fd3cf5a8a12ca47042adb183468458f13314d840882",
+        "configurationDigest": "sha256:ae9f97b3af609ca4b1c064fe83934c0ab9d47f1c3c20606ddef54c769a1858b6",
+        "manifestDigest": "sha256:11aec4355685e970df54406cdc9b418ffb9ac461a9ddcbc3a5da26658c6e5a25",
+        "issues": [
+          {
+            "path": [
+              "intentDigest"
+            ],
+            "code": "invalid_format"
+          },
+          {
+            "path": [
+              "configurationDigest"
+            ],
+            "code": "invalid_format"
+          },
+          {
+            "path": [
+              "manifestDigest"
+            ],
+            "code": "invalid_format"
+          }
+        ]
+      }
+    },
+    {
+      "id": "REQUESTED_TARGET_ROOT_IS_BOUND_BEFORE_WRITE",
+      "status": "FAIL",
+      "message": "Materializer ignored the confirmed target path and wrote another target",
+      "observation": {
+        "refused": false,
+        "requested": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave10-distribution-VhklX9/root-binding/different-target",
+        "wroteUnexpectedTarget": true
+      }
+    },
+    {
+      "id": "CONFIRMED_CONFIGURATION_DIGEST_IS_RECHECKED",
+      "status": "FAIL",
+      "message": "Changed configuration was materialized despite the unchanged confirmed digest",
+      "observation": {
+        "refused": false,
+        "wroteTarget": true
+      }
+    },
+    {
+      "id": "TRUSTED_PARENT_REVALIDATED_AT_WRITE",
+      "status": "FAIL",
+      "message": "A parent replaced by a symlink after construction redirected preparation writes",
+      "observation": {
+        "refused": false,
+        "wroteOutsideOriginalParent": true
+      }
+    },
+    {
+      "id": "SHARED_INSTALLATION_IS_NOT_CROSS_STATE_PROCESS_OWNERSHIP",
+      "status": "FAIL",
+      "message": "A process using the same install but a different state was claimed as owned",
+      "observation": {
+        "childPid": 39463,
+        "ownedPids": [
+          39463
+        ],
+        "considered": 0
+      }
+    },
+    {
+      "id": "JOURNAL_SPAWN_START_MISMATCH_CANNOT_REENTER_OWNED_SET",
+      "status": "FAIL",
+      "message": "Unconditional journal pid registration bypassed the recorded process-start mismatch",
+      "observation": {
+        "childPid": 52336,
+        "pidReused": true,
+        "ownedPids": [
+          52336
+        ],
+        "unknownPids": []
+      }
+    }
+  ],
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "limitations": [
+    "Direct candidate source; material fixtures are valid main-bound inert DTOs, not real committed recovery authority.",
+    "Resource negative tests call readonly accounting only; candidate stop functions never receive test or external process ids.",
+    "Only probe-created child processes are cleaned up; no user service or candidate source is changed.",
+    "No real managed upgrade, artifact installation, target activation, model or native task is exercised by this probe."
+  ]
+}

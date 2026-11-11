@@ -1,0 +1,47 @@
+{
+  "status": "PASS_EVIDENCE_HTTP_BROWSER",
+  "sourceCommit": "32fc7aee99b30b49030208d6bac95e843cc38d9c",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-11T11:11:59.492Z",
+  "cases": [
+    {
+      "id": "CONTEXT-DIALOG-RESIDENCE-IS-EXCLUDED-FROM-CANDIDATE-ACTIVITY",
+      "status": "PASS"
+    },
+    {
+      "id": "UI-ACCEPTANCE-RETAINS-EXACT-OUTCOME-AND-PARTIAL-TIMING",
+      "status": "PASS"
+    },
+    {
+      "id": "HISTORY-KEYSET-PAGINATION-AND-PROVENANCE",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-AND-MOBILE-EVIDENCE-READABLE-WITHOUT-OVERFLOW",
+      "status": "PASS"
+    },
+    {
+      "id": "UNKNOWN-ACTIVITY-IS-NOT-ZERO-AND-SWITCHES-WORK-IDENTITY",
+      "status": "PASS"
+    },
+    {
+      "id": "LATE-PREVIOUS-WORK-RESPONSE-CANNOT-REPLACE-CURRENT-HISTORY",
+      "status": "PASS"
+    },
+    {
+      "id": "MACHINE-FAIL-REMAINS-UNACCEPTABLE-WITH-READONLY-HISTORY",
+      "status": "PASS"
+    },
+    {
+      "id": "REOPEN-PRESERVES-HISTORY-AND-NO-DUPLICATE-ACCEPTANCE",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "limitations": [
+    "Actual loopback HTTP/SQLite and controlled subprocess fixture; no real model/native turn",
+    "Keyset history is per-read observed data, not a frozen snapshot across requests",
+    "UI visibility intervals are partial observational metadata"
+  ]
+}
