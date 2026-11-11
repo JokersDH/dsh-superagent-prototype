@@ -203,6 +203,14 @@ export async function runWave04E4({ root, runDirectory, keep = false }) {
   )
   cases.at(-1).evidence.distribution = {
     missing,
+    owner: 'D',
+    requiredInputs: [
+      'source commit and buildId',
+      'manifest digest and per-file sha256/bytes',
+      'platform, Node version, SQLite ABI and dependency closure',
+      'first-run/doctor/start/stop entry points',
+      'complete backup/restore and upgrade/rollback commands',
+    ],
     plannedNegatives: [
       'fresh-directory first-run and doctor, HTTP bundle instead of fixture fallback',
       'dependency/version/ABI/port diagnosis and missing multi-profile executables',
@@ -214,6 +222,26 @@ export async function runWave04E4({ root, runDirectory, keep = false }) {
       'corrupt, traversal, version-mismatched and failed-upgrade bundles fail explicitly',
       'a new directory alone is not a cross-machine PASS',
     ],
+  }
+
+  cases.push(
+    notTested(
+      define(
+        'E4-REAUTHORIZATION',
+        'Recovery re-authorization: inspect/prepare/commit a new bounded grant',
+        LAYERS.NOT_TESTED,
+        [
+          'Owner: main (business boundary) and D (consumer). No inspect/prepare/commit entry exists in this checkout.',
+          'Old queues, profiles, writers and native sessions must not become authority automatically.',
+        ],
+      ),
+      'No public recovery re-authorization entry exists; read-only recovery is verified, but new-grant prepare/commit, expiry, drift, replay and rollback cannot be executed.',
+    ),
+  )
+  cases.at(-1).evidence.reauthorization = {
+    unavailable: true,
+    requiredOperations: ['inspect', 'prepare', 'commit'],
+    owner: 'main/D',
   }
 
   return { cases, artifacts }

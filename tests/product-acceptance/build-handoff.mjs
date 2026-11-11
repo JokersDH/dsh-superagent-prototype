@@ -176,8 +176,9 @@ const CAPABILITIES = [
   },
   {
     id: 'attention-workbench',
-    label: '跨项目注意力工作台：期限/等待排序与分组',
-    notTested: ['Owner main/C；本轮未见聚合读取、期限排序或分组 UI，仅有每会话 attention 布尔值。'],
+    label: '跨项目注意力收件箱：排序/筛选/分页/逐项打开',
+    controlled: ['E3-ATTENTION-INBOX', 'E3-ATTENTION-INBOX-UI'],
+    notTested: ['真实业务截止/失效与 C 的 deterministic_priority 排序未接线。'],
   },
   {
     id: 'review-timing',
@@ -240,6 +241,16 @@ const CAPABILITIES = [
     id: 'distribution',
     label: '可迁移发行、安装、备份恢复、升级回滚',
     notTested: ['D 的 launcher/distribution/portability 未进入 main；无 staged bundle。'],
+  },
+  {
+    id: 'native-control',
+    label: '真实原生停止/问题/恢复控制',
+    notTested: ['B 的当前真实控制证据未作为输入提供；E 无该预算，不能把 fixture 当原生。'],
+  },
+  {
+    id: 'review-pilot',
+    label: '独立会话复核价值试点（8例三组）',
+    notTested: ['Preflight BLOCKED：pricing_unavailable + b_runtime_interface_missing；0/24 turn，无价值结论。'],
   },
   {
     id: 'actual-native',
@@ -344,7 +355,7 @@ const executionStatus = {
 }
 
 const tierVerdicts = {}
-for (const name of ['advisory-routing', 'controlled-review', 'actual-heterogeneous-review', 'local-alpha', 'full-product']) {
+for (const name of ['module', 'controlled-product', 'actual-native-control', 'installed-alpha', 'advisory-routing', 'controlled-review', 'actual-heterogeneous-review', 'review-value', 'local-alpha', 'full-product']) {
   tierVerdicts[name] = evaluateRelease({
     report,
     requirement: releaseTier(name),

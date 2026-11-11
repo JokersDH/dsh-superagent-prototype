@@ -225,16 +225,24 @@ export async function runE3({ root, runDirectory, keep = false }) {
       evidence.layouts = { mobile: initial, mobileSidebar: withSidebar, mobileDetail: withDetail }
     })
 
-    await push(define('E3-QUESTION-FORM', 'The decision inbox answers the real question through the UI'), async ({ assert, evidence }) => {
+    await push(define('E3-QUESTION-FORM', 'The attention inbox opens and answers the real question through the UI'), async ({ assert, evidence }) => {
       await page.setViewportSize(VIEWPORTS.desktop)
       await page.getByRole('navigation', { name: '工作台导航' }).getByRole('button', { name: '待我决定' }).click()
-      const card = page.locator('.question-card').first()
-      await card.waitFor()
+      const row = page.getByRole('button', { name: '打开待办：E3 待回答问题：允许受控检查', exact: true })
+      await row.waitFor({ timeout: 20_000 })
+      await row.click()
+      const card = page.locator('#work-inspector .question-card').first()
+      await card.waitFor({ timeout: 20_000 })
       assert('CARD_TARGET_DETAILS', (await card.locator('.technical-details').first().textContent())?.includes('原生目标'))
       const option = card.locator('.options button').first()
       const label = (await option.textContent())?.trim()
       await option.click()
-      await page.waitForFunction((id) => !document.querySelector(`#q-${id}`), facts.questionId, { timeout: 15_000 })
+      await page.getByRole('button', { name: '待我决定', exact: true }).click()
+      await page.waitForFunction(
+        () => ![...document.querySelectorAll('.attention-row')].some((item) => item.textContent?.includes('允许受控检查')),
+        undefined,
+        { timeout: 20_000 },
+      )
       const snapshot = await client.snapshot({ workId: facts.questionWorkId })
       assert('UI_ANSWER_PERSISTED', snapshot.questions.every((item) => item.id !== facts.questionId))
       const deliveries = await client.deliveries(facts.questionId)

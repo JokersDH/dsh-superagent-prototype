@@ -100,6 +100,7 @@ export const CONTROLLED_CASES = [
   case_('E3-SEALED-COPY', { layers: [LAYERS.READONLY] }),
   case_('E3-REVIEW-ACTIVITY-UI', { layers: [LAYERS.CONTROLLED], evidence: ['reviewTiming'] }),
   case_('E3-ATTENTION-INBOX', { layers: [LAYERS.CONTROLLED], evidence: ['attention'] }),
+  case_('E3-ATTENTION-INBOX-UI', { layers: [LAYERS.CONTROLLED] }),
   case_('E3-DESKTOP-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
   case_('E3-NOTEBOOK-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
   case_('E3-MOBILE-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),

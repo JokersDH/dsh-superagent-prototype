@@ -1,7 +1,24 @@
+import { createRequire } from 'node:module'
+import { join } from 'node:path'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { cleanup, pickPort, tempState } from '../lib/instance.mjs'
 import { scratchProject, startFaultProduct } from '../lib/fault-product.mjs'
+import { gotoConsole, layoutFacts, openBrowser, screenshot, VIEWPORTS } from '../lib/browser.mjs'
+
+async function startConsoleServer({ root, port, apiURL }) {
+  const require = createRequire(join(root, 'apps/console/package.json'))
+  const { createServer } = await import(require.resolve('vite'))
+  const server = await createServer({
+    root: join(root, 'apps/console'),
+    configFile: join(root, 'apps/console/vite.config.ts'),
+    define: { 'import.meta.env.VITE_CONSOLE_MODE': JSON.stringify('http') },
+    server: { host: '127.0.0.1', port, strictPort: true, proxy: { '/v1': { target: apiURL, changeOrigin: true } } },
+    logLevel: 'silent',
+  })
+  await server.listen()
+  return { url: `http://127.0.0.1:${port}/`, close: () => server.close() }
+}
 
 const define = (id, title, extra = {}) => ({
   id,
@@ -86,7 +103,10 @@ export async function runAttention({ root, runDirectory, keep = false }) {
     runtime.fault.active = false
 
     cases.push(await runCase(
-      define('E3-ATTENTION-INBOX', 'Cross-project attention ranks real items deterministically and scopes them by project'),
+      {
+        ...define('E3-ATTENTION-INBOX', 'Cross-project attention ranks real items deterministically and scopes them by project'),
+        evidence: {},
+      },
       async ({ assert, evidence }) => {
         const first = await client.json('/v1/attention')
         assert('PROTOCOL', first.protocol === 'attention-inbox/1')
@@ -254,6 +274,156 @@ export async function runAttention({ root, runDirectory, keep = false }) {
     cleanup({ root: projectRoot, state: '' }, { keep })
     if (keep) artifacts.state = state
   }
+
+
+  // Browser acceptance for the same inbox: cross-project rows, filters, per-item open and accept.
+  {
+    const { root: uiStateRoot, state: uiState } = tempState('pa-w6-att-ui-')
+    const { root: uiProjectRoot, project: uiProject } = scratchProject()
+    const vitePort = await pickPort()
+    const viteURL = `http://127.0.0.1:${vitePort}`
+    const uiScopeA = { projectId: 'project-att-a', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
+    const uiScopeB = { projectId: 'project-att-b', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
+    let uiRuntime
+    let consoleServer
+    let browser
+    try {
+      uiRuntime = await startFaultProduct({
+        stateRoot: uiState,
+        projectPath: uiProject,
+        projects: [
+          { id: uiScopeA.projectId, scope: uiScopeA },
+          { id: uiScopeB.projectId, scope: uiScopeB },
+        ],
+        allowedOrigins: [viteURL],
+        localDevelopmentAccess: true,
+      })
+      const client = uiRuntime.client
+      const configuration = await client.configuration()
+      const machine = configuration.projects[0].defaultCriteria.find((item) => item.kind === 'machine' && item.required)
+      const create = (kind, scope) =>
+        client.dispatch({
+          commandId: commandId(kind),
+          conversationId: `conv-${scope.projectId}`,
+          kind: 'create_work',
+          projectId: scope.projectId,
+          profileId: `profile-fixture-${kind}`,
+          goal: `${scope.projectId} ${kind} attention`,
+          scope,
+          criteria: [machine],
+        })
+      await create('question', uiScopeA)
+      await create('question', uiScopeB)
+      const cand = await create('pass', uiScopeA)
+      await create('fail', uiScopeB)
+      let view
+      for (let attempt = 0; attempt < 200; attempt += 1) {
+        view = await client.work(cand.receipt.workId)
+        if (view.actions.available.includes('accept_candidate')) break
+        await new Promise((resolveDelay) => setTimeout(resolveDelay, 100))
+      }
+      consoleServer = await startConsoleServer({ root, port: vitePort, apiURL: `http://127.0.0.1:${uiRuntime.port}` })
+      browser = await openBrowser({ root, viewport: VIEWPORTS.desktop })
+      const page = browser.page
+      await gotoConsole(page, consoleServer.url)
+      await page.getByRole('button', { name: '待我决定', exact: true }).click()
+      await page.waitForFunction(() => document.querySelectorAll('.attention-row').length >= 4, undefined, { timeout: 20_000 })
+      const rows = () => page.locator('.attention-row')
+      cases.push(
+        await runCase(
+          {
+            evidence: {},
+            id: 'E3-ATTENTION-INBOX-UI',
+            title: 'Attention inbox is usable across projects, filters, per-item open and deep links',
+            layer: LAYERS.CONTROLLED,
+            limitations: [
+              'Browser evidence is a controlled two-project fixture; no vendor model and no real business deadline.',
+            ],
+          },
+          async ({ assert, evidence }) => {
+            const initial = await rows().count()
+            assert('ROWS', initial >= 4, `rows ${initial}`)
+            const text = await page.locator('.attention-list').innerText()
+            assert('CROSS_PROJECT_ROWS', text.includes(uiScopeA.projectId) && text.includes(uiScopeB.projectId), text.slice(0, 200))
+            await page.getByRole('combobox', { name: '待办项目' }).selectOption(uiScopeB.projectId)
+            await page.waitForFunction(() => {
+              const list = document.querySelector('.attention-list')
+              return list && list.textContent.includes('project-att-b') && !list.textContent.includes('project-att-a')
+            }, undefined, { timeout: 15_000 })
+            assert('PROJECT_FILTER', true)
+            await page.getByRole('combobox', { name: '待办项目' }).selectOption('')
+            await page.waitForFunction(() => document.querySelectorAll('.attention-row').length >= 4, undefined, { timeout: 15_000 })
+            await page.getByRole('group', { name: '待办类型' }).getByRole('button', { name: '待回答' }).click()
+            await page.waitForFunction(
+              () => {
+                const rows = [...document.querySelectorAll('.attention-row')]
+                return rows.length >= 1 && rows.every((row) => row.className.includes('attention-question'))
+              },
+              undefined,
+              { timeout: 15_000 },
+            )
+            assert('TYPE_FILTER', (await rows().count()) === 2, `rows ${await rows().count()}`)
+            await page.getByRole('group', { name: '待办类型' }).getByRole('button', { name: '全部' }).click()
+            await page.getByRole('textbox', { name: '搜索待办' }).fill('project-att-b')
+            await page.waitForFunction(() => {
+              const list = document.querySelector('.attention-list')
+              return list && !list.textContent.includes('project-att-a')
+            }, undefined, { timeout: 15_000 })
+            await page.getByRole('textbox', { name: '搜索待办' }).fill('')
+            await page.waitForFunction(() => document.querySelectorAll('.attention-row').length >= 4, undefined, { timeout: 15_000 })
+
+            await page.getByRole('button', { name: `打开待办：${uiScopeA.projectId} pass attention`, exact: true }).click()
+            const detail = page.locator('#work-inspector')
+            await detail.waitFor()
+            await detail.getByRole('button', { name: '接受当前候选' }).click()
+            await page.waitForFunction(() => document.querySelector('#work-inspector .phase')?.textContent === '已交付', undefined, { timeout: 25_000 })
+            await page.getByRole('button', { name: '待我决定', exact: true }).click()
+            await page.waitForFunction(() => ![...document.querySelectorAll('.attention-row')].some((row) => row.className.includes('attention-candidate')), undefined, { timeout: 20_000 })
+            assert('ACCEPTED_ROW_REMOVED', true)
+
+            await page.goto(`${consoleServer.url}?conversation=conv-${uiScopeA.projectId}&work=${cand.receipt.workId}`, { waitUntil: 'domcontentloaded' })
+            await page.locator('.workspace-rail').waitFor()
+            await page.locator('#work-inspector .phase').waitFor({ timeout: 20_000 })
+            assert(
+              'DEEP_LINK_OPENS_WORK',
+              (await page.locator('#work-inspector .goal').innerText()).includes('pass attention'),
+              await page.locator('#work-inspector').innerText(),
+            )
+
+            await page.setViewportSize(VIEWPORTS.mobile)
+            await page.getByRole('button', { name: '待我决定', exact: true }).click()
+            await page.waitForFunction(() => document.querySelectorAll('.attention-row').length >= 3, undefined, { timeout: 20_000 })
+            const layout = await layoutFacts(page)
+            assert('MOBILE_NO_OVERFLOW', layout.horizontalOverflow === false, JSON.stringify(layout.overflowing))
+            assert('MOBILE_ROWS', (await rows().count()) >= 3)
+            await screenshot(page, join(runDirectory, 'screenshots'), 'mobile-attention-inbox')
+            artifacts.screenshots.push(join(runDirectory, 'screenshots', 'mobile-attention-inbox.png'))
+            evidence.attentionUi = { rows: initial, filters: 3, acceptedRemoved: true, deepLink: true, mobile: true }
+          },
+        ),
+      )
+    } finally {
+      await browser?.close()
+      await consoleServer?.close()
+      await uiRuntime?.close()
+      uiRuntime?.store?.close?.()
+      cleanup({ root: uiStateRoot, state: uiState }, { keep })
+      cleanup({ root: uiProjectRoot, state: '' }, { keep })
+    }
+  }
+
+  cases.push(
+    notTested(
+      define('E3-DECISION-TRANSACTION', 'Prepare writes nothing; confirmed decision commits atomically and revocation invalidates context', {
+        layer: LAYERS.NOT_TESTED,
+        limitations: [
+          'Owner: main (HTTP command/transaction) and C/A (DecisionTransactionService + AssistantStatePort).',
+          'No decision/proposal HTTP entry exists in this checkout; C SQL replay still reports one failing case.',
+        ],
+      }),
+      'record_decision is rejected as unsupported_capability; prepare/confirm/revoke and transaction-failure cases cannot be executed.',
+    ),
+  )
 
   return { cases, artifacts }
 }
