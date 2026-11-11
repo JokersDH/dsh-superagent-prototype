@@ -414,17 +414,18 @@ const alive = (pid) => {
   return state !== '' && !state.startsWith('Z')
 }
 
-const IDENTITY_TOKENS = (roots, target) => {
-  const raw = [
-    roots.config, roots.data, roots.logs, roots.workspace, roots.cache,
-    ...(target === undefined || target === null ? [] : [target.installDir, target.appRoot]),
-  ].filter((value) => typeof value === 'string' && value.length > 0)
+const canonicalPath = (value) => {
+  try { return realpathSync(value) } catch { return value }
+}
+
+// A shared install path can serve independent state roots, so install paths alone never prove process
+// ownership. Only this operation's private roots (state/config/logs/cache/workspace) are identity.
+const ROOT_TOKENS = (roots) => {
+  const raw = [roots.config, roots.data, roots.logs, roots.workspace, roots.cache].filter((value) => typeof value === 'string' && value.length > 0)
   const tokens = new Set()
   for (const value of raw) {
     tokens.add(value)
-    // Commands show the canonical path (/private/var/... on macOS) while roots may keep the symlinked
-    // form (/var/...); both name the same private directory, so both must be accepted.
-    try { tokens.add(realpathSync(value)) } catch { /* not created yet */ }
+    tokens.add(canonicalPath(value))
   }
   return [...tokens]
 }
@@ -450,22 +451,31 @@ const listProcesses = () => spawnSyncPs().map((line) => line.trim().split(/\s+/)
  * reporting an empty "proven" set is not a stop proof.
  */
 export async function accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn }) {
-  const tokens = IDENTITY_TOKENS(roots, target)
+  const tokens = ROOT_TOKENS(roots)
   const treeCandidates = new Set()
   let pidReused = false
   const addTree = (pid) => {
     if (!Number.isInteger(pid) || pid <= 0) return
     for (const child of processTree(pid)) treeCandidates.add(child)
   }
+  const claimed = new Set()
   if (Number.isInteger(spawnedPid) && spawnedPid > 0) {
     // The spawn pid may have exited and been recycled; only claim its tree when the recorded start
     // identity still matches. A recycled pid is not this operation's resource.
     const observed = await processStart(spawnedPid)
-    const expected = spawnedStart ?? journalSpawn?.processStart ?? null
-    if (expected !== null && observed !== expected) pidReused = true
-    else addTree(spawnedPid)
+    const expected = spawnedStart ?? (journalSpawn?.pid === spawnedPid ? journalSpawn?.processStart ?? null : null)
+    if (expected !== null && observed !== expected) {
+      pidReused = true
+      claimed.add(spawnedPid)
+    } else addTree(spawnedPid)
   }
-  for (const pid of [journalSpawn?.pid, record?.pid, record?.apiPid, record?.consolePid]) addTree(pid)
+  if (journalSpawn !== undefined && journalSpawn !== null && Number.isInteger(journalSpawn.pid) && journalSpawn.pid > 0 && !claimed.has(journalSpawn.pid)) {
+    // A recorded journal spawn is evidence only while its recorded start identity still matches.
+    const observed = await processStart(journalSpawn.pid)
+    if (journalSpawn.processStart !== undefined && observed !== journalSpawn.processStart) pidReused = true
+    else addTree(journalSpawn.pid)
+  }
+  for (const pid of [record?.pid, record?.apiPid, record?.consolePid]) addTree(pid)
 
   const owned = []
   const unknownLive = []
@@ -480,7 +490,7 @@ export async function accountRegisteredResources({ roots, target, record, spawne
   // Orphans whose recorded parent is gone still carry this private root in their argv. Only processes
   // that actually match the identity are claimed; unrelated system processes are not candidates.
   for (const { pid } of listProcesses()) {
-    if (pid === process.pid || treeCandidates.has(pid) || !alive(pid)) continue
+    if (pid === process.pid || treeCandidates.has(pid) || claimed.has(pid) || !alive(pid)) continue
     const command = commandOf(pid)
     if (command !== '' && commandMatchesIdentity(command, tokens) && !owned.some((entry) => entry.pid === pid))
       owned.push({ pid, command })
