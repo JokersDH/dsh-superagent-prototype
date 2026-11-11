@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**上下文与交付记录已接通：[http://127.0.0.1:5187/](http://127.0.0.1:5187/)。** 主线 `32fc7ae` 提供顶栏“上下文预览”：选择项目、原会话内工作、来源与预算，查看内容、摘要、遗漏和过期状态；工作详情新增交付记录、历史分页及部分可见活动计时。14项真实HTTP/SQLite网页流程在干净源码复跑通过，无模型调用。新预览使用独立state；原5180–5186服务和历史保留。A恢复验库三个反例仍FAIL，D目标准备尚无可集成的固定检查点，未开放恢复激活。接口、证据和精确限制见[0032](docs/rfcs/WP-16/0032-context-evidence-product-checkpoint.md)及[本轮记录](reports/releases/wave09-integration/README.zh-CN.md)。
+
 **当前派工：[第九轮恢复目标/context/托管升级整包](agent-tasks/product-wave-09/README.zh-CN.md)。** 已独立复验A备份与C旧授权反例，分范围接入；B资源/token、C种类/命令绑定、D孤儿进程、E费用实际链与安装来源仍有阻断。共享RecoveryTarget port及配置binder已交，A/D可立即做真实目标读验/准备，main承担context网页与最终授权激活。详细source/反例/范围见[0031](docs/rfcs/WP-16/0031-wave-09-admission-and-target-boundaries.md)，不新增预算/Driver，不把旧安装结果当当前个人版通过，七组实例保留。
 
 **提案网页已接通：[http://127.0.0.1:5186/](http://127.0.0.1:5186/)。** 用户消息旁“转为提案”可预览并明确确认创建工作、修订合同或记录决定，支持拒绝、来源漂移和刷新后核对原请求。8项真实HTTP/SQLite网页流程通过；A schema15生产恢复facts已集成，新增只读source记录查询，仍固定not_granted/startupAvailable=false。新个人开发预览使用独立私有state，原5180–5185未重启/迁移，本批没有触发真实模型任务；不是恢复target/安装/原生控制准入。源码与消费约定见[0030](docs/rfcs/WP-16/0030-wave-08-proposal-workbench-and-source-audit.md)及[限定证据](reports/releases/wave08-proposal-workbench/README.zh-CN.md)。
