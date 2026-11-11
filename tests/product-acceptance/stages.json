@@ -3,8 +3,8 @@
   "agent": "E",
   "taskPackage": "agent-tasks/product-wave-09/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "7027d31",
-  "checkpoint": null,
+  "base": "531c6b6",
+  "checkpoint": "6977bd9",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -13,7 +13,7 @@
     "pilotTurnsUsed": 0,
     "pilotTokensUsed": 0,
     "pilotUsd": null,
-    "note": "Research BLOCKED; no adapter/sender. Ledger v2 keeps 0/24 turns, 0 tokens, no price basis; the full costOf→settle chain keeps unknown and blocks. Real model sends 0."
+    "note": "Research BLOCKED; no B sender. Real model sends 0; ledger keeps 0/24, 0 tokens, unknown price. Full costOf→settle chain preserves unknown and blocks; E only reserves."
   },
   "stages": [
     {
@@ -21,7 +21,7 @@
       "title": "Pilot admission and fail-closed ledger",
       "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
       "notes": [
-        "Full cost chain: partial usage detail makes costOf undefined and settle keeps the reservation bound + unknown, then refuses further sends. The only sender is B-owned; E imports it and binds reservationId, and never spawns a descriptor command. 66 zero-model checks, refusal send count 0."
+        "Complete cost chain: partial usage makes costOf undefined; settle charges the bound, keeps unknown and refuses further sends. Only a B-owned sender module is imported (reservation identity echoed); E never spawns a descriptor command. 66 checks, refusal sends 0."
       ]
     },
     {
@@ -37,7 +37,7 @@
       "title": "Proposal HTTP, attention, decisions and review timing",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "E3-PROPOSAL-HTTP verifies pending preview, missing-input refusal, confirm/reject, replay, changed payload, tamper, cross-project isolation and that an answer message cannot become a decision. Proposal UI and context preview remain NOT_TESTED main blockers."
+        "E3-PROPOSAL-HTTP covers pending preview, missing input, confirm/reject, replay, drift, tamper, cross-project and answer-not-knowledge. E3-PROPOSAL-UI exercises the real console: preview has no effect, lost response survives reload with one settlement, second confirm and reject behave. Context preview remains NOT_TESTED."
       ]
     },
     {
@@ -45,7 +45,7 @@
       "title": "Explicit baseline/target installation and upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Fixed baseline b0f87c88 (schema 12, dirty) and target 9120a5ed (schema 13, clean) are named parameters; target cold install, config root, mode retention, unknown-PID block, backup/restore, upgrade and old-binary schema refusal are independent. Old wave06 results are historical only."
+        "Explicit baseline/target tuple is read from tar bytes and install.json; managed upgrade/rollback-install run in a bounded child probe with new data, same-schema rollback and tampered-target refusal. Crash windows/whole-process guards are E4-UPGRADE-FAULTS NOT_TESTED."
       ]
     },
     {

@@ -261,9 +261,12 @@ const CAPABILITIES = [
   },
   {
     id: 'two-binary-upgrade',
-    label: '显式 baseline/target 两个真实二进制的升级与拒绝不兼容回退',
+    label: 'D 托管 upgrade/rollback-install 与显式 baseline/target 字节',
     installed: ['E4-UPGRADE-ROLLBACK'],
-    notTested: ['升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。'],
+    notTested: [
+      'E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口与 launcher 死/API 活守卫本轮未稳定执行，保持 NOT_TESTED。',
+      '升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。',
+    ],
   },
   {
     id: 'install-host-guards',
@@ -385,6 +388,7 @@ const executionStatus = {
     screenshots: report.artifacts?.screenshots ?? [],
     matrix: join(reports, 'release-matrix.json'),
     executionStatus: join(reports, 'execution-status.json'),
+    wave09Status: join(reports, 'wave09-status.json'),
     wave08Status: join(reports, 'wave08-status.json'),
     wave07Status: join(reports, 'wave07-status.json'),
     wave06Status: join(reports, 'wave06-status.json'),
@@ -477,7 +481,7 @@ ${rows
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
 | 安装准入（个人 Alpha） | **PASS（仅所测 baseline→target 组合）**：cold install/config root/doctor、模式保持、备份恢复、显式升级、旧二进制 schema 拒绝与未知 PID 阻断 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK；旧 baseline 的 config-root 失败仅作历史，旧组合结果不映射到 target。 |
 
-安装物身份（显式 baseline/target）：baseline \`wave06-alpha-b0f87c88\` / buildId \`b0f87c883aa6b206\` / schema 12 / tar \`8b728b61…b5c5d\` / source \`9046d4c5\`（dirty，仅作基线）；target \`wave07-target-9120a5ed\` / buildId \`9120a5ed858e0feb\` / schema 13 / tar \`bbc13312…7912\` / source \`76f26a66\`（clean）。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 baseline→target 组合成立；旧 wave06 组合的结果保留为历史。
+安装物身份（显式 baseline/target tuple）：baseline \`wave06-alpha2-7e8f6ce6\` / buildId \`7e8f6ce6fa2e2633\` / schema 13 / tar \`0fe0ed53…c7631\` / source \`e10bfdb7\`（clean）；target \`wave08-target-cd0ecc29\` / buildId \`cd0ecc29d97d5c41\` / schema 13 / tar \`64bbe285…3d42\` / source \`9b75c2a1\`（clean）。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立；旧 dirty12→13 组合保留为历史。
 
 ## 独立复核价值试点
 
@@ -541,8 +545,14 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
 writeFileSync(
+  join(reports, 'wave09-status.json'),
+  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave09-status/1', taskPackage: stages.taskPackage,
+    artifactTuple: (byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple ?? null),
+    productSource: report.source, testCodeSource: report.source }, null, 2) + '\n',
+)
+writeFileSync(
   join(reports, 'wave08-status.json'),
-  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave08-status/1', taskPackage: stages.taskPackage }, null, 2) + '\n',
+  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave08-status/1', taskPackage: 'agent-tasks/product-wave-08/README.zh-CN.md', supersededBy: 'wave09-status.json' }, null, 2) + '\n',
 )
 writeFileSync(
   join(reports, 'wave07-status.json'),

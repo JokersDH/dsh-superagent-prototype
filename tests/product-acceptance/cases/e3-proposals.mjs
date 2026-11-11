@@ -242,12 +242,6 @@ export async function runProposals({ root, runDirectory, keep = false }) {
 
     cases.push(
       notTested(
-        define('E3-PROPOSAL-UI', 'Proposal confirmation and context are usable in the web entry', { layer: LAYERS.NOT_TESTED }),
-        'NOT_TESTED: the console has no proposal or context entry in this source (only the HTTP backend is published). Required: a page that shows the pending proposal, its source message, required inputs and expiry, and an explicit confirm/reject; a context preview bound to project/conversation/work with source and freshness. Until then this is a main blocker, not a library-level pass.',
-      ),
-    )
-    cases.push(
-      notTested(
         define('E3-CONTEXT-GRANT-BOUNDARY', 'Expired, purpose-mismatched or over-budget context grants never reach a provider', { layer: LAYERS.NOT_TESTED }),
         'NOT_TESTED: main publishes no context preview/read entry. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed.',
       ),

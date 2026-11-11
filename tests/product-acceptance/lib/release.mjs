@@ -281,6 +281,20 @@ function attentionIssues(attention) {
   return issues
 }
 
+/** The browser must keep a lost-response request identity and settle it exactly once. */
+export function proposalUiIssues(ui) {
+  if (!ui || typeof ui !== 'object') return ['missing']
+  const issues = []
+  if (!Number.isSafeInteger(ui.preview?.works) || !Number.isSafeInteger(ui.preview?.receipts)) issues.push('preview_state')
+  if (ui.pendingSurvivedReload !== true) issues.push('reload_identity')
+  if (ui.lostResponseSettledOnce !== true) issues.push('lost_response')
+  if (!Number.isSafeInteger(ui.confirm?.works) || ui.confirm.works <= ui.preview.works) issues.push('confirm_effect')
+  if (!Number.isSafeInteger(ui.secondConfirm?.works) || ui.secondConfirm.works !== ui.confirm.works + 1) issues.push('second_confirm')
+  if (!Number.isSafeInteger(ui.reject?.works) || ui.reject.works !== ui.secondConfirm.works) issues.push('reject_effect')
+  if (!Array.isArray(ui.viewports) || !ui.viewports.includes('mobile')) issues.push('viewports')
+  return issues
+}
+
 /**
  * A structured proposal is inert data until one explicit confirmation. Preview must be pending,
  * confirmation/rejection must be replay-safe, every drift/tamper/cross-project path must refuse,
@@ -355,17 +369,24 @@ export function upgradeIssues(upgrade) {
   if (!isSubstantive(base.buildId) || !isSubstantive(next.buildId) || base.buildId === next.buildId) issues.push('distinct_builds')
   if (!HEX.test(String(base.tarSha256 ?? '')) || !HEX.test(String(next.tarSha256 ?? '')) || base.tarSha256 === next.tarSha256)
     issues.push('distinct_bytes')
-  if (!Number.isSafeInteger(base.schema) || !Number.isSafeInteger(next.schema) || next.schema <= base.schema) issues.push('schema_order')
-  if (upgrade.migratedSchema !== next.schema) issues.push('schema_not_migrated')
-  if (!Number.isSafeInteger(upgrade.messages?.after) || !Number.isSafeInteger(upgrade.messages?.before) || upgrade.messages.after <= upgrade.messages.before)
-    issues.push('no_new_data')
-  if (upgrade.preUpgradeDataReadable !== true) issues.push('pre_data_lost')
+  if (!Number.isSafeInteger(base.schema) || !Number.isSafeInteger(next.schema) || next.schema < base.schema) issues.push('schema_order')
+  if (upgrade.status !== 'CONFIRMED') issues.push('switch_not_confirmed')
+  if (upgrade.pointer?.afterUpgrade !== next.buildId) issues.push('pointer_not_target')
+  if (upgrade.pointer?.afterRollback !== base.buildId) issues.push('pointer_not_reverted')
+  if (!isSubstantive(upgrade.backup?.path)) issues.push('no_preupgrade_backup')
+  if (!Number.isSafeInteger(upgrade.messages?.after) || !Number.isSafeInteger(upgrade.messages?.before) || upgrade.messages.after < upgrade.messages.before)
+    issues.push('data_loss')
+  if (upgrade.preDataReadable !== true) issues.push('pre_data_lost')
   if (upgrade.postUpgradeMessageKept !== true) issues.push('post_data_lost')
-  if (!['daemon_start_failed', 'schema_unsupported', 'runtime_mismatch'].includes(upgrade.oldBinary?.code)) issues.push('old_binary_accepted')
-  if (upgrade.oldBinary?.migrationError !== true) issues.push('no_migration_refusal')
-  if (upgrade.oldBinary?.dataUntouched !== true) issues.push('old_binary_touched_data')
-  if (upgrade.explicitRestore?.schema !== base.schema || upgrade.explicitRestore?.upgradedStateKept !== true)
-    issues.push('restore_not_explicit')
+  if (upgrade.binaryRollback?.status !== 'BINARY_ROLLED_BACK' || upgrade.binaryRollback?.build !== base.buildId) issues.push('binary_rollback')
+  if (upgrade.binaryRollback?.dataRolledBack !== false || upgrade.binaryRollback?.postDataKept !== true) issues.push('rollback_rolled_data')
+  // Crash-window and whole-process guards are a separate NOT_TESTED case in this round; their
+  // absence from a confirmed-switch probe is explicit, not a pass.
+  if (upgrade.tampered?.code !== 'target_tampered' || upgrade.tampered?.instanceUntouched !== true) issues.push('tampered_target')
+  const schema = upgrade.schemaRefusal ?? {}
+  if (schema.applicable === false) {
+    if (schema.reason !== 'same_schema') issues.push('schema_refusal_reason')
+  } else if (schema.code !== 'daemon_start_failed' && schema.code !== 'schema_unsupported') issues.push('schema_refusal')
   return issues
 }
 
@@ -559,6 +580,10 @@ export function evaluateRelease({
       if (entry.evidence?.includes('installation')) {
         for (const issue of installationIssues(result.evidence?.installation))
           failures.push(fail('installation_evidence_invalid', `Installation proof ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('proposalUi')) {
+        for (const issue of proposalUiIssues(result.evidence?.proposalUi))
+          failures.push(fail('proposal_ui_invalid', `Proposal UI ${issue}`, entry.id))
       }
       if (entry.evidence?.includes('proposals')) {
         for (const issue of proposalFlowIssues(result.evidence?.proposals))

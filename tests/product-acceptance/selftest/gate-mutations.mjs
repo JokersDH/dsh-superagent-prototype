@@ -86,6 +86,16 @@ const evidenceFor = (key) => {
       return { sameSizeCode: 'release_artifact_missing', missingCode: 'release_artifact_missing', corruptBundleCode: 'archive_invalid' }
     case 'rollback':
       return { bundleSha256: DIGEST, target: '/tmp/state', postBackupReceipt: 'recorded' }
+    case 'proposalUi':
+      return {
+        preview: { works: 0, receipts: 2 },
+        confirm: { works: 1, visibleRows: 1 },
+        secondConfirm: { works: 2 },
+        reject: { works: 2 },
+        viewports: ['desktop', 'notebook', 'mobile'],
+        pendingSurvivedReload: true,
+        lostResponseSettledOnce: true,
+      }
     case 'proposals':
       return {
         preview: { protocol: 'proposal-preview/1', requiredInputs: ['work.scope', 'work.criteria', 'work.profileId'], ttlMs: 300000 },
