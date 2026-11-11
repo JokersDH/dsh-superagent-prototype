@@ -1,0 +1,344 @@
+{
+  "$defs": {
+    "RecoverySourceCheckpoint": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "coverage": {
+          "enum": [
+            "complete",
+            "bounded",
+            "unsupported"
+          ],
+          "type": "string"
+        },
+        "families": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "digest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "name": {
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}$",
+                "type": "string"
+              },
+              "rows": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "truncated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "rows",
+              "digest",
+              "truncated"
+            ],
+            "type": "object"
+          },
+          "maxItems": 256,
+          "readOnly": true,
+          "type": "array"
+        },
+        "ignoredConfirmation": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "activationId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "commandId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "receiptSeq": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "activationId",
+                "commandId",
+                "receiptSeq"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "issues": {
+          "items": {
+            "enum": [
+              "scan_bounded",
+              "unsupported_schema",
+              "unknown_table",
+              "missing_table",
+              "confirmation_mismatch",
+              "inconsistent_record"
+            ],
+            "type": "string"
+          },
+          "maxItems": 16,
+          "readOnly": true,
+          "type": "array"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "observedEventCursor": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "productSchema": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "protocol": {
+          "const": "recovery-source-checkpoint/1",
+          "type": "string"
+        },
+        "sourceFingerprint": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "startupAvailable": {
+          "const": false,
+          "type": "boolean"
+        },
+        "volatileFieldsIgnored": {
+          "items": {
+            "const": "coordinator_instances.heartbeat_at",
+            "type": "string"
+          },
+          "maxItems": 1,
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "required": [
+        "protocol",
+        "observedAt",
+        "productSchema",
+        "observedEventCursor",
+        "coverage",
+        "sourceFingerprint",
+        "families",
+        "ignoredConfirmation",
+        "volatileFieldsIgnored",
+        "issues",
+        "startupAvailable"
+      ],
+      "type": "object"
+    },
+    "RecoverySourceCheckpointQuery": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "ignoreCommitted": {
+          "additionalProperties": false,
+          "properties": {
+            "intent": {
+              "additionalProperties": false,
+              "properties": {
+                "activationId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "commandId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "createdAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                "expiresAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                "machineDigest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "planDigest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "planId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "principal": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "authorityRef": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "userId": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "userId",
+                    "authorityRef"
+                  ],
+                  "type": "object"
+                },
+                "protocol": {
+                  "const": "recovery-activation-intent/1",
+                  "type": "string"
+                },
+                "resourcePolicyDigest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "source": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "inspectionFingerprint": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "markerDigest": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "stateId": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "stateRoot": {
+                      "maxLength": 4096,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "stateId",
+                    "stateRoot",
+                    "markerDigest",
+                    "inspectionFingerprint"
+                  ],
+                  "type": "object"
+                },
+                "target": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "configurationDigest": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "generationId": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "stateRoot": {
+                      "maxLength": 4096,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "generationId",
+                    "stateRoot",
+                    "configurationDigest"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "protocol",
+                "activationId",
+                "commandId",
+                "planId",
+                "planDigest",
+                "source",
+                "target",
+                "principal",
+                "machineDigest",
+                "resourcePolicyDigest",
+                "createdAt",
+                "expiresAt"
+              ],
+              "type": "object"
+            },
+            "protocol": {
+              "const": "recovery-activation-commit/1",
+              "type": "string"
+            },
+            "sourceReceipt": {
+              "additionalProperties": false,
+              "properties": {
+                "commandId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "seq": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "commandId",
+                "seq"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "protocol",
+            "intent",
+            "sourceReceipt"
+          ],
+          "type": "object"
+        },
+        "maxRows": {
+          "maximum": 20000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "maxRowsPerFamily": {
+          "maximum": 10000,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:recovery-source:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
