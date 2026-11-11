@@ -25,11 +25,13 @@ import { createServer } from 'node:net'
 import { createHash } from 'node:crypto'
 import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, unlinkSync, writeSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
+import { realpathSync } from 'node:fs'
 import { backupState } from './backup.mjs'
-import { processAlive, readInstanceRecord, verifyInstance } from './instance.mjs'
+import { processAlive, processStart, readInstanceRecord, removeInstanceRecord, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
 import { RELEASE_FILE, readRelease, validateRelease, verifyReleaseArtifacts } from './release.mjs'
 import { hasInstallManifest, initializeRelease, releaseBinding } from './release-bootstrap.mjs'
 import { stopInstance } from './stop.mjs'
+import { stopProcess } from './instance.mjs'
 
 export class UpgradeError extends Error {
   constructor(code, message, detail = {}) {
@@ -237,6 +239,17 @@ export async function planUpgrade({ installRoot, roots, to, allowSameSource = fa
 export async function upgradeInstall({ installRoot, roots, values, fault = process.env.PA_UPGRADE_FAULT ?? null }) {
   const to = values.to
   if (to === undefined) throw new UpgradeError('usage', 'upgrade 需要 --to <安装目录>')
+
+  // Re-entry with an unsettled journal is not a new operation: settle the earlier one first. This is
+  // checked before planning, because the crashed attempt may already look like "already applied".
+  const pendingJournal = readJournal(roots.config)
+  const terminal = (status) => ['confirmed', 'binary_rolled_back'].includes(status) || String(status).startsWith('reverted')
+  if (pendingJournal !== null && !terminal(pendingJournal.status))
+    throw new UpgradeError('upgrade_recover_required', 'An interrupted install switch is still recorded; re-entering a new switch is refused', {
+      journalStatus: pendingJournal.status,
+      hint: 'Run `pa upgrade --recover` (same operation identity), then start a new switch.',
+    })
+
   const { plan, target } = await planUpgrade({ installRoot, roots, to, allowSameSource: values.force === true })
   const journalPath = join(roots.config, SWITCH_JOURNAL)
   const previousPath = join(roots.config, PREVIOUS_RELEASE)
@@ -244,35 +257,31 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
 
   // The mode/access that the running instance actually used must survive the switch. Read it before
   // stopping; if the record is gone, only an explicit --mode/--access may replace it, otherwise refuse.
-  const instance = readInstanceRecord(roots.config)
-  const identity = preserveIdentity({ record: instance, explicitMode: values.mode, explicitAccess: values.access, journal: readJournal(roots.config) })
+  const instance = (() => { try { return readInstanceRecord(roots.config) } catch (error) {
+    throw new UpgradeError('invalid_instance_record', 'The instance record is untrusted; refusing to stop or switch', { cause: error.message, code: error.code })
+  } })()
+  const identity = preserveIdentity({ record: instance, explicitMode: values.mode, explicitAccess: values.access, journal: pendingJournal })
 
-  // 1. Stop the recorded instance if it is running. A misleading record must not kill anything.
+  // 1. Full resource barrier: launcher, API child, console listener and descendants must all be
+  // accounted for, including orphans after a launcher crash. No empty-set "proof".
   let stopped = null
-  if (instance !== null) {
+  if (instance !== null && values['no-stop'] !== true) {
+    const barrier = await ensureResourceBarrier({ roots, target, journal: pendingJournal })
+    stopped = barrier.stopped
+  } else if (instance === null) {
+    // A stopped install still needs the barrier: a crashed previous upgrade may have left a target.
+    const barrier = await ensureResourceBarrier({ roots, target, journal: pendingJournal })
+    stopped = barrier.stopped ?? null
+  } else {
+    // --no-stop: refuse a running instance explicitly, never bypass the identity check.
     const verification = await verifyInstance(instance)
-    if (verification.ok) {
-      if (values['no-stop'] === true)
-        throw new UpgradeError('upgrade_requires_stopped_instance', 'The instance is running; stop it explicitly or let upgrade stop it', { pid: instance.pid })
-      try {
-        stopped = await stopInstance({ roots })
-      } catch (error) {
-        throw new UpgradeError('upgrade_stop_failed', 'The running instance could not be stopped; nothing was switched', { cause: String(error?.message ?? error) })
-      }
-      if (stopped?.status !== 'STOPPED')
-        throw new UpgradeError('upgrade_stop_failed', 'The instance did not report a clean stop; nothing was switched', { status: stopped?.status ?? null })
-    } else if (await processAlive(instance.pid)) {
-      // A live process that is not the recorded instance is never killed and never treated as ours. It
-      // may still be an old writer for the same state, so the switch stays blocked instead of racing.
-      throw new UpgradeError('instance_record_unverified', 'The recorded instance does not verify but its pid is alive; refusing to stop or switch', {
-        pid: instance.pid,
-        failures: verification.failures.slice(0, 8),
-        hint: 'Inspect `pa status` and the process yourself; do not delete instance.json blindly.',
-      })
-    } else {
-      // A record whose process is gone is not authority and does not block a stopped-instance switch.
-      stopped = { status: 'ALREADY_STOPPED', reason: verification.code ?? 'not_running' }
-    }
+    if (verification.ok)
+      throw new UpgradeError('upgrade_requires_stopped_instance', 'The instance is running; stop it explicitly or let upgrade stop it', { pid: instance.pid })
+    throw new UpgradeError('instance_record_unverified', 'The recorded instance does not verify but its pid is alive; refusing to stop or switch', {
+      pid: instance.pid,
+      failures: verification.failures.slice(0, 8),
+      hint: 'Inspect `pa status` and the process yourself; do not delete instance.json blindly.',
+    })
   }
 
   // 2. Pre-upgrade backup before the pointer moves.
@@ -327,8 +336,12 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
   })
   if (fault === 'crash_after_switch') throw new UpgradeError('upgrade_interrupted', 'Injected crash after pointer switch (test fault); run `pa upgrade --recover`')
 
-  // 4. Start the target binary on the same data roots and require its own identity.
-  const started = await startTarget({ roots, target, seed: instance, identity, fault })
+  // 4. Start the target binary on the same data roots and require its own identity. The spawn pid is
+  // persisted before health so a crash or missing record is recoverable from the journal.
+  const started = await startTarget({
+    roots, target, seed: instance, identity, fault,
+    onSpawn: (spawn) => writeJournal({ roots, status: 'starting', reason: 'target_spawned', spawn }),
+  })
   writePrivateJson(journalPath, {
     protocol: 'personal-install-switch/1',
     status: 'confirmed',
@@ -392,53 +405,168 @@ const commandOf = (pid) => spawnSync('ps', ['-ww', '-p', String(pid), '-o', 'com
 const alive = (pid) => {
   try {
     process.kill(pid, 0)
-    return true
   } catch {
     return false
+  }
+  // A reaped-but-not-collected zombie cannot write anything; treating it as a live unknown writer
+  // would block every switch whose stopped launcher has an unreaped child.
+  const state = spawnSync('ps', ['-p', String(pid), '-o', 'stat='], { encoding: 'utf8' }).stdout.trim()
+  return state !== '' && !state.startsWith('Z')
+}
+
+const IDENTITY_TOKENS = (roots, target) => {
+  const raw = [
+    roots.config, roots.data, roots.logs, roots.workspace, roots.cache,
+    ...(target === undefined || target === null ? [] : [target.installDir, target.appRoot]),
+  ].filter((value) => typeof value === 'string' && value.length > 0)
+  const tokens = new Set()
+  for (const value of raw) {
+    tokens.add(value)
+    // Commands show the canonical path (/private/var/... on macOS) while roots may keep the symlinked
+    // form (/var/...); both name the same private directory, so both must be accepted.
+    try { tokens.add(realpathSync(value)) } catch { /* not created yet */ }
+  }
+  return [...tokens]
+}
+
+const commandMatchesIdentity = (command, tokens) => {
+  if (command === '') return false
+  return tokens.some((token) => {
+    const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    // A path token must stand alone as a whole argument segment, so a sibling temp root sharing a
+    // prefix (e.g. /tmp/x-sibling vs /tmp/x) is not claimed as this operation's process.
+    return new RegExp(`(?:^|[\\s'"=])${escaped}(?=$|[\\s'"/])`).test(command)
+  })
+}
+
+const listProcesses = () => spawnSyncPs().map((line) => line.trim().split(/\s+/).map(Number))
+  .filter(([pid, ppid]) => Number.isInteger(pid) && Number.isInteger(ppid))
+  .map(([pid, ppid]) => ({ pid, ppid }))
+
+/**
+ * Every registered resource must be accounted for: launcher, API child, console listener and any
+ * descendant. A live process that cannot be proven to belong to this operation's config/data/target
+ * identity stays UNKNOWN and blocks the switch. Filtering a live candidate out of the set and then
+ * reporting an empty "proven" set is not a stop proof.
+ */
+export async function accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn }) {
+  const tokens = IDENTITY_TOKENS(roots, target)
+  const treeCandidates = new Set()
+  let pidReused = false
+  const addTree = (pid) => {
+    if (!Number.isInteger(pid) || pid <= 0) return
+    for (const child of processTree(pid)) treeCandidates.add(child)
+  }
+  if (Number.isInteger(spawnedPid) && spawnedPid > 0) {
+    // The spawn pid may have exited and been recycled; only claim its tree when the recorded start
+    // identity still matches. A recycled pid is not this operation's resource.
+    const observed = await processStart(spawnedPid)
+    const expected = spawnedStart ?? journalSpawn?.processStart ?? null
+    if (expected !== null && observed !== expected) pidReused = true
+    else addTree(spawnedPid)
+  }
+  for (const pid of [journalSpawn?.pid, record?.pid, record?.apiPid, record?.consolePid]) addTree(pid)
+
+  const owned = []
+  const unknownLive = []
+  for (const pid of treeCandidates) {
+    if (pid === process.pid || !alive(pid)) continue
+    const command = commandOf(pid)
+    // A candidate that was started/registered by this operation but no longer matches its identity
+    // is UNKNOWN: it may be a reused pid or a foreign writer. It must block, not be filtered away.
+    if (command !== '' && commandMatchesIdentity(command, tokens)) owned.push({ pid, command })
+    else unknownLive.push({ pid, command: command === '' ? 'unknown' : command })
+  }
+  // Orphans whose recorded parent is gone still carry this private root in their argv. Only processes
+  // that actually match the identity are claimed; unrelated system processes are not candidates.
+  for (const { pid } of listProcesses()) {
+    if (pid === process.pid || treeCandidates.has(pid) || !alive(pid)) continue
+    const command = commandOf(pid)
+    if (command !== '' && commandMatchesIdentity(command, tokens) && !owned.some((entry) => entry.pid === pid))
+      owned.push({ pid, command })
+  }
+  return { owned, unknownLive, considered: treeCandidates.size, pidReused }
+}
+
+export async function stopRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn }) {
+  const accounted = await accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn })
+  const stopped = []
+  for (const { pid } of accounted.owned) {
+    try { process.kill(pid, 'SIGTERM'); stopped.push(pid) } catch { /* gone */ }
+  }
+  const deadline = Date.now() + 5000
+  while (Date.now() < deadline && accounted.owned.some(({ pid }) => alive(pid))) await new Promise((r) => setTimeout(r, 100))
+  for (const { pid } of accounted.owned) {
+    if (!alive(pid)) continue
+    try { process.kill(pid, 'SIGKILL') } catch { /* gone */ }
+  }
+  const killDeadline = Date.now() + 3000
+  while (Date.now() < killDeadline && accounted.owned.some(({ pid }) => alive(pid))) await new Promise((r) => setTimeout(r, 100))
+  const remaining = accounted.owned.filter(({ pid }) => alive(pid)).map(({ pid, command }) => ({ pid, command }))
+  return {
+    proven: remaining.length === 0 && accounted.unknownLive.length === 0,
+    stopped,
+    remaining,
+    unknownLive: accounted.unknownLive.map(({ pid, command }) => ({ pid, command: command.slice(0, 240) })),
+    considered: accounted.considered,
+    pidReused: accounted.pidReused === true,
   }
 }
 
 /**
- * Stop only processes this operation can prove it started: the spawn root and its descendants, plus
- * the recorded target instance. Every candidate must name the target install or this operation's
- * roots in its command line, so a reused pid or a foreign process is never touched.
- *
- * Returns whether the stop is proven. When it is not, the caller must keep the indeterminate state
- * (no pointer revert, no old-writer restart) instead of pretending the switch is clean.
+ * The pre-switch barrier. It reuses the recorded instance identity (including the orphan-API proof
+ * from `stop.mjs`) and refuses to touch the pointer while any registered resource is unaccounted for.
  */
-export async function stopOwnedTarget({ roots, target, spawnedPid, record }) {
-  const candidates = new Set()
-  if (Number.isInteger(spawnedPid) && spawnedPid > 0) for (const pid of processTree(spawnedPid)) candidates.add(pid)
-  for (const pid of [record?.pid, record?.apiPid]) {
-    if (!Number.isInteger(pid) || pid <= 0) continue
-    candidates.add(pid)
-    for (const child of processTree(pid)) candidates.add(child)
+export async function ensureResourceBarrier({ roots, target, journal }) {
+  const record = (() => {
+    try { return readInstanceRecord(roots.config) } catch (error) {
+      throw new UpgradeError('invalid_instance_record', 'The instance record is untrusted; refusing to stop or switch anything', { cause: error.message, code: error.code })
+    }
+  })()
+  let stopped = null
+  let orphan = false
+  if (record !== null) {
+    const verification = await verifyInstance(record)
+    if (verification.ok) {
+      const result = await stopInstance({ roots })
+      if (!result.ok || String(result.status).startsWith('STOP_TIMEOUT'))
+        throw new UpgradeError('upgrade_stop_failed', 'The running instance could not be stopped; nothing was switched', { status: result.status ?? null, code: result.code ?? null })
+      stopped = result
+      orphan = result.status === 'STOPPED_ORPHAN'
+    } else {
+      if (await processAlive(record.pid))
+        throw new UpgradeError('instance_record_unverified', 'The recorded launcher does not verify but its pid is alive; a live unknown target blocks the switch', { pid: record.pid, failures: verification.failures.slice(0, 8) })
+      // The launcher is gone; the recorded API child may still be the coordinator for this state.
+      const orphanCheck = await verifyCoordinatorProcess(record).catch(() => ({ ok: false, failures: ['verify_failed'] }))
+      if (!orphanCheck.ok && (await processAlive(record.apiPid)))
+        throw new UpgradeError('unknown_live_resource', 'The recorded API child is alive but cannot be proven to belong to this state; the switch is blocked', { apiPid: record.apiPid, failures: orphanCheck.failures.slice(0, 8) })
+      if (orphanCheck.ok) {
+        const stopResult = await stopProcess(record.apiPid, { timeoutMs: 6000 })
+        if (!stopResult.stopped)
+          throw new UpgradeError('upgrade_stop_failed', 'The orphaned API child could not be stopped; nothing was switched', { apiPid: record.apiPid })
+        orphan = true
+        stopped = { status: 'STOPPED_ORPHAN', apiPid: record.apiPid }
+      }
+    }
   }
-  const owned = []
-  for (const pid of candidates) {
-    if (pid === process.pid) continue
-    const command = commandOf(pid)
-    if (command === '') continue
-    if (command.includes(target.installDir) || command.includes(roots.config) || command.includes(roots.data) || command.includes(roots.logs))
-      owned.push(pid)
+  const proof = await stopRegisteredResources({ roots, target: target ?? null, record, journalSpawn: journal?.spawn ?? null })
+  if (!proof.proven) {
+    const code = proof.unknownLive.length > 0 ? 'unknown_live_resource' : 'target_stop_unproven'
+    throw new UpgradeError(code, 'A registered resource is still alive or cannot be proven to belong to this operation; the install pointer is unchanged', {
+      remaining: proof.remaining,
+      unknownLive: proof.unknownLive,
+      considered: proof.considered,
+    })
   }
-  const stopped = []
-  for (const pid of owned) {
-    try { process.kill(pid, 'SIGTERM'); stopped.push(pid) } catch { /* gone */ }
+  // The record described processes that are now proven stopped; removing it lets the target launcher
+  // start without inheriting a dead identity. A record that could not be proven is never removed.
+  if (record !== null) {
+    try { removeInstanceRecord(roots.config) } catch { /* the target start re-checks the record anyway */ }
   }
-  const deadline = Date.now() + 4000
-  while (Date.now() < deadline && owned.some((pid) => alive(pid))) await new Promise((r) => setTimeout(r, 100))
-  for (const pid of owned) {
-    if (!alive(pid)) continue
-    try { process.kill(pid, 'SIGKILL') } catch { /* gone */ }
-  }
-  const killDeadline = Date.now() + 2000
-  while (Date.now() < killDeadline && owned.some((pid) => alive(pid))) await new Promise((r) => setTimeout(r, 100))
-  const remaining = owned.filter((pid) => alive(pid))
-  return { proven: remaining.length === 0, stopped, remaining, considered: owned.length }
+  return { proven: true, record: record === null ? null : { pid: record.pid, apiPid: record.apiPid, consolePid: record.consolePid }, stopped, orphan, proof }
 }
 
-async function startTarget({ roots, target, seed, identity, fault }) {
+async function startTarget({ roots, target, seed, identity, fault, onSpawn }) {
   let consolePort = await freeFrom(seed, 'consoleURL', 0)
   let apiPort = await freeFrom(seed, 'apiURL', 0)
   if (!Number.isInteger(consolePort) || consolePort <= 0 || !Number.isInteger(apiPort) || apiPort <= 0 || consolePort === apiPort) {
@@ -460,11 +588,20 @@ async function startTarget({ roots, target, seed, identity, fault }) {
     ['start', ...modeArgs, '--port', String(consolePort), '--api-port', String(apiPort),
       '--install', target.appRoot, '--config-root', roots.config,
       '--data-root', roots.data, '--cache-root', roots.cache, '--logs-root', roots.logs, '--workspace-root', roots.workspace],
-    { cwd: target.installDir, detached: true, stdio: ['ignore', outFd, errFd] },
+    {
+      cwd: target.installDir,
+      detached: true,
+      stdio: ['ignore', outFd, errFd],
+      env: { ...process.env, ...(fault === 'target_record_missing' ? { PA_SUPPRESS_INSTANCE_RECORD: '1' } : {}) },
+    },
   )
   child.unref()
   closeSync(outFd)
   closeSync(errFd)
+  // Persist the spawn identity BEFORE any health/record work: a crash between spawn and the instance
+  // record must still leave a proven pid to stop on recovery.
+  const spawnedStart = await processStart(child.pid)
+  if (typeof onSpawn === 'function') onSpawn({ pid: child.pid, startedAt: new Date().toISOString(), processStart: spawnedStart })
 
   const fail = async (reason, detail = {}) => {
     // Prove the process tree this operation started is gone BEFORE touching the pointer or record.
@@ -472,12 +609,14 @@ async function startTarget({ roots, target, seed, identity, fault }) {
       // Test fault: pretend the stop could not be proven. The state machine must keep the indeterminate
       // state instead of reverting the pointer or restarting the old writer.
       ? { proven: false, stopped: [], remaining: [child.pid], considered: 1 }
-      : await stopOwnedTarget({ roots, target, spawnedPid: child.pid, record: readInstanceRecord(roots.config) })
+      : await stopRegisteredResources({ roots, target, spawnedPid: child.pid, spawnedStart, record: readInstanceRecord(roots.config) })
     if (!cleanup.proven) {
       writeJournalStatus({ roots, status: 'target_stop_unproven', reason, cleanup })
       throw new UpgradeError('target_stop_unproven', 'The failed target process tree could not be proven stopped; pointer and record are left as-is (no old writer is restarted)', {
         reason,
         remaining: cleanup.remaining,
+        unknownLive: cleanup.unknownLive ?? [],
+        considered: cleanup.considered ?? null,
         ...detail,
       })
     }
@@ -510,6 +649,11 @@ async function startTarget({ roots, target, seed, identity, fault }) {
     if (child.exitCode !== null) break
     await new Promise((r) => setTimeout(r, 150))
   }
+  if (fault === 'target_coordinator_exit') {
+    // Test fault: the coordinator dies right after answering health, before any record is written.
+    await stopRegisteredResources({ roots, target, spawnedPid: child.pid })
+    await fail('coordinator_exited_after_health', { health: health?.status ?? null })
+  }
   // Health can answer before the launcher persists its instance record; wait for the exact identity.
   let record = readInstanceRecord(roots.config)
   const recordDeadline = Date.now() + 15_000
@@ -535,11 +679,20 @@ async function startTarget({ roots, target, seed, identity, fault }) {
   return { pid: record.pid, apiURL: record.apiURL, consoleURL: record.consoleURL, buildId: record.buildId, mode: record.mode, access: record.access, health: health.status }
 }
 
-const writeJournalStatus = ({ roots, status, reason }) => {
+const writeJournal = ({ roots, status, reason, spawn }) => {
   const path = join(roots.config, SWITCH_JOURNAL)
   const existing = readJournal(roots.config) ?? {}
-  writePrivateJson(path, { ...existing, status, ...(reason === undefined ? {} : { reason }), updatedAt: new Date().toISOString(), dataRolledBack: false })
+  writePrivateJson(path, {
+    ...existing,
+    status,
+    ...(reason === undefined ? {} : { reason }),
+    // spawn/cleanup identity is part of the operation record, not a transient test detail.
+    ...(spawn === undefined ? {} : { spawn: { ...(existing.spawn ?? {}), ...spawn } }),
+    updatedAt: new Date().toISOString(),
+    dataRolledBack: false,
+  })
 }
+const writeJournalStatus = ({ roots, status, reason, cleanup, spawn }) => writeJournal({ roots, status, reason, spawn })
 
 async function revertPointer({ roots, target }) {
   const previousPath = join(roots.config, PREVIOUS_RELEASE)
@@ -563,9 +716,9 @@ async function revertPointer({ roots, target }) {
 export async function recoverSwitch({ installRoot, roots, values = {} }) {
   const journal = readJournal(roots.config)
   if (journal === null) throw new UpgradeError('upgrade_recover_not_needed', 'No interrupted install switch was recorded')
-  if (journal.status === 'confirmed' || journal.status === 'reverted_after_failed_start')
+  if (['confirmed', 'binary_rolled_back'].includes(journal.status) || String(journal.status).startsWith('reverted'))
     return { protocol: 'personal-install-switch/1', status: 'NO_OP', journalStatus: journal.status }
-  if (!['switched_unconfirmed', 'switching', 'stopping', 'target_stop_unproven'].includes(journal.status))
+  if (!['switched_unconfirmed', 'switching', 'stopping', 'starting', 'target_stop_unproven'].includes(journal.status))
     throw new UpgradeError('upgrade_recover_unknown_state', 'The switch journal is not in a recoverable state', { journalStatus: journal.status })
   // Never start (or revert over) an unknown live process: the same rule as upgrade/rollback.
   const existing = readInstanceRecord(roots.config)
@@ -576,10 +729,36 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
   const identity = preserveIdentity({ record: existing, explicitMode: values.mode, explicitAccess: values.access, journal })
   const target = inspectTargetInstall(journal.to.installDir)
 
+  // The target may have been spawned (identity persisted) but never confirmed. Stop the persisted
+  // spawn tree first; only a proven stop allows a pointer decision.
+  if (journal.status === 'starting') {
+    const current = readInstanceRecord(roots.config)
+    if (current !== null && current.buildId === target.release.buildId) {
+      const verification = await verifyInstance(current)
+      if (verification.ok) {
+        writeJournalStatus({ roots, status: 'confirmed', reason: 'recovered_after_spawn' })
+        return { protocol: 'personal-install-switch/1', status: 'RECOVERED', started: { pid: current.pid, apiURL: current.apiURL, buildId: current.buildId, mode: current.mode, access: current.access } }
+      }
+    }
+    const cleanup = await stopRegisteredResources({ roots, target, record: current, journalSpawn: journal.spawn ?? null })
+    if (!cleanup.proven) {
+      writeJournalStatus({ roots, status: 'target_stop_unproven', reason: 'spawn_stop_unproven', cleanup })
+      throw new UpgradeError('target_stop_unproven', 'The spawned target cannot be proven stopped; pointer and record are left as-is', { remaining: cleanup.remaining, unknownLive: cleanup.unknownLive })
+    }
+    const bindingNow = releaseBinding({ installRoot, configRoot: roots.config })
+    if (bindingNow.bound && bindingNow.installBuildId === target.release.buildId) {
+      await revertPointer({ roots, target })
+      writeJournalStatus({ roots, status: 'reverted_after_interrupted_switch', reason: 'spawn_without_record', cleanup })
+      return { protocol: 'personal-install-switch/1', status: 'REVERTED', reason: 'spawn_without_record', cleanup }
+    }
+    writeJournalStatus({ roots, status: 'reverted_after_interrupted_switch', reason: 'pointer_not_bound_to_target', cleanup })
+    return { protocol: 'personal-install-switch/1', status: 'REVERTED', reason: 'pointer_not_bound_to_target', cleanup }
+  }
+
   // A failed target whose stop could not be proven must first be stopped; only then may the pointer
   // be reverted. If it still cannot be proven stopped, keep the indeterminate state (no old writer).
   if (journal.status === 'target_stop_unproven') {
-    const cleanup = await stopOwnedTarget({ roots, target, record: existing })
+    const cleanup = await stopRegisteredResources({ roots, target, record: existing, journalSpawn: journal.spawn ?? null })
     if (!cleanup.proven) {
       writeJournalStatus({ roots, status: 'target_stop_unproven', reason: 'recover_stop_still_unproven', cleanup })
       throw new UpgradeError('target_stop_unproven', 'The failed target still cannot be proven stopped; refusing to revert or start another writer', {
@@ -623,20 +802,10 @@ export async function rollbackInstall({ installRoot, roots, values }) {
   const previous = readPreviousRelease(roots.config)
   if (previous === null || previous.unreadable === true)
     throw new UpgradeError('rollback_unavailable', 'No previous install pointer is recorded; restore a backup explicitly to return data')
-  const instance = readInstanceRecord(roots.config)
-  if (instance !== null) {
-    const verification = await verifyInstance(instance)
-    if (verification.ok) {
-      if (values['no-stop'] === true) throw new UpgradeError('upgrade_requires_stopped_instance', 'Stop the running instance before rolling the binary back')
-      const stopped = await stopInstance({ roots })
-      if (stopped?.status !== 'STOPPED') throw new UpgradeError('upgrade_stop_failed', 'The running instance could not be stopped', { status: stopped?.status ?? null })
-    } else if (await processAlive(instance.pid)) {
-      throw new UpgradeError('instance_record_unverified', 'The recorded instance does not verify but its pid is alive; refusing to roll the binary back over an unknown writer', {
-        pid: instance.pid,
-        failures: verification.failures.slice(0, 8),
-      })
-    }
-  }
+  // Same resource barrier as upgrade: a live orphan API/console or an unverifiable target blocks the
+  // pointer change instead of being filtered away.
+  const barrier = await ensureResourceBarrier({ roots, target: null, journal: readJournal(roots.config) })
+  void barrier
   const targetBuild = readRelease(roots.config).release?.buildId ?? null
   await revertPointer({ roots, target: { release: { buildId: targetBuild } } })
   writeJournalStatus({ roots, status: 'binary_rolled_back', reason: 'explicit_binary_rollback' })

@@ -23,7 +23,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
-import { ProductStore } from '../../packages/storage/dist/index.js'
+import { pathToFileURL } from 'node:url'
 import { readEvidenceSummary } from '../../packages/portability/dist/index.js'
 
 const REPO = fileURLToPath(new URL('../../', import.meta.url))
@@ -69,6 +69,7 @@ const copyInstall = (source, name) => {
   }
   return destination
 }
+const alivePid = (pid) => { try { process.kill(pid, 0); return true } catch { return false } }
 const sha256File = (path) => createHash('sha256').update(readFileSync(path)).digest('hex')
 // A pristine baseline install is extracted once from its frozen tar for the failure-window sections:
 // the shared baseline directory accumulates section A-C pointer history, and the frozen baseline
@@ -153,8 +154,16 @@ const instanceOf = (r) => {
 const statePath = (r) => join(r.data, 'state.sqlite')
 const evidenceOf = (r) => readEvidenceSummary(statePath(r))
 
-function seed(r, projectId, workId, marker) {
-  const store = new ProductStore({ path: statePath(r) })
+// The state must be written by the build that owns the schema: a schema-15 store cannot seed a
+// schema-13 baseline (and the recipe must not silently migrate it with the author checkout).
+async function storeFor(install) {
+  const module = await import(pathToFileURL(join(install, 'app', 'packages', 'storage', 'dist', 'index.js')).href)
+  return module.ProductStore
+}
+
+async function seed(r, install, projectId, workId, marker) {
+  const Store = await storeFor(install)
+  const store = new Store({ path: statePath(r) })
   try {
     const now = new Date().toISOString()
     // Each seed call uses a fresh project id, so a duplicate append never happens here.
@@ -200,16 +209,19 @@ try {
     '--data-root', join(root, 'target-probe-data'), '--cache-root', join(root, 'target-probe-cache'),
     '--logs-root', join(root, 'target-probe-logs'), '--workspace-root', join(root, 'target-probe-workspace')], { allowExit: [0] })
 
+  const baselineSchema = baselineManifest.producer.productSchema
+  const targetSchema = targetManifest.producer.productSchema
   section('installs', 'PASS', {
-    baseline: { buildId: baselineManifest.buildId, commit: baselineManifest.source.commit, schema: 13, tarFamily: 'wave06-alpha2' },
-    target: { buildId: targetManifest.buildId, commit: targetManifest.source.commit, schema: 13 },
+    baseline: { buildId: baselineManifest.buildId, commit: baselineManifest.source.commit, schema: baselineSchema, tarFamily: 'wave06-alpha2' },
+    target: { buildId: targetManifest.buildId, commit: targetManifest.source.commit, schema: targetSchema },
     sourceDistinct: true,
+    schemaChange: baselineSchema !== targetSchema ? `${baselineSchema}->${targetSchema}` : null,
   })
 
   const r = rootsFor(baseline, 'shared')
   switchTo(baseline)
   run(cli(baseline), ['first-run', '--json', ...rootArgs(r)], { allowExit: [0] })
-  const seeded = seed(r, 'project-upgrade', 'work-pre-upgrade', 'a')
+  const seeded = await seed(r, baseline, 'project-upgrade', 'work-pre-upgrade', 'a')
   const beforeDigest = evidenceOf(r).digest
   let instance = await startInstance(baseline, r, 'baseline')
   if (instance.record.buildId !== baselineManifest.buildId) throw new Error('baseline instance did not record its own buildId')
@@ -240,7 +252,12 @@ try {
   if (!afterSwitchEvidence.projects.some((project) => project.id === 'project-upgrade')) throw new Error('switching lost the pre-upgrade project')
   if (!afterSwitchEvidence.works.some((work) => work.id === 'work-pre-upgrade')) throw new Error('switching lost the pre-upgrade work')
   if (afterSwitchEvidence.artifacts[0]?.digest !== seeded.artifactDigest) throw new Error('switching lost the pre-upgrade artifact')
-  if (afterSwitchEvidence.digest !== beforeDigest) throw new Error('the switch changed business evidence (it must not migrate or rewrite data by itself)')
+  // A schema-changing target may legitimately migrate metadata on first start, so the raw evidence
+  // digest can differ; business rows must survive. When nothing migrates, the digest must be identical.
+  const schemaAfterSwitch = afterSwitchEvidence.productSchema
+  const schemaChanged = schemaAfterSwitch !== baselineSchema
+  if (!schemaChanged && afterSwitchEvidence.digest !== beforeDigest) throw new Error('the switch changed business evidence without a schema change')
+  if (schemaChanged && (afterSwitchEvidence.projects.length < 1 || afterSwitchEvidence.works.length < 1)) throw new Error('schema migration lost business rows')
   const targetHealth = await fetch(`http://127.0.0.1:${afterSwitch.apiURL.split(':').pop()}/v1/health`).catch(() => null)
   if (targetHealth?.ok !== true) throw new Error('target API is not healthy after the switch')
   const journal = JSON.parse(readFileSync(join(r.config, 'install-switch.json'), 'utf8'))
@@ -255,36 +272,71 @@ try {
     backup: { path: switched.json.backup.path, sha256: switched.json.backup.sha256 },
     instance: { pid: afterSwitch.pid, buildId: afterSwitch.buildId },
     evidenceDigestBefore: beforeDigest, evidenceDigestAfter: afterSwitchEvidence.digest,
+    schema: { before: baselineSchema, after: schemaAfterSwitch },
     mode: { record: afterSwitch.mode, health: targetModeBody?.mode ?? null },
     access: afterSwitch.access,
     dataRolledBack: journal.dataRolledBack === true,
   })
 
-  // ---- C. post-upgrade data survives a binary-only rollback ----
+  // ---- C. post-upgrade data, binary-only rollback, and a schema-changing pair ----
   const stopTarget = run(cli(target), ['stop', '--json', ...rootArgs(r)], { allowExit: [0, 2] })
   if (stopTarget.json?.status !== 'STOPPED') throw new Error('target instance did not stop for the post-upgrade write')
-  const postUpgrade = seed(r, 'project-post-upgrade', 'work-post-upgrade', 'b')
+  const postUpgrade = await seed(r, target, 'project-post-upgrade', 'work-post-upgrade', 'b')
   const afterWrite = evidenceOf(r)
-  const startedTargetAgain = await startInstance(target, r, 'target-after-write')
-  if (instanceOf(r)?.buildId !== targetManifest.buildId) throw new Error('target did not restart on the post-upgrade state')
   const rolled = run(cli(target), ['rollback-install', '--json', ...rootArgs(r)], { allowExit: [0] })
   if (rolled.json?.status !== 'BINARY_ROLLED_BACK') throw new Error('rollback-install did not report BINARY_ROLLED_BACK')
   if (rolled.json.dataRolledBack !== false) throw new Error('binary rollback must not roll data back')
   const pointerAfterRollback = JSON.parse(readFileSync(join(r.config, 'release.json'), 'utf8')).buildId
   if (pointerAfterRollback !== baselineManifest.buildId) throw new Error('binary rollback did not restore the baseline install pointer')
   switchTo(baseline)
-  const startedOld = await startInstance(baseline, r, 'baseline-after-rollback')
-  if (instanceOf(r)?.buildId !== baselineManifest.buildId) throw new Error('baseline did not start after the binary rollback')
+  const schema14or15 = afterWrite.productSchema
+  let oldBinaryRefusal = null
+  if (schema14or15 > baselineSchema) {
+    // The older binary must refuse the newer state exactly, without starting a writer or rewriting it.
+    const refusal = run(cli(baseline), ['start', '--json', '--port', String(await freePort()), '--api-port', String(await freePort()), ...rootArgs(r)], { allowExit: [2, 1] })
+    const readerMessage = /MigrationIntegrityError: Applied migration (\d+) is not registered in this build/
+    // The launcher tail is bounded, so inspect the daemon log itself for the exact storage refusal.
+    const daemonLogs = readdirSync(r.logs).filter((name) => name.endsWith('.log')).map((name) => join(r.logs, name))
+    let readerMatched = null
+    for (const path of daemonLogs) {
+      const match = readerMessage.exec(readFileSync(path, 'utf8'))
+      if (match !== null) { readerMatched = Number(match[1]); break }
+    }
+    const storageRefusal = readerMatched !== null
+    oldBinaryRefusal = {
+      code: refusal.json?.code ?? null, stateSchema: refusal.json?.detail?.stateSchema ?? null,
+      binarySchema: refusal.json?.detail?.binarySchema ?? null,
+      layer: refusal.json?.code === 'state_schema_newer_than_binary' ? 'launcher_preflight' : storageRefusal ? 'daemon_storage_reader' : 'other',
+      firstUnregisteredMigration: readerMatched,
+    }
+    if (!['state_schema_newer_than_binary', 'daemon_start_failed'].includes(oldBinaryRefusal.code) || (oldBinaryRefusal.code === 'daemon_start_failed' && !storageRefusal))
+      throw new Error(`older binary did not refuse the newer state exactly: ${JSON.stringify(refusal.json).slice(0, 300)}`)
+    if (instanceOf(r) !== null) throw new Error('the refused older binary left an instance record')
+    if (evidenceOf(r).productSchema !== schema14or15) throw new Error('the refused older binary changed the state schema')
+  } else {
+    const startedOld = await startInstance(baseline, r, 'baseline-after-rollback')
+    if (instanceOf(r)?.buildId !== baselineManifest.buildId) throw new Error('baseline did not start after the binary rollback')
+    void startedOld
+  }
+  // A compatible install for the current state is the target again; switching back is the only way to
+  // read the post-upgrade rows after a schema change (never a silent data rollback).
+  if (schema14or15 > baselineSchema) {
+    const back = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'c-reswitch.pab'), ...rootArgs(r)], { allowExit: [0], timeout: 600_000 })
+    if (back.json?.status !== 'CONFIRMED') throw new Error(`re-switch to the compatible target did not confirm: ${JSON.stringify(back.json).slice(0, 300)}`)
+    switchTo(target)
+  }
   const compatible = evidenceOf(r)
   if (!compatible.projects.some((project) => project.id === 'project-post-upgrade')) throw new Error('binary rollback lost post-upgrade projects')
   if (!compatible.works.some((work) => work.id === 'work-post-upgrade')) throw new Error('binary rollback lost post-upgrade work')
-  if (compatible.artifacts[0]?.digest !== postUpgrade.artifactDigest) throw new Error('binary rollback lost the post-upgrade artifact')
+  if (!compatible.artifacts.some((artifact) => artifact.digest === postUpgrade.artifactDigest)) throw new Error('binary rollback lost the post-upgrade artifact')
   section('C-post-upgrade-data-protection', 'PASS', {
     postUpgradeEvidence: afterWrite.digest,
-    binaryRollback: { pointer: pointerAfterRollback, dataRolledBack: false },
-    schemaCompatibleBothWays: true,
+    binaryRollback: { pointer: pointerAfterRollback, dataRolledBack: false, olderBinaryRefusal: oldBinaryRefusal },
+    schemaBefore: baselineSchema, schemaAfter: schema14or15,
     postUpgradeDataIntact: true,
-    note: 'Both builds use schema 13, so the older binary still reads the newer records; this is a binary-only rollback, never a data rollback.',
+    note: schema14or15 > baselineSchema
+      ? 'The schema-changing target migrated 13->' + schema14or15 + '; the old binary refused the newer state exactly and the same-version target read every post-upgrade row. Binary rollback never rolls data back.'
+      : 'Both builds use one schema; the older binary reads the newer records. This is a binary-only rollback, never a data rollback.',
   })
 
   // ---- D. exact schema incompatibility (not a missing-artifact side effect) ----
@@ -300,14 +352,14 @@ try {
   const refusal = run(cli(schema12), ['start', '--fixture', '--json', '--port', String(await freePort()), '--api-port', String(await freePort()), '--data-root', r.data, '--cache-root', schema12Roots.cache, '--logs-root', schema12Roots.logs, '--workspace-root', schema12Roots.workspace], { allowExit: [1, 2], timeout: 180_000 })
   if (refusal.status === 0) throw new Error('the schema-12 binary started on a schema-13 state')
   const refusalText = `${refusal.stdout ?? ''}\n${refusal.stderr ?? ''}`
-  const exactReaderRefusal = /MigrationIntegrityError: Applied migration 13 is not registered in this build/.test(refusalText)
+  const exactReaderRefusal = /MigrationIntegrityError: Applied migration \d+ is not registered in this build/.test(refusalText)
   if (!exactReaderRefusal)
     throw new Error(`the old schema reader did not refuse with the exact migration error: ${refusalText.slice(-600)}`)
   if (/release_artifact_missing/.test(refusalText))
     throw new Error('the old binary still failed for a release-artifact reason; that is not schema evidence')
   if (instanceOf(r)?.buildId === schema12Manifest.buildId) throw new Error('the refused old binary wrote an instance record')
   if (sha256File(statePath(r)) !== stateBeforeRefusal) throw new Error('the refused old binary rewrote the state')
-  if (evidenceOf(r).productSchema !== 13) throw new Error('the refused old binary changed the state schema')
+  if (evidenceOf(r).productSchema !== targetSchema) throw new Error('the refused old binary changed the state schema')
 
   // The older build must also refuse a schema-13 backup bundle with the portability code, not by
   // crashing on missing artifacts.
@@ -328,7 +380,8 @@ try {
   const futureState = join(root, 'future-state')
   mkdirSync(futureState, { recursive: true, mode: 0o700 })
   cpSync(statePath(r), join(futureState, 'state.sqlite'))
-  const futureStore = new ProductStore({ path: join(futureState, 'state.sqlite') })
+  const FutureStore = await storeFor(target)
+  const futureStore = new FutureStore({ path: join(futureState, 'state.sqlite') })
   try {
     futureStore.db.prepare("UPDATE schema_meta SET value = '99' WHERE key = 'product_schema'").run()
   } finally { futureStore.close() }
@@ -342,7 +395,7 @@ try {
   if (instanceOf(r)?.buildId !== undefined && instanceOf(r)?.state === futureState) throw new Error('the refused future-state start wrote an instance record')
   section('D-exact-schema-refusal', 'PASS', {
     oldBinary: schema12Manifest.buildId,
-    oldReaderError: 'MigrationIntegrityError: Applied migration 13 is not registered in this build',
+    oldReaderError: 'MigrationIntegrityError: Applied migration <n> is not registered in this build (daemon log)',
     oldRestoreCode: restoreRefusalCode,
     oldRestoreLayer: restoreRefusalCode === 'schema_unsupported' ? 'schema' : 'bundle_evidence_format',
     newBinaryFutureSchemaCode: futureStart.json.code,
@@ -350,6 +403,13 @@ try {
     stateUnchanged: true,
     writerStarted: false,
   })
+
+  // ---- E. failure windows on a fresh baseline state (schema13 -> target) ----
+  const installWin = copyInstall(pristineBaseline, 'e-windows-install')
+  const rWin = rootsFor(installWin, 'e-windows')
+  run(cli(installWin), ['first-run', '--json', ...rootArgs(rWin)], { allowExit: [0] })
+  await startInstance(installWin, rWin, 'e-windows')
+  switchTo(installWin)
 
   // ---- E. failure windows ----
   // E1: tampered target install is refused before the running instance is stopped.
@@ -362,24 +422,24 @@ try {
   } else {
     writeFileSync(tamperedFile, 'tampered')
   }
-  const refusedTamper = run(cli(target), ['upgrade', '--json', '--to', tampered, '--backup', join(root, 'tamper-backup.pab'), ...rootArgs(r)], { allowExit: [2] })
+  const refusedTamper = run(cli(target), ['upgrade', '--json', '--to', tampered, '--backup', join(root, 'tamper-backup.pab'), ...rootArgs(rWin)], { allowExit: [2] })
   if (refusedTamper.json?.code !== 'target_tampered') throw new Error(`tampered target was not refused: ${JSON.stringify(refusedTamper.json).slice(0, 300)}`)
-  if (instanceOf(r)?.buildId !== baselineManifest.buildId) throw new Error('a refused upgrade changed the running instance')
-  const stillUp = await fetch(`${instanceOf(r).apiURL}/v1/health`, { signal: AbortSignal.timeout(1000) }).catch(() => null)
+  if (instanceOf(rWin)?.buildId !== baselineManifest.buildId) throw new Error('a refused upgrade changed the running instance')
+  const stillUp = await fetch(`${instanceOf(rWin).apiURL}/v1/health`, { signal: AbortSignal.timeout(1000) }).catch(() => null)
   if (stillUp?.ok !== true) throw new Error('a refused upgrade stopped the running instance')
   section('E1-tampered-target-refused', 'PASS', { code: refusedTamper.json.code, instanceStillRunning: true })
 
   // E2: a running instance cannot be switched without an explicit stop.
-  const refusedRunning = run(cli(target), ['upgrade', '--json', '--to', target, '--no-stop', '--backup', join(root, 'no-stop.pab'), ...rootArgs(r)], { allowExit: [2] })
+  const refusedRunning = run(cli(target), ['upgrade', '--json', '--to', target, '--no-stop', '--backup', join(root, 'no-stop.pab'), ...rootArgs(rWin)], { allowExit: [2] })
   if (refusedRunning.json?.code !== 'upgrade_requires_stopped_instance') throw new Error(`running switch was not refused: ${JSON.stringify(refusedRunning.json).slice(0, 300)}`)
   section('E2-running-switch-refused', 'PASS', { code: refusedRunning.json.code })
 
   // E3: an unverified live pid in the instance record is never killed and blocks the switch.
   const sleeper = spawn('sleep', ['30'], { stdio: 'ignore' })
-  const recordPath = join(r.config, 'instance.json')
+  const recordPath = join(rWin.config, 'instance.json')
   const realRecord = JSON.parse(readFileSync(recordPath, 'utf8'))
   writeFileSync(recordPath, JSON.stringify({ ...realRecord, pid: sleeper.pid, apiPid: sleeper.pid, processStart: 'Mon Jan  1 00:00:00 2000' }))
-  const refusedUnverified = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'unverified.pab'), ...rootArgs(r)], { allowExit: [2] })
+  const refusedUnverified = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'unverified.pab'), ...rootArgs(rWin)], { allowExit: [2] })
   if (refusedUnverified.json?.code !== 'instance_record_unverified') throw new Error(`unverified record was not blocked: ${JSON.stringify(refusedUnverified.json).slice(0, 300)}`)
   const sleeperAlive = (() => { try { process.kill(sleeper.pid, 0); return true } catch { return false } })()
   if (!sleeperAlive) throw new Error('an unverified live process was killed')
@@ -388,26 +448,33 @@ try {
   section('E3-unverified-instance-blocked', 'PASS', { code: refusedUnverified.json.code, foreignProcessAlive: true })
 
   // E4: unhealthy target start reverts the install pointer and leaves data untouched.
-  const healthFault = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'health-fault.pab'), ...rootArgs(r)], { allowExit: [2], timeout: 180_000, env: { ...process.env, PA_UPGRADE_FAULT: 'target_unhealthy' } })
+  const healthFault = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'health-fault.pab'), ...rootArgs(rWin)], { allowExit: [2], timeout: 180_000, env: { ...process.env, PA_UPGRADE_FAULT: 'target_unhealthy' } })
   if (healthFault.json?.code !== 'upgrade_target_unhealthy') throw new Error(`unhealthy target was not reported: ${JSON.stringify(healthFault.json).slice(0, 300)}`)
-  const revertedPointer = JSON.parse(readFileSync(join(r.config, 'release.json'), 'utf8')).buildId
+  const revertedPointer = JSON.parse(readFileSync(join(rWin.config, 'release.json'), 'utf8')).buildId
   if (revertedPointer !== baselineManifest.buildId) throw new Error('failed start did not revert the install pointer')
-  if (evidenceOf(r).digest !== compatible.digest) throw new Error('failed start changed business evidence')
-  section('E4-unhealthy-target-reverted', 'PASS', { pointerAfterRevert: revertedPointer, dataUntouched: true })
+  // The fresh window has no business rows; a target boot may migrate metadata before the injected
+  // health failure, so compare business content, not the raw evidence digest.
+  const afterFault = evidenceOf(rWin)
+  if (afterFault.projects.length !== 0 || afterFault.works.length !== 0 || afterFault.artifacts.length !== 0)
+    throw new Error('failed start changed business rows in the fresh window')
+  section('E4-unhealthy-target-reverted', 'PASS', {
+    pointerAfterRevert: revertedPointer, dataUntouched: true,
+    schema: { before: baselineSchema, after: afterFault.productSchema },
+  })
 
   // E5: crash right after the pointer swap is recoverable.
-  const crash = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'crash-fault.pab'), ...rootArgs(r)], { allowExit: [2], env: { ...process.env, PA_UPGRADE_FAULT: 'crash_after_switch' } })
+  const crash = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'crash-fault.pab'), ...rootArgs(rWin)], { allowExit: [2], env: { ...process.env, PA_UPGRADE_FAULT: 'crash_after_switch' } })
   if (crash.json?.code !== 'upgrade_interrupted') throw new Error(`crash injection was not reported: ${JSON.stringify(crash.json).slice(0, 300)}`)
-  const pendingStatus = run(cli(target), ['upgrade-status', '--json', ...rootArgs(r)], { allowExit: [0] })
+  const pendingStatus = run(cli(target), ['upgrade-status', '--json', ...rootArgs(rWin)], { allowExit: [0] })
   if (pendingStatus.json?.status !== 'switched_unconfirmed') throw new Error('interrupted switch was not visible in upgrade-status')
-  const recoveredSwitch = run(cli(target), ['upgrade', '--json', '--recover', ...rootArgs(r)], { allowExit: [0] })
+  const recoveredSwitch = run(cli(target), ['upgrade', '--json', '--recover', ...rootArgs(rWin)], { allowExit: [0] })
   if (recoveredSwitch.json?.status !== 'RECOVERED') throw new Error(`switch recovery failed: ${JSON.stringify(recoveredSwitch.json).slice(0, 300)}`)
-  if (instanceOf(r)?.buildId !== targetManifest.buildId) throw new Error('recovered switch did not start the target build')
+  if (instanceOf(rWin)?.buildId !== targetManifest.buildId) throw new Error('recovered switch did not start the target build')
   switchTo(target)
-  section('E5-interrupted-switch-recovered', 'PASS', { status: recoveredSwitch.json.status, buildId: instanceOf(r).buildId })
+  section('E5-interrupted-switch-recovered', 'PASS', { status: recoveredSwitch.json.status, buildId: instanceOf(rWin).buildId })
 
   // E6: repeating the same switch is idempotent rather than a second switch.
-  const duplicate = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'duplicate.pab'), ...rootArgs(r)], { allowExit: [2] })
+  const duplicate = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'duplicate.pab'), ...rootArgs(rWin)], { allowExit: [2] })
   if (duplicate.json?.code !== 'upgrade_already_applied') throw new Error(`duplicate upgrade was not rejected: ${JSON.stringify(duplicate.json).slice(0, 300)}`)
   section('E6-duplicate-refused', 'PASS', { code: duplicate.json.code })
 
@@ -486,6 +553,72 @@ try {
     if (instanceOf(r9) !== null) throw new Error('record-missing window left an instance record')
     section('E9-record-missing-reverted', 'PASS', { journal: journal9.status, reason: journal9.reason, record: null, code: fail9.json?.code ?? null })
     run(cli(install9), ['stop', '--json', ...rootArgs(r9)], { allowExit: [0, 2] })
+  }
+
+  // ---- E10. orphan API after the launcher died: the registered child is still stopped ----
+  {
+    const install10 = copyInstall(pristineBaseline, 'e10-install')
+    const r10 = rootsFor(install10, 'e10')
+    run(cli(install10), ['first-run', '--json', ...rootArgs(r10)], { allowExit: [0] })
+    const instance10 = await startInstance(install10, r10, 'e10')
+    process.kill(instance10.record.pid, 'SIGKILL')
+    await new Promise((resolveWait) => setTimeout(resolveWait, 400))
+    const orphanRecord = JSON.parse(readFileSync(join(r10.config, 'instance.json'), 'utf8'))
+    if (!alivePid(orphanRecord.apiPid)) throw new Error('the API child did not survive the launcher kill; window not reproduced')
+    const switch10 = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'e10.pab'), ...rootArgs(r10)], { allowExit: [0], timeout: 600_000 })
+    if (switch10.json?.status !== 'CONFIRMED') throw new Error(`orphan-API upgrade did not confirm: ${JSON.stringify(switch10.json).slice(0, 300)}`)
+    if (alivePid(orphanRecord.apiPid)) throw new Error('the recorded orphan API child is still alive after the switch')
+    const record10 = instanceOf(r10)
+    if (record10?.buildId !== JSON.parse(readFileSync(join(target, 'install.json'), 'utf8')).buildId) throw new Error('orphan-API switch did not bind the target build')
+    section('E10-orphan-api-stopped', 'PASS', {
+      orphanApiPid: orphanRecord.apiPid, orphanStopped: true, stopped: switch10.json.stopped?.status ?? null, buildId: record10.buildId, mode: record10.mode,
+    })
+    run(cli(target), ['stop', '--json', ...rootArgs(r10)], { allowExit: [0, 2] })
+  }
+
+  // ---- E11. a live registered-looking process whose command does not verify stays UNKNOWN ----
+  {
+    const install11 = copyInstall(pristineBaseline, 'e11-install')
+    const r11 = rootsFor(install11, 'e11')
+    run(cli(install11), ['first-run', '--json', ...rootArgs(r11)], { allowExit: [0] })
+    const instance11 = await startInstance(install11, r11, 'e11')
+    process.kill(instance11.record.pid, 'SIGKILL')
+    await new Promise((resolveWait) => setTimeout(resolveWait, 400))
+    const record11 = JSON.parse(readFileSync(join(r11.config, 'instance.json'), 'utf8'))
+    const stranger = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 60000)'], { stdio: 'ignore', detached: true })
+    stranger.unref()
+    startedPids.add(stranger.pid)
+    // Replace the recorded API identity with the stranger: the pid is alive but its command/start do
+    // not match the record, so the barrier must report unknown_live_resource instead of killing it.
+    const tampered = { ...record11, apiPid: stranger.pid, apiProcessStart: undefined, apiArgv: undefined }
+    writeFileSync(join(r11.config, 'instance.json'), JSON.stringify(tampered), { mode: 0o600 })
+    const before11 = JSON.parse(readFileSync(join(r11.config, 'release.json'), 'utf8')).buildId
+    const attempted = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'e11.pab'), ...rootArgs(r11)], { allowExit: [1, 2] })
+    if (attempted.json?.code !== 'unknown_live_resource')
+      throw new Error(`unknown live target was not blocked with the exact code: ${JSON.stringify(attempted.json).slice(0, 300)}`)
+    if (!alivePid(stranger.pid)) throw new Error('the unknown live process was killed instead of being left to the operator')
+    if (JSON.parse(readFileSync(join(r11.config, 'release.json'), 'utf8')).buildId !== before11) throw new Error('the pointer moved while an unknown live target existed')
+    section('E11-unknown-live-blocked', 'PASS', { code: attempted.json.code, strangerAlive: true, pointer: before11 })
+    try { process.kill(stranger.pid, 'SIGKILL') } catch { /* gone */ }
+    run(cli(target), ['stop', '--json', ...rootArgs(r11)], { allowExit: [0, 2] })
+  }
+
+  // ---- E12. re-entry with an unsettled journal is refused until --recover ----
+  {
+    const install12 = copyInstall(pristineBaseline, 'e12-install')
+    const r12 = rootsFor(install12, 'e12')
+    run(cli(install12), ['first-run', '--json', ...rootArgs(r12)], { allowExit: [0] })
+    await startInstance(install12, r12, 'e12')
+    run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'e12.pab'), ...rootArgs(r12)], { allowExit: [2, 1], env: { ...process.env, PA_UPGRADE_FAULT: 'crash_after_switch' } })
+    const journal12 = JSON.parse(readFileSync(join(r12.config, 'install-switch.json'), 'utf8'))
+    if (journal12.status !== 'switched_unconfirmed') throw new Error(`crash window not recorded: ${journal12.status}`)
+    const reentry = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'e12b.pab'), ...rootArgs(r12)], { allowExit: [2, 1] })
+    if (reentry.json?.code !== 'upgrade_recover_required')
+      throw new Error(`re-entry was not refused with the exact code: ${JSON.stringify(reentry.json).slice(0, 300)}`)
+    const recovered = run(cli(target), ['upgrade', '--recover', '--json', ...rootArgs(r12)], { allowExit: [0, 1, 2] })
+    if (!['RECOVERED', 'REVERTED', 'RECOVERED_PREVIOUS'].includes(recovered.json?.status)) throw new Error('recovery did not settle the crashed switch')
+    section('E12-reentry-refused-until-recover', 'PASS', { reentry: reentry.json.code, journal: journal12.status, recovered: recovered.json.status })
+    run(cli(target), ['stop', '--json', ...rootArgs(r12)], { allowExit: [0, 2] })
   }
 
   run(cli(target), ['stop', '--json', ...rootArgs(r)], { allowExit: [0, 2] })

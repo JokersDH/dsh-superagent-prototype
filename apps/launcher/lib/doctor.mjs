@@ -166,7 +166,7 @@ export async function runDoctor({ installRoot, roots, deep = false, executorsFix
     try { return JSON.parse(readFileSync(join(roots.config, 'install-switch.json'), 'utf8')) } catch { return null }
   })()
   if (switchJournal === null) checks.push(pass('upgrade_journal', { status: 'none' }))
-  else if (switchJournal.status === 'confirmed' || String(switchJournal.status).startsWith('reverted'))
+  else if (switchJournal.status === 'confirmed' || switchJournal.status === 'binary_rolled_back' || String(switchJournal.status).startsWith('reverted'))
     checks.push(pass('upgrade_journal', { status: switchJournal.status }))
   else
     checks.push(warn('upgrade_journal', {

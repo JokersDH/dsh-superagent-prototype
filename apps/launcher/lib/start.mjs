@@ -316,7 +316,11 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
     startupMode,
     startedAt: new Date().toISOString(),
   }
-  writeInstanceRecord(roots.config, record)
+  if (process.env.PA_SUPPRESS_INSTANCE_RECORD === '1')
+    // Test-only fault injection for the upgrade window "health answered but the record was never
+    // persisted". It must be opt-in; normal starts always persist their identity before serving.
+    log('  [fault] instance record suppressed (PA_SUPPRESS_INSTANCE_RECORD=1)')
+  else writeInstanceRecord(roots.config, record)
   let closing
   const trace = (label) => {
     if (process.env.PA_DEBUG_SHUTDOWN === '1') process.stderr.write(`[shutdown ${Date.now()}ms] ${label}\n`)

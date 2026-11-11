@@ -6,6 +6,11 @@
  */
 export { PortabilityError, isPortabilityError, type PortabilityCode } from './errors.ts'
 export {
+  PortabilityRecoveryTargetMaterializer, RECOVERY_TARGET_MANIFEST_FILE,
+  RECOVERY_TARGET_MATERIAL_PROTOCOL, RECOVERY_TARGET_PREPARATION_PROTOCOL,
+  type RecoveryTargetMaterialLike, type RecoveryTargetMaterializerOptions, type RecoveryTargetPreparationLike,
+} from './recovery-target.ts'
+export {
   PRODUCT_ID,
   ROOT_NAMES,
   defaultRoots,

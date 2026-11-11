@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import Database from 'better-sqlite3'
-import { ProductStore } from '@personal-agent/storage'
+import { MIGRATIONS, PRODUCT_SCHEMA_VERSION, ProductStore, applyMigrations } from '@personal-agent/storage'
 import { createBundle, readEvidenceSummary, restoreBundle, snapshotState, verifyEvidenceSummary } from '../src/index.ts'
 
 const base = () => {
@@ -268,7 +268,7 @@ test('a future database schema is refused before a bundle can be certified', asy
  * Produces a schema-12 fixture: create real records through the public store, then remove the v13
  * tables. v13 only adds tables/indexes, so this is structurally the database an older build writes.
  */
-const seedSchema12 = (stateDir: string) => {
+const seedSchema12 = (stateDir: string, scratchPath: string) => {
   const store = new ProductStore({ path: join(stateDir, 'state.sqlite') })
   try {
     store.workflows.projects.append({
@@ -282,9 +282,20 @@ const seedSchema12 = (stateDir: string) => {
     store.close()
     throw error
   }
+  // A real schema-12 shape: apply only the recorded v1..v12 registry to a scratch file, then remove
+  // from the fixture every table a later migration introduced (the legacy bundle must not contain
+  // tables its recorded schema never had).
+  const scratch = new Database(scratchPath)
+  try { applyMigrations(scratch, { registry: MIGRATIONS.filter((entry) => entry.version <= 12) }) } finally { scratch.close() }
+  const allowed = new Set<string>()
+  const scratchRead = new Database(scratchPath, { readonly: true })
+  try {
+    for (const row of scratchRead.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as { name: string }[]) allowed.add(row.name)
+  } finally { scratchRead.close() }
   const db = new Database(join(stateDir, 'state.sqlite'))
   try {
-    db.exec('DROP TABLE route_advice; DROP TABLE review_evidence; DROP TABLE execution_outcome;')
+    const present = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as { name: string }[]
+    for (const table of present) if (!allowed.has(table.name) && table.name !== 'sqlite_sequence') db.exec(`DROP TABLE "${table.name}"`)
     db.prepare("UPDATE schema_meta SET value = '12' WHERE key = 'product_schema'").run()
     const applied = JSON.parse(String((db.prepare("SELECT value FROM schema_meta WHERE key = 'migrations'").get() as { value: string }).value)) as { version: number }[]
     db.prepare("UPDATE schema_meta SET value = ? WHERE key = 'migrations'").run(JSON.stringify(applied.filter((entry) => entry.version <= 12)))
@@ -294,10 +305,10 @@ const seedSchema12 = (stateDir: string) => {
   }
 }
 
-test('a schema-12 state is recorded as legacy evidence and restores into a schema-13 build without losing records', async (t) => {
+test('a schema-12 state is recorded as legacy evidence and restores into the current-schema build without losing records', async (t) => {
   const { root, stateDir, staging } = base()
   try {
-    assert.equal(seedSchema12(stateDir), 12)
+    assert.equal(seedSchema12(stateDir, join(root, 'scratch-12.sqlite')), 12)
     const snapshot = await snapshotState({ stateDir, stagingDir: join(staging, 'files') })
     assert.equal(snapshot.evidence.formatVersion, 1)
     assert.equal(snapshot.evidence.productSchema, 12)
@@ -313,12 +324,12 @@ test('a schema-12 state is recorded as legacy evidence and restores into a schem
     assert.equal(restored.report.database.productSchema, 12)
     assert.ok(restored.report.limitations.some((line) => line.includes('predates routing evidence')))
 
-    // The first open applies the append-only migration to schema 13; no user record is deleted.
+    // The first open applies the append-only migrations to the current schema; no user record is deleted.
     const store = new ProductStore({ path: join(target, 'state.sqlite') })
     try {
       const open = new Database(join(target, 'state.sqlite'), { readonly: true })
       try {
-        assert.equal(Number((open.prepare("SELECT value FROM schema_meta WHERE key = 'product_schema'").get() as { value: string }).value), 13)
+        assert.equal(Number((open.prepare("SELECT value FROM schema_meta WHERE key = 'product_schema'").get() as { value: string }).value), PRODUCT_SCHEMA_VERSION)
       } finally {
         open.close()
       }
@@ -327,7 +338,7 @@ test('a schema-12 state is recorded as legacy evidence and restores into a schem
       store.close()
     }
     const migrated = readEvidenceSummary(join(target, 'state.sqlite'))
-    assert.equal(migrated.productSchema, 13)
+    assert.equal(migrated.productSchema, PRODUCT_SCHEMA_VERSION)
     assert.equal(migrated.projects[0]?.id, 'project-legacy')
     assert.equal(migrated.routingEvidence.status, 'included')
     if (migrated.routingEvidence.status !== 'included') throw new Error('routing evidence missing after migration')
