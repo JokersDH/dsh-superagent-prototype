@@ -18,6 +18,7 @@ import { WorkEvidenceSchema } from '../src/work-evidence.ts';
 import { RecoveryInspectionSchema, RecoveryPrepareSchema, RecoveryPlanSchema } from '../src/recovery-state.ts';
 import { RecoveryActivationIntentSchema, RecoveryActivationCommitSchema, RecoveryActivationRecordSchema } from '../src/recovery-activation.ts';
 import { ProposalPrepareSchema, ProposalPreviewSchema, ProposalCommandSchema } from '../src/proposal-commands.ts';
+import { RecoveryTargetConfigurationSchema, RecoveryTargetPreparationSchema, RecoveryTargetMaterialSchema, RecoveryTargetInventorySchema } from '../src/recovery-target.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -86,6 +87,9 @@ outputs.set('generated/recovery-activation.manifest.json', canonical({ protocol:
 const proposalsText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:proposal-commands:1', $defs: { ProposalPrepare: z.toJSONSchema(ProposalPrepareSchema, { target: 'draft-2020-12', io: 'input' }), ProposalPreview: z.toJSONSchema(ProposalPreviewSchema, { target: 'draft-2020-12', io: 'input' }), ProposalCommand: z.toJSONSchema(ProposalCommandSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/proposals.schema.json', proposalsText);
 outputs.set('generated/proposals.manifest.json', canonical({ protocol: 'proposal-preview/1', schemaHash: digest(proposalsText), sourceHash: digest(readFileSync(resolve(root, 'src/proposal-commands.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const recoveryTargetText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:recovery-target:1', $defs: { RecoveryTargetConfiguration: z.toJSONSchema(RecoveryTargetConfigurationSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryTargetPreparation: z.toJSONSchema(RecoveryTargetPreparationSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryTargetMaterial: z.toJSONSchema(RecoveryTargetMaterialSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryTargetInventory: z.toJSONSchema(RecoveryTargetInventorySchema, { target: 'draft-2020-12', io: 'input' }) } });
+outputs.set('generated/recovery-target.schema.json', recoveryTargetText);
+outputs.set('generated/recovery-target.manifest.json', canonical({ protocol: 'recovery-target-preparation/1', schemaHash: digest(recoveryTargetText), sourceHash: digest(readFileSync(resolve(root, 'src/recovery-target.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [path, content] of outputs) {
   const target = resolve(root, path);
   if (check) {
