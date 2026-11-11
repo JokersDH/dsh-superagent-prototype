@@ -6,6 +6,7 @@ import { HttpTransport } from './transport.ts'
 import './styles.css'
 import './workbench.css'
 import './attention.css'
+import './decisions.css'
 
 const fixtureMode = import.meta.env.VITE_CONSOLE_MODE !== 'http'
 const transport = fixtureMode ? new FixtureAdapter(window.sessionStorage) : new HttpTransport()

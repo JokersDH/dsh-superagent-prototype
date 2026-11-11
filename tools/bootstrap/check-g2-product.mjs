@@ -8,7 +8,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const commands = [
   ['check:contracts'],
   ['check:g2-application'],
-  ['--filter', '@personal-agent/workspaces', '--filter', '@personal-agent/verification', '-r', 'build'],
+  ['--filter', '@personal-agent/workspaces', '--filter', '@personal-agent/verification', '--filter', '@personal-agent/knowledge', '--filter', '@personal-agent/routing', '-r', 'build'],
   ['--filter', '@personal-agent/workspaces', '--filter', '@personal-agent/verification', '-r', 'typecheck'],
   ['--filter', '@personal-agent/coordinator', 'typecheck:product'],
   ['--filter', '@personal-agent/workspaces', '--filter', '@personal-agent/verification', '-r', 'test'],

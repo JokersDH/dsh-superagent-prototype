@@ -13,6 +13,7 @@ import {
   Archive,
   ArchiveRestore,
   Bot,
+  Bookmark,
   Check,
   CheckCheck,
   ChevronRight,
@@ -69,6 +70,7 @@ import { TransportError } from './transport.ts'
 import { ProjectSettings } from './ProjectSettings.tsx'
 import { useReviewActivity } from './useReviewActivity.ts'
 import { AttentionInbox } from './AttentionInbox.tsx'
+import { DecisionWorkspace } from './DecisionWorkspace.tsx'
 import type { FixtureAdapter } from './fixture.ts'
 import { conversationId as defaultConversationId } from './config.ts'
 const phaseLabel: Record<WorkView['phase'], string> = {
@@ -154,6 +156,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [workspaceView, setWorkspaceView] = useState<'conversation' | 'works' | 'decisions' | 'executors'>('conversation')
   const [conversationTitle, setConversationTitle] = useState('主对话')
   const [catalogAvailable, setCatalogAvailable] = useState(false)
+  const [decisionSource, setDecisionSource] = useState<ConversationMessage | null>()
   const conversationDrafts = useRef(new Map<string, string>())
   const [assistant, setAssistant] = useState<AssistantProviderStatus | undefined>()
   const [waitingAfter, setWaitingAfter] = useState<number | undefined>()
@@ -745,6 +748,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           <a className="icon-button" href="/v1/guide" title="使用指南" aria-label="使用指南">
             <CircleHelp size={18} />
           </a>
+          {configuration?.decisionsAvailable && transport.decisions && transport.prepareDecision && transport.decisionCommand && <button type="button" className="icon-button" title="项目决定" aria-label="项目决定" onClick={() => setDecisionSource(null)}><Bookmark size={18} /></button>}
           <button
             type="button"
             className="icon-button secondary-tool"
@@ -1048,6 +1052,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               selectedQuestionCount={selectedQuestions.length}
               onInspectWork={() => { setWorkspaceOpen(false); setInspectorOpen(true); setModelPanelOpen(false) }}
               onDecisions={() => openView('decisions')}
+              onRecordDecision={configuration?.decisionsAvailable && transport.prepareDecision && transport.decisionCommand && transport.decisions
+                ? message => setDecisionSource(message) : undefined}
               onSend={async (text, useWorkContext) => {
                 const command: UserCommand = {
                   commandId: newId('cmd-chat'),
@@ -1213,6 +1219,10 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           {(workspaceOpen || inspectorOpen || modelPanelOpen) && <button type="button" className="drawer-backdrop" aria-label="关闭侧栏" onClick={() => { setWorkspaceOpen(false); setInspectorOpen(false); setModelPanelOpen(false) }} />}
         </main>
       )}
+      {auth === 'ready' && decisionSource !== undefined && configuration && configuration.projects.length > 0 &&
+        <DecisionWorkspace transport={transport} configuration={configuration} source={decisionSource ?? undefined}
+          sources={snapshot?.conversation?.messages ?? []} initialProjectId={decisionSource?.projectId ?? projectFilter ?? configuration.projects[0]!.id}
+          onClose={() => setDecisionSource(undefined)} />}
     </div>
   )
 }
@@ -1984,6 +1994,7 @@ function Conversation({
   selectedQuestionCount,
   onInspectWork,
   onDecisions,
+  onRecordDecision,
   pending,
   offline,
   assistant,
@@ -2005,6 +2016,7 @@ function Conversation({
   selectedQuestionCount: number
   onInspectWork: () => void
   onDecisions: () => void
+  onRecordDecision: ((message: ConversationMessage) => void) | undefined
   pending: boolean
   offline: boolean
   assistant: AssistantProviderStatus | undefined
@@ -2108,6 +2120,8 @@ function Conversation({
                 })}
               </time>
               {message.provenance === 'reasoner_reply' && <ReplyActions text={message.text} />}
+              {message.role === 'user' && message.provenance === 'trusted_user' && message.projectId && onRecordDecision &&
+                <button type="button" className="icon-button message-decision" title="记录为项目决定" aria-label="记录为项目决定" onClick={() => onRecordDecision(message)}><Bookmark size={14} /></button>}
             </header>
             <MessageText text={message.text} />
           </article>

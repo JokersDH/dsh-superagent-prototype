@@ -1,0 +1,162 @@
+{
+  "role": "C",
+  "branch": "codex/g3-assistant-context",
+  "mainBaseCommit": "a70db20",
+  "mergeCommit": "9aab1c8",
+  "stableCheckpoint": "027c305",
+  "updatedAt": "2026-11-10T13:10:00.000Z",
+  "ownedPaths": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge",
+    "packages/routing"
+  ],
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0,
+    "unknownSends": 0
+  },
+  "phases": [
+    {
+      "phase": "C1",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave05-assistant-probe-final.json",
+        "packages/context/reports/wave05-c1-verification.txt",
+        "packages/knowledge/test/real-store.case.ts",
+        "packages/knowledge/test/decision-transaction.case.ts",
+        "packages/knowledge/reports/decision-transaction-run.json",
+        "commit 027c305"
+      ],
+      "results": {
+        "realSqliteProbe": "PASS_SQLITE_ASSISTANT_CONSUMER (7/7; DECISION-DOMAIN-REPLAY-OVER-STORAGE PASS)",
+        "knowledgeTests": "35/35",
+        "decisionExample": "PASS (real temporary SQLite, 0 model/network)",
+        "wave04AdmissionRegression": "PASS (3/3 C cases)"
+      },
+      "note": "Adapter maps create/same-version/old-version/successor explicitly; old replay returns the current revoked/superseded head. DecisionTransactionService provides read-only prepare plus sync commit/revoke with actor/grant/scope/source/supersession re-checks."
+    },
+    {
+      "phase": "C2",
+      "status": "passed_pure_module",
+      "evidence": [
+        "packages/routing/src/attention.ts",
+        "packages/routing/test/attention.case.ts",
+        "packages/routing/test/eligibility.case.ts"
+      ],
+      "note": "rankAttention/groupAttention are deterministic over blocking relations, real business deadlines, waiting age and category; question expiry is separate and expired items are not actionable; grouping keeps per-target approval and never merges actors/projects. Eligibility is a pure filter over admitted identity, layer, capabilities, scope, budget and isolation/egress."
+    },
+    {
+      "phase": "C3",
+      "status": "passed_pure_module",
+      "evidence": [
+        "packages/routing/src/advisor.ts",
+        "packages/routing/test/advisor.case.ts"
+      ],
+      "note": "Cold-start advice emits none_eligible/only_eligible/operator_default/fixed_rule only; multiple candidates without a rule return needs_operator_choice instead of an invented ranking. No measured history/probability. Confirmation rejects expiry, task/catalog/policy drift, profile admission/identity drift and scope shrink."
+    },
+    {
+      "phase": "C4",
+      "status": "passed_pure_module",
+      "evidence": [
+        "packages/routing/src/review.ts",
+        "packages/routing/test/review.case.ts"
+      ],
+      "note": "Strict review-report/1 parsing; subject/candidate/artifact/contract/base/environment/check/input/reviewer/attempt/isolation/layer checks. sealed_copy proof + capsule digest or native_read_only/legacy proof; no_findings is not machine PASS; human acceptance is never written."
+    },
+    {
+      "phase": "C5",
+      "status": "passed_pending_a_port",
+      "evidence": [
+        "packages/routing/src/evidence-memory.ts",
+        "packages/routing/test/consumer.case.ts",
+        "packages/routing/examples/routing-loop.mjs",
+        "packages/routing/reports/routing-consumer-run.json",
+        "packages/context/reports/wave05-full-verification.txt"
+      ],
+      "note": "Zero-model consumer covers attention -> eligibility -> advice -> persisted/replayed advice -> confirmation -> frozen subject -> structured mock review -> persisted evidence -> candidate/profile invalidation. InMemoryRoutingEvidence mirrors A's sync append-only port. Real SQL RoutingEvidencePort is NOT_TESTED until A publishes it."
+    }
+  ],
+  "commands": [
+    "git fetch origin && git merge origin/main",
+    "pnpm --filter @personal-agent/{orchestrator-core,effects,storage,workflows,contracts,proposals,knowledge,context,routing} build",
+    "pnpm --filter @personal-agent/context typecheck && test && build",
+    "pnpm --filter @personal-agent/proposals typecheck && test && build",
+    "pnpm --filter @personal-agent/knowledge typecheck && test && build",
+    "pnpm --filter @personal-agent/routing typecheck && test && build",
+    "node tools/bootstrap/review-persisted-assistant.mjs",
+    "node tools/bootstrap/review-wave04-admission.mjs",
+    "node packages/knowledge/examples/decision-transaction.mjs",
+    "node packages/knowledge/examples/persisted-loop.mjs",
+    "node packages/routing/examples/routing-loop.mjs"
+  ],
+  "results": {
+    "contextTests": "34/34",
+    "proposalTests": "18/18",
+    "knowledgeTests": "35/35",
+    "routingTests": "29/29",
+    "typecheck": "PASS (four packages)",
+    "build": "PASS (four packages)",
+    "realSqliteAssistantProbe": "PASS_SQLITE_ASSISTANT_CONSUMER (7/7)",
+    "wave04AdmissionRegression": "PASS_ADMISSION_PROBES (3/3 C)",
+    "decisionTransactionExample": "PASS (real temporary SQLite, 0 model/network)",
+    "routingConsumerExample": "PASS (0 model/network; real A routing port NOT_TESTED)"
+  },
+  "dependencyRequests": [
+    {
+      "package": "packages/knowledge",
+      "added": [
+        "@personal-agent/storage (dev)",
+        "@personal-agent/workflows (dev)"
+      ],
+      "reason": "Real temporary SQLite decision transaction test/example.",
+      "rootLock": "pnpm-lock.yaml diff is uncommitted; main owns the authoritative lock."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "C-A-routing-evidence",
+      "owner": "A",
+      "status": "external_pending",
+      "input": "createWorkflowPorts(store).routingEvidence implementing the shared sync RoutingEvidencePort.",
+      "expected": "Sync put/get/list for advice/reviews/outcomes on the existing UnitOfWork; same-body replay idempotent, changed body conflict.",
+      "actual": "packages/contracts/src/routing-review.ts exists; no storage/workflows implementation on main.",
+      "continue": "C2-C4 pure modules and C5 consumer use an in-memory reference port with the identical interface; re-run the same consumer against A's port when it lands."
+    },
+    {
+      "id": "C-main-routing-wiring",
+      "owner": "main",
+      "status": "external_pending",
+      "input": "HTTP/provider/UI wiring, attention aggregation, advice confirmation command plan and trusted ReviewEvidence producer.",
+      "expected": "Default routing/review remains disabled behind the wave-05 R0 gates; main assembles trusted fields and writes receipts in one transaction.",
+      "actual": "No main consumer exists; assistant production remains disabled.",
+      "continue": "Use exported pure functions and the reference port; do not duplicate ranking/eligibility/review rules in coordinator."
+    },
+    {
+      "id": "C-B-profile-resolver",
+      "owner": "B",
+      "status": "external_pending",
+      "input": "Exact ExecutionProfileRef resolver and current native/controlled evidence + isolation capsule proof.",
+      "expected": "Trusted full compatibility/config digest and layer evidence per profile; no brand-name matching.",
+      "actual": "Eligibility consumes supplied facts; no resolver integration yet.",
+      "continue": "Main/B can supply ProfileFacts from the resolver without changing the pure evaluator."
+    }
+  ],
+  "notTested": [
+    "Real SQLite RoutingEvidencePort (A-owned, not present on main)",
+    "Main HTTP/provider/UI wiring for attention/advice/review evidence",
+    "Any real model or native task (budget 0)",
+    "Real reviewer session/isolation execution and review pilot outcomes (E-owned)"
+  ],
+  "mainNextSteps": [
+    "Re-run review-persisted-assistant.mjs and review-wave04-admission.mjs against this branch for the C gates.",
+    "Consume DecisionTransactionService in the existing UnitOfWork for record/revoke commands.",
+    "Render rankAttention/groupAttention output and buildContextPreview in the attention/workbench view.",
+    "Persist RouteAdvice/ReviewEvidence through A's routingEvidence port when published; keep default routing/review disabled until R0 gates pass."
+  ],
+  "aNextSteps": [
+    "Publish createWorkflowPorts(store).routingEvidence with sync append-only put/get/list and same-body replay.",
+    "Optionally add a persisted review-subject/current-candidate index for efficient invalidation queries."
+  ],
+  "latestDeliveryCommit": "b70a658"
+}

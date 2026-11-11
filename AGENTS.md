@@ -17,6 +17,7 @@
 - Shared AttentionRanker is `packages/contracts/src/attention.ts`. Preserve unknown waiting, explicit business deadlines and outgoing blockedWorkIds semantics; C's older incoming blockedBy field cannot be mechanically renamed. Main owns any new shared schema and all HTTP/UI.
 - Recovery authorization is main-owned and PLANNED until its actual interface checkpoint. Keep restore markers, old queues and unknown-writer barriers; no force switch or marker deletion may replace fresh binding/verification and explicit authorization of new work.
 - Preserve user services 5180/8796, 5181/8797, 5182/8798, 5183/8799 and 5184/8800. Use isolated temporary ports/state. Only main updates shared dispatch/docs/root lock; role evidence stays under each role's owned directory. Static dispatch checks are not runtime or release evidence.
+- Main's subsequent scoped checkpoint is WP-16/0024: A v13 ports, C decision transactions/shared ranker and B exact-profile resolver are integrated in the recorded scopes. Decision record/revoke HTTP/UI is available; generic proposal execution, automatic context injection and recovery reauthorization remain separate. Preserve the new 5185/8801 preview too; it has independent private state and does not migrate the old instances.
 
 ## Historical Product Wave-05 Assignments (2026-11-10)
 

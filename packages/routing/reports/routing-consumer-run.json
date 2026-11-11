@@ -1,0 +1,17 @@
+{
+  "protocol": "wave05-routing-consumer/1",
+  "generatedAt": "2026-11-11T02:32:18.810Z",
+  "result": {
+    "status": "PASS",
+    "modelCalls": 0,
+    "networkCalls": 0,
+    "attentionTop": [
+      "permission-1:deadline",
+      "clarify-1:expired"
+    ],
+    "adviceBasis": "only_eligible",
+    "reviewState": "current",
+    "staleReason": "candidate_changed",
+    "realRoutingEvidencePort": "NOT_TESTED (A-owned RoutingEvidencePort not present on main)"
+  }
+}
