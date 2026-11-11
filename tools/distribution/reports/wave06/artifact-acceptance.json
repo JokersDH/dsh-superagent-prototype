@@ -1,7 +1,7 @@
 {
   "case": "WAVE06-ARTIFACT-ACCEPTANCE",
   "status": "PASS",
-  "startedAt": "2026-11-11T04:41:10.756Z",
+  "startedAt": "2026-11-11T04:46:44.904Z",
   "steps": [
     {
       "id": "extract-and-first-run",
@@ -25,7 +25,10 @@
       "detail": {
         "coordinatorEntry": "extracted-install",
         "nativeBinding": "extracted-install",
-        "checkoutReferences": 0
+        "checkoutReferences": 0,
+        "openFilesTotal": 13,
+        "openFilesFromInstall": 6,
+        "openFilesFromCheckout": 0
       }
     },
     {
@@ -106,7 +109,7 @@
       ]
     }
   },
-  "finishedAt": "2026-11-11T04:41:16.956Z",
+  "finishedAt": "2026-11-11T04:46:51.762Z",
   "limitations": [
     "darwin/arm64 + Node 24.21.x measured only; cross-machine/ABI is NOT_TESTED.",
     "Uses fixture mode and isolated temp ports/state; no user service, native executor or model call.",

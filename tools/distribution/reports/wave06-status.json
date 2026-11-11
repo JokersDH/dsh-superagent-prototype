@@ -143,7 +143,7 @@
     },
     "d6": {
       "status": "PASS_WITH_E_PENDING",
-      "summary": "Frozen same-byte artifact produced from the clean commit outside Git; independent acceptance from a fresh extraction passed 8 steps including recovery preflight and restored read-only 422; E independent re-run still pending.",
+      "summary": "Frozen same-byte artifact produced from the clean commit outside Git; independent acceptance from a fresh extraction passed 8 steps: doctor gates, workbench, coordinator/native-binding/lsof provenance (0 checkout files), backup, restore with verified evidence, recovery preflight not_granted with unchanged bytes/marker, restored read-only 422. E independent re-run still pending.",
       "evidence": [
         "tools/distribution/reports/wave06/install-artifact.json",
         "tools/distribution/reports/wave06/artifact-acceptance.json"
@@ -190,7 +190,8 @@
     "artifactAcceptance": {
       "command": "node tools/distribution/verify-artifact.mjs --tar <frozen tar>",
       "steps": 8,
-      "status": "PASS"
+      "status": "PASS",
+      "provenance": "coordinator entry + native binding from the extracted install; lsof shows 0 open files under the author checkout"
     },
     "dispatchVerifier": {
       "command": "node agent-tasks/product-wave-06/verify.mjs",

@@ -108,7 +108,24 @@ try {
   const binding = spawnSync('lsof', ['-a', '-p', String(apiPid), '-Fn'], { encoding: 'utf8' }).stdout ?? ''
   const nativeBinding = binding.split('\n').find((line) => line.includes('better-sqlite3') && line.includes('.node')) ?? ''
   if (!nativeBinding.startsWith(`n${installReal}`)) throw new Error('artifact native binding is not loaded from the extracted install')
-  step('artifact-start-and-provenance', 'PASS', { coordinatorEntry: 'extracted-install', nativeBinding: 'extracted-install', checkoutReferences: 0 })
+  // Open-file provenance: no loaded file may live in the author checkout, so the running daemon does
+  // not depend on this repository being present.
+  const openFiles = (spawnSync('lsof', ['-p', String(apiPid), '-Fn'], { encoding: 'utf8' }).stdout ?? '')
+    .split('\n')
+    .filter((line) => line.startsWith('n/'))
+    .map((line) => line.slice(1))
+  const checkoutRoot = realpathSync(resolve(process.env.PA_AUTHOR_CHECKOUT ?? '..'))
+  const fromCheckout = openFiles.filter((path) => path.startsWith(checkoutRoot))
+  if (fromCheckout.length > 0) throw new Error(`artifact daemon opened files from the author checkout: ${fromCheckout.slice(0, 3)}`)
+  const fromInstall = openFiles.filter((path) => path.startsWith(installReal)).length
+  step('artifact-start-and-provenance', 'PASS', {
+    coordinatorEntry: 'extracted-install',
+    nativeBinding: 'extracted-install',
+    checkoutReferences: 0,
+    openFilesTotal: openFiles.length,
+    openFilesFromInstall: fromInstall,
+    openFilesFromCheckout: fromCheckout.length,
+  })
   const backup = pa(['backup', '--json', '--out', join(root, 'artifact-backup.pab')], { allowExit: [0] })
   if (backup.json?.status !== 'CREATED' || backup.json.evidence === null) throw new Error('artifact backup/evidence failed')
   step('artifact-backup', 'PASS', { digest: backup.json.evidence.digest, counts: backup.json.evidence.counts })
