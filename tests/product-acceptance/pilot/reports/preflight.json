@@ -53,6 +53,6 @@
     "maxTotalBillableTokens": 200000,
     "maxTotalCostUSD": 5
   },
-  "checkedAt": "2026-11-11T03:39:56.137Z",
+  "checkedAt": "2026-11-11T04:08:07.237Z",
   "note": "Preflight blocked; no model turn may be sent. Existing ledger reservations/usage were preserved."
 }
