@@ -24,6 +24,8 @@ import {
   ProjectSettingsPageSchema,
   ProjectSettingsCommandSchema,
   ReviewActivitySchema,
+  AttentionPageSchema,
+  AttentionQuerySchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -48,6 +50,8 @@ import type {
   ProjectSettingsPage,
   ProjectSettingsCommand,
   ReviewActivity,
+  AttentionPage,
+  AttentionQuery,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -99,6 +103,7 @@ export interface ConsoleTransport {
   projectSettings?(projectId: string): Promise<ProjectSettingsPage>
   projectSettingsCommand?(command: ProjectSettingsCommand): Promise<CommandReceipt>
   reviewActivity?(activity: ReviewActivity): Promise<CommandReceipt>
+  attention?(query: AttentionQuery): Promise<AttentionPage | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -326,6 +331,18 @@ export class HttpTransport implements ConsoleTransport {
     const receipt = CommandReceiptSchema.parse(await this.request(`/v1/projects/${encodeURIComponent(command.projectId)}/settings`, { method: 'POST', body: JSON.stringify(command) }))
     if (receipt.commandId !== command.commandId) throw new TransportError('schema_mismatch', '项目设置回执身份不匹配')
     return receipt
+  }
+  async attention(input: AttentionQuery): Promise<AttentionPage | undefined> {
+    const query = AttentionQuerySchema.parse(input), params = new URLSearchParams()
+    for (const [key, value] of Object.entries(query)) if (value !== undefined) params.set(key, String(value))
+    let body: unknown
+    try { body = await this.request(`/v1/attention?${params}`, undefined, true) }
+    catch (error) { if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined; throw error }
+    if (body === missingOptionalResource) return undefined
+    const page = AttentionPageSchema.parse(body)
+    if (query.projectId && page.items.some(item => item.projectId !== query.projectId))
+      throw new TransportError('schema_mismatch', '待办与所选项目不匹配')
+    return page
   }
   async reviewActivity(input: ReviewActivity): Promise<CommandReceipt> {
     const activity = ReviewActivitySchema.parse(input)

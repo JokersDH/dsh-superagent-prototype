@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
 import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
-import type { ConversationCommand, NativeQuestionBinding, ProjectSettingsCommand, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
+import type { AttentionRanker, ConversationCommand, NativeQuestionBinding, ProjectSettingsCommand, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { CheckRegistry } from '@personal-agent/verification'
@@ -21,6 +21,7 @@ import type { NativeProjectRegistry } from './project-registry.ts'
 import { ProductEnvironments } from './environments.ts'
 import { ProductProjectSettings } from './project-settings.ts'
 import { ProductReviewTiming } from './review-timing.ts'
+import { ProductAttention } from './attention.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -33,6 +34,7 @@ export function createProductRuntime(
     projectRegistry?: NativeProjectRegistry
     workspaceRoot?: string
     startupMode?: 'normal' | 'recovery_readonly'
+    attentionRanker?: AttentionRanker
   },
 ) {
   options = {
@@ -129,12 +131,17 @@ export function createProductRuntime(
   const reviewTiming = new ProductReviewTiming(store, application, completion, options.principal, () => configuredProjects.map(project => project.id))
   completion.onAccepted = (candidate, actor, at) => reviewTiming.accepted(candidate, actor, at)
   const conversations = new ApplicationConversations(store, options.principal, () => configuredProjects.map(project => project.id), options.actionSecret)
+  const attention = new ProductAttention(store, application, completion, {
+    projectIds: () => configuredProjects.map(project => project.id), verification: work => execution!.verificationStatus(work),
+    ...(options.attentionRanker ? { ranker: options.attentionRanker } : {}), ...(options.now ? { now: options.now } : {}),
+  })
   const assistantStreams = new AssistantStreams()
   if (options.assistantProvider)
     handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams, {
       nativeExecution: !!options.native,
     })
   const read: NonNullable<LocalHttpOptions['read']> = {
+    attention: query => attention.read(query),
     ...(projectSettings ? { projectSettings: async (projectId: string) => projectSettings.read(projectId) } : {}),
     conversations: async query => conversations.list(query),
     conversation: async id => conversations.get(id),

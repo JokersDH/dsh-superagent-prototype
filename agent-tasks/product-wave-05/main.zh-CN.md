@@ -14,6 +14,8 @@ primary checkout，拥有contracts/application/questions/coordinator/console/roo
 
 ## M2 注意力工作台优先，多profile组合受闸门控制
 
+主线注意力首个纵向已交：GET /v1/attention、项目/类型/搜索/分页、原会话深链接、逐项审阅导航，默认仅waiting_order；见 [0022](../../docs/rfcs/WP-16/0022-attention-inbox-consumer.md) 和 [限定证据](../../reports/releases/attention-inbox/README.zh-CN.md)。C候选已交但还需独立准入并适配共享输入，不能把本批当优先级或整个R0已通过。新预览5184/8800使用独立状态，原四组服务保留。
+
 与C先交跨项目/会话的待回答、待接受、故障恢复入口，显示实际期限/阻塞/等待原因并可回原工作。缺deadline不编造，过期问题不能发；连续批量审阅仍逐项命令/target，不合并权限或自动接受。只读索引与原动作重用，模型离线可查/答/停。该产品价值不等pilot或第二Driver。
 
 下述新增多profile/Driver生产投入等pilot promising；之前仅保留现有路径和稳定接口，不能因所有Agent已开工豁免前置验证。

@@ -12,6 +12,8 @@
 
 ## C2 注意力排序先交，准入过滤保持纯模块
 
+main已发布 [0022稳定输入](../../docs/rfcs/WP-16/0022-attention-inbox-consumer.md)：直接消费contracts/attention.ts的AttentionItem/AttentionRanker，输入items/now，返回完整id排列和共享reasons。不要复制DTO；main当前waiting_order只是可用降级，C的确定性优先级经准入后替换。
+
 提供`rankAttention`纯接口与fixture：跨项目问题/候选接受/故障阻断，按真实截止、阻塞关系、等待年龄和问题类别排序，并给可解释原因。缺业务deadline为unknown，不把expiresAt等同业务截止；已过期问题无可发送答案动作。main做聚合读取和工作台，不等pilot或第二Driver。
 
 批量审阅只分组和导航，不合并权限/认证授权或自动替用户作答。覆盖混合项目/另actor/旧问题与候选/截止过期/无截止/同分稳定排序，E可独立构造反例。交早期导出后继续纯Eligibility。

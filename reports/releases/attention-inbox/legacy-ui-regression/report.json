@@ -1,0 +1,45 @@
+{
+  "status": "PASS_CONTROLLED_UI_V3",
+  "checkedAt": "2026-11-10T13:00:21.118Z",
+  "sourceCommit": "e937dbed5e06b7bcf68b1cd7121d2a4bf2436e03",
+  "cases": [
+    {
+      "id": "CONTROLLED-FIXTURE-ONLY",
+      "status": "PASS"
+    },
+    {
+      "id": "DRAFT-SURVIVES-VIEW-SWITCH",
+      "status": "PASS"
+    },
+    {
+      "id": "TASK-SEARCH-FILTER-AND-RESET",
+      "status": "PASS"
+    },
+    {
+      "id": "DECISION-INBOX-USES-REAL-ANSWER-COMMAND",
+      "status": "PASS"
+    },
+    {
+      "id": "EXECUTOR-DIRECTORY-KEEPS-FIXTURE-IDENTITY",
+      "status": "PASS"
+    },
+    {
+      "id": "CONVERSATION-DETAIL-AND-DESKTOP-GEOMETRY",
+      "status": "PASS"
+    },
+    {
+      "id": "NARROW-NAVIGATION-AND-DRAWERS",
+      "status": "PASS"
+    },
+    {
+      "id": "NO-UNCAUGHT-ERROR-AND-PRIVATE-DESIGN-RECORD",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "captures": null,
+  "limitations": [
+    "Controlled browser fixture only; no vendor/model call or native compatibility claim",
+    "Daily backend workflow, migration and new runtime controls are separate wave-03 packages"
+  ]
+}
