@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs'
 import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
 import { sharedAttentionRanker } from '@personal-agent/routing'
-import type { AttentionRanker, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
+import type { AttentionRanker, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, RecoveryPrepare, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
+import { WorkEvidenceSchema } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { CheckRegistry } from '@personal-agent/verification'
@@ -24,6 +25,8 @@ import { ProductProjectSettings } from './project-settings.ts'
 import { ProductReviewTiming } from './review-timing.ts'
 import { ProductAttention } from './attention.ts'
 import { ProductDecisions } from './decisions.ts'
+import { projectAcceptedOutcome } from './accepted-outcomes.ts'
+import { ProductRecovery } from './recovery.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -131,9 +134,15 @@ export function createProductRuntime(
   )
   const { store } = options
   const reviewTiming = new ProductReviewTiming(store, application, completion, options.principal, () => configuredProjects.map(project => project.id))
-  completion.onAccepted = (candidate, actor, at) => reviewTiming.accepted(candidate, actor, at)
+  completion.onAccepted = (candidate, actor, at) => {
+    const eventSeq = reviewTiming.accepted(candidate, actor, at)
+    const result = projectAcceptedOutcome(store, eventSeq, candidate)
+    if (result.status === 'conflict') throw new ApplicationFault('verification_failed', 'Accepted outcome source identity conflicts')
+  }
   const conversations = new ApplicationConversations(store, options.principal, () => configuredProjects.map(project => project.id), options.actionSecret)
   const decisions = new ProductDecisions(store, options.principal, () => configuredProjects, options.actionSecret, options.now)
+  const recovery = new ProductRecovery(store, { stateRoot: options.stateRoot, startupMode: options.startupMode ?? 'normal',
+    principal: options.principal, projects: () => configuredProjects, ...(options.now ? { now: options.now } : {}) })
   const attention = new ProductAttention(store, application, completion, {
     projectIds: () => configuredProjects.map(project => project.id), verification: work => execution!.verificationStatus(work),
     ranker: options.attentionRanker ?? sharedAttentionRanker, ...(options.now ? { now: options.now } : {}),
@@ -144,6 +153,23 @@ export function createProductRuntime(
       nativeExecution: !!options.native,
     })
   const read: NonNullable<LocalHttpOptions['read']> = {
+    recovery: async () => recovery.inspect(),
+    workEvidence: async workId => {
+      const work = (await application.inspect({ workId })).works[0]
+      if (!work) throw new ApplicationFault('forbidden', 'Work evidence is outside the configured scope', 'none')
+      const timeline = store.workflows.index.timeline({ workId, projectIds: configuredProjects.map(project => project.id), limit: 500 })
+      if (!timeline) throw new ApplicationFault('forbidden', 'Work timeline is outside the configured scope', 'none')
+      const outcomes = timeline.entries.filter(entry => entry.kind === 'execution.outcome').map(entry => {
+        const value = store.workflows.routingEvidence.outcomes.get(entry.sourceRef)
+        if (!value || value.projectId !== work.work.projectId || value.attempt.contract.workId !== workId)
+          throw new ApplicationFault('storage_unavailable', 'Outcome source identity mismatch', 'none')
+        return value
+      })
+      const current = outcomes.some(value => value.attempt.contract.revision === work.contract.revision &&
+        value.attempt.contract.digest === work.contract.digest && value.verificationRef === work.actions.currentVerificationId)
+      return WorkEvidenceSchema.parse({ protocol: 'work-evidence/1', workId, entries: timeline.entries, outcomes, truncated: timeline.truncated,
+        projection: current ? 'recorded' : work.phase === 'delivered' ? timeline.truncated ? 'not_in_window' : 'source_missing' : 'not_accepted' })
+    },
     decisions: async query => decisions.list(query),
     attention: query => attention.read(query),
     ...(projectSettings ? { projectSettings: async (projectId: string) => projectSettings.read(projectId) } : {}),
@@ -329,6 +355,7 @@ export function createProductRuntime(
     read,
     projectSettings,
     operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor),
+      recoveryPrepare: async (input: RecoveryPrepare, actor: TrustedActor) => recovery.prepare(input, actor),
       prepareDecision: async (input: DecisionPrepare, actor: TrustedActor) => decisions.prepare(input, actor),
       decision: async (command: DecisionCommand, actor: TrustedActor) => decisions.dispatch(command, actor),
       reviewActivity: async (activity: ReviewActivity, actor: TrustedActor) => reviewTiming.record(activity, actor),

@@ -12,5 +12,7 @@ export * from './routing-review.ts';
 export * from './review-timing.ts';
 export * from './attention.ts';
 export * from './decision-commands.ts';
+export * from './work-evidence.ts';
+export * from './recovery-state.ts';
 export type * from './types.ts';
 export type * from './ports.ts';

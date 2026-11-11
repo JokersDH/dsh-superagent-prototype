@@ -37,6 +37,7 @@ ports.assistant.proposals.get(id) / .put(record, expectedVersion)
 ports.assistant.legacyDecisions({ projectId }) // audit-only, never valid memory
 ports.routingEvidence.advice / reviews / outcomes  // immutable RoutingEvidencePort
 ports.routingEvidence.sources(attemptId, projectId) // read-only outcome source projection
+ports.acceptance.consume({ eventSeq, projectId, profileRef, layer }) // accepted event -> outcome
 ports.index.timeline({ workId, projectIds, limit })
 
 const snapshots = new WorkflowSnapshots(store)
@@ -99,6 +100,10 @@ snapshots.verify('/private/new-snapshot-dir')
 - `state.stateFacts()` returns schema/writer/instance/queue/artifact/question/proposal observations for
   D's preflight. A writer row/PID is not a trusted stop proof; D still needs the existing barrier
   receipts.
+- `acceptance.consume` projects an existing `application.candidate.accepted` event to one deterministic
+  outcome only when candidate/work/attempt/profile/verification/acceptance sources are exact. Missing
+  sources return an auditable gap and write nothing; a machine-only contract may use the exact event
+  reference as acceptance source. It never appends a second accepted event or fabricates usage/time.
 - `routingEvidence` stores immutable RouteAdvice/ReviewEvidence/ExecutionOutcome records from the
   shared contracts. Put is idempotent for an identical complete body and conflicts on changes;
   project-scoped bounded lists support exact review-subject and execution-profile filters. The

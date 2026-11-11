@@ -4,6 +4,8 @@ primary checkout，继续codex/g2-execution-integration。先读本轮README、0
 
 当前已交有限检查点：[0024明确决定HTTP/网页与共享排序](../../docs/rfcs/WP-16/0024-wave-06-decisions-http-checkpoint.md)，生产源f638fe0，证据见 [主线限定交接](../../reports/releases/wave06-main-checkpoint/README.zh-CN.md)。M1-M3仍为IN_PROGRESS，不把记录/撤销决定当通用proposal/自动上下文已完成；M4恢复新授权、M5安装准入及M6价值决策仍未完成。新5185/8801预览与原五组服务同样保留，所有后续测试用隔离资源。
 
+第二检查点 [0025](../../docs/rfcs/WP-16/0025-outcome-projection-and-recovery-preflight.md) 已完成A接受投影生产组合、工作证据HTTP、真实A/C port消费，以及恢复inspect/prepare；源码d8d0a03，后端61项通过。M2时间线网页展示仍待补，M4仅只读部分已交，commitAvailable=false；不能通过放开旧队列或删除marker补齐。D/E可先消费新接口与明确阻断，原服务不重启。
+
 ## M1 先交共享输入与最小准入检查点
 
 独立复验A v13 port、C决定事务/重放、B精确profile resolver及D最小发行入口，分别先收可消费的源码检查点，再让A/C/D/E组合；不等五个整包全部结束才合入，也不让B的试点阻断卡住A/C产品接线。既有报告不代替当前源码，失败给owner受控复现，接受的commit/source/范围明确记录。root锁只由main再生成。

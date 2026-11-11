@@ -52,6 +52,7 @@ import type { NativeProductConfiguration } from './native-config.ts'
 import { NativeCodexSettingsSchema } from '../../../packages/drivers/codex-native/src/native.ts'
 import type { ProductCompletion } from './completion.ts'
 import type { ProductEnvironments } from './environments.ts'
+import { captureAttemptProfile } from './accepted-outcomes.ts'
 
 const IntentSchema = z.strictObject({
   kind: z.enum(['start', 'deliver']),
@@ -628,6 +629,8 @@ export class ProductExecution {
         })
         this.index(command, [...ticket.undelivered])
       }
+      if (command.kind !== 'begin') throw new Error('Attempt profile capture requires the initial begin command')
+      await captureAttemptProfile(this.store, spec, command.preparedPolicyRef)
       const run = (async () => {
         try {
           const exit = await running.waitExit()

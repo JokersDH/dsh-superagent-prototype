@@ -12,6 +12,7 @@ import { ProductStore } from '../../packages/storage/dist/index.js'
 import { createControlledProduct, FIXTURE_CHECK } from '../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../apps/coordinator/http/app.ts'
 import { ApplicationFault } from '../../packages/application/dist/index.js'
+import { projectAcceptedOutcome } from '../../apps/coordinator/product/accepted-outcomes.ts'
 
 const principal = { userId: 'local-product-user', authorityRef: 'local-product-authority' }
 const actor = { ...principal, source: 'local_cli' }
@@ -218,6 +219,11 @@ test('a machine-only contract completes without creating empty human acceptance'
     (value) => value?.actions.available.includes('accept_candidate'),
   )
   const acceptCommand = { commandId: 'timed-acceptance', conversationId: 'conversation-product', kind: 'accept_candidate', candidate: ready.actions.currentCandidate }
+  h.store.db.exec("CREATE TRIGGER reject_timed_acceptance BEFORE INSERT ON command_receipts WHEN NEW.command_id = 'timed-acceptance' BEGIN SELECT RAISE(ABORT, 'injected acceptance receipt failure'); END")
+  await assert.rejects(h.product.application.dispatch(acceptCommand, actor))
+  assert.equal(h.store.workflows.routingEvidence.outcomes.list({ projectId: scope.projectId }).records.length, 0)
+  assert.equal(h.store.events.after(0, 1000).filter(event => event.topic === 'application.candidate.accepted').length, 0)
+  h.store.db.exec('DROP TRIGGER reject_timed_acceptance')
   const accepted = await h.product.application.dispatch(acceptCommand, actor)
   assert.equal(accepted.status, 'recorded')
   assert.deepEqual(await h.product.application.dispatch(acceptCommand, actor), accepted)
@@ -229,6 +235,40 @@ test('a machine-only contract completes without creating empty human acceptance'
   assert.ok(timing.readyToAcceptanceMs >= 0)
   assert.equal(timing.activeReviewMs, null, 'No UI activity is unknown rather than fabricated zero')
   assert.equal(h.store.events.after(0, 1000).filter(event => event.topic === 'application.candidate.accepted' && event.entityRef === created.workId).length, 1)
+  const outcomes = h.store.workflows.routingEvidence.outcomes.list({ projectId: scope.projectId }).records
+  assert.equal(outcomes.length, 1)
+  assert.equal(outcomes[0].layer, 'controlled')
+  assert.equal(outcomes[0].usage.completeness, 'unknown')
+  assert.deepEqual(outcomes[0].reviewTiming, timing)
+  assert.deepEqual(outcomes[0].candidate, ready.actions.currentCandidate)
+  const evidence = await h.product.read.workEvidence(created.workId)
+  assert.equal(evidence.projection, 'recorded')
+  assert.equal(evidence.outcomes.length, 1)
+  assert.ok(evidence.entries.some(entry => entry.kind === 'execution.outcome' && entry.sourceRef === outcomes[0].id))
+  const event = h.store.events.after(0, 1000).find(event => event.topic === 'application.candidate.accepted' && event.entityRef === created.workId)
+  assert.equal(projectAcceptedOutcome(h.store, event.seq, ready.actions.currentCandidate).status, 'replayed')
+  assert.equal(projectAcceptedOutcome(h.store, event.seq, { ...ready.actions.currentCandidate, candidateGeneration: 99 }).status, 'conflict')
+  const app = createLocalHttpApp({ application: h.product.application, principal, apiToken: 'a'.repeat(64), bootstrapToken: 'b'.repeat(64),
+    allowedOrigins: ['http://127.0.0.1:5173'], mode: 'product', read: h.product.read, operations: h.product.operations })
+  assert.equal((await app.request(`http://127.0.0.1/v1/works/${created.workId}/evidence`)).status, 401)
+  const response = await app.request(`http://127.0.0.1/v1/works/${created.workId}/evidence`, { headers: { authorization: `Bearer ${'a'.repeat(64)}` } })
+  assert.equal(response.status, 200)
+  assert.deepEqual((await response.json()).outcomes[0].reviewTiming, timing)
+  await h.reopen()
+  assert.equal(h.store.workflows.routingEvidence.outcomes.list({ projectId: scope.projectId }).records.length, 1)
+})
+
+test('legacy acceptance without an archived profile stays delivered with a visible evidence gap', { timeout: 15000 }, async t => {
+  const h = fixture(t)
+  h.product.start()
+  const created = await h.create('pass', false)
+  const ready = await until(() => h.view(created.workId), value => value?.actions.available.includes('accept_candidate'))
+  h.store.db.prepare('DELETE FROM command_receipts WHERE command_id = ?').run(key('attempt-profile-snapshot', ready.actions.currentCandidate.assignmentId))
+  assert.equal((await h.command({ kind: 'accept_candidate', candidate: ready.actions.currentCandidate })).status, 'recorded')
+  assert.equal((await h.view(created.workId)).phase, 'delivered')
+  const evidence = await h.product.read.workEvidence(created.workId)
+  assert.equal(evidence.projection, 'source_missing')
+  assert.equal(evidence.outcomes.length, 0)
 })
 
 test(
