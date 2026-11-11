@@ -2,14 +2,14 @@
   "module": {
     "schema": "product-acceptance-release/1",
     "tier": "module",
-    "status": "FAIL",
-    "ok": false,
-    "checkedAt": "2026-11-11T14:54:01.315Z",
+    "status": "PASS",
+    "ok": true,
+    "checkedAt": "2026-11-11T15:00:28.210Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -402,19 +402,12 @@
         "status": "PASS"
       }
     ],
-    "failures": [
-      {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      }
-    ],
+    "failures": [],
     "claimedBy": {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T14:51:48.472Z",
-      "failureCodes": [
-        "source_dirty"
-      ]
+      "decidedAt": "2026-11-11T14:58:19.058Z",
+      "failureCodes": []
     },
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
@@ -424,14 +417,14 @@
   "controlled-product": {
     "schema": "product-acceptance-release/1",
     "tier": "controlled-product-workflow",
-    "status": "FAIL",
-    "ok": false,
-    "checkedAt": "2026-11-11T14:54:01.316Z",
+    "status": "PASS",
+    "ok": true,
+    "checkedAt": "2026-11-11T15:00:28.211Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1019,19 +1012,12 @@
         "status": "PASS"
       }
     ],
-    "failures": [
-      {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      }
-    ],
+    "failures": [],
     "claimedBy": {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T14:51:48.472Z",
-      "failureCodes": [
-        "source_dirty"
-      ]
+      "decidedAt": "2026-11-11T14:58:19.058Z",
+      "failureCodes": []
     },
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
@@ -1043,12 +1029,12 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T14:54:01.317Z",
+    "checkedAt": "2026-11-11T15:00:28.212Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1643,10 +1629,6 @@
     ],
     "failures": [
       {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      },
-      {
         "code": "case_not_pass",
         "detail": "Required case E5-NATIVE-CONTROL is NOT_TESTED",
         "caseId": "E5-NATIVE-CONTROL"
@@ -1663,12 +1645,10 @@
       }
     ],
     "claimedBy": {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T14:51:48.472Z",
-      "failureCodes": [
-        "source_dirty"
-      ]
+      "decidedAt": "2026-11-11T14:58:19.058Z",
+      "failureCodes": []
     },
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
@@ -1680,12 +1660,12 @@
     "tier": "installed-alpha",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T14:54:01.317Z",
+    "checkedAt": "2026-11-11T15:00:28.212Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2335,10 +2315,6 @@
     ],
     "failures": [
       {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      },
-      {
         "code": "case_not_pass",
         "detail": "Required case E4-MULTI-STATE is FAIL",
         "caseId": "E4-MULTI-STATE"
@@ -2350,12 +2326,10 @@
       }
     ],
     "claimedBy": {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T14:51:48.472Z",
-      "failureCodes": [
-        "source_dirty"
-      ]
+      "decidedAt": "2026-11-11T14:58:19.058Z",
+      "failureCodes": []
     },
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
@@ -2367,12 +2341,12 @@
     "tier": "advisory-routing",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T14:54:01.317Z",
+    "checkedAt": "2026-11-11T15:00:28.212Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2972,10 +2946,6 @@
     ],
     "failures": [
       {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      },
-      {
         "code": "case_not_pass",
         "detail": "Required case E2-ROUTE-ADVICE is NOT_TESTED",
         "caseId": "E2-ROUTE-ADVICE"
@@ -2992,12 +2962,10 @@
       }
     ],
     "claimedBy": {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T14:51:48.472Z",
-      "failureCodes": [
-        "source_dirty"
-      ]
+      "decidedAt": "2026-11-11T14:58:19.058Z",
+      "failureCodes": []
     },
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
@@ -3009,12 +2977,12 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T14:54:01.318Z",
+    "checkedAt": "2026-11-11T15:00:28.212Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3624,10 +3592,6 @@
     ],
     "failures": [
       {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      },
-      {
         "code": "case_not_pass",
         "detail": "Required case E2-ROUTE-ADVICE is NOT_TESTED",
         "caseId": "E2-ROUTE-ADVICE"
@@ -3654,12 +3618,10 @@
       }
     ],
     "claimedBy": {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T14:51:48.472Z",
-      "failureCodes": [
-        "source_dirty"
-      ]
+      "decidedAt": "2026-11-11T14:58:19.058Z",
+      "failureCodes": []
     },
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
@@ -3671,12 +3633,12 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T14:54:01.318Z",
+    "checkedAt": "2026-11-11T15:00:28.213Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4291,10 +4253,6 @@
     ],
     "failures": [
       {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      },
-      {
         "code": "case_not_pass",
         "detail": "Required case E2-ROUTE-ADVICE is NOT_TESTED",
         "caseId": "E2-ROUTE-ADVICE"
@@ -4326,12 +4284,10 @@
       }
     ],
     "claimedBy": {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T14:51:48.472Z",
-      "failureCodes": [
-        "source_dirty"
-      ]
+      "decidedAt": "2026-11-11T14:58:19.058Z",
+      "failureCodes": []
     },
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
@@ -4343,12 +4299,12 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T14:54:01.318Z",
+    "checkedAt": "2026-11-11T15:00:28.213Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4943,10 +4899,6 @@
     ],
     "failures": [
       {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      },
-      {
         "code": "case_not_pass",
         "detail": "Required case E6-REVIEW-PILOT is NOT_TESTED",
         "caseId": "E6-REVIEW-PILOT"
@@ -4963,12 +4915,10 @@
       }
     ],
     "claimedBy": {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T14:51:48.472Z",
-      "failureCodes": [
-        "source_dirty"
-      ]
+      "decidedAt": "2026-11-11T14:58:19.058Z",
+      "failureCodes": []
     },
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
@@ -4980,12 +4930,12 @@
     "tier": "local-alpha",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T14:54:01.318Z",
+    "checkedAt": "2026-11-11T15:00:28.213Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5635,10 +5585,6 @@
     ],
     "failures": [
       {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      },
-      {
         "code": "case_not_pass",
         "detail": "Required case E4-MULTI-STATE is FAIL",
         "caseId": "E4-MULTI-STATE"
@@ -5650,12 +5596,10 @@
       }
     ],
     "claimedBy": {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T14:51:48.472Z",
-      "failureCodes": [
-        "source_dirty"
-      ]
+      "decidedAt": "2026-11-11T14:58:19.058Z",
+      "failureCodes": []
     },
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
@@ -5667,12 +5611,12 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T14:54:01.319Z",
+    "checkedAt": "2026-11-11T15:00:28.213Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -6332,10 +6276,6 @@
     ],
     "failures": [
       {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      },
-      {
         "code": "case_not_pass",
         "detail": "Required case E4-MULTI-STATE is FAIL",
         "caseId": "E4-MULTI-STATE"
@@ -6372,12 +6312,10 @@
       }
     ],
     "claimedBy": {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T14:51:48.472Z",
-      "failureCodes": [
-        "source_dirty"
-      ]
+      "decidedAt": "2026-11-11T14:58:19.058Z",
+      "failureCodes": []
     },
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",

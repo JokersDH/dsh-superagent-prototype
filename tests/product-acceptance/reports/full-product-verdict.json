@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-11T14:54:01.321Z",
+  "checkedAt": "2026-11-11T15:00:28.215Z",
   "source": {
-    "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-    "dirty": true
+    "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+    "dirty": false
   },
-  "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+  "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -668,10 +668,6 @@
   ],
   "failures": [
     {
-      "code": "source_dirty",
-      "detail": "Release evidence requires a clean source worktree"
-    },
-    {
       "code": "case_not_pass",
       "detail": "Required case E4-MULTI-STATE is FAIL",
       "caseId": "E4-MULTI-STATE"
@@ -708,12 +704,10 @@
     }
   ],
   "claimedBy": {
-    "status": "FAIL",
+    "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-11T14:51:48.472Z",
-    "failureCodes": [
-      "source_dirty"
-    ]
+    "decidedAt": "2026-11-11T14:58:19.058Z",
+    "failureCodes": []
   },
   "notes": [
     "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",

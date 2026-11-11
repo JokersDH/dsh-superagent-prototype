@@ -569,7 +569,15 @@ writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null,
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
 writeFileSync(
   join(reports, 'wave10-status.json'),
-  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave10-status/1', taskPackage: 'agent-tasks/product-wave-10/README.zh-CN.md', supersedes: 'wave09-status.json', artifactTuple }, null, 2) + '\n',
+  JSON.stringify({
+    ...executionStatus,
+    schema: 'product-acceptance-wave10-status/1',
+    taskPackage: 'agent-tasks/product-wave-10/README.zh-CN.md',
+    supersedes: 'wave09-status.json',
+    testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
+    productSource: { commit: artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.schema ?? null },
+    artifactTuple,
+  }, null, 2) + '\n',
 )
 // Historical wave06-09 status files are frozen inputs; wave10 supersedes rather than rewrites them.
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)

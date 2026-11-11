@@ -1,6 +1,6 @@
 # Agent E 第十轮交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `f99ca39`，检查点 `81d7fa3`，本次证据源 `81d7fa3f363f917cdd6fbda06749684ddf5dbd52`（运行时尚有未提交文件，最终提交包含它们）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `f99ca39`，检查点 `81d7fa3`，本次证据源 `57e145d9fb8e6834e597baef01b12d4a0007ec2b`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
 
@@ -15,7 +15,7 @@
 | `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 14 + NOT_TESTED 5 + FAIL 1 |
 | `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 147 | PASS 130 + FAIL 1 + SKIPPED 0 + NOT_TESTED 16 + BLOCKED 0 + UNKNOWN 0 |
 
-本次聚合：**FAIL**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z`。
 
 ## 矩阵摘要
 
@@ -95,16 +95,16 @@
 
 | tier | 结果 |
 | --- | --- |
-| `module` | FAIL（source_dirty） |
-| `controlled-product` | FAIL（source_dirty） |
-| `actual-native-control` | FAIL（source_dirty, case_not_pass, layer_not_allowed） |
-| `installed-alpha` | FAIL（source_dirty, case_not_pass, required_evidence_missing） |
-| `advisory-routing` | FAIL（source_dirty, case_not_pass, layer_not_allowed） |
-| `controlled-review` | FAIL（source_dirty, case_not_pass, layer_not_allowed, missing_required_case） |
-| `actual-heterogeneous-review` | FAIL（source_dirty, case_not_pass, layer_not_allowed, missing_required_case） |
-| `review-value` | FAIL（source_dirty, case_not_pass, layer_not_allowed） |
-| `local-alpha` | FAIL（source_dirty, case_not_pass, required_evidence_missing） |
-| `full-product` | FAIL（source_dirty, case_not_pass, required_evidence_missing, missing_required_case, layer_not_allowed） |
+| `module` | PASS |
+| `controlled-product` | PASS |
+| `actual-native-control` | FAIL（case_not_pass, layer_not_allowed） |
+| `installed-alpha` | FAIL（case_not_pass, required_evidence_missing） |
+| `advisory-routing` | FAIL（case_not_pass, layer_not_allowed） |
+| `controlled-review` | FAIL（case_not_pass, layer_not_allowed, missing_required_case） |
+| `actual-heterogeneous-review` | FAIL（case_not_pass, layer_not_allowed, missing_required_case） |
+| `review-value` | FAIL（case_not_pass, layer_not_allowed） |
+| `local-alpha` | FAIL（case_not_pass, required_evidence_missing） |
+| `full-product` | FAIL（case_not_pass, required_evidence_missing, missing_required_case, layer_not_allowed） |
 
 ## 明确未测
 

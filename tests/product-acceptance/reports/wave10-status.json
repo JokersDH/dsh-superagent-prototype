@@ -4,9 +4,9 @@
   "branch": "codex/g3-product-acceptance",
   "base": "f99ca39",
   "checkpoint": "81d7fa3",
-  "head": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-  "worktreeDirtyAtRun": true,
-  "checkedAt": "2026-11-11T14:51:48.456Z",
+  "head": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+  "worktreeDirtyAtRun": false,
+  "checkedAt": "2026-11-11T14:58:19.044Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -658,7 +658,7 @@
         {
           "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
           "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: main publishes no proposal confirm/reject/replay or context preview endpoint. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen."
+          "reason": "NOT_TESTED: context preview now exists, but automatic proposal confirmation and grant/revocation invalidation do not. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen."
         },
         {
           "id": "E3-PROPOSAL-HTTP",
@@ -668,7 +668,7 @@
         {
           "id": "E3-CONTEXT-GRANT-BOUNDARY",
           "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: main publishes no context preview/read entry. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed."
+          "reason": "NOT_TESTED: E3-CONTEXT-PREVIEW verifies clamped budgets, omissions and basic refusals, but no public entry binds an expired grant or purpose mismatch to the read path. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed."
         },
         {
           "id": "E3-PROPOSAL-UI",
@@ -779,7 +779,7 @@
         {
           "id": "E4-MULTI-STATE",
           "status": "FAIL",
-          "reason": "MULTI_STOP_OTHER_BLOCKED: {\"exit\":0,\"bPid\":24143,\"bApi\":24157,\"bAlive\":true,\"bApiAlive\":false,\"bApiPort\":56819,\"apiOpenBefore\":true,\"apiOpenAfter\":false,\"recordedState\":\"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-multi-1N0WVp/data-b\",\"recordedPid\":24143,\"reportedStatus\":\"STOPPED\",\"reportedState\":null,\"reportedPid\":null,\"stdout\":\"{\\n  \\\"ok\\\": true,\\n  \\\"status\\\": \\\"STOPPED\\\",\\n  \\\"stopped\\\": true,\\n  \\\"stillAlive\\\": false,\\n  \\\"code\\\": null,\\n  \\\"verification\\\": {\\n    \\\"ok\\\": true,\\n    \\\"checks\\\": [\\n      {\\n        \\\"id\\\": \\\"launcher_alive\\\",\\n        \\\"ok\\\": true\\n      },\\n      {\\n        \\\"id\\\": \\\"process_start\\\",\\n        \\\"ok\\\": true,\\n        \\\"detail\\\": \\\"Wed N\"}"
+          "reason": "MULTI_STOP_OTHER_BLOCKED: {\"exit\":0,\"bPid\":81321,\"bApi\":81333,\"bAlive\":true,\"bApiAlive\":false,\"bApiPort\":59186,\"apiOpenBefore\":true,\"apiOpenAfter\":false,\"recordedState\":\"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-multi-LS0zH5/data-b\",\"recordedPid\":81321,\"reportedStatus\":\"STOPPED\",\"reportedState\":null,\"reportedPid\":null,\"stdout\":\"{\\n  \\\"ok\\\": true,\\n  \\\"status\\\": \\\"STOPPED\\\",\\n  \\\"stopped\\\": true,\\n  \\\"stillAlive\\\": false,\\n  \\\"code\\\": null,\\n  \\\"verification\\\": {\\n    \\\"ok\\\": true,\\n    \\\"checks\\\": [\\n      {\\n        \\\"id\\\": \\\"launcher_alive\\\",\\n        \\\"ok\\\": true\\n      },\\n      {\\n        \\\"id\\\": \\\"process_start\\\",\\n        \\\"ok\\\": true,\\n        \\\"detail\\\": \\\"Wed N\"}"
         },
         {
           "id": "E4-UPGRADE-FAULTS",
@@ -845,14 +845,14 @@
   "release": {
     "schema": "product-acceptance-release/1",
     "tier": "controlled-product-workflow",
-    "status": "FAIL",
-    "ok": false,
-    "checkedAt": "2026-11-11T14:51:48.472Z",
+    "status": "PASS",
+    "ok": true,
+    "checkedAt": "2026-11-11T14:58:19.058Z",
     "source": {
-      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
-      "dirty": true
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false
     },
-    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1440,40 +1440,35 @@
         "status": "PASS"
       }
     ],
-    "failures": [
-      {
-        "code": "source_dirty",
-        "detail": "Release evidence requires a clean source worktree"
-      }
-    ],
+    "failures": [],
     "claimedBy": null,
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/proposal-preview-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z/proposal-preview-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
@@ -1744,6 +1739,16 @@
   ],
   "taskPackage": "agent-tasks/product-wave-10/README.zh-CN.md",
   "supersedes": "wave09-status.json",
+  "testCodeSource": {
+    "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+    "dirty": false,
+    "branch": "codex/g3-product-acceptance"
+  },
+  "productSource": {
+    "commit": "6830e38c73f50542c7d836e4d5e579bcf5d27fe2",
+    "buildId": "f2390ffd1b87b79a",
+    "schema": 15
+  },
   "artifactTuple": {
     "baseline": {
       "buildId": "5db9a0d41924a4c6",
