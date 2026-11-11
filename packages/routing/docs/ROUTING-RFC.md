@@ -38,6 +38,12 @@ main probe (`review-persisted-assistant.mjs`, 7/7) pass.
   id. No probability/ROI and no authorization effect.
 
 Main consumes this as `rankSharedAttention`/`sharedAttentionRanker`; it does not copy the algorithm.
+`createProductRuntime` already exposes `attentionRanker?: AttentionRanker`, but `demo.ts` does not yet
+pass it, so the current product remains `waiting_order`. That wiring is main-owned.
+
+Reason mapping is limited to the shared enum; there is no expired reason. Expiry is answer validity,
+not authorization, and main excludes expired actionable inputs. Scale is one bounded attention page
+(≤20 works / 4040 items); duplicate ids are refused rather than silently deduplicated.
 
 ## C2 attention and eligibility
 

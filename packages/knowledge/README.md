@@ -77,12 +77,14 @@ revoked/superseded decision is never resurrected; a legitimate successor uses
 `expectedVersion = current.version`. Real SQLite replay at two different times is covered by
 `test/real-store.case.ts` and the independent `review-persisted-assistant.mjs` probe (7/7).
 
-`DecisionTransactionService` provides read-only `prepare` plus synchronous `commit`/`revoke` for
-main's UnitOfWork. `prepare` writes nothing and returns an immutable decision/source snapshot;
+`DecisionTransactionService` provides read-only `prepare`, `prepareRevocation` plus synchronous
+`commit`/`commitRevocation`/`revoke` for main's UnitOfWork. `prepare` writes nothing and returns an immutable decision/source snapshot;
 `commit`/`revoke` re-check trusted actor, project/grant/scope, current source digest/conversation and
 supersession state, then write through A's synchronous `AssistantStatePort`. Main writes its
 receipt/event in the same transaction; failures roll back. See
-`examples/decision-transaction.mjs` for a real temporary-SQLite consumer.
+`examples/decision-transaction.mjs` and `examples/assistant-workflow.mjs` for real temporary-SQLite
+consumers. The latter runs the web-flow recipe: authorized context preview -> proposal pending/confirm
+with receipt -> decision record with receipt -> revocation plan/commit -> old replay stays revoked.
 
 ## Wave-04 checkpoint
 

@@ -30,6 +30,16 @@ export interface CommitDecisionInput {
   readonly barrier?: () => { readonly ok: boolean; readonly detail?: string }
 }
 
+/** Read-only UI/command plan for revoking a decision at its currently observed version. */
+export interface PreparedRevocation {
+  readonly decisionId: string
+  readonly expectedVersion: number
+  readonly currentVersion: number
+  readonly actorRef: string
+  readonly projectId: string
+  readonly status: 'active' | 'revoked' | 'superseded' | 'expired'
+}
+
 function scopeWithin(scope: Scope, grant: Scope): boolean {
   return (
     scope.projectId === grant.projectId &&
@@ -149,6 +159,37 @@ export class DecisionTransactionService {
       actorRef: prepared.actorRef,
       recordedAt: prepared.recordedAt,
     })
+  }
+
+  /** No-write revocation plan; the caller confirms before the synchronous commit. */
+  prepareRevocation(decisionId: string, expectedVersion: number, actor: DecisionActor): PreparedRevocation {
+    const current = this.store.getSync(decisionId)
+    if (!current) throw new DecisionError('not_found', 'Decision does not exist')
+    if (current.decision.scope.projectId !== actor.projectId) {
+      throw new DecisionError('cross_project', 'Decision belongs to another project')
+    }
+    if (current.actorRef !== actor.actorRef) {
+      throw new DecisionError('actor_mismatch', 'Decision owner does not match the revoking actor')
+    }
+    if (current.decision.version !== expectedVersion) {
+      throw new DecisionError('conflict', 'Expected decision version is stale')
+    }
+    return snapshot({
+      decisionId,
+      expectedVersion,
+      currentVersion: current.decision.version,
+      actorRef: current.actorRef,
+      projectId: current.decision.scope.projectId,
+      status: current.status,
+    })
+  }
+
+  /** Synchronous revocation commit for the confirmed plan; CAS prevents stale UI actions. */
+  commitRevocation(prepared: PreparedRevocation, actor: DecisionActor, input: { now?: Date } = {}): RevokeResult {
+    if (prepared.actorRef !== actor.actorRef || prepared.projectId !== actor.projectId) {
+      throw new DecisionError('actor_mismatch', 'Revocation plan belongs to another actor or project')
+    }
+    return this.revoke(prepared.decisionId, prepared.expectedVersion, actor, input)
   }
 
   /** Synchronous CAS revocation in main's transaction. */
