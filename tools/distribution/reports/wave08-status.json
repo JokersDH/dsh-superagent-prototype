@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "eca5674",
   "mergedMain": "5d4065b",
-  "head": "9b75c2a",
+  "head": "9799c17",
   "artifactSourceCommit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate. Not main/E admission. Model calls 0. User services 5180-5185/8796-8801 untouched.",
