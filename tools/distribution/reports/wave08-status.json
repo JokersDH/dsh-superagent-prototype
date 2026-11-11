@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "eca5674",
   "mergedMain": "5d4065b",
-  "head": "9799c17",
+  "head": "fcff0ab",
   "artifactSourceCommit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate. Not main/E admission. Model calls 0. User services 5180-5185/8796-8801 untouched.",
@@ -63,7 +63,7 @@
     },
     "d5": {
       "status": "PARTIAL_BLOCKED_MAIN",
-      "summary": "main published read-only inspect/prepare and GET /v1/recovery/activations/:id audit (always not_granted/startupAvailable=false); target commit/start is still unimplemented. D consumes the audit as a refusal only (a locally claimed startup permit is audit_authority_unsupported), keeps a local precondition gate and reports upgrade journal state in doctor with the single next action. Recovery never starts a target from source receipts or a descriptor.",
+      "summary": "main published read-only inspect/prepare and GET /v1/recovery/activations/:id audit (always not_granted/startupAvailable=false); target commit/start is still unimplemented. D consumes the audit as a refusal only (a locally claimed startup permit is audit_authority_unsupported), keeps a local precondition gate, and doctor surfaces an unsettled install-switch journal (target_stop_unproven WARN with the single next action pa upgrade --recover, asserted in the binary recipe). Recovery never starts a target from source receipts or a descriptor.",
       "evidence": [
         "apps/launcher/lib/recovery-activation.mjs",
         "apps/launcher/test/recovery-activation.case.mjs"

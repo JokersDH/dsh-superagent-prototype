@@ -1,7 +1,7 @@
 {
   "case": "WAVE07-BINARY-UPGRADE",
   "status": "PASS",
-  "startedAt": "2026-11-11T09:17:39.704Z",
+  "startedAt": "2026-11-11T09:27:30.130Z",
   "sections": {
     "installs": {
       "status": "PASS",
@@ -26,7 +26,7 @@
         "buildId": "7e8f6ce6fa2e2633",
         "evidenceDigest": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
         "artifactDigest": "d690795d9b0136f3f35f6bd99f5c8a9ddc55757dd0706b8c2eb2401369fc7ba2",
-        "backup": "ee7b73111cf048198e0026b469021052f5abf544e023dd3e615c8b0bfb9c344a"
+        "backup": "191e19986f51480b21689c47daa07d583915b961b50c4bde1328037e3d5cabc7"
       }
     },
     "B-binary-switch": {
@@ -36,11 +36,11 @@
         "to": "cd0ecc29d97d5c41",
         "stopped": "STOPPED",
         "backup": {
-          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave07-upgrade-h8sJYJ/switch-backup.pab",
-          "sha256": "2e1b1f37d814e775b28241ee189bce50c19a2c34cc1faabd30b1ca143b1a80a5"
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave07-upgrade-opD7Qm/switch-backup.pab",
+          "sha256": "a6eacf5849d0c071863ca03ea3907dd3799fa5455d2455cbb75c229108bd4979"
         },
         "instance": {
-          "pid": 42112,
+          "pid": 53772,
           "buildId": "cd0ecc29d97d5c41"
         },
         "evidenceDigestBefore": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
@@ -125,6 +125,7 @@
         "refused": "target_stop_unproven",
         "journal": "target_stop_unproven",
         "statusVisible": "target_stop_unproven",
+        "doctor": "WARN",
         "settled": "REVERTED"
       }
     },
@@ -148,7 +149,7 @@
       }
     }
   },
-  "finishedAt": "2026-11-11T09:18:13.426Z",
+  "finishedAt": "2026-11-11T09:28:03.858Z",
   "limitations": [
     "Both D wave-07 artifacts use product schema 13, so the binary rollback check is compatibility-preserving; the incompatible-direction proof uses the frozen schema-12 wave-06 build.",
     "Only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured; other platforms/ABIs are NOT_TESTED.",

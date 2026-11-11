@@ -427,13 +427,19 @@ try {
     const status7 = run(cli(target), ['upgrade-status', '--json', ...rootArgs(r7)], { allowExit: [0, 1] })
     if (status7.json?.status !== 'target_stop_unproven')
       throw new Error(`upgrade-status did not expose the indeterminate switch: ${JSON.stringify(status7.json).slice(0, 200)}`)
+    // The staged wrapper injects its own --install; call the target launcher entry directly so the
+    // doctor run addresses the baseline install that this window is currently bound to.
+    const doctor7 = run(process.execPath, [join(target, 'app', 'apps', 'launcher', 'bin', 'pa.mjs'), 'doctor', '--json', ...rootArgs(r7)], { allowExit: [0, 1, 2] })
+    const journalCheck = doctor7.json?.checks?.find((entry) => entry.id === 'upgrade_journal')
+    if (journalCheck?.status !== 'WARN' || !/pa upgrade --recover/.test(journalCheck.detail?.hint ?? ''))
+      throw new Error(`doctor did not surface the interrupted switch with one next action: ${JSON.stringify(journalCheck).slice(0, 200)}`)
     const recover7 = run(cli(target), ['upgrade', '--recover', '--json', ...rootArgs(r7)], { allowExit: [0, 1, 2] })
     if (!['REVERTED', 'RECOVERED'].includes(recover7.json?.status))
       throw new Error(`recovery did not settle the unproven stop: ${JSON.stringify(recover7.json).slice(0, 300)}`)
     if (recover7.json?.dataRolledBack === true) throw new Error('settling the unproven stop rolled data back')
     section('E7-stop-unproven-kept', 'PASS', {
       refused: unproven.json?.code ?? null, journal: journal7.status,
-      statusVisible: status7.json.status, settled: recover7.json.status,
+      statusVisible: status7.json.status, doctor: journalCheck.status, settled: recover7.json.status,
     })
     run(cli(install7), ['stop', '--json', ...rootArgs(r7)], { allowExit: [0, 2] })
   }
