@@ -1,5 +1,7 @@
 # 第七轮：集成收口、恢复新工作与可核算试点
 
+新派工已由[第八轮](../product-wave-08/README.zh-CN.md)接续，保留原目录/分支、报告和全部预算。当前B费用可行性调查已收敛，研究封存BLOCKED；A/C/D/E剩余问题与主线责任见[0029](../../docs/rfcs/WP-16/0029-wave-08-product-closure-and-reviewed-inputs.md)。不要以重跑旧任务刷新额度或沿用过期缺接口描述。
+
 日期2026-11-11，派工基线`d4d51ae`。本轮延续原A–E工作区/分支与所有权，每包六阶段连续执行；不是从零重做第六轮。wave-05修订01和原预算账继续有效。计划/接口设计不计作产品完成。
 
 主线首批实际接口：[0027](../../docs/rfcs/WP-16/0027-wave-07-command-and-recovery-checkpoint.md)，源码da54758。A/C消费者源码已最小集成，应用同步命令companion和恢复意图fact port已可消费；恢复目标启动/HTTP提交尚未开放。C有效列表撤销后复活旧项的独立反例已补入C任务，不能由包内PASS覆盖。
