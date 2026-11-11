@@ -1,0 +1,21 @@
+{
+  "protocol": "wave06-real-routing-evidence/1",
+  "generatedAt": "2026-11-11T04:21:50.935Z",
+  "result": {
+    "status": "PASS",
+    "modelCalls": 0,
+    "networkCalls": 0,
+    "sqlite": "real temporary SQLite via createWorkflowPorts(store).routingEvidence",
+    "adviceReplay": true,
+    "reviewReplay": true,
+    "outcomeReplay": true,
+    "reviewsByExactSubject": 1,
+    "outcomesByExactProfile": 1,
+    "otherProjectAdvice": 0,
+    "changedBodyRefused": true,
+    "reviewState": "current",
+    "driftedState": "stale",
+    "driftedReason": "candidate_changed",
+    "executionAuthority": "none (advice/review/outcome are data only)"
+  }
+}

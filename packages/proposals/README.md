@@ -50,6 +50,22 @@ records and every returned `create`/`get`/`list`/`confirm` value are independent
 snapshots, so a caller cannot mutate an already-reviewed grant, scope or payload. Main
 builds the deterministic `UserCommand` and re-checks actor/project/scope/contract/barrier.
 
+## Command plan (wave-06 continuation)
+
+`planProposalCommand(intent, {commandId, conversationId, work?, revision?})` maps a confirmed intent to
+the **existing** `UserCommand` that main already dispatches:
+
+| Intent | Command | Extra user-confirmed input |
+| --- | --- | --- |
+| `reply` | none (`no_effect`) | — |
+| `create_work` | `create_work` | `work.scope`, `work.criteria`, `work.profileId` |
+| `revise_work` | `revise_work` | complete `revision.goal/scope/criteria` |
+| `record_decision` | `record_decision` | — (uses the intent's exact scope/source) |
+
+Missing inputs return `needs_user_input` with the exact field list; a rationale is never turned into a
+goal or contract. A confirmed scope for another project is refused. The plan contains no actor field,
+adds no command kind and executes nothing.
+
 ## Commands
 
 ```sh

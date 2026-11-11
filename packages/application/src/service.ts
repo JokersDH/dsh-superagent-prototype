@@ -31,6 +31,8 @@ import type {
   WorkRecord,
   WorkView,
   VerificationRetryCommand,
+  PreparedUserCommand,
+  TransactionalApplicationCommands,
 } from '@personal-agent/contracts'
 import {
   canRetry,
@@ -83,7 +85,7 @@ export interface ApplicationOptions {
   }
   now?: () => string
 }
-export interface ProductApplication extends ApplicationService {
+export interface ProductApplication extends ApplicationService, TransactionalApplicationCommands {
   readonly core: Engine
   readonly questions: QuestionBroker
   registerProject(project: ProjectConfiguration, registeredChecks: readonly string[]): void
@@ -128,6 +130,9 @@ class LocalApplication implements ProductApplication {
   private projects: readonly ProjectConfiguration[]
   private readonly actionSecret: Buffer
   private readonly options: ApplicationOptions
+  private readonly prepared = new WeakMap<PreparedUserCommand, {
+    command: UserCommand; actor: TrustedActor; digest: string; preflightError?: AppError; guard?: () => void
+  }>()
   constructor(options: ApplicationOptions) {
     // Trusted configuration is a startup snapshot; mutating a caller-owned array cannot grant access.
     this.options = {
@@ -449,6 +454,10 @@ class LocalApplication implements ProductApplication {
     return decision.ticketId
   }
   async dispatch(input: UserCommand, inputActor: TrustedActor): Promise<CommandReceipt> {
+    const prepared = await this.prepareCommand(input, inputActor)
+    return this.store.uow.atomic(() => this.commitPrepared(prepared))
+  }
+  async prepareCommand(input: UserCommand, inputActor: TrustedActor): Promise<PreparedUserCommand> {
     const command = UserCommandSchema.parse(input),
       actor = TrustedActorSchema.parse(inputActor)
     if (!this.actorAllowed(actor))
@@ -474,6 +483,19 @@ class LocalApplication implements ProductApplication {
         if (!preflightError) throw error
       }
     }
+    const prepared: PreparedUserCommand = Object.freeze({ protocol: 'prepared-user-command/1', commandId: command.commandId,
+      expiresAt: new Date(Date.parse(this.now()) + 5 * 60 * 1000).toISOString() })
+    this.prepared.set(prepared, { command, actor, digest, ...(preflightError ? { preflightError } : {}),
+      ...(completionGuard ? { guard: completionGuard } : {}) })
+    return prepared
+  }
+  commitPrepared(prepared: PreparedUserCommand): CommandReceipt {
+    if (!this.store.uow.nesting)
+      throw new ApplicationFault('invalid_request', 'Prepared commands require the caller UnitOfWork', 'none')
+    const state = this.prepared.get(prepared)
+    if (!state) throw new ApplicationFault('forbidden', 'Prepared command belongs to another application or was copied', 'none')
+    const { command, actor, digest, preflightError, guard } = state
+    if (!this.actorAllowed(actor)) throw new ApplicationFault('forbidden', 'Caller is not the configured local principal', 'none')
     return this.store.uow.atomic(() => {
       const prior = this.store.commands.get(command.commandId)
       if (prior) {
@@ -486,8 +508,10 @@ class LocalApplication implements ProductApplication {
         | Omit<Extract<CommandReceipt, { status: 'rejected' }>, 'commandId' | 'seq'>
       try {
         result = this.store.uow.atomic(() => {
+          if (Date.parse(prepared.expiresAt) <= Date.parse(this.now()))
+            throw new ApplicationFault('stale_contract', 'Prepared command expired; prepare again')
           if (preflightError) return { status: 'rejected' as const, error: preflightError }
-          completionGuard?.()
+          guard?.()
           return { status: 'recorded' as const, ...this.execute(command, actor) }
         })
       } catch (error) {

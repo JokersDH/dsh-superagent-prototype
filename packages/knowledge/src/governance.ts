@@ -18,7 +18,6 @@ import type {
 
 const DEFAULT_PAGE_SIZE = 50
 const MAX_PAGE_SIZE = 200
-const MAX_LIST_BATCHES = 4
 
 function scopeWithin(scope: Scope, grant: Scope): boolean {
   return (
@@ -145,7 +144,8 @@ export class DecisionGovernance {
     let exhausted = false
     let nextCursor: string | undefined
 
-    for (let batch = 0; batch < MAX_LIST_BATCHES && decisions.length < limit && !exhausted; batch += 1) {
+    // The store scan is complete-or-refuse; this loop only pages the caller's visible window.
+    for (let batch = 0; decisions.length < limit && !exhausted; batch += 1) {
       const page = await this.store.list({
         projectId,
         status: 'all',
@@ -165,6 +165,7 @@ export class DecisionGovernance {
       else cursor = page.nextCursor
       nextCursor = exhausted ? undefined : cursor
       if (decisions.length >= limit) break
+      if (batch > 10_000) throw new DecisionError('scan_incomplete', 'Decision page scan exceeded its bound', { projectId, scanned: decisions.length })
     }
 
     return {
@@ -174,11 +175,26 @@ export class DecisionGovernance {
     }
   }
 
-  /** Flat effective list used to build bounded decision context slices. */
+  /**
+   * Flat effective list used to build bounded decision context slices.
+   *
+   * `max` is an explicit caller cap (context budget). The underlying project scan is complete or
+   * refuses with `scan_incomplete`, so a short result is either the whole effective set or the
+   * caller's own cap — never a silently truncated page walk presented as full knowledge.
+   */
   async listEffective(projectId: string, max = 500, now: Date = this.now()): Promise<readonly DecisionRecord[]> {
+    return (await this.listEffectiveWindow(projectId, max, now)).decisions
+  }
+
+  /** Same as `listEffective`, plus whether the caller's own cap truncated the effective set. */
+  async listEffectiveWindow(
+    projectId: string,
+    max = 500,
+    now: Date = this.now(),
+  ): Promise<{ readonly decisions: readonly DecisionRecord[]; readonly truncatedByLimit: boolean }> {
     const records: DecisionRecord[] = []
     let cursor: string | undefined
-    for (let batch = 0; batch < MAX_LIST_BATCHES && records.length < max; batch += 1) {
+    for (;;) {
       const page = await this.store.list({
         projectId,
         status: 'all',
@@ -186,15 +202,14 @@ export class DecisionGovernance {
         limit: MAX_PAGE_SIZE,
       })
       for (const record of page.decisions) {
-        if (records.length >= max) break
         if (!this.isEffectiveRecord(record, now)) continue
         if ((await this.sourceState(record)) !== 'current') continue
+        if (records.length >= max) return { decisions: records, truncatedByLimit: true }
         records.push(this.withExpiry(record, now))
       }
-      if (!page.nextCursor) break
+      if (!page.nextCursor) return { decisions: records, truncatedByLimit: false }
       cursor = page.nextCursor
     }
-    return records
   }
 
   /** Current source validity is part of effectiveness, not only a record-time check. */

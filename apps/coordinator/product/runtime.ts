@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
 import { sharedAttentionRanker } from '@personal-agent/routing'
-import type { AttentionRanker, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, RecoveryPrepare, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
+import type { AttentionRanker, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryPrepare, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { WorkEvidenceSchema } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
@@ -27,6 +27,7 @@ import { ProductAttention } from './attention.ts'
 import { ProductDecisions } from './decisions.ts'
 import { projectAcceptedOutcome } from './accepted-outcomes.ts'
 import { ProductRecovery } from './recovery.ts'
+import { ProductProposals } from './proposals.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -141,6 +142,7 @@ export function createProductRuntime(
   }
   const conversations = new ApplicationConversations(store, options.principal, () => configuredProjects.map(project => project.id), options.actionSecret)
   const decisions = new ProductDecisions(store, options.principal, () => configuredProjects, options.actionSecret, options.now)
+  const proposals = new ProductProposals(store, application, decisions, options.principal, () => configuredProjects, options.actionSecret, options.now)
   const recovery = new ProductRecovery(store, { stateRoot: options.stateRoot, startupMode: options.startupMode ?? 'normal',
     principal: options.principal, projects: () => configuredProjects, ...(options.now ? { now: options.now } : {}) })
   const attention = new ProductAttention(store, application, completion, {
@@ -357,6 +359,8 @@ export function createProductRuntime(
     operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor),
       recoveryPrepare: async (input: RecoveryPrepare, actor: TrustedActor) => recovery.prepare(input, actor),
       prepareDecision: async (input: DecisionPrepare, actor: TrustedActor) => decisions.prepare(input, actor),
+      prepareProposal: (input: ProposalPrepare, actor: TrustedActor) => proposals.prepare(input, actor),
+      proposal: (command: ProposalCommand, actor: TrustedActor) => proposals.dispatch(command, actor),
       decision: async (command: DecisionCommand, actor: TrustedActor) => decisions.dispatch(command, actor),
       reviewActivity: async (activity: ReviewActivity, actor: TrustedActor) => reviewTiming.record(activity, actor),
       ...(projectSettings ? { projectSettings: (command: ProjectSettingsCommand, actor: TrustedActor) => projectSettings.dispatch(command, actor) } : {}) },

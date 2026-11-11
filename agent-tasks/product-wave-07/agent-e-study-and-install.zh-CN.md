@@ -6,6 +6,8 @@
 
 整包结果：试点使用唯一经准入的实际adapter并保留原账，能跑才做原8例三组；同时独立验证主线提案/恢复和D双binary安装，不让研究阻断产品验收。
 
+E3现在可消费main源码627ef0d的真实提案prepare/confirm/reject HTTP，见[0028](../../docs/rfcs/WP-16/0028-wave-07-proposal-http-and-admission.md)，已有工作/修订/决定三种效果及同事务回执。网页尚待M3，恢复target启动尚未交；A/C/D独立失败分列，不能用本批79项后端/受控通过覆盖。原预算/统一adapter前置不变，main未消费任何pilot额度。
+
 ## E1 先修ledger与执行准入的fail-closed检查点
 
 readLedger区分原始未创建与已有文件损坏/字段错/历史缺失；已存在但损坏不得回退全零。原授权累计账及unknown/reservation保留，写入/并发/重放/结算幂等，任何错误不得创造可用额度。
