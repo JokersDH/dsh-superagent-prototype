@@ -6,6 +6,8 @@
 
 整包结果：main可以在一个现有UnitOfWork内记录精确恢复意图/回执，恢复历史可完整审计，新执行库不带旧队列；给main/D/E可直接运行的持久化和快照recipe。本包不自行授权启动。
 
+主线补充准入输入见[0027实际接口](../../docs/rfcs/WP-16/0027-wave-07-command-and-recovery-checkpoint.md)和[0028独立反馈](../../docs/rfcs/WP-16/0028-wave-07-proposal-http-and-admission.md)：旧RecoveryPlan port暂不等价于RecoveryActivationFacts；必须消费已发布的完整activation/target/机器与资源绑定，不填默认伪值。另需修mapRow把envelope整体当plan读回的问题，覆盖record/get/list/reopen完整schema roundtrip。继续原A2/A4，不新开存储平台或改旧迁移。
+
 ## A1 先交持久接口与真实消费者检查点
 
 合并新main后复验已有storage/workflows/application/verification及C真实SQL消费者，核对必要workspace依赖，向main报root lock请求。发布最新exports、生产port实例、同步事务使用和reopen recipe，明确当前集成/未集成差异。

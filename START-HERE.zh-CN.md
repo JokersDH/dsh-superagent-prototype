@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**提案后端已接通：[0028](docs/rfcs/WP-16/0028-wave-07-proposal-http-and-admission.md)。** 源码627ef0d增加只读签名预览及明确confirm/reject，支持新建工作、修订合同和记录决定，提案状态/原业务效果/回执同事务。46项HTTP/恢复、33项受控产品/流式/设置通过。页面尚待接线，旧服务未重启；A/C/D新候选仍有明确准入反馈，不宣称恢复启动或安装Alpha完成。
+
 **第七轮首批实现：[事务命令与恢复意图接口](docs/rfcs/WP-16/0027-wave-07-command-and-recovery-checkpoint.md)。** A/C最新消费者已按路径集成；应用支持异步prepareCommand与同步commitPrepared，A可消费恢复意图fact port，main source事务消费者已交。七包回归与4项恢复意图组合通过；C有效列表复活旧项另有独立FAIL，已列入本轮修复。恢复commit/目标启动与提案网页仍未交，不改变旧服务或预算。
 
 **2026-11-11 当前派工：[第七轮六阶段整包](agent-tasks/product-wave-07/README.zh-CN.md)。** 已审视A d3207d8、B 6890fe8、C 119bb96、D 4a0ea7f、E 3cfe445候选；下发A恢复持久事实/历史证据、B统一实际adapter准入与有限费用可行性、C上下文/提案组合、D真实双binary升级、E预算拒绝与独立安装/产品验收。main承担恢复commit/激活、提案事务/网页及同源版本集成；[0026](docs/rfcs/WP-16/0026-wave-07-integration-and-admission.md)为待实施边界。每包先交可运行checkpoint，再连续推进；预算不刷新，pilot不阻断独立产品工作，原六组服务保留。这是新计划，不表示恢复激活、试点或安装Alpha已经通过。
