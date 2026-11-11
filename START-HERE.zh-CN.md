@@ -1,10 +1,12 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**2026-11-11 当前派工：[第七轮六阶段整包](agent-tasks/product-wave-07/README.zh-CN.md)。** 已审视A d3207d8、B 6890fe8、C 119bb96、D 4a0ea7f、E 3cfe445候选；下发A恢复持久事实/历史证据、B统一实际adapter准入与有限费用可行性、C上下文/提案组合、D真实双binary升级、E预算拒绝与独立安装/产品验收。main承担恢复commit/激活、提案事务/网页及同源版本集成；[0026](docs/rfcs/WP-16/0026-wave-07-integration-and-admission.md)为待实施边界。每包先交可运行checkpoint，再连续推进；预算不刷新，pilot不阻断独立产品工作，原六组服务保留。这是新计划，不表示恢复激活、试点或安装Alpha已经通过。
+
 **主线第二检查点：[接受Outcome与恢复只读预检](docs/rfcs/WP-16/0025-outcome-projection-and-recovery-preflight.md)。** 已接A最新接受投影，新增GET工作证据、GET恢复inspect和POST恢复prepare。后端61、契约211、storage75/workflows23通过；预检不改旧queue/marker/项目绑定。恢复commit和新授权仍未实现，返回not_granted/commitAvailable=false，不能当成恢复已可执行。旧5180–5185服务未重启，新接口在新源码部署后可用；见 [限定证据](reports/releases/wave06-outcome-recovery/README.zh-CN.md)。
 
 **第六轮主线新检查点：[http://127.0.0.1:5185/](http://127.0.0.1:5185/)。** 已接A v13持久port、C决定事务/共享待办优先级和B精确profile解析。用户消息可预览并明确记录为项目决定，顶栏可查/撤销，响应未知保留原命令；本批未启动模型，也未自动注入上下文或执行。决定网页4、待办网页6项及后端51项通过。新私有state与原5180–5184历史分开，未重启旧服务；接口/消费者见 [0024](docs/rfcs/WP-16/0024-wave-06-decisions-http-checkpoint.md) 与 [限定证据](reports/releases/wave06-main-checkpoint/README.zh-CN.md)。
 
-**2026-11-11 当前派工：[第六轮大颗粒整包](agent-tasks/product-wave-06/README.zh-CN.md)。** A持久消费者/计时迁移，B现有Codex控制与试点运行，C共享排序/决定事务，D个人Alpha发行恢复，E前置价值初筛与独立准入，main公共接口和产品接线。每包六阶段连续执行，保留原目录/分支/候选；先交稳定checkpoint再继续独立项。只更新任务顺序，不新增预算或第二Driver；共享语义与依赖见 [0023](docs/rfcs/WP-16/0023-wave-06-alpha-and-value-boundaries.md)。下文wave05及更早内容保留已测历史，修订01仍约束本轮。
+**第六轮历史派工：[大颗粒整包](agent-tasks/product-wave-06/README.zh-CN.md)。** A持久消费者/计时迁移，B现有Codex控制与试点运行，C共享排序/决定事务，D个人Alpha发行恢复，E前置价值初筛与独立准入，main公共接口和产品接线。保留原目录/分支/候选和已测结果；未完成项按第七轮继续。共享语义与依赖见 [0023](docs/rfcs/WP-16/0023-wave-06-alpha-and-value-boundaries.md)，修订01仍约束后续轮次。
 
 **跨项目待办预览：[http://127.0.0.1:5184/](http://127.0.0.1:5184/)。** 原“待我决定”入口已增加跨项目/会话的问题、当前候选及明确阻断，支持筛选、分页、回原会话和逐项审阅；每项仍单独回答/接受。当前按本页等待时间排列，C优先级候选尚待准入。新实例使用独立`.local-state/attention-preview`，原5180–5183及其历史保留，未自动迁移。后端43、前端18及22条分范围浏览器场景通过，非模型/复核收益证据；详见 [0022消费说明](docs/rfcs/WP-16/0022-attention-inbox-consumer.md) 与 [限定交接](reports/releases/attention-inbox/README.zh-CN.md)。
 
