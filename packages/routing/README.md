@@ -4,6 +4,26 @@ Pure, zero-model rules for the cross-project attention view, execution-profile e
 cold-start route advice and independent review evidence. This package has no model loop, SQL writer,
 executor or approval authority.
 
+## Shared AttentionRanker (`rankSharedAttention`)
+
+`sharedAttentionRanker` is directly assignable to contracts' `AttentionRanker`
+(`({ items, now }) => readonly { id, reasons }[]`). It returns a complete, duplicate-free permutation
+and uses only the shared `AttentionReason` enum. Rules:
+
+- `sinceAt: null` is unknown waiting (`unknown_wait`); no age is fabricated.
+- `deadlineAt` is the only business deadline; `deadline_overdue`/`deadline_near` use an explicit
+  24-hour near window. `expiresAt` is answer validity and never becomes a deadline reason; ranking
+  does not grant or remove permission to answer a still-valid item.
+- `blockedWorkIds` is outgoing (works this item blocks) and produces `blocks_other_work`. The old
+  local incoming `blockedBy` model is not renamed or reused; a work merely listed by another item is
+  not treated as a blocker.
+- Same items and explicit `now` produce the same order; ties resolve by deadline, known `sinceAt`,
+  then id. Duplicate ids are refused so a public page cannot be corrupted.
+- Grouping remains navigation-only; permission/authentication/candidate review stays per target.
+
+The older local `rankAttention`/`groupAttention` remains for C-side internal fixtures and is not the
+shared wire adapter.
+
 ## Attention (`rankAttention` / `groupAttention`)
 
 Deterministic order over questions, candidate acceptances and blocked work across projects and

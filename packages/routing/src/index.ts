@@ -54,3 +54,9 @@ export type {
   ReviewValidityState,
 } from './review.ts'
 export { InMemoryRoutingEvidence, RoutingEvidenceConflict } from './evidence-memory.ts'
+export {
+  AttentionRankError,
+  DEADLINE_NEAR_WINDOW_MS,
+  rankSharedAttention,
+  sharedAttentionRanker,
+} from './shared-attention.ts'

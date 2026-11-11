@@ -1,0 +1,81 @@
+{
+  "role": "C",
+  "branch": "codex/g3-assistant-context",
+  "mainBaseCommit": "82db295",
+  "mergeCommit": "690da7a",
+  "stableCheckpoint": "pending-c1c2-commit",
+  "updatedAt": "2026-11-11T00:30:00.000Z",
+  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "phases": [
+    {
+      "phase": "C1",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave06-c1-verification.txt",
+        "packages/context/reports/wave06-c1-assistant.json",
+        "packages/context/reports/wave06-c1-admission.json",
+        "packages/knowledge/examples/decision-transaction.mjs"
+      ],
+      "results": {
+        "realSqliteAssistantProbe": "PASS_SQLITE_ASSISTANT_CONSUMER (7/7)",
+        "wave04AdmissionRegression": "PASS_ADMISSION_PROBES (3/3 C)",
+        "knowledgeTests": "35/35",
+        "decisionExample": "PASS (real temporary SQLite, 0 model/network)"
+      },
+      "note": "Re-verified on merged wave-06 main: DecisionTransactionService prepare is read-only, commit/revoke are synchronous, real A AssistantStatePort replay/revoke/rollback and the old three C admission probes still pass."
+    },
+    {
+      "phase": "C2",
+      "status": "passed",
+      "evidence": [
+        "packages/routing/src/shared-attention.ts",
+        "packages/routing/test/shared-attention.case.ts",
+        "packages/routing/src/index.ts"
+      ],
+      "results": { "routingTests": "37/37 (includes 8 shared-ranker cases)" },
+      "note": "sharedAttentionRanker matches contracts AttentionRanker: complete permutation, shared reasons, sinceAt=null unknown, explicit deadlineAt only, expiresAt not a deadline, outgoing blockedWorkIds, stable explicit-now order, duplicate ids refused."
+    },
+    {
+      "phase": "C3",
+      "status": "blocked_external",
+      "owner": "A",
+      "repro": "grep -rn 'routingEvidence\\|RoutingEvidence' packages/storage/src packages/workflows/src  # no result; createWorkflowPorts(store) has no routingEvidence",
+      "required": "A synchronous RoutingEvidencePort implementation (advice/reviews/outcomes put/get/list, same-body replay, changed-body conflict) on the shared UnitOfWork, plus main admission.",
+      "continue": "Use InMemoryRoutingEvidence with the identical interface for C4/C5 negative cases; do not claim real SQL evidence until A lands."
+    },
+    { "phase": "C4", "status": "not_started", "note": "Decision/proposal/context consumption boundary: read-only prepare + sync commit plan." },
+    { "phase": "C5", "status": "not_started", "note": "Main consumer regression and targeted invalidation negatives." },
+    { "phase": "C6", "status": "not_started", "note": "Stable exports/docs, unknown-value policy, scale limits and final status." }
+  ],
+  "commands": [
+    "git fetch origin && git merge origin/main --no-edit",
+    "pnpm --filter @personal-agent/{contracts,orchestrator-core,effects,storage,workflows,proposals,knowledge,context,routing} build",
+    "pnpm --filter @personal-agent/context typecheck && test",
+    "pnpm --filter @personal-agent/proposals typecheck && test",
+    "pnpm --filter @personal-agent/knowledge typecheck && test",
+    "pnpm --filter @personal-agent/routing typecheck && test",
+    "node tools/bootstrap/review-persisted-assistant.mjs",
+    "node tools/bootstrap/review-wave04-admission.mjs",
+    "node packages/knowledge/examples/decision-transaction.mjs"
+  ],
+  "blockers": [
+    {
+      "id": "C3-A-routing-evidence",
+      "owner": "A",
+      "status": "blocked_external",
+      "input": "packages/workflows createWorkflowPorts(store).routingEvidence implementing packages/contracts routing-review.ts RoutingEvidencePort.",
+      "neededFor": "C3 real SQL combination for advice/review/outcome persistence."
+    }
+  ],
+  "notTested": [
+    "Real SQLite RoutingEvidencePort (A-owned, not on main)",
+    "Main HTTP/provider/UI wiring for shared attention/advice/review",
+    "Any real model or native task (budget 0)"
+  ],
+  "mainNextSteps": [
+    "Admit sharedAttentionRanker from packages/routing and pass it to ProductAttention's optional ranker.",
+    "Consume DecisionTransactionService in the existing UnitOfWork for record/revoke commands.",
+    "Publish the recovery re-authorization interface and routing evidence persistence when available."
+  ]
+}
