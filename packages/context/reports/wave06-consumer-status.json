@@ -5,8 +5,17 @@
   "mergeCommit": "3315f09",
   "checkpointCommit": "0d876b8",
   "updatedAt": "2026-11-11T04:30:00.000Z",
-  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
-  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "ownedPaths": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge",
+    "packages/routing"
+  ],
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0,
+    "unknownSends": 0
+  },
   "blockersCleared": [
     {
       "id": "C3-A-routing-evidence",
@@ -61,7 +70,9 @@
         "packages/knowledge/src/governance.ts",
         "packages/knowledge/test/scan-bounds.case.ts"
       ],
-      "results": { "knowledgeTests": "50/50" },
+      "results": {
+        "knowledgeTests": "50/50"
+      },
       "note": "Removed silent 1000-record/4-batch caps. Project scans are complete or throw DecisionError('scan_incomplete'); targeted supersession probe is used for single records and refuses when its budget is exceeded. listEffectiveWindow reports caller-cap truncation separately. Supersession is historical: revoking a replacement does not reactivate the older decision."
     },
     {
@@ -72,7 +83,9 @@
         "packages/routing/examples/real-evidence-loop.mjs",
         "packages/routing/reports/real-evidence-run.json"
       ],
-      "results": { "routingTests": "44/44 (5 real-port cases)" },
+      "results": {
+        "routingTests": "44/44 (5 real-port cases)"
+      },
       "note": "Real temporary SQLite through A RoutingEvidencePort: advice/review/outcome same-body replay, changed-body conflict, project isolation, exact-subject and exact-profile filters, trigger-failure rollback, reopen persistence, candidate/reviewer drift -> stale while audit stays. In-memory fixture no longer used as port evidence."
     },
     {
@@ -85,7 +98,10 @@
         "packages/knowledge/examples/assistant-workflow.mjs",
         "packages/knowledge/reports/assistant-workflow-run.json"
       ],
-      "results": { "proposalTests": "23/23", "assistantWorkflowExample": "PASS" },
+      "results": {
+        "proposalTests": "23/23",
+        "assistantWorkflowExample": "PASS"
+      },
       "note": "Library-level closed loop: bounded context preview (untrusted data, injection flagged) -> structured proposal prepare (read-only) -> persist pending -> explicit confirmation -> planProposalCommand maps the intent to the existing UserCommand -> decision command commits synchronously in one UnitOfWork with event+receipt. Missing scope/criteria/profile or a full revision contract returns needs_user_input; nothing executes before confirmation."
     },
     {
@@ -139,7 +155,11 @@
   "dependencyRequests": [
     {
       "package": "packages/routing",
-      "added": ["@personal-agent/storage (dev)", "@personal-agent/workflows (dev)", "@types/better-sqlite3 (dev)"],
+      "added": [
+        "@personal-agent/storage (dev)",
+        "@personal-agent/workflows (dev)",
+        "@types/better-sqlite3 (dev)"
+      ],
       "reason": "Real temporary-SQLite routing evidence verification.",
       "rootLock": "pnpm-lock.yaml diff uncommitted; main owns the authoritative lock."
     }
@@ -172,5 +192,6 @@
     "Consume planProposalCommand when proposal confirmation gets an HTTP command; it emits the existing UserCommand with no new kind.",
     "Use listEffectiveWindow when building bounded decision context so a caller cap is distinguishable from a complete project scan.",
     "Wire the trusted outcome producer and candidate-change invalidation into routingEvidence when enabling advice/review experiments."
-  ]
+  ],
+  "latestDeliveryCommit": "25f983a"
 }
