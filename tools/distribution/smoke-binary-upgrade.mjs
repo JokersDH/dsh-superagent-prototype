@@ -36,6 +36,8 @@ const { values } = parseArgs({
   },
 })
 const evidence = { case: 'WAVE07-BINARY-UPGRADE', status: 'FAIL', startedAt: new Date().toISOString(), sections: {} }
+// Only processes this run started under its own temp root may be cleaned up in `finally`.
+const startedPids = new Set()
 const section = (id, status, detail) => {
   evidence.sections[id] = { status, ...(detail === undefined ? {} : { detail }) }
   if (!values.json) process.stderr.write(`${status} ${id}${detail === undefined ? '' : ` ${JSON.stringify(detail).slice(0, 220)}`}\n`)
@@ -120,6 +122,8 @@ async function startInstance(install, r, label, extra = {}) {
     await new Promise((resolveWait) => setTimeout(resolveWait, 100))
   }
   if (record === null) throw new Error(`${label} did not record its instance (api ${apiPort})`)
+  startedPids.add(record.pid)
+  startedPids.add(record.apiPid)
   const stop = () => run(cli(install), ['stop', '--json', ...rootArgs(r)], { allowExit: [0, 2] })
   return { child, apiPort, consolePort, health, record, stop, apiURL: `http://127.0.0.1:${apiPort}` }
 }
@@ -332,6 +336,14 @@ try {
     'Reverting the install pointer is a binary rollback: data is never rolled back or deleted. Explicit `pa rollback --bundle`/`pa restore` is the only data-return path and preserves the original state.',
     'No user service (5180-5185/8796-8801) was started or stopped; all roots/ports are isolated.',
   ]
+  // Stop anything this run left behind: the pid must still be one of ours according to its command
+  // line (the temp root is unique), so a reused pid or a foreign process is never killed.
+  for (const pid of startedPids) {
+    try {
+      const command = spawnSync('ps', ['-ww', '-p', String(pid), '-o', 'command='], { encoding: 'utf8' }).stdout ?? ''
+      if (command.includes(root)) process.kill(pid, 'SIGKILL')
+    } catch { /* already gone */ }
+  }
   rmSync(root, { recursive: true, force: true })
   void resolve
 }
