@@ -4,6 +4,8 @@
 
 已交composer和decision provider，不重做。旧supersession列表修复主线已按0179889精确集成；main提案HTTP在627ef0d已交，旧“没proposal入口”阻断要更新。本轮成果是所有来源走同一授权边界的可组合上下文，以及能被真实应用消费的库接口。
 
+主线明确提案网页也已发布b436fde，8项实际网页场景通过，见[0030](../../docs/rfcs/WP-16/0030-wave-08-proposal-workbench-and-source-audit.md)。C4/C5可消费真实UI/HTTP，不再等待这部分；context预览/自动注入仍未开放，需单独关闭授权准入再组合。
+
 ## C1 先关闭独立授权probe并交修复检查点
 
 合并新main，运行`node tools/bootstrap/probe-wave08-context-grant.mjs "$PWD"`。当前三个FAIL：过期grant仍读provider、caller预算超过grant、purpose不匹配仍读取。必须在任何provider调用前统一鉴权，不只依赖port-backed ContextReader。

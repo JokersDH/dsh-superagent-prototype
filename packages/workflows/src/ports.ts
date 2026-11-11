@@ -5,11 +5,13 @@
  */
 import type {
   AcceptanceProjectionInput, AcceptanceProjectionResult, AssistantState, Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, LegacyDecisionRecord,
-  ProductStore, ProjectCurrent, ProjectSettings, ProjectVersion, SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, WorkIndexEntry,
+  ProductStore, ProjectCurrent, ProjectSettings, ProjectVersion, EvidencePage, RecoveryIntentInput, RecoveryIntentPage, RecoveryIntentRecord,
+  SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, WorkIndexEntry,
 } from '@personal-agent/storage'
 import { WorkflowConflict as StorageWorkflowConflict } from '@personal-agent/storage'
 import type {
   AssistantStatePage, AssistantStatePort, AssistantStateQuery, PersistedDecision, PersistedProposal, RoutingEvidencePort, WorkRecord,
+  RecoveryActivationFacts, RecoveryActivationIntent,
 } from '@personal-agent/contracts'
 
 export { SnapshotError, WorkflowSnapshots } from './snapshot.ts'
@@ -17,7 +19,7 @@ export type {
   SnapshotManifest, SnapshotArtifact, SnapshotResult, SnapshotVerification,
 } from './snapshot.ts'
 
-export type { Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, ProjectCurrent, ProjectSettings, ProjectVersion, WorkIndexEntry, SourceMessageMetadata, TimelineEntry, WorkflowStateFacts }
+export type { Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, ProjectCurrent, ProjectSettings, ProjectVersion, WorkIndexEntry, SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, EvidencePage, RecoveryActivationIntent }
 export { StorageWorkflowConflict as WorkflowConflict }
 
 export interface ConversationDiscoveryPort {
@@ -39,6 +41,16 @@ export interface AssistantPort extends AssistantStatePort {
 export interface AcceptanceProjectionPort {
   consume(input: AcceptanceProjectionInput): AcceptanceProjectionResult
 }
+
+export interface RecoveryIntentPort {
+  /** Synchronous fact write; joins the caller's UnitOfWork and never authorizes execution. */
+  record(input: RecoveryIntentInput): { record: RecoveryIntentRecord; replayed: boolean }
+  getByPlan(planId: string): RecoveryIntentRecord | undefined
+  getByCommand(commandId: string): RecoveryIntentRecord | undefined
+  list(input?: { sourceFingerprint?: string; limit?: number; cursor?: string }): RecoveryIntentPage
+}
+
+export interface RecoveryActivationPort extends RecoveryActivationFacts {}
 
 export interface ConversationPort {
   create(input: { id: string; projectId?: string; title: string; createdAt?: string }): { created: boolean; conversation: Conversation }
@@ -71,6 +83,7 @@ export interface ReadIndexPort {
   work(workId: string, projectIds: readonly string[]): WorkIndexEntry | undefined
   sourceMessage(messageId: string, projectIds: readonly string[]): SourceMessageMetadata | undefined
   timeline(input: { workId: string; projectIds: readonly string[]; limit?: number }): { entries: readonly TimelineEntry[]; truncated: boolean } | undefined
+  evidencePage(input: { workId: string; projectIds: readonly string[]; limit?: number; cursor?: string }): EvidencePage | undefined
   listArtifacts(input?: { limit?: number; before?: string }): { artifacts: { id: string; digest: string; bytes: number; path: string; createdAt: string }[]; nextCursor?: string; hasMore: boolean }
 }
 
@@ -88,6 +101,10 @@ export interface WorkflowPorts {
   assistant: AssistantPort
   routingEvidence: RoutingEvidencePortWithSources
   acceptance: AcceptanceProjectionPort
+  /** Legacy v14 plan intents: audit only, never an activation fact. */
+  recoveryIntents: RecoveryIntentPort
+  /** Shared 0027 production facts consumed by main's RecoveryIntentCommitter. */
+  recoveryActivations: RecoveryActivationPort
   index: ReadIndexPort
   state: StateFactsPort
 }
@@ -102,6 +119,8 @@ export function createWorkflowPorts(store: ProductStore): WorkflowPorts {
     assistant: store.workflows.assistant,
     routingEvidence: store.workflows.routingEvidence,
     acceptance: store.workflows.acceptance,
+    recoveryIntents: store.workflows.recoveryIntents,
+    recoveryActivations: store.workflows.recoveryActivations,
     index: store.workflows.index,
     state: store.workflows.index,
   }

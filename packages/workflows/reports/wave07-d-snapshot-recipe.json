@@ -1,0 +1,62 @@
+{
+  "protocol": "d-snapshot-recipe/1",
+  "status": "ok",
+  "manifest": {
+    "schema": 14,
+    "complete": true,
+    "artifacts": 1,
+    "families": [
+      [
+        "decisions",
+        1
+      ],
+      [
+        "legacy_decisions",
+        0
+      ],
+      [
+        "proposals",
+        0
+      ],
+      [
+        "project_settings",
+        0
+      ],
+      [
+        "contracts",
+        1
+      ],
+      [
+        "verifications",
+        0
+      ],
+      [
+        "acceptances",
+        0
+      ],
+      [
+        "outcomes",
+        1
+      ],
+      [
+        "reviews",
+        0
+      ],
+      [
+        "recovery_intents",
+        1
+      ]
+    ]
+  },
+  "restored": {
+    "verify": "ok",
+    "integrity": "ok",
+    "summary": {
+      "decisions": 1,
+      "outcomes": 1,
+      "settings": 0,
+      "recoveryIntents": 1,
+      "intentAuthorization": "not_granted"
+    }
+  }
+}
