@@ -1,0 +1,609 @@
+{
+  "schemaVersion": 1,
+  "wave": "product-wave-08",
+  "date": "2026-11-11",
+  "status": "PLANNED_NOT_EXECUTED",
+  "baseline": "436dc023c6fad30716baa0d64ac14562f0216880",
+  "sharedBoundary": "docs/rfcs/WP-16/0029-wave-08-product-closure-and-reviewed-inputs.md",
+  "newModelAllowance": 0,
+  "nativeModelsStartedByThisDispatch": 0,
+  "newDriverImplementation": false,
+  "pilotGatesProductAcceptance": false,
+  "studyState": "BLOCKED_CURRENT_RECIPE",
+  "preservedUserServices": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ]
+  ],
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "packet": "agent-tasks/product-wave-08/agent-a-durable-activation.zh-CN.md",
+      "candidate": "da5f62afc48692c6dd6f15a4ef4fd46734e635d0",
+      "candidateStatus": "REVIEWED_NOT_ADMITTED_BY_THIS_PLAN",
+      "ownedPaths": [
+        "packages/storage/",
+        "packages/workflows/"
+      ],
+      "evidencePath": "packages/workflows/reports/wave08-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "phases": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6"
+      ]
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "packet": "agent-tasks/product-wave-08/agent-b-runtime-operations.zh-CN.md",
+      "candidate": "748942e48030f9dba5d42ea7b07bc2bf7dde78f8",
+      "candidateStatus": "REVIEWED_NOT_ADMITTED_BY_THIS_PLAN",
+      "ownedPaths": [
+        "packages/execution/",
+        "packages/catalog/",
+        "packages/policy-preparation/",
+        "packages/driver-kit/",
+        "packages/testing/",
+        "packages/drivers/",
+        "apps/runner/",
+        "tests/native-acceptance/"
+      ],
+      "evidencePath": "tests/native-acceptance/reports/wave08-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "phases": [
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6"
+      ],
+      "grantId": "wave03-b-native",
+      "historicalLimit": 4,
+      "remaining": "UNKNOWN_NOT_SPENDABLE",
+      "resetLedger": false,
+      "feasibilityVerdict": "NO_SUPPORTED_BOUNDED_RECIPE",
+      "newFeasibilityInvestigations": 0
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "packet": "agent-tasks/product-wave-08/agent-c-authorized-context.zh-CN.md",
+      "candidate": "2d2fa10a5649c0e02759f349ada7e0edd92c6fd6",
+      "candidateStatus": "REVIEWED_NOT_ADMITTED_BY_THIS_PLAN",
+      "ownedPaths": [
+        "packages/context/",
+        "packages/proposals/",
+        "packages/knowledge/",
+        "packages/routing/"
+      ],
+      "evidencePath": "packages/context/reports/wave08-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "phases": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6"
+      ]
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "packet": "agent-tasks/product-wave-08/agent-d-personal-upgrade.zh-CN.md",
+      "candidate": "eca5674155a7d828ef15a17f5814b610a7cdc095",
+      "candidateStatus": "REVIEWED_NOT_ADMITTED_BY_THIS_PLAN",
+      "ownedPaths": [
+        "apps/launcher/",
+        "tools/distribution/",
+        "packages/portability/"
+      ],
+      "evidencePath": "tools/distribution/reports/wave08-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "phases": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6"
+      ]
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "packet": "agent-tasks/product-wave-08/agent-e-same-source-acceptance.zh-CN.md",
+      "candidate": "1a776d77271b5810d34b25a0398662a684485a48",
+      "candidateStatus": "REVIEWED_NOT_ADMITTED_BY_THIS_PLAN",
+      "ownedPaths": [
+        "tests/product-acceptance/"
+      ],
+      "evidencePath": "tests/product-acceptance/reports/wave08-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "phases": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6"
+      ],
+      "grantId": "wave05-independent-review-pilot-01",
+      "maxNativeTurnStarts": 24,
+      "maxAuthorTurnStarts": 8,
+      "maxReviewTurnStarts": 16,
+      "maxBillableTokens": 200000,
+      "maxCostUSD": 5,
+      "maxInFlight": 1,
+      "resetLedger": false,
+      "reconcileActualLedgerBeforeSend": true,
+      "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
+      "reportedTurnsUsed": 0,
+      "cliFallbackAllowed": false,
+      "unknownCostIsZero": false,
+      "unverifiedLegacyMigrationAllowed": false
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-08/main.zh-CN.md",
+      "ownedPaths": [
+        "packages/contracts/",
+        "packages/application/",
+        "packages/questions/",
+        "apps/coordinator/",
+        "apps/console/",
+        "agent-tasks/product-wave-08/",
+        "docs/rfcs/WP-16/"
+      ],
+      "evidencePath": "reports/releases/wave08-integration/status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "phases": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6"
+      ],
+      "additionalOwnership": [
+        "root_configuration_and_lock",
+        "shared_docs",
+        "cross_module_integration"
+      ]
+    }
+  },
+  "milestones": [
+    {
+      "id": "A1",
+      "owner": "A",
+      "phase": "A1",
+      "status": "NOT_STARTED",
+      "dependsOn": [],
+      "output": "correct full legacy plan roundtrip; publish exact current production port checkpoint"
+    },
+    {
+      "id": "A2",
+      "owner": "A",
+      "phase": "A2",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A1"
+      ],
+      "output": "actual shared activation facts in source UOW, append-only migration"
+    },
+    {
+      "id": "A4",
+      "owner": "A",
+      "phase": "A4",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A1"
+      ],
+      "output": "scoped bounded evidence pages and stable consumer recipe"
+    },
+    {
+      "id": "A5",
+      "owner": "A",
+      "phase": "A5",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A2",
+        "A4"
+      ],
+      "output": "schema migration and activation-fact snapshot/re-restore evidence"
+    },
+    {
+      "id": "B1",
+      "owner": "B",
+      "phase": "B1",
+      "status": "NOT_STARTED",
+      "dependsOn": [],
+      "output": "production readonly runtime diagnostics checkpoint"
+    },
+    {
+      "id": "B2",
+      "owner": "B",
+      "phase": "B2",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B1"
+      ],
+      "output": "current resource/instance query with unknown preserved"
+    },
+    {
+      "id": "B3",
+      "owner": "B",
+      "phase": "B3",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B2"
+      ],
+      "output": "controlled command/recovery crash windows and consumers"
+    },
+    {
+      "id": "B4",
+      "owner": "B",
+      "phase": "B4",
+      "status": "NOT_STARTED",
+      "dependsOn": [],
+      "output": "single actual adapter rejects missing grant/identity/bounds; no billing"
+    },
+    {
+      "id": "B5",
+      "owner": "B",
+      "phase": "B5",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B1",
+        "B2"
+      ],
+      "output": "main/D product diagnostic and release consumption"
+    },
+    {
+      "id": "B6",
+      "owner": "B",
+      "phase": "B6",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B3",
+        "B4",
+        "B5"
+      ],
+      "output": "runtime operations handoff; study remains blocked"
+    },
+    {
+      "id": "C1",
+      "owner": "C",
+      "phase": "C1",
+      "status": "NOT_STARTED",
+      "dependsOn": [],
+      "output": "all pre-read grant probes pass in candidate"
+    },
+    {
+      "id": "C2",
+      "owner": "C",
+      "phase": "C2",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C1"
+      ],
+      "output": "global authorized budgets and completeness semantics"
+    },
+    {
+      "id": "C3",
+      "owner": "C",
+      "phase": "C3",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C2"
+      ],
+      "output": "real A source/invalidity adapters for main"
+    },
+    {
+      "id": "C4",
+      "owner": "C",
+      "phase": "C4",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C1"
+      ],
+      "output": "current proposal/application same-UOW real consumer"
+    },
+    {
+      "id": "D1",
+      "owner": "D",
+      "phase": "D1",
+      "status": "NOT_STARTED",
+      "dependsOn": [],
+      "output": "actual mode preservation and unknown-live-process refusal checkpoint"
+    },
+    {
+      "id": "D2",
+      "owner": "D",
+      "phase": "D2",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "D1"
+      ],
+      "output": "target process cleanup and reentrant switch crash windows"
+    },
+    {
+      "id": "D3",
+      "owner": "D",
+      "phase": "D3",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "D1"
+      ],
+      "output": "exact schema refusal and post-upgrade data preservation"
+    },
+    {
+      "id": "E1",
+      "owner": "E",
+      "phase": "E1",
+      "status": "NOT_STARTED",
+      "dependsOn": [],
+      "output": "strict legacy ledger, exact model/provider and unknown-cost refusal"
+    },
+    {
+      "id": "E2",
+      "owner": "E",
+      "phase": "E2",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "E1",
+        "B4"
+      ],
+      "output": "single adapter no-send integration and blocked study seal"
+    },
+    {
+      "id": "M1-interfaces",
+      "owner": "main",
+      "phase": "M1",
+      "status": "NOT_STARTED",
+      "dependsOn": [],
+      "output": "existing command API consumed; actual target protocol checkpoint published early"
+    },
+    {
+      "id": "M1-source",
+      "owner": "main",
+      "phase": "M1",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A2",
+        "C2",
+        "D1"
+      ],
+      "output": "progressively admitted minimal production source"
+    },
+    {
+      "id": "M2",
+      "owner": "main",
+      "phase": "M2",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "M1-interfaces"
+      ],
+      "output": "actual proposal conversation UI and command recovery"
+    },
+    {
+      "id": "M3",
+      "owner": "main",
+      "phase": "M3",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C3",
+        "A4",
+        "M1-interfaces"
+      ],
+      "output": "authorized context/evidence HTTP and actual UI"
+    },
+    {
+      "id": "M4",
+      "owner": "main",
+      "phase": "M4",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A2",
+        "B2",
+        "M1-interfaces"
+      ],
+      "output": "actual source-bound private target activation and crash replay"
+    },
+    {
+      "id": "A3",
+      "owner": "A",
+      "phase": "A3",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A2",
+        "M4"
+      ],
+      "output": "actual main activation consumer persistent crash/reopen verification"
+    },
+    {
+      "id": "A6",
+      "owner": "A",
+      "phase": "A6",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "output": "source-bound persistence and snapshot handoff"
+    },
+    {
+      "id": "C5",
+      "owner": "C",
+      "phase": "C5",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C3",
+        "C4",
+        "M3"
+      ],
+      "output": "main context consumer and bounded performance"
+    },
+    {
+      "id": "C6",
+      "owner": "C",
+      "phase": "C6",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C2",
+        "C3",
+        "C4",
+        "C5"
+      ],
+      "output": "authorized context and proposal final handoff"
+    },
+    {
+      "id": "M5-freeze",
+      "owner": "main",
+      "phase": "M5",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "M1-source",
+        "M2",
+        "M3",
+        "M4",
+        "D2",
+        "D3"
+      ],
+      "output": "clean integrated target source before independent artifact acceptance"
+    },
+    {
+      "id": "D4",
+      "owner": "D",
+      "phase": "D4",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "M5-freeze"
+      ],
+      "output": "frozen new target from admitted main with explicit artifact identities"
+    },
+    {
+      "id": "D5",
+      "owner": "D",
+      "phase": "D5",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "M4",
+        "D2"
+      ],
+      "output": "actual main activation startup and user operations consumer"
+    },
+    {
+      "id": "D6",
+      "owner": "D",
+      "phase": "D6",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "D3",
+        "D4",
+        "D5"
+      ],
+      "output": "frozen bytes and independent E install recipe"
+    },
+    {
+      "id": "E3",
+      "owner": "E",
+      "phase": "E3",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "M2",
+        "M3"
+      ],
+      "output": "latest proposal/context browser and two-project acceptance"
+    },
+    {
+      "id": "E4",
+      "owner": "E",
+      "phase": "E4",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "D4"
+      ],
+      "output": "independent current explicit two-artifact install/mode/upgrade acceptance"
+    },
+    {
+      "id": "E5",
+      "owner": "E",
+      "phase": "E5",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "M4",
+        "A3",
+        "D5"
+      ],
+      "output": "actual activation crash windows and bounded reliability"
+    },
+    {
+      "id": "E6",
+      "owner": "E",
+      "phase": "E6",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "E2",
+        "E3",
+        "E4",
+        "E5"
+      ],
+      "output": "one source-bound tier matrix; old reports remain historical"
+    },
+    {
+      "id": "M5-admission",
+      "owner": "main",
+      "phase": "M5",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "D6",
+        "E3",
+        "E4",
+        "E5",
+        "B3"
+      ],
+      "output": "precise product/install admission or explicit unmet gates"
+    },
+    {
+      "id": "M6",
+      "owner": "main",
+      "phase": "M6",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "M5-admission",
+        "E6"
+      ],
+      "output": "user entry and full scoped handoff without study expansion"
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+export { planProposalCommand } from './command-plan.ts'
+export type { CommandPlan, CommandPlanInput } from './command-plan.ts'
 export { ProposalRegistry } from './registry.ts'
 export type { ConfirmProposalInput, CreateProposalInput } from './registry.ts'
 export { parseStructuredOutput, proposalDigest, proposalIntent, sameContract, scopeWithin, validateProposalBindings } from './parser.ts'

@@ -42,6 +42,9 @@ import {
   DecisionCommandSchema,
   DecisionQuerySchema,
   DecisionPageSchema,
+  ProposalPrepareSchema,
+  ProposalPreviewSchema,
+  ProposalCommandSchema,
   WorkEvidenceSchema,
   RecoveryInspectionSchema,
   RecoveryPrepareSchema,
@@ -77,6 +80,9 @@ import type {
   DecisionCommand,
   DecisionQuery,
   DecisionPage,
+  ProposalPrepare,
+  ProposalPreview,
+  ProposalCommand,
   WorkEvidence,
   RecoveryInspection,
   RecoveryPrepare,
@@ -135,6 +141,8 @@ export interface LocalHttpOptions {
     prepareDecision?(input: DecisionPrepare, actor: TrustedActor): Promise<DecisionPreview>
     decision?(command: DecisionCommand, actor: TrustedActor): Promise<CommandReceipt>
     recoveryPrepare?(input: RecoveryPrepare, actor: TrustedActor): Promise<RecoveryPlan>
+    prepareProposal?(input: ProposalPrepare, actor: TrustedActor): Promise<ProposalPreview>
+    proposal?(command: ProposalCommand, actor: TrustedActor): Promise<CommandReceipt>
   }
   read?: {
     attention?(query: AttentionQuery): Promise<AttentionPage>
@@ -221,14 +229,14 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
   )
   app.use(
     '*',
-    bodyLimit({
-      maxSize: 64 * 1024,
+    (c, next) => bodyLimit({
+      maxSize: ['/v1/proposals/commands', '/v1/decisions/commands'].includes(c.req.path) ? 256 * 1024 : 64 * 1024,
       onError: (c) =>
         c.json(
           { error: { code: 'invalid_request', message: 'Request body exceeds the local limit', retry: 'none' } },
           413,
         ),
-    }),
+    })(c, next),
   )
   app.get('/v1/health', (c) =>
     c.json({
@@ -314,6 +322,19 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
       profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate' })),
       projects: value.projects.map(project => { const { defaultProfileId: _, ...rest } = project; return { ...rest, profileIds: [], dispatchAllowed: false, blockedReason: 'writer_indeterminate' } }),
     }) : value)
+  })
+  app.post('/v1/proposals/prepare', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Proposal preview requires JSON')
+    if (!options.operations?.prepareProposal) throw new ApplicationFault('unsupported_capability', 'Proposal preparation is not connected')
+    return c.json(ProposalPreviewSchema.parse(await options.operations.prepareProposal(ProposalPrepareSchema.parse(await c.req.json()), c.get('actor'))))
+  })
+  app.post('/v1/proposals/commands', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Proposal command requires JSON')
+    if (!options.operations?.proposal) throw new ApplicationFault('unsupported_capability', 'Proposal commands are not connected')
+    const command = ProposalCommandSchema.parse(await c.req.json())
+    const receipt = CommandReceiptSchema.parse(await options.operations.proposal(command, c.get('actor')))
+    if (receipt.commandId !== command.commandId) throw new ApplicationFault('storage_unavailable', 'Proposal receipt identity mismatch', 'none')
+    return c.json(receipt, receipt.status === 'rejected' ? statusOf(receipt.error) : 200)
   })
   app.get('/v1/decisions', async (c) => {
     if (!options.read?.decisions) throw new ApplicationFault('unsupported_capability', 'Decision reader is not connected')

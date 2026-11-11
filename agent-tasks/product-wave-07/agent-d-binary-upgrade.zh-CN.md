@@ -6,6 +6,8 @@
 
 整包结果：E拿到同一来源链的基线/目标两个真实安装物，在新根独立安装、升级、诊断、失败恢复；恢复历史始终只读，新工作仅按main持久权威激活。不能只改tag或删除marker获得通过。
 
+D1独立反馈已在[0028](../../docs/rfcs/WP-16/0028-wave-07-proposal-http-and-admission.md)：c9a0698在空install/config根实际firstRun会因release.source=null时读取commit崩溃。补源码/空根/已有源码release/完整发行的实际firstRun及CLI，不只测bootstrap helper；保留真实来源验证。继续D1/D5与已有双binary工作，main未改你的工作树。恢复source事实接口已见[0027](../../docs/rfcs/WP-16/0027-wave-07-command-and-recovery-checkpoint.md)，仍不是target启动授权。
+
 ## D1 先修覆盖配置根的首次运行并交源码检查点
 
 复现E的PA_CONFIG_ROOT覆盖后release.json丢失/未初始化问题。实际发行入口从已验证安装manifest初始化对应私有配置根，拒绝不匹配/被篡改/错实例来源，不借用作者checkout或默认根伪装成功。

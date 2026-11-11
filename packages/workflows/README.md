@@ -109,8 +109,12 @@ snapshots.verify('/private/new-snapshot-dir')
   project-scoped bounded lists support exact review-subject and execution-profile filters. The
   `sources` extension returns existing binding/verification/acceptance/observation facts and leaves
   usage `unknown` when absent. `timeline` links bounded single-work facts without causal claims, and
-  snapshots block if a review report artifact reference is absent from the backup registry. See
-  `docs/RFC-0003-routing-evidence.md`.
+  snapshots block if a review report artifact reference is absent from the backup registry. The
+  snapshot manifest also carries a bounded workflow-evidence summary (per-family identities + record
+  body digests) so D can report coverage and detect row changes even with a re-recorded DB hash; a
+  schema newer than this build is blocked, and `examples/d-snapshot-restore.mjs` is the runnable
+  byte-copy restore/verify recipe. See `docs/RFC-0003-routing-evidence.md` and
+  `docs/RFC-0004-acceptance-outcome-consumer.md`.
 
 **Main migration required:** current `ApplicationConversations` passes `projectIds: []` as an
 internal discovery convention. That convention is removed. Main must pass the configured allowed
