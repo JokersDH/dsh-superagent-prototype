@@ -4,6 +4,8 @@
 
 本轮结果：main的RecoveryIntentCommitter可用你的真实生产port，source事实/receipt能重放并覆盖快照；历史证据分页给主线真实消费者。当前da5f62a未关闭上轮读回/共享port问题，不再把旧plan intent称已对齐。
 
+后续实际状态：fcf2563已与0c9ca71/9f1833d集成到main e4402d3，生产port、旧读回及事务消费者通过，见[0030](../../docs/rfcs/WP-16/0030-wave-08-proposal-workbench-and-source-audit.md)。不要重做已关闭A1/A2；继续快照/最终组合。main另交只读source记录查询，target激活仍未实现，不能把本批source通过扩大成A4 target已测。
+
 ## A1 先关读回反例并对齐已发布接口
 
 安全合并当前origin/main，修mapRow把envelope当plan返回的结构错误，覆盖record/getByPlan/getByCommand/list/reopen完整schema、摘要、actor/时间。读`packages/contracts/src/recovery-activation.ts`与main `recovery-intents.ts`，给最短实际生产port recipe并先push检查点。

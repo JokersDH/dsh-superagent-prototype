@@ -2,6 +2,8 @@
 
 日期2026-11-11；派工基线436dc02，审视输入见[0029](../../docs/rfcs/WP-16/0029-wave-08-product-closure-and-reviewed-inputs.md)。A–E继续原目录/分支和代码归属，wave05修订01、全部grant和旧实测范围保留。本轮每人六阶段，先交可运行checkpoint，再连续完成独立阶段，无需每修一处等下发。
 
+主线新实际检查点：[0030](../../docs/rfcs/WP-16/0030-wave-08-proposal-workbench-and-source-audit.md)，源码b436fde。明确提案网页8场景通过，A schema15生产facts及只读审计GET已集成；旧A读回/接口对齐阻断关闭。C可消费实际UI/HTTP，D/E可核对source记录但不能启动target；自动context/结构化reasoner和target激活仍待后续。新隔离预览5186/8802也须保留。
+
 ## 本轮出口
 
 1. 主对话里的真实日常闭环：提案预览/确认/拒绝、明确范围的上下文预览、工作/决定/交付证据，刷新与响应未知可恢复。
