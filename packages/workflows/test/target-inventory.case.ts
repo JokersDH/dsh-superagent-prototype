@@ -200,3 +200,47 @@ test('the table classification covers every table this build can migrate', () =>
   for (const name of migratedTableNames())
     assert.equal(known.has(name) || indexPattern.test(name), true, `unclassified migrated table: ${name}`)
 })
+
+
+test('a claimed schema with missing business tables is not a complete empty target', () => {
+  const root = tmp('target-claimed-')
+  try {
+    const db = new Database(join(root, 'state.sqlite'))
+    try {
+      db.exec('CREATE TABLE schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)')
+      db.prepare('INSERT INTO schema_meta VALUES (?, ?)').run('product_schema', JSON.stringify(PRODUCT_SCHEMA_VERSION))
+    } finally { db.close() }
+    const inventory = recoveryTargetInventory.inspect(root)
+    assert.notEqual(inventory.completeness, 'complete')
+    assert.equal(inventory.issues.includes('unsupported_schema'), true)
+    assert.equal(inventory.startupAvailable, false)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})
+
+test('only the exact FTS table and its shadow set are metadata; arbitrary prefixes are unknown', () => {
+  const { root } = emptyTarget()
+  try {
+    const db = new Database(join(root, 'state.sqlite'))
+    try {
+      db.exec('CREATE TABLE conversation_search_surprise (payload TEXT)')
+      db.prepare('INSERT INTO conversation_search_surprise VALUES (?)').run('residue')
+    } finally { db.close() }
+    const inventory = recoveryTargetInventory.inspect(root)
+    const table = inventory.tables.find(item => item.name === 'conversation_search_surprise')
+    assert.equal(table?.category, 'unknown')
+    assert.equal(inventory.issues.includes('unknown_table'), true)
+    assert.equal(inventory.completeness, 'unsupported')
+    assert.equal(inventory.tables.find(item => item.name === 'conversation_search_data')?.category, 'metadata')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})
+
+test('the returned digest names the inspected snapshot and is stable across identical inspections', () => {
+  const { root } = emptyTarget()
+  try {
+    const first = recoveryTargetInventory.inspect(root)
+    const second = recoveryTargetInventory.inspect(root)
+    assert.equal(first.completeness, 'complete')
+    assert.equal(first.databaseDigest, second.databaseDigest)
+    assert.equal(first.databaseDigest?.length, 64)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})

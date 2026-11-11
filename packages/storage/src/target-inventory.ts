@@ -20,8 +20,11 @@ const METADATA_TABLES = new Set([
   'schema_meta', 'coordinator_instances', 'writer_claim', 'artifacts', 'ingress_payloads',
   'event_log', 'command_receipts', 'fact_receipts',
 ])
-/** FTS5 shadow tables are derived index storage; their internal config rows are not business data. */
-const INDEX_TABLE = /^conversation_search(?:_|$)/
+/** Exactly the FTS5 table and its generated shadow tables; no arbitrary prefix is trusted. */
+const INDEX_TABLES = new Set([
+  'conversation_search', 'conversation_search_data', 'conversation_search_idx',
+  'conversation_search_content', 'conversation_search_docsize', 'conversation_search_config',
+])
 const MIN_SUPPORTED_SCHEMA = 1
 const MAX_TABLES = 256
 
@@ -54,7 +57,20 @@ export const TARGET_TABLE_CATEGORIES: Readonly<Record<string, 'metadata' | 'busi
 })
 
 const categoryOf = (name: string): 'metadata' | 'business' | 'unknown' =>
-  TARGET_TABLE_CATEGORIES[name] ?? (INDEX_TABLE.test(name) ? 'metadata' : 'unknown')
+  TARGET_TABLE_CATEGORIES[name] ?? (INDEX_TABLES.has(name) ? 'metadata' : 'unknown')
+
+/** Tables this build's registry creates up to and including `schema`, for completeness validation. */
+function expectedTablesFor(schema: number): Set<string> {
+  const names = new Set<string>()
+  for (const migration of MIGRATIONS) {
+    if (migration.version > schema) break
+    for (const statement of migration.statements) {
+      const match = /CREATE\s+(?:VIRTUAL\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z_][A-Za-z0-9_]*)/i.exec(statement)
+      if (match?.[1]) names.add(match[1])
+    }
+  }
+  return names
+}
 
 interface FileDigest { digest: string | null; stable: boolean; exists: boolean; regular: boolean }
 
@@ -128,10 +144,25 @@ function copySnapshot(stateRoot: string): Snapshot {
       (wal !== undefined) !== (walAfter !== undefined) ||
       (wal && walAfter && (wal.size !== walAfter.size || wal.mtimeMs !== walAfter.mtimeMs || wal.ino !== walAfter.ino))
     return { directory, issues: changed ? ['busy_or_changed'] : [], exists: true, changed: Boolean(changed) }
-  } catch (error) {
+  } catch {
     rmSync(directory, { recursive: true, force: true })
-    return { directory: undefined, issues: ['busy_or_changed'], exists: true, changed: true, ...{ error: String(error) } }
+    return { directory: undefined, issues: ['busy_or_changed'], exists: true, changed: true }
   }
+}
+
+/**
+ * Digest of the private snapshot that is about to be inspected (not a separate read of the source).
+ * The database and any WAL copies must both be regular, complete and stable; `-shm` is excluded.
+ */
+function snapshotDigest(directory: string): string | null {
+  const database = stableFileDigest(join(directory, 'state.sqlite'))
+  const wal = stableFileDigest(join(directory, 'state.sqlite-wal'))
+  if (!database.exists || !database.regular || !database.stable) return null
+  if (wal.exists && (!wal.regular || !wal.stable)) return null
+  const hash = createHash('sha256')
+  hash.update(`db:present:${database.digest ?? ''}`)
+  hash.update(`\nwal:${wal.exists ? 'present' : 'absent'}:${wal.exists ? wal.digest ?? '' : ''}`)
+  return hash.digest('hex')
 }
 
 export class RecoveryTargetInventoryReaderImpl implements RecoveryTargetInventoryReader {
@@ -157,18 +188,20 @@ export class RecoveryTargetInventoryReaderImpl implements RecoveryTargetInventor
     if ((root.mode & 0o077) !== 0 || (typeof process.getuid === 'function' && root.uid !== process.getuid()))
       issues.add('not_private')
 
-    const material = materialDigest(stateRoot)
-    for (const issue of material.issues) issues.add(issue)
     const snapshot = copySnapshot(stateRoot)
     for (const issue of snapshot.issues) issues.add(issue)
     if (!snapshot.exists) {
       issues.add('missing_database')
-      return finish(material.digest)
+      return finish(null)
     }
     if (!snapshot.directory) {
       completeness = issues.has('busy_or_changed') ? 'bounded' : 'unsupported'
-      return finish(material.digest)
+      return finish(null)
     }
+    // The digest is computed from the same private copy that will be inspected; a changed source
+    // during the copy is refused rather than bound to a different read.
+    const digest = snapshot.changed ? null : snapshotDigest(snapshot.directory)
+    if (digest === null && !snapshot.changed) issues.add('busy_or_changed')
 
     let db: Database.Database | undefined
     try {
@@ -189,8 +222,16 @@ export class RecoveryTargetInventoryReaderImpl implements RecoveryTargetInventor
         const rows = Number((db.prepare(`SELECT COUNT(*) AS n FROM "${name.replaceAll('"', '""')}"`).get() as { n: number }).n)
         tables.push({ name, category, rows })
       }
-      if (productSchema === null || !Number.isSafeInteger(productSchema) ||
-        productSchema < MIN_SUPPORTED_SCHEMA || productSchema > PRODUCT_SCHEMA_VERSION) issues.add('unsupported_schema')
+      const supportedSchema = productSchema !== null && Number.isSafeInteger(productSchema) &&
+        productSchema >= MIN_SUPPORTED_SCHEMA && productSchema <= PRODUCT_SCHEMA_VERSION
+      if (!supportedSchema) issues.add('unsupported_schema')
+      else {
+        // A claimed schema must carry its complete registered table set; a schema_meta-only or
+        // partially copied database is not an empty valid target.
+        const expected = expectedTablesFor(productSchema as number)
+        const present = new Set(names)
+        if ([...expected].some(name => !present.has(name))) issues.add('unsupported_schema')
+      }
       if (issues.has('unsupported_schema') || issues.has('unknown_table') || issues.has('integrity_failed'))
         completeness = 'unsupported'
       else if (bounded || issues.has('busy_or_changed')) completeness = 'bounded'
@@ -208,7 +249,7 @@ export class RecoveryTargetInventoryReaderImpl implements RecoveryTargetInventor
       db?.close()
       rmSync(snapshot.directory, { recursive: true, force: true })
     }
-    return finish(material.digest)
+    return finish(digest)
   }
 }
 
