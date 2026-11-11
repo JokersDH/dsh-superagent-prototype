@@ -10,7 +10,8 @@
   },
   "status": "BLOCKED_PREFLIGHT",
   "reason": [
-    "pricing_unavailable"
+    "pricing_unavailable",
+    "b_runtime_interface_missing"
   ],
   "reservation": {
     "turns": 0,

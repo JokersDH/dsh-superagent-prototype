@@ -69,6 +69,13 @@ export const SAFETY_CASES = [
   'E1-MUTATE-HETERO-NO-BUDGET',
   'E1-MUTATE-HETERO-NO-ISOLATION',
   'E1-MUTATE-HETERO-NO-SUBJECT',
+  'E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED',
+  'E1-MUTATE-NATIVE-CONTROL-NO-STOP',
+  'E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY',
+  'E1-MUTATE-PILOT-ZERO-TURNS',
+  'E1-MUTATE-PILOT-UNKNOWN-USAGE',
+  'E1-MUTATE-PILOT-BLOCKED-PASS',
+  'E1-MUTATE-PILOT-NO-ORACLE',
 ].map((id) => case_(id, { layers: [LAYERS.READONLY] }))
 
 /** Product workflow evidence from the controlled lane. */
@@ -92,6 +99,7 @@ export const CONTROLLED_CASES = [
   case_('E3-REVIEW-FIXTURES', { layers: [LAYERS.READONLY], evidence: ['fixture'] }),
   case_('E3-SEALED-COPY', { layers: [LAYERS.READONLY] }),
   case_('E3-REVIEW-ACTIVITY-UI', { layers: [LAYERS.CONTROLLED], evidence: ['reviewTiming'] }),
+  case_('E3-ATTENTION-INBOX', { layers: [LAYERS.CONTROLLED], evidence: ['attention'] }),
   case_('E3-DESKTOP-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
   case_('E3-NOTEBOOK-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
   case_('E3-MOBILE-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
@@ -133,6 +141,18 @@ export const CONTROLLED_REVIEW_CASES = [
 ]
 export const HETEROGENEOUS_CASES = [
   case_('E5-HETEROGENEOUS-REVIEW', { layers: [LAYERS.NATIVE], evidence: ['heterogeneous'] }),
+]
+export const NATIVE_CONTROL_CASES = [
+  case_('E5-NATIVE-CONTROL', { layers: [LAYERS.NATIVE], evidence: ['nativeControl'] }),
+]
+export const PILOT_CASES = [
+  case_('E6-REVIEW-PILOT', { layers: [LAYERS.NATIVE], evidence: ['pilot'] }),
+]
+const FIXTURE_CASES = [
+  case_('E2-ROUTE-FIXTURE', { layers: [LAYERS.READONLY], evidence: ['fixture'] }),
+  case_('E3-REVIEW-FIXTURES', { layers: [LAYERS.READONLY], evidence: ['fixture'] }),
+  case_('E3-SEALED-COPY', { layers: [LAYERS.READONLY] }),
+  case_('E4-PORTABILITY-CHECKLIST', { layers: [LAYERS.READONLY], evidence: ['fixture'] }),
 ]
 
 const controlled = {
@@ -184,7 +204,54 @@ export const TIERS = {
     requireCaseSource: true,
     cases: CONTROLLED_CASES.filter((item) => item.id.startsWith('E4-')),
   },
+  'module': {
+    tier: 'module',
+    description: 'Gate self-tests plus frozen contract/capsule fixtures only. No product workflow.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.READONLY],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: [...SAFETY_CASES, ...FIXTURE_CASES],
+  },
+  'controlled-product': controlled,
   'controlled-product-workflow': controlled,
+  'actual-native-control': {
+    tier: 'actual-native-control',
+    description:
+      'Controlled product workflow plus real native stop/question/recovery control with version, identity, budget and evidence proof.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY, LAYERS.NATIVE],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: [...SAFETY_CASES, ...CONTROLLED_CASES, ...NATIVE_CONTROL_CASES],
+  },
+  'installed-alpha': {
+    tier: 'installed-alpha',
+    description:
+      'Controlled product workflow plus a real staged installation outside the checkout. Native execution may remain separate.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY, LAYERS.INSTALLED],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: [...SAFETY_CASES, ...CONTROLLED_CASES, ...INSTALL_CASES],
+  },
+  'review-value': {
+    tier: 'review-value',
+    description:
+      'Actual heterogeneous review plus a real, complete 8-case three-arm pilot result. BLOCKED or zero turns is not a value result.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY, LAYERS.NATIVE],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: [
+      ...SAFETY_CASES,
+      ...CONTROLLED_CASES,
+      ...ADVISORY_CASES,
+      ...CONTROLLED_REVIEW_CASES,
+      ...HETEROGENEOUS_CASES,
+      ...PILOT_CASES,
+    ],
+  },
   'advisory-routing': {
     tier: 'advisory-routing',
     description:

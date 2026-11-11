@@ -60,6 +60,39 @@ const evidenceFor = (key) => {
       return { id: 'fixture', path: '/dev/null', sha256: DIGEST }
     case 'verificationRecovery':
       return { blockedId: 'blocked-1', retried: true, accepted: true }
+    case 'nativeControl':
+      return {
+        executed: true,
+        version: 'codex 0.164.0',
+        attemptId: 'attempt-native-1',
+        commandId: 'command-native-1',
+        profileIdentityDigest: DIGEST,
+        sourceCommit: COMMIT,
+        stop: { observed: true, evidenceRefs: ['stop-evidence'] },
+        question: { observed: true, evidenceRefs: ['question-evidence'] },
+        recovery: { observed: true, evidenceRefs: ['recovery-evidence'] },
+        budget: { grantId: 'wave03-b-native', usedTokens: 1200, maxTokens: 64000 },
+        evidenceRefs: ['native-evidence-1'],
+      }
+    case 'pilot':
+      return {
+        protocol: 'independent-review-pilot/1',
+        grantId: 'wave05-independent-review-pilot-01',
+        executed: true,
+        turnsUsed: 24,
+        tokensUsed: 180000,
+        costUSD: 4.2,
+        usageCompleteness: 'observed',
+        oracleDigest: DIGEST,
+        decision: 'promising',
+        sourceCommit: COMMIT,
+        arms: [
+          { id: 'no_review', turnStarts: 0 },
+          { id: 'same_session_self_review', turnStarts: 8 },
+          { id: 'fresh_session_review', turnStarts: 8 },
+        ],
+        refusals: [],
+      }
     case 'reviewTiming':
       return {
         candidateReadyAt: '2026-11-10T00:00:00.000Z',
@@ -201,6 +234,17 @@ const gateFor = (requirement, report) =>
 
 const rejectHeterogeneous = (assert, label, mutate, expected) => {
   const result = gateFor(heterogeneous, buildReportFor(heterogeneous, mutate))
+  assert(`${label}_REJECTED`, result.ok === false, `gate accepted ${label}`)
+  assert(
+    `${label}_CODE`,
+    result.failures.map((item) => item.code).includes(expected),
+    `expected ${expected}, got ${[...new Set(result.failures.map((item) => item.code))].join(',')}`,
+  )
+}
+
+const rejectTier = (assert, label, tierName, mutate, expected) => {
+  const requirement = tier(tierName)
+  const result = gateFor(requirement, buildReportFor(requirement, mutate))
   assert(`${label}_REJECTED`, result.ok === false, `gate accepted ${label}`)
   assert(
     `${label}_CODE`,
@@ -894,6 +938,69 @@ const ROUTING_CASES = [
         },
         'heterogeneous_review_invalid',
       ),
+  },
+  {
+    id: 'E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED',
+    title: 'Native control must come from an executed vendor run',
+    check: ({ assert }) =>
+      rejectTier(assert, 'NATIVE_CONTROL_NOT_EXECUTED', 'actual-native-control', (report) => {
+        findIn(report, 'E5-NATIVE-CONTROL').evidence.nativeControl.executed = false
+        return report
+      }, 'native_control_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-NATIVE-CONTROL-NO-STOP',
+    title: 'Native control without an observed stop is rejected',
+    check: ({ assert }) =>
+      rejectTier(assert, 'NATIVE_CONTROL_NO_STOP', 'actual-native-control', (report) => {
+        findIn(report, 'E5-NATIVE-CONTROL').evidence.nativeControl.stop = { observed: false, evidenceRefs: [] }
+        return report
+      }, 'native_control_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY',
+    title: 'Native control without observed recovery is rejected',
+    check: ({ assert }) =>
+      rejectTier(assert, 'NATIVE_CONTROL_NO_RECOVERY', 'actual-native-control', (report) => {
+        delete findIn(report, 'E5-NATIVE-CONTROL').evidence.nativeControl.recovery
+        return report
+      }, 'native_control_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-PILOT-ZERO-TURNS',
+    title: 'A zero-turn pilot cannot be a value result',
+    check: ({ assert }) =>
+      rejectTier(assert, 'PILOT_ZERO_TURNS', 'review-value', (report) => {
+        findIn(report, 'E6-REVIEW-PILOT').evidence.pilot.turnsUsed = 0
+        return report
+      }, 'pilot_evidence_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-PILOT-UNKNOWN-USAGE',
+    title: 'A pilot with unknown usage is rejected',
+    check: ({ assert }) =>
+      rejectTier(assert, 'PILOT_UNKNOWN_USAGE', 'review-value', (report) => {
+        findIn(report, 'E6-REVIEW-PILOT').evidence.pilot.usageCompleteness = 'unknown'
+        return report
+      }, 'pilot_evidence_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-PILOT-BLOCKED-PASS',
+    title: 'A BLOCKED pilot dressed as a decision is rejected',
+    check: ({ assert }) =>
+      rejectTier(assert, 'PILOT_BLOCKED_PASS', 'review-value', (report) => {
+        findIn(report, 'E6-REVIEW-PILOT').evidence.pilot.decision = 'BLOCKED'
+        return report
+      }, 'pilot_evidence_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-PILOT-NO-ORACLE',
+    title: 'A pilot without the frozen oracle digest is rejected',
+    check: ({ assert }) =>
+      rejectTier(assert, 'PILOT_NO_ORACLE', 'review-value', (report) => {
+        findIn(report, 'E6-REVIEW-PILOT').evidence.pilot.oracleDigest = 'nope'
+        return report
+      }, 'pilot_evidence_invalid'),
   },
   {
     id: 'E1-MUTATE-HETERO-NO-SUBJECT',

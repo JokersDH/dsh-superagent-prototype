@@ -102,21 +102,24 @@ await collect('e2', async () => {
   }
 })
 await collect('e3', async () => {
-  const [browser, assistant, wave05] = await Promise.all([
+  const [browser, assistant, wave05, attention] = await Promise.all([
     import('./cases/e3-browser.mjs'),
     import('./cases/e3-assistant.mjs'),
     import('./cases/e3-wave05.mjs'),
+    import('./cases/e3-attention.mjs'),
   ])
   const first = await browser.runE3({ root, runDirectory: run.directory, keep: values.keep === true })
   const second = await assistant.runAssistant({ root, runDirectory: run.directory, keep: values.keep === true })
   const third = await wave05.runWave05E3({ root, runDirectory: run.directory, keep: values.keep === true })
+  const fourth = await attention.runAttention({ root, runDirectory: run.directory, keep: values.keep === true })
   return {
-    cases: [...first.cases, ...second.cases, ...third.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases],
     artifacts: {
       screenshots: [
         ...(first.artifacts?.screenshots ?? []),
         ...(second.artifacts?.screenshots ?? []),
         ...(third.artifacts?.screenshots ?? []),
+        ...(fourth.artifacts?.screenshots ?? []),
       ],
     },
   }

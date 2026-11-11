@@ -69,6 +69,65 @@ function codexInfo() {
   }
 }
 
+function runtimeInterface() {
+  const path = join(root, 'tools/experiments/review-pilot-01/runtime-interface.json')
+  if (!existsSync(path)) return { ok: false, reason: 'b_runtime_interface_missing', path }
+  try {
+    const value = readJson(path)
+    const valid =
+      typeof value.protocol === 'string' &&
+      typeof value.entry === 'string' &&
+      typeof value.sessionResume === 'string' &&
+      typeof value.usage === 'string'
+    return valid ? { ok: true, value, path } : { ok: false, reason: 'b_runtime_interface_invalid', path }
+  } catch {
+    return { ok: false, reason: 'b_runtime_interface_invalid', path }
+  }
+}
+
+function ledgerState() {
+  if (!existsSync(ledgerPath)) return { ok: true, turns: 0, tokens: 0, unknown: 0 }
+  try {
+    const value = readJson(ledgerPath)
+    const turns = Number(value.actual?.turns ?? 0)
+    const tokens = Number(value.actual?.tokens ?? 0)
+    const unknown = Number(value.actual?.unknownTurns ?? 0)
+    return { ok: turns === 0 && tokens === 0 && unknown === 0, turns, tokens, unknown, status: value.status }
+  } catch {
+    return { ok: false, turns: null, tokens: null, unknown: null }
+  }
+}
+
+/**
+ * Second freeze point required by WP-16/0023: after the real author turn and before any review, the
+ * actual candidate/session material is digested. The initial cases/oracle stay frozen from stage one.
+ */
+export function freezeCandidate(caseId, capsulePath) {
+  const capsule = sealDirectory(capsulePath, mkdtempSync(join(tmpdir(), 'pa-candidate-freeze-')))
+  const record = {
+    schema: 'review-pilot-candidate/1',
+    caseId,
+    digest: capsule.manifest.digest,
+    files: capsule.manifest.files,
+    frozenAt: new Date().toISOString(),
+  }
+  mkdirSync(join(here, 'candidates'), { recursive: true })
+  writeFileSync(join(here, 'candidates', `${caseId}.json`), JSON.stringify(record, null, 2) + '\n')
+  return record
+}
+
+export function verifyCandidateFreeze(caseId, capsulePath) {
+  const path = join(here, 'candidates', `${caseId}.json`)
+  if (!existsSync(path)) return { ok: false, reason: 'candidate_not_frozen' }
+  const record = readJson(path)
+  const capsule = sealDirectory(capsulePath, mkdtempSync(join(tmpdir(), 'pa-candidate-check-')))
+  return {
+    ok: capsule.manifest.digest === record.digest,
+    expected: record.digest,
+    actual: capsule.manifest.digest,
+  }
+}
+
 function pricingSchedule() {
   if (!existsSync(pricingPath)) return { ok: false, reason: 'pricing_unavailable' }
   try {
@@ -128,10 +187,14 @@ function preflight() {
   const frozen = verifyFrozen()
   const codex = codexInfo()
   const pricing = pricingSchedule()
+  const runtime = runtimeInterface()
+  const ledger = ledgerState()
   const reasons = []
   if (!frozen.ok) reasons.push({ code: 'frozen_inputs_invalid', detail: frozen.code ?? frozen.mismatches })
   if (!codex.available) reasons.push({ code: 'codex_unavailable', detail: codex })
   if (!pricing.ok) reasons.push({ code: pricing.reason, detail: 'No operator-provided USD schedule; subscription access is not zero cost.' })
+  if (!runtime.ok) reasons.push({ code: runtime.reason, detail: runtime.path })
+  if (!ledger.ok) reasons.push({ code: 'ledger_reconciliation_required', detail: ledger })
   // Prove the sealing path itself works without any model call.
   let seal
   try {
@@ -159,6 +222,13 @@ function preflight() {
         }
       : { ok: false, mismatches: frozen.mismatches },
     sealSelfTest: seal ? { caseId: 'case-01', digest: seal.manifest.digest } : null,
+    protocolSemantics: {
+      stage1: 'Cases, oracle, scoring, order seed, model and budgets are frozen before any author call.',
+      stage2: 'freezeCandidate() digests the real author capsule before any review; verifyCandidateFreeze() rechecks it.',
+      alignedWith: 'WP-16/0023 two freeze points',
+    },
+    ledger,
+    runtimeInterface: runtime.ok ? { ok: true, path: runtime.path } : { ok: false, reason: runtime.reason, path: runtime.path },
     modelTurnsUsed: 0,
     reservation: { turns: 0, tokens: 0, unknownTurns: 0 },
     caps: PILOT_CAPS,

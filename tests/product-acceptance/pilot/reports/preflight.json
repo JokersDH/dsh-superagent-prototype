@@ -7,6 +7,10 @@
     {
       "code": "pricing_unavailable",
       "detail": "No operator-provided USD schedule; subscription access is not zero cost."
+    },
+    {
+      "code": "b_runtime_interface_missing",
+      "detail": "/Users/hh/Desktop/joker/superagent-agent-e/tools/experiments/review-pilot-01/runtime-interface.json"
     }
   ],
   "codex": {
@@ -27,6 +31,23 @@
     "caseId": "case-01",
     "digest": "22c0baceb70ae674abafbb5f6c72262eb142767bccd9220b78fdc59a8723cafc"
   },
+  "protocolSemantics": {
+    "stage1": "Cases, oracle, scoring, order seed, model and budgets are frozen before any author call.",
+    "stage2": "freezeCandidate() digests the real author capsule before any review; verifyCandidateFreeze() rechecks it.",
+    "alignedWith": "WP-16/0023 two freeze points"
+  },
+  "ledger": {
+    "ok": true,
+    "turns": 0,
+    "tokens": 0,
+    "unknown": 0,
+    "status": "BLOCKED_PREFLIGHT"
+  },
+  "runtimeInterface": {
+    "ok": false,
+    "reason": "b_runtime_interface_missing",
+    "path": "/Users/hh/Desktop/joker/superagent-agent-e/tools/experiments/review-pilot-01/runtime-interface.json"
+  },
   "modelTurnsUsed": 0,
   "reservation": {
     "turns": 0,
@@ -40,6 +61,6 @@
     "maxTotalBillableTokens": 200000,
     "maxTotalCostUSD": 5
   },
-  "checkedAt": "2026-11-10T12:34:45.786Z",
+  "checkedAt": "2026-11-11T02:31:08.183Z",
   "note": "Preflight only. No model turn was started; the pilot was not executed in this round."
 }

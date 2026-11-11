@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-05/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-06/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "a70db20",
-  "checkpoint": "ead7066",
+  "base": "82db295",
+  "checkpoint": null,
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -13,55 +13,55 @@
     "pilotTurnsUsed": 0,
     "pilotTokensUsed": 0,
     "pilotUsd": null,
-    "note": "Pilot preflight is BLOCKED on pricing_unavailable; zero model turns were started. No other model call occurred."
+    "note": "Pilot preflight BLOCKED (pricing_unavailable, b_runtime_interface_missing); 0/24 turns. No other model call."
   },
   "stages": [
     {
       "id": "E1",
-      "title": "Release-tool counterexamples first",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only",
+      "title": "Pilot preconditions and two-stage freeze",
+      "command": "node tests/product-acceptance/pilot/harness.mjs --preflight",
       "notes": [
-        "65 gate tests: the 50 wave-04 cases plus 15 routing/review mutations (advice entering the default path, eligible/excluded overlap, expired advice, missing evidence, review disposition mismatch, author-assignment reuse, missing sealed-copy isolation, malformed digest, heterogeneous same-protocol/unexecuted/missing version/budget/isolation/subject).",
-        "New tiers advisory-routing, controlled-review and actual-heterogeneous-review are strict supersets of the lower safety cases.",
-        "Pilot prepared and precommitted (8 synthetic cases, 4 seeded defects, hashed oracle/scoring); preflight BLOCKED on pricing_unavailable, so zero of 24 turns were used."
+        "Checks ledger, pricing, B runtime interface, protocol digest and both freeze points; BLOCKED with two reasons and 0 turns."
       ]
     },
     {
       "id": "E2",
-      "title": "Independent verification of the current main increment",
-      "command": "node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow",
+      "title": "Eight-case three-arm bounded pilot",
+      "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
       "notes": [
-        "Conversation catalog, verification recovery and assistant boundaries re-verified on the wave-05 main.",
-        "Attention signal (open work, archived visibility, clear after delivery) and acceptance timing (ready/accepted diff, unknown activity not zero, replay adds no event) verified through public HTTP and read-only SQLite.",
-        "Cross-project attention ordering, project settings, route advice and decisions remain NOT_TESTED because their producers/HTTP entries are absent."
+        "Not executed; requires preflight PASS. BLOCKED is not a value result."
       ]
     },
     {
       "id": "E3",
-      "title": "Assistant end-to-end and transaction-breaking negatives",
+      "title": "Attention and decision closed loop",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "C's three independent domain probes now PASS in main; main has no decision/proposal HTTP entry, so the assistant end-to-end stays NOT_TESTED.",
-        "Review schema fixtures and the sealed-copy capsule (no .git/deps, refuses symlinks, no hardlinks) pass; UI visibility activity is recorded in the acceptance event.",
-        "Author→freeze→review→report pipeline remains NOT_TESTED; no public review Work/artefact entry exists."
+        "Cross-project attention, deterministic order, pagination, per-target actions and offline readability verified; deadlines/ranker and decision HTTP remain NOT_TESTED."
       ]
     },
     {
       "id": "E4",
-      "title": "Installation and recovery acceptance",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12",
+      "title": "Same-artifact installation and recovery",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "Recovery read-only startup re-verified with a restored project binding: project visible, dispatch disabled, 422 business writes, queues unchanged, second start read-only.",
-        "Portable installation/first-run/backup/rollback stay NOT_TESTED because D's paths are absent; wave-05 negatives are recorded."
+        "Recovery read-only re-verified; D artifact absent, so installation/backup/rollback remain NOT_TESTED with required inputs."
       ]
     },
     {
       "id": "E5",
-      "title": "Bounded cycles, final matrix and handoff",
+      "title": "Strict gate tiers and bounded stability",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
+      "notes": [
+        "Tiers module/controlled-product/actual-native-control/installed-alpha/review-value; 72 gate tests; bounded cycles."
+      ]
+    },
+    {
+      "id": "E6",
+      "title": "Final decision and handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "Bounded mixed cycles plus tier verdicts: advisory-routing, controlled-review and actual-heterogeneous-review are expected non-zero while their producers are absent.",
-        "Pilot result is BLOCKED (not executed), never reported as a value benefit."
+        "Pilot decision and Alpha matrix recorded; missing prerequisites keep higher tiers non-zero."
       ]
     }
   ]

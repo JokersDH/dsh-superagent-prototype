@@ -35,13 +35,14 @@ export function scratchProject() {
  * injected; every observable assertion still goes through the public HTTP API and the real
  * application/verification composition.
  */
-export async function startFaultProduct({ stateRoot, projectPath, scope, principal, allowedOrigins, localDevelopmentAccess = false }) {
+export async function startFaultProduct({ stateRoot, projectPath, scope, projects, principal, allowedOrigins, localDevelopmentAccess = false }) {
   const owner = principal ?? { userId: 'wave04-recovery-user', authorityRef: 'wave04-recovery-authority' }
+  const configured = projects ?? [{ id: scope.projectId, scope }]
   const store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
   const product = createControlledProduct({
     store,
     principal: owner,
-    projects: [{ id: scope.projectId, scope }],
+    projects: configured.map((item) => ({ id: item.id, scope: item.scope })),
     actionSecret: Buffer.alloc(32, 1),
     stateRoot,
     scratchProject: projectPath,
@@ -84,7 +85,7 @@ export async function startFaultProduct({ stateRoot, projectPath, scope, princip
       const next = createControlledProduct({
         store,
         principal: owner,
-        projects: [{ id: scope.projectId, scope }],
+        projects: configured.map((item) => ({ id: item.id, scope: item.scope })),
         actionSecret: Buffer.alloc(32, 1),
         stateRoot,
         scratchProject: projectPath,

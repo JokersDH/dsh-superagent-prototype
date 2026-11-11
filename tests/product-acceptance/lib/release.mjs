@@ -188,6 +188,47 @@ export function heterogeneousReviewIssues(entry, sourceCommit) {
   return issues
 }
 
+/** Real native control evidence: execution, stop, native question and recovery, bound to one source. */
+export function nativeControlIssues(control, sourceCommit) {
+  if (!control || typeof control !== 'object') return ['missing']
+  const issues = []
+  if (control.executed !== true) issues.push('not_executed')
+  if (!isSubstantive(control.version)) issues.push('version_missing')
+  if (!isSubstantive(control.attemptId) || !isSubstantive(control.commandId)) issues.push('identity_missing')
+  if (!HEX.test(String(control.profileIdentityDigest ?? ''))) issues.push('profile_identity')
+  if (control.sourceCommit !== sourceCommit) issues.push('source_mismatch')
+  for (const name of ['stop', 'question', 'recovery']) {
+    const part = control[name]
+    if (!part || part.observed !== true) issues.push(`${name}_not_observed`)
+    else if (!Array.isArray(part.evidenceRefs) || part.evidenceRefs.length === 0) issues.push(`${name}_without_evidence`)
+  }
+  const budget = control.budget ?? {}
+  if (!isSubstantive(budget.grantId) || !Number.isSafeInteger(budget.usedTokens) ||
+      !Number.isSafeInteger(budget.maxTokens) || budget.usedTokens < 0 || budget.usedTokens > budget.maxTokens)
+    issues.push('budget_unbounded')
+  if (!Array.isArray(control.evidenceRefs) || control.evidenceRefs.length === 0) issues.push('evidence_refs_missing')
+  return issues
+}
+
+/** A real 8-case pilot result; BLOCKED/inconclusive or zero turns are not a value result. */
+export function pilotIssues(pilot, sourceCommit) {
+  if (!pilot || typeof pilot !== 'object') return ['missing']
+  const issues = []
+  if (pilot.protocol !== 'independent-review-pilot/1') issues.push('protocol')
+  if (pilot.grantId !== 'wave05-independent-review-pilot-01') issues.push('grant')
+  if (pilot.executed !== true) issues.push('not_executed')
+  if (!Number.isSafeInteger(pilot.turnsUsed) || pilot.turnsUsed < 1 || pilot.turnsUsed > 24) issues.push('turns')
+  if (!Number.isSafeInteger(pilot.tokensUsed) || pilot.tokensUsed < 1 || pilot.tokensUsed > 200000) issues.push('tokens')
+  if (!(typeof pilot.costUSD === 'number' && pilot.costUSD >= 0 && pilot.costUSD <= 5)) issues.push('cost')
+  if (pilot.usageCompleteness !== 'observed') issues.push('usage_unknown')
+  if (!HEX.test(String(pilot.oracleDigest ?? ''))) issues.push('oracle_digest')
+  if (!['promising', 'no_go_for_current_recipe'].includes(pilot.decision)) issues.push('decision')
+  if (pilot.sourceCommit !== sourceCommit) issues.push('source_mismatch')
+  if (!Array.isArray(pilot.arms) || pilot.arms.length !== 3) issues.push('arms')
+  if (Array.isArray(pilot.refusals) && pilot.refusals.length > 0) issues.push('invalid_result_claimed')
+  return issues
+}
+
 export function reviewTimingIssues(timing) {
   if (!timing || typeof timing !== 'object') return ['missing']
   const issues = []
@@ -392,6 +433,14 @@ export function evaluateRelease({
       if (entry.evidence?.includes('reviewTiming')) {
         for (const issue of reviewTimingIssues(result.evidence?.reviewTiming))
           failures.push(fail('review_timing_invalid', `Review timing ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('nativeControl')) {
+        for (const issue of nativeControlIssues(result.evidence?.nativeControl, report.source?.commit))
+          failures.push(fail('native_control_invalid', `Native control ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('pilot')) {
+        for (const issue of pilotIssues(result.evidence?.pilot, report.source?.commit))
+          failures.push(fail('pilot_evidence_invalid', `Pilot ${issue}`, entry.id))
       }
       if (entry.evidence?.includes('attention')) {
         for (const issue of attentionIssues(result.evidence?.attention))

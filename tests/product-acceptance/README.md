@@ -81,7 +81,7 @@ process that owns it and are never printed, logged or written into a report.
 
 | Tier | Requires |
 | --- | --- |
-| `harness-only` | The 65 gate self-tests only. No product claim. |
+| `harness-only` | The 72 gate self-tests only. No product claim. |
 | `e2-controlled-workflow` | The controlled product vertical, negative cases and loopback SDK chat. |
 | `e3-browser-ui` | The independent browser suite. |
 | `e4-bounded-stability` | Bounded cycles and portability checklist rules. Installation stays NOT_TESTED. |
@@ -89,6 +89,10 @@ process that owns it and are never printed, logged or written into a report.
 | `advisory-routing` | Workflow plus advisory attention/route-advice records (experiment only, never the default path). |
 | `controlled-review` | Advisory routing plus a controlled independent review with sealed-copy isolation. |
 | `actual-heterogeneous-review` | Every lower tier plus a real review executed by a different protocol with version, identity, budget, isolation and subject proof. |
+| `module` | Gate self-tests plus frozen contract/capsule fixtures; no product workflow. |
+| `actual-native-control` | Controlled workflow plus real native stop/question/recovery control proof. |
+| `installed-alpha` | Controlled workflow plus a staged installation outside the checkout. |
+| `review-value` | Actual heterogeneous review plus a complete real pilot result; a BLOCKED pilot fails. |
 | `local-alpha` | Workflow plus a staged installation outside the checkout; native excluded. |
 | `full-product` | Every lower tier plus staged installation and real native execution. It fails today by design. |
 
@@ -97,7 +101,7 @@ process that owns it and are never printed, logged or written into a report.
 
 ## What each suite asserts
 
-- `selftest/` — 65 bundles prove the gate rejects missing cases, unknown status/layer, uncertain
+- `selftest/` — 72 bundles prove the gate rejects missing cases, unknown status/layer, uncertain
   acceptance, stale reports, dirty/missing/cross-commit source, unbound cases, empty evidence,
   missing candidates, corrupt/unapplied patches, byte-mismatched downloads, unexecuted or incomplete
   native proof, installation that is not staged, invalid responses, fixture drift and illegal
@@ -147,9 +151,15 @@ oracle tests (4 fail on the defective cases, 4 pass on the clean ones); `pilot/o
 labels and keywords. `score.mjs` is hashed into the manifest, so editing the scoring rules after
 freezing is refused.
 
-Preflight is **BLOCKED (`pricing_unavailable`)**: Codex 0.164.0 is available and authenticated with
-an API key, but no operator-provided USD schedule exists for the configured model, and the protocol
-forbids treating subscription/key access as zero cost. Consequently **zero model turns were
-started**; `pilot/ledger.json` records 0 turns, 0 reservations and an unknown cost. To unblock, the
-operator supplies `pilot/pricing.json` (`model`, `inputPerMillion`, `outputPerMillion`,
-`currency: "USD"`, `source`, `observedAt`), then `--preflight` must PASS before `--execute`.
+Preflight is **BLOCKED (`pricing_unavailable`, `b_runtime_interface_missing`)**: Codex 0.164.0 is
+available and authenticated with an API key, but no operator-provided USD schedule exists for the
+configured model, and B has not published the bounded run interface
+(`tools/experiments/review-pilot-01/runtime-interface.json`). The protocol forbids treating
+subscription/key access as zero cost or fabricating a session runner. Consequently **zero model
+turns were started**; `pilot/ledger.json` records 0 turns, 0 reservations and an unknown cost.
+
+The two freeze points from WP-16/0023 are implemented: stage one hashes protocol/cases/oracle/scoring
+before any author call, and `freezeCandidate()` digests the real author capsule before any review.
+To unblock, the operator supplies `pilot/pricing.json` (`model`, `inputPerMillion`,
+`outputPerMillion`, `currency: "USD"`, `source`, `observedAt`) and B publishes the runtime
+interface; then `--preflight` must PASS before `--execute`.
