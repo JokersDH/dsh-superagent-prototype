@@ -178,6 +178,11 @@ export function preserveIdentity({ record, explicitMode, explicitAccess, journal
   return { mode, access }
 }
 
+/** A journal may record the app root or the install dir; both resolve to the install with bin/pa. */
+export function installDirOf(path) {
+  return existsSync(join(path, 'install.json')) ? path : dirname(path)
+}
+
 const readPreviousRelease = (configRoot) => {
   const path = join(configRoot, PREVIOUS_RELEASE)
   if (!existsSync(path)) return null
@@ -300,6 +305,11 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
     ports: instance === null ? null : { consoleURL: instance.consoleURL, apiURL: instance.apiURL },
     previousReleasePath: existsSync(previousPath) ? previousPath : null,
   })
+  if (fault === 'crash_after_stop') {
+    // Test fault: the instance is stopped and the previous pointer is saved, but nothing was
+    // switched. Recovery must restart the previous release with the same mode/access/ports.
+    throw new UpgradeError('upgrade_interrupted', 'Injected crash after stop but before the pointer switch (test fault); run `pa upgrade --recover`')
+  }
   const adopted = initializeRelease({ installRoot: target.appRoot, configRoot: roots.config, adoptExisting: true })
   writePrivateJson(journalPath, {
     protocol: 'personal-install-switch/1',
@@ -318,7 +328,7 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
   if (fault === 'crash_after_switch') throw new UpgradeError('upgrade_interrupted', 'Injected crash after pointer switch (test fault); run `pa upgrade --recover`')
 
   // 4. Start the target binary on the same data roots and require its own identity.
-  const started = await startTarget({ roots, target, seed: instance, fault })
+  const started = await startTarget({ roots, target, seed: instance, identity, fault })
   writePrivateJson(journalPath, {
     protocol: 'personal-install-switch/1',
     status: 'confirmed',
@@ -458,7 +468,11 @@ async function startTarget({ roots, target, seed, identity, fault }) {
 
   const fail = async (reason, detail = {}) => {
     // Prove the process tree this operation started is gone BEFORE touching the pointer or record.
-    const cleanup = await stopOwnedTarget({ roots, target, spawnedPid: child.pid, record: readInstanceRecord(roots.config) })
+    const cleanup = fault === 'target_stop_unproven'
+      // Test fault: pretend the stop could not be proven. The state machine must keep the indeterminate
+      // state instead of reverting the pointer or restarting the old writer.
+      ? { proven: false, stopped: [], remaining: [child.pid], considered: 1 }
+      : await stopOwnedTarget({ roots, target, spawnedPid: child.pid, record: readInstanceRecord(roots.config) })
     if (!cleanup.proven) {
       writeJournalStatus({ roots, status: 'target_stop_unproven', reason, cleanup })
       throw new UpgradeError('target_stop_unproven', 'The failed target process tree could not be proven stopped; pointer and record are left as-is (no old writer is restarted)', {
@@ -477,10 +491,11 @@ async function startTarget({ roots, target, seed, identity, fault }) {
       })
   }
 
-  if (fault === 'target_unhealthy') {
-    // Test fault: the instance may have started; failure cleanup must still stop it.
+  if (fault === 'target_unhealthy' || fault === 'target_stop_unproven') {
+    // Test fault: the instance may have started; failure cleanup must still stop it (or, for the
+    // stop-unproven variant, prove that the state machine keeps the indeterminate state).
     await new Promise((r) => setTimeout(r, 1200))
-    await fail('injected_unhealthy_target', { health: null })
+    await fail(fault === 'target_stop_unproven' ? 'injected_stop_unproven' : 'injected_unhealthy_target', { health: null })
   }
   const deadline = Date.now() + 60_000
   let health = null
@@ -501,6 +516,10 @@ async function startTarget({ roots, target, seed, identity, fault }) {
   while (Date.now() < recordDeadline && (record === null || record.buildId !== target.release.buildId)) {
     await new Promise((resolveWait) => setTimeout(resolveWait, 150))
     record = readInstanceRecord(roots.config)
+  }
+  if (fault === 'target_record_missing') {
+    // Test fault: the instance answered health but never persisted its record.
+    await fail('instance_record_missing', { health: health?.status ?? null })
   }
   const instanceVerified = record === null ? false : (await verifyInstance(record)).ok
   const modeMatches = record !== null && record.mode === identity.mode && record.access === identity.access && health?.mode === identity.mode
@@ -546,7 +565,7 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
   if (journal === null) throw new UpgradeError('upgrade_recover_not_needed', 'No interrupted install switch was recorded')
   if (journal.status === 'confirmed' || journal.status === 'reverted_after_failed_start')
     return { protocol: 'personal-install-switch/1', status: 'NO_OP', journalStatus: journal.status }
-  if (journal.status !== 'switched_unconfirmed' && journal.status !== 'switching')
+  if (!['switched_unconfirmed', 'switching', 'stopping', 'target_stop_unproven'].includes(journal.status))
     throw new UpgradeError('upgrade_recover_unknown_state', 'The switch journal is not in a recoverable state', { journalStatus: journal.status })
   // Never start (or revert over) an unknown live process: the same rule as upgrade/rollback.
   const existing = readInstanceRecord(roots.config)
@@ -556,11 +575,42 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
     })
   const identity = preserveIdentity({ record: existing, explicitMode: values.mode, explicitAccess: values.access, journal })
   const target = inspectTargetInstall(journal.to.installDir)
+
+  // A failed target whose stop could not be proven must first be stopped; only then may the pointer
+  // be reverted. If it still cannot be proven stopped, keep the indeterminate state (no old writer).
+  if (journal.status === 'target_stop_unproven') {
+    const cleanup = await stopOwnedTarget({ roots, target, record: existing })
+    if (!cleanup.proven) {
+      writeJournalStatus({ roots, status: 'target_stop_unproven', reason: 'recover_stop_still_unproven', cleanup })
+      throw new UpgradeError('target_stop_unproven', 'The failed target still cannot be proven stopped; refusing to revert or start another writer', {
+        remaining: cleanup.remaining,
+      })
+    }
+    await revertPointer({ roots, target })
+    writeJournalStatus({ roots, status: 'reverted_after_failed_start', reason: 'recover_after_stop_proven', cleanup })
+    return { protocol: 'personal-install-switch/1', status: 'REVERTED', reason: 'recover_after_stop_proven', cleanup }
+  }
+
+  // The instance was stopped but nothing was switched: restart the previous install, never the target.
+  if (journal.status === 'stopping') {
+    const previous = inspectTargetInstall(installDirOf(journal.from.installRoot))
+    const started = await startTarget({ roots, target: previous, seed: journal.ports ?? null, identity })
+    writeJournalStatus({ roots, status: 'reverted_after_interrupted_switch', reason: 'crash_after_stop_restarted_previous' })
+    return { protocol: 'personal-install-switch/1', status: 'RECOVERED_PREVIOUS', started }
+  }
   const binding = releaseBinding({ installRoot, configRoot: roots.config })
   if (!binding.bound || binding.installBuildId !== target.release.buildId) {
-    // The pointer write was interrupted or does not match the target: revert.
+    // The pointer was never bound to the target (crash before/during adoption): keep the previous
+    // pointer and restart the previous release so the user gets a running product back, not a
+    // silently stopped install.
     await revertPointer({ roots, target })
     writeJournalStatus({ roots, status: 'reverted_after_interrupted_switch', reason: 'pointer_not_bound_to_target' })
+    const previousInstall = inspectTargetInstall(installDirOf(journal.from.installRoot))
+    const running = readInstanceRecord(roots.config)
+    if (running === null || !(await verifyInstance(running)).ok) {
+      const started = await startTarget({ roots, target: previousInstall, seed: journal.ports ?? null, identity })
+      return { protocol: 'personal-install-switch/1', status: 'RECOVERED_PREVIOUS', reason: 'pointer_not_bound_to_target', started }
+    }
     return { protocol: 'personal-install-switch/1', status: 'REVERTED', reason: 'pointer_not_bound_to_target' }
   }
   const started = await startTarget({ roots, target, seed: journal.ports ?? null, identity })

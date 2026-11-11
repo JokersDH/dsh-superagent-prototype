@@ -8,7 +8,7 @@ import { chmodSync, mkdirSync, mkdtempSync, rmSync, symlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { ACTIVATION_CONSUMPTION_REQUIREMENTS, evaluateActivation } from '../lib/recovery-activation.mjs'
+import { ACTIVATION_CONSUMPTION_REQUIREMENTS, evaluateActivation, evaluateActivationAudit } from '../lib/recovery-activation.mjs'
 
 const DIGEST = 'a'.repeat(64)
 
@@ -159,4 +159,23 @@ test('a backup/restore cannot inherit executable activation: the consumption req
   assert.ok(ACTIVATION_CONSUMPTION_REQUIREMENTS.notPublished.some((entry) => /commit route/i.test(entry)))
   assert.ok(ACTIVATION_CONSUMPTION_REQUIREMENTS.forbidden.some((entry) => /inspect\/prepare success as authorization/.test(entry)))
   assert.ok(ACTIVATION_CONSUMPTION_REQUIREMENTS.forbidden.some((entry) => /second auth\/key store/.test(entry)))
+})
+
+test('main audit is consumed as a refusal, and a locally claimed startup permit is rejected', () => {
+  const audit = { activationId: 'activation-1', status: 'prepared', authorization: 'not_granted', startupAvailable: false }
+  const consistent = evaluateActivationAudit({ audit, activationId: 'activation-1' })
+  assert.equal(consistent.status, 'CONSISTENT_NOT_GRANTED')
+  assert.equal(consistent.authorization, 'not_granted')
+  assert.equal(consistent.started, false)
+
+  const forged = evaluateActivationAudit({ audit: { ...audit, startupAvailable: true } })
+  assert.equal(forged.status, 'BLOCKED')
+  assert.equal(forged.code, 'audit_authority_unsupported')
+
+  const granted = evaluateActivationAudit({ audit: { ...audit, authorization: 'granted' } })
+  assert.equal(granted.status, 'BLOCKED')
+  assert.equal(granted.code, 'audit_not_granted')
+
+  const mismatched = evaluateActivationAudit({ audit, activationId: 'other' })
+  assert.equal(mismatched.code, 'audit_matches_intent')
 })

@@ -177,6 +177,37 @@ export function evaluateActivation({ intent, facts, now = new Date() }) {
   }
 }
 
+/**
+ * Consume main's published read-only activation audit (WP-16/0030 GET /v1/recovery/activations/:id).
+ * The audit always reports not_granted/startupAvailable=false today; a positive startup claim is not a
+ * supported authority and is refused rather than trusted locally.
+ */
+export function evaluateActivationAudit({ audit, activationId = null } = {}) {
+  const checks = []
+  const blocked = (code) => ({ protocol: 'personal-recovery-activation-audit/1', status: 'BLOCKED', code,
+    authorization: 'not_granted', commitAvailable: false, started: false, checks })
+  if (!isRecord(audit)) return blocked('audit_missing')
+  checks.push(check('audit_activation_id', typeof audit.activationId === 'string' && audit.activationId.length > 0, audit.activationId ?? null))
+  if (activationId !== null) checks.push(check('audit_matches_intent', audit.activationId === activationId, { expected: activationId, observed: audit.activationId ?? null }))
+  checks.push(check('audit_status_known', typeof audit.status === 'string' && audit.status.length > 0, audit.status ?? null))
+  checks.push(check('audit_not_granted', audit.authorization === 'not_granted', audit.authorization ?? null))
+  checks.push(check('audit_startup_unavailable', audit.startupAvailable === false, audit.startupAvailable ?? null))
+  const failures = checks.filter((entry) => !entry.ok).map((entry) => entry.id)
+  if (failures.includes('audit_authority_unsupported') || (audit.startupAvailable !== false && audit.startupAvailable !== undefined))
+    return blocked('audit_authority_unsupported')
+  return {
+    protocol: 'personal-recovery-activation-audit/1',
+    status: failures.length === 0 ? 'CONSISTENT_NOT_GRANTED' : 'BLOCKED',
+    code: failures[0] ?? null,
+    failures,
+    checks,
+    authorization: 'not_granted',
+    commitAvailable: false,
+    started: false,
+    note: 'main audit is observational: not_granted/startupAvailable=false is consumed as a refusal, never as a start permit.',
+  }
+}
+
 /** Gather the facts this launcher can observe without starting business or writing state. */
 export function localActivationFacts({ intent, inspected, targetCounts, targetConfigDigest, previousActivations = [], committedSourceIntent = false, mainCommitStatus = 'main_commit_route_unpublished' }) {
   // A target prepared by main must not carry copied credentials; the caller reports its own scan.

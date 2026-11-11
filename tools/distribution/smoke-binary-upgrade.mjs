@@ -17,10 +17,10 @@
  */
 import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { chmodSync, closeSync, cpSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, closeSync, cpSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
-import { join, resolve } from 'node:path'
+import { join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { ProductStore } from '../../packages/storage/dist/index.js'
@@ -70,6 +70,23 @@ const copyInstall = (source, name) => {
   return destination
 }
 const sha256File = (path) => createHash('sha256').update(readFileSync(path)).digest('hex')
+// A pristine baseline install is extracted once from its frozen tar for the failure-window sections:
+// the shared baseline directory accumulates section A-C pointer history, and the frozen baseline
+// predates config-root adoption, so each window needs untouched shipped bytes + its own first-run.
+const extractPristine = (tarPath, name) => {
+  const destination = join(root, name)
+  mkdirSync(destination, { recursive: true, mode: 0o700 })
+  const listing = spawnSync('tar', ['-tzf', tarPath], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+  if (listing.status !== 0) throw new Error(`tar list failed: ${listing.stderr}`)
+  for (const entry of listing.stdout.split('\n').filter(Boolean))
+    if (entry.startsWith('/') || entry.split('/').includes('..')) throw new Error(`unsafe tar entry ${entry}`)
+  const result = spawnSync('tar', ['-xzf', tarPath, '-C', destination], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+  if (result.status !== 0) throw new Error(`tar extract failed: ${result.stderr}`)
+  const entries = readdirSync(destination)
+  const install = join(destination, entries.length === 1 ? entries[0] : '')
+  if (!existsSync(join(install, 'install.json'))) throw new Error('pristine baseline tar has no install manifest')
+  return install
+}
 const rootsFor = (install, name) => ({
   install: join(install, 'app'),
   config: join(install, 'var/config'),
@@ -171,6 +188,13 @@ try {
     throw new Error('baseline and target share a source commit; the switch must cross two real sources')
   // A private config root bound to the target install, used for target-only diagnostics such as the
   // future-schema refusal (the switch itself keeps sharing the baseline config root).
+  const baselineTar = values['baseline-tar'] ?? (() => {
+    const dir = dirname(values.baseline)
+    const found = readdirSync(dir).filter((name) => name.endsWith('.tar.gz'))
+    if (found.length !== 1) throw new Error(`pass --baseline-tar explicitly; found ${found.length} tar(s) in ${dir}`)
+    return join(dir, found[0])
+  })()
+  const pristineBaseline = extractPristine(baselineTar, 'pristine-baseline')
   const targetConfigRoot = join(root, 'target-config')
   run(cli(target), ['first-run', '--json', '--config-root', targetConfigRoot,
     '--data-root', join(root, 'target-probe-data'), '--cache-root', join(root, 'target-probe-cache'),
@@ -386,6 +410,77 @@ try {
   const duplicate = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'duplicate.pab'), ...rootArgs(r)], { allowExit: [2] })
   if (duplicate.json?.code !== 'upgrade_already_applied') throw new Error(`duplicate upgrade was not rejected: ${JSON.stringify(duplicate.json).slice(0, 300)}`)
   section('E6-duplicate-refused', 'PASS', { code: duplicate.json.code })
+
+  // ---- E7. a failed target whose stop cannot be proven keeps the indeterminate state ----
+  {
+    const install7 = copyInstall(pristineBaseline, 'e7-install')
+    const r7 = rootsFor(install7, 'e7')
+    // The pristine baseline ships its own release.json; its own first-run only creates the private
+    // launcher config, so the window starts from the shipped inventory without hand-written bytes.
+    run(cli(install7), ['first-run', '--json', ...rootArgs(r7)], { allowExit: [0] })
+    await startInstance(install7, r7, 'e7')
+    const unproven = run(cli(target), ['upgrade', '--json', '--to', install7, '--backup', join(root, 'e7.pab'), ...rootArgs(r7)],
+      { allowExit: [2, 1], env: { ...process.env, PA_UPGRADE_FAULT: 'target_stop_unproven' } })
+    const journal7 = JSON.parse(readFileSync(join(r7.config, 'install-switch.json'), 'utf8'))
+    if (journal7.status !== 'target_stop_unproven') throw new Error(`unproven stop was not recorded: ${journal7.status}`)
+    if (journal7.dataRolledBack === true) throw new Error('an unproven stop changed the data flag')
+    const status7 = run(cli(target), ['upgrade-status', '--json', ...rootArgs(r7)], { allowExit: [0, 1] })
+    if (status7.json?.status !== 'target_stop_unproven')
+      throw new Error(`upgrade-status did not expose the indeterminate switch: ${JSON.stringify(status7.json).slice(0, 200)}`)
+    const recover7 = run(cli(target), ['upgrade', '--recover', '--json', ...rootArgs(r7)], { allowExit: [0, 1, 2] })
+    if (!['REVERTED', 'RECOVERED'].includes(recover7.json?.status))
+      throw new Error(`recovery did not settle the unproven stop: ${JSON.stringify(recover7.json).slice(0, 300)}`)
+    if (recover7.json?.dataRolledBack === true) throw new Error('settling the unproven stop rolled data back')
+    section('E7-stop-unproven-kept', 'PASS', {
+      refused: unproven.json?.code ?? null, journal: journal7.status,
+      statusVisible: status7.json.status, settled: recover7.json.status,
+    })
+    run(cli(install7), ['stop', '--json', ...rootArgs(r7)], { allowExit: [0, 2] })
+  }
+
+  // ---- E8. crash after stop, before the pointer swap: recovery restarts the previous release ----
+  {
+    const install8 = copyInstall(pristineBaseline, 'e8-install')
+    const r8 = rootsFor(install8, 'e8')
+    // The pristine baseline ships its own release.json; its own first-run only creates the private
+    // launcher config, so the window starts from the shipped inventory without hand-written bytes.
+    run(cli(install8), ['first-run', '--json', ...rootArgs(r8)], { allowExit: [0] })
+    await startInstance(install8, r8, 'e8')
+    run(cli(target), ['upgrade', '--json', '--to', install8, '--backup', join(root, 'e8.pab'), ...rootArgs(r8)],
+      { allowExit: [2, 1], env: { ...process.env, PA_UPGRADE_FAULT: 'crash_after_stop' } })
+    const journal8 = JSON.parse(readFileSync(join(r8.config, 'install-switch.json'), 'utf8'))
+    if (!['stopping', 'switching'].includes(journal8.status)) throw new Error(`crash-after-stop was not recorded: ${journal8.status}`)
+    if (JSON.parse(readFileSync(join(r8.config, 'release.json'), 'utf8')).buildId !== JSON.parse(readFileSync(join(install8, 'install.json'), 'utf8')).buildId)
+      throw new Error('the pointer moved to the target even though the crash happened before adoption')
+    const recover8 = run(cli(target), ['upgrade', '--recover', '--json', ...rootArgs(r8)], { allowExit: [0, 1, 2] })
+    if (recover8.json?.status !== 'RECOVERED_PREVIOUS')
+      throw new Error(`recovery did not restart the previous release: ${JSON.stringify(recover8.json).slice(0, 300)}`)
+    const record8 = instanceOf(r8)
+    if (record8?.buildId !== JSON.parse(readFileSync(join(install8, 'install.json'), 'utf8')).buildId)
+      throw new Error('recovery after stop advanced to the target instead of restarting the previous release')
+    section('E8-crash-after-stop-restarts-previous', 'PASS', {
+      journal: journal8.status, recovered: recover8.json.status, buildId: record8.buildId, mode: record8.mode, access: record8.access,
+    })
+    run(cli(install8), ['stop', '--json', ...rootArgs(r8)], { allowExit: [0, 2] })
+  }
+
+  // ---- E9. health answered but the instance record was never persisted ----
+  {
+    const install9 = copyInstall(pristineBaseline, 'e9-install')
+    const r9 = rootsFor(install9, 'e9')
+    // The pristine baseline ships its own release.json; its own first-run only creates the private
+    // launcher config, so the window starts from the shipped inventory without hand-written bytes.
+    run(cli(install9), ['first-run', '--json', ...rootArgs(r9)], { allowExit: [0] })
+    await startInstance(install9, r9, 'e9')
+    const fail9 = run(cli(target), ['upgrade', '--json', '--to', install9, '--backup', join(root, 'e9.pab'), ...rootArgs(r9)],
+      { allowExit: [2, 1], env: { ...process.env, PA_UPGRADE_FAULT: 'target_record_missing' } })
+    const journal9 = JSON.parse(readFileSync(join(r9.config, 'install-switch.json'), 'utf8'))
+    if (journal9.status !== 'reverted_after_failed_start' || journal9.reason !== 'instance_record_missing')
+      throw new Error(`record-missing window did not revert cleanly: ${journal9.status}/${journal9.reason}`)
+    if (instanceOf(r9) !== null) throw new Error('record-missing window left an instance record')
+    section('E9-record-missing-reverted', 'PASS', { journal: journal9.status, reason: journal9.reason, record: null, code: fail9.json?.code ?? null })
+    run(cli(install9), ['stop', '--json', ...rootArgs(r9)], { allowExit: [0, 2] })
+  }
 
   run(cli(target), ['stop', '--json', ...rootArgs(r)], { allowExit: [0, 2] })
   evidence.status = Object.values(evidence.sections).every((entry) => entry.status === 'PASS') ? 'PASS' : 'PARTIAL'

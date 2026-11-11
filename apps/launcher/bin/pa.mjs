@@ -23,7 +23,7 @@ import { importBundle, restoreState, rollbackState } from '../lib/restore.mjs'
 import { startInstance } from '../lib/start.mjs'
 import { stopInstance } from '../lib/stop.mjs'
 import { UpgradeError, inspectTargetInstall, readJournal, recoverSwitch, rollbackInstall, upgradeInstall } from '../lib/upgrade.mjs'
-import { ACTIVATION_CONSUMPTION_REQUIREMENTS, LOCAL_RESOURCE_POLICY_DIGEST, currentMachineDigest, evaluateActivation } from '../lib/recovery-activation.mjs'
+import { ACTIVATION_CONSUMPTION_REQUIREMENTS, LOCAL_RESOURCE_POLICY_DIGEST, currentMachineDigest, evaluateActivation, evaluateActivationAudit } from '../lib/recovery-activation.mjs'
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url))
 const BUILD_SCRIPT = join(repoRoot, 'tools/distribution/build.mjs')
@@ -124,7 +124,7 @@ function commandSpecs() {
     upgrade: { ...COMMON, to: 'string', backup: 'string', 'no-backup': 'boolean', 'no-stop': 'boolean', recover: 'boolean', force: 'boolean', mode: 'string', access: 'string' },
     'upgrade-status': { ...COMMON },
     'rollback-install': { ...COMMON, 'no-stop': 'boolean' },
-    'recovery-activation-check': { ...COMMON, intent: 'string', 'target-root': 'string' },
+    'recovery-activation-check': { ...COMMON, intent: 'string', 'target-root': 'string', audit: 'string' },
     smoke: { ...COMMON },
   }
 }
@@ -327,7 +327,18 @@ async function main(argv) {
       committedSourceIntent: false,
       mainCommitStatus: 'main_commit_route_unpublished',
     }
-    const result = { ...evaluateActivation({ intent, facts }), consumptionRequirements: ACTIVATION_CONSUMPTION_REQUIREMENTS }
+    let auditResult = null
+    if (values.audit !== undefined) {
+      try { auditResult = evaluateActivationAudit({ audit: JSON.parse(readFileSync(resolve(values.audit), 'utf8')), activationId: intent?.activationId ?? null })
+      } catch { auditResult = evaluateActivationAudit({ audit: null }) }
+    }
+    const local = evaluateActivation({ intent, facts })
+    const result = {
+      ...local,
+      ...(auditResult === null ? {} : { audit: auditResult }),
+      ...(auditResult === null || auditResult.status === 'CONSISTENT_NOT_GRANTED' ? {} : { status: 'BLOCKED', code: auditResult.code }),
+      consumptionRequirements: ACTIVATION_CONSUMPTION_REQUIREMENTS,
+    }
     printResult({
       json: json ? result : null,
       human: [

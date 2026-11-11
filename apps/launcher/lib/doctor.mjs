@@ -160,6 +160,22 @@ export async function runDoctor({ installRoot, roots, deep = false, executorsFix
   // Is this config root bound to this exact install? A root that was never initialized, or one that
   // still points at another build, explains a `release_missing`/stale-start symptom before start.
   const binding = releaseBinding({ installRoot, configRoot: roots.config })
+  // A pending install-switch journal means the pointer/instance state is not settled; the user needs
+  // one explicit next action, not a hand-edited release.json or a deleted marker.
+  const switchJournal = (() => {
+    try { return JSON.parse(readFileSync(join(roots.config, 'install-switch.json'), 'utf8')) } catch { return null }
+  })()
+  if (switchJournal === null) checks.push(pass('upgrade_journal', { status: 'none' }))
+  else if (switchJournal.status === 'confirmed' || String(switchJournal.status).startsWith('reverted'))
+    checks.push(pass('upgrade_journal', { status: switchJournal.status }))
+  else
+    checks.push(warn('upgrade_journal', {
+      status: switchJournal.status,
+      hint: switchJournal.status === 'target_stop_unproven'
+        ? 'A failed target could not be proven stopped. Run `pa upgrade --recover` (it retries the proven stop and only then reverts); do not start another writer.'
+        : 'Run `pa upgrade --recover`; it settles the interrupted switch in the recorded mode/access without rolling data back.',
+    }))
+
   if (binding.bound) checks.push(pass('release_binding', { buildId: binding.installBuildId, digest: binding.configDigest }))
   else if (binding.code === 'release_missing' || binding.code === 'source_build_no_install_manifest')
     checks.push(warn('release_binding', {
