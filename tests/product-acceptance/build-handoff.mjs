@@ -496,10 +496,11 @@ node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow
 node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui
 node tests/product-acceptance/pilot/harness.mjs --selftest
 node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability
+node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha
 node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 \`\`\`
 
-最后一条命令以 \`controlled-product-internal-trial\` 聚合；任何 FAIL、缺失或未执行都会非零退出。
+最后一条命令以 \`controlled-product-workflow\` 聚合；同一份报告还要分别用 \`--tier=installed-alpha\` 与 \`--tier=review-value\` 判读，任何缺失的必需项都会让该 tier 保持非零。
 `
 
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
