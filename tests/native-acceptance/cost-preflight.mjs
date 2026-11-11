@@ -95,6 +95,15 @@ export function preflight(input) {
     if (!item.bounded) blockers.push(`${item.component} is not bounded: ${item.why}`)
   }
 
+  // Whether the protocol can carry a per-turn ceiling at all. On this runtime it cannot (measured),
+  // so the caller passes false; the generic evaluator stays able to return READY for a runtime that
+  // can, otherwise this guard could never be shown to open.
+  if (input.turnBoundExpressedViaProtocol === false) {
+    blockers.push(
+      'turn/start exposes no token bound field, so a per-turn ceiling cannot be attached to the turn at all',
+    )
+  }
+
   // A single maxOutputTokens field alone is explicitly not sufficient; say so rather than let it
   // look like coverage.
   if (typeof input.fields.maxOutputTokens === 'number') {
@@ -111,6 +120,34 @@ export function preflight(input) {
  * Kept as a value (not a doc) so a consumer can print it and so a test can assert it stays honest
  * as the runtime evolves.
  */
+/**
+ * Measured protocol facts behind the BLOCKED verdict, so a consumer can re-check them rather than
+ * trust this comment.
+ *
+ *   pricing       - `codex app-server generate-ts` yields 751 bindings; searching all of them for
+ *                   price/Price returns nothing. There is no price or cost surface to read.
+ *   turn bound    - TurnStartParams carries threadId, clientUserMessageId, turnTrigger,
+ *                   parentTurnId, rootTurnId, cwd, model, serviceTier, serviceTierForTurn. It has
+ *                   NO maxOutputTokens / maxTokens / tokenLimit field, so a per-turn ceiling
+ *                   cannot be expressed through turn/start at all.
+ *   usage timing  - usage arrives in thread/tokenUsage/updated AFTER the turn runs, with total and
+ *                   last breakdowns (input, cachedInput, cacheWriteInput, output,
+ *                   reasoningOutput). It measures spend; it cannot cap it.
+ *   model identity- a real run reports model `gpt-6.1-sol`, provider `OpenAI`. No public,
+ *                   checkable price exists for that identifier, so naming it does not produce a
+ *                   price basis.
+ */
+export const MEASURED_PROTOCOL_FACTS = Object.freeze({
+  pricingSurface: 'absent',
+  turnStartBoundFields: [],
+  turnStartFields: [
+    'threadId', 'clientUserMessageId', 'turnTrigger', 'parentTurnId', 'rootTurnId',
+    'cwd', 'model', 'serviceTier', 'serviceTierForTurn',
+  ],
+  usageTiming: 'post-turn notification only',
+  observedModelIdentity: { model: 'gpt-6.1-sol', provider: 'OpenAI', priceSource: null },
+})
+
 export function currentRuntimePreflight() {
   return preflight({
     priceSource: null, // no price surface exists in the protocol, and no external table was supplied
@@ -119,6 +156,7 @@ export function currentRuntimePreflight() {
     priceObservedAt: null,
     canStopWithinQuota: false,
     usageAvailableBeforeCompletion: false,
+    turnBoundExpressedViaProtocol: false,
     fields: {},
   })
 }

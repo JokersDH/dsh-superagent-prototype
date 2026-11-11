@@ -78,6 +78,19 @@ export function auditGrant(ledgerPath, grantId, limit, declared) {
   } else if (tasks.some(task => typeof task.state !== 'string' || task.state === 'unspecified')) {
     verdict = 'UNVERIFIED'
     reasons.push('at least one task row has no consumption state; reserved/used/unknown cannot be separated')
+  } else if (
+    // A reconstructed ledger exists precisely because the original record was lost. Its empty
+    // task list is the absence of records, NOT the proof that nothing was spent. Treating it as
+    // verified capacity would mean losing the history silently un-blocks spending - the exact
+    // false pass this audit exists to prevent.
+    grant.remainder === 'UNKNOWN' ||
+    grant.attributionState === 'UNVERIFIED' ||
+    (grant.reconstruction && grant.attributionState !== 'RECORDED')
+  ) {
+    verdict = 'UNVERIFIED'
+    reasons.push(
+      'the ledger was reconstructed from product records and its remainder is UNKNOWN: historical sends were never recorded, so this row proves nothing about past spend',
+    )
   }
 
   if (verdict === 'VERIFIED') {

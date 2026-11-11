@@ -1,0 +1,37 @@
+{
+  "note": "one grant per explicitly dispatched package; never reset by date, retry or phase change",
+  "reconstructedAt": "2026-11-11T03:32:09.003Z",
+  "reconstructionBy": "tests/native-acceptance/ledger-reconstruct.mjs",
+  "grants": [
+    {
+      "grantId": "wave03-b-native",
+      "limit": 4,
+      "scope": "B control/closure native attempts",
+      "dispatched": "2026-11-10",
+      "tasks": [],
+      "remainder": "UNKNOWN",
+      "attributionState": "UNVERIFIED",
+      "reconstruction": {
+        "method": "product-side reservation/attempt records only",
+        "ledgerExistedBefore": false,
+        "productAttemptRecordsFound": 0,
+        "productAttemptRecords": [],
+        "rejectedSources": [
+          "developer ~/.codex/sessions store: user-owned, mixed with unrelated desktop work, and ephemeral threads leave no trace there, so absence proves nothing",
+          "status documents asserting a count: an assertion is not a record"
+        ],
+        "limitaion": "Historical sends cannot be verified retrospectively. The remainder is therefore UNKNOWN and the grant stays unspendable until real reservations accumulate here."
+      }
+    },
+    {
+      "grantId": "wave05-independent-review-pilot-01",
+      "limit": 24,
+      "scope": "E-owned pilot: bounded native turn starts",
+      "dispatched": "2026-11-10",
+      "owner": "E",
+      "tasks": [],
+      "remainder": "UNKNOWN - owned by E; B never attributes or consumes this grant",
+      "attributionState": "NOT_B_GRANT"
+    }
+  ]
+}

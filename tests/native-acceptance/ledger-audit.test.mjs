@@ -129,3 +129,31 @@ test('an honest, reconciled ledger does allow a send', () => {
   assert.equal(decision.allowed, true, 'the gate must be able to open, or it proves nothing')
   assert.match(decision.reason, /3 of 4/)
 })
+
+test('a reconstructed ledger with an UNKNOWN remainder never releases capacity', () => {
+  // The dangerous regression: losing the original record and rebuilding an empty ledger must not
+  // look like "4 slots free". Absence of records is not proof of no spend.
+  const path = write({
+    grants: [{
+      grantId: GRANT, limit: 4, tasks: [],
+      remainder: 'UNKNOWN', attributionState: 'UNVERIFIED',
+      reconstruction: { method: 'product-side records only', productAttemptRecordsFound: 0 },
+    }],
+  })
+  const audit = auditGrant(path, GRANT, 4, { used: null, source: 'reconstructed' })
+  assert.equal(audit.verdict, 'UNVERIFIED')
+  assert.match(audit.reasons.join(' '), /remainder is UNKNOWN/)
+  assert.equal(maySendReal(audit).allowed, false, 'a reconstructed ledger must not unblock sends')
+})
+
+test('a reconstruction that IS reconciled may still release capacity', () => {
+  const path = write({
+    grants: [{
+      grantId: GRANT, limit: 4, tasks: [{ taskId: 't1', commandId: 'cmd-1', state: 'sent' }],
+      remainder: '3', attributionState: 'RECORDED',
+    }],
+  })
+  const audit = auditGrant(path, GRANT, 4, { used: 1, source: 'reconstructed' })
+  assert.equal(audit.verdict, 'VERIFIED')
+  assert.equal(maySendReal(audit).allowed, true, 'a genuinely reconciled ledger must still work')
+})

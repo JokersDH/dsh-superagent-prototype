@@ -2,9 +2,9 @@
   "wave": "product-wave-06",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "82db295",
-  "mergeCommit": "543ccac",
-  "previousCandidate": "6b4e4ab",
+  "base": "6f6edde",
+  "mergeCommit": "47a4b0e",
+  "previousCandidate": "987a7ad",
   "ownedPaths": [
     "apps/runner/",
     "packages/drivers/",
@@ -23,34 +23,33 @@
         "grantId": "wave03-b-native",
         "limit": 4,
         "ledgerPath": "tests/native-acceptance/reports/model-budget.json",
-        "ledgerPresent": false,
-        "verdict": "UNVERIFIED",
-        "declared": {
-          "used": 0,
-          "source": "tests/native-acceptance/reports/wave03-status.json"
-        },
-        "recordedFromLedger": {
-          "reserved": 0,
-          "sent": 0,
-          "unknown": 0,
-          "aborted": 0,
-          "consumed": 0
-        },
+        "ledgerExistedBefore": false,
+        "ledgerWritten": true,
+        "attributionState": "UNVERIFIED",
+        "remainder": "UNKNOWN",
         "maySendReal": false,
-        "why": "The ledger file the grant names has never existed in this branch's history (git log --all on that path is empty). wave03-status.json declares used=0 while pointing at that absent file, and budget.mjs grantView() answers used:0/remaining:4 from an empty fallback ledger. That is a status-document inference, not a reconciled remainder, so capacity is NOT treated as available and any real send is blocked until the ledger is reconstructed from real begin/attempt evidence."
+        "reconstruction": {
+          "tool": "tests/native-acceptance/ledger-reconstruct.mjs",
+          "method": "product-side reservation/attempt records only",
+          "productAttemptRecordsFound": 0,
+          "rejectedSources": [
+            "developer ~/.codex/sessions store: user-owned, mixed with unrelated desktop work, and ephemeral threads leave no trace there, so absence proves nothing",
+            "status documents asserting a count: an assertion is not a record"
+          ]
+        },
+        "criticalFinding": "Writing the reconstructed ledger with an empty task list initially made ledger-audit report VERIFIED with 4 free slots - losing the history would have silently un-blocked spending. ledger-audit now treats remainder=UNKNOWN / attributionState=UNVERIFIED as UNVERIFIED, with two regression tests."
+      },
+      {
+        "grantId": "wave05-independent-review-pilot-01",
+        "limit": 24,
+        "owner": "E",
+        "attributionState": "NOT_B_GRANT",
+        "bConsumes": false,
+        "note": "Untouched. B never attributes or consumes it."
       }
     ],
     "historicalRoundsUsed": 3,
-    "historicalNote": "Earlier rounds keep their own accounting. They are reported separately and are never merged into, or used to top up, the wave03 grant.",
-    "pilotGrant": {
-      "grantId": "wave05-independent-review-pilot-01",
-      "owner": "E",
-      "maxTotalTurnStarts": 24,
-      "maxTotalBillableTokens": 200000,
-      "maxTotalCostUSD": 5,
-      "bConsumes": false,
-      "touchedThisWave": false
-    },
+    "historicalNote": "Reported separately, never merged into or used to top up the wave03 grant. Not attributable from product records.",
     "modelCallsThisWave": 0
   },
   "phases": {
@@ -92,86 +91,116 @@
     },
     "B2": {
       "status": "PASS",
-      "label": "real author/fresh session and run boundary for E",
-      "evidenceClassification": "package-local, zero model calls (protocol surface verified from codex app-server generate-ts, 751 bindings)",
-      "delivered": "tests/native-acceptance/pilot-runner.mjs + pilot-runner.test.mjs (19/19)",
-      "sessionOperations": {
-        "author": "thread/start (persistent) - the no_review arm",
-        "author_continue": "thread/resume by real authorThreadId, or thread/fork with lastTurnId cut point",
-        "fresh_session": "thread/start with ephemeral true; ignores any authorThreadId passed in"
+      "label": "real author/fresh session transport and run boundary for E",
+      "evidenceClassification": "actual_native transport + protocol_fixture control flow + package-local guards",
+      "delivered": [
+        "tests/native-acceptance/pilot-transport.mjs - real codex app-server JSON-RPC 2.0 stdio transport",
+        "tests/native-acceptance/pilot-fixture-server.mjs - same-protocol look-alike with server-side wire journal",
+        "tests/native-acceptance/b7-pilot-transport.mjs - 14 cases",
+        "tests/native-acceptance/pilot-runner.mjs - arm->session policy layer (retained)"
+      ],
+      "realBinaryMeasured": {
+        "binary": "codex 0.164.0",
+        "initialize": "answers with userAgent/codexHome",
+        "threadStart": "returns a real thread id; model=gpt-6.1-sol provider=OpenAI",
+        "constructInspectWire": [
+          "initialize",
+          "thread/start",
+          "thread/read"
+        ],
+        "billingOnWireDuringInspect": false,
+        "checkpointBoundary": "a 0-turn thread has no rollout, so thread/resume and thread/fork refuse with 'no rollout found'; a second process reports 'thread not loaded'. A resumable checkpoint therefore REQUIRES a real author turn."
       },
-      "enforced": [
-        "a fresh reviewer is ephemeral and never carries an author thread id",
-        "a continue arm without a real authorThreadId is refused",
-        "a billable run with no reservation hook is refused",
-        "a hook that refuses or throws refuses the run",
-        "pricing_unavailable refuses rather than estimating",
-        "only startRun is marked billable; inspect/reconcile/cancel/collectReport never bill",
-        "malformed or wrong-subject reports are inconclusive or rejected, never PASS"
-      ]
+      "controlFlowProven": [
+        "author turn: reservation first, exactly one turn/start, usage including reasoningOutputTokens, turn completed",
+        "checkpoint: resume reopens the author thread and fork yields a distinct thread once a turn exists",
+        "fresh session: runs in a thread distinct from the author thread with its own reservation",
+        "cancel: turn/interrupt accepted, no additional turn/start",
+        "reconcile: reads the original thread, observes the existing turn, sends no new turn"
+      ],
+      "billingGuards": [
+        "no hook => refused before the wire; server journal shows no turn/start",
+        "refusing hook => refused before the wire",
+        "throwing hook => refused before the wire",
+        "no_review author arm => still requires a reservation; the label does not make it free",
+        "turn/start is the only billing method and is excluded from the non-billing set"
+      ],
+      "falsePassProof": "sabotaging the hook guard makes B7-NO-HOOK and B7-AUTHOR-ALSO-RESERVES fail (12/14); restoring returns 14/14"
     },
     "B3": {
       "status": "PASS_WITH_RECORDED_FAIL",
       "label": "sealed one-shot capsule and host boundary",
       "evidenceClassification": "package-local, zero model calls",
-      "delivered": "tests/native-acceptance/b3-sealed-copy.mjs; report tests/native-acceptance/reports/b3-sealed-copy.json",
-      "totals": {
-        "cases": 9,
-        "PASS": 8,
-        "FAIL": 1
-      },
-      "passing": [
-        "sealed copy has no .git, no remote config, no hooks",
-        "no capsule file shares an inode with the author checkout",
-        "links are not replicated into a capsule",
-        "scratch is writable and discarded; author files unchanged",
-        "input mutation invalidates the original subject digest",
-        "manifest binds the frozen subject and every file digest",
-        "capsule cleanup leaves nothing shared"
+      "delivered": [
+        "tests/native-acceptance/b3-sealed-copy.mjs (copy side, 8 PASS / 1 FAIL)",
+        "tests/native-acceptance/b8-host-isolation.mjs (host side with real enforcement, 9/9)"
       ],
-      "fail": {
-        "case": "B3-HARDLINK-ESCAPE",
-        "reason": "This filesystem permits linkSync. A caller that hardlinks instead of copying can modify the frozen source. Only copying bytes defends it; the OS does not. Recorded as FAIL and the suite exits non-zero."
+      "copySide": [
+        "no .git, no remote config, no hooks",
+        "no shared inode; files copied by bytes",
+        "scratch writable and discarded; author working file byte-identical",
+        "manifest binds the frozen subject and every file digest"
+      ],
+      "hostSide": {
+        "mechanism": "macOS Seatbelt via sandbox-exec (kernel-enforced for the child)",
+        "method": "each axis measured both without and with the profile, so the counter-case shows the mechanism is what denies",
+        "denied": [
+          "reading the author credential file",
+          "writing the author material",
+          "network egress"
+        ],
+        "allowed": [
+          "scratch writes inside the capsule",
+          "ordinary capsule reads and system tools"
+        ],
+        "note": "This supersedes the earlier 'cwd is not a sandbox' observation with an actual enforcement profile. A copy alone is still not isolation; the profile is what makes it one."
       },
-      "hostBoundary": "Confirmed a copy is NOT a sandbox: with cwd set to the capsule the author home is still readable by absolute path. Host file/tool/credential/network restrictions are NOT implemented by B and must be enforced separately.",
-      "scratchPolicy": "Writable scratch inside the capsule is allowed and discarded, per Amendment 01; native read-only is not forced."
+      "retainedFail": {
+        "case": "B3-HARDLINK-ESCAPE",
+        "reason": "This filesystem permits linkSync, so a caller that hardlinks instead of copying can modify the frozen source. Our capsule builder always copies bytes (B8-COPY-NO-SHARED-INODE proves it), but the OS alone does not prevent a different caller. Kept as FAIL, suite exits non-zero."
+      }
     },
     "B4": {
       "status": "BLOCKED",
-      "label": "price, usage and single-turn hard bound",
-      "evidenceClassification": "protocol-surface verified; no model call made",
+      "label": "price, usage and executable whole-turn bound",
+      "evidenceClassification": "protocol-surface verified against the real binary; no model call made",
       "delivered": "tests/native-acceptance/cost-preflight.mjs + cost-preflight.test.mjs (10/10)",
-      "pricing": {
-        "verdict": "unavailable",
-        "evidence": "codex app-server generate-ts produced 751 bindings; searching all of them for price or Price returns zero results. The protocol exposes no price or cost field, and no external table was supplied.",
-        "notDone": "No estimate, no zero, and no subscription assumption was substituted."
-      },
-      "usage": {
-        "available": true,
-        "fields": [
-          "totalTokens",
-          "inputTokens",
-          "cachedInputTokens",
-          "cacheWriteInputTokens",
-          "outputTokens",
-          "reasoningOutputTokens"
+      "measuredFacts": {
+        "pricingSurface": "absent - 751 generated bindings contain no price/cost field",
+        "turnStartBoundFields": [],
+        "turnStartFields": [
+          "threadId",
+          "clientUserMessageId",
+          "turnTrigger",
+          "parentTurnId",
+          "rootTurnId",
+          "cwd",
+          "model",
+          "serviceTier",
+          "serviceTierForTurn"
         ],
-        "delivery": "ThreadTokenUsageUpdatedNotification with total and last, AFTER a turn runs",
-        "consequence": "It measures spend but cannot cap the turn it reports."
+        "turnBoundConsequence": "turn/start exposes NO maxOutputTokens/maxTokens/tokenLimit field, so a per-turn ceiling cannot be attached to the turn at all",
+        "usageTiming": "thread/tokenUsage/updated arrives post-turn with total+last (input/cachedInput/cacheWriteInput/output/reasoningOutput)",
+        "observedModelIdentity": {
+          "model": "gpt-6.1-sol",
+          "provider": "OpenAI",
+          "priceSource": null
+        }
       },
-      "currentRuntimePreflight": "BLOCKED with 8 named blockers",
+      "currentRuntimePreflight": "BLOCKED with 9 named blockers",
       "rejectedAsInsufficient": [
         "maxOutputTokens alone",
         "wall-clock timeout",
-        "priced but cannot stop inside quota"
+        "priced but cannot stop inside quota",
+        "usage that only arrives after the turn"
       ],
-      "nextConsumerAction": "A real billable send stays blocked until a priced source, a concrete model id, an observed-at date and an in-quota stop are all supplied and the preflight returns READY."
+      "nextConsumerAction": "Real billable send stays blocked. Three independent gaps must close: a checkable price for the actual provider/model, an enforceable in-quota stop, and a way to express a per-turn ceiling that this protocol does not offer."
     },
     "B5": {
       "status": "PARTIAL",
       "label": "existing native control/question/recovery closure",
-      "evidenceClassification": "controlled = PASS; actual native = NOT_TESTED",
-      "recoveryImplementation": "Single implementation confirmed: packages/execution/src/recovery-transport.ts line 118 is the only new WeakMap in product sources; no second proof store exists; protocol-v1 unchanged.",
+      "evidenceClassification": "controlled = PASS; actual native stop/question = NOT_TESTED",
+      "recoveryImplementation": "Single implementation confirmed: packages/execution/src/recovery-transport.ts line 118 is the only new WeakMap in product sources; no second proof store; protocol-v1 unchanged.",
       "controlledResults": {
         "b3ProductionStop": {
           "cases": 6,
@@ -188,8 +217,7 @@
           "NOT_TESTED": 1
         }
       },
-      "actualNative": "NOT_TESTED - real vendor stop, per-target question delivery, epoch/attempt drift and unknown-send reconciliation were not exercised. The grant is UNVERIFIED and 0023 forbids B from consuming E's pilot grant.",
-      "handoff": "tests/native-acceptance/reports/wave06-b5-control-handoff.md"
+      "actualNative": "NOT_TESTED - a real vendor turn has never been started under this grant. The newly measured checkpoint boundary explains why: the checkpoint/continuation half cannot be exercised without a real author turn."
     },
     "B6": {
       "status": "PASS",
@@ -223,12 +251,17 @@
     "actual vendor native active stop/question/approval (no native turn was started in this wave)",
     "B4 question/answer crash window (no question observed before kill in prior controlled runs)"
   ],
-  "next": "B's six phases are complete. The pilot remains BLOCKED on pricing_unavailable (main/E) and the unverified wave03 ledger (B). E can run the recipe today and will see the exact refusal reason.",
+  "next": "Real transport and host isolation are delivered and measured. The pilot remains BLOCKED on three independent gaps (price, in-quota stop, no per-turn ceiling field) plus an UNKNOWN ledger remainder. E can drive the real transport today for every non-billing step; the author turn is the first step that requires a reconciled budget.",
   "deliverables": {
     "pilotRecipe": "node tests/native-acceptance/pilot-recipe.mjs [--json]",
-    "runtimeDiagnostics": "node tests/native-acceptance/runtime-diagnostics.mjs [--json]",
+    "realTransport": "tests/native-acceptance/pilot-transport.mjs (import PilotTransport)",
+    "transportAcceptance": "node tests/native-acceptance/b7-pilot-transport.mjs [--record]",
+    "hostIsolation": "node tests/native-acceptance/b8-host-isolation.mjs [--record]",
     "sealedCopy": "node tests/native-acceptance/b3-sealed-copy.mjs [--record]",
-    "newSuites": "node --test tests/native-acceptance/ledger-audit.test.mjs tests/native-acceptance/pilot-runner.test.mjs tests/native-acceptance/cost-preflight.test.mjs",
-    "controlSuites": "node tests/native-acceptance/false-pass.test.mjs; node --test tests/native-acceptance/b2-budget.test.mjs; node tests/native-acceptance/selftest.mjs"
-  }
+    "ledgerReconstruct": "node tests/native-acceptance/ledger-reconstruct.mjs [--write|--json]",
+    "runtimeDiagnostics": "node tests/native-acceptance/runtime-diagnostics.mjs [--json]",
+    "unitSuites": "node --test tests/native-acceptance/ledger-audit.test.mjs tests/native-acceptance/pilot-runner.test.mjs tests/native-acceptance/cost-preflight.test.mjs"
+  },
+  "sharedBoundary2": "docs/rfcs/WP-16/0024-wave-06-decisions-http-checkpoint.md",
+  "baseNote": "Merged origin/main 6f6edde (merge 47a4b0e, no conflicts). 0024 records main admitting B 8cc45ad at module scope (catalog 41)."
 }

@@ -1,0 +1,180 @@
+{
+  "generatedAt": "2026-11-11T03:43:13.532Z",
+  "environment": {
+    "note": "wave-06 B8 material-copy vs host isolation",
+    "modelCalls": 0,
+    "enforcement": "macos-seatbelt (sandbox-exec)"
+  },
+  "totals": {
+    "cases": 9,
+    "PASS": 9,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "B8-COPY-NO-GIT",
+      "title": "the capsule contains no Git surface at all",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "no .git, no remote config, no hooks in the capsule"
+      ],
+      "evidence": [
+        {
+          "capsuleFiles": [
+            "src/app.ts"
+          ],
+          "gitEntries": [],
+          "noRemote": true,
+          "noHooks": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B8-COPY-NO-SHARED-INODE",
+      "title": "no capsule file shares an inode with the author tree",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "1 file(s) copied by bytes; none hardlinked"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B8-COPY-AUTHOR-UNCHANGED",
+      "title": "working in the capsule never alters the author material",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "edits inside the capsule left the author working file byte-identical"
+      ],
+      "evidence": [
+        {
+          "authorAppDigestMatchesOriginal": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B8-HOST-READ-CREDENTIAL",
+      "title": "the reviewer cannot read the author credential file",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "allowed without the profile and denied with it, so the profile is what enforces this"
+      ],
+      "evidence": [
+        {
+          "withoutProfile": {
+            "status": 0,
+            "allowed": true
+          },
+          "withProfile": {
+            "status": 1,
+            "output": "cat: /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w06-b8-K7F5Ee/author-home/auth.json: Operation not perm"
+          },
+          "enforcement": "macos-seatbelt"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B8-HOST-WRITE-AUTHOR",
+      "title": "the reviewer cannot modify the author material",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "allowed without the profile and denied with it, so the profile is what enforces this"
+      ],
+      "evidence": [
+        {
+          "withoutProfile": {
+            "status": 0,
+            "allowed": true
+          },
+          "withProfile": {
+            "status": 1,
+            "output": "/bin/sh: /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w06-b8-K7F5Ee/author-project/src/app.ts: Operation "
+          },
+          "enforcement": "macos-seatbelt"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B8-HOST-NETWORK-EGRESS",
+      "title": "the reviewer cannot send data out over the network",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "allowed without the profile and denied with it, so the profile is what enforces this"
+      ],
+      "evidence": [
+        {
+          "withoutProfile": {
+            "status": 0,
+            "allowed": true
+          },
+          "withProfile": {
+            "status": 7,
+            "output": "http=000"
+          },
+          "enforcement": "macos-seatbelt"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B8-HOST-SCRATCH-ALLOWED",
+      "title": "scratch writes inside the capsule stay allowed under the profile",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "the profile permits scratch inside the capsule, so a review is not forced read-only"
+      ],
+      "evidence": [
+        {
+          "status": 0,
+          "wrote": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B8-HOST-PROFILE-DOES-NOT-BREAK-READS",
+      "title": "the profile still permits reading the capsule and system tools",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "capsule reads still work under the profile"
+      ],
+      "evidence": [
+        {
+          "status": 0,
+          "output": "export const answer = 0 // reviewer edit"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B8-AUTHOR-MATERIAL-INTACT",
+      "title": "after every probe the author material and credentials are unchanged",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "the author working file and credential file are byte-identical to before the probes"
+      ],
+      "evidence": [
+        {
+          "appMatches": true,
+          "authMatches": true
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
