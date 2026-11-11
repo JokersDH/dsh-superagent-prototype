@@ -51,7 +51,7 @@ export function DecisionWorkspace({ transport, configuration, sources, source, i
     finally { setBusy(false) }
   }
   return createPortal(<dialog ref={dialog} className="project-settings-dialog decision-workspace" aria-label="项目决定"
-    onCancel={event => { if (busy) event.preventDefault() }} onClose={onClose}>
+    onCancel={event => { if (busy) event.preventDefault() }} onClose={() => { if (!dialog.current?.open) onClose() }}>
     <header><div><h2>{editing ? preview ? '确认决定' : '记录决定' : '项目决定'}</h2><span className="context-line">{project?.displayName ?? projectId}</span></div>
       <button type="button" className="icon-button" aria-label="关闭项目决定" title="关闭项目决定" disabled={busy} onClick={onClose}><X size={18} /></button></header>
     {error && <p className="warn-text" role="alert">{error}</p>}
