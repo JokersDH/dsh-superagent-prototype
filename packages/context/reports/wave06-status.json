@@ -5,8 +5,17 @@
   "mergeCommit": "690da7a",
   "stableCheckpoint": "c9dc567",
   "updatedAt": "2026-11-11T02:00:00.000Z",
-  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
-  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "ownedPaths": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge",
+    "packages/routing"
+  ],
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0,
+    "unknownSends": 0
+  },
   "phases": [
     {
       "phase": "C1",
@@ -33,7 +42,9 @@
         "packages/routing/test/shared-attention.case.ts",
         "packages/routing/test/main-compat.case.ts"
       ],
-      "results": { "routingTests": "40/40 (includes 8 shared-ranker + 3 main-compat cases)" },
+      "results": {
+        "routingTests": "40/40 (includes 8 shared-ranker + 3 main-compat cases)"
+      },
       "note": "sharedAttentionRanker matches contracts AttentionRanker: complete permutation, shared reasons, sinceAt=null unknown, explicit deadlineAt only, expiresAt not a deadline, outgoing blockedWorkIds, stable explicit-now order, duplicate ids refused. Main-compat test validates AttentionPageSchema with a ProductAttention-shaped page."
     },
     {
@@ -118,7 +129,10 @@
   "dependencyRequests": [
     {
       "package": "packages/knowledge",
-      "added": ["@personal-agent/storage (dev)", "@personal-agent/workflows (dev)"],
+      "added": [
+        "@personal-agent/storage (dev)",
+        "@personal-agent/workflows (dev)"
+      ],
       "reason": "Real temporary SQLite decision/workflow tests and examples.",
       "rootLock": "pnpm-lock.yaml diff is uncommitted; main owns the authoritative lock."
     }
@@ -163,5 +177,6 @@
   "aNextSteps": [
     "Publish createWorkflowPorts(store).routingEvidence with sync append-only put/get/list and same-body replay.",
     "Optionally add a persisted review-subject/current-candidate index for efficient invalidation queries."
-  ]
+  ],
+  "latestDeliveryCommit": "fc84127"
 }
