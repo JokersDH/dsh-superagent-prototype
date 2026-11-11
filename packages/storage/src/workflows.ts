@@ -15,6 +15,7 @@ import { canonicalDigest } from './ingress.ts'
 import { ArtifactStore, type ArtifactRecord } from './artifacts.ts'
 import { AssistantState } from './assistant-state.ts'
 import { RoutingEvidence, type RoutingEvidenceSources } from './routing-evidence.ts'
+import { AcceptanceOutcomeProjection } from './acceptance-outcome.ts'
 
 import { WorkflowConflict } from './workflow-errors.ts'
 export { WorkflowConflict } from './workflow-errors.ts'
@@ -855,6 +856,7 @@ export class WorkflowRecords {
   readonly decisions: ProductDecisions
   readonly assistant: AssistantState
   readonly routingEvidence: RoutingEvidence
+  readonly acceptance: AcceptanceOutcomeProjection
   readonly index: WorkflowIndex
   constructor(db: Database.Database, uow: UnitOfWork, artifacts: ArtifactStore) {
     this.conversations = new ProductConversations(db, uow)
@@ -862,6 +864,7 @@ export class WorkflowRecords {
     this.decisions = new ProductDecisions(db, uow)
     this.assistant = new AssistantState(db, uow, this.decisions)
     this.routingEvidence = new RoutingEvidence(db, uow)
+    this.acceptance = new AcceptanceOutcomeProjection(db, uow, this.routingEvidence)
     this.index = new WorkflowIndex(db, artifacts, this.projects)
   }
 }
