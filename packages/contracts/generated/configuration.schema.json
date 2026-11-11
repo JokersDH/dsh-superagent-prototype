@@ -33,6 +33,9 @@
       "readOnly": true,
       "type": "array"
     },
+    "decisionsAvailable": {
+      "type": "boolean"
+    },
     "profiles": {
       "items": {
         "additionalProperties": false,

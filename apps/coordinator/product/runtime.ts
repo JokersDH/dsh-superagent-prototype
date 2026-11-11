@@ -285,6 +285,7 @@ export function createProductRuntime(
           .map((id) => ({ id, revision: checks.require(id).revision, displayName: checks.require(id).title ?? id })),
         enabledProfileIds: [...(options.native ? [options.native.profile.id] : []), ...FIXTURE_PROFILES],
         reviewActivityAvailable: options.startupMode !== 'recovery_readonly',
+        decisionsAvailable: options.startupMode !== 'recovery_readonly',
       })
       return configuration
     },
