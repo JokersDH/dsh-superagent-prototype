@@ -14,6 +14,7 @@ export type ProposalErrorCode =
   | 'barrier_blocked'
   | 'stale_authorization'
   | 'needs_user_input'
+  | 'plan_mismatch'
   | 'invalid_expiry'
 
 export class ProposalError extends Error {

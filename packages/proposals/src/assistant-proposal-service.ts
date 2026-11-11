@@ -227,6 +227,20 @@ export class AssistantProposalService {
    * - the same effect command replays idempotently; another command id conflicts.
    */
   confirmWithCommand(prepared: PreparedProposal, input: ConfirmWithCommandInput): ConfirmWithCommandResult {
+    // The effect command and the dispatched command must be the same identity, and the plan must
+    // stay on the prepared conversation. Both are checked before any confirmed write.
+    if (input.plan.commandId !== input.effectCommandId) {
+      throw new ProposalError('plan_mismatch', 'Plan command id must equal the effect command id', {
+        planCommandId: input.plan.commandId,
+        effectCommandId: input.effectCommandId,
+      })
+    }
+    if (input.plan.conversationId !== prepared.conversationId) {
+      throw new ProposalError('plan_mismatch', 'Plan belongs to another conversation than the prepared proposal', {
+        planConversationId: input.plan.conversationId,
+        preparedConversationId: prepared.conversationId,
+      })
+    }
     const planned = planProposalCommand(this.intentOf(prepared), input.plan)
     if (planned.kind === 'needs_user_input') {
       throw new ProposalError('needs_user_input', 'Proposal needs explicit user input before it can execute', {

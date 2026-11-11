@@ -51,6 +51,7 @@ export {
   authorizeComposition,
   buildCompositionPreview,
   buildSourceManifest,
+  validateComposedGroups,
 } from './composer.ts'
 export type {
   ComposedSourceManifest,

@@ -1,0 +1,39 @@
+{
+  "status": "PASS_CONTEXT_AND_PROPOSAL_BINDING",
+  "results": [
+    {
+      "case": "group_kind_control",
+      "status": "PASS",
+      "reads": 1,
+      "kinds": [
+        "decision"
+      ],
+      "errorCode": null
+    },
+    {
+      "case": "group_kind_alias",
+      "status": "PASS",
+      "reads": 0,
+      "kinds": [],
+      "errorCode": "composition_invalid"
+    },
+    {
+      "case": "effect_command_control",
+      "status": "PASS",
+      "state": "confirmed",
+      "recordedEffect": "effect-one",
+      "commandId": "effect-one",
+      "errorCode": null
+    },
+    {
+      "case": "effect_command_mismatch",
+      "status": "PASS",
+      "state": "pending",
+      "recordedEffect": null,
+      "commandId": null,
+      "errorCode": "plan_mismatch"
+    }
+  ],
+  "modelCalls": 0,
+  "diskWrites": 0
+}

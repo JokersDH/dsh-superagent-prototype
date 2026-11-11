@@ -89,7 +89,7 @@ test('a revision proposal needs the complete new contract, not the rationale', a
   )
   service.persistPending(prepared)
   assert.throws(
-    () => service.confirmWithCommand(prepared, commitInput(prepared, { commandId: 'c', conversationId: 'conv-1' })),
+    () => service.confirmWithCommand(prepared, commitInput(prepared, { commandId: 'command-1', conversationId: 'conv-1' })),
     (error: unknown) => error instanceof ProposalError && error.code === 'needs_user_input',
   )
 })
@@ -113,9 +113,19 @@ test('duplicate confirmation replays the same command, and a different command i
   const replay = service.confirmWithCommand(prepared, commitInput(prepared, plan))
   assert.equal(replay.replayed, true)
   assert.deepEqual(replay.command, first.command)
+  // A different effect id only conflicts once the plan carries the same (consistent) identity.
   assert.throws(
-    () => service.confirmWithCommand(prepared, commitInput(prepared, plan, { effectCommandId: 'command-2' })),
+    () =>
+      service.confirmWithCommand(
+        prepared,
+        commitInput(prepared, { commandId: 'command-2', conversationId: 'conv-1' }, { effectCommandId: 'command-2' }),
+      ),
     (error: unknown) => error instanceof ProposalError && error.code === 'conflict',
+  )
+  // An inconsistent plan/effect identity is refused before any confirmed write.
+  assert.throws(
+    () => service.confirmWithCommand(prepared, commitInput(prepared, plan, { effectCommandId: 'command-3' })),
+    (error: unknown) => error instanceof ProposalError && error.code === 'plan_mismatch',
   )
 })
 
