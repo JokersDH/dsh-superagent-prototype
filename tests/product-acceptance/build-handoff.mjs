@@ -574,6 +574,7 @@ writeFileSync(
     schema: 'product-acceptance-wave10-status/1',
     taskPackage: 'agent-tasks/product-wave-10/README.zh-CN.md',
     supersedes: 'wave09-status.json',
+    counts: report.counts,
     testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
     productSource: { commit: artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.schema ?? null },
     artifactTuple,

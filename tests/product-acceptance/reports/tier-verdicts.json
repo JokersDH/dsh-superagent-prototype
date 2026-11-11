@@ -4,7 +4,7 @@
     "tier": "module",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-11T15:00:28.210Z",
+    "checkedAt": "2026-11-11T15:00:59.671Z",
     "source": {
       "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
       "dirty": false
@@ -419,7 +419,7 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-11T15:00:28.211Z",
+    "checkedAt": "2026-11-11T15:00:59.673Z",
     "source": {
       "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
       "dirty": false
@@ -1029,7 +1029,7 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T15:00:28.212Z",
+    "checkedAt": "2026-11-11T15:00:59.674Z",
     "source": {
       "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
       "dirty": false
@@ -1660,7 +1660,7 @@
     "tier": "installed-alpha",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T15:00:28.212Z",
+    "checkedAt": "2026-11-11T15:00:59.674Z",
     "source": {
       "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
       "dirty": false
@@ -2341,7 +2341,7 @@
     "tier": "advisory-routing",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T15:00:28.212Z",
+    "checkedAt": "2026-11-11T15:00:59.674Z",
     "source": {
       "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
       "dirty": false
@@ -2977,7 +2977,7 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T15:00:28.212Z",
+    "checkedAt": "2026-11-11T15:00:59.674Z",
     "source": {
       "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
       "dirty": false
@@ -3633,7 +3633,7 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T15:00:28.213Z",
+    "checkedAt": "2026-11-11T15:00:59.675Z",
     "source": {
       "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
       "dirty": false
@@ -4299,7 +4299,7 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T15:00:28.213Z",
+    "checkedAt": "2026-11-11T15:00:59.675Z",
     "source": {
       "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
       "dirty": false
@@ -4930,7 +4930,7 @@
     "tier": "local-alpha",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T15:00:28.213Z",
+    "checkedAt": "2026-11-11T15:00:59.675Z",
     "source": {
       "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
       "dirty": false
@@ -5611,7 +5611,7 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T15:00:28.213Z",
+    "checkedAt": "2026-11-11T15:00:59.676Z",
     "source": {
       "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
       "dirty": false

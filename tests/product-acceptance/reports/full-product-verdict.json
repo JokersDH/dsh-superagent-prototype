@@ -3,7 +3,7 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-11T15:00:28.215Z",
+  "checkedAt": "2026-11-11T15:00:59.679Z",
   "source": {
     "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "dirty": false

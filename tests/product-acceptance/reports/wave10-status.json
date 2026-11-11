@@ -1739,6 +1739,14 @@
   ],
   "taskPackage": "agent-tasks/product-wave-10/README.zh-CN.md",
   "supersedes": "wave09-status.json",
+  "counts": {
+    "PASS": 130,
+    "FAIL": 1,
+    "SKIPPED": 0,
+    "NOT_TESTED": 16,
+    "BLOCKED": 0,
+    "UNKNOWN": 0
+  },
   "testCodeSource": {
     "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
     "dirty": false,
