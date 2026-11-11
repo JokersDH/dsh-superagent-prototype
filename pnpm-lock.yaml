@@ -169,6 +169,9 @@ importers:
       '@personal-agent/application':
         specifier: workspace:*
         version: link:../../packages/application
+      '@personal-agent/context':
+        specifier: workspace:*
+        version: link:../../packages/context
       '@personal-agent/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts

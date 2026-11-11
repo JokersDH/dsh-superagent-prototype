@@ -46,12 +46,18 @@ import {
   ProposalPreviewSchema,
   ProposalCommandSchema,
   WorkEvidenceSchema,
+  WorkEvidenceHistorySchema,
+  WorkEvidenceHistoryQuerySchema,
   RecoveryInspectionSchema,
   RecoveryPrepareSchema,
   RecoveryPlanSchema,
   RecoveryActivationRecordSchema,
+  ContextPreviewInputSchema,
+  ContextPreviewSchema,
 } from '@personal-agent/contracts'
 import type {
+  ContextPreviewInput,
+  ContextPreview,
   AnswerDelivery,
   ApplicationConfiguration,
   AssistantProviderStatus,
@@ -85,6 +91,8 @@ import type {
   ProposalPreview,
   ProposalCommand,
   WorkEvidence,
+  WorkEvidenceHistory,
+  WorkEvidenceHistoryQuery,
   RecoveryInspection,
   RecoveryPrepare,
   RecoveryPlan,
@@ -145,6 +153,7 @@ export interface LocalHttpOptions {
     recoveryPrepare?(input: RecoveryPrepare, actor: TrustedActor): Promise<RecoveryPlan>
     prepareProposal?(input: ProposalPrepare, actor: TrustedActor): Promise<ProposalPreview>
     proposal?(command: ProposalCommand, actor: TrustedActor): Promise<CommandReceipt>
+    contextPreview?(input: ContextPreviewInput, actor: TrustedActor): Promise<ContextPreview>
   }
   read?: {
     attention?(query: AttentionQuery): Promise<AttentionPage>
@@ -163,6 +172,7 @@ export interface LocalHttpOptions {
     workEnvironment?(workId: string): Promise<WorkEnvironment>
     workVerification?(workId: string): Promise<WorkVerificationStatus>
     workEvidence?(workId: string): Promise<WorkEvidence>
+    workEvidenceHistory?(workId: string, query: WorkEvidenceHistoryQuery): Promise<WorkEvidenceHistory>
     configuration?(): Promise<ApplicationConfiguration>
     verification?(id: string): Promise<Verification | undefined>
     deliveries?(questionId: string): Promise<readonly AnswerDelivery[]>
@@ -330,10 +340,15 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!options.read?.configuration)
       throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
     const value = ApplicationConfigurationSchema.parse(await options.read.configuration())
-    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false, decisionsAvailable: false, proposalsAvailable: false,
+    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false, decisionsAvailable: false, proposalsAvailable: false, contextPreviewAvailable: false,
       profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate' })),
       projects: value.projects.map(project => { const { defaultProfileId: _, ...rest } = project; return { ...rest, profileIds: [], dispatchAllowed: false, blockedReason: 'writer_indeterminate' } }),
     }) : value)
+  })
+  app.post('/v1/context/preview', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Context preview requires JSON')
+    if (!options.operations?.contextPreview) throw new ApplicationFault('unsupported_capability', 'Context preview is not connected')
+    return c.json(ContextPreviewSchema.parse(await options.operations.contextPreview(ContextPreviewInputSchema.parse(await c.req.json()), c.get('actor'))))
   })
   app.post('/v1/proposals/prepare', async (c) => {
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Proposal preview requires JSON')
@@ -432,6 +447,18 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     const receipt = CommandReceiptSchema.parse(await options.operations.projectSettings(command, c.get('actor')))
     if (receipt.commandId !== command.commandId) throw new ApplicationFault('storage_unavailable', 'Project settings receipt identity mismatch', 'none')
     return c.json(receipt)
+  })
+  app.get('/v1/works/:id/evidence/history', async (c) => {
+    if (!options.read?.workEvidenceHistory) throw new ApplicationFault('unsupported_capability', 'Work history reader is not connected')
+    const input = { ...c.req.query() } as Record<string, unknown>
+    if ('limit' in input) {
+      if (typeof input.limit !== 'string' || !/^[1-9][0-9]{0,2}$/.test(input.limit)) throw new ApplicationFault('invalid_request', 'Invalid evidence page size')
+      input.limit = Number(input.limit)
+    }
+    const id = IdSchema.parse(c.req.param('id'))
+    const page = WorkEvidenceHistorySchema.parse(await options.read.workEvidenceHistory(id, WorkEvidenceHistoryQuerySchema.parse(input)))
+    if (page.workId !== id) throw new ApplicationFault('storage_unavailable', 'History identity mismatch', 'none')
+    return c.json(page)
   })
   app.get('/v1/works/:id/evidence', async (c) => {
     if (!options.read?.workEvidence) throw new ApplicationFault('unsupported_capability', 'Work evidence is not connected')
