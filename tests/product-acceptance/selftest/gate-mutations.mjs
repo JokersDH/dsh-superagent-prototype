@@ -86,6 +86,11 @@ const evidenceFor = (key) => {
       return { sameSizeCode: 'release_artifact_missing', missingCode: 'release_artifact_missing', corruptBundleCode: 'archive_invalid' }
     case 'rollback':
       return { bundleSha256: DIGEST, target: '/tmp/state', postBackupReceipt: 'recorded' }
+    case 'configRoot':
+      return {
+        base: { role: 'base', firstRun: 'OK', initialized: 'PASS', seeded: 'PASS' },
+        upgrade: { role: 'upgrade', firstRun: 'OK', initialized: 'PASS', seeded: 'PASS' },
+      }
     case 'upgrade':
       return {
         base: { buildId: 'build-old', schema: 12, tarSha256: DIGEST },

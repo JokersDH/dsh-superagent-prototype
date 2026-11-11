@@ -127,6 +127,7 @@ export const CONTROLLED_CASES = [
 export const INSTALL_CASES = [
   case_('E4-INSTALL-ARTIFACT-IDENTITY', { layers: [LAYERS.INSTALLED], evidence: ['artifact', 'installation'] }),
   case_('E4-INSTALL-FIRST-RUN', { layers: [LAYERS.INSTALLED], evidence: ['install'] }),
+  case_('E4-INSTALL-CONFIG-ROOT', { layers: [LAYERS.INSTALLED], evidence: ['configRoot'] }),
   case_('E4-INSTALL-REUSE-CONCURRENCY', { layers: [LAYERS.INSTALLED], evidence: ['reuse'] }),
   case_('E4-BACKUP-RESTORE', { layers: [LAYERS.INSTALLED], evidence: ['restore'] }),
   case_('E4-INSTALL-TAMPER', { layers: [LAYERS.INSTALLED], evidence: ['tamper'] }),

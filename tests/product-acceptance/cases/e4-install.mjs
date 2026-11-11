@@ -504,6 +504,37 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       }
     })
 
+    await push(define('E4-INSTALL-CONFIG-ROOT', 'A private config root initializes the trusted release manifest'), async ({ assert, evidence }) => {
+      const probe = (target, role) => {
+        const configRoot = join(workspace, `config-root-${role}`)
+        const first = pa(target, ['first-run', '--json'], { env: { PA_CONFIG_ROOT: configRoot } })
+        const doctor = pa(target, ['doctor', '--json'], { env: { PA_CONFIG_ROOT: configRoot } })
+        const check = (doctor.json?.checks ?? []).find((item) => item.id === 'release_manifest')
+        // Seeding the prebuilt release manifest is the documented expectation for a private config
+        // root; verify that this is the only missing piece rather than an unsupported layout.
+        cpSync(join(target, 'var/config/release.json'), join(configRoot, 'release.json'))
+        const seeded = pa(target, ['doctor', '--json'], { env: { PA_CONFIG_ROOT: configRoot } })
+        const seededCheck = (seeded.json?.checks ?? []).find((item) => item.id === 'release_manifest')
+        return {
+          role,
+          firstRun: first.status === 0 ? 'OK' : `exit ${first.status}`,
+          initialized: check?.status ?? 'missing',
+          code: check?.detail?.message ?? null,
+          seeded: seededCheck?.status ?? 'missing',
+          doctorStatus: doctor.json?.status ?? 'unknown',
+        }
+      }
+      const base = probe(install, 'base')
+      const upgrade = probe(upgradeInstall, 'upgrade')
+      evidence.configRoot = { base, upgrade }
+      // A private config root must be usable out of the box; a manual release.json copy is not an
+      // initialization path a colleague can be expected to discover.
+      assert('BASE_CONFIG_ROOT_INITIALIZED', base.initialized === 'PASS', JSON.stringify(base))
+      assert('UPGRADE_CONFIG_ROOT_INITIALIZED', upgrade.initialized === 'PASS', JSON.stringify(upgrade))
+      assert('BASE_SEED_PROVES_MISSING_INIT', base.seeded === 'PASS', JSON.stringify(base))
+      assert('UPGRADE_SEED_PROVES_MISSING_INIT', upgrade.seeded === 'PASS', JSON.stringify(upgrade))
+    })
+
     await push(define('E4-INSTALL-REUSE-CONCURRENCY', 'Instance identity is reused only for an exact match and concurrent starts do not fork'), async ({ assert, evidence }) => {
       pa(install, ['stop', '--json'], { timeoutMs: 20_000 })
       const [port, apiPort, otherPort, otherApi] = await freePorts()

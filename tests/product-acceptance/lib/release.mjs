@@ -282,6 +282,22 @@ function attentionIssues(attention) {
 }
 
 /**
+ * A private config root must initialize from the install's trusted release manifest. A manual copy
+ * that makes doctor pass is evidence of the missing step, not evidence of a working first-run.
+ */
+export function configRootIssues(configRoot) {
+  if (!configRoot || typeof configRoot !== 'object') return ['missing']
+  const issues = []
+  for (const role of ['base', 'upgrade']) {
+    const item = configRoot[role] ?? {}
+    if (item.firstRun !== 'OK') issues.push(`${role}_first_run`)
+    if (item.initialized !== 'PASS') issues.push(`${role}_not_initialized`)
+    if (item.seeded !== 'PASS') issues.push(`${role}_seed_not_decisive`)
+  }
+  return issues
+}
+
+/**
  * A two-binary upgrade must move a real state forward, refuse the newer schema on the old binary
  * without deleting data, and keep an explicit restore clearly separate from a binary downgrade.
  */
@@ -497,6 +513,10 @@ export function evaluateRelease({
       if (entry.evidence?.includes('installation')) {
         for (const issue of installationIssues(result.evidence?.installation))
           failures.push(fail('installation_evidence_invalid', `Installation proof ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('configRoot')) {
+        for (const issue of configRootIssues(result.evidence?.configRoot))
+          failures.push(fail('config_root_invalid', `Config root ${issue}`, entry.id))
       }
       if (entry.evidence?.includes('upgrade')) {
         for (const issue of upgradeIssues(result.evidence?.upgrade))
