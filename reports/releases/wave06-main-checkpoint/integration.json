@@ -1,0 +1,62 @@
+{
+  "status": "PASS_SCOPED_DECISIONS_AND_ATTENTION_CHECKPOINT",
+  "branch": "codex/g2-execution-integration",
+  "baseCommit": "82db295",
+  "sourceCommit": "f638fe070f34d7b38f8f38bc167d3e9985a57efc",
+  "httpCheckpoint": "d1e704c",
+  "attentionEvidenceCommit": "6076d00bb73c5dd10149370adc04d7153e251dd2",
+  "integratedCandidates": {
+    "A": { "sourceCommits": ["f26f2eb", "1bd0996", "99a192b"], "scope": "storage/workflows v13 ports, timeline and snapshots; later wave06 accepted-outcome consumer is not integrated by this list" },
+    "C": { "sourceCommits": ["027c305", "ae7f80f", "b70a658", "9a39908", "c9dc567", "8f1e1a7", "fc84127", "623b636"], "scope": "decision transaction and pure modules, shared attention; production enabled only for explicit decisions and attention" },
+    "B": { "sourceCommits": ["8cc45ad"], "scope": "exact profile-reference resolver only; no native control or new Driver admission" }
+  },
+  "checks": [
+    { "command": "pnpm --dir packages/storage test", "status": "PASS", "cases": 75 },
+    { "command": "pnpm --dir packages/workflows test", "status": "PASS", "cases": 21 },
+    { "command": "pnpm --dir packages/knowledge test", "status": "PASS", "cases": 38 },
+    { "command": "pnpm --dir packages/routing test", "status": "PASS", "cases": 40 },
+    { "command": "pnpm --dir packages/catalog test", "status": "PASS", "cases": 41 },
+    { "command": "pnpm --dir packages/contracts test", "status": "PASS", "cases": 208 },
+    { "command": "pnpm --dir apps/console test", "status": "PASS", "cases": 19 },
+    { "command": "node --test tests/integration/decision-commands.case.mjs tests/integration/attention-inbox.case.mjs tests/integration/application-http.case.mjs tests/integration/product-execution.case.mjs tests/integration/review-timing.case.mjs", "status": "PASS", "cases": 51 },
+    { "command": "node tools/bootstrap/review-persisted-assistant.mjs --output reports/releases/wave06-main-checkpoint/assistant-sql.json", "status": "PASS_SQLITE_ASSISTANT_CONSUMER", "cases": 7, "report": "assistant-sql.json" },
+    { "command": "node tools/bootstrap/review-wave04-admission.mjs --output reports/releases/wave06-main-checkpoint/c-domain.json", "status": "PASS_ADMISSION_PROBES", "cases": 3, "report": "c-domain.json" },
+    { "command": "node tests/integration/decision-workbench-browser.mjs", "status": "PASS_DECISION_HTTP_BROWSER", "cases": 4, "sourceWorktreeClean": true, "report": "decisions-browser/browser-report.json" },
+    { "command": "node tests/integration/attention-inbox-browser.mjs --no-capture --output reports/releases/wave06-main-checkpoint/attention-browser", "status": "PASS_CONTROLLED_ATTENTION_INBOX_BROWSER", "cases": 6, "sourceWorktreeClean": true, "report": "attention-browser/browser-report.json" },
+    { "command": "pnpm --dir apps/coordinator typecheck:product", "status": "PASS" },
+    { "command": "pnpm --dir apps/console typecheck", "status": "PASS" },
+    { "command": "pnpm --dir packages/routing typecheck", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/storage --filter @personal-agent/workflows --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge -r build", "status": "PASS" },
+    { "command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/routing --filter @personal-agent/knowledge -r build", "status": "PASS" },
+    { "command": "pnpm --dir apps/console build", "status": "PASS", "note": "Non-fatal >500KB chunk advisory remains" },
+    { "command": "pnpm --dir packages/contracts check:generated", "status": "PASS", "schemas": 76 },
+    { "command": "node agent-tasks/product-wave-06/verify.mjs", "status": "PASS_DISPATCH_STATIC_ONLY" },
+    { "command": "node product-spec/tools/verify-spec.mjs --check", "status": "PASS_SPEC_STATIC_ONLY" },
+    { "command": "git diff --check", "status": "PASS" }
+  ],
+  "screenshots": { "sourceCommit": "f638fe070f34d7b38f8f38bc167d3e9985a57efc", "desktop": "decisions-browser/desktop.png", "mobile": "decisions-browser/mobile.png", "dimensions": [[1440, 900], [390, 844]] },
+  "uiReview": { "initialDisposition": "ship", "lastVerdict": "ship", "verdictScope": "Two subsequent semantic display corrections resolved; not a new full-surface or product-release audit", "report": "decision-ui-review.zh-CN.md", "designReport": "decision-design-consistency.zh-CN.md", "designSystemRewritten": false },
+  "frozenRunnerDataHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "preview": { "url": "http://127.0.0.1:5185/", "apiPort": 8801, "state": ".local-state/decisions-preview", "http": 200, "decisionsAvailable": true, "decisionProtocol": "decision-catalog/1", "attentionRanking": "deterministic_priority", "oldHistoryMigrated": false, "oldServicesRestarted": false },
+  "mainPhaseProgress": {
+    "M1": { "status": "IN_PROGRESS", "delivered": "A/C minimal source, B exact resolver and real decision schema/HTTP; remaining recovery/diagnostic interfaces are not all implemented" },
+    "M2": { "status": "IN_PROGRESS", "delivered": "C ranker in runtime plus existing current-source navigation; later A outcome/timeline producer still requires admission/composition" },
+    "M3": { "status": "IN_PROGRESS", "delivered": "Explicit decision record/revoke web flow and atomic source/grant guards; generic proposal confirmation/context injection not implemented" },
+    "M4": { "status": "NOT_STARTED", "required": "Recovery inspect/prepare/commit with fresh authorization and old-queue isolation" },
+    "M5": { "status": "NOT_STARTED", "required": "D exact installed artifact and E independent Alpha admission" },
+    "M6": { "status": "NOT_STARTED", "required": "E actual pilot decision and final product matrix" }
+  },
+  "mainModelTasks": 0,
+  "nativeCompatibilityExpanded": false,
+  "reviewValueMeasured": false,
+  "routingReviewDefaultEnabled": false,
+  "limitations": [
+    "All new workflows use actual local HTTP/SQLite and controlled fixtures; no real model/native task was started",
+    "Decision recorded state is audit metadata, never execution authority or automatic memory/context effectiveness",
+    "C supersession lookup has a bounded scan; catalog state is not used as proof of complete effective knowledge",
+    "Priority is deterministic within a bounded work page, not a global optimum or learned quality estimate",
+    "Original services 5180-5184 and their private state/queues remain separate; new preview does not consolidate old history",
+    "No generic proposal execution HTTP, recovery reauthorization, new Driver, automatic acceptance or personal Alpha release admission",
+    "External B/E grant ledgers and actual pilot results are not certified or reset by this report"
+  ]
+}
