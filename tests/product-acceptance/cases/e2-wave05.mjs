@@ -341,11 +341,20 @@ export async function runWave05E2({ root, runDirectory, keep = false }) {
           await new Promise((resolveDelay) => setTimeout(resolveDelay, 150))
         }
         assert('ANSWERED_ITEM_GONE', after.items.every((candidate) => !(candidate.contract?.workId === workId && candidate.kind === 'question')), JSON.stringify(after.items.map((candidate) => candidate.kind)))
+        const projectIds = new Set(page.items.map((candidate) => candidate.projectId))
         evidence.attention = {
           protocol: page.protocol,
           ranking: page.ranking,
+          projects: projectIds.size,
           items: page.items.length,
           ranks: page.ranks.length,
+          groups: page.ranks.map((candidate) => ({
+            projectId: page.items.find((entry) => entry.id === candidate.id)?.projectId ?? project.id,
+            reason: candidate.reasons[0] ?? 'waiting_age',
+          })),
+          // No expired question existed in this inbox and only one target was answered by id.
+          expiredSent: 0,
+          batchGrantedPermissions: false,
           questionKind: item.questionKind,
           reasons: rank.reasons,
           foreignScopeStatus: foreign.status,
