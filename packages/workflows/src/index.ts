@@ -9,6 +9,7 @@ export {
 } from './ports.ts'
 export { recoveryTargetInventory, createRecoveryTargetInventoryReader } from '@personal-agent/storage'
 export type { RecoveryTargetInventory } from '@personal-agent/contracts'
+export { projectWorkEvidence, type WorkEvidenceProjection } from './evidence-projection.ts'
 export {
   WorkflowSnapshots, SnapshotError, readSnapshotManifest, snapshotFileBytes,
   type SnapshotArtifact, type SnapshotManifest, type SnapshotResult, type SnapshotVerification,

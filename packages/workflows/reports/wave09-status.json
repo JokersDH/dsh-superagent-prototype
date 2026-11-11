@@ -1,0 +1,52 @@
+{
+  "role": "A",
+  "package": ["packages/storage", "packages/workflows"],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "531c6b6",
+  "mergeCommit": "73754cc",
+  "checkpoint": "ab6c4e1",
+  "testedSourceCommit": "ab6c4e1",
+  "migrations": [],
+  "productSchema": 15,
+  "phases": [
+    {"phase":"A1","status":"PASS","scope":"package-local","evidence":["lists","packages/storage/src/target-inventory.ts","target-inventory tests"],"note":"readonly DB/WAL copy, table classification, stable digest, startupAvailable false"},
+    {"phase":"A2","status":"PASS","scope":"package-local","evidence":["target-inventory tests (7)"],"note":"missing/corrupt/unknown/future/older/symlink/privacy/WAL/residue; bytes unchanged; no migration"},
+    {"phase":"A3","status":"PASS","scope":"source/target read half","evidence":["recovery-target-consumer tests (3)","main binder/committer"],"note":"inert preparation, config drift refused, empty target complete, source facts/queue/marker unchanged; D materializer external"},
+    {"phase":"A4","status":"PASS","scope":"package-local","evidence":["snapshot tests","examples/d-snapshot-restore.mjs","reports/wave09-d-snapshot-recipe.json"],"note":"source snapshot plus target inventory comparison; no credentials/activation authority"},
+    {"phase":"A5","status":"PASS","scope":"package-local","evidence":["evidence-page tests","projectWorkEvidence","examples/evidence-consumer.mjs","reports/wave09-evidence-recipe.json"],"note":"windows, partial timing, cursor/project refusal, projection statuses"},
+    {"phase":"A6","status":"PASS","scope":"package-local","evidence":["reports/wave09-*.txt","reports/wave09-performance.json"],"note":"full regression and handoff"}
+  ],
+  "results": {
+    "storageTests": "75/75",
+    "workflowTests": "56/56",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "mainDecisionIntegration": "8/8 (read-only execution)",
+    "mainReviewTiming": "3/3 (read-only execution)",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "dSnapshotRecipe": "reports/wave09-d-snapshot-recipe.json",
+    "evidenceRecipe": "reports/wave09-evidence-recipe.json",
+    "benchmark": "reports/wave09-performance.json",
+    "modelTasks": 0,
+    "unknownModelSends": 0
+  },
+  "blockers": [
+    {"owner":"D","id":"target-materializer","detail":"RecoveryTargetMaterializer is not in this checkout; A inspects an explicit empty-DB fixture only."},
+    {"owner":"main","id":"activation-and-start","detail":"Activation commit/HTTP and start switching remain main-owned; startupAvailable is false everywhere."},
+    {"owner":"B/main","id":"writer-barrier","detail":"Physical old-writer proof remains separate; empty tables are not quiescence."},
+    {"owner":"main","id":"root-lock","detail":"Root lock remains main-owned; no new dependency from this wave."}
+  ],
+  "notTested": [
+    "target materialization/start and cross-filesystem atomicity",
+    "physical writer revalidation",
+    "native/Codex execution, installed-alpha, E acceptance, review pilot"
+  ],
+  "mainNextSteps": [
+    "consume recoveryTargetInventory on the actual D-prepared target before authorization",
+    "require source fact/receipt + target bytes/identity + current resources before start",
+    "use projectWorkEvidence for work evidence projections instead of table guesses",
+    "keep restore marker and target materialization in main/D",
+    "use the D recipe output for E's source/target comparison"
+  ]
+}

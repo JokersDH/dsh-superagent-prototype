@@ -1,0 +1,27 @@
+{
+  "protocol": "evidence-consumer/1",
+  "pages": [
+    {
+      "returned": 3,
+      "window": "caller_limit",
+      "hasMore": true
+    },
+    {
+      "returned": 3,
+      "window": "caller_limit",
+      "hasMore": true
+    },
+    {
+      "returned": 2,
+      "window": "complete",
+      "hasMore": false
+    }
+  ],
+  "crossProject": "undefined",
+  "projection": {
+    "accepted": "recorded",
+    "sourceMissing": "source_missing",
+    "notInWindow": "not_in_window",
+    "notAccepted": "not_accepted"
+  }
+}

@@ -42,6 +42,8 @@ ports.recoveryIntents.record({ commandId, actor, plan, expectedInspectionFingerp
 ports.recoveryIntents.getByPlan(planId) / getByCommand(commandId) / list({ sourceFingerprint, limit, cursor })
 ports.recoveryActivations.get(activationId) / forCommand(commandId) / put(intent) // shared 0027 facts
 ports.index.evidencePage({ workId, projectIds, limit, cursor }) // complete | caller_limit | storage_cap
+recoveryTargetInventory.inspect(stateRoot) // read-only RecoveryTargetInventoryReader
+projectWorkEvidence({ delivered, currentAccepted, window }) // recorded/source_missing/not_in_window/not_accepted
 ports.index.timeline({ workId, projectIds, limit })
 
 const snapshots = new WorkflowSnapshots(store)

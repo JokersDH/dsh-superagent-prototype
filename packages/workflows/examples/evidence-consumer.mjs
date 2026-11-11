@@ -7,7 +7,7 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { ProductStore } from '@personal-agent/storage'
-import { createWorkflowPorts } from '../src/index.ts'
+import { createWorkflowPorts, projectWorkEvidence } from '../src/index.ts'
 
 const root = mkdtempSync(join(tmpdir(), 'pa-evidence-consumer-'))
 const at = '2026-11-11T00:00:00.000Z'
@@ -41,6 +41,12 @@ try {
   let crossProject = 'allowed'
   try { ports.index.evidencePage({ workId: 'work-1', projectIds: ['project-2'] }) } catch { crossProject = 'rejected' }
   if (ports.index.evidencePage({ workId: 'work-1', projectIds: ['project-2'] }) === undefined) crossProject = 'undefined'
-  console.log(JSON.stringify({ protocol: 'evidence-consumer/1', pages, crossProject }, null, 2))
+  const projection = {
+    accepted: projectWorkEvidence({ delivered: true, currentAccepted: true, window: 'complete' }),
+    sourceMissing: projectWorkEvidence({ delivered: true, currentAccepted: false, window: 'complete' }),
+    notInWindow: projectWorkEvidence({ delivered: true, currentAccepted: false, window: 'storage_cap' }),
+    notAccepted: projectWorkEvidence({ delivered: false, currentAccepted: false, window: 'complete' }),
+  }
+  console.log(JSON.stringify({ protocol: 'evidence-consumer/1', pages, crossProject, projection }, null, 2))
   store.close()
 } finally { rmSync(root, { recursive: true, force: true }) }

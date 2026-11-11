@@ -1,0 +1,75 @@
+{
+  "protocol": "d-snapshot-recipe/1",
+  "status": "ok",
+  "manifest": {
+    "schema": 15,
+    "complete": true,
+    "artifacts": 1,
+    "families": [
+      [
+        "decisions",
+        1
+      ],
+      [
+        "legacy_decisions",
+        0
+      ],
+      [
+        "proposals",
+        0
+      ],
+      [
+        "project_settings",
+        0
+      ],
+      [
+        "contracts",
+        1
+      ],
+      [
+        "verifications",
+        0
+      ],
+      [
+        "acceptances",
+        0
+      ],
+      [
+        "outcomes",
+        1
+      ],
+      [
+        "reviews",
+        0
+      ],
+      [
+        "recovery_intents",
+        1
+      ],
+      [
+        "recovery_activations",
+        1
+      ]
+    ]
+  },
+  "restored": {
+    "verify": "ok",
+    "integrity": "ok",
+    "summary": {
+      "decisions": 1,
+      "outcomes": 1,
+      "settings": 0,
+      "recoveryIntents": 1,
+      "recoveryActivations": 1,
+      "activationTarget": "/tmp/target-state",
+      "intentAuthorization": "not_granted"
+    }
+  },
+  "targetInventory": {
+    "completeness": "complete",
+    "schema": 15,
+    "digest": "f8307c106ffc47e97a9418b654f9724334bc90178782737e0155106b03d2af67",
+    "businessRows": false,
+    "startupAvailable": false
+  }
+}

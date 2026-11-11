@@ -4,11 +4,11 @@
  * byte-copy it to a new directory (a restore stand-in), and re-verify/read the durable evidence.
  * Uses only public ports. No model, account, network or user service is touched.
  */
-import { cpSync, mkdtempSync, rmSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import Database from 'better-sqlite3'
-import { ProductStore, verifyDatabase } from '@personal-agent/storage'
+import { ProductStore, recoveryTargetInventory, verifyDatabase } from '@personal-agent/storage'
 import { createWorkflowPorts, WorkflowSnapshots } from '../src/index.ts'
 
 const root = mkdtempSync(join(tmpdir(), 'pa-d-snapshot-'))
@@ -72,6 +72,11 @@ try {
   const restored = join(root, 'restored')
   cpSync(snapshot, restored, { recursive: true })
   const verified = snapshots.verify(restored)
+  const targetRoot = join(root, 'target')
+  mkdirSync(targetRoot, { recursive: true, mode: 0o700 })
+  const target = new ProductStore({ path: join(targetRoot, 'state.sqlite') })
+  target.close()
+  const targetInventory = recoveryTargetInventory.inspect(targetRoot)
   const db = new Database(join(restored, 'product.sqlite'), { readonly: true, fileMustExist: true })
   let summary
   try {
@@ -91,6 +96,9 @@ try {
     manifest: { schema: created.manifest.database.productSchema, complete: created.manifest.complete,
       artifacts: created.manifest.artifacts.length, families: created.manifest.evidence.families.map(family => [family.name, family.count]) },
     restored: { verify: verified.status, integrity: verifyDatabase(join(restored, 'product.sqlite')).integrity, summary },
+    targetInventory: { completeness: targetInventory.completeness, schema: targetInventory.productSchema,
+      digest: targetInventory.databaseDigest, businessRows: targetInventory.issues.includes('business_rows_present'),
+      startupAvailable: targetInventory.startupAvailable },
   }, null, 2))
 } finally {
   store.close()

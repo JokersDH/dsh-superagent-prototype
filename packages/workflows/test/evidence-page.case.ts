@@ -5,7 +5,7 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { ProductStore } from '@personal-agent/storage'
-import { createWorkflowPorts, WorkflowConflict } from '../src/index.ts'
+import { createWorkflowPorts, projectWorkEvidence, WorkflowConflict } from '../src/index.ts'
 
 const at = '2026-11-11T00:00:00.000Z'
 const scope = { projectId: 'project-1', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
@@ -137,4 +137,13 @@ test('partial review timing is visible in pages, and a cursor from another work 
     store.close()
     rmSync(dir, { recursive: true, force: true })
   }
+})
+
+
+test('work evidence projection keeps source_missing separate from not_in_window', () => {
+  assert.equal(projectWorkEvidence({ delivered: true, currentAccepted: true, window: 'complete' }), 'recorded')
+  assert.equal(projectWorkEvidence({ delivered: false, currentAccepted: false, window: 'complete' }), 'not_accepted')
+  assert.equal(projectWorkEvidence({ delivered: true, currentAccepted: false, window: 'complete' }), 'source_missing')
+  assert.equal(projectWorkEvidence({ delivered: true, currentAccepted: false, window: 'caller_limit' }), 'not_in_window')
+  assert.equal(projectWorkEvidence({ delivered: true, currentAccepted: false, window: 'storage_cap' }), 'not_in_window')
 })
