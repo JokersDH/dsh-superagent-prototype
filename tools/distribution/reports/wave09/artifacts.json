@@ -25,14 +25,14 @@
     }
   },
   "target": {
-    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave09-target/wave09-target-b295504.tar.gz",
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave09-target-r2/wave09-target-6830e38.tar.gz",
     "digests": {
-      "tarSha256": "eaf05420491b3a7fba584584c24e02f4ba2c1ac48c86aa8f1cd377c9b4f3d364",
-      "tarBytes": 20040871
+      "tarSha256": "62861d93d064374f90f7b638e6473804aeaab516d0633fbb9ffa453924434ae9",
+      "tarBytes": 20042061
     },
-    "buildId": "5db9a0d41924a4c6",
+    "buildId": "f2390ffd1b87b79a",
     "source": {
-      "commit": "b29550421f5bc40aad5e5a5e1d25ffa02453f7a2",
+      "commit": "6830e38c73f50542c7d836e4d5e579bcf5d27fe2",
       "branch": "codex/g3-local-distribution",
       "dirty": false
     },
@@ -53,7 +53,8 @@
     "target": 15
   },
   "notes": [
-    "Baseline is the preserved wave-06 artifact; target is built from the pushed wave-09 D source b295504 (clean, schema 15), not the old schema13/5d4065b pair.",
+    "Baseline is the preserved wave-06 artifact; target is built from the pushed wave-09 D head 6830e38 (clean, schema 15), which contains the D1-D3 launcher/portability fixes.",
+    "The earlier wave-09 candidate b295504/frozen target is superseded and must not be consumed by E.",
     "E must use these exact tar+sha256+source/build/schema tuples; the checkout is not an installation input."
   ]
 }

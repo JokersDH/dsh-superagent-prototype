@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "50c3471",
   "mergedMain": "e4095b9",
-  "head": "b295504",
+  "head": "6830e38",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E admission. Model calls 0; user services 5180-5186/8796-8802 untouched.",
   "ownedPaths": [
@@ -75,7 +75,7 @@
     },
     "d5": {
       "status": "PASS",
-      "summary": "A wave-09 target was built from the pushed clean D head b295504 (source.dirty=false, 6658 files) and frozen: build 5db9a0d41924a4c6, schema 15, sha256 eaf05420491b3a7fba584584c24e02f4ba2c1ac48c86aa8f1cd377c9b4f3d364. Cold start, config roots, managed upgrade/recover/rollback, exact schema refusal (old binary refuses newer state; new build preflight state_schema_newer_than_binary) and post-upgrade data preservation are measured; it is not presented as the old schema13/5d4065b pair.",
+      "summary": "A wave-09 target was built from the pushed clean D head 6830e38 (source.dirty=false, 6658 files) and frozen: build f2390ffd1b87b79a, schema 15, sha256 62861d93d064374f90f7b638e6473804aeaab516d0633fbb9ffa453924434ae9. Cold start, config roots, managed upgrade/recover/rollback, exact schema refusal (old binary refuses newer state; new build preflight state_schema_newer_than_binary) and post-upgrade data preservation are measured; it is not presented as the old schema13/5d4065b pair.",
       "evidence": [
         "tools/distribution/reports/wave09/artifacts.json",
         "tools/distribution/reports/wave09/binary-upgrade.json",
@@ -101,10 +101,10 @@
       "schema": 13
     },
     "target": {
-      "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave09-target/wave09-target-b295504.tar.gz",
-      "sha256": "eaf05420491b3a7fba584584c24e02f4ba2c1ac48c86aa8f1cd377c9b4f3d364",
-      "buildId": "5db9a0d41924a4c6",
-      "commit": "b29550421f5bc40aad5e5a5e1d25ffa02453f7a2",
+      "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave09-target-r2/wave09-target-6830e38.tar.gz",
+      "sha256": "62861d93d064374f90f7b638e6473804aeaab516d0633fbb9ffa453924434ae9",
+      "buildId": "f2390ffd1b87b79a",
+      "commit": "6830e38c73f50542c7d836e4d5e579bcf5d27fe2",
       "schema": 15
     }
   },

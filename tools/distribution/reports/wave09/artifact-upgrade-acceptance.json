@@ -1,7 +1,7 @@
 {
   "case": "WAVE09-ARTIFACT-UPGRADE",
   "status": "PASS",
-  "startedAt": "2026-11-11T11:40:54.883Z",
+  "startedAt": "2026-11-11T11:49:03.553Z",
   "steps": [
     {
       "id": "extract-verify",
@@ -13,13 +13,13 @@
           "files": 6603
         },
         "target": {
-          "buildId": "5db9a0d41924a4c6",
-          "commit": "b29550421f5bc40aad5e5a5e1d25ffa02453f7a2",
+          "buildId": "f2390ffd1b87b79a",
+          "commit": "6830e38c73f50542c7d836e4d5e579bcf5d27fe2",
           "files": 6658
         },
         "tarSha256": {
           "baseline": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
-          "target": "eaf05420491b3a7fba584584c24e02f4ba2c1ac48c86aa8f1cd377c9b4f3d364"
+          "target": "62861d93d064374f90f7b638e6473804aeaab516d0633fbb9ffa453924434ae9"
         }
       }
     },
@@ -35,7 +35,7 @@
       "id": "baseline-start-workbench",
       "status": "PASS",
       "detail": {
-        "api": "http://127.0.0.1:55968",
+        "api": "http://127.0.0.1:56956",
         "workbench": true,
         "openFilesSampled": 50
       }
@@ -44,7 +44,7 @@
       "id": "pre-upgrade-backup",
       "status": "PASS",
       "detail": {
-        "sha256": "ab7be06ac57661ada5e7828a3097ff724fe694649b7dd89354bc6da05f6ac059",
+        "sha256": "bd8e556a18db361d86d4cc0b0f6b47b0356922ee530f68283352815001dcd018",
         "evidenceDigest": "e6a5a551209a7409021f3278fca7faf84951cfc6a1ec775123ec5bbc09ba383c"
       }
     },
@@ -63,10 +63,10 @@
       "status": "PASS",
       "detail": {
         "from": "7e8f6ce6fa2e2633",
-        "to": "5db9a0d41924a4c6",
+        "to": "f2390ffd1b87b79a",
         "stopped": "STOPPED",
-        "backup": "7775ecc2a669c112f07ee607db885603dd9c549dcc5b7f446b38f37c8cc4fbe3",
-        "instanceBuildId": "5db9a0d41924a4c6",
+        "backup": "fc546a15339e0e677677696640e7db6bf252e771df2380b72c3fe5039bf1d707",
+        "instanceBuildId": "f2390ffd1b87b79a",
         "evidenceDigest": "ab2f3b9b109f292372e2cf5c7cf886a86a935be6a47014e64dee72657ae30160",
         "evidenceUnchanged": false
       }
@@ -94,12 +94,12 @@
       "id": "reswitch-compatible-target",
       "status": "PASS",
       "detail": {
-        "pointer": "5db9a0d41924a4c6",
-        "instanceBuildId": "5db9a0d41924a4c6"
+        "pointer": "f2390ffd1b87b79a",
+        "instanceBuildId": "f2390ffd1b87b79a"
       }
     }
   ],
-  "finishedAt": "2026-11-11T11:41:15.641Z",
+  "finishedAt": "2026-11-11T11:49:25.606Z",
   "limitations": [
     "The two artifacts use different product schemas; the switch migrates the state, the older binary refuses it after a binary-only rollback, and only the compatible target can run on it again.",
     "It does not seed business rows (product commands are main-owned); post-upgrade row preservation is covered by D smoke with its own harness.",

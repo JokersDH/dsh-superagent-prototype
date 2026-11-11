@@ -7,10 +7,10 @@
 | 角色 | tar | sha256 | source | buildId | schema |
 | --- | --- | --- | --- | --- | --- |
 | baseline | `/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz` | `0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631` | `e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389` | `7e8f6ce6fa2e2633` | 13 |
-| target | `/Users/hh/Desktop/joker/pa-artifacts/wave09-target/wave09-target-b295504.tar.gz` | `eaf05420491b3a7fba584584c24e02f4ba2c1ac48c86aa8f1cd377c9b4f3d364` | `b29550421f5bc40aad5e5a1d25ffa02453f7a2`（clean，D wave-09） | `5db9a0d41924a4c6` | 15 |
+| target | `/Users/hh/Desktop/joker/pa-artifacts/wave09-target-r2/wave09-target-6830e38.tar.gz` | `62861d93d064374f90f7b638e6473804aeaab516d0633fbb9ffa453924434ae9` | `6830e38c73f50542c7d836e4d5e579bcf5d27fe2`（clean，D wave-09） | `f2390ffd1b87b79a` | 15 |
 
-平台/ABI：darwin/arm64、Node 24.21.x、SQLite ABI 137。tar字节数：baseline 19,966,910；target 20,040,871。
-完整事实见`tools/distribution/reports/wave09/artifacts.json`。**不得**把旧wave-08 schema13包（`cd0ecc29`/`9b75c2a`）当当前main/schema15产物。
+平台/ABI：darwin/arm64、Node 24.21.x、SQLite ABI 137。tar字节数：baseline 19,966,910；target 20,041,0xx（见artifacts.json）。
+完整事实见`tools/distribution/reports/wave09/artifacts.json`。**不得**把旧wave-08 schema13包（`cd0ecc29`/`9b75c2a`）或被本r2取代的`b295504`候选当当前main/schema15产物。
 
 ## 2. 实际命令
 
@@ -35,7 +35,7 @@ schema变化的托管验收（D已复跑9/9 PASS）：
 ```sh
 node tools/distribution/verify-upgrade-artifact.mjs \
   --baseline-tar <baseline tar> --target-tar <target tar> \
-  --baseline-sha256 0fe0…c7631 --target-sha256 eaf0…3d364 --schema-change --json
+  --baseline-sha256 0fe0…c7631 --target-sha256 6286…4ae9 --schema-change --json
 ```
 
 覆盖：解包校验→first-run/doctor→静态工作台→升级前备份→target首次启动迁移13→15→实例身份/doctor/journal→binary-only rollback指针回baseline→旧二进制对schema15**精确拒绝**（`MigrationIntegrityError: Applied migration <n> is not registered`，无instance记录）→重新切回兼容target并健康→仅本root清理。
