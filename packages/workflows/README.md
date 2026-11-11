@@ -35,6 +35,9 @@ ports.discovery.discoverPage()  // explicit internal all-discovery, never [] aut
 ports.assistant.decisions.get(id) / .put(record, expectedVersion)
 ports.assistant.proposals.get(id) / .put(record, expectedVersion)
 ports.assistant.legacyDecisions({ projectId }) // audit-only, never valid memory
+ports.routingEvidence.advice / reviews / outcomes  // immutable RoutingEvidencePort
+ports.routingEvidence.sources(attemptId, projectId) // read-only outcome source projection
+ports.index.timeline({ workId, projectIds, limit })
 
 const snapshots = new WorkflowSnapshots(store)
 await snapshots.create({ destination: '/private/new-snapshot-dir' })
@@ -96,6 +99,13 @@ snapshots.verify('/private/new-snapshot-dir')
 - `state.stateFacts()` returns schema/writer/instance/queue/artifact/question/proposal observations for
   D's preflight. A writer row/PID is not a trusted stop proof; D still needs the existing barrier
   receipts.
+- `routingEvidence` stores immutable RouteAdvice/ReviewEvidence/ExecutionOutcome records from the
+  shared contracts. Put is idempotent for an identical complete body and conflicts on changes;
+  project-scoped bounded lists support exact review-subject and execution-profile filters. The
+  `sources` extension returns existing binding/verification/acceptance/observation facts and leaves
+  usage `unknown` when absent. `timeline` links bounded single-work facts without causal claims, and
+  snapshots block if a review report artifact reference is absent from the backup registry. See
+  `docs/RFC-0003-routing-evidence.md`.
 
 **Main migration required:** current `ApplicationConversations` passes `projectIds: []` as an
 internal discovery convention. That convention is removed. Main must pass the configured allowed
@@ -107,7 +117,7 @@ writer failure.
 ## Migrations
 
 Storage appends v8 `conversation-catalog`, v9 `project-settings`, v10 `user-decisions`, v11
-`assistant-state`, v12 `conversation-members`; v1–v7 checksums and tables are untouched. A v7/v10
+`assistant-state`, v12 `conversation-members`, v13 `routing-evidence`; v1–v7 checksums and tables are untouched. A v7/v10
 database upgrades in one transaction, keeps existing messages/works/decision bodies, and backfills
 conversation rows, FTS, membership and assistant metadata absence. Unknown/upstream databases, drift,
 gaps and future schemas keep the existing fail-closed behavior.

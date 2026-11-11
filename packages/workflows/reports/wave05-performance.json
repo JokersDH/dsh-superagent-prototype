@@ -1,0 +1,28 @@
+{
+  "protocol": "routing-evidence-benchmark/1",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "dataset": {
+    "advice": 500,
+    "reviews": 100,
+    "outcomes": 200
+  },
+  "seed": {
+    "ms": 94.33
+  },
+  "advice": {
+    "ms": 0.3,
+    "returned": 50,
+    "nextCursor": true
+  },
+  "reviews": {
+    "ms": 0.25,
+    "returned": 50
+  },
+  "outcomes": {
+    "ms": 0.16,
+    "returned": 50
+  },
+  "scope": "temporary SQLite; no model/account/network/user project"
+}

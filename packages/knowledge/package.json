@@ -5,10 +5,20 @@
   "type": "module",
   "license": "MIT",
   "description": "Explicit user-decision governance over the shared UserDecision/KnowledgePage contracts: source-bound record, revoke, supersede, expiry and queryable effective knowledge. Production persistence is consumed through a public store port owned by storage.",
-  "engines": { "node": ">=24.21.0 <25" },
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
   "packageManager": "pnpm@11.7.0",
-  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
-  "files": ["dist", "README.md"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "test": "node --test test/*.case.ts",
@@ -22,6 +32,8 @@
     "@personal-agent/context": "workspace:*",
     "@personal-agent/proposals": "workspace:*",
     "@types/node": "24.10.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "@personal-agent/storage": "workspace:*",
+    "@personal-agent/workflows": "workspace:*"
   }
 }

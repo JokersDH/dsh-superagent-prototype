@@ -2,6 +2,14 @@ export { DecisionGovernance } from './governance.ts'
 export type { DecisionGovernanceOptions } from './governance.ts'
 export { InMemoryDecisionStore } from './in-memory-store.ts'
 export { AssistantDecisionStore } from './assistant-decision-store.ts'
+export { DecisionTransactionService } from './decision-transaction.ts'
+export type {
+  CommitDecisionInput,
+  DecisionSourceSyncPort,
+  DecisionTransactionOptions,
+  PreparedDecision,
+  PreparedRevocation,
+} from './decision-transaction.ts'
 export { StaticDecisionSourcePort } from './static-source.ts'
 export { DecisionConflict, DecisionError } from './errors.ts'
 export type { DecisionConflictCode, DecisionErrorCode } from './errors.ts'

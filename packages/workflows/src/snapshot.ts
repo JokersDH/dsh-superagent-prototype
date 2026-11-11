@@ -10,7 +10,7 @@ import {
 } from 'node:fs'
 import { dirname, join } from 'node:path'
 import {
-  backupDatabase, readArtifactRegistry, verifyDatabase, type ArtifactRegistryRow, type ProductStore,
+  backupDatabase, readArtifactRegistry, readRoutingArtifactRefs, verifyDatabase, type ArtifactRegistryRow, type ProductStore,
 } from '@personal-agent/storage'
 
 export class SnapshotError extends Error {}
@@ -26,6 +26,9 @@ export interface SnapshotManifest {
   createdAt: string
   database: { path: 'product.sqlite'; bytes: number; sha256: string; productSchema: number; integrity: string; foreignKeyViolations: number }
   artifacts: readonly SnapshotArtifact[]
+  /** Artifact IDs referenced by review evidence; they must be present in the backup registry. */
+  referencedArtifacts: readonly string[]
+  missingReferences: readonly string[]
   complete: boolean
   missing: readonly string[]
   corrupt: readonly string[]
@@ -95,6 +98,9 @@ export class WorkflowSnapshots {
     const databasePath = join(input.destination, 'product.sqlite')
     const backup = await backupDatabase(this.store.db, databasePath)
     const artifactRows = readArtifactRegistry(databasePath)
+    const registryIds = new Set(artifactRows.map(row => row.id))
+    const referencedArtifacts = readRoutingArtifactRefs(databasePath)
+    const missingReferences = referencedArtifacts.filter(id => !registryIds.has(id))
     const artifacts: SnapshotArtifact[] = []
     const missing: string[] = []
     const corrupt: string[] = []
@@ -117,13 +123,15 @@ export class WorkflowSnapshots {
       integrity: backup.integrity,
       foreignKeyViolations: backup.foreignKeyViolations,
     }
-    const complete = missing.length === 0 && corrupt.length === 0 &&
+    const complete = missing.length === 0 && corrupt.length === 0 && missingReferences.length === 0 &&
       database.integrity === 'ok' && database.foreignKeyViolations === 0
     const manifest: SnapshotManifest = {
       protocol: 'workflow-snapshot/1',
       createdAt: input.createdAt ?? new Date().toISOString(),
       database,
       artifacts,
+      referencedArtifacts,
+      missingReferences,
       complete,
       missing,
       corrupt,
@@ -138,7 +146,7 @@ export class WorkflowSnapshots {
       manifestPath,
       manifest,
       ...(complete ? {} : {
-        message: `Snapshot is incomplete: ${missing.length} missing, ${corrupt.length} corrupt artifact(s); database integrity ${database.integrity}.`,
+        message: `Snapshot is incomplete: ${missing.length} missing, ${corrupt.length} corrupt, ${missingReferences.length} missing referenced artifact(s); database integrity ${database.integrity}.`,
       }),
     }
   }

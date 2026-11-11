@@ -30,6 +30,17 @@ export interface ArtifactRegistryRow {
   createdAt: string
 }
 
+/** Report artifact references from routing evidence in a snapshot (for completeness checks). */
+export function readRoutingArtifactRefs(databasePath: string): string[] {
+  const db = new Database(databasePath, { readonly: true, fileMustExist: true })
+  try {
+    const exists = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'review_evidence'").get()
+    if (!exists) return []
+    return (db.prepare('SELECT DISTINCT report_artifact_ref FROM review_evidence ORDER BY report_artifact_ref').all() as Record<string, unknown>[])
+      .map(row => String(row.report_artifact_ref))
+  } finally { db.close() }
+}
+
 /** Reads the artifact registry from a database snapshot without opening the live store. */
 export function readArtifactRegistry(databasePath: string): ArtifactRegistryRow[] {
   const db = new Database(databasePath, { readonly: true, fileMustExist: true })

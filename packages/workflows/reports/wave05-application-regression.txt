@@ -1,0 +1,24 @@
+✔ mutating startup profile, check or principal objects cannot expand application authority (22.825416ms)
+✔ create is one real core lifecycle, persisted product records and queued effects; reopen replays the original receipt (17.056708ms)
+✔ unauthorized actor, changed command body and unregistered machine checks cannot grant execution (10.099375ms)
+✔ last receipt failure rolls core, product index, messages, events and queued execution back together (18.836458ms)
+✔ discussion never creates work; explicit anchored supplement reaches only its original work and invalidates the candidate (38.413667ms)
+✔ stop is logical first and schedules physical reconciliation; late chat cannot resume stopped work (23.617375ms)
+✔ revision preserves work identity and old records, revokes the previous grant and shows switching while its writer is live (18.590334ms)
+✔ pause uses CAS, changes only future dispatch and rejects stale revisions (17.8585ms)
+✔ retry action token fences the current assignment and old writers; successful retry invalidates the old token (15.284041ms)
+✔ only current trusted verification can complete a candidate; machine failure is not overridden by acceptance (17.874667ms)
+✔ stream exposes only public notifications, handles future cursor and closes while idle (10.112333ms)
+✔ scope expiry removes execution actions while deterministic stop remains available (11.525125ms)
+✔ catalog commands keep CAS, replay, actor and transaction boundaries across reopen (20.817083ms)
+✔ message-only legacy and mixed-project catalogs are scoped by all persisted messages (11.917333ms)
+✔ catalog paging is encrypted, query-bound, and keeps archived active work visible (25.974084ms)
+✔ placeholder title follows the first user message without overwriting an explicit rename (23.744291ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 342.691084

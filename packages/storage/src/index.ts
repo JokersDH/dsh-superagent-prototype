@@ -132,9 +132,10 @@ export {
   WorkflowRecords, ProductConversations, ProductProjects, ProductDecisions, WorkflowIndex, WorkflowConflict,
   type Conversation, type ConversationPage, type ConversationSearchHit, type ConversationSearchPage,
   type ProjectCheck, type ProjectEnvironment, type ProjectSettings, type ProjectVersion, type ProjectCurrent,
-  type DecisionRecord, type WorkIndexEntry, type SourceMessageMetadata, type WorkflowStateFacts,
+  type DecisionRecord, type WorkIndexEntry, type SourceMessageMetadata, type WorkflowStateFacts, type TimelineEntry,
 } from './workflows.ts'
 export { AssistantState, type LegacyDecisionRecord } from './assistant-state.ts'
+export { RoutingEvidence, type RoutingEvidenceSources } from './routing-evidence.ts'
 export { ArtifactStore, ensureArtifactRoot, artifactRoot, stateDirOf, type ArtifactRecord, type WrittenArtifact, type GcResult } from './artifacts.ts'
 export {
   RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict, AuthorityConflict,
@@ -145,7 +146,7 @@ export {
   type RuntimeObservationRow, type ResourceObservationRow, type ResourceObservationSummary,
   type AttemptObservationSummary, type WriterStatus,
 } from './observations.ts'
-export { backupDatabase, verifyDatabase, readArtifactRegistry, type ArtifactRegistryRow, type BackupResult, type VerifyResult } from './backup.ts'
+export { backupDatabase, verifyDatabase, readArtifactRegistry, readRoutingArtifactRefs, type ArtifactRegistryRow, type BackupResult, type VerifyResult } from './backup.ts'
 export { WriterLock, WriterLockHeld, type LockContent, type LockProbe, type LockRegistry, type LockVerdict } from './writer-lock.ts'
 export {
   MIGRATIONS, PRODUCT_SCHEMA_VERSION, applyMigrations, migrationChecksum, refuseUnknownDatabase,

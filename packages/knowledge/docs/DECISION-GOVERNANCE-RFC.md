@@ -69,6 +69,25 @@ questions, agent replies or UI display messages.
 5. Cross-project memory inference, automatic rule promotion and learning-effect claims are out of
    scope.
 
+## Wave-05 C1 — real CAS replay and synchronous prepare/commit
+
+Production `AssistantStatePort.put` requires `version === expectedVersion + 1`. The adapter now
+distinguishes:
+
+| Situation | Mapping |
+| --- | --- |
+| no existing record | `expectedVersion 0`, version 1 |
+| same current version retry | compare full body/source/actor except `recordedAt`; return current head, no write |
+| older version replay after revoke/supersede | verify historical audit body; return current head (revoked/superseded) |
+| legitimate successor | `expectedVersion = current.version`, version +1 |
+| changed body/source/actor | conflict, no overwrite |
+
+`DecisionTransactionService.prepare` is read-only; `commit`/`revoke` are synchronous and join main's
+UnitOfWork, re-checking actor/project/grant/scope, current source digest/conversation and
+supersession. Tests cover real temporary SQLite, two-time replay, reopen, receipt-failure rollback,
+revoked old replay, same-id body change and source invalidation. The independent main probe
+`review-persisted-assistant.mjs` is 7/7 PASS.
+
 ## Wave-04 C2 — persisted decision adapter and vertical
 
 `AssistantDecisionStore` maps the shared synchronous `AssistantStatePort.decisions` to the decision

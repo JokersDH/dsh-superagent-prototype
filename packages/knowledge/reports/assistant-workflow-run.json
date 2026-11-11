@@ -1,0 +1,31 @@
+{
+  "protocol": "wave06-assistant-workflow/1",
+  "generatedAt": "2026-11-11T02:32:18.461Z",
+  "result": {
+    "status": "PASS",
+    "modelCalls": 0,
+    "networkCalls": 0,
+    "sqlite": "real temporary SQLite via A ProductStore/AssistantStatePort",
+    "context": {
+      "selectedFiles": [
+        "README.md"
+      ],
+      "injectionFlags": 1,
+      "trust": "untrusted_data"
+    },
+    "proposal": {
+      "state": "confirmed",
+      "version": 2
+    },
+    "decision": {
+      "status": "active",
+      "version": 1
+    },
+    "revocation": {
+      "status": "revoked",
+      "version": 2
+    },
+    "oldReplayStatus": "revoked",
+    "reopenedStatus": "revoked"
+  }
+}

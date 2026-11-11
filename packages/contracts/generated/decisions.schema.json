@@ -1,0 +1,686 @@
+{
+  "$defs": {
+    "DecisionCommand": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "conversationId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "kind": {
+              "const": "record_decision",
+              "type": "string"
+            },
+            "projectId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "token": {
+              "maxLength": 50000,
+              "minLength": 16,
+              "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "projectId",
+            "conversationId",
+            "kind",
+            "token"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "commandId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "conversationId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "decisionId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "expectedVersion": {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            },
+            "kind": {
+              "const": "revoke_decision",
+              "type": "string"
+            },
+            "projectId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "commandId",
+            "projectId",
+            "conversationId",
+            "kind",
+            "decisionId",
+            "expectedVersion"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "DecisionPage": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "decisions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "record": {
+                "additionalProperties": false,
+                "properties": {
+                  "actorRef": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  },
+                  "conversationId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  },
+                  "decision": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "authorityRef": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      },
+                      "content": {
+                        "maxLength": 16384,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "id": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      },
+                      "revokedAt": {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                        "type": "string"
+                      },
+                      "scope": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "allowedPaths": {
+                            "items": {
+                              "maxLength": 1024,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "maxItems": 256,
+                            "minItems": 1,
+                            "readOnly": true,
+                            "type": "array"
+                          },
+                          "excludedPaths": {
+                            "items": {
+                              "maxLength": 1024,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "maxItems": 256,
+                            "readOnly": true,
+                            "type": "array"
+                          },
+                          "expiresAt": {
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                            "type": "string"
+                          },
+                          "externalActions": {
+                            "items": {
+                              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                              "type": "string"
+                            },
+                            "maxItems": 1024,
+                            "readOnly": true,
+                            "type": "array",
+                            "uniqueItems": true
+                          },
+                          "projectId": {
+                            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "projectId",
+                          "allowedPaths",
+                          "excludedPaths",
+                          "externalActions"
+                        ],
+                        "type": "object",
+                        "x-runtime-rules": [
+                          "project-relative-paths"
+                        ]
+                      },
+                      "supersedes": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      },
+                      "version": {
+                        "maximum": 9007199254740991,
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "version",
+                      "content",
+                      "scope",
+                      "authorityRef"
+                    ],
+                    "type": "object"
+                  },
+                  "recordedAt": {
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                    "type": "string"
+                  },
+                  "revokedBy": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  },
+                  "sourceMessageId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  },
+                  "sourceTextDigest": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "decision",
+                  "sourceMessageId",
+                  "sourceTextDigest",
+                  "conversationId",
+                  "actorRef",
+                  "recordedAt"
+                ],
+                "type": "object"
+              },
+              "sourceState": {
+                "enum": [
+                  "current",
+                  "missing",
+                  "stale",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "recorded",
+                  "revoked",
+                  "superseded",
+                  "expired"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "record",
+              "sourceState",
+              "status"
+            ],
+            "type": "object"
+          },
+          "maxItems": 50,
+          "readOnly": true,
+          "type": "array"
+        },
+        "hasMore": {
+          "type": "boolean"
+        },
+        "nextCursor": {
+          "pattern": "^[A-Za-z0-9_-]{1,2048}$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "decision-catalog/1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "decisions",
+        "hasMore"
+      ],
+      "type": "object"
+    },
+    "DecisionPrepare": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "maxLength": 16384,
+          "minLength": 1,
+          "type": "string"
+        },
+        "conversationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "scope": {
+          "additionalProperties": false,
+          "properties": {
+            "allowedPaths": {
+              "items": {
+                "maxLength": 1024,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 256,
+              "minItems": 1,
+              "readOnly": true,
+              "type": "array"
+            },
+            "excludedPaths": {
+              "items": {
+                "maxLength": 1024,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 256,
+              "readOnly": true,
+              "type": "array"
+            },
+            "expiresAt": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            },
+            "externalActions": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "maxItems": 1024,
+              "readOnly": true,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "projectId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "projectId",
+            "allowedPaths",
+            "excludedPaths",
+            "externalActions"
+          ],
+          "type": "object",
+          "x-runtime-rules": [
+            "project-relative-paths"
+          ]
+        },
+        "sourceMessageId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "supersedes": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "projectId",
+        "conversationId",
+        "sourceMessageId",
+        "content",
+        "scope"
+      ],
+      "type": "object"
+    },
+    "DecisionPreview": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "conversationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "decision": {
+          "additionalProperties": false,
+          "properties": {
+            "authorityRef": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "content": {
+              "maxLength": 16384,
+              "minLength": 1,
+              "type": "string"
+            },
+            "id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "revokedAt": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            },
+            "scope": {
+              "additionalProperties": false,
+              "properties": {
+                "allowedPaths": {
+                  "items": {
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 256,
+                  "minItems": 1,
+                  "readOnly": true,
+                  "type": "array"
+                },
+                "excludedPaths": {
+                  "items": {
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 256,
+                  "readOnly": true,
+                  "type": "array"
+                },
+                "expiresAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                "externalActions": {
+                  "items": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  },
+                  "maxItems": 1024,
+                  "readOnly": true,
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "projectId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "projectId",
+                "allowedPaths",
+                "excludedPaths",
+                "externalActions"
+              ],
+              "type": "object",
+              "x-runtime-rules": [
+                "project-relative-paths"
+              ]
+            },
+            "supersedes": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "version": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "id",
+            "version",
+            "content",
+            "scope",
+            "authorityRef"
+          ],
+          "type": "object"
+        },
+        "expiresAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "decision-preview/1",
+          "type": "string"
+        },
+        "sourceMessageId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "token": {
+          "maxLength": 50000,
+          "minLength": 16,
+          "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "decision",
+        "conversationId",
+        "sourceMessageId",
+        "expiresAt",
+        "token"
+      ],
+      "type": "object"
+    },
+    "DecisionQuery": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {
+          "pattern": "^[A-Za-z0-9_-]{1,2048}$",
+          "type": "string"
+        },
+        "limit": {
+          "maximum": 50,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "projectId"
+      ],
+      "type": "object"
+    },
+    "DecisionView": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "record": {
+          "additionalProperties": false,
+          "properties": {
+            "actorRef": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "conversationId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "decision": {
+              "additionalProperties": false,
+              "properties": {
+                "authorityRef": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "content": {
+                  "maxLength": 16384,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "id": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "revokedAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                "scope": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "allowedPaths": {
+                      "items": {
+                        "maxLength": 1024,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "maxItems": 256,
+                      "minItems": 1,
+                      "readOnly": true,
+                      "type": "array"
+                    },
+                    "excludedPaths": {
+                      "items": {
+                        "maxLength": 1024,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "maxItems": 256,
+                      "readOnly": true,
+                      "type": "array"
+                    },
+                    "expiresAt": {
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                      "type": "string"
+                    },
+                    "externalActions": {
+                      "items": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      },
+                      "maxItems": 1024,
+                      "readOnly": true,
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "projectId": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "projectId",
+                    "allowedPaths",
+                    "excludedPaths",
+                    "externalActions"
+                  ],
+                  "type": "object",
+                  "x-runtime-rules": [
+                    "project-relative-paths"
+                  ]
+                },
+                "supersedes": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "version": {
+                  "maximum": 9007199254740991,
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "version",
+                "content",
+                "scope",
+                "authorityRef"
+              ],
+              "type": "object"
+            },
+            "recordedAt": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            },
+            "revokedBy": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "sourceMessageId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "sourceTextDigest": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "decision",
+            "sourceMessageId",
+            "sourceTextDigest",
+            "conversationId",
+            "actorRef",
+            "recordedAt"
+          ],
+          "type": "object"
+        },
+        "sourceState": {
+          "enum": [
+            "current",
+            "missing",
+            "stale",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "recorded",
+            "revoked",
+            "superseded",
+            "expired"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "record",
+        "sourceState",
+        "status"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:decision-commands:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

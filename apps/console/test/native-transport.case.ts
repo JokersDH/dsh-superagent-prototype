@@ -185,3 +185,21 @@ test('missing attention support degrades, while authentication failures remain e
   globalThis.fetch = async () => new Response(JSON.stringify({ error: { code: 'auth_required', message: 'Sign in', retry: 'user_action' } }), { status: 401 })
   await assert.rejects(new HttpTransport().attention({}), error => error instanceof TransportError && error.code === 'auth_required')
 })
+
+test('decision transport keeps preview source and exact confirmation receipt identities', async t => {
+  const original = globalThis.fetch
+  t.after(() => { globalThis.fetch = original })
+  const scope = { projectId: 'project-one', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
+  const input = { projectId: scope.projectId, conversationId: 'conversation-one', sourceMessageId: 'message-one', content: 'Keep checks', scope }
+  const preview = { protocol: 'decision-preview/1', decision: { id: 'decision-one', version: 1, content: input.content, scope, authorityRef: 'local-user' },
+    conversationId: input.conversationId, sourceMessageId: input.sourceMessageId, expiresAt: '2026-11-11T00:05:00.000Z', token: 'a'.repeat(20) + '.' + 'b'.repeat(43) }
+  globalThis.fetch = async () => new Response(JSON.stringify(preview))
+  assert.deepEqual(await new HttpTransport().prepareDecision(input), preview)
+  globalThis.fetch = async () => new Response(JSON.stringify({ ...preview, sourceMessageId: 'other-message' }))
+  await assert.rejects(new HttpTransport().prepareDecision(input), error => error instanceof TransportError && error.code === 'schema_mismatch')
+  const command = { kind: 'record_decision' as const, commandId: 'decision-command', projectId: scope.projectId, conversationId: input.conversationId, token: preview.token }
+  globalThis.fetch = async (_url, init) => { assert.deepEqual(JSON.parse(String(init?.body)), command); return new Response(JSON.stringify({ commandId: command.commandId, status: 'recorded', seq: 1 })) }
+  assert.equal((await new HttpTransport().decisionCommand(command)).status, 'recorded')
+  globalThis.fetch = async () => new Response(JSON.stringify({ commandId: 'another-command', status: 'recorded', seq: 1 }))
+  await assert.rejects(new HttpTransport().decisionCommand(command), error => error instanceof TransportError && error.code === 'schema_mismatch')
+})
