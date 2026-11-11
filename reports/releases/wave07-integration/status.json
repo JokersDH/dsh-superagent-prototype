@@ -1,0 +1,32 @@
+{
+  "wave": "product-wave-07",
+  "status": "PARTIAL_IMPLEMENTED_NOT_RELEASE_ADMITTED",
+  "implementationSource": "627ef0d",
+  "integratedSourceCheckpoints": ["07a2649", "1b6d21c", "7323a47", "644751d", "da54758"],
+  "phases": {"M1": "PARTIAL", "M2": "PASS_BACKEND_SCOPE", "M3": "NOT_STARTED", "M4": "PARTIAL_SOURCE_INTENT_ONLY", "M5": "NOT_STARTED", "M6": "IN_PROGRESS"},
+  "implemented": ["opaque async-preflight/sync-commit application companion", "immutable recovery intent schemas and synchronous facts port", "source intent/receipt transactional consumer with real SQLite test adapter", "authenticated read-only proposal preview and explicit confirm/reject HTTP", "atomic original create/revise/decision effect with proposal revisions and both command receipts", "bounded long-Chinese signed confirmation and explicit effect entity references"],
+  "checks": [
+    {"command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/orchestrator-core --filter @personal-agent/effects --filter @personal-agent/storage --filter @personal-agent/workflows --filter @personal-agent/questions --filter @personal-agent/application --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/context --filter @personal-agent/routing build", "exitCode": 0, "source": "da54758"},
+    {"command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/application --filter @personal-agent/workflows --filter @personal-agent/storage --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing test", "exitCode": 0, "source": "da54758"},
+    {"command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/application typecheck", "exitCode": 0, "source": "da54758"},
+    {"command": "pnpm --filter @personal-agent/coordinator typecheck:product", "exitCode": 0, "source": "627ef0d"},
+    {"command": "pnpm --filter @personal-agent/coordinator typecheck:http", "exitCode": 0, "source": "627ef0d"},
+    {"command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/coordinator typecheck", "exitCode": 0, "source": "627ef0d"},
+    {"command": "pnpm --filter @personal-agent/contracts check:generated", "exitCode": 0, "source": "627ef0d"},
+    {"command": "node --test tests/integration/proposal-commands.case.mjs tests/integration/decision-commands.case.mjs tests/integration/recovery-intents.case.mjs tests/integration/application-http.case.mjs tests/integration/recovery-preflight.case.mjs tests/integration/recovery-startup.case.mjs", "exitCode": 0, "tests": 46, "source": "627ef0d"},
+    {"command": "node --test --test-timeout=30000 tests/integration/product-execution.case.mjs tests/integration/assistant-replies.case.mjs tests/integration/project-settings.case.mjs", "exitCode": 0, "tests": 33, "source": "627ef0d"},
+    {"command": "node --test --test-reporter=dot packages/contracts/test/*.case.ts", "exitCode": 0, "source": "627ef0d"}
+  ],
+  "residualFailures": [
+    {"owner": "C", "command": "node tools/bootstrap/probe-wave07-supersession.mjs", "exitCode": 1, "singleStatus": "superseded", "activeList": ["old-decision"], "automaticContextEnabled": false},
+    {"owner": "A", "candidate": "da5f62a", "layer": "independent_temporary_SQLite_port", "status": "FAIL_RECOVERY_PLAN_ROUNDTRIP", "exitCode": 1, "returnedProtocol": "recovery-intent/1", "nestedPlan": true, "activationFactsPortAligned": false, "integrated": false},
+    {"owner": "D", "candidate": "c9a0698", "layer": "actual_firstRun_fresh_temporary_roots", "status": "FAIL_FRESH_SOURCE_FIRST_RUN", "exitCode": 1, "error": "Cannot read properties of null (reading 'commit')", "integrated": false}
+  ],
+  "pending": ["A production activation fact adapter alignment and plan roundtrip repair", "D first-run source checkpoint repair/admission", "C supersession-list repair before context admission", "proposal UI and structured assistant suggestions", "recovery target preparation/activation and crash windows", "independent installed/native/value admission"],
+  "recoveryCommitAvailable": false,
+  "frozenRuntimeSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "nativeTurnStarts": 0,
+  "userServicesChanged": false,
+  "budgetChanges": 0,
+  "limitations": ["SQLite recovery port is a test adapter, not A production persistence", "Source receipt cannot authorize target startup", "Package tests do not override the independently reproduced A/C/D failures", "Proposal API does not mean proposal UI or automatic structured reasoning is implemented", "Earlier unbounded stream regression run was cancelled; bounded single-case diagnosis and complete 33-case rerun passed", "No new native, browser, installation or study-value admission"]
+}

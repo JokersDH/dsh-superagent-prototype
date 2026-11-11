@@ -1,7 +1,8 @@
 export { DecisionGovernance } from './governance.ts'
 export type { DecisionGovernanceOptions } from './governance.ts'
 export { InMemoryDecisionStore } from './in-memory-store.ts'
-export { AssistantDecisionStore } from './assistant-decision-store.ts'
+export { AssistantDecisionStore, DEFAULT_DECISION_SCAN } from './assistant-decision-store.ts'
+export type { DecisionScanLimits } from './assistant-decision-store.ts'
 export { DecisionTransactionService } from './decision-transaction.ts'
 export type {
   CommitDecisionInput,

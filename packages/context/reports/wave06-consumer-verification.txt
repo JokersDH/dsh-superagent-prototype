@@ -1,0 +1,119 @@
+# Agent C consumer/assistant closed-loop verification (2026-11-11T04:21:42Z)
+
+base: 6f6edde docs(wave06): record decision workflow and shared ranking admission evidence
+
+## @personal-agent/context
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ source descriptors are not trusted blindly: a port cannot smuggle a foreign project (0.073292ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 409.349334
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/proposals
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ the shared ReasonerProposal schema is the only accepted proposal shape (0.097875ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 130.52375
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/knowledge
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ stale/foreign/expired/old-version inputs are refused without effects (0.410375ms)
+ℹ tests 50
+ℹ suites 0
+ℹ pass 50
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 400.560375
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/routing
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ duplicate ids are refused instead of corrupting the public page (0.208958ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 44
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 321.356125
+### build
+$ tsc -p tsconfig.build.json
+
+## main decision HTTP integration (main-owned test)
+✔ revocation persists audit history, foreign scope is refused and old previews cannot resurrect it (10.312417ms)
+✔ source disappearance is visible in the catalog and project-bound continuation is enforced (11.226042ms)
+✔ model messages and native answer display cannot become reusable user decisions (6.770417ms)
+✔ HTTP identity/schema and recovery read-only guard apply to every decision mutation (23.7795ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 247.991709
+
+## real SQLite assistant probe
+  "status": "PASS_SQLITE_ASSISTANT_CONSUMER",
+      "id": "PENDING-PROPOSAL-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "CONFIRM-RECEIPT-FAILURE-ROLLS-BACK-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "CONFIRM-REOPEN-AND-REPLAY-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "DECISION-PROVENANCE-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "DECISION-DOMAIN-REPLAY-OVER-STORAGE",
+      "owner": "C",
+      "status": "PASS"
+      "id": "DECISION-REVOKE-AND-REOPEN-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "SOURCE-INVALIDATION-EXCLUDES-PERSISTED-DECISION",
+      "owner": "integration",
+      "status": "PASS"
+
+## wave-04 C admission
+  "status": "PASS_ADMISSION_PROBES",
+      "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+      "status": "PASS",
+      "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+      "status": "PASS",
+      "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+      "status": "PASS",
+
+## examples
+{"status":"PASS","modelCalls":0,"networkCalls":0,"sqlite":"real temporary SQLite via A ProductStore/AssistantStatePort","context":{"selectedFiles":["README.md"],"injectionFlags":1,"trust":"untrusted_data"},"proposal":{"state":"confirmed","version":2},"commandPlan":{"kind":"command","commandKind":"record_decision","commandId":"command-decision"},"decision":{"status":"active","version":1},"revocation":{"status":"revoked","version":2},"oldReplayStatus":"revoked","reopenedStatus":"revoked"}
+{"status":"PASS","modelCalls":0,"networkCalls":0,"sqlite":"real temporary SQLite via A ProductStore/AssistantStatePort"}
+{"status":"PASS","modelCalls":0,"networkCalls":0,"sqlite":"real temporary SQLite via createWorkflowPorts(store).routingEvidence","adviceReplay":true,"reviewReplay":true,"outcomeReplay":true,"reviewsByExactSubject":1,"outcomesByExactProfile":1,"otherProjectAdvice":0,"changedBodyRefused":true,"reviewState":"current","driftedState":"stale","driftedReason":"candidate_changed","executionAuthority":"none (advice/review/outcome are data only)"}

@@ -4,7 +4,7 @@
   "mainBaseCommit": "82db295",
   "mergeCommit": "690da7a",
   "stableCheckpoint": "c9dc567",
-  "updatedAt": "2026-11-11T02:00:00.000Z",
+  "updatedAt": "2026-11-11T06:30:00.000Z",
   "ownedPaths": [
     "packages/context",
     "packages/proposals",
@@ -48,55 +48,12 @@
       "note": "sharedAttentionRanker matches contracts AttentionRanker: complete permutation, shared reasons, sinceAt=null unknown, explicit deadlineAt only, expiresAt not a deadline, outgoing blockedWorkIds, stable explicit-now order, duplicate ids refused. Main-compat test validates AttentionPageSchema with a ProductAttention-shaped page."
     },
     {
-      "phase": "C3",
-      "status": "blocked_external",
-      "owner": "A",
-      "repro": "grep -rn 'routingEvidence\\|RoutingEvidence' packages/storage/src packages/workflows/src  # no result; createWorkflowPorts(store) has no routingEvidence",
-      "required": "A synchronous RoutingEvidencePort implementation (advice/reviews/outcomes put/get/list, same-body replay, changed-body conflict) on the shared UnitOfWork, plus main admission.",
-      "continue": "C5 consumer and C4 negatives use InMemoryRoutingEvidence with the identical interface; real SQL is not claimed."
-    },
-    {
-      "phase": "C4",
+      "phase": "C1b",
       "status": "passed",
       "evidence": [
-        "packages/knowledge/src/decision-transaction.ts",
-        "packages/knowledge/test/workflow.case.ts",
-        "packages/knowledge/examples/assistant-workflow.mjs",
-        "packages/knowledge/reports/assistant-workflow-run.json"
+        "packages/context/reports/wave06-c1-verification.txt"
       ],
-      "results": {
-        "knowledgeTests": "38/38",
-        "assistantWorkflowExample": "PASS (real temporary SQLite, context preview + proposal + decision + revocation, 0 model/network)"
-      },
-      "note": "Added prepareRevocation/commitRevocation. Web-flow boundary covers read-only prepare, proposal confirm/reject, decision record/revoke, old replay cannot resurrect, source loss/actor/scope/version/expiry negatives, context injection remains untrusted data, and prose cannot become an executable proposal."
-    },
-    {
-      "phase": "C5",
-      "status": "passed_package_local_pending_main",
-      "evidence": [
-        "packages/routing/test/main-compat.case.ts",
-        "packages/context/reports/wave06-full-verification.txt",
-        "packages/context/reports/wave06-assistant-final.json",
-        "packages/context/reports/wave06-admission-final.json"
-      ],
-      "results": {
-        "regression": "context 34/34, proposals 18/18, knowledge 38/38, routing 40/40",
-        "realSqliteProbe": "7/7 PASS",
-        "wave04Admission": "3/3 C PASS",
-        "staticDispatch": "PASS_DISPATCH_STATIC_ONLY (36 phases, acyclic, owners, budget unchanged)"
-      },
-      "note": "C proves shared page compatibility and decision transaction semantics with main-shaped fixtures. Actual HTTP/UI consumer is blocked on main wiring: createProductRuntime supports attentionRanker but demo.ts does not pass it, and no decision command HTTP route exists yet."
-    },
-    {
-      "phase": "C6",
-      "status": "passed",
-      "evidence": [
-        "packages/routing/README.md",
-        "packages/routing/docs/ROUTING-RFC.md",
-        "packages/knowledge/README.md",
-        "packages/context/reports/wave06-status.json"
-      ],
-      "note": "Documents stable exports, unknown-value policy, deadline/near window, outgoing blockedWorkIds direction, reason mapping, scale limit, main wiring recipe and remaining A/main dependencies."
+      "note": "Re-verified on 6f6edde merge; the three previously blocked dependencies (A routingEvidence, shared ranker wiring, decision HTTP) are now present in main source."
     }
   ],
   "commands": [
@@ -178,5 +135,19 @@
     "Publish createWorkflowPorts(store).routingEvidence with sync append-only put/get/list and same-body replay.",
     "Optionally add a persisted review-subject/current-candidate index for efficient invalidation queries."
   ],
-  "latestDeliveryCommit": "fc84127"
+  "latestDeliveryCommit": "fc84127",
+  "continuation": {
+    "mainMerge": "3315f09 (contains 6f6edde)",
+    "blockersCleared": [
+      "A routingEvidence is now on main (packages/storage/src/routing-evidence.ts, createWorkflowPorts(store).routingEvidence)",
+      "main defaults createProductRuntime to sharedAttentionRanker (6076d00)",
+      "decision record/revoke HTTP + ProductDecisions exist (f638fe0)"
+    ],
+    "todos": [
+      "C3 real-port routing evidence combination",
+      "C2 effectiveness scan bound fix",
+      "C4 proposal->business command plan",
+      "C5 negatives + reopen/rollback"
+    ]
+  }
 }
