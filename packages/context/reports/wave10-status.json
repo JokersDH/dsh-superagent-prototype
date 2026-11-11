@@ -4,8 +4,17 @@
   "mainBaseCommit": "f99ca39",
   "mergeCommit": "e80526b",
   "updatedAt": "2026-11-11T12:30:00.000Z",
-  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
-  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "ownedPaths": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge",
+    "packages/routing"
+  ],
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0,
+    "unknownSends": 0
+  },
   "supersedes": "wave09-status.json for wave-10 facts (historical files retained). The old 'main has no context HTTP' conclusion is obsolete: main now serves POST /v1/context/preview.",
   "phases": [
     {
@@ -17,7 +26,10 @@
         "packages/proposals/test/main-path.case.ts",
         "packages/proposals/README.md"
       ],
-      "results": { "helperOnlyProbe": "PASS_OPTIONAL_HELPER_IDENTITY_ONLY", "proposalTests": "26/26" },
+      "results": {
+        "helperOnlyProbe": "PASS_OPTIONAL_HELPER_IDENTITY_ONLY",
+        "proposalTests": "26/26"
+      },
       "note": "Removed the unconsumed confirmWithCommand helper (and ConfirmWithCommand types/plan_mismatch): the same effect id could return a different executable command. Main's planProposalCommand + commit + prepareCommand/commitPrepared remains the only confirmation authority; its command receipt covers the full command body. AssistantProposalService.commit now also requires the exact reviewed expectedDigest on confirmed replay. Tests migrated to the main path."
     },
     {
@@ -28,7 +40,9 @@
         "packages/context/test/scoped-adapters.case.ts",
         "packages/knowledge/test/main-context-consumer.case.ts"
       ],
-      "results": { "contextTests": "78/78" },
+      "results": {
+        "contextTests": "78/78"
+      },
       "note": "createScopedConversationProvider bounds paging and filters by project/conversation, trusted-user provenance, permission-display and system messages, and other-work anchors; coverage() exposes scanned/returned/complete plus exclusion counts. createPublishedArtifactProvider looks up only caller-verified published ids (metadata only, deduped, maxIds-bounded) and reports missing/complete. The old recommended recipe (global registry enumeration / unfiltered messages) is no longer used."
     },
     {
@@ -135,5 +149,6 @@
     "Re-run `probe-wave10-context.mjs <checkout> --helper-only` (PASS) and the wave-08/09 library probes; the wave-09 helper case is NOT_TESTED because the helper is intentionally removed.",
     "When wiring context-use, feed the selected preview through projectPromptData and keep it bounded/untrusted; record the per-message selection and re-validate sources before sending.",
     "Optionally replace the private preview adapters with the exported scoped adapters, then add an actual-export consumer before claiming new-adapter admission."
-  ]
+  ],
+  "latestDeliveryCommit": "1d86b66"
 }
