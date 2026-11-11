@@ -1,6 +1,6 @@
-✔ waiting includes offline time but overlapping tabs only count the union of observed review intervals (1.157666ms)
-✔ unobserved activity and clock regression are unknown rather than fabricated zeros (0.091542ms)
-✔ activity requires a current candidate, a local UI actor, and idempotent scoped receipts (31.505584ms)
+✔ waiting includes offline time but overlapping tabs only count the union of observed review intervals (1.175041ms)
+✔ unobserved activity and clock regression are unknown rather than fabricated zeros (0.145041ms)
+✔ activity requires a current candidate, a local UI actor, and idempotent scoped receipts (33.353041ms)
 ℹ tests 3
 ℹ suites 0
 ℹ pass 3
@@ -8,4 +8,4 @@
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 151.675625
+ℹ duration_ms 155.119959

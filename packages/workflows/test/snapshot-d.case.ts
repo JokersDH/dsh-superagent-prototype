@@ -86,6 +86,14 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
     assert.equal(result.manifest.incompatibleSchema, false)
     assert.equal(result.manifest.complete, true)
     assert.deepEqual([...result.manifest.referencedArtifacts].sort(), [data.report.id])
+    const families = new Map(result.manifest.evidence.families.map(family => [family.name, family]))
+    assert.equal(families.get('decisions')!.count, 1)
+    assert.equal(families.get('project_settings')!.count, 1)
+    assert.equal(families.get('contracts')!.count, 1)
+    assert.equal(families.get('verifications')!.count, 1)
+    assert.equal(families.get('outcomes')!.count, 1)
+    assert.equal(families.get('reviews')!.count, 1)
+    assert.equal(result.manifest.evidence.complete, true)
     for (const row of result.manifest.artifacts)
       assert.equal(readFileSync(join(snapshot, row.snapshotPath)).length, row.bytes)
 
@@ -167,6 +175,26 @@ test('missing file, changed bytes and a newer schema make the snapshot unusable'
     assert.equal(future.status, 'blocked')
     assert.match(String(future.message), /schema 99|not restorable/)
     assert.throws(() => new ProductStore({ path: futureDatabase }), /newer than this build|not registered|gap at version 99/)
+
+    // A row-level change with re-recorded database bytes is still caught by the evidence digest.
+    const tamperedDir = join(data.root, 'tampered-copy')
+    cpSync(snapshot, tamperedDir, { recursive: true })
+    const tamperedDatabase = join(tamperedDir, 'product.sqlite')
+    const tamperDb = new Database(tamperedDatabase)
+    try {
+      const row = tamperDb.prepare("SELECT value FROM user_decision_versions WHERE id = 'decision-1'").get() as { value: string }
+      const value = JSON.parse(row.value)
+      tamperDb.prepare("UPDATE user_decision_versions SET value = ? WHERE id = 'decision-1'")
+        .run(JSON.stringify({ ...value, content: 'A different decision body' }))
+    } finally { tamperDb.close() }
+    const tamperedManifestPath = join(tamperedDir, 'snapshot.json')
+    const tamperedManifest = JSON.parse(readFileSync(tamperedManifestPath, 'utf8'))
+    const tamperedBytes = readFileSync(tamperedDatabase)
+    tamperedManifest.database.sha256 = createHash('sha256').update(tamperedBytes).digest('hex')
+    tamperedManifest.database.bytes = tamperedBytes.byteLength
+    writeFileSync(tamperedManifestPath, JSON.stringify(tamperedManifest, null, 2))
+    const tampered = new WorkflowSnapshots(data.store).verify(tamperedDir)
+    assert.equal(tampered.status, 'blocked', 'reference evidence detects a row change even with a re-recorded DB hash')
   } finally {
     data.store.close()
     rmSync(data.root, { recursive: true, force: true })

@@ -10,8 +10,8 @@ import {
 } from 'node:fs'
 import { dirname, join } from 'node:path'
 import {
-  backupDatabase, PRODUCT_SCHEMA_VERSION, readArtifactRegistry, readRoutingArtifactRefs, verifyDatabase,
-  type ArtifactRegistryRow, type ProductStore,
+  backupDatabase, PRODUCT_SCHEMA_VERSION, readArtifactRegistry, readRoutingArtifactRefs, readWorkflowEvidence, verifyDatabase,
+  type ArtifactRegistryRow, type ProductStore, type WorkflowEvidenceSummary,
 } from '@personal-agent/storage'
 
 export class SnapshotError extends Error {}
@@ -32,6 +32,8 @@ export interface SnapshotManifest {
   missingReferences: readonly string[]
   /** A database newer than this build's migration registry cannot be restored by this build. */
   incompatibleSchema: boolean
+  /** Bounded identities+digests for durable decisions/settings/contracts/verification/outcomes/reviews. */
+  evidence: WorkflowEvidenceSummary
   complete: boolean
   missing: readonly string[]
   corrupt: readonly string[]
@@ -104,6 +106,7 @@ export class WorkflowSnapshots {
     const registryIds = new Set(artifactRows.map(row => row.id))
     const referencedArtifacts = readRoutingArtifactRefs(databasePath)
     const missingReferences = referencedArtifacts.filter(id => !registryIds.has(id))
+    const evidence = readWorkflowEvidence(databasePath)
     const artifacts: SnapshotArtifact[] = []
     const missing: string[] = []
     const corrupt: string[] = []
@@ -137,6 +140,7 @@ export class WorkflowSnapshots {
       referencedArtifacts,
       missingReferences,
       incompatibleSchema,
+      evidence,
       complete,
       missing,
       corrupt,
@@ -183,6 +187,7 @@ export class WorkflowSnapshots {
     const bytes = readFileSync(databasePath)
     const databaseSha = sha256(bytes)
     const verified = verifyDatabase(databasePath)
+    const evidence = readWorkflowEvidence(databasePath)
     const artifacts = manifest.artifacts.map(item => {
       const file = join(destination, item.snapshotPath)
       if (!existsSync(file)) return { id: item.id, status: 'missing' as const }
@@ -192,6 +197,7 @@ export class WorkflowSnapshots {
     const incompatibleSchema = verified.productSchema === null || verified.productSchema > PRODUCT_SCHEMA_VERSION ||
       manifest.database.productSchema > PRODUCT_SCHEMA_VERSION
     const ok = manifest.complete && !manifest.incompatibleSchema && !incompatibleSchema &&
+      manifest.evidence?.digest === evidence.digest &&
       databaseSha === manifest.database.sha256 &&
       verified.integrity === 'ok' && verified.foreignKeyViolations === 0 &&
       verified.productSchema === manifest.database.productSchema &&
