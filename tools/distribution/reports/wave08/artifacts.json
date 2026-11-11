@@ -1,0 +1,230 @@
+{
+  "protocol": "wave08-d-artifacts/1",
+  "createdAt": "2026-11-11T09:19:07.861Z",
+  "modelCalls": 0,
+  "note": "Baseline is the preserved wave-06 artifact; target is frozen from the clean pushed D head after merging main wave-08. Old wave-07 pair results are preserved under reports/wave07/.",
+  "baseline": {
+    "format": "pa-install",
+    "formatVersion": 1,
+    "buildId": "7e8f6ce6fa2e2633",
+    "source": {
+      "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "platform": {
+      "measured": [
+        "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+      ],
+      "node": ">=24.21.0 <25",
+      "abi": "137",
+      "sqlite": ">=3.53.4",
+      "notTested": [
+        "linux",
+        "win32",
+        "darwin-x64",
+        "other Node ABIs",
+        "other machines",
+        "personal native execution"
+      ]
+    },
+    "entrypoints": {
+      "launcher": "app/apps/launcher/bin/pa.mjs",
+      "coordinator": "app/apps/coordinator/product/demo.ts",
+      "runner": "app/apps/runner/src/index.ts",
+      "consoleEntry": "app/apps/console/dist/index.html",
+      "nativeBinding": "app/node_modules/better-sqlite3"
+    },
+    "files": {
+      "count": 6603,
+      "bytes": 66153443
+    },
+    "workspacePackages": 21,
+    "dependencies": [
+      {
+        "name": "@hono/node-server",
+        "version": "2.1.6",
+        "digest": "7b3e6fe2788990a5429445d18a4bd6004026de0dfc17b966a0b99de5399efe36"
+      },
+      {
+        "name": "better-sqlite3",
+        "version": "13.0.3",
+        "digest": "dbd29487bbb8240a462174e84c2f90f4957aae33effcd64e6ce64a6a9569c4bd"
+      },
+      {
+        "name": "hono",
+        "version": "4.13.17",
+        "digest": "f24eb4b092c6a551b310bf3058058de83d70c2195ae5b39e06a13dc21de4b7ca"
+      },
+      {
+        "name": "node-addon-api",
+        "version": "8.9.2",
+        "digest": "b7f1ddbc660da84defd8872584bb6798c9a73889c5f7c707c7ffdabe0fe5fdd9"
+      },
+      {
+        "name": "openai",
+        "version": "7.53.0",
+        "digest": "0dab139b8bdae6597686f017e599d98fec8ab000f3a438564ca103e72938270e"
+      },
+      {
+        "name": "semver",
+        "version": "7.8.5",
+        "digest": "1da6acb3d51bee5c5f4e47332d62a9d66ab6dfdb7e2cc57a73f2b2db076a3dec"
+      },
+      {
+        "name": "yaml",
+        "version": "2.9.1",
+        "digest": "aaece76a1bebfd7d83bd1d5414fca5f2ca07ff962250cb097746f5683a38c911"
+      },
+      {
+        "name": "zod",
+        "version": "4.4.3",
+        "digest": "4323cf2a4d58d6e9468892ff49f8105ef1f9a905f8b2f7f9345c23938236e2c7"
+      }
+    ],
+    "producer": {
+      "product": "dsh-superagent",
+      "version": "0.1.0",
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "productSchema": 13,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "digests": {
+      "installManifestSha256": "09041204af46dca6810a070b4f2cba9895f07e2a56776ec8472af96ef785b548",
+      "releaseManifestSha256": "749ed6b304e6cfe782ae50987b94fa29cfa49c85e3d884b126485f546b8eb87e",
+      "closureDigest": "55069a730c6954261da765fc5dceadf78df2697f3348d4a99f64782e630e2966",
+      "tarSha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "tarBytes": 19911757
+    },
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz"
+  },
+  "target": {
+    "format": "pa-install",
+    "formatVersion": 1,
+    "buildId": "cd0ecc29d97d5c41",
+    "source": {
+      "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "platform": {
+      "measured": [
+        "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+      ],
+      "node": ">=24.21.0 <25",
+      "abi": "137",
+      "sqlite": ">=3.53.4",
+      "notTested": [
+        "linux",
+        "win32",
+        "darwin-x64",
+        "other Node ABIs",
+        "other machines",
+        "personal native execution"
+      ]
+    },
+    "entrypoints": {
+      "launcher": "app/apps/launcher/bin/pa.mjs",
+      "coordinator": "app/apps/coordinator/product/demo.ts",
+      "runner": "app/apps/runner/src/index.ts",
+      "consoleEntry": "app/apps/console/dist/index.html",
+      "nativeBinding": "app/node_modules/better-sqlite3"
+    },
+    "files": {
+      "count": 6630,
+      "bytes": 66371512
+    },
+    "workspacePackages": 21,
+    "dependencies": [
+      {
+        "name": "@hono/node-server",
+        "version": "2.1.6",
+        "digest": "7b3e6fe2788990a5429445d18a4bd6004026de0dfc17b966a0b99de5399efe36"
+      },
+      {
+        "name": "better-sqlite3",
+        "version": "13.0.3",
+        "digest": "dbd29487bbb8240a462174e84c2f90f4957aae33effcd64e6ce64a6a9569c4bd"
+      },
+      {
+        "name": "hono",
+        "version": "4.13.17",
+        "digest": "f24eb4b092c6a551b310bf3058058de83d70c2195ae5b39e06a13dc21de4b7ca"
+      },
+      {
+        "name": "node-addon-api",
+        "version": "8.9.2",
+        "digest": "b7f1ddbc660da84defd8872584bb6798c9a73889c5f7c707c7ffdabe0fe5fdd9"
+      },
+      {
+        "name": "openai",
+        "version": "7.53.0",
+        "digest": "0dab139b8bdae6597686f017e599d98fec8ab000f3a438564ca103e72938270e"
+      },
+      {
+        "name": "semver",
+        "version": "7.8.5",
+        "digest": "1da6acb3d51bee5c5f4e47332d62a9d66ab6dfdb7e2cc57a73f2b2db076a3dec"
+      },
+      {
+        "name": "yaml",
+        "version": "2.9.1",
+        "digest": "aaece76a1bebfd7d83bd1d5414fca5f2ca07ff962250cb097746f5683a38c911"
+      },
+      {
+        "name": "zod",
+        "version": "4.4.3",
+        "digest": "4323cf2a4d58d6e9468892ff49f8105ef1f9a905f8b2f7f9345c23938236e2c7"
+      }
+    ],
+    "producer": {
+      "product": "dsh-superagent",
+      "version": "0.1.0",
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "productSchema": 13,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "digests": {
+      "installManifestSha256": "0228c31f9e36fd3095a2a2d2c039388816531e002903364a0947932482dfdf17",
+      "releaseManifestSha256": "8dc02c156982ff4497c6559a119ceced2f38e511c7ebd076ae2bdac173129449",
+      "closureDigest": "bd7fe346989a3cd7381a4ddf51b1224ca3bc1108eebeec31858388baace26f2a",
+      "tarSha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42",
+      "tarBytes": 19966910
+    },
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave08-target/wave08-target-cd0ecc29.tar.gz"
+  },
+  "schema": {
+    "baseline": 13,
+    "target": 13,
+    "range": "schema 13 for both; the schema-12 control build is used only for exact refusal evidence, not as an upgrade source"
+  },
+  "differences": {
+    "buildId": [
+      "7e8f6ce6fa2e2633",
+      "cd0ecc29d97d5c41"
+    ],
+    "sourceCommit": [
+      "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e"
+    ],
+    "artifactsTargetMinusBaseline": 27
+  },
+  "commands": {
+    "buildBaseline": "wave-06 frozen artifact",
+    "buildTarget": "node tools/distribution/build.mjs --install-root . --config-root <dir> --output <install> at 9b75c2a (source.dirty=false)",
+    "freeze": "node tools/distribution/freeze-install.mjs --install <install> --artifact-dir <dir> --name <name>"
+  },
+  "limitations": [
+    "No artifact is committed to Git; tars live under /Users/hh/Desktop/joker/pa-artifacts/.",
+    "Darwin/arm64 + Node 24.21.x + SQLite ABI 137 only.",
+    "Both wave-08 artifacts are schema 13; a schema-changing pair is not tested, only exact refusal of a newer/older schema."
+  ]
+}

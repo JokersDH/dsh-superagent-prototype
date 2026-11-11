@@ -4,10 +4,10 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "eca5674",
   "mergedMain": "5d4065b",
-  "head": "bb36e24",
-  "artifactSourceCommit": null,
-  "status": "CHECKPOINT_D1",
-  "scopeNote": "Package-scoped candidate. Not main/E admission. Model calls 0; user services untouched.",
+  "head": "9b75c2a",
+  "artifactSourceCommit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate. Not main/E admission. Model calls 0. User services 5180-5185/8796-8801 untouched.",
   "ownedPaths": [
     "apps/launcher/",
     "tools/distribution/",
@@ -18,44 +18,123 @@
     "used": 0,
     "unknownNativeSends": 0
   },
+  "commits": {
+    "wave07Final": "eca5674",
+    "wave08D1D2": "2dc450f",
+    "wave08D2D5Source": "9b75c2a",
+    "artifactSource": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e"
+  },
   "phases": {
     "d1": {
       "status": "PASS",
-      "summary": "Upgrade/recover/rollback now establish the recorded mode+access and refuse instead of guessing; start flags preserve personal vs fixture; verifyInstance asserts the live health mode against the record; an unverifiable but alive pid blocks upgrade, recover and rollback consistently. Unit tests + 52-step smoke pass.",
+      "summary": "Upgrade/recover/rollback establish the recorded mode+access; start flags never force fixture; instance record and live health must both report the same mode (verifyInstance runtime_mode); an unverifiable live pid blocks upgrade, recover and rollback. 3 identity unit tests + 14-section binary recipe assert the consumer, not argv.",
       "evidence": [
         "apps/launcher/test/upgrade-identity.case.mjs",
-        "tools/distribution/reports/wave08/zero-model-smoke.json"
+        "tools/distribution/reports/wave08/binary-upgrade.json"
       ]
     },
     "d2": {
-      "status": "PARTIAL_IMPLEMENTED",
-      "summary": "Failed targets go through stopOwnedTarget: only the spawn root tree plus the recorded instance whose command names this operation roots are terminated; pointer/record recovery only happens after the tree is proven stopped, otherwise the journal records target_stop_unproven and nothing is reverted or restarted. Fault injection (target_unhealthy, crash_after_switch) covers two windows; the remaining windows are still being closed."
+      "status": "PASS",
+      "summary": "stopOwnedTarget terminates only this operation spawn tree/recorded instance whose command names the target install or this roots; pointer/record recovery happens only after the stop is proven, otherwise target_stop_unproven keeps the indeterminate state and recovery refuses. Windows covered: unhealthy target, crash after switch, crash after stop (restarts previous), health-ok-record-missing, stop-unproven, duplicate, running switch.",
+      "evidence": [
+        "tools/distribution/reports/wave08/binary-upgrade.json"
+      ],
+      "sections": {
+        "E4": "PASS",
+        "E5": "PASS",
+        "E7": "PASS",
+        "E8": "PASS",
+        "E9": "PASS"
+      }
     },
     "d3": {
-      "status": "IN_PROGRESS",
-      "summary": "Exact schema evidence replaces the old release_artifact_missing result: the frozen schema-12 build now runs with its own valid release and refuses a schema-13 state with the storage MigrationIntegrityError; the new build adds a pre-spawn state_schema_newer_than_binary refusal. Full re-run needs the wave-08 target artifact."
+      "status": "PASS_WITH_SCHEMA13_ONLY",
+      "summary": "Exact schema evidence: the frozen schema-12 build runs with its own valid release and refuses a schema-13 state with the storage MigrationIntegrityError (no record/listener/byte change); the new build refuses a future schema with state_schema_newer_than_binary before spawn; the old build bundle refusal is recorded as manifest_invalid format-layer, not relabelled schema_unsupported. Post-upgrade data survives a binary-only rollback; explicit restore is the only data-return path.",
+      "evidence": [
+        "tools/distribution/reports/wave08/binary-upgrade.json"
+      ]
     },
     "d4": {
-      "status": "NOT_STARTED"
+      "status": "PASS",
+      "summary": "Target built from the clean pushed D head that already merged main wave-08 (5d4065b): build cd0ecc29d97d5c41, source 9b75c2a, source.dirty=false, 6630 files, schema 13. Baseline remains the preserved wave-06 artifact. Explicit tar/buildId/source/schema/deps/closure recorded; tag-only rebuild not used.",
+      "evidence": [
+        "tools/distribution/reports/wave08/artifacts.json"
+      ]
     },
     "d5": {
-      "status": "NOT_STARTED"
+      "status": "PARTIAL_BLOCKED_MAIN",
+      "summary": "main published read-only inspect/prepare and GET /v1/recovery/activations/:id audit (always not_granted/startupAvailable=false); target commit/start is still unimplemented. D consumes the audit as a refusal only (a locally claimed startup permit is audit_authority_unsupported), keeps a local precondition gate and reports upgrade journal state in doctor with the single next action. Recovery never starts a target from source receipts or a descriptor.",
+      "evidence": [
+        "apps/launcher/lib/recovery-activation.mjs",
+        "apps/launcher/test/recovery-activation.case.mjs"
+      ],
+      "blockedBy": "main recovery target commit/start"
     },
     "d6": {
-      "status": "NOT_STARTED"
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Two tars frozen with hash/source/build/schema/deps/closure; E recipe published and re-run here from the tars (7/7 PASS: extract, first-run/doctor, workbench, backup, switch, identity/doctor/journal, binary-only rollback with unchanged evidence). D failure-window recipe 14/14 PASS. Old wave-07 evidence preserved. E independent acceptance pending.",
+      "evidence": [
+        "tools/distribution/reports/wave08/artifacts.json",
+        "tools/distribution/reports/wave08/artifact-upgrade-acceptance.json",
+        "tools/distribution/recipes/wave08-e-personal-upgrade.zh-CN.md"
+      ]
+    }
+  },
+  "artifacts": {
+    "baseline": {
+      "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "bytes": 19911757,
+      "buildId": "7e8f6ce6fa2e2633",
+      "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "schema": 13
+    },
+    "target": {
+      "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave08-target/wave08-target-cd0ecc29.tar.gz",
+      "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42",
+      "bytes": 19966910,
+      "buildId": "cd0ecc29d97d5c41",
+      "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+      "schema": 13
     }
   },
   "testLayers": {
     "launcher": {
       "command": "node --test apps/launcher/test/*.case.mjs",
-      "tests": 52,
+      "tests": 53,
       "status": "PASS"
     },
     "smoke": {
       "command": "node tools/distribution/smoke.mjs",
       "steps": 52,
       "status": "PASS",
-      "durationMs": 58642
+      "durationMs": 42360
+    },
+    "binaryUpgrade": {
+      "command": "node tools/distribution/smoke-binary-upgrade.mjs --baseline <wave06-alpha2 install> --target <wave08-target install>",
+      "sections": 14,
+      "status": "PASS",
+      "sectionStatus": {
+        "installs": "PASS",
+        "A-baseline-state": "PASS",
+        "B-binary-switch": "PASS",
+        "C-post-upgrade-data-protection": "PASS",
+        "D-exact-schema-refusal": "PASS",
+        "E1-tampered-target-refused": "PASS",
+        "E2-running-switch-refused": "PASS",
+        "E3-unverified-instance-blocked": "PASS",
+        "E4-unhealthy-target-reverted": "PASS",
+        "E5-interrupted-switch-recovered": "PASS",
+        "E6-duplicate-refused": "PASS",
+        "E7-stop-unproven-kept": "PASS",
+        "E8-crash-after-stop-restarts-previous": "PASS",
+        "E9-record-missing-reverted": "PASS"
+      }
+    },
+    "artifactUpgrade": {
+      "command": "node tools/distribution/verify-upgrade-artifact.mjs --baseline-tar ... --target-tar ... --baseline-sha256 ... --target-sha256 ...",
+      "steps": 7,
+      "status": "PASS"
     }
   },
   "blockers": [
@@ -63,16 +142,52 @@
       "id": "MAIN-RECOVERY-TARGET-ACTIVATION",
       "owner": "main",
       "status": "PLANNED",
-      "summary": "Target activation/commit route still unpublished; D keeps inspect/prepare + local precondition gate."
+      "summary": "Audit is observational only; target commit/start and a committed receipt are unpublished, so D5 stays partial."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E must run the published recipe against the two wave-08 tars from its own root; D does not edit E assertions."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Mode preservation is verified on fixture instances; a real personal billed execution was not started (zero-model rule)."
+    },
+    {
+      "id": "SCHEMA-CHANGE-UPGRADE",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Both artifacts are schema 13; only exact refusal of newer/older schema is measured."
     }
   ],
-  "evidence": [
-    "tools/distribution/reports/wave08/zero-model-smoke.json",
-    "apps/launcher/test/upgrade-identity.case.mjs"
+  "notTested": [
+    "cross-machine / other platform or ABI",
+    "personal native end-to-end or billed execution",
+    "schema-changing binary pair",
+    "SIGKILL at every individual step",
+    "E independent acceptance",
+    "recovery target commit/start (main)"
   ],
-  "limitations": [
-    "darwin/arm64 + Node 24.21.x + SQLite ABI 137 only",
-    "wave-08 target artifact not built yet",
-    "recovery target activation pending main"
+  "eConsumption": [
+    "Use the two tars and sha256 in tools/distribution/reports/wave08/artifacts.json; do not mix the author checkout or main new source.",
+    "Run node tools/distribution/verify-upgrade-artifact.mjs with both tars/sha256 from a fresh root; expect 7/7 PASS.",
+    "Run node tools/distribution/smoke-binary-upgrade.mjs with both install dirs (or --baseline-tar) for the 14-section failure windows.",
+    "Do not relax digest checks, delete markers, hand-edit release.json, or claim schema migration/personal billed/native/recovery-target from these results."
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave08/artifacts.json",
+    "tools/distribution/reports/wave08/zero-model-smoke.json",
+    "tools/distribution/reports/wave08/binary-upgrade.json",
+    "tools/distribution/reports/wave08/artifact-upgrade-acceptance.json",
+    "tools/distribution/recipes/wave08-e-personal-upgrade.zh-CN.md",
+    "docs/rfcs/WP-16/0031-wave-08-d-personal-upgrade.zh-CN.md"
+  ],
+  "preservedHistory": [
+    "wave-05/06/07 evidence and budgets unchanged",
+    "no shared contract/migration/root lock/other-agent tests modified",
+    "no restore marker deleted, no force switch, no silent data rollback"
   ]
 }

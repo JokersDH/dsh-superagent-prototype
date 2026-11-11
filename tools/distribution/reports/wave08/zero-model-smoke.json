@@ -1,24 +1,24 @@
 {
   "case": "DIST-TRIAL-01",
   "status": "PASS",
-  "startedAt": "2026-11-11T08:40:04.177Z",
+  "startedAt": "2026-11-11T09:12:17.051Z",
   "steps": [
     {
       "id": "build",
       "status": "PASS",
       "detail": {
-        "buildId": "fc6e2003fc48c9c5",
+        "buildId": "5deb3d7b2c00ff65",
         "artifacts": {
           "count": 787,
-          "bytes": 7585531
+          "bytes": 7590053
         },
         "dependencies": {
           "count": 8,
           "files": 5803
         },
         "staged": {
-          "path": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Cf4iq0/stage-build",
-          "installManifest": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Cf4iq0/stage-build/install.json"
+          "path": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-18Zplc/stage-build",
+          "installManifest": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-18Zplc/stage-build/install.json"
         }
       }
     },
@@ -26,7 +26,7 @@
       "id": "stage-closure",
       "status": "PASS",
       "detail": {
-        "root": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Cf4iq0/stage-relocated",
+        "root": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-18Zplc/stage-relocated",
         "files": 6630,
         "dependencies": 8,
         "workspacePackages": 21,
@@ -53,7 +53,7 @@
             "personal native execution"
           ]
         },
-        "buildId": "fc6e2003fc48c9c5"
+        "buildId": "5deb3d7b2c00ff65"
       }
     },
     {
@@ -73,8 +73,8 @@
       "status": "PASS",
       "detail": {
         "adopted": "initialized_from_install",
-        "buildId": "fc6e2003fc48c9c5",
-        "releaseDigest": "263330ebda6cb5050551a662bb5b480e8faf969e086516f507e0100efbf58bd3",
+        "buildId": "5deb3d7b2c00ff65",
+        "releaseDigest": "5cef981429e878b51521ee0832ca10b8d14ff7bb1e9c1e670fe9fc80336d5044",
         "binding": "PASS",
         "foreignInstall": "install_release_missing"
       }
@@ -100,14 +100,14 @@
       "id": "static-console",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:60709"
+        "url": "http://127.0.0.1:51687"
       }
     },
     {
       "id": "instance-marker",
       "status": "PASS",
       "detail": {
-        "buildId": "fc6e2003fc48c9c5"
+        "buildId": "5deb3d7b2c00ff65"
       }
     },
     {
@@ -148,7 +148,7 @@
       "id": "status-running",
       "status": "PASS",
       "detail": {
-        "pid": 64942,
+        "pid": 34984,
         "checks": 15
       }
     },
@@ -156,14 +156,14 @@
       "id": "reuse-verified-instance",
       "status": "PASS",
       "detail": {
-        "pid": 64942
+        "pid": 34984
       }
     },
     {
       "id": "completed-delivery-fixture",
       "status": "PASS",
       "detail": {
-        "workId": "275bb30ca8081c1085ed100bded65e03",
+        "workId": "018cb58319b6f2d61fde3ec493e9f059",
         "artifacts": 4,
         "bytes": 1756,
         "vendorCalls": 0
@@ -173,7 +173,7 @@
       "id": "backup-live",
       "status": "PASS",
       "detail": {
-        "archiveSha256": "990b0ce05f6b32860955d708dcf35c26c8e17bcd18368c6623a175a122206c22",
+        "archiveSha256": "e013ce99d974db2f53bf89251dd531555131825685d2b0962e1f618be38accad",
         "counts": {
           "entries": 21,
           "artifacts": 20,
@@ -185,7 +185,7 @@
           "eventSeq": 51
         },
         "evidence": {
-          "digest": "ca305c57883df267933fbbed15328ec6445fc5f40c6c4ffe0961876cd3f01adc",
+          "digest": "2be376d040e390e3295e058b4ccac895adc7db5d7bc2ab76c4e3d1e191a97925",
           "counts": {
             "projects": 0,
             "works": 0,
@@ -206,7 +206,7 @@
       "id": "verify-backup-live",
       "status": "PASS",
       "detail": {
-        "manifestDigest": "38078e92aae7ffd8a197e898f554344d8947fd2d724c6c32c5759dc7c2758657",
+        "manifestDigest": "84d3b8663d8668339f46e5ba95116acfc5f65624a62a1b8c00ea76b25742a324",
         "entries": 21
       }
     },
@@ -246,22 +246,22 @@
       "id": "stop-primary",
       "status": "PASS",
       "detail": {
-        "stopMs": 252
+        "stopMs": 250
       }
     },
     {
       "id": "verify-backup-offline",
       "status": "PASS",
       "detail": {
-        "manifestDigest": "38078e92aae7ffd8a197e898f554344d8947fd2d724c6c32c5759dc7c2758657"
+        "manifestDigest": "84d3b8663d8668339f46e5ba95116acfc5f65624a62a1b8c00ea76b25742a324"
       }
     },
     {
       "id": "orphan-record-recovery",
       "status": "PASS",
       "detail": {
-        "killedLauncherPid": 67209,
-        "stoppedApiPid": 67218,
+        "killedLauncherPid": 36563,
+        "stoppedApiPid": 36574,
         "status": "STOPPED_ORPHAN"
       }
     },
@@ -280,11 +280,11 @@
       "id": "restore-new-directory",
       "status": "PASS",
       "detail": {
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Cf4iq0/restored",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-18Zplc/restored",
         "pendingRebind": 0,
         "evidence": {
           "status": "verified",
-          "digest": "ca305c57883df267933fbbed15328ec6445fc5f40c6c4ffe0961876cd3f01adc",
+          "digest": "2be376d040e390e3295e058b4ccac895adc7db5d7bc2ab76c4e3d1e191a97925",
           "counts": {
             "projects": 0,
             "works": 0,
@@ -318,14 +318,14 @@
       "id": "import-managed-bundle",
       "status": "PASS",
       "detail": {
-        "importId": "990b0ce05f6b32860955d708dcf35c26c8e17bcd18368c6623a175a122206c22"
+        "importId": "e013ce99d974db2f53bf89251dd531555131825685d2b0962e1f618be38accad"
       }
     },
     {
       "id": "restore-managed-import",
       "status": "PASS",
       "detail": {
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Cf4iq0/restored-imported"
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-18Zplc/restored-imported"
       }
     },
     {
@@ -359,7 +359,7 @@
         },
         "authorization": "not_granted",
         "commitAvailable": false,
-        "proposedProjectId": "project-0dcaba0fe124d7c12db7c4d1",
+        "proposedProjectId": "project-e0386403c38cff95d1ad2b37",
         "planBlockers": [
           "authorization_not_implemented"
         ],
@@ -388,7 +388,7 @@
       "id": "stop-recovery-readonly",
       "status": "PASS",
       "detail": {
-        "stopMs": 272
+        "stopMs": 234
       }
     },
     {
@@ -425,14 +425,14 @@
       "id": "stop-login-instance",
       "status": "PASS",
       "detail": {
-        "stopMs": 250
+        "stopMs": 236
       }
     },
     {
       "id": "start-restored",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:61185",
+        "url": "http://127.0.0.1:51859",
         "health": {
           "status": "ok",
           "mode": "fixture",
@@ -446,7 +446,7 @@
       "id": "restored-delivery-bytes-roundtrip",
       "status": "PASS",
       "detail": {
-        "workId": "275bb30ca8081c1085ed100bded65e03",
+        "workId": "018cb58319b6f2d61fde3ec493e9f059",
         "artifacts": 4,
         "digestsMatch": true,
         "phase": "delivered"
@@ -456,7 +456,7 @@
       "id": "stop-restored",
       "status": "PASS",
       "detail": {
-        "stopMs": 259
+        "stopMs": 239
       }
     },
     {
@@ -470,30 +470,30 @@
       "id": "rollback-rehearsal",
       "status": "PASS",
       "detail": {
-        "failedDir": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Cf4iq0/restored.failed-2026-11-11T08-40-37-029Z",
-        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-Cf4iq0/restored"
+        "failedDir": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-18Zplc/restored.failed-2026-11-11T09-12-44-336Z",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-18Zplc/restored"
       }
     },
     {
       "id": "start-after-rollback",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:61220"
+        "url": "http://127.0.0.1:51888"
       }
     },
     {
       "id": "stop-after-rollback",
       "status": "PASS",
       "detail": {
-        "stopMs": 284
+        "stopMs": 234
       }
     },
     {
       "id": "stage-closure-start",
       "status": "PASS",
       "detail": {
-        "url": "http://127.0.0.1:61294",
-        "modules": 566,
+        "url": "http://127.0.0.1:51911",
+        "modules": 559,
         "outsideClosure": 0,
         "checkoutReferences": 0
       }
@@ -512,7 +512,7 @@
       "id": "stage-closure-stop",
       "status": "PASS",
       "detail": {
-        "stopMs": 4701,
+        "stopMs": 3268,
         "status": "RUNNING"
       }
     },
@@ -545,10 +545,10 @@
     "The trial instance ran on isolated temporary roots/ports; user services were not touched.",
     "Native authentication/environment is not migrated; restored state must be revalidated before real execution."
   ],
-  "durationMs": 58642,
-  "finishedAt": "2026-11-11T08:41:02.819Z",
+  "durationMs": 42360,
+  "finishedAt": "2026-11-11T09:12:59.411Z",
   "outputs": {
-    "backupArchiveSha256": "990b0ce05f6b32860955d708dcf35c26c8e17bcd18368c6623a175a122206c22",
-    "importId": "990b0ce05f6b32860955d708dcf35c26c8e17bcd18368c6623a175a122206c22"
+    "backupArchiveSha256": "e013ce99d974db2f53bf89251dd531555131825685d2b0962e1f618be38accad",
+    "importId": "e013ce99d974db2f53bf89251dd531555131825685d2b0962e1f618be38accad"
   }
 }
