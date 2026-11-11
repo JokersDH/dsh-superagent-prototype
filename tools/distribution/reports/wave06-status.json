@@ -23,7 +23,7 @@
     "wave06Checkpoint": "9046d4c",
     "wave06FirstCandidate": "3bdc842",
     "wave06R2Checkpoint": "e10bfdb",
-    "wave06R2Evidence": "next commit"
+    "wave06R2Evidence": "132a1c4 + this evidence commit"
   },
   "installIdentity": {
     "source": {
@@ -167,7 +167,8 @@
       "command": "node tools/distribution/smoke.mjs",
       "steps": 49,
       "status": "PASS",
-      "durationMs": 45725
+      "durationMs": 44690,
+      "sourceCommit": "132a1c412db1ba4e00e74298a80830a150bfa8d1"
     },
     "upgrade": {
       "command": "node tools/distribution/smoke-upgrade.mjs",
