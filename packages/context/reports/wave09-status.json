@@ -5,8 +5,17 @@
   "mergeCommit": "5f021b1",
   "repairCheckpoint": "45f4a1b",
   "updatedAt": "2026-11-11T10:50:00.000Z",
-  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
-  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "ownedPaths": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge",
+    "packages/routing"
+  ],
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0,
+    "unknownSends": 0
+  },
   "supersedes": "wave08-status.json for wave-09 facts (historical files retained; wave-07 group of files unchanged)",
   "phases": [
     {
@@ -34,7 +43,9 @@
         "packages/context/test/group-binding.case.ts",
         "packages/context/test/budget-integrity.case.ts"
       ],
-      "results": { "contextTests": "59/59" },
+      "results": {
+        "contextTests": "59/59"
+      },
       "note": "Custom groups validated before reads: unknown/duplicate name, duplicate priority, non-positive/non-integer priority, empty/duplicate kinds, kind outside the name family, share outside [0,1] or NaN/±Infinity. Budget still clamped by grant and caller; expiry/purpose/confirmedAt and mid-await rechecks preserved; scan_incomplete fatal; explicit truncation separate."
     },
     {
@@ -45,7 +56,10 @@
         "packages/knowledge/test/main-proposal-http.case.ts",
         "tests/integration/proposal-commands.case.mjs (main-owned, unmodified)"
       ],
-      "results": { "knowledgeTests": "71/71", "mainProposalIntegration": "10/10" },
+      "results": {
+        "knowledgeTests": "71/71",
+        "mainProposalIntegration": "10/10"
+      },
       "note": "Main's plan+commit+prepareCommand/commitPrepared stays authoritative. C consumers verify decision/work confirmation, reject terminal state, missing inputs inert, revision without current work refused, source/grant/preview drift rejected, same-body receipt replay identical, same command id with another body rejected, different effect id conflicts, receipt failure rollback+retry and reopen. The C-only confirmWithCommand helper now enforces the same command identity and is not used by main."
     },
     {
@@ -66,7 +80,9 @@
         "packages/context/reports/composition-performance.json",
         "packages/context/reports/wave09-verification.txt"
       ],
-      "results": { "performance": "PASS p50 ~0.45-0.56ms / p95 ~1.37-1.41ms; 12 slices / 3394 bytes in a 20-slice / 256KiB budget" },
+      "results": {
+        "performance": "PASS p50 ~0.45-0.56ms / p95 ~1.37-1.41ms; 12 slices / 3394 bytes in a 20-slice / 256KiB budget"
+      },
       "note": "Proposal/decision HTTP consumed from C (real HTTP + real SQLite). Context composition/preview HTTP is still not published by main (`grep -c 'v1/context' apps/coordinator/http/app.ts` = 0), so the UI-level assertion is BLOCKED on main; the library consumer and bounded performance are complete, and no C HTTP/UI/SQL is written."
     },
     {
@@ -127,5 +143,6 @@
     "Re-run `node tools/bootstrap/probe-wave09-context-proposal.mjs <checkout>` and `probe-wave08-context-grant.mjs`; all eight cases pass.",
     "Keep proposal confirmation on the existing plan+commit+prepareCommand/commitPrepared path; do not adopt confirmWithCommand unless the plan command id equals the effect id in the same transaction.",
     "When publishing context HTTP, call ContextComposer with main-side adapters and project buildCompositionPreview/buildSourceManifest; surface composition_invalid/grant_*/scan_incomplete as explicit states."
-  ]
+  ],
+  "latestDeliveryCommit": "81ba1bb"
 }
