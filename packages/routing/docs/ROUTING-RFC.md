@@ -24,6 +24,21 @@ actor/project/grant/scope, current source digest/conversation and supersession b
 A's port. Main writes receipt/event in the same UnitOfWork. Real temporary SQLite and the independent
 main probe (`review-persisted-assistant.mjs`, 7/7) pass.
 
+## C2 wave-06 shared AttentionRanker adapter
+
+`sharedAttentionRanker` implements contracts' `AttentionRanker` exactly. The adapter maps shared
+`AttentionItem` to ranks with only shared reasons:
+
+- `sinceAt=null` → `unknown_wait`; known waits use `waiting_age` with a capped monotonic age.
+- `deadlineAt` → `deadline_overdue` or `deadline_near` inside a documented 24-hour window; far
+  deadlines get no urgency reason. `expiresAt` is validity and never a deadline.
+- `blockedWorkIds` is outgoing; only the item declaring blocked works gets `blocks_other_work`.
+  Incoming `blockedBy` from C's old model is not renamed or inferred.
+- Complete permutation, duplicate ids refused, stable order by score → deadline → known sinceAt →
+  id. No probability/ROI and no authorization effect.
+
+Main consumes this as `rankSharedAttention`/`sharedAttentionRanker`; it does not copy the algorithm.
+
 ## C2 attention and eligibility
 
 `rankAttention(items, {now})` is a pure deterministic order over business deadline, blocking
