@@ -23,6 +23,7 @@ export interface ConfigurationSource {
   enabledProfileIds: readonly string[]
   reviewActivityAvailable?: boolean
   decisionsAvailable?: boolean
+  proposalsAvailable?: boolean
 }
 
 /** The runtime supplies the actual admission list; a probe result alone never grants dispatch. */
@@ -67,6 +68,7 @@ export function applicationConfiguration(source: ConfigurationSource, now = Date
   })
   const body = { protocol: CONFIGURATION_PROTOCOL, projects, profiles, checks: source.checks,
     ...(source.reviewActivityAvailable !== undefined ? { reviewActivityAvailable: source.reviewActivityAvailable } : {}),
-    ...(source.decisionsAvailable !== undefined ? { decisionsAvailable: source.decisionsAvailable } : {}) }
+    ...(source.decisionsAvailable !== undefined ? { decisionsAvailable: source.decisionsAvailable } : {}),
+    ...(source.proposalsAvailable !== undefined ? { proposalsAvailable: source.proposalsAvailable } : {}) }
   return ApplicationConfigurationSchema.parse({ ...body, revision: canonicalDigest(JSON.parse(JSON.stringify(body))) })
 }

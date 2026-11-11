@@ -1,0 +1,17 @@
+{
+  "surface": "explicit-proposal-workspace-extension",
+  "implementationSource": "b436fde158a8dd14015c3705550bd3ff0d0fd307",
+  "reviewer": "independent_fresh_context_impeccable_finish_reviewer",
+  "initialDisposition": "fix",
+  "finalDisposition": "ship",
+  "verdictScope": "Only the two original material findings were scored in the verdict pass",
+  "findings": [
+    {"id": "revision-target-disclosure", "priority": "P2", "status": "resolved", "evidence": ["target title/workId/expected revision from original signed preview", "same-conversation two-work browser assertion", "desktop/mobile revision captures"]},
+    {"id": "blocked-project-reason", "priority": "P2", "status": "resolved", "evidence": ["shared factual blockedLabel", "unavailable project annotation and disabled preview", "actual expired project browser assertion and desktop/mobile captures"]}
+  ],
+  "reviewerBrowserOrModelCalls": 0,
+  "browserCases": 8,
+  "nativeAndProductAdmission": false,
+  "detector": {"runs": 1, "advisories": ["13px and16px outside YAML ramp but present in incumbent CSS/prose"], "newUndefinedVariable": "resolved as explicit transparent with unchanged rendered fallback"},
+  "limitations": ["Screenshots cover create/revise/blocked states; not whole application", "Pending revision target recovery assessed from code", "No native/control/restore-target/install/value certification"]
+}

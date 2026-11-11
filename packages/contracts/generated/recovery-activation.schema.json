@@ -293,6 +293,194 @@
         "expiresAt"
       ],
       "type": "object"
+    },
+    "RecoveryActivationRecord": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "const": "not_granted",
+          "type": "string"
+        },
+        "committed": {
+          "additionalProperties": false,
+          "properties": {
+            "intent": {
+              "additionalProperties": false,
+              "properties": {
+                "activationId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "commandId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "createdAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                "expiresAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                "machineDigest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "planDigest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "planId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "principal": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "authorityRef": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "userId": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "userId",
+                    "authorityRef"
+                  ],
+                  "type": "object"
+                },
+                "protocol": {
+                  "const": "recovery-activation-intent/1",
+                  "type": "string"
+                },
+                "resourcePolicyDigest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "source": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "inspectionFingerprint": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "markerDigest": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "stateId": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "stateRoot": {
+                      "maxLength": 4096,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "stateId",
+                    "stateRoot",
+                    "markerDigest",
+                    "inspectionFingerprint"
+                  ],
+                  "type": "object"
+                },
+                "target": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "configurationDigest": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "generationId": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "stateRoot": {
+                      "maxLength": 4096,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "generationId",
+                    "stateRoot",
+                    "configurationDigest"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "protocol",
+                "activationId",
+                "commandId",
+                "planId",
+                "planDigest",
+                "source",
+                "target",
+                "principal",
+                "machineDigest",
+                "resourcePolicyDigest",
+                "createdAt",
+                "expiresAt"
+              ],
+              "type": "object"
+            },
+            "protocol": {
+              "const": "recovery-activation-commit/1",
+              "type": "string"
+            },
+            "sourceReceipt": {
+              "additionalProperties": false,
+              "properties": {
+                "commandId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "seq": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "commandId",
+                "seq"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "protocol",
+            "intent",
+            "sourceReceipt"
+          ],
+          "type": "object"
+        },
+        "protocol": {
+          "const": "recovery-activation-record/1",
+          "type": "string"
+        },
+        "startupAvailable": {
+          "const": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "protocol",
+        "committed",
+        "authorization",
+        "startupAvailable"
+      ],
+      "type": "object"
     }
   },
   "$id": "urn:personal-agent:recovery-activation:1",

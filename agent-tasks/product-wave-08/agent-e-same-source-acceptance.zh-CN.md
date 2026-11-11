@@ -4,6 +4,8 @@
 
 本轮研究执行封存BLOCKED，所有新阶段真实模型发送0，原grant和账本保留。大成果是同一source/artifact的日常网页与安装/恢复独立验收；不把旧source报告映射到新candidate，不重复已完成tier拆分。
 
+E3可基于main b436fde独立验收实际提案UI（主线8/8参考，不替代你的断言），以及A schema15生产facts的只读source审计GET，见[0030](../../docs/rfcs/WP-16/0030-wave-08-proposal-workbench-and-source-audit.md)。其固定not_granted/startupAvailable=false；E5 target仍待main。新预览5186/8802仅供用户，验收继续用隔离临时实例，不重启它。
+
 ## E1 先补账本迁移和身份/费用拒绝漏洞
 
 v1 legacy仅actual turns/tokens为0不足：wrong grant/caps、BLOCKED_UNKNOWN_USAGE、非零reservation/actual unknown不能迁为新零账；验证全部原身份、预算、历史完整性和unknown，无法证明就拒绝。字段缺失不能等于历史为零。

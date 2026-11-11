@@ -40,3 +40,12 @@ export const RecoveryActivationCommitSchema = z.strictObject({
   sourceReceipt: z.strictObject({ commandId: IdSchema, seq: z.number().int().positive().safe() }),
 }).refine(value => value.sourceReceipt.commandId === value.intent.commandId, 'Receipt must name the intent command')
 export type RecoveryActivationCommit = z.infer<typeof RecoveryActivationCommitSchema>
+
+/** An audit read never grants target startup, including after backup/restore or on another host. */
+export const RecoveryActivationRecordSchema = z.strictObject({
+  protocol: z.literal('recovery-activation-record/1'),
+  committed: RecoveryActivationCommitSchema,
+  authorization: z.literal('not_granted'),
+  startupAvailable: z.literal(false),
+})
+export type RecoveryActivationRecord = z.infer<typeof RecoveryActivationRecordSchema>
