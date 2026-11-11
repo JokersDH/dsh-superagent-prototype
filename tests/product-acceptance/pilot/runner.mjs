@@ -103,17 +103,29 @@ export function validateLedger(raw) {
   const fail = (code, detail) => issues.push({ code, detail })
   if (!raw || typeof raw !== 'object') return { ok: false, issues: [{ code: 'ledger_invalid', detail: 'not an object' }] }
   if (raw.schema === 'review-pilot-ledger/1') {
-    const zero =
-      raw.actual?.turns === 0 &&
-      raw.actual?.tokens === 0 &&
-      (raw.actual?.costUSD === 0 || raw.actual?.costUSD === null) &&
-      (raw.reservations?.length ?? 0) === 0 &&
-      (raw.turns?.length ?? 0) === 0
-    if (!zero)
-      return {
-        ok: false,
-        issues: [{ code: 'legacy_history_unverifiable', detail: 'A v1 ledger with usage cannot be verified; do not rebuild it as zero' }],
-      }
+    const issues = []
+    if (raw.grantId !== GRANT.id) issues.push({ code: 'legacy_identity', detail: 'grant identity differs' })
+    const caps = raw.caps ?? {}
+    for (const [key, value] of Object.entries(capsFromGrant()))
+      if (caps[key] !== value) issues.push({ code: 'legacy_caps', detail: `${key} is missing or differs` })
+    const actual = raw.actual
+    const reservation = raw.reservation
+    if (!actual || !Number.isSafeInteger(actual.turns) || !Number.isSafeInteger(actual.tokens) ||
+      !Number.isSafeInteger(actual.unknownTurns) || !(actual.costUSD === 0 || actual.costUSD === null))
+      issues.push({ code: 'legacy_incomplete', detail: 'actual fields are missing or not provably empty' })
+    else if (actual.turns !== 0 || actual.tokens !== 0 || actual.unknownTurns !== 0)
+      issues.push({ code: 'legacy_history_unverifiable', detail: 'A v1 ledger with usage cannot be verified; do not rebuild it as zero' })
+    if (!reservation || !Number.isSafeInteger(reservation.turns) || !Number.isSafeInteger(reservation.tokens) ||
+      !Number.isSafeInteger(reservation.unknownTurns) || reservation.turns !== 0 || reservation.tokens !== 0 || reservation.unknownTurns !== 0)
+      issues.push({ code: 'legacy_reservation_unverifiable', detail: 'A v1 ledger with reservations cannot be verified' })
+    if (!Array.isArray(raw.reservations) || raw.reservations.length !== 0)
+      issues.push({ code: 'legacy_reservation_unverifiable', detail: 'reservation history is missing or non-empty' })
+    if (!Array.isArray(raw.turns) || raw.turns.length !== 0)
+      issues.push({ code: 'legacy_history_unverifiable', detail: 'turn history is missing or non-empty' })
+    if (raw.status === 'BLOCKED_UNKNOWN_USAGE')
+      issues.push({ code: 'legacy_unknown_usage', detail: 'unknown usage cannot migrate into a fresh zero ledger' })
+    if (!LEDGER_STATUSES.has(raw.status)) issues.push({ code: 'legacy_status', detail: String(raw.status) })
+    if (issues.length > 0) return { ok: false, issues }
     return { ok: true, legacy: true, value: raw }
   }
   if (raw.schema !== LEDGER_SCHEMA) fail('ledger_schema', `expected ${LEDGER_SCHEMA}`)
@@ -331,7 +343,9 @@ function settleTurnUnlocked({ turnId, usage, costUSD, sessionId, startedAt, ende
     intAtLeast(usage.totalTokens, 0) &&
     (usage.inputTokens === null || intAtLeast(usage.inputTokens, 0)) &&
     (usage.outputTokens === null || intAtLeast(usage.outputTokens, 0))
-  const costValid = costUSD === undefined || isFiniteNonNegative(costUSD)
+  // A usable settlement needs a measured cost. Absent/NaN/Infinite cost is unknown, not free: the
+  // reservation stays charged at its bound and sends stop.
+  const costValid = typeof costUSD === 'number' && Number.isFinite(costUSD) && costUSD >= 0
   const measurable = usageValid && costValid
   const overrun =
     measurable &&
@@ -427,38 +441,23 @@ function sessionOf(events) {
 }
 
 /**
- * Runs one bounded turn through the executable named by the admitted adapter. There is no PATH
- * lookup and no default: an absent or relative executable is refused before spawning.
+ * Runs one turn through the single B-owned entry. E does not construct a CLI invocation, does not
+ * look up a binary on PATH and has no fallback: the admitted descriptor supplies the command, and
+ * the request is a versioned envelope written to stdin. Events are read from stdout JSONL.
  */
-export function runCodexTurn({
-  executable,
-  prompt,
-  cwd,
-  sandbox = 'read-only',
-  resumeSessionId,
-  outputSchemaPath,
-  lastMessagePath,
-  timeoutMs = 180000,
-  model,
-}) {
+function runEntryTurn({ entry, request, timeoutMs = 180000 }) {
   return new Promise((resolvePromise) => {
-    if (typeof executable !== 'string' || !isAbsolute(executable) || !existsSync(executable)) {
-      resolvePromise({ refused: 'executable_missing_or_relative', exit: null, usage: null, sessionId: null, events: 0 })
+    if (!entry || entry.owner !== 'b' || !Array.isArray(entry.command) || entry.command.length === 0 || !isAbsolute(entry.command[0])) {
+      resolvePromise({ refused: 'entry_missing_or_invalid', exit: null, usage: null, sessionId: null, events: 0 })
+      return
+    }
+    const [command, ...args] = entry.command
+    if (!existsSync(command)) {
+      resolvePromise({ refused: 'entry_executable_missing', exit: null, usage: null, sessionId: null, events: 0 })
       return
     }
     const startedAt = new Date().toISOString()
-    const args = ['exec']
-    if (resumeSessionId) args.push('resume', resumeSessionId)
-    args.push('--json', '--skip-git-repo-check', '--color', 'never', '--sandbox', sandbox, '-C', cwd)
-    if (model) args.push('-m', model)
-    if (outputSchemaPath) args.push('--output-schema', outputSchemaPath)
-    if (lastMessagePath) args.push('-o', lastMessagePath)
-    args.push(prompt)
-    const child = spawn(executable, args, {
-      cwd,
-      env: { ...process.env },
-      stdio: ['ignore', 'pipe', 'pipe'],
-    })
+    const child = spawn(command, args, { cwd: request.cwd, env: { ...process.env }, stdio: ['pipe', 'pipe', 'pipe'] })
     let stdout = ''
     let stderr = ''
     let settled = false
@@ -486,21 +485,22 @@ export function runCodexTurn({
     })
     child.stderr.on('data', (chunk) => {
       stderr += chunk.toString()
-      appendFileSync(join(here, 'reports', 'codex-turns.log'), chunk.toString())
+      appendFileSync(join(here, 'reports', 'adapter-turns.log'), chunk.toString())
     })
     child.once('error', (error) => finish({ error: String(error?.message ?? error) }))
     child.once('exit', (code, signal) => finish({ code, signal }))
+    child.stdin.end(`${JSON.stringify({ type: 'review-pilot.turn/1', ...request })}\n`)
   })
 }
 
 /**
- * The only send entry point. It refuses before spawning unless the adapter admission passed, so a
- * missing descriptor can never degrade into "just use the installed CLI".
+ * The only send entry point. It refuses before spawning unless the adapter admission passed and the
+ * admission carries a B-owned command; there is no CLI fallback.
  */
 export async function guardedSend({ admission, ...turn }) {
   if (!admission?.ok) return { ok: false, reason: 'admission_blocked', blockers: admission?.blockers ?? [{ code: 'adapter_missing', detail: 'no admission' }] }
-  const executable = admission.facts?.executable
-  const result = await runCodexTurn({ executable, ...turn })
+  const entry = admission.facts?.entry
+  const result = await runEntryTurn({ entry, request: turn })
   if (result.refused) return { ok: false, reason: result.refused }
   return { ok: true, result }
 }

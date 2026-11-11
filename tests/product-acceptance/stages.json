@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-07/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-08/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "ddac2b6",
-  "checkpoint": "c2ae2d2",
+  "base": "5d4065b",
+  "checkpoint": null,
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -13,7 +13,7 @@
     "pilotTurnsUsed": 0,
     "pilotTokensUsed": 0,
     "pilotUsd": null,
-    "note": "Pilot preflight BLOCKED (adapter_missing); ledger v2 is fail-closed and preserves 0/24 turns, 0 tokens, USD unknown. Runner selftest uses a fake process, not a model send. No other model call."
+    "note": "Pilot BLOCKED (adapter_missing); ledger v2 preserves 0/24 turns, 0 tokens, no price basis; no model send. Runner selftest uses a B-entry fake process."
   },
   "stages": [
     {
@@ -21,7 +21,7 @@
       "title": "Pilot admission and fail-closed ledger",
       "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
       "notes": [
-        "Ledger v2 distinguishes not-created from corrupt; a damaged/forged/incomplete ledger never becomes zero credit. Reservations use the adapter's declared whole-turn bound, are serialized, and replay idempotently. A missing adapter, version drift, stale isolation/session/material evidence or a missing main admission blocks every send; price alone grants nothing."
+        "Ledger v2 rejects damaged/forged/incomplete v1 migrations (identity, caps, reservations, unknown, history), requires model/provider and a B-owned entry, and treats a missing cost as unknown charged at the bound. 59 zero-model checks; fake sends stay 0 for every refusal."
       ]
     },
     {

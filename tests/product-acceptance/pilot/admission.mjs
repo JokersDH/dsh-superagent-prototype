@@ -88,6 +88,20 @@ export function evaluateAdapter(adapter, { now = Date.now(), probe = probeVersio
   if (adapter.fallbackExecutable !== undefined || adapter.fallback !== undefined)
     add('adapter_invalid', 'a fallback adapter path is not admissible')
 
+  if (!substantial(adapter.model) || ['default', 'auto', 'alias', 'unknown'].includes(String(adapter.model).toLowerCase()))
+    add('adapter_invalid', 'a concrete model identity is required')
+  if (!substantial(adapter.provider) || ['default', 'auto', 'alias', 'unknown'].includes(String(adapter.provider).toLowerCase()))
+    add('adapter_invalid', 'a concrete provider identity is required')
+
+  const entry = adapter.entry ?? {}
+  if (entry.owner !== 'b') add('adapter_invalid', 'the single send entry must be owned by B')
+  if (!['app-server', 'sdk-runner'].includes(entry.kind)) add('adapter_invalid', 'entry.kind')
+  if (!Array.isArray(entry.command) || entry.command.length === 0 || !substantial(entry.command[0]) || !String(entry.command[0]).startsWith('/'))
+    add('adapter_invalid', 'entry.command must start with an absolute executable')
+  if (!substantial(entry.protocolVersion)) add('adapter_invalid', 'entry.protocolVersion')
+  if (entry.fallbackCommand !== undefined || entry.fallback !== undefined)
+    add('adapter_invalid', 'a fallback command is not admissible')
+
   const version = probe(adapter.executable)
   if (!version.ok) add('adapter_invalid', `executable probe failed: ${version.reason}`)
   else if (!substantial(adapter.version) || !version.version.includes(adapter.version))
@@ -163,6 +177,12 @@ export function evaluateAdapter(adapter, { now = Date.now(), probe = probeVersio
       observedVersion: version.ok ? version.version : null,
       model: adapter.model ?? null,
       provider: adapter.provider ?? null,
+      entry: {
+        owner: entry.owner ?? null,
+        kind: entry.kind ?? null,
+        command: Array.isArray(entry.command) ? [...entry.command] : null,
+        protocolVersion: entry.protocolVersion ?? null,
+      },
       pricing: adapter.pricing ? { ...adapter.pricing } : null,
       protocolDigest: adapter.protocolDigest ?? null,
       bound: turnsBound,
@@ -209,6 +229,7 @@ export function makeTestAdapter({ executable, version = 'fake-cli 1.0.0', now = 
     version,
     model: 'test-model',
     provider: 'test-provider',
+    entry: { owner: 'b', kind: 'app-server', command: [executable], protocolVersion: 'selftest/1' },
     protocolDigest: 'a'.repeat(64),
     pricing: {
       currency: 'USD',

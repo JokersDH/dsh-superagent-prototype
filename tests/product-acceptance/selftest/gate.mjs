@@ -371,7 +371,11 @@ const CASES = [
       assert('SELFTEST_ADMISSION_REFUSALS', result?.assertions?.filter((item) => item.id.startsWith('ADMISSION_')).every((item) => item.ok))
       assert('SELFTEST_NO_REFUSAL_SENDS', result?.assertions?.some((item) => item.id === 'NO_SEND_FOR_ALL_REFUSALS' && item.ok))
       assert('SELFTEST_SEND_COUNTER', result?.modelSends === 1, String(result?.modelSends))
-      assert('SELFTEST_CHECKS', (result?.passes ?? 0) >= 35, String(result?.passes))
+      assert('SELFTEST_CHECKS', (result?.passes ?? 0) >= 55, String(result?.passes))
+      assert('SELFTEST_LEGACY', result?.assertions?.filter((item) => item.id.startsWith('CORRUPT_V1_')).every((item) => item.ok))
+      assert('SELFTEST_LEGACY_EMPTY', result?.assertions?.some((item) => item.id === 'V1_EMPTY_MIGRATES' && item.ok))
+      assert('SELFTEST_COST_UNKNOWN', result?.assertions?.filter((item) => item.id.includes('COST')).every((item) => item.ok))
+      assert('SELFTEST_IDENTITY', result?.assertions?.filter((item) => ['ADMISSION_NO_MODEL', 'ADMISSION_NO_PROVIDER', 'ADMISSION_NO_B_ENTRY', 'ADMISSION_ENTRY_FALLBACK'].includes(item.id)).every((item) => item.ok))
     },
   },
   {

@@ -44,7 +44,7 @@
   },
   "runnerSelfTest": {
     "protocol": "review-pilot-runner-selftest/2",
-    "passes": 45,
+    "passes": 59,
     "failures": []
   },
   "protocolSemantics": {
@@ -67,6 +67,6 @@
     "maxTotalBillableTokens": 200000,
     "maxTotalCostUSD": 5
   },
-  "checkedAt": "2026-11-11T06:12:01.814Z",
+  "checkedAt": "2026-11-11T08:18:29.618Z",
   "note": "Preflight blocked; no model turn may be sent. Existing ledger reservations/usage were preserved."
 }

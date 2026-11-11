@@ -19,7 +19,8 @@ export async function runnerSelftest() {
     [
       '#!/bin/sh',
       'if [ "$1" = "--version" ]; then echo "fake-cli 1.0.0"; exit 0; fi',
-      `echo "$@" >> ${JSON.stringify(counterPath)}`,
+      `echo send >> ${JSON.stringify(counterPath)}`,
+      'cat > /dev/null',
       'printf \'%s\\n\' \'{"type":"thread.started","thread_id":"11111111-1111-4111-8111-111111111111"}\'',
       'printf \'%s\\n\' \'{"type":"turn.completed","info":{"total_token_usage":{"input_tokens":1200,"cached_input_tokens":100,"output_tokens":300,"reasoning_output_tokens":50,"total_tokens":1500}}}\'',
       'exit 0',
@@ -153,7 +154,28 @@ export async function runnerSelftest() {
       ['NAN_COST', JSON.stringify(seal({ ...seeded, actual: { turns: 1, tokens: 100, costUSD: null, unknownTurns: 0 } }))],
       ['MISSING_CAPS', JSON.stringify(seal({ ...baseLedger(), caps: {} }))],
       ['DUPLICATE_TURN_ID', JSON.stringify(seal({ ...seeded, reservations: [...seeded.reservations, { ...seeded.reservations[0] }], turns: [...seeded.turns, { ...seeded.turns[0] }], actual: { turns: 2, tokens: 200, costUSD: 0.2, unknownTurns: 0 } }))],
-      ['V1_WITH_USAGE', JSON.stringify({ schema: 'review-pilot-ledger/1', grantId: runner.GRANT.id, actual: { turns: 3, tokens: 100, costUSD: 0.1, unknownTurns: 0 }, reservations: [], turns: [] })],
+      ['V1_WITH_USAGE', JSON.stringify({ schema: 'review-pilot-ledger/1', grantId: runner.GRANT.id, caps: {
+        maxTotalTurnStarts: 24, maxAuthorTurnStarts: 8, maxReviewTurnStarts: 16, maxTotalBillableTokens: 200000, maxTotalCostUSD: 5,
+      }, status: 'IN_PROGRESS', actual: { turns: 3, tokens: 100, costUSD: 0.1, unknownTurns: 0 }, reservation: { turns: 0, tokens: 0, unknownTurns: 0 }, reservations: [], turns: [] })],
+      ['V1_WRONG_GRANT', JSON.stringify({ schema: 'review-pilot-ledger/1', grantId: 'wave03-b-native', caps: {
+        maxTotalTurnStarts: 24, maxAuthorTurnStarts: 8, maxReviewTurnStarts: 16, maxTotalBillableTokens: 200000, maxTotalCostUSD: 5,
+      }, status: 'NOT_STARTED', actual: { turns: 0, tokens: 0, costUSD: null, unknownTurns: 0 }, reservation: { turns: 0, tokens: 0, unknownTurns: 0 }, reservations: [], turns: [] })],
+      ['V1_WRONG_CAPS', JSON.stringify({ schema: 'review-pilot-ledger/1', grantId: runner.GRANT.id, caps: {
+        maxTotalTurnStarts: 99, maxAuthorTurnStarts: 8, maxReviewTurnStarts: 16, maxTotalBillableTokens: 200000, maxTotalCostUSD: 5,
+      }, status: 'NOT_STARTED', actual: { turns: 0, tokens: 0, costUSD: null, unknownTurns: 0 }, reservation: { turns: 0, tokens: 0, unknownTurns: 0 }, reservations: [], turns: [] })],
+      ['V1_BLOCKED_UNKNOWN', JSON.stringify({ schema: 'review-pilot-ledger/1', grantId: runner.GRANT.id, caps: {
+        maxTotalTurnStarts: 24, maxAuthorTurnStarts: 8, maxReviewTurnStarts: 16, maxTotalBillableTokens: 200000, maxTotalCostUSD: 5,
+      }, status: 'BLOCKED_UNKNOWN_USAGE', actual: { turns: 0, tokens: 0, costUSD: null, unknownTurns: 0 }, reservation: { turns: 0, tokens: 0, unknownTurns: 0 }, reservations: [], turns: [] })],
+      ['V1_RESERVATION', JSON.stringify({ schema: 'review-pilot-ledger/1', grantId: runner.GRANT.id, caps: {
+        maxTotalTurnStarts: 24, maxAuthorTurnStarts: 8, maxReviewTurnStarts: 16, maxTotalBillableTokens: 200000, maxTotalCostUSD: 5,
+      }, status: 'IN_PROGRESS', actual: { turns: 0, tokens: 0, costUSD: null, unknownTurns: 0 }, reservation: { turns: 1, tokens: 100, unknownTurns: 0 }, reservations: [], turns: [] })],
+      ['V1_UNKNOWN_TURNS', JSON.stringify({ schema: 'review-pilot-ledger/1', grantId: runner.GRANT.id, caps: {
+        maxTotalTurnStarts: 24, maxAuthorTurnStarts: 8, maxReviewTurnStarts: 16, maxTotalBillableTokens: 200000, maxTotalCostUSD: 5,
+      }, status: 'IN_PROGRESS', actual: { turns: 0, tokens: 0, costUSD: null, unknownTurns: 2 }, reservation: { turns: 0, tokens: 0, unknownTurns: 0 }, reservations: [], turns: [] })],
+      ['V1_MISSING_CAPS', JSON.stringify({ schema: 'review-pilot-ledger/1', grantId: runner.GRANT.id, status: 'NOT_STARTED', actual: { turns: 0, tokens: 0, costUSD: null, unknownTurns: 0 }, reservation: { turns: 0, tokens: 0, unknownTurns: 0 }, reservations: [], turns: [] })],
+      ['V1_MISSING_FIELDS', JSON.stringify({ schema: 'review-pilot-ledger/1', grantId: runner.GRANT.id, caps: {
+        maxTotalTurnStarts: 24, maxAuthorTurnStarts: 8, maxReviewTurnStarts: 16, maxTotalBillableTokens: 200000, maxTotalCostUSD: 5,
+      }, status: 'NOT_STARTED' })],
       ['FORGED_IDENTITY', JSON.stringify(seal({ ...seeded, ledgerId: 'forged-other' }))],
     ]
     for (const [id, content] of damaged) {
@@ -171,6 +193,20 @@ export async function runnerSelftest() {
     check('LEDGER_LOCKED', lockedReserve.ok === false && lockedReserve.reason === 'ledger_locked' && lockedView.data.reservations.length === 0, JSON.stringify(lockedReserve))
     unlinkSync(`${ledgerPath}.lock`)
 
+    // A fully empty, fully identifiable v1 ledger is the only legacy form that may migrate.
+    writeFileSync(ledgerPath, JSON.stringify({ schema: 'review-pilot-ledger/1', grantId: runner.GRANT.id, caps: {
+      maxTotalTurnStarts: 24, maxAuthorTurnStarts: 8, maxReviewTurnStarts: 16, maxTotalBillableTokens: 200000, maxTotalCostUSD: 5,
+    }, status: 'NOT_STARTED', actual: { turns: 0, tokens: 0, costUSD: null, unknownTurns: 0 }, reservation: { turns: 0, tokens: 0, unknownTurns: 0 }, reservations: [], turns: [] }))
+    const legacy = runner.readLedgerView()
+    check('V1_EMPTY_MIGRATES', legacy.state === 'NOT_CREATED' && legacy.legacy === true && legacy.data.migratedFrom === 'review-pilot-ledger/1', JSON.stringify(legacy.state))
+
+    // Usage without a measured cost is unknown, not free.
+    resetLedger()
+    const priced = runner.reserveTurn({ caseId: 'no-cost', arm: 'author', admission })
+    const noCost = runner.settleTurn({ turnId: priced.reservation.turnId, usage: { totalTokens: 1500, inputTokens: 1200, outputTokens: 300 } })
+    check('USAGE_WITHOUT_COST_UNKNOWN', noCost.state === 'UNKNOWN_USAGE' && noCost.data.status === 'BLOCKED_UNKNOWN_USAGE' && noCost.data.actual.tokens === 144000, JSON.stringify(noCost.state))
+    check('NO_COST_NOT_ZERO', noCost.data.actual.costUSD === admission.bound.usd, String(noCost.data.actual.costUSD))
+
     // Admission negatives: each facet is named and no send happens.
     const negativeCases = [
       ['MISSING', undefined, 'adapter_missing'],
@@ -184,6 +220,10 @@ export async function runnerSelftest() {
       ['NEGATIVE_PRICE', makeTestAdapter({ executable: fakeCodex, overrides: { pricing: { ...makeTestAdapter({ executable: fakeCodex }).pricing, inputPerMillion: -1 } } }), 'price_basis_incomplete'],
       ['TRUNCATED_BOUND', makeTestAdapter({ executable: fakeCodex, overrides: { bound: { ...makeTestAdapter({ executable: fakeCodex }).bound, maxInputTokens: 0 } } }), 'whole_turn_bound_unavailable'],
       ['FALLBACK_PATH', makeTestAdapter({ executable: fakeCodex, overrides: { fallbackExecutable: '/usr/local/bin/codex' } }), 'adapter_invalid'],
+      ['NO_MODEL', makeTestAdapter({ executable: fakeCodex, overrides: { model: null } }), 'adapter_invalid'],
+      ['NO_PROVIDER', makeTestAdapter({ executable: fakeCodex, overrides: { provider: 'auto' } }), 'adapter_invalid'],
+      ['NO_B_ENTRY', makeTestAdapter({ executable: fakeCodex, overrides: { entry: { owner: 'e', kind: 'app-server', command: [fakeCodex], protocolVersion: 'x' } } }), 'adapter_invalid'],
+      ['ENTRY_FALLBACK', makeTestAdapter({ executable: fakeCodex, overrides: { entry: { owner: 'b', kind: 'app-server', command: [fakeCodex], protocolVersion: 'x', fallbackCommand: [fakeCodex] } } }), 'adapter_invalid'],
     ]
     resetLedger()
     for (const [id, adapter, expected] of negativeCases) {
