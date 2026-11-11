@@ -30,6 +30,7 @@
     "@hono/node-server": "2.1.6",
     "@personal-agent/application": "workspace:*",
     "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/knowledge": "workspace:*",
     "@personal-agent/effects": "workspace:*",
     "@personal-agent/environment-preparation": "workspace:*",
     "@personal-agent/orchestrator-core": "workspace:*",

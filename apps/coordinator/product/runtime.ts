@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
 import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
-import type { AttentionRanker, ConversationCommand, NativeQuestionBinding, ProjectSettingsCommand, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
+import type { AttentionRanker, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { CheckRegistry } from '@personal-agent/verification'
@@ -22,6 +22,7 @@ import { ProductEnvironments } from './environments.ts'
 import { ProductProjectSettings } from './project-settings.ts'
 import { ProductReviewTiming } from './review-timing.ts'
 import { ProductAttention } from './attention.ts'
+import { ProductDecisions } from './decisions.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -131,6 +132,7 @@ export function createProductRuntime(
   const reviewTiming = new ProductReviewTiming(store, application, completion, options.principal, () => configuredProjects.map(project => project.id))
   completion.onAccepted = (candidate, actor, at) => reviewTiming.accepted(candidate, actor, at)
   const conversations = new ApplicationConversations(store, options.principal, () => configuredProjects.map(project => project.id), options.actionSecret)
+  const decisions = new ProductDecisions(store, options.principal, () => configuredProjects, options.actionSecret, options.now)
   const attention = new ProductAttention(store, application, completion, {
     projectIds: () => configuredProjects.map(project => project.id), verification: work => execution!.verificationStatus(work),
     ...(options.attentionRanker ? { ranker: options.attentionRanker } : {}), ...(options.now ? { now: options.now } : {}),
@@ -141,6 +143,7 @@ export function createProductRuntime(
       nativeExecution: !!options.native,
     })
   const read: NonNullable<LocalHttpOptions['read']> = {
+    decisions: async query => decisions.list(query),
     attention: query => attention.read(query),
     ...(projectSettings ? { projectSettings: async (projectId: string) => projectSettings.read(projectId) } : {}),
     conversations: async query => conversations.list(query),
@@ -324,6 +327,8 @@ export function createProductRuntime(
     read,
     projectSettings,
     operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor),
+      prepareDecision: async (input: DecisionPrepare, actor: TrustedActor) => decisions.prepare(input, actor),
+      decision: async (command: DecisionCommand, actor: TrustedActor) => decisions.dispatch(command, actor),
       reviewActivity: async (activity: ReviewActivity, actor: TrustedActor) => reviewTiming.record(activity, actor),
       ...(projectSettings ? { projectSettings: (command: ProjectSettingsCommand, actor: TrustedActor) => projectSettings.dispatch(command, actor) } : {}) },
     start: () => {

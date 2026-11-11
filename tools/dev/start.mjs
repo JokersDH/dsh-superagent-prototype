@@ -73,6 +73,7 @@ async function start() {
     'storage',
     'questions',
     'application',
+    'knowledge',
     'workspaces',
     'verification',
     'environment-preparation',

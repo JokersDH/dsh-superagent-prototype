@@ -178,6 +178,9 @@ importers:
       '@personal-agent/environment-preparation':
         specifier: workspace:*
         version: link:../../packages/environment-preparation
+      '@personal-agent/knowledge':
+        specifier: workspace:*
+        version: link:../../packages/knowledge
       '@personal-agent/orchestrator-core':
         specifier: workspace:*
         version: link:../../packages/orchestrator-core
@@ -373,6 +376,12 @@ importers:
       '@personal-agent/proposals':
         specifier: workspace:*
         version: link:../proposals
+      '@personal-agent/storage':
+        specifier: workspace:*
+        version: link:../storage
+      '@personal-agent/workflows':
+        specifier: workspace:*
+        version: link:../workflows
       '@types/node':
         specifier: 24.10.0
         version: 24.10.0
