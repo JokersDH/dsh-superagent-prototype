@@ -1,0 +1,51 @@
+{
+  "wave": "product-wave-09",
+  "status": "SCOPED_SOURCE_ACCEPTANCE_WITH_BLOCKERS_NOT_PRODUCT_RELEASE",
+  "reviewBaseline": "7027d312a529943a6aebf7b418939f768206f290",
+  "implementationSource": "e95544f",
+  "integratedSource": {
+    "A": {"candidate": "f2bb24cc609b896ff04f4c39a950f1d39a6058df", "sourceCommit": "ee7f382c0179b2894620f55282431957a7d3da8e", "integration": "63cc3da", "scope": "Activation backup evidence family and owned tests/recipes"},
+    "C": {"candidate": "39d090b5ac0fa4f907d478401e8a2b87dd4a3b5f", "sourceCommit": "57a30f5252ed2d38a615ed7f8a31bdf7b294e1d2", "integration": "e95544f", "scope": "Only context src/test and effective-decision adapter src/test", "contextHTTPExposed": false, "confirmWithCommandIntegrated": false}
+  },
+  "checks": [
+    {"command": "node tools/bootstrap/probe-wave08-context-grant.mjs /Users/hh/Desktop/joker/superagent-agent-c", "exitCode": 0, "cases": 4, "source": "39d090b"},
+    {"command": "node tools/bootstrap/probe-wave08-context-grant.mjs /Users/hh/Desktop/joker/superagent", "exitCode": 0, "cases": 4, "source": "e95544f"},
+    {"command": "node --test --test-reporter=tap packages/context/test/*.case.ts", "exitCode": 0, "tests": 56, "source": "e95544f"},
+    {"command": "node --test --test-reporter=tap packages/knowledge/test/*.case.ts", "exitCode": 0, "tests": 54, "source": "e95544f"},
+    {"command": "node --test --test-reporter=tap packages/workflows/test/*.case.ts", "exitCode": 0, "tests": 45, "source": "e95544f"},
+    {"command": "node --test --test-reporter=tap packages/storage/test/*.case.ts", "exitCode": 0, "tests": 75, "source": "e95544f"},
+    {"command": "pnpm --filter @personal-agent/context --filter @personal-agent/storage --filter @personal-agent/workflows --filter @personal-agent/knowledge build", "exitCode": 0},
+    {"command": "pnpm --filter @personal-agent/context --filter @personal-agent/knowledge --filter @personal-agent/workflows typecheck", "exitCode": 0},
+    {"command": "node --test tests/integration/proposal-commands.case.mjs tests/integration/decision-commands.case.mjs tests/integration/recovery-activation-record.case.mjs", "exitCode": 0, "tests": 22},
+    {"command": "node --test tests/integration/recovery-target-configuration.case.mjs", "exitCode": 0, "tests": 2},
+    {"command": "pnpm --filter @personal-agent/contracts typecheck", "exitCode": 0},
+    {"command": "pnpm --filter @personal-agent/contracts build", "exitCode": 0},
+    {"command": "node --test --test-reporter=dot packages/contracts/test/*.case.ts", "exitCode": 0},
+    {"command": "pnpm --filter @personal-agent/contracts check:generated", "exitCode": 0},
+    {"command": "pnpm --filter @personal-agent/coordinator typecheck:product", "exitCode": 0},
+    {"command": "pnpm --filter @personal-agent/console build", "exitCode": 0, "warning": "Existing main bundle above500KB"}
+  ],
+  "openFindings": [
+    {"owner": "C", "source": "39d090b", "probe": "node tools/bootstrap/probe-wave09-context-proposal.mjs /Users/hh/Desktop/joker/superagent-agent-c", "exitCode": 1, "controls": "PASS", "failures": ["group_kind_alias", "effect_command_mismatch"], "observations": {"artifactOnlyGrantDecisionReads": 1, "recordedEffect": "effect-one", "returnedCommand": "other-command"}},
+    {"owner": "B", "source": "2434a16c9e12b31f48984451306c7ec39f04db2f", "method": "Precise source review and pure in-memory fake probes", "findings": ["ordinary JSON can satisfy release barrier", "proof time/machine/attempt/writer missing not refused", "serving versus terminated/closed mismatch", "same token can fake-send twice and remain issued", "input/transport/hook not frozen", "diagnostic override can imply billing admission"], "productionAuthorityIntegrated": false},
+    {"owner": "D", "source": "50c3471f76b1bc9eb4ee1f8ba25a62f37a682a38", "method": "Precise source/tar review and pure stub probes, no real PID signals", "observations": {"orphanAPIRollback": "BINARY_ROLLED_BACK", "pointerReverts": 1, "unmatchedLiveTargetStopProven": true, "considered": 0}, "findings": ["only launcher pid checked", "spawn/cleanup not persisted across missing record", "record_missing injected after a real record", "binary_rolled_back doctor/recover terminal mismatch"], "productionUpgradeIntegrated": false},
+    {"owner": "E/B", "sources": ["4abfcc5fe0b1a74b865a06d374cf5bc98e8451e4", "2434a16c9e12b31f48984451306c7ec39f04db2f"], "method": "Exact source and VM fake I/O probes", "observations": {"descriptorOnlyFakeSpawn": 1, "actualSpawn": 0, "incompleteUsageComputedCostUSD": 0, "ledgerSettlement": "SETTLED", "unknownTurnsAfter": 0}, "findings": ["E bypasses B sender with descriptor spawn", "costOf null detail becomes zero through harness"], "closedOldFailures": ["v1 wrong grant/caps/unknown identity rejected", "missing model/provider rejected"]}
+  ],
+  "distributionEvidence": {
+    "DPair": [
+      {"source": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389", "build": "7e8f6ce6fa2e2633", "schema": 13, "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631"},
+      {"source": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e", "build": "cd0ecc29d97d5c41", "schema": 13, "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"}
+    ],
+    "DPairHashesIndependentlyMatched": true,
+    "DTargetContainsCurrentMainUIOrSchema15": false,
+    "ETestedProductSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
+    "EReportedProductCases": {"pass": 125, "notTested": 15, "rerunByMain": false},
+    "ETestedInstallPair": {"baselineBuild": "b0f87c883aa6b206", "baselineSchema": 12, "targetBuild": "9120a5ed858e0feb", "targetSchema": 13},
+    "ECallsManagedUpgradeRollback": false,
+    "EIndependentlyTestedDCurrentPair": false
+  },
+  "targetInterface": {"source": "e95544f", "contracts": "packages/contracts/src/recovery-target.ts", "binder": "apps/coordinator/product/recovery-targets.ts", "startupAvailable": false, "materializerImplemented": false, "inventoryReaderImplemented": false, "activationHTTPImplemented": false},
+  "study": {"status": "BLOCKED_CURRENT_RECIPE", "newModelAllowance": 0, "nativeOrModelTurnsStartedByThisReview": 0, "ledgersChanged": false},
+  "existingSevenUserServicesChanged": false,
+  "limitations": ["B/D/E complete native/install suites were not rerun", "Fake probes are behavioral counterexamples, not real native execution", "Context module tests do not close the new kind-alias finding", "Target schema/binder tests do not implement target prepare/activate", "Old installed PASS is retained only for its actual historical pair and operations"]
+}

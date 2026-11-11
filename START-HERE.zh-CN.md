@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**当前派工：[第九轮恢复目标/context/托管升级整包](agent-tasks/product-wave-09/README.zh-CN.md)。** 已独立复验A备份与C旧授权反例，分范围接入；B资源/token、C种类/命令绑定、D孤儿进程、E费用实际链与安装来源仍有阻断。共享RecoveryTarget port及配置binder已交，A/D可立即做真实目标读验/准备，main承担context网页与最终授权激活。详细source/反例/范围见[0031](docs/rfcs/WP-16/0031-wave-09-admission-and-target-boundaries.md)，不新增预算/Driver，不把旧安装结果当当前个人版通过，七组实例保留。
+
 **提案网页已接通：[http://127.0.0.1:5186/](http://127.0.0.1:5186/)。** 用户消息旁“转为提案”可预览并明确确认创建工作、修订合同或记录决定，支持拒绝、来源漂移和刷新后核对原请求。8项真实HTTP/SQLite网页流程通过；A schema15生产恢复facts已集成，新增只读source记录查询，仍固定not_granted/startupAvailable=false。新个人开发预览使用独立私有state，原5180–5185未重启/迁移，本批没有触发真实模型任务；不是恢复target/安装/原生控制准入。源码与消费约定见[0030](docs/rfcs/WP-16/0030-wave-08-proposal-workbench-and-source-audit.md)及[限定证据](reports/releases/wave08-proposal-workbench/README.zh-CN.md)。
 
 **2026-11-11 当前派工：[第八轮可用个人版整包](agent-tasks/product-wave-08/README.zh-CN.md)。** A对齐生产激活事实/历史迁移，B现有运行诊断/恢复支持，C关闭上下文授权边界，D保留personal模式的升级/失败进程一致性，E同源网页/安装/恢复独立验收；main承担实际网页与target激活。审视及精确候选见[0029](docs/rfcs/WP-16/0029-wave-08-product-closure-and-reviewed-inputs.md)。旧决定复活已修；composer新反例未通过，未整体启用。当前Codex试点封存BLOCKED，不再重复费用上界调查、不刷新预算、不阻断产品，原六组服务保留。

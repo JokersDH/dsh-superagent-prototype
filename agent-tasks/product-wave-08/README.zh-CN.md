@@ -1,5 +1,7 @@
 # 第八轮：把现有能力接成可用的个人版
 
+新派工已由[第九轮](../product-wave-09/README.zh-CN.md)接续，原工作区/分支和所有预算不变。实际验收与新共享target接口见[0031](../../docs/rfcs/WP-16/0031-wave-09-admission-and-target-boundaries.md)。本页及旧结果保留历史，不重跑旧阶段刷新额度或把旧安装pair改标签当新结果。
+
 日期2026-11-11；派工基线436dc02，审视输入见[0029](../../docs/rfcs/WP-16/0029-wave-08-product-closure-and-reviewed-inputs.md)。A–E继续原目录/分支和代码归属，wave05修订01、全部grant和旧实测范围保留。本轮每人六阶段，先交可运行checkpoint，再连续完成独立阶段，无需每修一处等下发。
 
 主线新实际检查点：[0030](../../docs/rfcs/WP-16/0030-wave-08-proposal-workbench-and-source-audit.md)，源码b436fde。明确提案网页8场景通过，A schema15生产facts及只读审计GET已集成；旧A读回/接口对齐阻断关闭。C可消费实际UI/HTTP，D/E可核对source记录但不能启动target；自动context/结构化reasoner和target激活仍待后续。新隔离预览5186/8802也须保留。
