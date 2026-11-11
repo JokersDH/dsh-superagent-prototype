@@ -156,3 +156,32 @@ test('project settings transport preserves immutable command identity and reject
   globalThis.fetch = async () => new Response(JSON.stringify({ commandId: 'wrong-command', seq: 1, status: 'recorded' }))
   await assert.rejects(new HttpTransport().projectSettingsCommand(command), error => error instanceof TransportError && error.code === 'schema_mismatch')
 })
+
+test('attention preserves bounded query scope and rejects malformed or misbound pages', async t => {
+  const original = globalThis.fetch
+  t.after(() => { globalThis.fetch = original })
+  let requested = ''
+  const page = { protocol: 'attention-inbox/1', observedAt: '2026-11-10T00:00:00.000Z', items: [], ranks: [],
+    ranking: 'waiting_order', scannedWorks: 0, questionCoverage: 'complete', hasMore: false }
+  globalThis.fetch = async input => { requested = String(input); return new Response(JSON.stringify(page)) }
+  assert.deepEqual(await new HttpTransport().attention({ projectId: 'project:one', limit: 10 }), page)
+  assert.equal(new URL(requested, 'http://localhost').searchParams.get('projectId'), 'project:one')
+  await assert.rejects(new HttpTransport().attention({ limit: 21 }))
+  const item = { id: 'item-one', projectId: 'project-other', conversationId: 'conversation-one', contract: { workId: 'work-one', revision: 1, digest: 'a'.repeat(64) },
+    workTitle: 'Work', summary: 'Paused', sinceAt: null, deadlineAt: null, expiresAt: null, blockedWorkIds: [], kind: 'blocked', code: 'dispatch_paused' }
+  globalThis.fetch = async () => new Response(JSON.stringify({ ...page, items: [item], ranks: [{ id: item.id, reasons: ['unknown_wait'] }] }))
+  await assert.rejects(new HttpTransport().attention({ projectId: 'project-one' }), error => error instanceof TransportError && error.code === 'schema_mismatch')
+  globalThis.fetch = async () => new Response(JSON.stringify({ ...page, hasMore: true }))
+  await assert.rejects(new HttpTransport().attention({}))
+})
+
+test('missing attention support degrades, while authentication failures remain explicit', async t => {
+  const original = globalThis.fetch
+  t.after(() => { globalThis.fetch = original })
+  globalThis.fetch = async () => new Response('404 Not Found', { status: 404 })
+  assert.equal(await new HttpTransport().attention({}), undefined)
+  globalThis.fetch = async () => new Response(JSON.stringify({ error: { code: 'unsupported_capability', message: 'Unavailable', retry: 'none' } }), { status: 422 })
+  assert.equal(await new HttpTransport().attention({}), undefined)
+  globalThis.fetch = async () => new Response(JSON.stringify({ error: { code: 'auth_required', message: 'Sign in', retry: 'user_action' } }), { status: 401 })
+  await assert.rejects(new HttpTransport().attention({}), error => error instanceof TransportError && error.code === 'auth_required')
+})

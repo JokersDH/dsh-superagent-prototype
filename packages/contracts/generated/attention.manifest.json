@@ -1,0 +1,7 @@
+{
+  "protocol": "attention-inbox/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "c9d3dc4d9d132cf41b7fd80c541f51b65f886ed5a137cfa255b9ed68fde76cd0",
+  "sourceHash": "b7cf7583bdbf2c8d3b0dea57f7b072d6fad1eb92954f3187235c874d3aa2220e"
+}
