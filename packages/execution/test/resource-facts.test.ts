@@ -1,182 +1,315 @@
 import assert from 'node:assert/strict'
+import { mkdtempSync, rmSync, statSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { test } from 'node:test'
+import { makeAttemptSpec } from '../../testing/src/index.ts'
 import {
   INVALID_INFERENCES,
   RESOURCE_VERDICTS,
-  classifyResource,
+  classifyVerifiedResource,
   describeResourceFacts,
   resourceFactsDigest,
 } from '../src/resource-facts.ts'
+import {
+  connectRunnerRecovery,
+  createRunnerCredential,
+  serveRunnerRecovery,
+  verifiedRunnerInspection,
+} from '../src/recovery-transport.ts'
 
-/** A fully well-formed observation: everything a caller could supply correctly. */
-function goodObservation(overrides = {}) {
-  return {
+/**
+ * Mint a real authenticated proof through the EXISTING trusted factory.
+ *
+ * There is deliberately no test-only way to manufacture a proof: the registry lives in one WeakMap
+ * that only the authenticated client call populates. So the positive control runs a real socket
+ * server and a real authenticated client, which is exactly what a production caller does.
+ */
+/** The attempt tuple shared by the producer and the inspection, so both describe one attempt. */
+const SPEC = makeAttemptSpec({ fenceEpoch: 3 })
+
+async function withProof(inspection, run) {
+  const root = mkdtempSync(join(tmpdir(), 'pa-w09-proof-'))
+  const socketPath = join(root, 'runner.sock')
+  const credentialPath = join(root, 'runner.cred')
+  createRunnerCredential(credentialPath)
+  // RuntimeProducer is the existing production shape: attempt tuple + runner identity + source.
+  const spec = SPEC
+  const context = {
+    attempt: { ticketId: spec.ticketId, assignmentId: spec.assignmentId, attemptId: spec.attemptId, fenceEpoch: spec.fenceEpoch, contract: spec.contract },
     runnerIdentityRef: 'runner-1',
-    attempt: { attemptId: 'attempt-1', fenceEpoch: 3 },
     source: 'source-1',
-    state: 'serving',
+  }
+  const served = await serveRunnerRecovery(
+    { socketPath, credentialPath },
+    context,
+    {
+      async inspect() {
+        return inspection
+      },
+      async cancel() {
+        return inspection
+      },
+    },
+  )
+  try {
+    // The authenticated client verifies the live socket identity, so observe it rather than guess.
+    const stat = statSync(socketPath)
+    const endpoint = { socketPath, credentialPath, socketIdentity: { dev: stat.dev, ino: stat.ino } }
+    const client = connectRunnerRecovery(endpoint, context)
+    const proof = await client.inspect()
+    await run(proof, context)
+  } finally {
+    await served.close()
+    rmSync(root, { recursive: true, force: true })
+  }
+}
+
+/** A fully quiescent authenticated inspection. */
+function quiescentInspection(overrides = {}) {
+  return {
+    protocol: 1,
+    attempt: { ticketId: SPEC.ticketId, assignmentId: SPEC.assignmentId, attemptId: SPEC.attemptId, fenceEpoch: SPEC.fenceEpoch },
+    runnerIdentityRef: 'runner-1',
+    source: 'source-1',
+    state: 'terminated',
     admission: 'closed',
     coverage: 'complete_owned_resources',
-    observedAt: '2026-11-11T08:00:00.000Z',
-    machineId: 'machine-a',
-    observedMachineId: 'machine-a',
-    resources: [
-      { ref: 'proc-1', ownership: 'spawned_process', writer: 'quiescent', evidence: ['process exited with code 0'] },
-    ],
+    evidence: ['endpoint terminated after draining'],
+    observedAt: new Date().toISOString(),
+    resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'quiescent', evidence: ['process exited with code 0'] }],
     ...overrides,
   }
 }
 
-test('only complete, current, on-machine quiescence verifies a writer stopped', () => {
-  const facts = describeResourceFacts([goodObservation()])
-  assert.equal(facts.verdict, 'all_verified_quiescent')
-  assert.equal(facts.releaseBarrierSatisfied, true)
-  assert.equal(facts.resources[0].verdict, 'verified_quiescent')
-  assert.deepEqual(facts.resources[0].reasons, [])
-})
+// ===============================================================================================
+// B1: ordinary JSON must have no release authority
+// ===============================================================================================
 
-test('an old attempt reported ended does not verify a stop', () => {
-  // The endpoint answered about a past attempt; that says nothing about the writer process now.
-  const facts = describeResourceFacts([
-    goodObservation({ state: 'terminated', resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'quiescent', evidence: ['attempt ended'] }] }),
-  ])
-  assert.equal(facts.verdict, 'unknown')
+test('a plain inspection object is refused, not evaluated', () => {
+  const facts = describeResourceFacts(quiescentInspection())
+  assert.equal(facts.verdict, 'refused')
   assert.equal(facts.releaseBarrierSatisfied, false)
-  assert.match(facts.resources[0].reasons.join(' '), /terminated/)
+  assert.ok(facts.invalidInferencesDetected.includes('plain_json'))
 })
 
-test('a missing pid does not verify a stop', () => {
-  const observation = goodObservation({
-    resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'indeterminate', evidence: ['pid not found'] }],
+test('a JSON round-trip of a real proof is refused', async () => {
+  // The strongest form of the defect: a genuine proof serialized and parsed back must not work,
+  // otherwise anything that can write JSON can release the barrier.
+  await withProof(quiescentInspection(), async proof => {
+    const clone = JSON.parse(JSON.stringify(proof))
+    const facts = describeResourceFacts(clone)
+    assert.equal(facts.verdict, 'refused')
+    assert.equal(facts.releaseBarrierSatisfied, false)
   })
-  const facts = describeResourceFacts([observation])
-  assert.equal(facts.verdict, 'unknown')
-  assert.equal(facts.releaseBarrierSatisfied, false)
-  assert.match(facts.resources[0].reasons.join(' '), /indeterminate, which is not a stop/)
 })
 
-test('a signature from another machine does not verify a stop here', () => {
-  const facts = describeResourceFacts([goodObservation({ observedMachineId: 'machine-b' })])
-  assert.equal(facts.verdict, 'unknown')
-  assert.equal(facts.releaseBarrierSatisfied, false)
-  assert.ok(facts.resources[0].reasons.includes(INVALID_INFERENCES.other_machine))
-  assert.ok(facts.invalidInferencesDetected.includes('other_machine'))
+test('the seven ordinary-JSON counterexamples all fail to release the barrier', () => {
+  // Each of these was an accepted shortcut in wave-08. None may reach releaseBarrierSatisfied.
+  const counterexamples = [
+    ['hand-built complete object', quiescentInspection()],
+    ['assumed machine', { ...quiescentInspection(), machineId: 'machine-a', observedMachineId: 'machine-a' }],
+    ['assumed timeliness', { ...quiescentInspection(), proofRecordedAt: new Date().toISOString() }],
+    ['json string', JSON.parse(JSON.stringify(quiescentInspection()))],
+    ['structured clone', structuredClone(quiescentInspection())],
+    ['wrapped in inspection key', { inspection: quiescentInspection() }],
+    ['empty object', {}],
+  ]
+  const outcomes = counterexamples.map(([label, candidate]) => {
+    const facts = describeResourceFacts(candidate)
+    return { label, verdict: facts.verdict, released: facts.releaseBarrierSatisfied }
+  })
+  for (const outcome of outcomes) {
+    assert.equal(outcome.released, false, `${outcome.label} released the barrier from ordinary JSON`)
+  }
+  assert.equal(outcomes.filter(outcome => outcome.verdict === 'refused').length, outcomes.length)
 })
 
-test('an observation with no machine binding cannot be attributed to this host', () => {
-  const facts = describeResourceFacts([goodObservation({ observedMachineId: null })])
-  assert.equal(facts.verdict, 'unknown')
-  assert.match(facts.resources[0].reasons.join(' '), /not bound to a machine identity/)
+test('a real authenticated proof is evaluated, and quiescence releases the barrier', async () => {
+  await withProof(quiescentInspection(), async proof => {
+    const facts = describeResourceFacts(proof)
+    assert.equal(facts.verdict, 'all_verified_quiescent')
+    assert.equal(facts.releaseBarrierSatisfied, true)
+    assert.equal(facts.counts.total, 1)
+    assert.ok(facts.proof.socketIdentity, 'the authenticated socket identity must be reported')
+  })
 })
 
-test('wrong scope is not a release', () => {
-  // Coverage only describes what this endpoint owns. A resource outside that scope stays unknown.
-  const facts = describeResourceFacts([
-    goodObservation({ coverage: 'partial' }),
-  ])
-  assert.equal(facts.verdict, 'unknown')
-  assert.equal(facts.releaseBarrierSatisfied, false)
-  assert.match(facts.resources[0].reasons.join(' '), /partial coverage/)
+test('the reported proof provenance comes from the proof, not from caller fields', async () => {
+  await withProof(quiescentInspection(), async proof => {
+    const facts = describeResourceFacts(proof)
+    assert.equal(facts.proof.runnerIdentityRef, 'runner-1')
+    assert.equal(facts.proof.attempt.fenceEpoch, 3)
+    assert.equal(facts.proof.state, 'terminated')
+    // A caller cannot inject a different machine: there is no machine field to set.
+    assert.equal(typeof facts.proof.socketIdentity.ino, 'number')
+  })
 })
 
-test('lost contact neither verifies nor fabricates a writer', () => {
-  const facts = describeResourceFacts([goodObservation({ state: 'unknown', coverage: 'unknown' })])
-  assert.equal(facts.verdict, 'unknown')
-  assert.equal(facts.releaseBarrierSatisfied, false)
-  // With unknown coverage there is nothing to enumerate, so the honest answer is no observation.
-  assert.equal(facts.verdict !== 'all_verified_quiescent', true)
+test('requiredAt is validated rather than echoed', async () => {
+  const observedAt = new Date(Date.now() - 60_000).toISOString()
+  await withProof(quiescentInspection({ observedAt }), async proof => {
+    // The proof is fresh, so requiring a past instant is fine.
+    const ok = describeResourceFacts(proof, { requiredAt: new Date(Date.now() - 120_000).toISOString() })
+    assert.equal(ok.releaseBarrierSatisfied, true)
+
+    // Requiring a future instant cannot be satisfied by an older observation.
+    const stale = describeResourceFacts(proof, { requiredAt: new Date(Date.now() + 60_000).toISOString() })
+    assert.equal(stale.verdict, 'refused')
+    assert.equal(stale.releaseBarrierSatisfied, false)
+    assert.equal(stale.reason, 'stale_relative_to_requirement')
+    assert.ok(stale.invalidInferencesDetected.includes('stale_proof'))
+  })
 })
 
-test('an active writer blocks the barrier even when everything else is clean', () => {
-  const facts = describeResourceFacts([
-    goodObservation({
+test('an invalid requiredAt is refused instead of skipped', async () => {
+  await withProof(quiescentInspection(), async proof => {
+    const facts = describeResourceFacts(proof, { requiredAt: 'not-a-timestamp' })
+    assert.equal(facts.releaseBarrierSatisfied, false)
+    assert.equal(facts.reason, 'stale_relative_to_requirement')
+  })
+})
+
+test('an expired proof is refused by the existing transport rule', async () => {
+  await withProof(quiescentInspection(), async proof => {
+    // maxAgeMs of 1ms with a tiny wait exhausts the transport's own freshness window.
+    await new Promise(resolve => setTimeout(resolve, 10))
+    const facts = describeResourceFacts(proof, { maxAgeMs: 1 })
+    assert.equal(facts.verdict, 'refused')
+    assert.equal(facts.reason, 'stale_proof')
+    assert.equal(facts.releaseBarrierSatisfied, false)
+  })
+})
+
+// ===============================================================================================
+// B2: the barrier semantics on authenticated input
+// ===============================================================================================
+
+test('serving is not a release even when every writer is quiescent', async () => {
+  await withProof(quiescentInspection({ state: 'serving' }), async proof => {
+    const facts = describeResourceFacts(proof)
+    assert.equal(facts.releaseBarrierSatisfied, false)
+    assert.ok(facts.invalidInferencesDetected.includes('serving'))
+  })
+})
+
+test('open admission keeps a quiescent writer unresolved', async () => {
+  await withProof(quiescentInspection({ admission: 'open' }), async proof => {
+    const facts = describeResourceFacts(proof)
+    assert.equal(facts.releaseBarrierSatisfied, false)
+  })
+})
+
+test('partial coverage cannot vouch for a registered resource', async () => {
+  await withProof(quiescentInspection({ coverage: 'partial' }), async proof => {
+    const facts = describeResourceFacts(proof)
+    assert.equal(facts.releaseBarrierSatisfied, false)
+    assert.ok(facts.invalidInferencesDetected.includes('partial_coverage'))
+  })
+})
+
+test('an active writer blocks the barrier', async () => {
+  await withProof(
+    quiescentInspection({ resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'active', evidence: ['running'] }] }),
+    async proof => {
+      const facts = describeResourceFacts(proof)
+      assert.equal(facts.verdict, 'possibly_active')
+      assert.equal(facts.releaseBarrierSatisfied, false)
+    },
+  )
+})
+
+test('an indeterminate writer blocks the barrier', async () => {
+  await withProof(
+    quiescentInspection({ resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'indeterminate', evidence: [] }] }),
+    async proof => {
+      const facts = describeResourceFacts(proof)
+      assert.equal(facts.verdict, 'unknown')
+      assert.equal(facts.releaseBarrierSatisfied, false)
+    },
+  )
+})
+
+test('a quiescent writer without evidence cannot be audited', async () => {
+  await withProof(
+    quiescentInspection({ resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'quiescent', evidence: [] }] }),
+    async proof => {
+      const facts = describeResourceFacts(proof)
+      assert.equal(facts.releaseBarrierSatisfied, false)
+    },
+  )
+})
+
+test('no registered resources never satisfies the barrier', async () => {
+  await withProof(quiescentInspection({ resources: [] }), async proof => {
+    const facts = describeResourceFacts(proof)
+    assert.equal(facts.verdict, 'no_resources_observed')
+    assert.equal(facts.releaseBarrierSatisfied, false)
+  })
+})
+
+test('one unknown resource keeps the whole set unresolved', async () => {
+  await withProof(
+    quiescentInspection({
       resources: [
-        { ref: 'proc-1', ownership: 'spawned_process', writer: 'active', evidence: ['still running'] },
+        { ref: 'proc-1', ownership: 'spawned_process', writer: 'quiescent', evidence: ['exited'] },
+        { ref: 'proc-2', ownership: 'shared_service_session', writer: 'indeterminate', evidence: [] },
+      ],
+    }),
+    async proof => {
+      const facts = describeResourceFacts(proof)
+      assert.notEqual(facts.verdict, 'all_verified_quiescent')
+      assert.equal(facts.releaseBarrierSatisfied, false)
+      assert.equal(facts.counts.unknown, 1)
+    },
+  )
+})
+
+test('classified resources always carry a declared verdict and a reason when unresolved', async () => {
+  await withProof(
+    quiescentInspection({
+      resources: [
+        { ref: 'proc-1', ownership: 'spawned_process', writer: 'active', evidence: [] },
         { ref: 'proc-2', ownership: 'spawned_process', writer: 'quiescent', evidence: ['exited'] },
       ],
     }),
-  ])
-  assert.equal(facts.verdict, 'possibly_active')
-  assert.equal(facts.releaseBarrierSatisfied, false)
-  assert.equal(facts.counts.possiblyActive, 1)
+    async proof => {
+      const facts = describeResourceFacts(proof)
+      for (const resource of facts.resources) {
+        assert.ok(RESOURCE_VERDICTS.includes(resource.verdict))
+        if (resource.verdict !== 'verified_quiescent') assert.ok(resource.reasons.length > 0)
+      }
+    },
+  )
 })
 
-test('open business admission keeps a quiescent writer unresolved', () => {
-  const facts = describeResourceFacts([goodObservation({ admission: 'open' })])
-  assert.equal(facts.verdict, 'unknown')
-  assert.match(facts.resources[0].reasons.join(' '), /admission is still open/)
-})
-
-test('stale proof does not describe the current writer', () => {
-  const facts = describeResourceFacts([
-    goodObservation({ proofRecordedAt: '2026-11-11T07:00:00.000Z', observedAt: '2026-11-11T08:00:00.000Z' }),
-  ])
-  assert.equal(facts.verdict, 'unknown')
-  assert.ok(facts.resources[0].reasons.includes(INVALID_INFERENCES.stale_proof))
-})
-
-test('a quiescent report without evidence cannot be audited', () => {
-  const facts = describeResourceFacts([
-    goodObservation({ resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'quiescent', evidence: [] }] }),
-  ])
-  assert.equal(facts.verdict, 'unknown')
-  assert.match(facts.resources[0].reasons.join(' '), /no evidence/)
-})
-
-test('one unknown writer keeps the whole set unresolved', () => {
-  // Starting new execution while a single writer is unresolved is the exact hazard this guards.
-  const facts = describeResourceFacts([
-    goodObservation(),
-    goodObservation({ runnerIdentityRef: 'runner-2', resources: [{ ref: 'proc-9', ownership: 'spawned_process', writer: 'indeterminate', evidence: [] }] }),
-  ])
-  assert.notEqual(facts.verdict, 'all_verified_quiescent')
-  assert.equal(facts.releaseBarrierSatisfied, false)
-  assert.equal(facts.counts.unknown, 1)
-})
-
-test('no observations never satisfies the barrier', () => {
-  const facts = describeResourceFacts([])
-  assert.equal(facts.verdict, 'no_resources_observed')
-  assert.equal(facts.releaseBarrierSatisfied, false)
-})
-
-test('a new execution state is not treated as a release', () => {
-  const facts = describeResourceFacts([goodObservation({ coverage: 'partial', state: 'serving' })])
-  assert.equal(facts.releaseBarrierSatisfied, false)
-  assert.match(facts.notClaimed.join(' '), /new execution state released/)
-})
-
-test('every verdict is a declared value and every resource explains itself', () => {
-  const facts = describeResourceFacts([
-    goodObservation(),
-    goodObservation({ observedMachineId: 'machine-b' }),
-  ])
-  for (const resource of facts.resources) {
-    assert.ok(RESOURCE_VERDICTS.includes(resource.verdict), `unexpected verdict ${resource.verdict}`)
-    if (resource.verdict !== 'verified_quiescent') {
-      assert.ok(resource.reasons.length > 0, `${resource.ref} has no reason for ${resource.verdict}`)
-    }
-  }
-})
-
-test('the digest changes when the resource picture changes', () => {
-  const clean = describeResourceFacts([goodObservation()])
-  const active = describeResourceFacts([
-    goodObservation({ resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'active', evidence: ['running'] }] }),
-  ])
-  assert.notEqual(resourceFactsDigest(clean), resourceFactsDigest(active))
-  assert.equal(resourceFactsDigest(clean), resourceFactsDigest(describeResourceFacts([goodObservation()])))
-})
-
-test('classifyResource is usable on its own and agrees with the aggregate', () => {
-  const observation = goodObservation()
-  const single = classifyResource(observation.resources[0], observation)
-  const aggregate = describeResourceFacts([observation])
-  assert.equal(single.verdict, aggregate.resources[0].verdict)
-})
-
-test('a resource without identity concludes nothing', () => {
-  const result = classifyResource({}, goodObservation())
+test('classifyVerifiedResource refuses a bare resource with no authenticated binding', () => {
+  // Exported for reuse, but without a proof it can only refuse: there is no machine to appeal to.
+  const result = classifyVerifiedResource({ ref: 'proc-1', writer: 'quiescent', evidence: ['x'] }, quiescentInspection(), null)
   assert.equal(result.verdict, 'unknown')
-  assert.match(result.reasons.join(' '), /no identity/)
+  assert.ok(result.reasons.includes(INVALID_INFERENCES.plain_json))
+})
+
+test('the digest changes with the trusted picture and is a full sha256', async () => {
+  await withProof(quiescentInspection(), async proof => {
+    const clean = describeResourceFacts(proof)
+    assert.match(resourceFactsDigest(clean), /^[a-f0-9]{64}$/)
+    const other = describeResourceFacts(proof, { requiredAt: new Date(Date.now() + 60_000).toISOString() })
+    assert.notEqual(resourceFactsDigest(clean), resourceFactsDigest(other))
+  })
+})
+
+test('the barrier always refuses to over-claim', async () => {
+  await withProof(quiescentInspection(), async proof => {
+    const facts = describeResourceFacts(proof)
+    assert.ok(facts.notClaimed.length >= 4)
+    assert.match(facts.notClaimed.join(' '), /unobserved writer/)
+    assert.match(facts.notClaimed.join(' '), /new generation/)
+    assert.match(facts.notClaimed.join(' '), /diagnostic summary/)
+  })
+})
+
+test('the existing transport still rejects a proof it did not issue', () => {
+  // This is the invariant resource-facts relies on; asserting it here keeps the dependency honest.
+  assert.throws(() => verifiedRunnerInspection({ inspection: quiescentInspection() }))
 })

@@ -15,7 +15,7 @@ export type {
 export {
   INVALID_INFERENCES,
   RESOURCE_VERDICTS,
-  classifyResource,
+  classifyVerifiedResource,
   describeResourceFacts,
   resourceFactsDigest,
 } from './resource-facts.ts'

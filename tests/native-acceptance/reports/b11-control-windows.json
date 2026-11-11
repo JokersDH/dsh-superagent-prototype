@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T08:48:14.239Z",
+  "generatedAt": "2026-11-11T10:36:26.196Z",
   "environment": {
     "note": "wave-08 B11 controlled control/recovery failure windows",
     "modelCalls": 0
@@ -106,57 +106,52 @@
       "entities": []
     },
     {
-      "id": "B11-RESOURCE-UNCERTAIN-BLOCKS",
-      "title": "an unresolved resource blocks new execution",
+      "id": "B11-RESOURCE-PLAIN-JSON-REFUSED",
+      "title": "ordinary resource JSON cannot release the barrier",
       "lane": "package-local",
       "status": "PASS",
       "detail": [
-        "partial coverage keeps the barrier closed, so new execution is blocked rather than assumed safe"
+        "a hand-assembled resource object is refused, so ordinary JSON carries no release authority"
       ],
       "evidence": [
         {
-          "verdict": "unknown",
-          "releaseBarrierSatisfied": false,
-          "reasons": [
-            "the endpoint reports partial coverage, so its resource list is not exhaustive"
+          "verdict": "refused",
+          "released": false,
+          "detected": [
+            "plain_json"
           ]
         }
       ],
       "entities": []
     },
     {
-      "id": "B11-RESOURCE-ACTIVE-BLOCKS",
-      "title": "an active writer blocks even when everything else is clean",
+      "id": "B11-RESOURCE-EMPTY-REFUSED",
+      "title": "no observation never satisfies the barrier",
       "lane": "package-local",
       "status": "PASS",
       "detail": [
-        "an active writer blocks the resource barrier"
+        "an absent observation keeps the barrier closed; nothing is asserted about the old writer"
       ],
       "evidence": [
         {
-          "verdict": "possibly_active",
-          "satisfied": false
+          "verdict": "refused",
+          "released": false
         }
       ],
       "entities": []
     },
     {
-      "id": "B11-NEW-STATE-NO-RELEASE",
-      "title": "creating a new execution state does not release an old resource",
+      "id": "B11-OBSERVATION-VS-AUTHORITY",
+      "title": "an observation is not an authority even when it looks complete",
       "lane": "package-local",
       "status": "PASS",
       "detail": [
-        "with no observation of the old writer the barrier stays closed; a new state asserts nothing about it"
+        "a complete-looking observation is still not authority; only the authenticated proof is"
       ],
       "evidence": [
         {
-          "verdict": "no_resources_observed",
-          "satisfied": false,
-          "notClaimed": [
-            "that an unobserved writer does not exist",
-            "that a new execution state released any old resource",
-            "that native stop or unknown-send reconciliation were exercised"
-          ]
+          "verdict": "refused",
+          "released": false
         }
       ],
       "entities": []

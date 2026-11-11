@@ -172,55 +172,63 @@ log.begin('B11-STALE-EPOCH-COMMAND', 'a command built for the old tuple cannot b
 // ===============================================================================================
 // 3. resource-uncertain blocking (ties B2 resource facts to B3 blocking)
 // ===============================================================================================
-log.begin('B11-RESOURCE-UNCERTAIN-BLOCKS', 'an unresolved resource blocks new execution', 'package-local')
+// Wave-09 B1 changed this: a barrier claim now requires the existing authenticated proof, so plain
+// JSON is refused outright rather than evaluated. These three cases assert that refusal, which is
+// strictly stronger than the wave-08 assertions they replace.
+log.begin('B11-RESOURCE-PLAIN-JSON-REFUSED', 'ordinary resource JSON cannot release the barrier', 'package-local')
 {
-  const observation = {
+  const fabricated = {
     runnerIdentityRef: 'runner-old',
     state: 'serving',
     admission: 'closed',
-    coverage: 'partial', // the endpoint cannot see everything it owns
+    coverage: 'complete_owned_resources',
     observedAt: '2026-11-11T08:00:00.000Z',
     machineId: 'machine-a',
     observedMachineId: 'machine-a',
     resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'quiescent', evidence: ['exited'] }],
   }
-  const facts = describeResourceFacts([observation])
-  log.evidence({ verdict: facts.verdict, releaseBarrierSatisfied: facts.releaseBarrierSatisfied, reasons: facts.resources[0].reasons.slice(0, 2) })
-  if (facts.releaseBarrierSatisfied === false && facts.verdict === 'unknown') {
-    log.pass('partial coverage keeps the barrier closed, so new execution is blocked rather than assumed safe')
+  const facts = describeResourceFacts(fabricated)
+  log.evidence({ verdict: facts.verdict, released: facts.releaseBarrierSatisfied, detected: facts.invalidInferencesDetected })
+  if (facts.verdict === 'refused' && facts.releaseBarrierSatisfied === false && facts.invalidInferencesDetected.includes('plain_json')) {
+    log.pass('a hand-assembled resource object is refused, so ordinary JSON carries no release authority')
   } else {
-    log.fail(`an uncertain resource released the barrier: ${facts.verdict}`)
+    log.fail(`ordinary JSON was evaluated: ${JSON.stringify(facts).slice(0, 200)}`)
   }
 }
 
-log.begin('B11-RESOURCE-ACTIVE-BLOCKS', 'an active writer blocks even when everything else is clean', 'package-local')
+log.begin('B11-RESOURCE-EMPTY-REFUSED', 'no observation never satisfies the barrier', 'package-local')
 {
-  const facts = describeResourceFacts([
-    {
-      runnerIdentityRef: 'runner-old',
-      state: 'serving',
-      admission: 'closed',
-      coverage: 'complete_owned_resources',
-      observedAt: '2026-11-11T08:00:00.000Z',
-      machineId: 'machine-a',
-      observedMachineId: 'machine-a',
-      resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'active', evidence: ['running'] }],
-    },
-  ])
-  log.evidence({ verdict: facts.verdict, satisfied: facts.releaseBarrierSatisfied })
-  if (facts.releaseBarrierSatisfied === false) log.pass('an active writer blocks the resource barrier')
-  else log.fail('an active writer did not block the barrier')
+  const facts = describeResourceFacts([])
+  log.evidence({ verdict: facts.verdict, released: facts.releaseBarrierSatisfied })
+  if (facts.releaseBarrierSatisfied === false) log.pass('an absent observation keeps the barrier closed; nothing is asserted about the old writer')
+  else log.fail('absent observations released the barrier')
 }
 
-log.begin('B11-NEW-STATE-NO-RELEASE', 'creating a new execution state does not release an old resource', 'package-local')
+log.begin('B11-OBSERVATION-VS-AUTHORITY', 'an observation is not an authority even when it looks complete', 'package-local')
 {
-  // A new state is represented by simply not supplying an observation for the old writer.
-  const facts = describeResourceFacts([])
-  log.evidence({ verdict: facts.verdict, satisfied: facts.releaseBarrierSatisfied, notClaimed: facts.notClaimed })
-  if (facts.releaseBarrierSatisfied === false && facts.verdict === 'no_resources_observed') {
-    log.pass('with no observation of the old writer the barrier stays closed; a new state asserts nothing about it')
+  // The distinction the whole barrier rests on: reporting what you saw is not permission to release.
+  const looksComplete = { ...quiescentLookingPlainJson() }
+  const facts = describeResourceFacts(looksComplete)
+  log.evidence({ verdict: facts.verdict, released: facts.releaseBarrierSatisfied })
+  if (facts.releaseBarrierSatisfied === false) {
+    log.pass('a complete-looking observation is still not authority; only the authenticated proof is')
   } else {
-    log.fail(`absent observations released the barrier: ${facts.verdict}`)
+    log.fail('a plain observation was promoted to authority')
+  }
+}
+
+function quiescentLookingPlainJson() {
+  return {
+    protocol: 1,
+    attempt: { ticketId: 't', assignmentId: 'a', attemptId: 'x', fenceEpoch: 1 },
+    runnerIdentityRef: 'runner-1',
+    source: 'source-1',
+    state: 'terminated',
+    admission: 'closed',
+    coverage: 'complete_owned_resources',
+    evidence: ['drained'],
+    observedAt: new Date().toISOString(),
+    resources: [{ ref: 'proc-1', ownership: 'spawned_process', writer: 'quiescent', evidence: ['exited'] }],
   }
 }
 
