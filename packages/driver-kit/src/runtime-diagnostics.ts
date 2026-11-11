@@ -200,6 +200,27 @@ function privateFacts() {
  * Returns either a usable executor description or an explicit refusal. The refusal path is not an
  * exception: main and the launcher need to render why, so it is a first-class result.
  */
+/**
+ * Validate a caller-supplied model identity.
+ *
+ * `measured` is true only when the caller names a real model and provider AND says where the values
+ * came from. A bare pair with no provenance is not admitted as a measured identity.
+ */
+export function suppliedModelIdentity(input) {
+  if (input === undefined || input === null) {
+    return { measured: false, value: null, problem: 'no model/provider was measured, so billing cannot be admitted' }
+  }
+  const { model, modelProvider, observedFrom } = input
+  const value = { model: model ?? null, modelProvider: modelProvider ?? null, observedFrom: observedFrom ?? null }
+  if (typeof model !== 'string' || model === '' || typeof modelProvider !== 'string' || modelProvider === '') {
+    return { measured: false, value, problem: 'the model/provider values are missing, so billing cannot be admitted' }
+  }
+  if (typeof observedFrom !== 'string' || observedFrom === '') {
+    return { measured: false, value, problem: 'the model/provider values carry no provenance, so they cannot be trusted as measured' }
+  }
+  return { measured: true, value, problem: null }
+}
+
 export function describeRuntime(options = {}) {
   const { binary = 'codex', includePrivate = false, capabilities = {} } = options
   const observed = resolveRuntimeIdentity({ binary })
@@ -231,7 +252,16 @@ export function describeRuntime(options = {}) {
   const supplied = capabilities ?? {}
   const rows = CAPABILITY_ROWS.map(row => {
     const override = supplied[row.id]
-    const state = override?.state ?? defaultStateFor(row.id, { identity: observed, enforcement })
+    const observedState = defaultStateFor(row.id, { identity: observed, enforcement })
+    // A caller may REPORT a measurement, but never upgrade a billing-relevant row to supported.
+    // Otherwise an override object would be a way to switch on admission, which is what wave-09
+    // forbids: diagnostics report, they do not grant.
+    const state =
+      override?.state === undefined
+        ? observedState
+        : row.admitsBilling && override.state === 'supported'
+          ? observedState
+          : override.state
     return {
       id: row.id,
       label: row.label,
@@ -245,12 +275,20 @@ export function describeRuntime(options = {}) {
 
   const blocked = rows.filter(row => row.admitsBilling && row.state !== 'supported')
   const usable = reasons.length === 0
+  // Billing needs a REAL model/provider pair from a measured source. A null identity, or one that
+  // only exists because a caller claimed it, cannot produce the green light.
+  // Billing reasons are separate from usability reasons: a missing measured model identity blocks
+  // billing without claiming the executor is unusable.
+  const modelIdentity = suppliedModelIdentity(options.modelIdentity)
+  const billingReasons = modelIdentity.problem ? [modelIdentity.problem] : []
 
   return {
     protocol: 'runtime-description/1',
     usable,
     /** Only ever true when nothing blocks a billable run. Kept separate so a UI cannot conflate. */
-    billableAdmitted: usable && blocked.length === 0,
+    billableAdmitted: usable && blocked.length === 0 && billingReasons.length === 0 && modelIdentity.measured,
+    billingReasons,
+    modelIdentity: modelIdentity.value,
     reasons,
     identity,
     /** True when paths were withheld; main decides whether to publish the full form. */

@@ -31,7 +31,11 @@ export {
   descriptionDigest,
   probeHostEnforcement,
   resolveRuntimeIdentity,
+  suppliedModelIdentity,
 } from './runtime-diagnostics.ts'
 
 // --- wave-08 B4: the one send-admission path shared by B and E --------------------------------
-export { admitSend, consumeSendToken, isIssuedToken } from './send-admission.ts'
+export { SENDER_OWNER, admitSend, consumeSendToken, inspectToken } from './send-admission.ts'
+
+// --- wave-09 B4: the bounded sender E calls directly -------------------------------------------
+export { NO_SEND, createReviewSender } from './review-sender.ts'

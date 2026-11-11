@@ -131,3 +131,48 @@ test('identity resolution reports both a version and a byte digest', () => {
     assert.ok(identity.version, 'a located binary must report a version')
   }
 })
+
+// --- wave-09 B5: diagnostics report, they never grant -----------------------------------------
+
+test('a caller capability override cannot switch on billing', () => {
+  // Every billing-relevant row claimed supported and a full model identity supplied: still no light,
+  // because an override is a report and the rows stay at their observed value.
+  const description = describeRuntime({
+    capabilities: {
+      turn_budget_field: { state: 'supported' },
+      pricing_surface: { state: 'supported' },
+      native_control: { state: 'supported' },
+    },
+    modelIdentity: { model: 'gpt-6.1-sol', modelProvider: 'OpenAI', observedFrom: 'thread/start' },
+  })
+  assert.equal(description.billableAdmitted, false)
+  const billingRows = description.capabilities.filter(row => row.admitsBilling)
+  for (const row of billingRows) {
+    assert.notEqual(row.state, 'supported', `${row.id} was upgraded to supported by an override`)
+  }
+})
+
+test('a null model identity blocks billing even with every row supported', () => {
+  const description = describeRuntime({ modelIdentity: { model: null, modelProvider: null, observedFrom: 'thread/start' } })
+  assert.equal(description.billableAdmitted, false)
+  assert.match(description.billingReasons.join(' '), /model\/provider values are missing/)
+})
+
+test('a model identity without provenance is not treated as measured', () => {
+  const description = describeRuntime({ modelIdentity: { model: 'gpt-6.1-sol', modelProvider: 'OpenAI' } })
+  assert.equal(description.billableAdmitted, false)
+  assert.match(description.billingReasons.join(' '), /carry no provenance/)
+})
+
+test('a downgrade override is still honoured', () => {
+  // Reporting a capability as worse than observed must work, or a consumer cannot record a regression.
+  const description = describeRuntime({ capabilities: { host_isolation: { state: 'absent' } } })
+  const host = description.capabilities.find(row => row.id === 'host_isolation')
+  assert.equal(host.state, 'absent')
+})
+
+test('billing stays unadmitted on this host without a measured model identity', () => {
+  const description = describeRuntime()
+  assert.equal(description.billableAdmitted, false)
+  assert.equal(description.modelIdentity, null)
+})

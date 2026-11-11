@@ -1,0 +1,147 @@
+{
+  "wave": "product-wave-09",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "531c6b6",
+  "mergeCommit": "f3f5baa",
+  "previousCandidate": "e1a528d",
+  "packet": "agent-tasks/product-wave-09/agent-b-*.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0031-wave-09-admission-and-target-boundaries.md",
+  "scopeNote": "NO_SUPPORTED_BOUNDED_RECIPE preserved and NOT re-investigated. No new Driver, no billing proxy, no model send, no ledger refresh. wave03-b-native cap4 remainder stays UNKNOWN and unspendable; E's pilot grant untouched.",
+
+  "defectsClosed": {
+    "plain_json_release_authority": {
+      "phase": "B1",
+      "before": "resource-facts read plain JSON, so a caller could assemble machine/timeliness/writer fields by hand and receive releaseBarrierSatisfied=true",
+      "after": "the only accepted input is the existing authenticated VerifiedRunnerInspection, validated through the single `verified` WeakMap in recovery-transport.ts; no parallel registry was created",
+      "evidence": "packages/execution/test/resource-facts.test.ts (21 cases)"
+    },
+    "token_concurrent_double_spend": {
+      "phase": "B3",
+      "before": "a token could be consumed twice concurrently because nothing occupied its state before the reservation was awaited",
+      "after": "state is claimed SYNCHRONOUSLY before any await; a concurrent second consume loses the race and is refused",
+      "evidence": "packages/driver-kit/test/send-admission.test.ts (21 cases, including a slow-reservation race)"
+    },
+    "post_issuance_transport_substitution": {
+      "phase": "B3",
+      "before": "a token issued for the owned transport could be spent through any other transport the caller supplied",
+      "after": "the transport and hook are bound by object identity at issue time and must be the identical objects at consume time",
+      "evidence": "packages/driver-kit/test/send-admission.test.ts"
+    },
+    "plain_json_gates": {
+      "phase": "B3",
+      "before": "a caller-supplied gates object claiming everything satisfied was indistinguishable from measured evidence",
+      "after": "gates are snapshotted and frozen into the token; a missing gate is a refusal; a satisfied model gate still needs real model/provider values",
+      "evidence": "packages/driver-kit/test/send-admission.test.ts"
+    },
+    "caller_override_granted_billing": {
+      "phase": "B5",
+      "before": "a caller capability override could mark every billing-relevant row supported and switch on billableAdmitted",
+      "after": "overrides may only downgrade billing-relevant rows; billing also requires a measured model/provider carrying provenance, and billingReasons are separate from usability reasons",
+      "evidence": "packages/driver-kit/test/runtime-diagnostics.test.ts (17 cases)"
+    }
+  },
+
+  "phases": {
+    "B1": {
+      "status": "PASS",
+      "label": "ordinary resource JSON lost its release authority",
+      "delivered": ["packages/execution/src/resource-facts.ts (rewritten)", "packages/execution/test/resource-facts.test.ts"],
+      "reusedProof": "verifiedRunnerInspection() from recovery-transport.ts; the sole proof WeakMap",
+      "requiredAt": "actually validated: a proof observed before the required instant is refused as stale_relative_to_requirement, and an unparseable requiredAt is refused rather than skipped",
+      "counterexamples": "the seven ordinary-JSON shapes are asserted directly and all are refused",
+      "positiveControl": "a real authenticated server/client pair through serveRunnerRecovery/connectRunnerRecovery; there is deliberately no test-only way to mint a proof"
+    },
+    "B2": {
+      "status": "PASS",
+      "label": "barrier semantics on authenticated input",
+      "barrierRules": [
+        "serving is not a release even when every writer is quiescent",
+        "open admission keeps a quiescent writer unresolved",
+        "partial coverage cannot vouch for a registered resource",
+        "active or indeterminate writers block",
+        "a quiescent writer without evidence cannot be audited",
+        "no registered resources never satisfies the barrier",
+        "one unresolved resource keeps the whole set unresolved"
+      ],
+      "machineBinding": "the authenticated socket identity from the proof, never a caller field",
+      "observationVsAuthority": "a complete-looking plain observation is still not authority; only the authenticated proof is"
+    },
+    "B3": {
+      "status": "PASS",
+      "label": "one-use sender bound to immutable request and fixed transport",
+      "delivered": ["packages/driver-kit/src/send-admission.ts (rewritten)", "packages/driver-kit/test/send-admission.test.ts"],
+      "tokenBinds": ["grant identity", "gate digests", "subject", "profile", "host policy", "case+turn", "fixed transport object", "fixed hook object"],
+      "oneUse": "claimed synchronously before the reservation await; never refunded on refusal, throw or unknown",
+      "noSecondImplementation": "request keys entry/command/argv/cli/spawn/transportOverride/hookOverride are refused outright",
+      "ownerSpoofing": "naming the sender's own owner routes through that grant's real ledger audit, which fails, so a caller cannot ride this role's grant",
+      "fakeSendCount": 0
+    },
+    "B4": {
+      "status": "PASS",
+      "label": "the bounded sender E calls directly",
+      "delivered": ["packages/driver-kit/src/review-sender.ts", "packages/driver-kit/test/review-sender.test.ts"],
+      "entry": "createReviewSender({ transport, hook, grant, audit, costBound, hostPolicy }) -> { send, describe }",
+      "currentBehaviour": "a real send is refused because no per-turn ceiling and no price surface exist; fake send count stays 0 and nothing is reserved",
+      "noDescriptorUnlock": "a caller cannot switch the bound on with a claim; the measured bound decides and a caller may only make it stricter",
+      "descriptorSafety": "describe() returns no callable, so E receives no transport or raw command it could use to send another way"
+    },
+    "B5": {
+      "status": "PASS",
+      "label": "diagnostics report but never grant",
+      "delivered": ["packages/driver-kit/src/runtime-diagnostics.ts (hardened)"],
+      "rule": "a caller capability override may only downgrade a billing-relevant row; billing additionally requires a measured model/provider with provenance",
+      "separation": "billingReasons are reported separately from usability reasons, so a missing model identity blocks billing without claiming the executor is unusable",
+      "publicProjection": "no home or store path in the default projection; private facts are opt-in"
+    },
+    "B6": {
+      "status": "PASS",
+      "label": "frozen rerunnable handoff",
+      "authoritativeStatus": "tests/native-acceptance/reports/wave09-status.json"
+    }
+  },
+
+  "verification": {
+    "driverKit": {"tests": 65, "pass": 65, "fail": 0},
+    "execution": {"tests": 21, "pass": 21, "fail": 0},
+    "b9RunnerAdmission": {"cases": 17, "PASS": 17, "FAIL": 0},
+    "b11ControlWindows": {"cases": 11, "PASS": 10, "FAIL": 0, "NOT_TESTED": 1},
+    "unitSuites": {"tests": 41, "pass": 41}
+  },
+
+  "preservedConclusions": {
+    "boundedRecipe": "NO_SUPPORTED_BOUNDED_RECIPE",
+    "dossier": "tests/native-acceptance/reports/wave07-b4-bound-dossier.md",
+    "notReinvestigated": true
+  },
+
+  "budget": {
+    "grants": [
+      {"grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false},
+      {"grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "attributionState": "NOT_B_GRANT", "bConsumes": false, "touchedThisWave": false}
+    ],
+    "historicalRoundsUsed": 3,
+    "modelCallsThisWave": 0,
+    "realModelSends": 0
+  },
+
+  "notTested": [
+    "real vendor turn start, stop, question delivery, steer and unknown-send reconciliation",
+    "the process-wide epoch high-water mark across a real restart (needs durable storage owned by core/storage)",
+    "whether a goal token budget is checked before the first inference of a turn",
+    "actual billed amount for any real turn"
+  ],
+
+  "limitations": [
+    "the sender cannot prove the caller's process identity; grant authority is the ledger audit, not a boolean",
+    "host enforcement is macOS Seatbelt; elsewhere the host capability reports absent",
+    "a usable executor is not review admission and not release acceptance",
+    "diagnostics describe; they never carry release or billing authority"
+  ],
+
+  "nextConsumerSteps": {
+    "main": "consume describeResourceFacts only with an authenticated proof; a plain JSON resource summary has no release authority; consume describeRuntime for read-only facts",
+    "D": "describeRuntime gives exact executable/profile facts with paths redacted by default; no credential or account home is included",
+    "E": "use createReviewSender with the owned transport and your persistent reservation hook; there is no CLI fallback, no descriptor unlock and today the send refuses because the bounded recipe is blocked"
+  }
+}
