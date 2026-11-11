@@ -1,0 +1,21 @@
+{
+  "protocol": "evidence-consumer/1",
+  "pages": [
+    {
+      "returned": 3,
+      "window": "caller_limit",
+      "hasMore": true
+    },
+    {
+      "returned": 3,
+      "window": "caller_limit",
+      "hasMore": true
+    },
+    {
+      "returned": 2,
+      "window": "complete",
+      "hasMore": false
+    }
+  ],
+  "crossProject": "undefined"
+}
