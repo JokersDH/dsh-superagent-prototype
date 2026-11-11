@@ -1,0 +1,92 @@
+{
+  "status": "FAIL_RECOVERY_TARGET_INVENTORY_ADMISSION",
+  "command": [
+    "node",
+    "tools/bootstrap/probe-wave09-target-inventory.mjs",
+    "/Users/hh/Desktop/joker/superagent-agent-a",
+    "--output",
+    "/Users/hh/Desktop/joker/superagent/reports/releases/wave10-admission/storage.json"
+  ],
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-a",
+  "sourceCommit": "7f7e83e0d82b26c33eace6a516cf791e4f970767",
+  "sourceWorktreeClean": true,
+  "sourceHashes": {
+    "packages/storage/src/target-inventory.ts": "b40e0f3436592f8ead8c146a72dd8822d15593574bac4da50c044197b2131ae6",
+    "packages/storage/src/migrations.ts": "a7daf2569e77417dd27de65b671646338071e73a4f8e7e26be6177740ffc36a0"
+  },
+  "checkedAt": "2026-11-11T13:16:44.618Z",
+  "exitCode": 1,
+  "cases": [
+    {
+      "id": "CURRENT_EMPTY_SCHEMA_POSITIVE_CONTROL",
+      "status": "PASS",
+      "completeness": "complete",
+      "tableCount": 51,
+      "issues": [],
+      "startupAvailable": false
+    },
+    {
+      "id": "CLAIMED_SCHEMA_WITH_MISSING_BUSINESS_TABLES_REFUSES_COMPLETE",
+      "status": "FAIL",
+      "message": "The claimed schema has no business tables; it must not be an empty complete target",
+      "observation": {
+        "protocol": "recovery-target-inventory/1",
+        "stateRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave09-inventory-admission-CwS5Tk/missing-tables",
+        "observedAt": "2026-11-11T13:16:44.587Z",
+        "productSchema": 15,
+        "databaseDigest": "eafb9eaa587939282d14c1ea3e0cd3f64fec93ca1814b3be80dd6f85f82040f5",
+        "integrity": "ok",
+        "completeness": "complete",
+        "tables": [
+          {
+            "name": "schema_meta",
+            "category": "metadata",
+            "rows": 1
+          }
+        ],
+        "issues": [],
+        "startupAvailable": false
+      }
+    },
+    {
+      "id": "UNKNOWN_FTS_PREFIX_TABLE_IS_NOT_TRUSTED_METADATA",
+      "status": "FAIL",
+      "message": "An arbitrary table sharing the FTS prefix must be reported as unknown, including its row",
+      "observation": {
+        "completeness": "complete",
+        "issues": [],
+        "table": {
+          "name": "conversation_search_surprise",
+          "category": "metadata",
+          "rows": 1
+        }
+      }
+    },
+    {
+      "id": "RETURNED_DIGEST_BINDS_THE_ACTUALLY_INSPECTED_SNAPSHOT",
+      "status": "FAIL",
+      "message": "Complete inventory digest names bytes other than the inspected snapshot; refuse or bind the same snapshot",
+      "observation": {
+        "injected": true,
+        "completeness": "complete",
+        "issues": [],
+        "returnedDigest": "b170f2d86a8606026ef7884c82d0105c0e7f0d99ed79336e35e94377985b8ab9",
+        "stableDigest": "d0cd6a604691707f194a184add5593b4fc54efee9f4e054a53fa5e7ed97aa280"
+      }
+    }
+  ],
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "sourceReferences": {
+    "tableCompleteness": "packages/storage/src/target-inventory.ts:183",
+    "unknownPrefixClassification": "packages/storage/src/target-inventory.ts:56",
+    "digestSnapshotBinding": "packages/storage/src/target-inventory.ts:160"
+  },
+  "limitations": [
+    "Loads the candidate TypeScript source and its local SQLite dependency; no production source is edited.",
+    "Temporary databases only; no real target materializer, writer process, activation or installation is exercised.",
+    "The race uses an injected synchronous filesystem boundary, not a probabilistic concurrent process.",
+    "A complete inventory still grants no startup authority and does not prove writer quiescence.",
+    "Exact source line references describe the audited candidate and may move after a repair."
+  ]
+}

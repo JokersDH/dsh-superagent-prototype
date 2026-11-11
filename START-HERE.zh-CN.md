@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**当前派工：[第十轮六阶段大颗粒整包](agent-tasks/product-wave-10/README.zh-CN.md)。** 已重新审视A–E最新固定source：A三项库存反例未修，B新公共模块strict76错误，D材料/多state进程归属六反例FAIL；C新增问题限未消费helper/recipe，现有main上下文路径通过。E旧schema13安装不能代表D新schema15或当前main。下一包并行做“所选上下文用于单条对话”与“恢复/普通个人安装”，普通安装不再等恢复或研究。共享binding接口已在677cf26发布，主线负责真实HTTP/provider/目标组合；见[0033验收与分工](docs/rfcs/WP-16/0033-wave-10-admission-and-product-closure.md)。八组实例保留、模型/native0、不刷新预算。
+
 **上下文与交付记录已接通：[http://127.0.0.1:5187/](http://127.0.0.1:5187/)。** 主线 `32fc7ae` 提供顶栏“上下文预览”：选择项目、原会话内工作、来源与预算，查看内容、摘要、遗漏和过期状态；工作详情新增交付记录、历史分页及部分可见活动计时。14项真实HTTP/SQLite网页流程在干净源码复跑通过，无模型调用。新预览使用独立state；原5180–5186服务和历史保留。A恢复验库三个反例仍FAIL，D目标准备尚无可集成的固定检查点，未开放恢复激活。接口、证据和精确限制见[0032](docs/rfcs/WP-16/0032-context-evidence-product-checkpoint.md)及[本轮记录](reports/releases/wave09-integration/README.zh-CN.md)。
 
 **当前派工：[第九轮恢复目标/context/托管升级整包](agent-tasks/product-wave-09/README.zh-CN.md)。** 已独立复验A备份与C旧授权反例，分范围接入；B资源/token、C种类/命令绑定、D孤儿进程、E费用实际链与安装来源仍有阻断。共享RecoveryTarget port及配置binder已交，A/D可立即做真实目标读验/准备，main承担context网页与最终授权激活。详细source/反例/范围见[0031](docs/rfcs/WP-16/0031-wave-09-admission-and-target-boundaries.md)，不新增预算/Driver，不把旧安装结果当当前个人版通过，七组实例保留。

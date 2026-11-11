@@ -8,11 +8,11 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const candidate = process.argv[2]
-if (!candidate || process.argv.length !== 3)
-  throw new Error('Usage: node tools/bootstrap/probe-wave09-target-inventory.mjs <candidate-root>')
+if (!candidate || ![3, 5].includes(process.argv.length) || (process.argv.length === 5 && process.argv[3] !== '--output'))
+  throw new Error('Usage: node tools/bootstrap/probe-wave09-target-inventory.mjs <candidate-root> [--output <report-path>]')
 const sourceRoot = resolve(candidate)
 const repository = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
-const output = join(repository, 'reports/releases/wave09-integration/recovery-inventory-admission.json')
+const output = process.argv[4] ? resolve(process.argv[4]) : join(repository, 'reports/releases/wave09-integration/recovery-inventory-admission.json')
 const sourceFiles = ['packages/storage/src/target-inventory.ts', 'packages/storage/src/migrations.ts']
 const sourceHash = path => createHash('sha256').update(fs.readFileSync(join(sourceRoot, path))).digest('hex')
 const git = args => execFileSync('git', args, { cwd: sourceRoot, encoding: 'utf8' }).trim()
@@ -117,7 +117,7 @@ try {
   const pass = cases.length === 4 && cases.every(value => value.status === 'PASS')
   report = {
     status: pass ? 'PASS_RECOVERY_TARGET_INVENTORY_ADMISSION' : 'FAIL_RECOVERY_TARGET_INVENTORY_ADMISSION',
-    command: ['node', 'tools/bootstrap/probe-wave09-target-inventory.mjs', sourceRoot],
+    command: ['node', 'tools/bootstrap/probe-wave09-target-inventory.mjs', sourceRoot, ...(process.argv[4] ? ['--output', output] : [])],
     sourceRoot, sourceCommit, sourceWorktreeClean, sourceHashes, checkedAt: new Date().toISOString(),
     exitCode: pass ? 0 : 1, cases, modelCalls: 0, nativeTurns: 0,
     sourceReferences: {
@@ -134,7 +134,7 @@ try {
     ],
   }
 } catch (error) {
-  report = { status: 'ERROR_RECOVERY_TARGET_INVENTORY_PROBE', command: ['node', 'tools/bootstrap/probe-wave09-target-inventory.mjs', sourceRoot],
+  report = { status: 'ERROR_RECOVERY_TARGET_INVENTORY_PROBE', command: ['node', 'tools/bootstrap/probe-wave09-target-inventory.mjs', sourceRoot, ...(process.argv[4] ? ['--output', output] : [])],
     checkedAt: new Date().toISOString(), exitCode: 2, cases, error: error.message, modelCalls: 0, nativeTurns: 0 }
 } finally { fs.rmSync(root, { recursive: true, force: true }) }
 fs.mkdirSync(dirname(output), { recursive: true })
