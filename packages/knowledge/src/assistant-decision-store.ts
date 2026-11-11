@@ -208,7 +208,7 @@ export class AssistantDecisionStore implements DecisionStorePort {
         throw new DecisionConflict('payload_mismatch', 'A decision replay changed its body, source or actor')
       }
       // The current head may already be revoked or superseded; replay must not resurrect it.
-      return { record: this.toRecord(current, current.decision.supersedes ? this.supersededIds(projectId) : undefined), idempotent: true }
+      return { record: this.toRecord(current, this.supersededSetFor(current)), idempotent: true }
     }
     if (candidate.decision.version < current.decision.version) {
       const historical = this.port.decisions
@@ -217,13 +217,13 @@ export class AssistantDecisionStore implements DecisionStorePort {
       if (!historical || !sameReplayBody(historical, candidate)) {
         throw new DecisionConflict('stale_version', 'An older decision replay does not match its audit body')
       }
-      return { record: this.toRecord(current, current.decision.supersedes ? this.supersededIds(projectId) : undefined), idempotent: true }
+      return { record: this.toRecord(current, this.supersededSetFor(current)), idempotent: true }
     }
     if (candidate.decision.version !== current.decision.version + 1) {
       throw new DecisionConflict('stale_version', 'Decision version is not the next revision')
     }
     const stored = this.put(candidate, current.decision.version)
-    return { record: this.toRecord(stored.record, current.decision.supersedes ? this.supersededIds(projectId) : undefined), idempotent: stored.replayed }
+    return { record: this.toRecord(stored.record, this.supersededSetFor(stored.record)), idempotent: stored.replayed }
   }
 
   private put(record: PersistedDecision, expectedVersion: number): { record: PersistedDecision; replayed: boolean } {
@@ -258,7 +258,9 @@ export class AssistantDecisionStore implements DecisionStorePort {
   private supersededIds(projectId: string): ReadonlySet<string> {
     const superseded = new Set<string>()
     for (const record of this.scanProject(projectId).records) {
-      if (record.decision.supersedes && !record.decision.revokedAt) superseded.add(record.decision.supersedes)
+      // Supersession is a historical fact: revoking the replacement must not silently reactivate
+      // the older decision. Reusing the content requires a new explicit decision.
+      if (record.decision.supersedes) superseded.add(record.decision.supersedes)
     }
     return superseded
   }
@@ -281,7 +283,7 @@ export class AssistantDecisionStore implements DecisionStorePort {
       })
       for (const record of result.records) {
         if (record.decision.id === decisionId) continue
-        if (record.decision.supersedes === decisionId && !record.decision.revokedAt) return true
+        if (record.decision.supersedes === decisionId) return true
         if (Number.isFinite(cutoff) && Date.parse(record.recordedAt) < cutoff) return false
       }
       scanned += result.records.length
@@ -289,6 +291,13 @@ export class AssistantDecisionStore implements DecisionStorePort {
       cursor = result.nextCursor
     }
     return scanIncomplete(projectId, scanned, { pageSize, maxPages })
+  }
+
+  /** Whether another stored decision already supersedes this one (historical fact, even if revoked). */
+  private supersededSetFor(record: PersistedDecision): ReadonlySet<string> {
+    return this.isSuperseded(record.decision.id, record.recordedAt, record.decision.scope.projectId)
+      ? new Set([record.decision.id])
+      : OTHERWISE_EMPTY
   }
 
   private toRecord(record: PersistedDecision, superseded: ReadonlySet<string> = OTHERWISE_EMPTY): DecisionRecord {
