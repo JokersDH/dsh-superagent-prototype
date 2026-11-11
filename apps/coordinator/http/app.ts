@@ -49,6 +49,7 @@ import {
   RecoveryInspectionSchema,
   RecoveryPrepareSchema,
   RecoveryPlanSchema,
+  RecoveryActivationRecordSchema,
 } from '@personal-agent/contracts'
 import type {
   AnswerDelivery,
@@ -87,6 +88,7 @@ import type {
   RecoveryInspection,
   RecoveryPrepare,
   RecoveryPlan,
+  RecoveryActivationRecord,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -148,6 +150,7 @@ export interface LocalHttpOptions {
     attention?(query: AttentionQuery): Promise<AttentionPage>
     decisions?(query: DecisionQuery): Promise<DecisionPage>
     recovery?(): Promise<RecoveryInspection>
+    recoveryActivation?(activationId: string): Promise<RecoveryActivationRecord | undefined>
     conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog>
     conversation?(id: string): Promise<ConversationSummary>
     projectSettings?(projectId: string): Promise<ProjectSettingsPage>
@@ -306,6 +309,15 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!options.read?.recovery) throw new ApplicationFault('unsupported_capability', 'Recovery inspection is not connected')
     return c.json(RecoveryInspectionSchema.parse(await options.read.recovery()))
   })
+  app.get('/v1/recovery/activations/:id', async (c) => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Recovery record accepts no query')
+    if (!options.read?.recoveryActivation) throw new ApplicationFault('unsupported_capability', 'Recovery record reader is not connected')
+    const id = IdSchema.parse(c.req.param('id')), record = await options.read.recoveryActivation(id)
+    if (!record) return c.json({ error: { code: 'invalid_request', message: 'Recovery record was not found', retry: 'user_action' } }, 404)
+    const value = RecoveryActivationRecordSchema.parse(record)
+    if (value.committed.intent.activationId !== id) throw new ApplicationFault('storage_unavailable', 'Recovery record identity mismatch', 'none')
+    return c.json(value)
+  })
   app.post('/v1/recovery/prepare', async (c) => {
     if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Recovery preflight requires read-only startup')
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Recovery preflight requires JSON')
@@ -318,7 +330,7 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!options.read?.configuration)
       throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
     const value = ApplicationConfigurationSchema.parse(await options.read.configuration())
-    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false, decisionsAvailable: false,
+    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false, decisionsAvailable: false, proposalsAvailable: false,
       profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate' })),
       projects: value.projects.map(project => { const { defaultProfileId: _, ...rest } = project; return { ...rest, profileIds: [], dispatchAllowed: false, blockedReason: 'writer_indeterminate' } }),
     }) : value)

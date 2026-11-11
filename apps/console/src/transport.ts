@@ -31,6 +31,9 @@ import {
   DecisionCommandSchema,
   DecisionQuerySchema,
   DecisionPageSchema,
+  ProposalPrepareSchema,
+  ProposalPreviewSchema,
+  ProposalCommandSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -62,6 +65,9 @@ import type {
   DecisionCommand,
   DecisionQuery,
   DecisionPage,
+  ProposalPrepare,
+  ProposalPreview,
+  ProposalCommand,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -117,6 +123,8 @@ export interface ConsoleTransport {
   prepareDecision?(input: DecisionPrepare): Promise<DecisionPreview>
   decisionCommand?(command: DecisionCommand): Promise<CommandReceipt>
   decisions?(query: DecisionQuery): Promise<DecisionPage>
+  prepareProposal?(input: ProposalPrepare): Promise<ProposalPreview>
+  proposalCommand?(command: ProposalCommand): Promise<CommandReceipt>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -156,7 +164,7 @@ export class HttpTransport implements ConsoleTransport {
     this.base = base
   }
 
-  private async request(path: string, init?: RequestInit, optionalResource = false): Promise<unknown> {
+  private async request(path: string, init?: RequestInit, optionalResource = false, receiptCommandId?: string): Promise<unknown> {
     let response: Response
     try {
       response = await fetch(`${this.base}${path}`, {
@@ -177,7 +185,16 @@ export class HttpTransport implements ConsoleTransport {
       }
     }
     if (optionalResource && response.status === 404 && body === undefined) return missingOptionalResource
-    if (!response.ok) throw errorOf(response.status, body)
+    if (!response.ok) {
+      if (receiptCommandId) {
+        const receipt = CommandReceiptSchema.safeParse(body)
+        if (receipt.success) {
+          if (receipt.data.commandId !== receiptCommandId) throw new TransportError('schema_mismatch', '回执命令身份不匹配')
+          if (receipt.data.status === 'rejected') return receipt.data
+        }
+      }
+      throw errorOf(response.status, body)
+    }
     return body
   }
 
@@ -364,6 +381,25 @@ export class HttpTransport implements ConsoleTransport {
     const page = DecisionPageSchema.parse(await this.request(`/v1/decisions?${params}`))
     if (page.decisions.some(value => value.record.decision.scope.projectId !== query.projectId)) throw new TransportError('schema_mismatch', '决定目录项目不匹配')
     return page
+  }
+  async prepareProposal(input: ProposalPrepare): Promise<ProposalPreview> {
+    const value = ProposalPrepareSchema.parse(input)
+    const preview = ProposalPreviewSchema.parse(await this.request('/v1/proposals/prepare', {
+      method: 'POST', body: JSON.stringify(value), signal: AbortSignal.timeout(10000),
+    }))
+    const record = preview.record
+    if (record.projectId !== value.projectId || record.conversationId !== value.conversationId || record.sourceMessageId !== value.sourceMessageId ||
+      JSON.stringify(record.payload) !== JSON.stringify(value.payload))
+      throw new TransportError('schema_mismatch', '提案预览与原消息或内容不匹配')
+    return preview
+  }
+  async proposalCommand(input: ProposalCommand): Promise<CommandReceipt> {
+    const command = ProposalCommandSchema.parse(input)
+    const receipt = CommandReceiptSchema.parse(await this.request('/v1/proposals/commands', {
+      method: 'POST', body: JSON.stringify(command), signal: AbortSignal.timeout(10000),
+    }, false, command.commandId))
+    if (receipt.commandId !== command.commandId) throw new TransportError('schema_mismatch', '提案回执命令身份不匹配')
+    return receipt
   }
   async attention(input: AttentionQuery): Promise<AttentionPage | undefined> {
     const query = AttentionQuerySchema.parse(input), params = new URLSearchParams()

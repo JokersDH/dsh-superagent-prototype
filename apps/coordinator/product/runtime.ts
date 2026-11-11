@@ -28,6 +28,7 @@ import { ProductDecisions } from './decisions.ts'
 import { projectAcceptedOutcome } from './accepted-outcomes.ts'
 import { ProductRecovery } from './recovery.ts'
 import { ProductProposals } from './proposals.ts'
+import { readRecoveryActivationRecord } from './recovery-intents.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -156,6 +157,7 @@ export function createProductRuntime(
     })
   const read: NonNullable<LocalHttpOptions['read']> = {
     recovery: async () => recovery.inspect(),
+    recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
     workEvidence: async workId => {
       const work = (await application.inspect({ workId })).works[0]
       if (!work) throw new ApplicationFault('forbidden', 'Work evidence is outside the configured scope', 'none')
@@ -315,6 +317,7 @@ export function createProductRuntime(
         enabledProfileIds: [...(options.native ? [options.native.profile.id] : []), ...FIXTURE_PROFILES],
         reviewActivityAvailable: options.startupMode !== 'recovery_readonly',
         decisionsAvailable: options.startupMode !== 'recovery_readonly',
+        proposalsAvailable: options.startupMode !== 'recovery_readonly',
       })
       return configuration
     },

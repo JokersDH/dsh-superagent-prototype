@@ -16,7 +16,7 @@ import { AttentionItemSchema, AttentionPageSchema, AttentionQuerySchema, Attenti
 import { DecisionPrepareSchema, DecisionPreviewSchema, DecisionCommandSchema, DecisionQuerySchema, DecisionViewSchema, DecisionPageSchema } from '../src/decision-commands.ts';
 import { WorkEvidenceSchema } from '../src/work-evidence.ts';
 import { RecoveryInspectionSchema, RecoveryPrepareSchema, RecoveryPlanSchema } from '../src/recovery-state.ts';
-import { RecoveryActivationIntentSchema, RecoveryActivationCommitSchema } from '../src/recovery-activation.ts';
+import { RecoveryActivationIntentSchema, RecoveryActivationCommitSchema, RecoveryActivationRecordSchema } from '../src/recovery-activation.ts';
 import { ProposalPrepareSchema, ProposalPreviewSchema, ProposalCommandSchema } from '../src/proposal-commands.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -80,7 +80,7 @@ outputs.set('generated/work-evidence.manifest.json', canonical({ protocol: 'work
 const recoveryText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:recovery-inspection:1', $defs: { RecoveryInspection: z.toJSONSchema(RecoveryInspectionSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryPrepare: z.toJSONSchema(RecoveryPrepareSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryPlan: z.toJSONSchema(RecoveryPlanSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/recovery.schema.json', recoveryText);
 outputs.set('generated/recovery.manifest.json', canonical({ protocol: 'recovery-inspection/1', schemaHash: digest(recoveryText), sourceHash: digest(readFileSync(resolve(root, 'src/recovery-state.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
-const activationText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:recovery-activation:1', $defs: { RecoveryActivationIntent: z.toJSONSchema(RecoveryActivationIntentSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryActivationCommit: z.toJSONSchema(RecoveryActivationCommitSchema, { target: 'draft-2020-12', io: 'input' }) } });
+const activationText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:recovery-activation:1', $defs: { RecoveryActivationIntent: z.toJSONSchema(RecoveryActivationIntentSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryActivationCommit: z.toJSONSchema(RecoveryActivationCommitSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryActivationRecord: z.toJSONSchema(RecoveryActivationRecordSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/recovery-activation.schema.json', activationText);
 outputs.set('generated/recovery-activation.manifest.json', canonical({ protocol: 'recovery-activation-intent/1', schemaHash: digest(activationText), sourceHash: digest(readFileSync(resolve(root, 'src/recovery-activation.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 const proposalsText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:proposal-commands:1', $defs: { ProposalPrepare: z.toJSONSchema(ProposalPrepareSchema, { target: 'draft-2020-12', io: 'input' }), ProposalPreview: z.toJSONSchema(ProposalPreviewSchema, { target: 'draft-2020-12', io: 'input' }), ProposalCommand: z.toJSONSchema(ProposalCommandSchema, { target: 'draft-2020-12', io: 'input' }) } });

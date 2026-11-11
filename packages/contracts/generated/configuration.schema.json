@@ -364,6 +364,9 @@
       "readOnly": true,
       "type": "array"
     },
+    "proposalsAvailable": {
+      "type": "boolean"
+    },
     "protocol": {
       "const": "application-configuration/1",
       "type": "string"
