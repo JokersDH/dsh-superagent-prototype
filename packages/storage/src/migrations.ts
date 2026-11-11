@@ -385,8 +385,28 @@ const V14: Migration = {
   ],
 }
 
+
+/**
+ * v15: production recovery activation facts (0027 shared port). One immutable intent per activation,
+ * command and plan. Legacy v14 plan intents remain audit-only rows; they are never upgraded into this
+ * table or treated as target/start authorization.
+ */
+const V15: Migration = {
+  version: 15,
+  name: 'recovery-activations',
+  statements: [
+    `CREATE TABLE recovery_activations (
+      activation_id TEXT PRIMARY KEY, command_id TEXT NOT NULL UNIQUE, plan_id TEXT NOT NULL UNIQUE,
+      plan_digest TEXT NOT NULL, source_json TEXT NOT NULL, target_json TEXT NOT NULL,
+      principal_user_id TEXT NOT NULL, principal_authority_ref TEXT NOT NULL,
+      machine_digest TEXT NOT NULL, resource_policy_digest TEXT NOT NULL,
+      created_at TEXT NOT NULL, expires_at TEXT NOT NULL, value TEXT NOT NULL, digest TEXT NOT NULL)`,
+    `CREATE INDEX recovery_activations_created ON recovery_activations (created_at DESC, activation_id)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>

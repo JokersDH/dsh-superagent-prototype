@@ -45,6 +45,14 @@ test('recovery intent is one stable fact with receipt/event in the caller transa
       return result
     })
     assert.equal(recorded.replayed, false)
+    assert.deepEqual(recorded.record.plan, plan(), 'the read-back record returns the plan, never the stored envelope')
+    assert.equal(recorded.record.plan.protocol, 'recovery-plan/1')
+    assert.equal(recorded.record.plan.bindings[0]!.proposedProjectId, 'proposed-project')
+    assert.equal(recorded.record.plan.executor!.executableDigest, 'd'.repeat(64))
+    assert.equal(recorded.record.planDigest, canonicalDigest(JSON.parse(JSON.stringify(plan()))))
+    assert.equal(recorded.record.createdAt, at)
+    assert.equal(recorded.record.expiresAt, plan().expiresAt)
+    assert.equal(recorded.record.actorRef, actor.authorityRef)
     assert.equal(recorded.record.authorization, 'not_granted')
     assert.equal(recorded.record.activationAvailable, false)
     assert.equal(recorded.record.planDigest.length, 64)
@@ -54,6 +62,9 @@ test('recovery intent is one stable fact with receipt/event in the caller transa
     const replay = ports.recoveryIntents.record(input())
     assert.equal(replay.replayed, true)
     assert.equal(replay.record.planId, 'recovery-plan-1')
+    assert.deepEqual(replay.record.plan, plan())
+    assert.deepEqual(ports.recoveryIntents.getByCommand('recovery-command-1')!.plan, plan())
+    assert.deepEqual(ports.recoveryIntents.list().records[0]!.plan, plan())
     assert.equal(ports.recoveryIntents.list().records.length, 1)
 
     // A second command for the same plan/body is the same stable intent, not a second authorization.
@@ -115,7 +126,10 @@ test('a receipt failure rolls the intent back; reopen replays the committed fact
     store = new ProductStore({ path })
     try {
       const reopened = createWorkflowPorts(store)
-      assert.equal(reopened.recoveryIntents.getByPlan('recovery-plan-1')!.authorization, 'not_granted')
+      const readBack = reopened.recoveryIntents.getByPlan('recovery-plan-1')!
+      assert.equal(readBack.authorization, 'not_granted')
+      assert.deepEqual(readBack.plan, plan(), 'a reopened intent returns the complete plan')
+      assert.equal(readBack.planDigest, canonicalDigest(JSON.parse(JSON.stringify(plan()))))
       assert.equal(reopened.recoveryIntents.record(input()).replayed, true)
       assert.equal(reopened.recoveryIntents.list({ sourceFingerprint: fingerprint }).records.length, 1)
       const queuedAfter = store.queue.oldestRow('application.execute')!
@@ -180,4 +194,25 @@ test('a v13 database upgrades to the current schema with existing rows intact an
       assert.equal(store.workflows.recoveryIntents.record(input()).replayed, false)
     } finally { store.close() }
   } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+
+test('a hand-edited payload or indexed column is refused instead of returned as a plan', () => {
+  const dir = tmp('recovery-inconsistent-')
+  const store = new ProductStore({ path: join(dir, 'state.sqlite') })
+  try {
+    const port = createWorkflowPorts(store).recoveryIntents
+    port.record(input())
+    store.db.prepare("UPDATE recovery_intents SET plan_digest = ? WHERE plan_id = 'recovery-plan-1'").run('0'.repeat(64))
+    assert.throws(() => port.getByPlan('recovery-plan-1'), WorkflowConflict)
+    store.db.prepare("UPDATE recovery_intents SET plan_digest = ? WHERE plan_id = 'recovery-plan-1'")
+      .run(canonicalDigest(JSON.parse(JSON.stringify(plan()))))
+    const payload = JSON.parse(String((store.db.prepare("SELECT payload FROM recovery_intents WHERE plan_id = 'recovery-plan-1'").get() as { payload: string }).payload))
+    store.db.prepare("UPDATE recovery_intents SET payload = ? WHERE plan_id = 'recovery-plan-1'")
+      .run(JSON.stringify({ ...payload, plan: { ...payload.plan, planId: 'another-plan' } }))
+    assert.throws(() => port.getByPlan('recovery-plan-1'), WorkflowConflict)
+  } finally {
+    store.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
 })
