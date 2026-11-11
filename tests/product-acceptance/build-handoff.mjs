@@ -26,6 +26,9 @@ if (!runDirectory || !existsSync(join(runDirectory, 'report.json')))
   throw new Error('No run report found. Run `node tests/product-acceptance/run.mjs --suites=… --record` first.')
 
 const report = JSON.parse(readFileSync(join(runDirectory, 'report.json'), 'utf8'))
+const pilotPreflight = existsSync(join(here, 'pilot/reports/preflight.json'))
+  ? JSON.parse(readFileSync(join(here, 'pilot/reports/preflight.json'), 'utf8'))
+  : { status: 'NOT_EXECUTED', reasons: [{ code: 'no_preflight' }] }
 const release = report.release ?? JSON.parse(readFileSync(join(runDirectory, 'release.json'), 'utf8'))
 const stages = JSON.parse(readFileSync(join(here, 'stages.json'), 'utf8'))
 const byId = new Map(report.cases.map((item) => [item.id, item]))
@@ -151,17 +154,20 @@ const CAPABILITIES = [
   {
     id: 'install-first-run',
     label: '新目录/新账户安装与 first-run',
-    notTested: ['D 的 apps/launcher、tools/distribution、packages/portability 尚未交付。'],
+    installed: ['E4-INSTALL-FIRST-RUN', 'E4-INSTALL-REUSE-CONCURRENCY', 'E4-INSTALL-TAMPER'],
+    notTested: ['PA_CONFIG_ROOT 覆盖后 release.json 不随 first-run 写入（owner D，已完成最小复现）。'],
   },
   {
     id: 'backup-restore',
     label: '完整备份、恢复与路径映射',
-    notTested: ['无发行 bundle 与迁移 CLI。'],
+    installed: ['E4-BACKUP-RESTORE', 'E4-INSTALL-ROLLBACK'],
+    notTested: ['恢复后的新授权/重绑定归 main（E4-REAUTHORIZATION NOT_TESTED）；旧项目绑定恢复仍只读。'],
   },
   {
     id: 'upgrade-rollback',
     label: '升级与回滚',
-    notTested: ['无版本化发行产物。'],
+    installed: ['E4-INSTALL-ROLLBACK'],
+    notTested: ['真实升级需要第二个冻结 buildId；state 回滚已在同一字节上通过。'],
   },
   {
     id: 'session-catalog',
@@ -172,13 +178,13 @@ const CAPABILITIES = [
     id: 'attention-signal',
     label: '待办注意信号：未结束工作、归档可见、交付后清除',
     controlled: ['E2-ATTENTION-SIGNAL'],
-    notTested: ['跨项目/期限/等待排序的注意力工作台尚未交付。'],
+    notTested: ['真实 decisionDeadline/expiresAt 与多 tab 重叠未验证；本项目只有一个受控项目。'],
   },
   {
     id: 'attention-workbench',
     label: '跨项目注意力收件箱：排序/筛选/分页/逐项打开',
-    controlled: ['E3-ATTENTION-INBOX', 'E3-ATTENTION-INBOX-UI'],
-    notTested: ['真实业务截止/失效与 C 的 deterministic_priority 排序未接线。'],
+    controlled: ['E3-ATTENTION-INBOX', 'E3-ATTENTION-INBOX-UI', 'E2-ATTENTION-WORKBENCH'],
+    notTested: ['真实业务截止与授权过期后的问题失效仍无公开入口（E3-ATTENTION-DEADLINES、E3-DECISION-SOURCE-STATES）；deterministic_priority 排序与逐项动作已通过。'],
   },
   {
     id: 'review-timing',
@@ -211,10 +217,10 @@ const CAPABILITIES = [
   {
     id: 'context-proposals-decisions',
     label: '上下文、提案与明确决定治理',
-    readonly: ['E2-CONTEXT-PROPOSALS-NOT-TESTED'],
+    controlled: ['E3-DECISION-WORKFLOW'],
     notTested: [
-      'C 三项领域 probe 仍未修复；main 尚无决定/提案 HTTP 入口。',
-      '确认前不执行、重复确认幂等、撤销后失效、事务失败回滚与注入防护均未执行。',
+      '自动上下文与结构化提案确认未发布（owner C）。',
+      '源消息删除/授权过期/事务失败注入缺少公开入口（E3-DECISION-SOURCE-STATES）。',
     ],
   },
   {
@@ -226,11 +232,9 @@ const CAPABILITIES = [
   {
     id: 'assistant-state',
     label: '明确决定、授权上下文、结构化提案与事务消费',
+    controlled: ['E3-DECISION-WORKFLOW'],
     readonly: ['E3-ASSISTANT-SCHEMA-FIXTURES'],
-    notTested: [
-      'C 的三项领域 probe 仍未修复；main 尚无决定/提案 HTTP 入口。',
-      '确认前不执行、撤销后失效、事务失败回滚与注入防护全部未执行。',
-    ],
+    notTested: ['自动提案确认与撤销后上下文失效未发布。'],
   },
   {
     id: 'distribution',
@@ -244,8 +248,8 @@ const CAPABILITIES = [
       'E4-INSTALL-ROLLBACK',
     ],
     notTested: [
-      'E4-UPGRADE-ROLLBACK：只发布了一个冻结安装物（buildId d4eb3a13f4904d2d），真实升级需要第二个 buildId 且 schema 相同的冻结产物；同一字节上的 state 回滚已由 E4-INSTALL-ROLLBACK 验证。',
-      'E4-INSTALL-FIRST-RUN evidence.findings：PA_CONFIG_ROOT 覆盖后 doctor 报 release_manifest FAIL（owner D，最小复现已记录）。',
+      'E4-UPGRADE-ROLLBACK 需要第二个冻结 buildId（同 schema）；同一字节上的 state 回滚已通过。',
+      'PA_CONFIG_ROOT 覆盖后 release.json 缺失（owner D，最小复现已记录）。',
     ],
   },
   {
@@ -381,6 +385,17 @@ const stageSummary = (id) => {
     .join(' + ')
 }
 
+/** Counts for one real command, derived from the case ids it produced in this run. */
+const commandSummary = (prefixes) => {
+  const relevant = report.cases.filter((item) => prefixes.some((prefix) => item.id.startsWith(prefix)))
+  if (relevant.length === 0) return '无病例'
+  const counts = {}
+  for (const item of relevant) counts[item.status] = (counts[item.status] ?? 0) + 1
+  return Object.entries(counts)
+    .map(([status, count]) => `${status} ${count}`)
+    .join(' + ')
+}
+
 const handoff = `# Agent E 第六轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
@@ -389,13 +404,14 @@ const handoff = `# Agent E 第六轮交付交接
 
 ## 实际命令与结果
 
-| 阶段 | 命令 | 结果 |
+| 真实命令 | 覆盖病例 | 结果 |
 | --- | --- | --- |
-| E1 | \`${stages.stages[0].command}\` | ${stageSummary('E1')} |
-| E2 | \`${stages.stages[1].command}\` | ${stageSummary('E2')} |
-| E3 | \`${stages.stages[2].command}\` | ${stageSummary('E3')} |
-| E4 | \`${stages.stages[3].command}\` | ${stageSummary('E4')} |
-| E5 | \`${stages.stages[4].command}\` | 本文件与矩阵 |
+| \`node tests/product-acceptance/pilot/harness.mjs --preflight\` | 冻结输入/价格/ledger | ${pilotPreflight.status === 'BLOCKED' ? `BLOCKED（${[...new Set(pilotPreflight.reasons.map((item) => item.code))].join(', ')}）` : pilotPreflight.status}；runner selftest ${pilotPreflight.runnerSelfTest?.passes ?? '?'}/17 |
+| \`node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only\` | E1-* | ${commandSummary(['E1-'])} |
+| \`node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow\` | E2-* | ${commandSummary(['E2-'])} |
+| \`node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui\` | E3-* | ${commandSummary(['E3-'])} |
+| \`node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha\` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | ${commandSummary(['E4-', 'E5-NATIVE-CONTROL', 'E6-REVIEW-PILOT'])} |
+| \`node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record\` | 全部 129 | ${Object.entries(report.counts).map(([status, count]) => `${status} ${count}`).join(' + ')} |
 
 本次聚合：**${release.status}**（tier \`${release.tier}\`）。证据目录 \`${runDirectory}\`。
 

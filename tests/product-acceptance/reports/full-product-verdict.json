@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-11T02:41:33.300Z",
+  "checkedAt": "2026-11-11T03:54:52.077Z",
   "source": {
-    "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
     "dirty": false
   },
-  "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+  "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -476,6 +476,11 @@
       "status": "PASS"
     },
     {
+      "id": "E3-DECISION-WORKFLOW",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E3-DESKTOP-GEOMETRY",
       "required": true,
       "status": "PASS"
@@ -551,14 +556,34 @@
       "status": "PASS"
     },
     {
+      "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E4-INSTALL-FIRST-RUN",
       "required": true,
-      "status": "NOT_TESTED"
+      "status": "PASS"
+    },
+    {
+      "id": "E4-INSTALL-REUSE-CONCURRENCY",
+      "required": true,
+      "status": "PASS"
     },
     {
       "id": "E4-BACKUP-RESTORE",
       "required": true,
-      "status": "NOT_TESTED"
+      "status": "PASS"
+    },
+    {
+      "id": "E4-INSTALL-TAMPER",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-INSTALL-ROLLBACK",
+      "required": true,
+      "status": "PASS"
     },
     {
       "id": "E4-UPGRADE-ROLLBACK",
@@ -579,47 +604,12 @@
   "failures": [
     {
       "code": "case_not_pass",
-      "detail": "Required case E4-INSTALL-FIRST-RUN is NOT_TESTED",
-      "caseId": "E4-INSTALL-FIRST-RUN"
-    },
-    {
-      "code": "layer_not_allowed",
-      "detail": "Layer not-tested is not admitted by full-product",
-      "caseId": "E4-INSTALL-FIRST-RUN"
-    },
-    {
-      "code": "layer_not_allowed",
-      "detail": "Case E4-INSTALL-FIRST-RUN ran as not-tested, expected installed",
-      "caseId": "E4-INSTALL-FIRST-RUN"
-    },
-    {
-      "code": "case_not_pass",
-      "detail": "Required case E4-BACKUP-RESTORE is NOT_TESTED",
-      "caseId": "E4-BACKUP-RESTORE"
-    },
-    {
-      "code": "layer_not_allowed",
-      "detail": "Layer not-tested is not admitted by full-product",
-      "caseId": "E4-BACKUP-RESTORE"
-    },
-    {
-      "code": "layer_not_allowed",
-      "detail": "Case E4-BACKUP-RESTORE ran as not-tested, expected installed",
-      "caseId": "E4-BACKUP-RESTORE"
-    },
-    {
-      "code": "case_not_pass",
       "detail": "Required case E4-UPGRADE-ROLLBACK is NOT_TESTED",
       "caseId": "E4-UPGRADE-ROLLBACK"
     },
     {
-      "code": "layer_not_allowed",
-      "detail": "Layer not-tested is not admitted by full-product",
-      "caseId": "E4-UPGRADE-ROLLBACK"
-    },
-    {
-      "code": "layer_not_allowed",
-      "detail": "Case E4-UPGRADE-ROLLBACK ran as not-tested, expected installed",
+      "code": "required_evidence_missing",
+      "detail": "Case E4-UPGRADE-ROLLBACK has no substantive evidence.installation",
       "caseId": "E4-UPGRADE-ROLLBACK"
     },
     {
@@ -646,16 +636,12 @@
       "code": "required_evidence_missing",
       "detail": "Case E5-NATIVE-CONTROL has no substantive evidence.native",
       "caseId": "E5-NATIVE-CONTROL"
-    },
-    {
-      "code": "self_declared_pass_rejected",
-      "detail": "Report declares release PASS while the gate found blocking evidence"
     }
   ],
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-11T02:39:55.349Z",
+    "decidedAt": "2026-11-11T03:53:59.700Z",
     "failureCodes": []
   },
   "notes": [

@@ -4,12 +4,12 @@
     "tier": "module",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-11T02:41:33.296Z",
+    "checkedAt": "2026-11-11T03:54:52.073Z",
     "source": {
-      "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
       "dirty": false
     },
-    "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -396,7 +396,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T02:39:55.349Z",
+      "decidedAt": "2026-11-11T03:53:59.700Z",
       "failureCodes": []
     },
     "notes": [
@@ -409,12 +409,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-11T02:41:33.297Z",
+    "checkedAt": "2026-11-11T03:54:52.074Z",
     "source": {
-      "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
       "dirty": false
     },
-    "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -878,6 +878,11 @@
       },
       {
         "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
         "required": true,
         "status": "PASS"
       },
@@ -961,7 +966,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T02:39:55.349Z",
+      "decidedAt": "2026-11-11T03:53:59.700Z",
       "failureCodes": []
     },
     "notes": [
@@ -974,12 +979,12 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T02:41:33.298Z",
+    "checkedAt": "2026-11-11T03:54:52.075Z",
     "source": {
-      "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
       "dirty": false
     },
-    "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1443,6 +1448,11 @@
       },
       {
         "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
         "required": true,
         "status": "PASS"
       },
@@ -1542,16 +1552,12 @@
         "code": "layer_not_allowed",
         "detail": "Case E5-NATIVE-CONTROL ran as not-tested, expected actual-native",
         "caseId": "E5-NATIVE-CONTROL"
-      },
-      {
-        "code": "self_declared_pass_rejected",
-        "detail": "Report declares release PASS while the gate found blocking evidence"
       }
     ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T02:39:55.349Z",
+      "decidedAt": "2026-11-11T03:53:59.700Z",
       "failureCodes": []
     },
     "notes": [
@@ -1564,12 +1570,12 @@
     "tier": "installed-alpha",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T02:41:33.298Z",
+    "checkedAt": "2026-11-11T03:54:52.075Z",
     "source": {
-      "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
       "dirty": false
     },
-    "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2037,6 +2043,11 @@
         "status": "PASS"
       },
       {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-DESKTOP-GEOMETRY",
         "required": true,
         "status": "PASS"
@@ -2112,14 +2123,34 @@
         "status": "PASS"
       },
       {
+        "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E4-INSTALL-FIRST-RUN",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-REUSE-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
       },
       {
         "id": "E4-BACKUP-RESTORE",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-TAMPER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-ROLLBACK",
+        "required": true,
+        "status": "PASS"
       },
       {
         "id": "E4-UPGRADE-ROLLBACK",
@@ -2130,58 +2161,19 @@
     "failures": [
       {
         "code": "case_not_pass",
-        "detail": "Required case E4-INSTALL-FIRST-RUN is NOT_TESTED",
-        "caseId": "E4-INSTALL-FIRST-RUN"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by installed-alpha",
-        "caseId": "E4-INSTALL-FIRST-RUN"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E4-INSTALL-FIRST-RUN ran as not-tested, expected installed",
-        "caseId": "E4-INSTALL-FIRST-RUN"
-      },
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E4-BACKUP-RESTORE is NOT_TESTED",
-        "caseId": "E4-BACKUP-RESTORE"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by installed-alpha",
-        "caseId": "E4-BACKUP-RESTORE"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E4-BACKUP-RESTORE ran as not-tested, expected installed",
-        "caseId": "E4-BACKUP-RESTORE"
-      },
-      {
-        "code": "case_not_pass",
         "detail": "Required case E4-UPGRADE-ROLLBACK is NOT_TESTED",
         "caseId": "E4-UPGRADE-ROLLBACK"
       },
       {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by installed-alpha",
+        "code": "required_evidence_missing",
+        "detail": "Case E4-UPGRADE-ROLLBACK has no substantive evidence.installation",
         "caseId": "E4-UPGRADE-ROLLBACK"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E4-UPGRADE-ROLLBACK ran as not-tested, expected installed",
-        "caseId": "E4-UPGRADE-ROLLBACK"
-      },
-      {
-        "code": "self_declared_pass_rejected",
-        "detail": "Report declares release PASS while the gate found blocking evidence"
       }
     ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T02:39:55.349Z",
+      "decidedAt": "2026-11-11T03:53:59.700Z",
       "failureCodes": []
     },
     "notes": [
@@ -2194,12 +2186,12 @@
     "tier": "advisory-routing",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T02:41:33.298Z",
+    "checkedAt": "2026-11-11T03:54:52.075Z",
     "source": {
-      "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
       "dirty": false
     },
-    "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2667,6 +2659,11 @@
         "status": "PASS"
       },
       {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-DESKTOP-GEOMETRY",
         "required": true,
         "status": "PASS"
@@ -2744,7 +2741,7 @@
       {
         "id": "E2-ATTENTION-WORKBENCH",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
       },
       {
         "id": "E2-ROUTE-ADVICE",
@@ -2753,21 +2750,6 @@
       }
     ],
     "failures": [
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E2-ATTENTION-WORKBENCH is NOT_TESTED",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by advisory-routing",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E2-ATTENTION-WORKBENCH ran as not-tested, expected controlled-fixture",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
       {
         "code": "case_not_pass",
         "detail": "Required case E2-ROUTE-ADVICE is NOT_TESTED",
@@ -2782,16 +2764,12 @@
         "code": "layer_not_allowed",
         "detail": "Case E2-ROUTE-ADVICE ran as not-tested, expected controlled-fixture",
         "caseId": "E2-ROUTE-ADVICE"
-      },
-      {
-        "code": "self_declared_pass_rejected",
-        "detail": "Report declares release PASS while the gate found blocking evidence"
       }
     ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T02:39:55.349Z",
+      "decidedAt": "2026-11-11T03:53:59.700Z",
       "failureCodes": []
     },
     "notes": [
@@ -2804,12 +2782,12 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T02:41:33.298Z",
+    "checkedAt": "2026-11-11T03:54:52.075Z",
     "source": {
-      "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
       "dirty": false
     },
-    "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3277,6 +3255,11 @@
         "status": "PASS"
       },
       {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-DESKTOP-GEOMETRY",
         "required": true,
         "status": "PASS"
@@ -3354,7 +3337,7 @@
       {
         "id": "E2-ATTENTION-WORKBENCH",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
       },
       {
         "id": "E2-ROUTE-ADVICE",
@@ -3373,21 +3356,6 @@
       }
     ],
     "failures": [
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E2-ATTENTION-WORKBENCH is NOT_TESTED",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by controlled-review",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E2-ATTENTION-WORKBENCH ran as not-tested, expected controlled-fixture",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
       {
         "code": "case_not_pass",
         "detail": "Required case E2-ROUTE-ADVICE is NOT_TESTED",
@@ -3412,16 +3380,12 @@
         "code": "missing_required_case",
         "detail": "Required case E3-REVIEW-ISOLATION is absent",
         "caseId": "E3-REVIEW-ISOLATION"
-      },
-      {
-        "code": "self_declared_pass_rejected",
-        "detail": "Report declares release PASS while the gate found blocking evidence"
       }
     ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T02:39:55.349Z",
+      "decidedAt": "2026-11-11T03:53:59.700Z",
       "failureCodes": []
     },
     "notes": [
@@ -3434,12 +3398,12 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T02:41:33.298Z",
+    "checkedAt": "2026-11-11T03:54:52.075Z",
     "source": {
-      "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
       "dirty": false
     },
-    "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3907,6 +3871,11 @@
         "status": "PASS"
       },
       {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-DESKTOP-GEOMETRY",
         "required": true,
         "status": "PASS"
@@ -3984,7 +3953,7 @@
       {
         "id": "E2-ATTENTION-WORKBENCH",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
       },
       {
         "id": "E2-ROUTE-ADVICE",
@@ -4008,21 +3977,6 @@
       }
     ],
     "failures": [
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E2-ATTENTION-WORKBENCH is NOT_TESTED",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by actual-heterogeneous-review",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E2-ATTENTION-WORKBENCH ran as not-tested, expected controlled-fixture",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
       {
         "code": "case_not_pass",
         "detail": "Required case E2-ROUTE-ADVICE is NOT_TESTED",
@@ -4052,16 +4006,12 @@
         "code": "missing_required_case",
         "detail": "Required case E5-HETEROGENEOUS-REVIEW is absent",
         "caseId": "E5-HETEROGENEOUS-REVIEW"
-      },
-      {
-        "code": "self_declared_pass_rejected",
-        "detail": "Report declares release PASS while the gate found blocking evidence"
       }
     ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T02:39:55.349Z",
+      "decidedAt": "2026-11-11T03:53:59.700Z",
       "failureCodes": []
     },
     "notes": [
@@ -4074,12 +4024,12 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T02:41:33.298Z",
+    "checkedAt": "2026-11-11T03:54:52.075Z",
     "source": {
-      "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
       "dirty": false
     },
-    "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4547,6 +4497,11 @@
         "status": "PASS"
       },
       {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-DESKTOP-GEOMETRY",
         "required": true,
         "status": "PASS"
@@ -4622,82 +4577,12 @@
         "status": "PASS"
       },
       {
-        "id": "E2-ATTENTION-WORKBENCH",
-        "required": true,
-        "status": "NOT_TESTED"
-      },
-      {
-        "id": "E2-ROUTE-ADVICE",
-        "required": true,
-        "status": "NOT_TESTED"
-      },
-      {
-        "id": "E3-REVIEW-REPORT",
-        "required": true,
-        "status": "MISSING"
-      },
-      {
-        "id": "E3-REVIEW-ISOLATION",
-        "required": true,
-        "status": "MISSING"
-      },
-      {
-        "id": "E5-HETEROGENEOUS-REVIEW",
-        "required": true,
-        "status": "MISSING"
-      },
-      {
         "id": "E6-REVIEW-PILOT",
         "required": true,
         "status": "NOT_TESTED"
       }
     ],
     "failures": [
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E2-ATTENTION-WORKBENCH is NOT_TESTED",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by review-value",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E2-ATTENTION-WORKBENCH ran as not-tested, expected controlled-fixture",
-        "caseId": "E2-ATTENTION-WORKBENCH"
-      },
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E2-ROUTE-ADVICE is NOT_TESTED",
-        "caseId": "E2-ROUTE-ADVICE"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by review-value",
-        "caseId": "E2-ROUTE-ADVICE"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E2-ROUTE-ADVICE ran as not-tested, expected controlled-fixture",
-        "caseId": "E2-ROUTE-ADVICE"
-      },
-      {
-        "code": "missing_required_case",
-        "detail": "Required case E3-REVIEW-REPORT is absent",
-        "caseId": "E3-REVIEW-REPORT"
-      },
-      {
-        "code": "missing_required_case",
-        "detail": "Required case E3-REVIEW-ISOLATION is absent",
-        "caseId": "E3-REVIEW-ISOLATION"
-      },
-      {
-        "code": "missing_required_case",
-        "detail": "Required case E5-HETEROGENEOUS-REVIEW is absent",
-        "caseId": "E5-HETEROGENEOUS-REVIEW"
-      },
       {
         "code": "case_not_pass",
         "detail": "Required case E6-REVIEW-PILOT is NOT_TESTED",
@@ -4712,16 +4597,12 @@
         "code": "layer_not_allowed",
         "detail": "Case E6-REVIEW-PILOT ran as not-tested, expected actual-native",
         "caseId": "E6-REVIEW-PILOT"
-      },
-      {
-        "code": "self_declared_pass_rejected",
-        "detail": "Report declares release PASS while the gate found blocking evidence"
       }
     ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T02:39:55.349Z",
+      "decidedAt": "2026-11-11T03:53:59.700Z",
       "failureCodes": []
     },
     "notes": [
@@ -4734,12 +4615,12 @@
     "tier": "local-alpha",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T02:41:33.299Z",
+    "checkedAt": "2026-11-11T03:54:52.076Z",
     "source": {
-      "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
       "dirty": false
     },
-    "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5207,6 +5088,11 @@
         "status": "PASS"
       },
       {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-DESKTOP-GEOMETRY",
         "required": true,
         "status": "PASS"
@@ -5282,14 +5168,34 @@
         "status": "PASS"
       },
       {
+        "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E4-INSTALL-FIRST-RUN",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-REUSE-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
       },
       {
         "id": "E4-BACKUP-RESTORE",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-TAMPER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-ROLLBACK",
+        "required": true,
+        "status": "PASS"
       },
       {
         "id": "E4-UPGRADE-ROLLBACK",
@@ -5300,58 +5206,19 @@
     "failures": [
       {
         "code": "case_not_pass",
-        "detail": "Required case E4-INSTALL-FIRST-RUN is NOT_TESTED",
-        "caseId": "E4-INSTALL-FIRST-RUN"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by local-alpha",
-        "caseId": "E4-INSTALL-FIRST-RUN"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E4-INSTALL-FIRST-RUN ran as not-tested, expected installed",
-        "caseId": "E4-INSTALL-FIRST-RUN"
-      },
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E4-BACKUP-RESTORE is NOT_TESTED",
-        "caseId": "E4-BACKUP-RESTORE"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by local-alpha",
-        "caseId": "E4-BACKUP-RESTORE"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E4-BACKUP-RESTORE ran as not-tested, expected installed",
-        "caseId": "E4-BACKUP-RESTORE"
-      },
-      {
-        "code": "case_not_pass",
         "detail": "Required case E4-UPGRADE-ROLLBACK is NOT_TESTED",
         "caseId": "E4-UPGRADE-ROLLBACK"
       },
       {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by local-alpha",
+        "code": "required_evidence_missing",
+        "detail": "Case E4-UPGRADE-ROLLBACK has no substantive evidence.installation",
         "caseId": "E4-UPGRADE-ROLLBACK"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E4-UPGRADE-ROLLBACK ran as not-tested, expected installed",
-        "caseId": "E4-UPGRADE-ROLLBACK"
-      },
-      {
-        "code": "self_declared_pass_rejected",
-        "detail": "Report declares release PASS while the gate found blocking evidence"
       }
     ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T02:39:55.349Z",
+      "decidedAt": "2026-11-11T03:53:59.700Z",
       "failureCodes": []
     },
     "notes": [
@@ -5364,12 +5231,12 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T02:41:33.299Z",
+    "checkedAt": "2026-11-11T03:54:52.076Z",
     "source": {
-      "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
       "dirty": false
     },
-    "expectedSource": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5837,6 +5704,11 @@
         "status": "PASS"
       },
       {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-DESKTOP-GEOMETRY",
         "required": true,
         "status": "PASS"
@@ -5912,14 +5784,34 @@
         "status": "PASS"
       },
       {
+        "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E4-INSTALL-FIRST-RUN",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-REUSE-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
       },
       {
         "id": "E4-BACKUP-RESTORE",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-TAMPER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-ROLLBACK",
+        "required": true,
+        "status": "PASS"
       },
       {
         "id": "E4-UPGRADE-ROLLBACK",
@@ -5940,47 +5832,12 @@
     "failures": [
       {
         "code": "case_not_pass",
-        "detail": "Required case E4-INSTALL-FIRST-RUN is NOT_TESTED",
-        "caseId": "E4-INSTALL-FIRST-RUN"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by full-product",
-        "caseId": "E4-INSTALL-FIRST-RUN"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E4-INSTALL-FIRST-RUN ran as not-tested, expected installed",
-        "caseId": "E4-INSTALL-FIRST-RUN"
-      },
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E4-BACKUP-RESTORE is NOT_TESTED",
-        "caseId": "E4-BACKUP-RESTORE"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by full-product",
-        "caseId": "E4-BACKUP-RESTORE"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E4-BACKUP-RESTORE ran as not-tested, expected installed",
-        "caseId": "E4-BACKUP-RESTORE"
-      },
-      {
-        "code": "case_not_pass",
         "detail": "Required case E4-UPGRADE-ROLLBACK is NOT_TESTED",
         "caseId": "E4-UPGRADE-ROLLBACK"
       },
       {
-        "code": "layer_not_allowed",
-        "detail": "Layer not-tested is not admitted by full-product",
-        "caseId": "E4-UPGRADE-ROLLBACK"
-      },
-      {
-        "code": "layer_not_allowed",
-        "detail": "Case E4-UPGRADE-ROLLBACK ran as not-tested, expected installed",
+        "code": "required_evidence_missing",
+        "detail": "Case E4-UPGRADE-ROLLBACK has no substantive evidence.installation",
         "caseId": "E4-UPGRADE-ROLLBACK"
       },
       {
@@ -6007,16 +5864,12 @@
         "code": "required_evidence_missing",
         "detail": "Case E5-NATIVE-CONTROL has no substantive evidence.native",
         "caseId": "E5-NATIVE-CONTROL"
-      },
-      {
-        "code": "self_declared_pass_rejected",
-        "detail": "Report declares release PASS while the gate found blocking evidence"
       }
     ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T02:39:55.349Z",
+      "decidedAt": "2026-11-11T03:53:59.700Z",
       "failureCodes": []
     },
     "notes": [

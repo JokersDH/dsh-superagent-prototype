@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
+    "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
     "dirty": false
   },
   "environment": {
@@ -11,17 +11,17 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-11T02:39:55.336Z",
+  "checkedAt": "2026-11-11T03:53:59.685Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 109,
+    "PASS": 117,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 16,
+    "NOT_TESTED": 12,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
@@ -32,6 +32,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "PASS",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "真实模型回复与流式界面未在本轮执行；budget 0。"
@@ -48,6 +49,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "真实 Codex 执行属于 B 的原生验收，E 未触发计费任务。"
@@ -62,6 +64,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "真实原生权限/审批问题未执行；B 的原生证据未作为输入提供。"
@@ -77,6 +80,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "原生注册检查与真实 deliverable 未在本轮复验。"
@@ -93,6 +97,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "生产故障注入接口不存在；阻断由受控 completion port 注入，其余步骤走真实 HTTP。"
@@ -109,6 +114,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
@@ -121,6 +127,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
@@ -133,6 +140,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "旧提案与决定的撤销治理（C 未交付）"
@@ -147,6 +155,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "两个独立项目的隔离：受控 lane 只有一个项目。"
@@ -161,6 +170,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "真实原生写进程停止与物理资源屏障由 B 证明。"
@@ -176,6 +186,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "协调器 SIGKILL 后的原生恢复与重连（B 范围）。"
@@ -191,6 +202,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
@@ -204,6 +216,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
@@ -216,6 +229,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
@@ -228,6 +242,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
@@ -241,6 +256,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
@@ -253,6 +269,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "PASS",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
@@ -266,6 +283,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "长时间 soak、负载与多实例并发。"
@@ -280,6 +298,7 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "PASS",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
@@ -292,11 +311,16 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "D 的 apps/launcher、tools/distribution、packages/portability 尚未交付。"
+        "PA_CONFIG_ROOT 覆盖后 release.json 不随 first-run 写入（owner D，已完成最小复现）。"
       ],
-      "evidence": []
+      "evidence": [
+        "E4-INSTALL-FIRST-RUN",
+        "E4-INSTALL-REUSE-CONCURRENCY",
+        "E4-INSTALL-TAMPER"
+      ]
     },
     {
       "id": "backup-restore",
@@ -304,11 +328,15 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "无发行 bundle 与迁移 CLI。"
+        "恢复后的新授权/重绑定归 main（E4-REAUTHORIZATION NOT_TESTED）；旧项目绑定恢复仍只读。"
       ],
-      "evidence": []
+      "evidence": [
+        "E4-BACKUP-RESTORE",
+        "E4-INSTALL-ROLLBACK"
+      ]
     },
     {
       "id": "upgrade-rollback",
@@ -316,11 +344,14 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "无版本化发行产物。"
+        "真实升级需要第二个冻结 buildId；state 回滚已在同一字节上通过。"
       ],
-      "evidence": []
+      "evidence": [
+        "E4-INSTALL-ROLLBACK"
+      ]
     },
     {
       "id": "session-catalog",
@@ -328,6 +359,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
@@ -341,9 +373,10 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "跨项目/期限/等待排序的注意力工作台尚未交付。"
+        "真实 decisionDeadline/expiresAt 与多 tab 重叠未验证；本项目只有一个受控项目。"
       ],
       "evidence": [
         "E2-ATTENTION-SIGNAL"
@@ -355,13 +388,15 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "真实业务截止/失效与 C 的 deterministic_priority 排序未接线。"
+        "真实业务截止与授权过期后的问题失效仍无公开入口（E3-ATTENTION-DEADLINES、E3-DECISION-SOURCE-STATES）；deterministic_priority 排序与逐项动作已通过。"
       ],
       "evidence": [
         "E3-ATTENTION-INBOX",
-        "E3-ATTENTION-INBOX-UI"
+        "E3-ATTENTION-INBOX-UI",
+        "E2-ATTENTION-WORKBENCH"
       ]
     },
     {
@@ -370,6 +405,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "多 tab 重叠区间并集未直接测量；活动是可见/聚焦代理，不是人工思考时间。"
@@ -385,6 +421,7 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "PASS",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "C 的 packages/routing 与 main 的 HTTP/UI 入口未交付；0/1/多候选、身份漂移、旧政策等产品负例无法执行。"
@@ -399,6 +436,7 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "PASS",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "无 review Work/HTTP/证据发布入口；E3-REVIEW-PIPELINE 未执行。"
@@ -414,6 +452,7 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "第二协议未实现，独立试点 preflight 为 BLOCKED；不能把替换模型或 fixture 当异构。"
@@ -426,6 +465,7 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "仅合同 revision 已验证；项目设置版本 API 未交付（RFC-E-001 缺口 2）。"
@@ -435,16 +475,17 @@
     {
       "id": "context-proposals-decisions",
       "capability": "上下文、提案与明确决定治理",
-      "controlledFixture": "NOT_TESTED",
+      "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "C 三项领域 probe 仍未修复；main 尚无决定/提案 HTTP 入口。",
-        "确认前不执行、重复确认幂等、撤销后失效、事务失败回滚与注入防护均未执行。"
+        "自动上下文与结构化提案确认未发布（owner C）。",
+        "源消息删除/授权过期/事务失败注入缺少公开入口（E3-DECISION-SOURCE-STATES）。"
       ],
       "evidence": [
-        "E2-CONTEXT-PROPOSALS-NOT-TESTED"
+        "E3-DECISION-WORKFLOW"
       ]
     },
     {
@@ -453,6 +494,7 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "解除隔离后的新授权/环境重绑定未实现，不在本轮声明。"
@@ -464,15 +506,16 @@
     {
       "id": "assistant-state",
       "capability": "明确决定、授权上下文、结构化提案与事务消费",
-      "controlledFixture": "NOT_TESTED",
+      "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "PASS",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "C 的三项领域 probe 仍未修复；main 尚无决定/提案 HTTP 入口。",
-        "确认前不执行、撤销后失效、事务失败回滚与注入防护全部未执行。"
+        "自动提案确认与撤销后上下文失效未发布。"
       ],
       "evidence": [
+        "E3-DECISION-WORKFLOW",
         "E3-ASSISTANT-SCHEMA-FIXTURES"
       ]
     },
@@ -482,11 +525,20 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "D 的 launcher/distribution/portability 未进入 main；无 staged bundle。"
+        "E4-UPGRADE-ROLLBACK 需要第二个冻结 buildId（同 schema）；同一字节上的 state 回滚已通过。",
+        "PA_CONFIG_ROOT 覆盖后 release.json 缺失（owner D，最小复现已记录）。"
       ],
-      "evidence": []
+      "evidence": [
+        "E4-INSTALL-ARTIFACT-IDENTITY",
+        "E4-INSTALL-FIRST-RUN",
+        "E4-INSTALL-REUSE-CONCURRENCY",
+        "E4-BACKUP-RESTORE",
+        "E4-INSTALL-TAMPER",
+        "E4-INSTALL-ROLLBACK"
+      ]
     },
     {
       "id": "native-control",
@@ -494,6 +546,7 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "B 的当前真实控制证据未作为输入提供；E 无该预算，不能把 fixture 当原生。"
@@ -506,9 +559,10 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "Preflight BLOCKED：pricing_unavailable + b_runtime_interface_missing；0/24 turn，无价值结论。"
+        "Preflight BLOCKED：pricing_unavailable（配置模型没有操作者可核对的 USD 价格表）；0/24 turn；真实作者/续会话/新 session 执行链已实现并有 17 项 runner selftest（预留先于发送、单 turn 在途、unknown 不归还、token/USD 上限），但没有价格就不发送；无价值结论。"
       ],
       "evidence": []
     },
@@ -518,6 +572,7 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "B 的原生证据未作为已提交输入提供；E 未获单独预算，不触发模型任务。"
