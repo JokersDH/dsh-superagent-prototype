@@ -74,6 +74,7 @@ export const ApplicationConfigurationSchema = z
     reviewActivityAvailable: z.boolean().optional(),
     decisionsAvailable: z.boolean().optional(),
     proposalsAvailable: z.boolean().optional(),
+    contextPreviewAvailable: z.boolean().optional(),
     projects: z.array(ConfiguredProjectViewSchema).max(128).readonly(),
     profiles: z.array(ExecutionProfileViewSchema).max(128).readonly(),
     checks: z.array(RegisteredCheckViewSchema).max(128).readonly(),

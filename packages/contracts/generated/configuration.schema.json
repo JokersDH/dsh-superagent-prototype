@@ -33,6 +33,9 @@
       "readOnly": true,
       "type": "array"
     },
+    "contextPreviewAvailable": {
+      "type": "boolean"
+    },
     "decisionsAvailable": {
       "type": "boolean"
     },

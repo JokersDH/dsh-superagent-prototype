@@ -1,0 +1,58 @@
+{
+  "status": "FAIL_OPTIONAL_HELPER_IDENTITY_ONLY",
+  "mode": "helper_identity_only",
+  "recipeOriginalSourceHash": "fe66ebd3b0f957e4d05cc4b804ecf5c5a0ebb6f8316d66cc1d19c616aea159a2",
+  "newScopedAdaptersTested": false,
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "sourceCommit": "e58cf258351afc094adbb86e048b1ad48d2a1c54",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-11T13:36:05.842Z",
+  "command": [
+    "node",
+    "tools/bootstrap/probe-wave10-context.mjs",
+    "/Users/hh/Desktop/joker/superagent-agent-c",
+    "--helper-only"
+  ],
+  "exitCode": 1,
+  "sourceHashes": {
+    "packages/proposals/src/assistant-proposal-service.ts": "5eb8f3fb4bc7846849937d7d1a345f2e9cc74aa2d481c5fb21318622c1909a7b",
+    "packages/knowledge/test/main-context-consumer.case.ts": "fe66ebd3b0f957e4d05cc4b804ecf5c5a0ebb6f8316d66cc1d19c616aea159a2"
+  },
+  "cases": [
+    {
+      "id": "IDENTICAL_HELPER_CONFIRMATION_POSITIVE_CONTROL",
+      "status": "PASS",
+      "observation": {
+        "state": "confirmed",
+        "replayed": true,
+        "profileId": "profile-one"
+      }
+    },
+    {
+      "id": "SAME_EFFECT_ID_DIFFERENT_PLAN_BODY_CANNOT_RETURN_A_NEW_COMMAND",
+      "status": "FAIL",
+      "message": "The same effect identity returned a different executable command while claiming idempotent replay",
+      "observation": {
+        "firstProfile": "profile-one",
+        "replayProfile": "profile-two",
+        "replayed": true,
+        "errorCode": null
+      }
+    }
+  ],
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "references": {
+    "helperReplay": "packages/proposals/src/assistant-proposal-service.ts:158",
+    "helperCommand": "packages/proposals/src/assistant-proposal-service.ts:258",
+    "conversationRecipe": "packages/knowledge/test/main-context-consumer.case.ts:33",
+    "artifactRecipe": "packages/knowledge/test/main-context-consumer.case.ts:52"
+  },
+  "limitations": [
+    "The optional helper is deliberately absent from main; its failure does not affect the admitted ProductProposals receipt path.",
+    "The adapter negatives reproduce the recommended C test/document recipe, not a public production adapter; main already implements its own scoped adapters.",
+    "The two recipe implementations are fixed historical reproductions. They cannot certify a newly repaired adapter; use --helper-only for the dynamic helper check and add an actual-export consumer for new adapters.",
+    "Context providers are documented as pre-authorized; this does not claim the composer should infer artifact ownership from an unscoped registry.",
+    "Temporary actual SQLite and metadata only; no user services, model/native sends, external network or current-source UI are exercised."
+  ]
+}

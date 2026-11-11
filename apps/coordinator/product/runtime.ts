@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
 import { sharedAttentionRanker } from '@personal-agent/routing'
-import type { AttentionRanker, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryPrepare, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
+import type { AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryPrepare, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { WorkEvidenceSchema } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
@@ -29,6 +29,8 @@ import { projectAcceptedOutcome } from './accepted-outcomes.ts'
 import { ProductRecovery } from './recovery.ts'
 import { ProductProposals } from './proposals.ts'
 import { readRecoveryActivationRecord } from './recovery-intents.ts'
+import { ProductEvidenceHistory } from './evidence-history.ts'
+import { ProductContextPreview } from './context-preview.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -151,6 +153,7 @@ export function createProductRuntime(
     ranker: options.attentionRanker ?? sharedAttentionRanker, ...(options.now ? { now: options.now } : {}),
   })
   const assistantStreams = new AssistantStreams()
+  const evidenceHistory = new ProductEvidenceHistory(store, application, () => configuredProjects.map(project => project.id), options.actionSecret, options.now)
   if (options.assistantProvider)
     handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams, {
       nativeExecution: !!options.native,
@@ -158,6 +161,7 @@ export function createProductRuntime(
   const read: NonNullable<LocalHttpOptions['read']> = {
     recovery: async () => recovery.inspect(),
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
+    workEvidenceHistory: (workId, query) => evidenceHistory.read(workId, query),
     workEvidence: async workId => {
       const work = (await application.inspect({ workId })).works[0]
       if (!work) throw new ApplicationFault('forbidden', 'Work evidence is outside the configured scope', 'none')
@@ -169,7 +173,7 @@ export function createProductRuntime(
           throw new ApplicationFault('storage_unavailable', 'Outcome source identity mismatch', 'none')
         return value
       })
-      const current = outcomes.some(value => value.attempt.contract.revision === work.contract.revision &&
+      const current = outcomes.some(value => value.acceptance === 'accepted' && value.attempt.contract.revision === work.contract.revision &&
         value.attempt.contract.digest === work.contract.digest && value.verificationRef === work.actions.currentVerificationId)
       return WorkEvidenceSchema.parse({ protocol: 'work-evidence/1', workId, entries: timeline.entries, outcomes, truncated: timeline.truncated,
         projection: current ? 'recorded' : work.phase === 'delivered' ? timeline.truncated ? 'not_in_window' : 'source_missing' : 'not_accepted' })
@@ -318,6 +322,7 @@ export function createProductRuntime(
         reviewActivityAvailable: options.startupMode !== 'recovery_readonly',
         decisionsAvailable: options.startupMode !== 'recovery_readonly',
         proposalsAvailable: options.startupMode !== 'recovery_readonly',
+        contextPreviewAvailable: options.startupMode !== 'recovery_readonly',
       })
       return configuration
     },
@@ -351,6 +356,10 @@ export function createProductRuntime(
       }
     },
   }
+  const contextPreview = new ProductContextPreview(store, application, options.principal,
+    () => configuredProjects.map(project => ({ ...project,
+      ...(projectSettings?.has(project.id) ? { displayName: projectSettings.displayName(project.id) } : {}) })),
+    { verification: read.verification!, workEvidence: read.workEvidence! }, options.now)
   return {
     application,
     execution,
@@ -364,6 +373,10 @@ export function createProductRuntime(
       prepareDecision: async (input: DecisionPrepare, actor: TrustedActor) => decisions.prepare(input, actor),
       prepareProposal: (input: ProposalPrepare, actor: TrustedActor) => proposals.prepare(input, actor),
       proposal: (command: ProposalCommand, actor: TrustedActor) => proposals.dispatch(command, actor),
+      contextPreview: (input: ContextPreviewInput, actor: TrustedActor) => {
+        if (options.startupMode === 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Context preview requires a normal local instance', 'none')
+        return contextPreview.prepare(input, actor)
+      },
       decision: async (command: DecisionCommand, actor: TrustedActor) => decisions.dispatch(command, actor),
       reviewActivity: async (activity: ReviewActivity, actor: TrustedActor) => reviewTiming.record(activity, actor),
       ...(projectSettings ? { projectSettings: (command: ProjectSettingsCommand, actor: TrustedActor) => projectSettings.dispatch(command, actor) } : {}) },

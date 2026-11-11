@@ -4,7 +4,7 @@ import { detectInjectionPatterns } from './injection.ts'
 import { sha256Text } from './digest.ts'
 import { ContextReader } from './reader.ts'
 import { estimateTokens } from './tokens.ts'
-import { ContextGrantSchema, ContextRequestSchema } from './types.ts'
+import { ContextGrantSchema, ContextRequestSchema, ContextSourceKindSchema } from './types.ts'
 import type {
   ContextBudget,
   ContextBundle,
@@ -94,6 +94,53 @@ export const DEFAULT_COMPOSED_GROUPS: readonly ComposedGroupPlan[] = Object.free
   // Raw project files last: only the budget left over by the structured groups.
   { name: 'files', priority: 6, sourceKinds: ['document', 'source_file'], share: 0 },
 ])
+
+/** Every group name owns a fixed source-kind family; a name can never borrow another provider. */
+const GROUP_KIND_FAMILY: Record<ComposedGroupName, ReadonlySet<ContextSourceKind>> = {
+  contract: new Set(['contract', 'work']),
+  decisions: new Set(['decision']),
+  project_facts: new Set(['project_metadata', 'verification', 'delivery']),
+  conversation: new Set(['conversation_message']),
+  artifacts: new Set(['artifact']),
+  files: new Set(['document', 'source_file']),
+}
+
+/**
+ * Validates a caller group plan before any provider call: known name, kinds inside that name's
+ * family, no duplicates, sane priority/share, no NaN/negative/infinite budget inputs.
+ */
+export function validateComposedGroups(groups: readonly ComposedGroupPlan[]): void {
+  if (groups.length === 0) throw new ContextError('composition_invalid', 'Composition needs at least one group')
+  const names = new Set<string>()
+  const priorities = new Set<number>()
+  for (const group of groups) {
+    if (!Object.hasOwn(GROUP_KIND_FAMILY, group.name)) {
+      throw new ContextError('composition_invalid', `Unknown composition group: ${String(group.name)}`)
+    }
+    if (names.has(group.name)) throw new ContextError('composition_invalid', `Duplicate composition group: ${group.name}`)
+    names.add(group.name)
+    if (!Number.isInteger(group.priority) || group.priority < 1) {
+      throw new ContextError('composition_invalid', `Group ${group.name} needs a positive integer priority`)
+    }
+    if (priorities.has(group.priority)) {
+      throw new ContextError('composition_invalid', `Two groups share priority ${group.priority}`)
+    }
+    priorities.add(group.priority)
+    if (typeof group.share !== 'number' || !Number.isFinite(group.share) || group.share < 0 || group.share > 1) {
+      throw new ContextError('composition_invalid', `Group ${group.name} share must be a finite number in [0,1]`)
+    }
+    if (group.sourceKinds.length === 0) throw new ContextError('composition_invalid', `Group ${group.name} needs source kinds`)
+    if (new Set(group.sourceKinds).size !== group.sourceKinds.length) {
+      throw new ContextError('composition_invalid', `Group ${group.name} repeats a source kind`)
+    }
+    const family = GROUP_KIND_FAMILY[group.name]
+    for (const kind of group.sourceKinds) {
+      if (!ContextSourceKindSchema.safeParse(kind).success || !family.has(kind)) {
+        throw new ContextError('composition_invalid', `Group ${group.name} cannot declare source kind ${String(kind)}`)
+      }
+    }
+  }
+}
 
 export interface ContextCompositionRequest {
   readonly requestId: string
@@ -342,7 +389,7 @@ export class ContextComposer {
       throw new ContextError('composition_invalid', 'Conversation id cannot be empty')
     }
     const groups = [...(input.groups ?? DEFAULT_COMPOSED_GROUPS)].sort((a, b) => a.priority - b.priority)
-    if (groups.length === 0) throw new ContextError('composition_invalid', 'Composition needs at least one group')
+    validateComposedGroups(groups)
 
     const totalBytes = authorization.budget.maxBytes
     const totalTokens = authorization.budget.maxTokens

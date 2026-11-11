@@ -1,0 +1,51 @@
+{
+  "status": "SCOPED_CANDIDATE_REVIEW_COMPLETE_NOT_WHOLE_PRODUCT_ADMISSION",
+  "mainReviewBaseline": "2caee2e68d5891ed7d2d3a4550087aaf2e91d3bd",
+  "currentProductSource": "32fc7aee99b30b49030208d6bac95e843cc38d9c",
+  "newInterfaceCheckpoint": "677cf26",
+  "newInterfaceOnly": "AssistantContextBinding schema and synchronous A port; no context-use HTTP/provider behavior yet",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "candidates": {
+    "A": { "commit": "7f7e83e0d82b26c33eace6a516cf791e4f970767", "probe": "storage.json", "probePassed": 1, "probeFailed": 3, "ownedTargetTestsPassed": 10, "admission": "TARGET_READER_NOT_ADMITTED" },
+    "B": { "commit": "1175053d1598cd981a1bb20812d56a61fd4be277", "probe": "runtime.json", "probePassed": 3, "probeFailed": 4, "ownedTargetTestsPassed": 68, "controlPassed": 10, "controlNotTested": 1, "strictDiagnostics": 76, "admission": "NEW_PUBLIC_MODULES_NOT_ADMITTED" },
+    "C": { "commit": "e58cf258351afc094adbb86e048b1ad48d2a1c54", "probe": "context.json", "probePassed": 1, "probeFailed": 3, "fixedHistoricalRecipeFailures": 2, "newScopedAdaptersTested": false, "dynamicHelperProbe": "context-helper.json", "contextPassed": 59, "proposalsPassed": 30, "knowledgePassed": 71, "historicalBoundaryProbePassed": 8, "mainContextHttpPassed": 14, "admission": "EXISTING_MAIN_BOUNDARY_PRESERVED_UNUSED_HELPER_RECIPE_NOT_ADMITTED" },
+    "D": { "commit": "25e564315d11432b7932ef336d2122df119f88c0", "probe": "distribution.json", "probePassed": 1, "probeFailed": 6, "ownedTargetTestsPassed": 11, "admission": "MATERIAL_AND_RESOURCE_OWNERSHIP_NOT_ADMITTED" },
+    "E": { "commit": "57f5d19daf033bbf021083440d56ff06979508bf", "reportedTestSource": "4c38bd6d55523e42c2beaf59ee96cfa5e02d86be", "runnerSelftestPassed": 66, "historicalInstallTargetSource": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e", "historicalInstallTargetSchema": 13, "admission": "HISTORICAL_INSTALL_SCOPE_ONLY_CURRENT_SCHEMA15_AND_MAIN_UI_NOT_ADMITTED" }
+  },
+  "mainValidation": {
+    "contractsTestPassed": 222,
+    "contractsBuild": "PASS",
+    "contractsGeneratedCheck": "PASS",
+    "coordinatorProductTypecheck": "PASS",
+    "newProbeSyntaxChecks": "PASS",
+    "wave09StaticPlan": "PASS",
+    "wave10StaticPlan": "PASS",
+    "newPlanRoles": 6,
+    "newPlanPhases": 36,
+    "newPlanCheckpoints": 21,
+    "staticPlanIsProductEvidence": false
+  },
+  "artifactObserved": {
+    "targetSource": "6830e38c73f50542c7d836e4d5e579bcf5d27fe2",
+    "targetBuild": "f2390ffd1b87b79a", "schema": 15,
+    "targetSha256": "62861d93d064374f90f7b638e6473804aeaab516d0633fbb9ffa453924434ae9",
+    "targetBytes": 20042061,
+    "actualBaselineAndTargetByteHashesVerified": true,
+    "containsCurrentMainContextEvidence": false,
+    "fullManagedInstallMatrixRerun": false
+  },
+  "preservedUserServices": [[5180,8796],[5181,8797],[5182,8798],[5183,8799],[5184,8800],[5185,8801],[5186,8802],[5187,8803]],
+  "allEightApiHealthStatus": 200,
+  "userServicesRestarted": false,
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "budgetReset": false,
+  "nextDispatch": "agent-tasks/product-wave-10/README.zh-CN.md",
+  "limitations": [
+    "Candidate FAIL scopes are distinct from the already admitted current personal product",
+    "B sender findings are internal experimental contract failures, not proven user-facing permission bypasses",
+    "C recipe findings do not replace the composer's documented pre-authorized provider boundary",
+    "Distribution probes perform readonly resource accounting only and never call candidate stop on test or user processes",
+    "No new full installer, target activation, real model/native or review-value admission"
+  ]
+}

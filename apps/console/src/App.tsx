@@ -73,6 +73,8 @@ import { useReviewActivity } from './useReviewActivity.ts'
 import { AttentionInbox } from './AttentionInbox.tsx'
 import { DecisionWorkspace } from './DecisionWorkspace.tsx'
 import { ProposalWorkspace } from './ProposalWorkspace.tsx'
+import { ContextWorkspace } from './ContextWorkspace.tsx'
+import { WorkEvidencePanel } from './WorkEvidencePanel.tsx'
 import { blockedLabel } from './configuration-labels.ts'
 import type { FixtureAdapter } from './fixture.ts'
 import { conversationId as defaultConversationId } from './config.ts'
@@ -187,6 +189,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [createOpen, setCreateOpen] = useState(false)
   const [createDraft, setCreateDraft] = useState({ id: '', goal: '', projectId: '' })
   const [projectImportOpen, setProjectImportOpen] = useState(false)
+  const [contextOpen, setContextOpen] = useState(false)
   const [activateWorkId, setActivateWorkId] = useState<string | undefined>()
   const [workLocation, setWorkLocation] = useState<WorkLocation | undefined>()
   const [workEnvironment, setWorkEnvironment] = useState<WorkEnvironment | undefined>()
@@ -640,7 +643,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     snapshot?.works.some(work => work.work.id === question.contract.workId && work.work.projectId === projectFilter))
   const selectedQuestions = selectedWork ? openQuestions.filter(question => question.contract.workId === selectedWork.work.id) : openQuestions
   const flushReviewActivity = useReviewActivity(transport, selectedWork?.actions.currentCandidate,
-    !!configuration?.reviewActivityAvailable && inspectorOpen && !modelPanelOpen && !!selectedWork?.actions.currentVerificationId)
+    !!configuration?.reviewActivityAvailable && inspectorOpen && !modelPanelOpen && !contextOpen && !!selectedWork?.actions.currentVerificationId)
   const activeWorks = works.filter(work => ['evaluating', 'queued', 'working', 'verifying', 'switching'].includes(work.phase))
   const projectName = projectFilter
     ? configuration?.projects.find(project => project.id === projectFilter)?.displayName ?? projectFilter
@@ -754,6 +757,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           </a>
           {configuration?.decisionsAvailable && transport.decisions && transport.prepareDecision && transport.decisionCommand && <button type="button" className="icon-button" title="项目决定" aria-label="项目决定" onClick={() => setDecisionSource(null)}><Bookmark size={18} /></button>}
           {configuration?.proposalsAvailable && transport.prepareProposal && transport.proposalCommand && <button type="button" className="icon-button" title="创建提案" aria-label="创建提案" onClick={() => setProposalSource(null)}><FileCheck2 size={18} /></button>}
+          {configuration?.contextPreviewAvailable && transport.contextPreview && <button type="button" className="icon-button" title="上下文预览" aria-label="上下文预览" onClick={() => setContextOpen(true)}><Layers3 size={18} /></button>}
           <button
             type="button"
             className="icon-button secondary-tool"
@@ -1129,6 +1133,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                   onClick={() => void openAttention(reviewQueue[reviewIndex + 1]!, reviewQueue).catch(() => setNotice('交付暂时无法打开，请返回待办刷新。'))}><ArrowRight size={16} /></button>
               </div>}
               <WorkDetail
+                transport={transport}
                 work={selectedWork}
                 location={workLocation}
                 environment={workEnvironment}
@@ -1226,6 +1231,11 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           {(workspaceOpen || inspectorOpen || modelPanelOpen) && <button type="button" className="drawer-backdrop" aria-label="关闭侧栏" onClick={() => { setWorkspaceOpen(false); setInspectorOpen(false); setModelPanelOpen(false) }} />}
         </main>
       )}
+      {auth === 'ready' && contextOpen && configuration?.contextPreviewAvailable && configuration.projects.length > 0 &&
+        <ContextWorkspace key={conversationId} transport={transport} configuration={configuration} conversationId={conversationId}
+          works={snapshot?.works ?? []} initialProjectId={selectedWork?.work.projectId ?? projectFilter ?? configuration.projects[0]!.id}
+          {...(selectedWork?.work.conversationId === conversationId ? { initialWorkId: selectedWork.work.id } : {})}
+          onClose={() => setContextOpen(false)} />}
       {auth === 'ready' && decisionSource !== undefined && configuration && configuration.projects.length > 0 &&
         <DecisionWorkspace transport={transport} configuration={configuration} source={decisionSource ?? undefined}
           sources={snapshot?.conversation?.messages ?? []} initialProjectId={decisionSource?.projectId ?? projectFilter ?? configuration.projects[0]!.id}
@@ -2569,6 +2579,7 @@ function QuestionCard({
 }
 
 function WorkDetail({
+  transport,
   work,
   location,
   environment,
@@ -2586,6 +2597,7 @@ function WorkDetail({
   onAccept,
   onRevise,
 }: {
+  transport: ConsoleTransport
   work: WorkView | undefined
   location: WorkLocation | undefined
   environment: WorkEnvironment | undefined
@@ -2762,6 +2774,7 @@ function WorkDetail({
       )}
       <h4>当前候选产物</h4>
       <Artifacts ids={work.artifactIds} reader={artifactReader} />
+      <WorkEvidencePanel key={work.work.id} work={work} transport={transport} />
       <h4>可用动作</h4>
       <div className="actions">
         {available.includes('accept_candidate') && work.actions.currentCandidate && (

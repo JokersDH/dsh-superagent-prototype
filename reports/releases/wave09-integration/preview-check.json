@@ -1,0 +1,25 @@
+{
+  "sourceCommit": "32fc7aee99b30b49030208d6bac95e843cc38d9c",
+  "consoleURL": "http://127.0.0.1:5187/",
+  "apiPort": 8803,
+  "stateRoot": ".local-state/wave09-context-evidence-preview",
+  "mode": "personal",
+  "access": "local-development",
+  "contextPreviewAvailable": true,
+  "proposalsAvailable": true,
+  "initialWorks": 0,
+  "initialMessages": 0,
+  "oldApiHealth": [
+    { "port": 8796, "status": 200, "mode": "personal" },
+    { "port": 8797, "status": 200, "mode": "personal" },
+    { "port": 8798, "status": 200, "mode": "personal" },
+    { "port": 8799, "status": 200, "mode": "personal" },
+    { "port": 8800, "status": 200, "mode": "personal" },
+    { "port": 8801, "status": 200, "mode": "personal" },
+    { "port": 8802, "status": 200, "mode": "personal" }
+  ],
+  "oldServicesRestarted": false,
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "limitations": ["Development preview only; no installed bundle, model/native task or restored target execution was exercised"]
+}
