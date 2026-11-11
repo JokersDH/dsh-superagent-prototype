@@ -1,0 +1,108 @@
+{
+  "wave": "product-wave-10",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "f99ca39",
+  "mergeCommit": "9e4f9b9",
+  "checkpoint": "43717ca",
+  "previousCandidate": "1175053",
+  "packet": "agent-tasks/product-wave-10/agent-b-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0033",
+  "scopeNote": "No fee/recipe research this wave. No new Driver, no CAC, no desktop shell. Zero model and native turns. wave03-b-native cap4 remainder stays UNKNOWN and unspendable; E's pilot grant untouched; all eight user instances preserved.",
+
+  "B1": {
+    "status": "PASS",
+    "label": "the four public modules compile under main strict typing",
+    "strictDiagnostics": { "before": 76, "after": 0, "perFileBefore": { "send-admission": 25, "resource-facts": 19, "review-sender": 17, "runtime-diagnostics": 15 } },
+    "method": "real public types for request/result/refusal shapes; strict was not relaxed, no `any` escape was introduced, no useful export was removed",
+    "interfaceDefectsClosed": [
+      { "id": "INPUT_STAYS_FROZEN_WHILE_RESERVATION_IS_AWAITED", "fix": "the admitted input is snapshotted synchronously before any await, so mutating the caller object during the reservation cannot change what the transport receives" },
+      { "id": "FIXED_TRANSPORT_CANNOT_REPLACE_ITS_METHOD_AFTER_ISSUANCE", "fix": "the token binds the admitted startTurn IMPLEMENTATION as well as the transport object, and calls it with the transport as receiver, so a later method swap has no effect" },
+      { "id": "E_CONSUMER_CAN_CALL_THE_ACTUAL_B_SENDER_ENTRY", "fix": "review-sender.ts exports a module-level send; it refuses unless the request names a review-sender/1 b-sender entry, and even then refuses for want of an owned transport and a measured bound" }
+    ],
+    "mainProbe": { "command": "node tools/bootstrap/probe-wave10-runtime.mjs <B> <E>", "status": "PASS_SCOPED_RUNTIME_HELPER_ADMISSION", "cases": "7/7 PASS" },
+    "minimalSources": ["packages/execution/src/resource-facts.ts", "packages/driver-kit/src/runtime-diagnostics.ts", "packages/driver-kit/src/send-admission.ts", "packages/driver-kit/src/review-sender.ts"],
+    "defaultPathUntouched": "the personal chain keeps its existing authenticated proof; the new index exports do not wire any untested sender into the default path"
+  },
+
+  "B2": {
+    "status": "PASS",
+    "label": "diagnostics and current resources read through the single authenticated proof",
+    "singleProof": "verifiedRunnerInspection() / the one WeakMap in recovery-transport.ts; no parallel registry was created",
+    "observationOnly": "a description never grants release: releaseBarrierSatisfied requires an authenticated proof and complete coverage",
+    "rulesPreserved": ["serving is not a release", "closed admission required", "coverage must be complete", "attempt identity from the proof", "proof freshness", "paths redacted by default", "no credential read"],
+    "positiveAndNegative": "authenticated socket positive control plus refusal of plain JSON, JSON round-trip and hand-assembled lookalikes",
+    "evidence": "packages/execution/test/resource-facts.test.ts (21 cases) and probe case PLAIN_RESOURCE_JSON_HAS_NO_RELEASE_AUTHORITY"
+  },
+
+  "B3": {
+    "status": "PASS",
+    "label": "bounded closure of the experimental sender interface",
+    "frozenInput": "snapshotted before the reservation await; the same reference is what the transport receives",
+    "fixedImplementation": "startTurn is captured at issuance and invoked with the transport as receiver",
+    "oneUse": "claimed synchronously before the await; a refusal, throw or unknown outcome consumes the token and is never refunded",
+    "consumerConvention": { "module": "packages/driver-kit/src/review-sender.ts", "export": "send", "protocolVersion": "review-sender/1", "entryKind": "b-sender" },
+    "reservationId": "supplied by the caller's hook and echoed back by the module-level entry; the same owner keeps it",
+    "noCliSender": "no second CLI sender exists; the module-level entry is inert without an owned transport and a measured bound",
+    "defaultZeroSends": "with no bound the default path sends nothing and refreshes nothing",
+    "boundary": "this proves the refusal chain and a fixture single send. It does NOT claim to defend against a caller who already holds arbitrary host code, and it does not prove real review or native behaviour."
+  },
+
+  "B4": {
+    "status": "PASS",
+    "label": "persistent control and restart matrix",
+    "matrix": ["stop is idempotent and persists", "answers keep attempt and epoch identity", "different steers get distinct command identities", "a reconnect adds no duplicate begin", "an old-attempt proof does not release a new attempt", "an unproven stop never decays to stopped"],
+    "evidence": "tests/native-acceptance/b12-control-restart.mjs (6 PASS + 1 NOT_TESTED)",
+    "notTested": [
+      "real vendor stop/answer/steer/disconnect/reconnect and unknown-send reconciliation",
+      "the process-wide epoch high-water mark across a real restart, which needs durable storage owned by core/storage"
+    ]
+  },
+
+  "B5": {
+    "status": "PASS",
+    "label": "recovery and diagnostics consumption for main/D",
+    "activeOrUnknownResourcesBlock": "an active or indeterminate writer keeps the barrier closed and new execution refuses",
+    "newStateDoesNotForget": "creating a new state or generation releases nothing; no observation never satisfies the barrier",
+    "ownershipBoundary": "the resource set is authoritative for the endpoint it was authenticated against, and an observation is never permission to clean up another instance",
+    "actionableReasons": "refusals carry an explanation and the invalid inference they refused to make, rather than collapsing to an empty PASS or an empty set"
+  },
+
+  "B6": {
+    "status": "PASS",
+    "label": "full regression and scope handoff",
+    "layers": {
+      "strict": "0 diagnostics across the four modules",
+      "ownedTests": { "driver-kit": "65/65", "execution": "21/21" },
+      "mainProbe": "7/7 cases PASS",
+      "controlledControl": { "b11": "10 PASS + 1 NOT_TESTED", "b12": "6 PASS + 1 NOT_TESTED" },
+      "native": "NOT_TESTED - no vendor turn was executed"
+    }
+  },
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "attributionState": "NOT_B_GRANT", "bConsumes": false, "touchedThisWave": false }
+    ],
+    "historicalRoundsUsed": 3,
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "preservedConclusions": { "boundedRecipe": "NO_SUPPORTED_BOUNDED_RECIPE", "dossier": "tests/native-acceptance/reports/wave07-b4-bound-dossier.md", "reinvestigated": false },
+
+  "limitations": [
+    "all sender transports and reservations are local in-memory fakes; no ledger is read or written",
+    "the sender cannot prove the caller's process identity; grant authority is the ledger audit",
+    "the module-level send entry is inert by design; it is not a working native sender today",
+    "B resource facts do not replace main's current-binding and exact registered-manifest validation",
+    "no current personal-product permission bypass is claimed; the findings concern an experimental helper interface"
+  ],
+
+  "nextConsumerSteps": {
+    "main": "the four modules now compile under your strict settings; call describeResourceFacts only with an authenticated proof, and use describeRuntime for read-only facts",
+    "D": "describeRuntime yields exact executable/profile facts with paths redacted by default and no credential access",
+    "E": "consume the module-level send through the review-sender/1 b-sender entry; it is currently inert, which is the supported answer given the blocked recipe"
+  }
+}

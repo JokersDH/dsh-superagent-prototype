@@ -1,0 +1,138 @@
+{
+  "generatedAt": "2026-11-11T14:35:37.672Z",
+  "environment": {
+    "note": "wave-10 B12 persistent control and restart matrix",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 7,
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 1
+  },
+  "scope": "controlled only; native control NOT_TESTED",
+  "cases": [
+    {
+      "id": "B12-STOP-PERSISTS",
+      "title": "a stop issued before the writer exists is still delivered once",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "both stops resolved (confirmed/confirmed) over 1 physical command(s)"
+      ],
+      "evidence": [
+        {
+          "first": "confirmed",
+          "second": "confirmed",
+          "stopCommands": 1
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B12-ANSWER-IDENTITY",
+      "title": "an answer keeps the native binding and the attempt identity",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "every answer carries the same attempt and epoch, so it cannot be applied to another attempt"
+      ],
+      "evidence": [
+        {
+          "delivered": true,
+          "answered": true,
+          "answers": 1,
+          "identityHeld": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B12-STEER-DISTINCT",
+      "title": "a steer of different content gets a different command identity",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "two different steers produced distinct command identities"
+      ],
+      "evidence": [
+        {
+          "ids": [
+            "cmd-attempt-1-5-deliver-dd4c3b88ef652725382d81f4d8e54a53cd010716d85495b069150bdb74b6c32e",
+            "cmd-attempt-1-5-deliver-8acfc08c58289feb1af1b7d2987c8810ceb6317cf0c9c2410eac10b5878bf406"
+          ]
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B12-RECONNECT-NO-DUPLICATE-BEGIN",
+      "title": "a reconnect after disconnect does not begin again",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "the reconnect issued no additional begin (1 total)"
+      ],
+      "evidence": [
+        {
+          "beginsBefore": 1,
+          "beginsAfter": 1
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B12-OLD-PROOF-CANNOT-RELEASE-NEW",
+      "title": "a proof bound to the old attempt does not release a new one",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "the old proof names only its own attempt, so it cannot be read as releasing a new one"
+      ],
+      "evidence": [
+        {
+          "released": true,
+          "boundAttemptId": "attempt-1",
+          "oldAttemptId": "attempt-1"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B12-UNKNOWN-STOP-NOT-CLEAN",
+      "title": "an unproven stop never reads as a clean stop",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "three repeated stops kept the writer unresolved instead of decaying to stopped"
+      ],
+      "evidence": [
+        {
+          "quiescence": [
+            "indeterminate",
+            "indeterminate",
+            "indeterminate"
+          ]
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B12-NATIVE-NOT-TESTED",
+      "title": "these windows are controlled evidence and say so",
+      "lane": "package-local",
+      "status": "NOT_TESTED",
+      "detail": [
+        "real vendor stop/answer/steer, disconnect/reconnect and unknown-send reconciliation remain untested; this matrix is controlled evidence only"
+      ],
+      "evidence": [
+        {
+          "classification": "controlled (real supervisor, real proof transport, fake runner)",
+          "nativeExercised": false
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
