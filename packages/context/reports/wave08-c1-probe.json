@@ -1,0 +1,39 @@
+{
+  "status": "PASS_CONTEXT_GRANT_BOUNDARY",
+  "results": [
+    {
+      "kind": "valid_control",
+      "status": "PASS",
+      "reads": 1,
+      "returnedBytes": 1219,
+      "grantBytes": 4096,
+      "errorCode": null
+    },
+    {
+      "kind": "expired_grant",
+      "status": "PASS",
+      "reads": 0,
+      "returnedBytes": 0,
+      "grantBytes": 32,
+      "errorCode": "grant_expired"
+    },
+    {
+      "kind": "budget_above_grant",
+      "status": "PASS",
+      "reads": 1,
+      "returnedBytes": 0,
+      "grantBytes": 32,
+      "errorCode": null
+    },
+    {
+      "kind": "purpose_mismatch",
+      "status": "PASS",
+      "reads": 0,
+      "returnedBytes": 0,
+      "grantBytes": 32,
+      "errorCode": "grant_purpose"
+    }
+  ],
+  "modelCalls": 0,
+  "writes": 0
+}

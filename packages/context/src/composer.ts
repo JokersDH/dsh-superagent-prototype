@@ -133,6 +133,8 @@ export interface ContextComposition {
   readonly trust: 'untrusted_data'
   readonly baseline: { readonly commit?: string; readonly capturedAt: string }
   readonly budget: { readonly maxBytes: number; readonly maxTokens: number; readonly maxSlices: number; readonly maxDurationMs: number }
+  /** Dimensions the caller asked above the grant: clamped, never escalated. */
+  readonly budgetClamped: readonly string[]
   readonly groups: readonly ComposedGroupResult[]
   readonly slices: readonly ContextSlice[]
   readonly omitted: readonly ContextOmission[]
@@ -157,6 +159,94 @@ export interface ContextComposerSources {
 export interface ContextComposerOptions {
   readonly now?: () => Date
   readonly reader?: ContextReader
+}
+
+/** Hard ceilings, independent of any grant, so a malformed caller budget cannot demand unbounded work. */
+export const COMPOSITION_BUDGET_CEILINGS = Object.freeze({
+  maxFiles: 64,
+  maxSlices: 64,
+  maxBytes: 4 * 1024 * 1024,
+  maxTokens: 500_000,
+  maxDurationMs: 60_000,
+})
+
+export interface ResolvedCompositionBudget {
+  readonly maxFiles: number
+  readonly maxSlices: number
+  readonly maxBytes: number
+  readonly maxTokens: number
+  readonly maxDurationMs: number
+}
+
+export interface CompositionAuthorization {
+  readonly grant: ContextGrant
+  readonly budget: ResolvedCompositionBudget
+  /** Dimensions where the caller asked for more than the grant allowed and were clamped. */
+  readonly clamped: readonly string[]
+}
+
+function assertFinitePositive(value: unknown, name: string): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || !Number.isInteger(value) || value < 1) {
+    throw new ContextError('invalid_input', `Composition budget ${name} must be a positive integer`)
+  }
+  return value
+}
+
+/**
+ * The single authorization gate for every composition source (port, decisions, conversation,
+ * artifacts). It runs before any provider call, so no provider is touched for an expired,
+ * wrong-purpose or wrong-project grant, and it never widens the caller budget past the grant.
+ *
+ * Budget rules: missing dimension -> grant cap; zero/negative/NaN/non-integer -> `invalid_input`;
+ * above the grant or above the hard ceiling -> clamped (reported in `clamped`), never escalated.
+ */
+export function authorizeComposition(
+  input: { readonly projectId: string; readonly purpose: ContextPurpose; readonly grant: ContextGrant; readonly budget: ContextBudget },
+  now: Date,
+): CompositionAuthorization {
+  let grant: ContextGrant
+  try {
+    grant = ContextGrantSchema.parse(input.grant)
+  } catch {
+    throw new ContextError('invalid_input', 'Composition grant is invalid')
+  }
+  if (grant.gateway !== 'conversation') {
+    throw new ContextError('grant_gateway', 'Executor authorization cannot drive a conversation composition')
+  }
+  if (grant.projectId !== input.projectId || grant.scope.projectId !== input.projectId) {
+    throw new ContextError('grant_project', 'Composition grant belongs to another project')
+  }
+  if (grant.purpose !== input.purpose) {
+    throw new ContextError('grant_purpose', 'Composition purpose does not match the grant')
+  }
+  const confirmedAt = Date.parse(grant.confirmedAt)
+  if (!Number.isFinite(confirmedAt) || confirmedAt > now.getTime()) {
+    throw new ContextError('grant_unconfirmed', 'Composition grant has no past explicit confirmation')
+  }
+  if (grant.expiresAt !== undefined && Date.parse(grant.expiresAt) <= now.getTime()) {
+    throw new ContextError('grant_expired', 'Composition grant has expired')
+  }
+
+  const clamped: string[] = []
+  const cap = (name: keyof ResolvedCompositionBudget, asked: number | undefined, allowed: number): number => {
+    if (asked === undefined) return allowed
+    const value = assertFinitePositive(asked, name)
+    const limit = Math.min(allowed, COMPOSITION_BUDGET_CEILINGS[name])
+    if (value > limit) {
+      clamped.push(name)
+      return limit
+    }
+    return value
+  }
+  const maxFiles = cap('maxFiles', input.budget.maxFiles, grant.maxFiles)
+  const maxBytes = cap('maxBytes', input.budget.maxBytes, grant.maxBytes)
+  const maxTokens = cap('maxTokens', input.budget.maxTokens, grant.maxTokens)
+  const maxDurationMs = cap('maxDurationMs', input.budget.maxDurationMs, grant.maxDurationMs)
+  const maxSlices = Math.min(
+    maxFiles,
+    cap('maxSlices', input.budget.maxSlices, Math.min(grant.maxFiles, COMPOSITION_BUDGET_CEILINGS.maxSlices)),
+  )
+  return { grant, budget: { maxFiles, maxSlices, maxBytes, maxTokens, maxDurationMs }, clamped }
 }
 
 const PORT_GROUP_KINDS: ReadonlySet<ContextSourceKind> = new Set([
@@ -242,29 +332,23 @@ export class ContextComposer {
     const startedAt = this.now()
     const started = startedAt.getTime()
     if (input.projectId.length === 0) throw new ContextError('invalid_input', 'Composition needs a project')
-    let grant: ContextGrant
-    try {
-      grant = ContextGrantSchema.parse(input.grant)
-    } catch {
-      throw new ContextError('invalid_input', 'Composition grant is invalid')
-    }
-    if (grant.projectId !== input.projectId) {
-      throw new ContextError('grant_project', 'Composition grant belongs to another project')
-    }
-    if (grant.gateway !== 'conversation') {
-      throw new ContextError('grant_gateway', 'Executor authorization cannot drive a conversation composition')
-    }
+    // Unified gate: no provider is touched before this returns.
+    const authorization = authorizeComposition(
+      { projectId: input.projectId, purpose: input.purpose, grant: input.grant, budget: input.budget },
+      startedAt,
+    )
+    const grant = authorization.grant
     if (input.conversationId !== undefined && input.conversationId.length === 0) {
       throw new ContextError('composition_invalid', 'Conversation id cannot be empty')
     }
     const groups = [...(input.groups ?? DEFAULT_COMPOSED_GROUPS)].sort((a, b) => a.priority - b.priority)
     if (groups.length === 0) throw new ContextError('composition_invalid', 'Composition needs at least one group')
 
-    const totalBytes = Math.max(1, input.budget.maxBytes ?? grant.maxBytes)
-    const totalTokens = Math.max(1, input.budget.maxTokens ?? grant.maxTokens)
-    const totalFiles = Math.max(1, input.budget.maxFiles ?? grant.maxFiles)
-    const totalSlices = Math.max(1, input.budget.maxSlices ?? grant.maxFiles)
-    const maxDurationMs = Math.max(1, input.budget.maxDurationMs ?? grant.maxDurationMs)
+    const totalBytes = authorization.budget.maxBytes
+    const totalTokens = authorization.budget.maxTokens
+    const totalFiles = authorization.budget.maxFiles
+    const totalSlices = authorization.budget.maxSlices
+    const maxDurationMs = authorization.budget.maxDurationMs
 
     let remainingBytes = totalBytes
     let remainingTokens = totalTokens
@@ -289,21 +373,27 @@ export class ContextComposer {
         tokens: Math.min(shareTokens, remainingTokens),
         files: Math.min(shareFiles, remainingFiles),
       }
-      if (remainingSlices <= 0) {
+      // No allocation means no read: never force one extra slice/byte past the caller budget.
+      const allocatedSlices = Math.min(remainingSlices, allocated.files)
+      if (allocatedSlices < 1 || allocated.bytes < 1 || allocated.tokens < 1) {
+        const reason: ContextOmission = allocatedSlices < 1
+          ? { reason: 'budget_slices' }
+          : allocated.bytes < 1
+            ? { reason: 'budget_bytes' }
+            : { reason: 'budget_tokens' }
         results.push({
           name: group.name,
           priority: group.priority,
           sourceKinds: group.sourceKinds,
           status: 'truncated',
-          budget: { bytes: 0, tokens: 0, files: 0 },
+          budget: allocated,
           used: { bytes: 0, tokens: 0, files: 0 },
           slices: [],
-          omitted: [{ reason: 'budget_slices' }],
-          explanations: ['Caller slice budget exhausted; this group was not read.'],
+          omitted: [reason],
+          explanations: ['Caller budget is exhausted for this group; no source was read.'],
         })
         continue
       }
-      const allocatedSlices = Math.min(remainingSlices, Math.max(1, allocated.files))
 
       if (this.now().getTime() - started > maxDurationMs) {
         results.push({
@@ -342,17 +432,11 @@ export class ContextComposer {
       }
 
       // One global slice cap: per-group allocations can never add up past the caller's maxSlices.
-      const groupAllocation = {
-        bytes: allocated.bytes,
-        tokens: allocated.tokens,
-        files: Math.max(1, Math.min(allocated.files, allocatedSlices)),
-      }
-      const outcome = await this.composeGroup(
-        { ...group, sourceKinds: effectiveKinds },
-        input,
-        groupAllocation,
-        Math.max(1, Math.min(allocated.files, allocatedSlices)),
-      )
+      const groupAllocation = { bytes: allocated.bytes, tokens: allocated.tokens, files: allocatedSlices }
+      // Long provider awaits can outlive the grant: re-check before and after each group.
+      this.assertStillAuthorized(input, authorization)
+      const outcome = await this.composeGroup({ ...group, sourceKinds: effectiveKinds }, input, groupAllocation, allocatedSlices)
+      this.assertStillAuthorized(input, authorization)
       results.push(outcome.result)
       if (baseline === undefined && outcome.baseline !== undefined) baseline = outcome.baseline
       for (const flag of outcome.result.slices.length === 0 ? [] : outcome.injectionFlags) injectionFlags.push(flag)
@@ -377,6 +461,7 @@ export class ContextComposer {
     const tokens = slices.reduce((total, slice) => total + slice.tokens, 0)
     const used = { files, bytes, tokens, durationMs: Math.max(0, this.now().getTime() - started) }
 
+    this.assertStillAuthorized(input, authorization)
     const hasTruncation = results.some((group) => group.status === 'truncated' || group.status === 'unavailable')
     const status: ContextBundle['status'] =
       slices.length === 0 ? 'insufficient' : hasTruncation || omitted.length > 0 ? 'partial' : 'sufficient'
@@ -400,12 +485,24 @@ export class ContextComposer {
       trust: 'untrusted_data',
       baseline: baseline ?? { capturedAt: startedAt.toISOString() },
       budget: { maxBytes: totalBytes, maxTokens: totalTokens, maxSlices: totalSlices, maxDurationMs },
+      budgetClamped: authorization.clamped,
       groups: results,
       slices,
       omitted,
       injectionFlags,
       explanations,
       totals: used,
+    }
+  }
+
+  /** Re-runs the authorization gate with the current clock; expiry mid-composition refuses. */
+  private assertStillAuthorized(input: ContextCompositionRequest, authorization: CompositionAuthorization): void {
+    const current = authorizeComposition(
+      { projectId: input.projectId, purpose: input.purpose, grant: authorization.grant, budget: authorization.budget },
+      this.now(),
+    )
+    if (current.budget.maxBytes !== authorization.budget.maxBytes) {
+      throw new ContextError('composition_invalid', 'Composition authorization changed during the read')
     }
   }
 

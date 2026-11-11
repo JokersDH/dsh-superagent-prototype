@@ -44,7 +44,14 @@ export type {
   ReadIndexWorkView,
   WorkspaceReadIndex,
 } from './read-index-port.ts'
-export { ContextComposer, DEFAULT_COMPOSED_GROUPS, buildCompositionPreview } from './composer.ts'
+export {
+  ContextComposer,
+  COMPOSITION_BUDGET_CEILINGS,
+  DEFAULT_COMPOSED_GROUPS,
+  authorizeComposition,
+  buildCompositionPreview,
+} from './composer.ts'
+export type { CompositionAuthorization, ResolvedCompositionBudget } from './composer.ts'
 export type {
   ComposedArtifactProvider,
   ComposedArtifactView,
