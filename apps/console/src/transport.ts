@@ -34,6 +34,11 @@ import {
   ProposalPrepareSchema,
   ProposalPreviewSchema,
   ProposalCommandSchema,
+  WorkEvidenceSchema,
+  WorkEvidenceHistorySchema,
+  WorkEvidenceHistoryQuerySchema,
+  ContextPreviewInputSchema,
+  ContextPreviewSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -68,6 +73,11 @@ import type {
   ProposalPrepare,
   ProposalPreview,
   ProposalCommand,
+  WorkEvidence,
+  WorkEvidenceHistory,
+  WorkEvidenceHistoryQuery,
+  ContextPreviewInput,
+  ContextPreview,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -125,6 +135,9 @@ export interface ConsoleTransport {
   decisions?(query: DecisionQuery): Promise<DecisionPage>
   prepareProposal?(input: ProposalPrepare): Promise<ProposalPreview>
   proposalCommand?(command: ProposalCommand): Promise<CommandReceipt>
+  workEvidence?(workId: string): Promise<WorkEvidence | undefined>
+  workEvidenceHistory?(workId: string, query: WorkEvidenceHistoryQuery): Promise<WorkEvidenceHistory | undefined>
+  contextPreview?(input: ContextPreviewInput): Promise<ContextPreview>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -400,6 +413,42 @@ export class HttpTransport implements ConsoleTransport {
     }, false, command.commandId))
     if (receipt.commandId !== command.commandId) throw new TransportError('schema_mismatch', '提案回执命令身份不匹配')
     return receipt
+  }
+  async contextPreview(input: ContextPreviewInput): Promise<ContextPreview> {
+    const value = ContextPreviewInputSchema.parse(input)
+    const preview = ContextPreviewSchema.parse(await this.request('/v1/context/preview', {
+      method: 'POST', body: JSON.stringify(value), signal: AbortSignal.timeout(10000),
+    }))
+    if (preview.projectId !== value.projectId || preview.conversationId !== value.conversationId ||
+      preview.contract?.workId !== value.workId || [...preview.selections].sort().join() !== [...value.selections].sort().join())
+      throw new TransportError('schema_mismatch', '上下文预览与所选项目、会话或工作不匹配')
+    return preview
+  }
+  async workEvidence(workId: string): Promise<WorkEvidence | undefined> {
+    try {
+      const body = await this.request(`/v1/works/${encodeURIComponent(workId)}/evidence`, undefined, true)
+      if (body === missingOptionalResource) return undefined
+      const value = WorkEvidenceSchema.parse(body)
+      if (value.workId !== workId) throw new TransportError('schema_mismatch', '交付记录属于另一项工作')
+      return value
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async workEvidenceHistory(workId: string, input: WorkEvidenceHistoryQuery): Promise<WorkEvidenceHistory | undefined> {
+    const query = WorkEvidenceHistoryQuerySchema.parse(input), params = new URLSearchParams()
+    for (const [key, value] of Object.entries(query)) if (value !== undefined) params.set(key, String(value))
+    try {
+      const body = await this.request(`/v1/works/${encodeURIComponent(workId)}/evidence/history?${params}`, undefined, true)
+      if (body === missingOptionalResource) return undefined
+      const page = WorkEvidenceHistorySchema.parse(body)
+      if (page.workId !== workId) throw new TransportError('schema_mismatch', '交付历史属于另一项工作')
+      return page
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
   }
   async attention(input: AttentionQuery): Promise<AttentionPage | undefined> {
     const query = AttentionQuerySchema.parse(input), params = new URLSearchParams()

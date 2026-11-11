@@ -18,5 +18,7 @@ export type * from './prepared-commands.ts';
 export * from './recovery-activation.ts';
 export * from './proposal-commands.ts';
 export * from './recovery-target.ts';
+export * from './context-preview.ts';
+export * from './assistant-context.ts';
 export type * from './types.ts';
 export type * from './ports.ts';

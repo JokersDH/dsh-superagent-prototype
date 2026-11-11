@@ -1,0 +1,24 @@
+.work-evidence { margin-top: 20px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.work-evidence > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.work-evidence h4 { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 13px; font-weight: 600; }
+.work-evidence h4 svg { color: var(--muted); }
+.evidence-chevron-open { transform: rotate(180deg); }
+.evidence-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 4px 0 10px; color: var(--muted); font-size: 11px; }
+.evidence-summary { margin-bottom: 16px; }
+.evidence-projection { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; }
+.evidence-projection.evidence-recorded { color: var(--ok); }
+.evidence-timing { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; margin: 12px 0 0; font-size: 12px; }
+.evidence-timing dt { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.evidence-timing dd { margin: 0; color: var(--ink); text-align: right; }
+.evidence-partial { padding: 1px 4px; border-radius: 3px; background: var(--warn-soft); color: var(--warn); font-size: 10px; }
+.evidence-timeline { list-style: none; padding: 0; margin: 0; }
+.evidence-timeline > li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 8px; padding: 11px 0; border-top: 1px solid var(--line); }
+.evidence-event-icon { color: var(--muted); padding-top: 2px; }
+.evidence-event-title { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; font-size: 12px; }
+.evidence-event-title time { color: var(--muted); font-size: 10px; white-space: nowrap; }
+.evidence-revision { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+.work-evidence .technical-details { margin-top: 5px; font-size: 11px; }
+.work-evidence code { display: block; margin-top: 6px; padding: 4px 6px; overflow-wrap: anywhere; word-break: break-all; font-size: 10px; }
+.evidence-kind { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; overflow-wrap: anywhere; }
+.evidence-more { width: 100%; margin-top: 10px; font-size: 12px; }
+.evidence-bound, .evidence-empty { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
