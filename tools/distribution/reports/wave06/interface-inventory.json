@@ -1,0 +1,228 @@
+{
+  "protocol": "wave06-d-interface-inventory/1",
+  "createdBy": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "source": {
+    "mainBase": "82db295",
+    "mergeCommit": "0a84aa5",
+    "wave05Candidate": "809a957",
+    "dHeadAtCheckpoint": "0a84aa5489c4df85b09525a300186e91379e1bf4"
+  },
+  "checkpoint": {
+    "installSummary": "tools/distribution/reports/wave06/install-summary.json",
+    "emptyState": "tools/distribution/reports/wave06/checkpoint-install-doctor.json",
+    "installBuildId": "539f5a4dd277f684",
+    "installManifestSha256": "0224facd12d5f2c99420720fd7d9da5167648ea360c5ba1d694b0143f6d63746",
+    "releaseManifestSha256": "b3fa38c8e00cf6222b1bbf025b4b104ef88070f06b873f14494d81e8e208ca45"
+  },
+  "wave05Candidate": {
+    "commit": "809a957",
+    "reported": {
+      "portability": 36,
+      "launcher": 29,
+      "smoke": 47
+    },
+    "reverifyStatus": "pending in wave06 smoke"
+  },
+  "mainDelivered": {
+    "attention": {
+      "contract": "packages/contracts/src/attention.ts",
+      "rankerType": "AttentionRanker",
+      "console": "apps/console/src/AttentionInbox.tsx",
+      "coordinator": "apps/coordinator/product/attention.ts",
+      "installIncluded": true,
+      "consoleAttentionAssetIncluded": true
+    },
+    "recovery": {
+      "authoritativeStartupModeGate": true,
+      "readonlyRejectsBusinessPosts": true,
+      "inspectPrepareCommitInterface": "ABSENT (PLANNED)",
+      "evidence": [
+        "apps/coordinator/http/app.ts:267-268 read-only gate rejects business POSTs before recovery authorization",
+        "apps/coordinator/http/app.ts routes list contains no /v1/recovery/inspect|prepare|commit (PLANNED, WP-16/0023 §6)"
+      ],
+      "routes": [
+        "get /v1/health",
+        "post /v1/session",
+        "get /v1/session",
+        "get /v1/configuration",
+        "get /v1/attention",
+        "get /v1/conversations",
+        "get /v1/conversations/:id",
+        "post /v1/conversations/commands",
+        "get /v1/assistant",
+        "post /v1/projects",
+        "get /v1/projects/:id/settings",
+        "post /v1/projects/:id/settings",
+        "get /v1/works/:id/location",
+        "get /v1/guide",
+        "get /v1/works/:id/environment",
+        "get /v1/works/:id/verification",
+        "post /v1/works/:id/verification/retry",
+        "post /v1/works/:id/review-activity",
+        "get /v1/assistant/stream",
+        "post /v1/assistant/model",
+        "delete /v1/session",
+        "post /v1/commands",
+        "get /v1/snapshot",
+        "get /v1/works/:id",
+        "get /v1/conversations/:id/messages",
+        "get /v1/events",
+        "get /v1/questions/:id/deliveries",
+        "get /v1/verifications/:id",
+        "get /v1/artifacts/:id"
+      ]
+    },
+    "routes": []
+  },
+  "aPorts": {
+    "schemaVersion": 12,
+    "exported": [
+      "backupDatabase",
+      "verifyDatabase",
+      "readArtifactRegistry",
+      "WorkflowSnapshots (packages/workflows)",
+      "WorkflowIndex/ProductProjects/ProductDecisions/AssistantState via ProductStore"
+    ],
+    "v13EvidencePersistenceInMain": false,
+    "routingEvidencePersistenceInMain": false,
+    "note": "A wave-06 v13/attendance evidence is not in this main; bundle evidence covers the actual schema-12 public read surface and marks routing/outcome classes unavailable."
+  },
+  "bExecutor": {
+    "admittedAuthorEvidence": "reports/releases/native-mvp/native-product.json",
+    "status": "PASS_REAL_NATIVE_PRODUCT",
+    "profileVersion": "codex-cli 0.164.0",
+    "wave06SessionCapsuleInterfaceInMain": false,
+    "note": "No public session/capsule capability schema in this merge; D doctor keeps review entry experimental/disabled and supports diagnostic fixture only."
+  },
+  "rootLock": {
+    "localOnlyDiff": true,
+    "newExternalDependencies": [],
+    "owner": "main",
+    "note": "pnpm-lock.yaml local diff is not staged; no wave-06 dependency request."
+  },
+  "installClosure": {
+    "format": "pa-install",
+    "formatVersion": 1,
+    "files": 6483,
+    "bytes": 65501028,
+    "workspacePackages": 20,
+    "dependencies": [
+      {
+        "name": "@hono/node-server",
+        "version": "2.1.6",
+        "digest": "7b3e6fe2788990a5429445d18a4bd6004026de0dfc17b966a0b99de5399efe36"
+      },
+      {
+        "name": "better-sqlite3",
+        "version": "13.0.3",
+        "digest": "dbd29487bbb8240a462174e84c2f90f4957aae33effcd64e6ce64a6a9569c4bd"
+      },
+      {
+        "name": "hono",
+        "version": "4.13.17",
+        "digest": "f24eb4b092c6a551b310bf3058058de83d70c2195ae5b39e06a13dc21de4b7ca"
+      },
+      {
+        "name": "node-addon-api",
+        "version": "8.9.2",
+        "digest": "b7f1ddbc660da84defd8872584bb6798c9a73889c5f7c707c7ffdabe0fe5fdd9"
+      },
+      {
+        "name": "openai",
+        "version": "7.53.0",
+        "digest": "0dab139b8bdae6597686f017e599d98fec8ab000f3a438564ca103e72938270e"
+      },
+      {
+        "name": "semver",
+        "version": "7.8.5",
+        "digest": "1da6acb3d51bee5c5f4e47332d62a9d66ab6dfdb7e2cc57a73f2b2db076a3dec"
+      },
+      {
+        "name": "yaml",
+        "version": "2.9.1",
+        "digest": "aaece76a1bebfd7d83bd1d5414fca5f2ca07ff962250cb097746f5683a38c911"
+      },
+      {
+        "name": "zod",
+        "version": "4.4.3",
+        "digest": "4323cf2a4d58d6e9468892ff49f8105ef1f9a905f8b2f7f9345c23938236e2c7"
+      }
+    ],
+    "supportMatrix": {
+      "measured": [
+        "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+      ],
+      "node": ">=24.21.0 <25",
+      "abi": "137",
+      "sqlite": ">=3.53.4",
+      "notTested": [
+        "linux",
+        "win32",
+        "darwin-x64",
+        "other Node ABIs",
+        "other machines",
+        "personal native execution"
+      ]
+    },
+    "entrypoints": {
+      "launcher": "app/apps/launcher/bin/pa.mjs",
+      "coordinator": "app/apps/coordinator/product/demo.ts",
+      "runner": "app/apps/runner/src/index.ts",
+      "consoleEntry": "app/apps/console/dist/index.html",
+      "nativeBinding": "app/node_modules/better-sqlite3"
+    }
+  },
+  "emptyStateDoctor": {
+    "status": "DEGRADED",
+    "pass": [
+      "node_version",
+      "platform",
+      "sqlite_binding",
+      "release_manifest",
+      "console_assets",
+      "console_mode",
+      "runtime_dependencies",
+      "source_identity",
+      "runtime_abi",
+      "support_matrix",
+      "roots",
+      "recovery_marker",
+      "executor_codex"
+    ],
+    "warn": [
+      "instance",
+      "state",
+      "ports",
+      "review_executor"
+    ],
+    "note": "DEGRADED is expected before first start (no instance/state) and with the default API port busy; start uses isolated explicit ports."
+  },
+  "integrationGaps": [
+    {
+      "id": "A-WAVE06-EVIDENCE",
+      "owner": "A",
+      "status": "NOT_IN_MAIN",
+      "requiredInput": "A v13 evidence persistence + public read/consumption port (routing advice/review/outcome, ReviewTiming projection) integrated into main."
+    },
+    {
+      "id": "MAIN-RECOVERY-AUTHORIZATION",
+      "owner": "main",
+      "status": "PLANNED",
+      "requiredInput": "inspect/prepare/commit public interface with plan TTL, fingerprint/version, idempotent receipt and transactional authorization per WP-16/0023 §6."
+    },
+    {
+      "id": "B-EXECUTOR-CAPABILITY",
+      "owner": "B/main",
+      "status": "NOT_IN_MAIN",
+      "requiredInput": "machine-readable executor capability/admission input (author/reviewer, session/checkpoint/usage bounds) without secrets."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "requiredInput": "same frozen install artifact + independent negative/installation acceptance from E-owned tests."
+    }
+  ],
+  "nextConsumer": "main/E: empty-state install/doctor recipe is runnable from the recorded install summary; recovery authorization step stays BLOCKED until the main interface checkpoint."
+}

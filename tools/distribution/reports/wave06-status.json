@@ -1,0 +1,166 @@
+{
+  "package": "product-wave-06 / D：个人 Alpha 发行、迁移与恢复消费整包",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "82db295",
+  "mergeCommit": "0a84aa5",
+  "sourceCommit": "0a84aa5489c4df85b09525a300186e91379e1bf4",
+  "status": "CHECKPOINT_D1",
+  "scopeNote": "Package-scoped candidate evidence; not main/E admission, not a product Alpha, no cross-machine/ABI claim.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "unknownNativeSends": 0,
+    "note": "Zero-model local probes only; no native session or provider call."
+  },
+  "commits": {
+    "wave05Final": "809a957",
+    "wave06Checkpoint": "pending",
+    "wave06Final": "pending"
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Empty-state staged install built from merged main; first-run + doctor run inside the install; source/build/manifest identities and interface inventory recorded. main attention contract/UI is present; main recovery inspect/prepare/commit is ABSENT/PLANNED; A v13/routing evidence persistence and B wave-06 session/capsule interface are not in this main.",
+      "evidence": [
+        "tools/distribution/reports/wave06/interface-inventory.json",
+        "tools/distribution/reports/wave06/install-summary.json",
+        "tools/distribution/reports/wave06/checkpoint-install-doctor.json"
+      ]
+    },
+    "d2": {
+      "status": "NOT_STARTED"
+    },
+    "d3": {
+      "status": "NOT_STARTED"
+    },
+    "d4": {
+      "status": "NOT_STARTED"
+    },
+    "d5": {
+      "status": "NOT_STARTED"
+    },
+    "d6": {
+      "status": "NOT_STARTED"
+    }
+  },
+  "installIdentity": {
+    "buildId": "539f5a4dd277f684",
+    "installManifestSha256": "0224facd12d5f2c99420720fd7d9da5167648ea360c5ba1d694b0143f6d63746",
+    "releaseManifestSha256": "b3fa38c8e00cf6222b1bbf025b4b104ef88070f06b873f14494d81e8e208ca45",
+    "files": 6483,
+    "dependencies": [
+      "@hono/node-server",
+      "better-sqlite3",
+      "hono",
+      "node-addon-api",
+      "openai",
+      "semver",
+      "yaml",
+      "zod"
+    ],
+    "supportMatrix": {
+      "measured": [
+        "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+      ],
+      "node": ">=24.21.0 <25",
+      "abi": "137",
+      "sqlite": ">=3.53.4",
+      "notTested": [
+        "linux",
+        "win32",
+        "darwin-x64",
+        "other Node ABIs",
+        "other machines",
+        "personal native execution"
+      ]
+    }
+  },
+  "emptyStateDoctor": {
+    "command": "<install>/bin/pa first-run && <install>/bin/pa doctor --json",
+    "status": "DEGRADED",
+    "pass": [
+      "node_version",
+      "platform",
+      "sqlite_binding",
+      "release_manifest",
+      "console_assets",
+      "console_mode",
+      "runtime_dependencies",
+      "source_identity",
+      "runtime_abi",
+      "support_matrix",
+      "roots",
+      "recovery_marker",
+      "executor_codex"
+    ],
+    "warn": [
+      "instance",
+      "state",
+      "ports",
+      "review_executor"
+    ],
+    "note": "DEGRADED is expected before first start (no instance/state) and with the default API port busy; start uses isolated explicit ports."
+  },
+  "integrationGaps": [
+    {
+      "id": "A-WAVE06-EVIDENCE",
+      "owner": "A",
+      "status": "NOT_IN_MAIN",
+      "requiredInput": "A v13 evidence persistence + public read/consumption port (routing advice/review/outcome, ReviewTiming projection) integrated into main."
+    },
+    {
+      "id": "MAIN-RECOVERY-AUTHORIZATION",
+      "owner": "main",
+      "status": "PLANNED",
+      "requiredInput": "inspect/prepare/commit public interface with plan TTL, fingerprint/version, idempotent receipt and transactional authorization per WP-16/0023 §6."
+    },
+    {
+      "id": "B-EXECUTOR-CAPABILITY",
+      "owner": "B/main",
+      "status": "NOT_IN_MAIN",
+      "requiredInput": "machine-readable executor capability/admission input (author/reviewer, session/checkpoint/usage bounds) without secrets."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "requiredInput": "same frozen install artifact + independent negative/installation acceptance from E-owned tests."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "MAIN-RECOVERY-AUTHORIZATION",
+      "owner": "main",
+      "status": "PLANNED",
+      "summary": "No public inspect/prepare/commit interface in this main; D4 will be BLOCKED while D2/D3/D5 continue."
+    },
+    {
+      "id": "A-WAVE06-EVIDENCE",
+      "owner": "A",
+      "status": "NOT_IN_MAIN",
+      "summary": "Schema 12 only; v13/routing/ReviewTiming persistence not integrated, so those evidence classes remain unavailable rather than faked."
+    },
+    {
+      "id": "B-EXECUTOR-CAPABILITY",
+      "owner": "B/main",
+      "status": "NOT_IN_MAIN",
+      "summary": "No public session/capsule/executor capability schema; review entry remains experimental/disabled."
+    }
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave06/interface-inventory.json",
+    "tools/distribution/reports/wave06/install-summary.json",
+    "tools/distribution/reports/wave06/checkpoint-install-doctor.json"
+  ],
+  "limitations": [
+    "darwin/arm64 + Node 24.21.x + SQLite ABI 137 measured only",
+    "personal native end-to-end and recovery new authorization NOT_TESTED/BLOCKED",
+    "second executor review value depends on E pilot grant, zero calls here"
+  ]
+}

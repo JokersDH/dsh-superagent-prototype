@@ -1,0 +1,199 @@
+{
+  "source": {
+    "base": "82db295",
+    "merge": "0a84aa5",
+    "installBuildId": "539f5a4dd277f684",
+    "sourceCommit": "0a84aa5489c4df85b09525a300186e91379e1bf4"
+  },
+  "emptyState": {
+    "firstRun": {
+      "status": "OK",
+      "roots": {
+        "install": "/private/tmp/wave06-install/app",
+        "config": "/private/tmp/wave06-install/var/config",
+        "data": "/private/tmp/wave06-install/var/data",
+        "cache": "/private/tmp/wave06-install/var/cache",
+        "logs": "/private/tmp/wave06-install/var/logs",
+        "workspace": "/private/tmp/wave06-install/var/workspaces"
+      }
+    },
+    "doctor": {
+      "status": "DEGRADED",
+      "checks": [
+        {
+          "id": "node_version",
+          "status": "PASS",
+          "detail": {
+            "node": "24.21.0",
+            "supported": ">=24.21.0 <25"
+          }
+        },
+        {
+          "id": "platform",
+          "status": "PASS",
+          "detail": {
+            "platform": "darwin",
+            "arch": "arm64"
+          }
+        },
+        {
+          "id": "sqlite_binding",
+          "status": "PASS",
+          "detail": {
+            "sqlite": "3.53.4",
+            "abi": "137",
+            "node": "24.21.0"
+          }
+        },
+        {
+          "id": "release_manifest",
+          "status": "PASS",
+          "detail": {
+            "buildId": "539f5a4dd277f684",
+            "artifacts": 642,
+            "deep": false
+          }
+        },
+        {
+          "id": "console_assets",
+          "status": "PASS",
+          "detail": {
+            "root": "apps/console/dist"
+          }
+        },
+        {
+          "id": "console_mode",
+          "status": "PASS",
+          "detail": {
+            "mode": "http",
+            "digest": "bb1374140e7ebcff1f5a613a821a84ed9ab93a711c8a1fc5f3ddb797f9d40018"
+          }
+        },
+        {
+          "id": "runtime_dependencies",
+          "status": "PASS",
+          "detail": {
+            "checked": 8
+          }
+        },
+        {
+          "id": "source_identity",
+          "status": "PASS",
+          "detail": {
+            "commit": "0a84aa5489c4df85b09525a300186e91379e1bf4",
+            "dirty": false
+          }
+        },
+        {
+          "id": "runtime_abi",
+          "status": "PASS",
+          "detail": {
+            "node": "24.21.0",
+            "modulesAbi": "137",
+            "platform": "darwin",
+            "arch": "arm64",
+            "sqlite": "3.53.4",
+            "releaseAbi": "137"
+          }
+        },
+        {
+          "id": "support_matrix",
+          "status": "PASS",
+          "detail": {
+            "measured": [
+              "darwin-arm64",
+              "node >=24.21.0 <25"
+            ],
+            "node": ">=24.21.0 <25",
+            "abi": "137",
+            "sqlite": ">=3.53.4",
+            "notTested": [
+              "linux",
+              "win32",
+              "darwin-x64",
+              "other Node ABIs",
+              "other machines"
+            ]
+          }
+        },
+        {
+          "id": "roots",
+          "status": "PASS",
+          "detail": {
+            "count": 6
+          }
+        },
+        {
+          "id": "instance",
+          "status": "WARN",
+          "detail": {
+            "message": "No managed instance is recorded; run `pa start`."
+          }
+        },
+        {
+          "id": "state",
+          "status": "WARN",
+          "detail": {
+            "message": "No product database yet; the first start creates a new private state."
+          }
+        },
+        {
+          "id": "recovery_marker",
+          "status": "PASS",
+          "detail": {
+            "startupMode": "normal"
+          }
+        },
+        {
+          "id": "ports",
+          "status": "WARN",
+          "detail": {
+            "busy": [
+              {
+                "name": "api",
+                "port": 8790,
+                "ok": false,
+                "code": "EADDRINUSE"
+              }
+            ],
+            "hint": "Choose other --port/--api-port values; do not stop an unverified process."
+          }
+        },
+        {
+          "id": "executor_codex",
+          "status": "PASS",
+          "detail": {
+            "required": false,
+            "expectedVersion": "codex-cli 0.164.0",
+            "available": true,
+            "version": "codex-cli 0.164.0",
+            "authPresent": true,
+            "authMode": "600",
+            "codexHome": "/Users/hh/.codex",
+            "evidence": {
+              "status": "PASS_REAL_NATIVE_PRODUCT",
+              "profileVersion": "codex-cli 0.164.0",
+              "sourceCommit": "98dfbc9f380537dd541e1253a93a40d9d61beab9"
+            },
+            "hint": "Install and admit Codex CLI in your own account; this launcher never installs/upgrades it or reads credentials."
+          }
+        },
+        {
+          "id": "review_executor",
+          "status": "WARN",
+          "detail": {
+            "reason": "no_executor_interface",
+            "message": "B/main have not published a second-executor capability interface; the review entry stays experimental and disabled by default.",
+            "hint": "Author execution remains available; required review mode is BLOCKED until an admitted reviewer is configured."
+          }
+        }
+      ]
+    }
+  },
+  "installSummary": "tools/distribution/reports/wave06/install-summary.json",
+  "method": "build --output staged install; run <install>/bin/pa first-run + doctor in that directory with isolated var roots; no daemon started",
+  "limitations": [
+    "Doctor probes default ports, so a busy 8790 is reported as WARN; product start uses explicit isolated ports.",
+    "No user service was started/stopped; no native/model call."
+  ]
+}
