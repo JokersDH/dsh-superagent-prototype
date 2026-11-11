@@ -1,20 +1,81 @@
 {
   "role": "A",
-  "package": ["packages/storage", "packages/workflows"],
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
   "branch": "codex/g2-workspaces-verification",
   "mainBaseCommit": "5d4065b",
   "mergeCommit": "a0fa79f",
   "checkpoint": "fcf2563",
-  "testedSourceCommit": "fcf2563",
-  "migrations": [15],
+  "testedSourceCommit": "ee7f382",
+  "migrations": [
+    15
+  ],
   "productSchema": 15,
   "phases": [
-    {"phase":"A1","status":"PASS","scope":"package-local","evidence":["mapRow readback fix","recovery-intents tests (6)"],"note":"returns the stored plan with full actor/time/digest assertions; inconsistent rows refused"},
-    {"phase":"A2","status":"PASS","scope":"package-local","evidence":["v15 recovery_activations","shared RecoveryActivationFacts","recovery-activation tests"],"note":"synchronous caller-UoW put/get/forCommand; unique activation/command/plan; identity conflicts"},
-    {"phase":"A3","status":"PASS","scope":"source transaction","evidence":["real RecoveryIntentCommitter test 5 cases"],"note":"fact+receipt+event atomic, replay/reopen, wrong principal/policy, receipt and revalidation failures roll back; target start external"},
-    {"phase":"A4","status":"PASS","scope":"package-local","evidence":["evidence-page tests","examples/evidence-consumer.mjs","reports/wave08-performance.json"],"note":"window semantics, cursor stability/cross-work refusal, partial timing, cross-project rejection"},
-    {"phase":"A5","status":"PASS","scope":"package-local","evidence":["snapshot-d tests","v14->v15 fixture","examples/d-snapshot-restore.mjs"],"note":"legacy audit preserved, new facts empty on upgrade, evidence family and drop/corrupt/future blocked"},
-    {"phase":"A6","status":"PASS","scope":"package-local","evidence":["reports/wave08-*.txt","recipes"],"note":"full regression and handoff"}
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "mapRow readback fix",
+        "recovery-intents tests (6)"
+      ],
+      "note": "returns the stored plan with full actor/time/digest assertions; inconsistent rows refused"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "v15 recovery_activations",
+        "shared RecoveryActivationFacts",
+        "recovery-activation tests"
+      ],
+      "note": "synchronous caller-UoW put/get/forCommand; unique activation/command/plan; identity conflicts"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "source transaction",
+      "evidence": [
+        "real RecoveryIntentCommitter test 5 cases"
+      ],
+      "note": "fact+receipt+event atomic, replay/reopen, wrong principal/policy, receipt and revalidation failures roll back; target start external"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "evidence-page tests",
+        "examples/evidence-consumer.mjs",
+        "reports/wave08-performance.json"
+      ],
+      "note": "window semantics, cursor stability/cross-work refusal, partial timing, cross-project rejection"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "snapshot-d tests",
+        "v14->v15 fixture",
+        "examples/d-snapshot-restore.mjs"
+      ],
+      "note": "legacy audit preserved, new facts empty on upgrade, evidence family and drop/corrupt/future blocked"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "reports/wave08-*.txt",
+        "recipes"
+      ],
+      "note": "full regression and handoff"
+    }
   ],
   "results": {
     "storageTests": "75/75",
@@ -32,9 +93,21 @@
     "unknownModelSends": 0
   },
   "blockers": [
-    {"owner":"main","id":"recovery-commit-and-target-start","detail":"Main must publish commit/HTTP and target-start switching; A proves the source transaction and facts only."},
-    {"owner":"main/D","id":"target-preparation","detail":"Exact descriptor, new empty state, process cleanup/rollback and re-authorization remain main/D."},
-    {"owner":"main","id":"root-lock-request","detail":"packages/workflows test-only @personal-agent/knowledge dependency needs the authoritative lock."}
+    {
+      "owner": "main",
+      "id": "recovery-commit-and-target-start",
+      "detail": "Main must publish commit/HTTP and target-start switching; A proves the source transaction and facts only."
+    },
+    {
+      "owner": "main/D",
+      "id": "target-preparation",
+      "detail": "Exact descriptor, new empty state, process cleanup/rollback and re-authorization remain main/D."
+    },
+    {
+      "owner": "main",
+      "id": "root-lock-request",
+      "detail": "packages/workflows test-only @personal-agent/knowledge dependency needs the authoritative lock."
+    }
   ],
   "notTested": [
     "recovery target preparation/start and cross-database atomicity",
@@ -47,5 +120,7 @@
     "optionally adopt index.evidencePage for complete/caller_limit/storage_cap",
     "keep restore marker, target preparation and re-authorization in main/D",
     "regenerate the root lock"
-  ]
+  ],
+  "deliveryCommit": "ee7f382",
+  "updatedAt": "2026-11-11T00:00:00.000Z"
 }
