@@ -187,6 +187,9 @@ importers:
       '@personal-agent/questions':
         specifier: workspace:*
         version: link:../../packages/questions
+      '@personal-agent/routing':
+        specifier: workspace:*
+        version: link:../../packages/routing
       '@personal-agent/storage':
         specifier: workspace:*
         version: link:../../packages/storage
@@ -438,6 +441,22 @@ importers:
       '@personal-agent/storage':
         specifier: workspace:*
         version: link:../storage
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/node':
+        specifier: 24.10.0
+        version: 24.10.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+
+  packages/routing:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 4.4.3
         version: 4.4.3

@@ -74,6 +74,7 @@ async function start() {
     'questions',
     'application',
     'knowledge',
+    'routing',
     'workspaces',
     'verification',
     'environment-preparation',

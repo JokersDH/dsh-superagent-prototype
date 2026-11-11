@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
 import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
+import { sharedAttentionRanker } from '@personal-agent/routing'
 import type { AttentionRanker, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
@@ -135,7 +136,7 @@ export function createProductRuntime(
   const decisions = new ProductDecisions(store, options.principal, () => configuredProjects, options.actionSecret, options.now)
   const attention = new ProductAttention(store, application, completion, {
     projectIds: () => configuredProjects.map(project => project.id), verification: work => execution!.verificationStatus(work),
-    ...(options.attentionRanker ? { ranker: options.attentionRanker } : {}), ...(options.now ? { now: options.now } : {}),
+    ranker: options.attentionRanker ?? sharedAttentionRanker, ...(options.now ? { now: options.now } : {}),
   })
   const assistantStreams = new AssistantStreams()
   if (options.assistantProvider)
