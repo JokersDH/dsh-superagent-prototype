@@ -134,10 +134,8 @@ export class AssistantDecisionStore implements DecisionStorePort {
   listSync(query: DecisionQuery): DecisionPage {
     const limit = Math.min(Math.max(query.limit ?? 50, 1), 200)
     const records = this.scanProject(query.projectId).records
-    const superseded = new Set<string>()
-    for (const record of records) {
-      if (record.decision.supersedes && !record.decision.revokedAt) superseded.add(record.decision.supersedes)
-    }
+    // Supersession is historical: a revoked replacement still supersedes its target.
+    const superseded = this.supersededIds(query.projectId)
     const mapped = records
       .map((record) => this.toRecord(record, superseded))
       .filter((record) => query.status === undefined || query.status === 'all' || record.status === query.status)
