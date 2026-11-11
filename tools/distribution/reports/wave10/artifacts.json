@@ -46,7 +46,9 @@
       "platform": "darwin",
       "arch": "arm64",
       "abi": "137"
-    }
+    },
+    "files": 6670,
+    "bytes": 66851821
   },
   "schemaChange": {
     "baseline": 13,
@@ -55,6 +57,7 @@
   "notes": [
     "Baseline is the preserved wave-06 artifact; target is built from the pushed clean wave-10 D head cf7a3cf dataset (source.dirty=false, schema 15) containing D1-D4 source plus current main context/evidence (32fc7ae/677cf26).",
     "Earlier wave-06/08/09 tars remain historical and are not the current target.",
-    "E must use these tuples; the checkout is not an installation input."
+    "E must use these tuples; the checkout is not an installation input.",
+    "target file count 6670 and extracted bytes 66,851,821 are read from the frozen install-artifact manifest."
   ]
 }
