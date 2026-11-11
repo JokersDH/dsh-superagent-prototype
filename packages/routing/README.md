@@ -24,6 +24,26 @@ and uses only the shared `AttentionReason` enum. Rules:
 The older local `rankAttention`/`groupAttention` remains for C-side internal fixtures and is not the
 shared wire adapter.
 
+### Main wiring recipe
+
+```ts
+import { sharedAttentionRanker } from '@personal-agent/routing'
+createProductRuntime({ ...options, attentionRanker: sharedAttentionRanker })
+```
+
+`createProductRuntime` already accepts an optional `AttentionRanker`; `ProductAttention` passes
+`{ items, now }` and validates the page. Main still owns authorized source collection, paging,
+HTTP and UI. Until main passes this option the product remains on `waiting_order`.
+
+Reason mapping (shared enum only): `waiting_age`, `unknown_wait`, `deadline_overdue`,
+`deadline_near`, `blocks_other_work`, `permission_pending`, `authentication_pending`,
+`candidate_ready`, plus the blocked state code (`verification_blocked`, `machine_failed`,
+`writer_indeterminate`, `dispatch_paused`). There is no shared "expired" reason; expiry is validity,
+not ranking authority, and main excludes expired actionable inputs.
+
+Scale: the ranker is O(n log n) over one main page (currently at most 20 works / 4040 items per
+schema). It refuses duplicate ids and never drops or adds an input item.
+
 ## Attention (`rankAttention` / `groupAttention`)
 
 Deterministic order over questions, candidate acceptances and blocked work across projects and

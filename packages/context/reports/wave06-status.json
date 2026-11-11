@@ -4,18 +4,9 @@
   "mainBaseCommit": "82db295",
   "mergeCommit": "690da7a",
   "stableCheckpoint": "c9dc567",
-  "updatedAt": "2026-11-11T00:30:00.000Z",
-  "ownedPaths": [
-    "packages/context",
-    "packages/proposals",
-    "packages/knowledge",
-    "packages/routing"
-  ],
-  "nativeModelBudget": {
-    "allowed": 0,
-    "used": 0,
-    "unknownSends": 0
-  },
+  "updatedAt": "2026-11-11T02:00:00.000Z",
+  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
   "phases": [
     {
       "phase": "C1",
@@ -29,7 +20,7 @@
       "results": {
         "realSqliteAssistantProbe": "PASS_SQLITE_ASSISTANT_CONSUMER (7/7)",
         "wave04AdmissionRegression": "PASS_ADMISSION_PROBES (3/3 C)",
-        "knowledgeTests": "35/35",
+        "knowledgeTests": "35/35 at checkpoint",
         "decisionExample": "PASS (real temporary SQLite, 0 model/network)"
       },
       "note": "Re-verified on merged wave-06 main: DecisionTransactionService prepare is read-only, commit/revoke are synchronous, real A AssistantStatePort replay/revoke/rollback and the old three C admission probes still pass."
@@ -40,12 +31,10 @@
       "evidence": [
         "packages/routing/src/shared-attention.ts",
         "packages/routing/test/shared-attention.case.ts",
-        "packages/routing/src/index.ts"
+        "packages/routing/test/main-compat.case.ts"
       ],
-      "results": {
-        "routingTests": "37/37 (includes 8 shared-ranker cases)"
-      },
-      "note": "sharedAttentionRanker matches contracts AttentionRanker: complete permutation, shared reasons, sinceAt=null unknown, explicit deadlineAt only, expiresAt not a deadline, outgoing blockedWorkIds, stable explicit-now order, duplicate ids refused."
+      "results": { "routingTests": "40/40 (includes 8 shared-ranker + 3 main-compat cases)" },
+      "note": "sharedAttentionRanker matches contracts AttentionRanker: complete permutation, shared reasons, sinceAt=null unknown, explicit deadlineAt only, expiresAt not a deadline, outgoing blockedWorkIds, stable explicit-now order, duplicate ids refused. Main-compat test validates AttentionPageSchema with a ProductAttention-shaped page."
     },
     {
       "phase": "C3",
@@ -53,52 +42,126 @@
       "owner": "A",
       "repro": "grep -rn 'routingEvidence\\|RoutingEvidence' packages/storage/src packages/workflows/src  # no result; createWorkflowPorts(store) has no routingEvidence",
       "required": "A synchronous RoutingEvidencePort implementation (advice/reviews/outcomes put/get/list, same-body replay, changed-body conflict) on the shared UnitOfWork, plus main admission.",
-      "continue": "Use InMemoryRoutingEvidence with the identical interface for C4/C5 negative cases; do not claim real SQL evidence until A lands."
+      "continue": "C5 consumer and C4 negatives use InMemoryRoutingEvidence with the identical interface; real SQL is not claimed."
     },
     {
       "phase": "C4",
-      "status": "not_started",
-      "note": "Decision/proposal/context consumption boundary: read-only prepare + sync commit plan."
+      "status": "passed",
+      "evidence": [
+        "packages/knowledge/src/decision-transaction.ts",
+        "packages/knowledge/test/workflow.case.ts",
+        "packages/knowledge/examples/assistant-workflow.mjs",
+        "packages/knowledge/reports/assistant-workflow-run.json"
+      ],
+      "results": {
+        "knowledgeTests": "38/38",
+        "assistantWorkflowExample": "PASS (real temporary SQLite, context preview + proposal + decision + revocation, 0 model/network)"
+      },
+      "note": "Added prepareRevocation/commitRevocation. Web-flow boundary covers read-only prepare, proposal confirm/reject, decision record/revoke, old replay cannot resurrect, source loss/actor/scope/version/expiry negatives, context injection remains untrusted data, and prose cannot become an executable proposal."
     },
     {
       "phase": "C5",
-      "status": "not_started",
-      "note": "Main consumer regression and targeted invalidation negatives."
+      "status": "passed_package_local_pending_main",
+      "evidence": [
+        "packages/routing/test/main-compat.case.ts",
+        "packages/context/reports/wave06-full-verification.txt",
+        "packages/context/reports/wave06-assistant-final.json",
+        "packages/context/reports/wave06-admission-final.json"
+      ],
+      "results": {
+        "regression": "context 34/34, proposals 18/18, knowledge 38/38, routing 40/40",
+        "realSqliteProbe": "7/7 PASS",
+        "wave04Admission": "3/3 C PASS",
+        "staticDispatch": "PASS_DISPATCH_STATIC_ONLY (36 phases, acyclic, owners, budget unchanged)"
+      },
+      "note": "C proves shared page compatibility and decision transaction semantics with main-shaped fixtures. Actual HTTP/UI consumer is blocked on main wiring: createProductRuntime supports attentionRanker but demo.ts does not pass it, and no decision command HTTP route exists yet."
     },
     {
       "phase": "C6",
-      "status": "not_started",
-      "note": "Stable exports/docs, unknown-value policy, scale limits and final status."
+      "status": "passed",
+      "evidence": [
+        "packages/routing/README.md",
+        "packages/routing/docs/ROUTING-RFC.md",
+        "packages/knowledge/README.md",
+        "packages/context/reports/wave06-status.json"
+      ],
+      "note": "Documents stable exports, unknown-value policy, deadline/near window, outgoing blockedWorkIds direction, reason mapping, scale limit, main wiring recipe and remaining A/main dependencies."
     }
   ],
   "commands": [
     "git fetch origin && git merge origin/main --no-edit",
     "pnpm --filter @personal-agent/{contracts,orchestrator-core,effects,storage,workflows,proposals,knowledge,context,routing} build",
-    "pnpm --filter @personal-agent/context typecheck && test",
-    "pnpm --filter @personal-agent/proposals typecheck && test",
-    "pnpm --filter @personal-agent/knowledge typecheck && test",
-    "pnpm --filter @personal-agent/routing typecheck && test",
+    "pnpm --filter @personal-agent/context typecheck && test && build",
+    "pnpm --filter @personal-agent/proposals typecheck && test && build",
+    "pnpm --filter @personal-agent/knowledge typecheck && test && build",
+    "pnpm --filter @personal-agent/routing typecheck && test && build",
     "node tools/bootstrap/review-persisted-assistant.mjs",
     "node tools/bootstrap/review-wave04-admission.mjs",
-    "node packages/knowledge/examples/decision-transaction.mjs"
+    "node packages/knowledge/examples/decision-transaction.mjs",
+    "node packages/knowledge/examples/assistant-workflow.mjs",
+    "node packages/knowledge/examples/persisted-loop.mjs",
+    "node packages/routing/examples/routing-loop.mjs",
+    "node agent-tasks/product-wave-06/verify.mjs"
+  ],
+  "results": {
+    "contextTests": "34/34",
+    "proposalTests": "18/18",
+    "knowledgeTests": "38/38",
+    "routingTests": "40/40",
+    "typecheck": "PASS (four packages)",
+    "build": "PASS (four packages)",
+    "realSqliteAssistantProbe": "PASS_SQLITE_ASSISTANT_CONSUMER (7/7)",
+    "wave04AdmissionRegression": "PASS_ADMISSION_PROBES (3/3 C)",
+    "examples": "PASS (decision transaction, assistant workflow, persisted loop, routing loop; 0 model/network)",
+    "staticDispatch": "PASS_DISPATCH_STATIC_ONLY"
+  },
+  "dependencyRequests": [
+    {
+      "package": "packages/knowledge",
+      "added": ["@personal-agent/storage (dev)", "@personal-agent/workflows (dev)"],
+      "reason": "Real temporary SQLite decision/workflow tests and examples.",
+      "rootLock": "pnpm-lock.yaml diff is uncommitted; main owns the authoritative lock."
+    }
   ],
   "blockers": [
     {
       "id": "C3-A-routing-evidence",
       "owner": "A",
       "status": "blocked_external",
-      "input": "packages/workflows createWorkflowPorts(store).routingEvidence implementing packages/contracts routing-review.ts RoutingEvidencePort.",
-      "neededFor": "C3 real SQL combination for advice/review/outcome persistence."
+      "input": "createWorkflowPorts(store).routingEvidence implementing packages/contracts routing-review.ts RoutingEvidencePort on the shared UnitOfWork.",
+      "neededFor": "C3 real SQL combination for advice/review/outcome persistence.",
+      "continue": "C5 consumer uses InMemoryRoutingEvidence with the identical interface."
+    },
+    {
+      "id": "C5-main-attention-ranker",
+      "owner": "main",
+      "status": "external_pending",
+      "input": "apps/coordinator/product/demo.ts createProductRuntime call does not pass attentionRanker (runtime.ts already accepts it).",
+      "expected": "import { sharedAttentionRanker } from '@personal-agent/routing' and pass it; page ranking becomes deterministic_priority with source items unchanged.",
+      "continue": "C's main-compat test already validates the exact shared page/ranks contract."
+    },
+    {
+      "id": "C5-main-decision-http",
+      "owner": "main",
+      "status": "external_pending",
+      "input": "No decision record/revoke HTTP command route in apps/coordinator/http/app.ts.",
+      "expected": "Authenticated command schema/receipt/event; call DecisionTransactionService.prepare/commit/commitRevocation inside the existing UnitOfWork; no await and no out-of-transaction pre-write.",
+      "continue": "C's assistant-workflow example is the copyable transaction recipe."
     }
   ],
   "notTested": [
     "Real SQLite RoutingEvidencePort (A-owned, not on main)",
-    "Main HTTP/provider/UI wiring for shared attention/advice/review",
-    "Any real model or native task (budget 0)"
+    "Main HTTP/UI consumer for shared attention and decision commands",
+    "Any real model or native task (budget 0)",
+    "Review pilot value results (B/E-owned)"
   ],
   "mainNextSteps": [
-    "Admit sharedAttentionRanker from packages/routing and pass it to ProductAttention's optional ranker.",
-    "Consume DecisionTransactionService in the existing UnitOfWork for record/revoke commands.",
-    "Publish the recovery re-authorization interface and routing evidence persistence when available."
+    "Admit sharedAttentionRanker from packages/routing and pass it to createProductRuntime; re-run attention page/browser regressions.",
+    "Wire decision record/revoke endpoints to DecisionTransactionService in one UnitOfWork and reuse assistant-workflow.mjs as the recipe.",
+    "When A publishes routingEvidence, run routing consumer/negative matrix against the real port before enabling advice/review."
+  ],
+  "aNextSteps": [
+    "Publish createWorkflowPorts(store).routingEvidence with sync append-only put/get/list and same-body replay.",
+    "Optionally add a persisted review-subject/current-candidate index for efficient invalidation queries."
   ]
 }

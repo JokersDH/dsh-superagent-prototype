@@ -8,6 +8,7 @@ export type {
   DecisionSourceSyncPort,
   DecisionTransactionOptions,
   PreparedDecision,
+  PreparedRevocation,
 } from './decision-transaction.ts'
 export { StaticDecisionSourcePort } from './static-source.ts'
 export { DecisionConflict, DecisionError } from './errors.ts'
