@@ -467,7 +467,14 @@ export function evaluateRelease({
     }
   }
 
-  if (report.claim?.status === STATUS.PASS && failures.length > 0)
+  // A claim without a tier is universal and always checked. A claim for a different tier is not a
+  // claim about this one, so its contradictions are already reported by the specific failures.
+  const claimScope = report.claim?.tier
+  if (
+    report.claim?.status === STATUS.PASS &&
+    failures.length > 0 &&
+    (claimScope === undefined || claimScope === requirement?.tier)
+  )
     failures.push(
       fail('self_declared_pass_rejected', 'Report declares release PASS while the gate found blocking evidence'),
     )
