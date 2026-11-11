@@ -11,6 +11,7 @@ import type {
 import { WorkflowConflict as StorageWorkflowConflict } from '@personal-agent/storage'
 import type {
   AssistantStatePage, AssistantStatePort, AssistantStateQuery, PersistedDecision, PersistedProposal, RoutingEvidencePort, WorkRecord,
+  RecoveryActivationFacts, RecoveryActivationIntent,
 } from '@personal-agent/contracts'
 
 export { SnapshotError, WorkflowSnapshots } from './snapshot.ts'
@@ -18,7 +19,7 @@ export type {
   SnapshotManifest, SnapshotArtifact, SnapshotResult, SnapshotVerification,
 } from './snapshot.ts'
 
-export type { Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, ProjectCurrent, ProjectSettings, ProjectVersion, WorkIndexEntry, SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, EvidencePage }
+export type { Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, ProjectCurrent, ProjectSettings, ProjectVersion, WorkIndexEntry, SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, EvidencePage, RecoveryActivationIntent }
 export { StorageWorkflowConflict as WorkflowConflict }
 
 export interface ConversationDiscoveryPort {
@@ -48,6 +49,8 @@ export interface RecoveryIntentPort {
   getByCommand(commandId: string): RecoveryIntentRecord | undefined
   list(input?: { sourceFingerprint?: string; limit?: number; cursor?: string }): RecoveryIntentPage
 }
+
+export interface RecoveryActivationPort extends RecoveryActivationFacts {}
 
 export interface ConversationPort {
   create(input: { id: string; projectId?: string; title: string; createdAt?: string }): { created: boolean; conversation: Conversation }
@@ -98,7 +101,10 @@ export interface WorkflowPorts {
   assistant: AssistantPort
   routingEvidence: RoutingEvidencePortWithSources
   acceptance: AcceptanceProjectionPort
+  /** Legacy v14 plan intents: audit only, never an activation fact. */
   recoveryIntents: RecoveryIntentPort
+  /** Shared 0027 production facts consumed by main's RecoveryIntentCommitter. */
+  recoveryActivations: RecoveryActivationPort
   index: ReadIndexPort
   state: StateFactsPort
 }
@@ -114,6 +120,7 @@ export function createWorkflowPorts(store: ProductStore): WorkflowPorts {
     routingEvidence: store.workflows.routingEvidence,
     acceptance: store.workflows.acceptance,
     recoveryIntents: store.workflows.recoveryIntents,
+    recoveryActivations: store.workflows.recoveryActivations,
     index: store.workflows.index,
     state: store.workflows.index,
   }

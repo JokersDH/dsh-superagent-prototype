@@ -76,18 +76,45 @@ export class RecoveryIntents {
   }
 
   private mapRow(row: Row): RecoveryIntentRecord {
+    let envelope: {
+      protocol?: unknown; plan?: unknown; userId?: unknown; actorRef?: unknown
+      inspectionFingerprint?: unknown; sourceFingerprint?: unknown; confirmedAt?: unknown
+    }
+    try { envelope = json(row.payload) } catch {
+      throw new WorkflowConflict(`Recovery intent ${String(row.command_id)} has an unreadable payload`)
+    }
+    if (envelope.protocol !== 'recovery-intent/1') throw new WorkflowConflict('Recovery intent payload has an unsupported protocol')
+    let plan: RecoveryPlan
+    try { plan = RecoveryPlanSchema.parse(envelope.plan) } catch (error) {
+      throw new WorkflowConflict(`Recovery intent ${String(row.command_id)} does not contain a valid plan: ${String(error)}`)
+    }
+    const confirmedAt = typeof envelope.confirmedAt === 'string' ? envelope.confirmedAt : ''
+    if (
+      !confirmedAt ||
+      typeof envelope.userId !== 'string' || typeof envelope.actorRef !== 'string' ||
+      typeof envelope.inspectionFingerprint !== 'string' || typeof envelope.sourceFingerprint !== 'string'
+    ) throw new WorkflowConflict(`Recovery intent ${String(row.command_id)} is missing its envelope identity`)
+    const planDigest = digest(plan)
+    // The indexed columns and the immutable payload must agree; a hand-edited row is not a fact.
+    if (
+      String(row.plan_id) !== plan.planId || String(row.plan_digest) !== planDigest ||
+      String(row.user_id) !== envelope.userId || String(row.actor_ref) !== envelope.actorRef ||
+      String(row.inspection_fingerprint) !== envelope.inspectionFingerprint ||
+      String(row.source_fingerprint) !== envelope.sourceFingerprint ||
+      String(row.created_at) !== confirmedAt || String(row.expires_at) !== plan.expiresAt
+    ) throw new WorkflowConflict(`Recovery intent ${String(row.command_id)} row is inconsistent with its payload`)
     return {
       protocol: 'recovery-intent/1',
       commandId: String(row.command_id),
-      planId: String(row.plan_id),
-      planDigest: String(row.plan_digest),
-      inspectionFingerprint: String(row.inspection_fingerprint),
-      sourceFingerprint: String(row.source_fingerprint),
-      userId: String(row.user_id),
-      actorRef: String(row.actor_ref),
-      plan: json<RecoveryPlan>(row.payload),
-      createdAt: String(row.created_at),
-      expiresAt: String(row.expires_at),
+      planId: plan.planId,
+      planDigest,
+      inspectionFingerprint: envelope.inspectionFingerprint,
+      sourceFingerprint: envelope.sourceFingerprint,
+      userId: envelope.userId,
+      actorRef: envelope.actorRef,
+      plan,
+      createdAt: confirmedAt,
+      expiresAt: plan.expiresAt,
       authorization: 'not_granted',
       activationAvailable: false,
     }

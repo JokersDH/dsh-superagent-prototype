@@ -17,6 +17,7 @@ import { AssistantState } from './assistant-state.ts'
 import { RoutingEvidence, type RoutingEvidenceSources } from './routing-evidence.ts'
 import { AcceptanceOutcomeProjection } from './acceptance-outcome.ts'
 import { RecoveryIntents } from './recovery-intents.ts'
+import { RecoveryActivations } from './recovery-activations.ts'
 
 import { WorkflowConflict } from './workflow-errors.ts'
 export { WorkflowConflict } from './workflow-errors.ts'
@@ -911,6 +912,7 @@ export class WorkflowRecords {
   readonly routingEvidence: RoutingEvidence
   readonly acceptance: AcceptanceOutcomeProjection
   readonly recoveryIntents: RecoveryIntents
+  readonly recoveryActivations: RecoveryActivations
   readonly index: WorkflowIndex
   constructor(db: Database.Database, uow: UnitOfWork, artifacts: ArtifactStore) {
     this.conversations = new ProductConversations(db, uow)
@@ -920,6 +922,7 @@ export class WorkflowRecords {
     this.routingEvidence = new RoutingEvidence(db, uow)
     this.acceptance = new AcceptanceOutcomeProjection(db, uow, this.routingEvidence)
     this.recoveryIntents = new RecoveryIntents(db, uow)
+    this.recoveryActivations = new RecoveryActivations(db, uow)
     this.index = new WorkflowIndex(db, artifacts, this.projects)
   }
 }
