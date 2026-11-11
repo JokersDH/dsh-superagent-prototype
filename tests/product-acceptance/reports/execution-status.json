@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "531c6b6",
-  "checkpoint": "6977bd9",
-  "head": "4c38bd6d55523e42c2beaf59ee96cfa5e02d86be",
-  "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-11T11:18:20.021Z",
+  "base": "f99ca39",
+  "checkpoint": "81d7fa3",
+  "head": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+  "worktreeDirtyAtRun": true,
+  "checkedAt": "2026-11-11T14:51:48.456Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -411,7 +411,7 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 20,
+        "PASS": 21,
         "NOT_TESTED": 3
       },
       "cases": [
@@ -472,6 +472,11 @@
         },
         {
           "id": "E2-WORK-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-EVIDENCE-HISTORY",
           "status": "PASS",
           "reason": null
         },
@@ -537,11 +542,11 @@
       "title": "Proposal HTTP, attention, decisions and review timing",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "E3-PROPOSAL-HTTP covers pending preview, missing input, confirm/reject, replay, drift, tamper, cross-project and answer-not-knowledge. E3-PROPOSAL-UI exercises the real console: preview has no effect, lost response survives reload with one settlement, second confirm and reject behave. Context preview remains NOT_TESTED."
+        "E3-PROPOSAL-HTTP and E3-PROPOSAL-UI cover explicit proposal flows. E3-CONTEXT-PREVIEW now runs against real HTTP: bounded budget with clamping, untrusted trust label, work/contract sources, no execution effect, TTL, cross-project/foreign-conversation/missing-work/invalid-budget refusals. E2-EVIDENCE-HISTORY covers window/limit/cursor. E5-CONTEXT-USE stays NOT_TESTED because only preview and the binding schema exist, not a send/audit path."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 19,
+        "PASS": 21,
         "NOT_TESTED": 6
       },
       "cases": [
@@ -669,6 +674,16 @@
           "id": "E3-PROPOSAL-UI",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-PREVIEW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-PERSONAL-COLD-START",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -677,12 +692,13 @@
       "title": "Explicit baseline/target installation and upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Explicit baseline/target tuple is read from tar bytes and install.json; managed upgrade/rollback-install run in a bounded child probe with new data, same-schema rollback and tampered-target refusal. Crash windows/whole-process guards are E4-UPGRADE-FAULTS NOT_TESTED."
+        "Install matrix is parameterized by the real tar/sha/source/build/schema tuple (no fixed schema13/ports). E3-PERSONAL-COLD-START proves personal first-run, doctor, workbench assets, bearer refusal, DB schema and stop; a different config release is refused as release_source_conflict. Managed upgrade/rollback keeps data, tampered target is refused, and a cross-schema old binary refuses with state_schema_newer_than_binary after pointer rollback. E4-MULTI-STATE records a real D defect: a stop for state A returned STOPPED and killed shared-install state B's API; the launcher-dead window is therefore NOT_TESTED. Crash windows remain E4-UPGRADE-FAULTS NOT_TESTED."
       ],
-      "result": "PASS_WITH_GAPS",
+      "result": "FAIL",
       "counts": {
-        "PASS": 13,
-        "NOT_TESTED": 3
+        "PASS": 14,
+        "NOT_TESTED": 3,
+        "FAIL": 1
       },
       "cases": [
         {
@@ -756,6 +772,16 @@
           "reason": null
         },
         {
+          "id": "E4-UPGRADE-CROSS-SCHEMA",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-MULTI-STATE",
+          "status": "FAIL",
+          "reason": "MULTI_STOP_OTHER_BLOCKED: {\"exit\":0,\"bPid\":24143,\"bApi\":24157,\"bAlive\":true,\"bApiAlive\":false,\"bApiPort\":56819,\"apiOpenBefore\":true,\"apiOpenAfter\":false,\"recordedState\":\"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-multi-1N0WVp/data-b\",\"recordedPid\":24143,\"reportedStatus\":\"STOPPED\",\"reportedState\":null,\"reportedPid\":null,\"stdout\":\"{\\n  \\\"ok\\\": true,\\n  \\\"status\\\": \\\"STOPPED\\\",\\n  \\\"stopped\\\": true,\\n  \\\"stillAlive\\\": false,\\n  \\\"code\\\": null,\\n  \\\"verification\\\": {\\n    \\\"ok\\\": true,\\n    \\\"checks\\\": [\\n      {\\n        \\\"id\\\": \\\"launcher_alive\\\",\\n        \\\"ok\\\": true\\n      },\\n      {\\n        \\\"id\\\": \\\"process_start\\\",\\n        \\\"ok\\\": true,\\n        \\\"detail\\\": \\\"Wed N\"}"
+        },
+        {
           "id": "E4-UPGRADE-FAULTS",
           "status": "NOT_TESTED",
           "reason": "NOT_TESTED: the bounded managed-upgrade probe covers the confirmed switch, new data, binary rollback and a tampered target. D exposes PA_UPGRADE_FAULT crash windows and whole-process guards, but exercising them reliably needs a longer isolated run; this case stays NOT_TESTED rather than counting two fixture starts as an upgrade result."
@@ -776,9 +802,14 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "NOT_TESTED": 2
+        "NOT_TESTED": 3
       },
       "cases": [
+        {
+          "id": "E5-CONTEXT-USE",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: main publishes the context preview and the AssistantContextBinding contract, but no context-use HTTP or provider attachment. Required: an explicit per-message selection, revalidation of source/contract/grant immediately before send, a binding and receipt in the same transaction, no automatic resend after a lost response/unknown result, and a source audit showing what was used. A preview or the binding schema is not a send."
+        },
         {
           "id": "E5-NATIVE-CONTROL",
           "status": "NOT_TESTED",
@@ -787,7 +818,7 @@
         {
           "id": "E5-RECOVERY-INTERRUPTION",
           "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: main has no recovery commit/activation entry. Required inputs: source-committed activation fact, prepared target identity/bytes, activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority."
+          "reason": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
         }
       ]
     },
@@ -796,7 +827,7 @@
       "title": "Layered conclusions and handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave07-status separates module/controlled-product/actual-native-control/installed-alpha/review-value with source/evidence/owner; pilot value never gates product or install."
+        "wave10-status separates test source, product source/build and the exact artifact tuple with commands, exit codes, PASS/FAIL/NOT_TESTED and owners; wave09 and older ledgers are preserved and pilot value never gates product or install."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -814,14 +845,14 @@
   "release": {
     "schema": "product-acceptance-release/1",
     "tier": "controlled-product-workflow",
-    "status": "PASS",
-    "ok": true,
-    "checkedAt": "2026-11-11T11:18:20.039Z",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-11T14:51:48.472Z",
     "source": {
-      "commit": "4c38bd6d55523e42c2beaf59ee96cfa5e02d86be",
-      "dirty": false
+      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+      "dirty": true
     },
-    "expectedSource": "4c38bd6d55523e42c2beaf59ee96cfa5e02d86be",
+    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1214,6 +1245,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-EVIDENCE-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -1319,6 +1355,11 @@
         "status": "PASS"
       },
       {
+        "id": "E3-CONTEXT-PREVIEW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-DESKTOP-GEOMETRY",
         "required": true,
         "status": "PASS"
@@ -1399,45 +1440,68 @@
         "status": "PASS"
       }
     ],
-    "failures": [],
+    "failures": [
+      {
+        "code": "source_dirty",
+        "detail": "Release evidence requires a clean source worktree"
+      }
+    ],
     "claimedBy": null,
     "notes": [
       "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T11-15-31-572Z/proposal-preview-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-48-22-802Z/proposal-preview-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
     "wave09Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave09-status.json",
+    "wave10Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave10-status.json",
     "wave08Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave08-status.json",
     "wave07Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave07-status.json",
     "wave06Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave06-status.json",
     "tierVerdicts": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/tier-verdicts.json"
   },
-  "blockers": [],
+  "blockers": [
+    {
+      "id": "install-host-guards",
+      "capability": "模式保持、未知活 PID 阻断与不误杀",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "FAIL",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "E4-MULTI-STATE 观测到 D 真实缺陷：对 state A 的 stop 返回 STOPPED 并杀掉共享安装下 state B 的 API 进程（launcher 仍活），launcher 死/API 活窗口因此无法测量。"
+      ],
+      "evidence": [
+        "E4-INSTALL-HOST-GUARDS",
+        "E4-MULTI-STATE"
+      ]
+    }
+  ],
   "untested": [
     {
       "id": "conversation-chat",
@@ -1568,7 +1632,7 @@
     {
       "id": "context-proposals-decisions",
       "gaps": [
-        "自动上下文与结构化提案确认未发布（owner C）。",
+        "自动结构化提案确认仍未发布（owner C/main）；当前只验证显式 prepare/confirm/reject。",
         "源消息删除/授权过期/事务失败注入缺少公开入口（E3-DECISION-SOURCE-STATES）。"
       ]
     },
@@ -1587,20 +1651,22 @@
     {
       "id": "distribution",
       "gaps": [
-        "target 已修复 PA_CONFIG_ROOT 初始化；baseline 的失败只作历史，不映射到 target。",
-        "跨机器/跨 ABI 未测；只测 darwin/arm64 + Node 24.21.x + ABI 137。"
+        "安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。",
+        "旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。"
       ]
     },
     {
       "id": "two-binary-upgrade",
       "gaps": [
-        "E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口与 launcher 死/API 活守卫本轮未稳定执行，保持 NOT_TESTED。",
+        "E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口仍未稳定执行，保持 NOT_TESTED；不得以两次 fixture start 代替。",
         "升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。"
       ]
     },
     {
       "id": "install-host-guards",
-      "gaps": []
+      "gaps": [
+        "E4-MULTI-STATE 观测到 D 真实缺陷：对 state A 的 stop 返回 STOPPED 并杀掉共享安装下 state B 的 API 进程（launcher 仍活），launcher 死/API 活窗口因此无法测量。"
+      ]
     },
     {
       "id": "proposal-http",
@@ -1611,7 +1677,14 @@
     {
       "id": "context-window",
       "gaps": [
-        "main 仍无 context preview/read 入口；E3-CONTEXT-GRANT-BOUNDARY 记录了 expired/purpose/budget 反例与所需输入。"
+        "E5-CONTEXT-USE 未执行：main 只有 preview 与 binding schema，没有 context-use 发送入口/provider 附加、同事务 binding+receipt、未知结果不自动重发和来源审计。",
+        "E3-CONTEXT-GRANT-BOUNDARY 仍未执行：expired grant/purpose/超预算的 HTTP 级反例缺少入口。"
+      ]
+    },
+    {
+      "id": "work-evidence",
+      "gaps": [
+        "storage_cap 与并发写入窗口未单独触发；历史窗口语义按 complete/caller_limit 已验证。"
       ]
     },
     {
@@ -1641,8 +1714,13 @@
   ],
   "externalBlockers": [
     {
+      "owner": "D",
+      "code": "stop_claims_other_state",
+      "detail": "One install, two state roots: `pa stop --data-root <state A>` returned 0/STOPPED while state B was recorded, and state B's API process died (launcher remained). Minimal repro: start A, stop A, start B, then stop with A's data root; observed exit 0, bAlive true, bApiAlive false. D must bind the instance record to the exact state root and refuse to stop another state."
+    },
+    {
       "owner": "main/C",
-      "detail": "Proposal HTTP and the console workbench are verified; a context preview/read entry is still unpublished, and the C composer still fails expired/purpose/over-budget grant probes."
+      "detail": "Context preview and evidence history are verified over real HTTP; context use (explicit selection, pre-send revalidation, same-transaction binding/receipt, no auto-resend, source audit) and recovery activation are unpublished."
     },
     {
       "owner": "main",
@@ -1650,7 +1728,7 @@
     },
     {
       "owner": "D",
-      "detail": "Target 9120a5ed passes byte-for-byte and fixes the config-root initialization; any newer target must be named with its own tar/source/build/schema and independently re-tested rather than inheriting this verdict."
+      "detail": "The wave-09 target tuple (6830e38 build f2390ffd, schema 15) passes byte-for-byte, personal cold start and same-schema managed upgrade; cross-schema old-binary refusal is measured. Any newer target must be named with its own tar/source/build/schema and independently re-tested."
     },
     {
       "owner": "B",
@@ -1658,8 +1736,9 @@
     }
   ],
   "next": [
-    "C/main: publish automatic proposal/context confirmation and a review Work/Ticket/Assignment entry; E then adds confirm-before-execute, revocation-effect and transaction-failure cases on top of the already verified explicit decisions.",
-    "D: keep the target immutable; a new target artifact needs its own explicit identity (tar/sha/source/build/schema) and a fresh E4 run, not a mapping from 9120a5ed.",
+    "D: bind the single install instance record to its exact data root and make a stop aimed at another state refuse without signalling that state's launcher/API; then E can measure launcher-dead/API-alive and PID/start reuse windows.",
+    "C/main: publish automatic proposal/context confirmation, the context-use send path (explicit selection, revalidation, same-transaction binding/receipt, no auto-resend, source audit) and recovery activation; E then converts E5-CONTEXT-USE and E5-RECOVERY-INTERRUPTION from NOT_TESTED.",
+    "D: keep the target immutable; a new target needs its own explicit identity (tar/sha/source/build/schema) and a fresh E4 run, not a mapping from build f2390ffd.",
     "B: hand off native evidence bound to commit/attempt/command with executed=true and model-task counts; only a separately granted budget lets E re-run native.",
     "Main: treat controlled-product-workflow PASS as workflow evidence only; local-alpha and full-product remain non-zero until installation and native evidence exist."
   ]

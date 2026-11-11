@@ -571,24 +571,7 @@ writeFileSync(
   join(reports, 'wave10-status.json'),
   JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave10-status/1', taskPackage: 'agent-tasks/product-wave-10/README.zh-CN.md', supersedes: 'wave09-status.json', artifactTuple }, null, 2) + '\n',
 )
-writeFileSync(
-  join(reports, 'wave09-status.json'),
-  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave09-status/1', taskPackage: stages.taskPackage,
-    artifactTuple: (byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple ?? null),
-    productSource: report.source, testCodeSource: report.source }, null, 2) + '\n',
-)
-writeFileSync(
-  join(reports, 'wave08-status.json'),
-  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave08-status/1', taskPackage: 'agent-tasks/product-wave-08/README.zh-CN.md', supersededBy: 'wave09-status.json' }, null, 2) + '\n',
-)
-writeFileSync(
-  join(reports, 'wave07-status.json'),
-  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave07-status/1', taskPackage: 'agent-tasks/product-wave-07/README.zh-CN.md', supersededBy: 'wave08-status.json' }, null, 2) + '\n',
-)
-writeFileSync(
-  join(reports, 'wave06-status.json'),
-  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave06-status/1', taskPackage: 'agent-tasks/product-wave-06/README.zh-CN.md', supersededBy: 'wave07-status.json' }, null, 2) + '\n',
-)
+// Historical wave06-09 status files are frozen inputs; wave10 supersedes rather than rewrites them.
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 
 // Over-claim check: the same recorded evidence must fail the full-product tier while native and

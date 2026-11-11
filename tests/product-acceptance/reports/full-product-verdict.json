@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-11T11:20:01.542Z",
+  "checkedAt": "2026-11-11T14:54:01.321Z",
   "source": {
-    "commit": "4c38bd6d55523e42c2beaf59ee96cfa5e02d86be",
-    "dirty": false
+    "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "dirty": true
   },
-  "expectedSource": "4c38bd6d55523e42c2beaf59ee96cfa5e02d86be",
+  "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -401,6 +401,11 @@
       "status": "PASS"
     },
     {
+      "id": "E2-EVIDENCE-HISTORY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E2-REOPEN-PERSISTENCE",
       "required": true,
       "status": "PASS"
@@ -506,6 +511,11 @@
       "status": "PASS"
     },
     {
+      "id": "E3-CONTEXT-PREVIEW",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E3-DESKTOP-GEOMETRY",
       "required": true,
       "status": "PASS"
@@ -591,6 +601,11 @@
       "status": "PASS"
     },
     {
+      "id": "E3-PERSONAL-COLD-START",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E4-INSTALL-FIRST-RUN",
       "required": true,
       "status": "PASS"
@@ -631,6 +646,16 @@
       "status": "PASS"
     },
     {
+      "id": "E4-UPGRADE-CROSS-SCHEMA",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-MULTI-STATE",
+      "required": true,
+      "status": "FAIL"
+    },
+    {
       "id": "E5-NATIVE-DELIVERY",
       "required": true,
       "status": "MISSING"
@@ -642,6 +667,20 @@
     }
   ],
   "failures": [
+    {
+      "code": "source_dirty",
+      "detail": "Release evidence requires a clean source worktree"
+    },
+    {
+      "code": "case_not_pass",
+      "detail": "Required case E4-MULTI-STATE is FAIL",
+      "caseId": "E4-MULTI-STATE"
+    },
+    {
+      "code": "required_evidence_missing",
+      "detail": "Case E4-MULTI-STATE has no substantive evidence.multiState",
+      "caseId": "E4-MULTI-STATE"
+    },
     {
       "code": "missing_required_case",
       "detail": "Required case E5-NATIVE-DELIVERY is absent",
@@ -669,10 +708,12 @@
     }
   ],
   "claimedBy": {
-    "status": "PASS",
+    "status": "FAIL",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-11T11:18:20.039Z",
-    "failureCodes": []
+    "decidedAt": "2026-11-11T14:51:48.472Z",
+    "failureCodes": [
+      "source_dirty"
+    ]
   },
   "notes": [
     "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
