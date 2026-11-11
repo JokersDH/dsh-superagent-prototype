@@ -22,6 +22,87 @@
  */
 import { createHash } from 'node:crypto'
 
+/** A complete grant identity supplied by the caller. */
+export type GrantIdentity = {
+  grantId: string
+  owner: string
+  limit: number
+  ledgerPath: string
+  scope?: string
+}
+
+/** One gate as reported by the caller. A missing gate is a refusal, never a pass. */
+export type GateClaim = {
+  satisfied: boolean
+  reason?: string | null
+  evidence?: { model?: string; modelProvider?: string; [key: string]: unknown } | null
+}
+
+/** The gate set an admission requires. */
+export type GateSet = Partial<Record<'model_identity' | 'cost_bound' | 'isolation' | 'reservation', GateClaim>>
+
+/** The transport this sender owns. The exact object is bound into every token it issues. */
+export type SenderTransport = { startTurn(value: unknown): Promise<unknown> }
+
+/** A transport together with the implementation admitted at issue time. */
+type BoundTransport = { transport: SenderTransport; startTurn: SenderTransport['startTurn'] }
+
+/** The caller's persistent reservation hook. */
+export type ReservationHook = { reserve(request: unknown): Promise<{ admitted?: boolean; reason?: string; reservationId?: string } | null | undefined> }
+
+/** The audit callback used when a caller names this sender as the grant owner. */
+export type GrantAudit = (grant: GrantIdentity) => { allowed: boolean; reason?: string } | null
+
+/** The admission request. */
+export type AdmissionRequest = {
+  grant?: GrantIdentity
+  gates?: GateSet
+  hook?: ReservationHook
+  transport?: SenderTransport
+  caseRef?: string | null
+  turn?: number
+  subject?: string | null
+  profile?: Record<string, unknown> | null
+  hostPolicy?: Record<string, unknown> | null
+  audit?: GrantAudit
+}
+
+/** A refusal. It carries no token and nothing executable. */
+export type AdmissionRefusal = {
+  protocol: 'send-admission/2'
+  verdict: 'REFUSED'
+  refusal: { grantId: string | null; owner: string | null; problems: string[]; gates: Record<string, GateClaim> }
+  token: null
+  launch: null
+  consumable: false
+}
+
+/** An issued token. It is the only authority this sender accepts. */
+export type AdmissionToken = {
+  protocol: 'send-admission-token/2'
+  grantId: string
+  owner: string
+  caseRef: string | null
+  turn: number
+  issuedAt: string
+  digests: { grant: string; gates: string; subject: string | null; profile: string | null; hostPolicy: string | null; request: string }
+  digest: string
+}
+
+/** An admission decision. */
+export type AdmissionDecision =
+  | AdmissionRefusal
+  | { protocol: 'send-admission/2'; verdict: 'ADMITTED'; refusal: null; token: AdmissionToken; launch: null; consumable: true }
+
+/** The outcome of attempting to consume a token. */
+export type SendOutcome = {
+  sent: boolean
+  reason?: string | null
+  tokenConsumed?: boolean
+  reservation?: unknown
+  result?: unknown
+}
+
 /** Owner of this sending implementation. A request naming it must pass that grant's real audit. */
 export const SENDER_OWNER = 'B'
 
@@ -31,13 +112,14 @@ const ISSUED = new WeakMap()
 /** Request keys that would smuggle a raw command or a second implementation in. */
 const FORBIDDEN_REQUEST_KEYS = Object.freeze(['entry', 'command', 'argv', 'cli', 'spawn', 'transportOverride', 'hookOverride'])
 
-const REQUIRED_GATES = Object.freeze(['model_identity', 'cost_bound', 'isolation', 'reservation'])
+const REQUIRED_GATES = Object.freeze(['model_identity', 'cost_bound', 'isolation', 'reservation'] as const)
+type GateName = (typeof REQUIRED_GATES)[number]
 
-function digestsOf(request) {
-  const { grant = {}, gates = {}, subject = null, profile = null, hostPolicy = null, caseRef = null, turn = 1 } = request
+function digestsOf(request: AdmissionRequest): AdmissionToken['digests'] {
+  const { grant, gates, subject = null, profile = null, hostPolicy = null, caseRef = null, turn = 1 } = request
   return {
-    grant: createHash('sha256').update(JSON.stringify([grant.grantId, grant.owner, grant.limit, grant.ledgerPath, grant.scope ?? null])).digest('hex'),
-    gates: createHash('sha256').update(JSON.stringify(Object.keys(gates).sort().map(key => [key, gates[key]?.satisfied ?? null]))).digest('hex'),
+    grant: createHash('sha256').update(JSON.stringify([grant?.grantId ?? null, grant?.owner ?? null, grant?.limit ?? null, grant?.ledgerPath ?? null, grant?.scope ?? null])).digest('hex'),
+    gates: createHash('sha256').update(JSON.stringify(Object.keys(gates ?? {}).sort().map(key => [key, (gates as GateSet)[key as keyof GateSet]?.satisfied ?? null]))).digest('hex'),
     subject: subject === null ? null : createHash('sha256').update(String(subject)).digest('hex'),
     profile: profile === null ? null : createHash('sha256').update(JSON.stringify(profile)).digest('hex'),
     hostPolicy: hostPolicy === null ? null : createHash('sha256').update(JSON.stringify(hostPolicy)).digest('hex'),
@@ -52,7 +134,7 @@ function digestsOf(request) {
  * again at consume time is not a convenience: it must be the same object, which is what makes
  * post-issuance substitution detectable.
  */
-export function admitSend(request = {}) {
+export function admitSend(request: AdmissionRequest = {}): AdmissionDecision {
   const problems = []
 
   for (const key of FORBIDDEN_REQUEST_KEYS) {
@@ -72,9 +154,9 @@ export function admitSend(request = {}) {
   }
 
   // --- gates ----------------------------------------------------------------------------------
-  const gateStates = {}
+  const gateStates: Record<string, GateClaim> = {}
   for (const name of REQUIRED_GATES) {
-    const gate = gates[name]
+    const gate = (gates as GateSet)[name as GateName]
     if (gate === undefined || gate === null) {
       const reason = `gate "${name}" was not supplied, so it cannot be treated as passed`
       gateStates[name] = { satisfied: false, reason }
@@ -107,7 +189,7 @@ export function admitSend(request = {}) {
   // --- naming the sender's own owner routes through that grant's real audit -------------------
   // This is what stops a caller riding this role's own (unverified) grant to impersonate it.
   if (grant?.owner === SENDER_OWNER) {
-    const verdict = typeof audit === 'function' ? audit(grant) : null
+    const verdict = typeof audit === 'function' && grant !== undefined ? audit(grant) : null
     if (!verdict || verdict.allowed !== true) {
       const reason = verdict?.reason ?? 'naming this sender as the grant owner requires that grant to pass its own ledger audit, and it does not'
       problems.push(`grant spoofing refused: ${reason}`)
@@ -131,7 +213,31 @@ export function admitSend(request = {}) {
     }
   }
 
-  const bound = Object.freeze({ transport, hook })
+  // Reaching here means the request passed every check above, so each required value is present.
+  // The narrowing is explicit rather than an assertion, so a future edit cannot silently widen it.
+  if (!grant || !transport || !hook) {
+    return {
+      protocol: 'send-admission/2',
+      verdict: 'REFUSED',
+      refusal: { grantId: null, owner: null, problems: ['the request passed validation without a complete grant, transport and hook'], gates: gateStates },
+      token: null,
+      launch: null,
+      consumable: false,
+    }
+  }
+  // Bind the IMPLEMENTATION as well as the object: replacing `transport.startTurn` after issuance
+  // must not change what a token authorises, because object identity alone would not catch it.
+  const bound = Object.freeze({ transport, startTurn: transport.startTurn, hook })
+  if (typeof bound.startTurn !== 'function') {
+    return {
+      protocol: 'send-admission/2',
+      verdict: 'REFUSED',
+      refusal: { grantId: grant.grantId, owner: grant.owner, problems: ['the transport has no startTurn implementation to bind'], gates: gateStates },
+      token: null,
+      launch: null,
+      consumable: false,
+    }
+  }
   const digests = digestsOf({ grant, gates, subject, profile, hostPolicy, caseRef, turn })
   const token = Object.freeze({
     protocol: 'send-admission-token/2',
@@ -176,14 +282,17 @@ export function admitSend(request = {}) {
  * observes the claim and refuses rather than racing to a second send. The claim is never released on
  * failure — an unknown outcome must not become a free retry.
  */
-export async function consumeSendToken(candidate, { transport, hook, input } = {}) {
+export async function consumeSendToken(
+  candidate: unknown,
+  { transport, hook, input }: { transport?: SenderTransport; hook?: ReservationHook; input?: unknown } = {},
+): Promise<SendOutcome> {
   if (typeof candidate === 'string') {
     return { sent: false, reason: 'a string descriptor is not authority: only a token issued by admitSend can authorise a send' }
   }
   if (candidate === null || typeof candidate !== 'object') {
     return { sent: false, reason: 'no admission token was supplied' }
   }
-  const state = ISSUED.get(candidate)
+  const state = ISSUED.get(candidate as object)
   if (!state) {
     return { sent: false, reason: 'the supplied object was not issued by admitSend, so it carries no authority' }
   }
@@ -201,40 +310,51 @@ export async function consumeSendToken(candidate, { transport, hook, input } = {
   if (hook !== state.bound.hook) {
     return { sent: false, reason: 'the reservation hook differs from the one bound at issuance' }
   }
-  if (typeof transport.startTurn !== 'function') {
+  // The candidate is an issued token by this point, so narrow it once instead of indexing `object`.
+  const token = candidate as AdmissionToken
+  // Verified by object identity above, so these are the exact bound objects.
+  const boundTransport = state.bound.transport as SenderTransport
+  const boundStartTurn = state.bound.startTurn as SenderTransport['startTurn']
+  const boundHook = state.bound.hook as ReservationHook
+  if (typeof boundStartTurn !== 'function') {
+    return { sent: false, reason: 'the admitted startTurn implementation is gone, so this token cannot send' }
+  }
+  if (typeof boundTransport.startTurn !== 'function') {
     return { sent: false, reason: 'the bound transport cannot start a turn' }
   }
-  if (typeof hook.reserve !== 'function') {
+  if (typeof boundHook.reserve !== 'function') {
     return { sent: false, reason: 'the bound reservation hook cannot reserve' }
   }
 
   // --- reserve, then send --------------------------------------------------------------------
   let reservation
   try {
-    reservation = await hook.reserve({
-      grantId: candidate.grantId,
-      owner: candidate.owner,
+    reservation = await boundHook.reserve({
+      grantId: token.grantId,
+      owner: token.owner,
       caseRef: state.snapshot.caseRef,
       turn: state.snapshot.turn,
-      tokenDigest: candidate.digest,
+      tokenDigest: token.digest,
       requestDigest: state.snapshot.digests.request,
       subjectDigest: state.snapshot.digests.subject,
     })
   } catch (error) {
     // The claim is NOT released: an unknown reservation outcome is not a licence to resend.
-    return { sent: false, reason: `reservation threw, so nothing was sent and the token stays consumed: ${String(error?.message ?? error)}` }
+    return { sent: false, reason: `reservation threw, so nothing was sent and the token stays consumed: ${(error instanceof Error ? error.message : String(error))}` }
   }
   if (!reservation || reservation.admitted !== true) {
     return { sent: false, reason: `reservation refused: ${reservation?.reason ?? 'no admission returned'}`, tokenConsumed: true }
   }
 
-  const result = await transport.startTurn({
+  // Call the ADMITTED implementation with the transport as receiver, so a later method swap is
+  // ignored rather than silently honoured.
+  const result = await boundStartTurn.call(boundTransport, {
     input,
-    hook,
+    hook: boundHook,
     identity: {
-      grantId: candidate.grantId,
-      owner: candidate.owner,
-      tokenDigest: candidate.digest,
+      grantId: token.grantId,
+      owner: token.owner,
+      tokenDigest: token.digest,
       requestDigest: state.snapshot.digests.request,
       subjectDigest: state.snapshot.digests.subject,
     },
@@ -243,8 +363,8 @@ export async function consumeSendToken(candidate, { transport, hook, input } = {
 }
 
 /** Was this object issued here, and has it been consumed? For assertions and diagnostics only. */
-export function inspectToken(candidate) {
+export function inspectToken(candidate: unknown): { issued: boolean; claimed: boolean } {
   if (typeof candidate !== 'object' || candidate === null) return { issued: false, claimed: false }
-  const state = ISSUED.get(candidate)
+  const state = ISSUED.get(candidate as object)
   return state ? { issued: true, claimed: state.claimed } : { issued: false, claimed: false }
 }

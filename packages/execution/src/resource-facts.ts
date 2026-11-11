@@ -22,8 +22,69 @@
  */
 import { createHash } from 'node:crypto'
 import { performance } from 'node:perf_hooks'
-import type { VerifiedRunnerInspection } from './recovery-transport.ts'
+import type { RunnerEndpoint, RunnerInspection, VerifiedRunnerInspection } from './recovery-transport.ts'
 import { RunnerLinkError, verifiedRunnerInspection } from './recovery-transport.ts'
+
+/** One owned resource as reported by an authenticated inspection. */
+export type InspectionResource = RunnerInspection['resources'][number]
+
+/** A per-resource barrier verdict. */
+export type ResourceVerdict = (typeof RESOURCE_VERDICTS)[number]
+
+/** One classified resource. */
+export type ClassifiedResource = {
+  ref: string | null
+  verdict: ResourceVerdict
+  reasons: string[]
+  evidence: string[]
+  ownership?: InspectionResource['ownership'] | null
+}
+
+/** Options for {@link describeResourceFacts}. */
+export type ResourceFactsOptions = {
+  /** Maximum proof age accepted by the existing transport rule. */
+  maxAgeMs?: number
+  /** An instant the caller requires the observation to cover. Validated, not echoed. */
+  requiredAt?: string | null
+  /** Injectable monotonic clock for tests. */
+  now?: () => number
+}
+
+/** Provenance of the authenticated input a barrier verdict was evaluated on. */
+export type ResourceFactsProof = {
+  runnerIdentityRef: RunnerInspection['runnerIdentityRef']
+  attempt: RunnerInspection['attempt']
+  source: RunnerInspection['source']
+  observedAt: RunnerInspection['observedAt']
+  state: RunnerInspection['state']
+  admission: RunnerInspection['admission']
+  coverage: RunnerInspection['coverage']
+  socketIdentity: RunnerEndpoint['socketIdentity']
+}
+
+/** A reason a caller can show directly. */
+export type ResourceFactsBlocker = { ref: string | null; verdict: ResourceVerdict; reasons: string[] }
+
+/** The public barrier result. `refused` means the input was not an authenticated proof. */
+export type ResourceFacts = {
+  protocol: 'resource-facts/2'
+  verdict: 'refused' | 'no_resources_observed' | 'possibly_active' | 'unknown' | 'all_verified_quiescent'
+  releaseBarrierSatisfied: boolean
+  reason: string | null
+  explanation?: string
+  problems?: string[]
+  proof?: ResourceFactsProof
+  counts: { total: number; verified: number; possiblyActive: number; unknown: number }
+  resources: ClassifiedResource[]
+  invalidInferencesDetected: string[]
+  blockers: ResourceFactsBlocker[]
+  notClaimed: string[]
+  evaluatedAt?: string
+  evaluatedAtMonotonic?: number
+}
+
+/** The barrier outcome: a descriptive result, never an exception for ordinary refusal. */
+export type ResourceFactsRefusal = ResourceFacts & { verdict: 'refused'; releaseBarrierSatisfied: false }
 
 /**
  * Re-exported type only. It exists so a consumer can name the parameter without importing the
@@ -66,14 +127,16 @@ const REQUIRED_INSPECTION_FIELDS = Object.freeze([
   'observedAt',
 ])
 
-function checkCompleteShape(inspection) {
-  const problems = []
+function checkCompleteShape(inspection: Partial<RunnerInspection> | null | undefined): string[] {
+  const problems: string[] = []
+  const record = inspection as Record<string, unknown> | null | undefined
   for (const field of REQUIRED_INSPECTION_FIELDS) {
-    if (inspection?.[field] === undefined || inspection?.[field] === null) problems.push(`inspection.${field} is missing`)
+    if (record?.[field] === undefined || record?.[field] === null) problems.push(`inspection.${field} is missing`)
   }
-  if (inspection?.attempt) {
+  const attempt = record?.attempt as Record<string, unknown> | undefined
+  if (attempt) {
     for (const field of ['ticketId', 'assignmentId', 'attemptId', 'fenceEpoch']) {
-      if (inspection.attempt[field] === undefined || inspection.attempt[field] === null) {
+      if (attempt[field] === undefined || attempt[field] === null) {
         problems.push(`inspection.attempt.${field} is missing`)
       }
     }
@@ -90,7 +153,7 @@ function checkCompleteShape(inspection) {
  * `requiredAt` is VALIDATED, not merely echoed into the output: a proof observed before the moment
  * the caller requires cannot describe the world at that moment, so it is refused.
  */
-export function describeResourceFacts(proof, options = {}) {
+export function describeResourceFacts(proof: VerifiedRunnerInspection, options: ResourceFactsOptions = {}): ResourceFacts {
   const { maxAgeMs = 5000, requiredAt = null } = options
   const now = options.now ?? (() => performance.now())
 
@@ -106,7 +169,7 @@ export function describeResourceFacts(proof, options = {}) {
         ? INVALID_INFERENCES.stale_proof
         : reason === 'identity_mismatch'
           ? INVALID_INFERENCES.plain_json
-          : String(error?.message ?? error)
+          : error instanceof Error ? error.message : String(error)
     return {
       protocol: 'resource-facts/2',
       verdict: 'refused',
@@ -173,7 +236,7 @@ export function describeResourceFacts(proof, options = {}) {
   const possiblyActive = classified.filter(resource => resource.verdict === 'possibly_active')
   const unknown = classified.filter(resource => resource.verdict === 'unknown')
 
-  const detected = new Set()
+  const detected = new Set<string>()
   for (const resource of classified) {
     for (const reason of resource.reasons) {
       for (const [key, text] of Object.entries(INVALID_INFERENCES)) {
@@ -224,9 +287,13 @@ export function describeResourceFacts(proof, options = {}) {
 }
 
 /** Classify one resource from an AUTHENTICATED inspection. */
-export function classifyVerifiedResource(resource, inspection, endpoint = null) {
-  const reasons = []
-  const evidence = []
+export function classifyVerifiedResource(
+  resource: InspectionResource | null | undefined,
+  inspection: RunnerInspection,
+  endpoint: RunnerEndpoint | null = null,
+): ClassifiedResource {
+  const reasons: string[] = []
+  const evidence: string[] = []
 
   if (!resource || typeof resource.ref !== 'string' || resource.ref === '') {
     return { ref: null, verdict: 'unknown', reasons: ['the resource has no identity, so nothing can be concluded'], evidence }
@@ -268,7 +335,7 @@ export function classifyVerifiedResource(resource, inspection, endpoint = null) 
   if (!Array.isArray(resource.evidence) || resource.evidence.length === 0) {
     reasons.push('a quiescent report carries no evidence, so it cannot be audited')
   } else {
-    evidence.push(...resource.evidence)
+    evidence.push(...resource.evidence.map(item => String(item)))
   }
 
   const verdict = reasons.length === 0 ? 'verified_quiescent' : 'unknown'
@@ -280,7 +347,7 @@ export function classifyVerifiedResource(resource, inspection, endpoint = null) 
   return { ref: resource.ref, verdict, reasons, evidence, ownership: resource.ownership ?? null }
 }
 
-function notClaimed() {
+function notClaimed(): string[] {
   return [
     'that an unobserved writer does not exist',
     'that a new generation or execution state released any old resource',
@@ -290,7 +357,7 @@ function notClaimed() {
 }
 
 /** A stable digest so a consumer can detect that the trusted picture changed. */
-export function resourceFactsDigest(facts) {
+export function resourceFactsDigest(facts: ResourceFacts): string {
   const stable = [
     facts.protocol,
     facts.verdict,

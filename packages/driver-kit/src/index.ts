@@ -38,4 +38,4 @@ export {
 export { SENDER_OWNER, admitSend, consumeSendToken, inspectToken } from './send-admission.ts'
 
 // --- wave-09 B4: the bounded sender E calls directly -------------------------------------------
-export { NO_SEND, createReviewSender } from './review-sender.ts'
+export { NO_SEND, createReviewSender, send } from './review-sender.ts'

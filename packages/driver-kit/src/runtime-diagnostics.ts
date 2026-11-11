@@ -26,6 +26,75 @@ import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
+/** One capability row. */
+export type CapabilityRow = {
+  id: string
+  label: string
+  state: string
+  layer: string
+  admitsBilling: boolean
+  detail: string
+  invalidation: string
+}
+
+/** A caller-supplied capability override. May only weaken a billing-relevant row. */
+export type CapabilityOverride = { state?: string; layer?: string; detail?: string; invalidation?: string }
+
+/** A caller-supplied model identity with provenance. */
+export type ModelIdentityInput = { model?: string | null; modelProvider?: string | null; observedFrom?: string | null }
+
+/** Options for {@link describeRuntime}. */
+export type RuntimeDescriptionOptions = {
+  binary?: string
+  includePrivate?: boolean
+  capabilities?: Record<string, CapabilityOverride>
+  modelIdentity?: ModelIdentityInput | null
+}
+
+/** The observed identity of an installed CLI. */
+export type RuntimeIdentity = {
+  binary: string
+  declaredPath: string | null
+  realPath: string | null
+  digest: string | null
+  bytes: number | null
+  version: string | null
+  versionRaw: string | null
+  versionError: string | null
+  platform: string
+  arch: string
+  node: string
+  model: string | null
+  modelProvider: string | null
+  pathRedacted?: boolean
+}
+
+/** Measured host enforcement availability. */
+export type HostEnforcement = { available: boolean; mechanism: string | null; executable: string | null; evidence: string }
+
+/** Private machine facts, only present when explicitly requested. */
+export type PrivateFacts = { home: string; platformHome: string; knownPaths: Array<{ path: string; present: boolean }> }
+
+/** A blocked capability with what would invalidate its state. */
+export type BlockedCapability = { id: string; label: string; state: string; invalidation: string }
+
+/** The public runtime description. */
+export type RuntimeDescription = {
+  protocol: 'runtime-description/1'
+  usable: boolean
+  billableAdmitted: boolean
+  billingReasons: string[]
+  reasons: string[]
+  identity: RuntimeIdentity
+  enforcement: HostEnforcement
+  capabilities: CapabilityRow[]
+  blockedCapabilities: BlockedCapability[]
+  modelIdentity: { model: string | null; modelProvider: string | null; observedFrom: string | null } | null
+  pathRedacted: boolean
+  notClaimed: string[]
+  private?: PrivateFacts
+}
+
 /** Evidence layers, weakest to strongest for the claim each supports. */
 export const EVIDENCE_LAYERS = Object.freeze([
   'declared', // read from a document or version string
@@ -108,12 +177,12 @@ const CAPABILITY_ROWS = Object.freeze([
 /** Platforms whose local probing this module actually implements. */
 const PROBED_PLATFORMS = Object.freeze(['darwin', 'linux'])
 
-function run(command, args, timeoutMs = 20_000) {
+function run(command: string, args: string[], timeoutMs = 20_000): { ok: boolean; value: string | null; error?: string } {
   try {
     const value = execFileSync(command, args, { encoding: 'utf8', timeout: timeoutMs, stdio: ['ignore', 'pipe', 'ignore'] }).trim()
     return { ok: true, value }
   } catch (error) {
-    return { ok: false, value: null, error: String(error?.message ?? error) }
+    return { ok: false, value: null, error: (error instanceof Error ? error.message : String(error)) }
   }
 }
 
@@ -123,7 +192,7 @@ function run(command, args, timeoutMs = 20_000) {
  * `sha256` of the real file is what makes the identity comparable across upgrades: a version string
  * can repeat while the bytes change. Both are reported, and either being missing fails the light.
  */
-export function resolveRuntimeIdentity({ binary = 'codex' } = {}) {
+export function resolveRuntimeIdentity({ binary = 'codex' }: { binary?: string } = {}): RuntimeIdentity {
   const located = run('sh', ['-c', `command -v ${binary} 2>/dev/null || true`])
   const declaredPath = located.value || null
   let realPath = null
@@ -150,7 +219,7 @@ export function resolveRuntimeIdentity({ binary = 'codex' } = {}) {
     bytes,
     version: version.ok ? version.value : null,
     versionRaw: version.ok ? version.value : null,
-    versionError: version.ok ? null : version.error,
+    versionError: version.ok ? null : (version.error ?? null),
     platform: process.platform,
     arch: process.arch,
     node: process.version,
@@ -161,7 +230,7 @@ export function resolveRuntimeIdentity({ binary = 'codex' } = {}) {
 }
 
 /** Is a kernel-enforced host mechanism actually usable here? Measured by executing it. */
-export function probeHostEnforcement() {
+export function probeHostEnforcement(): HostEnforcement {
   if (process.platform === 'darwin') {
     const probe = run('sandbox-exec', ['-p', '(version 1)(allow default)', '/usr/bin/true'])
     return probe.ok
@@ -180,7 +249,7 @@ export function probeHostEnforcement() {
  * Private machine facts. Separated out so main decides whether any of it is projected: the default
  * description must never leak a home directory or a store path.
  */
-function privateFacts() {
+function privateFacts(): PrivateFacts {
   const home = homedir()
   const candidates = [
     join(home, '.codex', 'auth.json'),
@@ -206,7 +275,7 @@ function privateFacts() {
  * `measured` is true only when the caller names a real model and provider AND says where the values
  * came from. A bare pair with no provenance is not admitted as a measured identity.
  */
-export function suppliedModelIdentity(input) {
+export function suppliedModelIdentity(input: ModelIdentityInput | null | undefined): { measured: boolean; value: { model: string | null; modelProvider: string | null; observedFrom: string | null } | null; problem: string | null } {
   if (input === undefined || input === null) {
     return { measured: false, value: null, problem: 'no model/provider was measured, so billing cannot be admitted' }
   }
@@ -221,7 +290,7 @@ export function suppliedModelIdentity(input) {
   return { measured: true, value, problem: null }
 }
 
-export function describeRuntime(options = {}) {
+export function describeRuntime(options: RuntimeDescriptionOptions = {}): RuntimeDescription {
   const { binary = 'codex', includePrivate = false, capabilities = {} } = options
   const observed = resolveRuntimeIdentity({ binary })
   // Paths are private facts. The default projection publishes a redacted identity - enough to
@@ -318,7 +387,7 @@ export function describeRuntime(options = {}) {
  * measured and found to lack them; the measurement lives in the wave-07 dossier and is not
  * repeated here.
  */
-function defaultStateFor(id, { identity, enforcement }) {
+function defaultStateFor(id: string, { identity, enforcement }: { identity: RuntimeIdentity; enforcement: HostEnforcement }): string {
   switch (id) {
     case 'binary_identity':
       return identity.declaredPath && identity.digest ? 'supported' : 'absent'
@@ -341,7 +410,7 @@ function defaultStateFor(id, { identity, enforcement }) {
 }
 
 /** What would make this row's state stale. */
-function invalidationFor(id, state) {
+function invalidationFor(id: string, state: string): string {
   if (id === 'turn_budget_field' || id === 'pricing_surface') {
     return 'a protocol change that adds a per-turn ceiling or a price surface invalidates the absent verdict'
   }
@@ -355,7 +424,7 @@ function invalidationFor(id, state) {
 }
 
 /** Deterministic digest over the description minus volatile fields, so a consumer can detect drift. */
-export function descriptionDigest(description) {
+export function descriptionDigest(description: RuntimeDescription): string {
   const stable = {
     protocol: description.protocol,
     usable: description.usable,
