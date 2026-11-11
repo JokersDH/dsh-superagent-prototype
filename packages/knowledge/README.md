@@ -56,6 +56,21 @@ pnpm --filter @personal-agent/knowledge build
 node packages/knowledge/examples/assistant-loop.mjs
 ```
 
+## Effectiveness scan bounds (wave-06 continuation)
+
+`AssistantDecisionStore` never reports a partial project scan as complete knowledge:
+
+- `scanProject` pages the project until the port is exhausted. If the documented budget
+  (`DEFAULT_DECISION_SCAN`: 200 records/page, 200 pages = 40,000 decisions per project) is exceeded,
+  it throws `DecisionError('scan_incomplete')` instead of truncating.
+- `getSync` uses a targeted supersession probe that stops once it passes the target's `recordedAt`
+  (a superseder must be appended after its target) and also refuses on an exceeded bound.
+- `DecisionGovernance.listEffectiveWindow` reports `truncatedByLimit` when **the caller's own cap**
+  cut the effective set; `listEffective` keeps the cap-only signature. The store scan underneath is
+  still complete-or-refuse.
+- Limits are injectable (`new AssistantDecisionStore(port, { pageSize, maxPages })`) for regression
+  tests; lowering them proves the refusal path without a huge fixture.
+
 ## Persisted adapter (wave-04 C2)
 
 `AssistantDecisionStore` maps the shared synchronous `AssistantStatePort.decisions` to this domain
@@ -84,7 +99,12 @@ supersession state, then write through A's synchronous `AssistantStatePort`. Mai
 receipt/event in the same transaction; failures roll back. See
 `examples/decision-transaction.mjs` and `examples/assistant-workflow.mjs` for real temporary-SQLite
 consumers. The latter runs the web-flow recipe: authorized context preview -> proposal pending/confirm
-with receipt -> decision record with receipt -> revocation plan/commit -> old replay stays revoked.
+with receipt -> `planProposalCommand` mapping the confirmed intent to the existing `UserCommand` ->
+decision record with receipt -> revocation plan/commit -> old replay stays revoked.
+
+`test/full-loop.case.ts` covers the same loop plus unconfirmed/drifted confirmation, duplicate
+confirmation, receipt-failure rollback (decision + event + receipt), reopen, supersession, revoke with
+no resurrection, source loss and same-id body conflict.
 
 ## Wave-04 checkpoint
 
