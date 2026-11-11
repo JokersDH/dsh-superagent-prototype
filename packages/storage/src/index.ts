@@ -139,6 +139,10 @@ export { RoutingEvidence, type RoutingEvidenceSources } from './routing-evidence
 export { AcceptanceOutcomeProjection, type AcceptanceProjectionInput, type AcceptanceProjectionResult } from './acceptance-outcome.ts'
 export { RecoveryIntents, type RecoveryIntentInput, type RecoveryIntentRecord, type RecoveryIntentPage } from './recovery-intents.ts'
 export { RecoveryActivations } from './recovery-activations.ts'
+export {
+  RecoveryTargetInventoryReaderImpl, TARGET_TABLE_CATEGORIES, createRecoveryTargetInventoryReader,
+  migratedTableNames, recoveryTargetInventory,
+} from './target-inventory.ts'
 export { ArtifactStore, ensureArtifactRoot, artifactRoot, stateDirOf, type ArtifactRecord, type WrittenArtifact, type GcResult } from './artifacts.ts'
 export {
   RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict, AuthorityConflict,
