@@ -8,7 +8,7 @@ export const DecisionPrepareSchema = z.strictObject({
   content: z.string().trim().min(1).max(16384).refine(value => !value.includes('\0')),
   scope: ScopeSchema, supersedes: IdSchema.optional(),
 }).refine(value => value.projectId === value.scope.projectId, 'Decision scope must match the requested project')
-const token = z.string().min(16).max(50000).regex(/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/)
+const token = z.string().min(16).max(150000).regex(/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/)
 export const DecisionPreviewSchema = z.strictObject({
   protocol: z.literal('decision-preview/1'), decision: UserDecisionSchema,
   conversationId: IdSchema, sourceMessageId: IdSchema, expiresAt: TimestampSchema, token,

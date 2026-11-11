@@ -1,6 +1,12 @@
 # 第七轮：集成收口、恢复新工作与可核算试点
 
+新派工已由[第八轮](../product-wave-08/README.zh-CN.md)接续，保留原目录/分支、报告和全部预算。当前B费用可行性调查已收敛，研究封存BLOCKED；A/C/D/E剩余问题与主线责任见[0029](../../docs/rfcs/WP-16/0029-wave-08-product-closure-and-reviewed-inputs.md)。不要以重跑旧任务刷新额度或沿用过期缺接口描述。
+
 日期2026-11-11，派工基线`d4d51ae`。本轮延续原A–E工作区/分支与所有权，每包六阶段连续执行；不是从零重做第六轮。wave-05修订01和原预算账继续有效。计划/接口设计不计作产品完成。
+
+主线首批实际接口：[0027](../../docs/rfcs/WP-16/0027-wave-07-command-and-recovery-checkpoint.md)，源码da54758。A/C消费者源码已最小集成，应用同步命令companion和恢复意图fact port已可消费；恢复目标启动/HTTP提交尚未开放。C有效列表撤销后复活旧项的独立反例已补入C任务，不能由包内PASS覆盖。
+
+第二实际检查点：[0028提案HTTP闭环](../../docs/rfcs/WP-16/0028-wave-07-proposal-http-and-admission.md)，源码627ef0d。新建/修订/记决定三种显式确认已接真实事务，46项HTTP/恢复与33项受控/流式/设置通过；提案网页仍待M3。A新intent port读回/共享接口不匹配、D fresh first-run空值崩溃已补原包，均未整批准入。
 
 先读 [共享边界0026](../../docs/rfcs/WP-16/0026-wave-07-integration-and-admission.md)、[0025已实现接口](../../docs/rfcs/WP-16/0025-outcome-projection-and-recovery-preflight.md)、自己的完整任务及本页末尾启动指令。
 
@@ -76,7 +82,7 @@ E仍仅wave05-independent-review-pilot-01：24原生turn启动、200000累计计
 
 每包最终交branch/base/source、owned paths、接口checkpoint、实际命令/退出码、source/artifact/预算身份、分层结论、剩余owner及下一consumer步骤。安装物不混不同源码；研究结果不混协议fixture；报告存在或自报executed不是通过证据。root lock仅main更新，agents自己的临时解析diff不提交。
 
-只读计划检查：`node agent-tasks/product-wave-07/verify.mjs`。它不运行产品、模型或改账，也不授予准入。所有本轮阶段初始NOT_STARTED。
+只读计划检查：`node agent-tasks/product-wave-07/verify.mjs`。它不运行产品、模型或改账，也不授予准入。dispatch.json保留派工时所有阶段初始NOT_STARTED的快照；主线当前实测和未完成项以[集成状态](../../reports/releases/wave07-integration/status.json)为准，各owner更新自己的权威状态。
 
 ## 统一启动指令
 

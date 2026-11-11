@@ -147,7 +147,10 @@ export {
   type RuntimeObservationRow, type ResourceObservationRow, type ResourceObservationSummary,
   type AttemptObservationSummary, type WriterStatus,
 } from './observations.ts'
-export { backupDatabase, verifyDatabase, readArtifactRegistry, readRoutingArtifactRefs, type ArtifactRegistryRow, type BackupResult, type VerifyResult } from './backup.ts'
+export {
+  backupDatabase, verifyDatabase, readArtifactRegistry, readRoutingArtifactRefs, readWorkflowEvidence,
+  type ArtifactRegistryRow, type WorkflowEvidenceFamily, type WorkflowEvidenceSummary, type BackupResult, type VerifyResult,
+} from './backup.ts'
 export { WriterLock, WriterLockHeld, type LockContent, type LockProbe, type LockRegistry, type LockVerdict } from './writer-lock.ts'
 export {
   MIGRATIONS, PRODUCT_SCHEMA_VERSION, applyMigrations, migrationChecksum, refuseUnknownDatabase,
