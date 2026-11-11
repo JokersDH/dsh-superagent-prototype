@@ -8,6 +8,8 @@ import './workbench.css'
 import './attention.css'
 import './decisions.css'
 import './proposals.css'
+import './evidence.css'
+import './context.css'
 
 const fixtureMode = import.meta.env.VITE_CONSOLE_MODE !== 'http'
 const transport = fixtureMode ? new FixtureAdapter(window.sessionStorage) : new HttpTransport()
