@@ -30,6 +30,7 @@
     "@hono/node-server": "2.1.6",
     "@personal-agent/application": "workspace:*",
     "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/context": "workspace:*",
     "@personal-agent/knowledge": "workspace:*",
     "@personal-agent/proposals": "workspace:*",
     "@personal-agent/routing": "workspace:*",

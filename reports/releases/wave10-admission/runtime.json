@@ -1,0 +1,183 @@
+{
+  "status": "FAIL_SCOPED_NEW_RUNTIME_MODULE_ADMISSION",
+  "command": [
+    "node",
+    "tools/bootstrap/probe-wave10-runtime.mjs",
+    "/Users/hh/Desktop/joker/superagent-agent-b",
+    "/Users/hh/Desktop/joker/superagent-agent-e"
+  ],
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "sourceCommit": "1175053d1598cd981a1bb20812d56a61fd4be277",
+  "sourceWorktreeClean": true,
+  "publishedSource": "1175053d1598cd981a1bb20812d56a61fd4be277",
+  "baseCommit": "531c6b68a518851bd813c1b8e0ce32c3dcefefdd",
+  "sourceHashes": {
+    "packages/execution/src/resource-facts.ts": "dc529585ce888a8ac179a0465727a9d68b7cf4588e057ed7c25d6de3d6bc44d7",
+    "packages/driver-kit/src/send-admission.ts": "2699874514c0d5da2028046c7178f666bd8d4d225d88ccd452c67ce987e80f24",
+    "packages/driver-kit/src/review-sender.ts": "f4fc14f4edb1d6db413cd9dcd0150fe46dec6060fdf96ff5a6a8c7c9c79660f8",
+    "packages/driver-kit/src/runtime-diagnostics.ts": "02f2cf72ea333646fe081aa867245aa24be17f53668b475626913be3280a8f8f"
+  },
+  "evaluatorSource": "57f5d19daf033bbf021083440d56ff06979508bf",
+  "checkedAt": "2026-11-11T13:22:22.283Z",
+  "cases": [
+    {
+      "id": "PLAIN_RESOURCE_JSON_HAS_NO_RELEASE_AUTHORITY",
+      "scope": "diagnostic_module",
+      "status": "PASS",
+      "observation": {
+        "verdict": "refused",
+        "releaseBarrierSatisfied": false
+      }
+    },
+    {
+      "id": "ONE_TOKEN_CONCURRENT_CONSUMPTION_SENDS_AT_MOST_ONCE",
+      "scope": "experimental_sender_helper",
+      "status": "PASS",
+      "observation": {
+        "sends": 1,
+        "refusals": 1
+      }
+    },
+    {
+      "id": "DEFAULT_REVIEW_SENDER_REMAINS_BLOCKED_WITHOUT_BOUND",
+      "scope": "experimental_sender_helper",
+      "status": "PASS",
+      "observation": {
+        "sent": false,
+        "fakeSends": 0
+      }
+    },
+    {
+      "id": "INPUT_STAYS_FROZEN_WHILE_RESERVATION_IS_AWAITED",
+      "scope": "experimental_sender_immutable_request_contract",
+      "status": "FAIL",
+      "message": "The immutable request contract must either retain the admitted input or refuse its mutation\n\ntrue !== false\n",
+      "observation": {
+        "result": {
+          "sent": true,
+          "status": "sent",
+          "reason": null,
+          "attempts": 1,
+          "sends": 1,
+          "tokenState": {
+            "issued": true,
+            "claimed": true
+          }
+        },
+        "fakeSends": 1,
+        "receivedPrompt": "changed after admission",
+        "receivedMaterialDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    },
+    {
+      "id": "FIXED_TRANSPORT_CANNOT_REPLACE_ITS_METHOD_AFTER_ISSUANCE",
+      "scope": "experimental_sender_fixed_transport_contract",
+      "status": "FAIL",
+      "message": "Binding transport object identity must also preserve the admitted implementation\n\n1 !== 0\n",
+      "observation": {
+        "result": {
+          "sent": true,
+          "reservation": {
+            "admitted": true,
+            "reservationId": "fixture-1"
+          },
+          "result": {
+            "turnId": "replacement-fixture"
+          },
+          "tokenConsumed": true
+        },
+        "originalFakeSends": 0,
+        "replacementFakeSends": 1
+      }
+    },
+    {
+      "id": "E_CONSUMER_CAN_CALL_THE_ACTUAL_B_SENDER_ENTRY",
+      "scope": "experimental_B_E_consumer_integration",
+      "status": "FAIL",
+      "message": "E requires a module-level send export; the B factory alone is not that consumer entry\n\ntrue !== false\n",
+      "observation": {
+        "ok": false,
+        "reason": "b_sender_unavailable",
+        "detail": "missing export"
+      }
+    },
+    {
+      "id": "NEW_PUBLIC_MODULES_PASS_THE_EXISTING_STRICT_TYPESCRIPT_CONTRACT",
+      "scope": "new_module_integration",
+      "status": "FAIL",
+      "message": "Public TS exports must compile under the main strict settings; strip-only runtime tests cannot establish this\n\n2 !== 0\n",
+      "observation": {
+        "command": [
+          "pnpm",
+          "exec",
+          "tsc",
+          "--ignoreConfig",
+          "--noEmit",
+          "--strict",
+          "--skipLibCheck",
+          "--target",
+          "ES2024",
+          "--module",
+          "NodeNext",
+          "--moduleResolution",
+          "NodeNext",
+          "--allowImportingTsExtensions",
+          "--types",
+          "node",
+          "packages/driver-kit/src/runtime-diagnostics.ts",
+          "packages/driver-kit/src/send-admission.ts",
+          "packages/driver-kit/src/review-sender.ts",
+          "packages/execution/src/resource-facts.ts"
+        ],
+        "exitCode": 2,
+        "diagnosticCount": 76,
+        "perFile": {
+          "packages/driver-kit/src/review-sender.ts": 17,
+          "packages/driver-kit/src/runtime-diagnostics.ts": 15,
+          "packages/driver-kit/src/send-admission.ts": 25,
+          "packages/execution/src/resource-facts.ts": 19
+        },
+        "firstDiagnostics": [
+          "packages/driver-kit/src/review-sender.ts(30,38): error TS2339: Property 'transport' does not exist on type '{ costBound?: null | undefined; profile?: null | undefined; hostPolicy?: null | undefined; }'.",
+          "packages/driver-kit/src/review-sender.ts(30,49): error TS2339: Property 'hook' does not exist on type '{ costBound?: null | undefined; profile?: null | undefined; hostPolicy?: null | undefined; }'.",
+          "packages/driver-kit/src/review-sender.ts(30,55): error TS2339: Property 'grant' does not exist on type '{ costBound?: null | undefined; profile?: null | undefined; hostPolicy?: null | undefined; }'.",
+          "packages/driver-kit/src/review-sender.ts(30,62): error TS2339: Property 'audit' does not exist on type '{ costBound?: null | undefined; profile?: null | undefined; hostPolicy?: null | undefined; }'.",
+          "packages/driver-kit/src/review-sender.ts(43,25): error TS2339: Property 'caseRef' does not exist on type '{ turn?: number | undefined; subject?: null | undefined; gates?: {} | undefined; modelIdentity?: null | undefined; }'.",
+          "packages/driver-kit/src/review-sender.ts(43,60): error TS2339: Property 'input' does not exist on type '{ turn?: number | undefined; subject?: null | undefined; gates?: {} | undefined; modelIdentity?: null | undefined; }'.",
+          "packages/driver-kit/src/review-sender.ts(51,42): error TS2339: Property 'cost_bound' does not exist on type '{}'.",
+          "packages/driver-kit/src/review-sender.ts(55,69): error TS2339: Property 'cost_bound' does not exist on type '{}'."
+        ]
+      }
+    }
+  ],
+  "exitCode": 1,
+  "observedTrustedConstruction": {
+    "costBoundAvailableClaim": true,
+    "fakeSends": 1,
+    "sent": true,
+    "interpretation": "Factory parameters are trusted internal construction today; this observation is not a proven user-facing permission bypass."
+  },
+  "independentOwnedTests": {
+    "command": "node --test packages/execution/test/resource-facts.test.ts packages/driver-kit/test/send-admission.test.ts packages/driver-kit/test/review-sender.test.ts packages/driver-kit/test/runtime-diagnostics.test.ts",
+    "passed": 68,
+    "failed": 0,
+    "exitCode": 0
+  },
+  "controlledWindows": {
+    "command": "node tests/native-acceptance/b11-control-windows.mjs",
+    "passed": 10,
+    "notTested": 1,
+    "failed": 0,
+    "exitCode": 0
+  },
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "limitations": [
+    "All sender transports/reservations are local in-memory fakes. No ledger file is read or written, and no model/native turn is sent.",
+    "The immutable-input and fixed-method findings concern experimental helper interface promises; no current personal-product reachability is claimed.",
+    "Main currently does not consume these helpers; the existing authenticated production resource barrier remains the execution authority.",
+    "B resource facts do not replace main current-binding and exact registered-resource-manifest validation.",
+    "The B/E check calls actual E guardedSend with the actual B module; it proves an export/return-contract mismatch, not pilot value or native compatibility.",
+    "B9 protocol discovery was not rerun: it opens native protocol sessions, is historical evidence and is unnecessary for this zero-model bounded audit."
+  ]
+}

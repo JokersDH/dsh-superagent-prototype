@@ -14,11 +14,13 @@ import { ExecutionProfileRefSchema, ReviewSubjectSchema, ReviewReportSchema, Rou
 import { ReviewTimingSchema, ReviewActivitySchema } from '../src/review-timing.ts';
 import { AttentionItemSchema, AttentionPageSchema, AttentionQuerySchema, AttentionRankSchema } from '../src/attention.ts';
 import { DecisionPrepareSchema, DecisionPreviewSchema, DecisionCommandSchema, DecisionQuerySchema, DecisionViewSchema, DecisionPageSchema } from '../src/decision-commands.ts';
-import { WorkEvidenceSchema } from '../src/work-evidence.ts';
+import { WorkEvidenceSchema, WorkEvidenceHistorySchema, WorkEvidenceHistoryQuerySchema } from '../src/work-evidence.ts';
 import { RecoveryInspectionSchema, RecoveryPrepareSchema, RecoveryPlanSchema } from '../src/recovery-state.ts';
 import { RecoveryActivationIntentSchema, RecoveryActivationCommitSchema, RecoveryActivationRecordSchema } from '../src/recovery-activation.ts';
 import { ProposalPrepareSchema, ProposalPreviewSchema, ProposalCommandSchema } from '../src/proposal-commands.ts';
 import { RecoveryTargetConfigurationSchema, RecoveryTargetPreparationSchema, RecoveryTargetMaterialSchema, RecoveryTargetInventorySchema } from '../src/recovery-target.ts';
+import { ContextPreviewInputSchema, ContextPreviewSchema } from '../src/context-preview.ts';
+import { AssistantContextBindingSchema } from '../src/assistant-context.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -78,6 +80,9 @@ outputs.set('generated/decisions.manifest.json', canonical({ protocol: 'decision
 const workEvidenceText = canonical({ ...z.toJSONSchema(WorkEvidenceSchema, { target: 'draft-2020-12', io: 'input' }), $id: 'urn:personal-agent:work-evidence:1' });
 outputs.set('generated/work-evidence.schema.json', workEvidenceText);
 outputs.set('generated/work-evidence.manifest.json', canonical({ protocol: 'work-evidence/1', schemaHash: digest(workEvidenceText), sourceHash: digest(readFileSync(resolve(root, 'src/work-evidence.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const evidenceHistoryText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:work-evidence-history:1', $defs: { WorkEvidenceHistory: z.toJSONSchema(WorkEvidenceHistorySchema, { target: 'draft-2020-12', io: 'input' }), WorkEvidenceHistoryQuery: z.toJSONSchema(WorkEvidenceHistoryQuerySchema, { target: 'draft-2020-12', io: 'input' }) } });
+outputs.set('generated/work-evidence-history.schema.json', evidenceHistoryText);
+outputs.set('generated/work-evidence-history.manifest.json', canonical({ protocol: 'work-evidence-history/1', schemaHash: digest(evidenceHistoryText), sourceHash: digest(readFileSync(resolve(root, 'src/work-evidence.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 const recoveryText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:recovery-inspection:1', $defs: { RecoveryInspection: z.toJSONSchema(RecoveryInspectionSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryPrepare: z.toJSONSchema(RecoveryPrepareSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryPlan: z.toJSONSchema(RecoveryPlanSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/recovery.schema.json', recoveryText);
 outputs.set('generated/recovery.manifest.json', canonical({ protocol: 'recovery-inspection/1', schemaHash: digest(recoveryText), sourceHash: digest(readFileSync(resolve(root, 'src/recovery-state.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
@@ -90,6 +95,12 @@ outputs.set('generated/proposals.manifest.json', canonical({ protocol: 'proposal
 const recoveryTargetText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:recovery-target:1', $defs: { RecoveryTargetConfiguration: z.toJSONSchema(RecoveryTargetConfigurationSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryTargetPreparation: z.toJSONSchema(RecoveryTargetPreparationSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryTargetMaterial: z.toJSONSchema(RecoveryTargetMaterialSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryTargetInventory: z.toJSONSchema(RecoveryTargetInventorySchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/recovery-target.schema.json', recoveryTargetText);
 outputs.set('generated/recovery-target.manifest.json', canonical({ protocol: 'recovery-target-preparation/1', schemaHash: digest(recoveryTargetText), sourceHash: digest(readFileSync(resolve(root, 'src/recovery-target.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const contextPreviewText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:context-preview:1', $defs: { ContextPreviewInput: z.toJSONSchema(ContextPreviewInputSchema, { target: 'draft-2020-12', io: 'input' }), ContextPreview: z.toJSONSchema(ContextPreviewSchema, { target: 'draft-2020-12', io: 'input' }) } });
+outputs.set('generated/context-preview.schema.json', contextPreviewText);
+outputs.set('generated/context-preview.manifest.json', canonical({ protocol: 'context-preview/1', schemaHash: digest(contextPreviewText), sourceHash: digest(readFileSync(resolve(root, 'src/context-preview.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const assistantContextText = canonical({ ...z.toJSONSchema(AssistantContextBindingSchema, { target: 'draft-2020-12', io: 'input' }), $id: 'urn:personal-agent:assistant-context-binding:1' });
+outputs.set('generated/assistant-context.schema.json', assistantContextText);
+outputs.set('generated/assistant-context.manifest.json', canonical({ protocol: 'assistant-context-binding/1', schemaHash: digest(assistantContextText), sourceHash: digest(readFileSync(resolve(root, 'src/assistant-context.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [path, content] of outputs) {
   const target = resolve(root, path);
   if (check) {
