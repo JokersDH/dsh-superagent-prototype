@@ -1,20 +1,82 @@
 {
   "role": "A",
-  "package": ["packages/storage", "packages/workflows"],
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
   "branch": "codex/g2-workspaces-verification",
   "mainBaseCommit": "6f6edde",
   "mergeCommit": "66360f7",
   "interfaceCheckpoint": "c3990c2",
-  "testedSourceCommit": "c3990c2",
-  "migrations": [13],
+  "testedSourceCommit": "2c5d002",
+  "migrations": [
+    13
+  ],
   "productSchema": 13,
   "phases": [
-    {"phase":"A1","status":"PASS","scope":"package-local","evidence":["routing/acceptance tests","shared parsers","merged base 6f6edde"]},
-    {"phase":"A2","status":"PASS","scope":"package-local","evidence":["packages/workflows/test/acceptance.case.ts (4 cases)","reports/wave06-workflow-tests.txt"],"note":"same-transaction consume, replay/reopen no double count, rollback, new candidate separate outcome, unknown timing null"},
-    {"phase":"A3","status":"PASS","scope":"package-local","evidence":["routing/timeline/source tests","main attention consumes index.listWorks"],"note":"bounded exact-project reads; no second Work lifecycle"},
-    {"phase":"A4","status":"PASS","scope":"main composition (controlled)","evidence":["packages/workflows/test/decision-consumer.case.ts 4/4","tests/integration/decision-commands.case.mjs 8/8","tests/integration/review-timing.case.mjs 3/3","reports/wave06-decision-integration.txt"],"note":"real C AssistantDecisionStore/DecisionTransactionService on A port; prepare read-only, commit/replay/conflict/revoke/source invalidation/rollback; old blocker removed"},
-    {"phase":"A5","status":"PASS","scope":"package-local","evidence":["packages/workflows/test/snapshot-d.case.ts 2/2","examples/d-snapshot-restore.mjs","reports/wave06-d-snapshot-recipe.json"],"note":"schema13 snapshot evidence summary, missing/corrupt/hash-re-record/future schema blocked, byte-copy restore readback"},
-    {"phase":"A6","status":"PASS","scope":"package-local","evidence":["reports/wave06-*.txt","reports/wave06-performance.json"],"note":"bounded verification and documented handoff"}
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "routing/acceptance tests",
+        "shared parsers",
+        "merged base 6f6edde"
+      ]
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "packages/workflows/test/acceptance.case.ts (4 cases)",
+        "reports/wave06-workflow-tests.txt"
+      ],
+      "note": "same-transaction consume, replay/reopen no double count, rollback, new candidate separate outcome, unknown timing null"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "routing/timeline/source tests",
+        "main attention consumes index.listWorks"
+      ],
+      "note": "bounded exact-project reads; no second Work lifecycle"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "main composition (controlled)",
+      "evidence": [
+        "packages/workflows/test/decision-consumer.case.ts 4/4",
+        "tests/integration/decision-commands.case.mjs 8/8",
+        "tests/integration/review-timing.case.mjs 3/3",
+        "reports/wave06-decision-integration.txt"
+      ],
+      "note": "real C AssistantDecisionStore/DecisionTransactionService on A port; prepare read-only, commit/replay/conflict/revoke/source invalidation/rollback; old blocker removed"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "packages/workflows/test/snapshot-d.case.ts 2/2",
+        "examples/d-snapshot-restore.mjs",
+        "reports/wave06-d-snapshot-recipe.json"
+      ],
+      "note": "schema13 snapshot evidence summary, missing/corrupt/hash-re-record/future schema blocked, byte-copy restore readback"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "reports/wave06-*.txt",
+        "reports/wave06-performance.json"
+      ],
+      "note": "bounded verification and documented handoff"
+    }
   ],
   "results": {
     "storageTests": "75/75",
@@ -31,10 +93,26 @@
     "unknownModelSends": 0
   },
   "blockers": [
-    {"owner":"main","id":"acceptance-consume-wiring","detail":"Main must call acceptance.consume inside the real accept_candidate transaction with the trusted profile/layer; A cannot wire application composition."},
-    {"owner":"D/main","id":"restore-authorization","detail":"Byte snapshot, evidence summary and verification are available; actual restore/rollback/new-authorization remain main/D policy."},
-    {"owner":"B/E","id":"native-pilot","detail":"Native/Codex control, E pilot and value claims are outside A; zero model tasks and no actual_native evidence."},
-    {"owner":"main","id":"root-lock-request","detail":"packages/workflows now declares test-only @personal-agent/knowledge workspace dependency; main regenerates root lock. Local node_modules link is uncommitted."}
+    {
+      "owner": "main",
+      "id": "acceptance-consume-wiring",
+      "detail": "Main must call acceptance.consume inside the real accept_candidate transaction with the trusted profile/layer; A cannot wire application composition."
+    },
+    {
+      "owner": "D/main",
+      "id": "restore-authorization",
+      "detail": "Byte snapshot, evidence summary and verification are available; actual restore/rollback/new-authorization remain main/D policy."
+    },
+    {
+      "owner": "B/E",
+      "id": "native-pilot",
+      "detail": "Native/Codex control, E pilot and value claims are outside A; zero model tasks and no actual_native evidence."
+    },
+    {
+      "owner": "main",
+      "id": "root-lock-request",
+      "detail": "packages/workflows now declares test-only @personal-agent/knowledge workspace dependency; main regenerates root lock. Local node_modules link is uncommitted."
+    }
   ],
   "notTested": [
     "main acceptance.consume production wiring",
@@ -48,5 +126,7 @@
     "consume routingEvidence/timeline in any new advice UI; reject stale subject/profile/layer",
     "use WorkflowSnapshots evidence summary and keep restore/authorization in main/D",
     "re-run tests/integration/decision-commands.case.mjs against the final integrated commit"
-  ]
+  ],
+  "deliveryCommit": "2c5d002",
+  "updatedAt": "2026-11-11T00:00:00.000Z"
 }

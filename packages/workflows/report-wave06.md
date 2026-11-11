@@ -2,7 +2,7 @@
 
 - Branch: `codex/g2-workspaces-verification`
 - Main base: `6f6edde`; merge checkpoint: `66360f7`
-- Runnable checkpoint: `c3990c2`; final source commit is recorded in `reports/wave06-status.json`
+- Runnable checkpoint: `c3990c2`; final source: `2c5d002`
 - Owned paths: `packages/storage/`, `packages/workflows/`
 - Model tasks: **0**; unknown sends: **0**; no user service, account or native run
 
