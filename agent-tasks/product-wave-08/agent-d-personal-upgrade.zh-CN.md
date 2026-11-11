@@ -4,6 +4,8 @@
 
 本轮不重造已有双binary升级框架。eca5674的fresh-source null已修、两个真实不同tar存在；新目标要在main集成source上重冻，旧E安装组合不等于最新目标独立准入。大成果是实际personal模式、进程、指针和数据一致的升级/恢复路径。
 
+可先消费main b436fde的提案UI与GET /v1/recovery/activations/:id，见[0030](../../docs/rfcs/WP-16/0030-wave-08-proposal-workbench-and-source-audit.md)。该GET核对A生产facts/原receipt，但固定not_granted/startupAvailable=false，不是target启动授权。schema15已进入main，最终target/升级mode准入仍独立；保留新个人预览5186/8802。
+
 ## D1 先修模式切换与未知进程反例
 
 合并main，升级启动不得固定--fixture：保留原personal/fixture模式、项目/state/profile/端口与实例身份，无法核对就拒绝，不静默降级。无native版本可用也不自动换fixture。

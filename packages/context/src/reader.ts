@@ -23,6 +23,8 @@ const KIND_ORDER: Record<ContextSourceDescriptor['kind'], number> = {
   decision: 6,
   verification: 5,
   delivery: 4,
+  artifact: 3,
+  conversation_message: 3,
   project_metadata: 3,
   document: 2,
   source_file: 1,

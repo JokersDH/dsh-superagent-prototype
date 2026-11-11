@@ -44,6 +44,35 @@ export type {
   ReadIndexWorkView,
   WorkspaceReadIndex,
 } from './read-index-port.ts'
+export {
+  ContextComposer,
+  COMPOSITION_BUDGET_CEILINGS,
+  DEFAULT_COMPOSED_GROUPS,
+  authorizeComposition,
+  buildCompositionPreview,
+  buildSourceManifest,
+} from './composer.ts'
+export type {
+  ComposedSourceManifest,
+  ComposedSourceManifestEntry,
+  CompositionAuthorization,
+  ResolvedCompositionBudget,
+} from './composer.ts'
+export type {
+  ComposedArtifactProvider,
+  ComposedArtifactView,
+  ComposedConversationMessage,
+  ComposedConversationProvider,
+  ComposedDecisionProvider,
+  ComposedDecisionView,
+  ComposedGroupName,
+  ComposedGroupPlan,
+  ComposedGroupResult,
+  ContextComposerOptions,
+  ContextComposerSources,
+  ContextComposition,
+  ContextCompositionRequest,
+} from './composer.ts'
 export { buildContextPreview } from './preview.ts'
 export type { ContextPreview, ContextPreviewFile } from './preview.ts'
 export type { LocalProjectSourcePortOptions } from './local-port.ts'

@@ -1,0 +1,12 @@
+{
+  "source": "b436fde158a8dd14015c3705550bd3ff0d0fd307",
+  "consoleURL": "http://127.0.0.1:5186/",
+  "apiPort": 8802,
+  "state": ".local-state/wave08-proposal-preview",
+  "health": {"ready": true, "mode": "personal", "access": "local-development"},
+  "initialRead": {"consoleStatus": 200, "proposalsAvailable": true, "projects": 2, "nativeProfiles": 1, "works": 0, "messages": 0},
+  "keyboardProbe": {"status": "PASS_PREVIEW_KEYBOARD_AND_NARROW_VIEWPORT", "keyboardOpen": true, "outsideInteractiveFocus": false, "chromeBoundaryObserved": 1, "escapeCloses": true, "focusRestored": true, "narrowViewport": 320, "headerOverlap": false},
+  "oldInstancesRestartedOrMigrated": false,
+  "agentInitiatedModelOrNativeTurns": 0,
+  "limitations": ["Keyboard probe reads the live empty preview and sends no command/model request", "Native browser focus navigation may visit browser chrome; no outside page control became focused", "This is not an assistive-technology or full-product audit", "Initial state counts do not claim future user actions remain zero"]
+}

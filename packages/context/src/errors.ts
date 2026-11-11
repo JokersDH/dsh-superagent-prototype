@@ -10,6 +10,8 @@ export type ContextErrorCode =
   | 'unsupported_port'
   | 'denied_path'
   | 'cross_project'
+  | 'scan_incomplete'
+  | 'composition_invalid'
 
 /** Fatal request refusal. Insufficient or stale data is reported in the bundle instead. */
 export class ContextError extends Error {
@@ -30,6 +32,8 @@ export type ContextSourceFailure =
   | 'oversized'
   | 'denied_path'
   | 'cross_project'
+  | 'scan_incomplete'
+  | 'composition_invalid'
   | 'stale'
 
 export class ContextSourceAccessError extends Error {
