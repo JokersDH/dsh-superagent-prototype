@@ -255,7 +255,7 @@ const CAPABILITIES = [
       'E4-INSTALL-ROLLBACK',
     ],
     notTested: [
-      'PA_CONFIG_ROOT 覆盖后 release.json 缺失，base 与 upgrade 两个产物均复现（owner D）。',
+      'target 已修复 PA_CONFIG_ROOT 初始化；baseline 的失败只作历史，不映射到 target。',
       '跨机器/跨 ABI 未测；只测 darwin/arm64 + Node 24.21.x + ABI 137。',
     ],
   },
@@ -475,7 +475,7 @@ ${rows
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | 见 \`installed-alpha\` tier；target 的 cold install/config root/doctor、备份恢复、显式 baseline→target 升级与未知 PID 阻断均独立通过 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK；旧 baseline 的 config-root 失败仅作历史。 |
+| 安装准入（个人 Alpha） | 见 \`installed-alpha\` tier；target 的 cold install/config root/doctor、备份恢复、显式 baseline→target 升级与未知 PID 阻断均独立通过 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK；旧 baseline 的 config-root 失败仅作历史，旧组合结果不映射到 target。 |
 
 安装物身份（显式 baseline/target）：baseline \`wave06-alpha-b0f87c88\` / buildId \`b0f87c883aa6b206\` / schema 12 / tar \`8b728b61…b5c5d\` / source \`9046d4c5\`（dirty，仅作基线）；target \`wave07-target-9120a5ed\` / buildId \`9120a5ed858e0feb\` / schema 13 / tar \`bbc13312…7912\` / source \`76f26a66\`（clean）。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 baseline→target 组合成立；旧 wave06 组合的结果保留为历史。
 

@@ -359,8 +359,9 @@ export async function runInstall({ root, runDirectory, keep = false }) {
   }
 
   const workspace = mkdtempSync(join(tmpdir(), 'pa-e-install-'))
-  const install = join(workspace, 'base')
-  const upgradeInstall = join(workspace, 'upgrade')
+  // `install` is the candidate under test; `upgradeInstall` holds the historical baseline.
+  const install = join(workspace, 'target')
+  const upgradeInstall = join(workspace, 'baseline')
   const pristine = join(workspace, 'pristine')
   let stopped = false
   const stopAll = () => {
@@ -377,8 +378,8 @@ export async function runInstall({ root, runDirectory, keep = false }) {
   try {
     mkdirSync(install, { recursive: true })
     mkdirSync(upgradeInstall, { recursive: true })
-    execFileSync('tar', ['-xzf', ARTIFACTS.base.tarPath, '-C', install, '--strip-components=1'])
-    execFileSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', upgradeInstall, '--strip-components=1'])
+    execFileSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', install, '--strip-components=1'])
+    execFileSync('tar', ['-xzf', ARTIFACTS.base.tarPath, '-C', upgradeInstall, '--strip-components=1'])
 
     await push(define('E4-INSTALL-ARTIFACT-IDENTITY', 'The frozen install bytes match the recorded artifact identity'), async ({ assert, evidence }) => {
       for (const artifact of [ARTIFACTS.base, ARTIFACTS.upgrade]) {
@@ -387,13 +388,13 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       }
       const manifest = JSON.parse(readFileSync(join(install, 'install.json'), 'utf8'))
       assert('INSTALL_PROTOCOL', manifest.format === 'pa-install' && manifest.formatVersion === 1, manifest.format)
-      assert('INSTALL_BUILD_ID', manifest.buildId === EXPECTED.buildId, manifest.buildId)
-      assert('INSTALL_MANIFEST_DIGEST', digest(join(install, 'install.json')) === EXPECTED.installManifestSha256, digest(join(install, 'install.json')))
-      assert('RELEASE_MANIFEST_DIGEST', digest(join(install, 'var/config/release.json')) === EXPECTED.releaseManifestSha256, digest(join(install, 'var/config/release.json')))
+      assert('INSTALL_BUILD_ID', manifest.buildId === ARTIFACTS.upgrade.buildId, manifest.buildId)
+      assert('INSTALL_MANIFEST_DIGEST', digest(join(install, 'install.json')) === ARTIFACTS.upgrade.installManifestSha256, digest(join(install, 'install.json')))
+      assert('RELEASE_MANIFEST_DIGEST', digest(join(install, 'var/config/release.json')) === ARTIFACTS.upgrade.releaseManifestSha256, digest(join(install, 'var/config/release.json')))
       assert('PRODUCER_PLATFORM', manifest.producer.platform === PLATFORM.platform && manifest.producer.arch === PLATFORM.arch, `${manifest.producer.platform}/${manifest.producer.arch}`)
       assert('PRODUCER_NODE', manifest.producer.node === PLATFORM.node, manifest.producer.node)
       assert('PRODUCER_ABI', String(manifest.producer.abi) === PLATFORM.abi && manifest.producer.sqlite === PLATFORM.sqlite, `${manifest.producer.abi}/${manifest.producer.sqlite}`)
-      assert('SOURCE_COMMIT', manifest.source.commit === EXPECTED.sourceCommit, manifest.source.commit)
+      assert('SOURCE_COMMIT', manifest.source.commit === ARTIFACTS.upgrade.sourceCommit && manifest.source.dirty === false, JSON.stringify(manifest.source))
       const deps = (manifest.dependencies ?? []).map((item) => (typeof item === 'string' ? item : item.name)).sort()
       assert('DEPENDENCY_CLOSURE', JSON.stringify(deps) === JSON.stringify([...PLATFORM.dependencies].sort()), JSON.stringify(deps))
       for (const rel of ['app/apps/launcher/bin/pa.mjs', 'app/apps/coordinator/product/demo.ts', 'app/apps/console/dist/index.html', 'app/node_modules/better-sqlite3'])
@@ -402,17 +403,18 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       assert('NO_CHECKOUT_REFERENCES', scan.hits.length === 0, JSON.stringify(scan.hits.slice(0, 5)))
       const version = pa(install, ['version', '--json'])
       assert('LAUNCHER_VERSION', version.status === 0 && version.json?.node === process.versions.node, JSON.stringify(version.json))
-      const upgradeManifest = JSON.parse(readFileSync(join(upgradeInstall, 'install.json'), 'utf8'))
-      assert('TARGET_BUILD_ID', upgradeManifest.buildId === ARTIFACTS.upgrade.buildId, upgradeManifest.buildId)
-      assert('TARGET_INSTALL_DIGEST', digest(join(upgradeInstall, 'install.json')) === ARTIFACTS.upgrade.installManifestSha256, digest(join(upgradeInstall, 'install.json')))
-      assert('TARGET_RELEASE_DIGEST', digest(join(upgradeInstall, 'var/config/release.json')) === ARTIFACTS.upgrade.releaseManifestSha256, digest(join(upgradeInstall, 'var/config/release.json')))
-      assert('TARGET_SOURCE', upgradeManifest.source.commit === ARTIFACTS.upgrade.sourceCommit && upgradeManifest.source.dirty === false, JSON.stringify(upgradeManifest.source))
-      assert('TARGET_SCHEMA', upgradeManifest.producer.productSchema === 13, String(upgradeManifest.producer.productSchema))
-      assert('DISTINCT_BUILDS', upgradeManifest.buildId !== manifest.buildId && ARTIFACTS.base.tarSha256 !== ARTIFACTS.upgrade.tarSha256)
+      const baselineManifest = JSON.parse(readFileSync(join(upgradeInstall, 'install.json'), 'utf8'))
+      assert('BASELINE_BUILD_ID', baselineManifest.buildId === ARTIFACTS.base.buildId, baselineManifest.buildId)
+      assert('BASELINE_INSTALL_DIGEST', digest(join(upgradeInstall, 'install.json')) === ARTIFACTS.base.installManifestSha256, digest(join(upgradeInstall, 'install.json')))
+      assert('BASELINE_RELEASE_DIGEST', digest(join(upgradeInstall, 'var/config/release.json')) === ARTIFACTS.base.releaseManifestSha256, digest(join(upgradeInstall, 'var/config/release.json')))
+      assert('BASELINE_SOURCE', baselineManifest.source.commit === ARTIFACTS.base.sourceCommit && baselineManifest.source.dirty === true, JSON.stringify(baselineManifest.source))
+      assert('BASELINE_SCHEMA', baselineManifest.producer.productSchema === 12, String(baselineManifest.producer.productSchema))
+      assert('TARGET_SCHEMA', manifest.producer.productSchema === 13, String(manifest.producer.productSchema))
+      assert('DISTINCT_BUILDS', baselineManifest.buildId !== manifest.buildId && ARTIFACTS.base.tarSha256 !== ARTIFACTS.upgrade.tarSha256)
       evidence.artifact = {
         artifacts: [
-          { role: 'baseline', name: ARTIFACTS.base.name, buildId: ARTIFACTS.base.buildId, tarSha256: ARTIFACTS.base.tarSha256, schema: 12, source: manifest.source },
-          { role: 'target', name: ARTIFACTS.upgrade.name, buildId: ARTIFACTS.upgrade.buildId, tarSha256: ARTIFACTS.upgrade.tarSha256, schema: 13, source: upgradeManifest.source },
+          { role: 'baseline', name: ARTIFACTS.base.name, buildId: ARTIFACTS.base.buildId, tarSha256: ARTIFACTS.base.tarSha256, schema: 12, source: baselineManifest.source },
+          { role: 'target', name: ARTIFACTS.upgrade.name, buildId: ARTIFACTS.upgrade.buildId, tarSha256: ARTIFACTS.upgrade.tarSha256, schema: 13, source: manifest.source },
         ],
         files: manifest.files?.count,
         producer: manifest.producer,
@@ -422,8 +424,8 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       // The strict installed-alpha layer binds these facts rather than trusting a self-description.
       evidence.installation = {
         status: 'installed',
-        bundleVersion: EXPECTED.buildId,
-        bundleDigest: EXPECTED.tarSha256,
+        bundleVersion: ARTIFACTS.upgrade.buildId,
+        bundleDigest: ARTIFACTS.upgrade.tarSha256,
         stagedPath: install,
         originalCheckoutAvailable: false,
         independence: {
@@ -459,7 +461,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       try {
         assert('START_RUNNING', first_.status === 'RUNNING', JSON.stringify({ status: first_.status, code: first_.code, stderr: first_.stderr().slice(0, 300) }))
         const record = first_.instance
-        assert('START_BUILD', record?.buildId === EXPECTED.buildId, String(record?.buildId))
+        assert('START_BUILD', record?.buildId === ARTIFACTS.upgrade.buildId, String(record?.buildId))
         const inside = witnessPath(record?.state)
         assert('START_STATE_INSIDE_INSTALL', inside.startsWith(witnessPath(join(install, 'var'))), String(record?.state))
         const index = await waitHttp(`http://127.0.0.1:${port}/`, (value) => value.status === 200 && value.text.includes('个人 Agent 工作台'))
@@ -524,8 +526,8 @@ export async function runInstall({ root, runDirectory, keep = false }) {
           doctorStatus: doctor.json?.status ?? 'unknown',
         }
       }
-      const baseline = probe(install, 'baseline')
-      const target = probe(upgradeInstall, 'target')
+      const baseline = probe(upgradeInstall, 'baseline')
+      const target = probe(install, 'target')
       evidence.configRoot = { baseline, target, baselineHistorical: baseline.initialized }
       // The target is the candidate under test; the baseline's earlier failure is history and must
       // not be mapped onto a fixed target. Seeding proves the probe is decisive on both.
@@ -573,33 +575,33 @@ export async function runInstall({ root, runDirectory, keep = false }) {
 
     await push(define('E4-INSTALL-HOST-GUARDS', 'Mode is retained on reuse and an unknown live PID is never adopted or killed'), async ({ assert, evidence }) => {
       pa(install, ['stop', '--json'], { timeoutMs: 20_000 })
-      pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 20_000 })
-      const first = pa(upgradeInstall, ['first-run', '--json'])
+      pa(install, ['stop', '--json'], { timeoutMs: 20_000 })
+      const first = pa(install, ['first-run', '--json'])
       assert('GUARD_FIRST_RUN', first.status === 0, first.stdout + first.stderr)
       const [port, apiPort] = await freePorts()
-      const started = startPa(upgradeInstall, { port, apiPort })
+      const started = startPa(install, { port, apiPort })
       const running = await started.attempt
       assert('GUARD_RUNNING', running.status === 'RUNNING', JSON.stringify({ status: running.status, code: running.code }))
       let mode
       let originalRecord
       try {
-        originalRecord = readFileSync(join(upgradeInstall, 'var/config/instance.json'), 'utf8')
-        const status = pa(upgradeInstall, ['status', '--json'])
+        originalRecord = readFileSync(join(install, 'var/config/instance.json'), 'utf8')
+        const status = pa(install, ['status', '--json'])
         assert('MODE_FIXTURE', status.status === 0 && status.json?.instance?.mode === 'fixture', JSON.stringify({ status: status.status, mode: status.json?.instance?.mode }))
-        const reused = pa(upgradeInstall, ['start', '--fixture', '--json', '--port', String(port), '--api-port', String(apiPort)], { timeoutMs: 30_000 })
+        const reused = pa(install, ['start', '--fixture', '--json', '--port', String(port), '--api-port', String(apiPort)], { timeoutMs: 30_000 })
         assert('FIXTURE_REUSED', reused.status === 0 && reused.json?.status === 'REUSED' && reused.json?.instance?.mode === 'fixture', JSON.stringify({ status: reused.status, value: reused.json?.status }))
-        const personal = pa(upgradeInstall, ['start', '--json', '--port', String(port), '--api-port', String(apiPort)], { timeoutMs: 30_000 })
+        const personal = pa(install, ['start', '--json', '--port', String(port), '--api-port', String(apiPort)], { timeoutMs: 30_000 })
         const personalCode = personal.json?.code
         assert('PERSONAL_REFUSED', personal.status === 2 && ['author_executor_unavailable', 'author_executor_version_mismatch', 'instance_conflict'].includes(personalCode), JSON.stringify({ status: personal.status, code: personalCode }))
-        const still = pa(upgradeInstall, ['status', '--json'])
+        const still = pa(install, ['status', '--json'])
         assert('EXISTING_UNTOUCHED', still.status === 0 && still.json?.instance?.pid === running.instance.pid && still.json?.instance?.mode === 'fixture', JSON.stringify({ status: still.status, pid: still.json?.instance?.pid }))
         mode = { fixtureReused: true, personalRefused: personalCode, existingUntouched: true }
       } finally {
-        pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 30_000 })
+        pa(install, ['stop', '--json'], { timeoutMs: 30_000 })
       }
 
       // An instance record whose PID is a live, unrelated process must not be adopted or signalled.
-      const recordPath = join(upgradeInstall, 'var/config/instance.json')
+      const recordPath = join(install, 'var/config/instance.json')
       assert('RECORD_CAPTURED', typeof originalRecord === 'string' && originalRecord.length > 0)
       const foreign = spawn('sleep', ['120'], { stdio: 'ignore' })
       try {
@@ -609,10 +611,10 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         record.apiPid = foreign.pid + 1
         writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}
 `, { mode: 0o600 })
-        const blocked = pa(upgradeInstall, ['start', '--fixture', '--json', '--port', String(port), '--api-port', String(apiPort)], { timeoutMs: 30_000 })
+        const blocked = pa(install, ['start', '--fixture', '--json', '--port', String(port), '--api-port', String(apiPort)], { timeoutMs: 30_000 })
         assert('UNKNOWN_PID_BLOCKED', blocked.status === 2 && ['instance_identity_mismatch', 'invalid_instance_record'].includes(blocked.json?.code), JSON.stringify({ status: blocked.status, code: blocked.json?.code }))
         assert('UNKNOWN_PID_ALIVE_AFTER_START', process.kill(foreign.pid, 0) === true)
-        const stop = pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 20_000 })
+        const stop = pa(install, ['stop', '--json'], { timeoutMs: 20_000 })
         assert('STOP_REFUSED_UNVERIFIED', stop.status !== 0, JSON.stringify({ status: stop.status, code: stop.json?.code }))
         assert('UNKNOWN_PID_ALIVE_AFTER_STOP', process.kill(foreign.pid, 0) === true)
         evidence.hostGuards = { mode, unknownPid: { startCode: blocked.json?.code, stopStatus: stop.status, alive: true } }
@@ -798,13 +800,13 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 20_000 })
       for (const target of [install, upgradeInstall]) {
         const first = pa(target, ['first-run', '--json'])
-        assert(`FIRST_RUN_${target === install ? 'base' : 'upgrade'}`, first.status === 0 && first.json?.status === 'OK', first.stdout + first.stderr)
+        assert(`FIRST_RUN_${target === install ? 'target' : 'baseline'}`, first.status === 0 && first.json?.status === 'OK', first.stdout + first.stderr)
       }
       const [p1, a1, p2, a2, p3, a3, p4, a4] = await freePorts(8)
       // A dedicated state keeps the upgrade flow independent of earlier cases' rollback markers.
       const baseState = join(workspace, 'upgrade-base-state')
       const baseEnv = { PA_DATA_ROOT: baseState }
-      const baseStart = startPa(install, { port: p1, apiPort: a1, env: baseEnv })
+      const baseStart = startPa(upgradeInstall, { port: p1, apiPort: a1, env: baseEnv })
       const baseRunning = await baseStart.attempt
       assert('BASE_RUNNING', baseRunning.status === 'RUNNING', JSON.stringify({ status: baseRunning.status, code: baseRunning.code }))
       let seeded
@@ -822,16 +824,16 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         })
         assert('BASE_SEEDED', seeded.phase === 'delivered' && seeded.acceptedReceipt === 'recorded', JSON.stringify(seeded))
       } finally {
-        pa(install, ['stop', '--json'], { timeoutMs: 30_000 })
+        pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 30_000 })
       }
       const beforeSchema = readSchema(baseState)
       const beforeMessages = countMessages(baseState)
       assert('BASE_SCHEMA', beforeSchema === ARTIFACTS.base.productSchema, String(beforeSchema))
       const preBundle = join(workspace, 'pre-upgrade.pab')
-      const backup = pa(install, ['backup', '--out', preBundle, '--json'], { timeoutMs: 60_000, env: baseEnv })
+      const backup = pa(upgradeInstall, ['backup', '--out', preBundle, '--json'], { timeoutMs: 60_000, env: baseEnv })
       assert('PRE_UPGRADE_BACKUP', backup.status === 0 && existsSync(preBundle), backup.stdout + backup.stderr)
 
-      const upgradeStart = startPa(upgradeInstall, { port: p2, apiPort: a2, env: { PA_DATA_ROOT: baseState } })
+      const upgradeStart = startPa(install, { port: p2, apiPort: a2, env: { PA_DATA_ROOT: baseState } })
       const upgraded = await upgradeStart.attempt
       assert('UPGRADE_RUNNING', upgraded.status === 'RUNNING', JSON.stringify({ status: upgraded.status, code: upgraded.code, stderr: upgraded.stderr().slice(0, 300) }))
       assert('UPGRADE_BUILD_RUNNING', upgraded.instance?.buildId === ARTIFACTS.upgrade.buildId, String(upgraded.instance?.buildId))
@@ -849,16 +851,16 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         const work = await client.work(seeded.workId)
         assert('WORK_INTACT', work.phase === 'delivered' && JSON.stringify(work.artifactIds) === JSON.stringify(seeded.artifactIds), JSON.stringify({ phase: work.phase, artifacts: work.artifactIds }))
       } finally {
-        pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 30_000 })
+        pa(install, ['stop', '--json'], { timeoutMs: 30_000 })
       }
 
       // The old binary must refuse the newer schema instead of silently reverting data.
-      const oldOnNew = startPa(install, { port: p3, apiPort: a3, env: baseEnv })
+      const oldOnNew = startPa(upgradeInstall, { port: p3, apiPort: a3, env: baseEnv })
       const refused = await oldOnNew.attempt
       assert('OLD_BINARY_REFUSED', refused.status !== 'RUNNING' && refused.exitCode === 2 && refused.code === 'daemon_start_failed', JSON.stringify({ status: refused.status, exitCode: refused.exitCode, code: refused.code }))
-      const daemonLog = readdirSync(join(install, 'var/logs'))
+      const daemonLog = readdirSync(join(upgradeInstall, 'var/logs'))
         .filter((name) => name.startsWith('daemon-'))
-        .map((name) => readFileSync(join(install, 'var/logs', name), 'utf8'))
+        .map((name) => readFileSync(join(upgradeInstall, 'var/logs', name), 'utf8'))
         .join('\n')
       const refusalText = `${JSON.stringify(refused.detail ?? {})}\n${refused.stderr()}\n${daemonLog}`
       assert('OLD_BINARY_MIGRATION_ERROR', /MigrationIntegrityError|Applied migration .* is not registered/.test(refusalText), refusalText.slice(-400))
@@ -873,15 +875,15 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       // An explicit restore of the pre-upgrade backup into a NEW state is data recovery, not a
       // lossless binary downgrade: the upgraded state above is left intact.
       const restoredState = join(workspace, 'restored-pre-upgrade')
-      const restored = pa(install, ['restore', '--bundle', preBundle, '--to', restoredState, '--json'], { timeoutMs: 60_000 })
+      const restored = pa(upgradeInstall, ['restore', '--bundle', preBundle, '--to', restoredState, '--json'], { timeoutMs: 60_000 })
       assert('RESTORE_EXPLICIT', restored.status === 0 && restored.json?.status === 'RESTORED', restored.stdout + restored.stderr)
       assert('RESTORED_SCHEMA', readSchema(restoredState) === ARTIFACTS.base.productSchema, String(readSchema(restoredState)))
       assert('RESTORED_DATA', hasMessage(restoredState, '安装物验收') && !hasMessage(restoredState, '升级后新增的数据'))
-      const restoredStart = startPa(install, { port: p4, apiPort: a4, env: { PA_DATA_ROOT: restoredState } })
+      const restoredStart = startPa(upgradeInstall, { port: p4, apiPort: a4, env: { PA_DATA_ROOT: restoredState } })
       const again = await restoredStart.attempt
       assert('RESTORED_STARTS', again.status === 'RUNNING', JSON.stringify({ status: again.status, code: again.code }))
       assert('RESTORED_UPGRADED_STATE_KEPT', readSchema(baseState) === ARTIFACTS.upgrade.productSchema && hasMessage(baseState, '升级后新增的数据'))
-      pa(install, ['stop', '--json'], { timeoutMs: 30_000 })
+      pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 30_000 })
 
       evidence.upgrade = {
         baseline: { buildId: ARTIFACTS.base.buildId, schema: beforeSchema, tarSha256: ARTIFACTS.base.tarSha256, source: ARTIFACTS.base.sourceCommit },
