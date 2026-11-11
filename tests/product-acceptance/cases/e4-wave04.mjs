@@ -229,20 +229,22 @@ export async function runWave04E4({ root, runDirectory, keep = false }) {
     notTested(
       define(
         'E4-REAUTHORIZATION',
-        'Recovery re-authorization: inspect/prepare/commit a new bounded grant',
+        'Recovery re-authorization: commit a new bounded grant and activate only new work',
         LAYERS.NOT_TESTED,
         [
-          'Owner: main (business boundary) and D (consumer). No inspect/prepare/commit entry exists in this checkout.',
+          'Owner: main. inspect and prepare now exist and are verified by E4-RECOVERY-PREFLIGHT, but the authorization commit is not connected.',
           'Old queues, profiles, writers and native sessions must not become authority automatically.',
         ],
       ),
-      'No public recovery re-authorization entry exists; read-only recovery is verified, but new-grant prepare/commit, expiry, drift, replay and rollback cannot be executed.',
+      'Read-only inspect/prepare are verified (plan authorization=not_granted, commitAvailable=false, no writes, stale/foreign/commit refused). The commit path, expiry/drift/replay/rollback of a real grant, and activation of only new work are not implemented and stay NOT_TESTED.',
     ),
   )
   cases.at(-1).evidence.reauthorization = {
     unavailable: true,
-    requiredOperations: ['inspect', 'prepare', 'commit'],
-    owner: 'main/D',
+    verifiedOperations: ['inspect', 'prepare'],
+    requiredOperations: ['commit'],
+    owner: 'main',
+    verifiedBy: 'E4-RECOVERY-PREFLIGHT',
   }
 
   return { cases, artifacts }

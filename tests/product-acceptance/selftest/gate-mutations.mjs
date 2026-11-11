@@ -86,6 +86,34 @@ const evidenceFor = (key) => {
       return { sameSizeCode: 'release_artifact_missing', missingCode: 'release_artifact_missing', corruptBundleCode: 'archive_invalid' }
     case 'rollback':
       return { bundleSha256: DIGEST, target: '/tmp/state', postBackupReceipt: 'recorded' }
+    case 'workEvidence':
+      return {
+        protocol: 'work-evidence/1',
+        workId: 'work-1',
+        projection: 'recorded',
+        entries: 12,
+        outcomes: 1,
+        truncated: false,
+        unknownWorkStatus: 400,
+      }
+    case 'recoveryPreflight':
+      return {
+        inspection: {
+          protocol: 'recovery-inspection/1',
+          state: 'recovery_readonly',
+          markerDigest: DIGEST,
+          blockerCodes: ['authorization_not_implemented'],
+        },
+        plan: {
+          protocol: 'recovery-plan/1',
+          authorization: 'not_granted',
+          commitAvailable: false,
+          bindings: [{ sourceProjectId: 'project-atlas', headCommit: BASELINE }],
+          ttlMs: 300000,
+        },
+        writes: { rowsBefore: { event_log: 0 }, rowsAfter: { event_log: 0 }, markerUnchanged: true, bindingsUnsaved: true },
+        refusals: { staleFingerprint: 409, foreignProject: 403, commit: 422, normalPrepare: 422 },
+      }
     case 'cycles':
       return { requested: 8, completed: 8, attemptCount: 8, failures: [] }
     case 'fixture':

@@ -3,7 +3,7 @@
   "agent": "E",
   "taskPackage": "agent-tasks/product-wave-06/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "6f6edde",
+  "base": "d4d51ae",
   "checkpoint": "dc351a4",
   "budget": {
     "modelTasks": 0,

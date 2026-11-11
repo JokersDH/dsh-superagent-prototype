@@ -281,6 +281,54 @@ function attentionIssues(attention) {
   return issues
 }
 
+/**
+ * A work-evidence projection must bind the exact work, name its projection honestly, carry at most a
+ * bounded window and never include another work's outcome.
+ */
+export function workEvidenceIssues(evidence) {
+  if (!evidence || typeof evidence !== 'object') return ['missing']
+  const issues = []
+  if (evidence.protocol !== 'work-evidence/1') issues.push('protocol')
+  if (!isSubstantive(evidence.workId)) issues.push('work_binding')
+  if (!['recorded', 'source_missing', 'not_in_window', 'not_accepted'].includes(evidence.projection)) issues.push('projection')
+  if (!Number.isSafeInteger(evidence.entries) || evidence.entries < 1) issues.push('no_entries')
+  if (!Number.isSafeInteger(evidence.outcomes) || evidence.outcomes < 0) issues.push('outcome_count')
+  if (evidence.truncated !== false && evidence.truncated !== true) issues.push('truncation')
+  if (![400, 403, 404].includes(evidence.unknownWorkStatus)) issues.push('unknown_work_not_refused')
+  return issues
+}
+
+/**
+ * A recovery plan is diagnostics: it must carry no authority, must not write the restored state and
+ * must refuse a stale fingerprint, a foreign project and every commit entry.
+ */
+export function recoveryPreflightIssues(preflight) {
+  if (!preflight || typeof preflight !== 'object') return ['missing']
+  const issues = []
+  const inspection = preflight.inspection ?? {}
+  const plan = preflight.plan ?? {}
+  const refusals = preflight.refusals ?? {}
+  const writes = preflight.writes ?? {}
+  if (inspection.protocol !== 'recovery-inspection/1') issues.push('inspect_protocol')
+  if (inspection.state !== 'recovery_readonly') issues.push('inspect_state')
+  if (!HEX.test(String(inspection.markerDigest ?? ''))) issues.push('inspect_marker')
+  if (!Array.isArray(inspection.blockerCodes) || !inspection.blockerCodes.includes('authorization_not_implemented'))
+    issues.push('inspect_no_authority_blocker')
+  if (plan.protocol !== 'recovery-plan/1') issues.push('plan_protocol')
+  if (plan.authorization !== 'not_granted' || plan.commitAvailable !== false) issues.push('plan_claims_authority')
+  if (!Array.isArray(plan.bindings) || plan.bindings.length === 0) issues.push('plan_no_bindings')
+  else if (plan.bindings.some((binding) => !/^[a-f0-9]{40}$/.test(String(binding?.headCommit ?? '')))) issues.push('plan_binding_head')
+  if (!Number.isSafeInteger(plan.ttlMs) || plan.ttlMs <= 0 || plan.ttlMs > 5 * 60 * 1000 + 5_000) issues.push('plan_ttl')
+  if (JSON.stringify(writes.rowsBefore) !== JSON.stringify(writes.rowsAfter)) issues.push('prepare_wrote_rows')
+  if (writes.markerUnchanged !== true) issues.push('prepare_wrote_marker')
+  if (writes.bindingsUnsaved !== true) issues.push('prepare_saved_bindings')
+  if (refusals.staleFingerprint !== 409) issues.push('stale_fingerprint_not_refused')
+  if (refusals.foreignProject !== 403) issues.push('foreign_project_not_refused')
+  if (![403, 404, 422].includes(refusals.commit)) issues.push('commit_not_refused')
+  if (![403, 422].includes(refusals.normalPrepare)) issues.push('normal_prepare_not_refused')
+  return issues
+}
+
 function cycleIssues(cycles) {
   if (!cycles || typeof cycles !== 'object') return ['missing']
   const issues = []
@@ -423,6 +471,14 @@ export function evaluateRelease({
       if (entry.evidence?.includes('installation')) {
         for (const issue of installationIssues(result.evidence?.installation))
           failures.push(fail('installation_evidence_invalid', `Installation proof ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('workEvidence')) {
+        for (const issue of workEvidenceIssues(result.evidence?.workEvidence))
+          failures.push(fail('work_evidence_invalid', `Work evidence ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('recoveryPreflight')) {
+        for (const issue of recoveryPreflightIssues(result.evidence?.recoveryPreflight))
+          failures.push(fail('recovery_preflight_invalid', `Recovery preflight ${issue}`, entry.id))
       }
       if (entry.evidence?.includes('cycles')) {
         for (const issue of cycleIssues(result.evidence?.cycles))

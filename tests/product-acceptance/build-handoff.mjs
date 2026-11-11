@@ -75,6 +75,12 @@ const CAPABILITIES = [
     notTested: ['生产故障注入接口不存在；阻断由受控 completion port 注入，其余步骤走真实 HTTP。'],
   },
   {
+    id: 'accepted-outcome-evidence',
+    label: '接受结果投影与工作证据读取',
+    controlled: ['E2-WORK-EVIDENCE'],
+    notTested: ['工作台内进一步的时间线展示仍单列；source_missing/not_in_window 需要旧库来源缺失场景。'],
+  },
+  {
     id: 'machine-fail',
     label: '必需机器检查失败不可被人工接受',
     controlled: ['E2-MACHINE-FAIL'],
@@ -150,6 +156,7 @@ const CAPABILITIES = [
     id: 'portability-tooling',
     label: '迁移清单验收规则（缺产物/坏 digest/无回滚拒绝）',
     readonly: ['E4-PORTABILITY-CHECKLIST'],
+    controlled: ['E4-RECOVERY-PREFLIGHT'],
   },
   {
     id: 'install-first-run',

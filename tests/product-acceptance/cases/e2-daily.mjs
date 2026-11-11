@@ -666,6 +666,33 @@ export async function runE2({ root, runDirectory, keep = false }) {
     cases.push(decisionsCase)
 
     await push(
+      define('E2-WORK-EVIDENCE', 'Accepted outcome and work timeline are readable through the evidence projection'),
+      async ({ assert, evidence }) => {
+        if (!facts.delivery) throw new Error('E2-DAILY-VERTICAL did not reach delivery; evidence has no reference')
+        const { workId } = facts.delivery
+        const projected = await client.json(`/v1/works/${workId}/evidence`)
+        assert('EVIDENCE_PROTOCOL', projected.protocol === 'work-evidence/1', projected.protocol)
+        assert('EVIDENCE_WORK', projected.workId === workId, projected.workId)
+        assert('EVIDENCE_PROJECTION', projected.projection === 'recorded', projected.projection)
+        assert('EVIDENCE_OUTCOME', projected.outcomes.length === 1 && projected.outcomes[0].attempt.contract.workId === workId, JSON.stringify(projected.outcomes.map((item) => item.attempt?.contract?.workId)))
+        assert('EVIDENCE_ENTRIES', Array.isArray(projected.entries) && projected.entries.length > 0 && projected.entries.length <= 500, String(projected.entries?.length))
+        assert('EVIDENCE_ENTRY_SHAPE', projected.entries.every((entry) => typeof entry.kind === 'string' && typeof entry.sourceRef === 'string' && entry.detail !== undefined), JSON.stringify(projected.entries.slice(0, 2)))
+        assert('EVIDENCE_NOT_TRUNCATED', projected.truncated === false, JSON.stringify({ truncated: projected.truncated, entries: projected.entries.length }))
+        const foreign = await client.request('/v1/works/work-does-not-exist/evidence')
+        // The product refuses an unknown work id before any scope check; 400/403/404 are all refusals.
+        assert('EVIDENCE_UNKNOWN_WORK', [400, 403, 404].includes(foreign.status), `status ${foreign.status} ${JSON.stringify(foreign.body)}`)
+        evidence.workEvidence = {
+          protocol: projected.protocol,
+          projection: projected.projection,
+          entries: projected.entries.length,
+          outcomes: projected.outcomes.length,
+          truncated: projected.truncated,
+          unknownWorkStatus: foreign.status,
+        }
+      },
+    )
+
+    await push(
       define('E2-REOPEN-PERSISTENCE', 'A restart preserves delivery, conversation and artifacts without reopening work'),
       async ({ assert, evidence, note }) => {
         if (!facts.delivery) throw new Error('E2-DAILY-VERTICAL did not reach delivery; reopen has no reference')
