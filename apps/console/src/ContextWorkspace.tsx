@@ -58,6 +58,7 @@ export function ContextWorkspace({ transport, configuration, conversationId, wor
   const displayPreview = displayPrepared?.preview ?? preview
   const displayProject = configuration.projects.find(value => value.id === (displayPreview?.projectId ?? projectId))
   const canSend = !!configuration.assistantContextAvailable && !!transport.prepareAssistantContext && !!transport.sendAssistantContext && !!onSent
+  const canReconcile = !!transport.sendAssistantContext && !!onSent
   const sending = busy && !!pending
   const grantExpired = !!project?.scope.expiresAt && Date.parse(project.scope.expiresAt) <= Date.now()
   const input = { projectId, conversationId, ...(selectedWork ? { workId: selectedWork.work.id } : {}), selections, query, budget }
@@ -92,7 +93,7 @@ export function ContextWorkspace({ transport, configuration, conversationId, wor
     finally { if (sequence.current === request) setBusy(false) }
   }
   const send = async (value: AssistantContextPrepared, original?: AssistantContextSend) => {
-    if (busy || damaged || !canSend || (!original && expired)) return
+    if (busy || damaged || (original ? !canReconcile : !canSend || expired)) return
     const stored = PendingSchema.parse({ version: 1, command: original ?? { commandId: value.commandId, token: value.token }, prepared: value })
     try { sessionStorage.setItem(pendingKey, JSON.stringify(stored)) }
     catch { setDamaged(true); setError('浏览器无法保留原请求，发送已暂停。'); return }
@@ -144,7 +145,7 @@ export function ContextWorkspace({ transport, configuration, conversationId, wor
       <dl><dt>原会话</dt><dd><code>{displayPrepared.preview.conversationId}</code></dd>{displayPrepared.preview.contract && <><dt>工作版本</dt><dd><span>版本 {displayPrepared.preview.contract.revision}</span><code>{displayPrepared.preview.contract.workId}</code></dd></>}</dl></section>}
     {pending && <p className="context-pending" role="status"><RefreshCw size={15} />原请求待核对</p>}
     <div className="context-actions">
-      {pending ? <button type="button" className="primary" disabled={busy || damaged || !canSend} onClick={() => void send(pending.prepared, pending.command)}><RefreshCw size={15} />{busy ? '核对中' : '核对原请求'}</button>
+      {pending ? <button type="button" className="primary" disabled={busy || damaged || !canReconcile} onClick={() => void send(pending.prepared, pending.command)}><RefreshCw size={15} />{busy ? '核对中' : '核对原请求'}</button>
         : prepared ? <><button type="button" className="primary" disabled={busy || damaged || expired || !canSend} onClick={() => void send(prepared)}><Send size={15} />确认发送</button><button type="button" className="quiet" disabled={busy} onClick={clear}>修改消息</button></>
           : <><button type="button" className={canSend ? 'quiet' : 'primary'} disabled={busy || !valid || grantExpired} onClick={() => void prepare()}><FileSearch size={15} />{busy ? '读取中' : '生成预览'}</button>
             {canSend && <button type="button" className="primary" disabled={busy || damaged || !valid || grantExpired || !text.trim() || text.length > 16384} onClick={() => void prepare(true)}><Send size={15} />预览消息</button>}</>}

@@ -26,12 +26,12 @@ git(['add', 'src/.gitkeep']); git(['-c', 'user.name=Context Browser', '-c', 'use
 const principal = { userId: 'context-browser-user', authorityRef: 'context-browser-authority' }, actor = { ...principal, source: 'local_ui' }
 const scope = { projectId: 'payment-project', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
 const conversationId = 'payment-conversation', store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
-let time = new Date().toISOString(), firstRelease, firstStarted
+let time = new Date().toISOString(), providerConfigured = true, firstRelease, firstStarted
 const firstGate = new Promise(resolve => { firstRelease = resolve }), begun = new Promise(resolve => { firstStarted = resolve })
 const requests = [], records = new Map()
 const provider = {
-  status: () => ({ protocol: 'assistant-provider/1', configured: true, baseURL: 'https://fixture.invalid/v1', model: 'mock-context',
-    models: ['mock-context'], state: 'configured', secureTransport: true }),
+  status: () => ({ protocol: 'assistant-provider/1', configured: providerConfigured, baseURL: 'https://fixture.invalid/v1', model: 'mock-context',
+    models: ['mock-context'], state: providerConfigured ? 'configured' : 'not_configured', secureTransport: true }),
   selectModel() { return this.status() },
   reply: async (messages, onDelta) => {
     requests.push(structuredClone(messages)); onDelta('依据所选来源，')
@@ -174,12 +174,18 @@ try {
     await dialog.getByText('原请求待核对', { exact: true }).waitFor()
     await product.execution.effects.idle('application.assistant.reply')
     const calls = requests.length, messages = users().length
+    providerConfigured = false
     time = new Date(Date.parse(time) + 301000).toISOString()
     await page.reload(); await open()
+    const configuration = await (await page.request.get(`${origin}/v1/configuration`)).json()
+    assert.equal(configuration.assistantContextAvailable, false)
+    assert.equal(await dialog.getByRole('button', { name: '核对原请求', exact: true }).isEnabled(), true)
     await dialog.getByRole('button', { name: '核对原请求', exact: true }).click(); await dialog.waitFor({ state: 'hidden' })
     assert.equal(sent.length, 2); assert.deepEqual(sent[0], sent[1]); assert.equal(requests.length, calls); assert.equal(users().length, messages)
     assert.equal(await page.evaluate(() => sessionStorage.getItem('personal-agent:pending-context-message')), null)
     await page.unroute('**/v1/assistant/context/send')
+    providerConfigured = true
+    await page.reload()
   })
   await check('SOURCE-REJECTION-SETTLES-WITHOUT-SENDING-OR-LOSING-THE-DRAFT', async () => {
     await open(); await dialog.getByRole('textbox', { name: '上下文消息', exact: true }).fill('来源变化后应重新确认。')
@@ -231,7 +237,9 @@ try {
     checkedAt: new Date().toISOString(), cases, errors, modelCalls: 0, mockProviderCalls: requests.length,
     bindingPort: store.workflows.assistant.contextBindings ? 'production_A_port' : 'afterCommit_in_memory_composition_fixture',
     limitations: ['Actual local HTTP/SQLite/React/SSE plus mock AssistantModelPort; zero real native/model turns',
-      'A-compatible fixture fallback does not certify production binding-table crash durability', 'Work remains paused; no coding execution or target activation is admitted'] }
+      store.workflows.assistant.contextBindings ? 'Production A binding port is exercised in this process; no independent process-crash or backup certification'
+        : 'A-compatible fixture fallback does not certify production binding-table crash durability',
+      'Work remains paused; no coding execution or target activation is admitted'] }
   writeFileSync(join(output, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n')
   console.log(JSON.stringify(report, null, 2))
 }
