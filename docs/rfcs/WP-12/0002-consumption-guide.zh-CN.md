@@ -179,3 +179,56 @@ node apps/launcher/bin/pa.mjs stage --output <install>
 
 安装物摘要：`tools/distribution/reports/wave05/install-summary.json`；完整证据：
 `tools/distribution/reports/wave05-status.json`、`reports/wave05/`。
+
+---
+
+## 10. 第六轮增补：个人 Alpha 安装物、恢复消费与升级（2026-11-11）
+
+### 10.1 冻结安装物
+
+- 位置/摘要见 `tools/distribution/reports/wave06/install-artifact.json`（仓库外目录 + tar.gz，
+  `install.json`/`release.json`/tar sha256、buildId、平台/Node/ABI/依赖闭包）。
+- E 只从该冻结产物在新 root 独立执行；不得混用 D 旧包、main 新源码或另一分支 node_modules，
+  不改 D/E 断言，不重启用户五组服务。使用临时端口/state/项目。
+
+### 10.2 可复制普通路径
+
+```sh
+tar -xzf <wave06-alpha-install.tar.gz> -C <new-root>
+cd <new-root>/install
+./bin/pa first-run
+./bin/pa doctor                 # READY/DEGRADED/BLOCKED；不是准入
+./bin/pa start --fixture        # 作者执行器缺失时用 fixture 验证受控链路
+./bin/pa status
+./bin/pa stop
+./bin/pa backup --out <pre-upgrade.pab>
+# 新目录只读恢复：
+./bin/pa restore --bundle <pre-upgrade.pab> --to <new-state>
+./bin/pa recovery-status        # startupMode=recovery_readonly, authorization=BLOCKED(owner main)
+./bin/pa start --fixture --data-root <new-state> ...   # 只读历史，业务 POST 422
+./bin/pa rollback --bundle <pre-upgrade.pab> --target <state>
+```
+
+### 10.3 恢复新授权（main-owned，当前 BLOCKED）
+
+`recovery-status` 只读投影恢复 marker、pending rebind/revalidation 与 main `inspect/prepare/commit`
+接口需求；当前 main 未发布该接口，因此：
+
+- 不删 `restore-report.json`、不加 force/allow-resume 开关、不重放旧队列；
+- 不把旧 profile/writer/session 当新授权；
+- 新工作授权步骤保持 `BLOCKED_RECOVERY_AUTHORIZATION`，owner=main，所需输入见
+  `tools/distribution/reports/wave06/recovery-authorization-blocker.json`；
+- D 提供 CLI/诊断/发行消费，不建立第二认证/密钥存储或调度器。
+
+### 10.4 升级/回滚
+
+`smoke-upgrade.mjs` 已测：pre-upgrade backup → 新 build 启动（升级）→ 升级后数据写入 →
+rollback 到备份 → 原 project/work/artifact 与 evidence digest 恢复、升级后 revision 消失 →
+新 build 仍可启动。回滚只恢复 state 快照，不降级已安装二进制；未来 schema 在 snapshot/restore
+拒绝（`schema_unsupported`）。
+
+### 10.5 未覆盖
+
+A v13/routing/ReviewTiming 持久化与 C routing 实现未进入本 main（schema 12），bundle evidence
+对未见规范标 unavailable；B 第二执行器/session 胶囊接口未进 main；个人 native 端到端、恢复新授权、
+跨机器/ABI、第二协议复核均 NOT_TESTED/BLOCKED。

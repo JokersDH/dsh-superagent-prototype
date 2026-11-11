@@ -26,6 +26,17 @@ node tools/distribution/smoke.mjs
 `>=24.21.0 <25`、加载原生 SQLite binding、记录平台/ABI/SQLite/commit/artifact 摘要，并在写盘后
 自检全部 artifact 摘要。
 
+## 第六轮增补：升级/回滚、安装物冻结与恢复授权消费
+
+- `node tools/distribution/smoke-upgrade.mjs`：同一源码两个 build tag 的 staged install，验证
+  pre-upgrade backup、升级启动、升级后数据、rollback 恢复原 project/work/artifact/evidence digest、
+  新 build 仍可启动；失败退出非 0 并保留 JSON 证据。
+- `tools/distribution/freeze-install.mjs`：把 staged install 冻结到仓库外目录并生成 tar.gz 与
+  artifact manifest（install.json sha256、tar sha256、buildId、文件数、依赖闭包、支持矩阵）。
+- `pa recovery-status` 只读投影恢复 marker 与 main 授权接口状态；main 接口未发布时明确
+  `BLOCKED`（owner main），D 不猜 HTTP shape、不删 marker、不加重放/force 开关。
+- 证据：`tools/distribution/reports/wave06/*` 与 `wave06-status.json`。
+
 ## 第五轮增补：自检诊断、证据覆盖与支持矩阵
 
 - staged install 自检从“launcher 能加载”升级为“staged `bin/pa doctor` 必须通过

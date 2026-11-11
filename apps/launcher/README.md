@@ -52,6 +52,21 @@ node apps/launcher/bin/pa.mjs rollback --target ~/pa-restored   # 用最近已�
 - 网页关闭不影响 daemon；模型 key 只经已认证本机网页设置提交，CLI/日志/发行清单不回显、不存储。
 - 不复制他人在账号 home 中的 native 认证；不升级全局 Node/agent。
 
+## 第六轮增补（恢复消费与升级路径）
+
+- `recovery-status`：只读本地投影，显示 marker 是否有效、`startupMode`、pending rebind/requires
+  revalidation、旧队列 `queueReplay=never`，以及 `authorization.status=BLOCKED`、owner=main、
+  所需 inspect/prepare/commit 输入与禁止项（不删 marker、不 force、不重放旧队列、不把旧
+  writer/session 当新授权）。main 发布公共接口前不会伪造 HTTP 调用；该命令只读、不启动 daemon。
+- 备份 evidence 增加 `acceptedEvents`：从 `EventLog` 公共读端口读取
+  `application.candidate.accepted`（候选/actorRef/ReviewTiming/payload digest），表示 main 已持久化的
+  Outcome/ReviewTiming 事实；A v13 `ExecutionOutcome` 存储未进 main 时仍标 unavailable，不冒充。
+- 未来 schema（`product_schema > 当前`）在 snapshot/restore 均拒绝 `schema_unsupported`；缺失
+  artifact、同大小漂移、坏 manifest、活跃/未知 writer、活跃目标仍 fail-closed。
+- 升级/回滚：`tools/distribution/smoke-upgrade.mjs` 用同一源码两个 build tag 的 staged install 验证
+  pre-upgrade backup → 新 build 启动 → 升级后数据 → rollback 到备份 → 原 project/work/artifact 与
+  evidence digest 恢复、升级后 revision 消失、新 build 仍可启动。
+
 ## 第五轮增补（运行诊断、证据覆盖、执行器入口）
 
 - `doctor` 增加零模型预检：`runtime_abi`（Node/平台/ABI/SQLite binding）、`ports`（默认/实例端口）、
