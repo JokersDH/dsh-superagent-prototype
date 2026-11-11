@@ -12,11 +12,11 @@ import { createControlledProduct, FIXTURE_CHECK } from '../../apps/coordinator/p
 import { createLocalHttpApp } from '../../apps/coordinator/http/app.ts'
 import { listenLocalHttp } from '../../apps/coordinator/http/server.ts'
 
-const { values } = parseArgs({ options: { 'no-capture': { type: 'boolean', default: false } } })
+const { values } = parseArgs({ options: { 'no-capture': { type: 'boolean', default: false }, output: { type: 'string' } } })
 const require = createRequire(new URL('../../apps/console/package.json', import.meta.url))
 const { chromium } = require('@playwright/test')
 const { createServer: createViteServer } = await import(require.resolve('vite'))
-const output = resolve('reports/releases/conversation-catalog')
+const output = resolve(values.output ?? 'reports/releases/conversation-catalog')
 mkdirSync(output, { recursive: true })
 const root = mkdtempSync(join(tmpdir(), 'pa-catalog-browser-'))
 const stateRoot = join(root, 'state'), scratchProject = join(root, 'project')
