@@ -98,7 +98,18 @@ conversation messages → artifact metadata → raw project files. Rules:
 - every slice is `untrusted_data`; artifact paths are not included (identity/digest/size/time only);
 - bytes/tokens are conservative estimates for bounded composition, not billing guarantees.
 
-`buildCompositionPreview` returns the same safety fields main's upload confirmation needs.
+`buildCompositionPreview` returns the same safety fields main's upload confirmation needs, and
+`buildSourceManifest` gives main a stable per-source projection (`sourceId/kind/group/path/contentDigest/
+baselineCommit/truncated/bytes/tokens/trust`) plus `omitted`, `injectionFlagPaths` and `budgetClamped`.
+
+### Unified authorization gate (wave-08)
+
+Every source family (port, decisions, conversation, artifacts) passes one gate **before any provider
+call**: conversation gateway, project match, purpose match, past `confirmedAt`, unexpired grant and a
+positive-integer caller budget. Caller budgets are clamped to the grant (never escalated) and the
+clamped dimensions are reported in `budgetClamped`. A grant that expires during the composition
+refuses with `grant_expired`; no partial result is returned. Zero/negative/NaN budgets are
+`invalid_input` and read nothing.
 See `examples/composition-performance.mjs` and `reports/composition-performance.json` for a bounded
 deterministic measurement (0 model/network calls).
 

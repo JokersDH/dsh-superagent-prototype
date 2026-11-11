@@ -5,6 +5,7 @@ import {
   ContextComposer,
   ContextError,
   buildCompositionPreview,
+  buildSourceManifest,
   sha256Text,
   type ComposedConversationMessage,
   type ComposedDecisionView,
@@ -123,6 +124,24 @@ test('group budget shares truncate later groups explainably', async () => {
   const preview = buildCompositionPreview(composition)
   assert.equal(preview.totals.bytes, composition.totals.bytes)
   assert.ok(preview.omitted.some((item) => item.reason === 'budget_group'))
+})
+
+test('the source manifest exposes stable identities without authority or absolute paths', async () => {
+  const composition = await composer({ messages: [message(1)] }).compose(request())
+  const manifest = buildSourceManifest(composition)
+  assert.equal(manifest.protocol, 'context-source-manifest/1')
+  assert.equal(manifest.sources.length, composition.slices.length)
+  for (const source of manifest.sources) {
+    assert.equal(source.trust, 'untrusted_data')
+    assert.equal(source.contentDigest.length, 64)
+    assert.equal(source.path.startsWith('/'), false)
+    assert.ok(['contract', 'decisions', 'project_facts', 'conversation', 'artifacts', 'files'].includes(source.group))
+    assert.equal(Object.hasOwn(source, 'actor'), false)
+    assert.equal(Object.hasOwn(source, 'permissions'), false)
+  }
+  assert.deepEqual(manifest.injectionFlagPaths, composition.injectionFlags.map((flag) => flag.path))
+  assert.ok(Array.isArray(manifest.omitted))
+  assert.ok(Array.isArray(manifest.budgetClamped))
 })
 
 test('the global slice cap holds across all groups', async () => {

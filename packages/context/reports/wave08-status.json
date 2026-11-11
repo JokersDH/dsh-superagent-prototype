@@ -1,0 +1,147 @@
+{
+  "role": "C",
+  "branch": "codex/g3-assistant-context",
+  "mainBaseCommit": "5d4065b",
+  "mergeCommit": "3304cea",
+  "repairCheckpoint": "138a817",
+  "updatedAt": "2026-11-11T09:00:00.000Z",
+  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "supersedes": "wave07-status.json for wave-08 facts (historical file retained); wave06 consumer/status no longer authoritative",
+  "phases": [
+    {
+      "phase": "C1",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave08-c1-probe.json",
+        "packages/context/reports/wave08-c1-verification.txt",
+        "packages/context/test/grant-boundary.case.ts",
+        "commit 138a817"
+      ],
+      "results": {
+        "probe": "PASS_CONTEXT_GRANT_BOUNDARY (4/4)",
+        "contextTests": "51/51 at checkpoint"
+      },
+      "note": "Before: expired grant read the provider, caller budget exceeded the grant, purpose mismatch read. Now one authorizeComposition gate runs before any provider call for every source family; caller budgets are clamped to the grant and reported; zero/negative/NaN/non-integer budgets are invalid_input with zero reads."
+    },
+    {
+      "phase": "C2",
+      "status": "passed",
+      "evidence": [
+        "packages/context/src/composer.ts",
+        "packages/context/test/budget-integrity.case.ts",
+        "packages/context/test/composer.case.ts"
+      ],
+      "results": { "contextTests": "56/56" },
+      "note": "Global files/slices/bytes/tokens/duration caps hold under the grant and caller budget; a group with no remaining allocation is skipped instead of forcing one extra read; authorization is re-checked before/after every group and before returning, so mid-composition expiry refuses. Unavailable provider vs caller truncation vs scan_incomplete are distinct; scan_incomplete is fatal; tokens are documented estimates, not billing bounds."
+    },
+    {
+      "phase": "C3",
+      "status": "passed",
+      "evidence": [
+        "packages/context/src/composer.ts (buildSourceManifest)",
+        "packages/context/docs/WAVE08-RECIPE.md",
+        "packages/context/test/composer.case.ts"
+      ],
+      "note": "Stable source manifest (sourceId/kind/group/path/contentDigest/baselineCommit/truncated/bytes/tokens/trust) plus omitted/injectionFlagPaths/budgetClamped for main's DTO. Recipe documents the A port adapter, the fixed group order, and the excluded inputs (cross-project/session, contract drift, symlink/credential paths, permission/authentication answers, revoked/superseded decisions). Content stays untrusted_data; no actor/tool fields."
+    },
+    {
+      "phase": "C4",
+      "status": "passed",
+      "evidence": [
+        "packages/knowledge/test/main-proposal-consumer.case.ts",
+        "packages/knowledge/test/main-proposal-http.case.ts",
+        "tests/integration/proposal-commands.case.mjs (main-owned, unmodified)"
+      ],
+      "results": { "knowledgeTests": "68/68", "mainProposalIntegration": "10/10" },
+      "note": "Independent consumers drive main's ProductProposals and its real HTTP: decision proposal confirm writes the decision in the same transaction; reject is terminal with no effectCommandId and no business effect; expired preview and changed grant are rejected with no confirmed state; missing work inputs stay inert; revision without a current work is refused at prepare; a receipt failure rolls back proposal+effect+event+receipt and a retry succeeds; replay returns the same receipt with no second effect; reopen preserves states."
+    },
+    {
+      "phase": "C5",
+      "status": "partial",
+      "evidence": [
+        "packages/context/examples/composition-performance.mjs",
+        "packages/context/reports/composition-performance.json",
+        "packages/context/reports/wave08-verification.txt"
+      ],
+      "results": { "performance": "PASS p50 ~0.31-0.32ms / p95 ~0.58-0.67ms; 12 slices / 3394 bytes inside a 20-slice / 256KiB budget" },
+      "note": "Proposal and decision HTTP are consumed end to end from C-owned tests. Context composition/preview HTTP is NOT published by main (`grep -c 'v1/context' apps/coordinator/http/app.ts` = 0), so the UI assertion is BLOCKED on main; C did not write HTTP."
+    },
+    {
+      "phase": "C6",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave08-status.json",
+        "packages/context/docs/WAVE08-RECIPE.md",
+        "packages/context/README.md"
+      ],
+      "note": "Single authoritative wave-08 status; recipe, gate semantics, manifest contract and remaining owners recorded."
+    }
+  ],
+  "commands": [
+    "git fetch origin && git merge origin/main --no-edit",
+    "pnpm --filter @personal-agent/{contracts,orchestrator-core,effects,storage,workflows,questions,application,verification,workspaces,proposals,knowledge,context,routing} build",
+    "node tools/bootstrap/probe-wave08-context-grant.mjs \"$PWD\"",
+    "pnpm --filter @personal-agent/context typecheck && test && build",
+    "pnpm --filter @personal-agent/proposals typecheck && test && build",
+    "pnpm --filter @personal-agent/knowledge typecheck && test && build",
+    "pnpm --filter @personal-agent/routing typecheck && test && build",
+    "node --test tests/integration/proposal-commands.case.mjs",
+    "node --test tests/integration/decision-commands.case.mjs",
+    "node --test tests/integration/routing-sql-consumer.case.mjs",
+    "node tools/bootstrap/probe-wave07-supersession.mjs",
+    "node tools/bootstrap/review-persisted-assistant.mjs",
+    "node packages/context/examples/composition-performance.mjs"
+  ],
+  "results": {
+    "contextTests": "56/56",
+    "proposalTests": "30/30",
+    "knowledgeTests": "68/68",
+    "routingTests": "44/44",
+    "typecheck": "PASS (four packages)",
+    "build": "PASS (four packages)",
+    "wave08GrantProbe": "PASS_CONTEXT_GRANT_BOUNDARY (4/4)",
+    "wave07SupersessionProbe": "singleStatus=superseded, activeIds=[]",
+    "realSqliteAssistantProbe": "7/7",
+    "mainProposalIntegration": "10/10",
+    "mainDecisionIntegration": "8/8",
+    "routingSqlConsumer": "2/2",
+    "compositionPerformance": "PASS (bounded, deterministic, 0 model/network)"
+  },
+  "dependencyRequests": [
+    {
+      "package": "packages/knowledge",
+      "added": ["@personal-agent/orchestrator-core (dev)"],
+      "reason": "Independent consumer of main's proposal/decision HTTP composition (effectCommandId key parity).",
+      "rootLock": "pnpm-lock.yaml diff uncommitted; main owns the authoritative lock."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "C5-main-context-http",
+      "owner": "main",
+      "status": "external_pending",
+      "repro": "grep -c 'v1/context' apps/coordinator/http/app.ts  # 0",
+      "required": "Authenticated context composition/preview endpoint composing ContextComposer/buildCompositionPreview/buildSourceManifest.",
+      "continue": "C supplied the recipe, manifest contract and bounded performance; no C HTTP is written."
+    },
+    {
+      "id": "C-main-outcome-review-wiring",
+      "owner": "main",
+      "status": "external_pending",
+      "input": "Trusted ExecutionOutcome/review producer and candidate-change invalidation hook.",
+      "continue": "C-side validity rules unchanged and already delivered."
+    }
+  ],
+  "notTested": [
+    "Main context composition/preview HTTP and UI (not published)",
+    "Real native/review execution and pilot value (B/E-owned)",
+    "Any real model or native task (budget 0)"
+  ],
+  "mainNextSteps": [
+    "Re-run `node tools/bootstrap/probe-wave08-context-grant.mjs <checkout>`; all four cases pass on this branch.",
+    "Admit `authorizeComposition`/`ContextComposer`/`buildCompositionPreview`/`buildSourceManifest` and render sources, omissions, injection flags and `budgetClamped` in the preview entry.",
+    "Surface `grant_expired`/`grant_purpose`/`grant_unconfirmed` and `scan_incomplete` as explicit states, never as empty knowledge.",
+    "Keep proposal confirmation as prepareCommand/commitPrepared + C `commit` in one UnitOfWork (main's existing composition already matches; C consumers verify 10/10 + HTTP)."
+  ]
+}

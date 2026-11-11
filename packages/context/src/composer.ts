@@ -859,6 +859,67 @@ export class ContextComposer {
   }
 }
 
+/** Stable, transport-neutral source manifest for main's own DTO; no absolute paths or authority. */
+export interface ComposedSourceManifestEntry {
+  readonly sourceId: string
+  readonly kind: ContextSourceKind
+  readonly group: ComposedGroupName
+  readonly path: string
+  readonly title?: string
+  readonly contentDigest: string
+  readonly baselineCommit?: string
+  readonly truncated: boolean
+  readonly bytes: number
+  readonly tokens: number
+  readonly trust: 'untrusted_data'
+}
+
+export interface ComposedSourceManifest {
+  readonly protocol: 'context-source-manifest/1'
+  readonly projectId: string
+  readonly conversationId?: string
+  readonly workId?: string
+  readonly status: ContextComposition['status']
+  readonly sources: readonly ComposedSourceManifestEntry[]
+  readonly omitted: readonly ContextOmission[]
+  readonly injectionFlagPaths: readonly string[]
+  readonly budgetClamped: readonly string[]
+}
+
+/**
+ * Projects a composition into stable per-source identities for main. It adds no authorization and no
+ * field a client could use to claim actor/tool permission; content itself stays untrusted data.
+ */
+export function buildSourceManifest(composition: ContextComposition): ComposedSourceManifest {
+  const groupOf = new Map<string, ComposedGroupName>()
+  for (const group of composition.groups) {
+    for (const slice of group.slices) groupOf.set(slice.sourceId, group.name)
+  }
+  return {
+    protocol: 'context-source-manifest/1',
+    projectId: composition.projectId,
+    ...(composition.conversationId === undefined ? {} : { conversationId: composition.conversationId }),
+    ...(composition.workId === undefined ? {} : { workId: composition.workId }),
+    status: composition.status,
+    sources: composition.slices.map((slice) => ({
+      sourceId: slice.sourceId,
+      kind: slice.kind,
+      group: groupOf.get(slice.sourceId) ?? 'files',
+      path: slice.path,
+      ...(slice.title === undefined ? {} : { title: slice.title }),
+      contentDigest: slice.baseline.contentDigest,
+      ...(slice.baseline.commit === undefined ? {} : { baselineCommit: slice.baseline.commit }),
+      truncated: slice.truncated,
+      bytes: slice.bytes,
+      tokens: slice.tokens,
+      trust: 'untrusted_data' as const,
+    })),
+    omitted: composition.omitted,
+    injectionFlagPaths: composition.injectionFlags.map((flag) => flag.path),
+    budgetClamped: composition.budgetClamped,
+  }
+}
+
 /** Compact preview for main's UI; identical safety fields to `buildContextPreview`. */
 export function buildCompositionPreview(composition: ContextComposition): ContextPreview {
   const files: ContextPreviewFile[] = composition.groups.flatMap((group) =>

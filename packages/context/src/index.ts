@@ -50,8 +50,14 @@ export {
   DEFAULT_COMPOSED_GROUPS,
   authorizeComposition,
   buildCompositionPreview,
+  buildSourceManifest,
 } from './composer.ts'
-export type { CompositionAuthorization, ResolvedCompositionBudget } from './composer.ts'
+export type {
+  ComposedSourceManifest,
+  ComposedSourceManifestEntry,
+  CompositionAuthorization,
+  ResolvedCompositionBudget,
+} from './composer.ts'
 export type {
   ComposedArtifactProvider,
   ComposedArtifactView,

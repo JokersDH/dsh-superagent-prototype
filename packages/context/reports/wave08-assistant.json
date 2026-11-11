@@ -1,0 +1,48 @@
+{
+  "status": "PASS_SQLITE_ASSISTANT_CONSUMER",
+  "sourceCommit": "138a817590a2b3d66920fa01c7f54dacca28007d",
+  "checkedAt": "2026-11-11T08:52:41.330Z",
+  "modelCalls": 0,
+  "actualBusinessEffects": 0,
+  "cases": [
+    {
+      "id": "PENDING-PROPOSAL-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+    },
+    {
+      "id": "CONFIRM-RECEIPT-FAILURE-ROLLS-BACK-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+    },
+    {
+      "id": "CONFIRM-REOPEN-AND-REPLAY-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+    },
+    {
+      "id": "DECISION-PROVENANCE-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+    },
+    {
+      "id": "DECISION-DOMAIN-REPLAY-OVER-STORAGE",
+      "owner": "C",
+      "status": "PASS"
+    },
+    {
+      "id": "DECISION-REVOKE-AND-REOPEN-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+    },
+    {
+      "id": "SOURCE-INVALIDATION-EXCLUDES-PERSISTED-DECISION",
+      "owner": "integration",
+      "status": "PASS"
+    }
+  ],
+  "limitations": [
+    "Real temporary SQLite and production A/C ports; no HTTP/model/UI production enablement",
+    "Atomic proposal consumer records a fixture command receipt, without executing a coding or model task"
+  ]
+}

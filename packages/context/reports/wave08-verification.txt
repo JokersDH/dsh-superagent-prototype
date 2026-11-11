@@ -1,0 +1,68 @@
+# Agent C wave-08 verification (2026-11-11T08:52:31Z)
+138a817 Enforce one authorization gate for every context source
+
+## @personal-agent/context
+$ tsc -p tsconfig.json
+ℹ tests 56
+ℹ pass 56
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/proposals
+$ tsc -p tsconfig.json
+ℹ tests 30
+ℹ pass 30
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/knowledge
+$ tsc -p tsconfig.json
+ℹ tests 68
+ℹ pass 68
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/routing
+$ tsc -p tsconfig.json
+ℹ tests 44
+ℹ pass 44
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## wave-08 grant probe
+  "status": "PASS_CONTEXT_GRANT_BOUNDARY",
+      "kind": "valid_control",
+      "status": "PASS",
+      "reads": 1,
+      "errorCode": null
+      "kind": "expired_grant",
+      "status": "PASS",
+      "reads": 0,
+      "errorCode": "grant_expired"
+      "kind": "budget_above_grant",
+      "status": "PASS",
+      "reads": 1,
+      "errorCode": null
+      "kind": "purpose_mismatch",
+      "status": "PASS",
+      "reads": 0,
+      "errorCode": "grant_purpose"
+
+## main-owned integration
+ℹ tests 10
+ℹ pass 10
+ℹ fail 0
+ℹ tests 8
+ℹ pass 8
+ℹ fail 0
+ℹ tests 2
+ℹ pass 2
+ℹ fail 0
+
+## probes
+  "singleStatus": "superseded",
+  "activeIds": [],
+  "status": "PASS_SQLITE_ASSISTANT_CONSUMER",
+
+## performance
+{"status":"PASS","p50":0.313,"p95":0.672,"bytes":3394,"slices":12}

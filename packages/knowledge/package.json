@@ -34,6 +34,7 @@
     "@types/node": "24.10.0",
     "typescript": "6.0.3",
     "@personal-agent/storage": "workspace:*",
-    "@personal-agent/workflows": "workspace:*"
+    "@personal-agent/workflows": "workspace:*",
+    "@personal-agent/orchestrator-core": "workspace:*"
   }
 }
