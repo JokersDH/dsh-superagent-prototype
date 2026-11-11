@@ -349,8 +349,12 @@ try {
   if (backupEvidence === undefined || backupEvidence.protocol !== 'personal-evidence')
     throw new Error('backup manifest does not record evidence coverage')
   if (backupEvidence.counts.artifacts < 1) throw new Error('backup evidence does not cover the delivered artifacts')
-  if (backupEvidence.routingEvidence.status !== 'unavailable')
-    throw new Error('this merge has no routing evidence persistence; manifest must say unavailable, not included')
+  if (!['included', 'unavailable'].includes(backupEvidence.routingEvidence.status))
+    throw new Error('backup evidence does not describe routing evidence capability')
+  if (backupEvidence.routingEvidence.status === 'included' && backupEvidence.formatVersion !== 2)
+    throw new Error('a bundle that covers routing evidence must use evidence format 2')
+  if (backupEvidence.routingEvidence.status === 'unavailable' && backupEvidence.formatVersion !== 1)
+    throw new Error('a schema-12 bundle without routing evidence must remain evidence format 1')
   step('backup-live', 'PASS', { archiveSha256: backupArchiveSha256, counts: backup.json.counts, database: backup.json.database, evidence: { digest: backupEvidence.digest, counts: backupEvidence.counts, routing: backupEvidence.routingEvidence.status } })
 
   const verifyLive = runPa(['verify-backup', '--json', '--bundle', backupPath, ...stateArgs()], { allowExit: [0] })
@@ -522,7 +526,7 @@ try {
   if (restore.json?.status !== 'RESTORED') throw new Error(`restore did not report RESTORED: ${JSON.stringify(restore.json).slice(0, 600)}`)
   if (restore.json.report.database.integrity !== 'ok' || restore.json.report.database.foreignKeyViolations !== 0)
     throw new Error('restored database facts are not clean')
-  if (restore.json.report.evidence?.status !== 'verified')
+  if (!['verified', 'verified_with_migration'].includes(restore.json.report.evidence?.status))
     throw new Error('restore did not verify evidence coverage')
   if (restore.json.report.evidence.digest !== backupEvidence.digest)
     throw new Error('restored evidence digest does not match the bundle manifest')
@@ -657,6 +661,69 @@ try {
     commandStatus: rejectedCommand.status,
     errorCode: rejectedBody?.error?.code ?? null,
   })
+  // D4: consume main's read-only recovery inspect/prepare. Neither may write the database, marker,
+  // project registry or old queue, and the response is never treated as authorization.
+  const recoveryDb = join(recoveryRestored, 'state.sqlite')
+  const recoveryMarkerPath = join(recoveryRestored, 'restore-report.json')
+  const digestOfFile = (path) => createHash('sha256').update(readFileSync(path)).digest('hex')
+  const dbBeforePreflight = digestOfFile(recoveryDb)
+  const markerBeforePreflight = readFileSync(recoveryMarkerPath)
+  const inspected = runPa(['recovery-inspect', '--json', ...stateArgs(recoveryRestored)], { allowExit: [0] })
+  if (inspected.json?.startupMode !== 'recovery_readonly') throw new Error('recovery-inspect did not observe recovery_readonly')
+  if (typeof inspected.json?.inspectionFingerprint !== 'string' || inspected.json.inspectionFingerprint.length !== 64)
+    throw new Error('recovery-inspect did not return a bounded inspection fingerprint')
+  if (inspected.json?.authorization !== 'not_granted' || inspected.json?.commitAvailable !== false)
+    throw new Error('recovery-inspect must never report a grant')
+  const heldTotal = (inspected.json?.heldQueue?.waiting ?? -1) + (inspected.json?.heldQueue?.parked ?? -1)
+  if (heldTotal !== recoveryBefore.queue.length)
+    throw new Error(`recovery-inspect held queue (${heldTotal}) does not match the preserved queue ${recoveryBefore.queue.length}`)
+  if (!inspected.json.projects.some((project) => project.id === 'project-atlas'))
+    throw new Error('recovery-inspect did not list the configured project')
+
+  const preflightSource = join(root, 'recovery-preflight-project')
+  mkdirSync(preflightSource, { recursive: true })
+  writeFileSync(join(preflightSource, 'index.mjs'), 'export const ok = true\n')
+  const git = (args) => spawnSync('git', args, { cwd: preflightSource, encoding: 'utf8' })
+  git(['init', '-q'])
+  git(['add', 'index.mjs'])
+  git(['-c', 'user.name=Recovery Smoke', '-c', 'user.email=smoke@localhost', 'commit', '-qm', 'recovery base'])
+  const planned = runPa(['recovery-prepare', '--json', '--source-project', 'project-atlas', '--path', preflightSource, ...stateArgs(recoveryRestored)], { allowExit: [1, 2] })
+  if (planned.json?.status === 'BLOCKED') {
+    // A git identity that cannot be observed is an honest blocker, not a silent success.
+    if (planned.json.code !== 'prepare_refused') throw new Error(`unexpected prepare blocker ${planned.json.code}`)
+  }
+  if (planned.json?.authorization !== undefined && planned.json.authorization !== 'not_granted')
+    throw new Error('recovery-prepare must not grant authorization')
+  if (planned.json?.applied !== false) throw new Error('recovery-prepare must not apply anything')
+  if (planned.json?.bindings?.length !== 1 || planned.json.bindings[0].sourceProjectId !== 'project-atlas')
+    throw new Error('recovery-prepare did not bind the requested source project')
+  if (planned.json.bindings[0].proposedProjectId === 'project-atlas')
+    throw new Error('recovery-prepare silently reused the old project identity as a new binding')
+  if (planned.json?.commitRequirements?.status !== 'BLOCKED' || planned.json.commitRequirements.owner !== 'main')
+    throw new Error('recovery-prepare did not report the main-owned commit blocker')
+  const stalePrepare = runPa(['recovery-prepare', '--json', '--source-project', 'project-atlas', '--path', join(root, 'missing-project'), ...stateArgs(recoveryRestored)], { allowExit: [2] })
+  if (stalePrepare.json?.status !== 'BLOCKED' || !['prepare_refused', 'inspect_unavailable'].includes(stalePrepare.json.code))
+    throw new Error(`a missing project path must be refused, got ${JSON.stringify(stalePrepare.json).slice(0, 300)}`)
+
+  if (digestOfFile(recoveryDb) !== dbBeforePreflight) throw new Error('recovery inspect/prepare wrote the restored database')
+  if (!readFileSync(recoveryMarkerPath).equals(markerBeforePreflight)) throw new Error('recovery inspect/prepare changed the restore marker')
+  const afterPreflight = readBusinessSnapshot(recoveryDb)
+  if (JSON.stringify(afterPreflight) !== JSON.stringify(recoveryBefore))
+    throw new Error('recovery inspect/prepare consumed or replayed the old queue')
+  step('recovery-inspect-prepare-readonly', 'PASS', {
+    startupMode: inspected.json.startupMode,
+    fingerprintPresent: true,
+    heldQueue: inspected.json.heldQueue,
+    authorization: planned.json.authorization,
+    commitAvailable: planned.json.commitAvailable,
+    proposedProjectId: planned.json.bindings[0].proposedProjectId,
+    planBlockers: planned.json.blockers.map((blocker) => blocker.code ?? blocker),
+    commitOwner: planned.json.commitRequirements.owner,
+    databaseUnchanged: true,
+    markerUnchanged: true,
+    queueUnchanged: true,
+  })
+
   const recoveryStop = await stopTrial(recoveryInstance, { label: 'recovery' })
   step('stop-recovery-readonly', 'PASS', { stopMs: recoveryStop.stopMs })
   const recoveryAfter = readBusinessSnapshot(join(recoveryRestored, 'state.sqlite'))

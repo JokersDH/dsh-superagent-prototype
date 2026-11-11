@@ -16,6 +16,7 @@ import { runDoctor } from '../lib/doctor.mjs'
 import { firstRun } from '../lib/first-run.mjs'
 import { readInstanceRecord, verifyInstance } from '../lib/instance.mjs'
 import { recoveryStatus, recoverySummary } from '../lib/recovery.mjs'
+import { RECOVERY_COMMIT_REQUIREMENTS, RecoveryAuthorizationError, recoveryInspect, recoveryPrepare } from '../lib/recovery-authorization.mjs'
 import { readRelease } from '../lib/release.mjs'
 import { backupState, verifyBackup } from '../lib/backup.mjs'
 import { importBundle, restoreState, rollbackState } from '../lib/restore.mjs'
@@ -39,6 +40,8 @@ const HELP = `pa — 本机个人 Agent 助理启动器
   stop                   按已验证进程身份优雅停止；超时如实报告未静止资源
   doctor                 只读诊断 Node/ABI/SQLite/构建/根目录/实例/执行器
   recovery-status        只读列出恢复 marker/待重绑定/main 新授权接口状态（不发业务）
+  recovery-inspect       调用 main /v1/recovery/inspect（本机只读观测，不是授权）
+  recovery-prepare       调用 main /v1/recovery/prepare 获取只读重绑定计划（不落盘、不授权）
   backup                 创建完整备份 bundle（一致 DB 快照 + 引用产物 + 必要配置）
   verify-backup          只校验 bundle（结构/摘要/DB/安全），不恢复
   import-bundle          校验并登记已有 bundle 到本机托管备份目录
@@ -95,6 +98,8 @@ function commandSpecs() {
     status: COMMON,
     doctor: { ...COMMON, deep: 'boolean', 'executors-fixture': 'string' },
     'recovery-status': { ...COMMON },
+    'recovery-inspect': { ...COMMON },
+    'recovery-prepare': { ...COMMON, 'source-project': 'string', path: 'string', check: 'string', 'display-name': 'string' },
     start: {
       ...COMMON,
       port: 'string',
@@ -176,6 +181,64 @@ async function main(argv) {
       ].join('\n'),
     })
     return EXIT.OK
+  }
+
+  if (command === 'recovery-inspect') {
+    try {
+      const result = await recoveryInspect({ roots })
+      const human = [
+        `recovery-inspect: ${result.startupMode === 'recovery_readonly' ? 'RESTORED_READONLY' : 'NORMAL'}`,
+        `  fingerprint: ${result.inspectionFingerprint === null ? 'unavailable' : `${result.inspectionFingerprint.slice(0, 16)}…`}`,
+        `  schema: ${String(result.productSchema ?? 'unknown')} eventCursor: ${String(result.eventCursor ?? 'unknown')} marker: ${result.markerDigest === null ? 'none' : 'present'}`,
+        `  held queue: waiting ${String(result.heldQueue?.waiting ?? 'unknown')} parked ${String(result.heldQueue?.parked ?? 'unknown')}`,
+        `  projects: ${result.projects.map((project) => project.id).join(', ') || 'none'}; historical attempts: ${result.historicalAttempts.length}`,
+        `  blockers: ${result.blockers.map((blocker) => String(blocker.code ?? blocker)).join(', ') || 'none'}`,
+        `  authorization: ${result.authorization} commitAvailable: ${result.commitAvailable}`,
+        ...result.limitations.map((line) => `  ! ${line}`),
+      ].join('\n')
+      printResult({ json: json ? result : null, human })
+      return EXIT.OK
+    } catch (error) {
+      if (!(error instanceof RecoveryAuthorizationError)) throw error
+      const body = { status: 'BLOCKED', code: error.code, message: error.message, detail: error.detail,
+        hint: '恢复检查需要已运行且可核验的实例；不在这里伪造授权或启动业务。' }
+      printResult({ json: json ? body : null, human: `recovery-inspect BLOCKED ${error.code}: ${error.message}` })
+      return EXIT.BLOCKED
+    }
+  }
+
+  if (command === 'recovery-prepare') {
+    const sourceProject = values['source-project']
+    const projectPath = values.path
+    if (sourceProject === undefined || projectPath === undefined) {
+      printResult({ json: json ? { status: 'BLOCKED', code: 'usage', message: 'recovery-prepare 需要 --source-project 与 --path' } : null,
+        human: 'recovery-prepare 需要 --source-project <现有项目id> 与 --path <当前绝对 Git 根>；--check 默认 node_test。' })
+      return EXIT.BLOCKED
+    }
+    const bindings = [{
+      sourceProjectId: sourceProject,
+      project: { path: resolve(projectPath), check: values.check ?? 'node_test', ...(values['display-name'] === undefined ? {} : { displayName: values['display-name'] }) },
+    }]
+    try {
+      const plan = await recoveryPrepare({ roots, bindings })
+      const human = [
+        `recovery-prepare: ${plan.authorization} commitAvailable=${plan.commitAvailable}`,
+        `  plan: ${String(plan.planId ?? 'unavailable')} expires: ${String(plan.expiresAt ?? 'unavailable')}`,
+        `  bindings: ${plan.bindings.map((binding) => `${String(binding.sourceProjectId)}=>${String(binding.proposedProjectId ?? binding.projectId ?? '?')}`).join(', ') || 'none'}`,
+        `  blockers: ${plan.blockers.map((blocker) => String(blocker.code ?? blocker)).join(', ') || 'none'}`,
+        '  commit: BLOCKED (main recovery authorization is not implemented)',
+        ...RECOVERY_COMMIT_REQUIREMENTS.requiredInputs.map((line) => `  ? ${line}`),
+        ...plan.limitations.map((line) => `  ! ${line}`),
+      ].join('\n')
+      printResult({ json: json ? { ...plan, commitRequirements: RECOVERY_COMMIT_REQUIREMENTS } : null, human })
+      return EXIT.DEGRADED
+    } catch (error) {
+      if (!(error instanceof RecoveryAuthorizationError)) throw error
+      const body = { status: 'BLOCKED', code: error.code, message: error.message, detail: error.detail, commitRequirements: RECOVERY_COMMIT_REQUIREMENTS,
+        hint: '只读预检失败不改变恢复状态；不删除 marker、不重放旧队列、不切回 normal。' }
+      printResult({ json: json ? body : null, human: `recovery-prepare BLOCKED ${error.code}: ${error.message}` })
+      return EXIT.BLOCKED
+    }
   }
 
   if (command === 'recovery-status') {

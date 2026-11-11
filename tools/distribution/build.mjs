@@ -18,6 +18,9 @@ import { hashDirectory, resolveExternalClosure, stageFromRelease, workspacePacka
 
 const REPO_ROOT = fileURLToPath(new URL('../../', import.meta.url))
 const SUPPORTED_NODE = '>=24.21.0 <25'
+// Every workspace package the coordinator/runner import at runtime. A package that is imported but
+// not listed here fails at daemon start with ERR_MODULE_NOT_FOUND after staging, so keep this list in
+// step with the runtime import graph (routing/knowledge/context/proposals came with wave-06).
 const PACKAGES = [
   'contracts',
   'orchestrator-core',
@@ -29,6 +32,11 @@ const PACKAGES = [
   'verification',
   'environment-preparation',
   'portability',
+  'workflows',
+  'context',
+  'proposals',
+  'knowledge',
+  'routing',
 ]
 
 const { values } = parseArgs({

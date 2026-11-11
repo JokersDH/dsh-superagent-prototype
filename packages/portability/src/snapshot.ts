@@ -305,6 +305,12 @@ export async function snapshotState(options: SnapshotOptions): Promise<SnapshotR
 
   // Evidence coverage is read from the consistent snapshot itself through public storage ports.
   const evidence = readEvidenceSummary(stagedDatabase)
+  // A review report that the evidence refers to is part of the state: if its bytes are not in the
+  // artifact registry, the bundle cannot claim complete evidence recovery.
+  if (evidence.routingEvidence.status === 'included' && evidence.routingEvidence.missingArtifactRefs.length > 0)
+    throw new PortabilityError('artifact_missing', 'Review evidence references artifacts that are absent from the state', {
+      missingArtifactRefs: evidence.routingEvidence.missingArtifactRefs,
+    })
   const databaseFacts: DatabaseFacts = {
     integrity: verified.integrity,
     foreignKeyViolations: verified.foreignKeyViolations,

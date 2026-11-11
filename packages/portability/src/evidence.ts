@@ -19,16 +19,18 @@ import {
   ArtifactStore,
   EventLog,
   ProductDecisions,
+  RoutingEvidence,
   UnitOfWork,
   WorkflowIndex,
   WorkflowRecords,
   canonicalDigest,
   readArtifactRegistry,
+  readRoutingArtifactRefs,
 } from '@personal-agent/storage'
 import { PortabilityError } from './errors.ts'
 
 export const EVIDENCE_FORMAT = 'personal-evidence' as const
-export const EVIDENCE_FORMAT_VERSION = 1 as const
+export const EVIDENCE_FORMAT_VERSION = 2 as const
 
 export interface EvidenceProject {
   readonly id: string
@@ -51,6 +53,25 @@ export interface EvidenceWork {
   readonly deliverables: readonly { readonly verificationId: string; readonly artifactDigest: string; readonly criteriaDigest: string; readonly accepted: boolean }[]
 }
 
+export interface RoutingEvidenceSummary {
+  readonly status: 'included'
+  readonly reason: null
+  /** Empty when included: the required ports exist and their records are covered below. */
+  readonly requiredPorts: readonly string[]
+  readonly advice: readonly { readonly id: string; readonly projectId: string; readonly createdAt: string; readonly expiresAt: string; readonly sourceRef: string; readonly digest: string }[]
+  readonly reviews: readonly { readonly id: string; readonly projectId: string; readonly subjectDigest: string; readonly layer: string; readonly disposition: string; readonly observedAt: string; readonly reportArtifactRef: string; readonly digest: string }[]
+  readonly outcomes: readonly { readonly id: string; readonly projectId: string; readonly profileKey: string; readonly attemptKey: string; readonly layer: string; readonly acceptance: string; readonly observedAt: string; readonly digest: string }[]
+  /** Artifacts referenced by review evidence; they must also be present in the artifact registry. */
+  readonly artifactRefs: readonly string[]
+  readonly missingArtifactRefs: readonly string[]
+}
+
+export interface RoutingEvidenceUnavailable {
+  readonly status: 'unavailable'
+  readonly reason: string
+  readonly requiredPorts: readonly string[]
+}
+
 export interface EvidenceAcceptedEvent {
   readonly seq: number
   readonly entityRef: string
@@ -69,7 +90,8 @@ export interface EvidenceAcceptedEvent {
 
 export interface EvidenceSummary {
   readonly protocol: typeof EVIDENCE_FORMAT
-  readonly formatVersion: typeof EVIDENCE_FORMAT_VERSION
+  /** 2 when routing evidence is covered (schema 13+); 1 for a schema-12 database with no routing payload. */
+  readonly formatVersion: 1 | 2
   readonly digest: string
   readonly productSchema: number | null
   readonly projects: readonly EvidenceProject[]
@@ -80,11 +102,7 @@ export interface EvidenceSummary {
   readonly artifacts: readonly { readonly id: string; readonly digest: string; readonly bytes: number }[]
   /** Main writes application.candidate.accepted in the acceptance transaction; read via EventLog. */
   readonly acceptedEvents: readonly EvidenceAcceptedEvent[]
-  readonly routingEvidence: {
-    readonly status: 'unavailable' | 'included'
-    readonly reason: string
-    readonly requiredPorts: readonly string[]
-  }
+  readonly routingEvidence: RoutingEvidenceSummary | RoutingEvidenceUnavailable
   readonly counts: {
     readonly projects: number
     readonly works: number
@@ -93,6 +111,9 @@ export interface EvidenceSummary {
     readonly assistantProposals: number
     readonly artifacts: number
     readonly acceptedEvents: number
+    readonly routeAdvice: number
+    readonly reviewEvidence: number
+    readonly executionOutcomes: number
   }
   readonly limitations: readonly string[]
 }
@@ -108,7 +129,8 @@ const ROUTING_PORTS = [
 const LIMITATIONS = [
   'Route advice, review reports and execution outcomes have no storage implementation in this merge; the public RoutingEvidencePort is a contract only.',
   'The evidence digest covers readable persisted facts from public storage ports, not model quality, native truth or human acceptance.',
-  'Outcome/ReviewTiming coverage comes from the main acceptance event log (application.candidate.accepted), not from A wave-06 v13 ExecutionOutcome persistence, which is not in this merge.',
+  'Route advice, review evidence and execution outcomes are read from A v13 append-only tables through the public RoutingEvidence port; a record is an immutable fact, not proof of currentness, review PASS or model value.',
+  'Review-evidence artifact references are listed explicitly; a bundle whose review evidence points outside the artifact registry fails closed instead of copying unreferenced bytes.',
   'Project/worktree content and native sessions are out of scope; only persisted references and digests are included.',
 ] as const
 
@@ -266,14 +288,69 @@ export function readEvidenceSummary(databasePath: string): EvidenceSummary {
     assistantProposals.sort((a, b) => `${a.proposalId}@${a.version}`.localeCompare(`${b.proposalId}@${b.version}`))
     const artifacts = registryRows.sort((a, b) => a.id.localeCompare(b.id))
 
-    const routingEvidence = {
-      status: 'unavailable' as const,
-      reason: 'No storage implementation of RoutingEvidencePort exists in this merge; route advice/review reports/outcomes are not in the database yet.',
-      requiredPorts: [...ROUTING_PORTS],
+    // A v13 routing evidence, read through the public append-only port. A schema-12 database has no
+    // such tables; that stays explicitly unavailable instead of being reported as zero records.
+    const tables = new Set(
+      (db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as { name: string }[]).map((row) => row.name),
+    )
+    const routingTablesPresent = ['route_advice', 'review_evidence', 'execution_outcome'].every((name) => tables.has(name))
+    const advice: { id: string; projectId: string; createdAt: string; expiresAt: string; sourceRef: string; digest: string }[] = []
+    const reviews: { id: string; projectId: string; subjectDigest: string; layer: string; disposition: string; observedAt: string; reportArtifactRef: string; digest: string }[] = []
+    const outcomes: { id: string; projectId: string; profileKey: string; attemptKey: string; layer: string; acceptance: string; observedAt: string; digest: string }[] = []
+    let routingArtifactRefs: string[] = []
+    if (routingTablesPresent) {
+      const routing = new RoutingEvidence(db, uow)
+      for (const project of projects) {
+        const advicePage = routing.advice.list({ projectId: project.id, limit: 200 })
+        for (const record of advicePage.records)
+          advice.push({ id: record.id, projectId: record.projectId, createdAt: record.createdAt, expiresAt: record.expiresAt, sourceRef: record.sourceRef, digest: digestOf(record) })
+        const reviewPage = routing.reviews.list({ projectId: project.id, limit: 200 })
+        for (const record of reviewPage.records)
+          reviews.push({ id: record.id, projectId: record.projectId, subjectDigest: digestOf(record.subject), layer: record.layer, disposition: record.disposition, observedAt: record.observedAt, reportArtifactRef: record.reportArtifactRef, digest: digestOf(record) })
+        const outcomePage = routing.outcomes.list({ projectId: project.id, limit: 200 })
+        for (const record of outcomePage.records)
+          outcomes.push({
+            id: record.id,
+            projectId: record.projectId,
+            profileKey: record.profileRef.profileId,
+            attemptKey: `${record.attempt.ticketId}/${record.attempt.assignmentId}/${record.attempt.attemptId}@${record.attempt.fenceEpoch}`,
+            layer: record.layer,
+            acceptance: record.acceptance,
+            observedAt: record.observedAt,
+            digest: digestOf(record),
+          })
+      }
+      routingArtifactRefs = readRoutingArtifactRefs(databasePath)
     }
+    const adviceIds = new Set(advice.map((record) => record.id))
+    const reviewIds = new Set(reviews.map((record) => record.id))
+    const outcomeIds = new Set(outcomes.map((record) => record.id))
+    advice.sort((a, b) => a.id.localeCompare(b.id))
+    reviews.sort((a, b) => a.id.localeCompare(b.id))
+    outcomes.sort((a, b) => a.id.localeCompare(b.id))
+    if (advice.length !== adviceIds.size || reviews.length !== reviewIds.size || outcomes.length !== outcomeIds.size)
+      throw new PortabilityError('evidence_unreadable', 'Routing evidence pagination returned duplicate records')
+    const routingEvidence: EvidenceSummary['routingEvidence'] = routingTablesPresent
+      ? {
+          status: 'included',
+          reason: null,
+          requiredPorts: [],
+          advice,
+          reviews,
+          outcomes,
+          artifactRefs: routingArtifactRefs,
+          missingArtifactRefs: routingArtifactRefs.filter((id) => !registryRows.some((row) => row.id === id)),
+        }
+      : {
+          status: 'unavailable',
+          reason: 'This database predates A schema 13 (route_advice/review_evidence/execution_outcome); routing evidence is absent, not empty.',
+          requiredPorts: [...ROUTING_PORTS],
+        }
+    // A schema-12 database has no routing evidence payload, so its manifest is written as format 1:
+    // the bundle must not claim to have covered classes that did not exist when it was produced.
     const body = {
       protocol: EVIDENCE_FORMAT,
-      formatVersion: EVIDENCE_FORMAT_VERSION,
+      formatVersion: routingTablesPresent ? EVIDENCE_FORMAT_VERSION : (1 as const),
       productSchema,
       projects,
       works,
@@ -291,6 +368,9 @@ export function readEvidenceSummary(databasePath: string): EvidenceSummary {
         assistantProposals: assistantProposals.length,
         artifacts: artifacts.length,
         acceptedEvents: acceptedEvents.length,
+        routeAdvice: advice.length,
+        reviewEvidence: reviews.length,
+        executionOutcomes: outcomes.length,
       },
       limitations: [...LIMITATIONS],
     }
@@ -312,16 +392,50 @@ const same = (left: unknown, right: unknown): boolean => digestOf(left) === dige
  * Recompute the evidence summary from a restored database and require exact agreement with the
  * bundle manifest. A readable database is not enough: every covered evidence class must match.
  */
-export function verifyEvidenceSummary(databasePath: string, expected: EvidenceSummary): { ok: boolean; actual: EvidenceSummary; mismatches: readonly string[] } {
+export interface EvidenceVerification {
+  readonly ok: boolean
+  readonly actual: EvidenceSummary
+  readonly mismatches: readonly string[]
+  readonly legacyFormat: boolean
+  readonly migratedSchema: boolean
+}
+
+/**
+ * Recompute the evidence summary from a restored database and require exact agreement with the
+ * bundle manifest. A readable database is not enough: every covered evidence class must match.
+ *
+ * A bundle written before routing evidence existed (formatVersion 1) can still be restored: the
+ * recorded classes must match, and the routing tables must be empty after the append-only migration.
+ * A schema upgrade is reported as `migratedSchema`; it is never reported as if the old bundle had
+ * contained routing records.
+ */
+export function verifyEvidenceSummary(databasePath: string, expected: EvidenceSummary): EvidenceVerification {
   const actual = readEvidenceSummary(databasePath)
+  const legacyFormat = expected.formatVersion < 2
+  const migratedSchema = expected.productSchema !== actual.productSchema
   const mismatches: string[] = []
-  if (actual.protocol !== expected.protocol || actual.formatVersion !== expected.formatVersion) mismatches.push('format')
-  if (actual.productSchema !== expected.productSchema) mismatches.push('product_schema')
-  for (const key of ['projects', 'works', 'decisions', 'assistantDecisions', 'assistantProposals', 'artifacts', 'acceptedEvents'] as const) {
-    if (!same(actual[key], expected[key])) mismatches.push(key)
+  if (actual.protocol !== expected.protocol) mismatches.push('format')
+  if (legacyFormat) {
+    // A pre-v13 bundle had no routing payload at all; after the append-only migration those tables
+    // must be empty, and every class recorded by the old format must still match its count.
+    if (actual.routingEvidence.status === 'included') {
+      const routing = actual.routingEvidence
+      if (routing.advice.length + routing.reviews.length + routing.outcomes.length > 0) mismatches.push('routing_present_in_legacy_restore')
+    }
+    const recorded = expected.counts
+    if (
+      actual.counts.projects !== recorded.projects ||
+      actual.counts.works !== recorded.works ||
+      actual.counts.decisions !== recorded.decisions ||
+      actual.counts.assistantDecisions !== recorded.assistantDecisions ||
+      actual.counts.assistantProposals !== recorded.assistantProposals ||
+      actual.counts.artifacts !== recorded.artifacts ||
+      actual.counts.acceptedEvents !== recorded.acceptedEvents
+    ) mismatches.push('counts')
+  } else {
+    if (actual.digest !== expected.digest) mismatches.push('digest')
+    if (!same(actual.counts, expected.counts)) mismatches.push('counts')
+    if (!same(actual.routingEvidence, expected.routingEvidence)) mismatches.push('routing_evidence')
   }
-  if (!same(actual.counts, expected.counts)) mismatches.push('counts')
-  if (!same(actual.routingEvidence, expected.routingEvidence)) mismatches.push('routing_capability')
-  if (actual.digest !== expected.digest) mismatches.push('digest')
-  return { ok: mismatches.length === 0, actual, mismatches }
+  return { ok: mismatches.length === 0, actual, mismatches, legacyFormat, migratedSchema }
 }

@@ -1,63 +1,53 @@
 {
   "case": "WAVE06-UPGRADE-ROLLBACK",
   "status": "PASS",
-  "startedAt": "2026-11-11T02:38:56.861Z",
-  "steps": [
-    {
-      "id": "two-build-identities",
+  "startedAt": "2026-11-11T04:37:08.583Z",
+  "sections": {
+    "A-same-source-rebuild-data-roundtrip": {
       "status": "PASS",
       "detail": {
-        "buildA": "6984b93fa0f9bfe1",
-        "buildB": "6782964abab2a76b"
-      }
-    },
-    {
-      "id": "start-build-a",
-      "status": "PASS",
-      "detail": {
-        "health": "ok"
-      }
-    },
-    {
-      "id": "backup-pre-upgrade",
-      "status": "PASS",
-      "detail": {
-        "digest": "6dd290b501d43f767f05293e70bc454fa25e5c74e779cf0271a5ebd310d686b3",
-        "counts": {
-          "projects": 1,
-          "works": 1,
-          "decisions": 0,
-          "assistantDecisions": 0,
-          "assistantProposals": 0,
-          "artifacts": 1,
-          "acceptedEvents": 0
-        }
-      }
-    },
-    {
-      "id": "start-build-b-upgrade",
-      "status": "PASS",
-      "detail": {}
-    },
-    {
-      "id": "rollback-restores-pre-upgrade-state",
-      "status": "PASS",
-      "detail": {
-        "digest": "6dd290b501d43f767f05293e70bc454fa25e5c74e779cf0271a5ebd310d686b3",
+        "claim": "data round-trip across two builds of the same source; NOT a schema migration",
+        "buildA": "17bffe38e885e500",
+        "buildB": "0a0dc8f7728b5bef",
+        "evidenceDigest": "911b310a6300937757f3d57811d65a2ce451580497e4e618f81df95fd7eb8d64",
         "projectRevision": 1,
         "artifactDigest": "82b27fbee6a42a8e39dcdffb8c6094452d208e52b3ec728446ae9258f1feb42e"
       }
     },
-    {
-      "id": "start-build-b-after-rollback",
+    "B-cross-version-data-upgrade": {
       "status": "PASS",
-      "detail": {}
+      "detail": {
+        "claim": "schema-12 bundle restored by the schema-13 build; append-only migration on first start keeps every user record and adds empty routing tables",
+        "fromSchema": 12,
+        "toSchema": 13,
+        "oldBuildId": "d4eb3a13f4904d2d",
+        "newBuildId": "17bffe38e885e500",
+        "legacyEvidence": true,
+        "projectPreserved": "project-upgrade",
+        "workPreserved": "work-upgrade",
+        "artifactPreserved": true,
+        "routingRowsFabricated": 0
+      }
+    },
+    "C-cross-version-downgrade-refusal": {
+      "status": "PASS",
+      "detail": {
+        "claim": "a schema-13 state/bundle is refused by the schema-12 build; no down-migration, no data deletion, no silent open",
+        "oldBuildId": "d4eb3a13f4904d2d",
+        "newBuildId": "17bffe38e885e500",
+        "restoreCode": "manifest_invalid",
+        "restoreMessage": "Manifest evidence format version is unsupported",
+        "startCode": "daemon_start_failed",
+        "stateBytesUnchanged": true,
+        "schemaAfterRefusal": 13
+      }
     }
-  ],
-  "finishedAt": "2026-11-11T02:39:16.613Z",
+  },
+  "finishedAt": "2026-11-11T04:37:30.503Z",
   "limitations": [
-    "Two builds of the same source with an explicit build tag; this is an upgrade/rollback data-path proof, not a cross-version migration matrix or a new-protocol platform.",
-    "darwin/arm64 + Node 24.21.x measured only; no user service, native executor or model call.",
-    "Rollback restores the state snapshot; it does not downgrade the installed binaries."
+    "Section A is a rebuild/tag comparison of one source: it proves the data round-trip, not a version migration.",
+    "Sections B/C use one frozen older install artifact (schema 12) and one current build (schema 13) on darwin/arm64 only; other platforms, ABIs and intermediate schema versions are NOT_TESTED.",
+    "Rollback restores state bytes; it does not downgrade installed binaries and is not a downgrade path.",
+    "No user service, native executor or model call; all roots and ports are isolated."
   ]
 }

@@ -12,7 +12,7 @@ import { chmodSync, closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, mkdt
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import Database from 'better-sqlite3'
 import { PRODUCT_SCHEMA_VERSION, verifyDatabase } from '@personal-agent/storage'
-import { readEvidenceSummary, type EvidenceSummary } from './evidence.ts'
+import { verifyEvidenceSummary, type EvidenceSummary } from './evidence.ts'
 import { PortabilityError } from './errors.ts'
 import { DATABASE_ENTRY, MANIFEST_ENTRY } from './manifest.ts'
 import { readTarGz } from './archive.ts'
@@ -59,11 +59,16 @@ export interface RestoreReport {
   }
   /** Evidence coverage that was actually re-read from the restored database. */
   readonly evidence: {
-    readonly status: 'verified' | 'not_recorded'
+    readonly status: 'verified' | 'verified_with_migration' | 'not_recorded'
     readonly digest: string | null
     readonly counts: EvidenceSummary['counts'] | null
     readonly routingEvidence: EvidenceSummary['routingEvidence'] | null
     readonly reason: string | null
+    /** Bundle evidence format 1 predates routing evidence; the routing payload is absent by design. */
+    readonly legacyFormat: boolean
+    /** The restored database was migrated forward (append-only) from the bundle schema. */
+    readonly migratedSchema: boolean
+    readonly schema: { readonly bundle: number | null; readonly restored: number | null }
   }
   readonly requiresRevalidation: readonly string[]
   readonly excluded: readonly { path: string; reason: string }[]
@@ -273,26 +278,42 @@ export async function restoreBundle(options: RestoreOptions): Promise<RestoreRes
         counts: null,
         routingEvidence: null,
         reason: 'This bundle was produced before evidence coverage was recorded; evidence completeness is unknown.',
+        legacyFormat: false,
+        migratedSchema: false,
+        schema: { bundle: manifest.database.productSchema ?? null, restored: database.productSchema },
       }
     } else {
-      const actual = readEvidenceSummary(join(staging, 'state.sqlite'))
-      const expectedCounts = manifest.evidence.counts
-      const mismatches: string[] = []
-      if (actual.digest !== manifest.evidence.digest) mismatches.push('digest')
-      if (JSON.stringify(actual.counts) !== JSON.stringify(expectedCounts)) mismatches.push('counts')
-      if (actual.routingEvidence.status !== manifest.evidence.routingEvidence.status) mismatches.push('routing_capability')
-      if (mismatches.length > 0)
+      const expected = {
+        protocol: 'personal-evidence' as const,
+        formatVersion: manifest.evidence.formatVersion,
+        digest: manifest.evidence.digest,
+        productSchema: manifest.evidence.productSchema,
+        projects: [], works: [], decisions: [], assistantDecisions: [], assistantProposals: [], artifacts: [], acceptedEvents: [],
+        routingEvidence: manifest.evidence.routingEvidence,
+        counts: manifest.evidence.counts,
+        limitations: manifest.evidence.limitations,
+      } as unknown as EvidenceSummary
+      const verifiedEvidence = verifyEvidenceSummary(join(staging, 'state.sqlite'), expected)
+      if (!verifiedEvidence.ok)
         throw new PortabilityError('evidence_mismatch', 'Restored database evidence does not match the bundle manifest', {
-          mismatches,
+          mismatches: verifiedEvidence.mismatches,
           expectedDigest: manifest.evidence.digest,
-          actualDigest: actual.digest,
+          actualDigest: verifiedEvidence.actual.digest,
+        })
+      const routing = verifiedEvidence.actual.routingEvidence
+      if (routing.status === 'included' && routing.missingArtifactRefs.length > 0)
+        throw new PortabilityError('evidence_mismatch', 'Review evidence references artifacts that are absent from the restored state', {
+          missingArtifactRefs: routing.missingArtifactRefs,
         })
       evidenceReport = {
-        status: 'verified',
-        digest: actual.digest,
-        counts: actual.counts,
-        routingEvidence: actual.routingEvidence,
-        reason: actual.routingEvidence.status === 'unavailable' ? actual.routingEvidence.reason : null,
+        status: verifiedEvidence.migratedSchema ? 'verified_with_migration' : 'verified',
+        digest: verifiedEvidence.actual.digest,
+        counts: verifiedEvidence.actual.counts,
+        routingEvidence: routing,
+        reason: routing.status === 'unavailable' ? routing.reason : null,
+        legacyFormat: verifiedEvidence.legacyFormat,
+        migratedSchema: verifiedEvidence.migratedSchema,
+        schema: { bundle: manifest.evidence.productSchema, restored: verifiedEvidence.actual.productSchema },
       }
     }
 
@@ -334,9 +355,16 @@ export async function restoreBundle(options: RestoreOptions): Promise<RestoreRes
         'The restored instance has new local credentials; old runtime records and writer identity are not authority.',
         ...(evidenceReport.status === 'not_recorded'
           ? ['Legacy bundle has no evidence coverage; evidence completeness was not verified.']
-          : evidenceReport.routingEvidence?.status === 'unavailable'
-            ? ['Route advice/review report persistence was not present when this bundle was created; those evidence classes are not covered.']
-            : []),
+          : []),
+        ...(evidenceReport.migratedSchema
+          ? [`Restored database was migrated append-only from schema ${String(evidenceReport.schema.bundle)} to ${String(evidenceReport.schema.restored)}; no user record was deleted or rewritten, but schema-level behavior is new for this state.`]
+          : []),
+        ...(evidenceReport.legacyFormat
+          ? ['This bundle predates routing evidence (format 1); route advice/review/outcome records are absent by construction, not verified as zero.']
+          : []),
+        ...(evidenceReport.routingEvidence?.status === 'unavailable'
+          ? ['Routing evidence tables are absent from the restored database; those evidence classes are not covered.']
+          : []),
       ],
     }
     const reportPath = join(staging, 'restore-report.json')

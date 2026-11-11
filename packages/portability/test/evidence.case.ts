@@ -39,7 +39,7 @@ function seedState(stateDir: string) {
         candidate: {
           ticketId: 'ticket-evidence',
           assignmentId: 'assignment-evidence',
-          contract: { workId: 'work-evidence', revision: 1, digest: 'c'.repeat(64) },
+          contract: { workId: 'work-evidence', revision: 1, digest: 'c0'.repeat(32) },
           candidateGeneration: 1,
         },
         actorRef: 'local-user',
@@ -54,13 +54,78 @@ function seedState(stateDir: string) {
         },
       },
     })
+    const profile = { profileId: 'codex-cli', revision: 1, identityDigest: 'ef'.repeat(32) }
+    store.workflows.routingEvidence.advice.put({
+      protocol: 'route-advice/1',
+      id: 'advice-evidence',
+      projectId: 'project-evidence',
+      sourceRef: 'source-evidence',
+      taskContextDigest: 'ab'.repeat(32),
+      catalogRevision: 'cd'.repeat(32),
+      policyRevision: 'policy-evidence',
+      eligibleProfileRefs: [profile],
+      suggestedProfileRef: profile,
+      excluded: [],
+      basis: 'only_eligible',
+      evidenceRefs: ['evidence-route-support'],
+      reviewSuggested: false,
+      createdAt: now,
+      expiresAt: new Date(Date.parse(now) + 300_000).toISOString(),
+    })
+    store.workflows.routingEvidence.reviews.put({
+      protocol: 'review-evidence/1',
+      id: 'review-evidence',
+      projectId: 'project-evidence',
+      subject: {
+        candidate: {
+          ticketId: 'ticket-evidence', assignmentId: 'assignment-evidence', candidateGeneration: 1,
+          contract: { workId: 'work-evidence', revision: 1, digest: 'c0'.repeat(32) },
+        },
+        artifactDigest: artifact.digest, baseCommit: '9'.repeat(40), environmentRef: 'environment-evidence', checkPolicyRef: 'policy-check-evidence',
+      },
+      reviewerProfileRef: profile,
+      reviewAttempt: {
+        ticketId: 'ticket-review', assignmentId: 'assignment-review', attemptId: 'attempt-review', fenceEpoch: 1,
+        contract: { workId: 'work-review', revision: 1, digest: 'e1'.repeat(32) },
+      },
+      inputDigest: 'df'.repeat(32),
+      reportDigest: 'bd'.repeat(32),
+      reportArtifactRef: artifact.id,
+      isolation: { kind: 'sealed_copy', proofRef: 'isolation-proof-evidence', capsuleManifestDigest: 'ce'.repeat(32) },
+      evidenceRefs: [],
+      layer: 'controlled',
+      disposition: 'findings',
+      observedAt: now,
+    })
+    store.workflows.routingEvidence.outcomes.put({
+      protocol: 'execution-outcome/1',
+      id: 'outcome-evidence',
+      projectId: 'project-evidence',
+      attempt: {
+        ticketId: 'ticket-evidence', assignmentId: 'assignment-evidence', attemptId: 'attempt-evidence', fenceEpoch: 1,
+        contract: { workId: 'work-evidence', revision: 1, digest: 'c0'.repeat(32) },
+      },
+      profileRef: profile,
+      acceptance: 'accepted',
+      acceptanceRef: 'acceptance-evidence',
+      verificationRef: 'verification-evidence',
+      artifactDigest: artifact.digest,
+      candidate: {
+        ticketId: 'ticket-evidence', assignmentId: 'assignment-evidence', candidateGeneration: 1,
+        contract: { workId: 'work-evidence', revision: 1, digest: 'c0'.repeat(32) },
+      },
+      evidenceRefs: ['acceptance-evidence'],
+      layer: 'controlled',
+      usage: { completeness: 'unknown', evidenceRefs: [] },
+      observedAt: now,
+    })
     return { artifactId: artifact.id, artifactDigest: artifact.digest }
   } finally {
     store.close()
   }
 }
 
-test('the snapshot records readable project/work/artifact evidence and marks routing evidence unavailable', async (t) => {
+test('the snapshot records readable project/work/artifact and A routing evidence through the public ports', async (t) => {
   const { root, stateDir, staging } = base()
   try {
     const seeded = seedState(stateDir)
@@ -76,8 +141,17 @@ test('the snapshot records readable project/work/artifact evidence and marks rou
     assert.equal(snapshot.evidence.artifacts[0]?.id, seeded.artifactId)
     assert.equal(snapshot.evidence.projects[0]?.id, 'project-evidence')
     assert.equal(snapshot.evidence.works[0]?.id, 'work-evidence')
-    assert.equal(snapshot.evidence.routingEvidence.status, 'unavailable')
-    assert.ok(snapshot.evidence.routingEvidence.requiredPorts.length >= 1)
+    assert.equal(snapshot.evidence.formatVersion, 2)
+    assert.equal(snapshot.evidence.routingEvidence.status, 'included')
+    if (snapshot.evidence.routingEvidence.status !== 'included') throw new Error('routing evidence not included')
+    assert.equal(snapshot.evidence.counts.routeAdvice, 1)
+    assert.equal(snapshot.evidence.counts.reviewEvidence, 1)
+    assert.equal(snapshot.evidence.counts.executionOutcomes, 1)
+    assert.equal(snapshot.evidence.routingEvidence.advice[0]?.id, 'advice-evidence')
+    assert.equal(snapshot.evidence.routingEvidence.reviews[0]?.disposition, 'findings')
+    assert.equal(snapshot.evidence.routingEvidence.outcomes[0]?.acceptance, 'accepted')
+    assert.deepEqual(snapshot.evidence.routingEvidence.artifactRefs, [seeded.artifactId])
+    assert.deepEqual(snapshot.evidence.routingEvidence.missingArtifactRefs, [])
   } finally {
     rmSync(root, { recursive: true, force: true })
   }
@@ -96,14 +170,17 @@ test('the bundle carries the evidence digest and restore re-reads every covered 
     })
     assert.equal(bundle.manifest.evidence?.digest, snapshot.evidence.digest)
     assert.deepEqual(bundle.manifest.evidence?.counts, snapshot.evidence.counts)
-    assert.equal(bundle.manifest.evidence?.routingEvidence.status, 'unavailable')
+    assert.equal(bundle.manifest.evidence?.routingEvidence.status, 'included')
+    assert.equal(bundle.manifest.evidence?.counts.reviewEvidence, 1)
 
     const target = join(root, 'restored')
     const restored = await restoreBundle({ bundlePath: bundle.bundlePath, targetStateDir: target, stagingRoot: staging })
     assert.equal(restored.report.evidence.status, 'verified')
     assert.equal(restored.report.evidence.digest, snapshot.evidence.digest)
     assert.deepEqual(restored.report.evidence.counts, snapshot.evidence.counts)
-    assert.equal(restored.report.evidence.routingEvidence?.status, 'unavailable')
+    assert.equal(restored.report.evidence.routingEvidence?.status, 'included')
+    assert.equal(restored.report.evidence.legacyFormat, false)
+    assert.equal(restored.report.evidence.migratedSchema, false)
   } finally {
     rmSync(root, { recursive: true, force: true })
   }
@@ -131,7 +208,8 @@ test('evidence verification fails closed when a restored database gains evidence
     const verified = verifyEvidenceSummary(restoredDb, before)
     assert.equal(verified.ok, false)
     assert.ok(verified.mismatches.includes('digest'))
-    assert.ok(verified.mismatches.includes('projects'))
+    assert.equal(verified.actual.counts.projects, 1)
+    assert.notEqual(verified.actual.digest, before.digest)
   } finally {
     rmSync(root, { recursive: true, force: true })
   }
@@ -180,6 +258,104 @@ test('a future database schema is refused before a bundle can be certified', asy
     await assert.rejects(
       () => snapshotState({ stateDir, stagingDir: join(staging, 'files') }),
       (error: unknown) => (error as { code?: string }).code === 'schema_unsupported',
+    )
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+/**
+ * Produces a schema-12 fixture: create real records through the public store, then remove the v13
+ * tables. v13 only adds tables/indexes, so this is structurally the database an older build writes.
+ */
+const seedSchema12 = (stateDir: string) => {
+  const store = new ProductStore({ path: join(stateDir, 'state.sqlite') })
+  try {
+    store.workflows.projects.append({
+      projectId: 'project-legacy',
+      expectedRevision: 0,
+      settings: { pathDigest: 'b2'.repeat(32), check: 'node_test', sourceRef: 'legacy' },
+      createdAt: new Date().toISOString(),
+    })
+    store.close()
+  } catch (error) {
+    store.close()
+    throw error
+  }
+  const db = new Database(join(stateDir, 'state.sqlite'))
+  try {
+    db.exec('DROP TABLE route_advice; DROP TABLE review_evidence; DROP TABLE execution_outcome;')
+    db.prepare("UPDATE schema_meta SET value = '12' WHERE key = 'product_schema'").run()
+    const applied = JSON.parse(String((db.prepare("SELECT value FROM schema_meta WHERE key = 'migrations'").get() as { value: string }).value)) as { version: number }[]
+    db.prepare("UPDATE schema_meta SET value = ? WHERE key = 'migrations'").run(JSON.stringify(applied.filter((entry) => entry.version <= 12)))
+    return Number((db.prepare("SELECT value FROM schema_meta WHERE key = 'product_schema'").get() as { value: string }).value)
+  } finally {
+    db.close()
+  }
+}
+
+test('a schema-12 state is recorded as legacy evidence and restores into a schema-13 build without losing records', async (t) => {
+  const { root, stateDir, staging } = base()
+  try {
+    assert.equal(seedSchema12(stateDir), 12)
+    const snapshot = await snapshotState({ stateDir, stagingDir: join(staging, 'files') })
+    assert.equal(snapshot.evidence.formatVersion, 1)
+    assert.equal(snapshot.evidence.productSchema, 12)
+    assert.equal(snapshot.evidence.routingEvidence.status, 'unavailable')
+    const bundle = await createBundle({ stateDir, outputPath: join(root, 'legacy.pab'), stagingRoot: staging, productVersion: '0.1.0' })
+    assert.equal(bundle.manifest.evidence?.formatVersion, 1)
+    assert.equal(bundle.manifest.evidence?.routingEvidence.status, 'unavailable')
+
+    const target = join(root, 'restored')
+    const restored = await restoreBundle({ bundlePath: bundle.bundlePath, targetStateDir: target, stagingRoot: staging })
+    assert.equal(restored.report.evidence.status, 'verified')
+    assert.equal(restored.report.evidence.legacyFormat, true)
+    assert.equal(restored.report.database.productSchema, 12)
+    assert.ok(restored.report.limitations.some((line) => line.includes('predates routing evidence')))
+
+    // The first open applies the append-only migration to schema 13; no user record is deleted.
+    const store = new ProductStore({ path: join(target, 'state.sqlite') })
+    try {
+      const open = new Database(join(target, 'state.sqlite'), { readonly: true })
+      try {
+        assert.equal(Number((open.prepare("SELECT value FROM schema_meta WHERE key = 'product_schema'").get() as { value: string }).value), 13)
+      } finally {
+        open.close()
+      }
+      assert.equal(store.workflows.projects.current('project-legacy')?.revision, 1)
+    } finally {
+      store.close()
+    }
+    const migrated = readEvidenceSummary(join(target, 'state.sqlite'))
+    assert.equal(migrated.productSchema, 13)
+    assert.equal(migrated.projects[0]?.id, 'project-legacy')
+    assert.equal(migrated.routingEvidence.status, 'included')
+    if (migrated.routingEvidence.status !== 'included') throw new Error('routing evidence missing after migration')
+    assert.equal(migrated.routingEvidence.advice.length + migrated.routingEvidence.reviews.length + migrated.routingEvidence.outcomes.length, 0)
+    // A migrated legacy restore must still match the classes the old bundle recorded.
+    const legacyExpected = { ...snapshot.evidence }
+    const recheck = verifyEvidenceSummary(join(target, 'state.sqlite'), legacyExpected)
+    assert.equal(recheck.ok, true)
+    assert.equal(recheck.migratedSchema, true)
+    assert.equal(recheck.legacyFormat, true)
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test('review evidence that points at an artifact outside the registry refuses the bundle', async (t) => {
+  const { root, stateDir, staging } = base()
+  try {
+    seedState(stateDir)
+    const db = new Database(join(stateDir, 'state.sqlite'))
+    try {
+      db.prepare("UPDATE review_evidence SET report_artifact_ref = 'artifact-not-in-registry'").run()
+    } finally {
+      db.close()
+    }
+    await assert.rejects(
+      () => snapshotState({ stateDir, stagingDir: join(staging, 'files') }),
+      (error: unknown) => (error as { code?: string }).code === 'artifact_missing',
     )
   } finally {
     rmSync(root, { recursive: true, force: true })

@@ -66,7 +66,8 @@ export interface DatabaseFacts {
 
 export interface EvidenceReference {
   readonly protocol: 'personal-evidence'
-  readonly formatVersion: 1
+  /** 1 = schema 12 bundles (no routing evidence payload); 2 = schema 13 with routing evidence. */
+  readonly formatVersion: 1 | 2
   readonly digest: string
   readonly productSchema: number | null
   readonly counts: {
@@ -77,11 +78,19 @@ export interface EvidenceReference {
     readonly assistantProposals: number
     readonly artifacts: number
     readonly acceptedEvents: number
+    readonly routeAdvice: number
+    readonly reviewEvidence: number
+    readonly executionOutcomes: number
   }
   readonly routingEvidence: {
     readonly status: 'unavailable' | 'included'
-    readonly reason: string
+    readonly reason: string | null
     readonly requiredPorts: readonly string[]
+    readonly advice?: readonly { readonly id: string; readonly projectId: string; readonly createdAt: string; readonly expiresAt: string; readonly sourceRef: string; readonly digest: string }[]
+    readonly reviews?: readonly { readonly id: string; readonly projectId: string; readonly subjectDigest: string; readonly layer: string; readonly disposition: string; readonly observedAt: string; readonly reportArtifactRef: string; readonly digest: string }[]
+    readonly outcomes?: readonly { readonly id: string; readonly projectId: string; readonly profileKey: string; readonly attemptKey: string; readonly layer: string; readonly acceptance: string; readonly observedAt: string; readonly digest: string }[]
+    readonly artifactRefs?: readonly string[]
+    readonly missingArtifactRefs?: readonly string[]
   }
   readonly limitations: readonly string[]
 }
@@ -322,22 +331,44 @@ export function validateManifest(input: unknown): BackupManifest {
   if (limitations.length > 1000) fail('Manifest limitations is too long')
   const limitationTexts = limitations.map((entry) => str(entry, 'limitations[]', 2048))
 
+  // Routing-evidence rows are opaque recorded facts: every field must be a string and every row must
+  // stay byte-identical so restore can compare the recomputed digest, but the bundle validator does
+  // not re-interpret A's append-only record semantics.
+  const evidenceRoutingRow = <T>(entry: unknown, kind: string): T => {
+    const record = isRecord(entry) ? entry : fail(`Manifest evidence.routingEvidence.${kind} row is invalid`)
+    const out: Record<string, string> = {}
+    for (const [key, field] of Object.entries(record as Record<string, unknown>)) {
+      out[key] = typeof field === 'string' ? field : fail(`Manifest evidence.routingEvidence.${kind}.${key} must be a string`)
+    }
+    return out as T
+  }
+
   // Optional for legacy bundles. New bundles must carry a well-formed evidence reference.
   let evidence: EvidenceReference | undefined
   if (value.evidence !== undefined) {
     const raw = isRecord(value.evidence) ? value.evidence : fail('Manifest evidence is invalid')
     if (raw.protocol !== 'personal-evidence') fail('Manifest evidence protocol is unrecognized')
-    if (raw.formatVersion !== 1) fail('Manifest evidence format version is unsupported')
+    if (raw.formatVersion !== 1 && raw.formatVersion !== 2) fail('Manifest evidence format version is unsupported')
+    const formatVersion = raw.formatVersion === 2 ? 2 : 1
     const digest = str(raw.digest, 'evidence.digest', 64)
     if (!SHA256.test(digest)) fail('Manifest evidence digest is invalid')
     const evidenceCounts = isRecord(raw.counts) ? raw.counts : fail('Manifest evidence.counts is missing')
     const routing = isRecord(raw.routingEvidence) ? raw.routingEvidence : fail('Manifest evidence.routingEvidence is missing')
     if (!['unavailable', 'included'].includes(String(routing.status))) fail('Manifest evidence.routingEvidence.status is invalid')
-    const requiredPorts = Array.isArray(routing.requiredPorts) ? routing.requiredPorts : fail('Manifest evidence.routingEvidence.requiredPorts is missing')
+    const requiredPorts = routing.requiredPorts === undefined
+      ? (routing.status === 'included' ? [] : fail('Manifest evidence.routingEvidence.requiredPorts is missing'))
+      : (Array.isArray(routing.requiredPorts) ? routing.requiredPorts : fail('Manifest evidence.routingEvidence.requiredPorts is invalid'))
     const evidenceLimitations = Array.isArray(raw.limitations) ? raw.limitations : fail('Manifest evidence.limitations is missing')
+    if (formatVersion === 2 && routing.status === 'included') {
+      for (const key of ['advice', 'reviews', 'outcomes', 'artifactRefs', 'missingArtifactRefs'])
+        if (!Array.isArray(routing[key])) fail(`Manifest evidence.routingEvidence.${key} is missing`)
+      const missing = routing.missingArtifactRefs as unknown[]
+      if (missing.length > 0)
+        fail('Manifest evidence.routingEvidence reports review-evidence artifacts that are absent from the bundle')
+    }
     evidence = {
       protocol: 'personal-evidence',
-      formatVersion: 1,
+      formatVersion,
       digest,
       productSchema: raw.productSchema === null || raw.productSchema === undefined ? null : nonNegativeInt(raw.productSchema, 'evidence.productSchema'),
       counts: {
@@ -348,11 +379,21 @@ export function validateManifest(input: unknown): BackupManifest {
         assistantProposals: nonNegativeInt(evidenceCounts.assistantProposals, 'evidence.counts.assistantProposals'),
         artifacts: nonNegativeInt(evidenceCounts.artifacts, 'evidence.counts.artifacts'),
         acceptedEvents: nonNegativeInt(evidenceCounts.acceptedEvents, 'evidence.counts.acceptedEvents'),
+        routeAdvice: evidenceCounts.routeAdvice === undefined ? 0 : nonNegativeInt(evidenceCounts.routeAdvice, 'evidence.counts.routeAdvice'),
+        reviewEvidence: evidenceCounts.reviewEvidence === undefined ? 0 : nonNegativeInt(evidenceCounts.reviewEvidence, 'evidence.counts.reviewEvidence'),
+        executionOutcomes: evidenceCounts.executionOutcomes === undefined ? 0 : nonNegativeInt(evidenceCounts.executionOutcomes, 'evidence.counts.executionOutcomes'),
       },
       routingEvidence: {
         status: routing.status as 'unavailable' | 'included',
-        reason: str(routing.reason, 'evidence.routingEvidence.reason', 2048),
+        reason: routing.reason === null || routing.reason === undefined ? null : str(routing.reason, 'evidence.routingEvidence.reason', 2048),
         requiredPorts: requiredPorts.map((entry) => str(entry, 'evidence.routingEvidence.requiredPorts[]', 512)),
+        ...(formatVersion === 2 && routing.status === 'included' ? {
+          advice: (routing.advice as unknown[]).map((entry) => evidenceRoutingRow(entry, 'advice')),
+          reviews: (routing.reviews as unknown[]).map((entry) => evidenceRoutingRow(entry, 'reviews')),
+          outcomes: (routing.outcomes as unknown[]).map((entry) => evidenceRoutingRow(entry, 'outcomes')),
+          artifactRefs: (routing.artifactRefs as unknown[]).map((entry) => str(entry, 'evidence.routingEvidence.artifactRefs[]', 256)),
+          missingArtifactRefs: [],
+        } : {}),
       },
       limitations: evidenceLimitations.map((entry) => str(entry, 'evidence.limitations[]', 1024)),
     }
