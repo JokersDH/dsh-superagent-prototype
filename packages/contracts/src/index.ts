@@ -16,5 +16,6 @@ export * from './work-evidence.ts';
 export * from './recovery-state.ts';
 export type * from './prepared-commands.ts';
 export * from './recovery-activation.ts';
+export * from './proposal-commands.ts';
 export type * from './types.ts';
 export type * from './ports.ts';

@@ -184,6 +184,9 @@ importers:
       '@personal-agent/orchestrator-core':
         specifier: workspace:*
         version: link:../../packages/orchestrator-core
+      '@personal-agent/proposals':
+        specifier: workspace:*
+        version: link:../../packages/proposals
       '@personal-agent/questions':
         specifier: workspace:*
         version: link:../../packages/questions

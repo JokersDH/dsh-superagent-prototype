@@ -23,7 +23,7 @@
               "type": "string"
             },
             "token": {
-              "maxLength": 50000,
+              "maxLength": 150000,
               "minLength": 16,
               "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$",
               "type": "string"
@@ -477,7 +477,7 @@
           "type": "string"
         },
         "token": {
-          "maxLength": 50000,
+          "maxLength": 150000,
           "minLength": 16,
           "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$",
           "type": "string"
