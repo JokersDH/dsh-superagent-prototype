@@ -1,0 +1,16 @@
+✔ preparation is read-only; explicit record and its event/receipt commit once and survive reopen (19.298917ms)
+✔ source digest, source conversation, actor and configured grant are rechecked on confirmation (8.122667ms)
+✔ expired previews/scopes and tampered tokens cannot record or dispatch work (7.710709ms)
+✔ a receipt failure rolls the decision and event back, with a later identical command allowed (10.023875ms)
+✔ revocation persists audit history, foreign scope is refused and old previews cannot resurrect it (15.079708ms)
+✔ source disappearance is visible in the catalog and project-bound continuation is enforced (11.484ms)
+✔ model messages and native answer display cannot become reusable user decisions (9.820458ms)
+✔ HTTP identity/schema and recovery read-only guard apply to every decision mutation (23.463458ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 236.838125

@@ -20,8 +20,10 @@ const timed = {
 }
 const tmp = (prefix: string): string => mkdtempSync(join(tmpdir(), prefix))
 
-function fixture(): { store: ProductStore; seq: number } {
-  const store = new ProductStore({ path: join(tmp('acceptance-'), 'state.sqlite') })
+function fixture(): { store: ProductStore; seq: number; reopen(): ProductStore; path: string } {
+  let dir = tmp('acceptance-')
+  const path = join(dir, 'state.sqlite')
+  let store = new ProductStore({ path })
   let seq = 0
   store.uow.atomic(() => {
     store.product.works.insert({ id: 'work-author', projectId: 'project-1', conversationId: 'conversation-1', title: 'Author', createdAt: at })
@@ -46,11 +48,19 @@ function fixture(): { store: ProductStore; seq: number } {
     seq = store.events.append({ topic: 'application.candidate.accepted', entityRef: 'work-author',
       payload: { candidate, actorRef: 'actor-1', reviewTiming: timed } })
   })
-  return { store, seq }
+  return {
+    get store() { return store }, seq, path,
+    reopen() {
+      store.close()
+      store = new ProductStore({ path })
+      return store
+    },
+  }
 }
 
 test('accepted event projects one exact outcome and preserves unknown timing as null', () => {
-  const { store, seq } = fixture()
+  const fixtureA = fixture()
+  const { store, seq } = fixtureA
   try {
     const ports = createWorkflowPorts(store)
     const result = ports.acceptance.consume({ eventSeq: seq, projectId: 'project-1', profileRef, layer: 'controlled' })
@@ -70,6 +80,13 @@ test('accepted event projects one exact outcome and preserves unknown timing as 
     const timeline = ports.index.timeline({ workId: 'work-author', projectIds: ['project-1'] })!
     assert.equal(timeline.entries.some(entry => entry.kind === 'execution.outcome'), true)
     assert.equal((timeline.entries.find(entry => entry.kind === 'execution.outcome')!.detail as { reviewTiming: { activeReviewMs: null } }).reviewTiming.activeReviewMs, null)
+
+    const reopened = fixtureA.reopen()
+    const reopenedPorts = createWorkflowPorts(reopened)
+    const replayed = reopenedPorts.acceptance.consume({ eventSeq: seq, projectId: 'project-1', profileRef, layer: 'controlled' })
+    assert.equal(replayed.status, 'replayed')
+    assert.equal(reopenedPorts.routingEvidence.outcomes.list({ projectId: 'project-1' }).records.length, 1, 'reopen does not double-count')
+    assert.equal(reopened.events.after(0, 100).filter(event => event.topic === 'application.candidate.accepted').length, 1)
   } finally {
     store.close()
     rmSync(join(store.database.path, '..'), { recursive: true, force: true })
@@ -96,6 +113,63 @@ test('missing attempt/verification/acceptance or wrong project yields an auditab
     if (missing.status === 'incomplete') assert.deepEqual(missing.reasons, ['verification_missing'])
     assert.equal(ports.routingEvidence.outcomes.list({ projectId: 'project-1' }).records.length, 1)
     assert.equal(ports.acceptance.consume({ eventSeq: 9999, projectId: 'project-1', profileRef, layer: 'controlled' }).status, 'incomplete')
+  } finally {
+    store.close()
+    rmSync(join(store.database.path, '..'), { recursive: true, force: true })
+  }
+})
+
+
+test('acceptance.consume joins the accepting transaction and a later failure rolls the outcome back', () => {
+  const { store, seq: _ } = fixture()
+  try {
+    const ports = createWorkflowPorts(store)
+    let seq = 0
+    assert.throws(() => store.uow.atomic(() => {
+      seq = store.events.append({ topic: 'application.candidate.accepted', entityRef: 'work-author',
+        payload: { candidate, actorRef: 'actor-1', reviewTiming: timed } })
+      const result = ports.acceptance.consume({ eventSeq: seq, projectId: 'project-1', profileRef, layer: 'controlled' })
+      assert.equal(result.status, 'recorded')
+      store.events.append({ topic: 'application.work.changed', entityRef: 'work-author', payload: { workId: 'work-author' } })
+      throw new Error('injected post-accept failure')
+    }), /injected post-accept failure/)
+    assert.equal(ports.routingEvidence.outcomes.list({ projectId: 'project-1' }).records.length, 0, 'outcome rolls back with the acceptance')
+    assert.equal(store.events.after(0, 100).filter(event => event.topic === 'application.candidate.accepted').length, 1, 'only the fixture event exists')
+    assert.equal(store.events.after(0, 100).some(event => event.topic === 'application.work.changed'), false)
+  } finally {
+    store.close()
+    rmSync(join(store.database.path, '..'), { recursive: true, force: true })
+  }
+})
+
+test('a new candidate on the same work gets its own outcome; the older accepted outcome stays readable', () => {
+  const { store, seq } = fixture()
+  try {
+    const ports = createWorkflowPorts(store)
+    const first = ports.acceptance.consume({ eventSeq: seq, projectId: 'project-1', profileRef, layer: 'controlled' })
+    assert.equal(first.status, 'recorded')
+    const second: CandidateRef = { ...candidate, candidateGeneration: 2 }
+    store.uow.atomic(() => {
+      // The same ended attempt produced a second candidate generation; a different attempt for the
+      // same assignment would be ambiguous and must not be silently chosen.
+      store.db.prepare(`INSERT INTO completion_verifications
+        (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, criteria_digest,
+         environment_ref, verifier_identity_ref, results, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        .run('verification-2', 'author-ticket', 'author-assignment', 2, JSON.stringify(contract), 'e'.repeat(64),
+          'c'.repeat(64), 'environment-1', 'verifier-1', '[]', at)
+    })
+    const secondSeq = store.events.append({ topic: 'application.candidate.accepted', entityRef: 'work-author',
+      payload: { candidate: second, actorRef: 'actor-1', reviewTiming: { ...timed, activeReviewMs: 5000,
+        activeReviewSource: 'ui_visibility_proxy', activeReviewCompleteness: 'partial' } } })
+    const next = ports.acceptance.consume({ eventSeq: secondSeq, projectId: 'project-1', profileRef, layer: 'controlled' })
+    assert.equal(next.status, 'recorded')
+    if (first.status !== 'recorded' || next.status !== 'recorded') return
+    assert.notEqual(next.outcome.id, first.outcome.id)
+    assert.equal(next.outcome.reviewTiming!.activeReviewMs, 5000)
+    assert.equal(ports.routingEvidence.outcomes.list({ projectId: 'project-1' }).records.length, 2)
+    assert.equal(ports.routingEvidence.outcomes.get(first.outcome.id)!.candidate!.candidateGeneration, 1)
+    assert.equal(ports.acceptance.consume({ eventSeq: secondSeq, projectId: 'project-1', profileRef, layer: 'controlled' }).status, 'replayed')
+    assert.equal(ports.routingEvidence.outcomes.list({ projectId: 'project-1' }).records.length, 2, 'replay does not double-count')
   } finally {
     store.close()
     rmSync(join(store.database.path, '..'), { recursive: true, force: true })

@@ -1,0 +1,174 @@
+/**
+ * Wave-06 A5: D-consumable snapshot and restore integrity over schema 13. Creates a real state
+ * containing decisions, settings, contracts, verification, outcomes/ReviewTiming and artifacts;
+ * verifies bytes/references; restores a copy into a new directory and reads the data back.
+ */
+import assert from 'node:assert/strict'
+import { test } from 'node:test'
+import { cpSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import Database from 'better-sqlite3'
+import { ProductStore, verifyDatabase } from '@personal-agent/storage'
+import { createWorkflowPorts, WorkflowSnapshots } from '../src/index.ts'
+
+const at = '2026-11-11T00:00:00.000Z'
+const scope = { projectId: 'project-1', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
+const contract = { workId: 'work-1', revision: 1, digest: 'a'.repeat(64) }
+const profile = { profileId: 'codex', revision: 3, identityDigest: 'a'.repeat(64) }
+const tmp = (prefix: string): string => mkdtempSync(join(tmpdir(), prefix))
+
+function dataset() {
+  const root = tmp('pa-snapshot-d-')
+  const store = new ProductStore({ path: join(root, 'state.sqlite') })
+  const ports = createWorkflowPorts(store)
+  store.uow.atomic(() => {
+    store.product.works.insert({ id: 'work-1', projectId: 'project-1', conversationId: 'conversation-1', title: 'Snapshot work', createdAt: at })
+    store.product.contracts.append({ ...contract, goal: 'Deliver', scope,
+      criteria: [{ id: 'unit', kind: 'machine', description: 'Unit', required: true, checkDefinitionRef: 'check-1' }],
+      authorityRef: 'authority-1', createdAt: at })
+    store.product.links.attach({ contract, ticketId: 'ticket-1', role: 'primary', authorityRef: 'authority-1' })
+    store.authority.enable(contract)
+    store.product.messages.append({
+      id: 'message-1', conversationId: 'conversation-1', projectId: 'project-1', role: 'user',
+      provenance: 'trusted_user', text: '保留这条决定。', sourceRefs: [], createdAt: at,
+    })
+    ports.projects.append({ projectId: 'project-1', expectedRevision: 0,
+      settings: { pathDigest: 'd'.repeat(64), check: 'node_test', sourceRef: 'source:project-1', displayName: 'Snapshot project' } })
+    ports.assistant.decisions.put({
+      decision: { id: 'decision-1', version: 1, content: 'Keep the verified patch.', scope, authorityRef: 'authority-1' },
+      sourceMessageId: 'message-1', sourceTextDigest: 'e'.repeat(64), conversationId: 'conversation-1',
+      actorRef: 'actor-1', recordedAt: at,
+    }, 0)
+    store.db.prepare(`INSERT INTO completion_verifications
+      (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, criteria_digest,
+       environment_ref, verifier_identity_ref, results, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run('verification-1', 'ticket-1', 'assignment-1', 1, JSON.stringify(contract), 'b'.repeat(64),
+        'c'.repeat(64), 'environment-1', 'verifier-1', '[]', at)
+  })
+  const patch = store.artifacts.write(Buffer.from('diff --git a/src/a b/src/a\n'))
+  store.artifacts.insert(patch)
+  const report = store.artifacts.write(Buffer.from('# review report\n'))
+  store.artifacts.insert(report)
+  ports.routingEvidence.reviews.put({
+    protocol: 'review-evidence/1', id: 'review-1', projectId: 'project-1',
+    subject: { candidate: { ticketId: 'ticket-1', assignmentId: 'assignment-1', contract, candidateGeneration: 1 },
+      artifactDigest: 'b'.repeat(64), baseCommit: 'f'.repeat(40), environmentRef: 'environment-1', checkPolicyRef: 'policy-1' },
+    reviewerProfileRef: profile,
+    reviewAttempt: { ticketId: 'review-ticket', assignmentId: 'review-assignment', attemptId: 'review-attempt',
+      fenceEpoch: 1, contract: { workId: 'work-review', revision: 1, digest: 'a'.repeat(64) } },
+    inputDigest: 'a'.repeat(64), reportDigest: 'e'.repeat(64), reportArtifactRef: report.id,
+    isolation: { kind: 'sealed_copy', proofRef: 'capsule-proof', capsuleManifestDigest: 'a'.repeat(64) },
+    evidenceRefs: ['review-evidence-1'], layer: 'controlled', disposition: 'no_findings', observedAt: at,
+  })
+  ports.routingEvidence.outcomes.put({
+    protocol: 'execution-outcome/1', id: 'outcome-1', projectId: 'project-1',
+    attempt: { ticketId: 'ticket-1', assignmentId: 'assignment-1', attemptId: 'attempt-1', fenceEpoch: 1, contract },
+    profileRef: profile, candidate: { ticketId: 'ticket-1', assignmentId: 'assignment-1', contract, candidateGeneration: 1 },
+    verificationRef: 'verification-1', artifactDigest: 'b'.repeat(64), acceptance: 'accepted', acceptanceRef: 'acceptance-1',
+    evidenceRefs: ['verification-1', 'acceptance-1'], layer: 'controlled',
+    usage: { completeness: 'unknown', evidenceRefs: [] }, observedAt: at,
+    reviewTiming: { candidateReadyAt: at, acceptedAt: '2026-11-11T00:01:40.000Z', readyToAcceptanceMs: 100000,
+      activeReviewMs: 5000, activeReviewSource: 'ui_visibility_proxy', activeReviewCompleteness: 'partial',
+      evidenceRefs: ['review-activity:1'] },
+  })
+  return { root, store, ports, patch, report }
+}
+
+test('schema-13 snapshot includes decisions/settings/contracts/verification/outcome and restores readably', async () => {
+  const data = dataset()
+  const snapshot = join(data.root, 'snapshot')
+  const restored = join(data.root, 'restored')
+  try {
+    const result = await new WorkflowSnapshots(data.store).create({ destination: snapshot })
+    assert.equal(result.status, 'ok', result.message)
+    assert.equal(result.manifest.database.productSchema, 13)
+    assert.equal(result.manifest.incompatibleSchema, false)
+    assert.equal(result.manifest.complete, true)
+    assert.deepEqual([...result.manifest.referencedArtifacts].sort(), [data.report.id])
+    for (const row of result.manifest.artifacts)
+      assert.equal(readFileSync(join(snapshot, row.snapshotPath)).length, row.bytes)
+
+    // A "restore" is a byte copy into a new directory; D owns the actual policy.
+    cpSync(snapshot, restored, { recursive: true })
+    const verification = new WorkflowSnapshots(data.store).verify(restored)
+    assert.equal(verification.status, 'ok', verification.message)
+    assert.equal(verifyDatabase(join(restored, 'product.sqlite')).integrity, 'ok')
+
+    const db = new Database(join(restored, 'product.sqlite'), { readonly: true, fileMustExist: true })
+    try {
+      const decision = JSON.parse(String((db.prepare("SELECT value FROM user_decision_versions WHERE id = 'decision-1'").get() as { value: string }).value))
+      assert.equal(decision.content, 'Keep the verified patch.')
+      const metadata = db.prepare("SELECT source_text_digest FROM assistant_decision_versions WHERE id = 'decision-1'").get() as { source_text_digest: string }
+      assert.equal(metadata.source_text_digest, 'e'.repeat(64))
+      assert.equal((db.prepare("SELECT revision FROM project_settings_current WHERE project_id = 'project-1'").get() as { revision: number }).revision, 1)
+      assert.equal((db.prepare("SELECT COUNT(*) AS n FROM contract_revisions WHERE work_id = 'work-1'").get() as { n: number }).n, 1)
+      assert.equal((db.prepare("SELECT COUNT(*) AS n FROM completion_verifications WHERE id = 'verification-1'").get() as { n: number }).n, 1)
+      const outcome = JSON.parse(String((db.prepare("SELECT value FROM execution_outcome WHERE id = 'outcome-1'").get() as { value: string }).value))
+      assert.equal(outcome.acceptance, 'accepted')
+      assert.equal(outcome.reviewTiming.readyToAcceptanceMs, 100000)
+      assert.equal(outcome.reviewTiming.activeReviewMs, 5000)
+      assert.equal((db.prepare("SELECT COUNT(*) AS n FROM review_evidence WHERE id = 'review-1'").get() as { n: number }).n, 1)
+      assert.equal((db.prepare("SELECT report_artifact_ref FROM review_evidence WHERE id = 'review-1'").get() as { report_artifact_ref: string }).report_artifact_ref, data.report.id)
+      const stored = db.prepare('SELECT digest, bytes FROM artifacts WHERE id = ?').get(data.patch.id) as { digest: string; bytes: number }
+      assert.equal(stored.digest, data.patch.digest)
+      assert.equal(stored.bytes, data.patch.bytes)
+    } finally { db.close() }
+  } finally {
+    data.store.close()
+    rmSync(data.root, { recursive: true, force: true })
+  }
+})
+
+test('missing file, changed bytes and a newer schema make the snapshot unusable', async () => {
+  const data = dataset()
+  const snapshot = join(data.root, 'snapshot')
+  try {
+    const created = await new WorkflowSnapshots(data.store).create({ destination: snapshot })
+    assert.equal(created.status, 'ok', created.message)
+    const first = created.manifest.artifacts[0]!
+
+    const missingDir = join(data.root, 'missing-copy')
+    cpSync(snapshot, missingDir, { recursive: true })
+    unlinkSync(join(missingDir, first.snapshotPath))
+    const missing = new WorkflowSnapshots(data.store).verify(missingDir)
+    assert.equal(missing.status, 'blocked')
+    assert.equal(missing.artifacts.some(item => item.id === first.id && item.status === 'missing'), true)
+
+    const corruptDir = join(data.root, 'corrupt-copy')
+    cpSync(snapshot, corruptDir, { recursive: true })
+    const bytes = readFileSync(join(corruptDir, first.snapshotPath))
+    bytes.writeUInt8((bytes[0] ?? 0) ^ 0xff, 0)
+    writeFileSync(join(corruptDir, first.snapshotPath), bytes)
+    const corrupt = new WorkflowSnapshots(data.store).verify(corruptDir)
+    assert.equal(corrupt.status, 'blocked')
+    assert.equal(corrupt.artifacts.some(item => item.id === first.id && item.status === 'corrupt'), true)
+
+    // A newer schema cannot be restored by this build; opening it is refused by the migration entry.
+    const futureDir = join(data.root, 'future-copy')
+    cpSync(snapshot, futureDir, { recursive: true })
+    const futureDatabase = join(futureDir, 'product.sqlite')
+    const db = new Database(futureDatabase)
+    try {
+      db.prepare("UPDATE schema_meta SET value = '99' WHERE key = 'product_schema'").run()
+      const migrations = JSON.parse(String((db.prepare("SELECT value FROM schema_meta WHERE key = 'migrations'").get() as { value: string }).value))
+      migrations.push({ version: 99, name: 'future-v99', checksum: 'x', appliedAt: at })
+      db.prepare("UPDATE schema_meta SET value = ? WHERE key = 'migrations'").run(JSON.stringify(migrations))
+    } finally { db.close() }
+    const manifestPath = join(futureDir, 'snapshot.json')
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+    const futureBytes = readFileSync(futureDatabase)
+    const { createHash } = await import('node:crypto')
+    manifest.database.sha256 = createHash('sha256').update(futureBytes).digest('hex')
+    manifest.database.bytes = futureBytes.byteLength
+    manifest.database.productSchema = 99
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
+    const future = new WorkflowSnapshots(data.store).verify(futureDir)
+    assert.equal(future.status, 'blocked')
+    assert.match(String(future.message), /schema 99|not restorable/)
+    assert.throws(() => new ProductStore({ path: futureDatabase }), /newer than this build|not registered|gap at version 99/)
+  } finally {
+    data.store.close()
+    rmSync(data.root, { recursive: true, force: true })
+  }
+})
