@@ -2,7 +2,7 @@
 
 - Branch: `codex/g2-workspaces-verification`
 - Main base: `82db295`; merge checkpoint: `f3b4d64`
-- Stable interface checkpoint: `f26f2eb` (routing evidence), delivery source recorded in status
+- Stable interface checkpoint: `f26f2eb` (routing evidence), delivery source: `3b43728`
 - Owned paths: `packages/storage/`, `packages/workflows/`
 - Model tasks: **0**; unknown sends: **0**; no user service or account operation
 
