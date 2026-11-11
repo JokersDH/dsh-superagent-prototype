@@ -365,8 +365,28 @@ const V13: Migration = {
   ],
 }
 
+
+/**
+ * v14: recovery intent facts. One immutable intent per plan, keyed by the caller's command receipt.
+ * This is an audit fact for main's planned activation protocol, not an execution authorization: the
+ * row alone never grants native work, deletes a restore marker or consumes an old queue.
+ */
+const V14: Migration = {
+  version: 14,
+  name: 'recovery-intents',
+  statements: [
+    `CREATE TABLE recovery_intents (
+      command_id TEXT PRIMARY KEY, plan_id TEXT NOT NULL UNIQUE, plan_digest TEXT NOT NULL,
+      inspection_fingerprint TEXT NOT NULL, source_fingerprint TEXT NOT NULL, user_id TEXT NOT NULL,
+      actor_ref TEXT NOT NULL, payload TEXT NOT NULL, digest TEXT NOT NULL,
+      created_at TEXT NOT NULL, expires_at TEXT NOT NULL)`,
+    `CREATE INDEX recovery_intents_source ON recovery_intents (source_fingerprint, created_at DESC)`,
+    `CREATE INDEX recovery_intents_created ON recovery_intents (created_at DESC, plan_id)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>

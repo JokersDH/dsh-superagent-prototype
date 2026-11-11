@@ -8,7 +8,7 @@ import { applyMigrations, MIGRATIONS } from '@personal-agent/storage'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import Database from 'better-sqlite3'
-import { ProductStore, canonicalDigest } from '@personal-agent/storage'
+import { ProductStore, PRODUCT_SCHEMA_VERSION, canonicalDigest } from '@personal-agent/storage'
 import type {
   ExecutionOutcome, ReviewEvidence, RouteAdvice, ReviewSubject,
 } from '@personal-agent/contracts'
@@ -233,7 +233,7 @@ test('single-work timeline links persisted evidence without inventing causality'
 })
 
 
-test('a v12 database upgrades to v13 while keeping old contracts, decisions and deliveries', () => {
+test('a v12 database upgrades to the current schema while keeping old contracts, decisions and deliveries', () => {
   const dir = tmp('routing-v12-upgrade-')
   const path = join(dir, 'state.sqlite')
   try {
@@ -250,7 +250,7 @@ test('a v12 database upgrades to v13 while keeping old contracts, decisions and 
 
     const store = new ProductStore({ path })
     try {
-      assert.equal(store.database.productSchema, 13)
+      assert.equal(store.database.productSchema, PRODUCT_SCHEMA_VERSION)
       assert.equal(store.product.contracts.getByRef(contract)!.goal, 'old')
       assert.equal(store.authority.current('work-author')!.digest, contract.digest)
       assert.equal((store.db.prepare("SELECT COUNT(*) AS n FROM completion_verifications WHERE id = 'old-verification'").get() as { n: number }).n, 1)
