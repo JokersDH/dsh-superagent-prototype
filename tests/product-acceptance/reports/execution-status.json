@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "d4d51ae",
-  "checkpoint": "dc351a4",
-  "head": "1a4a0f572267abaf7cf1cea11013328851367963",
+  "base": "ddac2b6",
+  "checkpoint": "c2ae2d2",
+  "head": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-11T04:05:54.180Z",
+  "checkedAt": "2026-11-11T06:38:16.394Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -15,19 +15,19 @@
     "pilotTurnsUsed": 0,
     "pilotTokensUsed": 0,
     "pilotUsd": null,
-    "note": "Pilot preflight BLOCKED (pricing_unavailable); runner selftest is a local fake process, not a model send. 0/24 turns, 0 tokens, USD unknown. No other model call."
+    "note": "Pilot preflight BLOCKED (adapter_missing); ledger v2 is fail-closed and preserves 0/24 turns, 0 tokens, USD unknown. Runner selftest uses a fake process, not a model send. No other model call."
   },
   "stages": [
     {
       "id": "E1",
-      "title": "Pilot preconditions, two-stage freeze and persistent reservations",
-      "command": "node tests/product-acceptance/pilot/harness.mjs --preflight",
+      "title": "Pilot admission and fail-closed ledger",
+      "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
       "notes": [
-        "Preflight now checks frozen inputs, Codex availability, the operator price schedule, runner selftest and ledger; BLOCKED on pricing_unavailable only, ledger preserved at 0/24."
+        "Ledger v2 distinguishes not-created from corrupt; a damaged/forged/incomplete ledger never becomes zero credit. Reservations use the adapter's declared whole-turn bound, are serialized, and replay idempotently. A missing adapter, version drift, stale isolation/session/material evidence or a missing main admission blocks every send; price alone grants nothing."
       ],
       "result": "PASS",
       "counts": {
-        "PASS": 72
+        "PASS": 74
       },
       "cases": [
         {
@@ -132,6 +132,16 @@
         },
         {
           "id": "E1-FIXTURE-PORTABILITY-STRICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-ADMISSION-FAIL-CLOSED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-PREFLIGHT-NO-FALLBACK",
           "status": "PASS",
           "reason": null
         },
@@ -397,7 +407,7 @@
       "title": "Eight-case three-arm bounded pilot",
       "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
       "notes": [
-        "Real execute chain implemented (author, same-session review, fresh-session review, candidate freeze, strict scoring); not executed because preflight is BLOCKED. BLOCKED is not a value result."
+        "Real execute chain remains implemented but BLOCKED on adapter_missing; 0/24 turns, no sample replacement, no ID-swap resend."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -524,15 +534,15 @@
     },
     {
       "id": "E3",
-      "title": "Attention, ranking, review timing and decision closed loop",
+      "title": "Context and proposal product loop",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "Shared deterministic_priority ranker, cross-project inbox UI, per-target answer, decision prepare/record/revoke (read-only prepare, replay, conflict, tamper, scope) verified live; deadlines and source-state mutations remain NOT_TESTED."
+        "Existing decisions/attention/outcome negatives stay; context/proposal entries are added only after main publishes them, on real authenticated HTTP/SQLite."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
         "PASS": 17,
-        "NOT_TESTED": 4
+        "NOT_TESTED": 5
       },
       "cases": [
         {
@@ -639,20 +649,26 @@
           "id": "E3-DECISION-SOURCE-STATES",
           "status": "NOT_TESTED",
           "reason": "No public entry deletes/changes the source message or expires the project grant; transaction-failure injection is not exposed. These remain NOT_TESTED."
+        },
+        {
+          "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: main publishes no proposal confirm/reject/replay or context preview endpoint. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen."
         }
       ]
     },
     {
       "id": "E4",
-      "title": "Same-artifact installation, backup/restore, tamper and rollback",
+      "title": "Two-binary installation and upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "D's frozen tar.gz is verified byte-for-byte and run in a fresh directory: first-run/doctor/start/static workbench, reuse/concurrency, backup/restore read-only with blocked authorization, same-size/missing artifact and corrupt bundle refusals, state rollback. Upgrade needs a second buildId."
+        "Same-byte wave-06 artifact remains accepted; wave-07 needs two frozen different binaries, release.json initialization under PA_CONFIG_ROOT and data compatibility across upgrade/rollback."
       ],
-      "result": "PASS_WITH_GAPS",
+      "result": "FAIL",
       "counts": {
-        "PASS": 10,
-        "NOT_TESTED": 3
+        "PASS": 11,
+        "NOT_TESTED": 2,
+        "FAIL": 1
       },
       "cases": [
         {
@@ -691,6 +707,11 @@
           "reason": null
         },
         {
+          "id": "E4-INSTALL-CONFIG-ROOT",
+          "status": "FAIL",
+          "reason": "BASE_CONFIG_ROOT_INITIALIZED: {\"role\":\"base\",\"firstRun\":\"OK\",\"initialized\":\"FAIL\",\"code\":\"No built release manifest is recorded for this install\",\"seeded\":\"PASS\",\"doctorStatus\":\"BLOCKED\"}"
+        },
+        {
           "id": "E4-INSTALL-REUSE-CONCURRENCY",
           "status": "PASS",
           "reason": null
@@ -712,8 +733,8 @@
         },
         {
           "id": "E4-UPGRADE-ROLLBACK",
-          "status": "NOT_TESTED",
-          "reason": "Only one frozen artifact (buildId d4eb3a13f4904d2d) is published for wave 06. A real upgrade needs a second frozen artifact with a different buildId and the same product schema 12; state rollback on the same bytes is verified by E4-INSTALL-ROLLBACK. Required inputs: second artifactId/buildId/tarSha256."
+          "status": "PASS",
+          "reason": null
         },
         {
           "id": "E4-RECOVERY-PREFLIGHT",
@@ -724,29 +745,34 @@
     },
     {
       "id": "E5",
-      "title": "Strict gate tiers, refusals and bounded stability",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
+      "title": "Recovery authorization windows and bounded stability",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "Tiers module/controlled-product/actual-native-control/installed-alpha/review-value; 72 gate mutation/structure cases; up to 30 cycles or 45 minutes of mixed controlled work."
+        "Read-only inspect/prepare verified; the commit, target half-preparation, activation pointer switch and unknown-writer barriers stay NOT_TESTED until main publishes the entry. Bounded cycles only."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "NOT_TESTED": 1
+        "NOT_TESTED": 2
       },
       "cases": [
         {
           "id": "E5-NATIVE-CONTROL",
           "status": "NOT_TESTED",
           "reason": "No executed native stop/question/recovery evidence is available in this checkout."
+        },
+        {
+          "id": "E5-RECOVERY-INTERRUPTION",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: main has no recovery commit/activation entry. Required inputs: source-committed activation fact, prepared target identity/bytes, activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority."
         }
       ]
     },
     {
       "id": "E6",
-      "title": "Separated value, product and install conclusions",
+      "title": "Layered conclusions and handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "Value stays BLOCKED (no turn sent); product admission from the controlled tier; install admission from the same frozen bytes with the upgrade item still NOT_TESTED."
+        "wave07-status separates module/controlled-product/actual-native-control/installed-alpha/review-value with source/evidence/owner; pilot value never gates product or install."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -756,7 +782,7 @@
         {
           "id": "E6-REVIEW-PILOT",
           "status": "NOT_TESTED",
-          "reason": "Preflight BLOCKED: pricing_unavailable; 0/24 turns used."
+          "reason": "Preflight BLOCKED: adapter_missing; 0/24 turns used."
         }
       ]
     }
@@ -766,12 +792,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-11T04:05:54.196Z",
+    "checkedAt": "2026-11-11T06:38:16.410Z",
     "source": {
-      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
+      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
       "dirty": false
     },
-    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
+    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1010,6 +1036,16 @@
       },
       {
         "id": "E1-MUTATE-ADMISSION-PROBE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-ADMISSION-FAIL-CLOSED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-PREFLIGHT-NO-FALLBACK",
         "required": true,
         "status": "PASS"
       },
@@ -1336,28 +1372,29 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/mobile-attention-inbox.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-35-44-473Z/screenshots/mobile-attention-inbox.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
+    "wave07Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave07-status.json",
     "wave06Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave06-status.json",
     "tierVerdicts": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/tier-verdicts.json"
   },
@@ -1511,8 +1548,26 @@
     {
       "id": "distribution",
       "gaps": [
-        "E4-UPGRADE-ROLLBACK 需要第二个冻结 buildId（同 schema）；同一字节上的 state 回滚已通过。",
-        "PA_CONFIG_ROOT 覆盖后 release.json 缺失（owner D，最小复现已记录）。"
+        "PA_CONFIG_ROOT 覆盖后 release.json 缺失，base 与 upgrade 两个产物均复现（owner D）。",
+        "跨机器/跨 ABI 未测；只测 darwin/arm64 + Node 24.21.x + ABI 137。"
+      ]
+    },
+    {
+      "id": "two-binary-upgrade",
+      "gaps": [
+        "升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。"
+      ]
+    },
+    {
+      "id": "proposal-context",
+      "gaps": [
+        "main 未发布 proposal/context 入口；E3-PROPOSAL-CONTEXT-BOUNDARY 记录了所需输入与负例。"
+      ]
+    },
+    {
+      "id": "recovery-activation",
+      "gaps": [
+        "commit/activation 未发布；E5-RECOVERY-INTERRUPTION 记录四个中断窗口，prepare 不能替代授权。"
       ]
     },
     {
@@ -1524,7 +1579,7 @@
     {
       "id": "review-pilot",
       "gaps": [
-        "Preflight BLOCKED：pricing_unavailable（配置模型没有操作者可核对的 USD 价格表）；0/24 turn；真实作者/续会话/新 session 执行链已实现并有 17 项 runner selftest（预留先于发送、单 turn 在途、unknown 不归还、token/USD 上限），但没有价格就不发送；无价值结论。"
+        "Preflight BLOCKED：adapter_missing（没有经准入的单一实际 adapter 及其整 turn 硬上界/隔离/session/材料/main 准入）；0/24 turn；runner 45 项 selftest 证明损坏账/伪造身份/裁小预留/缺接口 fallback 均拒绝且 fake 发送为 0，但没有准入就不发送；无价值结论。"
       ]
     },
     {

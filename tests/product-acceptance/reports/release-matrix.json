@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
+    "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
     "dirty": false
   },
   "environment": {
@@ -11,17 +11,17 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-11T04:05:54.180Z",
+  "checkedAt": "2026-11-11T06:38:16.394Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 119,
-    "FAIL": 0,
+    "PASS": 122,
+    "FAIL": 1,
     "SKIPPED": 0,
-    "NOT_TESTED": 12,
+    "NOT_TESTED": 13,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
@@ -327,7 +327,7 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
-      "installed": "PASS",
+      "installed": "FAIL",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "PA_CONFIG_ROOT 覆盖后 release.json 不随 first-run 写入（owner D，已完成最小复现）。"
@@ -335,7 +335,8 @@
       "evidence": [
         "E4-INSTALL-FIRST-RUN",
         "E4-INSTALL-REUSE-CONCURRENCY",
-        "E4-INSTALL-TAMPER"
+        "E4-INSTALL-TAMPER",
+        "E4-INSTALL-CONFIG-ROOT"
       ]
     },
     {
@@ -544,8 +545,8 @@
       "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "E4-UPGRADE-ROLLBACK 需要第二个冻结 buildId（同 schema）；同一字节上的 state 回滚已通过。",
-        "PA_CONFIG_ROOT 覆盖后 release.json 缺失（owner D，最小复现已记录）。"
+        "PA_CONFIG_ROOT 覆盖后 release.json 缺失，base 与 upgrade 两个产物均复现（owner D）。",
+        "跨机器/跨 ABI 未测；只测 darwin/arm64 + Node 24.21.x + ABI 137。"
       ],
       "evidence": [
         "E4-INSTALL-ARTIFACT-IDENTITY",
@@ -555,6 +556,60 @@
         "E4-INSTALL-TAMPER",
         "E4-INSTALL-ROLLBACK"
       ]
+    },
+    {
+      "id": "two-binary-upgrade",
+      "capability": "两个真实不同二进制的数据升级与拒绝不兼容回退",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "PASS",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。"
+      ],
+      "evidence": [
+        "E4-UPGRADE-ROLLBACK"
+      ]
+    },
+    {
+      "id": "proposal-context",
+      "capability": "自动提案确认与上下文窗口（真实 HTTP/SQLite）",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "main 未发布 proposal/context 入口；E3-PROPOSAL-CONTEXT-BOUNDARY 记录了所需输入与负例。"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "recovery-preflight",
+      "capability": "恢复只读 inspect/prepare 与重放/重启边界",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E4-RECOVERY-PREFLIGHT"
+      ]
+    },
+    {
+      "id": "recovery-activation",
+      "capability": "恢复授权 commit、目标准备与激活切换",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "commit/activation 未发布；E5-RECOVERY-INTERRUPTION 记录四个中断窗口，prepare 不能替代授权。"
+      ],
+      "evidence": []
     },
     {
       "id": "native-control",
@@ -578,7 +633,7 @@
       "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "Preflight BLOCKED：pricing_unavailable（配置模型没有操作者可核对的 USD 价格表）；0/24 turn；真实作者/续会话/新 session 执行链已实现并有 17 项 runner selftest（预留先于发送、单 turn 在途、unknown 不归还、token/USD 上限），但没有价格就不发送；无价值结论。"
+        "Preflight BLOCKED：adapter_missing（没有经准入的单一实际 adapter 及其整 turn 硬上界/隔离/session/材料/main 准入）；0/24 turn；runner 45 项 selftest 证明损坏账/伪造身份/裁小预留/缺接口 fallback 均拒绝且 fake 发送为 0，但没有准入就不发送；无价值结论。"
       ],
       "evidence": []
     },

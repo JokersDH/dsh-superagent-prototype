@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-11T04:08:25.621Z",
+  "checkedAt": "2026-11-11T06:40:32.605Z",
   "source": {
-    "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
+    "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
     "dirty": false
   },
-  "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
+  "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -247,6 +247,16 @@
     },
     {
       "id": "E1-MUTATE-ADMISSION-PROBE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-ADMISSION-FAIL-CLOSED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-PREFLIGHT-NO-FALLBACK",
       "required": true,
       "status": "PASS"
     },
@@ -576,6 +586,11 @@
       "status": "PASS"
     },
     {
+      "id": "E4-INSTALL-CONFIG-ROOT",
+      "required": true,
+      "status": "FAIL"
+    },
+    {
       "id": "E4-INSTALL-REUSE-CONCURRENCY",
       "required": true,
       "status": "PASS"
@@ -598,7 +613,7 @@
     {
       "id": "E4-UPGRADE-ROLLBACK",
       "required": true,
-      "status": "NOT_TESTED"
+      "status": "PASS"
     },
     {
       "id": "E5-NATIVE-DELIVERY",
@@ -614,13 +629,8 @@
   "failures": [
     {
       "code": "case_not_pass",
-      "detail": "Required case E4-UPGRADE-ROLLBACK is NOT_TESTED",
-      "caseId": "E4-UPGRADE-ROLLBACK"
-    },
-    {
-      "code": "required_evidence_missing",
-      "detail": "Case E4-UPGRADE-ROLLBACK has no substantive evidence.installation",
-      "caseId": "E4-UPGRADE-ROLLBACK"
+      "detail": "Required case E4-INSTALL-CONFIG-ROOT is FAIL",
+      "caseId": "E4-INSTALL-CONFIG-ROOT"
     },
     {
       "code": "missing_required_case",
@@ -651,7 +661,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-11T04:05:54.196Z",
+    "decidedAt": "2026-11-11T06:38:16.410Z",
     "failureCodes": []
   },
   "notes": [

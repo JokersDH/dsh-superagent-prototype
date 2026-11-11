@@ -161,7 +161,7 @@ const CAPABILITIES = [
   {
     id: 'install-first-run',
     label: '新目录/新账户安装与 first-run',
-    installed: ['E4-INSTALL-FIRST-RUN', 'E4-INSTALL-REUSE-CONCURRENCY', 'E4-INSTALL-TAMPER'],
+    installed: ['E4-INSTALL-FIRST-RUN', 'E4-INSTALL-REUSE-CONCURRENCY', 'E4-INSTALL-TAMPER', 'E4-INSTALL-CONFIG-ROOT'],
     notTested: ['PA_CONFIG_ROOT 覆盖后 release.json 不随 first-run 写入（owner D，已完成最小复现）。'],
   },
   {
@@ -271,9 +271,13 @@ const CAPABILITIES = [
     notTested: ['main 未发布 proposal/context 入口；E3-PROPOSAL-CONTEXT-BOUNDARY 记录了所需输入与负例。'],
   },
   {
+    id: 'recovery-preflight',
+    label: '恢复只读 inspect/prepare 与重放/重启边界',
+    controlled: ['E4-RECOVERY-PREFLIGHT'],
+  },
+  {
     id: 'recovery-activation',
     label: '恢复授权 commit、目标准备与激活切换',
-    controlled: ['E4-RECOVERY-PREFLIGHT'],
     notTested: ['commit/activation 未发布；E5-RECOVERY-INTERRUPTION 记录四个中断窗口，prepare 不能替代授权。'],
   },
   {
@@ -457,11 +461,11 @@ ${rows
 
 | 维度 | 结论 | 依据 |
 | --- | --- | --- |
-| 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；pricing_unavailable；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
+| 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | 见 \`installed-alpha\` tier；同一冻结字节在全新目录可启动/备份/恢复/回滚，升级项缺第二个冻结产物 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK；E4-UPGRADE-ROLLBACK NOT_TESTED。 |
+| 安装准入（个人 Alpha） | **未通过**：安装、备份恢复与双产物升级本身通过，但私有 config root 不能初始化可信 release manifest | \`installed-alpha\` 因 E4-INSTALL-CONFIG-ROOT 失败而保持非零；owner D。 |
 
-安装物身份：\`wave06-alpha-d4eb3a13\` / buildId \`d4eb3a13f4904d2d\` / tar sha256 \`8b7675bafa7cded2c9c0656655abca3ff21721d52c3dc4f573a667d93f81f122\` / 19,762,194 bytes / darwin-arm64 / Node 24.21.0 / SQLite ABI 137。生产者 source commit \`9046d4c5\` 记录为 dirty，因此这些字节不能由某个干净提交重建——这是候选安装物，不是可重现发行。
+安装物身份（两个真实不同产物）：base \`wave06-alpha-b0f87c88\` / buildId \`b0f87c883aa6b206\` / schema 12 / tar \`8b728b61…b5c5d\` / source \`9046d4c5\`（dirty）；upgrade \`wave06-alpha2-7e8f6ce6\` / buildId \`7e8f6ce6fa2e2633\` / schema 13 / tar \`0fe0ed53…c7631\` / source \`e10bfdb7\`（clean）。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。base 的 source 为 dirty，故 base 字节不能由干净提交重建；upgrade 可绑定干净 source。
 
 ## 独立复核价值试点
 
