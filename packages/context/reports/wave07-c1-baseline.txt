@@ -1,0 +1,39 @@
+# Agent C wave-07 C1 baseline (2026-11-11T06:08:58Z)
+
+6bff83c Merge remote-tracking branch 'origin/main' into codex/g3-assistant-context
+
+## @personal-agent/context
+$ tsc -p tsconfig.json
+ℹ tests 34
+ℹ pass 34
+ℹ fail 0
+
+## @personal-agent/proposals
+$ tsc -p tsconfig.json
+ℹ tests 23
+ℹ pass 23
+ℹ fail 0
+
+## @personal-agent/knowledge
+$ tsc -p tsconfig.json
+ℹ tests 50
+ℹ pass 50
+ℹ fail 0
+
+## @personal-agent/routing
+$ tsc -p tsconfig.json
+ℹ tests 44
+ℹ pass 44
+ℹ fail 0
+
+## main decision HTTP integration
+ℹ tests 8
+ℹ pass 8
+ℹ fail 0
+
+## real SQLite assistant probe
+  "status": "PASS_SQLITE_ASSISTANT_CONSUMER",
+## routing sql consumer (main-owned)
+ℹ tests 2
+ℹ pass 2
+ℹ fail 0

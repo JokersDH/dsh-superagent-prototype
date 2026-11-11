@@ -1,0 +1,48 @@
+{
+  "role": "C",
+  "branch": "codex/g3-assistant-context",
+  "mainBaseCommit": "0df3fd1",
+  "mergeCommit": "6bff83c",
+  "updatedAt": "2026-11-11T06:20:00.000Z",
+  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "phases": [
+    {
+      "phase": "C1",
+      "status": "passed",
+      "evidence": [
+        "packages/context/docs/WAVE07-RECIPE.md",
+        "packages/context/reports/wave07-c1-baseline.txt"
+      ],
+      "results": {
+        "contextTests": "34/34",
+        "proposalTests": "23/23",
+        "knowledgeTests": "50/50",
+        "routingTests": "44/44",
+        "mainDecisionHttpIntegration": "8/8 (main-owned, unmodified)",
+        "routingSqlConsumer": "2/2 (main-owned, unmodified)",
+        "realSqliteAssistantProbe": "7/7"
+      },
+      "note": "Merged wave-07 main and re-verified all four packages plus main-owned decision/routing consumers. Recipe documents exports, production A ports, caller fixtures and the transaction split."
+    },
+    { "phase": "C2", "status": "not_started", "note": "Explicit-scope, explicitly-budgeted context composer." },
+    { "phase": "C3", "status": "not_started", "note": "Proposal prepare/sync-commit composition rules and needs_user_input." },
+    { "phase": "C4", "status": "not_started", "note": "Real SQLite lifecycle and source negatives." },
+    { "phase": "C5", "status": "not_started", "note": "Main entry consumption (blocked: no proposal/context HTTP yet) and deterministic performance." },
+    { "phase": "C6", "status": "not_started", "note": "Final authoritative status and handoff." }
+  ],
+  "blockers": [
+    {
+      "id": "C5-main-proposal-context-http",
+      "owner": "main",
+      "status": "external_pending",
+      "repro": "grep -rn 'proposal\\|context' apps/coordinator/http/app.ts  # no proposal/context routes",
+      "required": "Authenticated proposal confirm/reject and context preview endpoints composing C libraries.",
+      "continue": "C provides recipe + library-level consumer assertions and deterministic performance evidence meanwhile."
+    }
+  ],
+  "notTested": [
+    "Main HTTP/UI for proposal confirmation and context preview (not published)",
+    "Real model/native tasks (budget 0)"
+  ]
+}
