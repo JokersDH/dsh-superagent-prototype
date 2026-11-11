@@ -1,0 +1,7 @@
+{
+  "protocol": "decision-commands/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "7362def175c00c94c1f54ad51d5a05a4c961051e8f45f7f2271240ee78ec0313",
+  "sourceHash": "00a748517e77eb2f11569bd1cd0c4b3e11953e78d1a680709ae3be4a19c95774"
+}
