@@ -22,3 +22,13 @@ export {
   factIdFor,
 } from './attempt-io.ts'
 export type { AttemptIdentity, AttemptIOParts, CriticalFactInput } from './attempt-io.ts'
+
+// --- wave-08 B1: production runtime description (read-only, no thread, no turn) ---------------
+export {
+  CAPABILITY_STATES,
+  EVIDENCE_LAYERS,
+  describeRuntime,
+  descriptionDigest,
+  probeHostEnforcement,
+  resolveRuntimeIdentity,
+} from './runtime-diagnostics.ts'
