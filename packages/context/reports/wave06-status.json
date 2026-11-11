@@ -3,10 +3,19 @@
   "branch": "codex/g3-assistant-context",
   "mainBaseCommit": "82db295",
   "mergeCommit": "690da7a",
-  "stableCheckpoint": "pending-c1c2-commit",
+  "stableCheckpoint": "c9dc567",
   "updatedAt": "2026-11-11T00:30:00.000Z",
-  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
-  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "ownedPaths": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge",
+    "packages/routing"
+  ],
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0,
+    "unknownSends": 0
+  },
   "phases": [
     {
       "phase": "C1",
@@ -33,7 +42,9 @@
         "packages/routing/test/shared-attention.case.ts",
         "packages/routing/src/index.ts"
       ],
-      "results": { "routingTests": "37/37 (includes 8 shared-ranker cases)" },
+      "results": {
+        "routingTests": "37/37 (includes 8 shared-ranker cases)"
+      },
       "note": "sharedAttentionRanker matches contracts AttentionRanker: complete permutation, shared reasons, sinceAt=null unknown, explicit deadlineAt only, expiresAt not a deadline, outgoing blockedWorkIds, stable explicit-now order, duplicate ids refused."
     },
     {
@@ -44,9 +55,21 @@
       "required": "A synchronous RoutingEvidencePort implementation (advice/reviews/outcomes put/get/list, same-body replay, changed-body conflict) on the shared UnitOfWork, plus main admission.",
       "continue": "Use InMemoryRoutingEvidence with the identical interface for C4/C5 negative cases; do not claim real SQL evidence until A lands."
     },
-    { "phase": "C4", "status": "not_started", "note": "Decision/proposal/context consumption boundary: read-only prepare + sync commit plan." },
-    { "phase": "C5", "status": "not_started", "note": "Main consumer regression and targeted invalidation negatives." },
-    { "phase": "C6", "status": "not_started", "note": "Stable exports/docs, unknown-value policy, scale limits and final status." }
+    {
+      "phase": "C4",
+      "status": "not_started",
+      "note": "Decision/proposal/context consumption boundary: read-only prepare + sync commit plan."
+    },
+    {
+      "phase": "C5",
+      "status": "not_started",
+      "note": "Main consumer regression and targeted invalidation negatives."
+    },
+    {
+      "phase": "C6",
+      "status": "not_started",
+      "note": "Stable exports/docs, unknown-value policy, scale limits and final status."
+    }
   ],
   "commands": [
     "git fetch origin && git merge origin/main --no-edit",
