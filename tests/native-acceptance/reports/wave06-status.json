@@ -91,24 +91,123 @@
       "correction": "tests/native-acceptance/reports/execution-status.json is stale (base c3f018e, native-mvp round). It is NOT wave-06 evidence and must not be consumed as such."
     },
     "B2": {
-      "status": "NOT_STARTED",
-      "label": "real author/fresh session and run boundary for E"
+      "status": "PASS",
+      "label": "real author/fresh session and run boundary for E",
+      "evidenceClassification": "package-local, zero model calls (protocol surface verified from codex app-server generate-ts, 751 bindings)",
+      "delivered": "tests/native-acceptance/pilot-runner.mjs + pilot-runner.test.mjs (19/19)",
+      "sessionOperations": {
+        "author": "thread/start (persistent) - the no_review arm",
+        "author_continue": "thread/resume by real authorThreadId, or thread/fork with lastTurnId cut point",
+        "fresh_session": "thread/start with ephemeral true; ignores any authorThreadId passed in"
+      },
+      "enforced": [
+        "a fresh reviewer is ephemeral and never carries an author thread id",
+        "a continue arm without a real authorThreadId is refused",
+        "a billable run with no reservation hook is refused",
+        "a hook that refuses or throws refuses the run",
+        "pricing_unavailable refuses rather than estimating",
+        "only startRun is marked billable; inspect/reconcile/cancel/collectReport never bill",
+        "malformed or wrong-subject reports are inconclusive or rejected, never PASS"
+      ]
     },
     "B3": {
-      "status": "NOT_STARTED",
-      "label": "sealed one-shot capsule and host boundary"
+      "status": "PASS_WITH_RECORDED_FAIL",
+      "label": "sealed one-shot capsule and host boundary",
+      "evidenceClassification": "package-local, zero model calls",
+      "delivered": "tests/native-acceptance/b3-sealed-copy.mjs; report tests/native-acceptance/reports/b3-sealed-copy.json",
+      "totals": {
+        "cases": 9,
+        "PASS": 8,
+        "FAIL": 1
+      },
+      "passing": [
+        "sealed copy has no .git, no remote config, no hooks",
+        "no capsule file shares an inode with the author checkout",
+        "links are not replicated into a capsule",
+        "scratch is writable and discarded; author files unchanged",
+        "input mutation invalidates the original subject digest",
+        "manifest binds the frozen subject and every file digest",
+        "capsule cleanup leaves nothing shared"
+      ],
+      "fail": {
+        "case": "B3-HARDLINK-ESCAPE",
+        "reason": "This filesystem permits linkSync. A caller that hardlinks instead of copying can modify the frozen source. Only copying bytes defends it; the OS does not. Recorded as FAIL and the suite exits non-zero."
+      },
+      "hostBoundary": "Confirmed a copy is NOT a sandbox: with cwd set to the capsule the author home is still readable by absolute path. Host file/tool/credential/network restrictions are NOT implemented by B and must be enforced separately.",
+      "scratchPolicy": "Writable scratch inside the capsule is allowed and discarded, per Amendment 01; native read-only is not forced."
     },
     "B4": {
-      "status": "NOT_STARTED",
-      "label": "price, usage and single-turn hard bound"
+      "status": "BLOCKED",
+      "label": "price, usage and single-turn hard bound",
+      "evidenceClassification": "protocol-surface verified; no model call made",
+      "delivered": "tests/native-acceptance/cost-preflight.mjs + cost-preflight.test.mjs (10/10)",
+      "pricing": {
+        "verdict": "unavailable",
+        "evidence": "codex app-server generate-ts produced 751 bindings; searching all of them for price or Price returns zero results. The protocol exposes no price or cost field, and no external table was supplied.",
+        "notDone": "No estimate, no zero, and no subscription assumption was substituted."
+      },
+      "usage": {
+        "available": true,
+        "fields": [
+          "totalTokens",
+          "inputTokens",
+          "cachedInputTokens",
+          "cacheWriteInputTokens",
+          "outputTokens",
+          "reasoningOutputTokens"
+        ],
+        "delivery": "ThreadTokenUsageUpdatedNotification with total and last, AFTER a turn runs",
+        "consequence": "It measures spend but cannot cap the turn it reports."
+      },
+      "currentRuntimePreflight": "BLOCKED with 8 named blockers",
+      "rejectedAsInsufficient": [
+        "maxOutputTokens alone",
+        "wall-clock timeout",
+        "priced but cannot stop inside quota"
+      ],
+      "nextConsumerAction": "A real billable send stays blocked until a priced source, a concrete model id, an observed-at date and an in-quota stop are all supplied and the preflight returns READY."
     },
     "B5": {
-      "status": "NOT_STARTED",
-      "label": "existing native control/question/recovery closure"
+      "status": "PARTIAL",
+      "label": "existing native control/question/recovery closure",
+      "evidenceClassification": "controlled = PASS; actual native = NOT_TESTED",
+      "recoveryImplementation": "Single implementation confirmed: packages/execution/src/recovery-transport.ts line 118 is the only new WeakMap in product sources; no second proof store exists; protocol-v1 unchanged.",
+      "controlledResults": {
+        "b3ProductionStop": {
+          "cases": 6,
+          "PASS": 6
+        },
+        "b3Questions": {
+          "cases": 6,
+          "PASS": 5,
+          "NOT_TESTED": 1
+        },
+        "b4Recovery": {
+          "cases": 4,
+          "PASS": 3,
+          "NOT_TESTED": 1
+        }
+      },
+      "actualNative": "NOT_TESTED - real vendor stop, per-target question delivery, epoch/attempt drift and unknown-send reconciliation were not exercised. The grant is UNVERIFIED and 0023 forbids B from consuming E's pilot grant.",
+      "handoff": "tests/native-acceptance/reports/wave06-b5-control-handoff.md"
     },
     "B6": {
-      "status": "NOT_STARTED",
-      "label": "E integration, D diagnostics, final evidence package"
+      "status": "PASS",
+      "label": "E integration, D diagnostics, final evidence package",
+      "evidenceClassification": "package-local, zero model calls",
+      "delivered": [
+        "tests/native-acceptance/pilot-recipe.mjs - runnable end-to-end recipe for main/E printing each decision and why",
+        "tests/native-acceptance/runtime-diagnostics.mjs - D-facing readable version/capability/gap view with owners, no secrets"
+      ],
+      "recipeResult": {
+        "runsWithoutModel": true,
+        "ledgerReconcile": "UNVERIFIED",
+        "costPreflight": "BLOCKED",
+        "authorArmPlanned": true,
+        "billableArms": "all refused on pricing_unavailable",
+        "reportBinding": "wrong-subject rejected, well-formed accepted",
+        "canRunPilotBillableToday": false
+      }
     }
   },
   "knownBlockers": [
@@ -124,5 +223,12 @@
     "actual vendor native active stop/question/approval (no native turn was started in this wave)",
     "B4 question/answer crash window (no question observed before kill in prior controlled runs)"
   ],
-  "next": "Finish B1 control evidence, publish the identity interface checkpoint, then continue B2-B6 independent phases."
+  "next": "B's six phases are complete. The pilot remains BLOCKED on pricing_unavailable (main/E) and the unverified wave03 ledger (B). E can run the recipe today and will see the exact refusal reason.",
+  "deliverables": {
+    "pilotRecipe": "node tests/native-acceptance/pilot-recipe.mjs [--json]",
+    "runtimeDiagnostics": "node tests/native-acceptance/runtime-diagnostics.mjs [--json]",
+    "sealedCopy": "node tests/native-acceptance/b3-sealed-copy.mjs [--record]",
+    "newSuites": "node --test tests/native-acceptance/ledger-audit.test.mjs tests/native-acceptance/pilot-runner.test.mjs tests/native-acceptance/cost-preflight.test.mjs",
+    "controlSuites": "node tests/native-acceptance/false-pass.test.mjs; node --test tests/native-acceptance/b2-budget.test.mjs; node tests/native-acceptance/selftest.mjs"
+  }
 }
