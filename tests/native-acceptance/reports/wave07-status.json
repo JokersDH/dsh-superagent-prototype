@@ -1,0 +1,210 @@
+{
+  "wave": "product-wave-07",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "0df3fd1",
+  "mergeCommit": "130cc9f",
+  "previousCandidate": "6890fe8",
+  "checkpointCommit": "dc2ac9f",
+  "ownedPaths": [
+    "apps/runner/",
+    "packages/drivers/",
+    "packages/driver-kit/",
+    "packages/testing/",
+    "packages/catalog/",
+    "packages/policy-preparation/",
+    "tests/native-acceptance/"
+  ],
+  "packet": "agent-tasks/product-wave-07/agent-b-runtime-admission.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0026-wave-07-integration-and-admission.md",
+  "scopeNote": "No second Driver, no billing proxy, no new grant. wave03-b-native historical limit 4 stays with an UNKNOWN/unverified remainder and is not spendable; E's pilot grant is untouched.",
+
+  "singlePath": {
+    "module": "tests/native-acceptance/runtime-admission.mjs",
+    "entry": "admit(request)",
+    "principle": "one path for session, sealed copy, host isolation and budget; six independent gates, none short-circuits; a satisfied price never unlocks a missing isolation proof",
+    "gates": [
+      "execution_identity",
+      "session_fact",
+      "material_copy",
+      "host_isolation",
+      "budget_reservation",
+      "cost_bound"
+    ],
+    "currentVerdict": "REFUSED",
+    "unmetGates": ["budget_reservation", "cost_bound"],
+    "refusedCarriesNoLaunch": true,
+    "noCliFallback": "call() refuses turn/start; startTurn is the only billing path and requires a reservation hook, so a missing adapter cannot fall back to a direct CLI send"
+  },
+
+  "measuredFacts": {
+    "evidenceLayer": "actual_native (real binary responses) + package-local (local filesystem/e2e) + protocol_fixture",
+    "binary": "codex-cli 0.164.0",
+    "executableDigestObserved": true,
+    "acceptedMethodCount": 134,
+    "billingMethods": ["turn/start"],
+    "model": "gpt-6.1-sol",
+    "modelProvider": "OpenAI",
+    "ephemeralThreads": "supported",
+    "goalsOnPersistentThread": true,
+    "goalsOnEphemeralThread": false,
+    "goalAcceptsTokenBudget": true,
+    "goalReportsTokensUsed": true,
+    "checkpointRequiresTurn": true,
+    "checkpointNote": "measured on a separate clean thread: setting a goal persists thread state and makes an otherwise-empty thread resumable, which confounds a measurement taken after goal setup",
+    "hostEnforcement": "macos-seatbelt (sandbox-exec, kernel-enforced)",
+    "turnStartTokenCapFields": [],
+    "configTokenLimitKeys": [],
+    "modelListPriceFields": [],
+    "configPriceFields": [],
+    "accountUsageReadable": false
+  },
+
+  "phases": {
+    "B1": {
+      "status": "PASS",
+      "label": "fixed execution identity and unified admission input",
+      "delivered": ["runtime-admission.mjs", "b9-runner-admission.mjs (16 cases)"],
+      "unifiedResult": "REFUSED with every gate reported separately; identity digest binds the verdict to executable path/version/digest/model/provider",
+      "whatNonBillingProves": [
+        "initialize / thread/start / thread/read / thread/resume / thread/goal get-set-clear prove the transport, the session identity and the protocol surface",
+        "they do NOT prove a real author checkpoint: a 0-turn thread has no rollout, so resume/fork refuse"
+      ],
+      "gapsListedSeparately": {
+        "price": "unavailable (no price surface)",
+        "billingComponents": "not all boundable (see B4)",
+        "executableLimit": "absent (turn/start has no token cap field)",
+        "isolation": "proven for copy + host separately",
+        "session": "proven for identity and arm separation"
+      },
+      "noFallback": "E must not reach the CLI directly; the refusal above is the only supported answer on this host"
+    },
+    "B2": {
+      "status": "PASS",
+      "label": "session and host isolation bound to the same runner",
+      "delivered": ["b9-runner-admission.mjs"],
+      "sameLaunchPath": [
+        "transport: codex app-server JSON-RPC 2.0 stdio",
+        "copy: capsule-builder createSealedCapsule (bytes only)",
+        "host: buildSeatbeltProfile (deny network, deny author home read/write, deny author project write, allow capsule scratch)",
+        "budget: reservation hook required before any billing write"
+      ],
+      "armSeparation": "author continuation uses a persistent turn-backed thread; the fresh reviewer uses an ephemeral thread and carries no author thread id",
+      "hostResult": "deny network / deny author-home read / deny author-project write / allow capsule scratch, all under kernel enforcement"
+    },
+    "B3": {
+      "status": "PASS",
+      "label": "copy-builder and isolation counter-cases closed",
+      "delivered": ["capsule-builder.mjs", "b9-runner-admission.mjs"],
+      "resolution": "the wave-06 FAIL is not relabelled. The OS is not required to forbid hardlinks; the production builder only copies bytes and REFUSES a link-based copyMode at admission",
+      "unsafeNegativeControl": "retained and still able to demonstrate the hazard (a link builder does share an inode), so the refusal is not a tautology",
+      "assertionStrength": "known-unsafe modes must be refused with the specific sealed-copy rationale, because an 'unknown copyMode' message also names the mode and would mask a broken check",
+      "failClosed": ["symlink skipped and recorded", "shared inode detected", "git surface absent", "unknown copyMode refused"]
+    },
+    "B4": {
+      "status": "BLOCKED",
+      "verdict": "NO_SUPPORTED_BOUNDED_RECIPE",
+      "label": "cost-bound feasibility decision within a bounded investigation",
+      "delivered": [
+        "b10-bound-probe.mjs (8 cases, re-measures every claim)",
+        "reports/wave07-b4-bound-dossier.md"
+      ],
+      "reasons": [
+        "turn/start has no per-request token cap field, so no single-turn ceiling can be expressed",
+        "config/read (35654 bytes) exposes no token-limit key, so no config-level ceiling exists",
+        "thread/goal tokenBudget is cumulative across a goal: the first turn starts at tokensUsed=0 so it cannot cap that turn",
+        "usage arrives post-turn, so it measures spend without capping it",
+        "no price surface exists in the protocol, model list or config, and account usage/rate-limit reads need ChatGPT auth"
+      ],
+      "rejectedAsInsufficient": [
+        "bytes/4 estimate",
+        "fixed padding",
+        "Math.min clipping a reservation",
+        "wall-clock timeout",
+        "post-turn usage",
+        "output-token limit alone"
+      ],
+      "notTested": [
+        "whether a goal budget is checked before the first inference of a turn",
+        "whether exceeding the budget aborts an in-flight turn",
+        "actual billed amount for any real turn"
+      ],
+      "alternativeRecipesProposed": 2,
+      "alternativeRecipeNote": "both are zero-model verifiable, change no provider/model/protocol, need main to version the measurement design, and neither yields a single-turn hard bound",
+      "unlockRule": "pricing alone cannot unlock execution; runtime_bound_unavailable stays until a per-turn ceiling is expressible"
+    },
+    "B5": {
+      "status": "PARTIAL",
+      "label": "existing control/recovery/release consumption does not regress",
+      "evidenceClassification": "controlled = PASS; actual native control = NOT_TESTED",
+      "regressionsPreserved": {
+        "b3ProductionStop": {"cases": 6, "PASS": 6},
+        "b4Recovery": {"cases": 4, "PASS": 3, "NOT_TESTED": 1},
+        "falsePass": "6/6",
+        "budget": "10/10",
+        "selftest": "14/14",
+        "unitSuites": "41/41 (ledger-audit 12, pilot-runner 19, cost-preflight 10)"
+      },
+      "ledgerNonRefresh": "re-running ledger-reconstruct --write leaves the grant UNVERIFIED and unspendable; a reconstructed empty ledger does not become 4 free slots, verified again after rebuild",
+      "singleRecoveryImplementation": "packages/execution/src/recovery-transport.ts remains the only proof WeakMap; protocol-v1 unchanged",
+      "notTestedNative": "real vendor stop/question/steer/unknown-send were not exercised; B does not spend E's pilot grant to fill this, and a new state does not prove old writers stopped"
+    },
+    "B6": {
+      "status": "PASS",
+      "label": "single path and conclusion handed to main/E/D",
+      "deliveredThisFile": true,
+      "runnableEntries": {
+        "admission": "node tests/native-acceptance/b9-runner-admission.mjs [--record]",
+        "boundFeasibility": "node tests/native-acceptance/b10-bound-probe.mjs [--json|--record]",
+        "realTransport": "node tests/native-acceptance/pilot-real-recipe.mjs [--json]",
+        "transportAcceptance": "node tests/native-acceptance/b7-pilot-transport.mjs [--record]",
+        "hostIsolation": "node tests/native-acceptance/b8-host-isolation.mjs [--record]",
+        "ledgerReconstruct": "node tests/native-acceptance/ledger-reconstruct.mjs [--write|--json]",
+        "runtimeDiagnostics": "node tests/native-acceptance/runtime-diagnostics.mjs [--json]"
+      }
+    }
+  },
+
+  "budget": {
+    "grants": [
+      {
+        "grantId": "wave03-b-native",
+        "limit": 4,
+        "attributionState": "UNVERIFIED",
+        "remainder": "UNKNOWN",
+        "maySendReal": false,
+        "note": "reconstructed empty ledger never refreshes it; verified after a fresh reconstruction"
+      },
+      {
+        "grantId": "wave05-independent-review-pilot-01",
+        "limit": 24,
+        "owner": "E",
+        "attributionState": "NOT_B_GRANT",
+        "bConsumes": false,
+        "touchedThisWave": false
+      }
+    ],
+    "historicalRoundsUsed": 3,
+    "historicalNote": "reported separately, never merged into or used to top up the wave03 grant",
+    "modelCallsThisWave": 0
+  },
+
+  "notTested": [
+    "real vendor turn start, stop, question delivery, epoch drift and unknown-send reconciliation",
+    "whether a goal token budget is checked before the first inference of a turn",
+    "whether exceeding a goal budget aborts an in-flight turn",
+    "actual billed amount and cost for any real turn"
+  ],
+
+  "limitations": [
+    "host enforcement is macOS Seatbelt; on a host without it the host gate reports unavailable rather than claiming isolation",
+    "the 134-method inventory and all session facts are protocol-surface observations, not compatibility or product acceptance",
+    "admission REFUSED is the correct current answer; it is not evidence that review has no value"
+  ],
+
+  "nextConsumerSteps": {
+    "main": "consume admit() as the single admission result; treat REFUSED as the supported answer; version the two alternative recipes if the pilot design changes; pricing alone must not unlock execution",
+    "E": "use the one adapter path only; there is no CLI fallback. The first action that would bill is the author turn, and both budget and cost gates currently refuse it",
+    "D": "runtime-diagnostics.mjs gives readable version/capability/gap facts with owners and no secrets; host isolation requires a Seatbelt profile"
+  }
+}
