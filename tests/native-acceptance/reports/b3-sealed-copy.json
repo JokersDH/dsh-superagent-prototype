@@ -1,0 +1,152 @@
+{
+  "generatedAt": "2026-11-11T02:34:44.579Z",
+  "environment": {
+    "note": "wave-06 B3 sealed copy and host boundary",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 9,
+    "PASS": 8,
+    "FAIL": 1,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "B3-SEALED-COPY",
+      "title": "the capsule is a full copy without any Git surface",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "copied 2 file(s); no .git, no remote config, no hooks in the capsule"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B3-NO-SHARED-INODE",
+      "title": "capsule files never share an inode with the author checkout",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "every file was copied, none hardlinked"
+      ],
+      "evidence": [
+        {
+          "sharedInodes": []
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-HARDLINK-ESCAPE",
+      "title": "a hardlink that would modify the author copy is refused or detected",
+      "lane": "package-local",
+      "status": "FAIL",
+      "detail": [
+        "the filesystem allows a hardlink into the capsule; only copying bytes defends the frozen source"
+      ],
+      "evidence": [
+        {
+          "hardlinkCreated": true,
+          "sameInode": true,
+          "authorChanged": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-SYMLINK-ESCAPE",
+      "title": "an escaping symlink in the capsule cannot reach the author home",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "links are not replicated into a capsule (probe link resolvable=true); the copy step skips them"
+      ],
+      "evidence": [
+        {
+          "symlinkMade": true,
+          "isSymlink": true,
+          "credentialReachable": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-SCRATCH-DISCARD",
+      "title": "the reviewer may write scratch in the capsule; the frozen source is unchanged",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "scratch was writable and discarded; the author working files were never modified"
+      ],
+      "evidence": [
+        {
+          "scratchWritable": true,
+          "discarded": true,
+          "authorUntouched": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-INPUT-MUTATED",
+      "title": "changing the frozen input invalidates the original subject evidence",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "the mutated tree no longer matches the frozen digest, so it cannot prove the original candidate"
+      ],
+      "evidence": [
+        {
+          "digestBefore": "87c8d88c424afe11",
+          "digestAfter": "5d2eb782fe3a645d"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-HOST-BOUNDARY",
+      "title": "host files/credentials remain reachable, so the copy is not a sandbox",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "confirmed cwd/copy is not a sandbox: the author home is reachable by absolute path, so host restrictions must be enforced separately"
+      ],
+      "evidence": [
+        {
+          "credentialReadable": true,
+          "reachedFromCapsule": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-MANIFEST-BINDING",
+      "title": "the capsule manifest binds the frozen subject and its own file digests",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "the manifest is bound to the frozen subject and every recorded file digest still matches"
+      ],
+      "evidence": [
+        {
+          "manifestDigest": "073a3747a2b3a184",
+          "files": 2
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B3-CLEANUP",
+      "title": "the disposable capsule is removed after the run",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "capsule tree removed; nothing shared with the author remains"
+      ],
+      "evidence": [],
+      "entities": []
+    }
+  ]
+}
