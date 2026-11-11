@@ -94,7 +94,7 @@ function commandSpecs() {
     version: { json: 'boolean' },
     build: { ...COMMON, output: 'string', 'release-output': 'string', 'skip-packages': 'boolean', 'skip-console': 'boolean' },
     stage: { ...COMMON, output: 'string', 'skip-packages': 'boolean', 'skip-console': 'boolean' },
-    'first-run': COMMON,
+    'first-run': { ...COMMON, 'adopt-release': 'boolean' },
     status: COMMON,
     doctor: { ...COMMON, deep: 'boolean', 'executors-fixture': 'string' },
     'recovery-status': { ...COMMON },
@@ -165,12 +165,26 @@ async function main(argv) {
   }
 
   if (command === 'first-run') {
-    const result = await firstRun({ installRoot, roots, json })
+    const result = await firstRun({ installRoot, roots, json, adoptExisting: values['adopt-release'] === true })
+    if (result.status === 'BLOCKED') {
+      printResult({
+        json: json ? result : null,
+        human: [`first-run: BLOCKED ${result.code}: ${result.message}`, `  ${JSON.stringify(result.detail ?? {})}`, `  hint: ${result.hint}`].join('\n'),
+      })
+      return EXIT.BLOCKED
+    }
     printResult({
       json: json ? result : null,
       human: [
         `first-run: ${result.status}`,
         `  config: ${result.configFile}`,
+        `  release: ${result.release.buildId ?? 'none'} (${result.release.reason})`,
+        ...(result.release.reason === 'release_missing_development'
+          ? ['  ! 源码/裸 app 目录没有安装清单，不会借用默认根；先 `pa build --install-root . --config-root <此根>`。']
+          : []),
+        ...(result.release.reason === 'unverified_source_build'
+          ? ['  ! 该 config root 的 release.json 不是从安装清单采纳的；发行用途请从 `<install>/bin/pa` 初始化。']
+          : []),
         `  created roots: ${result.created.length ? result.created.join(', ') : 'none'}`,
         `  data: ${result.roots.data}`,
         `  executor: ${result.executor.available ? result.executor.version : 'not installed (native execution disabled)'}`,

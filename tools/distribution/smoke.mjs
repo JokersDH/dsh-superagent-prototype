@@ -16,7 +16,7 @@ import { createHash } from 'node:crypto'
 import { spawn, spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { createServer } from 'node:net'
-import { closeSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, closeSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -286,6 +286,42 @@ try {
   const firstRun = runPa(['first-run', '--json', ...stateArgs()], { allowExit: [0] })
   if (firstRun.json?.status !== 'OK') throw new Error('first-run did not report OK')
   step('first-run', 'PASS', { created: firstRun.json.created })
+
+  // An overridden config root must adopt this install's own release manifest instead of failing with
+  // release_missing, and must refuse a manifest from a different install.
+  const overrideConfig = join(root, '配置 root with space')
+  mkdirSync(overrideConfig, { recursive: true, mode: 0o700 })
+  chmodSync(overrideConfig, 0o700)
+  const overrideArgs = ['--install', join(stagedRoot, 'app'), '--config-root', overrideConfig,
+    '--data-root', join(root, 'override-state'), '--cache-root', join(root, 'override-cache'),
+    '--logs-root', join(root, 'override-logs'), '--workspace-root', join(root, 'override-workspace')]
+  const adopted = runPa(['first-run', '--json', ...overrideArgs], { allowExit: [0] })
+  if (adopted.json?.status !== 'OK' || adopted.json.release?.adopted !== true)
+    throw new Error(`overridden config root did not adopt the install release: ${JSON.stringify(adopted.json).slice(0, 300)}`)
+  const stagedInstallBuildId = JSON.parse(readFileSync(join(stagedRoot, 'install.json'), 'utf8')).buildId
+  if (adopted.json.release.buildId !== stagedInstallBuildId)
+    throw new Error('adopted release buildId does not match the staged install')
+  const boundDoctor = runPa(['doctor', '--json', ...overrideArgs], { allowExit: [0, 1] })
+  if (boundDoctor.json.checks.find((check) => check.id === 'release_binding')?.status !== 'PASS')
+    throw new Error('doctor did not report release_binding PASS after adoption')
+  const foreignInstall = join(root, 'foreign-install')
+  mkdirSync(join(foreignInstall, 'app'), { recursive: true })
+  writeFileSync(join(foreignInstall, 'install.json'), JSON.stringify({
+    format: 'pa-install', formatVersion: 1, buildId: 'foreign-build', source: { commit: 'f'.repeat(40) }, appRoot: 'app',
+    files: [{ path: 'var/config/release.json', kind: 'file', bytes: 1, sha256: 'f'.repeat(64) }],
+  }))
+  const foreign = runPa(['first-run', '--json', '--install', join(foreignInstall, 'app'), '--config-root', overrideConfig,
+    '--data-root', join(root, 'override-state'), '--cache-root', join(root, 'override-cache'),
+    '--logs-root', join(root, 'override-logs'), '--workspace-root', join(root, 'override-workspace')], { allowExit: [2] })
+  if (!['install_manifest_tampered', 'install_release_missing'].includes(foreign.json?.code))
+    throw new Error(`a foreign install was not refused: ${JSON.stringify(foreign.json).slice(0, 300)}`)
+  step('config-root-adoption', 'PASS', {
+    adopted: adopted.json.release.reason,
+    buildId: adopted.json.release.buildId,
+    releaseDigest: adopted.json.release.digest,
+    binding: 'PASS',
+    foreignInstall: foreign.json.code,
+  })
 
   const doctorBefore = runPa(['doctor', '--json', ...stateArgs()], { allowExit: [0, 1] })
   if (doctorBefore.json.checks.some((check) => check.status === 'FAIL')) throw new Error('doctor reported FAIL before start')

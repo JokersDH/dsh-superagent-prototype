@@ -1,0 +1,79 @@
+{
+  "package": "product-wave-07 / D：真实双二进制升级与恢复切换",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "d4d51ae",
+  "mergeCommit": "8d0953c",
+  "sourceCommit": null,
+  "status": "CHECKPOINT_D1",
+  "scopeNote": "Package-scoped candidate. Not main/E admission. Model 0; no user service touched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "unknownNativeSends": 0
+  },
+  "commits": {
+    "wave06Final": "4a0ea7f",
+    "wave07Checkpoint": "pending"
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Overridden --config-root/PA_CONFIG_ROOT now adopts the install release manifest after verifying the install inventory (size+digest), buildId/source match and artifact containment; different source is a conflict, tamper/wrong root/missing manifest refused, source checkout is labelled development and never fabricates a release. doctor adds release_binding; smoke adds config-root-adoption with unicode/space path and foreign install refusal.",
+      "evidence": [
+        "apps/launcher/test/release-bootstrap.case.mjs",
+        "tools/distribution/reports/wave07/zero-model-smoke.json"
+      ]
+    },
+    "d2": {
+      "status": "NOT_STARTED"
+    },
+    "d3": {
+      "status": "NOT_STARTED"
+    },
+    "d4": {
+      "status": "NOT_STARTED"
+    },
+    "d5": {
+      "status": "NOT_STARTED"
+    },
+    "d6": {
+      "status": "NOT_STARTED"
+    }
+  },
+  "testLayers": {
+    "launcher": {
+      "command": "node --test apps/launcher/test/*.case.mjs",
+      "tests": 37,
+      "status": "PASS"
+    },
+    "smoke": {
+      "command": "node tools/distribution/smoke.mjs",
+      "steps": 50,
+      "status": "PASS",
+      "durationMs": 66507
+    }
+  },
+  "blockers": [
+    {
+      "id": "MAIN-RECOVERY-ACTIVATION",
+      "owner": "main",
+      "status": "PLANNED",
+      "summary": "Recovery activation/commit interface not published; D4 prepares threat/failure fixtures and consumes read-only inspect/prepare only."
+    }
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave07/zero-model-smoke.json",
+    "apps/launcher/test/release-bootstrap.case.mjs"
+  ],
+  "limitations": [
+    "darwin/arm64 + Node 24.21.x + SQLite ABI 137 measured only",
+    "binary cross-version switch pending D3",
+    "recovery activation pending main"
+  ]
+}

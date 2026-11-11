@@ -31,6 +31,7 @@ import {
   verifyReleaseArtifacts,
   verifyRuntimeDependencies,
 } from './release.mjs'
+import { releaseBinding } from './release-bootstrap.mjs'
 
 const execute = promisify(execFile)
 
@@ -155,6 +156,29 @@ export async function runDoctor({ installRoot, roots, deep = false, executorsFix
       : warn('platform', { platform: platform.platform, arch: platform.arch, note: platform.note }),
   )
   checks.push(await checkSqlite(installRoot))
+
+  // Is this config root bound to this exact install? A root that was never initialized, or one that
+  // still points at another build, explains a `release_missing`/stale-start symptom before start.
+  const binding = releaseBinding({ installRoot, configRoot: roots.config })
+  if (binding.bound) checks.push(pass('release_binding', { buildId: binding.installBuildId, digest: binding.configDigest }))
+  else if (binding.code === 'release_missing' || binding.code === 'source_build_no_install_manifest')
+    checks.push(warn('release_binding', {
+      code: binding.code,
+      path: binding.path,
+      hint: binding.code === 'release_missing'
+        ? 'Run `pa first-run` in this config root; a distribution install adopts the release manifest recorded inside it.'
+        : 'This is a source-checkout build (no install inventory). Distribution provenance is only claimed by `<install>/bin/pa`.',
+    }))
+  else
+    checks.push(fail('release_binding', {
+      code: binding.code,
+      path: binding.path,
+      configDigest: binding.configDigest,
+      installDigest: binding.installDigest,
+      installBuildId: binding.installBuildId,
+      message: binding.message,
+      hint: 'The config root holds a release manifest from a different install. Use `pa upgrade --to <install>` or a fresh config root; do not copy manifests by hand.',
+    }))
 
   const releaseState = readRelease(roots.config)
   if (releaseState.release === null) {
