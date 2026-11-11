@@ -4,7 +4,7 @@
   "taskPackage": "agent-tasks/product-wave-08/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
   "base": "5d4065b",
-  "checkpoint": null,
+  "checkpoint": "614192d",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -13,7 +13,7 @@
     "pilotTurnsUsed": 0,
     "pilotTokensUsed": 0,
     "pilotUsd": null,
-    "note": "Pilot BLOCKED (adapter_missing); ledger v2 preserves 0/24 turns, 0 tokens, no price basis; no model send. Runner selftest uses a B-entry fake process."
+    "note": "Research stays BLOCKED with no adapter; ledger v2 preserves 0/24 turns, 0 tokens, no price basis; no model send. The only send entry is B-owned; E only reserves."
   },
   "stages": [
     {
@@ -29,23 +29,23 @@
       "title": "Eight-case three-arm bounded pilot",
       "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
       "notes": [
-        "Real execute chain remains implemented but BLOCKED on adapter_missing; 0/24 turns, no sample replacement, no ID-swap resend."
+        "Real execute chain is implemented but BLOCKED on adapter_missing; B-owned entry, no CLI fallback, no sample replacement."
       ]
     },
     {
       "id": "E3",
-      "title": "Context and proposal product loop",
+      "title": "Proposal HTTP, attention, decisions and review timing",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "Existing decisions/attention/outcome negatives stay; context/proposal entries are added only after main publishes them, on real authenticated HTTP/SQLite."
+        "E3-PROPOSAL-HTTP verifies pending preview, missing-input refusal, confirm/reject, replay, changed payload, tamper, cross-project isolation and that an answer message cannot become a decision. Proposal UI and context preview remain NOT_TESTED main blockers."
       ]
     },
     {
       "id": "E4",
-      "title": "Two-binary installation and upgrade",
+      "title": "Explicit baseline/target installation and upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Same-byte wave-06 artifact remains accepted; wave-07 needs two frozen different binaries, release.json initialization under PA_CONFIG_ROOT and data compatibility across upgrade/rollback."
+        "Fixed baseline b0f87c88 (schema 12, dirty) and target 9120a5ed (schema 13, clean) are named parameters; target cold install, config root, mode retention, unknown-PID block, backup/restore, upgrade and old-binary schema refusal are independent. Old wave06 results are historical only."
       ]
     },
     {
@@ -53,7 +53,7 @@
       "title": "Recovery authorization windows and bounded stability",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "Read-only inspect/prepare verified; the commit, target half-preparation, activation pointer switch and unknown-writer barriers stay NOT_TESTED until main publishes the entry. Bounded cycles only."
+        "Recovery inspect/prepare replay, restart drift and no-write are verified; commit/activation and the interruption windows remain NOT_TESTED until main publishes them. Bounded cycles only."
       ]
     },
     {

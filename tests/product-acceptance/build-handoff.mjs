@@ -261,14 +261,25 @@ const CAPABILITIES = [
   },
   {
     id: 'two-binary-upgrade',
-    label: '两个真实不同二进制的数据升级与拒绝不兼容回退',
+    label: '显式 baseline/target 两个真实二进制的升级与拒绝不兼容回退',
     installed: ['E4-UPGRADE-ROLLBACK'],
     notTested: ['升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。'],
   },
   {
-    id: 'proposal-context',
-    label: '自动提案确认与上下文窗口（真实 HTTP/SQLite）',
-    notTested: ['main 未发布 proposal/context 入口；E3-PROPOSAL-CONTEXT-BOUNDARY 记录了所需输入与负例。'],
+    id: 'install-host-guards',
+    label: '模式保持、未知活 PID 阻断与不误杀',
+    installed: ['E4-INSTALL-HOST-GUARDS'],
+  },
+  {
+    id: 'proposal-http',
+    label: '结构化提案 prepare/confirm/reject（真实 HTTP/SQLite）',
+    controlled: ['E3-PROPOSAL-HTTP'],
+    notTested: ['网页确认入口与 context 预览未发布；source/grant 漂移与 outer receipt 失败注入未执行。'],
+  },
+  {
+    id: 'proposal-ui-context',
+    label: '提案网页确认与上下文窗口',
+    notTested: ['console 无提案/上下文入口；E3-PROPOSAL-UI、E3-CONTEXT-GRANT-BOUNDARY 记录了所需输入与授权反例。'],
   },
   {
     id: 'recovery-preflight',
@@ -374,6 +385,7 @@ const executionStatus = {
     screenshots: report.artifacts?.screenshots ?? [],
     matrix: join(reports, 'release-matrix.json'),
     executionStatus: join(reports, 'execution-status.json'),
+    wave08Status: join(reports, 'wave08-status.json'),
     wave07Status: join(reports, 'wave07-status.json'),
     wave06Status: join(reports, 'wave06-status.json'),
     tierVerdicts: join(reports, 'tier-verdicts.json'),
@@ -383,7 +395,7 @@ const executionStatus = {
     .filter((row) => row.gaps.length > 0 || row.controlledFixture === 'NOT_TESTED')
     .map((row) => ({ id: row.id, gaps: row.gaps })),
   externalBlockers: [
-    { owner: 'C', detail: 'Automatic context/proposal confirmation and published ReviewEvidence are still absent; explicit decisions are now verified separately.' },
+    { owner: 'main/C', detail: 'Proposal HTTP is verified; the console confirmation page and any context preview are still unpublished, and the C composer still fails expired/purpose/over-budget grant probes.' },
     { owner: 'main', detail: 'Migration ownership and review Work/Ticket/Assignment publication remain outside current main, so E3-REVIEW-PIPELINE stays NOT_TESTED.' },
     { owner: 'D', detail: 'Source stays on codex/g3-local-distribution. The frozen tar.gz is accepted byte-for-byte; a second frozen buildId is required for E4-UPGRADE-ROLLBACK, and PA_CONFIG_ROOT override drops release.json.' },
     { owner: 'B', detail: 'Native ledger/results are not supplied as input and E has no budget, so actual-native and native control evidence are absent.' },
@@ -463,9 +475,9 @@ ${rows
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **未通过**：安装、备份恢复与双产物升级本身通过，但私有 config root 不能初始化可信 release manifest | \`installed-alpha\` 因 E4-INSTALL-CONFIG-ROOT 失败而保持非零；owner D。 |
+| 安装准入（个人 Alpha） | 见 \`installed-alpha\` tier；target 的 cold install/config root/doctor、备份恢复、显式 baseline→target 升级与未知 PID 阻断均独立通过 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK；旧 baseline 的 config-root 失败仅作历史。 |
 
-安装物身份（两个真实不同产物）：base \`wave06-alpha-b0f87c88\` / buildId \`b0f87c883aa6b206\` / schema 12 / tar \`8b728b61…b5c5d\` / source \`9046d4c5\`（dirty）；upgrade \`wave06-alpha2-7e8f6ce6\` / buildId \`7e8f6ce6fa2e2633\` / schema 13 / tar \`0fe0ed53…c7631\` / source \`e10bfdb7\`（clean）。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。base 的 source 为 dirty，故 base 字节不能由干净提交重建；upgrade 可绑定干净 source。
+安装物身份（显式 baseline/target）：baseline \`wave06-alpha-b0f87c88\` / buildId \`b0f87c883aa6b206\` / schema 12 / tar \`8b728b61…b5c5d\` / source \`9046d4c5\`（dirty，仅作基线）；target \`wave07-target-9120a5ed\` / buildId \`9120a5ed858e0feb\` / schema 13 / tar \`bbc13312…7912\` / source \`76f26a66\`（clean）。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 baseline→target 组合成立；旧 wave06 组合的结果保留为历史。
 
 ## 独立复核价值试点
 
@@ -529,8 +541,12 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
 writeFileSync(
+  join(reports, 'wave08-status.json'),
+  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave08-status/1', taskPackage: stages.taskPackage }, null, 2) + '\n',
+)
+writeFileSync(
   join(reports, 'wave07-status.json'),
-  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave07-status/1', taskPackage: stages.taskPackage }, null, 2) + '\n',
+  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave07-status/1', taskPackage: 'agent-tasks/product-wave-07/README.zh-CN.md', supersededBy: 'wave08-status.json' }, null, 2) + '\n',
 )
 writeFileSync(
   join(reports, 'wave06-status.json'),

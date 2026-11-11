@@ -282,18 +282,64 @@ function attentionIssues(attention) {
 }
 
 /**
+ * A structured proposal is inert data until one explicit confirmation. Preview must be pending,
+ * confirmation/rejection must be replay-safe, every drift/tamper/cross-project path must refuse,
+ * and a question answer must never become shared knowledge.
+ */
+export function proposalFlowIssues(flow) {
+  if (!flow || typeof flow !== 'object') return ['missing']
+  const issues = []
+  const preview = flow.preview ?? {}
+  const confirm = flow.confirm ?? {}
+  const replay = flow.replay ?? {}
+  const refusals = flow.refusals ?? {}
+  if (preview.protocol !== 'proposal-preview/1') issues.push('protocol')
+  if (!Array.isArray(preview.requiredInputs) || preview.requiredInputs.length < 3) issues.push('required_inputs')
+  if (!Number.isSafeInteger(preview.ttlMs) || preview.ttlMs <= 0 || preview.ttlMs > 5 * 60 * 1000 + 5_000) issues.push('ttl')
+  if (!isSubstantive(confirm.workId) || !Number.isSafeInteger(confirm.seq)) issues.push('confirm')
+  if (replay.seq !== confirm.seq) issues.push('replay_seq')
+  if (![400, 422].includes(refusals.missingInput)) issues.push('missing_input_not_refused')
+  if (refusals.changedPayload !== 409) issues.push('changed_payload_not_conflict')
+  if (refusals.tampered !== 403) issues.push('tampered_not_refused')
+  if (![400, 403].includes(refusals.crossProject)) issues.push('cross_project_not_refused')
+  if (flow.reject?.recorded !== true || flow.reject?.noWork !== true) issues.push('reject_effect')
+  if (!Number.isSafeInteger(flow.isolation?.projectA) || !Number.isSafeInteger(flow.isolation?.projectB)) issues.push('isolation')
+  if (flow.decision?.recorded !== true) issues.push('decision_effect')
+  if (![400, 403, 409].includes(flow.authAnswer)) issues.push('auth_answer_promoted')
+  return issues
+}
+
+/**
  * A private config root must initialize from the install's trusted release manifest. A manual copy
  * that makes doctor pass is evidence of the missing step, not evidence of a working first-run.
  */
 export function configRootIssues(configRoot) {
   if (!configRoot || typeof configRoot !== 'object') return ['missing']
   const issues = []
-  for (const role of ['base', 'upgrade']) {
+  for (const role of ['baseline', 'target']) {
     const item = configRoot[role] ?? {}
     if (item.firstRun !== 'OK') issues.push(`${role}_first_run`)
-    if (item.initialized !== 'PASS') issues.push(`${role}_not_initialized`)
     if (item.seeded !== 'PASS') issues.push(`${role}_seed_not_decisive`)
   }
+  if (configRoot.target?.initialized !== 'PASS') issues.push('target_not_initialized')
+  if (!['PASS', 'FAIL'].includes(configRoot.baselineHistorical)) issues.push('baseline_history')
+  return issues
+}
+
+/**
+ * The launcher must retain the fixture mode on reuse, refuse a personal request without an admitted
+ * executor, and never adopt or signal a live process that is not the recorded instance.
+ */
+export function hostGuardIssues(guards) {
+  if (!guards || typeof guards !== 'object') return ['missing']
+  const issues = []
+  if (guards.mode?.fixtureReused !== true) issues.push('mode_not_retained')
+  if (!['author_executor_unavailable', 'author_executor_version_mismatch', 'instance_conflict'].includes(guards.mode?.personalRefused))
+    issues.push('personal_not_refused')
+  if (guards.mode?.existingUntouched !== true) issues.push('existing_instance_changed')
+  if (!['instance_identity_mismatch', 'invalid_instance_record'].includes(guards.unknownPid?.startCode)) issues.push('unknown_pid_adopted')
+  if (guards.unknownPid?.stopStatus === 0) issues.push('unknown_pid_stopped')
+  if (guards.unknownPid?.alive !== true) issues.push('unknown_pid_killed')
   return issues
 }
 
@@ -304,8 +350,8 @@ export function configRootIssues(configRoot) {
 export function upgradeIssues(upgrade) {
   if (!upgrade || typeof upgrade !== 'object') return ['missing']
   const issues = []
-  const base = upgrade.base ?? {}
-  const next = upgrade.upgrade ?? {}
+  const base = upgrade.baseline ?? upgrade.base ?? {}
+  const next = upgrade.target ?? upgrade.upgrade ?? {}
   if (!isSubstantive(base.buildId) || !isSubstantive(next.buildId) || base.buildId === next.buildId) issues.push('distinct_builds')
   if (!HEX.test(String(base.tarSha256 ?? '')) || !HEX.test(String(next.tarSha256 ?? '')) || base.tarSha256 === next.tarSha256)
     issues.push('distinct_bytes')
@@ -514,9 +560,17 @@ export function evaluateRelease({
         for (const issue of installationIssues(result.evidence?.installation))
           failures.push(fail('installation_evidence_invalid', `Installation proof ${issue}`, entry.id))
       }
+      if (entry.evidence?.includes('proposals')) {
+        for (const issue of proposalFlowIssues(result.evidence?.proposals))
+          failures.push(fail('proposal_flow_invalid', `Proposal flow ${issue}`, entry.id))
+      }
       if (entry.evidence?.includes('configRoot')) {
         for (const issue of configRootIssues(result.evidence?.configRoot))
           failures.push(fail('config_root_invalid', `Config root ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('hostGuards')) {
+        for (const issue of hostGuardIssues(result.evidence?.hostGuards))
+          failures.push(fail('host_guard_invalid', `Host guard ${issue}`, entry.id))
       }
       if (entry.evidence?.includes('upgrade')) {
         for (const issue of upgradeIssues(result.evidence?.upgrade))

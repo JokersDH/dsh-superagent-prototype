@@ -86,15 +86,32 @@ const evidenceFor = (key) => {
       return { sameSizeCode: 'release_artifact_missing', missingCode: 'release_artifact_missing', corruptBundleCode: 'archive_invalid' }
     case 'rollback':
       return { bundleSha256: DIGEST, target: '/tmp/state', postBackupReceipt: 'recorded' }
+    case 'proposals':
+      return {
+        preview: { protocol: 'proposal-preview/1', requiredInputs: ['work.scope', 'work.criteria', 'work.profileId'], ttlMs: 300000 },
+        confirm: { workId: 'work-1', seq: 5 },
+        replay: { seq: 5, works: 1 },
+        refusals: { missingInput: 400, changedPayload: 409, tampered: 403, crossProject: 403 },
+        reject: { recorded: true, noWork: true },
+        isolation: { projectA: 1, projectB: 1 },
+        decision: { recorded: true },
+        authAnswer: 409,
+      }
     case 'configRoot':
       return {
-        base: { role: 'base', firstRun: 'OK', initialized: 'PASS', seeded: 'PASS' },
-        upgrade: { role: 'upgrade', firstRun: 'OK', initialized: 'PASS', seeded: 'PASS' },
+        baseline: { role: 'baseline', firstRun: 'OK', initialized: 'FAIL', seeded: 'PASS' },
+        target: { role: 'target', firstRun: 'OK', initialized: 'PASS', seeded: 'PASS' },
+        baselineHistorical: 'FAIL',
+      }
+    case 'hostGuards':
+      return {
+        mode: { fixtureReused: true, personalRefused: 'author_executor_unavailable', existingUntouched: true },
+        unknownPid: { startCode: 'instance_identity_mismatch', stopStatus: 1, alive: true },
       }
     case 'upgrade':
       return {
-        base: { buildId: 'build-old', schema: 12, tarSha256: DIGEST },
-        upgrade: { buildId: 'build-new', schema: 13, tarSha256: 'c'.repeat(64) },
+        baseline: { buildId: 'build-old', schema: 12, tarSha256: DIGEST },
+        target: { buildId: 'build-new', schema: 13, tarSha256: 'c'.repeat(64) },
         migratedSchema: 13,
         messages: { before: 3, after: 4 },
         preUpgradeDataReadable: true,

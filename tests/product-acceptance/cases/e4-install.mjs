@@ -31,11 +31,11 @@ import { sha256 } from '../lib/evidence.mjs'
  */
 const ARTIFACTS = Object.freeze({
   base: {
-    role: 'base',
+    role: 'baseline',
     name: 'wave06-alpha-b0f87c88',
     buildId: 'b0f87c883aa6b206',
     productSchema: 12,
-    tarPath: process.env.PA_E_INSTALL_TAR_BASE ?? '/Users/hh/Desktop/joker/pa-artifacts/wave06/wave06-alpha-b0f87c88.tar.gz',
+    tarPath: process.env.PA_E_INSTALL_BASELINE_TAR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave06/wave06-alpha-b0f87c88.tar.gz',
     tarSha256: '8b728b610d980fa9fa4a37886ecd50a3a767098ce7f4bec5bf9b35cb552b5c5d',
     tarBytes: 19762074,
     installManifestSha256: '64444cb87130593d656738fd6929333533738f73b1cfec0c2858eaa4c823d5b9',
@@ -46,18 +46,18 @@ const ARTIFACTS = Object.freeze({
     sourceDirty: true,
   },
   upgrade: {
-    role: 'upgrade',
-    name: 'wave06-alpha2-7e8f6ce6',
-    buildId: '7e8f6ce6fa2e2633',
+    role: 'target',
+    name: 'wave07-target-9120a5ed',
+    buildId: '9120a5ed858e0feb',
     productSchema: 13,
-    tarPath: process.env.PA_E_INSTALL_TAR_UPGRADE ?? '/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz',
-    tarSha256: '0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631',
-    tarBytes: 19911757,
-    installManifestSha256: '09041204af46dca6810a070b4f2cba9895f07e2a56776ec8472af96ef785b548',
-    releaseManifestSha256: '749ed6b304e6cfe782ae50987b94fa29cfa49c85e3d884b126485f546b8eb87e',
-    closureDigest: '55069a730c6954261da765fc5dceadf78df2697f3348d4a99f64782e630e2966',
-    files: 6603,
-    sourceCommit: 'e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389',
+    tarPath: process.env.PA_E_INSTALL_TARGET_TAR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave07-target2/wave07-target-9120a5ed.tar.gz',
+    tarSha256: 'bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912',
+    tarBytes: 19960481,
+    installManifestSha256: '9a6ef28d40c29c89f23f9e3012903795da463f1ed2e224c35a47ed2cf6b8b10b',
+    releaseManifestSha256: '35649d8ddb902f9ae20b69b89b5dcbe9f09cff502be53d2a967b913f0dc20d44',
+    closureDigest: '75bab54dbd14f7028ab02fc9c22b2db16c9681d0841de5ade48e3b03b1483e90',
+    files: 6629,
+    sourceCommit: '76f26a66c0554f7294de98637198a01c3703e69a',
     sourceDirty: false,
   },
 })
@@ -403,16 +403,16 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       const version = pa(install, ['version', '--json'])
       assert('LAUNCHER_VERSION', version.status === 0 && version.json?.node === process.versions.node, JSON.stringify(version.json))
       const upgradeManifest = JSON.parse(readFileSync(join(upgradeInstall, 'install.json'), 'utf8'))
-      assert('UPGRADE_BUILD_ID', upgradeManifest.buildId === ARTIFACTS.upgrade.buildId, upgradeManifest.buildId)
-      assert('UPGRADE_INSTALL_DIGEST', digest(join(upgradeInstall, 'install.json')) === ARTIFACTS.upgrade.installManifestSha256, digest(join(upgradeInstall, 'install.json')))
-      assert('UPGRADE_RELEASE_DIGEST', digest(join(upgradeInstall, 'var/config/release.json')) === ARTIFACTS.upgrade.releaseManifestSha256, digest(join(upgradeInstall, 'var/config/release.json')))
-      assert('UPGRADE_SOURCE', upgradeManifest.source.commit === ARTIFACTS.upgrade.sourceCommit && upgradeManifest.source.dirty === false, JSON.stringify(upgradeManifest.source))
-      assert('UPGRADE_SCHEMA', upgradeManifest.producer.productSchema === 13, String(upgradeManifest.producer.productSchema))
+      assert('TARGET_BUILD_ID', upgradeManifest.buildId === ARTIFACTS.upgrade.buildId, upgradeManifest.buildId)
+      assert('TARGET_INSTALL_DIGEST', digest(join(upgradeInstall, 'install.json')) === ARTIFACTS.upgrade.installManifestSha256, digest(join(upgradeInstall, 'install.json')))
+      assert('TARGET_RELEASE_DIGEST', digest(join(upgradeInstall, 'var/config/release.json')) === ARTIFACTS.upgrade.releaseManifestSha256, digest(join(upgradeInstall, 'var/config/release.json')))
+      assert('TARGET_SOURCE', upgradeManifest.source.commit === ARTIFACTS.upgrade.sourceCommit && upgradeManifest.source.dirty === false, JSON.stringify(upgradeManifest.source))
+      assert('TARGET_SCHEMA', upgradeManifest.producer.productSchema === 13, String(upgradeManifest.producer.productSchema))
       assert('DISTINCT_BUILDS', upgradeManifest.buildId !== manifest.buildId && ARTIFACTS.base.tarSha256 !== ARTIFACTS.upgrade.tarSha256)
       evidence.artifact = {
         artifacts: [
-          { role: 'base', name: ARTIFACTS.base.name, buildId: ARTIFACTS.base.buildId, tarSha256: ARTIFACTS.base.tarSha256, schema: 12, source: manifest.source },
-          { role: 'upgrade', name: ARTIFACTS.upgrade.name, buildId: ARTIFACTS.upgrade.buildId, tarSha256: ARTIFACTS.upgrade.tarSha256, schema: 13, source: upgradeManifest.source },
+          { role: 'baseline', name: ARTIFACTS.base.name, buildId: ARTIFACTS.base.buildId, tarSha256: ARTIFACTS.base.tarSha256, schema: 12, source: manifest.source },
+          { role: 'target', name: ARTIFACTS.upgrade.name, buildId: ARTIFACTS.upgrade.buildId, tarSha256: ARTIFACTS.upgrade.tarSha256, schema: 13, source: upgradeManifest.source },
         ],
         files: manifest.files?.count,
         producer: manifest.producer,
@@ -524,15 +524,15 @@ export async function runInstall({ root, runDirectory, keep = false }) {
           doctorStatus: doctor.json?.status ?? 'unknown',
         }
       }
-      const base = probe(install, 'base')
-      const upgrade = probe(upgradeInstall, 'upgrade')
-      evidence.configRoot = { base, upgrade }
-      // A private config root must be usable out of the box; a manual release.json copy is not an
-      // initialization path a colleague can be expected to discover.
-      assert('BASE_CONFIG_ROOT_INITIALIZED', base.initialized === 'PASS', JSON.stringify(base))
-      assert('UPGRADE_CONFIG_ROOT_INITIALIZED', upgrade.initialized === 'PASS', JSON.stringify(upgrade))
-      assert('BASE_SEED_PROVES_MISSING_INIT', base.seeded === 'PASS', JSON.stringify(base))
-      assert('UPGRADE_SEED_PROVES_MISSING_INIT', upgrade.seeded === 'PASS', JSON.stringify(upgrade))
+      const baseline = probe(install, 'baseline')
+      const target = probe(upgradeInstall, 'target')
+      evidence.configRoot = { baseline, target, baselineHistorical: baseline.initialized }
+      // The target is the candidate under test; the baseline's earlier failure is history and must
+      // not be mapped onto a fixed target. Seeding proves the probe is decisive on both.
+      assert('TARGET_CONFIG_ROOT_INITIALIZED', target.initialized === 'PASS', JSON.stringify(target))
+      assert('TARGET_SEED_PROVES_INIT', target.seeded === 'PASS', JSON.stringify(target))
+      assert('BASELINE_SEED_PROVES_INIT', baseline.seeded === 'PASS', JSON.stringify(baseline))
+      assert('BASELINE_HISTORY_RECORDED', ['PASS', 'FAIL'].includes(baseline.initialized), JSON.stringify(baseline))
     })
 
     await push(define('E4-INSTALL-REUSE-CONCURRENCY', 'Instance identity is reused only for an exact match and concurrent starts do not fork'), async ({ assert, evidence }) => {
@@ -568,6 +568,57 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         }
       } finally {
         pa(install, ['stop', '--json'], { timeoutMs: 20_000 })
+      }
+    })
+
+    await push(define('E4-INSTALL-HOST-GUARDS', 'Mode is retained on reuse and an unknown live PID is never adopted or killed'), async ({ assert, evidence }) => {
+      pa(install, ['stop', '--json'], { timeoutMs: 20_000 })
+      pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 20_000 })
+      const first = pa(upgradeInstall, ['first-run', '--json'])
+      assert('GUARD_FIRST_RUN', first.status === 0, first.stdout + first.stderr)
+      const [port, apiPort] = await freePorts()
+      const started = startPa(upgradeInstall, { port, apiPort })
+      const running = await started.attempt
+      assert('GUARD_RUNNING', running.status === 'RUNNING', JSON.stringify({ status: running.status, code: running.code }))
+      let mode
+      let originalRecord
+      try {
+        originalRecord = readFileSync(join(upgradeInstall, 'var/config/instance.json'), 'utf8')
+        const status = pa(upgradeInstall, ['status', '--json'])
+        assert('MODE_FIXTURE', status.status === 0 && status.json?.instance?.mode === 'fixture', JSON.stringify({ status: status.status, mode: status.json?.instance?.mode }))
+        const reused = pa(upgradeInstall, ['start', '--fixture', '--json', '--port', String(port), '--api-port', String(apiPort)], { timeoutMs: 30_000 })
+        assert('FIXTURE_REUSED', reused.status === 0 && reused.json?.status === 'REUSED' && reused.json?.instance?.mode === 'fixture', JSON.stringify({ status: reused.status, value: reused.json?.status }))
+        const personal = pa(upgradeInstall, ['start', '--json', '--port', String(port), '--api-port', String(apiPort)], { timeoutMs: 30_000 })
+        const personalCode = personal.json?.code
+        assert('PERSONAL_REFUSED', personal.status === 2 && ['author_executor_unavailable', 'author_executor_version_mismatch', 'instance_conflict'].includes(personalCode), JSON.stringify({ status: personal.status, code: personalCode }))
+        const still = pa(upgradeInstall, ['status', '--json'])
+        assert('EXISTING_UNTOUCHED', still.status === 0 && still.json?.instance?.pid === running.instance.pid && still.json?.instance?.mode === 'fixture', JSON.stringify({ status: still.status, pid: still.json?.instance?.pid }))
+        mode = { fixtureReused: true, personalRefused: personalCode, existingUntouched: true }
+      } finally {
+        pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 30_000 })
+      }
+
+      // An instance record whose PID is a live, unrelated process must not be adopted or signalled.
+      const recordPath = join(upgradeInstall, 'var/config/instance.json')
+      assert('RECORD_CAPTURED', typeof originalRecord === 'string' && originalRecord.length > 0)
+      const foreign = spawn('sleep', ['120'], { stdio: 'ignore' })
+      try {
+        const record = JSON.parse(originalRecord)
+        record.pid = foreign.pid
+        record.consolePid = foreign.pid
+        record.apiPid = foreign.pid + 1
+        writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}
+`, { mode: 0o600 })
+        const blocked = pa(upgradeInstall, ['start', '--fixture', '--json', '--port', String(port), '--api-port', String(apiPort)], { timeoutMs: 30_000 })
+        assert('UNKNOWN_PID_BLOCKED', blocked.status === 2 && ['instance_identity_mismatch', 'invalid_instance_record'].includes(blocked.json?.code), JSON.stringify({ status: blocked.status, code: blocked.json?.code }))
+        assert('UNKNOWN_PID_ALIVE_AFTER_START', process.kill(foreign.pid, 0) === true)
+        const stop = pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 20_000 })
+        assert('STOP_REFUSED_UNVERIFIED', stop.status !== 0, JSON.stringify({ status: stop.status, code: stop.json?.code }))
+        assert('UNKNOWN_PID_ALIVE_AFTER_STOP', process.kill(foreign.pid, 0) === true)
+        evidence.hostGuards = { mode, unknownPid: { startCode: blocked.json?.code, stopStatus: stop.status, alive: true } }
+      } finally {
+        writeFileSync(recordPath, originalRecord, { mode: 0o600 })
+        foreign.kill('SIGKILL')
       }
     })
 
@@ -833,8 +884,8 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       pa(install, ['stop', '--json'], { timeoutMs: 30_000 })
 
       evidence.upgrade = {
-        base: { buildId: ARTIFACTS.base.buildId, schema: beforeSchema, tarSha256: ARTIFACTS.base.tarSha256 },
-        upgrade: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, tarSha256: ARTIFACTS.upgrade.tarSha256 },
+        baseline: { buildId: ARTIFACTS.base.buildId, schema: beforeSchema, tarSha256: ARTIFACTS.base.tarSha256, source: ARTIFACTS.base.sourceCommit },
+        target: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, tarSha256: ARTIFACTS.upgrade.tarSha256, source: ARTIFACTS.upgrade.sourceCommit },
         migratedSchema: readSchema(baseState),
         messages: { before: beforeMessages, after: afterMessages },
         preUpgradeDataReadable: true,
