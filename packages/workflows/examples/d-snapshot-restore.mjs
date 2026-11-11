@@ -44,6 +44,18 @@ try {
   })
   const patch = store.artifacts.write(Buffer.from('diff --git a/src/a b/src/a\n'))
   store.artifacts.insert(patch)
+  ports.recoveryIntents.record({
+    commandId: 'recovery-command-1', actor: { userId: 'user-1', authorityRef: 'authority-1' },
+    plan: { protocol: 'recovery-plan/1', planId: 'recovery-plan-1', inspectionFingerprint: 'f'.repeat(64),
+      createdAt: at, expiresAt: '2026-11-11T00:05:00.000Z',
+      bindings: [{ sourceProjectId: 'project-1', proposedProjectId: 'project-1', path: '/tmp/project',
+        headCommit: 'f'.repeat(40), configurationDigest: 'a'.repeat(64), scopeDigest: 'b'.repeat(64) }],
+      executor: { profileId: 'codex', revision: 1, version: '0.164.0', executableDigest: 'c'.repeat(64) },
+      artifactsChecked: 1, artifactScanTruncated: false,
+      blockers: [{ code: 'authorization_not_implemented', owner: 'main', detail: 'commit not connected' }],
+      authorization: 'not_granted', commitAvailable: false },
+    expectedInspectionFingerprint: 'f'.repeat(64), sourceFingerprint: 'f'.repeat(64), confirmedAt: at,
+  })
 
   const snapshot = join(root, 'snapshot')
   const snapshots = new WorkflowSnapshots(store)
@@ -58,6 +70,8 @@ try {
       decisions: db.prepare('SELECT COUNT(*) AS n FROM assistant_decision_versions').get().n,
       outcomes: db.prepare("SELECT COUNT(*) AS n FROM execution_outcome WHERE id = 'outcome-1'").get().n,
       settings: db.prepare('SELECT COUNT(*) AS n FROM project_settings_versions').get().n,
+      recoveryIntents: db.prepare('SELECT COUNT(*) AS n FROM recovery_intents').get().n,
+      intentAuthorization: JSON.parse(String(db.prepare("SELECT payload FROM recovery_intents WHERE plan_id = 'recovery-plan-1'").get().payload)).plan.authorization,
     }
   } finally { db.close() }
   console.log(JSON.stringify({

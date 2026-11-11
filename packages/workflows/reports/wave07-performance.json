@@ -1,0 +1,25 @@
+{
+  "protocol": "wave07-evidence-benchmark/1",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "dataset": {
+    "verifications": 600,
+    "recoveryIntents": 200
+  },
+  "evidencePage": {
+    "ms": 6.13,
+    "returned": 100,
+    "window": "caller_limit"
+  },
+  "allPages": {
+    "ms": 1.16,
+    "pages": 3
+  },
+  "recoveryIntents": {
+    "ms": 0.45,
+    "returned": 50,
+    "hasMore": true
+  },
+  "scope": "temporary SQLite; no model/account/network/user project"
+}
