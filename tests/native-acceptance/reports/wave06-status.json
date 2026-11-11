@@ -1,0 +1,128 @@
+{
+  "wave": "product-wave-06",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "82db295",
+  "mergeCommit": "543ccac",
+  "previousCandidate": "6b4e4ab",
+  "ownedPaths": [
+    "apps/runner/",
+    "packages/drivers/",
+    "packages/driver-kit/",
+    "packages/testing/",
+    "packages/catalog/",
+    "packages/policy-preparation/",
+    "tests/native-acceptance/"
+  ],
+  "packet": "agent-tasks/product-wave-06/agent-b-pilot-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0023-wave-06-alpha-and-value-boundaries.md",
+  "scopeNote": "This package implements NO second-protocol Driver. E owns the pilot cases/scoring and calls the E grant; B only provides verifiable run capability and reconciles the original control grant.",
+  "budget": {
+    "grants": [
+      {
+        "grantId": "wave03-b-native",
+        "limit": 4,
+        "ledgerPath": "tests/native-acceptance/reports/model-budget.json",
+        "ledgerPresent": false,
+        "verdict": "UNVERIFIED",
+        "declared": {
+          "used": 0,
+          "source": "tests/native-acceptance/reports/wave03-status.json"
+        },
+        "recordedFromLedger": {
+          "reserved": 0,
+          "sent": 0,
+          "unknown": 0,
+          "aborted": 0,
+          "consumed": 0
+        },
+        "maySendReal": false,
+        "why": "The ledger file the grant names has never existed in this branch's history (git log --all on that path is empty). wave03-status.json declares used=0 while pointing at that absent file, and budget.mjs grantView() answers used:0/remaining:4 from an empty fallback ledger. That is a status-document inference, not a reconciled remainder, so capacity is NOT treated as available and any real send is blocked until the ledger is reconstructed from real begin/attempt evidence."
+      }
+    ],
+    "historicalRoundsUsed": 3,
+    "historicalNote": "Earlier rounds keep their own accounting. They are reported separately and are never merged into, or used to top up, the wave03 grant.",
+    "pilotGrant": {
+      "grantId": "wave05-independent-review-pilot-01",
+      "owner": "E",
+      "maxTotalTurnStarts": 24,
+      "maxTotalBillableTokens": 200000,
+      "maxTotalCostUSD": 5,
+      "bConsumes": false,
+      "touchedThisWave": false
+    },
+    "modelCallsThisWave": 0
+  },
+  "phases": {
+    "B1": {
+      "status": "PASS",
+      "label": "baseline, control evidence, exact identity interface",
+      "evidenceClassification": "package-local / controlled (zero model calls)",
+      "done": [
+        "merged origin/main 82db295 (merge 543ccac, no conflicts)",
+        "ledger audit published: grant wave03-b-native is UNVERIFIED, real send fail-closed",
+        "exact ExecutionProfileRef resolver retained from 6b4e4ab (packages/catalog/src/profile-ref.ts, 12 negative cases)",
+        "false-pass mirror 6/6, budget 10/10, ledger-audit 10/10, harness selftest 14/14",
+        "B3 controlled questions 5 PASS / 1 NOT_TESTED (stale-version branch did not advance to v2)",
+        "B3 production stop 6/6 through the production ProcessHost",
+        "B4 recovery 3 PASS / 1 NOT_TESTED (no question visible before kill)"
+      ],
+      "controlResults": {
+        "falsePass": "6/6",
+        "budget": "10/10",
+        "ledgerAudit": "10/10",
+        "selftest": "14/14",
+        "b3Questions": {
+          "cases": 6,
+          "PASS": 5,
+          "NOT_TESTED": 1
+        },
+        "b3ProductionStop": {
+          "cases": 6,
+          "PASS": 6
+        },
+        "b4Recovery": {
+          "cases": 4,
+          "PASS": 3,
+          "NOT_TESTED": 1
+        }
+      },
+      "todo": [],
+      "correction": "tests/native-acceptance/reports/execution-status.json is stale (base c3f018e, native-mvp round). It is NOT wave-06 evidence and must not be consumed as such."
+    },
+    "B2": {
+      "status": "NOT_STARTED",
+      "label": "real author/fresh session and run boundary for E"
+    },
+    "B3": {
+      "status": "NOT_STARTED",
+      "label": "sealed one-shot capsule and host boundary"
+    },
+    "B4": {
+      "status": "NOT_STARTED",
+      "label": "price, usage and single-turn hard bound"
+    },
+    "B5": {
+      "status": "NOT_STARTED",
+      "label": "existing native control/question/recovery closure"
+    },
+    "B6": {
+      "status": "NOT_STARTED",
+      "label": "E integration, D diagnostics, final evidence package"
+    }
+  },
+  "knownBlockers": [
+    {
+      "id": "B-LEDGER-ABSENT",
+      "owner": "B",
+      "blocks": "B5 real native send; anything that would consume the wave03 grant",
+      "detail": "No persisted reservation ledger exists. Real send is fail-closed until the grant is reconstructed from verifiable begin/attempt sources.",
+      "nextConsumerAction": "Do not send real native work under wave03-b-native. Use the controlled zero-model lanes until a reconstructed ledger is published."
+    }
+  ],
+  "notTested": [
+    "actual vendor native active stop/question/approval (no native turn was started in this wave)",
+    "B4 question/answer crash window (no question observed before kill in prior controlled runs)"
+  ],
+  "next": "Finish B1 control evidence, publish the identity interface checkpoint, then continue B2-B6 independent phases."
+}
