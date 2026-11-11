@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "d4d51ae",
   "mergedMain": "436dc02",
-  "head": "76f26a6",
+  "head": "9402626",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate evidence. Not main/E admission, not installed-alpha. Recovery activation commit is main-owned and still unpublished; binary switching is measured only for the two frozen artifacts below.",
   "ownedPaths": [
@@ -22,7 +22,8 @@
     "wave06Final": "4a0ea7f",
     "wave07CheckpointD1": "c9a0698",
     "wave07CheckpointD2D3": "5adf00b",
-    "wave07Final": "76f26a6"
+    "wave07Final": "9402626",
+    "artifactSourceCommit": "76f26a6"
   },
   "phases": {
     "d1": {
@@ -190,5 +191,6 @@
     "wave-05/06 evidence and budgets unchanged",
     "no shared contract/migration/root lock/other-agent tests/user services modified",
     "no restore marker deleted, no force switch, no silent data rollback"
-  ]
+  ],
+  "artifactSourceCommit": "76f26a6"
 }
