@@ -169,6 +169,13 @@ try {
     throw new Error('baseline and target are the same build; a tag-only rebuild cannot prove a binary switch')
   if (targetManifest.source.commit === baselineManifest.source.commit)
     throw new Error('baseline and target share a source commit; the switch must cross two real sources')
+  // A private config root bound to the target install, used for target-only diagnostics such as the
+  // future-schema refusal (the switch itself keeps sharing the baseline config root).
+  const targetConfigRoot = join(root, 'target-config')
+  run(cli(target), ['first-run', '--json', '--config-root', targetConfigRoot,
+    '--data-root', join(root, 'target-probe-data'), '--cache-root', join(root, 'target-probe-cache'),
+    '--logs-root', join(root, 'target-probe-logs'), '--workspace-root', join(root, 'target-probe-workspace')], { allowExit: [0] })
+
   section('installs', 'PASS', {
     baseline: { buildId: baselineManifest.buildId, commit: baselineManifest.source.commit, schema: 13, tarFamily: 'wave06-alpha2' },
     target: { buildId: targetManifest.buildId, commit: targetManifest.source.commit, schema: 13 },
@@ -199,6 +206,12 @@ try {
   const afterSwitch = instanceOf(r)
   if (afterSwitch?.buildId !== targetManifest.buildId) throw new Error('the running instance is not the target build')
   if (switched.json.started.pid !== afterSwitch.pid) throw new Error('switch result does not match the recorded instance pid')
+  // Consumer assertion, not argv inspection: the running product must still be the same mode/access.
+  if (afterSwitch.mode !== 'fixture' || afterSwitch.access !== 'local-development')
+    throw new Error(`the switch changed the instance identity: ${afterSwitch.mode}/${afterSwitch.access}`)
+  const targetModeHealth = await fetch(`${afterSwitch.apiURL}/v1/health`, { signal: AbortSignal.timeout(3000) }).catch(() => null)
+  const targetModeBody = targetModeHealth?.ok === true ? await targetModeHealth.json() : null
+  if (targetModeBody?.mode !== 'fixture') throw new Error(`target health reports mode ${targetModeBody?.mode ?? 'unknown'}, expected fixture`)
   const afterSwitchEvidence = evidenceOf(r)
   if (!afterSwitchEvidence.projects.some((project) => project.id === 'project-upgrade')) throw new Error('switching lost the pre-upgrade project')
   if (!afterSwitchEvidence.works.some((work) => work.id === 'work-pre-upgrade')) throw new Error('switching lost the pre-upgrade work')
@@ -218,6 +231,8 @@ try {
     backup: { path: switched.json.backup.path, sha256: switched.json.backup.sha256 },
     instance: { pid: afterSwitch.pid, buildId: afterSwitch.buildId },
     evidenceDigestBefore: beforeDigest, evidenceDigestAfter: afterSwitchEvidence.digest,
+    mode: { record: afterSwitch.mode, health: targetModeBody?.mode ?? null },
+    access: afterSwitch.access,
     dataRolledBack: journal.dataRolledBack === true,
   })
 
@@ -248,19 +263,68 @@ try {
     note: 'Both builds use schema 13, so the older binary still reads the newer records; this is a binary-only rollback, never a data rollback.',
   })
 
-  // ---- D. schema-incompatible older binary refuses the newer state ----
+  // ---- D. exact schema incompatibility (not a missing-artifact side effect) ----
+  // The older binary is given its own valid config/release so the only mismatch is the state schema;
+  // its real storage reader must refuse with the exact MigrationIntegrityError, and it must not leave
+  // an instance record, listener or changed bytes behind.
   const schema12 = copyInstall(values['old-schema-install'], 'schema12-install')
-  const refusal = run(cli(schema12), ['start', '--fixture', '--json', '--port', String(await freePort()), '--api-port', String(await freePort()), ...rootArgs(r)], { allowExit: [1, 2], timeout: 120_000 })
+  const schema12Roots = { install: join(schema12, 'app'), config: join(schema12, 'var/config'),
+    data: join(root, 'schema12-data'), cache: join(root, 'schema12-cache'), logs: join(root, 'schema12-logs'), workspace: join(root, 'schema12-workspace') }
+  run(cli(schema12), ['first-run', '--json', ...rootArgs(schema12Roots)], { allowExit: [0] })
+  const schema12Manifest = JSON.parse(readFileSync(join(schema12, 'install.json'), 'utf8'))
+  const stateBeforeRefusal = sha256File(statePath(r))
+  const refusal = run(cli(schema12), ['start', '--fixture', '--json', '--port', String(await freePort()), '--api-port', String(await freePort()), '--data-root', r.data, '--cache-root', schema12Roots.cache, '--logs-root', schema12Roots.logs, '--workspace-root', schema12Roots.workspace], { allowExit: [1, 2], timeout: 180_000 })
   if (refusal.status === 0) throw new Error('the schema-12 binary started on a schema-13 state')
-  const refusalCode = refusal.json?.code ?? 'daemon_start_failed'
-  const bytesAfterRefusal = sha256File(statePath(r))
-  if (evidenceOf(r).productSchema !== 13) throw new Error('the refused older binary changed the state schema')
-  if (sha256File(statePath(r)) !== bytesAfterRefusal) throw new Error('the refused older binary rewrote the state')
-  section('D-incompatible-binary-refusal', 'PASS', {
-    olderBinary: JSON.parse(readFileSync(join(schema12, 'install.json'), 'utf8')).buildId,
-    code: refusalCode,
-    schemaAfterRefusal: evidenceOf(r).productSchema,
+  const refusalText = `${refusal.stdout ?? ''}\n${refusal.stderr ?? ''}`
+  const exactReaderRefusal = /MigrationIntegrityError: Applied migration 13 is not registered in this build/.test(refusalText)
+  if (!exactReaderRefusal)
+    throw new Error(`the old schema reader did not refuse with the exact migration error: ${refusalText.slice(-600)}`)
+  if (/release_artifact_missing/.test(refusalText))
+    throw new Error('the old binary still failed for a release-artifact reason; that is not schema evidence')
+  if (instanceOf(r)?.buildId === schema12Manifest.buildId) throw new Error('the refused old binary wrote an instance record')
+  if (sha256File(statePath(r)) !== stateBeforeRefusal) throw new Error('the refused old binary rewrote the state')
+  if (evidenceOf(r).productSchema !== 13) throw new Error('the refused old binary changed the state schema')
+
+  // The older build must also refuse a schema-13 backup bundle with the portability code, not by
+  // crashing on missing artifacts.
+  const schema13Bundle = join(root, 'schema13.pab')
+  run(cli(target), ['backup', '--json', '--out', schema13Bundle, ...rootArgs({ ...r, install: join(target, 'app') })], { allowExit: [0] })
+  const oldRestoreTarget = join(root, 'old-restore-target')
+  const restoreRefusal = run(cli(schema12), ['restore', '--json', '--bundle', schema13Bundle, '--to', oldRestoreTarget, ...rootArgs(schema12Roots)], { allowExit: [2] })
+  // The older build can notice the newer evidence payload before it reads the schema; either way it
+  // is a refusal without a created target. Record exactly which layer refused instead of relabelling.
+  const restoreRefusalCode = restoreRefusal.json?.code
+  if (!['schema_unsupported', 'manifest_invalid'].includes(restoreRefusalCode))
+    throw new Error(`old build restore did not refuse the newer bundle: ${JSON.stringify(restoreRefusal.json).slice(0, 300)}`)
+  if (restoreRefusalCode === 'manifest_invalid' && !/format version is unsupported/i.test(restoreRefusal.json?.message ?? ''))
+    throw new Error('old build refused the bundle for an unrelated reason')
+  if (existsSync(oldRestoreTarget)) throw new Error('the refused restore created the target state')
+
+  // The new binary must refuse a state from a future schema with an explicit code before spawning.
+  const futureState = join(root, 'future-state')
+  mkdirSync(futureState, { recursive: true, mode: 0o700 })
+  cpSync(statePath(r), join(futureState, 'state.sqlite'))
+  const futureStore = new ProductStore({ path: join(futureState, 'state.sqlite') })
+  try {
+    futureStore.db.prepare("UPDATE schema_meta SET value = '99' WHERE key = 'product_schema'").run()
+  } finally { futureStore.close() }
+  const futureProbe = (() => { try { return readEvidenceSummary(join(futureState, 'state.sqlite')).productSchema } catch (error) { return `error:${error.code ?? error.message}` } })()
+  if (futureProbe !== 99) throw new Error(`future-state fixture did not keep schema 99: ${String(futureProbe)}`)
+  const futureStart = run(cli(target), ['start', '--fixture', '--json', '--port', String(await freePort()), '--api-port', String(await freePort()),
+    '--install', join(target, 'app'), '--config-root', targetConfigRoot, '--data-root', futureState,
+    '--cache-root', schema12Roots.cache, '--logs-root', schema12Roots.logs, '--workspace-root', schema12Roots.workspace], { allowExit: [2], timeout: 120_000 })
+  if (futureStart.json?.code !== 'state_schema_newer_than_binary' || futureStart.json.detail?.stateSchema !== 99)
+    throw new Error(`new binary did not refuse a future schema with the exact code: ${JSON.stringify(futureStart.json).slice(0, 300)}`)
+  if (instanceOf(r)?.buildId !== undefined && instanceOf(r)?.state === futureState) throw new Error('the refused future-state start wrote an instance record')
+  section('D-exact-schema-refusal', 'PASS', {
+    oldBinary: schema12Manifest.buildId,
+    oldReaderError: 'MigrationIntegrityError: Applied migration 13 is not registered in this build',
+    oldRestoreCode: restoreRefusalCode,
+    oldRestoreLayer: restoreRefusalCode === 'schema_unsupported' ? 'schema' : 'bundle_evidence_format',
+    newBinaryFutureSchemaCode: futureStart.json.code,
+    futureSchema: futureStart.json.detail.stateSchema,
     stateUnchanged: true,
+    writerStarted: false,
   })
 
   // ---- E. failure windows ----

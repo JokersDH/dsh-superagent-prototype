@@ -8,9 +8,10 @@
  * self-authorized resume switch.
  */
 import { spawn } from 'node:child_process'
+import { existsSync } from 'node:fs'
 import { createServer } from 'node:net'
 import { join } from 'node:path'
-import { ensureRoots } from '@personal-agent/portability'
+import { ensureRoots, readEvidenceSummary } from '@personal-agent/portability'
 import { EXIT } from './cli.mjs'
 import { readLauncherConfig } from './config.mjs'
 import { daemonArgv, spawnDaemon } from './daemon.mjs'
@@ -129,6 +130,31 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
   const access = values['require-login'] === true ? 'token' : 'local-development'
   const startupMode = expectedStartupMode(canonicalState)
   const recovery = recoverySummary(canonicalState)
+
+  // Exact schema rejection before any process is spawned: a state written by a newer build is not
+  // opened by an older binary at all (the daemon would fail with MigrationIntegrityError, but that is
+  // a crash, not a diagnostic refusal, and it must never look like a healthy start attempt).
+  const stateDatabase = join(canonicalState, 'state.sqlite')
+  try {
+    const observed = existsSync(stateDatabase) ? readEvidenceSummary(stateDatabase) : null
+    if (observed !== null && typeof release?.producer?.productSchema === 'number' && observed.productSchema > release.producer.productSchema)
+      return blocked(
+        'state_schema_newer_than_binary',
+        `state schema ${observed.productSchema} is newer than this binary (${release.producer.productSchema})`,
+        { stateSchema: observed.productSchema, binarySchema: release.producer.productSchema, state: canonicalState, buildId: release.buildId },
+        'Use the newer distribution for this state, or restore a backup made by this build. This binary does not downgrade or delete the state.',
+      )
+  } catch (error) {
+    // readEvidenceSummary refuses a future schema itself; that is exactly the case this preflight is
+    // here for, so turn it into the explicit refusal instead of letting the daemon crash later.
+    if (error?.code === 'schema_unsupported' && typeof error.detail?.productSchema === 'number')
+      return blocked(
+        'state_schema_newer_than_binary',
+        `state schema ${error.detail.productSchema} is newer than this binary (${error.detail.supported})`,
+        { stateSchema: error.detail.productSchema, binarySchema: error.detail.supported, state: canonicalState },
+        'Use the newer distribution for this state, or restore a backup made by this build. This binary does not downgrade or delete the state.',
+      )
+  }
   const desired = {
     install: canonicalInstall,
     state: canonicalState,

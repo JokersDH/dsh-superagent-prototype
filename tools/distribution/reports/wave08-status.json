@@ -1,0 +1,78 @@
+{
+  "package": "product-wave-08 / D：保留个人模式的升级、失败清理与恢复消费",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "eca5674",
+  "mergedMain": "5d4065b",
+  "head": "bb36e24",
+  "artifactSourceCommit": null,
+  "status": "CHECKPOINT_D1",
+  "scopeNote": "Package-scoped candidate. Not main/E admission. Model calls 0; user services untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "unknownNativeSends": 0
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Upgrade/recover/rollback now establish the recorded mode+access and refuse instead of guessing; start flags preserve personal vs fixture; verifyInstance asserts the live health mode against the record; an unverifiable but alive pid blocks upgrade, recover and rollback consistently. Unit tests + 52-step smoke pass.",
+      "evidence": [
+        "apps/launcher/test/upgrade-identity.case.mjs",
+        "tools/distribution/reports/wave08/zero-model-smoke.json"
+      ]
+    },
+    "d2": {
+      "status": "PARTIAL_IMPLEMENTED",
+      "summary": "Failed targets go through stopOwnedTarget: only the spawn root tree plus the recorded instance whose command names this operation roots are terminated; pointer/record recovery only happens after the tree is proven stopped, otherwise the journal records target_stop_unproven and nothing is reverted or restarted. Fault injection (target_unhealthy, crash_after_switch) covers two windows; the remaining windows are still being closed."
+    },
+    "d3": {
+      "status": "IN_PROGRESS",
+      "summary": "Exact schema evidence replaces the old release_artifact_missing result: the frozen schema-12 build now runs with its own valid release and refuses a schema-13 state with the storage MigrationIntegrityError; the new build adds a pre-spawn state_schema_newer_than_binary refusal. Full re-run needs the wave-08 target artifact."
+    },
+    "d4": {
+      "status": "NOT_STARTED"
+    },
+    "d5": {
+      "status": "NOT_STARTED"
+    },
+    "d6": {
+      "status": "NOT_STARTED"
+    }
+  },
+  "testLayers": {
+    "launcher": {
+      "command": "node --test apps/launcher/test/*.case.mjs",
+      "tests": 52,
+      "status": "PASS"
+    },
+    "smoke": {
+      "command": "node tools/distribution/smoke.mjs",
+      "steps": 52,
+      "status": "PASS",
+      "durationMs": 58642
+    }
+  },
+  "blockers": [
+    {
+      "id": "MAIN-RECOVERY-TARGET-ACTIVATION",
+      "owner": "main",
+      "status": "PLANNED",
+      "summary": "Target activation/commit route still unpublished; D keeps inspect/prepare + local precondition gate."
+    }
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave08/zero-model-smoke.json",
+    "apps/launcher/test/upgrade-identity.case.mjs"
+  ],
+  "limitations": [
+    "darwin/arm64 + Node 24.21.x + SQLite ABI 137 only",
+    "wave-08 target artifact not built yet",
+    "recovery target activation pending main"
+  ]
+}

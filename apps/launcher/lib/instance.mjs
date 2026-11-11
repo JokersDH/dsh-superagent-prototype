@@ -327,6 +327,13 @@ export async function verifyInstance(record, options = {}) {
     health = null
   }
   record0('health', health !== null && health.status === 'ok', health === null ? 'unreachable' : health.mode)
+  // The running consumer must actually be in the recorded mode: an upgrade that silently falls back
+  // from personal to fixture (or the reverse) is an identity mismatch, not a successful switch.
+  record0(
+    'runtime_mode',
+    health !== null && health.mode === record.mode,
+    { expected: record.mode, observed: health?.mode ?? null },
+  )
   const observedStartupMode = health?.startupMode === 'recovery_readonly' ? 'recovery_readonly' : 'normal'
   record0(
     'startup_mode',

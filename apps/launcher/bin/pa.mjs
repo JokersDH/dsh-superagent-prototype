@@ -121,7 +121,7 @@ function commandSpecs() {
     'import-bundle': { ...COMMON, bundle: 'string' },
     restore: { ...COMMON, bundle: 'string', to: 'string', 'map-path': 'list' },
     rollback: { ...COMMON, bundle: 'string', target: 'string', last: 'boolean' },
-    upgrade: { ...COMMON, to: 'string', backup: 'string', 'no-backup': 'boolean', 'no-stop': 'boolean', recover: 'boolean', force: 'boolean' },
+    upgrade: { ...COMMON, to: 'string', backup: 'string', 'no-backup': 'boolean', 'no-stop': 'boolean', recover: 'boolean', force: 'boolean', mode: 'string', access: 'string' },
     'upgrade-status': { ...COMMON },
     'rollback-install': { ...COMMON, 'no-stop': 'boolean' },
     'recovery-activation-check': { ...COMMON, intent: 'string', 'target-root': 'string' },
@@ -431,7 +431,7 @@ async function main(argv) {
   if (command === 'upgrade') {
     try {
       if (values.recover === true) {
-        const result = await recoverSwitch({ installRoot, roots })
+        const result = await recoverSwitch({ installRoot, roots, values })
         printResult({
           json: json ? result : null,
           human: [`upgrade --recover: ${result.status}`, ...(result.started ? [`  pid: ${result.started.pid}`, `  api: ${result.started.apiURL}`] : []), ...(result.reason ? [`  reason: ${result.reason}`] : [])].join('\n'),

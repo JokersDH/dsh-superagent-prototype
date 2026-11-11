@@ -20,7 +20,7 @@
  * It never deletes a restore marker, never downgrades the database schema, and never removes user
  * data to make a downgrade pass.
  */
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { createServer } from 'node:net'
 import { createHash } from 'node:crypto'
 import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, unlinkSync, writeSync } from 'node:fs'
@@ -155,6 +155,29 @@ export function inspectTargetInstall(targetRoot) {
   }
 }
 
+/** Start flags for the next launcher must preserve the mode/access the instance actually ran with. */
+export function launcherStartArgs({ mode, access }) {
+  if (mode !== 'fixture' && mode !== 'personal') throw new UpgradeError('upgrade_mode_unavailable', 'A launcher mode is required to preserve the running instance identity', { mode })
+  if (access !== 'token' && access !== 'local-development') throw new UpgradeError('upgrade_access_unavailable', 'An access mode is required to preserve the running instance identity', { access })
+  return [
+    ...(mode === 'fixture' ? ['--fixture'] : []),
+    ...(access === 'token' ? ['--require-login'] : []),
+  ]
+}
+
+/** Identity that must survive the switch; without it the upgrade refuses instead of guessing. */
+export function preserveIdentity({ record, explicitMode, explicitAccess, journal }) {
+  const mode = record?.mode ?? journal?.mode ?? explicitMode ?? null
+  const access = record?.access ?? journal?.access ?? explicitAccess ?? null
+  if (mode === null || access === null)
+    throw new UpgradeError('upgrade_mode_unavailable', 'The running instance mode/access cannot be established; refusing to switch instead of silently changing it', {
+      mode,
+      access,
+      hint: 'Pass --mode personal|fixture and --access local-development|token only if you know the intended identity; otherwise start the instance once so its record exists.',
+    })
+  return { mode, access }
+}
+
 const readPreviousRelease = (configRoot) => {
   const path = join(configRoot, PREVIOUS_RELEASE)
   if (!existsSync(path)) return null
@@ -192,7 +215,7 @@ export async function planUpgrade({ installRoot, roots, to, allowSameSource = fa
       schema: currentRelease?.producer?.productSchema ?? null,
     },
     to: { installDir: target.installDir, buildId: target.release.buildId, commit: target.release.source.commit, schema: target.dataSchema, digest: target.releaseDigest },
-    instance: instance === null ? null : { pid: instance.pid, apiURL: instance.apiURL, consoleURL: instance.consoleURL, buildId: instance.buildId },
+    instance: instance === null ? null : { pid: instance.pid, apiURL: instance.apiURL, consoleURL: instance.consoleURL, buildId: instance.buildId, mode: instance.mode, access: instance.access },
     sharedData: true,
     dataMigration: (target.dataSchema ?? 0) > (currentRelease?.producer?.productSchema ?? 0),
     binaryDowngrade: (target.dataSchema ?? 0) < (currentRelease?.producer?.productSchema ?? 0),
@@ -214,8 +237,12 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
   const previousPath = join(roots.config, PREVIOUS_RELEASE)
   const previous = readPreviousRelease(roots.config)
 
-  // 1. Stop the recorded instance if it is running. A misleading record must not kill anything.
+  // The mode/access that the running instance actually used must survive the switch. Read it before
+  // stopping; if the record is gone, only an explicit --mode/--access may replace it, otherwise refuse.
   const instance = readInstanceRecord(roots.config)
+  const identity = preserveIdentity({ record: instance, explicitMode: values.mode, explicitAccess: values.access, journal: readJournal(roots.config) })
+
+  // 1. Stop the recorded instance if it is running. A misleading record must not kill anything.
   let stopped = null
   if (instance !== null) {
     const verification = await verifyInstance(instance)
@@ -268,6 +295,8 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
     to: plan.to,
     stopped,
     backup,
+    mode: identity.mode,
+    access: identity.access,
     ports: instance === null ? null : { consoleURL: instance.consoleURL, apiURL: instance.apiURL },
     previousReleasePath: existsSync(previousPath) ? previousPath : null,
   })
@@ -281,6 +310,8 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
     stopped,
     backup,
     adopted,
+    mode: identity.mode,
+    access: identity.access,
     ports: instance === null ? null : { consoleURL: instance.consoleURL, apiURL: instance.apiURL },
     previousReleasePath: existsSync(previousPath) ? previousPath : null,
   })
@@ -299,6 +330,8 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
     backup,
     adopted,
     started,
+    mode: identity.mode,
+    access: identity.access,
     previousReleasePath: existsSync(previousPath) ? previousPath : null,
     dataRolledBack: false,
   })
@@ -316,7 +349,86 @@ const freeFrom = async (seed, key, fallback) => {
   return fallback
 }
 
-async function startTarget({ roots, target, seed, fault }) {
+/** Descendants of one pid inside this process tree (BFS over ps output). */
+const processTree = (rootPid) => {
+  const ps = spawnSyncPs()
+  const children = new Map()
+  for (const line of ps) {
+    const [pid, ppid] = line.trim().split(/\s+/).map(Number)
+    if (!Number.isInteger(pid) || !Number.isInteger(ppid)) continue
+    if (!children.has(ppid)) children.set(ppid, [])
+    children.get(ppid).push(pid)
+  }
+  const out = []
+  const queue = [rootPid]
+  const seen = new Set()
+  while (queue.length > 0) {
+    const pid = queue.shift()
+    if (seen.has(pid)) continue
+    seen.add(pid)
+    out.push(pid)
+    queue.push(...(children.get(pid) ?? []))
+  }
+  return out
+}
+
+const spawnSyncPs = () => {
+  const result = spawnSync('ps', ['-axo', 'pid=,ppid='], { encoding: 'utf8' })
+  return result.stdout.split('\n').filter(Boolean)
+}
+
+const commandOf = (pid) => spawnSync('ps', ['-ww', '-p', String(pid), '-o', 'command='], { encoding: 'utf8' }).stdout.trim()
+
+const alive = (pid) => {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Stop only processes this operation can prove it started: the spawn root and its descendants, plus
+ * the recorded target instance. Every candidate must name the target install or this operation's
+ * roots in its command line, so a reused pid or a foreign process is never touched.
+ *
+ * Returns whether the stop is proven. When it is not, the caller must keep the indeterminate state
+ * (no pointer revert, no old-writer restart) instead of pretending the switch is clean.
+ */
+export async function stopOwnedTarget({ roots, target, spawnedPid, record }) {
+  const candidates = new Set()
+  if (Number.isInteger(spawnedPid) && spawnedPid > 0) for (const pid of processTree(spawnedPid)) candidates.add(pid)
+  for (const pid of [record?.pid, record?.apiPid]) {
+    if (!Number.isInteger(pid) || pid <= 0) continue
+    candidates.add(pid)
+    for (const child of processTree(pid)) candidates.add(child)
+  }
+  const owned = []
+  for (const pid of candidates) {
+    if (pid === process.pid) continue
+    const command = commandOf(pid)
+    if (command === '') continue
+    if (command.includes(target.installDir) || command.includes(roots.config) || command.includes(roots.data) || command.includes(roots.logs))
+      owned.push(pid)
+  }
+  const stopped = []
+  for (const pid of owned) {
+    try { process.kill(pid, 'SIGTERM'); stopped.push(pid) } catch { /* gone */ }
+  }
+  const deadline = Date.now() + 4000
+  while (Date.now() < deadline && owned.some((pid) => alive(pid))) await new Promise((r) => setTimeout(r, 100))
+  for (const pid of owned) {
+    if (!alive(pid)) continue
+    try { process.kill(pid, 'SIGKILL') } catch { /* gone */ }
+  }
+  const killDeadline = Date.now() + 2000
+  while (Date.now() < killDeadline && owned.some((pid) => alive(pid))) await new Promise((r) => setTimeout(r, 100))
+  const remaining = owned.filter((pid) => alive(pid))
+  return { proven: remaining.length === 0, stopped, remaining, considered: owned.length }
+}
+
+async function startTarget({ roots, target, seed, identity, fault }) {
   let consolePort = await freeFrom(seed, 'consoleURL', 0)
   let apiPort = await freeFrom(seed, 'apiURL', 0)
   if (!Number.isInteger(consolePort) || consolePort <= 0 || !Number.isInteger(apiPort) || apiPort <= 0 || consolePort === apiPort) {
@@ -332,9 +444,10 @@ async function startTarget({ roots, target, seed, fault }) {
   mkdirSync(roots.logs, { recursive: true, mode: 0o700 })
   const outFd = openSync(out, 'a', 0o600)
   const errFd = openSync(err, 'a', 0o600)
+  const modeArgs = launcherStartArgs(identity)
   const child = spawn(
     target.wrapper,
-    ['start', '--fixture', '--port', String(consolePort), '--api-port', String(apiPort),
+    ['start', ...modeArgs, '--port', String(consolePort), '--api-port', String(apiPort),
       '--install', target.appRoot, '--config-root', roots.config,
       '--data-root', roots.data, '--cache-root', roots.cache, '--logs-root', roots.logs, '--workspace-root', roots.workspace],
     { cwd: target.installDir, detached: true, stdio: ['ignore', outFd, errFd] },
@@ -342,14 +455,35 @@ async function startTarget({ roots, target, seed, fault }) {
   child.unref()
   closeSync(outFd)
   closeSync(errFd)
+
+  const fail = async (reason, detail = {}) => {
+    // Prove the process tree this operation started is gone BEFORE touching the pointer or record.
+    const cleanup = await stopOwnedTarget({ roots, target, spawnedPid: child.pid, record: readInstanceRecord(roots.config) })
+    if (!cleanup.proven) {
+      writeJournalStatus({ roots, status: 'target_stop_unproven', reason, cleanup })
+      throw new UpgradeError('target_stop_unproven', 'The failed target process tree could not be proven stopped; pointer and record are left as-is (no old writer is restarted)', {
+        reason,
+        remaining: cleanup.remaining,
+        ...detail,
+      })
+    }
+    await revertPointer({ roots, target })
+    writeJournalStatus({ roots, status: 'reverted_after_failed_start', reason, cleanup })
+    throw new UpgradeError(reason === 'injected_unhealthy_target' ? 'upgrade_target_unhealthy' : 'upgrade_target_unhealthy',
+      'The target instance did not verify after the switch; its process tree is stopped and the install pointer was reverted (data untouched)', {
+        reason,
+        cleanup,
+        ...detail,
+      })
+  }
+
+  if (fault === 'target_unhealthy') {
+    // Test fault: the instance may have started; failure cleanup must still stop it.
+    await new Promise((r) => setTimeout(r, 1200))
+    await fail('injected_unhealthy_target', { health: null })
+  }
   const deadline = Date.now() + 60_000
   let health = null
-  if (fault === 'target_unhealthy') {
-    // Test fault: pretend the target never became healthy.
-    await revertPointer({ roots, target })
-    writeJournalStatus({ roots, status: 'reverted_after_failed_start', reason: 'injected_unhealthy_target' })
-    throw new UpgradeError('upgrade_target_unhealthy', 'The target instance did not become healthy; the install pointer was reverted (data untouched)')
-  }
   while (Date.now() < deadline) {
     try {
       const response = await fetch(`http://127.0.0.1:${apiPort}/v1/health`, { signal: AbortSignal.timeout(500) })
@@ -369,17 +503,17 @@ async function startTarget({ roots, target, seed, fault }) {
     record = readInstanceRecord(roots.config)
   }
   const instanceVerified = record === null ? false : (await verifyInstance(record)).ok
-  if (health === null || !instanceVerified || record.buildId !== target.release.buildId) {
-    try { await stopInstance({ roots, timeoutMs: 4000 }) } catch { /* best effort */ }
-    await revertPointer({ roots, target })
-    writeJournalStatus({ roots, status: 'reverted_after_failed_start', reason: health === null ? 'unhealthy' : 'identity_mismatch' })
-    throw new UpgradeError('upgrade_target_unhealthy', 'The target instance did not verify after the switch; the install pointer was reverted (data untouched)', {
+  const modeMatches = record !== null && record.mode === identity.mode && record.access === identity.access && health?.mode === identity.mode
+  if (health === null || !instanceVerified || record.buildId !== target.release.buildId || !modeMatches) {
+    await fail(health === null ? 'unhealthy' : modeMatches ? 'identity_mismatch' : 'mode_mismatch', {
       health: health?.status ?? null,
+      mode: { expected: identity.mode, health: health?.mode ?? null, record: record?.mode ?? null },
+      access: { expected: identity.access, record: record?.access ?? null },
       buildId: record?.buildId ?? null,
       targetBuildId: target.release.buildId,
     })
   }
-  return { pid: record.pid, apiURL: record.apiURL, consoleURL: record.consoleURL, buildId: record.buildId, health: health.status }
+  return { pid: record.pid, apiURL: record.apiURL, consoleURL: record.consoleURL, buildId: record.buildId, mode: record.mode, access: record.access, health: health.status }
 }
 
 const writeJournalStatus = ({ roots, status, reason }) => {
@@ -407,13 +541,20 @@ async function revertPointer({ roots, target }) {
 }
 
 /** Recover an interrupted switch from the journal; idempotent and never touches data. */
-export async function recoverSwitch({ installRoot, roots }) {
+export async function recoverSwitch({ installRoot, roots, values = {} }) {
   const journal = readJournal(roots.config)
   if (journal === null) throw new UpgradeError('upgrade_recover_not_needed', 'No interrupted install switch was recorded')
   if (journal.status === 'confirmed' || journal.status === 'reverted_after_failed_start')
     return { protocol: 'personal-install-switch/1', status: 'NO_OP', journalStatus: journal.status }
   if (journal.status !== 'switched_unconfirmed' && journal.status !== 'switching')
     throw new UpgradeError('upgrade_recover_unknown_state', 'The switch journal is not in a recoverable state', { journalStatus: journal.status })
+  // Never start (or revert over) an unknown live process: the same rule as upgrade/rollback.
+  const existing = readInstanceRecord(roots.config)
+  if (existing !== null && !(await verifyInstance(existing)).ok && (await processAlive(existing.pid)))
+    throw new UpgradeError('instance_record_unverified', 'The recorded instance does not verify but its pid is alive; recovery refuses to touch the pointer or start a second writer', {
+      pid: existing.pid,
+    })
+  const identity = preserveIdentity({ record: existing, explicitMode: values.mode, explicitAccess: values.access, journal })
   const target = inspectTargetInstall(journal.to.installDir)
   const binding = releaseBinding({ installRoot, configRoot: roots.config })
   if (!binding.bound || binding.installBuildId !== target.release.buildId) {
@@ -422,7 +563,7 @@ export async function recoverSwitch({ installRoot, roots }) {
     writeJournalStatus({ roots, status: 'reverted_after_interrupted_switch', reason: 'pointer_not_bound_to_target' })
     return { protocol: 'personal-install-switch/1', status: 'REVERTED', reason: 'pointer_not_bound_to_target' }
   }
-  const started = await startTarget({ roots, target, seed: journal.ports ?? null })
+  const started = await startTarget({ roots, target, seed: journal.ports ?? null, identity })
   writeJournalStatus({ roots, status: 'confirmed', reason: 'recovered' })
   return { protocol: 'personal-install-switch/1', status: 'RECOVERED', started }
 }
@@ -439,6 +580,11 @@ export async function rollbackInstall({ installRoot, roots, values }) {
       if (values['no-stop'] === true) throw new UpgradeError('upgrade_requires_stopped_instance', 'Stop the running instance before rolling the binary back')
       const stopped = await stopInstance({ roots })
       if (stopped?.status !== 'STOPPED') throw new UpgradeError('upgrade_stop_failed', 'The running instance could not be stopped', { status: stopped?.status ?? null })
+    } else if (await processAlive(instance.pid)) {
+      throw new UpgradeError('instance_record_unverified', 'The recorded instance does not verify but its pid is alive; refusing to roll the binary back over an unknown writer', {
+        pid: instance.pid,
+        failures: verification.failures.slice(0, 8),
+      })
     }
   }
   const targetBuild = readRelease(roots.config).release?.buildId ?? null
