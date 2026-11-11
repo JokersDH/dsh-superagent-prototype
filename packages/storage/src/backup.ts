@@ -78,6 +78,9 @@ const EVIDENCE_FAMILIES: readonly EvidenceFamilySpec[] = [
     order: 'id' },
   { name: 'outcomes', table: 'execution_outcome', identity: 'id', body: ['id', 'value', 'digest'], order: 'id' },
   { name: 'reviews', table: 'review_evidence', identity: 'id', body: ['id', 'value', 'digest'], order: 'id' },
+  { name: 'recovery_intents', table: 'recovery_intents', identity: 'command_id',
+    body: ['command_id', 'plan_id', 'plan_digest', 'inspection_fingerprint', 'source_fingerprint', 'user_id', 'actor_ref', 'payload', 'digest', 'created_at', 'expires_at'],
+    order: 'created_at, plan_id' },
 ]
 const EVIDENCE_LIMIT = 2000
 

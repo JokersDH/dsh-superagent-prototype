@@ -16,6 +16,7 @@ import { ArtifactStore, type ArtifactRecord } from './artifacts.ts'
 import { AssistantState } from './assistant-state.ts'
 import { RoutingEvidence, type RoutingEvidenceSources } from './routing-evidence.ts'
 import { AcceptanceOutcomeProjection } from './acceptance-outcome.ts'
+import { RecoveryIntents } from './recovery-intents.ts'
 
 import { WorkflowConflict } from './workflow-errors.ts'
 export { WorkflowConflict } from './workflow-errors.ts'
@@ -584,6 +585,15 @@ export interface SourceMessageMetadata {
   createdAt: string
 }
 
+export interface EvidencePage {
+  entries: readonly TimelineEntry[]
+  hasMore: boolean
+  nextCursor?: string
+  window: 'complete' | 'caller_limit' | 'storage_cap'
+  /** Present when window=storage_cap: the per-source scan hit its bound. */
+  sourcesCapped?: readonly string[]
+}
+
 export interface TimelineEntry {
   at: string
   kind: string
@@ -807,41 +817,84 @@ export class WorkflowIndex {
    * asserts causality, review correctness or a current profile from a historical row.
    */
   timeline(input: { workId: string; projectIds: readonly string[]; limit?: number }): { entries: readonly TimelineEntry[]; truncated: boolean } | undefined {
-    const workId = id(input.workId, 'work id')
-    const workRow = this.db.prepare('SELECT value FROM works WHERE id = ?').get(workId) as Row | undefined
+    const built = this.buildTimeline(input.workId, input.projectIds)
+    if (!built) return undefined
+    const limit = limitOf(input.limit, 200, 500)
+    return { entries: built.entries.slice(0, limit), truncated: built.capped || built.entries.length > limit }
+  }
+
+  /**
+   * Paged historical evidence for one work. `window` separates a caller-page boundary from an
+   * internal scan bound: `caller_limit` means continue with the cursor, `storage_cap` means the
+   * bounded per-source scan was exhausted and later facts may exist, `complete` means the observable
+   * facts were fully enumerated for this work.
+   */
+  evidencePage(input: { workId: string; projectIds: readonly string[]; limit?: number; cursor?: string }): EvidencePage | undefined {
+    const built = this.buildTimeline(input.workId, input.projectIds)
+    if (!built) return undefined
+    const limit = limitOf(input.limit, 100, 200)
+    let after = 0
+    if (input.cursor) {
+      const [at, kind, ...refParts] = input.cursor.split('\u0000')
+      const ref = refParts.join('\u0000')
+      if (!at || !kind || !ref) throw new WorkflowConflict('Invalid evidence cursor')
+      after = built.entries.findIndex(entry => entry.at === at && entry.kind === kind && entry.sourceRef === ref) + 1
+      if (after === 0) throw new WorkflowConflict('Evidence cursor is no longer in the observable window')
+    }
+    const page = built.entries.slice(after, after + limit)
+    const hasMore = after + limit < built.entries.length
+    const last = page.at(-1)
+    return {
+      entries: page,
+      hasMore,
+      ...(hasMore && last ? { nextCursor: `${last.at}\u0000${last.kind}\u0000${last.sourceRef}` } : {}),
+      window: hasMore ? 'caller_limit' : built.capped ? 'storage_cap' : 'complete',
+      ...(built.capped ? { sourcesCapped: built.cappedSources } : {}),
+    }
+  }
+
+  private buildTimeline(workId: string, projectIds: readonly string[]): { entries: TimelineEntry[]; capped: boolean; cappedSources: string[] } | undefined {
+    const idValue = id(workId, 'work id')
+    const workRow = this.db.prepare('SELECT value FROM works WHERE id = ?').get(idValue) as Row | undefined
     if (!workRow) return undefined
     const work = json<WorkRecord>(workRow.value)
-    if (!input.projectIds.includes(work.projectId)) return undefined
-    const limit = limitOf(input.limit, 200, 500)
+    if (!projectIds.includes(work.projectId)) return undefined
     const entries: TimelineEntry[] = [{ at: work.createdAt, kind: 'work.created', sourceRef: work.id, detail: { title: work.title } }]
-    const contracts = this.db.prepare('SELECT revision, digest, created_at FROM contract_revisions WHERE work_id = ?').all(workId) as Row[]
-    for (const row of contracts) entries.push({ at: text(row.created_at), kind: 'contract.revision', sourceRef: `${workId}@${text(row.revision)}/${text(row.digest)}`, detail: { revision: Number(row.revision), digest: text(row.digest) } })
-    const links = this.db.prepare('SELECT ticket_id, revision, digest, role FROM ticket_links WHERE work_id = ?').all(workId) as Row[]
+    const cappedSources: string[] = []
+    const capped = (source: string, rows: Row[], bound: number): Row[] => {
+      if (rows.length > bound) { cappedSources.push(source); return rows.slice(0, bound) }
+      return rows
+    }
+    const contracts = capped('contracts', this.db.prepare('SELECT revision, digest, created_at FROM contract_revisions WHERE work_id = ? ORDER BY revision DESC LIMIT 501').all(idValue) as Row[], 500)
+    for (const row of contracts) entries.push({ at: text(row.created_at), kind: 'contract.revision', sourceRef: `${idValue}@${text(row.revision)}/${text(row.digest)}`, detail: { revision: Number(row.revision), digest: text(row.digest) } })
+    const links = capped('links', this.db.prepare('SELECT ticket_id, revision, digest, role FROM ticket_links WHERE work_id = ? ORDER BY ticket_id LIMIT 501').all(idValue) as Row[], 500)
     for (const row of links) entries.push({ at: work.createdAt, kind: 'ticket.link', sourceRef: text(row.ticket_id), detail: { revision: Number(row.revision), digest: text(row.digest), role: text(row.role) } })
-    const questions = this.db.prepare('SELECT id, version, validity, opened_at FROM user_questions WHERE work_id = ?').all(workId) as Row[]
+    const questions = capped('questions', this.db.prepare('SELECT id, version, validity, opened_at FROM user_questions WHERE work_id = ? ORDER BY opened_at DESC, id LIMIT 501').all(idValue) as Row[], 500)
     for (const row of questions) entries.push({ at: text(row.opened_at), kind: 'question.opened', sourceRef: text(row.id), detail: { version: Number(row.version), validity: text(row.validity) } })
     const ticketIds = links.map(row => text(row.ticket_id))
     if (ticketIds.length) {
       const placeholders = ticketIds.map(() => '?').join(', ')
-      const verifications = this.db.prepare(`SELECT id, artifact_digest, criteria_digest, created_at FROM completion_verifications WHERE ticket_id IN (${placeholders})`).all(...ticketIds) as Row[]
+      const verifications = capped('verifications', this.db.prepare(`SELECT id, artifact_digest, criteria_digest, created_at FROM completion_verifications WHERE ticket_id IN (${placeholders}) ORDER BY created_at DESC, id LIMIT 201`).all(...ticketIds) as Row[], 200)
       for (const row of verifications) entries.push({ at: text(row.created_at), kind: 'verification.recorded', sourceRef: text(row.id), detail: { artifactDigest: text(row.artifact_digest), criteriaDigest: text(row.criteria_digest) } })
-      const acceptances = this.db.prepare(`SELECT id, artifact_digest, accepted_at FROM completion_acceptances WHERE ticket_id IN (${placeholders})`).all(...ticketIds) as Row[]
+      const acceptances = capped('acceptances', this.db.prepare(`SELECT id, artifact_digest, accepted_at FROM completion_acceptances WHERE ticket_id IN (${placeholders}) ORDER BY accepted_at DESC, id LIMIT 201`).all(...ticketIds) as Row[], 200)
       for (const row of acceptances) entries.push({ at: text(row.accepted_at), kind: 'acceptance.recorded', sourceRef: text(row.id), detail: { artifactDigest: text(row.artifact_digest) } })
-      const observations = this.db.prepare(`SELECT fact_id, kind, disposition, observed_at FROM runtime_observations WHERE ticket_id IN (${placeholders})`).all(...ticketIds) as Row[]
+      const observations = capped('runtime_observations', this.db.prepare(`SELECT fact_id, kind, disposition, observed_at FROM runtime_observations WHERE ticket_id IN (${placeholders}) ORDER BY observed_at DESC, fact_id LIMIT 201`).all(...ticketIds) as Row[], 200)
       for (const row of observations) entries.push({ at: text(row.observed_at), kind: `runtime.${text(row.kind)}`, sourceRef: text(row.fact_id), detail: { disposition: text(row.disposition) } })
     }
-    const reviews = this.db.prepare(`SELECT id, observed_at, disposition, layer FROM review_evidence
-      WHERE project_id = ? AND json_extract(subject_value, '$.candidate.contract.workId') = ?`).all(work.projectId, workId) as Row[]
+    const reviews = capped('reviews', this.db.prepare(`SELECT id, observed_at, disposition, layer FROM review_evidence
+      WHERE project_id = ? AND json_extract(subject_value, '$.candidate.contract.workId') = ?
+      ORDER BY observed_at DESC, id LIMIT 201`).all(work.projectId, idValue) as Row[], 200)
     for (const row of reviews) entries.push({ at: text(row.observed_at), kind: 'review.recorded', sourceRef: text(row.id), detail: { disposition: text(row.disposition), layer: text(row.layer) } })
-    const outcomes = this.db.prepare(`SELECT id, observed_at, acceptance, layer, value FROM execution_outcome
-      WHERE project_id = ? AND json_extract(value, '$.attempt.contract.workId') = ?`).all(work.projectId, workId) as Row[]
+    const outcomes = capped('outcomes', this.db.prepare(`SELECT id, observed_at, acceptance, layer, value FROM execution_outcome
+      WHERE project_id = ? AND json_extract(value, '$.attempt.contract.workId') = ?
+      ORDER BY observed_at DESC, id LIMIT 201`).all(work.projectId, idValue) as Row[], 200)
     for (const row of outcomes) {
       const outcome = json<{ reviewTiming?: unknown }>(row.value)
       entries.push({ at: text(row.observed_at), kind: 'execution.outcome', sourceRef: text(row.id),
         detail: { acceptance: text(row.acceptance), layer: text(row.layer), ...(outcome.reviewTiming ? { reviewTiming: outcome.reviewTiming } : {}) } })
     }
     entries.sort((a, b) => b.at.localeCompare(a.at) || a.kind.localeCompare(b.kind) || a.sourceRef.localeCompare(b.sourceRef))
-    return { entries: entries.slice(0, limit), truncated: entries.length > limit }
+    return { entries, capped: cappedSources.length > 0, cappedSources }
   }
 
   listArtifacts(input: { limit?: number; before?: string } = {}): { artifacts: ArtifactRecord[]; nextCursor?: string; hasMore: boolean } {
@@ -857,6 +910,7 @@ export class WorkflowRecords {
   readonly assistant: AssistantState
   readonly routingEvidence: RoutingEvidence
   readonly acceptance: AcceptanceOutcomeProjection
+  readonly recoveryIntents: RecoveryIntents
   readonly index: WorkflowIndex
   constructor(db: Database.Database, uow: UnitOfWork, artifacts: ArtifactStore) {
     this.conversations = new ProductConversations(db, uow)
@@ -865,6 +919,7 @@ export class WorkflowRecords {
     this.assistant = new AssistantState(db, uow, this.decisions)
     this.routingEvidence = new RoutingEvidence(db, uow)
     this.acceptance = new AcceptanceOutcomeProjection(db, uow, this.routingEvidence)
+    this.recoveryIntents = new RecoveryIntents(db, uow)
     this.index = new WorkflowIndex(db, artifacts, this.projects)
   }
 }
