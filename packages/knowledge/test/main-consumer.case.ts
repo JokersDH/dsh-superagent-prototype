@@ -11,7 +11,7 @@ import {
   LocalProjectSourcePort,
   buildCompositionPreview,
 } from '@personal-agent/context'
-import { AssistantProposalService } from '@personal-agent/proposals'
+import { AssistantProposalService, planProposalCommand } from '@personal-agent/proposals'
 import {
   AssistantDecisionStore,
   DecisionGovernance,
@@ -128,20 +128,23 @@ test('main-consumable chain over real A ports: compose -> preview -> proposal ->
     conversationId,
     sourceTextDigest: message.textDigest,
   })
+  // Main's admitted path: persistPending -> commit -> planProposalCommand, all in one UnitOfWork.
   const confirmed = store.uow.atomic(() => {
     proposals.persistPending(prepared)
-    return proposals.confirmWithCommand(prepared, {
+    return proposals.commit(prepared, {
       expectedVersion: 1,
       expectedDigest: prepared.payloadDigest,
       actorRef: actor.actorRef,
       effectCommandId: 'main-consumer-command',
       revalidate: () => ({ ok: true }),
       barrier: () => ({ ok: true }),
-      plan: { commandId: 'main-consumer-command', conversationId },
     })
   })
   assert.equal(confirmed.record.state, 'confirmed')
-  assert.equal(confirmed.command?.kind, 'record_decision')
+  const plan = planProposalCommand(confirmed.intent, { commandId: 'main-consumer-command', conversationId })
+  assert.equal(plan.kind, 'command')
+  if (plan.kind !== 'command') throw new Error('unreachable')
+  assert.equal(plan.command.kind, 'record_decision')
   assert.equal(JSON.stringify(preview).includes(projectRoot), false)
 })
 

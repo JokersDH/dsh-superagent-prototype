@@ -1,0 +1,139 @@
+{
+  "role": "C",
+  "branch": "codex/g3-assistant-context",
+  "mainBaseCommit": "f99ca39",
+  "mergeCommit": "e80526b",
+  "updatedAt": "2026-11-11T12:30:00.000Z",
+  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "supersedes": "wave09-status.json for wave-10 facts (historical files retained). The old 'main has no context HTTP' conclusion is obsolete: main now serves POST /v1/context/preview.",
+  "phases": [
+    {
+      "phase": "C1",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave10-verification.txt",
+        "tools/bootstrap/probe-wave10-context.mjs --helper-only",
+        "packages/proposals/test/main-path.case.ts",
+        "packages/proposals/README.md"
+      ],
+      "results": { "helperOnlyProbe": "PASS_OPTIONAL_HELPER_IDENTITY_ONLY", "proposalTests": "26/26" },
+      "note": "Removed the unconsumed confirmWithCommand helper (and ConfirmWithCommand types/plan_mismatch): the same effect id could return a different executable command. Main's planProposalCommand + commit + prepareCommand/commitPrepared remains the only confirmation authority; its command receipt covers the full command body. AssistantProposalService.commit now also requires the exact reviewed expectedDigest on confirmed replay. Tests migrated to the main path."
+    },
+    {
+      "phase": "C2",
+      "status": "passed",
+      "evidence": [
+        "packages/context/src/scoped-adapters.ts",
+        "packages/context/test/scoped-adapters.case.ts",
+        "packages/knowledge/test/main-context-consumer.case.ts"
+      ],
+      "results": { "contextTests": "78/78" },
+      "note": "createScopedConversationProvider bounds paging and filters by project/conversation, trusted-user provenance, permission-display and system messages, and other-work anchors; coverage() exposes scanned/returned/complete plus exclusion counts. createPublishedArtifactProvider looks up only caller-verified published ids (metadata only, deduped, maxIds-bounded) and reports missing/complete. The old recommended recipe (global registry enumeration / unfiltered messages) is no longer used."
+    },
+    {
+      "phase": "C3",
+      "status": "passed",
+      "evidence": [
+        "packages/context/src/composer.ts (buildSourceManifest / compareSourceManifests)",
+        "packages/context/test/manifest-compare.case.ts"
+      ],
+      "note": "Manifest entries carry wholeSourceDigest, visiblePreviewDigest (included text) and digestScope alongside the compatible contentDigest; the manifest carries selection (project/conversation/work/contract) and coverage (complete/groups/omitted/truncated/budgetClamped). compareSourceManifests returns unchanged|changed|incomplete with content/preview/truncation/budget/selection/contract/missing/added/replaced; a same sourceId with another path is `replaced`, and an incomplete scan on either side is `incomplete`, never unchanged."
+    },
+    {
+      "phase": "C4",
+      "status": "passed",
+      "evidence": [
+        "packages/context/src/prompt-data.ts",
+        "packages/context/test/prompt-data.case.ts"
+      ],
+      "note": "projectPromptData produces bounded untrusted reference text: item/UTF-8 byte/CJK-aware token caps with hard ceilings, per-item included-text digest, explicit truncation and omissions. No system role, tool, permission or command field; instruction-like content stays data; it sends no request and does not auto-attach."
+    },
+    {
+      "phase": "C5",
+      "status": "partial",
+      "evidence": [
+        "packages/knowledge/test/main-context-http.case.ts",
+        "tests/integration/context-preview.case.mjs (main-owned, 14/14)"
+      ],
+      "results": {
+        "contextHttpConsumer": "4/4 PASS",
+        "mainContextPreviewIntegration": "14/14",
+        "mainProposalIntegration": "10/10",
+        "mainDecisionIntegration": "8/8"
+      },
+      "note": "Consumed main's real POST /v1/context/preview: 401 unauthenticated, 200 scoped sources with sourceDigest/previewDigest, foreign-project and permission-display messages excluded, decision present then absent after revoke, newly appended message visible, oversized caller budget clamped and reported, artifacts-without-work 400, recovery_readonly 422. Context-use (binding a selection to one message and calling the model) has no main HTTP yet: NOT_TESTED, owner main. C provides projectPromptData as its library input and wrote no HTTP/SQL/signature."
+    },
+    {
+      "phase": "C6",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave10-status.json",
+        "packages/context/docs/WAVE10-RECIPE.md",
+        "packages/context/README.md",
+        "packages/context/reports/wave10-verification.txt"
+      ],
+      "note": "Four-package regression, old probes and the new adapter/manifest/prompt negatives are recorded; the historical wave-10 recipe probe cases are explicitly labelled fixed reproductions, not new-adapter certification."
+    }
+  ],
+  "commands": [
+    "git fetch origin && git merge origin/main --no-edit",
+    "pnpm --filter @personal-agent/{contracts,storage,workflows,proposals,knowledge,context,routing} build",
+    "node tools/bootstrap/probe-wave10-context.mjs \"$PWD\" --helper-only",
+    "node tools/bootstrap/probe-wave09-context-proposal.mjs \"$PWD\"",
+    "node tools/bootstrap/probe-wave08-context-grant.mjs \"$PWD\"",
+    "pnpm --filter @personal-agent/context typecheck && test && build",
+    "pnpm --filter @personal-agent/proposals typecheck && test && build",
+    "pnpm --filter @personal-agent/knowledge typecheck && test && build",
+    "pnpm --filter @personal-agent/routing typecheck && test && build",
+    "node --test tests/integration/context-preview.case.mjs",
+    "node --test tests/integration/proposal-commands.case.mjs",
+    "node --test tests/integration/decision-commands.case.mjs",
+    "node packages/context/examples/composition-performance.mjs"
+  ],
+  "results": {
+    "contextTests": "78/78",
+    "proposalTests": "26/26",
+    "knowledgeTests": "75/75",
+    "routingTests": "44/44",
+    "typecheck": "PASS (four packages)",
+    "build": "PASS (four packages)",
+    "wave10HelperOnly": "PASS_OPTIONAL_HELPER_IDENTITY_ONLY",
+    "wave10Full": "FAIL_CANDIDATE_HELPER_AND_RECIPE_ADMISSION (helper REMOVED=PASS; two fixed historical recipe reproductions FAIL by design, not new-adapter certification)",
+    "wave09Probe": "group-kind control+alias PASS; effect_command_binding NOT_TESTED (helper removed, superseded by wave-10 --helper-only)",
+    "wave08Probe": "PASS_CONTEXT_GRANT_BOUNDARY (4/4)",
+    "mainContextPreviewIntegration": "14/14",
+    "mainProposalIntegration": "10/10",
+    "mainDecisionIntegration": "8/8",
+    "compositionPerformance": "PASS p50 ~1.1ms / p95 ~2.4ms, 12 slices / 3394 bytes (bounded)"
+  },
+  "dependencyRequests": [],
+  "blockers": [
+    {
+      "id": "C5-main-context-use",
+      "owner": "main",
+      "status": "external_pending",
+      "repro": "grep -rn 'context-use\\|contextBinding' apps/coordinator/http apps/coordinator/product  # no context-use route; only /v1/context/preview",
+      "required": "Authenticated per-message context-use endpoint/binding that attaches a selected preview to one message and calls the existing AssistantModelPort.",
+      "continue": "C supplies projectPromptData + manifest/compare; no C HTTP, SQL, signature or model loop is written."
+    },
+    {
+      "id": "C2-main-adapter-replacement",
+      "owner": "main",
+      "status": "external_pending",
+      "input": "Main currently implements equivalent scoped conversation/artifact adapters privately in apps/coordinator/product/context-preview.ts.",
+      "expected": "Replace the duplicated adapters with the exported createScopedConversationProvider/createPublishedArtifactProvider when main next touches that file.",
+      "continue": "C adapters match the observed main behaviour (project/provenance/anchor filtering, published-id-only artifacts)."
+    }
+  ],
+  "notTested": [
+    "Main context-use (per-message selection → model call) HTTP and UI: not published",
+    "Real model/native execution (budget 0)",
+    "The two historical recipe probe cases cannot certify the new adapters"
+  ],
+  "mainNextSteps": [
+    "Re-run `probe-wave10-context.mjs <checkout> --helper-only` (PASS) and the wave-08/09 library probes; the wave-09 helper case is NOT_TESTED because the helper is intentionally removed.",
+    "When wiring context-use, feed the selected preview through projectPromptData and keep it bounded/untrusted; record the per-message selection and re-validate sources before sending.",
+    "Optionally replace the private preview adapters with the exported scoped adapters, then add an actual-export consumer before claiming new-adapter admission."
+  ]
+}

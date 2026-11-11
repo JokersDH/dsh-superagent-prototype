@@ -102,6 +102,22 @@ conversation messages → artifact metadata → raw project files. Rules:
 `buildSourceManifest` gives main a stable per-source projection (`sourceId/kind/group/path/contentDigest/
 baselineCommit/truncated/bytes/tokens/trust`) plus `omitted`, `injectionFlagPaths` and `budgetClamped`.
 
+### Scoped adapters, manifest comparison and prompt data (wave-10)
+
+- `createScopedConversationProvider(reader, {projectId, conversationId, workId?})` filters to the
+  selected project/conversation, trusted-user provenance only, excludes permission/authentication
+  answer displays and system messages, excludes messages anchored to another work, and exposes
+  `coverage()` so a bounded scan is never reported as a complete conversation.
+- `createPublishedArtifactProvider(lookup, {publishedArtifactIds})` looks up only verified published
+  ids (metadata only, no enumeration, no file bytes or absolute paths) and reports
+  requested/returned/missing coverage.
+- `buildSourceManifest` now carries `wholeSourceDigest`, `visiblePreviewDigest`, `digestScope`,
+  `selection` and a `coverage` block; `compareSourceManifests(before, after)` reports
+  `unchanged|changed|incomplete` with content/preview/truncation/budget/selection/contract/missing/
+  added/replaced reasons. It never signs a grant or promises a time window.
+- `projectPromptData(composition, budget)` produces bounded, fully untrusted reference text with
+  item/byte/CJK-aware-token caps, no system role and no tool/permission/command field.
+
 ### Group/kind binding (wave-09)
 
 A group name owns exactly one source-kind family (`contract`→contract/work, `decisions`→decision,

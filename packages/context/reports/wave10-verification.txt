@@ -1,0 +1,57 @@
+# Agent C wave-10 verification (2026-11-11T14:46:28Z)
+e80526b Merge remote-tracking branch 'origin/main' into codex/g3-assistant-context
+
+## @personal-agent/context
+$ tsc -p tsconfig.json
+ℹ tests 78
+ℹ pass 78
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/proposals
+$ tsc -p tsconfig.json
+ℹ tests 26
+ℹ pass 26
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/knowledge
+$ tsc -p tsconfig.json
+ℹ tests 75
+ℹ pass 75
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/routing
+$ tsc -p tsconfig.json
+ℹ tests 44
+ℹ pass 44
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## wave-10 helper-only probe
+  "status": "PASS_OPTIONAL_HELPER_IDENTITY_ONLY",
+      "id": "OPTIONAL_HELPER_REMOVED",
+      "status": "PASS",
+      "observation": {
+
+## wave-09 probe
+{
+  "status": "FAIL_OR_INCOMPLETE_CONTEXT_AND_PROPOSAL_BINDING",
+  "results": [
+## wave-08 probe
+{
+  "status": "PASS_CONTEXT_GRANT_BOUNDARY",
+  "results": [
+
+## wave-10 full probe (historical recipes expected to stay red)
+  "status": "FAIL_CANDIDATE_HELPER_AND_RECIPE_ADMISSION",
+      "id": "OPTIONAL_HELPER_REMOVED",
+      "status": "PASS",
+      "id": "RECOMMENDED_CONVERSATION_ADAPTER_EXCLUDES_FOREIGN_PROJECT_AND_PERMISSION_DISPLAY",
+      "status": "FAIL",
+      "id": "RECOMMENDED_ARTIFACT_ADAPTER_EXCLUDES_UNPUBLISHED_GLOBAL_REGISTRY_METADATA",
+      "status": "FAIL",
+
+## performance
+{"status":"PASS","p50":1.129,"p95":2.412,"bytes":3394,"slices":12}

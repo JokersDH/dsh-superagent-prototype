@@ -12,8 +12,8 @@ import {
   LocalProjectSourcePort,
   buildCompositionPreview,
   buildSourceManifest,
-  type ComposedArtifactProvider,
-  type ComposedConversationProvider,
+  createPublishedArtifactProvider,
+  createScopedConversationProvider,
 } from '@personal-agent/context'
 import {
   AssistantDecisionStore,
@@ -29,37 +29,19 @@ const conversationId = 'context-consumer-conversation'
 const scope: Scope = { projectId, allowedPaths: ['notes'], excludedPaths: [], externalActions: [] }
 const actor = { actorRef: 'context-consumer-user', projectId, grantScope: scope }
 
-/** Adapters a main-side consumer writes once over the trusted A ports. */
-function conversationProvider(store: ProductStore): ComposedConversationProvider {
-  return {
-    async recent({ conversationId: id, limit }) {
-      const page = store.product.messages.page(id, { limit })
-      return [...page.messages]
-        .sort((left, right) => right.sequence - left.sequence)
-        .map((message) => ({
-          messageId: message.id,
-          conversationId: message.conversationId,
-          sequence: message.sequence,
-          role: message.role,
-          provenance: message.provenance,
-          text: message.text,
-          createdAt: message.createdAt,
-        }))
-    },
-  }
+/**
+ * The recommended (wave-10) adapters: scoped conversation by project/conversation/work and artifact
+ * metadata only for the published ids main already verified.
+ */
+function conversationProvider(store: ProductStore, options: { workId?: string } = {}) {
+  return createScopedConversationProvider(
+    { page: (id, pageOptions) => store.product.messages.page(id, pageOptions) },
+    { projectId, conversationId, ...(options.workId ? { workId: options.workId } : {}) },
+  )
 }
 
-function artifactProvider(ports: ReturnType<typeof createWorkflowPorts>): ComposedArtifactProvider {
-  return {
-    async recent({ limit }) {
-      return ports.index.listArtifacts({ limit }).artifacts.map((artifact) => ({
-        artifactId: artifact.id,
-        digest: artifact.digest,
-        bytes: artifact.bytes,
-        createdAt: artifact.createdAt,
-      }))
-    },
-  }
+function artifactProvider(store: ProductStore, publishedArtifactIds: readonly string[]) {
+  return createPublishedArtifactProvider({ get: (id) => store.artifacts.get(id) }, { publishedArtifactIds })
 }
 
 test('a real-port context consumer produces manifest, preview and budget facts', async (t) => {
@@ -82,7 +64,9 @@ test('a real-port context consumer produces manifest, preview and budget facts',
     text: 'Understood, I will keep the checks.', sourceRefs: [], createdAt: NOW,
   })
   const ports = createWorkflowPorts(store)
-  store.artifacts.write(Buffer.from('artifact-bytes'))
+  const published = store.artifacts.write(Buffer.from('artifact-bytes'))
+  store.artifacts.insert(published, NOW)
+  store.artifacts.write(Buffer.from('unpublished-artifact-bytes'))
 
   const sources: DecisionSourceSyncPort = {
     getMessage(id) {
@@ -114,7 +98,7 @@ test('a real-port context consumer produces manifest, preview and budget facts',
       port: new LocalProjectSourcePort({ rootDir: projectRoot, projectId, baseline: { capturedAt: NOW } }),
       decisions: decisionContextProvider(governance, () => new Date(NOW)),
       conversation: conversationProvider(store),
-      artifacts: artifactProvider(ports),
+      artifacts: artifactProvider(store, [published.id]),
     },
     { now: () => new Date(NOW) },
   )

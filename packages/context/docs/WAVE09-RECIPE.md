@@ -19,16 +19,11 @@ Branch `codex/g3-assistant-context`，base `origin/main` `531c6b6`（merge `5f02
 空/重复 kind、kind 不属于该名字的家族、`share` 非 `[0,1]` 的有限数（NaN/±Infinity/负数）。
 `group_kind_alias` 反例（artifact-only grant + `decisions` 组）因此读到 0 条；正对照仍读取 1 条。
 
-## 2. effectCommandId 必须等于 plan.commandId
+## 2. 命令绑定（历史，wave-10 已移除辅助入口）
 
-`AssistantProposalService.confirmWithCommand` 在确认写入前要求：
-
-- `plan.commandId === effectCommandId`；
-- `plan.conversationId === prepared.conversationId`。
-
-不一致抛 `ProposalError('plan_mismatch')`，proposal 保持 `pending`、无 `effectCommandId`、无业务效果。
-正对照（一致）→ `confirmed` 且记录 `effectCommandId === command.commandId`。main 自己的
-`ProductProposals` 不使用该辅助入口，其 plan/commit/prepareCommand 组合仍是权威路径。
+wave-09 的 `confirmWithCommand` 辅助入口已删除：main 从未使用它，且同一 effect id 配不同 plan 会返回
+新命令，不能作为幂等证明。唯一权威路径是 main 的 `planProposalCommand + commit + prepareCommand/
+commitPrepared`，其 receipt 覆盖完整命令 body；C 的 `commit` 另要求确认重放携带精确 reviewed digest。
 
 ## 3. context 产品消费 adapter
 

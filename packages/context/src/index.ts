@@ -51,11 +51,17 @@ export {
   authorizeComposition,
   buildCompositionPreview,
   buildSourceManifest,
+  compareSourceManifests,
   validateComposedGroups,
 } from './composer.ts'
 export type {
   ComposedSourceManifest,
+  ComposedSourceManifestCoverage,
   ComposedSourceManifestEntry,
+  ComposedSourceManifestSelection,
+  SourceManifestChange,
+  SourceManifestChangeReason,
+  SourceManifestComparison,
   CompositionAuthorization,
   ResolvedCompositionBudget,
 } from './composer.ts'
@@ -74,6 +80,32 @@ export type {
   ContextComposition,
   ContextCompositionRequest,
 } from './composer.ts'
+export {
+  createPublishedArtifactProvider,
+  createScopedConversationProvider,
+} from './scoped-adapters.ts'
+export type {
+  ArtifactAdapterCoverage,
+  ConversationAdapterCoverage,
+  ConversationSelection,
+  PublishedArtifactSelection,
+  ScopedAdapterError,
+  ScopedArtifactLookup,
+  ScopedArtifactMetadata,
+  ScopedArtifactProvider,
+  ScopedConversationMessageView,
+  ScopedConversationPage,
+  ScopedConversationProvider,
+  ScopedConversationReader,
+} from './scoped-adapters.ts'
+export { PROMPT_DATA_CEILINGS, projectPromptData } from './prompt-data.ts'
+export type {
+  PromptDataBudget,
+  PromptDataHardCeilings,
+  PromptDataOmission,
+  PromptDataProjection,
+  PromptDataSourceReference,
+} from './prompt-data.ts'
 export { buildContextPreview } from './preview.ts'
 export type { ContextPreview, ContextPreviewFile } from './preview.ts'
 export type { LocalProjectSourcePortOptions } from './local-port.ts'

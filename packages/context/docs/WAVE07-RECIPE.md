@@ -23,7 +23,7 @@ store.uow.atomic(fn)   // the only transaction boundary main composes into
 | 包 | 导出 | 用途 |
 | --- | --- | --- |
 | `@personal-agent/context` | `ContextReader`, `buildContextPreview`, `ContextComposer`, `buildCompositionPreview`, `DEFAULT_COMPOSED_GROUPS`, `ReadIndexContextPort`, `LocalProjectSourcePort`, `StaticContextPort`, `CompositeContextPort`, `ContextError` | 有界、带来源的上下文读取、预览与显式预算组合 |
-| `@personal-agent/proposals` | `AssistantProposalService` (含 `confirmWithCommand`), `parseStructuredOutput`, `planProposalCommand`, `ProposalError`, `InMemoryAssistantState`(fixture) | 结构化提案、确认、命令计划 |
+| `@personal-agent/proposals` | `AssistantProposalService`, `parseStructuredOutput`, `planProposalCommand`, `ProposalError`, `InMemoryAssistantState`(fixture) | 结构化提案、确认、命令计划 |
 | `@personal-agent/knowledge` | `DecisionTransactionService`, `AssistantDecisionStore`, `DecisionGovernance`, `decisionContextProvider`, `DEFAULT_DECISION_SCAN`, `DecisionError`, `DecisionConflict` | 明确决定的 prepare/commit/revoke、效力规则与上下文 provider |
 | `@personal-agent/routing` | `sharedAttentionRanker`, `rankSharedAttention`, `evaluateEligibility`, `adviseRoute`, `validateAdviceForConfirmation`, `parseReviewReport`, `assessReviewValidity`, `assembleReviewEvidence` | 注意力排序、准入、建议、复核有效性 |
 
@@ -84,22 +84,23 @@ store.uow.atomic(() => {
 
 缺失项返回 `needs_user_input` + 具体字段；不会用默认值扩大权限。命令不含 actor 字段。
 
-## 4b. 最短 recipe：一次调用确认提案并拿到原命令
+## 4b. 最短 recipe：确认提案并拿到原命令（main 权威路径）
 
 ```ts
 store.uow.atomic(() => {
   proposals.persistPending(prepared)
-  const confirmed = proposals.confirmWithCommand(prepared, {
+  const confirmed = proposals.commit(prepared, {
     expectedVersion: 1, expectedDigest: prepared.payloadDigest, actorRef,
     effectCommandId: commandId,                       // main 生成
     revalidate: () => ({ ok: true }), barrier: () => ({ ok: true }),
-    plan: { commandId, conversationId, work },        // create_work 必需
   })
-  if (confirmed.command) dispatchExistingUserCommand(confirmed.command)  // 同一事务
+  const plan = planProposalCommand(confirmed.intent, { commandId, conversationId, work })
+  if (plan.kind === 'command') dispatchExistingUserCommand(plan.command)
 })
 ```
 
-`needs_user_input` 在确认**之前**抛出（提案保持 pending），`reply` 返回 `command: null` 且无业务效果。
+`needs_user_input` 由 `planProposalCommand` 返回（提案保持 pending，不写确认）；`reply` 返回 `no_effect`。
+命令 body 的幂等由 main 自身的 command receipt 保证（同 id 换 body 被拒）。
 
 ## 4c. 状态转换（不混用 reject 与 revoke）
 

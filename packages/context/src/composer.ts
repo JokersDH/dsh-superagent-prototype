@@ -913,12 +913,34 @@ export interface ComposedSourceManifestEntry {
   readonly group: ComposedGroupName
   readonly path: string
   readonly title?: string
+  /** Whole-source digest (the full source, not the possibly truncated preview). */
   readonly contentDigest: string
+  readonly wholeSourceDigest: string
+  /** Digest of exactly what the preview contains (differs when the slice was truncated). */
+  readonly visiblePreviewDigest: string
+  /** `content` means the whole source; `prefix` means only a bounded prefix was hashed. */
+  readonly digestScope: 'content' | 'prefix' | 'metadata'
   readonly baselineCommit?: string
   readonly truncated: boolean
   readonly bytes: number
   readonly tokens: number
   readonly trust: 'untrusted_data'
+}
+
+export interface ComposedSourceManifestSelection {
+  readonly projectId: string
+  readonly conversationId?: string
+  readonly workId?: string
+  readonly contract?: ContractRef
+}
+
+export interface ComposedSourceManifestCoverage {
+  /** True only when the composition was sufficient: no omitted/truncated source and no unavailable group. */
+  readonly complete: boolean
+  readonly groups: readonly { readonly name: ComposedGroupName; readonly status: ComposedGroupResult['status'] }[]
+  readonly omitted: number
+  readonly truncated: number
+  readonly budgetClamped: readonly string[]
 }
 
 export interface ComposedSourceManifest {
@@ -927,6 +949,8 @@ export interface ComposedSourceManifest {
   readonly conversationId?: string
   readonly workId?: string
   readonly status: ContextComposition['status']
+  readonly selection: ComposedSourceManifestSelection
+  readonly coverage: ComposedSourceManifestCoverage
   readonly sources: readonly ComposedSourceManifestEntry[]
   readonly omitted: readonly ContextOmission[]
   readonly injectionFlagPaths: readonly string[]
@@ -942,12 +966,32 @@ export function buildSourceManifest(composition: ContextComposition): ComposedSo
   for (const group of composition.groups) {
     for (const slice of group.slices) groupOf.set(slice.sourceId, group.name)
   }
+  const truncated = composition.slices.filter((slice) => slice.truncated).length
   return {
     protocol: 'context-source-manifest/1',
     projectId: composition.projectId,
     ...(composition.conversationId === undefined ? {} : { conversationId: composition.conversationId }),
     ...(composition.workId === undefined ? {} : { workId: composition.workId }),
     status: composition.status,
+    selection: {
+      projectId: composition.projectId,
+      ...(composition.conversationId === undefined ? {} : { conversationId: composition.conversationId }),
+      ...(composition.workId === undefined ? {} : { workId: composition.workId }),
+      ...(composition.contract === undefined ? {} : { contract: composition.contract }),
+    },
+    coverage: {
+      // Scan completeness: no group was left unread/truncated and no budget cap hid a source.
+      // A `missing`/`stale` source is a definite observation, not an incomplete scan; an empty
+      // composition is still not knowledge anyone can rely on.
+      complete:
+        composition.slices.length > 0 &&
+        composition.groups.every((group) => group.status !== 'unavailable' && group.status !== 'truncated') &&
+        !composition.omitted.some((item) => item.reason.startsWith('budget_') || item.reason === 'source_unavailable'),
+      groups: composition.groups.map((group) => ({ name: group.name, status: group.status })),
+      omitted: composition.omitted.length,
+      truncated,
+      budgetClamped: composition.budgetClamped,
+    },
     sources: composition.slices.map((slice) => ({
       sourceId: slice.sourceId,
       kind: slice.kind,
@@ -955,6 +999,9 @@ export function buildSourceManifest(composition: ContextComposition): ComposedSo
       path: slice.path,
       ...(slice.title === undefined ? {} : { title: slice.title }),
       contentDigest: slice.baseline.contentDigest,
+      wholeSourceDigest: slice.baseline.contentDigest,
+      visiblePreviewDigest: sha256Text(slice.content),
+      digestScope: slice.baseline.digestScope,
       ...(slice.baseline.commit === undefined ? {} : { baselineCommit: slice.baseline.commit }),
       truncated: slice.truncated,
       bytes: slice.bytes,
@@ -964,6 +1011,118 @@ export function buildSourceManifest(composition: ContextComposition): ComposedSo
     omitted: composition.omitted,
     injectionFlagPaths: composition.injectionFlags.map((flag) => flag.path),
     budgetClamped: composition.budgetClamped,
+  }
+}
+
+export type SourceManifestChangeReason =
+  | 'content'
+  | 'preview'
+  | 'truncation'
+  | 'budget'
+  | 'selection'
+  | 'contract'
+  | 'missing'
+  | 'added'
+  | 'replaced'
+
+export interface SourceManifestChange {
+  readonly sourceId?: string
+  readonly path: string
+  readonly kind: string
+  readonly reason: SourceManifestChangeReason
+}
+
+export interface SourceManifestComparison {
+  readonly protocol: 'context-source-manifest-comparison/1'
+  readonly status: 'unchanged' | 'changed' | 'incomplete'
+  readonly changes: readonly SourceManifestChange[]
+  readonly incompleteReasons: readonly ('previous_incomplete' | 'current_incomplete' | 'selection_changed' | 'contract_changed')[]
+}
+
+function selectionKey(manifest: ComposedSourceManifest): string {
+  return JSON.stringify([manifest.selection.projectId, manifest.selection.conversationId ?? null, manifest.selection.workId ?? null])
+}
+
+function contractKey(manifest: ComposedSourceManifest): string {
+  const contract = manifest.selection.contract
+  return contract === undefined ? 'none' : JSON.stringify([contract.workId, contract.revision, contract.digest])
+}
+
+/**
+ * Pure comparison of two manifests (for example before and after re-authorization or a re-read).
+ * It only reports data movement: it never signs a grant, stores a confirmation or promises that a
+ * source is unchanged for any time window.
+ *
+ * A same `sourceId` cannot hide a replacement: path/kind changes are reported as `replaced`, whole
+ * content changes as `content`, preview-only changes as `preview`, and truncation/budget movement as
+ * `truncation`/`budget`. An incomplete scan on either side is `incomplete`, never `unchanged`.
+ */
+export function compareSourceManifests(
+  previous: ComposedSourceManifest,
+  current: ComposedSourceManifest,
+): SourceManifestComparison {
+  const changes: SourceManifestChange[] = []
+  const incompleteReasons: SourceManifestComparison['incompleteReasons'][number][] = []
+  if (selectionKey(previous) !== selectionKey(current)) {
+    incompleteReasons.push('selection_changed')
+    changes.push({ path: '', kind: '', reason: 'selection' })
+  }
+  if (contractKey(previous) !== contractKey(current)) {
+    incompleteReasons.push('contract_changed')
+    changes.push({ path: '', kind: '', reason: 'contract' })
+  }
+  if (!previous.coverage.complete) incompleteReasons.push('previous_incomplete')
+  if (!current.coverage.complete) incompleteReasons.push('current_incomplete')
+
+  const previousByKey = new Map(previous.sources.map((source) => [`${source.kind} ${source.path}`, source]))
+  const currentByKey = new Map(current.sources.map((source) => [`${source.kind} ${source.path}`, source]))
+  const previousById = new Map(previous.sources.map((source) => [source.sourceId, source]))
+
+  for (const [key, before] of previousByKey) {
+    const after = currentByKey.get(key)
+    if (!after) {
+      const sameId = current.sources.find((source) => source.sourceId === before.sourceId)
+      changes.push({
+        sourceId: before.sourceId,
+        path: before.path,
+        kind: before.kind,
+        reason: sameId ? 'replaced' : 'missing',
+      })
+      continue
+    }
+    if (before.wholeSourceDigest !== after.wholeSourceDigest || before.contentDigest !== after.contentDigest) {
+      changes.push({ sourceId: before.sourceId, path: before.path, kind: before.kind, reason: 'content' })
+      continue
+    }
+    if (before.visiblePreviewDigest !== after.visiblePreviewDigest) {
+      changes.push({ sourceId: before.sourceId, path: before.path, kind: before.kind, reason: 'preview' })
+      continue
+    }
+    if (before.truncated !== after.truncated) {
+      changes.push({ sourceId: before.sourceId, path: before.path, kind: before.kind, reason: 'truncation' })
+    }
+  }
+  for (const [key, after] of currentByKey) {
+    if (previousByKey.has(key)) continue
+    const replaced = previousById.get(after.sourceId)
+    changes.push({
+      sourceId: after.sourceId,
+      path: after.path,
+      kind: after.kind,
+      reason: replaced && (replaced.path !== after.path || replaced.kind !== after.kind) ? 'replaced' : 'added',
+    })
+  }
+  if (JSON.stringify(previous.budgetClamped) !== JSON.stringify(current.budgetClamped)) {
+    changes.push({ path: '', kind: '', reason: 'budget' })
+  }
+
+  const status: SourceManifestComparison['status'] =
+    incompleteReasons.length > 0 ? 'incomplete' : changes.length > 0 ? 'changed' : 'unchanged'
+  return {
+    protocol: 'context-source-manifest-comparison/1',
+    status,
+    changes,
+    incompleteReasons: [...new Set(incompleteReasons)],
   }
 }
 

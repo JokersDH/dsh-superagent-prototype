@@ -162,6 +162,9 @@ export class AssistantProposalService {
       if (existing.payloadDigest !== prepared.payloadDigest || existing.actorRef !== prepared.actorRef) {
         throw new ProposalError('conflict', 'A confirmed proposal cannot be replayed with another payload or actor')
       }
+      if (input.expectedDigest !== existing.payloadDigest) {
+        throw new ProposalError('proposal_mutated', 'Replay must name the exact reviewed payload digest')
+      }
       return { record: existing, intent: snapshot(proposalIntent(existing.payload)), replayed: true }
     }
     if (!existing) {
@@ -214,60 +217,6 @@ export class AssistantProposalService {
       intent: snapshot(proposalIntent(stored.record.payload)),
       replayed: stored.replayed,
     }
-  }
-
-  /**
-   * Single synchronous confirmation entry for main: confirms the proposal (versioned, CAS, no
-   * pre-confirm effect) and returns the exact existing `UserCommand` to dispatch in the same
-   * UnitOfWork. Nothing is executed here.
-   *
-   * - `needs_user_input` (missing scope/criteria/profile or a complete revision) throws before any
-   *   write, so an under-specified proposal never becomes confirmed;
-   * - a `reply` intent confirms nothing and returns `command: null`;
-   * - the same effect command replays idempotently; another command id conflicts.
-   */
-  confirmWithCommand(prepared: PreparedProposal, input: ConfirmWithCommandInput): ConfirmWithCommandResult {
-    // The effect command and the dispatched command must be the same identity, and the plan must
-    // stay on the prepared conversation. Both are checked before any confirmed write.
-    if (input.plan.commandId !== input.effectCommandId) {
-      throw new ProposalError('plan_mismatch', 'Plan command id must equal the effect command id', {
-        planCommandId: input.plan.commandId,
-        effectCommandId: input.effectCommandId,
-      })
-    }
-    if (input.plan.conversationId !== prepared.conversationId) {
-      throw new ProposalError('plan_mismatch', 'Plan belongs to another conversation than the prepared proposal', {
-        planConversationId: input.plan.conversationId,
-        preparedConversationId: prepared.conversationId,
-      })
-    }
-    const planned = planProposalCommand(this.intentOf(prepared), input.plan)
-    if (planned.kind === 'needs_user_input') {
-      throw new ProposalError('needs_user_input', 'Proposal needs explicit user input before it can execute', {
-        intent: planned.intent,
-        missing: planned.missing,
-      })
-    }
-    const committed = this.commit(prepared, input)
-    if (planned.kind === 'no_effect') {
-      return { record: committed.record, intent: committed.intent, command: null, replayed: committed.replayed }
-    }
-    return {
-      record: committed.record,
-      intent: committed.intent,
-      command: snapshot(planned.command),
-      replayed: committed.replayed,
-    }
-  }
-
-  /** Pure intent projection used by `confirmWithCommand`; it never reads or writes state. */
-  private intentOf(prepared: PreparedProposal): ProposalIntent {
-    const existing = this.port.proposals.get(prepared.proposalId)
-    if (existing?.state === 'confirmed') {
-      const confirmed = this.confirmationIntent(existing)
-      if (confirmed) return confirmed
-    }
-    return snapshot(proposalIntent(prepared.payload))
   }
 
   reject(
