@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url'
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
 import { ProductStore } from '@personal-agent/storage'
 import { createWorkflowPorts } from '@personal-agent/workflows'
-import { AssistantProposalService } from '@personal-agent/proposals'
+import { AssistantProposalService, planProposalCommand } from '@personal-agent/proposals'
 import { ContextReader, LocalProjectSourcePort, buildContextPreview } from '@personal-agent/context'
 import { AssistantDecisionStore, DecisionTransactionService } from '../dist/index.js'
 
@@ -87,6 +87,13 @@ async function main() {
       return result
     })
 
+    const plan = planProposalCommand(confirmed.intent, {
+      commandId: 'command-decision',
+      conversationId,
+    })
+    if (plan.kind !== 'command' || plan.command.kind !== 'record_decision') throw new Error('unexpected command plan')
+    const plannedScope = plan.command.scope
+
     const decisions = new DecisionTransactionService(
       new AssistantDecisionStore(ports.assistant),
       sourcePort(ports, message.id, message.textDigest),
@@ -95,7 +102,7 @@ async function main() {
     const intent = confirmed.intent
     if (intent.kind !== 'record_decision') throw new Error('unexpected intent')
     const preparedDecision = decisions.prepare(
-      { decisionId: 'workflow-decision', content: intent.content, scope: intent.scope, sourceMessageId: intent.sourceMessageId },
+      { decisionId: 'workflow-decision', content: intent.content, scope: plannedScope, sourceMessageId: plan.command.sourceMessageId },
       actor,
     )
     const pendingDecisionAbsent = ports.assistant.decisions.get('workflow-decision') === undefined
@@ -104,9 +111,9 @@ async function main() {
       store.commands.record('command-decision', canonicalDigest({ decisionId: 'workflow-decision' }), () => ({ status: 'recorded' }))
       return result
     })
-    const plan = decisions.prepareRevocation('workflow-decision', 1, actor)
+    const revocation = decisions.prepareRevocation('workflow-decision', 1, actor)
     const revoked = store.uow.atomic(() => {
-      const result = decisions.commitRevocation(plan, actor)
+      const result = decisions.commitRevocation(revocation, actor)
       store.commands.record('command-revoke', canonicalDigest({ decisionId: 'workflow-decision', version: 2 }), () => ({ status: 'recorded' }))
       return result
     })
@@ -144,6 +151,7 @@ async function main() {
       sqlite: 'real temporary SQLite via A ProductStore/AssistantStatePort',
       context: { selectedFiles: preview.selectedFiles, injectionFlags: preview.injectionFlags.length, trust: bundle.trust },
       proposal: { state: confirmed.record.state, version: confirmed.record.version },
+      commandPlan: { kind: plan.kind, commandKind: plan.command.kind, commandId: plan.command.commandId },
       decision: { status: recorded.record.status, version: recorded.record.decision.version },
       revocation: { status: revoked.record.status, version: revoked.record.decision.version },
       oldReplayStatus: oldReplay.record.status,

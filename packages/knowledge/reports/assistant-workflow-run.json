@@ -1,6 +1,6 @@
 {
   "protocol": "wave06-assistant-workflow/1",
-  "generatedAt": "2026-11-11T02:32:18.461Z",
+  "generatedAt": "2026-11-11T04:21:50.772Z",
   "result": {
     "status": "PASS",
     "modelCalls": 0,
@@ -16,6 +16,11 @@
     "proposal": {
       "state": "confirmed",
       "version": 2
+    },
+    "commandPlan": {
+      "kind": "command",
+      "commandKind": "record_decision",
+      "commandId": "command-decision"
     },
     "decision": {
       "status": "active",

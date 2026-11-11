@@ -42,8 +42,12 @@ function fixture(t, reply) {
     store.close()
     rmSync(root, { recursive: true, force: true })
   })
-  const chat = (id, text, conversationId = 'conversation-1') =>
-    app.dispatch({ commandId: id, conversationId, kind: 'chat', projectId: scope.projectId, text }, actor)
+  const chat = async (id, text, conversationId = 'conversation-1') => {
+    const receipt = await app.dispatch({ commandId: id, conversationId, kind: 'chat', projectId: scope.projectId, text }, actor)
+    // This direct consumer has no runtime polling loop; notify it after the command commits.
+    effects.kick()
+    return receipt
+  }
   return {
     store,
     app,
@@ -177,7 +181,7 @@ test('a failed application command receipt rolls the chat and model effect back 
   assert.equal(h.messages().length, 0)
   assert.equal(h.calls, 0)
 })
-test('stream snapshots recover an in-progress reply and final authority waits for the message commit', async (t) => {
+test('stream snapshots recover an in-progress reply and final authority waits for the message commit', { timeout: 5000 }, async (t) => {
   let release, started
   const gate = new Promise((resolve) => {
     release = resolve
@@ -211,7 +215,7 @@ test('stream snapshots recover an in-progress reply and final authority waits fo
   abort.abort()
   await iterator.return()
 })
-test('service close aborts in-progress model generation without another inference', async (t) => {
+test('service close aborts in-progress model generation without another inference', { timeout: 5000 }, async (t) => {
   let started
   const first = new Promise((resolve) => {
     started = resolve

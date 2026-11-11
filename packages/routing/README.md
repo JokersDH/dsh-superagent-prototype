@@ -106,11 +106,12 @@ patch.
 
 ## Persistence fixture and gap
 
-`InMemoryRoutingEvidence` is a reference implementation of A's shared synchronous
-`RoutingEvidencePort` (append-only advice/reviews/outcomes, same-body replay, changed-body conflict,
-subject/profile filters). The real `createWorkflowPorts(store).routingEvidence` does not exist on
-main yet, so real-SQL evidence for this port is **NOT_TESTED**; C5 uses the fixture with the identical
-interface.
+A's real `createWorkflowPorts(store).routingEvidence` is now on main and is what C3 verifies:
+`test/real-evidence.case.ts` and `examples/real-evidence-loop.mjs` run advice/review/outcome
+persistence against real temporary SQLite, covering same-body replay, changed-body refusal, project
+isolation, exact-subject review filtering, exact-profile outcome filtering, receipt-failure rollback,
+process reopen and candidate/profile drift invalidation. `InMemoryRoutingEvidence` remains a unit
+fixture only; it is no longer evidence for the production port.
 
 ## Commands
 

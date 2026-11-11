@@ -93,8 +93,13 @@ export class ProductDecisions {
       sourceConversationId: record.conversationId, sourceTextDigest: record.sourceTextDigest, recordedAt: record.recordedAt }
   }
   dispatch(input: DecisionCommand, inputActor: TrustedActor): CommandReceipt {
-    const command = DecisionCommandSchema.parse(input), actor = this.actor(inputActor)
     if (this.store.uow.nesting) throw new ApplicationFault('invalid_request', 'Decision dispatch owns the outer transaction')
+    return this.store.uow.atomic(() => this.commitInTransaction(input, inputActor))
+  }
+  /** Joins proposal confirmation; a caller must roll its participants back on a rejected receipt. */
+  commitInTransaction(input: DecisionCommand, inputActor: TrustedActor): CommandReceipt {
+    const command = DecisionCommandSchema.parse(input), actor = this.actor(inputActor)
+    if (!this.store.uow.nesting) throw new ApplicationFault('invalid_request', 'Decision commit requires the caller UnitOfWork')
     const payloadDigest = digest({ command, actor })
     return this.store.uow.atomic(() => {
       const prior = this.store.commands.get(command.commandId)
@@ -102,7 +107,7 @@ export class ProductDecisions {
         if (prior.payloadDigest !== payloadDigest) throw new ApplicationFault('conflict', 'Command ID already names another request')
         return CommandReceiptSchema.parse({ ...(prior.result as object), commandId: command.commandId, seq: prior.seq })
       }
-      let result: { status: 'recorded' } | { status: 'rejected'; error: ApplicationFault['error'] }
+      let result: { status: 'recorded'; entityRefs: { decisionId: string } } | { status: 'rejected'; error: ApplicationFault['error'] }
       try { result = this.store.uow.atomic(() => {
         const project = this.project(command.projectId)
         let decisionId: string
@@ -119,7 +124,7 @@ export class ProductDecisions {
         }
         this.store.events.append({ topic: 'application.decision.changed', entityRef: decisionId,
           payload: { decisionId, projectId: project.id, conversationId: command.conversationId } })
-        return { status: 'recorded' as const }
+        return { status: 'recorded' as const, entityRefs: { decisionId } }
       }) } catch (error) {
         try { this.fault(error) } catch (fault) {
           if (!(fault instanceof ApplicationFault)) throw fault
