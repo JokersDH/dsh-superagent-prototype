@@ -268,8 +268,8 @@ const CAPABILITIES = [
     id: 'review-pilot',
     label: '独立会话复核价值试点（8例三组）',
     notTested: [
-      'Preflight BLOCKED：pricing_unavailable（配置模型没有操作者可核对的 USD 价格表）；0/24 turn；' +
-        '真实作者/续会话/新 session 执行链已实现并有 17 项 runner selftest（预留先于发送、单 turn 在途、unknown 不归还、token/USD 上限），但没有价格就不发送；无价值结论。',
+      'Preflight BLOCKED：adapter_missing（没有经准入的单一实际 adapter 及其整 turn 硬上界/隔离/session/材料/main 准入）；0/24 turn；' +
+        'runner 45 项 selftest 证明损坏账/伪造身份/裁小预留/缺接口 fallback 均拒绝且 fake 发送为 0，但没有准入就不发送；无价值结论。',
     ],
   },
   {
@@ -449,9 +449,10 @@ ${rows
 
 - 预注册协议：\`tools/experiments/review-pilot-01/protocol.json\`（24 turn / 20万 token / 5 USD）。
 - 冻结输入：8 个合成候选（4 个预埋缺陷、4 个干净）、隐藏 oracle 测试、评分规则均已 hash；\`node tests/product-acceptance/pilot/harness.mjs --freeze --check\` 可复验。
-- 预检：**BLOCKED (pricing_unavailable)**。Codex 0.164.0 可用且为 API key 计量（模型 gpt-6.1-sol），但没有操作者可核对的 USD 价格表。协议禁止把密钥/订阅当零成本。**0/24 turn、0 token、USD unknown、0 unknown send**；ledger 保留原值，预检只标注。
+- 预检：**BLOCKED (adapter_missing)**。没有经准入的单一实际 adapter（精确 executable/version/model/provider、全部计费组件的整 turn 硬上界、隔离、session、材料与 main 准入）；缺接口时**不回退 CLI**。价格文件本身不授权。**0/24 turn、0 token、USD unknown、0 unknown send**；ledger 保留原值，预检只标注。
 - 执行链已不是占位：作者 turn（workspace-write）→ 冻结真实 candidate 摘要 → 同一 session 续会话复核（read-only）→ 全新 session 在密封副本复核（read-only）→ 严格报告校验与评分。每次发送前持久预留，预检/失败不覆盖账；unknown 用量按预留上界计费并转 BLOCKED_UNKNOWN_USAGE，之后不再发送。
-- \`--selftest\` 17 项通过（单 turn 在途、预留先于发送、unknown 不归还、token/USD 上限、作者/复核分项上限、usage/session 解析）；它证明会计与进程适配，不是收益结果。
+- 账本与预留已按 wave-07 收紧：已存在但损坏/字段错/历史缺失/伪造身份的 ledger 不回退全零；预留使用 adapter 声明的整 turn 上界（无字节估算或 Math.min 裁小），并发写入串行化，重复预留/结算幂等，measured overrun 直接 BLOCKED_BOUND_VIOLATION。
+- \`--selftest\` 45 项通过（损坏账、伪造身份、并发锁、单 turn 在途、预留先于发送、unknown 不归还、越界阻断、token/USD/作者复核上限、adapter 缺失/漂移/伪隔离/仅价格均不发送）；它证明会计与准入，不是收益结果。
 - 干跑：\`--dry-run\` 用合成报告验证评分/预算/拒绝机制（检出、误报、缺 usage、预算不一致、挑例、改 oracle、报告越权均被正确处理）；干跑不是收益结果。
 - 要解除阻断：操作者提供 \`pilot/pricing.json\`（model、inputPerMillion、outputPerMillion、USD、source、observedAt）；预检 PASS 后才允许 \`--execute --confirm-grant\`，且仍受原 24/200000/USD5 上限。
 

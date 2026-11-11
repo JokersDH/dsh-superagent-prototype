@@ -1,23 +1,33 @@
 {
-  "protocol": "review-pilot-runner-selftest/1",
-  "createdAt": "2026-11-11T03:39:47.183Z",
-  "passes": 17,
+  "protocol": "review-pilot-runner-selftest/2",
+  "createdAt": "2026-11-11T06:12:18.781Z",
+  "passes": 45,
   "failures": [],
   "assertions": [
     {
-      "id": "LEDGER_DEFAULT",
+      "id": "ADAPTER_VALID",
       "ok": true,
-      "detail": null
+      "detail": "[]"
     },
     {
-      "id": "RESERVE_AUTHOR",
+      "id": "BOUND_IS_DECLARED_NOT_CLIPPED",
       "ok": true,
-      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-fd559c63-6a88-46cb-8b72-75f01c70bc54\",\"caseId\":\"case-01\",\"arm\":\"author\",\"upperTokens\":10101,\"upperUSD\":0.010101,\"status\":\"in_flight\",\"reservedAt\":\"2026-11-11T03:39:47.004Z\"}}"
+      "detail": "{\"tokens\":144000,\"usd\":0.1804,\"perTurnTokens\":24000,\"requestMultiplier\":6,\"components\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000}}"
     },
     {
-      "id": "RESERVATION_BOUNDED",
+      "id": "BOUND_USD_POSITIVE",
       "ok": true,
-      "detail": "{\"turnId\":\"turn-fd559c63-6a88-46cb-8b72-75f01c70bc54\",\"caseId\":\"case-01\",\"arm\":\"author\",\"upperTokens\":10101,\"upperUSD\":0.010101,\"status\":\"in_flight\",\"reservedAt\":\"2026-11-11T03:39:47.004Z\"}"
+      "detail": "0.1804"
+    },
+    {
+      "id": "RESERVE_USES_FULL_BOUND",
+      "ok": true,
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-ba5bc902-5807-4981-83d8-83e1e63da382\",\"caseId\":\"case-01\",\"arm\":\"author\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"4411850f9de8abf6118cc12b6721218d41f1b63f00810365e5d0ddee404ebf5c\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},\"stat"
+    },
+    {
+      "id": "RESERVE_REPLAY",
+      "ok": true,
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-ba5bc902-5807-4981-83d8-83e1e63da382\",\"caseId\":\"case-01\",\"arm\":\"author\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"4411850f9de8abf6118cc12b6721218d41f1b63f00810365e5d0ddee404ebf5c\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},\"stat"
     },
     {
       "id": "ONE_IN_FLIGHT",
@@ -25,49 +35,39 @@
       "detail": "{\"ok\":false,\"reason\":\"one_turn_in_flight\"}"
     },
     {
-      "id": "FAKE_CODEX_EXIT",
+      "id": "ADMITTED_SEND_RUNS",
       "ok": true,
-      "detail": "{\"code\":0,\"signal\":null}"
+      "detail": "{\"ok\":true,\"result\":{\"exit\":{\"code\":0,\"signal\":null},\"startedAt\":\"2026-11-11T06:12:18.738Z\",\"endedAt\":\"2026-11-11T06:12:18.742Z\",\"usage\":{\"totalTokens\":1500,\"inputTokens\":1200,\"cachedInputTokens\":100,\"outputTokens\":300,\"reasoningOutputTokens\":50},\"sessionId\":\"11111111-1111-4111-8111-111111111111\",\"stderrTail\":\"\",\"events\":2}}"
     },
     {
-      "id": "USAGE_PARSED",
+      "id": "SEND_COUNTER_ONE",
       "ok": true,
-      "detail": "{\"totalTokens\":1500,\"inputTokens\":1200,\"cachedInputTokens\":100,\"outputTokens\":300,\"reasoningOutputTokens\":50}"
+      "detail": "1"
     },
     {
-      "id": "SESSION_PARSED",
+      "id": "SETTLE_ONCE",
       "ok": true,
-      "detail": "11111111-1111-4111-8111-111111111111"
+      "detail": "{\"state\":\"SETTLED\",\"data\":{\"schema\":\"review-pilot-ledger/2\",\"grantId\":\"wave05-independent-review-pilot-01\",\"ledgerId\":\"wave05-independent-review-pilot-01\",\"historyComplete\":true,\"createdAt\":\"2026-11-11T06:12:18.737Z\",\"caps\":{\"maxTotalTurnStarts\":24,\"maxAuthorTurnStarts\":8,\"maxReviewTurnStarts\":16,\"maxTotalBillableTokens\":200000,\"maxTotalCostUSD\":5},\"status\":\"IN_PROGRESS\",\"reservation\":{\"turns\":0,\""
     },
     {
-      "id": "COST_COMPUTED",
+      "id": "SETTLE_REPLAY_IDEMPOTENT",
       "ok": true,
-      "detail": "0.00165"
+      "detail": "{\"state\":\"REPLAYED\",\"data\":{\"schema\":\"review-pilot-ledger/2\",\"grantId\":\"wave05-independent-review-pilot-01\",\"ledgerId\":\"wave05-independent-review-pilot-01\",\"historyComplete\":true,\"createdAt\":\"2026-11-11T06:12:18.737Z\",\"caps\":{\"maxTotalTurnStarts\":24,\"maxAuthorTurnStarts\":8,\"maxReviewTurnStarts\":16,\"maxTotalBillableTokens\":200000,\"maxTotalCostUSD\":5},\"status\":\"IN_PROGRESS\",\"reservation\":{\"turns\":0,"
     },
     {
-      "id": "SETTLE_TURN",
+      "id": "RESERVE_UNKNOWN_CASE",
       "ok": true,
-      "detail": "{\"turns\":1,\"tokens\":1500,\"costUSD\":0.00165,\"unknownTurns\":0}"
-    },
-    {
-      "id": "SETTLE_RECEIPT",
-      "ok": true,
-      "detail": null
-    },
-    {
-      "id": "RESERVE_SECOND",
-      "ok": true,
-      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-7cc72093-3c63-4d02-8dce-579d5a06eda5\",\"caseId\":\"case-02\",\"arm\":\"author\",\"upperTokens\":10101,\"upperUSD\":0.010101,\"status\":\"in_flight\",\"reservedAt\":\"2026-11-11T03:39:47.183Z\"}}"
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-e6732603-5eb1-47cf-9797-639337b92489\",\"caseId\":\"case-02\",\"arm\":\"self_review\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"4411850f9de8abf6118cc12b6721218d41f1b63f00810365e5d0ddee404ebf5c\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},"
     },
     {
       "id": "UNKNOWN_BLOCKS",
       "ok": true,
-      "detail": "BLOCKED_UNKNOWN_USAGE"
+      "detail": "\"UNKNOWN_USAGE\""
     },
     {
-      "id": "UNKNOWN_NOT_REFUNDED",
+      "id": "UNKNOWN_CHARGED_AT_BOUND",
       "ok": true,
-      "detail": "{\"turns\":2,\"tokens\":11601,\"costUSD\":0.011751000000000001,\"unknownTurns\":1}"
+      "detail": "{\"turns\":2,\"tokens\":145500,\"costUSD\":0.18235,\"unknownTurns\":1}"
     },
     {
       "id": "NO_SEND_AFTER_UNKNOWN",
@@ -75,9 +75,14 @@
       "detail": "{\"ok\":false,\"reason\":\"unknown_usage_unresolved\"}"
     },
     {
-      "id": "TOKEN_CEILING",
+      "id": "OVERRUN_BLOCKS",
       "ok": true,
-      "detail": "{\"ok\":false,\"reason\":\"budget_ceiling\"}"
+      "detail": "\"BOUND_VIOLATION\""
+    },
+    {
+      "id": "NO_SEND_AFTER_OVERRUN",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"bound_violation_unresolved\"}"
     },
     {
       "id": "AUTHOR_TURN_CAP",
@@ -87,7 +92,143 @@
     {
       "id": "REVIEW_STILL_ALLOWED",
       "ok": true,
-      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-3cca999b-183d-43d3-8610-f52cf079574e\",\"caseId\":\"case-05\",\"arm\":\"self_review\",\"upperTokens\":10098,\"upperUSD\":0.010098,\"status\":\"in_flight\",\"reservedAt\":\"2026-11-11T03:39:47.183Z\"}}"
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-50d7aaf6-57c2-4373-a654-779285091dd5\",\"caseId\":\"case-09\",\"arm\":\"self_review\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"4411850f9de8abf6118cc12b6721218d41f1b63f00810365e5d0ddee404ebf5c\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},"
+    },
+    {
+      "id": "TOKEN_CEILING",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"budget_ceiling\"}"
+    },
+    {
+      "id": "CORRUPT_BAD_JSON",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_NAMED_NAN",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_NEGATIVE_USAGE",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_WRONG_GRANT",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_MISSING_HISTORY",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_INTEGRITY_MISMATCH",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_INFINITY_TOKENS",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_NAN_COST",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_MISSING_CAPS",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_DUPLICATE_TURN_ID",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_V1_WITH_USAGE",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "CORRUPT_FORGED_IDENTITY",
+      "ok": true,
+      "detail": "CORRUPT ledger_corrupt"
+    },
+    {
+      "id": "LEDGER_LOCKED",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"ledger_locked\"}"
+    },
+    {
+      "id": "ADMISSION_MISSING",
+      "ok": true,
+      "detail": "[{\"code\":\"adapter_missing\",\"detail\":\"absent\"}]"
+    },
+    {
+      "id": "ADMISSION_WRONG_SCHEMA",
+      "ok": true,
+      "detail": "[{\"code\":\"adapter_invalid\",\"detail\":\"schema must be review-pilot-adapter/1\"}]"
+    },
+    {
+      "id": "ADMISSION_VERSION_DRIFT",
+      "ok": true,
+      "detail": "[{\"code\":\"adapter_version_drift\",\"detail\":\"declared fake-cli 9.9.9 but the executable reports fake-cli 1.0.0\"}]"
+    },
+    {
+      "id": "ADMISSION_PRICE_ONLY",
+      "ok": true,
+      "detail": "[{\"code\":\"whole_turn_bound_unavailable\",\"detail\":\"maxInputTokens must be a positive integer\"},{\"code\":\"whole_turn_bound_unavailable\",\"detail\":\"maxCachedInputTokens must be a positive integer\"},{\"code\":\"whole_turn_bound_unavailable\",\"detail\":\"maxCacheWriteInputTokens must be a positive integer\"},{\"code\":\"whole_turn_bound_unavailable\",\"detail\":\"maxOutputTokens must be a positive integer\"},{\"code\":\"w"
+    },
+    {
+      "id": "ADMISSION_BOOLEAN_ISOLATION",
+      "ok": true,
+      "detail": "[{\"code\":\"isolation_unproven\",\"detail\":\"isolation is not proven\"},{\"code\":\"isolation_unproven\",\"detail\":\"does not cover author_credential\"},{\"code\":\"isolation_unproven\",\"detail\":\"does not cover author_material\"},{\"code\":\"isolation_unproven\",\"detail\":\"does not cover network_egress\"},{\"code\":\"isolation_unproven\",\"detail\":\"evidenceDigest\"},{\"code\":\"isolation_unproven\",\"detail\":\"isolation evidence is "
+    },
+    {
+      "id": "ADMISSION_NO_SESSION_EVIDENCE",
+      "ok": true,
+      "detail": "[{\"code\":\"session_evidence_missing\",\"detail\":\"a fresh independent thread was not proven\"},{\"code\":\"session_evidence_missing\",\"detail\":\"identityField\"},{\"code\":\"session_evidence_missing\",\"detail\":\"session evidence is missing or stale\"}]"
+    },
+    {
+      "id": "ADMISSION_NO_MAIN_ADMISSION",
+      "ok": true,
+      "detail": "[{\"code\":\"main_admission_missing\",\"detail\":\"only a main admission can authorize the pilot\"},{\"code\":\"main_admission_missing\",\"detail\":\"decisionRef\"},{\"code\":\"main_admission_missing\",\"detail\":\"admission is missing or stale\"},{\"code\":\"main_admission_missing\",\"detail\":\"scope\"}]"
+    },
+    {
+      "id": "ADMISSION_STALE_EVIDENCE",
+      "ok": true,
+      "detail": "[{\"code\":\"isolation_unproven\",\"detail\":\"isolation evidence is missing or stale\"}]"
+    },
+    {
+      "id": "ADMISSION_NEGATIVE_PRICE",
+      "ok": true,
+      "detail": "[{\"code\":\"price_basis_incomplete\",\"detail\":\"inputPerMillion must be a positive finite number\"}]"
+    },
+    {
+      "id": "ADMISSION_TRUNCATED_BOUND",
+      "ok": true,
+      "detail": "[{\"code\":\"whole_turn_bound_unavailable\",\"detail\":\"maxInputTokens must be a positive integer\"}]"
+    },
+    {
+      "id": "ADMISSION_FALLBACK_PATH",
+      "ok": true,
+      "detail": "[{\"code\":\"adapter_invalid\",\"detail\":\"a fallback adapter path is not admissible\"}]"
+    },
+    {
+      "id": "NO_SEND_FOR_ALL_REFUSALS",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "id": "NO_RESERVATION_FOR_ALL_REFUSALS",
+      "ok": true,
+      "detail": "[]"
     }
-  ]
+  ],
+  "modelSends": 1
 }

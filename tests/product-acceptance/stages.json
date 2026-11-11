@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-06/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-07/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "d4d51ae",
-  "checkpoint": "dc351a4",
+  "base": "ddac2b6",
+  "checkpoint": null,
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -13,15 +13,15 @@
     "pilotTurnsUsed": 0,
     "pilotTokensUsed": 0,
     "pilotUsd": null,
-    "note": "Pilot preflight BLOCKED (pricing_unavailable); runner selftest is a local fake process, not a model send. 0/24 turns, 0 tokens, USD unknown. No other model call."
+    "note": "Pilot preflight BLOCKED (adapter_missing); ledger v2 is fail-closed and preserves 0/24 turns, 0 tokens, USD unknown. Runner selftest uses a fake process, not a model send. No other model call."
   },
   "stages": [
     {
       "id": "E1",
-      "title": "Pilot preconditions, two-stage freeze and persistent reservations",
-      "command": "node tests/product-acceptance/pilot/harness.mjs --preflight",
+      "title": "Pilot admission and fail-closed ledger",
+      "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
       "notes": [
-        "Preflight now checks frozen inputs, Codex availability, the operator price schedule, runner selftest and ledger; BLOCKED on pricing_unavailable only, ledger preserved at 0/24."
+        "Ledger v2 distinguishes not-created from corrupt; a damaged/forged/incomplete ledger never becomes zero credit. Reservations use the adapter's declared whole-turn bound, are serialized, and replay idempotently. A missing adapter, version drift, stale isolation/session/material evidence or a missing main admission blocks every send; price alone grants nothing."
       ]
     },
     {
@@ -29,39 +29,39 @@
       "title": "Eight-case three-arm bounded pilot",
       "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
       "notes": [
-        "Real execute chain implemented (author, same-session review, fresh-session review, candidate freeze, strict scoring); not executed because preflight is BLOCKED. BLOCKED is not a value result."
+        "Real execute chain remains implemented but BLOCKED on adapter_missing; 0/24 turns, no sample replacement, no ID-swap resend."
       ]
     },
     {
       "id": "E3",
-      "title": "Attention, ranking, review timing and decision closed loop",
+      "title": "Context and proposal product loop",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "Shared deterministic_priority ranker, cross-project inbox UI, per-target answer, decision prepare/record/revoke (read-only prepare, replay, conflict, tamper, scope) verified live; deadlines and source-state mutations remain NOT_TESTED."
+        "Existing decisions/attention/outcome negatives stay; context/proposal entries are added only after main publishes them, on real authenticated HTTP/SQLite."
       ]
     },
     {
       "id": "E4",
-      "title": "Same-artifact installation, backup/restore, tamper and rollback",
+      "title": "Two-binary installation and upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "D's frozen tar.gz is verified byte-for-byte and run in a fresh directory: first-run/doctor/start/static workbench, reuse/concurrency, backup/restore read-only with blocked authorization, same-size/missing artifact and corrupt bundle refusals, state rollback. Upgrade needs a second buildId."
+        "Same-byte wave-06 artifact remains accepted; wave-07 needs two frozen different binaries, release.json initialization under PA_CONFIG_ROOT and data compatibility across upgrade/rollback."
       ]
     },
     {
       "id": "E5",
-      "title": "Strict gate tiers, refusals and bounded stability",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
+      "title": "Recovery authorization windows and bounded stability",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "Tiers module/controlled-product/actual-native-control/installed-alpha/review-value; 72 gate mutation/structure cases; up to 30 cycles or 45 minutes of mixed controlled work."
+        "Read-only inspect/prepare verified; the commit, target half-preparation, activation pointer switch and unknown-writer barriers stay NOT_TESTED until main publishes the entry. Bounded cycles only."
       ]
     },
     {
       "id": "E6",
-      "title": "Separated value, product and install conclusions",
+      "title": "Layered conclusions and handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "Value stays BLOCKED (no turn sent); product admission from the controlled tier; install admission from the same frozen bytes with the upgrade item still NOT_TESTED."
+        "wave07-status separates module/controlled-product/actual-native-control/installed-alpha/review-value with source/evidence/owner; pilot value never gates product or install."
       ]
     }
   ]

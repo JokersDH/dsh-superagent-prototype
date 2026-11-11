@@ -3,12 +3,14 @@
  * Independent-review pilot harness.
  *
  *   node harness.mjs --freeze       # (re)write the case manifest before any model call
- *   node harness.mjs --preflight    # verify frozen inputs, model/usage preconditions and pricing
+ *   node harness.mjs --preflight    # frozen inputs + ledger + the one admitted adapter and its bound
+ *   node harness.mjs --selftest     # accounting/admission checks on a disposable ledger
  *   node harness.mjs --dry-run      # exercise scoring with synthetic reports; no model call
  *   node harness.mjs --execute --confirm-grant
  *
- * The execute path is intentionally guarded: it refuses unless preflight PASSed and a pricing
- * schedule exists, because the protocol forbids treating subscription access as zero cost.
+ * The execute path is guarded: it refuses unless preflight PASSed, which requires one admitted
+ * adapter with a whole-turn bound, isolation, session/material evidence and a main admission.
+ * A missing adapter is never replaced by the installed CLI, and price alone grants nothing.
  */
 import { execFileSync, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
@@ -20,20 +22,18 @@ import { scorePilot, PILOT_CAPS, ARMS } from './score.mjs'
 import {
   annotateLedger,
   costOf,
-  readLedger,
-  readPricing,
-  readRuntimeInterface,
+  guardedSend,
+  readLedgerView,
   reserveTurn,
-  runCodexTurn,
   settleTurn,
 } from './runner.mjs'
+import { currentAdmission } from './admission.mjs'
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../../..')
 const reports = join(here, 'reports')
 const manifestPath = join(here, 'cases.manifest.json')
 const oraclePath = join(here, 'oracle.json')
 const ledgerPath = join(here, 'ledger.json')
-const pricingPath = join(here, 'pricing.json')
 const grantId = 'wave05-independent-review-pilot-01'
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const args = new Set(process.argv.slice(2))
@@ -153,26 +153,6 @@ export function verifyCandidateFreeze(caseId, capsulePath) {
   }
 }
 
-function pricingSchedule() {
-  if (!existsSync(pricingPath)) return { ok: false, reason: 'pricing_unavailable' }
-  try {
-    const value = readJson(pricingPath)
-    const valid =
-      typeof value.model === 'string' &&
-      value.model.length > 0 &&
-      typeof value.inputPerMillion === 'number' &&
-      value.inputPerMillion >= 0 &&
-      typeof value.outputPerMillion === 'number' &&
-      value.outputPerMillion >= 0 &&
-      value.currency === 'USD' &&
-      typeof value.source === 'string' &&
-      typeof value.observedAt === 'string'
-    return valid ? { ok: true, value } : { ok: false, reason: 'pricing_invalid' }
-  } catch {
-    return { ok: false, reason: 'pricing_invalid' }
-  }
-}
-
 /**
  * Copies a frozen tree into a disposable capsule. `.git`, dependency and build directories are
  * excluded; symlinks are refused rather than followed, and no hard link is created.
@@ -211,21 +191,23 @@ function preflight() {
   ensureReports()
   const frozen = verifyFrozen()
   const codex = codexInfo()
-  const pricing = readPricing()
-  const runtime = readRuntimeInterface()
-  const ledger = readLedger()
+  const admission = currentAdmission()
+  const ledgerView = readLedgerView()
   const runner = runRunnerSelftest()
   const reasons = []
   if (runner.failures.length > 0)
     reasons.push({ code: 'runner_selftest_failed', detail: runner.failures.map((item) => item.id) })
   if (!frozen.ok) reasons.push({ code: 'frozen_inputs_invalid', detail: frozen.code ?? frozen.mismatches })
-  if (!codex.available) reasons.push({ code: 'codex_unavailable', detail: codex })
-  if (!pricing)
-    reasons.push({
-      code: 'pricing_unavailable',
-      detail: 'No operator-provided USD schedule for the configured model; key/subscription access is not zero cost.',
-    })
-  if ((ledger.reservations ?? []).some((item) => item.status === 'in_flight'))
+  if (ledgerView.state === 'CORRUPT')
+    reasons.push({ code: 'ledger_corrupt', detail: ledgerView.issues.map((item) => item.code) })
+  // Each admission facet is reported separately; a missing adapter never falls back to the CLI.
+  const seen = new Set()
+  for (const blocker of admission.blockers) {
+    if (seen.has(blocker.code)) continue
+    seen.add(blocker.code)
+    reasons.push({ code: blocker.code, detail: blocker.detail })
+  }
+  if (ledgerView.state !== 'CORRUPT' && ledgerView.data.reservations.some((item) => item.status === 'in_flight'))
     reasons.push({ code: 'turn_in_flight', detail: 'An earlier reservation is still open; reconcile it before sending.' })
   let seal
   try {
@@ -236,17 +218,22 @@ function preflight() {
     reasons.push({ code: 'seal_failed', detail: String(error?.message ?? error) })
   }
   const status = reasons.length === 0 ? 'PASS' : 'BLOCKED'
-  const adapter = runtime ? 'b-runtime-interface' : 'codex-cli-adapter'
+  const ledger = ledgerView.state === 'CORRUPT' ? null : ledgerView.data
   const result = {
-    schema: 'review-pilot-preflight/1',
+    schema: 'review-pilot-preflight/2',
     protocol: 'independent-review-pilot/1',
     grantId,
     status,
     reasons,
     codex,
-    adapter,
-    runtimeInterface: runtime ?? null,
-    pricing,
+    adapter: admission.descriptor,
+    admission: {
+      ok: admission.ok,
+      blockers: admission.blockers,
+      facts: admission.facts,
+      bound: admission.bound,
+    },
+    ledgerState: ledgerView.state,
     frozen: frozen.ok
       ? {
           manifestDigest: frozen.manifest.caseManifestDigest,
@@ -256,34 +243,38 @@ function preflight() {
         }
       : { ok: false, mismatches: frozen.mismatches },
     sealSelfTest: seal ? { caseId: 'case-01', digest: seal.manifest.digest } : null,
-    runnerSelfTest: { protocol: runner.protocol, passes: runner.passes, failures: runner.failures }, 
+    runnerSelfTest: { protocol: runner.protocol, passes: runner.passes, failures: runner.failures },
     protocolSemantics: {
       stage1: 'Cases, oracle, scoring, order seed, model and budgets are frozen before any author call.',
       stage2: 'freezeCandidate() digests the real author capsule before any review; verifyCandidateFreeze() rechecks it.',
       alignedWith: 'WP-16/0023 two freeze points',
     },
-    ledger: {
-      status: ledger.status,
-      turns: Number(ledger.actual?.turns ?? 0),
-      tokens: Number(ledger.actual?.tokens ?? 0),
-      unknownTurns: Number(ledger.actual?.unknownTurns ?? 0),
-      reservations: (ledger.reservations ?? []).length,
-    },
-    modelTurnsUsed: Number(ledger.actual?.turns ?? 0),
+    ledger: ledger
+      ? {
+          status: ledger.status,
+          turns: ledger.actual.turns,
+          tokens: ledger.actual.tokens,
+          unknownTurns: ledger.actual.unknownTurns,
+          reservations: ledger.reservations.length,
+        }
+      : { state: 'CORRUPT', issues: ledgerView.issues },
+    modelTurnsUsed: ledger ? ledger.actual.turns : null,
     caps: PILOT_CAPS,
     checkedAt: new Date().toISOString(),
     note:
       status === 'PASS'
-        ? 'Preflight passed; execution is allowed under the existing grant.'
+        ? 'Preflight passed; one admitted adapter and a bounded whole-turn reservation are required before each send.'
         : 'Preflight blocked; no model turn may be sent. Existing ledger reservations/usage were preserved.',
   }
   writeFileSync(join(reports, 'preflight.json'), JSON.stringify(result, null, 2) + '\n')
-  annotateLedger({
-    status: status === 'PASS' ? (Number(ledger.actual?.turns ?? 0) > 0 ? 'READY_RESUME' : 'READY_NOT_EXECUTED') : 'BLOCKED_PREFLIGHT',
-    reason: reasons.map((item) => item.code),
-    adapter,
-    lastPreflightAt: result.checkedAt,
-  })
+  if (ledgerView.state !== 'CORRUPT') {
+    annotateLedger({
+      status: status === 'PASS' ? (ledger.actual.turns > 0 ? 'READY_RESUME' : 'READY_NOT_EXECUTED') : 'BLOCKED_PREFLIGHT',
+      reason: reasons.map((item) => item.code),
+      adapter: admission.facts?.adapterId ?? null,
+      lastPreflightAt: result.checkedAt,
+    })
+  }
   process.stdout.write(`preflight ${status}: ${reasons.map((item) => item.code).join(', ') || 'ready'}\n`)
   return result
 }
@@ -444,8 +435,9 @@ async function execute() {
   if (!args.has('--confirm-grant')) throw new Error('Refusing to start model turns without --confirm-grant')
   const pre = preflight()
   if (pre.status !== 'PASS') throw new Error(`Preflight is ${pre.status}: ${pre.reasons.map((item) => item.code).join(', ')}`)
-  const pricing = readPricing()
-  if (!pricing) throw new Error('Pricing disappeared after preflight')
+  const admission = currentAdmission()
+  if (!admission.ok) throw new Error(`Admission disappeared after preflight: ${admission.blockers.map((item) => item.code).join(', ')}`)
+  const pricing = admission.facts.pricing
   const oracle = readJson(oraclePath)
   const schemaPath = join(here, 'report-schema.json')
   const workRoot = mkdtempSync(join(tmpdir(), 'pa-pilot-run-'))
@@ -455,12 +447,13 @@ async function execute() {
     same_session_self_review: { tokens: 0, usd: 0, turns: 0 },
     fresh_session_review: { tokens: 0, usd: 0, turns: 0 },
   }
-  const model = pricing.model
+  const model = admission.facts.model
 
   const turn = async ({ caseId, arm, prompt, cwd, sandbox, resumeSessionId, reportPath }) => {
-    const reservation = reserveTurn({ caseId, arm, prompt, pricing })
-    if (!reservation.ok) throw Object.assign(new Error(reservation.reason), { blocked: reservation.reason })
-    const result = await runCodexTurn({
+    const reservation = reserveTurn({ caseId, arm, admission })
+    if (!reservation.ok) throw Object.assign(new Error(String(reservation.reason)), { blocked: reservation.reason })
+    const sent = await guardedSend({
+      admission,
       prompt,
       cwd,
       sandbox,
@@ -469,8 +462,10 @@ async function execute() {
       ...(reportPath ? { outputSchemaPath: schemaPath, lastMessagePath: reportPath } : {}),
       timeoutMs: 180000,
     })
+    if (!sent.ok) throw Object.assign(new Error(String(sent.reason)), { blocked: sent.reason })
+    const result = sent.result
     const cost = costOf(result.usage, pricing)
-    settleTurn({
+    const settled = settleTurn({
       turnId: reservation.reservation.turnId,
       usage: result.usage,
       costUSD: cost,
@@ -479,7 +474,8 @@ async function execute() {
       endedAt: result.endedAt,
       exit: result.exit,
     })
-    if (!result.usage) throw Object.assign(new Error('usage_unavailable'), { blocked: 'usage_unavailable' })
+    if (settled.state === 'BOUND_VIOLATION') throw Object.assign(new Error('measured spend exceeded the admitted bound'), { blocked: 'bound_violation' })
+    if (settled.state === 'UNKNOWN_USAGE') throw Object.assign(new Error('usage_unavailable'), { blocked: 'usage_unavailable' })
     if (!result.sessionId) throw Object.assign(new Error('session_identity_missing'), { blocked: 'session_identity_missing' })
     if (arm !== 'author') {
       usageTotals[arm].tokens += result.usage.totalTokens
@@ -550,7 +546,7 @@ async function execute() {
     const budgets = Object.fromEntries(
       ARMS.map((arm) => [
         arm,
-        { model, version: 'codex-cli', tools: 'read-only', timeoutMs: 180000, maxTokens: 20000, maxUSD: 1 },
+        { model, version: admission.facts.version, tools: 'read-only', timeoutMs: 180000, maxTokens: admission.bound.tokens, maxUSD: admission.bound.usd },
       ]),
     )
     const usage = Object.fromEntries(

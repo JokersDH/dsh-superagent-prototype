@@ -1,6 +1,9 @@
 {
-  "schema": "review-pilot-ledger/1",
+  "schema": "review-pilot-ledger/2",
   "grantId": "wave05-independent-review-pilot-01",
+  "ledgerId": "wave05-independent-review-pilot-01",
+  "historyComplete": true,
+  "createdAt": "2026-11-11T06:10:40.097Z",
   "caps": {
     "maxTotalTurnStarts": 24,
     "maxAuthorTurnStarts": 8,
@@ -9,9 +12,6 @@
     "maxTotalCostUSD": 5
   },
   "status": "BLOCKED_PREFLIGHT",
-  "reason": [
-    "pricing_unavailable"
-  ],
   "reservation": {
     "turns": 0,
     "tokens": 0,
@@ -20,12 +20,17 @@
   "actual": {
     "turns": 0,
     "tokens": 0,
-    "costUSD": null,
+    "costUSD": 0,
     "unknownTurns": 0
   },
   "reservations": [],
   "turns": [],
-  "adapter": "codex-cli-adapter",
-  "lastPreflightAt": "2026-11-11T04:08:07.237Z",
-  "updatedAt": "2026-11-11T04:08:07.238Z"
+  "migratedFrom": "review-pilot-ledger/1",
+  "reason": [
+    "adapter_missing"
+  ],
+  "adapter": null,
+  "lastPreflightAt": "2026-11-11T06:12:01.814Z",
+  "updatedAt": "2026-11-11T06:12:01.815Z",
+  "integrity": "ced5d5b1f49a02b36587b9b815686ebc2f936b388772d9c6f4fd8e045ab724e3"
 }

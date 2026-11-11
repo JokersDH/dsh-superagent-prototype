@@ -1,4 +1,7 @@
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs'
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { runCase, STATUS, LAYERS } from '../lib/status.mjs'
@@ -347,6 +350,42 @@ const CASES = [
           fixture.cleanup()
         }
       }
+    },
+  },
+  {
+    id: 'E1-ADMISSION-FAIL-CLOSED',
+    title: 'The pilot runner refuses corrupt ledgers, clipped bounds and a missing adapter',
+    check: ({ assert }) => {
+      const here = dirname(fileURLToPath(import.meta.url))
+      const run = spawnSync(process.execPath, [join(here, '../pilot/runner-selftest.mjs')], { encoding: 'utf8', timeout: 120_000 })
+      let result
+      try {
+        result = JSON.parse(run.stdout)
+      } catch {
+        result = undefined
+      }
+      assert('SELFTEST_RAN', result !== undefined, (run.stderr || run.stdout || '').slice(-300))
+      assert('SELFTEST_NO_FAILURE', result?.failures?.length === 0, JSON.stringify(result?.failures ?? []))
+      assert('SELFTEST_BOUND_NOT_CLIPPED', result?.assertions?.some((item) => item.id === 'BOUND_IS_DECLARED_NOT_CLIPPED' && item.ok))
+      assert('SELFTEST_CORRUPT_LEDGER', result?.assertions?.filter((item) => item.id.startsWith('CORRUPT_')).every((item) => item.ok))
+      assert('SELFTEST_ADMISSION_REFUSALS', result?.assertions?.filter((item) => item.id.startsWith('ADMISSION_')).every((item) => item.ok))
+      assert('SELFTEST_NO_REFUSAL_SENDS', result?.assertions?.some((item) => item.id === 'NO_SEND_FOR_ALL_REFUSALS' && item.ok))
+      assert('SELFTEST_SEND_COUNTER', result?.modelSends === 1, String(result?.modelSends))
+      assert('SELFTEST_CHECKS', (result?.passes ?? 0) >= 35, String(result?.passes))
+    },
+  },
+  {
+    id: 'E1-PREFLIGHT-NO-FALLBACK',
+    title: 'The recorded preflight is blocked on a missing adapter instead of falling back to the CLI',
+    check: ({ assert }) => {
+      const here = dirname(fileURLToPath(import.meta.url))
+      const preflight = JSON.parse(readFileSync(join(here, '../pilot/reports/preflight.json'), 'utf8'))
+      assert('PREFLIGHT_BLOCKED', preflight.status === 'BLOCKED', preflight.status)
+      assert('NO_ADAPTER', preflight.reasons.some((item) => item.code === 'adapter_missing'), JSON.stringify(preflight.reasons))
+      assert('NO_CLI_FALLBACK_LABEL', JSON.stringify(preflight).includes('codex-cli-adapter') === false)
+      assert('LEDGER_ZERO', preflight.ledger.turns === 0 && preflight.ledger.tokens === 0, JSON.stringify(preflight.ledger))
+      assert('LEDGER_NOT_CORRUPT', preflight.ledgerState !== 'CORRUPT', preflight.ledgerState)
+      assert('ADMISSION_NOT_OK', preflight.admission?.ok === false, JSON.stringify(preflight.admission?.ok))
     },
   },
 ]
