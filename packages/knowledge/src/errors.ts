@@ -16,6 +16,7 @@ export type DecisionErrorCode =
   | 'not_found'
   | 'inactive'
   | 'invalid_cursor'
+  | 'scan_incomplete'
   | 'conflict'
 
 export class DecisionError extends Error {
