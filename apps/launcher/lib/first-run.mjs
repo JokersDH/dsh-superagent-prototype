@@ -52,15 +52,29 @@ export async function firstRun({ installRoot, roots, json, adoptExisting = false
     // release is claimed. `pa build --install-root . --config-root <this root>` writes one explicitly.
     const existing = readRelease(roots.config)
     release = existing.release === null
-      ? { status: 'OK', adopted: false, reason: 'release_missing_development', path: existing.path, buildId: null, source: null, digest: null }
+      ? {
+          status: 'OK',
+          adopted: false,
+          reason: 'release_missing_development',
+          provenance: 'unverified',
+          path: existing.path,
+          buildId: null,
+          commit: null,
+          source: null,
+          digest: null,
+          hint: 'No install inventory and no release manifest: run `pa build --install-root . --config-root <this root>`, or install from `<install>/bin/pa`.',
+        }
       : {
           status: 'OK',
           adopted: false,
           reason: 'unverified_source_build',
+          provenance: 'unverified',
           path: existing.path,
           buildId: existing.release.buildId,
+          commit: existing.release.source.commit,
           source: existing.release.source,
           digest: null,
+          hint: 'A source-checkout release is not distribution provenance; use `<install>/bin/pa` for an install whose bytes are inventory-verified.',
         }
   }
   const executor = await probeExecutor()
@@ -72,11 +86,15 @@ export async function firstRun({ installRoot, roots, json, adoptExisting = false
     roots: ensured.roots,
     release: {
       path: release.path,
-      buildId: release.buildId,
-      commit: release.source.commit,
-      digest: release.digest,
+      // A source checkout has no verified provenance: keep the fields explicit instead of inventing
+      // a commit/digest. A distribution install always fills them from its own inventory.
+      provenance: release.provenance ?? 'install_inventory',
+      buildId: release.buildId ?? null,
+      commit: release.commit ?? release.source?.commit ?? null,
+      digest: release.digest ?? null,
       reason: release.reason,
       adopted: release.adopted,
+      ...(release.hint === undefined ? {} : { hint: release.hint }),
     },
     platform,
     executor,

@@ -22,6 +22,7 @@ import { backupState, verifyBackup } from '../lib/backup.mjs'
 import { importBundle, restoreState, rollbackState } from '../lib/restore.mjs'
 import { startInstance } from '../lib/start.mjs'
 import { stopInstance } from '../lib/stop.mjs'
+import { UpgradeError, inspectTargetInstall, readJournal, recoverSwitch, rollbackInstall, upgradeInstall } from '../lib/upgrade.mjs'
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url))
 const BUILD_SCRIPT = join(repoRoot, 'tools/distribution/build.mjs')
@@ -38,6 +39,9 @@ const HELP = `pa — 本机个人 Agent 助理启动器
   start                  启动或复用本机实例（默认 fixture 关、个人模式）；打印网页地址
   status                 查询实例记录与真实进程身份
   stop                   按已验证进程身份优雅停止；超时如实报告未静止资源
+  upgrade                切换到另一个已冻结发行版：校验目标字节、备份、精确停实例、切换指针、启动核验，失败回退指针
+  upgrade-status         查看上次切换的 from/to/备份/是否回滚过数据
+  rollback-install       只把二进制指针切回上一个安装（不恢复数据、不降 schema）
   doctor                 只读诊断 Node/ABI/SQLite/构建/根目录/实例/执行器
   recovery-status        只读列出恢复 marker/待重绑定/main 新授权接口状态（不发业务）
   recovery-inspect       调用 main /v1/recovery/inspect（本机只读观测，不是授权）
@@ -115,6 +119,9 @@ function commandSpecs() {
     'import-bundle': { ...COMMON, bundle: 'string' },
     restore: { ...COMMON, bundle: 'string', to: 'string', 'map-path': 'list' },
     rollback: { ...COMMON, bundle: 'string', target: 'string', last: 'boolean' },
+    upgrade: { ...COMMON, to: 'string', backup: 'string', 'no-backup': 'boolean', 'no-stop': 'boolean', recover: 'boolean', force: 'boolean' },
+    'upgrade-status': { ...COMMON },
+    'rollback-install': { ...COMMON, 'no-stop': 'boolean' },
     smoke: { ...COMMON },
   }
 }
@@ -178,13 +185,8 @@ async function main(argv) {
       human: [
         `first-run: ${result.status}`,
         `  config: ${result.configFile}`,
-        `  release: ${result.release.buildId ?? 'none'} (${result.release.reason})`,
-        ...(result.release.reason === 'release_missing_development'
-          ? ['  ! 源码/裸 app 目录没有安装清单，不会借用默认根；先 `pa build --install-root . --config-root <此根>`。']
-          : []),
-        ...(result.release.reason === 'unverified_source_build'
-          ? ['  ! 该 config root 的 release.json 不是从安装清单采纳的；发行用途请从 `<install>/bin/pa` 初始化。']
-          : []),
+        `  release: ${result.release.buildId ?? 'none'} (${result.release.reason}, provenance ${result.release.provenance})`,
+        ...(result.release.hint === undefined ? [] : [`  ! ${result.release.hint}`]),
         `  created roots: ${result.created.length ? result.created.join(', ') : 'none'}`,
         `  data: ${result.roots.data}`,
         `  executor: ${result.executor.available ? result.executor.version : 'not installed (native execution disabled)'}`,
@@ -354,6 +356,87 @@ async function main(argv) {
       human: `stop: ${result.status}${result.message ? ` — ${result.message}` : ''}`,
     })
     return EXIT.OK
+  }
+
+  if (command === 'upgrade') {
+    try {
+      if (values.recover === true) {
+        const result = await recoverSwitch({ installRoot, roots })
+        printResult({
+          json: json ? result : null,
+          human: [`upgrade --recover: ${result.status}`, ...(result.started ? [`  pid: ${result.started.pid}`, `  api: ${result.started.apiURL}`] : []), ...(result.reason ? [`  reason: ${result.reason}`] : [])].join('\n'),
+        })
+        return result.status === 'NO_OP' || result.status === 'RECOVERED' ? EXIT.OK : EXIT.DEGRADED
+      }
+      const result = await upgradeInstall({ installRoot, roots, values })
+      printResult({
+        json: json ? result : null,
+        human: [
+          `upgrade: ${result.status}`,
+          `  from: ${result.plan.from.buildId ?? 'none'} (schema ${result.plan.from.schema ?? 'unknown'})`,
+          `  to:   ${result.plan.to.buildId} (schema ${result.plan.to.schema ?? 'unknown'})`,
+          `  instance: ${result.started.apiURL} pid ${result.started.pid}`,
+          `  backup: ${result.backup === null ? 'skipped (explicit --no-backup)' : result.backup.path}`,
+          `  data: ${result.plan.to.schema !== result.plan.from.schema ? 'schema changed by the target on first start; not rolled back' : 'unchanged schema; post-upgrade records remain in place'}`,
+          `  journal: ${result.journalPath}`,
+        ].join('\n'),
+      })
+      return EXIT.OK
+    } catch (error) {
+      if (!(error instanceof UpgradeError)) throw error
+      printResult({
+        json: json ? { status: 'BLOCKED', code: error.code, message: error.message, detail: error.detail } : null,
+        human: [`upgrade: BLOCKED ${error.code}: ${error.message}`, `  ${JSON.stringify(error.detail ?? {})}`].join('\n'),
+      })
+      return EXIT.BLOCKED
+    }
+  }
+
+  if (command === 'upgrade-status') {
+    const journal = readJournal(roots.config)
+    const target = (() => {
+      try {
+        return values.to === undefined ? null : inspectTargetInstall(values.to).release.buildId
+      } catch (error) {
+        return error.code ?? 'target_invalid'
+      }
+    })()
+    const result = journal === null
+      ? { status: 'NONE', configRoot: roots.config }
+      : { status: journal.status, configRoot: roots.config, from: journal.from, to: journal.to, switchedAt: journal.switchedAt, confirmedAt: journal.confirmedAt ?? null, backup: journal.backup ?? null, dataRolledBack: journal.dataRolledBack === true, previousReleasePath: journal.previousReleasePath ?? null, ...(target === null ? {} : { targetCheck: target }) }
+    printResult({
+      json: json ? result : null,
+      human: [
+        `upgrade-status: ${result.status}`,
+        ...(result.from ? [`  from: ${result.from.buildId} (schema ${result.from.schema})`, `  to:   ${result.to.buildId} (schema ${result.to.schema})`] : []),
+        ...(result.backup ? [`  backup: ${result.backup.path}`] : []),
+        ...(result.dataRolledBack ? ['  data rolled back: yes'] : ['  data rolled back: no']),
+      ].join('\n'),
+    })
+    return journal === null ? EXIT.DEGRADED : EXIT.OK
+  }
+
+  if (command === 'rollback-install') {
+    try {
+      const result = await rollbackInstall({ installRoot, roots, values })
+      printResult({
+        json: json ? result : null,
+        human: [
+          `rollback-install: ${result.status}`,
+          `  from: ${result.from ?? 'unknown'} -> ${result.to ?? 'unknown'}`,
+          '  仅切换二进制指针；不恢复备份、不降 schema、不删除升级后数据。',
+          `  ${result.note}`,
+        ].join('\n'),
+      })
+      return EXIT.OK
+    } catch (error) {
+      if (!(error instanceof UpgradeError)) throw error
+      printResult({
+        json: json ? { status: 'BLOCKED', code: error.code, message: error.message, detail: error.detail } : null,
+        human: [`rollback-install: BLOCKED ${error.code}: ${error.message}`].join('\n'),
+      })
+      return EXIT.BLOCKED
+    }
   }
 
   if (command === 'backup') {

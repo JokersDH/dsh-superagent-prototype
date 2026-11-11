@@ -1,0 +1,121 @@
+{
+  "case": "WAVE07-BINARY-UPGRADE",
+  "status": "PASS",
+  "startedAt": "2026-11-11T06:57:30.329Z",
+  "sections": {
+    "installs": {
+      "status": "PASS",
+      "detail": {
+        "baseline": {
+          "buildId": "7e8f6ce6fa2e2633",
+          "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+          "schema": 13,
+          "tarFamily": "wave06-alpha2"
+        },
+        "target": {
+          "buildId": "3e86f833ba5408fe",
+          "commit": "c9a06987fe73909374f492d7d146b3e7e955da07",
+          "schema": 13
+        },
+        "sourceDistinct": true
+      }
+    },
+    "A-baseline-state": {
+      "status": "PASS",
+      "detail": {
+        "buildId": "7e8f6ce6fa2e2633",
+        "evidenceDigest": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
+        "artifactDigest": "d690795d9b0136f3f35f6bd99f5c8a9ddc55757dd0706b8c2eb2401369fc7ba2",
+        "backup": "ca9d7a2e920d0f476bb9891c88af01983888b301ea4d2d33d820cd7eb720669c"
+      }
+    },
+    "B-binary-switch": {
+      "status": "PASS",
+      "detail": {
+        "from": "7e8f6ce6fa2e2633",
+        "to": "3e86f833ba5408fe",
+        "stopped": "STOPPED",
+        "backup": {
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave07-upgrade-YGb2CJ/switch-backup.pab",
+          "sha256": "099fd6ba57b3c4dd902a52dfc3168df4901ca63398661a2d469092f67d24784d"
+        },
+        "instance": {
+          "pid": 16948,
+          "buildId": "3e86f833ba5408fe"
+        },
+        "evidenceDigestBefore": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
+        "evidenceDigestAfter": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
+        "dataRolledBack": false
+      }
+    },
+    "C-post-upgrade-data-protection": {
+      "status": "PASS",
+      "detail": {
+        "postUpgradeEvidence": "30cfa6ab40133336ef99f29f334f5f9f6854cd9bae283c50cb2dabd5185a3ee9",
+        "binaryRollback": {
+          "pointer": "7e8f6ce6fa2e2633",
+          "dataRolledBack": false
+        },
+        "schemaCompatibleBothWays": true,
+        "postUpgradeDataIntact": true,
+        "note": "Both builds use schema 13, so the older binary still reads the newer records; this is a binary-only rollback, never a data rollback."
+      }
+    },
+    "D-incompatible-binary-refusal": {
+      "status": "PASS",
+      "detail": {
+        "olderBinary": "d4eb3a13f4904d2d",
+        "code": "release_artifact_missing",
+        "schemaAfterRefusal": 13,
+        "stateUnchanged": true
+      }
+    },
+    "E1-tampered-target-refused": {
+      "status": "PASS",
+      "detail": {
+        "code": "target_tampered",
+        "instanceStillRunning": true
+      }
+    },
+    "E2-running-switch-refused": {
+      "status": "PASS",
+      "detail": {
+        "code": "upgrade_requires_stopped_instance"
+      }
+    },
+    "E3-unverified-instance-blocked": {
+      "status": "PASS",
+      "detail": {
+        "code": "instance_record_unverified",
+        "foreignProcessAlive": true
+      }
+    },
+    "E4-unhealthy-target-reverted": {
+      "status": "PASS",
+      "detail": {
+        "pointerAfterRevert": "7e8f6ce6fa2e2633",
+        "dataUntouched": true
+      }
+    },
+    "E5-interrupted-switch-recovered": {
+      "status": "PASS",
+      "detail": {
+        "status": "RECOVERED",
+        "buildId": "3e86f833ba5408fe"
+      }
+    },
+    "E6-duplicate-refused": {
+      "status": "PASS",
+      "detail": {
+        "code": "upgrade_already_applied"
+      }
+    }
+  },
+  "finishedAt": "2026-11-11T06:57:53.198Z",
+  "limitations": [
+    "Both D wave-07 artifacts use product schema 13, so the binary rollback check is compatibility-preserving; the incompatible-direction proof uses the frozen schema-12 wave-06 build.",
+    "Only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured; other platforms/ABIs are NOT_TESTED.",
+    "Reverting the install pointer is a binary rollback: data is never rolled back or deleted. Explicit `pa rollback --bundle`/`pa restore` is the only data-return path and preserves the original state.",
+    "No user service (5180-5185/8796-8801) was started or stopped; all roots/ports are isolated."
+  ]
+}

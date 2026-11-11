@@ -323,6 +323,28 @@ try {
     foreignInstall: foreign.json.code,
   })
 
+  // A fresh source checkout (no install inventory, no release) must stay runnable and must not claim
+  // provenance it does not have.
+  const sourceConfig = join(root, 'fresh-source-config')
+  mkdirSync(sourceConfig, { recursive: true, mode: 0o700 })
+  chmodSync(sourceConfig, 0o700)
+  const sourceFirstRun = runPa(['first-run', '--json', '--config-root', sourceConfig], { allowExit: [0] })
+  if (sourceFirstRun.json?.status !== 'OK' || sourceFirstRun.json.release?.reason !== 'release_missing_development')
+    throw new Error(`fresh source first-run did not report unverified provenance: ${JSON.stringify(sourceFirstRun.json).slice(0, 300)}`)
+  if (sourceFirstRun.json.release.provenance !== 'unverified' || sourceFirstRun.json.release.buildId !== null || sourceFirstRun.json.release.commit !== null)
+    throw new Error('fresh source first-run invented a build/source identity')
+  if (existsSync(join(sourceConfig, 'release.json'))) throw new Error('fresh source first-run wrote a release manifest')
+  const sourceDoctor = runPa(['doctor', '--json', '--config-root', sourceConfig], { allowExit: [0, 1, 2] })
+  const sourceBinding = sourceDoctor.json.checks.find((check) => check.id === 'release_binding')
+  if (sourceBinding?.status !== 'WARN' || sourceBinding.detail?.code !== 'release_missing')
+    throw new Error(`fresh source doctor did not warn about the missing binding: ${JSON.stringify(sourceBinding).slice(0, 240)}`)
+  step('source-first-run-unverified', 'PASS', {
+    reason: sourceFirstRun.json.release.reason,
+    provenance: sourceFirstRun.json.release.provenance,
+    binding: sourceBinding.status,
+    wroteRelease: false,
+  })
+
   const doctorBefore = runPa(['doctor', '--json', ...stateArgs()], { allowExit: [0, 1] })
   if (doctorBefore.json.checks.some((check) => check.status === 'FAIL')) throw new Error('doctor reported FAIL before start')
   step('doctor-before-start', 'PASS', { status: doctorBefore.json.status })
