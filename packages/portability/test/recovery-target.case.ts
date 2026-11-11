@@ -3,7 +3,7 @@
  * copied, and every write stays inside the constructor-configured trusted private parent.
  */
 import assert from 'node:assert/strict'
-import { chmodSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, linkSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -143,6 +143,25 @@ test('discardStaging removes only proven-owned staging, never an initialized tar
     await materializer.discardStaging('activation-1')
     assert.equal(existsSync(material.stateRoot), false)
   } finally { rmSync(parent, { recursive: true, force: true }) }
+})
+
+test('a symlinked target directory and a hard-linked manifest are refused', async () => {
+  const root = base()
+  const parent = privateDir(join(root, 'parent'))
+  try {
+    const materializer = new PortabilityRecoveryTargetMaterializer({ trustedParent: parent, productSchema: 15 })
+    const elsewhere = privateDir(join(root, 'elsewhere'))
+    const link = join(parent, 'activation-symlink')
+    symlinkSync(elsewhere, link)
+    await assert.rejects(() => materializer.prepare(preparation('activation-symlink')), (error: unknown) => error instanceof PortabilityError && error.code === 'target_exists')
+    const material = await materializer.prepare(preparation('activation-hardlink'))
+    const manifestPath = join(material.stateRoot, RECOVERY_TARGET_MANIFEST_FILE)
+    const copyPath = join(root, 'manifest-copy.json')
+    writeFileSync(copyPath, readFileSync(manifestPath))
+    unlinkSync(manifestPath)
+    linkSync(copyPath, manifestPath)
+    assert.throws(() => materializer.read(material.stateRoot), (error: unknown) => error instanceof PortabilityError && error.code === 'target_manifest_invalid')
+  } finally { rmSync(root, { recursive: true, force: true }) }
 })
 
 test('materialize refuses duplicate project mappings and empty configurations', async () => {

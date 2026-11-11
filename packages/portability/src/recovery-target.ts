@@ -211,6 +211,7 @@ export class PortabilityRecoveryTargetMaterializer {
     const stat = lstatSync(manifestPath)
     if (stat.isSymbolicLink() || !stat.isFile()) fail('target_manifest_invalid', 'The target material must be a regular file', { manifestPath })
     if ((stat.mode & 0o077) !== 0) fail('target_manifest_invalid', 'The target material must be private', { manifestPath, mode: (stat.mode & 0o777).toString(8) })
+    if (stat.nlink !== 1) fail('target_manifest_invalid', 'The target material must not be hard-linked', { manifestPath, links: stat.nlink })
     let parsed: Record<string, unknown>
     try { parsed = JSON.parse(readFileSync(manifestPath, 'utf8')) as Record<string, unknown> } catch (error) {
       return fail('target_manifest_invalid', 'The target material is not valid JSON', { manifestPath, cause: String(error) })

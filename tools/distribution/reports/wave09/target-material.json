@@ -1,0 +1,55 @@
+{
+  "protocol": "wave09-target-material-recipe/1",
+  "status": "PASS",
+  "durationMs": 4,
+  "trustedParent": "/tmp/w9-parent2",
+  "steps": [
+    {
+      "id": "parent-trusted",
+      "status": "PASS",
+      "detail": {
+        "trustedParent": "/tmp/w9-parent2",
+        "mode": "700"
+      }
+    },
+    {
+      "id": "prepare-manifest-only",
+      "status": "PASS",
+      "detail": {
+        "stateRoot": "/tmp/w9-parent2/activation-wave09-recipe",
+        "manifestDigest": "sha256:15ecc6c8e433e9720fa1a745501dd224675efaa19a29cd09a837d71627a1d95d",
+        "entries": [
+          "recovery-target.json"
+        ]
+      }
+    },
+    {
+      "id": "readback",
+      "status": "PASS",
+      "detail": {
+        "productSchema": 15,
+        "startupAvailable": false
+      }
+    },
+    {
+      "id": "repeat-idempotent",
+      "status": "PASS",
+      "detail": {}
+    },
+    {
+      "id": "inventory-reader-unavailable",
+      "status": "SKIPPED",
+      "detail": {
+        "reason": "INVENTORY_READER_UNAVAILABLE",
+        "requirement": "A-owned RecoveryTargetInventoryReader.inspect(stateRoot) must be implemented and integrated by main; D does not fabricate an inventory."
+      }
+    },
+    {
+      "id": "discard-staging",
+      "status": "PASS",
+      "detail": {
+        "removed": true
+      }
+    }
+  ]
+}

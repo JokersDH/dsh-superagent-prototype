@@ -1,0 +1,219 @@
+{
+  "protocol": "wave09-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "50c3471",
+  "mergedMain": "e4095b9",
+  "head": "b295504",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate; not main/E admission. Model calls 0; user services 5180-5186/8796-8802 untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "unknownNativeSends": 0
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "upgrade/recover/rollback account for every registered resource (launcher, API child, console listener, descendants) including orphans after the launcher died. A live process not provable as this config/data/target identity is unknown_live_resource and blocks; unmatched candidates are never filtered into an empty proven set. Spawn trees match canonical paths, start identity and whole-segment tokens; unreaped zombies are not writers.",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs",
+        "apps/launcher/test/upgrade-resources.case.mjs",
+        "tools/distribution/reports/wave09/binary-upgrade.json"
+      ],
+      "sections": {
+        "E3": "PASS",
+        "E10": "PASS",
+        "E11": "PASS"
+      }
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "Spawn identity (pid+start) is persisted in the journal immediately after spawn and before health; recovery stops the persisted tree even without an instance record. The record-missing window is real (target suppresses the record via the injected PA_SUPPRESS_INSTANCE_RECORD env, answers health, then cleanup proves the stop before reverting). A coordinator-exit fault stops the tree after health. Settled journal states (confirmed/binary_rolled_back/reverted) allow a new operation; an unsettled journal refuses re-entry before planning with upgrade_recover_required, and doctor reports the single next action.",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs",
+        "apps/launcher/lib/start.mjs",
+        "apps/launcher/lib/doctor.mjs",
+        "tools/distribution/reports/wave09/binary-upgrade.json"
+      ],
+      "sections": {
+        "E7": "PASS",
+        "E8": "PASS",
+        "E9": "PASS",
+        "E12": "PASS"
+      }
+    },
+    "d3": {
+      "status": "PASS_WITH_INVENTORY_HANDOFF",
+      "summary": "PortabilityRecoveryTargetMaterializer implements prepare/read/discardStaging: trusted private parent fixed at construction (absolute, 0700, current user, not symlink), strict recovery-activation-commit/1 source with matching receipt command, unique project mappings, manifest-only target (no DB/queue/session/credential), canonical digest readback, symlink/hardlink/permission/identity refusals, idempotent repeat, staging-only discard that refuses any initialized target. startupAvailable is always false; no process is started.",
+      "evidence": [
+        "packages/portability/src/recovery-target.ts",
+        "packages/portability/test/recovery-target.case.ts",
+        "tools/distribution/reports/wave09/target-material.json"
+      ],
+      "inventory": {
+        "status": "INVENTORY_READER_UNAVAILABLE",
+        "requirement": "A-owned RecoveryTargetInventoryReader.inspect(stateRoot) is not integrated in this checkout; the recipe records SKIPPED instead of inventing emptiness."
+      }
+    },
+    "d4": {
+      "status": "PARTIAL_BLOCKED_READER_AND_ACTIVATION",
+      "summary": "D provides the callable materializer and an independent recipe. Combining with the real A inventory reader and main committed-source/resource re-read is not possible yet: the reader is absent from main and recovery target commit/start remains unimplemented. The recipe refuses to claim activation from a manifest, directory name or empty table.",
+      "evidence": [
+        "tools/distribution/verify-target-material.mjs",
+        "tools/distribution/reports/wave09/target-material.json"
+      ],
+      "blockedBy": [
+        "A RecoveryTargetInventoryReader integration",
+        "main recovery target commit/start"
+      ]
+    },
+    "d5": {
+      "status": "PASS",
+      "summary": "A wave-09 target was built from the pushed clean D head b295504 (source.dirty=false, 6658 files) and frozen: build 5db9a0d41924a4c6, schema 15, sha256 eaf05420491b3a7fba584584c24e02f4ba2c1ac48c86aa8f1cd377c9b4f3d364. Cold start, config roots, managed upgrade/recover/rollback, exact schema refusal (old binary refuses newer state; new build preflight state_schema_newer_than_binary) and post-upgrade data preservation are measured; it is not presented as the old schema13/5d4065b pair.",
+      "evidence": [
+        "tools/distribution/reports/wave09/artifacts.json",
+        "tools/distribution/reports/wave09/binary-upgrade.json",
+        "tools/distribution/reports/wave09/artifact-upgrade-acceptance.json"
+      ]
+    },
+    "d6": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "E recipe covers true managed upgrade/--recover/rollback-install (not two starts on one state), terminal journal semantics, failure windows E1-E12, full input tuple and cleanup rules. D ran it against the frozen tars: 17/17 PASS; schema-change E recipe 9/9 PASS. Independent E acceptance remains pending.",
+      "evidence": [
+        "tools/distribution/recipes/wave09-e-target-upgrade.zh-CN.md",
+        "tools/distribution/reports/wave09/binary-upgrade.json",
+        "tools/distribution/reports/wave09/artifact-upgrade-acceptance.json"
+      ]
+    }
+  },
+  "artifacts": {
+    "baseline": {
+      "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "buildId": "7e8f6ce6fa2e2633",
+      "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "schema": 13
+    },
+    "target": {
+      "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave09-target/wave09-target-b295504.tar.gz",
+      "sha256": "eaf05420491b3a7fba584584c24e02f4ba2c1ac48c86aa8f1cd377c9b4f3d364",
+      "buildId": "5db9a0d41924a4c6",
+      "commit": "b29550421f5bc40aad5e5a5e1d25ffa02453f7a2",
+      "schema": 15
+    }
+  },
+  "testLayers": {
+    "launcher": {
+      "tests": 56,
+      "status": "PASS"
+    },
+    "portability": {
+      "tests": 49,
+      "status": "PASS"
+    },
+    "smoke": {
+      "steps": 52,
+      "status": "PASS"
+    },
+    "binaryUpgrade": {
+      "sections": 17,
+      "status": "PASS",
+      "sectionStatus": {
+        "installs": "PASS",
+        "A-baseline-state": "PASS",
+        "B-binary-switch": "PASS",
+        "C-post-upgrade-data-protection": "PASS",
+        "D-exact-schema-refusal": "PASS",
+        "E1-tampered-target-refused": "PASS",
+        "E2-running-switch-refused": "PASS",
+        "E3-unverified-instance-blocked": "PASS",
+        "E4-unhealthy-target-reverted": "PASS",
+        "E5-interrupted-switch-recovered": "PASS",
+        "E6-duplicate-refused": "PASS",
+        "E7-stop-unproven-kept": "PASS",
+        "E8-crash-after-stop-restarts-previous": "PASS",
+        "E9-record-missing-reverted": "PASS",
+        "E10-orphan-api-stopped": "PASS",
+        "E11-unknown-live-blocked": "PASS",
+        "E12-reentry-refused-until-recover": "PASS"
+      }
+    },
+    "artifactUpgrade": {
+      "steps": 9,
+      "status": "PASS"
+    },
+    "targetMaterial": {
+      "steps": 6,
+      "status": "PASS",
+      "skipped": [
+        "inventory-reader-unavailable"
+      ]
+    }
+  },
+  "blockers": [
+    {
+      "id": "A-INVENTORY-READER",
+      "owner": "A/main",
+      "status": "PENDING",
+      "summary": "No RecoveryTargetInventoryReader in main; D recipe records the gap instead of an empty-table claim."
+    },
+    {
+      "id": "MAIN-RECOVERY-ACTIVATION",
+      "owner": "main",
+      "status": "PLANNED",
+      "summary": "Source receipts/audit only; committed target activation and startup remain unimplemented."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E must run the wave-09 managed recipe from its own root against the frozen tars."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Personal mode is preserved by record/health checks; a real personal billed turn was not started (zero-model rule)."
+    },
+    {
+      "id": "SCHEMA-CHANGING-DATA-MIGRATION-CLAIM",
+      "owner": "D/A",
+      "status": "NOT_TESTED",
+      "summary": "Measured: 13->15 migration on target start with business rows preserved and old-binary exact refusal. Broader migration compatibility is A/main scope."
+    }
+  ],
+  "notTested": [
+    "cross-machine/other platform or ABI",
+    "personal native end-to-end or billed execution",
+    "SIGKILL at every individual step",
+    "E independent acceptance",
+    "recovery target activation/startup (main)",
+    "A inventory reader integration"
+  ],
+  "eConsumption": [
+    "Use tools/distribution/reports/wave09/artifacts.json tuples (tar+sha256+source+build+schema); do not use the checkout or the old wave-08 schema13 pair.",
+    "Run verify-upgrade-artifact.mjs --schema-change with both tars/sha256 from a fresh root: expect 9/9 PASS.",
+    "Run smoke-binary-upgrade.mjs with both installs (or --baseline-tar) for the 17 managed consistency/failure windows.",
+    "Do not relax digest checks, delete markers, hand-edit release.json, or claim activation/personal billed/native from these results."
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave09/artifacts.json",
+    "tools/distribution/reports/wave09/binary-upgrade.json",
+    "tools/distribution/reports/wave09/artifact-upgrade-acceptance.json",
+    "tools/distribution/reports/wave09/target-material.json",
+    "tools/distribution/reports/wave09/zero-model-smoke.json",
+    "tools/distribution/recipes/wave09-e-target-upgrade.zh-CN.md",
+    "docs/rfcs/WP-16/0032-wave-09-d-target-and-upgrade.zh-CN.md"
+  ],
+  "preservedHistory": [
+    "wave-05/06/07/08 evidence and budgets unchanged",
+    "old wave-06/08 tars preserved",
+    "no shared contract/migration/root lock/E assertion modified"
+  ]
+}

@@ -27,6 +27,7 @@ const { values } = parseArgs({
     'baseline-sha256': { type: 'string' },
     'target-sha256': { type: 'string' },
     'work-root': { type: 'string' },
+    'schema-change': { type: 'boolean', default: false },
     json: { type: 'boolean', default: false },
   },
 })
@@ -34,7 +35,8 @@ if (values['baseline-tar'] === undefined || values['target-tar'] === undefined) 
   process.stderr.write('verify-upgrade-artifact 需要 --baseline-tar 与 --target-tar\n')
   process.exit(3)
 }
-const evidence = { case: 'WAVE07-ARTIFACT-UPGRADE', status: 'FAIL', startedAt: new Date().toISOString(), steps: [] }
+const schemaChange = values['schema-change'] === true
+const evidence = { case: schemaChange ? 'WAVE09-ARTIFACT-UPGRADE' : 'WAVE07-ARTIFACT-UPGRADE', status: 'FAIL', startedAt: new Date().toISOString(), steps: [] }
 const step = (id, status, detail) => {
   evidence.steps.push({ id, status, ...(detail === undefined ? {} : { detail }) })
   if (values.json !== true) process.stderr.write(`${status} ${id}${detail === undefined ? '' : ` ${JSON.stringify(detail).slice(0, 200)}`}\n`)
@@ -183,11 +185,19 @@ async function main() {
   const afterSwitchBackup = join(workRoot, 'after-switch.pab')
   const afterSwitch = run(targetCli, ['backup', '--json', '--out', afterSwitchBackup, ...stateArgs({ ...roots, install: join(target.installDir, 'app') })], { allowExit: [0] })
   const evidenceAfter = afterSwitch.json?.evidence?.digest ?? null
-  if (evidenceAfter !== evidenceBefore) throw new Error(`the binary switch changed business evidence: ${evidenceBefore} != ${evidenceAfter}`)
+  if (schemaChange) {
+    // A schema-changing target migrates metadata on first start; business rows must survive, and an
+    // empty target must stay empty. The raw evidence digest is not comparable across schemas.
+    const afterSwitchSchema = afterSwitch.json?.evidence?.productSchema ?? null
+    const baselineSchema = baseline.manifest.producer?.productSchema ?? null
+    if (afterSwitchSchema === null || afterSwitchSchema === baselineSchema)
+      throw new Error(`--schema-change was requested but the state schema did not change (${baselineSchema} -> ${afterSwitchSchema})`)
+    step('schema-migration-observed', 'PASS', { baselineSchema, afterSchema: afterSwitchSchema, evidenceBefore, evidenceAfter })
+  } else if (evidenceAfter !== evidenceBefore) throw new Error(`the binary switch changed business evidence: ${evidenceBefore} != ${evidenceAfter}`)
   step('binary-switch', 'PASS', {
     from: baseline.manifest.buildId, to: target.manifest.buildId,
     stopped: switched.json.stopped?.status ?? null, backup: switched.json.backup?.sha256 ?? null,
-    instanceBuildId: record.buildId, evidenceDigest: evidenceAfter, evidenceUnchanged: true,
+    instanceBuildId: record.buildId, evidenceDigest: evidenceAfter, evidenceUnchanged: !schemaChange,
   })
 
   const postDoctor = run(targetCli, ['doctor', '--json', ...stateArgs({ ...roots, install: join(target.installDir, 'app') })], { allowExit: [0, 1] })
@@ -203,29 +213,60 @@ async function main() {
   const rollback = run(targetCli, ['rollback-install', '--json', ...stateArgs({ ...roots, install: join(target.installDir, 'app') })], { allowExit: [0] })
   if (rollback.json?.status !== 'BINARY_ROLLED_BACK' || rollback.json.dataRolledBack !== false)
     throw new Error('rollback-install did not report a binary-only rollback')
-  // `pa start` supervises until stopped, so the instance is spawned detached like a real restart.
-  const restartConsole = await freePort()
-  let restartApi = await freePort()
-  if (restartApi === restartConsole) restartApi = await freePort()
-  const restartOut = openSync(join(workRoot, 'start-baseline-after-rollback.out.log'), 'w', 0o600)
-  const restartErr = openSync(join(workRoot, 'start-baseline-after-rollback.err.log'), 'w', 0o600)
-  const restarted = spawn(baselineCli, ['start', '--fixture', '--port', String(restartConsole), '--api-port', String(restartApi), ...stateArgs(roots)], {
-    cwd: baseline.installDir, stdio: ['ignore', restartOut, restartErr], detached: true,
-  })
-  restarted.unref()
-  closeSync(restartOut)
-  closeSync(restartErr)
-  const afterRollback = await waitForInstance(roots.config, baseline.manifest.buildId)
-  const afterRollbackBackup = join(workRoot, 'after-rollback.pab')
-  const afterRollbackEvidence = run(baselineCli, ['backup', '--json', '--out', afterRollbackBackup, ...stateArgs(roots)], { allowExit: [0] })
-  if (afterRollbackEvidence.json?.evidence?.digest !== evidenceBefore)
-    throw new Error('the binary rollback changed or lost business evidence')
-  run(baselineCli, ['stop', '--json', ...stateArgs(roots)], { allowExit: [0] })
-  step('binary-rollback-no-data-loss', 'PASS', {
-    pointer: baseline.manifest.buildId, instanceBuildId: afterRollback.buildId,
-    dataRolledBack: false, evidenceDigest: afterRollbackEvidence.json.evidence.digest, evidenceUnchanged: true,
-    note: 'Binary-only rollback: the state directory and any post-upgrade rows stay in place.',
-  })
+  const pointerAfterRollback = JSON.parse(readFileSync(join(roots.config, 'release.json'), 'utf8')).buildId
+  if (pointerAfterRollback !== baseline.manifest.buildId) throw new Error('binary rollback did not restore the baseline pointer')
+
+  if (schemaChange) {
+    // The older binary must refuse the newer state without writing anything; the pointer stays at the
+    // baseline and the data is untouched. The executable cannot be restarted by design, so re-switch
+    // to the compatible target is the only supported way to run on this state again.
+    const restartConsole = await freePort()
+    let restartApi = await freePort()
+    if (restartApi === restartConsole) restartApi = await freePort()
+    const oldStartOut = openSync(join(workRoot, 'start-old-after-rollback.out.log'), 'w', 0o600)
+    const oldStartErr = openSync(join(workRoot, 'start-old-after-rollback.err.log'), 'w', 0o600)
+    spawn(baselineCli, ['start', '--fixture', '--port', String(restartConsole), '--api-port', String(restartApi), ...stateArgs(roots)], {
+      cwd: baseline.installDir, stdio: ['ignore', oldStartOut, oldStartErr], detached: true,
+    }).unref()
+    closeSync(oldStartOut)
+    closeSync(oldStartErr)
+    await new Promise((r) => setTimeout(r, 3000))
+    if (existsSync(join(roots.config, 'instance.json'))) throw new Error('the older binary started on a newer schema instead of refusing')
+    const oldLogs = readdirSync(roots.logs).filter((name) => name.endsWith('.log')).map((name) => join(roots.logs, name))
+    const refused = oldLogs.some((path) => /MigrationIntegrityError: Applied migration \d+ is not registered in this build/.test(readFileSync(path, 'utf8')))
+    if (!refused) throw new Error('the older binary did not record the exact schema refusal')
+    step('old-binary-schema-refusal', 'PASS', { pointer: pointerAfterRollback, instanceRecord: false, exactStorageRefusal: true })
+
+    const back = run(targetCli, ['upgrade', '--json', '--to', target.installDir, '--backup', join(workRoot, 'reswitch.pab'), ...stateArgs({ ...roots, install: join(target.installDir, 'app') })], { allowExit: [0], timeout: 600_000 })
+    if (back.json?.status !== 'CONFIRMED') throw new Error(`re-switch to the compatible target did not confirm: ${JSON.stringify(back.json).slice(0, 300)}`)
+    const backRecord = await waitForInstance(roots.config, target.manifest.buildId)
+    const backHealth = await fetch(`${backRecord.apiURL}/v1/health`, { signal: AbortSignal.timeout(3000) }).catch(() => null)
+    if (backHealth?.ok !== true) throw new Error('re-switched target is not healthy')
+    run(targetCli, ['stop', '--json', ...stateArgs({ ...roots, install: join(target.installDir, 'app') })], { allowExit: [0] })
+    step('reswitch-compatible-target', 'PASS', { pointer: target.manifest.buildId, instanceBuildId: backRecord.buildId })
+  } else {
+    // `pa start` supervises until stopped, so the instance is spawned detached like a real restart.
+    const restartConsole = await freePort()
+    let restartApi = await freePort()
+    if (restartApi === restartConsole) restartApi = await freePort()
+    const restartOut = openSync(join(workRoot, 'start-baseline-after-rollback.out.log'), 'w', 0o600)
+    const restartErr = openSync(join(workRoot, 'start-baseline-after-rollback.err.log'), 'w', 0o600)
+    spawn(baselineCli, ['start', '--fixture', '--port', String(restartConsole), '--api-port', String(restartApi), ...stateArgs(roots)], {
+      cwd: baseline.installDir, stdio: ['ignore', restartOut, restartErr], detached: true,
+    }).unref()
+    closeSync(restartOut)
+    closeSync(restartErr)
+    const afterRollback = await waitForInstance(roots.config, baseline.manifest.buildId)
+    const afterRollbackEvidence = run(baselineCli, ['backup', '--json', '--out', join(workRoot, 'after-rollback.pab'), ...stateArgs(roots)], { allowExit: [0] })
+    if (afterRollbackEvidence.json?.evidence?.digest !== evidenceBefore)
+      throw new Error('the binary rollback changed or lost business evidence')
+    run(baselineCli, ['stop', '--json', ...stateArgs(roots)], { allowExit: [0] })
+    step('binary-rollback-no-data-loss', 'PASS', {
+      pointer: baseline.manifest.buildId, instanceBuildId: afterRollback.buildId,
+      dataRolledBack: false, evidenceDigest: afterRollbackEvidence.json.evidence.digest, evidenceUnchanged: true,
+      note: 'Binary-only rollback: the state directory and any post-upgrade rows stay in place.',
+    })
+  }
 
   evidence.status = evidence.steps.every((entry) => entry.status === 'PASS') ? 'PASS' : 'PARTIAL'
 }
@@ -248,7 +289,9 @@ try {
   }
   evidence.finishedAt = new Date().toISOString()
   evidence.limitations = [
-    'Both wave-07 artifacts use product schema 13; this recipe proves install/switch/rollback mechanics, not a schema migration.',
+    schemaChange
+      ? 'The two artifacts use different product schemas; the switch migrates the state, the older binary refuses it after a binary-only rollback, and only the compatible target can run on it again.'
+      : 'Both artifacts use one product schema; this recipe proves install/switch/rollback mechanics, not a schema migration.',
     'It does not seed business rows (product commands are main-owned); post-upgrade row preservation is covered by D smoke with its own harness.',
     'darwin/arm64 + Node 24.21.x + SQLite ABI 137 only; other platforms/ABIs are NOT_TESTED.',
     'A tar without its published sha256 cannot be attributed to a source commit; pass --baseline-sha256/--target-sha256.',
