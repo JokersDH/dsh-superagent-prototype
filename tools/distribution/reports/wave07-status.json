@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "d4d51ae",
   "mergedMain": "436dc02",
-  "head": "5adf00b",
+  "head": "76f26a6",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate evidence. Not main/E admission, not installed-alpha. Recovery activation commit is main-owned and still unpublished; binary switching is measured only for the two frozen artifacts below.",
   "ownedPaths": [
@@ -22,7 +22,7 @@
     "wave06Final": "4a0ea7f",
     "wave07CheckpointD1": "c9a0698",
     "wave07CheckpointD2D3": "5adf00b",
-    "wave07Final": "5adf00b"
+    "wave07Final": "76f26a6"
   },
   "phases": {
     "d1": {
@@ -36,7 +36,7 @@
     },
     "d2": {
       "status": "PASS",
-      "summary": "Two frozen installs from two different clean commits: baseline wave06-alpha2 (build 7e8f6ce6fa2e2633, source e10bfdb, 6603 files) and target wave07-target (build 3e7f046e03f2ce5d, source 5adf00b, 6627 files). Both source.dirty=false, out of Git, schema 13, darwin/arm64 + Node 24.21.x + SQLite ABI 137. Digests/dependency closures recorded; tag-only rebuild is not used as evidence.",
+      "summary": "Two frozen installs from two different clean commits: baseline wave06-alpha2 (build 7e8f6ce6fa2e2633, source e10bfdb, 6603 files) and target wave07-target (build 9120a5ed858e0feb, source 76f26a6, 6629 files). Both source.dirty=false, out of Git, schema 13, darwin/arm64 + Node 24.21.x + SQLite ABI 137. Digests/dependency closures recorded; tag-only rebuild is not used as evidence.",
       "evidence": [
         "tools/distribution/reports/wave07/artifacts.json"
       ],
@@ -49,11 +49,11 @@
           "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389"
         },
         "target": {
-          "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave07-target/wave07-target-3e7f046e.tar.gz",
-          "sha256": "c5ea704faf8a8b8766982757757c2fab2b76ac7b4f9008fe9948b9db147f2e02",
-          "bytes": 19952444,
-          "buildId": "3e7f046e03f2ce5d",
-          "commit": "5adf00b100431bcd923a867e1f62c78999359392"
+          "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave07-target2/wave07-target-9120a5ed.tar.gz",
+          "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912",
+          "bytes": 19960481,
+          "buildId": "9120a5ed858e0feb",
+          "commit": "76f26a66c0554f7294de98637198a01c3703e69a"
         }
       }
     },

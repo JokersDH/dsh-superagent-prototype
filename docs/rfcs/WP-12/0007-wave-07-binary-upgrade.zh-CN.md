@@ -27,10 +27,10 @@ portability）的发行、二进制切换与恢复消费证据，不是 main/E �
 
 | | baseline | target |
 | --- | --- | --- |
-| buildId | `7e8f6ce6fa2e2633` | `3e7f046e03f2ce5d` |
-| source | `e10bfdb`（wave-06 D head） | `5adf00b`（wave-07 D2/D3） |
-| 文件 / workspace 包 | 6603 / 21 | 6627 / 21 |
-| tar sha256 | `0fe0ed53…c7631` | `c5ea704f…2e02` |
+| buildId | `7e8f6ce6fa2e2633` | `9120a5ed858e0feb` |
+| source | `e10bfdb`（wave-06 D head） | `76f26a6`（wave-07 D 收口） |
+| 文件 / workspace 包 | 6603 / 21 | 6629 / 21 |
+| tar sha256 | `0fe0ed53…c7631` | `bbc13312…7912` |
 | 平台 / schema | darwin/arm64、schema 13、Node 24.21.x、ABI 137 | 同上 |
 
 两者均从 `source.dirty=false` 的干净提交构建，tar 与 install/release/closure 摘要、依赖闭包、平台矩阵记录在
@@ -55,7 +55,7 @@ portability）的发行、二进制切换与恢复消费证据，不是 main/E �
 6. **重复请求**：已运行目标 build 再升级 → `upgrade_already_applied`。
 
 实测（`tools/distribution/reports/wave07/binary-upgrade.json`，11 段全 PASS，冻结产物对）：切换
-`7e8f6ce6… → 3e7f046e…`；升级后写入的新 project/work/artifact 在**二进制回退**到 baseline 后仍可读，
+`7e8f6ce6… → 9120a5ed…`；升级后写入的新 project/work/artifact 在**二进制回退**到 baseline 后仍可读，
 证据摘要不变；schema-12 旧构建拒绝 schema-13 state（`release_artifact_missing`，状态字节/schema 不变）；
 tampered target、运行中切换、未验证活进程、目标不健康、切换后崩溃+恢复、重复升级各有独立负例。
 

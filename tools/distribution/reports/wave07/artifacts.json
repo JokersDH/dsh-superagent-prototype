@@ -1,6 +1,6 @@
 {
   "protocol": "wave07-d-artifacts/1",
-  "createdAt": "2026-11-11T07:40:33.702Z",
+  "createdAt": "2026-11-11T07:47:20.231Z",
   "modelCalls": 0,
   "note": "Two frozen distribution installs from two different clean source commits. Tag-only rebuilds are not used as upgrade evidence.",
   "baseline": {
@@ -111,9 +111,9 @@
   "target": {
     "format": "pa-install",
     "formatVersion": 1,
-    "buildId": "3e7f046e03f2ce5d",
+    "buildId": "9120a5ed858e0feb",
     "source": {
-      "commit": "5adf00b100431bcd923a867e1f62c78999359392",
+      "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
       "branch": "codex/g3-local-distribution",
       "dirty": false
     },
@@ -141,8 +141,8 @@
       "nativeBinding": "app/node_modules/better-sqlite3"
     },
     "files": {
-      "count": 6627,
-      "bytes": 66327108
+      "count": 6629,
+      "bytes": 66351726
     },
     "workspacePackages": 21,
     "dependencies": [
@@ -199,13 +199,13 @@
       "abi": "137"
     },
     "digests": {
-      "installManifestSha256": "05718486ad03a1c7c3d76373f451806857ceb08cdb107c25e976d8b02a12f4c3",
-      "releaseManifestSha256": "a682a026f1c378d2d0668aaca956f409a134c14498a5e04ad5555b024132e98f",
-      "closureDigest": "fde21a1c98dc74bea39ba3302b30afd70c3cc599eb42687085d6901fa7e38265",
-      "tarSha256": "c5ea704faf8a8b8766982757757c2fab2b76ac7b4f9008fe9948b9db147f2e02",
-      "tarBytes": 19952444
+      "installManifestSha256": "9a6ef28d40c29c89f23f9e3012903795da463f1ed2e224c35a47ed2cf6b8b10b",
+      "releaseManifestSha256": "35649d8ddb902f9ae20b69b89b5dcbe9f09cff502be53d2a967b913f0dc20d44",
+      "closureDigest": "75bab54dbd14f7028ab02fc9c22b2db16c9681d0841de5ade48e3b03b1483e90",
+      "tarSha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912",
+      "tarBytes": 19960481
     },
-    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave07-target/wave07-target-3e7f046e.tar.gz",
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave07-target2/wave07-target-9120a5ed.tar.gz",
     "commands": [
       "./bin/pa first-run",
       "./bin/pa doctor",
@@ -216,23 +216,23 @@
   "schema": {
     "baseline": 13,
     "target": 13,
-    "range": "schema 13 for both; the upgrade matrix for a different schema uses the separate wave-06 schema-12 artifact (control)"
+    "range": "schema 13 for both; a different-schema binary is refused (wave-06 schema-12 control), not migrated"
   },
   "differences": {
     "buildId": [
       "7e8f6ce6fa2e2633",
-      "3e7f046e03f2ce5d"
+      "9120a5ed858e0feb"
     ],
     "sourceCommit": [
       "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
-      "5adf00b100431bcd923a867e1f62c78999359392"
+      "76f26a66c0554f7294de98637198a01c3703e69a"
     ],
-    "artifactsTargetMinusBaseline": 24,
+    "artifactsTargetMinusBaseline": 26,
     "runtimePackagesTargetMinusBaseline": 0
   },
   "buildCommands": {
-    "baseline": "node tools/distribution/build.mjs --install-root <wave06 checkout e10bfdb> --config-root <dir> --output <install> (wave-06 run, source.dirty=false)",
-    "target": "node tools/distribution/build.mjs --install-root <repo at 5adf00b> --config-root <dir> --output <install> (source.dirty=false)"
+    "baseline": "node tools/distribution/build.mjs --install-root <wave06 checkout e10bfdb> --config-root <dir> --output <install> (source.dirty=false)",
+    "target": "node tools/distribution/build.mjs --install-root <repo at 76f26a6> --config-root <dir> --output <install> (source.dirty=false)"
   },
   "freezeCommand": "node tools/distribution/freeze-install.mjs --install <install> --artifact-dir <dir> --name <name>",
   "limitations": [

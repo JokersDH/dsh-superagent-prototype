@@ -1,7 +1,7 @@
 {
   "case": "WAVE07-ARTIFACT-UPGRADE",
   "status": "PASS",
-  "startedAt": "2026-11-11T07:37:54.274Z",
+  "startedAt": "2026-11-11T07:46:18.083Z",
   "steps": [
     {
       "id": "extract-verify",
@@ -13,13 +13,13 @@
           "files": 6603
         },
         "target": {
-          "buildId": "3e7f046e03f2ce5d",
-          "commit": "5adf00b100431bcd923a867e1f62c78999359392",
-          "files": 6627
+          "buildId": "9120a5ed858e0feb",
+          "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+          "files": 6629
         },
         "tarSha256": {
           "baseline": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
-          "target": "c5ea704faf8a8b8766982757757c2fab2b76ac7b4f9008fe9948b9db147f2e02"
+          "target": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
         }
       }
     },
@@ -35,7 +35,7 @@
       "id": "baseline-start-workbench",
       "status": "PASS",
       "detail": {
-        "api": "http://127.0.0.1:51075",
+        "api": "http://127.0.0.1:52068",
         "workbench": true,
         "openFilesSampled": 50
       }
@@ -44,7 +44,7 @@
       "id": "pre-upgrade-backup",
       "status": "PASS",
       "detail": {
-        "sha256": "86c210b5f6f3f8ddcfee9e04e6949dee0b977527a33e2f7b727dd33d2d099fac",
+        "sha256": "7ef6b7b7d9332d9353ea88aca46005c0d98f845551ee30550ebb51debfd5260d",
         "evidenceDigest": "e6a5a551209a7409021f3278fca7faf84951cfc6a1ec775123ec5bbc09ba383c"
       }
     },
@@ -53,10 +53,10 @@
       "status": "PASS",
       "detail": {
         "from": "7e8f6ce6fa2e2633",
-        "to": "3e7f046e03f2ce5d",
+        "to": "9120a5ed858e0feb",
         "stopped": "STOPPED",
-        "backup": "0b25bbd0825e24052f09ff889f8225e7d75ff015ce76bfd4217e7aa62afd49d0",
-        "instanceBuildId": "3e7f046e03f2ce5d",
+        "backup": "25c171aa05ab6ff2db9a275c5683fa3f042c1ad599331f259054bb5a15bf3687",
+        "instanceBuildId": "9120a5ed858e0feb",
         "evidenceDigest": "e6a5a551209a7409021f3278fca7faf84951cfc6a1ec775123ec5bbc09ba383c",
         "evidenceUnchanged": true
       }
@@ -84,7 +84,7 @@
       }
     }
   ],
-  "finishedAt": "2026-11-11T07:38:06.591Z",
+  "finishedAt": "2026-11-11T07:46:31.874Z",
   "limitations": [
     "Both wave-07 artifacts use product schema 13; this recipe proves install/switch/rollback mechanics, not a schema migration.",
     "It does not seed business rows (product commands are main-owned); post-upgrade row preservation is covered by D smoke with its own harness.",

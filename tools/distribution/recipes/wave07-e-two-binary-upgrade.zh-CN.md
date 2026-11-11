@@ -8,10 +8,10 @@
 | 角色 | 文件 | sha256 | buildId | source commit | schema |
 | --- | --- | --- | --- | --- | --- |
 | baseline | `/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz` | `0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631` | `7e8f6ce6fa2e2633` | `e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389` | 13 |
-| target | `/Users/hh/Desktop/joker/pa-artifacts/wave07-target/wave07-target-3e7f046e.tar.gz` | `c5ea704faf8a8b8766982757757c2fab2b76ac7b4f9008fe9948b9db147f2e02` | `3e7f046e03f2ce5d` | `5adf00b100431bcd923a867e1f62c78999359392` | 13 |
+| target | `/Users/hh/Desktop/joker/pa-artifacts/wave07-target/wave07-target-9120a5ed.tar.gz` | `bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912` | `9120a5ed858e0feb` | `76f26a66c0554f7294de98637198a01c3703e69a` | 13 |
 
 字节数、依赖闭包、workspace 包数、平台矩阵见 `tools/distribution/reports/wave07/artifacts.json`。
-两个 buildId/source 不同，且文件数相差 24；只改 tag 的重打包不作为证据。
+两个 buildId/source 不同，且文件数相差 26；只改 tag 的重打包不作为证据。
 
 ## 命令
 
