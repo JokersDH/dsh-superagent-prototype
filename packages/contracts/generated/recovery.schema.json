@@ -1,0 +1,490 @@
+{
+  "$defs": {
+    "RecoveryInspection": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "blockers": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "enum": [
+                  "not_restored",
+                  "marker_invalid",
+                  "restore_evidence_unknown",
+                  "source_scan_bounded",
+                  "historical_resources_need_revalidation",
+                  "artifact_missing_or_corrupt",
+                  "artifact_scan_bounded",
+                  "executor_unavailable",
+                  "authorization_not_implemented"
+                ],
+                "type": "string"
+              },
+              "detail": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "owner": {
+                "enum": [
+                  "main",
+                  "B",
+                  "D"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "owner",
+              "detail"
+            ],
+            "type": "object"
+          },
+          "maxItems": 32,
+          "readOnly": true,
+          "type": "array"
+        },
+        "commitAvailable": {
+          "const": false,
+          "type": "boolean"
+        },
+        "eventCursor": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "heldQueue": {
+          "additionalProperties": false,
+          "properties": {
+            "parked": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "waiting": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "waiting",
+            "parked"
+          ],
+          "type": "object"
+        },
+        "historicalAttempts": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "attemptId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "proof": {
+                "const": "needs_fresh_revalidation",
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "active",
+                  "stopping",
+                  "ended"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "attemptId",
+              "state",
+              "proof"
+            ],
+            "type": "object"
+          },
+          "maxItems": 1024,
+          "readOnly": true,
+          "type": "array"
+        },
+        "inspectionFingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "markerDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "productSchema": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "projects": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "displayName": {
+                "maxLength": 160,
+                "minLength": 1,
+                "type": "string"
+              },
+              "id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "displayName"
+            ],
+            "type": "object"
+          },
+          "maxItems": 128,
+          "readOnly": true,
+          "type": "array"
+        },
+        "protocol": {
+          "const": "recovery-inspection/1",
+          "type": "string"
+        },
+        "sourceScanTruncated": {
+          "type": "boolean"
+        },
+        "sourceWorksScanned": {
+          "maximum": 200,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "state": {
+          "enum": [
+            "normal",
+            "recovery_readonly"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "state",
+        "observedAt",
+        "inspectionFingerprint",
+        "markerDigest",
+        "productSchema",
+        "eventCursor",
+        "heldQueue",
+        "sourceWorksScanned",
+        "sourceScanTruncated",
+        "projects",
+        "historicalAttempts",
+        "blockers",
+        "commitAvailable"
+      ],
+      "type": "object"
+    },
+    "RecoveryPlan": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "artifactScanTruncated": {
+          "type": "boolean"
+        },
+        "artifactsChecked": {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "authorization": {
+          "const": "not_granted",
+          "type": "string"
+        },
+        "bindings": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "configurationDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "headCommit": {
+                "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$",
+                "type": "string"
+              },
+              "path": {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              },
+              "proposedProjectId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "scopeDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "sourceProjectId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "sourceProjectId",
+              "proposedProjectId",
+              "path",
+              "headCommit",
+              "configurationDigest",
+              "scopeDigest"
+            ],
+            "type": "object"
+          },
+          "maxItems": 20,
+          "readOnly": true,
+          "type": "array"
+        },
+        "blockers": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "enum": [
+                  "not_restored",
+                  "marker_invalid",
+                  "restore_evidence_unknown",
+                  "source_scan_bounded",
+                  "historical_resources_need_revalidation",
+                  "artifact_missing_or_corrupt",
+                  "artifact_scan_bounded",
+                  "executor_unavailable",
+                  "authorization_not_implemented"
+                ],
+                "type": "string"
+              },
+              "detail": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "owner": {
+                "enum": [
+                  "main",
+                  "B",
+                  "D"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "owner",
+              "detail"
+            ],
+            "type": "object"
+          },
+          "maxItems": 32,
+          "readOnly": true,
+          "type": "array"
+        },
+        "commitAvailable": {
+          "const": false,
+          "type": "boolean"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "executor": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "executableDigest": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "profileId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "revision": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991,
+                  "type": "integer"
+                },
+                "version": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "profileId",
+                "revision",
+                "version",
+                "executableDigest"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expiresAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "inspectionFingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "planId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "recovery-plan/1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "planId",
+        "inspectionFingerprint",
+        "createdAt",
+        "expiresAt",
+        "bindings",
+        "executor",
+        "artifactsChecked",
+        "artifactScanTruncated",
+        "blockers",
+        "authorization",
+        "commitAvailable"
+      ],
+      "type": "object"
+    },
+    "RecoveryPrepare": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "bindings": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "project": {
+                "additionalProperties": false,
+                "properties": {
+                  "check": {
+                    "enum": [
+                      "node_test",
+                      "pnpm_test",
+                      "npm_test"
+                    ],
+                    "type": "string"
+                  },
+                  "displayName": {
+                    "maxLength": 160,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "environment": {
+                    "oneOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "policy": {
+                            "const": "existing_only",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "policy"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "policy": {
+                            "const": "offline_install",
+                            "type": "string"
+                          },
+                          "storeDir": {
+                            "maxLength": 4096,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "policy",
+                          "storeDir"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "path": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "check"
+                ],
+                "type": "object"
+              },
+              "sourceProjectId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "sourceProjectId",
+              "project"
+            ],
+            "type": "object"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "readOnly": true,
+          "type": "array"
+        },
+        "expectedFingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "expectedFingerprint",
+        "bindings"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:recovery-inspection:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
