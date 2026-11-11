@@ -454,6 +454,7 @@ async function execute() {
     if (!reservation.ok) throw Object.assign(new Error(String(reservation.reason)), { blocked: reservation.reason })
     const sent = await guardedSend({
       admission,
+      reservationId: reservation.reservation.turnId,
       prompt,
       cwd,
       sandbox,
@@ -462,7 +463,12 @@ async function execute() {
       ...(reportPath ? { outputSchemaPath: schemaPath, lastMessagePath: reportPath } : {}),
       timeoutMs: 180000,
     })
-    if (!sent.ok) throw Object.assign(new Error(String(sent.reason)), { blocked: sent.reason })
+    if (!sent.ok) {
+      // The turn may or may not have reached the runtime. Keep the reservation charged as unknown
+      // instead of refunding a send that cannot be proven absent.
+      const unknown = settleTurn({ turnId: reservation.reservation.turnId, usage: null, exit: sent.reason })
+      throw Object.assign(new Error(String(sent.reason)), { blocked: sent.reason, ledger: unknown?.state })
+    }
     const result = sent.result
     const cost = costOf(result.usage, pricing)
     const settled = settleTurn({

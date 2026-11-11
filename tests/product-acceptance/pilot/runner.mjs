@@ -1,8 +1,7 @@
-import { spawn } from 'node:child_process'
 import { createHash, randomUUID } from 'node:crypto'
 import { appendFileSync, existsSync, openSync, closeSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { digestOf } from './admission.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -91,6 +90,7 @@ function freshLedger() {
   }
 }
 
+const substantial = (value) => typeof value === 'string' && value.trim().length > 0
 const intAtLeast = (value, minimum) => Number.isSafeInteger(value) && value >= minimum
 const isFiniteNonNegative = (value) => typeof value === 'number' && Number.isFinite(value) && value >= 0
 
@@ -338,11 +338,14 @@ function settleTurnUnlocked({ turnId, usage, costUSD, sessionId, startedAt, ende
   if (!existing) return { state: 'UNKNOWN_TURN', reason: 'no_reservation' }
   if (existing.status !== 'in_flight') return { state: 'REPLAYED', data: ledger, replayed: true }
 
+  // A partial usage report (for example totalTokens only) is not enough to price a turn. Treat it
+  // as unknown instead of computing a cheap total from missing components.
   const usageValid =
     usage &&
     intAtLeast(usage.totalTokens, 0) &&
-    (usage.inputTokens === null || intAtLeast(usage.inputTokens, 0)) &&
-    (usage.outputTokens === null || intAtLeast(usage.outputTokens, 0))
+    ['inputTokens', 'cachedInputTokens', 'cacheWriteInputTokens', 'outputTokens', 'reasoningOutputTokens'].every(
+      (component) => intAtLeast(usage[component], 0),
+    )
   // A usable settlement needs a measured cost. Absent/NaN/Infinite cost is unknown, not free: the
   // reservation stays charged at its bound and sends stop.
   const costValid = typeof costUSD === 'number' && Number.isFinite(costUSD) && costUSD >= 0
@@ -441,79 +444,54 @@ function sessionOf(events) {
 }
 
 /**
- * Runs one turn through the single B-owned entry. E does not construct a CLI invocation, does not
- * look up a binary on PATH and has no fallback: the admitted descriptor supplies the command, and
- * the request is a versioned envelope written to stdin. Events are read from stdout JSONL.
+ * Sends one turn through B's own sender module. E does not spawn a command, does not know a
+ * transport, and has no fallback: the admitted descriptor names a module/export owned by B, and the
+ * sender must echo the reservation identity it was given. A missing/mismatched sender is refused.
  */
-function runEntryTurn({ entry, request, timeoutMs = 180000 }) {
-  return new Promise((resolvePromise) => {
-    if (!entry || entry.owner !== 'b' || !Array.isArray(entry.command) || entry.command.length === 0 || !isAbsolute(entry.command[0])) {
-      resolvePromise({ refused: 'entry_missing_or_invalid', exit: null, usage: null, sessionId: null, events: 0 })
-      return
-    }
-    const [command, ...args] = entry.command
-    if (!existsSync(command)) {
-      resolvePromise({ refused: 'entry_executable_missing', exit: null, usage: null, sessionId: null, events: 0 })
-      return
-    }
-    const startedAt = new Date().toISOString()
-    const child = spawn(command, args, { cwd: request.cwd, env: { ...process.env }, stdio: ['pipe', 'pipe', 'pipe'] })
-    let stdout = ''
-    let stderr = ''
-    let settled = false
-    const finish = (exit) => {
-      if (settled) return
-      settled = true
-      clearTimeout(timer)
-      const events = parseEvents(stdout)
-      resolvePromise({
-        exit,
-        startedAt,
-        endedAt: new Date().toISOString(),
-        usage: usageOf(events),
-        sessionId: sessionOf(events),
-        stderrTail: stderr.slice(-2000),
-        events: events.length,
-      })
-    }
-    const timer = setTimeout(() => {
-      child.kill('SIGTERM')
-      setTimeout(() => child.kill('SIGKILL'), 3000)
-    }, timeoutMs)
-    child.stdout.on('data', (chunk) => {
-      stdout += chunk.toString()
-    })
-    child.stderr.on('data', (chunk) => {
-      stderr += chunk.toString()
-      appendFileSync(join(here, 'reports', 'adapter-turns.log'), chunk.toString())
-    })
-    child.once('error', (error) => finish({ error: String(error?.message ?? error) }))
-    child.once('exit', (code, signal) => finish({ code, signal }))
-    child.stdin.end(`${JSON.stringify({ type: 'review-pilot.turn/1', ...request })}\n`)
-  })
+export async function guardedSend({ admission, reservationId, ...turn }) {
+  if (!admission?.ok) return { ok: false, reason: 'admission_blocked', blockers: admission?.blockers ?? [{ code: 'adapter_missing', detail: 'no admission' }] }
+  if (!substantial(reservationId)) return { ok: false, reason: 'reservation_missing' }
+  const entry = admission.facts?.entry
+  if (!entry?.module) return { ok: false, reason: 'b_sender_unavailable' }
+  let module
+  try {
+    module = await import(pathToFileURL(entry.module).href)
+  } catch (error) {
+    return { ok: false, reason: 'b_sender_unavailable', detail: String(error?.message ?? error).slice(0, 300) }
+  }
+  const send = module[entry.export ?? 'send']
+  if (typeof send !== 'function') return { ok: false, reason: 'b_sender_unavailable', detail: 'missing export' }
+  let result
+  try {
+    result = await send({ protocolVersion: entry.protocolVersion, reservationId, ...turn })
+  } catch (error) {
+    return { ok: false, reason: 'b_sender_failed', detail: String(error?.message ?? error).slice(0, 300) }
+  }
+  if (!result || typeof result !== 'object') return { ok: false, reason: 'b_sender_invalid_result' }
+  if (result.reservationId !== reservationId) return { ok: false, reason: 'reservation_identity_mismatch', result }
+  return { ok: true, result }
 }
 
-/**
- * The only send entry point. It refuses before spawning unless the adapter admission passed and the
- * admission carries a B-owned command; there is no CLI fallback.
- */
-export async function guardedSend({ admission, ...turn }) {
-  if (!admission?.ok) return { ok: false, reason: 'admission_blocked', blockers: admission?.blockers ?? [{ code: 'adapter_missing', detail: 'no admission' }] }
-  const entry = admission.facts?.entry
-  const result = await runEntryTurn({ entry, request: turn })
-  if (result.refused) return { ok: false, reason: result.refused }
-  return { ok: true, result }
+const BILLED_COMPONENTS = ['inputTokens', 'cachedInputTokens', 'cacheWriteInputTokens', 'outputTokens', 'reasoningOutputTokens']
+const PRICE_FOR = {
+  inputTokens: 'inputPerMillion',
+  cachedInputTokens: 'cachedInputPerMillion',
+  cacheWriteInputTokens: 'cacheWriteInputPerMillion',
+  outputTokens: 'outputPerMillion',
+  reasoningOutputTokens: 'reasoningOutputPerMillion',
 }
 
 export function costOf(usage, pricing) {
   if (!usage || !pricing) return undefined
-  const priced =
-    (usage.inputTokens ?? 0) * (pricing.inputPerMillion ?? 0) +
-    (usage.cachedInputTokens ?? 0) * (pricing.cachedInputPerMillion ?? pricing.inputPerMillion ?? 0) +
-    (usage.cacheWriteInputTokens ?? 0) * (pricing.cacheWriteInputPerMillion ?? pricing.inputPerMillion ?? 0) +
-    (usage.outputTokens ?? 0) * (pricing.outputPerMillion ?? 0) +
-    (usage.reasoningOutputTokens ?? 0) * (pricing.reasoningOutputPerMillion ?? pricing.outputPerMillion ?? 0)
-  return priced / 1_000_000
+  // Every billed component and its rate must be measured. A missing component is not free; it makes
+  // the whole cost unknown so the caller keeps the reservation bound and blocks further sends.
+  for (const component of BILLED_COMPONENTS) {
+    if (!Number.isSafeInteger(usage[component]) || usage[component] < 0) return undefined
+    const price = pricing[PRICE_FOR[component]]
+    if (typeof price !== 'number' || !Number.isFinite(price) || price < 0) return undefined
+  }
+  const total = BILLED_COMPONENTS.reduce((sum, component) => sum + usage[component] * pricing[PRICE_FOR[component]], 0)
+  return total / 1_000_000
 }
 
 export { digestOf as digest }

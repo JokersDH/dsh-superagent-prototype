@@ -95,12 +95,16 @@ export function evaluateAdapter(adapter, { now = Date.now(), probe = probeVersio
 
   const entry = adapter.entry ?? {}
   if (entry.owner !== 'b') add('adapter_invalid', 'the single send entry must be owned by B')
-  if (!['app-server', 'sdk-runner'].includes(entry.kind)) add('adapter_invalid', 'entry.kind')
-  if (!Array.isArray(entry.command) || entry.command.length === 0 || !substantial(entry.command[0]) || !String(entry.command[0]).startsWith('/'))
-    add('adapter_invalid', 'entry.command must start with an absolute executable')
+  if (entry.kind !== 'b-sender') add('adapter_invalid', 'entry.kind must be the B-owned sender, not a command')
+  // E may not spawn a command from a descriptor. It imports the B sender module that owns the
+  // transport, reservation identity and isolation; a missing module is BLOCKED.
+  if (!substantial(entry.module) || !String(entry.module).startsWith('/')) add('adapter_invalid', 'entry.module must be an absolute B sender module')
+  if (!substantial(entry.export ?? 'send')) add('adapter_invalid', 'entry.export')
+  if (substantial(entry.module) && String(entry.module).startsWith('/') && !existsSync(entry.module))
+    add('b_sender_unavailable', 'the admitted B sender module is not present')
   if (!substantial(entry.protocolVersion)) add('adapter_invalid', 'entry.protocolVersion')
-  if (entry.fallbackCommand !== undefined || entry.fallback !== undefined)
-    add('adapter_invalid', 'a fallback command is not admissible')
+  if (entry.fallbackCommand !== undefined || entry.fallback !== undefined || entry.command !== undefined)
+    add('adapter_invalid', 'a fallback command or command list is not admissible')
 
   const version = probe(adapter.executable)
   if (!version.ok) add('adapter_invalid', `executable probe failed: ${version.reason}`)
@@ -180,7 +184,8 @@ export function evaluateAdapter(adapter, { now = Date.now(), probe = probeVersio
       entry: {
         owner: entry.owner ?? null,
         kind: entry.kind ?? null,
-        command: Array.isArray(entry.command) ? [...entry.command] : null,
+        module: entry.module ?? null,
+        export: entry.export ?? 'send',
         protocolVersion: entry.protocolVersion ?? null,
       },
       pricing: adapter.pricing ? { ...adapter.pricing } : null,
@@ -229,7 +234,7 @@ export function makeTestAdapter({ executable, version = 'fake-cli 1.0.0', now = 
     version,
     model: 'test-model',
     provider: 'test-provider',
-    entry: { owner: 'b', kind: 'app-server', command: [executable], protocolVersion: 'selftest/1' },
+    entry: { owner: 'b', kind: 'b-sender', module: executable, export: 'send', protocolVersion: 'selftest/1' },
     protocolDigest: 'a'.repeat(64),
     pricing: {
       currency: 'USD',

@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-08/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-09/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "5d4065b",
-  "checkpoint": "614192d",
+  "base": "7027d31",
+  "checkpoint": null,
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -13,7 +13,7 @@
     "pilotTurnsUsed": 0,
     "pilotTokensUsed": 0,
     "pilotUsd": null,
-    "note": "Research stays BLOCKED with no adapter; ledger v2 preserves 0/24 turns, 0 tokens, no price basis; no model send. The only send entry is B-owned; E only reserves."
+    "note": "Research BLOCKED; no adapter/sender. Ledger v2 keeps 0/24 turns, 0 tokens, no price basis; the full costOf→settle chain keeps unknown and blocks. Real model sends 0."
   },
   "stages": [
     {
@@ -21,7 +21,7 @@
       "title": "Pilot admission and fail-closed ledger",
       "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
       "notes": [
-        "Ledger v2 rejects damaged/forged/incomplete v1 migrations (identity, caps, reservations, unknown, history), requires model/provider and a B-owned entry, and treats a missing cost as unknown charged at the bound. 59 zero-model checks; fake sends stay 0 for every refusal."
+        "Full cost chain: partial usage detail makes costOf undefined and settle keeps the reservation bound + unknown, then refuses further sends. The only sender is B-owned; E imports it and binds reservationId, and never spawns a descriptor command. 66 zero-model checks, refusal send count 0."
       ]
     },
     {

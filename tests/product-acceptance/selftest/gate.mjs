@@ -370,7 +370,7 @@ const CASES = [
       assert('SELFTEST_CORRUPT_LEDGER', result?.assertions?.filter((item) => item.id.startsWith('CORRUPT_')).every((item) => item.ok))
       assert('SELFTEST_ADMISSION_REFUSALS', result?.assertions?.filter((item) => item.id.startsWith('ADMISSION_')).every((item) => item.ok))
       assert('SELFTEST_NO_REFUSAL_SENDS', result?.assertions?.some((item) => item.id === 'NO_SEND_FOR_ALL_REFUSALS' && item.ok))
-      assert('SELFTEST_SEND_COUNTER', result?.modelSends === 1, String(result?.modelSends))
+      assert('SELFTEST_SEND_COUNTER', result?.modelSends === 2 && result?.refusalSends === 0, `${result?.modelSends}/${result?.refusalSends}`)
       assert('SELFTEST_CHECKS', (result?.passes ?? 0) >= 55, String(result?.passes))
       assert('SELFTEST_LEGACY', result?.assertions?.filter((item) => item.id.startsWith('CORRUPT_V1_')).every((item) => item.ok))
       assert('SELFTEST_LEGACY_EMPTY', result?.assertions?.some((item) => item.id === 'V1_EMPTY_MIGRATES' && item.ok))

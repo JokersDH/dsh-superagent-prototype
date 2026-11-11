@@ -1,7 +1,7 @@
 {
   "protocol": "review-pilot-runner-selftest/2",
-  "createdAt": "2026-11-11T08:18:14.368Z",
-  "passes": 59,
+  "createdAt": "2026-11-11T10:28:21.203Z",
+  "passes": 66,
   "failures": [],
   "assertions": [
     {
@@ -22,12 +22,12 @@
     {
       "id": "RESERVE_USES_FULL_BOUND",
       "ok": true,
-      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-9cfd6ea7-2aeb-4516-9bb7-31f52dfdfd85\",\"caseId\":\"case-01\",\"arm\":\"author\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"7b5a6e9312dc376100e2ee50a30fca9f63ba6ac267073ecf54b3c2692bf33ef1\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},\"stat"
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-42394e64-f74f-4d65-a1c2-35d8e32dff3c\",\"caseId\":\"case-01\",\"arm\":\"author\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"63f2e347a7ba0eac872ddfa143a78eec6543e1084f531e788e8ca4343d3015c4\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},\"stat"
     },
     {
       "id": "RESERVE_REPLAY",
       "ok": true,
-      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-9cfd6ea7-2aeb-4516-9bb7-31f52dfdfd85\",\"caseId\":\"case-01\",\"arm\":\"author\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"7b5a6e9312dc376100e2ee50a30fca9f63ba6ac267073ecf54b3c2692bf33ef1\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},\"stat"
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-42394e64-f74f-4d65-a1c2-35d8e32dff3c\",\"caseId\":\"case-01\",\"arm\":\"author\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"63f2e347a7ba0eac872ddfa143a78eec6543e1084f531e788e8ca4343d3015c4\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},\"stat"
     },
     {
       "id": "ONE_IN_FLIGHT",
@@ -37,7 +37,7 @@
     {
       "id": "ADMITTED_SEND_RUNS",
       "ok": true,
-      "detail": "{\"ok\":true,\"result\":{\"exit\":{\"code\":0,\"signal\":null},\"startedAt\":\"2026-11-11T08:18:14.310Z\",\"endedAt\":\"2026-11-11T08:18:14.317Z\",\"usage\":{\"totalTokens\":1500,\"inputTokens\":1200,\"cachedInputTokens\":100,\"outputTokens\":300,\"reasoningOutputTokens\":50},\"sessionId\":\"11111111-1111-4111-8111-111111111111\",\"stderrTail\":\"\",\"events\":2}}"
+      "detail": "{\"ok\":true,\"result\":{\"reservationId\":\"turn-42394e64-f74f-4d65-a1c2-35d8e32dff3c\",\"exit\":{\"code\":0,\"signal\":null},\"startedAt\":\"2026-11-11T10:28:21.137Z\",\"endedAt\":\"2026-11-11T10:28:21.137Z\",\"sessionId\":\"11111111-1111-4111-8111-111111111111\",\"usage\":{\"totalTokens\":1500,\"inputTokens\":1200,\"cachedInputTokens\":100,\"cacheWriteInputTokens\":0,\"outputTokens\":300,\"reasoningOutputTokens\":50}}}"
     },
     {
       "id": "SEND_COUNTER_ONE",
@@ -47,17 +47,17 @@
     {
       "id": "SETTLE_ONCE",
       "ok": true,
-      "detail": "{\"state\":\"SETTLED\",\"data\":{\"schema\":\"review-pilot-ledger/2\",\"grantId\":\"wave05-independent-review-pilot-01\",\"ledgerId\":\"wave05-independent-review-pilot-01\",\"historyComplete\":true,\"createdAt\":\"2026-11-11T08:18:14.309Z\",\"caps\":{\"maxTotalTurnStarts\":24,\"maxAuthorTurnStarts\":8,\"maxReviewTurnStarts\":16,\"maxTotalBillableTokens\":200000,\"maxTotalCostUSD\":5},\"status\":\"IN_PROGRESS\",\"reservation\":{\"turns\":0,\""
+      "detail": "{\"state\":\"SETTLED\",\"data\":{\"schema\":\"review-pilot-ledger/2\",\"grantId\":\"wave05-independent-review-pilot-01\",\"ledgerId\":\"wave05-independent-review-pilot-01\",\"historyComplete\":true,\"createdAt\":\"2026-11-11T10:28:21.135Z\",\"caps\":{\"maxTotalTurnStarts\":24,\"maxAuthorTurnStarts\":8,\"maxReviewTurnStarts\":16,\"maxTotalBillableTokens\":200000,\"maxTotalCostUSD\":5},\"status\":\"IN_PROGRESS\",\"reservation\":{\"turns\":0,\""
     },
     {
       "id": "SETTLE_REPLAY_IDEMPOTENT",
       "ok": true,
-      "detail": "{\"state\":\"REPLAYED\",\"data\":{\"schema\":\"review-pilot-ledger/2\",\"grantId\":\"wave05-independent-review-pilot-01\",\"ledgerId\":\"wave05-independent-review-pilot-01\",\"historyComplete\":true,\"createdAt\":\"2026-11-11T08:18:14.309Z\",\"caps\":{\"maxTotalTurnStarts\":24,\"maxAuthorTurnStarts\":8,\"maxReviewTurnStarts\":16,\"maxTotalBillableTokens\":200000,\"maxTotalCostUSD\":5},\"status\":\"IN_PROGRESS\",\"reservation\":{\"turns\":0,"
+      "detail": "{\"state\":\"REPLAYED\",\"data\":{\"schema\":\"review-pilot-ledger/2\",\"grantId\":\"wave05-independent-review-pilot-01\",\"ledgerId\":\"wave05-independent-review-pilot-01\",\"historyComplete\":true,\"createdAt\":\"2026-11-11T10:28:21.135Z\",\"caps\":{\"maxTotalTurnStarts\":24,\"maxAuthorTurnStarts\":8,\"maxReviewTurnStarts\":16,\"maxTotalBillableTokens\":200000,\"maxTotalCostUSD\":5},\"status\":\"IN_PROGRESS\",\"reservation\":{\"turns\":0,"
     },
     {
       "id": "RESERVE_UNKNOWN_CASE",
       "ok": true,
-      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-f1768256-6a9e-4e2d-8daf-453de43615bb\",\"caseId\":\"case-02\",\"arm\":\"self_review\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"7b5a6e9312dc376100e2ee50a30fca9f63ba6ac267073ecf54b3c2692bf33ef1\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},"
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-13c08d07-2376-4a6e-89ee-9e06bba2aac0\",\"caseId\":\"case-02\",\"arm\":\"self_review\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"63f2e347a7ba0eac872ddfa143a78eec6543e1084f531e788e8ca4343d3015c4\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},"
     },
     {
       "id": "UNKNOWN_BLOCKS",
@@ -92,7 +92,7 @@
     {
       "id": "REVIEW_STILL_ALLOWED",
       "ok": true,
-      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-9bc8e397-fa37-43d7-a16c-3e0f22f2507f\",\"caseId\":\"case-09\",\"arm\":\"self_review\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"7b5a6e9312dc376100e2ee50a30fca9f63ba6ac267073ecf54b3c2692bf33ef1\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},"
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-ca47d4f2-60af-4f38-b0bf-4423b2c2d051\",\"caseId\":\"case-09\",\"arm\":\"self_review\",\"upperTokens\":144000,\"upperUSD\":0.1804,\"admissionDigest\":\"63f2e347a7ba0eac872ddfa143a78eec6543e1084f531e788e8ca4343d3015c4\",\"boundComponents\":{\"maxInputTokens\":10000,\"maxCachedInputTokens\":4000,\"maxCacheWriteInputTokens\":2000,\"maxOutputTokens\":4000,\"maxReasoningOutputTokens\":4000},"
     },
     {
       "id": "TOKEN_CEILING",
@@ -215,6 +215,36 @@
       "detail": "0.1804"
     },
     {
+      "id": "PARTIAL_COST_UNKNOWN",
+      "ok": true,
+      "detail": "undefined"
+    },
+    {
+      "id": "PARTIAL_SETTLE_UNKNOWN",
+      "ok": true,
+      "detail": "\"UNKNOWN_USAGE\""
+    },
+    {
+      "id": "PARTIAL_BLOCKS_SEND",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"unknown_usage_unresolved\"}"
+    },
+    {
+      "id": "COMPLETE_COST_KNOWN",
+      "ok": true,
+      "detail": "0.00195"
+    },
+    {
+      "id": "SENDER_RESERVATION_BINDING",
+      "ok": true,
+      "detail": "\"reservation_identity_mismatch\""
+    },
+    {
+      "id": "SENDER_MISSING_REFUSED",
+      "ok": true,
+      "detail": "\"b_sender_unavailable\""
+    },
+    {
       "id": "ADMISSION_MISSING",
       "ok": true,
       "detail": "[{\"code\":\"adapter_missing\",\"detail\":\"absent\"}]"
@@ -282,17 +312,22 @@
     {
       "id": "ADMISSION_NO_B_ENTRY",
       "ok": true,
-      "detail": "[{\"code\":\"adapter_invalid\",\"detail\":\"the single send entry must be owned by B\"}]"
+      "detail": "[{\"code\":\"adapter_invalid\",\"detail\":\"the single send entry must be owned by B\"},{\"code\":\"adapter_invalid\",\"detail\":\"entry.kind must be the B-owned sender, not a command\"},{\"code\":\"adapter_invalid\",\"detail\":\"entry.module must be an absolute B sender module\"},{\"code\":\"adapter_invalid\",\"detail\":\"a fallback command or command list is not admissible\"}]"
+    },
+    {
+      "id": "ADMISSION_ENTRY_COMMAND",
+      "ok": true,
+      "detail": "[{\"code\":\"adapter_invalid\",\"detail\":\"a fallback command or command list is not admissible\"}]"
     },
     {
       "id": "ADMISSION_ENTRY_FALLBACK",
       "ok": true,
-      "detail": "[{\"code\":\"adapter_invalid\",\"detail\":\"a fallback command is not admissible\"}]"
+      "detail": "[{\"code\":\"adapter_invalid\",\"detail\":\"a fallback command or command list is not admissible\"}]"
     },
     {
       "id": "NO_SEND_FOR_ALL_REFUSALS",
       "ok": true,
-      "detail": "1"
+      "detail": "0"
     },
     {
       "id": "NO_RESERVATION_FOR_ALL_REFUSALS",
@@ -300,5 +335,6 @@
       "detail": "[]"
     }
   ],
-  "modelSends": 1
+  "modelSends": 2,
+  "refusalSends": 0
 }
