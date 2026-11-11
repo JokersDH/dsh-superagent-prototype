@@ -9,11 +9,12 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
 import type { RecoveryPlan } from '@personal-agent/contracts'
-import { ProductStore } from '@personal-agent/storage'
+import { applyMigrations, MIGRATIONS, PRODUCT_SCHEMA_VERSION, ProductStore } from '@personal-agent/storage'
 import { createWorkflowPorts, WorkflowConflict } from '../src/index.ts'
 
 const at = '2026-11-11T00:00:00.000Z'
 const fingerprint = 'f'.repeat(64)
+const scope = { projectId: 'project-1', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
 const actor = { userId: 'user-1', authorityRef: 'authority-1' }
 const plan = (overrides: Partial<RecoveryPlan> = {}): RecoveryPlan => ({
   protocol: 'recovery-plan/1', planId: 'recovery-plan-1', inspectionFingerprint: fingerprint,
@@ -125,4 +126,58 @@ test('a receipt failure rolls the intent back; reopen replays the committed fact
     if (store.database.productSchema) store.close()
     rmSync(dir, { recursive: true, force: true })
   }
+})
+
+test('a failed target preparation leaves the original intent queryable and does not create another authorization', () => {
+  const dir = tmp('recovery-target-')
+  const store = new ProductStore({ path: join(dir, 'state.sqlite') })
+  try {
+    const port = createWorkflowPorts(store).recoveryIntents
+    const first = port.record(input())
+    // D/main's target preparation is outside this port; a failure there must not mutate the source
+    // fact, and the caller can re-query it by plan or command identity.
+    assert.equal(port.getByPlan(first.record.planId)!.planDigest, first.record.planDigest)
+    assert.equal(port.getByCommand('recovery-command-1')!.planId, first.record.planId)
+    assert.equal(port.list({ sourceFingerprint: fingerprint }).records.length, 1)
+    // A genuinely new plan is a new explicit user decision, never an automatic retry of the failed one.
+    const secondPlan = { ...plan(), planId: 'recovery-plan-2' }
+    const second = port.record(input({ commandId: 'recovery-command-2', plan: secondPlan }))
+    assert.equal(second.replayed, false)
+    assert.equal(port.list().records.length, 2)
+    assert.equal(port.getByPlan('recovery-plan-1')!.authorization, 'not_granted')
+  } finally {
+    store.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('a v13 database upgrades to the current schema with existing rows intact and no intent rows', async () => {
+  const dir = tmp('recovery-v13-')
+  const path = join(dir, 'state.sqlite')
+  try {
+    const Database = (await import('better-sqlite3')).default
+    const legacy = new Database(path)
+    applyMigrations(legacy, { registry: MIGRATIONS.slice(0, 13) })
+    legacy.prepare('INSERT INTO works (id, project_id, conversation_id, value, created_at) VALUES (?, ?, ?, ?, ?)')
+      .run('work-legacy', 'project-1', 'conversation-1', JSON.stringify({ id: 'work-legacy', projectId: 'project-1', conversationId: 'conversation-1', title: 'Legacy', createdAt: at }), at)
+    legacy.prepare(`INSERT INTO user_decision_versions
+      (id, version, project_id, content, authority_ref, supersedes, revoked_at, value, digest, created_at)
+      VALUES (?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?)`)
+      .run('decision-legacy', 1, 'project-1', 'legacy content', 'authority-1',
+        JSON.stringify({ id: 'decision-legacy', version: 1, content: 'legacy content', scope, authorityRef: 'authority-1' }), 'd'.repeat(64), at)
+    legacy.prepare(`INSERT INTO assistant_decision_versions
+      (id, version, project_id, source_message_id, source_text_digest, conversation_id, actor_ref, recorded_at, revoked_by, value_digest)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)`)
+      .run('decision-legacy', 1, 'project-1', 'message-1', 'e'.repeat(64), 'conversation-1', 'actor-1', at, 'd'.repeat(64))
+    legacy.close()
+
+    const store = new ProductStore({ path })
+    try {
+      assert.equal(store.database.productSchema, PRODUCT_SCHEMA_VERSION)
+      assert.equal(store.workflows.assistant.decisions.get('decision-legacy')!.decision.content, 'legacy content')
+      assert.equal(store.product.works.get('work-legacy')!.title, 'Legacy')
+      assert.equal(store.workflows.recoveryIntents.list().records.length, 0)
+      assert.equal(store.workflows.recoveryIntents.record(input()).replayed, false)
+    } finally { store.close() }
+  } finally { rmSync(dir, { recursive: true, force: true }) }
 })

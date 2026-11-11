@@ -1,0 +1,50 @@
+{
+  "role": "A",
+  "package": ["packages/storage", "packages/workflows"],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "0df3fd1",
+  "mergeCommit": "a562a7f",
+  "checkpoint": "0c9ca71",
+  "testedSourceCommit": "0c9ca71",
+  "migrations": [14],
+  "productSchema": 14,
+  "phases": [
+    {"phase":"A1","status":"PASS","scope":"package-local","evidence":["merged base rebuild","routing/acceptance/recovery tests","RFC-0005"]},
+    {"phase":"A2","status":"PASS","scope":"package-local","evidence":["packages/workflows/test/recovery-intents.case.ts (5 cases)"],"note":"one immutable intent per plan; exact replay; drift/expiry/actor/plan conflict; fact+receipt+event rollback; reopen; old queue untouched"},
+    {"phase":"A3","status":"PASS","scope":"package-local","evidence":["packages/workflows/test/evidence-page.case.ts","reports/wave07-performance.json"],"note":"stable cursor; complete/caller_limit/storage_cap; project isolation"},
+    {"phase":"A4","status":"PARTIAL","scope":"package-local; activation BLOCKED on main","evidence":["recovery intent crash/reopen tests","decision-commands 8/8","review-timing 3/3"],"note":"source facts covered; main recovery commit/start switching not published in 0026"},
+    {"phase":"A5","status":"PASS","scope":"package-local","evidence":["v13->v14 upgrade test","snapshot recovery_intents family","examples/d-snapshot-restore.mjs","reports/wave07-d-snapshot-recipe.json"],"note":"schema bounds and evidence summary; D restore policy external"},
+    {"phase":"A6","status":"PASS","scope":"package-local","evidence":["reports/wave07-*.txt","reports/wave07-performance.json"],"note":"bounded regression and handoff"}
+  ],
+  "results": {
+    "storageTests": "75/75",
+    "workflowTests": "38/38",
+    "applicationRegression": "16/16",
+    "verificationRegression": "23/23",
+    "mainDecisionIntegration": "8/8 (read-only execution)",
+    "mainReviewTiming": "3/3 (read-only execution)",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "benchmark": "reports/wave07-performance.json",
+    "dSnapshotRecipe": "reports/wave07-d-snapshot-recipe.json",
+    "modelTasks": 0,
+    "unknownModelSends": 0
+  },
+  "blockers": [
+    {"owner":"main","id":"recovery-activation-commit","detail":"Main has not published the activation commit/start-switch interface; RecoveryPlan is read-only (authorization=not_granted). A stores intent facts only."},
+    {"owner":"D","id":"target-preparation","detail":"New empty target state, relocation, rollback and re-authorization are D/main; A provides facts, snapshot and queries."},
+    {"owner":"main","id":"root-lock-request","detail":"packages/workflows test-only @personal-agent/knowledge workspace dependency remains for main's authoritative lock."}
+  ],
+  "notTested": [
+    "recovery activation commit and start switching",
+    "cross-database/filesystem atomicity and physical writer revalidation",
+    "native/Codex execution, E pilot, browser/product acceptance, installed-alpha"
+  ],
+  "mainNextSteps": [
+    "publish recovery commit schema/HTTP; call recoveryIntents.record with the exact plan inside the confirmation transaction",
+    "treat the intent as a fact, not a grant; require a new empty execution state before enabling work",
+    "optionally adopt index.evidencePage in /v1/works/:id/evidence for complete/caller_limit/storage_cap",
+    "keep restore/target preparation and re-authorization in main/D",
+    "regenerate the root lock for packages/workflows"
+  ]
+}

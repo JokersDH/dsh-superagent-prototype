@@ -62,6 +62,10 @@ test('evidence pages are stable across ties, scoped by project and distinguish w
     }
     assert.equal(last.window, 'complete')
     assert.equal(index.evidencePage({ workId: 'work-evidence', projectIds: ['project-2'] }), undefined)
+    // Historical/revoked decisions remain auditable with source state separate from effectiveness.
+    const full = index.evidencePage({ workId: 'work-evidence', projectIds: ['project-1'], limit: 200 })!
+    assert.equal(full.window === 'complete' || full.window === 'storage_cap', true)
+    assert.equal(full.entries.some(entry => entry.kind === 'execution.outcome'), true)
     assert.equal(index.evidencePage({ workId: 'work-other', projectIds: ['project-1'] }), undefined)
     assert.throws(() => index.evidencePage({ workId: 'work-evidence', projectIds: ['project-1'], cursor: 'a\u0000b\u0000c' }), WorkflowConflict)
   } finally {

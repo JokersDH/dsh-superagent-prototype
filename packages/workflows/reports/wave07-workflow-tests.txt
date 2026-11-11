@@ -1,0 +1,46 @@
+✔ accepted event projects one exact outcome and preserves unknown timing as null (60.237ms)
+✔ missing attempt/verification/acceptance or wrong project yields an auditable gap and writes no outcome (69.391458ms)
+✔ acceptance.consume joins the accepting transaction and a later failure rolls the outcome back (46.202333ms)
+✔ a new candidate on the same work gets its own outcome; the older accepted outcome stays readable (42.44925ms)
+✔ real SQLite: A port + C prepare/commit, same-body replay and changed-body conflict (55.009584ms)
+✔ real SQLite: revoke appends a version, stale revoke conflicts and old commit does not resurrect (33.335916ms)
+✔ real SQLite: source deletion/change blocks commit and reports missing/stale without fabricated data (74.67225ms)
+✔ real SQLite: a receipt failure rolls back C decision rows, event and receipt together (48.096542ms)
+✔ evidence pages are stable across ties, scoped by project and distinguish window causes (90.977875ms)
+✔ a capped source is reported as storage_cap, never silently complete (51.086583ms)
+✔ recovery intent is one stable fact with receipt/event in the caller transaction (32.272708ms)
+✔ changed plan, drifted source, expired plan and a different actor are refused without a second fact (69.65175ms)
+✔ a receipt failure rolls the intent back; reopen replays the committed fact and queues are untouched (56.425291ms)
+✔ a failed target preparation leaves the original intent queryable and does not create another authorization (21.669584ms)
+✔ a v13 database upgrades to the current schema with existing rows intact and no intent rows (88.326917ms)
+✔ routing evidence is immutable, project-scoped, replayable and cursor-bounded (49.695ms)
+✔ routing evidence joins the caller transaction and rolls back every record on failure (72.205583ms)
+✔ source projection rebuilds attempt evidence without claiming artifact ownership (47.320333ms)
+✔ routing records re-open in a second process and review report artifacts are snapshot-complete (278.480042ms)
+✔ single-work timeline links persisted evidence without inventing causality (25.188541ms)
+✔ a v12 database upgrades to the current schema while keeping old contracts, decisions and deliveries (12.200958ms)
+✔ schema-13 snapshot includes decisions/settings/contracts/verification/outcome and restores readably (161.509292ms)
+✔ missing file, changed bytes and a newer schema make the snapshot unusable (165.149125ms)
+✔ conversation catalog, search, archive and message identity survive reopen (41.782834ms)
+✔ unresolved work/questions remain visible as attention after archive (78.699583ms)
+✔ project settings are append-only, CAS-protected and archive only visibility (52.751584ms)
+✔ explicit decision versions append and revoke without inferred rules (48.75525ms)
+✔ read index is bounded, scoped and never invents a current setting or authority (52.694459ms)
+✔ a snapshot includes the database and digest-verified artifacts; missing bytes block it (107.227125ms)
+✔ a v7 database backfills the conversation catalog on upgrade and keeps message identity (10.731625ms)
+✔ catalog pagination, long/empty titles and message paging keep identity and bounds (34.653542ms)
+✔ a second Node process consumes the public workflow ports and snapshot verifier (166.129041ms)
+✔ AssistantState decisions are source-bound CAS records and legacy rows never become valid memory (9.796ms)
+✔ AssistantState proposals preserve immutable source/grant and confirmation command identity (9.146583ms)
+✔ assistant persistence joins the caller transaction and rolls back all rows on failure (8.1845ms)
+✔ conversation membership is indexed across v7 chat, works without messages and new messages (9.370958ms)
+✔ source message metadata is scoped/digested and state facts stay observational (7.011625ms)
+✔ a v10 ledger upgrades to the current schema: old decisions stay auditable but missing-source, new assistant state reopens (28.145833ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 969.792583

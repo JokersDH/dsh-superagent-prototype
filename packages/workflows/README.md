@@ -38,6 +38,9 @@ ports.assistant.legacyDecisions({ projectId }) // audit-only, never valid memory
 ports.routingEvidence.advice / reviews / outcomes  // immutable RoutingEvidencePort
 ports.routingEvidence.sources(attemptId, projectId) // read-only outcome source projection
 ports.acceptance.consume({ eventSeq, projectId, profileRef, layer }) // accepted event -> outcome
+ports.recoveryIntents.record({ commandId, actor, plan, expectedInspectionFingerprint, sourceFingerprint })
+ports.recoveryIntents.getByPlan(planId) / getByCommand(commandId) / list({ sourceFingerprint, limit, cursor })
+ports.index.evidencePage({ workId, projectIds, limit, cursor }) // complete | caller_limit | storage_cap
 ports.index.timeline({ workId, projectIds, limit })
 
 const snapshots = new WorkflowSnapshots(store)
@@ -115,6 +118,11 @@ snapshots.verify('/private/new-snapshot-dir')
   schema newer than this build is blocked, and `examples/d-snapshot-restore.mjs` is the runnable
   byte-copy restore/verify recipe. See `docs/RFC-0003-routing-evidence.md` and
   `docs/RFC-0004-acceptance-outcome-consumer.md`.
+- `recoveryIntents` records one immutable recovery plan-intent fact per plan/command, joined to the
+  caller's receipt/event transaction. It is explicitly `authorization: not_granted` /
+  `activationAvailable: false`; main owns the commit protocol and D owns target preparation.
+  `evidencePage` adds stable paging with explicit `complete` / `caller_limit` / `storage_cap`
+  semantics. See `docs/RFC-0005-recovery-intent-and-evidence.md`.
 
 **Main migration required:** current `ApplicationConversations` passes `projectIds: []` as an
 internal discovery convention. That convention is removed. Main must pass the configured allowed
@@ -126,7 +134,8 @@ writer failure.
 ## Migrations
 
 Storage appends v8 `conversation-catalog`, v9 `project-settings`, v10 `user-decisions`, v11
-`assistant-state`, v12 `conversation-members`, v13 `routing-evidence`; v1–v7 checksums and tables are untouched. A v7/v10
+`assistant-state`, v12 `conversation-members`, v13 `routing-evidence`, v14 `recovery-intents`; v1–v7
+checksums and tables are untouched. A v7/v10
 database upgrades in one transaction, keeps existing messages/works/decision bodies, and backfills
 conversation rows, FTS, membership and assistant metadata absence. Unknown/upstream databases, drift,
 gaps and future schemas keep the existing fail-closed behavior.
