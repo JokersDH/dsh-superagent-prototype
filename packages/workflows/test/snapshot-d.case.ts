@@ -84,6 +84,15 @@ function dataset() {
       authorization: 'not_granted', commitAvailable: false },
     expectedInspectionFingerprint: 'f'.repeat(64), sourceFingerprint: 'f'.repeat(64), confirmedAt: at,
   })
+  ports.recoveryActivations.put({
+    protocol: 'recovery-activation-intent/1', activationId: 'activation-1', commandId: 'activation-command-1',
+    planId: 'activation-plan-1', planDigest: 'b'.repeat(64),
+    source: { stateId: 'state-source', stateRoot: '/tmp/source-state', markerDigest: 'c'.repeat(64), inspectionFingerprint: 'd'.repeat(64) },
+    target: { generationId: 'generation-1', stateRoot: '/tmp/target-state', configurationDigest: 'e'.repeat(64) },
+    principal: { userId: 'user-1', authorityRef: 'authority-1' },
+    machineDigest: 'f'.repeat(64), resourcePolicyDigest: 'a'.repeat(64),
+    createdAt: at, expiresAt: '2026-11-11T00:05:00.000Z',
+  })
   return { root, store, ports, patch, report }
 }
 
@@ -106,6 +115,7 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
     assert.equal(families.get('outcomes')!.count, 1)
     assert.equal(families.get('reviews')!.count, 1)
     assert.equal(families.get('recovery_intents')!.count, 1)
+    assert.equal(families.get('recovery_activations')!.count, 1)
     assert.equal(result.manifest.evidence.complete, true)
     for (const row of result.manifest.artifacts)
       assert.equal(readFileSync(join(snapshot, row.snapshotPath)).length, row.bytes)
@@ -138,6 +148,11 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
       assert.equal(intent.plan.authorization, 'not_granted')
       assert.equal(intent.plan.commitAvailable, false)
       assert.equal(JSON.stringify(intent).includes('credential'), false, 'a recovery intent carries no credential reference')
+      const activation = JSON.parse(String((db.prepare("SELECT value FROM recovery_activations WHERE activation_id = 'activation-1'").get() as { value: string }).value))
+      assert.equal(activation.target.stateRoot, '/tmp/target-state')
+      assert.equal(activation.source.stateRoot, '/tmp/source-state')
+      assert.equal(JSON.stringify(activation).includes('credential'), false, 'an activation fact carries no credential reference')
+      assert.equal(JSON.stringify(activation).includes('token'), false)
     } finally { db.close() }
   } finally {
     data.store.close()
@@ -212,6 +227,21 @@ test('missing file, changed bytes and a newer schema make the snapshot unusable'
     writeFileSync(tamperedManifestPath, JSON.stringify(tamperedManifest, null, 2))
     const tampered = new WorkflowSnapshots(data.store).verify(tamperedDir)
     assert.equal(tampered.status, 'blocked', 'reference evidence detects a row change even with a re-recorded DB hash')
+
+    // Removing the activation table is not an empty-but-valid backup: the evidence family disappears.
+    const missingTableDir = join(data.root, 'missing-table-copy')
+    cpSync(snapshot, missingTableDir, { recursive: true })
+    const missingTableDb = join(missingTableDir, 'product.sqlite')
+    const dropDb = new Database(missingTableDb)
+    try { dropDb.exec('DROP TABLE recovery_activations') } finally { dropDb.close() }
+    const dropManifestPath = join(missingTableDir, 'snapshot.json')
+    const dropManifest = JSON.parse(readFileSync(dropManifestPath, 'utf8'))
+    const dropBytes = readFileSync(missingTableDb)
+    dropManifest.database.sha256 = createHash('sha256').update(dropBytes).digest('hex')
+    dropManifest.database.bytes = dropBytes.byteLength
+    writeFileSync(dropManifestPath, JSON.stringify(dropManifest, null, 2))
+    const dropped = new WorkflowSnapshots(data.store).verify(missingTableDir)
+    assert.equal(dropped.status, 'blocked', 'a missing activation table is not silently treated as empty evidence')
   } finally {
     data.store.close()
     rmSync(data.root, { recursive: true, force: true })

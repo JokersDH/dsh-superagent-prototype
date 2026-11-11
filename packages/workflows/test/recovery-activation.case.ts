@@ -8,6 +8,7 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { RecoveryActivationIntent, TrustedActor } from '@personal-agent/contracts'
+import { canonicalDigest } from '@personal-agent/contracts/canonical'
 import { ProductStore } from '@personal-agent/storage'
 import { RecoveryIntentCommitter } from '../../../apps/coordinator/product/recovery-intents.ts'
 const faultCode = (error: unknown): string | undefined => (error as { error?: { code?: string } } | null)?.error?.code
@@ -143,4 +144,48 @@ test('legacy v14 plan intents stay audit-only and are never returned as activati
     store.close()
     rmSync(dir, { recursive: true, force: true })
   }
+})
+
+test('a v14 database with a legacy plan intent upgrades to v15 without rewriting or promoting it', async () => {
+  const dir = tmp('recovery-v14-')
+  const path = join(dir, 'state.sqlite')
+  const legacyPlan = {
+    protocol: 'recovery-plan/1', planId: 'legacy-plan', inspectionFingerprint: 'f'.repeat(64),
+    createdAt: at, expiresAt: '2026-11-11T00:05:00.000Z',
+    bindings: [{ sourceProjectId: 'project-1', proposedProjectId: 'project-1', path: '/tmp/project',
+      headCommit: 'f'.repeat(40), configurationDigest: 'a'.repeat(64), scopeDigest: 'b'.repeat(64) }],
+    executor: null, artifactsChecked: 0, artifactScanTruncated: false,
+    blockers: [{ code: 'authorization_not_implemented', owner: 'main', detail: 'legacy' }],
+    authorization: 'not_granted', commitAvailable: false,
+  }
+  const envelope = { protocol: 'recovery-intent/1', plan: legacyPlan, userId: 'user-1', actorRef: 'authority-1',
+    inspectionFingerprint: 'f'.repeat(64), sourceFingerprint: 'f'.repeat(64), confirmedAt: at }
+  const envelopeDigest = canonicalDigest(JSON.parse(JSON.stringify(envelope)))
+  try {
+    const Database = (await import('better-sqlite3')).default
+    const legacy = new Database(path)
+    const { applyMigrations, MIGRATIONS } = await import('@personal-agent/storage')
+    applyMigrations(legacy, { registry: MIGRATIONS.slice(0, 14) })
+    legacy.prepare(`INSERT INTO recovery_intents
+      (command_id, plan_id, plan_digest, inspection_fingerprint, source_fingerprint, user_id, actor_ref,
+       payload, digest, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+      'legacy-command', 'legacy-plan', canonicalDigest(JSON.parse(JSON.stringify(legacyPlan))), 'f'.repeat(64), 'f'.repeat(64),
+      'user-1', 'authority-1', JSON.stringify(envelope), envelopeDigest, at, legacyPlan.expiresAt,
+    )
+    legacy.close()
+
+    const store = new ProductStore({ path })
+    try {
+      assert.equal(store.database.productSchema, 15)
+      const legacyRead = store.workflows.recoveryIntents.getByPlan('legacy-plan')!
+      assert.deepEqual(legacyRead.plan, legacyPlan, 'the legacy row is still readable as audit evidence')
+      assert.equal(legacyRead.authorization, 'not_granted')
+      assert.equal(store.workflows.recoveryActivations.get('legacy-plan'), undefined)
+      assert.equal(store.workflows.recoveryActivations.forCommand('legacy-command'), undefined)
+      // A new activation uses the shared schema and never silently inherits the legacy row.
+      store.workflows.recoveryActivations.put(intent({ planId: 'legacy-plan' }))
+      assert.equal(store.workflows.recoveryActivations.get('activation-1')!.planId, 'legacy-plan')
+      assert.equal(store.workflows.recoveryIntents.getByPlan('legacy-plan')!.plan.planId, 'legacy-plan')
+    } finally { store.close() }
+  } finally { rmSync(dir, { recursive: true, force: true }) }
 })

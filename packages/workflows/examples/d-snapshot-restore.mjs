@@ -57,6 +57,15 @@ try {
     expectedInspectionFingerprint: 'f'.repeat(64), sourceFingerprint: 'f'.repeat(64), confirmedAt: at,
   })
 
+  ports.recoveryActivations.put({
+    protocol: 'recovery-activation-intent/1', activationId: 'activation-1', commandId: 'activation-command-1',
+    planId: 'activation-plan-1', planDigest: 'b'.repeat(64),
+    source: { stateId: 'state-source', stateRoot: '/tmp/source-state', markerDigest: 'c'.repeat(64), inspectionFingerprint: 'd'.repeat(64) },
+    target: { generationId: 'generation-1', stateRoot: '/tmp/target-state', configurationDigest: 'e'.repeat(64) },
+    principal: { userId: 'user-1', authorityRef: 'authority-1' },
+    machineDigest: 'f'.repeat(64), resourcePolicyDigest: 'a'.repeat(64),
+    createdAt: at, expiresAt: '2026-11-11T00:05:00.000Z',
+  })
   const snapshot = join(root, 'snapshot')
   const snapshots = new WorkflowSnapshots(store)
   const created = await snapshots.create({ destination: snapshot })
@@ -71,6 +80,8 @@ try {
       outcomes: db.prepare("SELECT COUNT(*) AS n FROM execution_outcome WHERE id = 'outcome-1'").get().n,
       settings: db.prepare('SELECT COUNT(*) AS n FROM project_settings_versions').get().n,
       recoveryIntents: db.prepare('SELECT COUNT(*) AS n FROM recovery_intents').get().n,
+      recoveryActivations: db.prepare('SELECT COUNT(*) AS n FROM recovery_activations').get().n,
+      activationTarget: JSON.parse(String(db.prepare("SELECT value FROM recovery_activations WHERE activation_id = 'activation-1'").get().value)).target.stateRoot,
       intentAuthorization: JSON.parse(String(db.prepare("SELECT payload FROM recovery_intents WHERE plan_id = 'recovery-plan-1'").get().payload)).plan.authorization,
     }
   } finally { db.close() }
