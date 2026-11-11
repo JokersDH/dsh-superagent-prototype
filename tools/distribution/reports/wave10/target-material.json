@@ -1,0 +1,69 @@
+{
+  "protocol": "wave09-target-material-recipe/1",
+  "status": "PASS",
+  "durationMs": 26,
+  "trustedParent": "/tmp/w10pf",
+  "steps": [
+    {
+      "id": "parent-trusted",
+      "status": "PASS",
+      "detail": {
+        "trustedParent": "/tmp/w10pf",
+        "mode": "700"
+      }
+    },
+    {
+      "id": "prepare-manifest-only",
+      "status": "PASS",
+      "detail": {
+        "stateRoot": "/tmp/w10pf/activation-wave10-recipe",
+        "manifestDigest": "564e6bf85b739ff6baf1bb73ac09291842c50b08cd74c37c4115db777310102d",
+        "entries": [
+          "recovery-target.json"
+        ]
+      }
+    },
+    {
+      "id": "readback",
+      "status": "PASS",
+      "detail": {
+        "productSchema": 15,
+        "startupAvailable": false
+      }
+    },
+    {
+      "id": "repeat-idempotent",
+      "status": "PASS",
+      "detail": {}
+    },
+    {
+      "id": "empty-schema-initialized-by-public-store",
+      "status": "PASS",
+      "detail": {
+        "path": "/tmp/w10pf/activation-wave10-recipe/state.sqlite",
+        "productSchema": 15,
+        "materialReadable": true
+      }
+    },
+    {
+      "id": "discard-refuses-initialized-target",
+      "status": "PASS",
+      "detail": {}
+    },
+    {
+      "id": "inventory-reader-unavailable",
+      "status": "SKIPPED",
+      "detail": {
+        "reason": "INVENTORY_READER_UNAVAILABLE",
+        "requirement": "A-owned RecoveryTargetInventoryReader.inspect(stateRoot) must be implemented and integrated by main; D does not fabricate an inventory."
+      }
+    },
+    {
+      "id": "discard-staging-only",
+      "status": "PASS",
+      "detail": {
+        "removed": true
+      }
+    }
+  ]
+}

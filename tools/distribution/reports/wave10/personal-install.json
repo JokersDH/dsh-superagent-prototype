@@ -1,0 +1,80 @@
+{
+  "protocol": "wave10-personal-install/1",
+  "status": "PASS",
+  "startedAt": "2026-11-11T14:57:54.943Z",
+  "steps": [
+    {
+      "id": "source-identity",
+      "status": "PASS",
+      "detail": {
+        "buildId": "da2d78d126e4745f",
+        "commit": "cf7a3cfeb4ebabebe95b8670bae33a97d3a71596",
+        "schema": 15,
+        "dirty": false
+      }
+    },
+    {
+      "id": "cold-first-run",
+      "status": "PASS",
+      "detail": {
+        "status": "OK"
+      }
+    },
+    {
+      "id": "doctor-gates",
+      "status": "PASS",
+      "detail": {
+        "doctor": "DEGRADED",
+        "review_executor": "WARN"
+      }
+    },
+    {
+      "id": "personal-start-zero-turn",
+      "status": "PASS",
+      "detail": {
+        "mode": "personal",
+        "access": "local-development",
+        "buildId": "da2d78d126e4745f",
+        "startupMode": "normal"
+      }
+    },
+    {
+      "id": "backup",
+      "status": "PASS",
+      "detail": {
+        "sha256": "fb49c0a6468dec79ce98f5304807bf457044ac4927c1cb71ea1ad0943c7c3652",
+        "evidenceDigest": "72d094efe33fc790b3bf177c7d602fabb6b301ddebef69170b016e18d3ff887b"
+      }
+    },
+    {
+      "id": "restore-readonly-fresh-root",
+      "status": "PASS",
+      "detail": {
+        "backupEvidence": "72d094efe33fc790b3bf177c7d602fabb6b301ddebef69170b016e18d3ff887b",
+        "restoredEvidence": "72d094efe33fc790b3bf177c7d602fabb6b301ddebef69170b016e18d3ff887b",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-personal-install-tcI5TX/restored-state"
+      }
+    },
+    {
+      "id": "relocated-install",
+      "status": "PASS",
+      "detail": {
+        "doctor": "DEGRADED",
+        "health": "ok",
+        "mode": "fixture"
+      }
+    }
+  ],
+  "limitations": [
+    "Zero model turns: personal mode is started but no work is dispatched.",
+    "Cross-schema refusal and same-schema rollback are measured by the managed matrix, not duplicated here."
+  ],
+  "artifact": {
+    "install": "/tmp/w10frozen/install",
+    "buildId": "da2d78d126e4745f",
+    "commit": "cf7a3cfeb4ebabebe95b8670bae33a97d3a71596",
+    "schema": 15,
+    "dirty": false
+  },
+  "finishedAt": "2026-11-11T14:58:02.230Z"
+}

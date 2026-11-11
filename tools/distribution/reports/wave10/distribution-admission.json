@@ -6,13 +6,13 @@
     "/Users/hh/Desktop/joker/superagent-agent-d"
   ],
   "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-d",
-  "sourceCommit": "f8640ff95f8926ef6b04c0df51e7917fe8365471",
+  "sourceCommit": "cf7a3cfeb4ebabebe95b8670bae33a97d3a71596",
   "sourceWorktreeClean": false,
   "sourceHashes": {
     "packages/portability/src/recovery-target.ts": "4ea451c9489fc6debc21621857203090ab1ec75b61b532bcab49cb393be38479",
     "apps/launcher/lib/upgrade.mjs": "a7b729bc93819a0c06804307cfe0a3996789e9d6be4c56538c9e3c1e278e3fae"
   },
-  "checkedAt": "2026-11-11T14:53:55.357Z",
+  "checkedAt": "2026-11-11T14:59:34.745Z",
   "exitCode": 0,
   "cases": [
     {

@@ -20,4 +20,4 @@
 
 ## 4. 产物与限制
 
-冻结tuple见`tools/distribution/reports/wave10/artifacts.json`；矩阵17/17、personal 7/7、schema-change E 9/9、材料recipe PASS。未测：跨平台/ABI、真实个人计费turn、逐步SIGKILL、A reader集成、main激活、E独立准入。历史tar/报告保留。
+冻结tuple见`tools/distribution/reports/wave10/artifacts.json`：target build `da2d78d126e4745f`、source `cf7a3cf`（clean）、schema15、sha256 `f886a05c…f5a2`、20,073,981 B、6670文件。矩阵17/17、personal 7/7、schema-change E 9/9、admission probe 7/7、材料recipe PASS。未测：跨平台/ABI、真实个人计费turn、逐步SIGKILL、A reader集成、main激活、E独立准入。历史tar/报告保留。

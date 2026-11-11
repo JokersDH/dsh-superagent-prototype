@@ -7,9 +7,9 @@
 | 角色 | tar | sha256 | source | buildId | schema |
 | --- | --- | --- | --- | --- | --- |
 | baseline | `/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz` | `0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631` | `e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389` | `7e8f6ce6fa2e2633` | 13 |
-| target | 见`tools/distribution/reports/wave10/artifacts.json`（第十轮冻结） | 同左 | 同左 | 同左 | 15 |
+| target | `/Users/hh/Desktop/joker/pa-artifacts/wave10-target/wave10-target-cf7a3cf.tar.gz` | `f886a05c55dbe581198ce587d1c80c410ec08d13012ff0689cc77d70f44df5a2` | `cf7a3cfeb4ebabebe95b8670bae33a97d3a71596`（clean） | `da2d78d126e4745f` | 15 |
 
-E必须从该JSON取tar/sha256/source/build/schema/平台/ABI/字节数，不得用checkout或旧波次包替代。
+E必须从该JSON取tar/sha256/source/build/schema/平台/ABI/字节数（target tar 20,073,981 B，6670文件），不得用checkout或旧波次包替代。
 
 ## 2. 实际命令
 

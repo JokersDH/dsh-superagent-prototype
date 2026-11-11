@@ -1,0 +1,60 @@
+{
+  "protocol": "wave10-artifacts/1",
+  "baseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+    "digests": {
+      "tarSha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "tarBytes": 19911757
+    },
+    "buildId": "7e8f6ce6fa2e2633",
+    "source": {
+      "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "producer": {
+      "product": "dsh-superagent",
+      "version": "0.1.0",
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "productSchema": 13,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    }
+  },
+  "target": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave10-target/wave10-target-cf7a3cf.tar.gz",
+    "digests": {
+      "tarSha256": "f886a05c55dbe581198ce587d1c80c410ec08d13012ff0689cc77d70f44df5a2",
+      "tarBytes": 20073981
+    },
+    "buildId": "da2d78d126e4745f",
+    "source": {
+      "commit": "cf7a3cfeb4ebabebe95b8670bae33a97d3a71596",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "producer": {
+      "product": "dsh-superagent",
+      "version": "0.1.0",
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "productSchema": 15,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    }
+  },
+  "schemaChange": {
+    "baseline": 13,
+    "target": 15
+  },
+  "notes": [
+    "Baseline is the preserved wave-06 artifact; target is built from the pushed clean wave-10 D head cf7a3cf dataset (source.dirty=false, schema 15) containing D1-D4 source plus current main context/evidence (32fc7ae/677cf26).",
+    "Earlier wave-06/08/09 tars remain historical and are not the current target.",
+    "E must use these tuples; the checkout is not an installation input."
+  ]
+}

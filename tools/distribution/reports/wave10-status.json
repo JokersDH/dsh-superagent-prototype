@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "25e5643",
   "mergedMain": "104f17e",
-  "head": "f8640ff",
+  "head": "cf7a3cf",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E admission. Model/native turns 0; eight user instances untouched.",
   "ownedPaths": [
@@ -47,7 +47,7 @@
     },
     "d4": {
       "status": "PASS",
-      "summary": "Ordinary personal install built from current source and exercised without dispatching work: cold first-run, doctor gates, real personal-mode start (health/record mode+access, zero model turns), backup, readonly restore into a fresh root with identical evidence digest, and relocation to another path with doctor+fixture start. Managed upgrade/recover/rollback and cross-schema refusal are covered by the 17-section matrix.",
+      "summary": "Ordinary personal install built from the clean current source and exercised without dispatching work: cold first-run, doctor gates, real personal-mode start (health/record mode+access, zero model turns), backup, readonly restore into a fresh root with identical evidence digest, and relocation to another path with doctor+fixture start. Managed upgrade/recover/rollback and cross-schema refusal are covered by the 17-section matrix; all frozen-byte runs re-executed.",
       "evidence": [
         "tools/distribution/verify-personal-install.mjs",
         "tools/distribution/reports/wave10/personal-install.json",
@@ -67,7 +67,7 @@
     },
     "d6": {
       "status": "PASS_WITH_E_PENDING",
-      "summary": "Frozen baseline/target tuples and the latest ordinary-personal, managed-upgrade, schema-change and target-material recipes are published with exact commands, expected codes and cleanup rules. Independent E acceptance remains pending.",
+      "summary": "Frozen baseline/target tuples (cf7a3cf / schema15) and the latest ordinary-personal, managed-upgrade, schema-change and target-material recipes are published with exact commands, expected codes and cleanup rules. D re-ran every recipe against the frozen tars/install: matrix 17/17, personal 7/7, schema-change 9/9, material PASS. Independent E acceptance remains pending.",
       "evidence": [
         "tools/distribution/recipes/wave10-e-target-upgrade.zh-CN.md",
         "tools/distribution/reports/wave10/artifacts.json"
@@ -77,11 +77,126 @@
   "admissionProbe": {
     "status": "PASS_DISTRIBUTION_ADMISSION",
     "cases": 7,
-    "sourceCommit": "f8640ff95f8926ef6b04c0df51e7917fe8365471",
-    "clean": false
+    "sourceCommit": "cf7a3cfeb4ebabebe95b8670bae33a97d3a71596",
+    "clean": false,
+    "cleanExplanation": "The probe writes its report into the main-owned reports/releases path, so the worktree is dirty by that generated report; sourceHashes and sourceCommit are recorded in the probe report."
   },
-  "artifacts": null,
-  "testLayers": {},
+  "artifacts": {
+    "protocol": "wave10-artifacts/1",
+    "baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "digests": {
+        "tarSha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+        "tarBytes": 19911757
+      },
+      "buildId": "7e8f6ce6fa2e2633",
+      "source": {
+        "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "producer": {
+        "product": "dsh-superagent",
+        "version": "0.1.0",
+        "node": "24.21.0",
+        "pnpm": "11.7.0",
+        "sqlite": "3.53.4",
+        "productSchema": 13,
+        "platform": "darwin",
+        "arch": "arm64",
+        "abi": "137"
+      }
+    },
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave10-target/wave10-target-cf7a3cf.tar.gz",
+      "digests": {
+        "tarSha256": "f886a05c55dbe581198ce587d1c80c410ec08d13012ff0689cc77d70f44df5a2",
+        "tarBytes": 20073981
+      },
+      "buildId": "da2d78d126e4745f",
+      "source": {
+        "commit": "cf7a3cfeb4ebabebe95b8670bae33a97d3a71596",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "producer": {
+        "product": "dsh-superagent",
+        "version": "0.1.0",
+        "node": "24.21.0",
+        "pnpm": "11.7.0",
+        "sqlite": "3.53.4",
+        "productSchema": 15,
+        "platform": "darwin",
+        "arch": "arm64",
+        "abi": "137"
+      }
+    },
+    "schemaChange": {
+      "baseline": 13,
+      "target": 15
+    },
+    "notes": [
+      "Baseline is the preserved wave-06 artifact; target is built from the pushed clean wave-10 D head cf7a3cf dataset (source.dirty=false, schema 15) containing D1-D4 source plus current main context/evidence (32fc7ae/677cf26).",
+      "Earlier wave-06/08/09 tars remain historical and are not the current target.",
+      "E must use these tuples; the checkout is not an installation input."
+    ]
+  },
+  "testLayers": {
+    "launcher": {
+      "tests": 56,
+      "status": "PASS"
+    },
+    "portability": {
+      "tests": 52,
+      "status": "PASS"
+    },
+    "smoke": {
+      "steps": 52,
+      "status": "PASS"
+    },
+    "admissionProbe": {
+      "cases": 7,
+      "status": "PASS_DISTRIBUTION_ADMISSION"
+    },
+    "binaryUpgrade": {
+      "sections": 17,
+      "status": "PASS",
+      "sectionStatus": {
+        "installs": "PASS",
+        "A-baseline-state": "PASS",
+        "B-binary-switch": "PASS",
+        "C-post-upgrade-data-protection": "PASS",
+        "D-exact-schema-refusal": "PASS",
+        "E1-tampered-target-refused": "PASS",
+        "E2-running-switch-refused": "PASS",
+        "E3-unverified-instance-blocked": "PASS",
+        "E4-unhealthy-target-reverted": "PASS",
+        "E5-interrupted-switch-recovered": "PASS",
+        "E6-duplicate-refused": "PASS",
+        "E7-stop-unproven-kept": "PASS",
+        "E8-crash-after-stop-restarts-previous": "PASS",
+        "E9-record-missing-reverted": "PASS",
+        "E10-orphan-api-stopped": "PASS",
+        "E11-unknown-live-blocked": "PASS",
+        "E12-reentry-refused-until-recover": "PASS"
+      }
+    },
+    "personalInstall": {
+      "steps": 7,
+      "status": "PASS"
+    },
+    "artifactUpgrade": {
+      "steps": 9,
+      "status": "PASS"
+    },
+    "targetMaterial": {
+      "steps": 8,
+      "status": "PASS",
+      "skipped": [
+        "inventory-reader-unavailable"
+      ]
+    }
+  },
   "blockers": [
     {
       "id": "A-INVENTORY-READER",
