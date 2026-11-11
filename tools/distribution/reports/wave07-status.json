@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "d4d51ae",
   "mergedMain": "436dc02",
-  "head": "9402626",
+  "head": "536a064",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate evidence. Not main/E admission, not installed-alpha. Recovery activation commit is main-owned and still unpublished; binary switching is measured only for the two frozen artifacts below.",
   "ownedPaths": [
@@ -22,7 +22,7 @@
     "wave06Final": "4a0ea7f",
     "wave07CheckpointD1": "c9a0698",
     "wave07CheckpointD2D3": "5adf00b",
-    "wave07Final": "9402626",
+    "wave07Final": "536a064",
     "artifactSourceCommit": "76f26a6"
   },
   "phases": {
@@ -91,7 +91,7 @@
     },
     "d5": {
       "status": "PASS_WITH_NOTED_GAPS",
-      "summary": "Reentrant operations from a fresh root: install/first-run/doctor/start/status/backup/stop plus the two-artifact upgrade/rollback recipe; diagnostics report the release binding, upgrade journal and exact refusal codes; failures covered include corrupt target bytes, running switch, unverified live pid, unhealthy target, crash-after-swap + recover, duplicate request, schema-incompatible binary and corrupt/missing state. Cleanup only removes the operation own temp roots.",
+      "summary": "Reentrant operations from a fresh root: install/first-run/doctor/start/status/backup/stop plus the two-artifact upgrade/rollback recipe; diagnostics report the release binding, upgrade journal and exact refusal codes; failures covered include corrupt target bytes, running switch, unverified live pid, unhealthy target, crash-after-swap + recover, duplicate request, schema-incompatible binary and corrupt/missing state. Cleanup only stops processes whose command line still names this run own temp root and removes only that root.",
       "evidence": [
         "tools/distribution/verify-upgrade-artifact.mjs",
         "tools/distribution/reports/wave07/artifact-upgrade-acceptance.json",

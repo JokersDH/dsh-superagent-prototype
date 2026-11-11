@@ -1,7 +1,7 @@
 {
   "case": "WAVE07-BINARY-UPGRADE",
   "status": "PASS",
-  "startedAt": "2026-11-11T07:46:01.105Z",
+  "startedAt": "2026-11-11T07:50:51.626Z",
   "sections": {
     "installs": {
       "status": "PASS",
@@ -26,7 +26,7 @@
         "buildId": "7e8f6ce6fa2e2633",
         "evidenceDigest": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
         "artifactDigest": "d690795d9b0136f3f35f6bd99f5c8a9ddc55757dd0706b8c2eb2401369fc7ba2",
-        "backup": "2cfb182566cb7e23d17101c658417edbdd87e350d48025c8cec971b509c00265"
+        "backup": "85ddda44afbf821de084249d156d1ed68bb40b7f73a32fcd68e53df97cc8540d"
       }
     },
     "B-binary-switch": {
@@ -36,11 +36,11 @@
         "to": "9120a5ed858e0feb",
         "stopped": "STOPPED",
         "backup": {
-          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave07-upgrade-OZG11L/switch-backup.pab",
-          "sha256": "864f46ce87be864e4c048914984a838c435cb1215e93aef59f5d632aba9ca475"
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave07-upgrade-JJlKb3/switch-backup.pab",
+          "sha256": "2733d0cfa184b925a47fd3f5f2693dbda46c51d9dfeafaa3a0d5c89565d0f04e"
         },
         "instance": {
-          "pid": 59851,
+          "pid": 64287,
           "buildId": "9120a5ed858e0feb"
         },
         "evidenceDigestBefore": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
@@ -111,7 +111,7 @@
       }
     }
   },
-  "finishedAt": "2026-11-11T07:46:16.482Z",
+  "finishedAt": "2026-11-11T07:51:06.713Z",
   "limitations": [
     "Both D wave-07 artifacts use product schema 13, so the binary rollback check is compatibility-preserving; the incompatible-direction proof uses the frozen schema-12 wave-06 build.",
     "Only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured; other platforms/ABIs are NOT_TESTED.",
