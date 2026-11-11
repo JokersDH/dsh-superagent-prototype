@@ -1,0 +1,62 @@
+.attention-view { min-width: 0; }
+.attention-surface:not([hidden]) { display: flex; flex: 1; min-width: 0; min-height: 0; }
+.attention-tools, .attention-tools button, .attention-pagination > div, .attention-pagination button { display: flex; align-items: center; gap: 7px; }
+.attention-tools { flex-shrink: 0; }
+.attention-tools button { font-size: 12px; }
+.attention-header { padding-bottom: 18px; }
+.attention-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 0 32px 16px; }
+.attention-search { display: flex; flex: 1 1 220px; align-items: center; gap: 8px; min-width: 0; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); }
+.attention-search input { width: 100%; min-height: 34px; border: 0; background: transparent; outline: none; font-size: 13px; }
+.attention-search:focus-within { outline: 2px solid var(--focus, #408f75); outline-offset: 2px; }
+.attention-search svg { flex-shrink: 0; }
+.attention-project { display: flex; flex: 0 1 240px; align-items: center; gap: 8px; min-width: 0; font-size: 12px; color: var(--muted); }
+.attention-project > span { flex-shrink: 0; white-space: nowrap; }
+.attention-project select { width: 100%; min-width: 0; min-height: 34px; padding: 5px 8px; font-size: 12px; }
+.attention-tabs { display: flex; align-items: center; flex-wrap: wrap; gap: 3px; padding: 0 32px; border-bottom: 1px solid var(--line); }
+.attention-tabs button { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 10px; border: 0; border-radius: 0; background: transparent; color: var(--muted); font-size: 12px; }
+.attention-tabs button:hover:not(:disabled), .attention-tabs button[aria-pressed='true'] { border: 0; background: var(--accent-soft); color: var(--accent-strong); }
+.attention-tabs button[aria-pressed='true'] { box-shadow: inset 0 -2px var(--accent); }
+.attention-tabs button span { font-size: 11px; font-variant-numeric: tabular-nums; }
+.attention-order { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; color: var(--muted); font-size: 11px; white-space: nowrap; }
+.attention-content { flex: 1; min-height: 0; overflow: auto; }
+.attention-list { margin: 0; padding: 0 32px; list-style: none; }
+.attention-row { display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 19px 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; color: var(--ink); text-align: left; }
+.attention-row:hover:not(:disabled) { border: 0; border-bottom: 1px solid var(--line); background: #f8faf8; color: var(--ink); }
+.attention-icon { display: grid; flex: 0 0 30px; width: 30px; height: 30px; place-items: center; border-radius: 6px; color: var(--warn); background: var(--warn-soft); }
+.attention-candidate .attention-icon { color: var(--accent); background: var(--accent-soft); }
+.attention-blocked .attention-icon { color: var(--danger); background: var(--danger-soft); }
+.attention-body { display: flex; flex: 1; flex-direction: column; gap: 6px; min-width: 0; }
+.attention-row-title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.attention-row-title strong { min-width: 0; overflow-wrap: anywhere; font-size: 14px; font-weight: 600; }
+.attention-summary { overflow-wrap: anywhere; font-size: 13px; font-weight: 400; line-height: 1.7; }
+.attention-meta { display: flex; flex-wrap: wrap; gap: 4px 13px; color: var(--muted); font-size: 11px; font-weight: 400; }
+.attention-project-name { max-width: 240px; overflow-wrap: anywhere; }
+.attention-overdue { color: var(--danger); }
+.attention-rationale { color: var(--accent-strong); font-size: 11px; font-weight: 400; }
+.attention-chevron { flex-shrink: 0; margin-top: 8px; color: var(--muted); }
+.attention-empty { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 52px 24px; color: var(--muted); text-align: center; }
+.attention-empty h3 { margin: 0; font-size: 15px; font-weight: 500; }
+.attention-empty p { margin: 0; font-size: 12px; }
+.attention-error { display: flex; align-items: center; gap: 8px; margin: 14px 32px; padding: 8px 10px; border: 1px solid #efd5d4; border-radius: 6px; color: var(--danger); background: var(--danger-soft); font-size: 12px; }
+.attention-error span { flex: 1; }
+.attention-coverage { margin: 14px 32px; color: var(--warn); font-size: 12px; }
+.attention-more { display: block; margin: 18px auto; font-size: 12px; }
+.attention-pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 14px 32px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+.attention-pagination button { font-size: 12px; }
+.review-navigation { display: flex; align-items: center; gap: 5px; padding: 9px 16px; border-bottom: 1px solid var(--line); background: var(--sidebar); }
+.review-navigation span { flex: 1; color: var(--muted); font-size: 11px; }
+@media (max-width: 720px) {
+  .attention-header { flex-wrap: wrap; gap: 12px; }
+  .attention-filters { padding: 0 18px 12px; }
+  .attention-project { flex: 1 1 100%; }
+  .attention-tabs { padding: 0 9px; }
+  .attention-tabs button { gap: 5px; padding-inline: 8px; }
+  .attention-order { margin-left: 3px; font-size: 10px; }
+  .attention-list { padding-inline: 18px; }
+  .attention-row { gap: 10px; padding: 17px 0; }
+  .attention-icon { flex-basis: 26px; width: 26px; height: 26px; }
+  .attention-meta { gap: 4px 9px; }
+  .attention-pagination { padding: 12px 18px; }
+  .attention-error, .attention-coverage { margin-inline: 18px; }
+  .attention-search input { font-size: 16px; }
+}
