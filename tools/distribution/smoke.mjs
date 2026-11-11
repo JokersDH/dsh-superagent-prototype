@@ -528,6 +528,22 @@ try {
     throw new Error('restored evidence digest does not match the bundle manifest')
   if (JSON.stringify(restore.json.report.evidence.counts) !== JSON.stringify(backupEvidence.counts))
     throw new Error('restored evidence counts do not match the bundle manifest')
+  const recoveryStatus = runPa(['recovery-status', '--json', ...stateArgs(restoredData)], { allowExit: [1] })
+  if (recoveryStatus.json?.startupMode !== 'recovery_readonly') throw new Error('recovery-status did not report recovery_readonly for a restored state')
+  if (recoveryStatus.json?.authorization?.status !== 'BLOCKED' || recoveryStatus.json?.authorization?.owner !== 'main')
+    throw new Error('recovery-status must report the main-owned authorization interface as BLOCKED')
+  if (recoveryStatus.json?.markerPresent !== true || recoveryStatus.json?.queueReplay !== 'never')
+    throw new Error('recovery-status must preserve the marker and never replay the queue')
+  if (typeof recoveryStatus.json?.stateName !== 'string' || recoveryStatus.json.stateName.includes('/'))
+    throw new Error('recovery-status leaked an absolute state path')
+  step('recovery-status-blocked-authorization', 'PASS', {
+    startupMode: recoveryStatus.json.startupMode,
+    authorization: recoveryStatus.json.authorization.status,
+    owner: recoveryStatus.json.authorization.owner,
+    pendingRebind: recoveryStatus.json.pendingRebind.length,
+    queueReplay: recoveryStatus.json.queueReplay,
+  })
+
   step('restore-new-directory', 'PASS', {
     target: restoredData,
     pendingRebind: restore.json.report.pathMappings.pendingRebind.length,

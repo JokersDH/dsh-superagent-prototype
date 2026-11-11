@@ -11,7 +11,7 @@ import { createHash } from 'node:crypto'
 import { chmodSync, closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, renameSync, rmdirSync, rmSync, writeSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import Database from 'better-sqlite3'
-import { verifyDatabase } from '@personal-agent/storage'
+import { PRODUCT_SCHEMA_VERSION, verifyDatabase } from '@personal-agent/storage'
 import { readEvidenceSummary, type EvidenceSummary } from './evidence.ts'
 import { PortabilityError } from './errors.ts'
 import { DATABASE_ENTRY, MANIFEST_ENTRY } from './manifest.ts'
@@ -245,6 +245,13 @@ export async function restoreBundle(options: RestoreOptions): Promise<RestoreRes
       throw new PortabilityError('database_verify_failed', 'Restored database failed integrity or foreign-key checks', {
         integrity: database.integrity,
         foreignKeyViolations: database.foreignKeyViolations,
+      })
+    // Never activate a state from a newer schema: this build cannot prove it can read the data, and
+    // an implicit down-migration/deletion is forbidden.
+    if (database.productSchema !== null && database.productSchema > PRODUCT_SCHEMA_VERSION)
+      throw new PortabilityError('schema_unsupported', 'Bundle database schema is newer than this build supports', {
+        productSchema: database.productSchema,
+        supported: PRODUCT_SCHEMA_VERSION,
       })
     let eventSeq: number | null = null
     const db = new Database(join(staging, 'state.sqlite'), { readonly: true, fileMustExist: true })

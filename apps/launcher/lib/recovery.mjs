@@ -63,6 +63,45 @@ export function expectedStartupMode(stateDir) {
  */
 
 /** @returns {RecoverySummary} */
+export const RECOVERY_AUTHORIZATION = {
+  status: 'BLOCKED',
+  owner: 'main',
+  interface: 'recovery inspect/prepare/commit public interface (WP-16/0023 §6)',
+  reason:
+    'This build has only the read-only startup gate. Fresh binding/verification, an explicit plan with TTL/fingerprint and transactional new-work authorization are main-owned and not published yet; D does not guess HTTP shapes or add a force switch.',
+  requiredInputs: [
+    'inspect: read-only recovery state, verifiable sources and blockers; never dispatch old queue',
+    'prepare: re-verify machine/project paths/executor/environment/evidence and return a bounded plan snapshot',
+    'commit: authenticated confirmation of the exact plan/current fingerprint with idempotent receipt, drift rejection and same-transaction authorization',
+  ],
+  forbidden: ['delete restore marker', 'force switch', 'replay old queue', 'old writer/native session as new authority', 'second auth/key store'],
+} 
+
+/** Local, read-only recovery projection. It never calls HTTP or mutates the marker/state. */
+export function recoveryStatus({ roots }) {
+  const marker = readRestoreMarker(roots.data)
+  const summary = recoverySummary(roots.data)
+  return {
+    protocol: 'personal-recovery-status/1',
+    checkedAt: new Date().toISOString(),
+    stateName: roots.data.split('/').pop() ?? 'state',
+    markerPresent: marker.present,
+    markerValid: marker.valid,
+    markerPath: marker.path,
+    startupMode: summary.startupMode,
+    pendingRebind: summary.pendingRebind,
+    requiresRevalidation: summary.requiresRevalidation,
+    queueReplay: 'never',
+    markerPreserved: marker.present,
+    authorization: marker.present ? RECOVERY_AUTHORIZATION : { status: 'NOT_REQUIRED', owner: null, reason: 'No restore marker; normal startup authorization applies.' },
+    limitations: [
+      'Local projection only: this does not prove the writer is stopped, does not start the daemon and does not consume any queue.',
+      'New-work authorization requires the main inspect/prepare/commit interface; blocked rather than bypassed when absent.',
+      ...(marker.present && !marker.valid ? ['The restore marker is unreadable; the state is still treated as read-only.'] : []),
+    ],
+  }
+}
+
 export function recoverySummary(stateDir) {
   const marker = readRestoreMarker(stateDir)
   if (!marker.present)

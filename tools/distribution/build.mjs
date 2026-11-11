@@ -37,6 +37,7 @@ const { values } = parseArgs({
     'config-root': { type: 'string' },
     output: { type: 'string' },
     'release-output': { type: 'string' },
+    tag: { type: 'string' },
     'skip-console': { type: 'boolean', default: false },
     'skip-packages': { type: 'boolean', default: false },
     'skip-self-check': { type: 'boolean', default: false },
@@ -271,6 +272,7 @@ const buildId = sha256(
   JSON.stringify({
     artifacts: artifacts.map(({ path, bytes, sha256: digest }) => [path, bytes, digest]),
     commit,
+    tag: values.tag ?? '',
     node: process.versions.node,
     platform: process.platform,
     arch: process.arch,
@@ -356,6 +358,7 @@ const summary = {
   buildId,
   config: configPath,
   output: values.output ?? null,
+  tag: values.tag ?? null,
   staged: staged === null ? null : { path: staged.output, installManifest: staged.installPath },
   source: release.source,
   producer: { node: release.producer.node, sqlite, abi, platform: release.producer.platform, arch: release.producer.arch },

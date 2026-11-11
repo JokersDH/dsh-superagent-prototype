@@ -24,6 +24,7 @@ export type PortabilityCode =
   | 'artifact_digest_mismatch'
   | 'evidence_mismatch'
   | 'evidence_unreadable'
+  | 'schema_unsupported'
   | 'writer_uncertain'
   | 'state_in_use'
   | 'target_not_empty'

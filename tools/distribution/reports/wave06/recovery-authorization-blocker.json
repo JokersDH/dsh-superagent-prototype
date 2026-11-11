@@ -1,0 +1,94 @@
+{
+  "protocol": "wave06-recovery-authorization-blocker/1",
+  "createdBy": "agent-d",
+  "owner": "main",
+  "status": "BLOCKED",
+  "phase": "D4",
+  "createdAt": "2026-11-11T02:40:12.200Z",
+  "expectedInterface": {
+    "source": "WP-16/0023 §6",
+    "operations": [
+      {
+        "name": "inspect",
+        "expected": "read-only recovery state, verifiable sources/blockers, never dispatch old queue"
+      },
+      {
+        "name": "prepare",
+        "expected": "re-verify machine/project paths/executor/environment/evidence/resource state; bounded plan snapshot with expiry; no execution/native start"
+      },
+      {
+        "name": "commit",
+        "expected": "authenticated explicit confirmation of exact plan/current fingerprint/version; receipt+authorization+state in one transaction; replay idempotent; drift rejected"
+      }
+    ],
+    "semantics": [
+      "new work/new contract only",
+      "old queue not replayed",
+      "unknown-writer barrier preserved",
+      "old profile/writer/session not authority",
+      "marker never deleted",
+      "no force/allow-resume switch"
+    ]
+  },
+  "observedMain": {
+    "merge": "0a84aa5",
+    "readonlyGate": "apps/coordinator/http/app.ts:267-268 rejects business POSTs with unsupported_capability",
+    "routes": "no /v1/recovery/inspect|prepare|commit route in apps/coordinator/http/app.ts",
+    "missing": "public recovery authorization schema/endpoint"
+  },
+  "dConsumption": {
+    "command": "<install>/bin/pa recovery-status --json",
+    "cliStatus": "BLOCKED (owner main)",
+    "doesNot": [
+      "guess HTTP shape",
+      "delete restore-report.json",
+      "force switch",
+      "replay queue",
+      "add second auth/key store"
+    ]
+  },
+  "evidence": {
+    "artifactAcceptance": "tools/distribution/reports/wave06/artifact-acceptance.json",
+    "smoke": "tools/distribution/reports/wave06/zero-model-smoke.json",
+    "steps": [
+      {
+        "id": "extract-and-first-run",
+        "status": "PASS"
+      },
+      {
+        "id": "artifact-doctor-gates",
+        "status": "PASS"
+      },
+      {
+        "id": "artifact-start-and-provenance",
+        "status": "PASS"
+      },
+      {
+        "id": "artifact-backup",
+        "status": "PASS"
+      },
+      {
+        "id": "artifact-stop",
+        "status": "PASS"
+      },
+      {
+        "id": "artifact-restore-and-recovery-status",
+        "status": "PASS"
+      },
+      {
+        "id": "artifact-restored-readonly",
+        "status": "PASS"
+      },
+      {
+        "id": "recovery-status-blocked-authorization",
+        "status": "PASS"
+      }
+    ]
+  },
+  "requiredInputs": [
+    "main published inspect/prepare/commit interface with exact schema and error/receipt examples",
+    "main confirmation that recovery commit authorizes only new work/new contracts and preserves unknown-writer barrier",
+    "E negative tests for expired plan, fingerprint drift, replay and failure rollback"
+  ],
+  "next": "When main publishes the interface, extend /new D CLI to call it (no private auth), rerun D4 combination acceptance; until then keep D2/D3/D5 evidence and mark D4 BLOCKED."
+}

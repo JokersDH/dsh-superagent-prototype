@@ -1,0 +1,98 @@
+{
+  "case": "WAVE06-ARTIFACT-ACCEPTANCE",
+  "status": "PASS",
+  "startedAt": "2026-11-11T02:39:40.974Z",
+  "steps": [
+    {
+      "id": "extract-and-first-run",
+      "status": "PASS",
+      "detail": {
+        "tarSha256": "8b7675bafa7cded2c9c0656655abca3ff21721d52c3dc4f573a667d93f81f122",
+        "buildId": "d4eb3a13f4904d2d",
+        "files": 6483
+      }
+    },
+    {
+      "id": "artifact-doctor-gates",
+      "status": "PASS",
+      "detail": {
+        "status": "DEGRADED"
+      }
+    },
+    {
+      "id": "artifact-start-and-provenance",
+      "status": "PASS",
+      "detail": {
+        "coordinatorEntry": "extracted-install",
+        "nativeBinding": "extracted-install",
+        "checkoutReferences": 0
+      }
+    },
+    {
+      "id": "artifact-backup",
+      "status": "PASS",
+      "detail": {
+        "digest": "2c3de4f0ea5a23db9c269e48fe0fcf265634bbe51a257b052b0e03c8d7d1b8d2",
+        "counts": {
+          "projects": 0,
+          "works": 0,
+          "decisions": 0,
+          "assistantDecisions": 0,
+          "assistantProposals": 0,
+          "artifacts": 0,
+          "acceptedEvents": 0
+        }
+      }
+    },
+    {
+      "id": "artifact-stop",
+      "status": "PASS",
+      "detail": {}
+    },
+    {
+      "id": "artifact-restore-and-recovery-status",
+      "status": "PASS",
+      "detail": {
+        "evidence": "verified",
+        "authorization": "BLOCKED"
+      }
+    },
+    {
+      "id": "artifact-restored-readonly",
+      "status": "PASS",
+      "detail": {
+        "startupMode": "recovery_readonly",
+        "commandStatus": 422
+      }
+    }
+  ],
+  "artifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-final/wave06-alpha-d4eb3a13.tar.gz",
+    "tarSha256": "8b7675bafa7cded2c9c0656655abca3ff21721d52c3dc4f573a667d93f81f122",
+    "buildId": "d4eb3a13f4904d2d",
+    "installManifest": "install.json",
+    "files": 6483,
+    "supportMatrix": {
+      "measured": [
+        "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+      ],
+      "node": ">=24.21.0 <25",
+      "abi": "137",
+      "sqlite": ">=3.53.4",
+      "notTested": [
+        "linux",
+        "win32",
+        "darwin-x64",
+        "other Node ABIs",
+        "other machines",
+        "personal native execution"
+      ]
+    }
+  },
+  "finishedAt": "2026-11-11T02:39:47.658Z",
+  "limitations": [
+    "darwin/arm64 + Node 24.21.x measured only; cross-machine/ABI is NOT_TESTED.",
+    "Uses fixture mode and isolated temp ports/state; no user service, native executor or model call.",
+    "Recovery new authorization remains BLOCKED (main interface not published); this script does not bypass it."
+  ]
+}

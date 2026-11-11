@@ -76,6 +76,7 @@ export interface EvidenceReference {
     readonly assistantDecisions: number
     readonly assistantProposals: number
     readonly artifacts: number
+    readonly acceptedEvents: number
   }
   readonly routingEvidence: {
     readonly status: 'unavailable' | 'included'
@@ -346,6 +347,7 @@ export function validateManifest(input: unknown): BackupManifest {
         assistantDecisions: nonNegativeInt(evidenceCounts.assistantDecisions, 'evidence.counts.assistantDecisions'),
         assistantProposals: nonNegativeInt(evidenceCounts.assistantProposals, 'evidence.counts.assistantProposals'),
         artifacts: nonNegativeInt(evidenceCounts.artifacts, 'evidence.counts.artifacts'),
+        acceptedEvents: nonNegativeInt(evidenceCounts.acceptedEvents, 'evidence.counts.acceptedEvents'),
       },
       routingEvidence: {
         status: routing.status as 'unavailable' | 'included',

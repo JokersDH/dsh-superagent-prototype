@@ -17,6 +17,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
   ArtifactStore,
+  EventLog,
   ProductDecisions,
   UnitOfWork,
   WorkflowIndex,
@@ -50,6 +51,22 @@ export interface EvidenceWork {
   readonly deliverables: readonly { readonly verificationId: string; readonly artifactDigest: string; readonly criteriaDigest: string; readonly accepted: boolean }[]
 }
 
+export interface EvidenceAcceptedEvent {
+  readonly seq: number
+  readonly entityRef: string
+  readonly payloadDigest: string
+  readonly candidate: {
+    readonly workId: string
+    readonly ticketId: string
+    readonly assignmentId: string
+    readonly contractRevision: number
+    readonly contractDigest: string
+    readonly candidateGeneration: number
+  } | null
+  readonly actorRef: string | null
+  readonly reviewTiming: unknown
+}
+
 export interface EvidenceSummary {
   readonly protocol: typeof EVIDENCE_FORMAT
   readonly formatVersion: typeof EVIDENCE_FORMAT_VERSION
@@ -61,6 +78,8 @@ export interface EvidenceSummary {
   readonly assistantDecisions: readonly { readonly id: string; readonly digest: string }[]
   readonly assistantProposals: readonly { readonly proposalId: string; readonly version: number; readonly state: string; readonly payloadDigest: string }[]
   readonly artifacts: readonly { readonly id: string; readonly digest: string; readonly bytes: number }[]
+  /** Main writes application.candidate.accepted in the acceptance transaction; read via EventLog. */
+  readonly acceptedEvents: readonly EvidenceAcceptedEvent[]
   readonly routingEvidence: {
     readonly status: 'unavailable' | 'included'
     readonly reason: string
@@ -73,6 +92,7 @@ export interface EvidenceSummary {
     readonly assistantDecisions: number
     readonly assistantProposals: number
     readonly artifacts: number
+    readonly acceptedEvents: number
   }
   readonly limitations: readonly string[]
 }
@@ -88,6 +108,7 @@ const ROUTING_PORTS = [
 const LIMITATIONS = [
   'Route advice, review reports and execution outcomes have no storage implementation in this merge; the public RoutingEvidencePort is a contract only.',
   'The evidence digest covers readable persisted facts from public storage ports, not model quality, native truth or human acceptance.',
+  'Outcome/ReviewTiming coverage comes from the main acceptance event log (application.candidate.accepted), not from A wave-06 v13 ExecutionOutcome persistence, which is not in this merge.',
   'Project/worktree content and native sessions are out of scope; only persisted references and digests are included.',
 ] as const
 
@@ -201,6 +222,43 @@ export function readEvidenceSummary(databasePath: string): EvidenceSummary {
     } while (projectCursor !== undefined)
 
     const registryRows = readArtifactRegistry(databasePath).map((row) => ({ id: row.id, digest: row.digest, bytes: row.bytes }))
+
+    // Outcome/ReviewTiming evidence as actually persisted by main: the acceptance event carries the
+    // candidate, actorRef and reviewTiming in the same transaction as acceptance.
+    const eventLog = new EventLog(db)
+    const eventCursor = eventLog.cursor()
+    const acceptedEvents: EvidenceAcceptedEvent[] = []
+    let afterSeq = 0
+    let scanned = 0
+    while (afterSeq < eventCursor && scanned < 100_000) {
+      const rows = eventLog.after(afterSeq, 1000)
+      if (rows.length === 0) break
+      scanned += rows.length
+      for (const row of rows) {
+        afterSeq = row.seq
+        if (row.topic !== 'application.candidate.accepted') continue
+        const payload = (row.payload ?? null) as { candidate?: Record<string, unknown>; actorRef?: unknown; reviewTiming?: unknown } | null
+        const candidate = payload?.candidate
+        acceptedEvents.push({
+          seq: row.seq,
+          entityRef: row.entityRef,
+          payloadDigest: digestOf(row.payload),
+          candidate: candidate && typeof candidate === 'object' ? (() => {
+            const contract = (candidate.contract ?? {}) as { workId?: unknown; revision?: unknown; digest?: unknown }
+            return {
+              workId: String(contract.workId ?? candidate.workId),
+              ticketId: String(candidate.ticketId),
+              assignmentId: String(candidate.assignmentId),
+              contractRevision: Number(contract.revision),
+              contractDigest: String(contract.digest),
+              candidateGeneration: Number(candidate.candidateGeneration),
+            }
+          })() : null,
+          actorRef: typeof payload?.actorRef === 'string' ? payload.actorRef : null,
+          reviewTiming: payload?.reviewTiming ?? null,
+        })
+      }
+    }
     projects.sort((a, b) => a.id.localeCompare(b.id))
     works.sort((a, b) => `${a.projectId}/${a.id}`.localeCompare(`${b.projectId}/${b.id}`))
     decisions.sort((a, b) => `${a.id}@${a.version}`.localeCompare(`${b.id}@${b.version}`))
@@ -223,6 +281,7 @@ export function readEvidenceSummary(databasePath: string): EvidenceSummary {
       assistantDecisions,
       assistantProposals,
       artifacts,
+      acceptedEvents,
       routingEvidence,
       counts: {
         projects: projects.length,
@@ -231,6 +290,7 @@ export function readEvidenceSummary(databasePath: string): EvidenceSummary {
         assistantDecisions: assistantDecisions.length,
         assistantProposals: assistantProposals.length,
         artifacts: artifacts.length,
+        acceptedEvents: acceptedEvents.length,
       },
       limitations: [...LIMITATIONS],
     }
@@ -257,7 +317,7 @@ export function verifyEvidenceSummary(databasePath: string, expected: EvidenceSu
   const mismatches: string[] = []
   if (actual.protocol !== expected.protocol || actual.formatVersion !== expected.formatVersion) mismatches.push('format')
   if (actual.productSchema !== expected.productSchema) mismatches.push('product_schema')
-  for (const key of ['projects', 'works', 'decisions', 'assistantDecisions', 'assistantProposals', 'artifacts'] as const) {
+  for (const key of ['projects', 'works', 'decisions', 'assistantDecisions', 'assistantProposals', 'artifacts', 'acceptedEvents'] as const) {
     if (!same(actual[key], expected[key])) mismatches.push(key)
   }
   if (!same(actual.counts, expected.counts)) mismatches.push('counts')

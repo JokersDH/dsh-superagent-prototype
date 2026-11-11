@@ -15,7 +15,7 @@ import { readLauncherConfig } from '../lib/config.mjs'
 import { runDoctor } from '../lib/doctor.mjs'
 import { firstRun } from '../lib/first-run.mjs'
 import { readInstanceRecord, verifyInstance } from '../lib/instance.mjs'
-import { recoverySummary } from '../lib/recovery.mjs'
+import { recoveryStatus, recoverySummary } from '../lib/recovery.mjs'
 import { readRelease } from '../lib/release.mjs'
 import { backupState, verifyBackup } from '../lib/backup.mjs'
 import { importBundle, restoreState, rollbackState } from '../lib/restore.mjs'
@@ -38,6 +38,7 @@ const HELP = `pa — 本机个人 Agent 助理启动器
   status                 查询实例记录与真实进程身份
   stop                   按已验证进程身份优雅停止；超时如实报告未静止资源
   doctor                 只读诊断 Node/ABI/SQLite/构建/根目录/实例/执行器
+  recovery-status        只读列出恢复 marker/待重绑定/main 新授权接口状态（不发业务）
   backup                 创建完整备份 bundle（一致 DB 快照 + 引用产物 + 必要配置）
   verify-backup          只校验 bundle（结构/摘要/DB/安全），不恢复
   import-bundle          校验并登记已有 bundle 到本机托管备份目录
@@ -93,6 +94,7 @@ function commandSpecs() {
     'first-run': COMMON,
     status: COMMON,
     doctor: { ...COMMON, deep: 'boolean', 'executors-fixture': 'string' },
+    'recovery-status': { ...COMMON },
     start: {
       ...COMMON,
       port: 'string',
@@ -174,6 +176,20 @@ async function main(argv) {
       ].join('\n'),
     })
     return EXIT.OK
+  }
+
+  if (command === 'recovery-status') {
+    const status = recoveryStatus({ roots })
+    const human = [
+      `recovery-status: ${status.markerPresent ? 'RESTORED_READONLY' : 'NORMAL'}`,
+      `  state: ${status.stateName} startupMode: ${status.startupMode} markerPresent: ${status.markerPresent} markerValid: ${status.markerValid}`,
+      `  pending rebind: ${status.pendingRebind.length}; requires revalidation: ${status.requiresRevalidation.length}; queueReplay: ${status.queueReplay}`,
+      `  authorization: ${status.authorization.status}${status.authorization.owner ? ` (owner: ${status.authorization.owner})` : ''}`,
+      ...status.authorization.requiredInputs?.map((line) => `    - ${line}` ) ?? [],
+      ...status.limitations.map((line) => `  ! ${line}`),
+    ].join('\n')
+    printResult({ json: json ? status : null, human })
+    return status.markerPresent ? EXIT.DEGRADED : EXIT.OK
   }
 
   if (command === 'doctor') {

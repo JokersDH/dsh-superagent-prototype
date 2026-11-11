@@ -16,7 +16,7 @@ import { closeSync, createReadStream, createWriteStream, existsSync, fsyncSync, 
 import { once } from 'node:events'
 import { basename, dirname, isAbsolute, join, relative } from 'node:path'
 import Database from 'better-sqlite3'
-import { artifactRoot, backupDatabase, readArtifactRegistry, verifyDatabase, type VerifyResult } from '@personal-agent/storage'
+import { PRODUCT_SCHEMA_VERSION, artifactRoot, backupDatabase, readArtifactRegistry, verifyDatabase, type VerifyResult } from '@personal-agent/storage'
 import { PortabilityError } from './errors.ts'
 import { readEvidenceSummary, type EvidenceSummary } from './evidence.ts'
 import type { DatabaseFacts, ExcludedEntry, PathBinding, WriterClaimFacts } from './manifest.ts'
@@ -214,6 +214,13 @@ export async function snapshotState(options: SnapshotOptions): Promise<SnapshotR
         integrity: backup.integrity,
         foreignKeyViolations: backup.foreignKeyViolations,
       })
+    // A backup may be older than the current launcher (explicit migration on restore is allowed),
+    // but bytes from a future schema cannot be certified by this build.
+    if (verified.productSchema !== null && verified.productSchema > PRODUCT_SCHEMA_VERSION)
+      throw new PortabilityError('schema_unsupported', 'Database schema is newer than this build supports', {
+        productSchema: verified.productSchema,
+        supported: PRODUCT_SCHEMA_VERSION,
+      })
   } finally {
     live.close()
   }
@@ -237,6 +244,9 @@ export async function snapshotState(options: SnapshotOptions): Promise<SnapshotR
     const source = safeArtifactPath(artifactsRootDir, row.path, row.id)
     if (!existsSync(source))
       throw new PortabilityError('artifact_missing', 'A database-referenced artifact file is missing', { id: row.id })
+    const sourceStat = lstatSync(source)
+    if (!sourceStat.isFile() || sourceStat.isSymbolicLink())
+      throw new PortabilityError('artifact_missing', 'A database-referenced artifact is not a regular file', { id: row.id })
     const destination = join(stagingRoot, 'artifacts', row.id)
     const copy = await hashedCopy(source, destination)
     if (copy.bytes !== Number(row.bytes) || copy.sha256 !== row.digest)

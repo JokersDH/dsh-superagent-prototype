@@ -1,0 +1,63 @@
+{
+  "case": "WAVE06-UPGRADE-ROLLBACK",
+  "status": "PASS",
+  "startedAt": "2026-11-11T02:38:56.861Z",
+  "steps": [
+    {
+      "id": "two-build-identities",
+      "status": "PASS",
+      "detail": {
+        "buildA": "6984b93fa0f9bfe1",
+        "buildB": "6782964abab2a76b"
+      }
+    },
+    {
+      "id": "start-build-a",
+      "status": "PASS",
+      "detail": {
+        "health": "ok"
+      }
+    },
+    {
+      "id": "backup-pre-upgrade",
+      "status": "PASS",
+      "detail": {
+        "digest": "6dd290b501d43f767f05293e70bc454fa25e5c74e779cf0271a5ebd310d686b3",
+        "counts": {
+          "projects": 1,
+          "works": 1,
+          "decisions": 0,
+          "assistantDecisions": 0,
+          "assistantProposals": 0,
+          "artifacts": 1,
+          "acceptedEvents": 0
+        }
+      }
+    },
+    {
+      "id": "start-build-b-upgrade",
+      "status": "PASS",
+      "detail": {}
+    },
+    {
+      "id": "rollback-restores-pre-upgrade-state",
+      "status": "PASS",
+      "detail": {
+        "digest": "6dd290b501d43f767f05293e70bc454fa25e5c74e779cf0271a5ebd310d686b3",
+        "projectRevision": 1,
+        "artifactDigest": "82b27fbee6a42a8e39dcdffb8c6094452d208e52b3ec728446ae9258f1feb42e"
+      }
+    },
+    {
+      "id": "start-build-b-after-rollback",
+      "status": "PASS",
+      "detail": {}
+    }
+  ],
+  "finishedAt": "2026-11-11T02:39:16.613Z",
+  "limitations": [
+    "Two builds of the same source with an explicit build tag; this is an upgrade/rollback data-path proof, not a cross-version migration matrix or a new-protocol platform.",
+    "darwin/arm64 + Node 24.21.x measured only; no user service, native executor or model call.",
+    "Rollback restores the state snapshot; it does not downgrade the installed binaries."
+  ]
+}

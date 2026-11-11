@@ -3,10 +3,11 @@
  * readable and restore must fail closed if a restored database disagrees with that record.
  */
 import assert from 'node:assert/strict'
-import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
+import Database from 'better-sqlite3'
 import { ProductStore } from '@personal-agent/storage'
 import { createBundle, readEvidenceSummary, restoreBundle, snapshotState, verifyEvidenceSummary } from '../src/index.ts'
 
@@ -31,6 +32,28 @@ function seedState(stateDir: string) {
     store.product.works.insert({ id: 'work-evidence', projectId: 'project-evidence', conversationId: 'conv-evidence', title: 'evidence work', createdAt: now })
     const artifact = store.artifacts.write(Buffer.from('completed patch bytes\n'))
     store.artifacts.insert(artifact)
+    store.events.append({
+      topic: 'application.candidate.accepted',
+      entityRef: 'work-evidence',
+      payload: {
+        candidate: {
+          ticketId: 'ticket-evidence',
+          assignmentId: 'assignment-evidence',
+          contract: { workId: 'work-evidence', revision: 1, digest: 'c'.repeat(64) },
+          candidateGeneration: 1,
+        },
+        actorRef: 'local-user',
+        reviewTiming: {
+          candidateReadyAt: now,
+          acceptedAt: now,
+          readyToAcceptanceMs: 0,
+          activeReviewMs: null,
+          activeReviewSource: 'ui_visibility_proxy',
+          activeReviewCompleteness: 'unknown',
+          evidenceRefs: [],
+        },
+      },
+    })
     return { artifactId: artifact.id, artifactDigest: artifact.digest }
   } finally {
     store.close()
@@ -46,6 +69,10 @@ test('the snapshot records readable project/work/artifact evidence and marks rou
     assert.equal(snapshot.evidence.counts.projects, 1)
     assert.equal(snapshot.evidence.counts.works, 1)
     assert.equal(snapshot.evidence.counts.artifacts, 1)
+    assert.equal(snapshot.evidence.counts.acceptedEvents, 1)
+    assert.equal(snapshot.evidence.acceptedEvents[0]?.candidate?.workId, 'work-evidence')
+    assert.equal(snapshot.evidence.acceptedEvents[0]?.actorRef, 'local-user')
+    assert.ok(snapshot.evidence.acceptedEvents[0]?.payloadDigest.length === 64)
     assert.equal(snapshot.evidence.artifacts[0]?.id, seeded.artifactId)
     assert.equal(snapshot.evidence.projects[0]?.id, 'project-evidence')
     assert.equal(snapshot.evidence.works[0]?.id, 'work-evidence')
@@ -105,6 +132,55 @@ test('evidence verification fails closed when a restored database gains evidence
     assert.equal(verified.ok, false)
     assert.ok(verified.mismatches.includes('digest'))
     assert.ok(verified.mismatches.includes('projects'))
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test('a missing database-referenced artifact refuses the bundle instead of claiming success', async (t) => {
+  const { root, stateDir, staging } = base()
+  try {
+    const seeded = seedState(stateDir)
+    rmSync(join(stateDir, 'artifacts', seeded.artifactId), { force: true })
+    await assert.rejects(
+      () => snapshotState({ stateDir, stagingDir: join(staging, 'files') }),
+      (error: unknown) => (error as { code?: string }).code === 'artifact_missing',
+    )
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test('a symlinked artifact is refused instead of copying bytes from outside the state', async (t) => {
+  const { root, stateDir, staging } = base()
+  try {
+    const seeded = seedState(stateDir)
+    const artifactPath = join(stateDir, 'artifacts', seeded.artifactId)
+    rmSync(artifactPath, { force: true })
+    symlinkSync('/etc/hosts', artifactPath)
+    await assert.rejects(
+      () => snapshotState({ stateDir, stagingDir: join(staging, 'files') }),
+      (error: unknown) => (error as { code?: string }).code === 'artifact_missing',
+    )
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test('a future database schema is refused before a bundle can be certified', async (t) => {
+  const { root, stateDir, staging } = base()
+  try {
+    seedState(stateDir)
+    const db = new Database(join(stateDir, 'state.sqlite'))
+    try {
+      db.prepare("UPDATE schema_meta SET value = '999' WHERE key = 'product_schema'").run()
+    } finally {
+      db.close()
+    }
+    await assert.rejects(
+      () => snapshotState({ stateDir, stagingDir: join(staging, 'files') }),
+      (error: unknown) => (error as { code?: string }).code === 'schema_unsupported',
+    )
   } finally {
     rmSync(root, { recursive: true, force: true })
   }

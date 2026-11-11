@@ -2,13 +2,13 @@
   "package": "product-wave-06 / D staged install",
   "format": "pa-install",
   "formatVersion": 1,
-  "createdAt": "2026-11-11T02:29:09.556Z",
+  "createdAt": "2026-11-11T02:39:29.903Z",
   "source": {
-    "commit": "0a84aa5489c4df85b09525a300186e91379e1bf4",
+    "commit": "9046d4c5d3b9f583ba6384b851c32cc5703437c9",
     "branch": "codex/g3-local-distribution",
-    "dirty": false
+    "dirty": true
   },
-  "buildId": "539f5a4dd277f684",
+  "buildId": "d4eb3a13f4904d2d",
   "producer": {
     "product": "dsh-superagent",
     "version": "0.1.0",
@@ -112,10 +112,14 @@
   ],
   "files": {
     "count": 6483,
-    "bytes": 65501028
+    "bytes": 65517073
   },
-  "installManifestSha256": "0224facd12d5f2c99420720fd7d9da5167648ea360c5ba1d694b0143f6d63746",
-  "releaseManifestSha256": "b3fa38c8e00cf6222b1bbf025b4b104ef88070f06b873f14494d81e8e208ca45",
+  "installManifestSha256": "c98cda403c7f8e3343474fc70a96c2b7e022559fd748482801219f2750ac768c",
+  "releaseManifestSha256": "a9852c5eb1ec49e7d814fc6a61877fc6525f8cf3b6411da86c4edf83b1a491c8",
+  "closureDigest": "a815fb1e84e056f20be319390919a759e8296c3669cff88dee7298f0acf3d5b2",
+  "tarSha256": "8b7675bafa7cded2c9c0656655abca3ff21721d52c3dc4f573a667d93f81f122",
+  "tarBytes": 19762194,
+  "artifactPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-final/wave06-alpha-d4eb3a13.tar.gz",
   "commands": [
     "./bin/pa first-run",
     "./bin/pa doctor",
