@@ -1,0 +1,60 @@
+{
+  "status": "PASS_DISTRIBUTION_ADMISSION",
+  "command": [
+    "node",
+    "tools/bootstrap/probe-wave10-distribution.mjs",
+    "/Users/hh/Desktop/joker/superagent-agent-d"
+  ],
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-d",
+  "sourceCommit": "f8640ff95f8926ef6b04c0df51e7917fe8365471",
+  "sourceWorktreeClean": false,
+  "sourceHashes": {
+    "packages/portability/src/recovery-target.ts": "4ea451c9489fc6debc21621857203090ab1ec75b61b532bcab49cb393be38479",
+    "apps/launcher/lib/upgrade.mjs": "a7b729bc93819a0c06804307cfe0a3996789e9d6be4c56538c9e3c1e278e3fae"
+  },
+  "checkedAt": "2026-11-11T14:53:55.357Z",
+  "exitCode": 0,
+  "cases": [
+    {
+      "id": "MAIN_BOUND_INPUT_AND_REPEAT_POSITIVE_CONTROL",
+      "status": "PASS",
+      "observation": {
+        "inputValid": true,
+        "idempotent": true,
+        "startupAvailable": false
+      }
+    },
+    {
+      "id": "MATERIAL_OUTPUT_MATCHES_ACTUAL_SHARED_SCHEMA",
+      "status": "PASS"
+    },
+    {
+      "id": "REQUESTED_TARGET_ROOT_IS_BOUND_BEFORE_WRITE",
+      "status": "PASS"
+    },
+    {
+      "id": "CONFIRMED_CONFIGURATION_DIGEST_IS_RECHECKED",
+      "status": "PASS"
+    },
+    {
+      "id": "TRUSTED_PARENT_REVALIDATED_AT_WRITE",
+      "status": "PASS"
+    },
+    {
+      "id": "SHARED_INSTALLATION_IS_NOT_CROSS_STATE_PROCESS_OWNERSHIP",
+      "status": "PASS"
+    },
+    {
+      "id": "JOURNAL_SPAWN_START_MISMATCH_CANNOT_REENTER_OWNED_SET",
+      "status": "PASS"
+    }
+  ],
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "limitations": [
+    "Direct candidate source; material fixtures are valid main-bound inert DTOs, not real committed recovery authority.",
+    "Resource negative tests call readonly accounting only; candidate stop functions never receive test or external process ids.",
+    "Only probe-created child processes are cleaned up; no user service or candidate source is changed.",
+    "No real managed upgrade, artifact installation, target activation, model or native task is exercised by this probe."
+  ]
+}

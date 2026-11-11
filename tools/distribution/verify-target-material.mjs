@@ -10,12 +10,20 @@
  *
  * usage: verify-target-material.mjs --trusted-parent <private-dir> [--inventory-module <file.mjs>] [--json]
  */
-import { mkdirSync, mkdtempSync, readdirSync, rmSync, statSync } from 'node:fs'
+import { mkdirSync, readdirSync, rmSync, statSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { dirname, resolve as resolvePath } from 'node:path'
 import { PortabilityRecoveryTargetMaterializer, RECOVERY_TARGET_MANIFEST_FILE } from '../../packages/portability/dist/index.js'
 
+const repositoryRoot = resolvePath(dirname(new URL(import.meta.url).pathname), '../..')
+const assertRejectsDiscard = async (materializer, id) => {
+  let refused = false
+  try { await materializer.discardStaging(id) } catch (error) { refused = error?.code === 'target_not_staging' }
+  if (!refused) throw new Error('discardStaging removed or accepted an initialized target')
+}
 const args = process.argv.slice(2)
 const value = (name) => { const index = args.indexOf(name); return index === -1 ? undefined : args[index + 1] }
 const trustedParent = value('--trusted-parent')
@@ -26,7 +34,18 @@ if (trustedParent === undefined) {
 }
 const steps = []
 const step = (id, status, detail = {}) => { steps.push({ id, status, detail }); if (status !== 'PASS') process.stderr.write(`${status} ${id} ${JSON.stringify(detail).slice(0, 400)}\n`) }
-const activationId = 'activation-wave09-recipe'
+const canonical = (item) => {
+  if (item === null || typeof item !== 'object') return JSON.stringify(item)
+  if (Array.isArray(item)) return `[${item.map(canonical).join(',')}]`
+  return `{${Object.keys(item).sort().map((key) => `${JSON.stringify(key)}:${canonical(item[key])}`).join(',')}}`
+}
+const digest = (value) => createHash('sha256').update(canonical(value)).digest('hex')
+const activationId = 'activation-wave10-recipe'
+const configuration = {
+  protocol: 'recovery-target-configuration/1',
+  projects: [{ sourceProjectId: 'project-a', targetProjectId: 'project-a-copy', registration: { pathDigest: 'a'.repeat(64), check: 'node_test', sourceRef: 'ref' } }],
+  executor: { profileId: 'fixture', profileVersion: '1' },
+}
 const preparation = {
   protocol: 'recovery-target-preparation/1',
   source: {
@@ -38,7 +57,7 @@ const preparation = {
       planId: 'plan-wave09',
       planDigest: 'a'.repeat(64),
       source: { stateId: 'historical-state', stateRoot: join(tmpdir(), 'pa-recovery-source-reference'), markerDigest: 'b'.repeat(64), inspectionFingerprint: 'c'.repeat(64) },
-      target: { generationId: 'generation-wave09', stateRoot: join(trustedParent, activationId), configurationDigest: 'd'.repeat(64) },
+      target: { generationId: 'generation-wave10', stateRoot: join(trustedParent, activationId), configurationDigest: digest(configuration) },
       principal: { userId: 'local-user', authorityRef: 'authority-wave09' },
       machineDigest: 'e'.repeat(64),
       resourcePolicyDigest: 'f'.repeat(64),
@@ -47,11 +66,7 @@ const preparation = {
     },
     sourceReceipt: { commandId: `command-${activationId}`, seq: 1 },
   },
-  configuration: {
-    protocol: 'recovery-target-configuration/1',
-    projects: [{ sourceProjectId: 'project-a', targetProjectId: 'project-a-copy', registration: { pathDigest: 'a'.repeat(64), check: 'node_test', sourceRef: 'ref' } }],
-    executor: { profileId: 'fixture', profileVersion: '1' },
-  },
+  configuration,
   startupAvailable: false,
 }
 
@@ -63,7 +78,7 @@ try {
 
   const material = await materializer.prepare(preparation)
   if (material.startupAvailable !== false) throw new Error('material claimed startup availability')
-  if (material.activationId !== activationId || material.generationId !== 'generation-wave09') throw new Error('material identity mismatch')
+  if (material.activationId !== activationId || material.generationId !== 'generation-wave10') throw new Error('material identity mismatch')
   const entries = readdirSync(material.stateRoot)
   if (entries.length !== 1 || entries[0] !== RECOVERY_TARGET_MANIFEST_FILE) throw new Error(`target contains more than the manifest: ${entries.join(',')}`)
   step('prepare-manifest-only', 'PASS', { stateRoot: material.stateRoot, manifestDigest: material.manifestDigest, entries })
@@ -75,6 +90,17 @@ try {
   const repeated = await materializer.prepare(preparation)
   if (repeated.manifestDigest !== material.manifestDigest) throw new Error('repeat prepare was not idempotent')
   step('repeat-idempotent', 'PASS')
+
+  // Main (not D) initializes the brand-new empty target database through A's public Store at the
+  // exact prepared root. D only verifies read/replay still works and staging cleanup now refuses.
+  const storageModule = await import(pathToFileURL(join(repositoryRoot, 'packages/storage/dist/index.js')).href)
+  const store = new storageModule.ProductStore({ path: join(material.stateRoot, 'state.sqlite') })
+  store.close()
+  const afterInit = await materializer.read(material.stateRoot)
+  if (afterInit?.manifestDigest !== material.manifestDigest) throw new Error('material disappeared after the empty-schema initialization')
+  step('empty-schema-initialized-by-public-store', 'PASS', { path: join(material.stateRoot, 'state.sqlite'), productSchema: material.productSchema, materialReadable: true })
+  await assertRejectsDiscard(materializer, activationId)
+  step('discard-refuses-initialized-target', 'PASS')
 
   let inventory
   if (inventoryModule === undefined) {
@@ -93,8 +119,11 @@ try {
     step('inventory-readonly', 'PASS', { completeness: inventory.completeness, integrity: inventory.integrity, issues: inventory.issues, tables: inventory.tables.length })
   }
 
-  await materializer.discardStaging(activationId)
-  step('discard-staging', 'PASS', { removed: !readdirSync(trustedParent).includes(activationId) })
+  // A separate, never-initialized staging identity is still removable.
+  const staging = { ...preparation, source: { ...preparation.source, intent: { ...preparation.source.intent, activationId: `${activationId}-staging`, target: { ...preparation.source.intent.target, stateRoot: join(trustedParent, `${activationId}-staging`) } }, sourceReceipt: { commandId: preparation.source.intent.commandId, seq: 1 } } }
+  await materializer.prepare(staging)
+  await materializer.discardStaging(`${activationId}-staging`)
+  step('discard-staging-only', 'PASS', { removed: !readdirSync(trustedParent).includes(`${activationId}-staging`) })
   process.stdout.write(`${JSON.stringify({ protocol: 'wave09-target-material-recipe/1', status: steps.every((entry) => entry.status !== 'FAIL') ? 'PASS' : 'FAIL', durationMs: Date.now() - started, trustedParent, steps }, null, 2)}\n`)
 } catch (error) {
   step('abort', 'FAIL', { message: String(error?.stack ?? error) })

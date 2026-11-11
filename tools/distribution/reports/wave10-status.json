@@ -1,0 +1,139 @@
+{
+  "protocol": "wave10-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "25e5643",
+  "mergedMain": "104f17e",
+  "head": "f8640ff",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate; not main/E admission. Model/native turns 0; eight user instances untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "unknownNativeSends": 0,
+    "nativeTurns": 0
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Process ownership requires this operation private roots (config/data/logs/cache/workspace, raw+realpath), not the shared install path; start-identity mismatches cannot be re-claimed by journal or the global scan; unknown live resources block instead of becoming an empty proven set. Read-only admission probe 7/7 PASS before any stop-class matrix; the 17-section managed matrix then passed.",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs",
+        "apps/launcher/test/upgrade-resources.case.mjs",
+        "tools/distribution/reports/wave10/distribution-admission.json"
+      ]
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "PortabilityRecoveryTargetMaterializer implements the shared async port directly: shared material field set with bare hex digests, exact confirmed target.stateRoot as the trusted-parent child, recomputed canonical configurationDigest checked before any write, strict main-bound DTO validation. Write is temp+fsync+rename; half-write recovery only touches our temp files; foreign content blocks.",
+      "evidence": [
+        "packages/portability/src/recovery-target.ts",
+        "packages/portability/test/recovery-target.case.ts",
+        "tools/distribution/verify-target-material.mjs"
+      ]
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Parent lifecycle is revalidated on every prepare/read/discard (realpath, dev/ino, owner, 0700, no symlink). A parent swapped for a symlink/different directory is refused before writes. read tolerates main/A initializing the brand-new empty schema at the exact root; discardStaging refuses any initialized target and only removes this activation manifest-only staging.",
+      "evidence": [
+        "packages/portability/test/recovery-target.case.ts",
+        "tools/distribution/reports/wave10/target-material.json"
+      ]
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "Ordinary personal install built from current source and exercised without dispatching work: cold first-run, doctor gates, real personal-mode start (health/record mode+access, zero model turns), backup, readonly restore into a fresh root with identical evidence digest, and relocation to another path with doctor+fixture start. Managed upgrade/recover/rollback and cross-schema refusal are covered by the 17-section matrix.",
+      "evidence": [
+        "tools/distribution/verify-personal-install.mjs",
+        "tools/distribution/reports/wave10/personal-install.json",
+        "tools/distribution/reports/wave10/binary-upgrade.json"
+      ]
+    },
+    "d5": {
+      "status": "PARTIAL_BLOCKED_MAIN_A",
+      "summary": "Material-prepared and empty-schema-initialized-by-public-Store checkpoints pass; the current-resources-not-authorized checkpoint stays blocked because A RecoveryTargetInventoryReader and main target commit/activate are not published. No activation API or inventory is fabricated.",
+      "evidence": [
+        "tools/distribution/reports/wave10/target-material.json"
+      ],
+      "blockedBy": [
+        "A RecoveryTargetInventoryReader",
+        "main recovery target commit/activate"
+      ]
+    },
+    "d6": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Frozen baseline/target tuples and the latest ordinary-personal, managed-upgrade, schema-change and target-material recipes are published with exact commands, expected codes and cleanup rules. Independent E acceptance remains pending.",
+      "evidence": [
+        "tools/distribution/recipes/wave10-e-target-upgrade.zh-CN.md",
+        "tools/distribution/reports/wave10/artifacts.json"
+      ]
+    }
+  },
+  "admissionProbe": {
+    "status": "PASS_DISTRIBUTION_ADMISSION",
+    "cases": 7,
+    "sourceCommit": "f8640ff95f8926ef6b04c0df51e7917fe8365471",
+    "clean": false
+  },
+  "artifacts": null,
+  "testLayers": {},
+  "blockers": [
+    {
+      "id": "A-INVENTORY-READER",
+      "owner": "A/main",
+      "status": "PENDING",
+      "summary": "RecoveryTargetInventoryReader is not integrated; the material recipe records SKIPPED, never an empty-table claim."
+    },
+    {
+      "id": "MAIN-RECOVERY-ACTIVATION",
+      "owner": "main",
+      "status": "PLANNED",
+      "summary": "No target commit/activate; materials and empty schemas grant no startup."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E runs the wave-10 recipes from its own root against the frozen bytes."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Personal mode is started and verified but no work/model turn is dispatched (zero-model rule)."
+    }
+  ],
+  "notTested": [
+    "cross-machine/platform/ABI",
+    "real personal billed turn",
+    "SIGKILL at every individual step",
+    "A inventory reader integration",
+    "main recovery activation",
+    "E independent acceptance"
+  ],
+  "eConsumption": [
+    "Use tools/distribution/reports/wave10/artifacts.json tar/sha256/source/build/schema tuples; never the checkout or old wave-09 bytes.",
+    "Run smoke-binary-upgrade.mjs (17 windows), verify-personal-install.mjs (7 steps), verify-upgrade-artifact.mjs --schema-change (9 steps), verify-target-material.mjs.",
+    "Do not relax digests, delete markers, hand-edit release.json, or claim activation/personal billed/native from these results."
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave10/distribution-admission.json",
+    "tools/distribution/reports/wave10/artifacts.json",
+    "tools/distribution/reports/wave10/binary-upgrade.json",
+    "tools/distribution/reports/wave10/personal-install.json",
+    "tools/distribution/reports/wave10/artifact-upgrade-acceptance.json",
+    "tools/distribution/reports/wave10/target-material.json",
+    "tools/distribution/recipes/wave10-e-target-upgrade.zh-CN.md",
+    "docs/rfcs/WP-16/0034-wave-10-d-distribution.md"
+  ],
+  "preservedHistory": [
+    "wave-05..09 evidence/budgets unchanged",
+    "old tars preserved",
+    "no shared contract/migration/root lock/E assertion modified"
+  ]
+}
