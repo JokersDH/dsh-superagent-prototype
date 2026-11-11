@@ -32,6 +32,8 @@ const pilotPreflight = existsSync(join(here, 'pilot/reports/preflight.json'))
 const release = report.release ?? JSON.parse(readFileSync(join(runDirectory, 'release.json'), 'utf8'))
 const stages = JSON.parse(readFileSync(join(here, 'stages.json'), 'utf8'))
 const byId = new Map(report.cases.map((item) => [item.id, item]))
+const upgradeEvidence = byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade ?? {}
+const artifactTuple = { baseline: upgradeEvidence.baseline ?? null, target: upgradeEvidence.target ?? null }
 const caseStatus = (id) => byId.get(id)?.status ?? 'MISSING'
 
 /**
@@ -224,9 +226,9 @@ const CAPABILITIES = [
   {
     id: 'context-proposals-decisions',
     label: '上下文、提案与明确决定治理',
-    controlled: ['E3-DECISION-WORKFLOW'],
+    controlled: ['E3-DECISION-WORKFLOW', 'E3-PROPOSAL-HTTP', 'E3-PROPOSAL-UI'],
     notTested: [
-      '自动上下文与结构化提案确认未发布（owner C）。',
+      '自动结构化提案确认仍未发布（owner C/main）；当前只验证显式 prepare/confirm/reject。',
       '源消息删除/授权过期/事务失败注入缺少公开入口（E3-DECISION-SOURCE-STATES）。',
     ],
   },
@@ -249,29 +251,32 @@ const CAPABILITIES = [
     installed: [
       'E4-INSTALL-ARTIFACT-IDENTITY',
       'E4-INSTALL-FIRST-RUN',
+      'E3-PERSONAL-COLD-START',
+      'E4-INSTALL-CONFIG-ROOT',
       'E4-INSTALL-REUSE-CONCURRENCY',
       'E4-BACKUP-RESTORE',
       'E4-INSTALL-TAMPER',
       'E4-INSTALL-ROLLBACK',
     ],
     notTested: [
-      'target 已修复 PA_CONFIG_ROOT 初始化；baseline 的失败只作历史，不映射到 target。',
-      '跨机器/跨 ABI 未测；只测 darwin/arm64 + Node 24.21.x + ABI 137。',
+      '安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。',
+      '旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。',
     ],
   },
   {
     id: 'two-binary-upgrade',
     label: 'D 托管 upgrade/rollback-install 与显式 baseline/target 字节',
-    installed: ['E4-UPGRADE-ROLLBACK'],
+    installed: ['E4-UPGRADE-ROLLBACK', 'E4-UPGRADE-CROSS-SCHEMA'],
     notTested: [
-      'E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口与 launcher 死/API 活守卫本轮未稳定执行，保持 NOT_TESTED。',
+      'E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口仍未稳定执行，保持 NOT_TESTED；不得以两次 fixture start 代替。',
       '升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。',
     ],
   },
   {
     id: 'install-host-guards',
     label: '模式保持、未知活 PID 阻断与不误杀',
-    installed: ['E4-INSTALL-HOST-GUARDS'],
+    installed: ['E4-INSTALL-HOST-GUARDS', 'E4-MULTI-STATE'],
+    notTested: ['E4-MULTI-STATE 观测到 D 真实缺陷：对 state A 的 stop 返回 STOPPED 并杀掉共享安装下 state B 的 API 进程（launcher 仍活），launcher 死/API 活窗口因此无法测量。'],
   },
   {
     id: 'proposal-http',
@@ -287,12 +292,22 @@ const CAPABILITIES = [
   {
     id: 'context-window',
     label: '上下文来源/窗口/授权预览',
-    notTested: ['main 仍无 context preview/read 入口；E3-CONTEXT-GRANT-BOUNDARY 记录了 expired/purpose/budget 反例与所需输入。'],
+    controlled: ['E3-CONTEXT-PREVIEW'],
+    notTested: [
+      'E5-CONTEXT-USE 未执行：main 只有 preview 与 binding schema，没有 context-use 发送入口/provider 附加、同事务 binding+receipt、未知结果不自动重发和来源审计。',
+      'E3-CONTEXT-GRANT-BOUNDARY 仍未执行：expired grant/purpose/超预算的 HTTP 级反例缺少入口。',
+    ],
   },
   {
     id: 'recovery-preflight',
     label: '恢复只读 inspect/prepare 与重放/重启边界',
     controlled: ['E4-RECOVERY-PREFLIGHT'],
+  },
+  {
+    id: 'work-evidence',
+    label: '工作证据与分页历史',
+    controlled: ['E2-WORK-EVIDENCE', 'E2-EVIDENCE-HISTORY'],
+    notTested: ['storage_cap 与并发写入窗口未单独触发；历史窗口语义按 complete/caller_limit 已验证。'],
   },
   {
     id: 'recovery-activation',
@@ -394,24 +409,27 @@ const executionStatus = {
     matrix: join(reports, 'release-matrix.json'),
     executionStatus: join(reports, 'execution-status.json'),
     wave09Status: join(reports, 'wave09-status.json'),
+    wave10Status: join(reports, 'wave10-status.json'),
     wave08Status: join(reports, 'wave08-status.json'),
     wave07Status: join(reports, 'wave07-status.json'),
     wave06Status: join(reports, 'wave06-status.json'),
     tierVerdicts: join(reports, 'tier-verdicts.json'),
   },
-  blockers: rows.filter((row) => ['FAIL'].includes(row.controlledFixture) || row.actualNative === 'FAIL'),
+  blockers: rows.filter((row) => ['FAIL'].includes(row.controlledFixture) || row.installed === 'FAIL' || row.actualNative === 'FAIL'),
   untested: rows
     .filter((row) => row.gaps.length > 0 || row.controlledFixture === 'NOT_TESTED')
     .map((row) => ({ id: row.id, gaps: row.gaps })),
   externalBlockers: [
-    { owner: 'main/C', detail: 'Proposal HTTP and the console workbench are verified; a context preview/read entry is still unpublished, and the C composer still fails expired/purpose/over-budget grant probes.' },
+    { owner: 'D', code: 'stop_claims_other_state', detail: 'One install, two state roots: `pa stop --data-root <state A>` returned 0/STOPPED while state B was recorded, and state B\'s API process died (launcher remained). Minimal repro: start A, stop A, start B, then stop with A\'s data root; observed exit 0, bAlive true, bApiAlive false. D must bind the instance record to the exact state root and refuse to stop another state.' },
+    { owner: 'main/C', detail: 'Context preview and evidence history are verified over real HTTP; context use (explicit selection, pre-send revalidation, same-transaction binding/receipt, no auto-resend, source audit) and recovery activation are unpublished.' },
     { owner: 'main', detail: 'Migration ownership and review Work/Ticket/Assignment publication remain outside current main, so E3-REVIEW-PIPELINE stays NOT_TESTED.' },
-    { owner: 'D', detail: 'Target 9120a5ed passes byte-for-byte and fixes the config-root initialization; any newer target must be named with its own tar/source/build/schema and independently re-tested rather than inheriting this verdict.' },
+    { owner: 'D', detail: 'The wave-09 target tuple (6830e38 build f2390ffd, schema 15) passes byte-for-byte, personal cold start and same-schema managed upgrade; cross-schema old-binary refusal is measured. Any newer target must be named with its own tar/source/build/schema and independently re-tested.' },
     { owner: 'B', detail: 'Native ledger/results are not supplied as input and E has no budget, so actual-native and native control evidence are absent.' },
   ],
   next: [
-    'C/main: publish automatic proposal/context confirmation and a review Work/Ticket/Assignment entry; E then adds confirm-before-execute, revocation-effect and transaction-failure cases on top of the already verified explicit decisions.',
-    'D: keep the target immutable; a new target artifact needs its own explicit identity (tar/sha/source/build/schema) and a fresh E4 run, not a mapping from 9120a5ed.',
+    'D: bind the single install instance record to its exact data root and make a stop aimed at another state refuse without signalling that state\'s launcher/API; then E can measure launcher-dead/API-alive and PID/start reuse windows.',
+    'C/main: publish automatic proposal/context confirmation, the context-use send path (explicit selection, revalidation, same-transaction binding/receipt, no auto-resend, source audit) and recovery activation; E then converts E5-CONTEXT-USE and E5-RECOVERY-INTERRUPTION from NOT_TESTED.',
+    'D: keep the target immutable; a new target needs its own explicit identity (tar/sha/source/build/schema) and a fresh E4 run, not a mapping from build f2390ffd.',
     'B: hand off native evidence bound to commit/attempt/command with executed=true and model-task counts; only a separately granted budget lets E re-run native.',
     'Main: treat controlled-product-workflow PASS as workflow evidence only; local-alpha and full-product remain non-zero until installation and native evidence exist.',
   ],
@@ -446,7 +464,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第六轮交付交接
+const handoff = `# Agent E 第十轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -461,7 +479,7 @@ const handoff = `# Agent E 第六轮交付交接
 | \`node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow\` | E2-* | ${commandSummary(['E2-'])} |
 | \`node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui\` | E3-* | ${commandSummary(['E3-'])} |
 | \`node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha\` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | ${commandSummary(['E4-', 'E5-NATIVE-CONTROL', 'E6-REVIEW-PILOT'])} |
-| \`node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record\` | 全部 129 | ${Object.entries(report.counts).map(([status, count]) => `${status} ${count}`).join(' + ')} |
+| \`node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record\` | 全部 ${report.cases.length} | ${Object.entries(report.counts).map(([status, count]) => `${status} ${count}`).join(' + ')} |
 
 本次聚合：**${release.status}**（tier \`${release.tier}\`）。证据目录 \`${runDirectory}\`。
 
@@ -484,9 +502,9 @@ ${rows
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **PASS（仅所测 baseline→target tuple）**：cold install/config root/doctor、模式保持、备份恢复、D 托管 upgrade、升级后新数据、binary-only rollback 与未知 PID 阻断 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK；同 schema 下 schema 拒绝不适用；崩溃窗口 E4-UPGRADE-FAULTS 仍 NOT_TESTED。 |
+| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold install/config root/doctor、普通 personal cold start、模式保持、备份恢复、托管 upgrade、升级后新数据、binary-only rollback、跨 schema 精确拒绝 | E3-PERSONAL-COLD-START、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK、E4-UPGRADE-CROSS-SCHEMA。E4-MULTI-STATE 观测到 D 的 stop 误杀另一 state；E4-UPGRADE-FAULTS 仍 NOT_TESTED。 |
 
-安装物身份（显式 baseline/target tuple）：baseline \`wave06-alpha2-7e8f6ce6\` / buildId \`7e8f6ce6fa2e2633\` / schema 13 / tar \`0fe0ed53…c7631\` / source \`e10bfdb7\`（clean）；target \`wave08-target-cd0ecc29\` / buildId \`cd0ecc29d97d5c41\` / schema 13 / tar \`64bbe285…3d42\` / source \`9b75c2a1\`（clean）。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立；旧 dirty12→13 组合保留为历史。
+安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId \`${artifactTuple.baseline?.buildId ?? 'unknown'}\` / schema ${artifactTuple.baseline?.schema ?? '?'} / tar \`${String(artifactTuple.baseline?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.baseline?.source ?? '').slice(0, 8)}\`；target buildId \`${artifactTuple.target?.buildId ?? 'unknown'}\` / schema ${artifactTuple.target?.schema ?? '?'} / tar \`${String(artifactTuple.target?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.target?.source ?? '').slice(0, 8)}\`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
 ## 独立复核价值试点
 
@@ -520,15 +538,15 @@ ${rows
 - RSS/FD/磁盘是单实例观察；端口不变不能证明无进程泄漏。
 - 截图与几何断言只证明可达/不溢出/不重叠，不评价美观。
 - 推荐/复核仍只在实验入口；advisory/controlled-review/heterogeneous tier 因生产者缺失而非零。
-- 真实 native 投递/控制证据缺失，因此 \`full-product\` 仍被 gate 拒绝；\`installed-alpha\` 与 \`local-alpha\` 仅对所测 baseline→target 组合成立。
+- 真实 native 投递/控制证据缺失，因此 \`full-product\` 仍被 gate 拒绝；\`installed-alpha\` 与 \`local-alpha\` 只对所测 baseline→target 组合成立，且当前 D 的跨 state stop 缺陷使 installed-alpha 不能放行。
 - 试点被预检阻断，不能把 harness 或干跑当作价值已验证。
 
 ## 下一消费者
 
-1. 主线：审阅 \`RFC-E-001-consumer-interfaces.zh-CN.md\`，决定公共 DTO/命令归属；E 不复制生产类型。
-2. B：提供绑定 commit/attempt 的原生证据（\`executed: true\` + model task 计数）；E 只消费，不重跑计费任务。
-3. D：补第二个冻结 buildId 供升级演练；修复 PA_CONFIG_ROOT 覆盖时 release.json 不随 first-run 写入的问题。其余安装路径已由 E 在同一字节上独立通过。
-4. C：接线上下文/提案/决定后，E 增加“确认前不执行、重复确认幂等、撤销后失效、注入不扩权”用例。
+1. D：先修 \`stop\` 的 state 归属：单 install 多 state 时，针对 state A 的 stop 必须拒绝且不得信号 state B 的 launcher/API；再补 launcher 死/API 活与 PID/start reuse 窗口。最小复现见 \`externalBlockers.stop_claims_other_state\`。
+2. main/C：发布 context-use 发送路径（显式选择、发送前复验、同事务 binding/receipt、unknown 不自动重发、来源审计）与 recovery activation；E 再把 E5-CONTEXT-USE / E5-RECOVERY-INTERRUPTION 转成实测。
+3. B：提供绑定 commit/attempt 的原生证据（\`executed: true\` + model task 计数）；E 只消费，不重跑计费任务。
+4. 主线：审阅 \`RFC-E-001-consumer-interfaces.zh-CN.md\`；E 不复制生产类型。旧安装结果与 wave09 ledger 原样保留。
 
 ## 复验命令
 
@@ -549,6 +567,10 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
+writeFileSync(
+  join(reports, 'wave10-status.json'),
+  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave10-status/1', taskPackage: 'agent-tasks/product-wave-10/README.zh-CN.md', supersedes: 'wave09-status.json', artifactTuple }, null, 2) + '\n',
+)
 writeFileSync(
   join(reports, 'wave09-status.json'),
   JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave09-status/1', taskPackage: stages.taskPackage,

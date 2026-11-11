@@ -86,6 +86,7 @@ export const CONTROLLED_CASES = [
   case_('E2-DAILY-VERTICAL', { layers: [LAYERS.CONTROLLED], evidence: ['workId', 'verificationId', 'artifact', 'patch'] }),
   case_('E2-ARTIFACT-ROUNDTRIP', { layers: [LAYERS.CONTROLLED], evidence: ['artifact'] }),
   case_('E2-WORK-EVIDENCE', { layers: [LAYERS.CONTROLLED], evidence: ['workEvidence'] }),
+  case_('E2-EVIDENCE-HISTORY', { layers: [LAYERS.CONTROLLED], evidence: ['evidenceHistory'] }),
   case_('E2-REOPEN-PERSISTENCE', { layers: [LAYERS.CONTROLLED], evidence: ['workId', 'conversation'] }),
   case_('E2-REPLAY-AND-CONFLICT', { layers: [LAYERS.CONTROLLED] }),
   case_('E2-SESSION-ISOLATION', { layers: [LAYERS.CONTROLLED] }),
@@ -107,6 +108,7 @@ export const CONTROLLED_CASES = [
   case_('E3-DECISION-WORKFLOW', { layers: [LAYERS.CONTROLLED], evidence: ['decisionWorkflow'] }),
   case_('E3-PROPOSAL-HTTP', { layers: [LAYERS.CONTROLLED], evidence: ['proposals'] }),
   case_('E3-PROPOSAL-UI', { layers: [LAYERS.CONTROLLED], evidence: ['proposalUi'] }),
+  case_('E3-CONTEXT-PREVIEW', { layers: [LAYERS.CONTROLLED], evidence: ['contextPreview'] }),
   case_('E3-DESKTOP-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
   case_('E3-NOTEBOOK-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
   case_('E3-MOBILE-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
@@ -128,6 +130,7 @@ export const CONTROLLED_CASES = [
 /** Staged installation outside the development checkout. */
 export const INSTALL_CASES = [
   case_('E4-INSTALL-ARTIFACT-IDENTITY', { layers: [LAYERS.INSTALLED], evidence: ['artifact', 'installation'] }),
+  case_('E3-PERSONAL-COLD-START', { layers: [LAYERS.INSTALLED], evidence: ['personalInstall'] }),
   case_('E4-INSTALL-FIRST-RUN', { layers: [LAYERS.INSTALLED], evidence: ['install'] }),
   case_('E4-INSTALL-CONFIG-ROOT', { layers: [LAYERS.INSTALLED], evidence: ['configRoot'] }),
   case_('E4-INSTALL-REUSE-CONCURRENCY', { layers: [LAYERS.INSTALLED], evidence: ['reuse'] }),
@@ -136,6 +139,8 @@ export const INSTALL_CASES = [
   case_('E4-INSTALL-TAMPER', { layers: [LAYERS.INSTALLED], evidence: ['tamper'] }),
   case_('E4-INSTALL-ROLLBACK', { layers: [LAYERS.INSTALLED], evidence: ['rollback'] }),
   case_('E4-UPGRADE-ROLLBACK', { layers: [LAYERS.INSTALLED], evidence: ['upgrade'] }),
+  case_('E4-UPGRADE-CROSS-SCHEMA', { layers: [LAYERS.INSTALLED], evidence: ['crossUpgrade'] }),
+  case_('E4-MULTI-STATE', { layers: [LAYERS.INSTALLED], evidence: ['multiState'] }),
 ]
 
 /** Real vendor execution, with an executed/version/attempt/command/evidence proof. */

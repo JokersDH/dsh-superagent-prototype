@@ -243,7 +243,7 @@ export async function runProposals({ root, runDirectory, keep = false }) {
     cases.push(
       notTested(
         define('E3-CONTEXT-GRANT-BOUNDARY', 'Expired, purpose-mismatched or over-budget context grants never reach a provider', { layer: LAYERS.NOT_TESTED }),
-        'NOT_TESTED: main publishes no context preview/read entry. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed.',
+        'NOT_TESTED: E3-CONTEXT-PREVIEW verifies clamped budgets, omissions and basic refusals, but no public entry binds an expired grant or purpose mismatch to the read path. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed.',
       ),
     )
   } finally {

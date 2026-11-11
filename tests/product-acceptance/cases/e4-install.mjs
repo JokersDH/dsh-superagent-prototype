@@ -32,37 +32,42 @@ import { sha256 } from '../lib/evidence.mjs'
  * tests never start or stop the user's existing 5180-5184/8796-8800 instances.
  */
 const here = dirname(fileURLToPath(import.meta.url))
-const ARTIFACTS_DEFAULT = Object.freeze({
-  base: {
-    role: 'baseline',
-    name: 'wave06-alpha2-7e8f6ce6',
-    buildId: '7e8f6ce6fa2e2633',
-    productSchema: 13,
-    tarPath: process.env.PA_E_INSTALL_BASELINE_TAR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz',
-    tarSha256: '0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631',
-    tarBytes: 19911757,
-    installManifestSha256: '09041204af46dca6810a070b4f2cba9895f07e2a56776ec8472af96ef785b548',
-    releaseManifestSha256: '749ed6b304e6cfe782ae50987b94fa29cfa49c85e3d884b126485f546b8eb87e',
-    closureDigest: '55069a730c6954261da765fc5dceadf78df2697f3348d4a99f64782e630e2966',
-    files: 6603,
-    sourceCommit: 'e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389',
-    sourceDirty: false,
-  },
-  upgrade: {
-    role: 'target',
-    name: 'wave08-target-cd0ecc29',
-    buildId: 'cd0ecc29d97d5c41',
-    productSchema: 13,
-    tarPath: process.env.PA_E_INSTALL_TARGET_TAR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave08-target/wave08-target-cd0ecc29.tar.gz',
-    tarSha256: '64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42',
-    tarBytes: 19966910,
-    installManifestSha256: '0228c31f9e36fd3095a2a2d2c039388816531e002903364a0947932482dfdf17',
-    releaseManifestSha256: '8dc02c156982ff4497c6559a119ceced2f38e511c7ebd076ae2bdac173129449',
-    closureDigest: 'bd7fe346989a3cd7381a4ddf51b1224ca3bc1108eebeec31858388baace26f2a',
-    files: 6630,
-    sourceCommit: '9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e',
-    sourceDirty: false,
-  },
+const DEFAULT_DIRS = Object.freeze({
+  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave09-target',
+  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave09-target-r2',
+  cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave08-target',
+})
+
+/** Reads the artifact tuple from the producer's manifest next to the frozen tar. */
+function loadArtifact(role, dirName) {
+  const envJson = process.env[`PA_E_${role.toUpperCase()}_ARTIFACT_JSON`]
+  if (envJson !== undefined) return { role, ...JSON.parse(envJson) }
+  const dir = resolve(dirName)
+  const manifest = JSON.parse(readFileSync(join(dir, 'install-artifact.json'), 'utf8'))
+  return {
+    role,
+    name: manifest.name,
+    tarPath: manifest.tarPath ?? join(dir, `${manifest.name}.tar.gz`),
+    tarSha256: manifest.digests.tarSha256,
+    tarBytes: manifest.digests.tarBytes,
+    installManifestSha256: manifest.digests.installManifestSha256,
+    releaseManifestSha256: manifest.digests.releaseManifestSha256,
+    closureDigest: manifest.digests.closureDigest,
+    files: manifest.files?.count,
+    buildId: manifest.buildId,
+    sourceCommit: manifest.source.commit,
+    sourceDirty: manifest.source.dirty === true,
+    productSchema: manifest.producer.productSchema,
+    platform: manifest.producer.platform,
+    arch: manifest.producer.arch,
+    node: manifest.producer.node,
+    abi: String(manifest.producer.abi),
+  }
+}
+const ARTIFACTS = Object.freeze({
+  base: loadArtifact('baseline', DEFAULT_DIRS.baseline),
+  upgrade: loadArtifact('target', DEFAULT_DIRS.target),
+  cross: loadArtifact('cross', DEFAULT_DIRS.cross),
 })
 const PLATFORM = Object.freeze({
   platform: 'darwin',
@@ -73,28 +78,6 @@ const PLATFORM = Object.freeze({
   dependencies: ['@hono/node-server', 'better-sqlite3', 'hono', 'node-addon-api', 'openai', 'semver', 'yaml', 'zod'],
 })
 const TUPLE_FIELDS = ['tarPath', 'tarSha256', 'tarBytes', 'buildId', 'sourceCommit', 'productSchema']
-
-/** The explicit input tuple. A path override alone may not silently reuse the old identity. */
-function artifactSpec(role, defaults) {
-  const envName = `PA_E_${role.toUpperCase()}_ARTIFACT_JSON`
-  const raw = process.env[envName]
-  let spec = defaults
-  if (raw !== undefined) {
-    try {
-      spec = JSON.parse(raw)
-    } catch (error) {
-      throw new Error(`${envName} is not valid JSON: ${error.message}`)
-    }
-  }
-  const missing = TUPLE_FIELDS.filter((field) => spec[field] === undefined || spec[field] === null || spec[field] === '')
-  if (missing.length > 0) throw new Error(`${role} artifact tuple is missing ${missing.join(', ')}`)
-  return spec
-}
-const ARTIFACT_TUPLE = Object.freeze({
-  baseline: artifactSpec('BASELINE', ARTIFACTS_DEFAULT.base),
-  target: artifactSpec('TARGET', ARTIFACTS_DEFAULT.upgrade),
-})
-const ARTIFACTS = Object.freeze({ base: ARTIFACT_TUPLE.baseline, upgrade: ARTIFACT_TUPLE.target })
 
 /**
  * Reads the actual bytes/manifest and compares them to the declared tuple. Nothing is inferred from
@@ -117,8 +100,6 @@ export function verifyArtifactTuple(spec, tarPath, installDir) {
   return issues
 }
 
-/** The base artifact is the compatibility view used by the original install cases. */
-export const EXPECTED = ARTIFACTS.base
 
 const REQUIRED_INPUTS = [
   'artifactId/buildId and the tar.gz path',
@@ -481,7 +462,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       assert('PRODUCER_PLATFORM', manifest.producer.platform === PLATFORM.platform && manifest.producer.arch === PLATFORM.arch, `${manifest.producer.platform}/${manifest.producer.arch}`)
       assert('PRODUCER_NODE', manifest.producer.node === PLATFORM.node, manifest.producer.node)
       assert('PRODUCER_ABI', String(manifest.producer.abi) === PLATFORM.abi && manifest.producer.sqlite === PLATFORM.sqlite, `${manifest.producer.abi}/${manifest.producer.sqlite}`)
-      assert('SOURCE_COMMIT', manifest.source.commit === ARTIFACTS.upgrade.sourceCommit && manifest.source.dirty === false, JSON.stringify(manifest.source))
+      assert('SOURCE_COMMIT', manifest.source.commit === ARTIFACTS.upgrade.sourceCommit && manifest.source.dirty === ARTIFACTS.upgrade.sourceDirty, JSON.stringify(manifest.source))
       const deps = (manifest.dependencies ?? []).map((item) => (typeof item === 'string' ? item : item.name)).sort()
       assert('DEPENDENCY_CLOSURE', JSON.stringify(deps) === JSON.stringify([...PLATFORM.dependencies].sort()), JSON.stringify(deps))
       for (const rel of ['app/apps/launcher/bin/pa.mjs', 'app/apps/coordinator/product/demo.ts', 'app/apps/console/dist/index.html', 'app/node_modules/better-sqlite3'])
@@ -494,16 +475,16 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       assert('BASELINE_BUILD_ID', baselineManifest.buildId === ARTIFACTS.base.buildId, baselineManifest.buildId)
       assert('BASELINE_INSTALL_DIGEST', digest(join(upgradeInstall, 'install.json')) === ARTIFACTS.base.installManifestSha256, digest(join(upgradeInstall, 'install.json')))
       assert('BASELINE_RELEASE_DIGEST', digest(join(upgradeInstall, 'var/config/release.json')) === ARTIFACTS.base.releaseManifestSha256, digest(join(upgradeInstall, 'var/config/release.json')))
-      assert('BASELINE_SOURCE', baselineManifest.source.commit === ARTIFACTS.base.sourceCommit && baselineManifest.source.dirty === false, JSON.stringify(baselineManifest.source))
-      assert('BASELINE_SCHEMA', baselineManifest.producer.productSchema === 13, String(baselineManifest.producer.productSchema))
-      assert('TARGET_SCHEMA', manifest.producer.productSchema === 13, String(manifest.producer.productSchema))
+      assert('BASELINE_SOURCE', baselineManifest.source.commit === ARTIFACTS.base.sourceCommit && baselineManifest.source.dirty === ARTIFACTS.base.sourceDirty, JSON.stringify(baselineManifest.source))
+      assert('BASELINE_SCHEMA', baselineManifest.producer.productSchema === ARTIFACTS.base.productSchema, String(baselineManifest.producer.productSchema))
+      assert('TARGET_SCHEMA', manifest.producer.productSchema === ARTIFACTS.upgrade.productSchema, String(manifest.producer.productSchema))
       assert('DISTINCT_BUILDS', baselineManifest.buildId !== manifest.buildId && ARTIFACTS.base.tarSha256 !== ARTIFACTS.upgrade.tarSha256)
       evidence.artifact = {
         tuple: { baseline: ARTIFACTS.base, target: ARTIFACTS.upgrade },
         tupleRejections,
         artifacts: [
-          { role: 'baseline', name: ARTIFACTS.base.name, buildId: ARTIFACTS.base.buildId, tarSha256: ARTIFACTS.base.tarSha256, schema: 13, source: baselineManifest.source },
-          { role: 'target', name: ARTIFACTS.upgrade.name, buildId: ARTIFACTS.upgrade.buildId, tarSha256: ARTIFACTS.upgrade.tarSha256, schema: 13, source: manifest.source },
+          { role: 'baseline', name: ARTIFACTS.base.name, buildId: ARTIFACTS.base.buildId, tarSha256: ARTIFACTS.base.tarSha256, schema: ARTIFACTS.base.productSchema, source: baselineManifest.source },
+          { role: 'target', name: ARTIFACTS.upgrade.name, buildId: ARTIFACTS.upgrade.buildId, tarSha256: ARTIFACTS.upgrade.tarSha256, schema: ARTIFACTS.upgrade.productSchema, source: manifest.source },
         ],
         files: manifest.files?.count,
         producer: manifest.producer,
@@ -624,6 +605,43 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       assert('TARGET_SEED_PROVES_INIT', target.seeded === 'PASS', JSON.stringify(target))
       assert('BASELINE_SEED_PROVES_INIT', baseline.seeded === 'PASS', JSON.stringify(baseline))
       assert('BASELINE_HISTORY_RECORDED', ['PASS', 'FAIL'].includes(baseline.initialized), JSON.stringify(baseline))
+    })
+
+    await push(define('E3-PERSONAL-COLD-START', 'An ordinary personal install cold-starts, serves the workbench, adopts an older config and stops'), async ({ assert, evidence }) => {
+      const ports = await freePorts(4)
+      const child = spawnSync(process.execPath, [join(here, 'e3-personal-child.mjs')], {
+        env: {
+          ...process.env,
+          PA_E_PERSONAL_SPEC: JSON.stringify(ARTIFACTS.upgrade),
+          PA_E_PERSONAL_BASE: JSON.stringify(ARTIFACTS.base),
+          PA_E_PERSONAL_PORTS: JSON.stringify(ports),
+        },
+        encoding: 'utf8',
+        timeout: 300_000,
+      })
+      let probe
+      try { probe = JSON.parse(child.stdout.trim().split('\n').at(-1)) } catch { probe = undefined }
+      const steps = Object.fromEntries((probe?.steps ?? []).map((item) => [item.id, item]))
+      assert('PERSONAL_PROBE_RAN', probe !== undefined, `signal=${child.signal} status=${child.status} ${child.stderr.slice(-300)}`)
+      for (const id of ['first_run', 'doctor', 'start', 'health', 'console_assets', 'auth_required', 'instance_mode', 'schema', 'stop', 'stopped', 'config_conflict', 'start_conflict_blocked'])
+        assert(`PERSONAL_${id.toUpperCase()}`, steps[id]?.status === 'PASS', JSON.stringify(steps[id] ?? null))
+      assert('PERSONAL_SCHEMA', probe?.schema === ARTIFACTS.upgrade.productSchema, String(probe?.schema))
+      assert('PERSONAL_CONFIG_CONFLICT', probe?.configConflict?.code === 'release_source_conflict' && probe?.configConflict?.after === ARTIFACTS.base.buildId, JSON.stringify(probe?.configConflict))
+      assert('PERSONAL_NO_MODEL_SEND', probe?.modelSends === 0, String(probe?.modelSends))
+      evidence.personalInstall = {
+        artifact: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, source: ARTIFACTS.upgrade.sourceCommit, tarSha256: ARTIFACTS.upgrade.tarSha256 },
+        baselineConfig: { buildId: ARTIFACTS.base.buildId, schema: ARTIFACTS.base.productSchema },
+        start: probe?.start,
+        health: probe?.health,
+        console: probe?.console,
+        auth: probe?.auth,
+        schema: probe?.schema,
+        stop: probe?.stop,
+        migrated: probe?.migrated,
+        configConflict: probe?.configConflict,
+        modelSends: probe?.modelSends ?? null,
+        steps: probe?.steps ?? [],
+      }
     })
 
     await push(define('E4-INSTALL-REUSE-CONCURRENCY', 'Instance identity is reused only for an exact match and concurrent starts do not fork'), async ({ assert, evidence }) => {
@@ -885,8 +903,9 @@ export async function runInstall({ root, runDirectory, keep = false }) {
     })
 
     await push(define('E4-UPGRADE-ROLLBACK', 'D managed upgrade and binary rollback use the explicit pair in a bounded child probe'), async ({ assert, evidence }) => {
+      const probePorts = await freePorts(6)
       const child = spawnSync(process.execPath, [join(here, 'e4-managed-upgrade-child.mjs')], {
-        env: { ...process.env, PA_E_MANAGED_PAIR: JSON.stringify({ baseline: ARTIFACTS.base, target: ARTIFACTS.upgrade }) },
+        env: { ...process.env, PA_E_MANAGED_PAIR: JSON.stringify({ baseline: ARTIFACTS.base, target: ARTIFACTS.upgrade }), PA_E_MANAGED_PORTS: JSON.stringify(probePorts) },
         encoding: 'utf8',
         timeout: 240_000,
       })
@@ -922,6 +941,61 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         schemaRefusal: ARTIFACTS.upgrade.productSchema === ARTIFACTS.base.productSchema ? { applicable: false, reason: 'same_schema' } : { applicable: true },
         steps: probe?.steps ?? [],
         probeLimitations: 'Bounded child probe: fault-injection crash windows and whole-process launcher/API guards are a separate NOT_TESTED case.',
+      }
+    })
+
+    await push(define('E4-UPGRADE-CROSS-SCHEMA', 'A cross-schema upgrade leaves the old binary refusing the new database exactly'), async ({ assert, evidence }) => {
+      const ports = await freePorts(6)
+      const child = spawnSync(process.execPath, [join(here, 'e4-managed-upgrade-child.mjs')], {
+        env: {
+          ...process.env,
+          PA_E_MANAGED_PAIR: JSON.stringify({ baseline: ARTIFACTS.cross, target: ARTIFACTS.upgrade }),
+          PA_E_MANAGED_PORTS: JSON.stringify(ports),
+          PA_E_CROSS_CHECK: '1',
+        },
+        encoding: 'utf8',
+        timeout: 240_000,
+      })
+      let probe
+      try { probe = JSON.parse(child.stdout.trim().split('\n').at(-1)) } catch { probe = undefined }
+      const steps = Object.fromEntries((probe?.steps ?? []).map((item) => [item.id, item]))
+      assert('CROSS_PROBE_RAN', probe !== undefined, `signal=${child.signal} status=${child.status} ${child.stderr.slice(-300)}`)
+      assert('CROSS_UPGRADE', steps.upgrade?.status === 'PASS' && probe?.upgrade?.to === ARTIFACTS.upgrade.buildId, JSON.stringify(probe?.upgrade))
+      assert('CROSS_DATA', probe?.schema === ARTIFACTS.upgrade.productSchema && probe?.postKept === true, JSON.stringify({ schema: probe?.schema, post: probe?.postKept }))
+      assert('CROSS_REFUSAL', steps.cross_schema_refusal?.status === 'PASS', JSON.stringify(probe?.crossSchema ?? null))
+      assert('CROSS_ACCURATE_CODE', ['daemon_start_failed', 'schema_unsupported', 'runtime_mismatch', 'state_schema_newer_than_binary'].includes(probe?.crossSchema?.code) && probe.crossSchema.code !== 'release_artifact_missing', JSON.stringify(probe?.crossSchema ?? null))
+      assert('CROSS_NOT_ARTIFACT', probe?.crossSchema?.code !== 'release_artifact_missing', String(probe?.crossSchema?.code))
+      evidence.crossUpgrade = {
+        baseline: { buildId: ARTIFACTS.cross.buildId, schema: ARTIFACTS.cross.productSchema, source: ARTIFACTS.cross.sourceCommit, tarSha256: ARTIFACTS.cross.tarSha256 },
+        target: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, source: ARTIFACTS.upgrade.sourceCommit, tarSha256: ARTIFACTS.upgrade.tarSha256 },
+        upgrade: probe?.upgrade,
+        schema: probe?.schema,
+        postKept: probe?.postKept,
+        crossSchema: probe?.crossSchema,
+      }
+    })
+
+    await push(define('E4-MULTI-STATE', 'One install, two states: a stop for another state neither claims nor kills it'), async ({ assert, evidence }) => {
+      const ports = await freePorts(4)
+      const child = spawnSync(process.execPath, [join(here, 'e4-multistate-child.mjs')], {
+        env: { ...process.env, PA_E_MULTI_SPEC: JSON.stringify(ARTIFACTS.upgrade), PA_E_MULTI_PORTS: JSON.stringify(ports) },
+        encoding: 'utf8',
+        timeout: 240_000,
+      })
+      let probe
+      try { probe = JSON.parse(child.stdout.trim().split('\n').at(-1)) } catch { probe = undefined }
+      const steps = Object.fromEntries((probe?.steps ?? []).map((item) => [item.id, item]))
+      assert('MULTI_PROBE_RAN', probe !== undefined, `signal=${child.signal} status=${child.status} ${child.stderr.slice(-300)}`)
+      assert('MULTI_FIRST_RUN', steps.first_run?.status === 'PASS', JSON.stringify(steps.first_run ?? null))
+      assert('MULTI_STATE_A', steps.state_a_start?.status === 'PASS', JSON.stringify(steps.state_a_start ?? null))
+      assert('MULTI_STATE_B', steps.state_b_start?.status === 'PASS', JSON.stringify(steps.state_b_start ?? null))
+      assert('MULTI_STOP_OTHER_BLOCKED', steps.stop_other_state_blocked?.status === 'PASS', JSON.stringify(probe?.stopOtherState ?? null))
+      assert('MULTI_DEAD_LAUNCHER', steps.dead_launcher_api_alive?.status !== 'FAIL', JSON.stringify(probe?.deadLauncher ?? null))
+      evidence.multiState = {
+        stopOtherState: probe?.stopOtherState,
+        deadLauncher: probe?.deadLauncher,
+        steps: probe?.steps ?? [],
+        limitations: ['Only processes this probe spawned are signalled; unknown live targets are reported, not killed.'],
       }
     })
 

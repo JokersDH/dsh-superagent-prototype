@@ -246,11 +246,11 @@ export async function runDecisions({ root, runDirectory, keep = false }) {
         ...define('E3-PROPOSAL-CONTEXT-BOUNDARY', 'Proposal confirmation and context window are explicit, transactional and revocable'),
         layer: LAYERS.NOT_TESTED,
         limitations: [
-          'Owner: main (HTTP/composition) + C (rules). No proposal/context entry is published in this main yet.',
+          'Owner: main (HTTP/composition) + C (rules). Context preview is published and verified by E3-CONTEXT-PREVIEW; automatic proposal confirmation and grant-level revocation remain unpublished.',
           'Explicit decisions are verified separately by E3-DECISION-WORKFLOW; this case is the automatic proposal/context surface, not a duplicate.',
         ],
       },
-      'NOT_TESTED: main publishes no proposal confirm/reject/replay or context preview endpoint. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen.',
+      'NOT_TESTED: context preview now exists, but automatic proposal confirmation and grant/revocation invalidation do not. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen.',
     ),
   )
 

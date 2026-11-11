@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-09/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-10/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "531c6b6",
-  "checkpoint": "6977bd9",
+  "base": "f99ca39",
+  "checkpoint": "81d7fa3",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -37,7 +37,7 @@
       "title": "Proposal HTTP, attention, decisions and review timing",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "E3-PROPOSAL-HTTP covers pending preview, missing input, confirm/reject, replay, drift, tamper, cross-project and answer-not-knowledge. E3-PROPOSAL-UI exercises the real console: preview has no effect, lost response survives reload with one settlement, second confirm and reject behave. Context preview remains NOT_TESTED."
+        "E3-PROPOSAL-HTTP and E3-PROPOSAL-UI cover explicit proposal flows. E3-CONTEXT-PREVIEW now runs against real HTTP: bounded budget with clamping, untrusted trust label, work/contract sources, no execution effect, TTL, cross-project/foreign-conversation/missing-work/invalid-budget refusals. E2-EVIDENCE-HISTORY covers window/limit/cursor. E5-CONTEXT-USE stays NOT_TESTED because only preview and the binding schema exist, not a send/audit path."
       ]
     },
     {
@@ -45,7 +45,7 @@
       "title": "Explicit baseline/target installation and upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Explicit baseline/target tuple is read from tar bytes and install.json; managed upgrade/rollback-install run in a bounded child probe with new data, same-schema rollback and tampered-target refusal. Crash windows/whole-process guards are E4-UPGRADE-FAULTS NOT_TESTED."
+        "Install matrix is parameterized by the real tar/sha/source/build/schema tuple (no fixed schema13/ports). E3-PERSONAL-COLD-START proves personal first-run, doctor, workbench assets, bearer refusal, DB schema and stop; a different config release is refused as release_source_conflict. Managed upgrade/rollback keeps data, tampered target is refused, and a cross-schema old binary refuses with state_schema_newer_than_binary after pointer rollback. E4-MULTI-STATE records a real D defect: a stop for state A returned STOPPED and killed shared-install state B's API; the launcher-dead window is therefore NOT_TESTED. Crash windows remain E4-UPGRADE-FAULTS NOT_TESTED."
       ]
     },
     {
@@ -61,7 +61,7 @@
       "title": "Layered conclusions and handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave07-status separates module/controlled-product/actual-native-control/installed-alpha/review-value with source/evidence/owner; pilot value never gates product or install."
+        "wave10-status separates test source, product source/build and the exact artifact tuple with commands, exit codes, PASS/FAIL/NOT_TESTED and owners; wave09 and older ledgers are preserved and pilot value never gates product or install."
       ]
     }
   ]

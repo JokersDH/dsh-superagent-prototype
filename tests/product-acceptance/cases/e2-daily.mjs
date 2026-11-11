@@ -694,6 +694,37 @@ export async function runE2({ root, runDirectory, keep = false }) {
     )
 
     await push(
+      define('E2-EVIDENCE-HISTORY', 'Work evidence history is bounded, continuation-safe and project scoped'),
+      async ({ assert, evidence }) => {
+        if (!facts.delivery) throw new Error('E2-DAILY-VERTICAL did not reach delivery; history has no reference')
+        const { workId } = facts.delivery
+        const history = await client.json(`/v1/works/${workId}/evidence/history`)
+        assert('HISTORY_PROTOCOL', history.protocol === 'work-evidence-history/1', history.protocol)
+        assert('HISTORY_WORK', history.workId === workId && history.contract?.workId === workId, JSON.stringify(history.contract))
+        assert('HISTORY_ENTRIES', Array.isArray(history.entries) && history.entries.length > 0 && history.entries.length <= 100, String(history.entries?.length))
+        assert('HISTORY_WINDOW', ['complete', 'caller_limit'].includes(history.window), history.window)
+        assert('HISTORY_CONTINUATION', history.hasMore === (history.nextCursor !== undefined), JSON.stringify({ hasMore: history.hasMore }))
+        const first = await client.json(`/v1/works/${workId}/evidence/history?limit=1`)
+        assert('HISTORY_CALLER_LIMIT', first.window === 'caller_limit' && first.entries.length === 1 && first.hasMore === true && typeof first.nextCursor === 'string', JSON.stringify({ window: first.window, entries: first.entries.length }))
+        const second = await client.json(`/v1/works/${workId}/evidence/history?limit=1&cursor=${encodeURIComponent(first.nextCursor)}`)
+        assert('HISTORY_CURSOR_PAGE', second.protocol === 'work-evidence-history/1' && second.workId === workId && second.entries.length === 1 && second.entries[0].sourceRef !== first.entries[0].sourceRef, JSON.stringify(second.entries.map((item) => item.sourceRef)))
+        const badLimit = await client.request(`/v1/works/${workId}/evidence/history?limit=0`)
+        assert('HISTORY_LIMIT_REFUSED', badLimit.status === 400, `status ${badLimit.status}`)
+        const tooBig = await client.request(`/v1/works/${workId}/evidence/history?limit=101`)
+        assert('HISTORY_LIMIT_MAX_REFUSED', tooBig.status === 400, `status ${tooBig.status}`)
+        const unknown = await client.request('/v1/works/work-not-here/evidence/history')
+        assert('HISTORY_UNKNOWN_WORK', [400, 403, 404].includes(unknown.status), `status ${unknown.status}`)
+        evidence.evidenceHistory = {
+          protocol: history.protocol,
+          entries: history.entries.length,
+          window: history.window,
+          pages: [first.entries.length, second.entries.length],
+          refusals: { limitZero: badLimit.status, limitMax: tooBig.status, unknown: unknown.status },
+        }
+      },
+    )
+
+    await push(
       define('E2-REOPEN-PERSISTENCE', 'A restart preserves delivery, conversation and artifacts without reopening work'),
       async ({ assert, evidence, note }) => {
         if (!facts.delivery) throw new Error('E2-DAILY-VERTICAL did not reach delivery; reopen has no reference')

@@ -14,6 +14,10 @@ import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 
 const pair = JSON.parse(process.env.PA_E_MANAGED_PAIR ?? '{}')
+const ports = JSON.parse(process.env.PA_E_MANAGED_PORTS ?? '[]')
+const basePorts = ports.slice(0, 4)
+const rollbackPorts = ports.slice(4, 6)
+const crossCheck = process.env.PA_E_CROSS_CHECK === '1'
 const result = { protocol: 'e4-managed-upgrade-child/1', steps: [], ok: false }
 const step = (id, status, detail) => result.steps.push({ id, status, detail })
 const w = realpathSync(mkdtempSync(join(tmpdir(), 'pa-e-managed-')))
@@ -33,10 +37,15 @@ const start = (install, port, apiPort) => {
   child.stdout.on('data', (chunk) => { buffer += chunk })
   return new Promise((resolve) => {
     const deadline = Date.now() + 40_000
+    const finish = () => {
+      try { return resolve({ child, value: JSON.parse(buffer.trim()) }) } catch { /* multi-line fallback */ }
+      try { return resolve({ child, value: JSON.parse(buffer.trim().split('\n').filter(Boolean).at(-1)) }) } catch { return resolve({ child, value: undefined }) }
+    }
+    child.once('exit', finish)
     const poll = () => {
       const line = buffer.split('\n').find((item) => item.trim().startsWith('{'))
       if (line) { try { return resolve({ child, value: JSON.parse(line) }) } catch { /* keep */ } }
-      if (Date.now() > deadline) return resolve({ child, value: undefined })
+      if (Date.now() > deadline) return finish()
       setTimeout(poll, 120)
     }
     poll()
@@ -86,12 +95,12 @@ try {
   step('bootstrap', bootstrapJson?.release?.buildId === pair.baseline.buildId ? 'PASS' : 'FAIL', bootstrapJson?.release?.buildId ?? bootstrap.stderr.slice(-200))
   result.bootstrap = bootstrapJson?.release?.buildId ?? null
 
-  const base = await start(baseline, 5571, 8971)
+  const base = await start(baseline, basePorts[0] ?? 5571, basePorts[1] ?? 8971)
   running = base
-  const baseHealth = await health(`http://127.0.0.1:8971`)
+  const baseHealth = await health(`http://127.0.0.1:${basePorts[1] ?? 8971}`)
   step('baseline_start', base.value?.status === 'RUNNING' && baseHealth?.status === 'ok' ? 'PASS' : 'FAIL', JSON.stringify({ value: base.value?.status, health: baseHealth?.status }))
   result.baseline = base.value?.instance?.buildId ?? null
-  await chat(`http://127.0.0.1:8971`, '托管升级前的数据')
+  await chat(`http://127.0.0.1:${basePorts[1] ?? 8971}`, '托管升级前的数据')
 
   const upgrade = spawnSync(join(target, 'bin/pa'), ['upgrade', '--json', ...rootArgs, '--to', target, '--backup', join(w, 'pre.pab')], { cwd: w, env, encoding: 'utf8', timeout: 120_000 })
   const upgradeJson = (() => { try { return JSON.parse(upgrade.stdout) } catch { return undefined } })()
@@ -124,16 +133,33 @@ try {
     const rollbackJson = (() => { try { return JSON.parse(rollback.stdout) } catch { return undefined } })()
     result.rollback = rollbackJson ? { status: rollbackJson.status, from: rollbackJson.from, to: rollbackJson.to, dataRolledBack: rollbackJson.dataRolledBack } : null
     step('rollback_install', rollbackJson?.status === 'BINARY_ROLLED_BACK' && rollbackJson?.dataRolledBack === false ? 'PASS' : 'FAIL', JSON.stringify(result.rollback))
-    const base2 = await start(baseline, 5572, 8972)
+    if (crossCheck && pair.baseline.productSchema < pair.target.productSchema) {
+      // Pointer is back on the older binary; its start must now fail on the newer schema, not on assets.
+      const oldOnNew = await start(baseline, rollbackPorts[0] ?? 5582, rollbackPorts[1] ?? 8982)
+      const refused = oldOnNew.value
+      result.crossSchema = {
+        baselineSchema: pair.baseline.productSchema,
+        targetSchema: pair.target.productSchema,
+        status: refused?.status ?? null,
+        code: refused?.code ?? null,
+        migrationRefusal: /MigrationIntegrityError|Applied migration|is not registered|schema/.test(JSON.stringify(refused?.detail ?? {})),
+        dataSchema: schema(),
+      }
+      step('cross_schema_refusal', refused?.status === 'BLOCKED' && ['daemon_start_failed', 'schema_unsupported', 'runtime_mismatch', 'state_schema_newer_than_binary'].includes(refused?.code) && result.crossSchema.dataSchema === pair.target.productSchema ? 'PASS' : 'FAIL', JSON.stringify(result.crossSchema))
+      try { oldOnNew.child.kill('SIGKILL') } catch { /* gone */ }
+      result.ok = result.steps.every((item) => item.status === 'PASS')
+      throw Object.assign(new Error('cross_schema_probe_done'), { crossDone: true })
+    }
+    const base2 = await start(baseline, rollbackPorts[0] ?? 5572, rollbackPorts[1] ?? 8972)
     running = base2
-    const base2Health = await health(`http://127.0.0.1:8972`)
+    const base2Health = await health(`http://127.0.0.1:${rollbackPorts[1] ?? 8972}`)
     result.rollbackBuild = base2.value?.instance?.buildId ?? null
     result.rollbackKeptPost = hasMessage('托管升级后的新数据')
     step('rollback_start', base2.value?.status === 'RUNNING' && base2Health?.status === 'ok' && result.rollbackBuild === pair.baseline.buildId ? 'PASS' : 'FAIL', JSON.stringify({ build: result.rollbackBuild, health: base2Health?.status }))
   }
   result.ok = result.steps.every((item) => item.status === 'PASS')
 } catch (error) {
-  result.error = String(error?.message ?? error).slice(0, 500)
+  if (error?.crossDone !== true) result.error = String(error?.message ?? error).slice(0, 500)
 } finally {
   cleanup()
   try { running?.child?.kill('SIGKILL') } catch { /* gone */ }

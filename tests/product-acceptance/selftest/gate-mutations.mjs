@@ -86,6 +86,36 @@ const evidenceFor = (key) => {
       return { sameSizeCode: 'release_artifact_missing', missingCode: 'release_artifact_missing', corruptBundleCode: 'archive_invalid' }
     case 'rollback':
       return { bundleSha256: DIGEST, target: '/tmp/state', postBackupReceipt: 'recorded' }
+    case 'evidenceHistory':
+      return {
+        protocol: 'work-evidence-history/1',
+        entries: 12,
+        window: 'complete',
+        pages: [1, 1],
+        refusals: { limitZero: 400, limitMax: 400, unknown: 404 },
+      }
+    case 'personalInstall':
+      return {
+        start: 'RUNNING',
+        health: 'ok',
+        console: { status: 200, asset: true },
+        auth: 401,
+        schema: 15,
+        stop: { status: 'STOPPED', closed: true },
+        modelSends: 0,
+        artifact: { buildId: 'target' },
+        configConflict: { code: 'release_source_conflict', before: 'base', after: 'base' },
+      }
+    case 'contextPreview':
+      return {
+        protocol: 'context-preview/1',
+        trust: 'untrusted_data',
+        budget: { maxFiles: 32, maxBytes: 131072, maxTokens: 32768 },
+        budgetClamped: ['maxFiles', 'maxBytes', 'maxTokens'],
+        totals: { files: 3, bytes: 1200, tokens: 300 },
+        kinds: ['contract', 'work'],
+        refusals: { crossProject: 403, missingWork: 400 },
+      }
     case 'proposalUi':
       return {
         preview: { works: 0, receipts: 2 },
@@ -117,6 +147,20 @@ const evidenceFor = (key) => {
       return {
         mode: { fixtureReused: true, personalRefused: 'author_executor_unavailable', existingUntouched: true },
         unknownPid: { startCode: 'instance_identity_mismatch', stopStatus: 1, alive: true },
+      }
+    case 'multiState':
+      return {
+        stopOtherState: { exit: 1, bAlive: true, bApiAlive: true },
+        deadLauncher: { status: 'UNVERIFIED', apiAlive: true, apiAliveAfterStop: true },
+      }
+    case 'crossUpgrade':
+      return {
+        baseline: { buildId: 'old', schema: 13, tarSha256: DIGEST, source: 'old' },
+        target: { buildId: 'new', schema: 15, tarSha256: 'c'.repeat(64), source: 'new' },
+        upgrade: { status: 'CONFIRMED', to: 'new' },
+        schema: 15,
+        postKept: true,
+        crossSchema: { code: 'state_schema_newer_than_binary', migrationRefusal: false, dataSchema: 15 },
       }
     case 'upgrade':
       return {

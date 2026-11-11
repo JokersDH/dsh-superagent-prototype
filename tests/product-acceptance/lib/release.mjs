@@ -295,6 +295,35 @@ export function proposalUiIssues(ui) {
   return issues
 }
 
+/** Personal install must prove a real personal process, console, auth and config adoption. */
+export function personalInstallIssues(personal) {
+  if (!personal || typeof personal !== 'object') return ['missing']
+  const issues = []
+  if (personal.start !== 'RUNNING') issues.push('start')
+  if (personal.health !== 'ok') issues.push('health')
+  if (personal.console?.status !== 200 || personal.console?.asset !== true) issues.push('console')
+  if (personal.auth !== 401 && personal.auth !== 403) issues.push('auth')
+  if (!Number.isSafeInteger(personal.schema)) issues.push('schema')
+  if (personal.stop?.status !== 'STOPPED' || personal.stop?.closed !== true) issues.push('stop')
+  if (personal.modelSends !== 0) issues.push('model_send')
+  if (personal.configConflict?.code !== 'release_source_conflict' || personal.configConflict?.after !== personal.configConflict?.before) issues.push('config_conflict')
+  return issues
+}
+
+/** Context preview must be bounded, project/work bound and free of execution effects. */
+export function contextPreviewIssues(preview) {
+  if (!preview || typeof preview !== 'object') return ['missing']
+  const issues = []
+  if (preview.protocol !== 'context-preview/1') issues.push('protocol')
+  if (preview.trust !== 'untrusted_data') issues.push('trust')
+  if (!Array.isArray(preview.budgetClamped) || preview.budgetClamped.length === 0) issues.push('budget_not_clamped')
+  if (!preview.budget || preview.budget.maxFiles > 32 || preview.budget.maxBytes > 131072 || preview.budget.maxTokens > 32768) issues.push('ceiling')
+  if (!Number.isSafeInteger(preview.totals?.files) || !Number.isSafeInteger(preview.totals?.bytes)) issues.push('totals')
+  if (!Array.isArray(preview.kinds) || !preview.kinds.includes('work') || !preview.kinds.includes('contract')) issues.push('work_sources')
+  if (preview.refusals?.crossProject === 200 || preview.refusals?.missingWork !== 400) issues.push('refusals')
+  return issues
+}
+
 /**
  * A structured proposal is inert data until one explicit confirmation. Preview must be pending,
  * confirmation/rejection must be replay-safe, every drift/tamper/cross-project path must refuse,
@@ -320,6 +349,48 @@ export function proposalFlowIssues(flow) {
   if (!Number.isSafeInteger(flow.isolation?.projectA) || !Number.isSafeInteger(flow.isolation?.projectB)) issues.push('isolation')
   if (flow.decision?.recorded !== true) issues.push('decision_effect')
   if (![400, 403, 409].includes(flow.authAnswer)) issues.push('auth_answer_promoted')
+  return issues
+}
+
+/** Evidence history must name its work/contract, bound pages and refuse invalid limits. */
+export function evidenceHistoryIssues(history) {
+  if (!history || typeof history !== 'object') return ['missing']
+  const issues = []
+  if (history.protocol !== 'work-evidence-history/1') issues.push('protocol')
+  if (!Number.isSafeInteger(history.entries) || history.entries < 1) issues.push('no_entries')
+  if (!['complete', 'caller_limit', 'storage_cap'].includes(history.window)) issues.push('window')
+  if (!Array.isArray(history.pages) || history.pages.length !== 2) issues.push('pages')
+  if (history.refusals?.limitZero !== 400 || history.refusals?.limitMax !== 400) issues.push('limit_refusal')
+  if (![400, 403, 404].includes(history.refusals?.unknown)) issues.push('unknown_refusal')
+  return issues
+}
+
+/** A cross-schema upgrade must leave the old binary refusing the new database by schema, not assets. */
+export function crossUpgradeIssues(cross) {
+  if (!cross || typeof cross !== 'object') return ['missing']
+  const issues = []
+  const base = cross.baseline ?? {}
+  const target = cross.target ?? {}
+  if (!isSubstantive(base.buildId) || !isSubstantive(target.buildId) || base.buildId === target.buildId) issues.push('distinct_builds')
+  if (!HEX.test(String(base.tarSha256 ?? '')) || !HEX.test(String(target.tarSha256 ?? ''))) issues.push('tuple')
+  if (!Number.isSafeInteger(base.schema) || !Number.isSafeInteger(target.schema) || target.schema <= base.schema) issues.push('schema_order')
+  if (cross.upgrade?.status !== 'CONFIRMED' || cross.upgrade?.to !== target.buildId) issues.push('upgrade')
+  if (cross.schema !== target.schema || cross.postKept !== true) issues.push('data')
+  if (!['daemon_start_failed', 'schema_unsupported', 'runtime_mismatch', 'state_schema_newer_than_binary'].includes(cross.crossSchema?.code)) issues.push('old_binary_admitted')
+  if (cross.crossSchema?.code === 'release_artifact_missing') issues.push('wrong_reason')
+  if (cross.crossSchema?.migrationRefusal !== true && !['schema_unsupported', 'state_schema_newer_than_binary'].includes(cross.crossSchema?.code)) issues.push('no_schema_refusal')
+  if (cross.crossSchema?.dataSchema !== target.schema) issues.push('data_changed')
+  return issues
+}
+
+/** A shared install path is not ownership: another state's live instance must stay untouched. */
+export function multiStateIssues(state) {
+  if (!state || typeof state !== 'object') return ['missing']
+  const issues = []
+  const stop = state.stopOtherState ?? {}
+  const dead = state.deadLauncher ?? {}
+  if (stop.exit === 0 || stop.bAlive !== true || stop.bApiAlive !== true) issues.push('other_state_claimed')
+  if (dead.status !== 'UNVERIFIED' || dead.apiAlive !== true || dead.apiAliveAfterStop !== true) issues.push('dead_launcher_killed_api')
   return issues
 }
 
@@ -581,6 +652,18 @@ export function evaluateRelease({
         for (const issue of installationIssues(result.evidence?.installation))
           failures.push(fail('installation_evidence_invalid', `Installation proof ${issue}`, entry.id))
       }
+      if (entry.evidence?.includes('evidenceHistory')) {
+        for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
+          failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('personalInstall')) {
+        for (const issue of personalInstallIssues(result.evidence?.personalInstall))
+          failures.push(fail('personal_install_invalid', `Personal install ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('contextPreview')) {
+        for (const issue of contextPreviewIssues(result.evidence?.contextPreview))
+          failures.push(fail('context_preview_invalid', `Context preview ${issue}`, entry.id))
+      }
       if (entry.evidence?.includes('proposalUi')) {
         for (const issue of proposalUiIssues(result.evidence?.proposalUi))
           failures.push(fail('proposal_ui_invalid', `Proposal UI ${issue}`, entry.id))
@@ -596,6 +679,14 @@ export function evaluateRelease({
       if (entry.evidence?.includes('hostGuards')) {
         for (const issue of hostGuardIssues(result.evidence?.hostGuards))
           failures.push(fail('host_guard_invalid', `Host guard ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('multiState')) {
+        for (const issue of multiStateIssues(result.evidence?.multiState))
+          failures.push(fail('multi_state_invalid', `Multi-state ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('crossUpgrade')) {
+        for (const issue of crossUpgradeIssues(result.evidence?.crossUpgrade))
+          failures.push(fail('cross_upgrade_invalid', `Cross-schema upgrade ${issue}`, entry.id))
       }
       if (entry.evidence?.includes('upgrade')) {
         for (const issue of upgradeIssues(result.evidence?.upgrade))
