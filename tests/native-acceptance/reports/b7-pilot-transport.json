@@ -1,0 +1,235 @@
+{
+  "generatedAt": "2026-11-11T03:24:34.295Z",
+  "environment": {
+    "note": "wave-06 B7 real transport: actual_native + protocol_fixture + package-local",
+    "modelCalls": 0,
+    "realBinary": "codex 0.164.0"
+  },
+  "totals": {
+    "cases": 14,
+    "PASS": 14,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "cases": [
+    {
+      "id": "B7-REAL-INIT",
+      "title": "the real codex app-server answers initialize",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "initialize answered; userAgent=personal-agent-pilot/0.164.0 (Mac OS 26.6.0; arm"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B7-REAL-FRESH-THREAD",
+      "title": "the real binary creates an ephemeral thread without billing",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "thread/start returned 01a1c8a2-c5f2-7c60-9a2b-eb7471a88490; model=gpt-6.1-sol provider=OpenAI"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B7-REAL-INSPECT-NO-BILL",
+      "title": "constructing and inspecting never sends a model turn",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "sent only initialize, thread/start, thread/read - no turn/start, so no model turn was started"
+      ],
+      "evidence": [
+        {
+          "methodsSent": [
+            "initialize",
+            "thread/start",
+            "thread/read"
+          ]
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B7-REAL-CHECKPOINT-BOUNDARY",
+      "title": "a resumable checkpoint needs a real turn (measured)",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "measured: a 0-turn thread has no rollout, so resume/fork refuse - a real checkpoint requires a real author turn"
+      ],
+      "evidence": [
+        {
+          "readSameProcess": "ok turns=0",
+          "resume": "refused:no rollout found for thread id 01a1c8a2-c5f2-7c60-9a",
+          "fork": "refused:no rollout found for thread id 01a1c8a2-c5f2-7c60-9a"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B7-CHAIN-AUTHOR",
+      "title": "the author turn runs through a reservation and yields usage",
+      "lane": "protocol_fixture",
+      "status": "PASS",
+      "detail": [
+        "the author turn reserved first, sent exactly one turn/start, and reported usage including reasoning tokens"
+      ],
+      "evidence": [
+        {
+          "reservations": 1,
+          "turnsStarted": 1,
+          "completedTurns": 1,
+          "usageLast": {
+            "totalTokens": 120,
+            "inputTokens": 100,
+            "cachedInputTokens": 40,
+            "cacheWriteInputTokens": 10,
+            "outputTokens": 20,
+            "reasoningOutputTokens": 5
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B7-CHAIN-CONTINUE",
+      "title": "a real checkpoint can be resumed and forked once a turn exists",
+      "lane": "protocol_fixture",
+      "status": "PASS",
+      "detail": [
+        "resume reopened the author thread and fork produced a distinct thread"
+      ],
+      "evidence": [
+        {
+          "resume": "ok same=true",
+          "fork": "ok new=true"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B7-CHAIN-FRESH",
+      "title": "a fresh reviewer runs in its own ephemeral thread",
+      "lane": "protocol_fixture",
+      "status": "PASS",
+      "detail": [
+        "the fresh arm ran in a thread distinct from the author thread, with its own reservation"
+      ],
+      "evidence": [
+        {
+          "freshThread": "fixture-thread-3",
+          "authorThread": "fixture-thread-1",
+          "turnsBefore": 1,
+          "turnsAfter": 2
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B7-CANCEL",
+      "title": "cancel interrupts without starting another turn",
+      "lane": "protocol_fixture",
+      "status": "PASS",
+      "detail": [
+        "turn/interrupt was accepted and no additional turn/start was sent"
+      ],
+      "evidence": [
+        {
+          "interrupt": {
+            "interrupted": true,
+            "turnId": "fixture-turn-1"
+          },
+          "turnsBefore": 2,
+          "turnsAfter": 2
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B7-RECONCILE",
+      "title": "reconciliation reads the original thread and never re-sends",
+      "lane": "protocol_fixture",
+      "status": "PASS",
+      "detail": [
+        "reconcile observed the existing turn (1 on thread) and sent no new turn"
+      ],
+      "evidence": [
+        {
+          "sendObserved": true,
+          "observedTurnCount": 1,
+          "turnsBefore": 2,
+          "turnsAfter": 2
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B7-NO-HOOK",
+      "title": "a turn with no reservation hook sends zero bytes",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "refused as no_reservation_hook and the server saw no turn/start"
+      ],
+      "evidence": [
+        {
+          "serverSaw": [
+            "initialize",
+            "thread/start"
+          ],
+          "journal": ".b7-wire-62946-1.log"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B7-HOOK-REFUSES",
+      "title": "a refusing hook sends zero bytes",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "the refusing hook stopped the send before the wire (server saw no turn/start)"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B7-AUTHOR-ALSO-RESERVES",
+      "title": "the author arm is not free just because it is not a review",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "an arm labelled no_review still cannot send without a reservation"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B7-THROWING-HOOK",
+      "title": "a throwing hook refuses rather than falling through to a send",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "a ledger failure refused the send instead of proceeding (server saw no turn/start)"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B7-METHOD-SPLIT",
+      "title": "the billing method is exactly one and is not in the non-billing set",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "turn/start is excluded from the non-billing set; thread/start is included"
+      ],
+      "evidence": [],
+      "entities": []
+    }
+  ]
+}
