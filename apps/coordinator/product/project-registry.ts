@@ -31,13 +31,14 @@ const ProjectRecordSchema = z.strictObject({
 })
 const RegistrySchema = z.strictObject({ version: z.literal(1), projects: z.array(ProjectRecordSchema).max(100) })
 export type RegisteredProject = z.infer<typeof ProjectRecordSchema>
-const git = (cwd: string, args: string[]) =>
-  execFileSync('git', args, {
+const git = (cwd: string, args: string[], readOnlyInspection = false) =>
+  execFileSync('git', readOnlyInspection ? ['-c', 'core.fsmonitor=false', '-c', 'core.hooksPath=/dev/null', ...args] : args, {
     cwd,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
     timeout: 10000,
     maxBuffer: 2 * 1024 * 1024,
+    ...(readOnlyInspection ? { env: { ...process.env, GIT_OPTIONAL_LOCKS: '0' } } : {}),
   }).trim()
 
 /** Operator project settings are private configuration, not another execution database. */
@@ -65,19 +66,19 @@ export class NativeProjectRegistry {
   list(): RegisteredProject[] {
     return structuredClone(this.records)
   }
-  prepare(input: ProjectRegistrationInput, options: { allowSettingsChange?: boolean } = {}): RegisteredProject {
+  prepare(input: ProjectRegistrationInput, options: { allowSettingsChange?: boolean; readOnlyInspection?: boolean } = {}): RegisteredProject {
     input = ProjectRegistrationInputSchema.parse(input)
     if (!isAbsolute(input.path)) throw new ApplicationFault('invalid_request', '请选择 Git 仓库的绝对路径。')
     let path: string
     try {
       path = realpathSync(input.path)
-      if (!lstatSync(path).isDirectory() || realpathSync(git(path, ['rev-parse', '--show-toplevel'])) !== path)
+      if (!lstatSync(path).isDirectory() || realpathSync(git(path, ['rev-parse', '--show-toplevel'], options.readOnlyInspection)) !== path)
         throw new Error('not a repository root')
-      git(path, ['rev-parse', '--verify', 'HEAD'])
+      git(path, ['rev-parse', '--verify', 'HEAD'], options.readOnlyInspection)
     } catch {
       throw new ApplicationFault('invalid_request', '目录必须是已有提交的 Git 仓库根目录。')
     }
-    if (git(path, ['status', '--porcelain=v1', '--untracked-files=normal']))
+    if (git(path, ['status', '--porcelain=v1', '--untracked-files=normal', ...(options.readOnlyInspection ? ['--ignore-submodules=all'] : [])], options.readOnlyInspection))
       throw new ApplicationFault('conflict', '项目有未提交的修改，请提交当前基线后再导入。')
     let environment = input.environment
     if (environment?.policy === 'offline_install') {

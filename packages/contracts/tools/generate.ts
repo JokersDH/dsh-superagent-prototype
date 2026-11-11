@@ -14,6 +14,8 @@ import { ExecutionProfileRefSchema, ReviewSubjectSchema, ReviewReportSchema, Rou
 import { ReviewTimingSchema, ReviewActivitySchema } from '../src/review-timing.ts';
 import { AttentionItemSchema, AttentionPageSchema, AttentionQuerySchema, AttentionRankSchema } from '../src/attention.ts';
 import { DecisionPrepareSchema, DecisionPreviewSchema, DecisionCommandSchema, DecisionQuerySchema, DecisionViewSchema, DecisionPageSchema } from '../src/decision-commands.ts';
+import { WorkEvidenceSchema } from '../src/work-evidence.ts';
+import { RecoveryInspectionSchema, RecoveryPrepareSchema, RecoveryPlanSchema } from '../src/recovery-state.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -70,6 +72,12 @@ outputs.set('generated/attention.manifest.json', canonical({ protocol: 'attentio
 const decisionsText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:decision-commands:1', $defs: { DecisionPrepare: z.toJSONSchema(DecisionPrepareSchema, { target: 'draft-2020-12', io: 'input' }), DecisionPreview: z.toJSONSchema(DecisionPreviewSchema, { target: 'draft-2020-12', io: 'input' }), DecisionCommand: z.toJSONSchema(DecisionCommandSchema, { target: 'draft-2020-12', io: 'input' }), DecisionQuery: z.toJSONSchema(DecisionQuerySchema, { target: 'draft-2020-12', io: 'input' }), DecisionView: z.toJSONSchema(DecisionViewSchema, { target: 'draft-2020-12', io: 'input' }), DecisionPage: z.toJSONSchema(DecisionPageSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/decisions.schema.json', decisionsText);
 outputs.set('generated/decisions.manifest.json', canonical({ protocol: 'decision-commands/1', schemaHash: digest(decisionsText), sourceHash: digest(readFileSync(resolve(root, 'src/decision-commands.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const workEvidenceText = canonical({ ...z.toJSONSchema(WorkEvidenceSchema, { target: 'draft-2020-12', io: 'input' }), $id: 'urn:personal-agent:work-evidence:1' });
+outputs.set('generated/work-evidence.schema.json', workEvidenceText);
+outputs.set('generated/work-evidence.manifest.json', canonical({ protocol: 'work-evidence/1', schemaHash: digest(workEvidenceText), sourceHash: digest(readFileSync(resolve(root, 'src/work-evidence.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const recoveryText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:recovery-inspection:1', $defs: { RecoveryInspection: z.toJSONSchema(RecoveryInspectionSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryPrepare: z.toJSONSchema(RecoveryPrepareSchema, { target: 'draft-2020-12', io: 'input' }), RecoveryPlan: z.toJSONSchema(RecoveryPlanSchema, { target: 'draft-2020-12', io: 'input' }) } });
+outputs.set('generated/recovery.schema.json', recoveryText);
+outputs.set('generated/recovery.manifest.json', canonical({ protocol: 'recovery-inspection/1', schemaHash: digest(recoveryText), sourceHash: digest(readFileSync(resolve(root, 'src/recovery-state.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [path, content] of outputs) {
   const target = resolve(root, path);
   if (check) {

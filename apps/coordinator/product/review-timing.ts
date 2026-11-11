@@ -59,7 +59,7 @@ export class ProductReviewTiming {
       return CommandReceiptSchema.parse({ ...receipt.result, commandId: value.commandId, seq: receipt.seq })
     })
   }
-  accepted(candidate: CandidateRef, actor: TrustedActor, acceptedAt: string): void {
+  accepted(candidate: CandidateRef, actor: TrustedActor, acceptedAt: string): number {
     const metadata = this.completion.metadata(candidate), spans: ReviewActivity[] = []
     const evidenceRefs: string[] = metadata ? [metadata.verificationId] : []
     // Bounded scan from this candidate's verification receipt; A can later index this projection without changing the signal.
@@ -70,7 +70,7 @@ export class ProductReviewTiming {
         spans.push(parsed.data); if (evidenceRefs.length < 128) evidenceRefs.push(`review-activity:${event.seq}`)
       }
     }
-    this.store.events.append({ topic: 'application.candidate.accepted', entityRef: candidate.contract.workId,
+    return this.store.events.append({ topic: 'application.candidate.accepted', entityRef: candidate.contract.workId,
       payload: { candidate, actorRef: actor.authorityRef, reviewTiming: reviewTiming(metadata?.readyAt, acceptedAt, spans, evidenceRefs) } })
   }
 }
