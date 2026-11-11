@@ -1,0 +1,131 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "86c692f",
+  "mergeCommit": "9767750",
+  "checkpoint": "8e49d67",
+  "testedSourceCommit": "9767750",
+  "migrations": [
+    "v16 assistant-context-bindings"
+  ],
+  "productSchema": 16,
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "tools/bootstrap/probe-wave09-target-inventory.mjs",
+        "reports/wave10-inventory-admission.json",
+        "packages/storage/test/target-inventory.case.ts"
+      ],
+      "note": "three counterexamples closed: claimed incomplete schema refused, exact FTS/shadow set only, digest names the copied DB/WAL snapshot; 4/4 official cases PASS, startupAvailable false"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "packages/workflows/test/target-inventory.case.ts (12)",
+        "ProductStore init/close/reopen"
+      ],
+      "note": "real new target initialized by public ProductStore, complete before and after reopen; manifest-only and half-applied schema unsupported; no migration on inspect, no copied rows"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "public port; main consumer NOT_TESTED",
+      "evidence": [
+        "packages/storage/src/assistant-context.ts",
+        "v16 migration",
+        "packages/storage/test/assistant-context.case.ts (10)"
+      ],
+      "note": "store.workflows.assistant.contextBindings and ports.assistant.contextBindings; append-only v16, same chat/receipt UnitOfWork, both identities unique, same-body replay and conflict, artifact existence/digest bound, rollback/reopen/tamper"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "packages/workflows/test/snapshot-d.case.ts (3)",
+        "readWorkflowEvidence/readRoutingArtifactRefs"
+      ],
+      "note": "binding family and bundle reference in snapshot; missing bundle/table blocks; restored binding audit-only and inventory still startupAvailable false"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "assistant-context tests",
+        "500-binding SQLite batch"
+      ],
+      "note": "outer receipt rollback, lost response/readback replay, conflicting payload refused, missing/expired/invalid bundle refused, 500 bindings under 5000ms (measured 0.43s suite)"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "package-local regression",
+      "evidence": [
+        "reports/wave10-storage-tests.txt",
+        "reports/wave10-workflow-tests.txt",
+        "reports/wave10-application-regression.txt",
+        "reports/wave10-verification-regression.txt"
+      ],
+      "note": "full owned-package and consumer regression after merging origin/main"
+    }
+  ],
+  "results": {
+    "storageTests": "85/85",
+    "workflowTests": "62/62",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "targetInventoryProbe": "PASS_RECOVERY_TARGET_INVENTORY_ADMISSION (4/4)",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "schemaVersion": 16,
+    "newMigration": "v16 assistant-context-bindings",
+    "modelTasks": 0,
+    "unknownModelSends": 0
+  },
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "context-use-consumer",
+      "detail": "No context-use HTTP/provider/SSE consumer or per-message authorization exists in this checkout; A exposes the shared synchronous port only. Actual consumer compilation and send composition are NOT_TESTED here."
+    },
+    {
+      "owner": "D",
+      "id": "target-materializer",
+      "detail": "RecoveryTargetMaterializer remains external; A initializes/inspects an explicit empty target with the public ProductStore only."
+    },
+    {
+      "owner": "main",
+      "id": "activation-and-start",
+      "detail": "Recovery activation commit/start remains main-owned; startupAvailable is false everywhere."
+    },
+    {
+      "owner": "B/main",
+      "id": "writer-barrier",
+      "detail": "Empty tables and a clean inventory are not proof that a historical writer stopped."
+    }
+  ],
+  "notTested": [
+    "main context-use HTTP/UI/SSE and actual provider send",
+    "D target materialization and cross-filesystem activation",
+    "native/model execution, installation and E acceptance",
+    "physical old-writer quiescence"
+  ],
+  "mainNextSteps": [
+    "compose explicit confirmation + provider send in the same chat/receipt command and call ports.assistant.contextBindings.put there",
+    "require the bound bundle artifact row before commit and use the port's conflict result for replay",
+    "consume readWorkflowEvidence/readRoutingArtifactRefs snapshot families in D restore verification",
+    "call recoveryTargetInventory on the D-prepared target before main activation; keep startupAvailable false"
+  ],
+  "deliveryCommit": "8e49d67",
+  "updatedAt": "2026-11-11T15:05:00.000Z"
+}
