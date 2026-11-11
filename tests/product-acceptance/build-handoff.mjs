@@ -204,11 +204,6 @@ const CAPABILITIES = [
     notTested: ['第二协议未实现，独立试点 preflight 为 BLOCKED；不能把替换模型或 fixture 当异构。'],
   },
   {
-    id: 'independent-review-pilot',
-    label: '独立会话复核价值试点（24 turn / 20万 token / 5 USD）',
-    notTested: ['Preflight BLOCKED（pricing_unavailable），0/24 turn；未产生价值结论。'],
-  },
-  {
     id: 'project-settings-version',
     label: '项目设置版本化与归档',
     notTested: ['仅合同 revision 已验证；项目设置版本 API 未交付（RFC-E-001 缺口 2）。'],
@@ -310,8 +305,6 @@ const executionStatus = {
   checkedAt: report.checkedAt,
   budget: stages.budget,
   stages: stages.stages.map((stage) => {
-    if (stage.id === 'E5')
-      return { ...stage, result: report.release?.status === 'PASS' ? 'PASS' : 'SEE_RELEASE', cases: [] }
     const prefix = `${stage.id}-`
     const relevant = report.cases.filter((item) => item.id.startsWith(prefix))
     const counts = {}
@@ -333,7 +326,7 @@ const executionStatus = {
     screenshots: report.artifacts?.screenshots ?? [],
     matrix: join(reports, 'release-matrix.json'),
     executionStatus: join(reports, 'execution-status.json'),
-    wave05Status: join(reports, 'wave05-status.json'),
+    wave06Status: join(reports, 'wave06-status.json'),
     tierVerdicts: join(reports, 'tier-verdicts.json'),
   },
   blockers: rows.filter((row) => ['FAIL'].includes(row.controlledFixture) || row.actualNative === 'FAIL'),
@@ -372,7 +365,7 @@ const stageSummary = (id) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第五轮交付交接
+const handoff = `# Agent E 第六轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -407,9 +400,10 @@ ${rows
 
 - 预注册协议：\`tools/experiments/review-pilot-01/protocol.json\`（24 turn / 20万 token / 5 USD）。
 - 冻结输入：8 个合成候选（4 个预埋缺陷、4 个干净）、隐藏 oracle 测试、评分规则均已 hash；\`node tests/product-acceptance/pilot/harness.mjs --freeze --check\` 可复验。
-- 预检：**BLOCKED (pricing_unavailable)**。Codex 0.164.0 可用且为 API key 计量，但配置模型没有可核对的 USD 价格表；协议禁止把订阅/密钥访问当作零成本。**0/24 turn、0 token、USD unknown**。
+- 预检：**BLOCKED (pricing_unavailable, b_runtime_interface_missing)**。Codex 0.164.0 可用且为 API key 计量，但配置模型没有可核对的 USD 价格表；B 也未发布受限运行接口。协议禁止把密钥/订阅当零成本，也不能伪造 session runner。**0/24 turn、0 token、USD unknown**。
 - 干跑：\`--dry-run\` 用合成报告验证评分/预算/拒绝机制（检出、误报、缺 usage、预算不一致、挑例、改 oracle、报告越权均被正确处理）；干跑不是收益结果。
-- 要解除阻断：由操作者提供 \`pilot/pricing.json\`（model、inputPerMillion、outputPerMillion、USD、source、observedAt），预检通过后才允许 \`--execute --confirm-grant\`。
+- 两个冻结时点已实现：作者调用前固定 cases/oracle/评分/预算；作者产出后、任一 review 前用 \`freezeCandidate()\` 固定真实 candidate 摘要，review 前 \`verifyCandidateFreeze()\` 复核。
+- 要解除阻断：操作者提供 \`pilot/pricing.json\`（model、inputPerMillion、outputPerMillion、USD、source、observedAt）且 B 发布 \`tools/experiments/review-pilot-01/runtime-interface.json\`；预检 PASS 后才允许 \`--execute --confirm-grant\`。
 
 ## Tier 判定（同一份证据）
 
@@ -460,8 +454,8 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
 writeFileSync(
-  join(reports, 'wave05-status.json'),
-  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave05-status/1', taskPackage: stages.taskPackage }, null, 2) + '\n',
+  join(reports, 'wave06-status.json'),
+  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave06-status/1', taskPackage: stages.taskPackage }, null, 2) + '\n',
 )
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 

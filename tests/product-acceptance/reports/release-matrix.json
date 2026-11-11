@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "fea14dfdf9ee26b5c9439b7886bea2f3e8a16b3f",
+    "commit": "27302e4e302cca7c8f97bc560ed25c3500508147",
     "dirty": false
   },
   "environment": {
@@ -11,17 +11,17 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-10T12:48:03.628Z",
+  "checkedAt": "2026-11-11T02:39:55.336Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 100,
+    "PASS": 109,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 10,
+    "NOT_TESTED": 16,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
@@ -351,15 +351,18 @@
     },
     {
       "id": "attention-workbench",
-      "capability": "跨项目注意力工作台：期限/等待排序与分组",
-      "controlledFixture": "NOT_TESTED",
+      "capability": "跨项目注意力收件箱：排序/筛选/分页/逐项打开",
+      "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "Owner main/C；本轮未见聚合读取、期限排序或分组 UI，仅有每会话 attention 布尔值。"
+        "真实业务截止/失效与 C 的 deterministic_priority 排序未接线。"
       ],
-      "evidence": []
+      "evidence": [
+        "E3-ATTENTION-INBOX",
+        "E3-ATTENTION-INBOX-UI"
+      ]
     },
     {
       "id": "review-timing",
@@ -414,18 +417,6 @@
       "actualNative": "NOT_TESTED",
       "gaps": [
         "第二协议未实现，独立试点 preflight 为 BLOCKED；不能把替换模型或 fixture 当异构。"
-      ],
-      "evidence": []
-    },
-    {
-      "id": "independent-review-pilot",
-      "capability": "独立会话复核价值试点（24 turn / 20万 token / 5 USD）",
-      "controlledFixture": "NOT_TESTED",
-      "sdkMock": "NOT_TESTED",
-      "readonly": "NOT_TESTED",
-      "actualNative": "NOT_TESTED",
-      "gaps": [
-        "Preflight BLOCKED（pricing_unavailable），0/24 turn；未产生价值结论。"
       ],
       "evidence": []
     },
@@ -494,6 +485,30 @@
       "actualNative": "NOT_TESTED",
       "gaps": [
         "D 的 launcher/distribution/portability 未进入 main；无 staged bundle。"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "native-control",
+      "capability": "真实原生停止/问题/恢复控制",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "B 的当前真实控制证据未作为输入提供；E 无该预算，不能把 fixture 当原生。"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "review-pilot",
+      "capability": "独立会话复核价值试点（8例三组）",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "Preflight BLOCKED：pricing_unavailable + b_runtime_interface_missing；0/24 turn，无价值结论。"
       ],
       "evidence": []
     },
