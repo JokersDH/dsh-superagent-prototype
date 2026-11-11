@@ -15,8 +15,29 @@ import type {
   RevokeResult,
 } from './types.ts'
 
-const SCAN_PAGE = 200
-const MAX_SCAN_PAGES = 5
+/** Documented default scan budget: 200 records per page, 200 pages (40,000 decisions per project). */
+export const DEFAULT_DECISION_SCAN = Object.freeze({ pageSize: 200, maxPages: 200 })
+
+export interface DecisionScanLimits {
+  readonly pageSize?: number
+  readonly maxPages?: number
+}
+
+interface ScanResult {
+  readonly records: readonly PersistedDecision[]
+}
+
+/** Explicit refusal when a project scan cannot be completed inside its budget. */
+function scanIncomplete(projectId: string, scanned: number, limits: { pageSize: number; maxPages: number }): never {
+  throw new DecisionError('scan_incomplete', 'Decision project scan exceeded its bound; refuse to treat partial results as complete', {
+    projectId,
+    scanned,
+    pageSize: limits.pageSize,
+    maxPages: limits.maxPages,
+  })
+}
+
+const OTHERWISE_EMPTY: ReadonlySet<string> = new Set<string>()
 
 function encodeCursor(recordedAt: string, id: string): string {
   return Buffer.from(`${recordedAt}|${id}`, 'utf8').toString('base64url')
@@ -69,8 +90,13 @@ export interface SyncDecisionAppend {
  */
 export class AssistantDecisionStore implements DecisionStorePort {
   private readonly port: AssistantStatePort
-  constructor(port: AssistantStatePort) {
+  private readonly scanLimits: { readonly pageSize: number; readonly maxPages: number }
+  constructor(port: AssistantStatePort, limits: DecisionScanLimits = {}) {
     this.port = port
+    this.scanLimits = {
+      pageSize: Math.min(Math.max(limits.pageSize ?? DEFAULT_DECISION_SCAN.pageSize, 1), 200),
+      maxPages: Math.min(Math.max(limits.maxPages ?? DEFAULT_DECISION_SCAN.maxPages, 1), 10_000),
+    }
   }
 
   async append(input: AppendDecisionInput): Promise<SyncDecisionAppend> {
@@ -97,7 +123,8 @@ export class AssistantDecisionStore implements DecisionStorePort {
   getSync(decisionId: string): DecisionRecord | undefined {
     const record = this.port.decisions.get(decisionId)
     if (!record) return undefined
-    return this.toRecord(record, this.supersededIds(record.decision.scope.projectId))
+    const superseded = this.isSuperseded(decisionId, record.recordedAt, record.decision.scope.projectId)
+    return this.toRecord(record, superseded ? new Set([decisionId]) : OTHERWISE_EMPTY)
   }
 
   async list(query: DecisionQuery): Promise<DecisionPage> {
@@ -106,7 +133,7 @@ export class AssistantDecisionStore implements DecisionStorePort {
 
   listSync(query: DecisionQuery): DecisionPage {
     const limit = Math.min(Math.max(query.limit ?? 50, 1), 200)
-    const records = this.scanProject(query.projectId)
+    const records = this.scanProject(query.projectId).records
     const superseded = new Set<string>()
     for (const record of records) {
       if (record.decision.supersedes && !record.decision.revokedAt) superseded.add(record.decision.supersedes)
@@ -174,14 +201,14 @@ export class AssistantDecisionStore implements DecisionStorePort {
         throw new DecisionConflict('stale_version', 'A new decision must be version 1')
       }
       const stored = this.put(candidate, 0)
-      return { record: this.toRecord(stored.record, this.supersededIds(projectId)), idempotent: stored.replayed }
+      return { record: this.toRecord(stored.record), idempotent: stored.replayed }
     }
     if (candidate.decision.version === current.decision.version) {
       if (!sameReplayBody(current, candidate)) {
         throw new DecisionConflict('payload_mismatch', 'A decision replay changed its body, source or actor')
       }
       // The current head may already be revoked or superseded; replay must not resurrect it.
-      return { record: this.toRecord(current, this.supersededIds(projectId)), idempotent: true }
+      return { record: this.toRecord(current, current.decision.supersedes ? this.supersededIds(projectId) : undefined), idempotent: true }
     }
     if (candidate.decision.version < current.decision.version) {
       const historical = this.port.decisions
@@ -190,13 +217,13 @@ export class AssistantDecisionStore implements DecisionStorePort {
       if (!historical || !sameReplayBody(historical, candidate)) {
         throw new DecisionConflict('stale_version', 'An older decision replay does not match its audit body')
       }
-      return { record: this.toRecord(current, this.supersededIds(projectId)), idempotent: true }
+      return { record: this.toRecord(current, current.decision.supersedes ? this.supersededIds(projectId) : undefined), idempotent: true }
     }
     if (candidate.decision.version !== current.decision.version + 1) {
       throw new DecisionConflict('stale_version', 'Decision version is not the next revision')
     }
     const stored = this.put(candidate, current.decision.version)
-    return { record: this.toRecord(stored.record, this.supersededIds(projectId)), idempotent: stored.replayed }
+    return { record: this.toRecord(stored.record, current.decision.supersedes ? this.supersededIds(projectId) : undefined), idempotent: stored.replayed }
   }
 
   private put(record: PersistedDecision, expectedVersion: number): { record: PersistedDecision; replayed: boolean } {
@@ -207,31 +234,64 @@ export class AssistantDecisionStore implements DecisionStorePort {
     }
   }
 
-  private scanProject(projectId: string): readonly PersistedDecision[] {
+  /**
+   * Complete project scan or an explicit `scan_incomplete` refusal. A truncated page walk is never
+   * returned as if it were the whole project: supersession/effectiveness would silently be wrong.
+   */
+  private scanProject(projectId: string): ScanResult {
+    const { pageSize, maxPages } = this.scanLimits
     const records: PersistedDecision[] = []
     let cursor: string | undefined
-    for (let page = 0; page < MAX_SCAN_PAGES; page += 1) {
+    for (let page = 0; page < maxPages; page += 1) {
       const result = this.port.decisions.list({
         projectId,
         ...(cursor === undefined ? {} : { cursor }),
-        limit: SCAN_PAGE,
+        limit: pageSize,
       })
       records.push(...result.records)
-      if (!result.nextCursor) break
+      if (!result.nextCursor) return { records }
       cursor = result.nextCursor
     }
-    return records
+    return scanIncomplete(projectId, records.length, { pageSize, maxPages })
   }
 
   private supersededIds(projectId: string): ReadonlySet<string> {
     const superseded = new Set<string>()
-    for (const record of this.scanProject(projectId)) {
+    for (const record of this.scanProject(projectId).records) {
       if (record.decision.supersedes && !record.decision.revokedAt) superseded.add(record.decision.supersedes)
     }
     return superseded
   }
 
-  private toRecord(record: PersistedDecision, superseded: ReadonlySet<string>): DecisionRecord {
+  /**
+   * Targeted supersession probe. A superseding record must be appended after its target, so the
+   * DESC page walk can stop at records strictly older than the target. No superseder found after a
+   * complete walk is a proof, not an assumption; an exceeded bound refuses.
+   */
+  private isSuperseded(decisionId: string, recordedAt: string, projectId: string): boolean {
+    const { pageSize, maxPages } = this.scanLimits
+    const cutoff = Date.parse(recordedAt)
+    let cursor: string | undefined
+    let scanned = 0
+    for (let page = 0; page < maxPages; page += 1) {
+      const result = this.port.decisions.list({
+        projectId,
+        ...(cursor === undefined ? {} : { cursor }),
+        limit: pageSize,
+      })
+      for (const record of result.records) {
+        if (record.decision.id === decisionId) continue
+        if (record.decision.supersedes === decisionId && !record.decision.revokedAt) return true
+        if (Number.isFinite(cutoff) && Date.parse(record.recordedAt) < cutoff) return false
+      }
+      scanned += result.records.length
+      if (!result.nextCursor) return false
+      cursor = result.nextCursor
+    }
+    return scanIncomplete(projectId, scanned, { pageSize, maxPages })
+  }
+
+  private toRecord(record: PersistedDecision, superseded: ReadonlySet<string> = OTHERWISE_EMPTY): DecisionRecord {
     let status: DecisionStatus = 'active'
     if (record.decision.revokedAt) status = 'revoked'
     else if (superseded.has(record.decision.id)) status = 'superseded'
