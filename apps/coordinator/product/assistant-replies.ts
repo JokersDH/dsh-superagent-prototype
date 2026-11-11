@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import { IdSchema, JsonSchema } from '@personal-agent/contracts'
+import type { AssistantContextBinding, ConversationMessage } from '@personal-agent/contracts'
+import { ApplicationFault } from '@personal-agent/application'
 import { key } from '@personal-agent/orchestrator-core'
 import { canonicalDigest } from '@personal-agent/storage'
 import type { ProductStore } from '@personal-agent/storage'
@@ -17,7 +19,9 @@ export function handleAssistantReplies(
   store: ProductStore,
   provider: AssistantModelPort,
   streams?: AssistantStreams,
-  capabilities?: { nativeExecution: boolean },
+  capabilities?: { nativeExecution: boolean; context?(message: ConversationMessage): Promise<{
+    binding: AssistantContextBinding; content: string; assertCurrent(): void
+  } | undefined> },
 ) {
   const append = (input: z.infer<typeof Intent>, id: string, text: string, notice = false) =>
     store.uow.atomic(() => {
@@ -60,6 +64,12 @@ export function handleAssistantReplies(
         append(input, noticeId, '上次模型请求的结果未能确认，未自动重发。请重新发送消息后再试。', true)
         return
       }
+      let context
+      try { context = await capabilities?.context?.(user) }
+      catch {
+        append(input, noticeId, '所选上下文已变化、过期或无法核对，本条消息未发送给模型。请重新预览后发送。', true)
+        return
+      }
       const page = store.product.messages.page(input.conversationId, { limit: 100 })
       const users = page.messages.filter(
         (message) =>
@@ -84,7 +94,7 @@ export function handleAssistantReplies(
         .slice(-20)
         .map((message) => ({
           role: message.role === 'assistant' ? ('assistant' as const) : ('user' as const),
-          content: message.text.slice(0, 6000),
+          content: context && message.id === user.id ? message.text : message.text.slice(0, 6000),
         }))
       let remaining = 24000
       const messages = history
@@ -101,15 +111,23 @@ export function handleAssistantReplies(
         conversationId: input.conversationId,
         model,
         messages,
+        ...(context ? { contextRequestId: context.binding.requestId, bundleDigest: context.binding.bundleDigest } : {}),
       })
-      store.uow.atomic(() => {
-        store.commands.record(requestId, canonicalDigest(body), () => ({ kind: 'assistant-inference/1', input, model }))
-        store.events.append({
-          topic: 'application.assistant.responding',
-          entityRef: input.conversationId,
-          payload: { conversationId: input.conversationId, messageId: input.messageId },
+      try {
+        store.uow.atomic(() => {
+          context?.assertCurrent()
+          store.commands.record(requestId, canonicalDigest(body), () => ({ kind: 'assistant-inference/1', input, model }))
+          store.events.append({
+            topic: 'application.assistant.responding',
+            entityRef: input.conversationId,
+            payload: { conversationId: input.conversationId, messageId: input.messageId },
+          })
         })
-      })
+      } catch (error) {
+        if (!context || !(error instanceof ApplicationFault)) throw error
+        append(input, noticeId, '所选上下文在发送前已变化，本条消息未发送给模型。请重新预览后发送。', true)
+        return
+      }
       let result
       const signal = streams?.start({ ...input, replyId, model })
       try {
@@ -123,7 +141,9 @@ export function handleAssistantReplies(
                   ? '工作台已接入本机 Codex 开发执行器。用户通过“委托执行”明确选择项目、目标与验收检查后，可在隔离 Git 工作区实现代码、验证并审阅交付。需要开发时可建议用户确认委托，你不会自动派单或读取项目。'
                   : '此入口的受控验证执行器只执行固定 scratch 操作，不是通用编码 Agent。'),
             },
-            ...messages,
+            ...messages.slice(0, -1),
+            ...(context ? [{ role: 'user' as const, content: context.content }] : []),
+            ...messages.slice(-1),
           ],
           (text) => {
             streams?.append(input.messageId, text)

@@ -45,6 +45,7 @@ import type {
   ApplicationConfiguration,
   AssistantProviderStatus,
   AssistantStreamUpdate,
+  AssistantContextBinding,
   AssignmentRef,
   CandidateRef,
   CommandReceipt,
@@ -164,6 +165,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [decisionSource, setDecisionSource] = useState<ConversationMessage | null>()
   const [proposalSource, setProposalSource] = useState<ConversationMessage | null>()
   const conversationDrafts = useRef(new Map<string, string>())
+  const [settledContextDraft, setSettledContextDraft] = useState<{ conversationId: string; text: string; commandId: string }>()
   const [assistant, setAssistant] = useState<AssistantProviderStatus | undefined>()
   const [waitingAfter, setWaitingAfter] = useState<number | undefined>()
   const [streamReplies, setStreamReplies] = useState<readonly AssistantStreamUpdate[]>([])
@@ -1046,6 +1048,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               title={conversationTitle}
               initialDraft={conversationDrafts.current.get(conversationId) ?? ''}
               onDraftChange={text => conversationDrafts.current.set(conversationId, text)}
+              settledContextDraft={settledContextDraft?.conversationId === conversationId ? settledContextDraft : undefined}
+              contextTransport={configuration?.assistantContextAvailable ? transport : undefined}
               snapshot={snapshot}
               projectFilter={projectFilter}
               selectedWork={selectedWork}
@@ -1234,7 +1238,17 @@ export function App({ transport }: { transport: ConsoleTransport }) {
       {auth === 'ready' && contextOpen && configuration?.contextPreviewAvailable && configuration.projects.length > 0 &&
         <ContextWorkspace key={conversationId} transport={transport} configuration={configuration} conversationId={conversationId}
           works={snapshot?.works ?? []} initialProjectId={selectedWork?.work.projectId ?? projectFilter ?? configuration.projects[0]!.id}
+          initialDraft={conversationDrafts.current.get(conversationId) ?? ''}
           {...(selectedWork?.work.conversationId === conversationId ? { initialWorkId: selectedWork.work.id } : {})}
+          onSent={async value => {
+            if (conversationRef.current !== value.conversationId) return
+            if (conversationDrafts.current.get(value.conversationId) === value.text) {
+              conversationDrafts.current.set(value.conversationId, '')
+              setSettledContextDraft(value)
+            }
+            if (assistant?.configured) setWaitingAfter(snapshot?.conversation?.messages.at(-1)?.sequence ?? 0)
+            await refresh()
+          }}
           onClose={() => setContextOpen(false)} />}
       {auth === 'ready' && decisionSource !== undefined && configuration && configuration.projects.length > 0 &&
         <DecisionWorkspace transport={transport} configuration={configuration} source={decisionSource ?? undefined}
@@ -2002,6 +2016,8 @@ function Conversation({
   title,
   initialDraft,
   onDraftChange,
+  settledContextDraft,
+  contextTransport,
   snapshot,
   projectFilter,
   selectedWork,
@@ -2025,6 +2041,8 @@ function Conversation({
   title: string
   initialDraft: string
   onDraftChange: (value: string) => void
+  settledContextDraft: { text: string; commandId: string } | undefined
+  contextTransport: ConsoleTransport | undefined
   snapshot: Snapshot | undefined
   projectFilter: string | undefined
   selectedWork: WorkView | undefined
@@ -2047,6 +2065,7 @@ function Conversation({
 }) {
   const [draft, setDraft] = useState(initialDraft)
   useEffect(() => { onDraftChange(draft) }, [draft, onDraftChange])
+  useEffect(() => { if (settledContextDraft) setDraft(current => current === settledContextDraft.text ? '' : current) }, [settledContextDraft])
   const [useWorkContext, setUseWorkContext] = useState(false)
   useEffect(() => {
     if (activateWorkId && selectedWork?.work.id === activateWorkId) {
@@ -2143,6 +2162,8 @@ function Conversation({
                 <button type="button" className="icon-button message-decision" title="记录为项目决定" aria-label="记录为项目决定" onClick={() => onRecordDecision(message)}><Bookmark size={14} /></button>}
             </header>
             <MessageText text={message.text} />
+            {message.role === 'user' && message.provenance === 'trusted_user' && !message.anchor && contextTransport?.assistantContext &&
+              <MessageContextAudit message={message} transport={contextTransport} />}
           </article>
         ))}
         {drafts.map((reply) => (
@@ -2293,6 +2314,36 @@ function Conversation({
       </form>
     </div>
   )
+}
+
+function MessageContextAudit({ message, transport }: { message: ConversationMessage; transport: ConsoleTransport }) {
+  const [binding, setBinding] = useState<AssistantContextBinding>(), [loaded, setLoaded] = useState(false)
+  const [loading, setLoading] = useState(false), [failed, setFailed] = useState(false)
+  const sequence = useRef(0)
+  useEffect(() => () => { sequence.current++ }, [message.id])
+  const load = async () => {
+    const request = ++sequence.current
+    setLoading(true); setFailed(false)
+    try {
+      const result = await transport.assistantContext!(message.id)
+      if (request !== sequence.current) return
+      if (result && (result.projectId !== message.projectId || result.conversationId !== message.conversationId))
+        throw new Error('Context message identity mismatch')
+      setBinding(result); setLoaded(true)
+    } catch { if (request === sequence.current) setFailed(true) }
+    finally { if (request === sequence.current) setLoading(false) }
+  }
+  const labels = { work: '工作', contract: '当前合同', verification: '验证', delivery: '接受记录', decision: '项目决定',
+    project_metadata: '项目信息', conversation_message: '会话消息', artifact: '交付元数据' }
+  return <details className="message-context-audit" onToggle={event => {
+    if (event.currentTarget.open && !loaded && !loading && !failed) void load()
+  }}><summary><Layers3 size={13} />上下文来源{binding ? ` · ${binding.sources.length}` : ''}</summary>
+    {loading && <p role="status">正在核对来源</p>}
+    {failed && <p role="alert">来源记录暂时无法核对。<button type="button" className="icon-button" title="重新读取来源" aria-label="重新读取来源" onClick={() => void load()}><RefreshCw size={13} /></button></p>}
+    {loaded && !binding && <p>本条消息未附加上下文</p>}
+    {binding && <><p>记录于 {new Date(binding.confirmedAt).toLocaleString('zh-CN')}{binding.contract ? ` · 合同版本 ${binding.contract.revision}` : ''}</p>
+      <ul>{binding.sources.map(source => <li key={source.sourceId}><span>{labels[source.kind]}{source.truncated ? ' · 已截断' : ''}</span><code>{source.previewDigest}</code></li>)}</ul></>}
+  </details>
 }
 
 function MessageText({ text }: { text: string }) {
