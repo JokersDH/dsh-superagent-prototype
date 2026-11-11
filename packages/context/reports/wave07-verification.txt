@@ -1,0 +1,61 @@
+# Agent C wave-07 verification (2026-11-11T06:36:54Z)
+
+1e2a82f Publish wave-07 consumer recipe and re-verified baseline
+
+## @personal-agent/context
+### typecheck
+$ tsc -p tsconfig.json
+### test
+ℹ tests 44
+ℹ pass 44
+ℹ fail 0
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/proposals
+### typecheck
+$ tsc -p tsconfig.json
+### test
+ℹ tests 30
+ℹ pass 30
+ℹ fail 0
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/knowledge
+### typecheck
+$ tsc -p tsconfig.json
+### test
+ℹ tests 61
+ℹ pass 61
+ℹ fail 0
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/routing
+### typecheck
+$ tsc -p tsconfig.json
+### test
+ℹ tests 44
+ℹ pass 44
+ℹ fail 0
+### build
+$ tsc -p tsconfig.build.json
+
+## main-owned integration tests
+ℹ tests 8
+ℹ pass 8
+ℹ fail 0
+ℹ tests 2
+ℹ pass 2
+ℹ fail 0
+
+## real SQLite assistant probe
+  "status": "PASS_SQLITE_ASSISTANT_CONSUMER",
+## wave-04 C admission
+  "status": "PASS_ADMISSION_PROBES",
+
+## examples
+{"status":"PASS","p50":0.406,"p95":1.577,"bytes":3394,"slices":12}
+{"status":"PASS","modelCalls":0,"networkCalls":0,"sqlite":"real temporary SQLite via A ProductStore/AssistantStatePort","context":{"selectedFiles":["README.md"],"injectionFlags":1,"trust":"untrusted_data"},"proposal":{"state":"confirmed","version":2},"commandPlan":{"kind":"command","commandKind":"record_decision","commandId":"command-decision"},"decision":{"status":"active","version":1},"revocation":{"status":"revoked","version":2},"oldReplayStatus":"revoked","reopenedStatus":"revoked"}
+{"status":"PASS","modelCalls":0,"networkCalls":0,"sqlite":"real temporary SQLite via createWorkflowPorts(store).routingEvidence","adviceReplay":true,"reviewReplay":true,"outcomeReplay":true,"reviewsByExactSubject":1,"outcomesByExactProfile":1,"otherProjectAdvice":0,"changedBodyRefused":true,"reviewState":"current","driftedState":"stale","driftedReason":"candidate_changed","executionAuthority":"none (advice/review/outcome are data only)"}

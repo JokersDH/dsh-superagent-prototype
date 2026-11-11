@@ -1,0 +1,69 @@
+{
+  "protocol": "wave07-composition-performance/1",
+  "generatedAt": "2026-11-11T06:37:07.730Z",
+  "result": {
+    "status": "PASS",
+    "modelCalls": 0,
+    "networkCalls": 0,
+    "dataset": {
+      "files": 80,
+      "decisions": 120,
+      "messages": 60,
+      "artifacts": 40
+    },
+    "runs": 25,
+    "durationMs": {
+      "p50": 0.406,
+      "p95": 1.577,
+      "max": 1.799
+    },
+    "bounded": {
+      "maxBytes": 262144,
+      "maxTokens": 24000,
+      "maxSlices": 20,
+      "outputBytes": 3394,
+      "outputTokens": 853,
+      "outputSlices": 12
+    },
+    "groups": [
+      {
+        "name": "contract",
+        "status": "empty",
+        "slices": 0,
+        "omitted": 0
+      },
+      {
+        "name": "decisions",
+        "status": "truncated",
+        "slices": 5,
+        "omitted": 115
+      },
+      {
+        "name": "project_facts",
+        "status": "empty",
+        "slices": 0,
+        "omitted": 0
+      },
+      {
+        "name": "conversation",
+        "status": "truncated",
+        "slices": 4,
+        "omitted": 1
+      },
+      {
+        "name": "artifacts",
+        "status": "truncated",
+        "slices": 2,
+        "omitted": 1
+      },
+      {
+        "name": "files",
+        "status": "included",
+        "slices": 1,
+        "omitted": 1
+      }
+    ],
+    "deterministicSignature": "contract:empty:|decisions:truncated:decisions/decision-0.json,decisions/decision-1.json,decisions/decision-2.json,decisions/decision-3.json,decisions/decision-4.json|project_facts:empty:|conversation:truncated:conversation/000001-message-0.json,conversation/000002-message-1.json,conversation/000003-message-2.json,conversation/000004-message-3.json|artifacts:truncated:artifacts/artifact-0.json,artifacts/artifact-1.json|files:included:docs/doc-0.md",
+    "correctness": "bytes/tokens are conservative estimates for bounded composition, not billing guarantees"
+  }
+}

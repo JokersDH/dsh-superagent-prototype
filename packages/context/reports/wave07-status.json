@@ -3,9 +3,11 @@
   "branch": "codex/g3-assistant-context",
   "mainBaseCommit": "0df3fd1",
   "mergeCommit": "6bff83c",
-  "updatedAt": "2026-11-11T06:20:00.000Z",
+  "checkpointCommit": "1e2a82f",
+  "updatedAt": "2026-11-11T06:50:00.000Z",
   "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
   "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "supersedes": "packages/context/reports/wave06-status.json and wave06-consumer-status.json for new-state decisions; historical files retained unchanged",
   "phases": [
     {
       "phase": "C1",
@@ -15,34 +17,138 @@
         "packages/context/reports/wave07-c1-baseline.txt"
       ],
       "results": {
-        "contextTests": "34/34",
-        "proposalTests": "23/23",
-        "knowledgeTests": "50/50",
+        "contextTests": "34/34 at checkpoint",
+        "proposalTests": "23/23 at checkpoint",
+        "knowledgeTests": "50/50 at checkpoint",
         "routingTests": "44/44",
         "mainDecisionHttpIntegration": "8/8 (main-owned, unmodified)",
-        "routingSqlConsumer": "2/2 (main-owned, unmodified)",
-        "realSqliteAssistantProbe": "7/7"
+        "routingSqlConsumer": "2/2 (main-owned, unmodified)"
       },
-      "note": "Merged wave-07 main and re-verified all four packages plus main-owned decision/routing consumers. Recipe documents exports, production A ports, caller fixtures and the transaction split."
+      "note": "Merged wave-07 main; re-verified all owned packages and main-owned consumers; documented exports, production A ports, caller fixtures and transaction split."
     },
-    { "phase": "C2", "status": "not_started", "note": "Explicit-scope, explicitly-budgeted context composer." },
-    { "phase": "C3", "status": "not_started", "note": "Proposal prepare/sync-commit composition rules and needs_user_input." },
-    { "phase": "C4", "status": "not_started", "note": "Real SQLite lifecycle and source negatives." },
-    { "phase": "C5", "status": "not_started", "note": "Main entry consumption (blocked: no proposal/context HTTP yet) and deterministic performance." },
-    { "phase": "C6", "status": "not_started", "note": "Final authoritative status and handoff." }
+    {
+      "phase": "C2",
+      "status": "passed",
+      "evidence": [
+        "packages/context/src/composer.ts",
+        "packages/context/test/composer.case.ts",
+        "packages/context/examples/composition-performance.mjs",
+        "packages/context/reports/composition-performance.json"
+      ],
+      "results": {
+        "contextTests": "44/44",
+        "performance": "PASS p50 0.27-0.41ms / p95 0.49-1.58ms; 12 slices, 3394 bytes within a 20-slice/256KiB budget"
+      },
+      "note": "ContextComposer composes fixed-priority groups under an explicit caller budget: contract/work -> effective decisions -> project facts -> conversation -> artifact metadata -> raw files. Groups only read granted kinds; global byte/token/slice caps hold; incomplete decision scans fail the whole composition; cross-project items and missing providers are explicit; content stays untrusted_data; deterministic for fixed now."
+    },
+    {
+      "phase": "C3",
+      "status": "passed",
+      "evidence": [
+        "packages/proposals/src/assistant-proposal-service.ts",
+        "packages/proposals/src/command-plan.ts",
+        "packages/proposals/test/confirm-with-command.case.ts"
+      ],
+      "results": { "proposalTests": "30/30" },
+      "note": "confirmWithCommand validates plan input before confirming (needs_user_input keeps pending), confirms with the main-owned effectCommandId, and returns the existing UserCommand for same-transaction dispatch. Reply has no effect; duplicate confirmation replays one command; another command id conflicts."
+    },
+    {
+      "phase": "C4",
+      "status": "passed",
+      "evidence": [
+        "packages/knowledge/test/lifecycle-real.case.ts",
+        "packages/knowledge/test/full-loop.case.ts",
+        "packages/knowledge/test/main-consumer.case.ts",
+        "packages/knowledge/src/context-provider.ts"
+      ],
+      "results": { "knowledgeTests": "61/61" },
+      "note": "Real SQLite lifecycle: reject is a distinct terminal state (never a command), revoke keeps audit but leaves effective knowledge, source-digest drift blocks commit with no row, mid-transaction receipt failure rolls back proposal+decision+event+receipt, supersede-then-revoke never reactivates the original, reopen keeps statuses. decisionContextProvider exposes effective-only decisions with scan_incomplete propagation."
+    },
+    {
+      "phase": "C5",
+      "status": "partial",
+      "evidence": [
+        "packages/knowledge/test/main-consumer.case.ts",
+        "packages/context/reports/wave07-verification.txt"
+      ],
+      "note": "Library-level main-consumable chain proven over real A ports (compose -> preview -> proposal -> confirmWithCommand -> decision). Main has NOT published proposal/context HTTP, so the application/UI consumer is BLOCKED on main; no HTTP/UI was written by C. Deterministic performance measured with a bounded dataset; main-owned decision/routing integration tests still pass."
+    },
+    {
+      "phase": "C6",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave07-status.json",
+        "packages/context/docs/WAVE07-RECIPE.md",
+        "packages/context/README.md",
+        "packages/proposals/README.md",
+        "packages/knowledge/README.md"
+      ],
+      "note": "Single authoritative wave-07 status; recipe documents exports, composer, confirmWithCommand, state-transition table and the remaining main wiring."
+    }
+  ],
+  "commands": [
+    "git fetch origin && git merge origin/main --no-edit",
+    "pnpm --filter @personal-agent/{contracts,orchestrator-core,effects,storage,workflows,questions,application,verification,workspaces,proposals,knowledge,context,routing} build",
+    "pnpm --filter @personal-agent/context typecheck && test && build",
+    "pnpm --filter @personal-agent/proposals typecheck && test && build",
+    "pnpm --filter @personal-agent/knowledge typecheck && test && build",
+    "pnpm --filter @personal-agent/routing typecheck && test && build",
+    "node --test tests/integration/decision-commands.case.mjs",
+    "node --test tests/integration/routing-sql-consumer.case.mjs",
+    "node tools/bootstrap/review-persisted-assistant.mjs",
+    "node tools/bootstrap/review-wave04-admission.mjs",
+    "node packages/context/examples/composition-performance.mjs",
+    "node packages/knowledge/examples/assistant-workflow.mjs",
+    "node packages/routing/examples/real-evidence-loop.mjs"
+  ],
+  "results": {
+    "contextTests": "44/44",
+    "proposalTests": "30/30",
+    "knowledgeTests": "61/61",
+    "routingTests": "44/44",
+    "typecheck": "PASS (four packages)",
+    "build": "PASS (four packages)",
+    "mainDecisionHttpIntegration": "8/8",
+    "routingSqlConsumer": "2/2",
+    "realSqliteAssistantProbe": "7/7",
+    "wave04Admission": "3/3 C",
+    "compositionPerformance": "PASS (bounded, deterministic, 0 model/network)",
+    "examples": "assistant-workflow, real-evidence-loop, composition-performance all PASS"
+  },
+  "dependencyRequests": [
+    {
+      "package": "packages/routing",
+      "added": ["@personal-agent/storage (dev)", "@personal-agent/workflows (dev)", "@types/better-sqlite3 (dev)"],
+      "reason": "Real SQLite routing-evidence verification (unchanged from wave-06).",
+      "rootLock": "pnpm-lock.yaml diff uncommitted; main owns the authoritative lock."
+    }
   ],
   "blockers": [
     {
       "id": "C5-main-proposal-context-http",
       "owner": "main",
       "status": "external_pending",
-      "repro": "grep -rn 'proposal\\|context' apps/coordinator/http/app.ts  # no proposal/context routes",
-      "required": "Authenticated proposal confirm/reject and context preview endpoints composing C libraries.",
-      "continue": "C provides recipe + library-level consumer assertions and deterministic performance evidence meanwhile."
+      "repro": "grep -rn 'proposal\\|context' apps/coordinator/http/app.ts  # no proposal/context route; only /v1/decisions*",
+      "required": "Authenticated proposal confirm/reject and context composition/preview endpoints composing C libraries.",
+      "continue": "C supplied the recipe and a real-port library chain (test/main-consumer.case.ts) plus deterministic performance; the UI assertion stays BLOCKED without a main entry."
+    },
+    {
+      "id": "C-main-outcome-and-review-wiring",
+      "owner": "main",
+      "status": "external_pending",
+      "input": "Trusted ExecutionOutcome/review producer and candidate-change invalidation hook.",
+      "continue": "No C change required; evidence validity rules are already delivered."
     }
   ],
   "notTested": [
-    "Main HTTP/UI for proposal confirmation and context preview (not published)",
-    "Real model/native tasks (budget 0)"
+    "Main HTTP/UI for proposal confirmation and context composition (not published)",
+    "Real native/review execution and pilot value (B/E-owned)",
+    "Any real model or native task (budget 0)"
+  ],
+  "mainNextSteps": [
+    "Admit ContextComposer + buildCompositionPreview and render source/budget/omission/injection fields in the preview entry.",
+    "Wire proposal confirmation through confirmWithCommand inside one UnitOfWork; dispatch the returned UserCommand in the same transaction and write the receipt/event.",
+    "Use decisionContextProvider for effective decisions; surface ContextError('scan_incomplete') as an explicit unavailable state, never as empty knowledge.",
+    "Re-run main-owned decision/routing integration tests against this branch (8/8 and 2/2 locally)."
   ]
 }

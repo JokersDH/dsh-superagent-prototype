@@ -66,6 +66,16 @@ Missing inputs return `needs_user_input` with the exact field list; a rationale 
 goal or contract. A confirmed scope for another project is refused. The plan contains no actor field,
 adds no command kind and executes nothing.
 
+## Single confirmation entry (wave-07 C3)
+
+`AssistantProposalService.confirmWithCommand(prepared, {..., plan})` is main's one synchronous call:
+it validates the plan input **before** confirming (an under-specified work/revision proposal throws
+`needs_user_input` with the exact missing fields and stays `pending`), confirms with the main-owned
+`effectCommandId` (CAS, idempotent replay), and returns the exact existing `UserCommand` to dispatch
+in the same UnitOfWork. A `reply` intent confirms nothing executable and returns `command: null`.
+C never dispatches the command, never writes its effect and never accepts actor/native authority from
+model text.
+
 ## Commands
 
 ```sh

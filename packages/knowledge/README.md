@@ -71,6 +71,19 @@ node packages/knowledge/examples/assistant-loop.mjs
 - Limits are injectable (`new AssistantDecisionStore(port, { pageSize, maxPages })`) for regression
   tests; lowering them proves the refusal path without a huge fixture.
 
+## Context provider and lifecycle (wave-07 C3/C4)
+
+`decisionContextProvider(governance)` adapts `listEffectiveWindow` to the context composer port: only
+effective decisions are returned, `truncatedByLimit` reports the caller's own cap, and an incomplete
+scan propagates as `scan_incomplete` so composition fails.
+
+Proposal/decision state transitions are distinct and persist on A's SQLite:
+`pending → confirmed | rejected | expired | superseded`, and decisions `active → revoked | superseded`
+(`expired` is derived from scope). `reject` is not a revocation: a rejected proposal never produced a
+command, while a revoked decision keeps its audit history and leaves effective knowledge. Supersession
+is historical — revoking the replacement never reactivates the older decision. `test/lifecycle-real.case.ts`
+covers reject, revoke, source-digest drift, transaction rollback and reopen on real SQLite.
+
 ## Persisted adapter (wave-04 C2)
 
 `AssistantDecisionStore` maps the shared synchronous `AssistantStatePort.decisions` to this domain

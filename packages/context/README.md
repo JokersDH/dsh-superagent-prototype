@@ -79,6 +79,29 @@ index has no separate detail port. `buildContextPreview(bundle, validation?)` re
 files, byte/token totals, omission reasons, injection flags, baseline and revalidation validity that
 main needs before confirming a conversation upload.
 
+## Context composer (wave-07 C2)
+
+`ContextComposer` composes an explicit-scope, caller-budgeted context in a fixed priority order:
+current contract/work → effective decisions → project facts (metadata/verification/delivery) →
+conversation messages → artifact metadata → raw project files. Rules:
+
+- a group can only read source kinds the caller's grant actually includes; a plan never widens
+  authorization (an ungranted group is `empty` with `denied_kind`, and its unused budget carries to
+  later groups);
+- the global `maxSlices`/`maxBytes`/`maxTokens` caps hold across all groups; files are an absolute
+  count cap, not a proportional budget;
+- an incomplete decision-effectiveness scan fails the whole composition with
+  `ContextError('scan_incomplete')` instead of composing possibly-stale knowledge;
+- revoked/superseded/expired/source-invalid decisions are excluded by the provider, not re-derived
+  here; cross-project decisions/messages are omitted with a reason;
+- a missing optional provider is `unavailable` with `source_unavailable`, never silently empty;
+- every slice is `untrusted_data`; artifact paths are not included (identity/digest/size/time only);
+- bytes/tokens are conservative estimates for bounded composition, not billing guarantees.
+
+`buildCompositionPreview` returns the same safety fields main's upload confirmation needs.
+See `examples/composition-performance.mjs` and `reports/composition-performance.json` for a bounded
+deterministic measurement (0 model/network calls).
+
 ## Limits
 
 - Relevance ranking is a deterministic lexical heuristic, not semantic retrieval.

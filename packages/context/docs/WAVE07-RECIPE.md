@@ -22,9 +22,9 @@ store.uow.atomic(fn)   // the only transaction boundary main composes into
 
 | 包 | 导出 | 用途 |
 | --- | --- | --- |
-| `@personal-agent/context` | `ContextReader`, `buildContextPreview`, `ReadIndexContextPort`, `LocalProjectSourcePort`, `StaticContextPort`, `CompositeContextPort`, `ContextError` | 有界、带来源的上下文读取与预览 |
-| `@personal-agent/proposals` | `AssistantProposalService`, `parseStructuredOutput`, `planProposalCommand`, `ProposalError`, `InMemoryAssistantState`(fixture) | 结构化提案、确认、命令计划 |
-| `@personal-agent/knowledge` | `DecisionTransactionService`, `AssistantDecisionStore`, `DecisionGovernance`, `DEFAULT_DECISION_SCAN`, `DecisionError`, `DecisionConflict` | 明确决定的 prepare/commit/revoke 与效力规则 |
+| `@personal-agent/context` | `ContextReader`, `buildContextPreview`, `ContextComposer`, `buildCompositionPreview`, `DEFAULT_COMPOSED_GROUPS`, `ReadIndexContextPort`, `LocalProjectSourcePort`, `StaticContextPort`, `CompositeContextPort`, `ContextError` | 有界、带来源的上下文读取、预览与显式预算组合 |
+| `@personal-agent/proposals` | `AssistantProposalService` (含 `confirmWithCommand`), `parseStructuredOutput`, `planProposalCommand`, `ProposalError`, `InMemoryAssistantState`(fixture) | 结构化提案、确认、命令计划 |
+| `@personal-agent/knowledge` | `DecisionTransactionService`, `AssistantDecisionStore`, `DecisionGovernance`, `decisionContextProvider`, `DEFAULT_DECISION_SCAN`, `DecisionError`, `DecisionConflict` | 明确决定的 prepare/commit/revoke、效力规则与上下文 provider |
 | `@personal-agent/routing` | `sharedAttentionRanker`, `rankSharedAttention`, `evaluateEligibility`, `adviseRoute`, `validateAdviceForConfirmation`, `parseReviewReport`, `assessReviewValidity`, `assembleReviewEvidence` | 注意力排序、准入、建议、复核有效性 |
 
 ## 3. 最短 recipe：明确决定（record / revoke）
@@ -84,6 +84,33 @@ store.uow.atomic(() => {
 
 缺失项返回 `needs_user_input` + 具体字段；不会用默认值扩大权限。命令不含 actor 字段。
 
+## 4b. 最短 recipe：一次调用确认提案并拿到原命令
+
+```ts
+store.uow.atomic(() => {
+  proposals.persistPending(prepared)
+  const confirmed = proposals.confirmWithCommand(prepared, {
+    expectedVersion: 1, expectedDigest: prepared.payloadDigest, actorRef,
+    effectCommandId: commandId,                       // main 生成
+    revalidate: () => ({ ok: true }), barrier: () => ({ ok: true }),
+    plan: { commandId, conversationId, work },        // create_work 必需
+  })
+  if (confirmed.command) dispatchExistingUserCommand(confirmed.command)  // 同一事务
+})
+```
+
+`needs_user_input` 在确认**之前**抛出（提案保持 pending），`reply` 返回 `command: null` 且无业务效果。
+
+## 4c. 状态转换（不混用 reject 与 revoke）
+
+| 对象 | 转换 | 语义 |
+| --- | --- | --- |
+| 提案 | `pending → confirmed` | 版本 +1，绑定 main 的 `effectCommandId` |
+| 提案 | `pending → rejected` | 终态，从未产生命令；不可再确认 |
+| 提案 | `pending → expired \| superseded` | 有效期/被替换；不可确认 |
+| 决定 | `active → revoked` | 版本 +1，审计保留，不再进入有效上下文 |
+| 决定 | `active → superseded` | 新决定覆盖；**替替代者被撤销也不会复活旧决定** |
+
 ## 5. 最短 recipe：有界上下文预览
 
 ```ts
@@ -97,6 +124,22 @@ const preview = buildContextPreview(bundle)  // selectedFiles/bytes/tokens/omitt
 ```
 
 `bundle.trust === 'untrusted_data'`；预览不等于自动注入，是否进入模型请求由用户授权入口决定。
+
+显式预算组合（推荐给网页）：
+
+```ts
+const composer = new ContextComposer({
+  port: new ReadIndexContextPort({ projectId, index: ports.index }),
+  decisions: decisionContextProvider(governance),   // 只返回有效决定；扫描不完整会抛 scan_incomplete
+  conversation: { recent: ... }, artifacts: { recent: ... },
+})
+const composition = await composer.compose({ requestId, projectId, purpose, query, grant, budget,
+  conversationId, workId, contract })
+const preview = buildCompositionPreview(composition)
+```
+
+组顺序固定：合同/工作 → 有效决定 → 项目事实 → 历史消息 → 产物元数据 → 原始文件。组只能读取 grant
+实际包含的 kind；不完整效力扫描使整个组合失败（`ContextError('scan_incomplete')`）。
 
 ## 6. 已集成 vs 待集成（source 差异）
 

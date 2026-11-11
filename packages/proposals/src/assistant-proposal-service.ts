@@ -6,6 +6,9 @@ import { ProposalError } from './errors.ts'
 import { parseStructuredOutput, proposalDigest, proposalIntent, validateProposalBindings } from './parser.ts'
 import { snapshot } from './snapshot.ts'
 import type { ProposalIntent, ProposalTrustedContext } from './types.ts'
+import { planProposalCommand } from './command-plan.ts'
+import type { CommandPlan, CommandPlanInput } from './command-plan.ts'
+import type { UserCommand } from '@personal-agent/contracts'
 
 const DEFAULT_TTL_MS = 15 * 60 * 1000
 
@@ -52,6 +55,19 @@ export interface CommitProposalInput {
 export interface CommitProposalResult {
   readonly record: PersistedProposal
   readonly intent: ProposalIntent
+  readonly replayed: boolean
+}
+
+export interface ConfirmWithCommandInput extends CommitProposalInput {
+  /** Caller-confirmed scope/criteria/profile (create_work) or the full new contract (revise_work). */
+  readonly plan: CommandPlanInput
+}
+
+export interface ConfirmWithCommandResult {
+  readonly record: PersistedProposal
+  readonly intent: ProposalIntent
+  /** The existing business command main must dispatch in the same UnitOfWork; null for a reply. */
+  readonly command: UserCommand | null
   readonly replayed: boolean
 }
 
@@ -198,6 +214,46 @@ export class AssistantProposalService {
       intent: snapshot(proposalIntent(stored.record.payload)),
       replayed: stored.replayed,
     }
+  }
+
+  /**
+   * Single synchronous confirmation entry for main: confirms the proposal (versioned, CAS, no
+   * pre-confirm effect) and returns the exact existing `UserCommand` to dispatch in the same
+   * UnitOfWork. Nothing is executed here.
+   *
+   * - `needs_user_input` (missing scope/criteria/profile or a complete revision) throws before any
+   *   write, so an under-specified proposal never becomes confirmed;
+   * - a `reply` intent confirms nothing and returns `command: null`;
+   * - the same effect command replays idempotently; another command id conflicts.
+   */
+  confirmWithCommand(prepared: PreparedProposal, input: ConfirmWithCommandInput): ConfirmWithCommandResult {
+    const planned = planProposalCommand(this.intentOf(prepared), input.plan)
+    if (planned.kind === 'needs_user_input') {
+      throw new ProposalError('needs_user_input', 'Proposal needs explicit user input before it can execute', {
+        intent: planned.intent,
+        missing: planned.missing,
+      })
+    }
+    const committed = this.commit(prepared, input)
+    if (planned.kind === 'no_effect') {
+      return { record: committed.record, intent: committed.intent, command: null, replayed: committed.replayed }
+    }
+    return {
+      record: committed.record,
+      intent: committed.intent,
+      command: snapshot(planned.command),
+      replayed: committed.replayed,
+    }
+  }
+
+  /** Pure intent projection used by `confirmWithCommand`; it never reads or writes state. */
+  private intentOf(prepared: PreparedProposal): ProposalIntent {
+    const existing = this.port.proposals.get(prepared.proposalId)
+    if (existing?.state === 'confirmed') {
+      const confirmed = this.confirmationIntent(existing)
+      if (confirmed) return confirmed
+    }
+    return snapshot(proposalIntent(prepared.payload))
   }
 
   reject(

@@ -1,0 +1,47 @@
+{
+  "status": "PASS_ADMISSION_PROBES",
+  "sourceCommit": "1e2a82ff4d6d53be4fcf38dc6c643cefdf45938e",
+  "checkedAt": "2026-11-11T06:37:07.617Z",
+  "modelCalls": 0,
+  "scope": "Read-only domain/gate probes; no service or native task",
+  "cases": [
+    {
+      "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+      "owner": "C",
+      "status": "PASS",
+      "ok": true,
+      "actual": {
+        "effective": false,
+        "listCount": 0
+      },
+      "expected": {
+        "effective": false,
+        "listCount": 0
+      }
+    },
+    {
+      "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+      "owner": "C",
+      "status": "PASS",
+      "ok": true,
+      "actual": {
+        "foreignActorRefused": true
+      },
+      "expected": {
+        "foreignActorRefused": true
+      }
+    },
+    {
+      "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+      "owner": "C",
+      "status": "PASS",
+      "ok": true,
+      "actual": {
+        "callerChangedStoredGrant": false
+      },
+      "expected": {
+        "callerChangedStoredGrant": false
+      }
+    }
+  ]
+}

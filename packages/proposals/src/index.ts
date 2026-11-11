@@ -9,6 +9,8 @@ export { AssistantProposalService } from './assistant-proposal-service.ts'
 export type {
   AssistantProposalServiceOptions,
   CommitProposalInput,
+  ConfirmWithCommandInput,
+  ConfirmWithCommandResult,
   CommitProposalResult,
   PrepareProposalInput,
   PreparedProposal,

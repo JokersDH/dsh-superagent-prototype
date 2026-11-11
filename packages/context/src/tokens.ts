@@ -6,6 +6,8 @@ const KIND_WEIGHT: Record<ContextSourceKind, number> = {
   decision: 5,
   verification: 4,
   delivery: 3,
+  artifact: 3,
+  conversation_message: 3,
   project_metadata: 2,
   document: 2,
   source_file: 1,
