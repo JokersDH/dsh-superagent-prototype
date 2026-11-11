@@ -6,7 +6,10 @@ import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../../..')
-const ledgerPath = join(here, 'ledger.json')
+// The real ledger has one fixed location. PA_PILOT_LEDGER exists only so the runner's own accounting
+// can be exercised on a disposable ledger; it must never point at the committed ledger in a test.
+const ledgerPath = process.env.PA_PILOT_LEDGER ? resolve(process.env.PA_PILOT_LEDGER) : join(here, 'ledger.json')
+const codexExecutable = process.env.PA_PILOT_CODEX ?? 'codex'
 
 export const GRANT = Object.freeze({
   id: 'wave05-independent-review-pilot-01',
@@ -96,6 +99,8 @@ const estimateTokens = (text) => Math.ceil(Buffer.byteLength(text) / 4)
  */
 export function reserveTurn({ caseId, arm, prompt, maxOutputTokens = 4096, pricing }) {
   const ledger = readLedger()
+  if (ledger.status === 'BLOCKED_UNKNOWN_USAGE')
+    return { ok: false, reason: 'unknown_usage_unresolved' }
   const inFlight = (ledger.reservations ?? []).some((item) => item.status === 'in_flight')
   if (inFlight) return { ok: false, reason: 'one_turn_in_flight' }
   const usedTurns = Number(ledger.actual?.turns ?? 0)
@@ -163,10 +168,13 @@ export function settleTurn({ turnId, usage, costUSD, sessionId, startedAt, ended
         }
       : item,
   )
+  const settled = reservations.find((item) => item.turnId === turnId)
   const actual = { ...(ledger.actual ?? { turns: 0, tokens: 0, costUSD: 0, unknownTurns: 0 }) }
   actual.turns = Number(actual.turns ?? 0) + 1
-  actual.tokens = Number(actual.tokens ?? 0) + (usage ? usage.totalTokens : 0)
-  actual.costUSD = Number(actual.costUSD ?? 0) + (costUSD ?? 0)
+  // An unknown send is charged at its conservative reservation bound, never refunded as if it had
+  // not happened. A later reconciliation may only replace it with measured usage plus a new receipt.
+  actual.tokens = Number(actual.tokens ?? 0) + (usage ? usage.totalTokens : Number(settled?.upperTokens ?? 0))
+  actual.costUSD = Number(actual.costUSD ?? 0) + (costUSD ?? (usage ? 0 : Number(settled?.upperUSD ?? 0)))
   actual.unknownTurns = Number(actual.unknownTurns ?? 0) + (usage ? 0 : 1)
   writeAtomic(ledgerPath, {
     ...ledger,
@@ -260,7 +268,7 @@ export function runCodexTurn({
     if (outputSchemaPath) args.push('--output-schema', outputSchemaPath)
     if (lastMessagePath) args.push('-o', lastMessagePath)
     args.push(prompt)
-    const child = spawn('codex', args, {
+    const child = spawn(codexExecutable, args, {
       cwd,
       env: { ...process.env },
       stdio: ['ignore', 'pipe', 'pipe'],

@@ -128,26 +128,29 @@ await collect('e3', async () => {
   }
 })
 await collect('e4', async () => {
-  const [stability, wave04, release] = await Promise.all([
+  const [stability, wave04, release, install] = await Promise.all([
     import('./cases/e4-stability.mjs'),
     import('./cases/e4-wave04.mjs'),
     import('./cases/e5-release.mjs'),
+    import('./cases/e4-install.mjs'),
   ])
   const first = await stability.runE4({
     root,
     runDirectory: run.directory,
     keep: values.keep === true,
-    cycles: values.cycles ? Number(values.cycles) : 10,
+    cycles: values.cycles ? Number(values.cycles) : 30,
   })
   const second = await wave04.runWave04E4({ root, runDirectory: run.directory, keep: values.keep === true })
   const third = await release.runRelease({ root, runDirectory: run.directory, keep: values.keep === true })
+  const fourth = await install.runInstall({ root, runDirectory: run.directory, keep: values.keep === true })
   return {
-    cases: [...first.cases, ...second.cases, ...third.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases],
     artifacts: {
       screenshots: [
         ...(first.artifacts?.screenshots ?? []),
         ...(second.artifacts?.screenshots ?? []),
         ...(third.artifacts?.screenshots ?? []),
+        ...(fourth.artifacts?.screenshots ?? []),
       ],
     },
   }

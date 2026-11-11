@@ -193,12 +193,13 @@ export async function runWave04E4({ root, runDirectory, keep = false }) {
     notTested(
       define(
         'E4-DISTRIBUTION-PREREQUISITES',
-        'Staged installation, active-writer rollback and instance reuse are not testable yet',
+        'The launcher/portability source is not merged into main even though a frozen install exists',
         LAYERS.NOT_TESTED,
-        ['Owner: Agent D. No candidate has been integrated into this main checkout.'],
+        ['Owner: Agent D. Source stays on codex/g3-local-distribution; E verifies the frozen bytes separately in e4-install.mjs.'],
       ),
-      `Distribution paths absent from the merged source: ${missing.join(', ') || 'none'}. ` +
-        'No staged bundle exists, so installation and migration cannot be claimed.',
+      `Distribution source paths absent from this checkout: ${missing.join(', ') || 'none'}. ` +
+        'A frozen tar.gz is published outside Git and independently accepted by E4-INSTALL-*; source-level ' +
+        'installation and migration remain Agent D owned and are not claimed by this case.',
     ),
   )
   cases.at(-1).evidence.distribution = {

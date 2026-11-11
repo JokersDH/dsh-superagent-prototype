@@ -54,6 +54,38 @@ const evidenceFor = (key) => {
         ],
         originalCheckoutAvailable: false,
       }
+    case 'decisionWorkflow':
+      return {
+        previewReadOnly: true,
+        records: 1,
+        revoked: true,
+        sourceState: 'current',
+        executionEffects: 0,
+        businessRejections: ['conflict', 'tampered_token'],
+        events: 2,
+      }
+    case 'install':
+      return {
+        firstRun: 'OK',
+        doctor: { status: 'DEGRADED', checks: { release_manifest: 'PASS', runtime_dependencies: 'PASS' } },
+        instance: { buildId: 'build-1', startupMode: 'normal' },
+        health: { status: 'ok', mode: 'fixture' },
+      }
+    case 'reuse':
+      return { pid: 1, reusedPid: 1, conflictCode: 'instance_conflict', concurrent: [{ status: 'RUNNING' }, { status: 'BLOCKED' }] }
+    case 'restore':
+      return {
+        bundleSha256: DIGEST,
+        counts: { entries: 14, artifacts: 1 },
+        database: { integrity: 'ok', foreignKeyViolations: 0 },
+        restoreReport: 'recovery_readonly',
+        authorization: { status: 'BLOCKED', owner: 'main' },
+        businessStatus: 422,
+      }
+    case 'tamper':
+      return { sameSizeCode: 'release_artifact_missing', missingCode: 'release_artifact_missing', corruptBundleCode: 'archive_invalid' }
+    case 'rollback':
+      return { bundleSha256: DIGEST, target: '/tmp/state', postBackupReceipt: 'recorded' }
     case 'cycles':
       return { requested: 8, completed: 8, attemptCount: 8, failures: [] }
     case 'fixture':

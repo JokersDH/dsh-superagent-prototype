@@ -1,0 +1,93 @@
+{
+  "protocol": "review-pilot-runner-selftest/1",
+  "createdAt": "2026-11-11T03:39:47.183Z",
+  "passes": 17,
+  "failures": [],
+  "assertions": [
+    {
+      "id": "LEDGER_DEFAULT",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "id": "RESERVE_AUTHOR",
+      "ok": true,
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-fd559c63-6a88-46cb-8b72-75f01c70bc54\",\"caseId\":\"case-01\",\"arm\":\"author\",\"upperTokens\":10101,\"upperUSD\":0.010101,\"status\":\"in_flight\",\"reservedAt\":\"2026-11-11T03:39:47.004Z\"}}"
+    },
+    {
+      "id": "RESERVATION_BOUNDED",
+      "ok": true,
+      "detail": "{\"turnId\":\"turn-fd559c63-6a88-46cb-8b72-75f01c70bc54\",\"caseId\":\"case-01\",\"arm\":\"author\",\"upperTokens\":10101,\"upperUSD\":0.010101,\"status\":\"in_flight\",\"reservedAt\":\"2026-11-11T03:39:47.004Z\"}"
+    },
+    {
+      "id": "ONE_IN_FLIGHT",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"one_turn_in_flight\"}"
+    },
+    {
+      "id": "FAKE_CODEX_EXIT",
+      "ok": true,
+      "detail": "{\"code\":0,\"signal\":null}"
+    },
+    {
+      "id": "USAGE_PARSED",
+      "ok": true,
+      "detail": "{\"totalTokens\":1500,\"inputTokens\":1200,\"cachedInputTokens\":100,\"outputTokens\":300,\"reasoningOutputTokens\":50}"
+    },
+    {
+      "id": "SESSION_PARSED",
+      "ok": true,
+      "detail": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "id": "COST_COMPUTED",
+      "ok": true,
+      "detail": "0.00165"
+    },
+    {
+      "id": "SETTLE_TURN",
+      "ok": true,
+      "detail": "{\"turns\":1,\"tokens\":1500,\"costUSD\":0.00165,\"unknownTurns\":0}"
+    },
+    {
+      "id": "SETTLE_RECEIPT",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "id": "RESERVE_SECOND",
+      "ok": true,
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-7cc72093-3c63-4d02-8dce-579d5a06eda5\",\"caseId\":\"case-02\",\"arm\":\"author\",\"upperTokens\":10101,\"upperUSD\":0.010101,\"status\":\"in_flight\",\"reservedAt\":\"2026-11-11T03:39:47.183Z\"}}"
+    },
+    {
+      "id": "UNKNOWN_BLOCKS",
+      "ok": true,
+      "detail": "BLOCKED_UNKNOWN_USAGE"
+    },
+    {
+      "id": "UNKNOWN_NOT_REFUNDED",
+      "ok": true,
+      "detail": "{\"turns\":2,\"tokens\":11601,\"costUSD\":0.011751000000000001,\"unknownTurns\":1}"
+    },
+    {
+      "id": "NO_SEND_AFTER_UNKNOWN",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"unknown_usage_unresolved\"}"
+    },
+    {
+      "id": "TOKEN_CEILING",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"budget_ceiling\"}"
+    },
+    {
+      "id": "AUTHOR_TURN_CAP",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"author_turn_cap\"}"
+    },
+    {
+      "id": "REVIEW_STILL_ALLOWED",
+      "ok": true,
+      "detail": "{\"ok\":true,\"reservation\":{\"turnId\":\"turn-3cca999b-183d-43d3-8610-f52cf079574e\",\"caseId\":\"case-05\",\"arm\":\"self_review\",\"upperTokens\":10098,\"upperUSD\":0.010098,\"status\":\"in_flight\",\"reservedAt\":\"2026-11-11T03:39:47.183Z\"}}"
+    }
+  ]
+}

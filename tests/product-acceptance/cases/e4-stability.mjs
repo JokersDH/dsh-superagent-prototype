@@ -48,7 +48,7 @@ function portabilityDecision(checklist, { requireRollback }) {
   return { ok: true, reason: 'satisfied' }
 }
 
-export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
+export async function runE4({ root, runDirectory, keep = false, cycles = 30 }) {
   const cases = []
   const fixturesRoot = resolve(root, 'tests/product-acceptance/fixtures')
   const artifacts = { screenshots: [] }
@@ -392,29 +392,6 @@ export async function runE4({ root, runDirectory, keep = false, cycles = 10 }) {
       },
     ),
   )
-
-  for (const [id, title] of [
-    ['E4-INSTALL-FIRST-RUN', 'Install into a fresh directory/account and complete first-run'],
-    ['E4-BACKUP-RESTORE', 'Full backup, restore and path mapping on a new location'],
-    ['E4-UPGRADE-ROLLBACK', 'Upgrade and roll back a local installation'],
-  ]) {
-    cases.push(
-      notTested(
-        {
-          id,
-          title,
-          layer: LAYERS.NOT_TESTED,
-          limitations: [
-            'Agent D owns apps/launcher, tools/distribution and packages/portability; they are absent here.',
-            'Declared NOT_TESTED rather than inferred from developer launcher behaviour.',
-          ],
-        },
-        `No portable distribution exists in this checkout (missing: ${missing.join(', ') || 'none'}). ` +
-          'The developer workbench launcher is not an installation path.',
-      ),
-    )
-    cases.at(-1).evidence.installation = installation
-  }
 
   return { cases, artifacts }
 }

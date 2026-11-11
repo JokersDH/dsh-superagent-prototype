@@ -27,7 +27,6 @@ import {
   runCodexTurn,
   settleTurn,
 } from './runner.mjs'
-
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../../..')
 const reports = join(here, 'reports')
@@ -38,6 +37,22 @@ const pricingPath = join(here, 'pricing.json')
 const grantId = 'wave05-independent-review-pilot-01'
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const args = new Set(process.argv.slice(2))
+
+/** Runs the runner's accounting selftest in a separate process on a disposable ledger. */
+function runRunnerSelftest() {
+  const script = join(here, 'runner-selftest.mjs')
+  const result = spawnSync(process.execPath, [script], { encoding: 'utf8', timeout: 60_000 })
+  try {
+    return JSON.parse(result.stdout)
+  } catch {
+    return {
+      protocol: 'review-pilot-runner-selftest/1',
+      passes: 0,
+      failures: [{ id: 'selftest_crash', ok: false, detail: (result.stderr || result.stdout || '').slice(-400) }],
+      assertions: [],
+    }
+  }
+}
 
 function ensureReports() {
   mkdirSync(reports, { recursive: true })
@@ -199,7 +214,10 @@ function preflight() {
   const pricing = readPricing()
   const runtime = readRuntimeInterface()
   const ledger = readLedger()
+  const runner = runRunnerSelftest()
   const reasons = []
+  if (runner.failures.length > 0)
+    reasons.push({ code: 'runner_selftest_failed', detail: runner.failures.map((item) => item.id) })
   if (!frozen.ok) reasons.push({ code: 'frozen_inputs_invalid', detail: frozen.code ?? frozen.mismatches })
   if (!codex.available) reasons.push({ code: 'codex_unavailable', detail: codex })
   if (!pricing)
@@ -238,6 +256,7 @@ function preflight() {
         }
       : { ok: false, mismatches: frozen.mismatches },
     sealSelfTest: seal ? { caseId: 'case-01', digest: seal.manifest.digest } : null,
+    runnerSelfTest: { protocol: runner.protocol, passes: runner.passes, failures: runner.failures }, 
     protocolSemantics: {
       stage1: 'Cases, oracle, scoring, order seed, model and budgets are frozen before any author call.',
       stage2: 'freezeCandidate() digests the real author capsule before any review; verifyCandidateFreeze() rechecks it.',
@@ -599,9 +618,15 @@ if (!isMain) {
 } else if (args.has('--dry-run')) {
   const result = dryRun()
   process.exitCode = result.status === 'PASS_HARNESS_DRY_RUN' ? 0 : 1
+} else if (args.has('--selftest')) {
+  const result = runRunnerSelftest()
+  ensureReports()
+  writeFileSync(join(reports, 'runner-selftest.json'), JSON.stringify(result, null, 2) + '\n')
+  process.stdout.write(`runner-selftest ${result.failures.length === 0 ? 'PASS' : 'FAIL'}: ${result.passes} checks\n`)
+  process.exit(result.failures.length === 0 ? 0 : 1)
 } else if (args.has('--execute')) {
   execute()
 } else {
-  process.stdout.write('Use --freeze, --preflight, --dry-run or --execute --confirm-grant\n')
+  process.stdout.write('Use --freeze, --preflight, --selftest, --dry-run or --execute --confirm-grant\n')
   process.exitCode = 2
 }

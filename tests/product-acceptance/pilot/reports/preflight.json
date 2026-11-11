@@ -28,6 +28,11 @@
     "caseId": "case-01",
     "digest": "22c0baceb70ae674abafbb5f6c72262eb142767bccd9220b78fdc59a8723cafc"
   },
+  "runnerSelfTest": {
+    "protocol": "review-pilot-runner-selftest/1",
+    "passes": 17,
+    "failures": []
+  },
   "protocolSemantics": {
     "stage1": "Cases, oracle, scoring, order seed, model and budgets are frozen before any author call.",
     "stage2": "freezeCandidate() digests the real author capsule before any review; verifyCandidateFreeze() rechecks it.",
@@ -48,6 +53,6 @@
     "maxTotalBillableTokens": 200000,
     "maxTotalCostUSD": 5
   },
-  "checkedAt": "2026-11-11T03:18:53.438Z",
+  "checkedAt": "2026-11-11T03:39:56.137Z",
   "note": "Preflight blocked; no model turn may be sent. Existing ledger reservations/usage were preserved."
 }

@@ -235,7 +235,18 @@ const CAPABILITIES = [
   {
     id: 'distribution',
     label: '可迁移发行、安装、备份恢复、升级回滚',
-    notTested: ['D 的 launcher/distribution/portability 未进入 main；无 staged bundle。'],
+    installed: [
+      'E4-INSTALL-ARTIFACT-IDENTITY',
+      'E4-INSTALL-FIRST-RUN',
+      'E4-INSTALL-REUSE-CONCURRENCY',
+      'E4-BACKUP-RESTORE',
+      'E4-INSTALL-TAMPER',
+      'E4-INSTALL-ROLLBACK',
+    ],
+    notTested: [
+      'E4-UPGRADE-ROLLBACK：只发布了一个冻结安装物（buildId d4eb3a13f4904d2d），真实升级需要第二个 buildId 且 schema 相同的冻结产物；同一字节上的 state 回滚已由 E4-INSTALL-ROLLBACK 验证。',
+      'E4-INSTALL-FIRST-RUN evidence.findings：PA_CONFIG_ROOT 覆盖后 doctor 报 release_manifest FAIL（owner D，最小复现已记录）。',
+    ],
   },
   {
     id: 'native-control',
@@ -245,7 +256,10 @@ const CAPABILITIES = [
   {
     id: 'review-pilot',
     label: '独立会话复核价值试点（8例三组）',
-    notTested: ['Preflight BLOCKED：pricing_unavailable + b_runtime_interface_missing；0/24 turn，无价值结论。'],
+    notTested: [
+      'Preflight BLOCKED：pricing_unavailable（配置模型没有操作者可核对的 USD 价格表）；0/24 turn；' +
+        '真实作者/续会话/新 session 执行链已实现并有 17 项 runner selftest（预留先于发送、单 turn 在途、unknown 不归还、token/USD 上限），但没有价格就不发送；无价值结论。',
+    ],
   },
   {
     id: 'actual-native',
@@ -267,6 +281,7 @@ const rows = CAPABILITIES.map((capability) => {
   const sdkMock = rowStatus(capability.sdkMock)
   const readonly = rowStatus(capability.readonly)
   const native = capability.nativeReason ? 'NOT_TESTED' : rowStatus(capability.native)
+  const installed = rowStatus(capability.installed)
   const notTested = [...(capability.notTested ?? [])]
   if (capability.nativeReason) notTested.push(capability.nativeReason)
   return {
@@ -275,9 +290,10 @@ const rows = CAPABILITIES.map((capability) => {
     controlledFixture: controlled,
     sdkMock,
     readonly,
+    installed,
     actualNative: native,
     gaps: notTested,
-    evidence: [...(capability.controlled ?? []), ...(capability.sdkMock ?? []), ...(capability.readonly ?? [])].filter(
+    evidence: [...(capability.controlled ?? []), ...(capability.sdkMock ?? []), ...(capability.readonly ?? []), ...(capability.installed ?? [])].filter(
       (id) => byId.has(id),
     ),
   }
@@ -336,12 +352,12 @@ const executionStatus = {
   externalBlockers: [
     { owner: 'C', detail: 'C-MISSING-SOURCE-EFFECTIVENESS, C-CONFIRMED-REPLAY-STILL-AUTHENTICATES and C-PROPOSAL-SNAPSHOTS-GRANT still fail in the merged source.' },
     { owner: 'main', detail: 'No decision/proposal/context HTTP entry; assistant state cannot be exercised end to end.' },
-    { owner: 'D', detail: 'apps/launcher, tools/distribution and packages/portability are absent; no staged bundle or migration/recovery tooling.' },
+    { owner: 'D', detail: 'Source stays on codex/g3-local-distribution. The frozen tar.gz is accepted byte-for-byte; a second frozen buildId is required for E4-UPGRADE-ROLLBACK, and PA_CONFIG_ROOT override drops release.json.' },
     { owner: 'B', detail: 'Native ledger/results are not supplied as input and E has no budget, so actual-native and native control evidence are absent.' },
   ],
   next: [
     'Main: integrate the C fixes and publish the assistant state HTTP/command surface; E then adds confirm-before-execute, revocation-effect and transaction-failure cases.',
-    'D: publish a staged bundle and migration/recovery CLI; E runs install, first-run, backup/restore, upgrade/rollback in a fresh directory with the checkout unavailable.',
+    'D: publish a second frozen artifact (different buildId, same schema) for the upgrade case, and seed release.json when PA_CONFIG_ROOT is overridden; everything else in the frozen artifact already passes in a fresh directory.',
     'B: hand off native evidence bound to commit/attempt/command with executed=true and model-task counts; only a separately granted budget lets E re-run native.',
     'Main: treat controlled-product-workflow PASS as workflow evidence only; local-alpha and full-product remain non-zero until installation and native evidence exist.',
   ],
@@ -385,25 +401,36 @@ const handoff = `# Agent E 第六轮交付交接
 
 ## 矩阵摘要
 
-| 能力 | 受控 fixture | SDK mock | 只读 | 实际原生 |
-| --- | --- | --- | --- | --- |
+| 能力 | 受控 fixture | SDK mock | 只读 | 安装（同一字节） | 实际原生 |
+| --- | --- | --- | --- | --- | --- |
 ${rows
   .map(
     (row) =>
-      `| ${row.capability} | ${row.controlledFixture} | ${row.sdkMock} | ${row.readonly} | ${row.actualNative} |`,
+      `| ${row.capability} | ${row.controlledFixture} | ${row.sdkMock} | ${row.readonly} | ${row.installed} | ${row.actualNative} |`,
   )
   .join('\n')}
 
 完整数据见 \`release-matrix.json\`。
 
+## 分开的三类结论
+
+| 维度 | 结论 | 依据 |
+| --- | --- | --- |
+| 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；pricing_unavailable；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
+| 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
+| 安装准入（个人 Alpha） | 见 \`installed-alpha\` tier；同一冻结字节在全新目录可启动/备份/恢复/回滚，升级项缺第二个冻结产物 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK；E4-UPGRADE-ROLLBACK NOT_TESTED。 |
+
+安装物身份：\`wave06-alpha-d4eb3a13\` / buildId \`d4eb3a13f4904d2d\` / tar sha256 \`8b7675bafa7cded2c9c0656655abca3ff21721d52c3dc4f573a667d93f81f122\` / 19,762,194 bytes / darwin-arm64 / Node 24.21.0 / SQLite ABI 137。生产者 source commit \`9046d4c5\` 记录为 dirty，因此这些字节不能由某个干净提交重建——这是候选安装物，不是可重现发行。
+
 ## 独立复核价值试点
 
 - 预注册协议：\`tools/experiments/review-pilot-01/protocol.json\`（24 turn / 20万 token / 5 USD）。
 - 冻结输入：8 个合成候选（4 个预埋缺陷、4 个干净）、隐藏 oracle 测试、评分规则均已 hash；\`node tests/product-acceptance/pilot/harness.mjs --freeze --check\` 可复验。
-- 预检：**BLOCKED (pricing_unavailable, b_runtime_interface_missing)**。Codex 0.164.0 可用且为 API key 计量，但配置模型没有可核对的 USD 价格表；B 也未发布受限运行接口。协议禁止把密钥/订阅当零成本，也不能伪造 session runner。**0/24 turn、0 token、USD unknown**。
+- 预检：**BLOCKED (pricing_unavailable)**。Codex 0.164.0 可用且为 API key 计量（模型 gpt-6.1-sol），但没有操作者可核对的 USD 价格表。协议禁止把密钥/订阅当零成本。**0/24 turn、0 token、USD unknown、0 unknown send**；ledger 保留原值，预检只标注。
+- 执行链已不是占位：作者 turn（workspace-write）→ 冻结真实 candidate 摘要 → 同一 session 续会话复核（read-only）→ 全新 session 在密封副本复核（read-only）→ 严格报告校验与评分。每次发送前持久预留，预检/失败不覆盖账；unknown 用量按预留上界计费并转 BLOCKED_UNKNOWN_USAGE，之后不再发送。
+- \`--selftest\` 17 项通过（单 turn 在途、预留先于发送、unknown 不归还、token/USD 上限、作者/复核分项上限、usage/session 解析）；它证明会计与进程适配，不是收益结果。
 - 干跑：\`--dry-run\` 用合成报告验证评分/预算/拒绝机制（检出、误报、缺 usage、预算不一致、挑例、改 oracle、报告越权均被正确处理）；干跑不是收益结果。
-- 两个冻结时点已实现：作者调用前固定 cases/oracle/评分/预算；作者产出后、任一 review 前用 \`freezeCandidate()\` 固定真实 candidate 摘要，review 前 \`verifyCandidateFreeze()\` 复核。
-- 要解除阻断：操作者提供 \`pilot/pricing.json\`（model、inputPerMillion、outputPerMillion、USD、source、observedAt）且 B 发布 \`tools/experiments/review-pilot-01/runtime-interface.json\`；预检 PASS 后才允许 \`--execute --confirm-grant\`。
+- 要解除阻断：操作者提供 \`pilot/pricing.json\`（model、inputPerMillion、outputPerMillion、USD、source、observedAt）；预检 PASS 后才允许 \`--execute --confirm-grant\`，且仍受原 24/200000/USD5 上限。
 
 ## Tier 判定（同一份证据）
 
@@ -426,14 +453,14 @@ ${rows
 - RSS/FD/磁盘是单实例观察；端口不变不能证明无进程泄漏。
 - 截图与几何断言只证明可达/不溢出/不重叠，不评价美观。
 - 推荐/复核仍只在实验入口；advisory/controlled-review/heterogeneous tier 因生产者缺失而非零。
-- 安装、第二协议与真实 native 证据缺失，因此 \`local-alpha\`、\`full-product\` 被 gate 拒绝。
+- 第二协议与真实 native 证据缺失；安装缺第二个 buildId 的升级演练，因此 \`local-alpha\`、\`full-product\` 被 gate 拒绝。
 - 试点被预检阻断，不能把 harness 或干跑当作价值已验证。
 
 ## 下一消费者
 
 1. 主线：审阅 \`RFC-E-001-consumer-interfaces.zh-CN.md\`，决定公共 DTO/命令归属；E 不复制生产类型。
 2. B：提供绑定 commit/attempt 的原生证据（\`executed: true\` + model task 计数）；E 只消费，不重跑计费任务。
-3. D：发布 launcher/distribution/portability 后，E 在新目录/新账户执行安装、first-run、备份恢复、升级回滚。
+3. D：补第二个冻结 buildId 供升级演练；修复 PA_CONFIG_ROOT 覆盖时 release.json 不随 first-run 写入的问题。其余安装路径已由 E 在同一字节上独立通过。
 4. C：接线上下文/提案/决定后，E 增加“确认前不执行、重复确认幂等、撤销后失效、注入不扩权”用例。
 
 ## 复验命令
@@ -444,7 +471,8 @@ pnpm -r --filter '@personal-agent/*' build
 node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only
 node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow
 node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui
-node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability --cycles=12
+node tests/product-acceptance/pilot/harness.mjs --selftest
+node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability
 node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 \`\`\`
 
