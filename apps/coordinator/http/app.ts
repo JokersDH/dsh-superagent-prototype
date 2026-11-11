@@ -42,6 +42,10 @@ import {
   DecisionCommandSchema,
   DecisionQuerySchema,
   DecisionPageSchema,
+  WorkEvidenceSchema,
+  RecoveryInspectionSchema,
+  RecoveryPrepareSchema,
+  RecoveryPlanSchema,
 } from '@personal-agent/contracts'
 import type {
   AnswerDelivery,
@@ -73,6 +77,10 @@ import type {
   DecisionCommand,
   DecisionQuery,
   DecisionPage,
+  WorkEvidence,
+  RecoveryInspection,
+  RecoveryPrepare,
+  RecoveryPlan,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -126,10 +134,12 @@ export interface LocalHttpOptions {
     reviewActivity?(activity: ReviewActivity, actor: TrustedActor): Promise<CommandReceipt>
     prepareDecision?(input: DecisionPrepare, actor: TrustedActor): Promise<DecisionPreview>
     decision?(command: DecisionCommand, actor: TrustedActor): Promise<CommandReceipt>
+    recoveryPrepare?(input: RecoveryPrepare, actor: TrustedActor): Promise<RecoveryPlan>
   }
   read?: {
     attention?(query: AttentionQuery): Promise<AttentionPage>
     decisions?(query: DecisionQuery): Promise<DecisionPage>
+    recovery?(): Promise<RecoveryInspection>
     conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog>
     conversation?(id: string): Promise<ConversationSummary>
     projectSettings?(projectId: string): Promise<ProjectSettingsPage>
@@ -141,6 +151,7 @@ export interface LocalHttpOptions {
     workLocation?(workId: string): Promise<WorkLocation>
     workEnvironment?(workId: string): Promise<WorkEnvironment>
     workVerification?(workId: string): Promise<WorkVerificationStatus>
+    workEvidence?(workId: string): Promise<WorkEvidence>
     configuration?(): Promise<ApplicationConfiguration>
     verification?(id: string): Promise<Verification | undefined>
     deliveries?(questionId: string): Promise<readonly AnswerDelivery[]>
@@ -277,9 +288,21 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
   })
   app.get('/v1/session', (c) => c.json({ status: 'authenticated' }))
   app.use('/v1/*', async (c, next) => {
-    if (options.startupMode === 'recovery_readonly' && !['GET', 'HEAD', 'OPTIONS', 'DELETE'].includes(c.req.method))
+    const readOnlyRecoveryPreparation = c.req.method === 'POST' && c.req.path === '/v1/recovery/prepare'
+    if (options.startupMode === 'recovery_readonly' && !readOnlyRecoveryPreparation && !['GET', 'HEAD', 'OPTIONS', 'DELETE'].includes(c.req.method))
       throw new ApplicationFault('unsupported_capability', 'Restored state is read-only until explicit recovery and local revalidation', 'none')
     await next()
+  })
+  app.get('/v1/recovery/inspect', async (c) => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Recovery inspection accepts no query')
+    if (!options.read?.recovery) throw new ApplicationFault('unsupported_capability', 'Recovery inspection is not connected')
+    return c.json(RecoveryInspectionSchema.parse(await options.read.recovery()))
+  })
+  app.post('/v1/recovery/prepare', async (c) => {
+    if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Recovery preflight requires read-only startup')
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Recovery preflight requires JSON')
+    if (!options.operations?.recoveryPrepare) throw new ApplicationFault('unsupported_capability', 'Recovery preparation is not connected')
+    return c.json(RecoveryPlanSchema.parse(await options.operations.recoveryPrepare(RecoveryPrepareSchema.parse(await c.req.json()), c.get('actor'))))
   })
   app.get('/v1/configuration', async (c) => {
     if (Object.keys(c.req.query()).length)
@@ -376,6 +399,10 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     const receipt = CommandReceiptSchema.parse(await options.operations.projectSettings(command, c.get('actor')))
     if (receipt.commandId !== command.commandId) throw new ApplicationFault('storage_unavailable', 'Project settings receipt identity mismatch', 'none')
     return c.json(receipt)
+  })
+  app.get('/v1/works/:id/evidence', async (c) => {
+    if (!options.read?.workEvidence) throw new ApplicationFault('unsupported_capability', 'Work evidence is not connected')
+    return c.json(WorkEvidenceSchema.parse(await options.read.workEvidence(IdSchema.parse(c.req.param('id')))))
   })
   app.get('/v1/works/:id/location', async (c) => {
     if (!options.read?.workLocation)

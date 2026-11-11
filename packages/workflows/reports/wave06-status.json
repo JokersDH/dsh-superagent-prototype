@@ -1,0 +1,124 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "82db295",
+  "mergeCommit": "f3b4d64",
+  "interfaceCheckpoint": "f26f2eb",
+  "testedSourceCommit": "3b43728",
+  "migrations": [
+    13
+  ],
+  "productSchema": 13,
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "v13 routing store",
+        "routing/acceptance tests",
+        "shared parsers"
+      ],
+      "note": "immutable RoutingEvidencePort and acceptance checkpoint"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "packages/workflows/test/acceptance.case.ts"
+      ],
+      "note": "accepted event -> exact outcome; replay/gap/conflict; no second accepted event or fabricated timing"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "package-local; main consumes existing index",
+      "evidence": [
+        "routing/timeline tests",
+        "source-message tests",
+        "application 16/16"
+      ],
+      "note": "bounded project/work/source reads; no second Work lifecycle"
+    },
+    {
+      "phase": "A4",
+      "status": "BLOCKED",
+      "scope": "external C consumer",
+      "evidence": [
+        "C package absent in checkout",
+        "RFC-0004"
+      ],
+      "note": "same-port fixture only; owner C/main; no claim of real C integration"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "v12->v13 test",
+        "snapshot reference tests",
+        "second Node process test"
+      ],
+      "note": "upgrades and snapshot bytes/reference checks; D restore/authorization remains external"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "reports/wave06-*.txt",
+        "reports/wave06-performance.json"
+      ],
+      "note": "bounded verification and consumer/documentation handoff"
+    }
+  ],
+  "results": {
+    "storageTests": "75/75",
+    "workflowTests": "23/23",
+    "applicationRegression": "16/16",
+    "verificationRegression": "23/23",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "benchmark": "reports/wave06-performance.json",
+    "modelTasks": 0,
+    "unknownModelSends": 0
+  },
+  "blockers": [
+    {
+      "owner": "C/main",
+      "id": "C-real-consumer-missing",
+      "detail": "No C routing/decision real SQL consumer is present in this checkout; A provides shared-port fixtures only. Need C source checkpoint and main composition to run the real A/C vertical."
+    },
+    {
+      "owner": "main/D",
+      "id": "restore-authorization",
+      "detail": "WorkflowSnapshots and state facts are available; actual restore/new-authorization remains main/D policy and is NOT_TESTED here."
+    },
+    {
+      "owner": "E/B",
+      "id": "pilot-native",
+      "detail": "Native/Codex execution, E pilot and benefit claims are outside A; zero model tasks and no actual_native assertion."
+    }
+  ],
+  "notTested": [
+    "C real routing/decision prepare/commit/revoke consumer",
+    "main HTTP/UI acceptance.consume and attention integration after its checkpoint",
+    "D actual restore/rollback and new authorization",
+    "native/Codex execution, model calls, E pilot, browser/product acceptance",
+    "large-sample throughput or benefit"
+  ],
+  "mainNextSteps": [
+    "call acceptance.consume with the exact candidate event, profileRef and trusted layer inside the command transaction",
+    "never emit a second accepted event; preserve ReviewTiming null/partial and usage unknown",
+    "consume routingEvidence from main/C; reject stale subject/profile/layer before presenting current advice",
+    "use WorkflowSnapshots and keep restore/authorization in main/D",
+    "provide C checkpoint so A can rerun the actual A/C vertical"
+  ],
+  "deliveryCommit": "3b43728",
+  "updatedAt": "2026-11-11T00:00:00.000Z"
+}
