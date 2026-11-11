@@ -72,13 +72,24 @@ export async function runRelease({ root, runDirectory, keep = false }) {
       unavailable: true,
       status: executed?.status ?? preflight?.status ?? 'NOT_EXECUTED',
       grantId: 'wave05-independent-review-pilot-01',
-      turnsUsed: 0,
-      tokensUsed: 0,
+      turnsUsed: preflight?.ledger?.turns ?? 0,
+      tokensUsed: preflight?.ledger?.tokens ?? 0,
       costUSD: null,
       reasons:
         executed?.code
           ? [executed.code]
           : preflight?.reasons?.map((item) => item.code) ?? ['no_preflight'],
+      adapter: preflight?.adapter ?? null,
+      admissionBlockers: preflight?.admission?.blockers ?? null,
+      ledgerState: preflight?.ledgerState ?? null,
+      feasibility: preflight?.status === 'BLOCKED' ? 'blocked_on_adapter_admission' : 'not_executed',
+      requiredInputs: [
+        'one admitted adapter: executable + version + model/provider',
+        'per-component USD price with source and observed-at',
+        'an enforced whole-turn bound (input/cache-write/cached/output/reasoning/tool rounds) proven before send',
+        'isolation, session and material evidence bound to the same adapter',
+        'an explicit main admission for this frozen protocol',
+      ],
     }
     cases.push(pilot)
   }

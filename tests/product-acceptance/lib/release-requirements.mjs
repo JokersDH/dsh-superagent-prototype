@@ -131,7 +131,7 @@ export const INSTALL_CASES = [
   case_('E4-BACKUP-RESTORE', { layers: [LAYERS.INSTALLED], evidence: ['restore'] }),
   case_('E4-INSTALL-TAMPER', { layers: [LAYERS.INSTALLED], evidence: ['tamper'] }),
   case_('E4-INSTALL-ROLLBACK', { layers: [LAYERS.INSTALLED], evidence: ['rollback'] }),
-  case_('E4-UPGRADE-ROLLBACK', { layers: [LAYERS.INSTALLED], evidence: ['installation'] }),
+  case_('E4-UPGRADE-ROLLBACK', { layers: [LAYERS.INSTALLED], evidence: ['upgrade'] }),
 ]
 
 /** Real vendor execution, with an executed/version/attempt/command/evidence proof. */

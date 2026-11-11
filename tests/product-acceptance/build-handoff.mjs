@@ -255,9 +255,26 @@ const CAPABILITIES = [
       'E4-INSTALL-ROLLBACK',
     ],
     notTested: [
-      'E4-UPGRADE-ROLLBACK 需要第二个冻结 buildId（同 schema）；同一字节上的 state 回滚已通过。',
-      'PA_CONFIG_ROOT 覆盖后 release.json 缺失（owner D，最小复现已记录）。',
+      'PA_CONFIG_ROOT 覆盖后 release.json 缺失，base 与 upgrade 两个产物均复现（owner D）。',
+      '跨机器/跨 ABI 未测；只测 darwin/arm64 + Node 24.21.x + ABI 137。',
     ],
+  },
+  {
+    id: 'two-binary-upgrade',
+    label: '两个真实不同二进制的数据升级与拒绝不兼容回退',
+    installed: ['E4-UPGRADE-ROLLBACK'],
+    notTested: ['升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。'],
+  },
+  {
+    id: 'proposal-context',
+    label: '自动提案确认与上下文窗口（真实 HTTP/SQLite）',
+    notTested: ['main 未发布 proposal/context 入口；E3-PROPOSAL-CONTEXT-BOUNDARY 记录了所需输入与负例。'],
+  },
+  {
+    id: 'recovery-activation',
+    label: '恢复授权 commit、目标准备与激活切换',
+    controlled: ['E4-RECOVERY-PREFLIGHT'],
+    notTested: ['commit/activation 未发布；E5-RECOVERY-INTERRUPTION 记录四个中断窗口，prepare 不能替代授权。'],
   },
   {
     id: 'native-control',
@@ -353,6 +370,7 @@ const executionStatus = {
     screenshots: report.artifacts?.screenshots ?? [],
     matrix: join(reports, 'release-matrix.json'),
     executionStatus: join(reports, 'execution-status.json'),
+    wave07Status: join(reports, 'wave07-status.json'),
     wave06Status: join(reports, 'wave06-status.json'),
     tierVerdicts: join(reports, 'tier-verdicts.json'),
   },
@@ -507,8 +525,12 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
 writeFileSync(
+  join(reports, 'wave07-status.json'),
+  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave07-status/1', taskPackage: stages.taskPackage }, null, 2) + '\n',
+)
+writeFileSync(
   join(reports, 'wave06-status.json'),
-  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave06-status/1', taskPackage: stages.taskPackage }, null, 2) + '\n',
+  JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave06-status/1', taskPackage: 'agent-tasks/product-wave-06/README.zh-CN.md', supersededBy: 'wave07-status.json' }, null, 2) + '\n',
 )
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 

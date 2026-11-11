@@ -1,9 +1,9 @@
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { mkdtempSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { runCase, LAYERS } from '../lib/status.mjs'
+import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { countRows } from '../lib/product-db.mjs'
 import { cleanup, pickPort, startProduct, tempState } from '../lib/instance.mjs'
@@ -86,6 +86,7 @@ export async function runRecoveryPreflight({ root, runDirectory, keep = false })
       })()
       const tables = ['event_log', 'works', 'command_receipts', 'runtime_bindings']
       const rowsBefore = Object.fromEntries(tables.map((table) => [table, countRows(state, root, table)]))
+      const filesBefore = new Set(readdirSync(state))
 
       const inspection = await client.request('/v1/recovery/inspect')
       assert('INSPECT_200', inspection.status === 200, `status ${inspection.status} ${JSON.stringify(inspection.body)}`)
@@ -126,17 +127,48 @@ export async function runRecoveryPreflight({ root, runDirectory, keep = false })
       })()
       assert('BINDINGS_UNSAVED', (bindingsBefore === undefined) === (bindingsAfter === undefined) && (bindingsBefore === undefined || sha(bindingsAfter) === sha(bindingsBefore)))
 
-      const stale = await client.request('/v1/recovery/prepare', {
+      const reviewPlan = await client.request('/v1/recovery/prepare', { method: 'POST', body: prepareBody })
+      assert('PREPARE_REPLAY_WRITES_NOTHING', reviewPlan.status === 200 && JSON.stringify(Object.fromEntries(tables.map((table) => [table, countRows(state, root, table)]))) === JSON.stringify(rowsBefore), `status ${reviewPlan.status}`)
+      assert('PREPARE_REPLAY_NEW_PLAN', reviewPlan.body?.planId !== plan.planId && reviewPlan.body?.authorization === 'not_granted', JSON.stringify({ first: plan.planId, second: reviewPlan.body?.planId }))
+      const filesAfter = readdirSync(state)
+      assert('NO_PLAN_PERSISTED', filesAfter.every((name) => filesBefore.has(name)), JSON.stringify(filesAfter.filter((name) => !filesBefore.has(name))))
+
+      // A restart re-inspects the same restored state; the fingerprint is the same, and no
+      // authorization is retained or duplicated by the earlier plan.
+      const fingerprintBeforeRestart = fingerprint
+      await server.stop()
+      server = await startProduct({ root, port: ports.port, stateRoot: state, consoleOrigin: `http://127.0.0.1:${ports.consolePort}` })
+      const restartedClient = new LocalProductClient({ baseURL: `http://127.0.0.1:${ports.port}`, stateDir: state, timeoutMs: 20_000 })
+      const reinspection = await restartedClient.request('/v1/recovery/inspect')
+      const fingerprintAfter = reinspection.body?.inspectionFingerprint
+      assert('RESTART_INSPECT', reinspection.status === 200 && typeof fingerprintAfter === 'string', `status ${reinspection.status}`)
+      assert('RESTART_NO_AUTHORITY', reinspection.body.commitAvailable === false, JSON.stringify(reinspection.body?.commitAvailable))
+      // The fingerprint binds current writer/instance facts, so a restart may change it. If it does,
+      // the pre-restart plan must be rejected as drift instead of being silently reusable.
+      const changed = fingerprintAfter !== fingerprintBeforeRestart
+      const staleAfterRestart = changed
+        ? await restartedClient.request('/v1/recovery/prepare', { method: 'POST', body: prepareBody })
+        : { status: 200 }
+      assert('RESTART_DRIFT_REJECTED', !changed || staleAfterRestart.status === 409, `changed ${changed} status ${staleAfterRestart.status}`)
+      const afterRestartPrepare = await restartedClient.request('/v1/recovery/prepare', {
+        method: 'POST',
+        body: { ...prepareBody, expectedFingerprint: fingerprintAfter },
+      })
+      assert('RESTART_PLAN_STILL_UNGRANTED', afterRestartPrepare.status === 200 && afterRestartPrepare.body.authorization === 'not_granted' && afterRestartPrepare.body.commitAvailable === false, JSON.stringify({ status: afterRestartPrepare.status, authorization: afterRestartPrepare.body?.authorization }))
+      const clientAfter = restartedClient
+
+      const currentFingerprint = fingerprintAfter
+      const stale = await clientAfter.request('/v1/recovery/prepare', {
         method: 'POST',
         body: { ...prepareBody, expectedFingerprint: '0'.repeat(64) },
       })
       assert('STALE_FINGERPRINT_REFUSED', stale.status === 409, `status ${stale.status} ${JSON.stringify(stale.body)}`)
-      const foreign = await client.request('/v1/recovery/prepare', {
+      const foreign = await clientAfter.request('/v1/recovery/prepare', {
         method: 'POST',
-        body: { expectedFingerprint: fingerprint, bindings: [{ sourceProjectId: 'project-not-configured', project: { path: repository, check: 'node_test' } }] },
+        body: { expectedFingerprint: currentFingerprint, bindings: [{ sourceProjectId: 'project-not-configured', project: { path: repository, check: 'node_test' } }] },
       })
       assert('FOREIGN_PROJECT_REFUSED', foreign.status === 403, `status ${foreign.status} ${JSON.stringify(foreign.body)}`)
-      const commit = await client.request('/v1/recovery/commit', { method: 'POST', body: { planId: plan.planId, expectedFingerprint: fingerprint } })
+      const commit = await clientAfter.request('/v1/recovery/commit', { method: 'POST', body: { planId: plan.planId, expectedFingerprint: currentFingerprint } })
       assert('COMMIT_REFUSED', [403, 404, 422].includes(commit.status), `status ${commit.status} ${JSON.stringify(commit.body)}`)
 
       await server.stop()
@@ -170,6 +202,8 @@ export async function runRecoveryPreflight({ root, runDirectory, keep = false })
           ttlMs: expiry,
         },
         writes: { rowsBefore, rowsAfter, markerUnchanged: true, bindingsUnsaved: true },
+        replay: { planIdStable: false, secondPlanId: reviewPlan.body?.planId ?? null, noPlanFile: true },
+        restart: { fingerprintStable: !changed, driftStatus: staleAfterRestart.status, authorization: afterRestartPrepare.body?.authorization ?? null },
         refusals: {
           staleFingerprint: stale.status,
           foreignProject: foreign.status,
@@ -178,6 +212,21 @@ export async function runRecoveryPreflight({ root, runDirectory, keep = false })
         },
       }
     })
+  cases.push(
+    notTested(
+      {
+        id: 'E5-RECOVERY-INTERRUPTION',
+        title: 'Recovery activation survives or refuses each controlled interruption window',
+        layer: LAYERS.NOT_TESTED,
+        limitations: [
+          'Owner: main. inspect/prepare are verified read-only by E4-RECOVERY-PREFLIGHT; commit and activation are not published.',
+          'No target state is prepared by the current build, so half-prepared targets and activation pointer switches cannot be executed without inventing a private protocol.',
+        ],
+      },
+      'NOT_TESTED: main has no recovery commit/activation entry. Required inputs: source-committed activation fact, prepared target identity/bytes, activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority.',
+    ),
+  )
+
   } finally {
     await normalServer?.stop()
     await server?.stop()

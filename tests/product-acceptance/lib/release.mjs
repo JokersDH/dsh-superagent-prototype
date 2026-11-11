@@ -282,6 +282,32 @@ function attentionIssues(attention) {
 }
 
 /**
+ * A two-binary upgrade must move a real state forward, refuse the newer schema on the old binary
+ * without deleting data, and keep an explicit restore clearly separate from a binary downgrade.
+ */
+export function upgradeIssues(upgrade) {
+  if (!upgrade || typeof upgrade !== 'object') return ['missing']
+  const issues = []
+  const base = upgrade.base ?? {}
+  const next = upgrade.upgrade ?? {}
+  if (!isSubstantive(base.buildId) || !isSubstantive(next.buildId) || base.buildId === next.buildId) issues.push('distinct_builds')
+  if (!HEX.test(String(base.tarSha256 ?? '')) || !HEX.test(String(next.tarSha256 ?? '')) || base.tarSha256 === next.tarSha256)
+    issues.push('distinct_bytes')
+  if (!Number.isSafeInteger(base.schema) || !Number.isSafeInteger(next.schema) || next.schema <= base.schema) issues.push('schema_order')
+  if (upgrade.migratedSchema !== next.schema) issues.push('schema_not_migrated')
+  if (!Number.isSafeInteger(upgrade.messages?.after) || !Number.isSafeInteger(upgrade.messages?.before) || upgrade.messages.after <= upgrade.messages.before)
+    issues.push('no_new_data')
+  if (upgrade.preUpgradeDataReadable !== true) issues.push('pre_data_lost')
+  if (upgrade.postUpgradeMessageKept !== true) issues.push('post_data_lost')
+  if (!['daemon_start_failed', 'schema_unsupported', 'runtime_mismatch'].includes(upgrade.oldBinary?.code)) issues.push('old_binary_accepted')
+  if (upgrade.oldBinary?.migrationError !== true) issues.push('no_migration_refusal')
+  if (upgrade.oldBinary?.dataUntouched !== true) issues.push('old_binary_touched_data')
+  if (upgrade.explicitRestore?.schema !== base.schema || upgrade.explicitRestore?.upgradedStateKept !== true)
+    issues.push('restore_not_explicit')
+  return issues
+}
+
+/**
  * A work-evidence projection must bind the exact work, name its projection honestly, carry at most a
  * bounded window and never include another work's outcome.
  */
@@ -471,6 +497,10 @@ export function evaluateRelease({
       if (entry.evidence?.includes('installation')) {
         for (const issue of installationIssues(result.evidence?.installation))
           failures.push(fail('installation_evidence_invalid', `Installation proof ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('upgrade')) {
+        for (const issue of upgradeIssues(result.evidence?.upgrade))
+          failures.push(fail('upgrade_evidence_invalid', `Upgrade proof ${issue}`, entry.id))
       }
       if (entry.evidence?.includes('workEvidence')) {
         for (const issue of workEvidenceIssues(result.evidence?.workEvidence))

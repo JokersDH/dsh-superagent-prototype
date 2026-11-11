@@ -15,6 +15,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
+import { DatabaseSync } from 'node:sqlite'
 import { join, resolve } from 'node:path'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
@@ -28,35 +29,55 @@ import { sha256 } from '../lib/evidence.mjs'
  * Nothing from the source checkout (packages/, node_modules/, the dev launcher) is imported, and the
  * tests never start or stop the user's existing 5180-5184/8796-8800 instances.
  */
-const TAR_PATH =
-  process.env.PA_E_INSTALL_TAR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave06-final/wave06-alpha-d4eb3a13.tar.gz'
-
-/** Identity D recorded for this frozen artifact. A different byte set is a different artifact. */
-export const EXPECTED = Object.freeze({
-  artifactId: 'wave06-alpha-d4eb3a13',
-  buildId: 'd4eb3a13f4904d2d',
-  tarSha256: '8b7675bafa7cded2c9c0656655abca3ff21721d52c3dc4f573a667d93f81f122',
-  tarBytes: 19762194,
-  installManifestSha256: 'c98cda403c7f8e3343474fc70a96c2b7e022559fd748482801219f2750ac768c',
-  releaseManifestSha256: 'a9852c5eb1ec49e7d814fc6a61877fc6525f8cf3b6411da86c4edf83b1a491c8',
-  closureDigest: 'a815fb1e84e056f20be319390919a759e8296c3669cff88dee7298f0acf3d5b2',
-  files: 6483,
+const ARTIFACTS = Object.freeze({
+  base: {
+    role: 'base',
+    name: 'wave06-alpha-b0f87c88',
+    buildId: 'b0f87c883aa6b206',
+    productSchema: 12,
+    tarPath: process.env.PA_E_INSTALL_TAR_BASE ?? '/Users/hh/Desktop/joker/pa-artifacts/wave06/wave06-alpha-b0f87c88.tar.gz',
+    tarSha256: '8b728b610d980fa9fa4a37886ecd50a3a767098ce7f4bec5bf9b35cb552b5c5d',
+    tarBytes: 19762074,
+    installManifestSha256: '64444cb87130593d656738fd6929333533738f73b1cfec0c2858eaa4c823d5b9',
+    releaseManifestSha256: '962c89dc85d593dd211a80108cf8f71b2fdfd72df09718e6c5e239c5625c4e7f',
+    closureDigest: '10f3c1eccd544a96cc619e7c75cf29130c388f7bd28512f311f2accd878f8c8e',
+    files: 6483,
+    sourceCommit: '9046d4c5d3b9f583ba6384b851c32cc5703437c9',
+    sourceDirty: true,
+  },
+  upgrade: {
+    role: 'upgrade',
+    name: 'wave06-alpha2-7e8f6ce6',
+    buildId: '7e8f6ce6fa2e2633',
+    productSchema: 13,
+    tarPath: process.env.PA_E_INSTALL_TAR_UPGRADE ?? '/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz',
+    tarSha256: '0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631',
+    tarBytes: 19911757,
+    installManifestSha256: '09041204af46dca6810a070b4f2cba9895f07e2a56776ec8472af96ef785b548',
+    releaseManifestSha256: '749ed6b304e6cfe782ae50987b94fa29cfa49c85e3d884b126485f546b8eb87e',
+    closureDigest: '55069a730c6954261da765fc5dceadf78df2697f3348d4a99f64782e630e2966',
+    files: 6603,
+    sourceCommit: 'e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389',
+    sourceDirty: false,
+  },
+})
+const PLATFORM = Object.freeze({
   platform: 'darwin',
   arch: 'arm64',
   node: '24.21.0',
   abi: '137',
   sqlite: '3.53.4',
-  sourceCommit: '9046d4c5d3b9f583ba6384b851c32cc5703437c9',
-  sourceDirty: true,
   dependencies: ['@hono/node-server', 'better-sqlite3', 'hono', 'node-addon-api', 'openai', 'semver', 'yaml', 'zod'],
 })
+/** The base artifact is the compatibility view used by the original install cases. */
+export const EXPECTED = ARTIFACTS.base
 
 const REQUIRED_INPUTS = [
   'artifactId/buildId and the tar.gz path',
   'tarSha256 and tarBytes of the exact frozen artifact',
   'platform/arch/Node version and SQLite ABI of the producer',
   'install.json and release.json digests plus the dependency closure',
-  'for upgrade: a second frozen artifact with a different buildId and the same product schema',
+  'for upgrade: a second frozen artifact with a different buildId and a different product schema',
 ]
 
 function digest(file) {
@@ -72,7 +93,7 @@ function witnessPath(path) {
   }
 }
 
-function freePorts() {
+async function freePorts(count = 4) {
   const take = () =>
     new Promise((resolvePort, reject) => {
       const server = createServer()
@@ -82,7 +103,12 @@ function freePorts() {
         server.close(() => resolvePort(port))
       })
     })
-  return Promise.all([take(), take(), take(), take()])
+  const ports = new Set()
+  while (ports.size < count) {
+    const round = await Promise.all(Array.from({ length: count }, take))
+    for (const port of round) if (port >= 1024) ports.add(port)
+  }
+  return [...ports].slice(0, count)
 }
 
 function paEnv(extra = {}) {
@@ -179,6 +205,35 @@ async function waitHttp(url, predicate, { timeoutMs = 30_000 } = {}) {
     await new Promise((resolveDelay) => setTimeout(resolveDelay, 150))
   }
   throw new Error(`HTTP probe never matched: ${JSON.stringify(last)}`)
+}
+
+function readSchema(stateRoot) {
+  const db = new DatabaseSync(join(stateRoot, 'state.sqlite'), { readOnly: true })
+  try {
+    const row = db.prepare("select value from schema_meta where key = 'product_schema'").get()
+    return Number(row?.value)
+  } finally {
+    db.close()
+  }
+}
+
+function countMessages(stateRoot) {
+  const db = new DatabaseSync(join(stateRoot, 'state.sqlite'), { readOnly: true })
+  try {
+    return db.prepare('select count(*) as count from conversation_messages').get().count
+  } finally {
+    db.close()
+  }
+}
+
+function hasMessage(stateRoot, needle) {
+  const db = new DatabaseSync(join(stateRoot, 'state.sqlite'), { readOnly: true })
+  try {
+    // Messages are stored as JSON in `value`; the fixture text is stored verbatim (UTF-8).
+    return db.prepare('select count(*) as count from conversation_messages where value like ?').get(`%${needle}%`).count > 0
+  } finally {
+    db.close()
+  }
 }
 
 function scanCheckoutReferences(install) {
@@ -287,9 +342,9 @@ export async function runInstall({ root, runDirectory, keep = false }) {
     ],
   })
 
-  if (!existsSync(TAR_PATH)) {
+  if (!existsSync(ARTIFACTS.base.tarPath) || !existsSync(ARTIFACTS.upgrade.tarPath)) {
     const reason =
-      `Frozen install artifact not present (${TAR_PATH}). Required inputs: ${REQUIRED_INPUTS.join('; ')}. ` +
+      `Frozen install artifacts not present (base ${ARTIFACTS.base.tarPath}; upgrade ${ARTIFACTS.upgrade.tarPath}). Required inputs: ${REQUIRED_INPUTS.join('; ')}. ` +
       'A developer workbench launch is not an installation path.'
     for (const [id, title] of [
       ['E4-INSTALL-ARTIFACT-IDENTITY', 'The frozen install bytes match the recorded artifact identity'],
@@ -304,7 +359,8 @@ export async function runInstall({ root, runDirectory, keep = false }) {
   }
 
   const workspace = mkdtempSync(join(tmpdir(), 'pa-e-install-'))
-  const install = join(workspace, 'install')
+  const install = join(workspace, 'base')
+  const upgradeInstall = join(workspace, 'upgrade')
   const pristine = join(workspace, 'pristine')
   let stopped = false
   const stopAll = () => {
@@ -319,34 +375,46 @@ export async function runInstall({ root, runDirectory, keep = false }) {
   }
 
   try {
-    execFileSync('tar', ['-xzf', TAR_PATH, '-C', workspace])
+    mkdirSync(install, { recursive: true })
+    mkdirSync(upgradeInstall, { recursive: true })
+    execFileSync('tar', ['-xzf', ARTIFACTS.base.tarPath, '-C', install, '--strip-components=1'])
+    execFileSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', upgradeInstall, '--strip-components=1'])
 
     await push(define('E4-INSTALL-ARTIFACT-IDENTITY', 'The frozen install bytes match the recorded artifact identity'), async ({ assert, evidence }) => {
-      assert('TAR_DIGEST', digest(TAR_PATH) === EXPECTED.tarSha256, digest(TAR_PATH))
-      assert('TAR_BYTES', statSync(TAR_PATH).size === EXPECTED.tarBytes, String(statSync(TAR_PATH).size))
+      for (const artifact of [ARTIFACTS.base, ARTIFACTS.upgrade]) {
+        assert(`TAR_DIGEST_${artifact.role}`, digest(artifact.tarPath) === artifact.tarSha256, digest(artifact.tarPath))
+        assert(`TAR_BYTES_${artifact.role}`, statSync(artifact.tarPath).size === artifact.tarBytes, String(statSync(artifact.tarPath).size))
+      }
       const manifest = JSON.parse(readFileSync(join(install, 'install.json'), 'utf8'))
       assert('INSTALL_PROTOCOL', manifest.format === 'pa-install' && manifest.formatVersion === 1, manifest.format)
       assert('INSTALL_BUILD_ID', manifest.buildId === EXPECTED.buildId, manifest.buildId)
       assert('INSTALL_MANIFEST_DIGEST', digest(join(install, 'install.json')) === EXPECTED.installManifestSha256, digest(join(install, 'install.json')))
       assert('RELEASE_MANIFEST_DIGEST', digest(join(install, 'var/config/release.json')) === EXPECTED.releaseManifestSha256, digest(join(install, 'var/config/release.json')))
-      assert('PRODUCER_PLATFORM', manifest.producer.platform === EXPECTED.platform && manifest.producer.arch === EXPECTED.arch, `${manifest.producer.platform}/${manifest.producer.arch}`)
-      assert('PRODUCER_NODE', manifest.producer.node === EXPECTED.node, manifest.producer.node)
-      assert('PRODUCER_ABI', String(manifest.producer.abi) === EXPECTED.abi && manifest.producer.sqlite === EXPECTED.sqlite, `${manifest.producer.abi}/${manifest.producer.sqlite}`)
+      assert('PRODUCER_PLATFORM', manifest.producer.platform === PLATFORM.platform && manifest.producer.arch === PLATFORM.arch, `${manifest.producer.platform}/${manifest.producer.arch}`)
+      assert('PRODUCER_NODE', manifest.producer.node === PLATFORM.node, manifest.producer.node)
+      assert('PRODUCER_ABI', String(manifest.producer.abi) === PLATFORM.abi && manifest.producer.sqlite === PLATFORM.sqlite, `${manifest.producer.abi}/${manifest.producer.sqlite}`)
       assert('SOURCE_COMMIT', manifest.source.commit === EXPECTED.sourceCommit, manifest.source.commit)
       const deps = (manifest.dependencies ?? []).map((item) => (typeof item === 'string' ? item : item.name)).sort()
-      assert('DEPENDENCY_CLOSURE', JSON.stringify(deps) === JSON.stringify([...EXPECTED.dependencies].sort()), JSON.stringify(deps))
+      assert('DEPENDENCY_CLOSURE', JSON.stringify(deps) === JSON.stringify([...PLATFORM.dependencies].sort()), JSON.stringify(deps))
       for (const rel of ['app/apps/launcher/bin/pa.mjs', 'app/apps/coordinator/product/demo.ts', 'app/apps/console/dist/index.html', 'app/node_modules/better-sqlite3'])
         assert(`ENTRYPOINT_${rel.split('/').at(-1)}`, existsSync(join(install, rel)), rel)
       const scan = scanCheckoutReferences(install)
       assert('NO_CHECKOUT_REFERENCES', scan.hits.length === 0, JSON.stringify(scan.hits.slice(0, 5)))
       const version = pa(install, ['version', '--json'])
       assert('LAUNCHER_VERSION', version.status === 0 && version.json?.node === process.versions.node, JSON.stringify(version.json))
+      const upgradeManifest = JSON.parse(readFileSync(join(upgradeInstall, 'install.json'), 'utf8'))
+      assert('UPGRADE_BUILD_ID', upgradeManifest.buildId === ARTIFACTS.upgrade.buildId, upgradeManifest.buildId)
+      assert('UPGRADE_INSTALL_DIGEST', digest(join(upgradeInstall, 'install.json')) === ARTIFACTS.upgrade.installManifestSha256, digest(join(upgradeInstall, 'install.json')))
+      assert('UPGRADE_RELEASE_DIGEST', digest(join(upgradeInstall, 'var/config/release.json')) === ARTIFACTS.upgrade.releaseManifestSha256, digest(join(upgradeInstall, 'var/config/release.json')))
+      assert('UPGRADE_SOURCE', upgradeManifest.source.commit === ARTIFACTS.upgrade.sourceCommit && upgradeManifest.source.dirty === false, JSON.stringify(upgradeManifest.source))
+      assert('UPGRADE_SCHEMA', upgradeManifest.producer.productSchema === 13, String(upgradeManifest.producer.productSchema))
+      assert('DISTINCT_BUILDS', upgradeManifest.buildId !== manifest.buildId && ARTIFACTS.base.tarSha256 !== ARTIFACTS.upgrade.tarSha256)
       evidence.artifact = {
-        artifactId: EXPECTED.artifactId,
-        tarSha256: EXPECTED.tarSha256,
-        buildId: EXPECTED.buildId,
+        artifacts: [
+          { role: 'base', name: ARTIFACTS.base.name, buildId: ARTIFACTS.base.buildId, tarSha256: ARTIFACTS.base.tarSha256, schema: 12, source: manifest.source },
+          { role: 'upgrade', name: ARTIFACTS.upgrade.name, buildId: ARTIFACTS.upgrade.buildId, tarSha256: ARTIFACTS.upgrade.tarSha256, schema: 13, source: upgradeManifest.source },
+        ],
         files: manifest.files?.count,
-        source: manifest.source,
         producer: manifest.producer,
         scannedModules: scan.scanned,
         extractedAt: workspace,
@@ -414,16 +482,22 @@ export async function runInstall({ root, runDirectory, keep = false }) {
           health, staticHtmlBytes: index.text.length,
         }
         // Finding, not a pass: an overridden config root loses the prebuilt release manifest.
-        const configRoot = join(workspace, 'private-config')
-        const overridden = pa(install, ['doctor', '--json'], { env: { PA_CONFIG_ROOT: configRoot } })
-        const overriddenRelease = (overridden.json?.checks ?? []).find((check) => check.id === 'release_manifest')
+        const overrideProbe = (target, role) => {
+          const configRoot = join(workspace, `private-config-${role}`)
+          pa(target, ['first-run', '--json'], { env: { PA_CONFIG_ROOT: configRoot } })
+          const result = pa(target, ['doctor', '--json'], { env: { PA_CONFIG_ROOT: configRoot } })
+          const check = (result.json?.checks ?? []).find((item) => item.id === 'release_manifest')
+          return { role, buildId: role === 'base' ? ARTIFACTS.base.buildId : ARTIFACTS.upgrade.buildId, status: check?.status ?? 'unknown', detail: check?.detail?.message ?? null }
+        }
+        const overrideBase = overrideProbe(install, 'base')
+        const overrideUpgrade = overrideProbe(upgradeInstall, 'upgrade')
         evidence.findings = [{
           id: 'config_root_override_drops_release_manifest',
           owner: 'agent-d',
-          observed: overriddenRelease?.status ?? 'unknown',
-          code: overriddenRelease?.detail?.message ?? overridden.json?.checks,
-          repro: `PA_CONFIG_ROOT=<fresh dir> ${join(install, 'bin/pa')} first-run && PA_CONFIG_ROOT=<fresh dir> ${join(install, 'bin/pa')} doctor --json`,
-          impact: 'A colleague who moves the config root out of the install cannot start; only the in-install var/config finds release.json.',
+          observed: [overrideBase, overrideUpgrade].map((item) => `${item.role}:${item.status}`),
+          code: overrideBase.detail,
+          repro: `PA_CONFIG_ROOT=<fresh dir> <install>/bin/pa first-run && PA_CONFIG_ROOT=<fresh dir> <install>/bin/pa doctor --json`,
+          impact: 'A colleague who moves the config root out of either install cannot start; only the in-install var/config finds release.json.',
         }]
       } finally {
         pa(install, ['stop', '--json'], { timeoutMs: 20_000 })
@@ -637,10 +711,108 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       evidence.rollback = { bundleSha256: backup.json?.archiveSha256, target: stateRoot, postBackupReceipt: added?.receipt?.status }
     })
 
-    cases.push(notTested(
-      define('E4-UPGRADE-ROLLBACK', 'A second frozen build upgrades the state and rolls back'),
-      'Only one frozen artifact (buildId d4eb3a13f4904d2d) is published for wave 06. A real upgrade needs a second frozen artifact with a different buildId and the same product schema 12; state rollback on the same bytes is verified by E4-INSTALL-ROLLBACK. Required inputs: second artifactId/buildId/tarSha256.',
-    ))
+    await push(define('E4-UPGRADE-ROLLBACK', 'A second frozen build upgrades real data; the old binary refuses the new schema and an explicit restore does not delete it'), async ({ assert, evidence }) => {
+      pa(install, ['stop', '--json'], { timeoutMs: 20_000 })
+      pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 20_000 })
+      for (const target of [install, upgradeInstall]) {
+        const first = pa(target, ['first-run', '--json'])
+        assert(`FIRST_RUN_${target === install ? 'base' : 'upgrade'}`, first.status === 0 && first.json?.status === 'OK', first.stdout + first.stderr)
+      }
+      const [p1, a1, p2, a2, p3, a3, p4, a4] = await freePorts(8)
+      // A dedicated state keeps the upgrade flow independent of earlier cases' rollback markers.
+      const baseState = join(workspace, 'upgrade-base-state')
+      const baseEnv = { PA_DATA_ROOT: baseState }
+      const baseStart = startPa(install, { port: p1, apiPort: a1, env: baseEnv })
+      const baseRunning = await baseStart.attempt
+      assert('BASE_RUNNING', baseRunning.status === 'RUNNING', JSON.stringify({ status: baseRunning.status, code: baseRunning.code }))
+      let seeded
+      try {
+        const client = new LocalProductClient({ baseURL: baseRunning.instance.apiURL, stateDir: baseState, timeoutMs: 25_000 })
+        const configuration = await client.configuration()
+        const project = configuration.projects.find((item) => item.dispatchAllowed)
+        const machine = project.defaultCriteria.find((item) => item.kind === 'machine' && item.required)
+        seeded = await seedProduct(client, {
+          projectId: project.id,
+          scope: project.scope,
+          criteria: [machine].filter(Boolean),
+          profileId: project.profileIds.find((id) => id.endsWith('-pass')) ?? project.defaultProfileId,
+          conversationId: 'conv-upgrade',
+        })
+        assert('BASE_SEEDED', seeded.phase === 'delivered' && seeded.acceptedReceipt === 'recorded', JSON.stringify(seeded))
+      } finally {
+        pa(install, ['stop', '--json'], { timeoutMs: 30_000 })
+      }
+      const beforeSchema = readSchema(baseState)
+      const beforeMessages = countMessages(baseState)
+      assert('BASE_SCHEMA', beforeSchema === ARTIFACTS.base.productSchema, String(beforeSchema))
+      const preBundle = join(workspace, 'pre-upgrade.pab')
+      const backup = pa(install, ['backup', '--out', preBundle, '--json'], { timeoutMs: 60_000, env: baseEnv })
+      assert('PRE_UPGRADE_BACKUP', backup.status === 0 && existsSync(preBundle), backup.stdout + backup.stderr)
+
+      const upgradeStart = startPa(upgradeInstall, { port: p2, apiPort: a2, env: { PA_DATA_ROOT: baseState } })
+      const upgraded = await upgradeStart.attempt
+      assert('UPGRADE_RUNNING', upgraded.status === 'RUNNING', JSON.stringify({ status: upgraded.status, code: upgraded.code, stderr: upgraded.stderr().slice(0, 300) }))
+      assert('UPGRADE_BUILD_RUNNING', upgraded.instance?.buildId === ARTIFACTS.upgrade.buildId, String(upgraded.instance?.buildId))
+      let afterMessages
+      try {
+        assert('SCHEMA_MIGRATED', readSchema(baseState) === ARTIFACTS.upgrade.productSchema, String(readSchema(baseState)))
+        const client = new LocalProductClient({ baseURL: upgraded.instance.apiURL, stateDir: baseState, timeoutMs: 25_000 })
+        const page = await client.conversation('conv-upgrade')
+        assert('PRE_UPGRADE_DATA_READABLE', page.messages.some((item) => item.text?.includes('安装物验收')), JSON.stringify(page.messages.at(-1)))
+        const post = await client.dispatch({ commandId: `post-upgrade-${Date.now()}`, conversationId: 'conv-upgrade', kind: 'chat', projectId: 'project-atlas', text: '升级后新增的数据' })
+        assert('POST_UPGRADE_WRITE', post.receipt.status === 'recorded', JSON.stringify(post.receipt))
+        afterMessages = countMessages(baseState)
+        assert('POST_UPGRADE_MESSAGE', hasMessage(baseState, '升级后新增的数据'))
+        assert('MESSAGE_GROWTH', afterMessages > beforeMessages, `${beforeMessages} -> ${afterMessages}`)
+        const work = await client.work(seeded.workId)
+        assert('WORK_INTACT', work.phase === 'delivered' && JSON.stringify(work.artifactIds) === JSON.stringify(seeded.artifactIds), JSON.stringify({ phase: work.phase, artifacts: work.artifactIds }))
+      } finally {
+        pa(upgradeInstall, ['stop', '--json'], { timeoutMs: 30_000 })
+      }
+
+      // The old binary must refuse the newer schema instead of silently reverting data.
+      const oldOnNew = startPa(install, { port: p3, apiPort: a3, env: baseEnv })
+      const refused = await oldOnNew.attempt
+      assert('OLD_BINARY_REFUSED', refused.status !== 'RUNNING' && refused.exitCode === 2 && refused.code === 'daemon_start_failed', JSON.stringify({ status: refused.status, exitCode: refused.exitCode, code: refused.code }))
+      const daemonLog = readdirSync(join(install, 'var/logs'))
+        .filter((name) => name.startsWith('daemon-'))
+        .map((name) => readFileSync(join(install, 'var/logs', name), 'utf8'))
+        .join('\n')
+      const refusalText = `${JSON.stringify(refused.detail ?? {})}\n${refused.stderr()}\n${daemonLog}`
+      assert('OLD_BINARY_MIGRATION_ERROR', /MigrationIntegrityError|Applied migration .* is not registered/.test(refusalText), refusalText.slice(-400))
+      assert(
+        'DATA_NOT_DELETED',
+        readSchema(baseState) === ARTIFACTS.upgrade.productSchema &&
+          hasMessage(baseState, '升级后新增的数据') &&
+          hasMessage(baseState, '安装物验收'),
+        `${readSchema(baseState)} messages ${countMessages(baseState)} (was ${afterMessages})`,
+      )
+
+      // An explicit restore of the pre-upgrade backup into a NEW state is data recovery, not a
+      // lossless binary downgrade: the upgraded state above is left intact.
+      const restoredState = join(workspace, 'restored-pre-upgrade')
+      const restored = pa(install, ['restore', '--bundle', preBundle, '--to', restoredState, '--json'], { timeoutMs: 60_000 })
+      assert('RESTORE_EXPLICIT', restored.status === 0 && restored.json?.status === 'RESTORED', restored.stdout + restored.stderr)
+      assert('RESTORED_SCHEMA', readSchema(restoredState) === ARTIFACTS.base.productSchema, String(readSchema(restoredState)))
+      assert('RESTORED_DATA', hasMessage(restoredState, '安装物验收') && !hasMessage(restoredState, '升级后新增的数据'))
+      const restoredStart = startPa(install, { port: p4, apiPort: a4, env: { PA_DATA_ROOT: restoredState } })
+      const again = await restoredStart.attempt
+      assert('RESTORED_STARTS', again.status === 'RUNNING', JSON.stringify({ status: again.status, code: again.code }))
+      assert('RESTORED_UPGRADED_STATE_KEPT', readSchema(baseState) === ARTIFACTS.upgrade.productSchema && hasMessage(baseState, '升级后新增的数据'))
+      pa(install, ['stop', '--json'], { timeoutMs: 30_000 })
+
+      evidence.upgrade = {
+        base: { buildId: ARTIFACTS.base.buildId, schema: beforeSchema, tarSha256: ARTIFACTS.base.tarSha256 },
+        upgrade: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, tarSha256: ARTIFACTS.upgrade.tarSha256 },
+        migratedSchema: readSchema(baseState),
+        messages: { before: beforeMessages, after: afterMessages },
+        preUpgradeDataReadable: true,
+        postUpgradeMessageKept: hasMessage(baseState, '升级后新增的数据'),
+        oldBinary: { code: refused.code, migrationError: true, dataUntouched: true, detail: refused.detail ?? null },
+        explicitRestore: { schema: readSchema(restoredState), upgradedStateKept: true },
+      }
+    })
+
   } finally {
     stopAll()
     if (!keep) rmSync(workspace, { recursive: true, force: true })

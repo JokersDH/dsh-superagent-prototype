@@ -86,6 +86,17 @@ const evidenceFor = (key) => {
       return { sameSizeCode: 'release_artifact_missing', missingCode: 'release_artifact_missing', corruptBundleCode: 'archive_invalid' }
     case 'rollback':
       return { bundleSha256: DIGEST, target: '/tmp/state', postBackupReceipt: 'recorded' }
+    case 'upgrade':
+      return {
+        base: { buildId: 'build-old', schema: 12, tarSha256: DIGEST },
+        upgrade: { buildId: 'build-new', schema: 13, tarSha256: 'c'.repeat(64) },
+        migratedSchema: 13,
+        messages: { before: 3, after: 4 },
+        preUpgradeDataReadable: true,
+        postUpgradeMessageKept: true,
+        oldBinary: { code: 'daemon_start_failed', migrationError: true, dataUntouched: true },
+        explicitRestore: { schema: 12, upgradedStateKept: true },
+      }
     case 'workEvidence':
       return {
         protocol: 'work-evidence/1',
