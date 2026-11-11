@@ -10,13 +10,23 @@
  * The execute path is intentionally guarded: it refuses unless preflight PASSed and a pricing
  * schedule exists, because the protocol forbids treating subscription access as zero cost.
  */
-import { spawnSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { scorePilot, PILOT_CAPS, ARMS } from './score.mjs'
+import {
+  annotateLedger,
+  costOf,
+  readLedger,
+  readPricing,
+  readRuntimeInterface,
+  reserveTurn,
+  runCodexTurn,
+  settleTurn,
+} from './runner.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../../..')
@@ -111,13 +121,13 @@ export function freezeCandidate(caseId, capsulePath) {
     files: capsule.manifest.files,
     frozenAt: new Date().toISOString(),
   }
-  mkdirSync(join(here, 'candidates'), { recursive: true })
-  writeFileSync(join(here, 'candidates', `${caseId}.json`), JSON.stringify(record, null, 2) + '\n')
+  mkdirSync(join(here, 'reports', 'candidates'), { recursive: true })
+  writeFileSync(join(here, 'reports', 'candidates', `${caseId}.json`), JSON.stringify(record, null, 2) + '\n')
   return record
 }
 
 export function verifyCandidateFreeze(caseId, capsulePath) {
-  const path = join(here, 'candidates', `${caseId}.json`)
+  const path = join(here, 'reports', 'candidates', `${caseId}.json`)
   if (!existsSync(path)) return { ok: false, reason: 'candidate_not_frozen' }
   const record = readJson(path)
   const capsule = sealDirectory(capsulePath, mkdtempSync(join(tmpdir(), 'pa-candidate-check-')))
@@ -186,16 +196,19 @@ function preflight() {
   ensureReports()
   const frozen = verifyFrozen()
   const codex = codexInfo()
-  const pricing = pricingSchedule()
-  const runtime = runtimeInterface()
-  const ledger = ledgerState()
+  const pricing = readPricing()
+  const runtime = readRuntimeInterface()
+  const ledger = readLedger()
   const reasons = []
   if (!frozen.ok) reasons.push({ code: 'frozen_inputs_invalid', detail: frozen.code ?? frozen.mismatches })
   if (!codex.available) reasons.push({ code: 'codex_unavailable', detail: codex })
-  if (!pricing.ok) reasons.push({ code: pricing.reason, detail: 'No operator-provided USD schedule; subscription access is not zero cost.' })
-  if (!runtime.ok) reasons.push({ code: runtime.reason, detail: runtime.path })
-  if (!ledger.ok) reasons.push({ code: 'ledger_reconciliation_required', detail: ledger })
-  // Prove the sealing path itself works without any model call.
+  if (!pricing)
+    reasons.push({
+      code: 'pricing_unavailable',
+      detail: 'No operator-provided USD schedule for the configured model; key/subscription access is not zero cost.',
+    })
+  if ((ledger.reservations ?? []).some((item) => item.status === 'in_flight'))
+    reasons.push({ code: 'turn_in_flight', detail: 'An earlier reservation is still open; reconcile it before sending.' })
   let seal
   try {
     const target = mkdtempSync(join(tmpdir(), 'pa-pilot-seal-'))
@@ -205,6 +218,7 @@ function preflight() {
     reasons.push({ code: 'seal_failed', detail: String(error?.message ?? error) })
   }
   const status = reasons.length === 0 ? 'PASS' : 'BLOCKED'
+  const adapter = runtime ? 'b-runtime-interface' : 'codex-cli-adapter'
   const result = {
     schema: 'review-pilot-preflight/1',
     protocol: 'independent-review-pilot/1',
@@ -212,7 +226,9 @@ function preflight() {
     status,
     reasons,
     codex,
-    pricing: pricing.ok ? { ...pricing.value, currency: 'USD' } : null,
+    adapter,
+    runtimeInterface: runtime ?? null,
+    pricing,
     frozen: frozen.ok
       ? {
           manifestDigest: frozen.manifest.caseManifestDigest,
@@ -227,33 +243,28 @@ function preflight() {
       stage2: 'freezeCandidate() digests the real author capsule before any review; verifyCandidateFreeze() rechecks it.',
       alignedWith: 'WP-16/0023 two freeze points',
     },
-    ledger,
-    runtimeInterface: runtime.ok ? { ok: true, path: runtime.path } : { ok: false, reason: runtime.reason, path: runtime.path },
-    modelTurnsUsed: 0,
-    reservation: { turns: 0, tokens: 0, unknownTurns: 0 },
+    ledger: {
+      status: ledger.status,
+      turns: Number(ledger.actual?.turns ?? 0),
+      tokens: Number(ledger.actual?.tokens ?? 0),
+      unknownTurns: Number(ledger.actual?.unknownTurns ?? 0),
+      reservations: (ledger.reservations ?? []).length,
+    },
+    modelTurnsUsed: Number(ledger.actual?.turns ?? 0),
     caps: PILOT_CAPS,
     checkedAt: new Date().toISOString(),
-    note: 'Preflight only. No model turn was started; the pilot was not executed in this round.',
+    note:
+      status === 'PASS'
+        ? 'Preflight passed; execution is allowed under the existing grant.'
+        : 'Preflight blocked; no model turn may be sent. Existing ledger reservations/usage were preserved.',
   }
   writeFileSync(join(reports, 'preflight.json'), JSON.stringify(result, null, 2) + '\n')
-  writeFileSync(
-    ledgerPath,
-    JSON.stringify(
-      {
-        schema: 'review-pilot-ledger/1',
-        grantId,
-        caps: PILOT_CAPS,
-        status: status === 'PASS' ? 'READY_NOT_EXECUTED' : 'BLOCKED_PREFLIGHT',
-        reason: reasons.map((item) => item.code),
-        reservation: { turns: 0, tokens: 0, unknownTurns: 0 },
-        actual: { turns: 0, tokens: 0, costUSD: null, unknownTurns: 0 },
-        reservations: [],
-        turns: [],
-      },
-      null,
-      2,
-    ) + '\n',
-  )
+  annotateLedger({
+    status: status === 'PASS' ? (Number(ledger.actual?.turns ?? 0) > 0 ? 'READY_RESUME' : 'READY_NOT_EXECUTED') : 'BLOCKED_PREFLIGHT',
+    reason: reasons.map((item) => item.code),
+    adapter,
+    lastPreflightAt: result.checkedAt,
+  })
   process.stdout.write(`preflight ${status}: ${reasons.map((item) => item.code).join(', ') || 'ready'}\n`)
   return result
 }
@@ -380,13 +391,200 @@ function dryRun() {
   return report
 }
 
-function execute() {
+function abortExecution(code, detail) {
+  annotateLedger({ status: 'BLOCKED', reason: [code], stoppedAt: new Date().toISOString() })
+  const result = { schema: 'review-pilot-result/1', status: 'BLOCKED', code, detail, checkedAt: new Date().toISOString() }
+  writeFileSync(join(reports, 'result.json'), JSON.stringify(result, null, 2) + '\n')
+  process.stdout.write(`pilot BLOCKED: ${code} ${detail ?? ''}\n`)
+  return result
+}
+
+function parseReport(path) {
+  try {
+    const value = JSON.parse(readFileSync(path, 'utf8'))
+    if (!['findings', 'no_findings', 'inconclusive'].includes(value.disposition)) return undefined
+    if (!Array.isArray(value.findings) || !Array.isArray(value.limitations)) return undefined
+    for (const finding of value.findings) {
+      if (typeof finding.path !== 'string' || typeof finding.claim !== 'string') return undefined
+      if (!['high', 'medium', 'low'].includes(finding.severity)) return undefined
+    }
+    if (value.disposition === 'findings' && value.findings.length === 0) return undefined
+    if (value.disposition === 'no_findings' && value.findings.length > 0) return undefined
+    return value
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * Real bounded pilot execution. Author and both review arms reserve before every send; usage is
+ * settled from the runner's token_count events, and any missing usage or session identity stops the
+ * pilot without silently resending or refunding. This path is inactive while preflight is BLOCKED.
+ */
+async function execute() {
   if (!args.has('--confirm-grant')) throw new Error('Refusing to start model turns without --confirm-grant')
   const pre = preflight()
   if (pre.status !== 'PASS') throw new Error(`Preflight is ${pre.status}: ${pre.reasons.map((item) => item.code).join(', ')}`)
-  // The turn runner is deliberately minimal and has never been executed: the grant requires an
-  // operator-provided USD schedule before any send. See reports/preflight.json.
-  throw new Error('Pilot execution is not enabled: pricing schedule or usage-bound proof is required by the protocol')
+  const pricing = readPricing()
+  if (!pricing) throw new Error('Pricing disappeared after preflight')
+  const oracle = readJson(oraclePath)
+  const schemaPath = join(here, 'report-schema.json')
+  const workRoot = mkdtempSync(join(tmpdir(), 'pa-pilot-run-'))
+  const reportPaths = { no_review: {}, same_session_self_review: {}, fresh_session_review: {} }
+  const usageTotals = {
+    no_review: { tokens: 0, usd: 0, turns: 0 },
+    same_session_self_review: { tokens: 0, usd: 0, turns: 0 },
+    fresh_session_review: { tokens: 0, usd: 0, turns: 0 },
+  }
+  const model = pricing.model
+
+  const turn = async ({ caseId, arm, prompt, cwd, sandbox, resumeSessionId, reportPath }) => {
+    const reservation = reserveTurn({ caseId, arm, prompt, pricing })
+    if (!reservation.ok) throw Object.assign(new Error(reservation.reason), { blocked: reservation.reason })
+    const result = await runCodexTurn({
+      prompt,
+      cwd,
+      sandbox,
+      resumeSessionId,
+      model,
+      ...(reportPath ? { outputSchemaPath: schemaPath, lastMessagePath: reportPath } : {}),
+      timeoutMs: 180000,
+    })
+    const cost = costOf(result.usage, pricing)
+    settleTurn({
+      turnId: reservation.reservation.turnId,
+      usage: result.usage,
+      costUSD: cost,
+      sessionId: result.sessionId,
+      startedAt: result.startedAt,
+      endedAt: result.endedAt,
+      exit: result.exit,
+    })
+    if (!result.usage) throw Object.assign(new Error('usage_unavailable'), { blocked: 'usage_unavailable' })
+    if (!result.sessionId) throw Object.assign(new Error('session_identity_missing'), { blocked: 'session_identity_missing' })
+    if (arm !== 'author') {
+      usageTotals[arm].tokens += result.usage.totalTokens
+      usageTotals[arm].usd += cost ?? 0
+      usageTotals[arm].turns += 1
+    }
+    if (result.exit?.code !== 0) throw Object.assign(new Error(`turn exited ${result.exit.code}`), { blocked: 'turn_failed' })
+    return result
+  }
+
+  try {
+    for (const entry of oracle.cases) {
+      const task = readFileSync(join(here, 'cases', entry.id, 'task.md'), 'utf8')
+      const authorDir = join(workRoot, `${entry.id}-author`)
+      sealCase(entry.id, authorDir)
+      const authorPrompt = [
+        `You are the author for a synthetic coding task. Work only inside this directory.`,
+        task,
+        `Implement the requested addition in src/feature.js, keep the visible tests passing, and do not inspect anything outside this directory.`,
+      ].join('\n\n')
+      const author = await turn({
+        caseId: entry.id,
+        arm: 'author',
+        prompt: authorPrompt,
+        cwd: authorDir,
+        sandbox: 'workspace-write',
+      })
+      const frozenCandidate = freezeCandidate(entry.id, authorDir)
+      if (!frozenCandidate?.digest) throw Object.assign(new Error('candidate_freeze_failed'), { blocked: 'candidate_freeze_failed' })
+      const reviewPrompt = [
+        `Review the frozen candidate in this directory against task.md.`,
+        `Do not modify files, do not run anything outside this directory, and report only defensible findings with path/line/severity/claim.`,
+        `Return JSON matching the provided schema.`,
+      ].join('\n\n')
+      const selfPath = join(workRoot, `${entry.id}-self.json`)
+      await turn({
+        caseId: entry.id,
+        arm: 'same_session_self_review',
+        prompt: reviewPrompt,
+        cwd: authorDir,
+        sandbox: 'read-only',
+        resumeSessionId: author.sessionId,
+        reportPath: selfPath,
+      })
+      const freshDir = join(workRoot, `${entry.id}-fresh`)
+      sealDirectory(authorDir, freshDir)
+      const freshPath = join(workRoot, `${entry.id}-fresh.json`)
+      await turn({
+        caseId: entry.id,
+        arm: 'fresh_session_review',
+        prompt: reviewPrompt,
+        cwd: freshDir,
+        sandbox: 'read-only',
+        reportPath: freshPath,
+      })
+      const candidateCheck = verifyCandidateFreeze(entry.id, authorDir)
+      if (!candidateCheck.ok)
+        throw Object.assign(new Error(`candidate_mutated ${candidateCheck.expected} != ${candidateCheck.actual}`), {
+          blocked: 'candidate_mutated',
+        })
+      const selfReport = parseReport(selfPath)
+      const freshReport = parseReport(freshPath)
+      if (!selfReport || !freshReport) throw Object.assign(new Error('invalid_report'), { blocked: 'invalid_report' })
+      reportPaths.same_session_self_review[entry.id] = selfReport
+      reportPaths.fresh_session_review[entry.id] = freshReport
+    }
+
+    const budgets = Object.fromEntries(
+      ARMS.map((arm) => [
+        arm,
+        { model, version: 'codex-cli', tools: 'read-only', timeoutMs: 180000, maxTokens: 20000, maxUSD: 1 },
+      ]),
+    )
+    const usage = Object.fromEntries(
+      ARMS.map((arm) => [
+        arm,
+        arm === 'no_review'
+          ? {}
+          : {
+              completeness: 'observed',
+              tokens: usageTotals[arm].tokens,
+              usd: usageTotals[arm].usd,
+              unknownTurns: 0,
+            },
+      ]),
+    )
+    const score = scorePilot({
+      manifest: readJson(manifestPath),
+      oracle,
+      arms: {
+        no_review: { turnStarts: 0, reports: {} },
+        same_session_self_review: { turnStarts: 8, reports: reportPaths.same_session_self_review },
+        fresh_session_review: { turnStarts: 8, reports: reportPaths.fresh_session_review },
+      },
+      budgets,
+      usage,
+    })
+    const result = {
+      schema: 'review-pilot-result/1',
+      status: 'EXECUTED',
+      decision: score.decision,
+      rationale: score.rationale,
+      refusals: score.refusals,
+      totals: score.totals,
+      scored: score.scored,
+      usageTotals,
+      arms: ARMS.map((arm) => ({
+        id: arm,
+        turnStarts: arm === 'no_review' ? 0 : 8,
+        tokens: usageTotals[arm].tokens,
+        usd: usageTotals[arm].usd,
+      })),
+      sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+      oracleDigest: readJson(manifestPath).oracleDigest,
+      checkedAt: new Date().toISOString(),
+    }
+    writeFileSync(join(reports, 'result.json'), JSON.stringify(result, null, 2) + '\n')
+    annotateLedger({ status: 'COMPLETED', decision: score.decision, completedAt: result.checkedAt })
+    process.stdout.write(`pilot ${score.decision}: ${score.rationale}\n`)
+    return result
+  } catch (error) {
+    if (error?.blocked) return abortExecution(error.blocked, String(error.message))
+    throw error
+  }
 }
 
 const isMain = process.argv[1] !== undefined && import.meta.url === pathToFileURL(resolve(process.argv[1])).href

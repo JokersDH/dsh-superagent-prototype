@@ -655,8 +655,8 @@ export async function runE2({ root, runDirectory, keep = false }) {
           ],
         },
       ),
-      `record_decision returned ${decision.receipt.status} (${decision.receipt.error?.code ?? 'no error'}); ` +
-        'proposal confirmation and revocation have no public entry in this checkout.',
+      `The legacy record_decision command returned ${decision.receipt.status} (${decision.receipt.error?.code ?? 'no error'}); ` +
+        'explicit decisions use /v1/decisions (E3-DECISION-WORKFLOW), but structured proposal confirmation remains absent.',
     )
     decisionsCase.evidence.decision = {
       httpStatus: decision.status,

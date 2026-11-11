@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["disposition", "summary", "findings", "limitations"],
+  "properties": {
+    "disposition": { "enum": ["findings", "no_findings", "inconclusive"] },
+    "summary": { "type": "string" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "severity", "claim"],
+        "properties": {
+          "path": { "type": "string" },
+          "line": { "type": "integer" },
+          "severity": { "enum": ["high", "medium", "low"] },
+          "claim": { "type": "string" }
+        }
+      }
+    },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  }
+}

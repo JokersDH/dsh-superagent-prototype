@@ -10,8 +10,7 @@
   },
   "status": "BLOCKED_PREFLIGHT",
   "reason": [
-    "pricing_unavailable",
-    "b_runtime_interface_missing"
+    "pricing_unavailable"
   ],
   "reservation": {
     "turns": 0,
@@ -25,5 +24,8 @@
     "unknownTurns": 0
   },
   "reservations": [],
-  "turns": []
+  "turns": [],
+  "adapter": "codex-cli-adapter",
+  "lastPreflightAt": "2026-11-11T03:18:53.438Z",
+  "updatedAt": "2026-11-11T03:18:53.439Z"
 }

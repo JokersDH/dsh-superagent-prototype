@@ -110,7 +110,7 @@ export async function runAttention({ root, runDirectory, keep = false }) {
       async ({ assert, evidence }) => {
         const first = await client.json('/v1/attention')
         assert('PROTOCOL', first.protocol === 'attention-inbox/1')
-        assert('RANKING', first.ranking === 'waiting_order', first.ranking)
+        assert('RANKING', first.ranking === 'deterministic_priority', first.ranking)
         assert('ITEMS', first.items.length >= 5, `items ${first.items.length}`)
         const projectsSeen = new Set(first.items.map((item) => item.projectId))
         assert('CROSS_PROJECT', projectsSeen.has(scopeA.projectId) && projectsSeen.has(scopeB.projectId), JSON.stringify([...projectsSeen]))
@@ -124,27 +124,31 @@ export async function runAttention({ root, runDirectory, keep = false }) {
         )
         const byId = new Map(first.items.map((item) => [item.id, item]))
         const blocked = first.items.filter((item) => item.kind === 'blocked')
-        assert('BLOCKED_UNKNOWN_WAIT', blocked.every((item) => item.sinceAt === null))
-        assert(
-          'BLOCKED_RANK_LAST',
-          blocked.every((item) => {
-            const rank = first.ranks.find((entry) => entry.id === item.id)
-            const position = first.ranks.indexOf(rank)
-            return first.ranks.slice(position + 1).every((later) => byId.get(later.id)?.kind === 'blocked')
-          }),
-          JSON.stringify(first.ranks),
-        )
-        assert(
-          'UNKNOWN_REASON',
-          blocked.every((item) => first.ranks.find((rank) => rank.id === item.id)?.reasons.includes('unknown_wait')),
-        )
         const candidate = first.items.find((item) => item.kind === 'candidate')
+        const questions = first.items.filter((item) => item.kind === 'question')
+        const lastBlockedPosition = Math.max(
+          ...first.ranks.map((rank, position) => (byId.get(rank.id)?.kind === 'blocked' ? position : -1)),
+        )
+        const firstNonBlockedPosition = Math.min(
+          ...first.ranks.map((rank, position) => (byId.get(rank.id)?.kind !== 'blocked' ? position : Number.MAX_SAFE_INTEGER)),
+        )
+        assert('BLOCKED_FIRST', blocked.length === 0 || lastBlockedPosition < firstNonBlockedPosition, JSON.stringify(first.ranks))
+        assert(
+          'BLOCKED_CODE_REASON',
+          blocked.every((item) => first.ranks.find((rank) => rank.id === item.id)?.reasons.includes(item.code)),
+          JSON.stringify(first.ranks.filter((rank) => byId.get(rank.id)?.kind === 'blocked')),
+        )
         assert('CANDIDATE_READY_TIME', typeof candidate?.sinceAt === 'string', JSON.stringify(candidate))
         assert(
-          'WAITING_REASON',
-          first.items
-            .filter((item) => item.sinceAt !== null)
-            .every((item) => first.ranks.find((rank) => rank.id === item.id)?.reasons.includes('waiting_age')),
+          'CANDIDATE_REASON',
+          first.ranks.find((rank) => rank.id === candidate.id)?.reasons.includes('candidate_ready'),
+        )
+        assert(
+          'QUESTION_WAIT_REASONS',
+          questions.every((item) => {
+            const reasons = first.ranks.find((rank) => rank.id === item.id)?.reasons ?? []
+            return item.sinceAt === null ? reasons.includes('unknown_wait') : reasons.includes('waiting_age')
+          }),
         )
 
         const again = await client.json('/v1/attention')
@@ -258,15 +262,6 @@ export async function runAttention({ root, runDirectory, keep = false }) {
       ),
     )
 
-    cases.push(
-      notTested(
-        define('E3-ATTENTION-RANKER', 'C shared deterministic priority ranker (deterministic_priority)', {
-          layer: LAYERS.NOT_TESTED,
-          limitations: ['Owner: C/main. The product runs the default waiting_order ranker; no shared AttentionRanker is wired.'],
-        }),
-        'Attention ranking is waiting_order; deterministic_priority (C ranker) is not connected in this checkout.',
-      ),
-    )
   } finally {
     await runtime?.close()
     runtime?.store?.close?.()
@@ -411,19 +406,6 @@ export async function runAttention({ root, runDirectory, keep = false }) {
       cleanup({ root: uiProjectRoot, state: '' }, { keep })
     }
   }
-
-  cases.push(
-    notTested(
-      define('E3-DECISION-TRANSACTION', 'Prepare writes nothing; confirmed decision commits atomically and revocation invalidates context', {
-        layer: LAYERS.NOT_TESTED,
-        limitations: [
-          'Owner: main (HTTP command/transaction) and C/A (DecisionTransactionService + AssistantStatePort).',
-          'No decision/proposal HTTP entry exists in this checkout; C SQL replay still reports one failing case.',
-        ],
-      }),
-      'record_decision is rejected as unsupported_capability; prepare/confirm/revoke and transaction-failure cases cannot be executed.',
-    ),
-  )
 
   return { cases, artifacts }
 }

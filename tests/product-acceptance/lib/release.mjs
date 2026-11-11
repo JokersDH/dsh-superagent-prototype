@@ -229,6 +229,20 @@ export function pilotIssues(pilot, sourceCommit) {
   return issues
 }
 
+/** Explicit decisions: prepare writes nothing, confirm/revoke are audited, no execution effect. */
+export function decisionFlowIssues(flow) {
+  if (!flow || typeof flow !== 'object') return ['missing']
+  const issues = []
+  if (flow.previewReadOnly !== true) issues.push('prepare_not_proven_read_only')
+  if (!Number.isSafeInteger(flow.records) || flow.records < 1) issues.push('no_records')
+  if (flow.revoked !== true) issues.push('revoke_missing')
+  if (flow.sourceState !== 'current') issues.push('source_state')
+  if (flow.executionEffects !== 0) issues.push('execution_effect')
+  if (!Array.isArray(flow.businessRejections) || flow.businessRejections.length === 0) issues.push('no_business_rejection')
+  if (!Number.isSafeInteger(flow.events) || flow.events < 2) issues.push('events')
+  return issues
+}
+
 export function reviewTimingIssues(timing) {
   if (!timing || typeof timing !== 'object') return ['missing']
   const issues = []
@@ -433,6 +447,10 @@ export function evaluateRelease({
       if (entry.evidence?.includes('reviewTiming')) {
         for (const issue of reviewTimingIssues(result.evidence?.reviewTiming))
           failures.push(fail('review_timing_invalid', `Review timing ${issue}`, entry.id))
+      }
+      if (entry.evidence?.includes('decisionWorkflow')) {
+        for (const issue of decisionFlowIssues(result.evidence?.decisionWorkflow))
+          failures.push(fail('decision_workflow_invalid', `Decision workflow ${issue}`, entry.id))
       }
       if (entry.evidence?.includes('nativeControl')) {
         for (const issue of nativeControlIssues(result.evidence?.nativeControl, report.source?.commit))

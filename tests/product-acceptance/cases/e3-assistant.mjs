@@ -134,7 +134,7 @@ export async function runAssistant({ root, runDirectory, keep = false }) {
             'No decision/proposal HTTP entry exists in this checkout; no partial product claim is made.',
           ],
         },
-        'snapshot exposes no knowledge/decision projection; record_decision is rejected as unsupported_capability.',
+        'Explicit decisions now work over HTTP (E3-DECISION-WORKFLOW); automatic context/proposal confirmation is still absent.',
       )
       result.evidence = {
         assistantConfigured: assistant.body?.configured === true,

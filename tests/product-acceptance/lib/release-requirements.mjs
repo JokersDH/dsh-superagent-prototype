@@ -101,6 +101,7 @@ export const CONTROLLED_CASES = [
   case_('E3-REVIEW-ACTIVITY-UI', { layers: [LAYERS.CONTROLLED], evidence: ['reviewTiming'] }),
   case_('E3-ATTENTION-INBOX', { layers: [LAYERS.CONTROLLED], evidence: ['attention'] }),
   case_('E3-ATTENTION-INBOX-UI', { layers: [LAYERS.CONTROLLED] }),
+  case_('E3-DECISION-WORKFLOW', { layers: [LAYERS.CONTROLLED], evidence: ['decisionWorkflow'] }),
   case_('E3-DESKTOP-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
   case_('E3-NOTEBOOK-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
   case_('E3-MOBILE-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
@@ -239,19 +240,13 @@ export const TIERS = {
   'review-value': {
     tier: 'review-value',
     description:
-      'Actual heterogeneous review plus a real, complete 8-case three-arm pilot result. BLOCKED or zero turns is not a value result.',
+      'The controlled product plus one real, complete 8-case three-arm independent-session pilot. ' +
+      'It does not require a second protocol, route platform or heterogeneous review; a valid no-go is a research result.',
     maxAgeMs: 6 * 60 * 60 * 1000,
     allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY, LAYERS.NATIVE],
     requireCleanSource: true,
     requireCaseSource: true,
-    cases: [
-      ...SAFETY_CASES,
-      ...CONTROLLED_CASES,
-      ...ADVISORY_CASES,
-      ...CONTROLLED_REVIEW_CASES,
-      ...HETEROGENEOUS_CASES,
-      ...PILOT_CASES,
-    ],
+    cases: [...SAFETY_CASES, ...CONTROLLED_CASES, ...PILOT_CASES],
   },
   'advisory-routing': {
     tier: 'advisory-routing',

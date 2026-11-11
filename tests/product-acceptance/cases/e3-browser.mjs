@@ -230,6 +230,8 @@ export async function runE3({ root, runDirectory, keep = false }) {
       await page.getByRole('navigation', { name: '工作台导航' }).getByRole('button', { name: '待我决定' }).click()
       const row = page.getByRole('button', { name: '打开待办：E3 待回答问题：允许受控检查', exact: true })
       await row.waitFor({ timeout: 20_000 })
+      const attentionId = await row.getAttribute('data-attention-id')
+      assert('ROW_IDENTITY', typeof attentionId === 'string' && attentionId.length > 0, String(attentionId))
       await row.click()
       const card = page.locator('#work-inspector .question-card').first()
       await card.waitFor({ timeout: 20_000 })
@@ -238,9 +240,29 @@ export async function runE3({ root, runDirectory, keep = false }) {
       const label = (await option.textContent())?.trim()
       await option.click()
       await page.getByRole('button', { name: '待我决定', exact: true }).click()
+      // The answer must be durable before the inbox is asserted: poll the product API, not the page.
+      const deadline = Date.now() + 20_000
+      let answered = false
+      while (Date.now() < deadline) {
+        const current = await client.snapshot({ workId: facts.questionWorkId })
+        if (current.questions.every((item) => item.id !== facts.questionId)) { answered = true; break }
+        await new Promise((resolve) => setTimeout(resolve, 200))
+      }
+      assert('API_QUESTION_ANSWERED', answered)
+      const gone = () => page.evaluate(
+        (id) => !document.querySelector(`.attention-row[data-attention-id="${id}"]`),
+        attentionId,
+      )
+      // A live event push normally removes the row without interaction; a missed frame is recoverable
+      // through the inbox's own refresh control, so refresh only when the automatic update did not land.
+      const autoRefreshObserved = await Promise.race([
+        gone(),
+        new Promise((resolve) => setTimeout(() => resolve(false), 4_000)),
+      ])
+      if (!autoRefreshObserved) await page.getByRole('button', { name: '刷新待办' }).click()
       await page.waitForFunction(
-        () => ![...document.querySelectorAll('.attention-row')].some((item) => item.textContent?.includes('允许受控检查')),
-        undefined,
+        (id) => !document.querySelector(`.attention-row[data-attention-id="${id}"]`),
+        attentionId,
         { timeout: 20_000 },
       )
       const snapshot = await client.snapshot({ workId: facts.questionWorkId })
@@ -251,7 +273,10 @@ export async function runE3({ root, runDirectory, keep = false }) {
         deliveries.some((item) => ['native_applied', 'response_written', 'local_recorded'].includes(item.status)),
         JSON.stringify(deliveries),
       )
-      evidence.question = { id: facts.questionId, option: label, deliveries: deliveries.map((item) => item.status) }
+      evidence.question = {
+        id: facts.questionId, attentionId, option: label, autoRefreshObserved,
+        deliveries: deliveries.map((item) => item.status),
+      }
     })
 
     await push(define('E3-ACCEPT-AND-DOWNLOAD', 'Accept through the UI, verify the artifact bytes and a patch preview'), async ({ assert, evidence }) => {
