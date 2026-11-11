@@ -8,20 +8,20 @@
     "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows/reports/wave10-inventory-admission.json"
   ],
   "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-a",
-  "sourceCommit": "59213bad59b464c70912a9a56ffa42cea8f3eeb0",
+  "sourceCommit": "fd206e1627cee5926e197e3e654dbf0b132b9e51",
   "sourceWorktreeClean": false,
   "sourceHashes": {
-    "packages/storage/src/target-inventory.ts": "3aab1e5f61d9577082ba411191a04ad43c69007c176c84b3679603476def69d4",
-    "packages/storage/src/migrations.ts": "a7daf2569e77417dd27de65b671646338071e73a4f8e7e26be6177740ffc36a0"
+    "packages/storage/src/target-inventory.ts": "17b82f66c347b21a329f368f530de251fd38d68e44f3f1270b4724a6a596daeb",
+    "packages/storage/src/migrations.ts": "90e0b5980b2d03fabfe9da7de41700e01eef4b0de9b295e72d398bf33699fc75"
   },
-  "checkedAt": "2026-11-11T14:26:56.304Z",
+  "checkedAt": "2026-11-11T14:55:36.604Z",
   "exitCode": 0,
   "cases": [
     {
       "id": "CURRENT_EMPTY_SCHEMA_POSITIVE_CONTROL",
       "status": "PASS",
       "completeness": "complete",
-      "tableCount": 51,
+      "tableCount": 52,
       "issues": [],
       "startupAvailable": false
     },
@@ -55,7 +55,7 @@
         "busy_or_changed"
       ],
       "returnedDigest": null,
-      "stableDigest": "2d9330a3be7ac3129dfa42370b5312092fcffde73d786190964b48901138c4c6"
+      "stableDigest": "d3dc55f00705933346b80b6846658fb8dbdece5cf4b95eaf1887f173b85ece9a"
     }
   ],
   "modelCalls": 0,

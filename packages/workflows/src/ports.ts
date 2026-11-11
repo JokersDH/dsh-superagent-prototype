@@ -11,7 +11,7 @@ import type {
 import { WorkflowConflict as StorageWorkflowConflict } from '@personal-agent/storage'
 import type {
   AssistantStatePage, AssistantStatePort, AssistantStateQuery, PersistedDecision, PersistedProposal, RoutingEvidencePort, WorkRecord,
-  RecoveryActivationFacts, RecoveryActivationIntent,
+  AssistantContextBindings as AssistantContextBindingsPort, RecoveryActivationFacts, RecoveryActivationIntent,
 } from '@personal-agent/contracts'
 
 export { SnapshotError, WorkflowSnapshots } from './snapshot.ts'
@@ -34,6 +34,8 @@ export interface RoutingEvidencePortWithSources extends RoutingEvidencePort {
 }
 
 export interface AssistantPort extends AssistantStatePort {
+  /** Shared append-only selected-context audit (v16), same chat/receipt UnitOfWork. */
+  readonly contextBindings: AssistantContextBindingsPort
   /** Old UserDecision ledger rows without source/actor metadata: auditable but not valid memory. */
   legacyDecisions(query: AssistantStateQuery): { records: readonly LegacyDecisionRecord[]; nextCursor?: string }
 }
