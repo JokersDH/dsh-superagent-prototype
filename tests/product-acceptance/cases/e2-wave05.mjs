@@ -21,6 +21,14 @@ const define = (id, title, extra = {}) => ({
   ],
 })
 
+const QUESTION_CODE = {
+  clarification: 'clarification_pending',
+  permission: 'permission_pending',
+  authentication: 'authentication_pending',
+  review: 'review_pending',
+}
+const questionKindCode = (item) => QUESTION_CODE[item.questionKind] ?? 'clarification_pending'
+
 async function waitWork(client, workId, predicate, { timeoutMs = 25_000, label = 'work' } = {}) {
   const deadline = Date.now() + timeoutMs
   let latest
@@ -259,15 +267,92 @@ export async function runWave05E2({ root, runDirectory, keep = false }) {
       ),
     )
 
-    const workbench = notTested(
-      define('E2-ATTENTION-WORKBENCH', 'Cross-project attention aggregation with deadline/wait ordering', {
-        layer: LAYERS.NOT_TESTED,
-        limitations: ['Owner: main/C. Only a per-conversation attention boolean exists in this checkout.'],
-      }),
-      'No cross-project attention API or deadline/wait ordering is exposed; the per-conversation flag is verified separately in E2-ATTENTION-SIGNAL.',
+    await push(
+      define('E2-ATTENTION-WORKBENCH', 'Cross-project attention aggregation, deterministic order and scope'),
+      async ({ assert, evidence }) => {
+        const conversationId = 'conv-w5-attn'
+        await client.dispatch({
+          commandId: commandId('attn-chat'),
+          conversationId,
+          kind: 'chat',
+          projectId: project.id,
+          text: '跨项目待办来源：需要用户回答后才能继续。',
+        })
+        const created = await client.dispatch({
+          commandId: commandId('attn-question'),
+          conversationId,
+          kind: 'create_work',
+          projectId: project.id,
+          profileId: 'profile-fixture-question',
+          goal: '待办聚合：生成一个真实待回答问题',
+          scope: project.scope,
+          criteria: [machine],
+        })
+        const workId = created.receipt.workId
+        let snapshot
+        const deadline = Date.now() + 25_000
+        while (Date.now() < deadline) {
+          snapshot = await client.snapshot({ workId })
+          if (snapshot.questions.length === 1) break
+          await new Promise((resolveDelay) => setTimeout(resolveDelay, 120))
+        }
+        const question = snapshot.questions[0]
+        assert('QUESTION_OPEN', question !== undefined, JSON.stringify(snapshot.questions))
+
+        const page = await client.json('/v1/attention')
+        assert('ATTENTION_PROTOCOL', page.protocol === 'attention-inbox/1', page.protocol)
+        assert('DETERMINISTIC_ORDER', page.ranking === 'deterministic_priority', page.ranking)
+        const ids = page.items.map((item) => item.id)
+        assert('RANKS_COVER_ITEMS', page.ranks.length === ids.length && new Set(page.ranks.map((rank) => rank.id)).size === ids.length && page.ranks.every((rank) => ids.includes(rank.id)), JSON.stringify(page.ranks))
+        const item = page.items.find((candidate) => candidate.contract?.workId === workId)
+        assert('WORK_ITEM_PRESENT', item !== undefined && item.kind === 'question', JSON.stringify(page.items.map((candidate) => [candidate.kind, candidate.contract?.workId])))
+        const rank = page.ranks.find((candidate) => candidate.id === item.id)
+        const reasons = Array.isArray(rank?.reasons) ? rank.reasons : []
+        assert(
+          'RANK_REASONS',
+          reasons.includes(questionKindCode(item)) || reasons.includes('waiting_age') || reasons.includes('unknown_wait'),
+          JSON.stringify(rank ?? null),
+        )
+        assert('SOURCE_BINDING', item.projectId === project.id && item.conversationId === conversationId, JSON.stringify({ projectId: item.projectId, conversationId: item.conversationId }))
+
+        const scoped = await client.json(`/v1/attention?projectId=${project.id}`)
+        assert('PROJECT_SCOPE', scoped.items.every((candidate) => candidate.projectId === project.id), JSON.stringify(scoped.items.map((candidate) => candidate.projectId)))
+        const foreign = await client.request(`/v1/attention?projectId=project-other`)
+        assert('FOREIGN_SCOPE_REFUSED', foreign.status === 403 || (foreign.status === 200 && foreign.body.items.length === 0), `status ${foreign.status} items ${foreign.body?.items?.length}`)
+
+        const conversationView = await client.json(`/v1/conversations/${conversationId}`)
+        assert('CONVERSATION_SIGNAL', conversationView.attention === true, JSON.stringify({ attention: conversationView.attention }))
+
+        const answered = await client.dispatch({
+          commandId: commandId('attn-answer'),
+          conversationId,
+          kind: 'answer_question',
+          questionId: question.id,
+          expectedVersion: question.version,
+          answer: { kind: 'choices', optionIds: [question.presentation.options[0].id] },
+        })
+        assert('ANSWER_RECORDED', answered.receipt.status === 'recorded', JSON.stringify(answered.receipt))
+        const clearedBy = Date.now() + 20_000
+        let after
+        while (Date.now() < clearedBy) {
+          after = await client.json('/v1/attention')
+          const still = after.items.find((candidate) => candidate.contract?.workId === workId && candidate.kind === 'question')
+          if (still === undefined) break
+          await new Promise((resolveDelay) => setTimeout(resolveDelay, 150))
+        }
+        assert('ANSWERED_ITEM_GONE', after.items.every((candidate) => !(candidate.contract?.workId === workId && candidate.kind === 'question')), JSON.stringify(after.items.map((candidate) => candidate.kind)))
+        evidence.attention = {
+          protocol: page.protocol,
+          ranking: page.ranking,
+          items: page.items.length,
+          ranks: page.ranks.length,
+          questionKind: item.questionKind,
+          reasons: rank.reasons,
+          foreignScopeStatus: foreign.status,
+          answeredItemCleared: true,
+        }
+      },
     )
-    workbench.evidence.attention = { unavailable: true, perConversationSignal: 'E2-ATTENTION-SIGNAL' }
-    cases.push(workbench)
 
     const adviceCase = notTested(
       define('E2-ROUTE-ADVICE', 'Route advice is produced only through an explicit experimental entry', {
