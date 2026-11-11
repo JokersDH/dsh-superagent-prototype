@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { RecoveryActivationCommitSchema, RecoveryActivationIntentSchema } from '../src/index.ts'
+import { RecoveryActivationCommitSchema, RecoveryActivationIntentSchema, RecoveryActivationRecordSchema } from '../src/index.ts'
 
 const intent = { protocol: 'recovery-activation-intent/1', activationId: 'activation-one', commandId: 'confirm-recovery', planId: 'plan-one',
   planDigest: 'a'.repeat(64), source: { stateId: 'history-one', stateRoot: '/tmp/history', markerDigest: 'b'.repeat(64), inspectionFingerprint: 'c'.repeat(64) },
@@ -21,4 +21,11 @@ test('source receipt is exact evidence identity, not a target-start permission',
   assert.equal(RecoveryActivationCommitSchema.safeParse(value).success, true)
   assert.equal(RecoveryActivationCommitSchema.safeParse({ ...value, sourceReceipt: { commandId: 'other-command', seq: 1 } }).success, false)
   assert.equal(RecoveryActivationCommitSchema.safeParse({ ...value, mayStart: true }).success, false)
+})
+test('an activation audit cannot claim startup permission or a different record protocol', () => {
+  const record = { protocol: 'recovery-activation-record/1', committed: { protocol: 'recovery-activation-commit/1', intent,
+    sourceReceipt: { commandId: intent.commandId, seq: 1 } }, authorization: 'not_granted', startupAvailable: false }
+  assert.equal(RecoveryActivationRecordSchema.safeParse(record).success, true)
+  assert.equal(RecoveryActivationRecordSchema.safeParse({ ...record, startupAvailable: true }).success, false)
+  assert.equal(RecoveryActivationRecordSchema.safeParse({ ...record, authorization: 'granted' }).success, false)
 })

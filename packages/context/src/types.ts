@@ -30,6 +30,8 @@ export const ContextSourceKindSchema = z.enum([
   'verification',
   'delivery',
   'decision',
+  'conversation_message',
+  'artifact',
   'document',
   'source_file',
 ])
@@ -122,6 +124,8 @@ export const ContextOmissionReasonSchema = z.enum([
   'missing',
   'stale',
   'contract_stale',
+  'budget_group',
+  'source_unavailable',
 ])
 export type ContextOmissionReason = z.infer<typeof ContextOmissionReasonSchema>
 

@@ -1,10 +1,28 @@
-import { RecoveryActivationCommitSchema, RecoveryActivationIntentSchema, TrustedActorSchema } from '@personal-agent/contracts'
-import type { RecoveryActivationCommit, RecoveryActivationFacts, RecoveryActivationIntent, TrustedActor } from '@personal-agent/contracts'
+import { IdSchema, RecoveryActivationCommitSchema, RecoveryActivationIntentSchema, RecoveryActivationRecordSchema, TrustedActorSchema } from '@personal-agent/contracts'
+import type { RecoveryActivationCommit, RecoveryActivationFacts, RecoveryActivationIntent, RecoveryActivationRecord, TrustedActor } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { canonicalDigest } from '@personal-agent/storage'
 import type { ProductStore } from '@personal-agent/storage'
 
 const digest = (value: unknown) => canonicalDigest(JSON.parse(JSON.stringify(value)))
+
+/** Production A facts plus the original main receipt; read-only and intentionally not a startup grant. */
+export function readRecoveryActivationRecord(store: ProductStore, activationId: string,
+  principal: { userId: string; authorityRef: string }): RecoveryActivationRecord | undefined {
+  const id = IdSchema.parse(activationId)
+  return store.uow.atomic(() => {
+    const intent = store.workflows.recoveryActivations.get(id)
+    if (!intent) return undefined
+    if (intent.principal.userId !== principal.userId || intent.principal.authorityRef !== principal.authorityRef)
+      throw new ApplicationFault('forbidden', 'Recovery record belongs to another principal', 'none')
+    const byCommand = store.workflows.recoveryActivations.forCommand(intent.commandId), receipt = store.commands.get(intent.commandId)
+    if (digest(byCommand ?? null) !== digest(intent) || !receipt || receipt.status !== 'recorded' || digest(receipt.result) !== digest(intent) ||
+      !(['local_ui', 'local_cli'] as const).some(source => receipt.payloadDigest === digest({ intent, actor: { ...principal, source } })))
+      throw new ApplicationFault('storage_unavailable', 'Recovery fact and confirming receipt are inconsistent', 'none')
+    return RecoveryActivationRecordSchema.parse({ protocol: 'recovery-activation-record/1', authorization: 'not_granted', startupAvailable: false,
+      committed: { protocol: 'recovery-activation-commit/1', intent, sourceReceipt: { commandId: intent.commandId, seq: receipt.seq } } })
+  })
+}
 
 /** Source transaction only. Target materialization/startup must verify this source receipt separately. */
 export class RecoveryIntentCommitter {

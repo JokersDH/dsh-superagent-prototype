@@ -1,11 +1,11 @@
 {
   "wave": "product-wave-08",
-  "status": "REVIEWED_INPUTS_AND_NARROW_FIX_NOT_RELEASE_ADMITTED",
+  "status": "PROPOSAL_BROWSER_AND_PRODUCTION_SOURCE_AUDIT_NOT_RELEASE_ADMITTED",
   "reviewBaseline": "436dc023c6fad30716baa0d64ac14562f0216880",
-  "implementationSource": "ac12cb2",
-  "phases": {"M1": "PARTIAL_REVIEW_AND_NARROW_SOURCE_INTEGRATION", "M2": "NOT_STARTED", "M3": "NOT_STARTED", "M4": "NOT_STARTED", "M5": "NOT_STARTED", "M6": "IN_PROGRESS"},
+  "implementationSource": "b436fde158a8dd14015c3705550bd3ff0d0fd307",
+  "phases": {"M1": "PARTIAL_PRODUCTION_FACTS_AND_AUDIT_QUERY", "M2": "PASS_EXPLICIT_PROPOSAL_BROWSER_SCOPE", "M3": "NOT_STARTED", "M4": "PARTIAL_SOURCE_ONLY_TARGET_NOT_IMPLEMENTED", "M5": "NOT_STARTED", "M6": "IN_PROGRESS"},
   "candidates": {
-    "A": {"source": "da5f62afc48692c6dd6f15a4ef4fd46734e635d0", "status": "UNADMITTED", "reason": "Legacy plan readback and shared activation facts alignment still pending"},
+    "A": {"source": "fcf2563d2b23ec663546044ec78b053c33c28651", "status": "INTEGRATED_SCHEMA15_PRODUCTION_FACTS_SCOPE", "previousUnadmitted": "da5f62a", "integratedAs": ["1ccffb7", "fe2d101", "e4402d3"], "closed": ["legacy plan envelope readback", "shared activation facts alignment"], "remaining": ["final snapshot/target/distribution combinations"]},
     "B": {"source": "748942e48030f9dba5d42ea7b07bc2bf7dde78f8", "status": "REVIEWED_SCOPED_CANDIDATE", "studyVerdict": "NO_SUPPORTED_BOUNDED_RECIPE", "nativeControl": "NOT_TESTED"},
     "C": {"source": "2d2fa10a5649c0e02759f349ada7e0edd92c6fd6", "status": "ONLY_EXACT_SUPERSESSION_FIX_INTEGRATED", "fullComposer": "UNADMITTED_GRANT_BOUNDARY_FAIL"},
     "D": {"source": "eca5674155a7d828ef15a17f5814b610a7cdc095", "status": "UNADMITTED_PERSONAL_UPGRADE", "firstRunNull": "FIXED_IN_CANDIDATE", "twoDistinctSchema13Artifacts": "DIGESTS_MATCH", "remaining": ["forced fixture mode", "failed target process cleanup", "unknown live pid rollback guard", "schema refusal asserted only as nonzero exit"]},
@@ -15,11 +15,26 @@
     {"command": "node tools/bootstrap/probe-wave07-supersession.mjs", "exitCode": 0, "status": "PASS_SUPERSESSION_NO_RESURRECTION", "source": "ac12cb2", "activeIds": []},
     {"command": "pnpm --filter @personal-agent/knowledge build", "exitCode": 0, "source": "ac12cb2"},
     {"command": "pnpm --filter @personal-agent/knowledge test", "exitCode": 0, "tests": 50, "source": "ac12cb2"},
-    {"command": "node tools/bootstrap/probe-wave08-context-grant.mjs /Users/hh/Desktop/joker/superagent-agent-c", "candidateSource": "2d2fa10a5649c0e02759f349ada7e0edd92c6fd6", "exitCode": 1, "status": "FAIL_CONTEXT_GRANT_BOUNDARY", "validControl": "PASS", "failures": ["expired_grant", "budget_above_grant", "purpose_mismatch"], "providerReadsEach": 1, "grantBytes": 32, "returnedBytes": 1219}
+    {"command": "node tools/bootstrap/probe-wave08-context-grant.mjs /Users/hh/Desktop/joker/superagent-agent-c", "candidateSource": "2d2fa10a5649c0e02759f349ada7e0edd92c6fd6", "exitCode": 1, "status": "FAIL_CONTEXT_GRANT_BOUNDARY", "validControl": "PASS", "failures": ["expired_grant", "budget_above_grant", "purpose_mismatch"], "providerReadsEach": 1, "grantBytes": 32, "returnedBytes": 1219},
+    {"command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows build", "exitCode": 0, "source": "e4402d3"},
+    {"command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows typecheck", "exitCode": 0, "source": "b436fde"},
+    {"command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows test", "exitCode": 0, "storageTests": 75, "workflowTests": 43, "source": "b436fde"},
+    {"command": "pnpm --filter @personal-agent/console typecheck", "exitCode": 0, "source": "b436fde"},
+    {"command": "pnpm --filter @personal-agent/console test", "exitCode": 0, "tests": 22, "source": "b436fde"},
+    {"command": "pnpm --filter @personal-agent/console build", "exitCode": 0, "source": "b436fde", "warning": "Existing main bundle above500KB"},
+    {"command": "node tests/integration/proposal-workbench-browser.mjs --no-capture", "exitCode": 0, "cases": 8, "source": "b436fde", "sourceWorktreeClean": true},
+    {"command": "node --test tests/integration/recovery-activation-record.case.mjs", "exitCode": 0, "tests": 4, "source": "b436fde"},
+    {"command": "node --test tests/integration/recovery-activation-record.case.mjs tests/integration/proposal-commands.case.mjs tests/integration/recovery-preflight.case.mjs", "exitCode": 0, "tests": 20, "source": "b436fde"},
+    {"command": "pnpm --filter @personal-agent/coordinator typecheck:product", "exitCode": 0, "source": "b436fde"},
+    {"command": "pnpm --filter @personal-agent/coordinator typecheck:http", "exitCode": 0, "source": "b436fde"},
+    {"command": "pnpm --filter @personal-agent/contracts check:generated", "exitCode": 0, "source": "b436fde"},
+    {"command": "node --test --test-reporter=dot packages/contracts/test/*.case.ts", "exitCode": 0, "source": "b436fde"}
   ],
   "closedPriorFailure": {"id": "C-supersession-list", "exactSource": "017988976fe647b0be0f6f8671301022da49e360", "integration": "ac12cb2", "scope": "Historical supersession in active list only; not full C composer admission"},
-  "currentFunctionalityCarriedForward": {"proposalHTTP": "IMPLEMENTED_627ef0d", "proposalUI": "PENDING_MAIN", "contextHTTPAndUI": "PENDING_MAIN_AND_C_ADMISSION", "recoveryTargetActivation": "PENDING_MAIN_A_B_D", "recoveryCommitAvailable": false},
+  "currentFunctionalityCarriedForward": {"proposalHTTP": "IMPLEMENTED_627ef0d", "proposalUI": "EXPLICIT_USER_ENTRY_IMPLEMENTED_B436FDE", "automaticStructuredAssistantSuggestions": "NOT_IMPLEMENTED", "contextHTTPAndUI": "PENDING_MAIN_AND_C_ADMISSION", "recoverySourceAudit": "READ_ONLY_NOT_GRANTED_B436FDE", "recoveryTargetActivation": "PENDING_MAIN_A_B_D", "recoveryCommitAvailable": false},
   "study": {"status": "BLOCKED_CURRENT_RECIPE", "newFeasibilityInvestigations": 0, "newModelAllowance": 0, "nativeTurnStartsThisWave": 0, "originalLedgersUnchanged": true},
   "userServicesChanged": false,
-  "limitations": ["Reviewed candidate reports are not independent full test reruns", "Only the exact C supersession source change is newly integrated", "Current installed product/native control/review value remain separately unadmitted", "New dispatch starts no external agent by itself"]
+  "newIsolatedPreview": {"consoleURL": "http://127.0.0.1:5186/", "apiPort": 8802, "state": ".local-state/wave08-proposal-preview", "mode": "personal", "startedFromSource": "b436fde", "initialWorks": 0, "initialMessages": 0, "agentInitiatedNativeModelCalls": 0, "oldSixInstancesRestartedOrMigrated": false},
+  "designReview": {"finalDisposition": "ship", "scope": "Verdict only scores the two original findings", "findingsResolved": ["revision target identity/version", "disabled project reason"], "evidence": "reports/releases/wave08-proposal-workbench/review-verdict.json"},
+  "limitations": ["Reviewed B/C/D/E candidate reports are not independent full test reruns", "C composer remains separately unadmitted; only its exact supersession fix is integrated", "A production facts/query do not authorize target startup", "Proposal UI is explicit user operation, not automatic reasoning or context injection", "Current installed product/native control/review value remain separately unadmitted", "New local personal preview startup is not a new native task or release admission"]
 }

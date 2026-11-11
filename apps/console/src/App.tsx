@@ -21,6 +21,7 @@ import {
   Copy,
   Download,
   Eye,
+  FileCheck2,
   Folder,
   FolderPlus,
   Inbox,
@@ -71,6 +72,8 @@ import { ProjectSettings } from './ProjectSettings.tsx'
 import { useReviewActivity } from './useReviewActivity.ts'
 import { AttentionInbox } from './AttentionInbox.tsx'
 import { DecisionWorkspace } from './DecisionWorkspace.tsx'
+import { ProposalWorkspace } from './ProposalWorkspace.tsx'
+import { blockedLabel } from './configuration-labels.ts'
 import type { FixtureAdapter } from './fixture.ts'
 import { conversationId as defaultConversationId } from './config.ts'
 const phaseLabel: Record<WorkView['phase'], string> = {
@@ -157,6 +160,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [conversationTitle, setConversationTitle] = useState('主对话')
   const [catalogAvailable, setCatalogAvailable] = useState(false)
   const [decisionSource, setDecisionSource] = useState<ConversationMessage | null>()
+  const [proposalSource, setProposalSource] = useState<ConversationMessage | null>()
   const conversationDrafts = useRef(new Map<string, string>())
   const [assistant, setAssistant] = useState<AssistantProviderStatus | undefined>()
   const [waitingAfter, setWaitingAfter] = useState<number | undefined>()
@@ -749,6 +753,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             <CircleHelp size={18} />
           </a>
           {configuration?.decisionsAvailable && transport.decisions && transport.prepareDecision && transport.decisionCommand && <button type="button" className="icon-button" title="项目决定" aria-label="项目决定" onClick={() => setDecisionSource(null)}><Bookmark size={18} /></button>}
+          {configuration?.proposalsAvailable && transport.prepareProposal && transport.proposalCommand && <button type="button" className="icon-button" title="创建提案" aria-label="创建提案" onClick={() => setProposalSource(null)}><FileCheck2 size={18} /></button>}
           <button
             type="button"
             className="icon-button secondary-tool"
@@ -1054,6 +1059,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               onDecisions={() => openView('decisions')}
               onRecordDecision={configuration?.decisionsAvailable && transport.prepareDecision && transport.decisionCommand && transport.decisions
                 ? message => setDecisionSource(message) : undefined}
+              onPropose={configuration?.proposalsAvailable && transport.prepareProposal && transport.proposalCommand
+                ? message => setProposalSource(message) : undefined}
               onSend={async (text, useWorkContext) => {
                 const command: UserCommand = {
                   commandId: newId('cmd-chat'),
@@ -1223,6 +1230,12 @@ export function App({ transport }: { transport: ConsoleTransport }) {
         <DecisionWorkspace transport={transport} configuration={configuration} source={decisionSource ?? undefined}
           sources={snapshot?.conversation?.messages ?? []} initialProjectId={decisionSource?.projectId ?? projectFilter ?? configuration.projects[0]!.id}
           onClose={() => setDecisionSource(undefined)} />}
+      {auth === 'ready' && proposalSource !== undefined && configuration?.proposalsAvailable && configuration.projects.length > 0 &&
+        <ProposalWorkspace transport={transport} configuration={configuration} source={proposalSource ?? undefined}
+          sources={snapshot?.conversation?.messages ?? []} works={snapshot?.works ?? []}
+          initialProjectId={proposalSource?.projectId ?? projectFilter ?? configuration.projects[0]!.id}
+          onClose={() => setProposalSource(undefined)} onRecorded={async () => { await refresh() }}
+          onOpenWork={id => { setProposalSource(undefined); setSelectedWorkId(id); setInspectorOpen(true); setWorkspaceOpen(false); setModelPanelOpen(false) }} />}
     </div>
   )
 }
@@ -1603,14 +1616,6 @@ function Artifacts({
       )}
     </div>
   )
-}
-
-const blockedLabel = (reason?: string): string => {
-  if (reason === 'stale_contract') return '项目授权已过期'
-  if (reason === 'unsupported_capability') return '执行器不可调度'
-  if (reason === 'auth_required') return '需要重新认证'
-  if (reason === 'budget_exceeded') return '预算或会话受限'
-  return reason ? `暂不可调度（${reason}）` : '暂不可调度'
 }
 
 function ProjectImportForm({
@@ -1995,6 +2000,7 @@ function Conversation({
   onInspectWork,
   onDecisions,
   onRecordDecision,
+  onPropose,
   pending,
   offline,
   assistant,
@@ -2017,6 +2023,7 @@ function Conversation({
   onInspectWork: () => void
   onDecisions: () => void
   onRecordDecision: ((message: ConversationMessage) => void) | undefined
+  onPropose: ((message: ConversationMessage) => void) | undefined
   pending: boolean
   offline: boolean
   assistant: AssistantProviderStatus | undefined
@@ -2120,6 +2127,8 @@ function Conversation({
                 })}
               </time>
               {message.provenance === 'reasoner_reply' && <ReplyActions text={message.text} />}
+              {message.role === 'user' && message.provenance === 'trusted_user' && message.projectId && onPropose &&
+                <button type="button" className="icon-button message-proposal" title="转为提案" aria-label="转为提案" onClick={() => onPropose(message)}><FileCheck2 size={14} /></button>}
               {message.role === 'user' && message.provenance === 'trusted_user' && message.projectId && onRecordDecision &&
                 <button type="button" className="icon-button message-decision" title="记录为项目决定" aria-label="记录为项目决定" onClick={() => onRecordDecision(message)}><Bookmark size={14} /></button>}
             </header>
