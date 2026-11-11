@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-11T08:44:24.398Z",
+  "checkedAt": "2026-11-11T11:20:01.542Z",
   "source": {
-    "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
+    "commit": "4c38bd6d55523e42c2beaf59ee96cfa5e02d86be",
     "dirty": false
   },
-  "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
+  "expectedSource": "4c38bd6d55523e42c2beaf59ee96cfa5e02d86be",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -501,6 +501,11 @@
       "status": "PASS"
     },
     {
+      "id": "E3-PROPOSAL-UI",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E3-DESKTOP-GEOMETRY",
       "required": true,
       "status": "PASS"
@@ -666,7 +671,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-11T08:42:22.250Z",
+    "decidedAt": "2026-11-11T11:18:20.039Z",
     "failureCodes": []
   },
   "notes": [

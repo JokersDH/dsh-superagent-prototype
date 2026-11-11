@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
+    "commit": "4c38bd6d55523e42c2beaf59ee96cfa5e02d86be",
     "dirty": false
   },
   "environment": {
@@ -11,14 +11,14 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-11T08:42:22.239Z",
+  "checkedAt": "2026-11-11T11:18:20.021Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 125,
+    "PASS": 126,
     "FAIL": 0,
     "SKIPPED": 0,
     "NOT_TESTED": 15,
@@ -559,13 +559,14 @@
     },
     {
       "id": "two-binary-upgrade",
-      "capability": "显式 baseline/target 两个真实二进制的升级与拒绝不兼容回退",
+      "capability": "D 托管 upgrade/rollback-install 与显式 baseline/target 字节",
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
       "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
+        "E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口与 launcher 死/API 活守卫本轮未稳定执行，保持 NOT_TESTED。",
         "升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。"
       ],
       "evidence": [
@@ -594,22 +595,35 @@
       "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "网页确认入口与 context 预览未发布；source/grant 漂移与 outer receipt 失败注入未执行。"
+        "source/grant 漂移与 outer receipt 失败注入未在 HTTP 层单独执行；网页层由 E3-PROPOSAL-UI 覆盖。"
       ],
       "evidence": [
         "E3-PROPOSAL-HTTP"
       ]
     },
     {
-      "id": "proposal-ui-context",
-      "capability": "提案网页确认与上下文窗口",
+      "id": "proposal-ui",
+      "capability": "提案网页预览/确认/拒绝与响应丢失重放",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E3-PROPOSAL-UI"
+      ]
+    },
+    {
+      "id": "context-window",
+      "capability": "上下文来源/窗口/授权预览",
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
       "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "console 无提案/上下文入口；E3-PROPOSAL-UI、E3-CONTEXT-GRANT-BOUNDARY 记录了所需输入与授权反例。"
+        "main 仍无 context preview/read 入口；E3-CONTEXT-GRANT-BOUNDARY 记录了 expired/purpose/budget 反例与所需输入。"
       ],
       "evidence": []
     },

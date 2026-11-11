@@ -223,7 +223,7 @@ export async function runRecoveryPreflight({ root, runDirectory, keep = false })
           'No target state is prepared by the current build, so half-prepared targets and activation pointer switches cannot be executed without inventing a private protocol.',
         ],
       },
-      'NOT_TESTED: main has no recovery commit/activation entry. Required inputs: source-committed activation fact, prepared target identity/bytes, activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority.',
+      'NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation.',
     ),
   )
 

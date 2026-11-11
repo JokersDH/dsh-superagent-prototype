@@ -277,12 +277,17 @@ const CAPABILITIES = [
     id: 'proposal-http',
     label: '结构化提案 prepare/confirm/reject（真实 HTTP/SQLite）',
     controlled: ['E3-PROPOSAL-HTTP'],
-    notTested: ['网页确认入口与 context 预览未发布；source/grant 漂移与 outer receipt 失败注入未执行。'],
+    notTested: ['source/grant 漂移与 outer receipt 失败注入未在 HTTP 层单独执行；网页层由 E3-PROPOSAL-UI 覆盖。'],
   },
   {
-    id: 'proposal-ui-context',
-    label: '提案网页确认与上下文窗口',
-    notTested: ['console 无提案/上下文入口；E3-PROPOSAL-UI、E3-CONTEXT-GRANT-BOUNDARY 记录了所需输入与授权反例。'],
+    id: 'proposal-ui',
+    label: '提案网页预览/确认/拒绝与响应丢失重放',
+    controlled: ['E3-PROPOSAL-UI'],
+  },
+  {
+    id: 'context-window',
+    label: '上下文来源/窗口/授权预览',
+    notTested: ['main 仍无 context preview/read 入口；E3-CONTEXT-GRANT-BOUNDARY 记录了 expired/purpose/budget 反例与所需输入。'],
   },
   {
     id: 'recovery-preflight',
@@ -399,7 +404,7 @@ const executionStatus = {
     .filter((row) => row.gaps.length > 0 || row.controlledFixture === 'NOT_TESTED')
     .map((row) => ({ id: row.id, gaps: row.gaps })),
   externalBlockers: [
-    { owner: 'main/C', detail: 'Proposal HTTP is verified; the console confirmation page and any context preview are still unpublished, and the C composer still fails expired/purpose/over-budget grant probes.' },
+    { owner: 'main/C', detail: 'Proposal HTTP and the console workbench are verified; a context preview/read entry is still unpublished, and the C composer still fails expired/purpose/over-budget grant probes.' },
     { owner: 'main', detail: 'Migration ownership and review Work/Ticket/Assignment publication remain outside current main, so E3-REVIEW-PIPELINE stays NOT_TESTED.' },
     { owner: 'D', detail: 'Target 9120a5ed passes byte-for-byte and fixes the config-root initialization; any newer target must be named with its own tar/source/build/schema and independently re-tested rather than inheriting this verdict.' },
     { owner: 'B', detail: 'Native ledger/results are not supplied as input and E has no budget, so actual-native and native control evidence are absent.' },
@@ -479,7 +484,7 @@ ${rows
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **PASS（仅所测 baseline→target 组合）**：cold install/config root/doctor、模式保持、备份恢复、显式升级、旧二进制 schema 拒绝与未知 PID 阻断 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK；旧 baseline 的 config-root 失败仅作历史，旧组合结果不映射到 target。 |
+| 安装准入（个人 Alpha） | **PASS（仅所测 baseline→target tuple）**：cold install/config root/doctor、模式保持、备份恢复、D 托管 upgrade、升级后新数据、binary-only rollback 与未知 PID 阻断 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK；同 schema 下 schema 拒绝不适用；崩溃窗口 E4-UPGRADE-FAULTS 仍 NOT_TESTED。 |
 
 安装物身份（显式 baseline/target tuple）：baseline \`wave06-alpha2-7e8f6ce6\` / buildId \`7e8f6ce6fa2e2633\` / schema 13 / tar \`0fe0ed53…c7631\` / source \`e10bfdb7\`（clean）；target \`wave08-target-cd0ecc29\` / buildId \`cd0ecc29d97d5c41\` / schema 13 / tar \`64bbe285…3d42\` / source \`9b75c2a1\`（clean）。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立；旧 dirty12→13 组合保留为历史。
 
