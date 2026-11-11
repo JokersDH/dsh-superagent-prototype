@@ -5,8 +5,17 @@
   "mergeCommit": "6bff83c",
   "checkpointCommit": "1e2a82f",
   "updatedAt": "2026-11-11T06:50:00.000Z",
-  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
-  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "ownedPaths": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge",
+    "packages/routing"
+  ],
+  "nativeModelBudget": {
+    "allowed": 0,
+    "used": 0,
+    "unknownSends": 0
+  },
   "supersedes": "packages/context/reports/wave06-status.json and wave06-consumer-status.json for new-state decisions; historical files retained unchanged",
   "phases": [
     {
@@ -49,7 +58,9 @@
         "packages/proposals/src/command-plan.ts",
         "packages/proposals/test/confirm-with-command.case.ts"
       ],
-      "results": { "proposalTests": "30/30" },
+      "results": {
+        "proposalTests": "30/30"
+      },
       "note": "confirmWithCommand validates plan input before confirming (needs_user_input keeps pending), confirms with the main-owned effectCommandId, and returns the existing UserCommand for same-transaction dispatch. Reply has no effect; duplicate confirmation replays one command; another command id conflicts."
     },
     {
@@ -61,7 +72,9 @@
         "packages/knowledge/test/main-consumer.case.ts",
         "packages/knowledge/src/context-provider.ts"
       ],
-      "results": { "knowledgeTests": "61/61" },
+      "results": {
+        "knowledgeTests": "61/61"
+      },
       "note": "Real SQLite lifecycle: reject is a distinct terminal state (never a command), revoke keeps audit but leaves effective knowledge, source-digest drift blocks commit with no row, mid-transaction receipt failure rolls back proposal+decision+event+receipt, supersede-then-revoke never reactivates the original, reopen keeps statuses. decisionContextProvider exposes effective-only decisions with scan_incomplete propagation."
     },
     {
@@ -118,7 +131,11 @@
   "dependencyRequests": [
     {
       "package": "packages/routing",
-      "added": ["@personal-agent/storage (dev)", "@personal-agent/workflows (dev)", "@types/better-sqlite3 (dev)"],
+      "added": [
+        "@personal-agent/storage (dev)",
+        "@personal-agent/workflows (dev)",
+        "@types/better-sqlite3 (dev)"
+      ],
       "reason": "Real SQLite routing-evidence verification (unchanged from wave-06).",
       "rootLock": "pnpm-lock.yaml diff uncommitted; main owns the authoritative lock."
     }
@@ -150,5 +167,6 @@
     "Wire proposal confirmation through confirmWithCommand inside one UnitOfWork; dispatch the returned UserCommand in the same transaction and write the receipt/event.",
     "Use decisionContextProvider for effective decisions; surface ContextError('scan_incomplete') as an explicit unavailable state, never as empty knowledge.",
     "Re-run main-owned decision/routing integration tests against this branch (8/8 and 2/2 locally)."
-  ]
+  ],
+  "latestDeliveryCommit": "0179889"
 }
