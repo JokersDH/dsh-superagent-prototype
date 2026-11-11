@@ -68,6 +68,58 @@ test('an empty current-schema target inventories completely and is never a start
   } finally { rmSync(root, { recursive: true, force: true }) }
 })
 
+test('a real ProductStore-initialized target stays complete across close and reopen', () => {
+  const root = tmp('target-new-')
+  try {
+    writeFileSync(join(root, 'restore-report.json'), '{"protocol":"personal-restore/1"}\n')
+    writeFileSync(join(root, 'manifest.json'), '{"source":"new"}\n')
+    const db = join(root, 'state.sqlite')
+    const created = new ProductStore({ path: db })
+    created.close()
+    const before = directoryBytes(root)
+    const first = recoveryTargetInventory.inspect(root)
+    assert.deepEqual(directoryBytes(root), before, 'the first inventory does not write the new target')
+    assert.equal(first.completeness, 'complete')
+    assert.equal(first.productSchema, PRODUCT_SCHEMA_VERSION)
+    assert.equal(first.databaseDigest, recoveryTargetInventory.inspect(root).databaseDigest)
+    const names = first.tables.map(table => table.name).sort()
+    const reopened = new ProductStore({ path: db })
+    reopened.close()
+    const second = recoveryTargetInventory.inspect(root)
+    assert.equal(second.completeness, 'complete')
+    assert.deepEqual(second.tables.map(table => table.name).sort(), names, 'reopen does not add or drop tables')
+    assert.equal(second.tables.find(table => table.name === 'assistant_context_bindings')?.category, 'business')
+    const bindings = second.tables.find(table => table.name === 'assistant_context_bindings')
+    assert.equal(bindings?.rows, 0, 'a brand-new target has no copied bindings or business rows')
+    assert.equal(second.startupAvailable, false)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})
+
+test('a manifest-only target and a half-applied schema are unsupported, never empty', () => {
+  const manifestOnly = tmp('target-manifest-only-')
+  try {
+    writeFileSync(join(manifestOnly, 'restore-report.json'), '{"protocol":"personal-restore/1"}\n')
+    const inventory = recoveryTargetInventory.inspect(manifestOnly)
+    assert.equal(inventory.completeness, 'unsupported')
+    assert.equal(inventory.issues.includes('missing_database'), true)
+    assert.equal(inventory.databaseDigest, null)
+  } finally { rmSync(manifestOnly, { recursive: true, force: true }) }
+
+  const half = tmp('target-half-init-')
+  try {
+    const db = new Database(join(half, 'state.sqlite'))
+    applyMigrations(db, { registry: MIGRATIONS.slice(0, 10) })
+    db.prepare("UPDATE schema_meta SET value = ? WHERE key = 'product_schema'").run(String(PRODUCT_SCHEMA_VERSION))
+    db.close()
+    const before = directoryBytes(half)
+    const inventory = recoveryTargetInventory.inspect(half)
+    assert.equal(inventory.productSchema, PRODUCT_SCHEMA_VERSION)
+    assert.equal(inventory.issues.includes('unsupported_schema'), true)
+    assert.equal(inventory.completeness, 'unsupported')
+    assert.deepEqual(directoryBytes(half), before, 'an incomplete schema is not migrated by inspection')
+  } finally { rmSync(half, { recursive: true, force: true }) }
+})
+
 test('business rows are reported but never become startup authority', () => {
   const { root, db } = emptyTarget()
   try {
