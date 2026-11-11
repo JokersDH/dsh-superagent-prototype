@@ -136,6 +136,7 @@ export {
 } from './workflows.ts'
 export { AssistantState, type LegacyDecisionRecord } from './assistant-state.ts'
 export { RoutingEvidence, type RoutingEvidenceSources } from './routing-evidence.ts'
+export { AcceptanceOutcomeProjection, type AcceptanceProjectionInput, type AcceptanceProjectionResult } from './acceptance-outcome.ts'
 export { ArtifactStore, ensureArtifactRoot, artifactRoot, stateDirOf, type ArtifactRecord, type WrittenArtifact, type GcResult } from './artifacts.ts'
 export {
   RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict, AuthorityConflict,
