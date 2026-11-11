@@ -750,7 +750,7 @@ class LocalApplication implements ProductApplication {
             .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))
             .slice(0, query.limit ?? 200)
       const visible = new Set(works.map((work) => work.id))
-      const questions = this.store.product.questions.listOpen({ limit: 200 }).filter(
+      const questions = this.store.product.questions.listOpen({ limit: 200, ...(query.workId ? { workId: query.workId } : {}) }).filter(
         (question) =>
           visible.has(question.contract.workId) &&
           this.authorizedContract(question.contract) &&

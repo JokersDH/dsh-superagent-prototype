@@ -12,6 +12,7 @@ import { ConversationSummarySchema, ConversationCatalogQuerySchema, Conversation
 import { ProjectSettingsVersionSchema, ProjectSettingsPageSchema, ProjectSettingsCommandSchema } from '../src/project-settings.ts';
 import { ExecutionProfileRefSchema, ReviewSubjectSchema, ReviewReportSchema, RouteAdviceSchema, ReviewEvidenceSchema, ExecutionOutcomeSchema } from '../src/routing-review.ts';
 import { ReviewTimingSchema, ReviewActivitySchema } from '../src/review-timing.ts';
+import { AttentionItemSchema, AttentionPageSchema, AttentionQuerySchema, AttentionRankSchema } from '../src/attention.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -62,6 +63,9 @@ outputs.set('generated/routing-review.manifest.json', canonical({ protocol: 'rou
 const reviewTimingText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:review-timing:1', $defs: { ReviewTiming: z.toJSONSchema(ReviewTimingSchema, { target: 'draft-2020-12', io: 'input' }), ReviewActivity: z.toJSONSchema(ReviewActivitySchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/review-timing.schema.json', reviewTimingText);
 outputs.set('generated/review-timing.manifest.json', canonical({ protocol: 'review-timing/1', schemaHash: digest(reviewTimingText), sourceHash: digest(readFileSync(resolve(root, 'src/review-timing.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const attentionText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:attention-inbox:1', $defs: { AttentionItem: z.toJSONSchema(AttentionItemSchema, { target: 'draft-2020-12', io: 'input' }), AttentionRank: z.toJSONSchema(AttentionRankSchema, { target: 'draft-2020-12', io: 'input' }), AttentionPage: z.toJSONSchema(AttentionPageSchema, { target: 'draft-2020-12', io: 'input' }), AttentionQuery: z.toJSONSchema(AttentionQuerySchema, { target: 'draft-2020-12', io: 'input' }) } });
+outputs.set('generated/attention.schema.json', attentionText);
+outputs.set('generated/attention.manifest.json', canonical({ protocol: 'attention-inbox/1', schemaHash: digest(attentionText), sourceHash: digest(readFileSync(resolve(root, 'src/attention.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [path, content] of outputs) {
   const target = resolve(root, path);
   if (check) {

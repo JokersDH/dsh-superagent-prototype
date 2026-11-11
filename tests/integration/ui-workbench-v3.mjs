@@ -5,9 +5,9 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 
-const { values } = parseArgs({ options: { url: { type: 'string', default: 'http://127.0.0.1:5192' }, capture: { type: 'boolean', default: false } } })
+const { values } = parseArgs({ options: { url: { type: 'string', default: 'http://127.0.0.1:5192' }, capture: { type: 'boolean', default: false }, output: { type: 'string' } } })
 const { chromium } = createRequire(new URL('../../apps/console/package.json', import.meta.url))('@playwright/test')
-const output = resolve('reports/releases/ui-wave-03'), captures = resolve('apps/console/.impeccable/review')
+const output = resolve(values.output ?? 'reports/releases/ui-wave-03'), captures = resolve('apps/console/.impeccable/review')
 mkdirSync(output, { recursive: true })
 mkdirSync(captures, { recursive: true })
 const browser = await chromium.launch(), context = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'zh-CN', reducedMotion: 'reduce' })

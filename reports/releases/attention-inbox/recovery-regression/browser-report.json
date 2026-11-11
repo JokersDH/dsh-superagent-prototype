@@ -1,0 +1,31 @@
+{
+  "status": "PASS_CONTROLLED_VERIFICATION_RECOVERY_BROWSER",
+  "sourceCommit": "e937dbed5e06b7bcf68b1cd7121d2a4bf2436e03",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-10T12:58:30.535Z",
+  "cases": [
+    {
+      "id": "CREATE-AND-EXPOSE-PERSISTED-VERIFICATION-BLOCK",
+      "status": "PASS"
+    },
+    {
+      "id": "BLOCK-SURVIVES-RELOAD-AND-FITS-NARROW-DETAIL",
+      "status": "PASS"
+    },
+    {
+      "id": "RECHECK-VERIFIES-SAME-WRITER-AND-DELIVERS",
+      "status": "PASS"
+    },
+    {
+      "id": "FAILED-ACTIVITY-TRANSPORT-DOES-NOT-BLOCK-ACCEPTANCE",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "limitations": [
+    "Actual local HTTP/SQLite and controlled child; no native/model compatibility claim",
+    "Fault injected on the isolated completion port; no production fault-injection endpoint",
+    "Focused visible candidate detail is a partial activity proxy, not actual human thinking time"
+  ]
+}
