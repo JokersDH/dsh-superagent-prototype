@@ -3,17 +3,20 @@
   "createdBy": "agent-d",
   "branch": "codex/g3-local-distribution",
   "source": {
-    "mainBase": "82db295",
-    "mergeCommit": "0a84aa5",
+    "mainBase": "d4d51ae (WP-16/0024 -> 0025)",
+    "mergeCommit": "e10bfdb",
     "wave05Candidate": "809a957",
-    "dHeadAtCheckpoint": "0a84aa5489c4df85b09525a300186e91379e1bf4"
+    "dHeadAtCheckpoint": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389"
   },
   "checkpoint": {
     "installSummary": "tools/distribution/reports/wave06/install-summary.json",
     "emptyState": "tools/distribution/reports/wave06/checkpoint-install-doctor.json",
-    "installBuildId": "539f5a4dd277f684",
-    "installManifestSha256": "0224facd12d5f2c99420720fd7d9da5167648ea360c5ba1d694b0143f6d63746",
-    "releaseManifestSha256": "b3fa38c8e00cf6222b1bbf025b4b104ef88070f06b873f14494d81e8e208ca45"
+    "installBuildId": "7e8f6ce6fa2e2633",
+    "installManifestSha256": "09041204af46dca6810a070b4f2cba9895f07e2a56776ec8472af96ef785b548",
+    "releaseManifestSha256": "749ed6b304e6cfe782ae50987b94fa29cfa49c85e3d884b126485f546b8eb87e",
+    "tarSha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+    "sourceCommit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+    "sourceDirty": false
   },
   "wave05Candidate": {
     "commit": "809a957",
@@ -34,59 +37,43 @@
       "consoleAttentionAssetIncluded": true
     },
     "recovery": {
-      "authoritativeStartupModeGate": true,
-      "readonlyRejectsBusinessPosts": true,
-      "inspectPrepareCommitInterface": "ABSENT (PLANNED)",
-      "evidence": [
-        "apps/coordinator/http/app.ts:267-268 read-only gate rejects business POSTs before recovery authorization",
-        "apps/coordinator/http/app.ts routes list contains no /v1/recovery/inspect|prepare|commit (PLANNED, WP-16/0023 §6)"
-      ],
-      "routes": [
-        "get /v1/health",
-        "post /v1/session",
-        "get /v1/session",
-        "get /v1/configuration",
-        "get /v1/attention",
-        "get /v1/conversations",
-        "get /v1/conversations/:id",
-        "post /v1/conversations/commands",
-        "get /v1/assistant",
-        "post /v1/projects",
-        "get /v1/projects/:id/settings",
-        "post /v1/projects/:id/settings",
-        "get /v1/works/:id/location",
-        "get /v1/guide",
-        "get /v1/works/:id/environment",
-        "get /v1/works/:id/verification",
-        "post /v1/works/:id/verification/retry",
-        "post /v1/works/:id/review-activity",
-        "get /v1/assistant/stream",
-        "post /v1/assistant/model",
-        "delete /v1/session",
-        "post /v1/commands",
-        "get /v1/snapshot",
-        "get /v1/works/:id",
-        "get /v1/conversations/:id/messages",
-        "get /v1/events",
-        "get /v1/questions/:id/deliveries",
-        "get /v1/verifications/:id",
-        "get /v1/artifacts/:id"
+      "readonlyGate": true,
+      "inspect": "GET /v1/recovery/inspect (implemented, WP-16/0025 §3)",
+      "prepare": "POST /v1/recovery/prepare (implemented, read-only, authorization=not_granted, commitAvailable=false)",
+      "commit": "ABSENT (WP-16/0025 §4)",
+      "dConsumption": [
+        "pa recovery-inspect",
+        "pa recovery-prepare",
+        "pa recovery-status"
       ]
     },
-    "routes": []
+    "routes": [],
+    "decisions": {
+      "prepare": "POST /v1/decisions/prepare",
+      "commands": "POST /v1/decisions/commands",
+      "query": "GET /v1/decisions",
+      "ui": "decision record/revoke workbench",
+      "note": "D does not drive decisions; install must serve the UI that consumes them."
+    },
+    "acceptedOutcome": {
+      "projection": "A AcceptanceOutcomeProjection via main acceptance transaction",
+      "worksEvidence": "GET /v1/works/:id/evidence"
+    }
   },
   "aPorts": {
-    "schemaVersion": 12,
+    "schemaVersion": 13,
     "exported": [
+      "RoutingEvidence (route_advice/review_evidence/execution_outcome, append-only)",
+      "readRoutingArtifactRefs",
+      "readArtifactRegistry",
       "backupDatabase",
       "verifyDatabase",
-      "readArtifactRegistry",
-      "WorkflowSnapshots (packages/workflows)",
-      "WorkflowIndex/ProductProjects/ProductDecisions/AssistantState via ProductStore"
+      "WorkflowSnapshots",
+      "ProductStore/WorkflowIndex/ProductDecisions/AssistantState"
     ],
-    "v13EvidencePersistenceInMain": false,
-    "routingEvidencePersistenceInMain": false,
-    "note": "A wave-06 v13/attendance evidence is not in this main; bundle evidence covers the actual schema-12 public read surface and marks routing/outcome classes unavailable."
+    "v13EvidencePersistenceInMain": true,
+    "routingEvidencePersistenceInMain": true,
+    "note": "A v13 tables and ports are in this main; D reads them through the public RoutingEvidence port on a read-only snapshot and records missing review artifacts as a hard failure."
   },
   "bExecutor": {
     "admittedAuthorEvidence": "reports/releases/native-mvp/native-product.json",
@@ -200,29 +187,23 @@
   },
   "integrationGaps": [
     {
-      "id": "A-WAVE06-EVIDENCE",
-      "owner": "A",
-      "status": "NOT_IN_MAIN",
-      "requiredInput": "A v13 evidence persistence + public read/consumption port (routing advice/review/outcome, ReviewTiming projection) integrated into main."
-    },
-    {
-      "id": "MAIN-RECOVERY-AUTHORIZATION",
+      "id": "MAIN-RECOVERY-COMMIT",
       "owner": "main",
       "status": "PLANNED",
-      "requiredInput": "inspect/prepare/commit public interface with plan TTL, fingerprint/version, idempotent receipt and transactional authorization per WP-16/0023 §6."
+      "requiredInput": "authorization+receipt+state transition as one replayable boundary; old-queue isolation and physical resource proof"
     },
     {
       "id": "B-EXECUTOR-CAPABILITY",
       "owner": "B/main",
       "status": "NOT_IN_MAIN",
-      "requiredInput": "machine-readable executor capability/admission input (author/reviewer, session/checkpoint/usage bounds) without secrets."
+      "requiredInput": "machine-readable executor capability/session declared without secrets"
     },
     {
       "id": "E-INDEPENDENT-ACCEPTANCE",
       "owner": "E",
       "status": "PENDING",
-      "requiredInput": "same frozen install artifact + independent negative/installation acceptance from E-owned tests."
+      "requiredInput": "independent re-run of the frozen artifact tar from an E-owned root"
     }
   ],
-  "nextConsumer": "main/E: empty-state install/doctor recipe is runnable from the recorded install summary; recovery authorization step stays BLOCKED until the main interface checkpoint."
+  "nextConsumer": "main/E: run tools/distribution/verify-artifact.mjs --tar <frozen tar>; recovery inspect/prepare are consumable now, commit stays BLOCKED."
 }

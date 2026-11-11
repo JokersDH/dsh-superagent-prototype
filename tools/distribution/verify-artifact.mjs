@@ -7,7 +7,7 @@
  */
 import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdtempSync, openSync, closeSync, readFileSync, realpathSync, rmSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, openSync, closeSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -42,6 +42,7 @@ const run = (binary, args, options = {}) => {
 try {
   if (!existsSync(tarPath)) throw new Error('artifact tar is missing')
   const tarSha = createHash('sha256').update(readFileSync(tarPath)).digest('hex')
+  const sha256File = (path) => createHash('sha256').update(readFileSync(path)).digest('hex')
   const extract = run('tar', ['-xzf', tarPath, '-C', root], { allowExit: [0] })
   const installDir = join(root, 'install')
   if (!existsSync(join(installDir, 'bin', 'pa'))) throw new Error('extracted artifact has no bin/pa')
@@ -139,6 +140,44 @@ try {
     await new Promise((resolveWait) => setTimeout(resolveWait, 100))
   }
   if (restoredHealth?.startupMode !== 'recovery_readonly') throw new Error('restored artifact instance was not read-only')
+
+  // D4: the artifact must consume main's recovery inspect/prepare, and neither may write.
+  const restoredDb = join(restored, 'state.sqlite')
+  const markerPath = join(restored, 'restore-report.json')
+  const beforeDb = sha256File(restoredDb)
+  const beforeMarker = readFileSync(markerPath)
+  const inspected = pa(['recovery-inspect', '--json', '--data-root', restored], { allowExit: [0] })
+  if (inspected.json?.startupMode !== 'recovery_readonly' || inspected.json?.authorization !== 'not_granted')
+    throw new Error(`artifact recovery-inspect did not report read-only + not_granted: ${JSON.stringify(inspected.json).slice(0, 300)}`)
+  if (typeof inspected.json?.inspectionFingerprint !== 'string' || inspected.json.inspectionFingerprint.length !== 64)
+    throw new Error('artifact recovery-inspect did not return an inspection fingerprint')
+  const sourceProject = inspected.json.projects?.[0]?.id
+  if (typeof sourceProject !== 'string') throw new Error('artifact recovery-inspect listed no project to bind')
+  const bindingRepo = join(root, 'artifact-binding-project')
+  mkdirSync(bindingRepo, { recursive: true })
+  writeFileSync(join(bindingRepo, 'index.mjs'), 'export const ok = true\n')
+  const git = (args) => spawnSync('git', args, { cwd: bindingRepo, encoding: 'utf8' })
+  git(['init', '-q']); git(['add', 'index.mjs'])
+  git(['-c', 'user.name=Artifact Acceptance', '-c', 'user.email=artifact@localhost', 'commit', '-qm', 'artifact binding base'])
+  const planned = pa(['recovery-prepare', '--json', '--source-project', sourceProject, '--path', bindingRepo, '--data-root', restored], { allowExit: [1, 2] })
+  if (planned.json?.status === 'BLOCKED' && planned.json.code !== 'prepare_refused')
+    throw new Error(`artifact recovery-prepare failed unexpectedly: ${JSON.stringify(planned.json).slice(0, 300)}`)
+  if (planned.json?.authorization !== undefined && planned.json.authorization !== 'not_granted')
+    throw new Error('artifact recovery-prepare must not grant authorization')
+  if (planned.json?.commitAvailable === true) throw new Error('artifact recovery-prepare must not report commit availability')
+  if (planned.json?.applied === true) throw new Error('artifact recovery-prepare applied a plan')
+  if (sha256File(restoredDb) !== beforeDb) throw new Error('artifact recovery inspect/prepare wrote the restored database')
+  if (!readFileSync(markerPath).equals(beforeMarker)) throw new Error('artifact recovery inspect/prepare changed the restore marker')
+  step('artifact-recovery-preflight-readonly', 'PASS', {
+    startupMode: inspected.json.startupMode,
+    fingerprintPresent: true,
+    inspectAuthorization: inspected.json.authorization,
+    prepareAuthorization: planned.json.authorization ?? 'refused',
+    commitAvailable: planned.json.commitAvailable ?? false,
+    commitOwner: planned.json.commitRequirements?.owner ?? null,
+    databaseUnchanged: true,
+    markerUnchanged: true,
+  })
   const rejected = await fetch(`http://127.0.0.1:${restoreApi}/v1/commands`, {
     method: 'POST',
     headers: { connection: 'close', 'content-type': 'application/json', authorization: `Bearer ${readFileSync(join(restored, 'api.key'), 'utf8').trim()}` },

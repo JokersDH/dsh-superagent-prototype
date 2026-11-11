@@ -1,12 +1,12 @@
 {
-  "package": "product-wave-06 / D：个人 Alpha 发行、迁移与恢复消费整包",
+  "package": "product-wave-06 / D：个人 Alpha 发行、迁移与恢复消费整包（R2 收口）",
   "owner": "agent-d",
   "branch": "codex/g3-local-distribution",
   "baseCommit": "82db295",
-  "mergeCommit": "0a84aa5",
-  "sourceCommit": "0a84aa5489c4df85b09525a300186e91379e1bf4",
+  "mergedMain": "d4d51ae",
+  "sourceCommit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
   "status": "CANDIDATE",
-  "scopeNote": "Package-scoped candidate evidence; not main/E admission or personal Alpha. Cross-machine/ABI, personal native end-to-end and recovery new authorization are NOT_TESTED/BLOCKED.",
+  "scopeNote": "Package-scoped candidate evidence. Not main/E admission, not personal Alpha; recovery commit, cross-machine and native end-to-end stay NOT_TESTED/BLOCKED.",
   "ownedPaths": [
     "apps/launcher/",
     "tools/distribution/",
@@ -16,89 +16,73 @@
     "allocated": 0,
     "used": 0,
     "unknownNativeSends": 0,
-    "note": "Zero-model local probes only; no native executor task, session or provider call."
+    "note": "Zero-model local probes only; no native session or provider call."
   },
   "commits": {
     "wave05Final": "809a957",
     "wave06Checkpoint": "9046d4c",
-    "wave06Final": "see branch head"
+    "wave06FirstCandidate": "3bdc842",
+    "wave06R2Checkpoint": "e10bfdb",
+    "wave06R2Evidence": "next commit"
   },
-  "phases": {
-    "d1": {
-      "status": "PASS",
-      "summary": "Empty-state staged install built from merged main; first-run + doctor run inside the install; source/build/manifest identities and interface inventory recorded.",
-      "evidence": [
-        "tools/distribution/reports/wave06/interface-inventory.json",
-        "tools/distribution/reports/wave06/checkpoint-install-doctor.json"
-      ]
+  "installIdentity": {
+    "source": {
+      "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
     },
-    "d2": {
-      "status": "PASS_WITH_A_C_INTEGRATION_PENDING",
-      "summary": "Same-source staged closure from merged main includes the attention console/API; 6483 files, 20 workspace packages, 8 external dependency packages, entrypoints/supportMatrix; relocated closure starts with 527 runtime modules all inside install, 0 checkout references. Negative gates: port/agent/auth, same-size drift, console tamper, missing/broken/symlink artifact, future schema, active/unknown rollback.",
-      "evidence": [
-        "tools/distribution/reports/wave06/install-summary.json",
-        "tools/distribution/reports/wave06/zero-model-smoke.json"
-      ]
-    },
-    "d3": {
-      "status": "PASS_WITH_A_V13_PENDING",
-      "summary": "Bundle evidence covers readable public-port facts: project settings/policy snapshots, works/contracts/links, decisions, assistant state, artifact registry and main written application.candidate.accepted (candidate/actor/ReviewTiming/payload digest); restore re-reads every class and fails closed. A wave-06 v13 ExecutionOutcome/routing persistence is not in this main and is marked unavailable, not faked.",
-      "evidence": [
-        "packages/portability/test/evidence.case.ts",
-        "tools/distribution/reports/wave06/zero-model-smoke.json"
-      ]
-    },
-    "d4": {
-      "status": "BLOCKED",
-      "summary": "main recovery inspect/prepare/commit interface is PLANNED in WP-16/0023 and absent from merged main. D ships a read-only local recovery-status that reports recovery_readonly/marker/pending rebind and BLOCKED owner=main, plus the exact required inputs; it does not guess HTTP shapes, delete markers, add force switches or replay old queues.",
-      "evidence": [
-        "tools/distribution/reports/wave06/recovery-authorization-blocker.json"
-      ],
-      "blockedBy": "main RECOVERY-AUTHORIZATION"
-    },
-    "d5": {
-      "status": "PASS_WITH_MAIN_BLOCKED_AUTH",
-      "summary": "Ordinary path covered by 48-step smoke and a separate 6-step upgrade/rollback proof (two build identities, pre-upgrade backup, new-build start, post-upgrade data, rollback restores original project/work/artifact/evidence digest and removes the post-upgrade revision, new build starts again).",
-      "evidence": [
-        "tools/distribution/reports/wave06/upgrade-rollback.json",
-        "tools/distribution/reports/wave06/zero-model-smoke.json"
-      ]
-    },
-    "d6": {
-      "status": "PASS_WITH_E_PENDING",
-      "summary": "Frozen install artifact produced outside Git with tar/install/release/closure digests and independent acceptance from a fresh extraction: doctor gates, start/workbench, coordinator entry + native binding provenance from extracted install, backup/evidence, restore read-only + blocked authorization. E independent re-run pending.",
-      "evidence": [
-        "tools/distribution/reports/wave06/install-artifact.json",
-        "tools/distribution/reports/wave06/artifact-acceptance.json"
-      ]
-    }
-  },
-  "artifact": {
-    "buildId": "d4eb3a13f4904d2d",
-    "installDirectory": "/Users/hh/Desktop/joker/pa-artifacts/wave06-final/install",
-    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-final/wave06-alpha-d4eb3a13.tar.gz",
-    "tarSha256": "8b7675bafa7cded2c9c0656655abca3ff21721d52c3dc4f573a667d93f81f122",
-    "tarBytes": 19762194,
-    "installManifestSha256": "c98cda403c7f8e3343474fc70a96c2b7e022559fd748482801219f2750ac768c",
-    "releaseManifestSha256": "a9852c5eb1ec49e7d814fc6a61877fc6525f8cf3b6411da86c4edf83b1a491c8",
-    "closureDigest": "a815fb1e84e056f20be319390919a759e8296c3669cff88dee7298f0acf3d5b2",
+    "buildId": "7e8f6ce6fa2e2633",
+    "dirty": false,
+    "installDirectory": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/install",
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+    "tarSha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+    "tarBytes": 19911757,
+    "installManifestSha256": "09041204af46dca6810a070b4f2cba9895f07e2a56776ec8472af96ef785b548",
+    "releaseManifestSha256": "749ed6b304e6cfe782ae50987b94fa29cfa49c85e3d884b126485f546b8eb87e",
+    "closureDigest": "55069a730c6954261da765fc5dceadf78df2697f3348d4a99f64782e630e2966",
     "files": {
-      "count": 6483,
-      "bytes": 65517073
+      "count": 6603,
+      "bytes": 66153443
     },
-    "platform": "darwin/arm64",
-    "node": "24.21.0",
-    "sqliteAbi": "137",
+    "workspacePackages": 21,
     "dependencies": [
-      "@hono/node-server",
-      "better-sqlite3",
-      "hono",
-      "node-addon-api",
-      "openai",
-      "semver",
-      "yaml",
-      "zod"
+      {
+        "name": "@hono/node-server",
+        "version": "2.1.6"
+      },
+      {
+        "name": "better-sqlite3",
+        "version": "13.0.3"
+      },
+      {
+        "name": "hono",
+        "version": "4.13.17"
+      },
+      {
+        "name": "node-addon-api",
+        "version": "8.9.2"
+      },
+      {
+        "name": "openai",
+        "version": "7.53.0"
+      },
+      {
+        "name": "semver",
+        "version": "7.8.5"
+      },
+      {
+        "name": "yaml",
+        "version": "2.9.1"
+      },
+      {
+        "name": "zod",
+        "version": "4.4.3"
+      }
     ],
+    "platform": "darwin/arm64",
+    "node": "24.21.x",
+    "sqlite": "3.53.4",
+    "abi": "137",
     "supportMatrix": {
       "measured": [
         "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
@@ -114,14 +98,63 @@
         "other machines",
         "personal native execution"
       ]
+    }
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Interface inventory refreshed against WP-16/0024/0025: schema 13, A routing/outcome ports, decision HTTP/UI, shared ranker, acceptance projection, recovery inspect/prepare; B executor capability still absent.",
+      "evidence": [
+        "tools/distribution/reports/wave06/interface-inventory.json"
+      ]
     },
-    "recipe": "tools/distribution/reports/wave06/install-artifact.json + docs/rfcs/WP-12/0002 §10"
+    "d2": {
+      "status": "PASS",
+      "summary": "Clean-commit relocatable closure (6603 files, 21 workspace packages, 8 dependencies) starts with NODE_DEBUG showing 527 modules all inside the install and 0 checkout references; runtime package list now covers workflows/context/proposals/knowledge/routing so a staged start cannot silently miss an imported package.",
+      "evidence": [
+        "tools/distribution/reports/wave06/install-summary.json",
+        "tools/distribution/reports/wave06/zero-model-smoke.json"
+      ]
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Evidence format 2 reads A v13 route/review/outcome records through the public RoutingEvidence port plus main acceptance events; review-referenced artifacts are required (missing/symlink/non-regular fails the bundle); restore re-reads every class and fails closed; legacy schema-12 bundles verify recorded classes only and must migrate to empty routing tables.",
+      "evidence": [
+        "packages/portability/test/evidence.case.ts",
+        "tools/distribution/reports/wave06/zero-model-smoke.json"
+      ]
+    },
+    "d4": {
+      "status": "PARTIAL_BLOCKED_COMMIT",
+      "summary": "Consumes main GET /v1/recovery/inspect and POST /v1/recovery/prepare through pa recovery-inspect/prepare: fingerprint, held queue, plan with distinct proposedProjectId, authorization=not_granted, commitAvailable=false; database bytes, marker, queue and project registry unchanged; missing path refused. POST /v1/recovery/commit does not exist yet, so new authorization stays BLOCKED with the exact required inputs published.",
+      "evidence": [
+        "tools/distribution/reports/wave06/recovery-authorization-blocker.json",
+        "tools/distribution/reports/wave06/artifact-acceptance.json"
+      ],
+      "blockedBy": "main RECOVERY-COMMIT"
+    },
+    "d5": {
+      "status": "PASS_WITH_BINARY_MIGRATION_NOT_TESTED",
+      "summary": "Ordinary path 49-step smoke PASS. Upgrade/rollback split into three claims: same-source rebuild data round-trip (explicitly not migration), real schema-12 -> schema-13 data upgrade preserving project/work/artifact with empty routing tables, and real schema-13 -> schema-12 downgrade refusal with unchanged state bytes. Binary cross-version replacement is NOT_TESTED.",
+      "evidence": [
+        "tools/distribution/reports/wave06/upgrade-rollback.json",
+        "tools/distribution/reports/wave06/zero-model-smoke.json"
+      ]
+    },
+    "d6": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Frozen same-byte artifact produced from the clean commit outside Git; independent acceptance from a fresh extraction passed 8 steps including recovery preflight and restored read-only 422; E independent re-run still pending.",
+      "evidence": [
+        "tools/distribution/reports/wave06/install-artifact.json",
+        "tools/distribution/reports/wave06/artifact-acceptance.json"
+      ]
+    }
   },
   "testLayers": {
     "package": {
       "portability": {
         "command": "node --test packages/portability/test/*.case.ts",
-        "tests": 39,
+        "tests": 41,
         "status": "PASS"
       },
       "launcher": {
@@ -132,26 +165,32 @@
     },
     "smoke": {
       "command": "node tools/distribution/smoke.mjs",
-      "steps": 48,
+      "steps": 49,
       "status": "PASS",
-      "durationMs": 42616,
-      "modules": 527,
-      "checkoutReferences": 0
+      "durationMs": 45725
     },
     "upgrade": {
       "command": "node tools/distribution/smoke-upgrade.mjs",
-      "steps": 6,
+      "sections": [
+        {
+          "id": "A-same-source-rebuild-data-roundtrip",
+          "status": "PASS"
+        },
+        {
+          "id": "B-cross-version-data-upgrade",
+          "status": "PASS"
+        },
+        {
+          "id": "C-cross-version-downgrade-refusal",
+          "status": "PASS"
+        }
+      ],
       "status": "PASS"
     },
     "artifactAcceptance": {
       "command": "node tools/distribution/verify-artifact.mjs --tar <frozen tar>",
-      "steps": 7,
+      "steps": 8,
       "status": "PASS"
-    },
-    "recoveryProbe": {
-      "command": "node tools/distribution/repro-recovery-project-binding.mjs",
-      "status": "PASS_RECOVERY_PROJECT_BINDINGS",
-      "evidence": "tools/distribution/reports/wave06/recovery-project-bindings.json"
     },
     "dispatchVerifier": {
       "command": "node agent-tasks/product-wave-06/verify.mjs",
@@ -160,64 +199,64 @@
   },
   "blockers": [
     {
-      "id": "MAIN-RECOVERY-AUTHORIZATION",
+      "id": "MAIN-RECOVERY-COMMIT",
       "owner": "main",
       "status": "PLANNED",
-      "summary": "No public inspect/prepare/commit recovery authorization in merged main; D4 remains BLOCKED while D2/D3/D5/D6 completed. Required inputs and forbidden shortcuts are in the blocker JSON."
-    },
-    {
-      "id": "A-WAVE06-EVIDENCE",
-      "owner": "A",
-      "status": "NOT_IN_MAIN",
-      "summary": "Schema 12 only; A v13 ExecutionOutcome/routing/ReviewTiming persistence is not integrated, so those classes are marked unavailable rather than claimed. Bundle evidence covers existing public read surface + main acceptance event log."
+      "summary": "No POST /v1/recovery/commit; D4 is partial. Required inputs and forbidden shortcuts in the blocker JSON."
     },
     {
       "id": "B-EXECUTOR-CAPABILITY",
       "owner": "B/main",
       "status": "NOT_IN_MAIN",
-      "summary": "No public session/capsule/executor capability interface; review entry stays experimental/disabled and author executor diagnostics remain local/zero-model."
+      "summary": "No machine-readable executor capability/session interface; review entry stays experimental and disabled by default."
     },
     {
       "id": "E-INDEPENDENT-ACCEPTANCE",
       "owner": "E",
       "status": "PENDING",
-      "summary": "E must independently verify the frozen artifact in its own root; D does not modify E assertions."
+      "summary": "E must independently run the frozen tar from its own root; D does not edit E assertions."
+    },
+    {
+      "id": "BINARY-CROSS-VERSION",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Binary replacement across versions (install dir swap, instance record, ports) is not a tested path; only data upgrade and downgrade refusal are measured."
     },
     {
       "id": "ROOT-LOCK",
       "owner": "main",
       "status": "KNOWN",
-      "summary": "Local pnpm-lock.yaml diff is not staged; no new external dependency or lock request in wave-06."
+      "summary": "No new external dependency; local pnpm-lock diff not staged."
     }
   ],
   "notTested": [
-    "cross-machine/cross-ABI installation",
-    "personal native end-to-end execution",
-    "second-protocol driver/review execution",
-    "review value/pilot result",
-    "recovery new authorization",
-    "A v13 schema/evidence classes",
+    "cross-machine / other platform or ABI",
+    "personal native end-to-end",
+    "second-protocol driver or review value",
+    "recovery commit / new authorization",
+    "binary cross-version replacement",
     "E independent acceptance"
   ],
   "eConsumption": [
-    "Extract the frozen tar into E-owned new root; verify install.json/release.json/closure/tar digests from install-artifact.json.",
+    "Extract the frozen tar into an E-owned new root and verify install.json/release.json/closure/tar digests from install-artifact.json.",
     "Run <install>/bin/pa first-run then doctor; require release_manifest/runtime_abi/console_mode/runtime_dependencies PASS; review_executor WARN is expected.",
-    "Run start --fixture, verify static workbench, backup -> restore to new state, verify report.evidence.status=verified, recovery-status BLOCKED(owner main), read-only 422, stop.",
-    "Do not modify D assertions, delete restore markers, enable review by default, restart user services 5180-5184, or claim personal native/recovery authorization as tested.",
-    "Reference D evidence: tools/distribution/reports/wave06/install-artifact.json, wave06-status.json, zero-model-smoke.json, upgrade-rollback.json, artifact-acceptance.json, recovery-authorization-blocker.json."
+    "Run start --fixture, verify static workbench, backup -> restore to a new state, verify report.evidence.status=verified (legacy bundle => verified with legacyFormat), recovery-status/recovery-inspect/recovery-prepare report not_granted with commitAvailable=false, read-only /v1/commands stays 422, stop.",
+    "Do not modify D assertions, delete restore markers, enable review by default, restart user services 5180-5185, or claim recovery authorization/native/binary-migration as tested.",
+    "Reference: tools/distribution/reports/wave06/install-artifact.json, wave06-status.json, zero-model-smoke.json, upgrade-rollback.json, artifact-acceptance.json, recovery-authorization-blocker.json, docs/rfcs/WP-12/0006."
   ],
   "evidence": [
     "tools/distribution/reports/wave06/install-artifact.json",
     "tools/distribution/reports/wave06/install-summary.json",
+    "tools/distribution/reports/wave06/interface-inventory.json",
     "tools/distribution/reports/wave06/zero-model-smoke.json",
     "tools/distribution/reports/wave06/upgrade-rollback.json",
     "tools/distribution/reports/wave06/artifact-acceptance.json",
     "tools/distribution/reports/wave06/recovery-authorization-blocker.json",
-    "tools/distribution/reports/wave06/interface-inventory.json"
+    "docs/rfcs/WP-12/0006-wave-06-recovery-consumption.zh-CN.md"
   ],
   "preservedHistory": [
-    "wave-03/04/05 reports and commits unchanged",
+    "wave-03/04/05 evidence and commits unchanged",
     "no shared contract/migration/root lock/other-agent tests/user services modified",
-    "no restore marker deleted, no force switch, no second auth/key store"
+    "no restore marker deleted, no force switch, no second auth store"
   ]
 }

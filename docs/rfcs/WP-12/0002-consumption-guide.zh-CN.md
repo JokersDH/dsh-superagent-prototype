@@ -232,3 +232,44 @@ rollback 到备份 → 原 project/work/artifact 与 evidence digest 恢复、�
 A v13/routing/ReviewTiming 持久化与 C routing 实现未进入本 main（schema 12），bundle evidence
 对未见规范标 unavailable；B 第二执行器/session 胶囊接口未进 main；个人 native 端到端、恢复新授权、
 跨机器/ABI、第二协议复核均 NOT_TESTED/BLOCKED。
+
+---
+
+## 11. 第六轮收口：schema 13 安装物、恢复预检与跨版本行为（2026-11-11）
+
+### 11.1 安装物
+
+- source `e10bfdb`（dirty=false）、buildId `7e8f6ce6fa2e2633`、6603 文件、21 workspace 包、8 外部依赖、
+  darwin/arm64 + Node 24.21.x + SQLite ABI 137。
+- 仓库外 tar 与摘要：`tools/distribution/reports/wave06/install-artifact.json`（install/release/closure/tar
+  四个 sha256、字节数、依赖闭包、支持矩阵）。
+- 构建脚本现在覆盖 runtime import 图里的全部 workspace 包（新增 workflows/context/proposals/knowledge/routing）；
+  缺包会在 staged 启动时以 `ERR_MODULE_NOT_FOUND` 暴露，构建自检与 smoke 都会失败。
+
+### 11.2 恢复命令（本机、只读）
+
+```sh
+./bin/pa restore --bundle <pre-upgrade.pab> --to <new-state>
+./bin/pa start --fixture --data-root <new-state> ...   # recovery_readonly
+./bin/pa recovery-status  --json --data-root <new-state>
+./bin/pa recovery-inspect --json --data-root <new-state>
+./bin/pa recovery-prepare --json --source-project <id> --path <abs git root> --data-root <new-state>
+./bin/pa recovery-status  # commit 仍 BLOCKED（owner main）
+```
+
+inspect/prepare 是 main WP-16/0025 的只读接口：不写库/marker/队列/项目注册表，返回
+`authorization=not_granted`、`commitAvailable=false`；D 不把它们当授权，也不猜 commit shape。
+
+### 11.3 升级 / 回滚语义
+
+| 情形 | 行为 |
+| --- | --- |
+| 旧 schema 数据 + 新二进制 | restore 按 legacy evidence 校验 → 首次启动追加迁移到 schema 13，用户记录保留，routing 表为空 |
+| 新 schema 数据 + 旧二进制 | 旧构建拒绝 restore（evidence format 2）与 start；不改写、不降 schema |
+| 回滚 | 只恢复 state 快照；不降级二进制、不降 schema；升级后新增数据按备份语义消失，需用户显式执行 |
+| 同源码换 tag | 仅证明数据往返，不构成跨版本迁移证据 |
+
+### 11.4 证据
+
+`tools/distribution/reports/wave06/{install-artifact,install-summary,interface-inventory,zero-model-smoke,upgrade-rollback,artifact-acceptance,recovery-authorization-blocker}.json`、
+`tools/distribution/reports/wave06-status.json`、本目录 0006。

@@ -2,93 +2,64 @@
   "protocol": "wave06-recovery-authorization-blocker/1",
   "createdBy": "agent-d",
   "owner": "main",
-  "status": "BLOCKED",
   "phase": "D4",
-  "createdAt": "2026-11-11T02:40:12.200Z",
-  "expectedInterface": {
-    "source": "WP-16/0023 §6",
-    "operations": [
-      {
-        "name": "inspect",
-        "expected": "read-only recovery state, verifiable sources/blockers, never dispatch old queue"
-      },
-      {
-        "name": "prepare",
-        "expected": "re-verify machine/project paths/executor/environment/evidence/resource state; bounded plan snapshot with expiry; no execution/native start"
-      },
-      {
-        "name": "commit",
-        "expected": "authenticated explicit confirmation of exact plan/current fingerprint/version; receipt+authorization+state in one transaction; replay idempotent; drift rejected"
-      }
-    ],
-    "semantics": [
-      "new work/new contract only",
-      "old queue not replayed",
-      "unknown-writer barrier preserved",
-      "old profile/writer/session not authority",
-      "marker never deleted",
-      "no force/allow-resume switch"
+  "status": "PARTIAL: inspect+prepare consumed, commit BLOCKED",
+  "createdAt": "2026-11-11T04:43:01.167Z",
+  "consumed": {
+    "inspect": "GET /v1/recovery/inspect via `<install>/bin/pa recovery-inspect --json` (state, marker digest, schema, event cursor, held queue, projects, historical attempts, fingerprint)",
+    "prepare": "POST /v1/recovery/prepare via `<install>/bin/pa recovery-prepare --json --source-project <id> --path <abs git root>` (5-minute read-only plan, blockers, proposed project id)",
+    "localProjection": "`pa recovery-status --json` (marker/pending rebind, no HTTP, no daemon start)",
+    "negativesVerified": [
+      "missing project path refused (prepare_refused)",
+      "database bytes unchanged",
+      "restore marker unchanged",
+      "old queue waiting/parked unchanged",
+      "no instance state written",
+      "restored read-only still rejects /v1/commands with 422"
     ]
   },
   "observedMain": {
-    "merge": "0a84aa5",
-    "readonlyGate": "apps/coordinator/http/app.ts:267-268 rejects business POSTs with unsupported_capability",
-    "routes": "no /v1/recovery/inspect|prepare|commit route in apps/coordinator/http/app.ts",
-    "missing": "public recovery authorization schema/endpoint"
+    "merge": "d4d51ae",
+    "doc": "docs/rfcs/WP-16/0025-outcome-projection-and-recovery-preflight.md",
+    "planResponse": "authorization=not_granted, commitAvailable=false, planId/expiresAt present, bindings include proposedProjectId distinct from the source project"
   },
-  "dConsumption": {
-    "command": "<install>/bin/pa recovery-status --json",
-    "cliStatus": "BLOCKED (owner main)",
-    "doesNot": [
-      "guess HTTP shape",
-      "delete restore-report.json",
-      "force switch",
-      "replay queue",
-      "add second auth/key store"
-    ]
-  },
-  "evidence": {
-    "artifactAcceptance": "tools/distribution/reports/wave06/artifact-acceptance.json",
-    "smoke": "tools/distribution/reports/wave06/zero-model-smoke.json",
-    "steps": [
-      {
-        "id": "extract-and-first-run",
-        "status": "PASS"
-      },
-      {
-        "id": "artifact-doctor-gates",
-        "status": "PASS"
-      },
-      {
-        "id": "artifact-start-and-provenance",
-        "status": "PASS"
-      },
-      {
-        "id": "artifact-backup",
-        "status": "PASS"
-      },
-      {
-        "id": "artifact-stop",
-        "status": "PASS"
-      },
-      {
-        "id": "artifact-restore-and-recovery-status",
-        "status": "PASS"
-      },
-      {
-        "id": "artifact-restored-readonly",
-        "status": "PASS"
-      },
-      {
-        "id": "recovery-status-blocked-authorization",
-        "status": "PASS"
-      }
-    ]
+  "missing": {
+    "operation": "POST /v1/recovery/commit",
+    "reason": "WP-16/0025 §4 states it is not implemented; no schema, receipt or activation boundary exists"
   },
   "requiredInputs": [
-    "main published inspect/prepare/commit interface with exact schema and error/receipt examples",
-    "main confirmation that recovery commit authorizes only new work/new contracts and preserves unknown-writer barrier",
-    "E negative tests for expired plan, fingerprint drift, replay and failure rollback"
+    "restored database isolated from new business effects, plus proof that no old execute/answer/assistant/verify/reconcile queue entry is consumed",
+    "fresh verification of machine, project paths, executor, environment and physical resource state at commit time",
+    "authenticated explicit confirmation of the exact plan and current fingerprint, with an idempotent receipt",
+    "expired/drifted/replayed commitment rejected; authorization + receipt + necessary state in one transaction or a replayable deterministic activation boundary",
+    "only new work/new contracts authorized; restore marker kept and unknown-writer barrier preserved"
   ],
-  "next": "When main publishes the interface, extend /new D CLI to call it (no private auth), rerun D4 combination acceptance; until then keep D2/D3/D5 evidence and mark D4 BLOCKED."
+  "forbidden": [
+    "delete the restore marker",
+    "switch a restored database to normal",
+    "force/allow-resume switch",
+    "replay the old queue",
+    "treat a saved fingerprint or prepare plan as a credential",
+    "second auth/key store or scheduler in the launcher"
+  ],
+  "dWillDoWhenAvailable": [
+    "add `pa recovery-commit --json --plan <planId> --fingerprint <fp>` that calls main, never bypasses it",
+    "re-run D4 combination acceptance including expiry/drift/replay/failure rollback negatives",
+    "keep E evidence separate from D assertions"
+  ],
+  "evidence": {
+    "artifactAcceptance": "tools/distribution/reports/wave06/artifact-acceptance.json",
+    "smokeSteps": "tools/distribution/reports/wave06/zero-model-smoke.json#recovery-inspect-prepare-readonly",
+    "artifact": {
+      "installManifestSha256": "09041204af46dca6810a070b4f2cba9895f07e2a56776ec8472af96ef785b548",
+      "releaseManifestSha256": "749ed6b304e6cfe782ae50987b94fa29cfa49c85e3d884b126485f546b8eb87e",
+      "closureDigest": "55069a730c6954261da765fc5dceadf78df2697f3348d4a99f64782e630e2966",
+      "tarSha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "tarBytes": 19911757
+    }
+  },
+  "limitations": [
+    "preflight 200 is observation only and is not recovery activation or native admission",
+    "cross-machine/ABI, native end-to-end and the E independent run remain NOT_TESTED"
+  ]
 }

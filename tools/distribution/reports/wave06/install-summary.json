@@ -1,21 +1,21 @@
 {
-  "package": "product-wave-06 / D staged install",
+  "package": "product-wave-06 / D staged install (schema 13, clean integrated source)",
   "format": "pa-install",
   "formatVersion": 1,
-  "createdAt": "2026-11-11T02:39:29.903Z",
+  "createdAt": "2026-11-11T04:39:32.741Z",
   "source": {
-    "commit": "9046d4c5d3b9f583ba6384b851c32cc5703437c9",
+    "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
     "branch": "codex/g3-local-distribution",
-    "dirty": true
+    "dirty": false
   },
-  "buildId": "d4eb3a13f4904d2d",
+  "buildId": "7e8f6ce6fa2e2633",
   "producer": {
     "product": "dsh-superagent",
     "version": "0.1.0",
     "node": "24.21.0",
     "pnpm": "11.7.0",
     "sqlite": "3.53.4",
-    "productSchema": 12,
+    "productSchema": 13,
     "platform": "darwin",
     "arch": "arm64",
     "abi": "137"
@@ -27,7 +27,7 @@
     "consoleEntry": "app/apps/console/dist/index.html",
     "nativeBinding": "app/node_modules/better-sqlite3"
   },
-  "workspacePackageCount": 20,
+  "workspacePackageCount": 21,
   "supportMatrix": {
     "measured": [
       "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
@@ -111,15 +111,15 @@
     }
   ],
   "files": {
-    "count": 6483,
-    "bytes": 65517073
+    "count": 6603,
+    "bytes": 66153443
   },
-  "installManifestSha256": "c98cda403c7f8e3343474fc70a96c2b7e022559fd748482801219f2750ac768c",
-  "releaseManifestSha256": "a9852c5eb1ec49e7d814fc6a61877fc6525f8cf3b6411da86c4edf83b1a491c8",
-  "closureDigest": "a815fb1e84e056f20be319390919a759e8296c3669cff88dee7298f0acf3d5b2",
-  "tarSha256": "8b7675bafa7cded2c9c0656655abca3ff21721d52c3dc4f573a667d93f81f122",
-  "tarBytes": 19762194,
-  "artifactPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-final/wave06-alpha-d4eb3a13.tar.gz",
+  "installManifestSha256": "09041204af46dca6810a070b4f2cba9895f07e2a56776ec8472af96ef785b548",
+  "releaseManifestSha256": "749ed6b304e6cfe782ae50987b94fa29cfa49c85e3d884b126485f546b8eb87e",
+  "closureDigest": "55069a730c6954261da765fc5dceadf78df2697f3348d4a99f64782e630e2966",
+  "tarSha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+  "tarBytes": 19911757,
+  "artifactPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
   "commands": [
     "./bin/pa first-run",
     "./bin/pa doctor",
