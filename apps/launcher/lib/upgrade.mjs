@@ -177,13 +177,15 @@ export async function planUpgrade({ installRoot, roots, to, allowSameSource = fa
       buildId: target.release.buildId,
       installRoot: target.installDir,
     })
-  // The target must be a distribution install and must not be the currently bound install root.
+  // The install that is being replaced is the one this config root actually runs, not the install the
+  // upgrade tool itself was launched from (a new distribution carries the tool).
   const instance = readInstanceRecord(roots.config)
+  const fromInstallRoot = instance?.install ?? currentRelease?.installRoot ?? resolve(installRoot)
   const plan = {
     protocol: 'personal-install-switch/1',
     plannedAt: new Date().toISOString(),
     from: {
-      installRoot: resolve(installRoot),
+      installRoot: fromInstallRoot,
       bound: current.bound,
       buildId: currentRelease?.buildId ?? null,
       commit: currentRelease?.source?.commit ?? null,

@@ -782,6 +782,45 @@ try {
     queueUnchanged: true,
   })
 
+  // D4: the activation intent gate is local-only. With no main-committed source intent it must stay
+  // BLOCKED, never authorize, never start, and never write the restored state or the target.
+  const activationTarget = join(root, 'activation-target')
+  mkdirSync(activationTarget, { recursive: true, mode: 0o700 })
+  chmodSync(activationTarget, 0o700)
+  const intentPath = join(root, 'activation-intent.json')
+  writeFileSync(intentPath, JSON.stringify({
+    protocol: 'recovery-activation-intent/1',
+    activationId: 'activation-smoke', commandId: 'command-smoke', planId: 'plan-smoke',
+    planDigest: 'a'.repeat(64),
+    source: { stateId: 'state-restored', stateRoot: recoveryRestored, markerDigest: 'b'.repeat(64), inspectionFingerprint: 'c'.repeat(64) },
+    target: { generationId: 'generation-new', stateRoot: activationTarget, configurationDigest: 'd'.repeat(64) },
+    principal: { userId: 'local-user', authorityRef: 'authority-smoke' },
+    machineDigest: 'e'.repeat(64), resourcePolicyDigest: 'f'.repeat(64),
+    createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 120_000).toISOString(),
+  }))
+  const activation = runPa(['recovery-activation-check', '--json', '--intent', intentPath, '--target-root', activationTarget, ...stateArgs(recoveryRestored)], { allowExit: [2] })
+  if (activation.json?.status !== 'BLOCKED') throw new Error('activation check did not block without a main commit')
+  if (activation.json.authorization !== 'not_granted' || activation.json.commitAvailable !== false || activation.json.started !== false)
+    throw new Error('activation check claimed authority it does not have')
+  if (!activation.json.failures.includes('main_source_intent_committed'))
+    throw new Error('activation check did not report the missing main commit')
+  if (activation.json.consumptionRequirements?.owner !== 'main' || activation.json.consumptionRequirements.status !== 'BLOCKED')
+    throw new Error('activation check did not publish the main-owned requirements')
+  if (digestOfFile(recoveryDb) !== dbBeforePreflight) throw new Error('activation check wrote the restored database')
+  if (!readFileSync(recoveryMarkerPath).equals(markerBeforePreflight)) throw new Error('activation check changed the restore marker')
+  if (readdirSync(activationTarget).length !== 0) throw new Error('activation check prepared or wrote the target state')
+  step('recovery-activation-blocked', 'PASS', {
+    status: activation.json.status,
+    code: activation.json.code,
+    authorization: activation.json.authorization,
+    commitAvailable: activation.json.commitAvailable,
+    started: activation.json.started,
+    mainFailure: 'main_source_intent_committed',
+    owner: activation.json.consumptionRequirements.owner,
+    sourceUnchanged: true,
+    targetUntouched: true,
+  })
+
   const recoveryStop = await stopTrial(recoveryInstance, { label: 'recovery' })
   step('stop-recovery-readonly', 'PASS', { stopMs: recoveryStop.stopMs })
   const recoveryAfter = readBusinessSnapshot(join(recoveryRestored, 'state.sqlite'))

@@ -5,10 +5,10 @@
  * static console/proxy, process identity, diagnosis and backup/restore entrypoints.
  */
 import { spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { PortabilityError } from '@personal-agent/portability'
+import { PortabilityError, readEvidenceSummary } from '@personal-agent/portability'
 import { EXIT, UsageError, fail, intOption, parseArgs, printResult } from '../lib/cli.mjs'
 import { resolveContext, ROOT_OPTION_SPEC } from '../lib/context.mjs'
 import { readLauncherConfig } from '../lib/config.mjs'
@@ -23,6 +23,7 @@ import { importBundle, restoreState, rollbackState } from '../lib/restore.mjs'
 import { startInstance } from '../lib/start.mjs'
 import { stopInstance } from '../lib/stop.mjs'
 import { UpgradeError, inspectTargetInstall, readJournal, recoverSwitch, rollbackInstall, upgradeInstall } from '../lib/upgrade.mjs'
+import { ACTIVATION_CONSUMPTION_REQUIREMENTS, LOCAL_RESOURCE_POLICY_DIGEST, currentMachineDigest, evaluateActivation } from '../lib/recovery-activation.mjs'
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url))
 const BUILD_SCRIPT = join(repoRoot, 'tools/distribution/build.mjs')
@@ -42,6 +43,7 @@ const HELP = `pa — 本机个人 Agent 助理启动器
   upgrade                切换到另一个已冻结发行版：校验目标字节、备份、精确停实例、切换指针、启动核验，失败回退指针
   upgrade-status         查看上次切换的 from/to/备份/是否回滚过数据
   rollback-install       只把二进制指针切回上一个安装（不恢复数据、不降 schema）
+  recovery-activation-check  只读评估 main 的激活 intent 与本机目标 state 事实；永不授权、永不启动
   doctor                 只读诊断 Node/ABI/SQLite/构建/根目录/实例/执行器
   recovery-status        只读列出恢复 marker/待重绑定/main 新授权接口状态（不发业务）
   recovery-inspect       调用 main /v1/recovery/inspect（本机只读观测，不是授权）
@@ -122,6 +124,7 @@ function commandSpecs() {
     upgrade: { ...COMMON, to: 'string', backup: 'string', 'no-backup': 'boolean', 'no-stop': 'boolean', recover: 'boolean', force: 'boolean' },
     'upgrade-status': { ...COMMON },
     'rollback-install': { ...COMMON, 'no-stop': 'boolean' },
+    'recovery-activation-check': { ...COMMON, intent: 'string', 'target-root': 'string' },
     smoke: { ...COMMON },
   }
 }
@@ -269,6 +272,73 @@ async function main(argv) {
     ].join('\n')
     printResult({ json: json ? status : null, human })
     return status.markerPresent ? EXIT.DEGRADED : EXIT.OK
+  }
+
+  if (command === 'recovery-activation-check') {
+    if (values.intent === undefined || values['target-root'] === undefined) {
+      printResult({ human: 'recovery-activation-check 需要 --intent <main intent json> --target-root <新执行 state>' })
+      return EXIT.USAGE
+    }
+    const intentPath = resolve(values.intent)
+    const targetRoot = resolve(values['target-root'])
+    let intent
+    try {
+      intent = JSON.parse(readFileSync(intentPath, 'utf8'))
+    } catch (error) {
+      printResult({ json: json ? { status: 'BLOCKED', code: 'intent_unreadable', message: String(error?.message ?? error) } : null, human: `recovery-activation-check: BLOCKED intent_unreadable` })
+      return EXIT.BLOCKED
+    }
+    // Local observations only. The source is inspected read-only if this state is a restored instance.
+    let inspected = null
+    try {
+      inspected = await recoveryInspect({ roots })
+    } catch {
+      inspected = null
+    }
+    // Read-only: a not-yet-prepared target has no database at all, and this check must not create one.
+    let targetCounts = { projects: 0, works: 0, decisions: 0, artifacts: 0, acceptedEvents: 0 }
+    const targetConfigDigest = null
+    const targetState = join(targetRoot, 'state.sqlite')
+    if (existsSync(targetState)) {
+      try {
+        const summary = readEvidenceSummary(targetState)
+        targetCounts = {
+          projects: summary.counts.projects, works: summary.counts.works, decisions: summary.counts.decisions,
+          artifacts: summary.counts.artifacts, acceptedEvents: summary.counts.acceptedEvents,
+        }
+      } catch {
+        // Unreadable/incomplete target stays at zero counts and is still blocked by main's commit.
+      }
+    }
+    const facts = {
+      markerDigest: inspected?.markerDigest ?? null,
+      inspectionFingerprint: inspected?.inspectionFingerprint ?? null,
+      sourceStartupMode: inspected?.startupMode ?? null,
+      sourceHeldQueueUnchanged: inspected !== null,
+      machineDigest: currentMachineDigest(),
+      resourcePolicyDigest: LOCAL_RESOURCE_POLICY_DIGEST,
+      targetBusinessCounts: targetCounts,
+      targetInstanceRecord: existsSync(join(targetRoot, 'instance.json')),
+      targetCredentialFiles: 0,
+      targetNativeSessions: 0,
+      targetActivationRecords: 0,
+      targetConfigurationDigest: targetConfigDigest,
+      previousActivations: [],
+      committedSourceIntent: false,
+      mainCommitStatus: 'main_commit_route_unpublished',
+    }
+    const result = { ...evaluateActivation({ intent, facts }), consumptionRequirements: ACTIVATION_CONSUMPTION_REQUIREMENTS }
+    printResult({
+      json: json ? result : null,
+      human: [
+        `recovery-activation-check: ${result.status}${result.code === null ? '' : ` (${result.code})`}`,
+        `  authorization: ${result.authorization}  commitAvailable: ${String(result.commitAvailable)}`,
+        `  failures: ${result.failures.length === 0 ? 'none' : result.failures.join(', ')}`,
+        `  owner: ${result.owner}`,
+        '  该检查只读取本机事实；main 的提交事实/回执未发布前不会启动任何新执行 state。',
+      ].join('\n'),
+    })
+    return EXIT.BLOCKED
   }
 
   if (command === 'doctor') {

@@ -1,12 +1,12 @@
 {
-  "package": "product-wave-07 / D：真实双二进制升级与恢复切换",
+  "package": "product-wave-07 / D：真实双二进制升级、数据保护与恢复切换消费",
   "owner": "agent-d",
   "branch": "codex/g3-local-distribution",
   "baseCommit": "d4d51ae",
-  "mergeCommit": "f23814f",
-  "sourceCommit": null,
-  "status": "CHECKPOINT_D1",
-  "scopeNote": "Package-scoped candidate. Not main/E admission. Model 0; no user service touched.",
+  "mergedMain": "436dc02",
+  "head": "5adf00b",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate evidence. Not main/E admission, not installed-alpha. Recovery activation commit is main-owned and still unpublished; binary switching is measured only for the two frozen artifacts below.",
   "ownedPaths": [
     "apps/launcher/",
     "tools/distribution/",
@@ -15,16 +15,19 @@
   "modelBudget": {
     "allocated": 0,
     "used": 0,
-    "unknownNativeSends": 0
+    "unknownNativeSends": 0,
+    "note": "No model/native send; all probes are local fixture instances and frozen installs."
   },
   "commits": {
     "wave06Final": "4a0ea7f",
-    "wave07Checkpoint": "c9a0698"
+    "wave07CheckpointD1": "c9a0698",
+    "wave07CheckpointD2D3": "5adf00b",
+    "wave07Final": "5adf00b"
   },
   "phases": {
     "d1": {
       "status": "PASS",
-      "summary": "Release bootstrap adopts the install inventory into any --config-root/PA_CONFIG_ROOT after size+digest/buildId/source/containment checks; conflicts, tamper, wrong root and missing manifest are refused; source checkouts report unverified provenance (no fabricated commit/digest) and never write a release; doctor release_binding classifies install/source/missing; main 0028 fresh-source null-source probe fixed and covered by 4 real firstRun cases + 2 CLI smoke steps.",
+      "summary": "PA_CONFIG_ROOT/--config-root first-run now adopts the release manifest baked into the install after verifying every install byte (size+sha256), buildId/source agreement and artifact containment. Different source is a conflict, tamper/wrong root/missing manifest are refusals; a source checkout reports unverified provenance and writes no release. main 0028 fresh-source null-source crash fixed; doctor adds release_binding; smoke covers unicode/space config roots, foreign install refusal and fresh-source CLI.",
       "evidence": [
         "apps/launcher/test/release-bootstrap.case.mjs",
         "apps/launcher/test/first-run.case.mjs",
@@ -32,40 +35,34 @@
       ]
     },
     "d2": {
-      "status": "IN_PROGRESS",
-      "summary": "baseline artifact retained (wave06-alpha2, buildId 7e8f6ce6fa2e2633, source e10bfdb); target artifact will be frozen from the clean D2/D3 commit."
+      "status": "PASS",
+      "summary": "Two frozen installs from two different clean commits: baseline wave06-alpha2 (build 7e8f6ce6fa2e2633, source e10bfdb, 6603 files) and target wave07-target (build 3e7f046e03f2ce5d, source 5adf00b, 6627 files). Both source.dirty=false, out of Git, schema 13, darwin/arm64 + Node 24.21.x + SQLite ABI 137. Digests/dependency closures recorded; tag-only rebuild is not used as evidence.",
+      "evidence": [
+        "tools/distribution/reports/wave07/artifacts.json"
+      ],
+      "artifacts": {
+        "baseline": {
+          "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+          "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+          "bytes": 19911757,
+          "buildId": "7e8f6ce6fa2e2633",
+          "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389"
+        },
+        "target": {
+          "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave07-target/wave07-target-3e7f046e.tar.gz",
+          "sha256": "c5ea704faf8a8b8766982757757c2fab2b76ac7b4f9008fe9948b9db147f2e02",
+          "bytes": 19952444,
+          "buildId": "3e7f046e03f2ce5d",
+          "commit": "5adf00b100431bcd923a867e1f62c78999359392"
+        }
+      }
     },
     "d3": {
       "status": "PASS",
-      "summary": "pa upgrade verifies the target install inventory (all file digests), backs up, stops only the verified instance, swaps release pointer with a journal, starts the target on the same roots and requires its identity; failure reverts the pointer without touching data. Recipe proves switch, post-upgrade data survival across binary-only rollback, schema-incompatible older binary refusal, tampered target, running switch, unverified live instance, unhealthy target, crash-after-swap recovery and duplicate refusal.",
+      "summary": "pa upgrade verifies the target inventory byte-for-byte before touching the instance, takes a pre-upgrade backup, stops only the verified recorded instance (a live unverified pid blocks instead of being killed), keeps the previous pointer, swaps release.json with a journal, starts the target on the same roots and requires its own buildId/health. Failed start reverts the pointer without touching data. Recipe proves: switch, post-upgrade data survives a binary-only rollback, schema-incompatible older binary refuses the state, tampered target, running switch, unverified live instance, unhealthy target, crash-after-swap recovery and duplicate refusal.",
       "evidence": [
         "tools/distribution/reports/wave07/binary-upgrade.json"
-      ]
-    },
-    "d4": {
-      "status": "NOT_STARTED"
-    },
-    "d5": {
-      "status": "NOT_STARTED"
-    },
-    "d6": {
-      "status": "NOT_STARTED"
-    }
-  },
-  "testLayers": {
-    "launcher": {
-      "command": "node --test apps/launcher/test/*.case.mjs",
-      "tests": 41,
-      "status": "PASS"
-    },
-    "smoke": {
-      "command": "node tools/distribution/smoke.mjs",
-      "steps": 51,
-      "status": "PASS",
-      "durationMs": 46586
-    },
-    "binaryUpgrade": {
-      "command": "node tools/distribution/smoke-binary-upgrade.mjs",
+      ],
       "sections": {
         "installs": "PASS",
         "A-baseline-state": "PASS",
@@ -79,7 +76,66 @@
         "E5-interrupted-switch-recovered": "PASS",
         "E6-duplicate-refused": "PASS"
       },
+      "dataProtection": "Post-upgrade records were written under the target build and remained readable after rollback to the baseline binary; evidence digest unchanged. Rollback is binary-only, dataRolledBack=false."
+    },
+    "d4": {
+      "status": "PARTIAL_BLOCKED_MAIN_COMMIT",
+      "summary": "main publishes only read-only inspect/prepare plus the internal RecoveryActivationIntent/RecoveryActivationFacts contract; no commit route or committed receipt exists. D added a pure local precondition gate (expiry, digest drift, distinct private roots, half-prepared target, instance/credential/native-session/activation residue, replay) and a CLI that reports BLOCKED with the exact main-owned requirements; smoke proves it never writes the restored DB/marker, never prepares the target and never reports authorization.",
+      "evidence": [
+        "apps/launcher/lib/recovery-activation.mjs",
+        "apps/launcher/test/recovery-activation.case.mjs",
+        "tools/distribution/reports/wave07/zero-model-smoke.json"
+      ],
+      "blockedBy": "main recovery commit/activation route + committed source receipt"
+    },
+    "d5": {
+      "status": "PASS_WITH_NOTED_GAPS",
+      "summary": "Reentrant operations from a fresh root: install/first-run/doctor/start/status/backup/stop plus the two-artifact upgrade/rollback recipe; diagnostics report the release binding, upgrade journal and exact refusal codes; failures covered include corrupt target bytes, running switch, unverified live pid, unhealthy target, crash-after-swap + recover, duplicate request, schema-incompatible binary and corrupt/missing state. Cleanup only removes the operation own temp roots.",
+      "evidence": [
+        "tools/distribution/verify-upgrade-artifact.mjs",
+        "tools/distribution/reports/wave07/artifact-upgrade-acceptance.json",
+        "tools/distribution/smoke-binary-upgrade.mjs"
+      ],
+      "notTested": [
+        "targeted SIGKILL at every individual switch step (only crash-after-swap is injected)",
+        "orphan staging cleanup outside D-owned temp roots"
+      ]
+    },
+    "d6": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Both artifacts frozen with install/release/closure/tar digests; E recipe published and re-run here from the tars: extract-verify, first-run/doctor, static workbench, backup, binary switch, target identity/doctor/journal, binary-only rollback with unchanged evidence (7/7 PASS). E independent acceptance is still pending.",
+      "evidence": [
+        "tools/distribution/reports/wave07/artifacts.json",
+        "tools/distribution/reports/wave07/artifact-upgrade-acceptance.json",
+        "tools/distribution/recipes/wave07-e-two-binary-upgrade.zh-CN.md"
+      ]
+    }
+  },
+  "testLayers": {
+    "launcher": {
+      "command": "node --test apps/launcher/test/*.case.mjs",
+      "tests": 49,
       "status": "PASS"
+    },
+    "smoke": {
+      "command": "node tools/distribution/smoke.mjs",
+      "steps": 52,
+      "status": "PASS",
+      "durationMs": 48371
+    },
+    "binaryUpgrade": {
+      "command": "node tools/distribution/smoke-binary-upgrade.mjs --baseline <frozen baseline install> --target <frozen target install>",
+      "sections": 11,
+      "status": "PASS"
+    },
+    "artifactUpgrade": {
+      "command": "node tools/distribution/verify-upgrade-artifact.mjs --baseline-tar ... --target-tar ... --baseline-sha256 ... --target-sha256 ...",
+      "steps": 7,
+      "status": "PASS"
+    },
+    "dispatch": {
+      "command": "node agent-tasks/product-wave-07/verify.mjs",
+      "status": "PASS (static only; starts no runtime)"
     }
   },
   "blockers": [
@@ -87,127 +143,52 @@
       "id": "MAIN-RECOVERY-ACTIVATION",
       "owner": "main",
       "status": "PLANNED",
-      "summary": "Recovery activation/commit interface not published; D4 prepares threat/failure fixtures and consumes read-only inspect/prepare only."
+      "summary": "No recovery commit route/committed receipt; D4 partial. D publishes exact required inputs and refuses to start anything from a local check."
+    },
+    {
+      "id": "B-EXECUTOR-CAPABILITY",
+      "owner": "B/main",
+      "status": "NOT_IN_MAIN",
+      "summary": "No machine-readable executor capability/session; review execution remains experimental and disabled by default."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E must run the published recipe against the two frozen tars from its own root; D does not edit E assertions."
+    },
+    {
+      "id": "BINARY-MIGRATION-BEYOND-SCHEMA13",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Both wave-07 artifacts are schema 13. A different-schema binary is refused (wave-06 schema-12 control), but a real schema-changing binary pair is not available yet."
     }
+  ],
+  "notTested": [
+    "cross-machine / other platform or ABI",
+    "personal native end-to-end",
+    "recovery activation/commit (main-owned, unpublished)",
+    "a schema-changing binary pair (only refusal of an older schema is measured)",
+    "SIGKILL injected at every individual switch step",
+    "E independent acceptance"
+  ],
+  "eConsumption": [
+    "Use the two frozen tars and digests in tools/distribution/reports/wave07/artifacts.json; do not mix in the author checkout or main new source.",
+    "Run node tools/distribution/verify-upgrade-artifact.mjs with both tars and both published sha256 values from a fresh root; expect 7/7 PASS.",
+    "For deeper failure-window coverage run smoke-binary-upgrade with the two frozen install directories; it exercises the negatives listed in D3/D5.",
+    "Do not relax digest checks, delete restore markers, hand-edit release.json, or claim schema migration/native/recovery-activation from these results."
   ],
   "evidence": [
+    "tools/distribution/reports/wave07/artifacts.json",
     "tools/distribution/reports/wave07/zero-model-smoke.json",
     "tools/distribution/reports/wave07/binary-upgrade.json",
-    "apps/launcher/test/first-run.case.mjs",
-    "apps/launcher/test/release-bootstrap.case.mjs"
+    "tools/distribution/reports/wave07/artifact-upgrade-acceptance.json",
+    "tools/distribution/recipes/wave07-e-two-binary-upgrade.zh-CN.md",
+    "docs/rfcs/WP-12/0007-wave-07-binary-upgrade.zh-CN.md"
   ],
-  "limitations": [
-    "darwin/arm64 + Node 24.21.x + SQLite ABI 137 measured only",
-    "binary cross-version switch pending D3",
-    "recovery activation pending main"
-  ],
-  "binaryUpgrade": {
-    "installs": {
-      "status": "PASS",
-      "detail": {
-        "baseline": {
-          "buildId": "7e8f6ce6fa2e2633",
-          "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
-          "schema": 13,
-          "tarFamily": "wave06-alpha2"
-        },
-        "target": {
-          "buildId": "3e86f833ba5408fe",
-          "commit": "c9a06987fe73909374f492d7d146b3e7e955da07",
-          "schema": 13
-        },
-        "sourceDistinct": true
-      }
-    },
-    "A-baseline-state": {
-      "status": "PASS",
-      "detail": {
-        "buildId": "7e8f6ce6fa2e2633",
-        "evidenceDigest": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
-        "artifactDigest": "d690795d9b0136f3f35f6bd99f5c8a9ddc55757dd0706b8c2eb2401369fc7ba2",
-        "backup": "ca9d7a2e920d0f476bb9891c88af01983888b301ea4d2d33d820cd7eb720669c"
-      }
-    },
-    "B-binary-switch": {
-      "status": "PASS",
-      "detail": {
-        "from": "7e8f6ce6fa2e2633",
-        "to": "3e86f833ba5408fe",
-        "stopped": "STOPPED",
-        "backup": {
-          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave07-upgrade-YGb2CJ/switch-backup.pab",
-          "sha256": "099fd6ba57b3c4dd902a52dfc3168df4901ca63398661a2d469092f67d24784d"
-        },
-        "instance": {
-          "pid": 16948,
-          "buildId": "3e86f833ba5408fe"
-        },
-        "evidenceDigestBefore": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
-        "evidenceDigestAfter": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
-        "dataRolledBack": false
-      }
-    },
-    "C-post-upgrade-data-protection": {
-      "status": "PASS",
-      "detail": {
-        "postUpgradeEvidence": "30cfa6ab40133336ef99f29f334f5f9f6854cd9bae283c50cb2dabd5185a3ee9",
-        "binaryRollback": {
-          "pointer": "7e8f6ce6fa2e2633",
-          "dataRolledBack": false
-        },
-        "schemaCompatibleBothWays": true,
-        "postUpgradeDataIntact": true,
-        "note": "Both builds use schema 13, so the older binary still reads the newer records; this is a binary-only rollback, never a data rollback."
-      }
-    },
-    "D-incompatible-binary-refusal": {
-      "status": "PASS",
-      "detail": {
-        "olderBinary": "d4eb3a13f4904d2d",
-        "code": "release_artifact_missing",
-        "schemaAfterRefusal": 13,
-        "stateUnchanged": true
-      }
-    },
-    "E1-tampered-target-refused": {
-      "status": "PASS",
-      "detail": {
-        "code": "target_tampered",
-        "instanceStillRunning": true
-      }
-    },
-    "E2-running-switch-refused": {
-      "status": "PASS",
-      "detail": {
-        "code": "upgrade_requires_stopped_instance"
-      }
-    },
-    "E3-unverified-instance-blocked": {
-      "status": "PASS",
-      "detail": {
-        "code": "instance_record_unverified",
-        "foreignProcessAlive": true
-      }
-    },
-    "E4-unhealthy-target-reverted": {
-      "status": "PASS",
-      "detail": {
-        "pointerAfterRevert": "7e8f6ce6fa2e2633",
-        "dataUntouched": true
-      }
-    },
-    "E5-interrupted-switch-recovered": {
-      "status": "PASS",
-      "detail": {
-        "status": "RECOVERED",
-        "buildId": "3e86f833ba5408fe"
-      }
-    },
-    "E6-duplicate-refused": {
-      "status": "PASS",
-      "detail": {
-        "code": "upgrade_already_applied"
-      }
-    }
-  }
+  "preservedHistory": [
+    "wave-05/06 evidence and budgets unchanged",
+    "no shared contract/migration/root lock/other-agent tests/user services modified",
+    "no restore marker deleted, no force switch, no silent data rollback"
+  ]
 }

@@ -1,7 +1,7 @@
 {
   "case": "WAVE07-BINARY-UPGRADE",
   "status": "PASS",
-  "startedAt": "2026-11-11T06:57:30.329Z",
+  "startedAt": "2026-11-11T07:39:51.493Z",
   "sections": {
     "installs": {
       "status": "PASS",
@@ -13,8 +13,8 @@
           "tarFamily": "wave06-alpha2"
         },
         "target": {
-          "buildId": "3e86f833ba5408fe",
-          "commit": "c9a06987fe73909374f492d7d146b3e7e955da07",
+          "buildId": "3e7f046e03f2ce5d",
+          "commit": "5adf00b100431bcd923a867e1f62c78999359392",
           "schema": 13
         },
         "sourceDistinct": true
@@ -26,22 +26,22 @@
         "buildId": "7e8f6ce6fa2e2633",
         "evidenceDigest": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
         "artifactDigest": "d690795d9b0136f3f35f6bd99f5c8a9ddc55757dd0706b8c2eb2401369fc7ba2",
-        "backup": "ca9d7a2e920d0f476bb9891c88af01983888b301ea4d2d33d820cd7eb720669c"
+        "backup": "6b8fa2599e532b7297c6093a387887ca6b7ff1d32f9b3d81ba82e41a7331f525"
       }
     },
     "B-binary-switch": {
       "status": "PASS",
       "detail": {
         "from": "7e8f6ce6fa2e2633",
-        "to": "3e86f833ba5408fe",
+        "to": "3e7f046e03f2ce5d",
         "stopped": "STOPPED",
         "backup": {
-          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave07-upgrade-YGb2CJ/switch-backup.pab",
-          "sha256": "099fd6ba57b3c4dd902a52dfc3168df4901ca63398661a2d469092f67d24784d"
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave07-upgrade-XklGFM/switch-backup.pab",
+          "sha256": "4ae4fc6854509c5502a5a58962f287de5238e63c86db8c16906495f2bc7f8780"
         },
         "instance": {
-          "pid": 16948,
-          "buildId": "3e86f833ba5408fe"
+          "pid": 56725,
+          "buildId": "3e7f046e03f2ce5d"
         },
         "evidenceDigestBefore": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
         "evidenceDigestAfter": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
@@ -101,7 +101,7 @@
       "status": "PASS",
       "detail": {
         "status": "RECOVERED",
-        "buildId": "3e86f833ba5408fe"
+        "buildId": "3e7f046e03f2ce5d"
       }
     },
     "E6-duplicate-refused": {
@@ -111,7 +111,7 @@
       }
     }
   },
-  "finishedAt": "2026-11-11T06:57:53.198Z",
+  "finishedAt": "2026-11-11T07:40:06.806Z",
   "limitations": [
     "Both D wave-07 artifacts use product schema 13, so the binary rollback check is compatibility-preserving; the incompatible-direction proof uses the frozen schema-12 wave-06 build.",
     "Only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured; other platforms/ABIs are NOT_TESTED.",
