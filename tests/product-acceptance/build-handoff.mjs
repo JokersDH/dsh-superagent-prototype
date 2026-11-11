@@ -350,13 +350,13 @@ const executionStatus = {
     .filter((row) => row.gaps.length > 0 || row.controlledFixture === 'NOT_TESTED')
     .map((row) => ({ id: row.id, gaps: row.gaps })),
   externalBlockers: [
-    { owner: 'C', detail: 'C-MISSING-SOURCE-EFFECTIVENESS, C-CONFIRMED-REPLAY-STILL-AUTHENTICATES and C-PROPOSAL-SNAPSHOTS-GRANT still fail in the merged source.' },
-    { owner: 'main', detail: 'No decision/proposal/context HTTP entry; assistant state cannot be exercised end to end.' },
+    { owner: 'C', detail: 'Automatic context/proposal confirmation and published ReviewEvidence are still absent; explicit decisions are now verified separately.' },
+    { owner: 'main', detail: 'Migration ownership and review Work/Ticket/Assignment publication remain outside current main, so E3-REVIEW-PIPELINE stays NOT_TESTED.' },
     { owner: 'D', detail: 'Source stays on codex/g3-local-distribution. The frozen tar.gz is accepted byte-for-byte; a second frozen buildId is required for E4-UPGRADE-ROLLBACK, and PA_CONFIG_ROOT override drops release.json.' },
     { owner: 'B', detail: 'Native ledger/results are not supplied as input and E has no budget, so actual-native and native control evidence are absent.' },
   ],
   next: [
-    'Main: integrate the C fixes and publish the assistant state HTTP/command surface; E then adds confirm-before-execute, revocation-effect and transaction-failure cases.',
+    'C/main: publish automatic proposal/context confirmation and a review Work/Ticket/Assignment entry; E then adds confirm-before-execute, revocation-effect and transaction-failure cases on top of the already verified explicit decisions.',
     'D: publish a second frozen artifact (different buildId, same schema) for the upgrade case, and seed release.json when PA_CONFIG_ROOT is overridden; everything else in the frozen artifact already passes in a fresh directory.',
     'B: hand off native evidence bound to commit/attempt/command with executed=true and model-task counts; only a separately granted budget lets E re-run native.',
     'Main: treat controlled-product-workflow PASS as workflow evidence only; local-alpha and full-product remain non-zero until installation and native evidence exist.',
@@ -496,8 +496,6 @@ const overclaim = evaluateRelease({
   resolveFixture: resolveFixtureDigest,
 })
 writeFileSync(join(reports, 'full-product-verdict.json'), JSON.stringify(overclaim, null, 2) + '\n')
-writeFileSync(join(reports, 'tier-verdicts.json'), JSON.stringify(tierVerdicts, null, 2) + '\n')
-
 writeFileSync(join(reports, 'tier-verdicts.json'), JSON.stringify(tierVerdicts, null, 2) + '\n')
 
 process.stdout.write(
