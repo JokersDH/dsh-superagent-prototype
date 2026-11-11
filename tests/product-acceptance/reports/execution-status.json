@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "6f6edde",
+  "base": "d4d51ae",
   "checkpoint": "dc351a4",
-  "head": "ec98421e528955b5cbbca864f9c878099749f32f",
+  "head": "1a4a0f572267abaf7cf1cea11013328851367963",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-11T03:53:59.685Z",
+  "checkedAt": "2026-11-11T04:05:54.180Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -401,7 +401,7 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 19,
+        "PASS": 20,
         "NOT_TESTED": 3
       },
       "cases": [
@@ -459,6 +459,11 @@
           "id": "E2-CONTEXT-PROPOSALS-NOT-TESTED",
           "status": "NOT_TESTED",
           "reason": "The legacy record_decision command returned rejected (unsupported_capability); explicit decisions use /v1/decisions (E3-DECISION-WORKFLOW), but structured proposal confirmation remains absent."
+        },
+        {
+          "id": "E2-WORK-EVIDENCE",
+          "status": "PASS",
+          "reason": null
         },
         {
           "id": "E2-REOPEN-PERSISTENCE",
@@ -646,7 +651,7 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 9,
+        "PASS": 10,
         "NOT_TESTED": 3
       },
       "cases": [
@@ -673,7 +678,7 @@
         {
           "id": "E4-REAUTHORIZATION",
           "status": "NOT_TESTED",
-          "reason": "No public recovery re-authorization entry exists; read-only recovery is verified, but new-grant prepare/commit, expiry, drift, replay and rollback cannot be executed."
+          "reason": "Read-only inspect/prepare are verified (plan authorization=not_granted, commitAvailable=false, no writes, stale/foreign/commit refused). The commit path, expiry/drift/replay/rollback of a real grant, and activation of only new work are not implemented and stay NOT_TESTED."
         },
         {
           "id": "E4-INSTALL-ARTIFACT-IDENTITY",
@@ -709,6 +714,11 @@
           "id": "E4-UPGRADE-ROLLBACK",
           "status": "NOT_TESTED",
           "reason": "Only one frozen artifact (buildId d4eb3a13f4904d2d) is published for wave 06. A real upgrade needs a second frozen artifact with a different buildId and the same product schema 12; state rollback on the same bytes is verified by E4-INSTALL-ROLLBACK. Required inputs: second artifactId/buildId/tarSha256."
+        },
+        {
+          "id": "E4-RECOVERY-PREFLIGHT",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -756,12 +766,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-11T03:53:59.700Z",
+    "checkedAt": "2026-11-11T04:05:54.196Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1139,6 +1149,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -1294,6 +1309,11 @@
         "status": "PASS"
       },
       {
+        "id": "E4-RECOVERY-PREFLIGHT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E4-RECOVERY-READONLY",
         "required": true,
         "status": "PASS"
@@ -1316,25 +1336,25 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T03-51-54-941Z/screenshots/mobile-attention-inbox.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T04-03-44-315Z/screenshots/mobile-attention-inbox.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
@@ -1374,6 +1394,12 @@
       ]
     },
     {
+      "id": "accepted-outcome-evidence",
+      "gaps": [
+        "工作台内进一步的时间线展示仍单列；source_missing/not_in_window 需要旧库来源缺失场景。"
+      ]
+    },
+    {
       "id": "stale-guards",
       "gaps": [
         "旧提案与决定的撤销治理（C 未交付）"
@@ -1402,10 +1428,6 @@
       "gaps": [
         "长时间 soak、负载与多实例并发。"
       ]
-    },
-    {
-      "id": "portability-tooling",
-      "gaps": []
     },
     {
       "id": "install-first-run",

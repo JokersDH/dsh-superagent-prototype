@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
     "dirty": false
   },
   "environment": {
@@ -11,14 +11,14 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-11T03:53:59.685Z",
+  "checkedAt": "2026-11-11T04:05:54.180Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 117,
+    "PASS": 119,
     "FAIL": 0,
     "SKIPPED": 0,
     "NOT_TESTED": 12,
@@ -106,6 +106,21 @@
         "E2-VERIFICATION-RECOVERY",
         "E2-VERIFICATION-FINISHED-STATES",
         "E3-VERIFICATION-RECOVERY-UI"
+      ]
+    },
+    {
+      "id": "accepted-outcome-evidence",
+      "capability": "接受结果投影与工作证据读取",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "工作台内进一步的时间线展示仍单列；source_missing/not_in_window 需要旧库来源缺失场景。"
+      ],
+      "evidence": [
+        "E2-WORK-EVIDENCE"
       ]
     },
     {
@@ -295,13 +310,14 @@
     {
       "id": "portability-tooling",
       "capability": "迁移清单验收规则（缺产物/坏 digest/无回滚拒绝）",
-      "controlledFixture": "NOT_TESTED",
+      "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "PASS",
       "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
+        "E4-RECOVERY-PREFLIGHT",
         "E4-PORTABILITY-CHECKLIST"
       ]
     },

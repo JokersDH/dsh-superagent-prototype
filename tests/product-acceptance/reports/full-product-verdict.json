@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-11T03:54:52.077Z",
+  "checkedAt": "2026-11-11T04:07:39.625Z",
   "source": {
-    "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
     "dirty": false
   },
-  "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+  "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -386,6 +386,11 @@
       "status": "PASS"
     },
     {
+      "id": "E2-WORK-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E2-REOPEN-PERSISTENCE",
       "required": true,
       "status": "PASS"
@@ -541,6 +546,11 @@
       "status": "PASS"
     },
     {
+      "id": "E4-RECOVERY-PREFLIGHT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E4-RECOVERY-READONLY",
       "required": true,
       "status": "PASS"
@@ -641,7 +651,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-11T03:53:59.700Z",
+    "decidedAt": "2026-11-11T04:05:54.196Z",
     "failureCodes": []
   },
   "notes": [

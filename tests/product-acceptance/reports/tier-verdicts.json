@@ -4,12 +4,12 @@
     "tier": "module",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-11T03:54:52.073Z",
+    "checkedAt": "2026-11-11T04:07:39.619Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -396,7 +396,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T03:53:59.700Z",
+      "decidedAt": "2026-11-11T04:05:54.196Z",
       "failureCodes": []
     },
     "notes": [
@@ -409,12 +409,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-11T03:54:52.074Z",
+    "checkedAt": "2026-11-11T04:07:39.621Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -792,6 +792,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -943,6 +948,11 @@
       },
       {
         "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
         "required": true,
         "status": "PASS"
       },
@@ -966,7 +976,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T03:53:59.700Z",
+      "decidedAt": "2026-11-11T04:05:54.196Z",
       "failureCodes": []
     },
     "notes": [
@@ -979,12 +989,12 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T03:54:52.075Z",
+    "checkedAt": "2026-11-11T04:07:39.621Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1362,6 +1372,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -1513,6 +1528,11 @@
       },
       {
         "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
         "required": true,
         "status": "PASS"
       },
@@ -1557,7 +1577,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T03:53:59.700Z",
+      "decidedAt": "2026-11-11T04:05:54.196Z",
       "failureCodes": []
     },
     "notes": [
@@ -1570,12 +1590,12 @@
     "tier": "installed-alpha",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T03:54:52.075Z",
+    "checkedAt": "2026-11-11T04:07:39.621Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1953,6 +1973,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -2104,6 +2129,11 @@
       },
       {
         "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
         "required": true,
         "status": "PASS"
       },
@@ -2173,7 +2203,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T03:53:59.700Z",
+      "decidedAt": "2026-11-11T04:05:54.196Z",
       "failureCodes": []
     },
     "notes": [
@@ -2186,12 +2216,12 @@
     "tier": "advisory-routing",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T03:54:52.075Z",
+    "checkedAt": "2026-11-11T04:07:39.621Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2569,6 +2599,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -2720,6 +2755,11 @@
       },
       {
         "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
         "required": true,
         "status": "PASS"
       },
@@ -2769,7 +2809,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T03:53:59.700Z",
+      "decidedAt": "2026-11-11T04:05:54.196Z",
       "failureCodes": []
     },
     "notes": [
@@ -2782,12 +2822,12 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T03:54:52.075Z",
+    "checkedAt": "2026-11-11T04:07:39.622Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3165,6 +3205,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -3316,6 +3361,11 @@
       },
       {
         "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
         "required": true,
         "status": "PASS"
       },
@@ -3385,7 +3435,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T03:53:59.700Z",
+      "decidedAt": "2026-11-11T04:05:54.196Z",
       "failureCodes": []
     },
     "notes": [
@@ -3398,12 +3448,12 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T03:54:52.075Z",
+    "checkedAt": "2026-11-11T04:07:39.622Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3781,6 +3831,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -3932,6 +3987,11 @@
       },
       {
         "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
         "required": true,
         "status": "PASS"
       },
@@ -4011,7 +4071,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T03:53:59.700Z",
+      "decidedAt": "2026-11-11T04:05:54.196Z",
       "failureCodes": []
     },
     "notes": [
@@ -4024,12 +4084,12 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T03:54:52.075Z",
+    "checkedAt": "2026-11-11T04:07:39.622Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4407,6 +4467,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -4558,6 +4623,11 @@
       },
       {
         "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
         "required": true,
         "status": "PASS"
       },
@@ -4602,7 +4672,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T03:53:59.700Z",
+      "decidedAt": "2026-11-11T04:05:54.196Z",
       "failureCodes": []
     },
     "notes": [
@@ -4615,12 +4685,12 @@
     "tier": "local-alpha",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T03:54:52.076Z",
+    "checkedAt": "2026-11-11T04:07:39.622Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4998,6 +5068,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -5149,6 +5224,11 @@
       },
       {
         "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
         "required": true,
         "status": "PASS"
       },
@@ -5218,7 +5298,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T03:53:59.700Z",
+      "decidedAt": "2026-11-11T04:05:54.196Z",
       "failureCodes": []
     },
     "notes": [
@@ -5231,12 +5311,12 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T03:54:52.076Z",
+    "checkedAt": "2026-11-11T04:07:39.622Z",
     "source": {
-      "commit": "ec98421e528955b5cbbca864f9c878099749f32f",
+      "commit": "1a4a0f572267abaf7cf1cea11013328851367963",
       "dirty": false
     },
-    "expectedSource": "ec98421e528955b5cbbca864f9c878099749f32f",
+    "expectedSource": "1a4a0f572267abaf7cf1cea11013328851367963",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5614,6 +5694,11 @@
         "status": "PASS"
       },
       {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-REOPEN-PERSISTENCE",
         "required": true,
         "status": "PASS"
@@ -5765,6 +5850,11 @@
       },
       {
         "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
         "required": true,
         "status": "PASS"
       },
@@ -5869,7 +5959,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T03:53:59.700Z",
+      "decidedAt": "2026-11-11T04:05:54.196Z",
       "failureCodes": []
     },
     "notes": [
