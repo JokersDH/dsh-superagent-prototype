@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-11T06:40:32.605Z",
+  "checkedAt": "2026-11-11T08:44:24.398Z",
   "source": {
-    "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "dirty": false
   },
-  "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+  "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -496,6 +496,11 @@
       "status": "PASS"
     },
     {
+      "id": "E3-PROPOSAL-HTTP",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E3-DESKTOP-GEOMETRY",
       "required": true,
       "status": "PASS"
@@ -588,10 +593,15 @@
     {
       "id": "E4-INSTALL-CONFIG-ROOT",
       "required": true,
-      "status": "FAIL"
+      "status": "PASS"
     },
     {
       "id": "E4-INSTALL-REUSE-CONCURRENCY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-INSTALL-HOST-GUARDS",
       "required": true,
       "status": "PASS"
     },
@@ -628,11 +638,6 @@
   ],
   "failures": [
     {
-      "code": "case_not_pass",
-      "detail": "Required case E4-INSTALL-CONFIG-ROOT is FAIL",
-      "caseId": "E4-INSTALL-CONFIG-ROOT"
-    },
-    {
       "code": "missing_required_case",
       "detail": "Required case E5-NATIVE-DELIVERY is absent",
       "caseId": "E5-NATIVE-DELIVERY"
@@ -661,7 +666,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-11T06:38:16.410Z",
+    "decidedAt": "2026-11-11T08:42:22.250Z",
     "failureCodes": []
   },
   "notes": [

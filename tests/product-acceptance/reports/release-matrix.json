@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "dirty": false
   },
   "environment": {
@@ -11,17 +11,17 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-11T06:38:16.394Z",
+  "checkedAt": "2026-11-11T08:42:22.239Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 122,
-    "FAIL": 1,
+    "PASS": 125,
+    "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 13,
+    "NOT_TESTED": 15,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
@@ -327,7 +327,7 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
-      "installed": "FAIL",
+      "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "PA_CONFIG_ROOT 覆盖后 release.json 不随 first-run 写入（owner D，已完成最小复现）。"
@@ -545,7 +545,7 @@
       "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "PA_CONFIG_ROOT 覆盖后 release.json 缺失，base 与 upgrade 两个产物均复现（owner D）。",
+        "target 已修复 PA_CONFIG_ROOT 初始化；baseline 的失败只作历史，不映射到 target。",
         "跨机器/跨 ABI 未测；只测 darwin/arm64 + Node 24.21.x + ABI 137。"
       ],
       "evidence": [
@@ -559,7 +559,7 @@
     },
     {
       "id": "two-binary-upgrade",
-      "capability": "两个真实不同二进制的数据升级与拒绝不兼容回退",
+      "capability": "显式 baseline/target 两个真实二进制的升级与拒绝不兼容回退",
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
@@ -573,15 +573,43 @@
       ]
     },
     {
-      "id": "proposal-context",
-      "capability": "自动提案确认与上下文窗口（真实 HTTP/SQLite）",
+      "id": "install-host-guards",
+      "capability": "模式保持、未知活 PID 阻断与不误杀",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "PASS",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E4-INSTALL-HOST-GUARDS"
+      ]
+    },
+    {
+      "id": "proposal-http",
+      "capability": "结构化提案 prepare/confirm/reject（真实 HTTP/SQLite）",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "网页确认入口与 context 预览未发布；source/grant 漂移与 outer receipt 失败注入未执行。"
+      ],
+      "evidence": [
+        "E3-PROPOSAL-HTTP"
+      ]
+    },
+    {
+      "id": "proposal-ui-context",
+      "capability": "提案网页确认与上下文窗口",
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
       "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "main 未发布 proposal/context 入口；E3-PROPOSAL-CONTEXT-BOUNDARY 记录了所需输入与负例。"
+        "console 无提案/上下文入口；E3-PROPOSAL-UI、E3-CONTEXT-GRANT-BOUNDARY 记录了所需输入与授权反例。"
       ],
       "evidence": []
     },

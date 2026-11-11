@@ -4,12 +4,12 @@
     "tier": "module",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-11T06:40:32.599Z",
+    "checkedAt": "2026-11-11T08:44:24.393Z",
     "source": {
-      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+      "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
       "dirty": false
     },
-    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -406,7 +406,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T06:38:16.410Z",
+      "decidedAt": "2026-11-11T08:42:22.250Z",
       "failureCodes": []
     },
     "notes": [
@@ -419,12 +419,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-11T06:40:32.601Z",
+    "checkedAt": "2026-11-11T08:44:24.394Z",
     "source": {
-      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+      "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
       "dirty": false
     },
-    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -908,6 +908,11 @@
       },
       {
         "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
         "required": true,
         "status": "PASS"
       },
@@ -996,7 +1001,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T06:38:16.410Z",
+      "decidedAt": "2026-11-11T08:42:22.250Z",
       "failureCodes": []
     },
     "notes": [
@@ -1009,12 +1014,12 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T06:40:32.601Z",
+    "checkedAt": "2026-11-11T08:44:24.395Z",
     "source": {
-      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+      "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
       "dirty": false
     },
-    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1498,6 +1503,11 @@
       },
       {
         "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
         "required": true,
         "status": "PASS"
       },
@@ -1607,7 +1617,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T06:38:16.410Z",
+      "decidedAt": "2026-11-11T08:42:22.250Z",
       "failureCodes": []
     },
     "notes": [
@@ -1618,14 +1628,14 @@
   "installed-alpha": {
     "schema": "product-acceptance-release/1",
     "tier": "installed-alpha",
-    "status": "FAIL",
-    "ok": false,
-    "checkedAt": "2026-11-11T06:40:32.601Z",
+    "status": "PASS",
+    "ok": true,
+    "checkedAt": "2026-11-11T08:44:24.395Z",
     "source": {
-      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+      "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
       "dirty": false
     },
-    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2109,6 +2119,11 @@
       },
       {
         "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
         "required": true,
         "status": "PASS"
       },
@@ -2205,10 +2220,15 @@
       {
         "id": "E4-INSTALL-CONFIG-ROOT",
         "required": true,
-        "status": "FAIL"
+        "status": "PASS"
       },
       {
         "id": "E4-INSTALL-REUSE-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-HOST-GUARDS",
         "required": true,
         "status": "PASS"
       },
@@ -2233,17 +2253,11 @@
         "status": "PASS"
       }
     ],
-    "failures": [
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E4-INSTALL-CONFIG-ROOT is FAIL",
-        "caseId": "E4-INSTALL-CONFIG-ROOT"
-      }
-    ],
+    "failures": [],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T06:38:16.410Z",
+      "decidedAt": "2026-11-11T08:42:22.250Z",
       "failureCodes": []
     },
     "notes": [
@@ -2256,12 +2270,12 @@
     "tier": "advisory-routing",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T06:40:32.602Z",
+    "checkedAt": "2026-11-11T08:44:24.395Z",
     "source": {
-      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+      "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
       "dirty": false
     },
-    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2745,6 +2759,11 @@
       },
       {
         "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
         "required": true,
         "status": "PASS"
       },
@@ -2859,7 +2878,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T06:38:16.410Z",
+      "decidedAt": "2026-11-11T08:42:22.250Z",
       "failureCodes": []
     },
     "notes": [
@@ -2872,12 +2891,12 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T06:40:32.602Z",
+    "checkedAt": "2026-11-11T08:44:24.395Z",
     "source": {
-      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+      "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
       "dirty": false
     },
-    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3361,6 +3380,11 @@
       },
       {
         "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
         "required": true,
         "status": "PASS"
       },
@@ -3495,7 +3519,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T06:38:16.410Z",
+      "decidedAt": "2026-11-11T08:42:22.250Z",
       "failureCodes": []
     },
     "notes": [
@@ -3508,12 +3532,12 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T06:40:32.602Z",
+    "checkedAt": "2026-11-11T08:44:24.395Z",
     "source": {
-      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+      "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
       "dirty": false
     },
-    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3997,6 +4021,11 @@
       },
       {
         "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
         "required": true,
         "status": "PASS"
       },
@@ -4141,7 +4170,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T06:38:16.410Z",
+      "decidedAt": "2026-11-11T08:42:22.250Z",
       "failureCodes": []
     },
     "notes": [
@@ -4154,12 +4183,12 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T06:40:32.602Z",
+    "checkedAt": "2026-11-11T08:44:24.395Z",
     "source": {
-      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+      "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
       "dirty": false
     },
-    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4643,6 +4672,11 @@
       },
       {
         "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
         "required": true,
         "status": "PASS"
       },
@@ -4752,7 +4786,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T06:38:16.410Z",
+      "decidedAt": "2026-11-11T08:42:22.250Z",
       "failureCodes": []
     },
     "notes": [
@@ -4763,14 +4797,14 @@
   "local-alpha": {
     "schema": "product-acceptance-release/1",
     "tier": "local-alpha",
-    "status": "FAIL",
-    "ok": false,
-    "checkedAt": "2026-11-11T06:40:32.602Z",
+    "status": "PASS",
+    "ok": true,
+    "checkedAt": "2026-11-11T08:44:24.396Z",
     "source": {
-      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+      "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
       "dirty": false
     },
-    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5258,6 +5292,11 @@
         "status": "PASS"
       },
       {
+        "id": "E3-PROPOSAL-HTTP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-DESKTOP-GEOMETRY",
         "required": true,
         "status": "PASS"
@@ -5350,10 +5389,15 @@
       {
         "id": "E4-INSTALL-CONFIG-ROOT",
         "required": true,
-        "status": "FAIL"
+        "status": "PASS"
       },
       {
         "id": "E4-INSTALL-REUSE-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-HOST-GUARDS",
         "required": true,
         "status": "PASS"
       },
@@ -5378,17 +5422,11 @@
         "status": "PASS"
       }
     ],
-    "failures": [
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E4-INSTALL-CONFIG-ROOT is FAIL",
-        "caseId": "E4-INSTALL-CONFIG-ROOT"
-      }
-    ],
+    "failures": [],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T06:38:16.410Z",
+      "decidedAt": "2026-11-11T08:42:22.250Z",
       "failureCodes": []
     },
     "notes": [
@@ -5401,12 +5439,12 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-11T06:40:32.603Z",
+    "checkedAt": "2026-11-11T08:44:24.396Z",
     "source": {
-      "commit": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+      "commit": "8195d31dfda2bf922045c39688c9c59e29219cfe",
       "dirty": false
     },
-    "expectedSource": "9cdf8f7f68141d3d1aa597a1e80eb013f51cf3ab",
+    "expectedSource": "8195d31dfda2bf922045c39688c9c59e29219cfe",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5894,6 +5932,11 @@
         "status": "PASS"
       },
       {
+        "id": "E3-PROPOSAL-HTTP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-DESKTOP-GEOMETRY",
         "required": true,
         "status": "PASS"
@@ -5986,10 +6029,15 @@
       {
         "id": "E4-INSTALL-CONFIG-ROOT",
         "required": true,
-        "status": "FAIL"
+        "status": "PASS"
       },
       {
         "id": "E4-INSTALL-REUSE-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-HOST-GUARDS",
         "required": true,
         "status": "PASS"
       },
@@ -6026,11 +6074,6 @@
     ],
     "failures": [
       {
-        "code": "case_not_pass",
-        "detail": "Required case E4-INSTALL-CONFIG-ROOT is FAIL",
-        "caseId": "E4-INSTALL-CONFIG-ROOT"
-      },
-      {
         "code": "missing_required_case",
         "detail": "Required case E5-NATIVE-DELIVERY is absent",
         "caseId": "E5-NATIVE-DELIVERY"
@@ -6059,7 +6102,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-11T06:38:16.410Z",
+      "decidedAt": "2026-11-11T08:42:22.250Z",
       "failureCodes": []
     },
     "notes": [

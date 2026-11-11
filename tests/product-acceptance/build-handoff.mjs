@@ -397,12 +397,12 @@ const executionStatus = {
   externalBlockers: [
     { owner: 'main/C', detail: 'Proposal HTTP is verified; the console confirmation page and any context preview are still unpublished, and the C composer still fails expired/purpose/over-budget grant probes.' },
     { owner: 'main', detail: 'Migration ownership and review Work/Ticket/Assignment publication remain outside current main, so E3-REVIEW-PIPELINE stays NOT_TESTED.' },
-    { owner: 'D', detail: 'Source stays on codex/g3-local-distribution. The frozen tar.gz is accepted byte-for-byte; a second frozen buildId is required for E4-UPGRADE-ROLLBACK, and PA_CONFIG_ROOT override drops release.json.' },
+    { owner: 'D', detail: 'Target 9120a5ed passes byte-for-byte and fixes the config-root initialization; any newer target must be named with its own tar/source/build/schema and independently re-tested rather than inheriting this verdict.' },
     { owner: 'B', detail: 'Native ledger/results are not supplied as input and E has no budget, so actual-native and native control evidence are absent.' },
   ],
   next: [
     'C/main: publish automatic proposal/context confirmation and a review Work/Ticket/Assignment entry; E then adds confirm-before-execute, revocation-effect and transaction-failure cases on top of the already verified explicit decisions.',
-    'D: publish a second frozen artifact (different buildId, same schema) for the upgrade case, and seed release.json when PA_CONFIG_ROOT is overridden; everything else in the frozen artifact already passes in a fresh directory.',
+    'D: keep the target immutable; a new target artifact needs its own explicit identity (tar/sha/source/build/schema) and a fresh E4 run, not a mapping from 9120a5ed.',
     'B: hand off native evidence bound to commit/attempt/command with executed=true and model-task counts; only a separately granted budget lets E re-run native.',
     'Main: treat controlled-product-workflow PASS as workflow evidence only; local-alpha and full-product remain non-zero until installation and native evidence exist.',
   ],
@@ -475,7 +475,7 @@ ${rows
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | 见 \`installed-alpha\` tier；target 的 cold install/config root/doctor、备份恢复、显式 baseline→target 升级与未知 PID 阻断均独立通过 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK；旧 baseline 的 config-root 失败仅作历史，旧组合结果不映射到 target。 |
+| 安装准入（个人 Alpha） | **PASS（仅所测 baseline→target 组合）**：cold install/config root/doctor、模式保持、备份恢复、显式升级、旧二进制 schema 拒绝与未知 PID 阻断 | E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK；旧 baseline 的 config-root 失败仅作历史，旧组合结果不映射到 target。 |
 
 安装物身份（显式 baseline/target）：baseline \`wave06-alpha-b0f87c88\` / buildId \`b0f87c883aa6b206\` / schema 12 / tar \`8b728b61…b5c5d\` / source \`9046d4c5\`（dirty，仅作基线）；target \`wave07-target-9120a5ed\` / buildId \`9120a5ed858e0feb\` / schema 13 / tar \`bbc13312…7912\` / source \`76f26a66\`（clean）。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 baseline→target 组合成立；旧 wave06 组合的结果保留为历史。
 
@@ -511,7 +511,7 @@ ${rows
 - RSS/FD/磁盘是单实例观察；端口不变不能证明无进程泄漏。
 - 截图与几何断言只证明可达/不溢出/不重叠，不评价美观。
 - 推荐/复核仍只在实验入口；advisory/controlled-review/heterogeneous tier 因生产者缺失而非零。
-- 第二协议与真实 native 证据缺失；安装缺第二个 buildId 的升级演练，因此 \`local-alpha\`、\`full-product\` 被 gate 拒绝。
+- 真实 native 投递/控制证据缺失，因此 \`full-product\` 仍被 gate 拒绝；\`installed-alpha\` 与 \`local-alpha\` 仅对所测 baseline→target 组合成立。
 - 试点被预检阻断，不能把 harness 或干跑当作价值已验证。
 
 ## 下一消费者
