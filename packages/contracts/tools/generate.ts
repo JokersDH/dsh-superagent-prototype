@@ -20,6 +20,7 @@ import { RecoveryActivationIntentSchema, RecoveryActivationCommitSchema, Recover
 import { ProposalPrepareSchema, ProposalPreviewSchema, ProposalCommandSchema } from '../src/proposal-commands.ts';
 import { RecoveryTargetConfigurationSchema, RecoveryTargetPreparationSchema, RecoveryTargetMaterialSchema, RecoveryTargetInventorySchema } from '../src/recovery-target.ts';
 import { ContextPreviewInputSchema, ContextPreviewSchema } from '../src/context-preview.ts';
+import { AssistantContextBindingSchema } from '../src/assistant-context.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -97,6 +98,9 @@ outputs.set('generated/recovery-target.manifest.json', canonical({ protocol: 're
 const contextPreviewText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:context-preview:1', $defs: { ContextPreviewInput: z.toJSONSchema(ContextPreviewInputSchema, { target: 'draft-2020-12', io: 'input' }), ContextPreview: z.toJSONSchema(ContextPreviewSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/context-preview.schema.json', contextPreviewText);
 outputs.set('generated/context-preview.manifest.json', canonical({ protocol: 'context-preview/1', schemaHash: digest(contextPreviewText), sourceHash: digest(readFileSync(resolve(root, 'src/context-preview.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const assistantContextText = canonical({ ...z.toJSONSchema(AssistantContextBindingSchema, { target: 'draft-2020-12', io: 'input' }), $id: 'urn:personal-agent:assistant-context-binding:1' });
+outputs.set('generated/assistant-context.schema.json', assistantContextText);
+outputs.set('generated/assistant-context.manifest.json', canonical({ protocol: 'assistant-context-binding/1', schemaHash: digest(assistantContextText), sourceHash: digest(readFileSync(resolve(root, 'src/assistant-context.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [path, content] of outputs) {
   const target = resolve(root, path);
   if (check) {
