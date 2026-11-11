@@ -18,6 +18,7 @@
 - Recovery authorization is main-owned and PLANNED until its actual interface checkpoint. Keep restore markers, old queues and unknown-writer barriers; no force switch or marker deletion may replace fresh binding/verification and explicit authorization of new work.
 - Preserve user services 5180/8796, 5181/8797, 5182/8798, 5183/8799 and 5184/8800. Use isolated temporary ports/state. Only main updates shared dispatch/docs/root lock; role evidence stays under each role's owned directory. Static dispatch checks are not runtime or release evidence.
 - Main's subsequent scoped checkpoint is WP-16/0024: A v13 ports, C decision transactions/shared ranker and B exact-profile resolver are integrated in the recorded scopes. Decision record/revoke HTTP/UI is available; generic proposal execution, automatic context injection and recovery reauthorization remain separate. Preserve the new 5185/8801 preview too; it has independent private state and does not migrate the old instances.
+- WP-16/0025 adds A accepted-event Outcome composition, authenticated work evidence, recovery inspect and read-only recovery prepare. Plans explicitly say not_granted and commitAvailable=false; recovery commit/new authorization is not implemented. Only the exact authenticated prepare POST bypasses the restore mutation guard, and it must not write DB/marker/registry/queues. Do not relabel preflight success as recovery activation or native admission.
 
 ## Historical Product Wave-05 Assignments (2026-11-10)
 

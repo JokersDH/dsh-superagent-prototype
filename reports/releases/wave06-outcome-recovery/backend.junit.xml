@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+	<testcase name="health is public but data and commands require local credentials" time="0.081974" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="recovery read-only blocks business writes and removes action grants while preserving authenticated reads" time="0.169607" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="conversation catalog is authenticated, scoped and uses immutable command receipts" time="0.033902" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="local development access opens directly without a token, cookie or browser storage" time="0.025952" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="local development access keeps Origin, Host and actor checks and is fixture-only" time="0.029649" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="model settings expose a safe status and accept only a model selection command" time="0.017367" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="a model status containing credentials is rejected without disclosing them" time="0.027863" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="assistant SSE is authenticated and forwards text before the producer finishes" time="0.017639" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="a bearer command uses a server-generated actor and returns the original durable receipt on replay" time="0.024608" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="cookie sessions are HttpOnly/SameSite and Origin-protected JSON writes do not accept actor spoofing" time="0.017354" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="a forged Origin/Host, expired session, malformed query and oversized body fail with bounded stable errors" time="0.019061" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="schema-valid rejected commands are normal receipts, while native credentials cannot act as a human" time="0.017092" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="message paging is typed/exclusive and event streaming exposes only schema-valid public changes" time="0.026042" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="HTTP answers use the Broker and add display history without an extra generic core Input" time="0.033523" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="unexpected backend failures are redacted and unconnected detail ports never fake data" time="0.017472" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="the Node adapter serves actual loopback HTTP requests and shuts down without orphaned streams" time="0.025259" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/application-http.case.mjs"/>
+	<testcase name="attention reads authorized projects and original conversations without producing effects" time="0.184742" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/attention-inbox.case.mjs"/>
+	<testcase name="per-work questions are not starved by another project and expiry is separate from business deadline" time="0.180664" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/attention-inbox.case.mjs"/>
+	<testcase name="work pagination is explicit, and unknown wait ties are stable without inventing deadlines" time="0.033525" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/attention-inbox.case.mjs"/>
+	<testcase name="optional priority rule cannot omit or fabricate a source item" time="0.022754" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/attention-inbox.case.mjs"/>
+	<testcase name="HTTP attention requires local credentials and rejects actor/query injection, including recovery reads" time="0.042874" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/attention-inbox.case.mjs"/>
+	<testcase name="preparation is read-only; explicit record and its event/receipt commit once and survive reopen" time="0.102686" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/decision-commands.case.mjs"/>
+	<testcase name="source digest, source conversation, actor and configured grant are rechecked on confirmation" time="0.030418" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/decision-commands.case.mjs"/>
+	<testcase name="expired previews/scopes and tampered tokens cannot record or dispatch work" time="0.040392" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/decision-commands.case.mjs"/>
+	<testcase name="a receipt failure rolls the decision and event back, with a later identical command allowed" time="0.067902" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/decision-commands.case.mjs"/>
+	<testcase name="revocation persists audit history, foreign scope is refused and old previews cannot resurrect it" time="0.026429" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/decision-commands.case.mjs"/>
+	<testcase name="source disappearance is visible in the catalog and project-bound continuation is enforced" time="0.030557" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/decision-commands.case.mjs"/>
+	<testcase name="model messages and native answer display cannot become reusable user decisions" time="0.020542" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/decision-commands.case.mjs"/>
+	<testcase name="HTTP identity/schema and recovery read-only guard apply to every decision mutation" time="0.058614" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/decision-commands.case.mjs"/>
+	<testcase name="product executes a real child, routes its original question and verifies a human-accepted artifact" time="1.209094" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="required machine FAIL stays visible and cannot be overridden by human acceptance" time="0.905560" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="a machine-only contract completes without creating empty human acceptance" time="1.055337" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="legacy acceptance without an archived profile stays delivered with a visible evidence gap" time="0.915048" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="pause holds queued execution and resume launches once; effect replay cannot begin twice" time="0.886291" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="pause during asynchronous host registration retains the same unfed begin until resume" time="0.917459" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="stop obtains a physical barrier and an old native question cannot receive a late answer" time="0.494284" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="supplement reaches the current child once and its actual read clears core unread inputs" time="0.963071" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="two attempts with identical native RPC IDs retain separate original answer targets" time="1.166637" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="failed fact receipt rolls native question intake back with no phantom prompt or candidate" time="0.400376" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="real coordinator SIGKILL preserves an unknown writer and never replays begin on reopen" time="0.545184" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="revise waits for the old physical barrier and routes the next question only to the new attempt" time="0.782782" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="artifact mutation refuses acceptance and a successful command receipt survives reopen" time="1.157154" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="committed verification intent survives reopen after the controlled host has ended" time="1.853909" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="verification infrastructure failures stop after three tries and recover through authenticated idempotent HTTP" time="2.470968" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="invalid verification blocks immediately; stale blocks and rolled-back recovery never enqueue work" time="0.840881" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="changed resource proof and retired candidates cannot use a previously valid recovery action" time="0.398627" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="a non-PASS machine result is immutable and cannot be converted into a recheck or acceptance" time="0.821549" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="expired authorization removes recovery and refuses a schema-valid current candidate" time="0.396887" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="authenticated HTTP commands drive the actual child and expose only published artifacts" time="1.581696" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/product-execution.case.mjs"/>
+	<testcase name="recovery inspect and project preflight change no DB, marker, project registry or old queue" time="0.488527" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/recovery-preflight.case.mjs"/>
+	<testcase name="stale fingerprints, another actor/project and dirty targets are refused" time="0.157241" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/recovery-preflight.case.mjs"/>
+	<testcase name="read-only Git preflight cannot execute a repository filesystem-monitor command" time="0.205055" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/recovery-preflight.case.mjs"/>
+	<testcase name="unsafe, redirected and mismatched restore markers cannot become a binding plan" time="0.115233" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/recovery-preflight.case.mjs"/>
+	<testcase name="old ended bindings are not fresh resource proof, and missing bytes or executor are explicit gaps" time="0.174828" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/recovery-preflight.case.mjs"/>
+	<testcase name="only authenticated recovery preflight is exempt from the readonly mutation guard" time="0.193373" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/recovery-preflight.case.mjs"/>
+	<testcase name="actual restored demo exposes readonly preflight while old execution stays untouched" time="0.974604" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/recovery-process.case.mjs"/>
+	<testcase name="waiting includes offline time but overlapping tabs only count the union of observed review intervals" time="0.003402" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/review-timing.case.mjs"/>
+	<testcase name="unobserved activity and clock regression are unknown rather than fabricated zeros" time="0.000289" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/review-timing.case.mjs"/>
+	<testcase name="activity requires a current candidate, a local UI actor, and idempotent scoped receipts" time="0.127492" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/review-timing.case.mjs"/>
+	<testcase name="C advice writes, replays, rolls back and reopens through A actual SQLite port" time="0.100704" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/routing-sql-consumer.case.mjs"/>
+	<testcase name="C consumes A persisted fixture report without promoting it to a current review or completion authority" time="0.060966" classname="test" file="/Users/hh/Desktop/joker/superagent/tests/integration/routing-sql-consumer.case.mjs"/>
+	<!-- tests 61 -->
+	<!-- suites 0 -->
+	<!-- pass 61 -->
+	<!-- fail 0 -->
+	<!-- cancelled 0 -->
+	<!-- skipped 0 -->
+	<!-- todo 0 -->
+	<!-- duration_ms 20696.1095 -->
+</testsuites>
