@@ -4,7 +4,7 @@
  * verification. It never opens a second SQLite writer and never grants execution authority.
  */
 import type {
-  AssistantState, Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, LegacyDecisionRecord,
+  AcceptanceProjectionInput, AcceptanceProjectionResult, AssistantState, Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, LegacyDecisionRecord,
   ProductStore, ProjectCurrent, ProjectSettings, ProjectVersion, SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, WorkIndexEntry,
 } from '@personal-agent/storage'
 import { WorkflowConflict as StorageWorkflowConflict } from '@personal-agent/storage'
@@ -34,6 +34,10 @@ export interface RoutingEvidencePortWithSources extends RoutingEvidencePort {
 export interface AssistantPort extends AssistantStatePort {
   /** Old UserDecision ledger rows without source/actor metadata: auditable but not valid memory. */
   legacyDecisions(query: AssistantStateQuery): { records: readonly LegacyDecisionRecord[]; nextCursor?: string }
+}
+
+export interface AcceptanceProjectionPort {
+  consume(input: AcceptanceProjectionInput): AcceptanceProjectionResult
 }
 
 export interface ConversationPort {
@@ -83,6 +87,7 @@ export interface WorkflowPorts {
   decisions: DecisionLedgerPort
   assistant: AssistantPort
   routingEvidence: RoutingEvidencePortWithSources
+  acceptance: AcceptanceProjectionPort
   index: ReadIndexPort
   state: StateFactsPort
 }
@@ -96,6 +101,7 @@ export function createWorkflowPorts(store: ProductStore): WorkflowPorts {
     decisions: store.workflows.decisions,
     assistant: store.workflows.assistant,
     routingEvidence: store.workflows.routingEvidence,
+    acceptance: store.workflows.acceptance,
     index: store.workflows.index,
     state: store.workflows.index,
   }

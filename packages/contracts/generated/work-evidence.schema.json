@@ -1,0 +1,458 @@
+{
+  "$defs": {
+    "__schema0": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    }
+  },
+  "$id": "urn:personal-agent:work-evidence:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "entries": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "type": "string"
+          },
+          "detail": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "kind": {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          "sourceRef": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "at",
+          "kind",
+          "sourceRef",
+          "detail"
+        ],
+        "type": "object"
+      },
+      "maxItems": 500,
+      "readOnly": true,
+      "type": "array"
+    },
+    "outcomes": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "acceptance": {
+            "enum": [
+              "not_requested",
+              "accepted",
+              "rejected",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "acceptanceRef": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "artifactDigest": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "attempt": {
+            "additionalProperties": false,
+            "properties": {
+              "assignmentId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "attemptId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "contract": {
+                "additionalProperties": false,
+                "properties": {
+                  "digest": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "revision": {
+                    "maximum": 9007199254740991,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "workId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "workId",
+                  "revision",
+                  "digest"
+                ],
+                "type": "object"
+              },
+              "fenceEpoch": {
+                "maximum": 9007199254740991,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "ticketId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "ticketId",
+              "assignmentId",
+              "contract",
+              "attemptId",
+              "fenceEpoch"
+            ],
+            "type": "object"
+          },
+          "candidate": {
+            "additionalProperties": false,
+            "properties": {
+              "assignmentId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "candidateGeneration": {
+                "maximum": 9007199254740991,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "contract": {
+                "additionalProperties": false,
+                "properties": {
+                  "digest": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "revision": {
+                    "maximum": 9007199254740991,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "workId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "workId",
+                  "revision",
+                  "digest"
+                ],
+                "type": "object"
+              },
+              "ticketId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "ticketId",
+              "assignmentId",
+              "contract",
+              "candidateGeneration"
+            ],
+            "type": "object"
+          },
+          "durationMs": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "evidenceRefs": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "maxItems": 128,
+            "readOnly": true,
+            "type": "array"
+          },
+          "id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "layer": {
+            "enum": [
+              "actual_native",
+              "controlled",
+              "protocol_fixture",
+              "schema",
+              "operator_note"
+            ],
+            "type": "string"
+          },
+          "observedAt": {
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "type": "string"
+          },
+          "profileRef": {
+            "additionalProperties": false,
+            "properties": {
+              "identityDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "profileId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "revision": {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "profileId",
+              "revision",
+              "identityDigest"
+            ],
+            "type": "object"
+          },
+          "projectId": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "protocol": {
+            "const": "execution-outcome/1",
+            "type": "string"
+          },
+          "reviewTiming": {
+            "additionalProperties": false,
+            "properties": {
+              "acceptedAt": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "activeReviewCompleteness": {
+                "enum": [
+                  "partial",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              "activeReviewMs": {
+                "anyOf": [
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "activeReviewSource": {
+                "enum": [
+                  "ui_visibility_proxy",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              "candidateReadyAt": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "evidenceRefs": {
+                "items": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "maxItems": 128,
+                "readOnly": true,
+                "type": "array"
+              },
+              "readyToAcceptanceMs": {
+                "anyOf": [
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "candidateReadyAt",
+              "acceptedAt",
+              "readyToAcceptanceMs",
+              "activeReviewMs",
+              "activeReviewSource",
+              "activeReviewCompleteness",
+              "evidenceRefs"
+            ],
+            "type": "object"
+          },
+          "usage": {
+            "additionalProperties": false,
+            "properties": {
+              "completeness": {
+                "enum": [
+                  "observed",
+                  "partial",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              "cost": {
+                "additionalProperties": false,
+                "properties": {
+                  "amount": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "currency": {
+                    "pattern": "^[A-Z]{3}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "currency",
+                  "amount"
+                ],
+                "type": "object"
+              },
+              "evidenceRefs": {
+                "items": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "maxItems": 1024,
+                "readOnly": true,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "inputTokens": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "outputTokens": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "completeness",
+              "evidenceRefs"
+            ],
+            "type": "object"
+          },
+          "verificationRef": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "protocol",
+          "id",
+          "projectId",
+          "attempt",
+          "profileRef",
+          "acceptance",
+          "evidenceRefs",
+          "layer",
+          "usage",
+          "observedAt"
+        ],
+        "type": "object"
+      },
+      "maxItems": 500,
+      "readOnly": true,
+      "type": "array"
+    },
+    "projection": {
+      "enum": [
+        "recorded",
+        "source_missing",
+        "not_in_window",
+        "not_accepted"
+      ],
+      "type": "string"
+    },
+    "protocol": {
+      "const": "work-evidence/1",
+      "type": "string"
+    },
+    "truncated": {
+      "type": "boolean"
+    },
+    "workId": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "protocol",
+    "workId",
+    "projection",
+    "entries",
+    "outcomes",
+    "truncated"
+  ],
+  "type": "object"
+}
