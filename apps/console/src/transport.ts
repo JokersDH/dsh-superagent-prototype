@@ -26,6 +26,11 @@ import {
   ReviewActivitySchema,
   AttentionPageSchema,
   AttentionQuerySchema,
+  DecisionPrepareSchema,
+  DecisionPreviewSchema,
+  DecisionCommandSchema,
+  DecisionQuerySchema,
+  DecisionPageSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -52,6 +57,11 @@ import type {
   ReviewActivity,
   AttentionPage,
   AttentionQuery,
+  DecisionPrepare,
+  DecisionPreview,
+  DecisionCommand,
+  DecisionQuery,
+  DecisionPage,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -104,6 +114,9 @@ export interface ConsoleTransport {
   projectSettingsCommand?(command: ProjectSettingsCommand): Promise<CommandReceipt>
   reviewActivity?(activity: ReviewActivity): Promise<CommandReceipt>
   attention?(query: AttentionQuery): Promise<AttentionPage | undefined>
+  prepareDecision?(input: DecisionPrepare): Promise<DecisionPreview>
+  decisionCommand?(command: DecisionCommand): Promise<CommandReceipt>
+  decisions?(query: DecisionQuery): Promise<DecisionPage>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -331,6 +344,26 @@ export class HttpTransport implements ConsoleTransport {
     const receipt = CommandReceiptSchema.parse(await this.request(`/v1/projects/${encodeURIComponent(command.projectId)}/settings`, { method: 'POST', body: JSON.stringify(command) }))
     if (receipt.commandId !== command.commandId) throw new TransportError('schema_mismatch', '项目设置回执身份不匹配')
     return receipt
+  }
+  async prepareDecision(input: DecisionPrepare): Promise<DecisionPreview> {
+    const value = DecisionPrepareSchema.parse(input)
+    const preview = DecisionPreviewSchema.parse(await this.request('/v1/decisions/prepare', { method: 'POST', body: JSON.stringify(value) }))
+    if (preview.sourceMessageId !== value.sourceMessageId || preview.conversationId !== value.conversationId || preview.decision.scope.projectId !== value.projectId)
+      throw new TransportError('schema_mismatch', '决定预览来源不匹配')
+    return preview
+  }
+  async decisionCommand(input: DecisionCommand): Promise<CommandReceipt> {
+    const command = DecisionCommandSchema.parse(input)
+    const receipt = CommandReceiptSchema.parse(await this.request('/v1/decisions/commands', { method: 'POST', body: JSON.stringify(command), signal: AbortSignal.timeout(10000) }))
+    if (receipt.commandId !== command.commandId) throw new TransportError('schema_mismatch', '决定回执身份不匹配')
+    return receipt
+  }
+  async decisions(input: DecisionQuery): Promise<DecisionPage> {
+    const query = DecisionQuerySchema.parse(input), params = new URLSearchParams()
+    for (const [key, value] of Object.entries(query)) if (value !== undefined) params.set(key, String(value))
+    const page = DecisionPageSchema.parse(await this.request(`/v1/decisions?${params}`))
+    if (page.decisions.some(value => value.record.decision.scope.projectId !== query.projectId)) throw new TransportError('schema_mismatch', '决定目录项目不匹配')
+    return page
   }
   async attention(input: AttentionQuery): Promise<AttentionPage | undefined> {
     const query = AttentionQuerySchema.parse(input), params = new URLSearchParams()

@@ -37,6 +37,11 @@ import {
   ReviewActivitySchema,
   AttentionPageSchema,
   AttentionQuerySchema,
+  DecisionPrepareSchema,
+  DecisionPreviewSchema,
+  DecisionCommandSchema,
+  DecisionQuerySchema,
+  DecisionPageSchema,
 } from '@personal-agent/contracts'
 import type {
   AnswerDelivery,
@@ -63,6 +68,11 @@ import type {
   ReviewActivity,
   AttentionPage,
   AttentionQuery,
+  DecisionPrepare,
+  DecisionPreview,
+  DecisionCommand,
+  DecisionQuery,
+  DecisionPage,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -114,9 +124,12 @@ export interface LocalHttpOptions {
     conversation?(command: ConversationCommand, actor: TrustedActor): Promise<CommandReceipt>
     projectSettings?(command: ProjectSettingsCommand, actor: TrustedActor): Promise<CommandReceipt>
     reviewActivity?(activity: ReviewActivity, actor: TrustedActor): Promise<CommandReceipt>
+    prepareDecision?(input: DecisionPrepare, actor: TrustedActor): Promise<DecisionPreview>
+    decision?(command: DecisionCommand, actor: TrustedActor): Promise<CommandReceipt>
   }
   read?: {
     attention?(query: AttentionQuery): Promise<AttentionPage>
+    decisions?(query: DecisionQuery): Promise<DecisionPage>
     conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog>
     conversation?(id: string): Promise<ConversationSummary>
     projectSettings?(projectId: string): Promise<ProjectSettingsPage>
@@ -274,10 +287,32 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!options.read?.configuration)
       throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
     const value = ApplicationConfigurationSchema.parse(await options.read.configuration())
-    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false,
+    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false, decisionsAvailable: false,
       profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate' })),
       projects: value.projects.map(project => { const { defaultProfileId: _, ...rest } = project; return { ...rest, profileIds: [], dispatchAllowed: false, blockedReason: 'writer_indeterminate' } }),
     }) : value)
+  })
+  app.get('/v1/decisions', async (c) => {
+    if (!options.read?.decisions) throw new ApplicationFault('unsupported_capability', 'Decision reader is not connected')
+    const input = { ...c.req.query() } as Record<string, unknown>
+    if (typeof input.limit === 'string') {
+      if (!/^[1-9][0-9]*$/.test(input.limit)) throw new ApplicationFault('invalid_request', 'Invalid decision page size')
+      input.limit = Number(input.limit)
+    }
+    return c.json(DecisionPageSchema.parse(await options.read.decisions(DecisionQuerySchema.parse(input))))
+  })
+  app.post('/v1/decisions/prepare', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Decision preview requires JSON')
+    if (!options.operations?.prepareDecision) throw new ApplicationFault('unsupported_capability', 'Decision preparation is not connected')
+    return c.json(DecisionPreviewSchema.parse(await options.operations.prepareDecision(DecisionPrepareSchema.parse(await c.req.json()), c.get('actor'))))
+  })
+  app.post('/v1/decisions/commands', async (c) => {
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Decision command requires JSON')
+    if (!options.operations?.decision) throw new ApplicationFault('unsupported_capability', 'Decision commands are not connected')
+    const command = DecisionCommandSchema.parse(await c.req.json())
+    const receipt = CommandReceiptSchema.parse(await options.operations.decision(command, c.get('actor')))
+    if (receipt.commandId !== command.commandId) throw new ApplicationFault('storage_unavailable', 'Decision receipt identity mismatch', 'none')
+    return c.json(receipt)
   })
   app.get('/v1/attention', async (c) => {
     if (!options.read?.attention) throw new ApplicationFault('unsupported_capability', 'Attention reader is not connected')

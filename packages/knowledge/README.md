@@ -68,6 +68,24 @@ decision while persisted revisions remain auditable.
 until storage publishes the real `createWorkflowPorts(store).assistant` implementation. The real
 temporary-SQLite vertical is **BLOCKED/NOT_TESTED** until that port lands.
 
+## Wave-05 C1 — real-store replay and synchronous decision transaction
+
+`AssistantDecisionStore` now maps the production CAS contract explicitly: create uses
+`expectedVersion 0`; a same-version retry compares the full body/source/actor except `recordedAt` and
+returns the current persisted head without writing; an older replay returns the **current head** so a
+revoked/superseded decision is never resurrected; a legitimate successor uses
+`expectedVersion = current.version`. Real SQLite replay at two different times is covered by
+`test/real-store.case.ts` and the independent `review-persisted-assistant.mjs` probe (7/7).
+
+`DecisionTransactionService` provides read-only `prepare`, `prepareRevocation` plus synchronous
+`commit`/`commitRevocation`/`revoke` for main's UnitOfWork. `prepare` writes nothing and returns an immutable decision/source snapshot;
+`commit`/`revoke` re-check trusted actor, project/grant/scope, current source digest/conversation and
+supersession state, then write through A's synchronous `AssistantStatePort`. Main writes its
+receipt/event in the same transaction; failures roll back. See
+`examples/decision-transaction.mjs` and `examples/assistant-workflow.mjs` for real temporary-SQLite
+consumers. The latter runs the web-flow recipe: authorized context preview -> proposal pending/confirm
+with receipt -> decision record with receipt -> revocation plan/commit -> old replay stays revoked.
+
 ## Wave-04 checkpoint
 
 The three independent admission failures are fixed: missing-source decisions are no longer effective

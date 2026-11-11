@@ -13,11 +13,11 @@ import { createControlledProduct, FIXTURE_CHECK } from '../../apps/coordinator/p
 import { createLocalHttpApp } from '../../apps/coordinator/http/app.ts'
 import { listenLocalHttp } from '../../apps/coordinator/http/server.ts'
 
-const { values } = parseArgs({ options: { 'no-capture': { type: 'boolean', default: false } } })
+const { values } = parseArgs({ options: { 'no-capture': { type: 'boolean', default: false }, output: { type: 'string' } } })
 const require = createRequire(new URL('../../apps/console/package.json', import.meta.url))
 const { chromium } = require('@playwright/test')
 const { createServer: createViteServer } = await import(require.resolve('vite'))
-const output = resolve('reports/releases/attention-inbox/browser'), captures = resolve('apps/console/.impeccable/review')
+const output = resolve(values.output ?? 'reports/releases/attention-inbox/browser'), captures = resolve('apps/console/.impeccable/review')
 mkdirSync(output, { recursive: true }); mkdirSync(captures, { recursive: true })
 const root = mkdtempSync(join(tmpdir(), 'pa-attention-browser-')), stateRoot = join(root, 'state'), scratchProject = join(root, 'project')
 mkdirSync(stateRoot); mkdirSync(scratchProject)
@@ -86,6 +86,10 @@ try {
     assert.equal((await product.application.inspect({ conversationId: 'main-inbox' })).works.length, 0)
     await inbox()
     await page.waitForFunction(() => document.querySelectorAll('.attention-row').length === 5)
+    const observed = await product.read.attention({})
+    assert.equal(observed.ranking, 'deterministic_priority')
+    assert.ok(observed.ranks.every(rank => rank.reasons.length > 0))
+    assert.deepEqual(observed.ranks.map(rank => rank.id), await page.locator('.attention-row').evaluateAll(rows => rows.map(row => row.dataset.attentionId)))
     await page.getByText('全部会话 · 已读取 5 个工作 · 本页 5 项', { exact: true }).waitFor()
     assert.doesNotMatch(await page.locator('body').innerText(), /private-attention-diagnostic/)
     assert.equal(accepted().length, 0)
@@ -163,7 +167,7 @@ try {
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'tests/integration/attention-inbox-browser.mjs'], { encoding: 'utf8' }).trim() === '',
     checkedAt: new Date().toISOString(), cases, errors, modelCalls: 0,
     limitations: ['Real local HTTP/SQLite and controlled subprocesses only; no native compatibility or reviewer benefit claim',
-      'Current ranking is waiting order within a bounded work page; C deterministic priority is not enabled',
+      'C deterministic priority applies within a bounded work page, not a global optimal schedule',
       'Sequential review is navigation plus individual confirmation, never bulk authorization or auto-acceptance'] }
   writeFileSync(join(output, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n'); console.log(JSON.stringify(report, null, 2))
   rmSync(root, { recursive: true, force: true })

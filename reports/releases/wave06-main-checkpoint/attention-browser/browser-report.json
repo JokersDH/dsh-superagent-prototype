@@ -1,0 +1,39 @@
+{
+  "status": "PASS_CONTROLLED_ATTENTION_INBOX_BROWSER",
+  "sourceCommit": "6076d00bb73c5dd10149370adc04d7153e251dd2",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-11T02:48:42.033Z",
+  "cases": [
+    {
+      "id": "CROSS-PROJECT-INBOX-FROM-EMPTY-CONVERSATION-AND-RESPONSIVE",
+      "status": "PASS"
+    },
+    {
+      "id": "PROJECT-AND-KIND-FILTERS-KEEP-ORIGINAL-SOURCE",
+      "status": "PASS"
+    },
+    {
+      "id": "QUESTION-NAVIGATION-RELOADS-EXACT-WORK-AND-CONVERSATION",
+      "status": "PASS"
+    },
+    {
+      "id": "SEQUENTIAL-REVIEW-NAVIGATES-WITHOUT-BULK-ACCEPTANCE",
+      "status": "PASS"
+    },
+    {
+      "id": "MACHINE-FAIL-IS-A-BLOCKAGE-AND-CANNOT-BECOME-ACCEPTANCE",
+      "status": "PASS"
+    },
+    {
+      "id": "CROSS-CONVERSATION-ANSWER-USES-ONLY-ORIGINAL-TARGET",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "limitations": [
+    "Real local HTTP/SQLite and controlled subprocesses only; no native compatibility or reviewer benefit claim",
+    "C deterministic priority applies within a bounded work page, not a global optimal schedule",
+    "Sequential review is navigation plus individual confirmation, never bulk authorization or auto-acceptance"
+  ]
+}

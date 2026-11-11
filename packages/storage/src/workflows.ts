@@ -14,6 +14,7 @@ import { UnitOfWork } from './uow.ts'
 import { canonicalDigest } from './ingress.ts'
 import { ArtifactStore, type ArtifactRecord } from './artifacts.ts'
 import { AssistantState } from './assistant-state.ts'
+import { RoutingEvidence, type RoutingEvidenceSources } from './routing-evidence.ts'
 
 import { WorkflowConflict } from './workflow-errors.ts'
 export { WorkflowConflict } from './workflow-errors.ts'
@@ -582,6 +583,13 @@ export interface SourceMessageMetadata {
   createdAt: string
 }
 
+export interface TimelineEntry {
+  at: string
+  kind: string
+  sourceRef: string
+  detail: unknown
+}
+
 export interface WorkflowStateFacts {
   protocol: 'workflow-state/1'
   productSchema: number | null
@@ -793,6 +801,48 @@ export class WorkflowIndex {
     }
   }
 
+  /**
+   * Bounded single-work evidence timeline. It links existing facts by time and identity; it never
+   * asserts causality, review correctness or a current profile from a historical row.
+   */
+  timeline(input: { workId: string; projectIds: readonly string[]; limit?: number }): { entries: readonly TimelineEntry[]; truncated: boolean } | undefined {
+    const workId = id(input.workId, 'work id')
+    const workRow = this.db.prepare('SELECT value FROM works WHERE id = ?').get(workId) as Row | undefined
+    if (!workRow) return undefined
+    const work = json<WorkRecord>(workRow.value)
+    if (!input.projectIds.includes(work.projectId)) return undefined
+    const limit = limitOf(input.limit, 200, 500)
+    const entries: TimelineEntry[] = [{ at: work.createdAt, kind: 'work.created', sourceRef: work.id, detail: { title: work.title } }]
+    const contracts = this.db.prepare('SELECT revision, digest, created_at FROM contract_revisions WHERE work_id = ?').all(workId) as Row[]
+    for (const row of contracts) entries.push({ at: text(row.created_at), kind: 'contract.revision', sourceRef: `${workId}@${text(row.revision)}/${text(row.digest)}`, detail: { revision: Number(row.revision), digest: text(row.digest) } })
+    const links = this.db.prepare('SELECT ticket_id, revision, digest, role FROM ticket_links WHERE work_id = ?').all(workId) as Row[]
+    for (const row of links) entries.push({ at: work.createdAt, kind: 'ticket.link', sourceRef: text(row.ticket_id), detail: { revision: Number(row.revision), digest: text(row.digest), role: text(row.role) } })
+    const questions = this.db.prepare('SELECT id, version, validity, opened_at FROM user_questions WHERE work_id = ?').all(workId) as Row[]
+    for (const row of questions) entries.push({ at: text(row.opened_at), kind: 'question.opened', sourceRef: text(row.id), detail: { version: Number(row.version), validity: text(row.validity) } })
+    const ticketIds = links.map(row => text(row.ticket_id))
+    if (ticketIds.length) {
+      const placeholders = ticketIds.map(() => '?').join(', ')
+      const verifications = this.db.prepare(`SELECT id, artifact_digest, criteria_digest, created_at FROM completion_verifications WHERE ticket_id IN (${placeholders})`).all(...ticketIds) as Row[]
+      for (const row of verifications) entries.push({ at: text(row.created_at), kind: 'verification.recorded', sourceRef: text(row.id), detail: { artifactDigest: text(row.artifact_digest), criteriaDigest: text(row.criteria_digest) } })
+      const acceptances = this.db.prepare(`SELECT id, artifact_digest, accepted_at FROM completion_acceptances WHERE ticket_id IN (${placeholders})`).all(...ticketIds) as Row[]
+      for (const row of acceptances) entries.push({ at: text(row.accepted_at), kind: 'acceptance.recorded', sourceRef: text(row.id), detail: { artifactDigest: text(row.artifact_digest) } })
+      const observations = this.db.prepare(`SELECT fact_id, kind, disposition, observed_at FROM runtime_observations WHERE ticket_id IN (${placeholders})`).all(...ticketIds) as Row[]
+      for (const row of observations) entries.push({ at: text(row.observed_at), kind: `runtime.${text(row.kind)}`, sourceRef: text(row.fact_id), detail: { disposition: text(row.disposition) } })
+    }
+    const reviews = this.db.prepare(`SELECT id, observed_at, disposition, layer FROM review_evidence
+      WHERE project_id = ? AND json_extract(subject_value, '$.candidate.contract.workId') = ?`).all(work.projectId, workId) as Row[]
+    for (const row of reviews) entries.push({ at: text(row.observed_at), kind: 'review.recorded', sourceRef: text(row.id), detail: { disposition: text(row.disposition), layer: text(row.layer) } })
+    const outcomes = this.db.prepare(`SELECT id, observed_at, acceptance, layer, value FROM execution_outcome
+      WHERE project_id = ? AND json_extract(value, '$.attempt.contract.workId') = ?`).all(work.projectId, workId) as Row[]
+    for (const row of outcomes) {
+      const outcome = json<{ reviewTiming?: unknown }>(row.value)
+      entries.push({ at: text(row.observed_at), kind: 'execution.outcome', sourceRef: text(row.id),
+        detail: { acceptance: text(row.acceptance), layer: text(row.layer), ...(outcome.reviewTiming ? { reviewTiming: outcome.reviewTiming } : {}) } })
+    }
+    entries.sort((a, b) => b.at.localeCompare(a.at) || a.kind.localeCompare(b.kind) || a.sourceRef.localeCompare(b.sourceRef))
+    return { entries: entries.slice(0, limit), truncated: entries.length > limit }
+  }
+
   listArtifacts(input: { limit?: number; before?: string } = {}): { artifacts: ArtifactRecord[]; nextCursor?: string; hasMore: boolean } {
     return this.artifacts.list(input)
   }
@@ -804,12 +854,14 @@ export class WorkflowRecords {
   readonly projects: ProductProjects
   readonly decisions: ProductDecisions
   readonly assistant: AssistantState
+  readonly routingEvidence: RoutingEvidence
   readonly index: WorkflowIndex
   constructor(db: Database.Database, uow: UnitOfWork, artifacts: ArtifactStore) {
     this.conversations = new ProductConversations(db, uow)
     this.projects = new ProductProjects(db, uow)
     this.decisions = new ProductDecisions(db, uow)
     this.assistant = new AssistantState(db, uow, this.decisions)
+    this.routingEvidence = new RoutingEvidence(db, uow)
     this.index = new WorkflowIndex(db, artifacts, this.projects)
   }
 }

@@ -1,0 +1,26 @@
+{
+  "protocol": "wave05-decision-transaction/1",
+  "generatedAt": "2026-11-11T02:32:18.303Z",
+  "steps": {
+    "prepareWroteNothing": true,
+    "createdVersion": 1,
+    "createdStatus": "active",
+    "replayIdempotent": true,
+    "replayRecordedAt": "2026-11-10T00:00:00.000Z",
+    "revokedVersion": 2,
+    "revokedStatus": "revoked",
+    "oldReplayStatus": "revoked",
+    "oldReplayVersion": 2,
+    "history": [
+      "2:revoked",
+      "1:active"
+    ],
+    "commandRecorded": true
+  },
+  "result": {
+    "status": "PASS",
+    "modelCalls": 0,
+    "networkCalls": 0,
+    "sqlite": "real temporary SQLite via A ProductStore/AssistantStatePort"
+  }
+}

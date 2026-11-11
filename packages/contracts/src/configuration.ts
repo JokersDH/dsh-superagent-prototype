@@ -72,6 +72,7 @@ export const ApplicationConfigurationSchema = z
     protocol: z.literal(CONFIGURATION_PROTOCOL),
     revision: DigestSchema,
     reviewActivityAvailable: z.boolean().optional(),
+    decisionsAvailable: z.boolean().optional(),
     projects: z.array(ConfiguredProjectViewSchema).max(128).readonly(),
     profiles: z.array(ExecutionProfileViewSchema).max(128).readonly(),
     checks: z.array(RegisteredCheckViewSchema).max(128).readonly(),

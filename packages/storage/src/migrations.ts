@@ -337,8 +337,36 @@ const V12: Migration = {
   ],
 }
 
+
+/**
+ * v13: routing/review/outcome evidence. Immutable, append-only facts from trusted producers. The
+ * projection layer decides currentness; this table never rewrites a record or infers a review PASS,
+ * acceptance, current profile or model reward.
+ */
+const V13: Migration = {
+  version: 13,
+  name: 'routing-evidence',
+  statements: [
+    `CREATE TABLE route_advice (
+      id TEXT PRIMARY KEY, project_id TEXT NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL,
+      source_ref TEXT NOT NULL, value TEXT NOT NULL, digest TEXT NOT NULL)`,
+    `CREATE INDEX route_advice_project ON route_advice (project_id, created_at DESC, id DESC)`,
+    `CREATE TABLE review_evidence (
+      id TEXT PRIMARY KEY, project_id TEXT NOT NULL, subject_digest TEXT NOT NULL, subject_value TEXT NOT NULL,
+      layer TEXT NOT NULL, disposition TEXT NOT NULL, observed_at TEXT NOT NULL,
+      report_artifact_ref TEXT NOT NULL, value TEXT NOT NULL, digest TEXT NOT NULL)`,
+    `CREATE INDEX review_evidence_project ON review_evidence (project_id, observed_at DESC, id DESC)`,
+    `CREATE INDEX review_evidence_subject ON review_evidence (project_id, subject_digest, observed_at DESC)`,
+    `CREATE TABLE execution_outcome (
+      id TEXT PRIMARY KEY, project_id TEXT NOT NULL, profile_key TEXT NOT NULL, attempt_key TEXT NOT NULL,
+      layer TEXT NOT NULL, acceptance TEXT NOT NULL, observed_at TEXT NOT NULL, value TEXT NOT NULL, digest TEXT NOT NULL)`,
+    `CREATE INDEX execution_outcome_project ON execution_outcome (project_id, observed_at DESC, id DESC)`,
+    `CREATE INDEX execution_outcome_profile ON execution_outcome (project_id, profile_key, observed_at DESC, id DESC)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>
