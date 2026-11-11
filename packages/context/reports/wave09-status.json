@@ -1,0 +1,131 @@
+{
+  "role": "C",
+  "branch": "codex/g3-assistant-context",
+  "mainBaseCommit": "531c6b6",
+  "mergeCommit": "5f021b1",
+  "repairCheckpoint": "45f4a1b",
+  "updatedAt": "2026-11-11T10:50:00.000Z",
+  "ownedPaths": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "nativeModelBudget": { "allowed": 0, "used": 0, "unknownSends": 0 },
+  "supersedes": "wave08-status.json for wave-09 facts (historical files retained; wave-07 group of files unchanged)",
+  "phases": [
+    {
+      "phase": "C1",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave09-c1-probe.json",
+        "packages/context/reports/wave09-c1-verification.txt",
+        "packages/context/test/group-binding.case.ts",
+        "packages/proposals/test/confirm-with-command.case.ts",
+        "commit 45f4a1b"
+      ],
+      "results": {
+        "probe": "PASS_CONTEXT_AND_PROPOSAL_BINDING (4/4; 2 positive controls retained)",
+        "contextTests": "58/58 at checkpoint",
+        "proposalTests": "30/30"
+      },
+      "note": "Before: an artifact-only grant called the decision provider through a group named `decisions`, and confirmWithCommand confirmed while plan.commandId differed from effectCommandId. Now group names are bound to their source-kind family before any provider read (composition_invalid, reads=0), and confirmWithCommand refuses plan/effect or plan/conversation mismatch with plan_mismatch, leaving the proposal pending with no effectCommandId."
+    },
+    {
+      "phase": "C2",
+      "status": "passed",
+      "evidence": [
+        "packages/context/src/composer.ts (validateComposedGroups)",
+        "packages/context/test/group-binding.case.ts",
+        "packages/context/test/budget-integrity.case.ts"
+      ],
+      "results": { "contextTests": "59/59" },
+      "note": "Custom groups validated before reads: unknown/duplicate name, duplicate priority, non-positive/non-integer priority, empty/duplicate kinds, kind outside the name family, share outside [0,1] or NaN/±Infinity. Budget still clamped by grant and caller; expiry/purpose/confirmedAt and mid-await rechecks preserved; scan_incomplete fatal; explicit truncation separate."
+    },
+    {
+      "phase": "C3",
+      "status": "passed",
+      "evidence": [
+        "packages/knowledge/test/main-proposal-consumer.case.ts",
+        "packages/knowledge/test/main-proposal-http.case.ts",
+        "tests/integration/proposal-commands.case.mjs (main-owned, unmodified)"
+      ],
+      "results": { "knowledgeTests": "71/71", "mainProposalIntegration": "10/10" },
+      "note": "Main's plan+commit+prepareCommand/commitPrepared stays authoritative. C consumers verify decision/work confirmation, reject terminal state, missing inputs inert, revision without current work refused, source/grant/preview drift rejected, same-body receipt replay identical, same command id with another body rejected, different effect id conflicts, receipt failure rollback+retry and reopen. The C-only confirmWithCommand helper now enforces the same command identity and is not used by main."
+    },
+    {
+      "phase": "C4",
+      "status": "passed",
+      "evidence": [
+        "packages/knowledge/test/main-context-consumer.case.ts",
+        "packages/context/src/composer.ts (buildSourceManifest)",
+        "packages/context/docs/WAVE09-RECIPE.md"
+      ],
+      "note": "Real A-port consumer recipe: project/files via LocalProjectSourcePort, effective decisions via decisionContextProvider, conversation via store.product.messages.page, artifacts via ports.index.listArtifacts. Output includes stable manifest (sourceId/kind/group/path/contentDigest/baselineCommit/truncated/bytes/tokens/trust), preview, omitted, injectionFlagPaths and budgetClamped; no absolute paths, no actor/tool fields; expired/wrong-purpose/executor grants refused before reading."
+    },
+    {
+      "phase": "C5",
+      "status": "partial",
+      "evidence": [
+        "packages/context/examples/composition-performance.mjs",
+        "packages/context/reports/composition-performance.json",
+        "packages/context/reports/wave09-verification.txt"
+      ],
+      "results": { "performance": "PASS p50 ~0.45-0.56ms / p95 ~1.37-1.41ms; 12 slices / 3394 bytes in a 20-slice / 256KiB budget" },
+      "note": "Proposal/decision HTTP consumed from C (real HTTP + real SQLite). Context composition/preview HTTP is still not published by main (`grep -c 'v1/context' apps/coordinator/http/app.ts` = 0), so the UI-level assertion is BLOCKED on main; the library consumer and bounded performance are complete, and no C HTTP/UI/SQL is written."
+    },
+    {
+      "phase": "C6",
+      "status": "passed",
+      "evidence": [
+        "packages/context/reports/wave09-status.json",
+        "packages/context/docs/WAVE09-RECIPE.md",
+        "packages/context/README.md",
+        "packages/proposals/README.md"
+      ],
+      "note": "Single authoritative wave-09 status with old/new closure, real main entries and remaining owners."
+    }
+  ],
+  "commands": [
+    "git fetch origin && git merge origin/main --no-edit",
+    "pnpm --filter @personal-agent/{contracts,orchestrator-core,effects,storage,workflows,questions,application,verification,workspaces,proposals,knowledge,context,routing} build",
+    "node tools/bootstrap/probe-wave09-context-proposal.mjs \"$PWD\"",
+    "node tools/bootstrap/probe-wave08-context-grant.mjs \"$PWD\"",
+    "pnpm --filter @personal-agent/context typecheck && test && build",
+    "pnpm --filter @personal-agent/proposals typecheck && test && build",
+    "pnpm --filter @personal-agent/knowledge typecheck && test && build",
+    "pnpm --filter @personal-agent/routing typecheck && test && build",
+    "node --test tests/integration/proposal-commands.case.mjs",
+    "node --test tests/integration/decision-commands.case.mjs",
+    "node packages/context/examples/composition-performance.mjs"
+  ],
+  "results": {
+    "contextTests": "59/59",
+    "proposalTests": "30/30",
+    "knowledgeTests": "71/71",
+    "routingTests": "44/44",
+    "typecheck": "PASS (four packages)",
+    "build": "PASS (four packages)",
+    "wave09Probe": "PASS_CONTEXT_AND_PROPOSAL_BINDING (4/4)",
+    "wave08Probe": "PASS_CONTEXT_GRANT_BOUNDARY (4/4, regression)",
+    "mainProposalIntegration": "10/10",
+    "mainDecisionIntegration": "8/8",
+    "compositionPerformance": "PASS (bounded, deterministic, 0 model/network)"
+  },
+  "dependencyRequests": [],
+  "blockers": [
+    {
+      "id": "C5-main-context-http",
+      "owner": "main",
+      "status": "external_pending",
+      "repro": "grep -c 'v1/context' apps/coordinator/http/app.ts  # 0",
+      "required": "Authenticated context composition/preview endpoint composing ContextComposer/buildCompositionPreview/buildSourceManifest.",
+      "continue": "C supplied the adapter recipe, manifest contract and bounded performance; no C HTTP/UI is written."
+    }
+  ],
+  "notTested": [
+    "Main context composition/preview HTTP and UI (not published)",
+    "Real native/review execution and pilot value (B/E-owned)",
+    "Any real model or native task (budget 0)"
+  ],
+  "mainNextSteps": [
+    "Re-run `node tools/bootstrap/probe-wave09-context-proposal.mjs <checkout>` and `probe-wave08-context-grant.mjs`; all eight cases pass.",
+    "Keep proposal confirmation on the existing plan+commit+prepareCommand/commitPrepared path; do not adopt confirmWithCommand unless the plan command id equals the effect id in the same transaction.",
+    "When publishing context HTTP, call ContextComposer with main-side adapters and project buildCompositionPreview/buildSourceManifest; surface composition_invalid/grant_*/scan_incomplete as explicit states."
+  ]
+}

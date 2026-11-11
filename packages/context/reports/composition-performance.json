@@ -1,6 +1,6 @@
 {
   "protocol": "wave07-composition-performance/1",
-  "generatedAt": "2026-11-11T08:52:41.405Z",
+  "generatedAt": "2026-11-11T10:45:16.946Z",
   "result": {
     "status": "PASS",
     "modelCalls": 0,
@@ -13,9 +13,9 @@
     },
     "runs": 25,
     "durationMs": {
-      "p50": 0.313,
-      "p95": 0.672,
-      "max": 0.695
+      "p50": 0.563,
+      "p95": 1.413,
+      "max": 2.344
     },
     "bounded": {
       "maxBytes": 262144,

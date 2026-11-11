@@ -70,9 +70,10 @@ adds no command kind and executes nothing.
 
 `AssistantProposalService.confirmWithCommand(prepared, {..., plan})` is main's one synchronous call:
 it validates the plan input **before** confirming (an under-specified work/revision proposal throws
-`needs_user_input` with the exact missing fields and stays `pending`), confirms with the main-owned
-`effectCommandId` (CAS, idempotent replay), and returns the exact existing `UserCommand` to dispatch
-in the same UnitOfWork. A `reply` intent confirms nothing executable and returns `command: null`.
+`needs_user_input` with the exact missing fields and stays `pending`), requires
+`plan.commandId === effectCommandId` and `plan.conversationId === prepared.conversationId` (otherwise
+`plan_mismatch` before any confirmed write), confirms with the main-owned `effectCommandId` (CAS,
+idempotent replay), and returns the exact existing `UserCommand` to dispatch in the same UnitOfWork. A `reply` intent confirms nothing executable and returns `command: null`.
 C never dispatches the command, never writes its effect and never accepts actor/native authority from
 model text.
 

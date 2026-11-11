@@ -102,6 +102,16 @@ conversation messages → artifact metadata → raw project files. Rules:
 `buildSourceManifest` gives main a stable per-source projection (`sourceId/kind/group/path/contentDigest/
 baselineCommit/truncated/bytes/tokens/trust`) plus `omitted`, `injectionFlagPaths` and `budgetClamped`.
 
+### Group/kind binding (wave-09)
+
+A group name owns exactly one source-kind family (`contract`→contract/work, `decisions`→decision,
+`project_facts`→project_metadata/verification/delivery, `conversation`→conversation_message,
+`artifacts`→artifact, `files`→document/source_file). `validateComposedGroups` runs before any provider
+read and refuses unknown/duplicate names, duplicate priorities, non-integer/zero priority, duplicate
+kinds, kinds outside the name's family, and any `share` that is not a finite number in `[0,1]`
+(`composition_invalid`). An artifact-only grant can no longer call the decision provider through a
+group named `decisions`.
+
 ### Unified authorization gate (wave-08)
 
 Every source family (port, decisions, conversation, artifacts) passes one gate **before any provider

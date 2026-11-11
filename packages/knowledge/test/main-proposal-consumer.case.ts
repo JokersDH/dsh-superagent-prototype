@@ -153,6 +153,22 @@ test('a work proposal without user inputs stays inert; a revision without a curr
     error instanceof Error && 'error' in error && (error as { error?: { code?: string } }).error?.code === 'stale_contract')
 })
 
+test('the main receipt replays only the identical command body', async (t) => {
+  const h = setup(t)
+  const preview = await h.service.prepare(h.decision, actor)
+  const command = h.confirm(preview, 'receipt-parity')
+  const first = await h.service.dispatch(command, actor)
+  assert.equal(first.status, 'recorded')
+  const historyBefore = h.store.workflows.assistant.proposals.history(preview.record.proposalId).length
+  assert.deepEqual(await h.service.dispatch(command, actor), first)
+  assert.equal(h.store.workflows.assistant.proposals.history(preview.record.proposalId).length, historyBefore)
+  await assert.rejects(
+    h.service.dispatch({ ...command, conversationId: 'another-conversation' }, actor),
+    /another immutable request/,
+  )
+  assert.equal(h.store.workflows.assistant.proposals.history(preview.record.proposalId).length, historyBefore)
+})
+
 test('a receipt failure rolls back the confirmed proposal and the effect', async (t) => {
   const h = setup(t)
   const preview = await h.service.prepare(h.decision, actor)

@@ -75,6 +75,50 @@ test('an artifact-only grant cannot call the decision provider through a group n
   assert.deepEqual(control.slices.map((slice) => slice.kind), ['decision'])
 })
 
+test('an invalid custom group plan is refused before any provider is read', async () => {
+  const calls = { decisions: 0, listSources: 0 }
+  const composer = new ContextComposer(
+    {
+      port: {
+        projectBaseline: async () => ({ capturedAt: NOW }),
+        listSources: async () => {
+          calls.listSources += 1
+          return []
+        },
+        readSource: async () => {
+          throw new Error('unused')
+        },
+      },
+      decisions: {
+        listEffective: async () => {
+          calls.decisions += 1
+          return { decisions: [decision] }
+        },
+      },
+    },
+    { now: () => new Date(NOW) },
+  )
+  const invalidPlans: readonly (readonly ComposedGroupPlan[])[] = [
+    [{ name: 'not_a_group' as never, priority: 1, sourceKinds: ['decision'], share: 1 }],
+    [{ name: 'decisions', priority: 1, sourceKinds: ['decision', 'decision'], share: 1 }],
+    [{ name: 'decisions', priority: -1, sourceKinds: ['decision'], share: 1 }],
+    [{ name: 'decisions', priority: 1, sourceKinds: ['decision'], share: Number.NaN }],
+    [{ name: 'decisions', priority: 1, sourceKinds: ['decision'], share: Number.NEGATIVE_INFINITY }],
+    [
+      { name: 'decisions', priority: 1, sourceKinds: ['decision'], share: 1 },
+      { name: 'files', priority: 1, sourceKinds: ['document'], share: 1 },
+    ],
+  ]
+  for (const groups of invalidPlans) {
+    await assert.rejects(
+      composer.compose(request(baseGrant(['decision', 'document']), groups)),
+      (error: unknown) => error instanceof ContextError && error.code === 'composition_invalid',
+      JSON.stringify(groups),
+    )
+  }
+  assert.deepEqual(calls, { decisions: 0, listSources: 0 })
+})
+
 test('a group name can never declare another provider family', () => {
   for (const [name, kinds] of [
     ['decisions', ['artifact']],

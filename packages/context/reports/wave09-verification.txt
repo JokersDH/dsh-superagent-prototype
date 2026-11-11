@@ -1,0 +1,71 @@
+# Agent C wave-09 verification (2026-11-11T10:44:59Z)
+45f4a1b Bind composition groups to source kinds and plan to effect command identity
+
+## @personal-agent/context
+$ tsc -p tsconfig.json
+ℹ tests 59
+ℹ pass 59
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/proposals
+$ tsc -p tsconfig.json
+ℹ tests 30
+ℹ pass 30
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/knowledge
+$ tsc -p tsconfig.json
+ℹ tests 71
+ℹ pass 71
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/routing
+$ tsc -p tsconfig.json
+ℹ tests 44
+ℹ pass 44
+ℹ fail 0
+$ tsc -p tsconfig.build.json
+
+## wave-09 probe
+  "status": "PASS_CONTEXT_AND_PROPOSAL_BINDING",
+      "case": "group_kind_control",
+      "status": "PASS",
+      "reads": 1,
+      "errorCode": null
+      "case": "group_kind_alias",
+      "status": "PASS",
+      "reads": 0,
+      "errorCode": "composition_invalid"
+      "case": "effect_command_control",
+      "status": "PASS",
+      "state": "confirmed",
+      "errorCode": null
+      "case": "effect_command_mismatch",
+      "status": "PASS",
+      "state": "pending",
+      "errorCode": "plan_mismatch"
+
+## wave-08 grant probe
+  "status": "PASS_CONTEXT_GRANT_BOUNDARY",
+      "kind": "valid_control",
+      "status": "PASS",
+      "kind": "expired_grant",
+      "status": "PASS",
+      "kind": "budget_above_grant",
+      "status": "PASS",
+      "kind": "purpose_mismatch",
+      "status": "PASS",
+
+## main integration
+ℹ tests 10
+ℹ pass 10
+ℹ fail 0
+ℹ tests 8
+ℹ pass 8
+ℹ fail 0
+
+## performance
+{"status":"PASS","p50":0.563,"p95":1.413,"bytes":3394,"slices":12}
