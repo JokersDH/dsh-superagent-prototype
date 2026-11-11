@@ -105,3 +105,36 @@ test('a capped source is reported as storage_cap, never silently complete', () =
     rmSync(dir, { recursive: true, force: true })
   }
 })
+
+
+test('partial review timing is visible in pages, and a cursor from another work is refused', () => {
+  const dir = tmp('evidence-timing-')
+  const store = new ProductStore({ path: join(dir, 'state.sqlite') })
+  try {
+    seed(store)
+    const ports = createWorkflowPorts(store)
+    ports.routingEvidence.outcomes.put({
+      protocol: 'execution-outcome/1', id: 'outcome-timed', projectId: 'project-1',
+      attempt: { ticketId: 'ticket-1', assignmentId: 'assignment-1', attemptId: 'attempt-timed', fenceEpoch: 1, contract },
+      profileRef: { profileId: 'codex', revision: 1, identityDigest: 'a'.repeat(64) }, acceptance: 'unknown',
+      evidenceRefs: [], layer: 'controlled', usage: { completeness: 'unknown', evidenceRefs: [] }, observedAt: at,
+      reviewTiming: { candidateReadyAt: at, acceptedAt: '2026-11-11T00:01:40.000Z', readyToAcceptanceMs: 100000,
+        activeReviewMs: 5000, activeReviewSource: 'ui_visibility_proxy', activeReviewCompleteness: 'partial',
+        evidenceRefs: ['review-activity:1'] },
+    })
+    const page = ports.index.evidencePage({ workId: 'work-evidence', projectIds: ['project-1'], limit: 200 })!
+    const outcome = page.entries.find(entry => entry.sourceRef === 'outcome-timed')!
+    assert.equal((outcome.detail as { reviewTiming: { activeReviewMs: number; activeReviewCompleteness: string } })
+      .reviewTiming.activeReviewMs, 5000)
+    assert.equal((outcome.detail as { reviewTiming: { activeReviewCompleteness: string } }).reviewTiming.activeReviewCompleteness, 'partial')
+
+    const paged = ports.index.evidencePage({ workId: 'work-evidence', projectIds: ['project-1'], limit: 3 })!
+    const foreignCursor = paged.nextCursor
+    if (!foreignCursor) throw new Error('expected a page cursor')
+    assert.throws(() => ports.index.evidencePage({ workId: 'work-other', projectIds: ['project-2'], cursor: foreignCursor }),
+      WorkflowConflict)
+  } finally {
+    store.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})

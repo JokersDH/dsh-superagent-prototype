@@ -40,6 +40,7 @@ ports.routingEvidence.sources(attemptId, projectId) // read-only outcome source 
 ports.acceptance.consume({ eventSeq, projectId, profileRef, layer }) // accepted event -> outcome
 ports.recoveryIntents.record({ commandId, actor, plan, expectedInspectionFingerprint, sourceFingerprint })
 ports.recoveryIntents.getByPlan(planId) / getByCommand(commandId) / list({ sourceFingerprint, limit, cursor })
+ports.recoveryActivations.get(activationId) / forCommand(commandId) / put(intent) // shared 0027 facts
 ports.index.evidencePage({ workId, projectIds, limit, cursor }) // complete | caller_limit | storage_cap
 ports.index.timeline({ workId, projectIds, limit })
 
@@ -134,8 +135,8 @@ writer failure.
 ## Migrations
 
 Storage appends v8 `conversation-catalog`, v9 `project-settings`, v10 `user-decisions`, v11
-`assistant-state`, v12 `conversation-members`, v13 `routing-evidence`, v14 `recovery-intents`; v1–v7
-checksums and tables are untouched. A v7/v10
+`assistant-state`, v12 `conversation-members`, v13 `routing-evidence`, v14 `recovery-intents`, v15
+`recovery-activations`; v1–v7 checksums and tables are untouched. A v7/v10
 database upgrades in one transaction, keeps existing messages/works/decision bodies, and backfills
 conversation rows, FTS, membership and assistant metadata absence. Unknown/upstream databases, drift,
 gaps and future schemas keep the existing fail-closed behavior.
