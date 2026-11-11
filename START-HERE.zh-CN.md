@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**第七轮首批实现：[事务命令与恢复意图接口](docs/rfcs/WP-16/0027-wave-07-command-and-recovery-checkpoint.md)。** A/C最新消费者已按路径集成；应用支持异步prepareCommand与同步commitPrepared，A可消费恢复意图fact port，main source事务消费者已交。七包回归与4项恢复意图组合通过；C有效列表复活旧项另有独立FAIL，已列入本轮修复。恢复commit/目标启动与提案网页仍未交，不改变旧服务或预算。
+
 **2026-11-11 当前派工：[第七轮六阶段整包](agent-tasks/product-wave-07/README.zh-CN.md)。** 已审视A d3207d8、B 6890fe8、C 119bb96、D 4a0ea7f、E 3cfe445候选；下发A恢复持久事实/历史证据、B统一实际adapter准入与有限费用可行性、C上下文/提案组合、D真实双binary升级、E预算拒绝与独立安装/产品验收。main承担恢复commit/激活、提案事务/网页及同源版本集成；[0026](docs/rfcs/WP-16/0026-wave-07-integration-and-admission.md)为待实施边界。每包先交可运行checkpoint，再连续推进；预算不刷新，pilot不阻断独立产品工作，原六组服务保留。这是新计划，不表示恢复激活、试点或安装Alpha已经通过。
 
 **主线第二检查点：[接受Outcome与恢复只读预检](docs/rfcs/WP-16/0025-outcome-projection-and-recovery-preflight.md)。** 已接A最新接受投影，新增GET工作证据、GET恢复inspect和POST恢复prepare。后端61、契约211、storage75/workflows23通过；预检不改旧queue/marker/项目绑定。恢复commit和新授权仍未实现，返回not_granted/commitAvailable=false，不能当成恢复已可执行。旧5180–5185服务未重启，新接口在新源码部署后可用；见 [限定证据](reports/releases/wave06-outcome-recovery/README.zh-CN.md)。

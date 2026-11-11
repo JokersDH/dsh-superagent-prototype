@@ -1,0 +1,24 @@
+{
+  "wave": "product-wave-07",
+  "status": "PARTIAL_IMPLEMENTED_NOT_RELEASE_ADMITTED",
+  "implementationSource": "da54758",
+  "integratedSourceCheckpoints": ["07a2649", "1b6d21c", "7323a47", "644751d"],
+  "phases": {"M1": "PARTIAL", "M2": "IN_PROGRESS", "M3": "NOT_STARTED", "M4": "PARTIAL_SOURCE_INTENT_ONLY", "M5": "NOT_STARTED", "M6": "IN_PROGRESS"},
+  "implemented": ["opaque async-preflight/sync-commit application companion", "immutable recovery intent schemas and synchronous facts port", "source intent/receipt transactional consumer with real SQLite test adapter"],
+  "checks": [
+    {"command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/orchestrator-core --filter @personal-agent/effects --filter @personal-agent/storage --filter @personal-agent/workflows --filter @personal-agent/questions --filter @personal-agent/application --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/context --filter @personal-agent/routing build", "exitCode": 0},
+    {"command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/application --filter @personal-agent/workflows --filter @personal-agent/storage --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing test", "exitCode": 0},
+    {"command": "pnpm --filter @personal-agent/contracts --filter @personal-agent/application typecheck", "exitCode": 0},
+    {"command": "pnpm --filter @personal-agent/coordinator typecheck:product", "exitCode": 0},
+    {"command": "pnpm --filter @personal-agent/contracts check:generated", "exitCode": 0},
+    {"command": "node --test tests/integration/recovery-intents.case.mjs", "exitCode": 0, "tests": 4}
+  ],
+  "residualFailure": {"owner": "C", "command": "node tools/bootstrap/probe-wave07-supersession.mjs", "exitCode": 1, "singleStatus": "superseded", "activeList": ["old-decision"], "automaticContextEnabled": false},
+  "pending": ["A production activation fact adapter", "D first-run source checkpoint admission", "proposal HTTP and UI", "recovery target preparation/activation and crash windows", "independent installed/native/value admission"],
+  "recoveryCommitAvailable": false,
+  "frozenRuntimeSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "nativeTurnStarts": 0,
+  "userServicesChanged": false,
+  "budgetChanges": 0,
+  "limitations": ["SQLite recovery port is a test adapter, not A production persistence", "Source receipt cannot authorize target startup", "Package tests do not override the independently reproduced decision-list failure", "No new native, browser, installation or study-value admission"]
+}

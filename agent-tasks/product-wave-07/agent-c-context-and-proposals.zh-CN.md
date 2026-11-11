@@ -6,6 +6,8 @@
 
 整包结果：main可用少量组合代码接出有来源的上下文预览和确认提案；C规则能在真实A UnitOfWork同步提交，无先confirm后补业务效果。本包不自行发送模型或将待确认文本当命令。
 
+主线实际接口已发布：[0027](../../docs/rfcs/WP-16/0027-wave-07-command-and-recovery-checkpoint.md)，应用支持事务外prepareCommand/事务内commitPrepared。另有必须先关闭的残余：`node tools/bootstrap/probe-wave07-supersession.mjs`当前exit1，替代决定撤销后getSync旧项为superseded，listSync(status=active)却复活旧项；C2/C4须同时覆盖list/listEffectiveWindow，不只修单条get。
+
 ## C1 交可直接消费的真实库检查点
 
 合并main并复验现有context/proposals/knowledge/routing，给exports、生产A port实例、caller输入/错误fixture和最短recipe。列出已集成/待集成source差异，修正旧权威状态，不覆盖历史证据。

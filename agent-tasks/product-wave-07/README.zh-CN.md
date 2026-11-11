@@ -2,6 +2,8 @@
 
 日期2026-11-11，派工基线`d4d51ae`。本轮延续原A–E工作区/分支与所有权，每包六阶段连续执行；不是从零重做第六轮。wave-05修订01和原预算账继续有效。计划/接口设计不计作产品完成。
 
+主线首批实际接口：[0027](../../docs/rfcs/WP-16/0027-wave-07-command-and-recovery-checkpoint.md)，源码da54758。A/C消费者源码已最小集成，应用同步命令companion和恢复意图fact port已可消费；恢复目标启动/HTTP提交尚未开放。C有效列表撤销后复活旧项的独立反例已补入C任务，不能由包内PASS覆盖。
+
 先读 [共享边界0026](../../docs/rfcs/WP-16/0026-wave-07-integration-and-admission.md)、[0025已实现接口](../../docs/rfcs/WP-16/0025-outcome-projection-and-recovery-preflight.md)、自己的完整任务及本页末尾启动指令。
 
 ## 1. 本轮三个出口
