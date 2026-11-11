@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T06:23:54.498Z",
+  "generatedAt": "2026-11-11T08:53:32.384Z",
   "environment": {
     "platform": "darwin/arm64",
     "node": "v24.21.0",
@@ -46,23 +46,23 @@
           "noSecondBegin": true,
           "stopStatus": 200,
           "stopBody": {
-            "commandId": "cmd-b4-stop-1794378233401",
-            "workId": "603904fe8f8a637328d85401723fed21",
-            "seq": 14,
+            "commandId": "cmd-b4-stop-1794387211271",
+            "workId": "c3b38d1cce1f2e2c524de2e7ef4ffc4a",
+            "seq": 28,
             "status": "recorded"
           }
         }
       ],
       "entities": [
         {
-          "workId": "603904fe8f8a637328d85401723fed21",
-          "assignmentBefore": "8d3724ab50803cd748e9b9be5ff7f04e",
+          "workId": "c3b38d1cce1f2e2c524de2e7ef4ffc4a",
+          "assignmentBefore": "8e5332826adce691a744119d1371b904",
           "phase": "queued"
         },
         {
-          "assignmentAfter": "8d3724ab50803cd748e9b9be5ff7f04e",
-          "phaseAfter": "queued",
-          "resources": "active"
+          "assignmentAfter": "8e5332826adce691a744119d1371b904",
+          "phaseAfter": "verifying",
+          "resources": "quiescent"
         }
       ]
     },
@@ -82,8 +82,8 @@
       ],
       "entities": [
         {
-          "workId": "a3d933e7051be9a694c1c4d672e6665e",
-          "questionId": "e86fc6b5f81fcd934c7aa92f46d4e82c",
+          "workId": "c62981d8fb8a90697b6a632f4c7f84b7",
+          "questionId": "096714e95dbec814a0aa40a3666c6f7d",
           "survived": false
         }
       ]

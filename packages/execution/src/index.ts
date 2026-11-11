@@ -10,3 +10,12 @@ export type {
   StopResult,
   SupervisorOptions,
 } from './supervisor.ts'
+
+// --- wave-08 B2: current resource facts for recovery and upgrade ------------------------------
+export {
+  INVALID_INFERENCES,
+  RESOURCE_VERDICTS,
+  classifyResource,
+  describeResourceFacts,
+  resourceFactsDigest,
+} from './resource-facts.ts'

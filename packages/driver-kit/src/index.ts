@@ -32,3 +32,6 @@ export {
   probeHostEnforcement,
   resolveRuntimeIdentity,
 } from './runtime-diagnostics.ts'
+
+// --- wave-08 B4: the one send-admission path shared by B and E --------------------------------
+export { admitSend, consumeSendToken, isIssuedToken } from './send-admission.ts'

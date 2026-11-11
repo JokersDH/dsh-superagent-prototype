@@ -173,6 +173,7 @@ export async function admit(request) {
     capsuleRoot,
     ledgerPath,
     budgetHook,
+    grant = null,
     binary = 'codex',
   } = request ?? {}
 
@@ -245,20 +246,30 @@ export async function admit(request) {
   }
 
   // --- gate 5: budget reservation --------------------------------------------------------------
-  const audit = auditGrant(ledgerPath ?? 'tests/native-acceptance/reports/model-budget.json', 'wave03-b-native', 4, {
-    used: null,
-    source: 'reconstructed ledger',
-  })
-  const ledgerGate = maySendReal(audit)
+  // The caller supplies the grant identity. Nothing defaults to this role's own grant: a default is
+  // exactly how B's grant ended up gating E's decision, which wave-08 B4 closes.
   const hasHook = Boolean(budgetHook && typeof budgetHook.reserve === 'function')
-  gates.budget_reservation = {
-    satisfied: ledgerGate.allowed && hasHook,
-    evidence: { grantVerdict: audit.verdict, remainder: audit.remainder ?? 'UNKNOWN', maySendReal: ledgerGate.allowed, hookPresent: hasHook, reason: ledgerGate.reason },
-    gap: !hasHook
-      ? 'no reservation hook: a billable run must reserve before send'
-      : !ledgerGate.allowed
-        ? ledgerGate.reason
-        : null,
+  if (!grant || typeof grant !== 'object' || typeof grant.grantId !== 'string' || typeof grant.owner !== 'string') {
+    gates.budget_reservation = {
+      satisfied: false,
+      evidence: { hookPresent: hasHook },
+      gap: 'no complete grant identity was supplied: pass { grantId, owner, limit, ledgerPath } instead of relying on a role default',
+    }
+  } else {
+    const audit = auditGrant(grant.ledgerPath ?? ledgerPath ?? 'tests/native-acceptance/reports/model-budget.json', grant.grantId, grant.limit, {
+      used: null,
+      source: 'reconstructed ledger',
+    })
+    const ledgerGate = maySendReal(audit)
+    gates.budget_reservation = {
+      satisfied: ledgerGate.allowed && hasHook,
+      evidence: { grantId: grant.grantId, owner: grant.owner, grantVerdict: audit.verdict, remainder: audit.remainder ?? 'UNKNOWN', maySendReal: ledgerGate.allowed, hookPresent: hasHook, reason: ledgerGate.reason },
+      gap: !hasHook
+        ? 'no reservation hook: a billable run must reserve before send'
+        : !ledgerGate.allowed
+          ? ledgerGate.reason
+          : null,
+    }
   }
 
   // --- gate 6: cost bound ----------------------------------------------------------------------

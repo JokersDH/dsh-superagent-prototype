@@ -48,6 +48,7 @@ const admission = await admit({
   authorHome,
   capsuleRoot,
   ledgerPath,
+  grant: { grantId: 'wave03-b-native', owner: 'B', limit: 4, ledgerPath },
   budgetHook: { reserve: () => ({ admitted: true, reservationId: 'res-1' }) },
 })
 
@@ -130,6 +131,7 @@ log.begin('B9-ADMISSION-REFUSES-LINK', 'admission itself refuses a link copyMode
 const linkAdmission = await admit({
   arm: 'fresh_session', caseId: 'case-02', turn: 1, materialDigest,
   authorProject, authorHome, capsuleRoot, ledgerPath, copyMode: 'hardlink',
+  grant: { grantId: 'wave03-b-native', owner: 'B', limit: 4, ledgerPath },
   budgetHook: { reserve: () => ({ admitted: true, reservationId: 'res-2' }) },
 })
 const copyGate = linkAdmission.gates.material_copy
@@ -184,13 +186,23 @@ if (budget.satisfied === false && /UNVERIFIED|UNKNOWN/i.test(String(budget.gap))
 }
 
 log.begin('B9-NO-HOOK-REFUSES', 'a missing reservation hook is its own gap', 'package-local')
-const noHook = await admit({ arm: 'fresh_session', caseId: 'case-03', turn: 1, materialDigest, authorProject, authorHome, capsuleRoot, ledgerPath })
+const noHook = await admit({ arm: 'fresh_session', caseId: 'case-03', turn: 1, materialDigest, authorProject, authorHome, capsuleRoot, ledgerPath, grant: { grantId: 'wave03-b-native', owner: 'B', limit: 4, ledgerPath } })
 const noHookGate = noHook.gates.budget_reservation
 log.evidence({ satisfied: noHookGate.satisfied, gap: String(noHookGate.gap).slice(0, 90) })
 if (noHookGate.satisfied === false && /no reservation hook/i.test(String(noHookGate.gap))) {
   log.pass('admission reports the missing hook as its own reason instead of a generic refusal')
 } else {
   log.fail(`missing hook not reported distinctly: ${JSON.stringify(noHookGate).slice(0, 160)}`)
+}
+
+log.begin('B9-GRANT-REQUIRED', 'admission refuses when the caller supplies no grant identity', 'package-local')
+const noGrant = await admit({ arm: 'fresh_session', caseId: 'case-04', turn: 1, materialDigest, authorProject, authorHome, capsuleRoot, ledgerPath })
+const noGrantGate = noGrant.gates.budget_reservation
+log.evidence({ satisfied: noGrantGate.satisfied, gap: String(noGrantGate.gap).slice(0, 110) })
+if (noGrantGate.satisfied === false && /no complete grant identity/i.test(String(noGrantGate.gap))) {
+  log.pass('a missing grant is refused instead of silently auditing this role\'s own grant')
+} else {
+  log.fail(`admission defaulted a grant: ${JSON.stringify(noGrantGate).slice(0, 180)}`)
 }
 
 log.begin('B9-COST-GATE', 'the cost gate is blocked independently of the ledger', 'package-local')

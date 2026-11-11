@@ -1,0 +1,210 @@
+{
+  "wave": "product-wave-08",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "5d4065b",
+  "mergeCommit": "ee247f0",
+  "previousCandidate": "748942e",
+  "checkpointCommit": "b4388ff",
+  "packet": "agent-tasks/product-wave-08/agent-b-runtime-operations.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0029-wave-08-product-closure-and-reviewed-inputs.md",
+  "ownedPaths": [
+    "apps/runner/",
+    "packages/drivers/",
+    "packages/driver-kit/",
+    "packages/testing/",
+    "packages/catalog/",
+    "packages/policy-preparation/",
+    "tests/native-acceptance/"
+  ],
+  "scopeNote": "No second Driver, no CAC, no desktop shell, no auto-acceptance, no new grant. The wave-07 bounded-recipe investigation is complete and is not repeated.",
+
+  "consumableInterfaces": {
+    "note": "These are production library exports in owned packages, not test-dir reports. The tests-dir scripts are thin formatters over them.",
+    "runtime_description": {
+      "module": "packages/driver-kit/src/runtime-diagnostics.ts",
+      "exports": ["describeRuntime", "resolveRuntimeIdentity", "probeHostEnforcement", "descriptionDigest", "EVIDENCE_LAYERS", "CAPABILITY_STATES"],
+      "protocol": "runtime-description/1",
+      "cli": "node tests/native-acceptance/runtime-diagnostics.mjs [--private|--json]",
+      "privateByDefault": true,
+      "greenLightRule": "usable is derived only from an observed identity; a missing binary, unreadable digest or unprobed platform refuses with a reason"
+    },
+    "resource_facts": {
+      "module": "packages/execution/src/resource-facts.ts",
+      "exports": ["describeResourceFacts", "classifyResource", "resourceFactsDigest", "INVALID_INFERENCES", "RESOURCE_VERDICTS"],
+      "protocol": "resource-facts/1",
+      "releaseRule": "releaseBarrierSatisfied is true only when every observed resource reached verified_quiescent"
+    },
+    "send_admission": {
+      "module": "packages/driver-kit/src/send-admission.ts",
+      "exports": ["admitSend", "consumeSendToken", "isIssuedToken"],
+      "protocol": "send-admission/1",
+      "grantRule": "the caller supplies the complete grant identity; nothing defaults to a role-owned grant",
+      "authorityRule": "authorisation is a live object issued by admitSend; a string descriptor or a forged lookalike is refused"
+    }
+  },
+
+  "phases": {
+    "B1": {
+      "status": "PASS",
+      "label": "existing diagnostics became a consumable production library",
+      "delivered": [
+        "packages/driver-kit/src/runtime-diagnostics.ts",
+        "packages/driver-kit/test/runtime-diagnostics.test.ts (12 cases)",
+        "tests/native-acceptance/runtime-diagnostics.mjs (thin formatter)"
+      ],
+      "failClosed": [
+        "missing binary refuses instead of degrading to a green light",
+        "usability is judged on the observed identity, never the redacted projection",
+        "an unprobed platform claims no local capability",
+        "untested is never rendered as supported"
+      ],
+      "privacy": "the public projection leaks no home or store path; the full identity is opt-in behind includePrivate, and both forms agree on the digest so main can compare them",
+      "billingSeparation": "billableAdmitted is a separate flag from usable; turn_budget_field, pricing_surface and native_control stay absent/untested, so the executor is usable while billing stays closed",
+      "notAReport": "this is a package export; main/D call it directly instead of reading a tests-dir JSON as runtime authority"
+    },
+    "B2": {
+      "status": "PASS",
+      "label": "current resource query for recovery and upgrade",
+      "delivered": [
+        "packages/execution/src/resource-facts.ts",
+        "packages/execution/test/resource-facts.test.ts (18 cases)"
+      ],
+      "invalidInferencesNamed": [
+        "old attempt ended",
+        "pid missing",
+        "signature from another machine",
+        "wrong scope",
+        "lost contact",
+        "new state or generation",
+        "stale proof"
+      ],
+      "conservatism": "one unknown or possibly-active resource keeps the whole set unresolved; no observations never satisfies the barrier",
+      "reusedImplementation": "reads the existing RunnerInspection shape; no second DTO was invented and no shared schema was changed",
+      "sharedDtoRequest": "none needed at this time; if main wants a different projection it should name exact fields rather than this role guessing a JSON"
+    },
+    "B3": {
+      "status": "PASS",
+      "label": "control and recovery failure windows plus product consumption",
+      "delivered": ["tests/native-acceptance/b11-control-windows.mjs (11 cases)"],
+      "windowsAdded": [
+        "same-ID replay keeps one command identity",
+        "a replay reuses one command id so the Runner can dedupe by key",
+        "a start that does not supersede the durable binding is refused as stale",
+        "a reused attempt id is refused",
+        "an old-epoch command id differs from the new-epoch one",
+        "partial coverage keeps the resource barrier closed",
+        "an active writer blocks the barrier",
+        "creating a new state releases nothing",
+        "an indeterminate writer stays indeterminate across repeated stops"
+      ],
+      "correctionsDuringWork": [
+        "the idempotency contract is key stability, not suppression of a second physical command; dedupe is the Runner's duty, so the assertion now tests the key",
+        "the process-wide epoch high-water mark needs durable storage owned by core/storage, so it is recorded NOT_TESTED rather than claimed"
+      ],
+      "nativeScope": "actual native stop/answer/steer and unknown-send reconciliation remain NOT_TESTED; this suite is controlled evidence only"
+    },
+    "B4": {
+      "status": "PASS",
+      "label": "one adapter rejection path shared by B and E",
+      "delivered": [
+        "packages/driver-kit/src/send-admission.ts",
+        "packages/driver-kit/test/send-admission.test.ts (16 cases)",
+        "runtime-admission.mjs now requires an explicit grant"
+      ],
+      "closedDefect": "admission used to hardcode wave03-b-native/4, so B's grant gated E's decision while E's guarded send spawned its own CLI. There is now one chain: explicit grant in, one issued token out, one owned transport consumed.",
+      "refusalShape": "a refusal carries token=null and launch=null with nothing executable; a consumer can assert the absence rather than a missing key",
+      "bypassResistance": [
+        "a string descriptor is refused outright",
+        "a structurally identical forged token object is refused",
+        "a missing transport sends nothing, because this module holds no second wire",
+        "a reservation refusal or a throwing hook stops the send before the transport is called"
+      ],
+      "bugCaughtByTests": "a missing gate set its state but did not record a problem, so an empty gates object would have admitted a send; fixed and covered",
+      "fakeSendCount": 0,
+      "realSend": false
+    },
+    "B5": {
+      "status": "PASS",
+      "label": "current runtime consumption list for main/D/E",
+      "distinctions": {
+        "usableExecutor": "true - identity resolves, host enforcement available",
+        "currentlyUnadmittedReview": "true - billing stays blocked by cost_bound and the UNKNOWN ledger remainder",
+        "realControlUntested": "true - native stop/answer/steer never exercised",
+        "resourcePendingVerification": "true - the release barrier stays closed without current on-machine complete-coverage evidence"
+      },
+      "releaseArtifactCheck": "the description resolves the exact executable and its digest; no author account, credential or session content is read",
+      "modeHandling": "no mode is asserted here; D owns personal/fixture mode and this module never presents a fixture as personal"
+    },
+    "B6": {
+      "status": "PASS",
+      "label": "frozen runtime support handoff",
+      "authoritativeStatus": "tests/native-acceptance/reports/wave08-status.json"
+    }
+  },
+
+  "verification": {
+    "driver_kit": {"files": 2, "tests": 28, "pass": 28, "fail": 0},
+    "execution": {"files": 1, "tests": 18, "pass": 18, "fail": 0},
+    "b9RunnerAdmission": {"cases": 17, "PASS": 17, "FAIL": 0},
+    "b11ControlWindows": {"cases": 11, "PASS": 10, "FAIL": 0, "NOT_TESTED": 1},
+    "regressionsPreserved": {
+      "b7PilotTransport": {"cases": 14, "PASS": 14},
+      "b3ProductionStop": {"cases": 6, "PASS": 6},
+      "b4Recovery": {"cases": 4, "PASS": 3, "NOT_TESTED": 1},
+      "unitSuites": {"tests": 41, "pass": 41}
+    }
+  },
+
+  "preservedConclusions": {
+    "boundedRecipe": "NO_SUPPORTED_BOUNDED_RECIPE",
+    "dossier": "tests/native-acceptance/reports/wave07-b4-bound-dossier.md",
+    "notRepeated": true,
+    "note": "the wave-07 protocol/goal/price investigation is complete and is not re-run this wave; the verdict is carried forward, not re-derived"
+  },
+
+  "budget": {
+    "grants": [
+      {
+        "grantId": "wave03-b-native",
+        "limit": 4,
+        "attributionState": "UNVERIFIED",
+        "remainder": "UNKNOWN",
+        "maySendReal": false,
+        "note": "reconstructed empty ledgers do not refresh it; unchanged this wave"
+      },
+      {
+        "grantId": "wave05-independent-review-pilot-01",
+        "limit": 24,
+        "owner": "E",
+        "attributionState": "NOT_B_GRANT",
+        "bConsumes": false,
+        "touchedThisWave": false
+      }
+    ],
+    "historicalRoundsUsed": 3,
+    "modelCallsThisWave": 0,
+    "realModelSends": 0,
+    "fakeSendsInTests": 1,
+    "fakeSendNote": "one fake transport call in a test that proves the issued token reaches the owned transport; no real process is started"
+  },
+
+  "notTested": [
+    "real vendor turn start, stop, question delivery, steer and unknown-send reconciliation",
+    "the process-wide epoch high-water mark across a real restart (needs durable storage owned by core/storage)",
+    "whether a goal token budget is checked before the first inference of a turn",
+    "actual billed amount for any real turn"
+  ],
+
+  "limitations": [
+    "host enforcement is macOS Seatbelt; elsewhere the host capability reports absent rather than claiming isolation",
+    "resource facts describe only what an endpoint reports; an unobserved writer is unknown, never absent",
+    "a usable executor is not review admission and not release acceptance"
+  ],
+
+  "nextConsumerSteps": {
+    "main": "import describeRuntime/describeResourceFacts/admitSend from the owned packages; pass the caller's grant explicitly; treat a refusal as the supported answer and do not resolve it with a string descriptor",
+    "D": "use describeRuntime for the exact executable/profile facts and keep personal/fixture mode an explicit field you own; no credential or account home is included",
+    "E": "consume the one send path; supply the persistent reservation hook and the complete grant. A descriptor cannot unlock execution and there is no CLI fallback."
+  }
+}

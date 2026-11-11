@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-11T06:18:44.070Z",
+  "generatedAt": "2026-11-11T08:48:14.137Z",
   "environment": {
     "note": "wave-07 B9 unified admission: actual_native + package-local",
     "modelCalls": 0
   },
   "totals": {
-    "cases": 16,
-    "PASS": 16,
+    "cases": 17,
+    "PASS": 17,
     "FAIL": 0,
     "SKIPPED": 0,
     "NOT_TESTED": 0
@@ -228,6 +228,22 @@
         {
           "satisfied": false,
           "gap": "no reservation hook: a billable run must reserve before send"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-GRANT-REQUIRED",
+      "title": "admission refuses when the caller supplies no grant identity",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "a missing grant is refused instead of silently auditing this role's own grant"
+      ],
+      "evidence": [
+        {
+          "satisfied": false,
+          "gap": "no complete grant identity was supplied: pass { grantId, owner, limit, ledgerPath } instead of relying on a ro"
         }
       ],
       "entities": []

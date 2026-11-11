@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T06:20:22.240Z",
+  "generatedAt": "2026-11-11T08:49:03.678Z",
   "environment": {
     "platform": "darwin/arm64",
     "node": "v24.21.0",
@@ -21,14 +21,14 @@
       "lane": "controlled",
       "status": "PASS",
       "detail": [
-        "inventory reports res-17784-b149233f7285 as active (1 owned)"
+        "inventory reports res-97178-e2a724866442 as active (1 owned)"
       ],
       "evidence": [
         {
-          "ref": "res-17784-b149233f7285",
+          "ref": "res-97178-e2a724866442",
           "inventory": [
             {
-              "ref": "res-17784-b149233f7285",
+              "ref": "res-97178-e2a724866442",
               "writer": "active"
             }
           ]
@@ -72,7 +72,7 @@
           "grewAfter": false,
           "inventoryAfter": [
             {
-              "ref": "res-17784-b149233f7285",
+              "ref": "res-97178-e2a724866442",
               "writer": "quiescent"
             }
           ]

@@ -1,0 +1,220 @@
+{
+  "generatedAt": "2026-11-11T08:48:14.239Z",
+  "environment": {
+    "note": "wave-08 B11 controlled control/recovery failure windows",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 11,
+    "PASS": 10,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 1
+  },
+  "scope": "controlled only; native control is NOT_TESTED",
+  "cases": [
+    {
+      "id": "B11-REPLAY-SAME-ID",
+      "title": "a retry of the same logical command keeps one identity",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "the same logical input keeps one command identity; a different input or epoch does not collide"
+      ],
+      "evidence": [
+        {
+          "keyA": "attemptId=\"attempt-1\"\nfenceEpoch=7\nkind=\"deliver\"\nexpectedTurnRef=<absent>\ninputRef=\"input-1\"",
+          "sameInputStable": true,
+          "differentInputDistinct": true,
+          "differentEpochDistinct": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B11-REPLAY-IDEMPOTENCY-KEY",
+      "title": "a replay reuses one command identity so the Runner can dedupe",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "the replay reused one command id (2 deliver command(s), 1 identity), so the Runner can dedupe by key"
+      ],
+      "evidence": [
+        {
+          "first": {
+            "queued": true,
+            "commandId": "cmd-attempt-1-1-deliver-c9c84848659412102cfe39110af0a00713fecf3cdb5572c5ca3280f9f849c734"
+          },
+          "second": {
+            "queued": true,
+            "commandId": "cmd-attempt-1-1-deliver-c9c84848659412102cfe39110af0a00713fecf3cdb5572c5ca3280f9f849c734"
+          },
+          "deliverIds": [
+            "cmd-attempt-1-1-deliver-c9c84848659412102cfe39110af0a00713fecf3cdb5572c5ca3280f9f849c734",
+            "cmd-attempt-1-1-deliver-c9c84848659412102cfe39110af0a00713fecf3cdb5572c5ca3280f9f849c734"
+          ]
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B11-STALE-EPOCH",
+      "title": "a start that does not supersede the durable binding is refused",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "a start at an epoch that does not supersede the durable binding is refused as stale"
+      ],
+      "evidence": [
+        {
+          "outcome": "refused:stale_start",
+          "durableEpoch": 1
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B11-EPOCH-REUSE",
+      "title": "a reused attempt id is refused even across a restart",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "a reused attempt id is refused, so an ended attempt identity cannot be recycled"
+      ],
+      "evidence": [
+        {
+          "outcome": "refused:attempt_id_reused"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B11-STALE-EPOCH-COMMAND",
+      "title": "a command built for the old tuple cannot be replayed at the new epoch",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "an old-epoch command id differs from the new-epoch one, so a stale command cannot be mistaken for current"
+      ],
+      "evidence": [
+        {
+          "staleKey": "attemptId=\"attempt-1\"\nfenceEpoch=7\nkind=\"cancel\"\nreason=\"shutdown\"",
+          "newKey": "attemptId=\"attempt-1\"\nfenceEpoch=8\nkind=\"cancel\"\nreason=\"shutdown\"",
+          "distinct": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B11-RESOURCE-UNCERTAIN-BLOCKS",
+      "title": "an unresolved resource blocks new execution",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "partial coverage keeps the barrier closed, so new execution is blocked rather than assumed safe"
+      ],
+      "evidence": [
+        {
+          "verdict": "unknown",
+          "releaseBarrierSatisfied": false,
+          "reasons": [
+            "the endpoint reports partial coverage, so its resource list is not exhaustive"
+          ]
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B11-RESOURCE-ACTIVE-BLOCKS",
+      "title": "an active writer blocks even when everything else is clean",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "an active writer blocks the resource barrier"
+      ],
+      "evidence": [
+        {
+          "verdict": "possibly_active",
+          "satisfied": false
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B11-NEW-STATE-NO-RELEASE",
+      "title": "creating a new execution state does not release an old resource",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "with no observation of the old writer the barrier stays closed; a new state asserts nothing about it"
+      ],
+      "evidence": [
+        {
+          "verdict": "no_resources_observed",
+          "satisfied": false,
+          "notClaimed": [
+            "that an unobserved writer does not exist",
+            "that a new execution state released any old resource",
+            "that native stop or unknown-send reconciliation were exercised"
+          ]
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B11-UNKNOWN-SEND-RECONCILE",
+      "title": "an unknown send is reconciled before any retry",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "stop reported \"confirmed\" from 2 physical command(s); unknown is not reported as clean"
+      ],
+      "evidence": [
+        {
+          "stopResult": {
+            "state": "ended",
+            "quiescence": "confirmed",
+            "evidenceRefs": [
+              "fake-stop",
+              "reason:shutdown"
+            ]
+          },
+          "physicalCommands": 2
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B11-STOP-KEEPS-UNKNOWN",
+      "title": "repeated stop calls do not fabricate a stopped writer",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "an indeterminate writer stays indeterminate across repeated stops instead of decaying to stopped"
+      ],
+      "evidence": [
+        {
+          "first": "indeterminate",
+          "second": "indeterminate"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B11-NATIVE-NOT-TESTED",
+      "title": "these windows are controlled evidence and say so",
+      "lane": "package-local",
+      "status": "NOT_TESTED",
+      "detail": [
+        "real vendor stop/answer/steer and unknown-send reconciliation remain untested; this suite is controlled evidence only"
+      ],
+      "evidence": [
+        {
+          "classification": "controlled (real AttemptSupervisor + real resource-facts reader, fake Runner)",
+          "nativeExercised": false
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
