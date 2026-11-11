@@ -13,6 +13,7 @@ import { ProjectSettingsVersionSchema, ProjectSettingsPageSchema, ProjectSetting
 import { ExecutionProfileRefSchema, ReviewSubjectSchema, ReviewReportSchema, RouteAdviceSchema, ReviewEvidenceSchema, ExecutionOutcomeSchema } from '../src/routing-review.ts';
 import { ReviewTimingSchema, ReviewActivitySchema } from '../src/review-timing.ts';
 import { AttentionItemSchema, AttentionPageSchema, AttentionQuerySchema, AttentionRankSchema } from '../src/attention.ts';
+import { DecisionPrepareSchema, DecisionPreviewSchema, DecisionCommandSchema, DecisionQuerySchema, DecisionViewSchema, DecisionPageSchema } from '../src/decision-commands.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -66,6 +67,9 @@ outputs.set('generated/review-timing.manifest.json', canonical({ protocol: 'revi
 const attentionText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:attention-inbox:1', $defs: { AttentionItem: z.toJSONSchema(AttentionItemSchema, { target: 'draft-2020-12', io: 'input' }), AttentionRank: z.toJSONSchema(AttentionRankSchema, { target: 'draft-2020-12', io: 'input' }), AttentionPage: z.toJSONSchema(AttentionPageSchema, { target: 'draft-2020-12', io: 'input' }), AttentionQuery: z.toJSONSchema(AttentionQuerySchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/attention.schema.json', attentionText);
 outputs.set('generated/attention.manifest.json', canonical({ protocol: 'attention-inbox/1', schemaHash: digest(attentionText), sourceHash: digest(readFileSync(resolve(root, 'src/attention.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
+const decisionsText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:decision-commands:1', $defs: { DecisionPrepare: z.toJSONSchema(DecisionPrepareSchema, { target: 'draft-2020-12', io: 'input' }), DecisionPreview: z.toJSONSchema(DecisionPreviewSchema, { target: 'draft-2020-12', io: 'input' }), DecisionCommand: z.toJSONSchema(DecisionCommandSchema, { target: 'draft-2020-12', io: 'input' }), DecisionQuery: z.toJSONSchema(DecisionQuerySchema, { target: 'draft-2020-12', io: 'input' }), DecisionView: z.toJSONSchema(DecisionViewSchema, { target: 'draft-2020-12', io: 'input' }), DecisionPage: z.toJSONSchema(DecisionPageSchema, { target: 'draft-2020-12', io: 'input' }) } });
+outputs.set('generated/decisions.schema.json', decisionsText);
+outputs.set('generated/decisions.manifest.json', canonical({ protocol: 'decision-commands/1', schemaHash: digest(decisionsText), sourceHash: digest(readFileSync(resolve(root, 'src/decision-commands.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [path, content] of outputs) {
   const target = resolve(root, path);
   if (check) {

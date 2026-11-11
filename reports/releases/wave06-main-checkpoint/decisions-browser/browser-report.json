@@ -1,0 +1,30 @@
+{
+  "status": "PASS_DECISION_HTTP_BROWSER",
+  "sourceCommit": "f638fe070f34d7b38f8f38bc167d3e9985a57efc",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-11T02:50:52.528Z",
+  "cases": [
+    {
+      "id": "USER-MESSAGE-PREVIEW-IS-READONLY-AND-RESPONSIVE",
+      "status": "PASS"
+    },
+    {
+      "id": "EXPLICIT-CONFIRMATION-REOPEN-AND-REVOKE-KEEP-AUDIT",
+      "status": "PASS"
+    },
+    {
+      "id": "LOST-RESPONSE-RELOAD-RETRIES-THE-SAME-COMMAND-ONCE",
+      "status": "PASS"
+    },
+    {
+      "id": "DECISIONS-NEVER-CREATE-WORK-OR-NATIVE-EFFECTS",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "limitations": [
+    "Real local HTTP/SQLite and A/C persistence/domain code; no model/native call",
+    "Explicit decision record/revoke only; no generic proposal execution, automatic context injection or recovery reauthorization"
+  ]
+}

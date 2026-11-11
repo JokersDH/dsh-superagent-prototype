@@ -1,0 +1,104 @@
+# Agent C wave-06 full verification (2026-11-11T02:32:03Z)
+
+## @personal-agent/context
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ source descriptors are not trusted blindly: a port cannot smuggle a foreign project (0.090292ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 796.587833
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/proposals
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ the shared ReasonerProposal schema is the only accepted proposal shape (0.085375ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 194.776458
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/knowledge
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ stale/foreign/expired/old-version inputs are refused without effects (1.647458ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 589.974667
+### build
+$ tsc -p tsconfig.build.json
+
+## @personal-agent/routing
+### typecheck
+$ tsc -p tsconfig.json
+### test
+✔ duplicate ids are refused instead of corrupting the public page (0.22075ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 489.773125
+### build
+$ tsc -p tsconfig.build.json
+
+## real SQLite assistant probe
+  "status": "PASS_SQLITE_ASSISTANT_CONSUMER",
+      "id": "PENDING-PROPOSAL-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "CONFIRM-RECEIPT-FAILURE-ROLLS-BACK-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "CONFIRM-REOPEN-AND-REPLAY-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "DECISION-PROVENANCE-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "DECISION-DOMAIN-REPLAY-OVER-STORAGE",
+      "owner": "C",
+      "status": "PASS"
+      "id": "DECISION-REVOKE-AND-REOPEN-REAL-SQLITE",
+      "owner": "integration",
+      "status": "PASS"
+      "id": "SOURCE-INVALIDATION-EXCLUDES-PERSISTED-DECISION",
+      "owner": "integration",
+      "status": "PASS"
+
+## wave-04 admission
+  "status": "PASS_ADMISSION_PROBES",
+      "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+      "status": "PASS",
+      "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+      "status": "PASS",
+      "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+      "status": "PASS",
+
+## examples
+{"status":"PASS","modelCalls":0,"networkCalls":0,"sqlite":"real temporary SQLite via A ProductStore/AssistantStatePort"}
+{"status":"PASS","modelCalls":0,"networkCalls":0,"sqlite":"real temporary SQLite via A ProductStore/AssistantStatePort","context":{"selectedFiles":["README.md"],"injectionFlags":1,"trust":"untrusted_data"},"proposal":{"state":"confirmed","version":2},"decision":{"status":"active","version":1},"revocation":{"status":"revoked","version":2},"oldReplayStatus":"revoked","reopenedStatus":"revoked"}
+{"status":"PASS","modelCalls":0,"networkCalls":0,"realSqlAdapter":"covered separately by tools/bootstrap/review-persisted-assistant.mjs (7/7 real SQLite)"}
+{"status":"PASS","modelCalls":0,"networkCalls":0,"attentionTop":["permission-1:deadline","clarify-1:expired"],"adviceBasis":"only_eligible","reviewState":"current","staleReason":"candidate_changed","realRoutingEvidencePort":"NOT_TESTED (A-owned RoutingEvidencePort not present on main)"}
