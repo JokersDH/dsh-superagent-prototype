@@ -209,6 +209,27 @@ export class PilotTransport {
     })
   }
 
+  /**
+   * Call any NON-BILLING protocol method.
+   *
+   * This exists so a caller can reach protocol verbs the named helpers do not wrap (for example
+   * `thread/goal/set` when testing whether a real token budget exists) without opening a second
+   * code path to the billing method. `turn/start` is refused here; the only way to send a turn is
+   * `startTurn`, which enforces the reservation hook.
+   */
+  async call(method, params) {
+    if (typeof method !== 'string' || method.length === 0) {
+      throw new PilotTransportError('invalid_method', 'call() needs a method name')
+    }
+    if (method === BILLING_METHOD) {
+      throw new PilotTransportError(
+        'billing_method_refused',
+        'call() refuses turn/start; use startTurn() so the reservation hook is enforced',
+      )
+    }
+    return this.#request(method, params)
+  }
+
   // ---------------------------------------------------------------------------------------------
   // Non-billing operations. None of these can start a model turn.
   // ---------------------------------------------------------------------------------------------

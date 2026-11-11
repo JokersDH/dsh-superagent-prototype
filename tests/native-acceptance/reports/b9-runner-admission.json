@@ -1,0 +1,304 @@
+{
+  "generatedAt": "2026-11-11T06:18:44.070Z",
+  "environment": {
+    "note": "wave-07 B9 unified admission: actual_native + package-local",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 16,
+    "PASS": 16,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "admissionVerdict": "REFUSED",
+  "unmetGates": [
+    "budget_reservation",
+    "cost_bound"
+  ],
+  "cases": [
+    {
+      "id": "B9-ONE-PATH",
+      "title": "admission evaluates all gates in one call",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "all 6 gates evaluated without short-circuit; unmet=budget_reservation,cost_bound"
+      ],
+      "evidence": [
+        {
+          "gates": [
+            "execution_identity",
+            "session_fact",
+            "material_copy",
+            "host_isolation",
+            "budget_reservation",
+            "cost_bound"
+          ],
+          "unmet": [
+            "budget_reservation",
+            "cost_bound"
+          ]
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-IDENTITY",
+      "title": "execution identity is observed, not defaulted",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "identity: codex-cli 0.164.0 digest=61b0194f3bb6… platform=darwin/arm64"
+      ],
+      "evidence": [
+        {
+          "version": "codex-cli 0.164.0",
+          "digest": "61b0194f3bb65344",
+          "platform": "darwin/arm64"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-IDENTITY-DIGEST",
+      "title": "the verdict carries an identity digest that changes with identity",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "verdict is bound to an identity digest; a different model yields a different digest"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B9-SESSION-REAL",
+      "title": "session facts come from a real server",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "model=gpt-6.1-sol provider=OpenAI; ephemeral threads supported"
+      ],
+      "evidence": [
+        {
+          "model": "gpt-6.1-sol",
+          "provider": "OpenAI",
+          "ephemeral": true,
+          "goalsPersistent": true,
+          "goalsEphemeral": false
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-ARM-SEPARATION",
+      "title": "the fresh arm and the author arm use different session kinds",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "ephemeral fresh thread and a turn-backed persistent author checkpoint are distinct paths; a goal budget cannot attach to the fresh arm"
+      ],
+      "evidence": [
+        {
+          "checkpointRequiresTurn": true,
+          "goalsUsableByFreshArm": false
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-COPY-SAFE-BUILDER",
+      "title": "the production builder copies bytes and shares no inode",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "1 file(s) copied; no Git surface; no shared inode"
+      ],
+      "evidence": [
+        {
+          "files": 1,
+          "gitEntries": [],
+          "sharedInodes": 0,
+          "manifest": "750d75f2ab594152"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-COPY-REFUSES-LINK",
+      "title": "a link-based copy request is refused at admission",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "every known-unsafe mode is refused with the sealed-copy rationale; an unknown mode is also refused; \"bytes\" is accepted"
+      ],
+      "evidence": [
+        {
+          "refusals": [
+            "hardlink:refused(sealed)",
+            "link:refused(sealed)",
+            "reflink-shared-inode:refused(sealed)",
+            "symlink:refused(sealed)"
+          ],
+          "unknownMode": "refused",
+          "bytesAllowed": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-ADMISSION-REFUSES-LINK",
+      "title": "admission itself refuses a link copyMode, not just the helper",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "admission refused the hardlink copyMode and reported the sealed-copy requirement"
+      ],
+      "evidence": [
+        {
+          "copySatisfied": false,
+          "gap": "refusing copyMode \"hardlink\": a sealed copy must copy bytes and share no inode with the author tree",
+          "hostSatisfied": false
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-UNSAFE-NEGATIVE-CONTROL",
+      "title": "a deliberately unsafe link builder CAN corrupt the author tree",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "the unsafe builder does share an inode, so refusing it is a real control and not a tautology"
+      ],
+      "evidence": [
+        {
+          "linked": 1,
+          "sharesInode": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-HOST-GATE",
+      "title": "host isolation is a real enforcement mechanism, not a claim",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "host isolation via macos-seatbelt: network denied, author home unreadable, capsule scratch allowed"
+      ],
+      "evidence": [
+        {
+          "available": true,
+          "mechanism": "macos-seatbelt",
+          "deniesNetwork": true,
+          "deniesAuthorRead": true,
+          "allowsScratch": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-BUDGET-GATE",
+      "title": "the budget gate refuses an UNKNOWN ledger remainder",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "a reconstructed ledger with UNKNOWN remainder does not admit a run; the empty ledger is not 4 free slots"
+      ],
+      "evidence": [
+        {
+          "grantVerdict": "UNVERIFIED",
+          "remainder": "UNKNOWN",
+          "hookPresent": true,
+          "reason": "grant wave03-b-native is UNVERIFIED: the ledger was reconstructed from product records and its remainder is UN"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-NO-HOOK-REFUSES",
+      "title": "a missing reservation hook is its own gap",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "admission reports the missing hook as its own reason instead of a generic refusal"
+      ],
+      "evidence": [
+        {
+          "satisfied": false,
+          "gap": "no reservation hook: a billable run must reserve before send"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-COST-GATE",
+      "title": "the cost gate is blocked independently of the ledger",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "cost bound is blocked on its own 9 reasons; a valid reservation would not unlock it"
+      ],
+      "evidence": [
+        {
+          "verdict": "BLOCKED",
+          "blockers": 9,
+          "first": "price basis incomplete: no authoritative price source, no concrete model id, no observed-a"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-NO-LAUNCH-WHEN-REFUSED",
+      "title": "a refused verdict exposes no launch plan",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "REFUSED carries launch=null, so a consumer cannot start a run from it"
+      ],
+      "evidence": [
+        {
+          "verdict": "REFUSED",
+          "launch": null
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-NOT-CLAIMED",
+      "title": "admission states what it does not claim",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "admission explicitly disclaims 4 things, including turn success and product acceptance"
+      ],
+      "evidence": [
+        {
+          "notClaimed": [
+            "that a real vendor turn will succeed",
+            "that a real turn is bounded (cost_bound reports the measured runtime, which is BLOCKED)",
+            "that native stop/question/unknown-send were exercised",
+            "that admission is product or release acceptance"
+          ]
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B9-AUTHOR-INTACT",
+      "title": "the author tree is unchanged by admission and capsule work",
+      "lane": "package-local",
+      "status": "PASS",
+      "detail": [
+        "author working file is byte-identical and its credential file still exists untouched"
+      ],
+      "evidence": [
+        {
+          "appMatches": true
+        }
+      ],
+      "entities": []
+    }
+  ]
+}

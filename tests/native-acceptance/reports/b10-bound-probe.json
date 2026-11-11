@@ -1,0 +1,228 @@
+{
+  "generatedAt": "2026-11-11T06:18:42.296Z",
+  "environment": {
+    "note": "wave-07 B10 bounded-recipe feasibility probe",
+    "modelCalls": 0,
+    "verdict": "NO_SUPPORTED_BOUNDED_RECIPE"
+  },
+  "totals": {
+    "cases": 8,
+    "PASS": 8,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0
+  },
+  "findings": {
+    "methodCount": 134,
+    "hasTurnStart": true,
+    "hasGoalSet": true,
+    "model": {
+      "id": "gpt-6.1-sol",
+      "provider": "OpenAI",
+      "keys": [
+        "id",
+        "model",
+        "upgrade",
+        "upgradeInfo",
+        "availabilityNux",
+        "displayName",
+        "description",
+        "modelSpecialty",
+        "hidden",
+        "supportedReasoningEfforts",
+        "defaultReasoningEffort",
+        "inputModalities",
+        "supportsPersonality",
+        "multiAgentVersion",
+        "additionalSpeedTiers",
+        "serviceTiers",
+        "defaultServiceTier",
+        "availableAccessPrograms",
+        "isDefault"
+      ],
+      "priceFields": []
+    },
+    "config": {
+      "bytes": 35654,
+      "limitKeys": [],
+      "priceKeys": []
+    },
+    "goal": {
+      "tokenBudget": 1000,
+      "tokensUsed": 0,
+      "status": "active",
+      "supportsBudgetLimited": true
+    },
+    "goalOnEphemeral": "ephemeral thread does not support goals: 01a1c942-36ba-7342-a712-d4b3ea56c70c",
+    "account": {
+      "account/usage/read": "chatgpt authentication required to read token usage",
+      "account/rateLimits/read": "chatgpt authentication required to read rate limits"
+    },
+    "wire": [
+      "initialize",
+      "definitely/not-a-method",
+      "model/list",
+      "config/read",
+      "thread/start",
+      "thread/goal/set",
+      "thread/goal/clear",
+      "thread/start",
+      "thread/goal/set",
+      "account/usage/read",
+      "account/rateLimits/read"
+    ],
+    "verdict": "NO_SUPPORTED_BOUNDED_RECIPE",
+    "reasons": [
+      "turn/start has no per-request token cap field, so no single-turn ceiling can be expressed",
+      "config/read exposes no token-limit key, so no config-level ceiling exists either",
+      "thread/goal tokenBudget is cumulative across a thread goal: the first turn starts at tokensUsed=0 so it cannot be capped by it",
+      "usage arrives after the turn, so it measures spend without capping it",
+      "no price surface exists in the protocol, model list or config, so a cost ceiling has no unit"
+    ],
+    "notTested": [
+      "whether a goal budget is checked before the first inference of a turn",
+      "whether exceeding the budget aborts an in-flight turn",
+      "actual billed amount for any real turn"
+    ]
+  },
+  "cases": [
+    {
+      "id": "B10-BILLING-SET",
+      "title": "turn/start is the only billing method and call() refuses it",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "call() refuses turn/start; only startTurn (with a reservation hook) can send"
+      ],
+      "evidence": [],
+      "entities": []
+    },
+    {
+      "id": "B10-METHOD-INVENTORY",
+      "title": "the server publishes its accepted method list",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "enumerated 134 accepted methods, including turn/start and thread/goal/set"
+      ],
+      "evidence": [
+        {
+          "methodCount": 134,
+          "hasTurnStart": true,
+          "hasGoalSet": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B10-MODEL-NO-PRICE",
+      "title": "model/list exposes no price, cost or credit field",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "model gpt-6.1-sol lists 19 fields and none is a price"
+      ],
+      "evidence": [
+        {
+          "modelId": "gpt-6.1-sol",
+          "keys": 19,
+          "priceFields": []
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B10-CONFIG-NO-LIMIT",
+      "title": "config/read exposes no token-limit and no price key",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "read 35654 bytes of config with no token-limit key and no price key"
+      ],
+      "evidence": [
+        {
+          "bytes": 35654,
+          "limitKeys": [],
+          "priceKeys": []
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B10-GOAL-BUDGET",
+      "title": "thread/goal/set accepts a token budget on a persistent thread",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "a cumulative goal token budget is accepted and reports tokensUsed; this is NOT a single-turn bound"
+      ],
+      "evidence": [
+        {
+          "tokenBudget": 1000,
+          "tokensUsed": 0,
+          "status": "active"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B10-GOAL-NOT-EPHEMERAL",
+      "title": "a goal budget cannot be attached to an ephemeral thread",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "the ephemeral fresh-reviewer thread refuses goals, so a budget cannot be attached to it"
+      ],
+      "evidence": [
+        {
+          "refused": true,
+          "message": "ephemeral thread does not support goals: 01a1c942-36ba-7342-a712-d4b3ea56c70c"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B10-ACCOUNT-UNAVAILABLE",
+      "title": "account usage and rate-limit reads are unavailable",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "neither account surface is readable here, so no server-side price or quota can be read"
+      ],
+      "evidence": [
+        {
+          "account/usage/read": "chatgpt authentication required to read token usage",
+          "account/rateLimits/read": "chatgpt authentication required to read rate limits"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B10-NO-SEND",
+      "title": "the whole investigation sent no billing method",
+      "lane": "actual_native",
+      "status": "PASS",
+      "detail": [
+        "wire shows only non-billing methods (11 request(s)); turn/start never sent"
+      ],
+      "evidence": [
+        {
+          "methodsSent": [
+            "initialize",
+            "definitely/not-a-method",
+            "model/list",
+            "config/read",
+            "thread/start",
+            "thread/goal/set",
+            "thread/goal/clear",
+            "thread/start",
+            "thread/goal/set",
+            "account/usage/read",
+            "account/rateLimits/read"
+          ]
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
