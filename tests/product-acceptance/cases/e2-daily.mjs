@@ -683,6 +683,7 @@ export async function runE2({ root, runDirectory, keep = false }) {
         assert('EVIDENCE_UNKNOWN_WORK', [400, 403, 404].includes(foreign.status), `status ${foreign.status} ${JSON.stringify(foreign.body)}`)
         evidence.workEvidence = {
           protocol: projected.protocol,
+          workId,
           projection: projected.projection,
           entries: projected.entries.length,
           outcomes: projected.outcomes.length,
