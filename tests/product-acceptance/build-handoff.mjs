@@ -531,7 +531,7 @@ ${rows
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
 | 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold install/config root/doctor、普通 personal cold start、模式保持、备份恢复、篡改拒绝、requested-data-root stop、跨 schema 精确拒绝、D schema→当前A schema 迁移 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-CROSS-SCHEMA、E8-SCHEMA-MIGRATION。tuple=${frozenScope?.artifact?.buildId ?? '?'}/schema ${frozenScope?.artifact?.schema ?? '?'}，main schema ${frozenScope?.main?.schema ?? '?'}；current-main install=${currentMainInstall ? 'NOT_TESTED' : 'SCOPED PASS'}；E4-UPGRADE-ROLLBACK/E4-UPGRADE-FAULTS 仍 NOT_TESTED；copied-record stop=${byId.get('E7-OWNERSHIP-COPY')?.status ?? 'MISSING'}。 |
 
-安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId \`${artifactTuple.baseline?.buildId ?? 'unknown'}\` / schema ${artifactTuple.baseline?.schema ?? '?'} / tar \`${String(artifactTuple.baseline?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.baseline?.source ?? '').slice(0, 8)}\`；target buildId \`${artifactTuple.target?.buildId ?? 'unknown'}\` / schema ${artifactTuple.target?.schema ?? '?'} / tar \`${String(artifactTuple.target?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.target?.source ?? '').slice(0, 8)}\`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
+安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId \`${artifactTuple.baseline?.buildId ?? 'unknown'}\` / schema ${artifactTuple.baseline?.productSchema ?? artifactTuple.baseline?.schema ?? '?'} / tar \`${String(artifactTuple.baseline?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.baseline?.sourceCommit ?? artifactTuple.baseline?.source ?? '').slice(0, 8)}\`；target buildId \`${artifactTuple.target?.buildId ?? 'unknown'}\` / schema ${artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? '?'} / tar \`${String(artifactTuple.target?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? '').slice(0, 8)}\`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
 ## 独立复核价值试点
 
@@ -622,7 +622,7 @@ writeFileSync(
     },
     counts: report.counts,
     testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
-    productSource: { commit: artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.schema ?? null },
+    productSource: { commit: artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? null },
     mainSource: { commit: stages.base, schema: byId.get('E6-ARTIFACT-CURRENT-SCOPE')?.evidence?.frozenScope?.main?.schema ?? null },
     artifactTuple,
   }, null, 2) + '\n',

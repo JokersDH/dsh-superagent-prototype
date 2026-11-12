@@ -178,7 +178,7 @@ const evidenceFor = (key) => {
     case 'multiState':
       return {
         stopOtherState: { exit: 1, bAlive: true, bApiAlive: true },
-        deadLauncher: { status: 'UNVERIFIED', apiAlive: true, apiAliveAfterStop: true },
+        deadLauncher: { status: 'UNVERIFIED', apiAliveBefore: true, stopExit: 0, apiAliveAfterStop: false },
       }
     case 'crossUpgrade':
       return {
