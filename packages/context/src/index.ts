@@ -107,6 +107,46 @@ export type {
   PromptDataProjection,
   PromptDataSourceReference,
 } from './prompt-data.ts'
+export { collectContextHistory } from './history.ts'
+export type {
+  HistoryCompletedReply,
+  HistoryEntry,
+  HistoryEntrySource,
+  HistoryEntryState,
+  HistoryOmission,
+  HistoryView,
+  HistoryViewOptions,
+} from './history.ts'
+export {
+  RELEVANCE_CEILINGS,
+  RELEVANCE_DEFAULTS,
+  createConversationRelevanceCandidates,
+  createDecisionRelevanceCandidates,
+  createReadIndexWorkCandidates,
+  selectRelevantSources,
+} from './relevance.ts'
+export type {
+  RelevanceBudget,
+  RelevanceCandidate,
+  RelevanceItem,
+  RelevanceOmission,
+  RelevanceOmissionReason,
+  RelevanceSelection,
+  RelevanceSelectionOptions,
+} from './relevance.ts'
+export {
+  SOURCE_REVIEW_CEILINGS,
+  SOURCE_REVIEW_DEFAULTS,
+  projectSourceReview,
+} from './source-review.ts'
+export type {
+  SourceReviewBudget,
+  SourceReviewCategory,
+  SourceReviewCeilings,
+  SourceReviewItem,
+  SourceReviewOmission,
+  SourceReviewProjection,
+} from './source-review.ts'
 export { buildContextPreview } from './preview.ts'
 export type { ContextPreview, ContextPreviewFile } from './preview.ts'
 export type { LocalProjectSourcePortOptions } from './local-port.ts'
