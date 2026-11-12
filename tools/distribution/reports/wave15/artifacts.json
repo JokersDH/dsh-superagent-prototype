@@ -1,0 +1,75 @@
+{
+  "protocol": "wave15-artifacts/1",
+  "target": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave15-target/wave15-target-b1854c0-r2.tar.gz",
+    "sha256": "11497980a4077e854b64596c71efe45b1e68e058639838acef0b07657d61f54b",
+    "tarBytes": 20190414,
+    "buildId": "88df6d2eef1feeb7",
+    "source": {
+      "commit": "8962d102711e2d2f6b9bb8d5b8ed98437348f6a3",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "files": 6719,
+    "extractedBytes": 67336231,
+    "actualCapabilities": [
+      "complete birth/journal/recover identity (PID/start/UID/argv/root/operation)",
+      "tri-state post-signal stop",
+      "M1 discussion-only unavailable execution",
+      "runtime recovery inspect HTTP (commitAvailable=false)",
+      "history/source/reply/context",
+      "16->18 managed upgrade",
+      "backup/restore"
+    ]
+  },
+  "baseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+    "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+    "buildId": "7e8f6ce6fa2e2633",
+    "source": {
+      "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 13
+  },
+  "legacy16": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+    "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+    "buildId": "3311a04bd20ed7f9",
+    "source": {
+      "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 16
+  },
+  "dualPair13": {
+    "from": {
+      "buildId": "9120a5ed858e0feb",
+      "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+      "schema": 13,
+      "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
+    },
+    "to": {
+      "buildId": "cd0ecc29d97d5c41",
+      "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+      "schema": 13,
+      "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"
+    },
+    "note": "Historical same-schema scope, not relabeled current."
+  },
+  "historical": [
+    {
+      "label": "wave-14 114b73c",
+      "buildId": "a7df2b225a8c5c42",
+      "productSchema": 18,
+      "note": "Super: complete identity absent; historical."
+    }
+  ],
+  "notes": [
+    "Built from pushed clean wave-15 D head 8962d10 (dirty=false, schema18) on main 2ec460c including 697efdc.",
+    "Spawn identity persisted complete at birth; docs-only later heads do not change these bytes."
+  ]
+}

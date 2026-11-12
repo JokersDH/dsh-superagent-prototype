@@ -1,0 +1,43 @@
+{
+  "protocol": "wave15-runtime-recovery-http/1",
+  "status": "PASS",
+  "startedAt": "2026-11-12T16:48:35.792Z",
+  "steps": [
+    {
+      "id": "actual-inspect-http",
+      "status": "PASS",
+      "detail": {
+        "state": "normal",
+        "productSchema": 18,
+        "commitAvailable": false,
+        "logicalCoverage": "complete",
+        "projects": 1
+      }
+    },
+    {
+      "id": "actual-prepare-refused",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 422,
+        "code": "unsupported_capability"
+      }
+    },
+    {
+      "id": "stop",
+      "status": "PASS",
+      "detail": {
+        "status": "STOPPED"
+      }
+    }
+  ],
+  "limitations": [
+    "A normal personal instance is not a restored read-only state, so prepare is expected to refuse; this does not test activation.",
+    "The repository checkout is used only as the prepare source path; no model/native work is dispatched."
+  ],
+  "build": {
+    "buildId": "88df6d2eef1feeb7",
+    "commit": "8962d102711e2d2f6b9bb8d5b8ed98437348f6a3",
+    "schema": 18
+  },
+  "finishedAt": "2026-11-12T16:48:36.907Z"
+}

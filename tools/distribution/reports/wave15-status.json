@@ -1,0 +1,287 @@
+{
+  "protocol": "wave15-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "e9f8aff",
+  "mergedMain": "2ec460c",
+  "head": "8962d10",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/native turns 0; eleven user services untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "nativeTurns": 0
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Real spawn birth persists pid/start/UID/stable command/config/data/install/operation; journal and record callers pass expected operation. Stable command is captured after wrapper exec so recovery compares the same image.",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs"
+      ]
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "Journal/spawn identity is mandatory-complete: missing argv/command/uid/root/operation or a caller without expected operation is unverifiable, zero signals. Global path matches remain diagnostics only.",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs",
+        "tools/distribution/reports/wave15/ownership-mock-probe.json"
+      ]
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Post-signal stop is tri-state: stat failure/empty after SIGTERM stays UNKNOWN/unproven; only an observed dead process may complete a proven stop. Recovery with missing or post-signal-unknown identity returns BLOCKED without pointer/record changes.",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs"
+      ]
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "Pure-mock probe 4/4: producer-shaped journal missing fields, actual SIGTERM then stat UNKNOWN, recover with missing identity, and a complete positive control. Zero real scans/signals/processes before this gate.",
+      "evidence": [
+        "tools/distribution/reports/wave15/ownership-mock-probe.json"
+      ]
+    },
+    "d5": {
+      "status": "PASS",
+      "summary": "Real managed matrix 19/19 including SIGKILL windows and unhealthy/record-missing recovery; multi-state 8/8; cross-schema 3/3 blocking an unregistered stranger before the real 16->18 switch.",
+      "evidence": [
+        "tools/distribution/reports/wave15/binary-upgrade.json",
+        "tools/distribution/reports/wave15/cross-schema-upgrade.json"
+      ]
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "Current main data/API: A18 completed reply and binding plus history/source reads survive A snapshot+artifact relocation; 5/5. Main697efdc runtime recovery HTTP consumed from a personal instance: inspect 200 with commitAvailable=false and coherent logicalSource; normal non-restored prepare refused 422; 3/3.",
+      "evidence": [
+        "tools/distribution/reports/wave15/schema18-data.json",
+        "tools/distribution/reports/wave15/runtime-recovery-http.json"
+      ]
+    },
+    "d7": {
+      "status": "PASS",
+      "summary": "Clean frozen target from pushed source 8962d10 (dirty=false): build 88df6d2eef1feeb7, schema18, tar sha256 11497980..., 20,190,414 B, 6,719 files with complete birth identity, M1, recovery inspect, history/source/reply. Older 114b73c/99832f6 remain historical.",
+      "evidence": [
+        "tools/distribution/reports/wave15/artifacts.json"
+      ]
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Personal cold install 7/7; explicit no-executor start 4/4 stays personal with execution unavailable/operator_disabled and 422 dispatch refusal; legacy16->18 real upgrade and historical same-schema double-binary rollback remain separate.",
+      "evidence": [
+        "tools/distribution/reports/wave15/personal-install.json",
+        "tools/distribution/reports/wave15/personal-no-executor.json"
+      ]
+    },
+    "d9": {
+      "status": "PASS_WITH_MAIN_ACTIVATION_BLOCKED",
+      "summary": "Interrupted journal/pointer/spawn windows settle only with complete proof; support bundle redacted/0600/no-overwrite; inert material/empty DB never self-authorize. Main confirm/activation remains unimplemented (commitAvailable=false), so activation stays blocked.",
+      "evidence": [
+        "tools/distribution/reports/wave15/target-material.json"
+      ]
+    },
+    "d10": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Frozen-byte rerun: probe 4/4, matrix 19/19, multi 8/8, cross 3/3, data 5/5, personal 7/7, noexec 4/4, HTTP 3/3, backup 6/6, portable 5+1 NT, dual 6/6, material 8/8, smoke 52/52, launcher 60/60, portability 52/52. E verdict pending.",
+      "evidence": [
+        "tools/distribution/recipes/wave15-e-acceptance.zh-CN.md",
+        "docs/rfcs/WP-16/0044-wave-15-d-complete-birth-identity.md"
+      ]
+    }
+  },
+  "artifacts": {
+    "protocol": "wave15-artifacts/1",
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave15-target/wave15-target-b1854c0-r2.tar.gz",
+      "sha256": "11497980a4077e854b64596c71efe45b1e68e058639838acef0b07657d61f54b",
+      "tarBytes": 20190414,
+      "buildId": "88df6d2eef1feeb7",
+      "source": {
+        "commit": "8962d102711e2d2f6b9bb8d5b8ed98437348f6a3",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6719,
+      "extractedBytes": 67336231,
+      "actualCapabilities": [
+        "complete birth/journal/recover identity (PID/start/UID/argv/root/operation)",
+        "tri-state post-signal stop",
+        "M1 discussion-only unavailable execution",
+        "runtime recovery inspect HTTP (commitAvailable=false)",
+        "history/source/reply/context",
+        "16->18 managed upgrade",
+        "backup/restore"
+      ]
+    },
+    "baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "buildId": "7e8f6ce6fa2e2633",
+      "source": {
+        "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 13
+    },
+    "legacy16": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+      "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+      "buildId": "3311a04bd20ed7f9",
+      "source": {
+        "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 16
+    },
+    "dualPair13": {
+      "from": {
+        "buildId": "9120a5ed858e0feb",
+        "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+        "schema": 13,
+        "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
+      },
+      "to": {
+        "buildId": "cd0ecc29d97d5c41",
+        "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+        "schema": 13,
+        "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"
+      },
+      "note": "Historical same-schema scope, not relabeled current."
+    },
+    "historical": [
+      {
+        "label": "wave-14 114b73c",
+        "buildId": "a7df2b225a8c5c42",
+        "productSchema": 18,
+        "note": "Super: complete identity absent; historical."
+      }
+    ],
+    "notes": [
+      "Built from pushed clean wave-15 D head 8962d10 (dirty=false, schema18) on main 2ec460c including 697efdc.",
+      "Spawn identity persisted complete at birth; docs-only later heads do not change these bytes."
+    ]
+  },
+  "testLayers": {
+    "ownershipMock": {
+      "cases": 4,
+      "passed": 4,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "multiInstance": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "binaryUpgrade": {
+      "sections": 19,
+      "status": "PASS"
+    },
+    "crossSchema": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "schema18Data": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "personalInstall": {
+      "steps": 7,
+      "status": "PASS"
+    },
+    "personalNoExecutor": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "runtimeRecoveryHttp": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "backupSchema": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "portableClosure": {
+      "steps": 6,
+      "status": "PASS",
+      "notTested": [
+        "other-platform-abi"
+      ]
+    },
+    "dualBinary": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "targetMaterial": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "smoke": {
+      "steps": 52,
+      "status": "PASS"
+    },
+    "launcher": {
+      "tests": 60,
+      "status": "PASS"
+    },
+    "portability": {
+      "tests": 52,
+      "status": "PASS"
+    }
+  },
+  "blockers": [
+    {
+      "id": "MAIN-ACTIVATION-CONFIRM",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "Runtime inspect/prepare are real and commitAvailable=false; confirm/activation remains unimplemented."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E must bind to wave-15 frozen tuples independently."
+    },
+    {
+      "id": "PLATFORM-ABI",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Only darwin/arm64 current Node/SQLite ABI measured."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Zero real model/native turns."
+    }
+  ],
+  "notTested": [
+    "cross-platform/ABI",
+    "real personal billed turn",
+    "every individual SIGKILL step",
+    "main activation confirm",
+    "E independent acceptance"
+  ],
+  "eConsumption": [
+    "Use reports/wave15/artifacts.json tuples; never the checkout or old 114b73c bytes as current.",
+    "Run probe, matrix, multi, cross, data, personal, noexec, HTTP, backup, portable, dual, material recipes.",
+    "Do not relax identity/digests, delete markers/records, hand-edit release.json, pkill, or claim activation/personal billed/native."
+  ],
+  "preservedHistory": [
+    "wave-05..14 evidence/ledgers unchanged",
+    "wave-06/07/08/11/12/13/14 tars preserved and unrelabeled",
+    "no shared contract/migration/root lock/E assertion modified"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave15/*.json",
+    "tools/distribution/recipes/wave15-e-acceptance.zh-CN.md",
+    "docs/rfcs/WP-16/0044-wave-15-d-complete-birth-identity.md"
+  ]
+}

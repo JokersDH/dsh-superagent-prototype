@@ -1,0 +1,99 @@
+{
+  "protocol": "wave15-d-admission/1",
+  "source": "8962d102711e2d2f6b9bb8d5b8ed98437348f6a3",
+  "observations": [
+    {
+      "id": "ACTUAL_JOURNAL_MISSING_ARGV_ROOT_OPERATION",
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [
+        {
+          "pid": 912345,
+          "label": "journal",
+          "reason": "identity_incomplete"
+        }
+      ],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [
+        {
+          "pid": 912345,
+          "command": "node unrelated-worker --state /tmp/pa-wave15-identity-eBvSee/data",
+          "unregistered": true
+        }
+      ],
+      "considered": 0,
+      "pidReused": false,
+      "signals": [],
+      "status": "PASS"
+    },
+    {
+      "id": "POST_SIGNAL_STAT_UNKNOWN_IS_NOT_STOPPED",
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [
+        {
+          "pid": 912345,
+          "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /tmp/w15frozen/install/app/apps/launcher/bin/pa.mjs start --data-root /tmp/pa-wave15-identity-eBvSee/data --config-root /tmp/pa-wave15-identity-eBvSee/config --operation-id probe-owned-operation",
+          "reason": "post_signal_status_unknown"
+        }
+      ],
+      "stopped": [
+        912345
+      ],
+      "remaining": [
+        {
+          "pid": 912345,
+          "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /tmp/w15frozen/install/app/apps/launcher/bin/pa.mjs start --data-root /tmp/pa-wave15-identity-eBvSee/data --config-root /tmp/pa-wave15-identity-eBvSee/config --operation-id probe-owned-operation"
+        }
+      ],
+      "unknownLive": [],
+      "considered": 1,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "mockProcessStillAlive": true,
+      "positiveIdentityExercised": true,
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL_RECOVER_MISSING_RESOURCE_IDENTITY",
+      "result": "BLOCKED",
+      "signals": [],
+      "journal": "target_stop_unproven",
+      "status": "PASS"
+    },
+    {
+      "id": "COMPLETE_MOCK_IDENTITY_POSITIVE_CONTROL",
+      "proven": true,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 1,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "status": "PASS"
+    }
+  ],
+  "passed": 4,
+  "failed": 0,
+  "actualOsScans": 0,
+  "actualOsSignals": 0,
+  "actualProcessesSpawned": 0,
+  "realModelTurns": 0,
+  "nativeTurns": 0,
+  "scope": "Fully mocked producer-shaped journal and post-signal tri-state with a complete positive identity control; no live lifecycle admission"
+}
