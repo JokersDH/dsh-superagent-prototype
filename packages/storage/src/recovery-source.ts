@@ -123,7 +123,7 @@ export class RecoverySourceStore implements RecoverySourceReader {
       throw new WorkflowConflict('Recovery confirmation exclusion does not match the original receipt')
     const commandEvent = this.db.prepare('SELECT * FROM event_log WHERE seq = ?').get(commit.sourceReceipt.seq) as Row | undefined
     if (!commandEvent || String(commandEvent.topic) !== 'command' || String(commandEvent.entity_ref) !== commit.intent.commandId ||
-      String(commandEvent.payload) !== JSON.stringify({ status: 'recorded' }))
+      String(commandEvent.payload) !== JSON.stringify({ status: 'recorded' }) || commandEvent.payload_ref !== null)
       throw new WorkflowConflict('Recovery confirmation exclusion does not match the original recorded command event')
     // The committer appends exactly one intent event inside the receipt's apply, immediately before
     // commands.record appends its command event. Bind that exact preceding sequence; a later event
@@ -132,7 +132,7 @@ export class RecoverySourceStore implements RecoverySourceReader {
     const intentEvent = this.db.prepare('SELECT * FROM event_log WHERE seq = ?').get(intentEventSeq) as Row | undefined
     if (!intentEvent || String(intentEvent.topic) !== 'application.recovery.intent' ||
       String(intentEvent.entity_ref) !== commit.intent.activationId ||
-      String(intentEvent.payload) !== JSON.stringify(commit.intent))
+      String(intentEvent.payload) !== JSON.stringify(commit.intent) || intentEvent.payload_ref !== null)
       throw new WorkflowConflict('Recovery confirmation exclusion does not match the exact single intent event')
     return { activationId: commit.intent.activationId, commandId: commit.intent.commandId,
       receiptSeq: commit.sourceReceipt.seq, intentEventSeq, recoveryPayloadDigest: digest(commit.intent) }
@@ -164,24 +164,24 @@ export class RecoverySourceStore implements RecoverySourceReader {
         // Excluded rows do not consume the per-family lookahead: keep scanning until the next real
         // row is found or the table ends, so a tail behind an exclusion is never silently dropped.
         const kept: string[] = []
-        let bounded = false, cursorRowId: number | undefined
+        if (total >= maxRows) { truncated = true; issues.add('scan_bounded'); break }
+        let bounded = false, cursorRowId: bigint | undefined
         while (!bounded) {
           const batch = cursorRowId === undefined
-            ? this.db.prepare(`SELECT rowid AS __pa_rid, * FROM ${name} ORDER BY rowid LIMIT ${perFamily + 1}`).all() as Row[]
-            : this.db.prepare(`SELECT rowid AS __pa_rid, * FROM ${name} WHERE rowid > ? ORDER BY rowid LIMIT ${perFamily + 1}`)
+            ? this.db.prepare(`SELECT CAST(rowid AS TEXT) AS __pa_rid, * FROM ${name} ORDER BY rowid LIMIT ${perFamily + 1}`).all() as Row[]
+            : this.db.prepare(`SELECT CAST(rowid AS TEXT) AS __pa_rid, * FROM ${name} WHERE rowid > ? ORDER BY rowid LIMIT ${perFamily + 1}`)
               .all(cursorRowId) as Row[]
           if (!batch.length) break
           for (const row of batch) {
-            cursorRowId = Number(row.__pa_rid)
+            cursorRowId = BigInt(String(row.__pa_rid))
             delete row.__pa_rid
             if (excluded(name, row, exclusions)) continue
             kept.push(rowText(name, row))
-            if (kept.length > perFamily) { bounded = true; break }
+            if (kept.length > perFamily || total + kept.length > maxRows) { bounded = true; break }
           }
         }
         const keptBounded = bounded ? kept.slice(0, perFamily) : kept
         if (bounded) { truncated = true; issues.add('scan_bounded') }
-        if (total + keptBounded.length > maxRows) { truncated = true; issues.add('scan_bounded') }
         const allowed = Math.max(0, maxRows - total)
         const use = keptBounded.slice(0, allowed)
         if (use.length < keptBounded.length) { truncated = true; issues.add('scan_bounded') }

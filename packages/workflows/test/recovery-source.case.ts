@@ -317,3 +317,46 @@ test('a non-empty source covers work, queue, runtime binding and context data wi
     assert.notEqual(f.store.workflows.recoverySource.inspect().sourceFingerprint, before)
   } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
 })
+
+test('a rowid beyond Number.MAX_SAFE_INTEGER is scanned exactly and its change is visible', () => {
+  const f = fixture()
+  try {
+    f.store.product.works.insert({ id: 'huge-work', projectId: 'project-1', conversationId: 'conversation-1', title: 'Huge rowid', createdAt: at })
+    f.store.db.prepare('UPDATE works SET rowid = ? WHERE id = ?').run(9007199254740993n, 'huge-work')
+    const before = f.store.workflows.recoverySource.inspect()
+    assert.equal(before.coverage, 'complete')
+    assert.equal(before.families.find(family => family.name === 'works')?.rows, 1)
+    f.store.db.prepare('UPDATE works SET value = ? WHERE id = ?')
+      .run(JSON.stringify({ ...f.store.product.works.get('huge-work'), title: 'Changed huge rowid' }), 'huge-work')
+    assert.notEqual(f.store.workflows.recoverySource.inspect().sourceFingerprint, before.sourceFingerprint)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
+
+test('the ignored events must retain inline payload and a null payload_ref', () => {
+  const f = fixture()
+  try {
+    const committed = commit(f.store)
+    f.store.db.prepare('UPDATE event_log SET payload_ref = ? WHERE seq = ?').run('foreign-payload-ref', committed.sourceReceipt.seq)
+    assert.throws(() => f.store.workflows.recoverySource.inspect({ ignoreCommitted: committed }), WorkflowConflict)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
+
+test('the total scan budget stops reading further families instead of only truncating output', () => {
+  const f = fixture()
+  try {
+    for (let index = 0; index < 20; index += 1) commitAt(f.store, index)
+    const bounded = f.store.workflows.recoverySource.inspect({ maxRows: 1 })
+    assert.equal(bounded.coverage, 'bounded')
+    assert.equal(bounded.sourceFingerprint, null)
+    assert.ok(bounded.families.length < 47, `stopped after ${bounded.families.length} families`)
+    assert.equal(bounded.families.reduce((sum, family) => sum + family.rows, 0), 1)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
+
+test('the reported schema always comes from the shared migration version', async () => {
+  const f = fixture()
+  try {
+    const snapshot = f.store.workflows.recoverySource.inspect()
+    assert.equal(snapshot.productSchema, (await import('@personal-agent/storage')).PRODUCT_SCHEMA_VERSION)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
