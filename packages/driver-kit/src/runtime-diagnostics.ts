@@ -108,9 +108,14 @@ export type RuntimeDescription = {
  */
 export function redactPrivatePaths(text: string | null | undefined): string | null {
   if (typeof text !== 'string' || text === '') return text ?? null
-  // Unix absolute paths, Windows drive paths and home-relative paths.
+  // Unix absolute paths, home-relative paths and Windows drive or UNC paths. Each alternative keeps
+  // consuming separators and components so the WHOLE path is masked: leaving only the tail would
+  // still disclose a file name, and the aim is that no account or trailing component survives.
   return text
-    .replace(/(?:[A-Za-z]:[\\/]|~[\\/]|\/[^\s'"`()[\]{}<>,;:]+)+/g, '[redacted-path]')
+    .replace(/\\\\[^\s'"`()[\]{}<>,;|*?]+(?:\\[^\s'"`()[\]{}<>,;|*?]+)*/g, '[redacted-path]')
+    .replace(/[A-Za-z]:[\\/][^\s'"`()[\]{}<>,;|*?]*(?:[\\/][^\s'"`()[\]{}<>,;|*?]*)*/g, '[redacted-path]')
+    .replace(/~[\\/][^\s'"`()[\]{}<>,;|*?]*(?:[\\/][^\s'"`()[\]{}<>,;|*?]*)*/g, '[redacted-path]')
+    .replace(/\/[^\s'"`()[\]{}<>,;:]+(?:\/[^\s'"`()[\]{}<>,;:]+)*/g, '[redacted-path]')
 }
 
 /** Evidence layers, weakest to strongest for the claim each supports. */

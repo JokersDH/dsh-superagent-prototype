@@ -237,6 +237,12 @@ function jsonSafety(value: unknown, path = 'input', seen = new Set<object>()): {
   if (seen.has(node)) return { ok: false, reason: `${path} is a cycle, which has no JSON representation` }
   seen.add(node)
   try {
+    // A symbol key cannot be carried by JSON, and an array is just as capable of holding one as an
+    // object. Checking only the object branch let an array smuggle a required key past validation.
+    const symbolKeys = Object.getOwnPropertySymbols(node)
+    if (symbolKeys.length > 0) {
+      return { ok: false, reason: `${path} has ${symbolKeys.length} symbol key(s), which JSON cannot carry, so the request would be silently changed` }
+    }
     if (Array.isArray(node)) {
       for (let index = 0; index < node.length; index += 1) {
         const nested = jsonSafety(node[index], `${path}[${index}]`, seen)
@@ -244,11 +250,13 @@ function jsonSafety(value: unknown, path = 'input', seen = new Set<object>()): {
       }
       return { ok: true }
     }
-    // A symbol key cannot be expressed in JSON, so it would be dropped silently and the provider
-    // would receive a different request than the one that was admitted.
-    const symbolKeys = Object.getOwnPropertySymbols(node)
-    if (symbolKeys.length > 0) {
-      return { ok: false, reason: `${path} has ${symbolKeys.length} symbol key(s), which JSON cannot carry, so the request would be silently changed` }
+    // Only a plain object survives a JSON round trip unchanged. A Map, Set, Date, RegExp or class
+    // instance serialises to `{}` or to a string form, so the provider would receive something quite
+    // different from the admitted request - a Map of required context would arrive empty.
+    const prototype = Object.getPrototypeOf(node)
+    if (prototype !== Object.prototype && prototype !== null) {
+      const kind = prototype?.constructor?.name ?? 'non-plain object'
+      return { ok: false, reason: `${path} is a ${kind}, which JSON cannot carry faithfully, so nothing is reserved or sent` }
     }
     for (const [key, nested] of Object.entries(node as Record<string, unknown>)) {
       const verdict = jsonSafety(nested, `${path}.${key}`, seen)
@@ -260,19 +268,60 @@ function jsonSafety(value: unknown, path = 'input', seen = new Set<object>()): {
   }
 }
 
-function snapshotInput(input: unknown): { ok: true; value: unknown } | { ok: false; reason: string } {
-  // JSON safety first: this is the check that decides whether a budget may be reserved at all.
-  const safety = jsonSafety(input)
-  if (safety.ok === false) return { ok: false, reason: safety.reason }
-  if (input === null || input === undefined) return { ok: true, value: input }
-  if (typeof input !== 'object') return { ok: true, value: input }
+/**
+ * Scan the CALLER's object for structure that cannot survive into a JSON payload.
+ *
+ * This has to run on the source object, not on the clone, because cloning is exactly what destroys
+ * the evidence: `structuredClone` drops symbol-keyed properties without a word, and it resolves an
+ * accessor to whatever it happens to return. An array can hold a symbol key just as an object can.
+ * A getter is refused outright: its value can differ between the read that was validated and the
+ * read that was sent, so no claim about the payload would be true.
+ */
+function scanHazards(value: unknown, path = 'input', seen = new Set<object>()): { ok: true } | { ok: false; reason: string } {
+  if (value === null || typeof value !== 'object') return { ok: true }
+  const node = value as object
+  if (seen.has(node)) return { ok: false, reason: `${path} is a cycle, which has no JSON representation` }
+  seen.add(node)
   try {
-    return { ok: true, value: deepFreeze(structuredClone(input)) }
+    const symbolKeys = Object.getOwnPropertySymbols(node)
+    if (symbolKeys.length > 0) {
+      return { ok: false, reason: `${path} has ${symbolKeys.length} symbol key(s), which JSON cannot carry, so the request would be silently changed` }
+    }
+    for (const key of Object.getOwnPropertyNames(node)) {
+      const descriptor = Object.getOwnPropertyDescriptor(node, key)
+      if (descriptor === undefined) continue
+      if (typeof descriptor.get === 'function' || typeof descriptor.set === 'function') {
+        return { ok: false, reason: `${path}.${key} is an accessor, so its value is not stable between validation and sending` }
+      }
+      const nested = scanHazards(descriptor.value, `${path}.${key}`, seen)
+      if (nested.ok === false) return nested
+    }
+    return { ok: true }
+  } finally {
+    seen.delete(node)
+  }
+}
+
+function snapshotInput(input: unknown): { ok: true; value: unknown } | { ok: false; reason: string } {
+  if (input === null || input === undefined) return { ok: true, value: input }
+  // 1. Reject structure the clone would silently change or drop.
+  const hazards = scanHazards(input)
+  if (hazards.ok === false) return { ok: false, reason: hazards.reason }
+  // 2. Clone, then validate the cloned value as JSON. A getter can return a safe value the first time it
+  // is read and something else the second time, so validating the caller's object proves nothing
+  // about the value that would actually be sent. The clone is the payload.
+  let cloned: unknown
+  try {
+    cloned = structuredClone(input)
   } catch (error) {
-    // A value that cannot be cloned is REFUSED. Passing a placeholder object onward would mean
-    // reserving budget and sending stand-in text as model input, which is worse than refusing.
+    // A value that cannot be cloned is REFUSED. Passing a placeholder onward would mean reserving
+    // budget and sending stand-in text as model input, which is worse than refusing.
     return { ok: false, reason: `the admitted input cannot be snapshotted, so nothing is reserved or sent: ${error instanceof Error ? error.message : String(error)}` }
   }
+  const safety = jsonSafety(cloned)
+  if (safety.ok === false) return { ok: false, reason: safety.reason }
+  if (cloned === null || typeof cloned !== 'object') return { ok: true, value: cloned }
+  return { ok: true, value: deepFreeze(cloned) }
 }
 
 function deepFreeze<T>(value: T): T {
