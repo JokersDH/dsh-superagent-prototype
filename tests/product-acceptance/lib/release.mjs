@@ -476,7 +476,7 @@ export function multiStateIssues(state) {
   const stop = state.stopOtherState ?? {}
   const dead = state.deadLauncher ?? {}
   if (stop.exit === 0 || stop.bAlive !== true || stop.bApiAlive !== true) issues.push('other_state_claimed')
-  if (dead.status !== 'UNVERIFIED' || dead.apiAliveBefore !== true) issues.push('dead_launcher_window')
+  if (dead.status !== 'NOT_TESTED' && (dead.status !== 'UNVERIFIED' || dead.apiAliveBefore !== true)) issues.push('dead_launcher_window')
   return issues
 }
 

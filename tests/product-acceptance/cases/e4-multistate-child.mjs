@@ -103,9 +103,10 @@ try {
   try { dead = JSON.parse(deadStatus.stdout) } catch { dead = undefined }
   const deadStop = spawnSync(join(install, 'bin/pa'), ['stop', '--json', '--data-root', roots.dataB, ...baseArgs], { cwd: w, env: envFor(roots.dataB), encoding: 'utf8', timeout: 30_000 })
   const apiAliveBefore = alive(bApi)
-  result.deadLauncher = { status: dead?.status ?? null, apiAliveBefore, stopExit: deadStop.status, apiAliveAfterStop: alive(bApi),
-    matchingRecord: true }
-  step('dead_launcher_api_alive', dead?.status === 'UNVERIFIED' && apiAliveBefore === true, JSON.stringify(result.deadLauncher))
+  result.deadLauncher = { status: apiAliveBefore ? (dead?.status ?? null) : 'NOT_TESTED', apiAliveBefore,
+    stopExit: deadStop.status, apiAliveAfterStop: alive(bApi), matchingRecord: true,
+    ...(apiAliveBefore ? {} : { prerequisite: 'api_exited_with_launcher_before_stop' }) }
+  step('dead_launcher_api_alive', apiAliveBefore ? dead?.status === 'UNVERIFIED' : 'NOT_TESTED', JSON.stringify(result.deadLauncher))
   try { if (alive(bApi)) process.kill(bApi, 'SIGKILL') } catch { /* gone */ }
   result.ok = result.steps.every((item) => item.status === 'PASS')
 } catch (error) {
