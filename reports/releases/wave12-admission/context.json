@@ -1,0 +1,106 @@
+{
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "sourceCommit": "553983b3c12c386e106047146f1d52be72d8204c",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "passed": 0,
+  "failed": 8,
+  "observations": [
+    {
+      "id": "MANIFEST_DIGEST_SCOPE_MUST_CHANGE",
+      "status": "FAIL",
+      "message": "Expected \"actual\" to be strictly unequal to:\n\n'unchanged'",
+      "observed": {
+        "protocol": "context-source-manifest-comparison/1",
+        "status": "unchanged",
+        "changes": [],
+        "incompleteReasons": []
+      }
+    },
+    {
+      "id": "SOURCE_REVIEW_MAX_ITEMS",
+      "status": "FAIL",
+      "message": "The expression evaluated to a falsy value:\n\n  assert.ok(result.actualItems <= result.maxItems)\n",
+      "observed": {
+        "maxItems": 1,
+        "actualItems": 3
+      }
+    },
+    {
+      "id": "SOURCE_REVIEW_REDACTS_OMISSION_PATH",
+      "status": "FAIL",
+      "message": "The expression evaluated to a falsy value:\n\n  assert.ok(!JSON.stringify(result).includes('/Users/owner'))\n",
+      "observed": {
+        "path": "/Users/owner/private/secret.ts",
+        "reason": "missing"
+      }
+    },
+    {
+      "id": "RELEVANCE_REQUIRES_ROLE_AND_PROVENANCE",
+      "status": "FAIL",
+      "message": "Expected values to be strictly equal:\n\n1 !== 0\n",
+      "observed": {
+        "selected": [
+          "unknown-origin"
+        ],
+        "complete": true
+      }
+    },
+    {
+      "id": "RELEVANCE_PRESERVES_INCOMPLETE_COVERAGE",
+      "status": "FAIL",
+      "message": "Expected values to be strictly equal:\n\ntrue !== false\n",
+      "observed": {
+        "upstreamComplete": false,
+        "selectedComplete": true
+      }
+    },
+    {
+      "id": "REPLY_BODY_BINDS_CONVERSATION",
+      "status": "FAIL",
+      "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'candidates'\n- 'invalid_body'\n",
+      "observed": {
+        "status": "candidates",
+        "candidates": [
+          {
+            "kind": "requires_explicit_confirmation",
+            "commandKind": "record_decision",
+            "payloadDigest": "cfab4b036926488e96ce61c3bff2139f62906fc94ca36cdbe31cce56efa227de"
+          }
+        ]
+      }
+    },
+    {
+      "id": "REPLY_REVISION_BODY_BINDS_PROJECT",
+      "status": "FAIL",
+      "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'candidates'\n- 'invalid_body'\n",
+      "observed": {
+        "status": "candidates",
+        "candidates": [
+          {
+            "kind": "needs_user_input",
+            "missing": [
+              "revision.goal",
+              "revision.scope",
+              "revision.criteria"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "HISTORY_RECHECKS_WORK_QUERY",
+      "status": "FAIL",
+      "message": "Expected values to be strictly equal:\n\n1 !== 0\n",
+      "observed": {
+        "queryWorkId": "work-1",
+        "entries": [
+          {
+            "workId": "other-work",
+            "state": "current_window"
+          }
+        ]
+      }
+    }
+  ]
+}
