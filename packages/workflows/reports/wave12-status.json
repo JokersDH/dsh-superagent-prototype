@@ -1,0 +1,212 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "b466bc7",
+  "mergeCommit": "59dc388",
+  "checkpoints": [
+    "7a8e099",
+    "6d629ef"
+  ],
+  "testedSourceCommit": "6d629ef",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "probe": {
+    "command": "PA_ADMISSION_REPORT=packages/workflows/reports/wave12-storage-probe.json node tools/bootstrap/probe-wave12-storage.mjs $PWD",
+    "status": "PASS",
+    "pass": 4,
+    "fail": 0,
+    "cases": [
+      "EXACT_OWN_CONFIRMATION_POSITIVE_CONTROL",
+      "EXCLUDED_ROW_MUST_NOT_HIDE_A_TAIL_BEYOND_FAMILY_CAP",
+      "EXCLUSION_MUST_NOT_HIDE_A_SECOND_IDENTICAL_INTENT_EVENT",
+      "DERIVED_WORK_INDEX_MUST_AGREE_WITH_IMMUTABLE_BINDING"
+    ],
+    "evidence": "packages/workflows/reports/wave12-storage-probe.json"
+  },
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "recovery-source lookahead tests",
+        "probe tail case"
+      ],
+      "note": "exclusions happen before the per-family lookahead; head/middle/tail and total/per-family boundaries are bounded/null instead of complete with a dropped tail"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "recovery-source exact-event tests",
+        "probe duplicate event"
+      ],
+      "note": "only the exact original intent event seq (receipt seq-1), original activation row and original command event are excluded; later same-body events stay visible"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "context-history derived work tests",
+        "probe work case"
+      ],
+      "note": "work_id must equal immutable body contract.workId (including null); corrupted derived rows are rejected by page/read"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "recovery-source missing schema/event tests",
+        "second connection test"
+      ],
+      "note": "schema inventory, confirmation validation and family reads share one read transaction; missing schema_meta/event_log, unknown table and future schema are unsupported; only heartbeat_at is volatile"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "main consumer",
+      "evidence": [
+        "wave12-main-consumers.txt 75/75",
+        "reply-crash tests"
+      ],
+      "note": "real runtime/replyResults/schema18 with process tests; no Map fallback; restored/recovered text is the original artifact body"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "package-local plus main consumer",
+      "evidence": [
+        "snapshot-d tests",
+        "CompletedAssistantReplies restored-read"
+      ],
+      "note": "non-empty work/binding/result/receipt/artifact snapshot copies to a second root; main consumer reads the restored reply; missing bundle/result table, byte change and future schema block"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "context-history tests",
+        "wave12-performance.json"
+      ],
+      "note": "10000 bindings, multi-project/conversation/work, repeated timestamps, stable keyset and insert-between-pages; scope index plan recorded"
+    },
+    {
+      "phase": "A8",
+      "status": "NOT_TESTED_CONSUMER",
+      "scope": "main entry absent",
+      "evidence": [
+        "recovery-source tests",
+        "SIGKILL source before/after windows"
+      ],
+      "note": "independent source checks pass, but main has not wired RecoverySourceStore into an actual baseline/prepare/confirm path; only this composition is not tested"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "package-local handoff",
+      "evidence": [
+        "assistant-context v15/v16 upgrade tests",
+        "snapshot-d",
+        "wave12-source-delivery.md"
+      ],
+      "note": "v15/v16 upgrade keeps messages, FTS, receipts, bindings and results; current schema18/families/snapshot recipe and bad-DB/missing-artifact reproductions are published for D/E"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "package-local regression",
+      "evidence": [
+        "wave12-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, main product/target consumers, typecheck/build and static packet check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "94/94",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "mainAssistantAndProcessConsumers": "75/75",
+    "mainTargetConsumers": "50/50",
+    "storageProbe": "4/4",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductTypecheck": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "backupFamilies": [
+    "assistant_context_bindings",
+    "assistant_reply_results",
+    "recovery_activations",
+    "recovery_intents",
+    "outcomes",
+    "reviews",
+    "decisions",
+    "proposals",
+    "project_settings",
+    "contracts",
+    "verifications",
+    "acceptances",
+    "legacy_decisions"
+  ],
+  "limits": {
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288,
+    "snapshotEvidenceRowsPerFamily": 2000
+  },
+  "failureWindows": [
+    "excluded row at family cap head/middle/tail",
+    "later identical intent event",
+    "derived work_id tamper",
+    "missing schema_meta/event_log",
+    "second real connection commit",
+    "before/after result commit",
+    "after reply message",
+    "before/after source confirmation",
+    "missing bundle/reply table",
+    "changed result body",
+    "future schema"
+  ],
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "source-baseline-consumer",
+      "detail": "RecoverySourceStore is published and package-tested but not wired into main's actual baseline/prepare/confirm flow; that composition is NOT_TESTED."
+    },
+    {
+      "owner": "main/D",
+      "id": "activation-and-installation",
+      "detail": "Recovery activation/start, target materialization and schema18 installation remain external; snapshots never grant startup."
+    }
+  ],
+  "notTested": [
+    "main source baseline/prepare/confirm composition",
+    "actual recovery activation/start or target materialization",
+    "D schema18 installation/upgrade",
+    "E independent acceptance",
+    "real model/provider/native execution"
+  ],
+  "mainNextSteps": [
+    "compare recoverySource.inspect({ignoreCommitted}) against the pre-confirmation baseline in the actual prepare/confirm flow",
+    "keep marker/host/profile and physical writer checks separate from the logical fingerprint",
+    "use contextHistory.page behind a signed principal/project-scoped cursor",
+    "use the D/E recipe for current schema18 snapshot and corrupted-state negatives"
+  ],
+  "updatedAt": "2026-11-12T13:20:00.000Z"
+}
