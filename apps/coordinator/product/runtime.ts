@@ -162,6 +162,10 @@ export function createProductRuntime(
       : nativeProjects.find(project => project.id === contract.scope.projectId) : undefined,
   )
   const { store } = options
+  const replyResults = options.assistantReplyResults ??
+    (store.workflows.assistant as typeof store.workflows.assistant & { replyResults?: AssistantReplyResults }).replyResults
+  const completedReplies = replyResults ? new CompletedAssistantReplies(store, replyResults, options.principal,
+    () => configuredProjects.map(project => project.id)) : undefined
   let assistantContext: ProductAssistantContext | undefined
   let contextRecords: ProductContextRecords | undefined
   const recoveryTargets = options.recoveryTargets ? new ProductRecoveryTargets({
@@ -178,7 +182,7 @@ export function createProductRuntime(
   }
   const conversations = new ApplicationConversations(store, options.principal, () => configuredProjects.map(project => project.id), options.actionSecret)
   const decisions = new ProductDecisions(store, options.principal, () => configuredProjects, options.actionSecret, options.now)
-  const proposals = new ProductProposals(store, application, decisions, options.principal, () => configuredProjects, options.actionSecret, options.now)
+  const proposals = new ProductProposals(store, application, decisions, options.principal, () => configuredProjects, options.actionSecret, options.now, completedReplies)
   const recovery = new ProductRecovery(store, { stateRoot: options.stateRoot, startupMode: options.startupMode ?? 'normal',
     principal: options.principal, projects: () => configuredProjects, ...(options.now ? { now: options.now } : {}) })
   const attention = new ProductAttention(store, application, completion, {
@@ -187,20 +191,19 @@ export function createProductRuntime(
   })
   const assistantStreams = new AssistantStreams()
   const evidenceHistory = new ProductEvidenceHistory(store, application, () => configuredProjects.map(project => project.id), options.actionSecret, options.now)
-  const replyResults = options.assistantReplyResults ??
-    (store.workflows.assistant as typeof store.workflows.assistant & { replyResults?: AssistantReplyResults }).replyResults
   if (options.assistantProvider)
     handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams, {
       nativeExecution: !!options.native,
       executionUnavailable: !!unavailable,
       canReply: message => configuredProjects.some(project => project.id === message.projectId),
-      ...(replyResults ? { completed: new CompletedAssistantReplies(store, replyResults, options.principal,
-        () => configuredProjects.map(project => project.id)) } : {}),
+      proposalScope: projectId => configuredProjects.find(project => project.id === projectId)?.scope,
+      ...(completedReplies ? { completed: completedReplies } : {}),
       context: message => assistantContext?.forMessage(message) ?? Promise.resolve(undefined),
     })
   const read: NonNullable<LocalHttpOptions['read']> = {
     recovery: async () => recovery.inspect(),
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
+    ...(completedReplies ? { replyCandidates: async (messageId: string) => proposals.replyCandidates(messageId) } : {}),
     ...(recoveryTargets ? { recoveryTarget: (id: string) => recoveryTargets.read(id) } : {}),
     assistantContext: async messageId => assistantContext?.audit(messageId),
     contextHistory: async query => {
@@ -307,6 +310,10 @@ export function createProductRuntime(
               throw error
             }
           },
+          ...(typeof options.assistantProvider.setSuggestionsEnabled === 'function' ? { setAssistantSuggestions: async (enabled: boolean) => {
+            try { return options.assistantProvider!.setSuggestionsEnabled(enabled) }
+            catch (error) { throw new ApplicationFault('storage_unavailable', error instanceof ModelProviderError ? error.message : '提案建议设置未能保存。') }
+          } } : {}),
         }
       : {}),
     configuration: async () => {
@@ -381,6 +388,7 @@ export function createProductRuntime(
         assistantContextAvailable: !!assistantContext && !!options.assistantProvider?.status().configured && options.startupMode !== 'recovery_readonly',
         contextHistoryAvailable: !!contextRecords?.historyAvailable,
         contextSourcesAvailable: !!contextRecords,
+        replyCandidatesAvailable: !!completedReplies,
       })
       return configuration
     },
@@ -454,6 +462,7 @@ export function createProductRuntime(
       } } : {}),
       prepareDecision: async (input: DecisionPrepare, actor: TrustedActor) => decisions.prepare(input, actor),
       prepareProposal: (input: ProposalPrepare, actor: TrustedActor) => proposals.prepare(input, actor),
+      ...(completedReplies ? { prepareReplyCandidate: proposals.prepareReplyCandidate.bind(proposals) } : {}),
       proposal: (command: ProposalCommand, actor: TrustedActor) => proposals.dispatch(command, actor),
       contextPreview: (input: ContextPreviewInput, actor: TrustedActor) => {
         if (options.startupMode === 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Context preview requires a normal local instance', 'none')

@@ -6,6 +6,7 @@ import type { AssistantReplyBody, AssistantReplyResults } from '@personal-agent/
 import { canonicalJson } from '@personal-agent/contracts/canonical'
 import { key } from '@personal-agent/orchestrator-core'
 import type { ProductStore } from '@personal-agent/storage'
+import type { AssistantModelReply } from './model-provider.ts'
 
 const MAX_BYTES = 524288
 const digest = (value: string | Uint8Array) => createHash('sha256').update(value).digest('hex')
@@ -29,15 +30,18 @@ export class CompletedAssistantReplies {
     const inference = parsed.data, input = inference.input, source = this.store.product.messages.getById(input.messageId)
     if (requestId !== key('assistant-request', input.messageId) || !this.projectIds().includes(input.projectId) ||
       !source || source.role !== 'user' || source.provenance !== 'trusted_user' || source.anchor ||
-      source.projectId !== input.projectId || source.conversationId !== input.conversationId) throw invalid()
+      source.projectId !== input.projectId || source.conversationId !== input.conversationId ||
+      (inference.sourceTextDigest !== undefined && inference.sourceTextDigest !== digest(source.text))) throw invalid()
     return { receipt, inference }
   }
-  save(requestId: string, response: { text: string; model: string }): AssistantReplyBody {
+  save(requestId: string, response: AssistantModelReply): AssistantReplyBody {
     const { receipt, inference } = this.request(requestId), input = inference.input
-    const body = AssistantReplyBodySchema.parse({ protocol: 'assistant-reply-body/1',
+    const base = { protocol: 'assistant-reply-body/1' as const,
       projectId: input.projectId, conversationId: input.conversationId,
       sourceMessageId: input.messageId, replyMessageId: key('assistant-reply', input.messageId),
-      model: response.model, text: response.text, suggestions: [] })
+      model: response.model, text: response.text }
+    const structured = AssistantReplyBodySchema.safeParse({ ...base, suggestions: response.suggestions ?? [] })
+    const body = structured.success ? structured.data : AssistantReplyBodySchema.parse({ ...base, suggestions: [] })
     if (inference.model !== body.model) throw invalid()
     const artifact = this.store.artifacts.write(Buffer.from(canonicalJson(JsonSchema.parse(body))))
     this.store.uow.atomic(() => {
@@ -52,6 +56,9 @@ export class CompletedAssistantReplies {
     return body
   }
   read(requestId: string): AssistantReplyBody | undefined {
+    return this.readVerified(requestId)?.body
+  }
+  readVerified(requestId: string) {
     const value = this.results.forRequest(requestId)
     if (!value) return undefined
     try {
@@ -81,7 +88,11 @@ export class CompletedAssistantReplies {
       if (body.projectId !== result.projectId || body.conversationId !== result.conversationId ||
         body.sourceMessageId !== result.sourceMessageId || body.replyMessageId !== result.replyMessageId ||
         body.model !== result.model || digest(body.text) !== result.textDigest) throw invalid()
-      return body
+      if (canonicalJson(this.results.forRequest(requestId) ?? null) !== canonicalJson(result) ||
+        canonicalJson(this.results.forReply(result.replyMessageId) ?? null) !== canonicalJson(result)) throw invalid()
+      const final = this.request(requestId)
+      if (final.receipt.payloadDigest !== receipt.payloadDigest || canonicalJson(JsonSchema.parse(final.inference)) !== canonicalJson(JsonSchema.parse(inference))) throw invalid()
+      return { body, result, inference }
     } catch { throw invalid() }
   }
 }

@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { CONTRACT_API_MAJOR, CONTRACT_VERSION, wireSchemas } from '../src/schemas.ts';
 import { ApplicationConfigurationSchema, CONFIGURATION_PROTOCOL } from '../src/configuration.ts';
-import { AssistantProviderStatusSchema, AssistantModelSelectionSchema, AssistantStreamUpdateSchema } from '../src/assistant.ts';
+import { AssistantProviderStatusSchema, AssistantModelSelectionSchema, AssistantSuggestionsSettingSchema, AssistantStreamUpdateSchema } from '../src/assistant.ts';
+import { AssistantCandidatePrepareSchema, AssistantCandidatesSchema } from '../src/assistant-candidates.ts';
 import { ProjectRegistrationInputSchema, WorkLocationSchema, WorkEnvironmentSchema } from '../src/projects.ts';
 import { WorkVerificationStatusSchema, VerificationRetryCommandSchema } from '../src/operations.ts';
 import { ConversationSummarySchema, ConversationCatalogQuerySchema, ConversationCatalogSchema, ConversationCommandSchema } from '../src/conversations.ts';
@@ -53,7 +54,7 @@ const outputs = new Map<string, string>([
 const configurationText = canonical({ ...z.toJSONSchema(ApplicationConfigurationSchema, { target: 'draft-2020-12', io: 'input' }), $id: 'urn:personal-agent:application-configuration:1', 'x-runtime-validation': 'Use ApplicationConfigurationSchema for reference and readiness rules.' });
 outputs.set('generated/configuration.schema.json', configurationText);
 outputs.set('generated/configuration.manifest.json', canonical({ protocol: CONFIGURATION_PROTOCOL, schemaHash: digest(configurationText), sourceHash: digest(readFileSync(resolve(root, 'src/configuration.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
-const assistantText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:assistant-provider:1', $defs: { AssistantProviderStatus: z.toJSONSchema(AssistantProviderStatusSchema, { target: 'draft-2020-12', io: 'input' }), AssistantModelSelection: z.toJSONSchema(AssistantModelSelectionSchema, { target: 'draft-2020-12', io: 'input' }), AssistantStreamUpdate: z.toJSONSchema(AssistantStreamUpdateSchema, { target: 'draft-2020-12', io: 'input' }) } });
+const assistantText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:assistant-provider:1', $defs: { AssistantProviderStatus: z.toJSONSchema(AssistantProviderStatusSchema, { target: 'draft-2020-12', io: 'input' }), AssistantModelSelection: z.toJSONSchema(AssistantModelSelectionSchema, { target: 'draft-2020-12', io: 'input' }), AssistantSuggestionsSetting: z.toJSONSchema(AssistantSuggestionsSettingSchema, { target: 'draft-2020-12', io: 'input' }), AssistantStreamUpdate: z.toJSONSchema(AssistantStreamUpdateSchema, { target: 'draft-2020-12', io: 'input' }) } });
 outputs.set('generated/assistant.schema.json', assistantText);
 outputs.set('generated/assistant.manifest.json', canonical({ protocol: 'assistant-provider/1', schemaHash: digest(assistantText), sourceHash: digest(readFileSync(resolve(root, 'src/assistant.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 const projectsText = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'urn:personal-agent:project-configuration:1', $defs: { ProjectRegistrationInput: z.toJSONSchema(ProjectRegistrationInputSchema, { target: 'draft-2020-12', io: 'input' }), WorkLocation: z.toJSONSchema(WorkLocationSchema, { target: 'draft-2020-12', io: 'input' }), WorkEnvironment: z.toJSONSchema(WorkEnvironmentSchema, { target: 'draft-2020-12', io: 'input' }) } });
@@ -108,6 +109,7 @@ const assistantContextCommandsText = canonical({ $schema: 'https://json-schema.o
 outputs.set('generated/assistant-context-commands.schema.json', assistantContextCommandsText);
 outputs.set('generated/assistant-context-commands.manifest.json', canonical({ protocol: 'assistant-context-command/1', schemaHash: digest(assistantContextCommandsText), sourceHash: digest(readFileSync(resolve(root, 'src/assistant-context.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [name, protocol, source, schemas] of [
+  ['assistant-candidates', 'assistant-candidates/1', 'assistant-candidates.ts', { AssistantCandidatePrepare: AssistantCandidatePrepareSchema, AssistantCandidates: AssistantCandidatesSchema }],
   ['assistant-records', 'assistant-records/1', 'assistant-records.ts', { AssistantInferenceRecord: AssistantInferenceRecordSchema, AssistantReplyBody: AssistantReplyBodySchema, AssistantReplyResult: AssistantReplyResultSchema, AssistantContextHistoryQuery: AssistantContextHistoryQuerySchema, AssistantContextHistoryPage: AssistantContextHistoryPageSchema }],
   ['recovery-source', 'recovery-source-checkpoint/1', 'recovery-source.ts', { RecoverySourceCheckpointQuery: RecoverySourceCheckpointQuerySchema, RecoverySourceCheckpoint: RecoverySourceCheckpointSchema }],
   ['context-records', 'context-records/1', 'context-records.ts', { ContextHistoryQuery: ContextHistoryQuerySchema, ContextHistoryEntry: ContextHistoryEntrySchema, ContextHistory: ContextHistorySchema, ContextSources: ContextSourcesSchema }],

@@ -437,6 +437,9 @@
       "const": "application-configuration/1",
       "type": "string"
     },
+    "replyCandidatesAvailable": {
+      "type": "boolean"
+    },
     "reviewActivityAvailable": {
       "type": "boolean"
     },
