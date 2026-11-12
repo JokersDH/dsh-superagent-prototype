@@ -1,0 +1,31 @@
+{
+  "protocol": "wave12-main-integration/1",
+  "date": "2026-11-12",
+  "source": "530085c",
+  "browserTestSource": "939a6fec588e4979266b1d715726f65a7ce1f37c",
+  "aSource": "121ab84818b9cb8204a67c4d639e69cbf5040ef2",
+  "productSchema": 18,
+  "checks": {
+    "storage": {"passed":87,"failed":0,"exitCode":0},
+    "workflows": {"passed":71,"failed":0,"exitCode":0},
+    "assistantAndContext": {"passed":71,"failed":0,"exitCode":0},
+    "actualRuntimeProcesses": {"passed":4,"failed":0,"exitCode":0},
+    "recoveryTargetAndIntent": {"passed":55,"failed":0,"exitCode":0},
+    "totalPassed":288,
+    "actualContextBrowser":{"passed":9,"failed":0,"exitCode":0,"resultPort":"production_A_SQLite","schema":18},
+    "storageBuild":"PASS",
+    "workflowsBuild":"PASS",
+    "storageTypecheck":"PASS",
+    "productStrictTypecheck":"PASS"
+  },
+  "resultPort":"production A SQLite, no Map fallback in context product tests",
+  "processRecovery":"actual product runtime and effect queue, independent process SIGKILL, mock provider",
+  "recoverySourceAdmitted":false,
+  "rawHistoryWorkFilterAdmitted":false,
+  "targetActivation":"NOT_IMPLEMENTED",
+  "currentSourceInstallation":"NOT_TESTED",
+  "currentPreview":{"url":"http://127.0.0.1:5188/","source":"4140cac","schema":16,"restarted":false},
+  "realModelTurns":0,
+  "nativeTurnStarts":0,
+  "oldLedgersPreserved":true
+}
