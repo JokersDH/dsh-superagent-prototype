@@ -16,6 +16,8 @@ import { canonicalDigest } from './ingress.ts'
 import { WorkflowConflict } from './workflow-errors.ts'
 import type { ProductDecisions } from './workflows.ts'
 import { AssistantContextBindingStore } from './assistant-context.ts'
+import { AssistantContextHistoryStore } from './assistant-context-history.ts'
+import { AssistantReplyResultStore } from './assistant-reply-results.ts'
 
 type Row = Record<string, unknown>
 const json = <T>(value: unknown): T => JSON.parse(String(value)) as T
@@ -46,11 +48,17 @@ export class AssistantState implements AssistantStatePort {
   readonly proposals: AssistantStatePort['proposals']
   /** Wave-10 shared AssistantContextBindings audit; one append-only writer on this connection. */
   readonly contextBindings: AssistantContextBindingStore
+  /** Wave-11 read-only keyset history over the same append-only bindings. */
+  readonly contextHistory: AssistantContextHistoryStore
+  /** Wave-11 completed reply data over the existing request receipt; never a second sender. */
+  readonly replyResults: AssistantReplyResultStore
   constructor(db: Database.Database, uow: UnitOfWork, ledger: ProductDecisions) {
     this.db = db
     this.uow = uow
     this.ledger = ledger
     this.contextBindings = new AssistantContextBindingStore(db, uow)
+    this.contextHistory = new AssistantContextHistoryStore(db)
+    this.replyResults = new AssistantReplyResultStore(db, uow)
     this.decisions = {
       get: this.get.bind(this),
       list: this.list.bind(this),
