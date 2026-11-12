@@ -1,0 +1,51 @@
+{
+  "status": "PASS_CONTEXT_HISTORY_WORKBENCH",
+  "sourceCommit": "eea5fa25a6df9bf921e3be3a57bb77d539194abd",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-12T07:47:32.655Z",
+  "cases": [
+    {
+      "id": "ACTUAL-A18-HISTORY-PAGES-AND-DOES-NOT-SEND",
+      "status": "PASS"
+    },
+    {
+      "id": "ORIGINAL-SOURCE-IS-READABLE-AND-UNAFFECTED-BY-CURRENT-CHANGES",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-MOBILE-SOURCE-READER-AND-BACK-NAVIGATION-FIT",
+      "status": "PASS"
+    },
+    {
+      "id": "PROJECT-SWITCH-EMPTY-AND-RETRY-KEEP-RECORDS-SCOPED",
+      "status": "PASS"
+    },
+    {
+      "id": "EXPIRED-CURSOR-RELOADS-HISTORY-WITHOUT-REPLAYING-A-MODEL-REQUEST",
+      "status": "PASS"
+    },
+    {
+      "id": "MODEL-OFF-DOES-NOT-HIDE-MESSAGE-SOURCE-AUDIT",
+      "status": "PASS"
+    },
+    {
+      "id": "HISTORY-NAVIGATES-TO-THE-ORIGINAL-CONVERSATION",
+      "status": "PASS"
+    },
+    {
+      "id": "READONLY-CAPABILITY-AND-TAB-KEYBOARD-STATE-ARE-ACCURATE",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "seededMockReplies": 25,
+  "readTriggeredMockReplies": 0,
+  "productSchema": 18,
+  "ports": "production A SQLite contextBindings/contextHistory/replyResults",
+  "limitations": [
+    "Actual HTTP/SQLite/React/SSE with local mock provider; not native or installed acceptance",
+    "Readonly UI capability is projected by the fixture; backend readonly authorization is tested separately"
+  ]
+}

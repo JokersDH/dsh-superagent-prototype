@@ -60,6 +60,9 @@ import {
   AssistantContextPreparedSchema,
   AssistantContextSendSchema,
   AssistantContextBindingSchema,
+  ContextHistoryQuerySchema,
+  ContextHistorySchema,
+  ContextSourcesSchema,
 } from '@personal-agent/contracts'
 import type {
   RecoveryTargetPrepareInput,
@@ -68,6 +71,9 @@ import type {
   AssistantContextPrepared,
   AssistantContextSend,
   AssistantContextBinding,
+  ContextHistoryQuery,
+  ContextHistory,
+  ContextSources,
   ContextPreviewInput,
   ContextPreview,
   AnswerDelivery,
@@ -177,6 +183,8 @@ export interface LocalHttpOptions {
     recoveryActivation?(activationId: string): Promise<RecoveryActivationRecord | undefined>
     recoveryTarget?(activationId: string): Promise<RecoveryTargetStatus | undefined>
     assistantContext?(messageId: string): Promise<AssistantContextBinding | undefined>
+    contextHistory?(query: ContextHistoryQuery): Promise<ContextHistory>
+    contextSources?(messageId: string): Promise<ContextSources | undefined>
     conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog>
     conversation?(id: string): Promise<ConversationSummary>
     projectSettings?(projectId: string): Promise<ProjectSettingsPage>
@@ -406,6 +414,31 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     const receipt = CommandReceiptSchema.parse(await options.operations.assistantContextSend(input, c.get('actor')))
     if (receipt.commandId !== input.commandId) throw new ApplicationFault('storage_unavailable', 'Context message receipt identity mismatch', 'none')
     return c.json(receipt, receipt.status === 'rejected' ? statusOf(receipt.error) : 200)
+  })
+  app.get('/v1/context/history', async c => {
+    const params = new URL(c.req.url).searchParams
+    for (const key of params.keys()) if (params.getAll(key).length !== 1)
+      throw new ApplicationFault('invalid_request', 'Context history does not accept repeated parameters')
+    const value = { ...c.req.query() } as Record<string, unknown>
+    if (typeof value.limit === 'string') {
+      if (!/^\d+$/.test(value.limit)) throw new ApplicationFault('invalid_request', 'Context history limit must be an integer')
+      value.limit = Number(value.limit)
+    }
+    const input = ContextHistoryQuerySchema.parse(value)
+    if (!options.read?.contextHistory) throw new ApplicationFault('unsupported_capability', 'Context history is not connected')
+    const page = ContextHistorySchema.parse(await options.read.contextHistory(input))
+    if (page.projectId !== input.projectId || page.conversationId !== input.conversationId || page.workId !== input.workId ||
+      page.entries.length > (input.limit ?? 20)) throw new ApplicationFault('storage_unavailable', 'Context history scope mismatch', 'none')
+    return c.json(page)
+  })
+  app.get('/v1/messages/:id/context/sources', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Historical sources accept no query')
+    if (!options.read?.contextSources) throw new ApplicationFault('unsupported_capability', 'Historical sources are not connected')
+    const id = IdSchema.parse(c.req.param('id')), value = await options.read.contextSources(id)
+    if (!value) return c.json({ error: { code: 'invalid_request', message: 'Message context was not found', retry: 'user_action' } }, 404)
+    const sources = ContextSourcesSchema.parse(value)
+    if (sources.binding.messageId !== id) throw new ApplicationFault('storage_unavailable', 'Historical source identity mismatch', 'none')
+    return c.json(sources)
   })
   app.get('/v1/messages/:id/context', async c => {
     if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Message context accepts no query')

@@ -1,0 +1,52 @@
+{
+  "protocol": "wave13-b-admission/1",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "source": "9ec60270105e05b0a3c8d8264bec1f070fa43249",
+  "cases": [
+    {
+      "id": "NESTED_BIGINT_REFUSES_BEFORE_BUDGET",
+      "status": "FAIL",
+      "observation": {
+        "reservations": 1,
+        "fakeSends": 1,
+        "sent": true
+      }
+    },
+    {
+      "id": "NESTED_NONFINITE_REFUSES_BEFORE_BUDGET",
+      "status": "FAIL",
+      "observation": {
+        "reservations": 1,
+        "fakeSends": 1,
+        "sent": true
+      }
+    },
+    {
+      "id": "SYMBOL_KEYS_CANNOT_BE_SILENTLY_LOST",
+      "status": "FAIL",
+      "observation": {
+        "reservations": 1,
+        "fakeSends": 1,
+        "sent": true
+      }
+    },
+    {
+      "id": "PUBLIC_NESTED_DIAGNOSTICS_REDACT_PRIVATE_PATH",
+      "status": "FAIL"
+    },
+    {
+      "id": "PUBLIC_VERSION_OUTPUT_REDACTS_PRIVATE_PATH",
+      "status": "FAIL",
+      "observation": {
+        "binary": "[redacted]",
+        "version": "/private/tmp/pa-wave13-version-au9P6P/private-version.cjs",
+        "versionRaw": "/private/tmp/pa-wave13-version-au9P6P/private-version.cjs"
+      }
+    }
+  ],
+  "passed": 0,
+  "failed": 5,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "experimental helpers, inert transport/reservation, own version fixture, no budget ledger"
+}

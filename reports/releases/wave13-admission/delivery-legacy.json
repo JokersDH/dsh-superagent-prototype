@@ -1,0 +1,12 @@
+{
+  "id": "COPIED_LEGACY_RECORD_SELF_CONSISTENT_CONFIG",
+  "code": null,
+  "status": "STOPPED_ORPHAN",
+  "apiAlive": false,
+  "legacyConfigEvidence": "Only a launcher.json whose roots.config equals the copying config root",
+  "expected": "Refuse legacy unknown ownership before signals",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "source": "0ac2b58d4d861f066172dada6427de284219bd1c",
+  "verdict": "FAIL"
+}

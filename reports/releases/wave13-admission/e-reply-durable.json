@@ -1,0 +1,191 @@
+{
+  "cases": [
+    {
+      "id": "E2-REPLY-DURABLE",
+      "title": "A18 result and reply recover across independent SIGKILL processes without a second provider call",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "FIRST_KILLED",
+          "ok": true,
+          "detail": "{\"status\":null,\"signal\":\"SIGKILL\"}"
+        },
+        {
+          "id": "RESULT_PERSISTED",
+          "ok": true,
+          "detail": "{\"mode\":\"after-result\",\"modelCalls\":1,\"schema\":18,\"requestRecorded\":true,\"result\":{\"protocol\":\"assistant-reply-result/1\",\"requestId\":\"226f31820022966425675fbd0c13f637\",\"requestDigest\":\"aa6cdcca22dc1699834e1511348df62c5509b10af9c84d1e8803cde40fe34883\",\"sourceMessageId\":\"7aac5a13ac766b635a524c87760720"
+        },
+        {
+          "id": "NO_REPLY_BEFORE_RECOVERY",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "id": "ONE_PROVIDER_CALL",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "id": "RECOVER_OK",
+          "ok": true,
+          "detail": "{\"status\":0,\"calls\":0}"
+        },
+        {
+          "id": "REPLY_ONCE",
+          "ok": true,
+          "detail": "[{\"id\":\"0532fda3b612374d1f3b129d347bd78d\",\"conversationId\":\"w12-process-conversation\",\"sequence\":2,\"role\":\"assistant\",\"projectId\":\"w12-process-project\",\"provenance\":\"reasoner_reply\",\"text\":\"W12 durable response from the original request.\",\"sourceRefs\":[\"7aac5a13ac766b635a524c8776072068\"],\"createdAt\":\"2026-11-12T09:02:33.266Z\"}]"
+        },
+        {
+          "id": "RESULT_IDENTICAL",
+          "ok": true,
+          "detail": "result changed"
+        },
+        {
+          "id": "REPLAY_IDEMPOTENT",
+          "ok": true,
+          "detail": "{\"mode\":\"recover\",\"modelCalls\":0,\"schema\":18,\"requestRecorded\":true,\"result\":{\"protocol\":\"assistant-reply-result/1\",\"requestId\":\"226f31820022966425675fbd0c13f637\",\"requestDigest\":\"aa6cdcca22dc1699834e1511348df62c5509b10af9c84d1e8803cde40fe34883\",\"sourceMessageId\":\"7aac5a13ac766b635a524c8776072068\",\""
+        }
+      ],
+      "evidence": {
+        "replyDurable": {
+          "first": {
+            "calls": 1,
+            "result": "226f31820022966425675fbd0c13f637",
+            "replies": 0
+          },
+          "recovered": {
+            "calls": 0,
+            "replies": 1
+          },
+          "replayed": 0
+        }
+      },
+      "limitations": [
+        "Separate OS process with current product runtime, real A18 SQLite/effect queue and a loopback mock provider; no Map result port."
+      ],
+      "startedAt": "2026-11-12T09:02:32.787Z",
+      "finishedAt": "2026-11-12T09:02:33.485Z",
+      "durationMs": 698
+    },
+    {
+      "id": "E2-REPLY-UNKNOWN-DURABLE",
+      "title": "A request without a completed result stays unknown across SIGKILL and is never resent",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "UNKNOWN_KILLED",
+          "ok": true,
+          "detail": "{\"mode\":\"during-provider\",\"modelCalls\":1,\"schema\":18,\"requestRecorded\":true,\"result\":null,\"replies\":[],\"notices\":[]}"
+        },
+        {
+          "id": "REQUEST_ONLY",
+          "ok": true,
+          "detail": "{\"mode\":\"during-provider\",\"modelCalls\":1,\"schema\":18,\"requestRecorded\":true,\"result\":null,\"replies\":[],\"notices\":[]}"
+        },
+        {
+          "id": "UNKNOWN_RECOVERED",
+          "ok": true,
+          "detail": "{\"mode\":\"recover\",\"modelCalls\":0,\"schema\":18,\"requestRecorded\":true,\"result\":null,\"replies\":[],\"notices\":[{\"id\":\"7b46150b0cb4cc39acbb9c3d63783c2d\",\"conversationId\":\"w12-process-conversation\",\"sequence\":2,\"role\":\"system\",\"projectId\":\"w12-process-project\",\"provenance\":\"application_notice\",\"text\":\"上次模型"
+        },
+        {
+          "id": "UNKNOWN_NOTICE",
+          "ok": true,
+          "detail": "[{\"id\":\"7b46150b0cb4cc39acbb9c3d63783c2d\",\"conversationId\":\"w12-process-conversation\",\"sequence\":2,\"role\":\"system\",\"projectId\":\"w12-process-project\",\"provenance\":\"application_notice\",\"text\":\"上次模型请求的结果未能确认，未自动重发。请重新发送消息后再试。\",\"sourceRefs\":[\"7aac5a13ac766b635a524c8776072068\"],\"createdAt\":\"2026-11-12T09:02:33.873Z\"}]"
+        },
+        {
+          "id": "UNKNOWN_NO_RESEND_REPLAY",
+          "ok": true,
+          "detail": "{\"mode\":\"recover\",\"modelCalls\":0,\"schema\":18,\"requestRecorded\":true,\"result\":null,\"replies\":[],\"notices\":[{\"id\":\"7b46150b0cb4cc39acbb9c3d63783c2d\",\"conversationId\":\"w12-process-conversation\",\"sequence"
+        }
+      ],
+      "evidence": {
+        "replyUnknown": {
+          "crashedCalls": 1,
+          "recoveredCalls": 0,
+          "notice": "上次模型请求的结果未能确认，未自动重发。请重新发送消息后再试。"
+        }
+      },
+      "limitations": [
+        "Separate OS process with current product runtime, real A18 SQLite/effect queue and a loopback mock provider; no Map result port."
+      ],
+      "startedAt": "2026-11-12T09:02:33.485Z",
+      "finishedAt": "2026-11-12T09:02:34.098Z",
+      "durationMs": 613
+    },
+    {
+      "id": "E2-REPLY-MESSAGE-WINDOW",
+      "title": "SIGKILL after the reply message commit keeps exactly one reply and result",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "MESSAGE_KILLED",
+          "ok": true,
+          "detail": "{\"mode\":\"after-message\",\"modelCalls\":1,\"schema\":18,\"requestRecorded\":true,\"result\":{\"protocol\":\"assistant-reply-result/1\",\"requestId\":\"226f31820022966425675fbd0c13f637\",\"requestDigest\":\"aa6cdcca22dc1699834e1511348df62c5509b10af9c84d1e8803cde40fe34883\",\"sourceMessageId\":\"7aac5a13ac766b635a524c8776072"
+        },
+        {
+          "id": "MESSAGE_RECOVERED",
+          "ok": true,
+          "detail": "{\"mode\":\"recover\",\"modelCalls\":0,\"schema\":18,\"requestRecorded\":true,\"result\":{\"protocol\":\"assistant-reply-result/1\",\"requestId\":\"226f31820022966425675fbd0c13f637\",\"requestDigest\":\"aa6cdcca22dc1699834e1511348df62c5509b10af9c84d1e8803cde40fe34883\",\"sourceMessageId\":\"7aac5a13ac766b635a524c8776072068\",\""
+        },
+        {
+          "id": "MESSAGE_SAME_RESULT",
+          "ok": true,
+          "detail": "result changed"
+        }
+      ],
+      "evidence": {
+        "replyMessageWindow": {
+          "crashedCalls": 1,
+          "recoveredCalls": 0,
+          "replies": 1
+        }
+      },
+      "limitations": [
+        "Separate OS process with current product runtime, real A18 SQLite/effect queue and a loopback mock provider; no Map result port."
+      ],
+      "startedAt": "2026-11-12T09:02:34.098Z",
+      "finishedAt": "2026-11-12T09:02:34.523Z",
+      "durationMs": 425
+    },
+    {
+      "id": "E2-REPLY-BAD-ARTIFACT",
+      "title": "A corrupted persisted artifact refuses recovery without a new provider call",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "BAD_ARTIFACT_SETUP",
+          "ok": true,
+          "detail": "{\"mode\":\"after-result\",\"modelCalls\":1,\"schema\":18,\"requestRecorded\":true,\"result\":{\"protocol\":\"assistant-reply-result/1\",\"requestId\":\"226f31820022966425675fbd0c13f637\",\"requestDigest\":\"aa6cdcca22dc1699834e1511348df62c5509b10af9c84d1e8803cde40fe34883\",\"sourceMessageId\":\"7aac5a13ac766b635a524c87760720"
+        },
+        {
+          "id": "BAD_ARTIFACT_NO_REPLY",
+          "ok": true,
+          "detail": "{\"mode\":\"recover\",\"modelCalls\":0,\"schema\":18,\"requestRecorded\":true,\"result\":{\"protocol\":\"assistant-reply-result/1\",\"requestId\":\"226f31820022966425675fbd0c13f637\",\"requestDigest\":\"aa6cdcca22dc1699834e1511348df62c5509b10af9c84d1e8803cde40fe34883\",\"sourceMessageId\":\"7aac5a13ac766b635a524c8776072068\",\""
+        },
+        {
+          "id": "BAD_ARTIFACT_NOTICE",
+          "ok": true,
+          "detail": "[{\"id\":\"7b46150b0cb4cc39acbb9c3d63783c2d\",\"conversationId\":\"w12-process-conversation\",\"sequence\":2,\"role\":\"system\",\"projectId\":\"w12-process-project\",\"provenance\":\"application_notice\",\"text\":\"已完成的回复无法核对，未自动重发。请保留本条消息并检查本机数据。\",\"sourceRefs\":[\"7aac5a13ac766b635a524c8776072068\"],\"createdAt\":\"2026-11-12T09:02:34.943Z\"}]"
+        }
+      ],
+      "evidence": {
+        "replyBadArtifact": {
+          "calls": 0,
+          "replies": 0,
+          "notice": "已完成的回复无法核对，未自动重发。请保留本条消息并检查本机数据。"
+        }
+      },
+      "limitations": [
+        "Separate OS process with current product runtime, real A18 SQLite/effect queue and a loopback mock provider; no Map result port."
+      ],
+      "startedAt": "2026-11-12T09:02:34.523Z",
+      "finishedAt": "2026-11-12T09:02:34.960Z",
+      "durationMs": 437
+    }
+  ],
+  "artifacts": {}
+}

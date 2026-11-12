@@ -1,0 +1,27 @@
+{
+  "protocol": "wave13-e-gate-admission/1",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-e",
+  "source": "90baa01b4b8aaf8b5834d2ba3228de6bfc950824",
+  "cases": [
+    {
+      "id": "E7-OWNERSHIP-COPY",
+      "status": "FAIL",
+      "requiredByInstalledAlpha": false
+    },
+    {
+      "id": "E4-UPGRADE-FAULTS",
+      "status": "FAIL",
+      "requiredByInstalledAlpha": false
+    },
+    {
+      "id": "E6-CURRENT-MAIN-INSTALL",
+      "status": "FAIL",
+      "requiredByInstalledAlpha": false
+    }
+  ],
+  "passed": 0,
+  "failed": 3,
+  "scope": "required-case classification only, not a synthetic release PASS",
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0
+}
