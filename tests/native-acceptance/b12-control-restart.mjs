@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 /**
- * B12: persistent control and restart matrix (wave-10 B4, zero model calls).
+ * B12: in-memory control matrix (wave-10 B4, zero model calls).
+ *
+ * SCOPE CORRECTION (wave-11): this file does NOT demonstrate durable recovery. It rebuilds
+ * supervisor/binding objects in memory inside ONE process; no SQLite file is opened, nothing is
+ * fsynced, and no process is killed. A "no duplicate begin" result here is an artefact of the test
+ * not calling begin twice, not evidence of reconnect or persistence.
+ *
+ * The real durable claim moved to b13-durable-control.mjs, which uses a real SQLite file and a real
+ * spawned writer process with a real SIGKILL. Treat this file as a unit-level control matrix only.
  *
  * Covers the windows the earlier matrices left open: persistent stop/answer/steer, disconnect and
  * reconnect, no duplicate `begin` across a restart, and the rule that a proof from the OLD attempt
@@ -95,13 +103,13 @@ log.begin('B12-STEER-DISTINCT', 'a steer of different content gets a different c
 // ===============================================================================================
 // disconnect / reconnect
 // ===============================================================================================
-log.begin('B12-RECONNECT-NO-DUPLICATE-BEGIN', 'a reconnect after disconnect does not begin again', 'package-local')
+log.begin('B12-RECONNECT-NO-DUPLICATE-BEGIN', 'a same-process re-instantiation does not begin again (NOT durable recovery)', 'package-local')
 {
   const harness = makeSupervisor()
   await harness.supervisor.start(startInput())
   const before = beginCount(harness.runner)
-  // A reconnect is a fresh supervisor over the same durable binding store, which is what a process
-  // restart looks like from the supervisor's side.
+  // A fresh supervisor over the same in-memory binding store. This lives in ONE process, so it is a
+  // re-instantiation, not a restart, and it is not evidence that anything survived a process death.
   const reconnected = makeSupervisor({ bindings: harness.bindings, ledger: harness.ledger, runner: harness.runner })
   reconnected.supervisor.recover?.()
   const after = beginCount(harness.runner)
@@ -182,10 +190,11 @@ log.begin('B12-NATIVE-NOT-TESTED', 'these windows are controlled evidence and sa
   log.notTested('real vendor stop/answer/steer, disconnect/reconnect and unknown-send reconciliation remain untested; this matrix is controlled evidence only')
 }
 
+log.notTested('durable restart, real SQLite and real SIGKILL are covered by b13-durable-control.mjs; this file remains an in-process control matrix')
 log.notTested('the process-wide epoch high-water mark across a real restart needs durable storage owned by core/storage')
 
 const report = writeReport(
-  { cases: log.cases, environment: { note: 'wave-10 B12 persistent control and restart matrix', modelCalls: 0 }, extra: { scope: 'controlled only; native control NOT_TESTED' } },
+  { cases: log.cases, environment: { note: 'wave-10 B12 IN-MEMORY control matrix; not durable recovery (see b13)', modelCalls: 0 }, extra: { scope: 'in-process only; durable recovery is b13; native control NOT_TESTED', durableDatabaseUsed: false, actualProcessRestarts: 0 } },
   process.argv.includes('--record') ? `${repo}tests/native-acceptance/reports/b12-control-restart.json` : undefined,
 )
 for (const item of report.cases) process.stdout.write(`${item.status.padEnd(10)} ${item.id.padEnd(32)} ${item.detail.join(' | ')}\n`)

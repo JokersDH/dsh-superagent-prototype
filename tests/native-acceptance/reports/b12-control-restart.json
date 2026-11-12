@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-11-11T14:35:37.672Z",
+  "generatedAt": "2026-11-12T03:46:22.568Z",
   "environment": {
-    "note": "wave-10 B12 persistent control and restart matrix",
+    "note": "wave-10 B12 IN-MEMORY control matrix; not durable recovery (see b13)",
     "modelCalls": 0
   },
   "totals": {
@@ -11,7 +11,9 @@
     "SKIPPED": 0,
     "NOT_TESTED": 1
   },
-  "scope": "controlled only; native control NOT_TESTED",
+  "scope": "in-process only; durable recovery is b13; native control NOT_TESTED",
+  "durableDatabaseUsed": false,
+  "actualProcessRestarts": 0,
   "cases": [
     {
       "id": "B12-STOP-PERSISTS",
@@ -68,7 +70,7 @@
     },
     {
       "id": "B12-RECONNECT-NO-DUPLICATE-BEGIN",
-      "title": "a reconnect after disconnect does not begin again",
+      "title": "a same-process re-instantiation does not begin again (NOT durable recovery)",
       "lane": "package-local",
       "status": "PASS",
       "detail": [

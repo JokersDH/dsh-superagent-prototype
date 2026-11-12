@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-11-12T03:46:22.441Z",
+  "environment": {
+    "note": "wave-11 B13 real SQLite and independent-process matrix",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 7,
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 1
+  },
+  "scope": "controlled process; native NOT_TESTED",
+  "cases": [
+    {
+      "id": "B13-REAL-SQLITE-AND-PROCESS",
+      "title": "a real SQLite file and a real spawned writer process",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "real SQLite (schema 16, WAL, synchronous=FULL) behind a real authenticated runner socket"
+      ],
+      "evidence": [
+        {
+          "path": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave11-b13-A6hD2u/product.sqlite",
+          "fileExists": true,
+          "journalMode": "wal",
+          "synchronous": 2,
+          "productSchema": 16,
+          "endpoint": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-BEGIN-RECORDED-ONCE",
+      "title": "the begin is durable and cannot be recorded twice",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the begin is stored once and the duplicate write is refused by the key, not by convention"
+      ],
+      "evidence": [
+        {
+          "firstInserted": true,
+          "duplicateInserted": false,
+          "beginRows": 1
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-STOP-PERSISTS-WRITER-STATE",
+      "title": "a stop is recorded and the writer reports quiescence",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the writer process reported quiescent after the stop, and the stop is durable"
+      ],
+      "evidence": [
+        {
+          "state": "terminated",
+          "admission": "closed",
+          "coverage": "complete_owned_resources",
+          "writerQuiescent": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-SIGKILL-THEN-REBUILD-SAME-SQLITE",
+      "title": "a fresh process reads the same file after the writer is killed",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the file survived SIGKILL: 2 command(s) and epoch high-water 7 intact with attempt identity preserved"
+      ],
+      "evidence": [
+        {
+          "killed": {
+            "code": null,
+            "signal": "SIGKILL"
+          },
+          "commandsBefore": 2,
+          "commandsAfter": 2,
+          "epochBefore": 7,
+          "epochAfter": 7,
+          "identityIntact": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-EPOCH-HIGH-WATER-MONOTONIC",
+      "title": "the epoch high-water never goes backwards across reopen",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "a lower epoch cannot lower the stored high-water, and a higher one raises it"
+      ],
+      "evidence": [
+        {
+          "afterLowerAttempt": 7,
+          "afterRaise": 9
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-DUPLICATE-BEGIN-AFTER-REBUILD",
+      "title": "a post-rebuild begin attempt is still refused",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the rebuilt process cannot append a second begin for the same command identity"
+      ],
+      "evidence": [
+        {
+          "replayInserted": false,
+          "beginRows": 1
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-SCOPE-NOT-NATIVE",
+      "title": "this is controlled-process evidence, not vendor behaviour",
+      "lane": "controlled_process",
+      "status": "NOT_TESTED",
+      "detail": [
+        "an installed vendor agent was not executed; Driver behaviour here is a fixture scenario"
+      ],
+      "evidence": [
+        {
+          "driver": "fixture scenario (happy)",
+          "realVendorAgent": false,
+          "realSqlite": true,
+          "realChildProcess": true,
+          "realSigkill": true
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
