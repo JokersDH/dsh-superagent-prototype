@@ -1,0 +1,88 @@
+{
+  "protocol": "wave15-d-admission/1",
+  "source": "e9f8aff8c6ec71009879ca0c744a1b1e5c06149e",
+  "observations": [
+    {
+      "id": "ACTUAL_JOURNAL_MISSING_ARGV_ROOT_OPERATION",
+      "proven": true,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 1,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "status": "FAIL"
+    },
+    {
+      "id": "POST_SIGNAL_STAT_UNKNOWN_IS_NOT_STOPPED",
+      "proven": true,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 1,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "mockProcessStillAlive": true,
+      "positiveIdentityExercised": true,
+      "status": "FAIL"
+    },
+    {
+      "id": "ACTUAL_RECOVER_MISSING_RESOURCE_IDENTITY",
+      "result": "REVERTED",
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "journal": "reverted_after_failed_start",
+      "status": "FAIL"
+    },
+    {
+      "id": "COMPLETE_MOCK_IDENTITY_POSITIVE_CONTROL",
+      "proven": true,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 1,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "status": "PASS"
+    }
+  ],
+  "passed": 1,
+  "failed": 3,
+  "actualOsScans": 0,
+  "actualOsSignals": 0,
+  "actualProcessesSpawned": 0,
+  "realModelTurns": 0,
+  "nativeTurns": 0,
+  "scope": "Fully mocked producer-shaped journal and post-signal tri-state with a complete positive identity control; no live lifecycle admission"
+}

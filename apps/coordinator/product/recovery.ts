@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process'
 import { lstatSync, readFileSync, realpathSync } from 'node:fs'
 import { join } from 'node:path'
 import { z } from 'zod'
-import { JsonSchema, RecoveryInspectionSchema, RecoveryPlanSchema, RecoveryPrepareSchema, TrustedActorSchema } from '@personal-agent/contracts'
+import { JsonSchema, RecoveryInspectionSchema, RecoveryPlanSchema, RecoveryPrepareSchema, RecoverySourceCheckpointSchema, TrustedActorSchema } from '@personal-agent/contracts'
 import type { AgentProfile, RecoveryInspection, RecoveryPlan, RecoveryPrepare, TrustedActor } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { canonicalDigest } from '@personal-agent/storage'
@@ -29,10 +29,22 @@ export class ProductRecovery {
   }
   constructor(store: ProductStore, options: ProductRecovery['options']) { this.store = store; this.options = options }
   private now() { return this.options.now?.() ?? new Date().toISOString() }
+  private logicalSource(): NonNullable<RecoveryInspection['logicalSource']> {
+    try {
+      const source = RecoverySourceCheckpointSchema.parse(this.store.workflows.recoverySource.inspect())
+      return { coverage: source.coverage, fingerprint: source.coverage === 'complete' ? source.sourceFingerprint : null }
+    } catch { return { coverage: 'unsupported', fingerprint: null } }
+  }
   inspect(): RecoveryInspection {
+    return this.store.uow.atomic(() => this.inspectSnapshot())
+  }
+  private inspectSnapshot(): RecoveryInspection {
     const facts = this.store.workflows.index.stateFacts(), eventCursor = this.store.events.cursor()
+    const logicalSource = this.logicalSource()
     const projects = this.options.projects().map(project => ({ id: project.id, displayName: project.displayName ?? project.id }))
     const blockers: RecoveryInspection['blockers'][number][] = []
+    if (logicalSource.coverage !== 'complete') blockers.push({ code: 'source_checkpoint_unavailable', owner: 'A',
+      detail: 'The logical source is bounded, unsupported or unreadable; no binding plan can be prepared' })
     const file = join(this.options.stateRoot, 'restore-report.json')
     let markerDigest: string | null = null
     const active = this.options.startupMode === 'recovery_readonly'
@@ -67,10 +79,11 @@ export class ProductRecovery {
     if (attempts.size) blockers.push({ code: 'historical_resources_need_revalidation', owner: 'B', detail: 'Historical binding states and old quiescence records are not fresh local resource proof' })
     blockers.push({ code: 'authorization_not_implemented', owner: 'main', detail: 'Recovery authorization commit is not connected; old business queues remain disabled' })
     const body = { markerDigest, productSchema: facts.productSchema, eventCursor, heldQueue: facts.queue,
-      projects, works: works.map(work => work.id), bindings: bindingDigests.sort(), writer: facts.writerClaim }
+      projects, works: works.map(work => work.id), bindings: bindingDigests.sort(), writer: facts.writerClaim, logicalSource }
     return RecoveryInspectionSchema.parse({ protocol: 'recovery-inspection/1', state: active ? 'recovery_readonly' : 'normal',
       observedAt: this.now(), inspectionFingerprint: digest(body), markerDigest, productSchema: facts.productSchema, eventCursor,
       heldQueue: facts.queue, sourceWorksScanned: works.length, sourceScanTruncated: !!cursor,
+      logicalSource,
       projects, historicalAttempts: [...attempts.values()], blockers, commitAvailable: false })
   }
   prepare(input: RecoveryPrepare, inputActor: TrustedActor): RecoveryPlan {
@@ -81,6 +94,7 @@ export class ProductRecovery {
     if (before.state !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Recovery preflight is only available for restored state')
     if (before.inspectionFingerprint !== value.expectedFingerprint) throw new ApplicationFault('conflict', 'Recovery inspection changed; inspect again')
     if (before.blockers.some(blocker => blocker.code === 'marker_invalid')) throw new ApplicationFault('verification_failed', 'Restore marker cannot be verified')
+    if (before.logicalSource?.coverage !== 'complete') throw new ApplicationFault('verification_failed', 'The recovery logical source is not complete')
     const registry = new NativeProjectRegistry(this.options.stateRoot)
     const proposed = new Set<string>()
     const bindings = value.bindings.map(binding => {
@@ -115,6 +129,7 @@ export class ProductRecovery {
     const createdAt = this.now()
     return RecoveryPlanSchema.parse({ protocol: 'recovery-plan/1', planId: `recovery-plan-${randomUUID()}`,
       inspectionFingerprint: before.inspectionFingerprint, createdAt, expiresAt: new Date(Date.parse(createdAt) + 300000).toISOString(),
+      logicalSource: before.logicalSource,
       bindings, executor, artifactsChecked, artifactScanTruncated: !!next, blockers, authorization: 'not_granted', commitAvailable: false })
   }
 }

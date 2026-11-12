@@ -1,0 +1,228 @@
+{
+  "protocol": "wave14-e-admission/1",
+  "testHead": "d0d1159fb3a936bd37b0960655f76c7dfe29031b",
+  "testReportSource": {
+    "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
+    "dirty": false
+  },
+  "scope": "Bounded mutation checks using the actual installed-alpha requirements for six named entries. No full installed-tier PASS is claimed.",
+  "actualInstalledTier": {
+    "status": "FAIL",
+    "failedCaseIds": [
+      "E6-CURRENT-MAIN-INSTALL"
+    ]
+  },
+  "mutations": [
+    {
+      "id": "REQUIRED_CURRENT_FAULT_COPY_EMPTY_EVIDENCE",
+      "accepted": false,
+      "failures": [
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E4-UPGRADE-FAULTS has no substantive evidence.upgradeFaults",
+          "caseId": "E4-UPGRADE-FAULTS"
+        },
+        {
+          "code": "upgradeFaults_invalid",
+          "detail": "upgradeFaults missing",
+          "caseId": "E4-UPGRADE-FAULTS"
+        },
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E7-OWNERSHIP-COPY has no substantive evidence.ownershipCopy",
+          "caseId": "E7-OWNERSHIP-COPY"
+        },
+        {
+          "code": "ownershipCopy_invalid",
+          "detail": "ownershipCopy missing",
+          "caseId": "E7-OWNERSHIP-COPY"
+        },
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E6-CURRENT-MAIN-INSTALL has no substantive evidence.currentInstall",
+          "caseId": "E6-CURRENT-MAIN-INSTALL"
+        },
+        {
+          "code": "currentInstall_invalid",
+          "detail": "currentInstall missing",
+          "caseId": "E6-CURRENT-MAIN-INSTALL"
+        }
+      ]
+    },
+    {
+      "id": "VALID_BUT_FOREIGN_ARTIFACT_SOURCE",
+      "accepted": false,
+      "failures": [
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E4-UPGRADE-FAULTS has no substantive evidence.upgradeFaults",
+          "caseId": "E4-UPGRADE-FAULTS"
+        },
+        {
+          "code": "upgradeFaults_invalid",
+          "detail": "upgradeFaults missing",
+          "caseId": "E4-UPGRADE-FAULTS"
+        },
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E7-OWNERSHIP-COPY has no substantive evidence.ownershipCopy",
+          "caseId": "E7-OWNERSHIP-COPY"
+        },
+        {
+          "code": "ownershipCopy_invalid",
+          "detail": "ownershipCopy missing",
+          "caseId": "E7-OWNERSHIP-COPY"
+        },
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E6-CURRENT-MAIN-INSTALL has no substantive evidence.currentInstall",
+          "caseId": "E6-CURRENT-MAIN-INSTALL"
+        },
+        {
+          "code": "currentInstall_invalid",
+          "detail": "currentInstall missing",
+          "caseId": "E6-CURRENT-MAIN-INSTALL"
+        }
+      ]
+    },
+    {
+      "id": "VALID_BUT_FOREIGN_ARTIFACT_SHA",
+      "accepted": false,
+      "failures": [
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E4-UPGRADE-FAULTS has no substantive evidence.upgradeFaults",
+          "caseId": "E4-UPGRADE-FAULTS"
+        },
+        {
+          "code": "upgradeFaults_invalid",
+          "detail": "upgradeFaults missing",
+          "caseId": "E4-UPGRADE-FAULTS"
+        },
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E7-OWNERSHIP-COPY has no substantive evidence.ownershipCopy",
+          "caseId": "E7-OWNERSHIP-COPY"
+        },
+        {
+          "code": "ownershipCopy_invalid",
+          "detail": "ownershipCopy missing",
+          "caseId": "E7-OWNERSHIP-COPY"
+        },
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E6-CURRENT-MAIN-INSTALL has no substantive evidence.currentInstall",
+          "caseId": "E6-CURRENT-MAIN-INSTALL"
+        },
+        {
+          "code": "currentInstall_invalid",
+          "detail": "currentInstall missing",
+          "caseId": "E6-CURRENT-MAIN-INSTALL"
+        }
+      ]
+    },
+    {
+      "id": "WRONG_ARTIFACT_BUILD_AND_SIZE",
+      "accepted": false,
+      "failures": [
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E4-UPGRADE-FAULTS has no substantive evidence.upgradeFaults",
+          "caseId": "E4-UPGRADE-FAULTS"
+        },
+        {
+          "code": "upgradeFaults_invalid",
+          "detail": "upgradeFaults missing",
+          "caseId": "E4-UPGRADE-FAULTS"
+        },
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E7-OWNERSHIP-COPY has no substantive evidence.ownershipCopy",
+          "caseId": "E7-OWNERSHIP-COPY"
+        },
+        {
+          "code": "ownershipCopy_invalid",
+          "detail": "ownershipCopy missing",
+          "caseId": "E7-OWNERSHIP-COPY"
+        },
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E6-CURRENT-MAIN-INSTALL has no substantive evidence.currentInstall",
+          "caseId": "E6-CURRENT-MAIN-INSTALL"
+        },
+        {
+          "code": "currentInstall_invalid",
+          "detail": "currentInstall missing",
+          "caseId": "E6-CURRENT-MAIN-INSTALL"
+        }
+      ]
+    },
+    {
+      "id": "INSTALLED_CONTEXT_FOREIGN_TUPLE",
+      "accepted": false,
+      "failures": [
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E4-UPGRADE-FAULTS has no substantive evidence.upgradeFaults",
+          "caseId": "E4-UPGRADE-FAULTS"
+        },
+        {
+          "code": "upgradeFaults_invalid",
+          "detail": "upgradeFaults missing",
+          "caseId": "E4-UPGRADE-FAULTS"
+        },
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E7-OWNERSHIP-COPY has no substantive evidence.ownershipCopy",
+          "caseId": "E7-OWNERSHIP-COPY"
+        },
+        {
+          "code": "ownershipCopy_invalid",
+          "detail": "ownershipCopy missing",
+          "caseId": "E7-OWNERSHIP-COPY"
+        },
+        {
+          "code": "required_evidence_missing",
+          "detail": "Case E6-CURRENT-MAIN-INSTALL has no substantive evidence.currentInstall",
+          "caseId": "E6-CURRENT-MAIN-INSTALL"
+        },
+        {
+          "code": "currentInstall_invalid",
+          "detail": "currentInstall missing",
+          "caseId": "E6-CURRENT-MAIN-INSTALL"
+        }
+      ]
+    }
+  ],
+  "sourceRouteDetection": {
+    "regex": "\\/v1\\/messages\\/:id\\/context\\/sources",
+    "existsInVerifiedTar": true,
+    "detectedByE": true
+  },
+  "actualRunArtifact": {
+    "artifact": {
+      "buildId": "3ead6a26161f4c72",
+      "source": "99832f6c7e6a54b323a9d454f3a4840273d1275a",
+      "schema": 18,
+      "tarSha256": "b7e9dec7d264f94cadda10c6624db582ddd477ff83a7a8816c6acf5f0c5237d4",
+      "tarBytes": 20167862
+    },
+    "capability": {
+      "hasContextRoute": true,
+      "hasHistoryRoute": true,
+      "hasSourcesRoute": true,
+      "hasReplyResults": true,
+      "hasDiscussionReadiness": false,
+      "routeBytes": 45468
+    },
+    "main": {
+      "schema": 18
+    },
+    "currentMainEligible": true,
+    "reason": null
+  },
+  "realModelTurns": 0,
+  "nativeTurns": 0,
+  "passed": 5,
+  "failed": 0
+}

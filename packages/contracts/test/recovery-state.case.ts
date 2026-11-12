@@ -13,4 +13,7 @@ test('diagnostics cannot claim that recovery commit is available', () => {
     sourceWorksScanned: 0, sourceScanTruncated: false, projects: [], historicalAttempts: [], blockers: [], commitAvailable: false }
   assert.equal(RecoveryInspectionSchema.safeParse(value).success, true)
   assert.equal(RecoveryInspectionSchema.safeParse({ ...value, commitAvailable: true }).success, false)
+  assert.equal(RecoveryInspectionSchema.safeParse({ ...value, logicalSource: { coverage: 'complete', fingerprint: 'b'.repeat(64) } }).success, true)
+  assert.equal(RecoveryInspectionSchema.safeParse({ ...value, logicalSource: { coverage: 'bounded', fingerprint: 'b'.repeat(64) } }).success, false)
+  assert.equal(RecoveryInspectionSchema.safeParse({ ...value, logicalSource: { coverage: 'complete', fingerprint: null } }).success, false)
 })

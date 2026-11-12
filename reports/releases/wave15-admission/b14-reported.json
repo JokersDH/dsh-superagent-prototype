@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-11-12T14:18:03.082Z",
+  "environment": {
+    "note": "wave-14 B14 independent surviving Runner recovery closure",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 7,
+    "PASS": 5,
+    "FAIL": 1,
+    "SKIPPED": 0,
+    "NOT_TESTED": 1
+  },
+  "scope": "controlled process; native NOT_TESTED",
+  "cases": [
+    {
+      "id": "B14-RUNNER-IS-INDEPENDENT-PROCESS",
+      "title": "the Runner has its own pid and survives the coordinator",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the coordinator died by SIGKILL while Runner pid 35927 kept living in its own process"
+      ],
+      "evidence": [
+        {
+          "runnerPid": 35927,
+          "coordinatorPid": 35929,
+          "coordinatorSignal": "SIGKILL",
+          "aliveAfterCrash": true
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B14-RECOVERY-REACHES-SAME-LIVING-RUNNER",
+      "title": "a fresh coordinator reconnects without restarting the writer",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "recovery exited 0 against the same living Runner pid 35927"
+      ],
+      "evidence": [
+        {
+          "exitCode": 0,
+          "runnerPidSeen": "35927",
+          "runnerOwnerPid": 35927,
+          "counters": {
+            "inspect": 2,
+            "cancel": 0,
+            "answer": 0,
+            "begin": 0
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B14-RECEIVER-COUNTS-PROVE-NO-DUPLICATE",
+      "title": "the Runner itself counts what it served",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the receiver served 2 inspect(s) and 0 cancel(s); one begin receipt, no duplicate stop"
+      ],
+      "evidence": [
+        {
+          "counters": {
+            "inspect": 2,
+            "cancel": 0,
+            "answer": 0,
+            "begin": 0
+          },
+          "receipts": {
+            "begin": 1,
+            "answer": null,
+            "stop": null,
+            "deliver": null
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B14-POST-RECOVERY-DELIVERY",
+      "title": "a recovered coordinator completes pending delivery once",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the answer recorded before the crash was delivered exactly once by the recovered coordinator into the open writer"
+      ],
+      "evidence": [
+        {
+          "answerCrashSignal": "SIGKILL",
+          "deliverExit": 0,
+          "delivery": {
+            "delivered": true,
+            "outcome": "recorded_after_recovery"
+          },
+          "receipts": {
+            "begin": 1,
+            "answer": 2,
+            "stop": null,
+            "deliver": 3
+          },
+          "admission": "open"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B14-STOP-ACK-UNKNOWN-NOT-RESENT",
+      "title": "a stop acked but never receipted is not resent",
+      "lane": "controlled_process",
+      "status": "FAIL",
+      "detail": [
+        "the unknown stop was mishandled: {\"signal\":\"SIGKILL\",\"exit\":0,\"stopReceiptAbsent\":true,\"writerQuiescent\":false,\"cancelServedOnce\":false,\"cancelError\":null,\"counters\":{\"inspect\":5,\"cancel\":0,\"answer\":0,\"begin\":0}}"
+      ],
+      "evidence": [
+        {
+          "cancelError": null,
+          "stopCrashSignal": "SIGKILL",
+          "stopAcked": null,
+          "exitCode": 0,
+          "receipts": {
+            "begin": 1,
+            "answer": 2,
+            "stop": null,
+            "deliver": 3
+          },
+          "runnerState": "serving",
+          "writer": "active",
+          "counters": {
+            "inspect": 5,
+            "cancel": 0,
+            "answer": 0,
+            "begin": 0
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B14-EPOCH-FENCE-REFUSES-STALE",
+      "title": "an old epoch cannot reach the live writer",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "an epoch-1 cancel was refused before reaching the writer, which served 0 cancel(s) unchanged"
+      ],
+      "evidence": [
+        {
+          "staleEpochResult": "Runner recovery request was refused or indeterminate",
+          "refused": true,
+          "exitCode": 0
+        },
+        {
+          "staleRefused": true,
+          "writerUnchanged": true,
+          "afterStale": {
+            "inspect": 5,
+            "cancel": 0,
+            "answer": 0,
+            "begin": 0
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B14-SCOPE-NOT-NATIVE",
+      "title": "controlled-process evidence, not vendor behaviour",
+      "lane": "controlled_process",
+      "status": "NOT_TESTED",
+      "detail": [
+        "an installed vendor agent was not executed; the writer is a fixture process"
+      ],
+      "evidence": [
+        {
+          "realAuthTransport": true,
+          "independentRunnerProcess": true,
+          "realStore": true,
+          "realSigkill": true,
+          "realVendorAgent": false
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
