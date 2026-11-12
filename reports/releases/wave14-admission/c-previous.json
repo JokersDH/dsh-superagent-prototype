@@ -1,0 +1,100 @@
+{
+  "sourceCommit": "83ac3e1e629cc4a77963328460721ac8c7169e9a",
+  "observations": [
+    {
+      "id": "RELEVANCE_NO_TRUSTED_SCOPE_MUST_REFUSE",
+      "status": "PASS",
+      "observed": {
+        "selected": [],
+        "complete": true
+      }
+    },
+    {
+      "id": "COMPOSER_SCOPE_MUST_FILTER_DECISION_BODY",
+      "status": "PASS",
+      "observed": {
+        "grantPaths": [
+          "src"
+        ],
+        "included": []
+      }
+    },
+    {
+      "id": "COMPOSER_MUST_PRESERVE_SCOPED_PROVIDER_INCOMPLETE",
+      "status": "PASS",
+      "observed": {
+        "providerCoverage": {
+          "scanned": 1,
+          "returned": 1,
+          "complete": false,
+          "excluded": {
+            "otherConversation": 0,
+            "foreignProject": 0,
+            "unprovenProject": 0,
+            "questionAnchor": 0,
+            "otherWork": 0,
+            "permissionDisplay": 0,
+            "systemRole": 0,
+            "untrustedProvenance": 0
+          }
+        },
+        "compositionStatus": "partial",
+        "groupStatus": "truncated",
+        "manifestCoverage": {
+          "complete": false,
+          "groups": [
+            {
+              "name": "conversation",
+              "status": "truncated"
+            }
+          ],
+          "omitted": 1,
+          "truncated": 0,
+          "budgetClamped": []
+        },
+        "comparison": "incomplete"
+      }
+    },
+    {
+      "id": "HISTORY_MUST_REFUSE_FOREIGN_REPLY_PRINCIPAL",
+      "status": "PASS",
+      "observed": {
+        "bindingPrincipal": {
+          "userId": "user-1",
+          "authorityRef": "authority-1"
+        },
+        "replyPrincipal": {
+          "userId": "foreign-user",
+          "authorityRef": "foreign-authority"
+        },
+        "mismatchedReplies": 0
+      }
+    },
+    {
+      "id": "SOURCE_REVIEW_OMISSIONS_MUST_BE_BOUNDED",
+      "status": "PASS",
+      "observed": {
+        "maxItems": 1,
+        "omitted": 1,
+        "serializedBytes": 807,
+        "suppressed": {
+          "items": 0,
+          "bytes": 0,
+          "omissions": 4999
+        }
+      }
+    },
+    {
+      "id": "SOURCE_REVIEW_OMISSION_DETAIL_MUST_REDACT_HOST_PATH",
+      "status": "PASS",
+      "observed": {
+        "first": {
+          "reason": "missing",
+          "detail": "Cannot read <redacted-path>"
+        }
+      }
+    }
+  ],
+  "modelCalls": 0,
+  "nativeTurns": 0
+}

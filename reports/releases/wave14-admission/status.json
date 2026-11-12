@@ -1,0 +1,181 @@
+{
+  "protocol": "wave14-admission/1",
+  "date": "2026-11-12",
+  "mainSource": "1453cf279b872eb99116547f1b4ce77867b74880",
+  "status": "SCOPED_PROGRESS_WITH_BLOCKED_RELEASE",
+  "releaseApproved": false,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "previousBoundaryCases": {
+    "A": 4,
+    "B": 5,
+    "C": 6,
+    "D": 6,
+    "E": 3,
+    "total": 24,
+    "passed": 24,
+    "scope": "D pure mocks and E required classification only; not 24 whole-product or release scenarios"
+  },
+  "A": {
+    "source": "278b665a5c35fe9f10e0db0819d4c7d8ec2f6402",
+    "storageTests": 87,
+    "workflowTests": 100,
+    "strictBuild": "PASS",
+    "sourceReader": "reviewed_data_scope",
+    "mainBaselineConsumer": "NOT_IMPLEMENTED"
+  },
+  "B": {
+    "source": "aacc342462a96211f9f34fdaa3c131a97fac2ea5",
+    "helperTests": 68,
+    "strictExactOptional": "PASS",
+    "productionVertical": {
+      "passed": 6,
+      "notTested": 1,
+      "work": 1,
+      "ticket": 1,
+      "question": 1,
+      "answerDelivery": 1,
+      "facts": 7,
+      "dispatch": 2,
+      "scope": "actual product with local fixture child"
+    },
+    "newBoundaryFailures": 4,
+    "recovery": "reopened durable rows only; no recovered controls/independent Runner reconnect",
+    "defaultMainHelperAdmission": false
+  },
+  "C": {
+    "source": "83ac3e1e629cc4a77963328460721ac8c7169e9a",
+    "packageTests": 276,
+    "currentMainCombination": 9,
+    "strictBuildConsumer": "PASS",
+    "newBlockingObservations": 6,
+    "newIssueGroups": 3,
+    "privateReaderAndExpiryNotes": "not execution permission findings",
+    "defaultFactoryReplacement": "NOT_IMPLEMENTED_BY_MAIN"
+  },
+  "D": {
+    "source": "d833d0f5f91eaae61e80c9d2e471196fcabd0e0c",
+    "newMockFailures": 6,
+    "newIssueGroups": 3,
+    "legacyLiveProbe": "NOT_RUN_NO_INDEPENDENT_OPERATION_PROOF",
+    "actualOsScans": 0,
+    "actualOsSignals": 0,
+    "actualProcessesSpawned": 0,
+    "liveMatrixAdmission": false,
+    "artifact": "artifact.json",
+    "newArtifactIncludesReadiness": false
+  },
+  "E": {
+    "source": "3dfdcbdf667815bbf6e95440a1b8aa498af96006",
+    "newEvidenceMutationFailures": 5,
+    "installedTier": "FAIL",
+    "actualTestReportSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "actualArtifactSource": "020af824390e9230a4ff9d01f9e29b1ee93dd246",
+    "actualArtifactBuild": "1a2f34ac359a5739",
+    "newDArtifactAccepted": false,
+    "currentMainArtifactAccepted": false
+  },
+  "artifactTuple": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave13-target/wave13-target-99832f6.tar.gz",
+    "tarSha256": "b7e9dec7d264f94cadda10c6624db582ddd477ff83a7a8816c6acf5f0c5237d4",
+    "tarBytes": 20167862,
+    "source": {
+      "commit": "99832f6c7e6a54b323a9d454f3a4840273d1275a",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "buildId": "3ead6a26161f4c72",
+    "schemaActualExport": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v24.21.0",
+    "abiActual": "137",
+    "sqliteActual": "3.53.4",
+    "inventoryEntries": 6713,
+    "files": 6692,
+    "internalSymlinks": 21,
+    "extractedBytes": 67256832,
+    "installManifestSha256": "705824eda9c7d7758e1bfb1917f0afd7c0cb1f681efe0dc3b70d6c14f5da7a9e",
+    "releaseManifestSha256": "3bb62b59cca5deb9c36fab055368752d2f7186088531a36c79d9161c11dc6d5a",
+    "closureDigest": "45d9133c3366fb9046b731f64d903e60915e1f487899e7d94129d7db7a08d3f7",
+    "capability": {
+      "selectedContextPrepare": true,
+      "selectedContextSend": true,
+      "replyResultsConsumer": true,
+      "contextHistoryHttp": true,
+      "frozenSourceHttp": true,
+      "discussionOnlyFlag": false,
+      "unavailableExecutionRuntime": false
+    },
+    "ownership": [
+      {
+        "path": "apps/launcher/lib/identity.mjs",
+        "matchesDeclaredSource": true
+      },
+      {
+        "path": "apps/launcher/lib/upgrade.mjs",
+        "matchesDeclaredSource": true
+      },
+      {
+        "path": "apps/launcher/lib/stop.mjs",
+        "matchesDeclaredSource": true
+      }
+    ],
+    "mode": "Personal-capable bytes only; no lifecycle or installed-mode admission claimed",
+    "modelCalls": 0,
+    "nativeTurns": 0
+  },
+  "completionSnapshot": {
+    "source": "e1e0c97",
+    "stableAlphaRaw": 69,
+    "fullSchemeBRaw": 50.8,
+    "rescored": false
+  },
+  "preservedUserServices": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ],
+    [
+      5186,
+      8802
+    ],
+    [
+      5187,
+      8803
+    ],
+    [
+      5188,
+      8804
+    ],
+    [
+      5189,
+      8805
+    ],
+    [
+      5190,
+      8806
+    ]
+  ],
+  "dispatch": "../../../agent-tasks/product-wave-14/dispatch.json"
+}
