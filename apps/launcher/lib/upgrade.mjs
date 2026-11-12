@@ -384,9 +384,10 @@ const freeFrom = async (seed, key, fallback) => {
   return fallback
 }
 
-/** Descendants of one pid inside this process tree (BFS over ps output). */
-const processTree = (rootPid) => {
-  const ps = spawnSyncPs()
+/** Descendants of one pid inside this process tree (BFS over one ps snapshot). */
+const processTree = (rootPid, snapshot = null) => {
+  const ps = snapshot ?? spawnSyncPs()
+  if (ps === null) return null
   const children = new Map()
   for (const line of ps) {
     const [pid, ppid] = line.trim().split(/\s+/).map(Number)
@@ -408,8 +409,11 @@ const processTree = (rootPid) => {
 }
 
 const spawnSyncPs = () => {
-  const result = spawnSync('ps', ['-axo', 'pid=,ppid='], { encoding: 'utf8' })
-  return result.stdout.split('\n').filter(Boolean)
+  try {
+    const result = spawnSync('ps', ['-axo', 'pid=,ppid='], { encoding: 'utf8' })
+    if (result.error !== undefined || result.status !== 0) return null
+    return result.stdout.split('\n').filter(Boolean)
+  } catch { return null }
 }
 
 const commandOf = (pid) => spawnSync('ps', ['-ww', '-p', String(pid), '-o', 'command='], { encoding: 'utf8' }).stdout.trim()
@@ -455,9 +459,13 @@ const commandMatchesIdentity = (command, tokens) => {
   })
 }
 
-const listProcesses = () => spawnSyncPs().map((line) => line.trim().split(/\s+/).map(Number))
-  .filter(([pid, ppid]) => Number.isInteger(pid) && Number.isInteger(ppid))
-  .map(([pid, ppid]) => ({ pid, ppid }))
+const listProcesses = (snapshot = spawnSyncPs()) => {
+  if (snapshot === null) return null
+  return snapshot
+    .map((line) => line.trim().split(/\s+/).map(Number))
+    .filter(([pid, ppid]) => Number.isInteger(pid) && Number.isInteger(ppid))
+    .map(([pid, ppid]) => ({ pid, ppid }))
+}
 
 /**
  * Every registered resource must be accounted for: launcher, API child, console listener and any
@@ -467,52 +475,70 @@ const listProcesses = () => spawnSyncPs().map((line) => line.trim().split(/\s+/)
  */
 export async function accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn }) {
   const tokens = ROOT_TOKENS(roots)
+  const snapshot = spawnSyncPs()
+  const scannerOk = snapshot !== null
   const treeCandidates = new Set()
+  const unverifiable = []
   let pidReused = false
   const addTree = (pid) => {
     if (!Number.isInteger(pid) || pid <= 0) return
-    for (const child of processTree(pid)) treeCandidates.add(child)
+    const tree = processTree(pid, snapshot)
+    if (tree === null) return
+    for (const child of tree) treeCandidates.add(child)
+  }
+  // A recorded numeric pid is authority only together with its exact recorded start identity. A
+  // missing, unreadable or reused start stays UNKNOWN and contributes no tree.
+  const addVerifiedTree = async (pid, expectedStart, label) => {
+    if (!Number.isInteger(pid) || pid <= 0) return
+    if (!alive(pid)) return
+    if (typeof expectedStart !== 'string' || expectedStart.length === 0) {
+      unverifiable.push({ pid, label, reason: 'start_missing' })
+      return
+    }
+    let observed = null
+    try { observed = await processStart(pid) } catch { observed = null }
+    if (observed === null || observed !== expectedStart) {
+      pidReused = true
+      unverifiable.push({ pid, label, reason: observed === null ? 'start_unreadable' : 'start_mismatch' })
+      return
+    }
+    addTree(pid)
   }
   const claimed = new Set()
   if (Number.isInteger(spawnedPid) && spawnedPid > 0) {
-    // The spawn pid may have exited and been recycled; only claim its tree when the recorded start
-    // identity still matches. A recycled pid is not this operation's resource.
-    const observed = await processStart(spawnedPid)
     const expected = spawnedStart ?? (journalSpawn?.pid === spawnedPid ? journalSpawn?.processStart ?? null : null)
-    if (expected !== null && observed !== expected) {
-      pidReused = true
-      claimed.add(spawnedPid)
-    } else addTree(spawnedPid)
+    if (expected === null || expected === undefined) unverifiable.push({ pid: spawnedPid, label: 'spawn', reason: 'start_missing' })
+    else await addVerifiedTree(spawnedPid, expected, 'spawn')
   }
   if (journalSpawn !== undefined && journalSpawn !== null && Number.isInteger(journalSpawn.pid) && journalSpawn.pid > 0 && !claimed.has(journalSpawn.pid)) {
-    // A recorded journal spawn is evidence only while its recorded start identity still matches.
-    const observed = await processStart(journalSpawn.pid)
-    if (journalSpawn.processStart !== undefined && observed !== journalSpawn.processStart) pidReused = true
-    else addTree(journalSpawn.pid)
+    await addVerifiedTree(journalSpawn.pid, journalSpawn.processStart, 'journal')
   }
-  for (const pid of [record?.pid, record?.apiPid, record?.consolePid]) addTree(pid)
+  if (record !== null && record !== undefined) {
+    await addVerifiedTree(record.pid, record.processStart, 'launcher')
+    await addVerifiedTree(record.apiPid, record.apiProcessStart, 'api')
+    if (Number.isInteger(record.consolePid) && record.consolePid !== record.pid)
+      await addVerifiedTree(record.consolePid, record.consoleProcessStart, 'console')
+  }
 
+  const discovered = listProcesses(snapshot)
   const owned = []
   const unknownLive = []
   for (const pid of treeCandidates) {
     if (pid === process.pid || !alive(pid)) continue
     const command = commandOf(pid)
-    // A candidate that was started/registered by this operation but no longer matches its identity
-    // is UNKNOWN: it may be a reused pid or a foreign writer. It must block, not be filtered away.
     if (command !== '' && commandMatchesIdentity(command, tokens)) owned.push({ pid, command })
     else unknownLive.push({ pid, command: command === '' ? 'unknown' : command })
   }
-  // Diagnostic discovery only: a global path match is NOT ownership. Only a PID that this operation
-  // registered (record/journal/spawn tree, or an orphan whose recorded pid it already owns) may be
-  // stopped; every other match stays UNKNOWN and blocks an empty "proven" set.
   const unregistered = []
-  for (const { pid } of listProcesses()) {
+  for (const entry of discovered ?? []) {
+    const { pid, ppid } = entry
+    if (!Number.isInteger(pid) || !Number.isInteger(ppid)) continue
     if (pid === process.pid || treeCandidates.has(pid) || claimed.has(pid) || !alive(pid)) continue
     const command = commandOf(pid)
     if (command !== '' && commandMatchesIdentity(command, tokens)) unregistered.push({ pid, command })
   }
   for (const entry of unregistered) unknownLive.push({ ...entry, unregistered: true })
-  return { owned, unknownLive, unregistered, considered: treeCandidates.size, pidReused }
+  return { owned, unknownLive, unregistered, unverifiable, considered: treeCandidates.size, pidReused, scannerOk }
 }
 
 export async function stopRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn }) {
@@ -531,7 +557,10 @@ export async function stopRegisteredResources({ roots, target, record, spawnedPi
   while (Date.now() < killDeadline && accounted.owned.some(({ pid }) => alive(pid))) await new Promise((r) => setTimeout(r, 100))
   const remaining = accounted.owned.filter(({ pid }) => alive(pid)).map(({ pid, command }) => ({ pid, command }))
   return {
-    proven: remaining.length === 0 && accounted.unknownLive.length === 0,
+    proven: remaining.length === 0 && accounted.unknownLive.length === 0 && accounted.unknownLive.length === 0 &&
+      accounted.scannerOk === true && accounted.pidReused !== true && (accounted.unverifiable ?? []).length === 0,
+    scannerOk: accounted.scannerOk === true,
+    unverifiable: (accounted.unverifiable ?? []).map(({ pid, label, reason }) => ({ pid, label, reason })),
     stopped,
     remaining,
     unknownLive: accounted.unknownLive.map(({ pid, command, unregistered }) => ({ pid, command: command.slice(0, 240), ...(unregistered === true ? { unregistered: true } : {}) })),
@@ -768,6 +797,19 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
       return { protocol: 'personal-install-switch/1', status: 'BLOCKED', code: 'requested_root_mismatch',
         message: 'The recorded instance belongs to another config/state/install; recovery refuses to stop it or write the pointer', scope }
   }
+  // The record must be one of the two roles named by the journal, never an arbitrary install that
+  // happens to share state/config. This is the recover analogue of the old/new role check.
+  if (recorded !== null) {
+    const recordedInstall = canonicalPath(recorded.install ?? '')
+    const roles = [journal.from?.installRoot, journal.from?.installDir, journal.to?.installRoot, journal.to?.installDir]
+      .filter((value) => typeof value === 'string' && value.length > 0)
+    const allowed = [...new Set(roles.flatMap((value) => [canonicalPath(value), canonicalPath(join(value, 'app'))]))]
+    const requestedRole = canonicalPath(installRoot)
+    if (allowed.length === 0 || !allowed.includes(recordedInstall) || !allowed.includes(requestedRole))
+      return { protocol: 'personal-install-switch/1', status: 'BLOCKED', code: 'requested_root_mismatch',
+        message: 'The requested or recorded install is neither the journal old nor new role; recovery refuses to confirm or clean it',
+        detail: { recordedInstall, requestedRole, allowed } }
+  }
   // Never start (or revert over) an unknown live process: the same rule as upgrade/rollback.
   const existing = readInstanceRecord(roots.config)
   if (existing !== null && !(await verifyInstance(existing)).ok && (await processAlive(existing.pid)))
@@ -809,6 +851,10 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
     const cleanup = await stopRegisteredResources({ roots, target, record: existing, journalSpawn: journal.spawn ?? null })
     if (!cleanup.proven) {
       writeJournalStatus({ roots, status: 'target_stop_unproven', reason: 'recover_stop_still_unproven', cleanup })
+      const unknownIdentity = cleanup.pidReused === true || cleanup.scannerOk === false || (cleanup.unverifiable ?? []).length > 0 || (cleanup.unknownLive ?? []).length > 0
+      if (unknownIdentity)
+        return { protocol: 'personal-install-switch/1', status: 'BLOCKED', code: 'unknown_live_resource',
+          message: 'The failed target cannot be attributed (missing/reused start, scanner failure or unknown live resource); no pointer, record or signal change', cleanup }
       throw new UpgradeError('target_stop_unproven', 'The failed target still cannot be proven stopped; refusing to revert or start another writer', {
         remaining: cleanup.remaining,
       })

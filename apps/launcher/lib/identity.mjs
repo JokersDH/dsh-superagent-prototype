@@ -6,7 +6,8 @@
  * cwd, listener and health projection. A recorded breadcrumb is never evidence that a process is
  * gone; a live but unmatched PID is never signalled.
  */
-import { readFileSync, realpathSync } from 'node:fs'
+import { realpathSync } from 'node:fs'
+import { dirname } from 'node:path'
 import { basename, isAbsolute, join, resolve } from 'node:path'
 
 export const STARTUP_MODES = ['normal', 'recovery_readonly']
@@ -58,15 +59,26 @@ export function requestedScopeCheck({ roots, record, requireInstall = false }) {
   const installMatches = recordedInstall === requestedInstall || recordedInstall === canonicalPath(join(requestedInstall, 'app'))
   const requestedConfig = canonicalPath(roots.config)
   const recordedConfig = record.configRoot === undefined ? null : canonicalPath(record.configRoot)
-  // Legacy records (written before the config binding existed) are accepted only when the requested
-  // config root carries its own launcher.json naming this same config root. A copied legacy record
-  // dropped into an unrelated config root has no such evidence and stays explicitly unknown.
+  // A legacy record (written before configRoot existed) is bound only when its own recorded launcher
+  // argv still names this exact config/data/install triple. A copied record keeps the original argv,
+  // so a copying config root cannot self-certify through its own launcher.json; missing argv is unknown.
   const legacyConfigBound = () => {
-    try {
-      const launcher = JSON.parse(readFileSync(join(roots.config, 'launcher.json'), 'utf8'))
-      const recorded = launcher?.roots?.config
-      return typeof recorded === 'string' && canonicalPath(recorded) === requestedConfig
-    } catch { return false }
+    const argv = Array.isArray(record.launcherArgv) ? record.launcherArgv.map(String) : null
+    if (argv === null || argv.length < 3) return false
+    const valueOf = (flag) => {
+      const index = argv.lastIndexOf(flag)
+      if (index < 0 || index + 1 >= argv.length) return null
+      return argv[index + 1]
+    }
+    const argvConfig = valueOf('--config-root')
+    const argvData = valueOf('--data-root')
+    const argvInstall = valueOf('--install')
+    if (argvConfig === null || argvData === null || argvInstall === null) return false
+    const installOk = [canonicalPath(roots.install), canonicalPath(record.install ?? '')].includes(canonicalPath(argvInstall))
+      || [roots.install, dirnameCanonical(record.install ?? '')].includes(canonicalPath(argvInstall))
+    return canonicalPath(argvConfig) === requestedConfig &&
+      canonicalPath(argvData) === canonicalPath(roots.data) &&
+      installOk
   }
   const configBound = recordedConfig !== null ? recordedConfig === requestedConfig : legacyConfigBound()
   add('requested_config', configBound, {

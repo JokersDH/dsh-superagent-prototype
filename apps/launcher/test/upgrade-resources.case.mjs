@@ -9,6 +9,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { accountRegisteredResources, stopRegisteredResources } from '../lib/upgrade.mjs'
+import { processStart } from '../lib/instance.mjs'
 
 const roots = (dir) => ({ install: join(dir, 'app'), config: join(dir, 'config'), data: join(dir, 'data'), cache: join(dir, 'cache'), logs: join(dir, 'logs'), workspace: join(dir, 'workspace') })
 const alive = (pid) => { try { process.kill(pid, 0); return true } catch { return false } }
@@ -20,9 +21,10 @@ test('a matching child is owned and stopped, with the stop proven', async (t) =>
   const r = roots(dir)
   const child = spawn(process.execPath, ['-e', `setTimeout(() => {}, 60000); // ${r.data}`], { stdio: 'ignore' })
   await wait(150)
-  const accounted = await accountRegisteredResources({ roots: r, target: null, spawnedPid: child.pid })
+  const start = await processStart(child.pid)
+  const accounted = await accountRegisteredResources({ roots: r, target: null, spawnedPid: child.pid, spawnedStart: start })
   assert.equal(accounted.owned.some((entry) => entry.pid === child.pid), true)
-  const proof = await stopRegisteredResources({ roots: r, target: null, journalSpawn: { pid: child.pid } })
+  const proof = await stopRegisteredResources({ roots: r, target: null, journalSpawn: { pid: child.pid, processStart: start } })
   assert.equal(proof.proven, true)
   // A stopped child may still be an unreaped zombie for this test process; kill(0) would call that
   // alive, so wait for the exit event instead.
@@ -37,7 +39,7 @@ test('an unmatched live process stays UNKNOWN and prevents an empty-set stop pro
   const stranger = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 60000)'], { stdio: 'ignore' })
   await wait(150)
   try {
-    const proof = await stopRegisteredResources({ roots: r, target: null, spawnedPid: stranger.pid })
+    const proof = await stopRegisteredResources({ roots: r, target: null, spawnedPid: stranger.pid, spawnedStart: await processStart(stranger.pid) })
     assert.equal(proof.proven, false)
     assert.equal(proof.unknownLive.some((entry) => entry.pid === stranger.pid), true)
     assert.equal(alive(stranger.pid), true)

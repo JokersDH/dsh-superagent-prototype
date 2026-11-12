@@ -213,11 +213,13 @@ test('stop refuses an unknown live process and cleans only a provably stale reco
     writeInstanceRecord(roots.config, record)
     const refused = await stopInstance({ roots, timeoutMs: 1000 })
     assert.equal(refused.ok, false)
-    assert.equal(refused.code, 'instance_identity_mismatch')
+    // A record with a missing/mismatched start identity is UNKNOWN before any signal; the precise
+    // blocked code is unknown_live_resource, not a claimed identity mismatch.
+    assert.equal(refused.code, 'unknown_live_resource')
     assert.equal(process.exitCode ?? 0, 0, 'the test process was not signalled')
 
     // A stale record whose launcher pid no longer exists is cleaned without touching anything.
-    writeInstanceRecord(roots.config, { ...record, pid: 999_999, apiPid: 999_999 })
+    writeInstanceRecord(roots.config, { ...record, pid: 999_999, apiPid: 999_999, consolePid: 999_999 })
     const cleaned = await stopInstance({ roots, timeoutMs: 1000 })
     assert.equal(cleaned.ok, true)
     assert.equal(cleaned.status, 'STALE_RECORD_CLEANED')

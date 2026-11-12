@@ -3,7 +3,7 @@
  * API child is signalled only after its command line, uid, private state and listener still match;
  * an unknown process, stale record with a live listener, or stop timeout is reported, not hidden.
  */
-import { listenersOnPort, processCommand, readInstanceRecord, processAlive, removeInstanceRecord, stopProcess, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
+import { listenersOnPort, processCommand, readInstanceRecord, processAlive, processStart, removeInstanceRecord, stopProcess, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
 import { requestedScopeCheck } from './identity.mjs'
 
 const record_removed_code = 'instance_record_removed'
@@ -43,6 +43,30 @@ export async function stopInstance({ roots, timeoutMs = 8000, requireInstall = t
       message: '请求的私有根与实例记录不一致；不结束任何进程、不删除记录',
       detail: scope,
       hint: '用记录所属的 --config-root/--data-root/--install 调用，或先核对 `pa doctor`。',
+    }
+  }
+
+  // PID reuse or a missing recorded start identity is UNKNOWN: a numeric pid (or a self-consistent
+  // record) is not authority to signal. Check every recorded live pid before any signal.
+  const identityGaps = []
+  const checkStart = async (pid, expected, label) => {
+    if (!Number.isInteger(pid) || pid <= 0 || !(await processAlive(pid))) return
+    if (typeof expected !== 'string' || expected.length === 0) { identityGaps.push({ label, pid, reason: 'start_missing' }); return }
+    let observed = null
+    try { observed = await processStart(pid) } catch { observed = null }
+    if (observed === null || observed !== expected) identityGaps.push({ label, pid, reason: observed === null ? 'start_unreadable' : 'start_mismatch', expected, observed })
+  }
+  await checkStart(record.pid, record.processStart, 'launcher')
+  await checkStart(record.apiPid, record.apiProcessStart, 'api')
+  if (Number.isInteger(record.consolePid) && record.consolePid !== record.pid) await checkStart(record.consolePid, record.consoleProcessStart, 'console')
+  if (identityGaps.length > 0) {
+    return {
+      ok: false,
+      status: 'BLOCKED',
+      code: 'unknown_live_resource',
+      message: '登记 PID 缺少可核对的启动身份或已被复用；不发送信号、不删除记录',
+      detail: { gaps: identityGaps.slice(0, 8) },
+      hint: '重新启动该实例以写入完整身份；不要按 PID 猜测结束进程。',
     }
   }
 
