@@ -1,0 +1,68 @@
+{
+  "protocol": "agent-c-wave14-status/1",
+  "wave": "product-wave-14",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "6d24519",
+    "mergeCommit": "f0fe429",
+    "mainProduct": "1453cf2",
+    "previousOwnCommit": "83ac3e1",
+    "earlyCheckpoint": "dfe509b",
+    "middleCheckpoint": "4276cb2",
+    "rootLockDiffPreserved": true
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "actualExportProbes": {
+    "wave14": { "passed": 6, "failed": 0, "report": "/tmp/w14.json", "ownedCopy": "packages/context/reports/wave14-probe.json" },
+    "wave13Regression": { "passed": 6, "failed": 0 },
+    "wave12Regression": { "passed": 8, "failed": 0 },
+    "wave11Regression": { "passed": 17, "failed": 0 }
+  },
+  "closedCounterexamples": [
+    { "id": "OMISSION_SUPPRESSION_SETS_TRUNCATED_AND_TOTAL", "fix": "any suppression (items/bytes/omissions/detail) sets truncated; totals.suppressed sums all three budgets; totals.omitted stays the listed-omission count" },
+    { "id": "REVIEW_REDACTS_DETAIL_Library / custom / Z: / UNC", "fix": "redaction matches any POSIX absolute root, Windows drive paths, UNC shares and file URLs via boundary-aware patterns; relative refs and and/or stay readable" },
+    { "id": "PUBLISHED_ARTIFACT_PROVIDER_NEWEST_FIRST_CONTRACT", "fix": "artifacts sort createdAt desc with artifactId tie-break before the limit; maxIds still bounds lookups, coverage.complete includes limit trimming" }
+  ],
+  "stageOutcomes": {
+    "C1": "done: 6/6 new probe; suppression reaches truncated/totals without conflating omission, trim and not-scanned",
+    "C2": "done: broad path redaction with relative-reference regressions; artifact newest-first + deterministic tie-break; published-id authorization preserved",
+    "C3": "done: factory contracts documented and tested — coverage(), maxScannedMessages=600 production boundary, stable source fingerprints, metadata-only artifacts",
+    "C4": "done (data scope): factories proven inside real composer/manifest with call counts and source ids; main HTTP replacement NOT_TESTED",
+    "C5": "done: reviewVerifiedReplyCandidates requires main CompletedAssistantReplies-verified body and identity; raw bodies/rows/markers refused",
+    "C6": "done: real A18 reply body → verified review yields no_candidates because main stores suggestions=[]; no new confirmation authority, nothing executes",
+    "C7": "done: revocation, expiry, cutoff, mid-walk append, live source edit (frozen history keeps bundleDigest, fresh prepare sees new text), corrupt/unknown replies",
+    "C8": "done: 600-message scan boundary, 10000-message/10000-history/10000-candidate walks, 5000→10000 omission caps, bounded first page reads",
+    "C9": "done: strict/exactOptional typecheck+build across the chain; removed replyResults/replyFor documented with migration to replyReader",
+    "C10": "done: four-suite regression, four probes, status and recipe"
+  },
+  "consumerMap": [
+    { "export": "createScopedConversationProvider", "consumedBy": ["packages/context/test/factory-consumer.case.ts", "packages/context/test/scale.case.ts", "packages/context/test/scoped-adapters.case.ts"], "mainStatus": "pending default wiring" },
+    { "export": "createPublishedArtifactProvider", "consumedBy": ["packages/context/test/factory-consumer.case.ts", "packages/context/test/scoped-adapters.case.ts"], "mainStatus": "pending default wiring" },
+    { "export": "projectSourceReview", "consumedBy": ["wave-14 probe", "packages/context/test/source-review.case.ts", "packages/context/test/scale.case.ts"] },
+    { "export": "selectRelevantSources", "consumedBy": ["packages/context/test/relevance.case.ts", "packages/context/test/scale.case.ts", "wave-13 probe"] },
+    { "export": "collectContextHistory", "consumedBy": ["packages/knowledge/test/main-context-use-consumer.case.ts (real A18 + main CompletedAssistantReplies verification + frozen-after-edit case)"] },
+    { "export": "reviewVerifiedReplyCandidates", "consumedBy": ["packages/proposals/test/reply-candidates.case.ts", "packages/knowledge/test/main-context-use-consumer.case.ts (real completed body)"] }
+  ],
+  "ownedRegressions": {
+    "contextTests": { "passed": 124, "failed": 0 },
+    "proposalsTests": { "passed": 35, "failed": 0 },
+    "knowledgeTests": { "passed": 82, "failed": 0 },
+    "routingTests": { "passed": 44, "failed": 0 },
+    "typecheck": "pass",
+    "build": "pass"
+  },
+  "notTested": [
+    { "item": "main HTTP/runtime using these factories as its default preview adapter", "owner": "main", "reason": "main 1453cf2 still owns its private scoped adapter; C proves composer-level calls, ids and coverage only" },
+    { "item": "candidate review UI and explicit confirmation consumer", "owner": "main", "reason": "main persists suggestions=[] today; verified review correctly returns no_candidates" },
+    { "item": "assistant SSE admission", "owner": "main", "reason": "no SSE read in this consumer" },
+    { "item": "A history work_id derived-column negative", "owner": "A", "reason": "C rechecks query.workId; raw history not broadly admitted" }
+  ],
+  "preserved": {
+    "userServices": "5180/8796 through 5190/8806 untouched",
+    "historicalReports": "wave01-wave13 reports unchanged",
+    "rootLock": "pnpm-lock.yaml diff preserved and not committed"
+  }
+}
