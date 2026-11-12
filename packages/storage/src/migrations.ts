@@ -405,8 +405,28 @@ const V15: Migration = {
   ],
 }
 
+
+/**
+ * v16: append-only assistant context binding audit. One row per command and message, written in the
+ * existing chat/receipt UnitOfWork. The row holds only artifact references and digests; it grants no
+ * tools, sends no request and is not a replayable command.
+ */
+const V16: Migration = {
+  version: 16,
+  name: 'assistant-context-bindings',
+  statements: [
+    `CREATE TABLE assistant_context_bindings (
+      message_id TEXT PRIMARY KEY, command_id TEXT NOT NULL UNIQUE, request_id TEXT NOT NULL,
+      project_id TEXT NOT NULL, conversation_id TEXT NOT NULL, user_text_digest TEXT NOT NULL,
+      principal_user_id TEXT NOT NULL, principal_authority_ref TEXT NOT NULL,
+      bundle_ref TEXT NOT NULL, bundle_digest TEXT NOT NULL,
+      confirmed_at TEXT NOT NULL, expires_at TEXT NOT NULL, value TEXT NOT NULL, digest TEXT NOT NULL)`,
+    `CREATE INDEX assistant_context_bindings_scope ON assistant_context_bindings (project_id, confirmed_at DESC)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15, V16]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>

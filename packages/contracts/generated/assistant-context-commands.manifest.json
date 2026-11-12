@@ -1,0 +1,7 @@
+{
+  "protocol": "assistant-context-command/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "d0571b7a64071535455a68ed2373f4bb6ddbd57290807d79c1d03637abe32135",
+  "sourceHash": "5dc436a16e35083ea90d51cdf9a2233ae7dcd5bf09cf1906a4a60af5ee91bef6"
+}

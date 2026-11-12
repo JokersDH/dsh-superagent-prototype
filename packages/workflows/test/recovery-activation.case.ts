@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { RecoveryActivationIntent, TrustedActor } from '@personal-agent/contracts'
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
-import { ProductStore } from '@personal-agent/storage'
+import { ProductStore, PRODUCT_SCHEMA_VERSION } from '@personal-agent/storage'
 import { RecoveryIntentCommitter } from '../../../apps/coordinator/product/recovery-intents.ts'
 const faultCode = (error: unknown): string | undefined => (error as { error?: { code?: string } } | null)?.error?.code
 import { createWorkflowPorts, WorkflowConflict } from '../src/index.ts'
@@ -176,7 +176,7 @@ test('a v14 database with a legacy plan intent upgrades to v15 without rewriting
 
     const store = new ProductStore({ path })
     try {
-      assert.equal(store.database.productSchema, 15)
+      assert.equal(store.database.productSchema, PRODUCT_SCHEMA_VERSION)
       const legacyRead = store.workflows.recoveryIntents.getByPlan('legacy-plan')!
       assert.deepEqual(legacyRead.plan, legacyPlan, 'the legacy row is still readable as audit evidence')
       assert.equal(legacyRead.authorization, 'not_granted')
