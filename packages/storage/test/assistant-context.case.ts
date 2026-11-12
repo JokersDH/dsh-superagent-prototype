@@ -227,6 +227,15 @@ test('a v16 binding database upgrades append-only to v17/v18 and keeps its rows 
     )
     legacy.prepare("INSERT INTO command_receipts (command_id, payload_digest, status, seq, result, recorded_at) VALUES ('old-command', ?, 'recorded', 1, 'null', ?)")
       .run(digest('a'), value.confirmedAt)
+    const message = { id: 'old-message-2', conversationId: 'conv-1', projectId: 'proj-1', role: 'user',
+      provenance: 'trusted_user', text: 'legacy alpha message', sourceRefs: [], createdAt: value.confirmedAt }
+    legacy.prepare("INSERT INTO conversations (id, project_id, title, title_revision, created_at, updated_at) VALUES ('conv-1', 'proj-1', 'Legacy', 1, ?, ?)")
+      .run(value.confirmedAt, value.confirmedAt)
+    legacy.prepare('INSERT INTO conversation_members (conversation_id, project_id) VALUES (?, ?)').run('conv-1', 'proj-1')
+    legacy.prepare('INSERT INTO conversation_messages (conversation_id, sequence, id, value, created_at) VALUES (?, ?, ?, ?, ?)')
+      .run('conv-1', 1, message.id, JSON.stringify(message), value.confirmedAt)
+    legacy.prepare('INSERT INTO conversation_search (conversation_id, message_id, title, text) VALUES (?, ?, ?, ?)')
+      .run('conv-1', message.id, '', message.text)
     legacy.close()
 
     const upgraded = new ProductStore({ path })
@@ -236,6 +245,9 @@ test('a v16 binding database upgrades append-only to v17/v18 and keeps its rows 
       assert.deepEqual(upgraded.workflows.assistant.contextBindings.forCommand('old-command'), value)
       assert.equal(upgraded.commands.get('old-command')?.payloadDigest, digest('a'))
       assert.equal(upgraded.workflows.assistant.contextHistory.page({ projectIds: ['proj-1'] }).records[0]?.messageId, 'old-message')
+      const hits = upgraded.workflows.conversations.search({ query: 'legacy', projectIds: ['proj-1'] }).hits
+      assert.equal(hits[0]?.conversation.id, 'conv-1')
+      assert.match(hits[0]?.excerpt ?? '', /legacy alpha/)
       assert.equal(upgraded.workflows.assistant.replyResults.forRequest('old-request'), undefined)
       assert.deepEqual(upgraded.database.checkIntegrity(), { integrity: 'ok', foreignKeyViolations: 0 })
     } finally { upgraded.close() }

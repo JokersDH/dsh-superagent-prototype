@@ -152,3 +152,39 @@ test('5000 bindings page with a bounded index plan and stable results', () => {
     assert.ok(pageMs < 1000, `first page took ${pageMs.toFixed(0)}ms`)
   } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
 })
+
+
+test('a derived work_id that disagrees with the immutable body is never returned as another work', () => {
+  const f = fixture()
+  try {
+    f.store.workflows.assistant.contextBindings.put(binding({ messageId: 'work-message', workId: 'actual-work',
+      confirmedAt: at(30), bundleRef: f.artifact.id, bundleDigest: f.artifact.digest }))
+    f.store.db.prepare("UPDATE assistant_context_bindings SET work_id = 'foreign-work' WHERE message_id = 'work-message'").run()
+    const history = f.store.workflows.assistant.contextHistory
+    assert.throws(() => history.page({ projectIds: ['project-1'], workId: 'foreign-work' }))
+    assert.deepEqual(history.page({ projectIds: ['project-1'], workId: 'actual-work' }).records, [])
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+
+  const g = fixture()
+  try {
+    g.store.workflows.assistant.contextBindings.put(binding({ messageId: 'null-work', confirmedAt: at(31), bundleRef: g.artifact.id, bundleDigest: g.artifact.digest }))
+    g.store.db.prepare("UPDATE assistant_context_bindings SET work_id = 'foreign-work' WHERE message_id = 'null-work'").run()
+    assert.throws(() => g.store.workflows.assistant.contextHistory.page({ projectIds: ['project-1'], workId: 'foreign-work' }))
+  } finally { g.store.close(); rmSync(g.root, { recursive: true, force: true }) }
+})
+
+test('a page between an older cursor and newly inserted bindings neither duplicates nor drops older rows', () => {
+  const f = fixture()
+  try {
+    f.store.uow.atomic(() => {
+      for (const [index, messageId] of ['old-1', 'old-2', 'old-3', 'old-4'].entries())
+        f.store.workflows.assistant.contextBindings.put(binding({ messageId, confirmedAt: at(40 + index), bundleRef: f.artifact.id, bundleDigest: f.artifact.digest }))
+    })
+    const history = f.store.workflows.assistant.contextHistory
+    const first = history.page({ projectIds: ['project-1'], limit: 2 })
+    f.store.workflows.assistant.contextBindings.put(binding({ messageId: 'new-5', confirmedAt: at(50), bundleRef: f.artifact.id, bundleDigest: f.artifact.digest }))
+    const second = history.page({ projectIds: ['project-1'], limit: 2, cursor: first.nextCursor! })
+    assert.deepEqual(second.records.map(record => record.messageId), ['old-2', 'old-1'])
+    assert.equal(second.hasMore, false)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})

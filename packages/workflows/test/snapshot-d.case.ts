@@ -6,11 +6,14 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import Database from 'better-sqlite3'
 import { ProductStore, PRODUCT_SCHEMA_VERSION, recoveryTargetInventory, verifyDatabase } from '@personal-agent/storage'
 import { createWorkflowPorts, WorkflowSnapshots } from '../src/index.ts'
+import { CompletedAssistantReplies } from '../../../apps/coordinator/product/assistant-reply-results.ts'
+import { key } from '../../../packages/orchestrator-core/src/core/ids.ts'
 
 const at = '2026-11-11T00:00:00.000Z'
 const scope = { projectId: 'project-1', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
@@ -93,15 +96,18 @@ function dataset() {
     machineDigest: 'f'.repeat(64), resourcePolicyDigest: 'a'.repeat(64),
     createdAt: at, expiresAt: '2026-11-11T00:05:00.000Z',
   })
-  const replyBody = store.artifacts.write(new TextEncoder().encode('{"reply":"completed"}'))
+  const replyRequestId = key('assistant-request', 'message-1'), replyMessageId = key('assistant-reply', 'message-1')
+  const replyBodyValue = { protocol: 'assistant-reply-body/1', projectId: 'project-1', conversationId: 'conversation-1',
+    sourceMessageId: 'message-1', replyMessageId, model: 'mock-model', text: 'completed', suggestions: [] }
+  const replyBody = store.artifacts.write(new TextEncoder().encode(JSON.stringify(replyBodyValue)))
   store.artifacts.insert(replyBody)
-  store.commands.record('reply-request-1', 'a'.repeat(64), () => ({ kind: 'assistant-inference/1',
+  store.commands.record(replyRequestId, 'a'.repeat(64), () => ({ kind: 'assistant-inference/1',
     input: { messageId: 'message-1', conversationId: 'conversation-1', projectId: 'project-1' }, model: 'mock-model' }))
-  ports.assistant.replyResults.put({ protocol: 'assistant-reply-result/1', requestId: 'reply-request-1',
-    requestDigest: 'a'.repeat(64), sourceMessageId: 'message-1', replyMessageId: 'reply-message-1',
+  ports.assistant.replyResults.put({ protocol: 'assistant-reply-result/1', requestId: replyRequestId,
+    requestDigest: 'a'.repeat(64), sourceMessageId: 'message-1', replyMessageId,
     projectId: 'project-1', conversationId: 'conversation-1', principal: { userId: 'user-1', authorityRef: 'authority-1' },
     model: 'mock-model', artifactRef: replyBody.id, artifactDigest: replyBody.digest,
-    textDigest: 'a'.repeat(64), recordedAt: at })
+    textDigest: createHash('sha256').update('completed').digest('hex'), recordedAt: at })
   const bundle = store.artifacts.write(new TextEncoder().encode('{"context":"bounded"}'))
   store.artifacts.insert(bundle)
   ports.assistant.contextBindings.put({
@@ -113,7 +119,7 @@ function dataset() {
     sources: [{ sourceId: 'message-1', kind: 'conversation_message', sourceDigest: 'e'.repeat(64), previewDigest: 'e'.repeat(64), truncated: false }],
     confirmedAt: at, expiresAt: '2026-11-11T00:04:00.000Z',
   })
-  return { root, store, ports, patch, report, bundle, replyBody }
+  return { root, store, ports, patch, report, bundle, replyBody, replyRequestId, replyMessageId }
 }
 
 test('schema-13 snapshot includes decisions/settings/contracts/verification/outcome and restores readably', async () => {
@@ -158,6 +164,14 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
     assert.equal(inventory.issues.includes('business_rows_present'), true)
     assert.equal(inventory.startupAvailable, false)
 
+    // A main consumer reads the restored non-empty reply body without contacting a provider.
+    const restoredStore = new ProductStore({ path: join(restored, 'product.sqlite') })
+    try {
+      const consumer = new CompletedAssistantReplies(restoredStore, restoredStore.workflows.assistant.replyResults,
+        { userId: 'user-1', authorityRef: 'authority-1' }, () => ['project-1'])
+      assert.equal(consumer.read(data.replyRequestId)?.text, 'completed')
+    } finally { restoredStore.close() }
+
     const db = new Database(join(restored, 'product.sqlite'), { readonly: true, fileMustExist: true })
     try {
       const decision = JSON.parse(String((db.prepare("SELECT value FROM user_decision_versions WHERE id = 'decision-1'").get() as { value: string }).value))
@@ -172,9 +186,9 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
       assert.equal(outcome.reviewTiming.readyToAcceptanceMs, 100000)
       assert.equal(outcome.reviewTiming.activeReviewMs, 5000)
       assert.equal((db.prepare("SELECT COUNT(*) AS n FROM review_evidence WHERE id = 'review-1'").get() as { n: number }).n, 1)
-      const restoredReply = JSON.parse(String((db.prepare("SELECT value FROM assistant_reply_results WHERE request_id = 'reply-request-1'").get() as { value: string }).value))
+      const restoredReply = JSON.parse(String((db.prepare("SELECT value FROM assistant_reply_results WHERE request_id = ?").get(data.replyRequestId) as { value: string }).value))
       assert.equal(restoredReply.artifactRef, data.replyBody.id)
-      assert.equal(restoredReply.replyMessageId, 'reply-message-1')
+      assert.equal(restoredReply.replyMessageId, data.replyMessageId)
       const restoredBinding = JSON.parse(String((db.prepare("SELECT value FROM assistant_context_bindings WHERE message_id = 'message-1'").get() as { value: string }).value))
       assert.equal(restoredBinding.bundleRef, data.bundle.id)
       assert.equal(restoredBinding.purpose, 'conversation_discussion')
@@ -288,9 +302,9 @@ test('missing file, changed bytes and a newer schema make the snapshot unusable'
     const replyTamperDb = join(replyTamperDir, 'product.sqlite')
     const replyTamper = new Database(replyTamperDb)
     try {
-      const row = replyTamper.prepare("SELECT value FROM assistant_reply_results WHERE request_id = 'reply-request-1'").get() as { value: string }
-      replyTamper.prepare("UPDATE assistant_reply_results SET value = ?, text_digest = ? WHERE request_id = 'reply-request-1'")
-        .run(JSON.stringify({ ...JSON.parse(row.value), textDigest: '9'.repeat(64) }), '9'.repeat(64))
+      const row = replyTamper.prepare("SELECT value FROM assistant_reply_results WHERE request_id = ?").get(data.replyRequestId) as { value: string }
+      replyTamper.prepare("UPDATE assistant_reply_results SET value = ?, text_digest = ? WHERE request_id = ?")
+        .run(JSON.stringify({ ...JSON.parse(row.value), textDigest: '9'.repeat(64) }), '9'.repeat(64), data.replyRequestId)
     } finally { replyTamper.close() }
     const replyTamperManifestPath = join(replyTamperDir, 'snapshot.json')
     const replyTamperManifest = JSON.parse(readFileSync(replyTamperManifestPath, 'utf8'))

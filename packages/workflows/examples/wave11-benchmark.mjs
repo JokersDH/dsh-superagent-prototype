@@ -36,7 +36,7 @@ const messages = await measure(() => store.uow.atomic(() => {
 report.cases.push({ case: 'long-conversation', rows: 2000, insertMs: messages.ms })
 
 const bindings = await measure(() => store.uow.atomic(() => {
-  for (let index = 0; index < 5000; index += 1) {
+  for (let index = 0; index < 10000; index += 1) {
     const minute = index % 60, hour = Math.floor(index / 60) % 24
     store.workflows.assistant.contextBindings.put({
       protocol: 'assistant-context-binding/1', commandId: `bench-command-${index}`, messageId: `bench-message-${String(index).padStart(5, '0')}`,
@@ -51,12 +51,15 @@ const bindings = await measure(() => store.uow.atomic(() => {
     })
   }
 }))
-report.cases.push({ case: '5000-context-bindings', rows: 5000, insertMs: bindings.ms })
+report.cases.push({ case: '10000-context-bindings', rows: 10000, insertMs: bindings.ms })
 
 const history = createWorkflowPorts(store).assistant.contextHistory
 const page = await measure(() => history.page({ projectIds: ['project-1'], limit: 100 }))
 report.cases.push({ case: 'history-first-page', rows: page.value.records.length, hasMore: page.value.hasMore, ms: page.ms })
-const lookup = await measure(() => history.bundleStatus('bench-message-04999'))
+const plan = store.db.prepare(`EXPLAIN QUERY PLAN SELECT * FROM assistant_context_bindings
+  WHERE project_id IN (?) ORDER BY confirmed_at DESC, message_id DESC LIMIT 101`).all('project-1')
+report.cases.push({ case: 'history-query-plan', plan: plan.map(row => row.detail) })
+const lookup = await measure(() => history.bundleStatus('bench-message-09999'))
 report.cases.push({ case: 'bundle-lookup', present: lookup.value.present, digestMatches: lookup.value.digestMatches, bytes: lookup.value.bytes, ms: lookup.ms })
 const source = await measure(() => store.workflows.recoverySource.inspect())
 report.cases.push({ case: 'recovery-source-20000-row-window', coverage: source.value.coverage, families: source.value.families.length,
@@ -68,11 +71,11 @@ report.cases.push({ case: 'snapshot-create', status: snapshot.value.status, data
   artifacts: snapshot.value.manifest.artifacts.length, evidenceFamilies: snapshot.value.manifest.evidence.families.length, ms: snapshot.ms })
 const verify = await measure(() => new WorkflowSnapshots(store).verify(snapshotDir))
 report.cases.push({ case: 'snapshot-verify', status: verify.value.status, ms: verify.ms })
-report.limits = { maxRows: 20000, maxHistoryPage: 100, maxReplyBodyBytes: 524288, maxBindingsTested: 5000 }
+report.limits = { maxRows: 20000, maxHistoryPage: 100, maxReplyBodyBytes: 524288, maxBindingsTested: 10000 }
 report.limitations = ['Temporary database and content-addressed artifact only; no user state, model/native send or cleanup-policy test.',
   'Timings are single-process wall clock on this host, not a service SLO.']
 store.close()
 rmSync(temp, { recursive: true, force: true })
-const out = resolve('packages/workflows/reports/wave11-performance.json')
+const out = resolve('packages/workflows/reports/wave12-performance.json')
 writeFileSync(out, JSON.stringify(report, null, 2) + '\n')
 console.log(JSON.stringify(report, null, 2))

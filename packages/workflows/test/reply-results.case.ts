@@ -147,6 +147,10 @@ test('main CompletedAssistantReplies consumes the real A port and recovers acros
       const recovered = new CompletedAssistantReplies(reopened, reopened.workflows.assistant.replyResults, principal, () => ['project-1'])
       assert.equal(recovered.read(requestId)?.text, 'Durable completed reply.')
       assert.equal(reopened.workflows.assistant.replyResults.forRequest(requestId)?.requestDigest, reopened.commands.get(requestId)?.payloadDigest)
+      const foreign = new CompletedAssistantReplies(reopened, reopened.workflows.assistant.replyResults,
+        { userId: 'other-user', authorityRef: 'other-authority' }, () => ['project-1'])
+      assert.throws(() => foreign.read(requestId))
+      assert.throws(() => foreign.save(requestId, { text: 'must not save', model: 'mock-model' }))
     } finally { reopened.close() }
   } finally { rmSync(f.root, { recursive: true, force: true }) }
 })

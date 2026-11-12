@@ -32,6 +32,8 @@ function fixture() {
 const commit = (store: ProductStore, value = intent()) => new RecoveryIntentCommitter(
   store, store.workflows.recoveryActivations, principal, () => {}, () => at,
 ).commit(value, actor)
+const commitAt = (store: ProductStore, index: number) => commit(store, intent({ activationId: `activation-${index}`,
+  commandId: `recovery-command-${index}`, planId: `plan-${index}` }))
 
 test('an empty current source is complete and exposes no startup authority', () => {
   const f = fixture()
@@ -159,4 +161,71 @@ test('unknown, missing and future schema states are unsupported, never an empty 
     assert.equal(future.productSchema, 99)
     assert.equal(future.sourceFingerprint, null)
   } finally { g.store.close(); rmSync(g.root, { recursive: true, force: true }) }
+})
+
+
+test('an excluded activation at the head, middle or tail does not consume the family lookahead', () => {
+  const f = fixture()
+  try {
+    const before = commitAt(f.store, 0)
+    for (let index = 1; index <= 5; index += 1) commitAt(f.store, index)
+    const tail = f.store.workflows.recoverySource.inspect({ ignoreCommitted: before, maxRowsPerFamily: 5 })
+    const tailFamily = tail.families.find(family => family.name === 'recovery_activations')
+    assert.equal(tailFamily?.rows, 5)
+    assert.equal(tailFamily?.truncated, false, 'the excluded head does not consume the activation lookahead')
+
+    const head = commitAt(f.store, 6)
+    const headPage = f.store.workflows.recoverySource.inspect({ ignoreCommitted: head, maxRowsPerFamily: 5 })
+    assert.equal(headPage.coverage, 'bounded', 'six non-excluded activations exceed a five-row cap')
+    assert.equal(headPage.families.find(family => family.name === 'recovery_activations')?.truncated, true)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+
+  const g = fixture()
+  try {
+    commitAt(g.store, 1); commitAt(g.store, 2)
+    const middle = commitAt(g.store, 3)
+    commitAt(g.store, 4); commitAt(g.store, 5); commitAt(g.store, 6)
+    const page = g.store.workflows.recoverySource.inspect({ ignoreCommitted: middle, maxRowsPerFamily: 5 })
+    const family = page.families.find(value => value.name === 'recovery_activations')
+    assert.equal(family?.rows, 5)
+    assert.equal(family?.truncated, false, 'an excluded middle row is skipped without losing the tail')
+  } finally { g.store.close(); rmSync(g.root, { recursive: true, force: true }) }
+})
+
+test('total and per-family boundaries are bounded, never complete with a dropped tail', () => {
+  const f = fixture()
+  try {
+    for (let index = 0; index < 6; index += 1) commitAt(f.store, index)
+    const perFamily = f.store.workflows.recoverySource.inspect({ maxRowsPerFamily: 5, maxRows: 1000 })
+    assert.equal(perFamily.coverage, 'bounded')
+    assert.equal(perFamily.sourceFingerprint, null)
+    const total = f.store.workflows.recoverySource.inspect({ maxRows: 5, maxRowsPerFamily: 1000 })
+    assert.equal(total.coverage, 'bounded')
+    assert.equal(total.sourceFingerprint, null)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
+
+test('a later identical intent event is a new change and cannot be excluded', () => {
+  const f = fixture()
+  try {
+    const committed = commit(f.store)
+    const before = f.store.workflows.recoverySource.inspect({ ignoreCommitted: committed })
+    f.store.events.append({ topic: 'application.recovery.intent', entityRef: committed.intent.activationId, payload: committed.intent })
+    const after = f.store.workflows.recoverySource.inspect({ ignoreCommitted: committed })
+    assert.equal(after.coverage, 'complete')
+    assert.notEqual(after.sourceFingerprint, before.sourceFingerprint)
+    assert.ok(after.observedEventCursor > before.observedEventCursor)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
+
+test('a commit from a second real connection is visible to the next snapshot', () => {
+  const f = fixture()
+  try {
+    const before = f.store.workflows.recoverySource.inspect().sourceFingerprint
+    const other = new ProductStore({ path: f.path })
+    try {
+      other.product.works.insert({ id: 'other-connection', projectId: 'project-1', conversationId: 'conversation-1', title: 'Second connection', createdAt: at })
+    } finally { other.close() }
+    assert.notEqual(f.store.workflows.recoverySource.inspect().sourceFingerprint, before)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
 })

@@ -22,7 +22,7 @@ const DEFAULT_MAX_ROWS_PER_FAMILY = 10000
 
 /** Logical families: every necessary business/resource/queue row plus the stable writer identity. */
 const FAMILIES = [
-  'coordinator_instances', 'writer_claim', 'trigger', 'disposition', 'thread', 'ticket', 'decision',
+  'schema_meta', 'coordinator_instances', 'writer_claim', 'trigger', 'disposition', 'thread', 'ticket', 'decision',
   'trigger_thread', 'effect', 'dispatch_receipts', 'channel_receipts', 'answers', 'answer_deliveries',
   'command_receipts', 'fact_receipts', 'event_log', 'artifacts', 'ingress_payloads',
   'runtime_bindings', 'runtime_current', 'runtime_authority', 'runtime_observations', 'resource_observations',
@@ -42,6 +42,7 @@ interface Exclusions {
   activationId: string
   commandId: string
   receiptSeq: number
+  intentEventSeq: number
   recoveryPayloadDigest: string
 }
 
@@ -75,7 +76,8 @@ function excluded(table: string, row: Row, exclusions: Exclusions | undefined): 
   if (table === 'event_log') {
     const seq = Number(row.seq)
     if (seq === exclusions.receiptSeq && String(row.topic) === 'command' && String(row.entity_ref) === exclusions.commandId) return true
-    return String(row.topic) === 'application.recovery.intent' && String(row.entity_ref) === exclusions.activationId &&
+    return seq === exclusions.intentEventSeq && String(row.topic) === 'application.recovery.intent' &&
+      String(row.entity_ref) === exclusions.activationId &&
       shaPayload(row.payload === null ? null : String(row.payload)) === exclusions.recoveryPayloadDigest
   }
   return false
@@ -119,16 +121,23 @@ export class RecoverySourceStore implements RecoverySourceReader {
     const commandEvent = this.db.prepare('SELECT * FROM event_log WHERE seq = ?').get(commit.sourceReceipt.seq) as Row | undefined
     if (!commandEvent || String(commandEvent.topic) !== 'command' || String(commandEvent.entity_ref) !== commit.intent.commandId)
       throw new WorkflowConflict('Recovery confirmation exclusion does not match the original command event')
-    const intentEvent = this.db.prepare("SELECT * FROM event_log WHERE topic = 'application.recovery.intent' AND entity_ref = ?")
-      .get(commit.intent.activationId) as Row | undefined
-    if (!intentEvent || String(intentEvent.payload) !== JSON.stringify(commit.intent))
-      throw new WorkflowConflict('Recovery confirmation exclusion does not match the exact intent event')
+    // The committer appends exactly one intent event inside the receipt's apply, immediately before
+    // commands.record appends its command event. Bind that exact preceding sequence; a later event
+    // with the same body is a new change and must stay visible.
+    const intentEventSeq = commit.sourceReceipt.seq - 1
+    const intentEvent = this.db.prepare('SELECT * FROM event_log WHERE seq = ?').get(intentEventSeq) as Row | undefined
+    if (!intentEvent || String(intentEvent.topic) !== 'application.recovery.intent' ||
+      String(intentEvent.entity_ref) !== commit.intent.activationId ||
+      String(intentEvent.payload) !== JSON.stringify(commit.intent))
+      throw new WorkflowConflict('Recovery confirmation exclusion does not match the exact single intent event')
     return { activationId: commit.intent.activationId, commandId: commit.intent.commandId,
-      receiptSeq: commit.sourceReceipt.seq, recoveryPayloadDigest: digest(commit.intent) }
+      receiptSeq: commit.sourceReceipt.seq, intentEventSeq, recoveryPayloadDigest: digest(commit.intent) }
   }
 
   inspect(input: RecoverySourceCheckpointQuery = {}): RecoverySourceCheckpoint {
     const query = RecoverySourceCheckpointQuerySchema.parse(input)
+    // Validation, schema inventory and every family read share one SQLite read transaction.
+    return this.db.transaction(() => {
     const exclusions = this.exclusionsFor(query.ignoreCommitted)
     const maxRows = query.maxRows ?? DEFAULT_MAX_ROWS, perFamily = query.maxRowsPerFamily ?? DEFAULT_MAX_ROWS_PER_FAMILY
     const issues = new Set<RecoverySourceCheckpoint['issues'][number]>()
@@ -141,19 +150,29 @@ export class RecoverySourceStore implements RecoverySourceReader {
     const observedEventCursor = Number((this.db.prepare('SELECT IFNULL(MAX(seq), 0) AS seq FROM event_log').get() as Row).seq)
     const families: { name: string; rows: number; digest: string; truncated: boolean }[] = []
     let total = 0, truncated = false, readable = schema === PRODUCT_SCHEMA_VERSION
-    const scan = this.db.transaction(() => {
+    {
       for (const name of FAMILIES) {
         if (!present.has(name)) {
           families.push({ name, rows: 0, digest: sha(''), truncated: false })
           continue
         }
-        const rows = this.db.prepare(`SELECT * FROM ${name} ORDER BY rowid LIMIT ${perFamily + 1}`).all() as Row[]
+        // Excluded rows do not consume the per-family lookahead: keep scanning until the next real
+        // row is found or the table ends, so a tail behind an exclusion is never silently dropped.
         const kept: string[] = []
-        for (const row of rows) {
-          if (excluded(name, row, exclusions)) continue
-          kept.push(rowText(name, row))
+        let bounded = false, cursorRowId = -1
+        while (!bounded) {
+          const batch = this.db.prepare(`SELECT rowid AS __pa_rid, * FROM ${name} WHERE rowid > ? ORDER BY rowid LIMIT ${perFamily + 1}`)
+            .all(cursorRowId) as Row[]
+          if (!batch.length) break
+          for (const row of batch) {
+            cursorRowId = Number(row.__pa_rid)
+            delete row.__pa_rid
+            if (excluded(name, row, exclusions)) continue
+            kept.push(rowText(name, row))
+            if (kept.length > perFamily) { bounded = true; break }
+          }
         }
-        const bounded = kept.length > perFamily, keptBounded = bounded ? kept.slice(0, perFamily) : kept
+        const keptBounded = bounded ? kept.slice(0, perFamily) : kept
         if (bounded) { truncated = true; issues.add('scan_bounded') }
         if (total + keptBounded.length > maxRows) { truncated = true; issues.add('scan_bounded') }
         const allowed = Math.max(0, maxRows - total)
@@ -163,8 +182,7 @@ export class RecoverySourceStore implements RecoverySourceReader {
         use.sort()
         families.push({ name, rows: use.length, digest: sha(use.join('\n')), truncated: bounded || use.length < keptBounded.length })
       }
-    })
-    scan()
+    }
     if (truncated || issues.has('scan_bounded')) readable = false
     if (issues.has('unsupported_schema') || issues.has('unknown_table') || issues.has('missing_table')) readable = false
     const unsupported = issues.has('unsupported_schema') || issues.has('unknown_table') || issues.has('missing_table')
@@ -181,5 +199,6 @@ export class RecoverySourceStore implements RecoverySourceReader {
       volatileFieldsIgnored: ['coordinator_instances.heartbeat_at'],
       issues: [...issues], startupAvailable: false,
     })
+    })()
   }
 }

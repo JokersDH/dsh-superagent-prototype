@@ -11,6 +11,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ProductStore } from '@personal-agent/storage'
 import { key } from '../../../packages/orchestrator-core/src/core/ids.ts'
+import { CompletedAssistantReplies } from '../../../apps/coordinator/product/assistant-reply-results.ts'
 
 const fixture = join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'reply-crash.mjs')
 const messageId = 'crash-source', replyId = key('assistant-reply', messageId), requestId = key('assistant-request', messageId)
@@ -26,13 +27,17 @@ function recover(path: string) {
   const store = new ProductStore({ path })
   const result = store.workflows.assistant.replyResults.forRequest(requestId)
   let appended = 0
-  // A consumer may append the stable reply once; it never calls the provider when a result exists.
-  if (result && !store.product.messages.getById(replyId)) {
+  // The real consumer reads the original bounded body from the registered artifact; recovery never
+  // fabricates replacement text and never calls the provider when a result exists.
+  const consumer = new CompletedAssistantReplies(store, store.workflows.assistant.replyResults,
+    { userId: 'user-1', authorityRef: 'authority-1' }, () => ['project-1'])
+  const recovered = result ? consumer.read(requestId) : undefined
+  if (recovered && !store.product.messages.getById(replyId)) {
     store.product.messages.append({ id: replyId, conversationId: 'conversation-1', projectId: 'project-1', role: 'assistant',
-      provenance: 'reasoner_reply', text: 're-covered', sourceRefs: [messageId], createdAt: '2026-11-12T00:00:01.000Z' })
+      provenance: 'reasoner_reply', text: recovered.text, sourceRefs: [messageId], createdAt: '2026-11-12T00:00:01.000Z' })
     appended += 1
   }
-  return { store, result, appended }
+  return { store, result, recovered, appended }
 }
 
 test('SIGKILL after the before-send receipt but before the result leaves only an unknown request', () => {
@@ -50,9 +55,10 @@ test('SIGKILL after the before-send receipt but before the result leaves only an
 test('SIGKILL after the result commit recovers once without another model send', () => {
   const { root, path } = crash('after-result')
   try {
-    const { store, result, appended } = recover(path)
+    const { store, result, recovered, appended } = recover(path)
     try {
       assert.equal(result?.replyMessageId, replyId)
+      assert.equal(recovered?.text, 'Completed before the crash.')
       assert.equal(appended, 1)
       assert.equal(store.product.messages.page('conversation-1').messages.filter(message => message.id === replyId).length, 1)
       assert.equal(store.workflows.assistant.replyResults.forRequest(requestId)?.artifactRef, result?.artifactRef)
