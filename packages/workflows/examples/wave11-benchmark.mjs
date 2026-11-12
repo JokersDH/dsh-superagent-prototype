@@ -76,6 +76,6 @@ report.limitations = ['Temporary database and content-addressed artifact only; n
   'Timings are single-process wall clock on this host, not a service SLO.']
 store.close()
 rmSync(temp, { recursive: true, force: true })
-const out = resolve('packages/workflows/reports/wave12-performance.json')
+const out = resolve('packages/workflows/reports/wave13-performance.json')
 writeFileSync(out, JSON.stringify(report, null, 2) + '\n')
 console.log(JSON.stringify(report, null, 2))

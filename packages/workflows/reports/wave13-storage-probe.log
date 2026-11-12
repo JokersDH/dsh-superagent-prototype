@@ -1,0 +1,56 @@
+{
+  "protocol": "wave13-a-admission/1",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-a",
+  "source": "565fef0482f374f55c8cd06fb4d67aa583eec2cb",
+  "cases": [
+    {
+      "id": "NORMAL_BUSINESS_ROW_POSITIVE_CONTROL",
+      "status": "PASS",
+      "observation": {
+        "rejected": false,
+        "coverage": "complete",
+        "fingerprintChanged": true,
+        "ignoredConfirmation": {
+          "activationId": "activation",
+          "commandId": "command",
+          "receiptSeq": 2
+        }
+      }
+    },
+    {
+      "id": "NEGATIVE_ROWID_MUST_NOT_DISAPPEAR_FROM_A_COMPLETE_SOURCE",
+      "status": "PASS",
+      "observation": {
+        "rejected": false,
+        "coverage": "complete",
+        "fingerprintChanged": true,
+        "ignoredConfirmation": {
+          "activationId": "activation",
+          "commandId": "command",
+          "receiptSeq": 2
+        }
+      }
+    },
+    {
+      "id": "IGNORED_ACTIVATION_INDEX_MUST_MATCH_ITS_IMMUTABLE_BODY",
+      "status": "PASS",
+      "observation": {
+        "rejected": true,
+        "fingerprintChanged": true
+      }
+    },
+    {
+      "id": "IGNORED_COMMAND_EVENT_MUST_RETAIN_ITS_ORIGINAL_RECORDED_BODY",
+      "status": "PASS",
+      "observation": {
+        "rejected": true,
+        "fingerprintChanged": true
+      }
+    }
+  ],
+  "passed": 4,
+  "failed": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "candidate logical recovery source only; isolated temporary SQLite; no startup authority"
+}

@@ -1,0 +1,172 @@
+{
+  "status": "PASS_CROSS_SOURCE_RECOVERY_PREPARATION_CONSUMER",
+  "command": [
+    "node",
+    "tests/integration/recovery-target-d-consumer.mjs",
+    "/Users/hh/Desktop/joker/superagent-agent-d"
+  ],
+  "checkedAt": "2026-11-12T10:26:48.359Z",
+  "exitCode": 0,
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-d",
+  "sourceCommit": "b4fb24a3d328078b311a1094f8f82b25dd217f8e",
+  "sourceWorktreeClean": false,
+  "sourceHashes": {
+    "packages/portability/src/recovery-target.ts": "4ea451c9489fc6debc21621857203090ab1ec75b61b532bcab49cb393be38479",
+    "packages/portability/src/errors.ts": "5b8758a64fec72d62450c6833331a091638283239f19f5513f1e3e210bbdbdc9"
+  },
+  "mainSourceCommit": "565fef0482f374f55c8cd06fb4d67aa583eec2cb",
+  "testedMainSourcesClean": true,
+  "testedMainSourceHashes": {
+    "apps/coordinator/product/recovery-target-service.ts": "05bcbb22bf3a029cba3b7cf39b07e6771ed17f74510cee8298e2d2c9a5a34513",
+    "apps/coordinator/product/recovery-target-initializer.ts": "5c5b46ea65d53ef1050ca3f046804111d787333cf79e1f1cc3f39a429f9ca008",
+    "apps/coordinator/product/recovery-intents.ts": "4a55555e6fecf5f489cab6c2f43a334b680e4ced5f58b9c1cc9212752291900c",
+    "packages/storage/src/target-inventory.ts": "38e30ec66f5300b5b4048ee0a1659a5daf510b65e87acb8ae5d392db2bef24e4",
+    "packages/storage/src/migrations.ts": "080651b4fa8fc29bb149fe222b7fb755df98264a3d9a467f095e4ac0ada1ecec",
+    "packages/contracts/src/recovery-target.ts": "26d407147d463c1246b9c360e5688b8ba6f5cdee984bd49ac4003b500d0d182c",
+    "tests/integration/recovery-target-d-consumer.mjs": "0f118be0be55b2ede00852ea171be148c1fec8b7584b39d43b650eb8e1339950"
+  },
+  "productSchema": 18,
+  "cases": [
+    {
+      "id": "ACTUAL_D_PREPARE_MAIN_INITIALIZER_A_COMPLETE_EMPTY_INVENTORY",
+      "status": "PASS",
+      "observation": {
+        "step": "inventory_complete",
+        "productSchema": 18,
+        "tableCount": 53,
+        "initializedOnce": true,
+        "materialReadableAfterInitialization": true,
+        "sourceDataAndDatabaseBytesUnchanged": true,
+        "startupAvailable": false,
+        "authorization": "not_granted"
+      }
+    },
+    {
+      "id": "ACTUAL_MATERIAL_AND_TARGET_REPLAY_AFTER_SOURCE_REOPEN_DO_NOT_REINITIALIZE",
+      "status": "PASS",
+      "observation": {
+        "repeatedStep": "inventory_complete",
+        "reopenedStep": "inventory_complete",
+        "initializeCount": 1,
+        "sourceHistoryUnchanged": true
+      }
+    },
+    {
+      "id": "ACTUAL_D_STAGING_DISCARD_REFUSES_INITIALIZED_DATABASE",
+      "status": "PASS",
+      "observation": {
+        "refusedCode": "target_not_staging",
+        "databaseAndMaterialPreserved": true
+      }
+    },
+    {
+      "id": "EXPIRED_SOURCE_REFUSES_PREPARATION_BUT_REMAINS_INERT_AUDIT",
+      "status": "PASS",
+      "observation": {
+        "preparationRefusedBeforeTargetCreation": true,
+        "auditStep": "blocked",
+        "startupAvailable": false
+      }
+    },
+    {
+      "id": "CONFIGURATION_DRIFT_REFUSES_AT_MAIN_AND_ACTUAL_D_BEFORE_TARGET_CREATION",
+      "status": "PASS",
+      "observation": {
+        "mainRefusedCode": "conflict",
+        "materializerRefusedCode": "target_identity_mismatch",
+        "targetCreated": false
+      }
+    },
+    {
+      "id": "ACTUAL_A_RESIDUAL_BUSINESS_INVENTORY_BLOCKS_WITHOUT_REINITIALIZATION",
+      "status": "PASS",
+      "observation": {
+        "step": "blocked",
+        "residueObserved": true,
+        "initializeCount": 0,
+        "targetBytesPreserved": true,
+        "startupAvailable": false
+      }
+    },
+    {
+      "id": "CANDIDATE_AND_MAIN_TESTED_SOURCE_SNAPSHOTS_STAY_FIXED",
+      "status": "PASS",
+      "observation": {
+        "candidateSourceUnchanged": true,
+        "mainTestedSourceUnchanged": true
+      }
+    }
+  ],
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "limitations": [
+    "Cross-source production-port composition: D TypeScript loads from its candidate checkout; it is not copied into main or a distributable artifact.",
+    "Main source facts/receipts, exclusive target initialization and A readonly target inventory are actual production implementations.",
+    "Current-source validation checks real temporary marker/root/configuration identity only; it does not establish real machine/profile/physical-resource or activation admission.",
+    "The target path follows the D port rule trustedParent/activationId. All databases and filesystem mutations are isolated temporary resources.",
+    "No launcher stop, installed artifact, model/native request, user service or target startup is exercised; startup availability remains false."
+  ]
+}
+✔ tests/integration/recovery-target-d-consumer.mjs (550.521667ms)
+✔ target preparation and audit require authentication and exact browser write origin (57.412459ms)
+✔ strict target DTO accepts no caller actor, raw source, authority or query overrides (15.588667ms)
+✔ normal mode and absent configured ports cannot prepare; the readonly mutation exception is exact (14.572833ms)
+✔ explicit restored preparation initializes one real exclusive target; lost response replay and audit leave source unchanged (82.845875ms)
+✔ audit 404, response identity and ungrantable status are enforced at the actual HTTP boundary (26.3685ms)
+✔ fixture source identity revalidation rejects changed marker before database creation; expired records remain readonly audit (17.079583ms)
+✔ exclusive initialization uses the production schema with no business queues or writer claim (32.493834ms)
+✔ foreign, partial and symlinked targets are never opened, migrated or overwritten (3.3205ms)
+✔ non-private or wrong-schema material is rejected before database creation (0.750584ms)
+✔ production source/receipt and a real new empty Store prepare without source changes or startup authority (68.549291ms)
+▶ actor, unconfirmed fact, source-root and configuration refusals happen before filesystem ports
+  ✔ actor (11.694792ms)
+  ✔ unconfirmed (10.152167ms)
+  ✔ source_root (14.575042ms)
+  ✔ configuration (17.281542ms)
+  ✔ expired (14.522833ms)
+  ✔ missing (19.741791ms)
+✔ actor, unconfirmed fact, source-root and configuration refusals happen before filesystem ports (88.685292ms)
+▶ source/receipt drift, fresh validation failure and expiry after every awaited preparation phase refuse
+  ✔ prepare:receipt (21.277708ms)
+  ✔ prepare:expiry (23.0345ms)
+  ✔ prepare:validation (16.5725ms)
+  ✔ readback:receipt (13.248709ms)
+  ✔ readback:expiry (19.390333ms)
+  ✔ readback:validation (20.563167ms)
+  ✔ initialize:receipt (19.018625ms)
+  ✔ initialize:expiry (32.974125ms)
+  ✔ initialize:validation (23.931834ms)
+✔ source/receipt drift, fresh validation failure and expiry after every awaited preparation phase refuse (190.855958ms)
+▶ material protocol, exact subject and stable readback refuse before initializing a target
+  ✔ prefixed_digest (10.527542ms)
+  ✔ wrong_root (12.201125ms)
+  ✔ wrong_generation (12.962167ms)
+  ✔ wrong_intent (14.372333ms)
+  ✔ readback_changed (10.616ms)
+✔ material protocol, exact subject and stable readback refuse before initializing a target (61.119958ms)
+▶ incomplete, unsafe, wrong-schema and business-residual targets stay blocked without initialization
+  ✔ bounded (22.138709ms)
+  ✔ unsafe (21.999084ms)
+  ✔ wrong_schema (21.227125ms)
+  ✔ business (21.571417ms)
+  ✔ empty_tables (20.889125ms)
+✔ incomplete, unsafe, wrong-schema and business-residual targets stay blocked without initialization (108.33925ms)
+✔ lost initialization result is auditable and a repeat uses the completed database without initializing twice (22.299166ms)
+✔ simultaneous same-body preparation shares one initialization; caller mutation cannot change the result (18.789792ms)
+✔ read stays audit-only for absent, material-only, expired and changed material state (12.718542ms)
+✔ source transactions and asynchronous revalidation callbacks are refused (8.155458ms)
+✔ a rejected thenable source callback is observed and cannot begin target preparation (13.598083ms)
+✔ a configured root cannot substitute for the actual source Store root (8.23125ms)
+▶ port failures remain inspectable blocked outcomes and do not initialize unknown material
+  ✔ prepare (8.056375ms)
+  ✔ readback (9.21275ms)
+  ✔ inventory (9.402542ms)
+✔ port failures remain inspectable blocked outcomes and do not initialize unknown material (26.908209ms)
+ℹ tests 50
+ℹ suites 0
+ℹ pass 50
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 782.825125
