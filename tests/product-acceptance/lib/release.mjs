@@ -778,7 +778,9 @@ export function evaluateRelease({
       const item = byId.get(id)
       if (!item) continue
       const subject = item.evidence?.subject ?? item.evidence?.frozenScope?.artifact ??
-        item.evidence?.currentInstall?.subject ?? item.evidence?.upgradeFaults?.subject
+        item.evidence?.currentInstall?.subject ?? item.evidence?.upgradeFaults?.subject ??
+        item.evidence?.ownershipCopy?.subject ?? item.evidence?.installedContext?.subject ??
+        item.evidence?.backupContextReply?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
