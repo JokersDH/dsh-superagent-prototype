@@ -1,0 +1,26 @@
+{
+  "protocol": "wave11-main-integration/1",
+  "date": "2026-11-12",
+  "source": "31ddd2658e96bfbe9084d8ffe6e16020dabca321",
+  "dispatchSource": "d6303b3",
+  "contractSource": "98a50ca",
+  "scope": "completed-reply-consumer-and-pinned-provider-request",
+  "checks": {
+    "assistantAndContextCases": { "passed": 71, "failed": 0, "exitCode": 0 },
+    "productTypecheck": { "exitCode": 0 },
+    "diffCheck": { "exitCode": 0 },
+    "existingApiHealth": { "ports": [8796, 8797, 8798, 8799, 8800, 8801, 8802, 8803, 8804], "statuses": [200, 200, 200, 200, 200, 200, 200, 200, 200] }
+  },
+  "resultPort": {
+    "productionPath": "store.workflows.assistant.replyResults",
+    "fixture": "afterCommit in-process Map, not durable recovery",
+    "productionImplementation": "NOT_TESTED",
+    "crossProcessRecovery": "NOT_TESTED"
+  },
+  "currentPreview": { "url": "http://127.0.0.1:5188/", "productSource": "4140cac", "schema": 16, "restarted": false },
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "oldLedgersPreserved": true,
+  "targetActivation": "NOT_IMPLEMENTED",
+  "currentSourceInstallation": "NOT_TESTED"
+}

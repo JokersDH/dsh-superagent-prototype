@@ -7,7 +7,7 @@
 ```text
 继续第十一轮A长整包，工作目录 /Users/hh/Desktop/joker/superagent-agent-a，原分支 codex/g2-workspaces-verification。
 保留现有改动，fetch并合并最新origin/main，读AGENTS.md、agent-tasks/product-wave-11/README.zh-CN.md、agent-a-data.zh-CN.md和WP-16/0035。完整执行A1–A10，不在早期检查点停止。
-重点是三个main已发布的真实port：恢复源逻辑快照（排除精确本笔确认，其他变化必见）、上下文历史keyset、已完成回复结果持久化；再完成新引用/备份/迁移/真实跨进程故障与规模验证。SQL和append-only迁移只有你写，HTTP/provider/启动授权由main写。
+重点是三个main已发布的真实port：恢复源逻辑快照（排除精确本笔确认，其他变化必见）、上下文历史keyset、已完成回复结果持久化；再完成新引用/备份/迁移/真实跨进程故障与规模验证。main31ddd26已交完成回复真实消费者，读WP-16/0036并用真实A port替换明确fixture验证。SQL和append-only迁移只有你写，HTTP/provider/启动授权由main写。
 阶段1–2、4–6、最终各交可运行source并push原分支，随后继续。缺外部入口只阻断对应消费者，转做packet独立队列；模型/native0，不改旧迁移、不清ledger、不触碰九组用户实例。最终交exact source/命令/exit/证据/限制和main消费者步骤。
 ```
 
@@ -44,5 +44,5 @@
 继续第十一轮E独立验收长整包，工作目录 /Users/hh/Desktop/joker/superagent-agent-e，原分支 codex/g3-product-acceptance。
 保留现有改动/runs，fetch并合并最新origin/main，读AGENTS.md、本轮README、agent-e-acceptance.zh-CN.md和WP-16/0035，连续执行E1–E10。
 先用独立断言验当前main context-use/真实A SQL/HTTP/SSE/mock-provider、到期/guard/unknown/replay/多tab与日常工作流；再消费D准确当前字节做personal安装、跨state stop、backup/restore、managed upgrade/recover/rollback和真实故障窗口。去掉硬编码未发布和旧schema假设，旧tar结果保留原scope。
-新回复恢复/候选/activation未到只标对应NOT_TESTED，继续独立队列和有上限场景稳定性，不循环等、不放松断言、不改生产。早期/中期/最终交source-bound结果，只push原分支；真实模型/native0，费用unknown/旧ledger与九组用户服务保留。
+main31ddd26与WP-16/0036已提供完成回复消费者，可先测组合边界；真实A结果表未到只标持久恢复NOT_TESTED，不能把进程内Map fixture当持久性。候选/activation缺依赖时继续独立队列和有上限场景稳定性，不循环等、不放松断言、不改生产。早期/中期/最终交source-bound结果，只push原分支；真实模型/native0，费用unknown/旧ledger与九组用户服务保留。
 ```
