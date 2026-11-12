@@ -26,6 +26,8 @@ export interface ConfigurationSource {
   proposalsAvailable?: boolean
   contextPreviewAvailable?: boolean
   assistantContextAvailable?: boolean
+  contextHistoryAvailable?: boolean
+  contextSourcesAvailable?: boolean
 }
 
 /** The runtime supplies the actual admission list; a probe result alone never grants dispatch. */
@@ -73,6 +75,8 @@ export function applicationConfiguration(source: ConfigurationSource, now = Date
     ...(source.decisionsAvailable !== undefined ? { decisionsAvailable: source.decisionsAvailable } : {}),
     ...(source.proposalsAvailable !== undefined ? { proposalsAvailable: source.proposalsAvailable } : {}),
     ...(source.contextPreviewAvailable !== undefined ? { contextPreviewAvailable: source.contextPreviewAvailable } : {}),
-    ...(source.assistantContextAvailable !== undefined ? { assistantContextAvailable: source.assistantContextAvailable } : {}) }
+    ...(source.assistantContextAvailable !== undefined ? { assistantContextAvailable: source.assistantContextAvailable } : {}),
+    ...(source.contextHistoryAvailable !== undefined ? { contextHistoryAvailable: source.contextHistoryAvailable } : {}),
+    ...(source.contextSourcesAvailable !== undefined ? { contextSourcesAvailable: source.contextSourcesAvailable } : {}) }
   return ApplicationConfigurationSchema.parse({ ...body, revision: canonicalDigest(JSON.parse(JSON.stringify(body))) })
 }

@@ -1,0 +1,7 @@
+{
+  "protocol": "context-records/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "6899d40f16cf5b5fbea411372bd334460c4746a3f46c0158a18ea8e4c0b61005",
+  "sourceHash": "792e8b8d3eb5b6d6ded0cb3764566819171359db163df5e03d0435ec0ab3389b"
+}

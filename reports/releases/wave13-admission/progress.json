@@ -1,0 +1,149 @@
+{
+  "protocol": "product-completion-estimate/1",
+  "date": "2026-11-12",
+  "productSource": "e1e0c97a6fba3fbf5124fa3eb24fddb8b302c105",
+  "method": "Weighted deliverables, engineering estimate; not test-pass ratio, elapsed effort or release authorization",
+  "stableAlpha": {
+    "rawScore": 69,
+    "totalWeight": 100,
+    "roundedEstimatePercent": 70,
+    "engineeringRangePercent": [
+      65,
+      75
+    ],
+    "deliverables": [
+      {
+        "id": "conversation",
+        "name": "主对话、流式与日常工作台",
+        "weight": 8,
+        "completed": 8,
+        "evidence": "真实HTTP/SSE、模型配置、桌面/手机、上下文历史/原文已接通"
+      },
+      {
+        "id": "projects",
+        "name": "项目导入、目录与设置版本",
+        "weight": 7,
+        "completed": 7,
+        "evidence": "本机Git项目、持久会话/搜索、设置/归档等已有实际消费者"
+      },
+      {
+        "id": "work-contract",
+        "name": "委托与版本化合同",
+        "weight": 8,
+        "completed": 8,
+        "evidence": "明确确认、scope/criteria/profile、修订与旧版本守卫已接通"
+      },
+      {
+        "id": "workspace",
+        "name": "隔离工作区与依赖准备",
+        "weight": 8,
+        "completed": 7,
+        "evidence": "真实worktree/冻结、Node和普通单包pnpm离线缓存已验证；适用范围有限"
+      },
+      {
+        "id": "delivery",
+        "name": "机器检查、补丁与人工验收",
+        "weight": 10,
+        "completed": 9,
+        "evidence": "真实Codex正常交付链曾通过；当前验证/接受/导出已有回归"
+      },
+      {
+        "id": "questions",
+        "name": "提问、回答与运行控制",
+        "weight": 10,
+        "completed": 6,
+        "evidence": "Broker/逐target协议与产品界面存在；原生审批/steer/运行中停止覆盖不全"
+      },
+      {
+        "id": "durability",
+        "name": "回执、回复结果与审计持久化",
+        "weight": 10,
+        "completed": 8,
+        "evidence": "A18真实SQL、消息结果SIGKILL恢复、历史来源与原请求核对已验证"
+      },
+      {
+        "id": "active-recovery",
+        "name": "活动任务恢复与物理资源屏障",
+        "weight": 10,
+        "completed": 4,
+        "evidence": "部分认证/屏障通过；B最新测试仍未覆盖真实产品命令恢复"
+      },
+      {
+        "id": "restore",
+        "name": "非空备份、搬根与新授权",
+        "weight": 8,
+        "completed": 4,
+        "evidence": "备份/数据恢复分范围通过；源baseline/目标授权激活未闭合"
+      },
+      {
+        "id": "distribution",
+        "name": "当前个人安装、升级与多实例",
+        "weight": 10,
+        "completed": 4,
+        "evidence": "有真实schema18闭包字节；D所有权P1和当前主线安装验收未过"
+      },
+      {
+        "id": "release-proof",
+        "name": "独立当前版本验收与稳定性",
+        "weight": 8,
+        "completed": 3,
+        "evidence": "E已独立验证A18回复恢复；发布必测集与当前tar/48h场景未齐"
+      },
+      {
+        "id": "readiness",
+        "name": "无执行器退化与接入收口",
+        "weight": 3,
+        "completed": 1,
+        "evidence": "私有配置/部分诊断存在；缺Codex或版本不符仍会影响启动"
+      }
+    ]
+  },
+  "fullSchemeB": {
+    "rawScore": 50.8,
+    "roundedEstimatePercent": 50,
+    "engineeringRangePercent": [
+      45,
+      55
+    ],
+    "groups": [
+      {
+        "id": "stable-alpha",
+        "name": "首期稳定内测",
+        "weight": 70,
+        "completion": 69
+      },
+      {
+        "id": "multi-protocol",
+        "name": "多协议扩展",
+        "weight": 15,
+        "completion": 10
+      },
+      {
+        "id": "innovation-value",
+        "name": "创新收益验证",
+        "weight": 10,
+        "completion": 10
+      },
+      {
+        "id": "cac",
+        "name": "CAC与高级协作",
+        "weight": 5,
+        "completion": 0
+      }
+    ],
+    "notes": [
+      "Multi-protocol credit covers interfaces only; no second real protocol admitted",
+      "Innovation credit covers experiment preparation only; measured benefit is unproven",
+      "Desktop shell and shared cloud hosting are not added to this denominator"
+    ]
+  },
+  "releaseApproved": false,
+  "hardGates": [
+    "D legacy/config/PID-start/unknown-inventory ownership",
+    "B actual production create_work/queue/Runner/question/answer recovery",
+    "E mandatory case set and exact current artifact acceptance",
+    "main no-executor readiness and restore source/target authorization"
+  ],
+  "realModelTurnsThisAudit": 0,
+  "nativeTurnStartsThisAudit": 0
+}

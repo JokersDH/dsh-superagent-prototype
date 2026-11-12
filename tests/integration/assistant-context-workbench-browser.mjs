@@ -76,7 +76,7 @@ try {
   await vite.listen(); browser = await chromium.launch()
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'zh-CN' }), page = await context.newPage()
   page.setDefaultTimeout(10000); page.on('pageerror', error => errors.push(error.message))
-  const dialog = page.getByRole('dialog', { name: '上下文预览', exact: true })
+  const dialog = page.locator('dialog.context-workspace')
   const open = async () => { await page.getByRole('button', { name: '上下文预览', exact: true }).click(); await dialog.waitFor() }
   const prepare = async () => {
     const response = page.waitForResponse(result => result.url().endsWith('/v1/assistant/context/prepare') && result.request().method() === 'POST')
@@ -106,7 +106,7 @@ try {
   })
   await check('DESKTOP-AND-MOBILE-CONFIRMATION-AND-SOURCE-DETAIL-FIT', async () => {
     const source = dialog.locator('.context-source').first()
-    await source.locator('summary').click()
+    await source.locator(':scope > summary').click()
     for (const [name, width, height] of [['desktop', 1440, 900], ['mobile', 390, 844]]) {
       await page.setViewportSize({ width, height }); await page.evaluate(() => document.fonts.ready)
       await dialog.evaluate(element => { element.scrollTop = 0 })
@@ -136,10 +136,10 @@ try {
   await check('MESSAGE-AUDIT-COMES-FROM-THE-ACTUAL-BINDING', async () => {
     const article = page.locator('.message.role-user').filter({ hasText: '请结合当前工作说明兼容性要求。' })
     await article.locator('.message-context-audit > summary').click()
-    await article.locator('.message-context-audit li').first().waitFor()
+    await article.getByRole('region', { name: '原始上下文内容' }).waitFor()
     const user = users().find(message => message.text === '请结合当前工作说明兼容性要求。')
     const binding = store.workflows.assistant.contextBindings.forMessage(user.id)
-    assert.equal(await article.locator('.message-context-audit li').count(), binding.sources.length)
+    assert.equal(await article.locator('.context-frozen-sources > .context-source-list > .context-source').count(), binding.sources.length)
     assert.ok((await article.locator('.message-context-audit').textContent()).includes(binding.sources[0].previewDigest))
   })
   await check('EDITED-MODAL-MESSAGE-DOES-NOT-CLEAR-A-DIFFERENT-COMPOSER-DRAFT', async () => {
@@ -150,15 +150,19 @@ try {
     await product.execution.effects.idle('application.assistant.reply')
   })
   await check('LOST-RESPONSE-RELOAD-RECONCILES-THE-ORIGINAL-COMMAND-AFTER-EXPIRY', async () => {
+    await product.execution.effects.idle()
     await open(); await dialog.getByRole('textbox', { name: '上下文消息', exact: true }).fill('核对原请求，不重复生成。')
     await prepare()
     const sent = []
+    let firstReceipt
     await page.route('**/v1/assistant/context/send', async route => {
       sent.push(route.request().postDataJSON())
-      if (sent.length === 1) { const response = await route.fetch(); assert.equal((await response.json()).status, 'recorded'); await route.abort() }
+      if (sent.length === 1) { const response = await route.fetch(); firstReceipt = await response.json(); await route.abort() }
       else await route.continue()
     })
     await dialog.getByRole('button', { name: '确认发送', exact: true }).click()
+    await dialog.getByRole('button', { name: '核对原请求', exact: true }).waitFor()
+    assert.equal(firstReceipt?.status, 'recorded', JSON.stringify(firstReceipt))
     await dialog.getByText('原请求待核对', { exact: true }).waitFor()
     await product.execution.effects.idle('application.assistant.reply')
     const calls = requests.length, messages = users().length

@@ -197,10 +197,10 @@ const report = { status: failed ? 'FAIL_CANDIDATE_SCOPED_EXPORT_ADMISSION' : 'PA
   unrelatedLockDiffPreserved: git(['status', '--porcelain', '--', 'pnpm-lock.yaml']) !== '',
   sourceHashes: Object.fromEntries(sourceFiles.map(path => [path, hash(readFileSync(join(candidate, path)))])),
   checkedAt: new Date().toISOString(), exitCode: failed ? 1 : 0, passed: cases.length - failed, failed, cases,
-  independentOwnedTests: { context: { passed: 78, exitCode: 0 }, proposals: { passed: 26, exitCode: 0 },
+  historicalIndependentOwnedTests: { context: { passed: 78, exitCode: 0 }, proposals: { passed: 26, exitCode: 0 },
     knowledge: { passed: 75, exitCode: 0 }, contextTypecheck: { exitCode: 0 }, proposalsTypecheck: { exitCode: 0 }, contextBuild: { exitCode: 0 },
     historicalGrant: { passed: 4, exitCode: 0 }, historicalGroupBinding: { passed: 2, notTestedHelperRemoved: 1, exitCode: 1 } },
-  sourceReferences: {
+  historicalSourceReferences: {
     conversationQuestionAndWorkAnchors: 'packages/context/src/scoped-adapters.ts:118',
     conversationRoleProvenance: 'packages/context/src/scoped-adapters.ts:122',
     artifactLookupBudget: 'packages/context/src/scoped-adapters.ts:208',
@@ -218,6 +218,6 @@ const report = { status: failed ? 'FAIL_CANDIDATE_SCOPED_EXPORT_ADMISSION' : 'PA
     'Artifact identity sets are trusted caller inputs; tests do not ask this adapter to infer ownership from a global registry.',
     'Only this new probe and its own report are written; unrelated candidate lockfile changes are preserved.',
   ] }
-const output = join(repository, 'reports/releases/wave11-admission/context.json')
+const output = process.env.PA_ADMISSION_REPORT ? resolve(process.env.PA_ADMISSION_REPORT) : join(repository, 'reports/releases/wave11-admission/context.json')
 mkdirSync(dirname(output), { recursive: true }); writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`)
 console.log(JSON.stringify(report, null, 2)); process.exitCode = report.exitCode

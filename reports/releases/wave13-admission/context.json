@@ -1,0 +1,115 @@
+{
+  "sourceCommit": "667bf74a118597369e050ea3f17b932a4b0e5666",
+  "observations": [
+    {
+      "id": "RELEVANCE_NO_TRUSTED_SCOPE_MUST_REFUSE",
+      "status": "FAIL",
+      "observed": {
+        "selected": [
+          "private-decision"
+        ],
+        "complete": true
+      }
+    },
+    {
+      "id": "COMPOSER_SCOPE_MUST_FILTER_DECISION_BODY",
+      "status": "FAIL",
+      "observed": {
+        "grantPaths": [
+          "src"
+        ],
+        "included": [
+          {
+            "path": "decisions/private.json",
+            "includesSecret": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "COMPOSER_MUST_PRESERVE_SCOPED_PROVIDER_INCOMPLETE",
+      "status": "FAIL",
+      "observed": {
+        "providerCoverage": {
+          "scanned": 1,
+          "returned": 1,
+          "complete": false,
+          "excluded": {
+            "otherConversation": 0,
+            "foreignProject": 0,
+            "unprovenProject": 0,
+            "questionAnchor": 0,
+            "otherWork": 0,
+            "permissionDisplay": 0,
+            "systemRole": 0,
+            "untrustedProvenance": 0
+          }
+        },
+        "compositionStatus": "sufficient",
+        "groupStatus": "included",
+        "manifestCoverage": {
+          "complete": true,
+          "groups": [
+            {
+              "name": "conversation",
+              "status": "included"
+            }
+          ],
+          "omitted": 0,
+          "truncated": 0,
+          "budgetClamped": []
+        },
+        "comparison": "unchanged"
+      }
+    },
+    {
+      "id": "HISTORY_MUST_REFUSE_FOREIGN_REPLY_PRINCIPAL",
+      "status": "FAIL",
+      "observed": {
+        "bindingPrincipal": {
+          "userId": "user-1",
+          "authorityRef": "authority-1"
+        },
+        "replyPrincipal": {
+          "userId": "foreign-user",
+          "authorityRef": "foreign-authority"
+        },
+        "attached": {
+          "replyMessageId": "foreign-reply",
+          "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "artifactRef": "arbitrary-artifact",
+          "artifactDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "textDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "model": "foreign-model",
+          "recordedAt": "2026-11-12T00:00:00.000Z"
+        },
+        "mismatchedReplies": 0
+      }
+    },
+    {
+      "id": "SOURCE_REVIEW_OMISSIONS_MUST_BE_BOUNDED",
+      "status": "FAIL",
+      "observed": {
+        "maxItems": 1,
+        "omitted": 5000,
+        "serializedBytes": 365081,
+        "suppressed": {
+          "items": 0,
+          "bytes": 0
+        }
+      }
+    },
+    {
+      "id": "SOURCE_REVIEW_OMISSION_DETAIL_MUST_REDACT_HOST_PATH",
+      "status": "FAIL",
+      "observed": {
+        "first": {
+          "reason": "missing",
+          "detail": "Cannot read /Users/owner/private/0.ts"
+        }
+      }
+    }
+  ],
+  "modelCalls": 0,
+  "nativeTurns": 0
+}

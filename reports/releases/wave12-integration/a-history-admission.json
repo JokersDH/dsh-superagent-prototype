@@ -1,0 +1,57 @@
+{
+  "protocol": "wave12-a-admission/1",
+  "source": "7a8e0995079d2d83b642195ead1a9b9d5658fcad",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-a",
+  "sourceStable": true,
+  "cases": [
+    {
+      "id": "EXACT_OWN_CONFIRMATION_POSITIVE_CONTROL",
+      "status": "PASS",
+      "observation": {
+        "productSchema": 18,
+        "fingerprintUnchanged": true
+      }
+    },
+    {
+      "id": "EXCLUDED_ROW_MUST_NOT_HIDE_A_TAIL_BEYOND_FAMILY_CAP",
+      "status": "PASS",
+      "observation": {
+        "beforeCoverage": "complete",
+        "afterCoverage": "bounded",
+        "actualNonExcludedRows": 6,
+        "cap": 5,
+        "reported": {
+          "name": "recovery_activations",
+          "rows": 5,
+          "digest": "8211a73a5d5adbfd3e2eaed669b531f15723c735c8691a5e9fd0d8309b55e54b",
+          "truncated": true
+        },
+        "fingerprintUnchanged": false
+      }
+    },
+    {
+      "id": "EXCLUSION_MUST_NOT_HIDE_A_SECOND_IDENTICAL_INTENT_EVENT",
+      "status": "PASS",
+      "observation": {
+        "coverage": "complete",
+        "fingerprintUnchanged": false,
+        "observedCursorChanged": true
+      }
+    },
+    {
+      "id": "DERIVED_WORK_INDEX_MUST_AGREE_WITH_IMMUTABLE_BINDING",
+      "status": "PASS",
+      "observation": {
+        "rejected": true,
+        "queryWorkId": "foreign-work"
+      }
+    }
+  ],
+  "counts": {
+    "pass": 4,
+    "fail": 0
+  },
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "new logical source and raw history only; no startup authority; temp SQLite only"
+}
