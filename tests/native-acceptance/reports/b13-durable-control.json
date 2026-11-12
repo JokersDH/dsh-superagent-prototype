@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-11-12T03:46:22.441Z",
+  "generatedAt": "2026-11-12T07:08:52.091Z",
   "environment": {
-    "note": "wave-11 B13 real SQLite and independent-process matrix",
+    "note": "wave-12 B13 product recovery across independent coordinator SIGKILL",
     "modelCalls": 0
   },
   "totals": {
@@ -11,133 +11,228 @@
     "SKIPPED": 0,
     "NOT_TESTED": 1
   },
-  "scope": "controlled process; native NOT_TESTED",
+  "scope": "controlled product; native NOT_TESTED",
   "cases": [
     {
-      "id": "B13-REAL-SQLITE-AND-PROCESS",
-      "title": "a real SQLite file and a real spawned writer process",
+      "id": "B13-PRODUCT-STORE-AND-INDEPENDENT-RUNNER",
+      "title": "the real store and a separate Runner process",
       "lane": "controlled_process",
       "status": "PASS",
       "detail": [
-        "real SQLite (schema 16, WAL, synchronous=FULL) behind a real authenticated runner socket"
+        "a real product database was created and the coordinator died by SIGKILL in its own process, distinct from the Runner"
       ],
       "evidence": [
         {
-          "path": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave11-b13-A6hD2u/product.sqlite",
-          "fileExists": true,
-          "journalMode": "wal",
-          "synchronous": 2,
-          "productSchema": 16,
-          "endpoint": true
+          "coordinatorPid": 79621,
+          "runnerPid": 79611,
+          "storeCreated": true,
+          "crashSignal": "SIGKILL",
+          "separateProcesses": true
         }
       ],
       "entities": []
     },
     {
-      "id": "B13-BEGIN-RECORDED-ONCE",
-      "title": "the begin is durable and cannot be recorded twice",
+      "id": "B13-CRASH-AFTER-BEGIN",
+      "title": "the coordinator is SIGKILLed after-begin and a new process recovers",
       "lane": "controlled_process",
       "status": "PASS",
       "detail": [
-        "the begin is stored once and the duplicate write is refused by the key, not by convention"
+        "recovered from after-begin: attempt identity and epoch intact, one begin receipt, no second begin"
       ],
       "evidence": [
         {
-          "firstInserted": true,
-          "duplicateInserted": false,
-          "beginRows": 1
+          "crashSignal": "SIGKILL",
+          "crashWindow": "after-begin",
+          "recovered": {
+            "found": [
+              {
+                "id": "cmd-begin",
+                "seq": 1
+              },
+              {
+                "id": "cmd-question-1",
+                "seq": null
+              },
+              {
+                "id": "cmd-answer-1",
+                "seq": null
+              },
+              {
+                "id": "cmd-stop",
+                "seq": null
+              }
+            ],
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "runnerState": "serving",
+            "runnerAdmission": "open",
+            "writer": "active",
+            "coverage": "complete_owned_resources"
+          }
         }
       ],
       "entities": []
     },
     {
-      "id": "B13-STOP-PERSISTS-WRITER-STATE",
-      "title": "a stop is recorded and the writer reports quiescence",
+      "id": "B13-CRASH-AFTER-QUESTION",
+      "title": "the coordinator is SIGKILLed after-question and a new process recovers",
       "lane": "controlled_process",
       "status": "PASS",
       "detail": [
-        "the writer process reported quiescent after the stop, and the stop is durable"
+        "recovered from after-question: attempt identity and epoch intact, one begin receipt, no second begin"
       ],
       "evidence": [
         {
-          "state": "terminated",
-          "admission": "closed",
-          "coverage": "complete_owned_resources",
-          "writerQuiescent": true
+          "crashSignal": "SIGKILL",
+          "crashWindow": "after-question",
+          "recovered": {
+            "found": [
+              {
+                "id": "cmd-begin",
+                "seq": 1
+              },
+              {
+                "id": "cmd-question-1",
+                "seq": 2
+              },
+              {
+                "id": "cmd-answer-1",
+                "seq": null
+              },
+              {
+                "id": "cmd-stop",
+                "seq": null
+              }
+            ],
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "runnerState": "serving",
+            "runnerAdmission": "open",
+            "writer": "active",
+            "coverage": "complete_owned_resources"
+          }
         }
       ],
       "entities": []
     },
     {
-      "id": "B13-SIGKILL-THEN-REBUILD-SAME-SQLITE",
-      "title": "a fresh process reads the same file after the writer is killed",
+      "id": "B13-CRASH-AFTER-ANSWER",
+      "title": "the coordinator is SIGKILLed after-answer and a new process recovers",
       "lane": "controlled_process",
       "status": "PASS",
       "detail": [
-        "the file survived SIGKILL: 2 command(s) and epoch high-water 7 intact with attempt identity preserved"
+        "recovered from after-answer: attempt identity and epoch intact, one begin receipt, no second begin"
       ],
       "evidence": [
         {
-          "killed": {
-            "code": null,
-            "signal": "SIGKILL"
-          },
-          "commandsBefore": 2,
-          "commandsAfter": 2,
-          "epochBefore": 7,
-          "epochAfter": 7,
-          "identityIntact": true
+          "crashSignal": "SIGKILL",
+          "crashWindow": "after-answer",
+          "recovered": {
+            "found": [
+              {
+                "id": "cmd-begin",
+                "seq": 1
+              },
+              {
+                "id": "cmd-question-1",
+                "seq": 2
+              },
+              {
+                "id": "cmd-answer-1",
+                "seq": 3
+              },
+              {
+                "id": "cmd-stop",
+                "seq": null
+              }
+            ],
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "runnerState": "serving",
+            "runnerAdmission": "open",
+            "writer": "active",
+            "coverage": "complete_owned_resources"
+          }
         }
       ],
       "entities": []
     },
     {
-      "id": "B13-EPOCH-HIGH-WATER-MONOTONIC",
-      "title": "the epoch high-water never goes backwards across reopen",
+      "id": "B13-CRASH-AFTER-STOP-ACK",
+      "title": "the coordinator is SIGKILLed after-stop-ack and a new process recovers",
       "lane": "controlled_process",
       "status": "PASS",
       "detail": [
-        "a lower epoch cannot lower the stored high-water, and a higher one raises it"
+        "recovered from after-stop-ack: attempt identity and epoch intact, one begin receipt, no second begin"
       ],
       "evidence": [
         {
-          "afterLowerAttempt": 7,
-          "afterRaise": 9
+          "crashSignal": "SIGKILL",
+          "crashWindow": "after-stop-ack",
+          "recovered": {
+            "found": [
+              {
+                "id": "cmd-begin",
+                "seq": 1
+              },
+              {
+                "id": "cmd-question-1",
+                "seq": 2
+              },
+              {
+                "id": "cmd-answer-1",
+                "seq": 3
+              },
+              {
+                "id": "cmd-stop",
+                "seq": null
+              }
+            ],
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "runnerState": "terminated",
+            "runnerAdmission": "closed",
+            "writer": "quiescent",
+            "coverage": "complete_owned_resources"
+          }
         }
       ],
       "entities": []
     },
     {
-      "id": "B13-DUPLICATE-BEGIN-AFTER-REBUILD",
-      "title": "a post-rebuild begin attempt is still refused",
+      "id": "B13-STOP-UNKNOWN-NOT-RESENT-BY-RECOVERY",
+      "title": "an unrecorded stop is reported unknown rather than resent",
       "lane": "controlled_process",
       "status": "PASS",
       "detail": [
-        "the rebuilt process cannot append a second begin for the same command identity"
+        "the recovered process reports the Runner terminated without fabricating a stop receipt for a command it never recorded"
       ],
       "evidence": [
         {
-          "replayInserted": false,
-          "beginRows": 1
+          "stopReceiptSeq": null,
+          "runnerState": "terminated",
+          "writer": "quiescent"
         }
       ],
       "entities": []
     },
     {
       "id": "B13-SCOPE-NOT-NATIVE",
-      "title": "this is controlled-process evidence, not vendor behaviour",
+      "title": "controlled-product evidence, not vendor behaviour",
       "lane": "controlled_process",
       "status": "NOT_TESTED",
       "detail": [
-        "an installed vendor agent was not executed; Driver behaviour here is a fixture scenario"
+        "an installed vendor agent was not executed; the Driver scenario is a fixture"
       ],
       "evidence": [
         {
-          "driver": "fixture scenario (happy)",
-          "realVendorAgent": false,
-          "realSqlite": true,
-          "realChildProcess": true,
-          "realSigkill": true
+          "driver": "fixture scenario",
+          "realStore": true,
+          "independentRunnerProcess": true,
+          "independentCoordinatorProcess": true,
+          "realSigkill": true,
+          "realVendorAgent": false
         }
       ],
       "entities": []

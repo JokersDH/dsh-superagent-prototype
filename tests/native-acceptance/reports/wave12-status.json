@@ -1,0 +1,190 @@
+{
+  "wave": "product-wave-12",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "b466bc7",
+  "mergeCommit": "c5ec182",
+  "checkpoint": "3a116d9",
+  "previousCandidate": "b4e2031",
+  "packet": "agent-tasks/product-wave-11/agent-b-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0035",
+  "scopeNote": "Zero model and native turns. No fee/recipe or B9 research, no new Driver, no second ledger, no second database. wave03-b-native cap4 remainder stays UNKNOWN and unspendable; E's pilot grant untouched; nine user instances preserved.",
+  "B1": {
+    "status": "PASS",
+    "label": "non-model input refused before reserving; private paths redacted",
+    "fixed": [
+      "a top-level function or symbol skipped the clone test via a typeof short-circuit and reached reserve/send",
+      "identity.binary and identity.versionError leaked a caller-selected absolute path, and user-facing reasons quoted it"
+    ],
+    "method": "only null/undefined/string/finite number/boolean pass through; function, symbol and bigint refuse before admission, reservation or transport; binary carries the bare name when a name was given and [redacted] when a path was",
+    "probe": {
+      "command": "node tools/bootstrap/probe-wave12-runtime.mjs <B-root>",
+      "cases": "3/3 PASS"
+    }
+  },
+  "B2": {
+    "status": "PASS",
+    "label": "structural executable resolution and redacted diagnostics",
+    "shellRemoved": "`sh -c command -v <name>` is gone; tokenization lost a valid operator-selected path containing spaces and would also mangle non-ASCII names",
+    "structuralLookup": "an absolute or slash-containing selection is used verbatim; a bare name is joined against each PATH entry and tested; every candidate is recorded so a failure is diagnosable",
+    "symlinkHandling": "the executability test follows symlinks, because a symlink to the real binary is a legitimate operator selection",
+    "versionFromResolvedFile": "the version probe runs the resolved absolute path, so the reported version and the reported digest describe the same file",
+    "redaction": "the candidate path list is removed from the public projection because it contains PATH entries that can include a home directory; only the count is kept, and full paths stay behind includePrivate",
+    "readOnlyScope": "no account reset, no global tool upgrade, no network, no model"
+  },
+  "B3": {
+    "status": "PASS",
+    "label": "authenticated proof and current resource consumer unchanged",
+    "singleProof": "VerifiedRunnerInspection through the one WeakMap in recovery-transport.ts; no second registry was created",
+    "rules": [
+      "serving is not a release",
+      "closed admission required",
+      "coverage must be complete",
+      "attempt identity comes from the proof",
+      "proof freshness enforced",
+      "plain JSON, an empty resource set and an old state never release the barrier"
+    ],
+    "evidence": "packages/execution/test/resource-facts.test.ts (21 cases) plus probe case PLAIN_RESOURCE_JSON_HAS_NO_RELEASE_AUTHORITY"
+  },
+  "B4": {
+    "status": "PASS",
+    "label": "B/E refusal protocol agreed on the flat envelope",
+    "actualEEnvelope": "guardedSend calls send({ protocolVersion, reservationId, ...turn }); the version and reservation id are TOP-level, not nested in an admission descriptor",
+    "moduleEntry": "review-sender.ts send() takes that flat shape, echoes reservationId back, and refuses with status no_send for want of an owned transport and a measured bound rather than reporting an entry mismatch",
+    "stillCovered": [
+      "clone failure refuses before reserve and transport",
+      "a swapped transport method has no effect",
+      "concurrent token consumption sends at most once",
+      "an unknown outcome does not refund the token"
+    ],
+    "defaultZeroSends": "with no bound the default path still sends nothing and refreshes nothing"
+  },
+  "B5": {
+    "status": "PASS",
+    "label": "real SQLite and an independent writer process",
+    "substrate": {
+      "database": "A's ProductDatabase on a temp file",
+      "productSchema": 16,
+      "journalMode": "wal",
+      "synchronous": "FULL",
+      "writer": "real spawned runner-service child process behind a real authenticated socket"
+    },
+    "evidence": "tests/native-acceptance/b13-durable-control.mjs (6 PASS + 1 NOT_TESTED)",
+    "b12Corrected": "b12 is relabelled as an IN-MEMORY control matrix that does not demonstrate durable recovery; it opens no database, fsyncs nothing and kills no process, so its no-duplicate-begin result was an artefact of not calling begin twice"
+  },
+  "B6": {
+    "status": "PASS",
+    "label": "SIGKILL then rebuild from the same SQLite file",
+    "boundaries": [
+      "the duplicate begin is refused by the primary key rather than by convention",
+      "the file is reopened through a genuinely new connection after SIGKILL",
+      "command rows, attempt identity and epoch high-water all survive",
+      "a post-rebuild duplicate begin is still refused"
+    ],
+    "epoch": "a lower epoch cannot lower the stored high-water and a higher one raises it"
+  },
+  "B7": {
+    "status": "PARTIAL",
+    "label": "epoch persistence proven; unknown-send reconciliation not",
+    "proven": "epoch high-water is durable and monotonic across a real SIGKILL and a real reopen of the same file",
+    "notProven": [
+      "an old proof releasing a new attempt was covered only in-process by b12, not across a real process boundary",
+      "old native RPC ids were not re-pointed at a new session",
+      "no cross-process coordinator restart was driven"
+    ],
+    "rfcNeed": "a cross-process coordinator epoch store would be needed to close the remaining rows; none was invented and no second database was created"
+  },
+  "B8": {
+    "status": "NOT_REACHED",
+    "label": "main target prepare/activation consumption",
+    "note": "not started in this pass; no claim is made"
+  },
+  "B9": {
+    "status": "NOT_REACHED",
+    "label": "multi-slot queue, output caps and resumable degradation",
+    "note": "not started in this pass; no claim is made"
+  },
+  "B10": {
+    "status": "PASS",
+    "label": "regression and composable handoff",
+    "layers": {
+      "mainProbe": "11/11 PASS, PASS_SCOPED_B_HELPER_ADMISSION",
+      "strict": "0 diagnostics, including exactOptionalPropertyTypes",
+      "ownedTests": {
+        "driver-kit": "65/65",
+        "execution": "21/21"
+      },
+      "inProcessMatrix": {
+        "b11": "10 PASS + 1 NOT_TESTED",
+        "b12": "6 PASS + 1 NOT_TESTED"
+      },
+      "realSubstrateMatrix": {
+        "b13": "6 PASS + 1 NOT_TESTED"
+      },
+      "native": "NOT_TESTED - no vendor agent executed"
+    }
+  },
+  "budget": {
+    "grants": [
+      {
+        "grantId": "wave03-b-native",
+        "limit": 4,
+        "attributionState": "UNVERIFIED",
+        "remainder": "UNKNOWN",
+        "maySendReal": false
+      },
+      {
+        "grantId": "wave05-independent-review-pilot-01",
+        "limit": 24,
+        "owner": "E",
+        "bConsumes": false,
+        "touchedThisWave": false
+      }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+  "preservedConclusions": {
+    "boundedRecipe": "NO_SUPPORTED_BOUNDED_RECIPE",
+    "dossier": "tests/native-acceptance/reports/wave07-b4-bound-dossier.md",
+    "reinvestigated": false
+  },
+  "limitations": [
+    "b13 uses the real store and real separate processes but a FIXTURE driver scenario; no installed vendor agent was executed",
+    "answer/steer against a real vendor turn and unknown-send reconciliation remain untested",
+    "multi-slot queue, output caps, backpressure and FD/child/queue return-to-baseline are not covered",
+    "B8 (main target prepare/activation consumption) was not started"
+  ],
+  "nextConsumerSteps": {
+    "main": "the four modules compile under --strict plus exactOptionalPropertyTypes; the probe is the entry point for admission",
+    "D": "resolveRuntimeIdentity and describeRuntime give exact executable facts with paths redacted by default and no credential access",
+    "E": "call the module-level send with the flat { protocolVersion, reservationId, ...turn } envelope; it echoes reservationId and refuses while the recipe is blocked",
+    "B-continuation": "B8 and B9 remain open; b13 is the substrate to extend for answer/steer and multi-slot work"
+  },
+  "previousStatusFile": "wave11-status.json (B8/B9 remained open)",
+  "B5_B7": {
+    "status": "PASS",
+    "label": "product recovery across an independent coordinator SIGKILL",
+    "corrected": "the wave-11 b13 wrote a test-owned command/epoch table, never drove a Runner, and reopened the file inside the same parent - that was not product recovery",
+    "nowReal": {
+      "store": "A's ProductStore on real SQLite with real migrations",
+      "commands": "store.commands.record idempotent receipts, the product rule itself",
+      "runner": "separate spawned Runner process behind a real authenticated socket",
+      "coordinator": "separate spawned coordinator process killed by SIGKILL",
+      "recovery": "a genuinely new coordinator process over the SAME store and SAME Runner"
+    },
+    "windows": [
+      "after-begin",
+      "after-question",
+      "after-answer",
+      "after-stop-ack"
+    ],
+    "results": "each window really dies by SIGKILL; recovery keeps attempt identity and epoch, exactly one begin receipt, and never fabricates a stop receipt for a command that was never recorded",
+    "evidence": "tests/native-acceptance/b13-durable-control.mjs (6 PASS + 1 NOT_TESTED)"
+  },
+  "B8_B9": {
+    "status": "NOT_REACHED",
+    "label": "main target consumption; multi-slot/backpressure/output caps",
+    "note": "not started this pass; no claim made"
+  }
+}

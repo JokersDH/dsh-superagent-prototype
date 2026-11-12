@@ -1,204 +1,153 @@
 #!/usr/bin/env node
 /**
- * B13: real SQLite and independent-process control matrix (wave-11 B5-B7).
+ * B13: product recovery across an independent coordinator SIGKILL (wave-12 B5-B7).
  *
- * This replaces the wave-10 B12 claim. B12 rebuilt in-memory objects and optional-called a missing
- * `recover` method, so its "no duplicate begin" neither proved reconnect nor persistence. Here the
- * durable substrate is a real SQLite file (A's ProductDatabase: WAL, FULL sync, real migrations) and
- * the writer is a real spawned child process behind a real authenticated socket.
+ * This replaces the wave-11 B13 claim, which was not product recovery: it wrote a test-owned
+ * command/epoch table, never drove a Runner, and reopened the file inside the same parent process.
  *
- * What is exercised: start, stop, cancel-before-start at the start barrier, steer/answer identity,
- * SIGKILL of the writer process, and a rebuild from the SAME SQLite file by a fresh process.
+ * Here every element is the real one:
+ *   - the durable substrate is A's ProductStore (real SQLite, real migrations, real command receipts);
+ *   - the commands go through `store.commands.record`, whose idempotency is the real product rule;
+ *   - the Runner is a separate spawned process behind a real authenticated socket;
+ *   - the coordinator is a separate spawned process that is SIGKILLed at a named control window;
+ *   - recovery is a genuinely new coordinator process over the SAME store and the SAME Runner.
  *
- * What is NOT exercised: an installed vendor agent. Driver scenarios are fixtures, so every native
- * row stays NOT_TESTED.
+ * Windows: after begin, after a question is registered, after an answer is sent, and after a stop is
+ * acknowledged but before the coordinator records its own receipt.
+ *
+ * Driver scenarios stay fixtures, so every native row remains NOT_TESTED.
  *
  * Usage: node tests/native-acceptance/b13-durable-control.mjs [--record]
  */
-import { spawn } from 'node:child_process'
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { spawn, spawnSync } from 'node:child_process'
+import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
-import { ProductDatabase } from '../../packages/storage/src/connection.ts'
 import { createRunnerCredential } from '../../apps/coordinator/runner-link.ts'
 
 const log = new CaseLog()
 const repo = new URL('../../', import.meta.url).pathname
-const servicePath = fileURLToPath(new URL('../integration/runner-service.fixture.mjs', import.meta.url))
+const coordinatorFixture = fileURLToPath(new URL('./fixtures/b13-attempt-process.mjs', import.meta.url))
+const runnerFixture = fileURLToPath(new URL('../integration/runner-service.fixture.mjs', import.meta.url))
 
-/** Spawn the real independent Runner service process and wait for its authenticated endpoint. */
-function spawnRunner(directory) {
-  const child = spawn(process.execPath, [servicePath, directory], { stdio: ['ignore', 'ignore', 'pipe', 'ipc'] })
+/** Start the real independent Runner service process and wait for its authenticated endpoint. */
+function startRunner(sceneDir) {
+  const child = spawn(process.execPath, [runnerFixture, sceneDir], { stdio: ['ignore', 'ignore', 'pipe', 'ipc'] })
   let stderr = ''
   child.stderr.on('data', chunk => { stderr += chunk.toString() })
-  const exit = new Promise(resolve => { child.once('exit', (code, signal) => resolve({ code, signal })) })
   const ready = new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`runner service did not report ready: ${stderr}`)), 15_000)
+    const timer = setTimeout(() => reject(new Error(`runner did not become ready: ${stderr}`)), 15_000)
     child.once('message', value => { clearTimeout(timer); resolve(value) })
-    child.once('exit', (code, signal) => { clearTimeout(timer); reject(new Error(`runner service exited early ${code}/${signal}: ${stderr}`)) })
+    child.once('exit', (code, signal) => { clearTimeout(timer); reject(new Error(`runner exited early ${code}/${signal}: ${stderr}`)) })
   })
-  return { child, exit, ready, stderr: () => stderr }
+  return { child, ready }
 }
 
-/**
- * Durable command ledger over the real product database.
- *
- * This is a test-owned table, not a second product schema: it records the exact facts the matrix
- * needs to check across a process death. The product tables themselves stay A's.
- */
-function openLedger(path) {
-  const database = new ProductDatabase(path)
-  database.db.exec(`
-    CREATE TABLE IF NOT EXISTS b13_command (
-      command_id TEXT PRIMARY KEY,
-      attempt_id TEXT NOT NULL,
-      fence_epoch INTEGER NOT NULL,
-      kind TEXT NOT NULL,
-      body TEXT NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS b13_epoch (
-      scope TEXT PRIMARY KEY,
-      high_water INTEGER NOT NULL
-    );
-  `)
-  return database
+/** Run one coordinator process. Crash modes must die by SIGKILL; recover must exit cleanly. */
+function runCoordinator(stateRoot, sceneDir, mode) {
+  const result = spawnSync(process.execPath, [coordinatorFixture, stateRoot, sceneDir, mode], { encoding: 'utf8', timeout: 30_000 })
+  const output = (result.stdout ?? '').trim().split('\n').filter(Boolean).at(-1)
+  return { status: result.status, signal: result.signal, stderr: result.stderr, observation: output ? JSON.parse(output) : null }
 }
 
-/** Append a command. The PRIMARY KEY is what makes a duplicate begin impossible, not a check. */
-function recordCommand(database, command) {
-  const insert = database.db.prepare(
-    'INSERT INTO b13_command (command_id, attempt_id, fence_epoch, kind, body) VALUES (?, ?, ?, ?, ?) ON CONFLICT(command_id) DO NOTHING',
-  )
-  const result = insert.run(command.commandId, command.attemptId, command.fenceEpoch, command.kind, JSON.stringify(command))
-  return { inserted: result.changes === 1 }
-}
-
-function raiseEpoch(database, scope, epoch) {
-  database.db.prepare('INSERT INTO b13_epoch (scope, high_water) VALUES (?, ?) ON CONFLICT(scope) DO UPDATE SET high_water = MAX(high_water, excluded.high_water)').run(scope, epoch)
-  return database.db.prepare('SELECT high_water FROM b13_epoch WHERE scope = ?').get(scope).high_water
-}
-
-const readEpoch = (database, scope) => database.db.prepare('SELECT high_water FROM b13_epoch WHERE scope = ?').get(scope)?.high_water ?? null
-const readCommands = database => database.db.prepare('SELECT command_id, attempt_id, fence_epoch, kind FROM b13_command ORDER BY command_id').all()
-
-const directory = mkdtempSync(join(tmpdir(), 'pa-wave11-b13-'))
-const databasePath = join(directory, 'product.sqlite')
+const root = mkdtempSync(join(tmpdir(), 'pa-wave12-b13-'))
+const stateRoot = join(root, 'state')
+const sceneDir = join(root, 'scene')
 let runner
-let database
-
 try {
+  mkdirSync(stateRoot, { recursive: true, mode: 0o700 })
+  mkdirSync(sceneDir, { recursive: true, mode: 0o700 })
+  createRunnerCredential(join(sceneDir, 'runner.key'))
+  runner = startRunner(sceneDir)
+  await runner.ready
+
   // =============================================================================================
-  // B5: real process, real SQLite, start and stop
+  // The substrate really is the product store plus an independent Runner
   // =============================================================================================
-  log.begin('B13-REAL-SQLITE-AND-PROCESS', 'a real SQLite file and a real spawned writer process', 'controlled_process')
-  database = openLedger(databasePath)
-  // The service serves over an authenticated socket, so the shared credential must exist first.
-  createRunnerCredential(join(directory, 'runner.key'))
-  runner = spawnRunner(directory)
-  const ready = await runner.ready
-  const sqliteFacts = {
-    path: databasePath,
-    fileExists: existsSync(databasePath),
-    journalMode: database.db.pragma('journal_mode', { simple: true }),
-    synchronous: database.db.pragma('synchronous', { simple: true }),
-    productSchema: database.productSchema,
-    endpoint: Boolean(ready?.endpoint?.socketPath),
-  }
-  log.evidence(sqliteFacts)
-  if (sqliteFacts.fileExists && sqliteFacts.journalMode === 'wal' && sqliteFacts.endpoint) {
-    log.pass(`real SQLite (schema ${sqliteFacts.productSchema}, WAL, synchronous=FULL) behind a real authenticated runner socket`)
+  const { producer } = await import('../integration/runtime-ingress-fixture.ts')
+  const expected = { attemptId: producer.attempt.attemptId, fenceEpoch: producer.attempt.fenceEpoch }
+  log.begin('B13-PRODUCT-STORE-AND-INDEPENDENT-RUNNER', 'the real store and a separate Runner process', 'controlled_process')
+  const first = runCoordinator(stateRoot, sceneDir, 'begin')
+  const storeFile = join(stateRoot, 'product.sqlite')
+  log.evidence({
+    coordinatorPid: first.observation?.pid ?? null,
+    runnerPid: runner.child.pid,
+    storeCreated: existsSync(storeFile),
+    crashSignal: first.signal,
+    separateProcesses: (first.observation?.pid ?? 0) !== runner.child.pid,
+  })
+  if (existsSync(storeFile) && first.signal === 'SIGKILL' && first.observation?.pid !== runner.child.pid) {
+    log.pass('a real product database was created and the coordinator died by SIGKILL in its own process, distinct from the Runner')
   } else {
-    log.fail(`the substrate was not the expected real file/process: ${JSON.stringify(sqliteFacts)}`)
+    log.fail(`the substrate or the crash was not real: ${JSON.stringify({ store: existsSync(storeFile), signal: first.signal, stderr: first.stderr?.slice(0, 200) })}`)
   }
-
-  log.begin('B13-BEGIN-RECORDED-ONCE', 'the begin is durable and cannot be recorded twice', 'controlled_process')
-  const command = { commandId: 'cmd-begin-1', attemptId: 'attempt-1', fenceEpoch: 1, kind: 'begin', argv: ['--scenario', 'happy'] }
-  const first = recordCommand(database, command)
-  const duplicate = recordCommand(database, command)
-  const begins = readCommands(database).filter(row => row.kind === 'begin')
-  log.evidence({ firstInserted: first.inserted, duplicateInserted: duplicate.inserted, beginRows: begins.length })
-  // The second write is refused by the primary key, so "no duplicate begin" is a storage guarantee
-  // here rather than an artefact of the test not calling twice.
-  if (first.inserted === true && duplicate.inserted === false && begins.length === 1) {
-    log.pass('the begin is stored once and the duplicate write is refused by the key, not by convention')
-  } else {
-    log.fail(`the duplicate begin was not refused: ${JSON.stringify({ first, duplicate, begins })}`)
-  }
-
-  log.begin('B13-STOP-PERSISTS-WRITER-STATE', 'a stop is recorded and the writer reports quiescence', 'controlled_process')
-  const stopped = await (async () => {
-    const { connectRunnerRecovery } = await import('../../apps/coordinator/runner-link.ts')
-    const { producer } = await import('../integration/runtime-ingress-fixture.ts')
-    const client = connectRunnerRecovery(ready.endpoint, producer)
-    const state = await client.cancel({ ...producer.attempt, id: 'cmd-cancel-1', kind: 'cancel' })
-    recordCommand(database, { commandId: 'cmd-cancel-1', attemptId: 'attempt-1', fenceEpoch: 1, kind: 'cancel' })
-    return state
-  })()
-  // A proof-returning call wraps the state, so read through the authenticated envelope.
-  const state = stopped?.inspection ?? stopped
-  const writerQuiescent = state?.resources?.every(resource => resource.writer === 'quiescent') ?? false
-  log.evidence({ state: state?.state, admission: state?.admission, coverage: state?.coverage, writerQuiescent })
-  if (writerQuiescent) log.pass('the writer process reported quiescent after the stop, and the stop is durable')
-  else log.fail(`the writer did not report quiescent: ${JSON.stringify({ state: state?.state, admission: state?.admission, resources: state?.resources })?.slice(0, 200)}`)
 
   // =============================================================================================
-  // B6: SIGKILL the writer, then rebuild from the SAME SQLite file
+  // Each control window: SIGKILL, then a fresh coordinator recovers the same state
   // =============================================================================================
-  log.begin('B13-SIGKILL-THEN-REBUILD-SAME-SQLITE', 'a fresh process reads the same file after the writer is killed', 'controlled_process')
-  if (runner.child.exitCode === null) runner.child.kill('SIGKILL')
-  const killed = await runner.exit
-  runner = undefined
-  const beforeRebuild = readCommands(database).length
-  const epochBefore = raiseEpoch(database, 'attempt-1', 7)
-  database.db.close()
-
-  // A genuinely new connection to the same file: nothing is carried in memory.
-  database = openLedger(databasePath)
-  const afterRebuild = readCommands(database)
-  const epochAfter = readEpoch(database, 'attempt-1')
-  const identityIntact = afterRebuild.every(row => row.attempt_id === 'attempt-1')
-  log.evidence({ killed, commandsBefore: beforeRebuild, commandsAfter: afterRebuild.length, epochBefore, epochAfter, identityIntact })
-  if (killed.signal === 'SIGKILL' && afterRebuild.length === beforeRebuild && epochAfter === 7 && identityIntact) {
-    log.pass(`the file survived SIGKILL: ${afterRebuild.length} command(s) and epoch high-water ${epochAfter} intact with attempt identity preserved`)
-  } else {
-    log.fail(`the rebuild did not reproduce the durable facts: ${JSON.stringify({ killed, beforeRebuild, after: afterRebuild.length, epochAfter })}`)
+  const windows = [
+    ['after-begin', 'begin', 'B13-CRASH-AFTER-BEGIN'],
+    ['after-question', 'question', 'B13-CRASH-AFTER-QUESTION'],
+    ['after-answer', 'answer', 'B13-CRASH-AFTER-ANSWER'],
+    ['after-stop-ack', 'stop', 'B13-CRASH-AFTER-STOP-ACK'],
+  ]
+  for (const [window, mode, id] of windows) {
+    log.begin(id, `the coordinator is SIGKILLed ${window} and a new process recovers`, 'controlled_process')
+    const crashed = runCoordinator(stateRoot, sceneDir, mode)
+    const recovered = runCoordinator(stateRoot, sceneDir, 'recover')
+    const observed = recovered.observation ?? {}
+    const beginReceipts = (observed.found ?? []).filter(entry => entry.id === 'cmd-begin' && entry.seq !== null).length
+    log.evidence({ crashSignal: crashed.signal, crashWindow: crashed.observation?.crashed ?? null, recovered: observed })
+    if (crashed.signal !== 'SIGKILL') {
+      log.fail(`the ${window} window did not actually crash: ${JSON.stringify({ signal: crashed.signal, status: crashed.status, stderr: crashed.stderr?.slice(0, 200) })}`)
+      continue
+    }
+    if (observed.attemptId !== expected.attemptId || observed.fenceEpoch !== expected.fenceEpoch) {
+      log.fail(`the recovered process lost the attempt identity: ${JSON.stringify(observed)}`)
+      continue
+    }
+    if (beginReceipts !== 1) {
+      log.fail(`the begin receipt was not exactly once after recovery: ${beginReceipts}`)
+      continue
+    }
+    log.pass(`recovered from ${window}: attempt identity and epoch intact, one begin receipt, no second begin`)
   }
 
-  log.begin('B13-EPOCH-HIGH-WATER-MONOTONIC', 'the epoch high-water never goes backwards across reopen', 'controlled_process')
-  const lowered = raiseEpoch(database, 'attempt-1', 3)
-  const raised = raiseEpoch(database, 'attempt-1', 9)
-  log.evidence({ afterLowerAttempt: lowered, afterRaise: raised })
-  if (lowered === 7 && raised === 9) log.pass('a lower epoch cannot lower the stored high-water, and a higher one raises it')
-  else log.fail(`the epoch high-water was not monotonic: ${JSON.stringify({ lowered, raised })}`)
-
-  log.begin('B13-DUPLICATE-BEGIN-AFTER-REBUILD', 'a post-rebuild begin attempt is still refused', 'controlled_process')
-  const replay = recordCommand(database, command)
-  const replayCount = readCommands(database).filter(row => row.kind === 'begin').length
-  log.evidence({ replayInserted: replay.inserted, beginRows: replayCount })
-  if (replay.inserted === false && replayCount === 1) log.pass('the rebuilt process cannot append a second begin for the same command identity')
-  else log.fail(`a duplicate begin was accepted after the rebuild: ${JSON.stringify({ replay, replayCount })}`)
+  // =============================================================================================
+  // Unknown-outcome honesty: the stop was acknowledged but never receipted
+  // =============================================================================================
+  log.begin('B13-STOP-UNKNOWN-NOT-RESENT-BY-RECOVERY', 'an unrecorded stop is reported unknown rather than resent', 'controlled_process')
+  const recoveredAfterStop = runCoordinator(stateRoot, sceneDir, 'recover').observation ?? {}
+  const stopReceipt = (recoveredAfterStop.found ?? []).find(entry => entry.id === 'cmd-stop')
+  log.evidence({ stopReceiptSeq: stopReceipt?.seq ?? null, runnerState: recoveredAfterStop.runnerState, writer: recoveredAfterStop.writer })
+  // The crash happened after the Runner acknowledged the stop but before the coordinator recorded it.
+  // The honest state is: the Runner reports its own view, the receipt is absent, and no process
+  // invents a stop receipt on recovery.
+  if (stopReceipt?.seq === null && recoveredAfterStop.runnerState === 'terminated') {
+    log.pass('the recovered process reports the Runner terminated without fabricating a stop receipt for a command it never recorded')
+  } else {
+    log.fail(`the unknown stop was not handled honestly: ${JSON.stringify({ stopReceipt, state: recoveredAfterStop.runnerState })}`)
+  }
 
   // =============================================================================================
   // Honest scope
   // =============================================================================================
-  log.begin('B13-SCOPE-NOT-NATIVE', 'this is controlled-process evidence, not vendor behaviour', 'controlled_process')
-  log.evidence({ driver: 'fixture scenario (happy)', realVendorAgent: false, realSqlite: true, realChildProcess: true, realSigkill: true })
-  log.notTested('an installed vendor agent was not executed; Driver behaviour here is a fixture scenario')
-  log.notTested('answer/steer against a real vendor turn, and unknown-send reconciliation, remain untested')
-  log.notTested('a stop observed strictly before the start barrier was not reproduced in this pass')
+  log.begin('B13-SCOPE-NOT-NATIVE', 'controlled-product evidence, not vendor behaviour', 'controlled_process')
+  log.evidence({ driver: 'fixture scenario', realStore: true, independentRunnerProcess: true, independentCoordinatorProcess: true, realSigkill: true, realVendorAgent: false })
+  log.notTested('an installed vendor agent was not executed; the Driver scenario is a fixture')
+  log.notTested('answer/steer against a real vendor turn and unknown-send reconciliation remain untested')
+  log.notTested('multi-slot queue, output caps, backpressure and resource-return matrix are not covered by this file')
 } finally {
   if (runner?.child.exitCode === null) runner.child.kill('SIGKILL')
-  if (runner) await runner.exit
-  try { database?.db.close() } catch {}
-  rmSync(directory, { recursive: true, force: true })
+  rmSync(root, { recursive: true, force: true })
 }
 
 const report = writeReport(
-  { cases: log.cases, environment: { note: 'wave-11 B13 real SQLite and independent-process matrix', modelCalls: 0 }, extra: { scope: 'controlled process; native NOT_TESTED' } },
+  { cases: log.cases, environment: { note: 'wave-12 B13 product recovery across independent coordinator SIGKILL', modelCalls: 0 }, extra: { scope: 'controlled product; native NOT_TESTED' } },
   process.argv.includes('--record') ? `${repo}tests/native-acceptance/reports/b13-durable-control.json` : undefined,
 )
-for (const item of report.cases) process.stdout.write(`${item.status.padEnd(10)} ${item.id.padEnd(38)} ${item.detail.join(' | ')}\n`)
+for (const item of report.cases) process.stdout.write(`${item.status.padEnd(10)} ${item.id.padEnd(42)} ${item.detail.join(' | ')}\n`)
 process.stdout.write(`\nB13 totals: ${JSON.stringify(report.totals)}\n`)
 process.exit(report.totals.FAIL === 0 ? 0 : 1)
