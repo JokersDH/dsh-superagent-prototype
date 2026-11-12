@@ -6,7 +6,7 @@
  * cwd, listener and health projection. A recorded breadcrumb is never evidence that a process is
  * gone; a live but unmatched PID is never signalled.
  */
-import { realpathSync } from 'node:fs'
+import { readFileSync, realpathSync } from 'node:fs'
 import { basename, isAbsolute, join, resolve } from 'node:path'
 
 export const STARTUP_MODES = ['normal', 'recovery_readonly']
@@ -58,10 +58,19 @@ export function requestedScopeCheck({ roots, record, requireInstall = false }) {
   const installMatches = recordedInstall === requestedInstall || recordedInstall === canonicalPath(join(requestedInstall, 'app'))
   const requestedConfig = canonicalPath(roots.config)
   const recordedConfig = record.configRoot === undefined ? null : canonicalPath(record.configRoot)
-  // Legacy records without a config binding are explicitly unknown, never accepted as self-consistent
-  // authority for a requested config root.
-  add('requested_config', recordedConfig !== null && recordedConfig === requestedConfig, {
-    requested: requestedConfig, recorded: recordedConfig, legacy: recordedConfig === null,
+  // Legacy records (written before the config binding existed) are accepted only when the requested
+  // config root carries its own launcher.json naming this same config root. A copied legacy record
+  // dropped into an unrelated config root has no such evidence and stays explicitly unknown.
+  const legacyConfigBound = () => {
+    try {
+      const launcher = JSON.parse(readFileSync(join(roots.config, 'launcher.json'), 'utf8'))
+      const recorded = launcher?.roots?.config
+      return typeof recorded === 'string' && canonicalPath(recorded) === requestedConfig
+    } catch { return false }
+  }
+  const configBound = recordedConfig !== null ? recordedConfig === requestedConfig : legacyConfigBound()
+  add('requested_config', configBound, {
+    requested: requestedConfig, recorded: recordedConfig, legacy: recordedConfig === null, legacyConfigBound: recordedConfig === null ? legacyConfigBound() : false,
   })
   add('requested_state', recordedState === requestedState, { requested: requestedState, recorded: recordedState })
   add('requested_install', installMatches, { requested: requestedInstall, recorded: recordedInstall })

@@ -17,7 +17,7 @@ function removeRecord(configRoot) {
   }
 }
 
-export async function stopInstance({ roots, timeoutMs = 8000 }) {
+export async function stopInstance({ roots, timeoutMs = 8000, requireInstall = true }) {
   let record
   try {
     record = readInstanceRecord(roots.config)
@@ -34,7 +34,7 @@ export async function stopInstance({ roots, timeoutMs = 8000 }) {
 
   // A record only describes the roots it was written for. A stop aimed at another requested state or
   // install must refuse before touching a pid or deleting the record.
-  const scope = requestedScopeCheck({ roots, record, requireInstall: true })
+  const scope = requestedScopeCheck({ roots, record, requireInstall })
   if (!scope.ok) {
     return {
       ok: false,

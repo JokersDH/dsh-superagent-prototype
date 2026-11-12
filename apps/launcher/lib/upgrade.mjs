@@ -556,9 +556,17 @@ export async function ensureResourceBarrier({ roots, target, journal }) {
     const scope = requestedScopeCheck({ roots, record })
     if (!scope.ok)
       throw new UpgradeError('requested_root_mismatch', 'The recorded instance belongs to another state/install; refusing to stop or switch it', { scope })
+    // Account first, stop second: an unregistered but plausible writer must block the switch while
+    // this state's own instance is still running, instead of stopping it and only then discovering
+    // the unknown resource (which would leave an unsettled stop with no replacement).
+    const preflight = await accountRegisteredResources({ roots, target, record })
+    if (preflight.unknownLive.length > 0)
+      throw new UpgradeError('unknown_live_resource', 'An unregistered live process matches this state but is not owned by this operation; refusing to stop or switch anything', {
+        unknownLive: preflight.unknownLive.slice(0, 8).map(({ pid, command, unregistered }) => ({ pid, command: String(command).slice(0, 200), ...(unregistered === true ? { unregistered: true } : {}) })),
+      })
     const verification = await verifyInstance(record)
     if (verification.ok) {
-      const result = await stopInstance({ roots })
+      const result = await stopInstance({ roots, requireInstall: false })
       if (!result.ok || String(result.status).startsWith('STOP_TIMEOUT'))
         throw new UpgradeError('upgrade_stop_failed', 'The running instance could not be stopped; nothing was switched', { status: result.status ?? null, code: result.code ?? null })
       stopped = result
