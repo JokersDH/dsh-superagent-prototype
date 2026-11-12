@@ -258,3 +258,57 @@ test('the scoped adapters compose into the authorized composer without leaking f
   assert.equal(text.includes('FOREIGN_DISCUSSION'), false)
   assert.ok(text.includes('published-artifact'))
 })
+
+test('the conversation scan cap preserves the 600-message production boundary', async () => {
+  const many = Array.from({ length: 700 }, (_, index) => message({ id: `m-${index + 1}`, sequence: index + 1 }))
+  const adapter = createScopedConversationProvider(reader(many), { projectId, conversationId },
+    { pageSize: 200, maxPages: 10, maxScannedMessages: 600 })
+  const messages = await adapter.recent({ projectId, conversationId, limit: 700 })
+  assert.equal(adapter.coverage().scanned, 600)
+  assert.equal(adapter.coverage().complete, false)
+  assert.equal(messages.length, 600)
+  assert.equal(messages[0]!.messageId, 'm-700')
+  assert.equal(messages[599]!.messageId, 'm-101')
+
+  // Raising the explicit cap is the only way to walk further.
+  const full = createScopedConversationProvider(reader(many), { projectId, conversationId },
+    { pageSize: 200, maxPages: 10, maxScannedMessages: 5000 })
+  // Ask for more than exists so the walk ends on hasMore=false rather than its own result cap.
+  await full.recent({ projectId, conversationId, limit: 2000 })
+  assert.equal(full.coverage().scanned, 700)
+  assert.equal(full.coverage().complete, true)
+})
+
+test('the published-artifact provider returns newest first with a stable id tie-break', async () => {
+  const metadata = new Map([
+    ['old', { id: 'old', digest: 'a'.repeat(64), bytes: 1, createdAt: '2026-01-01T00:00:00.000Z' }],
+    ['new', { id: 'new', digest: 'b'.repeat(64), bytes: 2, createdAt: '2026-06-01T00:00:00.000Z' }],
+    ['tie-b', { id: 'tie-b', digest: 'c'.repeat(64), bytes: 3, createdAt: '2026-03-01T00:00:00.000Z' }],
+    ['tie-a', { id: 'tie-a', digest: 'd'.repeat(64), bytes: 4, createdAt: '2026-03-01T00:00:00.000Z' }],
+  ])
+  const provider = createPublishedArtifactProvider({ get: (id) => metadata.get(id) },
+    { publishedArtifactIds: ['old', 'tie-b', 'new', 'tie-a', 'old'] })
+  const newest = await provider.recent({ projectId, limit: 1 })
+  assert.deepEqual(newest.map((item) => item.artifactId), ['new'])
+  const all = await provider.recent({ projectId, limit: 10 })
+  assert.deepEqual(all.map((item) => item.artifactId), ['new', 'tie-a', 'tie-b', 'old'])
+  assert.deepEqual(provider.coverage(), { requested: 4, lookedUp: 4, returned: 4, missing: 0, oversized: 0, complete: true })
+})
+
+test('source fingerprints stay stable for the same identity and never come from unpublished ids', async () => {
+  const make = (text: string) => createScopedConversationProvider(
+    reader([message({ id: 'stable-message', sequence: 1, text })]),
+    { projectId, conversationId },
+  )
+  const first = await make('first body').recent({ projectId, conversationId, limit: 10 })
+  const second = await make('changed body').recent({ projectId, conversationId, limit: 10 })
+  assert.equal(first[0]!.messageId, second[0]!.messageId)
+
+  const looked: string[] = []
+  const provider = createPublishedArtifactProvider(
+    { get: (id) => { looked.push(id); return { id, digest: 'e'.repeat(64), bytes: 1, createdAt: NOW } } },
+    { publishedArtifactIds: ['published-only'] },
+  )
+  await provider.recent({ projectId, limit: 50 })
+  assert.deepEqual(looked, ['published-only'])
+})

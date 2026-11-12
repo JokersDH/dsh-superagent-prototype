@@ -1,0 +1,70 @@
+{
+  "protocol": "wave14-c-admission/1",
+  "sourceCommit": "f0fe429e6feb02186a569f845c719c7aab3bcf95",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "observations": [
+    {
+      "id": "OMISSION_SUPPRESSION_SETS_TRUNCATED_AND_TOTAL",
+      "status": "PASS",
+      "observed": {
+        "omitted": 1,
+        "suppressed": {
+          "items": 0,
+          "bytes": 0,
+          "omissions": 4999
+        },
+        "totalsSuppressed": 4999,
+        "truncated": true
+      }
+    },
+    {
+      "id": "REVIEW_REDACTS_DETAIL_Library",
+      "status": "PASS",
+      "observed": {
+        "detail": "Cannot read <redacted-path>"
+      }
+    },
+    {
+      "id": "REVIEW_REDACTS_DETAIL_custom",
+      "status": "PASS",
+      "observed": {
+        "detail": "Cannot read <redacted-path>"
+      }
+    },
+    {
+      "id": "REVIEW_REDACTS_DETAIL_Z:",
+      "status": "PASS",
+      "observed": {
+        "detail": "Cannot read <redacted-path>"
+      }
+    },
+    {
+      "id": "REVIEW_REDACTS_DETAIL_server",
+      "status": "PASS",
+      "observed": {
+        "detail": "Cannot read <redacted-path>"
+      }
+    },
+    {
+      "id": "PUBLISHED_ARTIFACT_PROVIDER_NEWEST_FIRST_CONTRACT",
+      "status": "PASS",
+      "observed": {
+        "returned": [
+          "new"
+        ],
+        "coverage": {
+          "requested": 2,
+          "lookedUp": 2,
+          "returned": 1,
+          "missing": 0,
+          "oversized": 0,
+          "complete": false
+        }
+      }
+    }
+  ],
+  "passed": 6,
+  "failed": 0,
+  "scope": "Public review bounded output and published-artifact provider order; no execution or history-reader authority claim"
+}

@@ -129,16 +129,24 @@ function sanitizeLabel(value: string, maxLength = 120): string {
     .slice(0, maxLength)
 }
 
-const HOST_PATH_PATTERNS = [
-  /\/(?:Users|home|private|var|tmp|opt|etc|root|mnt|Volumes|srv)\/[^\s"'`),;]*/g,
-  /[A-Za-z]:\\[^\s"'`),;]*/g,
-  /file:\/\/[^\s"'`),;]*/g,
+/**
+ * Any absolute root, not a fixed list of well-known directories: POSIX (`/Library`, `/custom`, …),
+ * Windows drive paths (`Z:/`, `Z:\`), UNC shares (`\\server\share`) and file URLs. The leading
+ * boundary keeps relative references such as `decisions/x.json` and `and/or` untouched.
+ */
+const HOST_PATH_PATTERNS: readonly RegExp[] = [
+  /(^|[\s"'`(=:,;])(?:[A-Za-z]:(?:\\|\/)[^\s"'`),;]*)/g,
+  /(^|[\s"'`(=:,;])(?:\\\\[^\s"'`),;]*)/g,
+  /(^|[\s"'`(=:,;])(?:file:\/\/[^\s"'`),;]*)/gi,
+  /(^|[\s"'`(=:,;])(?:\/[^\s"'`),;]+)+/g,
 ]
 
 /** Free text may embed a host path; the public projection replaces it with one fixed marker. */
 function redactText(value: string, maxLength = 120): string {
   let text = sanitizeLabel(value, maxLength)
-  for (const pattern of HOST_PATH_PATTERNS) text = text.replace(pattern, '<redacted-path>')
+  for (const pattern of HOST_PATH_PATTERNS) {
+    text = text.replace(pattern, (_match, boundary: string) => `${boundary}<redacted-path>`)
+  }
   return text
 }
 
@@ -291,6 +299,8 @@ export function projectSourceReview(
   if (suppressed.bytes > 0) notes.push(`${suppressed.bytes} source(s) had no remaining review byte budget and are counted, not listed.`)
   if (suppressed.omissions > 0) notes.push(`${suppressed.omissions} omission(s) exceeded the review omission budget and are counted, not listed.`)
   if (detailsDropped > 0) notes.push(`${detailsDropped} omission detail(s) exceeded the diagnostic byte budget and were dropped.`)
+  // Output trimming is a truncation of the public review, even when every source was listed.
+  if (suppressed.items > 0 || suppressed.bytes > 0 || suppressed.omissions > 0 || detailsDropped > 0) truncated = true
   if (composition.omitted.some((item) => item.reason === 'missing' || item.reason === 'stale' || item.reason === 'contract_stale')) {
     notes.push('Some selected sources are missing or stale; their recorded reason is listed under omitted.')
   }
@@ -311,7 +321,8 @@ export function projectSourceReview(
       items: items.length,
       visibleBytes,
       omitted: omitted.length,
-      suppressed: suppressed.items + suppressed.bytes,
+      // Every trimmed output budget is part of the same total; the per-budget counters stay separate.
+      suppressed: suppressed.items + suppressed.bytes + suppressed.omissions,
     },
     budget: resolved,
     truncated,

@@ -201,3 +201,43 @@ test('review budgets are clamped to ceilings and invalid values are refused', as
     assert.throws(() => projectSourceReview(composed, { maxOmissions: invalid }), TypeError)
   }
 })
+
+test('capped omissions mark the projection truncated and count into totals.suppressed', async () => {
+  const composed = await composition()
+  const review = projectSourceReview(
+    {
+      ...composed,
+      omitted: Array.from({ length: 5000 }, () => ({ reason: 'missing' as const })),
+    } as unknown as ContextComposition,
+    { maxItems: 1, maxOmissions: 1 },
+  )
+  assert.equal(review.omitted.length, 1)
+  assert.equal(review.suppressed.omissions, 4999)
+  assert.equal(review.truncated, true)
+  assert.ok(review.totals.suppressed >= review.suppressed.omissions)
+  // Source omissions, output trimming and not-scanned sources are separate counters: the omitted
+  // total only names the one listed omission, while trimming is counted in its own budget.
+  assert.equal(review.totals.omitted, 1)
+  assert.ok(review.suppressed.items + review.suppressed.bytes >= 1) // the second slice exceeded maxItems
+  assert.equal(review.suppressed.omissions, 4999)
+})
+
+test('every public path form is redacted while relative references stay readable', async () => {
+  const composed = await composition()
+  const absolute = ['/Library/Keychains/private.key', '/custom/team/private.env', 'Z:/Research/Secret/private.key',
+    'C:\\Users\\owner\\secret.key', '\\\\server\\private\\secret.key', 'file:///Users/owner/private/secret.key']
+  for (const path of absolute) {
+    const review = projectSourceReview({
+      ...composed,
+      omitted: [{ reason: 'missing', detail: `Cannot read ${path}` }],
+    } as unknown as ContextComposition)
+    assert.equal(review.omitted[0]!.detail?.includes(path), false, path)
+    assert.ok(review.omitted[0]!.detail?.includes('<redacted-path>'), path)
+  }
+  const relative = projectSourceReview({
+    ...composed,
+    omitted: [{ reason: 'missing', detail: 'Cannot read decisions/one.json or and/or src/a.ts' }],
+  } as unknown as ContextComposition)
+  assert.equal(relative.omitted[0]!.detail?.includes('decisions/one.json'), true)
+  assert.equal(relative.omitted[0]!.detail?.includes('and/or'), true)
+})

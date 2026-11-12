@@ -88,10 +88,14 @@ function isReusableDiscussionMessage(role: string, provenance: string): boolean 
 export function createScopedConversationProvider(
   reader: ScopedConversationReader,
   selection: ConversationSelection,
-  options: { readonly pageSize?: number; readonly maxPages?: number } = {},
+  options: { readonly pageSize?: number; readonly maxPages?: number; readonly maxScannedMessages?: number } = {},
 ): ScopedConversationProvider {
   const pageSize = Math.min(Math.max(options.pageSize ?? 50, 1), 200)
   const maxPages = Math.min(Math.max(options.maxPages ?? 8, 1), 100)
+  // Main's production scan boundary (600 messages) is preserved as an explicit cap; a full walk is
+  // only possible when the caller raises it deliberately.
+  const maxScannedMessages = Math.min(Math.max(options.maxScannedMessages ?? pageSize * maxPages, 1), 20_000)
+  const scanCap = Math.min(maxScannedMessages, pageSize * maxPages)
   let coverage: ConversationAdapterCoverage = {
     scanned: 0,
     returned: 0,
@@ -134,10 +138,19 @@ export function createScopedConversationProvider(
       let scanned = 0
       let before: number | undefined
       let complete = false
+      let scanStopped = false
       for (let pageIndex = 0; pageIndex < maxPages; pageIndex += 1) {
+        if (scanned >= scanCap) {
+          complete = false
+          break
+        }
         const page = reader.page(selection.conversationId, { limit: pageSize, ...(before === undefined ? {} : { before }) })
         const sorted = [...page.messages].sort((left, right) => right.sequence - left.sequence)
         for (const message of sorted) {
+          if (scanned >= scanCap) {
+            scanStopped = true
+            break
+          }
           scanned += 1
           if (message.conversationId !== selection.conversationId) {
             excluded.otherConversation += 1
@@ -183,6 +196,10 @@ export function createScopedConversationProvider(
             createdAt: message.createdAt,
           })
           if (accepted.length >= wanted) break
+        }
+        if (scanStopped) {
+          complete = false
+          break
         }
         if (accepted.length >= wanted) {
           complete = false
@@ -250,11 +267,20 @@ function positiveInteger(value: number | undefined, fallback: number, ceiling: n
   return Math.min(value, ceiling)
 }
 
+function createdAtKey(value: string): number {
+  const parsed = Date.parse(value)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
 /**
  * Only the caller-verified published artifact ids are looked up, metadata only. Duplicate ids are
  * collapsed; `maxIds` bounds attempted lookups (so a run of missing metadata cannot walk the whole
  * list) while the returned count is bounded separately by the request limit. A missing or
  * mistyped metadata row and an oversized artifact are counted, never replaced by a guess.
+ *
+ * Results are newest-first (`createdAt` descending, artifact id ascending as the stable tie-break),
+ * matching the provider contract the composer and main already rely on; a budget of one returns the
+ * newest artifact, not whichever id happened to be published first.
  */
 export function createPublishedArtifactProvider(
   lookup: ScopedArtifactLookup,
@@ -270,12 +296,12 @@ export function createPublishedArtifactProvider(
     async recent({ limit }) {
       const requestedIds = [...new Set(selection.publishedArtifactIds)]
       const maxResults = Math.max(limit, 1)
-      const artifacts: ComposedArtifactView[] = []
+      const found: ComposedArtifactView[] = []
       let lookedUp = 0
       let missing = 0
       let oversized = 0
       for (const id of requestedIds) {
-        if (lookedUp >= maxIds || artifacts.length >= maxResults) break
+        if (lookedUp >= maxIds) break
         lookedUp += 1
         const metadata = lookup.get(id)
         // A lookup that returns another identity is not evidence for the requested artifact.
@@ -287,15 +313,21 @@ export function createPublishedArtifactProvider(
           oversized += 1
           continue
         }
-        artifacts.push({ artifactId: metadata.id, digest: metadata.digest, bytes: metadata.bytes, createdAt: metadata.createdAt })
+        found.push({ artifactId: metadata.id, digest: metadata.digest, bytes: metadata.bytes, createdAt: metadata.createdAt })
       }
+      found.sort(
+        (left, right) =>
+          createdAtKey(right.createdAt) - createdAtKey(left.createdAt) ||
+          left.artifactId.localeCompare(right.artifactId),
+      )
+      const artifacts = found.slice(0, maxResults)
       coverage = {
         requested: requestedIds.length,
         lookedUp,
         returned: artifacts.length,
         missing,
         oversized,
-        complete: lookedUp === requestedIds.length && missing === 0 && oversized === 0,
+        complete: lookedUp === requestedIds.length && missing === 0 && oversized === 0 && found.length === artifacts.length,
       }
       return artifacts
     },
