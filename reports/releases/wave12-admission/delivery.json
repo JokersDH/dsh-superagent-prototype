@@ -1,0 +1,70 @@
+{
+  "dHead": "ebcebe1be556db9e35de83f1ddff467b3d5a1934",
+  "frozen": "/tmp/pa-wave12-delivery-audit.FESKq7/frozen/install",
+  "cases": [
+    {
+      "id": "MATCHING_STATE_POSITIVE",
+      "status": "STOPPED_ORPHAN",
+      "apiAlive": false,
+      "verdict": "PASS"
+    },
+    {
+      "id": "REQUESTED_DATA_ROOT_CLOSED",
+      "code": "requested_root_mismatch",
+      "apiAlive": true,
+      "recordPreserved": true,
+      "verdict": "PASS"
+    },
+    {
+      "id": "REQUESTED_INSTALL_ROOT_BYPASS",
+      "status": "STOPPED_ORPHAN",
+      "apiStopped": true,
+      "recordRemoved": true,
+      "verdict": "FAIL"
+    },
+    {
+      "id": "COPIED_RECORD_CONFIG_ROOT_BYPASS",
+      "status": "STOPPED_ORPHAN",
+      "apiStopped": true,
+      "originalRecordPreserved": true,
+      "verdict": "FAIL"
+    },
+    {
+      "id": "UNREGISTERED_OTHER_STATE_SHARED_CACHE_CLAIMED",
+      "owned": [
+        {
+          "pid": 912345,
+          "command": "node fake-coordinator --state /private/tmp/pa-wave12-delivery-eJfobR/mock/state-b --cache-root /private/tmp/pa-wave12-delivery-eJfobR/mock/shared-cache"
+        }
+      ],
+      "consideredRegistered": 0,
+      "mockedSignals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "proven": true,
+      "actualOsScans": 0,
+      "actualOsSignals": 0,
+      "verdict": "FAIL"
+    },
+    {
+      "id": "RECOVER_STARTING_REQUESTED_DATA_SCOPE_BYPASS",
+      "requestedData": "/private/tmp/pa-wave12-delivery-eJfobR/mock/state-a",
+      "recordedData": "/private/tmp/pa-wave12-delivery-eJfobR/mock/state-b",
+      "status": "RECOVERED",
+      "journalStatus": "confirmed",
+      "instanceVerification": "mocked-valid-other-state",
+      "realTargetByteValidation": true,
+      "actualOsScans": 0,
+      "actualOsSignals": 0,
+      "verdict": "FAIL"
+    }
+  ],
+  "passed": 2,
+  "failed": 4,
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "userServicesTouched": false
+}

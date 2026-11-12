@@ -1,0 +1,36 @@
+{
+  "status": "FAIL",
+  "sourceCommit": "deb359925bdbe849850dfc675bdfea50f0138ba9",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-12T06:32:33.662Z",
+  "cases": [
+    {
+      "id": "EXPLICIT-MESSAGE-PREVIEW-IS-READONLY-AND-BOUND-TO-EXACT-DRAFT-AND-SOURCES",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-AND-MOBILE-CONFIRMATION-AND-SOURCE-DETAIL-FIT",
+      "status": "PASS"
+    },
+    {
+      "id": "ONE-CONFIRM-USES-THE-EXISTING-STREAM-AND-PRESERVES-CONTEXT-ONLY-WORK-SELECTION",
+      "status": "PASS"
+    },
+    {
+      "id": "MESSAGE-AUDIT-COMES-FROM-THE-ACTUAL-BINDING",
+      "status": "FAIL",
+      "message": "bindingFixture is not defined"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "mockProviderCalls": 1,
+  "bindingPort": "production_A_port",
+  "replyResultPort": "production_A_SQLite",
+  "productSchema": 18,
+  "limitations": [
+    "Actual local HTTP/SQLite/React/SSE plus mock AssistantModelPort; zero real native/model turns",
+    "Production A binding/result ports exercised; independent process crashes are covered by a separate suite",
+    "Work remains paused; no coding execution or target activation is admitted"
+  ]
+}

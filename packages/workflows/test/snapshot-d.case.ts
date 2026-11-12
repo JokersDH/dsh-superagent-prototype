@@ -93,6 +93,15 @@ function dataset() {
     machineDigest: 'f'.repeat(64), resourcePolicyDigest: 'a'.repeat(64),
     createdAt: at, expiresAt: '2026-11-11T00:05:00.000Z',
   })
+  const replyBody = store.artifacts.write(new TextEncoder().encode('{"reply":"completed"}'))
+  store.artifacts.insert(replyBody)
+  store.commands.record('reply-request-1', 'a'.repeat(64), () => ({ kind: 'assistant-inference/1',
+    input: { messageId: 'message-1', conversationId: 'conversation-1', projectId: 'project-1' }, model: 'mock-model' }))
+  ports.assistant.replyResults.put({ protocol: 'assistant-reply-result/1', requestId: 'reply-request-1',
+    requestDigest: 'a'.repeat(64), sourceMessageId: 'message-1', replyMessageId: 'reply-message-1',
+    projectId: 'project-1', conversationId: 'conversation-1', principal: { userId: 'user-1', authorityRef: 'authority-1' },
+    model: 'mock-model', artifactRef: replyBody.id, artifactDigest: replyBody.digest,
+    textDigest: 'a'.repeat(64), recordedAt: at })
   const bundle = store.artifacts.write(new TextEncoder().encode('{"context":"bounded"}'))
   store.artifacts.insert(bundle)
   ports.assistant.contextBindings.put({
@@ -104,7 +113,7 @@ function dataset() {
     sources: [{ sourceId: 'message-1', kind: 'conversation_message', sourceDigest: 'e'.repeat(64), previewDigest: 'e'.repeat(64), truncated: false }],
     confirmedAt: at, expiresAt: '2026-11-11T00:04:00.000Z',
   })
-  return { root, store, ports, patch, report, bundle }
+  return { root, store, ports, patch, report, bundle, replyBody }
 }
 
 test('schema-13 snapshot includes decisions/settings/contracts/verification/outcome and restores readably', async () => {
@@ -117,7 +126,7 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
     assert.equal(result.manifest.database.productSchema, PRODUCT_SCHEMA_VERSION)
     assert.equal(result.manifest.incompatibleSchema, false)
     assert.equal(result.manifest.complete, true)
-    assert.deepEqual([...result.manifest.referencedArtifacts].sort(), [data.report.id, data.bundle.id].sort())
+    assert.deepEqual([...result.manifest.referencedArtifacts].sort(), [data.report.id, data.bundle.id, data.replyBody.id].sort())
     const families = new Map(result.manifest.evidence.families.map(family => [family.name, family]))
     assert.equal(families.get('decisions')!.count, 1)
     assert.equal(families.get('project_settings')!.count, 1)
@@ -128,6 +137,7 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
     assert.equal(families.get('recovery_intents')!.count, 1)
     assert.equal(families.get('recovery_activations')!.count, 1)
     assert.equal(families.get('assistant_context_bindings')!.count, 1)
+    assert.equal(families.get('assistant_reply_results')!.count, 1)
     assert.equal(result.manifest.evidence.complete, true)
     for (const row of result.manifest.artifacts)
       assert.equal(readFileSync(join(snapshot, row.snapshotPath)).length, row.bytes)
@@ -162,6 +172,9 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
       assert.equal(outcome.reviewTiming.readyToAcceptanceMs, 100000)
       assert.equal(outcome.reviewTiming.activeReviewMs, 5000)
       assert.equal((db.prepare("SELECT COUNT(*) AS n FROM review_evidence WHERE id = 'review-1'").get() as { n: number }).n, 1)
+      const restoredReply = JSON.parse(String((db.prepare("SELECT value FROM assistant_reply_results WHERE request_id = 'reply-request-1'").get() as { value: string }).value))
+      assert.equal(restoredReply.artifactRef, data.replyBody.id)
+      assert.equal(restoredReply.replyMessageId, 'reply-message-1')
       const restoredBinding = JSON.parse(String((db.prepare("SELECT value FROM assistant_context_bindings WHERE message_id = 'message-1'").get() as { value: string }).value))
       assert.equal(restoredBinding.bundleRef, data.bundle.id)
       assert.equal(restoredBinding.purpose, 'conversation_discussion')
@@ -190,9 +203,10 @@ test('a selected-context binding whose bundle artifact row is absent blocks the 
   const snapshot = join(data.root, 'snapshot-missing-bundle')
   try {
     data.store.db.prepare('DELETE FROM artifacts WHERE id = ?').run(data.bundle.id)
+    data.store.db.prepare('DELETE FROM artifacts WHERE id = ?').run(data.replyBody.id)
     const result = await new WorkflowSnapshots(data.store).create({ destination: snapshot })
     assert.equal(result.status, 'blocked')
-    assert.deepEqual(result.manifest.missingReferences, [data.bundle.id])
+    assert.deepEqual(result.manifest.missingReferences, [data.bundle.id, data.replyBody.id].sort())
     assert.equal(result.manifest.complete, false)
   } finally {
     data.store.close()
@@ -268,6 +282,25 @@ test('missing file, changed bytes and a newer schema make the snapshot unusable'
     const tampered = new WorkflowSnapshots(data.store).verify(tamperedDir)
     assert.equal(tampered.status, 'blocked', 'reference evidence detects a row change even with a re-recorded DB hash')
 
+    // A changed completed-reply result body with re-recorded database bytes is still caught.
+    const replyTamperDir = join(data.root, 'reply-tamper-copy')
+    cpSync(snapshot, replyTamperDir, { recursive: true })
+    const replyTamperDb = join(replyTamperDir, 'product.sqlite')
+    const replyTamper = new Database(replyTamperDb)
+    try {
+      const row = replyTamper.prepare("SELECT value FROM assistant_reply_results WHERE request_id = 'reply-request-1'").get() as { value: string }
+      replyTamper.prepare("UPDATE assistant_reply_results SET value = ?, text_digest = ? WHERE request_id = 'reply-request-1'")
+        .run(JSON.stringify({ ...JSON.parse(row.value), textDigest: '9'.repeat(64) }), '9'.repeat(64))
+    } finally { replyTamper.close() }
+    const replyTamperManifestPath = join(replyTamperDir, 'snapshot.json')
+    const replyTamperManifest = JSON.parse(readFileSync(replyTamperManifestPath, 'utf8'))
+    const replyTamperBytes = readFileSync(replyTamperDb)
+    replyTamperManifest.database.sha256 = createHash('sha256').update(replyTamperBytes).digest('hex')
+    replyTamperManifest.database.bytes = replyTamperBytes.byteLength
+    writeFileSync(replyTamperManifestPath, JSON.stringify(replyTamperManifest, null, 2))
+    const replyTampered = new WorkflowSnapshots(data.store).verify(replyTamperDir)
+    assert.equal(replyTampered.status, 'blocked', 'a changed completed reply result is detected through its family digest')
+
     // Removing the activation table is not an empty-but-valid backup: the evidence family disappears.
     const missingTableDir = join(data.root, 'missing-table-copy')
     cpSync(snapshot, missingTableDir, { recursive: true })
@@ -296,6 +329,20 @@ test('missing file, changed bytes and a newer schema make the snapshot unusable'
     writeFileSync(bindingManifestPath, JSON.stringify(bindingManifest, null, 2))
     const missingBinding = new WorkflowSnapshots(data.store).verify(missingBindingDir)
     assert.equal(missingBinding.status, 'blocked', 'a missing binding table is not silently treated as empty evidence')
+
+    const missingReplyDir = join(data.root, 'missing-reply-copy')
+    cpSync(snapshot, missingReplyDir, { recursive: true })
+    const missingReplyDb = join(missingReplyDir, 'product.sqlite')
+    const dropReplyDb = new Database(missingReplyDb)
+    try { dropReplyDb.exec('DROP TABLE assistant_reply_results') } finally { dropReplyDb.close() }
+    const replyManifestPath = join(missingReplyDir, 'snapshot.json')
+    const replyManifest = JSON.parse(readFileSync(replyManifestPath, 'utf8'))
+    const replyBytes = readFileSync(missingReplyDb)
+    replyManifest.database.sha256 = createHash('sha256').update(replyBytes).digest('hex')
+    replyManifest.database.bytes = replyBytes.byteLength
+    writeFileSync(replyManifestPath, JSON.stringify(replyManifest, null, 2))
+    const missingReply = new WorkflowSnapshots(data.store).verify(missingReplyDir)
+    assert.equal(missingReply.status, 'blocked', 'a missing reply result table is not silently treated as empty evidence')
   } finally {
     data.store.close()
     rmSync(data.root, { recursive: true, force: true })

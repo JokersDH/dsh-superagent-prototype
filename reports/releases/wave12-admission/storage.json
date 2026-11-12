@@ -1,0 +1,63 @@
+{
+  "protocol": "wave12-a-admission/1",
+  "source": "121ab84818b9cb8204a67c4d639e69cbf5040ef2",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-a",
+  "sourceStable": true,
+  "cases": [
+    {
+      "id": "EXACT_OWN_CONFIRMATION_POSITIVE_CONTROL",
+      "status": "PASS",
+      "observation": {
+        "productSchema": 18,
+        "fingerprintUnchanged": true
+      }
+    },
+    {
+      "id": "EXCLUDED_ROW_MUST_NOT_HIDE_A_TAIL_BEYOND_FAMILY_CAP",
+      "status": "FAIL",
+      "message": "Adding a non-excluded activation beyond the scan tail must be visible or bounded",
+      "observation": {
+        "beforeCoverage": "complete",
+        "afterCoverage": "complete",
+        "actualNonExcludedRows": 6,
+        "cap": 5,
+        "reported": {
+          "name": "recovery_activations",
+          "rows": 5,
+          "digest": "8211a73a5d5adbfd3e2eaed669b531f15723c735c8691a5e9fd0d8309b55e54b",
+          "truncated": false
+        },
+        "fingerprintUnchanged": true
+      }
+    },
+    {
+      "id": "EXCLUSION_MUST_NOT_HIDE_A_SECOND_IDENTICAL_INTENT_EVENT",
+      "status": "FAIL",
+      "message": "Only the original exact intent event may be ignored; a later same-body event is another change",
+      "observation": {
+        "coverage": "complete",
+        "fingerprintUnchanged": true,
+        "observedCursorChanged": true
+      }
+    },
+    {
+      "id": "DERIVED_WORK_INDEX_MUST_AGREE_WITH_IMMUTABLE_BINDING",
+      "status": "FAIL",
+      "message": "A corrupted derived work_id must not return another work as matching history",
+      "observation": {
+        "rejected": false,
+        "queryWorkId": "foreign-work",
+        "returnedWorkIds": [
+          "actual-work"
+        ]
+      }
+    }
+  ],
+  "counts": {
+    "pass": 1,
+    "fail": 3
+  },
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "new logical source and raw history only; no startup authority; temp SQLite only"
+}
