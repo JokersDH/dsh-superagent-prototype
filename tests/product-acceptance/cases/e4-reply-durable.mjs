@@ -96,5 +96,9 @@ export async function runReplyDurability() {
     ...define('E4-B-PRODUCTION-RECOVERY', 'Real B production begin/answer/stop recovery through the product Store/queues/Runner', { layer: LAYERS.NOT_TESTED }),
   }, 'NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B\'s new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery.'))
 
+  cases.push(notTested({
+    ...define('E5-D-OWNERSHIP-MOCKS', 'D full UID/argv/root/operation, journal scope, scanner failure and role mocks refuse', { layer: LAYERS.NOT_TESTED }),
+  }, 'NOT_TESTED: wave14 actual self-owned checks cover requested data root, copied record and wrong install; D\'s new identity UID/argv/operation, foreign journal scope, per-PID scan failure, malformed inventory and old/new install-role mocks were not independently reproduced in this checkout. Required: import the current D ownership functions with injected inventory/signals and assert UNKNOWN/refusal for each, before any broad live cleanup matrix.'))
+
   return { cases, artifacts: {} }
 }
