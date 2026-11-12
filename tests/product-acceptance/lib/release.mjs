@@ -334,6 +334,22 @@ export function concurrencyIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   return value.prepared === 4 && value.recorded === 4 && value.replies === 4 && value.providerCalls === 4 && value.bindings === 4 ? [] : ['bounded_concurrency']
 }
+export function replyDurableIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  return value.first?.calls === 1 && value.first?.replies === 0 && value.recovered?.calls === 0 && value.recovered?.replies === 1 ? [] : ['durable_reply']
+}
+export function replyUnknownIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  return value.crashedCalls === 1 && value.recoveredCalls === 0 && typeof value.notice === 'string' ? [] : ['unknown_resend']
+}
+export function replyWindowIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  return value.crashedCalls === 1 && value.recoveredCalls === 0 && value.replies === 1 ? [] : ['message_window']
+}
+export function replyBadArtifactIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  return value.calls === 0 && value.replies === 0 && typeof value.notice === 'string' ? [] : ['bad_artifact']
+}
 export function schemaMigrationIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -717,7 +733,7 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
           for (const issue of fn(result.evidence?.[key])) failures.push(fail(`${key}_invalid`, `${key} ${issue}`, entry.id))
         }

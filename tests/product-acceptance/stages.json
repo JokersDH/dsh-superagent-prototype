@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-11/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-12/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "b466bc7",
-  "checkpoint": "5d1acf5",
+  "base": "530085c",
+  "checkpoint": "617fd68",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -37,7 +37,7 @@
       "title": "Current context use, SSE, audit and reply consumer",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "E3-CONTEXT-USE/SSE/GUARDS/UI run real current-main HTTP, SQLite schema16, effects and a loopback mock provider: preview, confirm, same-transaction binding/receipt, audit, SSE, lost response, source drift, expiry and offline refusal. E4-COMPLETED-REPLY verifies recovery ordering with an explicit in-process port fixture; E4-REPLY-PERSISTENCE stays NOT_TESTED until A's replyResults rows exist."
+        "Real A18 SQLite/result rows plus current HTTP/SSE/UI: selected context, audit, lost response, mobile and two tabs. Independent-process SIGKILL cases cover after-result, during-provider, after-message and corrupted artifact with zero second provider calls."
       ]
     },
     {
@@ -45,7 +45,7 @@
       "title": "Explicit baseline/target installation and upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Install matrix now binds D's latest frozen tuple cf7a3cf/build da2d78d1/schema15: personal cold start, managed upgrade/rollback, cross-schema refusal, backup/restore, schema15→current-A schema16 migration and config adoption/conflict. E4-MULTI-STATE still proves the requested-root stop defect on these bytes; E6-CURRENT-MAIN-INSTALL is NOT_TESTED because no schema16/context-use tar exists."
+        "Install matrix binds D wave11-target a22d3a4/schema16 with context-use: cold personal, backup/restore, tamper, requested-data-root stop, schema16→current A schema18 migration. Same-schema binary upgrade/rollback is NOT_TESTED because no second schema16 build exists; cross-schema refusal passes. Copied record in another config root still stops the original API on these bytes."
       ]
     },
     {
@@ -53,7 +53,7 @@
       "title": "Bounded context concurrency, recovery windows and stability",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "E9-CONTEXT-CONCURRENCY runs four selected sends plus duplicate replay with one provider call per command; existing bounded cycles remain. Real recovery activation, multi-tab stale-selection UI and cross-process reply persistence remain NOT_TESTED with required inputs."
+        "E9-CONTEXT-CONCURRENCY plus 50 bounded operations; copy-record ownership uses only this process's spawned API. Generic global cleanup/recover/shared-cache ownership remains out of scope until D fixes and ships bytes."
       ]
     },
     {
@@ -61,7 +61,7 @@
       "title": "Layered conclusions and handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave11-status separates test source 5d1acf5, product source b466bc7/31ddd26 and the exact D artifact tuple; wave10 and older status files are frozen and not rewritten."
+        "wave12-status separates test source, main 530085c/schema18, D a22d3a4/schema16 artifact and current-main install NOT_TESTED; wave11 and older status files are frozen."
       ]
     },
     {

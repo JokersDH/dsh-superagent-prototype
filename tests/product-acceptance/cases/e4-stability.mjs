@@ -7,7 +7,7 @@ import { cleanup, pickPort, processSnapshot, startProduct, stateSizeKb, tempStat
 import { FIXTURE_PROTOCOL, loadFixture } from '../lib/fixtures.mjs'
 import { readRuntimeState } from '../lib/product-db.mjs'
 
-const MAX_CYCLES = 30
+const MAX_CYCLES = 60
 const MAX_DURATION_MS = 45 * 60 * 1000
 
 async function waitWork(client, workId, predicate, timeoutMs = 30_000) {
@@ -48,7 +48,7 @@ function portabilityDecision(checklist, { requireRollback }) {
   return { ok: true, reason: 'satisfied' }
 }
 
-export async function runE4({ root, runDirectory, keep = false, cycles = 30 }) {
+export async function runE4({ root, runDirectory, keep = false, cycles = 50 }) {
   const cases = []
   const fixturesRoot = resolve(root, 'tests/product-acceptance/fixtures')
   const artifacts = { screenshots: [] }

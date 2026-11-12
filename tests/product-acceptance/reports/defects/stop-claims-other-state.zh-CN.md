@@ -55,3 +55,10 @@ E 只记录证据，不修改 launcher；旧安装结果不因本轮修复而改
 - 结果仍为 FAIL：`stop --data-root A` 退出 0/STOPPED，record 属于 `data-b`，B 的 API 被终止（apiOpenBefore=true → apiOpenAfter=false），B launcher 存活。
 - 由于该步骤已杀掉 B 的 API，launcher 死/API 活窗口本轮保持 NOT_TESTED，未用删除 record 或其他人工方式补窗口。
 - D 源码 `fe01c3c` 的 `apps/launcher/lib/stop.mjs` 仍只校验 record 自身，未比较调用者 requested data root；本轮未使用用户九组实例。
+
+## 第十二轮 a22d3a4 schema16 复测
+
+- 目标：wave11-target-a22d3a4 / build `3311a04bd20ed7f9` / schema16 / source `a22d3a4`
+- requested data-root stop：`E4-MULTI-STATE` 通过；针对 state A 的 stop 不再认领 state B。
+- 但 copied record：把 `var/config/instance.json` 复制到另一 config root 后执行 stop，退出 0 并停止了原 API（`E7-OWNERSHIP-COPY` FAIL）。该 tar 的 record 无 configRoot，stop 只校验 state/install，未把调用者 config 绑定纳入权威。
+- D 源码 `020af82` 已声明继续修 config/共享路径所有权；本轮未运行真实全局 stop 矩阵，只用本进程 spawn 的单实例与复制 record 验证。

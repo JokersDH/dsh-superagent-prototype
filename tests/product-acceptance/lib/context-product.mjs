@@ -17,7 +17,7 @@ const digest = value => createHash('sha256').update(JSON.stringify(value)).diges
  * real application/effects and a loopback-only mock provider. No vendor call and no fixture port
  * substitutes for the A contextBindings table; only replyResults stays an explicit in-process map.
  */
-export async function startContextProduct({ stateRoot, projectPath, principal, projects, now, withReplyResults = true }) {
+export async function startContextProduct({ stateRoot, projectPath, principal, projects, now }) {
   const owner = principal ?? { userId: 'wave11-context-user', authorityRef: 'wave11-context-authority' }
   const configured = projects ?? []
   let store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
@@ -26,16 +26,6 @@ export async function startContextProduct({ stateRoot, projectPath, principal, p
   const requests = []
   const replies = []
   const completed = new Map()
-  const replyResults = {
-    forRequest: id => completed.has(id) ? structuredClone(completed.get(id)) : undefined,
-    forReply: id => { const found = [...completed.values()].find(value => value.replyMessageId === id); return found && structuredClone(found) },
-    put: value => {
-      if (!store.uow.nesting) throw new Error('replyResults.put must join the caller transaction')
-      const cloned = structuredClone(value)
-      store.uow.afterCommit(() => completed.set(cloned.requestId, cloned))
-      return { result: cloned, replayed: false }
-    },
-  }
   const provider = {
     status: () => ({ protocol: 'assistant-provider/1', configured: provider.configured !== false,
       baseURL: 'https://mock.invalid/v1', model: 'mock-context', models: ['mock-context'],
@@ -55,7 +45,6 @@ export async function startContextProduct({ stateRoot, projectPath, principal, p
       store, principal: owner, stateRoot, scratchProject: projectPath,
       projects: configured.map(item => ({ id: item.id, displayName: item.displayName ?? item.id, scope: item.scope })),
       actionSecret: Buffer.alloc(32, 2), assistantProvider: provider,
-      ...(withReplyResults ? { assistantReplyResults: replyResults } : {}),
       now: () => clock,
     })
     port = await freePort()
@@ -116,7 +105,6 @@ export async function startContextProduct({ stateRoot, projectPath, principal, p
     async cleanup() { try { await close() } catch {} rmSync(stateRoot, { recursive: true, force: true }) },
     provider,
     owner,
-    withReplyResults,
   }
 }
 

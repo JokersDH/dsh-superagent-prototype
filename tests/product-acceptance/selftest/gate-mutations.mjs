@@ -105,6 +105,14 @@ const evidenceFor = (key) => {
       return { desktopMessages: 1, mobileMessages: 2, tabMessages: 2, pendingReconciled: true, providerRequests: 5, auditCommandIds: ['c'] }
     case 'concurrency':
       return { prepared: 4, recorded: 4, replies: 4, providerCalls: 4, bindings: 4 }
+    case 'replyDurable':
+      return { first: { calls: 1, replies: 0 }, recovered: { calls: 0, replies: 1 } }
+    case 'replyUnknown':
+      return { crashedCalls: 1, recoveredCalls: 0, notice: '未自动重发' }
+    case 'replyMessageWindow':
+      return { crashedCalls: 1, recoveredCalls: 0, replies: 1 }
+    case 'replyBadArtifact':
+      return { calls: 0, replies: 0, notice: '无法核对' }
     case 'schemaMigration':
       return { old: { schema: 15, messages: 3 }, migrated: { schema: 16, messages: 3, bindingTable: true }, reopened: true }
     case 'completedReply':

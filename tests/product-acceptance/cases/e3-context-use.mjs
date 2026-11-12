@@ -186,7 +186,8 @@ export async function runContextUse({ root, runDirectory }) {
     assert('PROVIDER_ONCE_BEFORE_FAILURE', h.requests.length === 1, String(h.requests.length))
     assert('NO_REPLY_YET', !afterFailure.some(item => item.provenance === 'reasoner_reply'), JSON.stringify(afterFailure.map(item => item.provenance)))
     const auditBefore = await h.audit(user.id)
-    assert('COMPLETED_SAVED', h.completed().size === 1, String(h.completed().size))
+    const savedRows = Number(h.store.db.prepare('SELECT count(*) AS c FROM assistant_reply_results').get()?.c ?? 0)
+    assert('COMPLETED_SAVED', savedRows === 1, String(savedRows))
     h.store.db.exec('DROP TRIGGER fail_w11_reply')
     for (const row of h.store.queue.dueRows('application.assistant.reply', Number.MAX_SAFE_INTEGER, 100))
       h.store.queue.reschedule(row.kind, row.key, row.seq, row.generation, 0)
@@ -199,30 +200,7 @@ export async function runContextUse({ root, runDirectory }) {
     const auditAfter = await h.audit(user.id)
     assert('AUDIT_UNCHANGED', auditAfter.status === 200 && JSON.stringify(auditAfter.body) === JSON.stringify(auditBefore.body), JSON.stringify(auditAfter.body)?.slice(0, 200))
     evidence.completedReply = { providerRequests: h.requests.length, replies: recovered.length,
-      auditStable: true, recoveredMessageId: recovered[0].id, persistence: 'in-process-map-fixture-only' }
-  }))
-
-  cases.push(await runCase({ ...define('E4-REPLY-UNKNOWN', 'A pre-send receipt without a completed result stays unknown and is never automatically resent'),
-    evidence: {} }, async ({ assert, evidence }) => {
-    const { root, state, project } = contextProjectRoot()
-    // No replyResults port: the production composition must keep the unknown notice and not invent a result.
-    const h = await startContextProduct({ stateRoot: state, projectPath: project, withReplyResults: false,
-      projects: [{ id: 'w11-project-a', displayName: '项目 A', scope: scope('w11-project-a') }] })
-    try {
-      h.seed({ id: 'w11-source-u', conversationId: 'conv-u', projectId: 'w11-project-a', role: 'user', provenance: 'trusted_user',
-        text: 'W11-UNKNOWN-SOURCE', sourceRefs: [], createdAt: h.now() })
-      h.replies.push({ text: '不会作为持久结果保存。' })
-      const prepared = await h.prepare(input('w11-project-a', 'conv-u', 'w11-unknown-1', '未知完成结果。'))
-      h.store.db.exec("CREATE TRIGGER fail_w11_unknown BEFORE INSERT ON conversation_messages WHEN json_extract(NEW.value, '$.role') = 'assistant' BEGIN SELECT RAISE(ABORT, 'w11 unknown failure'); END")
-      await h.send({ commandId: 'w11-unknown-1', token: prepared.body.token })
-      await h.flush()
-      await h.flush()
-      const messages = await waitMessages(h.store, 'conv-u', list => list.some(item => item.provenance === 'application_notice'))
-      assert('UNKNOWN_NOTICE_AFTER_RETRY', messages.some(item => item.provenance === 'application_notice' && item.text.includes('未能确认')), JSON.stringify(messages.map(item => item.text)).slice(0, 300))
-      assert('UNKNOWN_ONE_PROVIDER', h.requests.length === 1, String(h.requests.length))
-      assert('UNKNOWN_NO_REPLY', !messages.some(item => item.provenance === 'reasoner_reply'), JSON.stringify(messages.map(item => item.provenance)))
-      evidence.unknownReply = { providerRequests: h.requests.length, notice: true, reply: false, durableResultPort: false }
-    } finally { await h.cleanup() }
+      auditStable: true, recoveredMessageId: recovered[0].id, persistence: 'A18 SQLite replyResults rows' }
   }))
 
   cases.push(await runCase({ ...define('E9-CONTEXT-CONCURRENCY', 'Four selected sends and one duplicate token stay bounded with one provider call each'),
@@ -247,12 +225,6 @@ export async function runContextUse({ root, runDirectory }) {
     assert('DUPLICATE_ONE_BINDING', bindingCount(h) === 4, String(bindingCount(h)))
     evidence.concurrency = { prepared: 4, recorded: 4, replies: 4, providerCalls: 4, bindings: 4, duplicateCalls: duplicate.map(item => item.status) }
   }))
-
-  cases.push(notTested({ ...define('E4-REPLY-PERSISTENCE', 'Completed results survive a real cross-process restart through the A store'),
-    layer: LAYERS.NOT_TESTED, limitations: [
-      'Requires A to implement `store.workflows.assistant.replyResults` with the result row and artifact registration in one transaction, plus backup coverage.',
-      'The current composition accepts an explicit port; E only used a process-local Map fixture and does not treat reopening SQLite in the same process as durable result persistence.',
-    ] }, 'NOT_TESTED: current main/31ddd26 publishes the consumer and its recovery ordering, but the production A replyResults port is not implemented in this checkout (only the in-process fixture port is accepted). Required: real A put/forRequest/forReply rows in the caller transaction, close/reopen and independent-process SIGKILL readback, backup/inventory of the result family and artifact, corrupt-result refusal, and no provider call when the result is recovered. The existing in-process-map recovery case is consumer evidence only.'))
 
   for (const h of activeHarnesses.splice(0)) { try { await h.cleanup() } catch { /* already closed */ } }
   return { cases, artifacts: {} }
