@@ -9,6 +9,7 @@ import { key } from '@personal-agent/orchestrator-core'
 import { collectContextHistory } from '../../context/src/index.ts'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
+import { CompletedAssistantReplies } from '../../../apps/coordinator/product/assistant-reply-results.ts'
 
 const principal = { userId: 'consumer-user', authorityRef: 'consumer-authority' }
 const actor: TrustedActor = { ...principal, source: 'local_cli' }
@@ -337,11 +338,28 @@ test('the real A18 history and completed reply are consumed through the durable 
   assert.equal(h.store.workflows.assistant.replyResults.forReply(result.replyMessageId)?.requestDigest, result.requestDigest)
 
   const now = () => new Date('2026-11-12T09:03:00.000Z')
+  const readerFor = (target: typeof h.store) => {
+    // Main verification: original receipt + artifact bytes + reply body identity.
+    const completed = new CompletedAssistantReplies(
+      target,
+      target.workflows.assistant.replyResults,
+      principal,
+      () => [projectId],
+    )
+    return (id: string) => {
+      try {
+        const requestId = key('assistant-request', id)
+        if (completed.read(requestId) === undefined) return undefined
+        const stored = target.workflows.assistant.replyResults.forRequest(requestId)
+        return stored === undefined ? undefined : { result: stored, verifiedBy: 'main-completed-reply' as const }
+      } catch {
+        return undefined
+      }
+    }
+  }
   const view = collectContextHistory(h.store.workflows.assistant.contextHistory, h.historyInput(), {
     now,
-    replyResults: h.store.workflows.assistant.replyResults,
-    // Main owns its assistant request key; C only projects the result it returns.
-    replyFor: (id) => h.store.workflows.assistant.replyResults.forRequest(key('assistant-request', id)),
+    replyReader: readerFor(h.store),
   })
   assert.equal(view.entries.length, 1)
   const entry = view.entries[0]!
@@ -361,7 +379,7 @@ test('the real A18 history and completed reply are consumed through the durable 
   // A work filter the binding does not carry is not this work's history.
   const workView = collectContextHistory(h.store.workflows.assistant.contextHistory, h.historyInput('other-work'), {
     now,
-    replyResults: h.store.workflows.assistant.replyResults,
+    replyReader: readerFor(h.store),
   })
   assert.equal(workView.entries.length, 0)
 
@@ -369,8 +387,7 @@ test('the real A18 history and completed reply are consumed through the durable 
   const reopened = await h.reopenStore()
   const durable = collectContextHistory(reopened.workflows.assistant.contextHistory, h.historyInput(), {
     now: () => new Date('2026-11-12T09:03:00.000Z'),
-    replyResults: reopened.workflows.assistant.replyResults,
-    replyFor: (id) => reopened.workflows.assistant.replyResults.forRequest(key('assistant-request', id)),
+    replyReader: readerFor(reopened),
   })
   assert.equal(durable.entries.length, 1)
   assert.equal(durable.entries[0]!.completedReply?.artifactDigest, result.artifactDigest)

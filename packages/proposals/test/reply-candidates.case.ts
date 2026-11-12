@@ -200,3 +200,26 @@ test('a revision proposal without a current contract is refused rather than gues
   assert.equal(review.status, 'no_candidates')
   assert.deepEqual(review.rejected.map((entry) => entry.reason), ['contract_stale'])
 })
+
+test('an expired-or-wider candidate scope and a foreign revision are refused item by item', () => {
+  const expiringGrant = {
+    ...bindings,
+    grantScope: { ...scope, expiresAt: '2026-11-12T10:00:00.000Z' },
+  }
+  const review = reviewReplyCandidates(
+    body([
+      {
+        kind: 'propose_decision',
+        content: 'Decision outliving the grant',
+        scope: { ...scope, expiresAt: '2026-11-12T12:00:00.000Z' },
+        sourceMessageId,
+      },
+      { kind: 'propose_revision', expected: { ...contract, revision: 9 }, rationale: 'Foreign revision', sourceMessageId },
+    ]),
+    expiringGrant,
+  )
+  assert.equal(review.status, 'no_candidates')
+  assert.deepEqual(review.rejected.map((entry) => entry.reason), ['scope_escalation', 'contract_stale'])
+  assert.equal(review.hasExecutableCandidates, false)
+  assert.equal(review.modelCallPerformed, false)
+})

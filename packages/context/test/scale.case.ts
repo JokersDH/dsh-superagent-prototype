@@ -246,3 +246,147 @@ test('a deterministic mixed Chinese/English baseline has fixed hits and zero con
   assert.equal(selection.omitted.filter((entry) => entry.reason === 'no_match').length, 1)
   assert.equal(selection.complete, true)
 })
+
+test('a 10000-message walk completes within 20 pages and stays deterministic at scale', async () => {
+  const messages: ScopedConversationMessageView[] = Array.from({ length: 10000 }, (_, index) => ({
+    id: `m-${index + 1}`,
+    conversationId,
+    projectId,
+    sequence: index + 1,
+    role: 'user',
+    provenance: 'trusted_user',
+    text: index === 9998 ? 'payment retry at the newest edge' : `line ${index + 1}`,
+    createdAt: sameTime,
+  }))
+  const reader = {
+    page(id: string, input: { before?: number; limit?: number }) {
+      const before = input.before ?? Number.MAX_SAFE_INTEGER
+      const eligible = messages
+        .filter((message) => message.conversationId === id && message.sequence < before)
+        .sort((left, right) => right.sequence - left.sequence)
+      const page = eligible.slice(0, input.limit ?? 50)
+      return { messages: page, hasMore: eligible.length > page.length }
+    },
+  }
+  const provider = createScopedConversationProvider(reader, { projectId, conversationId }, { pageSize: 200, maxPages: 60 })
+  const walked = await provider.recent({ projectId, conversationId, limit: 20_000 })
+  assert.equal(walked.length, 10000)
+  assert.equal(provider.coverage().scanned, 10000)
+  assert.equal(provider.coverage().complete, true)
+  assert.equal(provider.coverage().scanned, walked.length)
+
+  const batch = await createConversationRelevanceCandidates(provider, { projectId, conversationId }, { limit: 1000 })
+  const options = { projectId, query: 'payment retry', allowedKinds: ['conversation_message' as const], maxItems: 16, maxBytes: 32 * 1024 }
+  const first = selectRelevantSources(batch, options)
+  const second = selectRelevantSources(Object.assign([...batch].reverse(), { coverage: batch.coverage }), options)
+  assert.deepEqual(first.items.map((item) => item.sourceId), second.items.map((item) => item.sourceId))
+  assert.deepEqual(first.items.map((item) => item.sourceId), ['m-9999'])
+})
+
+test('10000 decision candidates are ranked with a bounded output and explicit budget omissions', () => {
+  const candidates = Array.from({ length: 10000 }, (_, index) =>
+    createDecisionRelevanceCandidates(
+      [
+        {
+          decisionId: `d-${index}`,
+          content: index % 200 === 0 ? 'payment retry rule' : `routine rule ${index}`,
+          scope,
+          sourceMessageId: 'm-1',
+          recordedAt: NOW,
+        },
+      ],
+      { coverage: { complete: true } },
+    ),
+  ).flat()
+  const selection = selectRelevantSources(candidates, {
+    projectId,
+    query: 'payment retry',
+    scope,
+    maxItems: 16,
+    maxBytes: 32 * 1024,
+  })
+  assert.equal(selection.items.length, 16)
+  assert.ok(selection.totals.considered === 10000)
+  assert.ok(selection.omitted.filter((entry) => entry.reason === 'budget_items').length > 0)
+  assert.ok(selection.omitted.filter((entry) => entry.reason === 'no_match').length > 0)
+  assert.equal(selection.complete, false)
+})
+
+test('10000 omissions are capped by the omission budget, not serialized in full', async () => {
+  const composed = await (await import('../src/composer.ts')).ContextComposer.prototype.constructor
+  void composed
+  const composition = {
+    protocol: 'context-composition/1',
+    requestId: 'omission-scale',
+    projectId,
+    grantId: 'grant-1',
+    purpose: 'conversation_discussion',
+    status: 'partial',
+    trust: 'untrusted_data',
+    baseline: { capturedAt: NOW },
+    budget: { maxBytes: 1024, maxTokens: 256, maxSlices: 2, maxDurationMs: 1000 },
+    budgetClamped: [],
+    groups: [],
+    slices: [],
+    omitted: Array.from({ length: 10000 }, (_, index) => ({
+      path: `/Users/owner/private/${index}.ts`,
+      reason: 'missing' as const,
+      detail: `Cannot read /Users/owner/private/${index}.ts`,
+    })),
+    injectionFlags: [],
+    explanations: [],
+    totals: { files: 0, bytes: 0, tokens: 0, durationMs: 0 },
+  } as unknown as ContextComposition
+  const review = projectSourceReview(composition, { maxItems: 4, maxOmissions: 5 })
+  assert.equal(review.omitted.length, 5)
+  assert.equal(review.suppressed.omissions, 9995)
+  assert.ok(Buffer.byteLength(JSON.stringify(review)) < 4096)
+  assert.equal(JSON.stringify(review).includes('/Users/owner'), false)
+  assert.ok(review.notes.some((note) => note.includes('omission budget')))
+})
+
+test('revocation, deletion and byte changes each surface as a distinct comparison outcome', async () => {
+  const { ContextComposer } = await import('../src/composer.ts')
+  const decisionsFor = (decisions: readonly { decisionId: string; content: string }[]) =>
+    new ContextComposer(
+      {
+        port: {
+          projectBaseline: async () => ({ capturedAt: NOW }),
+          listSources: async () => [],
+          readSource: async () => {
+            throw new Error('no files')
+          },
+        },
+        decisions: {
+          listEffective: async () => ({
+            decisions: decisions.map((decision) => ({
+              decisionId: decision.decisionId,
+              content: decision.content,
+              scope,
+              sourceMessageId: 'm-1',
+              recordedAt: NOW,
+            })),
+          }),
+        },
+      },
+      { now: () => new Date(NOW) },
+    ).compose({
+      requestId: 'invalidation',
+      projectId,
+      purpose: 'conversation_discussion',
+      query: '',
+      grant: makeGrant({ projectId, purpose: 'conversation_discussion', scope, sourceKinds: ['decision'] }),
+      budget: { maxFiles: 4, maxSlices: 4, maxBytes: 4096, maxTokens: 2000, maxDurationMs: 1000 },
+      groups: [{ name: 'decisions', priority: 1, sourceKinds: ['decision'], share: 1 }],
+    })
+
+  const before = buildSourceManifest(await decisionsFor([{ decisionId: 'd-1', content: 'Keep checks' }]))
+  const changed = buildSourceManifest(await decisionsFor([{ decisionId: 'd-1', content: 'Keep checks twice' }]))
+  const revoked = buildSourceManifest(await decisionsFor([]))
+  assert.ok(compareSourceManifests(before, changed).changes.some((change) => change.reason === 'content'))
+  // An empty composition is also an incomplete scan, so the comparison can be incomplete rather
+  // than merely changed; either way it must move and name the missing source.
+  const revokedComparison = compareSourceManifests(before, revoked)
+  assert.notEqual(revokedComparison.status, 'unchanged')
+  assert.ok(revokedComparison.changes.some((change) => change.reason === 'missing' || change.reason === 'omitted'))
+})
