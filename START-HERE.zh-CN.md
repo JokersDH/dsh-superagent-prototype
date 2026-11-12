@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**上下文历史与原始正文已可用：[http://127.0.0.1:5189/](http://127.0.0.1:5189/)。** main e97e65a/eea5fa2接通真实A18历史、签名分页、原bundle正文、消息来源审阅、跨会话筛选与返回原会话。A7a8e099的work一致性修复已按路径接入，恢复源扫描仍单列。505项非浏览器及8+9项网页场景通过，三项界面审阅修正均resolved。新5189/8805是独立personal state；原九组服务/历史不迁移、不重启，自动真实模型/native0。[实际范围](reports/releases/wave12-context/README.zh-CN.md)与[读取接口](docs/rfcs/WP-16/0038-context-history-and-frozen-source-reader.md)。A–E继续既定第十二轮十阶段整包，无需重新派工。
+
 **当前派工：[第十二轮产品交付长包](agent-tasks/product-wave-12/README.zh-CN.md)。** A修逻辑快照/历史三反例并收口持久数据；B做真实生产控制/独立进程恢复；C做来源检索到候选完整数据链；D先关所有权P1再交当前安装；E改为动态真实字节验收。每人十阶段，三次checkpoint后继续，见[五段转发话术](agent-tasks/product-wave-12/forward-prompts.zh-CN.md)和[0037独立验收](docs/rfcs/WP-16/0037-wave-12-admission-and-product-delivery.md)。
 
 **实际持久回复已接入main530085c/schema18。** 原HTTP测试已换真实A结果表；新增四个真实产品进程SIGKILL/损坏用例证明原结果只补一次、unknown不重发，主线本轮288项回归及9项真实A18网页复跑通过。A新source/history及B/C/D剩余阻断没有被整包放行。D新schema16 tar确含context-use，E旧schema15结论不能代表它；下一当前安装要用新schema18准确字节。原九组服务未更新，5188仍4140cac/schema16，真实模型/native0。[代码/测试范围](reports/releases/wave12-integration/README.zh-CN.md)。

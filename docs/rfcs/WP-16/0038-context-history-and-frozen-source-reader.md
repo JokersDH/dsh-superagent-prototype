@@ -27,3 +27,9 @@ main再核对A page返回的实际project/conversation/work和每条binding/原r
 ## 本检查点验证
 
 新契约2项、新HTTP/SQLite13项和既有assistant/context/进程75项通过；contracts全包226项、生成校验及coordinator product strict通过。覆盖分页/签名/跨principal/筛选/Scope变化、真实SQLite重开、过期记录、readonly、缺失/损坏/超限/symlink artifact、缺原消息、raw work错页和错误HTTP投影。模型发送0；UI尚待本轮实现，当前用户5188仍原版本。
+
+## 同轮产品完成更新
+
+后端源码e97e65a之后，A发布7a8e099，旧probe4/4通过；main仅接入work_id一致性校验与历史测试，并启用真实生产history。随后3d342fc/eea5fa2完成工作台预览/使用记录双视图、冻结来源可读正文、消息审计、跨会话工作筛选、返回原会话和手机焦点。A恢复源扫描没有因此整体集成或授启动权。
+
+最终新增历史网页8/8及原流程9/9通过，505项非浏览器回归、strict/build/生成检查通过；独立审阅三项修正均resolved，ship仅覆盖该修正清单。新个人预览5189/8805使用独立schema18 state，原九组根不迁移/重启。当前实际范围和命令见[本轮完整交付](../../../reports/releases/wave12-context/README.zh-CN.md)。

@@ -4,6 +4,7 @@
 
 ## 当前真实输入
 
+- 同轮main已发布[0038历史与冻结来源产品](../../docs/rfcs/WP-16/0038-context-history-and-frozen-source-reader.md)：e97e65a/eea5fa2为实际HTTP/UI，A7a8e099 work校验按路径准入，生产history已启用。新5189/8805也必须保留；后续A/C/E直接消费新入口，不能重复称历史HTTP尚未发布。原0037固定验收仍保留原source范围，恢复源/激活单列。
 - main `530085c`已按路径接入A回复结果/schema18/备份族，并以真实产品runtime做独立进程SIGKILL恢复；71条原主线+4条新进程测试通过。HTTP测试已移除内存结果替身。
 - A `121ab84`包内87/88通过，但source扫描/重复事件两条与history work索引一条新反例失败。RecoverySourceStore没有接入main；raw history代码因依赖已在main，但其筛选未准入，尚无HTTP消费。
 - B `4a40920`、C `553983b`的旧反例分别11/11、17/17关闭；新增B三条、C八条失败。B13测试自建表未驱动真实产品恢复，B8/B9未完成。main现有私有来源guard不撤销。

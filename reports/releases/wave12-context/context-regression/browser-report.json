@@ -1,0 +1,55 @@
+{
+  "status": "PASS_SELECTED_CONTEXT_WORKBENCH",
+  "sourceCommit": "e97e65a9035a31b472a4b99b6a315c982350534b",
+  "sourceWorktreeClean": false,
+  "checkedAt": "2026-11-12T07:26:04.297Z",
+  "cases": [
+    {
+      "id": "EXPLICIT-MESSAGE-PREVIEW-IS-READONLY-AND-BOUND-TO-EXACT-DRAFT-AND-SOURCES",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-AND-MOBILE-CONFIRMATION-AND-SOURCE-DETAIL-FIT",
+      "status": "PASS"
+    },
+    {
+      "id": "ONE-CONFIRM-USES-THE-EXISTING-STREAM-AND-PRESERVES-CONTEXT-ONLY-WORK-SELECTION",
+      "status": "PASS"
+    },
+    {
+      "id": "MESSAGE-AUDIT-COMES-FROM-THE-ACTUAL-BINDING",
+      "status": "PASS"
+    },
+    {
+      "id": "EDITED-MODAL-MESSAGE-DOES-NOT-CLEAR-A-DIFFERENT-COMPOSER-DRAFT",
+      "status": "PASS"
+    },
+    {
+      "id": "LOST-RESPONSE-RELOAD-RECONCILES-THE-ORIGINAL-COMMAND-AFTER-EXPIRY",
+      "status": "PASS"
+    },
+    {
+      "id": "SOURCE-REJECTION-SETTLES-WITHOUT-SENDING-OR-LOSING-THE-DRAFT",
+      "status": "PASS"
+    },
+    {
+      "id": "PROJECT-ISOLATION-INVALID-BUDGET-AND-FIRST-SEND-EXPIRY",
+      "status": "PASS"
+    },
+    {
+      "id": "CAPABILITY-OFF-KEEPS-THE-EXISTING-READONLY-PREVIEW",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "mockProviderCalls": 3,
+  "bindingPort": "production_A_port",
+  "replyResultPort": "production_A_SQLite",
+  "productSchema": 18,
+  "limitations": [
+    "Actual local HTTP/SQLite/React/SSE plus mock AssistantModelPort; zero real native/model turns",
+    "Production A binding/result ports exercised; independent process crashes are covered by a separate suite",
+    "Work remains paused; no coding execution or target activation is admitted"
+  ]
+}
