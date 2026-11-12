@@ -157,6 +157,7 @@ export const INSTALL_CASES = [
   case_('E4-INSTALL-ROLLBACK', { layers: [LAYERS.INSTALLED], evidence: ['rollback'] }),
   case_('E4-UPGRADE-FAULTS', { layers: [LAYERS.INSTALLED], evidence: ['upgradeFaults'] }),
   case_('E7-OWNERSHIP-COPY', { layers: [LAYERS.INSTALLED], evidence: ['ownershipCopy'] }),
+  case_('E5-D-OWNERSHIP-MOCKS', { layers: [LAYERS.INSTALLED] }),
   case_('E6-CURRENT-MAIN-INSTALL', { layers: [LAYERS.INSTALLED], evidence: ['currentInstall'] }),
   case_('E4-UPGRADE-ROLLBACK', { layers: [LAYERS.INSTALLED], evidence: ['upgrade'] }),
   case_('E4-UPGRADE-CROSS-SCHEMA', { layers: [LAYERS.INSTALLED], evidence: ['crossUpgrade'] }),

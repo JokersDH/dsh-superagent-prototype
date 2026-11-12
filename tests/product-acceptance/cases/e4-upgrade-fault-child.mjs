@@ -72,7 +72,7 @@ try {
   step('seed', await chat(`http://127.0.0.1:${ports[1] ?? 9211}`) === 200 ? 'PASS' : 'FAIL')
   const fault = spawnSync(join(target, 'bin/pa'), ['upgrade', '--json', ...rootArgs, '--to', target, '--backup', join(w, 'pre.pab')], { cwd: w, env: { ...env, PA_UPGRADE_FAULT: mode }, encoding: 'utf8', timeout: 120_000 })
   const faultJson = parse(fault.stdout)
-  result.fault = { exit: fault.status, status: faultJson?.status ?? null, code: faultJson?.code ?? null }
+  result.fault = { exit: fault.status, status: faultJson?.status ?? null, code: faultJson?.code ?? null, killed: fault.signal === 'SIGKILL' }
   const killed = mode.endsWith('_kill') && fault.signal === 'SIGKILL'
   step('fault_observed', (killed || (fault.status !== 0 && ['upgrade_interrupted', 'upgrade_target_unhealthy', 'upgrade_target_stop_unproven'].includes(faultJson?.code))) ? 'PASS' : 'FAIL', JSON.stringify({ ...result.fault, signal: fault.signal }))
   const recover = spawnSync(join(target, 'bin/pa'), ['upgrade', '--recover', '--json', ...rootArgs], { cwd: w, env, encoding: 'utf8', timeout: 120_000 })

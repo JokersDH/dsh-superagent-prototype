@@ -118,15 +118,22 @@ const evidenceFor = (key) => {
     case 'replyBadArtifact':
       return { calls: 0, replies: 0, notice: '无法核对' }
     case 'ownershipCopy':
-      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1 }, status: 2, apiAlive: true }
-    case 'upgradeFaults':
-      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1 }, windows: {}, actions: [], reason: 'synthetic' }
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        status: 2, code: 'requested_root_mismatch', apiAlive: true }
+    case 'upgradeFaults': {
+      const probe = { fault: { code: 'upgrade_interrupted' }, recover: { status: 'RECOVERED_PREVIOUS' }, dataKept: true,
+        steps: [{ id: 'fault_observed', status: 'PASS' }, { id: 'recover', status: 'PASS' }, { id: 'recovered_health', status: 'PASS' }, { id: 'data_kept', status: 'PASS' }] }
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        windows: Object.fromEntries(['crash_after_stop', 'crash_after_stop_kill', 'target_unhealthy'].map(mode => [mode, { probe }])) } }
     case 'currentInstall':
-      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1 }, mode: 'personal', action: 'probe', observed: 'BLOCKED' }
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'personal', action: 'probe', observed: 'RUNNING', instanceMode: 'personal',
+        capability: { hasContextRoute: true, hasHistoryRoute: true, hasSourcesRoute: true, hasReplyResults: true, hasDiscussionReadiness: true },
+        configuration: { assistantContextAvailable: true }, actions: { send: 200, sendStatus: 'recorded', audit: 200, history: 200, sources: 200, reply: 'ok' } }
     case 'backupContextReply':
       return { before: { bindings: 1, results: 1, messages: 2 }, after: { bindings: 1, results: 1, messages: 2 }, artifacts: 1, reply: 'ok' }
     case 'frozenScope':
-      return { artifact: { buildId: 'b', source: 'a'.repeat(40), schema: 18, tarSha256: 'b'.repeat(64), tarBytes: 1 },
+      return { artifact: { buildId: 'b', source: 'a'.repeat(40), schema: 18, tarSha256: 'b'.repeat(64), tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         capability: { hasContextRoute: true, hasHistoryRoute: true, hasSourcesRoute: true, hasReplyResults: true }, main: { schema: 18 }, currentMainEligible: true }
     case 'legacyMigration':
       return { old: { schema: 16, messages: 2 }, migrated: { schema: 18, messages: 2 } }
@@ -139,7 +146,7 @@ const evidenceFor = (key) => {
     case 'backupContextReply':
       return { before: { bindings: 1, results: 1, messages: 2 }, after: { bindings: 1, results: 1, messages: 2 }, artifacts: 1, reply: 'ok' }
     case 'installedContext':
-      return { mode: 'fixture', available: true, prepare: 200, send: 'recorded', reply: 'ok', audit: 200, modelCalls: 1 }
+      return { mode: 'fixture', subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' }, available: true, prepare: 200, send: 'recorded', reply: 'ok', audit: 200, modelCalls: 1 }
     case 'personalInstall':
       return {
         start: 'RUNNING',
@@ -937,6 +944,68 @@ const CASES = [
         findCase(report, 'E7-OWNERSHIP-COPY').source = { commit: 'e'.repeat(40) }
         return report
       }, 'stale_case_evidence'),
+  },
+  {
+    id: 'E1-MUTATE-CURRENT-BLOCKED-AS-PASS',
+    title: 'A BLOCKED/null-health current probe cannot be relabeled PASS',
+    check: ({ assert }) =>
+      rejectWith(assert, 'CURRENT_BLOCKED_PASS', (report) => {
+        const item = findCase(report, 'E6-CURRENT-MAIN-INSTALL')
+        item.status = STATUS.PASS
+        item.assertions = [{ id: 'label-only', ok: true }]
+        item.evidence.currentInstall = { ...item.evidence.currentInstall, observed: 'BLOCKED', health: null, instanceMode: null }
+        return report
+      }, 'current_install_failed'),
+  },
+  {
+    id: 'E1-MUTATE-CURRENT-FIXTURE-MODE',
+    title: 'A fixture-mode instance cannot satisfy current personal installation',
+    check: ({ assert }) =>
+      rejectWith(assert, 'CURRENT_FIXTURE', (report) => {
+        const item = findCase(report, 'E6-CURRENT-MAIN-INSTALL')
+        item.status = STATUS.PASS
+        item.assertions = [{ id: 'label-only', ok: true }]
+        item.evidence.currentInstall = { ...item.evidence.currentInstall, mode: 'fixture', instanceMode: 'fixture' }
+        return report
+      }, 'current_install_failed'),
+  },
+  {
+    id: 'E1-MUTATE-OWNERSHIP-COPY-NO-EXIT',
+    title: 'A refused copy without exit/code is not behavioral ownership evidence',
+    check: ({ assert }) =>
+      rejectWith(assert, 'COPY_NO_EXIT', (report) => {
+        const item = findCase(report, 'E7-OWNERSHIP-COPY')
+        item.status = STATUS.PASS
+        item.assertions = [{ id: 'label-only', ok: true }]
+        item.evidence.ownershipCopy = { ...item.evidence.ownershipCopy, status: undefined, code: null, apiAlive: true }
+        return report
+      }, 'ownership_copy_failed'),
+  },
+  {
+    id: 'E1-MUTATE-FAULT-STEP-NAMES',
+    title: 'Fault windows made only of PASS step names are rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FAULT_STEP_NAMES', (report) => {
+        const item = findCase(report, 'E4-UPGRADE-FAULTS')
+        item.status = STATUS.PASS
+        item.assertions = [{ id: 'label-only', ok: true }]
+        const steps = [{ id: 'fault_observed', status: 'PASS' }, { id: 'recover', status: 'PASS' }, { id: 'recovered_health', status: 'PASS' }, { id: 'data_kept', status: 'PASS' }]
+        item.evidence.upgradeFaults.windows = Object.fromEntries(['crash_after_stop', 'crash_after_stop_kill', 'target_unhealthy'].map(mode => [mode, { probe: { steps } }]))
+        return report
+      }, 'upgrade_faults_failed'),
+  },
+  {
+    id: 'E1-MUTATE-FOREIGN-ABI-PLATFORM',
+    title: 'linux/x64/ABI999 subject cannot certify a darwin/arm64/137 package',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FOREIGN_ABI', (report) => {
+        findCase(report, 'E4-INSTALL-ARTIFACT-IDENTITY').evidence.artifact = { tuple: { target: {
+          sourceCommit: COMMIT, buildId: 'build-1', productSchema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' } } }
+        const item = findCase(report, 'E6-CURRENT-MAIN-INSTALL')
+        item.evidence.currentInstall = { ...item.evidence.currentInstall, subject: {
+          source: COMMIT, buildId: 'build-1', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '999', platform: 'linux', arch: 'x64' } }
+        return report
+      }, 'subject_mismatch'),
   },
   {
     id: 'E1-MUTATE-SELF-CLAIM',

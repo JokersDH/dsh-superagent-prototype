@@ -34,8 +34,8 @@ import { sha256 } from '../lib/evidence.mjs'
  */
 const here = dirname(fileURLToPath(import.meta.url))
 const DEFAULT_DIRS = Object.freeze({
-  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave12-target',
-  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave13-target',
+  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave13-target',
+  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave14-target',
   cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',
 })
 
@@ -268,8 +268,8 @@ function startPa(install, { port, apiPort, env = {}, extraArgs = [] } = {}) {
 }
 
 /** Personal start without the fixture flag; used to measure the actual no-executor mode. */
-function startPersonalInstall(install, { port, apiPort, env = {} } = {}) {
-  const child = spawn(join(install, 'bin/pa'), ['start', '--json', '--port', String(port), '--api-port', String(apiPort)], {
+function startPersonalInstall(install, { port, apiPort, env = {}, extraArgs = [] } = {}) {
+  const child = spawn(join(install, 'bin/pa'), ['start', '--json', '--port', String(port), '--api-port', String(apiPort), ...extraArgs], {
     cwd: join(install, '..'), env: stripUndefined(paEnv(env)), stdio: ['ignore', 'pipe', 'pipe'],
   })
   let buffer = '', stderr = ''
@@ -1359,46 +1359,92 @@ export async function runInstall({ root, runDirectory, keep = false }) {
     })
 
     const currentProbe = await (async () => {
-      const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w14-current-')))
+      const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w15-current-')))
       const ownInstall = join(own, 'install')
-      mkdirSync(ownInstall, { recursive: true })
-      let started
-      const env = { PATH: '/usr/bin:/bin:/usr/sbin:/sbin' }
+      const ownBin = join(own, 'bin')
+      mkdirSync(ownInstall, { recursive: true }); mkdirSync(ownBin, { recursive: true })
+      spawnSync('ln', ['-sf', process.execPath, join(ownBin, 'node')])
+      const mock = await startMockModel({ stateRoot: join(own, 'model-state'), reply: 'W15 个人讨论回复。' })
+      const env = { PATH: `${ownBin}:/usr/bin:/bin:/usr/sbin:/sbin`, PA_MODEL_CONFIG: mock.configPath }
+      let started, client, configuration, actions = {}
       try {
         spawnSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', ownInstall, '--strip-components=1'])
         const first = pa(ownInstall, ['first-run', '--json'], { env })
         const [port, apiPort] = await freePorts()
-        started = startPersonalInstall(ownInstall, { port, apiPort, env })
+        started = startPersonalInstall(ownInstall, { port, apiPort, env, extraArgs: ['--discussion-only'] })
         const running = await started.attempt
-        let configuration
         if (running.status === 'RUNNING' && running.instance?.apiURL) {
           try {
-            const client = new LocalProductClient({ baseURL: running.instance.apiURL, stateDir: running.instance.state, timeoutMs: 10_000 })
+            client = new LocalProductClient({ baseURL: running.instance.apiURL, stateDir: running.instance.state, timeoutMs: 15_000 })
             configuration = await client.configuration()
-          } catch { /* recorded below */ }
+            const project = configuration.projects.find(item => item.discussionOnly) ?? configuration.projects.find(item => item.dispatchAllowed) ?? configuration.projects[0]
+            if (project) {
+              const seeded = await client.dispatch({ commandId: 'w15-current-seed', conversationId: 'conv-current', projectId: project.id, kind: 'chat', text: 'W15 当前包来源。' })
+              actions.seed = seeded.receipt?.status ?? seeded.status ?? null
+              await new Promise(resolve => setTimeout(resolve, 700))
+              const prepared = await client.request('/v1/assistant/context/prepare', { method: 'POST', body: {
+                commandId: 'w15-current-ctx', text: 'W15 当前包上下文。', context: { projectId: project.id, conversationId: 'conv-current',
+                  selections: ['project', 'conversation'], budget: { maxFiles: 8, maxBytes: 32768, maxTokens: 4096 } } } })
+              actions.prepare = prepared.status
+              if (prepared.status === 200) {
+                const sent = await client.request('/v1/assistant/context/send', { method: 'POST', body: { commandId: 'w15-current-ctx', token: prepared.body.token } })
+                actions.send = sent.status
+                actions.sendStatus = sent.body?.status ?? null
+                let page
+                for (let i = 0; i < 50; i += 1) {
+                  page = await client.conversation('conv-current')
+                  if (page.messages.some(item => item.provenance === 'reasoner_reply')) break
+                  await new Promise(resolve => setTimeout(resolve, 150))
+                }
+                actions.reply = page?.messages.find(item => item.provenance === 'reasoner_reply')?.text ?? null
+                const user = page?.messages.find(item => item.role === 'user' && item.text.includes('W15 当前包上下文'))
+                const audit = user ? await client.request(`/v1/messages/${user.id}/context`) : { status: 0 }
+                actions.audit = audit.status
+                const history = await client.request(`/v1/context/history?projectId=${encodeURIComponent(project.id)}&conversationId=conv-current&limit=5`)
+                actions.history = history.status
+                if (user) actions.sources = (await client.request(`/v1/messages/${user.id}/context/sources`)).status
+              }
+            }
+          } catch (error) { actions.failure = String(error?.message ?? error).slice(0, 300) }
         }
         return { subject: artifactSubject(ARTIFACTS.upgrade), capability: TARGET_CAPABILITY, mode: 'personal',
-          action: 'first_run_and_personal_start_without_executor', firstRun: first.json?.status ?? null,
+          action: 'first_run_discussion_only_personal_with_mock_provider', firstRun: first.json?.status ?? null,
           observed: running.status ?? null, code: running.code ?? null, instanceMode: running.instance?.mode ?? null,
-          health: running.instance?.apiURL ? 'observed' : null,
+          health: running.instance?.apiURL ? 'running' : null,
           configuration: configuration ? { assistantContextAvailable: configuration.assistantContextAvailable,
-            contextHistoryAvailable: configuration.contextHistoryAvailable, contextSourcesAvailable: configuration.contextSourcesAvailable } : null }
+            contextHistoryAvailable: configuration.contextHistoryAvailable, contextSourcesAvailable: configuration.contextSourcesAvailable,
+            projects: configuration.projects.length } : null, actions }
       } finally {
-        try { if (started) pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
+        try { pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
+        try {
+          const record = JSON.parse(readFileSync(join(ownInstall, 'var/config/instance.json'), 'utf8'))
+          for (const pid of [record.pid, record.apiPid]) {
+            if (!Number.isSafeInteger(pid)) continue
+            try {
+              const command = execFileSync('ps', ['-o', 'command=', '-p', String(pid)], { encoding: 'utf8' }).trim()
+              if (command.includes(ownInstall)) process.kill(pid, 'SIGKILL')
+            } catch { /* gone */ }
+          }
+        } catch { /* no record */ }
         try { started?.child?.kill('SIGKILL') } catch { /* gone */ }
+        await mock.close().catch(() => {})
         rmSync(own, { recursive: true, force: true })
       }
     })()
     const currentComplete = TARGET_CAPABILITY.hasContextRoute && TARGET_CAPABILITY.hasHistoryRoute &&
       TARGET_CAPABILITY.hasSourcesRoute && TARGET_CAPABILITY.hasReplyResults && TARGET_CAPABILITY.hasDiscussionReadiness &&
-      currentProbe.observed === 'RUNNING' && currentProbe.instanceMode === 'personal'
+      currentProbe.observed === 'RUNNING' && currentProbe.instanceMode === 'personal' &&
+      currentProbe.configuration?.assistantContextAvailable === true &&
+      currentProbe.actions?.send === 200 && currentProbe.actions?.sendStatus === 'recorded' &&
+      currentProbe.actions?.audit === 200 && currentProbe.actions?.history === 200 && currentProbe.actions?.sources === 200
     if (currentComplete) {
       await push(define('E6-CURRENT-MAIN-INSTALL', 'Current-main schema18 selected context is installed and exercised from cold personal bytes', {
         layer: LAYERS.INSTALLED, evidence: { currentInstall: { ...currentProbe, result: 'personal_start_observed' } },
       }), async ({ assert, evidence }) => {
-        assert('CURRENT_PERSONAL_START', currentProbe.observed === 'RUNNING' && currentProbe.instanceMode === 'personal', JSON.stringify(currentProbe))
-        assert('CURRENT_CAPABILITIES', currentComplete === true, JSON.stringify(currentProbe.capability))
-        evidence.currentInstall = { ...currentProbe, result: 'personal_start_observed' }
+        assert('CURRENT_PERSONAL_START', currentProbe.observed === 'RUNNING' && currentProbe.instanceMode === 'personal', JSON.stringify({ status: currentProbe.observed, code: currentProbe.code, mode: currentProbe.instanceMode }))
+        assert('CURRENT_CAPABILITIES', currentComplete === true, JSON.stringify({ capability: currentProbe.capability, configuration: currentProbe.configuration }))
+        assert('CURRENT_ACTIONS', currentProbe.actions?.send === 200 && currentProbe.actions?.sendStatus === 'recorded' && currentProbe.actions?.audit === 200 && currentProbe.actions?.history === 200 && currentProbe.actions?.sources === 200 && !!currentProbe.actions?.reply, JSON.stringify(currentProbe.actions))
+        evidence.currentInstall = { ...currentProbe, result: 'personal_context_history_sources_reply_observed' }
       })
     } else {
       const reason = `NOT_TESTED: actual probe extracted ${ARTIFACTS.upgrade.buildId}, first-run=${currentProbe.firstRun}, personal start=${currentProbe.observed}/${currentProbe.code ?? 'none'}, instanceMode=${currentProbe.instanceMode}; capabilities context=${TARGET_CAPABILITY.hasContextRoute}, history=${TARGET_CAPABILITY.hasHistoryRoute}, sources=${TARGET_CAPABILITY.hasSourcesRoute}, replyResults=${TARGET_CAPABILITY.hasReplyResults}, discussionReadiness=${TARGET_CAPABILITY.hasDiscussionReadiness}. This tuple is not the current-main M1 package; it was executed, not relabeled. Required: freeze a D tar containing the e1e0c97/d9d347e/b2b1adb product paths, then run the same personal probe plus context/history/source/reply.`

@@ -370,7 +370,7 @@ export function ownershipCopyIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
   if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
-  if (value.status === 0 || value.apiAlive !== true) issues.push('claimed_other_state')
+  if (value.status === 0 || !isSubstantive(value.code) || value.apiAlive !== true) issues.push('claimed_other_state')
   return issues
 }
 export function upgradeFaultsIssues(value) {
@@ -381,6 +381,9 @@ export function upgradeFaultsIssues(value) {
     const probe = windows[mode]?.probe, steps = Object.fromEntries((probe?.steps ?? []).map(item => [item.id, item]))
     if (!probe) { issues.push(mode); continue }
     if (steps.fault_observed?.status !== 'PASS' || steps.recover?.status !== 'PASS' || steps.recovered_health?.status !== 'PASS' || steps.data_kept?.status !== 'PASS') issues.push(mode)
+    if (!isSubstantive(probe.fault?.code) && !probe.fault?.killed) issues.push(`${mode}_fault`)
+    if (!isSubstantive(probe.recover?.status)) issues.push(`${mode}_recover`)
+    if (probe.dataKept !== true) issues.push(`${mode}_data`)
   }
   return issues
 }
@@ -389,6 +392,12 @@ export function currentInstallIssues(value) {
   const issues = []
   if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
   if (value.mode !== 'personal' || !isSubstantive(value.action) || !isSubstantive(value.observed)) issues.push('not_executed')
+  if (value.observed === 'RUNNING') {
+    if (value.instanceMode !== 'personal') issues.push('instance_mode')
+    if (value.configuration?.assistantContextAvailable !== true) issues.push('context_availability')
+    if (value.actions?.send !== 200 || value.actions?.sendStatus !== 'recorded' || value.actions?.audit !== 200 ||
+      value.actions?.history !== 200 || value.actions?.sources !== 200 || !isSubstantive(value.actions?.reply)) issues.push('actions')
+  }
   for (const key of ['hasContextRoute', 'hasHistoryRoute', 'hasSourcesRoute', 'hasReplyResults', 'hasDiscussionReadiness'])
     if (typeof value.capability?.[key] !== 'boolean') issues.push(key)
   return issues
@@ -767,6 +776,31 @@ export function evaluateRelease({
     }
   }
 
+  for (const id of ['E6-CURRENT-MAIN-INSTALL', 'E4-UPGRADE-FAULTS', 'E7-OWNERSHIP-COPY']) {
+    const item = byId.get(id)
+    if (item?.status !== STATUS.PASS) continue
+    if (id === 'E6-CURRENT-MAIN-INSTALL') {
+      const value = item.evidence?.currentInstall ?? {}
+      if (value.observed !== 'RUNNING' || value.instanceMode !== 'personal' || value.mode !== 'personal') {
+        failures.push(fail('current_install_failed', 'A current install PASS requires an actual RUNNING personal process', id))
+      }
+    }
+    if (id === 'E7-OWNERSHIP-COPY') {
+      const value = item.evidence?.ownershipCopy ?? {}
+      if (!Number.isInteger(value.status) || value.status === 0 || !isSubstantive(value.code)) {
+        failures.push(fail('ownership_copy_failed', 'Ownership copy PASS needs exit/code from the actual stop attempt', id))
+      }
+    }
+    if (id === 'E4-UPGRADE-FAULTS') {
+      const windows = item.evidence?.upgradeFaults?.windows ?? {}
+      for (const mode of ['crash_after_stop', 'crash_after_stop_kill', 'target_unhealthy']) {
+        const probe = windows[mode]?.probe
+        if (!probe?.fault || !probe?.recover || probe?.dataKept !== true)
+          failures.push(fail('upgrade_faults_failed', `Fault window ${mode} has no actual fault/recover/data result`, id))
+      }
+    }
+  }
+
   // Every claimed installation/current-tuple case must describe the same frozen subject.
   const canonicalTuple = byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target
   if (canonicalTuple) {
@@ -785,7 +819,7 @@ export function evaluateRelease({
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
       }
-      for (const field of ['source', 'buildId', 'schema', 'tarSha256', 'tarBytes']) {
+      for (const field of ['source', 'buildId', 'schema', 'tarSha256', 'tarBytes', 'abi', 'platform', 'arch']) {
         if (String(normalize(subject, field) ?? '') !== String(normalize(canonicalTuple, field) ?? ''))
           failures.push(fail('subject_mismatch', `Case ${id} ${field} differs from the tested artifact tuple`, id))
       }
