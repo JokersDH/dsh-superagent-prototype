@@ -147,7 +147,8 @@ export class RecoverySourceStore implements RecoverySourceReader {
     if (schema !== PRODUCT_SCHEMA_VERSION) issues.add('unsupported_schema')
     for (const table of tables) if (!known.has(table) && !table.startsWith('sqlite_')) issues.add('unknown_table')
     for (const table of known) if (!present.has(table) && !INDEX_TABLES.has(table)) issues.add('missing_table')
-    const observedEventCursor = Number((this.db.prepare('SELECT IFNULL(MAX(seq), 0) AS seq FROM event_log').get() as Row).seq)
+    const observedEventCursor = present.has('event_log')
+      ? Number((this.db.prepare('SELECT IFNULL(MAX(seq), 0) AS seq FROM event_log').get() as Row).seq) : 0
     const families: { name: string; rows: number; digest: string; truncated: boolean }[] = []
     let total = 0, truncated = false, readable = schema === PRODUCT_SCHEMA_VERSION
     {

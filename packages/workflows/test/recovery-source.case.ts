@@ -151,6 +151,23 @@ test('unknown, missing and future schema states are unsupported, never an empty 
     const missing = f.store.workflows.recoverySource.inspect()
     assert.equal(missing.coverage, 'unsupported')
     assert.equal(missing.issues.includes('missing_table'), true)
+    const noEvents = fixture()
+    try {
+      noEvents.store.db.exec('DROP TABLE event_log')
+      const snapshot = noEvents.store.workflows.recoverySource.inspect()
+      assert.equal(snapshot.coverage, 'unsupported')
+      assert.equal(snapshot.issues.includes('missing_table'), true)
+      assert.equal(snapshot.observedEventCursor, 0)
+      assert.equal(snapshot.sourceFingerprint, null)
+    } finally { noEvents.store.close(); rmSync(noEvents.root, { recursive: true, force: true }) }
+    const noSchema = fixture()
+    try {
+      noSchema.store.db.exec('DROP TABLE schema_meta')
+      const snapshot = noSchema.store.workflows.recoverySource.inspect()
+      assert.equal(snapshot.coverage, 'unsupported')
+      assert.equal(snapshot.productSchema, null)
+      assert.equal(snapshot.sourceFingerprint, null)
+    } finally { noSchema.store.close(); rmSync(noSchema.root, { recursive: true, force: true }) }
   } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
 
   const g = fixture()
