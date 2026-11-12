@@ -141,6 +141,7 @@ export const CONTROLLED_CASES = [
 /** Staged installation outside the development checkout. */
 export const INSTALL_CASES = [
   case_('E4-INSTALL-ARTIFACT-IDENTITY', { layers: [LAYERS.INSTALLED], evidence: ['artifact', 'installation'] }),
+  case_('E6-INSTALLED-CONTEXT', { layers: [LAYERS.INSTALLED], evidence: ['installedContext'] }),
   case_('E3-PERSONAL-COLD-START', { layers: [LAYERS.INSTALLED], evidence: ['personalInstall'] }),
   case_('E4-INSTALL-FIRST-RUN', { layers: [LAYERS.INSTALLED], evidence: ['install'] }),
   case_('E4-INSTALL-CONFIG-ROOT', { layers: [LAYERS.INSTALLED], evidence: ['configRoot'] }),

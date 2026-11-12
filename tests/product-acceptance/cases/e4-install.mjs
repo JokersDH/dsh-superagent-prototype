@@ -21,6 +21,7 @@ import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
+import { startMockModel } from '../lib/mock-model.mjs'
 import { sha256 } from '../lib/evidence.mjs'
 
 /**
@@ -1101,6 +1102,56 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       } finally {
         try { if (started) pa(extract, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
         rmSync(extract, { recursive: true, force: true })
+      }
+    })
+
+    await push(define('E6-INSTALLED-CONTEXT', 'The frozen D tar cold-starts personal fixture mode and sends selected context through its installed HTTP provider path', {
+      layer: LAYERS.INSTALLED,
+    }), async ({ assert, evidence }) => {
+      const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w12-ctx-install-')))
+      const ownInstall = join(own, 'install')
+      mkdirSync(ownInstall, { recursive: true })
+      const mock = await startMockModel({ stateRoot: join(own, 'model-state'), reply: '安装版上下文回复。' })
+      let started
+      try {
+        spawnSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', ownInstall, '--strip-components=1'])
+        const first = pa(ownInstall, ['first-run', '--json'])
+        assert('INSTALLED_CONTEXT_FIRST_RUN', first.status === 0, first.stderr.slice(-300))
+        const [port, apiPort] = await freePorts()
+        started = startPa(ownInstall, { port, apiPort, env: { PA_MODEL_CONFIG: mock.configPath } })
+        const running = await started.attempt
+        assert('INSTALLED_CONTEXT_RUNNING', running.status === 'RUNNING', JSON.stringify({ status: running.status, code: running.code }))
+        const client = new LocalProductClient({ baseURL: running.instance.apiURL, stateDir: running.instance.state, timeoutMs: 25_000 })
+        const configuration = await client.configuration()
+        assert('INSTALLED_CONTEXT_AVAILABLE', configuration.assistantContextAvailable === true, JSON.stringify({ available: configuration.assistantContextAvailable }))
+        const project = configuration.projects.find(item => item.dispatchAllowed)
+        const seeded = await client.dispatch({ commandId: 'w12-installed-seed', conversationId: 'conv-installed-ctx', kind: 'chat', projectId: project.id, text: '安装版上下文来源。' })
+        assert('INSTALLED_SEED', seeded.receipt?.status === 'recorded', JSON.stringify(seeded.receipt)?.slice(0, 200))
+        await new Promise(resolve => setTimeout(resolve, 800))
+        const prepared = await client.request('/v1/assistant/context/prepare', { method: 'POST', body: {
+          commandId: 'w12-installed-ctx', text: '请使用安装版上下文。', context: { projectId: project.id, conversationId: 'conv-installed-ctx',
+            selections: ['project', 'conversation'], budget: { maxFiles: 16, maxBytes: 65536, maxTokens: 8192 } } } })
+        assert('INSTALLED_PREPARE', prepared.status === 200 && prepared.body?.protocol === 'assistant-context-prepared/1', JSON.stringify(prepared.body)?.slice(0, 300))
+        const sent = await client.request('/v1/assistant/context/send', { method: 'POST', body: { commandId: 'w12-installed-ctx', token: prepared.body.token } })
+        assert('INSTALLED_SEND', sent.status === 200 && sent.body?.status === 'recorded', JSON.stringify(sent.body)?.slice(0, 300))
+        let reply, page
+        for (let index = 0; index < 50 && !reply; index += 1) {
+          page = await client.conversation('conv-installed-ctx')
+          reply = page.messages.find(item => item.provenance === 'reasoner_reply')
+          if (!reply) await new Promise(resolve => setTimeout(resolve, 150))
+        }
+        assert('INSTALLED_REPLY', reply?.text?.includes('安装版上下文回复'), JSON.stringify(reply?.text ?? null))
+        const userMessage = page?.messages.find(item => item.role === 'user' && item.text.includes('请使用安装版上下文'))
+        const binding = await client.request(`/v1/messages/${userMessage?.id ?? ''}/context`)
+        assert('INSTALLED_AUDIT', binding.status === 200 && binding.body?.commandId === 'w12-installed-ctx', JSON.stringify(binding.body)?.slice(0, 200))
+        assert('INSTALLED_MOCK_CALLED', mock.requests.length >= 1 && mock.requests.some(item => JSON.stringify(item.messages).includes('安装版上下文来源')), `calls ${mock.requests.length}`)
+        evidence.installedContext = { artifact: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, source: ARTIFACTS.upgrade.sourceCommit },
+          available: true, prepare: prepared.status, send: sent.body?.status, reply: reply?.text, audit: binding.status, modelCalls: mock.requests.length }
+      } finally {
+        try { pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
+        try { started?.child?.kill('SIGKILL') } catch { /* gone */ }
+        await mock.close().catch(() => {})
+        rmSync(own, { recursive: true, force: true })
       }
     })
 

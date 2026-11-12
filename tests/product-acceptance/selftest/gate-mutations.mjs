@@ -119,6 +119,8 @@ const evidenceFor = (key) => {
       return { providerRequests: 1, replies: 1, auditStable: true }
     case 'unknownReply':
       return { providerRequests: 1, notice: true, reply: false }
+    case 'installedContext':
+      return { available: true, prepare: 200, send: 'recorded', reply: 'ok', audit: 200, modelCalls: 1 }
     case 'personalInstall':
       return {
         start: 'RUNNING',

@@ -373,6 +373,15 @@ export function unknownReplyIssues(value) {
 }
 
 /** Personal install must prove a real personal process, console, auth and config adoption. */
+export function installedContextIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.available !== true) issues.push('availability')
+  if (value.prepare !== 200 || value.send !== 'recorded') issues.push('send')
+  if (!value.reply || value.audit !== 200) issues.push('reply_or_audit')
+  if (!(value.modelCalls >= 1)) issues.push('provider')
+  return issues
+}
 export function personalInstallIssues(personal) {
   if (!personal || typeof personal !== 'object') return ['missing']
   const issues = []
