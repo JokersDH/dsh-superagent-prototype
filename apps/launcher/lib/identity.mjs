@@ -56,6 +56,13 @@ export function requestedScopeCheck({ roots, record, requireInstall = false }) {
   const recordedState = canonicalPath(record.state)
   const recordedInstall = canonicalPath(record.install)
   const installMatches = recordedInstall === requestedInstall || recordedInstall === canonicalPath(join(requestedInstall, 'app'))
+  const requestedConfig = canonicalPath(roots.config)
+  const recordedConfig = record.configRoot === undefined ? null : canonicalPath(record.configRoot)
+  // Legacy records without a config binding are explicitly unknown, never accepted as self-consistent
+  // authority for a requested config root.
+  add('requested_config', recordedConfig !== null && recordedConfig === requestedConfig, {
+    requested: requestedConfig, recorded: recordedConfig, legacy: recordedConfig === null,
+  })
   add('requested_state', recordedState === requestedState, { requested: requestedState, recorded: recordedState })
   add('requested_install', installMatches, { requested: requestedInstall, recorded: recordedInstall })
   if (!installMatches && !requireInstall) failures.splice(failures.indexOf('requested_install'), 1)
@@ -64,8 +71,8 @@ export function requestedScopeCheck({ roots, record, requireInstall = false }) {
     installMatches,
     checks,
     failures,
-    requested: { state: requestedState, install: requestedInstall },
-    recorded: { state: recordedState, install: recordedInstall, buildId: record.buildId ?? null, mode: record.mode ?? null },
+    requested: { config: requestedConfig, state: requestedState, install: requestedInstall },
+    recorded: { config: recordedConfig, state: recordedState, install: recordedInstall, buildId: record.buildId ?? null, mode: record.mode ?? null },
   }
 }
 

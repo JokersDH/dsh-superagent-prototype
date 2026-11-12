@@ -34,7 +34,7 @@ export async function stopInstance({ roots, timeoutMs = 8000 }) {
 
   // A record only describes the roots it was written for. A stop aimed at another requested state or
   // install must refuse before touching a pid or deleting the record.
-  const scope = requestedScopeCheck({ roots, record })
+  const scope = requestedScopeCheck({ roots, record, requireInstall: true })
   if (!scope.ok) {
     return {
       ok: false,

@@ -28,13 +28,14 @@ const makeRoots = (root) => {
 }
 const recordFor = (roots, overrides = {}) => ({
   protocol: 'personal-product-instance/1', pid: 999_999, processStart: 'probe-start', apiPid: 999_998, consolePid: 999_999,
+  configRoot: roots.config,
   apiArgv: [process.execPath, join(roots.install, 'app/apps/coordinator/product/demo.ts'), '--state', roots.data],
   apiProcessStart: 'probe-api-start', apiUid: process.getuid?.() ?? 0,
   apiURL: 'http://127.0.0.1:45001', consoleURL: 'http://127.0.0.1:45002', state: roots.data, install: join(roots.install, 'app'),
   buildId: 'probe-build', mode: 'fixture', access: 'local-development', startupMode: 'normal', startedAt: new Date().toISOString(),
   ...overrides,
 })
-const writeRecord = (config, record) => writeFileSync(join(config, 'instance.json'), JSON.stringify(record, null, 2), { mode: 0o600 })
+const writeRecord = (config, record) => writeFileSync(join(config, 'instance.json'), JSON.stringify({ configRoot: config, ...record }, null, 2), { mode: 0o600 })
 
 test('a record matches its own requested roots but not another state or install', () => {
   const root = mkdtempSync(join(tmpdir(), 'pa-scope-'))
@@ -55,6 +56,15 @@ test('a record matches its own requested roots but not another state or install'
     const installMismatch = requestedScopeCheck({ roots: otherInstall, record, requireInstall: true })
     assert.equal(installMismatch.ok, false)
     assert.deepEqual(installMismatch.failures, ['requested_install'])
+    // A copied record keeps its original config binding and cannot authorize the copying config root.
+    const copiedConfig = join(root, 'copied-config')
+    mkdirSync(copiedConfig, { recursive: true, mode: 0o700 })
+    const copied = requestedScopeCheck({ roots: { ...roots, config: copiedConfig }, record })
+    assert.equal(copied.ok, false)
+    assert.equal(copied.failures.includes('requested_config'), true)
+    const legacy = requestedScopeCheck({ roots, record: { ...record, configRoot: undefined } })
+    assert.equal(legacy.ok, false)
+    assert.equal(legacy.failures.includes('requested_config'), true)
   } finally { rmSync(root, { recursive: true, force: true }) }
 })
 

@@ -432,8 +432,11 @@ const canonicalPath = (value) => {
 
 // A shared install path can serve independent state roots, so install paths alone never prove process
 // ownership. Only this operation's private roots (state/config/logs/cache/workspace) are identity.
+// Ownership identity is the per-operation private config root and the single requested state root.
+// cache/logs/workspace may be shared between independent states, so a hit there never proves that a
+// global PID belongs to this operation.
 const ROOT_TOKENS = (roots) => {
-  const raw = [roots.config, roots.data, roots.logs, roots.workspace, roots.cache].filter((value) => typeof value === 'string' && value.length > 0)
+  const raw = [roots.config, roots.data].filter((value) => typeof value === 'string' && value.length > 0)
   const tokens = new Set()
   for (const value of raw) {
     tokens.add(value)
@@ -499,15 +502,17 @@ export async function accountRegisteredResources({ roots, target, record, spawne
     if (command !== '' && commandMatchesIdentity(command, tokens)) owned.push({ pid, command })
     else unknownLive.push({ pid, command: command === '' ? 'unknown' : command })
   }
-  // Orphans whose recorded parent is gone still carry this private root in their argv. Only processes
-  // that actually match the identity are claimed; unrelated system processes are not candidates.
+  // Diagnostic discovery only: a global path match is NOT ownership. Only a PID that this operation
+  // registered (record/journal/spawn tree, or an orphan whose recorded pid it already owns) may be
+  // stopped; every other match stays UNKNOWN and blocks an empty "proven" set.
+  const unregistered = []
   for (const { pid } of listProcesses()) {
     if (pid === process.pid || treeCandidates.has(pid) || claimed.has(pid) || !alive(pid)) continue
     const command = commandOf(pid)
-    if (command !== '' && commandMatchesIdentity(command, tokens) && !owned.some((entry) => entry.pid === pid))
-      owned.push({ pid, command })
+    if (command !== '' && commandMatchesIdentity(command, tokens)) unregistered.push({ pid, command })
   }
-  return { owned, unknownLive, considered: treeCandidates.size, pidReused }
+  for (const entry of unregistered) unknownLive.push({ ...entry, unregistered: true })
+  return { owned, unknownLive, unregistered, considered: treeCandidates.size, pidReused }
 }
 
 export async function stopRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn }) {
@@ -529,7 +534,7 @@ export async function stopRegisteredResources({ roots, target, record, spawnedPi
     proven: remaining.length === 0 && accounted.unknownLive.length === 0,
     stopped,
     remaining,
-    unknownLive: accounted.unknownLive.map(({ pid, command }) => ({ pid, command: command.slice(0, 240) })),
+    unknownLive: accounted.unknownLive.map(({ pid, command, unregistered }) => ({ pid, command: command.slice(0, 240), ...(unregistered === true ? { unregistered: true } : {}) })),
     considered: accounted.considered,
     pidReused: accounted.pidReused === true,
   }
@@ -745,6 +750,16 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
     return { protocol: 'personal-install-switch/1', status: 'NO_OP', journalStatus: journal.status }
   if (!['switched_unconfirmed', 'switching', 'stopping', 'starting', 'target_stop_unproven'].includes(journal.status))
     throw new UpgradeError('upgrade_recover_unknown_state', 'The switch journal is not in a recoverable state', { journalStatus: journal.status })
+  // Every recovery branch is a side-effect path: the requested roots must first agree with the
+  // recorded instance (config/data/install especially). A copy of another state's record cannot make
+  // this operation stop that state or write confirmed/pointer.
+  const recorded = readInstanceRecord(roots.config)
+  if (recorded !== null) {
+    const scope = requestedScopeCheck({ roots, record: recorded })
+    if (!scope.ok)
+      return { protocol: 'personal-install-switch/1', status: 'BLOCKED', code: 'requested_root_mismatch',
+        message: 'The recorded instance belongs to another config/state/install; recovery refuses to stop it or write the pointer', scope }
+  }
   // Never start (or revert over) an unknown live process: the same rule as upgrade/rollback.
   const existing = readInstanceRecord(roots.config)
   if (existing !== null && !(await verifyInstance(existing)).ok && (await processAlive(existing.pid)))

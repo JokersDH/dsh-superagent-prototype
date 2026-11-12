@@ -94,6 +94,14 @@ export function validateInstanceRecord(value) {
               : (() => { throw new InstanceError('invalid_instance_record', 'Instance apiUid is invalid') })(),
         }),
     startedAt: typeof value.startedAt === 'string' && !Number.isNaN(Date.parse(value.startedAt)) ? value.startedAt : (() => { throw new InstanceError('invalid_instance_record', 'Instance startedAt is invalid') })(),
+    ...(value.configRoot === undefined
+      ? {}
+      : {
+          configRoot:
+            typeof value.configRoot === 'string' && resolve(value.configRoot) === value.configRoot
+              ? value.configRoot
+              : (() => { throw new InstanceError('invalid_instance_record', 'Instance configRoot is invalid') })(),
+        }),
   }
   return record
 }
@@ -121,7 +129,14 @@ export function readInstanceRecord(configRoot) {
 
 /** Atomic private write (0600) so a crash cannot leave a half-written instance record. */
 export function writeInstanceRecord(configRoot, record) {
-  const bytes = Buffer.from(`${JSON.stringify(record, null, 2)}\n`)
+  // Bind the record to the config root that first wrote it. Copying a record file or re-writing an
+  // existing record into another config root keeps the original binding, so a copy cannot authorize
+  // a command aimed at the copying config root. Legacy records without the field stay unknown.
+  // The in-memory identity is bound too, so a caller that later copies this same object into another
+  // config root carries the original binding instead of laundering it.
+  if (typeof record.configRoot !== 'string') record.configRoot = resolve(configRoot)
+  const bound = { ...record, configRoot: resolve(record.configRoot) }
+  const bytes = Buffer.from(`${JSON.stringify(bound, null, 2)}\n`)
   const path = instancePath(configRoot)
   const temporary = `${path}.${process.pid}.tmp`
   const fd = openSync(temporary, 'wx', 0o600)
