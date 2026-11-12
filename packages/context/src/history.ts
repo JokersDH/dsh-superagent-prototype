@@ -4,7 +4,6 @@ import type {
   AssistantContextHistoryPage,
   AssistantContextHistoryQuery,
   AssistantReplyResult,
-  AssistantReplyResults,
   ContractRef,
   Scope,
 } from '@personal-agent/contracts'
@@ -99,6 +98,16 @@ export interface HistoryView {
   readonly notes: readonly string[]
 }
 
+/**
+ * A completed reply only attaches through an owner that already verified the original request
+ * receipt and the artifact bytes (main's `CompletedAssistantReplies.read` path). A raw result row
+ * lookup is not enough: request/reply/model/artifact identities would otherwise be taken on trust.
+ */
+export interface TrustedCompletedReply {
+  readonly result: AssistantReplyResult
+  readonly verifiedBy: 'main-completed-reply'
+}
+
 export interface HistoryViewOptions {
   readonly now: () => Date
   readonly maxPages?: number
@@ -106,19 +115,16 @@ export interface HistoryViewOptions {
   readonly workId?: string
   readonly contract?: ContractRef
   readonly scope?: Scope
-  readonly replyResults?: Pick<AssistantReplyResults, 'forRequest'>
   /**
-   * Main's own reply lookup for a source message (for example through its assistant request key).
-   * C never guesses main's key format; when omitted only `replyResults.forRequest(binding.requestId)`
-   * is tried, which is exact but often a different identity from the inference request.
+   * Main's verified lookup for a source message. C never guesses the assistant request key and never
+   * attaches a reply from an unverified row; without this reader every entry stays `replyUnknown`.
    */
-  readonly replyFor?: (messageId: string) => AssistantReplyResult | undefined
+  readonly replyReader?: (messageId: string) => TrustedCompletedReply | undefined
 }
 
 function toEntry(
   binding: AssistantContextBinding,
   options: HistoryViewOptions,
-  requestReply: ((requestId: string) => AssistantReplyResult | undefined) | undefined,
 ): { entry: HistoryEntry; mismatchedReply: boolean } {
   const now = options.now().getTime()
   const expires = Date.parse(binding.expiresAt)
@@ -140,14 +146,20 @@ function toEntry(
     state = 'scope_changed'
   }
 
-  const reply = options.replyFor?.(binding.messageId) ?? requestReply?.(binding.requestId)
-  // A completed result only attaches when it names exactly this source/project/conversation.
+  const trusted = options.replyReader?.(binding.messageId)
+  const verified = trusted?.verifiedBy === 'main-completed-reply'
+  const reply = verified ? trusted!.result : undefined
+  // A completed result only attaches when it names exactly this source/project/conversation and the
+  // same principal as the binding. Request/reply/model/artifact identity is covered by the trusted
+  // reader's verification (original receipt + artifact bytes); an unverified row stays unknown.
   const matches =
     reply !== undefined &&
     reply.sourceMessageId === binding.messageId &&
     reply.projectId === binding.projectId &&
-    reply.conversationId === binding.conversationId
-  const mismatchedReply = reply !== undefined && !matches
+    reply.conversationId === binding.conversationId &&
+    reply.principal.userId === binding.principal.userId &&
+    reply.principal.authorityRef === binding.principal.authorityRef
+  const mismatchedReply = verified && !matches
   const completedReply: HistoryCompletedReply | undefined =
     reply === undefined || !matches
       ? undefined
@@ -253,7 +265,7 @@ export function collectContextHistory(
         continue
       }
       seen.add(binding.messageId)
-      const projected = toEntry(binding, options, options.replyResults?.forRequest.bind(options.replyResults))
+      const projected = toEntry(binding, options)
       if (projected.mismatchedReply) mismatchedReplies += 1
       entries.push(projected.entry)
     }

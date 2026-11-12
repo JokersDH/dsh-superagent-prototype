@@ -194,6 +194,7 @@ test('retrieval finds expected sources in a long conversation and many works wit
   const selection = selectRelevantSources(all, {
     projectId,
     query: 'payment timeout retry',
+    scope,
     maxItems: 12,
     maxBytes: 32 * 1024,
   })
@@ -276,11 +277,11 @@ test('a granted-kind restriction is applied before ranking, and invalid budgets 
       provenance: 'trusted_user',
     },
   ]
-  const restricted = selectRelevantSources(candidates, { projectId, query: 'payment', allowedKinds: ['decision'] })
+  const restricted = selectRelevantSources(candidates, { projectId, query: 'payment', scope, allowedKinds: ['decision'] })
   assert.deepEqual(restricted.items.map((item) => item.sourceId), ['decision-a'])
   assert.deepEqual(restricted.omitted, [{ sourceId: 'message-a', path: 'conversation/a.json', reason: 'denied_kind' }])
 
-  const unqueried = selectRelevantSources(candidates, { projectId })
+  const unqueried = selectRelevantSources(candidates, { projectId, scope })
   assert.equal(unqueried.items.length, 2)
   assert.deepEqual(unqueried.terms, [])
 
@@ -327,7 +328,7 @@ test('missing role/provenance, unproven scope and scope escalation are refused b
   // A project/kind selector alone is not a Scope authorization for contracts either.
   const contract = selectRelevantSources(
     [{ sourceId: 'contract-a', kind: 'contract', path: 'work/1/contract.json', content: 'payment', projectId, scope }],
-    { projectId, query: 'payment' },
+    { projectId, query: 'payment', scope },
   )
   assert.equal(contract.items.length, 1)
 })

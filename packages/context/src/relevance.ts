@@ -179,13 +179,13 @@ export function selectRelevantSources(
       }
     }
     if (candidate.kind === 'decision' || candidate.kind === 'contract') {
-      // A project/kind selector is not a Scope authorization: decision and contract scopes must be
-      // proven inside the current trusted scope before their正文 can influence ranking or digests.
-      if (candidate.scope === undefined) {
+      // A project/kind selector is not a Scope authorization: without the caller's trusted current
+      // scope there is nothing to prove the decision/contract body belongs in this discussion.
+      if (candidate.scope === undefined || options.scope === undefined) {
         omitted.push({ sourceId: candidate.sourceId, path: candidate.path, reason: 'scope_unproven' })
         continue
       }
-      if (options.scope !== undefined && !scopeWithin(candidate.scope, options.scope)) {
+      if (!scopeWithin(candidate.scope, options.scope)) {
         omitted.push({ sourceId: candidate.sourceId, path: candidate.path, reason: 'scope_escalation' })
         continue
       }

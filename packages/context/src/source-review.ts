@@ -49,30 +49,34 @@ export interface SourceReviewBudget {
   readonly maxItems: number
   readonly maxBytes: number
   readonly maxExcerptBytes: number
+  /** Omission entries are bounded separately from items; the rest is a counted suppression. */
+  readonly maxOmissions: number
 }
 
-export interface SourceReviewCeilings {
-  readonly maxItems: number
-  readonly maxBytes: number
-  readonly maxExcerptBytes: number
-}
+export interface SourceReviewCeilings extends SourceReviewBudget {}
 
 export const SOURCE_REVIEW_CEILINGS: SourceReviewCeilings = Object.freeze({
   maxItems: 64,
   maxBytes: 64 * 1024,
   maxExcerptBytes: 4 * 1024,
+  maxOmissions: 256,
 })
 
 export const SOURCE_REVIEW_DEFAULTS: SourceReviewBudget = Object.freeze({
   maxItems: 32,
   maxBytes: 16 * 1024,
   maxExcerptBytes: 1024,
+  maxOmissions: 32,
 })
+
+/** Fixed budget for omission diagnostics; details beyond it are dropped, not serialized. */
+const MAX_OMISSION_DETAIL_BYTES = 8 * 1024
 
 /** Bounded counters for sources the review budget stopped; no per-item entry is emitted for them. */
 export interface SourceReviewSuppressed {
   readonly items: number
   readonly bytes: number
+  readonly omissions: number
 }
 
 export interface SourceReviewProjection {
@@ -125,6 +129,19 @@ function sanitizeLabel(value: string, maxLength = 120): string {
     .slice(0, maxLength)
 }
 
+const HOST_PATH_PATTERNS = [
+  /\/(?:Users|home|private|var|tmp|opt|etc|root|mnt|Volumes|srv)\/[^\s"'`),;]*/g,
+  /[A-Za-z]:\\[^\s"'`),;]*/g,
+  /file:\/\/[^\s"'`),;]*/g,
+]
+
+/** Free text may embed a host path; the public projection replaces it with one fixed marker. */
+function redactText(value: string, maxLength = 120): string {
+  let text = sanitizeLabel(value, maxLength)
+  for (const pattern of HOST_PATH_PATTERNS) text = text.replace(pattern, '<redacted-path>')
+  return text
+}
+
 /** Project-relative only; anything absolute, parent-escaping or backslash-separated is not citable. */
 function safePath(path: string): string | undefined {
   if (path.length === 0 || path.length > 1024) return undefined
@@ -153,14 +170,15 @@ function citationOf(kind: ContextSourceKind, path: string | undefined, sourceId:
   return `${kind}:${reference}${short}`
 }
 
-function omissionOf(item: ContextOmission): SourceReviewOmission {
+function omissionOf(item: ContextOmission, withDetail: boolean): SourceReviewOmission {
   // The same path rule as review items: an absolute/host/parent-escaping path is never echoed back.
   const path = item.path === undefined ? undefined : safePath(item.path)
+  const detail = item.detail === undefined || !withDetail ? undefined : redactText(item.detail, 200)
   return {
     ...(item.sourceId === undefined ? {} : { sourceId: item.sourceId }),
     ...(path === undefined ? {} : { path }),
     reason: item.reason,
-    ...(item.detail === undefined ? {} : { detail: sanitizeLabel(item.detail, 200) }),
+    ...(detail === undefined ? {} : { detail }),
   }
 }
 
@@ -170,7 +188,12 @@ function omissionOf(item: ContextOmission): SourceReviewOmission {
  */
 export function projectSourceReview(
   composition: ContextComposition,
-  budget: { readonly maxItems?: number; readonly maxBytes?: number; readonly maxExcerptBytes?: number } = {},
+  budget: {
+    readonly maxItems?: number
+    readonly maxBytes?: number
+    readonly maxExcerptBytes?: number
+    readonly maxOmissions?: number
+  } = {},
 ): SourceReviewProjection {
   const resolved: SourceReviewBudget = {
     maxItems: resolvePositive(budget.maxItems, SOURCE_REVIEW_DEFAULTS.maxItems, SOURCE_REVIEW_CEILINGS.maxItems, 'maxItems'),
@@ -181,10 +204,16 @@ export function projectSourceReview(
       SOURCE_REVIEW_CEILINGS.maxExcerptBytes,
       'maxExcerptBytes',
     ),
+    maxOmissions: resolvePositive(
+      budget.maxOmissions,
+      Math.min(SOURCE_REVIEW_DEFAULTS.maxOmissions, budget.maxItems ?? SOURCE_REVIEW_DEFAULTS.maxItems),
+      SOURCE_REVIEW_CEILINGS.maxOmissions,
+      'maxOmissions',
+    ),
   }
   const items: SourceReviewItem[] = []
   const notes: string[] = []
-  const suppressed = { items: 0, bytes: 0 }
+  const suppressed = { items: 0, bytes: 0, omissions: 0 }
   let visibleBytes = 0
   let truncated = false
   let redactedPaths = 0
@@ -194,8 +223,8 @@ export function projectSourceReview(
     const category = CATEGORY[slice.kind]
     const path = safePath(slice.path)
     if (path === undefined) redactedPaths += 1
-    const label = sanitizeLabel(slice.title ?? '')
-    const title = label.length > 0 ? label : sanitizeLabel(path === undefined ? '(redacted source)' : basename(path))
+    const label = redactText(slice.title ?? '')
+    const title = label.length > 0 ? label : redactText(path === undefined ? '(redacted source)' : basename(path))
     const citation = citationOf(slice.kind, path, slice.sourceId, slice.baseline.commit)
 
     if (items.length >= resolved.maxItems) {
@@ -236,14 +265,32 @@ export function projectSourceReview(
     })
   }
 
-  const omitted = composition.omitted.map((item) => {
+  const omitted: SourceReviewOmission[] = []
+  let omissionDetailBytes = 0
+  let detailsDropped = 0
+  for (const item of composition.omitted) {
+    if (omitted.length >= resolved.maxOmissions) {
+      // Omission diagnostics are bounded independently of the item budget.
+      suppressed.omissions += 1
+      continue
+    }
     if (item.path !== undefined && safePath(item.path) === undefined) redactedOmissions += 1
-    return omissionOf(item)
-  })
+    const projected = omissionOf(item, true)
+    const cost = Buffer.byteLength(projected.detail ?? '', 'utf8')
+    if (projected.detail !== undefined && omissionDetailBytes + cost > MAX_OMISSION_DETAIL_BYTES) {
+      detailsDropped += 1
+      omitted.push(omissionOf(item, false))
+      continue
+    }
+    omissionDetailBytes += cost
+    omitted.push(projected)
+  }
   if (redactedPaths > 0) notes.push(`${redactedPaths} source path(s) were not project-relative and are cited by source id only.`)
   if (redactedOmissions > 0) notes.push(`${redactedOmissions} omitted path(s) were not project-relative and are reported by reason/source id only.`)
   if (suppressed.items > 0) notes.push(`${suppressed.items} source(s) exceeded the review item budget and are counted, not listed.`)
   if (suppressed.bytes > 0) notes.push(`${suppressed.bytes} source(s) had no remaining review byte budget and are counted, not listed.`)
+  if (suppressed.omissions > 0) notes.push(`${suppressed.omissions} omission(s) exceeded the review omission budget and are counted, not listed.`)
+  if (detailsDropped > 0) notes.push(`${detailsDropped} omission detail(s) exceeded the diagnostic byte budget and were dropped.`)
   if (composition.omitted.some((item) => item.reason === 'missing' || item.reason === 'stale' || item.reason === 'contract_stale')) {
     notes.push('Some selected sources are missing or stale; their recorded reason is listed under omitted.')
   }

@@ -153,11 +153,9 @@ test('a completed reply is attached as recorded data; a request receipt alone st
   const history = pagedHistory([binding(1), binding(2)])
   const view = collectContextHistory(history, query, {
     now,
-    replyResults: {
-      forRequest(requestId: string) {
-        lookups += 1
-        return requestId === 'req-2' ? reply : undefined
-      },
+    replyReader(messageId: string) {
+      lookups += 1
+      return messageId === 'msg-2' ? { result: reply, verifiedBy: 'main-completed-reply' } : undefined
     },
   })
   assert.equal(lookups, 2)
@@ -191,17 +189,30 @@ test("main's reply lookup attaches only matching results; a foreign result is co
     textDigest: digest('c'),
     recordedAt: confirmedAt,
   })
-  const foreign = { ...matched, conversationId: 'other-conversation' }
+  const foreignConversation = { ...matched, conversationId: 'other-conversation' }
+  const foreignPrincipal = { ...matched, principal: { userId: 'foreign-user', authorityRef: 'foreign-authority' } }
   const history = pagedHistory([bindingRow])
+  const trusted = (result: typeof matched) => () => ({ result, verifiedBy: 'main-completed-reply' as const })
 
-  const attached = collectContextHistory(history, query, { now, replyFor: () => matched })
+  const attached = collectContextHistory(history, query, { now, replyReader: trusted(matched) })
   assert.equal(attached.entries[0]!.replyUnknown, false)
   assert.equal(attached.totals.mismatchedReplies, 0)
 
-  const refused = collectContextHistory(history, query, { now, replyFor: () => foreign })
-  assert.equal(refused.entries[0]!.completedReply, undefined)
-  assert.equal(refused.entries[0]!.replyUnknown, true)
-  assert.equal(refused.totals.mismatchedReplies, 1)
+  for (const result of [foreignConversation, foreignPrincipal]) {
+    const refused = collectContextHistory(history, query, { now, replyReader: trusted(result) })
+    assert.equal(refused.entries[0]!.completedReply, undefined)
+    assert.equal(refused.entries[0]!.replyUnknown, true)
+    assert.equal(refused.totals.mismatchedReplies, 1)
+  }
+
+  // A raw row is not a verified reply: only a reader that marks main's verification may attach.
+  const rawRow = collectContextHistory(history, query, {
+    now,
+    replyReader: () => ({ result: matched, verifiedBy: 'raw-row' as never }),
+  })
+  assert.equal(rawRow.entries[0]!.completedReply, undefined)
+  assert.equal(rawRow.entries[0]!.replyUnknown, true)
+  assert.equal(rawRow.totals.mismatchedReplies, 0)
 })
 
 test('a non-advancing history cursor stops the walk instead of looping or duplicating pages', () => {

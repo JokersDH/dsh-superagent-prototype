@@ -186,9 +186,18 @@ test('non-project-relative paths and recorded omissions are reported without inv
 
 test('review budgets are clamped to ceilings and invalid values are refused', async () => {
   const composed = await composition()
-  const clamped = projectSourceReview(composed, { maxItems: 10_000, maxBytes: 10_000_000, maxExcerptBytes: 10_000_000 })
+  const clamped = projectSourceReview(composed, {
+    maxItems: 10_000,
+    maxBytes: 10_000_000,
+    maxExcerptBytes: 10_000_000,
+    maxOmissions: 10_000,
+  })
   assert.deepEqual(clamped.budget, SOURCE_REVIEW_CEILINGS)
+  // Without an explicit omission budget the cap tracks the item budget, never the ceiling.
+  const implicit = projectSourceReview(composed, { maxItems: 3 })
+  assert.equal(implicit.budget.maxOmissions, 3)
   for (const invalid of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1.5]) {
     assert.throws(() => projectSourceReview(composed, { maxItems: invalid }), TypeError)
+    assert.throws(() => projectSourceReview(composed, { maxOmissions: invalid }), TypeError)
   }
 })
