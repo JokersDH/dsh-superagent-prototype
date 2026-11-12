@@ -1,0 +1,39 @@
+{
+  "protocol": "wave12-b-admission/1",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "source": "4a409207848157fdcccdd91e005d23051b83eb11",
+  "cases": [
+    {
+      "id": "TOP_LEVEL_FUNCTION_REFUSES_BEFORE_RESERVE",
+      "status": "FAIL",
+      "observation": {
+        "reservations": 1,
+        "fakeSends": 1,
+        "sent": true
+      }
+    },
+    {
+      "id": "TOP_LEVEL_SYMBOL_REFUSES_BEFORE_RESERVE",
+      "status": "FAIL",
+      "observation": {
+        "reservations": 1,
+        "fakeSends": 1,
+        "sent": true
+      }
+    },
+    {
+      "id": "DEFAULT_PUBLIC_DESCRIPTION_REDACTS_ALL_PRIVATE_PATH_FIELDS",
+      "status": "FAIL",
+      "observation": {
+        "leaked": true,
+        "binary": "/tmp/independent-audit-private-home/agent-missing",
+        "versionError": "\"/tmp/independent-audit-private-home/agent-missing\" is not an executable file"
+      }
+    }
+  ],
+  "passed": 0,
+  "failed": 3,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "experimental helper only; fake reserve/send; no ledger touched"
+}

@@ -1,0 +1,29 @@
+{
+  "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+  "bytes": 20132388,
+  "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+  "source": {
+    "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+    "branch": "codex/g3-local-distribution",
+    "dirty": false
+  },
+  "buildId": "3311a04bd20ed7f9",
+  "producer": {
+    "product": "dsh-superagent",
+    "version": "0.1.0",
+    "node": "24.21.0",
+    "pnpm": "11.7.0",
+    "sqlite": "3.53.4",
+    "productSchema": 16,
+    "platform": "darwin",
+    "arch": "arm64",
+    "abi": "137"
+  },
+  "manifestFileCount": 6697,
+  "archiveEntryCount": 7247,
+  "httpMatchesGitSource": true,
+  "httpMatchesManifest": true,
+  "selectedContextSendSourcePresent": true,
+  "messageContextAuditSourcePresent": true,
+  "scope": "frozen artifact bytes and selected source indicators only; no installation/startup admission"
+}

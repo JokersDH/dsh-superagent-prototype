@@ -5,7 +5,6 @@ import { mkdtempSync, mkdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { ProductStore } from '../../packages/storage/dist/index.js'
-import { AssistantContextBindingSchema } from '../../packages/contracts/dist/index.js'
 import { key } from '../../packages/orchestrator-core/dist/index.js'
 import { createProductRuntime } from '../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../apps/coordinator/http/app.ts'
@@ -22,11 +21,11 @@ const timeout = (promise, milliseconds = 5000) => {
 }
 const deferred = () => { let resolve; const promise = new Promise(value => { resolve = value }); return { promise, resolve } }
 
-async function fixture(t, respond = async () => ({ text: 'Bounded context reply.', model: 'mock-context' }), completedResults = false) {
+async function fixture(t, respond = async () => ({ text: 'Bounded context reply.', model: 'mock-context' })) {
   const root = mkdtempSync(join(tmpdir(), 'pa-context-product-')), stateRoot = join(root, 'state'), projectRoot = join(root, 'project')
   mkdirSync(stateRoot); mkdirSync(projectRoot); mkdirSync(join(projectRoot, 'src'))
   let store = new ProductStore({ path: join(stateRoot, 'state.sqlite') }), product, now = new Date().toISOString(), beforeStatus
-  const records = new Map(), completedRecords = new Map(), requests = [], servers = [], releases = []
+  const requests = [], servers = [], releases = []
   const status = () => {
     const hook = beforeStatus; beforeStatus = undefined; hook?.()
     return { protocol: 'assistant-provider/1', configured: true, baseURL: 'https://fixture.invalid/v1',
@@ -36,35 +35,11 @@ async function fixture(t, respond = async () => ({ text: 'Bounded context reply.
     requests.push(structuredClone(args[0])); return respond(...args)
   } }
   const setup = () => {
-    // A is the only production SQL writer. This fallback commits only after the caller UoW and
-    // is explicitly a composition fixture, never evidence of A's binding-table durability.
-    const bindings = store.workflows.assistant.contextBindings ?? {
-      forMessage: id => { const record = [...records.values()].find(value => value.messageId === id); return record && structuredClone(record) },
-      forCommand: id => { const record = records.get(id); return record && structuredClone(record) },
-      put: value => {
-        assert.ok(store.uow.nesting > 0)
-        const binding = AssistantContextBindingSchema.parse(value), existing = records.get(binding.commandId)
-        if (existing) { assert.deepEqual(existing, binding); return { binding: structuredClone(existing), replayed: true } }
-        store.uow.afterCommit(() => records.set(binding.commandId, structuredClone(binding)))
-        return { binding, replayed: false }
-      },
-    }
-    // This result-port fallback survives only in the test process. Reopening SQLite below proves
-    // the product consumer/receipts/artifact path, not A's pending durable result implementation.
-    const replyResults = completedResults ? store.workflows.assistant.replyResults ?? {
-      forRequest: id => structuredClone(completedRecords.get(id)),
-      forReply: id => structuredClone([...completedRecords.values()].find(value => value.replyMessageId === id)),
-      put: value => {
-        assert.ok(store.uow.nesting > 0)
-        const result = structuredClone(value)
-        store.uow.afterCommit(() => completedRecords.set(result.requestId, result))
-        return { result, replayed: false }
-      },
-    } : undefined
+    assert.ok(store.workflows.assistant.contextBindings)
+    assert.ok(store.workflows.assistant.replyResults)
     product = createProductRuntime({ store, principal, stateRoot, scratchProject: projectRoot,
       projects: [{ id: scope.projectId, displayName: 'Payment project', scope }], actionSecret: Buffer.alloc(32, 38),
-      assistantProvider: provider, assistantContextBindings: bindings,
-      ...(replyResults ? { assistantReplyResults: replyResults } : {}), now: () => now })
+      assistantProvider: provider, now: () => now })
   }
   setup()
   store.product.messages.append({ id: 'payment-source', conversationId: 'context-conversation', projectId: scope.projectId,
@@ -135,8 +110,8 @@ test('a selected decision expiring at the final reservation blocks the provider 
   assert.ok(h.messages().some(message => message.provenance === 'application_notice' && message.text.includes('未发送给模型')))
 })
 
-test('HTTP context replies use the completed-result consumer after SQLite reopen with an explicitly in-process result port', async t => {
-  const h = await fixture(t, async () => ({ text: 'Recovered selected-context reply.', model: 'mock-context' }), true)
+test('HTTP context replies use the production SQLite completed-result port after reopen', async t => {
+  const h = await fixture(t, async () => ({ text: 'Recovered selected-context reply.', model: 'mock-context' }))
   const prepared = await h.prepare()
   await h.send(prepared)
   const messageId = key('message', prepared.commandId)
@@ -253,12 +228,15 @@ test('provider failure and a post-inference reply commit failure never cause a s
     assert.equal(h.requests.length, 1)
     const notice = h.messages().find(message => message.provenance === 'application_notice')
     const recovered = h.messages().find(message => message.provenance === 'reasoner_reply')
-    // The real A reply-result port survives the failed reply transaction, so a requeued effect
-    // appends the stable reply instead of the older unknown-result notice. Either path is valid;
-    // only one model request may exist.
-    assert.ok(notice || recovered)
-    if (notice) assert.doesNotMatch(notice.text, /fixture-secret|injected answer/)
-    if (recovered) assert.deepEqual(recovered.sourceRefs, [key('message', prepared.commandId)])
+    if (fault === 'unknown-result') {
+      assert.ok(notice); assert.doesNotMatch(notice.text, /fixture-secret|injected answer/)
+      assert.equal(recovered, undefined)
+    } else {
+      assert.equal(notice, undefined)
+      assert.equal(recovered?.text, 'Completed generation.')
+      assert.deepEqual(recovered.sourceRefs, [key('message', prepared.commandId)])
+      assert.ok(h.store.workflows.assistant.replyResults.forReply(recovered.id))
+    }
     assert.equal(h.store.queue.dueRows('application.assistant.reply', Number.MAX_SAFE_INTEGER, 100).length, 0)
   })
 })

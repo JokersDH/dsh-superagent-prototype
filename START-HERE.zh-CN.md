@@ -1,5 +1,9 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**当前派工：[第十二轮产品交付长包](agent-tasks/product-wave-12/README.zh-CN.md)。** A修逻辑快照/历史三反例并收口持久数据；B做真实生产控制/独立进程恢复；C做来源检索到候选完整数据链；D先关所有权P1再交当前安装；E改为动态真实字节验收。每人十阶段，三次checkpoint后继续，见[五段转发话术](agent-tasks/product-wave-12/forward-prompts.zh-CN.md)和[0037独立验收](docs/rfcs/WP-16/0037-wave-12-admission-and-product-delivery.md)。
+
+**实际持久回复已接入main530085c/schema18。** 原HTTP测试已换真实A结果表；新增四个真实产品进程SIGKILL/损坏用例证明原结果只补一次、unknown不重发，主线本轮288项回归及9项真实A18网页复跑通过。A新source/history及B/C/D剩余阻断没有被整包放行。D新schema16 tar确含context-use，E旧schema15结论不能代表它；下一当前安装要用新schema18准确字节。原九组服务未更新，5188仍4140cac/schema16，真实模型/native0。[代码/测试范围](reports/releases/wave12-integration/README.zh-CN.md)。
+
 **第十一轮主线真实消费者已交：[0036完成回复与配置固定](docs/rfcs/WP-16/0036-completed-reply-consumer-checkpoint.md)。** 源码31ddd26保存真实返回的回复artifact/result后再发布消息，原effect重试可核对补齐而不再发模型；SDK本次model/config固定，切换配置不误绑。71项主线回归及strict通过。A生产replyResults尚待实现接入，目前结果port测试是明确fixture，不宣称持久恢复准入；原5188运行预览/九组服务未更新。A/E继续本轮整包，直接消费该入口。
 
 **当前派工：[第十一轮十阶段长任务整包](agent-tasks/product-wave-11/README.zh-CN.md)。** A做源逻辑快照/历史/完成回复数据，B做实际持久控制，C做可靠来源检索与候选数据，D做多实例隔离和当前源码个人安装，E做当前用户流程/真实安装独立验收。每人十阶段、三个稳定检查点和独立备选队列，检查点后继续。新验收确认D通用stop跨state的P1；B四项新helper/C九条新模块反例未闭合，现用main能力保留。共享接口98a50ca已交，模型/native0、九组实例/账本保留。见[0035](docs/rfcs/WP-16/0035-wave-11-admission-and-long-run-packages.md)和[分别转发文本](agent-tasks/product-wave-11/forward-prompts.zh-CN.md)。
