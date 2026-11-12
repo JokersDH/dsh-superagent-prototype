@@ -206,20 +206,66 @@ export function createReviewSender(input: ReviewSenderInput = {}): ReviewSender 
  * A structured clone is used so nested objects cannot be mutated through the caller's reference; the
  * copy is frozen so this module cannot mutate it either.
  */
+/**
+ * Prove a value is JSON-safe model input BEFORE anything is reserved.
+ *
+ * `structuredClone` is the wrong test on its own: it happily clones a BigInt, a NaN and an object
+ * whose symbol keys it silently drops. All three would reserve budget and then either fail to
+ * serialise or lose required context on the wire. So the payload is checked as the structured JSON a
+ * provider would actually receive, and anything that cannot round-trip refuses here.
+ *
+ * Returns the path of the first offending value so the refusal names where the problem is.
+ */
+function jsonSafety(value: unknown, path = 'input', seen = new Set<object>()): { ok: true } | { ok: false; reason: string } {
+  if (value === null || value === undefined) return { ok: true }
+  const kind = typeof value
+  if (kind === 'string' || kind === 'boolean') return { ok: true }
+  if (kind === 'number') {
+    return Number.isFinite(value as number)
+      ? { ok: true }
+      : { ok: false, reason: `${path} is ${String(value)}, which has no JSON representation, so nothing is reserved or sent` }
+  }
+  if (kind === 'bigint') {
+    return { ok: false, reason: `${path} is a bigint, which has no JSON representation, so nothing is reserved or sent` }
+  }
+  if (kind === 'function' || kind === 'symbol') {
+    return { ok: false, reason: `${path} is a ${kind}, which is not model input, so nothing is reserved or sent` }
+  }
+  if (kind !== 'object') return { ok: false, reason: `${path} is a ${kind}, which is not model input` }
+
+  const node = value as object
+  if (seen.has(node)) return { ok: false, reason: `${path} is a cycle, which has no JSON representation` }
+  seen.add(node)
+  try {
+    if (Array.isArray(node)) {
+      for (let index = 0; index < node.length; index += 1) {
+        const nested = jsonSafety(node[index], `${path}[${index}]`, seen)
+        if (nested.ok === false) return nested
+      }
+      return { ok: true }
+    }
+    // A symbol key cannot be expressed in JSON, so it would be dropped silently and the provider
+    // would receive a different request than the one that was admitted.
+    const symbolKeys = Object.getOwnPropertySymbols(node)
+    if (symbolKeys.length > 0) {
+      return { ok: false, reason: `${path} has ${symbolKeys.length} symbol key(s), which JSON cannot carry, so the request would be silently changed` }
+    }
+    for (const [key, nested] of Object.entries(node as Record<string, unknown>)) {
+      const verdict = jsonSafety(nested, `${path}.${key}`, seen)
+      if (verdict.ok === false) return verdict
+    }
+    return { ok: true }
+  } finally {
+    seen.delete(node)
+  }
+}
+
 function snapshotInput(input: unknown): { ok: true; value: unknown } | { ok: false; reason: string } {
-  // Only values a model can actually receive pass through untouched. A function or symbol is not
-  // model input, and structuredClone would throw on them anyway - but it must be refused BEFORE any
-  // reservation, not after a placeholder has already been reserved for and sent.
+  // JSON safety first: this is the check that decides whether a budget may be reserved at all.
+  const safety = jsonSafety(input)
+  if (safety.ok === false) return { ok: false, reason: safety.reason }
   if (input === null || input === undefined) return { ok: true, value: input }
-  const primitive = typeof input
-  if (primitive === 'string' || primitive === 'number' || primitive === 'boolean') {
-    return Number.isFinite(input as number) || primitive !== 'number'
-      ? { ok: true, value: input }
-      : { ok: false, reason: 'the admitted input is not a finite number, so it cannot be sent as model input' }
-  }
-  if (primitive === 'function' || primitive === 'symbol' || primitive === 'bigint') {
-    return { ok: false, reason: `the admitted input is a ${primitive}, which is not model input, so nothing is reserved or sent` }
-  }
+  if (typeof input !== 'object') return { ok: true, value: input }
   try {
     return { ok: true, value: deepFreeze(structuredClone(input)) }
   } catch (error) {

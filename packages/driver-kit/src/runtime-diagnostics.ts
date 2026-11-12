@@ -98,6 +98,21 @@ export type RuntimeDescription = {
   private?: PrivateFacts
 }
 
+/**
+ * Replace absolute path tokens in a public string.
+ *
+ * Diagnostics carry text from several sources - caller-supplied capability details, a model-identity
+ * provenance note, and raw CLI version output. Any of them can quote an absolute path, and a path can
+ * contain an account name. Rather than trust each producer to have sanitised its own text, every
+ * public string is scrubbed here. The full text stays available behind includePrivate.
+ */
+export function redactPrivatePaths(text: string | null | undefined): string | null {
+  if (typeof text !== 'string' || text === '') return text ?? null
+  // Unix absolute paths, Windows drive paths and home-relative paths.
+  return text
+    .replace(/(?:[A-Za-z]:[\\/]|~[\\/]|\/[^\s'"`()[\]{}<>,;:]+)+/g, '[redacted-path]')
+}
+
 /** Evidence layers, weakest to strongest for the claim each supports. */
 export const EVIDENCE_LAYERS = Object.freeze([
   'declared', // read from a document or version string
@@ -349,7 +364,9 @@ export function describeRuntime(options: RuntimeDescriptionOptions = {}): Runtim
     : {
         ...observed,
         binary: publicBinary,
-        // The version error quotes the path it tried, so it is private detail as well.
+        // Raw version output and the version error both quote the path that was executed.
+        version: redactPrivatePaths(observed.version),
+        versionRaw: redactPrivatePaths(observed.versionRaw),
         versionError: observed.versionError === null ? null : '[redacted]',
         declaredPath: observed.declaredPath ? '[redacted]' : null,
         realPath: observed.realPath ? '[redacted]' : null,
@@ -418,18 +435,27 @@ export function describeRuntime(options: RuntimeDescriptionOptions = {}): Runtim
     /** Only ever true when nothing blocks a billable run. Kept separate so a UI cannot conflate. */
     billableAdmitted: usable && blocked.length === 0 && billingReasons.length === 0 && modelIdentity.measured,
     billingReasons,
-    modelIdentity: modelIdentity.value,
+    // Provenance text and nested diagnostics can quote an absolute path; scrub both in the public
+    // form rather than trusting each producer to have sanitised its own string.
+    modelIdentity: modelIdentity.value === null
+      ? null
+      : {
+          ...modelIdentity.value,
+          observedFrom: includePrivate ? modelIdentity.value.observedFrom : redactPrivatePaths(modelIdentity.value.observedFrom),
+        },
     reasons,
     identity,
     /** True when paths were withheld; main decides whether to publish the full form. */
     pathRedacted: !includePrivate,
     enforcement,
-    capabilities: rows,
+    capabilities: includePrivate
+      ? rows
+      : rows.map(row => ({ ...row, detail: redactPrivatePaths(row.detail) ?? row.detail, invalidation: redactPrivatePaths(row.invalidation) ?? row.invalidation })),
     blockedCapabilities: blocked.map(row => ({
       id: row.id,
       label: row.label,
       state: row.state,
-      invalidation: row.invalidation,
+      invalidation: includePrivate ? row.invalidation : (redactPrivatePaths(row.invalidation) ?? row.invalidation),
     })),
     /** What this description is not allowed to be read as. */
     notClaimed: [
