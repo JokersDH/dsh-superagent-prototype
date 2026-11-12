@@ -15,6 +15,27 @@ type Row = Record<string, unknown>
 const json = <T>(value: unknown): T => JSON.parse(String(value)) as T
 const digest = (value: unknown): string => canonicalDigest(JSON.parse(JSON.stringify(value)))
 
+/** Strict immutable A fact mapper shared by the activation store and the recovery source. */
+export function recoveryActivationFromRow(row: Row): RecoveryActivationIntent {
+  let intent: RecoveryActivationIntent
+  try { intent = RecoveryActivationIntentSchema.parse(json(row.value)) } catch (error) {
+    throw new WorkflowConflict(`Recovery activation ${String(row.activation_id)} has an invalid payload: ${String(error)}`)
+  }
+  // Every indexed column must agree with the immutable body; a hand-edited row is not a fact.
+  if (
+    String(row.activation_id) !== intent.activationId || String(row.command_id) !== intent.commandId ||
+    String(row.plan_id) !== intent.planId || String(row.plan_digest) !== intent.planDigest ||
+    String(row.principal_user_id) !== intent.principal.userId ||
+    String(row.principal_authority_ref) !== intent.principal.authorityRef ||
+    String(row.machine_digest) !== intent.machineDigest ||
+    String(row.resource_policy_digest) !== intent.resourcePolicyDigest ||
+    String(row.created_at) !== intent.createdAt || String(row.expires_at) !== intent.expiresAt ||
+    String(row.digest) !== digest(intent) ||
+    String(row.source_json) !== JSON.stringify(intent.source) || String(row.target_json) !== JSON.stringify(intent.target)
+  ) throw new WorkflowConflict(`Recovery activation ${String(row.activation_id)} row is inconsistent with its payload`)
+  return intent
+}
+
 export class RecoveryActivations implements RecoveryActivationFacts {
   private readonly db: Database.Database
   private readonly uow: UnitOfWork
@@ -23,25 +44,7 @@ export class RecoveryActivations implements RecoveryActivationFacts {
     this.uow = uow
   }
 
-  private mapRow(row: Row): RecoveryActivationIntent {
-    let intent: RecoveryActivationIntent
-    try { intent = RecoveryActivationIntentSchema.parse(json(row.value)) } catch (error) {
-      throw new WorkflowConflict(`Recovery activation ${String(row.activation_id)} has an invalid payload: ${String(error)}`)
-    }
-    // Indexed columns must agree with the immutable body; a hand-edited row is not a fact.
-    if (
-      String(row.activation_id) !== intent.activationId || String(row.command_id) !== intent.commandId ||
-      String(row.plan_id) !== intent.planId || String(row.plan_digest) !== intent.planDigest ||
-      String(row.principal_user_id) !== intent.principal.userId ||
-      String(row.principal_authority_ref) !== intent.principal.authorityRef ||
-      String(row.machine_digest) !== intent.machineDigest ||
-      String(row.resource_policy_digest) !== intent.resourcePolicyDigest ||
-      String(row.created_at) !== intent.createdAt || String(row.expires_at) !== intent.expiresAt ||
-      String(row.digest) !== digest(intent) ||
-      String(row.source_json) !== JSON.stringify(intent.source) || String(row.target_json) !== JSON.stringify(intent.target)
-    ) throw new WorkflowConflict(`Recovery activation ${String(row.activation_id)} row is inconsistent with its payload`)
-    return intent
-  }
+  private mapRow(row: Row): RecoveryActivationIntent { return recoveryActivationFromRow(row) }
 
   get(activationId: string): RecoveryActivationIntent | undefined {
     const row = this.db.prepare('SELECT * FROM recovery_activations WHERE activation_id = ?').get(activationId) as Row | undefined
