@@ -11,7 +11,8 @@ import type {
 import { WorkflowConflict as StorageWorkflowConflict } from '@personal-agent/storage'
 import type {
   AssistantStatePage, AssistantStatePort, AssistantStateQuery, PersistedDecision, PersistedProposal, RoutingEvidencePort, WorkRecord,
-  AssistantContextBindings as AssistantContextBindingsPort, RecoveryActivationFacts, RecoveryActivationIntent,
+  AssistantContextBindings as AssistantContextBindingsPort, AssistantContextHistory, AssistantReplyResults,
+  RecoveryActivationFacts, RecoveryActivationIntent, RecoverySourceReader,
 } from '@personal-agent/contracts'
 
 export { SnapshotError, WorkflowSnapshots } from './snapshot.ts'
@@ -36,6 +37,8 @@ export interface RoutingEvidencePortWithSources extends RoutingEvidencePort {
 export interface AssistantPort extends AssistantStatePort {
   /** Shared append-only selected-context audit (v16), same chat/receipt UnitOfWork. */
   readonly contextBindings: AssistantContextBindingsPort
+  readonly contextHistory: AssistantContextHistory
+  readonly replyResults: AssistantReplyResults
   /** Old UserDecision ledger rows without source/actor metadata: auditable but not valid memory. */
   legacyDecisions(query: AssistantStateQuery): { records: readonly LegacyDecisionRecord[]; nextCursor?: string }
 }
@@ -107,6 +110,8 @@ export interface WorkflowPorts {
   recoveryIntents: RecoveryIntentPort
   /** Shared 0027 production facts consumed by main's RecoveryIntentCommitter. */
   recoveryActivations: RecoveryActivationPort
+  /** Bounded logical source data only; main verifies marker/host/profile/resources separately. */
+  recoverySource: RecoverySourceReader
   index: ReadIndexPort
   state: StateFactsPort
 }
@@ -123,6 +128,7 @@ export function createWorkflowPorts(store: ProductStore): WorkflowPorts {
     acceptance: store.workflows.acceptance,
     recoveryIntents: store.workflows.recoveryIntents,
     recoveryActivations: store.workflows.recoveryActivations,
+    recoverySource: store.workflows.recoverySource,
     index: store.workflows.index,
     state: store.workflows.index,
   }

@@ -54,7 +54,7 @@ export const TARGET_TABLE_CATEGORIES: Readonly<Record<string, 'metadata' | 'busi
   user_decision_versions: 'business', assistant_decision_versions: 'business', assistant_proposal_versions: 'business',
   route_advice: 'business', review_evidence: 'business', execution_outcome: 'business',
   recovery_intents: 'business', recovery_activations: 'business',
-  assistant_context_bindings: 'business',
+  assistant_context_bindings: 'business', assistant_reply_results: 'business',
 })
 
 const categoryOf = (name: string): 'metadata' | 'business' | 'unknown' =>

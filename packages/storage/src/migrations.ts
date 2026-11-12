@@ -425,8 +425,43 @@ const V16: Migration = {
   ],
 }
 
+
+/**
+ * v17: selected-context history keyset index. The work identity is derived from the frozen optional
+ * contract reference; the binding body remains the authority and is never rewritten by this migration.
+ */
+const V17: Migration = {
+  version: 17,
+  name: 'assistant-context-history-index',
+  statements: [
+    `ALTER TABLE assistant_context_bindings ADD COLUMN work_id TEXT`,
+    `UPDATE assistant_context_bindings SET work_id = json_extract(value, '$.contract.workId')`,
+    `CREATE INDEX assistant_context_history_scope ON assistant_context_bindings (project_id, confirmed_at DESC, message_id DESC)`,
+    `CREATE INDEX assistant_context_history_conversation ON assistant_context_bindings (project_id, conversation_id, confirmed_at DESC, message_id DESC)`,
+    `CREATE INDEX assistant_context_history_work ON assistant_context_bindings (project_id, work_id, confirmed_at DESC, message_id DESC)`,
+  ],
+}
+
+/**
+ * v18: one completed assistant reply per original request/reply identity. This joins the existing
+ * before-send request receipt and artifact registry; it is not a new send lifecycle or replay grant.
+ */
+const V18: Migration = {
+  version: 18,
+  name: 'assistant-reply-results',
+  statements: [
+    `CREATE TABLE assistant_reply_results (
+      request_id TEXT PRIMARY KEY, request_digest TEXT NOT NULL, source_message_id TEXT NOT NULL,
+      reply_message_id TEXT NOT NULL UNIQUE, project_id TEXT NOT NULL, conversation_id TEXT NOT NULL,
+      principal_user_id TEXT NOT NULL, principal_authority_ref TEXT NOT NULL, model TEXT NOT NULL,
+      artifact_ref TEXT NOT NULL, artifact_digest TEXT NOT NULL, text_digest TEXT NOT NULL,
+      recorded_at TEXT NOT NULL, value TEXT NOT NULL, digest TEXT NOT NULL)`,
+    `CREATE INDEX assistant_reply_results_scope ON assistant_reply_results (project_id, recorded_at DESC)`,
+  ],
+}
+
 /** The registry this build applies, in order; the highest version is the product schema version. */
-export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15, V16]
+export const MIGRATIONS: readonly Migration[] = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15, V16, V17, V18]
 export const PRODUCT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version
 
 const row = (db: Database.Database, sql: string, ...args: unknown[]): Record<string, unknown> | undefined =>

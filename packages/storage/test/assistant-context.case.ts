@@ -140,7 +140,7 @@ test('a v15 database upgrades append-only to v16 with its prior rows intact', as
     const upgraded = new ProductStore({ path })
     try {
       assert.equal(upgraded.database.productSchema, PRODUCT_SCHEMA_VERSION)
-      assert.equal(PRODUCT_SCHEMA_VERSION, 16)
+      assert.equal(PRODUCT_SCHEMA_VERSION, 18)
       const legacy = upgraded.db.prepare("SELECT COUNT(*) AS n FROM project_settings_versions WHERE project_id = 'proj-1'").get() as { n: number }
       assert.equal(legacy.n, 1, 'pre-existing v15 rows survive the append-only upgrade')
       assert.equal(upgraded.workflows.assistant.contextBindings.forMessage('msg-1'), undefined)
