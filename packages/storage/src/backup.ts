@@ -86,6 +86,11 @@ const EVIDENCE_FAMILIES: readonly EvidenceFamilySpec[] = [
       'principal_user_id', 'principal_authority_ref', 'bundle_ref', 'bundle_digest', 'confirmed_at', 'expires_at',
       'value', 'digest'],
     order: 'confirmed_at, message_id' },
+  { name: 'assistant_reply_results', table: 'assistant_reply_results', identity: 'request_id',
+    body: ['request_id', 'request_digest', 'source_message_id', 'reply_message_id', 'project_id', 'conversation_id',
+      'principal_user_id', 'principal_authority_ref', 'model', 'artifact_ref', 'artifact_digest', 'text_digest',
+      'recorded_at', 'value', 'digest'],
+    order: 'recorded_at, request_id' },
   { name: 'recovery_activations', table: 'recovery_activations', identity: 'activation_id',
     body: ['activation_id', 'command_id', 'plan_id', 'plan_digest', 'source_json', 'target_json', 'principal_user_id',
       'principal_authority_ref', 'machine_digest', 'resource_policy_digest', 'created_at', 'expires_at', 'value', 'digest'],
@@ -148,13 +153,17 @@ export function readRoutingArtifactRefs(databasePath: string): string[] {
   try {
     const hasReview = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'review_evidence'").get()
     const hasBindings = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'assistant_context_bindings'").get()
-    if (!hasReview && !hasBindings) return []
+    const hasReplies = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'assistant_reply_results'").get()
+    if (!hasReview && !hasBindings && !hasReplies) return []
     const refs = new Set<string>()
     if (hasReview) for (const row of db.prepare('SELECT DISTINCT report_artifact_ref FROM review_evidence').all() as Record<string, unknown>[])
       refs.add(String(row.report_artifact_ref))
     // A selected-context bundle must remain present for the audit row to be meaningful after restore.
     if (hasBindings) for (const row of db.prepare('SELECT DISTINCT bundle_ref FROM assistant_context_bindings').all() as Record<string, unknown>[])
       refs.add(String(row.bundle_ref))
+    // A completed reply's bounded body artifact is required to recover the reply without resending.
+    if (hasReplies) for (const row of db.prepare('SELECT DISTINCT artifact_ref FROM assistant_reply_results').all() as Record<string, unknown>[])
+      refs.add(String(row.artifact_ref))
     return [...refs].sort()
   } finally { db.close() }
 }

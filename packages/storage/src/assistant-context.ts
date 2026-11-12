@@ -15,6 +15,26 @@ type Row = Record<string, unknown>
 const json = <T>(value: unknown): T => JSON.parse(String(value)) as T
 const digest = (value: unknown): string => canonicalDigest(JSON.parse(JSON.stringify(value)))
 
+/** Shared strict row validation for the binding table; history uses the same body authority. */
+export function contextBindingFromRow(row: Record<string, unknown>): AssistantContextBinding {
+  let binding: AssistantContextBinding
+  try { binding = AssistantContextBindingSchema.parse(json(row.value)) } catch (error) {
+    throw new WorkflowConflict(`Context binding ${String(row.message_id)} has an invalid payload: ${String(error)}`)
+  }
+  if (
+    String(row.message_id) !== binding.messageId || String(row.command_id) !== binding.commandId ||
+    String(row.request_id) !== binding.requestId || String(row.project_id) !== binding.projectId ||
+    String(row.conversation_id) !== binding.conversationId ||
+    String(row.user_text_digest) !== binding.userTextDigest ||
+    String(row.principal_user_id) !== binding.principal.userId ||
+    String(row.principal_authority_ref) !== binding.principal.authorityRef ||
+    String(row.bundle_ref) !== binding.bundleRef || String(row.bundle_digest) !== binding.bundleDigest ||
+    String(row.confirmed_at) !== binding.confirmedAt || String(row.expires_at) !== binding.expiresAt ||
+    String(row.digest) !== digest(binding)
+  ) throw new WorkflowConflict(`Context binding ${String(row.message_id)} row is inconsistent with its payload`)
+  return binding
+}
+
 export class AssistantContextBindingStore implements AssistantContextBindings {
   private readonly db: Database.Database
   private readonly uow: UnitOfWork
@@ -23,24 +43,7 @@ export class AssistantContextBindingStore implements AssistantContextBindings {
     this.uow = uow
   }
 
-  private mapRow(row: Row): AssistantContextBinding {
-    let binding: AssistantContextBinding
-    try { binding = AssistantContextBindingSchema.parse(json(row.value)) } catch (error) {
-      throw new WorkflowConflict(`Context binding ${String(row.message_id)} has an invalid payload: ${String(error)}`)
-    }
-    if (
-      String(row.message_id) !== binding.messageId || String(row.command_id) !== binding.commandId ||
-      String(row.request_id) !== binding.requestId || String(row.project_id) !== binding.projectId ||
-      String(row.conversation_id) !== binding.conversationId ||
-      String(row.user_text_digest) !== binding.userTextDigest ||
-      String(row.principal_user_id) !== binding.principal.userId ||
-      String(row.principal_authority_ref) !== binding.principal.authorityRef ||
-      String(row.bundle_ref) !== binding.bundleRef || String(row.bundle_digest) !== binding.bundleDigest ||
-      String(row.confirmed_at) !== binding.confirmedAt || String(row.expires_at) !== binding.expiresAt ||
-      String(row.digest) !== digest(binding)
-    ) throw new WorkflowConflict(`Context binding ${String(row.message_id)} row is inconsistent with its payload`)
-    return binding
-  }
+  private mapRow(row: Row): AssistantContextBinding { return contextBindingFromRow(row) }
 
   forMessage(messageId: string): AssistantContextBinding | undefined {
     const row = this.db.prepare('SELECT * FROM assistant_context_bindings WHERE message_id = ?').get(messageId) as Row | undefined
@@ -78,12 +81,12 @@ export class AssistantContextBindingStore implements AssistantContextBindings {
       this.db.prepare(`INSERT INTO assistant_context_bindings
         (message_id, command_id, request_id, project_id, conversation_id, user_text_digest,
          principal_user_id, principal_authority_ref, bundle_ref, bundle_digest,
-         confirmed_at, expires_at, value, digest)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+         confirmed_at, expires_at, work_id, value, digest)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
         binding.messageId, binding.commandId, binding.requestId, binding.projectId, binding.conversationId,
         binding.userTextDigest, binding.principal.userId, binding.principal.authorityRef,
         binding.bundleRef, binding.bundleDigest, binding.confirmedAt, binding.expiresAt,
-        JSON.stringify(binding), valueDigest,
+        binding.contract?.workId ?? null, JSON.stringify(binding), valueDigest,
       )
       return { binding: this.forMessage(binding.messageId)!, replayed: false }
     })
