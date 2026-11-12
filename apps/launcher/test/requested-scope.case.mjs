@@ -49,7 +49,10 @@ test('a record matches its own requested roots but not another state or install'
     assert.equal(stateMismatch.recorded.state.endsWith('state-a'), true)
     const otherInstall = { ...roots, install: join(root, 'other-install') }
     mkdirSync(join(otherInstall.install, 'app'), { recursive: true })
-    const installMismatch = requestedScopeCheck({ roots: otherInstall, record })
+    const installInformational = requestedScopeCheck({ roots: otherInstall, record })
+    assert.equal(installInformational.ok, true)
+    assert.equal(installInformational.installMatches, false)
+    const installMismatch = requestedScopeCheck({ roots: otherInstall, record, requireInstall: true })
     assert.equal(installMismatch.ok, false)
     assert.deepEqual(installMismatch.failures, ['requested_install'])
   } finally { rmSync(root, { recursive: true, force: true }) }

@@ -325,6 +325,11 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
     // switched. Recovery must restart the previous release with the same mode/access/ports.
     throw new UpgradeError('upgrade_interrupted', 'Injected crash after stop but before the pointer switch (test fault); run `pa upgrade --recover`')
   }
+  if (fault === 'crash_after_stop_kill') {
+    // Real crash window: the journal has the stopped resources, then this process dies by SIGKILL
+    // (not a thrown error), so only the durable journal can explain the interrupted switch.
+    process.kill(process.pid, 'SIGKILL')
+  }
   const adopted = initializeRelease({ installRoot: target.appRoot, configRoot: roots.config, adoptExisting: true })
   writePrivateJson(journalPath, {
     protocol: 'personal-install-switch/1',
@@ -340,6 +345,7 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
     ports: instance === null ? null : { consoleURL: instance.consoleURL, apiURL: instance.apiURL },
     previousReleasePath: existsSync(previousPath) ? previousPath : null,
   })
+  if (fault === 'crash_after_switch_kill') process.kill(process.pid, 'SIGKILL')
   if (fault === 'crash_after_switch') throw new UpgradeError('upgrade_interrupted', 'Injected crash after pointer switch (test fault); run `pa upgrade --recover`')
 
   // 4. Start the target binary on the same data roots and require its own identity. The spawn pid is

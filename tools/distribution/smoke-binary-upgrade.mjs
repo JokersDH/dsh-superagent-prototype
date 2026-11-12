@@ -600,6 +600,11 @@ try {
     if (JSON.parse(readFileSync(join(r11.config, 'release.json'), 'utf8')).buildId !== before11) throw new Error('the pointer moved while an unknown live target existed')
     section('E11-unknown-live-blocked', 'PASS', { code: attempted.json.code, strangerAlive: true, pointer: before11 })
     try { process.kill(stranger.pid, 'SIGKILL') } catch { /* gone */ }
+    // The launcher was SIGKILLed earlier, so its real API child remains a live writer whose pid the
+    // tampered record no longer names. It is still this test's own process: stop that exact pid, then
+    // the recorded port has no unknown listener and the stale record can be collected truthfully.
+    try { process.kill(instance11.record.apiPid, 'SIGKILL') } catch { /* gone */ }
+    await new Promise((resolveWait) => setTimeout(resolveWait, 300))
     run(cli(target), ['stop', '--json', ...rootArgs(r11)], { allowExit: [0, 2] })
   }
 
@@ -619,6 +624,34 @@ try {
     if (!['RECOVERED', 'REVERTED', 'RECOVERED_PREVIOUS'].includes(recovered.json?.status)) throw new Error('recovery did not settle the crashed switch')
     section('E12-reentry-refused-until-recover', 'PASS', { reentry: reentry.json.code, journal: journal12.status, recovered: recovered.json.status })
     run(cli(target), ['stop', '--json', ...rootArgs(r12)], { allowExit: [0, 2] })
+  }
+
+  // ---- E13/E14. real SIGKILL windows: the upgrade process dies; the journal is the only witness ----
+  {
+    for (const [id, fault, expectedJournal, name] of [
+      ['E13-kill-after-stop-recover', 'crash_after_stop_kill', 'stopped_before_switch', 'e13'],
+      ['E14-kill-after-switch-recover', 'crash_after_switch_kill', 'switched_unconfirmed', 'e14'],
+    ]) {
+      const installK = copyInstall(pristineBaseline, `${name}-install`)
+      const rK = rootsFor(installK, name)
+      run(cli(installK), ['first-run', '--json', ...rootArgs(rK)], { allowExit: [0] })
+      await startInstance(installK, rK, name)
+      const killed = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, `${name}.pab`), ...rootArgs(rK)], { allowExit: [null, 2, 1], env: { ...process.env, PA_UPGRADE_FAULT: fault } })
+      if (killed.signal !== 'SIGKILL') throw new Error(`${id}: the upgrade process was not killed by SIGKILL (signal=${killed.signal}, status=${killed.status})`)
+      const journalK = JSON.parse(readFileSync(join(rK.config, 'install-switch.json'), 'utf8'))
+      const acceptable = expectedJournal === 'switched_unconfirmed' ? ['switched_unconfirmed', 'starting'] : ['stopped_before_switch', 'switching', 'stopped', 'reverted_after_interrupted_switch']
+      if (!acceptable.includes(journalK.status)) throw new Error(`${id}: unexpected journal ${journalK.status}`)
+      const reentry = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, `${name}b.pab`), ...rootArgs(rK)], { allowExit: [1, 2] })
+      if (reentry.json?.code !== 'upgrade_recover_required') throw new Error(`${id}: re-entry was not refused: ${JSON.stringify(reentry.json).slice(0, 300)}`)
+      const recovered = run(cli(target), ['upgrade', '--recover', '--json', ...rootArgs(rK)], { allowExit: [0, 1, 2] })
+      if (!['RECOVERED', 'REVERTED', 'RECOVERED_PREVIOUS'].includes(recovered.json?.status)) throw new Error(`${id}: recovery did not settle: ${JSON.stringify(recovered.json).slice(0, 300)}`)
+      const after = JSON.parse(readFileSync(join(rK.config, 'install-switch.json'), 'utf8'))
+      if (!['confirmed', 'binary_rolled_back', 'reverted_after_interrupted_switch', 'reverted_after_failed_start'].includes(after.status)) throw new Error(`${id}: recovery left a non-terminal journal ${after.status}`)
+      const running = instanceOf(rK)
+      if (running === null) throw new Error(`${id}: recovery left no verified running instance`)
+      section(id, 'PASS', { signal: killed.signal, journalAfterKill: journalK.status, reentry: reentry.json.code, recovered: recovered.json.status, terminalJournal: after.status, buildId: running.buildId })
+      run(cli(target), ['stop', '--json', ...rootArgs(rK)], { allowExit: [0, 2] })
+    }
   }
 
   run(cli(target), ['stop', '--json', ...rootArgs(r)], { allowExit: [0, 2] })

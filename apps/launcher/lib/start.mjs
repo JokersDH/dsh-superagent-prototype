@@ -174,7 +174,7 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
     return blocked('invalid_instance_record', '实例记录不可信，拒绝复用', { cause: error.message, code: error.code }, '运行 `pa doctor` 检查私有状态。')
   }
   if (existing !== null) {
-    const scope = requestedScopeCheck({ roots, record: existing })
+    const scope = requestedScopeCheck({ roots, record: existing, requireInstall: true })
     if (!scope.ok)
       return blocked(
         'requested_root_mismatch',

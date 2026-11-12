@@ -44,7 +44,7 @@ export function identityDifferences(record, desired) {
  * different requested data/install root: callers refuse without signalling, deleting the record or
  * moving the pointer.
  */
-export function requestedScopeCheck({ roots, record }) {
+export function requestedScopeCheck({ roots, record, requireInstall = false }) {
   const checks = []
   const failures = []
   const add = (id, ok, detail) => {
@@ -58,8 +58,10 @@ export function requestedScopeCheck({ roots, record }) {
   const installMatches = recordedInstall === requestedInstall || recordedInstall === canonicalPath(join(requestedInstall, 'app'))
   add('requested_state', recordedState === requestedState, { requested: requestedState, recorded: recordedState })
   add('requested_install', installMatches, { requested: requestedInstall, recorded: recordedInstall })
+  if (!installMatches && !requireInstall) failures.splice(failures.indexOf('requested_install'), 1)
   return {
     ok: failures.length === 0,
+    installMatches,
     checks,
     failures,
     requested: { state: requestedState, install: requestedInstall },
