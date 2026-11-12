@@ -15,6 +15,7 @@ import { readLauncherConfig } from '../lib/config.mjs'
 import { runDoctor } from '../lib/doctor.mjs'
 import { firstRun } from '../lib/first-run.mjs'
 import { readInstanceRecord, verifyInstance } from '../lib/instance.mjs'
+import { writeSupportBundle } from '../lib/support.mjs'
 import { requestedScopeCheck } from '../lib/identity.mjs'
 import { recoveryStatus, recoverySummary } from '../lib/recovery.mjs'
 import { RECOVERY_COMMIT_REQUIREMENTS, RecoveryAuthorizationError, recoveryInspect, recoveryPrepare } from '../lib/recovery-authorization.mjs'
@@ -104,6 +105,7 @@ function commandSpecs() {
     'first-run': { ...COMMON, 'adopt-release': 'boolean' },
     status: COMMON,
     doctor: { ...COMMON, deep: 'boolean', 'executors-fixture': 'string' },
+    support: { ...COMMON, out: 'string' },
     'recovery-status': { ...COMMON },
     'recovery-inspect': { ...COMMON },
     'recovery-prepare': { ...COMMON, 'source-project': 'string', path: 'string', check: 'string', 'display-name': 'string' },
@@ -351,6 +353,20 @@ async function main(argv) {
       ].join('\n'),
     })
     return EXIT.BLOCKED
+  }
+
+  if (command === 'support') {
+    try {
+      const result = writeSupportBundle({ roots, out: values.out })
+      printResult({
+        json: json ? { status: 'CREATED', path: result.path, digest: result.digest, redaction: result.bundle.redaction } : null,
+        human: `support: CREATED\n  path: ${result.path}\n  digest: ${result.digest}\n  redacted: conversation/reply/prompt/keys/native sessions/nonces/account dirs/argv/absolute roots`,
+      })
+      return 0
+    } catch (error) {
+      printResult({ json: json ? { status: 'BLOCKED', code: error.code ?? 'support_failed', message: error.message } : null, human: `support: BLOCKED ${error.message}` })
+      return 2
+    }
   }
 
   if (command === 'doctor') {
