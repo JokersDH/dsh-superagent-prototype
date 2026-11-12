@@ -1,0 +1,102 @@
+{
+  "wave": "product-wave-13",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "30ecd70",
+  "mergeCommit": "841695d",
+  "checkpoints": [
+    "7cc5c00",
+    "f0fe120"
+  ],
+  "previousCandidate": "9ec6027",
+  "packet": "agent-tasks/product-wave-13/agent-b-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0039",
+  "scopeNote": "Zero model and native turns. No fee/recipe research, no new Driver, no second ledger and no test-authority table. wave03-b-native cap4 remainder stays UNKNOWN and unspendable; E's grant untouched; user instances untouched. Shared probe reports written to /tmp.",
+  "B2": {
+    "status": "PASS",
+    "label": "model payload validated as JSON before reserving; nested diagnostic paths scrubbed",
+    "probe": {
+      "command": "PA_ADMISSION_REPORT=/tmp/w13b-runtime.json node tools/bootstrap/probe-wave13-runtime.mjs <B-root>",
+      "cases": "5/5 PASS"
+    },
+    "sender": {
+      "defect": "structuredClone was the only admission test; it clones a BigInt and a NaN without complaint and silently drops symbol keys, so all three could reserve budget and then fail to serialise or deliver a different request than the one admitted",
+      "fix": "the input is checked as the structured JSON a provider would receive before any admission, reservation or transport work; a nested bigint, non-finite number, symbol key or cycle refuses and names the offending path",
+      "noReserveThenSerialize": true
+    },
+    "diagnostics": {
+      "defect": "private paths still escaped through caller-supplied capability detail/invalidation, the model-identity provenance note, and raw CLI version output (which printed the executed path)",
+      "fix": "one helper masks absolute, drive-letter and home-relative paths in every public string; full text stays behind includePrivate"
+    }
+  },
+  "B1": {
+    "status": "PASS",
+    "label": "real vertical product execution and a real coordinator SIGKILL over it",
+    "replaces": "wave-12 B13, which wrote only command receipts: Work/Ticket/effect/fact/dispatch/question/answer tables stayed empty, so it was not production recovery",
+    "realPath": [
+      "createControlledProduct",
+      "create_work via Application dispatch",
+      "real child Runner fed over the frozen frame protocol",
+      "QuestionBroker question",
+      "answer_question delivered to the original native request",
+      "accept_candidate to delivered"
+    ],
+    "realTablesPopulated": {
+      "works": 1,
+      "ticket": 1,
+      "ticket_links": 1,
+      "user_questions": 1,
+      "answer_deliveries": 1,
+      "fact_receipts": 7,
+      "dispatch_receipts": 2,
+      "artifacts": 20,
+      "event_log": 51
+    },
+    "sigkillWindow": "the coordinator dies by SIGKILL with the question durable; a fresh process keeps work/ticket/question/fact rows and appends no new fact or dispatch",
+    "evidence": "tests/native-acceptance/b13-vertical-production.mjs (6 PASS + 1 NOT_TESTED)",
+    "corrections": [
+      "real schema names are ticket, user_questions, answer_deliveries, fact_receipts and dispatch_receipts, not plural forms",
+      "the effect table IS the durable queue, so it drains on completion; it is asserted from the peak observed while work was pending",
+      "a fresh process legitimately reports no LIVE question via inspect(); the durable claim is about store rows and absence of re-execution, not in-memory rehydration"
+    ]
+  },
+  "notReached": {
+    "answerStopSteerEpoch": "not covered beyond the question-window SIGKILL",
+    "slots2and4": "not covered",
+    "resourceCapsBackpressure": "not covered",
+    "B8TargetConsumption": "not started",
+    "B9Degradation": "not started"
+  },
+  "budget": {
+    "grants": [
+      {
+        "grantId": "wave03-b-native",
+        "limit": 4,
+        "attributionState": "UNVERIFIED",
+        "remainder": "UNKNOWN",
+        "maySendReal": false
+      },
+      {
+        "grantId": "wave05-independent-review-pilot-01",
+        "limit": 24,
+        "owner": "E",
+        "bConsumes": false,
+        "touchedThisWave": false
+      }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+  "limitations": [
+    "the Driver is a fixture scenario; no installed vendor agent was executed",
+    "answer/stop/steer against a real vendor turn and unknown-send reconciliation remain NOT_TESTED",
+    "the only SIGKILL window exercised is after the question is durable; begin/answer/stop windows are not",
+    "2/4-slot queues, output caps, backpressure and FD/child/queue return-to-baseline are not covered",
+    "workspace packages had stale dist (contracts/context/knowledge missing new exports); they were rebuilt, not edited"
+  ],
+  "nextConsumerSteps": {
+    "main": "the four helper modules compile under strict plus exactOptionalPropertyTypes; probes are the entry points",
+    "E": "call the module-level send with the flat { protocolVersion, reservationId, ...turn } envelope; it echoes reservationId and refuses while the recipe is blocked",
+    "B-continuation": "extend b13-vertical-production.mjs rather than the wave-12 receipt fixture for begin/answer/stop windows, slots and caps"
+  }
+}

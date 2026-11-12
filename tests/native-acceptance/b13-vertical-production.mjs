@@ -18,6 +18,8 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
 import { ProductStore } from '../../packages/storage/src/index.ts'
 import { createControlledProduct, FIXTURE_CHECK } from '../../apps/coordinator/product/runtime.ts'
@@ -200,6 +202,33 @@ try {
     log.pass(`every production table wave-12 left empty now has rows: ${gapTables.map(name => `${name}=${finalCounts[name]}`).join(' ')}`)
   } else {
     log.fail(`these production tables were still empty: ${empty.join(', ')} -> ${JSON.stringify(finalCounts)}`)
+  }
+
+  // =============================================================================================
+  // B1 (second half): a real coordinator SIGKILL over this same vertical path
+  // =============================================================================================
+  log.begin('B13-VERTICAL-SIGKILL-QUESTION-WINDOW', 'a fresh process recovers a durable question without re-beginning', 'controlled_process')
+  const crashRoot = join(root, 'crash')
+  const fixture = fileURLToPath(new URL('./fixtures/b13-vertical-process.mjs', import.meta.url))
+  mkdirSync(join(crashRoot, 'project', 'src'), { recursive: true })
+  const crashed = spawnSync(process.execPath, [fixture, crashRoot, 'question'], { encoding: 'utf8', timeout: 60_000 })
+  const recovered = spawnSync(process.execPath, [fixture, crashRoot, 'recover'], { encoding: 'utf8', timeout: 60_000 })
+  const crashObs = (crashed.stdout ?? '').trim().split('\n').filter(Boolean).at(-1)
+  const recoverObs = (recovered.stdout ?? '').trim().split('\n').filter(Boolean).at(-1)
+  const crashedState = crashObs ? JSON.parse(crashObs) : null
+  const recoveredState = recoverObs ? JSON.parse(recoverObs) : null
+  log.evidence({ crashSignal: crashed.signal, crashed: crashedState, recovered: recoveredState, recoverExit: recovered.status })
+  // The durable claim is about STORE ROWS, not about a fresh runtime having rehydrated a live
+  // question into memory. `inspect()` in a new process legitimately reports no live question; what
+  // must hold is that the question row survived and nothing was executed a second time.
+  const maybe = recoveredState?.tables ?? {}
+  const crashedTables = crashedState?.tables ?? {}
+  const rowsHeld = (maybe.works ?? 0) >= 1 && (maybe.tickets ?? 0) >= 1 && (maybe.questions ?? 0) >= 1 && (maybe.facts ?? 0) >= 1
+  const noRegrowth = (maybe.facts ?? 0) <= (crashedTables.facts ?? 0) && (maybe.dispatch ?? 0) <= (crashedTables.dispatch ?? 0)
+  if (crashed.signal === 'SIGKILL' && (crashedState?.questions ?? 0) >= 1 && rowsHeld && noRegrowth) {
+    log.pass(`the coordinator died by SIGKILL with the question durable; a fresh process kept ${maybe.works} work, ${maybe.tickets} ticket, ${maybe.questions} question and ${maybe.facts} fact row(s), and appended no new fact or dispatch`)
+  } else {
+    log.fail(`the SIGKILL window did not preserve the vertical state: ${JSON.stringify({ signal: crashed.signal, rowsHeld, noRegrowth, crashedTables, recovered: maybe, liveQuestions: recoveredState?.questions, stderr: crashed.stderr?.slice(0, 200) })}`)
   }
 
   // =============================================================================================

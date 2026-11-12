@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-12T10:26:36.580Z",
+  "generatedAt": "2026-11-12T10:28:56.679Z",
   "environment": {
     "note": "wave-13 B13 real vertical product execution",
     "modelCalls": 0
   },
   "totals": {
-    "cases": 6,
-    "PASS": 5,
+    "cases": 7,
+    "PASS": 6,
     "FAIL": 0,
     "SKIPPED": 0,
     "NOT_TESTED": 1
@@ -54,7 +54,7 @@
       ],
       "evidence": [
         {
-          "questionId": "4f7b89ea3fcb98f52451a0552b2caa2a",
+          "questionId": "a4c6c0bd0b0152858f9bf3c8962bfa36",
           "targetNativeRequestId": "9223372036854775807",
           "midRunEffects": 1,
           "tables": {
@@ -162,6 +162,45 @@
             "artifacts": 20,
             "events": 51
           }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-VERTICAL-SIGKILL-QUESTION-WINDOW",
+      "title": "a fresh process recovers a durable question without re-beginning",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the coordinator died by SIGKILL with the question durable; a fresh process kept 1 work, 1 ticket, 1 question and 3 fact row(s), and appended no new fact or dispatch"
+      ],
+      "evidence": [
+        {
+          "crashSignal": "SIGKILL",
+          "crashed": {
+            "workId": "df68597d8ac34ac8f3b0dc924c0cc012",
+            "questions": 1,
+            "tables": {
+              "works": 1,
+              "tickets": 1,
+              "questions": 1,
+              "deliveries": 0,
+              "facts": 3,
+              "dispatch": 1
+            }
+          },
+          "recovered": {
+            "tables": {
+              "works": 1,
+              "tickets": 1,
+              "questions": 1,
+              "deliveries": 0,
+              "facts": 3,
+              "dispatch": 1
+            },
+            "questions": 0
+          },
+          "recoverExit": 0
         }
       ],
       "entities": []
