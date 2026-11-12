@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { Scope } from '@personal-agent/contracts'
-import { reviewReplyCandidates } from '../src/index.ts'
+import { reviewReplyCandidates, reviewVerifiedReplyCandidates } from '../src/index.ts'
 
 const projectId = 'project-1'
 const conversationId = 'conversation-1'
@@ -222,4 +222,60 @@ test('an expired-or-wider candidate scope and a foreign revision are refused ite
   assert.deepEqual(review.rejected.map((entry) => entry.reason), ['scope_escalation', 'contract_stale'])
   assert.equal(review.hasExecutableCandidates, false)
   assert.equal(review.modelCallPerformed, false)
+})
+
+test('only a main-verified completed reply reaches the candidate reviewer', () => {
+  const bodyValue = body([
+    { kind: 'propose_decision', content: 'Verified candidate', scope, sourceMessageId },
+  ])
+  const identity = {
+    requestId: 'assistant-request:message-1',
+    replyMessageId: 'reply-1',
+    sourceMessageId,
+    projectId,
+    conversationId,
+    model: 'test-model',
+    principal: { userId: 'user-1', authorityRef: 'authority-1' },
+  }
+  const verified = { ...bindings, principal: identity.principal }
+
+  const accepted = reviewVerifiedReplyCandidates({ verifiedBy: 'main-completed-reply', body: bodyValue, identity }, verified)
+  assert.equal(accepted.status, 'candidates')
+  assert.equal(accepted.verifiedBy, 'main-completed-reply')
+  assert.equal(accepted.candidates.length, 1)
+  assert.equal(accepted.candidates[0]!.executable, false)
+
+  // A raw body, an unknown marker or a hand-written string is refused.
+  assert.deepEqual(reviewVerifiedReplyCandidates(bodyValue, verified).rejected.map((entry) => entry.reason), ['unverified_reply'])
+  assert.deepEqual(
+    reviewVerifiedReplyCandidates({ verifiedBy: 'trusted', body: bodyValue, identity }, verified).rejected.map((entry) => entry.reason),
+    ['unverified_reply'],
+  )
+
+  // Identity drift between body, verified request and current bindings is refused.
+  const foreignModel = { ...verified, principal: identity.principal }
+  assert.deepEqual(
+    reviewVerifiedReplyCandidates({ verifiedBy: 'main-completed-reply', body: { ...bodyValue, model: 'other-model' }, identity }, foreignModel)
+      .rejected.map((entry) => entry.reason),
+    ['reply_identity_mismatch'],
+  )
+  assert.deepEqual(
+    reviewVerifiedReplyCandidates(
+      { verifiedBy: 'main-completed-reply', body: bodyValue, identity: { ...identity, sourceMessageId: 'other-source' } },
+      foreignModel,
+    ).rejected.map((entry) => entry.reason),
+    ['reply_identity_mismatch'],
+  )
+  assert.deepEqual(
+    reviewVerifiedReplyCandidates(
+      { verifiedBy: 'main-completed-reply', body: bodyValue, identity: { ...identity, principal: { userId: 'other', authorityRef: 'other' } } },
+      verified,
+    ).rejected.map((entry) => entry.reason),
+    ['principal_unverified'],
+  )
+  assert.deepEqual(
+    reviewVerifiedReplyCandidates({ verifiedBy: 'main-completed-reply', body: bodyValue, identity }, bindings)
+      .rejected.map((entry) => entry.reason),
+    ['principal_unverified'],
+  )
 })

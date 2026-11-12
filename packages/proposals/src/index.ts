@@ -13,7 +13,7 @@ export type {
   PrepareProposalInput,
   PreparedProposal,
 } from './assistant-proposal-service.ts'
-export { reviewReplyCandidates } from './reply-candidates.ts'
+export { reviewReplyCandidates, reviewVerifiedReplyCandidates } from './reply-candidates.ts'
 export type {
   ReplyCandidateBindings,
   ReplyCandidateField,
@@ -21,6 +21,7 @@ export type {
   ReplyCandidateRejection,
   ReplyCandidateReview,
   ReplyCandidateView,
+  VerifiedCompletedReply,
 } from './reply-candidates.ts'
 export { ProposalError } from './errors.ts'
 export type { ProposalErrorCode } from './errors.ts'

@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import type { Scope } from '@personal-agent/contracts'
+import type { AssistantContextBinding, Scope } from '@personal-agent/contracts'
 import {
   buildSourceManifest,
+  collectContextHistory,
   compareSourceManifests,
   createConversationRelevanceCandidates,
   createDecisionRelevanceCandidates,
@@ -389,4 +390,55 @@ test('revocation, deletion and byte changes each surface as a distinct compariso
   const revokedComparison = compareSourceManifests(before, revoked)
   assert.notEqual(revokedComparison.status, 'unchanged')
   assert.ok(revokedComparison.changes.some((change) => change.reason === 'missing' || change.reason === 'omitted'))
+})
+
+test('10000 history bindings are walked within a page budget with stable paging', async () => {
+  const binding = (index: number) => ({
+    protocol: 'assistant-context-binding/1',
+    commandId: `cmd-${index}`,
+    messageId: `msg-${String(index).padStart(5, '0')}`,
+    requestId: `req-${index}`,
+    projectId,
+    conversationId,
+    userTextDigest: 'a'.repeat(64),
+    principal: { userId: 'user-1', authorityRef: 'authority-1' },
+    purpose: 'conversation_discussion',
+    scope,
+    selections: ['decisions'],
+    bundleRef: `bundle-${index}`,
+    bundleDigest: 'b'.repeat(64),
+    sources: [{ sourceId: `decision-${index}`, kind: 'decision', sourceDigest: 'c'.repeat(64), previewDigest: 'd'.repeat(64), truncated: false }],
+    confirmedAt: sameTime,
+    expiresAt: '2026-11-12T00:04:00.000Z',
+  })
+  const records = Array.from({ length: 10000 }, (_, index) => binding(index))
+  let calls = 0
+  const page = (query: { cursor?: string | undefined }) => {
+    calls += 1
+    const offset = query.cursor === undefined ? 0 : Number(query.cursor.slice(2))
+    const slice = records.slice(offset, offset + 100)
+    const next = offset + slice.length
+    const hasMore = next < records.length
+    return {
+      protocol: 'assistant-context-history/1' as const,
+      observedAt: sameTime,
+      records: slice as unknown as readonly AssistantContextBinding[],
+      hasMore,
+      ...(hasMore ? { nextCursor: `c-${next}` } : {}),
+    }
+  }
+  const bounded = collectContextHistory({ page }, { projectIds: [projectId], conversationId }, { now: () => new Date(sameTime), maxPages: 3 })
+  assert.equal(bounded.pages, 3)
+  assert.equal(bounded.entries.length, 300)
+  assert.equal(bounded.complete, false)
+  assert.equal(bounded.hasMore, true)
+  assert.equal(new Set(bounded.entries.map((entry) => entry.messageId)).size, 300)
+
+  const full = collectContextHistory({ page }, { projectIds: [projectId], conversationId },
+    { now: () => new Date(sameTime), maxPages: 20 })
+  // 10000/100 = 100 pages; 20 is the documented ceiling, so the walk reports incompleteness.
+  assert.equal(full.pages, 20)
+  assert.equal(full.entries.length, 2000)
+  assert.equal(full.complete, false)
+  assert.equal(calls, 23)
 })

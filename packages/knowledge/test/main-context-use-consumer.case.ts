@@ -7,6 +7,7 @@ import { ProductStore } from '@personal-agent/storage'
 import type { TrustedActor } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import { collectContextHistory } from '../../context/src/index.ts'
+import { reviewVerifiedReplyCandidates } from '../../proposals/src/index.ts'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
 import { CompletedAssistantReplies } from '../../../apps/coordinator/product/assistant-reply-results.ts'
@@ -391,4 +392,83 @@ test('the real A18 history and completed reply are consumed through the durable 
   })
   assert.equal(durable.entries.length, 1)
   assert.equal(durable.entries[0]!.completedReply?.artifactDigest, result.artifactDigest)
+})
+
+test('the verified completed reply feeds the candidate reviewer without minting a new authority', async (t) => {
+  const h = fixture(t)
+  const prepared = await h.prepare(h.input('candidate-1', 'Answer and suggest.'))
+  await (await h.send(prepared)).json()
+  await h.flush()
+  const messageId = key('message', prepared.commandId)
+  const requestId = key('assistant-request', messageId)
+  const completed = new CompletedAssistantReplies(
+    h.store,
+    h.store.workflows.assistant.replyResults,
+    principal,
+    () => [projectId],
+  )
+  const body = completed.read(requestId)
+  assert.ok(body)
+  const result = h.store.workflows.assistant.replyResults.forRequest(requestId)
+  assert.ok(result)
+  const bindings = {
+    projectId,
+    conversationId,
+    sourceMessageId: messageId,
+    grantId: 'candidate-grant',
+    grantScope: scope,
+    principal,
+  }
+
+  const verified = reviewVerifiedReplyCandidates(
+    {
+      verifiedBy: 'main-completed-reply',
+      body,
+      identity: {
+        requestId,
+        replyMessageId: result.replyMessageId,
+        sourceMessageId: result.sourceMessageId,
+        projectId: result.projectId,
+        conversationId: result.conversationId,
+        model: result.model,
+        principal: result.principal,
+      },
+    },
+    bindings,
+  )
+  // main currently persists suggestions=[]; the reviewer must say so instead of inventing candidates.
+  assert.equal(verified.status, 'no_candidates')
+  assert.equal(verified.verifiedBy, 'main-completed-reply')
+  assert.equal(verified.reply, 'CONSUMER-REPLY')
+  assert.equal(verified.hasExecutableCandidates, false)
+  assert.equal(verified.modelCallPerformed, false)
+  assert.equal(verified.candidates.length, 0)
+
+  // A raw body is not accepted as a completed reply: no marker, no candidates.
+  const raw = reviewVerifiedReplyCandidates(body, bindings)
+  assert.equal(raw.status, 'invalid_body')
+  assert.deepEqual(raw.rejected.map((entry) => entry.reason), ['unverified_reply'])
+})
+
+test('history keeps the frozen body after the live source text changes', async (t) => {
+  const h = fixture(t)
+  const prepared = await h.prepare(h.input('frozen-1', 'Explain the frozen selection.'))
+  await (await h.send(prepared)).json()
+  await h.flush()
+  const messageId = key('message', prepared.commandId)
+  const before = await h.read(`/v1/messages/${messageId}/context`)
+  const frozenDigest = before.bundleDigest
+  assert.equal(frozenDigest.length, 64)
+
+  // Mutate the live message row: the audit must still return the originally frozen bundle.
+  const source = h.store.product.messages.getById('source-message')!
+  h.store.db.prepare('UPDATE conversation_messages SET value = ? WHERE id = ?')
+    .run(JSON.stringify({ ...source, text: 'CHANGED-SOURCE: this text no longer matches the frozen bundle.' }), source.id)
+  const after = await h.read(`/v1/messages/${messageId}/context`)
+  assert.equal(after.bundleDigest, frozenDigest)
+  assert.deepEqual(after.sources, before.sources)
+
+  // A fresh preparation reads the live text, proving history was not re-implemented as a read of now.
+  const fresh = await h.prepare(h.input('frozen-2', 'Explain the new selection.'))
+  assert.ok(fresh.preview.sources.some((source: { content: string }) => source.content.includes('CHANGED-SOURCE')))
 })

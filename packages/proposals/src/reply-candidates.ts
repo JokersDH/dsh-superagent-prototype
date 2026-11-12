@@ -22,7 +22,30 @@ export interface ReplyCandidateBindings {
   /** Current authorization scope, used only to refuse an escalating decision scope. */
   readonly grantScope: Scope
   readonly currentContract?: ContractRef
+  /** Authenticated principal the reply must belong to when verified by main. */
+  readonly principal?: { readonly userId: string; readonly authorityRef: string }
   readonly maxCandidates?: number
+}
+
+/**
+ * A body only reaches the candidate reviewer through main's completed-reply verification
+ * (`CompletedAssistantReplies.read`): original request receipt, artifact bytes, reply identity and
+ * principal were already checked by that owner. The marker is a private constructor contract for the
+ * caller that did the verification; it is not a public proof, and C never mints it.
+ */
+export interface VerifiedCompletedReply {
+  readonly verifiedBy: 'main-completed-reply'
+  readonly body: AssistantReplyBody
+  /** Identity the verifying owner observed on the original request/reply. */
+  readonly identity: {
+    readonly requestId: string
+    readonly replyMessageId: string
+    readonly sourceMessageId: string
+    readonly projectId: string
+    readonly conversationId: string
+    readonly model: string
+    readonly principal: { readonly userId: string; readonly authorityRef: string }
+  }
 }
 
 export type ReplyCandidatePlan =
@@ -72,6 +95,8 @@ export interface ReplyCandidateReview {
   readonly authorization: 'none'
   readonly untrusted: true
   readonly modelCallPerformed: false
+  /** `main-completed-reply` only when the body arrived through the verified entry point. */
+  readonly verifiedBy: 'main-completed-reply' | 'none'
   readonly notes: readonly string[]
 }
 
@@ -170,6 +195,7 @@ export function reviewReplyCandidates(rawBody: unknown, bindings: ReplyCandidate
     authorization: 'none',
     untrusted: true,
     modelCallPerformed: false,
+    verifiedBy: 'none',
     notes,
   })
   const parsed = AssistantReplyBodySchema.safeParse(rawBody)
@@ -248,6 +274,62 @@ export function reviewReplyCandidates(rawBody: unknown, bindings: ReplyCandidate
     authorization: 'none',
     untrusted: true,
     modelCallPerformed: false,
+    verifiedBy: 'none',
     notes,
   }
+}
+
+/**
+ * The only entry point for candidate data that claims to come from a completed model reply.
+ *
+ * `input` must be a `VerifiedCompletedReply` produced by the owner that checked the original request
+ * receipt and artifact bytes (main's `CompletedAssistantReplies.read`). A raw body, a row lookup or a
+ * hand-written marker is refused with `invalid_body`; C mints no verification and keeps no second
+ * confirmation authority.
+ */
+export function reviewVerifiedReplyCandidates(input: unknown, bindings: ReplyCandidateBindings): ReplyCandidateReview {
+  const refuse = (reason: string, detail: string): ReplyCandidateReview => ({
+    protocol: 'reply-candidate-review/1',
+    status: 'invalid_body',
+    reply: '',
+    candidates: [],
+    rejected: [{ index: 0, reason, detail }],
+    hasExecutableCandidates: false,
+    authorization: 'none',
+    untrusted: true,
+    modelCallPerformed: false,
+    verifiedBy: 'none',
+    notes: ['Only a main-verified completed reply can be reviewed; nothing here executes or re-sends.'],
+  })
+  if (input === null || typeof input !== 'object') return refuse('unverified_reply', 'No verified completed reply was supplied')
+  const value = input as Partial<VerifiedCompletedReply>
+  if (value.verifiedBy !== 'main-completed-reply' || value.body === undefined || value.identity === undefined) {
+    return refuse('unverified_reply', 'The reply did not arrive through the main completed-reply verifier')
+  }
+  const { body, identity } = value
+  if (
+    body.replyMessageId !== identity.replyMessageId ||
+    body.sourceMessageId !== identity.sourceMessageId ||
+    body.projectId !== identity.projectId ||
+    body.conversationId !== identity.conversationId ||
+    body.model !== identity.model
+  ) {
+    return refuse('reply_identity_mismatch', 'Reply body does not match the verified request/reply identity')
+  }
+  if (
+    identity.sourceMessageId !== bindings.sourceMessageId ||
+    identity.projectId !== bindings.projectId ||
+    identity.conversationId !== bindings.conversationId
+  ) {
+    return refuse('reply_binding_mismatch', 'Verified reply belongs to another source/project/conversation')
+  }
+  if (
+    bindings.principal === undefined ||
+    identity.principal.userId !== bindings.principal.userId ||
+    identity.principal.authorityRef !== bindings.principal.authorityRef
+  ) {
+    return refuse('principal_unverified', 'Verified reply principal is not the current authenticated principal')
+  }
+  const review = reviewReplyCandidates(body, bindings)
+  return { ...review, verifiedBy: 'main-completed-reply' }
 }
