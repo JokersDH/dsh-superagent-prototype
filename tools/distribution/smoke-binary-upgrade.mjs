@@ -521,7 +521,7 @@ try {
       throw new Error(`doctor did not surface the interrupted switch with one next action: ${JSON.stringify(journalCheck).slice(0, 200)}`)
     const recover7 = run(cli(target), ['upgrade', '--recover', '--json', ...rootArgs(r7)], { allowExit: [0, 1, 2] })
     if (!['REVERTED', 'RECOVERED'].includes(recover7.json?.status))
-      throw new Error(`recovery did not settle the unproven stop: ${JSON.stringify(recover7.json).slice(0, 300)}`)
+      throw new Error(`recovery did not settle the unproven stop: ${JSON.stringify(recover7.json).slice(0, 1400)}`)
     if (recover7.json?.dataRolledBack === true) throw new Error('settling the unproven stop rolled data back')
     section('E7-stop-unproven-kept', 'PASS', {
       refused: unproven.json?.code ?? null, journal: journal7.status,

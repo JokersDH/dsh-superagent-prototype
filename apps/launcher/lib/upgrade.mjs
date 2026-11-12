@@ -678,7 +678,7 @@ async function startTarget({ roots, target, seed, identity, fault, onSpawn }) {
       ? { proven: false, stopped: [], remaining: [child.pid], considered: 1 }
       : await stopRegisteredResources({ roots, target, spawnedPid: child.pid, spawnedStart, record: readInstanceRecord(roots.config) })
     if (!cleanup.proven) {
-      writeJournalStatus({ roots, status: 'target_stop_unproven', reason, cleanup })
+      writeJournalStatus({ roots, status: 'target_stop_unproven', reason, cleanup, ...(typeof plan === 'object' && plan !== null ? { extra: { from: plan.from, to: plan.to } } : {}) })
       throw new UpgradeError('target_stop_unproven', 'The failed target process tree could not be proven stopped; pointer and record are left as-is (no old writer is restarted)', {
         reason,
         remaining: cleanup.remaining,
@@ -746,11 +746,12 @@ async function startTarget({ roots, target, seed, identity, fault, onSpawn }) {
   return { pid: record.pid, apiURL: record.apiURL, consoleURL: record.consoleURL, buildId: record.buildId, mode: record.mode, access: record.access, health: health.status }
 }
 
-const writeJournal = ({ roots, status, reason, spawn }) => {
+const writeJournal = ({ roots, status, reason, spawn, extra }) => {
   const path = join(roots.config, SWITCH_JOURNAL)
   const existing = readJournal(roots.config) ?? {}
   writePrivateJson(path, {
     ...existing,
+    ...(extra === undefined ? {} : extra),
     status,
     ...(reason === undefined ? {} : { reason }),
     // spawn/cleanup identity is part of the operation record, not a transient test detail.
@@ -759,7 +760,7 @@ const writeJournal = ({ roots, status, reason, spawn }) => {
     dataRolledBack: false,
   })
 }
-const writeJournalStatus = ({ roots, status, reason, cleanup, spawn }) => writeJournal({ roots, status, reason, spawn })
+const writeJournalStatus = ({ roots, status, reason, cleanup, spawn, extra }) => writeJournal({ roots, status, reason, spawn, extra })
 
 async function revertPointer({ roots, target }) {
   const previousPath = join(roots.config, PREVIOUS_RELEASE)
@@ -803,12 +804,18 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
     const recordedInstall = canonicalPath(recorded.install ?? '')
     const roles = [journal.from?.installRoot, journal.from?.installDir, journal.to?.installRoot, journal.to?.installDir]
       .filter((value) => typeof value === 'string' && value.length > 0)
-    const allowed = [...new Set(roles.flatMap((value) => [canonicalPath(value), canonicalPath(join(value, 'app'))]))]
+    const allowed = [...new Set(roles.flatMap((value) => [canonicalPath(value), canonicalPath(join(value, 'app')), canonicalPath(dirname(value))]))]
     const requestedRole = canonicalPath(installRoot)
-    if (allowed.length === 0 || !allowed.includes(recordedInstall) || !allowed.includes(requestedRole))
+    // A confirming/starting branch writes the journal terminal state for an operation that began under
+    // a specific role pair, so the requested tool install must also be one of those roles. Cleanup or
+    // revert branches may legitimately be driven by a newer tool install; the recorded resource must
+    // still be exactly the journal old/new role in every branch.
+    const requestedRoleIsRole = allowed.includes(requestedRole)
+    const requiringRequestedRole = ['starting', 'switched_unconfirmed'].includes(journal.status)
+    if (allowed.length === 0 || !allowed.includes(recordedInstall) || (requiringRequestedRole && !requestedRoleIsRole))
       return { protocol: 'personal-install-switch/1', status: 'BLOCKED', code: 'requested_root_mismatch',
-        message: 'The requested or recorded install is neither the journal old nor new role; recovery refuses to confirm or clean it',
-        detail: { recordedInstall, requestedRole, allowed } }
+        message: 'The recorded install is not the journal old/new role, or a confirming request comes from a third role; recovery refuses to confirm or clean it',
+        detail: { recordedInstall, requestedRole, allowed, journalStatus: journal.status } }
   }
   // Never start (or revert over) an unknown live process: the same rule as upgrade/rollback.
   const existing = readInstanceRecord(roots.config)

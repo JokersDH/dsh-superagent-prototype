@@ -14,6 +14,7 @@ export const STARTUP_MODES = ['normal', 'recovery_readonly']
 export const MODES = ['fixture', 'personal']
 export const ACCESS_MODES = ['local-development', 'token']
 
+const dirnameCanonical = (value) => canonicalPath(dirname(value))
 export function canonicalPath(path) {
   try {
     return realpathSync(path)
