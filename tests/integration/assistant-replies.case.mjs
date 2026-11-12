@@ -1,17 +1,19 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { ProductStore } from '../../packages/storage/dist/index.js'
+import { ProductStore, canonicalDigest } from '../../packages/storage/dist/index.js'
 import { createProductApplication } from '../../packages/application/dist/index.js'
 import { Effects } from '../../packages/effects/dist/index.js'
 import { handleAssistantReplies } from '../../apps/coordinator/product/assistant-replies.ts'
 import { AssistantStreams } from '../../apps/coordinator/product/assistant-streams.ts'
+import { CompletedAssistantReplies } from '../../apps/coordinator/product/assistant-reply-results.ts'
+import { key } from '../../packages/orchestrator-core/dist/index.js'
 
 const principal = { userId: 'local-user', authorityRef: 'local-authority' },
   actor = { ...principal, source: 'local_ui' }
 const scope = { projectId: 'project-1', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
-function fixture(t, reply) {
+function fixture(t, reply, completed = false) {
   const root = mkdtempSync('/tmp/pa-assistant-'),
     store = new ProductStore({ path: join(root, 'state.sqlite') })
   const app = createProductApplication({
@@ -35,7 +37,23 @@ function fixture(t, reply) {
     },
   }
   const streams = new AssistantStreams()
-  handleAssistantReplies(effects, store, provider, streams)
+  // Port fixture only: real receipts/artifacts/UoW, but no claim about A's new table or process recovery.
+  const records = new Map()
+  const results = {
+    forRequest: id => structuredClone(records.get(id)),
+    forReply: id => structuredClone([...records.values()].find(value => value.replyMessageId === id)),
+    put: value => {
+      assert.ok(store.uow.nesting > 0)
+      const existing = records.get(value.requestId)
+      if (existing) { assert.deepEqual(existing, value); return { result: structuredClone(existing), replayed: true } }
+      const result = structuredClone(value)
+      store.uow.afterCommit(() => records.set(result.requestId, result))
+      return { result, replayed: false }
+    },
+  }
+  handleAssistantReplies(effects, store, provider, streams, completed ? {
+    nativeExecution: false, completed: new CompletedAssistantReplies(store, results, principal, () => [scope.projectId]),
+  } : undefined)
   effects.start()
   t.after(async () => {
     await effects.drain()
@@ -53,6 +71,9 @@ function fixture(t, reply) {
     app,
     effects,
     streams,
+    records,
+    results,
+    provider,
     chat,
     get calls() {
       return calls
@@ -233,4 +254,83 @@ test('service close aborts in-progress model generation without another inferenc
   await h.effects.idle()
   assert.equal(h.calls, 1)
   assert.equal(h.messages()[1].provenance, 'application_notice')
+})
+
+test('a returned result survives a later message failure and effect retry restores it without another inference', async t => {
+  const h = fixture(t, async () => ({ text: 'completed reply', model: 'mock-model' }), true)
+  h.store.db.exec("CREATE TRIGGER fail_reply BEFORE INSERT ON conversation_messages WHEN json_extract(NEW.value, '$.role') = 'assistant' BEGIN SELECT RAISE(ABORT, 'injected message failure'); END")
+  await h.chat('completed-retry', 'hello'); await h.effects.idle()
+  assert.equal(h.calls, 1); assert.equal(h.records.size, 1); assert.equal(h.messages().length, 1)
+  const result = [...h.records.values()][0]
+  assert.ok(h.store.artifacts.read(result.artifactRef))
+  h.store.db.exec('DROP TRIGGER fail_reply'); h.tick(); await h.effects.idle()
+  assert.equal(h.calls, 1)
+  assert.equal(h.messages()[1].text, 'completed reply')
+  assert.equal(h.messages()[1].provenance, 'reasoner_reply')
+  h.tick(); await h.effects.idle()
+  assert.equal(h.messages().length, 2); assert.equal(h.calls, 1)
+})
+
+test('a request record without a completed result remains unknown with the result port present', async t => {
+  const h = fixture(t, async () => { throw new Error('must not send') }, true)
+  const messageId = key('message', 'already-requested')
+  h.store.commands.record(key('assistant-request', messageId), 'a'.repeat(64), () => ({ kind: 'assistant-inference/1',
+    input: { messageId, conversationId: 'conversation-1', projectId: scope.projectId }, model: 'mock-model' }))
+  await h.chat('already-requested', 'hello'); await h.effects.idle()
+  assert.equal(h.calls, 0); assert.equal(h.records.size, 0)
+  assert.equal(h.messages()[1].provenance, 'application_notice')
+  assert.match(h.messages()[1].text, /未自动重发/)
+})
+
+test('a corrupted completed artifact refuses recovery without another provider call', async t => {
+  const h = fixture(t, async () => ({ text: 'original completed reply', model: 'mock-model' }), true)
+  h.store.db.exec("CREATE TRIGGER fail_reply BEFORE INSERT ON conversation_messages WHEN json_extract(NEW.value, '$.role') = 'assistant' BEGIN SELECT RAISE(ABORT, 'injected message failure'); END")
+  await h.chat('corrupt-result', 'hello'); await h.effects.idle()
+  const result = [...h.records.values()][0]
+  writeFileSync(h.store.artifacts.filePath(result.artifactRef), 'corrupt')
+  h.store.db.exec('DROP TRIGGER fail_reply'); h.tick(); await h.effects.idle()
+  assert.equal(h.calls, 1)
+  assert.equal(h.messages()[1].provenance, 'application_notice')
+  assert.match(h.messages()[1].text, /无法核对/)
+  assert.doesNotMatch(h.messages()[1].text, /corrupt|original completed reply/)
+})
+
+test('a completed result bound to another principal cannot be replayed', async t => {
+  const h = fixture(t, async () => ({ text: 'private reply', model: 'mock-model' }), true)
+  h.store.db.exec("CREATE TRIGGER fail_reply BEFORE INSERT ON conversation_messages WHEN json_extract(NEW.value, '$.role') = 'assistant' BEGIN SELECT RAISE(ABORT, 'injected message failure'); END")
+  await h.chat('foreign-result', 'hello'); await h.effects.idle()
+  const result = [...h.records.values()][0]
+  h.records.set(result.requestId, { ...result, principal: { ...principal, userId: 'other-user' } })
+  h.store.db.exec('DROP TRIGGER fail_reply'); h.tick(); await h.effects.idle()
+  assert.equal(h.calls, 1)
+  assert.equal(h.messages()[1].provenance, 'application_notice')
+  assert.doesNotMatch(h.messages()[1].text, /private reply/)
+})
+
+test('result persistence failure rolls back its artifact reference and cannot authorize a retry', async t => {
+  const h = fixture(t, async () => ({ text: 'reply not recorded', model: 'mock-model' }), true)
+  h.results.put = () => { throw new Error('injected result failure') }
+  await h.chat('result-failure', 'hello'); await h.effects.idle()
+  assert.equal(h.records.size, 0); assert.equal(h.store.artifacts.list().artifacts.length, 0)
+  assert.equal(h.messages().length, 1)
+  h.tick(); await h.effects.idle()
+  assert.equal(h.calls, 1)
+  assert.equal(h.messages()[1].provenance, 'application_notice')
+})
+
+test('the inference receipt binds the captured provider model and configuration used for sending', async t => {
+  const h = fixture(t, async () => ({ text: 'pinned reply', model: 'pinned-model' }), true)
+  const messageId = key('message', 'pinned-request'), requestId = key('assistant-request', messageId)
+  const configurationDigest = 'd'.repeat(64)
+  h.provider.status = () => ({ model: 'different-display-model' })
+  h.provider.prepareReply = () => ({ model: 'pinned-model', configurationDigest, reply: async (...args) => {
+    assert.equal(h.store.commands.get(requestId).result.model, 'pinned-model')
+    return h.provider.reply(...args)
+  } })
+  await h.chat('pinned-request', 'hello'); await h.effects.idle()
+  assert.equal(h.calls, 1)
+  assert.equal(h.store.commands.get(requestId).payloadDigest, canonicalDigest({ messageId,
+    conversationId: 'conversation-1', model: 'pinned-model', configurationDigest, messages: [{ role: 'user', content: 'hello' }] }))
+  assert.equal(h.messages()[1].text, 'pinned reply')
+  assert.equal([...h.records.values()][0].model, 'pinned-model')
 })

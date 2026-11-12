@@ -6,11 +6,13 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { parseArgs } from 'node:util'
 import { RecoveryTargetMaterialSchema, RecoveryTargetPreparationSchema } from '../../packages/contracts/dist/index.js'
 import { canonicalDigest } from '../../packages/contracts/src/canonical.ts'
 import { bindRecoveryTargetConfiguration } from '../../apps/coordinator/product/recovery-targets.ts'
 
-const candidate = resolve(process.argv[2] ?? '../superagent-agent-d')
+const { values, positionals } = parseArgs({ allowPositionals: true, options: { output: { type: 'string' } } })
+const candidate = resolve(positionals[0] ?? '../superagent-agent-d')
 const repository = resolve(new URL('../..', import.meta.url).pathname)
 const { PortabilityRecoveryTargetMaterializer } = await import(pathToFileURL(join(candidate, 'packages/portability/src/recovery-target.ts')))
 const { accountRegisteredResources } = await import(pathToFileURL(join(candidate, 'apps/launcher/lib/upgrade.mjs')))
@@ -123,7 +125,7 @@ try {
 }
 const report = {
   status: cases.every(item => item.status === 'PASS') ? 'PASS_DISTRIBUTION_ADMISSION' : 'FAIL_DISTRIBUTION_ADMISSION',
-  command: ['node', 'tools/bootstrap/probe-wave10-distribution.mjs', candidate],
+  command: ['node', 'tools/bootstrap/probe-wave10-distribution.mjs', candidate, ...(values.output ? ['--output', resolve(values.output)] : [])],
   sourceRoot: candidate,
   sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: candidate, encoding: 'utf8' }).trim(),
   sourceWorktreeClean: execFileSync('git', ['status', '--porcelain'], { cwd: candidate, encoding: 'utf8' }).trim() === '',
@@ -137,7 +139,7 @@ const report = {
     'No real managed upgrade, artifact installation, target activation, model or native task is exercised by this probe.',
   ],
 }
-const output = join(repository, 'reports/releases/wave10-admission/distribution.json')
+const output = values.output ? resolve(values.output) : join(repository, 'reports/releases/wave10-admission/distribution.json')
 mkdirSync(resolve(output, '..'), { recursive: true })
 writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`)
 console.log(JSON.stringify(report, null, 2))

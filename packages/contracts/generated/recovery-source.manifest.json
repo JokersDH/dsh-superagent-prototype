@@ -1,0 +1,7 @@
+{
+  "protocol": "recovery-source-checkpoint/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "3448838363a42d046734517ea3d0c7bbf887237e05ee2ac0334033931064176c",
+  "sourceHash": "cf89c102d95a1ff09661a36a6c8c7f513b136568104fb5ac27737c69a336ecc0"
+}

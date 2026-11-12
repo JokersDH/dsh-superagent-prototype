@@ -1,0 +1,75 @@
+{
+  "status": "PASS_RECOVERY_TARGET_INVENTORY_ADMISSION",
+  "command": [
+    "node",
+    "tools/bootstrap/probe-wave09-target-inventory.mjs",
+    "/Users/hh/Desktop/joker/superagent-agent-a",
+    "--output",
+    "/Users/hh/Desktop/joker/superagent/reports/releases/wave10-integration/storage-checkpoint.json"
+  ],
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-a",
+  "sourceCommit": "fd206e1627cee5926e197e3e654dbf0b132b9e51",
+  "sourceWorktreeClean": false,
+  "sourceHashes": {
+    "packages/storage/src/target-inventory.ts": "17b82f66c347b21a329f368f530de251fd38d68e44f3f1270b4724a6a596daeb",
+    "packages/storage/src/migrations.ts": "90e0b5980b2d03fabfe9da7de41700e01eef4b0de9b295e72d398bf33699fc75"
+  },
+  "checkedAt": "2026-11-11T14:41:09.921Z",
+  "exitCode": 0,
+  "cases": [
+    {
+      "id": "CURRENT_EMPTY_SCHEMA_POSITIVE_CONTROL",
+      "status": "PASS",
+      "completeness": "complete",
+      "tableCount": 52,
+      "issues": [],
+      "startupAvailable": false
+    },
+    {
+      "id": "CLAIMED_SCHEMA_WITH_MISSING_BUSINESS_TABLES_REFUSES_COMPLETE",
+      "status": "PASS",
+      "completeness": "unsupported",
+      "issues": [
+        "unsupported_schema"
+      ]
+    },
+    {
+      "id": "UNKNOWN_FTS_PREFIX_TABLE_IS_NOT_TRUSTED_METADATA",
+      "status": "PASS",
+      "completeness": "unsupported",
+      "issues": [
+        "unknown_table"
+      ],
+      "table": {
+        "name": "conversation_search_surprise",
+        "category": "unknown",
+        "rows": 1
+      }
+    },
+    {
+      "id": "RETURNED_DIGEST_BINDS_THE_ACTUALLY_INSPECTED_SNAPSHOT",
+      "status": "PASS",
+      "injected": true,
+      "completeness": "bounded",
+      "issues": [
+        "busy_or_changed"
+      ],
+      "returnedDigest": null,
+      "stableDigest": "e188b793964663dc5534386310fde1b9f26e287da333f753b8c696c36bca4223"
+    }
+  ],
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "sourceReferences": {
+    "tableCompleteness": "packages/storage/src/target-inventory.ts:183",
+    "unknownPrefixClassification": "packages/storage/src/target-inventory.ts:56",
+    "digestSnapshotBinding": "packages/storage/src/target-inventory.ts:160"
+  },
+  "limitations": [
+    "Loads the candidate TypeScript source and its local SQLite dependency; no production source is edited.",
+    "Temporary databases only; no real target materializer, writer process, activation or installation is exercised.",
+    "The race uses an injected synchronous filesystem boundary, not a probabilistic concurrent process.",
+    "A complete inventory still grants no startup authority and does not prove writer quiescence.",
+    "Exact source line references describe the audited candidate and may move after a repair."
+  ]
+}

@@ -3,6 +3,24 @@
 .context-workspace header > div { min-width: 0; }
 .context-workspace .context-line { overflow-wrap: anywhere; }
 .context-controls { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 18px; }
+.context-message-field { display: grid; gap: 7px; min-width: 0; color: var(--muted); font-size: 12px; }
+.context-message-field textarea { width: 100%; min-height: 98px; resize: vertical; padding: 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); color: var(--ink); font: inherit; font-size: 14px; line-height: 1.7; }
+.context-message-confirmation { border-top: 1px solid var(--line); padding-top: 16px; }
+.context-message-confirmation h3 { font-size: 13px; margin: 0 0 8px; }
+.context-message-confirmation > p { font-size: 14px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 14px; }
+.context-message-confirmation dl { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 8px 12px; margin: 0; font-size: 12px; }
+.context-message-confirmation dt { color: var(--muted); }
+.context-message-confirmation dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.context-message-confirmation dd code { font-size: 11px; }
+.context-message-confirmation dd > span { white-space: nowrap; }
+.context-message-confirmation dd > span + code { display: block; margin-top: 5px; }
+.context-pending { display: flex; align-items: center; gap: 7px; margin: 16px 0 0; color: var(--warn); font-size: 13px; }
+.message-context-audit { margin-top: 12px; color: var(--muted); font-size: 12px; }
+.message-context-audit > summary { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; min-height: 28px; }
+.message-context-audit ul { list-style: none; padding: 0; margin: 7px 0 0; display: grid; gap: 8px; }
+.message-context-audit li { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.message-context-audit code { max-width: 65%; min-width: 0; overflow-wrap: anywhere; font-size: 10px; }
+.message-context-audit p { margin: 7px 0; font-size: 12px; }
 .context-selectors { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 14px; }
 .context-selectors label, .context-query, .context-budget label { display: grid; gap: 7px; min-width: 0; color: var(--muted); font-size: 12px; }
 .context-selectors select { width: 100%; min-width: 0; text-overflow: ellipsis; }
@@ -46,5 +64,6 @@
   .context-selectors { grid-template-columns: minmax(0, 1fr); }
   .context-budget > div { grid-template-columns: minmax(0, 1fr); }
   .context-workspace input:not([type=checkbox]), .context-selectors select { font-size: 16px; }
+  .context-message-field textarea { font-size: 16px; }
   .context-actions button { min-height: 40px; }
 }
