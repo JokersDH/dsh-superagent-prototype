@@ -1,0 +1,148 @@
+{
+  "status": "PASS_SCOPED_DELIVERY_ADMISSION",
+  "command": [
+    "node",
+    "tools/bootstrap/probe-wave11-delivery.mjs",
+    "/Users/hh/Desktop/joker/superagent-agent-d",
+    "/Users/hh/Desktop/joker/superagent-agent-e"
+  ],
+  "checkedAt": "2026-11-12T04:47:33.912Z",
+  "dSource": {
+    "root": "/Users/hh/Desktop/joker/superagent-agent-d",
+    "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+    "origin": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+    "base": "b466bc760f073408d95005c3c9e6219d94c23e5e",
+    "clean": true,
+    "hashes": {
+      "apps/launcher/lib/stop.mjs": "39e5792995d1cb87c582a63134c43d36b37d76b309294763dfbf93914db54f0a",
+      "apps/launcher/lib/instance.mjs": "86901b984a031d8e9265a6d28596fd8042b64d1b1a59f5e2e73be22c783ca5d4",
+      "apps/launcher/lib/upgrade.mjs": "f4f21cc9db689fcdaea3e75c387c77d637376b0f3cb59f72d174b75498624727",
+      "packages/portability/src/recovery-target.ts": "4ea451c9489fc6debc21621857203090ab1ec75b61b532bcab49cb393be38479"
+    }
+  },
+  "eSource": {
+    "root": "/Users/hh/Desktop/joker/superagent-agent-e",
+    "commit": "fa45457f095334cbd54878223db9b8accb601062",
+    "origin": "fa45457f095334cbd54878223db9b8accb601062",
+    "base": "b466bc760f073408d95005c3c9e6219d94c23e5e",
+    "trackedClean": true
+  },
+  "cases": [
+    {
+      "id": "MATCHING_STATE_ORPHAN_API_POSITIVE_CONTROL",
+      "status": "PASS",
+      "observation": {
+        "status": "STOPPED_ORPHAN",
+        "apiStopped": true,
+        "onlyProbeOwnedPid": 24756
+      }
+    },
+    {
+      "id": "REQUESTED_DATA_ROOT_CANNOT_STOP_RECORDED_OTHER_STATE",
+      "status": "PASS",
+      "observation": {
+        "requestedState": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave11-delivery-qIVosx/cross-state/state-a",
+        "recordedState": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave11-delivery-qIVosx/cross-state/state-b",
+        "resultStatus": "BLOCKED",
+        "ok": false,
+        "otherStateApiAlive": true,
+        "recordPreserved": true,
+        "onlyProbeOwnedPid": 24836
+      }
+    },
+    {
+      "id": "FROZEN_D_TAR_BYTES_MATCH_PUBLISHED_TUPLES",
+      "status": "PASS",
+      "observation": [
+        {
+          "kind": "baseline",
+          "source": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+          "buildId": "7e8f6ce6fa2e2633",
+          "schema": 13,
+          "platform": "darwin",
+          "arch": "arm64",
+          "abi": "137",
+          "bytes": 19911757,
+          "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631"
+        },
+        {
+          "kind": "target",
+          "source": "cf7a3cfeb4ebabebe95b8670bae33a97d3a71596",
+          "buildId": "da2d78d126e4745f",
+          "schema": 15,
+          "platform": "darwin",
+          "arch": "arm64",
+          "abi": "137",
+          "bytes": 20073981,
+          "sha256": "f886a05c55dbe581198ce587d1c80c410ec08d13012ff0689cc77d70f44df5a2",
+          "packagedHttpCapabilities": {
+            "contextPreview": true,
+            "evidenceHistory": true,
+            "selectedContextSend": false,
+            "messageContextAudit": false
+          }
+        }
+      ]
+    }
+  ],
+  "eObservedReport": {
+    "testCodeSource": {
+      "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+      "dirty": false,
+      "branch": "codex/g3-product-acceptance"
+    },
+    "productSource": {
+      "commit": "6830e38c73f50542c7d836e4d5e579bcf5d27fe2",
+      "buildId": "f2390ffd1b87b79a",
+      "schema": 15
+    },
+    "counts": {
+      "PASS": 130,
+      "FAIL": 1,
+      "SKIPPED": 0,
+      "NOT_TESTED": 16,
+      "BLOCKED": 0,
+      "UNKNOWN": 0
+    },
+    "artifactTuple": {
+      "baseline": {
+        "buildId": "5db9a0d41924a4c6",
+        "schema": 15,
+        "tarSha256": "eaf05420491b3a7fba584584c24e02f4ba2c1ac48c86aa8f1cd377c9b4f3d364",
+        "source": "b29550421f5bc40aad5e5a5e1d25ffa02453f7a2"
+      },
+      "target": {
+        "buildId": "f2390ffd1b87b79a",
+        "schema": 15,
+        "tarSha256": "62861d93d064374f90f7b638e6473804aeaab516d0633fbb9ffa453924434ae9",
+        "source": "6830e38c73f50542c7d836e4d5e579bcf5d27fe2"
+      }
+    },
+    "contextUseStillNotTested": true
+  },
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "userServicesTouched": false,
+  "independentChecks": {
+    "command": "node --test apps/launcher/test/upgrade-resources.case.mjs packages/portability/test/recovery-target.case.ts",
+    "passed": 14,
+    "failed": 0,
+    "exitCode": 0,
+    "portabilityTypecheck": "PASS"
+  },
+  "references": {
+    "stopMissingRequestedIdentity": "apps/launcher/lib/stop.mjs:34",
+    "orphanStopUsesRecordWithoutRoots": "apps/launcher/lib/stop.mjs:53",
+    "eContextUsePlaceholder": "tests/product-acceptance/cases/e3-context.mjs:149",
+    "eArtifactScope": "tests/product-acceptance/reports/wave10-status.json"
+  },
+  "limitations": [
+    "Only probe-owned temporary API processes and an already exited probe-owned launcher pid were passed to candidate stopInstance.",
+    "No pa CLI, installed daemon, native agent, model request or global process scan was used in the stop negative.",
+    "The generic stop/root defect is separate from the previously passed upgrade/resource-accounting and materializer checks.",
+    "The verified frozen target is D cf7a3cf/schema15, not current main4140cac/schema16/context-use.",
+    "E is still testing6830e38/schema15; its missing context-use claim is stale relative to current main, not a failure of current main.",
+    "No full installer matrix, independent current-main browser suite, other-platform/ABI or activation admission is claimed."
+  ],
+  "exitCode": 0
+}

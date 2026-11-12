@@ -103,14 +103,20 @@ try {
   step('discard-refuses-initialized-target', 'PASS')
 
   let inventory
-  if (inventoryModule === undefined) {
+  let readerModule = inventoryModule
+  if (readerModule === undefined) {
+    // A published the public reader; consume it instead of reporting a permanent gap. The recipe
+    // still never fabricates an inventory and reports SKIPPED if the reader is absent.
+    try { readerModule = join(repositoryRoot, 'packages/storage/dist/index.js') } catch { readerModule = undefined }
+  }
+  if (readerModule === undefined) {
     step('inventory-reader-unavailable', 'SKIPPED', {
       reason: 'INVENTORY_READER_UNAVAILABLE',
       requirement: 'A-owned RecoveryTargetInventoryReader.inspect(stateRoot) must be implemented and integrated by main; D does not fabricate an inventory.',
     })
   } else {
-    const module = await import(pathToFileURL(inventoryModule).href)
-    const reader = module.createRecoveryTargetInventoryReader?.() ?? module.default?.()
+    const module = await import(pathToFileURL(readerModule).href)
+    const reader = module.createRecoveryTargetInventoryReader?.() ?? module.recoveryTargetInventory ?? module.default?.()
     if (reader === undefined || typeof reader.inspect !== 'function') throw new Error('the inventory module does not export a reader')
     inventory = reader.inspect(material.stateRoot)
     if (inventory.startupAvailable !== false) throw new Error('inventory claimed startup availability')

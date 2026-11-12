@@ -1,0 +1,89 @@
+{
+  "protocol": "wave11-dual-binary/1",
+  "status": "PASS",
+  "startedAt": "2026-11-12T04:47:34.081Z",
+  "steps": [
+    {
+      "id": "dual-artifacts",
+      "status": "PASS",
+      "detail": {
+        "from": {
+          "buildId": "9120a5ed858e0feb",
+          "schema": 13,
+          "source": "76f26a66"
+        },
+        "to": {
+          "buildId": "cd0ecc29d97d5c41",
+          "schema": 13,
+          "source": "9b75c2a1"
+        }
+      }
+    },
+    {
+      "id": "initial-binary-running",
+      "status": "PASS",
+      "detail": {
+        "buildId": "9120a5ed858e0feb",
+        "schema": 13,
+        "evidence": "5cf9352a81ef367c3d18999a2493223ea7f1ad4637023c377b3d8f86061e8586"
+      }
+    },
+    {
+      "id": "same-schema-upgrade",
+      "status": "PASS",
+      "detail": {
+        "buildId": "cd0ecc29d97d5c41",
+        "schema": 13,
+        "evidenceUnchanged": true,
+        "digestUnchanged": false
+      }
+    },
+    {
+      "id": "binary-rollback",
+      "status": "PASS",
+      "detail": {
+        "from": "cd0ecc29d97d5c41",
+        "to": "9120a5ed858e0feb",
+        "journal": "binary_rolled_back",
+        "runningBuild": "9120a5ed858e0feb",
+        "evidenceUnchanged": true,
+        "dataRolledBack": false
+      }
+    },
+    {
+      "id": "repeat-rollback-truthful",
+      "status": "PASS",
+      "detail": {
+        "status": "BINARY_ROLLED_BACK",
+        "from": "9120a5ed858e0feb",
+        "to": "9120a5ed858e0feb",
+        "journal": "binary_rolled_back"
+      }
+    },
+    {
+      "id": "cleanup",
+      "status": "PASS",
+      "detail": {
+        "status": "STOPPED"
+      }
+    }
+  ],
+  "limitations": [
+    "Both preserved artifacts are schema13; this proves a same-schema binary switch/rollback, not a schema migration or data rollback.",
+    "Incompatible old-binary-on-newer-schema refusal is measured by the wave-11 matrix against the schema16 target.",
+    "Only isolated temporary roots/ports; no user instance is touched."
+  ],
+  "artifacts": {
+    "from": {
+      "buildId": "9120a5ed858e0feb",
+      "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+      "schema": 13
+    },
+    "to": {
+      "buildId": "cd0ecc29d97d5c41",
+      "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+      "schema": 13
+    }
+  },
+  "finishedAt": "2026-11-12T04:47:41.505Z"
+}

@@ -435,7 +435,10 @@ try {
     ['start', '--fixture', '--port', String(primaryPort), '--api-port', String(primaryApiPort), '--json', ...stateArgs(otherState)],
     { allowExit: [2] },
   )
-  if (conflictState.json?.code !== 'instance_conflict') throw new Error(`different state reuse expected instance_conflict, got ${conflictState.json?.code}`)
+  // Starting the same config/install with another requested data root must refuse before reuse; the
+  // precise code is requested_root_mismatch, and no process/record of the recorded state is touched.
+  if (!['requested_root_mismatch', 'instance_conflict'].includes(conflictState.json?.code))
+    throw new Error(`different state reuse expected requested_root_mismatch/instance_conflict, got ${conflictState.json?.code}`)
   const otherConsole = await freePort()
   let otherApi = await freePort()
   if (otherApi === otherConsole) otherApi = await freePort()

@@ -1,0 +1,292 @@
+{
+  "protocol": "wave11-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "fe01c3c",
+  "mergedMain": "ed8b520",
+  "head": "a22d3a4",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/native turns 0; nine user services untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "nativeTurns": 0,
+    "unknownNativeSends": 0
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Public requestedScopeCheck binds requested install/config/data to the recorded instance: state is a hard boundary for every command, install is a hard boundary for start/reuse, and cross-state stop/status/start/upgrade refuse with requested_root_mismatch without signalling, deleting the record or moving the pointer. Read-only probe 3/3 before any stop-class matrix.",
+      "evidence": [
+        "apps/launcher/lib/identity.mjs",
+        "apps/launcher/lib/stop.mjs",
+        "apps/launcher/test/requested-scope.case.mjs",
+        "tools/distribution/reports/wave11/scoped-delivery.json"
+      ]
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "One install/two states matrix 8/8: both states live, cross-state stop/status refused, matching stop only own state, launcher-dead/API-alive orphan, stale record, PID reuse/start mismatch, missing record, and space/CJK paths. The unoperated state PID/API/DB/record stayed identical; unknown listeners naming the state block stale cleanup.",
+      "evidence": [
+        "tools/distribution/verify-multi-instance.mjs"
+      ]
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Real SIGKILL windows (crash_after_stop_kill/crash_after_switch_kill) prove the durable journal is the only witness: the upgrade process dies by SIGKILL, re-entry demands upgrade_recover_required, and recover leaves a terminal journal plus a verified running instance. Matrix 19/19 (E1-E14).",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs",
+        "tools/distribution/reports/wave11/binary-upgrade.json"
+      ]
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "Schema16 backup closure over A public entrypoints: A families (incl. assistant_context_bindings), backup to a fresh root with equal workflow-evidence digest, corrupted bundle archive_invalid, future schema17 refused by state_schema_newer_than_binary, and schema13 bundle migrated to 16 through A ProductStore. No SQL written by D.",
+      "evidence": [
+        "tools/distribution/verify-backup-schema16.mjs",
+        "tools/distribution/reports/wave11/backup-schema16.json"
+      ]
+    },
+    "d5": {
+      "status": "PASS_WITH_PLATFORM_LIMITS",
+      "summary": "Relocated closure with spaces/CJK, isolated HOME and cwd outside the checkout: doctor no FAIL, start/stop/support work; unsafe config permission is a FAIL/refusal; missing Node on PATH is an explicit diagnostic. Only darwin/arm64+current ABI measured; other platforms NOT_TESTED.",
+      "evidence": [
+        "tools/distribution/verify-portable-closure.mjs",
+        "tools/distribution/reports/wave11/portable-closure.json"
+      ]
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "Clean frozen target built from pushed source a22d3a4 (dirty=false): build 3311a04bd20ed7f9, schema16, tar sha256 a10f6274..., 20,132,388 B, 6,697 files. Exact tuple published for E; old schema15 artifacts remain historical and unrelabeled.",
+      "evidence": [
+        "tools/distribution/reports/wave11/artifacts.json"
+      ]
+    },
+    "d7": {
+      "status": "PASS",
+      "summary": "Ordinary personal cold install 7/7: cold first-run, doctor gates, real personal-mode start with zero model turns, backup, readonly restore into a fresh root with equal evidence digest, relocation start. Independent of target activation and the blocked study.",
+      "evidence": [
+        "tools/distribution/verify-personal-install.mjs",
+        "tools/distribution/reports/wave11/personal-install.json"
+      ]
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Real dual-binary same-schema switch between preserved wave-07/wave-08 builds: upgrade CONFIRMED to wave-08, A evidence unchanged, rollback-install to wave-07 with terminal binary_rolled_back journal, no silent data rollback, repeat rollback truthful. Cross-schema old-binary-on-16 refusal is matrix section D.",
+      "evidence": [
+        "tools/distribution/verify-dual-binary.mjs",
+        "tools/distribution/reports/wave11/dual-binary.json"
+      ]
+    },
+    "d9": {
+      "status": "PARTIAL_BLOCKED_MAIN_ACTIVATION",
+      "summary": "Material recipe now consumes A public RecoveryTargetInventoryReader: empty schema16 target inventory PASS (52 tables, no issues, startupAvailable false). New pa support --out emits a redacted whitelist bundle (no content/argv/keys/nonces/account dirs) with 0600 and no overwrite. Main activation/host grant handshake is not published, so activation remains blocked; material/empty DB/old backup never self-authorize.",
+      "evidence": [
+        "apps/launcher/lib/support.mjs",
+        "apps/launcher/test/support.case.mjs",
+        "tools/distribution/reports/wave11/target-material.json"
+      ]
+    },
+    "d10": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Frozen-byte rerun: matrix 19/19, personal 7/7, backup 6/6, portable 5 PASS+1 NOT_TESTED, dual 6/6, material PASS, smoke 52/52, launcher 60/60, portability 52/52, delivery probe 3/3. E acceptance remains pending.",
+      "evidence": [
+        "tools/distribution/recipes/wave11-e-acceptance.zh-CN.md",
+        "docs/rfcs/WP-16/0036-wave-11-d-delivery.md"
+      ]
+    }
+  },
+  "artifacts": {
+    "protocol": "wave11-artifacts/1",
+    "baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "tarBytes": 19911757,
+      "buildId": "7e8f6ce6fa2e2633",
+      "source": {
+        "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 13
+    },
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+      "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+      "tarBytes": 20132388,
+      "buildId": "3311a04bd20ed7f9",
+      "source": {
+        "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 16,
+      "files": 6697,
+      "extractedBytes": 67100514,
+      "platform": null,
+      "abi": {
+        "node": "137"
+      }
+    },
+    "dualPair": {
+      "from": {
+        "buildId": "9120a5ed858e0feb",
+        "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+        "productSchema": 13,
+        "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave07-target2/wave07-target-9120a5ed.tar.gz",
+        "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
+      },
+      "to": {
+        "buildId": "cd0ecc29d97d5c41",
+        "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+        "productSchema": 13,
+        "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave08-target/wave08-target-cd0ecc29.tar.gz",
+        "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"
+      }
+    },
+    "historical": [
+      {
+        "label": "wave-10 D cf7a3cf",
+        "buildId": "da2d78d126e4745f",
+        "source": "cf7a3cf",
+        "productSchema": 15,
+        "note": "Preserved; not current main/schema16, never relabeled."
+      },
+      {
+        "label": "wave-09 6830e38",
+        "productSchema": 15,
+        "note": "Preserved."
+      }
+    ],
+    "notes": [
+      "Target is built from the pushed clean wave-11 D head a22d3a4 (source.dirty=false, product schema16) on top of merged main ed8b520 (context-use 4140cac, contracts 98a50ca).",
+      "Baseline wave-06 schema13 is preserved history, used only for schema-change/refusal windows.",
+      "Dual pair are the preserved wave-07/wave-08 schema13 builds; the same-schema binary switch/rollback is measured there, not relabeled schema16.",
+      "E must bind cases to these tuples; the checkout is not an installation input."
+    ]
+  },
+  "testLayers": {
+    "deliveryProbe": {
+      "cases": 3,
+      "status": "PASS_SCOPED_DELIVERY_ADMISSION"
+    },
+    "multiInstance": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "binaryUpgrade": {
+      "sections": 19,
+      "status": "PASS",
+      "sectionStatus": {
+        "installs": "PASS",
+        "A-baseline-state": "PASS",
+        "B-binary-switch": "PASS",
+        "C-post-upgrade-data-protection": "PASS",
+        "D-exact-schema-refusal": "PASS",
+        "E1-tampered-target-refused": "PASS",
+        "E2-running-switch-refused": "PASS",
+        "E3-unverified-instance-blocked": "PASS",
+        "E4-unhealthy-target-reverted": "PASS",
+        "E5-interrupted-switch-recovered": "PASS",
+        "E6-duplicate-refused": "PASS",
+        "E7-stop-unproven-kept": "PASS",
+        "E8-crash-after-stop-restarts-previous": "PASS",
+        "E9-record-missing-reverted": "PASS",
+        "E10-orphan-api-stopped": "PASS",
+        "E11-unknown-live-blocked": "PASS",
+        "E12-reentry-refused-until-recover": "PASS",
+        "E13-kill-after-stop-recover": "PASS",
+        "E14-kill-after-switch-recover": "PASS"
+      }
+    },
+    "personalInstall": {
+      "steps": 7,
+      "status": "PASS"
+    },
+    "backupSchema16": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "portableClosure": {
+      "steps": 6,
+      "status": "PASS",
+      "notTested": [
+        "other-platform-abi"
+      ]
+    },
+    "dualBinary": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "targetMaterial": {
+      "steps": 8,
+      "status": "PASS",
+      "skipped": []
+    },
+    "smoke": {
+      "steps": 52,
+      "status": "PASS"
+    },
+    "launcher": {
+      "tests": 60,
+      "status": "PASS"
+    },
+    "portability": {
+      "tests": 52,
+      "status": "PASS"
+    }
+  },
+  "blockers": [
+    {
+      "id": "MAIN-ACTIVATION-HANDSHAKE",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "No published source baseline/authorization/activation host handshake; materials/empty DB remain inert."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E must bind cases to the frozen wave-11 tuples independently."
+    },
+    {
+      "id": "PLATFORM-ABI",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Only darwin/arm64 + current Node/SQLite ABI measured."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Personal mode verified with zero dispatched work/turns."
+    }
+  ],
+  "notTested": [
+    "cross-platform/ABI",
+    "real personal billed turn",
+    "every individual SIGKILL step",
+    "main target activation",
+    "E independent acceptance"
+  ],
+  "eConsumption": [
+    "Use tools/distribution/reports/wave11/artifacts.json tar/sha256/source/build/schema tuples; never the checkout or old wave-10 schema15 bytes.",
+    "Run probe-wave11-delivery, verify-multi-instance, smoke-binary-upgrade (19), verify-backup-schema16, verify-portable-closure, verify-personal-install, verify-dual-binary, verify-target-material.",
+    "Do not relax digests, delete markers/records, hand-edit release.json, pkill, or claim activation/personal billed/native from these results."
+  ],
+  "preservedHistory": [
+    "wave-05..10 evidence/ledgers unchanged",
+    "wave-06/07/08/09/10 tars preserved and unrelabeled",
+    "no shared contract/migration/root lock/E assertion modified"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave11/*.json",
+    "tools/distribution/recipes/wave11-e-acceptance.zh-CN.md",
+    "docs/rfcs/WP-16/0036-wave-11-d-delivery.md"
+  ]
+}
