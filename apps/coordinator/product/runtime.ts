@@ -4,7 +4,7 @@ import { ApplicationConversations, ApplicationFault, createProductApplication } 
 import type { ApplicationOptions } from '@personal-agent/application'
 import { sharedAttentionRanker } from '@personal-agent/routing'
 import { recoveryTargetInventory } from '@personal-agent/storage'
-import type { AssistantContextBindings, AssistantContextPrepare, AssistantContextSend, AssistantReplyResults, AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryActivationCommit, RecoveryPrepare, RecoveryTargetInventoryReader, RecoveryTargetMaterial, RecoveryTargetMaterializer, RecoveryTargetPrepareInput, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
+import type { AssistantContextBindings, AssistantContextHistory, AssistantContextPrepare, AssistantContextSend, AssistantReplyResults, AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryActivationCommit, RecoveryPrepare, RecoveryTargetInventoryReader, RecoveryTargetMaterial, RecoveryTargetMaterializer, RecoveryTargetPrepareInput, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { WorkEvidenceSchema } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
@@ -36,6 +36,7 @@ import { ProductAssistantContext } from './assistant-context-use.ts'
 import { ProductRecoveryTargets } from './recovery-target-service.ts'
 import { initializeRecoveryTarget } from './recovery-target-initializer.ts'
 import { CompletedAssistantReplies } from './assistant-reply-results.ts'
+import { ProductContextRecords } from './context-records.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -51,6 +52,7 @@ export function createProductRuntime(
     attentionRanker?: AttentionRanker
     assistantContextBindings?: AssistantContextBindings
     assistantReplyResults?: AssistantReplyResults
+    contextHistory?: AssistantContextHistory
     recoveryTargets?: {
       materializer: RecoveryTargetMaterializer
       inventory?: RecoveryTargetInventoryReader
@@ -151,6 +153,7 @@ export function createProductRuntime(
   )
   const { store } = options
   let assistantContext: ProductAssistantContext | undefined
+  let contextRecords: ProductContextRecords | undefined
   const recoveryTargets = options.recoveryTargets ? new ProductRecoveryTargets({
     store, principal: options.principal, stateRoot: options.stateRoot,
     materializer: options.recoveryTargets.materializer, inventory: options.recoveryTargets.inventory ?? recoveryTargetInventory,
@@ -188,6 +191,11 @@ export function createProductRuntime(
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
     ...(recoveryTargets ? { recoveryTarget: (id: string) => recoveryTargets.read(id) } : {}),
     assistantContext: async messageId => assistantContext?.audit(messageId),
+    contextHistory: async query => {
+      if (!contextRecords) throw new ApplicationFault('unsupported_capability', 'Context history is not connected')
+      return contextRecords.history(query)
+    },
+    contextSources: async messageId => contextRecords?.sources(messageId),
     workEvidenceHistory: (workId, query) => evidenceHistory.read(workId, query),
     workEvidence: async workId => {
       const work = (await application.inspect({ workId })).works[0]
@@ -351,6 +359,8 @@ export function createProductRuntime(
         proposalsAvailable: options.startupMode !== 'recovery_readonly',
         contextPreviewAvailable: options.startupMode !== 'recovery_readonly',
         assistantContextAvailable: !!assistantContext && !!options.assistantProvider?.status().configured && options.startupMode !== 'recovery_readonly',
+        contextHistoryAvailable: !!contextRecords?.historyAvailable,
+        contextSourcesAvailable: !!contextRecords,
       })
       return configuration
     },
@@ -390,6 +400,11 @@ export function createProductRuntime(
     { verification: read.verification!, workEvidence: read.workEvidence! }, options.now)
   const contextBindings = options.assistantContextBindings ??
     (store.workflows.assistant as typeof store.workflows.assistant & { contextBindings?: AssistantContextBindings }).contextBindings
+  if (contextBindings) contextRecords = new ProductContextRecords({
+    store, bindings: contextBindings, principal: options.principal, projects: () => configuredProjects,
+    secret: options.actionSecret, ...(options.contextHistory ? { history: options.contextHistory } : {}),
+    ...(options.now ? { now: options.now } : {}),
+  })
   if (contextBindings) assistantContext = new ProductAssistantContext({
     store, application, principal: options.principal, preview: contextPreview, bindings: contextBindings,
     projects: () => configuredProjects, secret: options.actionSecret, ...(options.now ? { now: options.now } : {}),
