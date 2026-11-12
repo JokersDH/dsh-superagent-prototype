@@ -3,7 +3,7 @@
  * API child is signalled only after its command line, uid, private state and listener still match;
  * an unknown process, stale record with a live listener, or stop timeout is reported, not hidden.
  */
-import { readInstanceRecord, processAlive, removeInstanceRecord, stopProcess, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
+import { listenersOnPort, processCommand, readInstanceRecord, processAlive, removeInstanceRecord, stopProcess, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
 import { requestedScopeCheck } from './identity.mjs'
 
 const record_removed_code = 'instance_record_removed'
@@ -82,10 +82,38 @@ export async function stopInstance({ roots, timeoutMs = 8000 }) {
     }
     const apiAlive = orphan.checks.some((check) => check.id === 'api_alive' && check.ok)
     if (!apiAlive) {
+      // A recorded port held by a process that is not one of the recorded pids is an unknown live
+      // target: keep the record and the process, and report it instead of collecting a "stale" record.
+      const unknownListeners = []
+      const foreignPorts = []
+      for (const url of [record.apiURL, record.consoleURL]) {
+        const port = new URL(url).port
+        const listeners = await listenersOnPort(port)
+        for (const pid of listeners.pids) {
+          if (pid === record.pid || pid === record.apiPid || pid === record.consolePid) continue
+          const commandLine = await processCommand(pid)
+          // Only a listener that names this record's state/install can be a lost writer for this
+          // instance. An unrelated service on a recycled port is recorded, not treated as ours.
+          if (commandLine !== null && (commandLine.includes(record.state) || commandLine.includes(record.install)))
+            unknownListeners.push({ port, pid, command: commandLine.slice(0, 200) })
+          else foreignPorts.push({ port, pid })
+        }
+      }
+      if (unknownListeners.length > 0) {
+        return {
+          ok: false,
+          status: 'UNVERIFIED',
+          code: 'unknown_live_resource',
+          message: '登记的端口仍由无法归属的进程监听；保留记录，不结束未知进程',
+          detail: { unknownListeners: unknownListeners.slice(0, 8) },
+          hint: '核对端口与进程来源；不要删除 instance.json 绕过。',
+        }
+      }
       const removed = removeRecord(roots.config)
       return {
         ok: true,
         status: 'STALE_RECORD_CLEANED',
+        ...(foreignPorts.length === 0 ? {} : { foreignPortOccupied: foreignPorts.slice(0, 8) }),
         message: 'launcher 与登记子进程都已退出；清理陈旧实例记录',
         verification: orphan,
         instanceRecordRemoved: removed,

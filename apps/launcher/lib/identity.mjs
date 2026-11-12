@@ -141,22 +141,48 @@ export function daemonInvocationMismatches(record, tokens) {
  */
 export function argvMatchesCommand(argv, command, options = {}) {
   if (!Array.isArray(argv) || argv.length < 2 || typeof command !== 'string') return false
-  const tokens = commandTokens(command)
-  if (tokens.length !== argv.length) return false
   const executable = argv[0]
-  const executableOk =
-    tokens[0] === executable ||
-    basename(executable) === tokens[0] ||
-    tokens[0].endsWith(`/${basename(executable)}`)
-  if (!executableOk) return false
-  for (let index = 1; index < argv.length; index += 1) {
-    if (index === 1 && typeof options.baseDir === 'string') {
-      // The OS may print the script as invoked (relative) while Node records an absolute argv[1].
-      const observed = isAbsolute(tokens[index]) ? tokens[index] : join(options.baseDir, tokens[index])
-      if (canonicalPath(observed) !== canonicalPath(argv[index])) return false
-      continue
+  if (typeof executable !== 'string' || executable.length === 0) return false
+  // The OS prints argv space-joined without quoting, so a path containing spaces cannot be split into
+  // tokens. Consume each recorded entry in order from the raw command line with argument boundaries.
+  const occurrence = (from, form) => {
+    if (form.length === 0) return -1
+    let index = command.indexOf(form, from)
+    while (index !== -1) {
+      const before = index === 0 || command[index - 1] === ' '
+      const after = index + form.length === command.length || command[index + form.length] === ' '
+      if (before && after) return index
+      index = command.indexOf(form, index + 1)
     }
-    if (tokens[index] !== argv[index]) return false
+    return -1
   }
-  return true
+  const executableOk = command.startsWith(executable) || command.startsWith(basename(executable)) ||
+    command.includes(`/${basename(executable)} `) || command === basename(executable)
+  if (!executableOk && command.indexOf(executable) === -1 && command.indexOf(basename(executable)) === -1) return false
+  let cursor = 0
+  for (let index = 1; index < argv.length; index += 1) {
+    const entry = argv[index]
+    if (typeof entry !== 'string') return false
+    const forms = [entry]
+    if (isAbsolute(entry)) forms.push(canonicalPath(entry))
+    if (index === 1 && typeof options.baseDir === 'string' && !isAbsolute(entry)) {
+      forms.push(join(options.baseDir, entry))
+      forms.push(canonicalPath(join(options.baseDir, entry)))
+    }
+    if (index === 1 && typeof options.baseDir === 'string' && isAbsolute(entry) && entry.startsWith(`${options.baseDir}/`)) {
+      // The OS may print the script as a path relative to the install root.
+      forms.push(entry.slice(options.baseDir.length + 1))
+    }
+    let found = -1
+    let formLength = 0
+    for (const form of forms) {
+      const position = occurrence(cursor, form)
+      if (position === -1) continue
+      if (found === -1 || position < found) { found = position; formLength = form.length }
+    }
+    if (found === -1) return false
+    cursor = found + formLength
+  }
+  // No trailing argument may follow the recorded argv.
+  return command.slice(cursor).trim() === ''
 }

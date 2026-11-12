@@ -76,3 +76,29 @@ test('stop for another requested state is refused, keeps the record and never si
     rmSync(root, { recursive: true, force: true })
   }
 })
+
+test('an unknown listener that names the recorded state blocks stale-record cleanup', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'pa-scope-listener-'))
+  const { createServer } = await import('node:net')
+  const server = createServer()
+  await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen))
+  const port = server.address().port
+  await new Promise((resolveClose) => server.close(resolveClose))
+  // The listener process carries the recorded state in its argv, so it could be a lost writer and
+  // must not be discarded as a "stale" record.
+  const child = spawn(process.execPath, ['-e', `require('node:net').createServer().listen(${port},'127.0.0.1');setInterval(()=>{},1000) // ${join(root, 'state-a')}`], { stdio: 'ignore' })
+  try {
+    await new Promise((resolveWait) => setTimeout(resolveWait, 250))
+    const roots = makeRoots(root)
+    const record = recordFor(roots, { pid: 999_999, apiPid: 999_998, consolePid: 999_999, apiURL: `http://127.0.0.1:${port}`, consoleURL: 'http://127.0.0.1:45002' })
+    writeRecord(roots.config, record)
+    const result = await stopInstance({ roots, timeoutMs: 1000 })
+    assert.equal(result.ok, false)
+    assert.equal(result.code, 'unknown_live_resource')
+    assert.equal(existsSync(join(roots.config, 'instance.json')), true)
+    assert.equal(child.exitCode, null, 'the unknown listener must not be signalled')
+  } finally {
+    try { child.kill('SIGKILL') } catch { /* gone */ }
+    rmSync(root, { recursive: true, force: true })
+  }
+})

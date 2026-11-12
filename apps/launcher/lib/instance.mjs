@@ -223,6 +223,21 @@ export async function verifyCoordinatorProcess(record) {
   return { ok: failures.length === 0, checks, failures }
 }
 
+/**
+ * Listener pids on a loopback port. Used only to detect an UNKNOWN live owner of a recorded port;
+ * the caller never signals these pids based on this observation alone.
+ */
+export async function processCommand(pid) {
+  return command('ps', ['-ww', '-p', String(pid), '-o', 'command='])
+}
+
+export async function listenersOnPort(port) {
+  const output = await command('lsof', ['-nP', '-iTCP:' + String(port), '-sTCP:LISTEN', '-Fn'])
+  if (output === null) return { supported: true, pids: [] }
+  const pids = [...output.matchAll(/^p(\d+)$/gm)].map((match) => Number(match[1])).filter((value) => Number.isInteger(value))
+  return { supported: true, pids: [...new Set(pids)] }
+}
+
 export async function stopProcess(pidValue, { timeoutMs = 8000 } = {}) {
   try {
     process.kill(pidValue, 'SIGTERM')
