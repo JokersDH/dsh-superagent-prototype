@@ -1,0 +1,12 @@
+{
+  "id": "COPIED_LEGACY_RECORD_SELF_CONSISTENT_CONFIG",
+  "code": "requested_root_mismatch",
+  "status": "BLOCKED",
+  "apiAlive": true,
+  "legacyConfigEvidence": "Only a launcher.json whose roots.config equals the copying config root",
+  "expected": "Refuse legacy unknown ownership before signals",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "source": "99832f6c7e6a54b323a9d454f3a4840273d1275a",
+  "verdict": "PASS"
+}
