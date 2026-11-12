@@ -1,0 +1,55 @@
+{
+  "wave": "product-wave-14",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "6d24519",
+  "mergeCommit": "0774975",
+  "earlyCheckpoint": "e28976f",
+  "previousCandidate": "aacc342",
+  "packet": "agent-tasks/product-wave-14/agent-b-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0041",
+  "scopeNote": "Zero model and native turns. No fee/recipe research, no new Driver, no second database/ledger, no probe-only recover authority. Two historical reports left untouched. Shared probe output written to /tmp.",
+
+  "B2": {
+    "status": "PASS",
+    "label": "validate the payload that will actually be sent; full Windows redaction",
+    "probe": { "command": "PA_ADMISSION_REPORT=/tmp/w14b-runtime.json node tools/bootstrap/probe-wave14-runtime.mjs <B-root>", "cases": "4/4 PASS" },
+    "rootCause": "all four shared one cause: validating the caller object instead of the payload, while cloning is exactly what destroys the evidence",
+    "twoPass": "a hazard scan runs on the caller object (symbol keys on objects AND arrays, accessors refused because a getter's value is not stable), then the value is cloned and the CLONE is validated as JSON",
+    "nonPlainRefused": "Map/Set/Date/class instances are refused: a Map of required context would serialise to {} and arrive empty",
+    "windowsRedaction": "separator-aware alternatives now consume the whole drive path, the UNC form and the POSIX form, so no account or trailing component survives"
+  },
+
+  "B1": {
+    "status": "PARTIAL",
+    "label": "recovery against an independent surviving Runner",
+    "proven": [
+      "the Runner is its own long-lived process; the coordinator dies by SIGKILL while Runner pid stays alive",
+      "recovery is a fresh coordinator that reaches the SAME living Runner pid, with recovered exit code asserted 0",
+      "receiver counters come from inside the Runner and show one begin receipt with no duplicated stop",
+      "post-recovery delivery records once into the still-open writer",
+      "an epoch-1 cancel is refused before it reaches the writer, whose cancel counter stays unchanged"
+    ],
+    "open": [
+      "the stop-ACK unknown window: the cancel returned without error and exited 0, yet the receiver served 0 cancels, so the window is NOT covered. Cause undetermined between harness and product; recorded as a FAIL rather than claimed",
+      "2/4-slot queues, output caps, backpressure and FD/child/queue return-to-baseline are not covered"
+    ],
+    "evidence": "tests/native-acceptance/b14-independent-runner.mjs (5 PASS + 1 FAIL + 1 NOT_TESTED)"
+  },
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "bConsumes": false, "touchedThisWave": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "limitations": [
+    "the writer is a fixture process; no installed vendor agent was executed",
+    "answer/stop/steer against a real vendor turn and unknown-send reconciliation remain NOT_TESTED",
+    "the stop-ACK window is open: the cancel never reached the receiver and the cause was not isolated",
+    "2/4-slot, output caps, backpressure and resource-return matrices are not covered"
+  ]
+}
