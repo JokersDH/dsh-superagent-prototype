@@ -1,0 +1,15 @@
+{
+  "protocol":"wave13-b-production-evidence/1",
+  "source":"9ec60270105e05b0a3c8d8264bec1f070fa43249",
+  "entry":"tests/native-acceptance/b13-durable-control.mjs",
+  "reported":{"passed":6,"notTested":1,"exitCode":0},
+  "independentlyObservedProductTableCounts":{"command_receipts":3,"runtime_bindings":1,"effect":0,"fact_receipts":0,"dispatch_receipts":0,"answers":0,"answer_deliveries":0,"user_questions":0,"ticket":0,"works":0,"runtime_current":0,"runtime_authority":0},
+  "writerStarts":1,
+  "writerCancels":1,
+  "writerStartedBy":"runner-service.fixture.mjs before coordinator product command",
+  "validEvidence":["real ProductStore SQLite","new coordinator subprocess SIGKILL/reopen","authenticated inspect/cancel"],
+  "notProven":["ProductApplication create_work","application.execute effect dispatch","Runner begin driven by product","QuestionBroker question","answer delivery","steer","multi-slot production recovery"],
+  "productionRecoveryAdmitted":false,
+  "realModelTurns":0,
+  "nativeTurnStarts":0
+}

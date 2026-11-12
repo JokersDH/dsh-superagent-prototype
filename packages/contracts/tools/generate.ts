@@ -23,6 +23,7 @@ import { ContextPreviewInputSchema, ContextPreviewSchema } from '../src/context-
 import { AssistantContextBindingSchema, AssistantContextPrepareSchema, AssistantContextPreparedSchema, AssistantContextSendSchema } from '../src/assistant-context.ts';
 import { AssistantInferenceRecordSchema, AssistantReplyBodySchema, AssistantReplyResultSchema, AssistantContextHistoryQuerySchema, AssistantContextHistoryPageSchema } from '../src/assistant-records.ts';
 import { RecoverySourceCheckpointQuerySchema, RecoverySourceCheckpointSchema } from '../src/recovery-source.ts';
+import { ContextHistoryQuerySchema, ContextHistoryEntrySchema, ContextHistorySchema, ContextSourcesSchema } from '../src/context-records.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -109,6 +110,7 @@ outputs.set('generated/assistant-context-commands.manifest.json', canonical({ pr
 for (const [name, protocol, source, schemas] of [
   ['assistant-records', 'assistant-records/1', 'assistant-records.ts', { AssistantInferenceRecord: AssistantInferenceRecordSchema, AssistantReplyBody: AssistantReplyBodySchema, AssistantReplyResult: AssistantReplyResultSchema, AssistantContextHistoryQuery: AssistantContextHistoryQuerySchema, AssistantContextHistoryPage: AssistantContextHistoryPageSchema }],
   ['recovery-source', 'recovery-source-checkpoint/1', 'recovery-source.ts', { RecoverySourceCheckpointQuery: RecoverySourceCheckpointQuerySchema, RecoverySourceCheckpoint: RecoverySourceCheckpointSchema }],
+  ['context-records', 'context-records/1', 'context-records.ts', { ContextHistoryQuery: ContextHistoryQuerySchema, ContextHistoryEntry: ContextHistoryEntrySchema, ContextHistory: ContextHistorySchema, ContextSources: ContextSourcesSchema }],
 ] as const) {
   const text = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: `urn:personal-agent:${name}:1`,
     $defs: Object.fromEntries(Object.entries(schemas).map(([key, schema]) => [key, z.toJSONSchema(schema, { target: 'draft-2020-12', io: 'input' })])) });

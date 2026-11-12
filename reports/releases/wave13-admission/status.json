@@ -1,0 +1,22 @@
+{
+  "protocol":"wave13-admission/1",
+  "date":"2026-11-12",
+  "productBaseline":"e1e0c97a6fba3fbf5124fa3eb24fddb8b302c105",
+  "sources":{"A":"d42a6e9b050be4f45df9cd69cc624b0f0a013d38","B":"9ec60270105e05b0a3c8d8264bec1f070fa43249","C":"667bf74a118597369e050ea3f17b932a4b0e5666","D":"0ac2b58d4d861f066172dada6427de284219bd1c","E":"90baa01b4b8aaf8b5834d2ba3228de6bfc950824"},
+  "priorNegativeClosures":{"A":4,"B":3,"C":8,"D":6},
+  "newNegativeCases":{"A":{"pass":1,"fail":3},"B":{"pass":0,"fail":5},"C":{"pass":0,"fail":6},"DMock":{"pass":0,"fail":6},"DLegacy":{"pass":0,"fail":1},"ERequiredCaseClassification":{"pass":0,"fail":3}},
+  "freshPackageTests":{"AStorage":87,"AWorkflows":94,"BOwned":68,"CFourPackages":269,"CCurrentMainCombination":9,"EReplyDurability":4},
+  "completionEstimate":{"stableAlphaRoundedPercent":70,"fullSchemeBRoundedPercent":50,"machineBasis":"progress.json","notReleaseApproval":true},
+  "noProductSourceIntegrationThisAudit":true,
+  "historicalReportPreservedAfterToolOutputFix":true,
+  "historicalContextReportSha256":"0b31f1a8f70b1e3f92c3df9bbdefa0711be0ae80c28915b72ea79047d55c4918",
+  "explicitLegacyProbeOutputControl":"PASS",
+  "dispatchIndependentStaticReview":"NO_MATERIAL_BLOCKER",
+  "allTenExistingApiHealthStatuses":200,
+  "oldUserEditsPreserved":true,
+  "realModelTurns":0,
+  "nativeTurnStarts":0,
+  "newModelAllowance":0,
+  "releaseApproved":false,
+  "preservedApiPorts":[8796,8797,8798,8799,8800,8801,8802,8803,8804,8805]
+}

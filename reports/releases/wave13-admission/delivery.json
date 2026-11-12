@@ -1,0 +1,106 @@
+{
+  "source": "0ac2b58d4d861f066172dada6427de284219bd1c",
+  "cases": [
+    {
+      "id": "RECORD_PID_REUSED_SAME_STATE",
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "proven": true,
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 2,
+      "pidReused": false,
+      "expected": "No signals; UNKNOWN start identity",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "JOURNAL_SPAWN_START_MISSING",
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "proven": true,
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 1,
+      "pidReused": false,
+      "expected": "No signals; UNKNOWN missing spawn identity",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "SPAWN_PID_REUSED_EMPTY_PROOF",
+      "signals": [],
+      "proven": true,
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 0,
+      "pidReused": true,
+      "expected": "proven=false",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "SCANNER_FAILURE_EMPTY_PROOF",
+      "signals": [],
+      "proven": true,
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 0,
+      "pidReused": false,
+      "expected": "proven=false; scanner UNKNOWN",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "RECOVER_WRONG_REQUESTED_INSTALL",
+      "result": {
+        "protocol": "personal-install-switch/1",
+        "status": "RECOVERED",
+        "started": {
+          "pid": 912346,
+          "apiURL": "http://127.0.0.1:65002",
+          "buildId": "1a2f34ac359a5739",
+          "mode": "fixture",
+          "access": "local-development"
+        }
+      },
+      "journal": "confirmed",
+      "expected": "BLOCKED requested_root_mismatch; journal unchanged",
+      "installRequested": "/tmp/pa-wave13-ownership-8J7QDW/scope/install",
+      "recordedInstall": "/tmp/pa-wave13-d-audit-M9VjvI/install/app",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "RECOVER_REUSED_API_RECORD",
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "result": "REVERTED",
+      "journal": "reverted_after_failed_start",
+      "expected": "No signals; BLOCKED unknown start identity",
+      "verdict": "FAIL"
+    }
+  ],
+  "passed": 0,
+  "failed": 6,
+  "actualOsScans": 0,
+  "actualOsSignals": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "pure mocked inventory and signals; own temporary roots; frozen input readonly"
+}

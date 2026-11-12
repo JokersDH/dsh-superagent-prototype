@@ -36,7 +36,13 @@
       "readOnly": true,
       "type": "array"
     },
+    "contextHistoryAvailable": {
+      "type": "boolean"
+    },
     "contextPreviewAvailable": {
+      "type": "boolean"
+    },
+    "contextSourcesAvailable": {
       "type": "boolean"
     },
     "decisionsAvailable": {
