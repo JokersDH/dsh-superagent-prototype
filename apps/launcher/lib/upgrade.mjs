@@ -610,13 +610,13 @@ export async function stopRegisteredResources({ roots, target, record, spawnedPi
   const deadline = Date.now() + 5000
   // A stat failure after SIGTERM is UNKNOWN, not `dead`: keep observing until the OS can confirm or the
   // watchdog expires, and never convert an unreadable post-signal status into a proven stop.
-  while (Date.now() < deadline && accounted.owned.some(({ pid }) => vitalityOf(pid) === 'alive')) await new Promise((r) => setTimeout(r, 100))
+  while (Date.now() < deadline && accounted.owned.some(({ pid }) => vitalityOf(pid) !== 'dead')) await new Promise((r) => setTimeout(r, 100))
   for (const { pid } of accounted.owned) {
     if (vitalityOf(pid) !== 'alive') continue
     try { process.kill(pid, 'SIGKILL') } catch { /* gone */ }
   }
   const killDeadline = Date.now() + 3000
-  while (Date.now() < killDeadline && accounted.owned.some(({ pid }) => vitalityOf(pid) === 'alive')) await new Promise((r) => setTimeout(r, 100))
+  while (Date.now() < killDeadline && accounted.owned.some(({ pid }) => vitalityOf(pid) !== 'dead')) await new Promise((r) => setTimeout(r, 100))
   const unknownAfterSignal = accounted.owned.filter(({ pid }) => vitalityOf(pid) === 'unknown').map(({ pid, command }) => ({ pid, command, reason: 'post_signal_status_unknown' }))
   const remaining = accounted.owned.filter(({ pid }) => vitalityOf(pid) !== 'dead').map(({ pid, command }) => ({ pid, command }))
   unverifiable.push(...unknownAfterSignal)
@@ -735,7 +735,15 @@ async function startTarget({ roots, target, seed, identity, fault, onSpawn, oper
   // The spawn identity is complete at birth: pid/start/uid/command/roots/operation. Recovery and the
   // barrier must not have to guess missing fields from a later record.
   const spawnedUid = await processUid(child.pid)
-  const spawnedCommand = await processCommand(child.pid)
+  // A wrapper script may exec the real interpreter just after spawn. Persist a stable command, not a
+  // transient shim image, so the later recovery compares against the same process identity.
+  let spawnedCommand = await processCommand(child.pid)
+  for (let attempt = 0; attempt < 20; attempt++) {
+    await new Promise((resolveWait) => setTimeout(resolveWait, 50))
+    const next = await processCommand(child.pid)
+    if (next !== '' && next === spawnedCommand) break
+    spawnedCommand = next
+  }
   if (typeof onSpawn === 'function') onSpawn({ pid: child.pid, startedAt: new Date().toISOString(), processStart: spawnedStart,
     uid: spawnedUid, command: spawnedCommand, configRoot: roots.config, dataRoot: roots.data, operationId })
 
@@ -752,6 +760,7 @@ async function startTarget({ roots, target, seed, identity, fault, onSpawn, oper
         reason,
         remaining: cleanup.remaining,
         unknownLive: cleanup.unknownLive ?? [],
+        unverifiable: cleanup.unverifiable ?? [],
         considered: cleanup.considered ?? null,
         ...detail,
       })
