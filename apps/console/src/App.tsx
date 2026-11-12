@@ -77,7 +77,7 @@ import { ProposalWorkspace } from './ProposalWorkspace.tsx'
 import { ContextWorkspace } from './ContextWorkspace.tsx'
 import { ContextSourceRecord } from './ContextSources.tsx'
 import { WorkEvidencePanel } from './WorkEvidencePanel.tsx'
-import { blockedLabel } from './configuration-labels.ts'
+import { blockedLabel, executionUnavailableLabel } from './configuration-labels.ts'
 import type { FixtureAdapter } from './fixture.ts'
 import { conversationId as defaultConversationId } from './config.ts'
 const phaseLabel: Record<WorkView['phase'], string> = {
@@ -645,6 +645,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const openQuestions = (snapshot?.questions ?? []).filter(question => !projectFilter ||
     snapshot?.works.some(work => work.work.id === question.contract.workId && work.work.projectId === projectFilter))
   const selectedQuestions = selectedWork ? openQuestions.filter(question => question.contract.workId === selectedWork.work.id) : openQuestions
+  const executionUnavailable = configuration?.executionAvailability?.state === 'unavailable' ? configuration.executionAvailability.reason : undefined
   const flushReviewActivity = useReviewActivity(transport, selectedWork?.actions.currentCandidate,
     !!configuration?.reviewActivityAvailable && inspectorOpen && !modelPanelOpen && !contextOpen && !!selectedWork?.actions.currentVerificationId)
   const activeWorks = works.filter(work => ['evaluating', 'queued', 'working', 'verifying', 'switching'].includes(work.phase))
@@ -1037,6 +1038,10 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           </aside>
 
           <section className="conversation" aria-label="主对话">
+            {executionUnavailable && <div className="execution-state" role="status" aria-label="开发执行状态">
+              <Bot size={18} aria-hidden="true" /><p><strong>{executionUnavailable === 'recovery_readonly' ? '恢复只读' : '开发执行未就绪'}</strong><span>{executionUnavailableLabel[executionUnavailable]}</span></p>
+              <button type="button" className="icon-button" title="查看执行器" aria-label="查看执行器" onClick={() => openView('executors')}><ArrowUpRight size={17} /></button>
+            </div>}
             {workspaceView === 'works' && <WorkDirectory works={works} loading={loading} configuration={configuration} onSelect={selectWork} onCreate={() => { openWorkDraft(); setWorkspaceOpen(true) }} />}
             <div className="attention-surface" hidden={workspaceView !== 'decisions'}><AttentionInbox transport={transport} configuration={configuration}
               active={workspaceView === 'decisions'} revision={snapshot?.cursor} onOpen={openAttention} onCount={setAttentionCount}
@@ -1061,6 +1066,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               streamReplies={streamReplies}
               activateWorkId={activateWorkId}
               canDelegate={configuration?.projects.some((project) => project.dispatchAllowed) === true}
+              executionBlocked={!!executionUnavailable}
               onDelegate={(text) => openWorkDraft(text)}
               selectedProjectName={projectName}
               selectedQuestionCount={selectedQuestions.length}
@@ -1830,8 +1836,10 @@ function NewWorkForm({
       )}
       {state === 'ready' && project && !project.dispatchAllowed && (
         <p className="warn-text" role="alert">
-          新委托已禁用：{blockedLabel(project.blockedReason)}
-          。查询、回答和停止仍可用。
+          {configuration?.executionAvailability?.state === 'unavailable'
+            ? `新委托已禁用：${executionUnavailableLabel[configuration.executionAvailability.reason]}。历史记录保留。`
+            : project.discussionOnly ? '当前工作区仅用于讨论。'
+            : `新委托已禁用：${blockedLabel(project.blockedReason)}。`}
         </p>
       )}
       <label>
@@ -2036,6 +2044,7 @@ function Conversation({
   streamReplies,
   activateWorkId,
   canDelegate,
+  executionBlocked,
   onDelegate,
   onSend,
   onLoadOlder,
@@ -2061,6 +2070,7 @@ function Conversation({
   streamReplies: readonly AssistantStreamUpdate[]
   activateWorkId: string | undefined
   canDelegate: boolean
+  executionBlocked: boolean
   onDelegate: (text: string) => void
   onSend: (text: string, useWorkContext: boolean) => Promise<boolean>
   onLoadOlder: (before: number) => Promise<void>
@@ -2070,11 +2080,11 @@ function Conversation({
   useEffect(() => { if (settledContextDraft) setDraft(current => current === settledContextDraft.text ? '' : current) }, [settledContextDraft])
   const [useWorkContext, setUseWorkContext] = useState(false)
   useEffect(() => {
-    if (activateWorkId && selectedWork?.work.id === activateWorkId) {
+    if (!executionBlocked && activateWorkId && selectedWork?.work.id === activateWorkId) {
       setUseWorkContext(true)
       setDraft('')
     } else setUseWorkContext(false)
-  }, [activateWorkId, selectedWork?.work.id])
+  }, [activateWorkId, selectedWork?.work.id, executionBlocked])
   const templateRef = useRef<HTMLDetailsElement | null>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const applyTemplate = (text: string) => {
@@ -2282,6 +2292,7 @@ function Conversation({
                 type="button"
                 className={useWorkContext ? 'context-mode active' : 'context-mode'}
                 aria-pressed={useWorkContext}
+                disabled={executionBlocked}
                 onClick={() => setUseWorkContext(true)}
               >
                 <Folder size={14} />
