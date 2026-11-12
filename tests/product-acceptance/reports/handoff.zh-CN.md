@@ -1,6 +1,6 @@
-# Agent E 第十四轮交付交接
+# Agent E 第十五轮交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `1453cf2`，检查点 `3e77025`，本次证据源 `ab73af5e7a77eb016c2543d0f8f3acbe02736da3`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `697efdc`，检查点 `53b1598`，本次证据源 `77d59c2ebf9ca3627ab985cc949eeec853e5efba`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
 
@@ -9,13 +9,13 @@
 | 真实命令 | 覆盖病例 | 结果 |
 | --- | --- | --- |
 | `node tests/product-acceptance/pilot/harness.mjs --preflight` | 冻结输入/价格/ledger | BLOCKED（adapter_missing）；runner selftest 66/17 |
-| `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | E1-* | PASS 84 |
+| `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | E1-* | PASS 89 |
 | `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | E2-* | PASS 25 + NOT_TESTED 3 |
 | `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 27 + NOT_TESTED 6 |
 | `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 17 + NOT_TESTED 5 |
-| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 178 | PASS 161 + FAIL 0 + SKIPPED 0 + NOT_TESTED 17 + BLOCKED 0 + UNKNOWN 0 |
+| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 183 | PASS 167 + FAIL 0 + SKIPPED 0 + NOT_TESTED 16 + BLOCKED 0 + UNKNOWN 0 |
 
-本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z`。
 
 ## 矩阵摘要
 
@@ -80,9 +80,9 @@
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 `controlled-product-workflow` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **FAIL（仅所测 tuple）**：cold personal、fixture 安装版 context、非空 context/reply 备份搬根、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=3ead6a26161f4c72/schema 18，main schema 18；current-main install=NOT_TESTED（仅此 required 项仍阻断）；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=false。 |
+| 安装准入（个人 Alpha） | **FAIL（仅所测 tuple）**：cold personal、fixture 安装版 context、非空 context/reply 备份搬根、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=a7df2b225a8c5c42/schema 18，main schema 18；current-main install=PASS (actual personal discussion-only + mock provider HTTP)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=true；D safety mocks=NOT_TESTED。 |
 
-安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `1a2f34ac359a5739` / schema 18 / tar `96d32fb5…` / source `020af824`；target buildId `3ead6a26161f4c72` / schema 18 / tar `b7e9dec7…` / source `99832f6c`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
+安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `3ead6a26161f4c72` / schema 18 / tar `b7e9dec7…` / source `99832f6c`；target buildId `a7df2b225a8c5c42` / schema 18 / tar `246fd80d…` / source `114b73c2`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
 ## 独立复核价值试点
 

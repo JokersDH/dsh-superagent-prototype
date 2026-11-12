@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-12T14:52:02.279Z",
+  "checkedAt": "2026-11-12T16:49:51.507Z",
   "source": {
-    "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
+    "commit": "77d59c2ebf9ca3627ab985cc949eeec853e5efba",
     "dirty": false
   },
-  "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
+  "expectedSource": "77d59c2ebf9ca3627ab985cc949eeec853e5efba",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -736,9 +736,14 @@
       "status": "PASS"
     },
     {
-      "id": "E6-CURRENT-MAIN-INSTALL",
+      "id": "E5-D-OWNERSHIP-MOCKS",
       "required": true,
       "status": "NOT_TESTED"
+    },
+    {
+      "id": "E6-CURRENT-MAIN-INSTALL",
+      "required": true,
+      "status": "PASS"
     },
     {
       "id": "E4-UPGRADE-ROLLBACK",
@@ -769,8 +774,8 @@
   "failures": [
     {
       "code": "case_not_pass",
-      "detail": "Required case E6-CURRENT-MAIN-INSTALL is NOT_TESTED",
-      "caseId": "E6-CURRENT-MAIN-INSTALL"
+      "detail": "Required case E5-D-OWNERSHIP-MOCKS is NOT_TESTED",
+      "caseId": "E5-D-OWNERSHIP-MOCKS"
     },
     {
       "code": "missing_required_case",
@@ -801,7 +806,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-12T14:51:39.570Z",
+    "decidedAt": "2026-11-12T16:47:52.701Z",
     "failureCodes": []
   },
   "notes": [

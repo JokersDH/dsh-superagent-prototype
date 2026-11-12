@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "1453cf2",
-  "checkpoint": "3e77025",
-  "head": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
+  "base": "697efdc",
+  "checkpoint": "53b1598",
+  "head": "77d59c2ebf9ca3627ab985cc949eeec853e5efba",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-12T14:51:39.555Z",
+  "checkedAt": "2026-11-12T16:47:52.680Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -27,7 +27,7 @@
       ],
       "result": "PASS",
       "counts": {
-        "PASS": 84
+        "PASS": 89
       },
       "cases": [
         {
@@ -317,6 +317,31 @@
         },
         {
           "id": "E1-MUTATE-REQUIRED-WRONG-RUN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CURRENT-BLOCKED-AS-PASS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CURRENT-FIXTURE-MODE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-OWNERSHIP-COPY-NO-EXIT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FAULT-STEP-NAMES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-ABI-PLATFORM",
           "status": "PASS",
           "reason": null
         },
@@ -940,8 +965,8 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "NOT_TESTED": 2,
-        "PASS": 2
+        "NOT_TESTED": 1,
+        "PASS": 3
       },
       "cases": [
         {
@@ -961,8 +986,8 @@
         },
         {
           "id": "E6-CURRENT-MAIN-INSTALL",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: actual probe extracted 3ead6a26161f4c72, first-run=OK, personal start=BLOCKED/none, instanceMode=null; capabilities context=true, history=true, sources=true, replyResults=true, discussionReadiness=false. This tuple is not the current-main M1 package; it was executed, not relabeled. Required: freeze a D tar containing the e1e0c97/d9d347e/b2b1adb product paths, then run the same personal probe plus context/history/source/reply."
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -1055,12 +1080,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-12T14:51:39.570Z",
+    "checkedAt": "2026-11-12T16:47:52.701Z",
     "source": {
-      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
+      "commit": "77d59c2ebf9ca3627ab985cc949eeec853e5efba",
       "dirty": false
     },
-    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
+    "expectedSource": "77d59c2ebf9ca3627ab985cc949eeec853e5efba",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1725,36 +1750,36 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T16-42-13-974Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
     "wave09Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave09-status.json",
-    "wave14Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave14-status.json",
+    "wave15Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave15-status.json",
     "wave08Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave08-status.json",
     "wave07Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave07-status.json",
     "wave06Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave06-status.json",
@@ -1991,11 +2016,6 @@
     }
   ],
   "externalBlockers": [
-    {
-      "owner": "D",
-      "code": "current_tar_incomplete",
-      "detail": "NOT_TESTED: actual probe extracted 3ead6a26161f4c72, first-run=OK, personal start=BLOCKED/none, instanceMode=null; capabilities context=true, history=true, sources=true, replyResults=true, discussionReadiness=false. This tuple is not the current-main M1 package; it was executed, not relabeled. Required: freeze a D tar containing the e1e0c97/d9d347e/b2b1adb product paths, then run the same personal probe plus context/history/source/reply."
-    },
     {
       "owner": "B",
       "code": "production_control_not_consumed",
