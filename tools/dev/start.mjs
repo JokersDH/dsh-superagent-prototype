@@ -7,6 +7,7 @@ const root = fileURLToPath(new URL('../../', import.meta.url))
 const args = process.argv.slice(2)
 const { values } = parseArgs({ args, options: {
   stop: { type: 'boolean' }, restart: { type: 'boolean' }, open: { type: 'boolean' }, fixture: { type: 'boolean' },
+  'discussion-only': { type: 'boolean' },
   'require-login': { type: 'boolean' }, state: { type: 'string' }, port: { type: 'string' }, 'api-port': { type: 'string' },
 } })
 const selectedState = instanceState(root, values.state)
@@ -39,6 +40,7 @@ async function stopExisting() {
   throw new Error('Workbench is still shutting down')
 }
 async function start() {
+  if (values.fixture && values['discussion-only']) throw new Error('Discussion-only personal mode cannot use fixture execution')
   if (args.includes('--stop') || args.includes('--restart')) {
     await stopExisting()
     if (args.includes('--stop')) {
@@ -57,6 +59,11 @@ async function start() {
       if ((values['require-login'] ? instance.health.access === undefined : instance.health.access === 'local-development') &&
           (!values.port || new URL(instance.record.consoleURL).port === values.port) &&
           (!values['api-port'] || new URL(instance.record.apiURL).port === values['api-port'])) {
+        if (values['discussion-only'] && instance.configuration.executionAvailability?.state !== 'unavailable') {
+          console.error('该实例仍启用开发执行。仅对话模式请使用独立的状态目录和端口。')
+          process.exitCode = 1
+          return
+        }
         console.log(`Workbench: ${instance.record.consoleURL}`)
         if (args.includes('--open') && process.platform === 'darwin')
           spawn('open', [instance.record.consoleURL], { stdio: 'ignore' }).unref()

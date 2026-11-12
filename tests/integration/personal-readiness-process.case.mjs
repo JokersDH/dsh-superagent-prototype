@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
+import { execFile, execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
+import { promisify } from 'node:util'
 import { ProductStore } from '../../packages/storage/dist/index.js'
 import { createProductApplication } from '../../packages/application/dist/index.js'
 import { DISCUSSION_PROJECT } from '../../apps/coordinator/product/native-startup.ts'
@@ -43,6 +44,21 @@ test('the actual workbench manager serves personal HTTP UI with no admitted proj
   assert.equal(config.projects.some(project => project.dispatchAllowed), false)
   assert.equal(record.mode, 'personal'); assert.equal(record.executionAvailability.state, 'unavailable')
   assert.equal(existsSync(h.launchLog), false); assert.equal(h.modelRequests.length, 0)
+})
+
+test('the ordinary start wrapper supports discussion-only and reuses the authenticated unavailable instance', { timeout: 30000 }, async t => {
+  const h = await personalCase({ mode: 'operator', workbench: true, wrapper: true }); t.after(() => h.close())
+  await h.start()
+  const before = readFileSync(join(h.state, 'workbench.json'), 'utf8')
+  const reused = await promisify(execFile)(process.execPath, ['tools/dev/start.mjs', '--discussion-only', '--state', h.state,
+    '--port', String(h.consolePort), '--api-port', String(h.apiPort)], { timeout: 8000, encoding: 'utf8' })
+  assert.match(reused.stdout, new RegExp(h.consoleURL.replaceAll('.', '\\.')))
+  assert.equal(readFileSync(join(h.state, 'workbench.json'), 'utf8'), before)
+  assert.deepEqual((await h.json('/v1/configuration')).value.executionAvailability, { state: 'unavailable', reason: 'operator_disabled' })
+  assert.equal(h.modelRequests.length, 0); assert.equal(existsSync(h.launchLog), false)
+  const absent = join(h.root, 'must-not-create')
+  await assert.rejects(promisify(execFile)(process.execPath, ['tools/dev/start.mjs', '--fixture', '--discussion-only', '--state', absent], { timeout: 3000 }), /cannot use fixture execution/)
+  assert.equal(existsSync(absent), false)
 })
 
 test('restore marker remains readonly and cannot activate model or old business queues', async t => {

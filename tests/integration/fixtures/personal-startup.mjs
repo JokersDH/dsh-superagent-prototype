@@ -14,7 +14,7 @@ export async function waitUntil(read, limit = 15000) {
   while (Date.now() < deadline) { const value = await read(); if (value) return value; await new Promise(resolve => setTimeout(resolve, 30)) }
   throw new Error('Personal startup condition timed out')
 }
-export async function personalCase({ mode = 'missing', workbench = false, noSystemPath = false, assistant = true } = {}) {
+export async function personalCase({ mode = 'missing', workbench = false, wrapper = false, noSystemPath = false, assistant = true, replyGate } = {}) {
   const root = mkdtempSync('/tmp/pa-personal-startup-'), state = join(root, 'state'), bin = join(root, 'private bin'), modelDir = join(root, 'model')
   for (const dir of [state, bin, modelDir]) mkdirSync(dir, { mode: 0o700 })
   const modelRequests = [], versionLog = join(root, 'version.log'), launchLog = join(root, 'native-launch.log'), whichLog = join(root, 'which.log')
@@ -25,7 +25,9 @@ export async function personalCase({ mode = 'missing', workbench = false, noSyst
     let text = ''; for await (const bytes of req) text += bytes
     modelRequests.push(JSON.parse(text))
     res.writeHead(200, { 'content-type': 'text/event-stream' })
-    res.end(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { content: '可以继续讨论需求。' }, finish_reason: null }] })}\n\ndata: ${JSON.stringify({ choices: [{ index: 0, delta: {}, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`)
+    res.write(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { content: '可以继续' }, finish_reason: null }] })}\n\n`)
+    if (modelRequests.length === 1 && replyGate) await replyGate
+    res.end(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { content: '讨论需求。' }, finish_reason: null }] })}\n\ndata: ${JSON.stringify({ choices: [{ index: 0, delta: {}, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`)
   })
   mock.listen(0, '127.0.0.1'); await once(mock, 'listening')
   const config = join(modelDir, 'model.json')
@@ -41,7 +43,7 @@ export async function personalCase({ mode = 'missing', workbench = false, noSyst
   }
   const start = async (extra = []) => {
     const args = workbench
-      ? ['tools/dev/workbench.mjs', '--port', String(consolePort), '--api-port', String(apiPort), '--state', state, ...(mode === 'operator' ? ['--discussion-only'] : []), ...extra]
+      ? [wrapper ? 'tools/dev/start.mjs' : 'tools/dev/workbench.mjs', '--port', String(consolePort), '--api-port', String(apiPort), '--state', state, ...(mode === 'operator' ? ['--discussion-only'] : []), ...extra]
       : ['apps/coordinator/product/demo.ts', '--port', String(apiPort), '--state', state, ...(mode === 'operator' ? ['--discussion-only'] : ['--native']),
         ...(assistant ? ['--assistant'] : []), ...extra]
     child = spawn(process.execPath, args, { cwd: resolve('.'), env: { ...process.env, PA_MODEL_CONFIG: config,
