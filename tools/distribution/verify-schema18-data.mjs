@@ -8,7 +8,7 @@
  */
 import { createServer } from 'node:net'
 import { spawn, spawnSync } from 'node:child_process'
-import { chmodSync, closeSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, closeSync, copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
@@ -109,7 +109,14 @@ try {
   if (reply === undefined) throw new Error(`no completed reply result was persisted for ${requestId}`)
   if (reply.textDigest.length !== 64 || reply.artifactDigest.length !== 64) throw new Error('reply result digests are not bare hex')
   if (!history.records.some((record) => record.messageId === messageId)) throw new Error('the sent message has no context binding in A history')
-  const replySnapshot = { requestId: reply.requestId, replyMessageId: reply.replyMessageId, sourceMessageId: reply.sourceMessageId, textDigest: reply.textDigest, artifactDigest: reply.artifactDigest, model: reply.model }
+  // Consume main's current history and frozen-source readers through the public product read port,
+  // not by reading A tables directly.
+  const historyRead = await product.read.contextHistory({ projectId })
+  const historyEntries = historyRead.entries ?? historyRead.records ?? []
+  if (!historyEntries.some((entry) => (entry.messageId ?? entry.record?.messageId) === messageId)) throw new Error('main context history did not expose the sent message')
+  const sourcesRead = await product.read.contextSources(messageId)
+  if (sourcesRead === undefined || sourcesRead === null) throw new Error('main frozen-source reader returned no audit for the sent message')
+  const replySnapshot = { requestId, replyMessageId: reply.replyMessageId, sourceMessageId: reply.sourceMessageId, textDigest: reply.textDigest, artifactDigest: reply.artifactDigest, model: reply.model }
   await product.close(); store.close()
 
   // Reopen through the public Store: the result is durable, not an in-memory fallback.
@@ -120,7 +127,7 @@ try {
   const families = Object.fromEntries(evidenceSummary.families.map((family) => [family.name, family.count]))
   if ((families.assistant_context_bindings ?? 0) < 1) throw new Error('the context binding family is empty in A backup evidence')
   if ((families.assistant_reply_results ?? 0) < 1) throw new Error('the reply result family is empty in A backup evidence')
-  step('nonempty-product-data', 'PASS', { requestId, messageId, replyMessageId: replySnapshot.replyMessageId, families: { assistant_context_bindings: families.assistant_context_bindings, assistant_reply_results: families.assistant_reply_results }, replyDurableAfterReopen: true })
+  step('nonempty-product-data', 'PASS', { requestId, messageId, replyMessageId: replySnapshot.replyMessageId, historyEntries: historyEntries.length, sources: Array.isArray(sourcesRead?.sources) ? sourcesRead.sources.length : 'present', families: { assistant_context_bindings: families.assistant_context_bindings, assistant_reply_results: families.assistant_reply_results }, replyDurableAfterReopen: true })
 
   // A public snapshot backup, new-root restore copy, then A readers on the restored file.
   const snapshot = join(root, 'backup', 'state.sqlite')
@@ -130,6 +137,9 @@ try {
   if (backup.integrity !== 'ok' || backup.productSchema !== currentSchema) throw new Error(`A snapshot did not verify: ${JSON.stringify(backup)}`)
   const restoredRoot = join(root, 'restored18'); mkdirSync(restoredRoot, { recursive: true, mode: 0o700 })
   copyFileSync(snapshot, join(restoredRoot, 'state.sqlite'))
+  // A product restore keeps the private artifact bytes beside the state DB; a DB-only copy would make
+  // frozen-source audits unavailable. Only the same private roots are copied, never queues/credentials.
+  if (existsSync(join(roots.data, 'artifacts'))) cpSync(join(roots.data, 'artifacts'), join(restoredRoot, 'artifacts'), { recursive: true })
   const restoredStore = new storage.ProductStore({ path: join(restoredRoot, 'state.sqlite') })
   const restoredReply = restoredStore.workflows.assistant.replyResults.forRequest(requestId)
   const restoredHistory = restoredStore.workflows.assistant.contextHistory.page({ projectIds: [projectId] })
@@ -138,8 +148,18 @@ try {
     throw new Error('the restored snapshot lost or changed the completed reply')
   if (!restoredHistory.records.some((record) => record.messageId === messageId)) throw new Error('the restored snapshot lost the context binding')
   if (restoredEvidence.digest !== evidenceSummary.digest) throw new Error('the restored A evidence digest differs from the source')
+  // The restored bytes must feed the same main read ports (history + frozen sources), proving the
+  // snapshot keeps current product data rather than only raw tables.
+  const restoredProduct = runtimeModule.createProductRuntime({ store: restoredStore, principal, stateRoot: restoredRoot, scratchProject: projectRoot,
+    projects: [{ id: projectId, displayName: 'Wave 12 project', scope }], actionSecret: Buffer.alloc(32, 12), assistantProvider: provider, now: () => now })
+  const restoredHistoryRead = await restoredProduct.read.contextHistory({ projectId })
+  const restoredEntries = restoredHistoryRead.entries ?? restoredHistoryRead.records ?? []
+  if (!restoredEntries.some((entry) => (entry.messageId ?? entry.record?.messageId) === messageId)) throw new Error('main context history lost the binding after restore')
+  const restoredSources = await restoredProduct.read.contextSources(messageId)
+  if (restoredSources === undefined || restoredSources === null) throw new Error('main frozen-source reader lost the audit after restore')
+  await restoredProduct.close()
   restoredStore.close()
-  step('snapshot-new-root-restore', 'PASS', { backupBytes: backup.bytes, restoredReply: true, restoredBinding: true, evidenceDigest: restoredEvidence.digest, startupAvailable: false, noInstanceRecord: !existsSync(join(restoredRoot, 'instance.json')) })
+  step('snapshot-new-root-restore', 'PASS', { backupBytes: backup.bytes, restoredReply: true, restoredBinding: true, restoredHistory: restoredEntries.length, restoredSources: Array.isArray(restoredSources?.sources) ? restoredSources.sources.length : 'present', evidenceDigest: restoredEvidence.digest, startupAvailable: false, noInstanceRecord: !existsSync(join(restoredRoot, 'instance.json')) })
 
   // Future schema (A public applyMigrations fixture) is refused by the current binary.
   const futurePath = join(root, 'future18', 'state.sqlite'); mkdirSync(join(root, 'future18'), { recursive: true, mode: 0o700 })
