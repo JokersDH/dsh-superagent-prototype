@@ -138,7 +138,7 @@ try {
     await article.locator('.message-context-audit > summary').click()
     await article.locator('.message-context-audit li').first().waitFor()
     const user = users().find(message => message.text === '请结合当前工作说明兼容性要求。')
-    const binding = bindingFixture.forMessage(user.id)
+    const binding = store.workflows.assistant.contextBindings.forMessage(user.id)
     assert.equal(await article.locator('.message-context-audit li').count(), binding.sources.length)
     assert.ok((await article.locator('.message-context-audit').textContent()).includes(binding.sources[0].previewDigest))
   })
