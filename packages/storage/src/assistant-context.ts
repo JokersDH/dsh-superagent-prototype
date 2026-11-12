@@ -30,7 +30,8 @@ export function contextBindingFromRow(row: Record<string, unknown>): AssistantCo
     String(row.principal_authority_ref) !== binding.principal.authorityRef ||
     String(row.bundle_ref) !== binding.bundleRef || String(row.bundle_digest) !== binding.bundleDigest ||
     String(row.confirmed_at) !== binding.confirmedAt || String(row.expires_at) !== binding.expiresAt ||
-    String(row.digest) !== digest(binding)
+    String(row.digest) !== digest(binding) ||
+    (row.work_id === undefined ? null : row.work_id) !== (binding.contract?.workId ?? null)
   ) throw new WorkflowConflict(`Context binding ${String(row.message_id)} row is inconsistent with its payload`)
   return binding
 }

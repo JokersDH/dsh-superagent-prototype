@@ -106,7 +106,7 @@ try {
   })
   await check('DESKTOP-AND-MOBILE-CONFIRMATION-AND-SOURCE-DETAIL-FIT', async () => {
     const source = dialog.locator('.context-source').first()
-    await source.locator('summary').click()
+    await source.locator(':scope > summary').click()
     for (const [name, width, height] of [['desktop', 1440, 900], ['mobile', 390, 844]]) {
       await page.setViewportSize({ width, height }); await page.evaluate(() => document.fonts.ready)
       await dialog.evaluate(element => { element.scrollTop = 0 })
@@ -136,10 +136,10 @@ try {
   await check('MESSAGE-AUDIT-COMES-FROM-THE-ACTUAL-BINDING', async () => {
     const article = page.locator('.message.role-user').filter({ hasText: '请结合当前工作说明兼容性要求。' })
     await article.locator('.message-context-audit > summary').click()
-    await article.locator('.message-context-audit li').first().waitFor()
+    await article.getByRole('region', { name: '原始上下文内容' }).waitFor()
     const user = users().find(message => message.text === '请结合当前工作说明兼容性要求。')
     const binding = store.workflows.assistant.contextBindings.forMessage(user.id)
-    assert.equal(await article.locator('.message-context-audit li').count(), binding.sources.length)
+    assert.equal(await article.locator('.context-frozen-sources > .context-source-list > .context-source').count(), binding.sources.length)
     assert.ok((await article.locator('.message-context-audit').textContent()).includes(binding.sources[0].previewDigest))
   })
   await check('EDITED-MODAL-MESSAGE-DOES-NOT-CLEAR-A-DIFFERENT-COMPOSER-DRAFT', async () => {

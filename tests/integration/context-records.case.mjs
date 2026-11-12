@@ -22,7 +22,7 @@ async function fixture(t) {
     model: 'fixture', models: ['fixture'], state: 'configured', secureTransport: true })
   const provider = { status, selectModel: status, reply: async () => { calls++; throw new Error('Read-only tests must not start the provider') } }
   const setup = () => { runtime = createProductRuntime({ store, stateRoot, scratchProject: project, principal, projects,
-    actionSecret: Buffer.alloc(32, 37), assistantProvider: provider, contextHistory: store.workflows.assistant.contextHistory, now: () => now }) }
+    actionSecret: Buffer.alloc(32, 37), assistantProvider: provider, now: () => now }) }
   setup()
   store.product.messages.append({ id: 'records-source', conversationId: 'records-conversation', projectId: scope.projectId,
     role: 'user', provenance: 'trusted_user', text: 'SOURCE: Preserve the existing error codes.', sourceRefs: [], createdAt: at })

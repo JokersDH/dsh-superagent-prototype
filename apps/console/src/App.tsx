@@ -75,6 +75,7 @@ import { AttentionInbox } from './AttentionInbox.tsx'
 import { DecisionWorkspace } from './DecisionWorkspace.tsx'
 import { ProposalWorkspace } from './ProposalWorkspace.tsx'
 import { ContextWorkspace } from './ContextWorkspace.tsx'
+import { ContextSourceRecord } from './ContextSources.tsx'
 import { WorkEvidencePanel } from './WorkEvidencePanel.tsx'
 import { blockedLabel } from './configuration-labels.ts'
 import type { FixtureAdapter } from './fixture.ts'
@@ -759,7 +760,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           </a>
           {configuration?.decisionsAvailable && transport.decisions && transport.prepareDecision && transport.decisionCommand && <button type="button" className="icon-button" title="项目决定" aria-label="项目决定" onClick={() => setDecisionSource(null)}><Bookmark size={18} /></button>}
           {configuration?.proposalsAvailable && transport.prepareProposal && transport.proposalCommand && <button type="button" className="icon-button" title="创建提案" aria-label="创建提案" onClick={() => setProposalSource(null)}><FileCheck2 size={18} /></button>}
-          {configuration?.contextPreviewAvailable && transport.contextPreview && <button type="button" className="icon-button" title="上下文预览" aria-label="上下文预览" onClick={() => setContextOpen(true)}><Layers3 size={18} /></button>}
+          {((configuration?.contextPreviewAvailable && transport.contextPreview) || (configuration?.contextHistoryAvailable && transport.contextHistory)) && <button type="button" className="icon-button" title="上下文预览" aria-label="上下文预览" onClick={() => setContextOpen(true)}><Layers3 size={18} /></button>}
           <button
             type="button"
             className="icon-button secondary-tool"
@@ -1049,7 +1050,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               initialDraft={conversationDrafts.current.get(conversationId) ?? ''}
               onDraftChange={text => conversationDrafts.current.set(conversationId, text)}
               settledContextDraft={settledContextDraft?.conversationId === conversationId ? settledContextDraft : undefined}
-              contextTransport={configuration?.assistantContextAvailable ? transport : undefined}
+              contextTransport={configuration?.contextSourcesAvailable || configuration?.assistantContextAvailable ? transport : undefined}
               snapshot={snapshot}
               projectFilter={projectFilter}
               selectedWork={selectedWork}
@@ -1235,7 +1236,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
           {(workspaceOpen || inspectorOpen || modelPanelOpen) && <button type="button" className="drawer-backdrop" aria-label="关闭侧栏" onClick={() => { setWorkspaceOpen(false); setInspectorOpen(false); setModelPanelOpen(false) }} />}
         </main>
       )}
-      {auth === 'ready' && contextOpen && configuration?.contextPreviewAvailable && configuration.projects.length > 0 &&
+      {auth === 'ready' && contextOpen && configuration && (configuration.contextPreviewAvailable || configuration.contextHistoryAvailable) && configuration.projects.length > 0 &&
         <ContextWorkspace key={conversationId} transport={transport} configuration={configuration} conversationId={conversationId}
           works={snapshot?.works ?? []} initialProjectId={selectedWork?.work.projectId ?? projectFilter ?? configuration.projects[0]!.id}
           initialDraft={conversationDrafts.current.get(conversationId) ?? ''}
@@ -1249,6 +1250,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             if (assistant?.configured) setWaitingAfter(snapshot?.conversation?.messages.at(-1)?.sequence ?? 0)
             await refresh()
           }}
+          onOpenConversation={(id, projectId) => { setContextOpen(false); setProjectFilter(projectId); selectConversation(id, '历史会话') }}
           onClose={() => setContextOpen(false)} />}
       {auth === 'ready' && decisionSource !== undefined && configuration && configuration.projects.length > 0 &&
         <DecisionWorkspace transport={transport} configuration={configuration} source={decisionSource ?? undefined}
@@ -2333,8 +2335,6 @@ function MessageContextAudit({ message, transport }: { message: ConversationMess
     } catch { if (request === sequence.current) setFailed(true) }
     finally { if (request === sequence.current) setLoading(false) }
   }
-  const labels = { work: '工作', contract: '当前合同', verification: '验证', delivery: '接受记录', decision: '项目决定',
-    project_metadata: '项目信息', conversation_message: '会话消息', artifact: '交付元数据' }
   return <details className="message-context-audit" onToggle={event => {
     if (event.currentTarget.open && !loaded && !loading && !failed) void load()
   }}><summary><Layers3 size={13} />上下文来源{binding ? ` · ${binding.sources.length}` : ''}</summary>
@@ -2342,7 +2342,7 @@ function MessageContextAudit({ message, transport }: { message: ConversationMess
     {failed && <p role="alert">来源记录暂时无法核对。<button type="button" className="icon-button" title="重新读取来源" aria-label="重新读取来源" onClick={() => void load()}><RefreshCw size={13} /></button></p>}
     {loaded && !binding && <p>本条消息未附加上下文</p>}
     {binding && <><p>记录于 {new Date(binding.confirmedAt).toLocaleString('zh-CN')}{binding.contract ? ` · 合同版本 ${binding.contract.revision}` : ''}</p>
-      <ul>{binding.sources.map(source => <li key={source.sourceId}><span>{labels[source.kind]}{source.truncated ? ' · 已截断' : ''}</span><code>{source.previewDigest}</code></li>)}</ul></>}
+      <ContextSourceRecord transport={transport} messageId={message.id} projectId={binding.projectId} conversationId={binding.conversationId} binding={binding} /></>}
   </details>
 }
 

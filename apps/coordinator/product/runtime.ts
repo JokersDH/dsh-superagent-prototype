@@ -402,7 +402,7 @@ export function createProductRuntime(
     (store.workflows.assistant as typeof store.workflows.assistant & { contextBindings?: AssistantContextBindings }).contextBindings
   if (contextBindings) contextRecords = new ProductContextRecords({
     store, bindings: contextBindings, principal: options.principal, projects: () => configuredProjects,
-    secret: options.actionSecret, ...(options.contextHistory ? { history: options.contextHistory } : {}),
+    secret: options.actionSecret, history: options.contextHistory ?? store.workflows.assistant.contextHistory,
     ...(options.now ? { now: options.now } : {}),
   })
   if (contextBindings) assistantContext = new ProductAssistantContext({
