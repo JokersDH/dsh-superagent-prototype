@@ -9,6 +9,8 @@
     "mergedOriginMain": "14688f2",
     "mergeCommit": "efb2812",
     "previousOwnCommit": "553983b",
+    "firstCheckpoint": "707ff0d",
+    "secondCheckpoint": "42fe471",
     "rootLockDiffPreserved": true
   },
   "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
@@ -19,58 +21,51 @@
       "failed": 0,
       "evidence": "packages/context/reports/wave12-probe.json"
     },
-    "wave11Regression": {
-      "command": "node tools/bootstrap/probe-wave11-context.mjs \"$PWD\"",
-      "passed": 17,
-      "failed": 0
-    }
+    "wave11Regression": { "passed": 17, "failed": 0 }
   },
   "closedCounterexamples": [
-    {
-      "id": "MANIFEST_DIGEST_SCOPE_MUST_CHANGE",
-      "fix": "compareSourceManifests reports digest_scope when the two sides hash different amounts; prefix/metadata equality marks digest_unverifiable instead of unchanged"
-    },
-    {
-      "id": "SOURCE_REVIEW_MAX_ITEMS",
-      "fix": "projectSourceReview never emits more than maxItems items; past the cap only bounded suppressed counts remain"
-    },
-    {
-      "id": "SOURCE_REVIEW_REDACTS_OMISSION_PATH",
-      "fix": "omission entries use the same project-relative rule as items; host/absolute paths are dropped and counted"
-    },
-    {
-      "id": "RELEVANCE_REQUIRES_ROLE_AND_PROVENANCE",
-      "fix": "a conversation candidate without role/provenance is refused by default (untrusted_role)"
-    },
-    {
-      "id": "RELEVANCE_PRESERVES_INCOMPLETE_COVERAGE",
-      "fix": "candidate batches carry upstream coverage and the selector keeps complete=false; work listings propagate hasMore"
-    },
-    {
-      "id": "REPLY_BODY_BINDS_CONVERSATION",
-      "fix": "the whole AssistantReplyBody envelope must match the trusted project/conversation/source before any suggestion"
-    },
-    {
-      "id": "REPLY_REVISION_BODY_BINDS_PROJECT",
-      "fix": "same envelope check; per-item current-contract and scope checks remain item-level rejections"
-    },
-    {
-      "id": "HISTORY_RECHECKS_WORK_QUERY",
-      "fix": "collectContextHistory rechecks query.workId against the binding contract, and an internally inconsistent binding is omitted"
-    }
+    { "id": "MANIFEST_DIGEST_SCOPE_MUST_CHANGE", "fix": "digestScope participates in comparison; prefix/metadata cannot prove whole equality (digest_unverifiable)" },
+    { "id": "SOURCE_REVIEW_MAX_ITEMS", "fix": "review never exceeds maxItems; past the cap only bounded suppressed counts remain" },
+    { "id": "SOURCE_REVIEW_REDACTS_OMISSION_PATH", "fix": "item and omission paths share the project-relative redaction rule" },
+    { "id": "RELEVANCE_REQUIRES_ROLE_AND_PROVENANCE", "fix": "missing role/provenance is refused by default" },
+    { "id": "RELEVANCE_PRESERVES_INCOMPLETE_COVERAGE", "fix": "candidate batches carry upstream coverage; work listing hasMore propagates" },
+    { "id": "REPLY_BODY_BINDS_CONVERSATION", "fix": "whole-body envelope is checked before suggestions" },
+    { "id": "REPLY_REVISION_BODY_BINDS_PROJECT", "fix": "same envelope rule; per-item contract/scope remain item rejections" },
+    { "id": "HISTORY_RECHECKS_WORK_QUERY", "fix": "query.workId rechecked against the binding contract; inconsistent bindings omitted" }
   ],
-  "stages": {
-    "C1": "done: eight actual-export counterexamples closed",
-    "C2": "in progress: relevance refuses missing provenance; decision/contract require a proven current Scope",
-    "C3": "in progress: upstream coverage and bounded output budgets kept separate",
-    "C4": "in progress: review/manifest integrity (bounds, omission redaction, unknown scope)",
-    "C5": "pending: real A18 contextHistory/replyResults consumer without Map fallback",
-    "C6": "pending: whole-body candidate envelope + per-item validation regression",
-    "C7": "pending: main replaceable-adapter recipe and current main consumer",
-    "C8": "pending: deterministic quality baseline",
-    "C9": "pending: 5000-source/deep-page/invalidations scale pack",
-    "C10": "pending: full regression, status and handoff"
+  "stageOutcomes": {
+    "C1": "done: 8/8 new probe, 17/17 wave-11 regression",
+    "C2": "done: relevance defaults to refusing missing provenance; decision/contract require a proven current Scope (unproven/escalation omitted before scoring)",
+    "C3": "done: upstream coverage (batch, hasMore) and output budgets (items/bytes/tokens) bounded separately; merged batches keep coverage",
+    "C4": "done: manifest digestScope/budget/baseline/omission comparison, digest_unverifiable; review bounded items/suppressed counts and omission redaction",
+    "C5": "done: real A18 contextBindings/contextHistory/replyResults consumed in the main HTTP consumer, no Map fallback; mismatched replies counted; verified across SQLite reopen",
+    "C6": "done: whole body envelope first, then per-item schema/binding/scope; needs_user_input preserved; nothing executes",
+    "C7": "done: replaceable-adapter recipe with cutoff/published IDs/Scope screening/coverage; consumer drives real main prepare/send/audit. SSE NOT_TESTED (not read)",
+    "C8": "done: deterministic mixed CN/EN baseline (3 targets, 0 contamination, duplicate collapsed) plus long-conversation dataset",
+    "C9": "done: 5000-message same-timestamp paging, deep pagination, mid-walk append cutoff, expired/superseded decisions, duplicate candidates, empty/missing/byte-change distinctions",
+    "C10": "done: four-package typecheck/build/test, both probes, status and recipe"
   },
+  "consumerMap": [
+    { "export": "createScopedConversationProvider / createPublishedArtifactProvider", "consumedBy": "packages/knowledge/test/main-context-http.case.ts (audit path) and C recipe; main replacement pending" },
+    { "export": "projectSourceReview", "consumedBy": "wave-12 probe + scale/review tests; no main UI yet" },
+    { "export": "selectRelevantSources + candidate batches", "consumedBy": "wave-12 probe, relevance.case.ts, scale.case.ts; main composition pending" },
+    { "export": "collectContextHistory", "consumedBy": "packages/knowledge/test/main-context-use-consumer.case.ts on real A18 SQLite; history UI pending" },
+    { "export": "reviewReplyCandidates", "consumedBy": "wave-12 probe + proposals tests; main ProductProposals integration pending" }
+  ],
+  "ownedRegressions": {
+    "contextTests": { "passed": 112, "failed": 0 },
+    "proposalsTests": { "passed": 33, "failed": 0 },
+    "knowledgeTests": { "passed": 80, "failed": 0 },
+    "routingTests": { "passed": 44, "failed": 0 },
+    "typecheck": "pass",
+    "build": "pass"
+  },
+  "notTested": [
+    { "item": "main replacement of its private scoped adapters with these exports", "owner": "main" },
+    { "item": "assistant SSE (/v1/assistant/stream) admission", "owner": "main", "reason": "this consumer does not read SSE and makes no SSE claim" },
+    { "item": "A history work_id derived-column negative", "owner": "A", "reason": "C defends by rechecking query.workId; raw history consumption is not broadly admitted until A fixes the source" },
+    { "item": "history/candidate review UI", "owner": "main" }
+  ],
   "preserved": {
     "userServices": "5180/8796 through 5188/8804 untouched",
     "historicalReports": "wave01-wave11 reports unchanged",
