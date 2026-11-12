@@ -342,10 +342,15 @@ export function describeRuntime(options: RuntimeDescriptionOptions = {}): Runtim
   // Paths are private facts. The default projection publishes a redacted identity - enough to
   // compare and diagnose, not enough to disclose where this user keeps the tool. main owns the
   // decision to widen it, which is why the full form only appears behind includePrivate.
+  // A bare command name is public; a caller-selected path can contain a home directory and is not.
+  const publicBinary = isAbsolute(binary) || binary.includes('/') ? '[redacted]' : binary
   const identity = includePrivate
     ? observed
     : {
         ...observed,
+        binary: publicBinary,
+        // The version error quotes the path it tried, so it is private detail as well.
+        versionError: observed.versionError === null ? null : '[redacted]',
         declaredPath: observed.declaredPath ? '[redacted]' : null,
         realPath: observed.realPath ? '[redacted]' : null,
         // The structural lookup records every candidate it tried, which are PATH entries and can
@@ -362,10 +367,13 @@ export function describeRuntime(options: RuntimeDescriptionOptions = {}): Runtim
   const reasons = []
   // Usability is judged on the observed identity. Judging it on the redacted projection would make
   // every redacted description look unusable.
-  if (!observed.declaredPath) reasons.push(`binary "${binary}" was not found on PATH`)
+  if (!observed.declaredPath) reasons.push(`binary "${publicBinary}" was not found on PATH`)
   else if (!observed.realPath) reasons.push('the binary path could not be resolved to a real file')
   else if (!observed.digest) reasons.push('the binary digest could not be read, so the identity is not comparable')
-  if (identity.version === null) reasons.push(`the version could not be read: ${identity.versionError}`)
+  if (identity.version === null) {
+    // Keep the explanation useful without quoting a private path.
+    reasons.push(includePrivate ? `the version could not be read: ${observed.versionError}` : `the version of "${publicBinary}" could not be read`)
+  }
   if (!PROBED_PLATFORMS.includes(process.platform)) {
     reasons.push(`platform ${process.platform} is not probed by this module, so no local capability can be claimed`)
   }

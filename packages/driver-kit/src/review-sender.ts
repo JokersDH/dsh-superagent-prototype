@@ -207,8 +207,19 @@ export function createReviewSender(input: ReviewSenderInput = {}): ReviewSender 
  * copy is frozen so this module cannot mutate it either.
  */
 function snapshotInput(input: unknown): { ok: true; value: unknown } | { ok: false; reason: string } {
+  // Only values a model can actually receive pass through untouched. A function or symbol is not
+  // model input, and structuredClone would throw on them anyway - but it must be refused BEFORE any
+  // reservation, not after a placeholder has already been reserved for and sent.
   if (input === null || input === undefined) return { ok: true, value: input }
-  if (typeof input !== 'object') return { ok: true, value: input }
+  const primitive = typeof input
+  if (primitive === 'string' || primitive === 'number' || primitive === 'boolean') {
+    return Number.isFinite(input as number) || primitive !== 'number'
+      ? { ok: true, value: input }
+      : { ok: false, reason: 'the admitted input is not a finite number, so it cannot be sent as model input' }
+  }
+  if (primitive === 'function' || primitive === 'symbol' || primitive === 'bigint') {
+    return { ok: false, reason: `the admitted input is a ${primitive}, which is not model input, so nothing is reserved or sent` }
+  }
   try {
     return { ok: true, value: deepFreeze(structuredClone(input)) }
   } catch (error) {
