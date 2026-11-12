@@ -44,8 +44,10 @@ function startRunner(sceneDir) {
 
 function runCoordinator(stateRoot, sceneDir, mode) {
   const result = spawnSync(process.execPath, [coordinatorFixture, stateRoot, sceneDir, mode], { encoding: 'utf8', timeout: 60_000 })
-  const line = (result.stdout ?? '').trim().split('\n').filter(Boolean).at(-1)
-  return { exitCode: result.status, signal: result.signal, stderr: result.stderr, observation: line ? JSON.parse(line) : null }
+  // Collect every emitted record. Reading only the last line is what hid the refused cancel.
+  const lines = (result.stdout ?? '').trim().split('\n').filter(Boolean).map(line => { try { return JSON.parse(line) } catch { return null } }).filter(Boolean)
+  const merged = lines.reduce((all, item) => ({ ...all, ...item }), {})
+  return { exitCode: result.status, signal: result.signal, stderr: result.stderr, observation: lines.length ? merged : null, records: lines }
 }
 
 const root = mkdtempSync(join(tmpdir(), 'pa-w14-b14-'))
@@ -56,7 +58,11 @@ try {
   mkdirSync(stateRoot, { recursive: true, mode: 0o700 })
   mkdirSync(sceneDir, { recursive: true, mode: 0o700 })
   createRunnerCredential(join(sceneDir, 'runner.key'))
-  writeFileSync(join(sceneDir, 'epoch'), '5')
+  // The writer epoch must be the epoch the current producer actually carries. Wave-14 wrote 5 while
+  // the producer carried 1, so every cancel was correctly refused by the fence and the stop window
+  // never reached the receiver - the failure was in this fixture, not in the product.
+  const { producer: fixtureProducer } = await import('../integration/runtime-ingress-fixture.ts')
+  writeFileSync(join(sceneDir, 'epoch'), String(fixtureProducer.attempt.fenceEpoch))
   runner = startRunner(sceneDir)
   const ready = await runner.ready
   const runnerPid = ready.pid
@@ -137,18 +143,19 @@ try {
   // =============================================================================================
   // Epoch fence and version fence
   // =============================================================================================
-  log.begin('B14-EPOCH-FENCE-REFUSES-STALE', 'an old epoch cannot reach the live writer', 'controlled_process')
+  log.begin('B14-EPOCH-FENCE-REFUSES-OLDER', 'a genuinely older epoch cannot reach the live writer', 'controlled_process')
   const stale = runCoordinator(stateRoot, sceneDir, 'stale')
   const staleLine = stale.observation?.outcome ?? ''
+  const epochFacts = { currentEpoch: stale.observation?.currentEpoch ?? null, sentEpoch: stale.observation?.sentEpoch ?? null }
   log.evidence({ staleEpochResult: staleLine, refused: stale.observation?.staleRefused ?? null, exitCode: stale.exitCode })
   // The transport wraps a receiver error in a generic refusal, so the receiver's own message is not
   // expected here. What matters is that the stale command was refused AND the live writer's counters
   // did not move: a fenced command must not reach the backend at all.
   const afterStale = (() => { try { return JSON.parse(readFileSync(join(sceneDir, 'receivers.json'), 'utf8')) } catch { return {} } })()
   const writerUnchanged = (afterStale.cancel ?? 0) === (stop.counters?.cancel ?? 0)
-  log.evidence({ staleRefused: stale.observation?.staleRefused ?? null, writerUnchanged, afterStale })
-  if (stale.observation?.staleRefused === true && writerUnchanged) {
-    log.pass(`an epoch-1 cancel was refused before reaching the writer, which served ${afterStale.cancel ?? 0} cancel(s) unchanged`)
+  log.evidence({ ...epochFacts, olderRefused: stale.observation?.olderRefused ?? null, writerUnchanged, afterStale })
+  if (stale.observation?.olderRefused === true && writerUnchanged && epochFacts.sentEpoch === epochFacts.currentEpoch - 1) {
+    log.pass(`epoch ${epochFacts.sentEpoch} (one older than the current ${epochFacts.currentEpoch}) was refused before reaching the writer, whose cancel count stayed ${afterStale.cancel ?? 0}`)
   } else {
     log.fail(`the epoch fence did not refuse a stale epoch: ${JSON.stringify({ staleLine, writerUnchanged, afterStale, stderr: stale.stderr?.slice(0, 200) })}`)
   }

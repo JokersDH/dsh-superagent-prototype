@@ -20,8 +20,15 @@ const [stateRoot, sceneDir, mode] = process.argv.slice(2)
 const emit = value => process.stdout.write(`${JSON.stringify(value)}\n`)
 
 /** Die exactly at a control window so recovery is measured against a real crash. */
-function crashAt(window) {
-  emit({ crashed: window, pid: process.pid })
+/**
+ * Kill at a control window, but emit the FULL stage record first.
+ *
+ * Wave-14 emitted only `{crashed}` here, so the driver read the last stdout line and the earlier
+ * `cancelError` was lost - which is how a refused cancel looked like a mysterious zero count.
+ * Now every stage record is emitted exactly once and the crash marker is additive.
+ */
+function crashAt(window, stage) {
+  emit({ ...stage, crashed: window, pid: process.pid })
   process.kill(process.pid, 'SIGKILL')
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50)
 }
@@ -43,14 +50,13 @@ try {
     receipt('cmd-begin', { kind: 'begin', attemptId, fenceEpoch })
     await client.inspect()
     const after = counters()
-    emit({ beginInspected: after.inspect - before.inspect, counters: after })
-    crashAt('after-begin')
+    crashAt('after-begin', { stage: 'begin', beginInspected: after.inspect - before.inspect, counters: after, epoch: fenceEpoch })
   } else if (mode === 'answer') {
     receipt('cmd-begin', { kind: 'begin', attemptId, fenceEpoch })
     await client.inspect()
     receipt('cmd-answer', { kind: 'answer', attemptId, questionId: 'q-1', answerId: 'a-1' })
     // The answer is durable in the store, but the coordinator dies before any delivery acknowledgement.
-    crashAt('after-answer-recorded')
+    crashAt('after-answer-recorded', { stage: 'answer', answerRecorded: true, epoch: fenceEpoch })
   } else if (mode === 'stopack') {
     // The stop is ACKed by the Runner and the coordinator dies BEFORE recording its own receipt:
     // the classic unknown-outcome window where a naive recovery would resend the stop.
@@ -60,15 +66,17 @@ try {
     } catch (error) {
       cancelError = String(error?.message ?? error).slice(0, 300)
     }
-    emit({ stopAcked: stopped?.inspection?.state ?? null, cancelError, counters: counters() })
-    crashAt('after-stop-ack')
+    crashAt('after-stop-ack', { stage: 'stop', stopAcked: stopped?.inspection?.state ?? null, cancelError: cancelError ?? null, counters: counters(), epoch: fenceEpoch })
   } else if (mode === 'stale') {
-    // An old epoch must never reach the live writer.
+    // A GENUINELY old epoch must never reach the live writer. The current epoch is whatever the
+    // authenticated inspection reports; wave-14 wrongly sent the current 1 and called it stale.
+    const current = (await client.inspect()).inspection.attempt.fenceEpoch
+    const older = current - 1
     try {
-      await client.cancel({ ...producer.attempt, id: 'stale-cancel', kind: 'cancel', fenceEpoch: 1 })
-      emit({ staleRefused: false, outcome: 'ACCEPTED' })
+      await client.cancel({ ...producer.attempt, id: `older-epoch-${older}`, kind: 'cancel', fenceEpoch: older })
+      emit({ stage: 'epoch', currentEpoch: current, sentEpoch: older, olderRefused: false, outcome: 'ACCEPTED' })
     } catch (error) {
-      emit({ staleRefused: true, outcome: String(error?.message ?? error).slice(0, 160) })
+      emit({ stage: 'epoch', currentEpoch: current, sentEpoch: older, olderRefused: true, outcome: String(error?.message ?? error).slice(0, 160) })
     }
   } else if (mode === 'recover' || mode === 'deliver') {
     const inspection = (await client.inspect()).inspection

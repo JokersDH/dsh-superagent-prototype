@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-11-12T14:18:03.082Z",
+  "generatedAt": "2026-11-12T16:10:35.065Z",
   "environment": {
     "note": "wave-14 B14 independent surviving Runner recovery closure",
     "modelCalls": 0
   },
   "totals": {
     "cases": 7,
-    "PASS": 5,
-    "FAIL": 1,
+    "PASS": 6,
+    "FAIL": 0,
     "SKIPPED": 0,
     "NOT_TESTED": 1
   },
@@ -19,14 +19,20 @@
       "lane": "controlled_process",
       "status": "PASS",
       "detail": [
-        "the coordinator died by SIGKILL while Runner pid 35927 kept living in its own process"
+        "the coordinator died by SIGKILL while Runner pid 29802 kept living in its own process"
       ],
       "evidence": [
         {
-          "runnerPid": 35927,
-          "coordinatorPid": 35929,
+          "runnerPid": 29802,
+          "coordinatorPid": 29828,
           "coordinatorSignal": "SIGKILL",
-          "aliveAfterCrash": true
+          "aliveAfterCrash": true,
+          "counters": {
+            "inspect": 1,
+            "cancel": 0,
+            "answer": 0,
+            "begin": 0
+          }
         }
       ],
       "entities": []
@@ -37,13 +43,13 @@
       "lane": "controlled_process",
       "status": "PASS",
       "detail": [
-        "recovery exited 0 against the same living Runner pid 35927"
+        "recovery exited 0 against the same living Runner pid 29802"
       ],
       "evidence": [
         {
           "exitCode": 0,
-          "runnerPidSeen": "35927",
-          "runnerOwnerPid": 35927,
+          "runnerPidSeen": "29802",
+          "runnerOwnerPid": 29802,
           "counters": {
             "inspect": 2,
             "cancel": 0,
@@ -111,15 +117,15 @@
       "id": "B14-STOP-ACK-UNKNOWN-NOT-RESENT",
       "title": "a stop acked but never receipted is not resent",
       "lane": "controlled_process",
-      "status": "FAIL",
+      "status": "PASS",
       "detail": [
-        "the unknown stop was mishandled: {\"signal\":\"SIGKILL\",\"exit\":0,\"stopReceiptAbsent\":true,\"writerQuiescent\":false,\"cancelServedOnce\":false,\"cancelError\":null,\"counters\":{\"inspect\":5,\"cancel\":0,\"answer\":0,\"begin\":0}}"
+        "the stop was served once by the Runner, its receipt is honestly absent, and recovery reports the writer terminated without resending"
       ],
       "evidence": [
         {
           "cancelError": null,
           "stopCrashSignal": "SIGKILL",
-          "stopAcked": null,
+          "stopAcked": "terminated",
           "exitCode": 0,
           "receipts": {
             "begin": 1,
@@ -127,11 +133,11 @@
             "stop": null,
             "deliver": 3
           },
-          "runnerState": "serving",
-          "writer": "active",
+          "runnerState": "terminated",
+          "writer": "quiescent",
           "counters": {
             "inspect": 5,
-            "cancel": 0,
+            "cancel": 1,
             "answer": 0,
             "begin": 0
           }
@@ -140,25 +146,27 @@
       "entities": []
     },
     {
-      "id": "B14-EPOCH-FENCE-REFUSES-STALE",
-      "title": "an old epoch cannot reach the live writer",
+      "id": "B14-EPOCH-FENCE-REFUSES-OLDER",
+      "title": "a genuinely older epoch cannot reach the live writer",
       "lane": "controlled_process",
       "status": "PASS",
       "detail": [
-        "an epoch-1 cancel was refused before reaching the writer, which served 0 cancel(s) unchanged"
+        "epoch 0 (one older than the current 1) was refused before reaching the writer, whose cancel count stayed 1"
       ],
       "evidence": [
         {
           "staleEpochResult": "Runner recovery request was refused or indeterminate",
-          "refused": true,
+          "refused": null,
           "exitCode": 0
         },
         {
-          "staleRefused": true,
+          "currentEpoch": 1,
+          "sentEpoch": 0,
+          "olderRefused": true,
           "writerUnchanged": true,
           "afterStale": {
-            "inspect": 5,
-            "cancel": 0,
+            "inspect": 6,
+            "cancel": 1,
             "answer": 0,
             "begin": 0
           }
