@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-11T15:00:59.679Z",
+  "checkedAt": "2026-11-12T04:00:37.617Z",
   "source": {
-    "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+    "commit": "1c667c2af202ea15111f91b1be0437928d6ef51b",
     "dirty": false
   },
-  "expectedSource": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+  "expectedSource": "1c667c2af202ea15111f91b1be0437928d6ef51b",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -516,6 +516,46 @@
       "status": "PASS"
     },
     {
+      "id": "E3-CONTEXT-USE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-CONTEXT-SSE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-CONTEXT-GUARDS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-CONTEXT-UI",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-COMPLETED-REPLY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E8-SCHEMA-MIGRATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E9-CONTEXT-CONCURRENCY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-REPLY-UNKNOWN",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E3-DESKTOP-GEOMETRY",
       "required": true,
       "status": "PASS"
@@ -706,7 +746,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-11T14:58:19.058Z",
+    "decidedAt": "2026-11-12T03:57:37.826Z",
     "failureCodes": []
   },
   "notes": [

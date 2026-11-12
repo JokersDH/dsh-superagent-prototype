@@ -48,3 +48,10 @@
 3. 修复后用同一 install 重跑 E4-MULTI-STATE，并补 launcher 死/API 活与 PID/start reuse 窗口。
 
 E 只记录证据，不修改 launcher；旧安装结果不因本轮修复而改标签。
+
+## 第十一轮复测（当前 D 冻结字节）
+
+- 目标：wave10-target-cf7a3cf / build `da2d78d126e4745f` / schema 15 / source `cf7a3cf`
+- 结果仍为 FAIL：`stop --data-root A` 退出 0/STOPPED，record 属于 `data-b`，B 的 API 被终止（apiOpenBefore=true → apiOpenAfter=false），B launcher 存活。
+- 由于该步骤已杀掉 B 的 API，launcher 死/API 活窗口本轮保持 NOT_TESTED，未用删除 record 或其他人工方式补窗口。
+- D 源码 `fe01c3c` 的 `apps/launcher/lib/stop.mjs` 仍只校验 record 自身，未比较调用者 requested data root；本轮未使用用户九组实例。

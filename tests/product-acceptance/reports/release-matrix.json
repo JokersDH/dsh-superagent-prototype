@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "57e145d9fb8e6834e597baef01b12d4a0007ec2b",
+    "commit": "1c667c2af202ea15111f91b1be0437928d6ef51b",
     "dirty": false
   },
   "environment": {
@@ -11,17 +11,17 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-11T14:58:19.044Z",
+  "checkedAt": "2026-11-12T03:57:37.812Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 130,
+    "PASS": 139,
     "FAIL": 1,
     "SKIPPED": 0,
-    "NOT_TESTED": 16,
+    "NOT_TESTED": 18,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
@@ -508,6 +508,55 @@
       ]
     },
     {
+      "id": "context-use",
+      "capability": "显式选源消息、同事务绑定、审计、SSE 与丢响应重放",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "contextHistory 分页/A 持久历史未发布；历史不是发送授权。",
+        "E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile 第二次选源和双 tab 独立旧 selection；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。"
+      ],
+      "evidence": [
+        "E3-CONTEXT-USE",
+        "E3-CONTEXT-SSE",
+        "E3-CONTEXT-GUARDS",
+        "E3-CONTEXT-UI",
+        "E9-CONTEXT-CONCURRENCY"
+      ]
+    },
+    {
+      "id": "reply-results",
+      "capability": "完成回复先落盘、失败重开补齐且不重复请求",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "E4-REPLY-PERSISTENCE：A 的真实 replyResults 行/跨进程 SIGKILL/backup 未到；当前只证明 consumer + 进程内 port fixture。"
+      ],
+      "evidence": [
+        "E4-COMPLETED-REPLY",
+        "E4-REPLY-UNKNOWN"
+      ]
+    },
+    {
+      "id": "schema-migration",
+      "capability": "真实 D schema15 数据库迁移到当前 A schema 且数据保留",
+      "controlledFixture": "PASS",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [],
+      "evidence": [
+        "E8-SCHEMA-MIGRATION"
+      ]
+    },
+    {
       "id": "recovery-readonly",
       "capability": "恢复后首次启动只读、零业务发送",
       "controlledFixture": "PASS",
@@ -543,14 +592,16 @@
       "capability": "可迁移发行、安装、备份恢复、升级回滚",
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
-      "readonly": "NOT_TESTED",
+      "readonly": "PASS",
       "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。",
-        "旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。"
+        "旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。",
+        "E6-CURRENT-MAIN-INSTALL NOT_TESTED：最新冻结 D 为 cf7a3cf/schema15 且无 selected-context send/audit，不能表示 current-main schema16；旧安装结果保持原 tuple scope。"
       ],
       "evidence": [
+        "E6-ARTIFACT-CURRENT-SCOPE",
         "E4-INSTALL-ARTIFACT-IDENTITY",
         "E4-INSTALL-FIRST-RUN",
         "E3-PERSONAL-COLD-START",
@@ -631,7 +682,6 @@
       "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "E5-CONTEXT-USE 未执行：main 只有 preview 与 binding schema，没有 context-use 发送入口/provider 附加、同事务 binding+receipt、未知结果不自动重发和来源审计。",
         "E3-CONTEXT-GRANT-BOUNDARY 仍未执行：expired grant/purpose/超预算的 HTTP 级反例缺少入口。"
       ],
       "evidence": [

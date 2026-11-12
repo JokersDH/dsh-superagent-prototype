@@ -1,6 +1,6 @@
-# Agent E 第十轮交付交接
+# Agent E 第十一轮交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `f99ca39`，检查点 `81d7fa3`，本次证据源 `57e145d9fb8e6834e597baef01b12d4a0007ec2b`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `b466bc7`，检查点 `5d1acf5`，本次证据源 `1c667c2af202ea15111f91b1be0437928d6ef51b`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
 
@@ -11,11 +11,11 @@
 | `node tests/product-acceptance/pilot/harness.mjs --preflight` | 冻结输入/价格/ledger | BLOCKED（adapter_missing）；runner selftest 66/17 |
 | `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | E1-* | PASS 74 |
 | `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | E2-* | PASS 21 + NOT_TESTED 3 |
-| `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 21 + NOT_TESTED 6 |
-| `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 14 + NOT_TESTED 5 + FAIL 1 |
-| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 147 | PASS 130 + FAIL 1 + SKIPPED 0 + NOT_TESTED 16 + BLOCKED 0 + UNKNOWN 0 |
+| `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 25 + NOT_TESTED 6 |
+| `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 16 + NOT_TESTED 6 + FAIL 1 |
+| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 158 | PASS 139 + FAIL 1 + SKIPPED 0 + NOT_TESTED 18 + BLOCKED 0 + UNKNOWN 0 |
 
-本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-54-37-353Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z`。
 
 ## 矩阵摘要
 
@@ -53,9 +53,12 @@
 | 真实不同协议复核（版本/身份/预算/隔离/主题） | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 项目设置版本化与归档 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 上下文、提案与明确决定治理 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 显式选源消息、同事务绑定、审计、SSE 与丢响应重放 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 完成回复先落盘、失败重开补齐且不重复请求 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 真实 D schema15 数据库迁移到当前 A schema 且数据保留 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 恢复后首次启动只读、零业务发送 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 明确决定、授权上下文、结构化提案与事务消费 | PASS | NOT_TESTED | PASS | NOT_TESTED | NOT_TESTED |
-| 可迁移发行、安装、备份恢复、升级回滚 | NOT_TESTED | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| 可迁移发行、安装、备份恢复、升级回滚 | NOT_TESTED | NOT_TESTED | PASS | PASS | NOT_TESTED |
 | D 托管 upgrade/rollback-install 与显式 baseline/target 字节 | NOT_TESTED | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
 | 模式保持、未知活 PID 阻断与不误杀 | NOT_TESTED | NOT_TESTED | NOT_TESTED | FAIL | NOT_TESTED |
 | 结构化提案 prepare/confirm/reject（真实 HTTP/SQLite） | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
@@ -76,9 +79,9 @@
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 `controlled-product-workflow` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **FAIL（仅所测 tuple）**：cold install/config root/doctor、普通 personal cold start、模式保持、备份恢复、托管 upgrade、升级后新数据、binary-only rollback、跨 schema 精确拒绝 | E3-PERSONAL-COLD-START、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK、E4-UPGRADE-CROSS-SCHEMA。E4-MULTI-STATE 观测到 D 的 stop 误杀另一 state；E4-UPGRADE-FAULTS 仍 NOT_TESTED。 |
+| 安装准入（个人 Alpha） | **FAIL（仅所测 tuple）**：cold install/config root/doctor、普通 personal cold start、模式保持、备份恢复、托管 upgrade、升级后新数据、binary-only rollback、跨 schema 精确拒绝、schema15→当前A schema16 迁移 | E3-PERSONAL-COLD-START、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK、E4-UPGRADE-CROSS-SCHEMA、E8-SCHEMA-MIGRATION。E4-MULTI-STATE 观测到 D 的 stop 误杀另一 state；E6-CURRENT-MAIN-INSTALL 因无 schema16/context-use 包 NOT_TESTED；E4-UPGRADE-FAULTS 仍 NOT_TESTED。 |
 
-安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `5db9a0d41924a4c6` / schema 15 / tar `eaf05420…` / source `b2955042`；target buildId `f2390ffd1b87b79a` / schema 15 / tar `62861d93…` / source `6830e38c`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
+安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `f2390ffd1b87b79a` / schema 15 / tar `62861d93…` / source `6830e38c`；target buildId `da2d78d126e4745f` / schema 15 / tar `f886a05c…` / source `cf7a3cfe`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
 ## 独立复核价值试点
 
@@ -130,13 +133,15 @@
 - **真实不同协议复核（版本/身份/预算/隔离/主题）**：第二协议未实现，独立试点 preflight 为 BLOCKED；不能把替换模型或 fixture 当异构。
 - **项目设置版本化与归档**：仅合同 revision 已验证；项目设置版本 API 未交付（RFC-E-001 缺口 2）。
 - **上下文、提案与明确决定治理**：自动结构化提案确认仍未发布（owner C/main）；当前只验证显式 prepare/confirm/reject。；源消息删除/授权过期/事务失败注入缺少公开入口（E3-DECISION-SOURCE-STATES）。
+- **显式选源消息、同事务绑定、审计、SSE 与丢响应重放**：contextHistory 分页/A 持久历史未发布；历史不是发送授权。；E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile 第二次选源和双 tab 独立旧 selection；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。
+- **完成回复先落盘、失败重开补齐且不重复请求**：E4-REPLY-PERSISTENCE：A 的真实 replyResults 行/跨进程 SIGKILL/backup 未到；当前只证明 consumer + 进程内 port fixture。
 - **恢复后首次启动只读、零业务发送**：解除隔离后的新授权/环境重绑定未实现，不在本轮声明。
 - **明确决定、授权上下文、结构化提案与事务消费**：自动提案确认与撤销后上下文失效未发布。
-- **可迁移发行、安装、备份恢复、升级回滚**：安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。；旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。
+- **可迁移发行、安装、备份恢复、升级回滚**：安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。；旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。；E6-CURRENT-MAIN-INSTALL NOT_TESTED：最新冻结 D 为 cf7a3cf/schema15 且无 selected-context send/audit，不能表示 current-main schema16；旧安装结果保持原 tuple scope。
 - **D 托管 upgrade/rollback-install 与显式 baseline/target 字节**：E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口仍未稳定执行，保持 NOT_TESTED；不得以两次 fixture start 代替。；升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。
 - **模式保持、未知活 PID 阻断与不误杀**：E4-MULTI-STATE 观测到 D 真实缺陷：对 state A 的 stop 返回 STOPPED 并杀掉共享安装下 state B 的 API 进程（launcher 仍活），launcher 死/API 活窗口因此无法测量。
 - **结构化提案 prepare/confirm/reject（真实 HTTP/SQLite）**：source/grant 漂移与 outer receipt 失败注入未在 HTTP 层单独执行；网页层由 E3-PROPOSAL-UI 覆盖。
-- **上下文来源/窗口/授权预览**：E5-CONTEXT-USE 未执行：main 只有 preview 与 binding schema，没有 context-use 发送入口/provider 附加、同事务 binding+receipt、未知结果不自动重发和来源审计。；E3-CONTEXT-GRANT-BOUNDARY 仍未执行：expired grant/purpose/超预算的 HTTP 级反例缺少入口。
+- **上下文来源/窗口/授权预览**：E3-CONTEXT-GRANT-BOUNDARY 仍未执行：expired grant/purpose/超预算的 HTTP 级反例缺少入口。
 - **工作证据与分页历史**：storage_cap 与并发写入窗口未单独触发；历史窗口语义按 complete/caller_limit 已验证。
 - **恢复授权 commit、目标准备与激活切换**：commit/activation 未发布；E5-RECOVERY-INTERRUPTION 记录四个中断窗口，prepare 不能替代授权。
 - **真实原生停止/问题/恢复控制**：B 的当前真实控制证据未作为输入提供；E 无该预算，不能把 fixture 当原生。
@@ -154,10 +159,10 @@
 
 ## 下一消费者
 
-1. D：先修 `stop` 的 state 归属：单 install 多 state 时，针对 state A 的 stop 必须拒绝且不得信号 state B 的 launcher/API；再补 launcher 死/API 活与 PID/start reuse 窗口。最小复现见 `externalBlockers.stop_claims_other_state`。
-2. main/C：发布 context-use 发送路径（显式选择、发送前复验、同事务 binding/receipt、unknown 不自动重发、来源审计）与 recovery activation；E 再把 E5-CONTEXT-USE / E5-RECOVERY-INTERRUPTION 转成实测。
-3. B：提供绑定 commit/attempt 的原生证据（`executed: true` + model task 计数）；E 只消费，不重跑计费任务。
-4. 主线：审阅 `RFC-E-001-consumer-interfaces.zh-CN.md`；E 不复制生产类型。旧安装结果与 wave09 ledger 原样保留。
+1. D：先修 `stop` 的 state 归属：单 install 多 state 时，针对 state A 的 stop 必须拒绝且不得信号 state B 的 launcher/API；再补 launcher 死/API 活与 PID/start reuse 窗口。最小复现见 `externalBlockers.stop_claims_other_state`。修复后还需冻结 current-main/schema16/context-use 的新 tar。
+2. A：实现 `store.workflows.assistant.replyResults` 的真实事务行与跨进程/备份/损坏拒绝，以及 `contextHistory` 分页；E 再关闭 E4-REPLY-PERSISTENCE 与 contextHistory NOT_TESTED。
+3. main：继续交 recovery activation 与真实空目标启动；E 已独立验证 context-use/SSE/audit、单 tab 丢响应、双 tab 独立旧 selection、mobile 再选源和 reply consumer，不重复把入口未发布当阻断。
+4. B：提供绑定 commit/attempt 的原生证据（`executed: true` + model task 计数）；E 只消费，不重跑计费任务。旧安装结果、wave09/wave10 ledger 与报告原样保留。
 
 ## 复验命令
 

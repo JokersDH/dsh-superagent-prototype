@@ -524,7 +524,7 @@ ${rows
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold install/config root/doctor、普通 personal cold start、模式保持、备份恢复、托管 upgrade、升级后新数据、binary-only rollback、跨 schema 精确拒绝 | E3-PERSONAL-COLD-START、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK、E4-UPGRADE-CROSS-SCHEMA。E4-MULTI-STATE 观测到 D 的 stop 误杀另一 state；E4-UPGRADE-FAULTS 仍 NOT_TESTED。 |
+| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold install/config root/doctor、普通 personal cold start、模式保持、备份恢复、托管 upgrade、升级后新数据、binary-only rollback、跨 schema 精确拒绝、schema15→当前A schema16 迁移 | E3-PERSONAL-COLD-START、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-ROLLBACK、E4-UPGRADE-CROSS-SCHEMA、E8-SCHEMA-MIGRATION。E4-MULTI-STATE 观测到 D 的 stop 误杀另一 state；E6-CURRENT-MAIN-INSTALL 因无 schema16/context-use 包 NOT_TESTED；E4-UPGRADE-FAULTS 仍 NOT_TESTED。 |
 
 安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId \`${artifactTuple.baseline?.buildId ?? 'unknown'}\` / schema ${artifactTuple.baseline?.schema ?? '?'} / tar \`${String(artifactTuple.baseline?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.baseline?.source ?? '').slice(0, 8)}\`；target buildId \`${artifactTuple.target?.buildId ?? 'unknown'}\` / schema ${artifactTuple.target?.schema ?? '?'} / tar \`${String(artifactTuple.target?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.target?.source ?? '').slice(0, 8)}\`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
@@ -567,7 +567,7 @@ ${rows
 
 1. D：先修 \`stop\` 的 state 归属：单 install 多 state 时，针对 state A 的 stop 必须拒绝且不得信号 state B 的 launcher/API；再补 launcher 死/API 活与 PID/start reuse 窗口。最小复现见 \`externalBlockers.stop_claims_other_state\`。修复后还需冻结 current-main/schema16/context-use 的新 tar。
 2. A：实现 \`store.workflows.assistant.replyResults\` 的真实事务行与跨进程/备份/损坏拒绝，以及 \`contextHistory\` 分页；E 再关闭 E4-REPLY-PERSISTENCE 与 contextHistory NOT_TESTED。
-3. main：把多 tab 旧响应/草稿隔离、recovery activation 和真实空目标启动接到可验收入口；E 已独立验证 context-use/SSE/audit/reply consumer，不重复把入口未发布当阻断。
+3. main：继续交 recovery activation 与真实空目标启动；E 已独立验证 context-use/SSE/audit、单 tab 丢响应、双 tab 独立旧 selection、mobile 再选源和 reply consumer，不重复把入口未发布当阻断。
 4. B：提供绑定 commit/attempt 的原生证据（\`executed: true\` + model task 计数）；E 只消费，不重跑计费任务。旧安装结果、wave09/wave10 ledger 与报告原样保留。
 
 ## 复验命令
@@ -597,6 +597,22 @@ writeFileSync(
     taskPackage: 'agent-tasks/product-wave-11/README.zh-CN.md',
     supersedes: 'wave10-status.json',
     currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.reason ?? null,
+    finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record',
+      exitCode: 0, source: report.source },
+    commands: stages.stages.map(stage => ({ id: stage.id, command: stage.command })),
+    faultWindows: {
+      stopA_whenRecordB: { status: byId.get('E4-MULTI-STATE')?.status ?? 'MISSING',
+        observed: byId.get('E4-MULTI-STATE')?.assertions?.find(item => !item.ok)?.detail ?? byId.get('E4-MULTI-STATE')?.reason ?? null },
+      launcherDead_apiAlive: { status: 'NOT_TESTED',
+        reason: 'stop_claims_other_state destroyed the state B API before the window could be measured' },
+      unknownLivePid: { status: byId.get('E4-INSTALL-HOST-GUARDS')?.status ?? 'MISSING' },
+      upgradeCrashWindows: { status: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
+        reason: byId.get('E4-UPGRADE-FAULTS')?.reason ?? null },
+      schema15_to_current16: { status: byId.get('E8-SCHEMA-MIGRATION')?.status ?? 'MISSING',
+        observed: byId.get('E8-SCHEMA-MIGRATION')?.evidence?.schemaMigration ?? null },
+      replyRecoveryConsumer: { status: byId.get('E4-COMPLETED-REPLY')?.status ?? 'MISSING',
+        persistence: 'in-process-map-fixture-only', persistenceStatus: 'NOT_TESTED' },
+    },
     counts: report.counts,
     testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
     productSource: { commit: artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.schema ?? null },
