@@ -1,0 +1,41 @@
+{
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "source": "cfe6a3a39250b196c7cdc93349c794161591b958",
+  "observations": [
+    {
+      "fixtureEpoch": 5,
+      "authenticatedAttemptEpoch": 1,
+      "sameCurrentAttempt": true,
+      "cancelOutcome": "refused",
+      "code": "unknown_outcome",
+      "counters": {
+        "inspect": 1,
+        "cancel": 0,
+        "answer": 0,
+        "begin": 0
+      },
+      "servicePid": 50105,
+      "onlyResourceRef": "writer-50105"
+    },
+    {
+      "fixtureEpoch": 1,
+      "authenticatedAttemptEpoch": 1,
+      "sameCurrentAttempt": true,
+      "cancelOutcome": "accepted",
+      "counters": {
+        "inspect": 1,
+        "cancel": 1,
+        "answer": 0,
+        "begin": 0
+      },
+      "resultingState": "terminated",
+      "resultingWriter": "quiescent",
+      "servicePid": 50106,
+      "onlyResourceRef": "writer-50106"
+    }
+  ],
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "ledgerOpened": false,
+  "scope": "Bounded epoch diagnosis using an inert private service; not production begin/answer/stop recovery or physical-writer evidence"
+}

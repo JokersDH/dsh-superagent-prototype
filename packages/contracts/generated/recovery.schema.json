@@ -14,6 +14,7 @@
                   "marker_invalid",
                   "restore_evidence_unknown",
                   "source_scan_bounded",
+                  "source_checkpoint_unavailable",
                   "historical_resources_need_revalidation",
                   "artifact_missing_or_corrupt",
                   "artifact_scan_bounded",
@@ -30,6 +31,7 @@
               "owner": {
                 "enum": [
                   "main",
+                  "A",
                   "B",
                   "D"
                 ],
@@ -111,6 +113,35 @@
         "inspectionFingerprint": {
           "pattern": "^[a-f0-9]{64}$",
           "type": "string"
+        },
+        "logicalSource": {
+          "additionalProperties": false,
+          "properties": {
+            "coverage": {
+              "enum": [
+                "complete",
+                "bounded",
+                "unsupported"
+              ],
+              "type": "string"
+            },
+            "fingerprint": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "coverage",
+            "fingerprint"
+          ],
+          "type": "object"
         },
         "markerDigest": {
           "anyOf": [
@@ -272,6 +303,7 @@
                   "marker_invalid",
                   "restore_evidence_unknown",
                   "source_scan_bounded",
+                  "source_checkpoint_unavailable",
                   "historical_resources_need_revalidation",
                   "artifact_missing_or_corrupt",
                   "artifact_scan_bounded",
@@ -288,6 +320,7 @@
               "owner": {
                 "enum": [
                   "main",
+                  "A",
                   "B",
                   "D"
                 ],
@@ -359,6 +392,35 @@
         "inspectionFingerprint": {
           "pattern": "^[a-f0-9]{64}$",
           "type": "string"
+        },
+        "logicalSource": {
+          "additionalProperties": false,
+          "properties": {
+            "coverage": {
+              "enum": [
+                "complete",
+                "bounded",
+                "unsupported"
+              ],
+              "type": "string"
+            },
+            "fingerprint": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "coverage",
+            "fingerprint"
+          ],
+          "type": "object"
         },
         "planId": {
           "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
