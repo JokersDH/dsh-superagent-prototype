@@ -252,7 +252,13 @@ test('provider failure and a post-inference reply commit failure never cause a s
     assert.deepEqual(await h.send(prepared), receipt); await h.flush()
     assert.equal(h.requests.length, 1)
     const notice = h.messages().find(message => message.provenance === 'application_notice')
-    assert.ok(notice); assert.doesNotMatch(notice.text, /fixture-secret|injected answer/)
+    const recovered = h.messages().find(message => message.provenance === 'reasoner_reply')
+    // The real A reply-result port survives the failed reply transaction, so a requeued effect
+    // appends the stable reply instead of the older unknown-result notice. Either path is valid;
+    // only one model request may exist.
+    assert.ok(notice || recovered)
+    if (notice) assert.doesNotMatch(notice.text, /fixture-secret|injected answer/)
+    if (recovered) assert.deepEqual(recovered.sourceRefs, [key('message', prepared.commandId)])
     assert.equal(h.store.queue.dueRows('application.assistant.reply', Number.MAX_SAFE_INTEGER, 100).length, 0)
   })
 })

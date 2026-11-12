@@ -1,0 +1,87 @@
+✔ a selected decision expiring at the final reservation blocks the provider without a write event (139.105583ms)
+✔ HTTP context replies use the completed-result consumer after SQLite reopen with an explicitly in-process result port (97.410333ms)
+✔ provider unavailability does not block an original receipt replay but rejects an unsent confirmation durably (87.481375ms)
+✔ real HTTP selection reaches the existing provider and SSE once, with a durable source audit (168.842959ms)
+▶ revoked decision and the final source guard refuse before provider send and keep safe notices
+  ✔ revocation (41.383625ms)
+  ✔ final-guard (38.345125ms)
+✔ revoked decision and the final source guard refuse before provider send and keep safe notices (80.145125ms)
+▶ provider failure and a post-inference reply commit failure never cause a second model request
+  ✔ unknown-result (40.065416ms)
+  ✔ reply-commit (57.773ms)
+✔ provider failure and a post-inference reply commit failure never cause a second model request (98.312417ms)
+✔ HTTP auth, strict bodies, readonly mode and audit identities remain enforced (36.440542ms)
+✔ ordinary chats retain their original history and never inherit a previous selected bundle (73.839458ms)
+✔ simultaneous original confirmations settle on one receipt, queue entry and provider request (67.385083ms)
+▶ a corrupt original receipt cannot reach the provider before loading or during final reservation
+  ✔ before-load (40.062875ms)
+  ✔ before-reservation (36.968333ms)
+✔ a corrupt original receipt cannot reach the provider before loading or during final reservation (77.438125ms)
+▶ confirmed source changes and expiry return a settled rejected HTTP receipt replayable after reopen
+  ✔ source (19.706875ms)
+  ✔ expiry (16.433667ms)
+✔ confirmed source changes and expiry return a settled rejected HTTP receipt replayable after reopen (36.44175ms)
+✔ rejected application effects roll back before one definitive rejection receipt is recorded (27.251041ms)
+✔ a rejection-storage fault stays an unknown HTTP error until the original request can be settled (15.048458ms)
+✔ explicit prepare is readonly and one confirm commits actual chat, bundle, binding and original receipt (84.731125ms)
+✔ tampering, caller authority, wrong actor and command identity fail before source reads or writes (26.551791ms)
+▶ a source change or expired confirmation cannot silently fall back to ordinary chat
+  ✔ source (43.630084ms)
+  ✔ expiry (37.329625ms)
+  ✔ scope (23.67975ms)
+✔ a source change or expired confirmation cannot silently fall back to ordinary chat (105.143625ms)
+✔ same original confirmation replays after expiry and source drift, including receipt/bundle reopen (41.874917ms)
+✔ ordinary prior chat cannot gain context later and another signed body conflicts under the same command (43.455834ms)
+▶ outer failures roll back chat, binding fixture, artifact reference, effect and receipt together
+  ✔ receipt (33.923917ms)
+  ✔ binding (32.014583ms)
+  ✔ binding-result (34.751ms)
+  ✔ rejected (49.3415ms)
+✔ outer failures roll back chat, binding fixture, artifact reference, effect and receipt together (150.40825ms)
+▶ source guards close both preview-return and application-preflight await windows
+  ✔ preview (30.137166ms)
+  ✔ application (37.907541ms)
+✔ source guards close both preview-return and application-preflight await windows (68.369333ms)
+✔ pre-send consumer verifies the frozen original snapshot and excludes its own newly appended message (45.260584ms)
+▶ pre-send revalidation refuses changed source, scope, expiry or artifact instead of omitting selected data
+  ✔ source (53.782875ms)
+  ✔ scope (43.324833ms)
+  ✔ expiry (50.12125ms)
+  ✔ artifact (32.243167ms)
+✔ pre-send revalidation refuses changed source, scope, expiry or artifact instead of omitting selected data (179.992042ms)
+✔ the returned synchronous guard checks source and binding immediately before request reservation (28.285875ms)
+✔ historical audit remains readable after expiry but never permits a new send (25.464292ms)
+✔ a rejected source confirmation replays after reopen and another token cannot claim its command (18.896084ms)
+✔ a failure while storing a deterministic rejection remains unknown until the original request can be recorded (24.504625ms)
+✔ a real application chat stores one model reply, replays its receipt and never creates work (37.437ms)
+✔ each model request sees only its conversation and earlier user turn (48.87425ms)
+✔ provider errors become safe notices, without automatic network retry or raw secret text (34.177875ms)
+✔ work delegation and anchored supplements are not ordinary model conversation context (47.946167ms)
+✔ a failed reply commit cannot charge a second model call when its effect is retried (27.886917ms)
+✔ a failed application command receipt rolls the chat and model effect back together (20.852083ms)
+✔ stream snapshots recover an in-progress reply and final authority waits for the message commit (110.809292ms)
+✔ service close aborts in-progress model generation without another inference (30.726917ms)
+✔ a returned result survives a later message failure and effect retry restores it without another inference (44.899333ms)
+✔ a request record without a completed result remains unknown with the result port present (29.019792ms)
+✔ a corrupted completed artifact refuses recovery without another provider call (44.477917ms)
+✔ a completed result bound to another principal cannot be replayed (51.829625ms)
+✔ result persistence failure rolls back its artifact reference and cannot authorize a retry (40.021625ms)
+✔ the inference receipt binds the captured provider model and configuration used for sending (47.535375ms)
+✔ the SDK makes one completion call and public status never contains the private key (51.059708ms)
+✔ an upstream success cannot disclose the configured credential in conversation text (11.974875ms)
+✔ upstream error payloads are redacted and never automatically retried (5.562042ms)
+✔ only configured model IDs can be selected and the private key stays server-side (18.785208ms)
+✔ unsafe private configuration permissions disable model use without leaking its contents (2.398125ms)
+✔ a credential split across network chunks is redacted before any display delta (8.431583ms)
+✔ a stream without a completion marker remains interrupted and is never retried (6.996375ms)
+✔ an external abort cancels SDK streaming without a retry or raw error disclosure (5.119959ms)
+✔ model text arrives incrementally before the upstream stream has finished (6.00425ms)
+✔ a prepared request pins the exact model/configuration and can only send once (17.369042ms)
+ℹ tests 71
+ℹ suites 0
+ℹ pass 71
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1534.998417

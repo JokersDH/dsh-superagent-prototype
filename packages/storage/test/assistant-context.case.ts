@@ -194,3 +194,64 @@ test('a bounded batch of bindings commits within a small real-SQLite budget', as
     assert.deepEqual(store.database.checkIntegrity(), { integrity: 'ok', foreignKeyViolations: 0 })
   })
 })
+
+test('a v16 binding database upgrades append-only to v17/v18 and keeps its rows readable', async () => {
+  const dir = tempDir('storage-context-v16-')
+  try {
+    const path = join(dir, 'product.sqlite')
+    const Database = (await import('better-sqlite3')).default
+    const { applyMigrations, MIGRATIONS, PRODUCT_SCHEMA_VERSION } = await import('../src/index.ts')
+    const { canonicalDigest } = await import('@personal-agent/contracts/canonical')
+    const legacy = new Database(path)
+    legacy.exec('PRAGMA journal_mode = WAL')
+    applyMigrations(legacy, { registry: MIGRATIONS.filter(migration => migration.version <= 16) })
+    const value = {
+      protocol: 'assistant-context-binding/1', commandId: 'old-command', messageId: 'old-message', requestId: 'old-request',
+      projectId: 'proj-1', conversationId: 'conv-1', userTextDigest: digest('a'),
+      principal: { userId: 'user-1', authorityRef: 'auth-1' }, purpose: 'conversation_discussion',
+      scope: { projectId: 'proj-1', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
+      selections: ['conversation'], bundleRef: 'old-artifact', bundleDigest: digest('b'),
+      sources: [{ sourceId: 'old-source', kind: 'conversation_message', sourceDigest: digest('c'), previewDigest: digest('d'), truncated: false }],
+      confirmedAt: '2026-11-11T00:00:00.000Z', expiresAt: '2026-11-11T00:04:00.000Z',
+    }
+    const valueDigest = canonicalDigest(JSON.parse(JSON.stringify(value)))
+    legacy.prepare("INSERT INTO artifacts (id, digest, bytes, path, created_at) VALUES ('old-artifact', ?, 1, 'artifacts/old', ?)")
+      .run(digest('b'), value.confirmedAt)
+    legacy.prepare(`INSERT INTO assistant_context_bindings
+      (message_id, command_id, request_id, project_id, conversation_id, user_text_digest, principal_user_id,
+       principal_authority_ref, bundle_ref, bundle_digest, confirmed_at, expires_at, value, digest)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+      value.messageId, value.commandId, value.requestId, value.projectId, value.conversationId, value.userTextDigest,
+      value.principal.userId, value.principal.authorityRef, value.bundleRef, value.bundleDigest,
+      value.confirmedAt, value.expiresAt, JSON.stringify(value), valueDigest,
+    )
+    legacy.prepare("INSERT INTO command_receipts (command_id, payload_digest, status, seq, result, recorded_at) VALUES ('old-command', ?, 'recorded', 1, 'null', ?)")
+      .run(digest('a'), value.confirmedAt)
+    legacy.close()
+
+    const upgraded = new ProductStore({ path })
+    try {
+      assert.equal(upgraded.database.productSchema, PRODUCT_SCHEMA_VERSION)
+      assert.deepEqual(upgraded.workflows.assistant.contextBindings.forMessage('old-message'), value)
+      assert.deepEqual(upgraded.workflows.assistant.contextBindings.forCommand('old-command'), value)
+      assert.equal(upgraded.commands.get('old-command')?.payloadDigest, digest('a'))
+      assert.equal(upgraded.workflows.assistant.contextHistory.page({ projectIds: ['proj-1'] }).records[0]?.messageId, 'old-message')
+      assert.equal(upgraded.workflows.assistant.replyResults.forRequest('old-request'), undefined)
+      assert.deepEqual(upgraded.database.checkIntegrity(), { integrity: 'ok', foreignKeyViolations: 0 })
+    } finally { upgraded.close() }
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('a future schema is refused instead of silently migrated by the store', async () => {
+  const dir = tempDir('storage-context-future-')
+  try {
+    const path = join(dir, 'product.sqlite')
+    const created = makeStore(dir)
+    created.store.db.prepare("UPDATE schema_meta SET value = '99' WHERE key = 'product_schema'").run()
+    const migrations = JSON.parse(String((created.store.db.prepare("SELECT value FROM schema_meta WHERE key = 'migrations'").get() as { value: string }).value))
+    migrations.push({ version: 99, name: 'future-v99', checksum: 'x', appliedAt: '2026-11-12T00:00:00.000Z' })
+    created.store.db.prepare("UPDATE schema_meta SET value = ? WHERE key = 'migrations'").run(JSON.stringify(migrations))
+    created.store.close()
+    assert.throws(() => new ProductStore({ path }), /newer than this build|not registered|gap at version 99/)
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})

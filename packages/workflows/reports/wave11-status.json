@@ -1,0 +1,207 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "b466bc7",
+  "mergeCommit": "c2ab04c",
+  "checkpoints": [
+    "bec0b82",
+    "d652ec0"
+  ],
+  "testedSourceCommit": "d652ec0",
+  "migrations": [
+    "v17 assistant-context-history-index",
+    "v18 assistant-reply-results"
+  ],
+  "productSchema": 18,
+  "ports": {
+    "recoverySource": "store.workflows.recoverySource.inspect / ports.recoverySource",
+    "contextHistory": "store.workflows.assistant.contextHistory.page / ports.assistant.contextHistory",
+    "replyResults": "store.workflows.assistant.replyResults / ports.assistant.replyResults"
+  },
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "packages/storage/src/recovery-source.ts",
+        "packages/workflows/test/recovery-source.case.ts (8)"
+      ],
+      "note": "bounded same-connection logical snapshot over 46 families; schema/table/limit failures unsupported/bounded; observed cursor excluded from digest; startupAvailable false"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "recovery-source tests",
+        "rollback/forged ignore/reopen cases"
+      ],
+      "note": "only exact activation row, original receipt/command event and exact intent event excluded; other confirmations/business/resources/writer identity visible; only heartbeat_at volatile; forged ignore refused"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "packages/storage/src/assistant-context-history.ts",
+        "packages/workflows/test/context-history.case.ts (6)"
+      ],
+      "note": "v17 work_id + three scope indexes; newest-first keyset with messageId tie-break; project/conversation/work filters; max100; raw cursor only data"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "context-history tests",
+        "EXPLAIN QUERY PLAN"
+      ],
+      "note": "row/value/digest mismatches fail the page; bundleStatus registry/digest only; 5000 bindings first page 3.1ms with history scope index"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "public port consumed by main",
+      "evidence": [
+        "packages/storage/src/assistant-reply-results.ts",
+        "packages/workflows/test/reply-results.case.ts (7)"
+      ],
+      "note": "v18 table; original receipt/inference/artifact validated; request+reply unique; same-body replay, different-body conflict; no send/replay grant"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "package-local plus main consumer",
+      "evidence": [
+        "reply-results tests",
+        "CompletedAssistantReplies real-port test"
+      ],
+      "note": "before-send only unknown; result survives later reply failure; outer receipt failure rolls back result+artifact; tamper refused; close/reopen recoverable"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "backup.ts family/references",
+        "snapshot-d tests",
+        "assistant-context v16 upgrade test"
+      ],
+      "note": "reply family and reply artifact refs in snapshot; missing bundle/reply table/byte tamper blocked; v15/v16 upgrade append-only; future schema refused"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "main consumers + real SIGKILL",
+      "evidence": [
+        "wave11-main-consumers.txt 71/71",
+        "wave11-target-consumers.txt 50/50",
+        "reply-crash tests (5)"
+      ],
+      "note": "result before/after, reply commit, source confirmation before/after each in an independent process killed with SIGKILL; no duplicate reply and no fake complete ignore"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "wave11-performance.json",
+        "snapshot-d tests"
+      ],
+      "note": "non-empty DB+artifact restore to second root; 100/1000 works, 2000-message conversation, 5000 bindings, 8103-row source checkpoint, snapshot create/verify"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "package-local regression",
+      "evidence": [
+        "wave11-*.txt",
+        "wave11-static-check.txt"
+      ],
+      "note": "storage/workflows/application/verification, main product/target consumers, typecheck/build and static packet check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "88/88",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "mainAssistantConsumers": "71/71",
+    "mainTargetConsumers": "50/50",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductTypecheck": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "backupFamilies": [
+    "assistant_context_bindings",
+    "assistant_reply_results",
+    "recovery_activations",
+    "recovery_intents",
+    "outcomes",
+    "reviews",
+    "decisions",
+    "proposals",
+    "project_settings",
+    "contracts",
+    "verifications",
+    "acceptances",
+    "legacy_decisions"
+  ],
+  "limits": {
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288,
+    "snapshotEvidenceRowsPerFamily": 2000
+  },
+  "failureWindows": [
+    "before-send receipt without result",
+    "result committed before failed reply transaction",
+    "reply message committed before crash",
+    "source confirmation before/after commit",
+    "outer receipt rollback",
+    "missing/changed artifact",
+    "tampered result/binding rows",
+    "missing reply/binding table in snapshot",
+    "foreign/malformed history cursor"
+  ],
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "history-and-source-consumers",
+      "detail": "Reply result is consumed by the real runtime; history/source ports are published but their HTTP/UI or activation-baseline composition and public cursor signing remain main-owned and NOT_TESTED here."
+    },
+    {
+      "owner": "main/D",
+      "id": "activation-and-materialization",
+      "detail": "Recovery activation authorization, target materialization/start and installation remain external; A snapshots never grant startup."
+    },
+    {
+      "owner": "main",
+      "id": "integration-test-expectation",
+      "detail": "One main fixture assertion in tests/integration/assistant-context-product.case.mjs was updated to accept the durable recovered reply instead of requiring the old in-process-fallback notice; production code was unchanged."
+    }
+  ],
+  "notTested": [
+    "actual recovery activation/start or target materialization",
+    "main history/source HTTP/UI and public cursor signing",
+    "real model/provider/native execution",
+    "D installation/upgrade",
+    "E independent acceptance"
+  ],
+  "mainNextSteps": [
+    "call replyResults.put inside the existing post-return artifact transaction (already consumed by CompletedAssistantReplies)",
+    "expose contextHistory.page behind signed public cursors bound to principal/project scope",
+    "compare recoverySource.inspect({ignoreCommitted}) against a pre-confirmation baseline and keep marker/physical checks separate",
+    "include reply/binding artifact references in D restore verification"
+  ],
+  "updatedAt": "2026-11-12T12:10:00.000Z"
+}

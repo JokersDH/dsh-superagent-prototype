@@ -35,6 +35,9 @@ ports.discovery.discoverPage()  // explicit internal all-discovery, never [] aut
 ports.assistant.decisions.get(id) / .put(record, expectedVersion)
 ports.assistant.proposals.get(id) / .put(record, expectedVersion)
 ports.assistant.contextBindings.forMessage(messageId) / forCommand(commandId) / put(binding) // sync, append-only audit
+ports.assistant.contextHistory.page({ projectIds, conversationId?, workId?, limit?, cursor? }) // newest-first keyset
+ports.assistant.replyResults.forRequest(requestId) / forReply(replyMessageId) / put(result) // completed data only
+ports.recoverySource.inspect({ ignoreCommitted?, maxRows?, maxRowsPerFamily? }) // logical source snapshot
 ports.assistant.legacyDecisions({ projectId }) // audit-only, never valid memory
 ports.routingEvidence.advice / reviews / outcomes  // immutable RoutingEvidencePort
 ports.routingEvidence.sources(attemptId, projectId) // read-only outcome source projection
@@ -139,7 +142,8 @@ writer failure.
 
 Storage appends v8 `conversation-catalog`, v9 `project-settings`, v10 `user-decisions`, v11
 `assistant-state`, v12 `conversation-members`, v13 `routing-evidence`, v14 `recovery-intents`, v15
-`recovery-activations`, v16 `assistant-context-bindings`; v1–v7 checksums and tables are untouched. A v7/v10
+`recovery-activations`, v16 `assistant-context-bindings`, v17 `assistant-context-history-index`, v18
+`assistant-reply-results`; v1–v7 checksums and tables are untouched. A v7/v10
 database upgrades in one transaction, keeps existing messages/works/decision bodies, and backfills
 conversation rows, FTS, membership and assistant metadata absence. Unknown/upstream databases, drift,
 gaps and future schemas keep the existing fail-closed behavior.

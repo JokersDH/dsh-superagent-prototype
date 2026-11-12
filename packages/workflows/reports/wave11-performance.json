@@ -1,0 +1,71 @@
+{
+  "protocol": "wave11-storage-benchmark/1",
+  "sourceCommit": "d652ec0ab4f1b82c2f0994a2bcafccb4ba634f33",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "cases": [
+    {
+      "case": "100-works",
+      "rows": 100,
+      "insertMs": 3.1
+    },
+    {
+      "case": "1000-works",
+      "rows": 1000,
+      "insertMs": 20.2
+    },
+    {
+      "case": "long-conversation",
+      "rows": 2000,
+      "insertMs": 301
+    },
+    {
+      "case": "5000-context-bindings",
+      "rows": 5000,
+      "insertMs": 530.5
+    },
+    {
+      "case": "history-first-page",
+      "rows": 100,
+      "hasMore": true,
+      "ms": 3.3
+    },
+    {
+      "case": "bundle-lookup",
+      "present": true,
+      "digestMatches": true,
+      "bytes": 16,
+      "ms": 0.2
+    },
+    {
+      "case": "recovery-source-20000-row-window",
+      "coverage": "complete",
+      "families": 46,
+      "rows": 8103,
+      "ms": 56
+    },
+    {
+      "case": "snapshot-create",
+      "status": "ok",
+      "databaseBytes": 16789504,
+      "artifacts": 1,
+      "evidenceFamilies": 13,
+      "ms": 196.5
+    },
+    {
+      "case": "snapshot-verify",
+      "status": "ok",
+      "ms": 46.5
+    }
+  ],
+  "limits": {
+    "maxRows": 20000,
+    "maxHistoryPage": 100,
+    "maxReplyBodyBytes": 524288,
+    "maxBindingsTested": 5000
+  },
+  "limitations": [
+    "Temporary database and content-addressed artifact only; no user state, model/native send or cleanup-policy test.",
+    "Timings are single-process wall clock on this host, not a service SLO."
+  ]
+}

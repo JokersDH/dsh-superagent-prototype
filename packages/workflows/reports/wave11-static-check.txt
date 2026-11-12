@@ -1,0 +1,16 @@
+{
+  "status": "PASS_LONG_DISPATCH_STATIC_ONLY",
+  "roles": 6,
+  "phases": 60,
+  "checkpoints": 25,
+  "localLinks": 74,
+  "acyclic": true,
+  "nonoverlappingOwners": true,
+  "independentQueues": true,
+  "continueAfterCheckpoint": true,
+  "normalInstallIndependentOfRestoration": true,
+  "productIndependentOfBlockedStudy": true,
+  "budgetUnchanged": true,
+  "runtimeTests": 0,
+  "nativeTurnStarts": 0
+}
