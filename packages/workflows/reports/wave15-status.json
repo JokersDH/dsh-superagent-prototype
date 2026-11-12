@@ -1,0 +1,232 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "697efdc",
+  "mergeCommit": "20e1817",
+  "checkpoints": [
+    "c4bd52c",
+    "9f47f3d"
+  ],
+  "testedSourceCommit": "9f47f3d",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "actualConsumers": {
+    "logicalSourceHttp": {
+      "status": "PASS",
+      "source": "main 697efdc",
+      "evidence": "wave15-logical-source-consumer.txt",
+      "tests": "8/8"
+    },
+    "recoveryCombination": {
+      "status": "PASS",
+      "evidence": "wave15-recovery-combination.txt",
+      "tests": "66/66"
+    },
+    "confirmAuthorization": {
+      "status": "NOT_TESTED",
+      "detail": "main has no real confirm/private authorization; actual commit route remains 422 and plans stay not_granted"
+    }
+  },
+  "probe": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave15-a.json node tools/bootstrap/probe-wave13-storage.mjs $PWD",
+    "status": "PASS",
+    "pass": 4,
+    "fail": 0,
+    "suite": "fixed-source wave13 probe reused; no wave15 storage probe published",
+    "evidence": "packages/workflows/reports/wave15-storage-probe.json"
+  },
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "actual HTTP consumer",
+      "evidence": [
+        "wave15-logical-source-consumer.txt 8/8",
+        "wave15-recovery-combination.txt 66/66"
+      ],
+      "note": "real ProductRecovery/runtime HTTP inspect+prepare read the A logicalSource fingerprint; unlogged business changes conflict; missing/unknown/future/bounded refuse; no source-entry-missing claim"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "real connections/process",
+      "evidence": [
+        "main heartbeat/writer/queue tests",
+        "independent writer test",
+        "wave15-performance.json"
+      ],
+      "note": "second connection and independent process writes change the next fingerprint; heartbeat stable; writer/queue/resource changes visible; 64-bit rowids exact; total budget stops scanning"
+    },
+    {
+      "phase": "A3",
+      "status": "NOT_TESTED",
+      "scope": "confirm not implemented",
+      "evidence": [
+        "wave15-recovery-combination"
+      ],
+      "note": "inspect/prepare is real; private confirm/authorization and target startup are not implemented, so only this combination is untested"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "non-empty restore",
+      "evidence": [
+        "snapshot-d tests",
+        "main CompletedAssistantReplies restored read"
+      ],
+      "note": "work/contract/ticket/decision/context/reply/receipt/queue/runtime/resource snapshot restores to second root; main reads original message/contract/request/reply body"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "corruption matrix",
+      "evidence": [
+        "snapshot-d negative tests"
+      ],
+      "note": "missing table/artifact/bundle, changed reply body, derived work_id, queue body, partial manifest and future schema all block; non-empty positive control in same flow"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "independent processes",
+      "evidence": [
+        "reply-crash tests",
+        "snapshot-crash tests"
+      ],
+      "note": "SIGKILL around result/message/source confirmation and snapshot creation; original artifact body once; partial backup unusable"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "D/E inputs",
+      "evidence": [
+        "wave15-consumer-map.md",
+        "v15/v16 upgrade tests"
+      ],
+      "note": "dynamic schema/families/artifact recipe; v15/v16/current keep FTS/messages/receipts/bindings/results; historical migrations unchanged"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "B existing stores",
+      "evidence": [
+        "runtime binding/current/fence reopen test"
+      ],
+      "note": "existing bindings/current/fenceEpoch and original receipts are read across reopen; no test table, second ledger or recovery authority"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "scale/consumer map",
+      "evidence": [
+        "wave15-performance.json",
+        "wave15-consumer-map.md"
+      ],
+      "note": "10000 bindings, 512KiB bundle, 13105-row source, bounded maxRows stops at 28 families/1000 rows; first page does not read bodies"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "package regression",
+      "evidence": [
+        "wave15-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, main product/target/recovery consumers, typecheck/build and static packet check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "106/106",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "mainProductConsumers": "88/88",
+    "mainTargetConsumers": "50/50",
+    "logicalSourceConsumer": "8/8",
+    "recoveryCombination": "66/66",
+    "fixedSourceProbe": "4/4",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "backupFamilies": [
+    "assistant_context_bindings (incl work_id)",
+    "assistant_reply_results",
+    "effect_queue",
+    "runtime_bindings",
+    "runtime_current",
+    "resource_observations",
+    "dispatch_receipts",
+    "recovery_activations",
+    "recovery_intents",
+    "decisions",
+    "proposals",
+    "project_settings",
+    "contracts",
+    "verifications",
+    "acceptances",
+    "outcomes",
+    "reviews",
+    "legacy_decisions"
+  ],
+  "limits": {
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288,
+    "bindingsTested": 10000,
+    "boundedScanFamilies": 28
+  },
+  "failureWindows": [
+    "negative rowid",
+    "rowid > MAX_SAFE_INTEGER",
+    "activation index/mirror",
+    "command event payload/payload_ref",
+    "later same-body intent event",
+    "total/per-family budget",
+    "missing schema_meta/event_log",
+    "second connection/process write",
+    "result/message/source SIGKILL",
+    "snapshot before/after SIGKILL",
+    "partial manifest",
+    "changed binding work_id",
+    "changed queue body",
+    "future schema"
+  ],
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "confirm-authorization-target",
+      "detail": "Real inspect/prepare is consumed, but private confirm/authorization and target start remain unimplemented; these are NOT_TESTED and separate from the passing preflight."
+    },
+    {
+      "owner": "main/D",
+      "id": "physical-writer-installation",
+      "detail": "Logical complete/snapshot restore never proves physical writer stop or grants installation/startup authorization."
+    }
+  ],
+  "notTested": [
+    "main confirm/private authorization and target activation",
+    "physical writer quiescence",
+    "D current-schema installation/upgrade",
+    "E independent release acceptance",
+    "real model/provider/native execution"
+  ],
+  "mainNextSteps": [
+    "keep the actual inspect/prepare logicalSource fingerprint consumer",
+    "after confirming, compare the exact ignored confirmation against a pre-confirmation baseline",
+    "keep marker/host/physical-writer and target-start checks separate",
+    "use wave15-consumer-map.md for D snapshot and E negative inputs"
+  ],
+  "updatedAt": "2026-11-12T16:20:00.000Z"
+}
