@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "530085c",
-  "checkpoint": "617fd68",
-  "head": "535965e4f7f4cf94bd3381715520a3a9504037b5",
+  "base": "e1e0c97",
+  "checkpoint": "227d133",
+  "head": "b8661f0425d82b96bca3d821917d7ffa00951403",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-12T08:01:44.734Z",
+  "checkedAt": "2026-11-12T10:50:51.351Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -27,7 +27,7 @@
       ],
       "result": "PASS",
       "counts": {
-        "PASS": 74
+        "PASS": 78
       },
       "cases": [
         {
@@ -267,6 +267,26 @@
         },
         {
           "id": "E1-MUTATE-NOT-TESTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-FAIL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-UNKNOWN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-REPORT-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-ARTIFACT-TUPLE",
           "status": "PASS",
           "reason": null
         },
@@ -566,7 +586,7 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 25,
+        "PASS": 27,
         "NOT_TESTED": 6
       },
       "cases": [
@@ -716,6 +736,16 @@
           "reason": null
         },
         {
+          "id": "E3-CONTEXT-HISTORY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-SOURCES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
           "id": "E3-CONTEXT-UI",
           "status": "PASS",
           "reason": null
@@ -737,7 +767,7 @@
       "result": "PASS_WITH_GAPS",
       "counts": {
         "PASS": 15,
-        "NOT_TESTED": 4
+        "NOT_TESTED": 5
       },
       "cases": [
         {
@@ -813,7 +843,7 @@
         {
           "id": "E4-UPGRADE-ROLLBACK",
           "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: the default baseline schema 15 differs from target schema 16; an older binary cannot start on the newer state, and no second frozen build with schema 16 is available. Cross-schema refusal is measured by E4-UPGRADE-CROSS-SCHEMA; the prior schema15 same-schema upgrade/rollback result remains scoped to its old tuple."
+          "reason": "NOT_TESTED: the default baseline schema 16 differs from target schema 18; an older binary cannot start on the newer state, and no second frozen build with schema 18 is available. Cross-schema refusal is measured by E4-UPGRADE-CROSS-SCHEMA; the prior schema15 same-schema upgrade/rollback result remains scoped to its old tuple."
         },
         {
           "id": "E4-UPGRADE-CROSS-SCHEMA",
@@ -834,6 +864,11 @@
           "id": "E4-RECOVERY-PREFLIGHT",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E4-B-PRODUCTION-RECOVERY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
         }
       ]
     },
@@ -846,14 +881,9 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "NOT_TESTED": 3
+        "NOT_TESTED": 2
       },
       "cases": [
-        {
-          "id": "E5-CONTEXT-HISTORY",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: current context send/binding/audit is verified by E3-CONTEXT-USE, but A `store.workflows.assistant.contextHistory` and a main signed public cursor are not implemented in this checkout. Required: projectIds/scoping, keyset tie-break, max 100, expired bindings visible as history but not sendable, missing source text reported, cross-principal refusal and cursor expiry."
-        },
         {
           "id": "E5-NATIVE-CONTROL",
           "status": "NOT_TESTED",
@@ -897,7 +927,7 @@
         {
           "id": "E6-CURRENT-MAIN-INSTALL",
           "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: measured D tuple build 3311a04bd20ed7f9, schema 16, context send=true; current main schema 18. Required: a clean schema18 D tar containing context-use and the A18 result/backup family, then a fresh cold personal install, config/doctor/assets/public API and mocked selected-context send/reply."
+          "reason": "NOT_TESTED: measured D tuple build 1a2f34ac359a5739, schema 18, context=true, history=false, sources=false, replyResults=true; current main schema 18. Required: an accurate D tar from current main with context/history/sources/replyResults, then a fresh cold personal install and independent mocked context/reply."
         }
       ]
     },
@@ -908,15 +938,25 @@
       "notes": [
         "E4-MULTI-STATE on D cf7a3cf bytes still claims state B and kills its API for a stop aimed at state A; launcher-dead/API-alive remains NOT_TESTED because that defect destroys the prerequisite. E4-INSTALL-HOST-GUARDS covers unknown PID refusal."
       ],
-      "result": "FAIL",
+      "result": "PASS",
       "counts": {
-        "FAIL": 1
+        "PASS": 3
       },
       "cases": [
         {
+          "id": "E7-BACKUP-CONTEXT-REPLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
           "id": "E7-OWNERSHIP-COPY",
-          "status": "FAIL",
-          "reason": "OWNERSHIP_COPY_REFUSED: {\"status\":0,\"code\":null}"
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-OWNERSHIP-WRONG-INSTALL",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -929,11 +969,16 @@
       ],
       "result": "PASS",
       "counts": {
-        "PASS": 1
+        "PASS": 2
       },
       "cases": [
         {
           "id": "E8-SCHEMA-MIGRATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E8-LEGACY16-MIGRATION",
           "status": "PASS",
           "reason": null
         }
@@ -975,12 +1020,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-12T08:01:44.748Z",
+    "checkedAt": "2026-11-12T10:50:51.368Z",
     "source": {
-      "commit": "535965e4f7f4cf94bd3381715520a3a9504037b5",
+      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
       "dirty": false
     },
-    "expectedSource": "535965e4f7f4cf94bd3381715520a3a9504037b5",
+    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1503,6 +1548,16 @@
         "status": "PASS"
       },
       {
+        "id": "E3-CONTEXT-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SOURCES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E3-CONTEXT-UI",
         "required": true,
         "status": "PASS"
@@ -1534,6 +1589,11 @@
       },
       {
         "id": "E8-SCHEMA-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-LEGACY16-MIGRATION",
         "required": true,
         "status": "PASS"
       },
@@ -1630,59 +1690,42 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/context-confirm-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
     "wave09Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave09-status.json",
-    "wave12Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave12-status.json",
+    "wave13Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave13-status.json",
     "wave08Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave08-status.json",
     "wave07Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave07-status.json",
     "wave06Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave06-status.json",
     "tierVerdicts": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/tier-verdicts.json"
   },
-  "blockers": [
-    {
-      "id": "install-host-guards",
-      "capability": "模式保持、未知活 PID 阻断与不误杀",
-      "controlledFixture": "NOT_TESTED",
-      "sdkMock": "NOT_TESTED",
-      "readonly": "NOT_TESTED",
-      "installed": "FAIL",
-      "actualNative": "NOT_TESTED",
-      "gaps": [
-        "E4-MULTI-STATE 观测到 D 真实缺陷：对 state A 的 stop 返回 STOPPED 并杀掉共享安装下 state B 的 API 进程（launcher 仍活），launcher 死/API 活窗口因此无法测量。"
-      ],
-      "evidence": [
-        "E4-INSTALL-HOST-GUARDS",
-        "E4-MULTI-STATE",
-        "E7-OWNERSHIP-COPY"
-      ]
-    }
-  ],
+  "blockers": [],
   "untested": [
     {
       "id": "conversation-chat",
@@ -1820,14 +1863,20 @@
     {
       "id": "context-use",
       "gaps": [
-        "contextHistory 分页/A 持久历史未发布；历史不是发送授权。",
-        "E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile 第二次选源和双 tab 独立旧 selection；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。"
+        "E3-CONTEXT-HISTORY/SOURCES 与 UI history tab 已覆盖签名分页、原文核对、model-off 与损坏 bundle；readonly/跨 principal 历史由各自层报告。",
+        "E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile、双 tab 与 history tab；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。"
       ]
     },
     {
       "id": "reply-results",
       "gaps": [
-        "contextHistory/正文历史入口仍未发布；非空备份搬根与 schema18 安装族没有当前 D 字节。"
+        "reply 候选仍固定 suggestions=[]，候选产品入口未独立验收；历史正文已由 E3-CONTEXT-HISTORY/SOURCES 覆盖。"
+      ]
+    },
+    {
+      "id": "production-control",
+      "gaps": [
+        "E4-B-PRODUCTION-RECOVERY：main 当前产品未消费 B 新生产控制；fixture/WORK 存在不等于真实 Runner begin/answer/stop 恢复。"
       ]
     },
     {
@@ -1860,7 +1909,7 @@
     {
       "id": "install-host-guards",
       "gaps": [
-        "E4-MULTI-STATE 观测到 D 真实缺陷：对 state A 的 stop 返回 STOPPED 并杀掉共享安装下 state B 的 API 进程（launcher 仍活），launcher 死/API 活窗口因此无法测量。"
+        "E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。"
       ]
     },
     {
@@ -1909,28 +1958,23 @@
   "externalBlockers": [
     {
       "owner": "D",
-      "code": "copied_record_stops_original",
-      "detail": "On the current a22d3a4/schema16 tar, requested-data-root stop passes, but copying `var/config/instance.json` into another config root and running stop returns 0/STOPPED and terminates the original self-owned API. The record has no config binding, so config is not part of the authority. D must bind config/install/state and refuse the copied record before any signal."
-    },
-    {
-      "owner": "main",
-      "detail": "Context preview, selected-context prepare/send, SSE, audit and the completed-reply consumer are verified on current main; multi-tab isolation is now covered; recovery activation, context history and a current schema18/context-use install package remain inputs."
-    },
-    {
-      "owner": "A",
-      "detail": "A18 replyResults rows are integrated and verified with independent-process SIGKILL, corrupt artifact and no resend. `contextHistory`/raw history remains unpublished; the current D tar is schema16 and does not carry the A18 result/backup family."
-    },
-    {
-      "owner": "main",
-      "detail": "Migration ownership and review Work/Ticket/Assignment publication remain outside current main, so E3-REVIEW-PIPELINE stays NOT_TESTED."
+      "code": "current_tar_incomplete",
+      "detail": "NOT_TESTED: measured D tuple build 1a2f34ac359a5739, schema 18, context=true, history=false, sources=false, replyResults=true; current main schema 18. Required: an accurate D tar from current main with context/history/sources/replyResults, then a fresh cold personal install and independent mocked context/reply."
     },
     {
       "owner": "D",
-      "detail": "The wave-09 target tuple (6830e38 build f2390ffd, schema 15) passes byte-for-byte, personal cold start and same-schema managed upgrade; cross-schema old-binary refusal is measured. Any newer target must be named with its own tar/source/build/schema and independently re-tested."
+      "code": "upgrade_faults_not_tested",
+      "detail": "NOT_TESTED: the bounded managed-upgrade probe covers the confirmed switch, new data, binary rollback and a tampered target. D exposes PA_UPGRADE_FAULT crash windows and whole-process guards, but exercising them reliably needs a longer isolated run; this case stays NOT_TESTED rather than counting two fixture starts as an upgrade result."
     },
     {
       "owner": "B",
-      "detail": "Native ledger/results are not supplied as input and E has no budget, so actual-native and native control evidence are absent."
+      "code": "production_control_not_consumed",
+      "detail": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+    },
+    {
+      "owner": "main",
+      "code": "recovery_activation_missing",
+      "detail": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
     }
   ],
   "next": [

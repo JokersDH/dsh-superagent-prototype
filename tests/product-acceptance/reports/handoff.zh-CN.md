@@ -1,6 +1,6 @@
-# Agent E 第十二轮交付交接
+# Agent E 第十三轮交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `530085c`，检查点 `617fd68`，本次证据源 `535965e4f7f4cf94bd3381715520a3a9504037b5`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `e1e0c97`，检查点 `227d133`，本次证据源 `b8661f0425d82b96bca3d821917d7ffa00951403`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
 
@@ -9,13 +9,13 @@
 | 真实命令 | 覆盖病例 | 结果 |
 | --- | --- | --- |
 | `node tests/product-acceptance/pilot/harness.mjs --preflight` | 冻结输入/价格/ledger | BLOCKED（adapter_missing）；runner selftest 66/17 |
-| `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | E1-* | PASS 74 |
+| `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | E1-* | PASS 78 |
 | `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | E2-* | PASS 25 + NOT_TESTED 3 |
-| `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 25 + NOT_TESTED 6 |
-| `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 15 + NOT_TESTED 6 |
-| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 162 | PASS 143 + FAIL 1 + SKIPPED 0 + NOT_TESTED 18 + BLOCKED 0 + UNKNOWN 0 |
+| `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 27 + NOT_TESTED 6 |
+| `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 15 + NOT_TESTED 7 |
+| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 171 | PASS 153 + FAIL 0 + SKIPPED 0 + NOT_TESTED 18 + BLOCKED 0 + UNKNOWN 0 |
 
-本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z`。
 
 ## 矩阵摘要
 
@@ -56,11 +56,12 @@
 | 显式选源消息、同事务绑定、审计、SSE 与丢响应重放 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 完成回复先落盘、失败重开补齐且不重复请求 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 真实 D 数据库迁移到当前 A schema 且数据保留 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| B 真实生产 begin/answer/stop 与独立进程恢复 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 恢复后首次启动只读、零业务发送 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 明确决定、授权上下文、结构化提案与事务消费 | PASS | NOT_TESTED | PASS | NOT_TESTED | NOT_TESTED |
 | 可迁移发行、安装、备份恢复、升级回滚 | NOT_TESTED | NOT_TESTED | PASS | PASS | NOT_TESTED |
 | D 托管 upgrade/rollback-install 与显式 baseline/target 字节 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 模式保持、未知活 PID 阻断与不误杀 | NOT_TESTED | NOT_TESTED | NOT_TESTED | FAIL | NOT_TESTED |
+| 模式保持、未知活 PID 阻断与不误杀 | NOT_TESTED | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
 | 结构化提案 prepare/confirm/reject（真实 HTTP/SQLite） | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 提案网页预览/确认/拒绝与响应丢失重放 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 上下文来源/窗口/授权预览 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
@@ -79,9 +80,9 @@
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 `controlled-product-workflow` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **FAIL（仅所测 tuple）**：cold install/config root/doctor、普通 personal cold start、模式保持、备份恢复、篡改拒绝、requested-data-root stop、跨 schema 精确拒绝、D schema→当前A schema 迁移 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-CROSS-SCHEMA、E8-SCHEMA-MIGRATION。tuple=3311a04bd20ed7f9/schema 16，main schema 18；current-main install=NOT_TESTED；E4-UPGRADE-ROLLBACK/E4-UPGRADE-FAULTS 仍 NOT_TESTED；copied-record stop=FAIL。 |
+| 安装准入（个人 Alpha） | **FAIL（仅所测 tuple）**：cold personal、fixture 安装版 context、非空 context/reply 备份搬根、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=1a2f34ac359a5739/schema 18，main schema 18；current-main install=NOT_TESTED；E4-UPGRADE-ROLLBACK/E4-UPGRADE-FAULTS 仍 NOT_TESTED；E6 current missing history=true。 |
 
-安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `da2d78d126e4745f` / schema 15 / tar `f886a05c…` / source `cf7a3cfe`；target buildId `3311a04bd20ed7f9` / schema 16 / tar `a10f6274…` / source `a22d3a4b`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
+安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `3311a04bd20ed7f9` / schema 16 / tar `a10f6274…` / source `a22d3a4b`；target buildId `1a2f34ac359a5739` / schema 18 / tar `96d32fb5…` / source `020af824`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
 ## 独立复核价值试点
 
@@ -101,13 +102,13 @@
 | `module` | PASS |
 | `controlled-product` | PASS |
 | `actual-native-control` | FAIL（case_not_pass, layer_not_allowed） |
-| `installed-alpha` | FAIL（case_not_pass, layer_not_allowed, required_evidence_missing） |
+| `installed-alpha` | FAIL（case_not_pass, required_evidence_missing） |
 | `advisory-routing` | FAIL（case_not_pass, layer_not_allowed） |
 | `controlled-review` | FAIL（case_not_pass, layer_not_allowed, missing_required_case） |
 | `actual-heterogeneous-review` | FAIL（case_not_pass, layer_not_allowed, missing_required_case） |
 | `review-value` | FAIL（case_not_pass, layer_not_allowed） |
-| `local-alpha` | FAIL（case_not_pass, layer_not_allowed, required_evidence_missing） |
-| `full-product` | FAIL（case_not_pass, layer_not_allowed, required_evidence_missing, missing_required_case） |
+| `local-alpha` | FAIL（case_not_pass, required_evidence_missing） |
+| `full-product` | FAIL（case_not_pass, required_evidence_missing, missing_required_case, layer_not_allowed） |
 
 ## 明确未测
 
@@ -133,13 +134,14 @@
 - **真实不同协议复核（版本/身份/预算/隔离/主题）**：第二协议未实现，独立试点 preflight 为 BLOCKED；不能把替换模型或 fixture 当异构。
 - **项目设置版本化与归档**：仅合同 revision 已验证；项目设置版本 API 未交付（RFC-E-001 缺口 2）。
 - **上下文、提案与明确决定治理**：自动结构化提案确认仍未发布（owner C/main）；当前只验证显式 prepare/confirm/reject。；源消息删除/授权过期/事务失败注入缺少公开入口（E3-DECISION-SOURCE-STATES）。
-- **显式选源消息、同事务绑定、审计、SSE 与丢响应重放**：contextHistory 分页/A 持久历史未发布；历史不是发送授权。；E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile 第二次选源和双 tab 独立旧 selection；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。
-- **完成回复先落盘、失败重开补齐且不重复请求**：contextHistory/正文历史入口仍未发布；非空备份搬根与 schema18 安装族没有当前 D 字节。
+- **显式选源消息、同事务绑定、审计、SSE 与丢响应重放**：E3-CONTEXT-HISTORY/SOURCES 与 UI history tab 已覆盖签名分页、原文核对、model-off 与损坏 bundle；readonly/跨 principal 历史由各自层报告。；E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile、双 tab 与 history tab；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。
+- **完成回复先落盘、失败重开补齐且不重复请求**：reply 候选仍固定 suggestions=[]，候选产品入口未独立验收；历史正文已由 E3-CONTEXT-HISTORY/SOURCES 覆盖。
+- **B 真实生产 begin/answer/stop 与独立进程恢复**：E4-B-PRODUCTION-RECOVERY：main 当前产品未消费 B 新生产控制；fixture/WORK 存在不等于真实 Runner begin/answer/stop 恢复。
 - **恢复后首次启动只读、零业务发送**：解除隔离后的新授权/环境重绑定未实现，不在本轮声明。
 - **明确决定、授权上下文、结构化提案与事务消费**：自动提案确认与撤销后上下文失效未发布。
 - **可迁移发行、安装、备份恢复、升级回滚**：安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。；旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。；E6-CURRENT-MAIN-INSTALL：按 E6-ARTIFACT-CURRENT-SCOPE 实测 schema/context 能力动态判断；当前 tuple 与 current main schema 不同时保留 NOT_TESTED，旧安装结果保持原 tuple scope。
 - **D 托管 upgrade/rollback-install 与显式 baseline/target 字节**：E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口仍未稳定执行，保持 NOT_TESTED；不得以两次 fixture start 代替。；升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。
-- **模式保持、未知活 PID 阻断与不误杀**：E4-MULTI-STATE 观测到 D 真实缺陷：对 state A 的 stop 返回 STOPPED 并杀掉共享安装下 state B 的 API 进程（launcher 仍活），launcher 死/API 活窗口因此无法测量。
+- **模式保持、未知活 PID 阻断与不误杀**：E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。
 - **结构化提案 prepare/confirm/reject（真实 HTTP/SQLite）**：source/grant 漂移与 outer receipt 失败注入未在 HTTP 层单独执行；网页层由 E3-PROPOSAL-UI 覆盖。
 - **上下文来源/窗口/授权预览**：E3-CONTEXT-GRANT-BOUNDARY 仍未执行：expired grant/purpose/超预算的 HTTP 级反例缺少入口。
 - **工作证据与分页历史**：storage_cap 与并发写入窗口未单独触发；历史窗口语义按 complete/caller_limit 已验证。
@@ -159,8 +161,8 @@
 
 ## 下一消费者
 
-1. D：requested-data-root stop 在 a22d3a4 已通过，但 copied record 到另一 config root 仍能停止原 API（E7-OWNERSHIP-COPY FAIL）；先统一 config/install/shared-cache 所有权，再冻结 current-main/schema18/context-use 的新 tar，并补同 schema 双 binary 的 upgrade/recover/rollback 与崩溃窗口。
-2. A/main：发布 contextHistory/正文历史与真实恢复 activation；E 已关闭 replyResults 的真实进程/SIGKILL/坏 artifact 组合，但 schema18 非空备份搬根仍等 D 当前 tar。
+1. D：当前 020af82/schema18 的 requested-root、copied-record 与 wrong-install 所有权均通过；剩余是 current-main history/sources 未进包（E6-CURRENT-MAIN-INSTALL NOT_TESTED）、没有第二个 schema18 binary 的 upgrade/rollback 与 PA_UPGRADE_FAULT 窗口。先交含 e1e0c97 history/source 的准确当前 tar 和第二个冻结 build，再关闭对应 NOT_TESTED。
+2. main/B：发布真实恢复 activation 与 B 生产 begin/answer/stop 消费者；E 已关闭 A18 回复/SIGKILL/坏 artifact、context history/source/frozen UI 和 schema18 非空备份搬根。
 3. main：继续交 recovery activation 与真实空目标启动；E 已独立验证 context-use/SSE/audit、单 tab 丢响应、双 tab 独立旧 selection、mobile 再选源和 reply consumer，不重复把入口未发布当阻断。
 4. B：提供绑定 commit/attempt 的原生证据（`executed: true` + model task 计数）；E 只消费，不重跑计费任务。旧安装结果、wave09/wave10 ledger 与报告原样保留。
 

@@ -309,7 +309,7 @@ const CAPABILITIES = [
     id: 'install-host-guards',
     label: '模式保持、未知活 PID 阻断与不误杀',
     installed: ['E4-INSTALL-HOST-GUARDS', 'E4-MULTI-STATE', 'E7-OWNERSHIP-COPY', 'E7-OWNERSHIP-WRONG-INSTALL'],
-    notTested: ['E4-MULTI-STATE 观测到 D 真实缺陷：对 state A 的 stop 返回 STOPPED 并杀掉共享安装下 state B 的 API 进程（launcher 仍活），launcher 死/API 活窗口因此无法测量。'],
+    notTested: ['E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。'],
   },
   {
     id: 'proposal-http',
@@ -581,7 +581,7 @@ ${rows
 
 ## 下一消费者
 
-1. D：requested-data-root stop 在 a22d3a4 已通过，但 copied record 到另一 config root 仍能停止原 API（E7-OWNERSHIP-COPY FAIL）；先统一 config/install/shared-cache 所有权，再冻结 current-main/schema18/context-use 的新 tar，并补同 schema 双 binary 的 upgrade/recover/rollback 与崩溃窗口。
+1. D：当前 020af82/schema18 的 requested-root、copied-record 与 wrong-install 所有权均通过；剩余是 current-main history/sources 未进包（E6-CURRENT-MAIN-INSTALL NOT_TESTED）、没有第二个 schema18 binary 的 upgrade/rollback 与 PA_UPGRADE_FAULT 窗口。先交含 e1e0c97 history/source 的准确当前 tar 和第二个冻结 build，再关闭对应 NOT_TESTED。
 2. main/B：发布真实恢复 activation 与 B 生产 begin/answer/stop 消费者；E 已关闭 A18 回复/SIGKILL/坏 artifact、context history/source/frozen UI 和 schema18 非空备份搬根。
 3. main：继续交 recovery activation 与真实空目标启动；E 已独立验证 context-use/SSE/audit、单 tab 丢响应、双 tab 独立旧 selection、mobile 再选源和 reply consumer，不重复把入口未发布当阻断。
 4. B：提供绑定 commit/attempt 的原生证据（\`executed: true\` + model task 计数）；E 只消费，不重跑计费任务。旧安装结果、wave09/wave10 ledger 与报告原样保留。

@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "535965e4f7f4cf94bd3381715520a3a9504037b5",
+    "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
     "dirty": false
   },
   "environment": {
@@ -11,15 +11,15 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-12T08:01:44.734Z",
+  "checkedAt": "2026-11-12T10:50:51.351Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 143,
-    "FAIL": 1,
+    "PASS": 153,
+    "FAIL": 0,
     "SKIPPED": 0,
     "NOT_TESTED": 18,
     "BLOCKED": 0,
@@ -516,13 +516,15 @@
       "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "contextHistory 分页/A 持久历史未发布；历史不是发送授权。",
-        "E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile 第二次选源和双 tab 独立旧 selection；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。"
+        "E3-CONTEXT-HISTORY/SOURCES 与 UI history tab 已覆盖签名分页、原文核对、model-off 与损坏 bundle；readonly/跨 principal 历史由各自层报告。",
+        "E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile、双 tab 与 history tab；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。"
       ],
       "evidence": [
         "E3-CONTEXT-USE",
         "E3-CONTEXT-SSE",
         "E3-CONTEXT-GUARDS",
+        "E3-CONTEXT-HISTORY",
+        "E3-CONTEXT-SOURCES",
         "E3-CONTEXT-UI",
         "E9-CONTEXT-CONCURRENCY"
       ]
@@ -536,7 +538,7 @@
       "installed": "NOT_TESTED",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "contextHistory/正文历史入口仍未发布；非空备份搬根与 schema18 安装族没有当前 D 字节。"
+        "reply 候选仍固定 suggestions=[]，候选产品入口未独立验收；历史正文已由 E3-CONTEXT-HISTORY/SOURCES 覆盖。"
       ],
       "evidence": [
         "E4-COMPLETED-REPLY",
@@ -556,8 +558,22 @@
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
-        "E8-SCHEMA-MIGRATION"
+        "E8-SCHEMA-MIGRATION",
+        "E8-LEGACY16-MIGRATION"
       ]
+    },
+    {
+      "id": "production-control",
+      "capability": "B 真实生产 begin/answer/stop 与独立进程恢复",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "NOT_TESTED",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "E4-B-PRODUCTION-RECOVERY：main 当前产品未消费 B 新生产控制；fixture/WORK 存在不等于真实 Runner begin/answer/stop 恢复。"
+      ],
+      "evidence": []
     },
     {
       "id": "recovery-readonly",
@@ -613,7 +629,8 @@
         "E4-INSTALL-REUSE-CONCURRENCY",
         "E4-BACKUP-RESTORE",
         "E4-INSTALL-TAMPER",
-        "E4-INSTALL-ROLLBACK"
+        "E4-INSTALL-ROLLBACK",
+        "E7-BACKUP-CONTEXT-REPLY"
       ]
     },
     {
@@ -639,15 +656,16 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
-      "installed": "FAIL",
+      "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "E4-MULTI-STATE 观测到 D 真实缺陷：对 state A 的 stop 返回 STOPPED 并杀掉共享安装下 state B 的 API 进程（launcher 仍活），launcher 死/API 活窗口因此无法测量。"
+        "E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。"
       ],
       "evidence": [
         "E4-INSTALL-HOST-GUARDS",
         "E4-MULTI-STATE",
-        "E7-OWNERSHIP-COPY"
+        "E7-OWNERSHIP-COPY",
+        "E7-OWNERSHIP-WRONG-INSTALL"
       ]
     },
     {
