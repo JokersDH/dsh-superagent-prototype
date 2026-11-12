@@ -8,15 +8,14 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { ProductStore } from '../../packages/storage/dist/index.js'
-import { AssistantContextBindingSchema } from '../../packages/contracts/dist/index.js'
 import { createProductRuntime } from '../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../apps/coordinator/http/app.ts'
 import { listenLocalHttp } from '../../apps/coordinator/http/server.ts'
 
-const { values } = parseArgs({ options: { 'no-capture': { type: 'boolean', default: false } } })
+const { values } = parseArgs({ options: { 'no-capture': { type: 'boolean', default: false }, output: { type: 'string' } } })
 const require = createRequire(new URL('../../apps/console/package.json', import.meta.url))
 const { chromium } = require('@playwright/test'), { createServer } = await import(require.resolve('vite'))
-const output = resolve('reports/releases/wave10-integration/context-browser')
+const output = resolve(values.output ?? 'reports/releases/wave10-integration/context-browser')
 mkdirSync(output, { recursive: true })
 const root = mkdtempSync(join(tmpdir(), 'pa-context-send-browser-')), stateRoot = join(root, 'state'), projectRoot = join(root, 'project')
 mkdirSync(stateRoot); mkdirSync(projectRoot); mkdirSync(join(projectRoot, 'src'))
@@ -28,7 +27,7 @@ const scope = { projectId: 'payment-project', allowedPaths: ['src/'], excludedPa
 const conversationId = 'payment-conversation', store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
 let time = new Date().toISOString(), providerConfigured = true, firstRelease, firstStarted
 const firstGate = new Promise(resolve => { firstRelease = resolve }), begun = new Promise(resolve => { firstStarted = resolve })
-const requests = [], records = new Map()
+const requests = []
 const provider = {
   status: () => ({ protocol: 'assistant-provider/1', configured: providerConfigured, baseURL: 'https://fixture.invalid/v1', model: 'mock-context',
     models: ['mock-context'], state: providerConfigured ? 'configured' : 'not_configured', secureTransport: true }),
@@ -40,23 +39,12 @@ const provider = {
     return { text: '依据所选来源，保留既有错误码。', model: 'mock-context' }
   },
 }
-// A remains the only SQL writer. This fallback is deliberately an afterCommit composition fixture;
-// its in-memory records do not certify production binding-table persistence or process recovery.
-const bindingFixture = store.workflows.assistant.contextBindings ?? {
-  forMessage: id => { const value = [...records.values()].find(value => value.messageId === id); return value && structuredClone(value) },
-  forCommand: id => { const value = records.get(id); return value && structuredClone(value) },
-  put: value => {
-    assert.ok(store.uow.nesting > 0)
-    const binding = AssistantContextBindingSchema.parse(value), existing = records.get(binding.commandId)
-    if (existing) { assert.deepEqual(existing, binding); return { binding: structuredClone(existing), replayed: true } }
-    store.uow.afterCommit(() => records.set(binding.commandId, structuredClone(binding)))
-    return { binding, replayed: false }
-  },
-}
+assert.ok(store.workflows.assistant.contextBindings)
+assert.ok(store.workflows.assistant.replyResults)
 const product = createProductRuntime({ store, principal, stateRoot, scratchProject: projectRoot,
   projects: [{ id: scope.projectId, displayName: '支付服务', scope },
     { id: 'docs-project', displayName: '文档项目', scope: { ...scope, projectId: 'docs-project' } }],
-  actionSecret: Buffer.alloc(32, 48), assistantProvider: provider, assistantContextBindings: bindingFixture, now: () => time })
+  actionSecret: Buffer.alloc(32, 48), assistantProvider: provider, now: () => time })
 const original = { id: 'payment-source', conversationId, projectId: scope.projectId, role: 'user', provenance: 'trusted_user',
   text: 'PAYMENT-SOURCE：支付变更必须保留既有错误码。', sourceRefs: [], createdAt: time }
 store.product.messages.append(original)
@@ -227,6 +215,9 @@ try {
     assert.equal(await dialog.getByRole('button', { name: '生成预览', exact: true }).isEnabled(), true)
     await page.keyboard.press('Escape'); await dialog.waitFor({ state: 'hidden' }); await page.unroute('**/v1/configuration')
     assert.deepEqual(errors, [])
+    const replies = store.product.messages.page(conversationId).messages.filter(message => message.provenance === 'reasoner_reply')
+    assert.ok(replies.length)
+    for (const reply of replies) assert.ok(store.workflows.assistant.replyResults.forReply(reply.id))
   })
 } finally {
   firstRelease(); await browser?.close(); await vite.close(); api.closeAllConnections(); await new Promise(resolve => api.close(resolve))
@@ -235,10 +226,9 @@ try {
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'tests/integration/assistant-context-workbench-browser.mjs'], { encoding: 'utf8' }).trim() === '',
     checkedAt: new Date().toISOString(), cases, errors, modelCalls: 0, mockProviderCalls: requests.length,
-    bindingPort: store.workflows.assistant.contextBindings ? 'production_A_port' : 'afterCommit_in_memory_composition_fixture',
+    bindingPort: 'production_A_port', replyResultPort: 'production_A_SQLite', productSchema: store.database.productSchema,
     limitations: ['Actual local HTTP/SQLite/React/SSE plus mock AssistantModelPort; zero real native/model turns',
-      store.workflows.assistant.contextBindings ? 'Production A binding port is exercised in this process; no independent process-crash or backup certification'
-        : 'A-compatible fixture fallback does not certify production binding-table crash durability',
+      'Production A binding/result ports exercised; independent process crashes are covered by a separate suite',
       'Work remains paused; no coding execution or target activation is admitted'] }
   writeFileSync(join(output, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n')
   console.log(JSON.stringify(report, null, 2))
