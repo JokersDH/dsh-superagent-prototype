@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { ProductStore } from '../../../packages/storage/dist/index.js'
-import { runCase, LAYERS } from '../lib/status.mjs'
+import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 
 const here = new URL('.', import.meta.url).pathname
 const child = join(here, 'w12-reply-process-child.mjs')
@@ -91,6 +91,10 @@ export async function runReplyDurability() {
         evidence.replyBadArtifact = { calls: recovered.value.modelCalls, replies: 0, notice: recovered.value.notices[0].text }
       } finally { rmSync(root, { recursive: true, force: true }) }
     }))
+
+  cases.push(notTested({
+    ...define('E4-B-PRODUCTION-RECOVERY', 'Real B production begin/answer/stop recovery through the product Store/queues/Runner', { layer: LAYERS.NOT_TESTED }),
+  }, 'NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B\'s new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery.'))
 
   return { cases, artifacts: {} }
 }

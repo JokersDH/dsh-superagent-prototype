@@ -1,4 +1,5 @@
 import { join } from 'node:path'
+import { writeFileSync } from 'node:fs'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { contextProjectRoot, startContextProduct } from '../lib/context-product.mjs'
 
@@ -202,6 +203,70 @@ export async function runContextUse({ root, runDirectory }) {
     evidence.completedReply = { providerRequests: h.requests.length, replies: recovered.length,
       auditStable: true, recoveredMessageId: recovered[0].id, persistence: 'A18 SQLite replyResults rows' }
   }))
+
+  cases.push(await runCase({ ...define('E3-CONTEXT-HISTORY', 'Signed history pages retain scope, continuation and model-off readability without resend'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const { h } = await harness()
+      const sendOne = async (id, text) => {
+        const prepared = await h.prepare(input('w11-project-a', 'conv-a', id, text))
+        const sent = await h.send({ commandId: id, token: prepared.body.token })
+        assert(`HISTORY_SEND_${id}`, sent.status === 200 && sent.body?.status === 'recorded', JSON.stringify(sent.body)?.slice(0, 200))
+        await h.flush()
+        return prepared
+      }
+      await sendOne('w11-history-1', '历史消息一。')
+      await sendOne('w11-history-2', '历史消息二。')
+      const first = await h.history({ projectId: 'w11-project-a', conversationId: 'conv-a', limit: 1 })
+      assert('HISTORY_200', first.status === 200 && first.body?.protocol === 'context-history/1', JSON.stringify(first.body)?.slice(0, 300))
+      assert('HISTORY_SCOPE', first.body?.projectId === 'w11-project-a' && first.body?.conversationId === 'conv-a', JSON.stringify(first.body)?.slice(0, 200))
+      assert('HISTORY_LIMIT', first.body?.entries?.length === 1 && first.body?.hasMore === true && !!first.body?.nextCursor, JSON.stringify({ entries: first.body?.entries?.length, more: first.body?.hasMore }))
+      const second = await h.history({ projectId: 'w11-project-a', conversationId: 'conv-a', limit: 1, cursor: first.body.nextCursor })
+      assert('HISTORY_CONTINUATION', second.status === 200 && second.body?.entries?.[0]?.messageId !== first.body.entries[0].messageId, JSON.stringify(second.body?.entries?.map(item => item.messageId)))
+      const entry = first.body.entries[0]
+      assert('HISTORY_ENTRY_TEXT', entry.message?.state === 'available' && entry.message.text.length > 0 && entry.sourceCount >= 1, JSON.stringify(entry)?.slice(0, 300))
+      const tampered = `${first.body.nextCursor.slice(0, -2)}AA`
+      const refused = await h.history({ projectId: 'w11-project-a', conversationId: 'conv-a', cursor: tampered })
+      assert('HISTORY_CURSOR_REFUSED', refused.status === 403 || refused.status === 400 || refused.status === 409, JSON.stringify(refused.body)?.slice(0, 200))
+      const crossProject = await h.history({ projectId: 'w11-project-a', conversationId: 'conv-b' })
+      assert('HISTORY_CROSS_CONVERSATION', crossProject.status === 200 && crossProject.body.entries.length === 0, JSON.stringify(crossProject.body?.entries?.length))
+      h.provider.configured = false
+      const offline = await h.history({ projectId: 'w11-project-a', conversationId: 'conv-a', limit: 5 })
+      assert('HISTORY_MODEL_OFF', offline.status === 200 && offline.body.entries.length >= 2, JSON.stringify({ status: offline.status, entries: offline.body?.entries?.length }))
+      h.provider.configured = true
+      h.setNow(new Date(Date.parse(entry.expiresAt) + 1000).toISOString())
+      const expired = await h.history({ projectId: 'w11-project-a', conversationId: 'conv-a', limit: 5 })
+      assert('HISTORY_EXPIRED_VISIBLE', expired.status === 200 && expired.body.entries.some(item => Date.parse(item.expiresAt) <= Date.parse(h.now())), JSON.stringify(expired.body?.entries?.map(item => item.expiresAt)))
+      const sources = await h.sources(entry.messageId)
+      assert('HISTORY_SOURCES_AFTER_EXPIRY', sources.status === 200 && sources.body?.protocol === 'context-sources/1', JSON.stringify(sources.body)?.slice(0, 300))
+      assert('HISTORY_NO_RESEND', h.requests.length === 2, String(h.requests.length))
+      evidence.history = { first: first.body.entries.length, more: first.body.hasMore, second: second.body?.entries?.length ?? null,
+        crossConversation: crossProject.body?.entries?.length ?? null, modelOff: offline.body?.entries?.length ?? null, expiredVisible: true, providerCalls: h.requests.length }
+    }))
+
+  cases.push(await runCase({ ...define('E3-CONTEXT-SOURCES', 'Frozen source bodies verify exactly and corrupt bundles expose no content'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const { h } = await harness()
+      const prepared = await h.prepare(input('w11-project-a', 'conv-a', 'w11-sources-1', '来源正文消息。'))
+      await h.send({ commandId: 'w11-sources-1', token: prepared.body.token })
+      await h.flush()
+      const binding = h.bindings().forCommand('w11-sources-1')
+      const sources = await h.sources(binding.messageId)
+      assert('SOURCES_200', sources.status === 200 && sources.body?.protocol === 'context-sources/1', JSON.stringify(sources.body)?.slice(0, 300))
+      assert('SOURCES_VERIFIED', sources.body?.state === 'verified', String(sources.body?.state))
+      assert('SOURCES_BINDING', JSON.stringify(sources.body?.binding) === JSON.stringify(binding), 'binding differs')
+      assert('SOURCES_EXACT', sources.body?.sources?.length === binding.sources.length && sources.body.sources.every((source, index) => source.previewDigest === binding.sources[index].previewDigest && source.sourceDigest === binding.sources[index].sourceDigest), JSON.stringify(sources.body?.sources?.map(item => item.sourceId)))
+      assert('SOURCES_NO_TOKEN', sources.body?.token === undefined && sources.body?.commandId === undefined, JSON.stringify(Object.keys(sources.body ?? {})))
+      const beforeCalls = h.requests.length
+      const path = h.store.artifacts.filePath(binding.bundleRef)
+      writeFileSync(path, 'corrupt frozen context bundle')
+      const missing = await h.sources(binding.messageId)
+      assert('SOURCES_CORRUPT_STATE', missing.status === 200 && ['missing', 'unverified', 'scope_changed'].includes(missing.body?.state), JSON.stringify(missing.body)?.slice(0, 300))
+      assert('SOURCES_CORRUPT_EMPTY', missing.body?.sources?.length === 0 && missing.body?.omitted?.length === 0, JSON.stringify(missing.body?.sources?.length))
+      assert('SOURCES_NO_PROVIDER', h.requests.length === beforeCalls, String(h.requests.length))
+      const absent = await h.sources('missing-message-id')
+      assert('SOURCES_404', absent.status === 404, String(absent.status))
+      evidence.sources = { verified: sources.body.sources.length, stateAfterCorrupt: missing.body?.state, providerCalls: h.requests.length }
+    }))
 
   cases.push(await runCase({ ...define('E9-CONTEXT-CONCURRENCY', 'Four selected sends and one duplicate token stay bounded with one provider call each'),
     evidence: {} }, async ({ assert, evidence }) => {

@@ -101,8 +101,12 @@ const evidenceFor = (key) => {
       return { complete: true, providerRequests: 1 }
     case 'guards':
       return { cross: 403, drift: 'conflict', expiry: 'stale_contract', offline: 'unsupported_capability', unknownProviderCalls: 1 }
+    case 'history':
+      return { first: 1, more: true, second: 1, crossConversation: 0, modelOff: 3, expiredVisible: true, providerCalls: 2 }
+    case 'sources':
+      return { verified: 2, stateAfterCorrupt: 'missing', providerCalls: 1 }
     case 'contextUi':
-      return { desktopMessages: 1, mobileMessages: 2, tabMessages: 2, pendingReconciled: true, providerRequests: 5, auditCommandIds: ['c'] }
+      return { desktopMessages: 1, mobileMessages: 2, tabMessages: 2, historyRows: 4, pendingReconciled: true, providerRequests: 5, auditCommandIds: ['c'] }
     case 'concurrency':
       return { prepared: 4, recorded: 4, replies: 4, providerCalls: 4, bindings: 4 }
     case 'replyDurable':
@@ -113,12 +117,19 @@ const evidenceFor = (key) => {
       return { crashedCalls: 1, recoveredCalls: 0, replies: 1 }
     case 'replyBadArtifact':
       return { calls: 0, replies: 0, notice: '无法核对' }
+    case 'frozenScope':
+      return { artifact: { buildId: 'b', source: 'a'.repeat(40), schema: 18, tarSha256: 'b'.repeat(64), tarBytes: 1 },
+        capability: { hasContextRoute: true, hasHistoryRoute: true, hasSourcesRoute: true, hasReplyResults: true }, main: { schema: 18 }, currentMainEligible: true }
+    case 'legacyMigration':
+      return { old: { schema: 16, messages: 2 }, migrated: { schema: 18, messages: 2 } }
     case 'schemaMigration':
       return { old: { schema: 15, messages: 3 }, migrated: { schema: 16, messages: 3, bindingTable: true }, reopened: true }
     case 'completedReply':
       return { providerRequests: 1, replies: 1, auditStable: true }
     case 'unknownReply':
       return { providerRequests: 1, notice: true, reply: false }
+    case 'backupContextReply':
+      return { before: { bindings: 1, results: 1, messages: 2 }, after: { bindings: 1, results: 1, messages: 2 }, artifacts: 1, reply: 'ok' }
     case 'installedContext':
       return { available: true, prepare: 200, send: 'recorded', reply: 'ok', audit: 200, modelCalls: 1 }
     case 'personalInstall':
@@ -462,7 +473,7 @@ const rejectWith = (assert, label, mutate, expected) => {
 
 const findCase = (report, id) => report.cases.find((item) => item.id === id)
 const NATIVE_ID = NATIVE_CASES[0].id
-const INSTALL_ID = INSTALL_CASES[0].id
+const INSTALL_ID = 'E4-INSTALL-ARTIFACT-IDENTITY'
 const DOWNLOAD_ID = 'E3-ACCEPT-AND-DOWNLOAD'
 const PATCH_ID = 'E2-DAILY-VERTICAL'
 
@@ -820,6 +831,42 @@ const CASES = [
         },
         'case_not_pass',
       ),
+  },
+  {
+    id: 'E1-MUTATE-REQUIRED-FAIL',
+    title: 'A required case with FAIL status blocks the tier',
+    check: ({ assert }) =>
+      rejectWith(assert, 'REQUIRED_FAIL', (report) => {
+        findCase(report, INSTALL_ID).status = STATUS.FAIL
+        return report
+      }, 'case_not_pass'),
+  },
+  {
+    id: 'E1-MUTATE-REQUIRED-UNKNOWN',
+    title: 'A required case with UNKNOWN status blocks the tier',
+    check: ({ assert }) =>
+      rejectWith(assert, 'REQUIRED_UNKNOWN', (report) => {
+        findCase(report, INSTALL_ID).status = STATUS.UNKNOWN
+        return report
+      }, 'case_not_pass'),
+  },
+  {
+    id: 'E1-MUTATE-WRONG-REPORT-SOURCE',
+    title: 'A report whose source differs from the evaluated source is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'WRONG_REPORT_SOURCE', (report) => {
+        report.source.commit = 'f'.repeat(40)
+        return report
+      }, 'source_mismatch'),
+  },
+  {
+    id: 'E1-MUTATE-WRONG-ARTIFACT-TUPLE',
+    title: 'A changed frozen tar tuple is rejected instead of accepted as the tested artifact',
+    check: ({ assert }) =>
+      rejectWith(assert, 'WRONG_ARTIFACT_TUPLE', (report) => {
+        findCase(report, 'E6-ARTIFACT-CURRENT-SCOPE').evidence.frozenScope.artifact.tarSha256 = '0'.repeat(64)
+        return report
+      }, 'frozenScope_invalid'),
   },
   {
     id: 'E1-MUTATE-SELF-CLAIM',

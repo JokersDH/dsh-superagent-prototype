@@ -87,6 +87,8 @@ export async function startContextProduct({ stateRoot, projectPath, principal, p
     prepare: body => request('/v1/assistant/context/prepare', { method: 'POST', body }),
     send: body => request('/v1/assistant/context/send', { method: 'POST', body }),
     audit: id => request(`/v1/messages/${id}/context`),
+    history: query => request(`/v1/context/history?${new URLSearchParams(Object.entries(query).filter(([, value]) => value !== undefined).map(([key, value]) => [key, String(value)]))}`),
+    sources: id => request(`/v1/messages/${id}/context/sources`),
     setNow: value => { clock = value },
     now: () => clock,
     bindings: () => store.workflows.assistant.contextBindings,

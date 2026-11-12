@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { STATUS } from './lib/status.mjs'
 import { evaluateRelease } from './lib/release.mjs'
-import { tier as releaseTier } from './lib/release-requirements.mjs'
+import { INSTALL_CASES, tier as releaseTier } from './lib/release-requirements.mjs'
 import { resolveFixtureDigest } from './lib/fixtures.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -239,22 +239,27 @@ const CAPABILITIES = [
   {
     id: 'context-use',
     label: '显式选源消息、同事务绑定、审计、SSE 与丢响应重放',
-    controlled: ['E3-CONTEXT-USE', 'E3-CONTEXT-SSE', 'E3-CONTEXT-GUARDS', 'E3-CONTEXT-UI', 'E9-CONTEXT-CONCURRENCY'],
+    controlled: ['E3-CONTEXT-USE', 'E3-CONTEXT-SSE', 'E3-CONTEXT-GUARDS', 'E3-CONTEXT-HISTORY', 'E3-CONTEXT-SOURCES', 'E3-CONTEXT-UI', 'E9-CONTEXT-CONCURRENCY'],
     notTested: [
-      'contextHistory 分页/A 持久历史未发布；历史不是发送授权。',
-      'E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile 第二次选源和双 tab 独立旧 selection；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。',
+      'E3-CONTEXT-HISTORY/SOURCES 与 UI history tab 已覆盖签名分页、原文核对、model-off 与损坏 bundle；readonly/跨 principal 历史由各自层报告。',
+      'E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile、双 tab 与 history tab；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。',
     ],
   },
   {
     id: 'reply-results',
     label: '完成回复先落盘、失败重开补齐且不重复请求',
     controlled: ['E4-COMPLETED-REPLY', 'E2-REPLY-DURABLE', 'E2-REPLY-UNKNOWN-DURABLE', 'E2-REPLY-MESSAGE-WINDOW', 'E2-REPLY-BAD-ARTIFACT'],
-    notTested: ['contextHistory/正文历史入口仍未发布；非空备份搬根与 schema18 安装族没有当前 D 字节。'],
+    notTested: ['reply 候选仍固定 suggestions=[]，候选产品入口未独立验收；历史正文已由 E3-CONTEXT-HISTORY/SOURCES 覆盖。'],
   },
   {
     id: 'schema-migration',
     label: '真实 D 数据库迁移到当前 A schema 且数据保留',
-    controlled: ['E8-SCHEMA-MIGRATION'],
+    controlled: ['E8-SCHEMA-MIGRATION', 'E8-LEGACY16-MIGRATION'],
+  },
+  {
+    id: 'production-control',
+    label: 'B 真实生产 begin/answer/stop 与独立进程恢复',
+    notTested: ['E4-B-PRODUCTION-RECOVERY：main 当前产品未消费 B 新生产控制；fixture/WORK 存在不等于真实 Runner begin/answer/stop 恢复。'],
   },
   {
     id: 'recovery-readonly',
@@ -283,6 +288,7 @@ const CAPABILITIES = [
       'E4-BACKUP-RESTORE',
       'E4-INSTALL-TAMPER',
       'E4-INSTALL-ROLLBACK',
+      'E7-BACKUP-CONTEXT-REPLY',
     ],
     notTested: [
       '安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。',
@@ -302,7 +308,7 @@ const CAPABILITIES = [
   {
     id: 'install-host-guards',
     label: '模式保持、未知活 PID 阻断与不误杀',
-    installed: ['E4-INSTALL-HOST-GUARDS', 'E4-MULTI-STATE', 'E7-OWNERSHIP-COPY'],
+    installed: ['E4-INSTALL-HOST-GUARDS', 'E4-MULTI-STATE', 'E7-OWNERSHIP-COPY', 'E7-OWNERSHIP-WRONG-INSTALL'],
     notTested: ['E4-MULTI-STATE 观测到 D 真实缺陷：对 state A 的 stop 返回 STOPPED 并杀掉共享安装下 state B 的 API 进程（launcher 仍活），launcher 死/API 活窗口因此无法测量。'],
   },
   {
@@ -435,7 +441,7 @@ const executionStatus = {
     matrix: join(reports, 'release-matrix.json'),
     executionStatus: join(reports, 'execution-status.json'),
     wave09Status: join(reports, 'wave09-status.json'),
-    wave12Status: join(reports, 'wave12-status.json'),
+    wave13Status: join(reports, 'wave13-status.json'),
     wave08Status: join(reports, 'wave08-status.json'),
     wave07Status: join(reports, 'wave07-status.json'),
     wave06Status: join(reports, 'wave06-status.json'),
@@ -445,14 +451,19 @@ const executionStatus = {
   untested: rows
     .filter((row) => row.gaps.length > 0 || row.controlledFixture === 'NOT_TESTED')
     .map((row) => ({ id: row.id, gaps: row.gaps })),
-  externalBlockers: [
-    { owner: 'D', code: 'copied_record_stops_original', detail: 'On the current a22d3a4/schema16 tar, requested-data-root stop passes, but copying `var/config/instance.json` into another config root and running stop returns 0/STOPPED and terminates the original self-owned API. The record has no config binding, so config is not part of the authority. D must bind config/install/state and refuse the copied record before any signal.' },
-    { owner: 'main', detail: 'Context preview, selected-context prepare/send, SSE, audit and the completed-reply consumer are verified on current main; multi-tab isolation is now covered; recovery activation, context history and a current schema18/context-use install package remain inputs.' },
-    { owner: 'A', detail: 'A18 replyResults rows are integrated and verified with independent-process SIGKILL, corrupt artifact and no resend. `contextHistory`/raw history remains unpublished; the current D tar is schema16 and does not carry the A18 result/backup family.' },
-    { owner: 'main', detail: 'Migration ownership and review Work/Ticket/Assignment publication remain outside current main, so E3-REVIEW-PIPELINE stays NOT_TESTED.' },
-    { owner: 'D', detail: 'The wave-09 target tuple (6830e38 build f2390ffd, schema 15) passes byte-for-byte, personal cold start and same-schema managed upgrade; cross-schema old-binary refusal is measured. Any newer target must be named with its own tar/source/build/schema and independently re-tested.' },
-    { owner: 'B', detail: 'Native ledger/results are not supplied as input and E has no budget, so actual-native and native control evidence are absent.' },
-  ],
+  externalBlockers: (() => {
+    const entries = []
+    const e7 = byId.get('E7-OWNERSHIP-COPY'), e6 = byId.get('E6-CURRENT-MAIN-INSTALL'), faults = byId.get('E4-UPGRADE-FAULTS')
+    if (e7?.status === 'FAIL') entries.push({ owner: 'D', code: 'copied_record_stops_original',
+      detail: e7.assertions?.find(item => !item.ok)?.detail ?? e7.reason ?? 'copied record refused by ownership check' })
+    if (e6?.status === 'NOT_TESTED') entries.push({ owner: 'D', code: 'current_tar_incomplete', detail: e6.reason })
+    if (faults?.status === 'NOT_TESTED') entries.push({ owner: 'D', code: 'upgrade_faults_not_tested', detail: faults.reason })
+    if (byId.get('E4-B-PRODUCTION-RECOVERY')?.status === 'NOT_TESTED') entries.push({ owner: 'B',
+      code: 'production_control_not_consumed', detail: byId.get('E4-B-PRODUCTION-RECOVERY').reason })
+    if (byId.get('E5-RECOVERY-INTERRUPTION')?.status === 'NOT_TESTED') entries.push({ owner: 'main',
+      code: 'recovery_activation_missing', detail: byId.get('E5-RECOVERY-INTERRUPTION').reason })
+    return entries
+  })(),
   next: [
     'D: bind the single install instance record to its exact data root and make a stop aimed at another state refuse without signalling that state\'s launcher/API; then E can measure launcher-dead/API-alive and PID/start reuse windows.',
     'C/main: publish automatic proposal/context confirmation, the context-use send path (explicit selection, revalidation, same-transaction binding/receipt, no auto-resend, source audit) and recovery activation; E then converts E5-CONTEXT-USE and E5-RECOVERY-INTERRUPTION from NOT_TESTED.',
@@ -491,7 +502,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第十二轮交付交接
+const handoff = `# Agent E 第十三轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -529,7 +540,7 @@ ${rows
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold install/config root/doctor、普通 personal cold start、模式保持、备份恢复、篡改拒绝、requested-data-root stop、跨 schema 精确拒绝、D schema→当前A schema 迁移 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-INSTALL-ROLLBACK、E4-UPGRADE-CROSS-SCHEMA、E8-SCHEMA-MIGRATION。tuple=${frozenScope?.artifact?.buildId ?? '?'}/schema ${frozenScope?.artifact?.schema ?? '?'}，main schema ${frozenScope?.main?.schema ?? '?'}；current-main install=${currentMainInstall ? 'NOT_TESTED' : 'SCOPED PASS'}；E4-UPGRADE-ROLLBACK/E4-UPGRADE-FAULTS 仍 NOT_TESTED；copied-record stop=${byId.get('E7-OWNERSHIP-COPY')?.status ?? 'MISSING'}。 |
+| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold personal、fixture 安装版 context、非空 context/reply 备份搬根、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=${frozenScope?.artifact?.buildId ?? '?'}/schema ${frozenScope?.artifact?.schema ?? '?'}，main schema ${frozenScope?.main?.schema ?? '?'}；current-main install=${currentMainInstall ? 'NOT_TESTED' : 'SCOPED PASS'}；E4-UPGRADE-ROLLBACK/E4-UPGRADE-FAULTS 仍 NOT_TESTED；E6 current missing history=${frozenScope?.capability?.hasHistoryRoute === false}。 |
 
 安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId \`${artifactTuple.baseline?.buildId ?? 'unknown'}\` / schema ${artifactTuple.baseline?.productSchema ?? artifactTuple.baseline?.schema ?? '?'} / tar \`${String(artifactTuple.baseline?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.baseline?.sourceCommit ?? artifactTuple.baseline?.source ?? '').slice(0, 8)}\`；target buildId \`${artifactTuple.target?.buildId ?? 'unknown'}\` / schema ${artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? '?'} / tar \`${String(artifactTuple.target?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? '').slice(0, 8)}\`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
@@ -571,7 +582,7 @@ ${rows
 ## 下一消费者
 
 1. D：requested-data-root stop 在 a22d3a4 已通过，但 copied record 到另一 config root 仍能停止原 API（E7-OWNERSHIP-COPY FAIL）；先统一 config/install/shared-cache 所有权，再冻结 current-main/schema18/context-use 的新 tar，并补同 schema 双 binary 的 upgrade/recover/rollback 与崩溃窗口。
-2. A/main：发布 contextHistory/正文历史与真实恢复 activation；E 已关闭 replyResults 的真实进程/SIGKILL/坏 artifact 组合，但 schema18 非空备份搬根仍等 D 当前 tar。
+2. main/B：发布真实恢复 activation 与 B 生产 begin/answer/stop 消费者；E 已关闭 A18 回复/SIGKILL/坏 artifact、context history/source/frozen UI 和 schema18 非空备份搬根。
 3. main：继续交 recovery activation 与真实空目标启动；E 已独立验证 context-use/SSE/audit、单 tab 丢响应、双 tab 独立旧 selection、mobile 再选源和 reply consumer，不重复把入口未发布当阻断。
 4. B：提供绑定 commit/attempt 的原生证据（\`executed: true\` + model task 计数）；E 只消费，不重跑计费任务。旧安装结果、wave09/wave10 ledger 与报告原样保留。
 
@@ -595,28 +606,37 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
 writeFileSync(
-  join(reports, 'wave12-status.json'),
+  join(reports, 'wave13-status.json'),
   JSON.stringify({
     ...executionStatus,
-    schema: 'product-acceptance-wave12-status/1',
-    taskPackage: 'agent-tasks/product-wave-12/README.zh-CN.md',
-    supersedes: 'wave11-status.json',
+    schema: 'product-acceptance-wave13-status/1',
+    taskPackage: 'agent-tasks/product-wave-13/README.zh-CN.md',
+    supersedes: 'wave12-status.json',
     currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.reason ?? null,
+    requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
+      E7: byId.get('E7-OWNERSHIP-COPY')?.status ?? 'MISSING',
+      upgradeFaults: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
+      currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
+      upgradeRollback: byId.get('E4-UPGRADE-ROLLBACK')?.status ?? 'MISSING' } },
     finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record',
       exitCode: 0, source: report.source },
     commands: stages.stages.map(stage => ({ id: stage.id, command: stage.command })),
     faultWindows: {
       copiedRecordOtherConfig: { status: byId.get('E7-OWNERSHIP-COPY')?.status ?? 'MISSING',
         observed: byId.get('E7-OWNERSHIP-COPY')?.assertions?.find(item => !item.ok)?.detail ?? null },
+      wrongInstall: { status: byId.get('E7-OWNERSHIP-WRONG-INSTALL')?.status ?? 'MISSING',
+        observed: byId.get('E7-OWNERSHIP-WRONG-INSTALL')?.assertions?.find(item => !item.ok)?.detail ?? null },
       stopA_whenRecordB: { status: byId.get('E4-MULTI-STATE')?.status ?? 'MISSING',
         observed: byId.get('E4-MULTI-STATE')?.assertions?.find(item => !item.ok)?.detail ?? byId.get('E4-MULTI-STATE')?.reason ?? null },
       launcherDead_apiAlive: { status: 'NOT_TESTED',
-        reason: 'stop_claims_other_state destroyed the state B API before the window could be measured' },
+        reason: byId.get('E4-MULTI-STATE')?.evidence?.multiState?.deadLauncher?.prerequisite ?? 'window unavailable' },
       unknownLivePid: { status: byId.get('E4-INSTALL-HOST-GUARDS')?.status ?? 'MISSING' },
       upgradeCrashWindows: { status: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
         reason: byId.get('E4-UPGRADE-FAULTS')?.reason ?? null },
-      schema15_to_current16: { status: byId.get('E8-SCHEMA-MIGRATION')?.status ?? 'MISSING',
+      schemaMigration: { status: byId.get('E8-SCHEMA-MIGRATION')?.status ?? 'MISSING',
         observed: byId.get('E8-SCHEMA-MIGRATION')?.evidence?.schemaMigration ?? null },
+      legacy16Migration: { status: byId.get('E8-LEGACY16-MIGRATION')?.status ?? 'MISSING',
+        observed: byId.get('E8-LEGACY16-MIGRATION')?.evidence?.legacyMigration ?? null },
       replyRecoveryConsumer: { status: byId.get('E2-REPLY-DURABLE')?.status ?? 'MISSING',
         persistence: 'A18 SQLite replyResults rows in independent processes', persistenceStatus: byId.get('E2-REPLY-DURABLE')?.status ?? 'MISSING' },
     },
@@ -627,7 +647,7 @@ writeFileSync(
     artifactTuple,
   }, null, 2) + '\n',
 )
-// Historical wave06-09 status files are frozen inputs; wave10 supersedes rather than rewrites them.
+// Historical wave06-12 status files are frozen inputs; wave13 supersedes rather than rewrites them.
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 
 // Over-claim check: the same recorded evidence must fail the full-product tier while native and

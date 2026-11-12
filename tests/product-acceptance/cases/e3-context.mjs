@@ -144,12 +144,6 @@ export async function runContext({ root, runDirectory, keep = false }) {
       ),
     )
 
-    cases.push(
-      notTested(
-        define('E5-CONTEXT-HISTORY', 'Authorized context history pages without becoming a new send grant', { layer: LAYERS.NOT_TESTED }),
-        'NOT_TESTED: current context send/binding/audit is verified by E3-CONTEXT-USE, but A `store.workflows.assistant.contextHistory` and a main signed public cursor are not implemented in this checkout. Required: projectIds/scoping, keyset tie-break, max 100, expired bindings visible as history but not sendable, missing source text reported, cross-principal refusal and cursor expiry.',
-      ),
-    )
   } finally {
     await runtime?.close?.()
     artifacts.cleaned = cleanup({ root: stateRoot, state }, { keep })

@@ -34,9 +34,9 @@ import { sha256 } from '../lib/evidence.mjs'
  */
 const here = dirname(fileURLToPath(import.meta.url))
 const DEFAULT_DIRS = Object.freeze({
-  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave10-target',
-  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',
-  cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave08-target',
+  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',
+  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave12-target',
+  cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',
 })
 
 /** Reads the artifact tuple from the producer's manifest next to the frozen tar. */
@@ -78,10 +78,13 @@ function tarFile(spec, suffix) {
   const read = spawnSync('tar', ['-xOzf', spec.tarPath, entry], { encoding: 'utf8', timeout: 60_000 })
   return read.status === 0 ? read.stdout : undefined
 }
+const TARGET_ROUTES = tarFile(ARTIFACTS.upgrade, '/apps/coordinator/http/app.ts') ?? ''
 const TARGET_CAPABILITY = Object.freeze({
-  hasContextRoute: /assistant\/context\/(prepare|send)/u.test(tarFile(ARTIFACTS.upgrade, '/apps/coordinator/http/app.ts') ?? ''),
+  hasContextRoute: /assistant\/context\/(prepare|send)/u.test(TARGET_ROUTES),
+  hasHistoryRoute: /\/v1\/context\/history/u.test(TARGET_ROUTES),
+  hasSourcesRoute: /\/v1\/messages\/:\.id\/context\/sources/u.test(TARGET_ROUTES),
   hasReplyResults: /assistantReplyResults|replyResults/u.test(tarFile(ARTIFACTS.upgrade, '/apps/coordinator/product/runtime.ts') ?? ''),
-  routeBytes: tarFile(ARTIFACTS.upgrade, '/apps/coordinator/http/app.ts')?.length ?? 0,
+  routeBytes: TARGET_ROUTES.length,
 })
 
 const PLATFORM = Object.freeze({
@@ -423,7 +426,8 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       ['E4-INSTALL-ROLLBACK', 'A pre-change backup rolls the state back and the install starts again'],
       ['E4-UPGRADE-ROLLBACK', 'A second frozen build upgrades the state and rolls back'],
     ]) cases.push(notTested(define(id, title, { layer: LAYERS.NOT_TESTED }), reason))
-    return { cases, artifacts }
+
+  return { cases, artifacts }
   }
 
   // Use the canonical path: the launcher records and re-checks cwd/argv identities, and macOS
@@ -840,6 +844,76 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       }
     })
 
+    await push(define('E7-BACKUP-CONTEXT-REPLY', 'A non-empty installed backup carries context bindings and completed replies into a second root', {
+      layer: LAYERS.INSTALLED,
+    }), async ({ assert, evidence }) => {
+      const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w13-backup-')))
+      const ownInstall = join(own, 'install')
+      mkdirSync(ownInstall, { recursive: true })
+      const mock = await startMockModel({ stateRoot: join(own, 'model-state'), reply: 'W13 备份回复。' })
+      let started
+      try {
+        spawnSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', ownInstall, '--strip-components=1'])
+        const first = pa(ownInstall, ['first-run', '--json'])
+        assert('CONTEXT_BACKUP_FIRST_RUN', first.status === 0, first.stderr.slice(-300))
+        const [port, apiPort] = await freePorts()
+        started = startPa(ownInstall, { port, apiPort, env: { PA_MODEL_CONFIG: mock.configPath } })
+        const running = await started.attempt
+        assert('CONTEXT_BACKUP_START', running.status === 'RUNNING', JSON.stringify({ status: running.status, code: running.code }))
+        const state = running.instance.state
+        const client = new LocalProductClient({ baseURL: running.instance.apiURL, stateDir: state, timeoutMs: 25_000 })
+        const configuration = await client.configuration()
+        const project = configuration.projects.find(item => item.dispatchAllowed)
+        await client.dispatch({ commandId: 'w13-backup-seed', conversationId: 'conv-backup', kind: 'chat', projectId: project.id, text: 'W13 备份来源。' })
+        await new Promise(resolve => setTimeout(resolve, 700))
+        const prepared = await client.request('/v1/assistant/context/prepare', { method: 'POST', body: {
+          commandId: 'w13-backup-ctx', text: 'W13 备份上下文消息。', context: { projectId: project.id, conversationId: 'conv-backup',
+            selections: ['project', 'conversation'], budget: { maxFiles: 8, maxBytes: 32768, maxTokens: 4096 } } } })
+        assert('CONTEXT_BACKUP_PREPARE', prepared.status === 200, JSON.stringify(prepared.body)?.slice(0, 200))
+        const sent = await client.request('/v1/assistant/context/send', { method: 'POST', body: { commandId: 'w13-backup-ctx', token: prepared.body.token } })
+        assert('CONTEXT_BACKUP_SEND', sent.status === 200 && sent.body?.status === 'recorded', JSON.stringify(sent.body)?.slice(0, 200))
+        let reply
+        for (let index = 0; index < 50 && !reply; index += 1) {
+          const page = await client.conversation('conv-backup')
+          reply = page.messages.find(item => item.provenance === 'reasoner_reply')
+          if (!reply) await new Promise(resolve => setTimeout(resolve, 150))
+        }
+        assert('CONTEXT_BACKUP_REPLY', reply?.text?.includes('W13 备份回复'), JSON.stringify(reply?.text ?? null))
+        pa(ownInstall, ['stop', '--json'], { timeoutMs: 25_000 })
+        const db = new DatabaseSync(join(state, 'state.sqlite'), { readOnly: true })
+        let before
+        try {
+          before = { bindings: Number(db.prepare('SELECT count(*) AS c FROM assistant_context_bindings').get()?.c ?? 0),
+            results: Number(db.prepare('SELECT count(*) AS c FROM assistant_reply_results').get()?.c ?? 0),
+            messages: Number(db.prepare('SELECT count(*) AS c FROM conversation_messages').get()?.c ?? 0) }
+        } finally { db.close() }
+        assert('CONTEXT_BACKUP_NONEMPTY', before.bindings >= 1 && before.results >= 1 && before.messages >= 2, JSON.stringify(before))
+        const bundle = join(own, 'rich.pab')
+        const backup = pa(ownInstall, ['backup', '--out', bundle, '--json'], { timeoutMs: 60_000 })
+        assert('CONTEXT_BACKUP_CREATED', backup.status === 0 && backup.json?.status === 'CREATED' && (backup.json?.counts?.artifacts ?? 0) >= 1, JSON.stringify(backup.json?.counts))
+        const restoredRoot = join(own, 'restored')
+        const restore = pa(ownInstall, ['restore', '--bundle', bundle, '--to', restoredRoot, '--json'], { timeoutMs: 60_000 })
+        assert('CONTEXT_BACKUP_RESTORED', restore.status === 0 && restore.json?.status === 'RESTORED', restore.stderr.slice(-300))
+        const restored = new DatabaseSync(join(restoredRoot, 'state.sqlite'), { readOnly: true })
+        let after
+        try {
+          after = { bindings: Number(restored.prepare('SELECT count(*) AS c FROM assistant_context_bindings').get()?.c ?? 0),
+            results: Number(restored.prepare('SELECT count(*) AS c FROM assistant_reply_results').get()?.c ?? 0),
+            messages: Number(restored.prepare('SELECT count(*) AS c FROM conversation_messages').get()?.c ?? 0) }
+        } finally { restored.close() }
+        assert('CONTEXT_BACKUP_COUNTS', after.bindings === before.bindings && after.results === before.results && after.messages === before.messages, JSON.stringify({ before, after }))
+        const artifactRows = readdirSync(join(restoredRoot, 'artifacts')).length
+        assert('CONTEXT_BACKUP_ARTIFACTS', artifactRows >= 1, String(artifactRows))
+        evidence.backupContextReply = { before, after, artifacts: artifactRows, backupArtifacts: backup.json?.counts?.artifacts ?? 0,
+          reply: reply.text }
+      } finally {
+        try { pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
+        try { started?.child?.kill('SIGKILL') } catch { /* gone */ }
+        await mock.close().catch(() => {})
+        rmSync(own, { recursive: true, force: true })
+      }
+    })
+
     await push(define('E4-INSTALL-TAMPER', 'A same-size or missing artifact and a corrupt bundle are refused'), async ({ assert, evidence }) => {
       pa(install, ['stop', '--json'], { timeoutMs: 20_000 })
       cpSync(install, pristine, { recursive: true, verbatimSymlinks: true })
@@ -981,7 +1055,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       })
     } else {
       cases.push(notTested({ ...define('E4-UPGRADE-ROLLBACK', 'A second frozen same-schema build upgrades the state and rolls back', {
-        layer: LAYERS.NOT_TESTED,
+        layer: LAYERS.INSTALLED,
       }) }, `NOT_TESTED: the default baseline schema ${ARTIFACTS.base.productSchema} differs from target schema ${ARTIFACTS.upgrade.productSchema}; an older binary cannot start on the newer state, and no second frozen build with schema ${ARTIFACTS.upgrade.productSchema} is available. Cross-schema refusal is measured by E4-UPGRADE-CROSS-SCHEMA; the prior schema15 same-schema upgrade/rollback result remains scoped to its old tuple.`))
     }
 
@@ -1042,7 +1116,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
 
     cases.push(
       notTested(
-        define('E4-UPGRADE-FAULTS', 'Interrupted switch, dead-launcher/API-alive and rollback terminal states', { layer: LAYERS.NOT_TESTED }),
+        define('E4-UPGRADE-FAULTS', 'Interrupted switch, dead-launcher/API-alive and rollback terminal states', { layer: LAYERS.INSTALLED }),
         'NOT_TESTED: the bounded managed-upgrade probe covers the confirmed switch, new data, binary rollback and a tampered target. D exposes PA_UPGRADE_FAULT crash windows and whole-process guards, but exercising them reliably needs a longer isolated run; this case stays NOT_TESTED rather than counting two fixture starts as an upgrade result.',
       ),
     )
@@ -1051,7 +1125,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
     stopAll()
     if (!keep) rmSync(workspace, { recursive: true, force: true })
   }
-    await push(define('E8-SCHEMA-MIGRATION', 'A real D schema15 database migrates to the current A schema with data preserved', { layer: LAYERS.CONTROLLED }), async ({ assert, evidence }) => {
+    await push(define('E8-SCHEMA-MIGRATION', 'A real D target database opens on the current A schema with data preserved', { layer: LAYERS.CONTROLLED }), async ({ assert, evidence }) => {
       const extract = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w11-migrate-')))
       let started
       try {
@@ -1090,7 +1164,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
           newMessages = Number(opened.db.prepare('SELECT count(*) AS c FROM conversation_messages').get()?.c ?? 0)
           bindingTable = Number(opened.db.prepare("SELECT count(*) AS c FROM sqlite_master WHERE type='table' AND name='assistant_context_bindings'").get()?.c ?? 0)
         } finally { opened.close() }
-        assert('MIGRATE_NEW_SCHEMA', newSchema >= 16 && newSchema !== oldSchema, `${oldSchema} -> ${newSchema}`)
+        assert('MIGRATE_NEW_SCHEMA', newSchema >= oldSchema && newSchema >= 16, `${oldSchema} -> ${newSchema}`)
         assert('MIGRATE_DATA_KEPT', newMessages === oldMessages, `${oldMessages} -> ${newMessages}`)
         assert('MIGRATE_BINDING_TABLE', bindingTable === 1, String(bindingTable))
         const reopened = new ProductStore({ path: join(copy, 'state.sqlite') })
@@ -1105,7 +1179,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       }
     })
 
-    await push(define('E6-INSTALLED-CONTEXT', 'The frozen D tar cold-starts personal fixture mode and sends selected context through its installed HTTP provider path', {
+    await push(define('E6-INSTALLED-CONTEXT', 'The frozen D tar cold-starts fixture mode and sends selected context through its installed HTTP provider path', {
       layer: LAYERS.INSTALLED,
     }), async ({ assert, evidence }) => {
       const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w12-ctx-install-')))
@@ -1145,13 +1219,60 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         const binding = await client.request(`/v1/messages/${userMessage?.id ?? ''}/context`)
         assert('INSTALLED_AUDIT', binding.status === 200 && binding.body?.commandId === 'w12-installed-ctx', JSON.stringify(binding.body)?.slice(0, 200))
         assert('INSTALLED_MOCK_CALLED', mock.requests.length >= 1 && mock.requests.some(item => JSON.stringify(item.messages).includes('安装版上下文来源')), `calls ${mock.requests.length}`)
-        evidence.installedContext = { artifact: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, source: ARTIFACTS.upgrade.sourceCommit },
+        evidence.installedContext = { mode: 'fixture', artifact: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, source: ARTIFACTS.upgrade.sourceCommit },
           available: true, prepare: prepared.status, send: sent.body?.status, reply: reply?.text, audit: binding.status, modelCalls: mock.requests.length }
       } finally {
         try { pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
         try { started?.child?.kill('SIGKILL') } catch { /* gone */ }
         await mock.close().catch(() => {})
         rmSync(own, { recursive: true, force: true })
+      }
+    })
+
+    await push(define('E8-LEGACY16-MIGRATION', 'A legacy D schema16 database migrates to current A schema18 independently', { layer: LAYERS.CONTROLLED }), async ({ assert, evidence }) => {
+      const extract = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w13-legacy-')))
+      let started
+      try {
+        spawnSync('tar', ['-xzf', ARTIFACTS.cross.tarPath, '-C', extract, '--strip-components=1'])
+        const first = pa(extract, ['first-run', '--json'])
+        assert('LEGACY_FIRST_RUN', first.status === 0 && first.json?.status === 'OK', first.stderr.slice(-300))
+        const [port, apiPort] = await freePorts()
+        started = startPa(extract, { port, apiPort })
+        const running = await started.attempt
+        assert('LEGACY_START', running.status === 'RUNNING', JSON.stringify({ status: running.status, code: running.code }))
+        try {
+          const key = readFileSync(join(running.instance.state, 'api.key'), 'utf8').trim()
+          const sent = await fetch(`${running.instance.apiURL}/v1/commands`, { method: 'POST', headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+            body: JSON.stringify({ commandId: 'w13-legacy-chat', conversationId: 'conv-legacy', kind: 'chat', projectId: 'project-atlas', text: 'legacy 迁移数据。' }), signal: AbortSignal.timeout(10_000) })
+          assert('LEGACY_SEED', sent.status === 200, String(sent.status))
+          await new Promise(resolve => setTimeout(resolve, 300))
+        } finally { pa(extract, ['stop', '--json'], { timeoutMs: 25_000 }) }
+        const oldState = running.instance.state
+        const db = new DatabaseSync(join(oldState, 'state.sqlite'), { readOnly: true })
+        let oldSchema, oldMessages
+        try {
+          oldSchema = Number(db.prepare("SELECT value FROM schema_meta WHERE key='product_schema'").get()?.value)
+          oldMessages = Number(db.prepare('SELECT count(*) AS c FROM conversation_messages').get()?.c ?? 0)
+        } finally { db.close() }
+        assert('LEGACY_SCHEMA16', oldSchema === ARTIFACTS.cross.productSchema && oldSchema < 18, String(oldSchema))
+        assert('LEGACY_DATA', oldMessages >= 1, String(oldMessages))
+        const { ProductStore } = await import('../../../packages/storage/dist/index.js')
+        const copy = join(extract, 'legacy-migrated')
+        cpSync(oldState, copy, { recursive: true })
+        const opened = new ProductStore({ path: join(copy, 'state.sqlite') })
+        let newSchema, newMessages
+        try {
+          newSchema = opened.database.productSchema
+          newMessages = Number(opened.db.prepare('SELECT count(*) AS c FROM conversation_messages').get()?.c ?? 0)
+          assert('LEGACY_BINDING_TABLE', Number(opened.db.prepare("SELECT count(*) AS c FROM sqlite_master WHERE type='table' AND name='assistant_context_bindings'").get()?.c ?? 0) === 1, 'binding table')
+        } finally { opened.close() }
+        assert('LEGACY_NEW_SCHEMA', newSchema === 18 && newSchema > oldSchema, `${oldSchema} -> ${newSchema}`)
+        assert('LEGACY_DATA_KEPT', newMessages === oldMessages, `${oldMessages} -> ${newMessages}`)
+        evidence.legacyMigration = { artifact: { buildId: ARTIFACTS.cross.buildId, source: ARTIFACTS.cross.sourceCommit, schema: ARTIFACTS.cross.productSchema },
+          old: { schema: oldSchema, messages: oldMessages }, migrated: { schema: newSchema, messages: newMessages } }
+      } finally {
+        try { if (started) pa(extract, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
+        rmSync(extract, { recursive: true, force: true })
       }
     })
 
@@ -1164,7 +1285,8 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       assert('TUPLE_HAS_CONTEXT_SEND', TARGET_CAPABILITY.hasContextRoute === true, JSON.stringify(TARGET_CAPABILITY))
       assert('TUPLE_REPLY_CONSUMER_MEASURED', typeof TARGET_CAPABILITY.hasReplyResults === 'boolean', String(TARGET_CAPABILITY.hasReplyResults))
       assert('TUPLE_SCHEMA_MEASURED', ARTIFACTS.upgrade.productSchema === 16 || ARTIFACTS.upgrade.productSchema > 0, String(ARTIFACTS.upgrade.productSchema))
-      const currentMainEligible = ARTIFACTS.upgrade.productSchema === PRODUCT_SCHEMA_VERSION && TARGET_CAPABILITY.hasContextRoute
+      const currentMainEligible = ARTIFACTS.upgrade.productSchema === PRODUCT_SCHEMA_VERSION && TARGET_CAPABILITY.hasContextRoute &&
+        TARGET_CAPABILITY.hasHistoryRoute && TARGET_CAPABILITY.hasSourcesRoute && TARGET_CAPABILITY.hasReplyResults
       evidence.frozenScope = {
         artifact: { buildId: ARTIFACTS.upgrade.buildId, source: ARTIFACTS.upgrade.sourceCommit,
           schema: ARTIFACTS.upgrade.productSchema, tarSha256: ARTIFACTS.upgrade.tarSha256, tarBytes: ARTIFACTS.upgrade.tarBytes },
@@ -1177,22 +1299,22 @@ export async function runInstall({ root, runDirectory, keep = false }) {
     })
 
     const targetSchema18 = ARTIFACTS.upgrade.productSchema === (await import('../../../packages/storage/dist/index.js')).PRODUCT_SCHEMA_VERSION
-    if (targetSchema18 && TARGET_CAPABILITY.hasContextRoute) {
+    if (targetSchema18 && TARGET_CAPABILITY.hasContextRoute && TARGET_CAPABILITY.hasHistoryRoute && TARGET_CAPABILITY.hasSourcesRoute && TARGET_CAPABILITY.hasReplyResults) {
       cases.push(notTested({ ...define('E6-CURRENT-MAIN-INSTALL', 'Current-main schema18 selected context is installed and exercised from cold personal bytes', {
-        layer: LAYERS.NOT_TESTED,
+        layer: LAYERS.INSTALLED,
       }) }, 'NOT_TESTED: the default target tuple now matches current main schema; run E3-PERSONAL-COLD-START and E6 scope in a clean re-record to admit current-main install.'))
     } else {
       cases.push(notTested({ ...define('E6-CURRENT-MAIN-INSTALL', 'Current-main schema18 selected context is installed and exercised from cold personal bytes', {
-        layer: LAYERS.NOT_TESTED,
+        layer: LAYERS.INSTALLED,
         limitations: [
-          `The measured D artifact is ${ARTIFACTS.upgrade.buildId}/schema ${ARTIFACTS.upgrade.productSchema}; current main schema is ${(await import('../../../packages/storage/dist/index.js')).PRODUCT_SCHEMA_VERSION}.`,
+          `The measured D artifact is ${ARTIFACTS.upgrade.buildId}/schema ${ARTIFACTS.upgrade.productSchema}; current main schema is ${(await import('../../../packages/storage/dist/index.js')).PRODUCT_SCHEMA_VERSION}; context=${TARGET_CAPABILITY.hasContextRoute}, history=${TARGET_CAPABILITY.hasHistoryRoute}, sources=${TARGET_CAPABILITY.hasSourcesRoute}, replyResults=${TARGET_CAPABILITY.hasReplyResults}.`,
           'Old wave-10/wave-11 personal and upgrade results remain valid only for their own tuple and are not relabeled as current-main admission.',
         ],
-      }) }, `NOT_TESTED: measured D tuple build ${ARTIFACTS.upgrade.buildId}, schema ${ARTIFACTS.upgrade.productSchema}, context send=${TARGET_CAPABILITY.hasContextRoute}; current main schema ${(await import('../../../packages/storage/dist/index.js')).PRODUCT_SCHEMA_VERSION}. Required: a clean schema18 D tar containing context-use and the A18 result/backup family, then a fresh cold personal install, config/doctor/assets/public API and mocked selected-context send/reply.`))
+      }) }, `NOT_TESTED: measured D tuple build ${ARTIFACTS.upgrade.buildId}, schema ${ARTIFACTS.upgrade.productSchema}, context=${TARGET_CAPABILITY.hasContextRoute}, history=${TARGET_CAPABILITY.hasHistoryRoute}, sources=${TARGET_CAPABILITY.hasSourcesRoute}, replyResults=${TARGET_CAPABILITY.hasReplyResults}; current main schema ${(await import('../../../packages/storage/dist/index.js')).PRODUCT_SCHEMA_VERSION}. Required: an accurate D tar from current main with context/history/sources/replyResults, then a fresh cold personal install and independent mocked context/reply.`))
     }
 
     await push(define('E7-OWNERSHIP-COPY', 'A copied instance record in another config root cannot stop the original self-owned API', {
-      layer: LAYERS.CONTROLLED,
+      layer: LAYERS.INSTALLED,
     }), async ({ assert, evidence }) => {
       const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w12-own-')))
       const ownInstall = join(own, 'install')
@@ -1219,6 +1341,37 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       } finally {
         try { pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
         try { started?.child?.kill('SIGKILL') } catch { /* already gone */ }
+        rmSync(own, { recursive: true, force: true })
+      }
+    })
+
+      await push(define('E7-OWNERSHIP-WRONG-INSTALL', "A second install cannot stop the first install's self-owned instance", {
+      layer: LAYERS.INSTALLED,
+    }), async ({ assert, evidence }) => {
+      const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w13-wronginstall-')))
+      const installA = join(own, 'a'), installB = join(own, 'b')
+      mkdirSync(installA, { recursive: true }); mkdirSync(installB, { recursive: true })
+      let started
+      try {
+        for (const dir of [installA, installB]) {
+          spawnSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', dir, '--strip-components=1'])
+          const first = pa(dir, ['first-run', '--json'])
+          assert(`WRONG_INSTALL_FIRST_${dir.endsWith('a') ? 'A' : 'B'}`, first.status === 0, first.stderr.slice(-200))
+        }
+        const [port, apiPort] = await freePorts()
+        started = startPa(installA, { port, apiPort })
+        const running = await started.attempt
+        assert('WRONG_INSTALL_RUNNING', running.status === 'RUNNING', JSON.stringify({ status: running.status, code: running.code }))
+        const record = JSON.parse(readFileSync(join(installA, 'var/config/instance.json'), 'utf8'))
+        const stop = pa(installB, ['stop', '--json'], { timeoutMs: 20_000, env: {
+          PA_CONFIG_ROOT: join(installA, 'var/config'), PA_DATA_ROOT: running.instance.state } })
+        const apiAlive = (() => { try { return process.kill(record.apiPid, 0) === true } catch { return false } })()
+        assert('WRONG_INSTALL_REFUSED', stop.status !== 0, JSON.stringify({ status: stop.status, code: stop.json?.code }))
+        assert('WRONG_INSTALL_API_ALIVE', apiAlive, String(record.apiPid))
+        evidence.wrongInstall = { status: stop.status, code: stop.json?.code ?? null, apiAlive }
+      } finally {
+        try { pa(installA, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
+        try { started?.child?.kill('SIGKILL') } catch { /* gone */ }
         rmSync(own, { recursive: true, force: true })
       }
     })

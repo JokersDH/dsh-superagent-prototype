@@ -44,11 +44,23 @@ export async function runContextUi({ root, runDirectory }) {
     }
     cases.push(await runCase({ ...define('E3-CONTEXT-UI', 'Workbench selects sources, survives a lost send response, reconciles once and works on mobile'), evidence: {} },
       async ({ assert, evidence }) => {
-        const openContext = async () => {
-          const button = page.getByRole('button', { name: '上下文预览' })
-          await button.click()
-          await page.getByRole('dialog', { name: '上下文预览' }).waitFor({ timeout: 10_000 })
+        const openContextOn = async (target) => {
+          await target.getByRole('button', { name: '上下文预览' }).click()
+          await target.locator('dialog.context-workspace').waitFor({ timeout: 10_000 })
+          await target.locator('dialog.context-workspace h2').waitFor({ timeout: 10_000 })
+          const heading = await target.locator('dialog.context-workspace h2').textContent()
+          if (String(heading).includes('核对消息请求') || String(heading).includes('确认上下文消息')) return
+          if (!String(heading).includes('上下文预览')) {
+            const previewTab = target.getByRole('tab', { name: '预览' })
+            if (await previewTab.count()) {
+              await previewTab.click()
+              await target.waitForTimeout(400)
+            }
+          }
+          const current = await target.locator('dialog.context-workspace h2').textContent()
+          if (!String(current).includes('上下文预览')) throw new Error(`Context dialog opened as ${current}`)
         }
+        const openContext = () => openContextOn(page)
         const fillAndPrepare = async (text) => {
           await page.getByLabel('上下文消息').fill(text)
           await page.getByRole('button', { name: '预览消息' }).click()
@@ -99,15 +111,13 @@ export async function runContextUi({ root, runDirectory }) {
         const tab2 = await browser.context.newPage()
         await tab2.goto(consoleURL, { waitUntil: 'domcontentloaded', timeout: 25_000 })
         await tab2.locator('#composer-input').waitFor({ timeout: 20_000 })
-        await tab2.getByRole('button', { name: '上下文预览' }).click()
-        await tab2.getByRole('dialog', { name: '上下文预览' }).waitFor({ timeout: 10_000 })
+        await openContextOn(tab2)
         await tab2.getByLabel('上下文消息').fill('W11-TAB-TWO')
         await tab2.getByRole('button', { name: '预览消息' }).click()
         await tab2.getByRole('heading', { name: '确认上下文消息' }).waitFor({ timeout: 15_000 })
         await tab2.getByRole('button', { name: '确认发送' }).click()
         await tab2.getByRole('dialog', { name: '上下文预览' }).waitFor({ state: 'hidden', timeout: 20_000 })
-        await page.getByRole('button', { name: '上下文预览' }).click()
-        await page.getByRole('dialog', { name: '上下文预览' }).waitFor({ timeout: 10_000 })
+        await openContext()
         await page.getByLabel('上下文消息').fill('W11-TAB-ONE')
         await page.getByRole('button', { name: '预览消息' }).click()
         await page.getByRole('heading', { name: '确认上下文消息' }).waitFor({ timeout: 15_000 })
@@ -117,7 +127,28 @@ export async function runContextUi({ root, runDirectory }) {
         assert('TABS_BOTH_MESSAGES', tabMessages.length === 2 && tabMessages[0].text !== tabMessages[1].text, JSON.stringify(tabMessages.map(item => item.text)))
         assert('TABS_PROVIDER_CALLS', mock.requests.length === callsBefore + 4, `before ${callsBefore} after ${mock.requests.length}`)
         await tab2.close()
-        evidence.contextUi = { desktopMessages: afterDesktop.length, mobileMessages: afterMobile.length, tabMessages: tabMessages.length,
+
+        // A fresh tab has no pending draft and reads the same A18 bindings from the history panel.
+        const historyTab = await browser.context.newPage()
+        await historyTab.goto(consoleURL, { waitUntil: 'domcontentloaded', timeout: 25_000 })
+        await historyTab.locator('#composer-input').waitFor({ timeout: 20_000 })
+        await historyTab.evaluate(() => sessionStorage.clear())
+        await historyTab.getByRole('button', { name: '上下文预览' }).click()
+        await historyTab.locator('dialog.context-workspace').waitFor({ timeout: 10_000 })
+        await historyTab.getByRole('tab', { name: '使用记录' }).click()
+        await historyTab.getByRole('heading', { name: '上下文使用记录' }).waitFor({ timeout: 10_000 })
+        const historyRows = historyTab.getByRole('button', { name: /^查看使用记录/ })
+        await historyRows.first().waitFor({ timeout: 10_000 })
+        const historyCount = await historyRows.count()
+        assert('HISTORY_UI_ROWS', historyCount >= 4, String(historyCount))
+        await historyRows.first().click()
+        await historyTab.getByRole('heading', { name: '原始上下文' }).waitFor({ timeout: 10_000 })
+        await historyTab.getByText('原始来源').first().waitFor({ timeout: 10_000 })
+        await screenshot(historyTab, shots, 'context-history-mobile')
+        artifacts.screenshots.push(join(shots, 'context-history-mobile.png'))
+        assert('HISTORY_UI_SOURCE', await historyTab.getByText(/条原始来源|来源文件已缺失/).first().isVisible(), 'source record missing')
+        await historyTab.close()
+        evidence.contextUi = { desktopMessages: afterDesktop.length, mobileMessages: afterMobile.length, tabMessages: tabMessages.length, historyRows: historyCount,
           pendingReconciled: true, providerRequests: mock.requests.length,
           auditCommandIds: [audit.body.commandId] }
       }))

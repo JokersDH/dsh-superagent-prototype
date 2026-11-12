@@ -112,6 +112,8 @@ export const CONTROLLED_CASES = [
   case_('E3-CONTEXT-USE', { layers: [LAYERS.CONTROLLED], evidence: ['contextUse'] }),
   case_('E3-CONTEXT-SSE', { layers: [LAYERS.CONTROLLED], evidence: ['sse'] }),
   case_('E3-CONTEXT-GUARDS', { layers: [LAYERS.CONTROLLED], evidence: ['guards'] }),
+  case_('E3-CONTEXT-HISTORY', { layers: [LAYERS.CONTROLLED], evidence: ['history'] }),
+  case_('E3-CONTEXT-SOURCES', { layers: [LAYERS.CONTROLLED], evidence: ['sources'] }),
   case_('E3-CONTEXT-UI', { layers: [LAYERS.CONTROLLED], evidence: ['contextUi'] }),
   case_('E4-COMPLETED-REPLY', { layers: [LAYERS.CONTROLLED], evidence: ['completedReply'] }),
   case_('E2-REPLY-DURABLE', { layers: [LAYERS.CONTROLLED], evidence: ['replyDurable'] }),
@@ -119,6 +121,7 @@ export const CONTROLLED_CASES = [
   case_('E2-REPLY-MESSAGE-WINDOW', { layers: [LAYERS.CONTROLLED], evidence: ['replyMessageWindow'] }),
   case_('E2-REPLY-BAD-ARTIFACT', { layers: [LAYERS.CONTROLLED], evidence: ['replyBadArtifact'] }),
   case_('E8-SCHEMA-MIGRATION', { layers: [LAYERS.CONTROLLED], evidence: ['schemaMigration'] }),
+  case_('E8-LEGACY16-MIGRATION', { layers: [LAYERS.CONTROLLED], evidence: ['legacyMigration'] }),
   case_('E9-CONTEXT-CONCURRENCY', { layers: [LAYERS.CONTROLLED], evidence: ['concurrency'] }),
   case_('E3-DESKTOP-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
   case_('E3-NOTEBOOK-GEOMETRY', { layers: [LAYERS.CONTROLLED], evidence: ['layouts'] }),
@@ -140,7 +143,9 @@ export const CONTROLLED_CASES = [
 
 /** Staged installation outside the development checkout. */
 export const INSTALL_CASES = [
+  case_('E6-ARTIFACT-CURRENT-SCOPE', { layers: [LAYERS.READONLY], evidence: ['frozenScope'] }),
   case_('E4-INSTALL-ARTIFACT-IDENTITY', { layers: [LAYERS.INSTALLED], evidence: ['artifact', 'installation'] }),
+  case_('E7-BACKUP-CONTEXT-REPLY', { layers: [LAYERS.INSTALLED], evidence: ['backupContextReply'] }),
   case_('E6-INSTALLED-CONTEXT', { layers: [LAYERS.INSTALLED], evidence: ['installedContext'] }),
   case_('E3-PERSONAL-COLD-START', { layers: [LAYERS.INSTALLED], evidence: ['personalInstall'] }),
   case_('E4-INSTALL-FIRST-RUN', { layers: [LAYERS.INSTALLED], evidence: ['install'] }),
@@ -150,6 +155,9 @@ export const INSTALL_CASES = [
   case_('E4-BACKUP-RESTORE', { layers: [LAYERS.INSTALLED], evidence: ['restore'] }),
   case_('E4-INSTALL-TAMPER', { layers: [LAYERS.INSTALLED], evidence: ['tamper'] }),
   case_('E4-INSTALL-ROLLBACK', { layers: [LAYERS.INSTALLED], evidence: ['rollback'] }),
+  case_('E4-UPGRADE-FAULTS', { layers: [LAYERS.INSTALLED] }),
+  case_('E7-OWNERSHIP-COPY', { layers: [LAYERS.INSTALLED] }),
+  case_('E6-CURRENT-MAIN-INSTALL', { layers: [LAYERS.INSTALLED] }),
   case_('E4-UPGRADE-ROLLBACK', { layers: [LAYERS.INSTALLED], evidence: ['upgrade'] }),
   case_('E4-UPGRADE-CROSS-SCHEMA', { layers: [LAYERS.INSTALLED], evidence: ['crossUpgrade'] }),
   case_('E4-MULTI-STATE', { layers: [LAYERS.INSTALLED], evidence: ['multiState'] }),

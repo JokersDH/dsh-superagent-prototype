@@ -320,11 +320,27 @@ export function contextGuardIssues(value) {
   if (value.unknownProviderCalls !== 1) issues.push('unknown_no_resend')
   return issues
 }
+export function contextHistoryIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.first !== 1 || value.more !== true) issues.push('page')
+  if (!(value.second >= 0)) issues.push('continuation')
+  if (value.crossConversation !== 0) issues.push('scope')
+  if (!(value.modelOff >= 2)) issues.push('model_off')
+  if (value.expiredVisible !== true) issues.push('expiry')
+  if (value.providerCalls !== 2) issues.push('resend')
+  return issues
+}
+export function contextSourcesIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  return value.verified >= 1 && ['missing', 'unverified', 'scope_changed'].includes(value.stateAfterCorrupt) && value.providerCalls === 1 ? [] : ['frozen_sources']
+}
 export function contextUiIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
   if (value.desktopMessages !== 1 || value.mobileMessages !== 2) issues.push('messages')
   if (value.tabMessages !== 2) issues.push('multi_tab')
+  if (!(value.historyRows >= 4)) issues.push('history_ui')
   if (value.pendingReconciled !== true) issues.push('lost_response')
   if (!(value.providerRequests >= 2)) issues.push('provider_calls')
   if (!Array.isArray(value.auditCommandIds) || !value.auditCommandIds[0]) issues.push('audit')
@@ -350,10 +366,23 @@ export function replyBadArtifactIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   return value.calls === 0 && value.replies === 0 && typeof value.notice === 'string' ? [] : ['bad_artifact']
 }
+export function frozenScopeIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = [], artifact = value.artifact ?? {}, capability = value.capability ?? {}, main = value.main ?? {}
+  if (!HEX64(artifact.tarSha256) || !HEX64(artifact.source) || !isSubstantive(artifact.buildId) || !Number.isSafeInteger(artifact.schema) || !Number.isSafeInteger(artifact.tarBytes)) issues.push('tuple')
+  if (!Number.isSafeInteger(main.schema)) issues.push('main_schema')
+  for (const key of ['hasContextRoute', 'hasHistoryRoute', 'hasSourcesRoute', 'hasReplyResults']) if (typeof capability[key] !== 'boolean') issues.push(key)
+  if (value.currentMainEligible === true && !(capability.hasContextRoute && capability.hasHistoryRoute && capability.hasSourcesRoute && capability.hasReplyResults)) issues.push('eligibility')
+  return issues
+}
+export function legacyMigrationIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  return value.old?.schema < value.migrated?.schema && value.migrated?.schema >= 18 && value.old?.messages === value.migrated?.messages ? [] : ['legacy_migration']
+}
 export function schemaMigrationIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
-  if (!(value.old?.schema < value.migrated?.schema)) issues.push('schema_order')
+  if (!(value.old?.schema <= value.migrated?.schema)) issues.push('schema_order')
   if (value.old?.messages !== value.migrated?.messages) issues.push('data_loss')
   if (value.migrated?.bindingTable !== true) issues.push('binding_table')
   if (value.reopened !== true) issues.push('reopen')
@@ -373,6 +402,15 @@ export function unknownReplyIssues(value) {
 }
 
 /** Personal install must prove a real personal process, console, auth and config adoption. */
+export function backupContextReplyIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!(value.before?.bindings >= 1 && value.before?.results >= 1 && value.before?.messages >= 2)) issues.push('not_nonempty')
+  if (JSON.stringify(value.after) !== JSON.stringify(value.before)) issues.push('counts_changed')
+  if (!(value.artifacts >= 1)) issues.push('artifact_missing')
+  if (typeof value.reply !== 'string') issues.push('reply')
+  return issues
+}
 export function installedContextIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -742,7 +780,7 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
           for (const issue of fn(result.evidence?.[key])) failures.push(fail(`${key}_invalid`, `${key} ${issue}`, entry.id))
         }
