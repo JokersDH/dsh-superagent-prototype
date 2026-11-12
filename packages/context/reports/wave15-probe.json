@@ -1,0 +1,32 @@
+{
+  "sourceCommit": "f5fe6bc899602dedb2909bd8d385bc8c01746bee",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "scope": "Unknown-input robustness only; malformed private wrapper input is not an execution grant or admitted main bypass",
+  "observations": [
+    {
+      "id": "NULL_BODY_RETURNS_INVALID_BODY",
+      "status": "PASS",
+      "observed": "invalid_body",
+      "expected": "invalid_body"
+    },
+    {
+      "id": "NULL_IDENTITY_RETURNS_INVALID_BODY",
+      "status": "PASS",
+      "observed": "invalid_body",
+      "expected": "invalid_body"
+    },
+    {
+      "id": "MISSING_PRINCIPAL_RETURNS_INVALID_BODY",
+      "status": "PASS",
+      "observed": "invalid_body",
+      "expected": "invalid_body"
+    },
+    {
+      "id": "VALID_PRIVATE_INPUT_REMAINS_NO_CANDIDATES",
+      "status": "PASS",
+      "observed": "no_candidates",
+      "expected": "no_candidates"
+    }
+  ]
+}

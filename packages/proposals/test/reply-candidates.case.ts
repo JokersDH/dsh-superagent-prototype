@@ -279,3 +279,59 @@ test('only a main-verified completed reply reaches the candidate reviewer', () =
     ['principal_unverified'],
   )
 })
+
+test('unknown verified-wrapper input is refused before any dereference', () => {
+  const bodyValue = body([{ kind: 'reply', text: 'Plain answer', sourceRefs: [] }])
+  const identity = {
+    requestId: 'assistant-request:message-1',
+    replyMessageId: 'reply-1',
+    sourceMessageId,
+    projectId,
+    conversationId,
+    model: 'test-model',
+    principal: { userId: 'user-1', authorityRef: 'authority-1' },
+  }
+  const verifiedBindings = { ...bindings, principal: identity.principal }
+
+  // Null body, null identity, missing principal and non-object input never throw.
+  for (const input of [
+    null,
+    undefined,
+    42,
+    'verified',
+    [],
+    { verifiedBy: 'main-completed-reply', body: null, identity },
+    { verifiedBy: 'main-completed-reply', body: bodyValue, identity: null },
+    {
+      verifiedBy: 'main-completed-reply',
+      body: bodyValue,
+      identity: {
+        requestId: identity.requestId,
+        replyMessageId: identity.replyMessageId,
+        sourceMessageId,
+        projectId,
+        conversationId,
+        model: identity.model,
+      },
+    },
+  ]) {
+    const review = reviewVerifiedReplyCandidates(input, verifiedBindings)
+    assert.equal(review.status, 'invalid_body')
+    assert.equal(review.candidates.length, 0)
+    assert.equal(review.modelCallPerformed, false)
+  }
+
+  // A null field inside an otherwise-shaped wrapper is also an incomplete identity, not a throw.
+  const partial = reviewVerifiedReplyCandidates(
+    { verifiedBy: 'main-completed-reply', body: { ...bodyValue, model: null }, identity },
+    verifiedBindings,
+  )
+  assert.equal(partial.status, 'invalid_body')
+  assert.deepEqual(partial.rejected.map((entry) => entry.reason), ['incomplete_identity'])
+
+  // The valid typed positive still reaches the candidate reviewer.
+  const positive = reviewVerifiedReplyCandidates({ verifiedBy: 'main-completed-reply', body: bodyValue, identity }, verifiedBindings)
+  assert.equal(positive.status, 'candidates')
+  assert.equal(positive.candidates.length, 1)
+  assert.equal(positive.verifiedBy, 'main-completed-reply')
+})

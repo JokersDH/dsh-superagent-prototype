@@ -301,35 +301,69 @@ export function reviewVerifiedReplyCandidates(input: unknown, bindings: ReplyCan
     verifiedBy: 'none',
     notes: ['Only a main-verified completed reply can be reviewed; nothing here executes or re-sends.'],
   })
-  if (input === null || typeof input !== 'object') return refuse('unverified_reply', 'No verified completed reply was supplied')
-  const value = input as Partial<VerifiedCompletedReply>
-  if (value.verifiedBy !== 'main-completed-reply' || value.body === undefined || value.identity === undefined) {
+  // Unknown input is validated before any dereference: a null/partial wrapper is a refused claim,
+  // never a thrown TypeError.
+  if (!isObject(input)) return refuse('unverified_reply', 'No verified completed reply was supplied')
+  if (input.verifiedBy !== 'main-completed-reply') {
     return refuse('unverified_reply', 'The reply did not arrive through the main completed-reply verifier')
   }
-  const { body, identity } = value
+  const body = input.body
+  const identity = input.identity
+  if (!isObject(body) || !isObject(identity)) {
+    return refuse('incomplete_identity', 'Verified reply body or identity is missing')
+  }
+  const bodyRef = {
+    replyMessageId: body.replyMessageId,
+    sourceMessageId: body.sourceMessageId,
+    projectId: body.projectId,
+    conversationId: body.conversationId,
+    model: body.model,
+  }
+  const identityRef = {
+    replyMessageId: identity.replyMessageId,
+    sourceMessageId: identity.sourceMessageId,
+    projectId: identity.projectId,
+    conversationId: identity.conversationId,
+    model: identity.model,
+  }
+  if (!Object.values(bodyRef).every(isNonEmptyString) || !Object.values(identityRef).every(isNonEmptyString)) {
+    return refuse('incomplete_identity', 'Verified reply identity is incomplete')
+  }
+  if (!isObject(identity.principal) || !isNonEmptyString(identity.principal.userId) || !isNonEmptyString(identity.principal.authorityRef)) {
+    return refuse('incomplete_identity', 'Verified reply principal is missing')
+  }
+  const principalRef = identity.principal
   if (
-    body.replyMessageId !== identity.replyMessageId ||
-    body.sourceMessageId !== identity.sourceMessageId ||
-    body.projectId !== identity.projectId ||
-    body.conversationId !== identity.conversationId ||
-    body.model !== identity.model
+    bodyRef.replyMessageId !== identityRef.replyMessageId ||
+    bodyRef.sourceMessageId !== identityRef.sourceMessageId ||
+    bodyRef.projectId !== identityRef.projectId ||
+    bodyRef.conversationId !== identityRef.conversationId ||
+    bodyRef.model !== identityRef.model
   ) {
     return refuse('reply_identity_mismatch', 'Reply body does not match the verified request/reply identity')
   }
   if (
-    identity.sourceMessageId !== bindings.sourceMessageId ||
-    identity.projectId !== bindings.projectId ||
-    identity.conversationId !== bindings.conversationId
+    identityRef.sourceMessageId !== bindings.sourceMessageId ||
+    identityRef.projectId !== bindings.projectId ||
+    identityRef.conversationId !== bindings.conversationId
   ) {
     return refuse('reply_binding_mismatch', 'Verified reply belongs to another source/project/conversation')
   }
   if (
     bindings.principal === undefined ||
-    identity.principal.userId !== bindings.principal.userId ||
-    identity.principal.authorityRef !== bindings.principal.authorityRef
+    principalRef.userId !== bindings.principal.userId ||
+    principalRef.authorityRef !== bindings.principal.authorityRef
   ) {
     return refuse('principal_unverified', 'Verified reply principal is not the current authenticated principal')
   }
   const review = reviewReplyCandidates(body, bindings)
   return { ...review, verifiedBy: 'main-completed-reply' }
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0
 }
