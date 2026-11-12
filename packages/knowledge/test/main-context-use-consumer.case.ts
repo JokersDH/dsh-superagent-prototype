@@ -4,9 +4,9 @@ import { mkdtempSync, mkdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { ProductStore } from '@personal-agent/storage'
-import { AssistantContextBindingSchema } from '@personal-agent/contracts'
-import type { AssistantContextBindings, TrustedActor } from '@personal-agent/contracts'
+import type { TrustedActor } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
+import { collectContextHistory } from '../../context/src/index.ts'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
 
@@ -21,9 +21,9 @@ const API = 'c'.repeat(64)
  * Independent consumer of main's real assistant context-use HTTP/SSE path.
  *
  * It drives prepare/send/audit through the product entry points with a mock AssistantModelPort and
- * checks what the provider actually receives, what the durable binding keeps, and how revocation,
- * expiry, replay and cutoff behave. The bindings port fallback is explicitly an in-test composition
- * fixture (main's own product test documents the same), never evidence of A's durable table.
+ * checks what the provider actually receives, what the durable A binding keeps, and how revocation,
+ * expiry, replay and cutoff behave. Bindings and completed replies are the real A18 store ports:
+ * there is no in-test Map fallback here.
  */
 function fixture(t: { after(fn: () => void): void }) {
   const root = mkdtempSync(join(tmpdir(), 'pa-context-consumer-'))
@@ -31,10 +31,13 @@ function fixture(t: { after(fn: () => void): void }) {
   const scratchProject = join(root, 'project')
   mkdirSync(stateRoot)
   mkdirSync(scratchProject)
-  const store = new ProductStore({ path: join(stateRoot, 'state.sqlite'), artifactsRoot: join(stateRoot, 'artifacts') })
+  const storePath = join(stateRoot, 'state.sqlite')
+  const artifactsRoot = join(stateRoot, 'artifacts')
+  let store = new ProductStore({ path: storePath, artifactsRoot })
+  const stores = [store]
+  let productClosed = false
   let now = '2026-11-12T09:00:00.000Z'
   const requests: { role: string; content: string }[][] = []
-  const records = new Map<string, unknown>()
   let configured = true
   const status = () => ({
     protocol: 'assistant-provider/1' as const,
@@ -53,30 +56,6 @@ function fixture(t: { after(fn: () => void): void }) {
       return { text: 'CONSUMER-REPLY', model: 'mock-context' }
     },
   }
-  const bindings = {
-    forMessage(id: string) {
-      for (const value of records.values()) {
-        const binding = value as { messageId?: string }
-        if (binding.messageId === id) return structuredClone(value)
-      }
-      return undefined
-    },
-    forCommand(id: string) {
-      const value = records.get(id)
-      return value === undefined ? undefined : structuredClone(value)
-    },
-    put(value: unknown) {
-      assert.ok(store.uow.nesting > 0)
-      const binding = AssistantContextBindingSchema.parse(value)
-      const existing = records.get(binding.commandId)
-      if (existing) {
-        assert.deepEqual(existing, binding)
-        return { binding: structuredClone(existing), replayed: true }
-      }
-      store.uow.afterCommit(() => records.set(binding.commandId, structuredClone(binding)))
-      return { binding, replayed: false }
-    },
-  }
   const product = createProductRuntime({
     store,
     principal,
@@ -87,7 +66,6 @@ function fixture(t: { after(fn: () => void): void }) {
     // The runtime option is typed as the concrete private provider; this fixture only needs the
     // published AssistantModelPort surface of status/selectModel/reply.
     assistantProvider: provider as unknown as NonNullable<Parameters<typeof createProductRuntime>[0]['assistantProvider']>,
-    assistantContextBindings: bindings as unknown as AssistantContextBindings,
     now: () => now,
   })
   store.product.messages.append({
@@ -136,13 +114,33 @@ function fixture(t: { after(fn: () => void): void }) {
     await product.execution.effects.idle('application.assistant.reply')
   }
   const messages = () => store.product.messages.page(conversationId).messages
-  t.after(async () => {
+  const closeProduct = async () => {
+    if (productClosed) return
+    productClosed = true
     await product.close()
+  }
+  const reopenStore = async () => {
+    await closeProduct()
     store.close()
+    store = new ProductStore({ path: storePath, artifactsRoot })
+    stores.push(store)
+    return store
+  }
+  t.after(async () => {
+    await closeProduct()
+    for (const open of stores) {
+      try {
+        open.close()
+      } catch {
+        // Already closed by reopenStore/after; a second close is not evidence.
+      }
+    }
     rmSync(root, { recursive: true, force: true })
   })
   return {
-    store,
+    get store() {
+      return store
+    },
     product,
     requests,
     prepare,
@@ -158,7 +156,12 @@ function fixture(t: { after(fn: () => void): void }) {
     setConfigured: (value: boolean) => {
       configured = value
     },
-    bindings,
+    reopenStore,
+    historyInput: (workId?: string) => ({
+      projectIds: [projectId],
+      conversationId,
+      ...(workId === undefined ? {} : { workId }),
+    }),
   }
 }
 
@@ -307,4 +310,68 @@ test('natural expiry and an offline provider settle a rejection before any model
   await offline.flush()
   assert.equal(offline.requests.length, 0)
   assert.equal(offline.messages().some((message) => message.id === key('message', pending.commandId)), false)
+})
+
+test('the real A18 history and completed reply are consumed through the durable store ports', async (t) => {
+  const h = fixture(t)
+  const prepared = await h.prepare(h.input('history-1', 'Explain and answer from the selection.'))
+  await (await h.send(prepared)).json()
+  await h.flush()
+  const messageId = key('message', prepared.commandId)
+  const requestId = key('assistant-request', messageId)
+
+  // Real A ports: the binding and the completed result live in SQLite, not an in-test Map.
+  const binding = h.store.workflows.assistant.contextBindings.forMessage(messageId)
+  assert.ok(binding)
+  assert.equal(binding.requestId, prepared.preview.requestId)
+  const result = h.store.workflows.assistant.replyResults.forRequest(requestId)
+  assert.ok(result)
+  assert.equal(result.replyMessageId, key('assistant-reply', messageId))
+  assert.equal(result.sourceMessageId, messageId)
+  assert.equal(result.projectId, projectId)
+  assert.equal(result.conversationId, conversationId)
+  assert.equal(result.principal.userId, principal.userId)
+  assert.equal(result.principal.authorityRef, principal.authorityRef)
+  assert.equal(result.model, 'mock-context')
+  assert.equal(result.artifactRef, result.artifactDigest)
+  assert.equal(h.store.workflows.assistant.replyResults.forReply(result.replyMessageId)?.requestDigest, result.requestDigest)
+
+  const now = () => new Date('2026-11-12T09:03:00.000Z')
+  const view = collectContextHistory(h.store.workflows.assistant.contextHistory, h.historyInput(), {
+    now,
+    replyResults: h.store.workflows.assistant.replyResults,
+    // Main owns its assistant request key; C only projects the result it returns.
+    replyFor: (id) => h.store.workflows.assistant.replyResults.forRequest(key('assistant-request', id)),
+  })
+  assert.equal(view.entries.length, 1)
+  const entry = view.entries[0]!
+  assert.equal(entry.messageId, messageId)
+  assert.equal(entry.projectId, projectId)
+  assert.equal(entry.conversationId, conversationId)
+  assert.equal(entry.state, 'current_window')
+  assert.equal(entry.replyUnknown, false)
+  assert.equal(entry.completedReply?.replyMessageId, key('assistant-reply', messageId))
+  assert.equal(entry.completedReply?.requestDigest, result.requestDigest)
+  assert.equal(entry.completedReply?.artifactDigest, result.artifactDigest)
+  assert.equal(entry.requiresExplicitReauthorization, true)
+  assert.equal(Object.hasOwn(entry.completedReply ?? {}, 'text'), false)
+  assert.equal(view.totals.completedReplies, 1)
+  assert.equal(view.totals.mismatchedReplies, 0)
+
+  // A work filter the binding does not carry is not this work's history.
+  const workView = collectContextHistory(h.store.workflows.assistant.contextHistory, h.historyInput('other-work'), {
+    now,
+    replyResults: h.store.workflows.assistant.replyResults,
+  })
+  assert.equal(workView.entries.length, 0)
+
+  // The rows survive a real SQLite reopen; durability is A's data property, not a new grant.
+  const reopened = await h.reopenStore()
+  const durable = collectContextHistory(reopened.workflows.assistant.contextHistory, h.historyInput(), {
+    now: () => new Date('2026-11-12T09:03:00.000Z'),
+    replyResults: reopened.workflows.assistant.replyResults,
+    replyFor: (id) => reopened.workflows.assistant.replyResults.forRequest(key('assistant-request', id)),
+  })
+  assert.equal(durable.entries.length, 1)
+  assert.equal(durable.entries[0]!.completedReply?.artifactDigest, result.artifactDigest)
 })

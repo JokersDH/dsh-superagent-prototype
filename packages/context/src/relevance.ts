@@ -45,6 +45,7 @@ export type RelevanceOmissionReason =
   | 'scope_unproven'
   | 'scope_escalation'
   | 'superseded'
+  | 'duplicate'
   | 'no_match'
   | 'budget_items'
   | 'budget_bytes'
@@ -152,6 +153,7 @@ export function selectRelevantSources(
   const upstreamComplete = batchCoverage?.complete ?? options.coverage?.complete ?? true
   const omitted: RelevanceOmission[] = []
   const eligible: { candidate: RelevanceCandidate; score: number; matched: readonly string[]; bytes: number; tokens: number }[] = []
+  const acceptedIds = new Set<string>()
 
   for (const candidate of candidates) {
     if (candidate.projectId !== options.projectId) {
@@ -192,11 +194,18 @@ export function selectRelevantSources(
       omitted.push({ sourceId: candidate.sourceId, path: candidate.path, reason: 'superseded' })
       continue
     }
+    // Deduplicate only among already-authorized candidates, so a rejected copy cannot shadow a
+    // legitimate one that appears later in the input.
+    if (acceptedIds.has(candidate.sourceId)) {
+      omitted.push({ sourceId: candidate.sourceId, path: candidate.path, reason: 'duplicate' })
+      continue
+    }
     const matched = matchedTerms(candidate, terms)
     if (terms.length > 0 && matched.length === 0) {
       omitted.push({ sourceId: candidate.sourceId, path: candidate.path, reason: 'no_match' })
       continue
     }
+    acceptedIds.add(candidate.sourceId)
     // A selected work gets only a small deterministic bonus, never an authorization.
     const workBonus = options.workId !== undefined && candidate.workId === options.workId ? 2 : 0
     eligible.push({

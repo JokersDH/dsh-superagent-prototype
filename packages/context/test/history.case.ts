@@ -174,6 +174,36 @@ test('a completed reply is attached as recorded data; a request receipt alone st
   assert.equal(Object.hasOwn(second.completedReply ?? {}, 'text'), false)
 })
 
+test("main's reply lookup attaches only matching results; a foreign result is counted, not shown", () => {
+  const bindingRow = binding(1)
+  const matched = AssistantReplyResultSchema.parse({
+    protocol: 'assistant-reply-result/1',
+    requestId: 'req-1',
+    requestDigest: digest('a'),
+    sourceMessageId: 'msg-1',
+    replyMessageId: 'reply-1',
+    projectId,
+    conversationId,
+    principal: { userId: 'user-1', authorityRef: 'authority-1' },
+    model: 'test-model',
+    artifactRef: 'artifact-1',
+    artifactDigest: digest('b'),
+    textDigest: digest('c'),
+    recordedAt: confirmedAt,
+  })
+  const foreign = { ...matched, conversationId: 'other-conversation' }
+  const history = pagedHistory([bindingRow])
+
+  const attached = collectContextHistory(history, query, { now, replyFor: () => matched })
+  assert.equal(attached.entries[0]!.replyUnknown, false)
+  assert.equal(attached.totals.mismatchedReplies, 0)
+
+  const refused = collectContextHistory(history, query, { now, replyFor: () => foreign })
+  assert.equal(refused.entries[0]!.completedReply, undefined)
+  assert.equal(refused.entries[0]!.replyUnknown, true)
+  assert.equal(refused.totals.mismatchedReplies, 1)
+})
+
 test('a non-advancing history cursor stops the walk instead of looping or duplicating pages', () => {
   let calls = 0
   const stuck = {

@@ -86,7 +86,14 @@ export interface HistoryView {
   readonly nextCursor?: string
   /** False when the page budget or a non-advancing cursor stopped the walk. */
   readonly complete: boolean
-  readonly totals: { readonly pages: number; readonly entries: number; readonly completedReplies: number; readonly unknownReplies: number }
+  readonly totals: {
+    readonly pages: number
+    readonly entries: number
+    readonly completedReplies: number
+    readonly unknownReplies: number
+    /** Completed results that named another source/project/conversation and were not attached. */
+    readonly mismatchedReplies: number
+  }
   readonly authorization: 'none'
   readonly untrusted: true
   readonly notes: readonly string[]
@@ -100,13 +107,19 @@ export interface HistoryViewOptions {
   readonly contract?: ContractRef
   readonly scope?: Scope
   readonly replyResults?: Pick<AssistantReplyResults, 'forRequest'>
+  /**
+   * Main's own reply lookup for a source message (for example through its assistant request key).
+   * C never guesses main's key format; when omitted only `replyResults.forRequest(binding.requestId)`
+   * is tried, which is exact but often a different identity from the inference request.
+   */
+  readonly replyFor?: (messageId: string) => AssistantReplyResult | undefined
 }
 
 function toEntry(
   binding: AssistantContextBinding,
   options: HistoryViewOptions,
   requestReply: ((requestId: string) => AssistantReplyResult | undefined) | undefined,
-): HistoryEntry {
+): { entry: HistoryEntry; mismatchedReply: boolean } {
   const now = options.now().getTime()
   const expires = Date.parse(binding.expiresAt)
   let state: HistoryEntryState = expires <= now ? 'expired' : 'current_window'
@@ -127,9 +140,16 @@ function toEntry(
     state = 'scope_changed'
   }
 
-  const reply = requestReply?.(binding.requestId)
+  const reply = options.replyFor?.(binding.messageId) ?? requestReply?.(binding.requestId)
+  // A completed result only attaches when it names exactly this source/project/conversation.
+  const matches =
+    reply !== undefined &&
+    reply.sourceMessageId === binding.messageId &&
+    reply.projectId === binding.projectId &&
+    reply.conversationId === binding.conversationId
+  const mismatchedReply = reply !== undefined && !matches
   const completedReply: HistoryCompletedReply | undefined =
-    reply === undefined
+    reply === undefined || !matches
       ? undefined
       : {
           replyMessageId: reply.replyMessageId,
@@ -141,7 +161,7 @@ function toEntry(
           recordedAt: reply.recordedAt,
         }
 
-  return {
+  const entry: HistoryEntry = {
     messageId: binding.messageId,
     requestId: binding.requestId,
     commandId: binding.commandId,
@@ -167,6 +187,7 @@ function toEntry(
     requiresExplicitReauthorization: true,
     trust: 'untrusted_data',
   }
+  return { entry, mismatchedReply }
 }
 
 /**
@@ -183,6 +204,7 @@ export function collectContextHistory(
   const entries: HistoryEntry[] = []
   const omitted: HistoryOmission[] = []
   const seen = new Set<string>()
+  let mismatchedReplies = 0
   let pages = 0
   let hasMore = false
   let nextCursor: string | undefined
@@ -231,7 +253,9 @@ export function collectContextHistory(
         continue
       }
       seen.add(binding.messageId)
-      entries.push(toEntry(binding, options, options.replyResults?.forRequest.bind(options.replyResults)))
+      const projected = toEntry(binding, options, options.replyResults?.forRequest.bind(options.replyResults))
+      if (projected.mismatchedReply) mismatchedReplies += 1
+      entries.push(projected.entry)
     }
     hasMore = page.hasMore
     nextCursor = page.nextCursor
@@ -252,6 +276,7 @@ export function collectContextHistory(
     'History bindings and completed replies are recorded data, not a grant, session or replay permission.',
     'A binding past its expiry remains viewable as history; any new send needs the current user confirmation.',
     'Source digests show what was frozen at that time; current source equality is unverified until re-read.',
+    'A completed reply attaches only when its source/project/conversation match; a mismatched result is counted, never shown.',
   ]
   return {
     protocol: 'assistant-context-history-view/1',
@@ -267,6 +292,7 @@ export function collectContextHistory(
       entries: entries.length,
       completedReplies,
       unknownReplies: entries.length - completedReplies,
+      mismatchedReplies,
     },
     authorization: 'none',
     untrusted: true,
