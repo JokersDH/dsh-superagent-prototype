@@ -69,6 +69,9 @@ const bounded = await measure(() => store.workflows.recoverySource.inspect({ max
 report.cases.push({ case: 'recovery-source-bounded', coverage: bounded.value.coverage, fingerprint: bounded.value.sourceFingerprint,
   families: bounded.value.families.length, rows: bounded.value.families.reduce((sum, family) => sum + family.rows, 0), ms: bounded.ms })
 
+const large = store.artifacts.write(new Uint8Array(524288))
+store.artifacts.insert(large)
+report.cases.push({ case: 'max-reply-bundle-artifact', rows: 1, bytes: large.bytes, id: large.id })
 const snapshotDir = join(temp, 'snapshot')
 const snapshot = await measure(() => new WorkflowSnapshots(store).create({ destination: snapshotDir }))
 report.cases.push({ case: 'snapshot-create', status: snapshot.value.status, databaseBytes: snapshot.value.manifest.database.bytes,
@@ -80,6 +83,6 @@ report.limitations = ['Temporary database and content-addressed artifact only; n
   'Timings are single-process wall clock on this host, not a service SLO.']
 store.close()
 rmSync(temp, { recursive: true, force: true })
-const out = resolve('packages/workflows/reports/wave14-performance.json')
+const out = resolve('packages/workflows/reports/wave15-performance.json')
 writeFileSync(out, JSON.stringify(report, null, 2) + '\n')
 console.log(JSON.stringify(report, null, 2))

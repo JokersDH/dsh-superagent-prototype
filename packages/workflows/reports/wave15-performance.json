@@ -1,0 +1,91 @@
+{
+  "protocol": "wave11-storage-benchmark/1",
+  "sourceCommit": "c4bd52c314f9d63b0393f6c6c883ad76a08c6b4e",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "cases": [
+    {
+      "case": "100-works",
+      "rows": 100,
+      "insertMs": 4.7
+    },
+    {
+      "case": "1000-works",
+      "rows": 1000,
+      "insertMs": 21
+    },
+    {
+      "case": "long-conversation",
+      "rows": 2000,
+      "insertMs": 293.4
+    },
+    {
+      "case": "10000-context-bindings",
+      "rows": 10000,
+      "insertMs": 1730.7
+    },
+    {
+      "case": "history-first-page",
+      "rows": 100,
+      "hasMore": true,
+      "ms": 5.8
+    },
+    {
+      "case": "history-query-plan",
+      "plan": [
+        "SEARCH assistant_context_bindings USING INDEX assistant_context_history_scope (project_id=?)"
+      ]
+    },
+    {
+      "case": "bundle-lookup",
+      "present": true,
+      "digestMatches": true,
+      "bytes": 16,
+      "ms": 0.7
+    },
+    {
+      "case": "recovery-source-20000-row-window",
+      "coverage": "complete",
+      "families": 47,
+      "rows": 13105,
+      "ms": 114.6
+    },
+    {
+      "case": "recovery-source-bounded",
+      "coverage": "bounded",
+      "fingerprint": null,
+      "families": 28,
+      "rows": 1000,
+      "ms": 3.2
+    },
+    {
+      "case": "max-reply-bundle-artifact",
+      "rows": 1,
+      "bytes": 524288,
+      "id": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+    },
+    {
+      "case": "snapshot-create",
+      "status": "ok",
+      "databaseBytes": 28688384,
+      "artifacts": 2,
+      "evidenceFamilies": 18,
+      "ms": 873.8
+    },
+    {
+      "case": "snapshot-verify",
+      "status": "ok",
+      "ms": 282.1
+    }
+  ],
+  "limits": {
+    "maxRows": 20000,
+    "maxHistoryPage": 100,
+    "maxReplyBodyBytes": 524288,
+    "maxBindingsTested": 10000
+  },
+  "limitations": [
+    "Temporary database and content-addressed artifact only; no user state, model/native send or cleanup-policy test.",
+    "Timings are single-process wall clock on this host, not a service SLO."
+  ]
+}
