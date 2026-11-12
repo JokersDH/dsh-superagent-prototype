@@ -836,7 +836,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
           decisionSurface: seeded.decision,
         }
       } finally {
-        pa(install, ['stop', '--json'], { timeoutMs: 20_000 })
+        pa(install, ['stop', '--json'], { timeoutMs: 20_000, env: { PA_DATA_ROOT: target } })
       }
     })
 
