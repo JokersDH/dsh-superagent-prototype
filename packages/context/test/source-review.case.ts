@@ -82,16 +82,27 @@ test('review items carry recognizable titles, categories and stable citations fr
   }
 })
 
-test('excerpts are bounded per item and globally, and nothing is silently dropped', async () => {
+test('excerpts are bounded per item and globally, and past a cap only bounded counts remain', async () => {
   const composed = await composition()
+  assert.ok(composed.slices.length >= 2)
   const review = projectSourceReview(composed, { maxItems: 1, maxBytes: 32 * 1024, maxExcerptBytes: 8 })
-  assert.equal(review.totals.items, composed.slices.length)
+  assert.equal(review.items.length, 1)
+  assert.ok(review.items.length <= review.budget.maxItems)
   const first = review.items[0]!
   assert.equal(first.status, 'excerpt_budget')
   assert.ok(first.excerptBytes <= 8)
-  // Items beyond maxItems are still listed with a reason instead of disappearing.
-  assert.ok(review.items.slice(1).every((item) => item.status === 'excerpt_budget' && item.excerpt === ''))
+  // Items beyond maxItems are counted, not listed with title/citation/excerpt.
+  assert.equal(review.suppressed.items, composed.slices.length - 1)
+  assert.equal(review.totals.suppressed, composed.slices.length - 1)
+  assert.ok(review.notes.some((note) => note.includes('item budget')))
   assert.equal(review.truncated, true)
+
+  // Once the byte budget is gone, later sources are counted instead of emitting empty placeholders.
+  const noBytes = projectSourceReview(composed, { maxItems: 8, maxBytes: 1, maxExcerptBytes: 8 })
+  assert.equal(noBytes.items.length, 1)
+  assert.ok(noBytes.items[0]!.excerptBytes <= 1)
+  assert.equal(noBytes.suppressed.bytes, composed.slices.length - 1)
+  assert.equal(noBytes.truncated, true)
 })
 
 test('a CJK excerpt cut on a byte boundary never yields a replacement character', async () => {
@@ -154,14 +165,23 @@ test('non-project-relative paths and recorded omissions are reported without inv
     explanations: [],
     totals: { files: 1, bytes: 24, tokens: 6, durationMs: 1 },
   } as unknown as ContextComposition
-  const review = projectSourceReview(composed)
-  const item = review.items[0]!
+  const hostPath = projectSourceReview(composed)
+  const item = hostPath.items[0]!
   assert.equal(item.citation.includes('/Users'), false)
   assert.equal(item.citation, 'source_file:redacted/src-absolute')
-  assert.ok(review.notes.some((note) => note.includes('project-relative')))
-  assert.deepEqual(review.omitted.map((entry) => entry.reason), ['missing', 'stale'])
-  assert.equal(review.omitted[0]!.sourceId, 'src-missing')
-  assert.equal(review.totals.omitted, 2)
+  assert.ok(hostPath.notes.some((note) => note.includes('project-relative')))
+  assert.deepEqual(hostPath.omitted.map((entry) => entry.reason), ['missing', 'stale'])
+  assert.equal(hostPath.omitted[0]!.sourceId, 'src-missing')
+  assert.equal(hostPath.totals.omitted, 2)
+
+  // The same path rule applies to omission entries: a host path is never echoed back.
+  const hostOmission = projectSourceReview({
+    ...composed,
+    omitted: [{ sourceId: 'src-host', path: '/Users/owner/private/secret.ts', reason: 'missing' }],
+  } as unknown as ContextComposition)
+  assert.equal(JSON.stringify(hostOmission.omitted).includes('/Users/owner'), false)
+  assert.deepEqual(hostOmission.omitted, [{ sourceId: 'src-host', reason: 'missing' }])
+  assert.ok(hostOmission.notes.some((note) => note.includes('omitted path')))
 })
 
 test('review budgets are clamped to ceilings and invalid values are refused', async () => {

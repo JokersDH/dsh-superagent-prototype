@@ -1,0 +1,82 @@
+{
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "sourceCommit": "efb2812394af2530e861aee8f0183678e4a7e2a3",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "passed": 8,
+  "failed": 0,
+  "observations": [
+    {
+      "id": "MANIFEST_DIGEST_SCOPE_MUST_CHANGE",
+      "status": "PASS",
+      "observed": {
+        "protocol": "context-source-manifest-comparison/1",
+        "status": "changed",
+        "changes": [
+          {
+            "sourceId": "decision-00251ef9c88f1dd5327c39590c668059",
+            "path": "decisions/decision-1.json",
+            "kind": "decision",
+            "reason": "digest_scope"
+          }
+        ],
+        "incompleteReasons": []
+      }
+    },
+    {
+      "id": "SOURCE_REVIEW_MAX_ITEMS",
+      "status": "PASS",
+      "observed": {
+        "maxItems": 1,
+        "actualItems": 1
+      }
+    },
+    {
+      "id": "SOURCE_REVIEW_REDACTS_OMISSION_PATH",
+      "status": "PASS",
+      "observed": {
+        "reason": "missing"
+      }
+    },
+    {
+      "id": "RELEVANCE_REQUIRES_ROLE_AND_PROVENANCE",
+      "status": "PASS",
+      "observed": {
+        "selected": [],
+        "complete": true
+      }
+    },
+    {
+      "id": "RELEVANCE_PRESERVES_INCOMPLETE_COVERAGE",
+      "status": "PASS",
+      "observed": {
+        "upstreamComplete": false,
+        "selectedComplete": false
+      }
+    },
+    {
+      "id": "REPLY_BODY_BINDS_CONVERSATION",
+      "status": "PASS",
+      "observed": {
+        "status": "invalid_body",
+        "candidates": []
+      }
+    },
+    {
+      "id": "REPLY_REVISION_BODY_BINDS_PROJECT",
+      "status": "PASS",
+      "observed": {
+        "status": "invalid_body",
+        "candidates": []
+      }
+    },
+    {
+      "id": "HISTORY_RECHECKS_WORK_QUERY",
+      "status": "PASS",
+      "observed": {
+        "queryWorkId": "work-1",
+        "entries": []
+      }
+    }
+  ]
+}

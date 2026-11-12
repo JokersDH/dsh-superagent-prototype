@@ -94,21 +94,47 @@ test('foreign-project, stale-contract and unbound suggestions are refused with r
   assert.equal(review.candidates.length, 0)
   assert.equal(review.hasExecutableCandidates, false)
 
-  // ...and when the port layer only checks the body, the review still refuses current-binding drift.
+  // Per-item current-binding drift inside a matching envelope is refused item by item.
   const drift = reviewReplyCandidates(
-    body(
-      [
-        { kind: 'propose_work', goal: 'Other project work', projectId: 'project-2', sourceMessageId },
-        { kind: 'propose_decision', content: 'Foreign decision', scope: { ...scope, projectId: 'project-2' }, sourceMessageId },
-        { kind: 'propose_revision', expected: { ...contract, revision: 3 }, rationale: 'Old contract', sourceMessageId },
-      ],
-      { projectId: 'project-2' },
-    ),
+    body([
+      { kind: 'propose_revision', expected: { ...contract, revision: 3 }, rationale: 'Old contract', sourceMessageId },
+      {
+        kind: 'propose_decision',
+        content: 'Widening scope',
+        // Valid path atoms, but `docs` is outside the trusted grant scope.
+        scope: { ...scope, allowedPaths: [...scope.allowedPaths, 'docs'] },
+        sourceMessageId,
+      },
+    ]),
     bindings,
   )
   assert.equal(drift.status, 'no_candidates')
-  assert.deepEqual(drift.rejected.map((entry) => entry.reason), ['cross_project', 'cross_project', 'contract_stale'])
+  assert.deepEqual(drift.rejected.map((entry) => entry.reason), ['contract_stale', 'scope_escalation'])
   assert.equal(drift.reply, 'Here is what I suggest.')
+})
+
+test('a whole reply body bound to another conversation/project is invalid before any suggestion', () => {
+  const cases = [
+    {
+      envelope: { conversationId: 'foreign-conversation' },
+      suggestion: { kind: 'propose_decision', scope, content: 'Envelope candidate', sourceMessageId },
+    },
+    {
+      envelope: { projectId: 'foreign-project' },
+      suggestion: { kind: 'propose_work', goal: 'Foreign envelope work', projectId: 'foreign-project', sourceMessageId },
+    },
+    {
+      envelope: { sourceMessageId: 'other-source' },
+      suggestion: { kind: 'propose_work', goal: 'Other source work', projectId, sourceMessageId: 'other-source' },
+    },
+  ]
+  for (const { envelope, suggestion } of cases) {
+    const review = reviewReplyCandidates(body([suggestion], envelope), bindings)
+    assert.equal(review.status, 'invalid_body')
+    assert.equal(review.candidates.length, 0)
+    assert.equal(review.reply, '')
+    assert.deepEqual(review.rejected.map((entry) => entry.reason), ['body_binding_mismatch'])
+  }
 })
 
 test('a body with no legal candidate keeps the ordinary reply and never invents a candidate', () => {

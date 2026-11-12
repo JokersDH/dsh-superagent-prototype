@@ -184,7 +184,13 @@ async function candidates() {
 
 test('retrieval finds expected sources in a long conversation and many works without mixing in forbidden data', async () => {
   const { conversation, decisions, works, conversationReader, provider, listCalls } = await candidates()
-  const all: RelevanceCandidate[] = [...conversation, ...decisions, ...works]
+  // Keep the batches' upstream coverage when merging them; dropping it would overstate completeness.
+  const all = Object.assign([...conversation, ...decisions, ...works], {
+    coverage: {
+      complete: conversation.coverage.complete && decisions.coverage.complete && works.coverage.complete,
+      returned: conversation.length + decisions.length + works.length,
+    },
+  })
   const selection = selectRelevantSources(all, {
     projectId,
     query: 'payment timeout retry',
@@ -219,7 +225,10 @@ test('retrieval finds expected sources in a long conversation and many works wit
   assert.equal(provider.coverage().scanned, 400)
   assert.equal(provider.coverage().complete, false)
   assert.equal(listCalls(), 1)
-  assert.equal(selection.complete, true)
+  // The bounded conversation walk was incomplete, so the merged selection cannot claim completeness
+  // even though its own output budget was sufficient.
+  assert.equal(selection.upstreamComplete, false)
+  assert.equal(selection.complete, false)
 
   // The selector returns metadata only: source text never leaves through this surface.
   for (const item of selection.items) assert.equal(Object.hasOwn(item, 'content'), false)
@@ -256,8 +265,16 @@ test('budgets end the selection explicitly and never present a truncated ranking
 
 test('a granted-kind restriction is applied before ranking, and invalid budgets are refused', () => {
   const candidates: RelevanceCandidate[] = [
-    { sourceId: 'decision-a', kind: 'decision', path: 'decisions/a.json', content: 'payment retry', projectId },
-    { sourceId: 'message-a', kind: 'conversation_message', path: 'conversation/a.json', content: 'payment retry', projectId },
+    { sourceId: 'decision-a', kind: 'decision', path: 'decisions/a.json', content: 'payment retry', projectId, scope },
+    {
+      sourceId: 'message-a',
+      kind: 'conversation_message',
+      path: 'conversation/a.json',
+      content: 'payment retry',
+      projectId,
+      role: 'user',
+      provenance: 'trusted_user',
+    },
   ]
   const restricted = selectRelevantSources(candidates, { projectId, query: 'payment', allowedKinds: ['decision'] })
   assert.deepEqual(restricted.items.map((item) => item.sourceId), ['decision-a'])
@@ -270,4 +287,67 @@ test('a granted-kind restriction is applied before ranking, and invalid budgets 
   for (const invalid of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1.5]) {
     assert.throws(() => selectRelevantSources(candidates, { projectId, maxItems: invalid }), TypeError)
   }
+})
+
+test('missing role/provenance, unproven scope and scope escalation are refused before scoring', () => {
+  const missingOrigin = selectRelevantSources(
+    [{ sourceId: 'unknown-origin', kind: 'conversation_message', path: 'conversation/1', content: 'payment', projectId }],
+    { projectId, query: 'payment', allowedKinds: ['conversation_message'] },
+  )
+  assert.deepEqual(missingOrigin.items, [])
+  assert.deepEqual(missingOrigin.omitted, [
+    { sourceId: 'unknown-origin', path: 'conversation/1', reason: 'untrusted_role' },
+  ])
+
+  const unscopedDecision = selectRelevantSources(
+    [{ sourceId: 'decision-unscoped', kind: 'decision', path: 'decisions/a.json', content: 'payment', projectId }],
+    { projectId, query: 'payment' },
+  )
+  assert.deepEqual(unscopedDecision.omitted, [
+    { sourceId: 'decision-unscoped', path: 'decisions/a.json', reason: 'scope_unproven' },
+  ])
+
+  const escalation = selectRelevantSources(
+    [
+      {
+        sourceId: 'decision-wide',
+        kind: 'decision',
+        path: 'decisions/wide.json',
+        content: 'payment',
+        projectId,
+        scope: { ...scope, allowedPaths: [...scope.allowedPaths, '/etc'] },
+      },
+    ],
+    { projectId, query: 'payment', scope },
+  )
+  assert.deepEqual(escalation.omitted, [
+    { sourceId: 'decision-wide', path: 'decisions/wide.json', reason: 'scope_escalation' },
+  ])
+
+  // A project/kind selector alone is not a Scope authorization for contracts either.
+  const contract = selectRelevantSources(
+    [{ sourceId: 'contract-a', kind: 'contract', path: 'work/1/contract.json', content: 'payment', projectId, scope }],
+    { projectId, query: 'payment' },
+  )
+  assert.equal(contract.items.length, 1)
+})
+
+test('an incomplete conversation or work listing keeps the selection incomplete', async () => {
+  const provider = {
+    recent: async () => [
+      { messageId: 'm', conversationId, sequence: 1, role: 'user' as const, provenance: 'trusted_user', text: 'payment', createdAt: NOW },
+    ],
+    coverage: () => ({ complete: false, scanned: 1, returned: 1, excluded: {} }),
+  }
+  const batch = await createConversationRelevanceCandidates(provider, { projectId, conversationId })
+  assert.equal(batch.coverage.complete, false)
+  const selected = selectRelevantSources(batch, { projectId, query: 'payment', allowedKinds: ['conversation_message'] })
+  assert.equal(selected.upstreamComplete, false)
+  assert.equal(selected.complete, false)
+
+  const { index } = workIndex(worksFixture())
+  const works = createReadIndexWorkCandidates(index, projectId, { limit: 10 })
+  assert.equal(works.coverage.complete, false) // 63 works, only 10 listed and hasMore
+  const workSelection = selectRelevantSources(works, { projectId, query: 'payment retry' })
+  assert.equal(workSelection.complete, false)
 })

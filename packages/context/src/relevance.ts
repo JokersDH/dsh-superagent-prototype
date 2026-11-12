@@ -1,6 +1,8 @@
+import type { Scope } from '@personal-agent/contracts'
 import type { ContextDecisionSource, ReadIndexWorkView, WorkspaceReadIndex } from './read-index-port.ts'
 import type { ComposedConversationMessage, ComposedConversationProvider } from './composer.ts'
 import { sha256Text } from './digest.ts'
+import { scopeWithin } from './paths.ts'
 import { estimateTokens, queryTerms, relevanceScore } from './tokens.ts'
 import type { ContextSourceKind } from './types.ts'
 
@@ -30,6 +32,8 @@ export interface RelevanceCandidate {
   readonly anchorQuestionId?: string
   /** True when an effective decision list already knows this decision was replaced. */
   readonly superseded?: boolean
+  /** Decision/contract scope, so the selector can require it to sit inside the current authorization. */
+  readonly scope?: Scope
 }
 
 export type RelevanceOmissionReason =
@@ -38,6 +42,8 @@ export type RelevanceOmissionReason =
   | 'question_anchor'
   | 'other_work'
   | 'untrusted_role'
+  | 'scope_unproven'
+  | 'scope_escalation'
   | 'superseded'
   | 'no_match'
   | 'budget_items'
@@ -78,10 +84,17 @@ export interface RelevanceSelection {
   readonly omitted: readonly RelevanceOmission[]
   readonly totals: { readonly considered: number; readonly eligible: number; readonly selected: number; readonly bytes: number }
   readonly budget: RelevanceBudget
-  /** False when the budget, not the data, ended the selection. */
+  /** False when the budget or an incomplete upstream scan ended the selection. */
   readonly complete: boolean
+  /** Upstream scan completeness reported by the batch producer; independent of the output budget. */
+  readonly upstreamComplete: boolean
   readonly untrusted: true
   readonly deterministic: true
+}
+
+/** An array of candidates that also carries the upstream scan completeness it was produced under. */
+export interface RelevanceCandidateBatch extends ReadonlyArray<RelevanceCandidate> {
+  readonly coverage: { readonly complete: boolean; readonly scanned?: number; readonly returned: number }
 }
 
 export interface RelevanceSelectionOptions {
@@ -91,6 +104,10 @@ export interface RelevanceSelectionOptions {
   readonly workId?: string
   readonly maxItems?: number
   readonly maxBytes?: number
+  /** Current authorization scope; decision/contract scopes must sit inside it. */
+  readonly scope?: Scope
+  /** Explicit upstream completeness when the caller did not produce a candidate batch. */
+  readonly coverage?: { readonly complete: boolean }
 }
 
 function resolvePositive(value: number | undefined, fallback: number, ceiling: number, name: string): number {
@@ -102,7 +119,8 @@ function resolvePositive(value: number | undefined, fallback: number, ceiling: n
 }
 
 function isReusableRole(role: string | undefined, provenance: string | undefined): boolean {
-  if (role === undefined || provenance === undefined) return true
+  // Missing origin is refused by default: an unknown role/provenance is not evidence of trust.
+  if (role === undefined || provenance === undefined) return false
   return (
     (role === 'user' && provenance === 'trusted_user') ||
     (role === 'assistant' && provenance === 'reasoner_reply')
@@ -130,6 +148,8 @@ export function selectRelevantSources(
   }
   const terms = queryTerms(options.query ?? '')
   const allowedKinds = options.allowedKinds === undefined ? undefined : new Set(options.allowedKinds)
+  const batchCoverage = (candidates as Partial<RelevanceCandidateBatch>).coverage
+  const upstreamComplete = batchCoverage?.complete ?? options.coverage?.complete ?? true
   const omitted: RelevanceOmission[] = []
   const eligible: { candidate: RelevanceCandidate; score: number; matched: readonly string[]; bytes: number; tokens: number }[] = []
 
@@ -153,6 +173,18 @@ export function selectRelevantSources(
       }
       if (!isReusableRole(candidate.role, candidate.provenance)) {
         omitted.push({ sourceId: candidate.sourceId, path: candidate.path, reason: 'untrusted_role' })
+        continue
+      }
+    }
+    if (candidate.kind === 'decision' || candidate.kind === 'contract') {
+      // A project/kind selector is not a Scope authorization: decision and contract scopes must be
+      // proven inside the current trusted scope before their正文 can influence ranking or digests.
+      if (candidate.scope === undefined) {
+        omitted.push({ sourceId: candidate.sourceId, path: candidate.path, reason: 'scope_unproven' })
+        continue
+      }
+      if (options.scope !== undefined && !scopeWithin(candidate.scope, options.scope)) {
+        omitted.push({ sourceId: candidate.sourceId, path: candidate.path, reason: 'scope_escalation' })
         continue
       }
     }
@@ -224,26 +256,38 @@ export function selectRelevantSources(
     omitted,
     totals: { considered: candidates.length, eligible: eligible.length, selected: items.length, bytes },
     budget,
-    complete: !omitted.some((entry) => entry.reason.startsWith('budget_')),
+    complete: upstreamComplete && !omitted.some((entry) => entry.reason.startsWith('budget_')),
+    upstreamComplete,
     untrusted: true,
     deterministic: true,
   }
 }
 
-/** Maps the scoped conversation provider into candidates; the adapter already filtered the read. */
+function asBatch(
+  candidates: readonly RelevanceCandidate[],
+  coverage: RelevanceCandidateBatch['coverage'],
+): RelevanceCandidateBatch {
+  return Object.assign([...candidates], { coverage })
+}
+
+/**
+ * Maps the scoped conversation provider into candidates and keeps the adapter's own coverage, so a
+ * bounded page walk stays visibly incomplete instead of becoming a complete-looking array.
+ */
 export async function createConversationRelevanceCandidates(
   provider: ComposedConversationProvider,
   selection: { readonly projectId: string; readonly conversationId: string },
   options: { readonly limit?: number } = {},
-): Promise<readonly RelevanceCandidate[]> {
+): Promise<RelevanceCandidateBatch> {
   const messages: readonly ComposedConversationMessage[] = await provider.recent({
     projectId: selection.projectId,
     conversationId: selection.conversationId,
     limit: Math.min(Math.max(options.limit ?? 200, 1), 1000),
   })
-  return messages.map((message) => ({
+  const reported = (provider as { coverage?: () => { complete?: boolean; scanned?: number } }).coverage?.()
+  const candidates = messages.map((message) => ({
     sourceId: message.messageId,
-    kind: 'conversation_message',
+    kind: 'conversation_message' as const,
     path: `conversation/${selection.conversationId}/${message.messageId}.json`,
     title: `Conversation message ${message.sequence}`,
     content: message.text,
@@ -251,23 +295,30 @@ export async function createConversationRelevanceCandidates(
     role: message.role,
     provenance: message.provenance,
   }))
+  return asBatch(candidates, {
+    complete: reported?.complete ?? true,
+    ...(reported?.scanned === undefined ? {} : { scanned: reported.scanned }),
+    returned: candidates.length,
+  })
 }
 
 /** Maps effective decisions; a known replacement id stays out even if it still appears in a page. */
 export function createDecisionRelevanceCandidates(
   decisions: readonly ContextDecisionSource[],
-  options: { readonly supersededIds?: readonly string[] } = {},
-): readonly RelevanceCandidate[] {
+  options: { readonly supersededIds?: readonly string[]; readonly coverage?: { readonly complete: boolean } } = {},
+): RelevanceCandidateBatch {
   const superseded = new Set(options.supersededIds ?? [])
-  return decisions.map((decision) => ({
+  const candidates = decisions.map((decision) => ({
     sourceId: decision.decisionId,
-    kind: 'decision',
+    kind: 'decision' as const,
     path: `decisions/${decision.decisionId}.json`,
     title: 'Explicit user decision',
     content: decision.content,
     projectId: decision.scope.projectId,
+    scope: decision.scope,
     superseded: superseded.has(decision.decisionId),
   }))
+  return asBatch(candidates, { complete: options.coverage?.complete ?? true, returned: candidates.length })
 }
 
 /**
@@ -279,7 +330,7 @@ export function createReadIndexWorkCandidates(
   index: WorkspaceReadIndex,
   projectId: string,
   options: { readonly limit?: number } = {},
-): readonly RelevanceCandidate[] {
+): RelevanceCandidateBatch {
   const limit = Math.min(Math.max(options.limit ?? 64, 1), 512)
   const listed = index.listWorks({ projectIds: [projectId], limit })
   const candidates: RelevanceCandidate[] = []
@@ -319,8 +370,14 @@ export function createReadIndexWorkCandidates(
         }),
         projectId,
         workId: work.id,
+        scope: entry.contract.scope,
       })
     }
   }
-  return candidates
+  // `hasMore`/`nextCursor` are kept as an explicit incomplete scan, never dropped with the array.
+  return asBatch(candidates, {
+    complete: !listed.hasMore,
+    scanned: listed.works.length,
+    returned: candidates.length,
+  })
 }

@@ -73,7 +73,7 @@ export interface HistoryOmission {
   readonly messageId?: string
   readonly projectId?: string
   readonly conversationId?: string
-  readonly reason: 'foreign_project' | 'other_conversation' | 'other_work' | 'duplicate'
+  readonly reason: 'foreign_project' | 'other_conversation' | 'other_work' | 'inconsistent_binding' | 'duplicate'
 }
 
 export interface HistoryView {
@@ -203,6 +203,26 @@ export function collectContextHistory(
           projectId: binding.projectId,
           conversationId: binding.conversationId,
           reason: 'other_conversation',
+        })
+        continue
+      }
+      if (query.workId !== undefined && binding.contract?.workId !== query.workId) {
+        // The page must agree with its own work filter; a row whose body names another work (or no
+        // work at all) is not silently counted as this work's history.
+        omitted.push({
+          messageId: binding.messageId,
+          projectId: binding.projectId,
+          conversationId: binding.conversationId,
+          reason: 'other_work',
+        })
+        continue
+      }
+      if (binding.scope.projectId !== binding.projectId) {
+        omitted.push({
+          messageId: binding.messageId,
+          projectId: binding.projectId,
+          conversationId: binding.conversationId,
+          reason: 'inconsistent_binding',
         })
         continue
       }

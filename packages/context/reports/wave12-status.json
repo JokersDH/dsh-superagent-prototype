@@ -1,0 +1,79 @@
+{
+  "protocol": "agent-c-wave12-status/1",
+  "wave": "product-wave-12",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "14688f2",
+    "mergeCommit": "efb2812",
+    "previousOwnCommit": "553983b",
+    "rootLockDiffPreserved": true
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "actualExportProbes": {
+    "wave12": {
+      "command": "node tools/bootstrap/probe-wave12-context.mjs \"$PWD\"",
+      "passed": 8,
+      "failed": 0,
+      "evidence": "packages/context/reports/wave12-probe.json"
+    },
+    "wave11Regression": {
+      "command": "node tools/bootstrap/probe-wave11-context.mjs \"$PWD\"",
+      "passed": 17,
+      "failed": 0
+    }
+  },
+  "closedCounterexamples": [
+    {
+      "id": "MANIFEST_DIGEST_SCOPE_MUST_CHANGE",
+      "fix": "compareSourceManifests reports digest_scope when the two sides hash different amounts; prefix/metadata equality marks digest_unverifiable instead of unchanged"
+    },
+    {
+      "id": "SOURCE_REVIEW_MAX_ITEMS",
+      "fix": "projectSourceReview never emits more than maxItems items; past the cap only bounded suppressed counts remain"
+    },
+    {
+      "id": "SOURCE_REVIEW_REDACTS_OMISSION_PATH",
+      "fix": "omission entries use the same project-relative rule as items; host/absolute paths are dropped and counted"
+    },
+    {
+      "id": "RELEVANCE_REQUIRES_ROLE_AND_PROVENANCE",
+      "fix": "a conversation candidate without role/provenance is refused by default (untrusted_role)"
+    },
+    {
+      "id": "RELEVANCE_PRESERVES_INCOMPLETE_COVERAGE",
+      "fix": "candidate batches carry upstream coverage and the selector keeps complete=false; work listings propagate hasMore"
+    },
+    {
+      "id": "REPLY_BODY_BINDS_CONVERSATION",
+      "fix": "the whole AssistantReplyBody envelope must match the trusted project/conversation/source before any suggestion"
+    },
+    {
+      "id": "REPLY_REVISION_BODY_BINDS_PROJECT",
+      "fix": "same envelope check; per-item current-contract and scope checks remain item-level rejections"
+    },
+    {
+      "id": "HISTORY_RECHECKS_WORK_QUERY",
+      "fix": "collectContextHistory rechecks query.workId against the binding contract, and an internally inconsistent binding is omitted"
+    }
+  ],
+  "stages": {
+    "C1": "done: eight actual-export counterexamples closed",
+    "C2": "in progress: relevance refuses missing provenance; decision/contract require a proven current Scope",
+    "C3": "in progress: upstream coverage and bounded output budgets kept separate",
+    "C4": "in progress: review/manifest integrity (bounds, omission redaction, unknown scope)",
+    "C5": "pending: real A18 contextHistory/replyResults consumer without Map fallback",
+    "C6": "pending: whole-body candidate envelope + per-item validation regression",
+    "C7": "pending: main replaceable-adapter recipe and current main consumer",
+    "C8": "pending: deterministic quality baseline",
+    "C9": "pending: 5000-source/deep-page/invalidations scale pack",
+    "C10": "pending: full regression, status and handoff"
+  },
+  "preserved": {
+    "userServices": "5180/8796 through 5188/8804 untouched",
+    "historicalReports": "wave01-wave11 reports unchanged",
+    "rootLock": "pnpm-lock.yaml diff preserved and not committed"
+  }
+}

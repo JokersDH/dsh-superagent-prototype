@@ -1038,6 +1038,7 @@ export type SourceManifestChangeReason =
   | 'selection'
   | 'contract'
   | 'baseline'
+  | 'digest_scope'
   | 'omitted'
   | 'missing'
   | 'added'
@@ -1054,7 +1055,13 @@ export interface SourceManifestComparison {
   readonly protocol: 'context-source-manifest-comparison/1'
   readonly status: 'unchanged' | 'changed' | 'incomplete'
   readonly changes: readonly SourceManifestChange[]
-  readonly incompleteReasons: readonly ('previous_incomplete' | 'current_incomplete' | 'selection_changed' | 'contract_changed')[]
+  readonly incompleteReasons: readonly (
+    | 'previous_incomplete'
+    | 'current_incomplete'
+    | 'selection_changed'
+    | 'contract_changed'
+    | 'digest_unverifiable'
+  )[]
 }
 
 function selectionKey(manifest: ComposedSourceManifest): string {
@@ -1092,6 +1099,7 @@ export function compareSourceManifests(
 ): SourceManifestComparison {
   const changes: SourceManifestChange[] = []
   const incompleteReasons: SourceManifestComparison['incompleteReasons'][number][] = []
+  let unverifiableDigests = false
   if (selectionKey(previous) !== selectionKey(current)) {
     incompleteReasons.push('selection_changed')
     changes.push({ path: '', kind: '', reason: 'selection' })
@@ -1128,6 +1136,16 @@ export function compareSourceManifests(
       changes.push({ sourceId: before.sourceId, path: before.path, kind: before.kind, reason: 'baseline' })
       continue
     }
+    if (before.digestScope !== after.digestScope) {
+      // The two sides hash different amounts of the source; equality of the digest strings would not
+      // mean the same thing, so this is never unchanged.
+      changes.push({ sourceId: before.sourceId, path: before.path, kind: before.kind, reason: 'digest_scope' })
+      continue
+    }
+    if (before.digestScope !== 'content') {
+      // Prefix/metadata digests cannot prove whole-source equality on their own.
+      unverifiableDigests = true
+    }
     if (before.wholeSourceDigest !== after.wholeSourceDigest || before.contentDigest !== after.contentDigest) {
       changes.push({ sourceId: before.sourceId, path: before.path, kind: before.kind, reason: 'content' })
       continue
@@ -1159,6 +1177,7 @@ export function compareSourceManifests(
   if (omissionsKey(previous) !== omissionsKey(current)) {
     changes.push({ path: '', kind: '', reason: 'omitted' })
   }
+  if (unverifiableDigests) incompleteReasons.push('digest_unverifiable')
 
   const status: SourceManifestComparison['status'] =
     incompleteReasons.length > 0 ? 'incomplete' : changes.length > 0 ? 'changed' : 'unchanged'

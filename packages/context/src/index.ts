@@ -128,6 +128,7 @@ export {
 export type {
   RelevanceBudget,
   RelevanceCandidate,
+  RelevanceCandidateBatch,
   RelevanceItem,
   RelevanceOmission,
   RelevanceOmissionReason,
@@ -146,6 +147,7 @@ export type {
   SourceReviewItem,
   SourceReviewOmission,
   SourceReviewProjection,
+  SourceReviewSuppressed,
 } from './source-review.ts'
 export { buildContextPreview } from './preview.ts'
 export type { ContextPreview, ContextPreviewFile } from './preview.ts'

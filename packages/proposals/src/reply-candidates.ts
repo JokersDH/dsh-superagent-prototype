@@ -160,26 +160,40 @@ export function reviewReplyCandidates(rawBody: unknown, bindings: ReplyCandidate
     'Candidates are untrusted model data; confirming one is the existing explicit user proposal flow.',
     'No model request, Work creation, policy write, decision record or delivery acceptance happens here.',
   ]
+  const invalidBody = (rejected: readonly ReplyCandidateRejection[]): ReplyCandidateReview => ({
+    protocol: 'reply-candidate-review/1',
+    status: 'invalid_body',
+    reply: '',
+    candidates: [],
+    rejected,
+    hasExecutableCandidates: false,
+    authorization: 'none',
+    untrusted: true,
+    modelCallPerformed: false,
+    notes,
+  })
   const parsed = AssistantReplyBodySchema.safeParse(rawBody)
   if (!parsed.success) {
-    return {
-      protocol: 'reply-candidate-review/1',
-      status: 'invalid_body',
-      reply: '',
-      candidates: [],
-      rejected: parsed.error.issues.slice(0, 8).map((issue, index) => ({
+    return invalidBody(
+      parsed.error.issues.slice(0, 8).map((issue, index) => ({
         index,
         reason: 'invalid_body',
         detail: sanitize(`${issue.path.join('.') || '$'}: ${issue.message}`, 300),
       })),
-      hasExecutableCandidates: false,
-      authorization: 'none',
-      untrusted: true,
-      modelCallPerformed: false,
-      notes,
-    }
+    )
   }
   const body: AssistantReplyBody = parsed.data
+  // The whole body envelope must belong to the trusted request before any suggestion is considered:
+  // a foreign conversation or project is not a candidate list to filter, it is another reply.
+  if (body.projectId !== bindings.projectId || body.conversationId !== bindings.conversationId || body.sourceMessageId !== bindings.sourceMessageId) {
+    return invalidBody([
+      {
+        index: 0,
+        reason: 'body_binding_mismatch',
+        detail: 'Reply body project/conversation/source does not match the trusted request',
+      },
+    ])
+  }
   const trusted = {
     actorRef: 'candidate-review',
     projectId: bindings.projectId,
