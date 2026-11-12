@@ -1,11 +1,12 @@
 import { join } from 'node:path'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
 import { sharedAttentionRanker } from '@personal-agent/routing'
 import { recoveryTargetInventory } from '@personal-agent/storage'
 import type { AssistantContextBindings, AssistantContextHistory, AssistantContextPrepare, AssistantContextSend, AssistantReplyResults, AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryActivationCommit, RecoveryPrepare, RecoveryTargetInventoryReader, RecoveryTargetMaterial, RecoveryTargetMaterializer, RecoveryTargetPrepareInput, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
-import { WorkEvidenceSchema } from '@personal-agent/contracts'
+import { ExecutionUnavailableReasonSchema, WorkEvidenceSchema } from '@personal-agent/contracts'
+import type { ExecutionUnavailableReason } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { CheckRegistry } from '@personal-agent/verification'
@@ -37,15 +38,18 @@ import { ProductRecoveryTargets } from './recovery-target-service.ts'
 import { initializeRecoveryTarget } from './recovery-target-initializer.ts'
 import { CompletedAssistantReplies } from './assistant-reply-results.ts'
 import { ProductContextRecords } from './context-records.ts'
+import { createDiscussionEffects } from './discussion-effects.ts'
+import type { ExecutionConsumer } from './discussion-effects.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
 export function createProductRuntime(
-  options: Omit<ApplicationOptions, 'completion' | 'nativeFence' | 'profileIds' | 'registeredChecks'> & {
+  options: Omit<ApplicationOptions, 'completion' | 'nativeFence' | 'profileIds' | 'registeredChecks' | 'executionEnabled'> & {
     stateRoot: string
     scratchProject: string
     assistantProvider?: PrivateModelProvider
     native?: NativeProductConfiguration
+    executionUnavailable?: ExecutionUnavailableReason
     projectRegistry?: NativeProjectRegistry
     workspaceRoot?: string
     startupMode?: 'normal' | 'recovery_readonly'
@@ -61,11 +65,14 @@ export function createProductRuntime(
     }
   },
 ) {
+  const unavailable = options.executionUnavailable === undefined ? undefined : ExecutionUnavailableReasonSchema.parse(options.executionUnavailable)
+  if (unavailable && options.native) throw new TypeError('Unavailable execution cannot contain an admitted native runtime')
+  const fixtureProfiles = unavailable ? [] : FIXTURE_PROFILES
   options = {
     ...options,
     principal: structuredClone(options.principal),
     projects: options.projects.map((project) => {
-      if (options.startupMode === 'recovery_readonly' || options.native?.projects.some((native) => native.id === project.id)) return structuredClone(project)
+      if (unavailable || project.discussionOnly || options.startupMode === 'recovery_readonly' || options.native?.projects.some((native) => native.id === project.id)) return structuredClone(project)
       const grant = structuredClone(project.scope)
       const scope: Scope = {
         projectId: project.id,
@@ -87,7 +94,9 @@ export function createProductRuntime(
     ...(options.native ? { native: { ...options.native, projects: nativeProjects } } : {}),
   }
   const environments = new ProductEnvironments(options.store, options.stateRoot)
-  const workspaces = new WorkspaceManager(options.workspaceRoot ?? join(options.stateRoot, 'workspaces'), { environment: environments })
+  const workspaceRoot = options.workspaceRoot && (!unavailable || existsSync(options.workspaceRoot))
+    ? options.workspaceRoot : join(options.stateRoot, 'workspaces')
+  const workspaces = new WorkspaceManager(workspaceRoot, { environment: environments })
   const checks = new CheckRegistry()
   checks.register({
     id: FIXTURE_CHECK,
@@ -113,10 +122,11 @@ export function createProductRuntime(
       return binding ? environments.checkEnvironment(binding) : undefined
     },
   })
-  let execution: ProductExecution | undefined
+  let execution: ExecutionConsumer | undefined
   const application = createProductApplication({
     ...options,
-    profileIds: [...(options.native ? [options.native.profile.id] : []), ...FIXTURE_PROFILES],
+    profileIds: [...(options.native ? [options.native.profile.id] : []), ...fixtureProfiles],
+    executionEnabled: !unavailable,
     registeredChecks: checks.ids(),
     registeredCheck: id => !!checks.latest(id),
     projectGrant: input => projectSettings?.authorize(input.projectId, input.profileId, input.criteria, input.newWork),
@@ -138,7 +148,7 @@ export function createProductRuntime(
     },
     nativeFence: (target: NativeQuestionBinding) => execution?.nativeFence(target) ?? 'unknown',
   })
-  execution = new ProductExecution(
+  execution = unavailable ? createDiscussionEffects(options.store) : new ProductExecution(
     options.store,
     application,
     workspaces,
@@ -182,6 +192,8 @@ export function createProductRuntime(
   if (options.assistantProvider)
     handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams, {
       nativeExecution: !!options.native,
+      executionUnavailable: !!unavailable,
+      canReply: message => configuredProjects.some(project => project.id === message.projectId),
       ...(replyResults ? { completed: new CompletedAssistantReplies(store, replyResults, options.principal,
         () => configuredProjects.map(project => project.id)) } : {}),
       context: message => assistantContext?.forMessage(message) ?? Promise.resolve(undefined),
@@ -223,7 +235,7 @@ export function createProductRuntime(
       if (!work) throw new ApplicationFault('invalid_request', 'Unknown work')
       return execution!.verificationStatus(work)
     },
-    ...(options.native && options.projectRegistry
+    ...((options.native || unavailable) && options.projectRegistry
       ? {
           registerProject: async (input) => {
             const record = options.projectRegistry!.prepare(input)
@@ -236,10 +248,10 @@ export function createProductRuntime(
             const existing = configuredProjects.find((item) => item.id === project.id)
             if (!existing) {
               options.projectRegistry!.save(record)
-              if (!projectSettings) checks.register(check)
+              if (!projectSettings && !unavailable) checks.register(check)
               application.registerProject(project, [check.id])
               configuredProjects.unshift(project)
-              nativeProjects.unshift({ id: record.id, path: record.path, check,
+              if (!unavailable) nativeProjects.unshift({ id: record.id, path: record.path, check,
                 ...(record.environment ? { environment: options.projectRegistry!.environment(record)! } : {}) })
               projectSettings?.register(record, nativeProjects[0])
             }
@@ -251,7 +263,8 @@ export function createProductRuntime(
       const view = (await application.inspect({ workId })).works[0]
       if (!view) throw new ApplicationFault('invalid_request', 'Unknown work')
       const projectPath =
-        options.native?.projects.find((project) => project.id === view.work.projectId)?.path ?? options.scratchProject
+        options.native?.projects.find((project) => project.id === view.work.projectId)?.path ??
+        options.projectRegistry?.list().find(project => project.id === view.work.projectId)?.path ?? options.scratchProject
       const link = view.links.find(
         (link) => link.role === 'primary' && link.contract.revision === view.contract.revision,
       )
@@ -304,10 +317,12 @@ export function createProductRuntime(
           ...(projectSettings?.has(project.id) ? { displayName: projectSettings.displayName(project.id) } : {}),
           settingsAvailable: projectSettings?.has(project.id) ?? false,
           ...(projectSettings?.has(project.id) && projectSettings.archived(project.id) ? { blockedReason: 'conflict' as const } : {}),
-          profileIds: options.native?.projects.some((native) => native.id === project.id)
+          profileIds: unavailable || project.discussionOnly ? [] : options.native?.projects.some((native) => native.id === project.id)
             ? [options.native.profile.id]
-            : FIXTURE_PROFILES,
-          defaultCriteria: options.native?.projects.some((native) => native.id === project.id)
+            : fixtureProfiles,
+          defaultCriteria: unavailable || project.discussionOnly
+            ? [{ id: 'review-output', kind: 'human' as const, required: true, description: '审阅讨论内容' }]
+            : options.native?.projects.some((native) => native.id === project.id)
             ? [
                 {
                   id: 'project-tests',
@@ -330,6 +345,9 @@ export function createProductRuntime(
               ],
         })),
         profiles: [
+          ...(unavailable ? [{ id: 'profile-codex-native', revision: 1, driverId: 'codex-native', kind: 'native' as const,
+            displayName: `Codex · ${{ not_installed: '未安装', incompatible_version: '版本未准入', unsupported_platform: '平台未准入', probe_failed: '检测未完成', not_admitted: '尚未准入', operator_disabled: '未启用', recovery_readonly: '恢复只读' }[unavailable]}`,
+            readiness: unavailable === 'not_installed' ? 'missing' as const : unavailable === 'incompatible_version' || unavailable === 'unsupported_platform' ? 'incompatible' as const : 'needs_setup' as const }] : []),
           ...(options.native
             ? [
                 {
@@ -342,7 +360,7 @@ export function createProductRuntime(
                 },
               ]
             : []),
-          ...FIXTURE_PROFILES.map((id) => ({
+          ...fixtureProfiles.map((id) => ({
             id,
             revision: 1,
             displayName: `受控验证 · ${{ question: '权限提问', pass: '检查通过', fail: '检查失败', slow: '延时任务' }[id.slice('profile-fixture-'.length)] ?? id}`,
@@ -351,9 +369,11 @@ export function createProductRuntime(
             readiness: 'fixture_ready' as const,
           })),
         ],
-        checks: [...new Set([FIXTURE_CHECK, ...currentNative.map(project => project.check.id)])]
+        checks: (unavailable ? [] : [...new Set([FIXTURE_CHECK, ...currentNative.map(project => project.check.id)])])
           .map((id) => ({ id, revision: checks.require(id).revision, displayName: checks.require(id).title ?? id })),
-        enabledProfileIds: [...(options.native ? [options.native.profile.id] : []), ...FIXTURE_PROFILES],
+        enabledProfileIds: options.startupMode === 'recovery_readonly' ? [] : [...(options.native ? [options.native.profile.id] : []), ...fixtureProfiles],
+        executionAvailability: options.startupMode === 'recovery_readonly' ? { state: 'unavailable', reason: 'recovery_readonly' }
+          : unavailable ? { state: 'unavailable', reason: unavailable } : { state: 'available', kind: options.native ? 'native' : 'controlled_fixture' },
         reviewActivityAvailable: options.startupMode !== 'recovery_readonly',
         decisionsAvailable: options.startupMode !== 'recovery_readonly',
         proposalsAvailable: options.startupMode !== 'recovery_readonly',

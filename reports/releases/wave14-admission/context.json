@@ -1,0 +1,70 @@
+{
+  "protocol": "wave14-c-admission/1",
+  "sourceCommit": "83ac3e1e629cc4a77963328460721ac8c7169e9a",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "observations": [
+    {
+      "id": "OMISSION_SUPPRESSION_SETS_TRUNCATED_AND_TOTAL",
+      "status": "FAIL",
+      "observed": {
+        "omitted": 1,
+        "suppressed": {
+          "items": 0,
+          "bytes": 0,
+          "omissions": 4999
+        },
+        "totalsSuppressed": 0,
+        "truncated": false
+      }
+    },
+    {
+      "id": "REVIEW_REDACTS_DETAIL_Library",
+      "status": "FAIL",
+      "observed": {
+        "detail": "Cannot read /Library/Keychains/private.key"
+      }
+    },
+    {
+      "id": "REVIEW_REDACTS_DETAIL_custom",
+      "status": "FAIL",
+      "observed": {
+        "detail": "Cannot read /custom/team/private.env"
+      }
+    },
+    {
+      "id": "REVIEW_REDACTS_DETAIL_Z:",
+      "status": "FAIL",
+      "observed": {
+        "detail": "Cannot read Z:/Research/Secret/private.key"
+      }
+    },
+    {
+      "id": "REVIEW_REDACTS_DETAIL_server",
+      "status": "FAIL",
+      "observed": {
+        "detail": "Cannot read \\\\server\\private\\secret.key"
+      }
+    },
+    {
+      "id": "PUBLISHED_ARTIFACT_PROVIDER_NEWEST_FIRST_CONTRACT",
+      "status": "FAIL",
+      "observed": {
+        "returned": [
+          "old"
+        ],
+        "coverage": {
+          "requested": 2,
+          "lookedUp": 1,
+          "returned": 1,
+          "missing": 0,
+          "oversized": 0,
+          "complete": false
+        }
+      }
+    }
+  ],
+  "passed": 0,
+  "failed": 6,
+  "scope": "Public review bounded output and published-artifact provider order; no execution or history-reader authority claim"
+}
