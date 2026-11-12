@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-12T04:00:37.617Z",
+  "checkedAt": "2026-11-12T08:02:18.664Z",
   "source": {
-    "commit": "1c667c2af202ea15111f91b1be0437928d6ef51b",
+    "commit": "535965e4f7f4cf94bd3381715520a3a9504037b5",
     "dirty": false
   },
-  "expectedSource": "1c667c2af202ea15111f91b1be0437928d6ef51b",
+  "expectedSource": "535965e4f7f4cf94bd3381715520a3a9504037b5",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -541,17 +541,32 @@
       "status": "PASS"
     },
     {
+      "id": "E2-REPLY-DURABLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-REPLY-UNKNOWN-DURABLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-REPLY-MESSAGE-WINDOW",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-REPLY-BAD-ARTIFACT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E8-SCHEMA-MIGRATION",
       "required": true,
       "status": "PASS"
     },
     {
       "id": "E9-CONTEXT-CONCURRENCY",
-      "required": true,
-      "status": "PASS"
-    },
-    {
-      "id": "E4-REPLY-UNKNOWN",
       "required": true,
       "status": "PASS"
     },
@@ -641,6 +656,11 @@
       "status": "PASS"
     },
     {
+      "id": "E6-INSTALLED-CONTEXT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E3-PERSONAL-COLD-START",
       "required": true,
       "status": "PASS"
@@ -683,7 +703,7 @@
     {
       "id": "E4-UPGRADE-ROLLBACK",
       "required": true,
-      "status": "PASS"
+      "status": "NOT_TESTED"
     },
     {
       "id": "E4-UPGRADE-CROSS-SCHEMA",
@@ -693,7 +713,7 @@
     {
       "id": "E4-MULTI-STATE",
       "required": true,
-      "status": "FAIL"
+      "status": "PASS"
     },
     {
       "id": "E5-NATIVE-DELIVERY",
@@ -709,13 +729,23 @@
   "failures": [
     {
       "code": "case_not_pass",
-      "detail": "Required case E4-MULTI-STATE is FAIL",
-      "caseId": "E4-MULTI-STATE"
+      "detail": "Required case E4-UPGRADE-ROLLBACK is NOT_TESTED",
+      "caseId": "E4-UPGRADE-ROLLBACK"
+    },
+    {
+      "code": "layer_not_allowed",
+      "detail": "Layer not-tested is not admitted by full-product",
+      "caseId": "E4-UPGRADE-ROLLBACK"
+    },
+    {
+      "code": "layer_not_allowed",
+      "detail": "Case E4-UPGRADE-ROLLBACK ran as not-tested, expected installed",
+      "caseId": "E4-UPGRADE-ROLLBACK"
     },
     {
       "code": "required_evidence_missing",
-      "detail": "Case E4-MULTI-STATE has no substantive evidence.multiState",
-      "caseId": "E4-MULTI-STATE"
+      "detail": "Case E4-UPGRADE-ROLLBACK has no substantive evidence.upgrade",
+      "caseId": "E4-UPGRADE-ROLLBACK"
     },
     {
       "code": "missing_required_case",
@@ -746,7 +776,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-12T03:57:37.826Z",
+    "decidedAt": "2026-11-12T08:01:44.748Z",
     "failureCodes": []
   },
   "notes": [

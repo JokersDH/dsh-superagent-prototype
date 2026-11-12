@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "b466bc7",
-  "checkpoint": "5d1acf5",
-  "head": "1c667c2af202ea15111f91b1be0437928d6ef51b",
+  "base": "530085c",
+  "checkpoint": "617fd68",
+  "head": "535965e4f7f4cf94bd3381715520a3a9504037b5",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-12T03:57:37.812Z",
+  "checkedAt": "2026-11-12T08:01:44.734Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -411,7 +411,7 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 21,
+        "PASS": 25,
         "NOT_TESTED": 3
       },
       "cases": [
@@ -534,6 +534,26 @@
           "id": "E2-PROJECT-SETTINGS",
           "status": "NOT_TESTED",
           "reason": "Project settings GET returned 422 and POST returned 422 (unsupported_capability)."
+        },
+        {
+          "id": "E2-REPLY-DURABLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-UNKNOWN-DURABLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-MESSAGE-WINDOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-BAD-ARTIFACT",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -542,7 +562,7 @@
       "title": "Current context use, SSE, audit and reply consumer",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "E3-CONTEXT-USE/SSE/GUARDS/UI run real current-main HTTP, SQLite schema16, effects and a loopback mock provider: preview, confirm, same-transaction binding/receipt, audit, SSE, lost response, source drift, expiry and offline refusal. E4-COMPLETED-REPLY verifies recovery ordering with an explicit in-process port fixture; E4-REPLY-PERSISTENCE stays NOT_TESTED until A's replyResults rows exist."
+        "Real A18 SQLite/result rows plus current HTTP/SSE/UI: selected context, audit, lost response, mobile and two tabs. Independent-process SIGKILL cases cover after-result, during-provider, after-message and corrupted artifact with zero second provider calls."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -712,29 +732,18 @@
       "title": "Explicit baseline/target installation and upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Install matrix now binds D's latest frozen tuple cf7a3cf/build da2d78d1/schema15: personal cold start, managed upgrade/rollback, cross-schema refusal, backup/restore, schema15→current-A schema16 migration and config adoption/conflict. E4-MULTI-STATE still proves the requested-root stop defect on these bytes; E6-CURRENT-MAIN-INSTALL is NOT_TESTED because no schema16/context-use tar exists."
+        "Install matrix binds D wave11-target a22d3a4/schema16 with context-use: cold personal, backup/restore, tamper, requested-data-root stop, schema16→current A schema18 migration. Same-schema binary upgrade/rollback is NOT_TESTED because no second schema16 build exists; cross-schema refusal passes. Copied record in another config root still stops the original API on these bytes."
       ],
-      "result": "FAIL",
+      "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 16,
-        "NOT_TESTED": 4,
-        "FAIL": 1
+        "PASS": 15,
+        "NOT_TESTED": 4
       },
       "cases": [
         {
           "id": "E4-COMPLETED-REPLY",
           "status": "PASS",
           "reason": null
-        },
-        {
-          "id": "E4-REPLY-UNKNOWN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-REPLY-PERSISTENCE",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: current main/31ddd26 publishes the consumer and its recovery ordering, but the production A replyResults port is not implemented in this checkout (only the in-process fixture port is accepted). Required: real A put/forRequest/forReply rows in the caller transaction, close/reopen and independent-process SIGKILL readback, backup/inventory of the result family and artifact, corrupt-result refusal, and no provider call when the result is recovered. The existing in-process-map recovery case is consumer evidence only."
         },
         {
           "id": "E4-BOUNDED-CYCLES",
@@ -803,8 +812,8 @@
         },
         {
           "id": "E4-UPGRADE-ROLLBACK",
-          "status": "PASS",
-          "reason": null
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: the default baseline schema 15 differs from target schema 16; an older binary cannot start on the newer state, and no second frozen build with schema 16 is available. Cross-schema refusal is measured by E4-UPGRADE-CROSS-SCHEMA; the prior schema15 same-schema upgrade/rollback result remains scoped to its old tuple."
         },
         {
           "id": "E4-UPGRADE-CROSS-SCHEMA",
@@ -813,8 +822,8 @@
         },
         {
           "id": "E4-MULTI-STATE",
-          "status": "FAIL",
-          "reason": "MULTI_STOP_OTHER_BLOCKED: {\"exit\":0,\"bPid\":82424,\"bApi\":82436,\"bAlive\":true,\"bApiAlive\":false,\"bApiPort\":56908,\"apiOpenBefore\":true,\"apiOpenAfter\":false,\"recordedState\":\"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-multi-xrmTIu/data-b\",\"recordedPid\":82424,\"reportedStatus\":\"STOPPED\",\"reportedState\":null,\"reportedPid\":null,\"stdout\":\"{\\n  \\\"ok\\\": true,\\n  \\\"status\\\": \\\"STOPPED\\\",\\n  \\\"stopped\\\": true,\\n  \\\"stillAlive\\\": false,\\n  \\\"code\\\": null,\\n  \\\"verification\\\": {\\n    \\\"ok\\\": true,\\n    \\\"checks\\\": [\\n      {\\n        \\\"id\\\": \\\"launcher_alive\\\",\\n        \\\"ok\\\": true\\n      },\\n      {\\n        \\\"id\\\": \\\"process_start\\\",\\n        \\\"ok\\\": true,\\n        \\\"detail\\\": \\\"Thu N\"}"
+          "status": "PASS",
+          "reason": null
         },
         {
           "id": "E4-UPGRADE-FAULTS",
@@ -833,7 +842,7 @@
       "title": "Bounded context concurrency, recovery windows and stability",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "E9-CONTEXT-CONCURRENCY runs four selected sends plus duplicate replay with one provider call per command; existing bounded cycles remain. Real recovery activation, multi-tab stale-selection UI and cross-process reply persistence remain NOT_TESTED with required inputs."
+        "E9-CONTEXT-CONCURRENCY plus 50 bounded operations; copy-record ownership uses only this process's spawned API. Generic global cleanup/recover/shared-cache ownership remains out of scope until D fixes and ships bytes."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -862,18 +871,23 @@
       "title": "Layered conclusions and handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave11-status separates test source 5d1acf5, product source b466bc7/31ddd26 and the exact D artifact tuple; wave10 and older status files are frozen and not rewritten."
+        "wave12-status separates test source, main 530085c/schema18, D a22d3a4/schema16 artifact and current-main install NOT_TESTED; wave11 and older status files are frozen."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
         "NOT_TESTED": 2,
-        "PASS": 1
+        "PASS": 2
       },
       "cases": [
         {
           "id": "E6-REVIEW-PILOT",
           "status": "NOT_TESTED",
           "reason": "Preflight BLOCKED: adapter_missing; 0/24 turns used."
+        },
+        {
+          "id": "E6-INSTALLED-CONTEXT",
+          "status": "PASS",
+          "reason": null
         },
         {
           "id": "E6-ARTIFACT-CURRENT-SCOPE",
@@ -883,7 +897,7 @@
         {
           "id": "E6-CURRENT-MAIN-INSTALL",
           "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: no current-main/schema16 frozen D tar exists in pa-artifacts. Required: a clean D build from current main containing selected-context prepare/send/audit and schema16, with tar/sha/source/build/schema/ABI tuple, then a fresh cold personal install, config/doctor/assets/public API and one selected-context send over the installed provider path. The old cf7a3cf schema15 artifact is explicitly out of scope."
+          "reason": "NOT_TESTED: measured D tuple build 3311a04bd20ed7f9, schema 16, context send=true; current main schema 18. Required: a clean schema18 D tar containing context-use and the A18 result/backup family, then a fresh cold personal install, config/doctor/assets/public API and mocked selected-context send/reply."
         }
       ]
     },
@@ -894,9 +908,17 @@
       "notes": [
         "E4-MULTI-STATE on D cf7a3cf bytes still claims state B and kills its API for a stop aimed at state A; launcher-dead/API-alive remains NOT_TESTED because that defect destroys the prerequisite. E4-INSTALL-HOST-GUARDS covers unknown PID refusal."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "FAIL",
+      "counts": {
+        "FAIL": 1
+      },
+      "cases": [
+        {
+          "id": "E7-OWNERSHIP-COPY",
+          "status": "FAIL",
+          "reason": "OWNERSHIP_COPY_REFUSED: {\"status\":0,\"code\":null}"
+        }
+      ]
     },
     {
       "id": "E8",
@@ -953,12 +975,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-12T03:57:37.826Z",
+    "checkedAt": "2026-11-12T08:01:44.748Z",
     "source": {
-      "commit": "1c667c2af202ea15111f91b1be0437928d6ef51b",
+      "commit": "535965e4f7f4cf94bd3381715520a3a9504037b5",
       "dirty": false
     },
-    "expectedSource": "1c667c2af202ea15111f91b1be0437928d6ef51b",
+    "expectedSource": "535965e4f7f4cf94bd3381715520a3a9504037b5",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1491,17 +1513,32 @@
         "status": "PASS"
       },
       {
+        "id": "E2-REPLY-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-UNKNOWN-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-MESSAGE-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-BAD-ARTIFACT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E8-SCHEMA-MIGRATION",
         "required": true,
         "status": "PASS"
       },
       {
         "id": "E9-CONTEXT-CONCURRENCY",
-        "required": true,
-        "status": "PASS"
-      },
-      {
-        "id": "E4-REPLY-UNKNOWN",
         "required": true,
         "status": "PASS"
       },
@@ -1593,35 +1630,35 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T03-54-25-169Z/screenshots/context-confirm-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T07-58-12-089Z/screenshots/context-confirm-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
     "wave09Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave09-status.json",
-    "wave11Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave11-status.json",
+    "wave12Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave12-status.json",
     "wave08Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave08-status.json",
     "wave07Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave07-status.json",
     "wave06Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave06-status.json",
@@ -1641,7 +1678,8 @@
       ],
       "evidence": [
         "E4-INSTALL-HOST-GUARDS",
-        "E4-MULTI-STATE"
+        "E4-MULTI-STATE",
+        "E7-OWNERSHIP-COPY"
       ]
     }
   ],
@@ -1789,7 +1827,7 @@
     {
       "id": "reply-results",
       "gaps": [
-        "E4-REPLY-PERSISTENCE：A 的真实 replyResults 行/跨进程 SIGKILL/backup 未到；当前只证明 consumer + 进程内 port fixture。"
+        "contextHistory/正文历史入口仍未发布；非空备份搬根与 schema18 安装族没有当前 D 字节。"
       ]
     },
     {
@@ -1809,7 +1847,7 @@
       "gaps": [
         "安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。",
         "旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。",
-        "E6-CURRENT-MAIN-INSTALL NOT_TESTED：最新冻结 D 为 cf7a3cf/schema15 且无 selected-context send/audit，不能表示 current-main schema16；旧安装结果保持原 tuple scope。"
+        "E6-CURRENT-MAIN-INSTALL：按 E6-ARTIFACT-CURRENT-SCOPE 实测 schema/context 能力动态判断；当前 tuple 与 current main schema 不同时保留 NOT_TESTED，旧安装结果保持原 tuple scope。"
       ]
     },
     {
@@ -1871,16 +1909,16 @@
   "externalBlockers": [
     {
       "owner": "D",
-      "code": "stop_claims_other_state",
-      "detail": "One install, two state roots: `pa stop --data-root <state A>` returned 0/STOPPED while state B was recorded, and state B's API process died (launcher remained). Minimal repro: start A, stop A, start B, then stop with A's data root; observed exit 0, bAlive true, bApiAlive false. D must bind the instance record to the exact state root and refuse to stop another state."
+      "code": "copied_record_stops_original",
+      "detail": "On the current a22d3a4/schema16 tar, requested-data-root stop passes, but copying `var/config/instance.json` into another config root and running stop returns 0/STOPPED and terminates the original self-owned API. The record has no config binding, so config is not part of the authority. D must bind config/install/state and refuse the copied record before any signal."
     },
     {
       "owner": "main",
-      "detail": "Context preview, selected-context prepare/send, SSE, audit and the completed-reply consumer are verified on current main; multi-tab stale-selection isolation, recovery activation and a current schema16/context-use install package remain inputs."
+      "detail": "Context preview, selected-context prepare/send, SSE, audit and the completed-reply consumer are verified on current main; multi-tab isolation is now covered; recovery activation, context history and a current schema18/context-use install package remain inputs."
     },
     {
       "owner": "A",
-      "detail": "Real `store.workflows.assistant.replyResults` rows (transaction, cross-process reopen/SIGKILL, backup, corrupt refusal) and `contextHistory` paging are not implemented in this checkout; E4-REPLY-PERSISTENCE and history stay NOT_TESTED."
+      "detail": "A18 replyResults rows are integrated and verified with independent-process SIGKILL, corrupt artifact and no resend. `contextHistory`/raw history remains unpublished; the current D tar is schema16 and does not carry the A18 result/backup family."
     },
     {
       "owner": "main",
