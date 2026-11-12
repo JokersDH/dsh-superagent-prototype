@@ -1,0 +1,115 @@
+{
+  "protocol": "wave13-readiness-preview/1",
+  "sourceCommit": "b2b1adbfc615d27ba4b0f9d9b623bf11c689a25d",
+  "checkedAt": "2026-11-12T11:17:18.062Z",
+  "consoleURL": "http://127.0.0.1:5190",
+  "apiURL": "http://127.0.0.1:8806",
+  "stateRoot": ".local-state/wave13-readiness-preview",
+  "productSchema": 18,
+  "launcherIdentityVerified": true,
+  "executionAvailability": {
+    "state": "unavailable",
+    "reason": "operator_disabled"
+  },
+  "projects": [
+    {
+      "id": "project-personal-dialogue",
+      "discussionOnly": true,
+      "dispatchAllowed": false
+    }
+  ],
+  "modelConfigured": true,
+  "historyAvailable": true,
+  "sourceAvailable": true,
+  "workCount": 0,
+  "messageCount": 0,
+  "realModelTurns": 0,
+  "realNativeTurns": 0,
+  "oldServices": [
+    {
+      "port": 5180,
+      "status": 200
+    },
+    {
+      "port": 5181,
+      "status": 200
+    },
+    {
+      "port": 5182,
+      "status": "unreachable"
+    },
+    {
+      "port": 5183,
+      "status": "unreachable"
+    },
+    {
+      "port": 5184,
+      "status": 200
+    },
+    {
+      "port": 5185,
+      "status": 200
+    },
+    {
+      "port": 5186,
+      "status": 200
+    },
+    {
+      "port": 5187,
+      "status": 200
+    },
+    {
+      "port": 5188,
+      "status": 200
+    },
+    {
+      "port": 5189,
+      "status": 200
+    },
+    {
+      "port": 8796,
+      "status": 200
+    },
+    {
+      "port": 8797,
+      "status": 200
+    },
+    {
+      "port": 8798,
+      "status": 200
+    },
+    {
+      "port": 8799,
+      "status": 200
+    },
+    {
+      "port": 8800,
+      "status": 200
+    },
+    {
+      "port": 8801,
+      "status": 200
+    },
+    {
+      "port": 8802,
+      "status": 200
+    },
+    {
+      "port": 8803,
+      "status": 200
+    },
+    {
+      "port": 8804,
+      "status": 200
+    },
+    {
+      "port": 8805,
+      "status": 200
+    }
+  ],
+  "limits": [
+    "New independent personal discussion state; no old data migrated or services restarted",
+    "Readiness preview is not native, installation, target activation or release admission",
+    "Old UI 5182 and 5183 were unreachable during this read-only observation; all ten old API health checks returned200; no repair or restart attempted"
+  ]
+}

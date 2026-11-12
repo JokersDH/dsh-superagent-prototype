@@ -1,0 +1,74 @@
+{
+  "protocol": "wave14-e-admission/1",
+  "testHead": "3dfdcbdf667815bbf6e95440a1b8aa498af96006",
+  "testReportSource": {
+    "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "dirty": false
+  },
+  "scope": "Bounded mutation checks using the actual installed-alpha requirements for six named entries. No full installed-tier PASS is claimed.",
+  "actualInstalledTier": {
+    "status": "FAIL",
+    "failedCaseIds": [
+      "E4-UPGRADE-FAULTS",
+      "E6-CURRENT-MAIN-INSTALL",
+      "E4-UPGRADE-ROLLBACK"
+    ]
+  },
+  "mutations": [
+    {
+      "id": "REQUIRED_CURRENT_FAULT_COPY_EMPTY_EVIDENCE",
+      "accepted": true,
+      "failures": []
+    },
+    {
+      "id": "VALID_BUT_FOREIGN_ARTIFACT_SOURCE",
+      "accepted": true,
+      "failures": []
+    },
+    {
+      "id": "VALID_BUT_FOREIGN_ARTIFACT_SHA",
+      "accepted": true,
+      "failures": []
+    },
+    {
+      "id": "WRONG_ARTIFACT_BUILD_AND_SIZE",
+      "accepted": true,
+      "failures": []
+    },
+    {
+      "id": "INSTALLED_CONTEXT_FOREIGN_TUPLE",
+      "accepted": true,
+      "failures": []
+    }
+  ],
+  "sourceRouteDetection": {
+    "regex": "\\/v1\\/messages\\/:\\.id\\/context\\/sources",
+    "existsInVerifiedTar": true,
+    "detectedByE": false
+  },
+  "actualRunArtifact": {
+    "artifact": {
+      "buildId": "1a2f34ac359a5739",
+      "source": "020af824390e9230a4ff9d01f9e29b1ee93dd246",
+      "schema": 18,
+      "tarSha256": "96d32fb55a0d8fa9a02f4a5497c54774e84176b42c5727da449343fb3913bfe5",
+      "tarBytes": 20147268
+    },
+    "capability": {
+      "hasContextRoute": true,
+      "hasHistoryRoute": false,
+      "hasSourcesRoute": false,
+      "hasReplyResults": true,
+      "routeBytes": 43277
+    },
+    "main": {
+      "schema": 18
+    },
+    "currentMainEligible": false,
+    "reason": "artifact schema 18 and routed context=true, main schema 18; the bytes are scoped to their own tuple"
+  },
+  "realModelTurns": 0,
+  "nativeTurns": 0,
+  "passed": 0,
+  "failed": 5
+}

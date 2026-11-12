@@ -1,0 +1,136 @@
+{
+  "source": "d833d0f5f91eaae61e80c9d2e471196fcabd0e0c",
+  "cases": [
+    {
+      "id": "RECORD_PID_REUSED_SAME_STATE",
+      "signals": [],
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [
+        {
+          "pid": 912345,
+          "label": "api",
+          "reason": "start_mismatch"
+        }
+      ],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [
+        {
+          "pid": 912345,
+          "command": "node worker --state /tmp/pa-wave13-ownership-0baJ1n/scope/data",
+          "unregistered": true
+        }
+      ],
+      "considered": 0,
+      "pidReused": true,
+      "expected": "No signals; UNKNOWN start identity",
+      "verdict": "PASS"
+    },
+    {
+      "id": "JOURNAL_SPAWN_START_MISSING",
+      "signals": [],
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [
+        {
+          "pid": 912345,
+          "label": "journal",
+          "reason": "start_missing"
+        }
+      ],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [
+        {
+          "pid": 912345,
+          "command": "node worker --state /tmp/pa-wave13-ownership-0baJ1n/scope/data",
+          "unregistered": true
+        }
+      ],
+      "considered": 0,
+      "pidReused": false,
+      "expected": "No signals; UNKNOWN missing spawn identity",
+      "verdict": "PASS"
+    },
+    {
+      "id": "SPAWN_PID_REUSED_EMPTY_PROOF",
+      "signals": [],
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [
+        {
+          "pid": 912345,
+          "label": "spawn",
+          "reason": "start_mismatch"
+        }
+      ],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [
+        {
+          "pid": 912345,
+          "command": "node worker --state /tmp/pa-wave13-ownership-0baJ1n/scope/data",
+          "unregistered": true
+        }
+      ],
+      "considered": 0,
+      "pidReused": true,
+      "expected": "proven=false",
+      "verdict": "PASS"
+    },
+    {
+      "id": "SCANNER_FAILURE_EMPTY_PROOF",
+      "signals": [],
+      "proven": false,
+      "scannerOk": false,
+      "unverifiable": [],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 0,
+      "pidReused": false,
+      "expected": "proven=false; scanner UNKNOWN",
+      "verdict": "PASS"
+    },
+    {
+      "id": "RECOVER_WRONG_REQUESTED_INSTALL",
+      "result": {
+        "protocol": "personal-install-switch/1",
+        "status": "BLOCKED",
+        "code": "requested_root_mismatch",
+        "message": "The recorded install is not the journal old/new role, or a confirming request comes from a third role; recovery refuses to confirm or clean it",
+        "detail": {
+          "recordedInstall": "/private/tmp/pa-wave14-delivery-audit-a4xIb6/install/app",
+          "requestedRole": "/private/tmp/pa-wave13-ownership-0baJ1n/scope/install",
+          "allowed": [
+            "/private/tmp/pa-wave14-delivery-audit-a4xIb6/install",
+            "/private/tmp/pa-wave14-delivery-audit-a4xIb6/install/app",
+            "/private/tmp/pa-wave14-delivery-audit-a4xIb6"
+          ],
+          "journalStatus": "starting"
+        }
+      },
+      "journal": "starting",
+      "expected": "BLOCKED requested_root_mismatch; journal unchanged",
+      "installRequested": "/tmp/pa-wave13-ownership-0baJ1n/scope/install",
+      "recordedInstall": "/tmp/pa-wave14-delivery-audit-a4xIb6/install/app",
+      "verdict": "PASS"
+    },
+    {
+      "id": "RECOVER_REUSED_API_RECORD",
+      "signals": [],
+      "result": "BLOCKED",
+      "journal": "target_stop_unproven",
+      "expected": "No signals; BLOCKED unknown start identity",
+      "verdict": "PASS"
+    }
+  ],
+  "passed": 6,
+  "failed": 0,
+  "actualOsScans": 0,
+  "actualOsSignals": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "pure mocked inventory and signals; own temporary roots; frozen input readonly"
+}

@@ -18,8 +18,10 @@ const { values } = parseArgs({
     'require-login': { type: 'boolean', default: false },
     open: { type: 'boolean', default: false },
     fixture: { type: 'boolean', default: false },
+    'discussion-only': { type: 'boolean', default: false },
   },
 })
+if (values.fixture && values['discussion-only']) throw new Error('Discussion-only personal mode cannot use fixture execution')
 const port = (name) => {
   const value = Number(values[name])
   if (!Number.isSafeInteger(value) || value < 1024 || value > 65535)
@@ -133,6 +135,7 @@ async function main() {
       consoleURL,
       '--assistant',
       ...(!values.fixture ? ['--native'] : []),
+      ...(values['discussion-only'] ? ['--discussion-only'] : []),
       ...(!values['require-login'] ? ['--local-access'] : []),
     ],
     root,
@@ -144,12 +147,12 @@ async function main() {
   })
   if (!response.ok) throw new Error('The product configuration is not available')
   const configuration = ApplicationConfigurationSchema.parse(await response.json())
-  const project = configuration.projects.find((project) => project.dispatchAllowed)
-  if (!project) throw new Error('No admitted project is available')
+  const project = configuration.projects.find((project) => project.dispatchAllowed) ?? configuration.projects[0]
+  if (!project) throw new Error('No configured workspace is available')
   const profiles = configuration.profiles.filter(
     (profile) => profile.dispatchAllowed && project.profileIds.includes(profile.id),
   )
-  if (!profiles.length || (values.fixture && profiles.some((profile) => profile.kind !== 'controlled_fixture')))
+  if (values.fixture && profiles.some((profile) => profile.kind !== 'controlled_fixture'))
     throw new Error('No compatible admitted executor is available')
   const check = project.defaultCriteria.find((criterion) => criterion.kind === 'machine' && criterion.required)
   const environment = Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.startsWith('VITE_')))
@@ -163,9 +166,9 @@ async function main() {
       VITE_API_TARGET: apiURL,
       VITE_CONVERSATION_ID: 'conv-main',
       VITE_PROFILE_IDS: profiles.map((profile) => profile.id).join(','),
-      VITE_DEFAULT_PROFILE: project.defaultProfileId,
-      VITE_CHECK_DEFINITION: check.checkDefinitionRef,
-      VITE_CHECK_CRITERION_ID: check.id,
+      VITE_DEFAULT_PROFILE: project.defaultProfileId ?? '',
+      VITE_CHECK_DEFINITION: check?.checkDefinitionRef ?? '',
+      VITE_CHECK_CRITERION_ID: check?.id ?? '',
     },
   )
   await waitFor(consoleURL, console)
@@ -182,6 +185,7 @@ async function main() {
         consoleURL,
         apiURL,
         configurationRevision: configuration.revision,
+        executionAvailability: configuration.executionAvailability,
         mode: values.fixture ? 'fixture' : 'personal',
         access: values['require-login'] ? 'token' : 'local-development',
       },

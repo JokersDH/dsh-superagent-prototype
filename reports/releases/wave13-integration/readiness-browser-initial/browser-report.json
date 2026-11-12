@@ -1,0 +1,37 @@
+{
+  "protocol": "personal-readiness-browser/1",
+  "source": "d9d347ee0d150f0bed8da47b78a285da88c9ef64",
+  "trackedSourceDirty": true,
+  "status": "PASS",
+  "cases": [
+    {
+      "id": "ACTUAL-PERSONAL-WORKBENCH-WITHOUT-CODEX-KEEPS-DISCUSSION-AND-EXPLAINS-READINESS",
+      "status": "PASS"
+    },
+    {
+      "id": "BLOCKED-DELEGATION-FORM-DOES-NOT-PROMISE-ANSWER-OR-STOP",
+      "status": "PASS"
+    },
+    {
+      "id": "ORDINARY-DISCUSSION-USES-ACTUAL-HTTP-SSE-AND-PERSISTED-REPLY",
+      "status": "PASS"
+    },
+    {
+      "id": "CONTEXT-PREVIEW-CONFIRM-AND-ORIGINAL-SOURCE-AUDIT-WORK-WITHOUT-EXECUTION",
+      "status": "PASS"
+    },
+    {
+      "id": "HISTORY-RELOAD-AND-ORIGINAL-BODY-READING-DO-NOT-RESEND-A-MODEL-REQUEST",
+      "status": "PASS"
+    },
+    {
+      "id": "READINESS-AND-COMPOSER-FIT-DESKTOP-MOBILE-AND-ZOOM-SIZE",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "mockModelRequests": 2,
+  "realModelTurns": 0,
+  "realNativeTurns": 0,
+  "scope": "Actual CLI/workbench/SQLite/HTTP/React/SSE using a local mock provider and a private missing-Codex executable probe. Not installed/native/activation/release admission."
+}

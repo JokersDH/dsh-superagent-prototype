@@ -1,0 +1,57 @@
+{
+  "protocol": "wave13-main-integration/1",
+  "date": "2026-11-12",
+  "backendSource": "d9d347ee0d150f0bed8da47b78a285da88c9ef64",
+  "productSource": "b2b1adbfc615d27ba4b0f9d9b623bf11c689a25d",
+  "status": "PASS_SCOPED_PERSONAL_DISCUSSION_READINESS",
+  "mainM1": "implemented_and_tested",
+  "releaseApproved": false,
+  "realModelTurns": 0,
+  "realNativeTurns": 0,
+  "checks": {
+    "contracts": 228,
+    "application": 20,
+    "productAssistantContextProcess": 77,
+    "discussionRuntime": 7,
+    "personalProcesses": 9,
+    "console": 31,
+    "localOperations": 12,
+    "nonBrowserTotal": 384,
+    "readinessBrowser": 6,
+    "selectedContextRegressionBrowser": 9,
+    "historyRegressionBrowser": 8,
+    "browserTotal": 23,
+    "coordinatorStrict": "PASS",
+    "consoleStrictAndBuild": "PASS",
+    "generatedContracts": "PASS"
+  },
+  "runtimeWireHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "preview": {
+    "consoleURL": "http://127.0.0.1:5190",
+    "apiURL": "http://127.0.0.1:8806",
+    "stateRoot": ".local-state/wave13-readiness-preview",
+    "schema": 18,
+    "mode": "personal",
+    "executionAvailability": { "state": "unavailable", "reason": "operator_disabled" },
+    "oldStateMigrated": false,
+    "oldServicesRestarted": false
+  },
+  "completionSnapshot": {
+    "source": "e1e0c97",
+    "stableAlphaRaw": 69,
+    "fullSchemeBRaw": 50.8,
+    "rescoredThisCheckpoint": false
+  },
+  "remainingMain": [
+    "Actual admitted C source/candidate consumers",
+    "Actual A logical-source baseline consumer",
+    "Local target authorization and startup composition after resource admission"
+  ],
+  "notAdmittedByThisCheckpoint": [
+    "Current installed artifact and E release gate",
+    "B native task control and active recovery",
+    "D process ownership and upgrade",
+    "Restored target activation",
+    "Independent review value or a new model allowance"
+  ]
+}
