@@ -552,8 +552,8 @@ button.stage-pending:hover:not(:disabled) { border: 0; background: #f5e9d3; colo
 .proposal-workspace[open]:has(> form) { display: flex; flex-direction: column; overflow: hidden; }
 .proposal-workspace:has(> form) > header { flex-shrink: 0; }
 .proposal-workspace > form { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
-.proposal-workspace > form > fieldset { min-height: 0; overflow-y: auto; padding: 0 2px 2px; }
-.proposal-workspace > form > footer { flex-shrink: 0; }
+.proposal-form-scroll { min-height: 0; overflow-y: auto; padding: 0 2px 2px; }
+.proposal-workspace > form > footer { flex-shrink: 0; background: var(--panel); }
 @media (max-height: 600px) {
   .conversation-head { min-height: 56px; padding-top: 8px; padding-bottom: 8px; }
   .messages { padding-top: 12px; padding-bottom: 12px; }

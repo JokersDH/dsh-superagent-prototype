@@ -48,7 +48,6 @@ try {
   const send = async text => { await page.getByRole('textbox', { name: '发送消息', exact: true }).fill(text); await page.getByRole('button', { name: '发送消息', exact: true }).click() }
   const openCandidates = async text => { const details = candidateFor(text); if (await details.getAttribute('open') === null) await details.locator(':scope > summary').click(); return details }
   const capture = async (prefix = '', target) => {
-    if (values['no-capture']) return
     for (const [name, width, height] of [['desktop', 1440, 900], ['mobile', 390, 844], ['zoom', 720, 450]]) {
       await page.setViewportSize({ width, height }); await page.evaluate(() => document.fonts.ready)
       if (target) await target.scrollIntoViewIfNeeded()
@@ -57,8 +56,11 @@ try {
       if (prefix === 'work-') {
         const action = await dialog.getByRole('button', { name: '预览提案', exact: true }).boundingBox(), frame = await dialog.boundingBox()
         assert.ok(action && frame && action.y >= frame.y && action.y + action.height <= Math.min(height, frame.y + frame.height), 'The complete form action must remain visible')
+        const scrolling = dialog.locator('.proposal-form-scroll'), scrollBox = await scrolling.boundingBox(), footerBox = await dialog.locator('form > footer').boundingBox()
+        assert.ok(scrollBox && footerBox && scrollBox.y + scrollBox.height <= footerBox.y, 'Content and actions must have disjoint painting areas')
+        assert.equal(await scrolling.evaluate(element => getComputedStyle(element).overflowY), 'auto')
       }
-      await page.screenshot({ path: join(output, `${prefix}${name}.png`), fullPage: true, animations: 'disabled' })
+      if (!values['no-capture']) await page.screenshot({ path: join(output, `${prefix}${name}.png`), fullPage: true, animations: 'disabled' })
     }
     await page.setViewportSize({ width: 1440, height: 900 })
   }

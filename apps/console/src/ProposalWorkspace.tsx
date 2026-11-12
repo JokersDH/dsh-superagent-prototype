@@ -168,7 +168,7 @@ export function ProposalWorkspace({ transport, configuration, sources, source, w
         {pending && <div className="proposal-pending" role="status"><RefreshCw size={16} /><span>原请求待核对</span>
           <button type="button" disabled={busy || damaged} onClick={() => void mutate(pending.command, pending.preview)}><RefreshCw size={15} />核对原请求</button></div>}
         {!displayPreview && !damaged && <form onSubmit={event => { event.preventDefault(); void prepare() }}>
-          <fieldset disabled={blocked}>
+          <div className="proposal-form-scroll"><fieldset disabled={blocked}>
             {!initialCandidate && <div className="proposal-modes" role="group" aria-label="提案类型">{modes.map(mode => <button key={mode.kind} type="button" aria-pressed={kind === mode.kind}
               onClick={() => { setKind(mode.kind); setError(undefined); setCriterionIds(project?.defaultCriteria.map(item => item.id) ?? []) }}><mode.icon size={15} />{mode.label}</button>)}</div>}
             <div className="proposal-fields"><label>项目<select aria-label="提案项目" value={projectId} disabled={!!initialCandidate} onChange={event => resetProject(event.target.value)}>
@@ -191,7 +191,7 @@ export function ProposalWorkspace({ transport, configuration, sources, source, w
               <p>外部动作：{scope.externalActions.join('、') || '无'}</p></section>}
             {kind !== 'propose_decision' && <section className="proposal-checks" aria-label="提案验收标准"><h3>验收标准</h3>{criteria.map(criterion => <label key={criterion.id} className="settings-toggle"><input type="checkbox" checked={criterionIds.includes(criterion.id)}
               onChange={event => setCriterionIds(event.target.checked ? [...criterionIds, criterion.id] : criterionIds.filter(value => value !== criterion.id))} /><span>{criteriaText(criterion)}<small>{criterion.kind === 'machine' ? '机器检查' : '人工验收'}</small></span></label>)}</section>}
-          </fieldset>
+          </fieldset></div>
           <footer><button type="submit" disabled={blocked || projectBlocked || (!selected && !initialCandidate) || !content.trim() || !scope?.allowedPaths.length ||
             (kind !== 'propose_decision' && (!project?.dispatchAllowed || !confirmedCriteria.some(value => value.kind === 'machine' && value.required))) ||
             (kind === 'propose_work' && !profileId) || (kind === 'propose_revision' && (!work || !revisionGoal.trim()))}><FileCheck2 size={15} />{busy ? '正在预览' : '预览提案'}</button></footer>
