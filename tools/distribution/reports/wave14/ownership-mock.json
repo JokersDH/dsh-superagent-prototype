@@ -1,0 +1,118 @@
+{
+  "protocol": "wave14-d-admission/1",
+  "source": "114b73c2723c3ec862f5ae199dc35e0152fbafed",
+  "cases": [
+    {
+      "id": "SAME_START_WRONG_UID_ARGV_OPERATION",
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [
+        {
+          "pid": 912345,
+          "label": "api",
+          "reason": "coordinator_identity"
+        }
+      ],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [
+        {
+          "pid": 912345,
+          "command": "node unrelated-worker --state /tmp/pa-wave14-ownership-mvumQM/new-mock/data",
+          "unregistered": true
+        }
+      ],
+      "considered": 0,
+      "pidReused": false,
+      "signals": [],
+      "uidQueried": false,
+      "expected": "No signal; identity mismatch",
+      "status": "PASS"
+    },
+    {
+      "id": "JOURNAL_SCOPE_UID_OPERATION_IGNORED",
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [
+        {
+          "pid": 912345,
+          "label": "journal",
+          "reason": "uid_unreadable"
+        }
+      ],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [
+        {
+          "pid": 912345,
+          "command": "node unrelated-worker --state /tmp/pa-wave14-ownership-mvumQM/new-mock/data",
+          "unregistered": true
+        }
+      ],
+      "considered": 0,
+      "pidReused": false,
+      "signals": [],
+      "expected": "No signal; foreign journal identity",
+      "status": "PASS"
+    },
+    {
+      "id": "PER_PID_STAT_FAILURE_EMPTY_PROOF",
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [
+        {
+          "pid": 912345,
+          "label": "api",
+          "reason": "status_unknown"
+        }
+      ],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 0,
+      "pidReused": false,
+      "signals": [],
+      "expected": "proven=false; per-PID status UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "id": "MALFORMED_INVENTORY_EMPTY_PROOF",
+      "proven": false,
+      "scannerOk": false,
+      "unverifiable": [],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 0,
+      "pidReused": false,
+      "signals": [],
+      "expected": "proven=false; malformed inventory UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "id": "INSTALL_DIR_PARENT_ACCEPTED_AS_ROLE",
+      "result": "BLOCKED",
+      "journal": "starting",
+      "requested": "/tmp/w14frozen",
+      "actualTarget": "/tmp/w14frozen/install",
+      "expected": "BLOCKED; parent of installDir is not old/new install",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL_RECOVER_WRONG_UID_ARGV_OPERATION",
+      "result": "BLOCKED",
+      "signals": [],
+      "journal": "target_stop_unproven",
+      "expected": "No signal; BLOCKED by failed coordinator identity",
+      "status": "PASS"
+    }
+  ],
+  "passed": 6,
+  "failed": 0,
+  "actualOsScans": 0,
+  "actualOsSignals": 0,
+  "actualProcessesSpawned": 0,
+  "realModelTurns": 0,
+  "nativeTurns": 0,
+  "scope": "Pure mock identity/inventory/signals and recover entrypoints; verified frozen input readonly; no live stop/install matrix"
+}

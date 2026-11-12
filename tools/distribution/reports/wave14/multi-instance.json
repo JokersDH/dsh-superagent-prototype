@@ -1,0 +1,99 @@
+{
+  "protocol": "wave11-multi-instance/1",
+  "status": "PASS",
+  "startedAt": "2026-11-12T14:43:20.739Z",
+  "steps": [
+    {
+      "id": "install-identity",
+      "status": "PASS",
+      "detail": {
+        "buildId": "a7df2b225a8c5c42",
+        "commit": "114b73c2723c3ec862f5ae199dc35e0152fbafed",
+        "schema": 18,
+        "dirty": false
+      }
+    },
+    {
+      "id": "two-states-running",
+      "status": "PASS",
+      "detail": {
+        "a": {
+          "pid": 38455,
+          "apiPid": 38477,
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-multi-instance-lHG42B/state-a/state"
+        },
+        "b": {
+          "pid": 38527,
+          "apiPid": 38541,
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-multi-instance-lHG42B/state-b/state"
+        }
+      }
+    },
+    {
+      "id": "cross-state-stop-status-refused",
+      "status": "PASS",
+      "detail": {
+        "code": "requested_root_mismatch",
+        "requestedState": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-multi-instance-lHG42B/state-b/state",
+        "recordedState": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-multi-instance-lHG42B/state-a/state",
+        "aAlive": true,
+        "bRecordUnchanged": true,
+        "bHealthUnchanged": "ok"
+      }
+    },
+    {
+      "id": "matching-stop-only-own-state",
+      "status": "PASS",
+      "detail": {
+        "stopped": "STOPPED",
+        "bStillAlive": true
+      }
+    },
+    {
+      "id": "orphan-api-cross-state",
+      "status": "PASS",
+      "detail": {
+        "crossCode": "requested_root_mismatch",
+        "apiAliveAfterCross": true,
+        "matching": "STOPPED_ORPHAN"
+      }
+    },
+    {
+      "id": "stale-and-missing-record",
+      "status": "PASS",
+      "detail": {
+        "stale": "STALE_RECORD_CLEANED",
+        "missing": "STOPPED"
+      }
+    },
+    {
+      "id": "pid-reuse-refused",
+      "status": "PASS",
+      "detail": {
+        "code": "unknown_live_resource",
+        "strangerAlive": true
+      }
+    },
+    {
+      "id": "space-cjk-paths",
+      "status": "PASS",
+      "detail": {
+        "state": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-multi-instance-lHG42B/空 格 dir/state-c/state",
+        "health": "ok",
+        "status": "RUNNING",
+        "stopped": "STOPPED"
+      }
+    }
+  ],
+  "limitations": [
+    "Uses one frozen/staged install and isolated temporary states; no user instance, shared queue or marker is touched.",
+    "Only processes spawned by this recipe and recorded in its own states are ever stopped."
+  ],
+  "artifact": {
+    "install": "/tmp/w14frozen/install",
+    "buildId": "a7df2b225a8c5c42",
+    "commit": "114b73c2723c3ec862f5ae199dc35e0152fbafed",
+    "schema": 18
+  },
+  "finishedAt": "2026-11-12T14:43:31.821Z"
+}

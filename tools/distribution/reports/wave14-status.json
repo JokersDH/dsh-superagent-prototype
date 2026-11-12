@@ -1,0 +1,297 @@
+{
+  "protocol": "wave14-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "d833d0f",
+  "mergedMain": "9f5bd76",
+  "head": "114b73c",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/native turns 0; eleven user services untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "nativeTurns": 0
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "One unified identity predicate now requires PID + start + UID + argv + config/data root + operation for each registered resource. A matching start with a wrong UID/argv/operation, a foreign journal scope or a different private root is unknown, never signalled.",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs",
+        "tools/distribution/reports/wave14/ownership-mock.json"
+      ]
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "Vitality is tri-state: per-PID stat failure/empty output is UNKNOWN, and malformed ps inventory makes scannerOk=false. Unknown never becomes owned or an empty proven set; proven requires clean scan, no pidReused and no unverifiable resource across stop/upgrade/recover/rollback.",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs",
+        "apps/launcher/lib/instance.mjs"
+      ]
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Recovery old/new roles are exactly the journal install roots and their app children; the install parent is no longer accepted. Confirming branches require the requested role, cleanup only the recorded role, and torn journals persist plan roles. Actual recover cleanup uses the same verified-start path.",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs"
+      ]
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "Six pure-mock cases close: same start/wrong UID/argv/operation, foreign journal scope/uid/root/operation, per-PID stat failure, malformed inventory, parent-install role, and actual recover wrong coordinator identity. Zero real scans/signals/processes; only then were live matrices run.",
+      "evidence": [
+        "tools/distribution/reports/wave14/ownership-mock.json"
+      ]
+    },
+    "d5": {
+      "status": "PASS",
+      "summary": "Fresh real-process matrix remains green: 19-section managed matrix incl. real SIGKILL, multi-state 8/8, and cross-schema 3/3 where an unregistered stranger blocks before any stop, the recipe kills only its own stranger, the real 16->18 upgrade confirms, and the old binary refuses the newer schema.",
+      "evidence": [
+        "tools/distribution/reports/wave14/binary-upgrade.json",
+        "tools/distribution/reports/wave14/cross-schema-upgrade.json"
+      ]
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "Current M1/data consumed through public ports: non-empty A18 reply/binding, main history/source reads, A snapshot+artifact new-root restore keeping them; corrupted/future schema refused; schema16 migrates to 18 via A ProductStore. 5/5.",
+      "evidence": [
+        "tools/distribution/reports/wave14/schema18-data.json"
+      ]
+    },
+    "d7": {
+      "status": "PASS",
+      "summary": "Clean frozen target from pushed source 114b73c (dirty=false): build a7df2b225a8c5c42, schema18, tar sha256 246fd80d..., 20,177,745 B, 6,714 files with M1 discussion-only/unavailable-execution plus history/source/reply. 99832f6 predates M1 and stays historical.",
+      "evidence": [
+        "tools/distribution/reports/wave14/artifacts.json"
+      ]
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Personal cold install 7/7 and no-executor cold start 4/4: explicit --discussion-only stays personal, reports execution unavailable/operator_disabled and refuses dispatch with 422 unsupported_capability; it never silently selects fixture or reads credentials. Real legacy16->18 migration and historical same-schema double-binary rollback remain separate.",
+      "evidence": [
+        "tools/distribution/verify-personal-no-executor.mjs",
+        "tools/distribution/reports/wave14/personal-no-executor.json"
+      ]
+    },
+    "d9": {
+      "status": "PASS_WITH_MAIN_ACTIVATION_BLOCKED",
+      "summary": "Interrupted windows settle only with complete proof; support bundle remains redacted/0600/no-overwrite; inert material/empty DB never self-authorize. Main activation/host grant handshake still has no published entry, so activation stays precisely blocked.",
+      "evidence": [
+        "apps/launcher/lib/support.mjs",
+        "tools/distribution/reports/wave14/target-material.json"
+      ]
+    },
+    "d10": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Frozen-byte rerun: mock 6/6, matrix 19/19, multi 8/8, cross 3/3, data 5/5, personal 7/7, no-executor 4/4, backup 6/6, portable 5+1 NT, dual 6/6, material PASS, smoke 52/52, launcher 60/60, portability 52/52. E independent verdict pending.",
+      "evidence": [
+        "tools/distribution/recipes/wave14-e-acceptance.zh-CN.md",
+        "docs/rfcs/WP-16/0042-wave-14-d-complete-identity-and-m1-install.md"
+      ]
+    }
+  },
+  "artifacts": {
+    "protocol": "wave14-artifacts/1",
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave14-target/wave14-target-114b73c.tar.gz",
+      "sha256": "246fd80ded7b5d2445890a7854dbc6261a71c1c4456f3ee2f41404b9b6e3c785",
+      "tarBytes": 20177745,
+      "buildId": "a7df2b225a8c5c42",
+      "source": {
+        "commit": "114b73c2723c3ec862f5ae199dc35e0152fbafed",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6714,
+      "extractedBytes": 67286171,
+      "platform": null,
+      "abi": {
+        "node": "137"
+      },
+      "actualCapabilities": [
+        "M1 personal discussion-only startup with unavailable execution",
+        "context history/source read",
+        "A18 completed reply results",
+        "selected-context prepare/send",
+        "non-empty backup/restore",
+        "legacy16->18 managed upgrade",
+        "explicit discussion-only no-executor cold start"
+      ]
+    },
+    "baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "buildId": "7e8f6ce6fa2e2633",
+      "source": {
+        "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 13,
+      "role": "historical schema13 matrix"
+    },
+    "legacy16": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+      "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+      "buildId": "3311a04bd20ed7f9",
+      "source": {
+        "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 16,
+      "role": "real schema16 source for 16->18 migration"
+    },
+    "dualPair13": {
+      "from": {
+        "buildId": "9120a5ed858e0feb",
+        "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+        "schema": 13,
+        "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
+      },
+      "to": {
+        "buildId": "cd0ecc29d97d5c41",
+        "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+        "schema": 13,
+        "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"
+      },
+      "note": "Same-schema rollback historical scope; not relabeled current."
+    },
+    "historical": [
+      {
+        "label": "wave-13 99832f6",
+        "buildId": "3ead6a26161f4c72",
+        "productSchema": 18,
+        "note": "Genuine but predates M1; never relabeled current full."
+      },
+      {
+        "label": "wave-12 020af82",
+        "buildId": "1a2f34ac359a5739",
+        "productSchema": 18,
+        "note": "Historical."
+      }
+    ],
+    "notes": [
+      "Target built from pushed clean wave-14 D head 114b73c (dirty=false, schema18) on merged main 9f5bd76 including 1453cf2/M1.",
+      "D writes no SQL/migrations; snapshot/restore uses A public entrypoints only.",
+      "E binds cases to these tuples; the checkout is not an installation input."
+    ]
+  },
+  "testLayers": {
+    "ownershipMock": {
+      "cases": 6,
+      "passed": 6,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "multiInstance": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "binaryUpgrade": {
+      "sections": 19,
+      "status": "PASS"
+    },
+    "crossSchema": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "schema18Data": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "personalInstall": {
+      "steps": 7,
+      "status": "PASS"
+    },
+    "personalNoExecutor": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "backupSchema": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "portableClosure": {
+      "steps": 6,
+      "status": "PASS",
+      "notTested": [
+        "other-platform-abi"
+      ]
+    },
+    "dualBinary": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "targetMaterial": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "smoke": {
+      "steps": 52,
+      "status": "PASS"
+    },
+    "launcher": {
+      "tests": 60,
+      "status": "PASS"
+    },
+    "portability": {
+      "tests": 52,
+      "status": "PASS"
+    }
+  },
+  "blockers": [
+    {
+      "id": "MAIN-ACTIVATION-HANDSHAKE",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "No published source baseline/authorization/activation host handshake; materials/empty DB remain inert."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E must bind cases to the frozen wave-14 tuples independently."
+    },
+    {
+      "id": "PLATFORM-ABI",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Only darwin/arm64 + current Node/SQLite ABI measured."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Personal mode verified with zero dispatched work/turns."
+    }
+  ],
+  "notTested": [
+    "cross-platform/ABI",
+    "real personal billed turn",
+    "every individual SIGKILL step",
+    "main target activation",
+    "E independent acceptance"
+  ],
+  "eConsumption": [
+    "Use tools/distribution/reports/wave14/artifacts.json tar/sha256/source/build/schema tuples; never the checkout or old 99832f6/schema16 bytes as current.",
+    "Run the ownership mock probe, matrix, multi, cross, data, personal, no-executor, backup, portable, dual, material recipes.",
+    "Do not relax digests, delete markers/records, hand-edit release.json, pkill, or claim activation/personal billed/native from these results."
+  ],
+  "preservedHistory": [
+    "wave-05..13 evidence/ledgers unchanged",
+    "wave-06/07/08/11/12/13 tars preserved and unrelabeled",
+    "no shared contract/migration/root lock/E assertion modified"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave14/*.json",
+    "tools/distribution/recipes/wave14-e-acceptance.zh-CN.md",
+    "docs/rfcs/WP-16/0042-wave-14-d-complete-identity-and-m1-install.md"
+  ]
+}
