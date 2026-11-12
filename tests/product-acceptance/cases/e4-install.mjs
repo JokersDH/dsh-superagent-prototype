@@ -1349,7 +1349,8 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         TARGET_CAPABILITY.hasHistoryRoute && TARGET_CAPABILITY.hasSourcesRoute && TARGET_CAPABILITY.hasReplyResults
       evidence.frozenScope = {
         artifact: { buildId: ARTIFACTS.upgrade.buildId, source: ARTIFACTS.upgrade.sourceCommit,
-          schema: ARTIFACTS.upgrade.productSchema, tarSha256: ARTIFACTS.upgrade.tarSha256, tarBytes: ARTIFACTS.upgrade.tarBytes },
+          schema: ARTIFACTS.upgrade.productSchema, tarSha256: ARTIFACTS.upgrade.tarSha256, tarBytes: ARTIFACTS.upgrade.tarBytes,
+          abi: ARTIFACTS.upgrade.abi, platform: ARTIFACTS.upgrade.platform, arch: ARTIFACTS.upgrade.arch },
         capability: TARGET_CAPABILITY,
         main: { schema: PRODUCT_SCHEMA_VERSION },
         currentMainEligible,
