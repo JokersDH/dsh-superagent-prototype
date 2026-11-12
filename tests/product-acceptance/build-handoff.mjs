@@ -293,15 +293,15 @@ const CAPABILITIES = [
     notTested: [
       '安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。',
       '旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。',
-      'E6-CURRENT-MAIN-INSTALL：按 E6-ARTIFACT-CURRENT-SCOPE 实测 schema/context 能力动态判断；当前 tuple 与 current main schema 不同时保留 NOT_TESTED，旧安装结果保持原 tuple scope。',
+      'E6-CURRENT-MAIN-INSTALL：99832f6 实测 context/history/sources/replyResults=true，但 discussionReadiness=false；无执行器 personal 探针实际 BLOCKED，因此不是当前 M1 安装。',
     ],
   },
   {
     id: 'two-binary-upgrade',
     label: 'D 托管 upgrade/rollback-install 与显式 baseline/target 字节',
-    installed: ['E4-UPGRADE-ROLLBACK', 'E4-UPGRADE-CROSS-SCHEMA'],
+    installed: ['E4-UPGRADE-ROLLBACK', 'E4-UPGRADE-FAULTS', 'E4-UPGRADE-CROSS-SCHEMA'],
     notTested: [
-      'E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口仍未稳定执行，保持 NOT_TESTED；不得以两次 fixture start 代替。',
+      '已执行 crash_after_stop、crash_after_stop_kill、target_unhealthy 三窗口 recovering previous + data preserved；pointer/spawn/record/ACK after-switch 仍未单独注入。',
       '升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。',
     ],
   },
@@ -441,7 +441,7 @@ const executionStatus = {
     matrix: join(reports, 'release-matrix.json'),
     executionStatus: join(reports, 'execution-status.json'),
     wave09Status: join(reports, 'wave09-status.json'),
-    wave13Status: join(reports, 'wave13-status.json'),
+    wave14Status: join(reports, 'wave14-status.json'),
     wave08Status: join(reports, 'wave08-status.json'),
     wave07Status: join(reports, 'wave07-status.json'),
     wave06Status: join(reports, 'wave06-status.json'),
@@ -502,7 +502,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第十三轮交付交接
+const handoff = `# Agent E 第十四轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -540,7 +540,7 @@ ${rows
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold personal、fixture 安装版 context、非空 context/reply 备份搬根、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=${frozenScope?.artifact?.buildId ?? '?'}/schema ${frozenScope?.artifact?.schema ?? '?'}，main schema ${frozenScope?.main?.schema ?? '?'}；current-main install=${currentMainInstall ? 'NOT_TESTED' : 'SCOPED PASS'}；E4-UPGRADE-ROLLBACK/E4-UPGRADE-FAULTS 仍 NOT_TESTED；E6 current missing history=${frozenScope?.capability?.hasHistoryRoute === false}。 |
+| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold personal、fixture 安装版 context、非空 context/reply 备份搬根、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=${frozenScope?.artifact?.buildId ?? '?'}/schema ${frozenScope?.artifact?.schema ?? '?'}，main schema ${frozenScope?.main?.schema ?? '?'}；current-main install=${currentMainInstall ? 'NOT_TESTED' : 'SCOPED PASS'}（仅此 required 项仍阻断）；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=${frozenScope?.capability?.hasDiscussionReadiness ?? '?'}。 |
 
 安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId \`${artifactTuple.baseline?.buildId ?? 'unknown'}\` / schema ${artifactTuple.baseline?.productSchema ?? artifactTuple.baseline?.schema ?? '?'} / tar \`${String(artifactTuple.baseline?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.baseline?.sourceCommit ?? artifactTuple.baseline?.source ?? '').slice(0, 8)}\`；target buildId \`${artifactTuple.target?.buildId ?? 'unknown'}\` / schema ${artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? '?'} / tar \`${String(artifactTuple.target?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? '').slice(0, 8)}\`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
@@ -581,7 +581,7 @@ ${rows
 
 ## 下一消费者
 
-1. D：当前 020af82/schema18 的 requested-root、copied-record 与 wrong-install 所有权均通过；剩余是 current-main history/sources 未进包（E6-CURRENT-MAIN-INSTALL NOT_TESTED）、没有第二个 schema18 binary 的 upgrade/rollback 与 PA_UPGRADE_FAULT 窗口。先交含 e1e0c97 history/source 的准确当前 tar 和第二个冻结 build，再关闭对应 NOT_TESTED。
+1. D：99832f6/schema18 已通过 requested-root、copied-record、wrong-install、双 binary upgrade/rollback 和三个 PA_UPGRADE_FAULT 窗口；唯一剩余 required 安装项是 current-main M1（discussionReadiness=false，personal start 在无执行器探针中 BLOCKED）。下一包合并 e1e0c97/d9d347e/b2b1adb 后冻结新 tar，再关闭 E6-CURRENT-MAIN-INSTALL。
 2. main/B：发布真实恢复 activation 与 B 生产 begin/answer/stop 消费者；E 已关闭 A18 回复/SIGKILL/坏 artifact、context history/source/frozen UI 和 schema18 非空备份搬根。
 3. main：继续交 recovery activation 与真实空目标启动；E 已独立验证 context-use/SSE/audit、单 tab 丢响应、双 tab 独立旧 selection、mobile 再选源和 reply consumer，不重复把入口未发布当阻断。
 4. B：提供绑定 commit/attempt 的原生证据（\`executed: true\` + model task 计数）；E 只消费，不重跑计费任务。旧安装结果、wave09/wave10 ledger 与报告原样保留。
@@ -606,12 +606,12 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
 writeFileSync(
-  join(reports, 'wave13-status.json'),
+  join(reports, 'wave14-status.json'),
   JSON.stringify({
     ...executionStatus,
-    schema: 'product-acceptance-wave13-status/1',
-    taskPackage: 'agent-tasks/product-wave-13/README.zh-CN.md',
-    supersedes: 'wave12-status.json',
+    schema: 'product-acceptance-wave14-status/1',
+    taskPackage: 'agent-tasks/product-wave-14/README.zh-CN.md',
+    supersedes: 'wave13-status.json',
     currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.reason ?? null,
     requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
       E7: byId.get('E7-OWNERSHIP-COPY')?.status ?? 'MISSING',
@@ -647,7 +647,7 @@ writeFileSync(
     artifactTuple,
   }, null, 2) + '\n',
 )
-// Historical wave06-12 status files are frozen inputs; wave13 supersedes rather than rewrites them.
+// Historical wave06-13 status files are frozen inputs; wave14 supersedes rather than rewrites them.
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 
 // Over-claim check: the same recorded evidence must fail the full-product tier while native and

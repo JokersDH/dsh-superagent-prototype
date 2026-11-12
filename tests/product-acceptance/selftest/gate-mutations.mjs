@@ -117,6 +117,14 @@ const evidenceFor = (key) => {
       return { crashedCalls: 1, recoveredCalls: 0, replies: 1 }
     case 'replyBadArtifact':
       return { calls: 0, replies: 0, notice: '无法核对' }
+    case 'ownershipCopy':
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1 }, status: 2, apiAlive: true }
+    case 'upgradeFaults':
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1 }, windows: {}, actions: [], reason: 'synthetic' }
+    case 'currentInstall':
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1 }, mode: 'personal', action: 'probe', observed: 'BLOCKED' }
+    case 'backupContextReply':
+      return { before: { bindings: 1, results: 1, messages: 2 }, after: { bindings: 1, results: 1, messages: 2 }, artifacts: 1, reply: 'ok' }
     case 'frozenScope':
       return { artifact: { buildId: 'b', source: 'a'.repeat(40), schema: 18, tarSha256: 'b'.repeat(64), tarBytes: 1 },
         capability: { hasContextRoute: true, hasHistoryRoute: true, hasSourcesRoute: true, hasReplyResults: true }, main: { schema: 18 }, currentMainEligible: true }
@@ -131,7 +139,7 @@ const evidenceFor = (key) => {
     case 'backupContextReply':
       return { before: { bindings: 1, results: 1, messages: 2 }, after: { bindings: 1, results: 1, messages: 2 }, artifacts: 1, reply: 'ok' }
     case 'installedContext':
-      return { available: true, prepare: 200, send: 'recorded', reply: 'ok', audit: 200, modelCalls: 1 }
+      return { mode: 'fixture', available: true, prepare: 200, send: 'recorded', reply: 'ok', audit: 200, modelCalls: 1 }
     case 'personalInstall':
       return {
         start: 'RUNNING',
@@ -192,14 +200,8 @@ const evidenceFor = (key) => {
         deadLauncher: { status: 'UNVERIFIED', apiAliveBefore: true, stopExit: 0, apiAliveAfterStop: false },
       }
     case 'crossUpgrade':
-      return {
-        baseline: { buildId: 'old', schema: 13, tarSha256: DIGEST, source: 'old' },
-        target: { buildId: 'new', schema: 15, tarSha256: 'c'.repeat(64), source: 'new' },
-        upgrade: { status: 'CONFIRMED', to: 'new' },
-        schema: 15,
-        postKept: true,
-        crossSchema: { code: 'state_schema_newer_than_binary', migrationRefusal: false, dataSchema: 15 },
-      }
+      return { baseline: { buildId: 'old', schema: 16, source: 'old' }, migratedSchema: 18,
+        status: 'BLOCKED', code: 'state_schema_newer_than_binary', dataSchema: 18 }
     case 'upgrade':
       return {
         baseline: { buildId: 'build-old', schema: 12, tarSha256: DIGEST },
@@ -867,6 +869,74 @@ const CASES = [
         findCase(report, 'E6-ARTIFACT-CURRENT-SCOPE').evidence.frozenScope.artifact.source = 'not-a-commit'
         return report
       }, 'frozenScope_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-REQUIRED-PASS-EMPTY-EVIDENCE',
+    title: 'Required PASS cases with empty evidence are rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'REQUIRED_PASS_EMPTY', (report) => {
+        for (const id of ['E7-OWNERSHIP-COPY', 'E4-UPGRADE-FAULTS', 'E6-CURRENT-MAIN-INSTALL']) {
+          const item = findCase(report, id)
+          item.status = STATUS.PASS
+          item.assertions = [{ id: 'label-only', ok: true }]
+          item.evidence = {}
+        }
+        return report
+      }, 'required_evidence_missing'),
+  },
+  {
+    id: 'E1-MUTATE-FOREIGN-SUBJECT-SOURCE',
+    title: 'A valid-looking foreign source cannot be substituted for the tested artifact',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FOREIGN_SOURCE', (report) => {
+        findCase(report, 'E4-INSTALL-ARTIFACT-IDENTITY').evidence.artifact = { tuple: { target: {
+          sourceCommit: COMMIT, buildId: 'build-1', productSchema: 18, tarSha256: DIGEST, tarBytes: 1 } } }
+        findCase(report, 'E6-INSTALLED-CONTEXT').evidence.installedContext.subject = {
+          source: 'a'.repeat(40), buildId: 'build-1', schema: 18, tarSha256: DIGEST, tarBytes: 1 }
+        return report
+      }, 'subject_mismatch'),
+  },
+  {
+    id: 'E1-MUTATE-FOREIGN-SUBJECT-SHA-SIZE',
+    title: 'A valid-looking foreign SHA/byte size cannot satisfy the subject relation',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FOREIGN_SHA_SIZE', (report) => {
+        findCase(report, 'E4-INSTALL-ARTIFACT-IDENTITY').evidence.artifact = { tuple: { target: {
+          sourceCommit: COMMIT, buildId: 'build-1', productSchema: 18, tarSha256: DIGEST, tarBytes: 1 } } }
+        findCase(report, 'E6-INSTALLED-CONTEXT').evidence.installedContext.subject = {
+          source: COMMIT, buildId: 'build-1', schema: 18, tarSha256: 'f'.repeat(64), tarBytes: 9 }
+        return report
+      }, 'subject_mismatch'),
+  },
+  {
+    id: 'E1-MUTATE-FOREIGN-SUBJECT-BUILD',
+    title: 'A valid-looking foreign build id cannot satisfy the subject relation',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FOREIGN_BUILD', (report) => {
+        findCase(report, 'E4-INSTALL-ARTIFACT-IDENTITY').evidence.artifact = { tuple: { target: {
+          sourceCommit: COMMIT, buildId: 'build-1', productSchema: 18, tarSha256: DIGEST, tarBytes: 1 } } }
+        findCase(report, 'E6-INSTALLED-CONTEXT').evidence.installedContext.subject = {
+          source: COMMIT, buildId: 'foreign-build', schema: 18, tarSha256: DIGEST, tarBytes: 1 }
+        return report
+      }, 'subject_mismatch'),
+  },
+  {
+    id: 'E1-MUTATE-WRONG-MODE',
+    title: 'A fixture-mode installed probe cannot be relabeled as personal',
+    check: ({ assert }) =>
+      rejectWith(assert, 'WRONG_MODE', (report) => {
+        findCase(report, 'E6-INSTALLED-CONTEXT').evidence.installedContext.mode = 'personal'
+        return report
+      }, 'installedContext_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-REQUIRED-WRONG-RUN',
+    title: 'A required install case bound to another source run is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'REQUIRED_WRONG_RUN', (report) => {
+        findCase(report, 'E7-OWNERSHIP-COPY').source = { commit: 'e'.repeat(40) }
+        return report
+      }, 'stale_case_evidence'),
   },
   {
     id: 'E1-MUTATE-SELF-CLAIM',

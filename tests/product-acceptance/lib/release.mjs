@@ -366,6 +366,33 @@ export function replyBadArtifactIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   return value.calls === 0 && value.replies === 0 && typeof value.notice === 'string' ? [] : ['bad_artifact']
 }
+export function ownershipCopyIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  if (value.status === 0 || value.apiAlive !== true) issues.push('claimed_other_state')
+  return issues
+}
+export function upgradeFaultsIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = [], windows = value.windows ?? {}
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  for (const mode of ['crash_after_stop', 'crash_after_stop_kill', 'target_unhealthy']) {
+    const probe = windows[mode]?.probe, steps = Object.fromEntries((probe?.steps ?? []).map(item => [item.id, item]))
+    if (!probe) { issues.push(mode); continue }
+    if (steps.fault_observed?.status !== 'PASS' || steps.recover?.status !== 'PASS' || steps.recovered_health?.status !== 'PASS' || steps.data_kept?.status !== 'PASS') issues.push(mode)
+  }
+  return issues
+}
+export function currentInstallIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  if (value.mode !== 'personal' || !isSubstantive(value.action) || !isSubstantive(value.observed)) issues.push('not_executed')
+  for (const key of ['hasContextRoute', 'hasHistoryRoute', 'hasSourcesRoute', 'hasReplyResults', 'hasDiscussionReadiness'])
+    if (typeof value.capability?.[key] !== 'boolean') issues.push(key)
+  return issues
+}
 export function frozenScopeIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = [], artifact = value.artifact ?? {}, capability = value.capability ?? {}, main = value.main ?? {}
@@ -414,6 +441,7 @@ export function backupContextReplyIssues(value) {
 export function installedContextIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
+  if (value.mode !== 'fixture') issues.push('mode')
   if (value.available !== true) issues.push('availability')
   if (value.prepare !== 200 || value.send !== 'recorded') issues.push('send')
   if (!value.reply || value.audit !== 200) issues.push('reply_or_audit')
@@ -492,18 +520,13 @@ export function evidenceHistoryIssues(history) {
 /** A cross-schema upgrade must leave the old binary refusing the new database by schema, not assets. */
 export function crossUpgradeIssues(cross) {
   if (!cross || typeof cross !== 'object') return ['missing']
-  const issues = []
-  const base = cross.baseline ?? {}
-  const target = cross.target ?? {}
-  if (!isSubstantive(base.buildId) || !isSubstantive(target.buildId) || base.buildId === target.buildId) issues.push('distinct_builds')
-  if (!HEX.test(String(base.tarSha256 ?? '')) || !HEX.test(String(target.tarSha256 ?? ''))) issues.push('tuple')
-  if (!Number.isSafeInteger(base.schema) || !Number.isSafeInteger(target.schema) || target.schema <= base.schema) issues.push('schema_order')
-  if (cross.upgrade?.status !== 'CONFIRMED' || cross.upgrade?.to !== target.buildId) issues.push('upgrade')
-  if (cross.schema !== target.schema || cross.postKept !== true) issues.push('data')
-  if (!['daemon_start_failed', 'schema_unsupported', 'runtime_mismatch', 'state_schema_newer_than_binary'].includes(cross.crossSchema?.code)) issues.push('old_binary_admitted')
-  if (cross.crossSchema?.code === 'release_artifact_missing') issues.push('wrong_reason')
-  if (cross.crossSchema?.migrationRefusal !== true && !['schema_unsupported', 'state_schema_newer_than_binary'].includes(cross.crossSchema?.code)) issues.push('no_schema_refusal')
-  if (cross.crossSchema?.dataSchema !== target.schema) issues.push('data_changed')
+  const issues = [], base = cross.baseline ?? {}
+  if (!isSubstantive(base.buildId) || !Number.isSafeInteger(base.schema)) issues.push('baseline')
+  if (!Number.isSafeInteger(cross.migratedSchema) || cross.migratedSchema <= base.schema) issues.push('schema_order')
+  if (cross.status !== 'BLOCKED') issues.push('old_binary_admitted')
+  if (!['daemon_start_failed', 'schema_unsupported', 'runtime_mismatch', 'state_schema_newer_than_binary'].includes(cross.code)) issues.push('wrong_reason')
+  if (cross.code === 'release_artifact_missing') issues.push('wrong_reason')
+  if (cross.dataSchema !== cross.migratedSchema) issues.push('data_changed')
   return issues
 }
 
@@ -744,6 +767,29 @@ export function evaluateRelease({
     }
   }
 
+  // Every claimed installation/current-tuple case must describe the same frozen subject.
+  const canonicalTuple = byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target
+  if (canonicalTuple) {
+    const subjectCases = ['E6-ARTIFACT-CURRENT-SCOPE', 'E6-CURRENT-MAIN-INSTALL', 'E6-INSTALLED-CONTEXT',
+      'E7-OWNERSHIP-COPY', 'E7-BACKUP-CONTEXT-REPLY', 'E4-UPGRADE-FAULTS']
+    const normalize = (value, key) => key === 'source' ? (value?.source ?? value?.sourceCommit)
+      : key === 'schema' ? (value?.schema ?? value?.productSchema) : value?.[key]
+    for (const id of subjectCases) {
+      const item = byId.get(id)
+      if (!item) continue
+      const subject = item.evidence?.subject ?? item.evidence?.frozenScope?.artifact ??
+        item.evidence?.currentInstall?.subject ?? item.evidence?.upgradeFaults?.subject
+      if (!subject || typeof subject !== 'object') {
+        failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
+        continue
+      }
+      for (const field of ['source', 'buildId', 'schema', 'tarSha256', 'tarBytes']) {
+        if (String(normalize(subject, field) ?? '') !== String(normalize(canonicalTuple, field) ?? ''))
+          failures.push(fail('subject_mismatch', `Case ${id} ${field} differs from the tested artifact tuple`, id))
+      }
+    }
+  }
+
   for (const entry of requirement?.cases ?? []) {
     const result = byId.get(entry.id)
     const record = { id: entry.id, required: entry.required !== false, status: result?.status ?? 'MISSING' }
@@ -780,7 +826,7 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
           for (const issue of fn(result.evidence?.[key])) failures.push(fail(`${key}_invalid`, `${key} ${issue}`, entry.id))
         }

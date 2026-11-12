@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-13/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-14/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "e1e0c97",
-  "checkpoint": "227d133",
+  "base": "1453cf2",
+  "checkpoint": "3e77025",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,

@@ -34,8 +34,8 @@ import { sha256 } from '../lib/evidence.mjs'
  */
 const here = dirname(fileURLToPath(import.meta.url))
 const DEFAULT_DIRS = Object.freeze({
-  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',
-  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave12-target',
+  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave12-target',
+  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave13-target',
   cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',
 })
 
@@ -82,10 +82,15 @@ const TARGET_ROUTES = tarFile(ARTIFACTS.upgrade, '/apps/coordinator/http/app.ts'
 const TARGET_CAPABILITY = Object.freeze({
   hasContextRoute: /assistant\/context\/(prepare|send)/u.test(TARGET_ROUTES),
   hasHistoryRoute: /\/v1\/context\/history/u.test(TARGET_ROUTES),
-  hasSourcesRoute: /\/v1\/messages\/:\.id\/context\/sources/u.test(TARGET_ROUTES),
+  hasSourcesRoute: /\/v1\/messages\/:id\/context\/sources/u.test(TARGET_ROUTES),
   hasReplyResults: /assistantReplyResults|replyResults/u.test(tarFile(ARTIFACTS.upgrade, '/apps/coordinator/product/runtime.ts') ?? ''),
+  hasDiscussionReadiness: !!tarFile(ARTIFACTS.upgrade, '/apps/coordinator/product/discussion-effects.ts') &&
+    /discussionOnly/u.test(tarFile(ARTIFACTS.upgrade, '/apps/coordinator/product/runtime.ts') ?? ''),
   routeBytes: TARGET_ROUTES.length,
 })
+
+const artifactSubject = spec => ({ source: spec.sourceCommit, buildId: spec.buildId, schema: spec.productSchema,
+  tarSha256: spec.tarSha256, tarBytes: spec.tarBytes, platform: spec.platform, arch: spec.arch, abi: spec.abi })
 
 const PLATFORM = Object.freeze({
   platform: 'darwin',
@@ -257,6 +262,31 @@ function startPa(install, { port, apiPort, env = {}, extraArgs = [] } = {}) {
         code: final?.code,
         exitCode: code,
       })
+    })
+  })
+  return { child, attempt }
+}
+
+/** Personal start without the fixture flag; used to measure the actual no-executor mode. */
+function startPersonalInstall(install, { port, apiPort, env = {} } = {}) {
+  const child = spawn(join(install, 'bin/pa'), ['start', '--json', '--port', String(port), '--api-port', String(apiPort)], {
+    cwd: join(install, '..'), env: stripUndefined(paEnv(env)), stdio: ['ignore', 'pipe', 'pipe'],
+  })
+  let buffer = '', stderr = ''
+  child.stderr.on('data', chunk => { stderr += chunk })
+  const attempt = new Promise(resolveAttempt => {
+    const finish = value => resolveAttempt({ ...value, child, stderr: () => stderr })
+    child.once('error', error => finish({ status: 'BLOCKED', code: 'spawn_failed', detail: error.message }))
+    child.stdout.on('data', chunk => {
+      buffer += chunk
+      const line = buffer.split('\n').find(item => item.trim().startsWith('{'))
+      if (line === undefined) return
+      try { const value = JSON.parse(line); finish({ status: value.status, instance: value.instance, code: value.code, detail: value.detail }) } catch { /* buffering */ }
+    })
+    child.once('exit', code => {
+      let final
+      try { final = JSON.parse(buffer.trim().split('\n').filter(Boolean).at(-1)) } catch { final = undefined }
+      finish({ status: final?.status ?? (code === 0 ? 'EXITED' : 'BLOCKED'), instance: final?.instance, code: final?.code, exitCode: code })
     })
   })
   return { child, attempt }
@@ -904,7 +934,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         assert('CONTEXT_BACKUP_COUNTS', after.bindings === before.bindings && after.results === before.results && after.messages === before.messages, JSON.stringify({ before, after }))
         const artifactRows = readdirSync(join(restoredRoot, 'artifacts')).length
         assert('CONTEXT_BACKUP_ARTIFACTS', artifactRows >= 1, String(artifactRows))
-        evidence.backupContextReply = { before, after, artifacts: artifactRows, backupArtifacts: backup.json?.counts?.artifacts ?? 0,
+        evidence.backupContextReply = { subject: artifactSubject(ARTIFACTS.upgrade), before, after, artifacts: artifactRows, backupArtifacts: backup.json?.counts?.artifacts ?? 0,
           reply: reply.text }
       } finally {
         try { pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
@@ -1059,34 +1089,48 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       }) }, `NOT_TESTED: the default baseline schema ${ARTIFACTS.base.productSchema} differs from target schema ${ARTIFACTS.upgrade.productSchema}; an older binary cannot start on the newer state, and no second frozen build with schema ${ARTIFACTS.upgrade.productSchema} is available. Cross-schema refusal is measured by E4-UPGRADE-CROSS-SCHEMA; the prior schema15 same-schema upgrade/rollback result remains scoped to its old tuple.`))
     }
 
-    await push(define('E4-UPGRADE-CROSS-SCHEMA', 'A cross-schema upgrade leaves the old binary refusing the new database exactly'), async ({ assert, evidence }) => {
-      const ports = await freePorts(6)
-      const child = spawnSync(process.execPath, [join(here, 'e4-managed-upgrade-child.mjs')], {
-        env: {
-          ...process.env,
-          PA_E_MANAGED_PAIR: JSON.stringify({ baseline: ARTIFACTS.cross, target: ARTIFACTS.upgrade }),
-          PA_E_MANAGED_PORTS: JSON.stringify(ports),
-          PA_E_CROSS_CHECK: '1',
-        },
-        encoding: 'utf8',
-        timeout: 240_000,
-      })
-      let probe
-      try { probe = JSON.parse(child.stdout.trim().split('\n').at(-1)) } catch { probe = undefined }
-      const steps = Object.fromEntries((probe?.steps ?? []).map((item) => [item.id, item]))
-      assert('CROSS_PROBE_RAN', probe !== undefined, `signal=${child.signal} status=${child.status} ${child.stderr.slice(-300)}`)
-      assert('CROSS_UPGRADE', steps.upgrade?.status === 'PASS' && probe?.upgrade?.to === ARTIFACTS.upgrade.buildId, JSON.stringify(probe?.upgrade))
-      assert('CROSS_DATA', probe?.schema === ARTIFACTS.upgrade.productSchema && probe?.postKept === true, JSON.stringify({ schema: probe?.schema, post: probe?.postKept }))
-      assert('CROSS_REFUSAL', steps.cross_schema_refusal?.status === 'PASS', JSON.stringify(probe?.crossSchema ?? null))
-      assert('CROSS_ACCURATE_CODE', ['daemon_start_failed', 'schema_unsupported', 'runtime_mismatch', 'state_schema_newer_than_binary'].includes(probe?.crossSchema?.code) && probe.crossSchema.code !== 'release_artifact_missing', JSON.stringify(probe?.crossSchema ?? null))
-      assert('CROSS_NOT_ARTIFACT', probe?.crossSchema?.code !== 'release_artifact_missing', String(probe?.crossSchema?.code))
-      evidence.crossUpgrade = {
-        baseline: { buildId: ARTIFACTS.cross.buildId, schema: ARTIFACTS.cross.productSchema, source: ARTIFACTS.cross.sourceCommit, tarSha256: ARTIFACTS.cross.tarSha256 },
-        target: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, source: ARTIFACTS.upgrade.sourceCommit, tarSha256: ARTIFACTS.upgrade.tarSha256 },
-        upgrade: probe?.upgrade,
-        schema: probe?.schema,
-        postKept: probe?.postKept,
-        crossSchema: probe?.crossSchema,
+    await push(define('E4-UPGRADE-CROSS-SCHEMA', 'An older D binary refuses a newer migrated state without a silent downgrade'), async ({ assert, evidence }) => {
+      const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w14-cross-')))
+      const crossInstall = join(own, 'cross')
+      mkdirSync(crossInstall, { recursive: true })
+      let started
+      try {
+        spawnSync('tar', ['-xzf', ARTIFACTS.cross.tarPath, '-C', crossInstall, '--strip-components=1'])
+        const first = pa(crossInstall, ['first-run', '--json'])
+        assert('CROSS_FIRST_RUN', first.status === 0, first.stderr.slice(-300))
+        const [port, apiPort] = await freePorts()
+        started = startPa(crossInstall, { port, apiPort })
+        const running = await started.attempt
+        assert('CROSS_BASE_RUNNING', running.status === 'RUNNING', JSON.stringify({ status: running.status, code: running.code }))
+        const state = running.instance.state
+        try {
+          const key = readFileSync(join(state, 'api.key'), 'utf8').trim()
+          const sent = await fetch(`${running.instance.apiURL}/v1/commands`, { method: 'POST', headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+            body: JSON.stringify({ commandId: 'w14-cross-chat', conversationId: 'conv-cross', kind: 'chat', projectId: 'project-atlas', text: '跨 schema 前数据。' }), signal: AbortSignal.timeout(10_000) })
+          assert('CROSS_SEED', sent.status === 200, String(sent.status))
+          await new Promise(resolve => setTimeout(resolve, 300))
+        } finally { pa(crossInstall, ['stop', '--json'], { timeoutMs: 25_000 }) }
+        const migrated = join(own, 'migrated')
+        cpSync(state, migrated, { recursive: true })
+        chmodSync(migrated, 0o700)
+        const { ProductStore } = await import('../../../packages/storage/dist/index.js')
+        const db = new ProductStore({ path: join(migrated, 'state.sqlite') })
+        let newSchema
+        try { newSchema = db.database.productSchema } finally { db.close() }
+        assert('CROSS_MIGRATED', newSchema > ARTIFACTS.cross.productSchema, `${ARTIFACTS.cross.productSchema} -> ${newSchema}`)
+        const oldOnNew = startPa(crossInstall, { port, apiPort, env: { PA_DATA_ROOT: migrated } })
+        const refusedResult = await oldOnNew.attempt
+        try { oldOnNew.child.kill('SIGKILL') } catch { /* gone */ }
+        evidence.crossUpgrade = { baseline: { buildId: ARTIFACTS.cross.buildId, schema: ARTIFACTS.cross.productSchema, source: ARTIFACTS.cross.sourceCommit },
+          migratedSchema: newSchema, status: refusedResult.status ?? null, code: refusedResult.code ?? null,
+          dataSchema: (() => { try { const check = new DatabaseSync(join(migrated, 'state.sqlite'), { readOnly: true }); try { return Number(check.prepare("select value from schema_meta where key='product_schema'").get()?.value) } finally { check.close() } } catch { return null } })(),
+          stderr: refusedResult.stderr?.().slice(-400) ?? null }
+        assert('CROSS_REFUSAL', refusedResult.status === 'BLOCKED', JSON.stringify({ status: refusedResult.status, code: refusedResult.code, stderr: evidence.crossUpgrade.stderr }))
+        assert('CROSS_CODE', ['daemon_start_failed', 'schema_unsupported', 'runtime_mismatch', 'state_schema_newer_than_binary'].includes(refusedResult.code) && refusedResult.code !== 'release_artifact_missing', JSON.stringify({ code: refusedResult.code ?? null, stderr: evidence.crossUpgrade.stderr }))
+        assert('CROSS_DATA_SCHEMA', evidence.crossUpgrade.dataSchema === newSchema, String(evidence.crossUpgrade.dataSchema))
+      } finally {
+        try { if (started) pa(crossInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
+        rmSync(own, { recursive: true, force: true })
       }
     })
 
@@ -1114,17 +1158,32 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       }
     })
 
-    cases.push(
-      notTested(
-        define('E4-UPGRADE-FAULTS', 'Interrupted switch, dead-launcher/API-alive and rollback terminal states', { layer: LAYERS.INSTALLED }),
-        'NOT_TESTED: the bounded managed-upgrade probe covers the confirmed switch, new data, binary rollback and a tampered target. D exposes PA_UPGRADE_FAULT crash windows and whole-process guards, but exercising them reliably needs a longer isolated run; this case stays NOT_TESTED rather than counting two fixture starts as an upgrade result.',
-      ),
-    )
+    await push(define('E4-UPGRADE-FAULTS', 'Pre-switch crash, SIGKILL and unhealthy-target recovery keep the previous build and data', {
+      layer: LAYERS.INSTALLED,
+    }), async ({ assert, evidence }) => {
+      const windows = {}
+      for (const mode of ['crash_after_stop', 'crash_after_stop_kill', 'target_unhealthy']) {
+        const ports = await freePorts(4)
+        const child = spawnSync(process.execPath, [join(here, 'e4-upgrade-fault-child.mjs')], {
+          env: { ...process.env, PA_E_FAULT_PAIR: JSON.stringify({ baseline: ARTIFACTS.base, target: ARTIFACTS.upgrade }),
+            PA_E_FAULT_PORTS: JSON.stringify(ports), PA_E_FAULT_MODE: mode },
+          encoding: 'utf8', timeout: 240_000,
+        })
+        let probe
+        try { probe = JSON.parse(child.stdout.trim().split('\n').filter(Boolean).at(-1)) } catch { probe = undefined }
+        windows[mode] = { status: child.status, signal: child.signal, probe }
+        assert(`FAULT_${mode.toUpperCase()}_RAN`, probe !== undefined, `status=${child.status} ${child.stderr.slice(-300)}`)
+        const steps = Object.fromEntries((probe?.steps ?? []).map(item => [item.id, item]))
+        assert(`FAULT_${mode.toUpperCase()}_OBSERVED`, steps.fault_observed?.status === 'PASS', JSON.stringify(steps.fault_observed ?? null))
+        assert(`FAULT_${mode.toUpperCase()}_RECOVERED`, steps.recover?.status === 'PASS', JSON.stringify(steps.recover ?? null))
+        assert(`FAULT_${mode.toUpperCase()}_HEALTH`, steps.recovered_health?.status === 'PASS', JSON.stringify(steps.recovered_health ?? null))
+        assert(`FAULT_${mode.toUpperCase()}_DATA`, steps.data_kept?.status === 'PASS' && probe?.dataKept === true, JSON.stringify({ data: probe?.dataKept }))
+        assert(`FAULT_${mode.toUpperCase()}_SCHEMA`, probe?.schema === ARTIFACTS.upgrade.productSchema, String(probe?.schema))
+      }
+      evidence.upgradeFaults = { subject: artifactSubject(ARTIFACTS.upgrade), windows,
+        missingWindows: ['pointer/spawn/record/ACK crash after successful switch are not separately injected'] }
+    })
 
-  } finally {
-    stopAll()
-    if (!keep) rmSync(workspace, { recursive: true, force: true })
-  }
     await push(define('E8-SCHEMA-MIGRATION', 'A real D target database opens on the current A schema with data preserved', { layer: LAYERS.CONTROLLED }), async ({ assert, evidence }) => {
       const extract = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w11-migrate-')))
       let started
@@ -1219,7 +1278,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         const binding = await client.request(`/v1/messages/${userMessage?.id ?? ''}/context`)
         assert('INSTALLED_AUDIT', binding.status === 200 && binding.body?.commandId === 'w12-installed-ctx', JSON.stringify(binding.body)?.slice(0, 200))
         assert('INSTALLED_MOCK_CALLED', mock.requests.length >= 1 && mock.requests.some(item => JSON.stringify(item.messages).includes('安装版上下文来源')), `calls ${mock.requests.length}`)
-        evidence.installedContext = { mode: 'fixture', artifact: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, source: ARTIFACTS.upgrade.sourceCommit },
+        evidence.installedContext = { mode: 'fixture', subject: artifactSubject(ARTIFACTS.upgrade), artifact: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, source: ARTIFACTS.upgrade.sourceCommit },
           available: true, prepare: prepared.status, send: sent.body?.status, reply: reply?.text, audit: binding.status, modelCalls: mock.requests.length }
       } finally {
         try { pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
@@ -1298,19 +1357,54 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       }
     })
 
-    const targetSchema18 = ARTIFACTS.upgrade.productSchema === (await import('../../../packages/storage/dist/index.js')).PRODUCT_SCHEMA_VERSION
-    if (targetSchema18 && TARGET_CAPABILITY.hasContextRoute && TARGET_CAPABILITY.hasHistoryRoute && TARGET_CAPABILITY.hasSourcesRoute && TARGET_CAPABILITY.hasReplyResults) {
-      cases.push(notTested({ ...define('E6-CURRENT-MAIN-INSTALL', 'Current-main schema18 selected context is installed and exercised from cold personal bytes', {
-        layer: LAYERS.INSTALLED,
-      }) }, 'NOT_TESTED: the default target tuple now matches current main schema; run E3-PERSONAL-COLD-START and E6 scope in a clean re-record to admit current-main install.'))
+    const currentProbe = await (async () => {
+      const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w14-current-')))
+      const ownInstall = join(own, 'install')
+      mkdirSync(ownInstall, { recursive: true })
+      let started
+      const env = { PATH: '/usr/bin:/bin:/usr/sbin:/sbin' }
+      try {
+        spawnSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', ownInstall, '--strip-components=1'])
+        const first = pa(ownInstall, ['first-run', '--json'], { env })
+        const [port, apiPort] = await freePorts()
+        started = startPersonalInstall(ownInstall, { port, apiPort, env })
+        const running = await started.attempt
+        let configuration
+        if (running.status === 'RUNNING' && running.instance?.apiURL) {
+          try {
+            const client = new LocalProductClient({ baseURL: running.instance.apiURL, stateDir: running.instance.state, timeoutMs: 10_000 })
+            configuration = await client.configuration()
+          } catch { /* recorded below */ }
+        }
+        return { subject: artifactSubject(ARTIFACTS.upgrade), capability: TARGET_CAPABILITY, mode: 'personal',
+          action: 'first_run_and_personal_start_without_executor', firstRun: first.json?.status ?? null,
+          observed: running.status ?? null, code: running.code ?? null, instanceMode: running.instance?.mode ?? null,
+          health: running.instance?.apiURL ? 'observed' : null,
+          configuration: configuration ? { assistantContextAvailable: configuration.assistantContextAvailable,
+            contextHistoryAvailable: configuration.contextHistoryAvailable, contextSourcesAvailable: configuration.contextSourcesAvailable } : null }
+      } finally {
+        try { if (started) pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
+        try { started?.child?.kill('SIGKILL') } catch { /* gone */ }
+        rmSync(own, { recursive: true, force: true })
+      }
+    })()
+    const currentComplete = TARGET_CAPABILITY.hasContextRoute && TARGET_CAPABILITY.hasHistoryRoute &&
+      TARGET_CAPABILITY.hasSourcesRoute && TARGET_CAPABILITY.hasReplyResults && TARGET_CAPABILITY.hasDiscussionReadiness &&
+      currentProbe.observed === 'RUNNING' && currentProbe.instanceMode === 'personal'
+    if (currentComplete) {
+      await push(define('E6-CURRENT-MAIN-INSTALL', 'Current-main schema18 selected context is installed and exercised from cold personal bytes', {
+        layer: LAYERS.INSTALLED, evidence: { currentInstall: { ...currentProbe, result: 'personal_start_observed' } },
+      }), async ({ assert, evidence }) => {
+        assert('CURRENT_PERSONAL_START', currentProbe.observed === 'RUNNING' && currentProbe.instanceMode === 'personal', JSON.stringify(currentProbe))
+        assert('CURRENT_CAPABILITIES', currentComplete === true, JSON.stringify(currentProbe.capability))
+        evidence.currentInstall = { ...currentProbe, result: 'personal_start_observed' }
+      })
     } else {
+      const reason = `NOT_TESTED: actual probe extracted ${ARTIFACTS.upgrade.buildId}, first-run=${currentProbe.firstRun}, personal start=${currentProbe.observed}/${currentProbe.code ?? 'none'}, instanceMode=${currentProbe.instanceMode}; capabilities context=${TARGET_CAPABILITY.hasContextRoute}, history=${TARGET_CAPABILITY.hasHistoryRoute}, sources=${TARGET_CAPABILITY.hasSourcesRoute}, replyResults=${TARGET_CAPABILITY.hasReplyResults}, discussionReadiness=${TARGET_CAPABILITY.hasDiscussionReadiness}. This tuple is not the current-main M1 package; it was executed, not relabeled. Required: freeze a D tar containing the e1e0c97/d9d347e/b2b1adb product paths, then run the same personal probe plus context/history/source/reply.`
       cases.push(notTested({ ...define('E6-CURRENT-MAIN-INSTALL', 'Current-main schema18 selected context is installed and exercised from cold personal bytes', {
-        layer: LAYERS.INSTALLED,
-        limitations: [
-          `The measured D artifact is ${ARTIFACTS.upgrade.buildId}/schema ${ARTIFACTS.upgrade.productSchema}; current main schema is ${(await import('../../../packages/storage/dist/index.js')).PRODUCT_SCHEMA_VERSION}; context=${TARGET_CAPABILITY.hasContextRoute}, history=${TARGET_CAPABILITY.hasHistoryRoute}, sources=${TARGET_CAPABILITY.hasSourcesRoute}, replyResults=${TARGET_CAPABILITY.hasReplyResults}.`,
-          'Old wave-10/wave-11 personal and upgrade results remain valid only for their own tuple and are not relabeled as current-main admission.',
-        ],
-      }) }, `NOT_TESTED: measured D tuple build ${ARTIFACTS.upgrade.buildId}, schema ${ARTIFACTS.upgrade.productSchema}, context=${TARGET_CAPABILITY.hasContextRoute}, history=${TARGET_CAPABILITY.hasHistoryRoute}, sources=${TARGET_CAPABILITY.hasSourcesRoute}, replyResults=${TARGET_CAPABILITY.hasReplyResults}; current main schema ${(await import('../../../packages/storage/dist/index.js')).PRODUCT_SCHEMA_VERSION}. Required: an accurate D tar from current main with context/history/sources/replyResults, then a fresh cold personal install and independent mocked context/reply.`))
+        layer: LAYERS.INSTALLED, limitations: [reason],
+        evidence: { currentInstall: { ...currentProbe, result: 'not_current_m1' } },
+      }) }, reason))
     }
 
     await push(define('E7-OWNERSHIP-COPY', 'A copied instance record in another config root cannot stop the original self-owned API', {
@@ -1336,7 +1430,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         const apiAlive = (() => { try { return process.kill(record.apiPid, 0) === true } catch { return false } })()
         assert('OWNERSHIP_COPY_REFUSED', copiedStop.status !== 0, JSON.stringify({ status: copiedStop.status, code: copiedStop.json?.code }))
         assert('OWNERSHIP_ORIGINAL_ALIVE', apiAlive, `apiPid ${record.apiPid}`)
-        evidence.ownershipCopy = { status: copiedStop.status, code: copiedStop.json?.code ?? null, apiAlive,
+        evidence.ownershipCopy = { subject: artifactSubject(ARTIFACTS.upgrade), status: copiedStop.status, code: copiedStop.json?.code ?? null, apiAlive,
           sourceConfig: join(ownInstall, 'var/config'), copiedConfig: alternate }
       } finally {
         try { pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
@@ -1377,4 +1471,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
     })
 
   return { cases, artifacts }
+  } finally {
+    stopAll()
+  }
 }
