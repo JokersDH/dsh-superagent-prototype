@@ -1,0 +1,38 @@
+{
+  "protocol": "wave15-main-integration/1",
+  "date": "2026-11-12",
+  "source": "697efdc",
+  "admittedACandidate": "3121ec46126a8579b45c7d128ee1700df4c82978",
+  "implemented": [
+    "Production A RecoverySourceStore/strict fact mapper minimal slice",
+    "Actual runtime HTTP recovery inspect and prepare logical-source baseline",
+    "Read-only same-connection snapshot and final source recheck",
+    "Incomplete sources refuse without consuming old business queues"
+  ],
+  "notImplemented": [
+    "Public source confirmation/permission",
+    "Target activation",
+    "Default C factory replacement",
+    "Nonempty assistant suggestion consumer",
+    "B business recovery product integration"
+  ],
+  "checks": {
+    "source": "697efdc",
+    "recoveryTests": 66,
+    "newActualLogicalSourceTests": 8,
+    "contracts": 228,
+    "storage": 87,
+    "workflows": 93,
+    "strict": "PASS",
+    "generated": "PASS",
+    "runtimeWireHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+    "sourceBaseline": "actual_inspect_prepare",
+    "confirmation": false,
+    "targetActivation": false
+  },
+  "releaseApproved": false,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "oldUserServicesRestarted": false,
+  "newPreviewCreated": false
+}
