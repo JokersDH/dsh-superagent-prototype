@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { PrivateModelProvider } from '../../../apps/coordinator/product/model-provider.ts'
 
-export async function candidateModel({ reply, gate } = {}) {
+export async function candidateModel({ reply, gate, legacy = false, enabled = true } = {}) {
   const root = mkdtempSync('/tmp/pa-candidate-model-'), requests = [], key = 'fixture-candidate-private-key'
   let makeReply = reply ?? (context => ({ text: '已整理为一项项目决定。', suggestions: [{ kind: 'propose_decision',
     content: '支付接口保留原有错误码。', scope: context.scope, sourceMessageId: context.sourceMessageId }] }))
@@ -11,7 +11,7 @@ export async function candidateModel({ reply, gate } = {}) {
     let bytes = ''; for await (const chunk of request) bytes += chunk
     const input = JSON.parse(bytes); requests.push(input)
     const context = input.tools ? JSON.parse(input.messages.at(-1).content).requestContext : undefined
-    const body = makeReply(context, input)
+    const body = context ? makeReply(context, input) : { text: '需要保留现有错误码。', suggestions: [] }
     response.writeHead(200, { 'content-type': 'text/event-stream' })
     const emit = delta => response.write(`data: ${JSON.stringify({ choices: [{ index: 0, delta, finish_reason: null }] })}\n\n`)
     emit({ content: body.text.slice(0, 2) })
@@ -27,7 +27,8 @@ export async function candidateModel({ reply, gate } = {}) {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
   const file = join(root, 'model.json')
   writeFileSync(file, JSON.stringify({ baseURL: `http://127.0.0.1:${server.address().port}/v1`, apiKey: key,
-    model: 'candidate-mock', allowedModels: ['candidate-mock'], allowInsecureHttp: true, maxOutputTokens: 512, suggestionsEnabled: true }), { mode: 0o600 })
+    model: 'candidate-mock', allowedModels: ['candidate-mock'], allowInsecureHttp: true, maxOutputTokens: 512,
+    ...(!legacy ? { suggestionsEnabled: enabled } : {}) }), { mode: 0o600 })
   return { root, file, key, requests, provider: new PrivateModelProvider(file),
     setReply: value => { makeReply = value },
     close: async () => { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); rmSync(root, { recursive: true, force: true }) },

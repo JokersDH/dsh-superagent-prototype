@@ -19,6 +19,7 @@ import type { ReasonerProposal, Scope } from '@personal-agent/contracts'
 import { ASSISTANT_REPLY_TOOL, AssistantSuggestionData } from './assistant-suggestion-data.ts'
 
 export const DEFAULT_MODEL_CONFIG = join(homedir(), '.config/superagent-personal/model.json')
+const PreferencesSchema = z.strictObject({ protocol: z.literal('assistant-suggestion-settings/1'), enabled: z.boolean() })
 const ConfigurationSchema = z
   .strictObject({
     baseURL: z.url().refine((value) => {
@@ -35,7 +36,7 @@ const ConfigurationSchema = z
     allowedModels: z.array(z.string().min(1).max(160)).min(1).max(32),
     allowInsecureHttp: z.boolean().default(false),
     maxOutputTokens: z.number().int().min(64).max(4096).default(1200),
-    suggestionsEnabled: z.boolean().default(false),
+    suggestionsEnabled: z.boolean().optional(),
   })
   .refine(
     (value) =>
@@ -98,9 +99,23 @@ export class PrivateModelProvider implements AssistantModelPort {
       throw new ModelProviderError('configuration_invalid', '模型私有配置格式不正确。')
     }
   }
+  private preferences() {
+    const path = `${this.path}.assistant-settings.json`
+    let stat
+    try { stat = lstatSync(path) }
+    catch (error) { if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined; throw new ModelProviderError('configuration_invalid', '提案建议私有设置无法读取。') }
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 4096 || stat.mode & 0o077 ||
+      (process.getuid && stat.uid !== process.getuid())) throw new ModelProviderError('configuration_invalid', '提案建议私有设置的权限或文件类型不正确。')
+    try { return PreferencesSchema.parse(JSON.parse(readFileSync(path, 'utf8'))) }
+    catch { throw new ModelProviderError('configuration_invalid', '提案建议私有设置格式不正确。') }
+  }
+  private configuration() {
+    const config = this.read()
+    return { ...config, suggestionsEnabled: this.preferences()?.enabled ?? config.suggestionsEnabled ?? false }
+  }
   status(): AssistantProviderStatus {
     try {
-      const config = this.read()
+      const config = this.configuration()
       return {
         protocol: 'assistant-provider/1',
         configured: true,
@@ -128,26 +143,26 @@ export class PrivateModelProvider implements AssistantModelPort {
     const config = this.read()
     if (!config.allowedModels.includes(model))
       throw new ModelProviderError('unsupported_model', '这个模型不在已配置的可选列表中。')
-    this.write({ ...config, model })
+    this.write(this.path, { ...config, model })
     return this.status()
   }
   setSuggestionsEnabled(enabled: boolean): AssistantProviderStatus {
-    const config = this.read()
-    this.write({ ...config, suggestionsEnabled: enabled })
+    this.configuration()
+    this.write(`${this.path}.assistant-settings.json`, PreferencesSchema.parse({ protocol: 'assistant-suggestion-settings/1', enabled }))
     return this.status()
   }
-  private write(config: z.infer<typeof ConfigurationSchema>) {
-    const temporary = `${this.path}.${randomUUID()}.tmp`
+  private write(path: string, value: unknown) {
+    const temporary = `${path}.${randomUUID()}.tmp`
     let fd: number | undefined
     try {
       fd = openSync(temporary, 'wx', 0o600)
-      const bytes = Buffer.from(JSON.stringify(config, null, 2) + '\n')
+      const bytes = Buffer.from(JSON.stringify(value, null, 2) + '\n')
       for (let offset = 0; offset < bytes.length; ) offset += writeSync(fd, bytes, offset)
       fsyncSync(fd)
       closeSync(fd)
       fd = undefined
-      renameSync(temporary, this.path)
-      const directory = openSync(dirname(this.path), 'r')
+      renameSync(temporary, path)
+      const directory = openSync(dirname(path), 'r')
       try {
         fsyncSync(directory)
       } finally {
@@ -169,7 +184,7 @@ export class PrivateModelProvider implements AssistantModelPort {
     return this.prepareReply().reply(messages, onDelta, signal, context)
   }
   prepareReply(): PreparedAssistantReply {
-    const config = this.read()
+    const config = this.configuration()
     const replyDataSchema = config.suggestionsEnabled ? structuredClone(ASSISTANT_REPLY_TOOL) : undefined
     let used = false
     return Object.freeze({
@@ -244,10 +259,10 @@ export class PrivateModelProvider implements AssistantModelPort {
         pending = held ? pending.slice(-held) : ''
       }
       for await (const chunk of result) {
-        const choice = chunk.choices[0]
+        const choice = chunk.choices?.[0]
         if (!choice) continue
-        if (choice.delta.content) redact(choice.delta.content)
-        if (config.suggestionsEnabled && choice.delta.tool_calls) suggestions.append(choice.delta.tool_calls)
+        if (typeof choice.delta?.content === 'string') redact(choice.delta.content)
+        if (config.suggestionsEnabled && choice.delta?.tool_calls !== undefined) suggestions.append(choice.delta.tool_calls)
         if (choice.finish_reason) {
           terminal = choice.finish_reason
           if (choice.finish_reason === 'stop' || choice.finish_reason === 'length' || (config.suggestionsEnabled && choice.finish_reason === 'tool_calls')) finished = true
@@ -278,6 +293,8 @@ export class PrivateModelProvider implements AssistantModelPort {
           ? '模型服务认证失败，请检查本机模型配置。'
           : status === 429
             ? '模型服务繁忙或额度受限，请稍后重试。'
+            : config.suggestionsEnabled && (status === 400 || status === 422)
+              ? '当前连接未能使用提案建议，请关闭该设置后重新发送。'
             : '模型暂时未能完成回复，请稍后重新发送。',
       )
     } finally {

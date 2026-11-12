@@ -11,7 +11,8 @@ export const ASSISTANT_REPLY_TOOL = {
     parameters },
 }
 
-type ToolDelta = { index: number; id?: string; type?: string; function?: { name?: string; arguments?: string } }
+const deltas = z.array(z.strictObject({ index: z.literal(0), id: z.string().max(256).nullish(), type: z.literal('function').nullish(),
+  function: z.strictObject({ name: z.string().max(128).nullish(), arguments: z.string().max(262144).nullish() }).nullish() })).max(1)
 
 /** Collects one bounded data channel. No tool callback, result message or second model request exists. */
 export class AssistantSuggestionData {
@@ -20,11 +21,13 @@ export class AssistantSuggestionData {
   private bytes = 0
   private invalid = false
   private id: string | undefined
-  append(deltas: readonly ToolDelta[]) {
-    for (const delta of deltas) {
+  append(input: unknown) {
+    if (this.invalid) return
+    const parsed = deltas.safeParse(input)
+    if (!parsed.success) { this.invalid = true; this.arguments = ''; return }
+    for (const delta of parsed.data) {
       if (this.invalid) continue
-      if (delta.index !== 0 || (delta.type !== undefined && delta.type !== 'function')) this.invalid = true
-      if (delta.id !== undefined) {
+      if (delta.id != null) {
         if (delta.id.length > 256 || (this.id !== undefined && this.id !== delta.id)) this.invalid = true
         this.id = delta.id
       }

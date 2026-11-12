@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { createServer } from 'node:http'
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { PrivateModelProvider } from '../../apps/coordinator/product/model-provider.ts'
@@ -53,6 +53,11 @@ for (const [id, deltas, terminal] of [
   ['too many proposals', tool({ text: 'Hidden tool text', suggestions: Array.from({ length: 9 }, proposal) }), 'tool_calls'],
   ['length finish', tool({ text: 'Hidden tool text', suggestions: [proposal()] }), 'length'],
   ['malformed JSON', [{ tool_calls: [{ index: 0, function: { name: 'assistant_reply', arguments: '{broken' } }] }], 'tool_calls'],
+  ['object arguments', [{ tool_calls: [{ index: 0, function: { name: 'assistant_reply', arguments: {} } }] }], 'tool_calls'],
+  ['numeric arguments', [{ tool_calls: [{ index: 0, function: { name: 'assistant_reply', arguments: 17 } }] }], 'tool_calls'],
+  ['nonarray calls', [{ tool_calls: {} }], 'tool_calls'],
+  ['null call', [{ tool_calls: [null] }], 'tool_calls'],
+  ['null delta', [null], 'tool_calls'],
   ['multiple calls', [...tool({ text: 'Hidden tool text', suggestions: [proposal()] }), { tool_calls: [{ index: 1, function: { name: 'assistant_reply', arguments: '{}' } }] }], 'tool_calls'],
   ['oversized arguments', [{ tool_calls: [{ index: 0, function: { name: 'assistant_reply', arguments: 'x'.repeat(262145) } }] }], 'tool_calls'],
 ]) test(`invalid structured data (${id}) preserves ordinary text and never retries`, async t => {
@@ -85,4 +90,18 @@ test('unsupported tools fail once without an automatic plain request', async t =
   const h = await fixture(t, [], { status: 400 })
   await assert.rejects(h.provider.reply([{ role: 'user', content: 'hello' }]), error => error.code === 'provider_error')
   assert.equal(h.requests.length, 1)
+})
+test('the preference sidecar leaves legacy strict model configuration bytes and keys compatible', async t => {
+  const h = await fixture(t, [], { enabled: false })
+  const config = JSON.parse(readFileSync(h.file, 'utf8')); delete config.suggestionsEnabled
+  writeFileSync(h.file, JSON.stringify(config))
+  const before = readFileSync(h.file)
+  assert.equal(h.provider.setSuggestionsEnabled(true).suggestionsEnabled, true)
+  assert.deepEqual(readFileSync(h.file), before)
+  const sidecar = `${h.file}.assistant-settings.json`
+  assert.equal(statSync(sidecar).mode & 0o777, 0o600)
+  assert.deepEqual(JSON.parse(readFileSync(sidecar, 'utf8')), { protocol: 'assistant-suggestion-settings/1', enabled: true })
+  h.provider.selectModel('fixture-model')
+  assert.equal('suggestionsEnabled' in JSON.parse(readFileSync(h.file, 'utf8')), false)
+  assert.equal(h.provider.status().suggestionsEnabled, true); assert.equal(h.requests.length, 0)
 })
