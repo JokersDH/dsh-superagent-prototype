@@ -1,5 +1,5 @@
 import { ApplicationConfigurationSchema, CONFIGURATION_PROTOCOL } from '@personal-agent/contracts'
-import type { ApplicationConfiguration, Criterion, ExecutionProfileView, Scope, AppError } from '@personal-agent/contracts'
+import type { ApplicationConfiguration, Criterion, ExecutionAvailability, ExecutionProfileView, Scope, AppError } from '@personal-agent/contracts'
 import { canonicalDigest } from '@personal-agent/storage'
 import { scopeWithin } from '@personal-agent/questions'
 
@@ -12,6 +12,7 @@ type Project = {
   profileIds?: readonly string[]
   blockedReason?: AppError['code']
   settingsAvailable?: boolean
+  discussionOnly?: boolean
 }
 type Profile = Omit<ExecutionProfileView, 'dispatchAllowed' | 'blockedReason'> & {
   blockedReason?: ExecutionProfileView['blockedReason']
@@ -28,6 +29,7 @@ export interface ConfigurationSource {
   assistantContextAvailable?: boolean
   contextHistoryAvailable?: boolean
   contextSourcesAvailable?: boolean
+  executionAvailability?: ExecutionAvailability
 }
 
 /** The runtime supplies the actual admission list; a probe result alone never grants dispatch. */
@@ -63,6 +65,7 @@ export function applicationConfiguration(source: ConfigurationSource, now = Date
       scope,
       defaultCriteria: project.defaultCriteria,
       ...(project.settingsAvailable !== undefined ? { settingsAvailable: project.settingsAvailable } : {}),
+      ...(project.discussionOnly !== undefined ? { discussionOnly: project.discussionOnly } : {}),
       profileIds: projectProfiles,
       dispatchAllowed,
       ...(dispatchAllowed
@@ -77,6 +80,7 @@ export function applicationConfiguration(source: ConfigurationSource, now = Date
     ...(source.contextPreviewAvailable !== undefined ? { contextPreviewAvailable: source.contextPreviewAvailable } : {}),
     ...(source.assistantContextAvailable !== undefined ? { assistantContextAvailable: source.assistantContextAvailable } : {}),
     ...(source.contextHistoryAvailable !== undefined ? { contextHistoryAvailable: source.contextHistoryAvailable } : {}),
-    ...(source.contextSourcesAvailable !== undefined ? { contextSourcesAvailable: source.contextSourcesAvailable } : {}) }
+    ...(source.contextSourcesAvailable !== undefined ? { contextSourcesAvailable: source.contextSourcesAvailable } : {}),
+    ...(source.executionAvailability ? { executionAvailability: source.executionAvailability } : {}) }
   return ApplicationConfigurationSchema.parse({ ...body, revision: canonicalDigest(JSON.parse(JSON.stringify(body))) })
 }

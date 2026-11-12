@@ -55,6 +55,7 @@ export interface ProjectConfiguration {
   id: string
   displayName?: string
   scope: Scope
+  discussionOnly?: boolean
 }
 export interface CompletionReviewPort {
   verifier: CompletionVerifier
@@ -76,6 +77,8 @@ export interface ApplicationOptions {
   nativeFence(target: NativeQuestionBinding): 'current' | 'stale' | 'unknown'
   completion?: CompletionReviewPort
   assistantReplies?: boolean
+  /** Trusted startup snapshot. False permits ordinary discussion, never work or native control. */
+  executionEnabled?: boolean
   projectPreflight?: (projectId: string) => Promise<void>
   registeredCheck?: (id: string) => boolean
   projectGrant?: (input: { projectId: string; profileId: string; criteria: ContractRevision['criteria']; newWork: boolean }) => void
@@ -277,6 +280,7 @@ class LocalApplication implements ProductApplication {
       id: IdSchema.parse(project.id),
       scope: ScopeSchema.parse(project.scope),
       ...(project.displayName ? { displayName: project.displayName } : {}),
+      ...(project.discussionOnly !== undefined ? { discussionOnly: project.discussionOnly } : {}),
     }
     const checks = registeredChecks.map((id) => IdSchema.parse(id))
     if (parsed.scope.projectId !== parsed.id)
@@ -397,6 +401,8 @@ class LocalApplication implements ProductApplication {
     profileId: string,
   ): string {
     this.validateScope(command.scope)
+    if (this.project(work.projectId)?.discussionOnly)
+      throw new ApplicationFault('unsupported_capability', '当前工作区仅用于讨论，未配置开发执行器。')
     if (revision > 200) throw new ApplicationFault('budget_exceeded', 'Work revision limit reached', 'none')
     if (!this.options.profileIds.includes(profileId))
       throw new ApplicationFault('unsupported_capability', 'Unknown execution profile')
@@ -467,7 +473,13 @@ class LocalApplication implements ProductApplication {
     const digest = digestOf({ command, actor })
     let completionGuard: (() => void) | undefined
     let preflightError: AppError | undefined
-    if (command.kind === 'create_work' && !this.store.commands.get(command.commandId)) {
+    if (!this.store.commands.get(command.commandId)) {
+      try { this.requireExecution(command) } catch (error) {
+        preflightError = expectedFailure(error)
+        if (!preflightError) throw error
+      }
+    }
+    if (!preflightError && command.kind === 'create_work' && !this.store.commands.get(command.commandId)) {
       try {
         await this.options.projectPreflight?.(command.projectId)
       } catch (error) {
@@ -475,7 +487,7 @@ class LocalApplication implements ProductApplication {
         if (!preflightError) throw error
       }
     }
-    if (command.kind === 'accept_candidate' && !this.store.commands.get(command.commandId)) {
+    if (!preflightError && command.kind === 'accept_candidate' && !this.store.commands.get(command.commandId)) {
       try {
         completionGuard = await this.options.completion?.preflight?.(command.candidate)
       } catch (error) {
@@ -510,6 +522,7 @@ class LocalApplication implements ProductApplication {
         result = this.store.uow.atomic(() => {
           if (Date.parse(prepared.expiresAt) <= Date.parse(this.now()))
             throw new ApplicationFault('stale_contract', 'Prepared command expired; prepare again')
+          this.requireExecution(command)
           if (preflightError) return { status: 'rejected' as const, error: preflightError }
           guard?.()
           return { status: 'recorded' as const, ...this.execute(command, actor) }
@@ -680,6 +693,7 @@ class LocalApplication implements ProductApplication {
       let result: { status: 'recorded'; workId: string } | { status: 'rejected'; error: AppError }
       try {
         result = this.store.uow.atomic(() => {
+          this.requireExecution(command)
           const { work, ticket } = this.expect(command.candidate.contract)
           this.checkConversation(work, command.conversationId)
           if (!this.authorizedContract(command.candidate.contract))
@@ -707,6 +721,10 @@ class LocalApplication implements ProductApplication {
   private checkConversation(work: WorkRecord, conversationId: string): void {
     if (work.conversationId !== conversationId)
       throw new ApplicationFault('conflict', 'Work belongs to another conversation')
+  }
+  private requireExecution(command: UserCommand | VerificationRetryCommand): void {
+    if (this.options.executionEnabled === false && (command.kind !== 'chat' || command.anchor))
+      throw new ApplicationFault('unsupported_capability', '开发执行器尚未就绪，本条请求未创建或控制开发工作。', 'user_action')
   }
   private chat(command: Extract<UserCommand, { kind: 'chat' }>, actor: TrustedActor) {
     if (!this.project(command.projectId)) throw new ApplicationFault('forbidden', 'Unknown configured project', 'none')
@@ -814,7 +832,7 @@ class LocalApplication implements ProductApplication {
     const physical = this.physical(workId),
       busy = physical.filter((item) => item.binding.state !== 'ended')
     const missingProof = !this.safeForNewWriter(workId) && !busy.length
-    const resourceStatus = missingProof
+    const resourceStatus = missingProof || (this.options.executionEnabled === false && (!ticket.ended || busy.length > 0))
       ? ('indeterminate' as const)
       : busy.length
         ? busy.some((item) => item.binding.state === 'stopping')
@@ -846,12 +864,12 @@ class LocalApplication implements ProductApplication {
             (result) => result.criterionId === criterion.id && result.outcome === 'PASS' && result.evidenceRefs.length,
           ),
       )
-    if (!ticket.ended) {
+    if (!ticket.ended && this.options.executionEnabled !== false) {
       available.push('stop_work')
       if (activeGrant) available.push(hold.paused ? 'resume_dispatch' : 'pause_dispatch')
       if (activeGrant && canRetry(ticket) && this.safeForNewWriter(workId)) available.push('retry_assignment')
       if (candidate && review && machinePassed && this.safeForNewWriter(workId)) available.push('accept_candidate')
-    } else if (activeGrant) available.push('continue_work')
+    } else if (ticket.ended && activeGrant && this.options.executionEnabled !== false) available.push('continue_work')
     let phase: WorkView['phase'] = ticket.ended
       ? ticket.ended.outcome === 'completed'
         ? 'delivered'
@@ -867,6 +885,7 @@ class LocalApplication implements ProductApplication {
     else if (busy.some((item) => item.binding.state === 'stopping')) phase = 'stopping'
     else if (missingProof) phase = 'uncertain'
     if (!activeGrant && !ticket.ended && phase !== 'stopping' && phase !== 'switching') phase = 'uncertain'
+    if (this.options.executionEnabled === false && (!ticket.ended || busy.length) && phase !== 'stopping' && phase !== 'switching') phase = 'uncertain'
     return {
       work,
       contract,

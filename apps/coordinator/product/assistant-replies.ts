@@ -20,7 +20,7 @@ export function handleAssistantReplies(
   store: ProductStore,
   provider: AssistantModelPort,
   streams?: AssistantStreams,
-  capabilities?: { nativeExecution: boolean; completed?: CompletedAssistantReplies; context?(message: ConversationMessage): Promise<{
+  capabilities?: { nativeExecution: boolean; executionUnavailable?: boolean; canReply?(message: ConversationMessage): boolean; completed?: CompletedAssistantReplies; context?(message: ConversationMessage): Promise<{
     binding: AssistantContextBinding; content: string; assertCurrent(): void
   } | undefined> },
 ) {
@@ -60,6 +60,10 @@ export function handleAssistantReplies(
         user.projectId !== input.projectId
       )
         return
+      if (capabilities?.canReply && !capabilities.canReply(user)) {
+        append(input, noticeId, '当前项目尚未配置，本条消息未发送给模型。', true)
+        return
+      }
       const requestId = key('assistant-request', input.messageId)
       if (store.commands.get(requestId)) {
         let recovered
@@ -158,7 +162,9 @@ export function handleAssistantReplies(
               role: 'system',
               content:
                 SYSTEM +
-                (capabilities?.nativeExecution
+                (capabilities?.executionUnavailable
+                  ? '当前开发执行器未就绪，只能讨论和审阅历史，不能创建或控制开发工作。'
+                  : capabilities?.nativeExecution
                   ? '工作台已接入本机 Codex 开发执行器。用户通过“委托执行”明确选择项目、目标与验收检查后，可在隔离 Git 工作区实现代码、验证并审阅交付。需要开发时可建议用户确认委托，你不会自动派单或读取项目。'
                   : '此入口的受控验证执行器只执行固定 scratch 操作，不是通用编码 Agent。'),
             },

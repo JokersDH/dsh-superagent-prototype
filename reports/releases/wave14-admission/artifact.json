@@ -1,0 +1,50 @@
+{
+  "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave13-target/wave13-target-99832f6.tar.gz",
+  "tarSha256": "b7e9dec7d264f94cadda10c6624db582ddd477ff83a7a8816c6acf5f0c5237d4",
+  "tarBytes": 20167862,
+  "source": {
+    "commit": "99832f6c7e6a54b323a9d454f3a4840273d1275a",
+    "branch": "codex/g3-local-distribution",
+    "dirty": false
+  },
+  "buildId": "3ead6a26161f4c72",
+  "schemaActualExport": 18,
+  "platform": "darwin",
+  "arch": "arm64",
+  "node": "v24.21.0",
+  "abiActual": "137",
+  "sqliteActual": "3.53.4",
+  "inventoryEntries": 6713,
+  "files": 6692,
+  "internalSymlinks": 21,
+  "extractedBytes": 67256832,
+  "installManifestSha256": "705824eda9c7d7758e1bfb1917f0afd7c0cb1f681efe0dc3b70d6c14f5da7a9e",
+  "releaseManifestSha256": "3bb62b59cca5deb9c36fab055368752d2f7186088531a36c79d9161c11dc6d5a",
+  "closureDigest": "45d9133c3366fb9046b731f64d903e60915e1f487899e7d94129d7db7a08d3f7",
+  "capability": {
+    "selectedContextPrepare": true,
+    "selectedContextSend": true,
+    "replyResultsConsumer": true,
+    "contextHistoryHttp": true,
+    "frozenSourceHttp": true,
+    "discussionOnlyFlag": false,
+    "unavailableExecutionRuntime": false
+  },
+  "ownership": [
+    {
+      "path": "apps/launcher/lib/identity.mjs",
+      "matchesDeclaredSource": true
+    },
+    {
+      "path": "apps/launcher/lib/upgrade.mjs",
+      "matchesDeclaredSource": true
+    },
+    {
+      "path": "apps/launcher/lib/stop.mjs",
+      "matchesDeclaredSource": true
+    }
+  ],
+  "mode": "Personal-capable bytes only; no lifecycle or installed-mode admission claimed",
+  "modelCalls": 0,
+  "nativeTurns": 0
+}
