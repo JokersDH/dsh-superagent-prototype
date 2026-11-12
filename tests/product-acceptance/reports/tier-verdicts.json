@@ -4,12 +4,12 @@
     "tier": "module",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-12T10:51:26.163Z",
+    "checkedAt": "2026-11-12T14:52:02.270Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -406,7 +406,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-12T10:50:51.368Z",
+      "decidedAt": "2026-11-12T14:51:39.570Z",
       "failureCodes": []
     },
     "notes": [
@@ -419,12 +419,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-12T10:51:26.164Z",
+    "checkedAt": "2026-11-12T14:52:02.271Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1086,7 +1086,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-12T10:50:51.368Z",
+      "decidedAt": "2026-11-12T14:51:39.570Z",
       "failureCodes": []
     },
     "notes": [
@@ -1099,12 +1099,12 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-12T10:51:26.165Z",
+    "checkedAt": "2026-11-12T14:52:02.273Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1787,7 +1787,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-12T10:50:51.368Z",
+      "decidedAt": "2026-11-12T14:51:39.570Z",
       "failureCodes": []
     },
     "notes": [
@@ -1800,12 +1800,12 @@
     "tier": "installed-alpha",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-12T10:51:26.166Z",
+    "checkedAt": "2026-11-12T14:52:02.273Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2525,7 +2525,7 @@
       {
         "id": "E4-UPGRADE-FAULTS",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
       },
       {
         "id": "E7-OWNERSHIP-COPY",
@@ -2540,7 +2540,7 @@
       {
         "id": "E4-UPGRADE-ROLLBACK",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
       },
       {
         "id": "E4-UPGRADE-CROSS-SCHEMA",
@@ -2556,29 +2556,14 @@
     "failures": [
       {
         "code": "case_not_pass",
-        "detail": "Required case E4-UPGRADE-FAULTS is NOT_TESTED",
-        "caseId": "E4-UPGRADE-FAULTS"
-      },
-      {
-        "code": "case_not_pass",
         "detail": "Required case E6-CURRENT-MAIN-INSTALL is NOT_TESTED",
         "caseId": "E6-CURRENT-MAIN-INSTALL"
-      },
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E4-UPGRADE-ROLLBACK is NOT_TESTED",
-        "caseId": "E4-UPGRADE-ROLLBACK"
-      },
-      {
-        "code": "required_evidence_missing",
-        "detail": "Case E4-UPGRADE-ROLLBACK has no substantive evidence.upgrade",
-        "caseId": "E4-UPGRADE-ROLLBACK"
       }
     ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-12T10:50:51.368Z",
+      "decidedAt": "2026-11-12T14:51:39.570Z",
       "failureCodes": []
     },
     "notes": [
@@ -2591,12 +2576,12 @@
     "tier": "advisory-routing",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-12T10:51:26.166Z",
+    "checkedAt": "2026-11-12T14:52:02.274Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3284,7 +3269,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-12T10:50:51.368Z",
+      "decidedAt": "2026-11-12T14:51:39.570Z",
       "failureCodes": []
     },
     "notes": [
@@ -3297,12 +3282,12 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-12T10:51:26.167Z",
+    "checkedAt": "2026-11-12T14:52:02.275Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4010,7 +3995,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-12T10:50:51.368Z",
+      "decidedAt": "2026-11-12T14:51:39.570Z",
       "failureCodes": []
     },
     "notes": [
@@ -4023,12 +4008,12 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-12T10:51:26.167Z",
+    "checkedAt": "2026-11-12T14:52:02.275Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4746,7 +4731,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-12T10:50:51.368Z",
+      "decidedAt": "2026-11-12T14:51:39.570Z",
       "failureCodes": []
     },
     "notes": [
@@ -4759,12 +4744,12 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-12T10:51:26.168Z",
+    "checkedAt": "2026-11-12T14:52:02.276Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5447,7 +5432,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-12T10:50:51.368Z",
+      "decidedAt": "2026-11-12T14:51:39.570Z",
       "failureCodes": []
     },
     "notes": [
@@ -5460,12 +5445,12 @@
     "tier": "local-alpha",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-12T10:51:26.168Z",
+    "checkedAt": "2026-11-12T14:52:02.276Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -6185,7 +6170,7 @@
       {
         "id": "E4-UPGRADE-FAULTS",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
       },
       {
         "id": "E7-OWNERSHIP-COPY",
@@ -6200,7 +6185,7 @@
       {
         "id": "E4-UPGRADE-ROLLBACK",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
       },
       {
         "id": "E4-UPGRADE-CROSS-SCHEMA",
@@ -6216,29 +6201,14 @@
     "failures": [
       {
         "code": "case_not_pass",
-        "detail": "Required case E4-UPGRADE-FAULTS is NOT_TESTED",
-        "caseId": "E4-UPGRADE-FAULTS"
-      },
-      {
-        "code": "case_not_pass",
         "detail": "Required case E6-CURRENT-MAIN-INSTALL is NOT_TESTED",
         "caseId": "E6-CURRENT-MAIN-INSTALL"
-      },
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E4-UPGRADE-ROLLBACK is NOT_TESTED",
-        "caseId": "E4-UPGRADE-ROLLBACK"
-      },
-      {
-        "code": "required_evidence_missing",
-        "detail": "Case E4-UPGRADE-ROLLBACK has no substantive evidence.upgrade",
-        "caseId": "E4-UPGRADE-ROLLBACK"
       }
     ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-12T10:50:51.368Z",
+      "decidedAt": "2026-11-12T14:51:39.570Z",
       "failureCodes": []
     },
     "notes": [
@@ -6251,12 +6221,12 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-12T10:51:26.169Z",
+    "checkedAt": "2026-11-12T14:52:02.277Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -6976,7 +6946,7 @@
       {
         "id": "E4-UPGRADE-FAULTS",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
       },
       {
         "id": "E7-OWNERSHIP-COPY",
@@ -6991,7 +6961,7 @@
       {
         "id": "E4-UPGRADE-ROLLBACK",
         "required": true,
-        "status": "NOT_TESTED"
+        "status": "PASS"
       },
       {
         "id": "E4-UPGRADE-CROSS-SCHEMA",
@@ -7017,23 +6987,8 @@
     "failures": [
       {
         "code": "case_not_pass",
-        "detail": "Required case E4-UPGRADE-FAULTS is NOT_TESTED",
-        "caseId": "E4-UPGRADE-FAULTS"
-      },
-      {
-        "code": "case_not_pass",
         "detail": "Required case E6-CURRENT-MAIN-INSTALL is NOT_TESTED",
         "caseId": "E6-CURRENT-MAIN-INSTALL"
-      },
-      {
-        "code": "case_not_pass",
-        "detail": "Required case E4-UPGRADE-ROLLBACK is NOT_TESTED",
-        "caseId": "E4-UPGRADE-ROLLBACK"
-      },
-      {
-        "code": "required_evidence_missing",
-        "detail": "Case E4-UPGRADE-ROLLBACK has no substantive evidence.upgrade",
-        "caseId": "E4-UPGRADE-ROLLBACK"
       },
       {
         "code": "missing_required_case",
@@ -7064,7 +7019,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-12T10:50:51.368Z",
+      "decidedAt": "2026-11-12T14:51:39.570Z",
       "failureCodes": []
     },
     "notes": [

@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "e1e0c97",
-  "checkpoint": "227d133",
-  "head": "b8661f0425d82b96bca3d821917d7ffa00951403",
+  "base": "1453cf2",
+  "checkpoint": "3e77025",
+  "head": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-12T10:50:51.351Z",
+  "checkedAt": "2026-11-12T14:51:39.555Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -27,7 +27,7 @@
       ],
       "result": "PASS",
       "counts": {
-        "PASS": 78
+        "PASS": 84
       },
       "cases": [
         {
@@ -287,6 +287,36 @@
         },
         {
           "id": "E1-MUTATE-WRONG-ARTIFACT-TUPLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-PASS-EMPTY-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-SUBJECT-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-SUBJECT-SHA-SIZE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-SUBJECT-BUILD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-MODE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-WRONG-RUN",
           "status": "PASS",
           "reason": null
         },
@@ -766,8 +796,8 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 15,
-        "NOT_TESTED": 5
+        "PASS": 17,
+        "NOT_TESTED": 3
       },
       "cases": [
         {
@@ -842,8 +872,8 @@
         },
         {
           "id": "E4-UPGRADE-ROLLBACK",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: the default baseline schema 16 differs from target schema 18; an older binary cannot start on the newer state, and no second frozen build with schema 18 is available. Cross-schema refusal is measured by E4-UPGRADE-CROSS-SCHEMA; the prior schema15 same-schema upgrade/rollback result remains scoped to its old tuple."
+          "status": "PASS",
+          "reason": null
         },
         {
           "id": "E4-UPGRADE-CROSS-SCHEMA",
@@ -857,8 +887,8 @@
         },
         {
           "id": "E4-UPGRADE-FAULTS",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: the bounded managed-upgrade probe covers the confirmed switch, new data, binary rollback and a tampered target. D exposes PA_UPGRADE_FAULT crash windows and whole-process guards, but exercising them reliably needs a longer isolated run; this case stays NOT_TESTED rather than counting two fixture starts as an upgrade result."
+          "status": "PASS",
+          "reason": null
         },
         {
           "id": "E4-RECOVERY-PREFLIGHT",
@@ -881,7 +911,7 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "NOT_TESTED": 2
+        "NOT_TESTED": 3
       },
       "cases": [
         {
@@ -893,6 +923,11 @@
           "id": "E5-RECOVERY-INTERRUPTION",
           "status": "NOT_TESTED",
           "reason": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
+        },
+        {
+          "id": "E5-D-OWNERSHIP-MOCKS",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: wave14 actual self-owned checks cover requested data root, copied record and wrong install; D's new identity UID/argv/operation, foreign journal scope, per-PID scan failure, malformed inventory and old/new install-role mocks were not independently reproduced in this checkout. Required: import the current D ownership functions with injected inventory/signals and assert UNKNOWN/refusal for each, before any broad live cleanup matrix."
         }
       ]
     },
@@ -927,7 +962,7 @@
         {
           "id": "E6-CURRENT-MAIN-INSTALL",
           "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: measured D tuple build 1a2f34ac359a5739, schema 18, context=true, history=false, sources=false, replyResults=true; current main schema 18. Required: an accurate D tar from current main with context/history/sources/replyResults, then a fresh cold personal install and independent mocked context/reply."
+          "reason": "NOT_TESTED: actual probe extracted 3ead6a26161f4c72, first-run=OK, personal start=BLOCKED/none, instanceMode=null; capabilities context=true, history=true, sources=true, replyResults=true, discussionReadiness=false. This tuple is not the current-main M1 package; it was executed, not relabeled. Required: freeze a D tar containing the e1e0c97/d9d347e/b2b1adb product paths, then run the same personal probe plus context/history/source/reply."
         }
       ]
     },
@@ -1020,12 +1055,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-12T10:50:51.368Z",
+    "checkedAt": "2026-11-12T14:51:39.570Z",
     "source": {
-      "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+      "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
       "dirty": false
     },
-    "expectedSource": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "expectedSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1690,36 +1725,36 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T10-47-00-291Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-12T14-46-51-240Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
     "wave09Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave09-status.json",
-    "wave13Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave13-status.json",
+    "wave14Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave14-status.json",
     "wave08Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave08-status.json",
     "wave07Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave07-status.json",
     "wave06Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave06-status.json",
@@ -1896,20 +1931,20 @@
       "gaps": [
         "安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。",
         "旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。",
-        "E6-CURRENT-MAIN-INSTALL：按 E6-ARTIFACT-CURRENT-SCOPE 实测 schema/context 能力动态判断；当前 tuple 与 current main schema 不同时保留 NOT_TESTED，旧安装结果保持原 tuple scope。"
+        "E6-CURRENT-MAIN-INSTALL：99832f6 实测 context/history/sources/replyResults=true，但 discussionReadiness=false；无执行器 personal 探针实际 BLOCKED，因此不是当前 M1 安装。"
       ]
     },
     {
       "id": "two-binary-upgrade",
       "gaps": [
-        "E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口仍未稳定执行，保持 NOT_TESTED；不得以两次 fixture start 代替。",
+        "已执行 crash_after_stop、crash_after_stop_kill、target_unhealthy 三窗口 recovering previous + data preserved；pointer/spawn/record/ACK after-switch 仍未单独注入。",
         "升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。"
       ]
     },
     {
       "id": "install-host-guards",
       "gaps": [
-        "E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。"
+        "E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。E5-D-OWNERSHIP-MOCKS 的 UID/argv/operation/journal/scanner/role mock 仍 NOT_TESTED。"
       ]
     },
     {
@@ -1959,17 +1994,17 @@
     {
       "owner": "D",
       "code": "current_tar_incomplete",
-      "detail": "NOT_TESTED: measured D tuple build 1a2f34ac359a5739, schema 18, context=true, history=false, sources=false, replyResults=true; current main schema 18. Required: an accurate D tar from current main with context/history/sources/replyResults, then a fresh cold personal install and independent mocked context/reply."
-    },
-    {
-      "owner": "D",
-      "code": "upgrade_faults_not_tested",
-      "detail": "NOT_TESTED: the bounded managed-upgrade probe covers the confirmed switch, new data, binary rollback and a tampered target. D exposes PA_UPGRADE_FAULT crash windows and whole-process guards, but exercising them reliably needs a longer isolated run; this case stays NOT_TESTED rather than counting two fixture starts as an upgrade result."
+      "detail": "NOT_TESTED: actual probe extracted 3ead6a26161f4c72, first-run=OK, personal start=BLOCKED/none, instanceMode=null; capabilities context=true, history=true, sources=true, replyResults=true, discussionReadiness=false. This tuple is not the current-main M1 package; it was executed, not relabeled. Required: freeze a D tar containing the e1e0c97/d9d347e/b2b1adb product paths, then run the same personal probe plus context/history/source/reply."
     },
     {
       "owner": "B",
       "code": "production_control_not_consumed",
       "detail": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+    },
+    {
+      "owner": "D",
+      "code": "ownership_mocks_not_reproduced",
+      "detail": "NOT_TESTED: wave14 actual self-owned checks cover requested data root, copied record and wrong install; D's new identity UID/argv/operation, foreign journal scope, per-PID scan failure, malformed inventory and old/new install-role mocks were not independently reproduced in this checkout. Required: import the current D ownership functions with injected inventory/signals and assert UNKNOWN/refusal for each, before any broad live cleanup matrix."
     },
     {
       "owner": "main",

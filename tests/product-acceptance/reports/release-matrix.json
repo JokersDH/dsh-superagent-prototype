@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "b8661f0425d82b96bca3d821917d7ffa00951403",
+    "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
     "dirty": false
   },
   "environment": {
@@ -11,17 +11,17 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-12T10:50:51.351Z",
+  "checkedAt": "2026-11-12T14:51:39.555Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 153,
+    "PASS": 161,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 18,
+    "NOT_TESTED": 17,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
@@ -617,7 +617,7 @@
       "gaps": [
         "安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。",
         "旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。",
-        "E6-CURRENT-MAIN-INSTALL：按 E6-ARTIFACT-CURRENT-SCOPE 实测 schema/context 能力动态判断；当前 tuple 与 current main schema 不同时保留 NOT_TESTED，旧安装结果保持原 tuple scope。"
+        "E6-CURRENT-MAIN-INSTALL：99832f6 实测 context/history/sources/replyResults=true，但 discussionReadiness=false；无执行器 personal 探针实际 BLOCKED，因此不是当前 M1 安装。"
       ],
       "evidence": [
         "E6-ARTIFACT-CURRENT-SCOPE",
@@ -639,14 +639,15 @@
       "controlledFixture": "NOT_TESTED",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
-      "installed": "NOT_TESTED",
+      "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "E4-UPGRADE-FAULTS：PA_UPGRADE_FAULT 崩溃窗口仍未稳定执行，保持 NOT_TESTED；不得以两次 fixture start 代替。",
+        "已执行 crash_after_stop、crash_after_stop_kill、target_unhealthy 三窗口 recovering previous + data preserved；pointer/spawn/record/ACK after-switch 仍未单独注入。",
         "升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。"
       ],
       "evidence": [
         "E4-UPGRADE-ROLLBACK",
+        "E4-UPGRADE-FAULTS",
         "E4-UPGRADE-CROSS-SCHEMA"
       ]
     },
@@ -659,7 +660,7 @@
       "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。"
+        "E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。E5-D-OWNERSHIP-MOCKS 的 UID/argv/operation/journal/scanner/role mock 仍 NOT_TESTED。"
       ],
       "evidence": [
         "E4-INSTALL-HOST-GUARDS",

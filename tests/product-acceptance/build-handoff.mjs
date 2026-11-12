@@ -309,7 +309,7 @@ const CAPABILITIES = [
     id: 'install-host-guards',
     label: '模式保持、未知活 PID 阻断与不误杀',
     installed: ['E4-INSTALL-HOST-GUARDS', 'E4-MULTI-STATE', 'E7-OWNERSHIP-COPY', 'E7-OWNERSHIP-WRONG-INSTALL'],
-    notTested: ['E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。'],
+    notTested: ['E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。E5-D-OWNERSHIP-MOCKS 的 UID/argv/operation/journal/scanner/role mock 仍 NOT_TESTED。'],
   },
   {
     id: 'proposal-http',
@@ -460,6 +460,8 @@ const executionStatus = {
     if (faults?.status === 'NOT_TESTED') entries.push({ owner: 'D', code: 'upgrade_faults_not_tested', detail: faults.reason })
     if (byId.get('E4-B-PRODUCTION-RECOVERY')?.status === 'NOT_TESTED') entries.push({ owner: 'B',
       code: 'production_control_not_consumed', detail: byId.get('E4-B-PRODUCTION-RECOVERY').reason })
+    if (byId.get('E5-D-OWNERSHIP-MOCKS')?.status === 'NOT_TESTED') entries.push({ owner: 'D',
+      code: 'ownership_mocks_not_reproduced', detail: byId.get('E5-D-OWNERSHIP-MOCKS').reason })
     if (byId.get('E5-RECOVERY-INTERRUPTION')?.status === 'NOT_TESTED') entries.push({ owner: 'main',
       code: 'recovery_activation_missing', detail: byId.get('E5-RECOVERY-INTERRUPTION').reason })
     return entries
