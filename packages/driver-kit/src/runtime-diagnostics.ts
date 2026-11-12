@@ -21,8 +21,9 @@
  * filesystem look are read-only.
  */
 import { execFileSync } from 'node:child_process'
+import { delimiter, isAbsolute, join as joinPath } from 'node:path'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs'
+import { accessSync, constants as fsConstants, existsSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
@@ -67,6 +68,8 @@ export type RuntimeIdentity = {
   model: string | null
   modelProvider: string | null
   pathRedacted?: boolean
+  /** Every path the structural lookup considered, so a failure is diagnosable without a shell. */
+  searchedPaths?: string[]
 }
 
 /** Measured host enforcement availability. */
@@ -192,9 +195,48 @@ function run(command: string, args: string[], timeoutMs = 20_000): { ok: boolean
  * `sha256` of the real file is what makes the identity comparable across upgrades: a version string
  * can repeat while the bytes change. Both are reported, and either being missing fails the light.
  */
+/**
+ * Resolve a binary to an absolute path WITHOUT a shell.
+ *
+ * Shelling out to `command -v <name>` loses a path that contains spaces or non-ASCII characters,
+ * because the shell re-tokenizes it. An operator may legitimately select such an executable, so the
+ * lookup is done structurally instead: an absolute input is used as given, and a bare name is
+ * searched across PATH by joining and testing each entry.
+ */
+export function resolveExecutablePath(binary: string): { path: string | null; searched: string[]; reason: string | null } {
+  const searched: string[] = []
+  const isExecutableFile = (candidate: string): boolean => {
+    try {
+      // statSync follows symlinks: an operator-selected path is legitimately a symlink to the real
+      // executable, so testing the link itself would reject a perfectly valid selection.
+      const stat = statSync(candidate)
+      if (!stat.isFile()) return false
+      accessSync(candidate, fsConstants.X_OK)
+      return true
+    } catch {
+      return false
+    }
+  }
+  // An absolute or relative path is taken verbatim; no tokenization happens at all.
+  if (isAbsolute(binary) || binary.includes('/')) {
+    searched.push(binary)
+    return isExecutableFile(binary)
+      ? { path: binary, searched, reason: null }
+      : { path: null, searched, reason: `"${binary}" is not an executable file` }
+  }
+  for (const entry of (process.env.PATH ?? '').split(delimiter)) {
+    if (entry === '') continue
+    const candidate = joinPath(entry, binary)
+    searched.push(candidate)
+    if (isExecutableFile(candidate)) return { path: candidate, searched, reason: null }
+  }
+  return { path: null, searched, reason: `"${binary}" was not found in PATH` }
+}
+
 export function resolveRuntimeIdentity({ binary = 'codex' }: { binary?: string } = {}): RuntimeIdentity {
-  const located = run('sh', ['-c', `command -v ${binary} 2>/dev/null || true`])
-  const declaredPath = located.value || null
+  const searched = resolveExecutablePath(binary)
+  const declaredPath = searched.path
+  const searchReason = searched.reason
   let realPath = null
   let digest = null
   let bytes = null
@@ -210,7 +252,10 @@ export function resolveRuntimeIdentity({ binary = 'codex' }: { binary?: string }
       realPath = null
     }
   }
-  const version = declaredPath ? run(binary, ['--version']) : { ok: false, value: null, error: 'binary not on PATH' }
+  // Invoke the RESOLVED absolute path so the version comes from the same file the digest covers.
+  const version = declaredPath
+    ? run(declaredPath, ['--version'])
+    : { ok: false, value: null, error: searchReason ?? 'binary not found' }
   return {
     binary,
     declaredPath,
@@ -219,7 +264,8 @@ export function resolveRuntimeIdentity({ binary = 'codex' }: { binary?: string }
     bytes,
     version: version.ok ? version.value : null,
     versionRaw: version.ok ? version.value : null,
-    versionError: version.ok ? null : (version.error ?? null),
+    versionError: version.ok ? null : (version.error ?? searchReason ?? null),
+    searchedPaths: searched.searched,
     platform: process.platform,
     arch: process.arch,
     node: process.version,
@@ -302,6 +348,13 @@ export function describeRuntime(options: RuntimeDescriptionOptions = {}): Runtim
         ...observed,
         declaredPath: observed.declaredPath ? '[redacted]' : null,
         realPath: observed.realPath ? '[redacted]' : null,
+        // The structural lookup records every candidate it tried, which are PATH entries and can
+        // contain a home directory. The count is useful for a failure; the paths are private.
+        // Spread rather than assign so the key is omitted entirely when there is nothing to say,
+        // which is what exactOptionalPropertyTypes requires.
+        ...(observed.searchedPaths
+          ? { searchedPaths: [`[redacted ${observed.searchedPaths.length} candidate path(s)]`] }
+          : {}),
         pathRedacted: true,
       }
   const enforcement = probeHostEnforcement()

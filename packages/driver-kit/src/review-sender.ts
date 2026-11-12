@@ -16,6 +16,7 @@
 import { admitSend, consumeSendToken, inspectToken } from './send-admission.ts'
 
 import type {
+  AdmissionRequest,
   AdmissionToken,
   GateClaim,
   GateSet,
@@ -105,9 +106,14 @@ export function createReviewSender(input: ReviewSenderInput = {}): ReviewSender 
    */
   async function send(attempt: ReviewSendInput = {}): Promise<ReviewSendResult> {
     const { caseRef, turn = 1, subject = null, input, gates = {}, modelIdentity = null } = attempt
-    // Snapshot the admitted input synchronously. A caller that mutates its object while the
-    // reservation is awaited must not be able to change what the transport receives.
-    const payload = snapshotInput(input)
+    // Snapshot the admitted input synchronously, BEFORE any admission, reservation or transport work.
+    // A caller that mutates its object while the reservation is awaited must not change what the
+    // transport receives, and an uncloneable input must not reach the wire at all.
+    const snapshot = snapshotInput(input)
+    if (snapshot.ok === false) {
+      return { sent: false, status: NO_SEND, reason: snapshot.reason, attempts, sends }
+    }
+    const payload = snapshot.value
     attempts += 1
 
     // The bound gate is the measured runtime, never a caller assertion. A caller may only make the
@@ -131,18 +137,17 @@ export function createReviewSender(input: ReviewSenderInput = {}): ReviewSender 
         : gates?.model_identity ?? { satisfied: false, reason: 'no model identity was measured' },
     }
 
-    const admitted = admitSend({
-      grant,
-      gates: mergedGates,
-      hook,
-      transport,
-      caseRef: caseRef ?? null,
-      turn,
-      subject,
-      profile,
-      hostPolicy,
-      audit,
-    })
+    // Build the request by adding only the keys that actually have a value. Passing `undefined`
+    // for an absent optional property is not the same as omitting it under
+    // exactOptionalPropertyTypes, and main compiles its consumers with that rule on.
+    const admissionRequest: AdmissionRequest = { gates: mergedGates, caseRef: caseRef ?? null, turn, subject }
+    if (grant !== undefined && grant !== null) admissionRequest.grant = grant
+    if (hook !== undefined && hook !== null) admissionRequest.hook = hook
+    if (transport !== undefined && transport !== null) admissionRequest.transport = transport
+    if (audit !== undefined && audit !== null) admissionRequest.audit = audit
+    if (profile !== undefined && profile !== null) admissionRequest.profile = profile
+    if (hostPolicy !== undefined && hostPolicy !== null) admissionRequest.hostPolicy = hostPolicy
+    const admitted = admitSend(admissionRequest)
 
     if (admitted.verdict !== 'ADMITTED') {
       return {
@@ -158,7 +163,11 @@ export function createReviewSender(input: ReviewSenderInput = {}): ReviewSender 
 
     // The admitted input is snapshotted here and the SAME reference is what gets sent, so a caller
     // mutating it while the reservation is awaited cannot change what the transport receives.
-    const consumed = await consumeSendToken(admitted.token, { transport, hook, input: payload })
+    // Same rule for the consume call: only the bound objects that exist are passed.
+    const consumeRequest: { transport?: SenderTransport; hook?: ReservationHook; input?: unknown } = { input: payload }
+    if (transport !== undefined && transport !== null) consumeRequest.transport = transport
+    if (hook !== undefined && hook !== null) consumeRequest.hook = hook
+    const consumed = await consumeSendToken(admitted.token, consumeRequest)
     if (consumed.sent === true) sends += 1
     return {
       sent: consumed.sent === true,
@@ -197,14 +206,15 @@ export function createReviewSender(input: ReviewSenderInput = {}): ReviewSender 
  * A structured clone is used so nested objects cannot be mutated through the caller's reference; the
  * copy is frozen so this module cannot mutate it either.
  */
-function snapshotInput(input: unknown): unknown {
-  if (input === null || input === undefined) return input
-  if (typeof input !== 'object') return input
+function snapshotInput(input: unknown): { ok: true; value: unknown } | { ok: false; reason: string } {
+  if (input === null || input === undefined) return { ok: true, value: input }
+  if (typeof input !== 'object') return { ok: true, value: input }
   try {
-    return deepFreeze(structuredClone(input))
-  } catch {
-    // A value that cannot be cloned is refused rather than passed through by reference.
-    return Object.freeze({ refused: 'the admitted input could not be snapshotted, so nothing may be sent' })
+    return { ok: true, value: deepFreeze(structuredClone(input)) }
+  } catch (error) {
+    // A value that cannot be cloned is REFUSED. Passing a placeholder object onward would mean
+    // reserving budget and sending stand-in text as model input, which is worse than refusing.
+    return { ok: false, reason: `the admitted input cannot be snapshotted, so nothing is reserved or sent: ${error instanceof Error ? error.message : String(error)}` }
   }
 }
 
@@ -223,21 +233,38 @@ function deepFreeze<T>(value: T): T {
  * transport it reports why, which is the supported answer today.
  */
 export async function send(request: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
-  const { admission: envelope, reservationId = null, input, caseRef = null } = request
-  const facts = (envelope as { facts?: { entry?: { owner?: string; kind?: string; protocolVersion?: string } } } | undefined)?.facts?.entry
+  // E calls this as `send({ protocolVersion, reservationId, ...turn })`, so the version and the
+  // reservation id arrive at the TOP level. A nested descriptor is accepted too, but the flat form
+  // is what E actually sends and is therefore the contract that has to work.
+  const nested = (request.admission as { facts?: { entry?: { protocolVersion?: string; kind?: string } } } | undefined)?.facts?.entry
+  const protocolVersion = (request.protocolVersion as string | undefined) ?? nested?.protocolVersion
+  const reservationId = (request.reservationId as string | undefined) ?? null
+  const caseRef = (request.caseRef as string | undefined) ?? null
+  const input = request.input
+  const entryKind = (request.entry as { kind?: string } | undefined)?.kind ?? nested?.kind
 
-  // Refuse anything that is not the agreed B-sender binding rather than guessing an alternative.
-  if (!facts || facts.protocolVersion !== 'review-sender/1' || facts.kind !== 'b-sender') {
+  // A reservation identity is required by the agreed envelope; without one there is nothing to echo.
+  if (typeof reservationId !== 'string' || reservationId.trim() === '') {
     return {
       protocol: 'review-sender/1',
       sent: false,
       status: NO_SEND,
-      reason: 'the request does not name a review-sender/1 b-sender entry, so this module is not the consumer for it',
+      reason: 'the request carries no reservationId, so this sender has no reservation identity to keep',
       reservationId,
     }
   }
 
-  // There is no owned transport and no measured bound in a module-level call, so the honest answer is
+  if (protocolVersion !== 'review-sender/1' || (entryKind !== undefined && entryKind !== 'b-sender')) {
+    return {
+      protocol: 'review-sender/1',
+      sent: false,
+      status: NO_SEND,
+      reason: `the request is not a review-sender/1 b-sender call, so this module is not its consumer`,
+      reservationId,
+    }
+  }
+
+  // The module-level entry has no owned transport and no measured bound, so the supported answer is
   // a refusal that names both. A caller cannot supply either through this entry.
   return {
     protocol: 'review-sender/1',
