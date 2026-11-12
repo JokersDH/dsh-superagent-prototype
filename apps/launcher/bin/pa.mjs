@@ -15,6 +15,7 @@ import { readLauncherConfig } from '../lib/config.mjs'
 import { runDoctor } from '../lib/doctor.mjs'
 import { firstRun } from '../lib/first-run.mjs'
 import { readInstanceRecord, verifyInstance } from '../lib/instance.mjs'
+import { requestedScopeCheck } from '../lib/identity.mjs'
 import { recoveryStatus, recoverySummary } from '../lib/recovery.mjs'
 import { RECOVERY_COMMIT_REQUIREMENTS, RecoveryAuthorizationError, recoveryInspect, recoveryPrepare } from '../lib/recovery-authorization.mjs'
 import { readRelease } from '../lib/release.mjs'
@@ -376,6 +377,14 @@ async function main(argv) {
       printResult({
         json: json ? { status: 'STOPPED', installRoot, roots } : null,
         human: `status: STOPPED\n  install: ${installRoot}\n  state: ${roots.data}\n  hint: pa start`,
+      })
+      return 2
+    }
+    const scope = requestedScopeCheck({ roots, record })
+    if (!scope.ok) {
+      printResult({
+        json: json ? { status: 'BLOCKED', code: 'requested_root_mismatch', detail: scope, installRoot, roots } : null,
+        human: `status: BLOCKED\n  code: requested_root_mismatch\n  requested: ${JSON.stringify(scope.requested)}\n  recorded: ${JSON.stringify(scope.recorded)}\n  hint: use the record's roots; nothing was stopped`,
       })
       return 2
     }

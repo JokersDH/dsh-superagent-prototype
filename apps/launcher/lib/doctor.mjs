@@ -21,6 +21,7 @@ import {
   readAuthorEvidence,
 } from './diagnostics.mjs'
 import { readInstanceRecord, verifyInstance } from './instance.mjs'
+import { requestedScopeCheck } from './identity.mjs'
 import { recoverySummary } from './recovery.mjs'
 import {
   SUPPORTED_NODE,
@@ -266,6 +267,10 @@ export async function runDoctor({ installRoot, roots, deep = false, executorsFix
   }
   if (instanceRecord === null) {
     checks.push(warn('instance', { message: 'No managed instance is recorded; run `pa start`.' }))
+  } else if (!requestedScopeCheck({ roots, record: instanceRecord }).ok) {
+    const scope = requestedScopeCheck({ roots, record: instanceRecord })
+    checks.push(fail('instance', { pid: instanceRecord.pid, code: 'requested_root_mismatch', requested: scope.requested, recorded: scope.recorded,
+      hint: 'The recorded instance belongs to another state/install; run the command with that record\'s roots.' }))
   } else {
     const verification = await verifyInstance(instanceRecord)
     checks.push(

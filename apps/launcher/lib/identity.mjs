@@ -38,6 +38,35 @@ export function identityDifferences(record, desired) {
   return differences
 }
 
+/**
+ * The requested roots must agree with the recorded instance before any command acts on it. A
+ * shared install path can serve independent state roots, so a record is never authority for a
+ * different requested data/install root: callers refuse without signalling, deleting the record or
+ * moving the pointer.
+ */
+export function requestedScopeCheck({ roots, record }) {
+  const checks = []
+  const failures = []
+  const add = (id, ok, detail) => {
+    checks.push({ id, ok, ...(detail === undefined ? {} : { detail }) })
+    if (!ok) failures.push(id)
+  }
+  const requestedState = canonicalPath(roots.data)
+  const requestedInstall = canonicalPath(roots.install)
+  const recordedState = canonicalPath(record.state)
+  const recordedInstall = canonicalPath(record.install)
+  const installMatches = recordedInstall === requestedInstall || recordedInstall === canonicalPath(join(requestedInstall, 'app'))
+  add('requested_state', recordedState === requestedState, { requested: requestedState, recorded: recordedState })
+  add('requested_install', installMatches, { requested: requestedInstall, recorded: recordedInstall })
+  return {
+    ok: failures.length === 0,
+    checks,
+    failures,
+    requested: { state: requestedState, install: requestedInstall },
+    recorded: { state: recordedState, install: recordedInstall, buildId: record.buildId ?? null, mode: record.mode ?? null },
+  }
+}
+
 /** The expected coordinator argv recorded on an instance. */
 export function expectedDaemonArgv(record) {
   const argv = [

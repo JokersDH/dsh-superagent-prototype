@@ -4,6 +4,7 @@
  * an unknown process, stale record with a live listener, or stop timeout is reported, not hidden.
  */
 import { readInstanceRecord, processAlive, removeInstanceRecord, stopProcess, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
+import { requestedScopeCheck } from './identity.mjs'
 
 const record_removed_code = 'instance_record_removed'
 
@@ -30,6 +31,20 @@ export async function stopInstance({ roots, timeoutMs = 8000 }) {
     }
   }
   if (record === null) return { ok: true, status: 'STOPPED', detail: { note: 'no managed instance is recorded' } }
+
+  // A record only describes the roots it was written for. A stop aimed at another requested state or
+  // install must refuse before touching a pid or deleting the record.
+  const scope = requestedScopeCheck({ roots, record })
+  if (!scope.ok) {
+    return {
+      ok: false,
+      status: 'BLOCKED',
+      code: 'requested_root_mismatch',
+      message: '请求的私有根与实例记录不一致；不结束任何进程、不删除记录',
+      detail: scope,
+      hint: '用记录所属的 --config-root/--data-root/--install 调用，或先核对 `pa doctor`。',
+    }
+  }
 
   const verification = await verifyInstance(record)
   if (verification.ok) {

@@ -18,6 +18,7 @@ import { daemonArgv, spawnDaemon } from './daemon.mjs'
 import { probeAuthorExecutor, probeRuntime, readAuthorEvidence } from './diagnostics.mjs'
 import { canonicalPath, identityDifferences } from './identity.mjs'
 import { captureProcessFacts, processStart, readInstanceRecord, removeInstanceRecord, verifyInstance, writeInstanceRecord } from './instance.mjs'
+import { requestedScopeCheck } from './identity.mjs'
 import { StartLockHeld, acquireStartLock } from './start-lock.mjs'
 import { expectedStartupMode, recoverySummary } from './recovery.mjs'
 import { httpGet } from './http-probe.mjs'
@@ -173,6 +174,14 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
     return blocked('invalid_instance_record', '实例记录不可信，拒绝复用', { cause: error.message, code: error.code }, '运行 `pa doctor` 检查私有状态。')
   }
   if (existing !== null) {
+    const scope = requestedScopeCheck({ roots, record: existing })
+    if (!scope.ok)
+      return blocked(
+        'requested_root_mismatch',
+        '实例记录属于其他 state/install；不复用、不结束该进程',
+        { scope },
+        '用记录所属的参数启动，或对该实例执行 `pa stop`；不会按 PID 猜测。',
+      )
     const verification = await verifyInstance(existing)
     if (!verification.ok)
       return blocked(

@@ -28,6 +28,7 @@ import { dirname, join, resolve } from 'node:path'
 import { realpathSync } from 'node:fs'
 import { backupState } from './backup.mjs'
 import { processAlive, processStart, readInstanceRecord, removeInstanceRecord, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
+import { requestedScopeCheck } from './identity.mjs'
 import { RELEASE_FILE, readRelease, validateRelease, verifyReleaseArtifacts } from './release.mjs'
 import { hasInstallManifest, initializeRelease, releaseBinding } from './release-bootstrap.mjs'
 import { stopInstance } from './stop.mjs'
@@ -260,6 +261,11 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
   const instance = (() => { try { return readInstanceRecord(roots.config) } catch (error) {
     throw new UpgradeError('invalid_instance_record', 'The instance record is untrusted; refusing to stop or switch', { cause: error.message, code: error.code })
   } })()
+  if (instance !== null) {
+    const scope = requestedScopeCheck({ roots, record: instance })
+    if (!scope.ok)
+      throw new UpgradeError('requested_root_mismatch', 'The recorded instance belongs to another state/install; refusing to stop or switch it', { scope })
+  }
   const identity = preserveIdentity({ record: instance, explicitMode: values.mode, explicitAccess: values.access, journal: pendingJournal })
 
   // 1. Full resource barrier: launcher, API child, console listener and descendants must all be
@@ -536,6 +542,9 @@ export async function ensureResourceBarrier({ roots, target, journal }) {
   let stopped = null
   let orphan = false
   if (record !== null) {
+    const scope = requestedScopeCheck({ roots, record })
+    if (!scope.ok)
+      throw new UpgradeError('requested_root_mismatch', 'The recorded instance belongs to another state/install; refusing to stop or switch it', { scope })
     const verification = await verifyInstance(record)
     if (verification.ok) {
       const result = await stopInstance({ roots })
