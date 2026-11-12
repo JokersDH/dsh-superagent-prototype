@@ -27,8 +27,8 @@ import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readF
 import { dirname, join, resolve } from 'node:path'
 import { realpathSync } from 'node:fs'
 import { backupState } from './backup.mjs'
-import { processAlive, processStart, readInstanceRecord, removeInstanceRecord, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
-import { requestedScopeCheck } from './identity.mjs'
+import { processAlive, processStart, processUid, readInstanceRecord, removeInstanceRecord, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
+import { argvMatchesCommand, requestedScopeCheck } from './identity.mjs'
 import { RELEASE_FILE, readRelease, validateRelease, verifyReleaseArtifacts } from './release.mjs'
 import { hasInstallManifest, initializeRelease, releaseBinding } from './release-bootstrap.mjs'
 import { stopInstance } from './stop.mjs'
@@ -412,11 +412,23 @@ const spawnSyncPs = () => {
   try {
     const result = spawnSync('ps', ['-axo', 'pid=,ppid='], { encoding: 'utf8' })
     if (result.error !== undefined || result.status !== 0) return null
-    return result.stdout.split('\n').filter(Boolean)
+    const lines = result.stdout.split('\n').filter(Boolean)
+    // A malformed row is a partial/failed inventory, never an empty proven set.
+    if (!lines.every((line) => /^\s*\d+\s+\d+\s*$/.test(line))) return null
+    return lines
   } catch { return null }
 }
 
 const commandOf = (pid) => spawnSync('ps', ['-ww', '-p', String(pid), '-o', 'command='], { encoding: 'utf8' }).stdout.trim()
+
+const vitalityOf = (pid) => {
+  try { process.kill(pid, 0) } catch { return 'dead' }
+  const result = spawnSync('ps', ['-p', String(pid), '-o', 'stat='], { encoding: 'utf8' })
+  if (result.error !== undefined || result.status !== 0) return 'unknown'
+  const state = result.stdout.trim()
+  if (state === '') return 'unknown'
+  return state.startsWith('Z') ? 'dead' : 'alive'
+}
 
 const alive = (pid) => {
   try {
@@ -473,58 +485,83 @@ const listProcesses = (snapshot = spawnSyncPs()) => {
  * identity stays UNKNOWN and blocks the switch. Filtering a live candidate out of the set and then
  * reporting an empty "proven" set is not a stop proof.
  */
-export async function accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn }) {
+export async function accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, operationId }) {
   const tokens = ROOT_TOKENS(roots)
   const snapshot = spawnSyncPs()
   const scannerOk = snapshot !== null
   const treeCandidates = new Set()
   const unverifiable = []
   let pidReused = false
+  const expectedUid = typeof process.getuid === 'function' ? process.getuid() : null
   const addTree = (pid) => {
     if (!Number.isInteger(pid) || pid <= 0) return
     const tree = processTree(pid, snapshot)
     if (tree === null) return
     for (const child of tree) treeCandidates.add(child)
   }
-  // A recorded numeric pid is authority only together with its exact recorded start identity. A
-  // missing, unreadable or reused start stays UNKNOWN and contributes no tree.
-  const addVerifiedTree = async (pid, expectedStart, label) => {
+  const mismatch = (pid, label, reason, extra = {}) => {
+    unverifiable.push({ pid, label, reason, ...extra })
+  }
+  // Every registered resource must match the complete recorded identity: pid + start + uid + argv +
+  // private root + operation. One matching field (even a matching start) is not ownership.
+  const addVerified = async ({ pid, label, start, argv, uid, configRoot, dataRoot, baseDir, operation }) => {
     if (!Number.isInteger(pid) || pid <= 0) return
-    if (!alive(pid)) return
-    if (typeof expectedStart !== 'string' || expectedStart.length === 0) {
-      unverifiable.push({ pid, label, reason: 'start_missing' })
-      return
+    const vitality = vitalityOf(pid)
+    if (vitality === 'dead') return
+    if (vitality === 'unknown') { mismatch(pid, label, 'status_unknown'); return }
+    if (typeof start !== 'string' || start.length === 0) { mismatch(pid, label, 'start_missing'); return }
+    let observedStart = null
+    try { observedStart = await processStart(pid) } catch { observedStart = null }
+    if (observedStart === null || observedStart !== start) { pidReused = true; mismatch(pid, label, observedStart === null ? 'start_unreadable' : 'start_mismatch'); return }
+    const command = commandOf(pid)
+    if (command === '') { mismatch(pid, label, 'command_unreadable'); return }
+    if (argv !== undefined && (!Array.isArray(argv) || !argvMatchesCommand(argv, command, { baseDir }))) { mismatch(pid, label, 'argv_mismatch'); return }
+    if (uid !== undefined && uid !== null) {
+      const observedUid = await processUid(pid)
+      if (observedUid === null) { mismatch(pid, label, 'uid_unreadable'); return }
+      if (Number(observedUid) !== Number(uid)) { mismatch(pid, label, 'uid_mismatch', { expected: Number(uid), observed: Number(observedUid) }); return }
     }
-    let observed = null
-    try { observed = await processStart(pid) } catch { observed = null }
-    if (observed === null || observed !== expectedStart) {
-      pidReused = true
-      unverifiable.push({ pid, label, reason: observed === null ? 'start_unreadable' : 'start_mismatch' })
-      return
+    if (configRoot !== undefined && canonicalPath(configRoot) !== canonicalPath(roots.config)) { mismatch(pid, label, 'config_root_mismatch'); return }
+    if (dataRoot !== undefined && canonicalPath(dataRoot) !== canonicalPath(roots.data)) { mismatch(pid, label, 'data_root_mismatch'); return }
+    if (operation !== undefined && operation !== null && operation !== operationId) { mismatch(pid, label, 'operation_mismatch'); return }
+    if (expectedUid !== null) {
+      const observedUid = await processUid(pid)
+      if (observedUid === null) { mismatch(pid, label, 'uid_unreadable'); return }
+      if (Number(observedUid) !== expectedUid) { mismatch(pid, label, 'uid_mismatch', { expected: expectedUid, observed: Number(observedUid) }); return }
     }
     addTree(pid)
   }
   const claimed = new Set()
   if (Number.isInteger(spawnedPid) && spawnedPid > 0) {
     const expected = spawnedStart ?? (journalSpawn?.pid === spawnedPid ? journalSpawn?.processStart ?? null : null)
-    if (expected === null || expected === undefined) unverifiable.push({ pid: spawnedPid, label: 'spawn', reason: 'start_missing' })
-    else await addVerifiedTree(spawnedPid, expected, 'spawn')
+    await addVerified({ pid: spawnedPid, label: 'spawn', start: expected, baseDir: roots.install, operation: undefined })
   }
   if (journalSpawn !== undefined && journalSpawn !== null && Number.isInteger(journalSpawn.pid) && journalSpawn.pid > 0 && !claimed.has(journalSpawn.pid)) {
-    await addVerifiedTree(journalSpawn.pid, journalSpawn.processStart, 'journal')
+    await addVerified({ pid: journalSpawn.pid, label: 'journal', start: journalSpawn.processStart, argv: journalSpawn.argv,
+      uid: journalSpawn.uid, configRoot: journalSpawn.configRoot, dataRoot: journalSpawn.dataRoot ?? journalSpawn.state,
+      baseDir: roots.install, operation: journalSpawn.operationId })
   }
   if (record !== null && record !== undefined) {
-    await addVerifiedTree(record.pid, record.processStart, 'launcher')
-    await addVerifiedTree(record.apiPid, record.apiProcessStart, 'api')
+    await addVerified({ pid: record.pid, label: 'launcher', start: record.processStart, argv: record.launcherArgv, uid: record.uid, baseDir: record.install })
+    const apiVitality = Number.isInteger(record.apiPid) ? vitalityOf(record.apiPid) : 'dead'
+    if (apiVitality === 'unknown') mismatch(record.apiPid, 'api', 'status_unknown')
+    if (Number.isInteger(record.apiPid) && apiVitality === 'alive') {
+      const coordinator = await verifyCoordinatorProcess(record).catch(() => ({ ok: false, failures: ['verify_failed'] }))
+      if (!coordinator.ok) mismatch(record.apiPid, 'api', 'coordinator_identity', { failures: (coordinator.failures ?? []).slice(0, 6) })
+      else await addVerified({ pid: record.apiPid, label: 'api', start: record.apiProcessStart, argv: record.apiArgv, uid: record.apiUid,
+        configRoot: record.configRoot, baseDir: record.install, operation: record.operationId })
+    }
     if (Number.isInteger(record.consolePid) && record.consolePid !== record.pid)
-      await addVerifiedTree(record.consolePid, record.consoleProcessStart, 'console')
+      await addVerified({ pid: record.consolePid, label: 'console', start: record.consoleProcessStart, uid: record.uid, baseDir: record.install })
   }
 
   const discovered = listProcesses(snapshot)
   const owned = []
   const unknownLive = []
   for (const pid of treeCandidates) {
-    if (pid === process.pid || !alive(pid)) continue
+    if (pid === process.pid) continue
+    const vitality = vitalityOf(pid)
+    if (vitality !== 'alive') continue
     const command = commandOf(pid)
     if (command !== '' && commandMatchesIdentity(command, tokens)) owned.push({ pid, command })
     else unknownLive.push({ pid, command: command === '' ? 'unknown' : command })
@@ -533,7 +570,8 @@ export async function accountRegisteredResources({ roots, target, record, spawne
   for (const entry of discovered ?? []) {
     const { pid, ppid } = entry
     if (!Number.isInteger(pid) || !Number.isInteger(ppid)) continue
-    if (pid === process.pid || treeCandidates.has(pid) || claimed.has(pid) || !alive(pid)) continue
+    if (pid === process.pid || treeCandidates.has(pid) || claimed.has(pid)) continue
+    if (vitalityOf(pid) !== 'alive') continue
     const command = commandOf(pid)
     if (command !== '' && commandMatchesIdentity(command, tokens)) unregistered.push({ pid, command })
   }
@@ -541,8 +579,8 @@ export async function accountRegisteredResources({ roots, target, record, spawne
   return { owned, unknownLive, unregistered, unverifiable, considered: treeCandidates.size, pidReused, scannerOk }
 }
 
-export async function stopRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn }) {
-  const accounted = await accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn })
+export async function stopRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, operationId }) {
+  const accounted = await accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, operationId })
   const stopped = []
   for (const { pid } of accounted.owned) {
     try { process.kill(pid, 'SIGTERM'); stopped.push(pid) } catch { /* gone */ }
@@ -804,7 +842,7 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
     const recordedInstall = canonicalPath(recorded.install ?? '')
     const roles = [journal.from?.installRoot, journal.from?.installDir, journal.to?.installRoot, journal.to?.installDir]
       .filter((value) => typeof value === 'string' && value.length > 0)
-    const allowed = [...new Set(roles.flatMap((value) => [canonicalPath(value), canonicalPath(join(value, 'app')), canonicalPath(dirname(value))]))]
+    const allowed = [...new Set(roles.flatMap((value) => [canonicalPath(value), canonicalPath(join(value, 'app'))]))]
     const requestedRole = canonicalPath(installRoot)
     // A confirming/starting branch writes the journal terminal state for an operation that began under
     // a specific role pair, so the requested tool install must also be one of those roles. Cleanup or

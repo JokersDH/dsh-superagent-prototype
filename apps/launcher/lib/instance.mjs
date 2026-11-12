@@ -246,6 +246,12 @@ export async function processCommand(pid) {
   return command('ps', ['-ww', '-p', String(pid), '-o', 'command='])
 }
 
+/** Numeric owner uid of one pid, or null when ps cannot answer. */
+export async function processUid(pid) {
+  const value = await command('ps', ['-p', String(pid), '-o', 'uid='])
+  return value !== null && /^\d+$/.test(value) ? Number(value) : null
+}
+
 export async function listenersOnPort(port) {
   const output = await command('lsof', ['-nP', '-iTCP:' + String(port), '-sTCP:LISTEN', '-Fn'])
   if (output === null) return { supported: true, pids: [] }
