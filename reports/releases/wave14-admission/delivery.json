@@ -1,0 +1,107 @@
+{
+  "protocol": "wave14-d-admission/1",
+  "source": "d833d0f5f91eaae61e80c9d2e471196fcabd0e0c",
+  "cases": [
+    {
+      "id": "SAME_START_WRONG_UID_ARGV_OPERATION",
+      "proven": true,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 1,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "uidQueried": false,
+      "expected": "No signal; identity mismatch",
+      "status": "FAIL"
+    },
+    {
+      "id": "JOURNAL_SCOPE_UID_OPERATION_IGNORED",
+      "proven": true,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 1,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "expected": "No signal; foreign journal identity",
+      "status": "FAIL"
+    },
+    {
+      "id": "PER_PID_STAT_FAILURE_EMPTY_PROOF",
+      "proven": true,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 0,
+      "pidReused": false,
+      "signals": [],
+      "expected": "proven=false; per-PID status UNKNOWN",
+      "status": "FAIL"
+    },
+    {
+      "id": "MALFORMED_INVENTORY_EMPTY_PROOF",
+      "proven": true,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 0,
+      "pidReused": false,
+      "signals": [],
+      "expected": "proven=false; malformed inventory UNKNOWN",
+      "status": "FAIL"
+    },
+    {
+      "id": "INSTALL_DIR_PARENT_ACCEPTED_AS_ROLE",
+      "result": "RECOVERED",
+      "journal": "confirmed",
+      "requested": "/tmp/pa-wave14-delivery-audit-a4xIb6",
+      "actualTarget": "/tmp/pa-wave14-delivery-audit-a4xIb6/install",
+      "expected": "BLOCKED; parent of installDir is not old/new install",
+      "status": "FAIL"
+    },
+    {
+      "id": "ACTUAL_RECOVER_WRONG_UID_ARGV_OPERATION",
+      "result": "REVERTED",
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "journal": "reverted_after_failed_start",
+      "expected": "No signal; BLOCKED by failed coordinator identity",
+      "status": "FAIL"
+    }
+  ],
+  "passed": 0,
+  "failed": 6,
+  "actualOsScans": 0,
+  "actualOsSignals": 0,
+  "actualProcessesSpawned": 0,
+  "realModelTurns": 0,
+  "nativeTurns": 0,
+  "scope": "Pure mock identity/inventory/signals and recover entrypoints; verified frozen input readonly; no live stop/install matrix"
+}

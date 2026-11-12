@@ -48,6 +48,57 @@
     "decisionsAvailable": {
       "type": "boolean"
     },
+    "executionAvailability": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "native",
+                "controlled_fixture"
+              ],
+              "type": "string"
+            },
+            "state": {
+              "const": "available",
+              "type": "string"
+            }
+          },
+          "required": [
+            "state",
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "enum": [
+                "not_installed",
+                "incompatible_version",
+                "unsupported_platform",
+                "probe_failed",
+                "not_admitted",
+                "operator_disabled",
+                "recovery_readonly"
+              ],
+              "type": "string"
+            },
+            "state": {
+              "const": "unavailable",
+              "type": "string"
+            }
+          },
+          "required": [
+            "state",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
     "profiles": {
       "items": {
         "additionalProperties": false,
@@ -281,6 +332,9 @@
           "defaultProfileId": {
             "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
             "type": "string"
+          },
+          "discussionOnly": {
+            "type": "boolean"
           },
           "dispatchAllowed": {
             "type": "boolean"

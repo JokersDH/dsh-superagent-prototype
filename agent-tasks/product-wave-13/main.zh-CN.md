@@ -4,6 +4,8 @@
 
 ## M1 先交无执行器启动的可运行入口
 
+**已实施：`d9d347e/b2b1adb`，限定范围见[0040](../../docs/rfcs/WP-16/0040-personal-discussion-readiness.md)和[wave13-integration](../../reports/releases/wave13-integration/README.zh-CN.md)。** 实际CLI/workbench/HTTP/SQLite/SSE/网页已测，旧业务队列不消费，普通启动参数与模式复用也已验证。D/E可以消费这一固定source继续普通安装；M3–M7的来源消费者及恢复授权/启动仍未完成。
+
 拆清personal讨论/历史能力与executor admission。缺Codex或版本不符时保留个人模式、实际对话和来源审阅，禁新委托；不默切controlled fixture。必须处理已有队列/unknown writer：不执行旧工作、不清markers、不假定停止。同步修正workbench“必须有admitted project”的启动前置，早交实际进程/HTTP测试给D/E。
 
 ## M2 精确承认source与进度

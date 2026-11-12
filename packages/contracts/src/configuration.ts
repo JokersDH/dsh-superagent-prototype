@@ -5,6 +5,13 @@ export const CONFIGURATION_PROTOCOL = 'application-configuration/1' as const
 const label = z.string().trim().min(1).max(160)
 const ids = z.array(IdSchema).max(128).readonly()
 const unique = (values: readonly { id: string }[]) => new Set(values.map((value) => value.id)).size === values.length
+export const ExecutionUnavailableReasonSchema = z.enum(['not_installed', 'incompatible_version', 'unsupported_platform', 'probe_failed', 'not_admitted', 'operator_disabled', 'recovery_readonly'])
+export const ExecutionAvailabilitySchema = z.discriminatedUnion('state', [
+  z.strictObject({ state: z.literal('available'), kind: z.enum(['native', 'controlled_fixture']) }),
+  z.strictObject({ state: z.literal('unavailable'), reason: ExecutionUnavailableReasonSchema }),
+])
+export type ExecutionUnavailableReason = z.infer<typeof ExecutionUnavailableReasonSchema>
+export type ExecutionAvailability = z.infer<typeof ExecutionAvailabilitySchema>
 
 /** Public read projection only; launch paths, argv, private config and credential references are excluded. */
 export const ExecutionProfileViewSchema = z
@@ -53,6 +60,7 @@ export const ConfiguredProjectViewSchema = z
     defaultProfileId: IdSchema.optional(),
     defaultCriteria: RequiredCriteriaSchema,
     settingsAvailable: z.boolean().optional(),
+    discussionOnly: z.boolean().optional(),
     dispatchAllowed: z.boolean(),
     blockedReason: AppErrorCodeSchema.optional(),
   })
@@ -65,6 +73,8 @@ export const ConfiguredProjectViewSchema = z
       ctx.addIssue({ code: 'custom', message: 'An enabled project requires an enabled default profile' })
     if (value.dispatchAllowed === (value.blockedReason !== undefined))
       ctx.addIssue({ code: 'custom', message: 'Only a blocked project needs a reason' })
+    if (value.discussionOnly && (value.dispatchAllowed || value.profileIds.length || value.defaultProfileId))
+      ctx.addIssue({ code: 'custom', message: 'A discussion workspace never admits execution' })
   })
 
 export const ApplicationConfigurationSchema = z
@@ -78,6 +88,7 @@ export const ApplicationConfigurationSchema = z
     assistantContextAvailable: z.boolean().optional(),
     contextHistoryAvailable: z.boolean().optional(),
     contextSourcesAvailable: z.boolean().optional(),
+    executionAvailability: ExecutionAvailabilitySchema.optional(),
     projects: z.array(ConfiguredProjectViewSchema).max(128).readonly(),
     profiles: z.array(ExecutionProfileViewSchema).max(128).readonly(),
     checks: z.array(RegisteredCheckViewSchema).max(128).readonly(),
@@ -87,11 +98,16 @@ export const ApplicationConfigurationSchema = z
       if (!unique(entries))
         ctx.addIssue({ code: 'custom', message: 'Configuration IDs must be unique within each collection' })
     const enabled = new Set(value.profiles.filter((profile) => profile.dispatchAllowed).map((profile) => profile.id))
+    const availability = value.executionAvailability, unavailable = availability?.state === 'unavailable'
+    if (unavailable && (enabled.size || value.projects.some(project => project.dispatchAllowed)))
+      ctx.addIssue({ code: 'custom', message: 'Unavailable execution cannot admit a profile or project' })
+    if (availability?.state === 'available' && !value.profiles.some(profile => profile.dispatchAllowed && profile.kind === availability.kind))
+      ctx.addIssue({ code: 'custom', message: 'Available execution requires an admitted matching profile' })
     const checks = new Set(value.checks.map((check) => check.id))
     for (const project of value.projects) {
       if (project.profileIds.some((id) => !enabled.has(id)))
         ctx.addIssue({ code: 'custom', message: 'Projects may select only dispatchable profiles' })
-      if (!project.defaultCriteria.some((criterion) => criterion.kind === 'machine' && criterion.required))
+      if (!unavailable && !project.discussionOnly && !project.defaultCriteria.some((criterion) => criterion.kind === 'machine' && criterion.required))
         ctx.addIssue({ code: 'custom', message: 'Project defaults need a required registered machine check' })
       if (
         project.defaultCriteria.some(
