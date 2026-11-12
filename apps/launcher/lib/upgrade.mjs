@@ -27,7 +27,7 @@ import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readF
 import { dirname, join, resolve } from 'node:path'
 import { realpathSync } from 'node:fs'
 import { backupState } from './backup.mjs'
-import { processAlive, processStart, processUid, readInstanceRecord, removeInstanceRecord, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
+import { processAlive, processCommand, processStart, processUid, readInstanceRecord, removeInstanceRecord, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
 import { argvMatchesCommand, requestedScopeCheck } from './identity.mjs'
 import { RELEASE_FILE, readRelease, validateRelease, verifyReleaseArtifacts } from './release.mjs'
 import { hasInstallManifest, initializeRelease, releaseBinding } from './release-bootstrap.mjs'
@@ -307,8 +307,10 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
     writePrivateJson(previousPath, JSON.parse(previousBytes.toString('utf8')))
   }
   const switchedAt = new Date().toISOString()
+  const operationId = `upgrade:${plan.to.buildId}:${switchedAt}:${process.pid}`
   writePrivateJson(journalPath, {
     protocol: 'personal-install-switch/1',
+    operationId,
     status: 'switching',
     switchedAt,
     from: plan.from,
@@ -333,6 +335,7 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
   const adopted = initializeRelease({ installRoot: target.appRoot, configRoot: roots.config, adoptExisting: true })
   writePrivateJson(journalPath, {
     protocol: 'personal-install-switch/1',
+    operationId,
     status: 'switched_unconfirmed',
     switchedAt,
     from: plan.from,
@@ -351,11 +354,12 @@ export async function upgradeInstall({ installRoot, roots, values, fault = proce
   // 4. Start the target binary on the same data roots and require its own identity. The spawn pid is
   // persisted before health so a crash or missing record is recoverable from the journal.
   const started = await startTarget({
-    roots, target, seed: instance, identity, fault,
+    roots, target, seed: instance, identity, fault, operationId,
     onSpawn: (spawn) => writeJournal({ roots, status: 'starting', reason: 'target_spawned', spawn }),
   })
   writePrivateJson(journalPath, {
     protocol: 'personal-install-switch/1',
+    operationId,
     status: 'confirmed',
     switchedAt,
     confirmedAt: new Date().toISOString(),
@@ -504,7 +508,7 @@ export async function accountRegisteredResources({ roots, target, record, spawne
   }
   // Every registered resource must match the complete recorded identity: pid + start + uid + argv +
   // private root + operation. One matching field (even a matching start) is not ownership.
-  const addVerified = async ({ pid, label, start, argv, uid, configRoot, dataRoot, baseDir, operation }) => {
+  const addVerified = async ({ pid, label, start, argv, command: expectedCommand, uid, configRoot, dataRoot, baseDir, operation, requireComplete = false }) => {
     if (!Number.isInteger(pid) || pid <= 0) return
     const vitality = vitalityOf(pid)
     if (vitality === 'dead') return
@@ -515,7 +519,17 @@ export async function accountRegisteredResources({ roots, target, record, spawne
     if (observedStart === null || observedStart !== start) { pidReused = true; mismatch(pid, label, observedStart === null ? 'start_unreadable' : 'start_mismatch'); return }
     const command = commandOf(pid)
     if (command === '') { mismatch(pid, label, 'command_unreadable'); return }
-    if (argv !== undefined && (!Array.isArray(argv) || !argvMatchesCommand(argv, command, { baseDir }))) { mismatch(pid, label, 'argv_mismatch'); return }
+    if (requireComplete) {
+      const missing = []
+      if (typeof expectedCommand !== 'string' && !Array.isArray(argv)) missing.push('argv')
+      if (uid === undefined || uid === null) missing.push('uid')
+      if (typeof configRoot !== 'string' || typeof dataRoot !== 'string') missing.push('root')
+      if (operation === undefined || operation === null) missing.push('operation')
+      if (missing.length > 0) { mismatch(pid, label, 'identity_incomplete', { missing }); return }
+    }
+    if (typeof expectedCommand === 'string' && expectedCommand.length > 0) {
+      if (command !== expectedCommand) { mismatch(pid, label, 'command_mismatch'); return }
+    } else if (argv !== undefined && (!Array.isArray(argv) || !argvMatchesCommand(argv, command, { baseDir }))) { mismatch(pid, label, 'argv_mismatch'); return }
     if (uid !== undefined && uid !== null) {
       const observedUid = await processUid(pid)
       if (observedUid === null) { mismatch(pid, label, 'uid_unreadable'); return }
@@ -532,14 +546,21 @@ export async function accountRegisteredResources({ roots, target, record, spawne
     addTree(pid)
   }
   const claimed = new Set()
+  const spawnIdentityOf = (source) => source === null || source === undefined ? null : ({
+    pid: source.pid, start: source.processStart, argv: source.argv, command: source.command, uid: source.uid,
+    configRoot: source.configRoot, dataRoot: source.dataRoot ?? source.state, operation: source.operationId,
+  })
   if (Number.isInteger(spawnedPid) && spawnedPid > 0) {
-    const expected = spawnedStart ?? (journalSpawn?.pid === spawnedPid ? journalSpawn?.processStart ?? null : null)
-    await addVerified({ pid: spawnedPid, label: 'spawn', start: expected, baseDir: roots.install, operation: undefined })
+    const identity = journalSpawn?.pid === spawnedPid ? spawnIdentityOf(journalSpawn) : null
+    await addVerified({ pid: spawnedPid, label: 'spawn', start: spawnedStart ?? identity?.start ?? null,
+      argv: identity?.argv, command: identity?.command, uid: identity?.uid, configRoot: identity?.configRoot,
+      dataRoot: identity?.dataRoot, baseDir: roots.install, operation: identity?.operation, requireComplete: true })
   }
   if (journalSpawn !== undefined && journalSpawn !== null && Number.isInteger(journalSpawn.pid) && journalSpawn.pid > 0 && !claimed.has(journalSpawn.pid)) {
-    await addVerified({ pid: journalSpawn.pid, label: 'journal', start: journalSpawn.processStart, argv: journalSpawn.argv,
-      uid: journalSpawn.uid, configRoot: journalSpawn.configRoot, dataRoot: journalSpawn.dataRoot ?? journalSpawn.state,
-      baseDir: roots.install, operation: journalSpawn.operationId })
+    const identity = spawnIdentityOf(journalSpawn)
+    await addVerified({ pid: journalSpawn.pid, label: 'journal', start: identity.start, argv: identity.argv,
+      command: identity.command, uid: identity.uid, configRoot: identity.configRoot, dataRoot: identity.dataRoot,
+      baseDir: roots.install, operation: identity.operation, requireComplete: true })
   }
   if (record !== null && record !== undefined) {
     await addVerified({ pid: record.pid, label: 'launcher', start: record.processStart, argv: record.launcherArgv, uid: record.uid, baseDir: record.install })
@@ -582,23 +603,28 @@ export async function accountRegisteredResources({ roots, target, record, spawne
 export async function stopRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, operationId }) {
   const accounted = await accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, operationId })
   const stopped = []
+  const unverifiable = (accounted.unverifiable ?? []).map(({ pid, label, reason }) => ({ pid, label, reason }))
   for (const { pid } of accounted.owned) {
     try { process.kill(pid, 'SIGTERM'); stopped.push(pid) } catch { /* gone */ }
   }
   const deadline = Date.now() + 5000
-  while (Date.now() < deadline && accounted.owned.some(({ pid }) => alive(pid))) await new Promise((r) => setTimeout(r, 100))
+  // A stat failure after SIGTERM is UNKNOWN, not `dead`: keep observing until the OS can confirm or the
+  // watchdog expires, and never convert an unreadable post-signal status into a proven stop.
+  while (Date.now() < deadline && accounted.owned.some(({ pid }) => vitalityOf(pid) === 'alive')) await new Promise((r) => setTimeout(r, 100))
   for (const { pid } of accounted.owned) {
-    if (!alive(pid)) continue
+    if (vitalityOf(pid) !== 'alive') continue
     try { process.kill(pid, 'SIGKILL') } catch { /* gone */ }
   }
   const killDeadline = Date.now() + 3000
-  while (Date.now() < killDeadline && accounted.owned.some(({ pid }) => alive(pid))) await new Promise((r) => setTimeout(r, 100))
-  const remaining = accounted.owned.filter(({ pid }) => alive(pid)).map(({ pid, command }) => ({ pid, command }))
+  while (Date.now() < killDeadline && accounted.owned.some(({ pid }) => vitalityOf(pid) === 'alive')) await new Promise((r) => setTimeout(r, 100))
+  const unknownAfterSignal = accounted.owned.filter(({ pid }) => vitalityOf(pid) === 'unknown').map(({ pid, command }) => ({ pid, command, reason: 'post_signal_status_unknown' }))
+  const remaining = accounted.owned.filter(({ pid }) => vitalityOf(pid) !== 'dead').map(({ pid, command }) => ({ pid, command }))
+  unverifiable.push(...unknownAfterSignal)
   return {
-    proven: remaining.length === 0 && accounted.unknownLive.length === 0 && accounted.unknownLive.length === 0 &&
-      accounted.scannerOk === true && accounted.pidReused !== true && (accounted.unverifiable ?? []).length === 0,
+    proven: remaining.length === 0 && accounted.unknownLive.length === 0 &&
+      accounted.scannerOk === true && accounted.pidReused !== true && (accounted.unverifiable ?? []).length === 0 && unknownAfterSignal.length === 0,
     scannerOk: accounted.scannerOk === true,
-    unverifiable: (accounted.unverifiable ?? []).map(({ pid, label, reason }) => ({ pid, label, reason })),
+    unverifiable,
     stopped,
     remaining,
     unknownLive: accounted.unknownLive.map(({ pid, command, unregistered }) => ({ pid, command: command.slice(0, 240), ...(unregistered === true ? { unregistered: true } : {}) })),
@@ -611,7 +637,7 @@ export async function stopRegisteredResources({ roots, target, record, spawnedPi
  * The pre-switch barrier. It reuses the recorded instance identity (including the orphan-API proof
  * from `stop.mjs`) and refuses to touch the pointer while any registered resource is unaccounted for.
  */
-export async function ensureResourceBarrier({ roots, target, journal }) {
+export async function ensureResourceBarrier({ roots, target, journal, operationId }) {
   const record = (() => {
     try { return readInstanceRecord(roots.config) } catch (error) {
       throw new UpgradeError('invalid_instance_record', 'The instance record is untrusted; refusing to stop or switch anything', { cause: error.message, code: error.code })
@@ -654,7 +680,7 @@ export async function ensureResourceBarrier({ roots, target, journal }) {
       }
     }
   }
-  const proof = await stopRegisteredResources({ roots, target: target ?? null, record, journalSpawn: journal?.spawn ?? null })
+  const proof = await stopRegisteredResources({ roots, target: target ?? null, record, journalSpawn: journal?.spawn ?? null, operationId: operationId ?? journal?.operationId })
   if (!proof.proven) {
     const code = proof.unknownLive.length > 0 ? 'unknown_live_resource' : 'target_stop_unproven'
     throw new UpgradeError(code, 'A registered resource is still alive or cannot be proven to belong to this operation; the install pointer is unchanged', {
@@ -671,7 +697,7 @@ export async function ensureResourceBarrier({ roots, target, journal }) {
   return { proven: true, record: record === null ? null : { pid: record.pid, apiPid: record.apiPid, consolePid: record.consolePid }, stopped, orphan, proof }
 }
 
-async function startTarget({ roots, target, seed, identity, fault, onSpawn }) {
+async function startTarget({ roots, target, seed, identity, fault, onSpawn, operationId }) {
   let consolePort = await freeFrom(seed, 'consoleURL', 0)
   let apiPort = await freeFrom(seed, 'apiURL', 0)
   if (!Number.isInteger(consolePort) || consolePort <= 0 || !Number.isInteger(apiPort) || apiPort <= 0 || consolePort === apiPort) {
@@ -706,7 +732,12 @@ async function startTarget({ roots, target, seed, identity, fault, onSpawn }) {
   // Persist the spawn identity BEFORE any health/record work: a crash between spawn and the instance
   // record must still leave a proven pid to stop on recovery.
   const spawnedStart = await processStart(child.pid)
-  if (typeof onSpawn === 'function') onSpawn({ pid: child.pid, startedAt: new Date().toISOString(), processStart: spawnedStart })
+  // The spawn identity is complete at birth: pid/start/uid/command/roots/operation. Recovery and the
+  // barrier must not have to guess missing fields from a later record.
+  const spawnedUid = await processUid(child.pid)
+  const spawnedCommand = await processCommand(child.pid)
+  if (typeof onSpawn === 'function') onSpawn({ pid: child.pid, startedAt: new Date().toISOString(), processStart: spawnedStart,
+    uid: spawnedUid, command: spawnedCommand, configRoot: roots.config, dataRoot: roots.data, operationId })
 
   const fail = async (reason, detail = {}) => {
     // Prove the process tree this operation started is gone BEFORE touching the pointer or record.
@@ -714,7 +745,7 @@ async function startTarget({ roots, target, seed, identity, fault, onSpawn }) {
       // Test fault: pretend the stop could not be proven. The state machine must keep the indeterminate
       // state instead of reverting the pointer or restarting the old writer.
       ? { proven: false, stopped: [], remaining: [child.pid], considered: 1 }
-      : await stopRegisteredResources({ roots, target, spawnedPid: child.pid, spawnedStart, record: readInstanceRecord(roots.config) })
+      : await stopRegisteredResources({ roots, target, spawnedPid: child.pid, spawnedStart, journalSpawn: readJournal(roots.config)?.spawn ?? null, operationId, record: readInstanceRecord(roots.config) })
     if (!cleanup.proven) {
       writeJournalStatus({ roots, status: 'target_stop_unproven', reason, cleanup, ...(typeof plan === 'object' && plan !== null ? { extra: { from: plan.from, to: plan.to } } : {}) })
       throw new UpgradeError('target_stop_unproven', 'The failed target process tree could not be proven stopped; pointer and record are left as-is (no old writer is restarted)', {
@@ -756,7 +787,7 @@ async function startTarget({ roots, target, seed, identity, fault, onSpawn }) {
   }
   if (fault === 'target_coordinator_exit') {
     // Test fault: the coordinator dies right after answering health, before any record is written.
-    await stopRegisteredResources({ roots, target, spawnedPid: child.pid })
+    await stopRegisteredResources({ roots, target, spawnedPid: child.pid, journalSpawn: readJournal(roots.config)?.spawn ?? null, operationId })
     await fail('coordinator_exited_after_health', { health: health?.status ?? null })
   }
   // Health can answer before the launcher persists its instance record; wait for the exact identity.
@@ -789,6 +820,7 @@ const writeJournal = ({ roots, status, reason, spawn, extra }) => {
   const existing = readJournal(roots.config) ?? {}
   writePrivateJson(path, {
     ...existing,
+    ...(existing.operationId === undefined && spawn?.operationId !== undefined ? { operationId: spawn.operationId } : {}),
     ...(extra === undefined ? {} : extra),
     status,
     ...(reason === undefined ? {} : { reason }),
@@ -865,6 +897,7 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
   const target = inspectTargetInstall(journal.to.installDir)
 
   // The target may have been spawned (identity persisted) but never confirmed. Stop the persisted
+  const operationId = journal.operationId ?? `recover:${journal.to?.buildId ?? journal.from?.buildId ?? 'unknown'}:${journal.switchedAt ?? 'unknown'}`
   // spawn tree first; only a proven stop allows a pointer decision.
   if (journal.status === 'starting') {
     const current = readInstanceRecord(roots.config)
@@ -875,7 +908,7 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
         return { protocol: 'personal-install-switch/1', status: 'RECOVERED', started: { pid: current.pid, apiURL: current.apiURL, buildId: current.buildId, mode: current.mode, access: current.access } }
       }
     }
-    const cleanup = await stopRegisteredResources({ roots, target, record: current, journalSpawn: journal.spawn ?? null })
+    const cleanup = await stopRegisteredResources({ roots, target, record: current, journalSpawn: journal.spawn ?? null, operationId })
     if (!cleanup.proven) {
       writeJournalStatus({ roots, status: 'target_stop_unproven', reason: 'spawn_stop_unproven', cleanup })
       throw new UpgradeError('target_stop_unproven', 'The spawned target cannot be proven stopped; pointer and record are left as-is', { remaining: cleanup.remaining, unknownLive: cleanup.unknownLive })
@@ -893,7 +926,7 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
   // A failed target whose stop could not be proven must first be stopped; only then may the pointer
   // be reverted. If it still cannot be proven stopped, keep the indeterminate state (no old writer).
   if (journal.status === 'target_stop_unproven') {
-    const cleanup = await stopRegisteredResources({ roots, target, record: existing, journalSpawn: journal.spawn ?? null })
+    const cleanup = await stopRegisteredResources({ roots, target, record: existing, journalSpawn: journal.spawn ?? null, operationId })
     if (!cleanup.proven) {
       writeJournalStatus({ roots, status: 'target_stop_unproven', reason: 'recover_stop_still_unproven', cleanup })
       const unknownIdentity = cleanup.pidReused === true || cleanup.scannerOk === false || (cleanup.unverifiable ?? []).length > 0 || (cleanup.unknownLive ?? []).length > 0
@@ -912,7 +945,7 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
   // The instance was stopped but nothing was switched: restart the previous install, never the target.
   if (journal.status === 'stopping') {
     const previous = inspectTargetInstall(installDirOf(journal.from.installRoot))
-    const started = await startTarget({ roots, target: previous, seed: journal.ports ?? null, identity })
+    const started = await startTarget({ roots, target: previous, seed: journal.ports ?? null, identity, operationId })
     writeJournalStatus({ roots, status: 'reverted_after_interrupted_switch', reason: 'crash_after_stop_restarted_previous' })
     return { protocol: 'personal-install-switch/1', status: 'RECOVERED_PREVIOUS', started }
   }
@@ -926,12 +959,12 @@ export async function recoverSwitch({ installRoot, roots, values = {} }) {
     const previousInstall = inspectTargetInstall(installDirOf(journal.from.installRoot))
     const running = readInstanceRecord(roots.config)
     if (running === null || !(await verifyInstance(running)).ok) {
-      const started = await startTarget({ roots, target: previousInstall, seed: journal.ports ?? null, identity })
+      const started = await startTarget({ roots, target: previousInstall, seed: journal.ports ?? null, identity, operationId })
       return { protocol: 'personal-install-switch/1', status: 'RECOVERED_PREVIOUS', reason: 'pointer_not_bound_to_target', started }
     }
     return { protocol: 'personal-install-switch/1', status: 'REVERTED', reason: 'pointer_not_bound_to_target' }
   }
-  const started = await startTarget({ roots, target, seed: journal.ports ?? null, identity })
+  const started = await startTarget({ roots, target, seed: journal.ports ?? null, identity, operationId })
   writeJournalStatus({ roots, status: 'confirmed', reason: 'recovered' })
   return { protocol: 'personal-install-switch/1', status: 'RECOVERED', started }
 }
