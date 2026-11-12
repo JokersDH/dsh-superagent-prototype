@@ -28,3 +28,11 @@ Unfinished old work remains visible with no execution actions and conservative u
 - Existing contracts 228, application 20 and six product/assistant/context/process suites 77 pass; coordinator and console strict typechecks and generated-contract check pass. Frozen wire hash remains `74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d`.
 
 All replies in these tests use an isolated local mock. Fake Codex supports only `--version` and records any non-version launch as a failure. Automatic real model/native turns remain 0. Browser verification and an optional isolated preview follow this checkpoint; this is not an installer, target activation, native control or whole-release verdict. Existing ten user instances remain untouched.
+
+## Follow-up product checkpoint
+
+Source `b2b1adb` completes public UI state and the ordinary `pnpm start --discussion-only` wrapper. A requested discussion-only start cannot silently reuse a running execution-enabled instance. The permanent discussion workspace is always non-dispatchable. The UI shows the classified reason, removes false answer/stop availability claims and disables the old work-anchored message mode. Short-height layout keeps the complete composer above mobile navigation.
+
+The process suite now has 9 cases including actual start-wrapper launch/reuse and fixture-mode conflict refusal. Current regression totals are 384 non-browser tests (contracts228, application20, product/assistant/context77, readiness runtime7/process9, console31, local operations12), plus 6 readiness browser cases and the existing context9/history8 browser cases. The final readiness browser captures bind clean tracked source `b2b1adb`; the other two regression reports accurately retain their pre-commit dirty-source label. The initial zoom failure and final resolved review remain recorded rather than rewritten as an initial PASS.
+
+An isolated discussion-only personal preview runs on UI5190/API8806, new private state `.local-state/wave13-readiness-preview`, schema18 and existing private model configuration. It was launched without sending a real model/native task. Source/profile readiness, installed artifact admission, restore activation and whole-product release remain separate. See [scoped evidence](../../../reports/releases/wave13-integration/README.zh-CN.md).

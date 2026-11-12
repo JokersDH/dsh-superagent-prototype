@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**无执行器个人启动已交付：[http://127.0.0.1:5190/](http://127.0.0.1:5190/)。** 主线`d9d347e/b2b1adb`在缺Codex、版本不符或检测失败时保留实际对话、历史与来源审阅，明确禁用开发执行，不切换固定流程。`pnpm start --discussion-only`可主动选择；旧任务/unknown writer/队列和恢复标记保留。新5190/8806是独立的仅对话数据目录，原5189开发预览继续保留。384项分范围非浏览器测试、6项新网页和原17项网页回归通过，真实模型/native0。见[0040接口](docs/rfcs/WP-16/0040-personal-discussion-readiness.md)与[实际交付范围](reports/releases/wave13-integration/README.zh-CN.md)。A–E继续第十三轮整包，无需重新下发；当前安装/目标激活/整体发布仍待验收。
+
 **当前派工：[第十三轮稳定内测收口](agent-tasks/product-wave-13/README.zh-CN.md)。** 已复验A–E最新固定source，旧问题多项关闭；活动任务真实控制、进程所有权、当前personal字节和独立gate仍未整体准入。A数据证据、B真实产品恢复、C可替换来源链、D安全交付、E发布必测各一个十阶段整包，main先交无执行器实际启动及产品消费者。[五段开工话术](agent-tasks/product-wave-13/forward-prompts.zh-CN.md)与[0039验收](docs/rfcs/WP-16/0039-wave-13-admission-and-alpha-closure.md)。
 
 **当前完成度：首期稳定内测约70%，完整方案B约50%。** 按交付项加权69/100与50.8%，不是测试通过率或发布批准；具体[评分与缺口](docs/roadmap/progress-2026-11-12.zh-CN.md)。现用5189个人预览和已测history/source/reply能力保留，十组服务不重启，真实模型/native0。
