@@ -94,6 +94,23 @@ const evidenceFor = (key) => {
         pages: [1, 1],
         refusals: { limitZero: 400, limitMax: 400, unknown: 404 },
       }
+    case 'contextUse':
+      return { protocol: 'assistant-context-prepared/1', sources: 2,
+        binding: { commandId: 'c', messageId: 'm', bundleDigest: 'd' }, providerRequests: 1, reopened: true }
+    case 'sse':
+      return { complete: true, providerRequests: 1 }
+    case 'guards':
+      return { cross: 403, drift: 'conflict', expiry: 'stale_contract', offline: 'unsupported_capability', unknownProviderCalls: 1 }
+    case 'contextUi':
+      return { desktopMessages: 1, mobileMessages: 2, tabMessages: 2, pendingReconciled: true, providerRequests: 5, auditCommandIds: ['c'] }
+    case 'concurrency':
+      return { prepared: 4, recorded: 4, replies: 4, providerCalls: 4, bindings: 4 }
+    case 'schemaMigration':
+      return { old: { schema: 15, messages: 3 }, migrated: { schema: 16, messages: 3, bindingTable: true }, reopened: true }
+    case 'completedReply':
+      return { providerRequests: 1, replies: 1, auditStable: true }
+    case 'unknownReply':
+      return { providerRequests: 1, notice: true, reply: false }
     case 'personalInstall':
       return {
         start: 'RUNNING',

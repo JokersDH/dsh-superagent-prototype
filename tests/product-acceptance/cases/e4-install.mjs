@@ -33,8 +33,8 @@ import { sha256 } from '../lib/evidence.mjs'
  */
 const here = dirname(fileURLToPath(import.meta.url))
 const DEFAULT_DIRS = Object.freeze({
-  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave09-target',
-  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave09-target-r2',
+  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave09-target-r2',
+  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave10-target',
   cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave08-target',
 })
 
@@ -1010,5 +1010,94 @@ export async function runInstall({ root, runDirectory, keep = false }) {
     stopAll()
     if (!keep) rmSync(workspace, { recursive: true, force: true })
   }
+    await push(define('E8-SCHEMA-MIGRATION', 'A real D schema15 database migrates to the current A schema with data preserved', { layer: LAYERS.CONTROLLED }), async ({ assert, evidence }) => {
+      const extract = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w11-migrate-')))
+      let started
+      try {
+        spawnSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', extract, '--strip-components=1'])
+        const first = pa(extract, ['first-run', '--json'])
+        assert('MIGRATE_FIRST_RUN', first.status === 0 && first.json?.status === 'OK', first.stderr.slice(-300))
+        const [port, apiPort] = await freePorts()
+        started = startPa(extract, { port, apiPort })
+        const running = await started.attempt
+        assert('MIGRATE_START', running.status === 'RUNNING', JSON.stringify({ status: running.status, code: running.code }))
+        try {
+          const apiURL = running.instance.apiURL
+          const key = readFileSync(join(running.instance.state, 'api.key'), 'utf8').trim()
+          const sent = await fetch(`${apiURL}/v1/commands`, { method: 'POST', headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+            body: JSON.stringify({ commandId: 'w11-migrate-chat', conversationId: 'conv-migrate', kind: 'chat', projectId: 'project-atlas', text: '迁移前的数据。' }),
+            signal: AbortSignal.timeout(10_000) })
+          assert('MIGRATE_SEED_CHAT', sent.status === 200, String(sent.status))
+          await new Promise(resolve => setTimeout(resolve, 400))
+        } finally { pa(extract, ['stop', '--json'], { timeoutMs: 30_000 }) }
+        const oldState = running.instance.state
+        const db = new DatabaseSync(join(oldState, 'state.sqlite'), { readOnly: true })
+        let oldSchema, oldMessages
+        try {
+          oldSchema = Number(db.prepare("SELECT value FROM schema_meta WHERE key='product_schema'").get()?.value)
+          oldMessages = Number(db.prepare('SELECT count(*) AS c FROM conversation_messages').get()?.c ?? 0)
+        } finally { db.close() }
+        assert('MIGRATE_OLD_SCHEMA', oldSchema === ARTIFACTS.upgrade.productSchema, `${oldSchema} vs ${ARTIFACTS.upgrade.productSchema}`)
+        assert('MIGRATE_HAS_DATA', oldMessages >= 1, String(oldMessages))
+        const { ProductStore } = await import('../../../packages/storage/dist/index.js')
+        const copy = join(extract, 'migrated-state')
+        cpSync(oldState, copy, { recursive: true })
+        const opened = new ProductStore({ path: join(copy, 'state.sqlite') })
+        let newSchema, newMessages, bindingTable
+        try {
+          newSchema = opened.database.productSchema
+          newMessages = Number(opened.db.prepare('SELECT count(*) AS c FROM conversation_messages').get()?.c ?? 0)
+          bindingTable = Number(opened.db.prepare("SELECT count(*) AS c FROM sqlite_master WHERE type='table' AND name='assistant_context_bindings'").get()?.c ?? 0)
+        } finally { opened.close() }
+        assert('MIGRATE_NEW_SCHEMA', newSchema >= 16 && newSchema !== oldSchema, `${oldSchema} -> ${newSchema}`)
+        assert('MIGRATE_DATA_KEPT', newMessages === oldMessages, `${oldMessages} -> ${newMessages}`)
+        assert('MIGRATE_BINDING_TABLE', bindingTable === 1, String(bindingTable))
+        const reopened = new ProductStore({ path: join(copy, 'state.sqlite') })
+        try { newSchema = reopened.database.productSchema } finally { reopened.close() }
+        assert('MIGRATE_REOPEN', newSchema >= 16, String(newSchema))
+        evidence.schemaMigration = { artifact: { buildId: ARTIFACTS.upgrade.buildId, source: ARTIFACTS.upgrade.sourceCommit, schema: ARTIFACTS.upgrade.productSchema },
+          old: { schema: oldSchema, messages: oldMessages }, migrated: { schema: newSchema, messages: newMessages, bindingTable: bindingTable === 1 },
+          reopened: newSchema >= 16 }
+      } finally {
+        try { if (started) pa(extract, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
+        rmSync(extract, { recursive: true, force: true })
+      }
+    })
+
+    await push(define('E6-ARTIFACT-CURRENT-SCOPE', 'The latest frozen D tuple is scoped exactly and does not claim current-main selected context', {
+      layer: LAYERS.READONLY,
+    }), async ({ assert, evidence }) => {
+      const { PRODUCT_SCHEMA_VERSION } = await import('../../../packages/storage/dist/index.js')
+      const extract = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w11-scope-')))
+      try {
+        spawnSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', extract, '--strip-components=1'])
+        const routeFile = join(extract, 'app/apps/coordinator/http/app.ts')
+        const routeText = existsSync(routeFile) ? readFileSync(routeFile, 'utf8') : ''
+        const hasContextRoute = /assistant\/context\/(prepare|send)/u.test(routeText)
+        assert('TUPLE_SCHEMA_READ', Number.isSafeInteger(ARTIFACTS.upgrade.productSchema), String(ARTIFACTS.upgrade.productSchema))
+        assert('MAIN_SCHEMA_CURRENT', Number.isSafeInteger(PRODUCT_SCHEMA_VERSION) && PRODUCT_SCHEMA_VERSION >= 16, String(PRODUCT_SCHEMA_VERSION))
+        assert('TUPLE_NOT_CURRENT_SCHEMA', ARTIFACTS.upgrade.productSchema !== PRODUCT_SCHEMA_VERSION, `${ARTIFACTS.upgrade.productSchema} vs ${PRODUCT_SCHEMA_VERSION}`)
+        assert('TUPLE_LACKS_CONTEXT_SEND', hasContextRoute === false, String(hasContextRoute))
+        evidence.frozenScope = {
+          artifact: { buildId: ARTIFACTS.upgrade.buildId, source: ARTIFACTS.upgrade.sourceCommit,
+            schema: ARTIFACTS.upgrade.productSchema, tarSha256: ARTIFACTS.upgrade.tarSha256 },
+          main: { schema: PRODUCT_SCHEMA_VERSION },
+          hasContextRoute,
+          eligibleForCurrentMain: false,
+          reason: 'Frozen D bytes are schema 15 without selected-context prepare/send; the current main schema16 consumer is not in this artifact.',
+        }
+      } finally { rmSync(extract, { recursive: true, force: true }) }
+    })
+
+    cases.push(notTested({
+      ...define('E6-CURRENT-MAIN-INSTALL', 'Current-main schema16 selected context is installed and exercised from cold personal bytes', {
+        layer: LAYERS.NOT_TESTED,
+        limitations: [
+          'The latest frozen D artifact is cf7a3cf/schema15/build da2d78d1 and contains no /v1/assistant/context prepare/send, so it cannot represent current main schema16.',
+          'Old wave-09/wave-10 personal and upgrade results remain valid only for their own tuple and are not relabeled as current-main admission.',
+        ],
+      }),
+    }, 'NOT_TESTED: no current-main/schema16 frozen D tar exists in pa-artifacts. Required: a clean D build from current main containing selected-context prepare/send/audit and schema16, with tar/sha/source/build/schema/ABI tuple, then a fresh cold personal install, config/doctor/assets/public API and one selected-context send over the installed provider path. The old cf7a3cf schema15 artifact is explicitly out of scope.'))
+
   return { cases, artifacts }
 }

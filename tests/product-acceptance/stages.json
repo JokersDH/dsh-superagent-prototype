@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-10/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-11/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "f99ca39",
-  "checkpoint": "81d7fa3",
+  "base": "b466bc7",
+  "checkpoint": "5d1acf5",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -34,10 +34,10 @@
     },
     {
       "id": "E3",
-      "title": "Proposal HTTP, attention, decisions and review timing",
+      "title": "Current context use, SSE, audit and reply consumer",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "E3-PROPOSAL-HTTP and E3-PROPOSAL-UI cover explicit proposal flows. E3-CONTEXT-PREVIEW now runs against real HTTP: bounded budget with clamping, untrusted trust label, work/contract sources, no execution effect, TTL, cross-project/foreign-conversation/missing-work/invalid-budget refusals. E2-EVIDENCE-HISTORY covers window/limit/cursor. E5-CONTEXT-USE stays NOT_TESTED because only preview and the binding schema exist, not a send/audit path."
+        "E3-CONTEXT-USE/SSE/GUARDS/UI run real current-main HTTP, SQLite schema16, effects and a loopback mock provider: preview, confirm, same-transaction binding/receipt, audit, SSE, lost response, source drift, expiry and offline refusal. E4-COMPLETED-REPLY verifies recovery ordering with an explicit in-process port fixture; E4-REPLY-PERSISTENCE stays NOT_TESTED until A's replyResults rows exist."
       ]
     },
     {
@@ -45,15 +45,15 @@
       "title": "Explicit baseline/target installation and upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Install matrix is parameterized by the real tar/sha/source/build/schema tuple (no fixed schema13/ports). E3-PERSONAL-COLD-START proves personal first-run, doctor, workbench assets, bearer refusal, DB schema and stop; a different config release is refused as release_source_conflict. Managed upgrade/rollback keeps data, tampered target is refused, and a cross-schema old binary refuses with state_schema_newer_than_binary after pointer rollback. E4-MULTI-STATE records a real D defect: a stop for state A returned STOPPED and killed shared-install state B's API; the launcher-dead window is therefore NOT_TESTED. Crash windows remain E4-UPGRADE-FAULTS NOT_TESTED."
+        "Install matrix now binds D's latest frozen tuple cf7a3cf/build da2d78d1/schema15: personal cold start, managed upgrade/rollback, cross-schema refusal, backup/restore, schema15→current-A schema16 migration and config adoption/conflict. E4-MULTI-STATE still proves the requested-root stop defect on these bytes; E6-CURRENT-MAIN-INSTALL is NOT_TESTED because no schema16/context-use tar exists."
       ]
     },
     {
       "id": "E5",
-      "title": "Recovery authorization windows and bounded stability",
+      "title": "Bounded context concurrency, recovery windows and stability",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "Recovery inspect/prepare replay, restart drift and no-write are verified; commit/activation and the interruption windows remain NOT_TESTED until main publishes them. Bounded cycles only."
+        "E9-CONTEXT-CONCURRENCY runs four selected sends plus duplicate replay with one provider call per command; existing bounded cycles remain. Real recovery activation, multi-tab stale-selection UI and cross-process reply persistence remain NOT_TESTED with required inputs."
       ]
     },
     {
@@ -61,7 +61,39 @@
       "title": "Layered conclusions and handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave10-status separates test source, product source/build and the exact artifact tuple with commands, exit codes, PASS/FAIL/NOT_TESTED and owners; wave09 and older ledgers are preserved and pilot value never gates product or install."
+        "wave11-status separates test source 5d1acf5, product source b466bc7/31ddd26 and the exact D artifact tuple; wave10 and older status files are frozen and not rewritten."
+      ]
+    },
+    {
+      "id": "E7",
+      "title": "Two-state stop and real process faults",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
+      "notes": [
+        "E4-MULTI-STATE on D cf7a3cf bytes still claims state B and kills its API for a stop aimed at state A; launcher-dead/API-alive remains NOT_TESTED because that defect destroys the prerequisite. E4-INSTALL-HOST-GUARDS covers unknown PID refusal."
+      ]
+    },
+    {
+      "id": "E8",
+      "title": "Backup, schema migration and managed upgrade",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
+      "notes": [
+        "E8-SCHEMA-MIGRATION takes a real schema15 DB from the frozen D install and opens it with current A: schema16, data count preserved, binding table present, reopen stable. Backup/restore, managed upgrade/rollback and cross-schema refusal run on the same tuple; PA_UPGRADE_FAULT crash windows remain NOT_TESTED."
+      ]
+    },
+    {
+      "id": "E9",
+      "title": "Bounded concurrency and stability",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
+      "notes": [
+        "E9-CONTEXT-CONCURRENCY: four distinct selected sends + duplicate replay, one provider call per command and four bindings. Existing 30-cycle bounded stability remains; FD/child/queue baselines are observed, not a leak proof."
+      ]
+    },
+    {
+      "id": "E10",
+      "title": "Source-driven final report",
+      "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
+      "notes": [
+        "wave11-status separates test source, main source, product/artifact tuple and current-main install NOT_TESTED; old wave10/09 status files are frozen and not rewritten."
       ]
     }
   ]

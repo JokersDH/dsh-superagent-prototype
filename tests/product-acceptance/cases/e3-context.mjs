@@ -146,8 +146,8 @@ export async function runContext({ root, runDirectory, keep = false }) {
 
     cases.push(
       notTested(
-        define('E5-CONTEXT-USE', 'An explicitly selected context is sent with one message and audited', { layer: LAYERS.NOT_TESTED }),
-        'NOT_TESTED: main publishes the context preview and the AssistantContextBinding contract, but no context-use HTTP or provider attachment. Required: an explicit per-message selection, revalidation of source/contract/grant immediately before send, a binding and receipt in the same transaction, no automatic resend after a lost response/unknown result, and a source audit showing what was used. A preview or the binding schema is not a send.',
+        define('E5-CONTEXT-HISTORY', 'Authorized context history pages without becoming a new send grant', { layer: LAYERS.NOT_TESTED }),
+        'NOT_TESTED: current context send/binding/audit is verified by E3-CONTEXT-USE, but A `store.workflows.assistant.contextHistory` and a main signed public cursor are not implemented in this checkout. Required: projectIds/scoping, keyset tie-break, max 100, expired bindings visible as history but not sendable, missing source text reported, cross-principal refusal and cursor expiry.',
       ),
     )
   } finally {

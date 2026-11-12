@@ -233,6 +233,26 @@ const CAPABILITIES = [
     ],
   },
   {
+    id: 'context-use',
+    label: '显式选源消息、同事务绑定、审计、SSE 与丢响应重放',
+    controlled: ['E3-CONTEXT-USE', 'E3-CONTEXT-SSE', 'E3-CONTEXT-GUARDS', 'E3-CONTEXT-UI', 'E9-CONTEXT-CONCURRENCY'],
+    notTested: [
+      'contextHistory 分页/A 持久历史未发布；历史不是发送授权。',
+      'E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile 第二次选源和双 tab 独立旧 selection；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。',
+    ],
+  },
+  {
+    id: 'reply-results',
+    label: '完成回复先落盘、失败重开补齐且不重复请求',
+    controlled: ['E4-COMPLETED-REPLY', 'E4-REPLY-UNKNOWN'],
+    notTested: ['E4-REPLY-PERSISTENCE：A 的真实 replyResults 行/跨进程 SIGKILL/backup 未到；当前只证明 consumer + 进程内 port fixture。'],
+  },
+  {
+    id: 'schema-migration',
+    label: '真实 D schema15 数据库迁移到当前 A schema 且数据保留',
+    controlled: ['E8-SCHEMA-MIGRATION'],
+  },
+  {
     id: 'recovery-readonly',
     label: '恢复后首次启动只读、零业务发送',
     controlled: ['E4-RECOVERY-READONLY'],
@@ -248,6 +268,7 @@ const CAPABILITIES = [
   {
     id: 'distribution',
     label: '可迁移发行、安装、备份恢复、升级回滚',
+    readonly: ['E6-ARTIFACT-CURRENT-SCOPE'],
     installed: [
       'E4-INSTALL-ARTIFACT-IDENTITY',
       'E4-INSTALL-FIRST-RUN',
@@ -261,6 +282,7 @@ const CAPABILITIES = [
     notTested: [
       '安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。',
       '旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。',
+      'E6-CURRENT-MAIN-INSTALL NOT_TESTED：最新冻结 D 为 cf7a3cf/schema15 且无 selected-context send/audit，不能表示 current-main schema16；旧安装结果保持原 tuple scope。',
     ],
   },
   {
@@ -294,7 +316,6 @@ const CAPABILITIES = [
     label: '上下文来源/窗口/授权预览',
     controlled: ['E3-CONTEXT-PREVIEW'],
     notTested: [
-      'E5-CONTEXT-USE 未执行：main 只有 preview 与 binding schema，没有 context-use 发送入口/provider 附加、同事务 binding+receipt、未知结果不自动重发和来源审计。',
       'E3-CONTEXT-GRANT-BOUNDARY 仍未执行：expired grant/purpose/超预算的 HTTP 级反例缺少入口。',
     ],
   },
@@ -409,7 +430,7 @@ const executionStatus = {
     matrix: join(reports, 'release-matrix.json'),
     executionStatus: join(reports, 'execution-status.json'),
     wave09Status: join(reports, 'wave09-status.json'),
-    wave10Status: join(reports, 'wave10-status.json'),
+    wave11Status: join(reports, 'wave11-status.json'),
     wave08Status: join(reports, 'wave08-status.json'),
     wave07Status: join(reports, 'wave07-status.json'),
     wave06Status: join(reports, 'wave06-status.json'),
@@ -421,7 +442,8 @@ const executionStatus = {
     .map((row) => ({ id: row.id, gaps: row.gaps })),
   externalBlockers: [
     { owner: 'D', code: 'stop_claims_other_state', detail: 'One install, two state roots: `pa stop --data-root <state A>` returned 0/STOPPED while state B was recorded, and state B\'s API process died (launcher remained). Minimal repro: start A, stop A, start B, then stop with A\'s data root; observed exit 0, bAlive true, bApiAlive false. D must bind the instance record to the exact state root and refuse to stop another state.' },
-    { owner: 'main/C', detail: 'Context preview and evidence history are verified over real HTTP; context use (explicit selection, pre-send revalidation, same-transaction binding/receipt, no auto-resend, source audit) and recovery activation are unpublished.' },
+    { owner: 'main', detail: 'Context preview, selected-context prepare/send, SSE, audit and the completed-reply consumer are verified on current main; multi-tab stale-selection isolation, recovery activation and a current schema16/context-use install package remain inputs.' },
+    { owner: 'A', detail: 'Real `store.workflows.assistant.replyResults` rows (transaction, cross-process reopen/SIGKILL, backup, corrupt refusal) and `contextHistory` paging are not implemented in this checkout; E4-REPLY-PERSISTENCE and history stay NOT_TESTED.' },
     { owner: 'main', detail: 'Migration ownership and review Work/Ticket/Assignment publication remain outside current main, so E3-REVIEW-PIPELINE stays NOT_TESTED.' },
     { owner: 'D', detail: 'The wave-09 target tuple (6830e38 build f2390ffd, schema 15) passes byte-for-byte, personal cold start and same-schema managed upgrade; cross-schema old-binary refusal is measured. Any newer target must be named with its own tar/source/build/schema and independently re-tested.' },
     { owner: 'B', detail: 'Native ledger/results are not supplied as input and E has no budget, so actual-native and native control evidence are absent.' },
@@ -464,7 +486,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第十轮交付交接
+const handoff = `# Agent E 第十一轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -543,10 +565,10 @@ ${rows
 
 ## 下一消费者
 
-1. D：先修 \`stop\` 的 state 归属：单 install 多 state 时，针对 state A 的 stop 必须拒绝且不得信号 state B 的 launcher/API；再补 launcher 死/API 活与 PID/start reuse 窗口。最小复现见 \`externalBlockers.stop_claims_other_state\`。
-2. main/C：发布 context-use 发送路径（显式选择、发送前复验、同事务 binding/receipt、unknown 不自动重发、来源审计）与 recovery activation；E 再把 E5-CONTEXT-USE / E5-RECOVERY-INTERRUPTION 转成实测。
-3. B：提供绑定 commit/attempt 的原生证据（\`executed: true\` + model task 计数）；E 只消费，不重跑计费任务。
-4. 主线：审阅 \`RFC-E-001-consumer-interfaces.zh-CN.md\`；E 不复制生产类型。旧安装结果与 wave09 ledger 原样保留。
+1. D：先修 \`stop\` 的 state 归属：单 install 多 state 时，针对 state A 的 stop 必须拒绝且不得信号 state B 的 launcher/API；再补 launcher 死/API 活与 PID/start reuse 窗口。最小复现见 \`externalBlockers.stop_claims_other_state\`。修复后还需冻结 current-main/schema16/context-use 的新 tar。
+2. A：实现 \`store.workflows.assistant.replyResults\` 的真实事务行与跨进程/备份/损坏拒绝，以及 \`contextHistory\` 分页；E 再关闭 E4-REPLY-PERSISTENCE 与 contextHistory NOT_TESTED。
+3. main：把多 tab 旧响应/草稿隔离、recovery activation 和真实空目标启动接到可验收入口；E 已独立验证 context-use/SSE/audit/reply consumer，不重复把入口未发布当阻断。
+4. B：提供绑定 commit/attempt 的原生证据（\`executed: true\` + model task 计数）；E 只消费，不重跑计费任务。旧安装结果、wave09/wave10 ledger 与报告原样保留。
 
 ## 复验命令
 
@@ -568,15 +590,17 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
 writeFileSync(
-  join(reports, 'wave10-status.json'),
+  join(reports, 'wave11-status.json'),
   JSON.stringify({
     ...executionStatus,
-    schema: 'product-acceptance-wave10-status/1',
-    taskPackage: 'agent-tasks/product-wave-10/README.zh-CN.md',
-    supersedes: 'wave09-status.json',
+    schema: 'product-acceptance-wave11-status/1',
+    taskPackage: 'agent-tasks/product-wave-11/README.zh-CN.md',
+    supersedes: 'wave10-status.json',
+    currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.reason ?? null,
     counts: report.counts,
     testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
     productSource: { commit: artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.schema ?? null },
+    mainSource: { commit: stages.base, schema: byId.get('E6-ARTIFACT-CURRENT-SCOPE')?.evidence?.frozenScope?.main?.schema ?? null },
     artifactTuple,
   }, null, 2) + '\n',
 )

@@ -295,6 +295,67 @@ export function proposalUiIssues(ui) {
   return issues
 }
 
+/** Selected context must join the message, receipt, binding and provider request exactly once. */
+export function contextUseIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.protocol !== 'assistant-context-prepared/1') issues.push('protocol')
+  if (!Number.isSafeInteger(value.sources) || value.sources < 1) issues.push('sources')
+  if (!value.binding?.commandId || !value.binding?.messageId || !value.binding?.bundleDigest) issues.push('binding')
+  if (value.providerRequests !== 1) issues.push('provider_calls')
+  if (value.reopened !== true) issues.push('reopen')
+  return issues
+}
+export function contextSseIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  return value.complete === true && value.providerRequests === 1 ? [] : ['stream_or_single_request']
+}
+export function contextGuardIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.cross !== 403 && value.cross !== 400) issues.push('cross_project')
+  if (!['conflict', 'verification_failed', 'stale_contract'].includes(value.drift)) issues.push('source_drift')
+  if (value.expiry !== 'stale_contract') issues.push('expiry')
+  if (value.offline !== 'unsupported_capability') issues.push('offline')
+  if (value.unknownProviderCalls !== 1) issues.push('unknown_no_resend')
+  return issues
+}
+export function contextUiIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.desktopMessages !== 1 || value.mobileMessages !== 2) issues.push('messages')
+  if (value.tabMessages !== 2) issues.push('multi_tab')
+  if (value.pendingReconciled !== true) issues.push('lost_response')
+  if (!(value.providerRequests >= 2)) issues.push('provider_calls')
+  if (!Array.isArray(value.auditCommandIds) || !value.auditCommandIds[0]) issues.push('audit')
+  return issues
+}
+export function concurrencyIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  return value.prepared === 4 && value.recorded === 4 && value.replies === 4 && value.providerCalls === 4 && value.bindings === 4 ? [] : ['bounded_concurrency']
+}
+export function schemaMigrationIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!(value.old?.schema < value.migrated?.schema)) issues.push('schema_order')
+  if (value.old?.messages !== value.migrated?.messages) issues.push('data_loss')
+  if (value.migrated?.bindingTable !== true) issues.push('binding_table')
+  if (value.reopened !== true) issues.push('reopen')
+  return issues
+}
+export function completedReplyIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.providerRequests !== 1) issues.push('provider_calls')
+  if (value.replies !== 1) issues.push('reply_count')
+  if (value.auditStable !== true) issues.push('audit')
+  return issues
+}
+export function unknownReplyIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  return value.providerRequests === 1 && value.notice === true && value.reply === false ? [] : ['unknown_resend_or_success']
+}
+
 /** Personal install must prove a real personal process, console, auth and config adoption. */
 export function personalInstallIssues(personal) {
   if (!personal || typeof personal !== 'object') return ['missing']
@@ -655,6 +716,11 @@ export function evaluateRelease({
       if (entry.evidence?.includes('evidenceHistory')) {
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
+      }
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+        if (entry.evidence?.includes(key)) {
+          for (const issue of fn(result.evidence?.[key])) failures.push(fail(`${key}_invalid`, `${key} ${issue}`, entry.id))
+        }
       }
       if (entry.evidence?.includes('personalInstall')) {
         for (const issue of personalInstallIssues(result.evidence?.personalInstall))

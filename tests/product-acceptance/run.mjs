@@ -102,7 +102,7 @@ await collect('e2', async () => {
   }
 })
 await collect('e3', async () => {
-  const [browser, assistant, wave05, attention, decisions, proposals, proposalUi, context] = await Promise.all([
+  const [browser, assistant, wave05, attention, decisions, proposals, proposalUi, context, contextUse, contextUi] = await Promise.all([
     import('./cases/e3-browser.mjs'),
     import('./cases/e3-assistant.mjs'),
     import('./cases/e3-wave05.mjs'),
@@ -111,6 +111,8 @@ await collect('e3', async () => {
     import('./cases/e3-proposals.mjs'),
     import('./cases/e3-proposal-ui.mjs'),
     import('./cases/e3-context.mjs'),
+    import('./cases/e3-context-use.mjs'),
+    import('./cases/e3-context-ui.mjs'),
   ])
   const first = await browser.runE3({ root, runDirectory: run.directory, keep: values.keep === true })
   const second = await assistant.runAssistant({ root, runDirectory: run.directory, keep: values.keep === true })
@@ -120,8 +122,10 @@ await collect('e3', async () => {
   const sixth = await proposals.runProposals({ root, runDirectory: run.directory, keep: values.keep === true })
   const seventh = await proposalUi.runProposalUi({ root, runDirectory: run.directory, keep: values.keep === true })
   const eighth = await context.runContext({ root, runDirectory: run.directory, keep: values.keep === true })
+  const ninth = await contextUse.runContextUse({ root, runDirectory: run.directory })
+  const tenth = await contextUi.runContextUi({ root, runDirectory: run.directory })
   return {
-    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...tenth.cases],
     artifacts: {
       screenshots: [
         ...(first.artifacts?.screenshots ?? []),
@@ -132,6 +136,7 @@ await collect('e3', async () => {
         ...(sixth.artifacts?.screenshots ?? []),
         ...(seventh.artifacts?.screenshots ?? []),
         ...(eighth.artifacts?.screenshots ?? []),
+        ...(tenth.artifacts?.screenshots ?? []),
       ],
     },
   }
