@@ -1,0 +1,96 @@
+{
+  "source": "d0d1159fb3a936bd37b0960655f76c7dfe29031b",
+  "reportSource": {
+    "commit": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
+    "dirty": false
+  },
+  "scope": "Actual installed-alpha entries and real existing evidence, canonical artifact case retained; isolated evidence audit, no whole-tier PASS claim",
+  "originalCurrent": {
+    "subject": {
+      "source": "99832f6c7e6a54b323a9d454f3a4840273d1275a",
+      "buildId": "3ead6a26161f4c72",
+      "schema": 18,
+      "tarSha256": "b7e9dec7d264f94cadda10c6624db582ddd477ff83a7a8816c6acf5f0c5237d4",
+      "tarBytes": 20167862,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "capability": {
+      "hasContextRoute": true,
+      "hasHistoryRoute": true,
+      "hasSourcesRoute": true,
+      "hasReplyResults": true,
+      "hasDiscussionReadiness": false,
+      "routeBytes": 45468
+    },
+    "mode": "personal",
+    "action": "first_run_and_personal_start_without_executor",
+    "firstRun": "OK",
+    "observed": "BLOCKED",
+    "code": null,
+    "instanceMode": null,
+    "health": null,
+    "configuration": null,
+    "result": "not_current_m1"
+  },
+  "observations": [
+    {
+      "id": "ACTUAL_BLOCKED_PERSONAL_START_PROMOTED_PASS",
+      "accepted": true,
+      "failures": [],
+      "status": "FAIL"
+    },
+    {
+      "id": "NESTED_FROZEN_SOURCE_FOREIGN",
+      "accepted": false,
+      "failures": [
+        {
+          "code": "subject_mismatch",
+          "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "TOP_LEVEL_SUBJECT_FOREIGN_CONTROL",
+      "accepted": false,
+      "failures": [
+        {
+          "code": "subject_mismatch",
+          "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "COPY_EXIT_AND_CODE_MISSING",
+      "accepted": true,
+      "failures": [],
+      "status": "FAIL"
+    },
+    {
+      "id": "FAULT_WINDOWS_ONLY_PASS_STEPS",
+      "accepted": true,
+      "failures": [],
+      "status": "FAIL"
+    },
+    {
+      "id": "CURRENT_OBSERVED_MODE_FIXTURE",
+      "accepted": true,
+      "failures": [],
+      "status": "FAIL"
+    },
+    {
+      "id": "CURRENT_SUBJECT_FOREIGN_ABI_PLATFORM",
+      "accepted": true,
+      "failures": [],
+      "status": "FAIL"
+    }
+  ],
+  "modelSends": 0,
+  "nativeTurns": 0,
+  "baselineCaveat": "The original current-install evidence is BLOCKED. Do not credit later per-field rejection without a coherent passing control and focal failure reason.",
+  "passed": 2,
+  "failed": 5
+}

@@ -1,0 +1,190 @@
+{
+  "protocol": "wave15-admission/1",
+  "date": "2026-11-12",
+  "reviewMainSource": "6d245194bdf345bf0d7511671e6468cded3b215c",
+  "mainProductCheckpoint": "697efdc",
+  "releaseApproved": false,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "candidates": {
+    "A": "3121ec46126a8579b45c7d128ee1700df4c82978",
+    "B": "cfe6a3a39250b196c7cdc93349c794161591b958",
+    "C": "2e1c0950f29c3236433e1485011e1f0738554145",
+    "D": "e9f8aff8c6ec71009879ca0c744a1b1e5c06149e",
+    "E": "d0d1159fb3a936bd37b0960655f76c7dfe29031b"
+  },
+  "A": {
+    "storage": 87,
+    "workflows": 105,
+    "oldProbe": 4,
+    "mainAdmission": "minimum_reader_strict_fact_slice_and_actual_inspect_prepare",
+    "confirmation": "NOT_IMPLEMENTED"
+  },
+  "B": {
+    "oldRuntime": 4,
+    "priorRuntime": 5,
+    "helperTests": 68,
+    "strictExactOptional": "PASS",
+    "B13": {
+      "passed": 6,
+      "notTested": 1,
+      "sourceLoader": true,
+      "note": "Initial direct import used stale contracts dist; not a source regression"
+    },
+    "B14": {
+      "reportedPassed": 5,
+      "reportedFailed": 1,
+      "reportedNotTested": 1,
+      "actualReceiverBegin": 0,
+      "actualReceiverAnswer": 0,
+      "admittedScope": "independent_authenticated_inert_service_reconnect_only"
+    },
+    "epochCause": "fixture5/current1; matching current1 accepts cancel",
+    "businessRecoveryAdmitted": false
+  },
+  "C": {
+    "oldProbe": 6,
+    "packages": 285,
+    "currentMainCombination": 11,
+    "strictBuild": "PASS",
+    "newWrapperRobustness": {
+      "passed": 1,
+      "failed": 3,
+      "severity": "P2",
+      "admittedPermissionBypass": false
+    },
+    "defaultFactoryConsumer": false,
+    "nonemptyCandidateConsumer": false
+  },
+  "D": {
+    "oldProbeReportedPass": 6,
+    "oldProbeCaveat": "New processUid was not mocked; fake PID UID was unreadable; one readonly observation outside the old raw counter",
+    "newFullyMocked": {
+      "passed": 1,
+      "failed": 3,
+      "completePositiveIdentityExercised": true,
+      "actualOsScans": 0,
+      "actualOsSignals": 0,
+      "actualProcessesSpawned": 0
+    },
+    "liveMatrixAdmitted": false,
+    "M1ArtifactVerified": true
+  },
+  "E": {
+    "oldEvidenceProbeRejected": 5,
+    "oldProbeCaveat": "Empty-evidence precondition masks tuple-specific checks",
+    "adaptedProbe": {
+      "passed": 2,
+      "failed": 5,
+      "baseline": "existing currentInstall BLOCKED; require coherent passing/focal controls on follow-up"
+    },
+    "reportedPassed": 161,
+    "reportedNotTested": 17,
+    "actualReportSource": "ab73af5e7a77eb016c2543d0f8f3acbe02736da3",
+    "actualArtifactSource": "99832f6c7e6a54b323a9d454f3a4840273d1275a",
+    "installedTier": "FAIL",
+    "newArtifactAccepted": false
+  },
+  "artifact": {
+    "source": {
+      "commit": "114b73c2723c3ec862f5ae199dc35e0152fbafed",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "buildId": "a7df2b225a8c5c42",
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave14-target/wave14-target-114b73c.tar.gz",
+    "tarSha256": "246fd80ded7b5d2445890a7854dbc6261a71c1c4456f3ee2f41404b9b6e3c785",
+    "tarBytes": 20177745,
+    "schemaActual": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v24.21.0",
+    "abi": "137",
+    "sqlite": "3.53.4",
+    "inventoryEntries": 6714,
+    "regularFiles": 6693,
+    "internalSymlinks": 21,
+    "extractedBytes": 67286171,
+    "installManifestSha256": "073aadcbc70ce016823d535a6432b580cc754d78ca8dc481f8abf458f91546e6",
+    "releaseManifestSha256": "3a4c021543cc77d5d172270cc6696494f5f678db169171c7188b9b887ea48ccd",
+    "closureDigest": "a07772e93a6b70eabf5317f76401032d15cd42c37e21e176cd5c50a02de7ac0f",
+    "capability": {
+      "context": true,
+      "history": true,
+      "sources": true,
+      "replyResults": true,
+      "discussionOnly": true,
+      "unavailableExecution": true
+    },
+    "mode": "Personal-capable bytes verified; no live instance started",
+    "modelSends": 0,
+    "nativeTurns": 0
+  },
+  "mainIntegration": {
+    "source": "697efdc",
+    "recoveryTests": 66,
+    "newActualLogicalSourceTests": 8,
+    "contracts": 228,
+    "storage": 87,
+    "workflows": 93,
+    "strict": "PASS",
+    "generated": "PASS",
+    "runtimeWireHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+    "sourceBaseline": "actual_inspect_prepare",
+    "confirmation": false,
+    "targetActivation": false
+  },
+  "completionSnapshot": {
+    "source": "e1e0c97",
+    "stableAlphaRaw": 69,
+    "fullSchemeBRaw": 50.8,
+    "rescored": false
+  },
+  "preservedUserServices": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ],
+    [
+      5186,
+      8802
+    ],
+    [
+      5187,
+      8803
+    ],
+    [
+      5188,
+      8804
+    ],
+    [
+      5189,
+      8805
+    ],
+    [
+      5190,
+      8806
+    ]
+  ],
+  "dispatch": "../../../agent-tasks/product-wave-15/dispatch.json"
+}

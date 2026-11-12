@@ -1,0 +1,53 @@
+{
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "source": "cfe6a3a39250b196c7cdc93349c794161591b958",
+  "cases": [
+    {
+      "id": "VALIDATION_MUST_COVER_ACTUAL_CLONED_ACCESSOR_VALUE",
+      "status": "PASS",
+      "observation": {
+        "reservations": 0,
+        "fakeSends": 0,
+        "sent": false,
+        "getterReads": 0,
+        "clonedValueType": "undefined"
+      }
+    },
+    {
+      "id": "ARRAY_SYMBOL_KEY_MUST_NOT_BYPASS_JSON_VALIDATION",
+      "status": "PASS",
+      "observation": {
+        "reservations": 0,
+        "fakeSends": 0,
+        "sent": false,
+        "originalSymbolKeys": 1,
+        "receivedSymbolKeys": 0
+      }
+    },
+    {
+      "id": "MAP_MODEL_CONTEXT_MUST_NOT_SILENTLY_SERIALIZE_EMPTY",
+      "status": "PASS",
+      "observation": {
+        "reservations": 0,
+        "fakeSends": 0,
+        "sent": false,
+        "receivedMap": false,
+        "receivedMapSize": null
+      }
+    },
+    {
+      "id": "PUBLIC_WINDOWS_PATH_MUST_REDACT_ACCOUNT_AND_TRAILING_COMPONENTS",
+      "status": "PASS",
+      "observation": {
+        "publicText": "[redacted-path]",
+        "publicDetail": "[redacted-path]",
+        "pathRedacted": true
+      }
+    }
+  ],
+  "passed": 4,
+  "failed": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "ledgerOpened": false
+}
