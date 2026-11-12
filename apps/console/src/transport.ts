@@ -43,6 +43,9 @@ import {
   AssistantContextPreparedSchema,
   AssistantContextSendSchema,
   AssistantContextBindingSchema,
+  ContextHistoryQuerySchema,
+  ContextHistorySchema,
+  ContextSourcesSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -86,6 +89,9 @@ import type {
   AssistantContextPrepared,
   AssistantContextSend,
   AssistantContextBinding,
+  ContextHistoryQuery,
+  ContextHistory,
+  ContextSources,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -149,6 +155,8 @@ export interface ConsoleTransport {
   prepareAssistantContext?(input: AssistantContextPrepare): Promise<AssistantContextPrepared>
   sendAssistantContext?(input: AssistantContextSend): Promise<CommandReceipt>
   assistantContext?(messageId: string): Promise<AssistantContextBinding | undefined>
+  contextHistory?(query: ContextHistoryQuery): Promise<ContextHistory>
+  contextSources?(messageId: string): Promise<ContextSources | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -461,6 +469,29 @@ export class HttpTransport implements ConsoleTransport {
       const binding = AssistantContextBindingSchema.parse(body)
       if (binding.messageId !== messageId) throw new TransportError('schema_mismatch', '上下文记录属于另一条消息')
       return binding
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async contextHistory(input: ContextHistoryQuery): Promise<ContextHistory> {
+    const query = ContextHistoryQuerySchema.parse(input), params = new URLSearchParams({ projectId: query.projectId })
+    if (query.conversationId) params.set('conversationId', query.conversationId)
+    if (query.workId) params.set('workId', query.workId)
+    if (query.limit !== undefined) params.set('limit', String(query.limit))
+    if (query.cursor) params.set('cursor', query.cursor)
+    const page = ContextHistorySchema.parse(await this.request(`/v1/context/history?${params}`, { signal: AbortSignal.timeout(10000) }))
+    if (page.projectId !== query.projectId || page.conversationId !== query.conversationId || page.workId !== query.workId ||
+      page.entries.length > (query.limit ?? 20)) throw new TransportError('schema_mismatch', '使用记录与所选项目、会话或工作不匹配')
+    return page
+  }
+  async contextSources(messageId: string): Promise<ContextSources | undefined> {
+    try {
+      const body = await this.request(`/v1/messages/${encodeURIComponent(messageId)}/context/sources`, { signal: AbortSignal.timeout(10000) }, 'json404')
+      if (body === missingOptionalResource) return undefined
+      const value = ContextSourcesSchema.parse(body)
+      if (value.binding.messageId !== messageId) throw new TransportError('schema_mismatch', '来源正文属于另一条消息')
+      return value
     } catch (error) {
       if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
       throw error

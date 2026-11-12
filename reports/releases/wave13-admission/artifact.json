@@ -1,0 +1,46 @@
+{
+  "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave12-target/wave12-target-020af82.tar.gz",
+  "tarSha256": "96d32fb55a0d8fa9a02f4a5497c54774e84176b42c5727da449343fb3913bfe5",
+  "tarBytes": 20147268,
+  "source": {
+    "commit": "020af824390e9230a4ff9d01f9e29b1ee93dd246",
+    "branch": "codex/g3-local-distribution",
+    "dirty": false
+  },
+  "buildId": "1a2f34ac359a5739",
+  "schemaActualExport": 18,
+  "platform": "darwin",
+  "arch": "arm64",
+  "node": "v24.21.0",
+  "abiActual": "137",
+  "sqliteActual": "3.53.4",
+  "filesVerified": 6707,
+  "extractedBytes": 67149633,
+  "installManifestSha256": "30daa828ce8cafd4185d93f883226eea80b6bfee4722bb79e0023200bce765c9",
+  "releaseManifestSha256": "29add0bbd4f87379b220e40a5fb771fcec8042afeef5308f2e296d40464d26c4",
+  "closureDigest": "c22e1946343c2a39ea69a840fc5f288810194e93e8e60ac9a6762de2436b6adf",
+  "capability": {
+    "selectedContextPrepare": true,
+    "selectedContextSend": true,
+    "replyResultsConsumer": true,
+    "contextHistoryHttp": false,
+    "frozenSourceHttp": false
+  },
+  "ownership": [
+    {
+      "path": "apps/launcher/lib/identity.mjs",
+      "matchesDeclaredSource": true
+    },
+    {
+      "path": "apps/launcher/lib/upgrade.mjs",
+      "matchesDeclaredSource": true
+    },
+    {
+      "path": "apps/launcher/lib/stop.mjs",
+      "matchesDeclaredSource": true
+    }
+  ],
+  "mode": "No instance was started; manifest supplies personal-capable launcher, actual cold-install admission not claimed",
+  "modelCalls": 0,
+  "nativeTurns": 0
+}

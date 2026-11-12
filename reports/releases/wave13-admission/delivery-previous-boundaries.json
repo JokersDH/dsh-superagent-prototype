@@ -1,0 +1,60 @@
+{
+  "dHead": "0ac2b58d4d861f066172dada6427de284219bd1c",
+  "frozen": "/tmp/pa-wave13-d-audit-M9VjvI/install",
+  "cases": [
+    {
+      "id": "MATCHING_STATE_POSITIVE",
+      "status": "STOPPED_ORPHAN",
+      "apiAlive": false,
+      "verdict": "PASS"
+    },
+    {
+      "id": "REQUESTED_DATA_ROOT_CLOSED",
+      "code": "requested_root_mismatch",
+      "apiAlive": true,
+      "recordPreserved": true,
+      "verdict": "PASS"
+    },
+    {
+      "id": "REQUESTED_INSTALL_ROOT_BYPASS",
+      "status": "BLOCKED",
+      "apiStopped": false,
+      "recordRemoved": false,
+      "verdict": "PASS"
+    },
+    {
+      "id": "COPIED_RECORD_CONFIG_ROOT_BYPASS",
+      "status": "BLOCKED",
+      "apiStopped": false,
+      "originalRecordPreserved": true,
+      "verdict": "PASS"
+    },
+    {
+      "id": "UNREGISTERED_OTHER_STATE_SHARED_CACHE_CLAIMED",
+      "owned": [],
+      "consideredRegistered": 0,
+      "mockedSignals": [],
+      "proven": true,
+      "actualOsScans": 0,
+      "actualOsSignals": 0,
+      "verdict": "PASS"
+    },
+    {
+      "id": "RECOVER_STARTING_REQUESTED_DATA_SCOPE_BYPASS",
+      "requestedData": "/private/tmp/pa-wave12-delivery-yIRIda/mock/state-a",
+      "recordedData": "/private/tmp/pa-wave12-delivery-yIRIda/mock/state-b",
+      "status": "BLOCKED",
+      "journalStatus": "starting",
+      "instanceVerification": "mocked-valid-other-state",
+      "realTargetByteValidation": true,
+      "actualOsScans": 0,
+      "actualOsSignals": 0,
+      "verdict": "PASS"
+    }
+  ],
+  "passed": 6,
+  "failed": 0,
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "userServicesTouched": false
+}
