@@ -56,7 +56,11 @@ try {
   const health = await waitHealth(apiPort)
   if (health === null) throw new Error(`personal no-executor start did not become healthy: ${readFileSync(join(root, 'start.err.log'), 'utf8').slice(0, 400)}`)
   if (health.mode !== 'personal') throw new Error(`installer did not start personal mode: ${health.mode}`)
-  const record = JSON.parse(readFileSync(join(roots.config, 'instance.json'), 'utf8'))
+  const recordPath = join(roots.config, 'instance.json')
+  const recordDeadline = Date.now() + 15_000
+  while (!existsSync(recordPath) && Date.now() < recordDeadline) await new Promise((r) => setTimeout(r, 150))
+  if (!existsSync(recordPath)) throw new Error('personal instance record was not written after health')
+  const record = JSON.parse(readFileSync(recordPath, 'utf8'))
   if (record.mode !== 'personal') throw new Error(`instance record is not personal: ${record.mode}`)
   step('personal-not-fixture', 'PASS', { healthMode: health.mode, recordMode: record.mode, buildId: record.buildId })
 
