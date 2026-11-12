@@ -1,0 +1,70 @@
+{
+  "protocol": "agent-c-wave15-status/1",
+  "wave": "product-wave-15",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "53b1598",
+    "mergeCommit": "f5fe6bc",
+    "mainCheckpoint": "697efdc",
+    "previousOwnCommit": "2e1c095",
+    "earlyCheckpoint": "1b720aa",
+    "middleCheckpoint": "c12e936",
+    "rootLockDiffPreserved": true
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "actualExportProbes": {
+    "wave15": { "passed": 4, "failed": 0, "report": "/tmp/w15.json", "ownedCopy": "packages/context/reports/wave15-probe.json" },
+    "wave14Regression": { "passed": 6, "failed": 0 },
+    "wave13Regression": { "passed": 6, "failed": 0 },
+    "wave12Regression": { "passed": 8, "failed": 0 },
+    "wave11Regression": { "passed": 17, "failed": 0 }
+  },
+  "closedCounterexamples": [
+    { "id": "NULL_BODY_RETURNS_INVALID_BODY", "fix": "wrapper validated before dereference; null body -> invalid_body" },
+    { "id": "NULL_IDENTITY_RETURNS_INVALID_BODY", "fix": "identity shape checked as object and required strings before use" },
+    { "id": "MISSING_PRINCIPAL_RETURNS_INVALID_BODY", "fix": "principal object/userId/authorityRef required; no TypeError" },
+    { "id": "VALID_PRIVATE_INPUT_REMAINS_NO_CANDIDATES", "fix": "typed positive control unchanged" }
+  ],
+  "stageOutcomes": {
+    "C1": "done: null body/identity/missing principal return invalid_body; valid typed positive preserved; P2 robustness only",
+    "C2": "done: minimal exports documented — factories, Composer Scope+coverage, candidate wrapper types; typed private vs unknown input distinction explicit",
+    "C3": "partially done: factories proven inside real composer/manifest (call counts, source ids, coverage); main default replacement NOT_TESTED (no caller in repo yet)",
+    "C4": "done (data): non-empty structured fixture with 3 suggestions and one real verified suggestion; main still persists suggestions=[] so production non-empty path NT",
+    "C5": "done: original suggestions[index], payloadDigest, request/reply/source/project/model/principal and optional artifact tuple cross-checked; verifiedIdentity exposed for main",
+    "C6": "done: verified candidate digest equals proposal preview digest; main ProductProposals HTTP confirm/replay/reject over real A state; no second confirmation authority",
+    "C7": "done (retained): revocation/expiry/cutoff/mid-walk append/live source edit (frozen audit unchanged, fresh prepare reads new text)",
+    "C8": "done: public review truth (items/bytes/omissions/suppressed/truncated) and nested detail redaction retained from wave-14 with typed additions",
+    "C9": "done: strict/exactOptional chain build; 600 scan boundary, 10000 messages/history/candidates, 5000+ omissions caps; reader call counts",
+    "C10": "done: four suites, five probes, status and consumer map"
+  },
+  "consumerMap": [
+    { "export": "createScopedConversationProvider / createPublishedArtifactProvider", "consumedBy": ["packages/context/test/factory-consumer.case.ts", "packages/context/test/scale.case.ts", "packages/context/test/scoped-adapters.case.ts"], "mainStatus": "NT — no main caller yet" },
+    { "export": "projectSourceReview", "consumedBy": ["wave-14/15 probes", "packages/context/test/source-review.case.ts", "packages/context/test/scale.case.ts"] },
+    { "export": "collectContextHistory", "consumedBy": ["packages/knowledge/test/main-context-use-consumer.case.ts (real A18 + main CompletedAssistantReplies + frozen-after-edit)"] },
+    { "export": "reviewVerifiedReplyCandidates", "consumedBy": ["wave-15 probe", "packages/proposals/test/verified-candidates-transaction.case.ts", "packages/proposals/test/reply-candidates.case.ts", "packages/knowledge/test/main-context-use-consumer.case.ts (real A proposal transaction + main HTTP proposals)"] },
+    { "export": "AssistantProposalService + planProposalCommand (consumption only)", "consumedBy": ["packages/knowledge/test/main-context-use-consumer.case.ts (real A AssistantStatePort)"] }
+  ],
+  "ownedRegressions": {
+    "contextTests": { "passed": 124, "failed": 0 },
+    "proposalsTests": { "passed": 39, "failed": 0 },
+    "knowledgeTests": { "passed": 84, "failed": 0 },
+    "routingTests": { "passed": 44, "failed": 0 },
+    "typecheck": "pass",
+    "build": "pass"
+  },
+  "notTested": [
+    { "item": "main default preview adapter replaced by C factories", "owner": "main", "reason": "no call site in the merged tree; composer-level call counts/ids/coverage only" },
+    { "item": "production non-empty suggestion path", "owner": "main", "reason": "model port returns text/model and main persists suggestions=[]; C provides structured fixture/validator only" },
+    { "item": "candidate review UI and final explicit confirmation surface", "owner": "main" },
+    { "item": "assistant SSE admission", "owner": "main", "reason": "not read by this consumer" },
+    { "item": "A history work_id derived-column negative", "owner": "A", "reason": "C rechecks query.workId" }
+  ],
+  "preserved": {
+    "userServices": "5180/8796 through 5190/8806 untouched",
+    "historicalReports": "wave01-wave14 reports unchanged",
+    "rootLock": "pnpm-lock.yaml diff preserved and not committed"
+  }
+}
