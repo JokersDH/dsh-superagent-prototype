@@ -1,0 +1,698 @@
+{
+  "$defs": {
+    "AssistantContextHistoryPage": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "hasMore": {
+          "type": "boolean"
+        },
+        "nextCursor": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "assistant-context-history/1",
+          "type": "string"
+        },
+        "records": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bundleDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "bundleRef": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "commandId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "confirmedAt": {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string"
+              },
+              "contract": {
+                "additionalProperties": false,
+                "properties": {
+                  "digest": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "revision": {
+                    "maximum": 9007199254740991,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "workId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "workId",
+                  "revision",
+                  "digest"
+                ],
+                "type": "object"
+              },
+              "conversationId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "expiresAt": {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string"
+              },
+              "messageId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "principal": {
+                "additionalProperties": false,
+                "properties": {
+                  "authorityRef": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  },
+                  "userId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "authorityRef"
+                ],
+                "type": "object"
+              },
+              "projectId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "protocol": {
+                "const": "assistant-context-binding/1",
+                "type": "string"
+              },
+              "purpose": {
+                "const": "conversation_discussion",
+                "type": "string"
+              },
+              "requestId": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "scope": {
+                "additionalProperties": false,
+                "properties": {
+                  "allowedPaths": {
+                    "items": {
+                      "maxLength": 1024,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "maxItems": 256,
+                    "minItems": 1,
+                    "readOnly": true,
+                    "type": "array"
+                  },
+                  "excludedPaths": {
+                    "items": {
+                      "maxLength": 1024,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "maxItems": 256,
+                    "readOnly": true,
+                    "type": "array"
+                  },
+                  "expiresAt": {
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                    "type": "string"
+                  },
+                  "externalActions": {
+                    "items": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "maxItems": 1024,
+                    "readOnly": true,
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "projectId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "allowedPaths",
+                  "excludedPaths",
+                  "externalActions"
+                ],
+                "type": "object",
+                "x-runtime-rules": [
+                  "project-relative-paths"
+                ]
+              },
+              "selections": {
+                "items": {
+                  "enum": [
+                    "work",
+                    "decisions",
+                    "project",
+                    "conversation",
+                    "artifacts"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "minItems": 1,
+                "readOnly": true,
+                "type": "array"
+              },
+              "sources": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "work",
+                        "contract",
+                        "verification",
+                        "delivery",
+                        "decision",
+                        "project_metadata",
+                        "conversation_message",
+                        "artifact"
+                      ],
+                      "type": "string"
+                    },
+                    "previewDigest": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "sourceDigest": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "sourceId": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "truncated": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "sourceId",
+                    "kind",
+                    "sourceDigest",
+                    "previewDigest",
+                    "truncated"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 64,
+                "minItems": 1,
+                "readOnly": true,
+                "type": "array"
+              },
+              "userTextDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "protocol",
+              "commandId",
+              "messageId",
+              "requestId",
+              "projectId",
+              "conversationId",
+              "userTextDigest",
+              "principal",
+              "purpose",
+              "scope",
+              "selections",
+              "bundleRef",
+              "bundleDigest",
+              "sources",
+              "confirmedAt",
+              "expiresAt"
+            ],
+            "type": "object"
+          },
+          "maxItems": 100,
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "required": [
+        "protocol",
+        "observedAt",
+        "records",
+        "hasMore"
+      ],
+      "type": "object"
+    },
+    "AssistantContextHistoryQuery": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "conversationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "cursor": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "limit": {
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "projectIds": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "readOnly": true,
+          "type": "array"
+        },
+        "workId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "projectIds"
+      ],
+      "type": "object"
+    },
+    "AssistantInferenceRecord": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "conversationId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "messageId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "projectId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "messageId",
+            "conversationId",
+            "projectId"
+          ],
+          "type": "object"
+        },
+        "kind": {
+          "const": "assistant-inference/1",
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "input",
+        "model"
+      ],
+      "type": "object"
+    },
+    "AssistantReplyBody": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "conversationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "model": {
+          "maxLength": 160,
+          "minLength": 1,
+          "type": "string"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "assistant-reply-body/1",
+          "type": "string"
+        },
+        "replyMessageId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "sourceMessageId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "suggestions": {
+          "items": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "reply",
+                    "type": "string"
+                  },
+                  "sourceRefs": {
+                    "items": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "maxItems": 1024,
+                    "readOnly": true,
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "text": {
+                    "maxLength": 32768,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "text",
+                  "sourceRefs"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "goal": {
+                    "maxLength": 16384,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "kind": {
+                    "const": "propose_work",
+                    "type": "string"
+                  },
+                  "projectId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  },
+                  "sourceMessageId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "goal",
+                  "projectId",
+                  "sourceMessageId"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "expected": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "digest": {
+                        "pattern": "^[a-f0-9]{64}$",
+                        "type": "string"
+                      },
+                      "revision": {
+                        "maximum": 9007199254740991,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "workId": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "workId",
+                      "revision",
+                      "digest"
+                    ],
+                    "type": "object"
+                  },
+                  "kind": {
+                    "const": "propose_revision",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sourceMessageId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "expected",
+                  "rationale",
+                  "sourceMessageId"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "content": {
+                    "maxLength": 16384,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "kind": {
+                    "const": "propose_decision",
+                    "type": "string"
+                  },
+                  "scope": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "allowedPaths": {
+                        "items": {
+                          "maxLength": 1024,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "maxItems": 256,
+                        "minItems": 1,
+                        "readOnly": true,
+                        "type": "array"
+                      },
+                      "excludedPaths": {
+                        "items": {
+                          "maxLength": 1024,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "maxItems": 256,
+                        "readOnly": true,
+                        "type": "array"
+                      },
+                      "expiresAt": {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                        "type": "string"
+                      },
+                      "externalActions": {
+                        "items": {
+                          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                          "type": "string"
+                        },
+                        "maxItems": 1024,
+                        "readOnly": true,
+                        "type": "array",
+                        "uniqueItems": true
+                      },
+                      "projectId": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "projectId",
+                      "allowedPaths",
+                      "excludedPaths",
+                      "externalActions"
+                    ],
+                    "type": "object",
+                    "x-runtime-rules": [
+                      "project-relative-paths"
+                    ]
+                  },
+                  "sourceMessageId": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "content",
+                  "scope",
+                  "sourceMessageId"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "maxItems": 8,
+          "readOnly": true,
+          "type": "array"
+        },
+        "text": {
+          "maxLength": 32768,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "projectId",
+        "conversationId",
+        "sourceMessageId",
+        "replyMessageId",
+        "model",
+        "text",
+        "suggestions"
+      ],
+      "type": "object"
+    },
+    "AssistantReplyResult": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "artifactDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "artifactRef": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "conversationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "model": {
+          "maxLength": 160,
+          "minLength": 1,
+          "type": "string"
+        },
+        "principal": {
+          "additionalProperties": false,
+          "properties": {
+            "authorityRef": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            },
+            "userId": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "userId",
+            "authorityRef"
+          ],
+          "type": "object"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "assistant-reply-result/1",
+          "type": "string"
+        },
+        "recordedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "replyMessageId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "requestDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "requestId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "sourceMessageId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "textDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "requestId",
+        "requestDigest",
+        "sourceMessageId",
+        "replyMessageId",
+        "projectId",
+        "conversationId",
+        "principal",
+        "model",
+        "artifactRef",
+        "artifactDigest",
+        "textDigest",
+        "recordedAt"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:assistant-records:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

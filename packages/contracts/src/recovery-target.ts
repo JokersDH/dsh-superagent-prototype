@@ -45,6 +45,30 @@ export type RecoveryTargetPreparation = z.infer<typeof RecoveryTargetPreparation
 export type RecoveryTargetMaterial = z.infer<typeof RecoveryTargetMaterialSchema>
 export type RecoveryTargetInventory = z.infer<typeof RecoveryTargetInventorySchema>
 
+export const RecoveryTargetPrepareInputSchema = z.strictObject({
+  activationId: IdSchema, configuration: RecoveryTargetConfigurationSchema,
+})
+export const RecoveryTargetStatusSchema = z.strictObject({
+  protocol: z.literal('recovery-target-status/1'), activationId: IdSchema, generationId: IdSchema, stateRoot,
+  sourceReceipt: RecoveryActivationCommitSchema.shape.sourceReceipt,
+  observedAt: TimestampSchema, expiresAt: TimestampSchema,
+  step: z.enum(['not_prepared', 'material_prepared', 'inventory_complete', 'blocked']),
+  material: RecoveryTargetMaterialSchema.optional(), inventory: RecoveryTargetInventorySchema.optional(),
+  blockers: z.array(z.strictObject({ code: z.enum(['source_expired', 'source_changed', 'material_mismatch', 'target_unsafe',
+    'initialization_unknown', 'inventory_incomplete', 'business_rows_present', 'authorization_not_implemented']),
+    owner: z.enum(['main', 'A', 'B', 'D']), detail: z.string().min(1).max(1024) })).max(16).readonly(),
+  authorization: z.literal('not_granted'), startupAvailable: z.literal(false),
+}).superRefine((value, context) => {
+  if ((value.material && (value.material.activationId !== value.activationId || value.material.generationId !== value.generationId || value.material.stateRoot !== value.stateRoot)) ||
+    (value.inventory && value.inventory.stateRoot !== value.stateRoot) ||
+    (value.step === 'inventory_complete' && (!value.material || !value.inventory || value.inventory.completeness !== 'complete' ||
+      value.inventory.integrity !== 'ok' || !value.inventory.databaseDigest || value.inventory.issues.length ||
+      value.inventory.productSchema !== value.material.productSchema || value.inventory.tables.some(table => table.category === 'business' && table.rows > 0))))
+    context.addIssue({ code: 'custom', message: 'Target status must bind one material and complete empty inventory' })
+})
+export type RecoveryTargetPrepareInput = z.infer<typeof RecoveryTargetPrepareInputSchema>
+export type RecoveryTargetStatus = z.infer<typeof RecoveryTargetStatusSchema>
+
 /** A-owned synchronous readonly storage inspection; never migrates or creates the target DB. */
 export interface RecoveryTargetInventoryReader {
   inspect(stateRoot: string): RecoveryTargetInventory

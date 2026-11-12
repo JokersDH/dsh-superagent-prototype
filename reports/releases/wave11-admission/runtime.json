@@ -1,0 +1,337 @@
+{
+  "status": "FAIL_SCOPED_NEW_B_HELPER_ADMISSION",
+  "command": [
+    "node",
+    "tools/bootstrap/probe-wave11-runtime.mjs",
+    "/Users/hh/Desktop/joker/superagent-agent-b",
+    "/Users/hh/Desktop/joker/superagent-agent-e"
+  ],
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "sourceCommit": "b4e2031ce819168ec688309ee5a3b11d766c4688",
+  "publishedSource": "b4e2031ce819168ec688309ee5a3b11d766c4688",
+  "sourceWorktreeClean": true,
+  "baseCommit": "f99ca39ac9f614ed3f5fc12c000dd78ae9293b73",
+  "evaluatorSource": "c12c15e0def25c84c490b70acdd89406759e5ca6",
+  "evaluatorTestSourceClean": true,
+  "checkedAt": "2026-11-11T15:57:55.246Z",
+  "sourceHashes": {
+    "packages/driver-kit/src/send-admission.ts": "6a745575b18e5e1574390b385d35839225a8c8b58490c71e5dcd3cc77c26c792",
+    "packages/driver-kit/src/review-sender.ts": "a49040dc932aed98c1572957df396285564c720cf3b3b76093b812ba1e437021",
+    "packages/driver-kit/src/runtime-diagnostics.ts": "93bbe47662e1980f3287724c77302f75401e594ea1d1f5973c815e25242216b8",
+    "packages/execution/src/resource-facts.ts": "b8108ffa86961d9c73001e497715cc8e3b97091a4c7ea8786488dac056e405bb",
+    "tests/native-acceptance/b12-control-restart.mjs": "f41ee342aaa0ccecca7fbe9698733f0a317020c64420fed51c031af9a2a00cf5"
+  },
+  "sourcesStable": true,
+  "legacyProbeHash": "efed1c86c4ea35d7827dd3c7587dbe5a6168befed2db1f3d80b60cadb1e17d2d",
+  "legacyProbeOldCasesPassed": 7,
+  "legacyStrict": {
+    "command": [
+      "pnpm",
+      "exec",
+      "tsc",
+      "--ignoreConfig",
+      "--noEmit",
+      "--strict",
+      "--skipLibCheck",
+      "--target",
+      "ES2024",
+      "--module",
+      "NodeNext",
+      "--moduleResolution",
+      "NodeNext",
+      "--allowImportingTsExtensions",
+      "--types",
+      "node",
+      "packages/driver-kit/src/runtime-diagnostics.ts",
+      "packages/driver-kit/src/send-admission.ts",
+      "packages/driver-kit/src/review-sender.ts",
+      "packages/execution/src/resource-facts.ts"
+    ],
+    "exitCode": 0,
+    "diagnosticCount": 0,
+    "perFile": {},
+    "firstDiagnostics": []
+  },
+  "cases": [
+    {
+      "id": "PLAIN_RESOURCE_JSON_HAS_NO_RELEASE_AUTHORITY",
+      "scope": "diagnostic_module",
+      "status": "PASS",
+      "observation": {
+        "verdict": "refused",
+        "releaseBarrierSatisfied": false
+      },
+      "origin": "previous_seven_case_probe"
+    },
+    {
+      "id": "ONE_TOKEN_CONCURRENT_CONSUMPTION_SENDS_AT_MOST_ONCE",
+      "scope": "experimental_sender_helper",
+      "status": "PASS",
+      "observation": {
+        "sends": 1,
+        "refusals": 1
+      },
+      "origin": "previous_seven_case_probe"
+    },
+    {
+      "id": "DEFAULT_REVIEW_SENDER_REMAINS_BLOCKED_WITHOUT_BOUND",
+      "scope": "experimental_sender_helper",
+      "status": "PASS",
+      "observation": {
+        "sent": false,
+        "fakeSends": 0
+      },
+      "origin": "previous_seven_case_probe"
+    },
+    {
+      "id": "INPUT_STAYS_FROZEN_WHILE_RESERVATION_IS_AWAITED",
+      "scope": "experimental_sender_immutable_request_contract",
+      "status": "PASS",
+      "observation": {
+        "result": {
+          "sent": true,
+          "status": "sent",
+          "reason": null,
+          "attempts": 1,
+          "sends": 1,
+          "tokenState": {
+            "issued": true,
+            "claimed": true
+          }
+        },
+        "fakeSends": 1,
+        "receivedPrompt": "approved frozen patch",
+        "receivedMaterialDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "origin": "previous_seven_case_probe"
+    },
+    {
+      "id": "FIXED_TRANSPORT_CANNOT_REPLACE_ITS_METHOD_AFTER_ISSUANCE",
+      "scope": "experimental_sender_fixed_transport_contract",
+      "status": "PASS",
+      "observation": {
+        "result": {
+          "sent": true,
+          "reservation": {
+            "admitted": true,
+            "reservationId": "fixture-1"
+          },
+          "result": {
+            "turnId": "fixture-turn"
+          },
+          "tokenConsumed": true
+        },
+        "originalFakeSends": 1,
+        "replacementFakeSends": 0
+      },
+      "origin": "previous_seven_case_probe"
+    },
+    {
+      "id": "E_CONSUMER_CAN_CALL_THE_ACTUAL_B_SENDER_ENTRY",
+      "scope": "experimental_B_E_consumer_integration",
+      "status": "PASS",
+      "observation": {
+        "ok": true,
+        "result": {
+          "protocol": "review-sender/1",
+          "sent": false,
+          "status": "no_send",
+          "reason": "the request does not name a review-sender/1 b-sender entry, so this module is not the consumer for it",
+          "reservationId": "fixture-not-persisted"
+        }
+      },
+      "origin": "previous_seven_case_probe"
+    },
+    {
+      "id": "NEW_PUBLIC_MODULES_PASS_THE_EXISTING_STRICT_TYPESCRIPT_CONTRACT",
+      "scope": "new_module_integration",
+      "status": "PASS",
+      "observation": {
+        "command": [
+          "pnpm",
+          "exec",
+          "tsc",
+          "--ignoreConfig",
+          "--noEmit",
+          "--strict",
+          "--skipLibCheck",
+          "--target",
+          "ES2024",
+          "--module",
+          "NodeNext",
+          "--moduleResolution",
+          "NodeNext",
+          "--allowImportingTsExtensions",
+          "--types",
+          "node",
+          "packages/driver-kit/src/runtime-diagnostics.ts",
+          "packages/driver-kit/src/send-admission.ts",
+          "packages/driver-kit/src/review-sender.ts",
+          "packages/execution/src/resource-facts.ts"
+        ],
+        "exitCode": 0,
+        "diagnosticCount": 0,
+        "perFile": {},
+        "firstDiagnostics": []
+      },
+      "origin": "previous_seven_case_probe"
+    },
+    {
+      "id": "PUBLIC_MODULES_MATCH_MAIN_EXACT_OPTIONAL_PROPERTY_POLICY",
+      "scope": "actual_main_consumer_type_policy",
+      "status": "FAIL",
+      "message": "Standalone --strict omits the main consumer exactOptionalPropertyTypes rule",
+      "observation": {
+        "command": [
+          "pnpm",
+          "exec",
+          "tsc",
+          "--ignoreConfig",
+          "--noEmit",
+          "--strict",
+          "--exactOptionalPropertyTypes",
+          "--skipLibCheck",
+          "--target",
+          "ES2024",
+          "--module",
+          "NodeNext",
+          "--moduleResolution",
+          "NodeNext",
+          "--allowImportingTsExtensions",
+          "--types",
+          "node",
+          "packages/driver-kit/src/runtime-diagnostics.ts",
+          "packages/driver-kit/src/send-admission.ts",
+          "packages/driver-kit/src/review-sender.ts",
+          "packages/execution/src/resource-facts.ts"
+        ],
+        "exitCode": 2,
+        "diagnosticCount": 2,
+        "diagnostics": [
+          "packages/driver-kit/src/review-sender.ts(134,32): error TS2379: Argument of type '{ grant: GrantIdentity | undefined; gates: { cost_bound: { satisfied: boolean; reason: string; }; isolation: GateClaim; reservation: GateClaim; model_identity: GateClaim; }; ... 7 more ...; audit: GrantAudit | undefined; }' is not assignable to parameter of type 'AdmissionRequest' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.",
+          "packages/driver-kit/src/review-sender.ts(161,61): error TS2379: Argument of type '{ transport: SenderTransport | undefined; hook: ReservationHook | undefined; input: unknown; }' is not assignable to parameter of type '{ transport?: SenderTransport; hook?: ReservationHook; input?: unknown; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        ]
+      }
+    },
+    {
+      "id": "UNCLONEABLE_INPUT_REFUSES_BEFORE_RESERVATION_AND_TRANSPORT",
+      "scope": "experimental_sender_input_contract",
+      "status": "FAIL",
+      "message": "A clone failure must refuse, not reserve and send a refusal sentinel as model input",
+      "observation": {
+        "reservations": 1,
+        "fakeSends": 1,
+        "receivedInput": {
+          "refused": "the admitted input could not be snapshotted, so nothing may be sent"
+        },
+        "result": {
+          "sent": true,
+          "status": "sent",
+          "reason": null,
+          "attempts": 1,
+          "sends": 1,
+          "tokenState": {
+            "issued": true,
+            "claimed": true
+          }
+        }
+      }
+    },
+    {
+      "id": "AGREED_E_BINDING_REACHES_B_DEFAULT_REFUSAL_NOT_ENTRY_MISMATCH",
+      "scope": "experimental_B_E_consumer_contract",
+      "status": "FAIL",
+      "message": "The actual E caller omits the admission envelope B expects; export presence alone does not close this signature mismatch",
+      "observation": {
+        "ok": true,
+        "result": {
+          "protocol": "review-sender/1",
+          "sent": false,
+          "status": "no_send",
+          "reason": "the request does not name a review-sender/1 b-sender entry, so this module is not the consumer for it",
+          "reservationId": "fixture-echo"
+        }
+      }
+    },
+    {
+      "id": "RUNTIME_IDENTITY_SUPPORTS_VALID_ABSOLUTE_EXECUTABLE_WITH_SPACES",
+      "scope": "new_diagnostic_module_path_handling",
+      "status": "FAIL",
+      "message": "Shell tokenization loses a valid operator-selected executable path containing spaces",
+      "observation": {
+        "declaredPath": null,
+        "realPath": null,
+        "version": null,
+        "expectedDeclaredPath": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave11-identity-f24kAb/agent with spaces",
+        "expectedRealPath": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node"
+      }
+    }
+  ],
+  "totals": {
+    "passed": 7,
+    "failed": 4
+  },
+  "controlledScope": {
+    "status": "NOT_TESTED_DURABLE_RESTART",
+    "b12SourceHash": "f41ee342aaa0ccecca7fbe9698733f0a317020c64420fed51c031af9a2a00cf5",
+    "recoveryMethodType": "undefined",
+    "reconstructedDelivery": {
+      "queued": false,
+      "reason": "attempt_not_running"
+    },
+    "inMemoryBindingCount": 1,
+    "actualProcessRestarts": 0,
+    "durableDatabaseUsed": false,
+    "begins": 1,
+    "interpretation": "The current B12 reconstructs memory-only objects and optional-calls a missing recover method. No duplicate begin by itself does not prove reconnect or persistence; this is a source-bound evidence limitation, not a requirement to add recover to this class."
+  },
+  "independentCommands": {
+    "owned": {
+      "exitCode": 0,
+      "passed": 68,
+      "failed": 0
+    },
+    "b11": {
+      "exitCode": 0,
+      "totals": {
+        "cases": 11,
+        "PASS": 10,
+        "FAIL": 0,
+        "SKIPPED": 0,
+        "NOT_TESTED": 1
+      }
+    },
+    "b12": {
+      "exitCode": 0,
+      "totals": {
+        "cases": 7,
+        "PASS": 6,
+        "FAIL": 0,
+        "SKIPPED": 0,
+        "NOT_TESTED": 1
+      },
+      "evidenceClassification": "NOT_TESTED_DURABLE_RESTART"
+    }
+  },
+  "references": {
+    "uncloneableInput": "packages/driver-kit/src/review-sender.ts:200",
+    "exactOptionalPolicy": "packages/driver-kit/src/review-sender.ts:134",
+    "senderSignature": "packages/driver-kit/src/review-sender.ts:225",
+    "evaluatorSignature": "tests/product-acceptance/pilot/runner.mjs:451",
+    "executablePath": "packages/driver-kit/src/runtime-diagnostics.ts:196",
+    "claimedReconnect": "tests/native-acceptance/b12-control-restart.mjs:98"
+  },
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "exitCode": 1,
+  "limitations": [
+    "Existing seven dynamic probes are reused in memory with its historical writer removed; wave10 evidence is not overwritten.",
+    "The exact-optional isolated compile separates real source errors from stale dist exports seen in the unbuilt candidate coordinator check.",
+    "All sender transports, reservations and the reconstruction exercise are in-memory fakes; no budget ledger is opened.",
+    "The whitespace-path fixture invokes a temporary symlink to the current Node executable with --version only, not a vendor protocol or model.",
+    "B12 missing recovery/persistence is an observed evidence limitation of this source, not a future hard gate requiring a new method on AttemptSupervisor.",
+    "Main currently does not consume the experimental helpers; these findings do not establish a current personal-product permission bypass.",
+    "The B/E entry remains inert. This checks correct refusal protocol recognition, not a working native sender or review value.",
+    "No user or native-account credential contents are read. Authenticated proof unit cases use their own temporary test credentials; diagnostics perform permitted --version and Seatbelt checks. User services and installed artifacts remain untouched."
+  ]
+}

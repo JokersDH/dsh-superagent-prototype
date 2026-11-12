@@ -5,11 +5,11 @@
  */
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { cpSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import Database from 'better-sqlite3'
-import { ProductStore, PRODUCT_SCHEMA_VERSION, verifyDatabase } from '@personal-agent/storage'
+import { ProductStore, PRODUCT_SCHEMA_VERSION, recoveryTargetInventory, verifyDatabase } from '@personal-agent/storage'
 import { createWorkflowPorts, WorkflowSnapshots } from '../src/index.ts'
 
 const at = '2026-11-11T00:00:00.000Z'
@@ -93,7 +93,18 @@ function dataset() {
     machineDigest: 'f'.repeat(64), resourcePolicyDigest: 'a'.repeat(64),
     createdAt: at, expiresAt: '2026-11-11T00:05:00.000Z',
   })
-  return { root, store, ports, patch, report }
+  const bundle = store.artifacts.write(new TextEncoder().encode('{"context":"bounded"}'))
+  store.artifacts.insert(bundle)
+  ports.assistant.contextBindings.put({
+    protocol: 'assistant-context-binding/1', commandId: 'context-command-1', messageId: 'message-1', requestId: 'context-request-1',
+    projectId: 'project-1', conversationId: 'conversation-1', userTextDigest: 'e'.repeat(64),
+    principal: { userId: 'user-1', authorityRef: 'authority-1' }, purpose: 'conversation_discussion', scope,
+    selections: ['conversation'],
+    bundleRef: bundle.id, bundleDigest: bundle.digest,
+    sources: [{ sourceId: 'message-1', kind: 'conversation_message', sourceDigest: 'e'.repeat(64), previewDigest: 'e'.repeat(64), truncated: false }],
+    confirmedAt: at, expiresAt: '2026-11-11T00:04:00.000Z',
+  })
+  return { root, store, ports, patch, report, bundle }
 }
 
 test('schema-13 snapshot includes decisions/settings/contracts/verification/outcome and restores readably', async () => {
@@ -106,7 +117,7 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
     assert.equal(result.manifest.database.productSchema, PRODUCT_SCHEMA_VERSION)
     assert.equal(result.manifest.incompatibleSchema, false)
     assert.equal(result.manifest.complete, true)
-    assert.deepEqual([...result.manifest.referencedArtifacts].sort(), [data.report.id])
+    assert.deepEqual([...result.manifest.referencedArtifacts].sort(), [data.report.id, data.bundle.id].sort())
     const families = new Map(result.manifest.evidence.families.map(family => [family.name, family]))
     assert.equal(families.get('decisions')!.count, 1)
     assert.equal(families.get('project_settings')!.count, 1)
@@ -116,6 +127,7 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
     assert.equal(families.get('reviews')!.count, 1)
     assert.equal(families.get('recovery_intents')!.count, 1)
     assert.equal(families.get('recovery_activations')!.count, 1)
+    assert.equal(families.get('assistant_context_bindings')!.count, 1)
     assert.equal(result.manifest.evidence.complete, true)
     for (const row of result.manifest.artifacts)
       assert.equal(readFileSync(join(snapshot, row.snapshotPath)).length, row.bytes)
@@ -125,6 +137,16 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
     const verification = new WorkflowSnapshots(data.store).verify(restored)
     assert.equal(verification.status, 'ok', verification.message)
     assert.equal(verifyDatabase(join(restored, 'product.sqlite')).integrity, 'ok')
+
+    // The restored binding stays audit-only: an inventory of the restored bytes still exports no
+    // startup authority merely because a selected-context row survived.
+    const targetRoot = join(data.root, 'restored-target')
+    mkdirSync(targetRoot)
+    cpSync(join(restored, 'product.sqlite'), join(targetRoot, 'state.sqlite'))
+    const inventory = recoveryTargetInventory.inspect(targetRoot)
+    assert.equal(inventory.completeness, 'complete')
+    assert.equal(inventory.issues.includes('business_rows_present'), true)
+    assert.equal(inventory.startupAvailable, false)
 
     const db = new Database(join(restored, 'product.sqlite'), { readonly: true, fileMustExist: true })
     try {
@@ -140,6 +162,9 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
       assert.equal(outcome.reviewTiming.readyToAcceptanceMs, 100000)
       assert.equal(outcome.reviewTiming.activeReviewMs, 5000)
       assert.equal((db.prepare("SELECT COUNT(*) AS n FROM review_evidence WHERE id = 'review-1'").get() as { n: number }).n, 1)
+      const restoredBinding = JSON.parse(String((db.prepare("SELECT value FROM assistant_context_bindings WHERE message_id = 'message-1'").get() as { value: string }).value))
+      assert.equal(restoredBinding.bundleRef, data.bundle.id)
+      assert.equal(restoredBinding.purpose, 'conversation_discussion')
       assert.equal((db.prepare("SELECT report_artifact_ref FROM review_evidence WHERE id = 'review-1'").get() as { report_artifact_ref: string }).report_artifact_ref, data.report.id)
       const stored = db.prepare('SELECT digest, bytes FROM artifacts WHERE id = ?').get(data.patch.id) as { digest: string; bytes: number }
       assert.equal(stored.digest, data.patch.digest)
@@ -154,6 +179,21 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
       assert.equal(JSON.stringify(activation).includes('credential'), false, 'an activation fact carries no credential reference')
       assert.equal(JSON.stringify(activation).includes('token'), false)
     } finally { db.close() }
+  } finally {
+    data.store.close()
+    rmSync(data.root, { recursive: true, force: true })
+  }
+})
+
+test('a selected-context binding whose bundle artifact row is absent blocks the snapshot', async () => {
+  const data = dataset()
+  const snapshot = join(data.root, 'snapshot-missing-bundle')
+  try {
+    data.store.db.prepare('DELETE FROM artifacts WHERE id = ?').run(data.bundle.id)
+    const result = await new WorkflowSnapshots(data.store).create({ destination: snapshot })
+    assert.equal(result.status, 'blocked')
+    assert.deepEqual(result.manifest.missingReferences, [data.bundle.id])
+    assert.equal(result.manifest.complete, false)
   } finally {
     data.store.close()
     rmSync(data.root, { recursive: true, force: true })
@@ -242,6 +282,20 @@ test('missing file, changed bytes and a newer schema make the snapshot unusable'
     writeFileSync(dropManifestPath, JSON.stringify(dropManifest, null, 2))
     const dropped = new WorkflowSnapshots(data.store).verify(missingTableDir)
     assert.equal(dropped.status, 'blocked', 'a missing activation table is not silently treated as empty evidence')
+
+    const missingBindingDir = join(data.root, 'missing-binding-copy')
+    cpSync(snapshot, missingBindingDir, { recursive: true })
+    const missingBindingDb = join(missingBindingDir, 'product.sqlite')
+    const dropBindingDb = new Database(missingBindingDb)
+    try { dropBindingDb.exec('DROP TABLE assistant_context_bindings') } finally { dropBindingDb.close() }
+    const bindingManifestPath = join(missingBindingDir, 'snapshot.json')
+    const bindingManifest = JSON.parse(readFileSync(bindingManifestPath, 'utf8'))
+    const bindingBytes = readFileSync(missingBindingDb)
+    bindingManifest.database.sha256 = createHash('sha256').update(bindingBytes).digest('hex')
+    bindingManifest.database.bytes = bindingBytes.byteLength
+    writeFileSync(bindingManifestPath, JSON.stringify(bindingManifest, null, 2))
+    const missingBinding = new WorkflowSnapshots(data.store).verify(missingBindingDir)
+    assert.equal(missingBinding.status, 'blocked', 'a missing binding table is not silently treated as empty evidence')
   } finally {
     data.store.close()
     rmSync(data.root, { recursive: true, force: true })

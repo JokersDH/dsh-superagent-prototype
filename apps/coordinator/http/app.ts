@@ -54,8 +54,20 @@ import {
   RecoveryActivationRecordSchema,
   ContextPreviewInputSchema,
   ContextPreviewSchema,
+  RecoveryTargetPrepareInputSchema,
+  RecoveryTargetStatusSchema,
+  AssistantContextPrepareSchema,
+  AssistantContextPreparedSchema,
+  AssistantContextSendSchema,
+  AssistantContextBindingSchema,
 } from '@personal-agent/contracts'
 import type {
+  RecoveryTargetPrepareInput,
+  RecoveryTargetStatus,
+  AssistantContextPrepare,
+  AssistantContextPrepared,
+  AssistantContextSend,
+  AssistantContextBinding,
   ContextPreviewInput,
   ContextPreview,
   AnswerDelivery,
@@ -154,12 +166,17 @@ export interface LocalHttpOptions {
     prepareProposal?(input: ProposalPrepare, actor: TrustedActor): Promise<ProposalPreview>
     proposal?(command: ProposalCommand, actor: TrustedActor): Promise<CommandReceipt>
     contextPreview?(input: ContextPreviewInput, actor: TrustedActor): Promise<ContextPreview>
+    recoveryTargetPrepare?(input: RecoveryTargetPrepareInput, actor: TrustedActor): Promise<RecoveryTargetStatus>
+    assistantContextPrepare?(input: AssistantContextPrepare, actor: TrustedActor): Promise<AssistantContextPrepared>
+    assistantContextSend?(input: AssistantContextSend, actor: TrustedActor): Promise<CommandReceipt>
   }
   read?: {
     attention?(query: AttentionQuery): Promise<AttentionPage>
     decisions?(query: DecisionQuery): Promise<DecisionPage>
     recovery?(): Promise<RecoveryInspection>
     recoveryActivation?(activationId: string): Promise<RecoveryActivationRecord | undefined>
+    recoveryTarget?(activationId: string): Promise<RecoveryTargetStatus | undefined>
+    assistantContext?(messageId: string): Promise<AssistantContextBinding | undefined>
     conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog>
     conversation?(id: string): Promise<ConversationSummary>
     projectSettings?(projectId: string): Promise<ProjectSettingsPage>
@@ -243,7 +260,7 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
   app.use(
     '*',
     (c, next) => bodyLimit({
-      maxSize: ['/v1/proposals/commands', '/v1/decisions/commands'].includes(c.req.path) ? 256 * 1024 : 64 * 1024,
+      maxSize: ['/v1/proposals/commands', '/v1/decisions/commands', '/v1/assistant/context/prepare', '/v1/assistant/context/send'].includes(c.req.path) ? 256 * 1024 : 64 * 1024,
       onError: (c) =>
         c.json(
           { error: { code: 'invalid_request', message: 'Request body exceeds the local limit', retry: 'none' } },
@@ -309,7 +326,7 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
   })
   app.get('/v1/session', (c) => c.json({ status: 'authenticated' }))
   app.use('/v1/*', async (c, next) => {
-    const readOnlyRecoveryPreparation = c.req.method === 'POST' && c.req.path === '/v1/recovery/prepare'
+    const readOnlyRecoveryPreparation = c.req.method === 'POST' && ['/v1/recovery/prepare', '/v1/recovery/targets/prepare'].includes(c.req.path)
     if (options.startupMode === 'recovery_readonly' && !readOnlyRecoveryPreparation && !['GET', 'HEAD', 'OPTIONS', 'DELETE'].includes(c.req.method))
       throw new ApplicationFault('unsupported_capability', 'Restored state is read-only until explicit recovery and local revalidation', 'none')
     await next()
@@ -334,13 +351,32 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!options.operations?.recoveryPrepare) throw new ApplicationFault('unsupported_capability', 'Recovery preparation is not connected')
     return c.json(RecoveryPlanSchema.parse(await options.operations.recoveryPrepare(RecoveryPrepareSchema.parse(await c.req.json()), c.get('actor'))))
   })
+  app.get('/v1/recovery/targets/:id', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Target status accepts no query')
+    if (!options.read?.recoveryTarget) throw new ApplicationFault('unsupported_capability', 'Target preparation is not connected')
+    const id = IdSchema.parse(c.req.param('id')), result = await options.read.recoveryTarget(id)
+    if (!result) return c.json({ error: { code: 'invalid_request', message: 'Recovery target was not found', retry: 'user_action' } }, 404)
+    const value = RecoveryTargetStatusSchema.parse(result)
+    if (value.activationId !== id) throw new ApplicationFault('storage_unavailable', 'Target status identity mismatch', 'none')
+    return c.json(value)
+  })
+  app.post('/v1/recovery/targets/prepare', async c => {
+    if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Target preparation requires restored read-only startup')
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Target preparation accepts no query')
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Target preparation requires JSON')
+    if (!options.operations?.recoveryTargetPrepare) throw new ApplicationFault('unsupported_capability', 'Target preparation is not connected')
+    const input = RecoveryTargetPrepareInputSchema.parse(await c.req.json())
+    const result = RecoveryTargetStatusSchema.parse(await options.operations.recoveryTargetPrepare(input, c.get('actor')))
+    if (result.activationId !== input.activationId) throw new ApplicationFault('storage_unavailable', 'Target preparation identity mismatch', 'none')
+    return c.json(result)
+  })
   app.get('/v1/configuration', async (c) => {
     if (Object.keys(c.req.query()).length)
       throw new ApplicationFault('invalid_request', 'Configuration does not accept query parameters')
     if (!options.read?.configuration)
       throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
     const value = ApplicationConfigurationSchema.parse(await options.read.configuration())
-    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false, decisionsAvailable: false, proposalsAvailable: false, contextPreviewAvailable: false,
+    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false, decisionsAvailable: false, proposalsAvailable: false, contextPreviewAvailable: false, assistantContextAvailable: false,
       profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate' })),
       projects: value.projects.map(project => { const { defaultProfileId: _, ...rest } = project; return { ...rest, profileIds: [], dispatchAllowed: false, blockedReason: 'writer_indeterminate' } }),
     }) : value)
@@ -349,6 +385,36 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Context preview requires JSON')
     if (!options.operations?.contextPreview) throw new ApplicationFault('unsupported_capability', 'Context preview is not connected')
     return c.json(ContextPreviewSchema.parse(await options.operations.contextPreview(ContextPreviewInputSchema.parse(await c.req.json()), c.get('actor'))))
+  })
+  app.post('/v1/assistant/context/prepare', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Context confirmation accepts no query')
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Context confirmation requires JSON')
+    if (!options.operations?.assistantContextPrepare) throw new ApplicationFault('unsupported_capability', 'Context discussion is not connected')
+    const input = AssistantContextPrepareSchema.parse(await c.req.json())
+    const result = AssistantContextPreparedSchema.parse(await options.operations.assistantContextPrepare(input, c.get('actor')))
+    if (result.commandId !== input.commandId || result.text !== input.text || result.preview.projectId !== input.context.projectId ||
+      result.preview.conversationId !== input.context.conversationId || result.preview.contract?.workId !== input.context.workId ||
+      JSON.stringify(result.preview.selections) !== JSON.stringify(input.context.selections))
+      throw new ApplicationFault('storage_unavailable', 'Context confirmation identity mismatch', 'none')
+    return c.json(result)
+  })
+  app.post('/v1/assistant/context/send', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Context message accepts no query')
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Context message requires JSON')
+    if (!options.operations?.assistantContextSend) throw new ApplicationFault('unsupported_capability', 'Context discussion is not connected')
+    const input = AssistantContextSendSchema.parse(await c.req.json())
+    const receipt = CommandReceiptSchema.parse(await options.operations.assistantContextSend(input, c.get('actor')))
+    if (receipt.commandId !== input.commandId) throw new ApplicationFault('storage_unavailable', 'Context message receipt identity mismatch', 'none')
+    return c.json(receipt, receipt.status === 'rejected' ? statusOf(receipt.error) : 200)
+  })
+  app.get('/v1/messages/:id/context', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Message context accepts no query')
+    if (!options.read?.assistantContext) throw new ApplicationFault('unsupported_capability', 'Context audit is not connected')
+    const id = IdSchema.parse(c.req.param('id')), value = await options.read.assistantContext(id)
+    if (!value) return c.json({ error: { code: 'invalid_request', message: 'Message context was not found', retry: 'user_action' } }, 404)
+    const binding = AssistantContextBindingSchema.parse(value)
+    if (binding.messageId !== id) throw new ApplicationFault('storage_unavailable', 'Message context identity mismatch', 'none')
+    return c.json(binding)
   })
   app.post('/v1/proposals/prepare', async (c) => {
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Proposal preview requires JSON')

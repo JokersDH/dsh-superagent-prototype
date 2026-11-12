@@ -1,0 +1,59 @@
+{
+  "status": "PASS_SCOPED_SELECTED_CONTEXT_PRODUCT_AND_TARGET_PREPARATION",
+  "sourceCommit": "4140cac15f4ab9c4f5027d96fbee99edb22347be",
+  "coreImplementation": "a6a33db84c33d872537dd1e931ba4cbff74552b4",
+  "readerIntegration": "86c692f893b298d50306a094a1c38a9f9f168ab5",
+  "v16Integration": "869716b",
+  "acceptedStorageCandidate": "8a91958c5e3ef9afe35555bd92f0d3b0418128b8",
+  "acceptedStorageImplementation": "8e49d67",
+  "dataSchema": 16,
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "validation": [
+    { "command": "pnpm --filter @personal-agent/contracts test", "status": "PASS", "passed": 222, "exitCode": 0 },
+    { "command": "pnpm --filter @personal-agent/storage test", "status": "PASS", "passed": 85, "exitCode": 0 },
+    { "command": "pnpm --filter @personal-agent/workflows test", "status": "PASS", "passed": 58, "exitCode": 0 },
+    { "command": "pnpm --filter @personal-agent/console test", "status": "PASS", "passed": 28, "exitCode": 0 },
+    { "command": "node --test tests/integration/assistant-context-use.case.mjs tests/integration/assistant-context-product.case.mjs tests/integration/recovery-target-service.case.mjs tests/integration/recovery-target-http.case.mjs tests/integration/recovery-target-initializer.case.mjs", "status": "PASS", "passed": 95, "exitCode": 0 },
+    { "command": "node --test tests/integration/context-preview.case.mjs tests/integration/assistant-replies.case.mjs tests/integration/proposal-commands.case.mjs tests/integration/evidence-history.case.mjs", "status": "PASS", "passed": 36, "exitCode": 0 },
+    { "command": "node tests/integration/assistant-context-workbench-browser.mjs --no-capture", "status": "PASS", "passed": 9, "exitCode": 0, "source": "4140cac15f4ab9c4f5027d96fbee99edb22347be", "clean": true, "bindingPort": "production_A_port", "evidence": "context-browser/browser-report.json" },
+    { "command": "node tests/integration/recovery-target-d-consumer.mjs /Users/hh/Desktop/joker/superagent-agent-d", "status": "PASS", "passed": 7, "exitCode": 0, "source": "a6a33db84c33d872537dd1e931ba4cbff74552b4", "clean": true, "dCandidate": "fe01c3c541e5f3fb870119f637ab067cb0aee8bc", "evidence": "recovery-d-consumer.json" },
+    { "command": "node tools/bootstrap/probe-wave09-target-inventory.mjs /Users/hh/Desktop/joker/superagent --output reports/releases/wave10-integration/storage-main.json", "status": "PASS", "passed": 4, "exitCode": 0, "source": "a6a33db84c33d872537dd1e931ba4cbff74552b4", "clean": true, "evidence": "storage-main.json" }
+  ],
+  "buildAndTypes": {
+    "contractsGenerated": "PASS",
+    "contractsStorageWorkflowsBuild": "PASS",
+    "coordinatorProductTypecheck": "PASS",
+    "coordinatorHttpTypecheck": "PASS",
+    "consoleTypecheck": "PASS",
+    "consoleBuild": "PASS_EXISTING_OVER_500KB_CHUNK_WARNING",
+    "wave10DispatchStatic": "PASS_STATIC_ONLY"
+  },
+  "independentReview": {
+    "backend": "SCOPED_NO_REMAINING_CONFIRMED_FINDING_AFTER_EXPIRY_GUARD_FIX",
+    "ui": "SHIP_INCREMENTAL_SCOPE",
+    "providerUnavailablePendingReconciliationFix": "RESOLVED_LIMITED_VERDICT",
+    "designSystem": "INCUMBENT_PRESERVED"
+  },
+  "wave10": {
+    "M1": "PARTIAL_HTTP_AND_CROSS_SOURCE_PRODUCTION_PORT_PREPARATION_NOT_DEFAULT_AUTHORITY",
+    "M2": "PASS_EXPLICIT_SIGNED_PER_MESSAGE_CONTEXT",
+    "M3": "PASS_PRODUCTION_A_SQL_AND_EXISTING_MOCK_PROVIDER_SSE_COMPOSITION",
+    "M4": "PARTIAL_CONTEXT_UI_DELIVERED_RECOVERY_ACTIVATION_NOT_IMPLEMENTED",
+    "M5": "NOT_ADMITTED_CURRENT_INSTALL_ARTIFACT",
+    "M6": "SCOPED_PERSONAL_DEVELOPMENT_PREVIEW"
+  },
+  "modelCallsByAgent": 0,
+  "nativeTurnsByAgent": 0,
+  "browserMockProviderCalls": 3,
+  "budgetReset": false,
+  "preview": "http://127.0.0.1:5188/",
+  "preservedUserServices": [[5180,8796],[5181,8797],[5182,8798],[5183,8799],[5184,8800],[5185,8801],[5186,8802],[5187,8803],[5188,8804]],
+  "limitations": [
+    "No real model response was used as acceptance; the live preview only reused private configured settings",
+    "Screenshots predate A SQL integration; clean-source functional replay uses production A and is labeled separately",
+    "D module is loaded from its candidate checkout for cross-source validation, not incorporated as a distributable dependency",
+    "Recovery source-current validation in tests checks temporary marker/root/config only, not actual host/profile/resource authority",
+    "Target operations require explicit trusted configuration, remain disabled by default, and never grant startup",
+    "No new native/control, target activation, current-source installation, second driver, CAC or review-value admission"
+  ]
+}
