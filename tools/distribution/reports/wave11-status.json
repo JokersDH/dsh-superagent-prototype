@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "fe01c3c",
   "mergedMain": "ed8b520",
-  "head": "275bd5b",
+  "head": "3d16692",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/native turns 0; nine user services untouched.",
   "ownedPaths": [
@@ -288,5 +288,6 @@
     "tools/distribution/reports/wave11/*.json",
     "tools/distribution/recipes/wave11-e-acceptance.zh-CN.md",
     "docs/rfcs/WP-16/0036-wave-11-d-delivery.md"
-  ]
+  ],
+  "evaluatedEvidenceCommit": "275bd5b"
 }
