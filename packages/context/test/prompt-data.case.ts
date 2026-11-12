@@ -3,6 +3,7 @@ import { test } from 'node:test'
 import type { Scope } from '@personal-agent/contracts'
 import {
   ContextComposer,
+  estimateTokens,
   projectPromptData,
   PROMPT_DATA_CEILINGS,
   sha256Text,
@@ -93,6 +94,51 @@ test('budgets are clamped to hard ceilings and invalid values are refused', asyn
   for (const invalid of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1.5]) {
     assert.throws(() => projectPromptData(composed, { maxItems: invalid }), TypeError)
   }
+})
+
+test('the UTF-8 byte cap covers the header, the body and the terminating newline exactly', async () => {
+  const composed = await composition([decision('d1', 'x'.repeat(1000))])
+  const complete = projectPromptData(composed, { maxBytes: 65536, maxTokens: 10_000 })
+  const head = complete.text.slice(0, complete.text.indexOf('\n') + 1)
+  const maxBytes = Buffer.byteLength(head, 'utf8') + 8
+  const result = projectPromptData(composed, { maxBytes, maxTokens: 10_000 })
+  assert.ok(Buffer.byteLength(result.text, 'utf8') <= maxBytes)
+  assert.equal(result.totals.bytes, Buffer.byteLength(result.text, 'utf8'))
+  assert.equal(result.truncated, true)
+})
+
+test('the reported token total covers every serialized character of the projection', async () => {
+  for (const id of ['d', 'dd', 'ddd', 'dddd']) {
+    const composed = await composition([decision(id, 'x'.repeat(1000))])
+    const complete = projectPromptData(composed, { maxBytes: 65536, maxTokens: 10_000 })
+    const head = complete.text.slice(0, complete.text.indexOf('\n') + 1)
+    const maxTokens = estimateTokens(head) + 1
+    const result = projectPromptData(composed, { maxBytes: 65536, maxTokens })
+    assert.ok(estimateTokens(result.text) <= maxTokens)
+    assert.ok(result.totals.tokens >= estimateTokens(result.text))
+  }
+})
+
+test('mixed UTF-8, CJK and surrogate pairs never leave a broken tail or replacement character', async () => {
+  for (const body of ['中文内容'.repeat(50), '😀'.repeat(60), 'mixed-中-😀-identifier'.repeat(30)]) {
+    const composed = await composition([decision('d1', body)], { maxTokens: 10_000 })
+    const complete = projectPromptData(composed, { maxBytes: 65536, maxTokens: 10_000 })
+    const head = complete.text.slice(0, complete.text.indexOf('\n') + 1)
+    const headBytes = Buffer.byteLength(head, 'utf8')
+    for (const extra of [2, 3, 4, 5, 9]) {
+      const result = projectPromptData(composed, { maxBytes: headBytes + extra, maxTokens: 10_000 })
+      assert.ok(Buffer.byteLength(result.text, 'utf8') <= headBytes + extra)
+      assert.equal(result.text.includes('\uFFFD'), false)
+    }
+  }
+})
+
+test('an upstream-truncated slice stays truncated in references and in the projection', async () => {
+  const composed = await composition([decision('long', 'y'.repeat(1000))], { maxTokens: 100 })
+  assert.equal(composed.slices[0]!.truncated, true)
+  const projection = projectPromptData(composed, { maxBytes: 65536, maxTokens: 10_000 })
+  assert.equal(projection.references[0]!.truncated, true)
+  assert.equal(projection.truncated, true)
 })
 
 test('an empty composition produces empty data rather than a fabricated block', async () => {

@@ -47,10 +47,13 @@ export interface ConversationAdapterCoverage {
     readonly otherConversation: number
     readonly foreignProject: number
     readonly unprovenProject: number
-    readonly untrustedProvenance: number
+    /** Question/authentication answer anchors are never reusable discussion context. */
+    readonly questionAnchor: number
+    /** Work-anchored supplements, including every one when no work is selected. */
+    readonly otherWork: number
     readonly permissionDisplay: number
     readonly systemRole: number
-    readonly otherWork: number
+    readonly untrustedProvenance: number
   }
 }
 
@@ -61,12 +64,26 @@ export interface ScopedConversationProvider extends ComposedConversationProvider
 
 const PERMISSION_DISPLAY_PROVENANCE = 'question_answer_display'
 const TRUSTED_USER = 'trusted_user'
+const REASONER_REPLY = 'reasoner_reply'
 
 /**
- * Filters to the selected project/conversation and trusted user messages, excludes permission /
- * authentication answer displays, system messages and (when a work is selected) messages anchored to
- * a different work. Paging is bounded and coverage is reported so a truncated scan is never presented
- * as a complete conversation.
+ * The exact reusable-discussion role/provenance pairs of the current main provider: a trusted user
+ * message and a legitimate completed reasoner reply. Nothing else may stand in for either.
+ */
+function isReusableDiscussionMessage(role: string, provenance: string): boolean {
+  return (
+    (role === 'user' && provenance === TRUSTED_USER) ||
+    (role === 'assistant' && provenance === REASONER_REPLY)
+  )
+}
+
+/**
+ * Filters to the selected project/conversation, excludes question/authentication anchors (whatever
+ * role or provenance claims them), messages anchored to a work other than the selected one — and all
+ * work-anchored messages when no work is selected — plus permission displays, system messages and
+ * any role/provenance pair that is not a trusted user message or a completed reasoner reply. Paging
+ * is bounded and coverage is reported so a truncated scan is never presented as a complete
+ * conversation.
  */
 export function createScopedConversationProvider(
   reader: ScopedConversationReader,
@@ -79,7 +96,16 @@ export function createScopedConversationProvider(
     scanned: 0,
     returned: 0,
     complete: false,
-    excluded: { otherConversation: 0, foreignProject: 0, unprovenProject: 0, untrustedProvenance: 0, permissionDisplay: 0, systemRole: 0, otherWork: 0 },
+    excluded: {
+      otherConversation: 0,
+      foreignProject: 0,
+      unprovenProject: 0,
+      questionAnchor: 0,
+      otherWork: 0,
+      permissionDisplay: 0,
+      systemRole: 0,
+      untrustedProvenance: 0,
+    },
   }
   return {
     coverage: () => coverage,
@@ -93,8 +119,18 @@ export function createScopedConversationProvider(
         return []
       }
       const wanted = Math.min(Math.max(limit, 1), pageSize * maxPages)
-      const excluded = { otherConversation: 0, foreignProject: 0, unprovenProject: 0, untrustedProvenance: 0, permissionDisplay: 0, systemRole: 0, otherWork: 0 }
+      const excluded = {
+        otherConversation: 0,
+        foreignProject: 0,
+        unprovenProject: 0,
+        questionAnchor: 0,
+        otherWork: 0,
+        permissionDisplay: 0,
+        systemRole: 0,
+        untrustedProvenance: 0,
+      }
       const accepted: (ComposedConversationMessage & { sequence: number })[] = []
+      const acceptedIds = new Set<string>()
       let scanned = 0
       let before: number | undefined
       let complete = false
@@ -115,23 +151,28 @@ export function createScopedConversationProvider(
             excluded.foreignProject += 1
             continue
           }
-          if (message.provenance === PERMISSION_DISPLAY_PROVENANCE) {
-            excluded.permissionDisplay += 1
+          // Any question/anchor answer display is excluded before role/provenance can claim trust.
+          if (message.anchor?.questionId !== undefined) {
+            excluded.questionAnchor += 1
             continue
           }
-          if (message.provenance !== TRUSTED_USER) {
-            excluded.untrustedProvenance += 1
-            continue
-          }
-          if (message.role === 'system') {
-            excluded.systemRole += 1
-            continue
-          }
+          // A work-anchored supplement is only reusable for that exact selected work; with no work
+          // selected every work-anchored supplement stays out of the general discussion.
           const anchoredWork = message.anchor?.workId
-          if (selection.workId !== undefined && anchoredWork !== undefined && anchoredWork !== selection.workId) {
+          if (anchoredWork !== undefined && anchoredWork !== selection.workId) {
             excluded.otherWork += 1
             continue
           }
+          if (!isReusableDiscussionMessage(message.role, message.provenance)) {
+            if (message.provenance === PERMISSION_DISPLAY_PROVENANCE) excluded.permissionDisplay += 1
+            else if (message.role === 'system') excluded.systemRole += 1
+            else excluded.untrustedProvenance += 1
+            continue
+          }
+          // A repeated page must not appear twice in the composition; the cursor guard below
+          // separately stops the walk and reports the scan as incomplete.
+          if (acceptedIds.has(message.id)) continue
+          acceptedIds.add(message.id)
           accepted.push({
             messageId: message.id,
             conversationId: message.conversationId,
@@ -151,7 +192,14 @@ export function createScopedConversationProvider(
           complete = true
           break
         }
-        before = sorted[sorted.length - 1]!.sequence
+        const next = sorted[sorted.length - 1]!.sequence
+        // A cursor that does not strictly move backwards would re-read the same page forever or
+        // silently rescan; report the scan as incomplete instead of claiming full coverage.
+        if (before !== undefined && next >= before) {
+          complete = false
+          break
+        }
+        before = next
       }
       coverage = { scanned, returned: accepted.length, complete, excluded }
       return accepted
@@ -177,9 +225,16 @@ export interface PublishedArtifactSelection {
 }
 
 export interface ArtifactAdapterCoverage {
+  /** Deduplicated published ids this selection names. */
   readonly requested: number
+  /** Metadata lookups actually attempted; bounded by `maxIds`, never by the result count. */
+  readonly lookedUp: number
   readonly returned: number
+  /** Looked-up ids whose metadata was absent or belonged to a different id. */
   readonly missing: number
+  /** Looked-up ids whose metadata exceeded `maxArtifactBytes`. */
+  readonly oversized: number
+  /** False when lookups/returns stopped early or any requested id could not be returned. */
   readonly complete: boolean
 }
 
@@ -187,38 +242,60 @@ export interface ScopedArtifactProvider extends ComposedArtifactProvider {
   coverage(): ArtifactAdapterCoverage
 }
 
+function positiveInteger(value: number | undefined, fallback: number, ceiling: number, name: string): number {
+  if (value === undefined) return Math.min(fallback, ceiling)
+  if (typeof value !== 'number' || !Number.isFinite(value) || !Number.isInteger(value) || value < 1) {
+    throw new TypeError(`Published artifact adapter ${name} must be a positive integer`)
+  }
+  return Math.min(value, ceiling)
+}
+
 /**
  * Only the caller-verified published artifact ids are looked up, metadata only. Duplicate ids are
- * collapsed and the list is bounded; a missing metadata row is counted, never replaced by a guess.
+ * collapsed; `maxIds` bounds attempted lookups (so a run of missing metadata cannot walk the whole
+ * list) while the returned count is bounded separately by the request limit. A missing or
+ * mistyped metadata row and an oversized artifact are counted, never replaced by a guess.
  */
 export function createPublishedArtifactProvider(
   lookup: ScopedArtifactLookup,
   selection: PublishedArtifactSelection,
-  options: { readonly maxIds?: number } = {},
+  options: { readonly maxIds?: number; readonly maxArtifactBytes?: number } = {},
 ): ScopedArtifactProvider {
-  const maxIds = Math.min(Math.max(options.maxIds ?? 64, 1), 256)
-  let coverage: ArtifactAdapterCoverage = { requested: 0, returned: 0, missing: 0, complete: true }
+  const maxIds = positiveInteger(options.maxIds, 64, 256, 'maxIds')
+  const maxArtifactBytes =
+    options.maxArtifactBytes === undefined ? undefined : positiveInteger(options.maxArtifactBytes, 1, Number.MAX_SAFE_INTEGER, 'maxArtifactBytes')
+  let coverage: ArtifactAdapterCoverage = { requested: 0, lookedUp: 0, returned: 0, missing: 0, oversized: 0, complete: true }
   return {
     coverage: () => coverage,
     async recent({ limit }) {
       const requestedIds = [...new Set(selection.publishedArtifactIds)]
-      const missing: string[] = []
+      const maxResults = Math.max(limit, 1)
       const artifacts: ComposedArtifactView[] = []
-      const wanted = Math.min(requestedIds.length, maxIds, Math.max(limit, 1))
+      let lookedUp = 0
+      let missing = 0
+      let oversized = 0
       for (const id of requestedIds) {
-        if (artifacts.length >= wanted) break
+        if (lookedUp >= maxIds || artifacts.length >= maxResults) break
+        lookedUp += 1
         const metadata = lookup.get(id)
-        if (!metadata) {
-          missing.push(id)
+        // A lookup that returns another identity is not evidence for the requested artifact.
+        if (!metadata || metadata.id !== id) {
+          missing += 1
+          continue
+        }
+        if (maxArtifactBytes !== undefined && metadata.bytes > maxArtifactBytes) {
+          oversized += 1
           continue
         }
         artifacts.push({ artifactId: metadata.id, digest: metadata.digest, bytes: metadata.bytes, createdAt: metadata.createdAt })
       }
       coverage = {
         requested: requestedIds.length,
+        lookedUp,
         returned: artifacts.length,
-        missing: missing.length,
-        complete: requestedIds.length <= wanted && missing.length === 0,
+        missing,
+        oversized,
+        complete: lookedUp === requestedIds.length && missing === 0 && oversized === 0,
       }
       return artifacts
     },

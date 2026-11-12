@@ -934,6 +934,14 @@ export interface ComposedSourceManifestSelection {
   readonly contract?: ContractRef
 }
 
+/** The resolved budget actually applied after the grant/caller/ceiling clamp — never the request. */
+export interface ComposedSourceManifestBudget {
+  readonly maxSlices: number
+  readonly maxBytes: number
+  readonly maxTokens: number
+  readonly maxDurationMs: number
+}
+
 export interface ComposedSourceManifestCoverage {
   /** True only when the composition was sufficient: no omitted/truncated source and no unavailable group. */
   readonly complete: boolean
@@ -950,6 +958,8 @@ export interface ComposedSourceManifest {
   readonly workId?: string
   readonly status: ContextComposition['status']
   readonly selection: ComposedSourceManifestSelection
+  /** Resolved budget after the grant/caller/ceiling clamp; a request-level change alone is not enough. */
+  readonly budget: ComposedSourceManifestBudget
   readonly coverage: ComposedSourceManifestCoverage
   readonly sources: readonly ComposedSourceManifestEntry[]
   readonly omitted: readonly ContextOmission[]
@@ -978,6 +988,12 @@ export function buildSourceManifest(composition: ContextComposition): ComposedSo
       ...(composition.conversationId === undefined ? {} : { conversationId: composition.conversationId }),
       ...(composition.workId === undefined ? {} : { workId: composition.workId }),
       ...(composition.contract === undefined ? {} : { contract: composition.contract }),
+    },
+    budget: {
+      maxSlices: composition.budget.maxSlices,
+      maxBytes: composition.budget.maxBytes,
+      maxTokens: composition.budget.maxTokens,
+      maxDurationMs: composition.budget.maxDurationMs,
     },
     coverage: {
       // Scan completeness: no group was left unread/truncated and no budget cap hid a source.
@@ -1021,6 +1037,8 @@ export type SourceManifestChangeReason =
   | 'budget'
   | 'selection'
   | 'contract'
+  | 'baseline'
+  | 'omitted'
   | 'missing'
   | 'added'
   | 'replaced'
@@ -1046,6 +1064,17 @@ function selectionKey(manifest: ComposedSourceManifest): string {
 function contractKey(manifest: ComposedSourceManifest): string {
   const contract = manifest.selection.contract
   return contract === undefined ? 'none' : JSON.stringify([contract.workId, contract.revision, contract.digest])
+}
+
+function budgetKey(manifest: ComposedSourceManifest): string {
+  const budget = manifest.budget
+  return JSON.stringify([budget.maxSlices, budget.maxBytes, budget.maxTokens, budget.maxDurationMs])
+}
+
+function omissionsKey(manifest: ComposedSourceManifest): string {
+  return JSON.stringify(
+    manifest.omitted.map((item) => [item.sourceId ?? null, item.path ?? null, item.reason, item.detail ?? null]),
+  )
 }
 
 /**
@@ -1074,8 +1103,8 @@ export function compareSourceManifests(
   if (!previous.coverage.complete) incompleteReasons.push('previous_incomplete')
   if (!current.coverage.complete) incompleteReasons.push('current_incomplete')
 
-  const previousByKey = new Map(previous.sources.map((source) => [`${source.kind} ${source.path}`, source]))
-  const currentByKey = new Map(current.sources.map((source) => [`${source.kind} ${source.path}`, source]))
+  const previousByKey = new Map(previous.sources.map((source) => [`${source.kind}\u0000${source.path}`, source]))
+  const currentByKey = new Map(current.sources.map((source) => [`${source.kind}\u0000${source.path}`, source]))
   const previousById = new Map(previous.sources.map((source) => [source.sourceId, source]))
 
   for (const [key, before] of previousByKey) {
@@ -1088,6 +1117,15 @@ export function compareSourceManifests(
         kind: before.kind,
         reason: sameId ? 'replaced' : 'missing',
       })
+      continue
+    }
+    if (before.sourceId !== after.sourceId) {
+      // A different identity at the same kind/path is a replacement, never unchanged.
+      changes.push({ sourceId: after.sourceId, path: after.path, kind: after.kind, reason: 'replaced' })
+      continue
+    }
+    if ((before.baselineCommit ?? null) !== (after.baselineCommit ?? null)) {
+      changes.push({ sourceId: before.sourceId, path: before.path, kind: before.kind, reason: 'baseline' })
       continue
     }
     if (before.wholeSourceDigest !== after.wholeSourceDigest || before.contentDigest !== after.contentDigest) {
@@ -1112,8 +1150,14 @@ export function compareSourceManifests(
       reason: replaced && (replaced.path !== after.path || replaced.kind !== after.kind) ? 'replaced' : 'added',
     })
   }
-  if (JSON.stringify(previous.budgetClamped) !== JSON.stringify(current.budgetClamped)) {
+  if (
+    budgetKey(previous) !== budgetKey(current) ||
+    JSON.stringify(previous.budgetClamped) !== JSON.stringify(current.budgetClamped)
+  ) {
     changes.push({ path: '', kind: '', reason: 'budget' })
+  }
+  if (omissionsKey(previous) !== omissionsKey(current)) {
+    changes.push({ path: '', kind: '', reason: 'omitted' })
   }
 
   const status: SourceManifestComparison['status'] =

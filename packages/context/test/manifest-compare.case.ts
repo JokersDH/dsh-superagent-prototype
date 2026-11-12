@@ -109,7 +109,9 @@ test('comparison reports unchanged, content, preview, missing, added and replace
   const shortPreview = buildSourceManifest(await compose({ decisions: [decision(long)], budget: { maxFiles: 6, maxSlices: 6, maxBytes: 8192, maxTokens: 40, maxDurationMs: 1000 } }))
   const preview = compareSourceManifests(fullPreview, shortPreview)
   assert.equal(preview.status, 'changed')
-  assert.deepEqual(preview.changes.map((change) => change.reason), ['preview'])
+  // The smaller preview is the visible change; the resolved token budget that caused it is also
+  // reported rather than being hidden behind the per-source diff.
+  assert.deepEqual(preview.changes.map((change) => change.reason), ['preview', 'budget'])
 
   const twoSources = buildSourceManifest(await compose({ decisions: [decision('Keep checks', 'decision-1'), decision('Second', 'decision-2')] }))
   const oneSource = buildSourceManifest(await compose({ decisions: [decision('Keep checks', 'decision-1')] }))

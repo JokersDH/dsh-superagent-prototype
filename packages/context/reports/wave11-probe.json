@@ -1,0 +1,234 @@
+{
+  "status": "PASS_CANDIDATE_SCOPED_EXPORT_ADMISSION",
+  "command": [
+    "node",
+    "tools/bootstrap/probe-wave11-context.mjs",
+    "/Users/hh/Desktop/joker/superagent-agent-c"
+  ],
+  "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "sourceCommit": "8d8ac6ec2a984ba1605dba6bd1534e4c11e9d565",
+  "publishedSource": "2c2598524b9bd253f2a68d47558e35ec3beeb667",
+  "baseCommit": "b466bc760f073408d95005c3c9e6219d94c23e5e",
+  "sourceWorktreeClean": false,
+  "unrelatedLockDiffPreserved": true,
+  "sourceHashes": {
+    "packages/context/src/scoped-adapters.ts": "e8a175c1e15be5bfaa9be5814b96564c90535e6a92341edba6a16fab3ae2b974",
+    "packages/context/src/composer.ts": "b092e05559fb4b6e98ecaeace45cbded4bc62f412d280897decd28b853398f62",
+    "packages/context/src/prompt-data.ts": "7b96ed2270aab4235830fbb573283199cc6a007caff0dae18151f42e33a04451",
+    "packages/proposals/src/assistant-proposal-service.ts": "8692f64c2c2d8d575467155345870bd9154ecc2f829389d56532afc2a4d3a595"
+  },
+  "checkedAt": "2026-11-12T04:12:49.969Z",
+  "exitCode": 0,
+  "passed": 17,
+  "failed": 0,
+  "cases": [
+    {
+      "id": "UNCONSUMED_CONFIRM_HELPER_REMOVED",
+      "scope": "dynamic_candidate_helper",
+      "status": "PASS",
+      "observation": {
+        "helperExported": false
+      }
+    },
+    {
+      "id": "PROJECT_CONVERSATION_AND_PERMISSION_DISPLAY_FILTER_POSITIVE_CONTROL",
+      "scope": "actual_conversation_adapter",
+      "status": "PASS",
+      "observation": {
+        "included": [
+          "selected"
+        ],
+        "coverage": {
+          "scanned": 4,
+          "returned": 1,
+          "complete": true,
+          "excluded": {
+            "otherConversation": 1,
+            "foreignProject": 1,
+            "unprovenProject": 0,
+            "questionAnchor": 1,
+            "otherWork": 0,
+            "permissionDisplay": 0,
+            "systemRole": 0,
+            "untrustedProvenance": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "TRUSTED_DISCUSSION_QUESTION_ANCHOR_IS_NOT_REUSABLE_CONTEXT",
+      "scope": "main_compatibility_conversation_boundary",
+      "status": "PASS"
+    },
+    {
+      "id": "NO_SELECTED_WORK_EXCLUDES_ALL_WORK_SUPPLEMENTS",
+      "scope": "main_compatibility_conversation_boundary",
+      "status": "PASS"
+    },
+    {
+      "id": "SELECTED_WORK_EXCLUDES_OTHER_WORK_POSITIVE_CONTROL",
+      "scope": "actual_conversation_adapter",
+      "status": "PASS",
+      "observation": {
+        "included": [
+          "selected",
+          "general"
+        ]
+      }
+    },
+    {
+      "id": "VALID_REASONER_REPLY_IS_RETAINED_WITH_MATCHING_ROLE",
+      "scope": "main_compatibility_conversation_boundary",
+      "status": "PASS"
+    },
+    {
+      "id": "BOUNDED_SCAN_EXPOSES_INCOMPLETE_COVERAGE",
+      "scope": "actual_conversation_adapter",
+      "status": "PASS",
+      "observation": {
+        "scanned": 2,
+        "returned": 2,
+        "complete": false,
+        "excluded": {
+          "otherConversation": 0,
+          "foreignProject": 0,
+          "unprovenProject": 0,
+          "questionAnchor": 0,
+          "otherWork": 0,
+          "permissionDisplay": 0,
+          "systemRole": 0,
+          "untrustedProvenance": 0
+        }
+      }
+    },
+    {
+      "id": "MAIN_CUTOFF_WRAPPER_CAN_EXCLUDE_LATER_OWN_MESSAGES",
+      "scope": "integration_requires_trusted_reader_wrapper",
+      "status": "PASS",
+      "observation": {
+        "included": [
+          "original-source"
+        ],
+        "nativeCutoffFieldAvailable": false,
+        "requirement": "Main must keep the trusted reader cutoff wrapper; this factory has no cutoff selection field"
+      }
+    },
+    {
+      "id": "ARTIFACTS_LOOK_UP_ONLY_PUBLISHED_IDS_POSITIVE_CONTROL",
+      "scope": "actual_artifact_adapter",
+      "status": "PASS",
+      "observation": {
+        "looked": [
+          "published"
+        ],
+        "coverage": {
+          "requested": 1,
+          "lookedUp": 1,
+          "returned": 1,
+          "missing": 0,
+          "oversized": 0,
+          "complete": true
+        }
+      }
+    },
+    {
+      "id": "MAX_IDS_CAPS_LOOKUPS_EVEN_WHEN_METADATA_IS_MISSING",
+      "scope": "actual_artifact_adapter_budget",
+      "status": "PASS"
+    },
+    {
+      "id": "EXPIRED_GRANT_REFUSES_BEFORE_PROVIDER_READ",
+      "scope": "existing_composer_authorization",
+      "status": "PASS",
+      "observation": {
+        "reads": 0
+      }
+    },
+    {
+      "id": "MANIFEST_CONTENT_SELECTION_AND_INCOMPLETE_CHANGES_POSITIVE_CONTROL",
+      "scope": "actual_manifest_comparison",
+      "status": "PASS",
+      "observation": {
+        "content": "changed",
+        "partial": "incomplete",
+        "selection": "non_unchanged"
+      }
+    },
+    {
+      "id": "SOURCE_ID_REPLACEMENT_CANNOT_BE_UNCHANGED_AT_SAME_PATH",
+      "scope": "actual_manifest_identity",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL_BUDGET_CHANGE_CANNOT_BE_UNCHANGED_WITHOUT_CLAMP",
+      "scope": "actual_manifest_budget",
+      "status": "PASS"
+    },
+    {
+      "id": "PROMPT_UTF8_BYTES_INCLUDE_THE_FINAL_SEPARATOR",
+      "scope": "actual_prompt_hard_budget",
+      "status": "PASS"
+    },
+    {
+      "id": "PROMPT_TOKEN_ESTIMATE_COVERS_THE_COMPLETE_SERIALIZED_TEXT",
+      "scope": "actual_prompt_hard_budget",
+      "status": "PASS"
+    },
+    {
+      "id": "PROMPT_REFERENCES_PRESERVE_UPSTREAM_TRUNCATION",
+      "scope": "actual_prompt_provenance",
+      "status": "PASS"
+    }
+  ],
+  "independentOwnedTests": {
+    "context": {
+      "passed": 78,
+      "exitCode": 0
+    },
+    "proposals": {
+      "passed": 26,
+      "exitCode": 0
+    },
+    "knowledge": {
+      "passed": 75,
+      "exitCode": 0
+    },
+    "contextTypecheck": {
+      "exitCode": 0
+    },
+    "proposalsTypecheck": {
+      "exitCode": 0
+    },
+    "contextBuild": {
+      "exitCode": 0
+    },
+    "historicalGrant": {
+      "passed": 4,
+      "exitCode": 0
+    },
+    "historicalGroupBinding": {
+      "passed": 2,
+      "notTestedHelperRemoved": 1,
+      "exitCode": 1
+    }
+  },
+  "sourceReferences": {
+    "conversationQuestionAndWorkAnchors": "packages/context/src/scoped-adapters.ts:118",
+    "conversationRoleProvenance": "packages/context/src/scoped-adapters.ts:122",
+    "artifactLookupBudget": "packages/context/src/scoped-adapters.ts:208",
+    "manifestSourceIdentity": "packages/context/src/composer.ts:1081",
+    "manifestResolvedBudget": "packages/context/src/composer.ts:1115",
+    "promptSeparatorBudget": "packages/context/src/prompt-data.ts:139",
+    "promptUpstreamTruncation": "packages/context/src/prompt-data.ts:149"
+  },
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "limitations": [
+    "Actual candidate exported adapters, manifest comparison, prompt projection and composer are called directly; historical fixed recipe implementations are not used.",
+    "These candidate modules are not integrated into the current main per-message flow; its private scoped adapters and full preview fingerprint remain authoritative.",
+    "No model/native, user service, production database, installer or new authorization is exercised.",
+    "The cutoff positive control uses a trusted main-side reader wrapper because the candidate selection type has no native cutoff field.",
+    "Artifact identity sets are trusted caller inputs; tests do not ask this adapter to infer ownership from a global registry.",
+    "Only this new probe and its own report are written; unrelated candidate lockfile changes are preserved."
+  ]
+}

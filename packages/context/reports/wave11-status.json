@@ -1,0 +1,101 @@
+{
+  "protocol": "agent-c-wave11-status/1",
+  "wave": "product-wave-11",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": [
+    "packages/context",
+    "packages/proposals",
+    "packages/knowledge",
+    "packages/routing"
+  ],
+  "base": {
+    "mergedOriginMain": "b466bc7",
+    "mergeCommit": "8d8ac6e",
+    "previousOwnCommit": "2c25985",
+    "rootLockDiffPreserved": true
+  },
+  "budget": {
+    "modelCalls": 0,
+    "nativeTurns": 0,
+    "newAllowance": false
+  },
+  "actualExportProbe": {
+    "command": "node tools/bootstrap/probe-wave11-context.mjs \"$PWD\"",
+    "status": "PASS_CANDIDATE_SCOPED_EXPORT_ADMISSION",
+    "passed": 17,
+    "failed": 0,
+    "beforeThisWave": { "passed": 8, "failed": 9 },
+    "evidence": "packages/context/reports/wave11-probe.json"
+  },
+  "closedCounterexamples": [
+    {
+      "id": "TRUSTED_DISCUSSION_QUESTION_ANCHOR_IS_NOT_REUSABLE_CONTEXT",
+      "fix": "scoped-adapters excludes any message with anchor.questionId before role/provenance is considered"
+    },
+    {
+      "id": "NO_SELECTED_WORK_EXCLUDES_ALL_WORK_SUPPLEMENTS",
+      "fix": "a work-anchored message is reusable only when that exact work is selected; with no selection every supplement is excluded"
+    },
+    {
+      "id": "VALID_REASONER_REPLY_IS_RETAINED_WITH_MATCHING_ROLE",
+      "fix": "reusable pairs are exactly user/trusted_user and assistant/reasoner_reply, matching main context-preview.ts:137-140"
+    },
+    {
+      "id": "MAX_IDS_CAPS_LOOKUPS_EVEN_WHEN_METADATA_IS_MISSING",
+      "fix": "artifact adapter counts attempted lookups; maxIds bounds lookups, the request limit bounds returns, missing/substituted/oversized/all-unattempted coverage is explicit"
+    },
+    {
+      "id": "SOURCE_ID_REPLACEMENT_CANNOT_BE_UNCHANGED_AT_SAME_PATH",
+      "fix": "manifest comparison compares sourceId at the same kind/path and reports replaced; baseline commit changes report baseline"
+    },
+    {
+      "id": "ACTUAL_BUDGET_CHANGE_CANNOT_BE_UNCHANGED_WITHOUT_CLAMP",
+      "fix": "manifest carries the resolved composition budget and the comparison reports budget movement, plus omissions"
+    },
+    {
+      "id": "PROMPT_UTF8_BYTES_INCLUDE_THE_FINAL_SEPARATOR",
+      "fix": "prompt projection reserves header, body and terminating newline inside the byte cap"
+    },
+    {
+      "id": "PROMPT_TOKEN_ESTIMATE_COVERS_THE_COMPLETE_SERIALIZED_TEXT",
+      "fix": "reported tokens are the conservative estimate of the serialized block, never a sum that drops the separator"
+    },
+    {
+      "id": "PROMPT_REFERENCES_PRESERVE_UPSTREAM_TRUNCATION",
+      "fix": "an upstream-truncated slice keeps truncated=true in its reference and in the projection"
+    }
+  ],
+  "ownedRegressions": {
+    "contextTests": { "passed": 86, "failed": 0 },
+    "proposalsTests": { "passed": 26, "failed": 0 },
+    "knowledgeTests": { "passed": 75, "failed": 0 },
+    "routingTests": { "passed": 44, "failed": 0 },
+    "typecheck": "pass"
+  },
+  "stages": {
+    "C1": "done: main-compatible conversation boundary (question anchors, unselected work supplements, reasoner replies, bounded cursor progress)",
+    "C2": "done: separate lookup/return/scan caps with duplicate, missing, substituted and oversized reporting",
+    "C3": "done: complete serialization budget (header+body+separator) and upstream truncation propagation",
+    "C4": "done: manifest identity, resolved budget, baseline, selection and omission comparison",
+    "C5": "pending: human-readable source review projection",
+    "C6": "pending: single-project deterministic relevance retrieval",
+    "C7": "pending: contextHistory/replyResults consumers",
+    "C8": "pending: pure ReasonerProposal candidate validation",
+    "C9": "pending: main context-use/SSE consumer regression",
+    "C10": "pending: full regression, final status and handoff"
+  },
+  "notTested": [
+    {
+      "item": "current main per-message adapter replacement",
+      "owner": "main",
+      "reason": "main still owns its private scoped adapters and full preview fingerprint; this wave publishes candidate exports and probes them directly"
+    }
+  ],
+  "preserved": {
+    "userServices": "5180/8796 through 5188/8804 untouched",
+    "historicalReports": "wave01-wave10 reports unchanged",
+    "rootLock": "pnpm-lock.yaml diff preserved and not committed"
+  }
+}

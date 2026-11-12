@@ -56,6 +56,7 @@ export {
 } from './composer.ts'
 export type {
   ComposedSourceManifest,
+  ComposedSourceManifestBudget,
   ComposedSourceManifestCoverage,
   ComposedSourceManifestEntry,
   ComposedSourceManifestSelection,

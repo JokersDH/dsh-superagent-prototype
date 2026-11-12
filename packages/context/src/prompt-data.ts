@@ -50,6 +50,11 @@ export interface PromptDataProjection {
 
 const DEFAULT_BUDGET: Required<PromptDataBudget> = { maxItems: 12, maxBytes: 32 * 1024, maxTokens: 8000 }
 
+/** One trailing newline terminates every block; bytes and tokens both reserve it up front. */
+const SEPARATOR = '\n'
+const SEPARATOR_BYTES = 1
+const SEPARATOR_TOKENS = 1
+
 function resolveBudget(budget: PromptDataBudget = {}): Required<PromptDataBudget> {
   const positive = (value: number | undefined, fallback: number, ceiling: number): number => {
     if (value === undefined) return Math.min(fallback, ceiling)
@@ -83,6 +88,23 @@ function truncateForTokens(text: string, maxTokens: number): { content: string; 
 }
 
 /**
+ * Fits one source body into the bytes/tokens left for content. `maxBytes`/`maxTokens` are already net
+ * of the header and the block separator, and both are hard caps for what this returns.
+ */
+function fitContent(text: string, maxBytes: number, maxTokens: number): { content: string; truncated: boolean } {
+  if (maxBytes <= 0 || maxTokens <= 0) return { content: '', truncated: text.length > 0 }
+  let content = text
+  let truncated = false
+  if (Buffer.byteLength(content, 'utf8') > maxBytes) {
+    content = Buffer.from(content, 'utf8').subarray(0, maxBytes).toString('utf8').replace(/\uFFFD+$/, '')
+    truncated = true
+  }
+  const tokenFit = truncateForTokens(content, maxTokens)
+  if (tokenFit.truncated) truncated = true
+  return { content: tokenFit.content, truncated }
+}
+
+/**
  * Projects a composition into bounded plain reference data for the existing AssistantModelPort.
  *
  * - Every block is labelled untrusted reference data; there is no system role, tool call, permission
@@ -112,8 +134,9 @@ export function projectPromptData(
     const head = header(slice)
     const headBytes = Buffer.byteLength(head, 'utf8')
     const headTokens = estimateTokens(head)
-    const remainingBytes = resolved.maxBytes - bytes - headBytes
-    const remainingTokens = resolved.maxTokens - tokens - headTokens
+    // The separator that terminates this block belongs to the same budget as its header and body.
+    const remainingBytes = resolved.maxBytes - bytes - headBytes - SEPARATOR_BYTES
+    const remainingTokens = resolved.maxTokens - tokens - headTokens - SEPARATOR_TOKENS
     if (remainingBytes <= 0) {
       omitted.push({ sourceId: slice.sourceId, path: slice.path, reason: 'budget_bytes' })
       truncated = true
@@ -124,29 +147,38 @@ export function projectPromptData(
       truncated = true
       continue
     }
-    // Fit the content into both caps; content is truncated before the item is dropped.
-    let content = slice.content
-    if (Buffer.byteLength(content, 'utf8') > remainingBytes) {
-      content = Buffer.from(content, 'utf8').subarray(0, remainingBytes).toString('utf8').replace(/\uFFFD$/, '')
-    }
-    const tokenFit = truncateForTokens(content, remainingTokens)
-    content = tokenFit.content
-    if (content.length === 0) {
+    // Fit the body into both caps; a body that no longer fits at all is omitted, never half-added.
+    const fit = fitContent(slice.content, remainingBytes, remainingTokens)
+    if (fit.content.length === 0) {
       omitted.push({ sourceId: slice.sourceId, path: slice.path, reason: 'budget_tokens' })
       truncated = true
       continue
     }
-    const block = `${head}${content}\n`
+    const block = `${head}${fit.content}${SEPARATOR}`
+    const blockBytes = Buffer.byteLength(block, 'utf8')
+    const blockTokens = estimateTokens(block)
+    // Defensive: the conservative estimate of the serialized block is the reported amount.
+    if (blockBytes > resolved.maxBytes - bytes) {
+      omitted.push({ sourceId: slice.sourceId, path: slice.path, reason: 'budget_bytes' })
+      truncated = true
+      continue
+    }
+    if (blockTokens > resolved.maxTokens - tokens) {
+      omitted.push({ sourceId: slice.sourceId, path: slice.path, reason: 'budget_tokens' })
+      truncated = true
+      continue
+    }
     parts.push(block)
-    bytes += Buffer.byteLength(block, 'utf8')
-    tokens += headTokens + estimateTokens(content)
-    if (tokenFit.truncated || content !== slice.content) truncated = true
+    bytes += blockBytes
+    tokens += blockTokens
+    const sourceTruncated = fit.truncated || slice.content !== fit.content || slice.truncated
+    if (sourceTruncated) truncated = true
     references.push({
       sourceId: slice.sourceId,
       kind: slice.kind,
       path: slice.path,
-      visiblePreviewDigest: sha256Text(content),
-      truncated: tokenFit.truncated || content !== slice.content,
+      visiblePreviewDigest: sha256Text(fit.content),
+      truncated: sourceTruncated,
     })
   }
 

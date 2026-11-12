@@ -43,17 +43,19 @@ function reader(messages: readonly ScopedConversationMessageView[], options: { h
 
 test('the scoped conversation adapter excludes foreign projects, permission displays and untrusted provenance', async () => {
   const source = reader([
-    message({ id: 'selected', sequence: 5 }),
-    message({ id: 'foreign', sequence: 4, projectId: 'project-2' }),
-    unprovenProject('unproven', 3),
-    message({ id: 'permission', sequence: 2, provenance: 'question_answer_display' }),
-    message({ id: 'reasoner', sequence: 1, role: 'assistant', provenance: 'reasoner_reply' }),
-    message({ id: 'system', sequence: 6, role: 'system' }),
-    message({ id: 'other-conversation', sequence: 7, conversationId: 'conv-2' }),
+    message({ id: 'selected', sequence: 6 }),
+    message({ id: 'foreign', sequence: 5, projectId: 'project-2' }),
+    unprovenProject('unproven', 4),
+    message({ id: 'permission', sequence: 3, provenance: 'question_answer_display' }),
+    message({ id: 'reasoner', sequence: 2, role: 'assistant', provenance: 'reasoner_reply' }),
+    message({ id: 'untrusted', sequence: 7, provenance: 'native_notice' }),
+    message({ id: 'system', sequence: 8, role: 'system' }),
+    message({ id: 'other-conversation', sequence: 9, conversationId: 'conv-2' }),
   ])
   const adapter = createScopedConversationProvider(source, { projectId, conversationId })
   const messages = await adapter.recent({ projectId, conversationId, limit: 20 })
-  assert.deepEqual(messages.map((value) => value.messageId), ['selected'])
+  // A legitimate completed reasoner reply is reusable discussion context, exactly like main's reader.
+  assert.deepEqual(messages.map((value) => value.messageId), ['selected', 'reasoner'])
   const coverage = adapter.coverage()
   assert.equal(coverage.excluded.foreignProject, 1)
   assert.equal(coverage.excluded.unprovenProject, 1)
@@ -61,6 +63,45 @@ test('the scoped conversation adapter excludes foreign projects, permission disp
   assert.equal(coverage.excluded.untrustedProvenance, 1)
   assert.equal(coverage.excluded.systemRole, 1)
   assert.equal(coverage.complete, true)
+})
+
+test('question anchors and unselected work supplements never become reusable discussion context', async () => {
+  const anchored = createScopedConversationProvider(
+    reader([
+      message({ id: 'discussion', sequence: 3 }),
+      message({ id: 'auth-answer', sequence: 2, anchor: { questionId: 'q-1' } }),
+      message({ id: 'work-supplement', sequence: 1, anchor: { workId: 'work-9' } }),
+    ]),
+    { projectId, conversationId },
+  )
+  const messages = await anchored.recent({ projectId, conversationId, limit: 20 })
+  assert.deepEqual(messages.map((value) => value.messageId), ['discussion'])
+  assert.equal(anchored.coverage().excluded.questionAnchor, 1)
+  assert.equal(anchored.coverage().excluded.otherWork, 1)
+
+  // Even a trusted user message carrying a question anchor is excluded before provenance is checked.
+  const trustedQuestion = createScopedConversationProvider(
+    reader([message({ id: 'trusted-question', sequence: 1, anchor: { questionId: 'q-2' } })]),
+    { projectId, conversationId },
+  )
+  assert.deepEqual(await trustedQuestion.recent({ projectId, conversationId, limit: 20 }), [])
+  assert.equal(trustedQuestion.coverage().excluded.questionAnchor, 1)
+  assert.equal(trustedQuestion.coverage().excluded.untrustedProvenance, 0)
+})
+
+test('a misbehaving reader page that does not move the cursor is reported as incomplete', async () => {
+  let calls = 0
+  const stuck = {
+    page(): ScopedConversationPage {
+      calls += 1
+      return { messages: [message({ id: 'a', sequence: 5 })], hasMore: true }
+    },
+  }
+  const adapter = createScopedConversationProvider(stuck, { projectId, conversationId }, { pageSize: 1, maxPages: 5 })
+  const messages = await adapter.recent({ projectId, conversationId, limit: 5 })
+  assert.equal(messages.length, 1)
+  assert.equal(calls, 2)
+  assert.equal(adapter.coverage().complete, false)
 })
 
 test('a misbehaving reader cannot smuggle another conversation into the composition', async () => {
@@ -131,14 +172,45 @@ test('the published-artifact adapter only looks up verified ids and never enumer
   const artifacts = await adapter.recent({ projectId, limit: 10 })
   assert.deepEqual(artifacts.map((value) => value.artifactId), ['pub-1'])
   assert.deepEqual(looked, ['pub-1', 'missing'])
-  assert.deepEqual(adapter.coverage(), { requested: 2, returned: 1, missing: 1, complete: false })
+  assert.deepEqual(adapter.coverage(), { requested: 2, lookedUp: 2, returned: 1, missing: 1, oversized: 0, complete: false })
 })
 
 test('the published-artifact adapter is bounded by maxIds', async () => {
   const lookup = { get: (id: string) => ({ id, digest: 'b'.repeat(64), bytes: 1, createdAt: NOW }) }
   const adapter = createPublishedArtifactProvider(lookup, { publishedArtifactIds: ['a', 'b', 'c', 'd'] }, { maxIds: 2 })
   assert.equal((await adapter.recent({ projectId, limit: 10 })).length, 2)
+  assert.equal(adapter.coverage().lookedUp, 2)
   assert.equal(adapter.coverage().complete, false)
+})
+
+test('maxIds bounds lookups even when every metadata row is missing', async () => {
+  let lookups = 0
+  const adapter = createPublishedArtifactProvider(
+    { get: () => { lookups += 1; return undefined } },
+    { publishedArtifactIds: Array.from({ length: 100 }, (_, index) => `missing-${index}`) },
+    { maxIds: 2 },
+  )
+  assert.deepEqual(await adapter.recent({ projectId, limit: 10 }), [])
+  assert.equal(lookups, 2)
+  assert.deepEqual(adapter.coverage(), { requested: 100, lookedUp: 2, returned: 0, missing: 2, oversized: 0, complete: false })
+})
+
+test('metadata that belongs to another id or exceeds the byte cap is never returned as evidence', async () => {
+  const adapter = createPublishedArtifactProvider(
+    {
+      get: (id) => ({
+        id: id === 'substituted' ? 'someone-else' : id,
+        digest: 'd'.repeat(64),
+        bytes: id === 'huge' ? 1_000_000 : 5,
+        createdAt: NOW,
+      }),
+    },
+    { publishedArtifactIds: ['ok', 'substituted', 'huge'] },
+    { maxArtifactBytes: 1024 },
+  )
+  const artifacts = await adapter.recent({ projectId, limit: 10 })
+  assert.deepEqual(artifacts.map((value) => value.artifactId), ['ok'])
+  assert.deepEqual(adapter.coverage(), { requested: 3, lookedUp: 3, returned: 1, missing: 1, oversized: 1, complete: false })
 })
 
 test('the scoped adapters compose into the authorized composer without leaking foreign material', async () => {
