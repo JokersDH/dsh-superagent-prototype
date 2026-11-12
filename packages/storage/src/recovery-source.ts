@@ -11,6 +11,7 @@ import { RecoveryActivationCommitSchema, RecoverySourceCheckpointSchema, Recover
 import type { RecoveryActivationCommit, RecoverySourceCheckpoint, RecoverySourceCheckpointQuery, RecoverySourceReader } from '@personal-agent/contracts'
 import { MIGRATIONS, PRODUCT_SCHEMA_VERSION } from './migrations.ts'
 import { canonicalDigest } from './ingress.ts'
+import { recoveryActivationFromRow } from './recovery-activations.ts'
 import { WorkflowConflict } from './workflow-errors.ts'
 
 const INDEX_TABLES = new Set([
@@ -108,10 +109,12 @@ export class RecoverySourceStore implements RecoverySourceReader {
     try { commit = RecoveryActivationCommitSchema.parse(input) } catch (error) {
       throw new WorkflowConflict(`Illegal recovery confirmation exclusion: ${String(error)}`)
     }
-    const activation = this.db.prepare('SELECT * FROM recovery_activations WHERE activation_id = ?').get(commit.intent.activationId) as Row | undefined
-    if (!activation || String(activation.command_id) !== commit.intent.commandId ||
-      String(activation.digest) !== digest(commit.intent) || String(activation.value) !== JSON.stringify(commit.intent))
-      throw new WorkflowConflict('Recovery confirmation exclusion does not name an exact committed A fact')
+    const activationRow = this.db.prepare('SELECT * FROM recovery_activations WHERE activation_id = ?').get(commit.intent.activationId) as Row | undefined
+    if (!activationRow) throw new WorkflowConflict('Recovery confirmation exclusion does not name an exact committed A fact')
+    // Reuse the sole strict A fact mapper; every indexed column and both JSON mirror columns must agree.
+    const activation = recoveryActivationFromRow(activationRow)
+    if (digest(activation) !== digest(commit.intent))
+      throw new WorkflowConflict('Recovery confirmation exclusion does not match the immutable A fact')
     const receipt = this.db.prepare('SELECT * FROM command_receipts WHERE command_id = ?').get(commit.intent.commandId) as Row | undefined
     if (!receipt || Number(receipt.seq) !== commit.sourceReceipt.seq || String(receipt.status) !== 'recorded' ||
       String(receipt.payload_digest) !== digest({ intent: commit.intent, actor: { ...commit.intent.principal, source: 'local_ui' } }) &&
@@ -119,8 +122,9 @@ export class RecoverySourceStore implements RecoverySourceReader {
       String(receipt.result) !== JSON.stringify(commit.intent))
       throw new WorkflowConflict('Recovery confirmation exclusion does not match the original receipt')
     const commandEvent = this.db.prepare('SELECT * FROM event_log WHERE seq = ?').get(commit.sourceReceipt.seq) as Row | undefined
-    if (!commandEvent || String(commandEvent.topic) !== 'command' || String(commandEvent.entity_ref) !== commit.intent.commandId)
-      throw new WorkflowConflict('Recovery confirmation exclusion does not match the original command event')
+    if (!commandEvent || String(commandEvent.topic) !== 'command' || String(commandEvent.entity_ref) !== commit.intent.commandId ||
+      String(commandEvent.payload) !== JSON.stringify({ status: 'recorded' }))
+      throw new WorkflowConflict('Recovery confirmation exclusion does not match the original recorded command event')
     // The committer appends exactly one intent event inside the receipt's apply, immediately before
     // commands.record appends its command event. Bind that exact preceding sequence; a later event
     // with the same body is a new change and must stay visible.
@@ -160,10 +164,12 @@ export class RecoverySourceStore implements RecoverySourceReader {
         // Excluded rows do not consume the per-family lookahead: keep scanning until the next real
         // row is found or the table ends, so a tail behind an exclusion is never silently dropped.
         const kept: string[] = []
-        let bounded = false, cursorRowId = -1
+        let bounded = false, cursorRowId: number | undefined
         while (!bounded) {
-          const batch = this.db.prepare(`SELECT rowid AS __pa_rid, * FROM ${name} WHERE rowid > ? ORDER BY rowid LIMIT ${perFamily + 1}`)
-            .all(cursorRowId) as Row[]
+          const batch = cursorRowId === undefined
+            ? this.db.prepare(`SELECT rowid AS __pa_rid, * FROM ${name} ORDER BY rowid LIMIT ${perFamily + 1}`).all() as Row[]
+            : this.db.prepare(`SELECT rowid AS __pa_rid, * FROM ${name} WHERE rowid > ? ORDER BY rowid LIMIT ${perFamily + 1}`)
+              .all(cursorRowId) as Row[]
           if (!batch.length) break
           for (const row of batch) {
             cursorRowId = Number(row.__pa_rid)

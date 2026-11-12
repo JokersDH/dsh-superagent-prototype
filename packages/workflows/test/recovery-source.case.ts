@@ -246,3 +246,74 @@ test('a commit from a second real connection is visible to the next snapshot', (
     assert.notEqual(f.store.workflows.recoverySource.inspect().sourceFingerprint, before)
   } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
 })
+
+test('a negative-rowid logical row is read and its content change is visible', () => {
+  const f = fixture()
+  try {
+    f.store.product.works.insert({ id: 'negative-work', projectId: 'project-1', conversationId: 'conversation-1', title: 'Original negative row', createdAt: at })
+    f.store.db.prepare('UPDATE works SET rowid = -2 WHERE id = ?').run('negative-work')
+    const before = f.store.workflows.recoverySource.inspect()
+    assert.equal(before.coverage, 'complete')
+    assert.equal(before.families.find(family => family.name === 'works')?.rows, 1)
+    f.store.db.prepare('UPDATE works SET value = ? WHERE id = ?')
+      .run(JSON.stringify({ ...f.store.product.works.get('negative-work'), title: 'Changed negative row' }), 'negative-work')
+    const after = f.store.workflows.recoverySource.inspect()
+    assert.notEqual(after.sourceFingerprint, before.sourceFingerprint)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
+
+test('a corrupted activation index/mirror column is not accepted as an ignorable fact', () => {
+  const f = fixture()
+  try {
+    const committed = commit(f.store)
+    f.store.db.prepare('UPDATE recovery_activations SET target_json = ? WHERE activation_id = ?')
+      .run(JSON.stringify({ ...committed.intent.target, stateRoot: '/tmp/unconfirmed-target' }), committed.intent.activationId)
+    assert.throws(() => f.store.workflows.recoverySource.inspect({ ignoreCommitted: committed }), WorkflowConflict)
+    assert.throws(() => f.store.workflows.recoveryActivations.get(committed.intent.activationId), WorkflowConflict)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
+
+test('the original command event must retain its recorded payload to be excluded', () => {
+  const f = fixture()
+  try {
+    const committed = commit(f.store)
+    f.store.db.prepare('UPDATE event_log SET payload = ? WHERE seq = ?')
+      .run(JSON.stringify({ status: 'rejected' }), committed.sourceReceipt.seq)
+    assert.throws(() => f.store.workflows.recoverySource.inspect({ ignoreCommitted: committed }), WorkflowConflict)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
+
+test('a non-empty source covers work, queue, runtime binding and context data without mixing connections', () => {
+  const f = fixture()
+  try {
+    const contract = { workId: 'work-source', revision: 1, digest: 'a'.repeat(64) }
+    f.store.product.works.insert({ id: 'work-source', projectId: 'project-1', conversationId: 'conversation-1', title: 'Source work', createdAt: at })
+    f.store.queue.enqueue('application.execute', 'queue-1', '{}', 1, 0, at)
+    f.store.bindings.record({ attemptId: 'attempt-1', ticketId: 'ticket-1', assignmentId: 'assignment-1', fenceEpoch: 2,
+      contract, state: 'active', runnerIdentityRef: 'runner-1', source: 'test',
+      resources: [{ ref: 'process-1', ownership: 'spawned_process' }] })
+    f.store.bindings.setCurrent('ticket-1', 'attempt-1')
+    const artifact = f.store.artifacts.write(new TextEncoder().encode('{"bounded":true}'))
+    f.store.artifacts.insert(artifact)
+    f.store.commands.record('source-command', 'a'.repeat(64), () => ({ ok: true }))
+    f.store.workflows.assistant.contextBindings.put({ protocol: 'assistant-context-binding/1', commandId: 'context-command',
+      messageId: 'context-message', requestId: 'context-request', projectId: 'project-1', conversationId: 'conversation-1',
+      userTextDigest: 'a'.repeat(64), principal, purpose: 'conversation_discussion',
+      scope: { projectId: 'project-1', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
+      selections: ['conversation'], bundleRef: artifact.id, bundleDigest: artifact.digest,
+      sources: [{ sourceId: 'source-1', kind: 'conversation_message', sourceDigest: 'b'.repeat(64), previewDigest: 'c'.repeat(64), truncated: false }],
+      confirmedAt: at, expiresAt: '2026-11-12T00:04:00.000Z' })
+    const snapshot = f.store.workflows.recoverySource.inspect()
+    assert.equal(snapshot.coverage, 'complete')
+    for (const name of ['works', 'effect', 'runtime_bindings', 'runtime_current', 'assistant_context_bindings', 'command_receipts'])
+      assert.ok((snapshot.families.find(family => family.name === name)?.rows ?? 0) > 0, name)
+    assert.equal(f.store.bindings.current<{ fenceEpoch: number }>('ticket-1')?.fenceEpoch, 2)
+
+    const before = snapshot.sourceFingerprint
+    const other = new ProductStore({ path: f.path })
+    try { other.bindings.record({ attemptId: 'attempt-2', ticketId: 'ticket-2', assignmentId: 'assignment-2', fenceEpoch: 1,
+      contract: { workId: 'work-2', revision: 1, digest: 'd'.repeat(64) }, state: 'active', runnerIdentityRef: 'runner-2', source: 'test',
+      resources: [] }) } finally { other.close() }
+    assert.notEqual(f.store.workflows.recoverySource.inspect().sourceFingerprint, before)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
