@@ -14,6 +14,7 @@
     "mergedOriginMain": "b466bc7",
     "mergeCommit": "8d8ac6e",
     "previousOwnCommit": "2c25985",
+    "earlyCheckpoint": "480c5ee",
     "rootLockDiffPreserved": true
   },
   "budget": {
@@ -67,35 +68,76 @@
       "fix": "an upstream-truncated slice keeps truncated=true in its reference and in the projection"
     }
   ],
-  "ownedRegressions": {
-    "contextTests": { "passed": 86, "failed": 0 },
-    "proposalsTests": { "passed": 26, "failed": 0 },
-    "knowledgeTests": { "passed": 75, "failed": 0 },
-    "routingTests": { "passed": 44, "failed": 0 },
-    "typecheck": "pass"
+  "delivered": {
+    "C1": "Main-compatible conversation boundary: question anchors, unselected work supplements, role/provenance pairs, duplicate and non-advancing cursor guards (packages/context/src/scoped-adapters.ts)",
+    "C2": "Separate lookup/return caps with duplicate, missing, substituted-identity and oversized metadata reporting (createPublishedArtifactProvider)",
+    "C3": "Complete serialization budget over header+body+newline, conservative token totals and upstream truncation propagation (packages/context/src/prompt-data.ts)",
+    "C4": "Manifest identity/budget comparison: sourceId replacement, resolved budget, baseline commit and omissions (compareSourceManifests)",
+    "C5": "Human-readable, bounded source review projection with trusted titles/citations, excerpts, digests and omission reasons (projectSourceReview, source-review.ts)",
+    "C6": "Single-project deterministic relevance retrieval over A's read index/work list with authorization before ranking and a long-conversation dataset (relevance.ts)",
+    "C7": "Read-only context-history and completed-reply consumer with expiry/contract/scope drift states and explicit reauthorization requirement (history.ts)",
+    "C8": "Pure reply-candidate validation/projection over AssistantReplyBody + ReasonerProposalSchema + planProposalCommand; no execution (reply-candidates.ts)",
+    "C9": "Independent consumer of main prepare/send/audit provider path: untrusted bundle layer, audit identity, cutoff, token replay, revocation, expiry, offline provider (knowledge/test/main-context-use-consumer.case.ts)",
+    "C10": "Full four-package regression, probe, status and handoff"
   },
-  "stages": {
-    "C1": "done: main-compatible conversation boundary (question anchors, unselected work supplements, reasoner replies, bounded cursor progress)",
-    "C2": "done: separate lookup/return/scan caps with duplicate, missing, substituted and oversized reporting",
-    "C3": "done: complete serialization budget (header+body+separator) and upstream truncation propagation",
-    "C4": "done: manifest identity, resolved budget, baseline, selection and omission comparison",
-    "C5": "pending: human-readable source review projection",
-    "C6": "pending: single-project deterministic relevance retrieval",
-    "C7": "pending: contextHistory/replyResults consumers",
-    "C8": "pending: pure ReasonerProposal candidate validation",
-    "C9": "pending: main context-use/SSE consumer regression",
-    "C10": "pending: full regression, final status and handoff"
+  "exportsForMain": {
+    "packages/context": [
+      "createScopedConversationProvider",
+      "createPublishedArtifactProvider",
+      "buildSourceManifest",
+      "compareSourceManifests",
+      "projectPromptData",
+      "projectSourceReview",
+      "selectRelevantSources",
+      "createConversationRelevanceCandidates",
+      "createDecisionRelevanceCandidates",
+      "createReadIndexWorkCandidates",
+      "collectContextHistory"
+    ],
+    "packages/proposals": [
+      "reviewReplyCandidates"
+    ]
+  },
+  "relevanceDataset": {
+    "location": "packages/context/test/relevance.case.ts",
+    "conversationMessages": 403,
+    "workRecords": 63,
+    "expectedHits": 8,
+    "expectedHitsSelected": 8,
+    "forbiddenCandidates": 6,
+    "forbiddenSelected": 0,
+    "boundedOperations": { "conversationPages": 4, "indexListCalls": 1 },
+    "deterministic": "reversed input order yields identical ordered ids and scores"
+  },
+  "ownedRegressions": {
+    "contextTests": { "passed": 101, "failed": 0 },
+    "proposalsTests": { "passed": 32, "failed": 0 },
+    "knowledgeTests": { "passed": 79, "failed": 0 },
+    "routingTests": { "passed": 44, "failed": 0 },
+    "typecheck": "pass",
+    "build": "pass"
   },
   "notTested": [
     {
-      "item": "current main per-message adapter replacement",
+      "item": "main replacement of its private scoped adapters with these exports",
       "owner": "main",
-      "reason": "main still owns its private scoped adapters and full preview fingerprint; this wave publishes candidate exports and probes them directly"
+      "reason": "main still owns its per-message adapter and full preview fingerprint; this wave publishes and probes the candidate exports directly, and C9 consumes the current main path"
+    },
+    {
+      "item": "durable A store.workflows.assistant.contextHistory/replyResults",
+      "owner": "A",
+      "reason": "this worktree has contracts and the binding store only; history/reply pages are exercised against the published contract with a paged fixture, not a real A16 table"
+    },
+    {
+      "item": "history/candidate review UI",
+      "owner": "main",
+      "reason": "no product surface is wired in this checkout; C publishes library projections only"
     }
   ],
   "preserved": {
     "userServices": "5180/8796 through 5188/8804 untouched",
     "historicalReports": "wave01-wave10 reports unchanged",
-    "rootLock": "pnpm-lock.yaml diff preserved and not committed"
+    "rootLock": "pnpm-lock.yaml diff preserved and not committed",
+    "sharedContracts": "no contracts/application/http/ui edits"
   }
 }

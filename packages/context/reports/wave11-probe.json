@@ -6,10 +6,10 @@
     "/Users/hh/Desktop/joker/superagent-agent-c"
   ],
   "sourceRoot": "/Users/hh/Desktop/joker/superagent-agent-c",
-  "sourceCommit": "8d8ac6ec2a984ba1605dba6bd1534e4c11e9d565",
-  "publishedSource": "2c2598524b9bd253f2a68d47558e35ec3beeb667",
+  "sourceCommit": "480c5ee81d31fe364f0f2df142cf13af4390c500",
+  "publishedSource": "480c5ee81d31fe364f0f2df142cf13af4390c500",
   "baseCommit": "b466bc760f073408d95005c3c9e6219d94c23e5e",
-  "sourceWorktreeClean": false,
+  "sourceWorktreeClean": true,
   "unrelatedLockDiffPreserved": true,
   "sourceHashes": {
     "packages/context/src/scoped-adapters.ts": "e8a175c1e15be5bfaa9be5814b96564c90535e6a92341edba6a16fab3ae2b974",
@@ -17,7 +17,7 @@
     "packages/context/src/prompt-data.ts": "7b96ed2270aab4235830fbb573283199cc6a007caff0dae18151f42e33a04451",
     "packages/proposals/src/assistant-proposal-service.ts": "8692f64c2c2d8d575467155345870bd9154ecc2f829389d56532afc2a4d3a595"
   },
-  "checkedAt": "2026-11-12T04:12:49.969Z",
+  "checkedAt": "2026-11-12T05:17:47.538Z",
   "exitCode": 0,
   "passed": 17,
   "failed": 0,
