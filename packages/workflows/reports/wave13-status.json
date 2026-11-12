@@ -1,0 +1,211 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "e1e0c97",
+  "mergeCommit": null,
+  "checkpoints": [
+    "565fef0",
+    "d25d9a0"
+  ],
+  "testedSourceCommit": "d25d9a0",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "probe": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave13-a.json node tools/bootstrap/probe-wave13-storage.mjs $PWD",
+    "status": "PASS",
+    "pass": 4,
+    "fail": 0,
+    "cases": [
+      "NORMAL_BUSINESS_ROW_POSITIVE_CONTROL",
+      "NEGATIVE_ROWID_MUST_NOT_DISAPPEAR_FROM_A_COMPLETE_SOURCE",
+      "IGNORED_ACTIVATION_INDEX_MUST_MATCH_ITS_IMMUTABLE_BODY",
+      "IGNORED_COMMAND_EVENT_MUST_RETAIN_ITS_ORIGINAL_RECORDED_BODY"
+    ],
+    "evidence": "packages/workflows/reports/wave13-storage-probe.json"
+  },
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "package-local + probe",
+      "evidence": [
+        "wave13-storage-probe.json",
+        "recovery-source tests"
+      ],
+      "note": "negative rowids included from the first batch; strict A fact mapper validates all activation indexes/mirrors; command event payload must be exactly recorded"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "recovery-source.case.ts (16)",
+        "565fef0"
+      ],
+      "note": "single read transaction covers schema/fact/receipt/events/families; complete/bounded/unsupported boundaries and first checkpoint published"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "non-empty source test",
+        "second connection test"
+      ],
+      "note": "work/queue/runtime binding/current/context/receipt covered in one snapshot; another real connection write changes the next fingerprint; bad table/schema states unsupported"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "existing stores only",
+      "evidence": [
+        "runtime binding fence/current test"
+      ],
+      "note": "B can read existing runtime binding/current with fenceEpoch and original receipts; no test-only table, ledger or recovery method added"
+    },
+    {
+      "phase": "A5",
+      "status": "NOT_TESTED",
+      "scope": "main entry absent",
+      "evidence": [
+        "main consumer search",
+        "source package tests"
+      ],
+      "note": "main still has no baseline/prepare/confirm consumer of RecoverySourceStore; only this composition is not tested"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "package-local + main consumer",
+      "evidence": [
+        "snapshot-d tests",
+        "CompletedAssistantReplies restored read"
+      ],
+      "note": "non-empty DB with work/decision/context/reply/receipt/artifacts restores to second root and the real consumer reads original reply body; missing table/bundle, byte change and future schema block"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "independent process",
+      "evidence": [
+        "reply-crash tests",
+        "snapshot-crash tests"
+      ],
+      "note": "SIGKILL before/after result, after reply message, before/after source confirmation, and before/after snapshot creation; recovery uses original artifact body"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "context-history scale test",
+        "wave13-performance.json"
+      ],
+      "note": "10000 bindings first page 2.6ms with scope index; multi-project/conversation/work, repeated time, insert-between-pages; no body scan"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "D/E input",
+      "evidence": [
+        "wave13-source-delivery.md",
+        "v15/v16 upgrade tests"
+      ],
+      "note": "current schema/families/snapshot recipe published without hardcoding; v15/v16 upgrades keep FTS/messages/receipts/bindings/results"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "package-local regression",
+      "evidence": [
+        "wave13-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, main product/history/target consumers, typecheck/build and static packet check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "100/100",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "mainConsumers": "88/88",
+    "mainTargetConsumers": "50/50",
+    "storageProbe": "4/4",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "backupFamilies": [
+    "assistant_context_bindings",
+    "assistant_reply_results",
+    "recovery_activations",
+    "recovery_intents",
+    "outcomes",
+    "reviews",
+    "decisions",
+    "proposals",
+    "project_settings",
+    "contracts",
+    "verifications",
+    "acceptances",
+    "legacy_decisions"
+  ],
+  "limits": {
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288,
+    "snapshotEvidenceRowsPerFamily": 2000,
+    "bindingsTested": 10000
+  },
+  "failureWindows": [
+    "negative rowid",
+    "activation index/mirror tamper",
+    "command event payload",
+    "later same-body intent event",
+    "missing schema_meta/event_log",
+    "second connection commit",
+    "result/reply/message SIGKILL",
+    "source confirmation SIGKILL",
+    "snapshot before/after SIGKILL",
+    "missing bundle/result table",
+    "future schema"
+  ],
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "source-baseline-consumer",
+      "detail": "RecoverySourceStore has no actual main baseline/prepare/confirm consumer; that composition is NOT_TESTED."
+    },
+    {
+      "owner": "main/D",
+      "id": "activation-installation",
+      "detail": "Recovery activation/start, target materialization and current schema installation remain external; logical source/backup never grants startup."
+    }
+  ],
+  "notTested": [
+    "main baseline/prepare/confirm source composition",
+    "actual recovery activation/start or target materialization",
+    "D current-schema installation/upgrade",
+    "E independent release acceptance",
+    "real model/provider/native execution"
+  ],
+  "mainNextSteps": [
+    "consume recoverySource.inspect against a pre-confirmation baseline in the actual prepare/confirm flow",
+    "keep marker/host/physical-writer checks separate from the logical fingerprint",
+    "use contextHistory.page behind a signed principal/project cursor",
+    "use wave13-source-delivery.md for current schema snapshot and D/E negative inputs"
+  ],
+  "updatedAt": "2026-11-12T14:10:00.000Z"
+}
