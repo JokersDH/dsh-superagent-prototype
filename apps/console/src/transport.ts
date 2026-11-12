@@ -39,6 +39,10 @@ import {
   WorkEvidenceHistoryQuerySchema,
   ContextPreviewInputSchema,
   ContextPreviewSchema,
+  AssistantContextPrepareSchema,
+  AssistantContextPreparedSchema,
+  AssistantContextSendSchema,
+  AssistantContextBindingSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -78,6 +82,10 @@ import type {
   WorkEvidenceHistoryQuery,
   ContextPreviewInput,
   ContextPreview,
+  AssistantContextPrepare,
+  AssistantContextPrepared,
+  AssistantContextSend,
+  AssistantContextBinding,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -138,6 +146,9 @@ export interface ConsoleTransport {
   workEvidence?(workId: string): Promise<WorkEvidence | undefined>
   workEvidenceHistory?(workId: string, query: WorkEvidenceHistoryQuery): Promise<WorkEvidenceHistory | undefined>
   contextPreview?(input: ContextPreviewInput): Promise<ContextPreview>
+  prepareAssistantContext?(input: AssistantContextPrepare): Promise<AssistantContextPrepared>
+  sendAssistantContext?(input: AssistantContextSend): Promise<CommandReceipt>
+  assistantContext?(messageId: string): Promise<AssistantContextBinding | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -177,7 +188,7 @@ export class HttpTransport implements ConsoleTransport {
     this.base = base
   }
 
-  private async request(path: string, init?: RequestInit, optionalResource = false, receiptCommandId?: string): Promise<unknown> {
+  private async request(path: string, init?: RequestInit, optionalResource: boolean | 'json404' = false, receiptCommandId?: string): Promise<unknown> {
     let response: Response
     try {
       response = await fetch(`${this.base}${path}`, {
@@ -197,7 +208,7 @@ export class HttpTransport implements ConsoleTransport {
         body = undefined
       }
     }
-    if (optionalResource && response.status === 404 && body === undefined) return missingOptionalResource
+    if (optionalResource && response.status === 404 && (body === undefined || optionalResource === 'json404')) return missingOptionalResource
     if (!response.ok) {
       if (receiptCommandId) {
         const receipt = CommandReceiptSchema.safeParse(body)
@@ -423,6 +434,37 @@ export class HttpTransport implements ConsoleTransport {
       preview.contract?.workId !== value.workId || [...preview.selections].sort().join() !== [...value.selections].sort().join())
       throw new TransportError('schema_mismatch', '上下文预览与所选项目、会话或工作不匹配')
     return preview
+  }
+  async prepareAssistantContext(input: AssistantContextPrepare): Promise<AssistantContextPrepared> {
+    const value = AssistantContextPrepareSchema.parse(input)
+    const prepared = AssistantContextPreparedSchema.parse(await this.request('/v1/assistant/context/prepare', {
+      method: 'POST', body: JSON.stringify(value), signal: AbortSignal.timeout(10000),
+    }))
+    if (prepared.commandId !== value.commandId || prepared.text !== value.text || prepared.preview.projectId !== value.context.projectId ||
+      prepared.preview.conversationId !== value.context.conversationId || prepared.preview.contract?.workId !== value.context.workId ||
+      [...prepared.preview.selections].sort().join() !== [...value.context.selections].sort().join())
+      throw new TransportError('schema_mismatch', '消息确认与原文、会话或所选来源不匹配')
+    return prepared
+  }
+  async sendAssistantContext(input: AssistantContextSend): Promise<CommandReceipt> {
+    const command = AssistantContextSendSchema.parse(input)
+    const receipt = CommandReceiptSchema.parse(await this.request('/v1/assistant/context/send', {
+      method: 'POST', body: JSON.stringify(command), signal: AbortSignal.timeout(10000),
+    }, false, command.commandId))
+    if (receipt.commandId !== command.commandId) throw new TransportError('schema_mismatch', '消息回执身份不匹配')
+    return receipt
+  }
+  async assistantContext(messageId: string): Promise<AssistantContextBinding | undefined> {
+    try {
+      const body = await this.request(`/v1/messages/${encodeURIComponent(messageId)}/context`, undefined, 'json404')
+      if (body === missingOptionalResource) return undefined
+      const binding = AssistantContextBindingSchema.parse(body)
+      if (binding.messageId !== messageId) throw new TransportError('schema_mismatch', '上下文记录属于另一条消息')
+      return binding
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
   }
   async workEvidence(workId: string): Promise<WorkEvidence | undefined> {
     try {

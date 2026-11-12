@@ -2,6 +2,8 @@
 
 2026-11-11。先读[0033验收及稳定输入](../../docs/rfcs/WP-16/0033-wave-10-admission-and-product-closure.md)、[独立反例](../../reports/releases/wave10-admission/README.zh-CN.md)，再读自己的packet。基线main `2caee2e`，产品 `32fc7ae`；开工合并实际最新origin/main，保留原目录、分支、候选、历史报告与账本。已有context/evidence网页已交，不能继续用531c6b6说main缺入口。
 
+主线已继续发布[0034实际上下文发送/目标消费者](../../docs/rfcs/WP-16/0034-context-use-and-target-preparation.md)，产品4140cac、A数据schema16。A/C/E可以直接消费真实prepare/send/audit/SSE；D可跑实际跨source目标准备。早期“main缺入口”只保留历史；恢复activate尚未交，不用准备成功替代授权。新增用户预览5188/8804，与原八组一起保留。继续本轮原六阶段整包，无需新派工或刷新预算。
+
 ## 本轮成果
 
 1. 用户可把有界、经复验的所选上下文用于一条对话，并查看来源；默认关闭，没有新推理循环或隐式派单。

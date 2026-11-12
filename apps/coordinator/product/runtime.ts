@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs'
 import { ApplicationConversations, ApplicationFault, createProductApplication } from '@personal-agent/application'
 import type { ApplicationOptions } from '@personal-agent/application'
 import { sharedAttentionRanker } from '@personal-agent/routing'
-import type { AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryPrepare, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
+import { recoveryTargetInventory } from '@personal-agent/storage'
+import type { AssistantContextBindings, AssistantContextPrepare, AssistantContextSend, AssistantReplyResults, AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryActivationCommit, RecoveryPrepare, RecoveryTargetInventoryReader, RecoveryTargetMaterial, RecoveryTargetMaterializer, RecoveryTargetPrepareInput, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { WorkEvidenceSchema } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
@@ -31,6 +32,10 @@ import { ProductProposals } from './proposals.ts'
 import { readRecoveryActivationRecord } from './recovery-intents.ts'
 import { ProductEvidenceHistory } from './evidence-history.ts'
 import { ProductContextPreview } from './context-preview.ts'
+import { ProductAssistantContext } from './assistant-context-use.ts'
+import { ProductRecoveryTargets } from './recovery-target-service.ts'
+import { initializeRecoveryTarget } from './recovery-target-initializer.ts'
+import { CompletedAssistantReplies } from './assistant-reply-results.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -44,6 +49,14 @@ export function createProductRuntime(
     workspaceRoot?: string
     startupMode?: 'normal' | 'recovery_readonly'
     attentionRanker?: AttentionRanker
+    assistantContextBindings?: AssistantContextBindings
+    assistantReplyResults?: AssistantReplyResults
+    recoveryTargets?: {
+      materializer: RecoveryTargetMaterializer
+      inventory?: RecoveryTargetInventoryReader
+      revalidateSource(commit: RecoveryActivationCommit): void
+      initialize?(material: RecoveryTargetMaterial): Promise<void>
+    }
   },
 ) {
   options = {
@@ -137,6 +150,13 @@ export function createProductRuntime(
       : nativeProjects.find(project => project.id === contract.scope.projectId) : undefined,
   )
   const { store } = options
+  let assistantContext: ProductAssistantContext | undefined
+  const recoveryTargets = options.recoveryTargets ? new ProductRecoveryTargets({
+    store, principal: options.principal, stateRoot: options.stateRoot,
+    materializer: options.recoveryTargets.materializer, inventory: options.recoveryTargets.inventory ?? recoveryTargetInventory,
+    revalidateSource: options.recoveryTargets.revalidateSource,
+    initialize: options.recoveryTargets.initialize ?? initializeRecoveryTarget, ...(options.now ? { now: options.now } : {}),
+  }) : undefined
   const reviewTiming = new ProductReviewTiming(store, application, completion, options.principal, () => configuredProjects.map(project => project.id))
   completion.onAccepted = (candidate, actor, at) => {
     const eventSeq = reviewTiming.accepted(candidate, actor, at)
@@ -154,13 +174,20 @@ export function createProductRuntime(
   })
   const assistantStreams = new AssistantStreams()
   const evidenceHistory = new ProductEvidenceHistory(store, application, () => configuredProjects.map(project => project.id), options.actionSecret, options.now)
+  const replyResults = options.assistantReplyResults ??
+    (store.workflows.assistant as typeof store.workflows.assistant & { replyResults?: AssistantReplyResults }).replyResults
   if (options.assistantProvider)
     handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams, {
       nativeExecution: !!options.native,
+      ...(replyResults ? { completed: new CompletedAssistantReplies(store, replyResults, options.principal,
+        () => configuredProjects.map(project => project.id)) } : {}),
+      context: message => assistantContext?.forMessage(message) ?? Promise.resolve(undefined),
     })
   const read: NonNullable<LocalHttpOptions['read']> = {
     recovery: async () => recovery.inspect(),
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
+    ...(recoveryTargets ? { recoveryTarget: (id: string) => recoveryTargets.read(id) } : {}),
+    assistantContext: async messageId => assistantContext?.audit(messageId),
     workEvidenceHistory: (workId, query) => evidenceHistory.read(workId, query),
     workEvidence: async workId => {
       const work = (await application.inspect({ workId })).works[0]
@@ -323,6 +350,7 @@ export function createProductRuntime(
         decisionsAvailable: options.startupMode !== 'recovery_readonly',
         proposalsAvailable: options.startupMode !== 'recovery_readonly',
         contextPreviewAvailable: options.startupMode !== 'recovery_readonly',
+        assistantContextAvailable: !!assistantContext && !!options.assistantProvider?.status().configured && options.startupMode !== 'recovery_readonly',
       })
       return configuration
     },
@@ -360,6 +388,21 @@ export function createProductRuntime(
     () => configuredProjects.map(project => ({ ...project,
       ...(projectSettings?.has(project.id) ? { displayName: projectSettings.displayName(project.id) } : {}) })),
     { verification: read.verification!, workEvidence: read.workEvidence! }, options.now)
+  const contextBindings = options.assistantContextBindings ??
+    (store.workflows.assistant as typeof store.workflows.assistant & { contextBindings?: AssistantContextBindings }).contextBindings
+  if (contextBindings) assistantContext = new ProductAssistantContext({
+    store, application, principal: options.principal, preview: contextPreview, bindings: contextBindings,
+    projects: () => configuredProjects, secret: options.actionSecret, ...(options.now ? { now: options.now } : {}),
+    beforeNewSend: () => {
+      if (!options.assistantProvider?.status().configured)
+        throw new ApplicationFault('unsupported_capability', 'A configured discussion provider is required for a new context message', 'none')
+    },
+  })
+  const selectedContext = () => {
+    if (options.startupMode === 'recovery_readonly' || !assistantContext)
+      throw new ApplicationFault('unsupported_capability', 'Selected-context discussion is not available in this instance', 'none')
+    return assistantContext
+  }
   return {
     application,
     execution,
@@ -370,6 +413,10 @@ export function createProductRuntime(
     projectSettings,
     operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor),
       recoveryPrepare: async (input: RecoveryPrepare, actor: TrustedActor) => recovery.prepare(input, actor),
+      ...(recoveryTargets ? { recoveryTargetPrepare: (input: RecoveryTargetPrepareInput, actor: TrustedActor) => {
+        if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Target preparation requires restored read-only startup', 'none')
+        return recoveryTargets.prepare(input, actor)
+      } } : {}),
       prepareDecision: async (input: DecisionPrepare, actor: TrustedActor) => decisions.prepare(input, actor),
       prepareProposal: (input: ProposalPrepare, actor: TrustedActor) => proposals.prepare(input, actor),
       proposal: (command: ProposalCommand, actor: TrustedActor) => proposals.dispatch(command, actor),
@@ -377,6 +424,8 @@ export function createProductRuntime(
         if (options.startupMode === 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Context preview requires a normal local instance', 'none')
         return contextPreview.prepare(input, actor)
       },
+      assistantContextPrepare: (input: AssistantContextPrepare, actor: TrustedActor) => selectedContext().prepare(input, actor),
+      assistantContextSend: (input: AssistantContextSend, actor: TrustedActor) => selectedContext().dispatch(input, actor),
       decision: async (command: DecisionCommand, actor: TrustedActor) => decisions.dispatch(command, actor),
       reviewActivity: async (activity: ReviewActivity, actor: TrustedActor) => reviewTiming.record(activity, actor),
       ...(projectSettings ? { projectSettings: (command: ProjectSettingsCommand, actor: TrustedActor) => projectSettings.dispatch(command, actor) } : {}) },

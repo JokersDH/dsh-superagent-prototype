@@ -1,0 +1,38 @@
+{
+  "status": "SCOPED_REVIEW_COMPLETE_NEW_CANDIDATES_NOT_WHOLE_PRODUCT_ADMITTED",
+  "reviewBaseline": "7f7bdd7",
+  "currentProductBaseline": "4140cac15f4ab9c4f5027d96fbee99edb22347be",
+  "newInterfaceAndReplayFix": "98a50ca",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "candidates": {
+    "A": {"source":"8a91958c5e3ef9afe35555bd92f0d3b0418128b8","status":"PREVIOUSLY_ADMITTED_SLICES_PRESERVED_NO_NEW_SOURCE","mainOutstandingClaim":"context-use missing claim is stale"},
+    "B": {"source":"b4e2031ce819168ec688309ee5a3b11d766c4688","passed":7,"failed":4,"exitCode":1,"ownedPassed":68,"strictDiagnostics":0,"exactOptionalDiagnostics":2,"durableRestart":"NOT_TESTED_MEMORY_ONLY_RECONSTRUCTION","evidence":"runtime.json"},
+    "C": {"source":"2c2598524b9bd253f2a68d47558e35ec3beeb667","passed":8,"failed":9,"exitCode":1,"ownedContextPassed":78,"ownedProposalsPassed":26,"ownedKnowledgePassed":75,"sourceClean":true,"unrelatedLockPreserved":true,"evidence":"context.json"},
+    "D": {"source":"fe01c3c541e5f3fb870119f637ab067cb0aee8bc","passed":2,"failed":1,"exitCode":1,"severity":"P1_REQUESTED_STATE_STOP_MISMATCH","ownedTargetedPassed":14,"portabilityTypecheck":"PASS","oldUpgradeMaterialScopedAdmission":"PRESERVED","evidence":"delivery.json"},
+    "E": {"source":"c12c15e0def25c84c490b70acdd89406759e5ca6","actualReportedProduct":"6830e38c73f50542c7d836e4d5e579bcf5d27fe2","actualReportedSchema":15,"independentStopFinding":"CONFIRMED_BY_MAIN_OWNED_TEMP_PROBE","currentContextUseIndependentAdmission":"NOT_TESTED_IN_THIS_SOURCE","evidence":"delivery.json"}
+  },
+  "artifactObserved": {
+    "targetSource":"cf7a3cfeb4ebabebe95b8670bae33a97d3a71596","buildId":"da2d78d126e4745f","schema":15,
+    "sha256":"f886a05c55dbe581198ce587d1c80c410ec08d13012ff0689cc77d70f44df5a2","bytes":20073981,
+    "actualHashAndSizeVerified":true,"containsContextPreview":true,"containsEvidenceHistory":true,
+    "containsSelectedContextSend":false,"containsMessageContextAudit":false,"currentMainInstallAdmitted":false
+  },
+  "mainChanges": {
+    "proposalExpectedDigestReplaySlice":"ADMITTED_3_LINE_FIX_AND_MAIN_PATH_TESTS_FROM_C",
+    "proposalsTestsPassed":26,"mainProposalIntegrationPassed":10,
+    "contractsTestsPassed":224,"contractsBuild":"PASS","generatedCheck":"PASS","coordinatorProductTypecheck":"PASS",
+    "newPorts":["RecoverySourceReader","AssistantContextHistory","AssistantReplyResults"],
+    "newPortImplementationsAvailable":false
+  },
+  "nextDispatch": "agent-tasks/product-wave-11/README.zh-CN.md",
+  "longPackages":{"roles":6,"phasesPerRole":10,"totalPhases":60,"sourceCheckpointsPerRole":3,"independentFallbackQueues":true,"unboundedPolling":false,"planStaticCheck":"PASS_STATIC_ONLY"},
+  "modelCallsByAgent":0,"nativeTurnsByAgent":0,"budgetReset":false,"userServicesStopped":false,
+  "preservedUserServices":[[5180,8796],[5181,8797],[5182,8798],[5183,8799],[5184,8800],[5185,8801],[5186,8802],[5187,8803],[5188,8804]],
+  "limitations":[
+    "B and C new helper failures do not imply an existing main personal-product permission bypass",
+    "D stop negative used only probe-owned API and exited launcher PIDs, without pa CLI/global scanning/user stops",
+    "Previously accepted upgrade/resource/material preparation scope is preserved",
+    "No new full installer, target activation, real native/model or review-benefit admission",
+    "New contracts are development inputs; implementation remains assigned to A/main, not claimed complete"
+  ]
+}

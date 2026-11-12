@@ -81,6 +81,11 @@ const EVIDENCE_FAMILIES: readonly EvidenceFamilySpec[] = [
   { name: 'recovery_intents', table: 'recovery_intents', identity: 'command_id',
     body: ['command_id', 'plan_id', 'plan_digest', 'inspection_fingerprint', 'source_fingerprint', 'user_id', 'actor_ref', 'payload', 'digest', 'created_at', 'expires_at'],
     order: 'created_at, plan_id' },
+  { name: 'assistant_context_bindings', table: 'assistant_context_bindings', identity: 'message_id',
+    body: ['message_id', 'command_id', 'request_id', 'project_id', 'conversation_id', 'user_text_digest',
+      'principal_user_id', 'principal_authority_ref', 'bundle_ref', 'bundle_digest', 'confirmed_at', 'expires_at',
+      'value', 'digest'],
+    order: 'confirmed_at, message_id' },
   { name: 'recovery_activations', table: 'recovery_activations', identity: 'activation_id',
     body: ['activation_id', 'command_id', 'plan_id', 'plan_digest', 'source_json', 'target_json', 'principal_user_id',
       'principal_authority_ref', 'machine_digest', 'resource_policy_digest', 'created_at', 'expires_at', 'value', 'digest'],
@@ -141,10 +146,16 @@ export interface ArtifactRegistryRow {
 export function readRoutingArtifactRefs(databasePath: string): string[] {
   const db = new Database(databasePath, { readonly: true, fileMustExist: true })
   try {
-    const exists = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'review_evidence'").get()
-    if (!exists) return []
-    return (db.prepare('SELECT DISTINCT report_artifact_ref FROM review_evidence ORDER BY report_artifact_ref').all() as Record<string, unknown>[])
-      .map(row => String(row.report_artifact_ref))
+    const hasReview = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'review_evidence'").get()
+    const hasBindings = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'assistant_context_bindings'").get()
+    if (!hasReview && !hasBindings) return []
+    const refs = new Set<string>()
+    if (hasReview) for (const row of db.prepare('SELECT DISTINCT report_artifact_ref FROM review_evidence').all() as Record<string, unknown>[])
+      refs.add(String(row.report_artifact_ref))
+    // A selected-context bundle must remain present for the audit row to be meaningful after restore.
+    if (hasBindings) for (const row of db.prepare('SELECT DISTINCT bundle_ref FROM assistant_context_bindings').all() as Record<string, unknown>[])
+      refs.add(String(row.bundle_ref))
+    return [...refs].sort()
   } finally { db.close() }
 }
 
