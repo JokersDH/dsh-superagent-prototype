@@ -1,8 +1,12 @@
 # 从这里开始：仓库、代码位置和并行开发
 
-**当前派工：[第十四轮五个完整交付包](agent-tasks/product-wave-14/README.zh-CN.md)。** 已验A278b665/Baacc342/C83ac3e1/Dd833d0f/E3dfdcbd：旧24条限定反例通过；B真实产品正常纵向、A数据、C Scope修复和D新history/source/reply包成立。D完整进程身份/部分扫描仍P1，E实际证据/准确tuple仍P1；实际恢复控制、main来源/候选/授权消费者和当前M1安装继续收口。每人十阶段、三个可运行source，交checkpoint后继续独立队列。见[分别转发话术](agent-tasks/product-wave-14/forward-prompts.zh-CN.md)、[0041精确范围](docs/rfcs/WP-16/0041-wave-14-reviewed-inputs-and-product-exits.md)及[验收证据](reports/releases/wave14-admission/README.zh-CN.md)。十一组原实例保留，真实模型/native0。
+**当前派工：[第十五轮实际入口与同一包闭环](agent-tasks/product-wave-15/README.zh-CN.md)。** 已验A3121ec4/Bcfe6a3a/C2e1c095/De9f8aff/Ed0d1159：A数据与C旧6修复成立，B正常纵向保留，新114b73c包已含M1。B14仍receipt-only而非真实业务恢复；D实际身份producer/停止后三态、E实际动作/模式/ABI证据仍需关闭。每人十阶段、三个可运行source，交后继续独立队列。见[分别转发话术](agent-tasks/product-wave-15/forward-prompts.zh-CN.md)、[0043固定范围](docs/rfcs/WP-16/0043-wave-15-production-composition-and-admission.md)和[验收证据](reports/releases/wave15-admission/README.zh-CN.md)。原十一实例/预算保留，真实模型/native0。
 
-**无执行器个人启动已交付：[http://127.0.0.1:5190/](http://127.0.0.1:5190/)。** 主线`d9d347e/b2b1adb`在缺Codex、版本不符或检测失败时保留实际对话、历史与来源审阅，明确禁用开发执行，不切换固定流程。`pnpm start --discussion-only`可主动选择；旧任务/unknown writer/队列和恢复标记保留。新5190/8806是独立的仅对话数据目录，原5189开发预览继续保留。384项分范围非浏览器测试、6项新网页和原17项网页回归通过，真实模型/native0。见[0040接口](docs/rfcs/WP-16/0040-personal-discussion-readiness.md)与[实际交付范围](reports/releases/wave13-integration/README.zh-CN.md)。后续派工以本页顶端第十四轮为准；当前安装/目标激活/整体发布仍待验收。
+**主线实际source预检已交：`697efdc`。** 恢复inspect/prepare现在消费A完整逻辑源，同一SQLite快照与原指纹绑定；没有新event的业务变化也会拒绝，bounded/unsupported不可prepare。新8项/恢复组合66及contracts228/storage87/workflows93/strict通过。接口见[0042](docs/rfcs/WP-16/0042-logical-source-preflight-checkpoint.md)。这是源码和真实临时HTTP消费者验证，原预览未重启；confirm/许可/target启动仍未实现，不将逻辑摘要当物理停止证明。
+
+**上一轮：[第十四轮五个完整交付包](agent-tasks/product-wave-14/README.zh-CN.md)。** 已验A278b665/Baacc342/C83ac3e1/Dd833d0f/E3dfdcbd：旧24条限定反例通过；B真实产品正常纵向、A数据、C Scope修复和D新history/source/reply包成立。历史范围见[0041](docs/rfcs/WP-16/0041-wave-14-reviewed-inputs-and-product-exits.md)及[证据](reports/releases/wave14-admission/README.zh-CN.md)。
+
+**无执行器个人启动已交付：[http://127.0.0.1:5190/](http://127.0.0.1:5190/)。** 主线`d9d347e/b2b1adb`在缺Codex、版本不符或检测失败时保留实际对话、历史与来源审阅，明确禁用开发执行，不切换固定流程。`pnpm start --discussion-only`可主动选择；旧任务/unknown writer/队列和恢复标记保留。新5190/8806是独立的仅对话数据目录，原5189开发预览继续保留。384项分范围非浏览器测试、6项新网页和原17项网页回归通过，真实模型/native0。见[0040接口](docs/rfcs/WP-16/0040-personal-discussion-readiness.md)与[实际交付范围](reports/releases/wave13-integration/README.zh-CN.md)。后续派工以本页顶端第十五轮为准；当前安装/目标激活/整体发布仍待验收。
 
 **上一轮派工：[第十三轮稳定内测收口](agent-tasks/product-wave-13/README.zh-CN.md)。** 已复验A–E最新固定source，旧问题多项关闭；活动任务真实控制、进程所有权、当前personal字节和独立gate仍未整体准入。A数据证据、B真实产品恢复、C可替换来源链、D安全交付、E发布必测各一个十阶段整包，main先交无执行器实际启动及产品消费者。[五段开工话术](agent-tasks/product-wave-13/forward-prompts.zh-CN.md)与[0039验收](docs/rfcs/WP-16/0039-wave-13-admission-and-alpha-closure.md)。
 

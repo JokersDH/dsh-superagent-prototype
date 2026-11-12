@@ -1,0 +1,35 @@
+{
+  "source": {
+    "commit": "114b73c2723c3ec862f5ae199dc35e0152fbafed",
+    "branch": "codex/g3-local-distribution",
+    "dirty": false
+  },
+  "buildId": "a7df2b225a8c5c42",
+  "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave14-target/wave14-target-114b73c.tar.gz",
+  "tarSha256": "246fd80ded7b5d2445890a7854dbc6261a71c1c4456f3ee2f41404b9b6e3c785",
+  "tarBytes": 20177745,
+  "schemaActual": 18,
+  "platform": "darwin",
+  "arch": "arm64",
+  "node": "v24.21.0",
+  "abi": "137",
+  "sqlite": "3.53.4",
+  "inventoryEntries": 6714,
+  "regularFiles": 6693,
+  "internalSymlinks": 21,
+  "extractedBytes": 67286171,
+  "installManifestSha256": "073aadcbc70ce016823d535a6432b580cc754d78ca8dc481f8abf458f91546e6",
+  "releaseManifestSha256": "3a4c021543cc77d5d172270cc6696494f5f678db169171c7188b9b887ea48ccd",
+  "closureDigest": "a07772e93a6b70eabf5317f76401032d15cd42c37e21e176cd5c50a02de7ac0f",
+  "capability": {
+    "context": true,
+    "history": true,
+    "sources": true,
+    "replyResults": true,
+    "discussionOnly": true,
+    "unavailableExecution": true
+  },
+  "mode": "Personal-capable bytes verified; no live instance started",
+  "modelSends": 0,
+  "nativeTurns": 0
+}

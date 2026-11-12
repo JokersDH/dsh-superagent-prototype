@@ -2,6 +2,6 @@
   "protocol": "recovery-inspection/1",
   "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
   "runtimeValidationRequired": true,
-  "schemaHash": "e89a3b16acdfe6a8c3eba57c8f4b246c519baa4b29db756c01f9f4d88e31b850",
-  "sourceHash": "0a918c4b9dc91a2ace7da84a94cc49b110a205a529f511643b658ed6efa039ac"
+  "schemaHash": "78b945565fb109c03dddc238a338732b50a33565423225e2af3c9c8f0f7cccea",
+  "sourceHash": "ca19b7f6728d1759601547fbcf7eb4382b7d8f2c4349e7d5f697a8e54218d8c2"
 }
