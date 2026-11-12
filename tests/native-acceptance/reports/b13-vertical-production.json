@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-11-12T10:26:36.580Z",
+  "environment": {
+    "note": "wave-13 B13 real vertical product execution",
+    "modelCalls": 0
+  },
+  "totals": {
+    "cases": 6,
+    "PASS": 5,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 1
+  },
+  "scope": "controlled product; native NOT_TESTED",
+  "cases": [
+    {
+      "id": "B13-VERTICAL-CREATE-WORK",
+      "title": "create_work goes through the real Application command",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "create_work recorded and populated real tables: 1 work, 1 ticket, 1 link(s)"
+      ],
+      "evidence": [
+        {
+          "status": "recorded",
+          "workId": "f6081dfef3dcffeb9bfc185305d55be5",
+          "tables": {
+            "works": 1,
+            "tickets": 1,
+            "ticket_links": 1,
+            "questions": 0,
+            "deliveries": 0,
+            "effects": 1,
+            "facts": 0,
+            "payloads": 0,
+            "bindings": 0,
+            "dispatch": 0,
+            "controls": 0,
+            "events": 6,
+            "artifacts": 0
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-VERTICAL-RUNNER-AND-QUESTION",
+      "title": "a real child Runner is fed and a real question is registered",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the Runner was fed (3 fact, 1 dispatch, 1 pending queue row(s)) and the QuestionBroker registered 1 question"
+      ],
+      "evidence": [
+        {
+          "questionId": "4f7b89ea3fcb98f52451a0552b2caa2a",
+          "targetNativeRequestId": "9223372036854775807",
+          "midRunEffects": 1,
+          "tables": {
+            "works": 1,
+            "tickets": 1,
+            "ticket_links": 1,
+            "questions": 1,
+            "deliveries": 0,
+            "effects": 0,
+            "facts": 3,
+            "payloads": 8,
+            "bindings": 1,
+            "dispatch": 1,
+            "controls": 0,
+            "events": 20,
+            "artifacts": 8
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-VERTICAL-ANSWER-DELIVERY",
+      "title": "the answer is delivered to the original native request",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the answer was delivered to the original native request (1 delivery row(s), status native_applied)"
+      ],
+      "evidence": [
+        {
+          "status": "recorded",
+          "deliveries": [
+            "native_applied"
+          ],
+          "tables": {
+            "works": 1,
+            "tickets": 1,
+            "ticket_links": 1,
+            "questions": 1,
+            "deliveries": 1,
+            "effects": 0,
+            "facts": 7,
+            "payloads": 16,
+            "bindings": 1,
+            "dispatch": 2,
+            "controls": 0,
+            "events": 46,
+            "artifacts": 20
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-VERTICAL-CANDIDATE-ACCEPT",
+      "title": "a candidate is produced and accepted through the real command",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the candidate was accepted and the work reached delivered with 4 artifact(s)"
+      ],
+      "evidence": [
+        {
+          "status": "recorded",
+          "phase": "delivered",
+          "artifactIds": 4,
+          "tables": {
+            "works": 1,
+            "tickets": 1,
+            "ticket_links": 1,
+            "questions": 1,
+            "deliveries": 1,
+            "effects": 0,
+            "facts": 7,
+            "payloads": 16,
+            "bindings": 1,
+            "dispatch": 2,
+            "controls": 0,
+            "events": 51,
+            "artifacts": 20
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-PRODUCTION-TABLES-NOT-EMPTY",
+      "title": "the tables wave-12 left at zero are populated",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "every production table wave-12 left empty now has rows: works=1 tickets=1 ticket_links=1 questions=1 deliveries=1 facts=7 dispatch=2 artifacts=20 events=51"
+      ],
+      "evidence": [
+        {
+          "counts": {
+            "works": 1,
+            "tickets": 1,
+            "ticket_links": 1,
+            "questions": 1,
+            "deliveries": 1,
+            "facts": 7,
+            "dispatch": 2,
+            "artifacts": 20,
+            "events": 51
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B13-SCOPE-NOT-NATIVE",
+      "title": "controlled product evidence, not vendor behaviour",
+      "lane": "controlled_process",
+      "status": "NOT_TESTED",
+      "detail": [
+        "an installed vendor agent was not executed; the Driver is a fixture scenario"
+      ],
+      "evidence": [
+        {
+          "driver": "fixture scenario (question + fixed output)",
+          "realVendorAgent": false,
+          "realProductRuntime": true,
+          "realChildRunner": true,
+          "realTables": true
+        }
+      ],
+      "entities": []
+    }
+  ]
+}
