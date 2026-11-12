@@ -210,7 +210,8 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
       return blocked('port_in_use', `本机端口 ${port} 已被占用`, { name, port, cause: availability.code }, '用 --port/--api-port 选择其它端口，或先运行 `pa doctor` 核对已有实例。')
   }
 
-  if (mode === 'personal') {
+  const discussionOnly = values['discussion-only'] === true
+  if (mode === 'personal' && !discussionOnly) {
     const evidence = readAuthorEvidence(installRoot)
     const expectedVersion = evidence?.status === 'PASS_REAL_NATIVE_PRODUCT' ? evidence.profileVersion : null
     const executor = probeAuthorExecutor({ installRoot, required: true, expectedVersion })
@@ -233,6 +234,7 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
   await listenDistributionServer(server, consolePort)
 
   const expectedArgv = daemonArgv({
+    discussionOnly,
     installRoot: canonicalInstall,
     apiPort,
     state: canonicalState,
@@ -242,6 +244,7 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
     startupMode,
   })
   const daemon = spawnDaemon({
+    discussionOnly,
     installRoot: canonicalInstall,
     apiPort,
     state: canonicalState,

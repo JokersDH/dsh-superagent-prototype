@@ -114,6 +114,7 @@ function commandSpecs() {
       port: 'string',
       'api-port': 'string',
       fixture: 'boolean',
+      'discussion-only': 'boolean',
       'require-login': 'boolean',
       open: 'boolean',
       'no-build': 'boolean',

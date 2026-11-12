@@ -63,7 +63,7 @@ export function createBoundedLog(logsRoot, buildId) {
   return { path, write }
 }
 
-export function daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access, startupMode = 'normal' }) {
+export function daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access, startupMode = 'normal', discussionOnly = false }) {
   const argv = [
     join(installRoot, 'apps/coordinator/product/demo.ts'),
     '--port',
@@ -79,7 +79,12 @@ export function daemonArgv({ installRoot, apiPort, state, consoleURL, mode, acce
   // them either: the marker still forces read-only even if a caller passes normal/native/assistant.
   if (startupMode !== 'recovery_readonly') {
     argv.push('--assistant')
-    if (mode === 'personal') argv.push('--native')
+    if (mode === 'personal') {
+      // No-executor personal startup is an explicit discussion-only mode from main M1; it never
+      // silently becomes the controlled fixture and never asks for a native executor.
+      if (discussionOnly) argv.push('--discussion-only')
+      else argv.push('--native')
+    }
   }
   if (access === 'local-development') argv.push('--local-access')
   return argv
@@ -106,10 +111,10 @@ export async function waitForHealth(apiURL, child, { timeoutMs = 30_000, childEx
  * and reports resources that outlive the deadline.
  */
 export function spawnDaemon(options) {
-  const { installRoot, apiPort, state, consoleURL, mode, access, logsRoot, buildId, startupMode = 'normal' } = options
+  const { installRoot, apiPort, state, consoleURL, mode, access, logsRoot, buildId, startupMode = 'normal', discussionOnly = false } = options
   const log = createBoundedLog(logsRoot, buildId)
   const tail = []
-  const child = spawn(process.execPath, daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access, startupMode }), {
+  const child = spawn(process.execPath, daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access, startupMode, discussionOnly }), {
     cwd: installRoot,
     env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' },
     stdio: ['ignore', 'pipe', 'pipe'],
