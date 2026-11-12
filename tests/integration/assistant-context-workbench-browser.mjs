@@ -76,7 +76,7 @@ try {
   await vite.listen(); browser = await chromium.launch()
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'zh-CN' }), page = await context.newPage()
   page.setDefaultTimeout(10000); page.on('pageerror', error => errors.push(error.message))
-  const dialog = page.getByRole('dialog', { name: '上下文预览', exact: true })
+  const dialog = page.locator('dialog.context-workspace')
   const open = async () => { await page.getByRole('button', { name: '上下文预览', exact: true }).click(); await dialog.waitFor() }
   const prepare = async () => {
     const response = page.waitForResponse(result => result.url().endsWith('/v1/assistant/context/prepare') && result.request().method() === 'POST')
@@ -150,15 +150,19 @@ try {
     await product.execution.effects.idle('application.assistant.reply')
   })
   await check('LOST-RESPONSE-RELOAD-RECONCILES-THE-ORIGINAL-COMMAND-AFTER-EXPIRY', async () => {
+    await product.execution.effects.idle()
     await open(); await dialog.getByRole('textbox', { name: '上下文消息', exact: true }).fill('核对原请求，不重复生成。')
     await prepare()
     const sent = []
+    let firstReceipt
     await page.route('**/v1/assistant/context/send', async route => {
       sent.push(route.request().postDataJSON())
-      if (sent.length === 1) { const response = await route.fetch(); assert.equal((await response.json()).status, 'recorded'); await route.abort() }
+      if (sent.length === 1) { const response = await route.fetch(); firstReceipt = await response.json(); await route.abort() }
       else await route.continue()
     })
     await dialog.getByRole('button', { name: '确认发送', exact: true }).click()
+    await dialog.getByRole('button', { name: '核对原请求', exact: true }).waitFor()
+    assert.equal(firstReceipt?.status, 'recorded', JSON.stringify(firstReceipt))
     await dialog.getByText('原请求待核对', { exact: true }).waitFor()
     await product.execution.effects.idle('application.assistant.reply')
     const calls = requests.length, messages = users().length

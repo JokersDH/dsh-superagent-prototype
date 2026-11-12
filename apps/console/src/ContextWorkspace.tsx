@@ -116,10 +116,10 @@ export function ContextWorkspace({ transport, configuration, conversationId, wor
     try { await navigator.clipboard.writeText(JSON.stringify(displayPreview, null, 2)); setCopied(true) }
     catch { setError('浏览器未允许复制，请在来源详情中选择内容。') }
   }
-  return createPortal(<dialog ref={dialog} className="project-settings-dialog context-workspace" aria-label="上下文预览"
+  return createPortal(<dialog ref={dialog} className="project-settings-dialog context-workspace" aria-labelledby={`${tabsId}-heading`}
     onCancel={event => { if (sending) event.preventDefault() }}
     onClose={() => { if (!dialog.current?.open) onClose() }}>
-    <header><div><h2>{view === 'history' ? '上下文使用记录' : pending ? '核对消息请求' : prepared ? '确认上下文消息' : '上下文预览'}</h2><p className="context-line">{headerProject?.displayName ?? projectId}{view === 'history' ? '' : pending ? ' · 原请求' : selectedWork ? ` · ${selectedWork.work.title}` : ' · 当前会话'}</p></div>
+    <header><div><h2 id={`${tabsId}-heading`}>{view === 'history' ? '上下文使用记录' : pending ? '核对消息请求' : prepared ? '确认上下文消息' : '上下文预览'}</h2><p className="context-line">{headerProject?.displayName ?? projectId}{view === 'history' ? '' : pending ? ' · 原请求' : selectedWork ? ` · ${selectedWork.work.title}` : ' · 当前会话'}</p></div>
       <button type="button" className="icon-button" aria-label="关闭上下文预览" title="关闭上下文预览" disabled={sending} onClick={onClose}><X size={18} /></button></header>
     {hasHistory && configuration.contextPreviewAvailable !== false && <div className="context-tabs" role="tablist" aria-label="上下文视图" onKeyDown={event => {
       if (busy || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return

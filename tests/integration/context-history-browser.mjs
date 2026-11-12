@@ -34,6 +34,15 @@ const product = createProductRuntime({ store, principal, stateRoot, scratchProje
   projects: [{ id: projectId, displayName: '支付服务', scope }, { id: 'docs-project', displayName: '文档项目', scope: { ...scope, projectId: 'docs-project' } },
     { id: 'empty-project', displayName: '空项目', scope: { ...scope, projectId: 'empty-project' } }],
   actionSecret: Buffer.alloc(32, 49), assistantProvider: provider, now: () => now })
+const configuration = await product.read.configuration(), configuredProject = configuration.projects.find(project => project.id === projectId)
+const otherWorkTitle = '其他会话的兼容性复核'
+const otherWork = await product.application.dispatch({ kind: 'create_work', commandId: 'history-other-work', conversationId: 'other-conversation',
+  projectId, goal: otherWorkTitle, scope, criteria: configuredProject.defaultCriteria, profileId: configuredProject.defaultProfileId }, actor)
+assert.equal(otherWork.status, 'recorded')
+const otherWorkView = (await product.application.inspect({ workId: otherWork.workId })).works[0]
+assert.equal((await product.application.dispatch({ kind: 'pause_dispatch', commandId: 'history-hold-other-work', conversationId: 'other-conversation',
+  expected: { workId: otherWorkView.contract.workId, revision: otherWorkView.contract.revision, digest: otherWorkView.contract.digest },
+  expectedHoldRevision: otherWorkView.actions.dispatchHold.revision }, actor)).status, 'recorded')
 const source = { id: 'history-payment-source', conversationId, projectId, role: 'user', provenance: 'trusted_user',
   text: 'PAYMENT-HISTORY：支付变更必须保留既有错误码，重复请求返回同一笔结果。', sourceRefs: [], createdAt: now }
 store.product.messages.append(source)
@@ -49,12 +58,12 @@ async function seed(commandId, text, selection = {}) {
 const targetText = '复核支付接口的原始约束，保持错误码与重复请求处理一致。'
 try {
   for (let index = 0; index < 22; index++) await seed(`history-${index}`, `历史需求 ${String(index).padStart(2, '0')}：核对项目范围与兼容性。`)
-  await seed('history-other-session', '其他会话的历史约束核对。', { conversationId: 'other-conversation' })
+  await seed('history-other-session', '其他会话的历史约束核对。', { conversationId: 'other-conversation', workId: otherWork.workId, selections: ['work'] })
   await seed('history-docs', '文档项目的独立上下文记录。', { projectId: 'docs-project' })
   store.product.messages.append({ ...source, id: 'history-frozen-source', createdAt: now })
   await seed('history-target', targetText, { selections: ['conversation', 'project'] })
 } catch (error) { await product.close(); store.close(); rmSync(root, { recursive: true, force: true }); throw error }
-product.start(); await product.execution.effects.idle('application.assistant.reply')
+product.start(); await product.execution.effects.idle()
 store.db.prepare('UPDATE conversation_messages SET value = ? WHERE id = ?').run(JSON.stringify({ ...store.product.messages.getById('history-frozen-source'),
   text: 'CURRENT-SOURCE-CHANGED：这是后来变化的来源，不应替换历史正文。' }), 'history-frozen-source')
 const baselineCalls = modelCalls, baselineEvents = store.events.cursor()
@@ -77,12 +86,13 @@ try {
   await vite.listen(); browser = await chromium.launch()
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'zh-CN' }), page = await context.newPage()
   page.setDefaultTimeout(10000); page.on('pageerror', error => errors.push(error.message))
-  const dialog = page.getByRole('dialog', { name: '上下文预览', exact: true })
+  const dialog = page.locator('dialog.context-workspace')
   const openHistory = async () => {
     await page.getByRole('button', { name: '上下文预览', exact: true }).click(); await dialog.waitFor()
     const tab = dialog.getByRole('tab', { name: '使用记录', exact: true })
     if (await tab.count()) await tab.click()
     await dialog.getByRole('heading', { name: '上下文使用记录', exact: true }).waitFor()
+    assert.equal(await page.getByRole('dialog', { name: '上下文使用记录', exact: true }).count(), 1)
     await dialog.getByRole('list', { name: '上下文使用记录列表' }).waitFor()
   }
   await page.goto(`${origin}/?conversation=${conversationId}`)
@@ -111,12 +121,14 @@ try {
   await check('DESKTOP-MOBILE-SOURCE-READER-AND-BACK-NAVIGATION-FIT', async () => {
     for (const [name, width, height] of [['desktop', 1440, 900], ['mobile', 390, 844]]) {
       await page.setViewportSize({ width, height }); await page.evaluate(() => document.fonts.ready)
+      if (width < 720) await page.waitForFunction(() => document.activeElement?.matches('.context-history-detail-heading h3'))
       await dialog.evaluate(element => { element.scrollTop = 0 })
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
       assert.equal(await dialog.evaluate(element => element.scrollWidth > element.clientWidth + 1), false)
       if (!values['no-capture']) await page.screenshot({ path: join(output, `${name}.png`), fullPage: true, animations: 'disabled' })
     }
     await dialog.getByRole('button', { name: '返回使用记录', exact: true }).click()
+    await page.waitForFunction(text => document.activeElement?.getAttribute('aria-label') === `查看使用记录：${text}`, targetText)
     await dialog.getByRole('list', { name: '上下文使用记录列表' }).waitFor({ state: 'visible' })
     await page.setViewportSize({ width: 1440, height: 900 })
   })
@@ -158,6 +170,8 @@ try {
   await check('HISTORY-NAVIGATES-TO-THE-ORIGINAL-CONVERSATION', async () => {
     await openHistory()
     await dialog.getByRole('checkbox', { name: '仅当前会话', exact: true }).uncheck()
+    await dialog.getByRole('combobox', { name: '记录工作', exact: true }).getByRole('option', { name: otherWorkTitle, exact: true }).waitFor({ state: 'attached' })
+    await dialog.getByRole('combobox', { name: '记录工作', exact: true }).selectOption(otherWork.workId)
     await dialog.getByRole('button', { name: '查看使用记录：其他会话的历史约束核对。', exact: true }).click()
     await dialog.getByRole('region', { name: '原始上下文内容' }).waitFor()
     await dialog.getByRole('button', { name: '返回原会话', exact: true }).click()
