@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "d833d0f",
   "mergedMain": "9f5bd76",
-  "head": "114b73c",
+  "head": "e549c68",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/native turns 0; eleven user services untouched.",
   "ownedPaths": [
