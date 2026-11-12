@@ -1,0 +1,206 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "1453cf2",
+  "mergeCommit": "8fd1aeb",
+  "checkpoints": [
+    "87504a9",
+    "794b5aa"
+  ],
+  "testedSourceCommit": "794b5aa",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "probe": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave14-a.json node tools/bootstrap/probe-wave13-storage.mjs $PWD",
+    "status": "PASS",
+    "pass": 4,
+    "fail": 0,
+    "suite": "wave13 fixed-source probe reused; no wave14 storage probe was published",
+    "evidence": "packages/workflows/reports/wave14-storage-probe.json"
+  },
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "wave14-storage-probe.json",
+        "wave14-consumer-map.md"
+      ],
+      "note": "existing RecoverySourceReader/RecoveryActivationFacts published as the only source input with complete/bounded/unsupported, exact ignore and heartbeat rules; no parallel grant port"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "recovery-source tests",
+        "87504a9"
+      ],
+      "note": "strict mapper, receipt/result/status/payload digest, command and intent event payload + null payload_ref, exact seq; later same-body events visible; negative and >MAX_SAFE_INTEGER rowids exact; total budget stops scanning further families"
+    },
+    {
+      "phase": "A3",
+      "status": "NOT_TESTED",
+      "scope": "main entry absent",
+      "evidence": [
+        "main consumer search"
+      ],
+      "note": "main has no actual baseline/prepare/confirm consumer of RecoverySourceStore; only this composition is untested, independent source work continues"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "package-local + main consumer",
+      "evidence": [
+        "snapshot-d tests",
+        "CompletedAssistantReplies restored read"
+      ],
+      "note": "non-empty work/contract/decision/context/reply/artifact snapshot restores to a second root; main reads original message/contract/receipt and reply body; missing refs/tables/bytes/future schema fail"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "existing stores only",
+      "evidence": [
+        "recovery-source non-empty reopen test"
+      ],
+      "note": "B reads existing bindings/current/fenceEpoch and original receipt across reopen; source covers runtime/dispatch/answer families; no test table, ledger or recover method added"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "independent processes",
+      "evidence": [
+        "reply-crash tests",
+        "snapshot-crash tests"
+      ],
+      "note": "SIGKILL before/after result/message/source confirmation and snapshot creation; restored original artifact body once; partial snapshot without manifest is blocked"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "D/E input",
+      "evidence": [
+        "wave14-consumer-map.md",
+        "v15/v16 upgrade tests"
+      ],
+      "note": "dynamic PRODUCT_SCHEMA_VERSION/families/snapshot recipe; v15/v16/current upgrades keep FTS/messages/receipts/bindings/results without rewriting migration bodies"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "package-local",
+      "evidence": [
+        "wave14-performance.json",
+        "context-history scale test"
+      ],
+      "note": "10000 bindings first page 6.6ms; complete 13105-row snapshot 65.9ms; bounded maxRows=1000 stops after 28 families/1000 rows in 1.8ms; no full artifact scan on first page"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "handoff",
+      "evidence": [
+        "wave14-consumer-map.md"
+      ],
+      "note": "separate main/B/D/E call snippets and NOT_TESTED source baseline; source/history/reply/activation keep distinct admission"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "package-local regression",
+      "evidence": [
+        "wave14-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, main product/history/target consumers, typecheck/build and static packet check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "105/105",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "mainConsumers": "88/88",
+    "mainTargetConsumers": "50/50",
+    "storageProbe": "4/4",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "backupFamilies": [
+    "assistant_context_bindings",
+    "assistant_reply_results",
+    "recovery_activations",
+    "recovery_intents",
+    "outcomes",
+    "reviews",
+    "decisions",
+    "proposals",
+    "project_settings",
+    "contracts",
+    "verifications",
+    "acceptances",
+    "legacy_decisions"
+  ],
+  "limits": {
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288,
+    "bindingsTested": 10000,
+    "boundedScanFamilies": 28
+  },
+  "failureWindows": [
+    "negative rowid",
+    "rowid > MAX_SAFE_INTEGER",
+    "activation index/mirror",
+    "command event payload/payload_ref",
+    "later same-body intent event",
+    "total/per-family scan budget",
+    "missing schema_meta/event_log",
+    "second connection write",
+    "result/message/source SIGKILL",
+    "snapshot before/after SIGKILL",
+    "partial snapshot manifest",
+    "missing bundle/result table",
+    "future schema"
+  ],
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "source-baseline-consumer",
+      "detail": "RecoverySourceStore lacks an actual main prepare/confirm consumer; that composition is NOT_TESTED."
+    },
+    {
+      "owner": "main/D",
+      "id": "activation-installation",
+      "detail": "Activation/start, target materialization and current-schema installation remain external; data/snapshot never grants startup."
+    }
+  ],
+  "notTested": [
+    "main baseline/prepare/confirm composition",
+    "actual recovery activation/start or target materialization",
+    "D current-schema installation/upgrade",
+    "E independent release acceptance",
+    "real model/provider/native execution"
+  ],
+  "mainNextSteps": [
+    "consume recoverySource.inspect with a pre-confirmation baseline in the real prepare/confirm flow",
+    "keep marker/host/physical-writer checks separate from logical fingerprints",
+    "use contextHistory.page behind signed cursors and replyResults via CompletedAssistantReplies",
+    "use wave14-consumer-map.md for D snapshot and E negative inputs"
+  ],
+  "updatedAt": "2026-11-12T15:20:00.000Z"
+}
