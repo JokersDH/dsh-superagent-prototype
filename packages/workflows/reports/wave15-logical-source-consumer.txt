@@ -1,0 +1,16 @@
+✔ actual runtime HTTP recovery inspect consumes the production A logical source reader (100.9305ms)
+✔ a logical business change invalidates a prior binding preview without a new event (68.924208ms)
+✔ the sole heartbeat exclusion stays stable while writer identity changes remain visible (209.946375ms)
+✔ unsupported logical source (unknown table) cannot become a binding plan (83.271625ms)
+✔ unsupported logical source (missing required table) cannot become a binding plan (88.789542ms)
+✔ unsupported logical source (future schema) cannot become a binding plan (73.470959ms)
+✔ an actually bounded production source cannot prepare a binding plan (287.345792ms)
+✔ an unlogged logical change during executable preflight is rejected by the final check (283.030042ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1720.173958

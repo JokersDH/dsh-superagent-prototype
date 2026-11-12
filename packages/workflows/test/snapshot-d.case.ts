@@ -114,11 +114,23 @@ function dataset() {
     protocol: 'assistant-context-binding/1', commandId: 'context-command-1', messageId: 'message-1', requestId: 'context-request-1',
     projectId: 'project-1', conversationId: 'conversation-1', userTextDigest: 'e'.repeat(64),
     principal: { userId: 'user-1', authorityRef: 'authority-1' }, purpose: 'conversation_discussion', scope,
-    selections: ['conversation'],
-    bundleRef: bundle.id, bundleDigest: bundle.digest,
-    sources: [{ sourceId: 'message-1', kind: 'conversation_message', sourceDigest: 'e'.repeat(64), previewDigest: 'e'.repeat(64), truncated: false }],
+    contract, selections: ['work'], bundleRef: bundle.id, bundleDigest: bundle.digest,
+    sources: [{ sourceId: 'work-1', kind: 'work', sourceDigest: 'e'.repeat(64), previewDigest: 'e'.repeat(64), truncated: false }],
     confirmedAt: at, expiresAt: '2026-11-11T00:04:00.000Z',
   })
+  store.queue.enqueue('application.execute', 'snapshot-queue', '{"workId":"work-1"}', 1, 0, at)
+  store.bindings.record({ attemptId: 'snapshot-attempt', ticketId: 'ticket-1', assignmentId: 'assignment-1', fenceEpoch: 3,
+    contract, state: 'active', runnerIdentityRef: 'runner-snapshot', source: 'snapshot-test',
+    resources: [{ ref: 'snapshot-process', ownership: 'spawned_process' }] })
+  store.bindings.setCurrent('ticket-1', 'snapshot-attempt')
+  store.db.prepare(`INSERT INTO runtime_observations
+    (fact_id, ticket_id, assignment_id, attempt_id, fence_epoch, contract, kind, disposition, payload_ref, payload_sha256, detail, observed_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run('snapshot-observation', 'ticket-1', 'assignment-1', 'snapshot-attempt', 3,
+    JSON.stringify(contract), 'process', 'running', bundle.id, 'f'.repeat(64), '{}', at)
+  store.db.prepare(`INSERT INTO resource_observations
+    (fact_id, attempt_id, resource_ref, ownership, kind, status, exit_code, signal, observed_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run('snapshot-observation', 'snapshot-attempt', 'snapshot-process',
+    'spawned_process', 'process', 'running', null, null, at)
   return { root, store, ports, patch, report, bundle, replyBody, replyRequestId, replyMessageId }
 }
 
@@ -144,6 +156,10 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
     assert.equal(families.get('recovery_activations')!.count, 1)
     assert.equal(families.get('assistant_context_bindings')!.count, 1)
     assert.equal(families.get('assistant_reply_results')!.count, 1)
+    assert.equal(families.get('effect_queue')!.count, 1)
+    assert.equal(families.get('runtime_bindings')!.count, 1)
+    assert.equal(families.get('runtime_current')!.count, 1)
+    assert.equal(families.get('resource_observations')!.count, 1)
     assert.equal(result.manifest.evidence.complete, true)
     for (const row of result.manifest.artifacts)
       assert.equal(readFileSync(join(snapshot, row.snapshotPath)).length, row.bytes)
@@ -173,6 +189,9 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
       assert.equal(restoredStore.product.messages.getById('message-1')?.text, '保留这条决定。')
       assert.equal(restoredStore.product.contracts.getByRef(contract)?.digest, 'a'.repeat(64))
       assert.equal(restoredStore.commands.get(data.replyRequestId)?.payloadDigest, 'a'.repeat(64))
+      assert.equal(restoredStore.bindings.current<{ fenceEpoch: number }>('ticket-1')?.fenceEpoch, 3)
+      assert.equal(restoredStore.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 10)
+        .some(row => row.key === 'snapshot-queue'), true)
     } finally { restoredStore.close() }
 
     const db = new Database(join(restored, 'product.sqlite'), { readonly: true, fileMustExist: true })
@@ -317,6 +336,35 @@ test('missing file, changed bytes and a newer schema make the snapshot unusable'
     writeFileSync(replyTamperManifestPath, JSON.stringify(replyTamperManifest, null, 2))
     const replyTampered = new WorkflowSnapshots(data.store).verify(replyTamperDir)
     assert.equal(replyTampered.status, 'blocked', 'a changed completed reply result is detected through its family digest')
+
+    // The derived work index and queue body are covered by the new families.
+    const workIndexDir = join(data.root, 'work-index-tamper')
+    cpSync(snapshot, workIndexDir, { recursive: true })
+    const workIndexDb = join(workIndexDir, 'product.sqlite')
+    const workIndex = new Database(workIndexDb)
+    try { workIndex.prepare("UPDATE assistant_context_bindings SET work_id = 'foreign-work' WHERE message_id = 'message-1'").run() } finally { workIndex.close() }
+    const workIndexManifestPath = join(workIndexDir, 'snapshot.json')
+    const workIndexManifest = JSON.parse(readFileSync(workIndexManifestPath, 'utf8'))
+    const workIndexBytes = readFileSync(workIndexDb)
+    workIndexManifest.database.sha256 = createHash('sha256').update(workIndexBytes).digest('hex')
+    workIndexManifest.database.bytes = workIndexBytes.byteLength
+    writeFileSync(workIndexManifestPath, JSON.stringify(workIndexManifest, null, 2))
+    assert.equal(new WorkflowSnapshots(data.store).verify(workIndexDir).status, 'blocked',
+      'a changed derived work_id is detected through the binding family')
+
+    const queueDir = join(data.root, 'queue-tamper')
+    cpSync(snapshot, queueDir, { recursive: true })
+    const queueDb = join(queueDir, 'product.sqlite')
+    const queue = new Database(queueDb)
+    try { queue.prepare("UPDATE effect SET value = ? WHERE key = 'snapshot-queue'").run('{"workId":"other"}') } finally { queue.close() }
+    const queueManifestPath = join(queueDir, 'snapshot.json')
+    const queueManifest = JSON.parse(readFileSync(queueManifestPath, 'utf8'))
+    const queueBytes = readFileSync(queueDb)
+    queueManifest.database.sha256 = createHash('sha256').update(queueBytes).digest('hex')
+    queueManifest.database.bytes = queueBytes.byteLength
+    writeFileSync(queueManifestPath, JSON.stringify(queueManifest, null, 2))
+    assert.equal(new WorkflowSnapshots(data.store).verify(queueDir).status, 'blocked',
+      'a changed queue body is detected through the effect family')
 
     // Removing the activation table is not an empty-but-valid backup: the evidence family disappears.
     const missingTableDir = join(data.root, 'missing-table-copy')

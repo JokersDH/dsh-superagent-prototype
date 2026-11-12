@@ -5,6 +5,9 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { mkdtempSync, rmSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { RecoveryActivationIntent, TrustedActor } from '@personal-agent/contracts'
@@ -369,5 +372,18 @@ test('the reported schema always comes from the shared migration version', async
   try {
     const snapshot = f.store.workflows.recoverySource.inspect()
     assert.equal(snapshot.productSchema, (await import('@personal-agent/storage')).PRODUCT_SCHEMA_VERSION)
+  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+})
+
+test('an independent writer process changes the next logical snapshot', () => {
+  const f = fixture()
+  try {
+    const before = f.store.workflows.recoverySource.inspect()
+    const child = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'source-writer.mjs'), f.path, 'process-work'], { encoding: 'utf8', timeout: 20000 })
+    assert.equal(child.status, 0, child.stderr)
+    const after = f.store.workflows.recoverySource.inspect()
+    assert.equal(after.coverage, 'complete')
+    assert.notEqual(after.sourceFingerprint, before.sourceFingerprint)
+    assert.equal(after.families.find(family => family.name === 'works')?.rows, 1)
   } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
 })

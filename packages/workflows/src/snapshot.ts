@@ -196,8 +196,18 @@ export class WorkflowSnapshots {
     })
     const incompatibleSchema = verified.productSchema === null || verified.productSchema > PRODUCT_SCHEMA_VERSION ||
       manifest.database.productSchema > PRODUCT_SCHEMA_VERSION
+    // Compare every family recorded by this manifest. Newer builds may add families; an older
+    // snapshot remains verifiable for the exact families it recorded, while a new snapshot records
+    // and verifies the complete current family set.
+    const manifestFamilies = manifest.evidence?.families
+    const evidenceMatches = Array.isArray(manifestFamilies) && manifestFamilies.length > 0 &&
+      manifestFamilies.every(family => {
+        const current = evidence.families.find(value => value.name === family.name)
+        return !!current && current.count === family.count && current.digest === family.digest &&
+          current.truncated === family.truncated
+      })
     const ok = manifest.complete && !manifest.incompatibleSchema && !incompatibleSchema &&
-      manifest.evidence?.digest === evidence.digest &&
+      evidenceMatches &&
       databaseSha === manifest.database.sha256 &&
       verified.integrity === 'ok' && verified.foreignKeyViolations === 0 &&
       verified.productSchema === manifest.database.productSchema &&
