@@ -7,7 +7,7 @@ import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 
 const here = new URL('.', import.meta.url).pathname
 const child = join(here, 'w12-reply-process-child.mjs')
-const define = (id, title, extra = {}) => ({ id, title, layer: LAYERS.CONTROLLED, limitations: [
+const define = (id, title, extra = {}) => ({ id, title, layer: extra.layer ?? LAYERS.CONTROLLED, limitations: [
   'Separate OS process with current product runtime, real A18 SQLite/effect queue and a loopback mock provider; no Map result port.',
   ...(extra.limitations ?? []),
 ] })
