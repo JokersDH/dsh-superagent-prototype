@@ -1,0 +1,87 @@
+{
+  "protocol": "wave12-artifacts/1",
+  "baseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+    "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+    "tarBytes": 19911757,
+    "buildId": "7e8f6ce6fa2e2633",
+    "source": {
+      "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 13,
+    "role": "historical schema13 baseline for schema-change/refusal windows"
+  },
+  "target": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave12-target/wave12-target-020af82.tar.gz",
+    "sha256": "96d32fb55a0d8fa9a02f4a5497c54774e84176b42c5727da449343fb3913bfe5",
+    "tarBytes": 20147268,
+    "buildId": "1a2f34ac359a5739",
+    "source": {
+      "commit": "020af824390e9230a4ff9d01f9e29b1ee93dd246",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "files": 6707,
+    "extractedBytes": 67149633,
+    "platform": null,
+    "abi": {
+      "node": "137"
+    }
+  },
+  "legacy16": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+    "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+    "buildId": "3311a04bd20ed7f9",
+    "source": {
+      "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 16,
+    "role": "schema16 source for the real 16->18 upgrade and migration"
+  },
+  "dualPair13": {
+    "from": {
+      "buildId": "9120a5ed858e0feb",
+      "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+      "schema": 13,
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave07-target2/wave07-target-9120a5ed.tar.gz",
+      "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
+    },
+    "to": {
+      "buildId": "cd0ecc29d97d5c41",
+      "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+      "schema": 13,
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave08-target/wave08-target-cd0ecc29.tar.gz",
+      "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"
+    },
+    "note": "Same-schema binary rollback scope remains the preserved schema13 pair; not relabeled current."
+  },
+  "historical": [
+    {
+      "label": "wave-11 a22d3a4",
+      "buildId": "3311a04bd20ed7f9",
+      "productSchema": 16,
+      "note": "Real; kept and used as legacy16, never relabeled schema18."
+    },
+    {
+      "label": "wave-10 cf7a3cf",
+      "buildId": "da2d78d126e4745f",
+      "productSchema": 15,
+      "note": "Historical."
+    },
+    {
+      "label": "wave-09 6830e38",
+      "productSchema": 15,
+      "note": "Historical."
+    }
+  ],
+  "notes": [
+    "Target built from pushed clean wave-12 D head 020af82 (source.dirty=false, schema18) on merged main 14688f2/530085c (replyResults, schema18, backup families, real runtime crash recovery).",
+    "D writes no SQL/migrations; legacy migration/snapshot readers are A public entrypoints.",
+    "E binds cases to these tuples; the checkout is not an installation input."
+  ]
+}

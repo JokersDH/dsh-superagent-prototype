@@ -101,6 +101,21 @@ const rootArgs = (r) => ['--install', r.install, '--config-root', r.config, '--d
 let currentApp = null
 const switchTo = (install, app) => { currentApp = app ?? join(install, 'app'); return currentApp }
 const cli = (install) => join(install, 'bin', 'pa')
+const rootOverrides = (r) => ['--config-root', r.config, '--data-root', r.data, '--cache-root', r.cache, '--logs-root', r.logs, '--workspace-root', r.workspace]
+// Stop through the install that the record itself names; a different requested install must refuse.
+const stopOwned = (r) => {
+  let installRoot = dirname(r.install)
+  try {
+    const record = JSON.parse(readFileSync(join(r.config, 'instance.json'), 'utf8'))
+    if (typeof record.install === 'string') installRoot = dirname(record.install)
+  } catch { /* no record: the requested install is fine */ }
+  try { return run(cli(installRoot), ['stop', '--json', ...rootOverrides(r)], { allowExit: [0, 2], timeout: 60_000 }) }
+  catch (error) {
+    let record = null
+    try { record = JSON.parse(readFileSync(join(r.config, 'instance.json'), 'utf8')) } catch { /* none */ }
+    throw new Error(`${error.message} | installRoot=${installRoot} exists=${existsSync(cli(installRoot))} record=${JSON.stringify(record)?.slice(0, 300)}`)
+  }
+}
 
 async function startInstance(install, r, label, extra = {}) {
   const consolePort = extra.consolePort ?? (await freePort())
@@ -142,7 +157,7 @@ async function startInstance(install, r, label, extra = {}) {
   if (record === null) throw new Error(`${label} did not record its instance (api ${apiPort})`)
   startedPids.add(record.pid)
   startedPids.add(record.apiPid)
-  const stop = () => run(cli(install), ['stop', '--json', ...rootArgs(r)], { allowExit: [0, 2] })
+  const stop = () => stopOwned(r)
   return { child, apiPort, consolePort, health, record, stop, apiURL: `http://127.0.0.1:${apiPort}` }
 }
 
@@ -279,7 +294,7 @@ try {
   })
 
   // ---- C. post-upgrade data, binary-only rollback, and a schema-changing pair ----
-  const stopTarget = run(cli(target), ['stop', '--json', ...rootArgs(r)], { allowExit: [0, 2] })
+  const stopTarget = stopOwned(r)
   if (stopTarget.json?.status !== 'STOPPED') throw new Error('target instance did not stop for the post-upgrade write')
   const postUpgrade = await seed(r, target, 'project-post-upgrade', 'work-post-upgrade', 'b')
   const afterWrite = evidenceOf(r)
@@ -440,7 +455,11 @@ try {
   const realRecord = JSON.parse(readFileSync(recordPath, 'utf8'))
   writeFileSync(recordPath, JSON.stringify({ ...realRecord, pid: sleeper.pid, apiPid: sleeper.pid, processStart: 'Mon Jan  1 00:00:00 2000' }))
   const refusedUnverified = run(cli(target), ['upgrade', '--json', '--to', target, '--backup', join(root, 'unverified.pab'), ...rootArgs(rWin)], { allowExit: [2] })
-  if (refusedUnverified.json?.code !== 'instance_record_unverified') throw new Error(`unverified record was not blocked: ${JSON.stringify(refusedUnverified.json).slice(0, 300)}`)
+  // A record pointing at an unrelated live pid is blocked either by the preflight accounting
+  // (unknown_live_resource) or by the record verification (instance_record_unverified); both mean the
+  // switch did not stop or adopt the foreign process.
+  if (!['instance_record_unverified', 'unknown_live_resource'].includes(refusedUnverified.json?.code))
+    throw new Error(`unverified record was not blocked: ${JSON.stringify(refusedUnverified.json).slice(0, 300)}`)
   const sleeperAlive = (() => { try { process.kill(sleeper.pid, 0); return true } catch { return false } })()
   if (!sleeperAlive) throw new Error('an unverified live process was killed')
   writeFileSync(recordPath, JSON.stringify(realRecord))
@@ -508,7 +527,7 @@ try {
       refused: unproven.json?.code ?? null, journal: journal7.status,
       statusVisible: status7.json.status, doctor: journalCheck.status, settled: recover7.json.status,
     })
-    run(cli(install7), ['stop', '--json', ...rootArgs(r7)], { allowExit: [0, 2] })
+    stopOwned(r7)
   }
 
   // ---- E8. crash after stop, before the pointer swap: recovery restarts the previous release ----
@@ -534,7 +553,7 @@ try {
     section('E8-crash-after-stop-restarts-previous', 'PASS', {
       journal: journal8.status, recovered: recover8.json.status, buildId: record8.buildId, mode: record8.mode, access: record8.access,
     })
-    run(cli(install8), ['stop', '--json', ...rootArgs(r8)], { allowExit: [0, 2] })
+    stopOwned(r8)
   }
 
   // ---- E9. health answered but the instance record was never persisted ----
@@ -552,7 +571,7 @@ try {
       throw new Error(`record-missing window did not revert cleanly: ${journal9.status}/${journal9.reason}`)
     if (instanceOf(r9) !== null) throw new Error('record-missing window left an instance record')
     section('E9-record-missing-reverted', 'PASS', { journal: journal9.status, reason: journal9.reason, record: null, code: fail9.json?.code ?? null })
-    run(cli(install9), ['stop', '--json', ...rootArgs(r9)], { allowExit: [0, 2] })
+    stopOwned(r9)
   }
 
   // ---- E10. orphan API after the launcher died: the registered child is still stopped ----
@@ -573,7 +592,7 @@ try {
     section('E10-orphan-api-stopped', 'PASS', {
       orphanApiPid: orphanRecord.apiPid, orphanStopped: true, stopped: switch10.json.stopped?.status ?? null, buildId: record10.buildId, mode: record10.mode,
     })
-    run(cli(target), ['stop', '--json', ...rootArgs(r10)], { allowExit: [0, 2] })
+    stopOwned(r10)
   }
 
   // ---- E11. a live registered-looking process whose command does not verify stays UNKNOWN ----
@@ -605,7 +624,7 @@ try {
     // the recorded port has no unknown listener and the stale record can be collected truthfully.
     try { process.kill(instance11.record.apiPid, 'SIGKILL') } catch { /* gone */ }
     await new Promise((resolveWait) => setTimeout(resolveWait, 300))
-    run(cli(target), ['stop', '--json', ...rootArgs(r11)], { allowExit: [0, 2] })
+    stopOwned(r11)
   }
 
   // ---- E12. re-entry with an unsettled journal is refused until --recover ----
@@ -623,7 +642,7 @@ try {
     const recovered = run(cli(target), ['upgrade', '--recover', '--json', ...rootArgs(r12)], { allowExit: [0, 1, 2] })
     if (!['RECOVERED', 'REVERTED', 'RECOVERED_PREVIOUS'].includes(recovered.json?.status)) throw new Error('recovery did not settle the crashed switch')
     section('E12-reentry-refused-until-recover', 'PASS', { reentry: reentry.json.code, journal: journal12.status, recovered: recovered.json.status })
-    run(cli(target), ['stop', '--json', ...rootArgs(r12)], { allowExit: [0, 2] })
+    stopOwned(r12)
   }
 
   // ---- E13/E14. real SIGKILL windows: the upgrade process dies; the journal is the only witness ----
@@ -650,11 +669,11 @@ try {
       const running = instanceOf(rK)
       if (running === null) throw new Error(`${id}: recovery left no verified running instance`)
       section(id, 'PASS', { signal: killed.signal, journalAfterKill: journalK.status, reentry: reentry.json.code, recovered: recovered.json.status, terminalJournal: after.status, buildId: running.buildId })
-      run(cli(target), ['stop', '--json', ...rootArgs(rK)], { allowExit: [0, 2] })
+      stopOwned(rK)
     }
   }
 
-  run(cli(target), ['stop', '--json', ...rootArgs(r)], { allowExit: [0, 2] })
+  stopOwned(r)
   evidence.status = Object.values(evidence.sections).every((entry) => entry.status === 'PASS') ? 'PASS' : 'PARTIAL'
 } catch (error) {
   evidence.status = 'FAIL'
