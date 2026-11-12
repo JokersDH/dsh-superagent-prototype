@@ -308,14 +308,25 @@ test('a non-empty source covers work, queue, runtime binding and context data wi
     for (const name of ['works', 'effect', 'runtime_bindings', 'runtime_current', 'assistant_context_bindings', 'command_receipts'])
       assert.ok((snapshot.families.find(family => family.name === name)?.rows ?? 0) > 0, name)
     assert.equal(f.store.bindings.current<{ fenceEpoch: number }>('ticket-1')?.fenceEpoch, 2)
+    f.store.close()
+    const reopened = new ProductStore({ path: f.path })
+    try {
+      assert.equal(reopened.bindings.current<{ fenceEpoch: number }>('ticket-1')?.fenceEpoch, 2)
+      assert.equal(reopened.bindings.binding<{ attemptId: string }>('attempt-1')?.attemptId, 'attempt-1')
+      assert.equal(reopened.commands.get('source-command')?.payloadDigest, 'a'.repeat(64))
+      assert.equal(reopened.workflows.recoverySource.inspect().coverage, 'complete')
+    } finally { reopened.close() }
+    const again = new ProductStore({ path: f.path }).bindings.current<{ fenceEpoch: number }>('ticket-1')?.fenceEpoch
+    assert.equal(again, 2)
 
     const before = snapshot.sourceFingerprint
     const other = new ProductStore({ path: f.path })
     try { other.bindings.record({ attemptId: 'attempt-2', ticketId: 'ticket-2', assignmentId: 'assignment-2', fenceEpoch: 1,
       contract: { workId: 'work-2', revision: 1, digest: 'd'.repeat(64) }, state: 'active', runnerIdentityRef: 'runner-2', source: 'test',
       resources: [] }) } finally { other.close() }
-    assert.notEqual(f.store.workflows.recoverySource.inspect().sourceFingerprint, before)
-  } finally { f.store.close(); rmSync(f.root, { recursive: true, force: true }) }
+    const finalStore = new ProductStore({ path: f.path })
+    try { assert.notEqual(finalStore.workflows.recoverySource.inspect().sourceFingerprint, before) } finally { finalStore.close() }
+  } finally { try { f.store.close() } catch { /* already closed above */ } rmSync(f.root, { recursive: true, force: true }) }
 })
 
 test('a rowid beyond Number.MAX_SAFE_INTEGER is scanned exactly and its change is visible', () => {

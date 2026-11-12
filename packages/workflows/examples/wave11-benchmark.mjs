@@ -65,6 +65,10 @@ const source = await measure(() => store.workflows.recoverySource.inspect())
 report.cases.push({ case: 'recovery-source-20000-row-window', coverage: source.value.coverage, families: source.value.families.length,
   rows: source.value.families.reduce((sum, family) => sum + family.rows, 0), ms: source.ms })
 
+const bounded = await measure(() => store.workflows.recoverySource.inspect({ maxRows: 1000 }))
+report.cases.push({ case: 'recovery-source-bounded', coverage: bounded.value.coverage, fingerprint: bounded.value.sourceFingerprint,
+  families: bounded.value.families.length, rows: bounded.value.families.reduce((sum, family) => sum + family.rows, 0), ms: bounded.ms })
+
 const snapshotDir = join(temp, 'snapshot')
 const snapshot = await measure(() => new WorkflowSnapshots(store).create({ destination: snapshotDir }))
 report.cases.push({ case: 'snapshot-create', status: snapshot.value.status, databaseBytes: snapshot.value.manifest.database.bytes,
@@ -76,6 +80,6 @@ report.limitations = ['Temporary database and content-addressed artifact only; n
   'Timings are single-process wall clock on this host, not a service SLO.']
 store.close()
 rmSync(temp, { recursive: true, force: true })
-const out = resolve('packages/workflows/reports/wave13-performance.json')
+const out = resolve('packages/workflows/reports/wave14-performance.json')
 writeFileSync(out, JSON.stringify(report, null, 2) + '\n')
 console.log(JSON.stringify(report, null, 2))

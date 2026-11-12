@@ -40,3 +40,16 @@ test('SIGKILL after snapshot creation leaves a verifiable snapshot with the comm
     } finally { store.close() }
   } finally { rmSync(root, { recursive: true, force: true }) }
 })
+
+test('a partial snapshot directory without a manifest is blocked, never a usable complete backup', () => {
+  const { root, db, snapshot } = run('after')
+  try {
+    const store = new ProductStore({ path: db })
+    try {
+      rmSync(join(snapshot, 'snapshot.json'))
+      const verification = new WorkflowSnapshots(store).verify(snapshot)
+      assert.equal(verification.status, 'blocked')
+      assert.match(verification.message ?? '', /manifest|missing/i)
+    } finally { store.close() }
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})

@@ -170,6 +170,9 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
       const consumer = new CompletedAssistantReplies(restoredStore, restoredStore.workflows.assistant.replyResults,
         { userId: 'user-1', authorityRef: 'authority-1' }, () => ['project-1'])
       assert.equal(consumer.read(data.replyRequestId)?.text, 'completed')
+      assert.equal(restoredStore.product.messages.getById('message-1')?.text, '保留这条决定。')
+      assert.equal(restoredStore.product.contracts.getByRef(contract)?.digest, 'a'.repeat(64))
+      assert.equal(restoredStore.commands.get(data.replyRequestId)?.payloadDigest, 'a'.repeat(64))
     } finally { restoredStore.close() }
 
     const db = new Database(join(restored, 'product.sqlite'), { readonly: true, fileMustExist: true })
