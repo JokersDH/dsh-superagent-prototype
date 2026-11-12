@@ -22,6 +22,7 @@ export type {
   ReplyCandidateReview,
   ReplyCandidateView,
   VerifiedCompletedReply,
+  VerifiedReplyIdentity,
 } from './reply-candidates.ts'
 export { ProposalError } from './errors.ts'
 export type { ProposalErrorCode } from './errors.ts'

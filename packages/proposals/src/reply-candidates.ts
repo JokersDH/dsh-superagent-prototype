@@ -45,7 +45,25 @@ export interface VerifiedCompletedReply {
     readonly conversationId: string
     readonly model: string
     readonly principal: { readonly userId: string; readonly authorityRef: string }
+    /** Optional original-request/artifact tuple; main's CompletedAssistantReplies has all three. */
+    readonly requestDigest?: string
+    readonly artifactRef?: string
+    readonly artifactDigest?: string
   }
+}
+
+/** Identity C cross-checked for a verified reply; main binds its own transaction to these values. */
+export interface VerifiedReplyIdentity {
+  readonly requestId: string
+  readonly replyMessageId: string
+  readonly sourceMessageId: string
+  readonly projectId: string
+  readonly conversationId: string
+  readonly model: string
+  readonly principal: { readonly userId: string; readonly authorityRef: string }
+  readonly requestDigest?: string
+  readonly artifactRef?: string
+  readonly artifactDigest?: string
 }
 
 export type ReplyCandidatePlan =
@@ -97,6 +115,8 @@ export interface ReplyCandidateReview {
   readonly modelCallPerformed: false
   /** `main-completed-reply` only when the body arrived through the verified entry point. */
   readonly verifiedBy: 'main-completed-reply' | 'none'
+  /** Present only on a main-verified review; the exact tuple main may bind to its transaction. */
+  readonly verifiedIdentity?: VerifiedReplyIdentity
   readonly notes: readonly string[]
 }
 
@@ -325,14 +345,29 @@ export function reviewVerifiedReplyCandidates(input: unknown, bindings: ReplyCan
     projectId: identity.projectId,
     conversationId: identity.conversationId,
     model: identity.model,
-  }
+  } as { replyMessageId: string; sourceMessageId: string; projectId: string; conversationId: string; model: string }
   if (!Object.values(bodyRef).every(isNonEmptyString) || !Object.values(identityRef).every(isNonEmptyString)) {
     return refuse('incomplete_identity', 'Verified reply identity is incomplete')
+  }
+  if (!isNonEmptyString(identity.requestId)) {
+    return refuse('incomplete_identity', 'Verified reply request identity is missing')
   }
   if (!isObject(identity.principal) || !isNonEmptyString(identity.principal.userId) || !isNonEmptyString(identity.principal.authorityRef)) {
     return refuse('incomplete_identity', 'Verified reply principal is missing')
   }
-  const principalRef = identity.principal
+  const principalRef = identity.principal as { userId: string; authorityRef: string }
+  // Main's completed reader also knows the original request digest and artifact tuple. When it
+  // supplies any part, the whole tuple must be consistent; a partial/forged tuple is refused.
+  const tuple = [identity.requestDigest, identity.artifactRef, identity.artifactDigest]
+  const supplied = tuple.filter((value) => value !== undefined).length
+  if (supplied > 0) {
+    if (supplied !== 3 || !tuple.every(isNonEmptyString)) {
+      return refuse('incomplete_identity', 'Verified reply artifact tuple is incomplete')
+    }
+    if (identity.artifactRef !== identity.artifactDigest) {
+      return refuse('artifact_mismatch', 'Verified reply artifact reference and digest disagree')
+    }
+  }
   if (
     bodyRef.replyMessageId !== identityRef.replyMessageId ||
     bodyRef.sourceMessageId !== identityRef.sourceMessageId ||
@@ -357,7 +392,23 @@ export function reviewVerifiedReplyCandidates(input: unknown, bindings: ReplyCan
     return refuse('principal_unverified', 'Verified reply principal is not the current authenticated principal')
   }
   const review = reviewReplyCandidates(body, bindings)
-  return { ...review, verifiedBy: 'main-completed-reply' }
+  const verifiedIdentity: VerifiedReplyIdentity = {
+    requestId: identity.requestId as string,
+    replyMessageId: identityRef.replyMessageId,
+    sourceMessageId: identityRef.sourceMessageId,
+    projectId: identityRef.projectId,
+    conversationId: identityRef.conversationId,
+    model: identityRef.model,
+    principal: { userId: principalRef.userId, authorityRef: principalRef.authorityRef },
+    ...(supplied === 3
+      ? {
+          requestDigest: identity.requestDigest as string,
+          artifactRef: identity.artifactRef as string,
+          artifactDigest: identity.artifactDigest as string,
+        }
+      : {}),
+  }
+  return { ...review, verifiedBy: 'main-completed-reply', verifiedIdentity }
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {

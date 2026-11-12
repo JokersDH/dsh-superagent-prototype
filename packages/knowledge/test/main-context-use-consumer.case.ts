@@ -7,7 +7,7 @@ import { ProductStore } from '@personal-agent/storage'
 import type { TrustedActor } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import { collectContextHistory } from '../../context/src/index.ts'
-import { reviewVerifiedReplyCandidates } from '../../proposals/src/index.ts'
+import { AssistantProposalService, planProposalCommand, proposalDigest, reviewVerifiedReplyCandidates } from '../../proposals/src/index.ts'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
 import { CompletedAssistantReplies } from '../../../apps/coordinator/product/assistant-reply-results.ts'
@@ -471,4 +471,207 @@ test('history keeps the frozen body after the live source text changes', async (
   // A fresh preparation reads the live text, proving history was not re-implemented as a read of now.
   const fresh = await h.prepare(h.input('frozen-2', 'Explain the new selection.'))
   assert.ok(fresh.preview.sources.some((source: { content: string }) => source.content.includes('CHANGED-SOURCE')))
+})
+
+test('a non-empty verified candidate joins the original proposal service over real A state', async (t) => {
+  const h = fixture(t)
+  const suggestion = {
+    kind: 'propose_work',
+    goal: 'Add retry budget checks',
+    projectId,
+    sourceMessageId: 'source-message',
+  }
+  const replyBody = {
+    protocol: 'assistant-reply-body/1',
+    projectId,
+    conversationId,
+    sourceMessageId: 'source-message',
+    replyMessageId: 'reply-candidate-1',
+    model: 'mock-context',
+    text: 'Here is a plan.',
+    suggestions: [suggestion],
+  }
+  const artifactDigest = 'e'.repeat(64)
+  const review = reviewVerifiedReplyCandidates(
+    {
+      verifiedBy: 'main-completed-reply',
+      body: replyBody,
+      identity: {
+        requestId: 'assistant-request:source-message',
+        replyMessageId: 'reply-candidate-1',
+        sourceMessageId: 'source-message',
+        projectId,
+        conversationId,
+        model: 'mock-context',
+        principal,
+        requestDigest: 'f'.repeat(64),
+        artifactRef: artifactDigest,
+        artifactDigest,
+      },
+    },
+    {
+      projectId,
+      conversationId,
+      sourceMessageId: 'source-message',
+      grantId: 'candidate-grant',
+      grantScope: scope,
+      principal,
+    },
+  )
+  assert.equal(review.status, 'candidates')
+  const candidate = review.candidates[0]!
+  assert.equal(candidate.index, 0)
+  assert.equal(candidate.payloadDigest, proposalDigest(suggestion as never))
+  assert.equal(candidate.plan.kind, 'needs_user_input')
+
+  const service = new AssistantProposalService(h.store.workflows.assistant, {
+    now: () => new Date('2026-11-12T09:03:00.000Z'),
+  })
+  const trusted = { actorRef: principal.userId, projectId, grant: { grantId: 'candidate-grant', scope }, sourceMessageId: 'source-message' }
+  const prepared = await service.prepare({
+    proposalId: 'proposal-1',
+    payload: suggestion,
+    trusted,
+    conversationId,
+    sourceTextDigest: 'a'.repeat(64),
+  })
+  // The persisted proposal digest is the original suggestion digest, not a summary-derived one.
+  assert.equal(prepared.payloadDigest, candidate.payloadDigest)
+  service.persistPending(prepared)
+  assert.equal(h.store.workflows.assistant.proposals.get('proposal-1')?.state, 'pending')
+  assert.equal(h.store.workflows.assistant.proposals.get('proposal-1')?.effectCommandId, undefined)
+
+  const commitInput = {
+    expectedVersion: 1,
+    expectedDigest: prepared.payloadDigest,
+    actorRef: principal.userId,
+    effectCommandId: 'candidate-command-1',
+    revalidate: () => ({ ok: true }),
+    barrier: () => ({ ok: true }),
+  }
+  const confirmed = service.commit(prepared, commitInput)
+  assert.equal(confirmed.record.state, 'confirmed')
+  assert.equal(confirmed.record.effectCommandId, 'candidate-command-1')
+  const replay = service.commit(prepared, commitInput)
+  assert.equal(replay.replayed, true)
+  assert.equal(h.store.workflows.assistant.proposals.history('proposal-1').length, 2)
+
+  // Missing user inputs stay a plan; the command body is derived from the original payload + inputs.
+  const missing = planProposalCommand(confirmed.intent, { commandId: 'candidate-command-1', conversationId })
+  assert.equal(missing.kind, 'needs_user_input')
+  const planned = planProposalCommand(confirmed.intent, {
+    commandId: 'candidate-command-1',
+    conversationId,
+    work: {
+      scope,
+      criteria: [{ id: 'criterion-1', description: 'checks pass', kind: 'machine', required: true, checkDefinitionRef: 'check-1' }],
+      profileId: 'codex-native',
+    },
+  })
+  assert.equal(planned.kind, 'command')
+  if (planned.kind !== 'command') throw new Error('unreachable')
+  assert.equal('goal' in planned.command && planned.command.goal, 'Add retry budget checks')
+
+  // Rejection is a separate terminal state in the same A proposal state; no command id appears.
+  const rejected = await service.prepare({
+    proposalId: 'proposal-2',
+    payload: suggestion,
+    trusted,
+    conversationId,
+    sourceTextDigest: 'a'.repeat(64),
+  })
+  service.persistPending(rejected)
+  const rejectedRecord = service.reject(rejected, { actorRef: principal.userId, reason: 'user declined' })
+  assert.equal(rejectedRecord.state, 'rejected')
+  assert.equal(rejectedRecord.effectCommandId, undefined)
+  assert.equal(h.store.workflows.assistant.proposals.history('proposal-2').length, 2)
+})
+
+test('a verified decision candidate flows through main ProductProposals confirm/reject data', async (t) => {
+  const h = fixture(t)
+  const suggestion = { kind: 'propose_decision', content: 'CANDIDATE-DECISION: keep retries bounded.', scope, sourceMessageId: 'source-message' }
+  const replyBody = {
+    protocol: 'assistant-reply-body/1',
+    projectId,
+    conversationId,
+    sourceMessageId: 'source-message',
+    replyMessageId: 'reply-candidate-2',
+    model: 'mock-context',
+    text: 'Answer with a decision candidate.',
+    suggestions: [suggestion],
+  }
+  const artifactDigest = '1'.repeat(64)
+  const review = reviewVerifiedReplyCandidates(
+    {
+      verifiedBy: 'main-completed-reply',
+      body: replyBody,
+      identity: {
+        requestId: 'assistant-request:source-message',
+        replyMessageId: 'reply-candidate-2',
+        sourceMessageId: 'source-message',
+        projectId,
+        conversationId,
+        model: 'mock-context',
+        principal,
+        requestDigest: '2'.repeat(64),
+        artifactRef: artifactDigest,
+        artifactDigest,
+      },
+    },
+    { projectId, conversationId, sourceMessageId: 'source-message', grantId: 'candidate-grant-2', grantScope: scope, principal },
+  )
+  const candidate = review.candidates[0]!
+  assert.equal(candidate.plan.kind, 'requires_explicit_confirmation')
+  assert.equal(candidate.payloadDigest, proposalDigest(suggestion as never))
+
+  // Main's own preview signs the original payload digest; C only supplied the data.
+  const prepareBody = { projectId, conversationId, sourceMessageId: 'source-message', payload: suggestion }
+  const preview = await h.read('/v1/proposals/prepare', prepareBody)
+  assert.equal(preview.protocol, 'proposal-preview/1')
+  assert.equal(preview.record.payloadDigest, candidate.payloadDigest)
+  assert.deepEqual(preview.requiredInputs, [])
+
+  // Confirmation is the user's explicit command: the original payload becomes one decision command.
+  const confirm = await h.read('/v1/proposals/commands', {
+    kind: 'confirm_proposal',
+    commandId: 'proposal-command-1',
+    projectId,
+    conversationId,
+    token: preview.token,
+  })
+  assert.equal(confirm.status, 'recorded')
+  assert.equal(confirm.commandId, 'proposal-command-1')
+  const stored = h.store.workflows.assistant.proposals.get(preview.record.proposalId)
+  assert.equal(stored?.state, 'confirmed')
+  // Main derives its own deterministic effect command id; the client command id is the receipt id.
+  assert.equal(typeof stored?.effectCommandId, 'string')
+  assert.ok((stored?.effectCommandId ?? '').length > 0)
+  const decisions = h.store.workflows.assistant.decisions.list({ projectId, limit: 10 }).records
+  assert.ok(decisions.some((entry) => entry.decision.content.includes('CANDIDATE-DECISION')))
+
+  // Lost-response replay returns the same receipt and adds no second decision.
+  const replay = await h.read('/v1/proposals/commands', {
+    kind: 'confirm_proposal',
+    commandId: 'proposal-command-1',
+    projectId,
+    conversationId,
+    token: preview.token,
+  })
+  assert.deepEqual(replay, confirm)
+  assert.equal(h.store.workflows.assistant.decisions.list({ projectId, limit: 10 }).records.length, decisions.length)
+
+  // Rejection is a separate terminal state with its own receipt and no effect command.
+  const rejectedPreview = await h.read('/v1/proposals/prepare', prepareBody)
+  const rejectReceipt = await h.read('/v1/proposals/commands', {
+    kind: 'reject_proposal',
+    commandId: 'proposal-command-2',
+    projectId,
+    conversationId,
+    token: rejectedPreview.token,
+  })
+  // Rejection is a successful command that records the rejected proposal state.
+  assert.equal(rejectReceipt.status, 'recorded')
+  const rejectedRecord = h.store.workflows.assistant.proposals.get(rejectedPreview.record.proposalId)
+  assert.equal(rejectedRecord?.state, 'rejected')
+  assert.equal(rejectedRecord?.effectCommandId, undefined)
 })
