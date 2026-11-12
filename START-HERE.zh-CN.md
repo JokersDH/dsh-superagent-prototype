@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**当前派工：[第十一轮十阶段长任务整包](agent-tasks/product-wave-11/README.zh-CN.md)。** A做源逻辑快照/历史/完成回复数据，B做实际持久控制，C做可靠来源检索与候选数据，D做多实例隔离和当前源码个人安装，E做当前用户流程/真实安装独立验收。每人十阶段、三个稳定检查点和独立备选队列，检查点后继续。新验收确认D通用stop跨state的P1；B四项新helper/C九条新模块反例未闭合，现用main能力保留。共享接口98a50ca已交，模型/native0、九组实例/账本保留。见[0035](docs/rfcs/WP-16/0035-wave-11-admission-and-long-run-packages.md)和[分别转发文本](agent-tasks/product-wave-11/forward-prompts.zh-CN.md)。
+
 **所选上下文可以用于对话：[http://127.0.0.1:5188/](http://127.0.0.1:5188/)。** 产品源码4140cac：草稿→上下文预览→预览消息→明确发送→原流式回复与逐消息来源审计，已接A schema16真实持久化。clean source网页9/9及新后端95/95通过，模型为mock；新个人预览复用已有私有配置，原八组实例和历史保留。D真实材料与main/A空目标组合7/7通过，仍不授恢复启动权；恢复激活/当前安装包分层推进。实际接口/证据见[0034](docs/rfcs/WP-16/0034-context-use-and-target-preparation.md)与[新版指南](docs/ASSISTANT-GUIDE.zh-CN.md)。
 
 **当前派工：[第十轮六阶段大颗粒整包](agent-tasks/product-wave-10/README.zh-CN.md)。** 已重新审视A–E最新固定source：A三项库存反例未修，B新公共模块strict76错误，D材料/多state进程归属六反例FAIL；C新增问题限未消费helper/recipe，现有main上下文路径通过。E旧schema13安装不能代表D新schema15或当前main。下一包并行做“所选上下文用于单条对话”与“恢复/普通个人安装”，普通安装不再等恢复或研究。共享binding接口已在677cf26发布，主线负责真实HTTP/provider/目标组合；见[0033验收与分工](docs/rfcs/WP-16/0033-wave-10-admission-and-product-closure.md)。八组实例保留、模型/native0、不刷新预算。
