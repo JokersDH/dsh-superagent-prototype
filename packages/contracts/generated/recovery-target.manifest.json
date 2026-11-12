@@ -2,6 +2,6 @@
   "protocol": "recovery-target-preparation/1",
   "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
   "runtimeValidationRequired": true,
-  "schemaHash": "84a047e2d5832b892b6333da695a2be4e0c27b4917d927a8fccf5fc6b94de747",
-  "sourceHash": "320f1a816cd5c69acccfa6e17b71bcf06bd20860493c5aa7129632166c97ef45"
+  "schemaHash": "facf1b0c8767bff524afaee24e1328680c7ce257f9a3b0d18325c438f1a64bb0",
+  "sourceHash": "26d407147d463c1246b9c360e5688b8ba6f5cdee984bd49ac4003b500d0d182c"
 }

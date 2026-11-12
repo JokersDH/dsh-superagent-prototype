@@ -146,6 +146,9 @@ export class AssistantProposalService {
       if (existing.payloadDigest !== prepared.payloadDigest || existing.actorRef !== prepared.actorRef) {
         throw new ProposalError('conflict', 'A confirmed proposal cannot be replayed with another payload or actor')
       }
+      if (input.expectedDigest !== existing.payloadDigest) {
+        throw new ProposalError('proposal_mutated', 'Replay must name the exact reviewed payload digest')
+      }
       return { record: existing, intent: snapshot(proposalIntent(existing.payload)), replayed: true }
     }
     if (!existing) {

@@ -15,6 +15,7 @@ import { UnitOfWork } from './uow.ts'
 import { canonicalDigest } from './ingress.ts'
 import { WorkflowConflict } from './workflow-errors.ts'
 import type { ProductDecisions } from './workflows.ts'
+import { AssistantContextBindingStore } from './assistant-context.ts'
 
 type Row = Record<string, unknown>
 const json = <T>(value: unknown): T => JSON.parse(String(value)) as T
@@ -43,10 +44,13 @@ export class AssistantState implements AssistantStatePort {
   private readonly ledger: ProductDecisions
   readonly decisions: AssistantStatePort['decisions']
   readonly proposals: AssistantStatePort['proposals']
+  /** Wave-10 shared AssistantContextBindings audit; one append-only writer on this connection. */
+  readonly contextBindings: AssistantContextBindingStore
   constructor(db: Database.Database, uow: UnitOfWork, ledger: ProductDecisions) {
     this.db = db
     this.uow = uow
     this.ledger = ledger
+    this.contextBindings = new AssistantContextBindingStore(db, uow)
     this.decisions = {
       get: this.get.bind(this),
       list: this.list.bind(this),

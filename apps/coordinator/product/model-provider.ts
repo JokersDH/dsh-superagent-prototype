@@ -12,7 +12,7 @@ import {
   writeSync,
 } from 'node:fs'
 import { homedir } from 'node:os'
-import { randomUUID } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import { dirname, join } from 'node:path'
 import type { AssistantProviderStatus } from '@personal-agent/contracts'
 
@@ -49,11 +49,17 @@ export class ModelProviderError extends Error {
 }
 export interface AssistantModelPort {
   status(): AssistantProviderStatus
+  prepareReply?(): PreparedAssistantReply
   reply(
     messages: readonly { role: 'system' | 'user' | 'assistant'; content: string }[],
     onDelta?: (text: string) => void,
     signal?: AbortSignal,
   ): Promise<{ text: string; model: string }>
+}
+export interface PreparedAssistantReply {
+  readonly model: string
+  readonly configurationDigest: string
+  reply: AssistantModelPort['reply']
 }
 
 /** A single SDK completion call; no tool loop, native credentials or repository-file access. */
@@ -144,7 +150,27 @@ export class PrivateModelProvider implements AssistantModelPort {
     onDelta?: (text: string) => void,
     signal?: AbortSignal,
   ) {
+    return this.prepareReply().reply(messages, onDelta, signal)
+  }
+  prepareReply(): PreparedAssistantReply {
     const config = this.read()
+    let used = false
+    return Object.freeze({
+      model: config.model,
+      configurationDigest: createHash('sha256').update(JSON.stringify(config)).digest('hex'),
+      reply: async (...args: Parameters<AssistantModelPort['reply']>) => {
+        if (used) throw new ModelProviderError('request_already_used', '这个模型请求已发送，未自动重发。')
+        used = true
+        return this.request(config, ...args)
+      },
+    })
+  }
+  private async request(
+    config: z.infer<typeof ConfigurationSchema>,
+    messages: readonly { role: 'system' | 'user' | 'assistant'; content: string }[],
+    onDelta?: (text: string) => void,
+    signal?: AbortSignal,
+  ) {
     const client = new OpenAI({
       apiKey: config.apiKey,
       baseURL: config.baseURL,

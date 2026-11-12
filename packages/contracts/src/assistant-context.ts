@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { ContractRefSchema, DigestSchema, IdSchema, ScopeSchema, TimestampSchema } from './schemas.ts'
-import { ContextSelectionSchema } from './context-preview.ts'
+import { ContextSelectionSchema, ContextPreviewInputSchema, ContextPreviewSchema } from './context-preview.ts'
 
 /** A frozen user-selected discussion input. This audit record grants neither tools nor replay. */
 export const AssistantContextBindingSchema = z.strictObject({
@@ -39,3 +39,20 @@ export interface AssistantContextBindings {
   /** Same body replays; either identity with a different body conflicts. No send or private UoW. */
   put(binding: AssistantContextBinding): { binding: AssistantContextBinding; replayed: boolean }
 }
+
+export const AssistantContextPrepareSchema = z.strictObject({
+  commandId: IdSchema, text: z.string().min(1).max(16384).refine(value => value.trim().length > 0),
+  context: ContextPreviewInputSchema,
+})
+export const AssistantContextPreparedSchema = z.strictObject({
+  protocol: z.literal('assistant-context-prepared/1'), commandId: IdSchema,
+  token: z.string().min(16).max(196608).regex(/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/),
+  preview: ContextPreviewSchema, text: z.string().min(1).max(16384), expiresAt: TimestampSchema,
+}).refine(value => value.expiresAt === value.preview.expiresAt && value.preview.sources.length > 0,
+  'Selected context must contain a source and share the preview expiry')
+export const AssistantContextSendSchema = z.strictObject({
+  commandId: IdSchema, token: z.string().min(16).max(196608).regex(/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/),
+})
+export type AssistantContextPrepare = z.infer<typeof AssistantContextPrepareSchema>
+export type AssistantContextPrepared = z.infer<typeof AssistantContextPreparedSchema>
+export type AssistantContextSend = z.infer<typeof AssistantContextSendSchema>

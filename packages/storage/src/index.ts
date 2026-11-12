@@ -135,10 +135,15 @@ export {
   type DecisionRecord, type WorkIndexEntry, type SourceMessageMetadata, type WorkflowStateFacts, type TimelineEntry, type EvidencePage,
 } from './workflows.ts'
 export { AssistantState, type LegacyDecisionRecord } from './assistant-state.ts'
+export { AssistantContextBindingStore } from './assistant-context.ts'
 export { RoutingEvidence, type RoutingEvidenceSources } from './routing-evidence.ts'
 export { AcceptanceOutcomeProjection, type AcceptanceProjectionInput, type AcceptanceProjectionResult } from './acceptance-outcome.ts'
 export { RecoveryIntents, type RecoveryIntentInput, type RecoveryIntentRecord, type RecoveryIntentPage } from './recovery-intents.ts'
 export { RecoveryActivations } from './recovery-activations.ts'
+export {
+  RecoveryTargetInventoryReaderImpl, TARGET_TABLE_CATEGORIES, createRecoveryTargetInventoryReader,
+  migratedTableNames, recoveryTargetInventory,
+} from './target-inventory.ts'
 export { ArtifactStore, ensureArtifactRoot, artifactRoot, stateDirOf, type ArtifactRecord, type WrittenArtifact, type GcResult } from './artifacts.ts'
 export {
   RuntimeBindings, RuntimeAuthority, ImmutablePayloads, BindingConflict, PayloadConflict, AuthorityConflict,
