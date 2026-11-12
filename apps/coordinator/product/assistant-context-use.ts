@@ -25,7 +25,7 @@ const SignedSchema = z.strictObject({ version: z.literal(1), actor: TrustedActor
   input: AssistantContextPrepareSchema, scope: ScopeSchema, meta: MetaSchema,
   conversationThrough: z.number().int().nonnegative().safe(), fingerprint: DigestSchema, bundleDigest: DigestSchema })
 type Signed = z.infer<typeof SignedSchema>
-const BundleSchema = z.strictObject({ protocol: z.literal('assistant-context-bundle/1'),
+export const AssistantContextBundleSchema = z.strictObject({ protocol: z.literal('assistant-context-bundle/1'),
   input: ContextPreviewInputSchema, preview: ContextPreviewSchema, scope: ScopeSchema,
   conversationThrough: z.number().int().nonnegative().safe() })
 
@@ -34,7 +34,7 @@ function fingerprint(preview: ContextPreview): string {
   return digest({ ...rest, sources: sources.map(({ content: _content, ...source }) => source) })
 }
 function bundle(input: AssistantContextPrepare['context'], preview: ContextPreview, scope: Scope, conversationThrough: number) {
-  return BundleSchema.parse({ protocol: 'assistant-context-bundle/1', input, preview, scope, conversationThrough })
+  return AssistantContextBundleSchema.parse({ protocol: 'assistant-context-bundle/1', input, preview, scope, conversationThrough })
 }
 const sourceRefs = (preview: ContextPreview) => preview.sources.map(({ sourceId, kind, sourceDigest, previewDigest, truncated }) =>
   ({ sourceId, kind, sourceDigest, previewDigest, truncated }))
@@ -266,13 +266,13 @@ export class ProductAssistantContext {
         throw new ApplicationFault('stale_contract', 'Selected context expired or its message authorization changed; prepare again')
     }
     assertBinding()
-    let frozen: z.infer<typeof BundleSchema>
+    let frozen: z.infer<typeof AssistantContextBundleSchema>
     try {
       const artifact = store.artifacts.get(binding.bundleRef)
       if (!artifact || artifact.bytes > 1024 * 1024 || artifact.digest !== binding.bundleDigest) throw new Error('Bundle registry mismatch')
       const read = store.artifacts.read(binding.bundleRef)
       if (!read || textDigest(read.data) !== binding.bundleDigest || read.data.byteLength !== artifact.bytes) throw new Error('Bundle bytes mismatch')
-      frozen = BundleSchema.parse(JSON.parse(Buffer.from(read.data).toString('utf8')))
+      frozen = AssistantContextBundleSchema.parse(JSON.parse(Buffer.from(read.data).toString('utf8')))
     } catch { throw new ApplicationFault('storage_unavailable', 'Selected context bundle is missing or changed', 'none') }
     this.checkPreview(frozen.preview, frozen.input)
     if (frozen.preview.requestId !== binding.requestId || frozen.preview.expiresAt !== binding.expiresAt ||

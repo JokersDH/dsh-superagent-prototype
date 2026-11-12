@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Check, ChevronDown, Copy, FileSearch, RefreshCw, Send, X } from 'lucide-react'
+import { Check, ChevronDown, Copy, FileSearch, History, RefreshCw, Send, X } from 'lucide-react'
 import { z } from 'zod'
 import { AssistantContextPreparedSchema, AssistantContextSendSchema, ContextPreviewInputSchema } from '@personal-agent/contracts'
 import type { ApplicationConfiguration, AssistantContextPrepared, AssistantContextSend, ContextPreview, ContextPreviewInput, WorkView } from '@personal-agent/contracts'
 import { TransportError } from './transport.ts'
 import type { ConsoleTransport } from './transport.ts'
+import { ContextSourceList } from './ContextSources.tsx'
+import { ContextHistoryPanel } from './ContextHistory.tsx'
 
 type Selection = ContextPreviewInput['selections'][number]
 const options: { id: Selection; label: string; needsWork?: boolean }[] = [
@@ -13,10 +15,6 @@ const options: { id: Selection; label: string; needsWork?: boolean }[] = [
   { id: 'project', label: '项目信息' }, { id: 'conversation', label: '当前会话' },
   { id: 'artifacts', label: '交付元数据', needsWork: true },
 ]
-const kindLabel: Record<ContextPreview['sources'][number]['kind'], string> = {
-  work: '工作', contract: '当前合同', verification: '验证', delivery: '接受记录', decision: '项目决定',
-  project_metadata: '项目信息', conversation_message: '会话消息', artifact: '交付元数据',
-}
 const groupLabel: Record<ContextPreview['groups'][number]['name'], string> = {
   contract: '当前工作', decisions: '项目决定', project_facts: '项目与验证', conversation: '当前会话', artifacts: '交付元数据',
 }
@@ -37,10 +35,11 @@ function remembered(): { value?: Pending; damaged: boolean } {
   catch { return { damaged: true } }
 }
 
-export function ContextWorkspace({ transport, configuration, conversationId, works, initialProjectId, initialWorkId, initialDraft = '', onClose, onSent }: {
+export function ContextWorkspace({ transport, configuration, conversationId, works, initialProjectId, initialWorkId, initialDraft = '', onClose, onSent, onOpenConversation }: {
   transport: ConsoleTransport; configuration: ApplicationConfiguration; conversationId: string; works: readonly WorkView[];
   initialProjectId: string; initialWorkId?: string; initialDraft?: string; onClose(): void
   onSent?(value: { text: string; conversationId: string; commandId: string }): Promise<void>
+  onOpenConversation?(id: string, projectId: string): void
 }) {
   const [initial] = useState(remembered)
   const [pending, setPending] = useState<Pending | undefined>(initial.value), [damaged, setDamaged] = useState(initial.damaged)
@@ -50,6 +49,8 @@ export function ContextWorkspace({ transport, configuration, conversationId, wor
   const [preview, setPreview] = useState<ContextPreview>(), [busy, setBusy] = useState(false), [error, setError] = useState<string>()
   const [prepared, setPrepared] = useState<AssistantContextPrepared>(), [text, setText] = useState(initialDraft)
   const [expired, setExpired] = useState(false), [copied, setCopied] = useState(false)
+  const [view, setView] = useState<'preview' | 'history'>(configuration.contextPreviewAvailable === false ? 'history' : 'preview')
+  const tabsId = useId(), hasHistory = !!configuration.contextHistoryAvailable && !!transport.contextHistory
   const dialog = useRef<HTMLDialogElement>(null), sequence = useRef(0)
   const candidates = works.filter(work => work.work.projectId === projectId && work.work.conversationId === conversationId)
   const selectedWork = candidates.find(work => work.work.id === workId)
@@ -57,6 +58,7 @@ export function ContextWorkspace({ transport, configuration, conversationId, wor
   const displayPrepared = pending?.prepared ?? prepared
   const displayPreview = displayPrepared?.preview ?? preview
   const displayProject = configuration.projects.find(value => value.id === (displayPreview?.projectId ?? projectId))
+  const headerProject = view === 'history' ? project : displayProject
   const canSend = !!configuration.assistantContextAvailable && !!transport.prepareAssistantContext && !!transport.sendAssistantContext && !!onSent
   const canReconcile = !!transport.sendAssistantContext && !!onSent
   const sending = busy && !!pending
@@ -68,6 +70,7 @@ export function ContextWorkspace({ transport, configuration, conversationId, wor
     dialog.current?.showModal()
     return () => { sequence.current++; dialog.current?.close(); focused?.focus() }
   }, [])
+  useEffect(() => { if (!hasHistory) setView('preview') }, [hasHistory])
   useEffect(() => {
     if (!displayPreview) { setExpired(false); return }
     const remaining = Date.parse(displayPreview.expiresAt) - Date.now()
@@ -113,11 +116,24 @@ export function ContextWorkspace({ transport, configuration, conversationId, wor
     try { await navigator.clipboard.writeText(JSON.stringify(displayPreview, null, 2)); setCopied(true) }
     catch { setError('浏览器未允许复制，请在来源详情中选择内容。') }
   }
-  return createPortal(<dialog ref={dialog} className="project-settings-dialog context-workspace" aria-label="上下文预览"
+  return createPortal(<dialog ref={dialog} className="project-settings-dialog context-workspace" aria-labelledby={`${tabsId}-heading`}
     onCancel={event => { if (sending) event.preventDefault() }}
     onClose={() => { if (!dialog.current?.open) onClose() }}>
-    <header><div><h2>{pending ? '核对消息请求' : prepared ? '确认上下文消息' : '上下文预览'}</h2><p className="context-line">{displayProject?.displayName ?? projectId}{pending ? ' · 原请求' : selectedWork ? ` · ${selectedWork.work.title}` : ' · 当前会话'}</p></div>
+    <header><div><h2 id={`${tabsId}-heading`}>{view === 'history' ? '上下文使用记录' : pending ? '核对消息请求' : prepared ? '确认上下文消息' : '上下文预览'}</h2><p className="context-line">{headerProject?.displayName ?? projectId}{view === 'history' ? '' : pending ? ' · 原请求' : selectedWork ? ` · ${selectedWork.work.title}` : ' · 当前会话'}</p></div>
       <button type="button" className="icon-button" aria-label="关闭上下文预览" title="关闭上下文预览" disabled={sending} onClick={onClose}><X size={18} /></button></header>
+    {hasHistory && configuration.contextPreviewAvailable !== false && <div className="context-tabs" role="tablist" aria-label="上下文视图" onKeyDown={event => {
+      if (busy || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+      event.preventDefault()
+      const next = event.key === 'Home' ? 'preview' : event.key === 'End' ? 'history' : view === 'preview' ? 'history' : 'preview'
+      setView(next); document.getElementById(`${tabsId}-${next}`)?.focus()
+    }}><button type="button" role="tab" id={`${tabsId}-preview`} aria-controls={`${tabsId}-preview-panel`} aria-selected={view === 'preview'} tabIndex={view === 'preview' ? 0 : -1} disabled={busy} onClick={() => setView('preview')}><FileSearch size={15} />预览</button>
+      <button type="button" role="tab" id={`${tabsId}-history`} aria-controls={`${tabsId}-history-panel`} aria-selected={view === 'history'} tabIndex={view === 'history' ? 0 : -1} disabled={busy} onClick={() => setView('history')}><History size={15} />使用记录</button></div>}
+    {view === 'history' && hasHistory ? <div role="tabpanel" id={`${tabsId}-history-panel`} aria-labelledby={configuration.contextPreviewAvailable !== false ? `${tabsId}-history` : undefined}>
+      <ContextHistoryPanel transport={transport} configuration={configuration} conversationId={conversationId} projectId={projectId} works={works}
+        {...(selectedWork ? { initialWorkId: selectedWork.work.id } : {})}
+        onProjectChange={id => { clear(); setProjectId(id); setWorkId(''); setSelections(previous => previous.filter(id => id !== 'work' && id !== 'artifacts')) }}
+        {...(onOpenConversation ? { onOpenConversation } : {})} />
+    </div> : <div role={hasHistory ? 'tabpanel' : undefined} id={`${tabsId}-preview-panel`} aria-labelledby={hasHistory ? `${tabsId}-preview` : undefined}>
     {!displayPrepared && <fieldset className="context-controls" disabled={busy}>
       <div className="context-selectors"><label>项目<select aria-label="上下文项目" value={projectId} onChange={event => {
         clear(); setProjectId(event.target.value); setWorkId(''); setSelections(previous => previous.filter(id => id !== 'work' && id !== 'artifacts'))
@@ -158,11 +174,9 @@ export function ContextWorkspace({ transport, configuration, conversationId, wor
       <ul className="context-group-list">{displayPreview.groups.map(group => <li key={group.name}><span>{groupLabel[group.name]}</span><span>{stateLabel[group.status]} · {group.used.files} 条</span></li>)}</ul>
       {displayPreview.issues.length > 0 && <p className="context-warning" role="status">{displayPreview.issues.includes('conversation_scan_incomplete') ? '会话较长，仅检查了最近 600 条消息。' : ''}{displayPreview.issues.includes('artifact_source_missing') ? '部分交付来源缺失。' : ''}</p>}
       {displayPreview.injectionFlags.length > 0 && <p className="context-warning" role="status">{displayPreview.injectionFlags.length} 条来源含指令式文本，已标记为非授权内容。</p>}
-      <div className="context-source-list">{displayPreview.sources.map(source => <details className="context-source" key={source.sourceId}>
-        <summary><FileSearch size={15} /><span>{kindLabel[source.kind]}<small>{size(source.bytes)} · 约 {Math.ceil(source.estimatedTokens)} tokens{source.truncated ? ' · 已截断' : ''}</small></span><ChevronDown size={14} /></summary>
-        <pre>{source.content}</pre><dl><dt>来源摘要</dt><dd><code>{source.sourceDigest}</code></dd><dt>预览摘要</dt><dd><code>{source.previewDigest}</code></dd></dl>
-      </details>)}</div>
+      <ContextSourceList sources={displayPreview.sources} />
       {displayPreview.omitted.length > 0 && <details className="context-omissions"><summary>未纳入 {displayPreview.omitted.length} 项</summary><ul>{displayPreview.omitted.map((item, index) => <li key={index}>{reasonLabel[item.reason] ?? '来源不符合读取条件'}{item.path && <code>{item.path}</code>}</li>)}</ul></details>}
     </section>}
+    </div>}
   </dialog>, document.body)
 }
