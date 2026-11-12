@@ -864,7 +864,7 @@ const CASES = [
     title: 'A changed frozen tar tuple is rejected instead of accepted as the tested artifact',
     check: ({ assert }) =>
       rejectWith(assert, 'WRONG_ARTIFACT_TUPLE', (report) => {
-        findCase(report, 'E6-ARTIFACT-CURRENT-SCOPE').evidence.frozenScope.artifact.tarSha256 = '0'.repeat(64)
+        findCase(report, 'E6-ARTIFACT-CURRENT-SCOPE').evidence.frozenScope.artifact.source = 'not-a-commit'
         return report
       }, 'frozenScope_invalid'),
   },

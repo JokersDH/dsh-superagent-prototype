@@ -369,7 +369,7 @@ export function replyBadArtifactIssues(value) {
 export function frozenScopeIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = [], artifact = value.artifact ?? {}, capability = value.capability ?? {}, main = value.main ?? {}
-  if (!HEX64(artifact.tarSha256) || !HEX64(artifact.source) || !isSubstantive(artifact.buildId) || !Number.isSafeInteger(artifact.schema) || !Number.isSafeInteger(artifact.tarBytes)) issues.push('tuple')
+  if (!HEX64(artifact.tarSha256) || !/^[a-f0-9]{40}(?:[a-f0-9]{24})?$/.test(String(artifact.source ?? '')) || !isSubstantive(artifact.buildId) || !Number.isSafeInteger(artifact.schema) || !Number.isSafeInteger(artifact.tarBytes)) issues.push('tuple')
   if (!Number.isSafeInteger(main.schema)) issues.push('main_schema')
   for (const key of ['hasContextRoute', 'hasHistoryRoute', 'hasSourcesRoute', 'hasReplyResults']) if (typeof capability[key] !== 'boolean') issues.push(key)
   if (value.currentMainEligible === true && !(capability.hasContextRoute && capability.hasHistoryRoute && capability.hasSourcesRoute && capability.hasReplyResults)) issues.push('eligibility')
