@@ -22,11 +22,11 @@ const timeout = (promise, milliseconds = 5000) => {
 }
 const deferred = () => { let resolve; const promise = new Promise(value => { resolve = value }); return { promise, resolve } }
 
-async function fixture(t, respond = async () => ({ text: 'Bounded context reply.', model: 'mock-context' })) {
+async function fixture(t, respond = async () => ({ text: 'Bounded context reply.', model: 'mock-context' }), completedResults = false) {
   const root = mkdtempSync(join(tmpdir(), 'pa-context-product-')), stateRoot = join(root, 'state'), projectRoot = join(root, 'project')
   mkdirSync(stateRoot); mkdirSync(projectRoot); mkdirSync(join(projectRoot, 'src'))
   let store = new ProductStore({ path: join(stateRoot, 'state.sqlite') }), product, now = new Date().toISOString(), beforeStatus
-  const records = new Map(), requests = [], servers = [], releases = []
+  const records = new Map(), completedRecords = new Map(), requests = [], servers = [], releases = []
   const status = () => {
     const hook = beforeStatus; beforeStatus = undefined; hook?.()
     return { protocol: 'assistant-provider/1', configured: true, baseURL: 'https://fixture.invalid/v1',
@@ -49,9 +49,22 @@ async function fixture(t, respond = async () => ({ text: 'Bounded context reply.
         return { binding, replayed: false }
       },
     }
+    // This result-port fallback survives only in the test process. Reopening SQLite below proves
+    // the product consumer/receipts/artifact path, not A's pending durable result implementation.
+    const replyResults = completedResults ? store.workflows.assistant.replyResults ?? {
+      forRequest: id => structuredClone(completedRecords.get(id)),
+      forReply: id => structuredClone([...completedRecords.values()].find(value => value.replyMessageId === id)),
+      put: value => {
+        assert.ok(store.uow.nesting > 0)
+        const result = structuredClone(value)
+        store.uow.afterCommit(() => completedRecords.set(result.requestId, result))
+        return { result, replayed: false }
+      },
+    } : undefined
     product = createProductRuntime({ store, principal, stateRoot, scratchProject: projectRoot,
       projects: [{ id: scope.projectId, displayName: 'Payment project', scope }], actionSecret: Buffer.alloc(32, 38),
-      assistantProvider: provider, assistantContextBindings: bindings, now: () => now })
+      assistantProvider: provider, assistantContextBindings: bindings,
+      ...(replyResults ? { assistantReplyResults: replyResults } : {}), now: () => now })
   }
   setup()
   store.product.messages.append({ id: 'payment-source', conversationId: 'context-conversation', projectId: scope.projectId,
@@ -120,6 +133,24 @@ test('a selected decision expiring at the final reservation blocks the provider 
   assert.equal(h.requests.length, 0)
   assert.equal(h.store.commands.get(key('assistant-request', key('message', prepared.commandId))), undefined)
   assert.ok(h.messages().some(message => message.provenance === 'application_notice' && message.text.includes('未发送给模型')))
+})
+
+test('HTTP context replies use the completed-result consumer after SQLite reopen with an explicitly in-process result port', async t => {
+  const h = await fixture(t, async () => ({ text: 'Recovered selected-context reply.', model: 'mock-context' }), true)
+  const prepared = await h.prepare()
+  await h.send(prepared)
+  const messageId = key('message', prepared.commandId)
+  h.store.db.exec("CREATE TRIGGER fail_reply BEFORE INSERT ON conversation_messages WHEN json_extract(NEW.value, '$.role') = 'assistant' BEGIN SELECT RAISE(ABORT, 'injected reply failure'); END")
+  await h.flush()
+  assert.equal(h.requests.length, 1)
+  assert.equal(h.messages().filter(message => message.provenance === 'reasoner_reply').length, 0)
+  const audit = await h.read(`/v1/messages/${messageId}/context`)
+  h.store.db.exec('DROP TRIGGER fail_reply'); h.requeueDue(); await h.reopen(); await h.flush()
+  assert.equal(h.requests.length, 1)
+  const replies = h.messages().filter(message => message.provenance === 'reasoner_reply')
+  assert.equal(replies.length, 1); assert.equal(replies[0].text, 'Recovered selected-context reply.')
+  assert.deepEqual(replies[0].sourceRefs, [messageId])
+  assert.deepEqual(await h.read(`/v1/messages/${messageId}/context`), audit)
 })
 
 test('provider unavailability does not block an original receipt replay but rejects an unsent confirmation durably', async t => {

@@ -4,7 +4,7 @@ import { ApplicationConversations, ApplicationFault, createProductApplication } 
 import type { ApplicationOptions } from '@personal-agent/application'
 import { sharedAttentionRanker } from '@personal-agent/routing'
 import { recoveryTargetInventory } from '@personal-agent/storage'
-import type { AssistantContextBindings, AssistantContextPrepare, AssistantContextSend, AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryActivationCommit, RecoveryPrepare, RecoveryTargetInventoryReader, RecoveryTargetMaterial, RecoveryTargetMaterializer, RecoveryTargetPrepareInput, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
+import type { AssistantContextBindings, AssistantContextPrepare, AssistantContextSend, AssistantReplyResults, AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryActivationCommit, RecoveryPrepare, RecoveryTargetInventoryReader, RecoveryTargetMaterial, RecoveryTargetMaterializer, RecoveryTargetPrepareInput, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { WorkEvidenceSchema } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
@@ -35,6 +35,7 @@ import { ProductContextPreview } from './context-preview.ts'
 import { ProductAssistantContext } from './assistant-context-use.ts'
 import { ProductRecoveryTargets } from './recovery-target-service.ts'
 import { initializeRecoveryTarget } from './recovery-target-initializer.ts'
+import { CompletedAssistantReplies } from './assistant-reply-results.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -49,6 +50,7 @@ export function createProductRuntime(
     startupMode?: 'normal' | 'recovery_readonly'
     attentionRanker?: AttentionRanker
     assistantContextBindings?: AssistantContextBindings
+    assistantReplyResults?: AssistantReplyResults
     recoveryTargets?: {
       materializer: RecoveryTargetMaterializer
       inventory?: RecoveryTargetInventoryReader
@@ -172,9 +174,13 @@ export function createProductRuntime(
   })
   const assistantStreams = new AssistantStreams()
   const evidenceHistory = new ProductEvidenceHistory(store, application, () => configuredProjects.map(project => project.id), options.actionSecret, options.now)
+  const replyResults = options.assistantReplyResults ??
+    (store.workflows.assistant as typeof store.workflows.assistant & { replyResults?: AssistantReplyResults }).replyResults
   if (options.assistantProvider)
     handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams, {
       nativeExecution: !!options.native,
+      ...(replyResults ? { completed: new CompletedAssistantReplies(store, replyResults, options.principal,
+        () => configuredProjects.map(project => project.id)) } : {}),
       context: message => assistantContext?.forMessage(message) ?? Promise.resolve(undefined),
     })
   const read: NonNullable<LocalHttpOptions['read']> = {

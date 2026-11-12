@@ -9,6 +9,7 @@ import type { Effects } from '@personal-agent/effects'
 import { ModelProviderError } from './model-provider.ts'
 import type { AssistantModelPort } from './model-provider.ts'
 import type { AssistantStreams } from './assistant-streams.ts'
+import type { CompletedAssistantReplies } from './assistant-reply-results.ts'
 
 const Intent = z.strictObject({ messageId: IdSchema, conversationId: IdSchema, projectId: IdSchema })
 const SYSTEM =
@@ -19,7 +20,7 @@ export function handleAssistantReplies(
   store: ProductStore,
   provider: AssistantModelPort,
   streams?: AssistantStreams,
-  capabilities?: { nativeExecution: boolean; context?(message: ConversationMessage): Promise<{
+  capabilities?: { nativeExecution: boolean; completed?: CompletedAssistantReplies; context?(message: ConversationMessage): Promise<{
     binding: AssistantContextBinding; content: string; assertCurrent(): void
   } | undefined> },
 ) {
@@ -61,6 +62,19 @@ export function handleAssistantReplies(
         return
       const requestId = key('assistant-request', input.messageId)
       if (store.commands.get(requestId)) {
+        let recovered
+        try { recovered = capabilities?.completed?.read(requestId) }
+        catch {
+          append(input, noticeId, '已完成的回复无法核对，未自动重发。请保留本条消息并检查本机数据。', true)
+          return
+        }
+        if (recovered) {
+          append(input, replyId, recovered.text)
+          streams?.start({ ...input, replyId, model: recovered.model })
+          streams?.append(input.messageId, recovered.text)
+          streams?.finish(input.messageId, 'complete')
+          return
+        }
         append(input, noticeId, '上次模型请求的结果未能确认，未自动重发。请重新发送消息后再试。', true)
         return
       }
@@ -105,11 +119,18 @@ export function handleAssistantReplies(
           return true
         })
         .reverse()
-      const model = provider.status().model
+      let prepared
+      try { prepared = provider.prepareReply?.() }
+      catch (error) {
+        append(input, noticeId, error instanceof ModelProviderError ? error.message : '模型连接暂时不可用，本条消息未发送。', true)
+        return
+      }
+      const model = prepared?.model ?? provider.status().model
       const body = JsonSchema.parse({
         messageId: input.messageId,
         conversationId: input.conversationId,
         model,
+        ...(prepared ? { configurationDigest: prepared.configurationDigest } : {}),
         messages,
         ...(context ? { contextRequestId: context.binding.requestId, bundleDigest: context.binding.bundleDigest } : {}),
       })
@@ -131,7 +152,7 @@ export function handleAssistantReplies(
       let result
       const signal = streams?.start({ ...input, replyId, model })
       try {
-        result = await provider.reply(
+        result = await (prepared ? prepared.reply.bind(prepared) : provider.reply.bind(provider))(
           [
             {
               role: 'system',
@@ -161,7 +182,8 @@ export function handleAssistantReplies(
         return
       }
       try {
-        append(input, replyId, result.text)
+        const completed = capabilities?.completed?.save(requestId, result)
+        append(input, replyId, completed?.text ?? result.text)
         streams?.finish(input.messageId, 'complete')
       } catch (error) {
         streams?.finish(input.messageId, 'interrupted')

@@ -8,12 +8,14 @@ import { PrivateModelProvider } from '../../apps/coordinator/product/model-provi
 async function fixture(t, status = 200, content = 'SDK reply', chunks = [content], finish = true) {
   const directory = mkdtempSync('/tmp/pa-provider-')
   let calls = 0
+  const requests = []
   const server = createServer(async (req, res) => {
     let body = ''
     for await (const bytes of req) body += bytes
     calls++
     assert.equal(req.headers.authorization, 'Bearer fixture-private-api-key')
     const input = JSON.parse(body)
+    requests.push(input)
     assert.equal(input.model, 'model-1')
     if (status === 200 && input.stream) {
       res.writeHead(200, { 'content-type': 'text/event-stream' })
@@ -65,6 +67,7 @@ async function fixture(t, status = 200, content = 'SDK reply', chunks = [content
   return {
     file,
     key,
+    requests,
     provider: new PrivateModelProvider(file),
     get calls() {
       return calls
@@ -196,4 +199,21 @@ test('model text arrives incrementally before the upstream stream has finished',
   assert.equal(streamingRequested, true)
   assert.equal(outcome, 'delta')
   assert.equal(deltas.join(''), '第一段第二段')
+})
+
+test('a prepared request pins the exact model/configuration and can only send once', async t => {
+  const h = await fixture(t)
+  const prepared = h.provider.prepareReply(), original = prepared.configurationDigest
+  assert.equal(prepared.model, 'model-1')
+  assert.match(original, /^[a-f0-9]{64}$/)
+  h.provider.selectModel('model-2')
+  const changed = JSON.parse(readFileSync(h.file, 'utf8'))
+  writeFileSync(h.file, JSON.stringify({ ...changed, apiKey: 'different-fixture-private-key', maxOutputTokens: 128 }))
+  assert.notEqual(h.provider.prepareReply().configurationDigest, original)
+  assert.equal((await prepared.reply([{ role: 'user', content: 'hello' }])).model, 'model-1')
+  assert.equal(h.provider.status().model, 'model-2')
+  await assert.rejects(prepared.reply([{ role: 'user', content: 'again' }]), error => error.code === 'request_already_used')
+  assert.equal(h.calls, 1)
+  assert.equal(h.requests[0].max_tokens, 64)
+  assert.doesNotMatch(JSON.stringify(prepared), /fixture-private-api-key|apiKey|model\.json/)
 })
