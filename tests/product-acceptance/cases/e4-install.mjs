@@ -436,6 +436,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
     id,
     title,
     layer: extra.layer ?? LAYERS.INSTALLED,
+    ...(extra.evidence ? { evidence: extra.evidence } : {}),
     limitations: [
       'Same-machine staged install from D\'s frozen tar.gz; only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured.',
       'No vendor model call, no personal native end-to-end; the controlled fixture executor is used inside the install.',
