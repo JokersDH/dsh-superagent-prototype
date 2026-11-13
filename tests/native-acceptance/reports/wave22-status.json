@@ -1,0 +1,76 @@
+{
+  "wave": "product-wave-22",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "54d6e1b",
+  "previousCandidate": "c40f7b0",
+  "checkpoint": "1 of 3",
+  "scopeNote": "Zero real model and native turns. Only B-owned paths. No new ledger/lifecycle/wire, no second coordinator, no shared-contract or main-product-class edit, no guard weakened, no global socket scan. Twelve services and all ledgers untouched. Two historical report diffs and untracked b16-real-begin.mjs preserved.",
+
+  "priorRepairsNotRedone": {
+    "controlContract": "registration/guard/pending/post-proof 5/5 (wave-21) unchanged",
+    "oldIdentityInode": "3/3 unchanged",
+    "reconcileFourBranches": "4/4 unchanged",
+    "moduleStrict": "actual-module strict + exactOptionalPropertyTypes unchanged",
+    "normalProducer": "not rewritten; normal Q&A + physical stop 10/10 unchanged"
+  },
+
+  "milestone1_businessAttach": {
+    "status": "PARTIAL - CHANNEL DELIVERED, END-TO-END HANDOVER NOT PASSING",
+    "delivered": [
+      {
+        "file": "packages/execution/src/recovery-transport.ts",
+        "change": "the existing authenticated Runner endpoint now also carries business traffic: GET /v1/facts?since=N replays facts the Runner itself recorded, and POST /v1/commands admits business commands. Both sit behind the SAME bearer auth and the SAME producer identity check as inspect/cancel, reuse the id-conflict and capacity rules, and are refused with business_action_forbidden/identity_mismatch exactly like the control routes.",
+        "note": "a helper named request shadowed node:http's request and was renamed to invoke; that was a real bug found by the standalone compile"
+      },
+      {
+        "file": "apps/runner/src/recovery-endpoint.ts",
+        "change": "optional facts/command passed through so a Runner can serve the business channel over its existing endpoint"
+      },
+      {
+        "file": "apps/runner/src/runner-service.ts",
+        "change": "the real Runner now serves facts from its OWN durable journal (FileCriticalJournal.entries) and admits business commands through the existing runner.feed, refusing when business admission is closed or the writer was physically stopped"
+      },
+      {
+        "file": "apps/runner/src/business-attach.ts",
+        "change": "attach port: same attempt/session/contract/epoch re-bound from caller state, pinned registered endpoint required, authenticated inspection before any write, Broker beforeCommand guard preserved and unsuppressed, state-aware reconcile (not_seen/intent_recorded/observed/unknown), returns post-command proof and never presents sent as quiescence"
+      }
+    ],
+    "verification": {
+      "typecheck": "root tsconfig typecheck reports no error in recovery-transport, recovery-endpoint, runner-service or business-attach",
+      "controlRegression": "PA_ADMISSION_REPORT=/tmp/pa-b-wave22-regress.json node tools/bootstrap/probe-wave22-runtime.mjs -> PASS_SCOPED_CONTROL_STATE_BRANCHES 4/4, sourceStable true"
+    },
+    "endToEndProof": {
+      "harness": "tests/native-acceptance/b22-business-attach.mjs",
+      "status": "FAILING - NOT EVIDENCE",
+      "whatItIs": "spawns a real Runner through RunnerLink, attaches client A, reads original facts, disconnects A, attaches client B to the SAME Runner and expects the original fact replay plus one guarded original command",
+      "observed": "after aligning the producer identity so the inspection no longer fails with identity_mismatch, the facts request comes back non-200 and surfaces as unknown_outcome",
+      "meaning": "the business channel is wired and type-clean, but the A-to-B handover over a real Runner is NOT proven. This is the first thing to fix next."
+    }
+  },
+
+  "milestonesNotReached": {
+    "milestone2_coordinatorSigkillNewProcessRecovery": "NOT_REACHED - no new process reconnecting from the same A store to the original command/attempt/session/epoch with a real native_applied answer, no bounded begin/answer ACK/receipt windows, no already-received-no-resend or unknown-no-new-id",
+    "milestone3_recoveredVerification": "NOT_REACHED - no recovered check/current candidate/human accept, no real runtime valid old epoch or late-ACK refusal, no 2/4 slots and resource return",
+    "mainPortRfcTypes": "the attach port above is the intended minimal surface for main, but no RFC document has been written yet"
+  },
+
+  "wholePackageComplete": false,
+  "wholePackageNote": "milestone 1 is partial and milestones 2 and 3 are NOT_REACHED, so this is not a finished package.",
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "bConsumes": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "limitations": [
+    "the business channel is exercised only in a controlled fake-producer lane; no installed agent or gateway was contacted",
+    "the A-to-B handover proof does not pass yet, so same-Runner client handover is claimed only as wired source, not as observed evidence",
+    "no coordinator SIGKILL recovery, no ACK/receipt window, no recovered verify/candidate/accept, no slot matrix",
+    "one of the three required runnable checkpoints has been published"
+  ]
+}

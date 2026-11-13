@@ -269,6 +269,22 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 await stopPhysical()
                 void command
               },
+              // Business attach: facts come from this Runner's own durable journal, so a second client
+              // recovers the original work instead of trusting its own memory or a second ledger.
+              facts: async since => {
+                const entries = journal!.entries().map((entry, index) => ({
+                  seq: index + 1,
+                  fact: entry.fact,
+                  payload: entry.payload,
+                }))
+                return { frames: entries.filter(entry => entry.seq > since), next: entries.length }
+              },
+              // Business commands are admitted to the SAME attempt and child through the existing feed.
+              command: async command => {
+                if (!runner) throw new Error('Runner business channel is not bootstrapped')
+                if (businessClosed || physicallyStopped) throw new Error('Runner business admission is closed')
+                await runner.feed(command)
+              },
             })
           }
           write({

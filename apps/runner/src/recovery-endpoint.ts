@@ -15,6 +15,10 @@ export type RecoveryEndpointOptions = {
   resources: () => RunnerResourceState[]
   state: () => 'serving' | 'terminated' | 'unknown'
   cancel: (command: Extract<RunnerCommand, { kind: 'cancel' }>) => Promise<void>
+  /** Durable business facts this Runner already recorded, for attach replay. */
+  facts?: (since: number) => Promise<{ frames: unknown[]; next: number }>
+  /** Business command intake for an attached client; applied to the same attempt and child. */
+  command?: (command: RunnerCommand) => Promise<void>
   now?: () => string
 }
 export const CREDENTIAL_FILE = 'runner.credential'
@@ -62,6 +66,8 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
       await options.cancel(command)
       return state()
     },
+    ...(options.facts ? { facts: options.facts } : {}),
+    ...(options.command ? { command: async (command) => { await options.command!(command); return state() } } : {}),
   })
   return {
     socketPath,

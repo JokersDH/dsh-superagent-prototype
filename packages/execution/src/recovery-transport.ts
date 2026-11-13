@@ -27,6 +27,17 @@ export interface RecoveryRunnerPort {
   inspect(): Promise<RunnerState>
   /** Must close business admission before attempting to stop owned resources. */
   cancel(command: Extract<ReturnType<typeof RunnerCommandSchema.parse>, { kind: 'cancel' }>): Promise<RunnerState>
+  /**
+   * Business facts already recorded by this Runner, from `since` onward. Replay is what lets a second
+   * client recover the original work without a second ledger: the frames come from the Runner's own
+   * durable journal, not from the caller's memory.
+   */
+  facts?(since: number): Promise<{ frames: unknown[]; next: number }>
+  /**
+   * Business command intake for an attached client. The Runner applies it to the SAME attempt and
+   * child; this is admission of an authenticated command, not a second execution lifecycle.
+   */
+  command?(command: ReturnType<typeof RunnerCommandSchema.parse>): Promise<RunnerState>
 }
 export class RunnerLinkError extends Error {
   readonly code: 'unavailable' | 'auth_failed' | 'identity_mismatch' | 'invalid_response' | 'timeout' | 'unknown_outcome' | 'stale_proof'
@@ -88,12 +99,36 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
   catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error }
   const trusted = identity(context), key = credential(endpoint.credentialPath)
   const cancels = new Map<string, { body: string; result: Promise<RunnerInspection> }>()
+  // Business commands get their own replay map so a control cancel and a business command cannot
+  // shadow each other's id, while both keep the same conflict and capacity rules.
+  const commands = new Map<string, { body: string; result: Promise<RunnerInspection> }>()
   const inspect = async (state: RunnerState) => RunnerInspectionSchema.parse({ ...state, protocol: 1, ...trusted, observedAt: new Date().toISOString() })
   const server = createServer((req, res) => { void (async () => {
     const supplied = typeof req.headers.authorization === 'string' ? req.headers.authorization : ''
     const expected = `Bearer ${key}`
     if (Buffer.byteLength(supplied) !== Buffer.byteLength(expected) || !timingSafeEqual(Buffer.from(supplied), Buffer.from(expected))) { reply(res, 401, { error: 'auth_failed' }); return }
     if (req.method === 'GET' && req.url === '/v1/inspection') { reply(res, 200, await inspect(await backend.inspect())); return }
+    if (req.method === 'GET' && req.url?.startsWith('/v1/facts')) {
+      if (!backend.facts) { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
+      const since = Number(new URL(req.url, 'http://runner').searchParams.get('since') ?? '0')
+      if (!Number.isSafeInteger(since) || since < 0) { reply(res, 400, { error: 'invalid_since' }); return }
+      const replay = await backend.facts(since)
+      if (!Array.isArray(replay.frames) || !Number.isSafeInteger(replay.next) || replay.next < since) { reply(res, 503, { error: 'invalid_replay' }); return }
+      reply(res, 200, { frames: replay.frames, next: replay.next })
+      return
+    }
+    if (req.method === 'POST' && req.url === '/v1/commands') {
+      if (!backend.command) { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
+      const command = RunnerCommandSchema.parse(await body(req))
+      if (!matches({ ...trusted, attempt: command }, trusted)) { reply(res, 409, { error: 'identity_mismatch' }); return }
+      const content = JSON.stringify(command), existing = commands.get(command.id)
+      if (existing && existing.body !== content) { reply(res, 409, { error: 'command_conflict' }); return }
+      if (!existing && commands.size >= 256) { reply(res, 503, { error: 'control_capacity' }); return }
+      const result = existing?.result ?? Promise.resolve().then(() => backend.command!(command)).then(inspect)
+      if (!existing) { commands.set(command.id, { body: content, result }); void result.catch(() => undefined) }
+      reply(res, 200, await result)
+      return
+    }
     if (req.method !== 'POST' || req.url !== '/v1/cancel') { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
     const command = RunnerCommandSchema.parse(await body(req))
     if (command.kind !== 'cancel') { reply(res, 403, { error: 'business_action_forbidden' }); return }
@@ -126,7 +161,7 @@ export function verifiedRunnerInspection(proof: VerifiedRunnerInspection, maxAge
 export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimeProducer, timeoutMs = 3000) {
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0 || timeoutMs > 60_000) throw new RangeError('Runner timeout must be between 0 and 60000 milliseconds')
   const endpoint = structuredClone(input), trusted = identity(context), key = credential(endpoint.credentialPath)
-  async function call(method: 'GET' | 'POST', path: string, data?: unknown): Promise<VerifiedRunnerInspection> {
+  async function invoke(method: 'GET' | 'POST', path: string, data?: unknown): Promise<unknown> {
     privateDirectory(dirname(endpoint.socketPath))
     let stat
     try { stat = lstatSync(endpoint.socketPath) }
@@ -152,6 +187,10 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
       req.once('error', error => { clearTimeout(deadline); reject(error instanceof RunnerLinkError ? error : new RunnerLinkError('unavailable', 'Runner recovery connection is unavailable')) })
       req.end(bytes)
     })
+    return { value, startedAt }
+  }
+  async function call(method: 'GET' | 'POST', path: string, data?: unknown): Promise<VerifiedRunnerInspection> {
+    const { value, startedAt } = await invoke(method, path, data) as { value: unknown; startedAt: number }
     const parsed = RunnerInspectionSchema.safeParse(value)
     if (!parsed.success) throw new RunnerLinkError('invalid_response', 'Runner inspection did not match the recovery protocol')
     if (!matches(parsed.data, trusted)) throw new RunnerLinkError('identity_mismatch', 'Runner inspection belongs to another registered attempt')
@@ -159,5 +198,15 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
     verified.set(proof, { value: parsed.data, startedAt, endpoint })
     return proof
   }
-  return Object.freeze({ inspect: () => call('GET', '/v1/inspection'), cancel: (command: Extract<ReturnType<typeof RunnerCommandSchema.parse>, { kind: 'cancel' }>) => call('POST', '/v1/cancel', command) })
+  return Object.freeze({ inspect: () => call('GET', '/v1/inspection'),
+    cancel: (command: Extract<ReturnType<typeof RunnerCommandSchema.parse>, { kind: 'cancel' }>) => call('POST', '/v1/cancel', command),
+    facts: async (since = 0) => {
+      if (!Number.isSafeInteger(since) || since < 0) throw new RunnerLinkError('invalid_response', 'Fact replay cursor must be a nonnegative integer')
+      // Replay is not an inspection, so it is validated as its own shape rather than forced through one.
+      const { value } = await invoke('GET', `/v1/facts?since=${since}`) as { value: unknown }
+      const replay = value as { frames?: unknown; next?: unknown }
+      if (!Array.isArray(replay?.frames) || !Number.isSafeInteger(replay?.next)) throw new RunnerLinkError('invalid_response', 'Runner fact replay did not match the attach protocol')
+      return { frames: replay.frames as unknown[], next: replay.next as number }
+    },
+    command: (command: ReturnType<typeof RunnerCommandSchema.parse>) => call('POST', '/v1/commands', command) })
 }
