@@ -1,0 +1,242 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "a64a127",
+  "mergeCommit": "20e1817",
+  "checkpoints": [
+    "4968e65",
+    "60a23e0"
+  ],
+  "testedSourceCommit": "60a23e0",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "evidenceFamilySetVersion": 2,
+  "evidenceFamilyCount": 21,
+  "actualConsumers": {
+    "sourceInspectPrepare": {
+      "status": "PASS",
+      "evidence": "wave16-source-combination.txt",
+      "tests": "66/66"
+    },
+    "candidates": {
+      "status": "PASS",
+      "evidence": "wave16-candidate-consumers.txt",
+      "tests": "31/31"
+    },
+    "productExecution": {
+      "status": "PASS",
+      "evidence": "wave16-product-execution.txt",
+      "tests": "20/20"
+    },
+    "mainProductConsumers": {
+      "status": "PASS",
+      "evidence": "wave16-main-consumers.txt",
+      "tests": "89/89"
+    },
+    "sourceConfirmAuthorization": {
+      "status": "NOT_REACHED",
+      "detail": "main commit remains 422; private authorization/target start not implemented"
+    }
+  },
+  "probe": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave16-a.json node tools/bootstrap/probe-wave16-storage.mjs $PWD",
+    "status": "PASS",
+    "pass": 4,
+    "fail": 0,
+    "evidence": "packages/workflows/reports/wave16-storage-probe.json"
+  },
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "snapshot integrity",
+      "evidence": [
+        "wave16-storage-probe.json 4/4",
+        "snapshot-d versioned test"
+      ],
+      "note": "current v2 requires exact 21-family set; removing effect_queue/keeping one family/duplicate/unknown/future version blocked; nonempty positive covers queue, derived work_id, runtime/resource and reply/context"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "versioned generation/verification",
+      "evidence": [
+        "snapshot-d tests"
+      ],
+      "note": "create writes workflow-snapshot/2 + workflow-evidence/2 familySetVersion 2 and verify uses the same list; legacy v1 manifests verify only recorded families; append-only, no new DB migration"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "real candidate restore",
+      "evidence": [
+        "wave16-candidate-restore.case.ts",
+        "wave16-candidate-consumers.txt 31/31"
+      ],
+      "note": "local SDK mock -> A18 result -> actual candidate GET/prepare -> explicit confirmation (proposal/decision/receipt) -> snapshot -> second-root restore reads original body/proposals/decision"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "real Q&A continuity",
+      "evidence": [
+        "wave16-question-restore.case.ts",
+        "wave16-product-execution.txt 20/20"
+      ],
+      "note": "controlled Application/Broker/fixture Runner creates Work/Ticket/link, original question/answer/native delivery and queue/runtime rows; second-root restore reads them and no startup authority"
+    },
+    {
+      "phase": "A5",
+      "status": "NOT_REACHED",
+      "scope": "main confirmation",
+      "evidence": [
+        "source combination 66/66 commit 422"
+      ],
+      "note": "main has no source confirm/private authorization/target start; only this item is NOT_REACHED, all other stages continue"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "independent processes",
+      "evidence": [
+        "reply-crash tests",
+        "snapshot-crash tests"
+      ],
+      "note": "SIGKILL around result/message/source confirmation and snapshot creation; original body once; partial manifest blocked; v2 manifest is used"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "D/E recipe",
+      "evidence": [
+        "wave16-data-recipe.md"
+      ],
+      "note": "runnable producer/restore commands, exact family list/version, artifact size and negative matrix; no HTTP/UI/contract change"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "legacy compatibility",
+      "evidence": [
+        "snapshot-d legacy v1 test",
+        "assistant-context v15/v16 tests"
+      ],
+      "note": "current DB schema18 and old DB upgrades retain FTS/messages/receipts/bindings/results; old manifest v1 keeps only its recorded family capability; no authorization inheritance"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "bounded cost",
+      "evidence": [
+        "wave16-performance.json"
+      ],
+      "note": "10000 bindings first page 3.8ms; 13105-row source 73ms; bounded 1000 rows stops at 28 families in 1.9ms; 512KiB bundle; snapshot create 570.1ms/verify 80.6ms; lazy body"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "package regression",
+      "evidence": [
+        "wave16-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, main candidate/execution/source/target consumers, typecheck/build and static packet check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "109/109",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "mainProductConsumers": "89/89",
+    "mainTargetConsumers": "50/50",
+    "candidateConsumers": "31/31",
+    "productExecution": "20/20",
+    "sourceCombination": "66/66",
+    "snapshotProbe": "4/4",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "evidenceFamilies": [
+    "decisions",
+    "legacy_decisions",
+    "proposals",
+    "project_settings",
+    "contracts",
+    "verifications",
+    "acceptances",
+    "outcomes",
+    "reviews",
+    "recovery_intents",
+    "assistant_context_bindings",
+    "user_questions",
+    "answers",
+    "answer_deliveries",
+    "effect_queue",
+    "runtime_bindings",
+    "runtime_current",
+    "resource_observations",
+    "dispatch_receipts",
+    "assistant_reply_results",
+    "recovery_activations"
+  ],
+  "limits": {
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288,
+    "bindingsTested": 10000,
+    "boundedScanFamilies": 28
+  },
+  "failureWindows": [
+    "remove effect_queue family",
+    "single-family manifest",
+    "duplicate/unknown family",
+    "future familySetVersion",
+    "legacy v1 subset",
+    "changed binding work_id",
+    "changed queue body",
+    "missing table/artifact",
+    "partial manifest",
+    "result/message/source SIGKILL",
+    "snapshot before/after SIGKILL",
+    "future schema"
+  ],
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "confirm-authorization-target",
+      "detail": "Actual source inspect/prepare and candidate confirmation are consumed; source confirm/private authorization/target start remain unimplemented and NOT_REACHED."
+    },
+    {
+      "owner": "main/D",
+      "id": "physical-writer-installation",
+      "detail": "Logical complete and snapshot restore never prove physical writer stop or grant installation/startup."
+    }
+  ],
+  "notTested": [
+    "main source confirm/private authorization and target activation",
+    "physical writer quiescence",
+    "D current-schema installation/upgrade",
+    "E independent release acceptance",
+    "real model/provider/native execution"
+  ],
+  "mainNextSteps": [
+    "supply the actual source confirm consumer and compare the exact ignored confirmation to a pre-confirmation baseline",
+    "keep marker/host/physical-writer and target-start checks separate",
+    "use the v2 exact family list and wave16-data-recipe for D/E",
+    "do not treat restored state as executable authorization"
+  ],
+  "updatedAt": "2026-11-13T10:30:00.000Z"
+}
