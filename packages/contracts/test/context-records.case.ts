@@ -34,4 +34,10 @@ test('historical source content requires the exact frozen source binding and gra
   assert.equal(ContextSourcesSchema.safeParse({ ...view, state: 'missing' }).success, false)
   assert.equal(ContextSourcesSchema.safeParse({ ...view, sources: [{ ...source, sourceId: 'foreign' }] }).success, false)
   assert.ok(ContextSourcesSchema.safeParse({ ...view, state: 'scope_changed', sources: [] }).success)
+  const withheld = { ...view, state: 'scope_changed', sources: [], scopeReview: { protocol: 'context-scope-review/1',
+    reasons: ['selection_narrowed'], partial: true, withheldSourceCount: 1, authorization: 'none' } }
+  assert.ok(ContextSourcesSchema.safeParse(withheld).success)
+  for (const change of [{ authorization: 'granted' }, { partial: false }, { withheldSourceCount: 0 },
+    { reasons: ['selection_narrowed', 'selection_narrowed'] }, { readableWorks: 100 }])
+    assert.equal(ContextSourcesSchema.safeParse({ ...withheld, scopeReview: { ...withheld.scopeReview, ...change } }).success, false)
 })

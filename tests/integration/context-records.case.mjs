@@ -132,6 +132,46 @@ test('scope narrowing withholds the frozen body and a different principal cannot
   assert.throws(() => h.service({ principal: { ...principal, authorityRef: 'other-authority' } }).sources(messageId), error => error.error?.code === 'forbidden')
   assert.equal(artifactReads, 0); assert.equal(h.calls, 0)
 })
+
+test('optional scope diagnostics explain the authoritative narrowed source result without artifact or unrelated reads', async t => {
+  const h = await fixture(t), { messageId } = await h.send('scope-review')
+  const selected = { ...scope, allowedPaths: ['src/narrow/'] }
+  const service = h.service({ projects: () => [{ id: scope.projectId, scope: selected }] })
+  let artifactReads = 0
+  const original = h.store.artifacts.get.bind(h.store.artifacts)
+  h.store.artifacts.get = (...args) => { artifactReads++; return original(...args) }
+  const before = h.store.events.cursor(), app = h.app({ read: { ...h.runtime.read,
+    contextSources: async (id, options) => service.sources(id, options) } })
+  const url = await h.listen(app)
+  const ordinary = await h.json(`/v1/messages/${messageId}/context/sources`, undefined, { url })
+  assert.equal(ordinary.state, 'scope_changed'); assert.equal('scopeReview' in ordinary, false)
+  const reviewed = await h.json(`/v1/messages/${messageId}/context/sources?scopeReview=1`, undefined, { url })
+  assert.deepEqual(reviewed.sources, []); assert.equal(reviewed.state, ordinary.state)
+  assert.deepEqual(reviewed.scopeReview, { protocol: 'context-scope-review/1', reasons: ['selection_narrowed'], partial: true,
+    withheldSourceCount: ordinary.binding.sources.length, authorization: 'none' })
+  assert.equal('readable' in reviewed.scopeReview, false)
+  assert.equal(artifactReads, 0); assert.equal(h.store.events.cursor(), before); assert.equal(h.calls, 0)
+  for (const suffix of ['?scopeReview=0', '?scopeReview=1&grant=foreign', '?scopeReview=1&scopeReview=1'])
+    assert.equal((await h.request(`/v1/messages/${messageId}/context/sources${suffix}`, undefined, { url })).status, 400)
+})
+
+test('scope diagnostics preserve verified bodies, distinguish added exclusions, and never grant a foreign principal access', async t => {
+  const h = await fixture(t), { messageId } = await h.send('scope-review-states')
+  const plain = await h.json(`/v1/messages/${messageId}/context/sources`)
+  const reviewed = await h.json(`/v1/messages/${messageId}/context/sources?scopeReview=1`)
+  const { scopeReview, ...withoutReview } = reviewed
+  assert.deepEqual(withoutReview, plain)
+  assert.deepEqual(scopeReview, { protocol: 'context-scope-review/1', reasons: [], partial: false, withheldSourceCount: 0, authorization: 'none' })
+  const excluded = h.service({ projects: () => [{ id: scope.projectId, scope: { ...scope, excludedPaths: ['src/private/'] } }] }).sources(messageId, { scopeReview: true })
+  assert.equal(excluded.state, 'scope_changed'); assert.deepEqual(excluded.sources, [])
+  assert.deepEqual(excluded.scopeReview.reasons, ['exclusion_added'])
+  const validity = h.service({ projects: () => [{ id: scope.projectId, scope: { ...scope, expiresAt: '2026-11-12T00:05:00.000Z' } }] }).sources(messageId, { scopeReview: true })
+  assert.equal(validity.state, 'scope_changed'); assert.deepEqual(validity.scopeReview.reasons, ['selection_validity_changed'])
+  assert.throws(() => h.service({ principal: { ...principal, userId: 'foreign' } }).sources(messageId, { scopeReview: true }), error => error.error?.code === 'forbidden')
+  const readonly = await h.listen(h.app({ startupMode: 'recovery_readonly' }))
+  assert.equal((await h.json(`/v1/messages/${messageId}/context/sources?scopeReview=1`, undefined, { url: readonly })).scopeReview.authorization, 'none')
+  assert.equal(h.calls, 0)
+})
 test('main rechecks raw history work scope before it can reach a public page', async t => {
   const h = await fixture(t), config = await h.runtime.read.configuration(), project = config.projects[0]
   const create = id => h.runtime.application.dispatch({ kind: 'create_work', commandId: id, conversationId: 'records-conversation',

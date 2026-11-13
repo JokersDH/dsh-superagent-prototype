@@ -216,7 +216,7 @@ export function createProductRuntime(
       if (!contextRecords) throw new ApplicationFault('unsupported_capability', 'Context history is not connected')
       return contextRecords.history(query)
     },
-    contextSources: async messageId => contextRecords?.sources(messageId),
+    contextSources: async (messageId, query) => contextRecords?.sources(messageId, query),
     workEvidenceHistory: (workId, query) => evidenceHistory.read(workId, query),
     workEvidence: async workId => {
       const work = (await application.inspect({ workId })).works[0]
