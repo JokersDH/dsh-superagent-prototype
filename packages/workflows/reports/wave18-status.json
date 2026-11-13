@@ -1,0 +1,234 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "e438ab5",
+  "mergeCommit": "4166ae4",
+  "checkpoints": [
+    "9972c42"
+  ],
+  "testedSourceCommit": "9972c42",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "currentEvidenceVersion": 2,
+  "currentFamilyCount": 21,
+  "legacyEvidenceVersion": 1,
+  "legacyFamilyCount": 13,
+  "actualConsumers": {
+    "genuineOldV1Producer": {
+      "status": "PASS",
+      "evidence": "wave18-v1-producer.json",
+      "tests": "2/2"
+    },
+    "sourcePrepareConfirmAudit": {
+      "status": "PASS",
+      "evidence": "wave18-source-confirmation.txt",
+      "tests": "14/14"
+    },
+    "recoveryCombination": {
+      "status": "PASS",
+      "evidence": "wave18-recovery-combination.txt",
+      "tests": "106/106"
+    },
+    "candidateConsumers": {
+      "status": "PASS",
+      "evidence": "wave18-candidate-consumers.txt",
+      "tests": "31/31"
+    },
+    "productExecution": {
+      "status": "PASS",
+      "evidence": "wave18-product-execution.txt",
+      "tests": "20/20"
+    },
+    "privatePermissionTarget": {
+      "status": "NOT_REACHED",
+      "detail": "source confirmation is actual; private startup permission, physical writer proof and target activation are not implemented"
+    }
+  },
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "version-aware evidence",
+      "evidence": [
+        "wave18-v1-producer.json 2/2",
+        "snapshot-d tests"
+      ],
+      "note": "v2 exact 21; genuine v1 exact 13 with old field list (no binding work_id); mixed pairs, v2 missing version, future and v1 subsets blocked"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "required schema",
+      "evidence": [
+        "schema inventory tests"
+      ],
+      "note": "missing empty assistant_reply_results/index/unknown table blocked even after DB hash rewrite; legacy still must satisfy recorded schema"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "actual source confirmation",
+      "evidence": [
+        "wave18-source-confirmation.txt 14/14",
+        "wave18-recovery-combination.txt 106/106"
+      ],
+      "note": "real HTTP prepare/confirm/audit; prepare no writes; same-UoW exact fact/event/receipt; foreign/expiry/marker/source change and extra writes rollback"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "exact ignore/replay",
+      "evidence": [
+        "source confirmation tests"
+      ],
+      "note": "only this fact/receipt/two events and fixed heartbeat excluded; other queue/runtime/resource changes visible; original token replays original result after reopen without reauthorization"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "combined non-empty restore",
+      "evidence": [
+        "wave16-candidate-restore extended",
+        "readonly HTTP"
+      ],
+      "note": "one snapshot contains real SDK candidate/decision, real context binding, Work/Ticket, original Q&A, held queue, runtime and source activation/receipt; second-root recovery_readonly HTTP reads history/reply, queue held, business POST rejected, no model send"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "process interruption",
+      "evidence": [
+        "source confirmation 2 SIGKILL",
+        "reply-crash",
+        "snapshot-crash"
+      ],
+      "note": "before/after source transaction, result/message and snapshot registration; partial backup blocked; original artifact body once"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "D/E recipe",
+      "evidence": [
+        "wave18-data-recipe.md"
+      ],
+      "note": "runnable genuine-v1 probe, v2 pair/schema, combined producer→snapshot→second-root readonly and negatives; no hand SQL/verified marker"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "legacy compatibility",
+      "evidence": [
+        "wave18-v1-producer.json",
+        "snapshot-d"
+      ],
+      "note": "real old producer v1 empty/nonempty binding both verify; v1 subset blocked; DB upgrades and snapshot format remain distinct; no authorization inheritance"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "bounded cost",
+      "evidence": [
+        "wave18-performance.json"
+      ],
+      "note": "10000 bindings; bounded 1000 rows/28 families 2.8ms; snapshot create 428.3ms/verify 105.4ms with schema inventory; body lazy"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "package regression",
+      "evidence": [
+        "wave18-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, main product/candidate/source/target consumers, typecheck/build and static check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "109/109",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "sourceConfirmation": "14/14",
+    "recoveryCombination": "106/106",
+    "mainProductConsumers": "89/89",
+    "mainTargetConsumers": "50/50",
+    "candidateConsumers": "31/31",
+    "productExecution": "20/20",
+    "v1ProducerProbe": "2/2",
+    "v2SnapshotProbe": "4/4",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "v1Families": [
+    "decisions",
+    "legacy_decisions",
+    "proposals",
+    "project_settings",
+    "contracts",
+    "verifications",
+    "acceptances",
+    "outcomes",
+    "reviews",
+    "recovery_intents",
+    "assistant_context_bindings",
+    "assistant_reply_results",
+    "recovery_activations"
+  ],
+  "limits": {
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288,
+    "bindingsTested": 10000,
+    "boundedScanFamilies": 28
+  },
+  "failureWindows": [
+    "v1 subset",
+    "mixed snapshot/evidence versions",
+    "v2 missing family version",
+    "future version",
+    "missing empty table",
+    "missing index",
+    "unknown table",
+    "changed work_id/queue/reply bytes",
+    "partial manifest",
+    "source confirmation SIGKILL",
+    "result/message/snapshot SIGKILL"
+  ],
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "private-permission-target",
+      "detail": "Actual inspect/prepare/confirm/audit exists; private startup permission, physical writer proof and target activation remain unimplemented."
+    },
+    {
+      "owner": "main/D",
+      "id": "installation",
+      "detail": "Restored data/snapshots never grant installation or startup authority."
+    }
+  ],
+  "notTested": [
+    "private permission/target activation",
+    "physical writer proof",
+    "D installation/upgrade",
+    "E independent release acceptance",
+    "real model/native"
+  ],
+  "mainNextSteps": [
+    "keep exact source confirmation and v1/v2 verification",
+    "use wave18-data-recipe for D/E",
+    "add private host/resources permission without deriving from snapshots"
+  ],
+  "updatedAt": "2026-11-13T14:10:00.000Z"
+}
