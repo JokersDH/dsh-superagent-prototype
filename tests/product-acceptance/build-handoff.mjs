@@ -520,7 +520,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第二十一轮交付交接
+const handoff = `# Agent E 第二十二轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -558,7 +558,7 @@ ${rows
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=${frozenScope?.artifact?.buildId ?? '?'}/schema ${frozenScope?.artifact?.schema ?? '?'}，main schema ${frozenScope?.main?.schema ?? '?'}；current-main install=${currentMainInstall ? 'NOT_TESTED' : 'PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)'}；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=${frozenScope?.capability?.hasDiscussionReadiness ?? '?'}；D safety mocks=${byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING'}（helper 从 ee tar 提取并核对文件 hash；旧97仅mock失败对照）；candidate installed=${byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING'}；second root=${byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING'}（probeScope=fixture+recovery_readonly）；installed source confirm=${byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING'}；installed stability=${byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING'}；workflow formats=${byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING'}（按包能力：${byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.capability ?? '?'}）；personal review=${byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING'}（consumerOrigin=${byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview?.consumerEntry?.origin ?? '?'}，packageEntry=true）；refusals=${byId.get('E5-RESTORED-REVIEW-REFUSALS')?.status ?? 'MISSING'}；review reuse=${byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.status ?? 'MISSING'}（digestAvailable=${byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.digestAvailable ?? '?'}；differentSelection=${byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.outcomes?.differentFile?.status ?? '?'}）。personal旧项目只读重绑定未到，对应项NOT_REACHED，403不自动放宽。 |
+| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=${frozenScope?.artifact?.buildId ?? '?'}/schema ${frozenScope?.artifact?.schema ?? '?'}，main schema ${frozenScope?.main?.schema ?? '?'}；current-main install=${currentMainInstall ? 'NOT_TESTED' : 'PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)'}；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=${frozenScope?.capability?.hasDiscussionReadiness ?? '?'}；D safety mocks=${byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING'}（helper 从 ee tar 提取并核对文件 hash；旧97仅mock失败对照）；candidate installed=${byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING'}；second root=${byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING'}（probeScope=fixture+recovery_readonly）；installed source confirm=${byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING'}；installed stability=${byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING'}；workflow formats=${byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING'}（按包能力：${byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.capability ?? '?'}）；personal review=${byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING'}（consumerOrigin=${byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview?.consumerEntry?.origin ?? '?'}，digest=${String(byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview?.healthDigest ?? '').slice(0, 8)}…，scopeDiagnostics=${byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview?.scopeDiagnostics ?? '?'}）；refusals=${byId.get('E5-RESTORED-REVIEW-REFUSALS')?.status ?? 'MISSING'}；review reuse=${byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.status ?? 'MISSING'}（same=${byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.outcomes?.sameFile?.status ?? '?'}，digestSame=${byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.sameDigest === byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.healthDigest}，different=${byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.outcomes?.differentFile?.status ?? '?'}）。personal旧项目只读重绑定未到，对应项NOT_REACHED，403不自动放宽。 |
 
 安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId \`${artifactTuple.baseline?.buildId ?? 'unknown'}\` / schema ${artifactTuple.baseline?.productSchema ?? artifactTuple.baseline?.schema ?? '?'} / tar \`${String(artifactTuple.baseline?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.baseline?.sourceCommit ?? artifactTuple.baseline?.source ?? '').slice(0, 8)}\`；target buildId \`${artifactTuple.target?.buildId ?? 'unknown'}\` / schema ${artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? '?'} / tar \`${String(artifactTuple.target?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? '').slice(0, 8)}\`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
@@ -790,8 +790,10 @@ if (!existsSync(join(reports, 'wave20-status.json')))
     artifactTuple,
   }, null, 2) + '\n',
 )
-writeFileSync(
-  join(reports, 'wave21-status.json'),
+// wave21-status.json is a frozen historical input; wave-22 supersedes it and must not rewrite it.
+if (!existsSync(join(reports, 'wave21-status.json')))
+  writeFileSync(
+    join(reports, 'wave21-status.json'),
   JSON.stringify({
     ...executionStatus,
     schema: 'product-acceptance-wave21-status/1',
@@ -852,7 +854,77 @@ writeFileSync(
     artifactTuple,
   }, null, 2) + '\n',
 )
-// Historical wave06-20 status files are frozen inputs; wave21 supersedes them.
+writeFileSync(
+  join(reports, 'wave22-status.json'),
+  JSON.stringify({
+    ...executionStatus,
+    schema: 'product-acceptance-wave22-status/1',
+    taskPackage: 'agent-tasks/product-wave-22/README.zh-CN.md',
+    supersedes: 'wave21-status.json',
+    subject: { target: byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target ?? null,
+      baseline: byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade?.baseline ?? null,
+      control: byId.get('E5-D-OWNERSHIP-MOCKS')?.evidence?.ownershipMocks?.previousPackageHelper ?? null },
+    layers: {
+      source: 'historical source-checkout review results stay source-level (wave20 revoked scope)',
+      fixture: 'fixture+recovery_readonly second root stays its own layer and is not personal',
+      installed: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
+      native: 'NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate',
+    },
+    scopes: {
+      ordinaryPersonal595: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
+      installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      workflowFormats: { status: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
+        capability: byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.capability ?? null },
+      secondRootFixtureReadonly: { status: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING', probeScope: 'fixture+recovery_readonly' },
+      restoredPersonalReview: { status: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
+        consumerOrigin: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview?.consumerEntry?.origin ?? null,
+        package: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview?.consumerEntry?.package ?? null,
+        healthDigest: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview?.healthDigest ?? null,
+        scopeDiagnostics: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview?.scopeDiagnostics ?? null },
+      restoredReviewRefusals: byId.get('E5-RESTORED-REVIEW-REFUSALS')?.status ?? 'MISSING',
+      reviewReuse: { status: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.status ?? 'MISSING',
+        digestAvailable: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.digestAvailable ?? null,
+        sameDigest: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.sameDigest ?? null,
+        sameFile: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.outcomes?.sameFile?.status ?? null,
+        differentFile: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.outcomes?.differentFile?.status ?? null },
+      installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
+      installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
+      missingArtifactTerminal: byId.get('E4-INSTALL-TAMPER')?.evidence?.tamperTerminal ?? null,
+      privatePermissionTarget: 'NOT_REACHED: private startup permission and target activation remain main scope',
+      bBusinessRecovery: 'NOT_TESTED: B reconnect wrapper is not admitted; controlled normal Q&A/physical stop stays its own scope',
+    },
+    retainedHistory: {
+      e4eRun: 'waves 21 run 2026-11-13T13-18-18-989Z kept its honest reuse FAIL; only its independently passing review/refusal evidence was used for source calibration',
+      revokedSourceOnly: ['wave20 E4-PERSONAL-RESTORED-REVIEW installed PASS', 'wave20 E5-RESTORED-REVIEW-REFUSALS installed PASS'],
+    },
+    requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
+      ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
+      installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
+      installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
+      installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
+      workflowFormats: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
+      personalReview: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
+      reviewRefusals: byId.get('E5-RESTORED-REVIEW-REFUSALS')?.status ?? 'MISSING',
+      reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.status ?? 'MISSING',
+      currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
+      upgradeFaults: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
+      upgradeRollback: byId.get('E4-UPGRADE-ROLLBACK')?.status ?? 'MISSING' } },
+    finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record',
+      exitCode: 0, source: report.source },
+    commands: stages.stages.map(stage => ({ id: stage.id, command: stage.command })),
+    personalReview: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview ?? null,
+    restoredReviewRefusals: byId.get('E5-RESTORED-REVIEW-REFUSALS')?.evidence?.restoredReviewRefusals ?? null,
+    reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse ?? null,
+    workflowFormats: byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats ?? null,
+    counts: report.counts,
+    testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
+    productSource: { commit: artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? null },
+    mainSource: { commit: stages.base, schema: byId.get('E6-ARTIFACT-CURRENT-SCOPE')?.evidence?.frozenScope?.main?.schema ?? null },
+    artifactTuple,
+  }, null, 2) + '\n',
+)
+// Historical wave06-21 status files are frozen inputs; wave22 supersedes them.
 
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 

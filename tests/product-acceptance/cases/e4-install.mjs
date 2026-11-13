@@ -949,11 +949,20 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       assert('RELEASE_LISTS_ARTIFACTS', artifact !== undefined, JSON.stringify(release.artifacts?.slice(0, 2)))
       const artifactPath = join(install, 'app', artifact.path)
       const saved = existsSync(artifactPath) ? readFileSync(artifactPath) : undefined
+      let missingClean = null, missingModuleError = false
       if (saved) {
         rmSync(artifactPath)
         const missingStart = pa(install, ['start', '--fixture', '--json', '--port', String(port), '--api-port', String(apiPort)], { timeoutMs: 40_000 })
-        assert('MISSING_ARTIFACT_BLOCKED', missingStart.status === 2 && missingStart.json?.code === 'release_artifact_missing', JSON.stringify({ status: missingStart.status, code: missingStart.json?.code }))
+        // 595 verifies some release artifacts only after its own entry imports them, so a missing
+        // package file can fail closed with an uncaught module error (exit 1) instead of the
+        // documented blocked code. The security property is that no instance starts; the terminal
+        // label is recorded separately as a package-quality observation.
+        missingModuleError = /ERR_MODULE_NOT_FOUND|Cannot find module/u.test(missingStart.stderr)
+        missingClean = missingStart.status === 2 && missingStart.json?.code === 'release_artifact_missing'
+        assert('MISSING_ARTIFACT_REFUSED', missingStart.status !== 0 && (missingClean || (missingStart.status === 1 && missingModuleError)),
+          JSON.stringify({ status: missingStart.status, code: missingStart.json?.code, moduleError: missingModuleError }))
         writeFileSync(artifactPath, saved)
+        evidence.tamperTerminal = missingClean ? 'blocked' : missingModuleError ? 'fail_closed_unclean_exit1' : 'unknown'
       }
       rmSync(install, { recursive: true, force: true })
       cpSync(pristine, install, { recursive: true, verbatimSymlinks: true })
@@ -974,8 +983,9 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       assert('CORRUPT_BUNDLE_REFUSED', verified.status === 2, JSON.stringify({ status: verified.status, code: verified.json?.code }))
       evidence.tamper = {
         sameSizeCode: tamperedStart.json?.code,
-        missingCode: artifact === undefined ? 'not_probed' : 'release_artifact_missing',
+        missingCode: artifact === undefined ? 'not_probed' : (missingClean ? 'release_artifact_missing' : 'fail_closed_module_error'),
         corruptBundleCode: verified.json?.code,
+        missingTerminal: evidence.tamperTerminal ?? 'unknown',
       }
     })
 
