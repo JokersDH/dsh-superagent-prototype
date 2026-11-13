@@ -1,0 +1,556 @@
+{
+  "case": "DIST-TRIAL-01",
+  "status": "PASS",
+  "startedAt": "2026-11-13T16:39:41.773Z",
+  "steps": [
+    {
+      "id": "build",
+      "status": "PASS",
+      "detail": {
+        "buildId": "b35c1bdf4e96b1c8",
+        "artifacts": {
+          "count": 904,
+          "bytes": 8757107
+        },
+        "dependencies": {
+          "count": 8,
+          "files": 5803
+        },
+        "staged": {
+          "path": "/tmp/w23smoke/stage-build",
+          "installManifest": "/tmp/w23smoke/stage-build/install.json"
+        }
+      }
+    },
+    {
+      "id": "stage-closure",
+      "status": "PASS",
+      "detail": {
+        "root": "/tmp/w23smoke/stage-relocated",
+        "files": 6747,
+        "dependencies": 8,
+        "workspacePackages": 21,
+        "entrypoints": {
+          "launcher": "app/apps/launcher/bin/pa.mjs",
+          "coordinator": "app/apps/coordinator/product/demo.ts",
+          "runner": "app/apps/runner/src/index.ts",
+          "consoleEntry": "app/apps/console/dist/index.html",
+          "nativeBinding": "app/node_modules/better-sqlite3"
+        },
+        "supportMatrix": {
+          "measured": [
+            "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+          ],
+          "node": ">=24.21.0 <25",
+          "abi": "137",
+          "sqlite": ">=3.53.4",
+          "notTested": [
+            "linux",
+            "win32",
+            "darwin-x64",
+            "other Node ABIs",
+            "other machines",
+            "personal native execution"
+          ]
+        },
+        "buildId": "b35c1bdf4e96b1c8"
+      }
+    },
+    {
+      "id": "first-run",
+      "status": "PASS",
+      "detail": {
+        "created": [
+          "data",
+          "cache",
+          "logs",
+          "workspace"
+        ]
+      }
+    },
+    {
+      "id": "config-root-adoption",
+      "status": "PASS",
+      "detail": {
+        "adopted": "initialized_from_install",
+        "buildId": "b35c1bdf4e96b1c8",
+        "releaseDigest": "ebf394f89092b5d235861cd36858c037a88e18b3b8e36168cd07a5a414b80a91",
+        "binding": "PASS",
+        "foreignInstall": "install_release_missing"
+      }
+    },
+    {
+      "id": "source-first-run-unverified",
+      "status": "PASS",
+      "detail": {
+        "reason": "release_missing_development",
+        "provenance": "unverified",
+        "binding": "WARN",
+        "wroteRelease": false
+      }
+    },
+    {
+      "id": "doctor-before-start",
+      "status": "PASS",
+      "detail": {
+        "status": "DEGRADED"
+      }
+    },
+    {
+      "id": "static-console",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:57788"
+      }
+    },
+    {
+      "id": "instance-marker",
+      "status": "PASS",
+      "detail": {
+        "buildId": "b35c1bdf4e96b1c8"
+      }
+    },
+    {
+      "id": "api-health-direct",
+      "status": "PASS",
+      "detail": {
+        "status": "ok",
+        "mode": "fixture",
+        "access": "local-development"
+      }
+    },
+    {
+      "id": "api-health-via-proxy",
+      "status": "PASS",
+      "detail": {
+        "status": "ok",
+        "mode": "fixture",
+        "access": "local-development"
+      }
+    },
+    {
+      "id": "product-configuration",
+      "status": "PASS",
+      "detail": {
+        "revision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
+        "projects": 1
+      }
+    },
+    {
+      "id": "console-asset",
+      "status": "PASS",
+      "detail": {
+        "path": "/assets/index-BXDBCweW.js",
+        "bytes": 610645
+      }
+    },
+    {
+      "id": "status-running",
+      "status": "PASS",
+      "detail": {
+        "pid": 17143,
+        "checks": 15
+      }
+    },
+    {
+      "id": "reuse-verified-instance",
+      "status": "PASS",
+      "detail": {
+        "pid": 17143
+      }
+    },
+    {
+      "id": "completed-delivery-fixture",
+      "status": "PASS",
+      "detail": {
+        "workId": "14ef9a11c3cd0e3d3689eb23c8043f85",
+        "artifacts": 4,
+        "bytes": 1756,
+        "vendorCalls": 0
+      }
+    },
+    {
+      "id": "backup-live",
+      "status": "PASS",
+      "detail": {
+        "archiveSha256": "f579426cf6ab022e54b592a1a0044c0b5fa5f28a0234ca3478c6dffa05dbe27f",
+        "counts": {
+          "entries": 21,
+          "artifacts": 20,
+          "excluded": 11
+        },
+        "database": {
+          "integrity": "ok",
+          "foreignKeyViolations": 0,
+          "eventSeq": 51
+        },
+        "evidence": {
+          "digest": "8b6aac557d2ab1a74792283df7680dcb434a0dddb45b77ee49e354744060af48",
+          "counts": {
+            "projects": 0,
+            "works": 0,
+            "decisions": 0,
+            "assistantDecisions": 0,
+            "assistantProposals": 0,
+            "artifacts": 20,
+            "acceptedEvents": 1,
+            "routeAdvice": 0,
+            "reviewEvidence": 0,
+            "executionOutcomes": 0
+          },
+          "routing": "included"
+        }
+      }
+    },
+    {
+      "id": "verify-backup-live",
+      "status": "PASS",
+      "detail": {
+        "manifestDigest": "b43b1a5df7b7eefd612784ddf87e7878772172218201d960f1732e23ef083eeb",
+        "entries": 21
+      }
+    },
+    {
+      "id": "rollback-refuses-active-state",
+      "status": "PASS",
+      "detail": {
+        "code": "target_active"
+      }
+    },
+    {
+      "id": "reuse-requires-matching-identity",
+      "status": "PASS",
+      "detail": {
+        "state": "requested_root_mismatch",
+        "ports": "instance_conflict"
+      }
+    },
+    {
+      "id": "concurrent-start-single-winner",
+      "status": "PASS",
+      "detail": {
+        "loserCode": "start_in_progress",
+        "winnerExit": 0
+      }
+    },
+    {
+      "id": "start-stable-diagnostics",
+      "status": "PASS",
+      "detail": {
+        "busyPort": "port_in_use",
+        "missingAuthor": "author_executor_unavailable",
+        "missingAuth": "author_auth_unavailable"
+      }
+    },
+    {
+      "id": "stop-primary",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 336
+      }
+    },
+    {
+      "id": "verify-backup-offline",
+      "status": "PASS",
+      "detail": {
+        "manifestDigest": "b43b1a5df7b7eefd612784ddf87e7878772172218201d960f1732e23ef083eeb"
+      }
+    },
+    {
+      "id": "orphan-record-recovery",
+      "status": "PASS",
+      "detail": {
+        "killedLauncherPid": 24718,
+        "stoppedApiPid": 24729,
+        "status": "STOPPED_ORPHAN"
+      }
+    },
+    {
+      "id": "recovery-status-blocked-authorization",
+      "status": "PASS",
+      "detail": {
+        "startupMode": "recovery_readonly",
+        "authorization": "BLOCKED",
+        "owner": "main",
+        "pendingRebind": 0,
+        "queueReplay": "never"
+      }
+    },
+    {
+      "id": "restore-new-directory",
+      "status": "PASS",
+      "detail": {
+        "target": "/tmp/w23smoke/restored",
+        "pendingRebind": 0,
+        "evidence": {
+          "status": "verified",
+          "digest": "8b6aac557d2ab1a74792283df7680dcb434a0dddb45b77ee49e354744060af48",
+          "counts": {
+            "projects": 0,
+            "works": 0,
+            "decisions": 0,
+            "assistantDecisions": 0,
+            "assistantProposals": 0,
+            "artifacts": 20,
+            "acceptedEvents": 1,
+            "routeAdvice": 0,
+            "reviewEvidence": 0,
+            "executionOutcomes": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "restore-refuses-non-empty",
+      "status": "PASS",
+      "detail": {
+        "code": "target_not_empty"
+      }
+    },
+    {
+      "id": "restore-refuses-corrupted",
+      "status": "PASS",
+      "detail": {
+        "code": "archive_invalid"
+      }
+    },
+    {
+      "id": "import-managed-bundle",
+      "status": "PASS",
+      "detail": {
+        "importId": "f579426cf6ab022e54b592a1a0044c0b5fa5f28a0234ca3478c6dffa05dbe27f"
+      }
+    },
+    {
+      "id": "restore-managed-import",
+      "status": "PASS",
+      "detail": {
+        "target": "/tmp/w23smoke/restored-imported"
+      }
+    },
+    {
+      "id": "restore-rebind-preserves-identity",
+      "status": "PASS",
+      "detail": {
+        "entity": "project-rebind-old",
+        "applied": 1,
+        "pendingRebind": 1,
+        "credentialsCarried": false
+      }
+    },
+    {
+      "id": "restored-first-start-readonly",
+      "status": "PASS",
+      "detail": {
+        "startupMode": "recovery_readonly",
+        "commandStatus": 422,
+        "errorCode": "unsupported_capability"
+      }
+    },
+    {
+      "id": "recovery-inspect-prepare-readonly",
+      "status": "PASS",
+      "detail": {
+        "startupMode": "recovery_readonly",
+        "fingerprintPresent": true,
+        "heldQueue": {
+          "waiting": 4,
+          "parked": 1
+        },
+        "authorization": "not_granted",
+        "commitAvailable": false,
+        "proposedProjectId": "project-58e8c2cf6783d16b0fa961f9",
+        "planBlockers": [
+          "authorization_not_implemented"
+        ],
+        "commitOwner": "main",
+        "databaseUnchanged": true,
+        "markerUnchanged": true,
+        "queueUnchanged": true
+      }
+    },
+    {
+      "id": "recovery-activation-blocked",
+      "status": "PASS",
+      "detail": {
+        "status": "BLOCKED",
+        "code": "marker_matches",
+        "authorization": "not_granted",
+        "commitAvailable": false,
+        "started": false,
+        "mainFailure": "main_source_intent_committed",
+        "owner": "main",
+        "sourceUnchanged": true,
+        "targetUntouched": true
+      }
+    },
+    {
+      "id": "stop-recovery-readonly",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 311
+      }
+    },
+    {
+      "id": "restore-does-not-revive-old-authority",
+      "status": "PASS",
+      "detail": {
+        "oldWriterPid": 999999,
+        "currentWriterPid": null,
+        "credentialsCarried": false,
+        "markerPreserved": true
+      }
+    },
+    {
+      "id": "recovery-keeps-old-business",
+      "status": "PASS",
+      "detail": {
+        "queued": 5,
+        "answers": 1,
+        "deliveries": 1,
+        "markerPreserved": true
+      }
+    },
+    {
+      "id": "login-gated-session",
+      "status": "PASS",
+      "detail": {
+        "beforeBootstrap": "auth_required",
+        "afterBootstrap": "authenticated",
+        "startupMode": "recovery_readonly",
+        "writeStatus": 422
+      }
+    },
+    {
+      "id": "stop-login-instance",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 311
+      }
+    },
+    {
+      "id": "start-restored",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:57950",
+        "health": {
+          "status": "ok",
+          "mode": "fixture",
+          "startupMode": "recovery_readonly",
+          "access": "local-development"
+        },
+        "startupMode": "recovery_readonly"
+      }
+    },
+    {
+      "id": "restored-delivery-bytes-roundtrip",
+      "status": "PASS",
+      "detail": {
+        "workId": "14ef9a11c3cd0e3d3689eb23c8043f85",
+        "artifacts": 4,
+        "digestsMatch": true,
+        "phase": "delivered"
+      }
+    },
+    {
+      "id": "stop-restored",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 321
+      }
+    },
+    {
+      "id": "rollback-verifies-snapshot-before-move",
+      "status": "PASS",
+      "detail": {
+        "code": "archive_invalid"
+      }
+    },
+    {
+      "id": "rollback-rehearsal",
+      "status": "PASS",
+      "detail": {
+        "failedDir": "/tmp/w23smoke/restored.failed-2026-11-13T16-40-18-511Z",
+        "target": "/tmp/w23smoke/restored"
+      }
+    },
+    {
+      "id": "start-after-rollback",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:57998"
+      }
+    },
+    {
+      "id": "stop-after-rollback",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 325
+      }
+    },
+    {
+      "id": "stage-closure-start",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:58023",
+        "modules": 617,
+        "outsideClosure": 0,
+        "checkoutReferences": 0
+      }
+    },
+    {
+      "id": "doctor-executor-capabilities",
+      "status": "PASS",
+      "detail": {
+        "defaultReview": "no_executor_interface",
+        "requiredReviewBlocked": "BLOCKED",
+        "authorPathWithoutReviewer": "DEGRADED",
+        "reviewerCheck": "PASS"
+      }
+    },
+    {
+      "id": "stage-closure-stop",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 5967,
+        "status": "RUNNING"
+      }
+    },
+    {
+      "id": "startup-verifies-executed-bytes",
+      "status": "PASS",
+      "detail": {
+        "code": "release_artifact_missing",
+        "sameLength": true
+      }
+    },
+    {
+      "id": "skip-console-refuses-tampered-http-bundle",
+      "status": "PASS",
+      "detail": {
+        "exit": 2
+      }
+    },
+    {
+      "id": "doctor-after-stop",
+      "status": "PASS",
+      "detail": {
+        "status": "DEGRADED"
+      }
+    }
+  ],
+  "limitations": [
+    "Fixture mode only: no vendor/model request, no native agent, no user project.",
+    "Only darwin/arm64 + Node 24.21.x is a measured candidate; other platforms remain NOT_TESTED.",
+    "The trial instance ran on isolated temporary roots/ports; user services were not touched.",
+    "Native authentication/environment is not migrated; restored state must be revalidated before real execution."
+  ],
+  "durationMs": 65631,
+  "finishedAt": "2026-11-13T16:40:47.404Z",
+  "root": "/tmp/w23smoke",
+  "outputs": {
+    "backupArchiveSha256": "f579426cf6ab022e54b592a1a0044c0b5fa5f28a0234ca3478c6dffa05dbe27f",
+    "importId": "f579426cf6ab022e54b592a1a0044c0b5fa5f28a0234ca3478c6dffa05dbe27f",
+    "backupPath": "/tmp/w23smoke/backup/state.pab"
+  }
+}

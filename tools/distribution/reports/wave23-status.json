@@ -1,0 +1,647 @@
+{
+  "protocol": "wave23-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "ab16943",
+  "mergedMain": "03f7b7e",
+  "head": "0ede11d",
+  "frozenSource": "0ede11d",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate; not main/E/release admission. Real vendor/model/native turns 0; twelve user services untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "nativeTurns": 0,
+    "vendorSends": 0
+  },
+  "goal": "whole wave-23 D result package; three milestones published, independent stages continue",
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Merged main 8c8fdef (via 03f7b7e), regenerated actual closure with 40 launcher/23 portability/9 distribution/5 root files and environment Node24.21/ABI137/SQLite3.53.4/schema18. Old 58ae294 closure is not reused; historical wave22 closure restored untouched.",
+      "evidence": [
+        "tools/distribution/reports/wave23/ordinary-source-closure.json"
+      ]
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "same-store/nonempty/real now track every detached start by born PID/start/UID/argv/install/config/data/operation. Launcher and API/console child proofs are distinct. CLI stop refusal falls back only to exact proven PIDs; missing/mismatch/unconfirmed keeps a restricted private root as UNKNOWN. Six pure controls pass.",
+      "evidence": [
+        "tools/distribution/reports/wave23/live-cleanup-controls.json"
+      ]
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Bounded faults after seed start, review start, candidate read and assertion run in fresh roots; each returns FAIL with clean resources. Startup-fault windows for nonempty/real also clean. Old first smoke timeout is preserved as a failure; after stale-probe cleanup the independent smoke rerun is 52/52.",
+      "evidence": [
+        "tools/distribution/reports/wave23/same-store-dual.json",
+        "tools/distribution/reports/wave23/smoke.json"
+      ]
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "Main 8c8fdef ordinary integration consumed. `pa --help`, `pa help review-restored` and `pa review-restored --help` all exit 0, expose prepare/start/reopen and repeated --project, and create no state/config/process.",
+      "evidence": [
+        "tools/distribution/reports/wave23/cli-help.json"
+      ]
+    },
+    "d5": {
+      "status": "PASS_WITH_DRIVER_LIMIT",
+      "summary": "Copied retained B Store keeps real Work/question/answer/attempt/native_applied and adds controlled SDK/context candidates; original IDs/digests are asserted on the second root. A/C independent parameterized driver is absent from package; main HTTP consumer is used and that dependence is NOT_TESTED.",
+      "evidence": [
+        "tools/distribution/reports/wave23/same-store-dual.json"
+      ]
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "Actual workflow-snapshot/1 and /2 create and verify; bundle restore database sha equals both snapshot database sha. Explicit review yields candidates2, history/source200, business422, no extra fake request, original IDs and optional scopeReview=1 actual field with authorization none. Default interface not changed.",
+      "evidence": [
+        "tools/distribution/reports/wave23/same-store-dual.json"
+      ]
+    },
+    "d7": {
+      "status": "PASS",
+      "summary": "Clean successor frozen from 0ede11d: build 1eb8733c8b1729bc, tar d0398897..., 20,247,278 B, 6,747 files, schema18/ABI137. 595/a9b/e4e/ee/b911/651/97 remain immutable and unrelabeled; complete source closure handed with environment and producer/consumer entry.",
+      "evidence": [
+        "tools/distribution/reports/wave23/artifacts.json"
+      ]
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Cold install 7/7, no-executor 4/4, multi-state 8/8, same-schema ee->successor and legacy16->18 3/3; exit/status/pointer/operation/data checked; unknown live resources refuse upgrade; 97 remains mock-only.",
+      "evidence": [
+        "tools/distribution/reports/wave23/personal-install.json",
+        "tools/distribution/reports/wave23/multi-instance.json",
+        "tools/distribution/reports/wave23/cross-schema-upgrade.json"
+      ]
+    },
+    "d9": {
+      "status": "PASS_WITH_MAIN_ACTIVATION_BLOCKED",
+      "summary": "Prepare/start/REUSED/refusal/reprepare/reopen sequence is executable and support/material 8/8 are redacted/0600/no-overwrite; resource return proven through cleanup and stop. Review is readonly historical selection, not private startup permission/target or executable grant.",
+      "evidence": [
+        "tools/distribution/reports/wave23/nonempty-personal-http.json",
+        "tools/distribution/reports/wave23/target-material.json"
+      ]
+    },
+    "d10": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Frozen rerun: same3, controls6, nonempty12, real4, matrix19/19, multi8/8, cross3/3, data5/5, personal7/7, noexec4/4, source5/5, ee->new3/3, backup6/6, portable5+1NT, dual6/6, material8/8, smoke52/52, help1, launcher60/60, portability52/52. E final verdict pending.",
+      "evidence": [
+        "tools/distribution/recipes/wave23-e-acceptance.zh-CN.md",
+        "docs/rfcs/WP-16/0062-wave-23-d-cleanup-and-same-store-dual.md"
+      ]
+    }
+  },
+  "artifacts": {
+    "protocol": "wave23-artifacts/1",
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave23-target/wave23-target-0ede11d.tar.gz",
+      "sha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+      "tarBytes": 20247278,
+      "buildId": "1eb8733c8b1729bc",
+      "source": {
+        "commit": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6747,
+      "extractedBytes": 67559948,
+      "supportMatrix": {
+        "measured": [
+          "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+        ],
+        "node": ">=24.21.0 <25",
+        "abi": "137",
+        "sqlite": ">=3.53.4",
+        "notTested": [
+          "linux",
+          "win32",
+          "darwin-x64",
+          "other Node ABIs",
+          "other machines",
+          "personal native execution"
+        ]
+      },
+      "environment": {
+        "node": "24.21.0",
+        "pnpm": "11.7.0",
+        "sqlite": "3.53.4",
+        "abi": "137",
+        "platform": "darwin",
+        "arch": "arm64"
+      },
+      "actualCapabilities": [
+        "probe-born PID/start/UID/root/config/operation ownership and bounded cleanup/fault windows",
+        "same-Store real Broker Work/question/answer/attempt/native_applied plus SDK candidates",
+        "default1/explicit2 workflow snapshot create/verify and restored DB byte identity",
+        "second-root explicit personal review with original IDs and optional scopeReview=1",
+        "package-local prepare/start selection reuse/refusals",
+        "CLI help discoverability",
+        "main8c8fdef integrated ordinary source closure"
+      ]
+    },
+    "exact595": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave21-target/wave21-target-595b3f1.tar.gz",
+      "sha256": "e875b9b90445db5826bf01d72d710fd55b208309598347ca45be618773ae026d",
+      "tarBytes": 20242124,
+      "buildId": "cc16eca05e4da244",
+      "source": {
+        "commit": "595b3f138872f176b7c6b214b4b6b1b87c1ed017",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6744,
+      "note": "E ordinary scope already measured; preserved immutable."
+    },
+    "a9bPrevious": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave22-target/wave22-target-a9b155c.tar.gz",
+      "sha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+      "tarBytes": 20246850,
+      "buildId": "9fdc283f55927f6f",
+      "source": {
+        "commit": "a9b155c13be197d828544a26f4827cf9d4acab68",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6747,
+      "note": "6747 bytes independently verified; not E-admitted."
+    },
+    "e4ePrevious": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave20-target/wave20-target-e4e0623.tar.gz",
+      "sha256": "1f78e38b3568a781ebf4670174451516ceb7c32b982b0990e21757c34e4ddfc1",
+      "buildId": "637ed44e850f447a",
+      "source": {
+        "commit": "e4e0623dcb6d90318939f9613f9251ff73fcc602",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18
+    },
+    "eeBaseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave19-target/wave19-target-ee7fbd8.tar.gz",
+      "sha256": "b0990149d0a8c81a130d358ea07100332bc30d509e9c7dfdf7a176e61b7f7ecc",
+      "buildId": "90e81429079a7d50",
+      "source": {
+        "commit": "ee7fbd8ab59bde8b875dcd933fda58d7bbf2fd5d",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18
+    },
+    "b911Baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave18-target/wave18-target-b9117aa.tar.gz",
+      "sha256": "4a81380a5fd0c69aabe8d38604dd661ab3fb3f30113b4bb2d3e5156c2ff54c1a",
+      "buildId": "6a45633067501dd2",
+      "source": {
+        "commit": "b9117aad12797a3ee3c454172d1f918516a18f33",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18
+    },
+    "safe651Baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave17-target/wave17-target-65102f7.tar.gz",
+      "sha256": "33d874c9a25f22d2710fb29d686f03ad5b37de7ad2cdb09f40d16fd7ecb86340",
+      "buildId": "f55470ae14cc4985",
+      "source": {
+        "commit": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18
+    },
+    "old97MockOnly": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave16-target/wave16-target-97cace7.tar.gz",
+      "sha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+      "buildId": "8a5a0a85631f22ca",
+      "source": {
+        "commit": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18
+    },
+    "baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "buildId": "7e8f6ce6fa2e2633",
+      "source": {
+        "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 13
+    },
+    "legacy16": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+      "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+      "buildId": "3311a04bd20ed7f9",
+      "source": {
+        "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 16
+    },
+    "sourceClosure": "tools/distribution/reports/wave23/ordinary-source-closure.json",
+    "notes": [
+      "Built from clean wave-23 D head 0ede11d; merge main 03f7b7e includes 8c8fdef.",
+      "Same Store uses a copied retained B state; original data is read-only. Only controlled local SDK endpoint used; vendor/native 0.",
+      "Snapshot v1/v2 create/verify actual; second-root bundle restore bytes match both snapshots.",
+      "A/C independent driver absent: main HTTP consumer used; that item remains a measured dependency limit.",
+      "Private permission/target/native remain unclaimed; docs-only heads do not refreeze."
+    ]
+  },
+  "sameStore": {
+    "seed": {
+      "projectId": "project-personal-dialogue",
+      "sourceMessageId": "b9428dd4a5bf99d861f6eb63770215f8",
+      "candidates": 2,
+      "fakeRequests": 1,
+      "nativeTurns": 0,
+      "vendorSends": 0,
+      "origin": {
+        "attempts": [
+          {
+            "attemptId": "attempt-7ff22d69-7274-40c4-a3f5-ee91737e5e7b",
+            "ticketId": "ad9e66aa770b076a02faf78b4a6c0b0f"
+          }
+        ],
+        "works": [
+          {
+            "id": "276cc06c228825748795e0923d16ed40",
+            "status": null
+          }
+        ],
+        "questions": [
+          {
+            "id": "codex-question-d72a004f5f5583c4a92853eeab93fa775ff002655130ad9d",
+            "workId": "276cc06c228825748795e0923d16ed40",
+            "version": 2
+          }
+        ],
+        "tickets": [
+          {
+            "ticketId": "ad9e66aa770b076a02faf78b4a6c0b0f",
+            "workId": null
+          }
+        ],
+        "answers": [
+          {
+            "answerId": "db4be89e34a893a388ee1a9e8f15e205",
+            "questionId": "codex-question-d72a004f5f5583c4a92853eeab93fa775ff002655130ad9d",
+            "digest": "ad9fed5544dec8d3e236eca6f9ec55c21e2a9a260415fe9e5c9823e40f677f9b"
+          }
+        ],
+        "nativeApplied": [
+          {
+            "answerId": "db4be89e34a893a388ee1a9e8f15e205",
+            "status": "native_applied"
+          }
+        ]
+      },
+      "snapshots": {
+        "v1": "workflow-snapshot/1",
+        "v1Families": 13,
+        "v1Digest": "f792d8e4e4a1f3e9d3ccc1ecd6b4874df0321742d790828af72e993e2b4eb2a6",
+        "v2": "workflow-snapshot/2",
+        "v2Families": 21,
+        "v2Digest": "e56bed32bfe008054db69c92036eb82de1e37f1df77133675cbae09782b7a54d"
+      }
+    },
+    "review": {
+      "markerState": "recovery_readonly",
+      "works": 1,
+      "candidates": 2,
+      "sources": 200,
+      "scopeReviewOptIn": true,
+      "businessRefused": true,
+      "originalWork": 1,
+      "originalQuestions": 1,
+      "originalAnswers": 1,
+      "originalAttempts": 1,
+      "nativeApplied": 1,
+      "historyAfterConsent": 200,
+      "snapshotsV1V2": true,
+      "snapshotBytesRestored": true,
+      "originalIdsPreserved": true,
+      "workflowV1Families": 13,
+      "workflowV2Families": 21,
+      "fakeRequests": 1,
+      "nativeTurns": 0
+    },
+    "scopeReview": {
+      "protocol": "context-scope-review/1",
+      "reasons": 0,
+      "withheld": null
+    }
+  },
+  "cleanupControls": {
+    "protocol": "wave23-cleanup-controls/1",
+    "status": "PASS",
+    "steps": [
+      {
+        "id": "positive-complete-own",
+        "status": "PASS",
+        "detail": {
+          "proof": {
+            "owned": true,
+            "checks": [
+              {
+                "pid": 75653,
+                "ppid": 75652,
+                "startOk": true,
+                "uidOk": true,
+                "argvOk": true,
+                "isLauncher": true,
+                "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/"
+              }
+            ],
+            "operation": "start",
+            "pids": [
+              75653
+            ]
+          }
+        }
+      },
+      {
+        "id": "foreign-root-refused",
+        "status": "PASS",
+        "detail": {
+          "proof": {
+            "owned": false,
+            "reason": "root_mismatch",
+            "recorded": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/other-state",
+            "requested": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/state"
+          }
+        }
+      },
+      {
+        "id": "start-mismatch-refused",
+        "status": "PASS",
+        "detail": {
+          "proof": {
+            "owned": false,
+            "reason": "identity_mismatch",
+            "pid": 75653,
+            "checks": [
+              {
+                "pid": 75653,
+                "ppid": 75652,
+                "startOk": false,
+                "uidOk": true,
+                "argvOk": true,
+                "isLauncher": true,
+                "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "missing-record-refused",
+        "status": "PASS",
+        "detail": {
+          "proof": {
+            "owned": false,
+            "reason": "record_missing"
+          }
+        }
+      },
+      {
+        "id": "cleanup-failure-retains-material",
+        "status": "PASS",
+        "detail": {
+          "first": {
+            "status": "UNKNOWN",
+            "stopped": [],
+            "unknown": [
+              {
+                "pid": 75653,
+                "reason": "stop_unconfirmed",
+                "stopStatus": 1,
+                "stdout": "",
+                "proof": {
+                  "owned": true,
+                  "checks": [
+                    {
+                      "pid": 75653,
+                      "ppid": 75652,
+                      "startOk": true,
+                      "uidOk": true,
+                      "argvOk": true,
+                      "isLauncher": true,
+                      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/"
+                    }
+                  ],
+                  "operation": "start",
+                  "pids": [
+                    75653
+                  ]
+                }
+              }
+            ],
+            "retained": true
+          }
+        }
+      },
+      {
+        "id": "repeated-finally-still-unknown",
+        "status": "PASS",
+        "detail": {
+          "second": {
+            "status": "UNKNOWN",
+            "stopped": [],
+            "unknown": [
+              {
+                "pid": 75653,
+                "reason": "stop_unconfirmed",
+                "stopStatus": 1,
+                "stdout": "",
+                "proof": {
+                  "owned": true,
+                  "checks": [
+                    {
+                      "pid": 75653,
+                      "ppid": 75652,
+                      "startOk": true,
+                      "uidOk": true,
+                      "argvOk": true,
+                      "isLauncher": true,
+                      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/"
+                    }
+                  ],
+                  "operation": "start",
+                  "pids": [
+                    75653
+                  ]
+                }
+              }
+            ],
+            "retained": true
+          }
+        }
+      }
+    ]
+  },
+  "testLayers": {
+    "sameStore": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "cleanupControls": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "liveReview": {
+      "steps": 12,
+      "status": "PASS"
+    },
+    "realBusiness": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "binaryUpgrade": {
+      "sections": 19,
+      "status": "PASS"
+    },
+    "multiInstance": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "crossSchema": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "schema18Data": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "personalInstall": {
+      "steps": 7,
+      "status": "PASS"
+    },
+    "personalNoExecutor": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "sourceConfirmation": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "sameSchema18": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "backupSchema": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "portableClosure": {
+      "steps": 6,
+      "status": "PASS",
+      "notTested": [
+        "other-platform-abi"
+      ]
+    },
+    "dualBinary": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "targetMaterial": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "smoke": {
+      "steps": 52,
+      "status": "PASS",
+      "initialTimeoutPreserved": true,
+      "rerunClean": true
+    },
+    "cliHelp": {
+      "steps": 1,
+      "status": "PASS"
+    },
+    "launcher": {
+      "tests": 60,
+      "status": "PASS"
+    },
+    "portability": {
+      "tests": 52,
+      "status": "PASS"
+    }
+  },
+  "blockers": [
+    {
+      "id": "A-C-INDEPENDENT-DRIVER",
+      "owner": "A/C",
+      "status": "NOT_TESTED",
+      "summary": "No A/C parameterized driver in package; same-store uses main HTTP consumer."
+    },
+    {
+      "id": "MAIN-PRIVATE-STARTUP-PERMISSION",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "Review selection is not private startup permission/target grant."
+    },
+    {
+      "id": "A-V2-NOT-ADMITTED",
+      "owner": "A/main",
+      "status": "NOT_SUPPORTED",
+      "summary": "Only observed v1/v2 read recipes consumed."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "Verify exact 595 and successor from immutable bytes; initial smoke failure retained."
+    },
+    {
+      "id": "PLATFORM-ABI",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Only darwin-arm64 Node24.21/ABI137 measured."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Zero real vendor/model/native turns."
+    }
+  ],
+  "notTested": [
+    "A/C independent driver",
+    "A v2",
+    "private startup permission/target",
+    "external real vendor Store merge",
+    "cross-platform/ABI",
+    "real personal billed turn",
+    "every individual SIGKILL",
+    "long soak",
+    "E independent acceptance"
+  ],
+  "eConsumption": [
+    "Verify exact 595 first; REUSED is success, mismatches remain refused.",
+    "Then verify successor 0ede11d/1eb8733c... from immutable bytes.",
+    "Run cleanup controls, same-store normal and four faults, nonempty, real, matrix, multi, cross, data, personal, noexec, source, ee->new, backup, portable, dual, material, smoke, help.",
+    "Do not use source checkout to supply missing prepare/consumer, auto-load review files, treat digest/grant or claim private permission/native; do not accept UNKNOWN resource stop as cleaned."
+  ],
+  "preservedHistory": [
+    "wave-05..22 evidence/ledgers unchanged",
+    "all historical tars/states preserved",
+    "no shared contract/migration/root lock/E assertion modified"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave23/*.json",
+    "tools/distribution/recipes/wave23-e-acceptance.zh-CN.md",
+    "docs/rfcs/WP-16/0062-wave-23-d-cleanup-and-same-store-dual.md"
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "protocol": "wave23-cleanup-controls/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "positive-complete-own",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": true,
+          "checks": [
+            {
+              "pid": 75653,
+              "ppid": 75652,
+              "startOk": true,
+              "uidOk": true,
+              "argvOk": true,
+              "isLauncher": true,
+              "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/"
+            }
+          ],
+          "operation": "start",
+          "pids": [
+            75653
+          ]
+        }
+      }
+    },
+    {
+      "id": "foreign-root-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "root_mismatch",
+          "recorded": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/other-state",
+          "requested": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/state"
+        }
+      }
+    },
+    {
+      "id": "start-mismatch-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "identity_mismatch",
+          "pid": 75653,
+          "checks": [
+            {
+              "pid": 75653,
+              "ppid": 75652,
+              "startOk": false,
+              "uidOk": true,
+              "argvOk": true,
+              "isLauncher": true,
+              "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "missing-record-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "record_missing"
+        }
+      }
+    },
+    {
+      "id": "cleanup-failure-retains-material",
+      "status": "PASS",
+      "detail": {
+        "first": {
+          "status": "UNKNOWN",
+          "stopped": [],
+          "unknown": [
+            {
+              "pid": 75653,
+              "reason": "stop_unconfirmed",
+              "stopStatus": 1,
+              "stdout": "",
+              "proof": {
+                "owned": true,
+                "checks": [
+                  {
+                    "pid": 75653,
+                    "ppid": 75652,
+                    "startOk": true,
+                    "uidOk": true,
+                    "argvOk": true,
+                    "isLauncher": true,
+                    "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/"
+                  }
+                ],
+                "operation": "start",
+                "pids": [
+                  75653
+                ]
+              }
+            }
+          ],
+          "retained": true
+        }
+      }
+    },
+    {
+      "id": "repeated-finally-still-unknown",
+      "status": "PASS",
+      "detail": {
+        "second": {
+          "status": "UNKNOWN",
+          "stopped": [],
+          "unknown": [
+            {
+              "pid": 75653,
+              "reason": "stop_unconfirmed",
+              "stopStatus": 1,
+              "stdout": "",
+              "proof": {
+                "owned": true,
+                "checks": [
+                  {
+                    "pid": 75653,
+                    "ppid": 75652,
+                    "startOk": true,
+                    "uidOk": true,
+                    "argvOk": true,
+                    "isLauncher": true,
+                    "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-DDZq1X/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/"
+                  }
+                ],
+                "operation": "start",
+                "pids": [
+                  75653
+                ]
+              }
+            }
+          ],
+          "retained": true
+        }
+      }
+    }
+  ]
+}
