@@ -1,0 +1,50 @@
+{
+  "protocol": "wave19-main-versioned-snapshot/1",
+  "date": "2026-11-13",
+  "source": "98561245a0e5ff8250ca94e28bc517a3e32948d5",
+  "admittedASlice": "7cabe8d version-specific v1/v2 recipes and selective snapshot verification; existing main schema guards retained",
+  "implemented": [
+    "Default v1 creation/reader preserves genuine historical 13-family recipe",
+    "Explicit formatVersion2 produces exact21-family evidence",
+    "Verification chooses corresponding version recipe and scans it once",
+    "Mixed/partial/duplicate/future versions refuse",
+    "Null/noninteger/zero/future/required-schema guards retained for both versions",
+    "Persisted independent genuine-v1 fixture/evidence/source hashes without a database file"
+  ],
+  "notImplemented": [
+    "Restored-personal explicit readonly project binding",
+    "Private startup permission",
+    "Recovered native business composition",
+    "Actual target activation",
+    "Latest installed b911 or later package certification"
+  ],
+  "checks": {
+    "newVersionedTests": 14,
+    "schemaRegressionTests": 7,
+    "independentReviewVersionTests": 21,
+    "cleanVersionSchemaSourceCombinationTests": 35,
+    "storageTests": 87,
+    "workflowTests": 93,
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "sourceWorktreeDirtyAtCleanRun": false,
+    "testCommand": "node --test tests/integration/snapshot-version-compat.case.mjs tests/integration/snapshot-schema-admission.case.mjs tests/integration/recovery-source-confirmation.case.mjs"
+  },
+  "snapshotDefaultVersion": 1,
+  "explicitVersion2": true,
+  "evidenceDefaultVersion": 1,
+  "legacyFamilyCount": 13,
+  "currentVersion2FamilyCount": 21,
+  "legacyBindingDigest": "51d53c57b7d4be9c586f5b6a255a9d8f6bbd8db64c71f3e032e70a2df6cce7dd",
+  "legacyEvidenceDigest": "e339e38272cdadaf38059ffeea18476a10c839e78427c30940371395c49de4cd",
+  "productSchema": 18,
+  "migrationsAdded": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "preservedServicePairs": 12,
+  "userServicesRestarted": false,
+  "privateStartupPermission": false,
+  "targetActivation": false,
+  "releaseApproved": false
+}
