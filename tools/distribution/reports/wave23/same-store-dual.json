@@ -55,10 +55,10 @@
         "snapshots": {
           "v1": "workflow-snapshot/1",
           "v1Families": 13,
-          "v1Digest": "f792d8e4e4a1f3e9d3ccc1ecd6b4874df0321742d790828af72e993e2b4eb2a6",
+          "v1Digest": "ad832e64bd520aa3bc84183bb2fb12d279d17615bddec59bfeca2d0ec108c799",
           "v2": "workflow-snapshot/2",
           "v2Families": 21,
-          "v2Digest": "e56bed32bfe008054db69c92036eb82de1e37f1df77133675cbae09782b7a54d"
+          "v2Digest": "6eb8c8ec75f0d7b778fef8e2ec402d36b363f059584eb691cc0902ebe8b44f9b"
         }
       }
     },
@@ -69,6 +69,18 @@
         "protocol": "context-scope-review/1",
         "reasons": 0,
         "withheld": null
+      }
+    },
+    {
+      "id": "same-store-review-reopen",
+      "status": "PASS",
+      "detail": {
+        "pidChanged": true,
+        "reprepared": true,
+        "digestObserved": true,
+        "candidates": 2,
+        "history": 200,
+        "noResend": true
       }
     },
     {

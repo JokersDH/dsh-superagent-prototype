@@ -46,10 +46,30 @@ node tools/distribution/verify-target-material.mjs --trusted-parent <0700> --jso
 node tools/distribution/smoke.mjs --keep-root <new> # 52/52
 ```
 
+## 3.1) 包内 consumer entry hashes
+
+`tools/distribution/reports/wave23/consumer-entries.json`（同一 tar 解包后）：
+
+| entry | sha256 前缀 |
+| --- | --- |
+| `bin/pa` | `50d0b3665549` |
+| `app/apps/launcher/bin/pa.mjs` | `5e17dbc6c17d` |
+| `app/apps/launcher/lib/start.mjs` | `493ca3f8eee1` |
+| `app/apps/launcher/lib/review.mjs` | `7679cf9beb58` |
+| `app/apps/launcher/lib/daemon.mjs` | `1ac7fafa40da` |
+| `app/apps/coordinator/product/restored-review.ts` | `e6b77f1cdbdd` |
+| `app/apps/coordinator/product/demo.ts` | `ea78e3e91585` |
+| `app/packages/portability/dist/index.js` | `be3ec033e9cd` |
+| `app/packages/storage/dist/index.js` | `cc40878067f3` |
+| `app/packages/workflows/dist/index.js` | `52f2b92706fa` |
+
+完整 SHA/bytes 见该 JSON；E 必须直接从 immutable tar 重算并比对，不接受 checkout 提供实现。
+
 ## 4) 断言要点
 
 - 清理工具：positive owned、foreign root、start mismatch、missing record、cleanup failure、repeated finally 六控制。故障注入在 seed/review 启动、候选读取、断言处均返回 FAIL 且资源 CLEAN；UNKNOWN 时保留受限 root，不删状态。
 - 同 Store：真实 Work 1、question 1、answer 1、attempt 1、native_applied 1 与 SDK candidates 2；原 IDs/digests 在第二 root 全保留；v1/v2 snapshot create/verify 后，恢复数据库 sha 等于两版本快照数据库 sha；候选2、history/source200、业务422、provider fake 请求1不增；`scopeReview=1` 实际返回 `context-scope-review/1`。
+- 重开：stop 后源/marker 变化，重新 `review-restored` 生成新文件，新进程/PID 启动，候选2/history200，旧完成请求不重发。
 - 帮助：`pa --help`、`pa help review-restored`、`pa review-restored --help` 均0退出且不创建 state/config/进程；重复 `--project` 与实际参数一致。
 - 包内 prepare/start 同源；REUSED 成功；不同/缺失/未绑定/端口登录拒绝保留 PID；fixture 不能升级。
 - E 应把外部真实 A/C driver 缺失列为 NOT_TESTED，不能把本轮 main HTTP 消费冒充 A/C 独立 driver。

@@ -44,7 +44,8 @@
       "second-root explicit personal review with original IDs and optional scopeReview=1",
       "package-local prepare/start selection reuse/refusals",
       "CLI help discoverability",
-      "main8c8fdef integrated ordinary source closure"
+      "main8c8fdef integrated ordinary source closure",
+      "review re-preparation and reopen in a new process with no old request resend"
     ]
   },
   "exact595": {
@@ -159,5 +160,6 @@
     "Snapshot v1/v2 create/verify actual; second-root bundle restore bytes match both snapshots.",
     "A/C independent driver absent: main HTTP consumer used; that item remains a measured dependency limit.",
     "Private permission/target/native remain unclaimed; docs-only heads do not refreeze."
-  ]
+  ],
+  "consumerEntries": "tools/distribution/reports/wave23/consumer-entries.json"
 }

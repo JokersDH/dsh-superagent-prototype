@@ -1,0 +1,58 @@
+{
+  "protocol": "wave23-consumer-entries/1",
+  "target": "pa-artifacts/wave23-target/wave23-target-0ede11d.tar.gz",
+  "buildId": "1eb8733c8b1729bc",
+  "source": "0ede11d",
+  "entries": [
+    {
+      "path": "bin/pa",
+      "bytes": 459,
+      "sha256": "50d0b366554986d2fae29b3f1f9ea836ca5d04134b1427babe4c6df89244ede7"
+    },
+    {
+      "path": "app/apps/launcher/bin/pa.mjs",
+      "bytes": 36842,
+      "sha256": "5e17dbc6c17d7490fefaaa9469aa50fe6f73a3bd205b63d083646a95b0620112"
+    },
+    {
+      "path": "app/apps/launcher/lib/start.mjs",
+      "bytes": 22958,
+      "sha256": "493ca3f8eee1d6258c868ffd86311462c57ac8ef8e8d38bd653d0eb818c3b227"
+    },
+    {
+      "path": "app/apps/launcher/lib/review.mjs",
+      "bytes": 2743,
+      "sha256": "7679cf9beb584667e10049753835f680a5957f4170b8871c13447e19b00b11e2"
+    },
+    {
+      "path": "app/apps/launcher/lib/daemon.mjs",
+      "bytes": 7303,
+      "sha256": "1ac7fafa40daf225405c739de1e12669647b1a9d1c772d1c70ac340467614f8a"
+    },
+    {
+      "path": "app/apps/coordinator/product/restored-review.ts",
+      "bytes": 7325,
+      "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5"
+    },
+    {
+      "path": "app/apps/coordinator/product/demo.ts",
+      "bytes": 6819,
+      "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1"
+    },
+    {
+      "path": "app/packages/portability/dist/index.js",
+      "bytes": 1487,
+      "sha256": "be3ec033e9cd78add27c06e5d1eaa913a751aef7f28a25acc4909141b898d735"
+    },
+    {
+      "path": "app/packages/storage/dist/index.js",
+      "bytes": 7224,
+      "sha256": "cc40878067f3c2c068c81f1be09fdb3fab29ae3998837ba92ce208cf4149f504"
+    },
+    {
+      "path": "app/packages/workflows/dist/index.js",
+      "bytes": 302,
+      "sha256": "52f2b92706fa2646fbfef069a5a9891081897ad4d409abb8cb07b09b99cd1660"
+    }
+  ]
+}

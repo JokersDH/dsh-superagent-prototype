@@ -210,7 +210,33 @@ try {
   if (fakeRequests.length > 1) throw new Error('reviewed startup/read called the fake model again')
   const stop = run(cli, ['stop', '--json', ...reviewArgs], [0], env)
   if (stop.json?.status !== 'STOPPED') throw new Error('review stop failed')
+  const firstReviewRecord = reviewEvidence?.record ?? null
   reviewEvidence = null
+  // After stop the source/marker may have moved, so the operator must re-prepare a new private
+  // selection before reopening. This is a new process and window; no old completed request is resent.
+  const reopenPath = join(root, 'review-reopen.json')
+  const repreparedReopen = run(cli, ['review-restored', '--json', '--state', reviewState, '--project', project.id, '--project', businessProjectId, '--allow-path', '.', '--out', reopenPath], [0], env)
+  if (repreparedReopen.json?.status !== 'prepared') throw new Error('review reopen re-preparation failed')
+  const reopenConsole = await freePort(); let reopenApi = await freePort(); if (reopenApi === reopenConsole) reopenApi = await freePort()
+  const reopenOut = openSync(join(root, 'reopen.out.log'), 'w', 0o600), reopenErr = openSync(join(root, 'reopen.err.log'), 'w', 0o600)
+  const reopenDaemon = spawn(cli, ['start', '--discussion-only', '--review-restored-scope', reopenPath, '--port', String(reopenConsole), '--api-port', String(reopenApi), ...reviewArgs], { cwd: install, env, stdio: ['ignore', reopenOut, reopenErr], detached: true })
+  reopenDaemon.unref(); closeSync(reopenOut); closeSync(reopenErr)
+  const reopenHealth = await waitHealth(reopenApi)
+  if (reopenHealth === null) throw new Error(`review reopen not healthy: ${readFileSync(join(root, 'reopen.err.log'), 'utf8').slice(0, 500)}`)
+  const reopenRecord = await waitBornRecord(reviewRoots.config)
+  reviewEvidence = { record: reopenRecord, args: reviewArgs }
+  if (typeof reopenHealth.restoredReviewDigest !== 'string' || reopenHealth.restoredReviewDigest.length !== 64) throw new Error('review reopen health did not carry a selection digest')
+  if (firstReviewRecord && reopenRecord && firstReviewRecord.pid === reopenRecord.pid) throw new Error('review reopen reused the stopped PID')
+  const reopenAuth = { authorization: `Bearer ${readFileSync(join(reviewState, 'api.key'), 'utf8').trim()}` }
+  const reopenGet = async (path) => { const res = await fetch(`http://127.0.0.1:${reopenApi}${path}`, { headers: reopenAuth }); return { status: res.status, body: await res.json() } }
+  const reopenCandidates = await reopenGet(`/v1/messages/${encodeURIComponent(source.id)}/candidates`)
+  const reopenHistory = await reopenGet(`/v1/conversations/${encodeURIComponent(conversationId)}/messages?limit=50`)
+  if (reopenCandidates.status !== 200 || reopenHistory.status !== 200) throw new Error('review reopen data not readable')
+  const reopenStop = run(cli, ['stop', '--json', ...reviewArgs], [0], env)
+  if (reopenStop.json?.status !== 'STOPPED') throw new Error('review reopen stop failed')
+  reviewEvidence = null
+  step('same-store-review-reopen', 'PASS', { pidChanged: !!firstReviewRecord && !!reopenRecord && firstReviewRecord.pid !== reopenRecord.pid,
+    reprepared: true, digestObserved: true, candidates: reopenCandidates.body.candidates.length, history: 200, noResend: fakeRequests.length === 1 })
   step('same-store-second-root-personal-review', 'PASS', { markerState: inspect.body.state, works: (snapshot.body.works ?? []).length, candidates: afterCandidates.body.candidates.length,
     sources: 200, scopeReviewOptIn: scopedOptIn, businessRefused: true, originalWork: origin.works.length, originalQuestions: origin.questions.length, originalAnswers: origin.answers.length, originalAttempts: origin.attempts.length, nativeApplied: origin.nativeApplied.length, historyAfterConsent: historyAfter.status, snapshotsV1V2: true, snapshotBytesRestored: true, originalIdsPreserved: true, workflowV1Families: v1.families.length, workflowV2Families: v2.families.length, fakeRequests: fakeRequests.length, nativeTurns: reviewHealth.nativeTurns ?? 0 })
   evidence.status = 'PASS'

@@ -82,7 +82,7 @@
     },
     "d9": {
       "status": "PASS_WITH_MAIN_ACTIVATION_BLOCKED",
-      "summary": "Prepare/start/REUSED/refusal/reprepare/reopen sequence is executable and support/material 8/8 are redacted/0600/no-overwrite; resource return proven through cleanup and stop. Review is readonly historical selection, not private startup permission/target or executable grant.",
+      "summary": "Prepare/start/REUSED/refusal/reprepare/reopen sequence is executable: after stop the source/marker moved, a new private review file was prepared and a new process reopened with new PID, candidates/history 200 and no old request resend. Support/material 8/8 are redacted/0600/no-overwrite; cleanup returns exact resources. Review is readonly historical selection, not private startup permission/target.",
       "evidence": [
         "tools/distribution/reports/wave23/nonempty-personal-http.json",
         "tools/distribution/reports/wave23/target-material.json"
@@ -258,7 +258,8 @@
       "Snapshot v1/v2 create/verify actual; second-root bundle restore bytes match both snapshots.",
       "A/C independent driver absent: main HTTP consumer used; that item remains a measured dependency limit.",
       "Private permission/target/native remain unclaimed; docs-only heads do not refreeze."
-    ]
+    ],
+    "consumerEntries": "tools/distribution/reports/wave23/consumer-entries.json"
   },
   "sameStore": {
     "seed": {
@@ -342,7 +343,8 @@
       "protocol": "context-scope-review/1",
       "reasons": 0,
       "withheld": null
-    }
+    },
+    "reopen": null
   },
   "cleanupControls": {
     "protocol": "wave23-cleanup-controls/1",
@@ -494,7 +496,7 @@
   },
   "testLayers": {
     "sameStore": {
-      "steps": 3,
+      "steps": 4,
       "status": "PASS"
     },
     "cleanupControls": {
