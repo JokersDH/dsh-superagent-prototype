@@ -10,7 +10,7 @@ import {
 } from 'node:fs'
 import { dirname, join } from 'node:path'
 import {
-  backupDatabase, PRODUCT_SCHEMA_VERSION, readArtifactRegistry, readRoutingArtifactRefs, readWorkflowEvidence, verifyDatabase,
+  backupDatabase, PRODUCT_SCHEMA_VERSION, inspectSchemaInventory, readArtifactRegistry, readRoutingArtifactRefs, readWorkflowEvidence, verifyDatabase,
   type ArtifactRegistryRow, type ProductStore, type WorkflowEvidenceSummary,
 } from '@personal-agent/storage'
 
@@ -130,8 +130,11 @@ export class WorkflowSnapshots {
       foreignKeyViolations: backup.foreignKeyViolations,
     }
     const incompatibleSchema = database.productSchema > PRODUCT_SCHEMA_VERSION
+    const inventory = inspectSchemaInventory(databasePath, database.productSchema)
+    const schemaOk = inventory.productSchema !== null && Number.isSafeInteger(inventory.productSchema) && inventory.productSchema >= 1 &&
+      !inventory.futureSchema && !inventory.missingTables.length && !inventory.missingIndexes.length && !inventory.unknownTables.length
     const complete = missing.length === 0 && corrupt.length === 0 && missingReferences.length === 0 &&
-      !incompatibleSchema && database.integrity === 'ok' && database.foreignKeyViolations === 0
+      !incompatibleSchema && schemaOk && database.integrity === 'ok' && database.foreignKeyViolations === 0
     const manifest: SnapshotManifest = {
       protocol: 'workflow-snapshot/1',
       createdAt: input.createdAt ?? new Date().toISOString(),
@@ -196,8 +199,11 @@ export class WorkflowSnapshots {
     })
     const incompatibleSchema = verified.productSchema === null || verified.productSchema > PRODUCT_SCHEMA_VERSION ||
       manifest.database.productSchema > PRODUCT_SCHEMA_VERSION
-    const ok = manifest.complete && !manifest.incompatibleSchema && !incompatibleSchema &&
-      manifest.evidence?.digest === evidence.digest &&
+    const inventory = inspectSchemaInventory(databasePath, verified.productSchema)
+    const schemaOk = inventory.productSchema !== null && Number.isSafeInteger(inventory.productSchema) && inventory.productSchema >= 1 &&
+      !inventory.futureSchema && !inventory.missingTables.length && !inventory.missingIndexes.length && !inventory.unknownTables.length
+    const ok = manifest.complete && !manifest.incompatibleSchema && !incompatibleSchema && schemaOk &&
+      manifest.evidence?.protocol === 'workflow-evidence/1' && manifest.evidence.digest === evidence.digest &&
       databaseSha === manifest.database.sha256 &&
       verified.integrity === 'ok' && verified.foreignKeyViolations === 0 &&
       verified.productSchema === manifest.database.productSchema &&
