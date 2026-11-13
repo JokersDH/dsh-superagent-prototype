@@ -1,0 +1,111 @@
+{
+  "protocol": "agent-c-wave20-status/1",
+  "wave": "product-wave-20",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "4c93817",
+    "mainExplicitRestoredReview": "773b34d",
+    "mergeCommit": "0751379",
+    "rootLockDiffPreserved": true
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "consumedMainEntry": {
+    "module": "apps/coordinator/product/restored-review.ts",
+    "prepare": "prepareRestoredReview(store, state, {userId:'local-demo-user',authorityRef:'local-demo-authority'}, selection, secret, now)",
+    "load": "loadRestoredReview(file, store, state, principal, secret, now)",
+    "cli": "tools/dev/review-restored.mjs --state <restored> --project <id> --allow-path src/ --output <new 600 file>",
+    "startup": "apps/coordinator/product/demo.ts --state <restored> --port <p> --discussion-only --assistant --review-restored-scope <file>",
+    "workbench": "tools/dev/workbench.mjs forwards the same flag and explicitly refuses --fixture combined with restored review (source fact, not executed this wave)",
+    "consent": "restored-personal-review/1, access=historical_data_read_only, startupAvailable=false, 0600, 5-minute window",
+    "bindings": ["realpath stateRoot", "principal", "host/platform/arch/uid", "markerDigest", "sourceFingerprint", "action key"]
+  },
+  "sameChain": {
+    "location": "packages/knowledge/test/main-personal-readstartup.case.ts",
+    "realBusiness": {
+      "path": "controlled normal product: Application -> Effects -> Broker -> fixture executor",
+      "work": "create_work -> real Ticket, candidate accepted -> delivered",
+      "question": "real Broker user_questions -> answer_question -> delivery native_applied",
+      "display": "anchored trusted_user + question_answer_display; not an ordinary reasoner message",
+      "vendorNative": 0
+    },
+    "candidateAndContext": {
+      "producer": "normal no-executor instance with the same src/ + .git scope as the personal selection",
+      "originalCandidateDigest": "captured before snapshot and identical in personal review",
+      "frozenAuditDigest": "captured before snapshot and identical in personal review"
+    },
+    "formats": {
+      "defaultV1": "workflow-snapshot/1 + workflow-evidence/1, 13 families, verified",
+      "explicitV2": "workflow-snapshot/2 + workflow-evidence/2, familySetVersion 2, 21 families, verified",
+      "invalidVersion": "formatVersion 3 rejected before destination creation",
+      "personalEvidenceSeparate": "portability personal-evidence 1/2 not mixed with workflow snapshot/evidence"
+    },
+    "personalReadStartup": {
+      "beforeSelection": "GET /v1/messages/:id/candidates and /v1/context/history both 403",
+      "reviewFile": "new 0600 file, second run to same output refused, no API/action key, sourceFingerprint equals current restored DB",
+      "health": "mode=personal, startupMode=recovery_readonly",
+      "configuration": "selected project dispatchAllowed=false, profileIds=[], scope exactly the explicit selection",
+      "readable": ["original candidate payloadDigest", "context history entry", "frozen audit bundleDigest", "context sources state=verified", "/v1/snapshot", "/v1/works/:id delivered", "/v1/questions/:id/deliveries native_applied"],
+      "refused": ["candidates prepare 422", "chat 422", "answer_question 422", "create_work 422", "proposals 422", "context preview 422", "old context token replay 422"],
+      "held": "queue row 1 before and after; Work count unchanged",
+      "provider": "2 fixture requests before and after the review; 0 new calls in personal review",
+      "permissionQa": "display text is not present in frozen context sources and is not reused as an ordinary model message"
+    },
+    "sourceFacts": {
+      "inspect": "200",
+      "prepare": "authorization=not_granted, startupAvailable=false, target directory not created",
+      "confirm": "startupAvailable=false",
+      "audit": "equals confirm",
+      "grant": "read selection and source facts never become executable grant"
+    },
+    "rejectionMatrix": {
+      "expired": "forbidden",
+      "foreignPrincipal": "forbidden",
+      "foreignRoot": "forbidden",
+      "foreignKey": "forbidden",
+      "scopeEscalation": "forbidden",
+      "unsafePermissions": "forbidden",
+      "symlink": "forbidden",
+      "fifo": "forbidden",
+      "missingFile": "forbidden",
+      "sourceChange": "forbidden (isolated drift store)",
+      "markerChange": "forbidden (isolated drift store)",
+      "signatureChange": "forbidden (isolated drift store)",
+      "unknownProject": "refused at prepare",
+      "unsafePath": "refused at prepare",
+      "externalAction": "refused at prepare",
+      "executableClaim": "refused at prepare"
+    }
+  },
+  "tests": {
+    "context": 124,
+    "proposals": 41,
+    "knowledge": 99,
+    "routing": 44,
+    "total": 308,
+    "flags": "all PASS, 0 FAIL",
+    "newCase": "packages/knowledge/test/main-personal-readstartup.case.ts"
+  },
+  "strict": {
+    "tscNoEmit": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+    "workspaceBuild": "pnpm -r --workspace-concurrency=4 run build -> 0",
+    "status": "PASS"
+  },
+  "consumerGuidance": {
+    "D": "consume the new 600 file, demo/workbench flag, personal-restore/1 marker and explicit src/+exclusion scope; never derive grant from old settings/registry and never substitute --fixture for personal",
+    "E": "keep workflow-snapshot/1|2, personal-restore/1 and restored-personal-review/1 identities separate; read-only startup is not source confirm, private permission or target startup",
+    "installation": "existing same-package tar/hash/build/schema binding remains the installer gate; this wave claims no installed certification"
+  },
+  "limitations": [
+    "workbench flag forwarding is source evidence only; the executed process is demo.ts",
+    "restore is a real v1 product database/artifacts copy plus a real marker, not the launcher install/upgrade flow",
+    "no private permission, target creation, queue consumption or vendor native turn",
+    "permission Q&A reuse boundary is measured only in this focused personal-read scope"
+  ],
+  "evidence": [
+    "packages/context/docs/WAVE20-RECIPE.md",
+    "packages/context/reports/wave20-personal-readstartup.tap"
+  ]
+}
