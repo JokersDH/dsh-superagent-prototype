@@ -1,0 +1,252 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "6050b4b",
+  "mergeCommit": "20e1817",
+  "checkpoints": [
+    "27e5ef8",
+    "4402f20"
+  ],
+  "testedSourceCommit": "4402f20",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "evidenceFamilySetVersion": 2,
+  "evidenceFamilyCount": 21,
+  "actualConsumers": {
+    "sourcePrepareConfirmAudit": {
+      "status": "PASS",
+      "evidence": "wave17-source-confirmation.txt",
+      "tests": "14/14",
+      "note": "real HTTP transaction, same-UoW A fact/event/receipt, exact ignoreCommitted, lost-response replay, two SIGKILL windows"
+    },
+    "recoveryCombination": {
+      "status": "PASS",
+      "evidence": "wave17-recovery-combination.txt",
+      "tests": "106/106"
+    },
+    "candidates": {
+      "status": "PASS",
+      "evidence": "wave17-candidate-consumers.txt",
+      "tests": "31/31"
+    },
+    "productExecution": {
+      "status": "PASS",
+      "evidence": "wave17-product-execution.txt",
+      "tests": "20/20"
+    },
+    "mainProductConsumers": {
+      "status": "PASS",
+      "evidence": "wave17-main-consumers.txt",
+      "tests": "89/89"
+    },
+    "privatePermissionTargetStart": {
+      "status": "NOT_REACHED",
+      "detail": "source confirmation is real, but private startup permission, physical writer proof and target activation are not implemented"
+    }
+  },
+  "probe": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave17-a.json node tools/bootstrap/probe-wave16-storage.mjs $PWD",
+    "status": "PASS",
+    "pass": 4,
+    "fail": 0,
+    "suite": "wave16 fixed snapshot probe reused; no wave17 storage probe published",
+    "evidence": "packages/workflows/reports/wave17-storage-probe.json"
+  },
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "snapshot format",
+      "evidence": [
+        "snapshot-d versioned tests",
+        "probe 4/4"
+      ],
+      "note": "snapshot/1+evidence/2, v2 missing version, v2+evidence/1 and future versions blocked; current v2 still requires exact 21 families; legacy real v1 positive control remains"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "required schema",
+      "evidence": [
+        "inspectSchemaInventory",
+        "snapshot-d negative tests"
+      ],
+      "note": "current snapshot requires actual required tables/indexes; dropping empty assistant_reply_results, a required index or adding unknown table blocks even after DB hash rewrite"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "actual source confirmation",
+      "evidence": [
+        "wave17-source-confirmation.txt 14/14",
+        "wave17-recovery-combination.txt 106/106"
+      ],
+      "note": "consumes main e32/6050 prepare/confirm/audit; prepare no writes; confirm exact source transaction/receipt and foreign/expiry/marker/source-change refusals"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "exact ignore/replay",
+      "evidence": [
+        "source confirmation tests"
+      ],
+      "note": "only this confirmed fact/receipt/two events and fixed heartbeat excluded; other queue/runtime/resource changes visible; same-channel original token replays original result without reauthorization"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "second-root recovery_readonly",
+      "evidence": [
+        "wave16-candidate-restore real readonly HTTP",
+        "wave16-question-restore"
+      ],
+      "note": "real runtime/HTTP on second root reads original reply/work/question/answer; held queue unchanged; business POST rejected; no model/native send"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "process interruption",
+      "evidence": [
+        "source confirmation 2 SIGKILL windows",
+        "reply-crash tests",
+        "snapshot-crash tests"
+      ],
+      "note": "before/after source transaction, result/message and snapshot registration; one original artifact replay, partial backup blocked"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "D/E recipe",
+      "evidence": [
+        "wave17-data-recipe.md"
+      ],
+      "note": "format pair/schema/family/artifact/source-confirm commands and negative matrix; no HTTP/UI/contracts/E assertion changes"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "legacy compatibility",
+      "evidence": [
+        "snapshot-d legacy v1 test",
+        "v15/v16 upgrade tests"
+      ],
+      "note": "old v1 verifies only recorded families and cannot claim current v2; DB upgrades retain FTS/messages/receipts/bindings/results; no authorization inheritance"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "bounded cost",
+      "evidence": [
+        "wave17-performance.json"
+      ],
+      "note": "10000 bindings first page 3.8ms; 13105-row source 73ms; bounded 1000 rows 1.9ms/28 families; snapshot create 350.7ms/verify 73.7ms; schema/family rejection before body reads"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "package regression",
+      "evidence": [
+        "wave17-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, main product/candidate/source/target consumers, typecheck/build and static packet check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "109/109",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "sourceConfirmation": "14/14",
+    "recoveryCombination": "106/106",
+    "mainProductConsumers": "89/89",
+    "mainTargetConsumers": "50/50",
+    "candidateConsumers": "31/31",
+    "productExecution": "20/20",
+    "snapshotProbe": "4/4",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "evidenceFamilies": [
+    "decisions",
+    "legacy_decisions",
+    "proposals",
+    "project_settings",
+    "contracts",
+    "verifications",
+    "acceptances",
+    "outcomes",
+    "reviews",
+    "recovery_intents",
+    "assistant_context_bindings",
+    "user_questions",
+    "answers",
+    "answer_deliveries",
+    "effect_queue",
+    "runtime_bindings",
+    "runtime_current",
+    "resource_observations",
+    "dispatch_receipts",
+    "assistant_reply_results",
+    "recovery_activations"
+  ],
+  "limits": {
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288,
+    "bindingsTested": 10000,
+    "boundedScanFamilies": 28
+  },
+  "failureWindows": [
+    "mixed snapshot/evidence versions",
+    "missing familySetVersion",
+    "future familySetVersion",
+    "missing empty required table",
+    "missing required index",
+    "unknown table",
+    "changed queue/binding/reply bytes",
+    "partial manifest",
+    "future schema",
+    "source confirm before/after SIGKILL",
+    "result/message SIGKILL",
+    "snapshot before/after SIGKILL"
+  ],
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "private-permission-target",
+      "detail": "Actual source prepare/confirm/audit exists, but private startup permission, physical writer quiescence and target activation remain not implemented."
+    },
+    {
+      "owner": "main/D",
+      "id": "installation",
+      "detail": "Snapshots and restored data never grant installation or startup authority."
+    }
+  ],
+  "notTested": [
+    "private startup permission and target activation",
+    "physical writer proof",
+    "D current-schema installation/upgrade",
+    "E independent release acceptance",
+    "real model/provider/native execution"
+  ],
+  "mainNextSteps": [
+    "keep exact ignoreCommitted source confirmation consumer",
+    "add private host/resources/target permission after proof without deriving it from snapshots",
+    "use wave17-data-recipe.md for D/E",
+    "do not treat v1 compatibility as current v2 capability"
+  ],
+  "updatedAt": "2026-11-13T12:40:00.000Z"
+}
