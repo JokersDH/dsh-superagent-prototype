@@ -1,0 +1,160 @@
+{
+  "protocol": "wave19-ac-independent-admission/1",
+  "date": "2026-11-13",
+  "mainSource": "f875ead9f9f8d7bfe9a3e73e7b159705628bf266",
+  "mainRuntimeBaseline": "e438ab5 plus 6050b4b source confirmation",
+  "sources": {
+    "A": "7cabe8d0b6ea69aed97343ed827ff2f6ddf52453",
+    "C": "91b0a292743acd2dd2f1aaaaed9bd27e8977d4e1"
+  },
+  "modelCalls": 0,
+  "nativeTurnStarts": 0,
+  "browserRuns": 0,
+  "releaseApproved": false,
+  "genuineV1Compatibility": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave19-v1-compat.json node tools/bootstrap/probe-wave18-context.mjs /Users/hh/Desktop/joker/superagent /Users/hh/Desktop/joker/superagent-agent-a",
+    "exitCode": 0,
+    "passed": 2,
+    "failed": 0,
+    "report": "/tmp/pa-wave19-v1-compat.json",
+    "closed": "The real existing main v1 producer's empty and nonempty binding snapshots now self-verify and verify under A. The old 13-family binding digest is accepted through the version-specific v1 recipe; no manifest relabeling is used.",
+    "producerFilesStable": true,
+    "candidateFilesStable": true,
+    "oldBindingDigest": "51d53c57b7d4be9c586f5b6a255a9d8f6bbd8db64c71f3e032e70a2df6cce7dd"
+  },
+  "genuineV1Golden": {
+    "path": "/tmp/pa-wave19-v1-golden.json",
+    "mode": "0600",
+    "containsDatabase": false,
+    "contents": "Full real old-producer 13-family workflow-evidence/1 summary, deterministic nonempty binding/artifact fixture, original create/verify result and source/dist SHA256 hashes",
+    "evidenceDigest": "e339e38272cdadaf38059ffeea18476a10c839e78427c30940371395c49de4cd",
+    "producerFilesStable": true
+  },
+  "priorBoundaries": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave19-ac-prior.json node tools/bootstrap/probe-wave17-context.mjs /Users/hh/Desktop/joker/superagent-agent-a /Users/hh/Desktop/joker/superagent-agent-c",
+    "exitCode": 0,
+    "passed": 8,
+    "failed": 0,
+    "report": "/tmp/pa-wave19-ac-prior.json",
+    "scope": "Current nonempty v2, full queue corruption control, mixed version rejection, missing empty required table rejection, typed/outer/nested wrapper boundaries retained"
+  },
+  "A": {
+    "verdict": "Version-specific v1/v2 evidence source is admissible. Snapshot source requires preserving existing main valid-schema guards and a compatibility-preserving default-format adapter; do not overwrite snapshot.ts wholesale.",
+    "regression": {
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows test",
+      "exitCode": 0,
+      "storagePassed": 87,
+      "workflowsPassed": 109,
+      "log": "/tmp/pa-wave19-a-tests.log",
+      "typecheckExitCode": 0,
+      "buildExitCode": 0
+    },
+    "newUnifiedFixtureScope": {
+      "file": "packages/workflows/test/wave16-candidate-restore.case.ts",
+      "actual": "The same Store contains real SDK candidate/explicit decision confirmation and selected-context binding, then a current v2 snapshot is restored into a second-root recovery_readonly runtime/HTTP; frozen history is readable, business chat refuses and queue/events are unchanged.",
+      "notActualProductOrigin": [
+        "Work/contract/link rows are inserted directly through public storage ports at lines65-71, not Application/Effects/Runner.",
+        "Question/answer/delivery rows at lines74-81 are direct storage-port writes, with delivery local_recorded; they are not generated through the Broker/answer transport.",
+        "Source activation at lines82-89 uses RecoveryIntentCommitter with a no-op revalidator and handwritten intent fields, not source prepare/confirm HTTP in this unified fixture."
+      ],
+      "restoredRuntimeLimit": "The second-root readonly runtime in this fixture has no attached assistant provider and checks history HTTP only. The separate existing real controlled Q&A and actual source-confirm suites retain their scopes; they do not make the unified fixture a real Broker/source-HTTP chain."
+    },
+    "sourceConfirmationScope": "Main actual source prepare/confirm/audit is delivered and remains data-only/not_granted/startupAvailable=false. No missing source-confirmation blocker is asserted. Private startup permission, physical writer proof and target activation remain separate."
+  },
+  "C": {
+    "verdict": "The previous split same-root/copy evidence gap closes for the admitted main-v1 candidate/context/decision chain: one real snapshot now feeds the second-root readonly HTTP and source-confirm flow. Real Broker/Q&A generation in that same chain is still not covered.",
+    "regression": {
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing test",
+      "exitCode": 0,
+      "contextPassed": 124,
+      "proposalsPassed": 41,
+      "knowledgePassed": 97,
+      "routingPassed": 44,
+      "log": "/tmp/pa-wave19-c-tests.log",
+      "typecheckExitCode": 0,
+      "buildExitCode": 0
+    },
+    "sameSnapshotConsumer": {
+      "file": "packages/knowledge/test/main-snapshot-second-root.case.ts",
+      "actual": "Actual SDK chat/A18 body, candidate pointer prepare and original decision confirmation, selected-context binding/history, then public WorkflowSnapshots create+verify and second-root recovery_readonly runtime/HTTP over that same snapshot.",
+      "reads": "Candidate digest, history entry, frozen bundle digest/source and decision catalog remain original; permission-display data is excluded.",
+      "refusals": "Business prepare/confirm/context-send, including the original context token, refuse; start throws; held queue count stays1, works0, counted provider calls do not increase.",
+      "sourceFacts": "The same second root drives actual source prepare/confirm/audit; target remains absent, startupAvailable=false, candidates stay inert, queue/decisions/model calls unchanged.",
+      "limit": "The claimed permission Q&A input is only a manually appended question_answer_display message with a question anchor, and the held queue references a nonexistent historical Work. No actual Broker question/answer/native-delivery rows or Work are generated in this chain. The report itself correctly lists real Broker recovery as not reached; zero model/native allowance does not prevent using the already-existing controlled product fixture."
+    },
+    "oldDependencyClaim": "C's authored A-v1-format NOT_REACHED note describes the previous A candidate. Fresh genuine-v1 compatibility now passes; it is not a current blocker for main integration.",
+    "remainingModuleOnly": ["selectRelevantSources/candidate batches", "projectSourceReview", "collectContextHistory HTTP replacement"],
+    "permissionScope": "No new current-main authorization bypass found or claimed. No new private grant, SQL/HTTP writer or model loop is introduced."
+  },
+  "schemaGuardComparison": {
+    "command": "node /tmp/pa-wave19-schema-guard.mjs",
+    "exitCode": 1,
+    "report": "/tmp/pa-wave19-schema-guard.json",
+    "scope": "Same nonempty queue-bearing database; only schema_meta product_schema changes. Actual WorkflowSnapshots create/verify entrypoints compare candidate A with existing main guards.",
+    "observations": [
+      { "owner": "A", "schema": 18, "status": "PASS", "created": "ok", "complete": true, "verified": "ok" },
+      { "owner": "main", "schema": 18, "status": "PASS", "created": "ok", "complete": true, "verified": "ok" },
+      { "owner": "A", "schema": 0, "status": "FAIL", "created": "ok", "complete": true, "verified": "blocked" },
+      { "owner": "main", "schema": 0, "status": "PASS", "created": "blocked", "complete": false, "verified": "blocked" },
+      { "owner": "A", "schema": 1.5, "status": "FAIL", "created": "ok", "complete": true, "verified": "ok" },
+      { "owner": "main", "schema": 1.5, "status": "PASS", "created": "blocked", "complete": false, "verified": "blocked" }
+    ]
+  },
+  "findings": [
+    {
+      "id": "A_SNAPSHOT_VALID_SCHEMA_GUARD_REGRESSION_AGAINST_CURRENT_MAIN",
+      "severity": "P2",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows/src/snapshot.ts",
+      "line": 137,
+      "relatedLine": 239,
+      "condition": "A schema0 database is not future and inspectSchemaInventory returns empty missing-object arrays for invalid schema, so A create marks it complete. Fractional schema1.5 also passes A verify because the remaining >=1 test omits Number.isSafeInteger.",
+      "observed": "A create returns ok/complete for0 and1.5; A verify also returns ok for1.5. Current main rejects both under the same data-positive control.",
+      "integrationAction": "Preserve main productSchema!==null, Number.isSafeInteger and >=1 checks in both create and verify while taking A version-specific recipes. This does not reopen the now-passing real-v1 compatibility or previous counterexamples."
+    }
+  ],
+  "mainAdmission": {
+    "decision": "ADMIT_REVIEWED_VERSIONED_RECIPES_WITH_MAIN_GUARDS_AND_DEFAULT_V1_ADAPTER",
+    "sourceSlices": [
+      "packages/storage/src/backup.ts: legacy13 exact names and original binding field/order/digest recipe plus current21 recipe and readWorkflowEvidence(version1|2); preserve current public default behavior deliberately rather than importing A default2 blindly",
+      "packages/storage/src/index.ts: corresponding evidence version/type/function exports only",
+      "packages/workflows/src/snapshot.ts: exact v1/v2 protocol+family+digest verification, with existing main valid-schema checks retained; optional create formatVersion1|2 defaults to1 and only explicit2 selects current v2 recipe",
+      "Remove unused legacyEvidence read from create; do not do an extra legacy scan when producing a single selected format",
+      "C has no new production-source diff this wave; its owned same-snapshot consumer test and accurate scope mapping are reusable evidence"
+    ],
+    "requiredFocusedTests": [
+      "Genuine frozen old-main13-family golden and nonempty binding self/cross-verification",
+      "Default create remains v1; explicit formatVersion2 creates complete21-family v2; both verify through their own recipes",
+      "Mixed/future/missing version and partial/duplicate/unknown families reject without weakening v1",
+      "Existing main schema0/fractional/null/missing-meta guards retained in both paths",
+      "Current default-v1 second-root consumer stays passing; explicit-v2 consumers are claimed only after actual execution"
+    ]
+  },
+  "limitedDParserScope": {
+    "execution": "none; readonly source inventory only, not a D admission",
+    "observed": "Portability bundle.ts calls local snapshotState. manifest.ts350 requires personal-evidence with formatVersion1|2 and restore.ts287 reconstructs personal-evidence. No direct WorkflowSnapshots/readWorkflowEvidence call or workflow-snapshot/1-only guard was found in this inspected path.",
+    "constraint": "Personal bundle/evidence formats are distinct from workflow snapshot/evidence formats. Keeping create default1 is a conservative WorkflowSnapshots API compatibility choice, not a proven direct D parser restriction. Installed-byte compatibility still belongs to exact D/E evidence."
+  },
+  "nextOutcomePackages": {
+    "A": {
+      "outcome": "Versioned backup release consumer with one genuine Broker-to-restored-readonly dataset",
+      "early": "Keep the now-closed real-v1 golden and exact current-v2 recipes, preserve validSchema guards and cover supported format selection without extra create scans.",
+      "middle": "Use the existing controlled Application/Effects/Runner/Broker to create Work/Ticket/Question/Answer/Delivery in the SAME Store as actual SDK/context/candidate data; replace manual Q&A and no-op source-intent fixture with actual source HTTP on the restored root.",
+      "final": "Provide D/E a parameterized old/default-v1/explicit-v2 producer-verify-restore recipe, count provider calls/held queue state through readonly HTTP, and retain no-start/no-resend boundaries without deriving private permission from a snapshot."
+    },
+    "C": {
+      "outcome": "Complete current second-root review chain including real controlled work/question provenance",
+      "early": "Retain the now-passing one-snapshot candidate/context readonly/source-confirm chain and remove the obsolete A-v1 blocker note after consuming the admitted source.",
+      "middle": "Consume the real controlled Broker dataset in that same chain, verify question-answer display exclusion and original native-binding data through existing HTTP/read ports, without labeling persistence-only rows as Broker execution.",
+      "final": "Exercise selected snapshot versions and scoped source/receipt drift with counted reader/provider costs; keep actual source facts data-only and leave private permission/target/native admission separately bounded."
+    }
+  },
+  "preserved": {
+    "AWorktree": "clean",
+    "CWorktree": "original pnpm-lock.yaml diff only",
+    "userServiceGroups": 12,
+    "servicesTouched": false,
+    "ledgersTouched": false,
+    "historicalReportsOverwritten": false,
+    "repositoryOutput": "reports/releases/wave19-admission/context.json"
+  }
+}
