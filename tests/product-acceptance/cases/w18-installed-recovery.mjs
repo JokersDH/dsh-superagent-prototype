@@ -483,5 +483,20 @@ export async function runInstalledRecovery() {
           : 'NOT_REACHED for this frozen package: no versioned snapshot code, v1-only scope kept' }
     }))
 
+  cases.push(await runCase({ ...define('E9-INSTALLED-STABILITY', 'Bounded concurrent reads, repeated confirmation and a service reopen on the second root return every request/queue/resource to baseline'), evidence: {} },
+    async ({ assert, evidence }) => {
+      assert('INSTALLED_STABILITY_PROVISIONED', observed !== undefined, failure ?? 'no observation')
+      if (!observed) return
+      const s = observed.stress
+      assert('INSTALLED_STABILITY_CONCURRENT', s.concurrent.length === 4 && s.concurrent.every(status => status === 200), JSON.stringify(s.concurrent))
+      assert('INSTALLED_STABILITY_REPEATED', s.repeatedEqual === true && observed.source.replayEqual === true, JSON.stringify({ repeated: s.repeatedEqual, replay: observed.source.replayEqual }))
+      assert('INSTALLED_STABILITY_QUEUE', s.queueReturned === true && s.countsStable === true, JSON.stringify({ queue: s.queueReturned, counts: s.countsStable }))
+      assert('INSTALLED_STABILITY_NO_RESEND', s.providerUnchanged === true, String(s.providerUnchanged))
+      assert('INSTALLED_STABILITY_REOPEN', observed.source.reopened === 'RUNNING' && observed.source.reopenedEqual === true, JSON.stringify({ status: observed.source.reopened, equal: observed.source.reopenedEqual }))
+      evidence.installedStability = { subject: frozenArtifactSubject(target), mode: 'recovery_readonly',
+        concurrent: s.concurrent, repeatedEqual: s.repeatedEqual, queueReturned: s.queueReturned, countsStable: s.countsStable,
+        providerUnchanged: s.providerUnchanged, reopened: observed.source.reopened, reopenedEqual: observed.source.reopenedEqual }
+    }))
+
   return { cases, artifacts: {} }
 }
