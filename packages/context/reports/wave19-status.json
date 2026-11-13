@@ -1,0 +1,87 @@
+{
+  "protocol": "agent-c-wave19-status/1",
+  "wave": "product-wave-19",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "2208899",
+    "mergeCommit": "a8e1db5",
+    "mainVersionedSnapshot": "9856124",
+    "previousOwnCommit": "91b0a29",
+    "chainCheckpoint": "476141f",
+    "rootLockDiffPreserved": true
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "sameChain": {
+    "location": "packages/knowledge/test/main-business-snapshot-chain.case.ts",
+    "realBusinessEntities": {
+      "provenance": "main controlled normal product path: Application -> Effects -> Broker -> fixture executor",
+      "work": "create_work produced a real Work/Ticket; candidate accepted -> delivered",
+      "question": "real Broker user_questions row; answered -> delivery status native_applied",
+      "pendingQuestion": "second Work kept an unanswered real question for read-only review",
+      "vendorNative": 0
+    },
+    "formats": {
+      "defaultV1": "workflow-snapshot/1 + workflow-evidence/1, verified",
+      "explicitV2": "workflow-snapshot/2 + workflow-evidence/2, familySetVersion 2, verified",
+      "invalidVersion": "formatVersion 3 rejected before destination creation"
+    },
+    "secondRootReadonly": {
+      "snapshotRead": "works + pending question visible",
+      "deliveredWork": "GET /v1/works/:id -> delivered",
+      "deliveries": "answered question still native_applied",
+      "answerPendingQuestion": "422",
+      "otherBusiness": ["create_work 422", "candidates prepare 422", "proposals 422", "context preview 422", "old context token 422"],
+      "start": "unsupported_capability",
+      "frozen": "candidate digest, history entry and audit bundleDigest identical",
+      "heldQueue": "effect rows unchanged",
+      "modelCallsAfterRestore": 0,
+      "sourceFacts": "prepare/confirm not_granted, target not created, audit equals confirm"
+    },
+    "sensitiveQa": "question/answer rows are anchored or question_answer_display; ordinary preview excludes them and no plain reasoner message carries them"
+  },
+  "consumerMap": {
+    "actualCalls": [
+      "main controlled normal product path (create_work/answer_question/accept_candidate) for real Work/Ticket/Broker Q&A",
+      "WorkflowSnapshots default v1 and explicit v2 create/verify",
+      "recovery_readonly runtime+HTTP on the v1 snapshot",
+      "GET /v1/snapshot, /v1/works/:id, /v1/questions/:id/deliveries",
+      "source prepare/confirm/audit",
+      "candidate GET/prepare + proposals confirm (normal phase)"
+    ],
+    "moduleOnly": ["selectRelevantSources", "projectSourceReview", "collectContextHistory"]
+  },
+  "cost": {
+    "providerCalls": "1 per reply; 0 after restore",
+    "snapshot": "one v1 and one v2 backup of the same store; read-only review does not scan the whole DB",
+    "heldQueue": "unchanged",
+    "reusedEvidence": ["600 scan boundary", "8 candidates/long text", "10000 history", "wave18 same-root/second-root bridge"]
+  },
+  "probes": {
+    "oldContextProbes": { "wave15": 4, "wave14": 6, "wave13": 6, "wave12": 8, "wave11": 17 },
+    "wave18COnlyWrapper": { "passed": 4, "failed": 0, "evidence": "packages/context/reports/wave18-c-probe.json" }
+  },
+  "ownedRegressions": {
+    "contextTests": { "passed": 124, "failed": 0 },
+    "proposalsTests": { "passed": 41, "failed": 0 },
+    "knowledgeTests": { "passed": 98, "failed": 0 },
+    "routingTests": { "passed": 44, "failed": 0 },
+    "typecheck": "pass",
+    "build": "pass"
+  },
+  "notReached": [
+    { "item": "personal historical project read-only rebinding (consent/principal/root)", "owner": "main", "reason": "no main entry in this merge; fixture recovery_readonly is not personal" },
+    { "item": "B business reconnect / crash recovery / real Runner transport", "owner": "B", "reason": "B-owned; C consumes the controlled normal producer data only" },
+    { "item": "vendor native question/answer compatibility", "owner": "main/B", "reason": "0 vendor native turns; Broker Q&A comes from the controlled fixture executor" },
+    { "item": "private startup permission / target activation / native value", "owner": "main", "reason": "source confirmation only records facts" },
+    { "item": "C module-only projections wired into main HTTP", "owner": "main" }
+  ],
+  "preserved": {
+    "userServices": "5180/8796 through 5191/8807 untouched",
+    "historicalReports": "wave01-wave18 reports unchanged",
+    "rootLock": "pnpm-lock.yaml diff preserved and not committed",
+    "eAssertions": "unchanged"
+  }
+}
