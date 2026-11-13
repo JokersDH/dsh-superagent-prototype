@@ -19,9 +19,11 @@ const { values } = parseArgs({
     open: { type: 'boolean', default: false },
     fixture: { type: 'boolean', default: false },
     'discussion-only': { type: 'boolean', default: false },
+    'review-restored-scope': { type: 'string' },
   },
 })
 if (values.fixture && values['discussion-only']) throw new Error('Discussion-only personal mode cannot use fixture execution')
+if (values.fixture && values['review-restored-scope']) throw new Error('Restored review is an explicit personal entry')
 const port = (name) => {
   const value = Number(values[name])
   if (!Number.isSafeInteger(value) || value < 1024 || value > 65535)
@@ -136,6 +138,7 @@ async function main() {
       '--assistant',
       ...(!values.fixture ? ['--native'] : []),
       ...(values['discussion-only'] ? ['--discussion-only'] : []),
+      ...(values['review-restored-scope'] ? ['--review-restored-scope', resolve(values['review-restored-scope'])] : []),
       ...(!values['require-login'] ? ['--local-access'] : []),
     ],
     root,
