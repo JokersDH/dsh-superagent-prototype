@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-13T07:07:15.423Z",
+  "checkedAt": "2026-11-13T08:28:35.133Z",
   "source": {
-    "commit": "93c56f6fac16f31dab354e94a107339f767727be",
+    "commit": "5264cbddf39aa7ce00bf50eb8d2a09ca26de97a4",
     "dirty": false
   },
-  "expectedSource": "93c56f6fac16f31dab354e94a107339f767727be",
+  "expectedSource": "5264cbddf39aa7ce00bf50eb8d2a09ca26de97a4",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -716,6 +716,11 @@
       "status": "PASS"
     },
     {
+      "id": "E5-WORKFLOW-FORMATS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E6-INSTALLED-CONTEXT",
       "required": true,
       "status": "PASS"
@@ -836,7 +841,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-13T07:03:32.127Z",
+    "decidedAt": "2026-11-13T08:24:04.185Z",
     "failureCodes": []
   },
   "notes": [
