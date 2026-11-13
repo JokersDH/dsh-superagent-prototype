@@ -1,0 +1,30 @@
+{
+  "protocol": "assistant-candidates-browser/1",
+  "source": "eb96c3ee68be96883c7a027cd845ea8f9e9150b6",
+  "trackedSourceDirty": true,
+  "status": "FAIL",
+  "cases": [
+    {
+      "id": "EXPLICIT_PREFERENCE_DEFAULTS_OFF_AND_SIDECAR_PRESERVES_LEGACY_MODEL_CONFIG",
+      "status": "PASS"
+    },
+    {
+      "id": "ONE_SDK_RESPONSE_STREAMS_AND_LAZY_CANDIDATE_REVIEW_HAS_NO_BUSINESS_EFFECT",
+      "status": "PASS"
+    },
+    {
+      "id": "ORIGINAL_CANDIDATE_FORM_AND_PREVIEW_ARE_INERT_AND_CLOSE_RESTORES_FOCUS",
+      "status": "PASS"
+    },
+    {
+      "id": "LOST_CONFIRMATION_RESPONSE_RELOAD_REPLAYS_THE_ORIGINAL_COMMAND_ONCE",
+      "status": "FAIL",
+      "message": "locator.waitFor: Error: strict mode violation: getByRole('dialog', { name: '提案', exact: true }).getByRole('heading', { name: '决定已记录', exact: true }) resolved to 2 elements:\n    1) <h2>决定已记录</h2> aka getByRole('dialog', { name: '提案' }).locator('h2')\n    2) <h3>决定已记录</h3> aka getByRole('region', { name: '提案结果' }).getByRole('heading', { name: '决定已记录' })\n\nCall log:\n\u001b[2m  - waiting for getByRole('dialog', { name: '提案', exact: true }).getByRole('heading', { name: '决定已记录', exact: true }) to be visible\u001b[22m\n"
+    }
+  ],
+  "errors": [],
+  "mockSDKRequests": 1,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "Actual React/HTTP/SQLite/PrivateModelProvider SDK with a private local mock; controlled local work creation/revision, not vendor/native/install/activation admission"
+}

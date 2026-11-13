@@ -1,0 +1,144 @@
+{
+  "protocol": "wave16-ac-independent-admission/1",
+  "reviewBaseline": "a64a127",
+  "observedMain": "87d548c54b470638535037575b2dd85061344bc5",
+  "mainChangeDuringAudit": "87d548c adds two architecture documents only; product source is equivalent to the requested a64a127 baseline",
+  "modelCalls": 0,
+  "nativeTurnStarts": 0,
+  "browserRuns": 0,
+  "releaseApproved": false,
+  "sources": {
+    "A": "29800f652ec8804e6139e312c3235e4ad202c976",
+    "C": "f6f985e1c8ce95610bf231bdf1804e2053f72164"
+  },
+  "A": {
+    "verdict": "previous source admission retained; new snapshot verifier compatibility slice not admitted",
+    "previousSourceProbe": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave16-a-previous.json node tools/bootstrap/probe-wave13-storage.mjs /Users/hh/Desktop/joker/superagent-agent-a",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "report": "/tmp/pa-wave16-a-previous.json"
+    },
+    "packages": {
+      "testCommand": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows test",
+      "testExitCode": 0,
+      "storagePassed": 87,
+      "workflowsPassed": 106,
+      "typecheckExitCode": 0,
+      "buildExitCode": 0
+    },
+    "currentMainLogicalSourceConsumer": {
+      "command": "node --import /tmp/pa-wave16-ac-main-hook.mjs --test tests/integration/recovery-logical-source.case.mjs",
+      "exitCode": 0,
+      "passed": 8,
+      "scope": "Current main runtime/HTTP with A storage/workflows ports; real source inspect/prepare, no confirm or startup authorization"
+    },
+    "newSnapshotProbe": {
+      "command": "node /tmp/pa-wave16-a-snapshot-subset.mjs",
+      "reproduceCommand": "PA_ADMISSION_REPORT=/tmp/pa-wave16-storage-reproduce.json node tools/bootstrap/probe-wave16-storage.mjs /Users/hh/Desktop/joker/superagent-agent-a",
+      "exitCode": 1,
+      "passed": 2,
+      "failed": 2,
+      "report": "/tmp/pa-wave16-a-snapshot-subset.json",
+      "observations": [
+        { "id": "NONEMPTY_SNAPSHOT_POSITIVE", "status": "PASS", "created": "ok", "verified": "ok", "queueRows": 1 },
+        { "id": "TAMPERED_QUEUE_WITH_FULL_18_FAMILIES", "status": "PASS", "verified": "blocked" },
+        { "id": "TAMPERED_QUEUE_WITH_EFFECT_FAMILY_REMOVED", "status": "FAIL", "verified": "ok", "families": 17 },
+        { "id": "TAMPERED_QUEUE_WITH_ONLY_ONE_FAMILY", "status": "FAIL", "verified": "ok", "families": 1 }
+      ]
+    },
+    "dependencyCompatibility": {
+      "status": "REQUIRES_CURRENT_MAIN_CONTRACTS",
+      "detail": "Wholesale old A dist plus its old contract package rejects current inference records containing replyFormat/sourceTextDigest at packages/storage/src/assistant-reply-results.ts:44. This does not reproduce on current main and is not a main candidate regression. Merge current main contracts before claiming current SDK/candidate consumers.",
+      "initialCombinedHarness": "Logical source 8 passed; candidate cases failed because the stale A contract rejected the inference record; the factory script additionally needed its explicit module-mock flag/output argument. Scopes were isolated and rerun correctly below."
+    },
+    "remainingProductionConsumer": "Source inspect/prepare exists. Real source confirmation/private permission/target startup remain main-owned and separately not reached. Logical completeness or a snapshot does not prove physical writer quiescence."
+  },
+  "C": {
+    "verdict": "unknown-wrapper fix admitted at pure-data scope; current main factory and nonempty candidate product scope retained",
+    "previousWrapperProbe": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave16-c-previous.json node tools/bootstrap/probe-wave15-context.mjs /Users/hh/Desktop/joker/superagent-agent-c",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "report": "/tmp/pa-wave16-c-previous.json"
+    },
+    "packages": {
+      "testCommand": "pnpm --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing test",
+      "testExitCode": 0,
+      "contextPassed": 124,
+      "proposalsPassed": 39,
+      "knowledgePassed": 84,
+      "routingPassed": 44,
+      "typecheckExitCode": 0,
+      "buildExitCode": 0
+    },
+    "currentMainConsumers": [
+      {
+        "command": "node --experimental-test-module-mocks tests/integration/context-factory-consumer.mjs --output /tmp/pa-wave16-main-factory",
+        "exitCode": 0,
+        "passed": 6,
+        "report": "/tmp/pa-wave16-main-factory/report.json",
+        "scope": "Actual default runtime/HTTP/SQLite factories; cutoff, 600-message scan limit, published artifact set, original fingerprints and synchronous guard; controlled local product work only"
+      },
+      {
+        "command": "node --import /tmp/pa-wave16-c-main-hook.mjs --test tests/integration/assistant-candidates.case.mjs",
+        "exitCode": 0,
+        "passed": 11,
+        "scope": "Current main SDK/mock transport, nonempty durable body, candidate GET/prepare, original ProductProposals confirmation/rejection/replay and drift rejection; C proposal/context source aliases only"
+      },
+      {
+        "command": "node --import /tmp/pa-wave16-c-main-hook.mjs --test packages/knowledge/test/main-context-use-consumer.case.ts packages/knowledge/test/main-context-http.case.ts",
+        "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+        "exitCode": 0,
+        "passed": 13,
+        "scope": "C consumer fixtures using current main runtime/HTTP/CompletedAssistantReplies and current main Store dependencies; the two added nonempty examples still construct data wrappers by hand"
+      },
+      {
+        "command": "pnpm exec tsc -p /tmp/pa-wave16-c-consumer.tsconfig.json",
+        "exitCode": 0,
+        "scope": "Current main context-preview/context-use/reply-results/proposals compiled against C source under strict/exactOptional"
+      }
+    ],
+    "evidenceLimits": [
+      "C's new nonempty fixtures at packages/knowledge/test/main-context-use-consumer.case.ts:494 and :604 construct main-completed-reply wrappers and arbitrary artifact digests; they do not obtain those candidates from CompletedAssistantReplies.readVerified.",
+      "The new generic /v1/proposals/prepare case at the same file:628 exercises a real explicit user proposal transaction, but does not exercise /v1/messages/:id/candidates or /v1/assistant/candidates/prepare and its original replyOrigin binding.",
+      "C status/recipe missing-factory, suggestions-empty and missing-UI claims describe its old 53b1598 base and are stale for current main 0044-0046. Main's actual product is independently passing above.",
+      "No current-main permission bypass was found; verifiedBy and verifiedIdentity remain private data-injection conventions, not public authority."
+    ]
+  },
+  "findings": [
+    {
+      "id": "A_SNAPSHOT_ARBITRARY_EVIDENCE_FAMILY_SUBSET",
+      "severity": "P2",
+      "source": "29800f652ec8804e6139e312c3235e4ad202c976",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows/src/snapshot.ts",
+      "line": 203,
+      "detail": "The verifier accepts any nonempty family subset and no longer verifies the manifest evidence digest. A changed nonempty effect queue is blocked with full evidence but accepted after its family is removed, or after all but one family are removed. Historical compatibility needs explicitly recognized/versioned family contracts rather than arbitrary subsets.",
+      "scope": "New A snapshot-verifier slice; existing main source preflight and historical admissions are unchanged"
+    },
+    {
+      "id": "C_CURRENT_MAIN_CANDIDATE_CONSUMPTION_EVIDENCE_GAP",
+      "severity": "P2",
+      "source": "f6f985e1c8ce95610bf231bdf1804e2053f72164",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-c/packages/knowledge/test/main-context-use-consumer.case.ts",
+      "line": 494,
+      "detail": "The added nonempty cases are hand-constructed data and generic proposal-transaction fixtures. The next consumer package should use the now-existing current main verified body and candidate GET/prepare origin path; do not count the old missing-entry claims as present blockers.",
+      "scope": "Evidence/consumer gap, not a demonstrated current-main authorization bug"
+    }
+  ],
+  "nextOutcomePackages": {
+    "A": "Current-version nonempty snapshot integrity and read-only restore: close exact/versioned family completeness with historical positive controls; sync current inference contracts; restore actual current SDK/context/candidate data and original queues/resources to a new root; preserve readonly/unknown-writer barriers; test corruption and bounded process windows; consume real source confirmation only after main publishes it.",
+    "C": "Current default-source and same-response candidate consumer closure: merge current main, replace hand-stamped nonempty examples with actual returned/verified body and original index/digest/request/artifact tuple; call real candidate GET/prepare and original confirm/reject/replay; retain cutoff/published IDs/full synchronous guards; cover source/Scope/result drift and bounded output; update consumer map without adding SQL/HTTP/LLM or a second authority."
+  },
+  "preserved": {
+    "AWorktreeTrackedChanges": "none",
+    "CWorktreeTrackedChanges": "pre-existing pnpm-lock.yaml only",
+    "userServiceGroups": 12,
+    "userServicesTouched": false,
+    "ledgersTouched": false,
+    "historicalReportsOverwritten": false,
+    "onlyRepositoryReportWritten": "reports/releases/wave16-admission/context.json"
+  }
+}

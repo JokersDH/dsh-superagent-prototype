@@ -10,8 +10,10 @@ export const AssistantProviderStatusSchema = z.strictObject({
   state: z.enum(['not_configured', 'configured', 'responding', 'available', 'error']),
   secureTransport: z.boolean(),
   lastResponseAt: TimestampSchema.optional(),
+  suggestionsEnabled: z.boolean().optional(),
 })
 export const AssistantModelSelectionSchema = z.strictObject({ model: z.string().trim().min(1).max(160) })
+export const AssistantSuggestionsSettingSchema = z.strictObject({ enabled: z.boolean() })
 export type AssistantProviderStatus = z.infer<typeof AssistantProviderStatusSchema>
 export const AssistantStreamUpdateSchema = z.strictObject({
   protocol: z.literal('assistant-stream/1'),

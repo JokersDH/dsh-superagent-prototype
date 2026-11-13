@@ -12,6 +12,9 @@ import {
   ApplicationConfigurationSchema,
   AssistantProviderStatusSchema,
   AssistantModelSelectionSchema,
+  AssistantSuggestionsSettingSchema,
+  AssistantCandidatePrepareSchema,
+  AssistantCandidatesSchema,
   AssistantStreamUpdateSchema,
   ProjectRegistrationInputSchema,
   WorkLocationSchema,
@@ -79,6 +82,8 @@ import type {
   AnswerDelivery,
   ApplicationConfiguration,
   AssistantProviderStatus,
+  AssistantCandidatePrepare,
+  AssistantCandidates,
   AssistantStreamUpdate,
   ProjectRegistrationInput,
   WorkLocation,
@@ -170,6 +175,7 @@ export interface LocalHttpOptions {
     decision?(command: DecisionCommand, actor: TrustedActor): Promise<CommandReceipt>
     recoveryPrepare?(input: RecoveryPrepare, actor: TrustedActor): Promise<RecoveryPlan>
     prepareProposal?(input: ProposalPrepare, actor: TrustedActor): Promise<ProposalPreview>
+    prepareReplyCandidate?(input: AssistantCandidatePrepare, actor: TrustedActor): Promise<ProposalPreview>
     proposal?(command: ProposalCommand, actor: TrustedActor): Promise<CommandReceipt>
     contextPreview?(input: ContextPreviewInput, actor: TrustedActor): Promise<ContextPreview>
     recoveryTargetPrepare?(input: RecoveryTargetPrepareInput, actor: TrustedActor): Promise<RecoveryTargetStatus>
@@ -191,6 +197,8 @@ export interface LocalHttpOptions {
     assistant?(): Promise<AssistantProviderStatus>
     assistantStream?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
     selectModel?(model: string): Promise<AssistantProviderStatus>
+    setAssistantSuggestions?(enabled: boolean): Promise<AssistantProviderStatus>
+    replyCandidates?(messageId: string): Promise<AssistantCandidates>
     guide?(): Promise<string>
     registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
     workLocation?(workId: string): Promise<WorkLocation>
@@ -432,6 +440,22 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
       page.entries.length > (input.limit ?? 20)) throw new ApplicationFault('storage_unavailable', 'Context history scope mismatch', 'none')
     return c.json(page)
   })
+  app.get('/v1/messages/:id/candidates', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Reply candidates accept no query')
+    if (!options.read?.replyCandidates) throw new ApplicationFault('unsupported_capability', 'Reply candidates are not connected')
+    const id = IdSchema.parse(c.req.param('id')), value = AssistantCandidatesSchema.parse(await options.read.replyCandidates(id))
+    if (value.messageId !== id) throw new ApplicationFault('storage_unavailable', 'Reply candidate source mismatch', 'none')
+    return c.json(value)
+  })
+  app.post('/v1/assistant/candidates/prepare', async c => {
+    if (!c.req.header('content-type')?.startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Reply candidate preparation requires JSON')
+    if (!options.operations?.prepareReplyCandidate) throw new ApplicationFault('unsupported_capability', 'Reply candidate preparation is not connected')
+    const input = AssistantCandidatePrepareSchema.parse(await c.req.json())
+    const value = ProposalPreviewSchema.parse(await options.operations.prepareReplyCandidate(input, c.get('actor')))
+    if (value.record.sourceMessageId !== input.messageId || value.record.payloadDigest !== input.payloadDigest)
+      throw new ApplicationFault('storage_unavailable', 'Reply candidate preview mismatch', 'none')
+    return c.json(value)
+  })
   app.get('/v1/messages/:id/context/sources', async c => {
     if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Historical sources accept no query')
     if (!options.read?.contextSources) throw new ApplicationFault('unsupported_capability', 'Historical sources are not connected')
@@ -644,6 +668,12 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
       throw new ApplicationFault('unsupported_capability', 'Model selection is not configured')
     const input = AssistantModelSelectionSchema.parse(await c.req.json())
     return c.json(AssistantProviderStatusSchema.parse(await options.read.selectModel(input.model)))
+  })
+  app.post('/v1/assistant/suggestions', async c => {
+    if (!c.req.header('content-type')?.startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Suggestion settings require JSON')
+    if (!options.read?.setAssistantSuggestions) throw new ApplicationFault('unsupported_capability', 'Suggestion settings are not configured')
+    const input = AssistantSuggestionsSettingSchema.parse(await c.req.json())
+    return c.json(AssistantProviderStatusSchema.parse(await options.read.setAssistantSuggestions(input.enabled)))
   })
   app.delete('/v1/session', (c) => {
     const id = getCookie(c, COOKIE)

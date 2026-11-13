@@ -1,0 +1,43 @@
+{
+  "protocol": "wave15-main-candidate-checks/1",
+  "date": "2026-11-13",
+  "backendRun": {
+    "command": "node --test tests/integration/assistant-suggestions.case.mjs tests/integration/assistant-candidates.case.mjs tests/integration/assistant-reply-process.case.mjs tests/integration/proposal-commands.case.mjs tests/integration/assistant-replies.case.mjs tests/integration/model-provider.case.mjs tests/integration/assistant-context-product.case.mjs",
+    "sourceAtRun": "eb96c3e+working changes subsequently committed in104b7a0",
+    "status": "PASS",
+    "tests": 91,
+    "failures": 0,
+    "sdkCases": 20,
+    "candidateCases": 11,
+    "actualProcessCrashCases": 5
+  },
+  "consoleTransport": {
+    "command": "pnpm --dir apps/console test",
+    "status": "PASS",
+    "tests": 34,
+    "failures": 0
+  },
+  "staticChecks": [
+    { "command": "pnpm --dir apps/coordinator typecheck:product", "status": "PASS" },
+    { "command": "pnpm --dir apps/coordinator typecheck:http", "status": "PASS" },
+    { "command": "pnpm --dir apps/console typecheck", "status": "PASS", "source": "1169535" },
+    { "command": "pnpm --dir apps/console build", "status": "PASS", "source": "1169535", "advisory": "Existing main JavaScript bundle exceeds500KiB (613.11kB beforegzip)" },
+    { "command": "node product-spec/tools/verify-spec.mjs --check", "status": "PASS", "scope": "Generated specification consistency only" }
+  ],
+  "actualConsumerEvidence": "context-factory-final/report.json",
+  "browserEvidence": [
+    "candidates-browser-final/browser-report.json",
+    "candidates-layout-confirmation-clean/browser-report.json",
+    "proposal-browser-regression-clean/browser-report.json",
+    "context-browser-regression/browser-report.json"
+  ],
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "releaseApproved": false,
+  "limitations": [
+    "SDK calls use private localhost mock, not the configured external model gateway",
+    "Controlled Work creation/revision is not another native coding execution admission",
+    "Functional/DOM layout confirmation does not replace a missing final visual ship verdict",
+    "No source-confirm, private activation authority, installed release or target startup admission"
+  ]
+}
