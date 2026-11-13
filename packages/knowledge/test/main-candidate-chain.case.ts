@@ -182,6 +182,22 @@ test('decision confirm, artifact corruption replay, and rejection keep one origi
   assert.equal(h.store.workflows.assistant.decisions.list({ projectId, limit: 10 }).records.length, 1)
   assert.equal(h.model.requests.length, 1)
 
+  // Revoking the recorded decision does not revive anything and the original receipt still replays.
+  const recordedDecision = h.store.workflows.assistant.decisions.list({ projectId, limit: 10 }).records[0]!.decision
+  const revoked = await h.product.operations.decision({
+    kind: 'revoke_decision',
+    commandId: 'chain-revoke',
+    projectId,
+    conversationId,
+    decisionId: recordedDecision.id,
+    expectedVersion: 1,
+  }, actor)
+  assert.equal(revoked.status, 'recorded')
+  assert.ok(h.store.workflows.assistant.decisions.list({ projectId, limit: 10 }).records[0]!.decision.revokedAt)
+  assert.deepEqual(await h.confirm(preview, 'chain-confirm-1'), first)
+  assert.equal(h.store.workflows.assistant.decisions.list({ projectId, limit: 10 }).records.length, 1)
+  assert.equal(h.model.requests.length, 1)
+
   // A recorded confirmation replays even after the artifact bytes are damaged; nothing re-executes.
   const result = h.store.workflows.assistant.replyResults.forRequest(key('assistant-request', messageId))!
   writeFileSync(h.store.artifacts.filePath(result.artifactRef), 'corrupt after the recorded business result')
