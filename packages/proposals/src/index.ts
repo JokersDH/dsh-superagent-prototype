@@ -34,5 +34,3 @@ export type {
   ProposalTrustedContext,
   StructuredParseResult,
 } from './types.ts'
-export { reviewReplyCandidates } from './reply-candidates.ts'
-export type { ReplyCandidateBindings, ReplyCandidateReview, ReplyCandidateView } from './reply-candidates.ts'

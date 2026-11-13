@@ -218,7 +218,10 @@ export function reviewReplyCandidates(rawBody: unknown, bindings: ReplyCandidate
     verifiedBy: 'none',
     notes,
   })
-  const parsed = AssistantReplyBodySchema.safeParse(rawBody)
+  if (rawBody !== null && typeof rawBody === 'object' && Object.getOwnPropertySymbols(rawBody).length > 0) {
+    return invalidBody([{ index: 0, reason: 'invalid_body', detail: 'Symbol-keyed fields are not accepted' }])
+  }
+  const parsed = safeBody(rawBody)
   if (!parsed.success) {
     return invalidBody(
       parsed.error.issues.slice(0, 8).map((issue, index) => ({
@@ -324,11 +327,13 @@ export function reviewVerifiedReplyCandidates(input: unknown, bindings: ReplyCan
   // Unknown input is validated before any dereference: a null/partial wrapper is a refused claim,
   // never a thrown TypeError.
   if (!isObject(input)) return refuse('unverified_reply', 'No verified completed reply was supplied')
-  if (input.verifiedBy !== 'main-completed-reply') {
+  // Public/unknown input may carry throwing getters or hostile shapes; every read stays bounded.
+  const verifiedBy = safeRead(input, 'verifiedBy')
+  if (verifiedBy !== 'main-completed-reply') {
     return refuse('unverified_reply', 'The reply did not arrive through the main completed-reply verifier')
   }
-  const body = input.body
-  const identity = input.identity
+  const body = safeRead(input, 'body')
+  const identity = safeRead(input, 'identity')
   if (!isObject(body) || !isObject(identity)) {
     return refuse('incomplete_identity', 'Verified reply body or identity is missing')
   }
@@ -409,6 +414,24 @@ export function reviewVerifiedReplyCandidates(input: unknown, bindings: ReplyCan
       : {}),
   }
   return { ...review, verifiedBy: 'main-completed-reply', verifiedIdentity }
+}
+
+function safeRead(value: Record<string, unknown>, key: string): unknown {
+  try {
+    return value[key]
+  } catch {
+    return undefined
+  }
+}
+
+function safeBody(input: unknown): ReturnType<typeof AssistantReplyBodySchema.safeParse> {
+  try {
+    return AssistantReplyBodySchema.safeParse(input)
+  } catch (error) {
+    // A hostile getter/proxy can throw during parsing; report it as a bounded invalid body.
+    const message = error instanceof Error ? error.message : 'Invalid assistant reply body'
+    return { success: false, error: { issues: [{ path: [], message }] } } as unknown as ReturnType<typeof AssistantReplyBodySchema.safeParse>
+  }
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {

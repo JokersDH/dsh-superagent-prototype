@@ -335,3 +335,44 @@ test('unknown verified-wrapper input is refused before any dereference', () => {
   assert.equal(positive.candidates.length, 1)
   assert.equal(positive.verifiedBy, 'main-completed-reply')
 })
+
+test('public unknown candidate input fails closed for getters, hostile arrays and oversized data', () => {
+  const throwing = {
+    get protocol() {
+      throw new Error('getter exploded')
+    },
+    text: 'hello',
+    suggestions: [],
+  }
+  assert.equal(reviewReplyCandidates(throwing, bindings).status, 'invalid_body')
+
+  const getterSuggestions = {
+    protocol: 'assistant-reply-body/1',
+    projectId,
+    conversationId,
+    sourceMessageId,
+    replyMessageId: 'reply-1',
+    model: 'test-model',
+    text: 'hello',
+    get suggestions(): never {
+      throw new Error('suggestions getter exploded')
+    },
+  }
+  assert.equal(reviewReplyCandidates(getterSuggestions, bindings).status, 'invalid_body')
+
+  // Oversized suggestion lists, holes and symbol keys stay bounded failures, not partial acceptance.
+  const oversized = body(Array.from({ length: 10_000 }, () => ({ kind: 'reply', text: 'x', sourceRefs: [] })))
+  assert.equal(reviewReplyCandidates(oversized, bindings).status, 'invalid_body')
+  const sparse = body([, ,]) as unknown as Record<string, unknown>
+  assert.equal(reviewReplyCandidates(sparse, bindings).status, 'invalid_body')
+  const symbolKeyed = { ...body([{ kind: 'reply', text: 'x', sourceRefs: [] }]), [Symbol('extra')]: true }
+  assert.equal(reviewReplyCandidates(symbolKeyed, bindings).status, 'invalid_body')
+
+  // A verified wrapper whose property read throws is refused without dereference or throw.
+  const verifiedInput = {
+    get verifiedBy(): never {
+      throw new Error('wrapper getter exploded')
+    },
+  }
+  assert.equal(reviewVerifiedReplyCandidates(verifiedInput, { ...bindings, principal: { userId: 'user-1', authorityRef: 'authority-1' } }).status, 'invalid_body')
+})

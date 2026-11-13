@@ -157,9 +157,3 @@ export { detectInjectionPatterns } from './injection.ts'
 export { estimateTokens, queryTerms, relevanceScore } from './tokens.ts'
 export { isDeniedPath, isExternalReference, pathWithin, scopeWithin } from './paths.ts'
 export { sha256Bytes, sha256Text } from './digest.ts'
-export { createScopedConversationProvider, createPublishedArtifactProvider } from './scoped-adapters.ts'
-export type {
-  ScopedConversationMessageView, ScopedConversationPage, ScopedConversationReader, ConversationSelection,
-  ConversationAdapterCoverage, ScopedConversationProvider, ScopedArtifactMetadata, ScopedArtifactLookup,
-  PublishedArtifactSelection, ArtifactAdapterCoverage, ScopedArtifactProvider,
-} from './scoped-adapters.ts'
