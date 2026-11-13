@@ -1,0 +1,134 @@
+{
+  "protocol": "wave23-runtime-admission/1",
+  "date": "2026-11-13",
+  "status": "PARTIAL_SOURCE_NEW_CHANNEL_NOT_ADMITTED",
+  "candidateRoot": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "candidateSource": "f35c38ba167c81feb4031b5b31ee09c7e4747401",
+  "candidateBranch": "codex/g1-runtime",
+  "mainBaseline": "54d6e1b1a692bb5d82edc68d6356cb84e432c5d1",
+  "sourceChanges": [
+    "apps/runner/src/business-attach.ts",
+    "apps/runner/src/recovery-endpoint.ts",
+    "apps/runner/src/runner-service.ts",
+    "packages/execution/src/recovery-transport.ts",
+    "tests/native-acceptance/b22-business-attach.mjs",
+    "tests/native-acceptance/reports/wave22-status.json"
+  ],
+  "deliveredScope": {
+    "newSourceBeyondOldControlWrapper": true,
+    "description": "Actual optional GET /v1/facts and POST /v1/commands handlers over the existing authenticated Runner endpoint; actual runner-service reads FileCriticalJournal and feeds the existing AttemptRunner. attachBusinessRunner preserves a beforeCommand callback and calls authenticated inspection before its send method.",
+    "businessAttachApiPresent": true,
+    "actualFactSinkBrokerRebinding": false,
+    "actualTwoClientLifecyclePassed": false,
+    "coordinatorSigkillRecoveryPassed": false,
+    "recoveredDeliveryPassed": false,
+    "rfcPublished": false,
+    "wholePackageComplete": false,
+    "submittedStatusTruthful": true,
+    "newChannelIntegratedOnMain": false
+  },
+  "verification": [
+    {
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes --skipLibCheck --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --types node apps/runner/src/business-attach.ts apps/runner/src/runner-service.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "scope": "Actual new modules and their imports; root tsconfig alone does not include these modules."
+    },
+    {
+      "command": "node --test apps/runner/test/recovery-endpoint.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 9,
+      "failed": 0,
+      "scope": "Existing optional-backend control endpoint regressions only; these tests do not enable the new business routes."
+    },
+    {
+      "command": "node tests/native-acceptance/b22-business-attach.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "error": "RunnerLinkError unknown_outcome from recovery-transport.ts:179 while replaying facts",
+      "scope": "Original submitted harness; real private Runner process and fixed /usr/bin/false fixture profile. No installed vendor agent, gateway or model call. Throws before writing its final report; not a passing two-client handover."
+    },
+    {
+      "command": "node /tmp/pa-wave23-b-audit.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "passed": 5,
+      "failed": 4,
+      "scope": "Private local Unix endpoint with actual B serve/connect/attach modules, controlled backend and actual FileCriticalJournal; no child process or model. Exact private temporary root created and removed by the probe. The sole backend write is the deliberately failing foreign-source command negative, never a product/native operation.",
+      "cases": [
+        { "id": "original-context-inspection-and-fact-positive", "status": "PASS" },
+        { "id": "foreign-source-inspection-refusal-positive", "status": "PASS" },
+        { "id": "foreign-source-facts-must-refuse", "status": "FAIL", "observed": "Missing expected rejection: original frames returned to a client whose expected source is foreign." },
+        { "id": "preserved-beforewrite-guard-refuses-with-no-write", "status": "PASS" },
+        { "id": "foreign-binding-attach-facts-must-refuse", "status": "FAIL", "observed": "Missing expected rejection: attach facade facts() returns the same original frames with a foreign source binding." },
+        { "id": "foreign-source-command-must-refuse-before-write", "status": "FAIL", "observed": "Client rejects identity_mismatch only after the controlled backend command counter advances from 0 to 1." },
+        { "id": "small-replay-positive-before-oversized-page", "status": "PASS" },
+        { "id": "actual-journal-read-valid-160-record-positive", "status": "PASS", "observed": "160 genuine schema-valid runtime.error records append and read through FileCriticalJournal; serialized replay exceeds 64KB." },
+        { "id": "actual-journal-valid-over-transport-cap-replay", "status": "FAIL", "observed": "Same valid journal-derived frames return unknown_outcome because full replay exceeds the recovery transport's 64KB response limit." }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "B23-FACTS-CONTEXT-IDENTITY",
+      "priority": "P1_NEW_CHANNEL_ADMISSION",
+      "file": "packages/execution/src/recovery-transport.ts",
+      "line": 203,
+      "relatedFile": "apps/runner/src/business-attach.ts",
+      "relatedLine": 112,
+      "problem": "The new facts response contains frames/next only. Unlike inspect, connectRunnerRecovery.facts never binds the response to the expected attempt/producer/source, and attachBusinessRunner.facts calls it without an identity check. A client that fails the existing source inspection still reads original frames with the same pinned endpoint and credential.",
+      "impact": "New recovery consumer could ingest facts from a mismatched registered context. This is an unconsumed candidate API boundary; no current main public-product data leak is claimed.",
+      "requiredOutcome": "Bind every fact page to the exact registered identity and validate before exposing frames; retain positive original-context replay and independent foreign source/attempt/contract/epoch/socket refusals. Do not infer authority from possessing a copied credential alone."
+    },
+    {
+      "id": "B23-UNBOUNDED-FACT-PAGE",
+      "priority": "P1_BUSINESS_RECOVERY_ADMISSION",
+      "file": "apps/runner/src/runner-service.ts",
+      "line": 274,
+      "relatedFile": "packages/execution/src/recovery-transport.ts",
+      "relatedLine": 115,
+      "problem": "Runner maps the complete journal and returns every frame after since in one response. Journal capacity is 8MiB but transport response cap is 64KiB; there is no page/byte bound, next points to total length rather than a bounded acknowledged prefix, and an ordinary 160-record valid journal fails at the response cap.",
+      "requiredOutcome": "Implement bounded replay with immutable journal sequence/cursor, validated frame identity and byte-aware pagination or payload-reference transfer; prove multiple pages have no skip/duplicate and large valid payloads have an explicit bounded transport path. Do not merely raise global response limits or silently truncate frames."
+    },
+    {
+      "id": "B23-LOWLEVEL-COMMAND-PREFLIGHT",
+      "priority": "P2_NEW_PUBLIC_HELPER",
+      "file": "packages/execution/src/recovery-transport.ts",
+      "line": 211,
+      "problem": "New connectRunnerRecovery.command dispatches without checking expected producer context first; inspection identity is validated only on the returned response, after backend mutation. attachBusinessRunner.send currently performs the inspection first and preserves its guard, so the tested facade send path is not this bypass.",
+      "requiredOutcome": "Make the new public command client refuse foreign expected context before mutation or make the safe inspected/guarded facade the only exposed send surface; test the actual intended main consumer. Preserve the already-fixed prior control wrapper scope."
+    },
+    {
+      "id": "B23-HANDOVER-ASSERTION",
+      "priority": "P2_ACCEPTANCE_HARNESS",
+      "file": "tests/native-acceptance/b22-business-attach.mjs",
+      "line": 102,
+      "problem": "The observed-not-resent assertion explicitly calls b.send(original) again before constructing an always-observed reconciliation facade, then tests a different command id. It cannot establish that the original observed command was not sent again, even after the earlier replay failure is fixed.",
+      "requiredOutcome": "Use one original command id/body and authoritative durable observation, count actual receiver/native effects, and keep an unobserved positive. First achieve the genuine submitted two-client handover before claiming checkpoint one."
+    }
+  ],
+  "architectureGaps": [
+    "Runner fact receipts, payload-read responses and native-write-admission waiters remain bound to original stdio; the new endpoint exposes facts/command but no replacement coordinator fact sink, payload service, receipt ACK or actual Broker native-write admission channel.",
+    "The new business route calls AttemptRunner.feed directly; service-level begin/launch/receiver-log logic remains on the original stdio command path. A shared dispatch path is needed rather than a second partial intake lifecycle.",
+    "Client close is currently a no-op and no actual handover ownership/session fencing lifecycle is implemented.",
+    "No exact-store coordinator SIGKILL/new-process original-ID answer, bounded begin/answer ACK windows, recovered verification/candidate/manual acceptance or 2/4-slot evidence is delivered."
+  ],
+  "admission": {
+    "oldControlScopePreserved": true,
+    "newModuleStrictPassed": true,
+    "newBusinessSourceExists": true,
+    "firstRunnableHandoverAdmitted": false,
+    "businessRecoveryAdmitted": false,
+    "nativeAdmission": false,
+    "releaseAdmission": false,
+    "recommendedSourceIntegration": "Do not wholesale integrate the candidate business channel. Preserve old main control path. B should first publish a passing identity-bound bounded attach/stream/receipt/payload/native-admission port with actual two-client lifecycle and a minimal RFC, then main can compose its existing A Store and Broker."
+  },
+  "nextWholePackage": {
+    "milestone1": "Close submitted handover failure plus identity-bound bounded fact replay, original before-write guard and typed real receipt/payload/admission attachment; same Runner/child and two genuine client lifecycles; minimal RFC/consumer fixture.",
+    "milestone2": "Original coordinator SIGKILL, new process uses exact A registry/current binding and original IDs to continue the same question/answer; actual native_applied or preserved unknown, bounded receipt/ACK fault windows without resends/new IDs.",
+    "milestone3": "Same original Work proceeds to registered check, current candidate and manual acceptance; valid stale epoch/late ACK negatives, stop/post-proof and 2/4-slot resource return. Publish checkpoints and continue the whole goal; no new model allowance."
+  },
+  "budget": { "realModelTurns": 0, "nativeTurnStarts": 0, "oldBCap4Remainder": "UNKNOWN_NOT_SPENDABLE", "ePilot": "UNCHANGED_BLOCKED" },
+  "preservation": { "userServicesRestarted": false, "globalSocketDiscovery": false, "unrelatedCredentialsRead": false, "candidateFilesChanged": false, "historicalReportDiffsPreserved": true, "untrackedB16Preserved": true }
+}

@@ -222,6 +222,16 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
 
+  apps/launcher:
+    dependencies:
+      '@personal-agent/portability':
+        specifier: workspace:*
+        version: link:../../packages/portability
+    devDependencies:
+      '@personal-agent/storage':
+        specifier: workspace:*
+        version: link:../../packages/storage
+
   apps/runner:
     dependencies:
       '@personal-agent/contracts':
@@ -419,6 +429,25 @@ importers:
       '@personal-agent/contracts':
         specifier: workspace:*
         version: link:../contracts
+
+  packages/portability:
+    dependencies:
+      '@personal-agent/storage':
+        specifier: workspace:*
+        version: link:../storage
+      better-sqlite3:
+        specifier: 13.0.3
+        version: 13.0.3
+    devDependencies:
+      '@types/better-sqlite3':
+        specifier: ^7.6.12
+        version: 7.6.13
+      '@types/node':
+        specifier: 24.10.0
+        version: 24.10.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   packages/proposals:
     dependencies:
