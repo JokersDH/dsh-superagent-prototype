@@ -24,6 +24,7 @@ import { ContextPreviewInputSchema, ContextPreviewSchema } from '../src/context-
 import { AssistantContextBindingSchema, AssistantContextPrepareSchema, AssistantContextPreparedSchema, AssistantContextSendSchema } from '../src/assistant-context.ts';
 import { AssistantInferenceRecordSchema, AssistantReplyBodySchema, AssistantReplyResultSchema, AssistantContextHistoryQuerySchema, AssistantContextHistoryPageSchema } from '../src/assistant-records.ts';
 import { RecoverySourceCheckpointQuerySchema, RecoverySourceCheckpointSchema } from '../src/recovery-source.ts';
+import { RecoverySourcePrepareSchema, RecoverySourcePreparedSchema, RecoverySourceConfirmSchema } from '../src/recovery-source-confirmation.ts';
 import { ContextHistoryQuerySchema, ContextHistoryEntrySchema, ContextHistorySchema, ContextSourcesSchema } from '../src/context-records.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -112,6 +113,7 @@ for (const [name, protocol, source, schemas] of [
   ['assistant-candidates', 'assistant-candidates/1', 'assistant-candidates.ts', { AssistantCandidatePrepare: AssistantCandidatePrepareSchema, AssistantCandidates: AssistantCandidatesSchema }],
   ['assistant-records', 'assistant-records/1', 'assistant-records.ts', { AssistantInferenceRecord: AssistantInferenceRecordSchema, AssistantReplyBody: AssistantReplyBodySchema, AssistantReplyResult: AssistantReplyResultSchema, AssistantContextHistoryQuery: AssistantContextHistoryQuerySchema, AssistantContextHistoryPage: AssistantContextHistoryPageSchema }],
   ['recovery-source', 'recovery-source-checkpoint/1', 'recovery-source.ts', { RecoverySourceCheckpointQuery: RecoverySourceCheckpointQuerySchema, RecoverySourceCheckpoint: RecoverySourceCheckpointSchema }],
+  ['recovery-source-confirmation', 'recovery-source-prepared/1', 'recovery-source-confirmation.ts', { RecoverySourcePrepare: RecoverySourcePrepareSchema, RecoverySourcePrepared: RecoverySourcePreparedSchema, RecoverySourceConfirm: RecoverySourceConfirmSchema }],
   ['context-records', 'context-records/1', 'context-records.ts', { ContextHistoryQuery: ContextHistoryQuerySchema, ContextHistoryEntry: ContextHistoryEntrySchema, ContextHistory: ContextHistorySchema, ContextSources: ContextSourcesSchema }],
 ] as const) {
   const text = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: `urn:personal-agent:${name}:1`,

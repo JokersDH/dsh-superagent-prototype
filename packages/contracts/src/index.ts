@@ -24,5 +24,6 @@ export * from './assistant-records.ts';
 export * from './assistant-candidates.ts';
 export * from './context-records.ts';
 export * from './recovery-source.ts';
+export * from './recovery-source-confirmation.ts';
 export type * from './types.ts';
 export type * from './ports.ts';
