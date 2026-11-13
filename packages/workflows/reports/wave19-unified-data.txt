@@ -1,0 +1,10 @@
+WAVE19_UNIFIED_METRICS {"business":{"works":1,"tickets":1,"questions":1,"answers":1,"deliveries":1,"nativeApplied":1,"dispatch":2},"formats":[{"format":1,"databaseBytes":679936,"families":13,"status":"ok","business":{"works":1,"tickets":1,"questions":1,"answers":1,"deliveries":1,"nativeApplied":1,"dispatch":2},"candidates":1,"contextRows":1},{"format":2,"databaseBytes":679936,"families":21,"status":"ok","business":{"works":1,"tickets":1,"questions":1,"answers":1,"deliveries":1,"nativeApplied":1,"dispatch":2},"candidates":1,"contextRows":1}],"providerRequests":2}
+✔ one real business+SDK store snapshots in both recipes and reopens read-only at a second root (1367.603834ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1751.674667

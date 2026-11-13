@@ -1,0 +1,202 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "2208899",
+  "mergeCommit": "1ad77c7",
+  "checkpoints": [
+    "1ad77c7",
+    "f112ead",
+    "db04ccf",
+    "90c0c49"
+  ],
+  "testedSourceCommit": "90c0c49",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "currentEvidenceVersion": 2,
+  "currentFamilyCount": 21,
+  "legacyEvidenceVersion": 1,
+  "legacyFamilyCount": 13,
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "published interface and guards aligned",
+      "detail": "readWorkflowEvidence defaults to 1 with explicit 1|2 validation; create defaults to v1 and only formatVersion 2 writes workflow-snapshot/2; verify reads only the outer protocol recipe; both paths keep non-null/safe-integer/>=1 and required table/index/unknown-table/future-version checks. Own fixtures state the explicit format instead of relying on an old default.",
+      "evidence": [
+        "wave19-workflow-tests.txt",
+        "wave19-storage-tests.txt"
+      ]
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "main genuine v1 golden and current 21-family set",
+      "detail": "Rebuilds main genuine-v1-evidence.json fixture binding/bundle, reads v1 evidence and requires the exact overall digest e339e38272cdadaf38059ffeea18476a10c839e78427c30940371395c49de4cd and binding digest 51d53c57b7d4be9c586f5b6a255a9d8f6bbd8db64c71f3e032e70a2df6cce7dd. Explicit v2 keeps 21 families/familySetVersion 2. Missing/subset/duplicate/mixed/future and missing table/index/unknown table remain blocked.",
+      "evidence": [
+        "wave19-main-golden.txt",
+        "wave19-workflow-tests.txt"
+      ]
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "real product business producer",
+      "detail": "create_work through the real controlled product (application/effects/Broker/fixture executor) creates Work 1, Ticket 1, a Broker question, an answer and one native_applied delivery with dispatch receipts 2; rows come from the product chain, not public-store inserts.",
+      "evidence": [
+        "wave19-unified-data.txt",
+        "wave19-recovery-combination.txt"
+      ]
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "one store with SDK/context/candidates",
+      "detail": "The same store also holds the local SDK reply, the inert candidate, its explicit confirmation and the selected-context binding; identities/counts are asserted and no display message substitutes for a Broker entity. The payload is not an execution grant.",
+      "evidence": [
+        "wave19-unified-data.txt",
+        "wave19-candidate-consumers.txt"
+      ]
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "one snapshot to a second readonly root",
+      "detail": "The same store is snapshotted in default v1 (13 families, no familySetVersion) and explicit v2 (21 families) and both verify. Each restore reopens the real recovery_readonly HTTP/composition: work/question/answer/native_applied delivery, candidate, context history and binding and the source fact are readable; business POST is refused, the held queue and event cursor do not move and the provider receives no new request. This is a controlled fixture readonly root, not a personal-project rebinding.",
+      "evidence": [
+        "wave19-unified-data.txt"
+      ]
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "real source facts",
+      "detail": "Source prepare/confirm/audit run through the published HTTP over the same store (no no-op revalidate committer); authorization stays not_granted/startupAvailable=false and the original receipt is the audit record. The exported no-op committer remains only a module fixture.",
+      "evidence": [
+        "wave19-source-confirmation.txt",
+        "wave19-recovery-combination.txt"
+      ]
+    },
+    {
+      "phase": "A7",
+      "status": "NOT_REACHED",
+      "scope": "personal readonly rebinding data port",
+      "detail": "main has not published the restored-personal project readonly binding entry/consumer, so no A persistence port or read index is added and no historical settings become an executable grant. A targeted data port follows the published interface when it exists.",
+      "evidence": []
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "runnable data recipe for D/E",
+      "detail": "packages/workflows/docs/wave19-data-recipe.md names the format versions/protocols, the real business chain, the second-root scope and the exact commands; no handwritten SQL, credential copying or migration edits.",
+      "evidence": [
+        "wave19-data-recipe.md"
+      ]
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "bounded cost and unknown states",
+      "detail": "One read per format; v1/v2 snapshots of the same store are 679936 DB bytes with 13/21 families and no full-body scan; the reader keeps its bounded 2000-row family limit and partial/unknown states stay visible. No SQL transaction is held across an await.",
+      "evidence": [
+        "wave19-performance.json",
+        "wave19-unified-data.txt"
+      ]
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "final same-source result",
+      "detail": "This file binds the wave-19 result to 90c0c49 with main 2208899 merged; the old wave18 v1 evidence, 8 negatives and 196-package scope remain history and are not relabelled. Product install/native/value conclusions stay with their own owners.",
+      "evidence": [
+        "wave19-status.json"
+      ]
+    }
+  ],
+  "actualConsumers": {
+    "genuineMainV1Golden": {
+      "status": "PASS",
+      "evidence": "wave19-main-golden.txt"
+    },
+    "genuineOldV1Producer": {
+      "status": "PASS",
+      "evidence": "wave19-v1-producer.json"
+    },
+    "unifiedRealBusinessData": {
+      "status": "PASS",
+      "evidence": "wave19-unified-data.txt"
+    },
+    "sourcePrepareConfirmAudit": {
+      "status": "PASS",
+      "evidence": "wave19-source-confirmation.txt",
+      "tests": "14/14"
+    },
+    "recoveryCombination": {
+      "status": "PASS",
+      "evidence": "wave19-recovery-combination.txt",
+      "tests": "106/106"
+    },
+    "candidateConsumers": {
+      "status": "PASS",
+      "evidence": "wave19-candidate-consumers.txt",
+      "tests": "31/31"
+    },
+    "productExecution": {
+      "status": "PASS",
+      "evidence": "wave19-product-execution.txt",
+      "tests": "20/20"
+    },
+    "mainConsumers": {
+      "status": "PASS",
+      "evidence": "wave19-main-consumers.txt",
+      "tests": "89/89"
+    },
+    "targetConsumers": {
+      "status": "PASS",
+      "evidence": "wave19-target-consumers.txt",
+      "tests": "50/50"
+    },
+    "personalReadonlyBindingPort": {
+      "status": "NOT_REACHED",
+      "detail": "main entry absent; no private grant or historical settings promoted"
+    }
+  },
+  "scopes": {
+    "data": "PASS: real product Work/Ticket/Broker Q&A/native_applied plus SDK reply/candidate/context/source fact in one store, snapshotted in v1/v2 and restored read-only",
+    "normal": "PASS: control/normal product chain with policy.prepared/begin/native_applied delivery in the controlled fixture",
+    "recovered": "PASS only as controlled fixture recovery_readonly HTTP; no restored-personal rebinding",
+    "installed": "NOT_TESTED: A does not install the product (D/E scope)",
+    "native": "0 vendor/native sends; fixture executor only",
+    "value": "BLOCKED: pilot unchanged"
+  },
+  "budgets": {
+    "modelTasks": 0,
+    "vendorNativeTurns": 0,
+    "pilotGrant": "wave05-independent-review-pilot-01",
+    "pilotStatus": "BLOCKED",
+    "note": "no reset/top-up/refund/sample replacement"
+  },
+  "preserved": {
+    "userServices": 12,
+    "tars": "unchanged",
+    "nativeProfiles": "unchanged",
+    "ledgers": "unchanged",
+    "oldScopes": [
+      "wave18 genuine v1 2/2",
+      "old 8 negatives",
+      "196-package scope"
+    ]
+  },
+  "limitations": [
+    "The restored second root is a controlled fixture recovery_readonly composition; it is not a personal-project readonly rebinding and the current 403 is not relaxed.",
+    "A does not certify product installation, native compatibility, private startup permission, writer quiescence or target activation.",
+    "The no-op revalidate committer remains only a module fixture; the unified chain uses the real HTTP source prepare/confirm/audit."
+  ]
+}

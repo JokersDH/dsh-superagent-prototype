@@ -1,0 +1,67 @@
+{
+  "protocol": "wave18-v1-binding-compatibility/1",
+  "sources": {
+    "producer": {
+      "root": "/tmp/pa-old-v1",
+      "head": "3121ec46126a8579b45c7d128ee1700df4c82978",
+      "trackedStatus": "",
+      "files": {
+        "packages/storage/src/backup.ts": "42ba7b7c0939d8ac196f1e8ffb8d6289034ab322718c003427c0ee3468e09e3e",
+        "packages/storage/dist/backup.js": "09050a6b5c607f3e5ec03dafaf4ea07cb178476b181d1f1f3cdab8d12b982de3",
+        "packages/workflows/src/snapshot.ts": "207c6bfc5c3656f0f24ee09d7ce0fd0393a3821ed49d8fa14529d78d841245d9",
+        "packages/workflows/dist/snapshot.js": "e760aba211d5062a9c3b946a6c7455338f6af8b7c2858e42684a7dc0471447c1"
+      }
+    },
+    "A": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "head": "1ad77c7b1669cd7f80dca3ee0e329d84e2cd9238",
+      "trackedStatus": "",
+      "files": {
+        "packages/storage/src/backup.ts": "3a8ac5922f924a1b0477ace1edbd7e05527c5d6036e85b3c0a77d20a9fa68311",
+        "packages/storage/dist/backup.js": "7e6ee7c15fe15feaa8f49dd1b4f23c7586970186e376b0109cefa3a4b46b2dfe",
+        "packages/workflows/src/snapshot.ts": "cd4340ed0a20d29c676a708f2c55649b1e2d6843d4443d7fa65a2c55a65b431c",
+        "packages/workflows/dist/snapshot.js": "a90998b82e1d6a6599c69c42a4dbef12bdff7d75cc84cf6726528686f43b6fd5"
+      }
+    }
+  },
+  "producerFilesStable": true,
+  "candidateFilesStable": true,
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "observations": [
+    {
+      "id": "GENUINE_EMPTY_V1_CONTROL",
+      "status": "PASS",
+      "originalCreated": "ok",
+      "originalProtocol": "workflow-snapshot/1",
+      "evidenceProtocol": "workflow-evidence/1",
+      "originalVerified": "ok",
+      "candidateVerified": "ok"
+    },
+    {
+      "id": "GENUINE_NONEMPTY_BINDING_V1",
+      "status": "PASS",
+      "originalCreated": "ok",
+      "originalProtocol": "workflow-snapshot/1",
+      "evidenceProtocol": "workflow-evidence/1",
+      "originalVerified": "ok",
+      "candidateVerified": "ok",
+      "oldBindingFamily": {
+        "name": "assistant_context_bindings",
+        "count": 1,
+        "digest": "51d53c57b7d4be9c586f5b6a255a9d8f6bbd8db64c71f3e032e70a2df6cce7dd",
+        "truncated": false
+      },
+      "candidateBindingFamily": {
+        "name": "assistant_context_bindings",
+        "count": 1,
+        "digest": "51d53c57b7d4be9c586f5b6a255a9d8f6bbd8db64c71f3e032e70a2df6cce7dd",
+        "truncated": false
+      },
+      "derivedWorkId": "legacy-work"
+    }
+  ],
+  "passed": 2,
+  "failed": 0,
+  "scope": "Genuine old-producer v1 snapshots and nonempty context-binding digest compatibility only; no format relabeling, model send or startup authority"
+}

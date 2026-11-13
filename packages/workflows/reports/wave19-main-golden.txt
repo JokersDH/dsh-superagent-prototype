@@ -1,0 +1,9 @@
+✔ the genuine main v1 golden matches the legacy recipe and differs from explicit v2 only where versioned (75.1105ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 231.242417
