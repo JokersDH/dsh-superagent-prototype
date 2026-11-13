@@ -83,6 +83,8 @@ export { estimateTokens, queryTerms, relevanceScore } from './tokens.ts'
 export { isDeniedPath, isExternalReference, pathWithin, scopeWithin } from './paths.ts'
 export { sha256Bytes, sha256Text } from './digest.ts'
 export { createScopedConversationProvider, createPublishedArtifactProvider } from './scoped-adapters.ts'
+export { explainRestoredReviewScope } from './restored-review.ts'
+export type { RestoredScopeReason, RestoredScopeReview, RestoredScopeReviewInput } from './restored-review.ts'
 export type {
   ScopedConversationMessageView, ScopedConversationPage, ScopedConversationReader, ConversationSelection,
   ConversationAdapterCoverage, ScopedConversationProvider, ScopedArtifactMetadata, ScopedArtifactLookup,

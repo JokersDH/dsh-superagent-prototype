@@ -1,0 +1,63 @@
+{
+  "protocol": "wave22-main-scope-diagnostic/1",
+  "date": "2026-11-13",
+  "source": "712e1911fd26b6fdcf71a0c683162b719224f949",
+  "admittedCSlice": "e82901a pure restored-review projection, minimal exports/tests; unobserved counts nullable",
+  "implemented": [
+    "Actual context source reader invokes bounded C scope explanation only when requested",
+    "Explicit ?scopeReview=1 opt-in with strict/duplicate-query refusal",
+    "Optional shared DTO reasons/partial/withheld count/authorization none",
+    "Original default response shape and authoritative principal/scope/source state preserved",
+    "Scope-changed paths never read artifact; no added candidate/history/work scans"
+  ],
+  "notImplemented": [
+    "UI consumption of scope diagnostics",
+    "Complete launcher/portability source integration on main",
+    "Business stream/session/fact-sink/Broker attachment",
+    "Private startup permission",
+    "Target activation",
+    "E final exact595 independent installed verdict"
+  ],
+  "checks": {
+    "contextRecordTests": 15,
+    "selectedContextProductTests": 21,
+    "personalReadTests": 12,
+    "cleanCombinationTests": 48,
+    "contextPackageTests": 78,
+    "contracts": 230,
+    "productStrict": "PASS",
+    "httpStrict": "PASS",
+    "generated": "PASS",
+    "independentReviewNewConsumerTests": 2,
+    "sourceWorktreeDirtyAtCleanRun": false,
+    "command": "node --test tests/integration/context-records.case.mjs tests/integration/restored-personal-review.case.mjs tests/integration/assistant-context-product.case.mjs",
+    "scopeChangedArtifactReads": 0,
+    "newDatabaseWrites": 0,
+    "newProviderCalls": 0,
+    "validityDiagnosticTargeted": "PASS",
+    "defaultResponseAddsField": false,
+    "unobservedCountsFabricated": false
+  },
+  "dispatchVerification": {
+    "status": "PASS_LONG_DISPATCH_STATIC_ONLY",
+    "rolesIncludingMain": 6,
+    "phases": 60,
+    "checkpoints": 31,
+    "localLinks": 136,
+    "acyclic": true,
+    "nonoverlappingOwners": true,
+    "confersRuntimeOrReleaseAdmission": false
+  },
+  "authorization": "none",
+  "scopeDiagnosticGrantsAuthority": false,
+  "uiUpdated": false,
+  "productSchema": 18,
+  "migrationsAdded": 0,
+  "wireHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "preservedServicePairs": 12,
+  "userServicesRestarted": false,
+  "newPreviewStarted": false,
+  "releaseApproved": false
+}
