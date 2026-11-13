@@ -200,7 +200,7 @@ export interface LocalHttpOptions {
     recoveryTarget?(activationId: string): Promise<RecoveryTargetStatus | undefined>
     assistantContext?(messageId: string): Promise<AssistantContextBinding | undefined>
     contextHistory?(query: ContextHistoryQuery): Promise<ContextHistory>
-    contextSources?(messageId: string): Promise<ContextSources | undefined>
+    contextSources?(messageId: string, options?: { scopeReview?: boolean }): Promise<ContextSources | undefined>
     conversations?(query: ConversationCatalogQuery): Promise<ConversationCatalog>
     conversation?(id: string): Promise<ConversationSummary>
     projectSettings?(projectId: string): Promise<ProjectSettingsPage>
@@ -485,9 +485,10 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     return c.json(value)
   })
   app.get('/v1/messages/:id/context/sources', async c => {
-    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Historical sources accept no query')
+    if ((c.req.queries('scopeReview')?.length ?? 0) > 1) throw new ApplicationFault('invalid_request', 'Scope review accepts one explicit query value')
+    const query = z.strictObject({ scopeReview: z.literal('1').optional() }).parse(c.req.query())
     if (!options.read?.contextSources) throw new ApplicationFault('unsupported_capability', 'Historical sources are not connected')
-    const id = IdSchema.parse(c.req.param('id')), value = await options.read.contextSources(id)
+    const id = IdSchema.parse(c.req.param('id')), value = await options.read.contextSources(id, { scopeReview: query.scopeReview === '1' })
     if (!value) return c.json({ error: { code: 'invalid_request', message: 'Message context was not found', retry: 'user_action' } }, 404)
     const sources = ContextSourcesSchema.parse(value)
     if (sources.binding.messageId !== id) throw new ApplicationFault('storage_unavailable', 'Historical source identity mismatch', 'none')

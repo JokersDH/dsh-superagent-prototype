@@ -596,6 +596,52 @@
           "const": "context-sources/1",
           "type": "string"
         },
+        "scopeReview": {
+          "additionalProperties": false,
+          "properties": {
+            "authorization": {
+              "const": "none",
+              "type": "string"
+            },
+            "partial": {
+              "type": "boolean"
+            },
+            "protocol": {
+              "const": "context-scope-review/1",
+              "type": "string"
+            },
+            "reasons": {
+              "items": {
+                "enum": [
+                  "project_changed",
+                  "selection_narrowed",
+                  "selection_broadened",
+                  "selection_replaced",
+                  "exclusion_added",
+                  "exclusion_removed",
+                  "selection_validity_changed"
+                ],
+                "type": "string"
+              },
+              "maxItems": 7,
+              "readOnly": true,
+              "type": "array"
+            },
+            "withheldSourceCount": {
+              "maximum": 64,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "protocol",
+            "reasons",
+            "partial",
+            "withheldSourceCount",
+            "authorization"
+          ],
+          "type": "object"
+        },
         "sources": {
           "items": {
             "additionalProperties": false,
