@@ -14,8 +14,9 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
+import { cleanupBornResources, waitBornRecord } from './lib/live-cleanup.mjs'
 
-const { values } = parseArgs({ options: { install: { type: 'string' }, business: { type: 'string' }, json: { type: 'boolean', default: false } } })
+const { values } = parseArgs({ options: { install: { type: 'string' }, business: { type: 'string' }, fault: { type: 'string' }, json: { type: 'boolean', default: false } } })
 const root = mkdtempSync(join(tmpdir(), 'pa-real-business-'))
 chmodSync(root, 0o700)
 const evidence = { protocol: 'wave19-real-business-relocation/1', status: 'FAIL', steps: [], nativeTurns: 0, vendorSends: 0,
@@ -26,6 +27,7 @@ const run = (cli, args, allow = [0]) => { const r = spawnSync(cli, args, { encod
 const freePort = () => new Promise((r) => { const s = createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)) }) })
 const waitHealth = async (port, ms = 60_000) => { const end = Date.now() + ms; while (Date.now() < end) { try { const res = await fetch(`http://127.0.0.1:${port}/v1/health`, { signal: AbortSignal.timeout(700) }); if (res.ok) return await res.json() } catch {} await new Promise((r) => setTimeout(r, 200)) } return null }
 
+let born = null
 try {
   if (values.install === undefined || values.business === undefined) throw new Error('--install and --business are required')
   const install = resolve(values.install), businessState = resolve(values.business)
@@ -89,6 +91,8 @@ try {
   const daemon = spawn(cli, ['start', '--port', String(consolePort), '--api-port', String(apiPort), ...restoredArgs], { cwd: install, stdio: ['ignore', outFd, errFd], detached: true })
   daemon.unref(); closeSync(outFd); closeSync(errFd)
   const health = await waitHealth(apiPort)
+  born = health === null ? null : { record: await waitBornRecord(restoredRoots.config), args: restoredArgs }
+  if (values.fault === 'after-start') throw new Error('injected_fault:after-start')
   if (health === null) throw new Error(`restored instance not healthy: ${readFileSync(join(root, 'restored.err.log'), 'utf8').slice(0, 400)}`)
   const token = readFileSync(join(restoredState, 'api.key'), 'utf8').trim()
   const auth = { authorization: `Bearer ${token}` }
@@ -140,6 +144,17 @@ try {
   evidence.build = { buildId: manifestJson.buildId, commit: manifestJson.source.commit, schema: manifestJson.producer.productSchema }
   evidence.business = { source: businessState, tables: counts, workflowEvidenceV1: v1.digest, workflowEvidenceV2: v2.digest, bundle: verified.archiveSha256 }
 } catch (error) { evidence.status = 'FAIL'; evidence.error = String(error?.stack ?? error) }
-finally { rmSync(root, { recursive: true, force: true }) }
+finally {
+  let retained = false
+  if (evidence.status !== 'PASS' && born) {
+    if (!born.record) { evidence.cleanup = [{ status: 'UNKNOWN', unknown: [{ reason: 'record_never_observed' }], retained: true }]; retained = true }
+    else {
+      const report = await cleanupBornResources({ cli: join(values.install, 'bin/pa'), install: resolve(values.install), roots: { config: born.record.configRoot, data: born.record.state }, records: [born.record], args: born.args, env: process.env })
+      evidence.cleanup = [report]; retained = report.retained
+    }
+    if (retained) evidence.retainedRoot = root
+  }
+  if (!retained) rmSync(root, { recursive: true, force: true })
+}
 process.stdout.write(`${JSON.stringify(evidence, null, 2)}\n`)
 process.exitCode = evidence.status === 'PASS' ? 0 : 1

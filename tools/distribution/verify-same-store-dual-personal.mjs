@@ -8,12 +8,14 @@ import { createServer } from 'node:http'
 import { createServer as createNetServer } from 'node:net'
 import { spawn, spawnSync } from 'node:child_process'
 import { chmodSync, closeSync, cpSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
+import { cleanupBornResources, waitBornRecord } from './lib/live-cleanup.mjs'
 
-const { values } = parseArgs({ options: { install: { type: 'string' }, business: { type: 'string' }, json: { type: 'boolean', default: false } } })
+const { values } = parseArgs({ options: { install: { type: 'string' }, business: { type: 'string' }, fault: { type: 'string' }, json: { type: 'boolean', default: false } } })
 const root = mkdtempSync(join(tmpdir(), 'pa-same-store-'))
 chmodSync(root, 0o700)
 const evidence = { protocol: 'wave22-same-store-dual/1', status: 'FAIL', steps: [], nativeTurns: 0, vendorSends: 0,
@@ -23,6 +25,8 @@ const run = (cli, args, allow = [0], env) => { const r = spawnSync(cli, args, { 
 const freePort = () => new Promise((r) => { const s = createNetServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)) }) })
 const waitHealth = async (port, ms = 60_000) => { const end = Date.now() + ms; while (Date.now() < end) { try { const res = await fetch(`http://127.0.0.1:${port}/v1/health`, { signal: AbortSignal.timeout(700) }); if (res.ok) return await res.json() } catch {} await new Promise((r) => setTimeout(r, 150)) } return null }
 let fake = null, fakeURL = '', fakeRequests = []
+let seedEvidence = null, reviewEvidence = null
+const fault = (name) => { if (values.fault === name) throw new Error(`injected_fault:${name}`) }
 const startFake = (port) => new Promise((resolveServer) => {
   fake = createServer(async (req, res) => {
     if (req.method !== 'POST' || !req.url.endsWith('/chat/completions')) { res.writeHead(404); res.end('{}'); return }
@@ -76,6 +80,8 @@ try {
   seedDaemon.unref(); closeSync(seedOut); closeSync(seedErr)
   const seedHealth = await waitHealth(seedApi)
   if (seedHealth === null) throw new Error(`seed personal not healthy: ${readFileSync(join(root, 'seed.err.log'), 'utf8').slice(0, 500)}`)
+  seedEvidence = { record: await waitBornRecord(roots.config), args: seedArgs }
+  fault('after-seed-start')
   const seedAuth = { authorization: `Bearer ${readFileSync(join(seedState, 'api.key'), 'utf8').trim()}` }
   const sget = async (path) => { const res = await fetch(`http://127.0.0.1:${seedApi}${path}`, { headers: seedAuth }); return { status: res.status, body: await res.json() } }
   const spost = async (path, body) => { const res = await fetch(`http://127.0.0.1:${seedApi}${path}`, { method: 'POST', headers: { ...seedAuth, 'content-type': 'application/json' }, body: JSON.stringify(body) }); return { status: res.status, body: await res.json() } }
@@ -107,7 +113,31 @@ try {
   if (seedHealth.nativeTurns > 0 || seedHealth.vendorSends > 0) throw new Error('seed personal started native/vendor execution')
   const seedStop = run(cli, ['stop', '--json', ...seedArgs], [0], env)
   if (seedStop.json?.status !== 'STOPPED') throw new Error('seed stop failed')
-  step('same-store-seed', 'PASS', { projectId: project.id, sourceMessageId: source.id, candidates: candidates.body.candidates.length, fakeRequests: fakeRequests.length, nativeTurns: 0, vendorSends: 0 })
+  seedEvidence = null
+  const storageSeed = await import(pathToFileURL(join(install, 'app/packages/storage/dist/index.js')).href)
+  const workflowsSeed = await import(pathToFileURL(join(install, 'app/packages/workflows/dist/index.js')).href)
+  const seedStore = new storageSeed.ProductStore({ path: join(seedState, 'state.sqlite') })
+  const origin = (() => {
+    const works = seedStore.product.works.listByProject(businessProjectId, { limit: 20 })
+    const questions = seedStore.db.prepare('SELECT id, work_id, version FROM user_questions ORDER BY id LIMIT 100').all()
+    const links = works.flatMap((work) => seedStore.product.links.listByWork(work.id))
+    const answers = seedStore.db.prepare('SELECT answer_id, question_id, answer_digest FROM answers ORDER BY answer_id LIMIT 50').all()
+    const deliveries = seedStore.db.prepare("SELECT answer_id, status FROM answer_deliveries WHERE status = 'native_applied' ORDER BY answer_id LIMIT 50").all()
+    return { works: works.map((work) => ({ id: work.id, revision: work.revision, status: work.status ?? null })), questions: questions.map((question) => ({ id: String(question.id), workId: String(question.work_id), version: Number(question.version) })),
+      tickets: links.map((link) => ({ ticketId: link.ticketId ?? link.id ?? null, workId: link.workId ?? null })), answers: answers.map((row) => ({ answerId: String(row.answer_id), questionId: String(row.question_id), digest: String(row.answer_digest) })), nativeApplied: deliveries.map((row) => ({ answerId: String(row.answer_id), status: String(row.status) })) }
+  })()
+  if (origin.works.length < 1 || origin.questions.length < 1 || origin.answers.length < 1 || origin.nativeApplied.length < 1) throw new Error(`origin business identities incomplete: ${JSON.stringify({ works: origin.works.length, questions: origin.questions.length, answers: origin.answers.length, nativeApplied: origin.nativeApplied.length })}`)
+  const snapshots = new workflowsSeed.WorkflowSnapshots(seedStore)
+  const snapV1 = join(root, 'snapshot-v1'), snapV2 = join(root, 'snapshot-v2')
+  const createdV1 = await snapshots.create({ destination: snapV1, formatVersion: 1 })
+  const createdV2 = await snapshots.create({ destination: snapV2, formatVersion: 2 })
+  if (createdV1.status !== 'ok' || createdV1.manifest.protocol !== 'workflow-snapshot/1' || createdV1.manifest.evidence.families.length !== 13) throw new Error(`v1 snapshot create failed: ${JSON.stringify({ status: createdV1.status, message: createdV1.message, protocol: createdV1.manifest?.protocol, familySetVersion: createdV1.manifest?.evidence?.familySetVersion, missing: createdV1.manifest?.missing, corrupt: createdV1.manifest?.corrupt })})`)
+  if (createdV2.status !== 'ok' || createdV2.manifest.protocol !== 'workflow-snapshot/2' || createdV2.manifest.evidence.familySetVersion !== 2) throw new Error('v2 snapshot create failed')
+  const verifyV1 = snapshots.verify(snapV1), verifyV2 = snapshots.verify(snapV2)
+  if (verifyV1.status !== 'ok' || verifyV2.status !== 'ok') throw new Error('snapshot verify failed')
+  seedStore.close()
+  step('same-store-seed', 'PASS', { projectId: project.id, sourceMessageId: source.id, candidates: candidates.body.candidates.length, fakeRequests: fakeRequests.length, nativeTurns: 0, vendorSends: 0,
+    origin, snapshots: { v1: createdV1.manifest.protocol, v1Families: createdV1.manifest.evidence.families.length, v1Digest: createdV1.manifest.evidence.digest, v2: createdV2.manifest.protocol, v2Families: createdV2.manifest.evidence.families.length, v2Digest: createdV2.manifest.evidence.digest } })
 
   const bundle = join(root, 'same-store.pab')
   const backup = run(cli, ['backup', '--json', '--out', bundle, ...seedArgs], [0], env)
@@ -130,12 +160,16 @@ try {
   reviewDaemon.unref(); closeSync(rOut); closeSync(rErr)
   const reviewHealth = await waitHealth(rApi)
   if (reviewHealth === null) throw new Error(`review not healthy: ${readFileSync(join(root, 'review.err.log'), 'utf8').slice(0, 500)}`)
+  reviewEvidence = { record: await waitBornRecord(reviewRoots.config), args: reviewArgs }
+  fault('after-review-start')
   const rAuth = { authorization: `Bearer ${readFileSync(join(reviewState, 'api.key'), 'utf8').trim()}` }
   const rget = async (path) => { const res = await fetch(`http://127.0.0.1:${rApi}${path}`, { headers: rAuth }); return { status: res.status, body: await res.json() } }
   const rpost = async (path, body) => { const res = await fetch(`http://127.0.0.1:${rApi}${path}`, { method: 'POST', headers: { ...rAuth, 'content-type': 'application/json' }, body: JSON.stringify(body) }); return { status: res.status, body: await res.json() } }
   const inspect = await rget('/v1/recovery/inspect')
   const snapshot = await rget('/v1/snapshot')
   if (snapshot.status !== 200 || (snapshot.body.works ?? []).length < 1) throw new Error('same-store review lacks real Work')
+  fault('assert-fail')
+  fault('candidate-read-fail')
   const afterCandidates = await rget(`/v1/messages/${encodeURIComponent(source.id)}/candidates`)
   if (afterCandidates.status !== 200 || afterCandidates.body.status !== 'candidates') throw new Error('same-store review candidates missing')
   const afterSources = await rget(`/v1/messages/${encodeURIComponent(source.id)}/context/sources`)
@@ -150,14 +184,44 @@ try {
   const v1 = storage.readWorkflowEvidence(join(reviewState, 'state.sqlite'), 1)
   const v2 = storage.readWorkflowEvidence(join(reviewState, 'state.sqlite'), 2)
   if (v1.families.length !== 13 || v2.families.length !== 21) throw new Error('dual-format family counts changed')
+  const restoredDbSha = createHash('sha256').update(readFileSync(join(reviewState, 'state.sqlite'))).digest('hex')
+  if (restoredDbSha !== createdV1.manifest.database.sha256 || restoredDbSha !== createdV2.manifest.database.sha256) throw new Error('restored database bytes differ from the actual v1/v2 snapshot databases')
+  const reviewStore = new storage.ProductStore({ path: join(reviewState, 'state.sqlite') })
+  const restoredBusiness = (() => {
+    const works = reviewStore.product.works.listByProject(businessProjectId, { limit: 20 })
+    const questions = reviewStore.db.prepare('SELECT id, work_id FROM user_questions ORDER BY id LIMIT 100').all()
+    const links = works.flatMap((work) => reviewStore.product.links.listByWork(work.id))
+    const answers = reviewStore.db.prepare('SELECT answer_id, question_id, answer_digest FROM answers ORDER BY answer_id LIMIT 50').all()
+    const deliveries = reviewStore.db.prepare("SELECT answer_id, status FROM answer_deliveries WHERE status = 'native_applied' ORDER BY answer_id LIMIT 50").all()
+    return { works: works.map((work) => ({ id: work.id })), questions: questions.map((question) => ({ id: String(question.id), workId: String(question.work_id) })),
+      tickets: links.map((link) => ({ ticketId: link.ticketId ?? link.id ?? null })), answers: answers.map((row) => ({ answerId: String(row.answer_id), questionId: String(row.question_id), digest: String(row.answer_digest) })), nativeApplied: deliveries.map((row) => ({ answerId: String(row.answer_id), status: String(row.status) })) }
+  })()
+  reviewStore.close()
+  const missing = { works: origin.works.filter((item) => !restoredBusiness.works.some((value) => value.id === item.id)).map((item) => item.id),
+    questions: origin.questions.filter((item) => !restoredBusiness.questions.some((value) => value.id === item.id && value.workId === item.workId)).map((item) => item.id),
+    answers: origin.answers.filter((item) => !restoredBusiness.answers.some((value) => value.answerId === item.answerId && value.digest === item.digest)).map((item) => item.answerId),
+    nativeApplied: origin.nativeApplied.filter((item) => !restoredBusiness.nativeApplied.some((value) => value.answerId === item.answerId && value.status === item.status)).map((item) => item.answerId) }
+  if (Object.values(missing).some((list) => list.length > 0)) throw new Error(`restored original IDs/digests differ: ${JSON.stringify(missing)}`)
   if (fakeRequests.length > 1) throw new Error('reviewed startup/read called the fake model again')
   const stop = run(cli, ['stop', '--json', ...reviewArgs], [0], env)
   if (stop.json?.status !== 'STOPPED') throw new Error('review stop failed')
+  reviewEvidence = null
   step('same-store-second-root-personal-review', 'PASS', { markerState: inspect.body.state, works: (snapshot.body.works ?? []).length, candidates: afterCandidates.body.candidates.length,
-    sources: 200, scopeReviewOptIn: scopedOptIn, businessRefused: true, workflowV1Families: v1.families.length, workflowV2Families: v2.families.length, fakeRequests: fakeRequests.length, nativeTurns: reviewHealth.nativeTurns ?? 0 })
+    sources: 200, scopeReviewOptIn: scopedOptIn, businessRefused: true, originalWork: origin.works.length, originalQuestions: origin.questions.length, originalAnswers: origin.answers.length, nativeApplied: origin.nativeApplied.length, snapshotsV1V2: true, snapshotBytesRestored: true, originalIdsPreserved: true, workflowV1Families: v1.families.length, workflowV2Families: v2.families.length, fakeRequests: fakeRequests.length, nativeTurns: reviewHealth.nativeTurns ?? 0 })
   evidence.status = 'PASS'
   evidence.build = { buildId: manifest.buildId, commit: manifest.source.commit, schema: manifest.producer.productSchema }
 } catch (error) { evidence.status = 'FAIL'; evidence.error = String(error?.stack ?? error) }
-finally { try { fake?.close() } catch {} rmSync(root, { recursive: true, force: true }) }
+finally {
+  try { fake?.close() } catch {}
+  const cleanups = []
+  for (const entry of [reviewEvidence, seedEvidence].filter(Boolean)) {
+    if (!entry.record) { cleanups.push({ status: 'UNKNOWN', unknown: [{ reason: 'record_never_observed' }], retained: true }); continue }
+    cleanups.push(await cleanupBornResources({ cli: join(values.install, 'bin/pa'), install: resolve(values.install), roots: { config: entry.record.configRoot, data: entry.record.state }, records: [entry.record], args: entry.args, env: process.env }))
+  }
+  evidence.cleanup = cleanups
+  const retained = cleanups.some((item) => item.retained)
+  if (retained) evidence.retainedRoot = root
+  else rmSync(root, { recursive: true, force: true })
+}
 process.stdout.write(`${JSON.stringify(evidence, null, 2)}\n`)
 process.exitCode = evidence.status === 'PASS' ? 0 : 1
