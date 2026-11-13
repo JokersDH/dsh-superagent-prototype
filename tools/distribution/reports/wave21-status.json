@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "2350af2",
   "mergedMain": "5d0c623",
-  "head": "595b3f1",
+  "head": "b95e874",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/vendor/native turns 0; twelve user services untouched.",
   "ownedPaths": [
@@ -422,5 +422,6 @@
     "tools/distribution/reports/wave21/*.json",
     "tools/distribution/recipes/wave21-e-acceptance.zh-CN.md",
     "docs/rfcs/WP-16/0058-wave-21-d-live-review-identity-and-package-prepare.md"
-  ]
+  ],
+  "evidenceHead": "b95e874"
 }
