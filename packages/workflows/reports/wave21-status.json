@@ -1,0 +1,184 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "f856fa5",
+  "mergeCommit": "8fd1aeb",
+  "checkpoints": [
+    "c6639f7"
+  ],
+  "testedSourceCommit": "c6639f7",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "defaultFormat": 1,
+  "explicitFormat": 2,
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "real controlled data",
+      "evidence": [
+        "wave21-workflow-tests.txt"
+      ],
+      "note": "same real controlled Application/Effects/Broker Work/Q&A/native_applied + SDK/context/candidate chain retained; explicitly not external B reconnect/vendor native"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "two formats same data",
+      "evidence": [
+        "wave20-personal-business",
+        "wave21-personal-v2"
+      ],
+      "note": "same real business/SDK/context data snapshotted as default v1 (13 families) and explicit v2 (21 families), both verify with guards/golden"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "both personal processes",
+      "evidence": [
+        "wave20-personal-business",
+        "wave21-personal-v2"
+      ],
+      "note": "each format restored at a second root; CLI 600 selection; actual personal readonly reads candidate/history/source/Work/Q&A/native delivery; business 422, queue held, provider unchanged"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "signed narrow scope",
+      "evidence": [
+        "wave20-personal-business narrow block"
+      ],
+      "note": "new valid CLI selection src/narrow/ + exclude src/private/ starts; history 200; original wider binding returns 200 state=scope_changed with empty sources; no signature tamper"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "standard start/reuse",
+      "evidence": [
+        "wave21-restored-personal.txt 12/12"
+      ],
+      "note": "tools/dev/start actual health digest; same file reuses PID unchanged; missing/different selection, port/login and restart+review rejected before build/spawn/stop"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "independent failures",
+      "evidence": [
+        "restored-personal tests",
+        "snapshot tests"
+      ],
+      "note": "each marker/source/file/expiry/path/filetype negative has its own valid positive control; generation/load interruption does not write business rows; old SIGKILL evidence retained separately"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "source facts vs read consent",
+      "evidence": [
+        "wave21-source-confirmation.txt 14/14",
+        "wave21-recovery-combination.txt 106/106"
+      ],
+      "note": "source prepare/confirm/audit/token replay and readstartup/private permission remain separate; old queue/unknown resources unchanged; no new grant from historical data"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "D/E recipe",
+      "evidence": [
+        "wave21-data-recipe.md"
+      ],
+      "note": "parameterized install/state/project/producer/format/port/review recipe; public APIs only, no SQL/credential copy; consumer/source/fixture/installed layers named"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "strict/cost",
+      "evidence": [
+        "strict typecheck",
+        "wave21-performance.json"
+      ],
+      "note": "strict/exactOptional/build pass; v1 create 575ms/verify96.6ms; v2 create186.3ms/verify89.9ms; only corresponding format read and bodies lazy"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "final regression",
+      "evidence": [
+        "wave21-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, personal/source/candidate/target consumers, typecheck/build and static check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "114/114",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "restoredPersonal": "12/12",
+    "sourceConfirmation": "14/14",
+    "recoveryCombination": "106/106",
+    "mainProductConsumers": "89/89",
+    "mainTargetConsumers": "50/50",
+    "candidateConsumers": "31/31",
+    "productExecution": "20/20",
+    "genuineV1Probe": "2/2",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "limits": {
+    "v1Families": 13,
+    "v2Families": 21,
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288
+  },
+  "failureWindows": [
+    "mixed v1/v2",
+    "subset/duplicate/future",
+    "missing empty table/index",
+    "foreign principal/root/source",
+    "expired review file",
+    "unsafe file type",
+    "narrow scope scope_changed",
+    "port/login/restart selection mismatch",
+    "source confirmation SIGKILL",
+    "result/message/snapshot SIGKILL"
+  ],
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "private-permission-target",
+      "detail": "personal readonly selection and standard-start reuse exist, but private startup permission, physical writer proof and target activation remain unimplemented"
+    },
+    {
+      "owner": "main/D",
+      "id": "installation",
+      "detail": "Restored data/read consent never grants installation/execution; D/E must bind their own consumer bytes."
+    }
+  ],
+  "notTested": [
+    "private startup permission/target activation",
+    "physical writer proof",
+    "D installed consumer",
+    "E independent release acceptance",
+    "real vendor model/native"
+  ],
+  "mainNextSteps": [
+    "keep actual health selection identity and personal readonly consent separate from grants",
+    "use wave21-data-recipe for D/E same-package consumers",
+    "connect private host/resources/target only after independent proof"
+  ],
+  "updatedAt": "2026-11-13T18:30:00.000Z"
+}
