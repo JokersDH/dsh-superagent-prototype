@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "efd081f",
   "mergedMain": "1b8d3d2",
-  "head": "a9b155c",
+  "head": "e5947ff",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/vendor/native turns 0; twelve user services untouched.",
   "ownedPaths": [
@@ -238,7 +238,29 @@
       "A v2/private startup permission/target/native remain unclaimed; docs-only heads do not refreeze."
     ]
   },
-  "sourceClosure": null,
+  "sourceClosure": {
+    "reviewProtocol": "restored-personal-review/1",
+    "windowMs": 300000,
+    "markerState": "recovery_readonly",
+    "startupMode": "recovery_readonly",
+    "candidatesBeforeConsent": 403,
+    "candidatesAfterConsent": 2,
+    "sourcesAfterConsent": 200,
+    "historyAfterConsent": 200,
+    "businessRefused": true,
+    "modelRequests": 0,
+    "nativeTurns": 0,
+    "fixtureRejected": true,
+    "invalidFileRejected": true,
+    "tamperedRejected": true,
+    "startupAvailable": false,
+    "unboundSelectionRefused": true,
+    "sameSelectionReused": true,
+    "differentSelectionRefused": true,
+    "noSelectionRefused": true,
+    "changedPortRefused": true,
+    "pidStable": true
+  },
   "sameStore": {
     "seed": {
       "projectId": "project-personal-dialogue",
@@ -260,8 +282,8 @@
       "status": "PASS"
     },
     "liveReviewSelection": {
-      "steps": 11,
-      "status": "FAIL"
+      "steps": 12,
+      "status": "PASS"
     },
     "realBusinessRelocation": {
       "steps": 4,
