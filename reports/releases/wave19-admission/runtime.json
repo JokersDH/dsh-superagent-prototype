@@ -1,0 +1,220 @@
+{
+  "protocol": "wave19-b-admission/1",
+  "status": "PASS_SCOPED_B_OWNED_NORMAL_QA_AND_PHYSICAL_STOP_RECOVERY_NOT_DELIVERED",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "source": "ad222c186fe718581d0148d9f54cde724cfcad86",
+  "mainSource": "f875ead9f9f8d7bfe9a3e73e7b159705628bf266",
+  "mainRuntimeSource": "6050b4bf066d170c54c45e7f9bf4024abac285dc",
+  "previousReviewedCandidate": "1e1f82a6a0076ea06c7a3d769388b6a4b1bc8bd5",
+  "realModelTurns": 0,
+  "vendorNativeTurnStarts": 0,
+  "budgetLedgerOpened": false,
+  "candidateOwnProducerUsed": true,
+  "mainDiagnosticProducerUsedForAdmission": false,
+  "normalPreparationAndBrokerQuestionAdmitted": true,
+  "normalAnswerNativeAppliedAdmitted": true,
+  "normalControlledPhysicalStopAdmitted": true,
+  "physicalStopScope": "Registered owned resources in the bounded normal run only; not crash recovery, orphan/pre-record coverage, target activation or global resource ownership admission.",
+  "businessRecoveryAdmitted": false,
+  "newProductionRuntimeOrReconnectSourceDelivered": false,
+  "committedChanges": [
+    "tests/native-acceptance/b18-product-normal.mjs",
+    "tests/native-acceptance/fixtures/fake-codex-executable.mjs",
+    "tests/native-acceptance/fixtures/fake-codex-producer.mjs",
+    "tests/native-acceptance/reports/b18-product-normal.json",
+    "tests/native-acceptance/reports/wave18-status.json"
+  ],
+  "commands": [
+    {
+      "command": "node --check tests/native-acceptance/fixtures/fake-codex-producer.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0
+    },
+    {
+      "command": "node tests/native-acceptance/fixtures/fake-codex-producer.mjs --version",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "output": "codex-cli 0.164.0",
+      "scope": "B-owned local Node fixture only; not an installed vendor binary."
+    },
+    {
+      "command": "node --check tests/native-acceptance/b18-product-normal.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0
+    },
+    {
+      "command": "NODE_OPTIONS='--import=/tmp/pa-wave15-b-source-loader.mjs' env -u PA_RUNNER_SCENARIO -u PA_RUNNER_RECEIVER_LOG -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN -u PA_PRODUCER_LOG -u PA_PRODUCER_HOLD node /tmp/pa-wave19-b18-observe.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "originalCandidateTotals": { "PASS": 4, "FAIL": 1, "NOT_TESTED": 1 },
+      "scope": "Candidate B18 assertions are unchanged in an in-memory replay. Only absolute import anchors and private-store snapshots before stop/cleanup are added. No candidate report is written.",
+      "reports": ["/tmp/pa-wave19-b-before-stop.json", "/tmp/pa-wave19-b-after-stop.json"],
+      "beforeStop": {
+        "receiverKinds": ["begin", "answer"],
+        "bindingState": "active",
+        "answerDeliveryStatus": "response_written",
+        "factKinds": ["writer.observed", "policy.prepared", "dispatch.observed", "question.opened", "dispatch.observed"],
+        "nativeAppliedObserved": false
+      },
+      "afterStop": {
+        "bindingState": "ended",
+        "childPid": 76292,
+        "childAlive": false,
+        "receiverCancelFrames": 0,
+        "producerTurnInterrupt": false,
+        "events": ["runtime.recovery.cancel-requested", "runtime.barrier.confirmed"],
+        "barrierScope": "registered_owned_resources_only",
+        "tables": {
+          "works": 1, "ticket": 1, "ticket_links": 1, "effect": 0,
+          "fact_receipts": 6, "dispatch_receipts": 2, "user_questions": 1,
+          "answers": 1, "answer_deliveries": 1, "runtime_bindings": 1, "runtime_current": 1
+        }
+      }
+    },
+    {
+      "command": "NODE_OPTIONS='--import=/tmp/pa-wave15-b-source-loader.mjs' env -u PA_RUNNER_SCENARIO -u PA_RUNNER_RECEIVER_LOG -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN -u PA_PRODUCER_LOG -u PA_PRODUCER_HOLD node /tmp/pa-wave19-b-normal-control.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "outcome": "PASS",
+      "report": "/tmp/pa-wave19-b-normal-control.json",
+      "producer": "tests/native-acceptance/fixtures/fake-codex-producer.mjs from the fixed candidate",
+      "scope": "Independent consumer of the SAME B-submitted producer and existing original ProductRuntime/Application/Effects/NativeProductAttempt/RunnerLink/CodexProductDriver/Broker/A Store. It waits for native_applied before stop and inspects the actual authenticated physical barrier; this is not main's counterfactual producer credited to B.",
+      "receiverCounts": { "begin": 1, "answer": 1, "cancelBusinessFrames": 0 },
+      "factKinds": ["writer.observed", "policy.prepared", "dispatch.observed", "question.opened", "dispatch.observed", "answer.observed", "writer.observed"],
+      "answerDeliveryStatusBeforeStop": "native_applied",
+      "answerEvidence": ["codex-server-request-resolved"],
+      "bindingStateAfterStop": "ended",
+      "registeredChildResource": "res-77685-6aa3cfac91b3",
+      "registeredChildPid": 77685,
+      "registeredChildAliveAfterStop": false,
+      "barrierCount": 1,
+      "storedAuthenticatedProof": {
+        "state": "terminated", "admission": "closed", "coverage": "complete_owned_resources",
+        "attemptId": "attempt-d9b02726-0feb-43c5-843b-76f5b2cbc626", "fenceEpoch": 1,
+        "resources": [{ "ref": "res-77685-6aa3cfac91b3", "ownership": "spawned_process", "writer": "quiescent",
+          "evidence": ["sigterm-group", "group-quiescent", "leader:code=null;signal=SIGTERM"] }]
+      },
+      "tables": {
+        "works": 1, "ticket": 1, "ticket_links": 1, "effect": 0,
+        "fact_receipts": 7, "dispatch_receipts": 2, "user_questions": 1,
+        "answers": 1, "answer_deliveries": 1, "runtime_bindings": 1, "runtime_current": 1
+      }
+    },
+    {
+      "command": "env -u PA_RUNNER_SCENARIO -u PA_RUNNER_RECEIVER_LOG -u PA_PRODUCER_LOG -u PA_PRODUCER_HOLD node --test packages/drivers/codex-native/test/native.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 14,
+      "failed": 0,
+      "scope": "Original product Driver preparation/identity/before-write/policy/terminal regressions using local mocks. No unchanged broad helper suite was repeated."
+    }
+  ],
+  "persistentNormalReproduction": {
+    "tool": "tools/bootstrap/probe-wave19-runtime.mjs",
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave19-b-normal-reusable.json node tools/bootstrap/probe-wave19-runtime.mjs /Users/hh/Desktop/joker/superagent-agent-b",
+    "output": "/tmp/pa-wave19-b-normal-reusable.json",
+    "exitCode": 0,
+    "classification": "B_SUBMITTED_PRODUCER_CONTROLLED_NORMAL_ONLY",
+    "outcome": "PASS",
+    "checksPassed": 10,
+    "producerMatchesCommit": true,
+    "source": "ad222c186fe718581d0148d9f54cde724cfcad86",
+    "receiverCounts": { "begin": 1, "answer": 1, "businessCancel": 0 },
+    "answerDeliveryStatus": "native_applied",
+    "barrierCount": 1,
+    "bindingState": "ended",
+    "childPid": 88605,
+    "childAlive": false,
+    "tables": { "works": 1, "ticket": 1, "ticket_links": 1, "fact_receipts": 7, "dispatch_receipts": 2, "user_questions": 1, "answers": 1, "answer_deliveries": 1, "runtime_bindings": 1, "runtime_current": 1 },
+    "cleanupComplete": true,
+    "sourceStable": true,
+    "outputPolicy": "An explicit new absolute PA_ADMISSION_REPORT outside the candidate checkout is mandatory; existing output is refused and creation is exclusive mode 0600. Use a new path for each run.",
+    "scope": "Uses the exact B HEAD producer, actual original App/A Store/Broker and Driver. Waits for native_applied before stop, then checks original authenticated complete proof/barrier and actual child exit. No business-cancel/turn-interrupt-only stop condition, main diagnostic fixture, recovery/native compatibility or release claim."
+  },
+  "closedScopes": [
+    "B's own submitted producer is valid JavaScript and returns the expected local version; the previous .mjs parse defect is closed.",
+    "B's producer now implements the original product Driver's thread policy handshake and supported approval identity without fabricating a prepared fact or weakening guards.",
+    "The real product path using that producer creates linked Work/Ticket/assignment/binding state, persists writer/policy/dispatch/question facts, sends one actual begin and opens one original Broker permission question.",
+    "Independent same-source observation confirms an answer reaches native_applied on its original target after the before-write path; it is not merely a recorded command or pre-admission receiver frame.",
+    "The bounded normal stop uses the existing authenticated cancellation path, stops its registered actual child, commits runtime.barrier.confirmed and ends the binding. No claim is made about crash/reconnect/orphan/resource-set fault coverage.",
+    "The earlier B13 normal and B16 receiver scopes remain intact. The old B14 inert-service limitations do not revoke the new real normal producer scope."
+  ],
+  "findings": [
+    {
+      "priority": 2,
+      "id": "STOP_ASSERTION_OBSERVES_THE_WRONG_CONTROL_CHANNEL",
+      "file": "tests/native-acceptance/b18-product-normal.mjs",
+      "line": 196,
+      "relatedLines": [204, 206, 209],
+      "observation": "The assertion requires a business cancel frame or native turn/interrupt. Actual product stop intentionally uses runtime.reconcile -> authenticated /v1/cancel -> stopPhysical. In the unchanged run there are no such business frames, but the actual child is gone, binding ended and runtime.barrier.confirmed exists. The claimed finding that nothing reaches the physical writer is contradicted by its own private physical state.",
+      "actualPath": [
+        "packages/application/src/service.ts:205 closes dispatch and enqueues runtime.reconcile for the stopping binding",
+        "apps/coordinator/reconcile-runner.ts:82 commits a stable cancel intent then invokes client.cancel",
+        "apps/runner/src/recovery-endpoint.ts:60 closes admission and invokes its physical cancellation callback",
+        "apps/runner/src/runner-service.ts:267 invokes stopPhysical",
+        "apps/coordinator/resource-barrier.ts:66 ends the binding only after the authenticated complete quiescent resource proof"
+      ],
+      "correction": "Assert the original cancel intent, authenticated proof/current binding/full manifest, child process quiescence, barrier receipt and final state. Only require a graceful native turn/interrupt if that separate behavior is the explicit case under test."
+    },
+    {
+      "priority": 2,
+      "id": "ANSWER_SUCCESS_STOPS_AT_PRE_ADMISSION_RECEIVER_FRAME",
+      "file": "tests/native-acceptance/b18-product-normal.mjs",
+      "line": 177,
+      "relatedLines": [184, 190],
+      "observation": "The harness passes as soon as Runner receiver logging shows an answer, then immediately calls stop. That log is written before admission and does not prove native consumption. In the unchanged run the original Broker is only response_written before stop, with no answer.observed fact; stop prevents the later native_applied observation. A separate consumer that waits for the original target's native_applied succeeds with the same submitted producer and guards.",
+      "correction": "Name the intended boundary precisely and wait for it: recorded/local intent, response_written, or native_applied with original target/session/request/attempt identity and evidence. Use native_applied before stop when claiming completed normal Q&A. A separate stop-during-answer case should retain its actual partial/unknown status."
+    },
+    {
+      "priority": 2,
+      "id": "DURABLE_IDENTITY_COMPARISON_IS_NOT_A_PASS_CONDITION",
+      "file": "tests/native-acceptance/b18-product-normal.mjs",
+      "line": 159,
+      "observation": "sameAttempt is computed at line 158 but only changes the success message. The current actual attempts do match, so this does not revoke the scoped normal result; the reusable assertion should require the match rather than treating it as optional text."
+    }
+  ],
+  "normalConsumerRecipe": {
+    "mainOwnedEntry": "createProductRuntime(options).native.profile",
+    "producer": "tests/native-acceptance/fixtures/fake-codex-producer.mjs at the fixed candidate",
+    "profile": "Explicit internal test profile: driverId=codex-native, executable=process.execPath, argv=[absolute candidate producer], expectedVersion=0.164.0. No installed-Codex or gateway fallback.",
+    "consumer": "Private ProductStore plus registered temporary project -> product.start -> application.dispatch(create_work) -> original policy.prepared/begin/Broker question -> application.dispatch(answer_question) -> original target native_applied -> application.dispatch(stop_work) -> authenticated registered-resource barrier.",
+    "repro": "/tmp/pa-wave19-b-normal-control.mjs",
+    "newNormalMainInterfaceRequired": false,
+    "publicStartupImplication": "None: this is an explicitly selected local fake acceptance profile, not permission to register an automatic personal/native fallback."
+  },
+  "recoveryPorts": {
+    "alreadyExistingPhysicalRecovery": "loadRecoveryRunner/reconcileRegisteredRunner consume existing A registration/binding/queue state and the authenticated inspection/cancel endpoint. This bounded normal case exercises that existing physical cancellation path; it does not prove coordinator SIGKILL recovery.",
+    "newBProductionSourceChanges": [],
+    "businessReconnectAdapterDelivered": false,
+    "businessResumeAvailable": false,
+    "firstRemainingSubsystemGap": "No fresh-coordinator adapter can reconnect the original business stream/fact sink and current Broker before-write callbacks to the SAME live Runner/session. The existing recovery transport exposes inspection/cancel only, while NativeProductAttempt's child/feed and answerWrites are live-process state. Persisted receipts or an inspection proof cannot substitute for that business authority.",
+    "mainOwnership": "B must publish an actual B-owned Runner service/link reconnect implementation plus an RFC/typed consumer contract. Main owns rebuilding trusted product authorization/current contract and attaching that port inside ProductExecution/NativeProductAttempt; B must not independently edit main-owned product classes or invent a second ledger/lifecycle."
+  },
+  "wave18PacketAssessment": {
+    "B1": "DELIVERED_SCOPED: submitted valid executable/protocol and existing A observation/binding APIs.",
+    "B2": "DELIVERED_NORMAL_SCOPE: B producer now performs original product preparation/begin/Broker question with durable linked business state; main's earlier diagnostic is not credited.",
+    "B3": "NORMAL_CAPABILITY_VERIFIED: independent original-consumer sequence confirms native_applied answer and actual physical stop. Submitted boundary assertions/narrative need the corrections above.",
+    "B4": "PARTIAL: actual child is registered and normal stop's complete registered-resource proof works; full birth PID/start/UID/argv/operation evidence plus pre-record/orphan/unknown matrices are not delivered.",
+    "B5": "NOT_REACHED: no new persistent business reconnect adapter/RFC.",
+    "B6": "NOT_REACHED: no original begin send/receive/ACK/receipt coordinator-crash matrix.",
+    "B7": "NOT_REACHED: no recovered Broker answer/stop or unknown outcome matrix.",
+    "B8": "NOT_REACHED: no valid positive stale-epoch/session/version matrix or recovered verification/current candidate/human accept.",
+    "B9": "NOT_REACHED: no two/four-slot/backpressure/resource-return matrix.",
+    "B10": "PARTIAL: checkpoint 1 of 3; status preserves budget/scope honestly but its normal-stop failure diagnosis is incorrect and answer success boundary is too weak."
+  },
+  "nextContinuousPackage": {
+    "title": "Durable same-Runner business reconnect and original-identity control recovery",
+    "earlyCheckpoint": "Keep the now-working B producer and normal original product path. Correct answer/stop/identity assertions using original Broker per-target states and existing authenticated physical barrier evidence. Record child birth PID/start/UID/argv/root/attempt/operation from real spawn. Publish the minimum B-owned persistent business reconnect service/link adapter and a precise main integration RFC; do not rebuild the normal producer again or wait for a new normal main interface.",
+    "middleCheckpoint": "With main's guarded attachment consumer, reconnect a fresh coordinator to the same actual Runner/native session and original A Work/Ticket/assignment/command. Preserve current authorization and before-write callbacks. Cover finite begin and Broker answer send/receive/ACK/receipt faults, stop during pending answer, ACK loss, partial/unknown resources and replay without duplicate send or replacement IDs.",
+    "finalCheckpoint": "Prove current>=2/old>=1 focal controls and old contract/question/session/late ACK refusal; continue one interrupted original work to registered machine verification/current candidate/human accept, then two/four-slot isolation, control priority, bounded output/backpressure and FD/child/queue return. Publish middle and final sources after the early checkpoint; all vendor model/native turns remain zero."
+  },
+  "preservation": {
+    "candidateSourceOrAssertionsEdited": false,
+    "candidateHistoricalReportsWritten": false,
+    "untrackedB16RealBeginPreservedAndExcluded": true,
+    "oldWave11AndWave12ReportDiffsPreserved": true,
+    "privateProfilesOrBudgetsTouched": false,
+    "twelveUserServicesTouched": false,
+    "onlyMainArtifactWritten": "reports/releases/wave19-admission/runtime.json"
+  }
+}
