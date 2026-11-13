@@ -1,0 +1,206 @@
+{
+  "protocol": "wave21-delivery-admission/1",
+  "status": "ORDINARY_EE_SCOPE_PRESERVED_READ_STARTUP_INSTALLED_ADMISSION_BLOCKED_BY_CONSUMER_SOURCE_MISMATCH",
+  "sources": {
+    "main": "4c938174b45c1a2177380c1d1f7eb7abb7c60f54",
+    "mainReadStartup": "773b34de57b3a2f8c79eca19bcb8aaee55c83ed8",
+    "mainWorkflowFormats": "98561245a0e5ff8250ca94e28bc517a3e32948d5",
+    "d": "2350af22a61d088a96f06666eca1edc04bd38a47",
+    "e": "f51e3c45e258b4acd9710c275ba098a41d08cd9a",
+    "eRecordedTestSource": "dcaa884030eebdac23e5eb4cb95c95d6e7c6bbd0",
+    "laterMainFollowup": "During this audit parent main added health.restoredReviewDigest and strict same-selection reuse in tools/dev/start.mjs. This is a later source input, not part of fixed D e4e bytes and does not automatically repair its separate launcher reuse path. No later commit or independent test result is assigned here."
+  },
+  "safety": {
+    "vendorModelSends": 0,
+    "nativeTurnStarts": 0,
+    "candidateLiveResourcesStarted": 0,
+    "probeActualOsScans": 0,
+    "probeActualOsSignals": 0,
+    "networkListenersStarted": 0,
+    "liveInstallStopUpgradeCleanupMatricesRun": false,
+    "userServicesPreserved": "All twelve pairs 5180-5191 / 8796-8807",
+    "userStateProfilesTarsLedgersChanged": false,
+    "dWorktreeClean": true,
+    "eUntrackedRunDirectoriesPreserved": 81,
+    "productionAndAcceptanceSourcesChanged": false,
+    "repositoryWrites": [
+      "reports/releases/wave21-admission/delivery.json",
+      "tools/bootstrap/probe-wave21-delivery.mjs",
+      "tools/bootstrap/probe-wave21-release-gate.mjs"
+    ],
+    "temporaryArtifactsRetained": "/tmp/pa-wave21-delivery-audit-IheJBM"
+  },
+  "verification": {
+    "artifactBytes": {
+      "command": "node /tmp/pa-wave21-delivery-audit-IheJBM/verify-bytes.mjs",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave21-delivery-audit-IheJBM/artifact-verified.json"
+    },
+    "frozenChild": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave21-d-child.json node --experimental-test-module-mocks tools/bootstrap/probe-wave18-delivery.mjs /tmp/pa-wave21-delivery-audit-IheJBM/install",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "report": "/tmp/pa-wave21-d-child.json",
+      "moduleSha256": "9f88c5ff8fb3d77f388a9725272ea05f4199db33ab2fcdda06551022d9883135",
+      "scope": "Complete parent/registered-child positives and missing/wrong-start/helper/recover negatives from immutable e4e bytes. The already admitted651 child gate remains closed."
+    },
+    "launcherExplicitReviewReuse": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave21-d-persistent.json node --experimental-test-module-mocks tools/bootstrap/probe-wave21-delivery.mjs /Users/hh/Desktop/joker/superagent-agent-d",
+      "exitCode": 1,
+      "passed": 1,
+      "failed": 1,
+      "report": "/tmp/pa-wave21-d-persistent.json",
+      "previousObservationReport": "/tmp/pa-wave21-delivery-audit-IheJBM/d-start-reuse-results.json",
+      "scope": "Actual startInstance existing-record path. All release/runtime/identity/lock admission inputs are independently mocked for a matching already-running unbound personal readonly daemon; all process/network calls forbidden. The only changed request option is an explicit private review file. No signature authority or real process is created."
+    },
+    "reviewConsumerProvenance": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave21-e-persistent.json node tools/bootstrap/probe-wave21-release-gate.mjs /Users/hh/Desktop/joker/superagent-agent-e /tmp/pa-wave21-delivery-audit-IheJBM/install",
+      "exitCode": 1,
+      "passed": 1,
+      "failed": 1,
+      "report": "/tmp/pa-wave21-e-persistent.json",
+      "previousObservationReport": "/tmp/pa-wave21-delivery-audit-IheJBM/e-entry-results.json",
+      "scope": "Original declared full installed-alpha report is a gate-calibration positive, not independent acceptance of its already source-only review cases. One focal actual consumer provenance replacement names verified e4e entry bytes while canonical ee data subject remains unchanged; gate wrongly accepts. Existing ordinary inherited package scope is evaluated separately."
+    },
+    "ordinaryEeScope": {
+      "report": "/tmp/pa-wave21-e-persistent.json",
+      "accepted": true,
+      "inheritedInstalledCases": 24,
+      "classification": "Ordinary exact-ee scope excluding the two newly source-only personal-review requirements, retaining all old safety/product requirements. This is not a rewrite of E's required tier or approval of its new26-case whole installed claim.",
+      "scopeLimit": "26 data tuples all match ee; consumer provenance for2 new cases does not. Matching data provenance alone cannot establish matching execution entry bytes."
+    }
+  },
+  "persistentToolPolicy": "Both new tools require a new absolute PA_ADMISSION_REPORT, exclusively create0600 output and reject overwrite. D accepts candidateRoot, E accepts E-root and a previously verified e4e install. Each was rerun once to/tmp with its full positive. No live or Hono suite was replayed.",
+  "findings": [
+    {
+      "id": "E-SOURCE-REVIEW-CONSUMER-AS-OLD-INSTALLED-PASS",
+      "priority": 1,
+      "status": "FAIL",
+      "files": [
+        { "path": "tests/product-acceptance/cases/w20-personal-review.mjs", "lines": [64, 89, 195, 205, 231, 239, 261, 262, 331, 338] },
+        { "path": "tests/product-acceptance/lib/release-requirements.mjs", "lines": [157, 158] },
+        { "path": "tests/product-acceptance/lib/release.mjs", "lines": [398, 402, 411, 415, 990] }
+      ],
+      "summary": "The two required installed personal-review cases execute current E-checkout main CLI/demo/restored-review code, using frozen ee only as their data producer. The evidence honestly says packageEntry=false and the entry is absent from the package, but the gate still admits it as an installed ee consumer capability.",
+      "observed": "Original report installed-alpha passes with canonical ee7fbd8 subject and source-only review entry. Its own separate same-package entry case is NOT_REACHED. Replacing only the consumer origin/entrySubject/file hashes with real verified e4e provenance leaves canonical ee unchanged and still passes; validators only require nonempty entryOrigin and matching data subject.",
+      "expected": "Preserve genuine main-source personal readonly HTTP evidence at source/controlled layer. A required installed review capability needs an actual same-tar CLI/runtime consumer and explicit consumer-file provenance; source-only packageEntry=false or a foreign entry must not satisfy it.",
+      "scope": "This is not a reopening of the closed immutable child-helper provenance gate. It concerns newly added review consumers, not the old ordinary ee data/API results.",
+      "admissionEffect": "Do not admit the new26-case installed-alpha claim including review. Preserve inherited ordinary24-case ee personal/data/format scopes and main-source review behavior separately. New e4e review remains an accurate D-owned actual candidate until E measures that subject."
+    },
+    {
+      "id": "D-EXPLICIT-REVIEW-SILENTLY-IGNORED-ON-REUSE",
+      "priority": 2,
+      "status": "FAIL",
+      "file": "apps/launcher/lib/start.mjs",
+      "lines": [137, 186, 220, 228],
+      "summary": "The newly requested review selection is validated as a private file but omitted from desired/existing instance identity. A fully verified old unbound readonly daemon is silently reused and never consumes the new explicit review file.",
+      "observed": "Exact old unbound personal readonly reuse positive returns ok/reused=true. Adding only --review-restored-scope returns the same ok/reused=true before the daemon argument/spawn path, whose apiArgv has no review flag.",
+      "expected": "A changed explicit startup read selection must refuse with actionable stop/restart guidance or actually start with the selection. Successful reuse must require the same verified selection identity; do not imply a file was consumed when it was skipped.",
+      "scope": "Ergonomic/startup-contract gap, not an observed read authorization bypass. The mock file is a private regular file only; signature validation remains main's startup authority and no read permission is created. Main's later restoredReviewDigest consumer is a suitable real input for the D port."
+    }
+  ],
+  "closedScopes": [
+    "D daemonArgv receives reviewRestoredScope as an explicit parameter; the previous options-scoping ReferenceError is fixed. spawnDaemon destructures the same option and start forwards it to expectedArgv and spawn.",
+    "CLI start declares --review-restored-scope; D refuses fixture/normal/non-discussion use, missing/world-readable/symlink files, and forwards only explicit restored-personal discussion-only requests.",
+    "The current immutable e4e child ownership boundary passes5/5; no old child/UNKNOWN issue is reopened.",
+    "E dynamic workflow format validation on exact ee now actually produces and verifies snapshot/evidence1 and2,13/21 families, rejects3 without output and preserves sourceDB bytes.",
+    "The prior ordinary-personal/helper/data-subject gate scopes remain valid. Current main source773 personal signed-file review behavior exists and its source-level evidence remains legitimate.",
+    "No old ee package is claimed to contain later773 bytes; the new e4e package genuinely contains them."
+  ],
+  "newArtifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave20-target/wave20-target-e4e0623.tar.gz",
+    "tarSha256": "1f78e38b3568a781ebf4670174451516ceb7c32b982b0990e21757c34e4ddfc1",
+    "tarBytes": 20237580,
+    "source": "e4e0623dcb6d90318939f9613f9251ff73fcc602",
+    "sourceDirty": false,
+    "buildId": "637ed44e850f447a",
+    "productSchemaActualExport": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeActual": "24.21.0",
+    "abiActual": "137",
+    "sqliteActual": "3.53.4",
+    "inventoryEntries": 6743,
+    "regularFilesHashAndSizeVerified": 6722,
+    "internalSymlinksVerified": 21,
+    "extractedBytes": 67533216,
+    "installManifestSha256": "dabec223a3b13c11ad00657b4acbd90a2a27072f068783c2c470fb2668345daf",
+    "releaseManifestSha256": "5721b3f0aebb374b8392a55f0a9ffb8e9333906676b42ec802bf6767fac869ec",
+    "closureDigest": "de8f3163a7897658a8a5180fda403d8701fc4a75a6df35abc3ebbe7664463d65",
+    "verifiedInstallRoot": "/tmp/pa-wave21-delivery-audit-IheJBM/install",
+    "runtimeSlice": "773b34d is an ancestor; package includes restored-review.ts and actual demo startup flag plus main985 dual format bytes. No launcher/portability runtime delta from e4e through2350af2.",
+    "modeScope": "Personal-capable/readstartup bytes verified; no candidate instance started in this audit.",
+    "standalonePrepareCli": "The frozen package includes app/apps/coordinator/product/restored-review.ts but not app/tools/dev/review-restored.mjs and has no pa review-prepare command. D's actual recipe calls the shipped prepareRestoredReview module directly then writes a private file. Do not present this as already shipping the main tools/dev CLI; a thin user-facing packaged preparation command remains a useful delivery item.",
+    "dActualReadStartup": {
+      "report": "tools/distribution/reports/wave20/nonempty-personal-http.json",
+      "source": "e4e0623dcb6d90318939f9613f9251ff73fcc602",
+      "buildId": "637ed44e850f447a",
+      "producer": "Shipped ProductStore/main prepareRestoredReview/credentials modules, private0700/0600 resources, pa launcher explicit personal discussion-only start",
+      "scope": "D-owned actual same-package recipe records source baseline403, reviewed2 candidates/history/source200, original data/business422/model0/native0; fixture/missing/world-readable/symlink/tampered config refusal. Source confirmation remains not_granted/startupAvailable=false.",
+      "independence": "Inspected actual recipe, evidence and exact bytes; not rerun live and not independent E installation acceptance.",
+      "combinedDataLimit": "Real B Work/Q&A/native_applied data and SDK candidate/review state remain separate. Historical Work actor authorization and same-Store merge are not claimed."
+    }
+  },
+  "eRecordedScopes": {
+    "counts": { "PASS": 196, "FAIL": 0, "NOT_TESTED": 16 },
+    "testSource": "dcaa884030eebdac23e5eb4cb95c95d6e7c6bbd0",
+    "canonicalProductSource": "ee7fbd8ab59bde8b875dcd933fda58d7bbf2fd5d",
+    "canonicalBuildId": "90e81429079a7d50",
+    "canonicalTarSha256": "b0990149d0a8c81a130d358ea07100332bc30d509e9c7dfdf7a176e61b7f7ecc",
+    "ordinaryEe": "Existing24 installed cases remain a valid scoped ordinary-personal/helper/data/format tier. A scope-specific reevaluation excluding only the two new source-only requirements accepts; the shared E test rules were not modified.",
+    "newReadStartupCases": "Actual source checkout CLI/demo on ee-produced restored data: before403, after200 candidate/history/frozen body, business422, queue held and provider unchanged. packageEntry=false is recorded. These are legitimate cross-version source-consumer integration outcomes, not same-package installed entry acceptance.",
+    "newSourceConsumerFileSha256": {
+      "tools/dev/review-restored.mjs": "ac8052e810dbc304e473fb48bdc4d4070b0ef5144464b77a9cde93f467ee1391",
+      "apps/coordinator/product/demo.ts": "ba770b81eedd9317cdf529f4719c076bffdc3a932999ad466314284f69fbfc61",
+      "apps/coordinator/product/restored-review.ts": "83cec484bf2b0815b1e5ca53653dc7f3ad883c3ab396ff838965004031dd8c11"
+    },
+    "eeByteAbsence": "Exact ee package has no restored-review module, no review startup flag and no review artifact inventory entries. This is a chronological limit of ee, not a current-main regression.",
+    "refusalLimit": "E combined expired/tampered case does not prove valid-signed expiry separately; valid-signed foreign principal/host/key are explicitly NOT_TESTED. Keep the documented source scope without inflating it.",
+    "fixtureReadonly": "Existing installed richer Work/Q&A/candidate/source-confirmation second-root lane still uses fixture+recovery_readonly; it is not personal review consent or target permission.",
+    "wholeInstalled26": "REJECTED_FOR_REVIEW_CONSUMER_PROVENANCE",
+    "nativeFullProduct": "NOT_GRANTED"
+  },
+  "mainIntegrableDistributionClosure": {
+    "mainCurrentState": "Main4c93817 does not track apps/launcher/bin/pa.mjs; do not cherry-pick a lone launcher function or silently assume a complete distribution is already integrated.",
+    "coherentOwnedSource": [
+      "apps/launcher/package.json + bin/pa.mjs + complete lib/ closure + focused test/ fixtures",
+      "packages/portability/package.json + complete src/ + tsconfig build/export surface + tests",
+      "tools/distribution build.mjs/stage.mjs/freeze-install.mjs and exactly needed scripts/entry mappings, excluding historical report churn"
+    ],
+    "declaredDependencies": {
+      "@personal-agent/launcher": ["@personal-agent/portability workspace API"],
+      "@personal-agent/portability": ["@personal-agent/storage workspace API", "better-sqlite3 13.0.3"],
+      "build": ["Node>=24.21.0<25 / ABI137 measured", "TypeScript6.0.3", "pnpm11.7.0", "main-owned workspace/root scripts/lock/dependency links"],
+      "runtimeProduct": ["current main coordinator demo/runtime/HTTP contracts", "static HTTP console build", "main restored-review producer/load/health restoredReviewDigest API", "current storage workflow1/2/schema guard and artifact snapshot ports"]
+    },
+    "remainingBeforeReadStartupIntegration": "D must port the actual current selection digest/health reuse contract and E must bind producer+consumer entry bytes to the same new package. The existing ordinary personal closure can be integrated in its admitted scope without declaring the source-only review tests installed.",
+    "authorityBoundary": "Package startup read selection, source facts and distribution material do not create private execution/startup permission, native recovery or target activation. Root/contracts/lock modifications remain main-owned."
+  },
+  "nextPackages": {
+    "d": [
+      "Keep the admitted immutable child/gate/ordinary scopes; repair only the explicit review reuse contract using main health.restoredReviewDigest/current selection verification.",
+      "Persist or re-read the actual requested selection identity for matching reuse; refuse unbound/different-selection/absent review mismatches with clear stop/reprepare guidance, preserving the five-minute startup-only meaning.",
+      "Ship an ergonomic package preparation command calling main's real prepareRestoredReview port, or stage the exact supported CLI closure, without adding a new signer/permission authority.",
+      "Maintain main producer/runtime signatures, NOFOLLOW/NONBLOCK/private-file validation, explicit personal+readonly mode and no auto-discovery/fixture fallback across every entry.",
+      "Freeze only necessary runtime changes with producer/consumer/module/helper provenance and give E the exact immutable package before final acceptance.",
+      "Measure same-package personal cold/restored before403/after200 candidate/history/frozen source and strict same-selection/different-selection reuse with no provider/queue/native effects.",
+      "Carry the real normal Q&A and SDK/candidate datasets toward one actual public-API Store workflow, retaining separate scopes until truly measured; source facts and read consent remain data-only.",
+      "Verify same-package dual workflow formats and distinct personal-evidence/bundle protocols, protected new-write upgrades and bounded independently owned cleanup.",
+      "Integrate coherent distribution dependency closure with main root ownership, private redacted support and limited meaningful resource-return checks; old packages/reports remain untouched.",
+      "Publish early/mid/final runnable source and exact ordinary/readstartup/fixture/native/target scope, without waiting for missing execution authority to block independent personal delivery."
+    ],
+    "e": [
+      "Keep ee ordinary24 installed and main-source review outcomes separately; retract only the new installed review consumer claim until same-package execution is measured.",
+      "Represent frozen data producer and actual CLI/runtime consumer subjects/files independently, require same package for installed review, and reject packageEntry=false or verified foreign consumers on an unchanged report positive.",
+      "Retarget current review cases to exact e4e or its necessary strict-reuse successor; run the package's actual preparation/start CLI rather than process.cwd source checkout.",
+      "Consume main health selection digest and D reuse refusal contract in complete positive/focal tests, including already-running unbound or different-selection daemon without broadening safety requirements.",
+      "Repeat same-subject personal restored original body/candidate/history/source review with explicit private file and before/after refusal, preserving business422/provider0/queue held and source not_granted.",
+      "Measure valid-signed expiry/principal/host/key negatives only with independently owned keys and exact producer output, keeping unexecuted cases honest and startup-window semantics accurate.",
+      "Keep fixture+readonly delivered Work/Q&A/source-confirmation separate from personal readstartup and B independent business recovery until the real merged flow exists.",
+      "Retain dynamic workflow1/2 and exact schema compatibility assertions, snapshot format roles and protected different-binary upgrade data with all required subjects tied to immutable bytes.",
+      "Use finite meaningful SSE/reopen/concurrent-read and resource-return checks on only independently born resources; no vendor/native budget or long-soak claim.",
+      "Publish accurate producer/consumer/package/helper provenance and early/mid/final tier verdicts. Source-level success cannot repair a missing frozen entry, and read consent cannot become target permission."
+    ]
+  }
+}
