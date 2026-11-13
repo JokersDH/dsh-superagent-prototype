@@ -15,6 +15,7 @@ import { ensureRoots, readEvidenceSummary } from '@personal-agent/portability'
 import { EXIT } from './cli.mjs'
 import { readLauncherConfig } from './config.mjs'
 import { daemonArgv, spawnDaemon } from './daemon.mjs'
+import { restoredReviewIdentity } from '../../coordinator/product/restored-review.ts'
 import { probeAuthorExecutor, probeRuntime, readAuthorEvidence } from './diagnostics.mjs'
 import { canonicalPath, identityDifferences } from './identity.mjs'
 import { captureProcessFacts, processStart, readInstanceRecord, removeInstanceRecord, verifyInstance, writeInstanceRecord } from './instance.mjs'
@@ -158,6 +159,19 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
         '重新生成 private 文件；不接受旧文件、FIFO、符号链接或宽权限文件。',
       )
   }
+  let requestedReviewIdentity = null
+  if (reviewRestoredScope !== null) {
+    try {
+      requestedReviewIdentity = restoredReviewIdentity(reviewRestoredScope)
+    } catch (error) {
+      return blocked(
+        'review_scope_invalid',
+        'review 配置未通过 main 的同一文件校验（签名/结构/权限）',
+        { path: reviewRestoredScope, cause: String(error?.message ?? error) },
+        '用包内 `pa review-restored` 重新生成 0600 配置；不从未验证文件推导选择。',
+      )
+    }
+  }
 
   // Exact schema rejection before any process is spawned: a state written by a newer build is not
   // opened by an older binary at all (the daemon would fail with MigrationIntegrityError, but that is
@@ -216,6 +230,39 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
         '已有实例记录但真实进程身份不一致；不结束未知进程',
         { failures: verification.failures, record: existing },
         '运行 `pa stop` 清理可核实实例，或 `pa doctor` 查看详情。',
+      )
+    // Compare the requested normalized file identity with the actual daemon health digest before
+    // any port/access conflict branch. The record is never a substitute for live health, and an
+    // unbound/different/missing selection must not stop or mutate the existing instance.
+    let liveHealth = null
+    try {
+      const response = await httpGet(`${existing.apiURL}/v1/health`, { timeoutMs: 2000, parseJson: true })
+      if (response.status === 200) liveHealth = response.body
+    } catch {
+      liveHealth = null
+    }
+    if (liveHealth === null)
+      return blocked(
+        'instance_health_unavailable',
+        '已有实例记录存在，但无法核验其实际 health；不复用、不结束未知进程',
+        { pid: existing.pid, apiURL: existing.apiURL },
+        '先用 `pa doctor`/`pa status` 核对实际实例与端口；不根据记录猜测选择。',
+      )
+    if (requestedReviewIdentity !== null && (liveHealth.mode !== 'personal' || liveHealth.startupMode !== 'recovery_readonly')) {
+      return blocked(
+        'restored_review_selection_mismatch',
+        '已有实例不是 personal/recovery_readonly；显式 review 选择不能升级普通/fixture 实例',
+        { liveMode: liveHealth.mode ?? null, liveStartupMode: liveHealth.startupMode ?? null, requestedReviewIdentity },
+        '先正常 `pa stop` 经核实的该实例，再以 restored personal discussion-only 启动；不会原地提升权限。',
+      )
+    }
+    const liveReviewIdentity = typeof liveHealth.restoredReviewDigest === 'string' ? liveHealth.restoredReviewDigest : null
+    if (requestedReviewIdentity !== liveReviewIdentity)
+      return blocked(
+        'restored_review_selection_mismatch',
+        '本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束',
+        { requestedReviewIdentity, liveReviewIdentity, pid: existing.pid },
+        '用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。',
       )
     const differences = identityDifferences(existing, desired)
     if (differences.length > 0)
@@ -308,6 +355,17 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
   }
 
   const observedStartupMode = health?.startupMode === 'recovery_readonly' ? 'recovery_readonly' : 'normal'
+  if (requestedReviewIdentity !== null) {
+    if (health?.mode !== 'personal' || observedStartupMode !== 'recovery_readonly' || health?.restoredReviewDigest !== requestedReviewIdentity) {
+      await stopFailedStart()
+      return blocked(
+        'restored_review_selection_mismatch',
+        '新实例 health 未携带本次已验证 review 选择摘要；拒绝把未生效选择当作已审阅启动',
+        { requestedReviewIdentity, health },
+        '核对包内 prepare/consumer 是否同版本；不重签、不降级到 fixture，也不保留错误实例。',
+      )
+    }
+  }
   if (observedStartupMode !== startupMode) {
     await stopFailedStart()
     return blocked(

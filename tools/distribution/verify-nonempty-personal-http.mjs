@@ -244,28 +244,9 @@ try {
   const reviewFirst = run(cli, ['first-run', '--json', ...reviewArgs])
   if (!['READY', 'OK'].includes(reviewFirst.json?.status)) throw new Error('review first-run failed')
   const reviewPath = join(root, 'review-restored.json')
-  const storage = await import(pathToFileURL(join(install, 'app/packages/storage/dist/index.js')).href)
-  const reviewModule = await import(pathToFileURL(join(install, 'app/apps/coordinator/product/restored-review.ts')).href)
-  const localState = await import(pathToFileURL(join(install, 'app/apps/coordinator/http/local-state.ts')).href)
-  const actionKey = localState.localCredentials(reviewState)('action.key')
-  const reviewStore = new storage.ProductStore({ path: join(reviewState, 'state.sqlite') })
-  let reviewFile
-  try {
-    reviewFile = reviewModule.prepareRestoredReview(reviewStore, reviewState,
-      { userId: 'local-demo-user', authorityRef: 'local-demo-authority' },
-      [{ projectId: project.id, allowedPaths: ['.'], excludedPaths: ['.git'] }],
-      Buffer.from(actionKey, 'hex'))
-  } catch (error) {
-    let detail = null
-    try {
-      const recoveryModule = await import(pathToFileURL(join(install, 'app/apps/coordinator/product/recovery.ts')).href)
-      const recovery = new recoveryModule.ProductRecovery(reviewStore, { stateRoot: reviewState, startupMode: 'recovery_readonly', principal: { userId: 'local-demo-user', authorityRef: 'local-demo-authority' }, projects: () => [] })
-      const inspected = recovery.inspect()
-      detail = { state: inspected.state, markerDigest: inspected.markerDigest, blockers: inspected.blockers, coverage: inspected.logicalSource?.coverage, fingerprint: inspected.logicalSource?.fingerprint, projects: inspected.projects?.map(p => p.id), reviewProject: rInspect.body.projects[0]?.id, selectedProject: project.id, hasWork: reviewStore.product.works.listByProject(project.id, { limit: 1 }).length, currentProject: !!reviewStore.workflows.projects.current(project.id) }
-    } catch (diagnostic) { detail = { diagnostic: String(diagnostic?.message ?? diagnostic) } }
-    throw new Error(`review preparation failed: ${String(error?.message)} ${JSON.stringify(detail)}`)
-  } finally { reviewStore.close() }
-  writeFileSync(reviewPath, JSON.stringify(reviewFile, null, 2) + '\n', { mode: 0o600 })
+  const preparedReview = run(cli, ['review-restored', '--json', '--state', reviewState, '--project', project.id, '--allow-path', '.', '--out', reviewPath])
+  if (preparedReview.json?.status !== 'prepared') throw new Error(`package review-restored failed: ${JSON.stringify(preparedReview.json).slice(0, 400)}`)
+  const reviewFile = JSON.parse(readFileSync(reviewPath, 'utf8'))
   const windowMs = Date.parse(reviewFile.payload.expiresAt) - Date.parse(reviewFile.payload.createdAt)
   if (windowMs <= 0 || windowMs > 300000) throw new Error('review startup window exceeds five minutes')
   const rawStart = (extra) => spawnSync(cli, ['start', '--port', String(rConsole), '--api-port', String(rApi), ...reviewArgs, ...extra], { cwd: install, encoding: 'utf8', timeout: 90000 })
@@ -306,11 +287,25 @@ try {
   if (businessAfter.status !== 422 || businessAfter.body.error?.code !== 'unsupported_capability') throw new Error('reviewed business mutation was not refused')
   if (fakeRequests.length !== 1) throw new Error('reviewed startup/read called the model')
   if (reviewHealth.nativeTurns > 0 || reviewHealth.vendorSends > 0) throw new Error('reviewed startup started native/vendor execution')
+  const pidBefore = (() => { try { return JSON.parse(readFileSync(join(reviewRoots.config, 'instance.json'), 'utf8')).pid } catch { return null } })()
+  const sameReuse = run(cli, ['start', '--discussion-only', '--review-restored-scope', reviewPath, '--port', String(rConsole2), '--api-port', String(rApi2), ...reviewArgs])
+  if (!['READY', 'RUNNING'].includes(sameReuse.json?.status) || sameReuse.json?.reused !== true) throw new Error(`same review selection did not reuse: ${JSON.stringify(sameReuse.json).slice(0, 300)}`)
+  const narrowPath = join(root, 'review-narrow.json')
+  const narrowPrepared = run(cli, ['review-restored', '--json', '--state', reviewState, '--project', project.id, '--allow-path', 'README.md', '--out', narrowPath])
+  if (narrowPrepared.json?.status !== 'prepared') throw new Error('narrow review preparation failed')
+  const mismatch = run(cli, ['start', '--discussion-only', '--review-restored-scope', narrowPath, '--port', String(rConsole2), '--api-port', String(rApi2), ...reviewArgs], [2])
+  if (!mismatch.stdout.includes('restored_review_selection_mismatch')) throw new Error(`different selection was not refused: ${mismatch.stdout.slice(0, 300)}`)
+  const noFile = run(cli, ['start', '--discussion-only', '--port', String(rConsole2), '--api-port', String(rApi2), ...reviewArgs], [2])
+  if (!noFile.stdout.includes('restored_review_selection_mismatch')) throw new Error('missing selection was not refused against live review instance')
+  const changedPort = run(cli, ['start', '--discussion-only', '--review-restored-scope', reviewPath, '--port', String(rConsole2), '--api-port', String(await freePort()), ...reviewArgs], [2])
+  if (!changedPort.stdout.includes('instance_conflict')) throw new Error('changed port with same selection was not refused')
+  const pidAfter = (() => { try { return JSON.parse(readFileSync(join(reviewRoots.config, 'instance.json'), 'utf8')).pid } catch { return null } })()
+  if (pidBefore === null || pidBefore !== pidAfter) throw new Error('selection refusal changed the existing instance PID')
   const rvStop = run(cli, ['stop', '--json', ...reviewArgs])
   if (rvStop.json?.status !== 'STOPPED') throw new Error('reviewed stop failed')
   step('explicit-reviewed-personal', 'PASS', { reviewProtocol: reviewFile.payload.protocol, windowMs, markerState: inspected.body.state, startupMode: reviewHealth.startupMode,
     candidatesBeforeConsent: 403, candidatesAfterConsent: candidatesAfter.body.candidates.length, sourcesAfterConsent: 200, historyAfterConsent: 200,
-    businessRefused: true, modelRequests: fakeRequests.length - 1, nativeTurns: reviewHealth.nativeTurns ?? 0, fixtureRejected: true, invalidFileRejected: true, tamperedRejected: true, startupAvailable: false })
+    businessRefused: true, modelRequests: fakeRequests.length - 1, nativeTurns: reviewHealth.nativeTurns ?? 0, fixtureRejected: true, invalidFileRejected: true, tamperedRejected: true, startupAvailable: false, sameSelectionReused: true, differentSelectionRefused: true, noSelectionRefused: true, changedPortRefused: true, pidStable: true })
 
   evidence.status = 'PASS'
   evidence.build = { buildId: manifest.buildId, commit: manifest.source.commit, schema: manifest.producer.productSchema }

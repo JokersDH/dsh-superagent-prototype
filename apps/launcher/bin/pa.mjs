@@ -23,6 +23,7 @@ import { readRelease } from '../lib/release.mjs'
 import { backupState, verifyBackup } from '../lib/backup.mjs'
 import { importBundle, restoreState, rollbackState } from '../lib/restore.mjs'
 import { startInstance } from '../lib/start.mjs'
+import { prepareReview } from '../lib/review.mjs'
 import { stopInstance } from '../lib/stop.mjs'
 import { UpgradeError, inspectTargetInstall, readJournal, recoverSwitch, rollbackInstall, upgradeInstall } from '../lib/upgrade.mjs'
 import { ACTIVATION_CONSUMPTION_REQUIREMENTS, LOCAL_RESOURCE_POLICY_DIGEST, currentMachineDigest, evaluateActivation, evaluateActivationAudit } from '../lib/recovery-activation.mjs'
@@ -120,6 +121,7 @@ function commandSpecs() {
       open: 'boolean',
       'no-build': 'boolean',
     },
+    'review-restored': { ...COMMON, state: 'string', project: 'string', 'allow-path': 'list', 'exclude-path': 'list', out: 'string' },
     stop: { ...COMMON, timeout: 'string' },
     backup: { ...COMMON, out: 'string', label: 'string' },
     'verify-backup': { ...COMMON, bundle: 'string' },
@@ -416,6 +418,26 @@ async function main(argv) {
     const result = { status: 'UNVERIFIED', instance: record, checks: verification.checks, failures: verification.failures, installRoot, roots }
     printResult({ json: json ? result : null, human: `${printStatus(result)}\n  hint: run pa doctor; stop refuses to kill an unverified process` })
     return EXIT.DEGRADED
+  }
+
+  if (command === 'review-restored') {
+    const result = prepareReview({
+      state: values.state, project: values.project, allowPaths: values['allow-path'],
+      excludePaths: values['exclude-path'], out: values.out,
+    })
+    if (!result.ok) {
+      printResult({ json: json ? { status: 'BLOCKED', code: result.code, message: result.message, detail: result.detail ?? {} } : null,
+        human: `review-restored: BLOCKED ${result.code}: ${result.message}` })
+      return EXIT.BLOCKED
+    }
+    printResult({ json: json ? result : null, human: [
+      `review-restored: ${result.status}`,
+      `  output: ${result.output}`,
+      `  projects: ${result.projects.join(', ')} expiresAt: ${result.expiresAt}`,
+      `  access: ${result.access} startupAvailable: ${String(result.startupAvailable)} protocol: ${result.protocol}`,
+      '  只读启动选择，不是授权；用 `pa start --discussion-only --review-restored-scope <output>` 显式消费。',
+    ].join('\n') })
+    return EXIT.OK
   }
 
   if (command === 'start') {
