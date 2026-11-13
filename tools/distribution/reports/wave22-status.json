@@ -1,0 +1,399 @@
+{
+  "protocol": "wave22-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "efd081f",
+  "mergedMain": "1b8d3d2",
+  "head": "a9b155c",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/vendor/native turns 0; twelve user services untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "nativeTurns": 0,
+    "vendorSends": 0
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Exact 595b3f1/build cc16eca05e4da244/sha e875b9b9... immutable input is handed to E first; REUSED is a successful terminal state and E old e4e FAIL is not relabeled or pasted onto 595.",
+      "evidence": [
+        "tools/distribution/reports/wave22/artifacts.json"
+      ]
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "Package prepare `pa review-restored` and startup consumer use the same main signer/loader; same valid selection returns REUSED while different/narrow/no-file/port/login remain refused with stable PID. No source checkout signs a missing package entry.",
+      "evidence": [
+        "tools/distribution/reports/wave22/nonempty-personal-http.json"
+      ]
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Coherent ordinary source/deploy closure lists launcher bin/lib/test/package (40 files), portability src/test/package/tsconfig (23), distribution build/stage/freeze plus three recipes (7) and root configs (5), each with sha256/bytes, installClosure, runtime dependencies and root requirements; no lone upgrade.mjs or historical report bulk.",
+      "evidence": [
+        "tools/distribution/reports/wave22/ordinary-source-closure.json"
+      ]
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "One real Store is seeded by B normal Work/Broker/Q&A/native_applied and then a controlled SDK context send, yielding two candidates in the same Store; backup to a second root and explicit personal review read Work>=1, 2 candidates, source/history 200, business 422 and no extra fake request. Vendor/native 0.",
+      "evidence": [
+        "tools/distribution/reports/wave22/same-store-dual.json"
+      ]
+    },
+    "d5": {
+      "status": "PASS_OPTIONAL_OBSERVED",
+      "summary": "Main712 optional diagnostics are consumed only from the actual new target via `?scopeReview=1`, which returned context-scope-review/1; default interface and v1 digest remain unchanged and old 595 is not retroactively certified by the later API. Required reasons/withheld count are not fabricated.",
+      "evidence": [
+        "tools/distribution/reports/wave22/same-store-dual.json"
+      ]
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "Necessary runtime bytes changed for main712/multi-project review, so a clean successor was frozen from a9b155c: build 9fdc283f55927f6f, schema18, tar sha 413dee2f..., 20,246,850 B, 6,747 files. 595/e4e/ee/b911/651/97 preserved and unrelabeled.",
+      "evidence": [
+        "tools/distribution/reports/wave22/artifacts.json"
+      ]
+    },
+    "d7": {
+      "status": "PASS",
+      "summary": "Successor cold install 7/7, no-executor 4/4, multi-instance 8/8 with independent states; selection change never silently stops/replaces an instance; unknown resources are not zeroed; 97 stays mock-only.",
+      "evidence": [
+        "tools/distribution/reports/wave22/personal-install.json",
+        "tools/distribution/reports/wave22/personal-no-executor.json",
+        "tools/distribution/reports/wave22/multi-instance.json"
+      ]
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Safe ee->successor same-schema18 and legacy16->18 are 3/3; exit/status/pointer/mode/data are checked and post-upgrade writes are not silently rolled back. Old e4e reuse limitation remains historical.",
+      "evidence": [
+        "tools/distribution/reports/wave22/same-schema18-upgrade.json",
+        "tools/distribution/reports/wave22/cross-schema-upgrade.json"
+      ]
+    },
+    "d9": {
+      "status": "PASS_WITH_MAIN_ACTIVATION_BLOCKED",
+      "summary": "Managed matrix 19/19; support/material 8/8 redacted/0600/no-overwrite; preparation/start/refusal/re-preparation CLI steps are executable. Review is a readonly historical selection, not private startup permission or target grant.",
+      "evidence": [
+        "tools/distribution/reports/wave22/binary-upgrade.json",
+        "tools/distribution/reports/wave22/target-material.json"
+      ]
+    },
+    "d10": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Frozen rerun: same3, nonempty12, real4, matrix19/19, multi8/8, cross3/3, data5/5, personal7/7, noexec4/4, source5/5, ee->new3/3, backup6/6, portable5+1NT, dual6/6, material8/8, smoke52/52, launcher60/60, portability52/52. E verdict pending.",
+      "evidence": [
+        "tools/distribution/recipes/wave22-e-acceptance.zh-CN.md",
+        "docs/rfcs/WP-16/0060-wave-22-d-same-store-and-ordinary-closure.md"
+      ]
+    }
+  },
+  "artifacts": {
+    "protocol": "wave22-artifacts/1",
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave22-target/wave22-target-a9b155c.tar.gz",
+      "sha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+      "tarBytes": 20246850,
+      "buildId": "9fdc283f55927f6f",
+      "source": {
+        "commit": "a9b155c13be197d828544a26f4827cf9d4acab68",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6747,
+      "extractedBytes": 67558313,
+      "supportMatrix": {
+        "measured": [
+          "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+        ],
+        "node": ">=24.21.0 <25",
+        "abi": "137",
+        "sqlite": ">=3.53.4",
+        "notTested": [
+          "linux",
+          "win32",
+          "darwin-x64",
+          "other Node ABIs",
+          "other machines",
+          "personal native execution"
+        ]
+      },
+      "actualCapabilities": [
+        "same Store B normal Broker/Work/answer/native_applied + SDK/context/candidates reviewed personal on second root",
+        "dual workflow-evidence default1/explicit2 and optional scopeReview=1 actual",
+        "main712 optional diagnostics consumed only from installed target",
+        "package prepare/start selection reuse with REUSED terminal and refusals",
+        "complete coherent ordinary source closure manifest",
+        "same-schema and 16->18 upgrades",
+        "backup/restore, support material"
+      ]
+    },
+    "exact595Delivered": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave21-target/wave21-target-595b3f1.tar.gz",
+      "sha256": "e875b9b90445db5826bf01d72d710fd55b208309598347ca45be618773ae026d",
+      "tarBytes": 20242124,
+      "buildId": "cc16eca05e4da244",
+      "source": {
+        "commit": "595b3f138872f176b7c6b214b4b6b1b87c1ed017",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6744,
+      "note": "D1 exact immutable input for E; REUSED is a successful terminal state. E old e4e result is not relabeled."
+    },
+    "e4ePrevious": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave20-target/wave20-target-e4e0623.tar.gz",
+      "sha256": "1f78e38b3568a781ebf4670174451516ceb7c32b982b0990e21757c34e4ddfc1",
+      "buildId": "637ed44e850f447a",
+      "source": {
+        "commit": "e4e0623dcb6d90318939f9613f9251ff73fcc602",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "note": "Old E target with reuse FAIL; not relabeled."
+    },
+    "eeBaseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave19-target/wave19-target-ee7fbd8.tar.gz",
+      "sha256": "b0990149d0a8c81a130d358ea07100332bc30d509e9c7dfdf7a176e61b7f7ecc",
+      "buildId": "90e81429079a7d50",
+      "source": {
+        "commit": "ee7fbd8ab59bde8b875dcd933fda58d7bbf2fd5d",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "note": "Pre-773 source; no review entry."
+    },
+    "b911Baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave18-target/wave18-target-b9117aa.tar.gz",
+      "sha256": "4a81380a5fd0c69aabe8d38604dd661ab3fb3f30113b4bb2d3e5156c2ff54c1a",
+      "buildId": "6a45633067501dd2",
+      "source": {
+        "commit": "b9117aad12797a3ee3c454172d1f918516a18f33",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18
+    },
+    "safe651Baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave17-target/wave17-target-65102f7.tar.gz",
+      "sha256": "33d874c9a25f22d2710fb29d686f03ad5b37de7ad2cdb09f40d16fd7ecb86340",
+      "buildId": "f55470ae14cc4985",
+      "source": {
+        "commit": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18
+    },
+    "old97MockOnly": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave16-target/wave16-target-97cace7.tar.gz",
+      "sha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+      "buildId": "8a5a0a85631f22ca",
+      "source": {
+        "commit": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "note": "Mock-only unsafe lifecycle control."
+    },
+    "baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "buildId": "7e8f6ce6fa2e2633",
+      "source": {
+        "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 13
+    },
+    "legacy16": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+      "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+      "buildId": "3311a04bd20ed7f9",
+      "source": {
+        "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 16
+    },
+    "sourceClosure": "tools/distribution/reports/wave22/ordinary-source-closure.json",
+    "notes": [
+      "Built from pushed clean wave-22 D head a9b155c; merge main 1b8d3d2 includes 712e191.",
+      "Same Store real Broker/Work/answer/native_applied plus controlled SDK candidates is actual, not a merge claim across separate states.",
+      "Optional scopeReview=1 is only claimed because the installed target actually served it.",
+      "A v2/private startup permission/target/native remain unclaimed; docs-only heads do not refreeze."
+    ]
+  },
+  "sourceClosure": null,
+  "sameStore": {
+    "seed": {
+      "projectId": "project-personal-dialogue",
+      "sourceMessageId": "b9428dd4a5bf99d861f6eb63770215f8",
+      "candidates": 2,
+      "fakeRequests": 1,
+      "nativeTurns": 0,
+      "vendorSends": 0
+    },
+    "scopeReview": {
+      "protocol": "context-scope-review/1",
+      "reasons": 0,
+      "withheld": null
+    }
+  },
+  "testLayers": {
+    "sameStore": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "liveReviewSelection": {
+      "steps": 11,
+      "status": "FAIL"
+    },
+    "realBusinessRelocation": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "multiInstance": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "binaryUpgrade": {
+      "sections": 19,
+      "status": "PASS"
+    },
+    "crossSchema": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "schema18Data": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "personalInstall": {
+      "steps": 7,
+      "status": "PASS"
+    },
+    "personalNoExecutor": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "sourceConfirmation": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "sameSchema18": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "backupSchema": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "portableClosure": {
+      "steps": 6,
+      "status": "PASS",
+      "notTested": [
+        "other-platform-abi"
+      ]
+    },
+    "dualBinary": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "targetMaterial": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "smoke": {
+      "steps": 52,
+      "status": "PASS",
+      "keepRoot": true
+    },
+    "launcher": {
+      "tests": 60,
+      "status": "PASS"
+    },
+    "portability": {
+      "tests": 52,
+      "status": "PASS"
+    }
+  },
+  "blockers": [
+    {
+      "id": "MAIN-PRIVATE-STARTUP-PERMISSION",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "Review selection is not private startup permission/target grant."
+    },
+    {
+      "id": "A-V2-NOT-ADMITTED",
+      "owner": "A/main",
+      "status": "NOT_SUPPORTED",
+      "summary": "Only observed v1/v2 read recipes and personal-evidence2 consumed."
+    },
+    {
+      "id": "HISTORICAL-WORK-ACTOR-AUTH",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "Restored actor may be unauthorized for historical Work."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E must verify exact 595 and this successor from immutable bytes; REUSED is success."
+    },
+    {
+      "id": "PLATFORM-ABI",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Only darwin/arm64 current Node/SQLite ABI measured."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Zero real vendor/model/native turns."
+    }
+  ],
+  "notTested": [
+    "A v2",
+    "historical Work actor authorization",
+    "private startup permission/target",
+    "cross-platform/ABI",
+    "real personal billed turn",
+    "every individual SIGKILL step",
+    "external real vendor Store merge",
+    "E independent acceptance"
+  ],
+  "eConsumption": [
+    "Verify exact 595 first; REUSED is success, mismatches must remain refused.",
+    "Then verify successor a9b155c/9fdc283f... from immutable bytes; GPU no.",
+    "Run same-store, nonempty, real business, matrix, multi, cross, data, personal, noexec, source, ee->new, backup, portable, dual, material, smoke.",
+    "Do not use source checkout to supply missing prepare/consumer, auto-load review files, treat digest as grant, or claim private activation/native."
+  ],
+  "preservedHistory": [
+    "wave-05..21 evidence/ledgers unchanged",
+    "all historical tars/states preserved",
+    "no shared contract/migration/root lock/E assertion modified"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave22/*.json",
+    "tools/distribution/recipes/wave22-e-acceptance.zh-CN.md",
+    "docs/rfcs/WP-16/0060-wave-22-d-same-store-and-ordinary-closure.md"
+  ]
+}

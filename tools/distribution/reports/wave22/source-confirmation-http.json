@@ -1,0 +1,64 @@
+{
+  "protocol": "wave17-source-confirmation-http/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "nonempty-backup-restored",
+      "status": "PASS",
+      "detail": {
+        "bundle": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-source-confirm-Dc8Fkq/source.pab",
+        "restoredState": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-source-confirm-Dc8Fkq/run/restored/state",
+        "schema": 18
+      }
+    },
+    {
+      "id": "restored-readonly-inspect",
+      "status": "PASS",
+      "detail": {
+        "mode": "fixture",
+        "state": "recovery_readonly",
+        "commitAvailable": false,
+        "projects": 1
+      }
+    },
+    {
+      "id": "source-prepare-actual",
+      "status": "PASS",
+      "detail": {
+        "protocol": "recovery-source-prepared/1",
+        "planId": "recovery-plan-1b70fe27-7464-4041-9c17-b923dc8fa4e2",
+        "authorization": "not_granted",
+        "startupAvailable": false,
+        "tokenChars": 3996
+      }
+    },
+    {
+      "id": "source-confirm-data-only",
+      "status": "PASS",
+      "detail": {
+        "protocol": "recovery-activation-record/1",
+        "activationId": "recovery-activation-22dfde97-ff63-4e91-9a89-26871e37cc7f",
+        "authorization": "not_granted",
+        "startupAvailable": false
+      }
+    },
+    {
+      "id": "source-audit-not-granted",
+      "status": "PASS",
+      "detail": {
+        "authorization": "not_granted",
+        "startupAvailable": false
+      }
+    }
+  ],
+  "limitations": [
+    "Source confirmation is data-only: authorization=not_granted and startupAvailable=false; no target/queue/Runner action.",
+    "Zero model/native turns; the fixture provider is only used to create a nonempty backup."
+  ],
+  "outcome": "confirmed-data-only",
+  "build": {
+    "buildId": "9fdc283f55927f6f",
+    "commit": "a9b155c13be197d828544a26f4827cf9d4acab68",
+    "schema": 18
+  }
+}

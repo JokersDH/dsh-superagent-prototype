@@ -1,0 +1,54 @@
+{
+  "protocol": "wave22-same-store-dual/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "same-store-seed",
+      "status": "PASS",
+      "detail": {
+        "projectId": "project-personal-dialogue",
+        "sourceMessageId": "b9428dd4a5bf99d861f6eb63770215f8",
+        "candidates": 2,
+        "fakeRequests": 1,
+        "nativeTurns": 0,
+        "vendorSends": 0
+      }
+    },
+    {
+      "id": "scope-review-optional",
+      "status": "PASS",
+      "detail": {
+        "protocol": "context-scope-review/1",
+        "reasons": 0,
+        "withheld": null
+      }
+    },
+    {
+      "id": "same-store-second-root-personal-review",
+      "status": "PASS",
+      "detail": {
+        "markerState": "recovery_readonly",
+        "works": 1,
+        "candidates": 2,
+        "sources": 200,
+        "scopeReviewOptIn": true,
+        "businessRefused": true,
+        "workflowV1Families": 13,
+        "workflowV2Families": 21,
+        "fakeRequests": 1,
+        "nativeTurns": 0
+      }
+    }
+  ],
+  "nativeTurns": 0,
+  "vendorSends": 0,
+  "limitations": [
+    "Controlled local fake endpoint only; no real vendor/model/native turn.",
+    "The retained B state is copied before mutation; the original evidence state is not modified."
+  ],
+  "build": {
+    "buildId": "9fdc283f55927f6f",
+    "commit": "a9b155c13be197d828544a26f4827cf9d4acab68",
+    "schema": 18
+  }
+}

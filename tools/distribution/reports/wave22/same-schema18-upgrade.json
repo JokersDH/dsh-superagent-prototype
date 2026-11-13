@@ -1,0 +1,49 @@
+{
+  "protocol": "wave16-same-schema18-upgrade/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "start-from-schema18",
+      "status": "PASS",
+      "detail": {
+        "fromBuild": "90e81429079a7d50",
+        "mode": "fixture",
+        "schema": 18
+      }
+    },
+    {
+      "id": "same-schema-upgrade-confirmed",
+      "status": "PASS",
+      "detail": {
+        "fromBuild": "90e81429079a7d50",
+        "toBuild": "9fdc283f55927f6f",
+        "mode": "fixture",
+        "pointerBuild": "9fdc283f55927f6f",
+        "dataRolledBack": null,
+        "stateBytes": 651264
+      }
+    },
+    {
+      "id": "stop",
+      "status": "PASS",
+      "detail": {
+        "status": "STOPPED"
+      }
+    }
+  ],
+  "limitations": [
+    "Fixture mode is used for the managed switch; personal/no-executor behavior is covered separately."
+  ],
+  "tuple": {
+    "from": {
+      "buildId": "90e81429079a7d50",
+      "source": "ee7fbd8ab59bde8b875dcd933fda58d7bbf2fd5d",
+      "sha256": null
+    },
+    "to": {
+      "buildId": "9fdc283f55927f6f",
+      "source": "a9b155c13be197d828544a26f4827cf9d4acab68",
+      "schema": 18
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "protocol": "wave18-nonempty-personal-http/1",
+  "status": "FAIL",
+  "steps": [
+    {
+      "id": "discussion-only-personal",
+      "status": "PASS",
+      "detail": {
+        "mode": "personal",
+        "personalMode": true,
+        "executionUnavailable": true
+      }
+    },
+    {
+      "id": "original-request-and-fake-sdk",
+      "status": "PASS",
+      "detail": {
+        "sourceMessageId": "3098fa36370fccfcb8db6b6f4091a8e1",
+        "projectId": "project-personal-dialogue",
+        "fakeRequests": 1,
+        "vendorSends": 0
+      }
+    },
+    {
+      "id": "nonempty-candidates",
+      "status": "PASS",
+      "detail": {
+        "status": "candidates",
+        "count": 2,
+        "kinds": [
+          "propose_work",
+          "propose_decision"
+        ],
+        "trust": "untrusted_data",
+        "executable": false
+      }
+    },
+    {
+      "id": "candidate-prepare",
+      "status": "PASS",
+      "detail": {
+        "index": 0,
+        "kind": "propose_work",
+        "requiredInputs": [
+          "work.scope",
+          "work.criteria",
+          "work.profileId"
+        ],
+        "tokenChars": 2171,
+        "state": "pending"
+      }
+    },
+    {
+      "id": "explicit-reject",
+      "status": "PASS",
+      "detail": {
+        "status": "recorded",
+        "commandId": "wave18-reject-1",
+        "result": null
+      }
+    },
+    {
+      "id": "explicit-decision-confirm-and-replay",
+      "status": "PASS",
+      "detail": {
+        "status": "recorded",
+        "receiptDigest": null,
+        "replaySameCommand": true,
+        "result": null
+      }
+    },
+    {
+      "id": "work-confirm-refused-without-executor",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 422,
+        "code": "unsupported_capability"
+      }
+    },
+    {
+      "id": "native-zero",
+      "status": "PASS",
+      "detail": {
+        "nativeTurns": 0,
+        "vendorSends": 0,
+        "discussionOnly": true
+      }
+    },
+    {
+      "id": "config-files",
+      "status": "PASS",
+      "detail": {
+        "files": [
+          "launcher.json",
+          "model.json",
+          "model.json.assistant-settings.json",
+          "release.json"
+        ]
+      }
+    },
+    {
+      "id": "same-data-relocation-readonly",
+      "status": "PASS_WITH_FIXTURE_LIMIT",
+      "detail": {
+        "restoredState": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-nonempty-personal-vIjB6g/restored/state",
+        "restoredMode": "fixture",
+        "markerState": "recovery_readonly",
+        "candidates": "NOT_TESTED",
+        "restoredCandidateError": {
+          "httpStatus": 403,
+          "code": "forbidden",
+          "reason": "main restored-project rebind is not implemented"
+        },
+        "originalSources": "NOT_TESTED",
+        "restoredOriginalSourceError": {
+          "httpStatus": 403,
+          "code": "forbidden",
+          "reason": "main restored-project rebind is not implemented"
+        },
+        "originalText": true,
+        "businessRefused": true,
+        "modelRequestsDuringRestore": 0
+      }
+    },
+    {
+      "id": "same-data-source-confirm",
+      "status": "PASS",
+      "detail": {
+        "activationId": "recovery-activation-8997b8da-2a44-438e-96f7-9a042f44c41c",
+        "authorization": "not_granted",
+        "startupAvailable": false,
+        "audit": "not_granted",
+        "notAGrant": true
+      }
+    }
+  ],
+  "nativeTurns": 0,
+  "vendorSends": 0,
+  "limitations": [
+    "The model endpoint is a local fake; no vendor request or native executor exists in discussion-only mode."
+  ],
+  "error": "Error: selection refusal changed the existing instance PID: before=null after=11780 narrow={\"ok\":true,\"status\":\"prepared\",\"output\":\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-nonempty-personal-vIjB6g/re mismatch={\"status\":\"BLOCKED\",\"code\":\"restored_review_selection_mismatch\",\"message\":\"本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束\", noFile={\"status\":\"BLOCKED\",\"code\":\"restored_review_selection_mismatch\",\"message\":\"本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束\", port={\"status\":\"BLOCKED\",\"code\":\"instance_conflict\",\"message\":\"已运行实例与本次请求的身份不一致；不静默复用不同 state/mode/access/build/端口\",\"detail\":\n    at file:///Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-nonempty-personal-http.mjs:321:59\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+}

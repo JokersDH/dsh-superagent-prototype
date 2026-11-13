@@ -1,0 +1,110 @@
+{
+  "protocol": "wave19-real-business-relocation/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "workflow-evidence-v1-v2-real-data",
+      "status": "PASS",
+      "detail": {
+        "databaseSchema": 18,
+        "v1Protocol": "workflow-evidence/1",
+        "v1Families": 13,
+        "v1Digest": "caace32a556a47a3e3c4e544845524d3b3c823de3d9bc0df8796a2fead8dffc9",
+        "v2Protocol": "workflow-evidence/2",
+        "v2FamilySetVersion": 2,
+        "v2Families": 21,
+        "v2Digest": "8797911788319c9d6228092708fcaf59b0de9f5ad7a55a790ba6dac87290ebf7",
+        "questions": 1,
+        "answers": 1,
+        "deliveries": 1,
+        "runtimeBindings": 1,
+        "dispatchReceipts": 2,
+        "unsupportedVersionRejected": true
+      }
+    },
+    {
+      "id": "personal-evidence-bundle-real-data",
+      "status": "PASS",
+      "detail": {
+        "bundle": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-real-business-kp5yZS/real-business.pab",
+        "archiveSha256": "16a93ca1e36da8664b392d3b8042edaed8e8bb228dea8258f513e196bb6be579",
+        "entries": 18,
+        "evidenceProtocol": "personal-evidence",
+        "evidenceFormatVersion": 2,
+        "bundleFormatVersion": 1,
+        "databaseSchema": 18,
+        "manifestDigest": "d6b682dc22a632fa001505682ae63b800c14ef30a5064b43573ad3aa13f570c4"
+      }
+    },
+    {
+      "id": "real-business-second-root-readonly",
+      "status": "PASS",
+      "detail": {
+        "restoredMode": "fixture",
+        "markerState": "recovery_readonly",
+        "works": 1,
+        "openQuestions": 0,
+        "sourceQuestionFamilies": 1,
+        "workRead": "NOT_TESTED",
+        "workReadLimit": {
+          "httpStatus": null,
+          "reason": "restored actor is not authorized for the historical Work"
+        },
+        "businessRefused": true,
+        "sourceDigestUnchanged": true,
+        "oldQueueReplayed": false
+      }
+    },
+    {
+      "id": "real-business-source-facts",
+      "status": "PASS",
+      "detail": {
+        "activationId": "recovery-activation-04c0efe6-2ade-4643-94ef-f11befb8e137",
+        "authorization": "not_granted",
+        "startupAvailable": false,
+        "audit": "not_granted",
+        "targetStarted": false
+      }
+    }
+  ],
+  "nativeTurns": 0,
+  "vendorSends": 0,
+  "limitations": [
+    "Business data is the retained B submitted normal-producer state (zero real vendor/native turns); D only reads it.",
+    "Restored nonempty candidates/historical source reads still require main restored-personal project rebinding; they are not claimed here."
+  ],
+  "build": {
+    "buildId": "9fdc283f55927f6f",
+    "commit": "a9b155c13be197d828544a26f4827cf9d4acab68",
+    "schema": 18
+  },
+  "business": {
+    "source": "/tmp/pa-wave19-normal-FsWfko/state",
+    "tables": {
+      "decisions": 0,
+      "legacy_decisions": 0,
+      "proposals": 0,
+      "project_settings": 1,
+      "contracts": 1,
+      "verifications": 0,
+      "acceptances": 0,
+      "outcomes": 0,
+      "reviews": 0,
+      "recovery_intents": 0,
+      "assistant_context_bindings": 0,
+      "user_questions": 1,
+      "answers": 1,
+      "answer_deliveries": 1,
+      "effect_queue": 0,
+      "runtime_bindings": 1,
+      "runtime_current": 1,
+      "resource_observations": 2,
+      "dispatch_receipts": 2,
+      "assistant_reply_results": 0,
+      "recovery_activations": 0
+    },
+    "workflowEvidenceV1": "caace32a556a47a3e3c4e544845524d3b3c823de3d9bc0df8796a2fead8dffc9",
+    "workflowEvidenceV2": "8797911788319c9d6228092708fcaf59b0de9f5ad7a55a790ba6dac87290ebf7",
+    "bundle": "16a93ca1e36da8664b392d3b8042edaed8e8bb228dea8258f513e196bb6be579"
+  }
+}
