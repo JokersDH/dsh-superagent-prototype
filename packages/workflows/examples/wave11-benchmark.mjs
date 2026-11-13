@@ -72,17 +72,25 @@ report.cases.push({ case: 'recovery-source-bounded', coverage: bounded.value.cov
 const large = store.artifacts.write(new Uint8Array(524288))
 store.artifacts.insert(large)
 report.cases.push({ case: 'max-reply-bundle-artifact', rows: 1, bytes: large.bytes, id: large.id })
-const snapshotDir = join(temp, 'snapshot')
-const snapshot = await measure(() => new WorkflowSnapshots(store).create({ destination: snapshotDir }))
-report.cases.push({ case: 'snapshot-create', status: snapshot.value.status, databaseBytes: snapshot.value.manifest.database.bytes,
-  artifacts: snapshot.value.manifest.artifacts.length, evidenceFamilies: snapshot.value.manifest.evidence.families.length, ms: snapshot.ms })
+const v1Dir = join(temp, 'snapshot-v1')
+const v1 = await measure(() => new WorkflowSnapshots(store).create({ destination: v1Dir }))
+report.cases.push({ case: 'snapshot-v1-create', status: v1.value.status, protocol: v1.value.manifest.protocol,
+  databaseBytes: v1.value.manifest.database.bytes, artifacts: v1.value.manifest.artifacts.length,
+  evidenceFamilies: v1.value.manifest.evidence.families.length, ms: v1.ms })
+const v1Verify = await measure(() => new WorkflowSnapshots(store).verify(v1Dir))
+report.cases.push({ case: 'snapshot-v1-verify', status: v1Verify.value.status, ms: v1Verify.ms })
+const snapshotDir = join(temp, 'snapshot-v2')
+const snapshot = await measure(() => new WorkflowSnapshots(store).create({ destination: snapshotDir, formatVersion: 2 }))
+report.cases.push({ case: 'snapshot-v2-create', status: snapshot.value.status, protocol: snapshot.value.manifest.protocol,
+  databaseBytes: snapshot.value.manifest.database.bytes, artifacts: snapshot.value.manifest.artifacts.length,
+  evidenceFamilies: snapshot.value.manifest.evidence.families.length, ms: snapshot.ms })
 const verify = await measure(() => new WorkflowSnapshots(store).verify(snapshotDir))
-report.cases.push({ case: 'snapshot-verify', status: verify.value.status, ms: verify.ms })
+report.cases.push({ case: 'snapshot-v2-verify', status: verify.value.status, ms: verify.ms })
 report.limits = { maxRows: 20000, maxHistoryPage: 100, maxReplyBodyBytes: 524288, maxBindingsTested: 10000 }
 report.limitations = ['Temporary database and content-addressed artifact only; no user state, model/native send or cleanup-policy test.',
   'Timings are single-process wall clock on this host, not a service SLO.']
 store.close()
 rmSync(temp, { recursive: true, force: true })
-const out = resolve('packages/workflows/reports/wave18-performance.json')
+const out = resolve('packages/workflows/reports/wave19-performance.json')
 writeFileSync(out, JSON.stringify(report, null, 2) + '\n')
 console.log(JSON.stringify(report, null, 2))

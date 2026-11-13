@@ -147,7 +147,7 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
   const snapshot = join(data.root, 'snapshot')
   const restored = join(data.root, 'restored')
   try {
-    const result = await new WorkflowSnapshots(data.store).create({ destination: snapshot })
+    const result = await new WorkflowSnapshots(data.store).create({ destination: snapshot, formatVersion: 2 })
     assert.equal(result.status, 'ok', result.message)
     assert.equal(result.manifest.database.productSchema, PRODUCT_SCHEMA_VERSION)
     assert.equal(result.manifest.incompatibleSchema, false)
@@ -254,7 +254,7 @@ test('a selected-context binding whose bundle artifact row is absent blocks the 
   try {
     data.store.db.prepare('DELETE FROM artifacts WHERE id = ?').run(data.bundle.id)
     data.store.db.prepare('DELETE FROM artifacts WHERE id = ?').run(data.replyBody.id)
-    const result = await new WorkflowSnapshots(data.store).create({ destination: snapshot })
+    const result = await new WorkflowSnapshots(data.store).create({ destination: snapshot, formatVersion: 2 })
     assert.equal(result.status, 'blocked')
     assert.deepEqual(result.manifest.missingReferences, [data.bundle.id, data.replyBody.id].sort())
     assert.equal(result.manifest.complete, false)
@@ -268,7 +268,7 @@ test('missing file, changed bytes and a newer schema make the snapshot unusable'
   const data = dataset()
   const snapshot = join(data.root, 'snapshot')
   try {
-    const created = await new WorkflowSnapshots(data.store).create({ destination: snapshot })
+    const created = await new WorkflowSnapshots(data.store).create({ destination: snapshot, formatVersion: 2 })
     assert.equal(created.status, 'ok', created.message)
     const first = created.manifest.artifacts[0]!
 
@@ -431,7 +431,7 @@ test('missing file, changed bytes and a newer schema make the snapshot unusable'
 test('a v2 evidence manifest requires the exact complete family set while a v1 manifest keeps its recorded scope', async () => {
   const data = dataset(), snapshot = join(data.root, 'snapshot-versioned')
   try {
-    const created = await new WorkflowSnapshots(data.store).create({ destination: snapshot })
+    const created = await new WorkflowSnapshots(data.store).create({ destination: snapshot, formatVersion: 2 })
     assert.equal(created.status, 'ok', created.message)
     assert.equal(created.manifest.protocol, 'workflow-snapshot/2')
     assert.equal(created.manifest.evidence.protocol, 'workflow-evidence/2')
@@ -489,4 +489,35 @@ test('a v2 evidence manifest requires the exact complete family set while a v1 m
   } finally {
     data.store.close(); rmSync(data.root, { recursive: true, force: true })
   }
+})
+
+test('default v1 and explicit v2 are separate recipes and both keep the valid-schema guard', async () => {
+  const data = dataset()
+  try {
+    const v1 = await new WorkflowSnapshots(data.store).create({ destination: join(data.root, 'default-v1') })
+    assert.equal(v1.status, 'ok', v1.message)
+    assert.equal(v1.manifest.protocol, 'workflow-snapshot/1')
+    assert.equal(v1.manifest.evidence.protocol, 'workflow-evidence/1')
+    assert.equal(v1.manifest.evidence.families.length, 13)
+    assert.equal(v1.manifest.evidence.familySetVersion, undefined)
+    assert.equal(new WorkflowSnapshots(data.store).verify(join(data.root, 'default-v1')).status, 'ok')
+
+    const v2 = await new WorkflowSnapshots(data.store).create({ destination: join(data.root, 'explicit-v2'), formatVersion: 2 })
+    assert.equal(v2.status, 'ok', v2.message)
+    assert.equal(v2.manifest.protocol, 'workflow-snapshot/2')
+    assert.equal(v2.manifest.evidence.protocol, 'workflow-evidence/2')
+    assert.equal(v2.manifest.evidence.families.length, 21)
+    assert.equal(v2.manifest.evidence.familySetVersion, 2)
+    assert.equal(new WorkflowSnapshots(data.store).verify(join(data.root, 'explicit-v2')).status, 'ok')
+
+    for (const [label, value] of [['schema-zero', '0'], ['schema-fraction', '1.5']] as const) {
+      const root = join(data.root, label), store = new ProductStore({ path: join(root, 'state.sqlite') })
+      try {
+        store.db.prepare("UPDATE schema_meta SET value = ? WHERE key = 'product_schema'").run(value)
+        const created = await new WorkflowSnapshots(store).create({ destination: join(root, 'snapshot'), formatVersion: 2 })
+        assert.equal(created.status, 'blocked', label)
+        assert.equal(new WorkflowSnapshots(store).verify(join(root, 'snapshot')).status, 'blocked', label)
+      } finally { store.close() }
+    }
+  } finally { data.store.close(); rmSync(data.root, { recursive: true, force: true }) }
 })

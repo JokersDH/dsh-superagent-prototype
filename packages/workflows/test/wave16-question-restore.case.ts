@@ -60,7 +60,7 @@ test('a real question/answer/delivery workflow restores at a second root without
   // Keep one real held queue row so the restored queue itself is non-empty as well.
   store.queue.enqueue('application.execute', 'wave16-held-queue', '{}', 1, 0, new Date().toISOString())
   const snapshotDir = join(root, 'snapshot')
-  const createdSnapshot = await new WorkflowSnapshots(store).create({ destination: snapshotDir })
+  const createdSnapshot = await new WorkflowSnapshots(store).create({ destination: snapshotDir, formatVersion: 2 })
   assert.equal(createdSnapshot.status, 'ok', createdSnapshot.message)
   const families = new Map(createdSnapshot.manifest.evidence.families.map(family => [family.name, family]))
   for (const name of ['user_questions', 'answers', 'answer_deliveries', 'effect_queue', 'runtime_bindings', 'runtime_current'])

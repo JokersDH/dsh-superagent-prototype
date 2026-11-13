@@ -10,10 +10,9 @@ import { join } from 'node:path'
 import { test } from 'node:test'
 import { ProductStore } from '@personal-agent/storage'
 import { key } from '../../orchestrator-core/src/core/ids.ts'
-import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
+import { createControlledProduct, createProductRuntime, FIXTURE_CHECK } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
 import { WorkflowSnapshots } from '../src/index.ts'
-import { RecoveryIntentCommitter } from '../../../apps/coordinator/product/recovery-intents.ts'
 // @ts-expect-error main-owned plain-JS fixture without declarations
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 
@@ -21,18 +20,57 @@ const principal = { userId: 'wave16-candidate-user', authorityRef: 'wave16-candi
 const actor = { ...principal, source: 'local_cli' as const }, projectId = 'wave16-candidate-project', conversationId = 'wave16-candidate-conversation'
 const scope = { projectId, allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
 const apiToken = 'a'.repeat(64), headers = { authorization: `Bearer ${apiToken}`, 'content-type': 'application/json' }
+const criteria = [
+  { id: 'wave19-output', kind: 'machine' as const, required: true as const, description: 'Fixed output matches', checkDefinitionRef: FIXTURE_CHECK },
+  { id: 'wave19-human', kind: 'human' as const, required: true, description: 'Review output' },
+]
+async function until<T>(read: () => Promise<T>, predicate: (value: T) => boolean, timeout = 10000): Promise<T> {
+  const deadline = Date.now() + timeout
+  let latest: T | undefined
+  while (Date.now() < deadline) {
+    latest = await read()
+    if (predicate(latest)) return latest
+    await new Promise(resolve => setTimeout(resolve, 20))
+  }
+  throw new Error(`Product condition timed out: ${JSON.stringify(latest ?? null)}`)
+}
 
 test('a real candidate confirmation survives a snapshot restore at a second root', async t => {
   const model = await candidateModel(), root = model.root, stateRoot = join(root, 'state'), projectRoot = join(root, 'project')
-  mkdirSync(stateRoot); mkdirSync(join(projectRoot, 'src'), { recursive: true }); writeFileSync(join(projectRoot, 'src/.gitkeep'), '')
+  mkdirSync(stateRoot, { mode: 0o700 }); mkdirSync(join(projectRoot, 'src'), { recursive: true }); writeFileSync(join(projectRoot, 'src/.gitkeep'), '')
   const git = (args: string[]) => execFileSync('git', args, { cwd: projectRoot, stdio: 'pipe' })
-  git(['init', '-q']); git(['add', 'src/.gitkeep']); git(['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '-qm', 'Candidate restore fixture'])
+  writeFileSync(join(projectRoot, 'index.mjs'), 'export const ok = true\n')
+  git(['init', '-q']); git(['add', 'src/.gitkeep', 'index.mjs']); git(['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '-qm', 'Candidate restore fixture'])
   const store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
-  const product = createProductRuntime({ store, stateRoot, scratchProject: projectRoot, principal,
+  // Generate real Work/Ticket/question/answer/native delivery through the actual controlled product.
+  const controlled = createControlledProduct({ store, principal, projects: [{ id: projectId, scope }],
+    actionSecret: Buffer.alloc(32, 64), stateRoot, scratchProject: projectRoot })
+  let businessWorkId: string, businessQuestionId: string, businessAnswerId: string
+  try {
+    controlled.start()
+    let seq = 0
+    const businessCommand = (value: any) => controlled.application.dispatch({ commandId: `wave19-business-${++seq}`,
+      conversationId, ...value }, actor)
+    const created = await businessCommand({ kind: 'create_work', projectId, goal: 'Wave-19 controlled business work',
+      profileId: 'profile-fixture-question', scope, criteria })
+    assert.equal(created.status, 'recorded')
+    businessWorkId = created.workId as string
+    const view = await until(async () => controlled.application.inspect({}), value => value.questions.length === 1)
+    const question = view.questions[0]!
+    businessQuestionId = question.id
+    const answer = await businessCommand({ kind: 'answer_question', questionId: question.id, expectedVersion: question.version,
+      answer: { kind: 'choices', optionIds: ['allow'] } })
+    assert.equal(answer.status, 'recorded')
+    await until(async () => controlled.application.questions.currentDeliveries(question.id), value => value[0]?.status === 'native_applied')
+    const storedAnswer = store.db.prepare('SELECT answer_id FROM answers WHERE question_id = ?').get(question.id) as { answer_id: string }
+    businessAnswerId = storedAnswer.answer_id
+    assert.ok((store.db.prepare('SELECT COUNT(*) AS n FROM dispatch_receipts').get() as { n: number }).n > 0)
+  } finally { await controlled.close() }
+  let product: ReturnType<typeof createProductRuntime> | undefined = createProductRuntime({ store, stateRoot, scratchProject: projectRoot, principal,
     projects: [{ id: projectId, scope }], actionSecret: Buffer.alloc(32, 61), assistantProvider: model.provider })
   let restored: ProductStore | undefined
   t.after(async () => { if (restored) try { restored.close() } catch { /* closed in test */ }
-    await product.close(); store.close(); await model.close(); rmSync(root, { recursive: true, force: true }) })
+    if (product) await product.close(); store.close(); await model.close(); rmSync(root, { recursive: true, force: true }) })
   const app = createLocalHttpApp({ application: product.application, principal, apiToken, bootstrapToken: 'b'.repeat(64),
     allowedOrigins: ['http://127.0.0.1:5173'], mode: 'fixture', read: product.read, operations: product.operations })
   const request = async (path: string, body?: unknown) => {
@@ -62,34 +100,46 @@ test('a real candidate confirmation survives a snapshot restore at a second root
   assert.equal(contextPrepared.status, 200, JSON.stringify(contextPrepared.value))
   assert.equal((await request('/v1/assistant/context/send', { commandId: contextCommand, token: contextPrepared.value.token })).status, 200)
   await product.execution.effects.idle('application.assistant.reply')
-  const workId = 'wave16-combined-work', contract = { workId, revision: 1, digest: 'c'.repeat(64) }, ticketId = 'wave16-combined-ticket'
-  store.product.works.insert({ id: workId, projectId, conversationId, title: 'Combined candidate work', createdAt: new Date().toISOString() })
-  store.product.contracts.append({ ...contract, goal: 'Combined snapshot work', scope,
-    criteria: [{ id: 'combined-human', kind: 'human', required: true, description: 'Review' }], authorityRef: principal.authorityRef,
-    createdAt: new Date().toISOString() })
-  store.product.links.attach({ contract, ticketId, role: 'primary', authorityRef: principal.authorityRef })
-  store.authority.enable(contract)
   const contextBinding = store.workflows.assistant.contextBindings.forMessage(contextMessageId)
   assert.ok(contextBinding)
-  store.product.questions.insert({ id: 'wave16-combined-question', version: 1, kind: 'clarification', contract, scope,
-    prompt: 'Continue with the combined work?', nativePayloadRef: contextBinding.bundleRef, presentation: { kind: 'free_text' },
-    targets: [{ ticketId, assignmentId: 'wave16-combined-assignment', contract, attemptId: 'wave16-combined-attempt', fenceEpoch: 1,
-      id: 'wave16-combined-target', connectionEpoch: 1, nativeRequestId: { kind: 'string', value: 'wave16-combined-native' },
-      nativeMethod: 'question/ask', provenanceRef: 'wave16-combined-provenance' }], openedAt: new Date().toISOString(), validity: 'open' })
-  store.answers.record('wave16-combined-answer', { questionId: 'wave16-combined-question', expectedVersion: 1,
-    digest: 'e'.repeat(64), answer: { kind: 'free_text', text: 'yes' } })
-  store.answers.upsertDelivery('wave16-combined-answer', 'wave16-combined-target', 'local_recorded')
-  const activationIntent = { protocol: 'recovery-activation-intent/1', activationId: 'wave16-combined-activation',
-    commandId: 'wave16-combined-source-command', planId: 'wave16-combined-plan', planDigest: 'f'.repeat(64),
-    source: { stateId: 'source', stateRoot: '/tmp/source', markerDigest: 'a'.repeat(64), inspectionFingerprint: 'b'.repeat(64) },
-    target: { generationId: 'generation', stateRoot: '/tmp/target', configurationDigest: 'c'.repeat(64) },
-    principal, machineDigest: 'd'.repeat(64), resourcePolicyDigest: 'e'.repeat(64),
-    createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 300000).toISOString() }
-  const sourceCommit = new RecoveryIntentCommitter(store, store.workflows.recoveryActivations, principal, () => {})
-    .commit(activationIntent as any, { ...principal, source: 'local_ui' })
   store.queue.enqueue('application.execute', 'wave16-candidate-held', '{"held":true}', 1, 0, new Date().toISOString())
+  await product.close(); product = undefined
+
+  // Real HTTP source prepare/confirm/audit over the same Store (no no-op revalidate committer).
+  const markerPath = join(stateRoot, 'restore-report.json')
+  writeFileSync(markerPath, JSON.stringify({ protocol: 'personal-restore/1', targetPath: stateRoot,
+    database: { integrity: 'ok', foreignKeyViolations: 0, productSchema: 18 }, evidence: { status: 'verified' } }), { mode: 0o600 })
+  const sourceRuntime = createProductRuntime({ store, stateRoot, scratchProject: projectRoot, principal,
+    projects: [{ id: projectId, scope }], actionSecret: Buffer.alloc(32, 65), startupMode: 'recovery_readonly',
+    recoveryExecutor: (() => ({ id: 'wave19-readonly-executor', revision: 1, executable: process.execPath, expectedVersion: process.version })) as any })
+  let sourceRecord: any
+  try {
+    const sourceApp = createLocalHttpApp({ application: sourceRuntime.application, principal, apiToken, bootstrapToken: 'b'.repeat(64),
+      allowedOrigins: ['http://127.0.0.1:5173'], mode: 'personal', startupMode: 'recovery_readonly',
+      read: sourceRuntime.read, operations: sourceRuntime.operations })
+    const sourceRequest = async (path: string, body: unknown) => {
+      const response = await sourceApp.request(`http://127.0.0.1/v1/recovery/source/${path}`, { method: 'POST', headers, body: JSON.stringify(body) })
+      return { status: response.status, value: await response.json() as any }
+    }
+    const prepareInput: any = {
+      preflight: { expectedFingerprint: (await sourceRuntime.read.recovery!()).inspectionFingerprint,
+        bindings: [{ sourceProjectId: projectId, project: { path: projectRoot, check: 'node_test' } }] },
+      targetStateRoot: join(root, 'new-empty-target'),
+    }
+    const preparedSource = await sourceRequest('prepare', prepareInput)
+    assert.equal(preparedSource.status, 200, JSON.stringify(preparedSource.value))
+    assert.equal(preparedSource.value.authorization, 'not_granted')
+    assert.equal(preparedSource.value.startupAvailable, false)
+    const confirmation = await sourceRequest('confirm', { token: preparedSource.value.token })
+    assert.equal(confirmation.status, 200, JSON.stringify(confirmation.value))
+    sourceRecord = confirmation.value
+    assert.equal(sourceRecord.authorization, 'not_granted')
+    const audit = await sourceApp.request(`http://127.0.0.1/v1/recovery/activations/${sourceRecord.committed.intent.activationId}`, { headers })
+    assert.equal(audit.status, 200)
+    assert.deepEqual(await audit.json(), sourceRecord)
+  } finally { await sourceRuntime.close() }
   const snapshot = join(root, 'snapshot')
-  const created = await new WorkflowSnapshots(store).create({ destination: snapshot })
+  const created = await new WorkflowSnapshots(store).create({ destination: snapshot, formatVersion: 2 })
   assert.equal(created.status, 'ok', created.message)
   const restoreRoot = mkdtempSync(join(tmpdir(), 'wave16-candidate-restore-'))
   cpSync(snapshot, restoreRoot, { recursive: true })
@@ -106,15 +156,16 @@ test('a real candidate confirmation survives a snapshot restore at a second root
     assert.equal(verification.status, 'ok', verification.message)
     assert.equal(restored.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 10)
       .some(row => row.key === 'wave16-candidate-held'), true)
-    assert.equal(restored.product.works.get(workId)?.title, 'Combined candidate work')
-    assert.equal(restored.product.contracts.getByRef(contract)?.goal, 'Combined snapshot work')
-    assert.equal(restored.product.questions.get('wave16-combined-question')?.validity, 'open')
-    assert.equal(restored.answers.get('wave16-combined-answer')?.digest, 'e'.repeat(64))
-    assert.equal(restored.answers.deliveries('wave16-combined-answer')[0]?.status, 'local_recorded')
+    assert.equal(restored.product.works.get(businessWorkId)?.title, 'Wave-19 controlled business work')
+    assert.equal(restored.product.questions.get(businessQuestionId)?.validity, 'answered')
+    assert.equal(restored.answers.get(businessAnswerId)?.questionId, businessQuestionId)
+    assert.equal(restored.answers.deliveries(businessAnswerId)[0]?.status, 'native_applied')
     assert.equal(restored.workflows.assistant.contextBindings.forMessage(contextMessageId)?.bundleRef, contextBinding.bundleRef)
-    assert.equal(restored.workflows.recoveryActivations.get('wave16-combined-activation')?.commandId, 'wave16-combined-source-command')
-    assert.equal(restored.commands.get('wave16-combined-source-command')?.payloadDigest, store.commands.get('wave16-combined-source-command')?.payloadDigest)
-    const restoredSource = restored.workflows.recoverySource.inspect({ ignoreCommitted: sourceCommit as any })
+    assert.equal(restored.workflows.recoveryActivations.get(sourceRecord.committed.intent.activationId)?.commandId,
+      sourceRecord.committed.intent.commandId)
+    assert.equal(restored.commands.get(sourceRecord.committed.intent.commandId)?.payloadDigest,
+      store.commands.get(sourceRecord.committed.intent.commandId)?.payloadDigest)
+    const restoredSource = restored.workflows.recoverySource.inspect({ ignoreCommitted: sourceRecord.committed })
     assert.equal(restoredSource.coverage, 'complete')
 
     // Start the actual recovery_readonly runtime/HTTP over the second-root database.
