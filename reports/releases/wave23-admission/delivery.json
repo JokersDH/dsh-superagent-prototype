@@ -1,0 +1,162 @@
+{
+  "protocol": "wave23-delivery-admission/1",
+  "date": "2026-11-13",
+  "scope": "Independent readonly byte/provenance checks and pure release-gate controls; no live installation or process lifecycle matrix rerun",
+  "candidates": {
+    "D": "ab1694349986d7531102a0b90d92f2629a108b81",
+    "DDirty": false,
+    "E": "ac8f1871b29d2d48641ae3785a3d91106d8edcd6",
+    "ETestSourceAtFinalRun": "7443efd08cfba165c93624b3ab63ed4d462f5b78",
+    "EDirty": "Only preserved historical untracked report runs"
+  },
+  "newArtifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave22-target/wave22-target-a9b155c.tar.gz",
+    "source": "a9b155c13be197d828544a26f4827cf9d4acab68",
+    "sourceDirty": false,
+    "buildId": "9fdc283f55927f6f",
+    "sha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+    "tarBytes": 20246850,
+    "schema": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "abi": "137",
+    "sqlite": "3.53.4",
+    "verifiedEntries": 6747,
+    "verifiedRegularFiles": 6726,
+    "verifiedInternalSymlinks": 21,
+    "verifiedRegularBytes": 67558313,
+    "fileDigestMismatches": [],
+    "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave23-package-ePydbd/install",
+    "verification": "Read expected tar SHA/size; validate member paths; extract into new private directory; verify every install-manifest regular file hash/size and realpath-bounded internal link. Canonical realpaths handle macOS /var vs /private/var alias.",
+    "independentInstalledEAdmission": false
+  },
+  "sourceClosure": {
+    "manifest": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave22/ordinary-source-closure.json",
+    "manifestSource": "58ae294",
+    "entriesCheckedAgainstDHead": 75,
+    "matches": 74,
+    "mismatches": ["tools/distribution/verify-nonempty-personal-http.mjs"],
+    "note": "The helper changed after manifest generation. Launcher/portability/build/stage/freeze entries match. Recompute the closure from the actual fixed source before calling the entire manifest current.",
+    "mainIntegrationSourceRecommendation": "a9b155c13be197d828544a26f4827cf9d4acab68",
+    "mainReportedImport": {
+      "files": 71,
+      "launcherSourceTestAndDocs": 42,
+      "portabilitySourceTestConfigAndDocs": 25,
+      "distribution": [
+        "tools/distribution/README.md",
+        "tools/distribution/build.mjs",
+        "tools/distribution/stage.mjs",
+        "tools/distribution/freeze-install.mjs"
+      ],
+      "excludesHistoricalReportsAndLiveMatrixProbes": true,
+      "scope": "Main reports source checkpoint8c8fdef: portability strict/build0, portability52 and launcher60 cases, full15-package/console/8-external-dependency build+stage. All live verification tools excluded. Exact main build/unit results are recorded by main, not rerun or separately certified by this audit."
+    },
+    "dependencies": [
+      "Root workspace scripts/config/lock remain main-owned",
+      "@personal-agent/portability, storage, contracts, application and other coordinator workspace dependencies",
+      "zod and better-sqlite3 with matching Node ABI",
+      "Built console static assets and real coordinator entry",
+      "Full launcher lib/bin and portability exports/config; isolated upgrade.mjs is insufficient"
+    ]
+  },
+  "eActualRecordedResult": {
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T14-48-56-062Z/report.json",
+    "counts": { "PASS": 200, "FAIL": 0, "NOT_TESTED": 15 },
+    "subjectSource": "595b3f138872f176b7c6b214b4b6b1b87c1ed017",
+    "subjectBuildId": "cc16eca05e4da244",
+    "subjectTarSha256": "e875b9b90445db5826bf01d72d710fd55b208309598347ca45be618773ae026d",
+    "installedAlpha": "PASS_161_REQUIRED_IN_RECORDED_TOOL",
+    "localAlpha": "PASS_SAME_SCOPED_INSTALLED_TIER_NOT_FULL_PRODUCT",
+    "fullProduct": "FAIL_NATIVE_DELIVERY_AND_CONTROL_NOT_MEASURED",
+    "scopeDiagnostics": "NOT_REACHED_595_PREDATES_712",
+    "sameFileActualStatus": "REUSED",
+    "samePidAndProcessStartObserved": true,
+    "sameHealthDigestObserved": true,
+    "differentMissingPortAndUnboundActuallyBlocked": true,
+    "samePackageConsumerFileChecks": {
+      "count": 4,
+      "matches": 4,
+      "paths": [
+        "apps/launcher/lib/start.mjs",
+        "apps/launcher/lib/daemon.mjs",
+        "apps/coordinator/product/restored-review.ts",
+        "apps/coordinator/product/demo.ts"
+      ],
+      "method": "Read actual files from immutable595 tar and compare recorded SHA/bytes"
+    },
+    "admission": "Retain the genuine measured595 ordinary personal/review/install scope. New a9b artifact has no E final verdict. A new gate omission below limits generalized fail-closed release authority; it does not erase genuine complete observations in the recorded595 positive.",
+    "historicalE4eFailure": "Preserved, not relabeled as595 or a9b"
+  },
+  "independentGateControls": {
+    "method": "Import E actual evaluateRelease/reviewReuseIssues/tier/resolveFixtureDigest; clone the real complete final595 report; evaluate at its recorded checkedAt to isolate evidence semantics; no recorded report files mutated",
+    "commandForm": "node --input-type=module heredoc from the E checkout, importing tests/product-acceptance/lib/release.mjs",
+    "exitCode": 0,
+    "controls": [
+      { "case": "actual_complete595_report", "expected": "PASS", "actual": "PASS" },
+      { "case": "health_digest_mismatch", "expected": "REFUSE", "actual": "REFUSE", "reason": "reviewReuse_invalid digest" },
+      { "case": "actual_foreign_a9b_consumer_tuple_and_four_packaged_file_hashes_on595_data", "expected": "REFUSE", "actual": "REFUSE", "reason": "reviewReuse_invalid consumer_provenance" },
+      { "case": "missing_process_identity", "expected": "REFUSE", "actual": "PASS" },
+      { "case": "missing_digestAvailable_healthDigest_sameDigest", "expected": "REFUSE", "actual": "PASS" },
+      { "case": "different_selection_RUNNING_same_pid_without_reused_boolean", "expected": "REFUSE", "actual": "PASS" },
+      { "case": "missing_differentFile_refusal_observation", "expected": "REFUSE", "actual": "PASS" }
+    ],
+    "passedAsExpected": 3,
+    "failedAsExpected": 4,
+    "noSyntheticGreenWholeReportCreated": true
+  },
+  "findings": [
+    {
+      "id": "E_REQUIRED_REUSE_GATE_INCOMPLETE_OBSERVATIONS",
+      "priority": "P1_ACCEPTANCE_TOOL_SCOPE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "line": 439,
+      "summary": "Actual installed-alpha gate accepts missing process/digest/refusal observations and a different-selection RUNNING same-PID response when reused is absent.",
+      "cause": "processes and digestAvailable checks are conditional; refusal loop only rejects REUSED or RUNNING with reused===true, so absent observations and RUNNING without a boolean pass. The genuine recorded595 report has complete correct observations, but required gate is not generally fail-closed.",
+      "next": "Require present valid original/reused process identity and actual supported health digest, explicit observed refusal terminal states for every mismatched request, then test full-report positive and independent omissions/contradictions. Keep legitimate REUSED and measured595 scope."
+    },
+    {
+      "id": "D_SAME_STORE_PROBE_FAILURE_CLEANUP",
+      "priority": "P2_PROBE_LIFECYCLE_BLOCKS_BROAD_LIVE_RERUN",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-same-store-dual-personal.mjs",
+      "line": 161,
+      "summary": "Detached seed/review daemons are stopped only along the happy path; finally always recursively deletes the private root. Any post-start failure can leave live probe daemons after removing their config/state.",
+      "evidence": "Detached spawn at75 and129; normal stop at108 and154; catch only records an error; finally161 closes fake HTTP then removes root. No failure cleanup/finally stop or born-resource ownership inventory.",
+      "next": "Track each probe-born PID/start/root/config/operation; on failure stop only proven owned resources, preserve private material when ownership/stop is unknown, and inject bounded failures after both startup windows. Do not run the current live probe in admission."
+    },
+    {
+      "id": "D_SAME_STORE_SCOPE_OVERCLAIM",
+      "priority": "P2_EVIDENCE_SCOPE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-same-store-dual-personal.mjs",
+      "line": 135,
+      "summary": "The new flow genuinely combines a copied B state with SDK/context candidates and reads Work after personal restore, but does not assert original Broker question/answer/native_applied identities after restore or restore actual workflow snapshot versions1/2.",
+      "evidence": "It asserts snapshot.works length>=1, candidate count/status, sources200 and business422; calls readWorkflowEvidence1/2 and counts families. No original question/answer/delivery receipt identity assertion or create/restore both snapshot versions. Optional diagnostic evidence reads .withheld instead of actual .withheldSourceCount and only checks protocol.",
+      "next": "Parameterize a provenance-bound producer, preserve original Work/question/answer/attempt/result IDs through actual same snapshot/second-root consumers for both formats, and assert bounded reasons/withheldSourceCount/authorization plus original body guards. No handwritten SQL or fixtures replacing missing product behavior."
+    }
+  ],
+  "nextLargePackages": {
+    "D": [
+      "Close probe-owned failure cleanup and bounded injection before broad live recipes",
+      "Produce updated exact source closure including changed helper hashes",
+      "One same-store original Broker/Work/answer/native_applied plus SDK candidates through actual dual-format restore and package-local personal review",
+      "Keep a9b immutable for E; refreeze only changed runtime bytes, not documentation-only commits",
+      "Consume main complete ordinary integration source checkpoint once supplied, then exact package upgrade/reopen/support bounds"
+    ],
+    "E": [
+      "Repair required REUSED evidence completeness with full real positive and four independent omission/contradiction negatives",
+      "Retain measured595 exact ordinary scope and source/tar/consumer separation",
+      "Move independently to accurate a9b or necessary successor, with all same-package consumer/file hashes",
+      "Verify D corrected original-business same-store dual-format restore chain and diagnostic fields",
+      "Record layered install/product/native/value results; native and blocked study remain separate"
+    ]
+  },
+  "safety": {
+    "realModelTurns": 0,
+    "nativeTurnStarts": 0,
+    "vendorSends": 0,
+    "liveLifecycleProbesRun": 0,
+    "userServicesRestartedOrStopped": false,
+    "oldStateProfilesTarsLedgersAndERunsPreserved": true,
+    "candidateSourceAndAcceptanceAssertionsEdited": false
+  }
+}

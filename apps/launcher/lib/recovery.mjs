@@ -75,7 +75,7 @@ export const RECOVERY_AUTHORIZATION = {
     'commit: authenticated confirmation of the exact plan/current fingerprint with idempotent receipt, drift rejection and same-transaction authorization',
   ],
   forbidden: ['delete restore marker', 'force switch', 'replay old queue', 'old writer/native session as new authority', 'second auth/key store'],
-} 
+}
 
 /** Local, read-only recovery projection. It never calls HTTP or mutates the marker/state. */
 export function recoveryStatus({ roots }) {

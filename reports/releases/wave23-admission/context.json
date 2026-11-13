@@ -1,0 +1,141 @@
+{
+  "protocol": "wave23-ac-admission/1",
+  "date": "2026-11-13",
+  "status": "PASS_SCOPED_ACTUAL_READS_DRIVER_NOT_ADMITTED_AS_PACKAGE_GATE",
+  "fixedSources": {
+    "mainBaseline": "54d6e1b",
+    "A": "d8750fea1acc0fa28316de5016d41cbf730b3ae3",
+    "C": "b00a790b48825186c995cd71e40998735c73d113"
+  },
+  "worktrees": {
+    "A": "/Users/hh/Desktop/joker/superagent-agent-a",
+    "C": "/Users/hh/Desktop/joker/superagent-agent-c",
+    "dirtyBeforeAndAfter": { "A": [], "C": ["pnpm-lock.yaml"] },
+    "sourceFilesEditedByReview": false
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "node --test packages/workflows/test/wave22-attempt-facts.case.ts",
+      "exitCode": 0,
+      "tests": 1,
+      "passed": 1,
+      "scope": "Real controlled Work/question/answer/native_applied plus original attempt/epoch/contract/fact persistence after same-process Store reopen; synthetic dispatch unknown uses the existing port, not a vendor send"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test packages/knowledge/test/main-personal-scope-review.case.ts packages/knowledge/test/main-personal-package-driver.case.ts",
+      "exitCode": 0,
+      "tests": 2,
+      "passed": 2,
+      "scope": "Actual v1 and v2 standard start.mjs personal processes; actual opt-in/default HTTP diagnostics; valid narrow/exclusion/validity and missing-artifact cases; original receipt refusal/provider unchanged; no installed launcher or vendor native admission"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm --filter @personal-agent/workflows typecheck",
+      "exitCode": 0,
+      "scope": "Strict workflows including new attempt fixture"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/knowledge typecheck",
+      "exitCode": 0,
+      "scope": "Both actual new consumer/helper packages"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node /tmp/pa-wave23-context-audit-NPmIim/probe-driver.mjs",
+      "exitCode": 0,
+      "positiveCases": 1,
+      "negativeMutations": 1,
+      "correctNegativeRefusals": 0,
+      "report": "/tmp/pa-wave23-context-audit-NPmIim/driver-probe.json",
+      "scope": "Private owned mock install, start child, state and local HTTP service only; chat422 positive and unique chat200 mutation both return driver exit0/status ok"
+    }
+  ],
+  "admittedScopes": {
+    "AExistingAttemptFactRecipe": true,
+    "ASameProcessStoreReopen": true,
+    "ANewNodeProcessReadback": false,
+    "AExecutableParameterizedPackageDriver": false,
+    "CActualScopeDiagnostics": true,
+    "CValidScopeIndependentRefusals": true,
+    "CDualFormatStandardStart": true,
+    "CParameterizedSourceDriverPositive": true,
+    "CDriverSelfContainedPackageAcceptance": false,
+    "InstalledConsumer": false,
+    "NativeBusinessRecovery": false,
+    "PrivatePermissionOrTarget": false
+  },
+  "findings": [
+    {
+      "id": "C-DRIVER-FAILED-EXPECTED-OUTCOME-STILL-OK",
+      "priority": "P2",
+      "file": "packages/context/tools/personal-review-driver.mjs",
+      "line": 124,
+      "detail": "The driver records chat/candidate/prepare statuses and Work/delivery values but does not assert their expected results before emitting status ok at line136. In a private protocol positive chat422 returns exit0/statusok; changing only chat to200 still returns exit0/statusok with refused.chat200. The outer submitted positive test asserts expected results, so its real positive pass remains valid; consumers must not use driver status alone as an acceptance verdict.",
+      "impact": "New sourceOnly tool can produce an apparent successful result after a behavior regression. This is not a demonstrated production authorization bypass or failure in E's existing package gate.",
+      "next": "Enforce requested expected user-flow outcomes or emit an explicit observation-only status that an independent consumer must validate. Add valid positive plus independent refusal/work/delivery mutations."
+    },
+    {
+      "id": "C-DRIVER-READY-SERVICE-NOT-BOUND-TO-STARTED-CONSUMER",
+      "priority": "P2",
+      "file": "packages/context/tools/personal-review-driver.mjs",
+      "line": 99,
+      "detail": "Readiness accepts any successful /v1/health at the requested port. It verifies only mode/startupMode, not this review's restoredReviewDigest, state/launcher/start identity or spawned consumer ownership, and does not reject child exit before declaring ready. The private mock probe's start entry is a no-op child while a separately owned pre-existing mock service supplies all successful reads; the driver still returns ok. File hashes record the requested entries but do not bind the serving process to them.",
+      "impact": "An occupied/reused endpoint can be mistaken for the supplied package's actual consumer. Hash binding in E remains additionally required; ordinary existing production main startup identity behavior is not invalidated.",
+      "next": "Use the package's trusted instance/process/root identity and exact prepared review identity, preserve lawful reuse, refuse unbound/different ready services, and never signal a resource merely because a port matches."
+    },
+    {
+      "id": "C-DRIVER-REQUEST-DEADLINE-NOT-ENFORCED",
+      "priority": "P2",
+      "file": "packages/context/tools/personal-review-driver.mjs",
+      "line": 40,
+      "detail": "waitFor checks its wall-clock deadline only before awaiting an unbounded fetch. Every subsequent HTTP read/post also lacks an AbortSignal deadline. A connection that accepts but never completes can retain the operation beyond the advertised readiness/flow deadline; only the outer test timeout currently bounds it.",
+      "evidence": "Static source review only; no hanging live process probe was started.",
+      "next": "Add per-request abort deadlines bounded by an overall flow deadline, explicit early-child failure handling and exact owned-resource cleanup."
+    }
+  ],
+  "deliveryGaps": [
+    {
+      "id": "A-NEW-PROCESS-READBACK-NOT-YET-PROVEN",
+      "file": "packages/workflows/test/wave22-attempt-facts.case.ts",
+      "line": 83,
+      "detail": "The new test closes one ProductStore and constructs another in the same Node process. It correctly proves persisted same-process reopen, but not the requested new-process consistent reading or a process crash window. The dispatch intent states are demonstrated through a separate synthetic target, not the actual business dispatch transport. No new production bug is established.",
+      "next": "Run a bounded separate Node reader from the closed writer's original IDs and one transaction/UoW, preserving original dispatch/observation/unknown semantics. Keep original command, question and answer identity with no resend."
+    },
+    {
+      "id": "A-PACKAGE-DRIVER-IS-A-RECIPE",
+      "file": "packages/workflows/docs/wave22-attempt-facts-and-data-recipe.md",
+      "line": 40,
+      "detail": "A8 supplies a useful command/input recipe but no executable driver implementation. The stated D/E installed consumer remains explicitly not tested. C now supplies an executable source driver, with the focused defects above to close before treating it as a package gate.",
+      "next": "A should provide parameterized producer and separate-process reader fixtures/data manifest for the shared same-package flow, rather than inventing a second consumer driver."
+    }
+  ],
+  "minimalMainIntegration": {
+    "productionSourceRequiredFromA": [],
+    "productionSourceRequiredFromC": [],
+    "reason": "A changes tests/docs/reports; C adds a tool/tests/UI input data without changing the already-integrated explainer or existing runtime authority.",
+    "usefulInputs": [
+      "A packages/workflows/docs/wave22-attempt-facts-and-data-recipe.md",
+      "C packages/context/reports/wave22-ui-contract.json",
+      "C packages/knowledge/test/helpers/personal-chain.ts",
+      "C packages/knowledge/test/main-personal-scope-review.case.ts"
+    ],
+    "driverIntegration": "Wait for strict result, consumer identity and bounded I/O fixes or explicitly use as raw observation-only input with an independent verifier."
+  },
+  "nextWholePackages": {
+    "A": "Bounded separate-process attempt fact reader/producer and immutable data manifest; then original-ID B recovered result landing/idempotence when B's real port is available; preserve dual-format actual personal data.",
+    "C": "Harden the single shared parameterized consumer driver for expected outcomes, exact serving/review identity and bounded I/O; provide source and package entry dialects with no fallback, then same-package dual-format frozen-source workflow and UI inputs."
+  },
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "nativeTurnStarts": 0,
+    "userServicesRestarted": false,
+    "globalSocketDiscovery": false,
+    "foreignCredentialsRead": false,
+    "mutatedAgentSource": false,
+    "privateProbeResourcesStopped": true,
+    "releaseApproved": false
+  }
+}

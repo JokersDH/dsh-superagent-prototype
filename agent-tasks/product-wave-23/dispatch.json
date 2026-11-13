@@ -1,0 +1,543 @@
+{
+  "schemaVersion": 1,
+  "wave": "product-wave-23",
+  "date": "2026-11-13",
+  "status": "PLANNED_NOT_EXECUTED",
+  "reviewBaseline": "54d6e1b1a692bb5d82edc68d6356cb84e432c5d1",
+  "observedMain": "8c8fdefa12ff04d524eec8424efe3a90bc09a6fd",
+  "productRuntimeSource": "8c8fdefa12ff04d524eec8424efe3a90bc09a6fd",
+  "sharedBoundary": "docs/rfcs/WP-16/0061-wave-23-admission-and-end-to-end-packages.md",
+  "contracts": [
+    "packages/contracts/src/recovery-state.ts",
+    "packages/contracts/src/recovery-source.ts",
+    "packages/contracts/src/recovery-activation.ts",
+    "packages/contracts/src/recovery-target.ts",
+    "packages/contracts/src/assistant-candidates.ts",
+    "packages/contracts/src/recovery-source-confirmation.ts"
+  ],
+  "newModelAllowance": 0,
+  "nativeModelsStartedByThisDispatch": 0,
+  "newDriverImplementation": false,
+  "studyState": "BLOCKED_CURRENT_RECIPE",
+  "pilotGatesProductAcceptance": false,
+  "normalInstallRequiresRecoveryActivation": false,
+  "checkpointsPerOwner": 3,
+  "continueAfterCheckpoint": true,
+  "independentQueueRequired": true,
+  "unboundedPollingAllowed": false,
+  "preservedUserServices": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ],
+    [
+      5186,
+      8802
+    ],
+    [
+      5187,
+      8803
+    ],
+    [
+      5188,
+      8804
+    ],
+    [
+      5189,
+      8805
+    ],
+    [
+      5190,
+      8806
+    ],
+    [
+      5191,
+      8807
+    ]
+  ],
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "candidate": "d8750fea1acc0fa28316de5016d41cbf730b3ae3",
+      "packet": "agent-tasks/product-wave-23/agent-a-data.zh-CN.md",
+      "ownedPaths": [
+        "packages/storage/",
+        "packages/workflows/"
+      ],
+      "evidencePath": "packages/workflows/reports/wave23-status.json",
+      "phases": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "candidate": "f35c38ba167c81feb4031b5b31ee09c7e4747401",
+      "packet": "agent-tasks/product-wave-23/agent-b-runtime.zh-CN.md",
+      "ownedPaths": [
+        "packages/execution/",
+        "packages/catalog/",
+        "packages/policy-preparation/",
+        "packages/driver-kit/",
+        "packages/testing/",
+        "packages/drivers/",
+        "apps/runner/",
+        "tests/native-acceptance/"
+      ],
+      "evidencePath": "tests/native-acceptance/reports/wave23-status.json",
+      "grantId": "wave03-b-native",
+      "historicalLimit": 4,
+      "remaining": "UNKNOWN_NOT_SPENDABLE",
+      "resetLedger": false,
+      "newFeasibilityInvestigations": 0,
+      "phases": [
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+        "B8",
+        "B9",
+        "B10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "candidate": "b00a790b48825186c995cd71e40998735c73d113",
+      "packet": "agent-tasks/product-wave-23/agent-c-context.zh-CN.md",
+      "ownedPaths": [
+        "packages/context/",
+        "packages/proposals/",
+        "packages/knowledge/",
+        "packages/routing/"
+      ],
+      "evidencePath": "packages/context/reports/wave23-status.json",
+      "phases": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "candidate": "ab1694349986d7531102a0b90d92f2629a108b81",
+      "packet": "agent-tasks/product-wave-23/agent-d-delivery.zh-CN.md",
+      "ownedPaths": [
+        "apps/launcher/",
+        "tools/distribution/",
+        "packages/portability/"
+      ],
+      "evidencePath": "tools/distribution/reports/wave23-status.json",
+      "phases": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8",
+        "D9",
+        "D10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "candidate": "ac8f1871b29d2d48641ae3785a3d91106d8edcd6",
+      "packet": "agent-tasks/product-wave-23/agent-e-acceptance.zh-CN.md",
+      "ownedPaths": [
+        "tests/product-acceptance/"
+      ],
+      "evidencePath": "tests/product-acceptance/reports/wave23-status.json",
+      "grantId": "wave05-independent-review-pilot-01",
+      "maxNativeTurnStarts": 24,
+      "maxAuthorTurnStarts": 8,
+      "maxReviewTurnStarts": 16,
+      "maxBillableTokens": 200000,
+      "maxCostUSD": 5,
+      "maxInFlight": 1,
+      "resetLedger": false,
+      "unknownCostIsZero": false,
+      "cliFallbackAllowed": false,
+      "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
+      "phases": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6",
+        "E7",
+        "E8",
+        "E9",
+        "E10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-23/main.zh-CN.md",
+      "ownedPaths": [
+        "packages/contracts/",
+        "packages/application/",
+        "packages/questions/",
+        "apps/coordinator/",
+        "apps/console/",
+        "agent-tasks/product-wave-23/",
+        "tools/bootstrap/",
+        "docs/rfcs/WP-16/"
+      ],
+      "evidencePath": "reports/releases/wave23-integration/status.json",
+      "phases": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    }
+  },
+  "checkpoints": {
+    "M-current-product": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-source-confirm": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-scope-diagnostics": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-ordinary-source": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-clean-stage": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "A-original-facts": {
+      "owner": "A",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "C-dual-standard-read": {
+      "owner": "C",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "B-old-control": {
+      "owner": "B",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "D-a9b-frozen": {
+      "owner": "D",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "E-measured595": {
+      "owner": "E",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "A-new-process-reader": {
+      "owner": "A",
+      "dependsOn": [
+        "A-original-facts"
+      ]
+    },
+    "A-data-producer": {
+      "owner": "A",
+      "dependsOn": [
+        "A-new-process-reader"
+      ]
+    },
+    "A-recovered-results": {
+      "owner": "A",
+      "dependsOn": [
+        "B-resumed-business",
+        "A-new-process-reader"
+      ]
+    },
+    "C-bounded-identity-driver": {
+      "owner": "C",
+      "dependsOn": [
+        "M-scope-diagnostics",
+        "C-dual-standard-read"
+      ]
+    },
+    "C-package-driver": {
+      "owner": "C",
+      "dependsOn": [
+        "C-bounded-identity-driver",
+        "D-a9b-frozen",
+        "A-data-producer"
+      ]
+    },
+    "C-ui-inputs": {
+      "owner": "C",
+      "dependsOn": [
+        "C-bounded-identity-driver"
+      ]
+    },
+    "B-safe-attach": {
+      "owner": "B",
+      "dependsOn": [
+        "B-old-control"
+      ]
+    },
+    "M-attach-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "B-safe-attach",
+        "A-new-process-reader"
+      ]
+    },
+    "B-resumed-business": {
+      "owner": "B",
+      "dependsOn": [
+        "M-attach-consumer",
+        "B-safe-attach"
+      ]
+    },
+    "B-recovered-delivery": {
+      "owner": "B",
+      "dependsOn": [
+        "B-resumed-business"
+      ]
+    },
+    "D-safe-probes-and-cli": {
+      "owner": "D",
+      "dependsOn": [
+        "M-ordinary-source"
+      ]
+    },
+    "D-current-bytes": {
+      "owner": "D",
+      "dependsOn": [
+        "M-ordinary-source",
+        "D-safe-probes-and-cli"
+      ]
+    },
+    "D-same-data-dual": {
+      "owner": "D",
+      "dependsOn": [
+        "D-current-bytes",
+        "C-package-driver",
+        "A-data-producer"
+      ]
+    },
+    "D-upgrade-reopen": {
+      "owner": "D",
+      "dependsOn": [
+        "D-current-bytes"
+      ]
+    },
+    "E-complete-reuse-gate": {
+      "owner": "E",
+      "dependsOn": [
+        "E-measured595"
+      ]
+    },
+    "E-current-package": {
+      "owner": "E",
+      "dependsOn": [
+        "D-current-bytes",
+        "E-complete-reuse-gate"
+      ]
+    },
+    "E-joint-data-flow": {
+      "owner": "E",
+      "dependsOn": [
+        "E-current-package",
+        "D-same-data-dual"
+      ]
+    },
+    "E-ordinary-verdict": {
+      "owner": "E",
+      "dependsOn": [
+        "E-joint-data-flow",
+        "D-upgrade-reopen"
+      ]
+    },
+    "M-scope-ui": {
+      "owner": "main",
+      "dependsOn": [
+        "M-scope-diagnostics",
+        "C-ui-inputs"
+      ]
+    },
+    "M-private-permission": {
+      "owner": "main",
+      "dependsOn": [
+        "M-source-confirm",
+        "B-safe-attach"
+      ]
+    },
+    "M-target-activation": {
+      "owner": "main",
+      "dependsOn": [
+        "M-private-permission",
+        "B-resumed-business"
+      ]
+    },
+    "E-target-verdict": {
+      "owner": "E",
+      "dependsOn": [
+        "M-target-activation"
+      ]
+    }
+  },
+  "providedInputs": {
+    "sourceConfirmImplemented": true,
+    "scopeDiagnosticImplemented": true,
+    "scopeDiagnosticUiImplemented": false,
+    "ordinaryDistributionIntegrated": true,
+    "ordinaryDistributionSource": "8c8fdefa12ff04d524eec8424efe3a90bc09a6fd",
+    "ordinaryImportedFiles": 71,
+    "cleanSourceStage": true,
+    "cleanStageBuildId": "48eee1409b617c6e",
+    "cleanStageIsIndependentInstalledAdmission": false,
+    "aSameProcessOriginalFactsPassed": true,
+    "aNewProcessReadbackProven": false,
+    "cActualScopeDiagnosticPassed": true,
+    "cDualFormatStandardStartPassed": true,
+    "cDriverStrictResultsIdentityDeadlinesAdmitted": false,
+    "bActualBusinessChannelSourceExists": true,
+    "bNewModuleStrictPassed": true,
+    "bOldEndpointControlPassed": true,
+    "bFirstHandoverAdmitted": false,
+    "bFactsIdentityAndBoundedReplayAdmitted": false,
+    "bFactSinkBrokerRebindingImplemented": false,
+    "bBusinessRecoveryImplemented": false,
+    "privatePermissionImplemented": false,
+    "targetActivationImplemented": false,
+    "dRuntimeSource": "a9b155c13be197d828544a26f4827cf9d4acab68",
+    "dArtifact": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave22-target/wave22-target-a9b155c.tar.gz",
+      "source": "a9b155c13be197d828544a26f4827cf9d4acab68",
+      "sourceDirty": false,
+      "buildId": "9fdc283f55927f6f",
+      "sha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+      "tarBytes": 20246850,
+      "schema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "24.21.0",
+      "abi": "137",
+      "sqlite": "3.53.4",
+      "verifiedEntries": 6747,
+      "verifiedRegularFiles": 6726,
+      "verifiedInternalSymlinks": 21,
+      "verifiedRegularBytes": 67558313,
+      "fileDigestMismatches": [],
+      "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave23-package-ePydbd/install",
+      "verification": "Read expected tar SHA/size; validate member paths; extract into new private directory; verify every install-manifest regular file hash/size and realpath-bounded internal link. Canonical realpaths handle macOS /var vs /private/var alias.",
+      "independentInstalledEAdmission": false
+    },
+    "dSourceClosureOneProbeHashStale": true,
+    "dProbeFailureCleanupAdmitted": false,
+    "dRealDualSnapshotOriginalBrokerIdentityProven": false,
+    "eMeasured595Preserved": true,
+    "eMeasured595": {
+      "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T14-48-56-062Z/report.json",
+      "counts": {
+        "PASS": 200,
+        "FAIL": 0,
+        "NOT_TESTED": 15
+      },
+      "subjectSource": "595b3f138872f176b7c6b214b4b6b1b87c1ed017",
+      "subjectBuildId": "cc16eca05e4da244",
+      "subjectTarSha256": "e875b9b90445db5826bf01d72d710fd55b208309598347ca45be618773ae026d",
+      "installedAlpha": "PASS_161_REQUIRED_IN_RECORDED_TOOL",
+      "localAlpha": "PASS_SAME_SCOPED_INSTALLED_TIER_NOT_FULL_PRODUCT",
+      "fullProduct": "FAIL_NATIVE_DELIVERY_AND_CONTROL_NOT_MEASURED",
+      "scopeDiagnostics": "NOT_REACHED_595_PREDATES_712",
+      "sameFileActualStatus": "REUSED",
+      "samePidAndProcessStartObserved": true,
+      "sameHealthDigestObserved": true,
+      "differentMissingPortAndUnboundActuallyBlocked": true,
+      "samePackageConsumerFileChecks": {
+        "count": 4,
+        "matches": 4,
+        "paths": [
+          "apps/launcher/lib/start.mjs",
+          "apps/launcher/lib/daemon.mjs",
+          "apps/coordinator/product/restored-review.ts",
+          "apps/coordinator/product/demo.ts"
+        ],
+        "method": "Read actual files from immutable595 tar and compare recorded SHA/bytes"
+      },
+      "admission": "Retain the genuine measured595 ordinary personal/review/install scope. New a9b artifact has no E final verdict. A new gate omission below limits generalized fail-closed release authority; it does not erase genuine complete observations in the recorded595 positive.",
+      "historicalE4eFailure": "Preserved, not relabeled as595 or a9b"
+    },
+    "eWholeRequiredGateCompletenessAdmitted": false,
+    "eNewA9bInstalledAdmission": false,
+    "eNewMainInstalledAdmission": false
+  },
+  "completionEstimateRef": "reports/releases/wave13-admission/progress.json",
+  "releaseApproved": false,
+  "goalCoversWholePackage": true,
+  "goalsChangeExecutionBudgets": false
+}
