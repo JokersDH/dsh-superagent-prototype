@@ -1,0 +1,140 @@
+{
+  "protocol": "wave19-artifacts/1",
+  "target": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave19-target/wave19-target-ee7fbd8.tar.gz",
+    "sha256": "b0990149d0a8c81a130d358ea07100332bc30d509e9c7dfdf7a176e61b7f7ecc",
+    "tarBytes": 20236793,
+    "buildId": "90e81429079a7d50",
+    "source": {
+      "commit": "ee7fbd8ab59bde8b875dcd933fda58d7bbf2fd5d",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "files": 6742,
+    "extractedBytes": 67523569,
+    "supportMatrix": {
+      "measured": [
+        "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+      ],
+      "node": ">=24.21.0 <25",
+      "abi": "137",
+      "sqlite": ">=3.53.4",
+      "notTested": [
+        "linux",
+        "win32",
+        "darwin-x64",
+        "other Node ABIs",
+        "other machines",
+        "personal native execution"
+      ]
+    },
+    "actualCapabilities": [
+      "main985 workflow-evidence default v1 / explicit v2 actual calls on real data",
+      "portability personal-evidence v1/v2 actual create/verify on real data",
+      "B/A real normal Work/Broker/answer/native_applied retained read-only relocation",
+      "registered-child 5/5 and same-package personal nonempty candidates/decision confirm",
+      "restored source prepare/confirm/audit data-only",
+      "e438/985 runtime schema guards preserved; A v2 not claimed",
+      "M1 discussion-only unavailable execution",
+      "runtime recovery inspect/prepare HTTP",
+      "history/source/reply/context",
+      "same-schema18 and 16->18 upgrades",
+      "backup/restore"
+    ]
+  },
+  "b911Baseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave18-target/wave18-target-b9117aa.tar.gz",
+    "sha256": "4a81380a5fd0c69aabe8d38604dd661ab3fb3f30113b4bb2d3e5156c2ff54c1a",
+    "buildId": "6a45633067501dd2",
+    "source": {
+      "commit": "b9117aad12797a3ee3c454172d1f918516a18f33",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "note": "E-facing exact prior b911 subject; not relabeled as wave19."
+  },
+  "safe651Baseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave17-target/wave17-target-65102f7.tar.gz",
+    "sha256": "33d874c9a25f22d2710fb29d686f03ad5b37de7ad2cdb09f40d16fd7ecb86340",
+    "buildId": "f55470ae14cc4985",
+    "source": {
+      "commit": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "note": "Safe 651->wave19 upgrade baseline."
+  },
+  "old97MockOnly": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave16-target/wave16-target-97cace7.tar.gz",
+    "sha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+    "buildId": "8a5a0a85631f22ca",
+    "source": {
+      "commit": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "note": "Mock-only unsafe lifecycle control; never live or current."
+  },
+  "baseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+    "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+    "buildId": "7e8f6ce6fa2e2633",
+    "source": {
+      "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 13
+  },
+  "legacy16": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+    "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+    "buildId": "3311a04bd20ed7f9",
+    "source": {
+      "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 16
+  },
+  "dualPair13": {
+    "from": {
+      "buildId": "9120a5ed858e0feb",
+      "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+      "schema": 13,
+      "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
+    },
+    "to": {
+      "buildId": "cd0ecc29d97d5c41",
+      "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+      "schema": 13,
+      "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"
+    },
+    "note": "Historical same-schema scope, not relabeled current."
+  },
+  "businessData": {
+    "producer": "B submitted normal producer probe wave19 (retained D-owned copy)",
+    "source": "/tmp/pa-wave19-normal-FsWfko/state",
+    "tables": {
+      "works": 1,
+      "ticket": 1,
+      "user_questions": 1,
+      "answers": 1,
+      "answer_deliveries": 1,
+      "runtime_bindings": 1,
+      "dispatch_receipts": 2
+    },
+    "workflowEvidenceV1Digest": "caace32a556a47a3e3c4e544845524d3b3c823de3d9bc0df8796a2fead8dffc9",
+    "workflowEvidenceV2Digest": "8797911788319c9d6228092708fcaf59b0de9f5ad7a55a790ba6dac87290ebf7",
+    "note": "Retained temp state used read-only; not committed to the repository and not a target activation grant."
+  },
+  "notes": [
+    "Built from pushed clean wave-19 D head ee7fbd8 (dirty=false) on main merge ee2297e including 9856124.",
+    "Workflow-evidence v1/v2 and personal-evidence v1/v2 were called and checked on the real retained B/A business data; these are distinct protocols.",
+    "A v2 is not admitted and not claimed. Docs-only later heads do not change these bytes."
+  ]
+}

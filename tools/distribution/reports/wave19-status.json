@@ -1,0 +1,388 @@
+{
+  "protocol": "wave19-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "9a0f1a0",
+  "mergedMain": "ee2297e",
+  "head": "ee7fbd8",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate; not main/E/release admission. Real vendor/model/native turns 0; twelve user services untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "nativeTurns": 0,
+    "vendorSends": 0
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Exact b9117aa/build6a45633067501dd2/schema18/sha4a81380a... preserved as the first E-facing subject; safe 651 is the upgrade baseline and old 97 remains mock-only. Every helper/API/CLI action loads from the immutable package.",
+      "evidence": [
+        "tools/distribution/reports/wave19/artifacts.json"
+      ]
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "b911 same-package evidence retained: frozen child helper 5/5, nonempty personal 11 steps with propose_work/propose_decision, preference, context/history/source, explicit decision confirm/replay and no-executor work refusal. Successor reruns the same recipe from its own bytes; docs-only heads do not refreeze.",
+      "evidence": [
+        "tools/distribution/reports/wave19/nonempty-personal-http.json"
+      ]
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Main985 dual format actually called on retained real B/A normal data: readWorkflowEvidence default/1 = workflow-evidence/1, 13 families, same digest; explicit 2 = workflow-evidence/2, familySetVersion2, 21 families; invalid 3 rejects TypeError before creating a DB. portability createBundle/verifyBundle actual call yields personal-evidence formatVersion2, bundle formatVersion1; the two protocols are not conflated.",
+      "evidence": [
+        "tools/distribution/reports/wave19/real-business-relocation.json"
+      ]
+    },
+    "d4": {
+      "status": "PASS_WITH_REBIND_LIMIT",
+      "summary": "Restored-personal historical-project readonly binding/rebind remains unimplemented; candidate/historical-source reads can return 403 and the restored business run honestly uses the restore report fixture mode. --fixture is never used to claim personal success.",
+      "evidence": [
+        "tools/distribution/reports/wave19/real-business-relocation.json",
+        "tools/distribution/reports/wave19/nonempty-personal-http.json"
+      ]
+    },
+    "d5": {
+      "status": "PASS_WITH_WORK_AUTH_LIMIT",
+      "summary": "Retained B submitted normal producer data (Work/Broker/question/answer/native_applied, real vendor/native 0) relocated to a second private root and read through recovery_readonly HTTP: snapshot works>=1, business mutation 422, source digest unchanged, old queue not replayed; source prepare/confirm/audit data-only. Historical Work actor authorization and open-question projection stay limited.",
+      "evidence": [
+        "tools/distribution/reports/wave19/real-business-relocation.json"
+      ]
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "Necessary main985 runtime bytes changed, so a new successor was frozen from clean pushed source ee7fbd8: build 90e81429079a7d50, schema18, tar sha b0990149..., 20,236,793 B, 6,742 files. b911/651/97 are preserved and never relabeled.",
+      "evidence": [
+        "tools/distribution/reports/wave19/artifacts.json"
+      ]
+    },
+    "d7": {
+      "status": "PASS",
+      "summary": "Successor cold install 7/7; no-executor discussion-only 4/4; multi-instance 8/8 with two independent states; unknown old resources are not cleared. Old 97 lifecycle remains mock-only.",
+      "evidence": [
+        "tools/distribution/reports/wave19/personal-install.json",
+        "tools/distribution/reports/wave19/personal-no-executor.json",
+        "tools/distribution/reports/wave19/multi-instance.json"
+      ]
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Safe 651->successor same-schema18 upgrade 3/3 confirms pointer/process/mode/data; legacy16->18 3/3 and historical schema13 pair remain separate; no silent post-write rollback.",
+      "evidence": [
+        "tools/distribution/reports/wave19/same-schema18-upgrade.json",
+        "tools/distribution/reports/wave19/cross-schema-upgrade.json"
+      ]
+    },
+    "d9": {
+      "status": "PASS_WITH_MAIN_ACTIVATION_BLOCKED",
+      "summary": "Managed matrix 19/19 covers spawn/record/pointer/SIGKILL windows; support/material 8/8 redacted/0600/inert; source confirmation/read-only binding/private startup permission remain separate and target is not started.",
+      "evidence": [
+        "tools/distribution/reports/wave19/binary-upgrade.json",
+        "tools/distribution/reports/wave19/target-material.json"
+      ]
+    },
+    "d10": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Frozen rerun: real4/4, nonempty11, matrix19/19, multi8/8, cross3/3, data5/5, personal7/7, noexec4/4, source5/5, 651->new3/3, backup6/6, portable5+1NT, dual6/6, material8/8, smoke52/52, launcher60/60, portability52/52. E verdict pending.",
+      "evidence": [
+        "tools/distribution/recipes/wave19-e-acceptance.zh-CN.md",
+        "docs/rfcs/WP-16/0054-wave-19-d-dual-format-real-business-and-successor.md"
+      ]
+    }
+  },
+  "artifacts": {
+    "protocol": "wave19-artifacts/1",
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave19-target/wave19-target-ee7fbd8.tar.gz",
+      "sha256": "b0990149d0a8c81a130d358ea07100332bc30d509e9c7dfdf7a176e61b7f7ecc",
+      "tarBytes": 20236793,
+      "buildId": "90e81429079a7d50",
+      "source": {
+        "commit": "ee7fbd8ab59bde8b875dcd933fda58d7bbf2fd5d",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6742,
+      "extractedBytes": 67523569,
+      "supportMatrix": {
+        "measured": [
+          "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+        ],
+        "node": ">=24.21.0 <25",
+        "abi": "137",
+        "sqlite": ">=3.53.4",
+        "notTested": [
+          "linux",
+          "win32",
+          "darwin-x64",
+          "other Node ABIs",
+          "other machines",
+          "personal native execution"
+        ]
+      },
+      "actualCapabilities": [
+        "main985 workflow-evidence default v1 / explicit v2 actual calls on real data",
+        "portability personal-evidence v1/v2 actual create/verify on real data",
+        "B/A real normal Work/Broker/answer/native_applied retained read-only relocation",
+        "registered-child 5/5 and same-package personal nonempty candidates/decision confirm",
+        "restored source prepare/confirm/audit data-only",
+        "e438/985 runtime schema guards preserved; A v2 not claimed",
+        "M1 discussion-only unavailable execution",
+        "runtime recovery inspect/prepare HTTP",
+        "history/source/reply/context",
+        "same-schema18 and 16->18 upgrades",
+        "backup/restore"
+      ]
+    },
+    "b911Baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave18-target/wave18-target-b9117aa.tar.gz",
+      "sha256": "4a81380a5fd0c69aabe8d38604dd661ab3fb3f30113b4bb2d3e5156c2ff54c1a",
+      "buildId": "6a45633067501dd2",
+      "source": {
+        "commit": "b9117aad12797a3ee3c454172d1f918516a18f33",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "note": "E-facing exact prior b911 subject; not relabeled as wave19."
+    },
+    "safe651Baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave17-target/wave17-target-65102f7.tar.gz",
+      "sha256": "33d874c9a25f22d2710fb29d686f03ad5b37de7ad2cdb09f40d16fd7ecb86340",
+      "buildId": "f55470ae14cc4985",
+      "source": {
+        "commit": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "note": "Safe 651->wave19 upgrade baseline."
+    },
+    "old97MockOnly": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave16-target/wave16-target-97cace7.tar.gz",
+      "sha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+      "buildId": "8a5a0a85631f22ca",
+      "source": {
+        "commit": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "note": "Mock-only unsafe lifecycle control; never live or current."
+    },
+    "baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "buildId": "7e8f6ce6fa2e2633",
+      "source": {
+        "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 13
+    },
+    "legacy16": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+      "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+      "buildId": "3311a04bd20ed7f9",
+      "source": {
+        "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 16
+    },
+    "dualPair13": {
+      "from": {
+        "buildId": "9120a5ed858e0feb",
+        "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+        "schema": 13,
+        "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
+      },
+      "to": {
+        "buildId": "cd0ecc29d97d5c41",
+        "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+        "schema": 13,
+        "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"
+      },
+      "note": "Historical same-schema scope, not relabeled current."
+    },
+    "businessData": {
+      "producer": "B submitted normal producer probe wave19 (retained D-owned copy)",
+      "source": "/tmp/pa-wave19-normal-FsWfko/state",
+      "tables": {
+        "works": 1,
+        "ticket": 1,
+        "user_questions": 1,
+        "answers": 1,
+        "answer_deliveries": 1,
+        "runtime_bindings": 1,
+        "dispatch_receipts": 2
+      },
+      "workflowEvidenceV1Digest": "caace32a556a47a3e3c4e544845524d3b3c823de3d9bc0df8796a2fead8dffc9",
+      "workflowEvidenceV2Digest": "8797911788319c9d6228092708fcaf59b0de9f5ad7a55a790ba6dac87290ebf7",
+      "note": "Retained temp state used read-only; not committed to the repository and not a target activation grant."
+    },
+    "notes": [
+      "Built from pushed clean wave-19 D head ee7fbd8 (dirty=false) on main merge ee2297e including 9856124.",
+      "Workflow-evidence v1/v2 and personal-evidence v1/v2 were called and checked on the real retained B/A business data; these are distinct protocols.",
+      "A v2 is not admitted and not claimed. Docs-only later heads do not change these bytes."
+    ]
+  },
+  "testLayers": {
+    "ownershipChild": {
+      "cases": 5,
+      "passed": 5,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "realBusinessRelocation": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "nonemptyPersonal": {
+      "steps": 11,
+      "status": "PASS"
+    },
+    "multiInstance": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "binaryUpgrade": {
+      "sections": 19,
+      "status": "PASS"
+    },
+    "crossSchema": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "schema18Data": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "personalInstall": {
+      "steps": 7,
+      "status": "PASS"
+    },
+    "personalNoExecutor": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "sourceConfirmation": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "sameSchema18": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "backupSchema": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "portableClosure": {
+      "steps": 6,
+      "status": "PASS",
+      "notTested": [
+        "other-platform-abi"
+      ]
+    },
+    "dualBinary": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "targetMaterial": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "smoke": {
+      "steps": 52,
+      "status": "PASS",
+      "keepRoot": true
+    },
+    "launcher": {
+      "tests": 60,
+      "status": "PASS"
+    },
+    "portability": {
+      "tests": 52,
+      "status": "PASS"
+    }
+  },
+  "blockers": [
+    {
+      "id": "MAIN-RESTORED-PERSONAL-REBIND",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "Historical project readonly binding/rebind not implemented; candidate/source reads can 403. Fixture mode is not personal evidence."
+    },
+    {
+      "id": "HISTORICAL-WORK-ACTOR-AUTH",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "Restored actor may be unauthorized for historical Work (400/403). Not treated as missing data."
+    },
+    {
+      "id": "A-V2-NOT-ADMITTED",
+      "owner": "A/main",
+      "status": "NOT_SUPPORTED",
+      "summary": "Only main985 v1/v2 read recipes are consumed; A v2 production support is not claimed."
+    },
+    {
+      "id": "MAIN-ACTIVATION-CONFIRM",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "Source facts/readonly binding/private startup permission/target remain separate and unimplemented."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E must verify b911 first and the successor from immutable bytes."
+    },
+    {
+      "id": "PLATFORM-ABI",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Only darwin/arm64 current Node/SQLite ABI measured."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Zero real vendor/model/native turns."
+    }
+  ],
+  "notTested": [
+    "restored-personal rebind candidate/source reads",
+    "historical Work actor authorization",
+    "A v2",
+    "cross-platform/ABI",
+    "real personal billed turn",
+    "every individual SIGKILL step",
+    "main activation confirm",
+    "E independent acceptance"
+  ],
+  "eConsumption": [
+    "Verify b911 first from its exact tuple/package; then the successor ee7fbd8. Load helpers from the immutable package.",
+    "Run real-business relocation with a retained B normal state, nonempty personal, matrix, multi, cross, data, personal, noexec, source, 651->new, backup, portable, dual, material, smoke.",
+    "Do not treat fixture-mode restore as personal/rebind proof, do not conflate workflow-evidence with personal-evidence, do not claim A v2/private activation/native."
+  ],
+  "preservedHistory": [
+    "wave-05..18 evidence/ledgers unchanged",
+    "all historical tars (b911/651/97 and older) preserved and unrelabeled",
+    "no shared contract/migration/root lock/E assertion modified"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave19/*.json",
+    "tools/distribution/recipes/wave19-e-acceptance.zh-CN.md",
+    "docs/rfcs/WP-16/0054-wave-19-d-dual-format-real-business-and-successor.md"
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "protocol": "wave09-target-material-recipe/1",
+  "status": "PASS",
+  "durationMs": 42,
+  "trustedParent": "/tmp/w19pf",
+  "steps": [
+    {
+      "id": "parent-trusted",
+      "status": "PASS",
+      "detail": {
+        "trustedParent": "/tmp/w19pf",
+        "mode": "700"
+      }
+    },
+    {
+      "id": "prepare-manifest-only",
+      "status": "PASS",
+      "detail": {
+        "stateRoot": "/tmp/w19pf/activation-wave10-recipe",
+        "manifestDigest": "5a016ee1c4ce8ce441cdf989353c6efe21e8969f671fa69398d7dcee9c7241b9",
+        "entries": [
+          "recovery-target.json"
+        ]
+      }
+    },
+    {
+      "id": "readback",
+      "status": "PASS",
+      "detail": {
+        "productSchema": 15,
+        "startupAvailable": false
+      }
+    },
+    {
+      "id": "repeat-idempotent",
+      "status": "PASS",
+      "detail": {}
+    },
+    {
+      "id": "empty-schema-initialized-by-public-store",
+      "status": "PASS",
+      "detail": {
+        "path": "/tmp/w19pf/activation-wave10-recipe/state.sqlite",
+        "productSchema": 15,
+        "materialReadable": true
+      }
+    },
+    {
+      "id": "discard-refuses-initialized-target",
+      "status": "PASS",
+      "detail": {}
+    },
+    {
+      "id": "inventory-readonly",
+      "status": "PASS",
+      "detail": {
+        "completeness": "complete",
+        "integrity": "ok",
+        "issues": [],
+        "tables": 53
+      }
+    },
+    {
+      "id": "discard-staging-only",
+      "status": "PASS",
+      "detail": {
+        "removed": true
+      }
+    }
+  ]
+}
