@@ -24,6 +24,7 @@ import { LocalProductClient } from '../lib/http-client.mjs'
 import { startMockModel } from '../lib/mock-model.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { sha256 } from '../lib/evidence.mjs'
+import { DEFAULT_FROZEN_DIRS, loadFrozenArtifact } from '../lib/frozen-package.mjs'
 
 /**
  * Independent acceptance of D's frozen wave-06 install artifact.
@@ -34,42 +35,11 @@ import { sha256 } from '../lib/evidence.mjs'
  * tests never start or stop the user's existing 5180-5184/8796-8800 instances.
  */
 const here = dirname(fileURLToPath(import.meta.url))
-const DEFAULT_DIRS = Object.freeze({
-  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave15-target',
-  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave16-target',
-  cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',
-})
-
-/** Reads the artifact tuple from the producer's manifest next to the frozen tar. */
-function loadArtifact(role, dirName) {
-  const envJson = process.env[`PA_E_${role.toUpperCase()}_ARTIFACT_JSON`]
-  if (envJson !== undefined) return { role, ...JSON.parse(envJson) }
-  const dir = resolve(dirName)
-  const manifest = JSON.parse(readFileSync(join(dir, 'install-artifact.json'), 'utf8'))
-  return {
-    role,
-    name: manifest.name,
-    tarPath: manifest.tarPath ?? join(dir, `${manifest.name}.tar.gz`),
-    tarSha256: manifest.digests.tarSha256,
-    tarBytes: manifest.digests.tarBytes,
-    installManifestSha256: manifest.digests.installManifestSha256,
-    releaseManifestSha256: manifest.digests.releaseManifestSha256,
-    closureDigest: manifest.digests.closureDigest,
-    files: manifest.files?.count,
-    buildId: manifest.buildId,
-    sourceCommit: manifest.source.commit,
-    sourceDirty: manifest.source.dirty === true,
-    productSchema: manifest.producer.productSchema,
-    platform: manifest.producer.platform,
-    arch: manifest.producer.arch,
-    node: manifest.producer.node,
-    abi: String(manifest.producer.abi),
-  }
-}
+const DEFAULT_DIRS = DEFAULT_FROZEN_DIRS
 const ARTIFACTS = Object.freeze({
-  base: loadArtifact('baseline', DEFAULT_DIRS.baseline),
-  upgrade: loadArtifact('target', DEFAULT_DIRS.target),
-  cross: loadArtifact('cross', DEFAULT_DIRS.cross),
+  base: loadFrozenArtifact('baseline', DEFAULT_DIRS.baseline),
+  upgrade: loadFrozenArtifact('target', DEFAULT_DIRS.target),
+  cross: loadFrozenArtifact('cross', DEFAULT_DIRS.cross),
 })
 /** Reads one packaged file without extracting the whole tar, so capability is measured from bytes. */
 function tarFile(spec, suffix) {
@@ -1366,7 +1336,11 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       const ownBin = join(own, 'bin')
       mkdirSync(ownInstall, { recursive: true }); mkdirSync(ownBin, { recursive: true })
       spawnSync('ln', ['-sf', process.execPath, join(ownBin, 'node')])
-      const mock = await candidateModel()
+      const mock = await candidateModel({ reply: context => ({ text: '已整理为三项建议。', suggestions: [
+        { kind: 'propose_work', goal: '补充幂等错误码用例', projectId: context.projectId, sourceMessageId: context.sourceMessageId },
+        { kind: 'propose_decision', content: '支付接口保留原有错误码。', scope: context.scope, sourceMessageId: context.sourceMessageId },
+        { kind: 'propose_decision', content: '退款接口统一返回幂等键。', scope: context.scope, sourceMessageId: context.sourceMessageId },
+      ] }) })
       const env = { PATH: `${ownBin}:/usr/bin:/bin:/usr/sbin:/sbin`, PA_MODEL_CONFIG: mock.file }
       let started, client, configuration, actions = {}
       try {
@@ -1381,46 +1355,100 @@ export async function runInstall({ root, runDirectory, keep = false }) {
             configuration = await client.configuration()
             const project = configuration.projects.find(item => item.discussionOnly) ?? configuration.projects.find(item => item.dispatchAllowed) ?? configuration.projects[0]
             if (project) {
-              const seeded = await client.dispatch({ commandId: 'w15-current-seed', conversationId: 'conv-current', projectId: project.id, kind: 'chat', text: 'W15 当前包来源。' })
+              // A context message belongs to an existing conversation, so seed one ordinary chat first.
+              const seeded = await client.dispatch({ commandId: 'w18-current-seed', conversationId: 'conv-current', projectId: project.id, kind: 'chat', text: 'W18 当前包来源。' })
               actions.seed = seeded.receipt?.status ?? seeded.status ?? null
               await new Promise(resolve => setTimeout(resolve, 700))
-              const prepared = await client.request('/v1/assistant/context/prepare', { method: 'POST', body: {
-                commandId: 'w15-current-ctx', text: 'W15 当前包上下文。', context: { projectId: project.id, conversationId: 'conv-current',
-                  selections: ['project', 'conversation'], budget: { maxFiles: 8, maxBytes: 32768, maxTokens: 4096 } } } })
-              actions.prepare = prepared.status
-              if (prepared.status === 200) {
-                const sent = await client.request('/v1/assistant/context/send', { method: 'POST', body: { commandId: 'w15-current-ctx', token: prepared.body.token } })
-                actions.send = sent.status
-                actions.sendStatus = sent.body?.status ?? null
-                let page
-                for (let i = 0; i < 50; i += 1) {
+              const runContext = async (commandId, text) => {
+                const prepared = await client.request('/v1/assistant/context/prepare', { method: 'POST', body: {
+                  commandId, text, context: { projectId: project.id, conversationId: 'conv-current',
+                    selections: ['project', 'conversation'], budget: { maxFiles: 8, maxBytes: 32768, maxTokens: 4096 } } } })
+                if (prepared.status !== 200) return { prepare: prepared.status }
+                const sent = await client.request('/v1/assistant/context/send', { method: 'POST', body: { commandId, token: prepared.body.token } })
+                // The reply must belong to this context message: an earlier chat reply would bind the
+                // candidate check to the wrong source message.
+                let page, user, reply
+                for (let i = 0; i < 120; i += 1) {
                   page = await client.conversation('conv-current')
-                  if (page.messages.some(item => item.provenance === 'reasoner_reply')) break
+                  user = page.messages.find(item => item.role === 'user' && item.text === text)
+                  const index = user ? page.messages.indexOf(user) : -1
+                  if (index >= 0) {
+                    reply = page.messages.slice(index + 1).find(item => item.provenance === 'reasoner_reply')
+                    if (reply) break
+                  }
                   await new Promise(resolve => setTimeout(resolve, 150))
                 }
-                actions.reply = page?.messages.find(item => item.provenance === 'reasoner_reply')?.text ?? null
-                const user = page?.messages.find(item => item.role === 'user' && item.text.includes('W15 当前包上下文'))
-                const audit = user ? await client.request(`/v1/messages/${user.id}/context`) : { status: 0 }
-                actions.audit = audit.status
-                const history = await client.request(`/v1/context/history?projectId=${encodeURIComponent(project.id)}&conversationId=conv-current&limit=5`)
-                actions.history = history.status
-                if (user) actions.sources = (await client.request(`/v1/messages/${user.id}/context/sources`)).status
-                if (user) {
-                  const candidates = await client.request(`/v1/messages/${user.id}/candidates`)
-                  actions.candidates = candidates.status
-                  actions.candidateStatus = candidates.body?.status ?? null
-                  if (candidates.status === 200 && candidates.body?.status === 'candidates') {
-                    const selected = candidates.body.candidates[0]
-                    const preview = await client.request('/v1/assistant/candidates/prepare', { method: 'POST', body: { messageId: user.id, index: selected.index, payloadDigest: selected.payloadDigest } })
-                    actions.candidatePrepare = preview.status
-                    if (preview.status === 200) {
-                      const confirmed = await client.request('/v1/proposals/commands', { method: 'POST', body: { kind: 'confirm_proposal', commandId: 'w16-current-candidate', projectId: project.id, conversationId: 'conv-current', token: preview.body.token } })
-                      actions.candidateConfirm = confirmed.status
-                      actions.candidateConfirmStatus = confirmed.body?.status ?? null
-                    }
+                return { prepare: 200, send: sent.status, sendStatus: sent.body?.status ?? null, user, reply, page }
+              }
+              // Default-off: the installed provider reports suggestions disabled and a reply carries none.
+              const off = await client.request('/v1/assistant/suggestions', { method: 'POST', body: { enabled: false } })
+              actions.suggestionsOff = off.status
+              actions.suggestionsOffEnabled = off.body?.suggestionsEnabled ?? null
+              const closed = await runContext('w15-current-ctx-closed', 'W15 当前包上下文关闭。')
+              actions.prepare = closed.prepare ?? 0
+              actions.send = closed.send ?? 0
+              actions.sendStatus = closed.sendStatus ?? null
+              actions.reply = closed.reply?.text ?? null
+              const offPage = closed.user ? await client.request(`/v1/messages/${closed.user.id}/candidates`) : { status: 0, body: null }
+              actions.offCandidates = offPage.status
+              actions.offCandidateStatus = offPage.body?.status ?? null
+              const audit = closed.user ? await client.request(`/v1/messages/${closed.user.id}/context`) : { status: 0 }
+              actions.audit = audit.status
+              actions.history = (await client.request(`/v1/context/history?projectId=${encodeURIComponent(project.id)}&conversationId=conv-current&limit=5`)).status
+              if (closed.user) actions.sources = (await client.request(`/v1/messages/${closed.user.id}/context/sources`)).status
+              // Explicit opt-in, then a reply with non-empty suggestions.
+              const on = await client.request('/v1/assistant/suggestions', { method: 'POST', body: { enabled: true } })
+              actions.suggestionsOn = on.status
+              actions.suggestionsOnEnabled = on.body?.suggestionsEnabled ?? null
+              const open = await runContext('w15-current-ctx', 'W15 当前包上下文。')
+              actions.suggestionsPrepare = open.prepare ?? 0
+              actions.suggestionsSend = open.send ?? 0
+              actions.suggestionsReply = open.reply?.text ?? null
+              if (open.user) {
+                const candidates = await client.request(`/v1/messages/${open.user.id}/candidates`)
+                actions.candidates = candidates.status
+                actions.candidateStatus = candidates.body?.status ?? null
+                actions.candidateCount = candidates.body?.candidates?.length ?? 0
+                const list = candidates.body?.candidates ?? []
+                const work = list.find(item => item.kind === 'propose_work')
+                const decision = list.find(item => item.kind === 'propose_decision')
+                const rejectedCandidate = list.filter(item => item.kind === 'propose_decision').at(-1)
+                if (work) {
+                  const preview = await client.request('/v1/assistant/candidates/prepare', { method: 'POST', body: { messageId: open.user.id, index: work.index, payloadDigest: work.payloadDigest } })
+                  actions.candidateWorkPrepare = preview.status
+                  actions.candidateWorkRequiredInputs = preview.body?.requiredInputs ?? []
+                  if (preview.status === 200) {
+                    const missing = await client.request('/v1/proposals/commands', { method: 'POST', body: { kind: 'confirm_proposal', commandId: 'w18-current-work-missing', projectId: project.id, conversationId: 'conv-current', token: preview.body.token } })
+                    actions.candidateWorkConfirm = missing.status
+                    actions.candidateWorkStatus = missing.body?.status ?? null
+                  }
+                }
+                if (decision) {
+                  const preview = await client.request('/v1/assistant/candidates/prepare', { method: 'POST', body: { messageId: open.user.id, index: decision.index, payloadDigest: decision.payloadDigest } })
+                  actions.candidatePrepare = preview.status
+                  if (preview.status === 200) {
+                    const confirmed = await client.request('/v1/proposals/commands', { method: 'POST', body: { kind: 'confirm_proposal', commandId: 'w18-current-candidate', projectId: project.id, conversationId: 'conv-current', token: preview.body.token } })
+                    actions.candidateConfirm = confirmed.status
+                    actions.candidateConfirmStatus = confirmed.body?.status ?? null
+                    actions.candidateConfirmReceipt = confirmed.body?.receiptId ?? confirmed.body?.commandId ?? null
+                    const replay = await client.request('/v1/proposals/commands', { method: 'POST', body: { kind: 'confirm_proposal', commandId: 'w18-current-candidate', projectId: project.id, conversationId: 'conv-current', token: preview.body.token } })
+                    actions.candidateReplay = replay.status
+                    actions.candidateReplaySame = JSON.stringify(replay.body) === JSON.stringify(confirmed.body)
+                  }
+                }
+                if (rejectedCandidate && rejectedCandidate !== decision) {
+                  const preview = await client.request('/v1/assistant/candidates/prepare', { method: 'POST', body: { messageId: open.user.id, index: rejectedCandidate.index, payloadDigest: rejectedCandidate.payloadDigest } })
+                  actions.candidateRejectPrepare = preview.status
+                  if (preview.status === 200) {
+                    const rejected = await client.request('/v1/proposals/commands', { method: 'POST', body: { kind: 'reject_proposal', commandId: 'w18-current-reject', projectId: project.id, conversationId: 'conv-current', token: preview.body.token } })
+                    actions.candidateReject = rejected.status
+                    actions.candidateRejectStatus = rejected.body?.status ?? null
                   }
                 }
               }
+              actions.nativeSends = 0
+              actions.dispatchPaused = 'discussion_only_no_executor'
+              actions.providerRequests = mock.requests.length
             }
           } catch (error) { actions.failure = String(error?.message ?? error).slice(0, 300) }
         }
@@ -1471,21 +1499,24 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       }) }, reason))
     }
 
-    if (currentProbe.actions?.candidateStatus === 'candidates' && currentProbe.actions?.candidateConfirmStatus === 'recorded') {
-      await push(define('E5-INSTALLED-CANDIDATES', 'The installed package exposes an inert candidate, prepares it and confirms once through the original proposal transaction', {
-        layer: LAYERS.INSTALLED, evidence: { installedCandidates: { subject: artifactSubject(ARTIFACTS.upgrade), actions: currentProbe.actions } },
-      }), async ({ assert, evidence }) => {
-        assert('INSTALLED_CANDIDATE_GET', currentProbe.actions.candidates === 200, String(currentProbe.actions.candidates))
-        assert('INSTALLED_CANDIDATE_PREPARE', currentProbe.actions.candidatePrepare === 200, String(currentProbe.actions.candidatePrepare))
-        assert('INSTALLED_CANDIDATE_CONFIRM', currentProbe.actions.candidateConfirmStatus === 'recorded', String(currentProbe.actions.candidateConfirmStatus))
-        evidence.installedCandidates = { subject: artifactSubject(ARTIFACTS.upgrade), actions: currentProbe.actions }
-      })
-    } else {
-      cases.push(notTested({ ...define('E5-INSTALLED-CANDIDATES', 'The installed package exposes an inert candidate, prepares it and confirms once through the original proposal transaction', {
-        layer: LAYERS.INSTALLED,
-        evidence: { installedCandidates: { subject: artifactSubject(ARTIFACTS.upgrade), actions: currentProbe.actions } },
-      }) }, `NOT_TESTED: the frozen 8962d10 package reply format is pre-suggestion (candidate GET=${currentProbe.actions?.candidates ?? 'not_run'}, status=${currentProbe.actions?.candidateStatus ?? 'none'}); it cannot certify the current main suggestion/candidate UI. Main-source candidate flow is separately verified by E4-CANDIDATE-FLOW.`))
-    }
+    await push(define('E5-INSTALLED-CANDIDATES', 'The installed package keeps suggestions off by default, then exposes non-empty inert candidates that prepare, confirm once, replay and reject without a business effect', {
+      layer: LAYERS.INSTALLED, evidence: { installedCandidates: { subject: artifactSubject(ARTIFACTS.upgrade), actions: currentProbe.actions } },
+    }), async ({ assert, evidence }) => {
+      const a = currentProbe.actions ?? {}
+      assert('INSTALLED_SUGGESTIONS_DEFAULT_OFF', a.suggestionsOff === 200 && a.suggestionsOffEnabled === false && a.offCandidateStatus === 'none',
+        JSON.stringify({ status: a.suggestionsOff, enabled: a.suggestionsOffEnabled, candidates: a.offCandidateStatus }))
+      assert('INSTALLED_SUGGESTIONS_ENABLED', a.suggestionsOn === 200 && a.suggestionsOnEnabled === true, JSON.stringify({ status: a.suggestionsOn, enabled: a.suggestionsOnEnabled }))
+      assert('INSTALLED_CANDIDATE_GET', a.candidates === 200 && a.candidateStatus === 'candidates' && (a.candidateCount ?? 0) >= 2,
+        JSON.stringify({ status: a.candidates, candidateStatus: a.candidateStatus, count: a.candidateCount }))
+      assert('INSTALLED_CANDIDATE_WORK_INPUTS', a.candidateWorkPrepare === 200 && (a.candidateWorkRequiredInputs?.length ?? 0) > 0 && a.candidateWorkStatus === 'rejected',
+        JSON.stringify({ prepare: a.candidateWorkPrepare, required: a.candidateWorkRequiredInputs, status: a.candidateWorkStatus }))
+      assert('INSTALLED_CANDIDATE_PREPARE', a.candidatePrepare === 200, String(a.candidatePrepare))
+      assert('INSTALLED_CANDIDATE_CONFIRM', a.candidateConfirmStatus === 'recorded', JSON.stringify({ status: a.candidateConfirm, value: a.candidateConfirmStatus }))
+      assert('INSTALLED_CANDIDATE_REPLAY', a.candidateReplay === 200 && a.candidateReplaySame === true, JSON.stringify({ status: a.candidateReplay, same: a.candidateReplaySame }))
+      assert('INSTALLED_CANDIDATE_REJECT', a.candidateRejectPrepare === 200 && a.candidateRejectStatus === 'recorded', JSON.stringify({ prepare: a.candidateRejectPrepare, status: a.candidateRejectStatus }))
+      assert('INSTALLED_NO_NATIVE_SEND', a.nativeSends === 0 && a.dispatchPaused === 'discussion_only_no_executor', JSON.stringify({ nativeSends: a.nativeSends, dispatch: a.dispatchPaused }))
+      evidence.installedCandidates = { subject: artifactSubject(ARTIFACTS.upgrade), mode: 'personal', action: 'discussion_only_default_off_then_enabled', actions: a }
+    })
 
     await push(define('E7-OWNERSHIP-COPY', 'A copied instance record in another config root cannot stop the original self-owned API', {
       layer: LAYERS.INSTALLED,
