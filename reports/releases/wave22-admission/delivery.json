@@ -1,0 +1,195 @@
+{
+  "protocol": "wave22-delivery-admission/1",
+  "status": "D_REUSE_AND_E_CONSUMER_PROVENANCE_CLOSED_NEW595_E_FINAL_MEASUREMENT_PENDING",
+  "sources": {
+    "main": "a92bb9ebeacf629c9a75975f2f780d17f609c702",
+    "mainReadStartupIdentity": "f856fa5c297832d6c771ef458a63c84be3a7b166",
+    "d": "efd081fea56074516d11c2195bad903f3f9f1c2e",
+    "e": "49dc0f6bd8529f0620af6fb566b470ba5c30aab4",
+    "eRecordedTestSource": "292cff92bf8eb71e01dd638be2c617ed1b1505cc",
+    "laterMainScopeDiagnostic": {
+      "source": "712e1911fd26b6fdcf71a0c683162b719224f949",
+      "scope": "Main subsequently added optional GET context/sources scopeReview=1 diagnostics for withheld frozen sources. No UI or read permission changes are implied. The fixed595 package predates this later input; absence is temporal scope and does not require docs-only refreezing. This delivery follow-up did not execute the diagnostic."
+    }
+  },
+  "safety": {
+    "vendorModelSends": 0,
+    "nativeTurnStarts": 0,
+    "candidateLiveResourcesStarted": 0,
+    "probeActualOsScans": 0,
+    "probeActualOsSignals": 0,
+    "networkListenersStarted": 0,
+    "liveInstallStopUpgradeCleanupMatricesRun": false,
+    "userServicesPreserved": "All twelve pairs 5180-5191 / 8796-8807",
+    "userStateProfilesTarsLedgersChanged": false,
+    "dWorktreeClean": true,
+    "eUntrackedRunDirectoriesPreserved": 83,
+    "productionAndAcceptanceSourcesChanged": false,
+    "repositoryWrites": [
+      "reports/releases/wave22-admission/delivery.json",
+      "tools/bootstrap/probe-wave22-release-gate.mjs",
+      "tools/bootstrap/probe-wave22-delivery.mjs"
+    ],
+    "temporaryArtifactsRetained": "/tmp/pa-wave22-delivery-audit-Mrj86r"
+  },
+  "verification": {
+    "oldDProbeApplicability": "The earlier tool does not inject newly added httpGet/restoredReviewIdentity observations. It was not run unchanged: that could issue a real network request or turn the file-normalizer precondition into a false green. The bounded equivalent below mocks both new inputs explicitly.",
+    "dActualSelectionReuse": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave22-d-persistent.json node --experimental-test-module-mocks tools/bootstrap/probe-wave22-delivery.mjs /Users/hh/Desktop/joker/superagent-agent-d",
+      "exitCode": 0,
+      "passed": 6,
+      "failed": 0,
+      "report": "/tmp/pa-wave22-d-persistent.json",
+      "previousObservationReport": "/tmp/pa-wave22-delivery-audit-Mrj86r/d-selection-results.json",
+      "scope": "Actual D startInstance existing-record path. Complete verified-record/admission control, main file-identity return and live http health are injected. Matching unbound and same-selection positives succeed; unbound+selection, different selection, no-selection-when-bound and selection-before-port refuse for focal reasons. No process/network operations execute."
+    },
+    "eOldFullProbeApplicability": "The original whole installed-alpha report now correctly FAILs at the old e4e reuse case. No synthetic whole-report PASS was created to test provenance; only actually passing installed review/refusal records and canonical identity form the focal positive below.",
+    "eActualConsumerProvenance": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave22-e-persistent.json node tools/bootstrap/probe-wave22-release-gate.mjs /Users/hh/Desktop/joker/superagent-agent-e /tmp/pa-wave22-delivery-audit-Mrj86r/install",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "report": "/tmp/pa-wave22-e-persistent.json",
+      "previousObservationReport": "/tmp/pa-wave22-delivery-audit-Mrj86r/e-consumer-results.json",
+      "fileControl": "All4 consumer entry file SHA/size values in recorded E e4e evidence equal bytes read directly from its actual verified immutable tar.",
+      "scope": "Actual passing e4e installed personal review/refusal plus canonical identity positive. Exactly one consumerEntry substitution uses true new595 package and file bytes while data subject remains e4e. E refuses specifically as personalReview consumer_provenance. This is a focal scope validation, not a full installed-tier green control.",
+      "actualFullInstalledAlpha": "FAIL: required E5-REVIEW-REUSE-CONSISTENCY on the exact old e4e artifact."
+    },
+    "newArtifactBytes": {
+      "command": "node /tmp/pa-wave22-delivery-audit-Mrj86r/verify-bytes.mjs",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave22-delivery-audit-Mrj86r/artifact-verified.json"
+    }
+  },
+  "persistentProbePolicy": "New tools accept explicit candidate roots and a verified595 install where needed, require a new absolute PA_ADMISSION_REPORT and exclusively create0600 output. E derives its focused requirements from actual installed-alpha rules and includes only original actualPASS identity/review/refusal records; it keeps the original whole-tier olde4e reuseFAIL. Only the previously measured foreign595 consumer substitution is run. D injects file identity, health, process and network observations. Each tool was executed once; no added source-origin negative or live lane was introduced.",
+  "closedFindings": [
+    {
+      "id": "D-EXPLICIT-REVIEW-SILENTLY-IGNORED-ON-REUSE",
+      "priority": 2,
+      "status": "CLOSED_IN_CURRENT595_LAUNCHER_SCOPE",
+      "source": "apps/launcher/lib/start.mjs:162 parses requested file identity, :239 reads actual health, :259-260 compares requested/live digest before identityDifferences/ports, :358-359 verifies effective new-start health.",
+      "evidence": "Six focused actual-export mock cases pass; D same-package actual process evidence reports same selection REUSED, changed/unbound/narrow/no-file/port refusals and stable PID. The record is not substituted for actual health."
+    },
+    {
+      "id": "E-SOURCE-REVIEW-CONSUMER-AS-OLD-INSTALLED-PASS",
+      "priority": 1,
+      "status": "CLOSED_IN_RECORDED_E4E_CONSUMER_SCOPE",
+      "source": "w21-personal-recovery.mjs uses extracted package preparation imports and bin/pa startup; consumerEntry() records package start/daemon/restored-review/demo file hashes. release.mjs:398 consumerEntryIssues requires package origin and matching source/build/tar subject.",
+      "evidence": "Recorded4 consumer file hashes/bytes match immutable e4e, actual positive passes, and true595 consumer provenance with unchanged e4e data is refused. E full installed tier now remains FAIL at the old package's genuine reuse problem rather than mixing fixed595 into it."
+    }
+  ],
+  "currentP1InAuditedScopes": false,
+  "currentFindings": [],
+  "admission": {
+    "ordinaryPreviousScopes": "PRESERVED",
+    "e4eInitialReadStartup": "SCOPED_INSTALLED_INITIAL_START_AND_FILE_REFUSALS_CORROBORATED",
+    "e4eLiveSelectionReuse": "FAIL_AS_PREVIOUSLY_RECORDED_NOT_RELABELED_FIXED",
+    "fullEInstalledAlpha": "FAIL_ON_EXACT_E4E_REQUIRED_REUSE",
+    "new595SourceAndByteScope": "ACCEPTED_FOCUSED_LAUNCHER_REUSE_PLUS_SAME_PACKAGE_PREPARE_CONSUMER_CANDIDATE",
+    "new595IndependentFullInstalledTier": "NOT_REACHED_E_STILL_TARGETS_E4E",
+    "overallNativeOrTarget": "NOT_GRANTED",
+    "limits": [
+      "No new live package cold/reuse/stop matrix was run here; D actual same595 evidence was inspected and coherent with bytes/mocked caller behavior.",
+      "Ordinary personal discussion-only/local SDK candidate/context/history/reply and source fact scopes remain valid for their exact previously tested packages.",
+      "Readstartup initial start and same-selection reuse are different claims; e4e passes the former but fails the latter, while fixed595 must receive E's own final same-subject run.",
+      "Fixture+recovery_readonly richer Work/Q&A restoration remains separately labeled; retained B normal Q&A/native_applied and SDK candidate states are still separate, no combined same-Store workflow is claimed.",
+      "Signed startup read selection is not private permission, physical writer quiescence, B business recovery, native execution or target activation.",
+      "Only measured darwin-arm64/Node24.21.x/ABI137 support; no cross-platform, new vendor budget or long-soak result."
+    ]
+  },
+  "newArtifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave21-target/wave21-target-595b3f1.tar.gz",
+    "tarSha256": "e875b9b90445db5826bf01d72d710fd55b208309598347ca45be618773ae026d",
+    "tarBytes": 20242124,
+    "source": "595b3f138872f176b7c6b214b4b6b1b87c1ed017",
+    "sourceDirty": false,
+    "buildId": "cc16eca05e4da244",
+    "productSchemaActualExport": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeActual": "24.21.0",
+    "abiActual": "137",
+    "sqliteActual": "3.53.4",
+    "inventoryEntries": 6744,
+    "regularFilesHashAndSizeVerified": 6723,
+    "internalSymlinksVerified": 21,
+    "extractedBytes": 67541760,
+    "installManifestSha256": "22a393f8ff0a844e5337b5657b90b793a5bc1e4284ce3f2e3f9719263f582a5a",
+    "releaseManifestSha256": "4448f0af3a2993e6dbd47cdca69182d9a47994c2d26f715c000d60e74f860a9e",
+    "closureDigest": "d6ab4370a55da8b0e9f2195a314fe86605085072968a5f552182a4435cd28e1f",
+    "verifiedInstallRoot": "/tmp/pa-wave22-delivery-audit-Mrj86r/install",
+    "samePackageProducer": "apps/launcher/bin/pa.mjs review-restored command calls lib/review.mjs, which imports same-package prepareRestoredReview, ProductStore and localCredentials; new0600 wx/fsync output, no overwrite and no second signer.",
+    "samePackageConsumer": "start.mjs imports same-package restoredReviewIdentity and compares actual health.restoredReviewDigest; daemon forwards only explicit file to personal+recovery_readonly discussion-only startup. New startup health must match the requested identity.",
+    "runtimeAncestor": "Main f856fa5 is an ancestor; main985 dual workflow format and valid schema/v1 digest guards remain included. No launcher/portability runtime delta from595b3f1 through currentD efd081f; docs-only heads do not refreeze.",
+    "dActualProcessEvidence": {
+      "report": "tools/distribution/reports/wave21/nonempty-personal-http.json",
+      "source": "595b3f138872f176b7c6b214b4b6b1b87c1ed017",
+      "buildId": "cc16eca05e4da244",
+      "observed": "Package-contained preparation then actual pa start, before403/after2 candidates/history/source200, business422/model0/native0, sameSelectionReused, unbound/different/narrow/noSelection/changedPort refusals, pidStable.",
+      "independenceLimit": "D-owned actual evidence inspected, not rerun live here and not independent E final595 admission."
+    }
+  },
+  "eRecordedScope": {
+    "counts": { "PASS": 199, "FAIL": 1, "NOT_TESTED": 15 },
+    "testSource": "292cff92bf8eb71e01dd638be2c617ed1b1505cc",
+    "productSource": "e4e0623dcb6d90318939f9613f9251ff73fcc602",
+    "buildId": "637ed44e850f447a",
+    "tarSha256": "1f78e38b3568a781ebf4670174451516ceb7c32b982b0990e21757c34e4ddfc1",
+    "installedAlpha": "FAIL",
+    "requiredFailure": "E5-REVIEW-REUSE-CONSISTENCY",
+    "initialReview": "Actual extracted-package prepareRestoredReview imports via a test wrapper, bin/pa startup, before403/after200 original body/candidates/history/frozen source, business422/no provider/no queue; no checkout CLI/demo fills a missing package entry.",
+    "preparationBoundary": "e4e has no shipped user-facing prepare command, so E uses a harness script importing the package's real signer. That is a truthful same-byte API test, not proof of a shipped CLI.595 now ships pa review-restored and E should consume that exact command next.",
+    "consumerFileControl": [
+      { "path": "apps/launcher/lib/start.mjs", "sha256": "028087d84e0ecda31bf1596604d72eab7ee4eab15504bd280f38437d3ace9540", "bytes": 19678 },
+      { "path": "apps/launcher/lib/daemon.mjs", "sha256": "1ac7fafa40daf225405c739de1e12669647b1a9d1c772d1c70ac340467614f8a", "bytes": 7303 },
+      { "path": "apps/coordinator/product/restored-review.ts", "sha256": "83cec484bf2b0815b1e5ca53653dc7f3ad883c3ab396ff838965004031dd8c11", "bytes": 6639 },
+      { "path": "apps/coordinator/product/demo.ts", "sha256": "ba770b81eedd9317cdf529f4719c076bffdc3a932999ad466314284f69fbfc61", "bytes": 6691 }
+    ],
+    "knownOldReuse": "sameFile/differentFile/noFile all returned REUSED on e4e, healthDigest null, which correctly triggers the required negative. New595 behavior is not substituted into these old results.",
+    "validatorCompatibilityNext": "release.mjs reviewReuseIssues currently requires sameFile.status RUNNING with reused=true, whereas actual pa CLI reports REUSED (same test body already recognizes REUSED or RUNNING). E must align a valid current same-selection positive to the actual explicit CLI terminal semantics when retargeting595, retaining all different/unbound/PID/health refusal requirements. Do not count an unrelated precondition failure as proof."
+  },
+  "mainCompleteDistributionIntegration": {
+    "decision": "Current595 source scope is stable enough to start coherent ordinary-personal/readstartup integration into main. Do not wait for E to catch up before preparing the source closure, but keep final independent595 installed-tier acceptance pending its real same-subject run. The exact reviewed package should remain immutable.",
+    "mainMissingClosure": "Main a92bb9e still does not track apps/launcher/bin/pa.mjs; an isolated upgrade/start file copy is not a complete runnable distribution.",
+    "ownedFilesToIntegrateTogether": [
+      "apps/launcher/package.json, bin/pa.mjs, complete lib/ including new review.mjs and start/daemon/identity/instance/config/release/recovery/backup/restore/upgrade modules, focused tests and documentation",
+      "packages/portability/package.json, full src/ and public export/index surface, tsconfig/build files, focused archive/roots/manifest/evidence/snapshot/restore tests",
+      "tools/distribution/build.mjs, stage.mjs, freeze-install.mjs, exact stage wrappers/copy inventory and needed verification recipes, excluding historical report/RFC churn"
+    ],
+    "dependencyOrder": [
+      "main-owned contracts/current coordinator runtime/demo/HTTP/console built artifacts and restored-review loadWithIdentity/identity/health API",
+      "main current storage/workflow1/default/explicit2/schema guards and artifact/snapshot APIs, better-sqlite3 13.0.3 with measured ABI137",
+      "portability workspace package build/export links, then launcher workspace package and Node>=24.21.0<25 runtime",
+      "distribution build/stage/freeze output closure with all21 referenced workspace packages plus exact runtime dependencies/licenses",
+      "main-owned pnpm workspace/root scripts/lock/dependency links and focused package/product consumer compilation/regressions"
+    ],
+    "authorityGate": "Integrate ordinary personal/readstartup CLI and data transport only in their recorded scopes; keep target/private startup permission/native business recovery explicitly unavailable. Do not import D's package selfreports as release authority.",
+    "sourceSlices": "D's review-restored CLI+review.mjs and start selection-health comparison are the new minimal behavior slice on top of the coherent prior launcher closure. Main f856 behavior already exists on main; do not overwrite current core from D's older merge. E consumerEntry provenance rules and actual package tests are an acceptance slice, with its status REUSED compatibility correction needed for next positive."
+  },
+  "nextPackages": {
+    "d": [
+      "Keep595 immutable source/build/tar and closed old reuse/consumer gaps; send E exact same-package CLI/module/helper provenance and commands.",
+      "Assist main coherent launcher/portability/distribution dependency integration with explicit file ownership and main-managed root/lock updates, not source cherry-picks lacking dependencies.",
+      "Preserve same-main producer/consumer selection identity, private wx0600 output, actual health digest and refusal-before-port behavior across all launch/reuse paths.",
+      "Keep complete positive same-selection and focal different/narrow/no-file/unbound/health-unavailable cases; actual self-owned PID evidence must remain stable, without broad global cleanup.",
+      "Use the shipped pa review-restored command for user recipes, including source/marker changes and reprepare semantics; live reuse is not a five-minute authority refresh.",
+      "Move B normal Work/Q&A/native_applied and SDK context/candidate data toward a real same-Store public producer flow, preserving separate scopes until it truly exists.",
+      "Carry that data through both supported workflow formats and second-root personal review, original receipts/body and held queue/provider zero; historical Work actor access is separately authorized.",
+      "Continue precise safe-baseline upgrades/new-write protection and finite resource-return/SSE/reopen checks under existing owned-resource proof.",
+      "Keep support private/redacted and target material inert; no private startup permission/native budget is inferred from read selection or source facts.",
+      "Publish early/mid/final source and only necessary new runtime bytes, then consume E independent same595 or exact successor verdict."
+    ],
+    "e": [
+      "Preserve truthful olde4e initial-readstartup PASS and reuse FAIL; do not relabel its199/1/15 outcome as fixed595 or erase prior ordinary package admissions.",
+      "Retarget all27 required case/helper/producer/consumer inputs to exact595 and use shipped pa review-restored rather than a checkout or injected user CLI.",
+      "Normalize actual pa REUSED terminal semantics for a complete same-selection positive, then assert different/narrow/no-file/unbound/changed-port refusal and actual health digest/PID stability without weakening the requirement.",
+      "Keep immutable consumer file SHA/size controls and one truly foreign consumer package substitution on the passing reviewed scope, never a same-tuple fake negative or whole-tier false positive.",
+      "Independently run same-package personal preparation/start before403/after200 candidates/history/frozen body and business422/no-provider/no-queue behavior, including refusal/reprepare scope.",
+      "Retain controlled signed-expiry/root/principal/host/key boundaries and startup-window versus runtime-read meaning; read consent/source fact/private permission cannot substitute for each other.",
+      "Maintain explicit distinction between fixture+readonly rich Work data, B normal transport state and genuine combined personal same-Store restoration until measured.",
+      "Keep dynamic workflow format1/2, distinct portability personal-evidence/bundle versions and protected upgrade/write semantics under one exact target and safe baseline.",
+      "Use finite meaningful page/reconnect/reopen/concurrent-read/resource tests on only independently owned resources, with no real vendor/native or long-soak claim.",
+      "Publish correct early/mid/final same-byte layer verdicts; when the new full installed tier is green it remains ordinary/readstartup, not native recovery or target activation."
+    ]
+  }
+}

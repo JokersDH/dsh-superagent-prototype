@@ -1,0 +1,143 @@
+{
+  "protocol": "wave22-ac-independent-admission/1",
+  "date": "2026-11-13",
+  "mainSource": "a92bb9ebeacf629c9a75975f2f780d17f609c702",
+  "mainRuntimeBaseline": "f856fa5 standard start/reuse plus 9856124 versioned snapshots",
+  "sources": {
+    "A": "bee155d81fcfe0951adf07dc3c0e192170985892",
+    "C": "e82901af33b36d282cab48351628fb2fa61ebe28"
+  },
+  "modelCalls": 0,
+  "vendorNativeTurns": 0,
+  "browserRuns": 0,
+  "releaseApproved": false,
+  "summary": {
+    "A": "Actual second-root personal demo processes now run for both v1 and v2. A newly signed narrower selection returns truthful scope_changed with no original source body. Existing strict/build remains passing.",
+    "C": "One real business/SDK/context Store now feeds actual second-root personal processes in both snapshot formats, v1 through standard start/reuse and v2 through demo. Legal narrowed/excluded selections and fresh independent failure controls pass. The new explanation helper is still module/test-only and is not a main user-visible consumer.",
+    "productionFindings": "No new production safety or data-integrity defect found in this finite changed-path audit."
+  },
+  "A": {
+    "strict": {
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows typecheck",
+      "exitCode": 0,
+      "log": "/tmp/pa-wave22-a-strict.log"
+    },
+    "build": {
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows build",
+      "exitCode": 0,
+      "log": "/tmp/pa-wave22-a-build.log"
+    },
+    "targetedConsumers": {
+      "command": "node --test packages/workflows/test/wave20-personal-business.case.ts packages/workflows/test/wave21-personal-v2.case.ts",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "log": "/tmp/pa-wave22-a-dual.log",
+      "actual": "Each fixture generates real controlled Work/Ticket/Broker question/answer/native_applied plus local SDK candidate/context data, creates and verifies its selected v1/v2 snapshot, restores another root, signs a new private review file through the actual CLI and starts an actual personal recovery_readonly demo child.",
+      "readsAndRefusals": "Candidate/history and original work/question-delivery reads succeed; native_applied is retained; answer mutation422, held queue and original data remain after child exit.",
+      "legalNarrowSelection": "After stopping the wide child, the real CLI signs src/narrow/ plus exclude src/private/ with the same original principal. Another personal child starts; history remains200, original context sources return200 with state scope_changed and empty sources, and business mutation remains422.",
+      "entryScope": "Both A changed-path tests execute demo.ts, not standard start/workbench or an installed launcher. The reported standard-start12-case evidence belongs to the separate main suite and is retained under its own scope."
+    },
+    "evidenceLimits": [
+      "The two A format cases independently regenerate equivalent business data rather than restoring two snapshots of one identical Store. C's new chain below uses one actual Store for both formats.",
+      "A still asserts candidate/history HTTP status more narrowly than C's payload/digest/state assertions, and samples the provider baseline after its child is healthy. C's pre-start baseline and exact payload checks supply stronger coverage.",
+      "No new A production-source difference in reviewed backup/snapshot/start code is needed by main."
+    ],
+    "fullRegressionScope": "The previously accepted strict/runtime data scopes are retained. The author's full87+114 runtime count was not mechanically rerun in this narrow audit."
+  },
+  "C": {
+    "strict": {
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing typecheck",
+      "exitCode": 0,
+      "log": "/tmp/pa-wave22-c-strict.log"
+    },
+    "build": {
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing build",
+      "exitCode": 0,
+      "log": "/tmp/pa-wave22-c-build.log"
+    },
+    "targetedConsumers": {
+      "command": "node --test packages/knowledge/test/main-personal-dual-format.case.ts packages/context/test/restored-review-scope.case.ts",
+      "exitCode": 0,
+      "passed": 6,
+      "failed": 0,
+      "actualPersonalChainTests": 1,
+      "independentFailureMatrixTests": 1,
+      "pureExplanationTests": 4,
+      "log": "/tmp/pa-wave22-c-dual.log",
+      "sameStore": "Real controlled App/Effects/Broker produces Work/question/answer/native_applied and accepted delivered Work. The same Store contains actual SDK candidate confirmation and a selected-context frozen binding; both snapshots originate from that Store.",
+      "v1": "Default v1 snapshot verifies, is restored to its own private root, gets its own new CLI-signed review file, and starts through the standard tools/dev/start.mjs wrapper. Health digest equals the file's canonical identity and workbench record; same selection reuses the original console/PID; missing/different selection and restart with review refuse. Different-selection plus port/login options still refuse before build/stop/start with unchanged PID.",
+      "v2": "Explicit v2 verifies and is restored to a different private root with independent credentials/marker/new review file. Actual demo.ts personal recovery_readonly child reads identical original candidate digest, verified sources, delivered Work and native_applied delivery; candidate preparation refuses422.",
+      "preserved": "Frozen candidate/context identities remain original, permission Q&A displays are excluded, old context/proposal business commands refuse, queue stays1, Work stays1 and counted provider requests remain at the original2 through all reviewed child startups.",
+      "sourceFacts": "Actual v1 personal source prepare/confirm/audit stays not_granted/startupAvailable=false with no target creation or model resend. Source facts are distinct from read-startup consent and do not authorize business/target execution."
+    },
+    "legalScopeConsumer": {
+      "narrow": "A newly signed allowedPaths src/narrow/ selection starts after explicit stop. Candidate list is empty with scope_escalation, history still contains its original entry, original frozen source body is withheld as scope_changed with no sources; delivered Work/native_applied review remains data only and mutations refuse.",
+      "exclusion": "A second newly signed selection keeps src/ and adds src/secret/ exclusion. Actual source DTO reports scope_changed; the C projection reports exclusion_added and partial.",
+      "notTampering": "Both cases use actual CLI signatures from the current restored root. They are not invalid-signature edits presented as Scope shrink tests."
+    },
+    "independentFailures": {
+      "method": "Each of12 cases creates a fresh Store/root/marker/key/file and successfully loads its valid selection first, then performs exactly one change.",
+      "cases": ["source queue added", "marker changed", "signature changed", "root changed with a fresh fixture HMAC", "machineDigest changed with a fresh fixture HMAC", "principal changed with a fresh fixture HMAC", "Scope edited without signature", "expired startup window", "unsafe file permissions", "symlink", "FIFO", "missing file"],
+      "additionalClaims": "Unknown project, parent-escaping path, externalActions and executable claims refuse at the real prepare helper.",
+      "scope": "This closes the earlier cumulative-drift evidence gap. Root/host/principal checks are exercised via loader-bound fields, not an actual physical host migration."
+    },
+    "fullRegressionScope": "The author's128+41+101+44=314 full suite count was not mechanically rerun; this audit executes all changed pure-explanation and actual dual-format/failure consumers plus complete four-package strict/build."
+  },
+  "scopeExplainerAdmission": {
+    "source": "packages/context/src/restored-review.ts",
+    "function": "explainRestoredReviewScope",
+    "actualCurrentCallers": ["packages/context/test/restored-review-scope.case.ts", "packages/knowledge/test/main-personal-dual-format.case.ts"],
+    "mainProductionCallers": [],
+    "mainCurrentUserState": "apps/console/src/ContextSources.tsx:87 still renders only a generic scope_changed status. There is no main HTTP/runtime/console call to this helper at the fixed baseline.",
+    "safeScope": "Pure presentation data derived from typed scopes and already-authorized sourcesState; authorization is always none. It does not sign/read credentials, access Store/SQL/HTTP, persist confirmation, start a model or grant permission.",
+    "minimalFiles": [
+      "packages/context/src/restored-review.ts",
+      "packages/context/src/index.ts: two corresponding function/type export lines only",
+      "packages/context/test/restored-review-scope.case.ts"
+    ],
+    "existingDependency": "context/src/paths.ts already supplies pathWithin; no wholesale reader/composer/relevance import is necessary.",
+    "practicalMainReadInterface": {
+      "existingEntry": "GET /v1/messages/:id/context/sources through ProductContextRecords.sources",
+      "inputs": "Use the already-validated binding.scope, current configured/restored-review Scope for the same project, authoritative sources.state and binding.sources sourceIds. Both scopes are data already held by the current reader; public callers must not provide arbitrary project Scope or verified markers.",
+      "minimalPublicProjection": "An optional read-only explanation field can carry state/scopeChanged/partial/reasons/withheldSourceIds/authorization:none beside the existing ContextSources DTO, with main-owned contracts/schema validation. The console can render these actual refusal/partial reasons.",
+      "counts": "The helper also accepts readable candidate/history/Work/delivery counts. Do not add four whole-project scans merely to populate them. Use only already-loaded/returned DTO window counts and label them observational, or keep these counts out of the first public projection until measured.",
+      "authority": "Keep existing Scope containment, principal/root/source verification and the state!=verified empty-body rule authoritative. The explainer describes the result; it must never decide whether frozen content is released."
+    }
+  },
+  "findings": [],
+  "remainingScope": [
+    "Actual personal second-root read is now covered for both workflow snapshot formats; the old v2-only-create/verify gap is closed.",
+    "Standard start/workbench reuse runs only for the v1 restored root in the new C chain. V2 uses direct demo.ts; do not claim both formats ran through standard start.",
+    "Source confirmation in this new dual-format chain is exercised on v1; v2 source-confirm behavior is not newly claimed.",
+    "The pure scope explainer is not yet a user-visible main consumer. Its tests do not make it a new permission or substitute for the existing data-read guard.",
+    "Source test processes are not D launcher/immutable installed-byte acceptance or E independent release verdicts. No UI screenshots, vendor/native compatibility, writer quiescence, private permission or target startup admission was attempted."
+  ],
+  "mainIntegration": {
+    "A": "No new reviewed production slice required: the relevant backup.ts/snapshot.ts/restored-review/start implementation is already main-owned/admitted. Reuse the changed v2/narrow-scope tests and recipe as scoped consumers, not a whole worktree merge.",
+    "C": "The explainer and its two exports are a small admissible pure-data slice under the read-interface constraints above. Actual HTTP/schema/UI integration remains main-owned; do not import unrelated module-only projections or authority helpers."
+  },
+  "nextOutcomePackages": {
+    "A": {
+      "userVisibleOutcome": "One reproducible same-package recovery-and-read report for either supported snapshot format",
+      "early": "Turn the existing tested data/format/CLI steps into one bounded parameterized producer/restore/review driver accepting an explicit package/runtime root, new state/ports and format. Record exact source/package/artifact identity and original data references; avoid a third copied fixture implementation.",
+      "middle": "Give D/E a runnable input that produces the actual controlled business+SDK/context data and reads it in a restored personal process with legitimate wider/narrower/excluded selections. Reuse already-passing source tests rather than expanding unrelated scale matrices.",
+      "final": "Consume main's eventual explanation DTO and exact package entry, preserve old receipts/frozen bodies and held queues, and return bounded failure status and cleanup ownership. Installed release/physical/private activation verdicts remain with their owners."
+    },
+    "C": {
+      "userVisibleOutcome": "A restored-history reviewer can see why source text is withheld and what remains readable after a new selection",
+      "early": "Ship the minimal explainer data slice and precise current-state mapping to main. Keep the actual source Scope/principal/root guard authoritative and remove any implication that module-only explanation is already public.",
+      "middle": "Consume main's existing-source-endpoint explanation in actual personal wide/narrow/exclusion/missing/unverified flows; verify concise reasons and withheld IDs match original frozen binding while candidates/Work/history remain audit-only where allowed.",
+      "final": "Provide D/E the parameterized same-package personal consumer with observed read costs, independent invalidation controls and both-format identity evidence; preserve source facts/read consent/execution permission separation and avoid new SQL/HTTP/grant/LLM authority."
+    }
+  },
+  "preserved": {
+    "AWorktree": "clean",
+    "CWorktree": "original pnpm-lock.yaml diff only",
+    "userServiceGroups": 12,
+    "servicesTouched": false,
+    "ledgersTouched": false,
+    "historicalReportsOverwritten": false,
+    "repositoryOutput": "reports/releases/wave22-admission/context.json"
+  }
+}
