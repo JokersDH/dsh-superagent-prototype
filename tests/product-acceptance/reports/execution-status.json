@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "2208899",
-  "checkpoint": "7204fde",
-  "head": "5264cbddf39aa7ce00bf50eb8d2a09ca26de97a4",
+  "base": "4c93817",
+  "checkpoint": "421c4db",
+  "head": "dcaa884030eebdac23e5eb4cb95c95d6e7c6bbd0",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-13T08:24:04.170Z",
+  "checkedAt": "2026-11-13T12:16:23.644Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -20,14 +20,14 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Target switched to the accurate b911 package",
+      "title": "Subject switched to the accurate ee package",
       "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
       "notes": [
-        "All artifact/case/helper inputs read wave18-target b9117aa/build6a45633067501dd2/sha4a81380a from actual bytes; baseline is 651 as the safety upgrade source and 97 stays a mock-only failing control. The 23 required installed cases are unchanged."
+        "All 24 required cases, the helper and the upgrade pair move to wave19-target ee7fbd8/build90e81429079a7d50/sha b0990149; b911 is the safety upgrade baseline and 97 stays a mock-only failing control. The 651/97 historical scopes are kept as history."
       ],
       "result": "PASS",
       "counts": {
-        "PASS": 105
+        "PASS": 107
       },
       "cases": [
         {
@@ -426,6 +426,16 @@
           "reason": null
         },
         {
+          "id": "E1-MUTATE-PERSONAL-REVIEW-UNBOUND-READ",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PERSONAL-REVIEW-FIFO-ALLOWED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
           "id": "E1-MUTATE-SELF-CLAIM",
           "status": "PASS",
           "reason": null
@@ -559,10 +569,10 @@
     },
     {
       "id": "E2",
-      "title": "Source calibration kept, new cases in the subject map",
+      "title": "Format assertions follow the package capability",
       "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
       "notes": [
-        "Helper is extracted from the b911 tar and its file SHA is checked; 97 still fails the same probe 2 PASS/3 FAIL. The full-report positive control and foreign-helper mutations still reject, and the workflow-format/second-root cases are inside the required subject relation."
+        "The format case reads the frozen package dist/source: ee produces default workflow-snapshot/1 (13 families) and explicit formatVersion 2 (21 families, familySetVersion 2), rejects version 3 without creating the destination, and leaves the source DB unchanged. A v1-only package keeps its old measured scope instead of being called a regression. Install/restore protocols stay separate."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -714,10 +724,10 @@
     },
     {
       "id": "E3",
-      "title": "Ordinary personal chain on b911",
+      "title": "Ordinary personal chain on ee",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "default-off suggestions, SDK non-empty candidates, GET/prepare/confirm/reject/replay, context/history/frozen source, discussion-only no-executor mode, real health/mode/exit and native sends 0."
+        "Default-off suggestions, explicit opt-in, non-empty candidates, confirm/replay/reject, context/history/frozen source/reply, discussion-only mode, real health/exit and native sends 0."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -894,14 +904,14 @@
     },
     {
       "id": "E4",
-      "title": "Recovery scopes kept separate",
+      "title": "Explicit restored-personal review",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "The installed second root and source confirmation are explicitly fixture+recovery_readonly. The restored-personal readonly rebinding case is NOT_REACHED because main has no entry yet; the 403 is not relaxed."
+        "A package-restored personal project is refused unbound (candidates/history 403) and readable after the main review-restored CLI file is supplied (candidates/history/sources/original body 200); business POST 422, held queue unchanged, provider request count unchanged. The frozen package predates the 773 entry, so the entry is the main CLI/demo consumer over package data."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 20,
+        "PASS": 21,
         "NOT_TESTED": 4
       },
       "cases": [
@@ -1021,23 +1031,28 @@
           "reason": null
         },
         {
+          "id": "E4-PERSONAL-RESTORED-REVIEW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
           "id": "E4-PERSONAL-READONLY-REBIND",
           "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: the installed restore lane starts with --fixture and main recovery_readonly; main has not published the restored-personal project readonly rebinding entry that would authorise reading a user project and refusing changes. The current 403 must not be relaxed or borrowed as an installed permission. Required: main readonly binding for a real personal project, original text readback, explicit change refusal and no inherited execution authority."
+          "reason": "NOT_REACHED: main 773 supplies the explicit review CLI and personal startup, which E now exercises in E4-PERSONAL-RESTORED-REVIEW. The frozen target package predates that entry, so a same-package installed entry remains NOT_REACHED until D freezes a package containing 773."
         }
       ]
     },
     {
       "id": "E5",
-      "title": "Formats verified from the package itself",
+      "title": "File/source/host refusals",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "The b911 package contains only workflow-snapshot/1 and the single-argument v1 evidence reader; a 13-family v1 summary reads from the restored DB and an explicit v2 argument returns the same v1 data, so explicit v2 is NOT_REACHED for this package. Install/restore protocols are recorded separately from workflow protocols."
+        "Tampered signature, foreign restored root, public file mode, symlink, FIFO, expired/tampered payload, existing output, unknown project and unsafe path are refused without starting a readable instance. Expiry with a valid signature and foreign principal/host are listed as entry NOT_TESTED because forging them needs the probe-owned key."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
         "NOT_TESTED": 2,
-        "PASS": 3
+        "PASS": 4
       },
       "cases": [
         {
@@ -1064,15 +1079,20 @@
           "id": "E5-WORKFLOW-FORMATS",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E5-RESTORED-REVIEW-REFUSALS",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
     {
       "id": "E6",
-      "title": "Real business data in one store and second root",
+      "title": "Real business data and second root",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "The second root reads the seeded Work/Q&A/context/candidates/reply from the same store; A/B real producer data remains a separate owner scope and hand-filled rows are not used as evidence."
+        "Installed fixture/controlled product Work/Q&A/native_applied plus SDK/context/candidates in one store; second root recovery_readonly reads them, refuses business writes, holds the queue and does not resend. The restored-personal lane is a separate personal proof, not a fixture result relabel."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1109,10 +1129,10 @@
     },
     {
       "id": "E7",
-      "title": "Original source facts and authority separation",
+      "title": "Source/read/startup permission separation",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Source prepare/confirm/audit and the original token replay through the installed readonly entry with not_granted/startupAvailable false; private startup permission and personal rebinding stay separate."
+        "Source prepare/confirm/audit and original-token behavior remain facts, not startup permission; the review file is historical read-only consent, not a private startup grant or execution authority. B wrapper is not used as recovery evidence."
       ],
       "result": "PASS",
       "counts": {
@@ -1143,10 +1163,10 @@
     },
     {
       "id": "E8",
-      "title": "Upgrade and bounded faults on the accurate subject",
+      "title": "Upgrade and bounded faults",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "651->b911 same-schema18 upgrade/rollback with the exact pair, 16->18 legacy migration and old-binary refusal, three fault windows with status/exit/pointer/operation/data, and the target helper from the same tar."
+        "b911→ee same-schema18 and 16→18, three fault windows with status/exit/pointer/operation/data, tamper refusal and rollback keeping post-upgrade data, all on the frozen pair."
       ],
       "result": "PASS",
       "counts": {
@@ -1167,10 +1187,10 @@
     },
     {
       "id": "E9",
-      "title": "Bounded stability and user surface",
+      "title": "Bounded stability and UI",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "Concurrent readonly reads, repeated original-token confirmations and a service reopen return counts, queues and provider requests to baseline."
+        "Concurrent readonly reads, repeated token confirmations and a service reopen return queue/counts/provider to baseline; known workbench surfaces only."
       ],
       "result": "PASS",
       "counts": {
@@ -1194,7 +1214,7 @@
       "title": "Final same-subject verdict",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave19-status.json records the b911 subject, the 651/97 roles, fixture readonly scopes and the exact NOT_REACHED items; the clean recorded run is committed after the source checkpoints."
+        "wave20-status.json binds the result to the final source with the mode/protocol/consumer mapping; the 651/b911 ordinary-personal scopes stay history and the personal review scope is not extrapolated to native/target/value."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1206,12 +1226,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-13T08:24:04.185Z",
+    "checkedAt": "2026-11-13T12:16:23.661Z",
     "source": {
-      "commit": "5264cbddf39aa7ce00bf50eb8d2a09ca26de97a4",
+      "commit": "dcaa884030eebdac23e5eb4cb95c95d6e7c6bbd0",
       "dirty": false
     },
-    "expectedSource": "5264cbddf39aa7ce00bf50eb8d2a09ca26de97a4",
+    "expectedSource": "dcaa884030eebdac23e5eb4cb95c95d6e7c6bbd0",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1891,31 +1911,31 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T08-18-19-556Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T12-11-05-597Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
@@ -2130,6 +2150,12 @@
       "id": "work-evidence",
       "gaps": [
         "storage_cap 与并发写入窗口未单独触发；历史窗口语义按 complete/caller_limit 已验证。"
+      ]
+    },
+    {
+      "id": "restored-personal-review",
+      "gaps": [
+        "有效签名下的过期/foreign principal/host 拒绝由 main 模块契约覆盖；E 不伪造 probe-owned key。"
       ]
     },
     {

@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "5264cbddf39aa7ce00bf50eb8d2a09ca26de97a4",
+    "commit": "dcaa884030eebdac23e5eb4cb95c95d6e7c6bbd0",
     "dirty": false
   },
   "environment": {
@@ -11,14 +11,14 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-13T08:24:04.170Z",
+  "checkedAt": "2026-11-13T12:16:23.644Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 192,
+    "PASS": 196,
     "FAIL": 0,
     "SKIPPED": 0,
     "NOT_TESTED": 16,
@@ -746,6 +746,22 @@
       "evidence": [
         "E2-WORK-EVIDENCE",
         "E2-EVIDENCE-HISTORY"
+      ]
+    },
+    {
+      "id": "restored-personal-review",
+      "capability": "显式恢复 personal 项目的只读审阅入口与拒绝面",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "PASS",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "有效签名下的过期/foreign principal/host 拒绝由 main 模块契约覆盖；E 不伪造 probe-owned key。"
+      ],
+      "evidence": [
+        "E4-PERSONAL-RESTORED-REVIEW",
+        "E5-RESTORED-REVIEW-REFUSALS"
       ]
     },
     {
