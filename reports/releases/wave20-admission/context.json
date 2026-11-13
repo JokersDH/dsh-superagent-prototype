@@ -1,0 +1,150 @@
+{
+  "protocol": "wave20-ac-independent-admission/1",
+  "date": "2026-11-13",
+  "mainSource": "22088996ad4b6ffec534b07a89db4c270cec1627",
+  "mainRuntimeBaseline": "9856124 versioned snapshots and 6050b4b source confirmation",
+  "sources": {
+    "A": "d1050e9944f33f366a673f2b7e8c4eb1ffc0f125",
+    "C": "647682c31a8b231063af39f68871cba6b7ca4964"
+  },
+  "modelCalls": 0,
+  "vendorNativeTurns": 0,
+  "browserRuns": 0,
+  "releaseApproved": false,
+  "summary": {
+    "A": "The former handwritten unified Q&A/source-intent gap closes at the existing main controlled-product fixture layer. Same-Store real business, SDK/context and source facts survive both snapshot formats and readonly second-root reads. Package runtime tests pass, but its new owned fixture fails strict compilation at two lines.",
+    "C": "The same-store real controlled Work/Ticket/Broker/answer/delivery chain now reaches one verified snapshot and second-root readonly HTTP/source confirmation. Package tests, strict and build pass. Personal readonly binding remains a separate forthcoming main consumer; no global failure is assigned to that dependency.",
+    "productionFindings": "No new production safety or data-integrity defect was found within this finite changed-path audit."
+  },
+  "A": {
+    "regression": {
+      "testCommand": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows test",
+      "testExitCode": 0,
+      "storagePassed": 87,
+      "workflowsPassed": 112,
+      "totalPassed": 199,
+      "testLog": "/tmp/pa-wave20-a-tests.log",
+      "buildCommand": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows build",
+      "buildExitCode": 0,
+      "strictCommand": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows typecheck",
+      "strictExitCode": 2,
+      "strictStorage": "PASS",
+      "strictWorkflows": "FAIL: TS2322 at wave19-unified-data.case.ts:126 and TS2722 at :137",
+      "reportedCountNote": "The authored wave19 status still lists 109 workflows/196 total and typecheck PASS. Independent fixed-source execution is 112 workflows/199 total, with strict failure."
+    },
+    "focusedRealConsumers": {
+      "command": "node --test packages/workflows/test/wave19-unified-data.case.ts packages/workflows/test/wave16-candidate-restore.case.ts",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "log": "/tmp/pa-wave20-a-unified.log",
+      "causalPath": "Existing main createControlledProduct/createProductRuntime -> Application create_work -> Effects -> controlled fixture executor -> Broker question -> Application answer_question -> original answer delivery native_applied. Rows are observed/asserted, not inserted as substitute business facts.",
+      "businessRows": { "works": 1, "tickets": 1, "questions": 1, "answers": 1, "deliveries": 1, "nativeApplied": 1, "dispatch": 2 },
+      "sameStoreData": ["real business identities", "original local SDK reply/candidate", "explicit candidate decision confirmation", "selected-context bundle/binding", "actual source prepare/confirm/audit fact and receipt", "held queue"],
+      "formats": [
+        { "format": 1, "protocol": "workflow-snapshot/1", "families": 13, "databaseBytes": 679936, "created": "ok", "verified": "ok", "readonlySecondRoot": "PASS" },
+        { "format": 2, "protocol": "workflow-snapshot/2", "families": 21, "databaseBytes": 679936, "created": "ok", "verified": "ok", "readonlySecondRoot": "PASS" }
+      ],
+      "providerRequests": 2,
+      "providerScope": "Two original local mock SDK requests for chat/context; no additional provider request after restore.",
+      "sourceFactsScope": "Source prepare/confirm/audit is run through the real HTTP over the same source Store before snapshot. Second roots read the copied exact source activation/receipt. No private permission, target creation or startup is inferred.",
+      "restoredReadsScope": "Work/question/answer/native_applied identity is checked through A public Store ports. Second-root HTTP explicitly checks candidate/history; business chat refuses and queue/event cursor stays unchanged. This A test does not read the restored Q&A through HTTP and its restored runtime has no assistant provider attached."
+    },
+    "producerOwnership": "No external B producerPath/SHA or B checkout script is imported. This is the already-existing admitted main controlled normal-product path, an equivalent real Application/Broker causal producer. It is not B independent Runner reconnect/crash-recovery or vendor-native protocol evidence."
+  },
+  "C": {
+    "regression": {
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing test",
+      "exitCode": 0,
+      "contextPassed": 124,
+      "proposalsPassed": 41,
+      "knowledgePassed": 98,
+      "routingPassed": 44,
+      "totalPassed": 307,
+      "log": "/tmp/pa-wave20-c-tests.log",
+      "typecheckExitCode": 0,
+      "buildExitCode": 0
+    },
+    "focusedRealConsumer": {
+      "command": "node --test packages/knowledge/test/main-business-snapshot-chain.case.ts",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "log": "/tmp/pa-wave20-c-business.log",
+      "producer": "A single real ProductStore and main createControlledProduct runtime generates two Works/Tickets. The first question is answered through Application, delivery becomes native_applied, and the candidate is explicitly accepted to delivered. The second Work keeps an actual Broker question pending.",
+      "normalChain": "Same runtime/Store also produces the actual SDK candidate, pointer prepare/explicit decision confirmation, selected-context bundle/history. Permission question/answer content remains anchored/display provenance and is excluded from ordinary selected conversation context.",
+      "formats": "The same Store produces and verifies default v1 and explicit v2; unsupported format3 refuses before a destination exists.",
+      "restoredFormat": 1,
+      "restoredHttp": ["snapshot exposes original Works and pending question", "work GET preserves delivered state", "question deliveries GET preserves native_applied", "candidate GET keeps original payloadDigest", "history and audit keep original frozen binding/bundleDigest"],
+      "readonlyRefusals": ["answer pending question", "create_work", "candidate prepare", "proposal command", "context preview", "original context-send token", "runtime.start"],
+      "heldQueue": "Effect-row count unchanged through refused business mutations and source confirmation",
+      "provider": "Original counted local SDK provider is attached to the readonly runtime; no extra request occurs after snapshot restoration.",
+      "sourceFacts": "The actual source prepare/confirm/audit HTTP executes on this restored second root. It stays not_granted/startupAvailable=false, does not create the proposed target, consume queue rows or resend provider requests.",
+      "scope": "Controlled fixture recovery_readonly composition. Restored personal project binding, installed bytes, physical quiescence, private permission and target startup are not claimed."
+    },
+    "producerOwnership": "Uses existing main controlled normal-product entrypoints, not an external B-owned producer script or vendor runtime. It adds no SQL/HTTP/grant/LLM authority.",
+    "moduleOnlyRetained": ["selectRelevantSources", "projectSourceReview", "collectContextHistory HTTP replacement"]
+  },
+  "mainVersionGuardRegression": {
+    "command": "node --test tests/integration/snapshot-version-compat.case.mjs tests/integration/snapshot-schema-admission.case.mjs",
+    "exitCode": 0,
+    "passed": 21,
+    "failed": 0,
+    "log": "/tmp/pa-wave20-main-version.log",
+    "retained": ["Complete genuine old13-family evidence golden and nonempty binding digest", "Default v1 output and readonly verification", "Explicit v2 exact21-family recipe", "Exact protocol/family/digest checks and invalid-version refusal", "Both formats reject null/invalid/fractional schema and required-table/index/meta/unknown-table negatives in the scoped test set"]
+  },
+  "findings": [
+    {
+      "id": "A_NEW_UNIFIED_FIXTURE_FAILS_STRICT_AGENTPROFILE",
+      "severity": "P2",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows/test/wave19-unified-data.case.ts",
+      "line": 126,
+      "error": "TS2322",
+      "detail": "The recoveryExecutor callback returns only id/revision/executable/expectedVersion. The published createProductRuntime option requires a complete AgentProfile, including driverId/driverApiMajor/driverRelease/argv/nativeConfigRef/permissionPolicyRevision/requiredFeatures. The package typecheck exits2 despite the report claiming PASS.",
+      "scope": "Owned test/consumer compile contract; the runtime regression tests themselves pass. Do not weaken the main shared type or suppress the error to admit this fixture."
+    },
+    {
+      "id": "A_NEW_UNIFIED_FIXTURE_CALLS_OPTIONAL_READER",
+      "severity": "P2",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows/test/wave19-unified-data.case.ts",
+      "line": 137,
+      "error": "TS2722",
+      "detail": "sourceRuntime.read.recovery is optional in the structural LocalHttp read port and is invoked without narrowing. Assert the actual provided consumer before calling it so strict/exactOptional verification reflects the same runtime path.",
+      "scope": "Same owned fixture compile failure, not a production authorization bypass."
+    }
+  ],
+  "mainIntegration": {
+    "productionSource": "A backup.ts and workflows/snapshot.ts are byte-equivalent to the current main2208899 source. No fresh production import is required for this wave; retain main's default-v1/explicit-v2 and valid-schema guards.",
+    "minimalReusableSlices": [
+      "A packages/workflows/test/wave19-golden.case.ts as additional golden consumer evidence",
+      "A packages/workflows/test/wave19-unified-data.case.ts after completing the typed profile and narrowing its optional reader",
+      "A wave16-candidate-restore real business/source HTTP additions as scoped data/readonly regression evidence",
+      "C packages/knowledge/test/main-business-snapshot-chain.case.ts as passing same-Application/Store/Broker -> snapshot -> second-root readonly/source HTTP consumer",
+      "Owned parameterized recipe updates; no whole-package merge of older schema-inventory/target-inventory variants or unrelated helpers"
+    ],
+    "personalBindingDependency": "The main personal historical-project readonly-binding entry is not published at the fixed baseline. A7/C4 remain a specific NOT_REACHED dependency, not rejection of the passing controlled same-chain work. Main intends to implement the actual entry separately."
+  },
+  "nextOutcomePackages": {
+    "A": {
+      "outcome": "Current personal readonly-binding data consumer and installed nonempty recovery recipe",
+      "early": "Close the two owned strict errors, update fresh112-workflow counts and retain the now-real Broker/SDK/source chain without changing shared AgentProfile or snapshot defaults.",
+      "middle": "Consume main's actual personal-readonly binding when published: persist/read only the narrowly requested provenance/principal/root-bound data through the existing Store/UoW, demonstrate exact original artifacts/receipts and held queues without inventing permission.",
+      "final": "Give D/E one executable same-package normal-producer -> selected snapshot version -> restored personal readonly recipe, including exact version/schema/artifact identity, failure/replay boundaries and bounded costs. Controlled fixture, installed/personal and native/activation scopes stay separate."
+    },
+    "C": {
+      "outcome": "Real personal restored-history/candidate/question review under explicit readonly binding",
+      "early": "Retain this passing same-chain fixture outcome as a baseline; consume main's published binding DTO/HTTP with explicit current principal/root/source and readonly consent, without reading old settings as grants.",
+      "middle": "Review the same restored real Work/pending Question/native_applied evidence/candidate/frozen context through current personal entrypoints; verify wrong principal/root/source, scope shrink, stale/corrupt artifacts and old tokens refuse or remain audit-only.",
+      "final": "Exercise source fact confirmation alongside readonly binding without enabling business/target/old queues, record actual reader/provider counts and supply precise current consumers to E. Do not add a second confirmation authority, SQL/HTTP writer or private model loop."
+    }
+  },
+  "preserved": {
+    "AWorktree": "clean",
+    "CWorktree": "original pnpm-lock.yaml diff only",
+    "userServiceGroups": 12,
+    "servicesTouched": false,
+    "ledgersTouched": false,
+    "historicalReportsOverwritten": false,
+    "repositoryOutput": "reports/releases/wave20-admission/context.json"
+  }
+}

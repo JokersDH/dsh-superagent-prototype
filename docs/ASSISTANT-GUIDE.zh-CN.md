@@ -109,6 +109,15 @@
 
 ## 启停与开发检查
 
+恢复后的个人实例如果缺少原项目注册，历史候选或来源可能返回403。当前可由本机显式选择项目和允许路径，仅开放本次启动的历史审阅：
+
+```sh
+node tools/dev/review-restored.mjs --state /absolute/restored-state --project historical-project --allow-path src/ --output /absolute/new-review.json
+node tools/dev/workbench.mjs --discussion-only --state /absolute/restored-state --port 5192 --api-port 8808 --review-restored-scope /absolute/new-review.json
+```
+
+将示例根目录、历史项目ID、路径和空闲端口换成实际输入。配置文件必须尚不存在，生成后五分钟内显式用于启动；状态变化或重开时重新准备。它只开放历史候选/使用记录/原文读取，不启用模型、旧任务、批准或目标执行；当前没有对应网页授权表单。说明见[只读启动边界](rfcs/WP-16/0054-explicit-restored-personal-review.md)。原有十二实例不需为此重启。
+
 恢复源确认的后端现已提供只读准备和明确确认接口，供恢复开发与验收使用；当前网页尚无对应表单，旧运行实例未自动更新。它只记录本次源意图并支持核对原回执，不启动目标、不消费旧队列。恢复激活与私有本机许可仍未开放，详见[源确认检查点](rfcs/WP-16/0048-actual-source-confirmation-checkpoint.md)。
 
 ```sh
