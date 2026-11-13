@@ -1,0 +1,182 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "712e191",
+  "mergeCommit": "b90d210",
+  "checkpoints": [
+    "d8adbb7"
+  ],
+  "testedSourceCommit": "d8adbb7",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "workflowV1Families": 13,
+  "workflowV2Families": 21,
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "existing attempt ports",
+      "evidence": [
+        "wave22-attempt-facts.case.ts"
+      ],
+      "note": "maps binding/current/contract/attempt/epoch/session/resources, command receipts, dispatch intent/written/accepted/indeterminate, observations/payloads, question/answer/delivery and source facts; no new ledger or probe-only method"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "consistent reopen",
+      "evidence": [
+        "wave22-attempt-facts.case.ts"
+      ],
+      "note": "real controlled attempt is read before answer and after reopen; same attempt/ticket/assignment/contract/fence/question/answer/delivery/observations identities; read does not authorize resend"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "B/main data recipe",
+      "evidence": [
+        "wave22-attempt-facts-and-data-recipe.md"
+      ],
+      "note": "public producer/reader commands; normal controlled Broker and B-owned external producer scopes kept distinct; credentials/endpoints remain in original registration"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "intent/observed/unknown",
+      "evidence": [
+        "wave22-attempt-facts.case.ts"
+      ],
+      "note": "not_sent/written write-before intent, indeterminate unknown, command receipt alone is not native observation; real answer reaches native_applied; no command/attempt replacement"
+    },
+    {
+      "phase": "A5",
+      "status": "NOT_REACHED",
+      "scope": "B attach dependency",
+      "detail": "B has not delivered the same-Runner business attach port; new coordinator results landing in the original A Store with idempotent native_applied/unknown is blocked on that port"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "dual-format personal review",
+      "evidence": [
+        "wave20-personal-business",
+        "wave21-personal-v2",
+        "wave22-restored-personal 12/12"
+      ],
+      "note": "same real Work/Q&A/native_applied + SDK/context/candidate data through v1 and v2 snapshots to personal readonly; business 422, queue held, provider unchanged"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "Scope diagnostics",
+      "evidence": [
+        "wave20-personal-business narrow block",
+        "wave22-main-consumers 91/91"
+      ],
+      "note": "default sources shape unchanged; explicit ?scopeReview=1 returns bounded reasons selection_narrowed+exclusion_added, partial, withheldSourceCount=binding sources, authorization=none; actual state remains scope_changed/empty; no extra artifact reads"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "D/E parameterized driver",
+      "evidence": [
+        "wave22-attempt-facts-and-data-recipe.md"
+      ],
+      "note": "recipe variables install root/producer SHA/state root/project/allow/exclude/format/ports/review entry; public CLI/APIs only; source-only tests do not certify installed consumer bytes"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "strict/cost",
+      "evidence": [
+        "strict typecheck",
+        "wave22-performance.json"
+      ],
+      "note": "strict/exactOptional/build pass; one recipe scan per format; bodies lazy; no cross-await SQL transaction or migration"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "final regression",
+      "evidence": [
+        "wave22-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, personal/source/candidate/target consumers, typecheck/build and static check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "115/115",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "restoredPersonal": "12/12",
+    "recoveryCombination": "106/106",
+    "mainProductConsumers": "91/91",
+    "mainTargetConsumers": "50/50",
+    "candidateConsumers": "31/31",
+    "productExecution": "20/20",
+    "genuineV1Probe": "2/2",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "limits": {
+    "v1Families": 13,
+    "v2Families": 21,
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288
+  },
+  "failureWindows": [
+    "unsent intent",
+    "written not observed",
+    "indeterminate unknown",
+    "native_applied result",
+    "ended binding not writer-stop",
+    "mixed v1/v2",
+    "missing artifact/table/index",
+    "foreign principal/root",
+    "expired review file",
+    "narrow scope scope_changed",
+    "selection reuse mismatch"
+  ],
+  "blockers": [
+    {
+      "owner": "B",
+      "id": "business-attach-port",
+      "detail": "No same-Runner business attach; A5 results landing/idempotence is NOT_REACHED. Existing inspect/cancel wrapper is not business resume."
+    },
+    {
+      "owner": "main",
+      "id": "private-permission-target",
+      "detail": "Personal readonly selection and source facts exist; private startup permission, physical writer proof and target activation remain unimplemented."
+    }
+  ],
+  "notTested": [
+    "B business attach/recovered answer delivery",
+    "private startup permission/target activation",
+    "physical writer proof",
+    "D installed consumer",
+    "E independent release acceptance",
+    "real vendor model/native"
+  ],
+  "mainNextSteps": [
+    "use wave22 attempt-fact map to consume B attach results without inventing a ledger",
+    "keep receipt/dispatch/observation/unknown distinct",
+    "retain scopeReview as explanation only, never authorization",
+    "use wave22 recipe for D/E consumer-byte checks"
+  ],
+  "updatedAt": "2026-11-13T20:10:00.000Z"
+}
