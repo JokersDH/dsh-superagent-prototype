@@ -1,0 +1,86 @@
+{
+  "protocol": "agent-c-wave17-status/1",
+  "wave": "product-wave-17",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "d494212",
+    "mergeCommit": "1f7af35",
+    "mainRuntimeBaseline": "6050b4b",
+    "previousOwnCommit": "f56f17c",
+    "earlyCheckpoint": "2531fe8",
+    "middleCheckpoint": "d801d95",
+    "rootLockDiffPreserved": true
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "sourceMapping": {
+    "A": { "root": "/Users/hh/Desktop/joker/superagent-agent-a", "head": "8b462e1997f2f9bfb58ca544a10d32d992aaedce", "state": "dirty: packages/storage source mid-change; dist inconsistent with source" },
+    "C": { "head": "2531fe8/d801d95 plus final commit", "state": "clean owned paths" },
+    "main": { "mergeBase": "1f7af35", "runtimeBaseline": "6050b4b/6050b4b" }
+  },
+  "probes": {
+    "wave17Full": { "status": "NOT_REACHED", "reason": "probe-wave17-context.mjs imports A packages/storage dist; A worktree has uncommitted schema-inventory/target-inventory changes and its dist refuses the import. Not built or modified in A's workspace." },
+    "wave17COnly": { "status": "PASS", "passed": 4, "failed": 0, "evidence": "packages/context/reports/wave17-c-probe.json", "modes": ["TYPED_NONEMPTY_POSITIVE", "OUTER_GETTER_REFUSAL_CONTROL", "NESTED_BODY_GETTER_REFUSAL", "NESTED_PRINCIPAL_GETTER_REFUSAL"] },
+    "wave15Regression": { "passed": 4, "failed": 0 },
+    "wave14Regression": { "passed": 6, "failed": 0 },
+    "wave13Regression": { "passed": 6, "failed": 0 },
+    "wave12Regression": { "passed": 8, "failed": 0 },
+    "wave11Regression": { "passed": 17, "failed": 0 }
+  },
+  "consumerMap": {
+    "actualCalls": [
+      { "entry": "reviewVerifiedReplyCandidates", "caller": "packages/knowledge/test/main-candidate-chain.case.ts via main CompletedAssistantReplies.readVerified" },
+      { "entry": "GET /v1/messages/:id/candidates + prepare + proposals confirm/reject", "caller": "packages/knowledge/test/main-candidate-chain.case.ts (real local SDK fixture, 8 cases)" },
+      { "entry": "recovery_readonly runtime + HTTP", "caller": "packages/knowledge/test/main-recovery-readonly.case.ts (same real root, marker, held queue)" },
+      { "entry": "POST /v1/recovery/source/prepare + confirm + audit", "caller": "packages/knowledge/test/main-recovery-readonly.case.ts" },
+      { "entry": "main context preview default C factory", "caller": "packages/knowledge/test/main-context-http.case.ts (600 boundary partial/issues)" }
+    ],
+    "moduleOnly": [
+      "selectRelevantSources / candidate batches (main composes retrieval in its preview)",
+      "projectSourceReview (main maps its own preview DTO)",
+      "collectContextHistory (main history HTTP uses its own reader; C reads real A18 tables in tests)"
+    ]
+  },
+  "readonlyEvidence": {
+    "candidates": "200, executable=false, authorization=none",
+    "history": "200, non-empty frozen entries",
+    "frozenAudit": "bundleDigest identical to normal root",
+    "businessMutations": "candidates/prepare, proposals, context/preview, assistant context, decisions prepare all 422",
+    "oldQueue": "held queue row count unchanged",
+    "sourceConfirm": "prepare/confirm 200 not_granted/startupAvailable=false; arbitrary target not created; audit equals confirm",
+    "model": "0 additional provider calls",
+    "works": "0"
+  },
+  "replayEvidence": [
+    "candidate confirm receipt replays after decision revoke with no second decision/work",
+    "candidate confirm receipt replays after artifact corruption with no provider resend",
+    "source confirm audit equals original confirm record; original token/fact path not re-authorized"
+  ],
+  "costEvidence": {
+    "providerCalls": "1 per reply; 8 candidates + 30k text still 1",
+    "conversationScanBoundary": "600 messages -> preview partial + conversation_scan_incomplete + omitted source_unavailable",
+    "historyScale": "wave-15 10000-history evidence retained; no re-run needed (complexity unchanged)",
+    "readonly": "GET-only review; no effect consumption"
+  },
+  "ownedRegressions": {
+    "contextTests": { "passed": 124, "failed": 0 },
+    "proposalsTests": { "passed": 41, "failed": 0 },
+    "knowledgeTests": { "passed": 96, "failed": 0 },
+    "routingTests": { "passed": 44, "failed": 0 },
+    "typecheck": "pass",
+    "build": "pass"
+  },
+  "notReached": [
+    { "item": "wave17 full A+C probe (snapshot mixed-version / missing-required-table)", "owner": "A", "reason": "A source/dist mid-change; C did not build or modify A workspace" },
+    { "item": "main private startup permission / target activation / native value", "owner": "main", "reason": "layered and not delivered; source confirm stays not_granted" },
+    { "item": "assistant SSE admission", "owner": "main", "reason": "not read by C consumers" },
+    { "item": "real remote model/provider", "owner": "main", "reason": "fixture is a private local pseudo-SDK; real model/native turns 0" }
+  ],
+  "preserved": {
+    "userServices": "5180/8796 through 5191/8807 untouched",
+    "historicalReports": "wave01-wave16 reports unchanged",
+    "rootLock": "pnpm-lock.yaml diff preserved and not committed"
+  }
+}

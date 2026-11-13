@@ -1,0 +1,47 @@
+{
+  "protocol": "wave17-c-only-observations/1",
+  "sourceCommit": "1f7af35febf53221621fea7429687a026a36b07d",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "observations": [
+    {
+      "id": "TYPED_NONEMPTY_POSITIVE",
+      "status": "PASS",
+      "observed": {
+        "status": "candidates",
+        "candidates": 1
+      },
+      "expected": "candidates"
+    },
+    {
+      "id": "OUTER_GETTER_REFUSAL_CONTROL",
+      "status": "PASS",
+      "observed": {
+        "status": "invalid_body",
+        "candidates": 0
+      },
+      "expected": "invalid_body"
+    },
+    {
+      "id": "NESTED_BODY_GETTER_REFUSAL",
+      "status": "PASS",
+      "observed": {
+        "status": "invalid_body",
+        "candidates": 0
+      },
+      "expected": "invalid_body"
+    },
+    {
+      "id": "NESTED_PRINCIPAL_GETTER_REFUSAL",
+      "status": "PASS",
+      "observed": {
+        "status": "invalid_body",
+        "candidates": 0
+      },
+      "expected": "invalid_body"
+    }
+  ],
+  "passed": 4,
+  "failed": 0,
+  "scope": "C half only: private-wrapper robustness. A snapshot half of probe-wave17-context is NOT_REACHED because A workspace dist/source are mid-change."
+}
