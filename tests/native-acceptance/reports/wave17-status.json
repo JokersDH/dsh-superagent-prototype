@@ -1,0 +1,80 @@
+{
+  "wave": "product-wave-17",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "d494212",
+  "previousCandidate": "8d7ddce",
+  "packet": "agent-tasks/product-wave-17/agent-b-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0049",
+  "scopeNote": "Zero real model and native turns. Only B-owned paths. No second ledger/coordinator/lifecycle, no shared-contract change, no main product class edited. Twelve services untouched. Two historical report diffs preserved; untracked b16-real-begin.mjs preserved and not submitted. Shared probe output in /tmp.",
+
+  "B1_preparation_contract": {
+    "status": "NOT_CLOSED",
+    "rootCauseAddressed": "wave-16 blocker was that the codex-fake lane swapped in CodexNativeDriver (never emits policy.prepared) and disabled eager preparation, while main's NativeProductAttempt awaits a policy.prepared fact before feeding begin",
+    "fixDelivered": "the ORIGINAL CodexProductDriver and every preparation/authorization guard are retained; a B-owned fake executable process now answers the version and app-server protocol that the driver actually calls, so no guard is removed and no prepared fact is fabricated",
+    "evidence": "tests/native-acceptance/b17-product-native.mjs",
+    "observed": {
+      "runnerSpawned": true,
+      "childWriterProcessSpawned": true,
+      "childResourceRef": "res-<pid>-<hash> ownership=spawned_process",
+      "factReceiptsPersistedInAStore": 2,
+      "wave16FactReceipts": 0,
+      "receiverBeginCount": 0,
+      "bindingState": "stopping"
+    },
+    "remainingBlocker": "the attempt serves, persists 2 critical fact receipts through the product sink, and then reaches binding state stopping BEFORE main feeds begin; the receiver log therefore has no begin. Which two facts these are and why serve() ends early is not yet identified, because fact_receipts stores only fact_id/payload_digest/seq and runtime.observed carries no kind.",
+    "nextStep": "identify the two fact kinds at the sink boundary and why the driver's serve() completes before begin; only then does the preparation contract close"
+  },
+
+  "B2_application_join": {
+    "status": "PARTIAL",
+    "proven": [
+      "the real create_work -> Application -> Effects -> NativeProductAttempt -> RunnerLink path spawns a real runner-service-entry process",
+      "that runner spawns a real child writer process, recorded as a spawned_process resource on the binding",
+      "native facts land in A's durable store through the product sink (fact_receipts=2), not as in-memory persisted:true",
+      "Work/Ticket/ticket_link/binding rows are created and consistent"
+    ],
+    "notProven": [
+      "begin is not fed, so dispatch_receipts stays 0 and no source fact is tied to a begun attempt",
+      "no question exists; this fixture emits no approval by default and the approval variant behaved identically",
+      "the receiver/binding attempt identity cannot yet be cross-checked against a begin"
+    ]
+  },
+
+  "receiverHalfCarriedForward": {
+    "from": "8d7ddce (wave-16), unchanged and still true",
+    "detail": "a separately spawned Runner does receive begin (1) and emits dispatch.observed/turn.ended when driven directly through RunnerLink; that half is independent of the product join attempted here"
+  },
+
+  "regressions": {
+    "b13_normal_vertical": "unchanged at 6 PASS + 1 NOT_TESTED (not re-run after the last edit)",
+    "driver_kit": "65/65 previously; unchanged sources",
+    "strict": "no shared contract or main product source touched"
+  },
+
+  "notReached": {
+    "B3_questionAndChildWriterIdentity": "child process exists but its birth PID/start/UID/resource manifest is not yet recorded as evidence; no real question",
+    "B4_businessReconnectPort": "not started",
+    "B5_beginCrashWindows": "not started",
+    "B6_answerAndStopRecovery": "not started",
+    "B7_validStaleEpochFence": "not started; epoch0 is only an invalid-input case and no stale-epoch claim is made",
+    "B8_recoveredDeliveryToAccept": "not started",
+    "B9_slots2And4AndReturn": "not started"
+  },
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "bConsumes": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "limitations": [
+    "the Driver runs against a B-owned fake executable; installed-Codex behaviour and gateway are NOT_TESTED and were not contacted",
+    "the preparation contract is not closed: begin never reaches the receiver in the product path",
+    "no question, no answer, no cancel, no crash window, no epoch fence, no recovered delivery, no slot matrix in this checkpoint",
+    "fact kinds are not recoverable from the current schema, which is why the two persisted facts are not yet identified"
+  ]
+}
