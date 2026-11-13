@@ -447,6 +447,9 @@ test('a v2 evidence manifest requires the exact complete family set while a v1 m
       ['duplicate-family', (manifest: any) => { manifest.evidence.families.push({ ...manifest.evidence.families[0] }) }],
       ['unknown-family', (manifest: any) => { manifest.evidence.families[0] = { ...manifest.evidence.families[0], name: 'unknown_family' } }],
       ['future-version', (manifest: any) => { manifest.evidence.familySetVersion = 3 }],
+      ['mixed-old-snapshot-new-evidence', (manifest: any) => { manifest.protocol = 'workflow-snapshot/1'; delete manifest.evidence.familySetVersion }],
+      ['v2-missing-family-version', (manifest: any) => { delete manifest.evidence.familySetVersion }],
+      ['v2-evidence-v1', (manifest: any) => { manifest.evidence.protocol = 'workflow-evidence/1' }],
     ] as const) {
       const target = copy(name); rewrite(target, mutate)
       assert.equal(new WorkflowSnapshots(data.store).verify(target).status, 'blocked', name)
@@ -461,6 +464,22 @@ test('a v2 evidence manifest requires the exact complete family set while a v1 m
     })
     assert.equal(new WorkflowSnapshots(data.store).verify(legacy).status, 'ok',
       'a v1 manifest is verified against the families it actually recorded')
+
+    for (const [name, mutate] of [
+      ['missing-empty-table', (db: any) => db.exec('DROP TABLE assistant_reply_results')],
+      ['missing-required-index', (db: any) => db.exec('DROP INDEX assistant_context_history_scope')],
+      ['unknown-table', (db: any) => db.exec('CREATE TABLE unexpected_snapshot_table (id TEXT PRIMARY KEY)')],
+    ] as const) {
+      const target = copy(name), databasePath = join(target, 'product.sqlite')
+      const database = new Database(databasePath)
+      try { mutate(database) } finally { database.close() }
+      rewrite(target, manifest => {
+        const bytes = readFileSync(databasePath)
+        manifest.database.bytes = bytes.byteLength
+        manifest.database.sha256 = createHash('sha256').update(bytes).digest('hex')
+      })
+      assert.equal(new WorkflowSnapshots(data.store).verify(target).status, 'blocked', name)
+    }
   } finally {
     data.store.close(); rmSync(data.root, { recursive: true, force: true })
   }

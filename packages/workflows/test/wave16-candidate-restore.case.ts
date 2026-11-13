@@ -55,6 +55,7 @@ test('a real candidate confirmation survives a snapshot restore at a second root
   const result = store.workflows.assistant.replyResults.forRequest(requestId)
   assert.ok(result)
 
+  store.queue.enqueue('application.execute', 'wave16-candidate-held', '{"held":true}', 1, 0, new Date().toISOString())
   const snapshot = join(root, 'snapshot')
   const created = await new WorkflowSnapshots(store).create({ destination: snapshot })
   assert.equal(created.status, 'ok', created.message)
@@ -71,5 +72,28 @@ test('a real candidate confirmation survives a snapshot restore at a second root
     assert.ok(JSON.parse(artifact).suggestions.length > 0)
     const verification = new WorkflowSnapshots(restored).verify(restoreRoot)
     assert.equal(verification.status, 'ok', verification.message)
+    assert.equal(restored.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 10)
+      .some(row => row.key === 'wave16-candidate-held'), true)
+
+    // Start the actual recovery_readonly runtime/HTTP over the second-root database.
+    const readonly = createProductRuntime({ store: restored, stateRoot: restoreRoot, scratchProject: projectRoot, principal,
+      projects: [{ id: projectId, scope }], actionSecret: Buffer.alloc(32, 63), startupMode: 'recovery_readonly' })
+    try {
+      const app = createLocalHttpApp({ application: readonly.application, principal, apiToken, bootstrapToken: 'b'.repeat(64),
+        allowedOrigins: ['http://127.0.0.1:5173'], mode: 'personal', startupMode: 'recovery_readonly',
+        read: readonly.read, operations: readonly.operations })
+      const snapshotResponse = await app.request(`http://127.0.0.1/v1/snapshot?conversationId=${encodeURIComponent(conversationId)}`, { headers })
+      assert.equal(snapshotResponse.status, 200)
+      const snapshotValue = await snapshotResponse.json() as any
+      assert.ok(snapshotValue.conversation.messages.some((message: any) => message.provenance === 'reasoner_reply' && message.text.length > 0))
+      const queueBefore = restored.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 10)
+      const eventsBefore = restored.events.cursor()
+      const rejected = await app.request('http://127.0.0.1/v1/commands', { method: 'POST', headers,
+        body: JSON.stringify({ kind: 'chat', commandId: 'readonly-must-not-send', conversationId, projectId, text: 'Do not send' }) })
+      assert.notEqual(rejected.status, 200)
+      assert.deepEqual(restored.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 10), queueBefore)
+      assert.equal(restored.events.cursor(), eventsBefore)
+      assert.equal(restored.product.messages.page(conversationId).messages.filter(message => message.provenance === 'reasoner_reply').length, 1)
+    } finally { await readonly.close() }
   } finally { restored.close(); restored = undefined; rmSync(restoreRoot, { recursive: true, force: true }) }
 })

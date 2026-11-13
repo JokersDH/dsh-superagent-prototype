@@ -10,7 +10,7 @@ import {
 } from 'node:fs'
 import { dirname, join } from 'node:path'
 import {
-  backupDatabase, EVIDENCE_FAMILY_SET_VERSION, PRODUCT_SCHEMA_VERSION, readArtifactRegistry, readRoutingArtifactRefs, readWorkflowEvidence, verifyDatabase,
+  backupDatabase, EVIDENCE_FAMILY_SET_VERSION, PRODUCT_SCHEMA_VERSION, inspectSchemaInventory, readArtifactRegistry, readRoutingArtifactRefs, readWorkflowEvidence, verifyDatabase,
   type ArtifactRegistryRow, type ProductStore, type WorkflowEvidenceSummary,
 } from '@personal-agent/storage'
 
@@ -34,6 +34,8 @@ export interface SnapshotManifest {
   incompatibleSchema: boolean
   /** Bounded identities+digests for durable decisions/settings/contracts/verification/outcomes/reviews. */
   evidence: WorkflowEvidenceSummary
+  /** Required schema objects observed when this snapshot was created. */
+  schemaInventory?: { missingTables: readonly string[]; missingIndexes: readonly string[]; unknownTables: readonly string[] }
   complete: boolean
   missing: readonly string[]
   corrupt: readonly string[]
@@ -130,8 +132,11 @@ export class WorkflowSnapshots {
       foreignKeyViolations: backup.foreignKeyViolations,
     }
     const incompatibleSchema = database.productSchema > PRODUCT_SCHEMA_VERSION
+    const schemaInventory = inspectSchemaInventory(databasePath, database.productSchema)
+    const schemaOk = !schemaInventory.futureSchema && schemaInventory.missingTables.length === 0 &&
+      schemaInventory.missingIndexes.length === 0 && schemaInventory.unknownTables.length === 0
     const complete = missing.length === 0 && corrupt.length === 0 && missingReferences.length === 0 &&
-      !incompatibleSchema && database.integrity === 'ok' && database.foreignKeyViolations === 0
+      !incompatibleSchema && schemaOk && database.integrity === 'ok' && database.foreignKeyViolations === 0
     const manifest: SnapshotManifest = {
       protocol: 'workflow-snapshot/2',
       createdAt: input.createdAt ?? new Date().toISOString(),
@@ -141,6 +146,8 @@ export class WorkflowSnapshots {
       missingReferences,
       incompatibleSchema,
       evidence,
+      schemaInventory: { missingTables: schemaInventory.missingTables, missingIndexes: schemaInventory.missingIndexes,
+        unknownTables: schemaInventory.unknownTables },
       complete,
       missing,
       corrupt,
@@ -220,8 +227,13 @@ export class WorkflowSnapshots {
       : manifest.protocol === 'workflow-snapshot/2'
         ? familySetVersion === EVIDENCE_FAMILY_SET_VERSION && manifest.evidence?.protocol === 'workflow-evidence/2' &&
           manifest.evidence.digest === evidence.digest && exactFamilies
-        : familySetVersion === undefined && legacyFamilies
-    const ok = manifest.complete && !manifest.incompatibleSchema && !incompatibleSchema &&
+        : manifest.protocol === 'workflow-snapshot/1'
+          ? familySetVersion === undefined && manifest.evidence?.protocol === 'workflow-evidence/1' && legacyFamilies
+          : false
+    const schemaInventory = inspectSchemaInventory(databasePath, verified.productSchema)
+    const schemaOk = !schemaInventory.futureSchema && schemaInventory.missingTables.length === 0 &&
+      schemaInventory.missingIndexes.length === 0 && schemaInventory.unknownTables.length === 0
+    const ok = manifest.complete && !manifest.incompatibleSchema && !incompatibleSchema && schemaOk &&
       evidenceMatches &&
       databaseSha === manifest.database.sha256 &&
       verified.integrity === 'ok' && verified.foreignKeyViolations === 0 &&
@@ -236,7 +248,9 @@ export class WorkflowSnapshots {
       ...(ok ? {} : {
         message: incompatibleSchema
           ? `Snapshot schema ${String(verified.productSchema)} is not restorable by this build (${PRODUCT_SCHEMA_VERSION}).`
-          : 'Snapshot bytes, database integrity or referenced artifacts do not match the manifest.',
+          : !schemaOk
+            ? `Snapshot schema is missing required objects: ${JSON.stringify(schemaInventory)}`
+            : 'Snapshot bytes, database integrity, family version or referenced artifacts do not match the manifest.',
       }),
     }
   }
