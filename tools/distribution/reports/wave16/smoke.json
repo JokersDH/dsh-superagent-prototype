@@ -1,0 +1,554 @@
+{
+  "case": "DIST-TRIAL-01",
+  "status": "PASS",
+  "startedAt": "2026-11-13T02:37:02.283Z",
+  "steps": [
+    {
+      "id": "build",
+      "status": "PASS",
+      "detail": {
+        "buildId": "daa37616cf6a1498",
+        "artifacts": {
+          "count": 888,
+          "bytes": 8662547
+        },
+        "dependencies": {
+          "count": 8,
+          "files": 5803
+        },
+        "staged": {
+          "path": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8rUgJq/stage-build",
+          "installManifest": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8rUgJq/stage-build/install.json"
+        }
+      }
+    },
+    {
+      "id": "stage-closure",
+      "status": "PASS",
+      "detail": {
+        "root": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8rUgJq/stage-relocated",
+        "files": 6731,
+        "dependencies": 8,
+        "workspacePackages": 21,
+        "entrypoints": {
+          "launcher": "app/apps/launcher/bin/pa.mjs",
+          "coordinator": "app/apps/coordinator/product/demo.ts",
+          "runner": "app/apps/runner/src/index.ts",
+          "consoleEntry": "app/apps/console/dist/index.html",
+          "nativeBinding": "app/node_modules/better-sqlite3"
+        },
+        "supportMatrix": {
+          "measured": [
+            "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+          ],
+          "node": ">=24.21.0 <25",
+          "abi": "137",
+          "sqlite": ">=3.53.4",
+          "notTested": [
+            "linux",
+            "win32",
+            "darwin-x64",
+            "other Node ABIs",
+            "other machines",
+            "personal native execution"
+          ]
+        },
+        "buildId": "daa37616cf6a1498"
+      }
+    },
+    {
+      "id": "first-run",
+      "status": "PASS",
+      "detail": {
+        "created": [
+          "data",
+          "cache",
+          "logs",
+          "workspace"
+        ]
+      }
+    },
+    {
+      "id": "config-root-adoption",
+      "status": "PASS",
+      "detail": {
+        "adopted": "initialized_from_install",
+        "buildId": "daa37616cf6a1498",
+        "releaseDigest": "8b974c945a31350c125d72d63ae878cfee80d0f8e427d171ecf2685b33e4b147",
+        "binding": "PASS",
+        "foreignInstall": "install_release_missing"
+      }
+    },
+    {
+      "id": "source-first-run-unverified",
+      "status": "PASS",
+      "detail": {
+        "reason": "release_missing_development",
+        "provenance": "unverified",
+        "binding": "WARN",
+        "wroteRelease": false
+      }
+    },
+    {
+      "id": "doctor-before-start",
+      "status": "PASS",
+      "detail": {
+        "status": "DEGRADED"
+      }
+    },
+    {
+      "id": "static-console",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:57042"
+      }
+    },
+    {
+      "id": "instance-marker",
+      "status": "PASS",
+      "detail": {
+        "buildId": "daa37616cf6a1498"
+      }
+    },
+    {
+      "id": "api-health-direct",
+      "status": "PASS",
+      "detail": {
+        "status": "ok",
+        "mode": "fixture",
+        "access": "local-development"
+      }
+    },
+    {
+      "id": "api-health-via-proxy",
+      "status": "PASS",
+      "detail": {
+        "status": "ok",
+        "mode": "fixture",
+        "access": "local-development"
+      }
+    },
+    {
+      "id": "product-configuration",
+      "status": "PASS",
+      "detail": {
+        "revision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
+        "projects": 1
+      }
+    },
+    {
+      "id": "console-asset",
+      "status": "PASS",
+      "detail": {
+        "path": "/assets/index-DJa5Q3MZ.js",
+        "bytes": 609472
+      }
+    },
+    {
+      "id": "status-running",
+      "status": "PASS",
+      "detail": {
+        "pid": 14562,
+        "checks": 15
+      }
+    },
+    {
+      "id": "reuse-verified-instance",
+      "status": "PASS",
+      "detail": {
+        "pid": 14562
+      }
+    },
+    {
+      "id": "completed-delivery-fixture",
+      "status": "PASS",
+      "detail": {
+        "workId": "f0e0899e1802985e84c6190734ac8553",
+        "artifacts": 4,
+        "bytes": 1756,
+        "vendorCalls": 0
+      }
+    },
+    {
+      "id": "backup-live",
+      "status": "PASS",
+      "detail": {
+        "archiveSha256": "d7da2ed5e1a17d5c8cf995d4ff8211a8637dceec3c7264c22242189fd41793f9",
+        "counts": {
+          "entries": 21,
+          "artifacts": 20,
+          "excluded": 11
+        },
+        "database": {
+          "integrity": "ok",
+          "foreignKeyViolations": 0,
+          "eventSeq": 51
+        },
+        "evidence": {
+          "digest": "4a350ee466f9a68caf5ac3481224f24c9ef67700e567881d90b0f1acf75d9a3f",
+          "counts": {
+            "projects": 0,
+            "works": 0,
+            "decisions": 0,
+            "assistantDecisions": 0,
+            "assistantProposals": 0,
+            "artifacts": 20,
+            "acceptedEvents": 1,
+            "routeAdvice": 0,
+            "reviewEvidence": 0,
+            "executionOutcomes": 0
+          },
+          "routing": "included"
+        }
+      }
+    },
+    {
+      "id": "verify-backup-live",
+      "status": "PASS",
+      "detail": {
+        "manifestDigest": "f2a37dfe04b0460ab4ef9f347c8b997080bcd3d02592b385c7ff5854d3c5de5e",
+        "entries": 21
+      }
+    },
+    {
+      "id": "rollback-refuses-active-state",
+      "status": "PASS",
+      "detail": {
+        "code": "target_active"
+      }
+    },
+    {
+      "id": "reuse-requires-matching-identity",
+      "status": "PASS",
+      "detail": {
+        "state": "requested_root_mismatch",
+        "ports": "instance_conflict"
+      }
+    },
+    {
+      "id": "concurrent-start-single-winner",
+      "status": "PASS",
+      "detail": {
+        "loserCode": "start_in_progress",
+        "winnerExit": 0
+      }
+    },
+    {
+      "id": "start-stable-diagnostics",
+      "status": "PASS",
+      "detail": {
+        "busyPort": "port_in_use",
+        "missingAuthor": "author_executor_unavailable",
+        "missingAuth": "author_auth_unavailable"
+      }
+    },
+    {
+      "id": "stop-primary",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 287
+      }
+    },
+    {
+      "id": "verify-backup-offline",
+      "status": "PASS",
+      "detail": {
+        "manifestDigest": "f2a37dfe04b0460ab4ef9f347c8b997080bcd3d02592b385c7ff5854d3c5de5e"
+      }
+    },
+    {
+      "id": "orphan-record-recovery",
+      "status": "PASS",
+      "detail": {
+        "killedLauncherPid": 16089,
+        "stoppedApiPid": 16098,
+        "status": "STOPPED_ORPHAN"
+      }
+    },
+    {
+      "id": "recovery-status-blocked-authorization",
+      "status": "PASS",
+      "detail": {
+        "startupMode": "recovery_readonly",
+        "authorization": "BLOCKED",
+        "owner": "main",
+        "pendingRebind": 0,
+        "queueReplay": "never"
+      }
+    },
+    {
+      "id": "restore-new-directory",
+      "status": "PASS",
+      "detail": {
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8rUgJq/restored",
+        "pendingRebind": 0,
+        "evidence": {
+          "status": "verified",
+          "digest": "4a350ee466f9a68caf5ac3481224f24c9ef67700e567881d90b0f1acf75d9a3f",
+          "counts": {
+            "projects": 0,
+            "works": 0,
+            "decisions": 0,
+            "assistantDecisions": 0,
+            "assistantProposals": 0,
+            "artifacts": 20,
+            "acceptedEvents": 1,
+            "routeAdvice": 0,
+            "reviewEvidence": 0,
+            "executionOutcomes": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "restore-refuses-non-empty",
+      "status": "PASS",
+      "detail": {
+        "code": "target_not_empty"
+      }
+    },
+    {
+      "id": "restore-refuses-corrupted",
+      "status": "PASS",
+      "detail": {
+        "code": "archive_invalid"
+      }
+    },
+    {
+      "id": "import-managed-bundle",
+      "status": "PASS",
+      "detail": {
+        "importId": "d7da2ed5e1a17d5c8cf995d4ff8211a8637dceec3c7264c22242189fd41793f9"
+      }
+    },
+    {
+      "id": "restore-managed-import",
+      "status": "PASS",
+      "detail": {
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8rUgJq/restored-imported"
+      }
+    },
+    {
+      "id": "restore-rebind-preserves-identity",
+      "status": "PASS",
+      "detail": {
+        "entity": "project-rebind-old",
+        "applied": 1,
+        "pendingRebind": 1,
+        "credentialsCarried": false
+      }
+    },
+    {
+      "id": "restored-first-start-readonly",
+      "status": "PASS",
+      "detail": {
+        "startupMode": "recovery_readonly",
+        "commandStatus": 422,
+        "errorCode": "unsupported_capability"
+      }
+    },
+    {
+      "id": "recovery-inspect-prepare-readonly",
+      "status": "PASS",
+      "detail": {
+        "startupMode": "recovery_readonly",
+        "fingerprintPresent": true,
+        "heldQueue": {
+          "waiting": 4,
+          "parked": 1
+        },
+        "authorization": "not_granted",
+        "commitAvailable": false,
+        "proposedProjectId": "project-8e8e73e4589ebcb5c456fd74",
+        "planBlockers": [
+          "authorization_not_implemented"
+        ],
+        "commitOwner": "main",
+        "databaseUnchanged": true,
+        "markerUnchanged": true,
+        "queueUnchanged": true
+      }
+    },
+    {
+      "id": "recovery-activation-blocked",
+      "status": "PASS",
+      "detail": {
+        "status": "BLOCKED",
+        "code": "marker_matches",
+        "authorization": "not_granted",
+        "commitAvailable": false,
+        "started": false,
+        "mainFailure": "main_source_intent_committed",
+        "owner": "main",
+        "sourceUnchanged": true,
+        "targetUntouched": true
+      }
+    },
+    {
+      "id": "stop-recovery-readonly",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 276
+      }
+    },
+    {
+      "id": "restore-does-not-revive-old-authority",
+      "status": "PASS",
+      "detail": {
+        "oldWriterPid": 999999,
+        "currentWriterPid": null,
+        "credentialsCarried": false,
+        "markerPreserved": true
+      }
+    },
+    {
+      "id": "recovery-keeps-old-business",
+      "status": "PASS",
+      "detail": {
+        "queued": 5,
+        "answers": 1,
+        "deliveries": 1,
+        "markerPreserved": true
+      }
+    },
+    {
+      "id": "login-gated-session",
+      "status": "PASS",
+      "detail": {
+        "beforeBootstrap": "auth_required",
+        "afterBootstrap": "authenticated",
+        "startupMode": "recovery_readonly",
+        "writeStatus": 422
+      }
+    },
+    {
+      "id": "stop-login-instance",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 268
+      }
+    },
+    {
+      "id": "start-restored",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:57198",
+        "health": {
+          "status": "ok",
+          "mode": "fixture",
+          "startupMode": "recovery_readonly",
+          "access": "local-development"
+        },
+        "startupMode": "recovery_readonly"
+      }
+    },
+    {
+      "id": "restored-delivery-bytes-roundtrip",
+      "status": "PASS",
+      "detail": {
+        "workId": "f0e0899e1802985e84c6190734ac8553",
+        "artifacts": 4,
+        "digestsMatch": true,
+        "phase": "delivered"
+      }
+    },
+    {
+      "id": "stop-restored",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 266
+      }
+    },
+    {
+      "id": "rollback-verifies-snapshot-before-move",
+      "status": "PASS",
+      "detail": {
+        "code": "archive_invalid"
+      }
+    },
+    {
+      "id": "rollback-rehearsal",
+      "status": "PASS",
+      "detail": {
+        "failedDir": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8rUgJq/restored.failed-2026-11-13T02-37-33-027Z",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-trial-smoke-8rUgJq/restored"
+      }
+    },
+    {
+      "id": "start-after-rollback",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:57229"
+      }
+    },
+    {
+      "id": "stop-after-rollback",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 267
+      }
+    },
+    {
+      "id": "stage-closure-start",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:57255",
+        "modules": 584,
+        "outsideClosure": 0,
+        "checkoutReferences": 0
+      }
+    },
+    {
+      "id": "doctor-executor-capabilities",
+      "status": "PASS",
+      "detail": {
+        "defaultReview": "no_executor_interface",
+        "requiredReviewBlocked": "BLOCKED",
+        "authorPathWithoutReviewer": "DEGRADED",
+        "reviewerCheck": "PASS"
+      }
+    },
+    {
+      "id": "stage-closure-stop",
+      "status": "PASS",
+      "detail": {
+        "stopMs": 5043,
+        "status": "RUNNING"
+      }
+    },
+    {
+      "id": "startup-verifies-executed-bytes",
+      "status": "PASS",
+      "detail": {
+        "code": "release_artifact_missing",
+        "sameLength": true
+      }
+    },
+    {
+      "id": "skip-console-refuses-tampered-http-bundle",
+      "status": "PASS",
+      "detail": {
+        "exit": 2
+      }
+    },
+    {
+      "id": "doctor-after-stop",
+      "status": "PASS",
+      "detail": {
+        "status": "DEGRADED"
+      }
+    }
+  ],
+  "limitations": [
+    "Fixture mode only: no vendor/model request, no native agent, no user project.",
+    "Only darwin/arm64 + Node 24.21.x is a measured candidate; other platforms remain NOT_TESTED.",
+    "The trial instance ran on isolated temporary roots/ports; user services were not touched.",
+    "Native authentication/environment is not migrated; restored state must be revalidated before real execution."
+  ],
+  "durationMs": 50263,
+  "finishedAt": "2026-11-13T02:37:52.546Z",
+  "outputs": {
+    "backupArchiveSha256": "d7da2ed5e1a17d5c8cf995d4ff8211a8637dceec3c7264c22242189fd41793f9",
+    "importId": "d7da2ed5e1a17d5c8cf995d4ff8211a8637dceec3c7264c22242189fd41793f9"
+  }
+}

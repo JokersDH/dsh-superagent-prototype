@@ -1,0 +1,49 @@
+{
+  "protocol": "wave16-current-personal-http/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "provider-default-off",
+      "status": "PASS",
+      "detail": {
+        "configured": true,
+        "suggestionsEnabled": false
+      }
+    },
+    {
+      "id": "candidate-route-actual",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 403,
+        "code": "forbidden"
+      }
+    },
+    {
+      "id": "private-preference-roundtrip",
+      "status": "PASS",
+      "detail": {
+        "defaultOff": true,
+        "enabled": true,
+        "disabled": false,
+        "settingsMode": "0600",
+        "legacyModelUnchanged": true
+      }
+    },
+    {
+      "id": "stop",
+      "status": "PASS",
+      "detail": {
+        "status": "STOPPED"
+      }
+    }
+  ],
+  "limitations": [
+    "No model request is sent; candidate/preferences wiring is read/written locally only.",
+    "A nonempty suggestion body requires an actual returned request and is NOT_TESTED here."
+  ],
+  "build": {
+    "buildId": "8a5a0a85631f22ca",
+    "commit": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+    "schema": 18
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "protocol": "wave16-d-admission/1",
+  "source": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+  "candidateRoot": "/Users/hh/Desktop/joker/superagent-agent-d",
+  "frozen": {
+    "root": "/tmp/w16frozen/install",
+    "source": {
+      "commit": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "buildId": "8a5a0a85631f22ca",
+    "schema": 18
+  },
+  "cases": [
+    {
+      "id": "COMPLETE_PARENT_POSITIVE",
+      "proven": true,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 1,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "FOREIGN_UID_UNREGISTERED_CHILD_INHERITS_PARENT",
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [
+        {
+          "pid": 912346,
+          "command": "node foreign-child --state /tmp/pa-wave16-delivery-C2cfPy/data"
+        }
+      ],
+      "considered": 2,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "uidReads": [
+        912345,
+        912345,
+        912345,
+        912346
+      ],
+      "foreignChildUid": 1501,
+      "expected": "Child stays UNKNOWN, receives no signal, and stop is unproven",
+      "status": "PASS"
+    },
+    {
+      "id": "DISCOVERED_STATUS_UNKNOWN_EMPTY_PROOF",
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [
+        {
+          "pid": 912345,
+          "label": "discovered",
+          "reason": "status_unknown"
+        }
+      ],
+      "stopped": [],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 0,
+      "pidReused": false,
+      "signals": [],
+      "expected": "A discovered process with unreadable status prevents a proven empty set",
+      "status": "PASS"
+    },
+    {
+      "id": "RECOVER_UNKNOWN_DISCOVERED_WRITER",
+      "result": "BLOCKED",
+      "journal": "target_stop_unproven",
+      "signals": [],
+      "mockWriterStillAlive": true,
+      "pointerExistedBefore": false,
+      "pointerExistsAfter": false,
+      "expected": "Recovery is BLOCKED without a pointer change while the discovered writer is UNKNOWN",
+      "status": "PASS"
+    }
+  ],
+  "passed": 4,
+  "failed": 0,
+  "actualOsScans": 0,
+  "actualOsSignals": 0,
+  "actualProcessesSpawned": 0,
+  "realModelTurns": 0,
+  "nativeTurns": 0,
+  "scope": "Complete parent positive plus child ownership, discovered UNKNOWN and actual recovery; all identity/inventory/signals mocked, verified frozen input readonly, no live lifecycle admission"
+}

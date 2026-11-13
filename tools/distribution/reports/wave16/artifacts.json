@@ -1,0 +1,98 @@
+{
+  "protocol": "wave16-artifacts/1",
+  "target": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave16-target/wave16-target-97cace7.tar.gz",
+    "sha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+    "tarBytes": 20218294,
+    "buildId": "8a5a0a85631f22ca",
+    "source": {
+      "commit": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "files": 6731,
+    "extractedBytes": 67462076,
+    "supportMatrix": {
+      "measured": [
+        "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+      ],
+      "node": ">=24.21.0 <25",
+      "abi": "137",
+      "sqlite": ">=3.53.4",
+      "notTested": [
+        "linux",
+        "win32",
+        "darwin-x64",
+        "other Node ABIs",
+        "other machines",
+        "personal native execution"
+      ]
+    },
+    "actualCapabilities": [
+      "complete birth/journal/recover identity incl. foreign-UID child and discovered UNKNOWN",
+      "tri-state post-signal stop",
+      "M1 discussion-only unavailable execution",
+      "runtime recovery inspect/prepare HTTP",
+      "current main a64a127/1169535 personal candidate/preference HTTP with default-off private settings",
+      "history/source/reply/context",
+      "same-schema18 upgrade between different binaries",
+      "16->18 managed upgrade",
+      "backup/restore"
+    ]
+  },
+  "baseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+    "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+    "buildId": "7e8f6ce6fa2e2633",
+    "source": {
+      "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 13
+  },
+  "legacy16": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+    "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+    "buildId": "3311a04bd20ed7f9",
+    "source": {
+      "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 16
+  },
+  "previousCurrent": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave15-target/wave15-target-b1854c0-r2.tar.gz",
+    "sha256": "11497980a4077e854b64596c71efe45b1e68e058639838acef0b07657d61f54b",
+    "buildId": "88df6d2eef1feeb7",
+    "source": {
+      "commit": "8962d102711e2d2f6b9bb8d5b8ed98437348f6a3",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "note": "Schema18 same-schema source for the 18->18 upgrade; historical, not current."
+  },
+  "dualPair13": {
+    "from": {
+      "buildId": "9120a5ed858e0feb",
+      "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+      "schema": 13,
+      "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
+    },
+    "to": {
+      "buildId": "cd0ecc29d97d5c41",
+      "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+      "schema": 13,
+      "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"
+    },
+    "note": "Historical same-schema scope, not relabeled current."
+  },
+  "notes": [
+    "Built from pushed clean wave-16 D head 97cace7 (dirty=false, schema18) on main a9f1234 merge including a64a127/1169535 and retained 87d548c docs.",
+    "Spawn identity persisted complete at birth; foreign-UID children and discovered UNKNOWN never become owned.",
+    "Docs-only later heads do not change these bytes."
+  ]
+}
