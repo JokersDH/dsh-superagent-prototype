@@ -55,6 +55,9 @@ import {
   RecoveryPrepareSchema,
   RecoveryPlanSchema,
   RecoveryActivationRecordSchema,
+  RecoverySourcePrepareSchema,
+  RecoverySourcePreparedSchema,
+  RecoverySourceConfirmSchema,
   ContextPreviewInputSchema,
   ContextPreviewSchema,
   RecoveryTargetPrepareInputSchema,
@@ -120,6 +123,9 @@ import type {
   RecoveryPrepare,
   RecoveryPlan,
   RecoveryActivationRecord,
+  RecoverySourcePrepare,
+  RecoverySourcePrepared,
+  RecoverySourceConfirm,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -174,6 +180,8 @@ export interface LocalHttpOptions {
     prepareDecision?(input: DecisionPrepare, actor: TrustedActor): Promise<DecisionPreview>
     decision?(command: DecisionCommand, actor: TrustedActor): Promise<CommandReceipt>
     recoveryPrepare?(input: RecoveryPrepare, actor: TrustedActor): Promise<RecoveryPlan>
+    recoverySourcePrepare?(input: RecoverySourcePrepare, actor: TrustedActor): Promise<RecoverySourcePrepared>
+    recoverySourceConfirm?(input: RecoverySourceConfirm, actor: TrustedActor): Promise<RecoveryActivationRecord>
     prepareProposal?(input: ProposalPrepare, actor: TrustedActor): Promise<ProposalPreview>
     prepareReplyCandidate?(input: AssistantCandidatePrepare, actor: TrustedActor): Promise<ProposalPreview>
     proposal?(command: ProposalCommand, actor: TrustedActor): Promise<CommandReceipt>
@@ -276,7 +284,7 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
   app.use(
     '*',
     (c, next) => bodyLimit({
-      maxSize: ['/v1/proposals/commands', '/v1/decisions/commands', '/v1/assistant/context/prepare', '/v1/assistant/context/send'].includes(c.req.path) ? 256 * 1024 : 64 * 1024,
+      maxSize: ['/v1/proposals/commands', '/v1/decisions/commands', '/v1/assistant/context/prepare', '/v1/assistant/context/send', '/v1/recovery/source/prepare', '/v1/recovery/source/confirm'].includes(c.req.path) ? 256 * 1024 : 64 * 1024,
       onError: (c) =>
         c.json(
           { error: { code: 'invalid_request', message: 'Request body exceeds the local limit', retry: 'none' } },
@@ -342,7 +350,7 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
   })
   app.get('/v1/session', (c) => c.json({ status: 'authenticated' }))
   app.use('/v1/*', async (c, next) => {
-    const readOnlyRecoveryPreparation = c.req.method === 'POST' && ['/v1/recovery/prepare', '/v1/recovery/targets/prepare'].includes(c.req.path)
+    const readOnlyRecoveryPreparation = c.req.method === 'POST' && ['/v1/recovery/prepare', '/v1/recovery/targets/prepare', '/v1/recovery/source/prepare', '/v1/recovery/source/confirm'].includes(c.req.path)
     if (options.startupMode === 'recovery_readonly' && !readOnlyRecoveryPreparation && !['GET', 'HEAD', 'OPTIONS', 'DELETE'].includes(c.req.method))
       throw new ApplicationFault('unsupported_capability', 'Restored state is read-only until explicit recovery and local revalidation', 'none')
     await next()
@@ -366,6 +374,20 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Recovery preflight requires JSON')
     if (!options.operations?.recoveryPrepare) throw new ApplicationFault('unsupported_capability', 'Recovery preparation is not connected')
     return c.json(RecoveryPlanSchema.parse(await options.operations.recoveryPrepare(RecoveryPrepareSchema.parse(await c.req.json()), c.get('actor'))))
+  })
+  app.post('/v1/recovery/source/prepare', async c => {
+    if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Source preparation requires restored read-only startup')
+    if (Object.keys(c.req.query()).length || !c.req.header('content-type')?.toLowerCase().startsWith('application/json'))
+      throw new ApplicationFault('invalid_request', 'Source preparation requires JSON without a query')
+    if (!options.operations?.recoverySourcePrepare) throw new ApplicationFault('unsupported_capability', 'Source confirmation is not connected')
+    return c.json(RecoverySourcePreparedSchema.parse(await options.operations.recoverySourcePrepare(RecoverySourcePrepareSchema.parse(await c.req.json()), c.get('actor'))))
+  })
+  app.post('/v1/recovery/source/confirm', async c => {
+    if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Source confirmation requires restored read-only startup')
+    if (Object.keys(c.req.query()).length || !c.req.header('content-type')?.toLowerCase().startsWith('application/json'))
+      throw new ApplicationFault('invalid_request', 'Source confirmation requires JSON without a query')
+    if (!options.operations?.recoverySourceConfirm) throw new ApplicationFault('unsupported_capability', 'Source confirmation is not connected')
+    return c.json(RecoveryActivationRecordSchema.parse(await options.operations.recoverySourceConfirm(RecoverySourceConfirmSchema.parse(await c.req.json()), c.get('actor'))))
   })
   app.get('/v1/recovery/targets/:id', async c => {
     if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Target status accepts no query')
