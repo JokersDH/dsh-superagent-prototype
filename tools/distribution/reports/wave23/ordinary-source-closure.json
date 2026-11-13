@@ -1,8 +1,8 @@
 {
   "protocol": "wave23-ordinary-source-closure/1",
   "frozenRuntimeSource": "0ede11d",
-  "sourceCommit": "e4547ad",
-  "generatedAt": "2026-11-13T16:43:50.630Z",
+  "sourceCommit": "4a9be06",
+  "generatedAt": "2026-11-13T16:48:43.924Z",
   "purpose": "Coherent ordinary personal distribution source/deploy closure with actual cleanup/fault, CLI help and same-Store validation tools; frozen runtime target remains 0ede11d; excludes historical reports.",
   "groups": {
     "launcher": [
@@ -372,8 +372,8 @@
       },
       {
         "path": "tools/distribution/verify-same-store-dual-personal.mjs",
-        "bytes": 24913,
-        "sha256": "b097b59d0931d0b076a9971524eb9fbb203e622d2ee6356b4014bdc521c5d488"
+        "bytes": 27903,
+        "sha256": "3087fa7d1243e6d38615c123d01339fa9098067780ffa65f6ee3d88e6cd0ae35"
       }
     ],
     "root": [
