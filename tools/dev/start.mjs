@@ -8,6 +8,7 @@ const args = process.argv.slice(2)
 const { values } = parseArgs({ args, options: {
   stop: { type: 'boolean' }, restart: { type: 'boolean' }, open: { type: 'boolean' }, fixture: { type: 'boolean' },
   'discussion-only': { type: 'boolean' },
+  'review-restored-scope': { type: 'string' },
   'require-login': { type: 'boolean' }, state: { type: 'string' }, port: { type: 'string' }, 'api-port': { type: 'string' },
 } })
 const selectedState = instanceState(root, values.state)
@@ -41,6 +42,10 @@ async function stopExisting() {
 }
 async function start() {
   if (values.fixture && values['discussion-only']) throw new Error('Discussion-only personal mode cannot use fixture execution')
+  if (values['review-restored-scope'] && (values.fixture || values.stop || values.restart))
+    throw new Error('只读恢复选择只能用于个人启动；重开时先停止，再重新准备当前源配置。')
+  const requestedReviewDigest = values['review-restored-scope']
+    ? (await import('../../apps/coordinator/product/restored-review.ts')).restoredReviewIdentity(values['review-restored-scope']) : undefined
   if (args.includes('--stop') || args.includes('--restart')) {
     await stopExisting()
     if (args.includes('--stop')) {
@@ -56,6 +61,11 @@ async function start() {
         root, state: selectedState, expectedMode: values.fixture ? 'fixture' : 'personal',
         parseConfiguration: (value) => ApplicationConfigurationSchema.parse(value),
       })
+      if (requestedReviewDigest !== instance.health.restoredReviewDigest) {
+        console.error('运行实例的只读恢复选择与本次请求不同。请保留该实例，或明确停止后重新准备配置并启动。')
+        process.exitCode = 1
+        return
+      }
       if ((values['require-login'] ? instance.health.access === undefined : instance.health.access === 'local-development') &&
           (!values.port || new URL(instance.record.consoleURL).port === values.port) &&
           (!values['api-port'] || new URL(instance.record.apiURL).port === values['api-port'])) {

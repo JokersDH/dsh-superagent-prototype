@@ -57,16 +57,24 @@ export function prepareRestoredReview(store: ProductStore, stateRoot: string, pr
 }
 
 /** Applied only when the operator supplies this file on a restored personal startup; never auto-loaded from a backup. */
-export function loadRestoredReview(path: string, store: ProductStore, stateRoot: string, principal: Principal,
-  secret: Uint8Array, now = new Date().toISOString()): RestoredReviewProject[] {
+function readReviewFile(path: string): z.infer<typeof FileSchema> {
+  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK)
   try {
-    const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK)
-    let file: z.infer<typeof FileSchema>
-    try {
-      const stat = fstatSync(fd)
-      if (!stat.isFile() || stat.size > 131072 || stat.mode & 0o077 || (process.getuid && stat.uid !== process.getuid())) throw fault()
-      file = FileSchema.parse(JSON.parse(readFileSync(fd, 'utf8')))
-    } finally { closeSync(fd) }
+    const stat = fstatSync(fd)
+    if (!stat.isFile() || stat.size > 131072 || stat.mode & 0o077 || (process.getuid && stat.uid !== process.getuid())) throw fault()
+    return FileSchema.parse(JSON.parse(readFileSync(fd, 'utf8')))
+  } finally { closeSync(fd) }
+}
+
+/** Observational identity for matching a requested file to an already validated live process. */
+export function restoredReviewIdentity(path: string): string {
+  try { return digest(readReviewFile(path)) } catch { throw fault() }
+}
+
+export function loadRestoredReviewWithIdentity(path: string, store: ProductStore, stateRoot: string, principal: Principal,
+  secret: Uint8Array, now = new Date().toISOString()): { projects: RestoredReviewProject[]; identity: string } {
+  try {
+    const file = readReviewFile(path)
     const actual = Buffer.from(file.signature), expected = Buffer.from(signature(file.payload, secret))
     if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) throw fault()
     return store.uow.atomic(() => {
@@ -74,13 +82,19 @@ export function loadRestoredReview(path: string, store: ProductStore, stateRoot:
       if (payload.stateRoot !== current.root || digest(payload.principal) !== digest(principal) ||
         payload.sourceFingerprint !== current.sourceFingerprint || payload.markerDigest !== current.markerDigest ||
         payload.machineDigest !== machine(secret) || Date.parse(payload.createdAt) > at || Date.parse(payload.expiresAt) <= at) throw fault()
-      return payload.projects.map(project => {
+      const projects = payload.projects.map(project => {
         if (!knownProject(store, project.projectId)) throw fault()
         return { id: project.projectId, displayName: store.workflows.projects.current(project.projectId)?.settings.displayName ?? project.projectId,
           scope: ScopeSchema.parse({ projectId: project.projectId, allowedPaths: project.allowedPaths, excludedPaths: project.excludedPaths, externalActions: [] }),
           discussionOnly: true as const }
       })
+      return { projects, identity: digest(file) }
     })
   } catch { throw fault() }
+}
+
+export function loadRestoredReview(path: string, store: ProductStore, stateRoot: string, principal: Principal,
+  secret: Uint8Array, now = new Date().toISOString()): RestoredReviewProject[] {
+  return loadRestoredReviewWithIdentity(path, store, stateRoot, principal, secret, now).projects
 }
 
