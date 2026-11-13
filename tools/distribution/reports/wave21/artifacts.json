@@ -1,0 +1,132 @@
+{
+  "protocol": "wave21-artifacts/1",
+  "target": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave21-target/wave21-target-595b3f1.tar.gz",
+    "sha256": "e875b9b90445db5826bf01d72d710fd55b208309598347ca45be618773ae026d",
+    "tarBytes": 20242124,
+    "buildId": "cc16eca05e4da244",
+    "source": {
+      "commit": "595b3f138872f176b7c6b214b4b6b1b87c1ed017",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "files": 6744,
+    "extractedBytes": 67541760,
+    "supportMatrix": {
+      "measured": [
+        "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+      ],
+      "node": ">=24.21.0 <25",
+      "abi": "137",
+      "sqlite": ">=3.53.4",
+      "notTested": [
+        "linux",
+        "win32",
+        "darwin-x64",
+        "other Node ABIs",
+        "other machines",
+        "personal native execution"
+      ]
+    },
+    "actualCapabilities": [
+      "live review identity reuse gate from actual daemon health digest before port/access checks",
+      "package-contained review-restored prepare CLI using main signer in same immutable package",
+      "reviewed candidates 403->2, history/source200, business422, model/native0",
+      "unbound/different/narrow/no-selection/changed-port refusals preserve PID",
+      "main985 workflow-evidence default1/explicit2 and personal-evidence2 on retained B data",
+      "B Work/Broker/Q&A/native_applied readonly relocation and source facts",
+      "registered-child 5/5",
+      "personal nonempty candidate lifecycle",
+      "same-schema18 upgrades and 16->18",
+      "backup/restore and support material"
+    ]
+  },
+  "e4ePrevious": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave20-target/wave20-target-e4e0623.tar.gz",
+    "sha256": "1f78e38b3568a781ebf4670174451516ceb7c32b982b0990e21757c34e4ddfc1",
+    "buildId": "637ed44e850f447a",
+    "source": {
+      "commit": "e4e0623dcb6d90318939f9613f9251ff73fcc602",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "note": "First 773 review startup pass; reuse path is not fixed there and is not relabeled."
+  },
+  "eeBaseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave19-target/wave19-target-ee7fbd8.tar.gz",
+    "sha256": "b0990149d0a8c81a130d358ea07100332bc30d509e9c7dfdf7a176e61b7f7ecc",
+    "buildId": "90e81429079a7d50",
+    "source": {
+      "commit": "ee7fbd8ab59bde8b875dcd933fda58d7bbf2fd5d",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "note": "Pre-773 source; no review binding entry."
+  },
+  "b911Baseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave18-target/wave18-target-b9117aa.tar.gz",
+    "sha256": "4a81380a5fd0c69aabe8d38604dd661ab3fb3f30113b4bb2d3e5156c2ff54c1a",
+    "buildId": "6a45633067501dd2",
+    "source": {
+      "commit": "b9117aad12797a3ee3c454172d1f918516a18f33",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18
+  },
+  "safe651Baseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave17-target/wave17-target-65102f7.tar.gz",
+    "sha256": "33d874c9a25f22d2710fb29d686f03ad5b37de7ad2cdb09f40d16fd7ecb86340",
+    "buildId": "f55470ae14cc4985",
+    "source": {
+      "commit": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18
+  },
+  "old97MockOnly": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave16-target/wave16-target-97cace7.tar.gz",
+    "sha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+    "buildId": "8a5a0a85631f22ca",
+    "source": {
+      "commit": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "note": "Mock-only unsafe lifecycle control; never live."
+  },
+  "baseline": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+    "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+    "buildId": "7e8f6ce6fa2e2633",
+    "source": {
+      "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 13
+  },
+  "legacy16": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+    "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+    "buildId": "3311a04bd20ed7f9",
+    "source": {
+      "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 16
+  },
+  "notes": [
+    "Built from pushed clean wave-21 D head 595b3f1; merge main e5d89bb includes f856fa5.",
+    "Review selection is compared as main parsed-file digest from actual health; record is not a substitute.",
+    "Package prepare and start consumer both come from the same target; no source checkout supplies a missing entry.",
+    "B real Work/Q&A and SDK candidate review remain separate scopes; same-Store merge is not claimed.",
+    "A v2/private activation/target remain unclaimed; docs-only heads do not refreeze."
+  ]
+}

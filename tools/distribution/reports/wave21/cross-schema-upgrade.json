@@ -1,0 +1,53 @@
+{
+  "protocol": "wave12-cross-schema/1",
+  "status": "PASS",
+  "startedAt": "2026-11-13T13:02:48.391Z",
+  "steps": [
+    {
+      "id": "unregistered-writer-blocks",
+      "status": "PASS",
+      "detail": {
+        "code": "unknown_live_resource",
+        "strangerAlive": true,
+        "runningBuild": "3311a04bd20ed7f9",
+        "pointerUnchanged": true
+      }
+    },
+    {
+      "id": "schema16-to-18-upgrade",
+      "status": "PASS",
+      "detail": {
+        "from": "3311a04bd20ed7f9",
+        "to": "cc16eca05e4da244",
+        "schema": 18,
+        "backup": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cross-schema-oA38bW/run/upgrade.pab"
+      }
+    },
+    {
+      "id": "old-binary-refuses-new-schema",
+      "status": "PASS",
+      "detail": {
+        "code": "state_schema_newer_than_binary",
+        "schema": 18,
+        "evidenceDigest": "ab3c4f3050ccdc550e0edc531babd2dc918673275711342c5ca412c947e941ba"
+      }
+    }
+  ],
+  "limitations": [
+    "The stranger is spawned by this recipe and is the only non-owned process; no shared install/cache/logs scan is used to kill it.",
+    "Same-schema dual-binary rollback remains the preserved wave-07/wave-08 schema13 pair (wave-11 dual recipe); this recipe is the cross-schema direction."
+  ],
+  "artifacts": {
+    "from": {
+      "buildId": "3311a04bd20ed7f9",
+      "schema": 16,
+      "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51"
+    },
+    "to": {
+      "buildId": "cc16eca05e4da244",
+      "schema": 18,
+      "commit": "595b3f138872f176b7c6b214b4b6b1b87c1ed017"
+    }
+  },
+  "finishedAt": "2026-11-13T13:03:06.136Z"
+}
