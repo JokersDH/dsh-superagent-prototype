@@ -1,0 +1,114 @@
+{
+  "protocol": "agent-c-wave23-status/1",
+  "wave": "product-wave-23",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "f29c9e6",
+    "mainOrdinaryDistribution": "8c8fdef",
+    "previousCRecord": "b00a790",
+    "mergeCommit": "2ffa687",
+    "rootLockDiffPreserved": true
+  },
+  "sourceCommits": { "driverProtocol": "6698ebf", "testsAndEvidence": "def4017" },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "driverProtocol": {
+    "protocol": "personal-review-driver/2",
+    "statuses": {
+      "verified-flow": "strict assertions passed against the bound serving consumer, exit 0",
+      "reused": "verified live instance with the same selection reused and left running, exit 0",
+      "refused-verified": "entry refused exactly the requested selection mismatch, exit 0",
+      "observed": "--observe only, no assertions and verified=false; never acceptance, exit 0",
+      "NOT_REACHED": "selected package lacks the capability, exit 4, no checkout fallback",
+      "failed": "assertion/identity/HTTP/deadline/cleanup failure, exit 1; usage exit 2"
+    },
+    "migration": "wave22 status:ok is removed; consumers must read status/verified"
+  },
+  "strictResults": {
+    "v1Source": "verified-flow, identity bound, record pid = spawned pid, cleanup stopped",
+    "v2Source": "verified-flow through the same standard entry with its own root and consent",
+    "observed": "status observed, verified false, assertions [], actual chat still 422",
+    "negativeCalibration": [
+      "chat expectation 200 -> failed/assertion_failed exit 1",
+      "work phase running -> failed/assertion_failed",
+      "delivery accepted -> failed/assertion_failed",
+      "wrong candidate digest -> failed/assertion_failed",
+      "missing work id -> failed/assertion_failed"
+    ],
+    "data": ["history entries", "sources state/diagnostic", "candidate payloadDigest/non-executable", "candidate prepare 422", "chat 422", "Work delivered", "delivery native_applied"]
+  },
+  "deadlinesAndFaults": {
+    "budgets": ["perRequestMs 5000 default", "deadlineMs 180000 default", "readinessMs 150000 default", "stopGraceMs 8000"],
+    "privateControls": ["silent connected peer -> request_timeout", "half JSON -> invalid_json", "entry exit 3 -> entry_exited", "never ready -> readiness_timeout", "SIGTERM ignored -> one SIGKILL escalation", "elapsed deadline -> deadline_exceeded", "log tail capped at 64KiB"],
+    "driverLevel": ["/usr/bin/true start entry -> entry_exited, mock ready service not accepted", "hanging entry -> readiness_timeout and owned child stopped"]
+  },
+  "consumerBinding": {
+    "identityFunction": "package's own restoredReviewIdentity in a child process",
+    "fresh": "record pid equals spawned entry pid, record digest equals requested digest, mode personal, api port matches, process alive, health digest matches",
+    "reused": "entry exit 0 plus the same record digest, alive original pid (!= spawned pid) and matching health digest",
+    "refusals": ["different valid narrow selection -> refused-verified, original pid unchanged", "different state root -> refused-verified", "ready foreign port without record -> entry_exited failure"],
+    "missingSelection": "covered by retained wave21 standard-start reuse/refusal test"
+  },
+  "dialects": {
+    "source": { "review": "tools/dev/review-restored.mjs", "start": "tools/dev/start.mjs", "identity": "state/workbench.json + health" },
+    "package": { "review": "pa review-restored --json --out", "start": "pa start --json", "identity": "package instance record" },
+    "packageReached": "review-restored actually produced a 0600 selection (projects [wave22-project])",
+    "packageStart": "NOT_REACHED exit 4 with release_missing/first_run_required family on this source checkout; entries point to pa and no fallback occurred",
+    "notReachedRule": "a package entry without the required flags fails explicitly; the driver never searches for another script"
+  },
+  "sameStoreFlow": {
+    "producer": "packages/knowledge/test/helpers/personal-chain.ts on one ProductStore",
+    "mapping": {
+      "Work/Ticket": "GET /v1/works/:id -> delivered",
+      "Broker question/answer": "GET /v1/questions/:id/deliveries -> native_applied",
+      "SDK candidate": "original payloadDigest, executable false, prepare 422",
+      "proposal receipt": "original token replay 422 (retained wave22 scope)",
+      "context binding/frozen body": "history entry, sources verified, audit bundleDigest unchanged",
+      "queue/provider": "held 1, no new provider calls"
+    },
+    "formats": "default workflow-snapshot/1 and explicit workflow-snapshot/2 each restored to its own root and reviewed through the source standard entry"
+  },
+  "invalidations": {
+    "retained": ["fresh positive control per marker/source/signature/stateRoot/machine/principal/scope/expiry/file type/absence", "narrow selection starts but scope_changed hides content", "missing artifact -> missing", "damaged same-length artifact -> unverified"],
+    "cost": ["reasons <=7", "withheldSourceCount <=64", "diagnostic <4KiB", "no readable-count scan or cross-await transaction"],
+    "unmeasured": ["long-term timed revocation", "concurrent writer races"]
+  },
+  "uiContract": {
+    "file": "packages/context/reports/wave23-ui-contract.json",
+    "protocol": "restored-scope-ui-contract/2",
+    "owner": "main",
+    "actualSamples": {
+      "verifiedValidity": "reasons [selection_validity_changed], partial false, withheld 0",
+      "scopeChangedNarrow": "reasons [selection_narrowed, selection_validity_changed], partial true, withheld 2",
+      "missing": "reasons [selection_validity_changed], partial true, withheld 0",
+      "unverified": "reasons [], partial true, withheld 0"
+    },
+    "allAuthorization": "none"
+  },
+  "tests": { "context": 129, "proposals": 41, "knowledge": 110, "routing": 44, "total": 324, "result": "all PASS" },
+  "strict": { "tscNoEmit": "four owned packages PASS", "workspaceBuild": "pnpm -r build -> 0" },
+  "layerBoundaries": {
+    "source": "driver and source tests passed",
+    "package": "package review entry reached; package start NOT_REACHED without release/first-run",
+    "installed": "not claimed; E must bind entry SHA and package subject",
+    "native": "0 vendor/native turns",
+    "businessRecovery": "not touched; B/private/target remain separate"
+  },
+  "limitations": [
+    "D launcher install/upgrade was not run; package start was measured only as NOT_REACHED",
+    "restore is a real v1/v2 database/artifacts copy plus marker, not the full install matrix",
+    "long-term revocation and concurrent writers remain unmeasured",
+    "no private permission, target startup, queue consumption or vendor native turn"
+  ],
+  "evidence": [
+    "packages/context/docs/WAVE23-RECIPE.md",
+    "packages/context/reports/wave23-ui-contract.json",
+    "packages/context/reports/wave23-driver-lib.tap",
+    "packages/context/reports/wave23-driver-strict.tap",
+    "packages/context/reports/wave23-driver-dual-format.tap",
+    "packages/context/reports/wave23-scope-review.tap",
+    "packages/context/reports/wave23-suites.json"
+  ]
+}
