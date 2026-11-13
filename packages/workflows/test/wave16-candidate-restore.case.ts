@@ -13,10 +13,11 @@ import { key } from '../../orchestrator-core/src/core/ids.ts'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
 import { WorkflowSnapshots } from '../src/index.ts'
+// @ts-expect-error main-owned plain-JS fixture without declarations
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 
 const principal = { userId: 'wave16-candidate-user', authorityRef: 'wave16-candidate-authority' }
-const actor = { ...principal, source: 'local_cli' }, projectId = 'wave16-candidate-project', conversationId = 'wave16-candidate-conversation'
+const actor = { ...principal, source: 'local_cli' as const }, projectId = 'wave16-candidate-project', conversationId = 'wave16-candidate-conversation'
 const scope = { projectId, allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }
 const apiToken = 'a'.repeat(64), headers = { authorization: `Bearer ${apiToken}`, 'content-type': 'application/json' }
 
@@ -35,7 +36,7 @@ test('a real candidate confirmation survives a snapshot restore at a second root
     allowedOrigins: ['http://127.0.0.1:5173'], mode: 'fixture', read: product.read, operations: product.operations })
   const request = async (path: string, body?: unknown) => {
     const response = await app.request(`http://127.0.0.1${path}`, { ...(body === undefined ? {} : { method: 'POST', body: JSON.stringify(body) }), headers })
-    return { status: response.status, value: await response.json() }
+    return { status: response.status, value: (await response.json()) as any }
   }
   const receipt = await product.application.dispatch({ kind: 'chat', commandId: 'wave16-chat', projectId, conversationId, text: '请整理支付约束。' }, actor)
   assert.equal(receipt.status, 'recorded')
@@ -50,7 +51,7 @@ test('a real candidate confirmation survives a snapshot restore at a second root
     projectId, conversationId, token: prepared.value.token })
   assert.equal(confirmed.status, 200, JSON.stringify(confirmed.value))
   assert.equal(store.workflows.assistant.proposals.get(prepared.value.record.proposalId)?.state, 'confirmed')
-  assert.equal(store.db.prepare('SELECT COUNT(*) AS n FROM assistant_decision_versions').get().n, 1)
+  assert.equal((store.db.prepare('SELECT COUNT(*) AS n FROM assistant_decision_versions').get() as { n: number }).n, 1)
   const result = store.workflows.assistant.replyResults.forRequest(requestId)
   assert.ok(result)
 
@@ -62,10 +63,10 @@ test('a real candidate confirmation survives a snapshot restore at a second root
   restored = new ProductStore({ path: join(restoreRoot, 'product.sqlite') })
   try {
     assert.equal(restored.workflows.assistant.proposals.get(prepared.value.record.proposalId)?.state, 'confirmed')
-    assert.equal(restored.db.prepare('SELECT COUNT(*) AS n FROM assistant_decision_versions').get().n, 1)
-    assert.equal(restored.workflows.assistant.replyResults.forRequest(requestId)?.artifactDigest, result.artifactDigest)
+    assert.equal((restored.db.prepare('SELECT COUNT(*) AS n FROM assistant_decision_versions').get() as { n: number }).n, 1)
+    assert.equal(restored.workflows.assistant.replyResults.forRequest(requestId)?.artifactDigest, result!.artifactDigest)
     assert.equal(restored.commands.get('wave16-confirm')?.payloadDigest, store.commands.get('wave16-confirm')?.payloadDigest)
-    const artifact = restored.artifacts.read(result.artifactRef).data.toString()
+    const artifact = restored.artifacts.read(result!.artifactRef)!.data.toString()
     assert.equal(JSON.parse(artifact).sourceMessageId, messageId)
     assert.ok(JSON.parse(artifact).suggestions.length > 0)
     const verification = new WorkflowSnapshots(restored).verify(restoreRoot)
