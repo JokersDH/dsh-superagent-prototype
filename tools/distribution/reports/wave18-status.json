@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "94ee3c6",
   "mergedMain": "5ef8bf1",
-  "head": "b9117aa",
+  "head": "c48dfc0",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/vendor/native turns 0; twelve user services untouched.",
   "ownedPaths": [
@@ -349,5 +349,6 @@
     "tools/distribution/reports/wave18/*.json",
     "tools/distribution/recipes/wave18-e-acceptance.zh-CN.md",
     "docs/rfcs/WP-16/0052-wave-18-d-same-package-personal-and-relocation.md"
-  ]
+  ],
+  "evidenceHead": "c48dfc0"
 }
