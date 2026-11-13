@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "efd081f",
   "mergedMain": "1b8d3d2",
-  "head": "e5947ff",
+  "head": "0c64a6f",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/vendor/native turns 0; twelve user services untouched.",
   "ownedPaths": [
@@ -417,5 +417,6 @@
     "tools/distribution/reports/wave22/*.json",
     "tools/distribution/recipes/wave22-e-acceptance.zh-CN.md",
     "docs/rfcs/WP-16/0060-wave-22-d-same-store-and-ordinary-closure.md"
-  ]
+  ],
+  "evidenceHead": "0c64a6f"
 }
