@@ -1,0 +1,93 @@
+{
+  "protocol": "agent-c-wave21-status/1",
+  "wave": "product-wave-21",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "a92bb9e",
+    "mainStandardStart": "f856fa5",
+    "mergeCommit": "7a0780f",
+    "rootLockDiffPreserved": true
+  },
+  "sourceCommit": { "scopeExplainer": "d2a17dd", "dualFormatConsumer": "266f416" },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "fixedChain": {
+    "location": "packages/knowledge/test/main-personal-dual-format.case.ts",
+    "realBusiness": "controlled Application -> Effects -> Broker: Work -> question -> answer -> native_applied -> accept -> delivered",
+    "candidate": "real SDK reply candidate plus a confirmed proposal receipt and a selected-context frozen binding",
+    "permissionQa": "anchored trusted_user plus question_answer_display, never an ordinary reasoner message"
+  },
+  "dualFormatPersonalRecovery": {
+    "v1": {
+      "snapshot": "workflow-snapshot/1 + workflow-evidence/1, verified",
+      "root": "restored-v1 with its own personal-restore/1 marker, api.key, action.key and restored-personal-review/1 file",
+      "entry": "tools/dev/start.mjs --discussion-only --review-restored-scope (standard pnpm start entry)",
+      "reads": ["original candidate payloadDigest", "history entry", "frozen sources verified with content", "audit bundleDigest", "Work delivered", "delivery native_applied"],
+      "refused": ["candidates prepare 422", "confirmed proposal token replay 422", "chat 422", "answer_question 422", "context preview 422", "old context token 422"]
+    },
+    "v2": {
+      "snapshot": "workflow-snapshot/2 + workflow-evidence/2 + familySetVersion 2, verified",
+      "root": "restored-v2 with its own marker, credentials and new review file",
+      "entry": "apps/coordinator/product/demo.ts --discussion-only --assistant --review-restored-scope",
+      "reads": ["original candidate payloadDigest", "frozen sources verified", "Work delivered", "delivery native_applied"],
+      "refused": ["candidates prepare 422"]
+    },
+    "shared": {
+      "heldQueue": 1,
+      "works": 1,
+      "providerRequests": "2 before and after every personal review; 0 new",
+      "modelNative": 0,
+      "sourceFacts": "inspect 200, prepare/confirm not_granted and startupAvailable false, target directory not created, audit equals confirm"
+    }
+  },
+  "legalNarrowScope": {
+    "narrow": { "selection": "allowedPaths ['src/narrow/'] + excluded ['.git']", "sourcesState": "scope_changed", "sources": [], "history": 1, "candidates": 0, "candidateRejected": "scope_escalation", "work": "delivered", "delivery": "native_applied", "business": 422 },
+    "exclusion": { "selection": "allowedPaths ['src/'] + excluded ['.git','src/secret/']", "sourcesState": "scope_changed", "explainedReason": "exclusion_added" },
+    "explainer": {
+      "module": "packages/context/src/restored-review.ts",
+      "function": "explainRestoredReviewScope",
+      "protocol": "restored-review-scope/1",
+      "outputs": "state, scopeChanged, partial, reasons, withheldSourceIds, readable counts, authorization none",
+      "moduleOnly": "pure projection over actual HTTP DTOs; no SQL, HTTP, confirmation authority, ledger or grant"
+    }
+  },
+  "standardStartIdentity": {
+    "healthDigest": "matches restoredReviewIdentity(file) and workbench.json.restoredReviewDigest",
+    "sameSelectionReuse": "prints original consoleURL, workbench pid unchanged",
+    "refusedWithoutStopping": ["missing selection", "different valid narrow selection", "--restart with review", "different selection + --port", "different selection + --require-login"],
+    "pidAfterRefusals": "unchanged",
+    "bypass": "port/login cannot bypass the selection comparison and no build/stop happens"
+  },
+  "independentRejectionMatrix": {
+    "method": "each case gets a fresh store, marker, key and valid signed file; a successful positive load precedes exactly one change",
+    "cases": ["source row added", "marker changed", "signature replaced", "signed stateRoot changed", "signed machineDigest changed", "signed principal changed", "scope changed without a new signature", "expired window", "0644 file", "symlink", "FIFO", "missing file"],
+    "claims": ["unknown project", "unsafe ../outside path", "externalActions", "executable:true"],
+    "mainMatrix": "main's own independent rejection scope is retained separately; this is not a new production vulnerability claim"
+  },
+  "readerCost": {
+    "historyEntries": 1,
+    "candidateAndSourceDtoBytes": "<64KiB asserted",
+    "fullDatabaseBodyScan": "none",
+    "existingBounds": "reuses 600-byte consent, 8-candidate/long-text and 10000-history regression bounds",
+    "sqlAcrossAwait": "none; reads use the existing synchronous main/A ports"
+  },
+  "tests": { "context": 128, "proposals": 41, "knowledge": 101, "routing": 44, "total": 314, "result": "all PASS" },
+  "strict": { "tscNoEmit": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"], "workspaceBuild": "pnpm -r --workspace-concurrency=4 run build -> 0", "status": "PASS" },
+  "consumerRecipe": {
+    "for": ["D", "E"],
+    "parameters": ["INSTALL_ROOT", "STATE", "CONSOLE_PORT", "API_PORT", "MODEL_CONFIG", "REVIEW_FILE"],
+    "consumerEntry": ["tools/dev/start.mjs", "apps/coordinator/product/demo.ts", "tools/dev/review-restored.mjs", "apps/coordinator/product/restored-review.ts"],
+    "sourceCommit": "266f416 on codex/g3-assistant-context",
+    "packageSubject": "must come from D's actual tar/hash/build; this source pass does not certify any older installed package and cannot be used to backfill an installed result",
+    "steps": ["verify restored DB and personal-restore/1", "generate a new 0600 selection with review-restored.mjs", "start with the explicit review flag", "assert personal health digest, read-only identities, sources verified/scope_changed and all business 422", "re-open by stopping first and re-preparing from the current source"]
+  },
+  "limitations": [
+    "executed entries are start.mjs and demo.ts; D launcher was not run",
+    "restore is a real v1/v2 database/artifacts copy plus marker, not the full install/upgrade matrix",
+    "under a narrower selection the original candidate is correctly rejected as scope_escalation and frozen content is withheld as scope_changed",
+    "no private permission, target startup, queue consumption or vendor native turn"
+  ],
+  "evidence": ["packages/context/docs/WAVE21-RECIPE.md", "packages/context/reports/wave21-dual-format.tap", "packages/context/reports/wave21-suites.json"]
+}

@@ -1,0 +1,12 @@
+{
+  "protocol": "agent-c-wave21-suites/1",
+  "context": 128,
+  "proposals": 41,
+  "knowledge": 101,
+  "routing": 44,
+  "total": 314,
+  "result": "all PASS, 0 FAIL",
+  "commands": [
+    "node --test --experimental-strip-types --test-isolation=none --test-reporter=tap test/*.case.ts (packages/context|proposals|knowledge|routing)"
+  ]
+}
