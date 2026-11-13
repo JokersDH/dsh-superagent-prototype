@@ -116,8 +116,8 @@ test('actual personal scope diagnostics explain narrow, exclusion, validity and 
   assert.equal((await get(`/v1/messages/${chain.contextMessageId}/context`)).bundleDigest, chain.frozenDigest)
   // Original receipts replay is refused without any provider call.
   const callsBefore = chain.modelCalls
-  assert.equal(await status('/v1/proposals/commands', { kind: 'confirm_proposal', commandId: 'w22-confirm', projectId, conversationId: 'wave22-conversation', token: 'a.b' }), 422)
-  assert.equal(await status('/v1/assistant/context/send', { commandId: 'w22-context', token: 'a.b' }), 422)
+  assert.equal(await status('/v1/proposals/commands', { kind: 'confirm_proposal', commandId: 'w22-confirm', projectId, conversationId: 'wave22-conversation', token: chain.confirmToken }), 422)
+  assert.equal(await status('/v1/assistant/context/send', { commandId: 'w22-context', token: chain.contextToken }), 422)
   assert.equal(await status('/v1/commands', { kind: 'chat', commandId: 'w22-review-chat', projectId, conversationId: 'wave22-conversation', text: 'x' }), 422)
   assert.equal(chain.model.requests.length, callsBefore)
   await stop()

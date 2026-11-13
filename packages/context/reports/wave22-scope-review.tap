@@ -2,7 +2,7 @@ TAP version 13
 # Subtest: actual personal scope diagnostics explain narrow, exclusion, validity and missing frozen sources without widening
 ok 1 - actual personal scope diagnostics explain narrow, exclusion, validity and missing frozen sources without widening
   ---
-  duration_ms: 4077.472458
+  duration_ms: 4032.893375
   type: 'test'
   ...
 1..1
@@ -13,4 +13,4 @@ ok 1 - actual personal scope diagnostics explain narrow, exclusion, validity and
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 4436.216291
+# duration_ms 4421.393917

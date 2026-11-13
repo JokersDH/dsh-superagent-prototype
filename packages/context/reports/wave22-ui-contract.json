@@ -1,0 +1,48 @@
+{
+  "protocol": "restored-scope-ui-contract/1",
+  "owner": "main (C does not edit UI or E assertions)",
+  "consumer": {
+    "endpoint": "GET /v1/messages/:id/context/sources",
+    "optIn": "append exactly ?scopeReview=1",
+    "defaultResponse": "unchanged old shape; no scopeReview key",
+    "inputs": ["messageId from GET /v1/context/history", "explicit operator opt-in"],
+    "forbiddenInputs": ["principal", "scope/grant", "project override", "any authorization claim"],
+    "notes": ["presentation data only", "authorization is always none", "observedAt may differ between the two reads"]
+  },
+  "states": {
+    "verified": { "title": "已核对冻结原文", "copy": "以下内容与当时发送时一致。", "partial": false },
+    "scope_changed": { "title": "当前只读选择与冻结时不同", "copy": "冻结原文未展示；历史记录、工作与回答仍可查看。", "partial": true },
+    "missing": { "title": "冻结原文文件缺失", "copy": "无法读取当时的原文，也不会用当前来源替代。", "partial": true },
+    "unverified": { "title": "无法核对冻结原文", "copy": "原文或回执校验未通过，未核对内容不会展示。", "partial": true }
+  },
+  "reasons": {
+    "project_changed": "所属项目与冻结时不同",
+    "selection_narrowed": "当前允许路径比冻结时更窄",
+    "selection_broadened": "当前允许路径比冻结时更宽",
+    "selection_replaced": "允许路径已变化",
+    "exclusion_added": "新增了排除路径",
+    "exclusion_removed": "移除了排除路径",
+    "selection_validity_changed": "选择有效期与冻结时不同"
+  },
+  "render": {
+    "withheldSourceCount": "显示『另有 N 条冻结来源未展示』，N 最大 64",
+    "partialBadge": "仅在 scopeReview.partial 为 true 时显示只读提示",
+    "authorization": "不渲染为权限、允许执行或重试许可",
+    "reasons": "最多 7 条去重原因，按数组顺序展示"
+  },
+  "doNotRender": [
+    "readable counts (not present in public DTO)",
+    "raw allowed/excluded path values from diagnostics",
+    "principal, tokens or key material",
+    "authorization none as any kind of approval"
+  ],
+  "testHints": [
+    "default response has no scopeReview key",
+    "opt-in body equals default apart from observedAt and scopeReview",
+    "narrow selection: state scope_changed, empty sources, reasons include selection_narrowed",
+    "new exclusion: reasons include exclusion_added",
+    "validity drift on a verified body: reasons selection_validity_changed, partial false",
+    "missing artifact: state missing, partial true, withheldSourceCount 0",
+    "strict query: only exactly one scopeReview=1 accepted; other values/repeats 400"
+  ]
+}

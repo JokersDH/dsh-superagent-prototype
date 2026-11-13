@@ -1,0 +1,91 @@
+{
+  "protocol": "agent-c-wave22-status/1",
+  "wave": "product-wave-22",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "54d6e1b",
+    "mainScopeDiagnostics": "712e191",
+    "mergeCommit": "1d6eada",
+    "rootLockDiffPreserved": true
+  },
+  "sourceCommits": { "driver": "92eef14", "testsAndEvidence": "1ec4a27" },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "fixedChain": {
+    "helper": "packages/knowledge/test/helpers/personal-chain.ts",
+    "realBusiness": "controlled Work -> Broker question -> answer -> native_applied -> accept -> delivered",
+    "candidate": "real SDK candidate plus confirmed proposal receipt and original context token",
+    "permissionQa": "anchored trusted_user plus question_answer_display, never ordinary model input"
+  },
+  "actualDiagnostics": {
+    "endpoint": "GET /v1/messages/:id/context/sources",
+    "default": "old shape with no scopeReview key",
+    "optIn": "?scopeReview=1 only",
+    "diagnosticFields": ["protocol context-scope-review/1", "distinct reasons", "partial", "withheldSourceCount <=64", "authorization none"],
+    "authorityUnchanged": "state, body release, principal and original binding remain authoritative; diagnostics change neither",
+    "strictQuery": "400 for 0, empty, repeated, true, or extra query parameters",
+    "noPrivateData": "no principal, readable counts or raw paths in the public diagnostic"
+  },
+  "scopeCases": {
+    "wideValidity": { "state": "verified", "reasons": ["selection_validity_changed"], "partial": false, "withheldSourceCount": 0, "body": "original frozen text" },
+    "narrow": { "state": "scope_changed", "sources": [], "reasons": ["selection_narrowed", "selection_validity_changed"], "partial": true, "withheldSourceCount": "binding sources length", "candidate": "scope_escalation", "business": 422 },
+    "exclusion": { "state": "scope_changed", "sources": [], "reasons": ["exclusion_added", "selection_validity_changed"], "partial": true },
+    "missingArtifact": { "state": "missing", "sources": [], "partial": true, "withheldSourceCount": 0, "business": 422 }
+  },
+  "invalidations": {
+    "originalReceipts": "confirmed proposal token and original context token replay both 422",
+    "frozenBody": "audit bundleDigest equals the source binding and is not replaced by live sources",
+    "provider": "request count unchanged; 0 new calls",
+    "permissionQa": "display text absent from frozen sources"
+  },
+  "dualFormatStandardEntry": {
+    "driver": "packages/context/tools/personal-review-driver.mjs",
+    "v1": { "entry": "tools/dev/start.mjs", "health": "personal/recovery_readonly with restoredReviewDigest", "reads": "verified sources, Work delivered, delivery native_applied", "refusals": "candidate prepare 422, chat 422" },
+    "v2": { "entry": "tools/dev/start.mjs", "newRisk": "v2 through the standard entry (v1 standard/reuse and v2 demo retained from wave21)", "sameReads": true },
+    "output": ["entry paths and SHA-256", "review file SHA-256 and mode", "health digest", "default/opt-in sources", "refusals", "sourceOnly true", "packageSubject null unless supplied"]
+  },
+  "uiContract": {
+    "file": "packages/context/reports/wave22-ui-contract.json",
+    "owner": "main",
+    "states": ["verified", "scope_changed", "missing", "unverified"],
+    "reasons": ["project_changed", "selection_narrowed", "selection_broadened", "selection_replaced", "exclusion_added", "exclusion_removed", "selection_validity_changed"],
+    "forbidden": ["readable counts", "raw paths", "principal/tokens", "treating authorization none as approval"]
+  },
+  "projectionBoundary": {
+    "helper": "packages/context/src/restored-review.ts",
+    "kind": "pure typed presentation",
+    "authority": "main guard remains the only release rule",
+    "unknownCounts": "null when unobserved; not exposed in the public DTO",
+    "moduleOnly": "no SQL, HTTP writer, confirmation authority or LLM loop"
+  },
+  "readerCost": {
+    "diagnosticBytes": "<4KiB asserted",
+    "reasons": "<=7 distinct",
+    "withheldSourceCount": "<=64",
+    "fullDatabaseBodyScan": "none",
+    "sqlAcrossAwait": "none",
+    "boundariesReused": ["600-byte consent", "8 candidates", "10000 history"]
+  },
+  "tests": { "context": 129, "proposals": 41, "knowledge": 103, "routing": 44, "total": 317, "result": "all PASS" },
+  "strict": { "tscNoEmit": "four owned packages PASS", "workspaceBuild": "pnpm -r build -> 0" },
+  "consumerRules": {
+    "D": "run the driver from the real install root; report actual entry hashes and its own package subject",
+    "E": "bind the driver output to the same package consumer bytes before calling it installed; source checkout never certifies an old package",
+    "notReached": "a package entry without the state/port/api-port/discussion-only/review flags must fail explicitly, not fall back to the source demo"
+  },
+  "limitations": [
+    "executed entries are start.mjs and demo.ts; D launcher was not run",
+    "restore is a real v1/v2 database/artifacts copy plus a personal-restore/1 marker, not the full install/upgrade matrix",
+    "validity case reflects frozen binding expiresAt versus the current selection, not a live revocation timer",
+    "no private permission, target startup, queue consumption or vendor native turn"
+  ],
+  "evidence": [
+    "packages/context/docs/WAVE22-RECIPE.md",
+    "packages/context/reports/wave22-ui-contract.json",
+    "packages/context/reports/wave22-scope-review.tap",
+    "packages/context/reports/wave22-package-driver.tap",
+    "packages/context/reports/wave22-suites.json"
+  ]
+}

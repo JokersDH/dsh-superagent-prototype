@@ -39,6 +39,8 @@ export interface PersonalChain {
   readonly sourceMessageId: string
   readonly contextMessageId: string
   readonly reviewedCandidate: { index: number; payloadDigest: string }
+  readonly contextToken: string
+  readonly confirmToken: string
   readonly frozenDigest: string
   readonly bindingScope: { projectId: string; allowedPaths: readonly string[]; excludedPaths: readonly string[]; externalActions: readonly string[]; expiresAt?: string }
   readonly frozenSourceIds: readonly string[]
@@ -116,9 +118,10 @@ export async function buildPersonalChain(root: string, options: { expiresAt?: st
       const preview = await (await app.request('/v1/assistant/candidates/prepare', {
         method: 'POST', headers, body: JSON.stringify({ messageId: sourceMessageId, index: reviewedCandidate.index, payloadDigest: reviewedCandidate.payloadDigest }),
       })).json()
+      const confirmToken = (preview as { token: string }).token
       const confirmed = await (await app.request('/v1/proposals/commands', {
         method: 'POST', headers,
-        body: JSON.stringify({ kind: 'confirm_proposal', commandId: 'w22-confirm', projectId, conversationId, token: (preview as { token: string }).token }),
+        body: JSON.stringify({ kind: 'confirm_proposal', commandId: 'w22-confirm', projectId, conversationId, token: confirmToken }),
       })).json()
       if (confirmed.status !== 'recorded') throw new Error('Proposal confirmation was not recorded')
       const frozen = await (await app.request(`/v1/messages/${encodeURIComponent(contextMessageId)}/context`, { headers })).json()
@@ -135,7 +138,7 @@ export async function buildPersonalChain(root: string, options: { expiresAt?: st
       return {
         model: { file: model.file, requests: model.requests, close: () => model.close() },
         source, scratch, v1: v1 as never, v2: v2 as never, workId, question, sourceMessageId, contextMessageId,
-        reviewedCandidate, frozenDigest, bindingScope, frozenSourceIds, modelCalls,
+        reviewedCandidate, contextToken: preparedContext.token, confirmToken, frozenDigest, bindingScope, frozenSourceIds, modelCalls,
       }
     } finally {
       await viewer.close().catch(() => undefined)
