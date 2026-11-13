@@ -1,0 +1,154 @@
+{
+  "protocol": "wave18-frozen-delivery-admission/1",
+  "installs": [
+    {
+      "frozen": "/private/tmp/w20frozen/install",
+      "subject": {
+        "source": "e4e0623dcb6d90318939f9613f9251ff73fcc602",
+        "buildId": "637ed44e850f447a",
+        "schema": 18
+      },
+      "modulePath": "/private/tmp/w20frozen/install/app/apps/launcher/lib/upgrade.mjs",
+      "moduleSha256": "9f88c5ff8fb3d77f388a9725272ea05f4199db33ab2fcdda06551022d9883135",
+      "cases": [
+        {
+          "id": "COMPLETE_PARENT_POSITIVE",
+          "proven": true,
+          "scannerOk": true,
+          "unverifiable": [],
+          "stopped": [
+            912345
+          ],
+          "remaining": [],
+          "unknownLive": [],
+          "considered": 1,
+          "pidReused": false,
+          "signals": [
+            {
+              "pid": 912345,
+              "signal": "SIGTERM"
+            }
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "COMPLETE_REGISTERED_CHILD_POSITIVE",
+          "proven": true,
+          "scannerOk": true,
+          "unverifiable": [],
+          "stopped": [
+            912345,
+            912346
+          ],
+          "remaining": [],
+          "unknownLive": [],
+          "considered": 2,
+          "pidReused": false,
+          "signals": [
+            {
+              "pid": 912345,
+              "signal": "SIGTERM"
+            },
+            {
+              "pid": 912346,
+              "signal": "SIGTERM"
+            }
+          ],
+          "startReads": [
+            912345,
+            912346
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "UNREGISTERED_CHILD_NEGATIVE",
+          "proven": false,
+          "scannerOk": true,
+          "unverifiable": [],
+          "stopped": [
+            912345
+          ],
+          "remaining": [],
+          "unknownLive": [
+            {
+              "pid": 912346,
+              "command": "node registered-child --state /tmp/pa-wave18-frozen-child-OccUEb/data"
+            }
+          ],
+          "considered": 2,
+          "pidReused": false,
+          "signals": [
+            {
+              "pid": 912345,
+              "signal": "SIGTERM"
+            }
+          ],
+          "startReads": [
+            912345
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "REGISTERED_WRONG_START_NEGATIVE",
+          "proven": false,
+          "scannerOk": true,
+          "unverifiable": [
+            {
+              "pid": 912346,
+              "label": "child",
+              "reason": "start_mismatch"
+            }
+          ],
+          "stopped": [
+            912345
+          ],
+          "remaining": [],
+          "unknownLive": [
+            {
+              "pid": 912346,
+              "command": "node registered-child --state /tmp/pa-wave18-frozen-child-OccUEb/data"
+            }
+          ],
+          "considered": 2,
+          "pidReused": true,
+          "signals": [
+            {
+              "pid": 912345,
+              "signal": "SIGTERM"
+            }
+          ],
+          "startReads": [
+            912345,
+            912346
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "ACTUAL_RECOVER_UNREGISTERED_CHILD",
+          "result": "BLOCKED",
+          "journal": "target_stop_unproven",
+          "signals": [
+            {
+              "pid": 912345,
+              "signal": "SIGTERM"
+            }
+          ],
+          "pointerCreated": false,
+          "status": "PASS"
+        }
+      ],
+      "passed": 5,
+      "failed": 0,
+      "notTested": 0
+    }
+  ],
+  "passed": 5,
+  "failed": 0,
+  "notTested": 0,
+  "actualOsScans": 0,
+  "actualOsSignals": 0,
+  "candidateProcessesStarted": 0,
+  "vendorSends": 0,
+  "nativeTurns": 0,
+  "scope": "Each verified immutable package is evaluated independently with full parent/registered-child positives and missing/wrong-start/helper/recover negatives; all candidate process operations mocked, no live lifecycle admission"
+}
