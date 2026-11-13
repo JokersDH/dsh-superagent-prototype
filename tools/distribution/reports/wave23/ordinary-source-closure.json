@@ -1,0 +1,442 @@
+{
+  "protocol": "wave23-ordinary-source-closure/1",
+  "sourceCommit": "26a7321",
+  "generatedAt": "2026-11-13T16:07:02.541Z",
+  "purpose": "Coherent ordinary personal distribution source/deploy closure with actual cleanup/fault and same-Store validation tools; excludes historical reports and unrelated prototypes.",
+  "groups": {
+    "launcher": [
+      {
+        "path": "apps/launcher/bin/pa.mjs",
+        "bytes": 36842,
+        "sha256": "5e17dbc6c17d7490fefaaa9469aa50fe6f73a3bd205b63d083646a95b0620112"
+      },
+      {
+        "path": "apps/launcher/lib/backup-index.mjs",
+        "bytes": 2108,
+        "sha256": "e1d226b406138e7942c603c2259b922bf7ea290cb3ca1acf137ab30300fdbfbf"
+      },
+      {
+        "path": "apps/launcher/lib/backup.mjs",
+        "bytes": 5164,
+        "sha256": "54e33b001d74899e7049834fc79b51acb5bcc8ad617762849f21e8acae6ae032"
+      },
+      {
+        "path": "apps/launcher/lib/cli.mjs",
+        "bytes": 3125,
+        "sha256": "937d3b840e49c1e897980db87fab75ab43f41f3302e4f04c264c21464d963eba"
+      },
+      {
+        "path": "apps/launcher/lib/config.mjs",
+        "bytes": 3133,
+        "sha256": "3a938220bbefb1305666fe22dc23641f39cb058fb09867df6ae42cf26bce0dd7"
+      },
+      {
+        "path": "apps/launcher/lib/context.mjs",
+        "bytes": 1875,
+        "sha256": "43b6544974271cc30fca0848306130c4ad828f5b5a2b5a525a487be85e1444f4"
+      },
+      {
+        "path": "apps/launcher/lib/daemon.mjs",
+        "bytes": 7303,
+        "sha256": "1ac7fafa40daf225405c739de1e12669647b1a9d1c772d1c70ac340467614f8a"
+      },
+      {
+        "path": "apps/launcher/lib/diagnostics.mjs",
+        "bytes": 7275,
+        "sha256": "94b5e7eaef4f9845f50e2b4785b8ef9f6308cbe7c3a223b3c737436913e02df5"
+      },
+      {
+        "path": "apps/launcher/lib/doctor.mjs",
+        "bytes": 15333,
+        "sha256": "95f549df67f290eb516a5c41528a39ac61e18aa39428fe732791bda132a7ac65"
+      },
+      {
+        "path": "apps/launcher/lib/first-run.mjs",
+        "bytes": 4795,
+        "sha256": "76963d9a40721f73685730aff32f3ad64e18f94ed1b7aa2d3a0e0adb7303f2cf"
+      },
+      {
+        "path": "apps/launcher/lib/http-probe.mjs",
+        "bytes": 1289,
+        "sha256": "70cfdb582382b9987704085efd9716c27d64a6bd0a7105fc0f3010e115081b55"
+      },
+      {
+        "path": "apps/launcher/lib/identity.mjs",
+        "bytes": 10200,
+        "sha256": "24a459f1b0ec1420ecad6bab83ef9a5a9a4c068f7341655c08a6b59beb58d121"
+      },
+      {
+        "path": "apps/launcher/lib/instance.mjs",
+        "bytes": 20023,
+        "sha256": "ef9eae903516d34c3000b1a0d75ce9cec93f67ca9c8d1219a77421cabc02063e"
+      },
+      {
+        "path": "apps/launcher/lib/recovery-activation.mjs",
+        "bytes": 13997,
+        "sha256": "57816db8e9a307127155112045ef1ccdd80f6f15d0ef71eb6e05e89b030ebec2"
+      },
+      {
+        "path": "apps/launcher/lib/recovery-authorization.mjs",
+        "bytes": 10601,
+        "sha256": "f9989909c5a2618ae4e942b1628ec860c19c940c95eb9b053b917f01d14c62e3"
+      },
+      {
+        "path": "apps/launcher/lib/recovery.mjs",
+        "bytes": 5845,
+        "sha256": "2d5af56dfeec5bebd4e1dd32271ded49830dcb992fcfe170b4d33bcb288b064e"
+      },
+      {
+        "path": "apps/launcher/lib/release-bootstrap.mjs",
+        "bytes": 13832,
+        "sha256": "f1f8d2f163b9a1ddc1a4bfb8a446f121892d9b68ea3dfa7ec2e8248640ff4e62"
+      },
+      {
+        "path": "apps/launcher/lib/release.mjs",
+        "bytes": 14172,
+        "sha256": "f2fde48e0af945c23da4b90a5af54ae300210cade44524d873fbe0fedddd4edc"
+      },
+      {
+        "path": "apps/launcher/lib/restore.mjs",
+        "bytes": 13212,
+        "sha256": "302134df80a86bdcacc6663b78491613cd30523fbb7fcf6d588a8baf1f0fa6e8"
+      },
+      {
+        "path": "apps/launcher/lib/review.mjs",
+        "bytes": 2743,
+        "sha256": "7679cf9beb584667e10049753835f680a5957f4170b8871c13447e19b00b11e2"
+      },
+      {
+        "path": "apps/launcher/lib/start-lock.mjs",
+        "bytes": 4064,
+        "sha256": "0e9bc17117704dec44417a715a563cac536220e33f43d0077bb6f7e946f8639d"
+      },
+      {
+        "path": "apps/launcher/lib/start.mjs",
+        "bytes": 22958,
+        "sha256": "493ca3f8eee1d6258c868ffd86311462c57ac8ef8e8d38bd653d0eb818c3b227"
+      },
+      {
+        "path": "apps/launcher/lib/static-server.mjs",
+        "bytes": 7050,
+        "sha256": "8797bffb0c3c2d22eeef46bc58fdcbcbb4696a1e7cdac9d673781c094ca66adb"
+      },
+      {
+        "path": "apps/launcher/lib/stop.mjs",
+        "bytes": 7446,
+        "sha256": "8bd3c1115c8bcb5b5626de908cd3eb73d004bd4d49dac17f57f7b2152a59d136"
+      },
+      {
+        "path": "apps/launcher/lib/support.mjs",
+        "bytes": 4153,
+        "sha256": "4465fecf0631a5c505d59b1e7587a6447c4cdbcc8828029a0499b118cb6ba699"
+      },
+      {
+        "path": "apps/launcher/lib/upgrade.mjs",
+        "bytes": 60281,
+        "sha256": "9f88c5ff8fb3d77f388a9725272ea05f4199db33ab2fcdda06551022d9883135"
+      },
+      {
+        "path": "apps/launcher/package.json",
+        "bytes": 932,
+        "sha256": "844b8538c250d0bdba0d6c59bcec2a88f276f236b23eb9c22a1da441e41798f1"
+      },
+      {
+        "path": "apps/launcher/test/cli.case.mjs",
+        "bytes": 10471,
+        "sha256": "3189890ec7769a7073cae55e1927b3df45deccc4c914add9c731a1aabb791d5a"
+      },
+      {
+        "path": "apps/launcher/test/diagnostics.case.mjs",
+        "bytes": 4751,
+        "sha256": "c344123be62d6efdac2bc83efa204bcfa052973ce5c8b92f98480b2d7a15f514"
+      },
+      {
+        "path": "apps/launcher/test/first-run.case.mjs",
+        "bytes": 6826,
+        "sha256": "1f9607394266857364080cdfbf97100a201bea8610e1fb23ba75e8d651392993"
+      },
+      {
+        "path": "apps/launcher/test/identity.case.mjs",
+        "bytes": 6140,
+        "sha256": "5de7a799397e25a8bafb7a2e16b4220b9336e7b98991bc78b807ac43ec737ed3"
+      },
+      {
+        "path": "apps/launcher/test/recovery-activation.case.mjs",
+        "bytes": 9433,
+        "sha256": "6a8e6ce299e43b505d787a1dc0eb7273184f1e1d0e4bc37984f9915ea1e65ba9"
+      },
+      {
+        "path": "apps/launcher/test/release-bootstrap.case.mjs",
+        "bytes": 10521,
+        "sha256": "818e7632a24046448ac2dd9568e0c7f461921fd1b8d9db05266e7efe8c68c491"
+      },
+      {
+        "path": "apps/launcher/test/release-gate.case.mjs",
+        "bytes": 4603,
+        "sha256": "cb244500072bcf572d63553b666e2b153aaf1af2422a8518259457062e05c6d6"
+      },
+      {
+        "path": "apps/launcher/test/requested-scope.case.mjs",
+        "bytes": 6586,
+        "sha256": "0cfeba3208b6d84fe1e383f7290c8c9bef80a6ae0b6c49d3c387bf389a1b6bb5"
+      },
+      {
+        "path": "apps/launcher/test/restore.case.mjs",
+        "bytes": 6471,
+        "sha256": "5777248e7bfbc19c004297e8b8f7220487dc5e66773b5f41c82788eb4f0dada5"
+      },
+      {
+        "path": "apps/launcher/test/static-server.case.mjs",
+        "bytes": 6038,
+        "sha256": "c088d671c22e2847e2e941ed8a76d77140693f6fa54090577868e799ab09e3e1"
+      },
+      {
+        "path": "apps/launcher/test/support.case.mjs",
+        "bytes": 2562,
+        "sha256": "9a5f9611cc6b60e515e111f5445a083cb010cdd1232a509060135064912ee617"
+      },
+      {
+        "path": "apps/launcher/test/upgrade-identity.case.mjs",
+        "bytes": 2282,
+        "sha256": "ebe7b0db87d59db75697d282cab04f7a2d5b449b02f0c2980361f3e74c9641fe"
+      },
+      {
+        "path": "apps/launcher/test/upgrade-resources.case.mjs",
+        "bytes": 4005,
+        "sha256": "b5655cc1f9c6117b20d3ca8bdf8886325282c74973b5390b4c784bd82a1fa335"
+      }
+    ],
+    "portability": [
+      {
+        "path": "packages/portability/package.json",
+        "bytes": 1065,
+        "sha256": "7b4dce4a949932b35f1f60d3f24bcda01e93ba8df16a26364bd870016070263a"
+      },
+      {
+        "path": "packages/portability/src/archive.ts",
+        "bytes": 12299,
+        "sha256": "764c80b175dfa0e2ed87c0513ac3a3c80e96cf003581e37168ac50ab0c17e19f"
+      },
+      {
+        "path": "packages/portability/src/bundle.ts",
+        "bytes": 12549,
+        "sha256": "7b3369cddb90730f2d49209c7655e1a3c4a1fd02606c076fe3e5b8455c8f83bf"
+      },
+      {
+        "path": "packages/portability/src/errors.ts",
+        "bytes": 1569,
+        "sha256": "5b8758a64fec72d62450c6833331a091638283239f19f5513f1e3e210bbdbdc9"
+      },
+      {
+        "path": "packages/portability/src/evidence.ts",
+        "bytes": 22668,
+        "sha256": "6534659468d8da3ed6fbe544ddf77e9c1b897f484da79cb6e6dd24a871b096a6"
+      },
+      {
+        "path": "packages/portability/src/index.ts",
+        "bytes": 2501,
+        "sha256": "4f8061211e36b3959cd861215ef2aaae74167de6e1a3df67cb082d373fffe363"
+      },
+      {
+        "path": "packages/portability/src/manifest.ts",
+        "bytes": 22266,
+        "sha256": "f12a1accd12546ce0d3693edc995a026df443e0421a94a9d41217fccb2ebd971"
+      },
+      {
+        "path": "packages/portability/src/recovery-target.ts",
+        "bytes": 17680,
+        "sha256": "4ea451c9489fc6debc21621857203090ab1ec75b61b532bcab49cb393be38479"
+      },
+      {
+        "path": "packages/portability/src/restore.ts",
+        "bytes": 19354,
+        "sha256": "16cfc59fb766c1b6e0b045204ad8fb675c42e3293d61a60b8e6c03b59f6250a5"
+      },
+      {
+        "path": "packages/portability/src/roots.ts",
+        "bytes": 9917,
+        "sha256": "c6f4ae71b0cbf84a42bffc32ff7e2a967cc85b21ecabd2b66857bb61b85e49e7"
+      },
+      {
+        "path": "packages/portability/src/snapshot.ts",
+        "bytes": 15100,
+        "sha256": "562d72b676a00c6fafa03cc60fb4203f07adacd6cb25fab1a4be381e6a2c5279"
+      },
+      {
+        "path": "packages/portability/src/state.ts",
+        "bytes": 8610,
+        "sha256": "dc8114241993626d3f316cf0ee345a7c91fcba9ac58f3e7e4e78acf1904e50df"
+      },
+      {
+        "path": "packages/portability/test/archive.case.ts",
+        "bytes": 7420,
+        "sha256": "70c2388502c1261ed3f94cec17dbf67f47585ae4306e0fbe8151bbb0839a71af"
+      },
+      {
+        "path": "packages/portability/test/bundle.case.ts",
+        "bytes": 12594,
+        "sha256": "b7f1e4ee416404cfd1383cbe06891ad5e6e16785cfad6bc5afebb78e80fa37db"
+      },
+      {
+        "path": "packages/portability/test/evidence.case.ts",
+        "bytes": 17475,
+        "sha256": "ec46f2e463af9e090302b6f11c3866c64b6f16ad5fc546e9ab7c061f6c4ef57d"
+      },
+      {
+        "path": "packages/portability/test/manifest.case.ts",
+        "bytes": 4451,
+        "sha256": "64a0d1e36b7327fb9c8f184bd1e4a96770b7ae1670f17931fba7a6203ee3e158"
+      },
+      {
+        "path": "packages/portability/test/recovery-target.case.ts",
+        "bytes": 15174,
+        "sha256": "6bfe5ceef811b8389e236aacfe8b93e0f04cbdc6938250277b8e32526c7263dc"
+      },
+      {
+        "path": "packages/portability/test/restore.case.ts",
+        "bytes": 7532,
+        "sha256": "d78aef091ce872a202f2282e045251f18113b9d75b1d0d188886d5b1362e05b1"
+      },
+      {
+        "path": "packages/portability/test/roots.case.ts",
+        "bytes": 5874,
+        "sha256": "e30f66abc6464db44cec9f7814cb4d0dfc6c36300aad7b7f6a9e5c7699deb231"
+      },
+      {
+        "path": "packages/portability/test/state.case.ts",
+        "bytes": 5449,
+        "sha256": "b88495e64de89dca52cddd931dd2fb12fcf83e8393abc8e1868def6db72e32ea"
+      },
+      {
+        "path": "packages/portability/tsconfig.base.json",
+        "bytes": 322,
+        "sha256": "52c2f05cda7c899aafe757611f34f6ffe141b2609c572022dbc5fb34b650adb1"
+      },
+      {
+        "path": "packages/portability/tsconfig.build.json",
+        "bytes": 277,
+        "sha256": "b780db4a517de83c50441183aeefcfad32d4b13b0819e78a0fdeb8e22b9cf754"
+      },
+      {
+        "path": "packages/portability/tsconfig.json",
+        "bytes": 173,
+        "sha256": "2c52aca7526c06894ea6773e090bad7573493bef84d174899b274b05c5b56cbf"
+      }
+    ],
+    "distribution": [
+      {
+        "path": "tools/distribution/README.md",
+        "bytes": 5763,
+        "sha256": "17bb7c555304c0a81a94c486d409a8fd1677e6e05fefb16c2a9392eab5232167"
+      },
+      {
+        "path": "tools/distribution/build.mjs",
+        "bytes": 15403,
+        "sha256": "a35fb2bd7c0cb247d0d8a98c3006cf376e9df16ad90d52a420b81c2e18e43ef2"
+      },
+      {
+        "path": "tools/distribution/freeze-install.mjs",
+        "bytes": 4863,
+        "sha256": "71fb542afc67e9709029c1bca2ccd02c53081b0c8c0396f4fb97cbf486a92a2e"
+      },
+      {
+        "path": "tools/distribution/lib/live-cleanup.mjs",
+        "bytes": 5530,
+        "sha256": "7065faacebd1520573a09efd6a27792cbab4ede2bc56ad118e10c169d2ee609c"
+      },
+      {
+        "path": "tools/distribution/stage.mjs",
+        "bytes": 18303,
+        "sha256": "bfc16798cc9436d451bf65c5e11bc6d3c9f5065928abe7c19267399c91bbdf30"
+      },
+      {
+        "path": "tools/distribution/verify-live-cleanup-controls.mjs",
+        "bytes": 3721,
+        "sha256": "b05acb9947ad2edf276e4366830a6b2d20f3c2cc1cf3a78187edf6d99429d9ba"
+      },
+      {
+        "path": "tools/distribution/verify-nonempty-personal-http.mjs",
+        "bytes": 37922,
+        "sha256": "694d98703c0b26924c717cadd4f61c7b6c4cb28781fe0c019f019325cf2d5f61"
+      },
+      {
+        "path": "tools/distribution/verify-real-business-relocation.mjs",
+        "bytes": 15337,
+        "sha256": "f218b7a8c9fdcc5ad22749e65a5f53523b70f0c9ea352eff1fc22cfccc871afb"
+      },
+      {
+        "path": "tools/distribution/verify-same-store-dual-personal.mjs",
+        "bytes": 24913,
+        "sha256": "b097b59d0931d0b076a9971524eb9fbb203e622d2ee6356b4014bdc521c5d488"
+      }
+    ],
+    "root": [
+      {
+        "path": "apps/launcher/package.json",
+        "bytes": 932,
+        "sha256": "844b8538c250d0bdba0d6c59bcec2a88f276f236b23eb9c22a1da441e41798f1"
+      },
+      {
+        "path": "package.json",
+        "bytes": 7183,
+        "sha256": "d3318dc95282df9a9d7b6707adbc3509347fd8d5791d781202601836b66fc5dc"
+      },
+      {
+        "path": "packages/portability/package.json",
+        "bytes": 1065,
+        "sha256": "7b4dce4a949932b35f1f60d3f24bcda01e93ba8df16a26364bd870016070263a"
+      },
+      {
+        "path": "pnpm-workspace.yaml",
+        "bytes": 102,
+        "sha256": "9c2085d9abd9b482a0eacf8edb5776c7fbb6e52cf19e880e722d634e3c270e15"
+      },
+      {
+        "path": "tsconfig.json",
+        "bytes": 576,
+        "sha256": "bdcfde2b4ea9b69252536b4293b60a8167f0c46d50244fa6dc15678764a93ad2"
+      }
+    ]
+  },
+  "environment": {
+    "node": "24.21.0",
+    "pnpm": "11.7.0",
+    "sqlite": "3.53.4",
+    "abi": "137",
+    "platform": "darwin",
+    "arch": "arm64",
+    "productSchema": 18
+  },
+  "rootConfiguration": {
+    "required": [
+      "pnpm-workspace.yaml includes apps/* and packages/*",
+      "root package.json scripts build/product/test",
+      "Node 24.21 / ABI 137 / SQLite 3.53.4",
+      "console static assets and coordinator/storage/contracts/application/workflows workspace packages are build closure"
+    ]
+  },
+  "installClosure": {
+    "build": "tools/distribution/build.mjs",
+    "stage": "tools/distribution/stage.mjs",
+    "freeze": "tools/distribution/freeze-install.mjs",
+    "targetManifest": "install.json",
+    "fullDependencyClosure": true,
+    "note": "launcher/portability are not independently deployable; build/stage resolve all workspace/native dependencies and the complete target closure."
+  },
+  "runtimeDependencies": [
+    "@personal-agent/portability",
+    "@personal-agent/storage",
+    "@personal-agent/workflows",
+    "@personal-agent/contracts",
+    "@personal-agent/application",
+    "zod",
+    "better-sqlite3 ABI 137",
+    "coordinator demo/http/console assets"
+  ],
+  "boundaries": [
+    "Zero real vendor/model/native turns.",
+    "Review selection is readonly historical data, not private startup permission or target grant.",
+    "Historical tars/reports/state are not part of this source closure.",
+    "A/C driver absence blocks only the corresponding measured item, not ordinary install."
+  ]
+}
