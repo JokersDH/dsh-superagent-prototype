@@ -1,6 +1,6 @@
-# Agent E 第二十一轮交付交接
+# Agent E 第二十二轮交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `a92bb9e`，检查点 `515fe71`，本次证据源 `292cff92bf8eb71e01dd638be2c617ed1b1505cc`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `54d6e1b`，检查点 `null`，本次证据源 `7443efd08cfba165c93624b3ab63ed4d462f5b78`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
 
@@ -13,9 +13,9 @@
 | `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | E2-* | PASS 25 + NOT_TESTED 3 |
 | `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 27 + NOT_TESTED 6 |
 | `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 21 + NOT_TESTED 5 |
-| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 215 | PASS 199 + FAIL 1 + SKIPPED 0 + NOT_TESTED 15 + BLOCKED 0 + UNKNOWN 0 |
+| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 215 | PASS 200 + FAIL 0 + SKIPPED 0 + NOT_TESTED 15 + BLOCKED 0 + UNKNOWN 0 |
 
-本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T13-18-18-989Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T14-48-56-062Z`。
 
 ## 矩阵摘要
 
@@ -82,9 +82,9 @@
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 `controlled-product-workflow` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **FAIL（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=637ed44e850f447a/schema 18，main schema 18；current-main install=PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=true；D safety mocks=PASS（helper 从 ee tar 提取并核对文件 hash；旧97仅mock失败对照）；candidate installed=PASS；second root=PASS（probeScope=fixture+recovery_readonly）；installed source confirm=PASS；installed stability=PASS；workflow formats=PASS（按包能力：default1+explicit2）；personal review=PASS（consumerOrigin=package，packageEntry=true）；refusals=PASS；review reuse=FAIL（digestAvailable=false；differentSelection=REUSED）。personal旧项目只读重绑定未到，对应项NOT_REACHED，403不自动放宽。 |
+| 安装准入（个人 Alpha） | **PASS（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=cc16eca05e4da244/schema 18，main schema 18；current-main install=PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=true；D safety mocks=PASS（helper 从 ee tar 提取并核对文件 hash；旧97仅mock失败对照）；candidate installed=PASS；second root=PASS（probeScope=fixture+recovery_readonly）；installed source confirm=PASS；installed stability=PASS；workflow formats=PASS（按包能力：default1+explicit2）；personal review=PASS（consumerOrigin=package，digest=44206eb5…，scopeDiagnostics=NOT_REACHED_712_absent）；refusals=PASS；review reuse=PASS（same=REUSED，digestSame=true，different=BLOCKED）。personal旧项目只读重绑定未到，对应项NOT_REACHED，403不自动放宽。 |
 
-安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `90e81429079a7d50` / schema 18 / tar `b0990149…` / source `ee7fbd8a`；target buildId `637ed44e850f447a` / schema 18 / tar `1f78e38b…` / source `e4e0623d`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
+安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `637ed44e850f447a` / schema 18 / tar `1f78e38b…` / source `e4e0623d`；target buildId `cc16eca05e4da244` / schema 18 / tar `e875b9b9…` / source `595b3f13`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
 ## 独立复核价值试点
 
@@ -104,13 +104,13 @@
 | `module` | PASS |
 | `controlled-product` | PASS |
 | `actual-native-control` | FAIL（case_not_pass, layer_not_allowed） |
-| `installed-alpha` | FAIL（case_not_pass） |
+| `installed-alpha` | PASS |
 | `advisory-routing` | FAIL（case_not_pass, layer_not_allowed） |
 | `controlled-review` | FAIL（case_not_pass, layer_not_allowed, missing_required_case） |
 | `actual-heterogeneous-review` | FAIL（case_not_pass, layer_not_allowed, missing_required_case） |
 | `review-value` | FAIL（case_not_pass, layer_not_allowed） |
-| `local-alpha` | FAIL（case_not_pass） |
-| `full-product` | FAIL（case_not_pass, missing_required_case, layer_not_allowed, required_evidence_missing） |
+| `local-alpha` | PASS |
+| `full-product` | FAIL（missing_required_case, case_not_pass, layer_not_allowed, required_evidence_missing） |
 
 ## 明确未测
 
