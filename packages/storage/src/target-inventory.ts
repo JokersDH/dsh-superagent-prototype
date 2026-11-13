@@ -21,7 +21,7 @@ const METADATA_TABLES = new Set([
   'event_log', 'command_receipts', 'fact_receipts',
 ])
 /** Exactly the FTS5 table and its generated shadow tables; no arbitrary prefix is trusted. */
-const INDEX_TABLES = new Set([
+export const TARGET_INDEX_TABLES: ReadonlySet<string> = new Set([
   'conversation_search', 'conversation_search_data', 'conversation_search_idx',
   'conversation_search_content', 'conversation_search_docsize', 'conversation_search_config',
 ])
@@ -58,7 +58,22 @@ export const TARGET_TABLE_CATEGORIES: Readonly<Record<string, 'metadata' | 'busi
 })
 
 const categoryOf = (name: string): 'metadata' | 'business' | 'unknown' =>
-  TARGET_TABLE_CATEGORIES[name] ?? (INDEX_TABLES.has(name) ? 'metadata' : 'unknown')
+  TARGET_TABLE_CATEGORIES[name] ?? (TARGET_INDEX_TABLES.has(name) ? 'metadata' : 'unknown')
+
+/** Tables and named indexes the migration registry creates through the claimed schema. */
+export function requiredSchemaObjects(schema: number): { tables: Set<string>; indexes: Set<string> } {
+  const tables = new Set<string>(), indexes = new Set<string>()
+  for (const migration of MIGRATIONS) {
+    if (migration.version > schema) break
+    for (const statement of migration.statements) {
+      const table = /CREATE\s+(?:VIRTUAL\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z_][A-Za-z0-9_]*)/i.exec(statement)
+      if (table?.[1]) tables.add(table[1])
+      const index = /CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z_][A-Za-z0-9_]*)/i.exec(statement)
+      if (index?.[1]) indexes.add(index[1])
+    }
+  }
+  return { tables, indexes }
+}
 
 /** Tables this build's registry creates up to and including `schema`, for completeness validation. */
 function expectedTablesFor(schema: number): Set<string> {

@@ -1,0 +1,213 @@
+{
+  "protocol": "wave18-delivery-admission/1",
+  "status": "CURRENT_D_CHILD_SCOPE_PASSES_E_INSTALLED_ADMISSION_REJECTED_FOR_MIXED_SUBJECT",
+  "sources": {
+    "main": "d494212f7658c228eb4f0d24639b22fd1fe95109",
+    "mainRuntime": "6050b4bf066d170c54c45e7f9bf4024abac285dc",
+    "d": "94ee3c6150ec49bebab801dda9eec7ecf7cd4f20",
+    "e": "48f73f65fb213a41e8b4331a2b3a256d8aabe2d6",
+    "eRecordedTestSource": "4f39f582cf5aa20c7a2846073c18e2aed4d43a74"
+  },
+  "safety": {
+    "vendorModelSends": 0,
+    "nativeTurnStarts": 0,
+    "candidateLiveResourcesStarted": 0,
+    "probeActualOsScans": 0,
+    "probeActualOsSignals": 0,
+    "liveInstallStopUpgradeCleanupMatricesRun": false,
+    "eLiveChildFixtureRun": false,
+    "eSourceConfirmationScope": "Two focused Hono request/real SQLite cases in generated isolated state; Git fixture commands only, no live D launcher/cleanup or vendor call.",
+    "userServicesPreserved": "All twelve pairs 5180-5191 / 8796-8807",
+    "userStateProfilesTarsLedgersChanged": false,
+    "dWorktreeClean": true,
+    "eUntrackedRunDirectoriesPreserved": 74,
+    "productionAndAcceptanceSourcesChanged": false,
+    "repositoryWrites": [
+      "reports/releases/wave18-admission/delivery.json",
+      "tools/bootstrap/probe-wave18-delivery.mjs",
+      "tools/bootstrap/probe-wave18-release-gate.mjs"
+    ],
+    "temporaryArtifactsRetained": "/tmp/pa-wave18-delivery-audit-lWXHuK",
+    "mockCoverage": "Frozen helper comparison injects every used process identity/inventory/signal function and forbids real process commands."
+  },
+  "verification": {
+    "dPrevious": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave18-d-previous.json node --experimental-test-module-mocks tools/bootstrap/probe-wave17-delivery.mjs /Users/hh/Desktop/joker/superagent-agent-d /tmp/pa-wave18-delivery-audit-lWXHuK/install",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "report": "/tmp/pa-wave18-d-previous.json",
+      "scope": "Complete parent positive plus same-UID unregistered helper and actual recovery negatives."
+    },
+    "ePrevious": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave18-e-previous.json node tools/bootstrap/probe-wave17-release-gate.mjs /Users/hh/Desktop/joker/superagent-agent-e",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "report": "/tmp/pa-wave18-e-previous.json",
+      "scope": "Unchanged six-case actual personal HTTP/fault evidence positive passes; NO_OP/exit1 and missing pointer pair now reject with focal reasons."
+    },
+    "newFrozenChild": {
+      "command": "node --experimental-test-module-mocks /tmp/pa-wave18-delivery-audit-lWXHuK/frozen-child-gate.mjs /tmp/pa-wave18-delivery-audit-lWXHuK/install /tmp/pa-wave18-delivery-audit-lWXHuK/new-frozen-child.json",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "report": "/tmp/pa-wave18-delivery-audit-lWXHuK/new-frozen-child.json",
+      "moduleSource": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+      "moduleSha256": "9f88c5ff8fb3d77f388a9725272ea05f4199db33ab2fcdda06551022d9883135",
+      "scope": "Imports the immutable extracted package module, verifies its recorded file hash, then checks complete parent and registered-child positives, unregistered/wrong-start negatives and actual recover refusal."
+    },
+    "oldFrozenChild": {
+      "command": "node --experimental-test-module-mocks /tmp/pa-wave18-delivery-audit-lWXHuK/frozen-child-gate.mjs /tmp/pa-wave17-delivery-audit-0guO8q/install /tmp/pa-wave18-delivery-audit-lWXHuK/old-frozen-child.json",
+      "exitCode": 1,
+      "passed": 2,
+      "failed": 3,
+      "report": "/tmp/pa-wave18-delivery-audit-lWXHuK/old-frozen-child.json",
+      "moduleSource": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+      "moduleSha256": "fa4b4ed348fccbe00b22af348c8b5513a19662f3fc99ce3bc063a28b8e96742a",
+      "scope": "The exact artifact E declares installed still signals unregistered/wrong-start children and actual recovery returns REVERTED. These are preserved old artifact failures, not a regression of fixed D65102f7."
+    },
+    "eSafetySubjectBinding": {
+      "command": "node /tmp/pa-wave18-delivery-audit-lWXHuK/e-safety-subject-gate.mjs",
+      "exitCode": 1,
+      "passed": 1,
+      "failed": 1,
+      "report": "/tmp/pa-wave18-delivery-audit-lWXHuK/e-safety-subject-results.json",
+      "scope": "Original actual full installed-alpha report is an unchanged declared-PASS gate control, not independent approval of its mixed-source safety. Only safety-helper provenance is replaced with the independently verified new65102f7 tuple/module hash; installed97cace7 subject stays unchanged. Gate incorrectly accepts the mismatch."
+    },
+    "eSourceConfirmation": {
+      "command": "node --input-type=module -e 'import {runSourceConfirm} from \"./tests/product-acceptance/cases/e4-source-confirm.mjs\"; const r=await runSourceConfirm(); console.log(JSON.stringify(r)); process.exitCode=r.cases.some(c=>c.status!==\"PASS\")?1:0'",
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "report": "/tmp/pa-wave18-delivery-audit-lWXHuK/e-source-confirm.json",
+      "scope": "Actual current runtime/Hono source prepare, confirm, audit and replay with real SQLite; held queue and restore marker unchanged, no target, authorization=not_granted/startupAvailable=false. One combined expiry/profile-change refusal tested. This is controlled source-layer evidence, not installed65102f7 verification."
+    },
+    "persistentFrozenComparison": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave18-d-persistent.json node --experimental-test-module-mocks tools/bootstrap/probe-wave18-delivery.mjs /tmp/pa-wave18-delivery-audit-lWXHuK/install /tmp/pa-wave17-delivery-audit-0guO8q/install",
+      "exitCode": 1,
+      "passed": 7,
+      "failed": 3,
+      "perInstall": [
+        { "source": "65102f79352743ef38cdbcf9170f37b4d3ade06b", "passed": 5, "failed": 0 },
+        { "source": "97cace735c6cdbdd7ecdade05132371da1a5273c", "passed": 2, "failed": 3 }
+      ],
+      "scope": "One persistent-tool invocation imports each immutable install independently and verifies its module against that install inventory. Nonzero reflects preserved old97 failures; current651 passes all five focused cases.",
+      "report": "/tmp/pa-wave18-d-persistent.json"
+    },
+    "persistentSafetySubject": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave18-e-persistent.json node tools/bootstrap/probe-wave18-release-gate.mjs /Users/hh/Desktop/joker/superagent-agent-e /tmp/pa-wave18-delivery-audit-lWXHuK/install",
+      "exitCode": 1,
+      "passed": 1,
+      "failed": 1,
+      "scope": "Original complete installed-alpha report remains the declared-PASS control. Actual new tar/manifest/helper bytes are checked before only helper provenance is injected into the unchanged old97 evidence.",
+      "report": "/tmp/pa-wave18-e-persistent.json"
+    },
+    "artifactBytes": {
+      "command": "node /tmp/pa-wave18-delivery-audit-lWXHuK/verify-bytes.mjs",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave18-delivery-audit-lWXHuK/artifact-verified.json"
+    }
+  },
+  "persistentProbePolicy": "Both tools require a new absolute PA_ADMISSION_REPORT and exclusively create a 0600 report. D takes one verified immutable install and optionally an old verified install, never a mutable helper checkout. E takes E-root and an optional verified helper install (default from this report's artifact), and checks actual tar/manifest/module bytes before the provenance mutation. No source/Hono cases are repeated by these tools.",
+  "closedScopes": [
+    "Current D now requires independently registered child identities; same UID and ancestry do not admit an unregistered child.",
+    "A complete registered child positive actually stops; wrong child start and missing registration refuse without signalling the child.",
+    "Actual current recovery stays BLOCKED with no pointer when a child is unproven.",
+    "Current D worktree and frozen65102f7 upgrade.mjs hashes match exactly; later D heads change no launcher/portability runtime bytes.",
+    "E rejects previous NO_OP/exit1 and missing-pointer-pair mutations while unchanged actual personal HTTP/fault evidence passes.",
+    "Current main source prepare/confirm/audit is implemented and independently exercised at source/controlled level; this is not a private execution grant or target activation.",
+    "New D package contains current candidate/preferences/nonempty reply and e32/6050 source-confirmation routes."
+  ],
+  "findings": [
+    {
+      "id": "E-NEW-CHECKOUT-SAFETY-CERTIFIES-OLD-ARTIFACT",
+      "priority": 1,
+      "status": "FAIL",
+      "files": [
+        { "path": "tests/product-acceptance/cases/w17-d-child-gate.mjs", "lines": [9, 18, 19] },
+        { "path": "tests/product-acceptance/cases/e4-reply-durable.mjs", "lines": [99, 103, 111] },
+        { "path": "tests/product-acceptance/lib/release.mjs", "lines": [381, 831, 833, 848] }
+      ],
+      "summary": "The installed safety case imports the mutable D checkout, labels its result installed, and stores only dRoot/steps/proof. It neither imports the installed package helper nor binds helper source/file hash/subject to the tested tar. E5-D-OWNERSHIP-MOCKS is omitted from the cross-case frozen-subject comparison.",
+      "observed": "E declares installed-alpha PASS for97cace7. Its safety evidence names superagent-agent-d without an actual commit or module digest. Exact97cace7 frozen bytes independently fail three child/recover cases, whereas fixed65102f7 passes all five. The unchanged full E report passes the gate; adding verified65102f7 helper provenance/subject while retaining installed97cace7 still passes.",
+      "expected": "Installed safety must execute immutable helper bytes from the same verified tar subject and bind source/build/hash/size/schema/ABI/platform/arch plus module digest to that subject. Foreign checkout safety cannot repair a vulnerable frozen package's admission.",
+      "admissionEffect": "Reject E's current installed-alpha PASS for the managed lifecycle tier. Preserve its independently valid ordinary personal discussion/context/history/reply outcomes under exact97cace7 scope.",
+      "cases": ["SAFETY_HELPER_FOREIGN_TO_INSTALLED_SUBJECT", "old frozen UNREGISTERED_CHILD_NEGATIVE", "old frozen REGISTERED_WRONG_START_NEGATIVE", "old frozen ACTUAL_RECOVER_UNREGISTERED_CHILD"]
+    }
+  ],
+  "currentDRemainingP1": {
+    "observedInAuditedChildScope": false,
+    "scopeLimit": "This closes the exact reviewed child/discovery/recovery cases, not every possible lifecycle or physical writer scenario. No new broad live matrix was run.",
+    "old97cace7StillUnsafe": true
+  },
+  "artifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave17-target/wave17-target-65102f7.tar.gz",
+    "tarSha256": "33d874c9a25f22d2710fb29d686f03ad5b37de7ad2cdb09f40d16fd7ecb86340",
+    "tarBytes": 20225208,
+    "source": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+    "sourceDirty": false,
+    "buildId": "f55470ae14cc4985",
+    "productSchemaActualExport": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeActual": "24.21.0",
+    "abiActual": "137",
+    "sqliteActual": "3.53.4",
+    "inventoryEntries": 6737,
+    "regularFilesHashAndSizeVerified": 6716,
+    "internalSymlinksVerified": 21,
+    "extractedBytes": 67493046,
+    "installManifestSha256": "4cdefdee6a710c312a715794443b9dd5ad7713aae55edfde25b57e79b9a3fbdb",
+    "releaseManifestSha256": "e7526637b361c7efe2727a7741a995978785b9d8c391baf31822661f04d736cb",
+    "closureDigest": "2871160232215cff08029817dce27db81980b0da870637b21b3eb66895c16b74",
+    "verifiedInstallRoot": "/tmp/pa-wave18-delivery-audit-lWXHuK/install",
+    "verifiedCapabilitiesFromBytes": { "sourcePrepare": true, "sourceConfirm": true, "candidateRoute": true, "privatePreferences": true, "nonemptyReplyStorage": true },
+    "modeScope": "Personal-capable current bytes verified; no live instance started in this audit. Source confirmation remains data-only and grants no target/Runner authority."
+  },
+  "eRecordedScope": {
+    "counts": { "PASS": 177, "FAIL": 0, "NOT_TESTED": 15 },
+    "testSource": "4f39f582cf5aa20c7a2846073c18e2aed4d43a74",
+    "productSource": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+    "buildId": "8a5a0a85631f22ca",
+    "tarSha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+    "declaredInstalledAlpha": "PASS",
+    "independentManagedLifecycleVerdict": "REJECTED_MIXED_SAFETY_SUBJECT",
+    "validOrdinaryScope": "Recorded exact97cace7 personal discussion-only/local mock-provider context/history/source/reply and candidate-related source-fixture outcomes remain scoped facts. They do not certify the new65102f7 package or old97 child cleanup.",
+    "sourceConfirmation": "Two current source-layer Hono/SQLite cases PASS; not an installed97 or installed651 source-confirmation verdict.",
+    "temporalRule": "A feature missing from an older tested tuple is a package-time scope, not a regression of current main.97 already includes1169535 candidates;651 adds actual source-confirmation runtime."
+  },
+  "minimalIntegrableSlices": {
+    "dReviewedDelta": "6f02703 apps/launcher/lib/upgrade.mjs independent registered-child verification and producer child facts, plus already reviewed compatible recover CLI semantics.65102f7 adds a source-confirmation HTTP recipe; later94ee3c6 has no launcher/portability runtime delta.",
+    "dependencyBoundary": "Main d494212 does not yet track D's launcher/portability packages: a direct comparison adds66 package/runtime/test files. Do not cherry-pick upgrade.mjs alone without its existing D runtime dependency closure. Integrate the coherent ordinary-personal package closure with main-owned root/config/lock changes separately; exclude D reports/RFC history and any activation admission claim.",
+    "eReviewedDelta": "4f39f58 exit0 and pointer-presence validation plus focused source-confirmation tests are independently corroborated. Do not integrate the installed-layer ownership gate claim until frozen-subject/module binding is fixed.",
+    "ordinaryPersonalDecision": "Do not block existing discussion-only product use or source confirmation on this E gate bug. Stage new65102f7 as a precisely scoped personal candidate with verified bytes and passing child mock boundary. Its independent same-tuple personal cold/HTTP/backup/upgrade acceptance remains NOT_REACHED here; E must retarget the exact package before a managed installed tier is admitted. No need to redo obsolete waves or invent unrelated safety demands."
+  },
+  "nextPackages": {
+    "d": [
+      "Preserve the now-closed registered-child/UNKNOWN/CLI boundary and publish the exact byte module digest as the safety consumer input.",
+      "Provide an immutable E import root and fixture entry that targets the extracted65102f7 runtime, not a mutable checkout; docs-only heads do not trigger a refreeze.",
+      "Keep complete parent/registered-child positives and unregistered/wrong-start helper/recover negatives with injected identity reads.",
+      "After same-subject safety proof, use bounded independently born resources for the necessary parent-death/pre-record/ACK windows and cleanup proof, not a broad global sweep.",
+      "Consume the existing local SDK candidate fixture through an actual returned personal request and original verified result reader; main candidate/source-confirm entries already exist.",
+      "Record default-off/sidecar compatibility, nonempty candidate read/prepare/explicit confirm/reject/replay, and native0 under one accurate package.",
+      "Back up nonempty candidate body/source/decision or held work and receipts, then verify relocated readonly review, source prepare/confirm/audit and no execution permission inheritance.",
+      "Complete same-subject different-binary18 and legacy16 migration with protected new writes, original operation and present pointers/compatible exits.",
+      "Maintain private redacted support material and inert targets; source confirmation is not target activation or physical writer quiescence.",
+      "Publish early/mid/final source and exact immutable tuple; let E's actual new-package result close the ordinary managed-personal gate."
+    ],
+    "e": [
+      "Reject current mixed-subject installed-alpha admission while preserving old ordinary product outcomes and all historical reports.",
+      "Execute safety mocks against the extracted immutable package, record module hash/source and full artifact subject, and require E5-D-OWNERSHIP-MOCKS in frozen-subject comparison.",
+      "Retain unchanged actual report gate-control and the focal foreign-helper tuple refusal, plus old97 failure/new651 success evidence without relabeling old bytes.",
+      "Replace the mutable-checkout live child fixture as the installed safety authority; any later owned-process lane needs independent child birth/start/root/operation checks even during cleanup.",
+      "Retarget installed-alpha to exact65102f7 or an explicitly new runtime build and run the bounded ordinary personal cold/reuse/no-executor/local-mock HTTP flow.",
+      "Exercise same-tuple candidate/default-off/sidecar/prepare/confirm/reject/replay and context/history/source/reply with actual request/body/result identities and native0.",
+      "Keep controlled source-confirmation evidence distinct, then verify actual installed restored-readonly prepare/confirm/audit, held queue/marker and no grant/target action.",
+      "Verify nonempty relocated data and current different-binary upgrades with original operation, explicit pointers and exact terminal exits; preserve post-upgrade writes.",
+      "Run a finite meaningful stability/resource-return sequence; native/B recovery/value/target gaps remain explicit independent tiers.",
+      "Publish current test/product/artifact subjects and early/mid/final layered verdicts; no mutable source can silently supplement frozen package safety."
+    ]
+  }
+}
