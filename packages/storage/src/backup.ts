@@ -31,8 +31,11 @@ export interface WorkflowEvidenceFamily {
   truncated: boolean
 }
 
+export const EVIDENCE_FAMILY_SET_VERSION = 2 as const
 export interface WorkflowEvidenceSummary {
-  protocol: 'workflow-evidence/1'
+  protocol: 'workflow-evidence/1' | 'workflow-evidence/2'
+  /** V2 records its family-set version; v1 uses the exact historical family set and recipe. */
+  familySetVersion?: number
   families: readonly WorkflowEvidenceFamily[]
   digest: string
   complete: boolean
@@ -84,8 +87,26 @@ const EVIDENCE_FAMILIES: readonly EvidenceFamilySpec[] = [
   { name: 'assistant_context_bindings', table: 'assistant_context_bindings', identity: 'message_id',
     body: ['message_id', 'command_id', 'request_id', 'project_id', 'conversation_id', 'user_text_digest',
       'principal_user_id', 'principal_authority_ref', 'bundle_ref', 'bundle_digest', 'confirmed_at', 'expires_at',
-      'value', 'digest'],
+      'work_id', 'value', 'digest'],
     order: 'confirmed_at, message_id' },
+  { name: 'user_questions', table: 'user_questions', identity: 'id',
+    body: ['id', 'version', 'work_id', 'revision', 'digest', 'validity', 'opened_at', 'value'], order: 'id' },
+  { name: 'answers', table: 'answers', identity: 'answer_id',
+    body: ['answer_id', 'question_id', 'expected_version', 'answer_digest', 'answer', 'recorded_at'], order: 'answer_id' },
+  { name: 'answer_deliveries', table: 'answer_deliveries', identity: "answer_id || ':' || target_binding_id",
+    body: ['answer_id', 'target_binding_id', 'status', 'evidence', 'updated_at'], order: 'answer_id, target_binding_id' },
+  { name: 'effect_queue', table: 'effect', identity: "kind || ':' || key",
+    body: ['kind', 'key', 'value', 'seq', 'generation', 'attempts', 'error', 'due', 'since', 'parked_reason', 'parked_at'],
+    order: 'kind, key' },
+  { name: 'runtime_bindings', table: 'runtime_bindings', identity: 'attempt_id',
+    body: ['attempt_id', 'ticket_id', 'state', 'value'], order: 'attempt_id' },
+  { name: 'runtime_current', table: 'runtime_current', identity: 'ticket_id',
+    body: ['ticket_id', 'attempt_id'], order: 'ticket_id' },
+  { name: 'resource_observations', table: 'resource_observations', identity: "fact_id || ':' || resource_ref",
+    body: ['fact_id', 'attempt_id', 'resource_ref', 'ownership', 'kind', 'status', 'exit_code', 'signal', 'observed_at'],
+    order: 'fact_id, resource_ref' },
+  { name: 'dispatch_receipts', table: 'dispatch_receipts', identity: "command_id || ':' || target",
+    body: ['command_id', 'target', 'delivery', 'native_ref', 'error', 'updated_at'], order: 'command_id, target' },
   { name: 'assistant_reply_results', table: 'assistant_reply_results', identity: 'request_id',
     body: ['request_id', 'request_digest', 'source_message_id', 'reply_message_id', 'project_id', 'conversation_id',
       'principal_user_id', 'principal_authority_ref', 'model', 'artifact_ref', 'artifact_digest', 'text_digest',
@@ -96,6 +117,22 @@ const EVIDENCE_FAMILIES: readonly EvidenceFamilySpec[] = [
       'principal_authority_ref', 'machine_digest', 'resource_policy_digest', 'created_at', 'expires_at', 'value', 'digest'],
     order: 'created_at, activation_id' },
 ]
+/** Exact family set and field list produced by the real pre-v2 (wave14) producer. */
+const LEGACY_FAMILY_NAMES = new Set([
+  'decisions', 'legacy_decisions', 'proposals', 'project_settings', 'contracts', 'verifications',
+  'acceptances', 'outcomes', 'reviews', 'recovery_intents', 'assistant_context_bindings',
+  'assistant_reply_results', 'recovery_activations',
+])
+const LEGACY_BINDING_BODY = ['message_id', 'command_id', 'request_id', 'project_id', 'conversation_id',
+  'user_text_digest', 'principal_user_id', 'principal_authority_ref', 'bundle_ref', 'bundle_digest',
+  'confirmed_at', 'expires_at', 'value', 'digest'] as const
+
+function evidenceFamilySpecs(version: 1 | 2): readonly EvidenceFamilySpec[] {
+  if (version === 2) return EVIDENCE_FAMILIES
+  return EVIDENCE_FAMILIES.filter(family => LEGACY_FAMILY_NAMES.has(family.name)).map(family =>
+    family.name === 'assistant_context_bindings' ? { ...family, body: LEGACY_BINDING_BODY } : family)
+}
+
 const EVIDENCE_LIMIT = 2000
 
 /**
@@ -104,11 +141,12 @@ const EVIDENCE_LIMIT = 2000
  * the database file bytes and manifest hash were re-recorded. It is not a second event authority
  * and does not return record bodies to callers.
  */
-export function readWorkflowEvidence(databasePath: string): WorkflowEvidenceSummary {
+export function readWorkflowEvidence(databasePath: string, version: 1 | 2 = 1): WorkflowEvidenceSummary {
+  if (version !== 1 && version !== 2) throw new TypeError('Unsupported workflow evidence version')
   const db = new Database(databasePath, { readonly: true, fileMustExist: true })
   try {
     const families: WorkflowEvidenceFamily[] = []
-    for (const family of EVIDENCE_FAMILIES) {
+    for (const family of evidenceFamilySpecs(version)) {
       const exists = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?")
         .get(family.existsTable ?? family.table)
       if (!exists) {
@@ -135,7 +173,10 @@ export function readWorkflowEvidence(databasePath: string): WorkflowEvidenceSumm
     const digest = createHash('sha256')
       .update(families.map(family => `${family.name}:${family.count}:${family.digest}`).join('\n'))
       .digest('hex')
-    return { protocol: 'workflow-evidence/1', families, digest, complete: families.every(family => !family.truncated) }
+    return version === 2
+      ? { protocol: 'workflow-evidence/2', familySetVersion: EVIDENCE_FAMILY_SET_VERSION, families, digest,
+          complete: families.every(family => !family.truncated) }
+      : { protocol: 'workflow-evidence/1', families, digest, complete: families.every(family => !family.truncated) }
   } finally { db.close() }
 }
 

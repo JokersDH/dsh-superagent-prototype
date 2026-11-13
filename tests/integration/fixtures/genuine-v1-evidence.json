@@ -1,0 +1,152 @@
+{
+  "protocol": "genuine-main-v1-evidence-golden/1",
+  "producer": {
+    "root": "/Users/hh/Desktop/joker/superagent",
+    "source": "f875ead9f9f8d7bfe9a3e73e7b159705628bf266",
+    "files": {
+      "packages/storage/src/backup.ts": "42ba7b7c0939d8ac196f1e8ffb8d6289034ab322718c003427c0ee3468e09e3e",
+      "packages/storage/dist/backup.js": "09050a6b5c607f3e5ec03dafaf4ea07cb178476b181d1f1f3cdab8d12b982de3",
+      "packages/workflows/src/snapshot.ts": "f9d63ad8780a9b5c462480590aec70f32eeed94f8c17ccea67b2f3ed578890e4",
+      "packages/workflows/dist/snapshot.js": "35bbb9661988db9a5b344cb56667abf3ca21e53da0d75db18b1d2b7364fd72fe"
+    },
+    "producerFilesStable": true
+  },
+  "fixture": {
+    "productSchema": 18,
+    "bundleText": "{\"bounded\":true}",
+    "binding": {
+      "protocol": "assistant-context-binding/1",
+      "commandId": "legacy-command",
+      "messageId": "legacy-message",
+      "requestId": "legacy-request",
+      "projectId": "legacy-project",
+      "conversationId": "legacy-conversation",
+      "userTextDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "principal": {
+        "userId": "legacy-user",
+        "authorityRef": "legacy-authority"
+      },
+      "purpose": "conversation_discussion",
+      "scope": {
+        "projectId": "legacy-project",
+        "allowedPaths": [
+          "src"
+        ],
+        "excludedPaths": [],
+        "externalActions": []
+      },
+      "contract": {
+        "workId": "legacy-work",
+        "revision": 1,
+        "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "selections": [
+        "work"
+      ],
+      "bundleRef": "1af87f0baad2da7e9f3852d051e6ee131b322812afaa47a31fe7ca2b0656ee15",
+      "bundleDigest": "1af87f0baad2da7e9f3852d051e6ee131b322812afaa47a31fe7ca2b0656ee15",
+      "sources": [
+        {
+          "sourceId": "legacy-work",
+          "kind": "contract",
+          "sourceDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "previewDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "truncated": false
+        }
+      ],
+      "confirmedAt": "2026-11-13T00:00:00.000Z",
+      "expiresAt": "2026-11-13T00:04:00.000Z"
+    }
+  },
+  "snapshotProtocol": "workflow-snapshot/1",
+  "originalCreated": "ok",
+  "originalVerified": "ok",
+  "evidence": {
+    "protocol": "workflow-evidence/1",
+    "families": [
+      {
+        "name": "decisions",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "legacy_decisions",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "proposals",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "project_settings",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "contracts",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "verifications",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "acceptances",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "outcomes",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "reviews",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "recovery_intents",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "assistant_context_bindings",
+        "count": 1,
+        "digest": "51d53c57b7d4be9c586f5b6a255a9d8f6bbd8db64c71f3e032e70a2df6cce7dd",
+        "truncated": false
+      },
+      {
+        "name": "assistant_reply_results",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      {
+        "name": "recovery_activations",
+        "count": 0,
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      }
+    ],
+    "digest": "e339e38272cdadaf38059ffeea18476a10c839e78427c30940371395c49de4cd",
+    "complete": true
+  },
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "containsDatabase": false
+}
