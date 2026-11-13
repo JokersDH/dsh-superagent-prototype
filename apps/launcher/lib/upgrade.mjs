@@ -489,11 +489,12 @@ const listProcesses = (snapshot = spawnSyncPs()) => {
  * identity stays UNKNOWN and blocks the switch. Filtering a live candidate out of the set and then
  * reporting an empty "proven" set is not a stop proof.
  */
-export async function accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, operationId }) {
+export async function accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, spawnedChildren, operationId }) {
   const tokens = ROOT_TOKENS(roots)
   const snapshot = spawnSyncPs()
   const scannerOk = snapshot !== null
   const treeCandidates = new Set()
+  const registeredRoots = new Set()
   const unverifiable = []
   let pidReused = false
   const expectedUid = typeof process.getuid === 'function' ? process.getuid() : null
@@ -543,6 +544,7 @@ export async function accountRegisteredResources({ roots, target, record, spawne
       if (observedUid === null) { mismatch(pid, label, 'uid_unreadable'); return }
       if (Number(observedUid) !== expectedUid) { mismatch(pid, label, 'uid_mismatch', { expected: expectedUid, observed: Number(observedUid) }); return }
     }
+    registeredRoots.add(pid)
     addTree(pid)
   }
   const claimed = new Set()
@@ -550,6 +552,14 @@ export async function accountRegisteredResources({ roots, target, record, spawne
     pid: source.pid, start: source.processStart, argv: source.argv, command: source.command, uid: source.uid,
     configRoot: source.configRoot, dataRoot: source.dataRoot ?? source.state, operation: source.operationId,
   })
+  const verifyChildren = async (children, identity) => {
+    for (const entry of Array.isArray(children) ? children : []) {
+      if (!Number.isInteger(entry?.pid) || entry.pid <= 0) continue
+      await addVerified({ pid: entry.pid, label: 'child', start: entry.processStart ?? entry.start, command: entry.command,
+        argv: entry.argv, uid: entry.uid, configRoot: identity?.configRoot, dataRoot: identity?.dataRoot,
+        baseDir: roots.install, operation: identity?.operation, requireComplete: true })
+    }
+  }
   if (Number.isInteger(spawnedPid) && spawnedPid > 0) {
     const identity = journalSpawn?.pid === spawnedPid ? spawnIdentityOf(journalSpawn) : null
     await addVerified({ pid: spawnedPid, label: 'spawn', start: spawnedStart ?? identity?.start ?? null,
@@ -561,7 +571,9 @@ export async function accountRegisteredResources({ roots, target, record, spawne
     await addVerified({ pid: journalSpawn.pid, label: 'journal', start: identity.start, argv: identity.argv,
       command: identity.command, uid: identity.uid, configRoot: identity.configRoot, dataRoot: identity.dataRoot,
       baseDir: roots.install, operation: identity.operation, requireComplete: true })
+    await verifyChildren(journalSpawn.children, identity)
   }
+  if (journalSpawn !== undefined && journalSpawn !== null) await verifyChildren(spawnedChildren, spawnIdentityOf(journalSpawn))
   if (record !== null && record !== undefined) {
     await addVerified({ pid: record.pid, label: 'launcher', start: record.processStart, argv: record.launcherArgv, uid: record.uid, baseDir: record.install })
     const apiVitality = Number.isInteger(record.apiPid) ? vitalityOf(record.apiPid) : 'dead'
@@ -586,15 +598,15 @@ export async function accountRegisteredResources({ roots, target, record, spawne
     if (vitality === 'unknown') { mismatch(pid, 'child', 'status_unknown'); continue }
     const command = commandOf(pid)
     if (command === '') { mismatch(pid, 'child', 'command_unreadable'); continue }
-    // A descendant inherits the parent's private roots in its command line, so ancestry/path alone is
-    // not ownership. Its OS owner must be the same verified uid before it can be signalled.
+    // A descendant is owned only when its own recorded identity (registered child/journal child/record
+    // api/console) was verified above. Ancestry, same UID and a matching path are not enough.
+    if (!registeredRoots.has(pid)) { unknownLive.push({ pid, command, reason: 'descendant_unregistered' }); continue }
     const observedUid = await processUid(pid)
     if (observedUid === null || (expectedUid !== null && Number(observedUid) !== expectedUid)) {
       unknownLive.push({ pid, command, reason: 'uid_mismatch', observedUid })
       continue
     }
-    if (commandMatchesIdentity(command, tokens)) owned.push({ pid, command })
-    else unknownLive.push({ pid, command })
+    owned.push({ pid, command })
   }
   const unregistered = []
   for (const entry of discovered ?? []) {
@@ -612,8 +624,8 @@ export async function accountRegisteredResources({ roots, target, record, spawne
   return { owned, unknownLive, unregistered, unverifiable, considered: treeCandidates.size, pidReused, scannerOk }
 }
 
-export async function stopRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, operationId }) {
-  const accounted = await accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, operationId })
+export async function stopRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, spawnedChildren, operationId }) {
+  const accounted = await accountRegisteredResources({ roots, target, record, spawnedPid, spawnedStart, journalSpawn, spawnedChildren, operationId })
   const stopped = []
   const unverifiable = (accounted.unverifiable ?? []).map(({ pid, label, reason }) => ({ pid, label, reason }))
   for (const { pid } of accounted.owned) {
@@ -709,6 +721,20 @@ export async function ensureResourceBarrier({ roots, target, journal, operationI
   return { proven: true, record: record === null ? null : { pid: record.pid, apiPid: record.apiPid, consolePid: record.consolePid }, stopped, orphan, proof }
 }
 
+async function captureChildIdentities(rootPid) {
+  const snapshot = spawnSyncPs()
+  const tree = processTree(rootPid, snapshot) ?? []
+  const children = []
+  for (const pid of tree) {
+    if (pid === rootPid) continue
+    const start = await processStart(pid).catch(() => null)
+    const uid = await processUid(pid).catch(() => null)
+    const command = await processCommand(pid).catch(() => '')
+    if (start && command) children.push({ pid, processStart: start, uid, command })
+  }
+  return children
+}
+
 async function startTarget({ roots, target, seed, identity, fault, onSpawn, operationId }) {
   let consolePort = await freeFrom(seed, 'consoleURL', 0)
   let apiPort = await freeFrom(seed, 'apiURL', 0)
@@ -756,8 +782,10 @@ async function startTarget({ roots, target, seed, identity, fault, onSpawn, oper
     if (next !== '' && next === spawnedCommand) break
     spawnedCommand = next
   }
-  if (typeof onSpawn === 'function') onSpawn({ pid: child.pid, startedAt: new Date().toISOString(), processStart: spawnedStart,
-    uid: spawnedUid, command: spawnedCommand, configRoot: roots.config, dataRoot: roots.data, operationId })
+  const spawnFacts = { pid: child.pid, startedAt: new Date().toISOString(), processStart: spawnedStart,
+    uid: spawnedUid, command: spawnedCommand, configRoot: roots.config, dataRoot: roots.data, operationId,
+    children: await captureChildIdentities(child.pid) }
+  if (typeof onSpawn === 'function') onSpawn(spawnFacts)
 
   const fail = async (reason, detail = {}) => {
     // Prove the process tree this operation started is gone BEFORE touching the pointer or record.
@@ -765,7 +793,9 @@ async function startTarget({ roots, target, seed, identity, fault, onSpawn, oper
       // Test fault: pretend the stop could not be proven. The state machine must keep the indeterminate
       // state instead of reverting the pointer or restarting the old writer.
       ? { proven: false, stopped: [], remaining: [child.pid], considered: 1 }
-      : await stopRegisteredResources({ roots, target, spawnedPid: child.pid, spawnedStart, journalSpawn: readJournal(roots.config)?.spawn ?? null, operationId, record: readInstanceRecord(roots.config) })
+      : await stopRegisteredResources({ roots, target, spawnedPid: child.pid, spawnedStart,
+        journalSpawn: readJournal(roots.config)?.spawn ?? null, spawnedChildren: await captureChildIdentities(child.pid),
+        operationId, record: readInstanceRecord(roots.config) })
     if (!cleanup.proven) {
       writeJournalStatus({ roots, status: 'target_stop_unproven', reason, cleanup, ...(typeof plan === 'object' && plan !== null ? { extra: { from: plan.from, to: plan.to } } : {}) })
       throw new UpgradeError('target_stop_unproven', 'The failed target process tree could not be proven stopped; pointer and record are left as-is (no old writer is restarted)', {
@@ -806,9 +836,13 @@ async function startTarget({ roots, target, seed, identity, fault, onSpawn, oper
     if (child.exitCode !== null) break
     await new Promise((r) => setTimeout(r, 150))
   }
+  // The launcher spawns its API child shortly after birth; persist a refreshed child identity list so
+  // recovery can verify each child independently instead of inheriting it by ancestry.
+  if (typeof onSpawn === 'function') onSpawn({ ...spawnFacts, children: await captureChildIdentities(child.pid) })
   if (fault === 'target_coordinator_exit') {
     // Test fault: the coordinator dies right after answering health, before any record is written.
-    await stopRegisteredResources({ roots, target, spawnedPid: child.pid, journalSpawn: readJournal(roots.config)?.spawn ?? null, operationId })
+    await stopRegisteredResources({ roots, target, spawnedPid: child.pid, journalSpawn: readJournal(roots.config)?.spawn ?? null,
+      spawnedChildren: await captureChildIdentities(child.pid), operationId })
     await fail('coordinator_exited_after_health', { health: health?.status ?? null })
   }
   // Health can answer before the launcher persists its instance record; wait for the exact identity.
