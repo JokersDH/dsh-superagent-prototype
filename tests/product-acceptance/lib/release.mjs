@@ -949,7 +949,8 @@ export function evaluateRelease({
         item.evidence?.ownershipCopy?.subject ?? item.evidence?.installedContext?.subject ??
         item.evidence?.backupContextReply?.subject ?? item.evidence?.ownershipMocks?.subject ??
         item.evidence?.installedCandidates?.subject ?? item.evidence?.secondRoot?.subject ??
-        item.evidence?.installedSourceConfirm?.subject ?? item.evidence?.installedStability?.subject
+        item.evidence?.installedSourceConfirm?.subject ?? item.evidence?.installedStability?.subject ??
+        item.evidence?.workflowFormats?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
