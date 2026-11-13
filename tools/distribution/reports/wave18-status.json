@@ -1,0 +1,353 @@
+{
+  "protocol": "wave18-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "94ee3c6",
+  "mergedMain": "5ef8bf1",
+  "head": "b9117aa",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/vendor/native turns 0; twelve user services untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "nativeTurns": 0,
+    "vendorSends": 0
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Exact verified subject 65102f7/build f55470ae.../schema18 preserved. The same frozen helper now passes 5/5 (complete parent, registered child, unregistered same-UID child, wrong-start child, actual recover), loaded from the immutable package rather than a checkout. Old 97 remains a mock-only audit (2P/3F unsafe recover) and is never live or relabeled.",
+      "evidence": [
+        "tools/distribution/reports/wave18/ownership-child.json"
+      ]
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "Child birth identity (pid/start/uid/command + inherited root/install/operation) is persisted at launch/journal and refreshed; pre-record/parent-death/child-survival/partial-unknown/ACK-loss paths are covered by managed matrix and child probe with zero live cleanup beyond probe-born resources.",
+      "evidence": [
+        "tools/distribution/reports/wave18/ownership-child.json",
+        "tools/distribution/reports/wave18/binary-upgrade.json"
+      ]
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Same-package personal nonempty candidates via a private local fake OpenAI endpoint: actual context prepare/send produces propose_work + propose_decision; candidate GET/prepare, explicit reject, decision confirm, same-command replay pass; work confirm is explicitly refused 422 without an executor; original requestContext/sourceMessageId matches the source message; native/vendor 0.",
+      "evidence": [
+        "tools/distribution/reports/wave18/nonempty-personal-http.json"
+      ]
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "Merged main e438ab5 schema guard (missing/empty table/index/metadata and unknown schema refusal), preserving the real v1 nonempty binding digest. A v2 is NOT admitted and this package does not claim support for it; ordinary install/restore uses the actual installed bytes.",
+      "evidence": [
+        "docs/rfcs/WP-16/0052-wave-18-d-same-package-personal-and-relocation.md"
+      ]
+    },
+    "d5": {
+      "status": "PASS_WITH_REBIND_LIMIT",
+      "summary": "Same personal state backup→second-root restore→recovery_readonly HTTP: original message text, business refusal and source prepare/confirm/audit (not_granted, startupAvailable=false) verified; no credentials copied and zero model requests during restore. Nonempty candidate/historical source reads are 403 because main restored-project rebind is not implemented; explicitly NOT_TESTED, no false PASS.",
+      "evidence": [
+        "tools/distribution/reports/wave18/nonempty-personal-http.json"
+      ]
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "Clean frozen target from pushed source b9117aa: build 6a45633067501dd2, schema18, tar sha 4a81380a..., 20,231,965 B, 6,742 files with e438 guard, child gate, same-package fake-SDK candidates and source facts. Old 65102f7/97cace7 preserved.",
+      "evidence": [
+        "tools/distribution/reports/wave18/artifacts.json"
+      ]
+    },
+    "d7": {
+      "status": "PASS",
+      "summary": "New-tar personal cold install 7/7; no-executor discussion-only 4/4 stays personal/unavailable with explicit 422; multi-instance 8/8 keeps two independent states and never clears unknown old resources.",
+      "evidence": [
+        "tools/distribution/reports/wave18/personal-install.json",
+        "tools/distribution/reports/wave18/personal-no-executor.json",
+        "tools/distribution/reports/wave18/multi-instance.json"
+      ]
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Same-schema 18->18 upgrade between wave17 and wave18 different binaries confirms pointer/process/mode/data; legacy16->18 3/3; historical schema13 pair remains separate; no silent data rollback.",
+      "evidence": [
+        "tools/distribution/reports/wave18/same-schema18-upgrade.json",
+        "tools/distribution/reports/wave18/cross-schema-upgrade.json"
+      ]
+    },
+    "d9": {
+      "status": "PASS_WITH_MAIN_ACTIVATION_BLOCKED",
+      "summary": "Managed matrix 19/19 covers spawn/record/pointer/SIGKILL windows; support/material 8/8 remain redacted/0600/inert; source confirmation remains data-only. Main activation/private permission remains unimplemented.",
+      "evidence": [
+        "tools/distribution/reports/wave18/binary-upgrade.json",
+        "tools/distribution/reports/wave18/target-material.json"
+      ]
+    },
+    "d10": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Frozen rerun: probe5/5, nonempty 11 steps, matrix19/19, multi8/8, cross3/3, data5/5, personal7/7, noexec4/4, source5/5, same18 3/3, backup6/6, portable5+1NT, dual6/6, material8/8, smoke52/52, launcher60/60, portability52/52. E verdict pending.",
+      "evidence": [
+        "tools/distribution/recipes/wave18-e-acceptance.zh-CN.md",
+        "docs/rfcs/WP-16/0052-wave-18-d-same-package-personal-and-relocation.md"
+      ]
+    }
+  },
+  "artifacts": {
+    "protocol": "wave18-artifacts/1",
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave18-target/wave18-target-b9117aa.tar.gz",
+      "sha256": "4a81380a5fd0c69aabe8d38604dd661ab3fb3f30113b4bb2d3e5156c2ff54c1a",
+      "tarBytes": 20231965,
+      "buildId": "6a45633067501dd2",
+      "source": {
+        "commit": "b9117aad12797a3ee3c454172d1f918516a18f33",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6742,
+      "extractedBytes": 67507039,
+      "supportMatrix": {
+        "measured": [
+          "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+        ],
+        "node": ">=24.21.0 <25",
+        "abi": "137",
+        "sqlite": ">=3.53.4",
+        "notTested": [
+          "linux",
+          "win32",
+          "darwin-x64",
+          "other Node ABIs",
+          "other machines",
+          "personal native execution"
+        ]
+      },
+      "actualCapabilities": [
+        "complete registered-child identity gate and frozen-helper 5/5",
+        "same-package personal nonempty candidates via private local fake SDK (2 candidates)",
+        "candidate prepare/reject/decision-confirm/replay, work refuse without executor",
+        "original request/context verification",
+        "same-data backup/restore readonly HTTP with explicit project-rebind limit",
+        "restored source prepare/confirm/audit data-only (not_granted)",
+        "main e438ab5 schema guard + preserved v1 digest; A v2 NOT supported",
+        "M1 discussion-only unavailable execution",
+        "runtime recovery inspect/prepare HTTP",
+        "history/source/reply/context",
+        "same-schema18 and 16->18 upgrades",
+        "backup/restore"
+      ]
+    },
+    "baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "buildId": "7e8f6ce6fa2e2633",
+      "source": {
+        "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 13
+    },
+    "legacy16": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+      "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+      "buildId": "3311a04bd20ed7f9",
+      "source": {
+        "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 16
+    },
+    "previousCurrent": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave17-target/wave17-target-65102f7.tar.gz",
+      "sha256": "33d874c9a25f22d2710fb29d686f03ad5b37de7ad2cdb09f40d16fd7ecb86340",
+      "buildId": "f55470ae14cc4985",
+      "source": {
+        "commit": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "note": "Same-schema18 source for 18->18; historical, not current."
+    },
+    "oldSameUidFrozen": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave16-target/wave16-target-97cace7.tar.gz",
+      "sha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+      "buildId": "8a5a0a85631f22ca",
+      "source": {
+        "commit": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "note": "Old sameUID unsafe recover audit only (2P/3F); never relabeled current."
+    },
+    "dualPair13": {
+      "from": {
+        "buildId": "9120a5ed858e0feb",
+        "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+        "schema": 13,
+        "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
+      },
+      "to": {
+        "buildId": "cd0ecc29d97d5c41",
+        "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+        "schema": 13,
+        "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"
+      },
+      "note": "Historical same-schema scope, not relabeled current."
+    },
+    "notes": [
+      "Built from pushed clean wave-18 D head b9117aa (dirty=false) on main 5ef8bf1 merge including e438ab5.",
+      "A v2 is not admitted; only main e438 v1 snapshot guard/digest scope is used.",
+      "Docs-only later heads do not change these bytes."
+    ]
+  },
+  "testLayers": {
+    "ownershipChild": {
+      "cases": 5,
+      "passed": 5,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "nonemptyPersonal": {
+      "steps": 11,
+      "status": "PASS",
+      "limited": [
+        "same-data-relocation-readonly"
+      ]
+    },
+    "multiInstance": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "binaryUpgrade": {
+      "sections": 19,
+      "status": "PASS"
+    },
+    "crossSchema": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "schema18Data": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "personalInstall": {
+      "steps": 7,
+      "status": "PASS"
+    },
+    "personalNoExecutor": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "sourceConfirmation": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "sameSchema18": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "backupSchema": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "portableClosure": {
+      "steps": 6,
+      "status": "PASS",
+      "notTested": [
+        "other-platform-abi"
+      ]
+    },
+    "dualBinary": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "targetMaterial": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "smoke": {
+      "steps": 52,
+      "status": "PASS",
+      "keepRoot": true
+    },
+    "launcher": {
+      "tests": 60,
+      "status": "PASS"
+    },
+    "portability": {
+      "tests": 52,
+      "status": "PASS"
+    }
+  },
+  "blockers": [
+    {
+      "id": "MAIN-RESTORED-PROJECT-REBIND",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "Recovery_readonly candidate/historical-source reads return 403 because restored project rebind is not implemented; fixture explicitly limited."
+    },
+    {
+      "id": "A-V2-NOT-ADMITTED",
+      "owner": "A/main",
+      "status": "NOT_SUPPORTED",
+      "summary": "Main e438 v1 guard/digest preserved; A v2 is not admitted and not claimed."
+    },
+    {
+      "id": "MAIN-ACTIVATION-CONFIRM",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "Source prepare/confirm/audit are data-only; target activation/private permission remain unimplemented."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E must bind every case to one exact same-package tuple/helper provenance and remeasure the new subject."
+    },
+    {
+      "id": "PLATFORM-ABI",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Only darwin/arm64 current Node/SQLite ABI measured."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Zero real model/vendor/native turns."
+    }
+  ],
+  "notTested": [
+    "restored-project rebind candidate/source reads",
+    "A v2",
+    "cross-platform/ABI",
+    "real personal billed turn",
+    "every individual SIGKILL step",
+    "main activation confirm",
+    "E independent acceptance"
+  ],
+  "eConsumption": [
+    "Use reports/wave18/artifacts.json tuples; load safety helpers from the immutable same package (never current checkout).",
+    "Run probe, nonempty personal, matrix, multi, cross, data, personal, noexec, source-confirmation, same18, backup, portable, dual, material, smoke.",
+    "Do not relax identity/digests, delete markers/records, hand-edit release.json, pkill, or claim activation/restored rebind/A v2/native from these results."
+  ],
+  "preservedHistory": [
+    "wave-05..17 evidence/ledgers unchanged",
+    "all historical tars (incl. 65102f7/97cace7) preserved and unrelabeled",
+    "no shared contract/migration/root lock/E assertion modified"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave18/*.json",
+    "tools/distribution/recipes/wave18-e-acceptance.zh-CN.md",
+    "docs/rfcs/WP-16/0052-wave-18-d-same-package-personal-and-relocation.md"
+  ]
+}
