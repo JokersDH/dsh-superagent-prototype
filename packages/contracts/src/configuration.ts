@@ -88,6 +88,7 @@ export const ApplicationConfigurationSchema = z
     assistantContextAvailable: z.boolean().optional(),
     contextHistoryAvailable: z.boolean().optional(),
     contextSourcesAvailable: z.boolean().optional(),
+    replyCandidatesAvailable: z.boolean().optional(),
     executionAvailability: ExecutionAvailabilitySchema.optional(),
     projects: z.array(ConfiguredProjectViewSchema).max(128).readonly(),
     profiles: z.array(ExecutionProfileViewSchema).max(128).readonly(),

@@ -1,0 +1,45 @@
+{
+  "protocol": "assistant-candidates-browser/1",
+  "source": "1169535ec3716d928da82b02865daebea7b06d06",
+  "trackedSourceDirty": false,
+  "status": "PASS",
+  "cases": [
+    {
+      "id": "EXPLICIT_PREFERENCE_DEFAULTS_OFF_AND_SIDECAR_PRESERVES_LEGACY_MODEL_CONFIG",
+      "status": "PASS"
+    },
+    {
+      "id": "ONE_SDK_RESPONSE_STREAMS_AND_LAZY_CANDIDATE_REVIEW_HAS_NO_BUSINESS_EFFECT",
+      "status": "PASS"
+    },
+    {
+      "id": "ORIGINAL_CANDIDATE_FORM_AND_PREVIEW_ARE_INERT_AND_CLOSE_RESTORES_FOCUS",
+      "status": "PASS"
+    },
+    {
+      "id": "LOST_CONFIRMATION_RESPONSE_RELOAD_REPLAYS_THE_ORIGINAL_COMMAND_ONCE",
+      "status": "PASS"
+    },
+    {
+      "id": "WORK_CANDIDATE_REQUIRES_USER_SCOPE_REGISTERED_CHECK_AND_PROFILE_BEFORE_CREATION",
+      "status": "PASS"
+    },
+    {
+      "id": "REVISION_CANDIDATE_LOADS_EXACT_CURRENT_TARGET_AND_REQUIRES_AN_EXPLICIT_NEW_GOAL",
+      "status": "PASS"
+    },
+    {
+      "id": "INVALID_SCOPE_AND_CORRUPT_BODY_SHOW_SAFE_STATES_WITHOUT_MODEL_RETRY",
+      "status": "PASS"
+    },
+    {
+      "id": "PLAIN_MODE_STILL_STREAMS_AND_THE_LEGACY_MODEL_CONFIG_REMAINS_UNCHANGED",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "mockSDKRequests": 5,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "Actual React/HTTP/SQLite/PrivateModelProvider SDK with a private local mock; controlled local work creation/revision, not vendor/native/install/activation admission"
+}

@@ -2,6 +2,8 @@
 
 继续primary checkout/原分支与main拥有路径。697efdc已交实际A inspect/prepare，新8/恢复66/三包与strict通过。下一步不再把“所有source入口缺失”作为整包阻断；confirm/许可/业务重连仍需实际实现。模型/native0。
 
+2026-11-13检查点：M1实际factory65ac737、M2同次响应候选eb96c3e、M3实际网页104b7a0/1169535已发布origin/main。后端91/console34/factory6，候选8/原提案8/上下文9网页分范围通过；视觉最后裁决fix，后续具体修正有DOM/功能证据但没有新截图批准。独立personal预览5191/8807可用，原十一实例保留。详见[本轮实施状态](../../reports/releases/wave15-integration/README.zh-CN.md)和[0046](../../docs/rfcs/WP-16/0046-candidate-workbench-and-private-preferences.md)。下面十阶段保留，下一主线出口M4；这不是整个wave已完成，也不重置A–E队列。
+
 ## M1 真正替换默认C来源
 
 接已过旧6/285/11组合的最小Scope/coverage/factory切片，runtime实际调用conversation/artifact provider。保留cutoff/600条/published ID/原指纹/最终同步guard，精确证明新factory被调用，公开投影独立映射不扩大授权。

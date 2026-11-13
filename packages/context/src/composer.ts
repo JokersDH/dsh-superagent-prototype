@@ -2,6 +2,7 @@ import type { ContractRef, Scope } from '@personal-agent/contracts'
 import { ContextError } from './errors.ts'
 import { detectInjectionPatterns } from './injection.ts'
 import { sha256Text } from './digest.ts'
+import { scopeWithin } from './paths.ts'
 import { ContextReader } from './reader.ts'
 import { estimateTokens } from './tokens.ts'
 import { ContextGrantSchema, ContextRequestSchema, ContextSourceKindSchema } from './types.ts'
@@ -63,6 +64,7 @@ export interface ComposedConversationProvider {
     readonly conversationId: string
     readonly limit: number
   }): Promise<readonly ComposedConversationMessage[]>
+  coverage?(): { readonly complete: boolean }
 }
 
 export interface ComposedArtifactView {
@@ -75,6 +77,7 @@ export interface ComposedArtifactView {
 /** Bounded newest-first artifact metadata reader; never returns a host filesystem path. */
 export interface ComposedArtifactProvider {
   recent(input: { readonly projectId: string; readonly limit: number }): Promise<readonly ComposedArtifactView[]>
+  coverage?(): { readonly complete: boolean }
 }
 
 export interface ComposedGroupPlan {
@@ -662,6 +665,11 @@ export class ContextComposer {
         omitted.push({ path: `decisions/${decision.decisionId}.json`, reason: 'cross_project' })
         continue
       }
+      if (!scopeWithin(decision.scope, input.grant.scope)) {
+        omitted.push({ path: `decisions/${decision.decisionId}.json`, reason: 'excluded_path',
+          detail: 'decision scope is outside the conversation grant' })
+        continue
+      }
       if (bytes >= allocated.bytes || tokens >= allocated.tokens) {
         omitted.push({ path: `decisions/${decision.decisionId}.json`, reason: 'budget_group' })
         continue
@@ -804,6 +812,8 @@ export class ContextComposer {
     if (messages.length >= limit) {
       omitted.push({ reason: 'budget_group', detail: 'conversation limit reached; older messages were not read' })
     }
+    const incompleteScan = this.sources.conversation.coverage?.().complete === false
+    if (incompleteScan) omitted.push({ reason: 'source_unavailable', detail: 'conversation provider scan is incomplete' })
     return {
       result: {
         name: group.name,
@@ -812,7 +822,7 @@ export class ContextComposer {
         status:
           output.length === 0
             ? 'empty'
-            : messages.length >= limit || omitted.some((item) => item.reason === 'budget_group')
+            : incompleteScan || messages.length >= limit || omitted.some((item) => item.reason === 'budget_group')
               ? 'truncated'
               : 'included',
         budget: allocated,
@@ -884,6 +894,8 @@ export class ContextComposer {
     if (artifacts.length >= limit) {
       omitted.push({ reason: 'budget_group', detail: 'artifact limit reached; older artifacts were not read' })
     }
+    const incompleteScan = this.sources.artifacts.coverage?.().complete === false
+    if (incompleteScan) omitted.push({ reason: 'source_unavailable', detail: 'artifact provider selection is incomplete' })
     return {
       result: {
         name: group.name,
@@ -892,7 +904,7 @@ export class ContextComposer {
         status:
           slices.length === 0
             ? 'empty'
-            : artifacts.length >= limit || omitted.some((item) => item.reason === 'budget_group')
+            : incompleteScan || artifacts.length >= limit || omitted.some((item) => item.reason === 'budget_group')
               ? 'truncated'
               : 'included',
         budget: allocated,

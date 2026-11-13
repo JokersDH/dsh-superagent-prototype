@@ -1,0 +1,212 @@
+{
+  "protocol": "wave16-b-admission/1",
+  "status": "PARTIAL_SCOPED_ADMISSION_BUSINESS_RECOVERY_NOT_IMPLEMENTED",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "source": "c7f7e77e405f33a612c59c69c8305245917a5b44",
+  "mainSource": "a64a127d52e04fb9eba8771ee22380db47e45baa",
+  "sourceStable": true,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "budgetLedgerOpened": false,
+  "productionRecoveryAdmitted": false,
+  "physicalWriterBarrierAdmitted": false,
+  "runtimeSourceChangesSincePreviousReviewedCandidate": [],
+  "candidateChanges": [
+    "tests/native-acceptance/b14-independent-runner.mjs",
+    "tests/native-acceptance/fixtures/b14-coordinator.mjs",
+    "tests/native-acceptance/reports/b14-independent-runner.json"
+  ],
+  "commands": [
+    {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave16-b-old4.json node tools/bootstrap/probe-wave14-runtime.mjs /Users/hh/Desktop/joker/superagent-agent-b",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "report": "/tmp/pa-wave16-b-old4.json"
+    },
+    {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave16-b-old5.json node tools/bootstrap/probe-wave13-runtime.mjs /Users/hh/Desktop/joker/superagent-agent-b",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "report": "/tmp/pa-wave16-b-old5.json"
+    },
+    {
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes --skipLibCheck --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --types node packages/driver-kit/src/runtime-diagnostics.ts packages/driver-kit/src/send-admission.ts packages/driver-kit/src/review-sender.ts packages/execution/src/resource-facts.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "diagnostics": 0,
+      "scope": "Four public helper modules under the main strict and exactOptionalPropertyTypes policy; this does not prove a new production consumer."
+    },
+    {
+      "command": "node --test packages/execution/test/resource-facts.test.ts packages/driver-kit/test/send-admission.test.ts packages/driver-kit/test/review-sender.test.ts packages/driver-kit/test/runtime-diagnostics.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 68,
+      "failed": 0
+    },
+    {
+      "command": "NODE_OPTIONS='--import=/tmp/pa-wave15-b-source-loader.mjs' node tests/native-acceptance/b13-vertical-production.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 6,
+      "failed": 0,
+      "notTested": 1,
+      "scope": "Existing real normal Application/create_work/Effects/AttemptRunner/Broker/answer/accept path, plus question-row survival after SIGKILL. The temporary loader resolves contracts to current candidate source instead of stale ignored dist; no source or assertions are changed.",
+      "normalPathRows": {
+        "works": 1,
+        "ticket": 1,
+        "ticket_links": 1,
+        "user_questions": 1,
+        "answer_deliveries": 1,
+        "fact_receipts": 7,
+        "dispatch_receipts": 2,
+        "artifacts": 20,
+        "event_log": 51
+      }
+    },
+    {
+      "command": "node /tmp/pa-wave16-b14-observe.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 6,
+      "failed": 0,
+      "notTested": 1,
+      "scope": "Candidate B14 is evaluated in memory with relative import anchors made absolute, report output exposed and private DB state read before cleanup. Candidate assertions and runtime imports are unchanged. No tracked report is written.",
+      "runnerPid": 71530,
+      "firstCoordinatorPid": 71559,
+      "firstCoordinatorSignal": "SIGKILL",
+      "recoveredExitCode": 0,
+      "runnerPidUnchangedAcrossRecovery": true,
+      "finalReceiverCounters": {
+        "inspect": 6,
+        "cancel": 1,
+        "answer": 0,
+        "begin": 0
+      },
+      "stop": {
+        "cancelError": null,
+        "acknowledgedState": "terminated",
+        "crashSignal": "SIGKILL",
+        "recoveredExitCode": 0,
+        "stopReceipt": null,
+        "receiverCancels": 1,
+        "physicalWriterProven": false
+      },
+      "finalTables": {
+        "command_receipts": 3,
+        "works": 0,
+        "ticket": 0,
+        "effect": 0,
+        "fact_receipts": 0,
+        "dispatch_receipts": 0,
+        "user_questions": 0,
+        "answers": 0,
+        "answer_deliveries": 0,
+        "runtime_bindings": 0,
+        "runtime_current": 0
+      },
+      "epochCase": {
+        "currentEpoch": 1,
+        "sentEpoch": 0,
+        "olderRefused": true,
+        "sentCommandSchemaValid": false,
+        "scope": "Invalid nonpositive epoch refusal; not a focal test of a valid stale positive epoch."
+      }
+    }
+  ],
+  "persistentReproduction": {
+    "tool": "tools/bootstrap/probe-wave16-runtime.mjs",
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave16-b-repro-c7.json node tools/bootstrap/probe-wave16-runtime.mjs /Users/hh/Desktop/joker/superagent-agent-b",
+    "output": "/tmp/pa-wave16-b-repro-c7.json",
+    "exitCode": 1,
+    "passed": 3,
+    "failed": 3,
+    "candidateTotalsPreserved": { "PASS": 6, "FAIL": 0, "NOT_TESTED": 1 },
+    "failedExpectations": [
+      "ACTUAL_BUSINESS_RECEIVER_BEGIN_AND_ANSWER",
+      "ACTUAL_BUSINESS_RECORDS_ARE_POPULATED",
+      "OLDER_EPOCH_COMMAND_IS_VALID_BEFORE_IDENTITY_REJECTION"
+    ],
+    "candidateAssertionsChanged": false,
+    "candidateReportsWritten": false,
+    "observationDatabaseReadonly": true,
+    "outputPolicy": "PA_ADMISSION_REPORT must name a new absolute path outside the candidate worktree; existing files are refused. Use a new path for each rerun.",
+    "scope": "Original candidate assertions are unchanged; only report output and private temporary DB observation are hooked. The independent business expectations deliberately make c7f7e77 fail admission while preserving inert-service and existing B13 scopes."
+  },
+  "closedScopes": [
+    "All four wave14 helper counterexamples and all five wave13 helper counterexamples pass on the fixed candidate.",
+    "Public helper strict/exactOptional compilation and 68 existing helper/resource tests pass.",
+    "The original B13 normal product vertical and its narrowly scoped durable-question SIGKILL evidence remain admitted; B14 limitations do not revoke them.",
+    "B14 now uses the same fixture epoch as its authenticated producer, receives the current cancel once, preserves the absent stop receipt after SIGKILL, and reopens with exit code zero.",
+    "Crash output no longer loses the earlier stage observation: one full stage record is emitted and all records are collected.",
+    "An independent inert authenticated inspection/cancel service survives coordinator SIGKILL and is reached at the same PID."
+  ],
+  "findings": [
+    {
+      "priority": 1,
+      "id": "B14_BUSINESS_SUCCESS_IS_STILL_RECEIPT_ONLY",
+      "file": "tests/native-acceptance/fixtures/b14-coordinator.mjs",
+      "line": 48,
+      "relatedLines": [54, 88, 94],
+      "assertionFile": "tests/native-acceptance/b14-independent-runner.mjs",
+      "assertionLine": 100,
+      "observation": "The begin/answer branches record arbitrary command bodies and inspect only. Delivery creates cmd-deliver and treats receipt presence as delivered=true. Receiver begin=0 and answer=0; Work/Ticket/effect/fact/dispatch/question/answer/binding/current tables all remain zero while B14 reports business PASS.",
+      "scope": "Missing required production recovery implementation and false-positive fixture assertions; not evidence of a current main user-facing permission bypass."
+    },
+    {
+      "priority": 1,
+      "id": "B14_RESOURCES_ARE_SYNTHETIC_NOT_PHYSICAL_WRITER_EVIDENCE",
+      "file": "tests/native-acceptance/fixtures/b14-runner-service.mjs",
+      "line": 25,
+      "relatedLines": [54, 61, 70],
+      "observation": "The service spawns no child or actual AttemptRunner. It advertises writer-${pid} as a spawned_process and changes strings to quiescent/terminated in cancel. Its authenticated state and receiver cancel count demonstrate inert control behavior, not stopping a real writer or satisfying a complete physical resource barrier."
+    },
+    {
+      "priority": 2,
+      "id": "OLDER_EPOCH_CASE_IS_SCHEMA_INVALID_ZERO",
+      "file": "tests/native-acceptance/fixtures/b14-coordinator.mjs",
+      "line": 73,
+      "relatedLines": [74, 76],
+      "schemaFile": "packages/contracts/src/schemas.ts",
+      "schemaLine": 42,
+      "observation": "Current producer epoch is one; current-1 is zero. RunnerCommandSchema requires a positive epoch and rejects this command before the stale identity boundary. Current cancel now correctly succeeds, but a valid positive stale epoch remains untested. A focal replacement needs currentEpoch >= 2 and oldEpoch >= 1, with the matching current command accepted under otherwise identical preconditions. This is an evidence gap, not a demonstrated production permission bypass."
+    }
+  ],
+  "wave15Packet": {
+    "B1": "NOT_IMPLEMENTED: no recovered actual business receiver path; normal B13 baseline remains.",
+    "B2": "PARTIAL: fixture epoch mismatch and lost crash output fixed; no A-current-binding source or valid stale-positive test.",
+    "B3": "NOT_IMPLEMENTED: no new NativeProductAttempt/RunnerLink/Runner service business reconnect port or adapter.",
+    "B4": "NOT_IMPLEMENTED: no actual begin receive/ACK/receipt recovery windows.",
+    "B5": "NOT_IMPLEMENTED: no recovered QuestionBroker target/session answer delivery.",
+    "B6": "PARTIAL_INERT_ONLY: authenticated cancel receive and absent receipt demonstrated; no actual physical writer/resource barrier.",
+    "B7": "NOT_IMPLEMENTED: contract/session/attempt/positive epoch control recovery matrix absent.",
+    "B8": "NOT_IMPLEMENTED: recovery-to-verification/current candidate/accept absent; normal-path acceptance preserved.",
+    "B9": "NOT_IMPLEMENTED: no real Work/Effects/independent Runner 2/4-slot or resource-return matrix.",
+    "B10": "INCOMPLETE: tests/native-acceptance/reports/wave15-status.json is absent; historical wave14 status remains."
+  },
+  "nextLargeTask": {
+    "title": "Actual product business recovery through the existing independent Runner service",
+    "firstRunnableCheckpoint": "Use the admitted Application/create_work/Effects/Runner/Broker normal path with B-owned fake app-server and the existing actual NativeProductAttempt/RunnerLink/runner-service-entry; observe at least one real begin and a real persisted question. Implement the smallest B-owned business reconnect adapter/port and publish an RFC for main's guarded composition, without editing main-owned product classes or creating another coordinator/ledger/lifecycle.",
+    "middleCheckpoint": "A fresh coordinator reconnects to the same actual Runner and physical child. Drive the original Broker answer and product stop through their real transport/queues; bind original command, attempt, session, positive epoch, before-write authorization and complete resource manifest. Assert receiver begin/answer/cancel counts and recovered exit codes around send/receive/ACK/receipt faults. Preserve unknown without resend or replacement identities.",
+    "finalCheckpoint": "Continue the same recovered work to actual verification/current candidate/human accept, then bounded two/four-slot isolation and FD/child/queue return-to-baseline. Publish exact source, runnable recipe and wave status; use zero vendor native/model turns."
+  },
+  "preservation": {
+    "candidateTrackedFilesEdited": [],
+    "preexistingDirtyReportsRetained": [
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json"
+    ],
+    "preexistingDirtyReportNumstat": [
+      "49 additions / 49 deletions: reports/releases/wave11-admission/runtime.json",
+      "15 additions / 15 deletions: reports/releases/wave12-admission/runtime.json"
+    ],
+    "userServicesTouched": false,
+    "privateProfilesTouched": false,
+    "budgetLedgerTouched": false,
+    "historicalReportsOverwritten": false,
+    "modelOrVendorProtocolSendCommandsRun": false
+  }
+}
