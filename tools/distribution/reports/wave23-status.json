@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "ab16943",
   "mergedMain": "03f7b7e",
-  "head": "3736e8e",
+  "head": "408be16",
   "frozenSource": "0ede11d",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Real vendor/model/native turns 0; twelve user services untouched.",
@@ -23,7 +23,7 @@
   "phases": {
     "d1": {
       "status": "PASS",
-      "summary": "Merged main 8c8fdef (via 03f7b7e), regenerated actual closure with 40 launcher/23 portability/9 distribution/5 root files and environment Node24.21/ABI137/SQLite3.53.4/schema18. Old 58ae294 closure is not reused; historical wave22 closure restored untouched.",
+      "summary": "Merged main 8c8fdef (via 03f7b7e); actual closure lists 40 launcher/23 portability/10 distribution/5 root files with environment Node24.21/ABI137/SQLite3.53.4/schema18 and source tree 24a5386; later closure/docs-only commits do not change runtime. Historical wave22 closure restored untouched.",
       "evidence": [
         "tools/distribution/reports/wave23/ordinary-source-closure.json"
       ]
@@ -653,6 +653,7 @@
     "tools/distribution/recipes/wave23-e-acceptance.zh-CN.md",
     "docs/rfcs/WP-16/0062-wave-23-d-cleanup-and-same-store-dual.md"
   ],
-  "evidenceHead": "3736e8e",
-  "sourceClosureHead": "2d3b3c4"
+  "evidenceHead": "408be16",
+  "sourceClosureHead": "2d3b3c4",
+  "closureSource": "24a5386"
 }
