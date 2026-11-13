@@ -115,6 +115,7 @@ function commandSpecs() {
       'api-port': 'string',
       fixture: 'boolean',
       'discussion-only': 'boolean',
+      'review-restored-scope': 'string',
       'require-login': 'boolean',
       open: 'boolean',
       'no-build': 'boolean',

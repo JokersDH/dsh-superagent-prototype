@@ -8,9 +8,9 @@
  * self-authorized resume switch.
  */
 import { spawn } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, lstatSync } from 'node:fs'
 import { createServer } from 'node:net'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { ensureRoots, readEvidenceSummary } from '@personal-agent/portability'
 import { EXIT } from './cli.mjs'
 import { readLauncherConfig } from './config.mjs'
@@ -210,7 +210,6 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
       return blocked('port_in_use', `本机端口 ${port} 已被占用`, { name, port, cause: availability.code }, '用 --port/--api-port 选择其它端口，或先运行 `pa doctor` 核对已有实例。')
   }
 
-  const discussionOnly = values['discussion-only'] === true
   if (mode === 'personal' && !discussionOnly) {
     const evidence = readAuthorEvidence(installRoot)
     const expectedVersion = evidence?.status === 'PASS_REAL_NATIVE_PRODUCT' ? evidence.profileVersion : null
@@ -235,6 +234,7 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
 
   const expectedArgv = daemonArgv({
     discussionOnly,
+    reviewRestoredScope,
     installRoot: canonicalInstall,
     apiPort,
     state: canonicalState,
@@ -245,6 +245,7 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
   })
   const daemon = spawnDaemon({
     discussionOnly,
+    reviewRestoredScope,
     installRoot: canonicalInstall,
     apiPort,
     state: canonicalState,

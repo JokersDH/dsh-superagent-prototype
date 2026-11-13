@@ -63,7 +63,7 @@ export function createBoundedLog(logsRoot, buildId) {
   return { path, write }
 }
 
-export function daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access, startupMode = 'normal', discussionOnly = false }) {
+export function daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access, startupMode = 'normal', discussionOnly = false, reviewRestoredScope = null }) {
   const argv = [
     join(installRoot, 'apps/coordinator/product/demo.ts'),
     '--port',
@@ -85,6 +85,11 @@ export function daemonArgv({ installRoot, apiPort, state, consoleURL, mode, acce
       if (discussionOnly) argv.push('--discussion-only')
       else argv.push('--native')
     }
+  } else if (reviewRestoredScope !== null) {
+    // Main requires an explicitly requested personal restored startup to consume the review config.
+    // This is still recovery_readonly; the flag only enables read-only historical review, never an
+    // executor, queue replay or target. The launcher never discovers a config by itself.
+    argv.push('--assistant', '--discussion-only', '--review-restored-scope', reviewRestoredScope)
   }
   if (access === 'local-development') argv.push('--local-access')
   return argv
@@ -111,10 +116,10 @@ export async function waitForHealth(apiURL, child, { timeoutMs = 30_000, childEx
  * and reports resources that outlive the deadline.
  */
 export function spawnDaemon(options) {
-  const { installRoot, apiPort, state, consoleURL, mode, access, logsRoot, buildId, startupMode = 'normal', discussionOnly = false } = options
+  const { installRoot, apiPort, state, consoleURL, mode, access, logsRoot, buildId, startupMode = 'normal', discussionOnly = false, reviewRestoredScope = null } = options
   const log = createBoundedLog(logsRoot, buildId)
   const tail = []
-  const child = spawn(process.execPath, daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access, startupMode, discussionOnly }), {
+  const child = spawn(process.execPath, daemonArgv({ installRoot, apiPort, state, consoleURL, mode, access, startupMode, discussionOnly, reviewRestoredScope }), {
     cwd: installRoot,
     env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' },
     stdio: ['ignore', 'pipe', 'pipe'],
