@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-13T12:21:47.475Z",
+  "checkedAt": "2026-11-13T13:28:50.005Z",
   "source": {
-    "commit": "dcaa884030eebdac23e5eb4cb95c95d6e7c6bbd0",
+    "commit": "292cff92bf8eb71e01dd638be2c617ed1b1505cc",
     "dirty": false
   },
-  "expectedSource": "dcaa884030eebdac23e5eb4cb95c95d6e7c6bbd0",
+  "expectedSource": "292cff92bf8eb71e01dd638be2c617ed1b1505cc",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -731,6 +731,11 @@
       "status": "PASS"
     },
     {
+      "id": "E5-REVIEW-REUSE-CONSISTENCY",
+      "required": true,
+      "status": "FAIL"
+    },
+    {
       "id": "E6-INSTALLED-CONTEXT",
       "required": true,
       "status": "PASS"
@@ -823,6 +828,11 @@
   ],
   "failures": [
     {
+      "code": "case_not_pass",
+      "detail": "Required case E5-REVIEW-REUSE-CONSISTENCY is FAIL",
+      "caseId": "E5-REVIEW-REUSE-CONSISTENCY"
+    },
+    {
       "code": "missing_required_case",
       "detail": "Required case E5-NATIVE-DELIVERY is absent",
       "caseId": "E5-NATIVE-DELIVERY"
@@ -851,7 +861,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-13T12:16:23.661Z",
+    "decidedAt": "2026-11-13T13:23:52.846Z",
     "failureCodes": []
   },
   "notes": [

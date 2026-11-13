@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "dcaa884030eebdac23e5eb4cb95c95d6e7c6bbd0",
+    "commit": "292cff92bf8eb71e01dd638be2c617ed1b1505cc",
     "dirty": false
   },
   "environment": {
@@ -11,17 +11,17 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-13T12:16:23.644Z",
+  "checkedAt": "2026-11-13T13:23:52.830Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 196,
-    "FAIL": 0,
+    "PASS": 199,
+    "FAIL": 1,
     "SKIPPED": 0,
-    "NOT_TESTED": 16,
+    "NOT_TESTED": 15,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
