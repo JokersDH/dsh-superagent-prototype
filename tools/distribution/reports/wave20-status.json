@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "35925dd",
   "mergedMain": "e5d89bb",
-  "head": "e4e0623",
+  "head": "2dd3972",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Real vendor/model/native turns 0; twelve user services untouched.",
   "ownedPaths": [
@@ -421,5 +421,6 @@
     "tools/distribution/reports/wave20/*.json",
     "tools/distribution/recipes/wave20-e-acceptance.zh-CN.md",
     "docs/rfcs/WP-16/0056-wave-20-d-explicit-review-and-exact-successor.md"
-  ]
+  ],
+  "evidenceHead": "2dd3972"
 }
