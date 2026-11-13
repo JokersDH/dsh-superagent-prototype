@@ -1,0 +1,71 @@
+{
+  "protocol": "agent-c-wave16-status/1",
+  "wave": "product-wave-16",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "7a2f9e9",
+    "mergeCommit": "0778d46",
+    "mainProduct": "a64a127/1169535",
+    "previousOwnCommit": "f6f985e",
+    "earlyCheckpoint": "fc63635",
+    "middleCheckpoint": "de32a88",
+    "rootLockDiffPreserved": true
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "actualConsumers": [
+    {
+      "entry": "GET /v1/messages/:id/candidates + POST /v1/assistant/candidates/prepare",
+      "consumedBy": "packages/knowledge/test/main-candidate-chain.case.ts",
+      "evidence": "real local SDK fixture -> chat -> A18 artifact -> candidate GET -> pointer prepare -> confirm/reject/replay; decision/work/revision kinds, mixed/stale/reply-only, pointer+source drift, missing artifact"
+    },
+    {
+      "entry": "main default scoped factory in apps/coordinator/product/context-preview.ts",
+      "consumedBy": "packages/knowledge/test/main-context-http.case.ts",
+      "evidence": "610 excluded displays hit the 600 scan boundary: preview partial, issues conversation_scan_incomplete, omitted source_unavailable"
+    },
+    {
+      "entry": "main CompletedAssistantReplies.readVerified + second-root ProductStore snapshot",
+      "consumedBy": "packages/knowledge/test/main-candidate-chain.case.ts (second-root case) and main-context-use-consumer.case.ts",
+      "evidence": "frozen reply and history readable in a copied state root; missing artifact refused; no business effect created"
+    }
+  ],
+  "moduleOnly": [
+    { "export": "selectRelevantSources / createConversationRelevanceCandidates / createDecisionRelevanceCandidates / createReadIndexWorkCandidates", "reason": "main still composes retrieval through its own preview; C tests only" },
+    { "export": "projectSourceReview", "reason": "main maps its own preview DTO; C review not wired to HTTP" },
+    { "export": "collectContextHistory", "reason": "main e1e0c97 history HTTP does not call C reader; C reads real A18 tables only in tests" }
+  ],
+  "stageOutcomes": {
+    "C1": "done: real fixture chat -> A18 artifact -> candidate GET -> pointer prepare -> verified reader; no hand-built wrapper in the new path",
+    "C2": "done: decision/work/revision confirm+reject, requiredInputs, missing-input rejection, original receipt replay (incl. corrupt artifact), mixed valid/stale, reply-only",
+    "C3": "done (within main guards): pointer index/digest drift and live source edit refused before a second business effect; artifact missing refuses GET/prepare; project/contract drift covered by revision stale + main origin validation",
+    "C4": "done: main default factory boundary test added; existing main factory six cases referenced, not re-counted",
+    "C5": "done: public preview partial + issues + omitted source_unavailable; nested path redaction remains in C library tests",
+    "C6": "done: second-root snapshot reads frozen reply and non-empty history, refuses missing artifact, creates no business state; target activation NT",
+    "C7": "done (retained): revoked decision disappears from preview; supersession/scope/expiry explanation remains in DecisionGovernance tests; no new learning or authority",
+    "C8": "done: null/missing/throwing-getter/oversized/sparse/symbol input all bounded invalid_body; typed wrapper remains main-only",
+    "C9": "done: 600 scan boundary, 8 candidates + 30k text with one reader call, public partial state; 10000-history scale remains from wave-15",
+    "C10": "done: four suites, five probes, recipe and consumer map"
+  },
+  "ownedRegressions": {
+    "contextTests": { "passed": 124, "failed": 0 },
+    "proposalsTests": { "passed": 40, "failed": 0 },
+    "knowledgeTests": { "passed": 93, "failed": 0 },
+    "routingTests": { "passed": 44, "failed": 0 },
+    "typecheck": "pass",
+    "build": "pass"
+  },
+  "notTested": [
+    { "item": "main recovery source confirm/private permission/target activation", "owner": "main", "reason": "recovery line not delivered; cross-root checks are read-only snapshots" },
+    { "item": "assistant SSE admission", "owner": "main", "reason": "not read by C consumers" },
+    { "item": "real remote model/provider", "owner": "main", "reason": "fixture is a private local pseudo-SDK; real model/native turns stay 0" },
+    { "item": "candidate review UI wiring of C projections", "owner": "main", "reason": "main UI consumes its own candidate DTO; C verifies the data preconditions" }
+  ],
+  "preserved": {
+    "userServices": "5180/8796 through 5191/8807 untouched",
+    "historicalReports": "wave01-wave15 reports unchanged; wave15 admission notes remain scoped to their baseline",
+    "rootLock": "pnpm-lock.yaml diff preserved and not committed"
+  }
+}
