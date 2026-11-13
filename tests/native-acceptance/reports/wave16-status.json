@@ -1,0 +1,68 @@
+{
+  "wave": "product-wave-16",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "7a2f9e9",
+  "mergeCommit": "b9c334e",
+  "previousCandidate": "c7f7e77",
+  "packet": "agent-tasks/product-wave-16/agent-b-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0047",
+  "scopeNote": "Zero real model and native turns. Only B-owned paths touched. No second ledger/coordinator/lifecycle, no second database, no new Driver, no price/recipe research. Twelve user instances untouched. Two historical report diffs preserved. Shared probe outputs go to /tmp.",
+
+  "B1_receiver_reached": {
+    "status": "PASS",
+    "what_changed": "the spawned Runner process is now genuinely observed receiving begin; all earlier waves reported begin=0",
+    "evidence": "tests/native-acceptance/b16-native-begin.mjs (3 PASS + 1 NOT_TESTED)",
+    "receiverCounts": { "begin": 1, "answer": 0, "cancel": 0 },
+    "runnerProcess": { "spawnedAsSeparateProcess": true, "pidDiffersFromCoordinator": true, "attemptId": "attempt-1", "fenceEpoch": 1 },
+    "criticalFactsEmitted": ["dispatch.observed", "turn.ended"],
+    "howCounted": "the Runner process itself appends every frame it receives to PA_RUNNER_RECEIVER_LOG before any admission check; the count therefore comes from the receiving process, not from the caller's bookkeeping",
+    "twoB_ownedEnablers": [
+      { "file": "apps/runner/src/runner-service.ts", "change": "optional PA_RUNNER_RECEIVER_LOG append of every received command; inert when unset", "defaultBehaviourChanged": false },
+      { "file": "apps/runner/src/runner-service-entry.ts", "change": "PA_RUNNER_SCENARIO overrides the scenario argv; argv stays authoritative when unset", "defaultBehaviourChanged": false }
+    ],
+    "lane": "Codex Driver against the B-owned in-process fake app-server (codex-fake); no installed Codex executed"
+  },
+
+  "B1_join_to_application": {
+    "status": "NOT_REACHED",
+    "detail": "the product Application/Broker vertical and this receiver are still two separately proven halves. Joining them is exactly the business reconnect port (B2).",
+    "what_was_attempted": "createProductRuntime with a native NativeProductConfiguration, native profile matching the create_work profileId, so the product would spawn NativeProductAttempt itself",
+    "blockerObserved": "main's NativeProductAttempt completes its environment/preparation handshake before sending begin; with no environment plan the prepared promise never resolves, and codex-fake sets eagerPrepare=false. No main product class was edited, per the packet.",
+    "businessRowsFromTheNativeAttempt": { "works": 1, "tickets": 1, "links": 1, "bindings": 1, "questions": 0, "facts": 0, "dispatch": 0 },
+    "conclusion": "the native product attempt prepared (works/ticket/link/binding rows exist) but produced no begin because the handshake never completed; this is a real missing product-side hook, not a fabricated result"
+  },
+
+  "regression": {
+    "b13_normal_vertical": { "status": "PASS", "cases": "6 PASS + 1 NOT_TESTED" },
+    "driver_kit": { "status": "PASS", "cases": "65/65" },
+    "strict": { "status": "PASS", "detail": "driver-kit helpers compile under --strict --exactOptionalPropertyTypes" }
+  },
+
+  "notReached": {
+    "B2_businessReconnectPort": "port source not yet published; only the receiver half is proven",
+    "B3_actualWriterResourceSet": "no controlled child writer with birth PID/start/UID/resource identity recorded yet",
+    "B4_beginCrashWindows": "not started",
+    "B5_brokerAnswerRecovery": "not started",
+    "B6_stopPhysicalBarrier": "not started",
+    "B7_validStaleEpochFence": "not started; epoch0 would only be an invalid-input test, so no stale-epoch claim is made",
+    "B8_recoveredDeliveryToAccept": "not started",
+    "B9_slots2And4AndReturn": "not started"
+  },
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "bConsumes": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "limitations": [
+    "the Driver is exercised against a fake app-server; installed-agent behaviour remains NOT_TESTED",
+    "the receiver proof is a single begin on one attempt; no crash window, answer, cancel or epoch fence is covered",
+    "the product-side join is not implemented, so no claim is made that the product's own create_work reaches this receiver",
+    "recovered exit codes, 2/4 slots and resource return are not measured in this checkpoint"
+  ]
+}

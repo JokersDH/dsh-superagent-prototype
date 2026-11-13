@@ -19,7 +19,7 @@
  * socket); this module does not define a second socket protocol.
  */
 import { fileURLToPath } from 'node:url'
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { AgentDriverV1, AttemptIO } from '../../../packages/contracts/src/ports.ts'
 import type { AttemptSpec, CriticalFact, DurableReceipt, Json, RunnerCommand } from '../../../packages/contracts/src/types.ts'
@@ -293,6 +293,16 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
             break
           }
           const command: RunnerCommand = frame.command
+          // Optional receiver log (wave-16 B1). Off by default and inert when unset; when a path is
+          // supplied, every command the Runner ACTUALLY received is appended before any admission
+          // check. This is the only honest source for "receiver begin count": the caller's own
+          // bookkeeping cannot prove the frame arrived at the writer's process.
+          if (process.env.PA_RUNNER_RECEIVER_LOG) {
+            await appendFile(
+              process.env.PA_RUNNER_RECEIVER_LOG,
+              `${JSON.stringify({ kind: command.kind, id: command.id, attemptId: command.attemptId, fenceEpoch: command.fenceEpoch, at: new Date().toISOString() })}\n`,
+            ).catch(() => undefined)
+          }
           if (businessClosed) {
             write({ type: 'error', id: frame.id, code: 'state_indeterminate', reason: 'admission_closed', message: 'Attempt admission is closed' })
             break

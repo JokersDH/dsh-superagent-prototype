@@ -19,7 +19,11 @@ import { ProcessHost } from './process-host.ts'
 import { encodeFrame } from '../../../packages/driver-kit/src/index.ts'
 import { prepareRunnerEnvironment } from './environment-preparation.ts'
 
-const scenario = process.argv[2] ?? 'happy'
+// Wave-16 B1: the coordinator spawns this file with a fixed scenario argument, so a controlled
+// lane needs an environment override to reach the Codex Driver against the in-process fake
+// app-server. The argument remains authoritative when the variable is absent, so production
+// behaviour is unchanged and an installed Codex is never selected by accident.
+const scenario = process.env.PA_RUNNER_SCENARIO ?? process.argv[2] ?? 'happy'
 let detached = false
 process.stdout.on('error', error => { if ((error as NodeJS.ErrnoException).code === 'EPIPE') detached = true; else throw error })
 
