@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**当前派工：[第十六轮真实恢复与当前版本交付长包](agent-tasks/product-wave-16/README.zh-CN.md)。** 已复验A29800f6/Bc7f7e77/Cf6f985e/D0b9481c/Eed1c890，旧修复保留；A新manifest完整性、B真实业务恢复、D子资源/发现UNKNOWN及E恢复exit证据需收口。C消费已存在的真实候选入口；D/E交当前建议版同一包。每人十阶段、三个可运行checkpoint，交后继续独立队列。直接转发[五段开工话术](agent-tasks/product-wave-16/forward-prompts.zh-CN.md)，细节见[0047](docs/rfcs/WP-16/0047-wave-16-reviewed-deliveries-and-long-packages.md)和[验收记录](reports/releases/wave16-admission/README.zh-CN.md)。十二实例/预算保留，真实模型/native0；main下一出口实际source确认/许可。以下前期检查点与派工按历史范围保留，以本段第十六轮为准。
+
 **同次回复建议已接入真实确认链：[http://127.0.0.1:5191/](http://127.0.0.1:5191/)。** 主线`65ac737/eb96c3e/104b7a0/1169535`完成wave15 M1–M3：默认C scoped来源、单次SDK非空建议、原回复候选读取、补齐输入及明确预览/确认/拒绝。模型设置中的“提案建议”默认关闭；原网关tools兼容尚未实测，不会自动重发。后端91、console34、factory6及候选8/原提案8/上下文9网页流程分范围通过，真实模型/native0。新5191/8807使用独立personal state，原十一组实例未重启。见[使用方法](docs/ASSISTANT-GUIDE.zh-CN.md)、[0046](docs/rfcs/WP-16/0046-candidate-workbench-and-private-preferences.md)及[精确交付范围](reports/releases/wave15-integration/README.zh-CN.md)。恢复source confirm、私有许可、真实业务恢复和target启动仍待后续阶段，A–E继续原第十五轮整包，无需重新下发。
 
 **当前派工：[第十五轮实际入口与同一包闭环](agent-tasks/product-wave-15/README.zh-CN.md)。** 已验A3121ec4/Bcfe6a3a/C2e1c095/De9f8aff/Ed0d1159：A数据与C旧6修复成立，B正常纵向保留，新114b73c包已含M1。B14仍receipt-only而非真实业务恢复；D实际身份producer/停止后三态、E实际动作/模式/ABI证据仍需关闭。每人十阶段、三个可运行source，交后继续独立队列。见[分别转发话术](agent-tasks/product-wave-15/forward-prompts.zh-CN.md)、[0043固定范围](docs/rfcs/WP-16/0043-wave-15-production-composition-and-admission.md)和[验收证据](reports/releases/wave15-admission/README.zh-CN.md)。原十一实例/预算保留，真实模型/native0。

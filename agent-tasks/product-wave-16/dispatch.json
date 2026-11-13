@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "wave": "product-wave-16",
+  "date": "2026-11-13",
+  "status": "PLANNED_NOT_EXECUTED",
+  "reviewBaseline": "a64a127d52e04fb9eba8771ee22380db47e45baa",
+  "observedMain": "87d548c54b470638535037575b2dd85061344bc5",
+  "productRuntimeSource": "1169535ec3716d928da82b02865daebea7b06d06",
+  "sharedBoundary": "docs/rfcs/WP-16/0047-wave-16-reviewed-deliveries-and-long-packages.md",
+  "contracts": [
+    "packages/contracts/src/recovery-state.ts",
+    "packages/contracts/src/recovery-source.ts",
+    "packages/contracts/src/recovery-activation.ts",
+    "packages/contracts/src/recovery-target.ts",
+    "packages/contracts/src/assistant-candidates.ts"
+  ],
+  "newModelAllowance": 0,
+  "nativeModelsStartedByThisDispatch": 0,
+  "newDriverImplementation": false,
+  "studyState": "BLOCKED_CURRENT_RECIPE",
+  "pilotGatesProductAcceptance": false,
+  "normalInstallRequiresRecoveryActivation": false,
+  "checkpointsPerOwner": 3,
+  "continueAfterCheckpoint": true,
+  "independentQueueRequired": true,
+  "unboundedPollingAllowed": false,
+  "preservedUserServices": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ],
+    [
+      5186,
+      8802
+    ],
+    [
+      5187,
+      8803
+    ],
+    [
+      5188,
+      8804
+    ],
+    [
+      5189,
+      8805
+    ],
+    [
+      5190,
+      8806
+    ],
+    [
+      5191,
+      8807
+    ]
+  ],
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "candidate": "29800f652ec8804e6139e312c3235e4ad202c976",
+      "packet": "agent-tasks/product-wave-16/agent-a-data.zh-CN.md",
+      "ownedPaths": [
+        "packages/storage/",
+        "packages/workflows/"
+      ],
+      "evidencePath": "packages/workflows/reports/wave16-status.json",
+      "phases": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "candidate": "c7f7e77e405f33a612c59c69c8305245917a5b44",
+      "packet": "agent-tasks/product-wave-16/agent-b-runtime.zh-CN.md",
+      "ownedPaths": [
+        "packages/execution/",
+        "packages/catalog/",
+        "packages/policy-preparation/",
+        "packages/driver-kit/",
+        "packages/testing/",
+        "packages/drivers/",
+        "apps/runner/",
+        "tests/native-acceptance/"
+      ],
+      "evidencePath": "tests/native-acceptance/reports/wave16-status.json",
+      "grantId": "wave03-b-native",
+      "historicalLimit": 4,
+      "remaining": "UNKNOWN_NOT_SPENDABLE",
+      "resetLedger": false,
+      "newFeasibilityInvestigations": 0,
+      "phases": [
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+        "B8",
+        "B9",
+        "B10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "candidate": "f6f985e1c8ce95610bf231bdf1804e2053f72164",
+      "packet": "agent-tasks/product-wave-16/agent-c-context.zh-CN.md",
+      "ownedPaths": [
+        "packages/context/",
+        "packages/proposals/",
+        "packages/knowledge/",
+        "packages/routing/"
+      ],
+      "evidencePath": "packages/context/reports/wave16-status.json",
+      "phases": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "candidate": "0b9481ce83cf455a9ef41d0ccf94b5255c4d55d1",
+      "packet": "agent-tasks/product-wave-16/agent-d-delivery.zh-CN.md",
+      "ownedPaths": [
+        "apps/launcher/",
+        "tools/distribution/",
+        "packages/portability/"
+      ],
+      "evidencePath": "tools/distribution/reports/wave16-status.json",
+      "phases": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8",
+        "D9",
+        "D10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "candidate": "ed1c8903b5f3c01077d3e441ce94ced764e6f759",
+      "packet": "agent-tasks/product-wave-16/agent-e-acceptance.zh-CN.md",
+      "ownedPaths": [
+        "tests/product-acceptance/"
+      ],
+      "evidencePath": "tests/product-acceptance/reports/wave16-status.json",
+      "grantId": "wave05-independent-review-pilot-01",
+      "maxNativeTurnStarts": 24,
+      "maxAuthorTurnStarts": 8,
+      "maxReviewTurnStarts": 16,
+      "maxBillableTokens": 200000,
+      "maxCostUSD": 5,
+      "maxInFlight": 1,
+      "resetLedger": false,
+      "unknownCostIsZero": false,
+      "cliFallbackAllowed": false,
+      "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
+      "phases": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6",
+        "E7",
+        "E8",
+        "E9",
+        "E10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-16/main.zh-CN.md",
+      "ownedPaths": [
+        "packages/contracts/",
+        "packages/application/",
+        "packages/questions/",
+        "apps/coordinator/",
+        "apps/console/",
+        "agent-tasks/product-wave-16/",
+        "tools/bootstrap/",
+        "docs/rfcs/WP-16/"
+      ],
+      "evidencePath": "reports/releases/wave16-integration/status.json",
+      "phases": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    }
+  },
+  "checkpoints": {
+    "M-current-candidates": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "A-reviewed-source": {
+      "owner": "A",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "B-normal-product": {
+      "owner": "B",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "D-old-bytes": {
+      "owner": "D",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "A-full-manifest": {
+      "owner": "A",
+      "dependsOn": []
+    },
+    "A-nonempty-restore": {
+      "owner": "A",
+      "dependsOn": [
+        "A-full-manifest",
+        "M-current-candidates"
+      ]
+    },
+    "M-source-confirm": {
+      "owner": "main",
+      "dependsOn": [
+        "A-reviewed-source"
+      ]
+    },
+    "A-confirm-consumer": {
+      "owner": "A",
+      "dependsOn": [
+        "M-source-confirm"
+      ]
+    },
+    "C-actual-candidates": {
+      "owner": "C",
+      "dependsOn": [
+        "M-current-candidates"
+      ]
+    },
+    "C-frozen-history": {
+      "owner": "C",
+      "dependsOn": [
+        "A-nonempty-restore"
+      ]
+    },
+    "B-real-receiver": {
+      "owner": "B",
+      "dependsOn": [
+        "B-normal-product"
+      ]
+    },
+    "B-business-port": {
+      "owner": "B",
+      "dependsOn": [
+        "B-real-receiver"
+      ]
+    },
+    "M-business-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "B-business-port"
+      ]
+    },
+    "B-recovered-business": {
+      "owner": "B",
+      "dependsOn": [
+        "M-business-consumer",
+        "B-business-port"
+      ]
+    },
+    "B-recovered-delivery": {
+      "owner": "B",
+      "dependsOn": [
+        "B-recovered-business"
+      ]
+    },
+    "D-resource-identity": {
+      "owner": "D",
+      "dependsOn": []
+    },
+    "D-owned-live": {
+      "owner": "D",
+      "dependsOn": [
+        "D-resource-identity"
+      ]
+    },
+    "D-current-bytes": {
+      "owner": "D",
+      "dependsOn": [
+        "D-owned-live",
+        "M-current-candidates"
+      ]
+    },
+    "D-nonempty-relocation": {
+      "owner": "D",
+      "dependsOn": [
+        "D-current-bytes",
+        "A-nonempty-restore"
+      ]
+    },
+    "E-behavior-gate": {
+      "owner": "E",
+      "dependsOn": []
+    },
+    "E-resource-mocks": {
+      "owner": "E",
+      "dependsOn": [
+        "D-resource-identity"
+      ]
+    },
+    "E-current-ui": {
+      "owner": "E",
+      "dependsOn": [
+        "M-current-candidates"
+      ]
+    },
+    "E-installed": {
+      "owner": "E",
+      "dependsOn": [
+        "D-current-bytes",
+        "E-behavior-gate",
+        "E-resource-mocks"
+      ]
+    },
+    "E-relocation": {
+      "owner": "E",
+      "dependsOn": [
+        "E-installed",
+        "D-nonempty-relocation"
+      ]
+    },
+    "M-private-permission": {
+      "owner": "main",
+      "dependsOn": [
+        "M-source-confirm",
+        "D-owned-live",
+        "B-recovered-business"
+      ]
+    },
+    "M-target-activation": {
+      "owner": "main",
+      "dependsOn": [
+        "M-private-permission"
+      ]
+    },
+    "E-target-activation": {
+      "owner": "E",
+      "dependsOn": [
+        "M-target-activation"
+      ]
+    }
+  },
+  "providedInputs": {
+    "defaultCFactoryImplemented": true,
+    "nonemptyReplyCandidatesImplemented": true,
+    "explicitCandidateUIImplemented": true,
+    "sourceBaselineScope": "actual_inspect_prepare_only",
+    "sourceConfirmImplemented": false,
+    "privatePermissionImplemented": false,
+    "targetActivationImplemented": false,
+    "bBusinessRecoveryImplemented": false,
+    "ordinaryInstallBaselineAvailableNow": true,
+    "currentPreview": "http://127.0.0.1:5191/",
+    "currentPreviewAPI": "http://127.0.0.1:8807/",
+    "historicalDArtifact": {
+      "source": "8962d102711e2d2f6b9bb8d5b8ed98437348f6a3",
+      "buildId": "88df6d2eef1feeb7",
+      "schema": 18,
+      "sha256": "11497980a4077e854b64596c71efe45b1e68e058639838acef0b07657d61f54b",
+      "bytes": 20190414,
+      "includesCurrentCandidates": false
+    }
+  },
+  "completionEstimateRef": "reports/releases/wave13-admission/progress.json",
+  "releaseApproved": false
+}
