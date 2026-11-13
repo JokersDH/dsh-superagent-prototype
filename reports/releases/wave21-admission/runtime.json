@@ -1,0 +1,183 @@
+{
+  "protocol": "wave21-b-admission/1",
+  "status": "OLD_BOUNDARIES_CLOSED_INSPECT_CANCEL_SOURCE_STILL_GATED_BUSINESS_ATTACH_NOT_DELIVERED",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "source": "18a5c1eb6610028b725c7be5033dc1b590238e16",
+  "mainSource": "4c938174b45c1a2177380c1d1f7eb7abb7c60f54",
+  "mainRuntimeSource": "773b34de57b3a2f8c79eca19bcb8aaee55c83ed8",
+  "previousReviewedCandidate": "e9073ed6fb63fe698c77eacdee3fa198a176fd77",
+  "realModelTurns": 0,
+  "vendorNativeTurnStarts": 0,
+  "budgetLedgerOpened": false,
+  "normalQaPhysicalStopScopePreserved": true,
+  "normalProductRerunThisAudit": false,
+  "wholeNewWrapperSourceAdmitted": false,
+  "businessRecoveryAdmitted": false,
+  "ownChanges": [
+    "apps/runner/src/business-reconnect.ts",
+    "tests/native-acceptance/reports/wave20-status.json"
+  ],
+  "commands": [
+    {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave21-b-previous-boundaries.json node tools/bootstrap/probe-wave20-runtime.mjs /Users/hh/Desktop/joker/superagent-agent-b",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "report": "/tmp/pa-wave21-b-previous-boundaries.json",
+      "sourceStable": true,
+      "cleanupComplete": true,
+      "closedCases": [
+        { "id": "FOREIGN_SOURCE_REFUSES_BEFORE_RECEIVER_CANCEL", "receiverCancels": 0, "beforeWriteCalls": 0 },
+        { "id": "REGISTERED_SOCKET_INODE_MUST_NOT_BE_REPINNED", "originalAndReplacementPositiveControls": true, "originalTransportRejectsReplacement": true, "wrapperRejectsReplacement": true },
+        { "id": "CURRENT_TWO_ACCEPTS_AND_EXPECTED_OLD_ONE_REFUSES_LOCALLY", "currentEpoch": 2, "oldEpoch": 1, "schemasValid": true, "currentGuardCalls": 1, "oldGuardCalls": 0, "receiverCancels": 1, "refusal": "epoch_not_current" }
+      ],
+      "scope": "The old two runtime boundary failures and refusal-literal behavior are closed. The epoch case remains local expected/binding validation with a current positive control, not an actual runtime epoch advance or coordinator recovery."
+    },
+    {
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes --skipLibCheck --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --types node apps/runner/src/business-reconnect.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 2,
+      "diagnostics": ["apps/runner/src/business-reconnect.ts(121,5): error TS2345: resolveEndpoint returns optional socketIdentity, but RunnerEndpoint requires socketIdentity"],
+      "scope": "The old stale_epoch/epoch_not_current error is fixed, but the submitted module still does not pass its real strict/exactOptional consumer. The root tsconfig clean claim does not substitute for compiling this app module."
+    },
+    {
+      "command": "NODE_OPTIONS='--import=/tmp/pa-wave15-b-source-loader.mjs' node /tmp/pa-wave21-b-registration-contract.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "passed": 4,
+      "failed": 1,
+      "report": "/tmp/pa-wave21-b-registration-contract.json",
+      "scope": "Private real A ProductStore/current binding/immutable registration with one existing-protocol mock service. No real process/writer, product normal re-execution, coordinator restart or native/model turn.",
+      "registration": {
+        "receiptSeq": 2,
+        "helperExactEndpoint": true,
+        "helperExactProducer": true,
+        "helperDigestMatches": true,
+        "socketIdentity": { "dev": 16777233, "ino": 51070619 }
+      },
+      "currentGuardRefusal": { "calls": 1, "error": "private-current-principal-refused", "receiverCancels": 0, "stateAfter": "serving" },
+      "intentOnlyReceipt": {
+        "kind": "runner-cancel-intent/1",
+        "receiverCancelsBeforeSend": 0,
+        "rawCommandsHasConsumer": { "refused": "already_recorded", "beforeWriteCalls": 0 },
+        "stateAwareConsumer": { "beforeWriteCalls": 1, "sent": true, "receiverCancels": 1 },
+        "scope": "A persisted intent is not an observed/completed Runner send. The predicate must be supplied with the correct state semantics; this is not a current production bypass or a new durable result implementation."
+      },
+      "cancelProof": {
+        "returnedProof": { "state": "serving", "admission": "open", "writer": "active" },
+        "freshAfterProof": { "state": "terminated", "admission": "closed", "writer": "quiescent" },
+        "returnsActualPostCancelProof": false
+      }
+    }
+  ],
+  "persistentRegistrationReproduction": {
+    "tool": "tools/bootstrap/probe-wave21-runtime.mjs",
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave21-b-registration-reusable.json node tools/bootstrap/probe-wave21-runtime.mjs /Users/hh/Desktop/joker/superagent-agent-b",
+    "output": "/tmp/pa-wave21-b-registration-reusable.json",
+    "exitCode": 1,
+    "passed": 4,
+    "failed": 1,
+    "classification": "PRIVATE_A_REGISTRATION_AND_MOCK_CONTROL_ONLY",
+    "failedCase": "CANCEL_RETURNS_AUTHENTICATED_POST_CANCEL_PROOF",
+    "positiveCases": [
+      "EXACT_REGISTERED_ENDPOINT_PRODUCER_AND_DIGEST",
+      "CURRENT_GUARD_REFUSAL_HAS_NO_RECEIVER_CANCEL",
+      "PENDING_INTENT_CAN_EXIST_BEFORE_ANY_RECEIVER_SEND",
+      "STATE_AWARE_CONSUMER_SENDS_ORIGINAL_PENDING_INTENT_ONCE"
+    ],
+    "returnedProof": { "state": "serving", "admission": "open", "writer": "active" },
+    "freshAfterProof": { "state": "terminated", "admission": "closed", "writer": "quiescent" },
+    "sourceStable": true,
+    "cleanupComplete": true,
+    "outputPolicy": "New absolute PA_ADMISSION_REPORT outside the candidate checkout is required. Existing files are refused and report creation is exclusive mode 0600. Use a new path per run.",
+    "scope": "Only a private real A Store/immutable registration/current binding and bounded existing-protocol mock. No normal product rerun, global scan, vendor/native/model call, physical writer or business recovery. Raw receipt rejection is recorded as caller-semantic observation, not a permission finding. Main keeps its original post-response proof API and does not substitute this wrapper."
+  },
+  "completedScopes": [
+    "Explicit original registered endpoint dev/ino is now passed to the existing transport unchanged; old socket replacement is refused.",
+    "Authenticated inspect now precedes the guard and cancel, so the old foreign source case refuses with receiver cancel zero and guard zero.",
+    "The refusal literal is unified as epoch_not_current; local positive current2/old1 behavior passes.",
+    "registeredEndpointFor executes the existing A loadRecoveryRunner path and returns exact immutable endpoint, producer and registration digest in the private Store test.",
+    "The caller's beforeWrite refusal still prevents cancellation. A state-aware caller can send the original pending intent without creating another ledger.",
+    "Previously admitted B-submitted producer normal Q&A/native_applied/registered physical-stop scope remains. No need to repeat or redevelop the normal producer."
+  ],
+  "findings": [
+    {
+      "priority": 2,
+      "id": "MODULE_STRICT_CONSUMER_STILL_FAILS_OPTIONAL_ENDPOINT_IDENTITY",
+      "file": "apps/runner/src/business-reconnect.ts",
+      "line": 92,
+      "relatedLine": 121,
+      "observation": "resolveEndpoint is explicitly typed with socketIdentity optional and its result is passed to connectRunnerRecovery's required RunnerEndpoint. Direct strict/exactOptional compilation exits two with TS2345. Each runtime branch currently supplies an identity, so this is an interface typing defect rather than evidence the old registered-inode runtime fix failed.",
+      "minimalRepair": "Use the existing required RunnerEndpoint return type and preserve its exact registered value; do not assert away or drop the identity."
+    },
+    {
+      "priority": 2,
+      "id": "CANCEL_RETURNS_PRE_INSPECTION_AND_DROPS_POST_CANCEL_PROOF",
+      "file": "apps/runner/src/business-reconnect.ts",
+      "line": 145,
+      "relatedLines": [147, 148],
+      "observation": "cancel() stores the proof from the initial identity inspect, ignores the VerifiedRunnerInspection returned by client.cancel(), then returns the original proof. The positive mock sends cancel once and returns sent:true beside serving/open/active, while a fresh inspect is terminated/closed/quiescent. This is explicitly described as a pre-inspection in its comments, so it is not falsely presented as a physical barrier, but it does not deliver the packet's requested actual cancel response proof.",
+      "minimalRepair": "Keep the pre-inspection for identity checking, return the actual authenticated post-cancel response proof as the response result, optionally retaining distinctly named preflightProof. Main must still enforce fresh proof/current binding/full resource manifest and own final barrier admission."
+    },
+    {
+      "priority": 2,
+      "id": "DURABLE_INTENT_AND_OBSERVED_RESULT_CONTRACT_STILL_UNSPECIFIED",
+      "file": "apps/runner/src/business-reconnect.ts",
+      "line": 55,
+      "relatedLine": 139,
+      "observation": "The module still accepts a boolean alreadyRecorded predicate and does not persist or classify intent/received/result/unknown. The actual main physical consumer records runner-cancel-intent before contacting the peer. A raw Boolean(store.commands.get(id)) consumer therefore refuses the original unsent intent as already_recorded and never calls beforeWrite; a purpose-aware pending-intent predicate can send it. This is a consumer integration requirement demonstrated by the private A Store test, not a standalone claim that the predicate API bypasses permissions.",
+      "remainingWork": "Publish exact typed intent/result/unknown/replay semantics and an A-state consumer recipe. Do not infer native receipt from command existence, silently refund unknown or allocate replacement identities."
+    }
+  ],
+  "scopeLimitsAndStaleClaims": {
+    "noBusinessAttach": "Only the inspect/cancel wrapper and status changed. No new stream/session/fact-sink/Broker attach implementation, business RPC, coordinator-replacement consumer, RFC or fault matrix is submitted.",
+    "registeredSocketExists": "The status still claims the product native lane exposes no registered Runner endpoint. This was disproven on e9073ed using the real A registration and actual live product; current NativeProductAttempt/registry transport is unchanged. Main's existing endpoint path is not an external dependency blocking B's remaining implementation.",
+    "normalAssertionsUnchanged": "The submitted b19-normal-reconnect.mjs global socket scan and original-target/sameAttempt/barrier assertion gaps were not edited in this checkpoint. They were not executed during this audit.",
+    "principalGuard": "The local socket credential/authenticated producer proves the peer, not an application principal grant. The beforeWrite callback remains the main-owned fresh principal/contract/current assignment/attempt/epoch/operation authority; the source comment about a wrong principal being refused by the server is not an implemented application-principal check.",
+    "endpointFallback": "An explicitly supplied complete registered endpoint passes the reviewed pinning boundary. endpoint remains optional and the derive-from-root fallback still lstat-pins the current path. Main's consumer must require the original A registration and must never use that fallback to replace missing/invalid registration authority.",
+    "proofIsNotResume": "An authenticated inspect/cancel response does not restore business authorization or prove a live business stream is attached. Cancellation is not resumed work."
+  },
+  "publicTypesAndMainConsumption": {
+    "module": "apps/runner/src/business-reconnect.ts",
+    "exports": ["BusinessBinding", "BusinessReconnectOptions", "ReconnectRefusal", "CancelOutcome", "BusinessReconnect", "reconnectBusinessRunner", "registeredEndpointFor", "bindingMatchesContract"],
+    "minimalAdmissibleSlices": [
+      "The canonical epoch_not_current refusal and the pre-cancel authenticated producer verification ordering are verified source fixes.",
+      "Complete explicit registered endpoint passthrough closes the reviewed inode failure; preserve this while correcting resolveEndpoint's return type.",
+      "The data-only registeredEndpointFor helper has been exercised against the real A immutable registration and returns exact endpoint/producer/digest. This does not grant authorization and is not yet a type-clean whole-module consumer admission."
+    ],
+    "wholeModuleIntegrationGate": "Fix direct strict typing, retain the actual post-cancel proof and publish exact pending-intent/result semantics before substituting this source into a production main control path.",
+    "mainCanUseAlreadyAdmittedPath": "Continue loadRecoveryRunner(store, originalAttemptId) -> connectRunnerRecovery(registration.body.endpoint, registration.body.producer), with the existing reconcileRegisteredRunner stable intent and confirmOwnedQuiescence fresh complete proof/current binding/manifest commit. No new normal main API or root contract is required for that already-admitted physical path.",
+    "futureNarrowWrapperConsumer": "Supply exact registration.body.endpoint and producer-derived immutable binding, plus fresh expected/current operation checks and a purpose-aware A command-state reader. beforeWrite must re-read main-owned principal and current contract/assignment/attempt/epoch immediately before the cancel. Consume the actual response proof or explicitly re-inspect; sent:true is not a barrier.",
+    "businessConsumerStillAbsent": "The packet's actual new business attachment port must transport the original session/commands/fact sink and Broker write-authority callbacks to a new coordinator. Main owns the trusted rebuild/authorization/product attachment; B owns the real Runner service/link port and its bounded tests. No second ledger, lifecycle or private wire should be introduced."
+  },
+  "wave20PacketAssessment": {
+    "B1": "PARTIAL: old literal mismatch closed, local current2/old1 passes; actual module typing still fails on optional socketIdentity.",
+    "B2": "DELIVERED_IN_REVIEWED_REGISTERED_SCOPE: foreign source refuses before cancel and explicit old inode is preserved. Full current application-principal authorization remains caller-owned.",
+    "B3": "PARTIAL: registeredEndpointFor helper delivered; original harness/global discovery/target/attempt/full-proof assertion corrections are not submitted.",
+    "B4": "PARTIAL: pre-inspection proof exposed, but actual cancel response proof discarded and durable intent/result/unknown contract remains caller boolean policy.",
+    "B5": "NOT_REACHED: no actual business stream/session/fact-sink/Broker attachment port/RFC.",
+    "B6": "NOT_REACHED: no fresh coordinator original begin/answer receive/ACK/receipt fault windows.",
+    "B7": "NOT_REACHED: no stop recovery/fault/resource matrix or actual valid-positive runtime epoch/session/version controls.",
+    "B8": "NOT_REACHED: no interrupted original work to registered check/current candidate/human accept.",
+    "B9": "NOT_REACHED: no complete recovered two/four-slot/backpressure/resource-return matrix.",
+    "B10": "PARTIAL: one of three source checkpoints, status is explicit about missing business attach but repeats a stale endpoint claim and overstates typechecking."
+  },
+  "nextContinuousPackage": {
+    "title": "Finish exact registered control contract, then implement real same-Runner business attachment",
+    "earlyCheckpoint": "Correct the existing required endpoint type, preserve/return actual post-cancel proof and distinguish original pending intent, observed result and unknown. Tighten the existing A-registry/normal target/attempt/barrier consumer recipe without changing or redoing the already-admitted producer. Publish a directly compilable runnable source and scoped tests; stop treating endpoint availability as blocked.",
+    "middleCheckpoint": "Deliver the missing real Runner service/link business stream/session/fact-sink/Broker attach port and concrete RFC/types for main's current principal/contract/assignment/attempt/epoch/before-write authority. Reattach a genuinely fresh coordinator to the SAME live Runner/child and original A command identities. Exercise bounded begin and answer send/receive/ACK/receipt windows and unknown retention with no duplicate sends or replacement IDs.",
+    "finalCheckpoint": "Add original-identity stop recovery/full resource/unknown descendant controls, schema-valid current/old runtime epoch and old contract/question/session/late ACK negatives, then recover one Work through registered verification/current candidate/human accept and bounded two/four-slot priority/output/backpressure plus FD/child/queue return. Continue independent stages after each of the early/middle/final checkpoints; model/native turns remain zero."
+  },
+  "preservation": {
+    "candidateSourceAssertionsReportsEdited": false,
+    "globalEndpointScanExecuted": false,
+    "normalProductRerun": false,
+    "onlyPrivateMockServicesAndPrivateAStoreUsed": true,
+    "untrackedB16RealBeginPreservedAndExcluded": true,
+    "oldWave11AndWave12ReportDiffsPreserved": true,
+    "privateProfilesOrBudgetsTouched": false,
+    "twelveUserServicesTouched": false,
+    "onlyMainArtifactWritten": "reports/releases/wave21-admission/runtime.json"
+  }
+}
