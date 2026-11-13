@@ -128,9 +128,36 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
   }
   if (consolePort === apiPort) return blocked('invalid_port', '网页与接口端口不能相同')
   const mode = values.fixture === true ? 'fixture' : 'personal'
+  const discussionOnly = values['discussion-only'] === true
   const access = values['require-login'] === true ? 'token' : 'local-development'
   const startupMode = expectedStartupMode(canonicalState)
   const recovery = recoverySummary(canonicalState)
+  // Main's explicit restored-personal review is opt-in only. The launcher never scans for a review
+  // file, never derives one from the restore report and never enables it for fixture/normal startup.
+  const reviewRestoredScope =
+    typeof values['review-restored-scope'] === 'string' ? resolve(values['review-restored-scope']) : null
+  if (reviewRestoredScope !== null) {
+    if (mode !== 'personal' || startupMode !== 'recovery_readonly' || !discussionOnly)
+      return blocked(
+        'review_requires_restored_personal',
+        '显式历史审阅只适用于已恢复 personal 的 discussion-only 只读启动',
+        { mode, startupMode, discussionOnly },
+        '先恢复状态，再以 `pa start --discussion-only --review-restored-scope <file>` 启动；不会用 fixture 代替 personal。',
+      )
+    let stat = null
+    try {
+      stat = lstatSync(reviewRestoredScope)
+    } catch {
+      return blocked('review_scope_missing', '显式 review 配置文件不存在', { path: reviewRestoredScope }, '用 main 的 review-restored 命令重新生成新的私有文件。')
+    }
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.uid !== process.getuid?.() || (stat.mode & 0o077) !== 0)
+      return blocked(
+        'review_scope_invalid',
+        'review 配置必须是当前用户拥有的 private regular file（0600，非符号链接）',
+        { regular: stat.isFile(), symlink: stat.isSymbolicLink(), uid: stat.uid, mode: stat.mode & 0o777 },
+        '重新生成 private 文件；不接受旧文件、FIFO、符号链接或宽权限文件。',
+      )
+  }
 
   // Exact schema rejection before any process is spawned: a state written by a newer build is not
   // opened by an older binary at all (the daemon would fail with MigrationIntegrityError, but that is
