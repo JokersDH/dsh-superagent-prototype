@@ -1,8 +1,9 @@
 {
   "protocol": "wave23-ordinary-source-closure/1",
-  "sourceCommit": "26a7321",
-  "generatedAt": "2026-11-13T16:07:02.541Z",
-  "purpose": "Coherent ordinary personal distribution source/deploy closure with actual cleanup/fault and same-Store validation tools; excludes historical reports and unrelated prototypes.",
+  "frozenRuntimeSource": "0ede11d",
+  "sourceCommit": "e4547ad",
+  "generatedAt": "2026-11-13T16:43:50.630Z",
+  "purpose": "Coherent ordinary personal distribution source/deploy closure with actual cleanup/fault, CLI help and same-Store validation tools; frozen runtime target remains 0ede11d; excludes historical reports.",
   "groups": {
     "launcher": [
       {
@@ -348,6 +349,11 @@
         "path": "tools/distribution/stage.mjs",
         "bytes": 18303,
         "sha256": "bfc16798cc9436d451bf65c5e11bc6d3c9f5065928abe7c19267399c91bbdf30"
+      },
+      {
+        "path": "tools/distribution/verify-cli-help.mjs",
+        "bytes": 2075,
+        "sha256": "73a8d5243d1a072e8427de68dae03aeaec1bae78d9021770207c0e7e8cea3840"
       },
       {
         "path": "tools/distribution/verify-live-cleanup-controls.mjs",
