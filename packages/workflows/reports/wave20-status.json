@@ -1,0 +1,182 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "773b34d",
+  "mergeCommit": "4166ae4",
+  "checkpoints": [
+    "8f02bdf"
+  ],
+  "testedSourceCommit": "8f02bdf",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "evidenceVersionDefault": 1,
+  "evidenceVersionExplicit": 2,
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "strict",
+      "evidence": [
+        "wave20-workflow-tests.txt",
+        "strict typecheck"
+      ],
+      "note": "wave19 unified fixture uses full AgentProfile and narrows optional read.recovery; no any; strict and runtime tests pass"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "main controlled producer",
+      "evidence": [
+        "wave20-product-execution.txt",
+        "wave20-recovery-combination.txt"
+      ],
+      "note": "real controlled Application/Effects/Broker -> question/answer/native_applied; explicitly not external B reconnect or vendor native"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "actual personal CLI/process",
+      "evidence": [
+        "wave20-restored-personal.txt 11/11"
+      ],
+      "note": "unbound candidate 403; review-restored writes private 600 config; personal+recovery_readonly candidate/history/sources 200; business 422; provider count unchanged"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "scope/file invalidation",
+      "evidence": [
+        "wave20-restored-personal.txt"
+      ],
+      "note": "source/root/principal/host/key mismatch, expiry, unknown project, unsafe path, symlink/FIFO and execution claims refused; config is startup-only consent"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "real business personal read",
+      "evidence": [
+        "wave20-personal-business.case.ts"
+      ],
+      "note": "same source Store has real Work/Ticket/Q&A/native_applied + SDK reply/candidate/context; after restore and explicit CLI, personal HTTP reads candidate/history/sources/Work and native delivery; answer POST 422, queue held, provider unchanged"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "dual format and source facts",
+      "evidence": [
+        "wave20-source-confirmation.txt 14/14",
+        "wave19-unified-data strict"
+      ],
+      "note": "default v1/explicit v2, genuine golden and valid schema guard remain; real HTTP source prepare/confirm/audit with original receipt; no-op committer only module fixture"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "D/E recipe",
+      "evidence": [
+        "wave20-data-recipe.md"
+      ],
+      "note": "parameterized producer/business/snapshot/two-root personal CLI recipe, format/schema/artifact/negative matrix; no hand SQL or credential copy"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "negative/partial inputs",
+      "evidence": [
+        "snapshot-d tests",
+        "restored-personal tests"
+      ],
+      "note": "missing artifact/table/index, mixed versions, subset/duplicate/future, scope reduction, foreign principal/root, expired/unsafe file refused; read consent does not refresh source/private permission"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "bounded cost",
+      "evidence": [
+        "wave20-performance.json",
+        "wave20-personal-business"
+      ],
+      "note": "v1 create 241.9ms/verify63.1ms; v2 create111ms/verify57.9ms; personal business test ~1.1s; only corresponding format read, bodies lazy"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "package regression",
+      "evidence": [
+        "wave20-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, main personal/source/candidate/target consumers, typecheck/build and static check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "113/113",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "restoredPersonal": "11/11",
+    "sourceConfirmation": "14/14",
+    "recoveryCombination": "106/106",
+    "mainProductConsumers": "89/89",
+    "mainTargetConsumers": "50/50",
+    "candidateConsumers": "31/31",
+    "productExecution": "20/20",
+    "genuineV1Probe": "2/2",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "limits": {
+    "snapshotV1Families": 13,
+    "snapshotV2Families": 21,
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288
+  },
+  "failureWindows": [
+    "missing artifact/table/index",
+    "mixed v1/v2",
+    "subset/duplicate/future version",
+    "scope reduction",
+    "foreign principal/root",
+    "expired/unsafe review file",
+    "source confirmation SIGKILL",
+    "snapshot/result/message SIGKILL"
+  ],
+  "blockers": [
+    {
+      "owner": "main",
+      "id": "private-permission-target",
+      "detail": "personal readonly review exists, but private startup permission, physical writer proof and target activation remain unimplemented"
+    },
+    {
+      "owner": "main/D",
+      "id": "installation",
+      "detail": "Restored data/personal read consent never grants installation or execution authority."
+    }
+  ],
+  "notTested": [
+    "private startup permission/target activation",
+    "physical writer proof",
+    "D installation/upgrade",
+    "E independent release acceptance",
+    "real vendor model/native"
+  ],
+  "mainNextSteps": [
+    "keep explicit review-restored consent and source confirmation separate from execution permission",
+    "use wave20-data-recipe for D/E",
+    "connect private host/resources/target only after independent proof"
+  ],
+  "updatedAt": "2026-11-13T16:20:00.000Z"
+}
