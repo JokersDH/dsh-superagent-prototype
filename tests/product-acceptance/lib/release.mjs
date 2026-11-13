@@ -443,14 +443,17 @@ export function reviewReuseIssues(value) {
   if (value.mode !== 'personal') issues.push('mode')
   issues.push(...consumerEntryIssues(value))
   const same = outcomes.sameFile ?? {}
-  if (!(same.status === 'RUNNING' && same.reused === true && same.instance?.pid === value.firstPid)) issues.push('same_selection')
+  // A correct same-selection reuse may report REUSED (or RUNNING on a fresh start); it must keep the
+  // original PID. Other requests must never be silently reused with that PID.
+  if (!((same.status === 'REUSED' || same.status === 'RUNNING') && (same.instance?.pid ?? null) === value.firstPid)) issues.push('same_selection')
   for (const name of ['differentFile', 'missingFile', 'portChange', 'unboundThenSelection']) {
     const item = outcomes[name] ?? {}
-    if (item.status === 'RUNNING' && item.reused === true) issues.push(name)
+    if (item.status === 'REUSED' || (item.status === 'RUNNING' && item.reused === true)) issues.push(name)
   }
+  if (value.processes && (value.processes.live === null || value.processes.live !== value.processes.reused)) issues.push('operation')
   if (!Number.isSafeInteger(value.pidAfterRefusals) || value.pidAfterRefusals !== value.firstPid ||
     !Number.isSafeInteger(value.pidAfterUnbound) || value.pidAfterUnbound !== value.unboundPid) issues.push('pid')
-  if (value.digestAvailable === true && !HEX.test(String(value.healthDigest ?? ''))) issues.push('digest')
+  if (value.digestAvailable === true && (!HEX.test(String(value.healthDigest ?? '')) || value.sameDigest !== value.healthDigest)) issues.push('digest')
   if (value.digestAvailable === false && !isSubstantive(value.scope)) issues.push('digest_scope')
   return issues
 }

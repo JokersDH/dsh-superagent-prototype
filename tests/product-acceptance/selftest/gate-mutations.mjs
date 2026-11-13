@@ -153,13 +153,13 @@ const evidenceFor = (key) => {
     case 'reviewReuse':
       return {
         subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
-        mode: 'personal', healthDigest: DIGEST, digestAvailable: true, firstPid: 100, unboundPid: 200, pidAfterRefusals: 100, pidAfterUnbound: 200,
-        scope: 'selection digest present',
+        mode: 'personal', healthDigest: DIGEST, digestAvailable: true, sameDigest: DIGEST, firstPid: 100, unboundPid: 200, pidAfterRefusals: 100, pidAfterUnbound: 200,
+        processes: { live: 'start-1', reused: 'start-1' }, scope: 'selection digest present',
         consumerEntry: { origin: 'package', package: { source: COMMIT, buildId: 'b', tarSha256: DIGEST, tarBytes: 1 },
           files: [{ path: 'apps/launcher/lib/start.mjs', sha256: 'a'.repeat(64), bytes: 1 },
             { path: 'apps/coordinator/product/restored-review.ts', sha256: 'b'.repeat(64), bytes: 1 },
             { path: 'apps/coordinator/product/demo.ts', sha256: 'c'.repeat(64), bytes: 1 }] },
-        outcomes: { sameFile: { status: 'RUNNING', reused: true, instance: { pid: 100 } },
+        outcomes: { sameFile: { status: 'REUSED', instance: { pid: 100 } },
           differentFile: { status: 'BLOCKED', reused: false }, missingFile: { status: 'BLOCKED', reused: false },
           portChange: { status: 'BLOCKED', reused: false }, unboundThenSelection: { status: 'BLOCKED', reused: false } },
       }

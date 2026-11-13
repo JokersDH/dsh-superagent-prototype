@@ -139,35 +139,14 @@ function consumerEntry(install, target) {
   }
 }
 
-const PREPARE_SCRIPT = `import { openSync, closeSync, fsyncSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
-import { ProductStore, verifyDatabase, PRODUCT_SCHEMA_VERSION } from './packages/storage/dist/index.js'
-import { localCredentials } from './apps/coordinator/http/local-state.ts'
-import { prepareRestoredReview } from './apps/coordinator/product/restored-review.ts'
-const state = process.env.W21_STATE, output = process.env.W21_OUTPUT, project = process.env.W21_PROJECT
-const allow = process.env.W21_ALLOW.split(',')
-const verified = verifyDatabase(join(state, 'state.sqlite'))
-if (verified.productSchema !== PRODUCT_SCHEMA_VERSION || verified.integrity !== 'ok' || verified.foreignKeyViolations)
-  throw new Error('review preparation requires a verified current restored database')
-const secret = Buffer.from(localCredentials(state)('action.key'), 'hex')
-const store = new ProductStore({ path: join(state, 'state.sqlite') })
-try {
-  const file = prepareRestoredReview(store, state, { userId: 'local-demo-user', authorityRef: 'local-demo-authority' },
-    [{ projectId: project, allowedPaths: allow, excludedPaths: ['.git'] }], secret)
-  const fd = openSync(output, 'wx', 0o600)
-  try { writeFileSync(fd, JSON.stringify(file, null, 2) + '\\n'); fsyncSync(fd) } finally { closeSync(fd) }
-  process.stdout.write(JSON.stringify({ status: 'prepared', projects: file.payload.projects.map(item => item.projectId) }) + '\\n')
-} finally { store.close() }
-`
-
-function packagePrepare(install, { state, project, allow, output, timeoutMs = 60_000 }) {
-  const script = join(install, 'app', 'w21-prepare-review.mjs')
-  if (!existsSync(script)) writeFileSync(script, PREPARE_SCRIPT)
-  const result = spawnSync(process.execPath, ['--experimental-strip-types', script], {
-    cwd: join(install, 'app'), encoding: 'utf8', timeout: timeoutMs,
-    env: { ...process.env, W21_STATE: state, W21_OUTPUT: output, W21_PROJECT: project, W21_ALLOW: allow.join(',') },
+function packagePrepare(install, { state, project, allow, output, exclude = ['.git'], timeoutMs = 60_000 }) {
+  const args = ['review-restored', '--json', '--state', state, '--project', project,
+    ...allow.flatMap(path => ['--allow-path', path]), ...exclude.flatMap(path => ['--exclude-path', path]), '--out', output]
+  const result = spawnSync(join(install, 'bin/pa'), args, {
+    cwd: join(install, '..'), encoding: 'utf8', timeout: timeoutMs,
+    env: { ...process.env, PA_NODE: process.execPath },
   })
-  return { status: result.status, json: parseJson(result.stdout), stderr: String(result.stderr).slice(-500) }
+  return { status: result.status, json: parseJson(result.stdout), stderr: String(result.stderr).slice(-500), stdout: String(result.stdout).slice(-500) }
 }
 
 async function provision(target) {
@@ -306,6 +285,8 @@ export async function runPersonalReview() {
         assert('REVIEW_QUEUE_HELD', details.queueAfter === details.queueBefore, 'queue changed')
         assert('REVIEW_NO_PROVIDER', mock.requests.length === observed.modelRequests, JSON.stringify({ before: observed.modelRequests, after: mock.requests.length }))
         assert('REVIEW_HEALTH_READONLY', details.health.status === 'ok' && details.health.startupMode === 'recovery_readonly', JSON.stringify(details.health))
+        const scopeDiagnostics = /scopeReview/u.test(readFileSync(join(install, 'app/apps/coordinator/http/app.ts'), 'utf8'))
+          ? 'present' : 'NOT_REACHED_712_absent'
         const entry = consumerEntry(install, target)
         assert('REVIEW_CONSUMER_PACKAGE', entry.origin === 'package' && entry.package.source === target.sourceCommit &&
           entry.package.buildId === target.buildId && entry.files.every(file => /^[a-f0-9]{64}$/u.test(file.sha256)),
@@ -315,6 +296,7 @@ export async function runPersonalReview() {
           before: unboundStatuses, after: { candidates: details.candidates, history: details.history, sources: details.sources, originalBody: details.originalBody },
           reviewFile: { mode: '600', access: 'historical_data_read_only', startupAvailable: false, projects: 1 },
           business: details.business, queueHeld: true, providerRequests: mock.requests.length, health: details.health,
+          healthDigest: details.health.digest, scopeDiagnostics,
           registry: observed.registry, restore: { verify: observed.verify, restore: observed.restore },
         }
       } finally { rmSync(reviewFile, { force: true }) }
@@ -402,6 +384,7 @@ export async function runPersonalReview() {
         const health = await (await fetch(`http://127.0.0.1:${apiPort}/v1/health`, { signal: AbortSignal.timeout(5_000) })).json().catch(() => ({}))
         const digest = health.restoredReviewDigest ?? null
         outcomes.sameFile = await request(first)
+        const sameDigest = (await (await fetch(`http://127.0.0.1:${apiPort}/v1/health`, { signal: AbortSignal.timeout(5_000) })).json().catch(() => ({}))).restoredReviewDigest ?? null
         outcomes.differentFile = await request(narrow)
         outcomes.missingFile = await request(null)
         outcomes.missingFilePath = await request(gone)
@@ -417,21 +400,26 @@ export async function runPersonalReview() {
         await stopOwned(install, { state: restored, config, mockFile: mock.file })
 
         evidence.reviewReuse = { subject: frozenArtifactSubject(target), mode: 'personal', consumerEntry: consumerEntry(install, target),
-          healthDigest: digest, digestAvailable: typeof digest === 'string',
+          healthDigest: digest, digestAvailable: typeof digest === 'string', sameDigest,
+          processes: { live: live.instance?.processStart ?? null, reused: outcomes.sameFile.instance?.processStart ?? null },
           firstPid, unboundPid, pidAfterRefusals, pidAfterUnbound, outcomes,
           scope: digest === null ? 'the frozen package predates the f856 selection digest; reuse identity is NOT_REACHED for this package' : 'selection digest present' }
-        const reusedSame = value => (value.status === 'REUSED' || value.status === 'RUNNING') &&
-          (value.reused === undefined || value.reused === true) && (value.instance?.pid ?? null) === firstPid
-        const notSilent = value => !((value.status === 'REUSED' || value.status === 'RUNNING') && (value.instance?.pid ?? null) === firstPid)
+        const reusedSame = value => value.status === 'REUSED' && (value.instance?.pid ?? null) === firstPid
+        const notSilent = value => value.status !== 'REUSED' && !(value.status === 'RUNNING' && value.reused === true)
         assert('REUSE_SAME_FILE', reusedSame(outcomes.sameFile), JSON.stringify({ value: outcomes.sameFile, pid: firstPid }))
+        assert('REUSE_DIGEST_PRESENT', typeof digest === 'string' && /^[a-f0-9]{64}$/u.test(digest), JSON.stringify({ digest }))
+        assert('REUSE_DIGEST_UNCHANGED', sameDigest === digest, JSON.stringify({ digest, sameDigest }))
+        assert('REUSE_SELECTION_OPERATION', outcomes.sameFile.instance?.mode === 'personal' &&
+          outcomes.sameFile.instance?.startupMode === 'recovery_readonly' &&
+          outcomes.sameFile.instance?.processStart === live.instance?.processStart,
+          JSON.stringify({ live: live.instance?.processStart ?? null, same: outcomes.sameFile.instance?.processStart ?? null }))
         assert('REUSE_DIFFERENT_SELECTION_REFUSED', notSilent(outcomes.differentFile), JSON.stringify(outcomes.differentFile).slice(0, 300))
         assert('REUSE_MISSING_SELECTION_REFUSED', notSilent(outcomes.missingFile), JSON.stringify(outcomes.missingFile).slice(0, 300))
         assert('REUSE_PORT_NOT_SILENT', notSilent(outcomes.portChange), JSON.stringify(outcomes.portChange).slice(0, 300))
         assert('REUSE_UNBOUND_SELECTION_REFUSED', notSilent(outcomes.unboundThenSelection), JSON.stringify(outcomes.unboundThenSelection).slice(0, 300))
         assert('REUSE_PID_STABLE_ON_REFUSAL', pidAfterRefusals === firstPid && pidAfterUnbound === unboundPid,
           JSON.stringify({ firstPid, pidAfterRefusals, unboundPid, pidAfterUnbound }))
-        assert('REUSE_HEALTH_DIGEST_SCOPE', (typeof digest === 'string' && /^[a-f0-9]{64}$/u.test(digest)) ||
-          (digest === null && typeof health.startupMode === 'string'), JSON.stringify({ digest, health: health.startupMode ?? null }))
+
       } finally {
         for (const file of [first, narrow]) try { rmSync(file, { force: true }) } catch { /* best effort */ }
         try { await stopOwned(install, { state: restored, config, mockFile: mock.file }) } catch { /* best effort */ }
