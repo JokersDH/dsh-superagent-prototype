@@ -123,6 +123,14 @@ function dataset() {
     contract, state: 'active', runnerIdentityRef: 'runner-snapshot', source: 'snapshot-test',
     resources: [{ ref: 'snapshot-process', ownership: 'spawned_process' }] })
   store.bindings.setCurrent('ticket-1', 'snapshot-attempt')
+  store.product.questions.insert({ id: 'snapshot-question', version: 1, kind: 'clarification', contract, scope,
+    prompt: 'Approve the snapshot fixture?', nativePayloadRef: bundle.id, presentation: { kind: 'free_text' },
+    targets: [{ ticketId: 'ticket-1', assignmentId: 'assignment-1', contract, attemptId: 'snapshot-attempt', fenceEpoch: 3,
+      id: 'snapshot-target', connectionEpoch: 1, nativeRequestId: { kind: 'string', value: 'native-req-1' },
+      nativeMethod: 'question/ask', provenanceRef: 'provenance-1' }], openedAt: at, validity: 'open' })
+  store.answers.record('snapshot-answer', { questionId: 'snapshot-question', expectedVersion: 1,
+    digest: 'd'.repeat(64), answer: { kind: 'free_text', text: 'approved' } })
+  store.answers.upsertDelivery('snapshot-answer', 'snapshot-target', 'local_recorded')
   store.db.prepare(`INSERT INTO runtime_observations
     (fact_id, ticket_id, assignment_id, attempt_id, fence_epoch, contract, kind, disposition, payload_ref, payload_sha256, detail, observed_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run('snapshot-observation', 'ticket-1', 'assignment-1', 'snapshot-attempt', 3,
@@ -160,6 +168,9 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
     assert.equal(families.get('runtime_bindings')!.count, 1)
     assert.equal(families.get('runtime_current')!.count, 1)
     assert.equal(families.get('resource_observations')!.count, 1)
+    assert.equal(families.get('user_questions')!.count, 1)
+    assert.equal(families.get('answers')!.count, 1)
+    assert.equal(families.get('answer_deliveries')!.count, 1)
     assert.equal(result.manifest.evidence.complete, true)
     for (const row of result.manifest.artifacts)
       assert.equal(readFileSync(join(snapshot, row.snapshotPath)).length, row.bytes)
@@ -192,6 +203,9 @@ test('schema-13 snapshot includes decisions/settings/contracts/verification/outc
       assert.equal(restoredStore.bindings.current<{ fenceEpoch: number }>('ticket-1')?.fenceEpoch, 3)
       assert.equal(restoredStore.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 10)
         .some(row => row.key === 'snapshot-queue'), true)
+      assert.equal(restoredStore.product.questions.get('snapshot-question')?.validity, 'open')
+      assert.equal(restoredStore.answers.get('snapshot-answer')?.digest, 'd'.repeat(64))
+      assert.equal(restoredStore.answers.deliveries('snapshot-answer')[0]?.status, 'local_recorded')
     } finally { restoredStore.close() }
 
     const db = new Database(join(restored, 'product.sqlite'), { readonly: true, fileMustExist: true })
@@ -411,5 +425,43 @@ test('missing file, changed bytes and a newer schema make the snapshot unusable'
   } finally {
     data.store.close()
     rmSync(data.root, { recursive: true, force: true })
+  }
+})
+
+test('a v2 evidence manifest requires the exact complete family set while a v1 manifest keeps its recorded scope', async () => {
+  const data = dataset(), snapshot = join(data.root, 'snapshot-versioned')
+  try {
+    const created = await new WorkflowSnapshots(data.store).create({ destination: snapshot })
+    assert.equal(created.status, 'ok', created.message)
+    assert.equal(created.manifest.protocol, 'workflow-snapshot/2')
+    assert.equal(created.manifest.evidence.protocol, 'workflow-evidence/2')
+    assert.equal(created.manifest.evidence.familySetVersion, 2)
+    const copy = (name: string) => { const target = join(data.root, name); cpSync(snapshot, target, { recursive: true }); return target }
+    const rewrite = (target: string, mutate: (manifest: any) => void) => {
+      const manifestPath = join(target, 'snapshot.json'), manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+      mutate(manifest); writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
+    }
+    for (const [name, mutate] of [
+      ['drop-family', (manifest: any) => { manifest.evidence.families = manifest.evidence.families.filter((family: any) => family.name !== 'effect_queue') }],
+      ['one-family', (manifest: any) => { manifest.evidence.families = manifest.evidence.families.slice(0, 1) }],
+      ['duplicate-family', (manifest: any) => { manifest.evidence.families.push({ ...manifest.evidence.families[0] }) }],
+      ['unknown-family', (manifest: any) => { manifest.evidence.families[0] = { ...manifest.evidence.families[0], name: 'unknown_family' } }],
+      ['future-version', (manifest: any) => { manifest.evidence.familySetVersion = 3 }],
+    ] as const) {
+      const target = copy(name); rewrite(target, mutate)
+      assert.equal(new WorkflowSnapshots(data.store).verify(target).status, 'blocked', name)
+    }
+
+    const legacy = copy('legacy-v1')
+    rewrite(legacy, manifest => {
+      manifest.protocol = 'workflow-snapshot/1'
+      manifest.evidence.protocol = 'workflow-evidence/1'
+      delete manifest.evidence.familySetVersion
+      manifest.evidence.families = manifest.evidence.families.slice(0, 2)
+    })
+    assert.equal(new WorkflowSnapshots(data.store).verify(legacy).status, 'ok',
+      'a v1 manifest is verified against the families it actually recorded')
+  } finally {
+    data.store.close(); rmSync(data.root, { recursive: true, force: true })
   }
 })

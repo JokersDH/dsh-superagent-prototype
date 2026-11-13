@@ -10,7 +10,7 @@ import {
 } from 'node:fs'
 import { dirname, join } from 'node:path'
 import {
-  backupDatabase, PRODUCT_SCHEMA_VERSION, readArtifactRegistry, readRoutingArtifactRefs, readWorkflowEvidence, verifyDatabase,
+  backupDatabase, EVIDENCE_FAMILY_SET_VERSION, PRODUCT_SCHEMA_VERSION, readArtifactRegistry, readRoutingArtifactRefs, readWorkflowEvidence, verifyDatabase,
   type ArtifactRegistryRow, type ProductStore, type WorkflowEvidenceSummary,
 } from '@personal-agent/storage'
 
@@ -23,7 +23,7 @@ export interface SnapshotArtifact extends ArtifactRegistryRow {
 }
 
 export interface SnapshotManifest {
-  protocol: 'workflow-snapshot/1'
+  protocol: 'workflow-snapshot/1' | 'workflow-snapshot/2'
   createdAt: string
   database: { path: 'product.sqlite'; bytes: number; sha256: string; productSchema: number; integrity: string; foreignKeyViolations: number }
   artifacts: readonly SnapshotArtifact[]
@@ -133,7 +133,7 @@ export class WorkflowSnapshots {
     const complete = missing.length === 0 && corrupt.length === 0 && missingReferences.length === 0 &&
       !incompatibleSchema && database.integrity === 'ok' && database.foreignKeyViolations === 0
     const manifest: SnapshotManifest = {
-      protocol: 'workflow-snapshot/1',
+      protocol: 'workflow-snapshot/2',
       createdAt: input.createdAt ?? new Date().toISOString(),
       database,
       artifacts,
@@ -166,7 +166,7 @@ export class WorkflowSnapshots {
     let manifest: SnapshotManifest
     try {
       manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as SnapshotManifest
-      if (manifest.protocol !== 'workflow-snapshot/1' || !Array.isArray(manifest.artifacts))
+      if (!['workflow-snapshot/1', 'workflow-snapshot/2'].includes(manifest.protocol) || !Array.isArray(manifest.artifacts))
         throw new Error('unsupported manifest')
     } catch (error) {
       return {
@@ -196,16 +196,31 @@ export class WorkflowSnapshots {
     })
     const incompatibleSchema = verified.productSchema === null || verified.productSchema > PRODUCT_SCHEMA_VERSION ||
       manifest.database.productSchema > PRODUCT_SCHEMA_VERSION
-    // Compare every family recorded by this manifest. Newer builds may add families; an older
-    // snapshot remains verifiable for the exact families it recorded, while a new snapshot records
-    // and verifies the complete current family set.
+    // Family-set v2 is a complete, versioned list: creation and verification require the exact
+    // current family set and the overall digest. A v1 manifest has no familySetVersion and keeps its
+    // historical capability by checking only the families it actually recorded.
     const manifestFamilies = manifest.evidence?.families
-    const evidenceMatches = Array.isArray(manifestFamilies) && manifestFamilies.length > 0 &&
+    const familySetVersion = manifest.evidence?.familySetVersion
+    const futureFamilySet = typeof familySetVersion === 'number' && familySetVersion > EVIDENCE_FAMILY_SET_VERSION
+    const exactFamilies = Array.isArray(manifestFamilies) &&
+      manifestFamilies.length === evidence.families.length &&
+      new Set(manifestFamilies.map(family => family.name)).size === manifestFamilies.length &&
+      evidence.families.every(current => {
+        const recorded = manifestFamilies.find(family => family.name === current.name)
+        return !!recorded && recorded.count === current.count && recorded.digest === current.digest &&
+          recorded.truncated === current.truncated
+      })
+    const legacyFamilies = Array.isArray(manifestFamilies) && manifestFamilies.length > 0 &&
       manifestFamilies.every(family => {
         const current = evidence.families.find(value => value.name === family.name)
         return !!current && current.count === family.count && current.digest === family.digest &&
           current.truncated === family.truncated
       })
+    const evidenceMatches = futureFamilySet ? false
+      : manifest.protocol === 'workflow-snapshot/2'
+        ? familySetVersion === EVIDENCE_FAMILY_SET_VERSION && manifest.evidence?.protocol === 'workflow-evidence/2' &&
+          manifest.evidence.digest === evidence.digest && exactFamilies
+        : familySetVersion === undefined && legacyFamilies
     const ok = manifest.complete && !manifest.incompatibleSchema && !incompatibleSchema &&
       evidenceMatches &&
       databaseSha === manifest.database.sha256 &&

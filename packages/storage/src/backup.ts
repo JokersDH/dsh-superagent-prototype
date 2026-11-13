@@ -31,8 +31,11 @@ export interface WorkflowEvidenceFamily {
   truncated: boolean
 }
 
+export const EVIDENCE_FAMILY_SET_VERSION = 2 as const
 export interface WorkflowEvidenceSummary {
-  protocol: 'workflow-evidence/1'
+  protocol: 'workflow-evidence/1' | 'workflow-evidence/2'
+  /** Present from family-set version 2; v1 manifests have no version and are verified by their recorded families. */
+  familySetVersion?: number
   families: readonly WorkflowEvidenceFamily[]
   digest: string
   complete: boolean
@@ -86,6 +89,12 @@ const EVIDENCE_FAMILIES: readonly EvidenceFamilySpec[] = [
       'principal_user_id', 'principal_authority_ref', 'bundle_ref', 'bundle_digest', 'confirmed_at', 'expires_at',
       'work_id', 'value', 'digest'],
     order: 'confirmed_at, message_id' },
+  { name: 'user_questions', table: 'user_questions', identity: 'id',
+    body: ['id', 'version', 'work_id', 'revision', 'digest', 'validity', 'opened_at', 'value'], order: 'id' },
+  { name: 'answers', table: 'answers', identity: 'answer_id',
+    body: ['answer_id', 'question_id', 'expected_version', 'answer_digest', 'answer', 'recorded_at'], order: 'answer_id' },
+  { name: 'answer_deliveries', table: 'answer_deliveries', identity: "answer_id || ':' || target_binding_id",
+    body: ['answer_id', 'target_binding_id', 'status', 'evidence', 'updated_at'], order: 'answer_id, target_binding_id' },
   { name: 'effect_queue', table: 'effect', identity: "kind || ':' || key",
     body: ['kind', 'key', 'value', 'seq', 'generation', 'attempts', 'error', 'due', 'since', 'parked_reason', 'parked_at'],
     order: 'kind, key' },
@@ -147,7 +156,8 @@ export function readWorkflowEvidence(databasePath: string): WorkflowEvidenceSumm
     const digest = createHash('sha256')
       .update(families.map(family => `${family.name}:${family.count}:${family.digest}`).join('\n'))
       .digest('hex')
-    return { protocol: 'workflow-evidence/1', families, digest, complete: families.every(family => !family.truncated) }
+    return { protocol: 'workflow-evidence/2', familySetVersion: EVIDENCE_FAMILY_SET_VERSION, families, digest,
+      complete: families.every(family => !family.truncated) }
   } finally { db.close() }
 }
 

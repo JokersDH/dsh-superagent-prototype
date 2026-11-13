@@ -158,7 +158,7 @@ export {
   type AttemptObservationSummary, type WriterStatus,
 } from './observations.ts'
 export {
-  backupDatabase, verifyDatabase, readArtifactRegistry, readRoutingArtifactRefs, readWorkflowEvidence,
+  backupDatabase, verifyDatabase, readArtifactRegistry, readRoutingArtifactRefs, readWorkflowEvidence, EVIDENCE_FAMILY_SET_VERSION,
   type ArtifactRegistryRow, type WorkflowEvidenceFamily, type WorkflowEvidenceSummary, type BackupResult, type VerifyResult,
 } from './backup.ts'
 export { WriterLock, WriterLockHeld, type LockContent, type LockProbe, type LockRegistry, type LockVerdict } from './writer-lock.ts'
