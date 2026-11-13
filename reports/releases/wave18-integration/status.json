@@ -1,0 +1,53 @@
+{
+  "protocol": "wave18-main-snapshot-schema/1",
+  "date": "2026-11-13",
+  "source": "e438ab5b227d41dbea06530958ef4da51b81e7db",
+  "admittedASlice": "6dc4bc5 readonly schema helper/inventory plus create/verify checks; not v2/legacy verifier",
+  "scope": "Current v1 snapshot integrity and legacy digest preservation",
+  "implemented": [
+    "Required table/index inventory from existing migrations",
+    "Unknown/missing metadata/future/invalid schema refusal in actual snapshot create/verify",
+    "V1 evidence protocol guard with unchanged original whole digest and binding recipe"
+  ],
+  "notIntegrated": [
+    "A v2/expanded evidence and incompatible legacy verification",
+    "Full D launcher/portability package",
+    "E cross-subject installed-alpha gate"
+  ],
+  "checks": {
+    "newSnapshotTests": 7,
+    "cleanSchemaAndSourceCombinationTests": 29,
+    "storageTests": 87,
+    "workflowTests": 93,
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "testCommand": "node --test tests/integration/snapshot-schema-admission.case.mjs tests/integration/recovery-source-confirmation.case.mjs tests/integration/recovery-logical-source.case.mjs",
+    "sourceWorktreeDirtyAtCleanRun": false
+  },
+  "snapshotFormat": "workflow-snapshot/1",
+  "evidenceFormat": "workflow-evidence/1",
+  "oldBindingFamilyDigest": "51d53c57b7d4be9c586f5b6a255a9d8f6bbd8db64c71f3e032e70a2df6cce7dd",
+  "productSchema": 18,
+  "migrationsAdded": 0,
+  "mainPreparationDiagnostic": {
+    "tool": "tools/bootstrap/diagnose-wave18-b-preparation.mjs",
+    "fixture": "tools/bootstrap/fixtures/wave18-fake-codex.mjs",
+    "classification": "MAIN_DIAGNOSTIC_NOT_B_SUBMITTED_DELIVERY",
+    "creditedToB": false,
+    "policyPrepared": true,
+    "receiverBegin": 1,
+    "brokerQuestions": 1,
+    "persistedFacts": 4,
+    "cleanupComplete": true,
+    "automaticVendorFallback": false,
+    "scope": "Normal local-fake path only; not business recovery/answer/stop/native compatibility"
+  },
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "preservedServicePairs": 12,
+  "userServicesRestarted": false,
+  "privateStartupPermission": false,
+  "targetActivation": false,
+  "releaseApproved": false
+}
