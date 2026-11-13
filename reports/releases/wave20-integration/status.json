@@ -1,0 +1,51 @@
+{
+  "protocol": "wave20-main-restored-personal-review/1",
+  "date": "2026-11-13",
+  "source": "773b34de57b3a2f8c79eca19bcb8aaee55c83ed8",
+  "implemented": [
+    "Explicit local review-restored selection of historical project/path",
+    "Private HMAC startup config bound to current local root/principal/host/action key/marker/logical source",
+    "Real personal demo/workbench startup flag, default no auto-load from backups",
+    "Restored historical candidate/history/frozen source reads without enabling business/model/queue"
+  ],
+  "interface": "tools/dev/review-restored.mjs + personal --review-restored-scope file",
+  "startupWindowMinutes": 5,
+  "authorizationLifetime": "Current started process only; window is checked at startup, no in-process timed revocation claim",
+  "access": "historical_data_read_only",
+  "startupAvailable": false,
+  "checks": {
+    "newTests": 11,
+    "cleanReadStartupSourceSnapshotTests": 48,
+    "coordinatorProductStrict": "PASS",
+    "independentReview": "FIFO blocking reproduced, fixed with O_NONBLOCK and original reproduction independently resolved",
+    "realPersonalProcess": true,
+    "mode": "personal",
+    "startupMode": "recovery_readonly",
+    "beforeCandidateStatus": 403,
+    "afterCandidateStatus": 200,
+    "afterHistoryStatus": 200,
+    "afterFrozenSourcesState": "verified",
+    "businessPrepareStatus": 422,
+    "originalMockRequests": 2,
+    "mockRequestsAfterRestore": 2,
+    "heldQueueRows": 1,
+    "workRows": 0,
+    "sourceWorktreeDirtyAtCleanRun": false,
+    "command": "node --test tests/integration/restored-personal-review.case.mjs tests/integration/recovery-startup.case.mjs tests/integration/recovery-source-confirmation.case.mjs tests/integration/snapshot-version-compat.case.mjs tests/integration/snapshot-schema-admission.case.mjs"
+  },
+  "notImplemented": [
+    "Read authorization UI/persistent UI management",
+    "D launcher passthrough and current new installed artifact",
+    "Private startup permission",
+    "Recovered native business stream integration",
+    "Actual target activation"
+  ],
+  "productSchema": 18,
+  "migrationsAdded": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "preservedServicePairs": 12,
+  "userServicesRestarted": false,
+  "newPreviewStarted": false,
+  "releaseApproved": false
+}

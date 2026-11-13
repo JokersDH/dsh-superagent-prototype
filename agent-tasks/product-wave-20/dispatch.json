@@ -1,0 +1,504 @@
+{
+  "schemaVersion": 1,
+  "wave": "product-wave-20",
+  "date": "2026-11-13",
+  "status": "PLANNED_NOT_EXECUTED",
+  "reviewBaseline": "22088996ad4b6ffec534b07a89db4c270cec1627",
+  "observedMain": "773b34de57b3a2f8c79eca19bcb8aaee55c83ed8",
+  "productRuntimeSource": "773b34de57b3a2f8c79eca19bcb8aaee55c83ed8",
+  "sharedBoundary": "docs/rfcs/WP-16/0055-wave-20-admission-and-personal-recovery.md",
+  "contracts": [
+    "packages/contracts/src/recovery-state.ts",
+    "packages/contracts/src/recovery-source.ts",
+    "packages/contracts/src/recovery-activation.ts",
+    "packages/contracts/src/recovery-target.ts",
+    "packages/contracts/src/assistant-candidates.ts",
+    "packages/contracts/src/recovery-source-confirmation.ts"
+  ],
+  "newModelAllowance": 0,
+  "nativeModelsStartedByThisDispatch": 0,
+  "newDriverImplementation": false,
+  "studyState": "BLOCKED_CURRENT_RECIPE",
+  "pilotGatesProductAcceptance": false,
+  "normalInstallRequiresRecoveryActivation": false,
+  "checkpointsPerOwner": 3,
+  "continueAfterCheckpoint": true,
+  "independentQueueRequired": true,
+  "unboundedPollingAllowed": false,
+  "preservedUserServices": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ],
+    [
+      5186,
+      8802
+    ],
+    [
+      5187,
+      8803
+    ],
+    [
+      5188,
+      8804
+    ],
+    [
+      5189,
+      8805
+    ],
+    [
+      5190,
+      8806
+    ],
+    [
+      5191,
+      8807
+    ]
+  ],
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "candidate": "d1050e9944f33f366a673f2b7e8c4eb1ffc0f125",
+      "packet": "agent-tasks/product-wave-20/agent-a-data.zh-CN.md",
+      "ownedPaths": [
+        "packages/storage/",
+        "packages/workflows/"
+      ],
+      "evidencePath": "packages/workflows/reports/wave20-status.json",
+      "phases": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "candidate": "e9073ed6fb63fe698c77eacdee3fa198a176fd77",
+      "packet": "agent-tasks/product-wave-20/agent-b-runtime.zh-CN.md",
+      "ownedPaths": [
+        "packages/execution/",
+        "packages/catalog/",
+        "packages/policy-preparation/",
+        "packages/driver-kit/",
+        "packages/testing/",
+        "packages/drivers/",
+        "apps/runner/",
+        "tests/native-acceptance/"
+      ],
+      "evidencePath": "tests/native-acceptance/reports/wave20-status.json",
+      "grantId": "wave03-b-native",
+      "historicalLimit": 4,
+      "remaining": "UNKNOWN_NOT_SPENDABLE",
+      "resetLedger": false,
+      "newFeasibilityInvestigations": 0,
+      "phases": [
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+        "B8",
+        "B9",
+        "B10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "candidate": "647682c31a8b231063af39f68871cba6b7ca4964",
+      "packet": "agent-tasks/product-wave-20/agent-c-context.zh-CN.md",
+      "ownedPaths": [
+        "packages/context/",
+        "packages/proposals/",
+        "packages/knowledge/",
+        "packages/routing/"
+      ],
+      "evidencePath": "packages/context/reports/wave20-status.json",
+      "phases": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "candidate": "35925ddcb28b89b2393572563b486babfa05863e",
+      "packet": "agent-tasks/product-wave-20/agent-d-delivery.zh-CN.md",
+      "ownedPaths": [
+        "apps/launcher/",
+        "tools/distribution/",
+        "packages/portability/"
+      ],
+      "evidencePath": "tools/distribution/reports/wave20-status.json",
+      "phases": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8",
+        "D9",
+        "D10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "candidate": "acf450981c0f7e4728ead2caf59fd1fc53b425a1",
+      "packet": "agent-tasks/product-wave-20/agent-e-acceptance.zh-CN.md",
+      "ownedPaths": [
+        "tests/product-acceptance/"
+      ],
+      "evidencePath": "tests/product-acceptance/reports/wave20-status.json",
+      "grantId": "wave05-independent-review-pilot-01",
+      "maxNativeTurnStarts": 24,
+      "maxAuthorTurnStarts": 8,
+      "maxReviewTurnStarts": 16,
+      "maxBillableTokens": 200000,
+      "maxCostUSD": 5,
+      "maxInFlight": 1,
+      "resetLedger": false,
+      "unknownCostIsZero": false,
+      "cliFallbackAllowed": false,
+      "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
+      "phases": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6",
+        "E7",
+        "E8",
+        "E9",
+        "E10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-20/main.zh-CN.md",
+      "ownedPaths": [
+        "packages/contracts/",
+        "packages/application/",
+        "packages/questions/",
+        "apps/coordinator/",
+        "apps/console/",
+        "agent-tasks/product-wave-20/",
+        "tools/bootstrap/",
+        "docs/rfcs/WP-16/"
+      ],
+      "evidencePath": "reports/releases/wave20-integration/status.json",
+      "phases": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave"
+    }
+  },
+  "checkpoints": {
+    "M-current-product": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-source-confirm": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-snapshot-versions": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-personal-read-binding": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-registered-physical-control": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "A-strict-fixture": {
+      "owner": "A",
+      "dependsOn": []
+    },
+    "A-existing-real-data": {
+      "owner": "A",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "A-personal-read-consumer": {
+      "owner": "A",
+      "dependsOn": [
+        "A-strict-fixture",
+        "M-personal-read-binding"
+      ]
+    },
+    "A-same-data-recipe": {
+      "owner": "A",
+      "dependsOn": [
+        "A-personal-read-consumer",
+        "M-snapshot-versions"
+      ]
+    },
+    "C-existing-real-data": {
+      "owner": "C",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "C-personal-read-consumer": {
+      "owner": "C",
+      "dependsOn": [
+        "M-personal-read-binding",
+        "C-existing-real-data"
+      ]
+    },
+    "B-normal-control": {
+      "owner": "B",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "B-exact-control-wrapper": {
+      "owner": "B",
+      "dependsOn": []
+    },
+    "B-business-attach-port": {
+      "owner": "B",
+      "dependsOn": [
+        "B-exact-control-wrapper",
+        "B-normal-control"
+      ]
+    },
+    "M-business-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "B-business-attach-port"
+      ]
+    },
+    "B-recovered-business": {
+      "owner": "B",
+      "dependsOn": [
+        "M-business-consumer",
+        "B-business-attach-port"
+      ]
+    },
+    "B-recovery-resource-proof": {
+      "owner": "B",
+      "dependsOn": [
+        "B-exact-control-wrapper"
+      ]
+    },
+    "D-ee-frozen-input": {
+      "owner": "D",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "D-personal-read-launcher": {
+      "owner": "D",
+      "dependsOn": [
+        "M-personal-read-binding"
+      ]
+    },
+    "D-current-bytes": {
+      "owner": "D",
+      "dependsOn": [
+        "D-personal-read-launcher",
+        "D-ee-frozen-input"
+      ]
+    },
+    "D-personal-read-flow": {
+      "owner": "D",
+      "dependsOn": [
+        "D-current-bytes",
+        "A-same-data-recipe"
+      ]
+    },
+    "E-same-artifact-gate": {
+      "owner": "E",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "E-b911-personal-scope": {
+      "owner": "E",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "E-ee-format": {
+      "owner": "E",
+      "dependsOn": [
+        "D-ee-frozen-input",
+        "E-same-artifact-gate"
+      ]
+    },
+    "E-new-personal-package": {
+      "owner": "E",
+      "dependsOn": [
+        "D-current-bytes",
+        "E-same-artifact-gate"
+      ]
+    },
+    "E-personal-read-binding": {
+      "owner": "E",
+      "dependsOn": [
+        "E-new-personal-package",
+        "M-personal-read-binding"
+      ]
+    },
+    "E-real-data-restore": {
+      "owner": "E",
+      "dependsOn": [
+        "E-personal-read-binding",
+        "D-personal-read-flow"
+      ]
+    },
+    "M-private-permission": {
+      "owner": "main",
+      "dependsOn": [
+        "M-source-confirm",
+        "B-recovery-resource-proof",
+        "D-current-bytes"
+      ]
+    },
+    "M-target-activation": {
+      "owner": "main",
+      "dependsOn": [
+        "M-private-permission",
+        "B-recovered-business"
+      ]
+    },
+    "E-target-activation": {
+      "owner": "E",
+      "dependsOn": [
+        "M-target-activation"
+      ]
+    }
+  },
+  "providedInputs": {
+    "defaultCFactoryImplemented": true,
+    "nonemptyReplyCandidatesImplemented": true,
+    "explicitCandidateUIImplemented": true,
+    "sourceBaselineScope": "actual_inspect_prepare_and_explicit_source_confirmation_only",
+    "sourceConfirmImplemented": true,
+    "privatePermissionImplemented": false,
+    "targetActivationImplemented": false,
+    "bBusinessRecoveryImplemented": false,
+    "ordinaryInstallBaselineAvailableNow": true,
+    "currentPreview": "http://127.0.0.1:5191/",
+    "currentPreviewAPI": "http://127.0.0.1:8807/",
+    "historicalDArtifact": {
+      "source": "ee7fbd8ab59bde8b875dcd933fda58d7bbf2fd5d",
+      "buildId": "90e81429079a7d50",
+      "schema": 18,
+      "sha256": "b0990149d0a8c81a130d358ea07100332bc30d509e9c7dfdf7a176e61b7f7ecc",
+      "bytes": 20236793,
+      "includesCurrentCandidates": true,
+      "includesSourceConfirmation": true,
+      "includesNewSnapshotSchemaGuard": true,
+      "includesVersionedWorkflowSnapshots": true,
+      "includesPersonalReadStartup": false
+    },
+    "sourceConfirmSource": "6050b4bf066d170c54c45e7f9bf4024abac285dc",
+    "sourceConfirmationGrantsStartup": false,
+    "bRealReceiverHalfImplemented": true,
+    "snapshotSchemaGuardImplemented": true,
+    "snapshotSchemaGuardSource": "e438ab5b227d41dbea06530958ef4da51b81e7db",
+    "snapshotFormat": "workflow-snapshot/1",
+    "evidenceFormat": "workflow-evidence/1",
+    "fullAV2SnapshotIntegrated": false,
+    "normalMainNativeProfileInterfaceAvailable": true,
+    "mainLocalPreparationDiagnosticAvailable": true,
+    "bSubmittedProducerPrepared": true,
+    "mainDiagnosticCreditedToB": false,
+    "dSameFrozenArtifactSafetyAdmitted": true,
+    "eCrossArtifactInstalledPassAccepted": false,
+    "versionedWorkflowEvidenceIntegrated": true,
+    "explicitWorkflowV2Supported": true,
+    "workflowDefaultFormatVersion": 1,
+    "versionedSnapshotSource": "98561245a0e5ff8250ca94e28bc517a3e32948d5",
+    "bControlledNormalAnswerApplied": true,
+    "bControlledNormalPhysicalStop": true,
+    "personalRestoredReadBindingImplemented": true,
+    "eSameArtifactBindingFixAdmitted": true,
+    "eSameArtifact651PersonalScopeAdmitted": true,
+    "eLatestB911InstalledAdmission": true,
+    "eAdmittedArtifact": {
+      "source": "b9117aad12797a3ee3c454172d1f918516a18f33",
+      "buildId": "6a45633067501dd2",
+      "schema": 18,
+      "requiredCases": 24,
+      "scope": "Exact ordinary personal; fixture-only readonly recovery, not ee or new personal read startup/native/private grant/target"
+    },
+    "personalRestoredReadBindingSource": "773b34de57b3a2f8c79eca19bcb8aaee55c83ed8",
+    "readBindingInterface": "Explicit private CLI startup configuration, not a new HTTP/UI grant",
+    "readBindingGrantsExecution": false,
+    "bExactWrapperAdmitted": false,
+    "bSubmittedBusinessFeedAvailable": false,
+    "bOldRegisteredControlAvailable": true,
+    "aNewFixtureStrictPassed": false,
+    "aSameProductionSourceAsMain": true,
+    "cSameRealControlledSnapshotChainAdmitted": true,
+    "eLatestEeInstalledAdmission": false
+  },
+  "completionEstimateRef": "reports/releases/wave13-admission/progress.json",
+  "releaseApproved": false,
+  "goalCoversWholePackage": true,
+  "goalsChangeExecutionBudgets": false
+}
