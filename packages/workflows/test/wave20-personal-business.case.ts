@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { ProductStore } from '@personal-agent/storage'
+import { key } from '../../orchestrator-core/src/core/ids.ts'
 import { WorkflowSnapshots } from '../src/index.ts'
 import { localCredentials } from '../../../apps/coordinator/http/local-state.ts'
 import { createControlledProduct, createProductRuntime, FIXTURE_CHECK } from '../../../apps/coordinator/product/runtime.ts'
@@ -72,6 +73,7 @@ test('explicit personal readonly startup reads real Work/Q&A and SDK data withou
     context: { projectId, conversationId, selections: ['conversation'], budget: { maxFiles: 16, maxBytes: 65536, maxTokens: 16384 } } }, actor)
   await runtime.operations.assistantContextSend({ commandId: context.commandId, token: context.token }, actor)
   await until(async () => store.product.messages.page(conversationId).messages.filter(value => value.role === 'assistant').length === 2, value => value)
+  const contextMessageId = key('message', 'wave20-context')
   await runtime.close(); runtime = undefined
   store.queue.enqueue('application.execute', 'held-personal', '{}', 1, 0, new Date().toISOString())
   const snapshot = await new WorkflowSnapshots(store).create({ destination: join(root, 'snapshot') })
@@ -100,6 +102,29 @@ test('explicit personal readonly startup reads real Work/Q&A and SDK data withou
   const refusal = await fetch(`${api}/v1/commands`, { method: 'POST', headers: { ...headers, 'content-type': 'application/json' },
     body: JSON.stringify({ kind: 'answer_question', questionId: businessQuestionId, expectedVersion: 1, answer: { kind: 'free_text', text: 'x' } }) })
   assert.equal(refusal.status, 422)
+  assert.equal(model.requests.length, requestsBefore)
+  await stop()
+
+  // A4: a genuinely signed narrower scope is accepted as a startup selection; reads stay read-only,
+  // while the original wider context binding reports scope_changed rather than being forged.
+  const narrowFile = join(root, 'narrow-review.json')
+  execFileSync(process.execPath, [join(repoRoot, 'tools/dev/review-restored.mjs'), '--state', restored, '--project', projectId,
+    '--allow-path', 'src/narrow/', '--exclude-path', 'src/private/', '--output', narrowFile], { cwd: repoRoot, stdio: 'pipe' })
+  const narrowPort = await availablePort(), narrowApi = `http://127.0.0.1:${narrowPort}`
+  child = spawn(process.execPath, [join(repoRoot, 'apps/coordinator/product/demo.ts'), '--state', restored, '--port', String(narrowPort),
+    '--discussion-only', '--assistant', '--review-restored-scope', narrowFile], { cwd: repoRoot,
+    env: { ...process.env, PA_MODEL_CONFIG: model.file }, stdio: ['ignore', 'pipe', 'pipe'] })
+  child.stdout.on('data', (bytes: Buffer) => { output.text += bytes.toString() }); child.stderr.on('data', (bytes: Buffer) => { output.text += bytes.toString() })
+  await waitUntil(async () => { if (child.exitCode !== null || child.signalCode !== null) throw new Error(output.text.slice(-2000));
+    try { return (await fetch(`${narrowApi}/v1/health`)).ok } catch { return false } })
+  assert.equal((await fetch(`${narrowApi}/v1/context/history?projectId=${projectId}`, { headers })).status, 200)
+  const narrowSources = await fetch(`${narrowApi}/v1/messages/${contextMessageId}/context/sources`, { headers })
+  assert.equal(narrowSources.status, 200, await narrowSources.clone().text())
+  const narrowView = await narrowSources.json()
+  assert.equal(narrowView.state, 'scope_changed'); assert.deepEqual(narrowView.sources, [])
+  const narrowRefusal = await fetch(`${narrowApi}/v1/commands`, { method: 'POST', headers: { ...headers, 'content-type': 'application/json' },
+    body: JSON.stringify({ kind: 'answer_question', questionId: businessQuestionId, expectedVersion: 1, answer: { kind: 'free_text', text: 'x' } }) })
+  assert.equal(narrowRefusal.status, 422)
   assert.equal(model.requests.length, requestsBefore)
   await stop()
   const check = new ProductStore({ path: join(restored, 'state.sqlite') })
