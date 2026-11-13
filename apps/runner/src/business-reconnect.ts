@@ -22,7 +22,7 @@
  */
 import { lstatSync } from 'node:fs'
 import { connectRunnerRecovery } from '../../../packages/execution/src/recovery-transport.ts'
-import type { VerifiedRunnerInspection } from '../../../packages/execution/src/recovery-transport.ts'
+import type { RunnerEndpoint, VerifiedRunnerInspection } from '../../../packages/execution/src/recovery-transport.ts'
 import type { AttemptSpec, RunnerCommand } from '../../../packages/contracts/src/types.ts'
 import { CREDENTIAL_FILE, SOCKET_FILE, endpointDirectory } from './recovery-endpoint.ts'
 
@@ -52,15 +52,36 @@ export type BusinessReconnectOptions = {
   endpoint?: { socketPath: string; credentialPath: string; socketIdentity: { dev: number; ino: number } }
   /** Preserved product guard: runs immediately before any cancel is written. */
   beforeWrite: (command: CancelCommand) => Promise<void>
-  /** Ids the Runner already recorded. A recorded command is never resent. */
-  alreadyRecorded: (commandId: string) => boolean
+  /**
+   * Legacy boolean form. It cannot distinguish a recorded-but-unsent intent from an observed result,
+   * so a caller with real state should pass `reconcile` instead.
+   */
+  alreadyRecorded?: (commandId: string) => boolean
+  /**
+   * State-aware reconciliation. A may record an unsent intent before the write; treating that as
+   * "already sent" would silently drop a command, and treating an unknown as sent would hide an
+   * indeterminate native call. Only an observed result suppresses a resend.
+   */
+  reconcile?: (commandId: string) => CommandReconciliation
   timeoutMs?: number
 }
+
+/** What the caller's own store can prove about a command right now. */
+export type CommandReconciliation =
+  /** Nothing durable mentions this id; it has never left this process. */
+  | { state: 'not_seen' }
+  /** An intent row exists but no result was observed. It must still be sent, once. */
+  | { state: 'intent_recorded'; detail?: string }
+  /** A result was observed. It must never be resent. */
+  | { state: 'observed'; detail?: string }
+  /** Durable state cannot decide. Refuse and let a human reconcile rather than guess. */
+  | { state: 'unknown'; detail: string }
 
 export type ReconnectRefusal =
   | { refused: 'identity_mismatch'; detail: string }
   | { refused: 'epoch_not_current'; detail: string }
   | { refused: 'already_recorded'; detail: string }
+  | { refused: 'indeterminate'; detail: string }
 
 export type CancelOutcome =
   /** `sent` records that the transport accepted the cancel; `proof` is the inspection it preceded. */
@@ -89,7 +110,7 @@ const refusing = (refusal: ReconnectRefusal): BusinessReconnect => ({
  * included. Only when the caller has none does the wrapper derive the conventional path - and even
  * then it pins whatever inode it finds, which is exactly why a caller with a registration must pass it.
  */
-function resolveEndpoint(options: BusinessReconnectOptions): { socketPath: string; credentialPath: string; socketIdentity?: { dev: number; ino: number } } {
+function resolveEndpoint(options: BusinessReconnectOptions): RunnerEndpoint {
   if (options.endpoint) return options.endpoint
   const directory = endpointDirectory(options.stateRoot, options.binding.attemptId)
   const socketPath = `${directory}/${SOCKET_FILE}`
@@ -136,15 +157,28 @@ export async function reconnectBusinessRunner(options: BusinessReconnectOptions)
   return {
     inspect: () => client.inspect(),
     async cancel(command) {
-      if (options.alreadyRecorded(command.id)) {
-        return { refused: 'already_recorded', detail: `command ${command.id} is already recorded; it is not resent` }
+      const reconciliation: CommandReconciliation = options.reconcile
+        ? options.reconcile(command.id)
+        : options.alreadyRecorded?.(command.id)
+          ? { state: 'observed' as const }
+          : { state: 'not_seen' as const }
+
+      // An observed result is final; a recorded intent is NOT proof of a send and must still go out.
+      if (reconciliation.state === 'observed') {
+        return { refused: 'already_recorded', detail: `command ${command.id} already has an observed result; it is not resent` }
       }
+      if (reconciliation.state === 'unknown') {
+        return { refused: 'indeterminate', detail: reconciliation.detail }
+      }
+
       // Authenticated identity first: a foreign producer, a replaced socket or a wrong principal is
       // refused by the server before this wrapper writes anything. Moving this after the guard would
       // let a foreign cancel reach the receiver, which is the defect this ordering exists to prevent.
-      const proof = await client.inspect()
+      await client.inspect()
       await options.beforeWrite(command)
-      await client.cancel(command)
+      // The proof that matters is the one the transport returns AFTER the cancel, not the snapshot
+      // taken before it. Returning the pre-cancel inspection claimed a state the cancel had changed.
+      const proof = await client.cancel(command)
       return { sent: true, kind: 'cancel', proof }
     },
     close: () => {},

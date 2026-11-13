@@ -1,0 +1,81 @@
+{
+  "wave": "product-wave-21",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "a92bb9e",
+  "previousCandidate": "18a5c1e",
+  "packet": "agent-tasks/product-wave-21/agent-b-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0057",
+  "checkpoint": "1 of 3",
+  "scopeNote": "Zero real model and native turns. Only B-owned paths. No new ledger/lifecycle/wire, no second coordinator, no shared-contract or main-product-class edit, no guard weakened, no global socket scan. Twelve services and all ledgers untouched. Two historical report diffs and untracked b16-real-begin.mjs preserved.",
+
+  "normalControlUnchanged": {
+    "status": "NOT_REPACKETED",
+    "detail": "normal Q&A plus controlled physical stop remain 10/10 from wave-19; the producer was not rewritten and no main normal interface was awaited."
+  },
+
+  "namedDefectsFixed": {
+    "directStrictTypeError": {
+      "reported": "TS2345 - resolveEndpoint returned an optional socketIdentity into a required RunnerEndpoint",
+      "fix": "resolveEndpoint now returns a complete RunnerEndpoint; the derive path always stats the socket, so the identity is always present",
+      "verification": "npx tsc --noEmit --ignoreConfig --strict --exactOptionalPropertyTypes --allowImportingTsExtensions ... apps/runner/src/business-reconnect.ts -> exit 0, no errors",
+      "notClaimed": "the module is NOT excluded from any root tsconfig to make this look clean"
+    },
+    "proofTakenBeforeTheCancel": {
+      "reported": "cancel returned the pre-inspect serving/open/active proof and dropped the real post-cancel proof",
+      "fix": "the proof now comes from the transport call that performs the cancel; the pre-cancel inspection is used only for authenticated admission and is no longer returned as the outcome"
+    },
+    "intentConfusedWithObservedResult": {
+      "reported": "raw commands.has treats a recorded-but-unsent intent as an observed send",
+      "fix": "added state-aware reconcile: not_seen, intent_recorded, observed, unknown. Only observed suppresses a resend; intent_recorded still sends exactly once; unknown refuses as indeterminate instead of guessing",
+      "compatibility": "the legacy boolean alreadyRecorded is still accepted so existing callers and main's probe keep working"
+    }
+  },
+
+  "probe": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-b-wave21-goal-start.json node tools/bootstrap/probe-wave21-runtime.mjs <B-root>",
+    "outputPathWasNew": true,
+    "protocol": "wave21-b-registration-contract/1",
+    "classification": "PRIVATE_A_REGISTRATION_AND_MOCK_CONTROL_ONLY",
+    "status": "PASS_SCOPED_REGISTRATION_CONTRACT",
+    "passed": 5,
+    "failed": 0,
+    "sourceStable": true,
+    "before": "4 PASS / 1 FAIL",
+    "cases": [
+      "EXACT_REGISTERED_ENDPOINT_PRODUCER_AND_DIGEST",
+      "CURRENT_GUARD_REFUSAL_HAS_NO_RECEIVER_CANCEL",
+      "PENDING_INTENT_CAN_EXIST_BEFORE_ANY_RECEIVER_SEND",
+      "STATE_AWARE_CONSUMER_SENDS_ORIGINAL_PENDING_INTENT_ONCE",
+      "CANCEL_RETURNS_AUTHENTICATED_POST_CANCEL_PROOF"
+    ]
+  },
+
+  "stillNotBusinessResume": {
+    "statement": "this is an inspect/cancel control wrapper. There is no business stream, session, fact sink or Broker before-write attach, and no cross-coordinator recovery.",
+    "B4_businessAttachPortRfc": "NOT_REACHED",
+    "B5_sameRunnerAcrossCoordinatorInterruption": "NOT_REACHED",
+    "B6_beginAnswerStopWindows": "NOT_REACHED",
+    "B7_runtimeValidOldEpoch": "NOT_REACHED - the probe's old-epoch case is a construction-time expected/binding mismatch, not a runtime epoch advance",
+    "B8_recoveredDeliveryCheckCandidateHumanAccept": "NOT_REACHED",
+    "B9_slots2And4AndReturn": "NOT_REACHED"
+  },
+
+  "wholePackageComplete": false,
+  "wholePackageNote": "the ten-stage packet is not complete. B4 through B9 are NOT_REACHED, so this cannot be reported as a finished package.",
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "bConsumes": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "limitations": [
+    "the probe runs against probe-owned private registration and mock control services; it is scoped contract evidence, not product recovery",
+    "no physical writer, principal grant, installed-agent compatibility or release admission is claimed",
+    "only one of the three required runnable checkpoints has been published"
+  ]
+}
