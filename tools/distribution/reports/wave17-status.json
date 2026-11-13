@@ -1,0 +1,306 @@
+{
+  "protocol": "wave17-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "baseCommit": "6f05ab5",
+  "mergedMain": "45918ed",
+  "head": "65102f7",
+  "status": "CANDIDATE",
+  "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/native turns 0; twelve user services untouched.",
+  "ownedPaths": [
+    "apps/launcher/",
+    "tools/distribution/",
+    "packages/portability/"
+  ],
+  "modelBudget": {
+    "allocated": 0,
+    "used": 0,
+    "nativeTurns": 0
+  },
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Owned children now require their own recorded identity (record API/console or journal child birth list with pid/start/uid/command/root/operation). Ancestry, same UID and shared path alone are UNKNOWN; zero signals and no proven parent stop.",
+      "evidence": [
+        "apps/launcher/lib/upgrade.mjs",
+        "tools/distribution/reports/wave17/ownership-mock.json"
+      ]
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "Producer persists child identities at birth and refreshes them after health; fail/recover verify each child independently, so real cleanup remains provable while an unregistered same-UID child stays UNKNOWN and actual recover is BLOCKED with journal/pointer unchanged.",
+      "evidence": [
+        "tools/distribution/reports/wave17/ownership-mock.json"
+      ]
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Complete-parent positive control still signals the parent and proves; same-UID unregistered child helper and actual recover negatives stay unproven/BLOCKED with 0 child signals. All identity/inventory/signals mocked first, no live lifecycle admitted by that probe.",
+      "evidence": [
+        "tools/distribution/reports/wave17/ownership-mock.json"
+      ]
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "Main e32a3fc actual source confirmation consumed over HTTP from a restored read-only state: nonempty backup→restore marker→source/prepare→source/confirm→activations audit. Record is data-only authorization=not_granted, startupAvailable=false; no target/queue/Runner/permission action.",
+      "evidence": [
+        "tools/distribution/reports/wave17/source-confirmation-http.json"
+      ]
+    },
+    "d5": {
+      "status": "PASS",
+      "summary": "Clean frozen target from pushed source 65102f7: build f55470ae14cc4985, schema18, tar sha256 33d874c9..., 20,225,208 B, 6,737 files with child-identity gate, M1, e32 source confirmation and history/source/reply. Older 97cace7 preserved and not relabeled.",
+      "evidence": [
+        "tools/distribution/reports/wave17/artifacts.json"
+      ]
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "New-tar personal cold install 7/7; no-executor discussion-only 4/4 stays personal with unavailable execution and explicit 422 refusal; unknown old resources are never cleared by detection failure.",
+      "evidence": [
+        "tools/distribution/reports/wave17/personal-install.json",
+        "tools/distribution/reports/wave17/personal-no-executor.json"
+      ]
+    },
+    "d7": {
+      "status": "PASS_WITH_SUGGESTION_FIXTURE_LIMIT",
+      "summary": "Nonempty A18 reply/binding/history/frozen sources plus private artifact bytes survive snapshot+new-root restore; active 5/5. Nonempty suggestion candidate fixture through main/C verified body+proposal scope is NOT_TESTED and no empty-data substitution is claimed.",
+      "evidence": [
+        "tools/distribution/reports/wave17/schema18-data.json"
+      ]
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Same-schema 18->18 upgrade between different real binaries confirms pointer/process/mode and data; legacy16->18 3/3; historical schema13 pair remains separate. No silent data rollback.",
+      "evidence": [
+        "tools/distribution/reports/wave17/same-schema18-upgrade.json",
+        "tools/distribution/reports/wave17/cross-schema-upgrade.json"
+      ]
+    },
+    "d9": {
+      "status": "PASS_WITH_MAIN_ACTIVATION_BLOCKED",
+      "summary": "Managed matrix 19/19 covers spawn/record/pointer/SIGKILL windows; support/material remain redacted/0600/inert. Main confirm/activation remains unimplemented (source confirmation is not a grant).",
+      "evidence": [
+        "tools/distribution/reports/wave17/binary-upgrade.json",
+        "tools/distribution/reports/wave17/target-material.json"
+      ]
+    },
+    "d10": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Frozen-byte rerun: probe3/3, matrix19/19, multi8/8, cross3/3, data5/5, personal7/7, noexec4/4, source5/5, same18 3/3, backup6/6, portable5+1NT, dual6/6, material8/8, smoke52/52, launcher60/60, portability52/52. E verdict pending.",
+      "evidence": [
+        "tools/distribution/recipes/wave17-e-acceptance.zh-CN.md",
+        "docs/rfcs/WP-16/0050-wave-17-d-independent-child-and-source-confirmation.md"
+      ]
+    }
+  },
+  "artifacts": {
+    "protocol": "wave17-artifacts/1",
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave17-target/wave17-target-65102f7.tar.gz",
+      "sha256": "33d874c9a25f22d2710fb29d686f03ad5b37de7ad2cdb09f40d16fd7ecb86340",
+      "tarBytes": 20225208,
+      "buildId": "f55470ae14cc4985",
+      "source": {
+        "commit": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6737,
+      "extractedBytes": 67493046,
+      "actualCapabilities": [
+        "complete birth/journal/recover identity including independently registered child identities",
+        "same-UID unregistered child stays UNKNOWN (no signal, recover BLOCKED)",
+        "tri-state post-signal stop",
+        "M1 discussion-only unavailable execution",
+        "e32a3fc restored source prepare/confirm/audit over real HTTP (data-only, not_granted, startupAvailable=false)",
+        "runtime recovery inspect/prepare HTTP",
+        "history/source/reply/context",
+        "same-schema18 and 16->18 managed upgrades",
+        "backup/restore"
+      ]
+    },
+    "baseline": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave06-alpha2/wave06-alpha2-7e8f6ce6.tar.gz",
+      "sha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+      "buildId": "7e8f6ce6fa2e2633",
+      "source": {
+        "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 13
+    },
+    "legacy16": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave11-target/wave11-target-a22d3a4.tar.gz",
+      "sha256": "a10f627492c0f9ebc709137689fb26ed59f2bb463c7ea93d7c347a682770d2cb",
+      "buildId": "3311a04bd20ed7f9",
+      "source": {
+        "commit": "a22d3a4bbc7084265b6fa8cce9205131a17e0a51",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 16
+    },
+    "previousCurrent": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave16-target/wave16-target-97cace7.tar.gz",
+      "sha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+      "buildId": "8a5a0a85631f22ca",
+      "source": {
+        "commit": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "note": "Schema18 same-schema source; historical, not current."
+    },
+    "dualPair13": {
+      "from": {
+        "buildId": "9120a5ed858e0feb",
+        "commit": "76f26a66c0554f7294de98637198a01c3703e69a",
+        "schema": 13,
+        "sha256": "bbc133125271da6925e2c1a16122c487e93fe760463dd2be304dab748e137912"
+      },
+      "to": {
+        "buildId": "cd0ecc29d97d5c41",
+        "commit": "9b75c2a1a3e3ce7a1b95983f2e8500a2cd59b82e",
+        "schema": 13,
+        "sha256": "64bbe285d472b1dbaf3830899dabdefdc3ed9a69a750b537e0ee14397ca53d42"
+      },
+      "note": "Historical same-schema scope, not relabeled current."
+    },
+    "notes": [
+      "Built from pushed clean wave-17 D head 65102f7 (dirty=false, schema18) on main 45918ed merge including e32a3fc/6050b4b.",
+      "Child ownership uses independently registered identities (record API/console or journal child birth list); ancestry/same UID/path alone is UNKNOWN.",
+      "Docs-only later heads do not change these bytes."
+    ]
+  },
+  "testLayers": {
+    "ownershipMock": {
+      "cases": 3,
+      "passed": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "multiInstance": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "binaryUpgrade": {
+      "sections": 19,
+      "status": "PASS"
+    },
+    "crossSchema": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "schema18Data": {
+      "steps": 5,
+      "status": "PASS"
+    },
+    "personalInstall": {
+      "steps": 7,
+      "status": "PASS"
+    },
+    "personalNoExecutor": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "sourceConfirmation": {
+      "steps": 5,
+      "status": "PASS",
+      "outcome": "confirmed-data-only"
+    },
+    "sameSchema18": {
+      "steps": 3,
+      "status": "PASS"
+    },
+    "backupSchema": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "portableClosure": {
+      "steps": 6,
+      "status": "PASS",
+      "notTested": [
+        "other-platform-abi"
+      ]
+    },
+    "dualBinary": {
+      "steps": 6,
+      "status": "PASS"
+    },
+    "targetMaterial": {
+      "steps": 8,
+      "status": "PASS"
+    },
+    "smoke": {
+      "steps": 52,
+      "status": "PASS"
+    },
+    "launcher": {
+      "tests": 60,
+      "status": "PASS"
+    },
+    "portability": {
+      "tests": 52,
+      "status": "PASS"
+    }
+  },
+  "blockers": [
+    {
+      "id": "MAIN-ACTIVATION-CONFIRM",
+      "owner": "main",
+      "status": "PENDING",
+      "summary": "Source prepare/confirm/audit are real data-only (not_granted/startupAvailable=false); target activation/permission remains unimplemented."
+    },
+    {
+      "id": "E-INDEPENDENT-ACCEPTANCE",
+      "owner": "E",
+      "status": "PENDING",
+      "summary": "E must bind to wave-17 frozen tuple independently."
+    },
+    {
+      "id": "NONEMPTY-SUGGESTION-FIXTURE",
+      "owner": "D/main/C",
+      "status": "NOT_TESTED",
+      "summary": "Requires main/C verified completed body plus proposal scope; not replaced with empty data."
+    },
+    {
+      "id": "PLATFORM-ABI",
+      "owner": "D",
+      "status": "NOT_TESTED",
+      "summary": "Only darwin/arm64 current Node/SQLite ABI measured."
+    },
+    {
+      "id": "PERSONAL-BILLED-EXECUTION",
+      "owner": "D/main",
+      "status": "NOT_TESTED",
+      "summary": "Zero real model/native turns."
+    }
+  ],
+  "notTested": [
+    "nonempty suggestion candidate fixture",
+    "cross-platform/ABI",
+    "real personal billed turn",
+    "every individual SIGKILL step",
+    "main activation confirm",
+    "E independent acceptance"
+  ],
+  "eConsumption": [
+    "Use reports/wave17/artifacts.json tuples; never checkout or old 97cace7 bytes as current.",
+    "Run probe, matrix, multi, cross, data, personal, noexec, source-confirmation, same18, backup, portable, dual, material recipes.",
+    "Do not relax identity/digests, delete markers/records, hand-edit release.json, pkill, or claim activation/suggestion fixture/native from these results."
+  ],
+  "preservedHistory": [
+    "wave-05..16 evidence/ledgers unchanged",
+    "all historical tars (incl. 97cace7/6b6517c4) preserved and unrelabeled",
+    "no shared contract/migration/root lock/E assertion modified"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave17/*.json",
+    "tools/distribution/recipes/wave17-e-acceptance.zh-CN.md",
+    "docs/rfcs/WP-16/0050-wave-17-d-independent-child-and-source-confirmation.md"
+  ]
+}

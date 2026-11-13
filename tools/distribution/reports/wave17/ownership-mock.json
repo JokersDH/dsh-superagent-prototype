@@ -1,0 +1,106 @@
+{
+  "protocol": "wave17-d-admission/1",
+  "source": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+  "candidateRoot": "/Users/hh/Desktop/joker/superagent-agent-d",
+  "frozen": {
+    "root": "/tmp/w17frozen/install",
+    "source": {
+      "commit": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "buildId": "f55470ae14cc4985",
+    "schema": 18
+  },
+  "cases": [
+    {
+      "id": "COMPLETE_PARENT_POSITIVE",
+      "proven": true,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [],
+      "considered": 1,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "UNREGISTERED_SAME_UID_CHILD",
+      "proven": false,
+      "scannerOk": true,
+      "unverifiable": [],
+      "stopped": [
+        912345
+      ],
+      "remaining": [],
+      "unknownLive": [
+        {
+          "pid": 912346,
+          "command": "node unrelated-child --state /tmp/pa-wave17-delivery-eqogaj/data"
+        }
+      ],
+      "considered": 2,
+      "pidReused": false,
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "uidReads": [
+        912345,
+        912345,
+        912345
+      ],
+      "startReads": [
+        912345
+      ],
+      "childCommand": "node unrelated-child --state /tmp/pa-wave17-delivery-eqogaj/data",
+      "childHasIndependentBirth": false,
+      "expected": "Child lacks independent start/argv/root/install/operation identity; no child signal and no proven stop",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL_RECOVER_UNREGISTERED_SAME_UID_CHILD",
+      "result": "BLOCKED",
+      "journal": "target_stop_unproven",
+      "signals": [
+        {
+          "pid": 912345,
+          "signal": "SIGTERM"
+        }
+      ],
+      "uidReads": [
+        912345,
+        912345,
+        912345
+      ],
+      "startReads": [
+        912345
+      ],
+      "childStillAlive": true,
+      "pointerExistedBefore": false,
+      "pointerExistsAfter": false,
+      "expected": "Recovery stays BLOCKED without child signals or pointer change while child identity is unproven",
+      "status": "PASS"
+    }
+  ],
+  "passed": 3,
+  "failed": 0,
+  "notTested": 0,
+  "actualOsScans": 0,
+  "actualOsSignals": 0,
+  "actualProcessesSpawned": 0,
+  "vendorSends": 0,
+  "nativeTurns": 0,
+  "scope": "Complete parent positive plus same-UID child helper and actual recover negatives; all identity/inventory/signals mocked, verified frozen input readonly, no live lifecycle admission"
+}

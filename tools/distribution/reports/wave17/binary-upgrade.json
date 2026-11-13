@@ -1,0 +1,224 @@
+{
+  "case": "WAVE07-BINARY-UPGRADE",
+  "status": "PASS",
+  "startedAt": "2026-11-13T04:04:40.775Z",
+  "sections": {
+    "installs": {
+      "status": "PASS",
+      "detail": {
+        "baseline": {
+          "buildId": "7e8f6ce6fa2e2633",
+          "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+          "schema": 13,
+          "tarFamily": "wave06-alpha2"
+        },
+        "target": {
+          "buildId": "f55470ae14cc4985",
+          "commit": "65102f79352743ef38cdbcf9170f37b4d3ade06b",
+          "schema": 18
+        },
+        "sourceDistinct": true,
+        "schemaChange": "13->18"
+      }
+    },
+    "A-baseline-state": {
+      "status": "PASS",
+      "detail": {
+        "buildId": "7e8f6ce6fa2e2633",
+        "evidenceDigest": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
+        "artifactDigest": "d690795d9b0136f3f35f6bd99f5c8a9ddc55757dd0706b8c2eb2401369fc7ba2",
+        "backup": "ecbcde70423d69c3f13617a33fa8ceba42bcdae1eecef1070e54b88559d141c1"
+      }
+    },
+    "B-binary-switch": {
+      "status": "PASS",
+      "detail": {
+        "from": "7e8f6ce6fa2e2633",
+        "to": "f55470ae14cc4985",
+        "stopped": "STOPPED",
+        "backup": {
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave07-upgrade-G52SVw/switch-backup.pab",
+          "sha256": "6af07c8ee9310bd01cdb151c0d4c88d8b45dbc371ab4cbc94f8568621d1b7de8"
+        },
+        "instance": {
+          "pid": 49361,
+          "buildId": "f55470ae14cc4985"
+        },
+        "evidenceDigestBefore": "cc65eedf611bf4dc57fc351efed94bff5b925eb16161aeba1a48acd89117252e",
+        "evidenceDigestAfter": "b25a5d110452c6ab81f5fbaab31b22c2993c7c816b670fc05d264615e39c3ad9",
+        "schema": {
+          "before": 13,
+          "after": 18
+        },
+        "mode": {
+          "record": "fixture",
+          "health": "fixture"
+        },
+        "access": "local-development",
+        "dataRolledBack": false
+      }
+    },
+    "C-post-upgrade-data-protection": {
+      "status": "PASS",
+      "detail": {
+        "postUpgradeEvidence": "8e491ec18d9aaf674ff35200fdabd527b9d8f01d12a003423ff7de7e2f32957e",
+        "binaryRollback": {
+          "pointer": "7e8f6ce6fa2e2633",
+          "dataRolledBack": false,
+          "olderBinaryRefusal": {
+            "code": "daemon_start_failed",
+            "stateSchema": null,
+            "binarySchema": null,
+            "layer": "daemon_storage_reader",
+            "firstUnregisteredMigration": 14
+          }
+        },
+        "schemaBefore": 13,
+        "schemaAfter": 18,
+        "postUpgradeDataIntact": true,
+        "note": "The schema-changing target migrated 13->18; the old binary refused the newer state exactly and the same-version target read every post-upgrade row. Binary rollback never rolls data back."
+      }
+    },
+    "D-exact-schema-refusal": {
+      "status": "PASS",
+      "detail": {
+        "oldBinary": "d4eb3a13f4904d2d",
+        "oldReaderError": "MigrationIntegrityError: Applied migration <n> is not registered in this build (daemon log)",
+        "oldRestoreCode": "manifest_invalid",
+        "oldRestoreLayer": "bundle_evidence_format",
+        "newBinaryFutureSchemaCode": "state_schema_newer_than_binary",
+        "futureSchema": 99,
+        "stateUnchanged": true,
+        "writerStarted": false
+      }
+    },
+    "E1-tampered-target-refused": {
+      "status": "PASS",
+      "detail": {
+        "code": "target_tampered",
+        "instanceStillRunning": true
+      }
+    },
+    "E2-running-switch-refused": {
+      "status": "PASS",
+      "detail": {
+        "code": "upgrade_requires_stopped_instance"
+      }
+    },
+    "E3-unverified-instance-blocked": {
+      "status": "PASS",
+      "detail": {
+        "code": "unknown_live_resource",
+        "foreignProcessAlive": true
+      }
+    },
+    "E4-unhealthy-target-reverted": {
+      "status": "PASS",
+      "detail": {
+        "pointerAfterRevert": "7e8f6ce6fa2e2633",
+        "dataUntouched": true,
+        "schema": {
+          "before": 13,
+          "after": 18
+        }
+      }
+    },
+    "E5-interrupted-switch-recovered": {
+      "status": "PASS",
+      "detail": {
+        "status": "RECOVERED",
+        "buildId": "f55470ae14cc4985"
+      }
+    },
+    "E6-duplicate-refused": {
+      "status": "PASS",
+      "detail": {
+        "code": "upgrade_already_applied"
+      }
+    },
+    "E7-stop-unproven-kept": {
+      "status": "PASS",
+      "detail": {
+        "refused": "target_stop_unproven",
+        "journal": "target_stop_unproven",
+        "statusVisible": "target_stop_unproven",
+        "doctor": "WARN",
+        "settled": "REVERTED"
+      }
+    },
+    "E8-crash-after-stop-restarts-previous": {
+      "status": "PASS",
+      "detail": {
+        "journal": "switching",
+        "recovered": "RECOVERED_PREVIOUS",
+        "buildId": "7e8f6ce6fa2e2633",
+        "mode": "fixture",
+        "access": "local-development"
+      }
+    },
+    "E9-record-missing-reverted": {
+      "status": "PASS",
+      "detail": {
+        "journal": "reverted_after_failed_start",
+        "reason": "instance_record_missing",
+        "record": null,
+        "code": "upgrade_target_unhealthy"
+      }
+    },
+    "E10-orphan-api-stopped": {
+      "status": "PASS",
+      "detail": {
+        "orphanApiPid": 45977,
+        "orphanStopped": true,
+        "stopped": "STOPPED_ORPHAN",
+        "buildId": "f55470ae14cc4985",
+        "mode": "fixture"
+      }
+    },
+    "E11-unknown-live-blocked": {
+      "status": "PASS",
+      "detail": {
+        "code": "unknown_live_resource",
+        "strangerAlive": true,
+        "pointer": "7e8f6ce6fa2e2633"
+      }
+    },
+    "E12-reentry-refused-until-recover": {
+      "status": "PASS",
+      "detail": {
+        "reentry": "upgrade_recover_required",
+        "journal": "switched_unconfirmed",
+        "recovered": "RECOVERED"
+      }
+    },
+    "E13-kill-after-stop-recover": {
+      "status": "PASS",
+      "detail": {
+        "signal": "SIGKILL",
+        "journalAfterKill": "switching",
+        "reentry": "upgrade_recover_required",
+        "recovered": "RECOVERED_PREVIOUS",
+        "terminalJournal": "reverted_after_interrupted_switch",
+        "buildId": "7e8f6ce6fa2e2633"
+      }
+    },
+    "E14-kill-after-switch-recover": {
+      "status": "PASS",
+      "detail": {
+        "signal": "SIGKILL",
+        "journalAfterKill": "switched_unconfirmed",
+        "reentry": "upgrade_recover_required",
+        "recovered": "RECOVERED",
+        "terminalJournal": "confirmed",
+        "buildId": "f55470ae14cc4985"
+      }
+    }
+  },
+  "finishedAt": "2026-11-13T04:07:02.155Z",
+  "limitations": [
+    "Both D wave-07 artifacts use product schema 13, so the binary rollback check is compatibility-preserving; the incompatible-direction proof uses the frozen schema-12 wave-06 build.",
+    "Only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured; other platforms/ABIs are NOT_TESTED.",
+    "Reverting the install pointer is a binary rollback: data is never rolled back or deleted. Explicit `pa rollback --bundle`/`pa restore` is the only data-return path and preserves the original state.",
+    "No user service (5180-5185/8796-8801) was started or stopped; all roots/ports are isolated."
+  ]
+}
