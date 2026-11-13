@@ -1,0 +1,70 @@
+{
+  "wave": "product-wave-20",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "4c93817",
+  "previousCandidate": "e9073ed",
+  "packet": "agent-tasks/product-wave-20/agent-b-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0055",
+  "checkpoint": "1 of 3",
+  "scopeNote": "Zero real model and native turns. Only B-owned paths. No ledger/lifecycle/wire, no second coordinator, no shared-contract or main-product-class edit, no guard weakened. Twelve services untouched. Two historical report diffs and untracked b16-real-begin.mjs preserved.",
+
+  "normalControlUnchanged": {
+    "status": "NOT_REPACKETED",
+    "detail": "normal Q&A plus physical stop stay at 10/10 from wave-19. The producer was not rewritten this wave."
+  },
+
+  "wrapperBoundaries": {
+    "probe": "PA_ADMISSION_REPORT=/tmp/pa-b-wave20-goal-start.json node tools/bootstrap/probe-wave20-runtime.mjs <B-root>",
+    "outputPathWasNew": true,
+    "status": "PASS_SCOPED_WRAPPER_BOUNDARIES",
+    "passed": 3,
+    "failed": 0,
+    "sourceStable": true,
+    "classification": "PRIVATE_MOCK_WRAPPER_BOUNDARIES_ONLY",
+    "before": "1 PASS / 2 FAIL",
+    "cases": [
+      { "id": "FOREIGN_SOURCE_REFUSES_BEFORE_RECEIVER_CANCEL", "status": "PASS", "fix": "the authenticated inspection now runs BEFORE the guard and the cancel, so the server refuses a foreign producer/source and the receiver cancel counter stays 0" },
+      { "id": "REGISTERED_SOCKET_INODE_MUST_NOT_BE_REPINNED", "status": "PASS", "fix": "the registered dev/ino is passed through verbatim instead of being recomputed from a fresh lstat, so a replacement socket at the same path is rejected by the transport pin" },
+      { "id": "CURRENT_TWO_ACCEPTS_AND_EXPECTED_OLD_ONE_REFUSES_LOCALLY", "status": "PASS", "fix": "one canonical refusal name (epoch_not_current) replaces the two spellings that failed strict consumers; the current epoch accepts with the guard called once and the older epoch refuses with zero guard calls and zero receiver cancels" }
+    ]
+  },
+
+  "deliveredSource": {
+    "file": "apps/runner/src/business-reconnect.ts",
+    "typecheck": "clean under root strict tsconfig",
+    "guards": [
+      "product before-write callback still runs, unsuppressed, immediately before any cancel",
+      "foreign ticket/attempt/epoch refused locally before the socket is used",
+      "already_recorded ids are refused, never resent",
+      "returns the inspection proof beside sent, so sent is not presented as quiescence proof",
+      "registered endpoint helper consumes A's loadRecoveryRunner registration; no global socket scan and no unrelated credential is attempted"
+    ],
+    "explicitLimit": "authenticated inspect plus cancel is NOT a business resume. No business stream, session, fact sink or Broker attach exists here yet."
+  },
+
+  "notReached": {
+    "sameAttemptOriginalQuestionTargetBarrierAssertions": "not yet added to the product-lane harness",
+    "businessStreamSessionFactSinkBrokerAttachPortRfc": "not started",
+    "crossCoordinatorSameRunnerAndCommandWindows": "not started",
+    "validStaleEpochAgainstRealAttempt": "the probe's old-epoch case is a construction-time expected/binding mismatch with schema-valid values, not a runtime epoch advance; a real stale-epoch proof still needs current epoch >= 2",
+    "recoveredDeliveryInspectionHumanAccept": "not started",
+    "slots2And4AndReturn": "not started"
+  },
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "bConsumes": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "limitations": [
+    "the probe runs against probe-owned private mock services; it is scoped wrapper-boundary evidence, not product recovery",
+    "no physical writer, principal grant, installed-agent compatibility or release admission is claimed",
+    "only one of the three required runnable checkpoints has been published",
+    "the earlier wave-19 product-lane reconnect case still does not run, because that lane exposes no registered Runner endpoint; the registered-endpoint path is exercised only through the probe-owned services"
+  ]
+}
