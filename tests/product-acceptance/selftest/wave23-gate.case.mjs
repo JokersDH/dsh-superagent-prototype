@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { runCase, STATUS, LAYERS } from '../lib/status.mjs'
 import { evaluateRelease } from '../lib/release.mjs'
-import { tier } from '../lib/release-requirements.mjs'
+import { tier, INSTALL_CASES } from '../lib/release-requirements.mjs'
 import { resolveFixtureDigest } from '../lib/fixtures.mjs'
 import { DEFAULT_FROZEN_DIRS, loadFrozenArtifact } from '../lib/frozen-package.mjs'
 
@@ -19,8 +19,16 @@ const fixture = JSON.parse(readFileSync(new URL('../fixtures/wave22-595-report.j
 const recordedNow = Date.parse(fixture.checkedAt) + 1_000
 const copy = () => JSON.parse(JSON.stringify(fixture))
 const reuse = report => report.cases.find(item => item.id === 'E5-REVIEW-REUSE-CONSISTENCY')
+// The recorded 595 report predates the a9b-only E7-SCOPE-DIAGNOSTICS case. The historical positive
+// control uses the recorded required scope (present in that report); current runs still use the full
+// INSTALL_CASES set, so this is a recorded-time control, not a relaxation of today's gate.
+const recordedIds = new Set(fixture.cases.map(item => item.id))
+const requirement = {
+  ...tier('installed-alpha'),
+  cases: INSTALL_CASES.filter(entry => recordedIds.has(entry.id)),
+}
 const evaluate = (report, now = recordedNow) =>
-  evaluateRelease({ report, requirement: tier('installed-alpha'), expectedSource: fixture.source.commit, now, resolveFixture: resolveFixtureDigest })
+  evaluateRelease({ report, requirement, expectedSource: fixture.source.commit, now, resolveFixture: resolveFixtureDigest })
 const codes = result => new Set(result.failures.map(item => item.code))
 
 /** Hashes the same consumer files from a second frozen package, read from its tar bytes. */

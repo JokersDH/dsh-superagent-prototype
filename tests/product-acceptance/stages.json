@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-22/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-23/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "54d6e1b",
-  "checkpoint": null,
+  "base": "f29c9e6",
+  "checkpoint": "0f72838",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -18,66 +18,66 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Accurate 595 target",
+      "title": "Real 595 positive control and frozen scope",
       "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
       "notes": [
-        "All required cases, helper, consumer and upgrade pair move to 595b3f1/buildcc16eca05e4da244; e4e is the safety baseline and 97 the mock control. The old e4e 199PASS/1FAIL/15NT stays as history and is not carried to 595."
+        "The complete recorded 595 report (run 2026-11-13T14-48-56-062Z) is committed as the installed-alpha positive control, evaluated at its recorded time; the current re-check time is recorded separately. The 200 PASS/0 FAIL/15 NOT_TESTED and 161 required scope stay as measured history."
       ]
     },
     {
       "id": "E2",
-      "title": "REUSED terminal state calibrated",
+      "title": "Process identity is required",
       "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
       "notes": [
-        "Same valid selection may end as REUSED; the case requires the original PID, unchanged process start and the same actual health restoredReviewDigest. Different/missing file, changed port and unbound+selection remain blocked; rejections keep the PID. No hardcoded RUNNING-only success."
+        "reviewReuse now requires the observed original/reused process identity, the same process start on the REUSED instance and the original PID; deleting the observation, a null/empty/mismatched start or a different PID is rejected."
       ]
     },
     {
       "id": "E3",
-      "title": "Full consumer positive and foreign negative",
+      "title": "Digest and refusal observations are required",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "The 595 consumer positive reads package prepare/start files with hashes; the foreign consumer mutation and source-origin mutation remain rejected. The old e4e report with a real reuse FAIL is isolated: only its independently passing review/refusal evidence is used for source calibration."
+        "A digest-supporting package must expose healthDigest and an equal sameDigest; only an explicitly unsupported package can declare its scope. Every different/missing/port/unbound request needs a real BLOCKED terminal with a code, so RUNNING on the original PID without a reused flag or a missing observation is rejected. The real report is the positive; four single-observation mutations and the foreign consumer are rejected."
       ]
     },
     {
       "id": "E4",
-      "title": "Same-package personal read",
+      "title": "Same-package consumer bytes",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Package pa review-restored produces the 600 file and package bin/pa starts personal recovery: unbound 403, explicit 200 candidates/history/sources/original body, same-file REUSED with digest, different/narrow refusal, business 422, queue held, provider 0."
+        "Every required installed case compares subject, consumer package source/build/tar and the four consumer file hashes. A real second package entry rejects even when the data tuple is unchanged; no checkout can supply a missing package consumer."
       ]
     },
     {
       "id": "E5",
-      "title": "Formats, states and optional diagnostics",
+      "title": "Accurate a9b package",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "The package produces and verifies default v1 (13 families) and explicit v2 (21 families) from the restored store with version 3 refused and DB unchanged. 595 predates main 712, so ?scopeReview diagnostics are NOT_REACHED for this package; default shape and authorization stay as the package bytes define."
+        "Target is a9b155c/build9fdc283f55927f6f/tar 413dee2f…/20246850 bytes with 595 as the safety baseline; tuple, schema, ABI and consumer files are read from the extracted package before any flow."
       ]
     },
     {
       "id": "E6",
-      "title": "One real data chain",
+      "title": "Same data chain and both formats",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "Installed fixture/controlled product Work/Q&A/native_applied plus SDK/context/candidates stay in one store; second-root readonly reads them, refuses business writes, holds the queue and does not resend. Fixture, normal, recovered and vendor scopes stay separate."
+        "The package produces/verifies default v1 (13 families) and explicit v2 (21 families) snapshots over the same restored store; personal review reads the original Work/Q&A/context/candidate data with the package consumer, business 422, queue held and provider unchanged. Fixture/readonly stays a separate layer."
       ]
     },
     {
       "id": "E7",
-      "title": "Deployment and upgrade",
+      "title": "Optional diagnostics with real permission guards",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Cold/reuse/no-executor/multi-state, e4e→595 and 16→18, three fault windows with status/exit/pointer/operation/data, tamper refusal and rollback keeping post-upgrade data."
+        "a9b contains 712: default sources keep the old shape, ?scopeReview=1 returns the bounded context-scope-review/1 projection with authorization none, duplicate/unknown queries are refused, and a freshly prepared narrow restart explains the withheld body without serving it. Diagnostics never authorize."
       ]
     },
     {
       "id": "E8",
-      "title": "Private input refusals",
+      "title": "Ordinary install, reuse, upgrade and failure protection",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Fresh legal positive then valid-to-invalid changes: tampered/foreign root/public/symlink/FIFO/expired, existing output, unknown project and unsafe path are refused without a readable instance; expiry is exercised with its own prepared file rather than reusing the signature failure."
+        "Cold/reuse/no-executor/multi-state, 595→a9b and 16→18, real same-file REUSED with PID/start/digest, mismatched selection/port refused without stopping the live instance, tamper refusal and post-upgrade data kept. D dangerous live cleanup scripts are not run."
       ]
     },
     {
@@ -85,15 +85,15 @@
       "title": "Bounded usability",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "Concurrent readonly reads, repeated confirmations and a reopen return queue/counts/provider to baseline; desktop/mobile remain limited to the known workbench surfaces."
+        "Concurrent readonly reads, repeated confirmations and a reopen return queue/counts/provider to baseline; desktop/mobile remain limited to the known workbench surfaces; no long soak claim."
       ]
     },
     {
       "id": "E10",
-      "title": "Final same-consumer verdict",
+      "title": "Layered final verdict",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave22-status records the 595 data subject and consumer hashes separately, the REUSED/digest result, the optional-diagnostics scope and the retained historical e4e failure."
+        "wave23-status separates module/controlled/ordinary-installed/recovery/native/value and keeps the 595 measured scope, the a9b result and the old e4e failure. Required set is not relaxed; full-product stays refused for native evidence."
       ]
     }
   ]

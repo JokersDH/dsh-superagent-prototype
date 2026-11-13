@@ -1049,7 +1049,8 @@ export function evaluateRelease({
         item.evidence?.installedCandidates?.subject ?? item.evidence?.secondRoot?.subject ??
         item.evidence?.installedSourceConfirm?.subject ?? item.evidence?.installedStability?.subject ??
         item.evidence?.workflowFormats?.subject ?? item.evidence?.personalReview?.subject ??
-        item.evidence?.restoredReviewRefusals?.subject ?? item.evidence?.reviewReuse?.subject
+        item.evidence?.restoredReviewRefusals?.subject ?? item.evidence?.reviewReuse?.subject ??
+        item.evidence?.scopeDiagnostics?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
