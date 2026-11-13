@@ -1,0 +1,12 @@
+{
+  "protocol": "agent-c-wave23-suites/1",
+  "context": 129,
+  "proposals": 41,
+  "knowledge": 110,
+  "routing": 44,
+  "total": 324,
+  "result": "all PASS, 0 FAIL",
+  "strict": "tsc -p each owned package PASS",
+  "build": "pnpm -r --workspace-concurrency=4 run build -> 0",
+  "commands": ["node --test --experimental-strip-types --test-isolation=none --test-timeout=600000 --test-reporter=tap test/*.case.ts (each owned package)"]
+}

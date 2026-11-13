@@ -1,0 +1,17 @@
+TAP version 13
+W23_REUSED {"code":0,"status":"reused","record":{"protocol":"personal-workbench/1","pid":61345,"processStart":"Sat Nov 14 00:54:55 2026","apiPid":61346,"consolePid":61350,"consoleURL":"http://127.0.0.1:64540","apiURL":"http://127.0.0.1:64541","configurationRevision":"252e2ffad1960f2c9c13b5ee8319b8e515855c51e62762b79e0df32217607983","executionAvailability":{"state":"unavailable","reason":"recovery_readonly"},"restoredReviewDigest":"4fb0fe41be7ac9ad739f8a5a6d6a1fe88b830d69993a48f3d83f31877cb0f370","mode":"personal","access":"local-development"},"reusePorts":{"console":64540,"api":64541},"identity":{"requestedFile":"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave23-strict-QXroH0/kept-selection.json","requestedDigest":"4fb0fe41be7ac9ad739f8a5a6d6a1fe88b830d69993a48f3d83f31877cb0f370","actualHealthDigest":"4fb0fe41be7ac9ad739f8a5a6d6a1fe88b830d69993a48f3d83f31877cb0f370","recordPid":61345,"childPid":61361,"stateRoot":"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave23-strict-QXroH0/restored-v1","bound":true},"cleanup":{"owned":false,"attempted":true,"stopped":false,"detail":"reused-left-running"}}
+# Subtest: the driver asserts a real user flow, binds the actual consumer and rejects every requested mismatch
+ok 1 - the driver asserts a real user flow, binds the actual consumer and rejects every requested mismatch
+  ---
+  duration_ms: 67356.478209
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 67680.545625
