@@ -1,0 +1,19 @@
+✔ explicit startup selection binds current source, local principal and exact read-only paths without DB changes (31.596792ms)
+✔ startup refuses source changes (14.126083ms)
+✔ startup refuses marker changes (10.96425ms)
+✔ startup refuses signature changes (10.01575ms)
+✔ startup refuses requested scope changes (9.987375ms)
+✔ startup refuses unsafe file permissions (10.543417ms)
+✔ startup refuses symlink input (9.959084ms)
+✔ startup refuses FIFO input (21.887083ms)
+✔ expired, foreign principal, root and current local key cannot replay startup consent (11.39225ms)
+✔ unknown projects, unsafe paths and execution claims cannot enter an explicit review selection (16.194459ms)
+✔ actual personal startup reviews only explicitly rebound historical data; queues/model/native remain disabled (937.436125ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1456.573583

@@ -123,7 +123,11 @@ test('one real business+SDK store snapshots in both recipes and reopens read-onl
     database: { integrity: 'ok', foreignKeyViolations: 0, productSchema: 18 }, evidence: { status: 'verified' } }), { mode: 0o600 })
   const sourceRuntime = createProductRuntime({ store, stateRoot, scratchProject: projectRoot, principal,
     projects: [{ id: projectId, scope }], actionSecret: Buffer.alloc(32, 65), startupMode: 'recovery_readonly',
-    recoveryExecutor: () => ({ id: 'wave19-unified-readonly-executor', revision: 1, executable: process.execPath, expectedVersion: process.version }) })
+    recoveryExecutor: () => ({ id: 'wave19-unified-readonly-executor', revision: 1,
+      driverId: 'wave19-readonly-fixture', driverApiMajor: 1 as const, driverRelease: 'fixture-1',
+      executable: process.execPath, argv: [], expectedVersion: process.version,
+      nativeConfigRef: 'wave19-readonly-config', permissionPolicyRevision: 'wave19-readonly-policy',
+      requiredFeatures: [] }) })
   let sourceRecord: any
   try {
     const sourceApp = createLocalHttpApp({ application: sourceRuntime.application, principal, apiToken, bootstrapToken: 'b'.repeat(64),
@@ -133,8 +137,10 @@ test('one real business+SDK store snapshots in both recipes and reopens read-onl
       const response = await sourceApp.request(`http://127.0.0.1/v1/recovery/source/${path}`, { method: 'POST', headers, body: JSON.stringify(body) })
       return { status: response.status, value: await response.json() as any }
     }
+    const recoveryRead = sourceRuntime.read.recovery
+    assert.ok(recoveryRead)
     const preparedSource = await sourceRequest('prepare', {
-      preflight: { expectedFingerprint: (await sourceRuntime.read.recovery()).inspectionFingerprint,
+      preflight: { expectedFingerprint: (await recoveryRead()).inspectionFingerprint,
         bindings: [{ sourceProjectId: projectId, project: { path: projectRoot, check: 'node_test' } }] },
       targetStateRoot: join(root, 'wave19-empty-target') })
     assert.equal(preparedSource.status, 200, JSON.stringify(preparedSource.value))
