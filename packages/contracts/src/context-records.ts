@@ -28,12 +28,21 @@ export const ContextHistorySchema = z.strictObject({
 })
 
 /** Original frozen data only. Expiry is historical and this response carries no send/execute token. */
+export const ContextScopeReviewSchema = z.strictObject({ protocol: z.literal('context-scope-review/1'),
+  reasons: z.array(z.enum(['project_changed', 'selection_narrowed', 'selection_broadened', 'selection_replaced',
+    'exclusion_added', 'exclusion_removed', 'selection_validity_changed'])).max(7).readonly(),
+  partial: z.boolean(), withheldSourceCount: z.number().int().min(0).max(64), authorization: z.literal('none') })
+  .refine(value => new Set(value.reasons).size === value.reasons.length, 'Scope explanations must be distinct')
 export const ContextSourcesSchema = z.strictObject({
   protocol: z.literal('context-sources/1'), observedAt: TimestampSchema, binding: AssistantContextBindingSchema,
   state: z.enum(['verified', 'missing', 'unverified', 'scope_changed']),
   sources: ContextPreviewSchema.shape.sources, omitted: ContextPreviewSchema.shape.omitted,
   injectionFlags: ContextPreviewSchema.shape.injectionFlags,
+  scopeReview: ContextScopeReviewSchema.optional(),
 }).superRefine((value, ctx) => {
+  if (value.scopeReview && (value.scopeReview.partial !== (value.state !== 'verified') ||
+    value.scopeReview.withheldSourceCount !== (value.state === 'scope_changed' ? value.binding.sources.length : 0)))
+    ctx.addIssue({ code: 'custom', message: 'Scope diagnostics must preserve the authoritative original-source state' })
   if (value.state !== 'verified' && (value.sources.length || value.omitted.length || value.injectionFlags.length))
     ctx.addIssue({ code: 'custom', message: 'Unverified history must not contain source content' })
   if (value.state === 'verified' && (value.sources.length !== value.binding.sources.length || value.sources.some((source, index) => {

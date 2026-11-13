@@ -12,6 +12,7 @@ import type {
 import { ApplicationFault } from '@personal-agent/application'
 import { key } from '@personal-agent/orchestrator-core'
 import { scopeWithin } from '@personal-agent/questions'
+import { explainRestoredReviewScope } from '@personal-agent/context'
 import { canonicalDigest } from '@personal-agent/storage'
 import type { ProductStore } from '@personal-agent/storage'
 import { AssistantContextBundleSchema } from './assistant-context-use.ts'
@@ -120,16 +121,25 @@ export class ProductContextRecords {
         observedAt, entries, hasMore: page.hasMore, ...(body ? { nextCursor: `${body}.${this.sign(body)}` } : {}) })
     })
   }
-  sources(messageId: string): ContextSources | undefined {
+  sources(messageId: string, options: { scopeReview?: boolean } = {}): ContextSources | undefined {
     const id = IdSchema.parse(messageId), { store, bindings } = this.options
     return store.uow.atomic(() => {
       const input = bindings.forMessage(id)
       if (!input) return undefined
       if (input.messageId !== id) throw unavailable()
       const { binding, message } = this.record(input), observedAt = this.now()
+      const selection = this.project(binding.projectId).scope
+      const review = (state: ContextSources['state']) => {
+        if (!options.scopeReview) return {}
+        const explanation = explainRestoredReviewScope({ bindingScope: binding.scope, selection, sourcesState: state,
+          frozenSourceIds: binding.sources.map(source => source.sourceId) })
+        return { scopeReview: { protocol: 'context-scope-review/1', reasons: [...new Set([...explanation.reasons,
+          ...(binding.scope.expiresAt !== selection.expiresAt ? ['selection_validity_changed' as const] : [])])],
+        partial: state !== 'verified', withheldSourceCount: explanation.withheldSourceIds.length, authorization: 'none' } }
+      }
       const empty = (state: ContextSources['state']) => ContextSourcesSchema.parse({ protocol: 'context-sources/1',
-        observedAt, binding, state, sources: [], omitted: [], injectionFlags: [] })
-      if (!scopeWithin(binding.scope, this.project(binding.projectId).scope)) return empty('scope_changed')
+        observedAt, binding, state, sources: [], omitted: [], injectionFlags: [], ...review(state) })
+      if (!scopeWithin(binding.scope, selection)) return empty('scope_changed')
       if (!message) return empty('unverified')
       if (binding.bundleRef !== binding.bundleDigest) return empty('unverified')
       const artifact = store.artifacts.get(binding.bundleRef)
@@ -157,7 +167,7 @@ export class ProductContextRecords {
           digest(preview.selections) !== digest(binding.selections) || preview.sources.some(source =>
             sha(source.content) !== source.previewDigest || Buffer.byteLength(source.content) !== source.bytes)) return empty('unverified')
         return ContextSourcesSchema.parse({ protocol: 'context-sources/1', observedAt, binding, state: 'verified',
-          sources: preview.sources, omitted: preview.omitted, injectionFlags: preview.injectionFlags })
+          sources: preview.sources, omitted: preview.omitted, injectionFlags: preview.injectionFlags, ...review('verified') })
       } catch (error) {
         return empty((error as NodeJS.ErrnoException).code === 'ENOENT' ? 'missing' : 'unverified')
       }

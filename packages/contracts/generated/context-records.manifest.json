@@ -2,6 +2,6 @@
   "protocol": "context-records/1",
   "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
   "runtimeValidationRequired": true,
-  "schemaHash": "6899d40f16cf5b5fbea411372bd334460c4746a3f46c0158a18ea8e4c0b61005",
-  "sourceHash": "792e8b8d3eb5b6d6ded0cb3764566819171359db163df5e03d0435ec0ab3389b"
+  "schemaHash": "840d15f87a8456fe777105efd80c92856c330ff520251eb47e91c290e104a682",
+  "sourceHash": "7c241e0b68ab642b81501154060abbb06b553c934af511f03351c236ae5da30d"
 }
