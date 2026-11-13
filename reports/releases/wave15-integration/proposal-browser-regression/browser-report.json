@@ -1,0 +1,46 @@
+{
+  "status": "PASS_PROPOSAL_HTTP_BROWSER",
+  "sourceCommit": "104b7a08cccc88d6a5cc26b41ad22389fea1a36b",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-12T17:35:00.353Z",
+  "cases": [
+    {
+      "id": "EXPLICIT-PREVIEW-IS-READONLY-DESKTOP-AND-MOBILE",
+      "status": "PASS"
+    },
+    {
+      "id": "CONFIRM-CREATES-ONE-WORK-AND-NAVIGATES-TO-IT",
+      "status": "PASS"
+    },
+    {
+      "id": "REVISION-USES-THE-CURRENT-CONTRACT-AND-EXPLICIT-GOAL",
+      "status": "PASS"
+    },
+    {
+      "id": "DECISION-AND-REJECTION-ARE-DURABLE-WITHOUT-NEW-WORK",
+      "status": "PASS"
+    },
+    {
+      "id": "LOST-RESPONSE-RELOAD-KEEPS-EXACT-COMMAND-AND-ONE-EFFECT",
+      "status": "PASS"
+    },
+    {
+      "id": "REJECTED-RECEIPT-SETTLES-WITHOUT-AN-UNKNOWN-RETRY-LOOP",
+      "status": "PASS"
+    },
+    {
+      "id": "PROJECT-SCOPE-AND-MISSING-INPUTS-STAY-EXPLICIT",
+      "status": "PASS"
+    },
+    {
+      "id": "EXPIRED-PROJECT-EXPLAINS-DISABLED-PREVIEW",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "modelCalls": 0,
+  "limitations": [
+    "Real local HTTP/SQLite and UI over A/C ports; runtime effects not started",
+    "No real model/native/automatic structured reasoning or restored target activation"
+  ]
+}

@@ -8,6 +8,8 @@ export const AssistantInferenceRecordSchema = z.strictObject({
   kind: z.literal('assistant-inference/1'),
   input: z.strictObject({ messageId: IdSchema, conversationId: IdSchema, projectId: IdSchema }),
   model: model.nullable(),
+  replyFormat: z.enum(['plain', 'suggestions']).optional(),
+  sourceTextDigest: DigestSchema.optional(),
 })
 /** Minimal validated response data, not an SDK/session dump or an executable suggestion. */
 export const AssistantReplyBodySchema = z.strictObject({

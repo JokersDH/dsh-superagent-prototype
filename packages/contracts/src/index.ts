@@ -21,6 +21,7 @@ export * from './recovery-target.ts';
 export * from './context-preview.ts';
 export * from './assistant-context.ts';
 export * from './assistant-records.ts';
+export * from './assistant-candidates.ts';
 export * from './context-records.ts';
 export * from './recovery-source.ts';
 export type * from './types.ts';

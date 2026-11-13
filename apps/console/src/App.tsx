@@ -74,6 +74,8 @@ import { useReviewActivity } from './useReviewActivity.ts'
 import { AttentionInbox } from './AttentionInbox.tsx'
 import { DecisionWorkspace } from './DecisionWorkspace.tsx'
 import { ProposalWorkspace } from './ProposalWorkspace.tsx'
+import { ReplyCandidates } from './ReplyCandidates.tsx'
+import type { CandidateDraft } from './ReplyCandidates.tsx'
 import { ContextWorkspace } from './ContextWorkspace.tsx'
 import { ContextSourceRecord } from './ContextSources.tsx'
 import { WorkEvidencePanel } from './WorkEvidencePanel.tsx'
@@ -165,6 +167,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [catalogAvailable, setCatalogAvailable] = useState(false)
   const [decisionSource, setDecisionSource] = useState<ConversationMessage | null>()
   const [proposalSource, setProposalSource] = useState<ConversationMessage | null>()
+  const [candidateDraft, setCandidateDraft] = useState<CandidateDraft>()
   const conversationDrafts = useRef(new Map<string, string>())
   const [settledContextDraft, setSettledContextDraft] = useState<{ conversationId: string; text: string; commandId: string }>()
   const [assistant, setAssistant] = useState<AssistantProviderStatus | undefined>()
@@ -349,6 +352,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
       setWaitingAfter(undefined)
   }, [snapshot, waitingAfter])
   const selectConversation = (id: string, title: string) => {
+    setCandidateDraft(undefined)
     attentionNavigation.current += 1
     focusedWork.current = undefined
     attentionQuestion.current = undefined
@@ -760,7 +764,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             <CircleHelp size={18} />
           </a>
           {configuration?.decisionsAvailable && transport.decisions && transport.prepareDecision && transport.decisionCommand && <button type="button" className="icon-button" title="项目决定" aria-label="项目决定" onClick={() => setDecisionSource(null)}><Bookmark size={18} /></button>}
-          {configuration?.proposalsAvailable && transport.prepareProposal && transport.proposalCommand && <button type="button" className="icon-button" title="创建提案" aria-label="创建提案" onClick={() => setProposalSource(null)}><FileCheck2 size={18} /></button>}
+          {configuration?.proposalsAvailable && transport.prepareProposal && transport.proposalCommand && <button type="button" className="icon-button" title="创建提案" aria-label="创建提案" onClick={() => { setCandidateDraft(undefined); setProposalSource(null) }}><FileCheck2 size={18} /></button>}
           {((configuration?.contextPreviewAvailable && transport.contextPreview) || (configuration?.contextHistoryAvailable && transport.contextHistory)) && <button type="button" className="icon-button" title="上下文预览" aria-label="上下文预览" onClick={() => setContextOpen(true)}><Layers3 size={18} /></button>}
           <button
             type="button"
@@ -1056,6 +1060,9 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               onDraftChange={text => conversationDrafts.current.set(conversationId, text)}
               settledContextDraft={settledContextDraft?.conversationId === conversationId ? settledContextDraft : undefined}
               contextTransport={configuration?.contextSourcesAvailable || configuration?.assistantContextAvailable ? transport : undefined}
+              candidateTransport={configuration?.replyCandidatesAvailable ? transport : undefined}
+              configuration={configuration}
+              onCandidatePrepared={value => { if (conversationRef.current === value.preview.record.conversationId) { setProposalSource(undefined); setCandidateDraft(value) } }}
               snapshot={snapshot}
               projectFilter={projectFilter}
               selectedWork={selectedWork}
@@ -1075,7 +1082,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               onRecordDecision={configuration?.decisionsAvailable && transport.prepareDecision && transport.decisionCommand && transport.decisions
                 ? message => setDecisionSource(message) : undefined}
               onPropose={configuration?.proposalsAvailable && transport.prepareProposal && transport.proposalCommand
-                ? message => setProposalSource(message) : undefined}
+                ? message => { setCandidateDraft(undefined); setProposalSource(message) } : undefined}
               onSend={async (text, useWorkContext) => {
                 const command: UserCommand = {
                   commandId: newId('cmd-chat'),
@@ -1132,6 +1139,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 onSelect={async (model) => {
                   if (transport.selectModel) setAssistant(await transport.selectModel(model))
                 }}
+                onReload={refreshAssistant}
+                onSuggestions={transport.setAssistantSuggestions ? async enabled => { setAssistant(await transport.setAssistantSuggestions!(enabled)) } : undefined}
               />
             )}
             <div className="work-panels" hidden={modelPanelOpen}>
@@ -1262,12 +1271,13 @@ export function App({ transport }: { transport: ConsoleTransport }) {
         <DecisionWorkspace transport={transport} configuration={configuration} source={decisionSource ?? undefined}
           sources={snapshot?.conversation?.messages ?? []} initialProjectId={decisionSource?.projectId ?? projectFilter ?? configuration.projects[0]!.id}
           onClose={() => setDecisionSource(undefined)} />}
-      {auth === 'ready' && proposalSource !== undefined && configuration?.proposalsAvailable && configuration.projects.length > 0 &&
-        <ProposalWorkspace transport={transport} configuration={configuration} source={proposalSource ?? undefined}
+      {auth === 'ready' && (proposalSource !== undefined || candidateDraft) && configuration?.proposalsAvailable && configuration.projects.length > 0 &&
+        <ProposalWorkspace key={candidateDraft?.preview.token ?? 'manual-proposal'} transport={transport} configuration={configuration} source={proposalSource ?? undefined}
+          {...(candidateDraft ? { initialCandidate: candidateDraft } : {})}
           sources={snapshot?.conversation?.messages ?? []} works={snapshot?.works ?? []}
           initialProjectId={proposalSource?.projectId ?? projectFilter ?? configuration.projects[0]!.id}
-          onClose={() => setProposalSource(undefined)} onRecorded={async () => { await refresh() }}
-          onOpenWork={id => { setProposalSource(undefined); setSelectedWorkId(id); setInspectorOpen(true); setWorkspaceOpen(false); setModelPanelOpen(false) }} />}
+          onClose={() => { setProposalSource(undefined); setCandidateDraft(undefined) }} onRecorded={async () => { await refresh() }}
+          onOpenWork={id => { setProposalSource(undefined); setCandidateDraft(undefined); setSelectedWorkId(id); setInspectorOpen(true); setWorkspaceOpen(false); setModelPanelOpen(false) }} />}
     </div>
   )
 }
@@ -1420,10 +1430,14 @@ function ModelPanel({
   status,
   onClose,
   onSelect,
+  onReload,
+  onSuggestions,
 }: {
   status: AssistantProviderStatus | undefined
   onClose: () => void
   onSelect: (model: string) => Promise<void>
+  onReload: () => Promise<void>
+  onSuggestions: ((enabled: boolean) => Promise<void>) | undefined
 }) {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | undefined>()
@@ -1434,9 +1448,9 @@ function ModelPanel({
           <Sparkles size={17} />
           对话模型
         </h2>
-        <button className="icon-button" type="button" onClick={onClose} aria-label="关闭模型设置" title="关闭">
+        <div className="section-tools"><button type="button" className="icon-button" title="刷新模型设置" aria-label="刷新模型设置" disabled={pending} onClick={() => void onReload()}><RefreshCw size={16} /></button><button className="icon-button" type="button" onClick={onClose} aria-label="关闭模型设置" title="关闭">
           <X size={16} />
-        </button>
+        </button></div>
       </div>
       <div className="provider-state">
         <span className={`state-dot ${status?.state ?? ''}`} />
@@ -1477,6 +1491,13 @@ function ModelPanel({
           </option>
         ))}
       </select>
+      {status?.suggestionsEnabled !== undefined && onSuggestions && <label className="settings-toggle model-suggestion-setting">
+        <input type="checkbox" checked={status.suggestionsEnabled} disabled={!status.configured || pending || status.state === 'responding'}
+          onChange={async event => {
+            const enabled = event.target.checked; setPending(true); setError(undefined)
+            try { await onSuggestions(enabled) } catch { setError('设置结果尚未确认，请刷新核对。') } finally { setPending(false) }
+          }} /><span>提案建议</span>
+      </label>}
       <dl className="provider-facts">
         <dt>服务地址</dt>
         <dd>{status?.baseURL ?? '未配置'}</dd>
@@ -2028,6 +2049,9 @@ function Conversation({
   onDraftChange,
   settledContextDraft,
   contextTransport,
+  candidateTransport,
+  configuration,
+  onCandidatePrepared,
   snapshot,
   projectFilter,
   selectedWork,
@@ -2054,6 +2078,9 @@ function Conversation({
   onDraftChange: (value: string) => void
   settledContextDraft: { text: string; commandId: string } | undefined
   contextTransport: ConsoleTransport | undefined
+  candidateTransport: ConsoleTransport | undefined
+  configuration: ApplicationConfiguration | undefined
+  onCandidatePrepared: (value: CandidateDraft) => void
   snapshot: Snapshot | undefined
   projectFilter: string | undefined
   selectedWork: WorkView | undefined
@@ -2174,6 +2201,9 @@ function Conversation({
                 <button type="button" className="icon-button message-decision" title="记录为项目决定" aria-label="记录为项目决定" onClick={() => onRecordDecision(message)}><Bookmark size={14} /></button>}
             </header>
             <MessageText text={message.text} />
+            {message.role === 'assistant' && message.provenance === 'reasoner_reply' && message.sourceRefs[0] &&
+              candidateTransport?.replyCandidates && configuration && <ReplyCandidates message={message} transport={candidateTransport}
+                configuration={configuration} onPrepared={onCandidatePrepared} />}
             {message.role === 'user' && message.provenance === 'trusted_user' && !message.anchor && contextTransport?.assistantContext &&
               <MessageContextAudit message={message} transport={contextTransport} />}
           </article>

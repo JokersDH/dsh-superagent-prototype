@@ -1,6 +1,7 @@
 import { z } from 'zod'
+import { createHash } from 'node:crypto'
 import { IdSchema, JsonSchema } from '@personal-agent/contracts'
-import type { AssistantContextBinding, ConversationMessage } from '@personal-agent/contracts'
+import type { AssistantContextBinding, ConversationMessage, Scope } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { key } from '@personal-agent/orchestrator-core'
 import { canonicalDigest } from '@personal-agent/storage'
@@ -20,7 +21,7 @@ export function handleAssistantReplies(
   store: ProductStore,
   provider: AssistantModelPort,
   streams?: AssistantStreams,
-  capabilities?: { nativeExecution: boolean; executionUnavailable?: boolean; canReply?(message: ConversationMessage): boolean; completed?: CompletedAssistantReplies; context?(message: ConversationMessage): Promise<{
+  capabilities?: { nativeExecution: boolean; executionUnavailable?: boolean; canReply?(message: ConversationMessage): boolean; proposalScope?(projectId: string): Scope | undefined; completed?: CompletedAssistantReplies; context?(message: ConversationMessage): Promise<{
     binding: AssistantContextBinding; content: string; assertCurrent(): void
   } | undefined> },
 ) {
@@ -130,10 +131,17 @@ export function handleAssistantReplies(
         return
       }
       const model = prepared?.model ?? provider.status().model
+      const replyFormat = (prepared?.suggestionsEnabled ?? provider.status().suggestionsEnabled) ? 'suggestions' : 'plain'
+      const scope = replyFormat === 'suggestions' ? capabilities?.proposalScope?.(input.projectId) : undefined
+      const proposalContext = scope ? { projectId: input.projectId, sourceMessageId: input.messageId,
+        ...(Buffer.byteLength(JSON.stringify(scope)) <= 16384 ? { scope: structuredClone(scope) } : {}) } : undefined
+      const sourceTextDigest = createHash('sha256').update(user.text).digest('hex')
       const body = JsonSchema.parse({
         messageId: input.messageId,
         conversationId: input.conversationId,
         model,
+        replyFormat, sourceTextDigest,
+        ...(proposalContext ? { proposalContext } : {}),
         ...(prepared ? { configurationDigest: prepared.configurationDigest } : {}),
         messages,
         ...(context ? { contextRequestId: context.binding.requestId, bundleDigest: context.binding.bundleDigest } : {}),
@@ -141,7 +149,7 @@ export function handleAssistantReplies(
       try {
         store.uow.atomic(() => {
           context?.assertCurrent()
-          store.commands.record(requestId, canonicalDigest(body), () => ({ kind: 'assistant-inference/1', input, model }))
+          store.commands.record(requestId, canonicalDigest(body), () => ({ kind: 'assistant-inference/1', input, model, replyFormat, sourceTextDigest }))
           store.events.append({
             topic: 'application.assistant.responding',
             entityRef: input.conversationId,
@@ -176,6 +184,7 @@ export function handleAssistantReplies(
             streams?.append(input.messageId, text)
           },
           signal,
+          proposalContext,
         )
       } catch (error) {
         streams?.finish(input.messageId, 'interrupted')
