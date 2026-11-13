@@ -1,0 +1,45 @@
+{
+  "protocol": "wave17-main-source-confirmation/1",
+  "date": "2026-11-13",
+  "source": "6050b4bf066d170c54c45e7f9bf4024abac285dc",
+  "scope": "Actual restored runtime/HTTP/A18 source-intent confirmation only",
+  "implemented": [
+    "Signed strict source preparation and explicit confirmation",
+    "Server-computed principal/state/host/isolation-policy/preflight binding",
+    "Original RecoveryIntentCommitter/A facts/events/receipt transaction",
+    "Exact ignoreCommitted postguard in the same UnitOfWork",
+    "Original same-channel request replay after expiry and runtime/process reopen"
+  ],
+  "notImplemented": [
+    "Private startup permission",
+    "Physical writer quiescence admission",
+    "B recovered business integration",
+    "Target activation",
+    "Recovery confirmation UI",
+    "Current installed release admission"
+  ],
+  "checks": {
+    "newHttpAndProcessTests": 14,
+    "independentProductProcessSigkillWindows": 2,
+    "cleanRecoveryCandidateProposalTests": 106,
+    "contracts": 230,
+    "productStrict": "PASS",
+    "httpStrict": "PASS",
+    "generated": "PASS",
+    "wireHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+    "cleanTestSource": "6050b4bf066d170c54c45e7f9bf4024abac285dc",
+    "sourceWorktreeDirtyAtCleanRun": false,
+    "independentReview": "Postguard thenable finding reproduced, fixed and independently confirmed resolved"
+  },
+  "regressionCommand": "node --test tests/integration/recovery-source-confirmation.case.mjs tests/integration/recovery-intents.case.mjs tests/integration/recovery-preflight.case.mjs tests/integration/recovery-logical-source.case.mjs tests/integration/recovery-target-http.case.mjs tests/integration/recovery-target-service.case.mjs tests/integration/recovery-activation-record.case.mjs tests/integration/recovery-startup.case.mjs tests/integration/assistant-candidates.case.mjs tests/integration/proposal-commands.case.mjs",
+  "authorization": "not_granted",
+  "startupAvailable": false,
+  "productSchema": 18,
+  "migrationsAdded": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "preservedOldServicePairs": 12,
+  "userServicesRestarted": false,
+  "newPreviewStarted": false,
+  "releaseApproved": false
+}

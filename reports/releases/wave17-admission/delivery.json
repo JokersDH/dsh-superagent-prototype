@@ -1,0 +1,197 @@
+{
+  "protocol": "wave17-delivery-admission/1",
+  "status": "BLOCKED_BY_SAME_UID_UNREGISTERED_CHILD_OWNERSHIP",
+  "sources": {
+    "main": "7a2f9e98ef8c52680e7766a25cc83aa13e3253b9",
+    "mainProductCheckpoint": "1169535",
+    "d": "6f05ab5045e48e15dea05b82ad85e075791562ed",
+    "e": "79e0ab5eb6b0624e84ca00d37ca2a98537ae9715",
+    "eRecordedTestSource": "4a71624e1f7df93bc3f11228e88e0a2e6cb15cb3",
+    "laterMainFollowup": {
+      "source": "e32a3fceed79bf210c8592982c15769eaa61ed0c",
+      "scope": "Main subsequently published actual source prepare/confirm entrypoints. This is not an execution grant or target activation. The fixed audited delivery input above remains 7a2f9e9."
+    }
+  },
+  "safety": {
+    "vendorModelSends": 0,
+    "nativeTurnStarts": 0,
+    "candidateLiveResourcesStarted": 0,
+    "probeActualOsScans": 0,
+    "probeActualOsSignals": 0,
+    "liveInstallStopUpgradeCleanupMatricesRun": false,
+    "userServicesPreserved": "All twelve pairs 5180-5191 / 8796-8807",
+    "userStateProfilesTarsLedgersChanged": false,
+    "dWorktreeClean": true,
+    "eUntrackedRunDirectoriesPreserved": 71,
+    "productionAndAcceptanceSourcesChanged": false,
+    "repositoryWrites": [
+      "reports/releases/wave17-admission/delivery.json",
+      "tools/bootstrap/probe-wave17-delivery.mjs",
+      "tools/bootstrap/probe-wave17-release-gate.mjs"
+    ],
+    "temporaryArtifactsRetained": "/tmp/pa-wave17-delivery-audit-0guO8q",
+    "mockCoverage": "All identity reads, inventory, signals and candidate process launches are injected or forbidden, including processUid/processStart/processCommand/captureProcessFacts/stopProcess. Git metadata reads are outside the candidate lifecycle."
+  },
+  "verification": {
+    "dPrevious": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave17-d-previous.json node --experimental-test-module-mocks tools/bootstrap/probe-wave16-delivery.mjs /Users/hh/Desktop/joker/superagent-agent-d /tmp/pa-wave17-delivery-audit-0guO8q/install",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "scope": "Complete parent positive; foreign-UID child refused; globally discovered UNKNOWN preserved; actual recovery BLOCKED without a pointer change.",
+      "report": "/tmp/pa-wave17-d-previous.json"
+    },
+    "ePrevious": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave17-e-previous.json node tools/bootstrap/probe-wave16-release-gate.mjs /Users/hh/Desktop/joker/superagent-agent-e",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "scope": "Unchanged actual personal HTTP positive passes. BLOCKED, fixture, missing copy exit/code, step-only faults, foreign ABI/platform/arch, and actual recover BLOCKED/nonzero mutations are refused with focal reasons.",
+      "report": "/tmp/pa-wave17-e-previous.json"
+    },
+    "dSameUidChild": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave17-d-persistent.json node --experimental-test-module-mocks tools/bootstrap/probe-wave17-delivery.mjs /Users/hh/Desktop/joker/superagent-agent-d /tmp/pa-wave17-delivery-audit-0guO8q/install",
+      "exitCode": 1,
+      "passed": 1,
+      "failed": 2,
+      "scope": "Complete independently modeled parent positive passes; only the child UID differs from the prior focused child test. Same-UID unregistered child and actual recovery both fail complete-resource-identity expectations.",
+      "report": "/tmp/pa-wave17-d-persistent.json",
+      "previousObservationReport": "/tmp/pa-wave17-delivery-audit-0guO8q/d-same-uid-results.json"
+    },
+    "eFocalRecovery": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave17-e-persistent.json node tools/bootstrap/probe-wave17-release-gate.mjs /Users/hh/Desktop/joker/superagent-agent-e",
+      "exitCode": 1,
+      "passed": 1,
+      "failed": 2,
+      "scope": "Actual unchanged six-case installed evidence positive passes. Two focal mutations retain all unrelated evidence: NO_OP with exit1 and missing both pointer observations. Both are incorrectly accepted. No full installed-tier release PASS is claimed.",
+      "report": "/tmp/pa-wave17-e-persistent.json",
+      "previousObservationReport": "/tmp/pa-wave17-delivery-audit-0guO8q/e-focal-recovery-results.json"
+    },
+    "artifactBytes": {
+      "command": "node /tmp/pa-wave17-delivery-audit-0guO8q/verify-bytes.mjs",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave17-delivery-audit-0guO8q/artifact-verified.json"
+    }
+  },
+  "persistentProbeOutputPolicy": "Both tools require an explicit absolute PA_ADMISSION_REPORT and exclusively create a new 0600 report. Existing evidence is never overwritten. D takes candidateRoot and a previously verified frozen install; E takes candidateRoot and retains the actual six-case positive control before focal mutations.",
+  "closedScopes": [
+    "D foreign-UID child identity is independently read and refused; globally discovered status UNKNOWN remains unverifiable and blocks actual pointer recovery.",
+    "D recover CLI now maps NO_OP/RECOVERED/RECOVERED_PREVIOUS/REVERTED/CONFIRMED to exit0 and BLOCKED to exit2. The previously recorded legacy exit1 is not a current D source regression.",
+    "E now refuses actual recover BLOCKED/nonzero and validates operation-after and nonnull pointer mismatch, preserving all previous behavior/mode/subject guards.",
+    "E actual RUNNING personal mock-provider context/history/source/reply flow remains a valid positive for its exact old 8962d10 artifact.",
+    "D97cace7 artifact genuinely includes current main1169535 nonempty suggestions, candidate routes, private default-off preferences and console candidate/preference bytes.",
+    "No claim that a new main feature missing from E's older tested artifact is a regression of that older package."
+  ],
+  "findings": [
+    {
+      "id": "D-SAME-UID-CHILD-PATH-OWNERSHIP",
+      "priority": 1,
+      "status": "FAIL",
+      "file": "apps/launcher/lib/upgrade.mjs",
+      "lines": [504, 546, 591, 596],
+      "summary": "Descendants inherit the verified parent's candidate tree. The new child check verifies only the current UID, then private path tokens still grant owned status without independent child start/argv/config/data/install/operation birth identity.",
+      "observed": "The complete parent positive succeeds. A same-UID child with unrelated command, different start and no registered birth is SIGTERMed and stop is proven. UID is read for both, but startReads contains only the parent. Actual recoverSwitch(target_stop_unproven) follows this path, signals the child and returns REVERTED.",
+      "expected": "Same user and ancestry/path are not complete ownership. Unknown child identity must remain unproven, receive no signal, and block pointer recovery.",
+      "cases": ["UNREGISTERED_SAME_UID_CHILD", "ACTUAL_RECOVER_UNREGISTERED_SAME_UID_CHILD"],
+      "scope": "This does not reopen the closed foreign-UID test; it tests the remaining same-UID complete-identity requirement on actual current exports and recover entrypoint."
+    },
+    {
+      "id": "E-NO-OP-EXIT-ONE-ACCEPTED",
+      "priority": 2,
+      "status": "FAIL",
+      "file": "tests/product-acceptance/lib/release.mjs",
+      "lines": [390],
+      "relatedTest": "tests/product-acceptance/cases/e4-upgrade-fault-child.mjs:91",
+      "summary": "All successful recovery statuses accept exit0 or exit1 without a status/subject-specific relation; the child test still uses recognized status OR exit0.",
+      "observed": "The actual recorded target_unhealthy NO_OP/exit0 control passes. Changing only recover.exit to1 remains accepted by the same gate.",
+      "expected": "NO_OP is exit0 in both the tested older artifact and the fixed current CLI. Legacy RECOVERED_PREVIOUS/exit1 history cannot justify accepting NO_OP/exit1 or blanket nonzero recovery for every subject.",
+      "case": "NO_OP_WITH_EXIT_ONE"
+    },
+    {
+      "id": "E-MISSING-POINTER-PAIR-ACCEPTED",
+      "priority": 2,
+      "status": "FAIL",
+      "file": "tests/product-acceptance/lib/release.mjs",
+      "lines": [393],
+      "summary": "The pointer check rejects null or inequality but permits two missing undefined observations.",
+      "observed": "On the unchanged passing actual crash_after_stop control, deleting pointerBefore and pointerAfter leaves undefined===undefined and the gate accepts.",
+      "expected": "Both pointer observations must exist and be valid identities, then their relation must match the recovery operation and terminal status.",
+      "case": "POINTER_EVIDENCE_MISSING"
+    }
+  ],
+  "artifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave16-target/wave16-target-97cace7.tar.gz",
+    "tarSha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+    "tarBytes": 20218294,
+    "source": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+    "sourceDirty": false,
+    "buildId": "8a5a0a85631f22ca",
+    "productSchemaActualExport": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeActual": "24.21.0",
+    "abiActual": "137",
+    "sqliteActual": "3.53.4",
+    "inventoryEntries": 6731,
+    "regularFilesHashAndSizeVerified": 6710,
+    "internalSymlinksVerified": 21,
+    "extractedBytes": 67462076,
+    "installManifestSha256": "57090a6d219c03524eb307317919d4a301b5908873e53f7d74df36a810f3e5a6",
+    "releaseManifestSha256": "d692db162a4474ee0c96ec4efbb6fbeefef205015091fd4adf76ae92e584c245",
+    "closureDigest": "b3c2d7c585956dd7c9b9467dc2ab5c0e8e077fcc3ac2d7f02c4764859ec3ee1e",
+    "verifiedInstallRoot": "/tmp/pa-wave17-delivery-audit-0guO8q/install",
+    "modeScope": "Personal-capable bytes verified; no live instance started by this audit.",
+    "temporalScope": "97cace7 genuinely includes main1169535 candidate/preference functionality. It predates the later e32a3fc source prepare/confirm entrypoints; those missing later APIs are a chronological package boundary, not a regression. Main source prepare/confirm is now delivered, while execution grant and target activation remain separate.",
+    "capabilitiesFromActualBytes": {
+      "main1169535AncestorOfArtifactSource": true,
+      "nonemptySuggestionsStored": "assistant-reply-results.ts:43 uses response.suggestions",
+      "candidateReadAndPrepareHttp": "http/app.ts:443 and :450",
+      "privatePreferences": "model-provider.ts:103/:151 private .assistant-settings.json",
+      "defaultOff": "model-provider.ts:114 falls back to false",
+      "singleSdkToolResponsePath": "model-provider.ts:236 tools/tool_choice and :281 returned suggestions",
+      "consoleScript": "index-DJa5Q3MZ.js",
+      "consoleContainsSuggestionsFlag": true,
+      "consoleContainsCandidateRoute": true,
+      "consoleBuildMode": "http",
+      "consoleBuildDigest": "0a187b365290a9c2e77ff541d5abcd6c4f22072cf43263bafa2d696da206c02f"
+    }
+  },
+  "eRecordedScope": {
+    "counts": { "PASS": 171, "FAIL": 0, "NOT_TESTED": 17 },
+    "testSource": "4a71624e1f7df93bc3f11228e88e0a2e6cb15cb3",
+    "productSource": "8962d102711e2d2f6b9bb8d5b8ed98437348f6a3",
+    "buildId": "88df6d2eef1feeb7",
+    "tarSha256": "11497980a4077e854b64596c71efe45b1e68e058639838acef0b07657d61f54b",
+    "installedAlpha": "FAIL",
+    "requiredBlocker": "E5-D-OWNERSHIP-MOCKS is NOT_TESTED",
+    "mainSourceCandidateFlow": "E4-CANDIDATE-FLOW is recorded PASS in controlled-fixture scope with candidates/executable=false/prepare200/confirm recorded/replay recorded/providerCalls1.",
+    "installedCandidates": "E5-INSTALLED-CANDIDATES remains NOT_TESTED on exact older 8962d10 subject, where candidate GET404 is an expected temporal limitation.",
+    "limitation": "This audit preserves those old scoped outcomes. They are not acceptance or rejection of D97cace7 or current main1169535 candidate behavior."
+  },
+  "nextPackages": {
+    "d": [
+      "Replace same-UID ancestry/path ownership with complete independently tracked identities for every child/resource; preserve the closed foreign-UID and UNKNOWN behavior.",
+      "Unify record/API/console/child proof with real birth and expected operation; never infer missing child start/argv/root/install/operation from its parent.",
+      "Publish a runnable safety checkpoint with complete registered-child positive and unregistered same-UID helper/recover negatives; require no child signal/no pointer change on refusal.",
+      "After safety passes, execute bounded newly born owned parent-death/pre-record/ACK/partial-stop scenarios with the same proof used for cleanup.",
+      "Preserve current97cace7 candidate/preferences/M1/logical-preflight scope; refreeze only changed runtime bytes with an exact clean tuple.",
+      "Generate a returned nonempty suggestion through a local mock SDK/provider in personal mode, exercise candidate prepare/confirm/replay and default-off preferences without vendor/native sends.",
+      "Include nonempty reply/candidate body, decision or held work, context sources and receipts in relocated backup tests; keep credentials and execution permission out.",
+      "Run different-binary current-schema upgrade and legacy16 migration with explicit compatible CLI exit/status/operation/pointer/data results and protected post-upgrade writes.",
+      "Keep support bundles private/redacted/no-overwrite and target material inert; activation remains main-owned and separately gated.",
+      "Publish early/mid/final source, immutable artifact tuple and E recipe; preserve all twelve instances and all old artifacts."
+    ],
+    "e": [
+      "Preserve the coherent actual personal HTTP positive and all seven closed focal refusal checks.",
+      "Require status-specific successful exit semantics; reject NO_OP/exit1 and remove recognized-status OR exit0 shortcuts from actual child acceptance.",
+      "Require present valid pointer observations and operation identity before checking equality; retain the exact missing-pointer negative with unchanged other evidence.",
+      "Independently reproduce complete child/resource D mocks, including same-UID unregistered child and actual recovery, before broad live matrices.",
+      "Consume97cace7 or its accurately refrozen safety successor as a new subject; do not relabel8962d10 historical installed results.",
+      "Verify personal default-off/private preference, local SDK nonempty suggestion, actual candidate read/prepare/explicit confirm/reject/replay and original context/history/source/reply on the same package.",
+      "Tie HTTP bodies, request/result/artifact/source identities and runtime mode to the frozen subject; preserve source-fixture versus installed evidence layers.",
+      "Verify nonempty restored candidates/decisions/held work and exact-source different-binary upgrades with protected writes and no authorization inheritance.",
+      "Run a bounded meaningful stability sequence with actual queue/request/resource outcomes and no model/native sends.",
+      "Generate layered verdicts from current actual evidence, retaining old scopes and explicit native/activation/value limits; publish early/mid/final checkpoints on the original origin branch."
+    ]
+  }
+}

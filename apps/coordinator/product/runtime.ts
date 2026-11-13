@@ -6,7 +6,7 @@ import { sharedAttentionRanker } from '@personal-agent/routing'
 import { recoveryTargetInventory } from '@personal-agent/storage'
 import type { AssistantContextBindings, AssistantContextHistory, AssistantContextPrepare, AssistantContextSend, AssistantReplyResults, AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryActivationCommit, RecoveryPrepare, RecoveryTargetInventoryReader, RecoveryTargetMaterial, RecoveryTargetMaterializer, RecoveryTargetPrepareInput, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
 import { ExecutionUnavailableReasonSchema, WorkEvidenceSchema } from '@personal-agent/contracts'
-import type { ExecutionUnavailableReason } from '@personal-agent/contracts'
+import type { AgentProfile, ExecutionUnavailableReason, RecoverySourcePrepare, RecoverySourceConfirm } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { CheckRegistry } from '@personal-agent/verification'
@@ -29,6 +29,7 @@ import { ProductAttention } from './attention.ts'
 import { ProductDecisions } from './decisions.ts'
 import { projectAcceptedOutcome } from './accepted-outcomes.ts'
 import { ProductRecovery } from './recovery.ts'
+import { ProductRecoverySource } from './recovery-source-confirmation.ts'
 import { ProductProposals } from './proposals.ts'
 import { readRecoveryActivationRecord } from './recovery-intents.ts'
 import { ProductEvidenceHistory } from './evidence-history.ts'
@@ -57,6 +58,7 @@ export function createProductRuntime(
     assistantContextBindings?: AssistantContextBindings
     assistantReplyResults?: AssistantReplyResults
     contextHistory?: AssistantContextHistory
+    recoveryExecutor?: () => AgentProfile
     recoveryTargets?: {
       materializer: RecoveryTargetMaterializer
       inventory?: RecoveryTargetInventoryReader
@@ -184,7 +186,11 @@ export function createProductRuntime(
   const decisions = new ProductDecisions(store, options.principal, () => configuredProjects, options.actionSecret, options.now)
   const proposals = new ProductProposals(store, application, decisions, options.principal, () => configuredProjects, options.actionSecret, options.now, completedReplies)
   const recovery = new ProductRecovery(store, { stateRoot: options.stateRoot, startupMode: options.startupMode ?? 'normal',
-    principal: options.principal, projects: () => configuredProjects, ...(options.now ? { now: options.now } : {}) })
+    principal: options.principal, projects: () => configuredProjects, ...(options.now ? { now: options.now } : {}),
+    ...(options.recoveryExecutor ? { executor: options.recoveryExecutor } : {}) })
+  const recoverySource = new ProductRecoverySource(store, recovery, { stateRoot: options.stateRoot,
+    startupMode: options.startupMode ?? 'normal', principal: options.principal, secret: options.actionSecret,
+    ...(options.now ? { now: options.now } : {}) })
   const attention = new ProductAttention(store, application, completion, {
     projectIds: () => configuredProjects.map(project => project.id), verification: work => execution!.verificationStatus(work),
     ranker: options.attentionRanker ?? sharedAttentionRanker, ...(options.now ? { now: options.now } : {}),
@@ -456,6 +462,8 @@ export function createProductRuntime(
     projectSettings,
     operations: { retryVerification: application.retryVerification.bind(application), conversation: async (command: ConversationCommand, actor: TrustedActor) => conversations.dispatch(command, actor),
       recoveryPrepare: async (input: RecoveryPrepare, actor: TrustedActor) => recovery.prepare(input, actor),
+      recoverySourcePrepare: async (input: RecoverySourcePrepare, actor: TrustedActor) => recoverySource.prepare(input, actor),
+      recoverySourceConfirm: async (input: RecoverySourceConfirm, actor: TrustedActor) => recoverySource.confirm(input, actor),
       ...(recoveryTargets ? { recoveryTargetPrepare: (input: RecoveryTargetPrepareInput, actor: TrustedActor) => {
         if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Target preparation requires restored read-only startup', 'none')
         return recoveryTargets.prepare(input, actor)
