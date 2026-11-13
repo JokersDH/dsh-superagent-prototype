@@ -118,10 +118,14 @@ test('explicit personal readonly startup reads real Work/Q&A and SDK data withou
   await waitUntil(async () => { if (child.exitCode !== null || child.signalCode !== null) throw new Error(output.text.slice(-2000));
     try { return (await fetch(`${narrowApi}/v1/health`)).ok } catch { return false } })
   assert.equal((await fetch(`${narrowApi}/v1/context/history?projectId=${projectId}`, { headers })).status, 200)
-  const narrowSources = await fetch(`${narrowApi}/v1/messages/${contextMessageId}/context/sources`, { headers })
+  const narrowSources = await fetch(`${narrowApi}/v1/messages/${contextMessageId}/context/sources?scopeReview=1`, { headers })
   assert.equal(narrowSources.status, 200, await narrowSources.clone().text())
   const narrowView = await narrowSources.json()
   assert.equal(narrowView.state, 'scope_changed'); assert.deepEqual(narrowView.sources, [])
+  assert.deepEqual([...narrowView.scopeReview.reasons].sort(), ['exclusion_added', 'selection_narrowed'])
+  assert.equal(narrowView.scopeReview.partial, true)
+  assert.equal(narrowView.scopeReview.withheldSourceCount, narrowView.binding.sources.length)
+  assert.equal(narrowView.scopeReview.authorization, 'none')
   const narrowRefusal = await fetch(`${narrowApi}/v1/commands`, { method: 'POST', headers: { ...headers, 'content-type': 'application/json' },
     body: JSON.stringify({ kind: 'answer_question', questionId: businessQuestionId, expectedVersion: 1, answer: { kind: 'free_text', text: 'x' } }) })
   assert.equal(narrowRefusal.status, 422)

@@ -1,0 +1,20 @@
+{
+  "status": "PASS_LONG_DISPATCH_STATIC_ONLY",
+  "roles": 6,
+  "phases": 60,
+  "checkpoints": 31,
+  "localLinks": 136,
+  "acyclic": true,
+  "nonoverlappingOwners": true,
+  "repairedControlAdmitted": true,
+  "businessAttachStillRequired": true,
+  "scopeDiagnosticOptInOnly": true,
+  "scopeDiagnosticUiImplemented": false,
+  "exact595VerdictRequired": true,
+  "oldE4eFailurePreserved": true,
+  "ordinaryInstallIndependentOfActivation": true,
+  "budgetUnchanged": true,
+  "preservedServicePairs": 12,
+  "runtimeTests": 0,
+  "nativeTurnStarts": 0
+}
