@@ -116,6 +116,9 @@ try {
   if (!historyEntries.some((entry) => (entry.messageId ?? entry.record?.messageId) === messageId)) throw new Error('main context history did not expose the sent message')
   const sourcesRead = await product.read.contextSources(messageId)
   if (sourcesRead === undefined || sourcesRead === null) throw new Error('main frozen-source reader returned no audit for the sent message')
+  // Nonempty suggestion generation through main's candidate reader is NOT_TESTED in this fixture:
+  // it requires main/C's verified completed body plus proposal scope, which this isolated data recipe
+  // does not create. The source-confirmation recipe consumes the real e32 HTTP path separately.
   const replySnapshot = { requestId, replyMessageId: reply.replyMessageId, sourceMessageId: reply.sourceMessageId, textDigest: reply.textDigest, artifactDigest: reply.artifactDigest, model: reply.model }
   await product.close(); store.close()
 
@@ -123,6 +126,7 @@ try {
   store = new storage.ProductStore({ path: databasePath })
   const reopenedReply = store.workflows.assistant.replyResults.forRequest(requestId)
   if (reopenedReply === undefined || reopenedReply.textDigest !== replySnapshot.textDigest) throw new Error('the reply result did not survive a Store reopen')
+
   const evidenceSummary = storage.readWorkflowEvidence(databasePath)
   const families = Object.fromEntries(evidenceSummary.families.map((family) => [family.name, family.count]))
   if ((families.assistant_context_bindings ?? 0) < 1) throw new Error('the context binding family is empty in A backup evidence')
