@@ -395,16 +395,53 @@ export function installedStabilityIssues(value) {
   if (value.reopened !== 'RUNNING' || value.reopenedEqual !== true) issues.push('reopen')
   return issues
 }
+export function personalReviewIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const before = value.before ?? {}, after = value.after ?? {}, issues = []
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  if (value.mode !== 'personal' || value.state !== 'recovery_readonly' || !isSubstantive(value.entryOrigin)) issues.push('mode')
+  if (before.healthy !== true || before.candidates !== 403 || before.history !== 403) issues.push('unbound')
+  if (after.candidates !== 200 || after.history !== 200 || after.sources !== 200 || after.originalBody !== true) issues.push('bound')
+  if (value.business !== 422) issues.push('business')
+  if (value.queueHeld !== true) issues.push('queue')
+  if (value.reviewFile?.mode !== '600' || value.reviewFile?.access !== 'historical_data_read_only' || value.reviewFile?.startupAvailable !== false) issues.push('review_file')
+  if (!Number.isSafeInteger(value.providerRequests)) issues.push('provider')
+  return issues
+}
+export function restoredReviewRefusalsIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const results = value.results ?? {}, issues = []
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  if (value.mode !== 'personal' || !isSubstantive(value.entryOrigin)) issues.push('mode')
+  for (const name of ['tamperedSignature', 'foreignRoot', 'publicMode', 'symlink', 'fifo'])
+    if (results[name]?.healthy !== false) issues.push(name)
+  for (const name of ['existingOutput', 'unknownProject', 'unsafePath'])
+    if (!Number.isInteger(results[name]?.status) || results[name].status === 0) issues.push(name)
+  if (results.expiredOrTampered?.healthy !== false) issues.push('expired_or_tampered')
+  if (!Array.isArray(value.notTestedEntry) || !isSubstantive(value.notTestedReason)) issues.push('scope')
+  return issues
+}
 export function workflowFormatsIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
   if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
   if (value.mode !== 'installed_bytes') issues.push('mode')
-  if (JSON.stringify(value.snapshotProtocols) !== JSON.stringify(['workflow-snapshot/1'])) issues.push('snapshot_protocol')
-  if (JSON.stringify(value.evidenceProtocols) !== JSON.stringify(['workflow-evidence/1'])) issues.push('evidence_protocol')
-  if (value.hasFormatVersion !== false || value.hasFamilySetVersion !== false) issues.push('dual_version_claim')
-  if (!value.v1 || value.v1.protocol !== 'workflow-evidence/1' || !(value.v1.families >= 13) || !HEX.test(String(value.v1.digest ?? ''))) issues.push('v1_data')
-  if (!value.v2 || value.v2.protocol !== 'workflow-evidence/1' || value.v2.families !== value.v1?.families) issues.push('v2_claim')
+  const scope = value.capability
+  if (scope !== 'default1+explicit2' && scope !== 'v1-only') issues.push('capability')
+  if (!value.v1 || value.v1.status !== 'ok' || value.v1.protocol !== 'workflow-snapshot/1' ||
+    value.v1.evidenceProtocol !== 'workflow-evidence/1' || value.v1.families !== 13 ||
+    value.v1.familySetVersion !== null || value.v1.verified !== 'ok' || !HEX.test(String(value.v1.digest ?? ''))) issues.push('v1')
+  if (scope === 'default1+explicit2') {
+    if (!value.v2 || value.v2.status !== 'ok' || value.v2.protocol !== 'workflow-snapshot/2' ||
+      value.v2.evidenceProtocol !== 'workflow-evidence/2' || value.v2.families !== 21 ||
+      value.v2.familySetVersion !== 2 || value.v2.verified !== 'ok' || !HEX.test(String(value.v2.digest ?? ''))) issues.push('v2')
+    else if (value.v2.digest === value.v1.digest) issues.push('v2_recipe')
+    if (!value.invalid3 || value.invalid3.rejected !== true || value.invalid3.destinationCreated !== false) issues.push('invalid_version')
+    if (value.dbUnchanged !== true) issues.push('source_db')
+    if (!value.snapshotProtocols?.includes('workflow-snapshot/2') || !value.evidenceProtocols?.includes('workflow-evidence/2')) issues.push('protocol_pair')
+  } else if (scope === 'v1-only') {
+    if (!value.v2 || value.v2.unsupported !== true || value.v2.families !== 13 || value.snapshotProtocols?.includes('workflow-snapshot/2')) issues.push('v2_claim')
+  }
   if (value.portability?.installArtifact !== 'pa-install/1' || value.portability?.restoreReport !== 'personal-restore/1' ||
     !isSubstantive(value.explicitV2)) issues.push('protocol_separation')
   return issues
@@ -950,7 +987,8 @@ export function evaluateRelease({
         item.evidence?.backupContextReply?.subject ?? item.evidence?.ownershipMocks?.subject ??
         item.evidence?.installedCandidates?.subject ?? item.evidence?.secondRoot?.subject ??
         item.evidence?.installedSourceConfirm?.subject ?? item.evidence?.installedStability?.subject ??
-        item.evidence?.workflowFormats?.subject
+        item.evidence?.workflowFormats?.subject ?? item.evidence?.personalReview?.subject ??
+        item.evidence?.restoredReviewRefusals?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
@@ -998,7 +1036,7 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
           for (const issue of fn(result.evidence?.[key]))
             failures.push(fail(key === 'ownershipMocks' ? (OWNERSHIP_ISSUE_CODES[issue] ?? 'ownershipMocks_invalid') : `${key}_invalid`, `${key} ${issue}`, entry.id))

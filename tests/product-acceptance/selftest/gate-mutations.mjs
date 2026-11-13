@@ -124,15 +124,35 @@ const evidenceFor = (key) => {
       return { crashedCalls: 1, recoveredCalls: 0, replies: 1 }
     case 'replyBadArtifact':
       return { calls: 0, replies: 0, notice: '无法核对' }
+    case 'personalReview':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'personal', state: 'recovery_readonly', entryOrigin: 'main CLI + demo.ts',
+        before: { healthy: true, candidates: 403, history: 403 },
+        after: { candidates: 200, history: 200, sources: 200, originalBody: true },
+        reviewFile: { mode: '600', access: 'historical_data_read_only', startupAvailable: false },
+        business: 422, queueHeld: true, providerRequests: 2,
+      }
+    case 'restoredReviewRefusals':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'personal', entryOrigin: 'main CLI + demo.ts',
+        results: { tamperedSignature: { healthy: false }, foreignRoot: { healthy: false }, publicMode: { healthy: false },
+          symlink: { healthy: false }, fifo: { healthy: false }, expiredOrTampered: { healthy: false },
+          existingOutput: { status: 1 }, unknownProject: { status: 1 }, unsafePath: { status: 1 } },
+        notTestedEntry: ['expiry with a valid signature'], notTestedReason: 'forging a signature needs the probe-owned action key',
+      }
     case 'workflowFormats':
       return {
         subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
-        mode: 'installed_bytes', snapshotProtocols: ['workflow-snapshot/1'], evidenceProtocols: ['workflow-evidence/1'],
-        hasFormatVersion: false, hasFamilySetVersion: false, readSignature: 'export function readWorkflowEvidence(databasePath: string)',
-        v1: { protocol: 'workflow-evidence/1', families: 13, digest: DIGEST, complete: true },
-        v2: { protocol: 'workflow-evidence/1', families: 13 },
+        mode: 'installed_bytes', capability: 'default1+explicit2',
+        snapshotProtocols: ['workflow-snapshot/1', 'workflow-snapshot/2'], evidenceProtocols: ['workflow-evidence/1', 'workflow-evidence/2'],
+        hasFormatVersion: true, hasFamilySetVersion: true, readSignature: 'export function readWorkflowEvidence(databasePath: string, version: 1 | 2 = 1)',
+        v1: { protocol: 'workflow-snapshot/1', evidenceProtocol: 'workflow-evidence/1', families: 13, familySetVersion: null, status: 'ok', verified: 'ok', digest: DIGEST },
+        v2: { protocol: 'workflow-snapshot/2', evidenceProtocol: 'workflow-evidence/2', families: 21, familySetVersion: 2, status: 'ok', verified: 'ok', digest: 'c'.repeat(64) },
+        invalid3: { rejected: true, destinationCreated: false }, dbUnchanged: true, dbBytes: 679936,
         portability: { installArtifact: 'pa-install/1', restoreReport: 'personal-restore/1' },
-        explicitV2: 'NOT_TESTED: no v2 code in the frozen package',
+        explicitV2: 'verified: workflow-snapshot/2 with 21 families and familySetVersion 2',
       }
     case 'installedStability':
       return {
@@ -1236,8 +1256,7 @@ const CASES = [
     check: ({ assert }) =>
       rejectWith(assert, 'WORKFLOW_V2', (report) => {
         const item = findCase(report, 'E5-WORKFLOW-FORMATS').evidence.workflowFormats
-        item.hasFormatVersion = true
-        item.snapshotProtocols = ['workflow-snapshot/1', 'workflow-snapshot/2']
+        item.v2 = { ...item.v2, families: 13 }
         return report
       }, 'workflowFormats_invalid'),
   },
@@ -1249,6 +1268,24 @@ const CASES = [
         delete findCase(report, 'E7-SECOND-ROOT-READONLY').evidence.secondRoot.probeScope
         return report
       }, 'secondRoot_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-PERSONAL-REVIEW-UNBOUND-READ',
+    title: 'An unbound restored personal start that already reads the project is not the explicit-review proof',
+    check: ({ assert }) =>
+      rejectWith(assert, 'PERSONAL_UNBOUND', (report) => {
+        findCase(report, 'E4-PERSONAL-RESTORED-REVIEW').evidence.personalReview.before.candidates = 200
+        return report
+      }, 'personalReview_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-PERSONAL-REVIEW-FIFO-ALLOWED',
+    title: 'A blocking FIFO review input that still starts is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'REVIEW_FIFO', (report) => {
+        findCase(report, 'E5-RESTORED-REVIEW-REFUSALS').evidence.restoredReviewRefusals.results.fifo.healthy = true
+        return report
+      }, 'restoredReviewRefusals_invalid'),
   },
   {
     id: 'E1-MUTATE-SELF-CLAIM',

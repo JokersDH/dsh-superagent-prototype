@@ -142,7 +142,7 @@ await collect('e3', async () => {
   }
 })
 await collect('e4', async () => {
-  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery] = await Promise.all([
+  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview] = await Promise.all([
     import('./cases/e4-stability.mjs'),
     import('./cases/e4-wave04.mjs'),
     import('./cases/e5-release.mjs'),
@@ -151,6 +151,7 @@ await collect('e4', async () => {
     import('./cases/e4-reply-durable.mjs'),
     import('./cases/e4-source-confirm.mjs'),
     import('./cases/w18-installed-recovery.mjs'),
+    import('./cases/w20-personal-review.mjs'),
   ])
   const first = await stability.runE4({
     root,
@@ -165,8 +166,9 @@ await collect('e4', async () => {
   const sixth = await replyDurability.runReplyDurability({ root, runDirectory: run.directory })
   const seventh = await sourceConfirm.runSourceConfirm({ root, runDirectory: run.directory })
   const eighth = await installedRecovery.runInstalledRecovery({ root, runDirectory: run.directory })
+  const ninth = await personalReview.runPersonalReview({ root, runDirectory: run.directory })
   return {
-    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases],
     artifacts: {
       screenshots: [
         ...(first.artifacts?.screenshots ?? []),

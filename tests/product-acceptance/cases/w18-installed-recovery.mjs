@@ -3,7 +3,7 @@ import { createServer } from 'node:net'
 import { DatabaseSync } from 'node:sqlite'
 import { createHash } from 'node:crypto'
 import {
-  existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync,
+  copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -200,7 +200,7 @@ async function provision(target) {
     const restore = launcher(install, ['restore', '--bundle', bundle, '--to', restoredRoot, '--json'], { timeoutMs: 90_000 })
     if (restore.status !== 0 || restore.json?.status !== 'RESTORED') throw new Error(`restore ${restore.status}: ${restore.stderr}`)
     const marker = join(restoredRoot, 'restore-report.json')
-    const format = await packagedFormatEvidence(install, restoredRoot, marker)
+    const format = await packagedFormatEvidence(install, restoredRoot, marker, own)
     const beforeDb = snapshotDb(join(restoredRoot, 'state.sqlite'))
     const [rp, rap] = [await freePort(), await freePort()]
     restoredStarted = start(install, { port: rp, apiPort: rap, env: { PA_DATA_ROOT: restoredRoot, PA_MODEL_CONFIG: mock.file } })
@@ -310,17 +310,49 @@ async function provision(target) {
  * Reads the snapshot/evidence support of the frozen package itself. The package's own dist and
  * source bytes decide which workflow format exists; a later main source tree cannot lend v2 to it.
  */
-async function packagedFormatEvidence(install, restoredRoot, marker) {
+async function packagedFormatEvidence(install, restoredRoot, marker, workRoot) {
   const read = relative => readFileSync(join(install, 'app', relative), 'utf8')
   const snapshotSource = read('packages/workflows/src/snapshot.ts')
   const backupSource = read('packages/storage/src/backup.ts')
   const storage = await import(pathToFileURL(join(install, 'app/packages/storage/dist/index.js')).href)
-  const dbPath = join(restoredRoot, 'state.sqlite')
-  const call = arg => {
-    try { return { ok: true, value: storage.readWorkflowEvidence(dbPath, ...(arg === undefined ? [] : [arg])) } }
-    catch (error) { return { ok: false, error: String(error?.message ?? error).slice(0, 200) } }
+  const workflows = await import(pathToFileURL(join(install, 'app/packages/workflows/dist/index.js')).href)
+  const work = mkdtempSync(join(workRoot, 'format-'))
+  const dbPath = join(work, 'state.sqlite')
+  copyFileSync(join(restoredRoot, 'state.sqlite'), dbPath)
+  for (const suffix of ['-wal', '-shm']) {
+    if (existsSync(join(restoredRoot, `state.sqlite${suffix}`))) copyFileSync(join(restoredRoot, `state.sqlite${suffix}`), `${dbPath}${suffix}`)
   }
-  const v1 = call(undefined), v2 = call(2)
+  if (existsSync(join(restoredRoot, 'artifacts'))) cpSync(join(restoredRoot, 'artifacts'), join(work, 'artifacts'), { recursive: true })
+  const dbBefore = sha(readFileSync(dbPath))
+  const supportsV2 = /formatVersion/u.test(snapshotSource) && /familySetVersion/u.test(backupSource)
+  const format = { work }
+  try {
+    const store = new storage.ProductStore({ path: dbPath })
+    try {
+      const snaps = new workflows.WorkflowSnapshots(store)
+      const v1 = await snaps.create({ destination: join(work, 'v1') })
+      const v1Verify = snaps.verify(join(work, 'v1'))
+      format.v1 = { status: v1.status, protocol: v1.manifest.protocol, evidenceProtocol: v1.manifest.evidence.protocol,
+        families: v1.manifest.evidence.families.length, familySetVersion: v1.manifest.evidence.familySetVersion ?? null,
+        verified: v1Verify.status, digest: v1.manifest.evidence.digest }
+      if (supportsV2) {
+        const v2 = await snaps.create({ destination: join(work, 'v2'), formatVersion: 2 })
+        const v2Verify = snaps.verify(join(work, 'v2'))
+        format.v2 = { status: v2.status, protocol: v2.manifest.protocol, evidenceProtocol: v2.manifest.evidence.protocol,
+          families: v2.manifest.evidence.families.length, familySetVersion: v2.manifest.evidence.familySetVersion ?? null,
+          verified: v2Verify.status, digest: v2.manifest.evidence.digest }
+      } else {
+        const legacy = storage.readWorkflowEvidence(dbPath, 2)
+        format.v2 = { unsupported: true, protocol: legacy.protocol, families: legacy.families?.length ?? 0 }
+      }
+      let invalidError = null
+      const invalidDir = join(work, 'invalid-3')
+      try { await snaps.create({ destination: invalidDir, formatVersion: 3 }) } catch (error) { invalidError = String(error?.message ?? error).slice(0, 200) }
+      format.invalid3 = { rejected: invalidError !== null, destinationCreated: existsSync(invalidDir), error: invalidError }
+      format.dbUnchanged = sha(readFileSync(dbPath)) === dbBefore
+      format.dbBytes = statSync(dbPath).size
+    } finally { store.close() }
+  } finally { rmSync(work, { recursive: true, force: true }) }
   const restoreProtocol = existsSync(marker) ? JSON.parse(readFileSync(marker, 'utf8')).protocol ?? null : null
   const installManifest = existsSync(join(install, 'install.json'))
     ? JSON.parse(readFileSync(join(install, 'install.json'), 'utf8')) : null
@@ -330,9 +362,9 @@ async function packagedFormatEvidence(install, restoredRoot, marker) {
     evidenceProtocols: [...new Set(backupSource.match(/workflow-evidence\/\d/g) ?? [])].sort(),
     hasFormatVersion: /formatVersion/u.test(snapshotSource),
     hasFamilySetVersion: /familySetVersion/u.test(backupSource),
+    supportsV2,
     readSignature: (backupSource.match(/export function readWorkflowEvidence\([^)]*\)/) ?? [null])[0],
-    v1: v1.ok ? { protocol: v1.value.protocol, families: v1.value.families?.length ?? 0, digest: v1.value.digest, complete: v1.value.complete } : v1,
-    v2: v2.ok ? { protocol: v2.value.protocol, families: v2.value.families?.length ?? 0 } : v2,
+    ...format,
     portability: { installArtifact: installProtocol, restoreReport: restoreProtocol },
   }
 }
@@ -420,40 +452,35 @@ export async function runInstalledRecovery() {
       assert('FORMAT_PROVISIONED', observed?.format !== undefined, failure ?? 'no observation')
       if (!observed?.format) return
       const format = observed.format
-      assert('FORMAT_SNAPSHOT_V1_ONLY', JSON.stringify(format.snapshotProtocols) === JSON.stringify(['workflow-snapshot/1']), JSON.stringify(format.snapshotProtocols))
-      assert('FORMAT_EVIDENCE_V1_ONLY', JSON.stringify(format.evidenceProtocols) === JSON.stringify(['workflow-evidence/1']), JSON.stringify(format.evidenceProtocols))
-      assert('FORMAT_NO_DUAL_VERSION', format.hasFormatVersion === false && format.hasFamilySetVersion === false &&
-        !/version/iu.test(String(format.readSignature ?? '')), JSON.stringify({ formatVersion: format.hasFormatVersion, familySetVersion: format.hasFamilySetVersion, signature: format.readSignature }))
-      assert('FORMAT_V1_DATA', format.v1?.ok !== false && format.v1?.protocol === 'workflow-evidence/1' && format.v1?.families >= 13 &&
-        /^[a-f0-9]{64}$/u.test(String(format.v1?.digest ?? '')), JSON.stringify(format.v1))
-      assert('FORMAT_V2_ABSENT', format.v2?.ok !== false && format.v2?.protocol === 'workflow-evidence/1' && format.v2?.families === format.v1?.families,
-        JSON.stringify({ v2: format.v2, v1Families: format.v1?.families }))
+      assert('FORMAT_V1_DEFAULT', format.v1?.status === 'ok' && format.v1?.protocol === 'workflow-snapshot/1' &&
+        format.v1?.evidenceProtocol === 'workflow-evidence/1' && format.v1?.families === 13 && format.v1?.familySetVersion === null &&
+        format.v1?.verified === 'ok' && /^[a-f0-9]{64}$/u.test(String(format.v1?.digest ?? '')), JSON.stringify(format.v1))
+      if (format.supportsV2) {
+        assert('FORMAT_V2_EXPLICIT', format.v2?.status === 'ok' && format.v2?.protocol === 'workflow-snapshot/2' &&
+          format.v2?.evidenceProtocol === 'workflow-evidence/2' && format.v2?.families === 21 && format.v2?.familySetVersion === 2 &&
+          format.v2?.verified === 'ok' && /^[a-f0-9]{64}$/u.test(String(format.v2?.digest ?? '')), JSON.stringify(format.v2))
+        assert('FORMAT_V2_DISTINCT', format.v2?.digest !== format.v1?.digest, JSON.stringify({ v1: format.v1?.digest, v2: format.v2?.digest }))
+        assert('FORMAT_INVALID_VERSION_REFUSED', format.invalid3?.rejected === true && format.invalid3?.destinationCreated === false,
+          JSON.stringify(format.invalid3))
+        assert('FORMAT_SOURCE_DB_UNCHANGED', format.dbUnchanged === true, String(format.dbUnchanged))
+        assert('FORMAT_PROTOCOL_PAIR', format.snapshotProtocols.includes('workflow-snapshot/1') && format.snapshotProtocols.includes('workflow-snapshot/2') &&
+          format.evidenceProtocols.includes('workflow-evidence/1') && format.evidenceProtocols.includes('workflow-evidence/2'), JSON.stringify({ snapshot: format.snapshotProtocols, evidence: format.evidenceProtocols }))
+      } else {
+        // Old v1-only bytes keep their measured scope; the case never invents v2 for them.
+        assert('FORMAT_V1_ONLY_OLD_SCOPE', format.v2?.unsupported === true && format.v2?.families === 13 &&
+          !format.snapshotProtocols.includes('workflow-snapshot/2'), JSON.stringify(format.v2))
+      }
       assert('FORMAT_PROTOCOL_SEPARATION', format.portability?.installArtifact === 'pa-install/1' &&
         format.portability?.restoreReport === 'personal-restore/1' &&
         !format.snapshotProtocols.includes(format.portability.restoreReport), JSON.stringify(format.portability))
       evidence.workflowFormats = { subject: frozenArtifactSubject(target), mode: 'installed_bytes',
+        capability: format.supportsV2 ? 'default1+explicit2' : 'v1-only',
         snapshotProtocols: format.snapshotProtocols, evidenceProtocols: format.evidenceProtocols,
         hasFormatVersion: format.hasFormatVersion, hasFamilySetVersion: format.hasFamilySetVersion, readSignature: format.readSignature,
-        v1: format.v1, v2: format.v2, portability: format.portability,
-        explicitV2: 'NOT_TESTED: this frozen package has no workflow-snapshot/2 or versioned readWorkflowEvidence code; main 985 source cannot certify it' }
-    }))
-
-  cases.push(notTested({ ...define('E4-PERSONAL-READONLY-REBIND', 'A restored personal project is read through main\'s explicit readonly rebinding entry with its original text and change refusal'), evidence: {} },
-    'NOT_TESTED: the installed restore lane starts with --fixture and main recovery_readonly; main has not published the restored-personal project readonly rebinding entry that would authorise reading a user project and refusing changes. The current 403 must not be relaxed or borrowed as an installed permission. Required: main readonly binding for a real personal project, original text readback, explicit change refusal and no inherited execution authority.'))
-
-  cases.push(await runCase({ ...define('E9-INSTALLED-STABILITY', 'Bounded concurrent reads, repeated confirmation and a service reopen on the second root return every request/queue/resource to baseline'), evidence: {} },
-    async ({ assert, evidence }) => {
-      assert('INSTALLED_STABILITY_PROVISIONED', observed !== undefined, failure ?? 'no observation')
-      if (!observed) return
-      const s = observed.stress
-      assert('INSTALLED_STABILITY_CONCURRENT', s.concurrent.length === 4 && s.concurrent.every(status => status === 200), JSON.stringify(s.concurrent))
-      assert('INSTALLED_STABILITY_REPEATED', s.repeatedEqual === true && observed.source.replayEqual === true, JSON.stringify({ repeated: s.repeatedEqual, replay: observed.source.replayEqual }))
-      assert('INSTALLED_STABILITY_QUEUE', s.queueReturned === true && s.countsStable === true, JSON.stringify({ queue: s.queueReturned, counts: s.countsStable }))
-      assert('INSTALLED_STABILITY_NO_RESEND', s.providerUnchanged === true, String(s.providerUnchanged))
-      assert('INSTALLED_STABILITY_REOPEN', observed.source.reopened === 'RUNNING' && observed.source.reopenedEqual === true, JSON.stringify({ status: observed.source.reopened, equal: observed.source.reopenedEqual }))
-      evidence.installedStability = { subject: frozenArtifactSubject(target), mode: 'recovery_readonly',
-        concurrent: s.concurrent, repeatedEqual: s.repeatedEqual, queueReturned: s.queueReturned, countsStable: s.countsStable,
-        providerUnchanged: s.providerUnchanged, reopened: observed.source.reopened, reopenedEqual: observed.source.reopenedEqual }
+        v1: format.v1, v2: format.v2, invalid3: format.invalid3 ?? null, dbUnchanged: format.dbUnchanged ?? null, dbBytes: format.dbBytes ?? null,
+        portability: format.portability,
+        explicitV2: format.supportsV2 ? 'verified: workflow-snapshot/2 with 21 families and familySetVersion 2'
+          : 'NOT_REACHED for this frozen package: no versioned snapshot code, v1-only scope kept' }
     }))
 
   return { cases, artifacts: {} }
