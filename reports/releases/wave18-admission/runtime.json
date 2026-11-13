@@ -1,0 +1,260 @@
+{
+  "protocol": "wave18-b-admission/1",
+  "status": "PARTIAL_PRODUCT_STARTUP_JOIN_CONFIRMED_PREPARATION_BLOCKED",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "source": "1e1f82a6a0076ea06c7a3d769388b6a4b1bc8bd5",
+  "mainSource": "d494212f7658c228eb4f0d24639b22fd1fe95109",
+  "mainRuntimeSource": "6050b4bf066d170c54c45e7f9bf4024abac285dc",
+  "previousReviewedCandidate": "8d7ddce71be191cab9789c78c3592fc1c7ee1905",
+  "realModelTurns": 0,
+  "vendorNativeTurnStarts": 0,
+  "budgetLedgerOpened": false,
+  "preparationContractAdmitted": false,
+  "businessRecoveryAdmitted": false,
+  "physicalBarrierAdmitted": false,
+  "newCommittedFiles": [
+    "tests/native-acceptance/b17-product-native.mjs",
+    "tests/native-acceptance/fixtures/fake-codex-executable.mjs",
+    "tests/native-acceptance/reports/wave17-status.json"
+  ],
+  "untrackedExcluded": {
+    "path": "tests/native-acceptance/b16-real-begin.mjs",
+    "preserved": true,
+    "executed": false,
+    "countedAsDelivery": false
+  },
+  "candidateObserved": {
+    "realProductRuntimeUsed": true,
+    "realApplicationCreateWorkUsed": true,
+    "realEffectsAndNativeProductAttemptUsed": true,
+    "originalCodexProductDriverUsed": true,
+    "realRunnerAndFakeExecutableChildSpawned": true,
+    "fakeExecutableOperational": false,
+    "bindingState": "stopping",
+    "registeredChildResource": "res-3744-c624437ae1db",
+    "fullChildBirthPidStartUidManifestMeasured": false,
+    "receiverFrames": [],
+    "receiverBeginCount": 0,
+    "factKinds": ["writer.observed", "runtime.error"],
+    "runtimeErrorDetail": { "code": "protocol_error" },
+    "tables": {
+      "works": 1,
+      "ticket": 1,
+      "ticket_links": 1,
+      "effect": 2,
+      "fact_receipts": 2,
+      "dispatch_receipts": 0,
+      "user_questions": 0,
+      "answers": 0,
+      "answer_deliveries": 0,
+      "runtime_bindings": 1,
+      "runtime_current": 1
+    },
+    "scope": "New real product-startup/owned-child/failure-fact persistence scope. This is more than the prior direct Runner receiver half, but it does not reach policy.prepared, begin, approval or recovery. The candidate status correctly says NOT_CLOSED."
+  },
+  "commands": [
+    {
+      "command": "node --check tests/native-acceptance/fixtures/fake-codex-executable.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "error": "SyntaxError: missing ) after argument list",
+      "fileLine": 29,
+      "offendingSource": "process.stdin.on('data', chunk => transport.send(chunk as Uint8Array))"
+    },
+    {
+      "command": "node tests/native-acceptance/fixtures/fake-codex-executable.mjs --version",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "error": "The same .mjs parse error occurs before the --version branch can run."
+    },
+    {
+      "command": "NODE_OPTIONS='--import=/tmp/pa-wave15-b-source-loader.mjs' env -u PA_RUNNER_SCENARIO -u PA_RUNNER_RECEIVER_LOG -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN -u PA_FAKE_APPROVAL node /tmp/pa-wave18-b17-observe.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "completedCandidateTotals": null,
+      "error": "The unchanged B17 assertions first record failure before begin, then time out waiting for a begin frame. No final candidate case report is produced.",
+      "scope": "In-memory replay of the committed B17 harness with absolute import anchors and read-only observation of its own store before original cleanup. Candidate assertions/producer are unchanged. The contracts source loader avoids stale ignored dist."
+    },
+    {
+      "command": "env -u PA_RUNNER_SCENARIO -u PA_RUNNER_RECEIVER_LOG -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN node --test packages/drivers/codex-native/test/native.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 14,
+      "failed": 0,
+      "scope": "Existing original product Driver preparation, exact native request identity, before-write authorization, wrong-attempt/contract and policy guard regressions using controlled mocks only."
+    },
+    {
+      "command": "NODE_OPTIONS='--import=/tmp/pa-wave15-b-source-loader.mjs' env -u PA_RUNNER_SCENARIO -u PA_RUNNER_RECEIVER_LOG -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN node tests/native-acceptance/b13-vertical-production.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 6,
+      "failed": 0,
+      "notTested": 1,
+      "scope": "Existing normal controlled Application/Effects/Runner/Broker/answer/accept and narrowly scoped question-row SIGKILL admission preserved; not used as recovered native-business evidence."
+    },
+    {
+      "command": "env -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN node tests/native-acceptance/b16-native-begin.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "notTested": 1,
+      "runnerPid": 2443,
+      "coordinatorPid": 2403,
+      "beginCount": 1,
+      "factKinds": ["dispatch.observed", "turn.ended"],
+      "scope": "Previous separate Runner receiver half remains valid and is not revoked by the new fake-executable failure."
+    }
+  ],
+  "findings": [
+    {
+      "priority": 1,
+      "id": "FAKE_EXECUTABLE_IS_NOT_VALID_JAVASCRIPT",
+      "file": "tests/native-acceptance/fixtures/fake-codex-executable.mjs",
+      "line": 29,
+      "observation": "A TypeScript 'as Uint8Array' assertion is present in a .mjs executable. Both syntax checking and --version exit one. The original product Driver really spawns this child, but the child fails before speaking any preparation protocol. This is the first current blocker; it is not an A schema or main preparation-hook defect.",
+      "scope": "Blocking submitted controlled fixture, not an installed-vendor compatibility or production permission-bypass finding."
+    },
+    {
+      "priority": 1,
+      "id": "REUSED_GENERIC_FAKE_DOES_NOT_IMPLEMENT_PRODUCT_POLICY_OR_REQUEST_IDENTITIES",
+      "file": "tests/native-acceptance/fixtures/fake-codex-executable.mjs",
+      "line": 26,
+      "producerFile": "packages/drivers/codex-native/src/fake-app-server.ts",
+      "producerLines": [72, 82],
+      "consumerFile": "packages/drivers/codex-native/src/native.ts",
+      "consumerLines": [171, 182, 353, 483],
+      "observation": "Even after the parse error is removed, the reused fake's thread/start result contains only thread.id. The actual product Driver requires matching cwd/approvalPolicy and a workspaceWrite sandbox with networkAccess=false and both exclusion flags, and serializes a model field. Its approval variant also emits the older ExecCommandApproval/requestApproval method without required thread/turn/item identities. The producer must meet the original product Driver contract; guards should remain intact. This is a source-grounded next constraint, not a second submitted passing run."
+    },
+    {
+      "priority": 2,
+      "id": "HARNESS_READS_NONEXISTENT_FACT_AND_BINDING_COLUMNS",
+      "file": "tests/native-acceptance/b17-product-native.mjs",
+      "line": 107,
+      "relatedLine": 164,
+      "observation": "SELECT kind FROM fact_receipts is caught and converted to an empty array. SELECT fence_epoch FROM runtime_bindings is also caught and converted to null; the indexed table stores that identity in value JSON. These queries hide existing observations and prevent later kind/identity assertions from succeeding even when the runtime works.",
+      "existingPublicConsumer": "store.observations.forAttempt(attemptId) exposes kind/payloadRef/detail and store.bindings.binding(attemptId) or current(ticketId) exposes the full immutable identity. apps/coordinator/stored-ingress.ts:38 also puts kind on runtime.observed event payloads. No A migration or new database is needed.",
+      "scope": "The status claim that fact kinds cannot be recovered from the current schema is incorrect."
+    }
+  ],
+  "boundedDiagnostic": {
+    "countedAsCandidateDelivery": false,
+    "candidateSourceOrGuardsModified": false,
+    "consumer": "/tmp/pa-wave18-b-product-consumer.mjs",
+    "baseline": {
+      "command": "PA_DIAGNOSTIC_REPORT=/tmp/pa-wave18-b-baseline-observation.json NODE_OPTIONS='--import=/tmp/pa-wave15-b-source-loader.mjs' env -u PA_RUNNER_SCENARIO -u PA_RUNNER_RECEIVER_LOG -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN -u PA_FAKE_APPROVAL node /tmp/pa-wave18-b-product-consumer.mjs /Users/hh/Desktop/joker/superagent-agent-b/tests/native-acceptance/fixtures/fake-codex-executable.mjs",
+      "exitCode": 0,
+      "meaningOfExitZero": "The diagnostic expected and confirmed the current producer's failure before begin; this is not an admission PASS.",
+      "report": "/tmp/pa-wave18-b-baseline-observation.json",
+      "factKinds": ["writer.observed", "runtime.error"],
+      "bindingState": "stopping",
+      "beginCount": 0
+    },
+    "counterfactual": {
+      "producer": "/tmp/pa-wave18-fake-codex-producer.mjs",
+      "command": "PA_DIAGNOSTIC_REPORT=/tmp/pa-wave18-b-counterfactual-observation.json NODE_OPTIONS='--import=/tmp/pa-wave15-b-source-loader.mjs' env -u PA_RUNNER_SCENARIO -u PA_RUNNER_RECEIVER_LOG -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN -u PA_FAKE_APPROVAL node /tmp/pa-wave18-b-product-consumer.mjs /tmp/pa-wave18-fake-codex-producer.mjs",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave18-b-counterfactual-observation.json",
+      "syntaxCheckExitCode": 0,
+      "versionCheckExitCode": 0,
+      "versionOutput": "codex-cli 0.164.0",
+      "producerDifference": "A separately constructed local JSON-RPC fake supplies the actual thread/start policy fields and a supported item/commandExecution/requestApproval with exact thread/turn/item identity. It is not merely a one-line correction of the submitted producer, and is not credited to B.",
+      "factKinds": ["writer.observed", "policy.prepared", "dispatch.observed", "question.opened"],
+      "beginCount": 1,
+      "attemptId": "attempt-5114a313-9293-434c-8c79-980f8555706d",
+      "fenceEpoch": 1,
+      "bindingState": "active",
+      "registeredChildResource": "res-3737-5333e71fc7a4",
+      "tables": {
+        "works": 1,
+        "ticket": 1,
+        "ticket_links": 1,
+        "effect": 0,
+        "fact_receipts": 4,
+        "dispatch_receipts": 1,
+        "user_questions": 1,
+        "answers": 0,
+        "answer_deliveries": 0,
+        "runtime_bindings": 1,
+        "runtime_current": 1
+      },
+      "questionTarget": {
+        "connectionEpoch": 1,
+        "nativeRequestId": { "kind": "integer", "decimal": "42" },
+        "nativeMethod": "item/commandExecution/requestApproval"
+      },
+      "scope": "One finite diagnostic of the existing normal composition. No answer, recovered business feed, crash window, full child birth manifest, physical barrier or final delivery is claimed. Fake declared sandbox fields are protocol test data, not measured vendor enforcement."
+    }
+  },
+  "mainReusableDiagnostic": {
+    "classification": "MAIN_DIAGNOSTIC_NOT_B_SUBMITTED_DELIVERY",
+    "tool": "tools/bootstrap/diagnose-wave18-b-preparation.mjs",
+    "producer": "tools/bootstrap/fixtures/wave18-fake-codex.mjs",
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave18-main-preparation-reusable.json node tools/bootstrap/diagnose-wave18-b-preparation.mjs /Users/hh/Desktop/joker/superagent-agent-b",
+    "output": "/tmp/pa-wave18-main-preparation-reusable.json",
+    "exitCode": 0,
+    "diagnosticOutcome": "PASS",
+    "creditedToBSubmittedDelivery": false,
+    "source": "1e1f82a6a0076ea06c7a3d769388b6a4b1bc8bd5",
+    "checksPassed": [
+      "policyPrepared",
+      "beginReceivedExactlyOnce",
+      "acceptedDispatch",
+      "originalBrokerQuestion",
+      "sameAttempt",
+      "durableRows"
+    ],
+    "factKinds": ["writer.observed", "policy.prepared", "dispatch.observed", "question.opened"],
+    "rows": { "works": 1, "ticket": 1, "ticket_links": 1, "fact_receipts": 4, "dispatch_receipts": 1, "user_questions": 1, "runtime_bindings": 1, "runtime_current": 1 },
+    "receiverBeginCount": 1,
+    "ownedRunnerPid": 8010,
+    "registeredFakeChildResource": "res-8011-00136b7fbede",
+    "cleanupComplete": true,
+    "sourceStable": true,
+    "outputPolicy": "An explicit new absolute PA_ADMISSION_REPORT path outside B's checkout is mandatory. Existing files are refused; report creation uses exclusive write and mode 0600. Use a new output path per run.",
+    "isolation": "Only Node plus the fixed main local fixture is configured; unexpected coordinator subprocesses are refused, no installed-Codex fallback exists, and no provider is configured. All work uses a new private project/store and exact owned ChildProcess handles for fallback cleanup.",
+    "nextBAction": "Port this protocol producer into the B-owned fake executable and submit the committed normal product consumer with the existing A observation/binding APIs. Then continue original Broker Q&A, actual-child stop and durable recovery; this main diagnostic is not B completion or a reason to wait for a new normal-composition main interface."
+  },
+  "minimalProducerConsumerIntegration": {
+    "mainOwnedEntry": "apps/coordinator/product/runtime.ts:createProductRuntime(options).native.profile",
+    "normalPathAlreadyAvailable": true,
+    "mainProductSourceChangedByCandidate": false,
+    "producerRequirement": "B supplies a syntactically valid controlled fake executable implementing the ORIGINAL CodexProductDriver's version/initialize/thread-start policy/begin/approval protocol, plus accurate receiver/resource instrumentation. The producer stays in B-owned fixtures.",
+    "consumerRecipe": [
+      "Create only a private temporary ProductStore and registered temporary project using NativeProjectRegistry.prepare/save/scope/check.",
+      "Pass native.profile with driverId=codex-native, executable=process.execPath and argv=[absolute B fake executable], together with registered native.projects and approvalPolicy=on-request, into the existing createProductRuntime.",
+      "Call product.start() and the existing application.dispatch(create_work, trusted local actor). Keep original NativeProductAttempt, RunnerLink, eager preparation, CodexProductDriver, stored ingress and before-write authorization unchanged.",
+      "Read actual fact kinds and full attempt identity through existing A observation/binding APIs. Assert policy.prepared, receiver begin, dispatch and Broker question on the SAME Work/Ticket/assignment/attempt.",
+      "This is an explicit internal fake acceptance composition only. Do not install a fake profile as an automatic personal/native fallback or widen startup readiness."
+    ],
+    "noNewPortRequiredForNormalJoin": true,
+    "businessReconnectStillRequiresBDelivery": "Normal producer/consumer composition is already callable. Recovery after coordinator loss still needs a real B-owned reconnect adapter/port and RFC retaining current principal/contract/session/attempt/epoch/before-write authority; authenticated inspect alone does not authorize recovered feed."
+  },
+  "wave17PacketAssessment": {
+    "B1": "NOT_CLOSED: correct original Driver path selected, but committed fake executable fails parsing and its protocol is insufficient.",
+    "B2": "PARTIAL: real Application/Effects/NativeProductAttempt/RunnerLink/child startup and A failure-fact persistence proven; policy/begin/dispatch still blocked in submitted source.",
+    "B3": "PARTIAL_BIRTH_ONLY: an actual fake executable child resource is registered; no working approval/question or full PID/start/UID/operation manifest in submitted run.",
+    "B4": "NOT_REACHED: no business reconnect port or concrete implementation/RFC added.",
+    "B5": "NOT_REACHED: no actual begin receive/ACK/receipt crash windows.",
+    "B6": "NOT_REACHED: no submitted Broker answer or actual-writer stop recovery.",
+    "B7": "NOT_REACHED: no valid positive stale-epoch/current-control or session/resource matrix.",
+    "B8": "NOT_REACHED: no recovered verification/current candidate/human accept; original normal B13 retained.",
+    "B9": "NOT_REACHED: no linked two/four-slot/resource-return matrix.",
+    "B10": "PARTIAL: committed status honestly marks NOT_CLOSED, but the root cause and available observation APIs need correction before the next runnable checkpoint."
+  },
+  "nextContinuousPackage": {
+    "title": "Finish the normal original-Driver producer/consumer, then deliver actual durable business recovery",
+    "earlyCheckpoint": "Fix the B executable as valid JavaScript, match the exact product policy/modern request identities, and replace swallowed invalid SQL with existing A APIs. Submit a committed normal create_work -> policy.prepared -> begin -> Broker approval/answer vertical with durable linked rows and an actual ProcessHost child; node --check and --version are prerequisites. Main can consume this through the existing native.profile test composition without editing or weakening its product classes.",
+    "middleCheckpoint": "Instrument real child birth PID/start/UID/root/attempt/resource identities and actual received begin/answer/cancel. Publish the minimum B-owned business reconnect adapter/port and an RFC specifying main-owned current authorization callbacks. Cover same-identity begin, Broker answer and stop send/receive/ACK/receipt crash windows with unknown retention and complete physical manifests.",
+    "finalCheckpoint": "Verify schema-valid positive stale epochs/current controls and old session/contract/late ACKs, continue one original interrupted Work through registered verification/current candidate/human accept, then bounded two/four-slot output/backpressure and FD/child/queue return. Preserve each early/middle/final source checkpoint and proceed through independent stages; all vendor model/native turns remain zero."
+  },
+  "preservation": {
+    "candidateSourceOrAssertionsEdited": false,
+    "candidateHistoricalReportsWritten": false,
+    "untrackedB16RealBeginPreservedAndExcluded": true,
+    "oldWave11AndWave12ReportDiffsPreserved": true,
+    "privateProfilesOrBudgetsTouched": false,
+    "twelveUserServicesTouched": false,
+    "onlyMainArtifactWritten": "reports/releases/wave18-admission/runtime.json"
+  }
+}

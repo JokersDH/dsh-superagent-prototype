@@ -1,0 +1,160 @@
+{
+  "protocol": "wave18-ac-independent-admission/1",
+  "date": "2026-11-13",
+  "mainSource": "d494212f7658c228eb4f0d24639b22fd1fe95109",
+  "mainRuntimeBaseline": "6050b4b",
+  "sources": {
+    "A": "6dc4bc5b948661a473032a2a9699fafa8e0edb25",
+    "C": "a07e660cb1fb817e7c87f5f0072edcbac42f2751"
+  },
+  "modelCalls": 0,
+  "nativeTurnStarts": 0,
+  "browserRuns": 0,
+  "releaseApproved": false,
+  "previousCounterexamples": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-wave18-ac-previous.json node tools/bootstrap/probe-wave17-context.mjs /Users/hh/Desktop/joker/superagent-agent-a /Users/hh/Desktop/joker/superagent-agent-c",
+    "exitCode": 0,
+    "passed": 8,
+    "failed": 0,
+    "report": "/tmp/pa-wave18-ac-previous.json",
+    "reportMode": "0600",
+    "closedScope": [
+      "A complete nonempty v2 and full-queue corruption control",
+      "A mixed snapshot1/evidence2 without familySetVersion rejects",
+      "A missing originally empty assistant_reply_results table rejects",
+      "C typed nonempty and outer-getter controls",
+      "C nested body.replyMessageId and identity.principal getters return invalid_body"
+    ]
+  },
+  "A": {
+    "verdict": "Old wave17 counterexamples close; schema checks and actual source-confirmation/data consumers pass. Do not import the whole new evidence/legacy-verifier recipe until genuine old nonempty v1 compatibility is restored.",
+    "regression": {
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows test",
+      "exitCode": 0,
+      "storagePassed": 87,
+      "workflowsPassed": 109,
+      "log": "/tmp/pa-wave18-a-tests.log",
+      "typecheckExitCode": 0,
+      "buildExitCode": 0
+    },
+    "sourceConfirmation": {
+      "command": "node --test tests/integration/recovery-source-confirmation.case.mjs",
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "exitCode": 0,
+      "passed": 14,
+      "failed": 0,
+      "log": "/tmp/pa-wave18-a-source-confirm.log",
+      "scope": "Actual main source prepare/confirm/audit and same-UoW fact/event/receipt, refusal/replay and process windows; data only, always not_granted/startupAvailable=false"
+    },
+    "readonlyScope": {
+      "file": "packages/workflows/test/wave16-candidate-restore.case.ts",
+      "line": 80,
+      "status": "PASS_SCOPED_SECOND_ROOT_HTTP",
+      "actual": "Real SDK candidate confirmation -> WorkflowSnapshots -> second-root ProductStore -> recovery_readonly runtime and personal-mode HTTP; snapshot GET retains the original reply, business chat POST refuses, queue/events remain unchanged.",
+      "limits": [
+        "The restored runtime is not given the mock assistant provider, so this case does not measure attempted provider calls from a restored assistant queue.",
+        "The Q&A dataset in wave16-question-restore.case.ts remains a second-Store/read-only-inventory test; it was not extended to Q&A HTTP in the restored runtime.",
+        "Private startup permission, current physical resource proof and target activation remain separate; source confirmation is implemented and consumed."
+      ]
+    },
+    "legacyCompatibility": {
+      "command": "node /tmp/pa-wave18-legacy-binding-compat.mjs",
+      "reproduceCommand": "PA_ADMISSION_REPORT=/tmp/pa-wave18-context-reproduce.json node tools/bootstrap/probe-wave18-context.mjs /Users/hh/Desktop/joker/superagent /Users/hh/Desktop/joker/superagent-agent-a",
+      "exitCode": 1,
+      "report": "/tmp/pa-wave18-legacy-binding-compat.json",
+      "producer": "Unmodified existing main v1 WorkflowSnapshots and readWorkflowEvidence dist; real public Store artifact/contextBindings ports, no relabeling or manifest edits",
+      "observations": [
+        { "id": "GENUINE_EMPTY_V1_CONTROL", "protocol": "workflow-snapshot/1", "evidenceProtocol": "workflow-evidence/1", "originalVerified": "ok", "candidateVerified": "ok" },
+        { "id": "GENUINE_NONEMPTY_BINDING_V1", "protocol": "workflow-snapshot/1", "evidenceProtocol": "workflow-evidence/1", "bindingCount": 1, "derivedWorkId": "legacy-work", "originalVerified": "ok", "candidateVerified": "blocked", "oldBindingDigest": "51d53c57b7d4be9c586f5b6a255a9d8f6bbd8db64c71f3e032e70a2df6cce7dd", "candidateBindingDigest": "7022d0a2ca54342c557a37667dbdcadf90b487be66640eb76dffbaa26b6b5bc8" }
+      ]
+    }
+  },
+  "C": {
+    "verdict": "Prior getter findings resolved. Current actual candidate/source-confirm/readonly consumers pass; controlled same-root readonly mode is demonstrated, while a single consistent second-root snapshot-to-readonly-HTTP composition is still not demonstrated by C.",
+    "regression": {
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing test",
+      "exitCode": 0,
+      "contextPassed": 124,
+      "proposalsPassed": 41,
+      "knowledgePassed": 96,
+      "routingPassed": 44,
+      "log": "/tmp/pa-wave18-c-tests.log",
+      "typecheckExitCode": 0,
+      "buildExitCode": 0
+    },
+    "actualConsumers": [
+      {
+        "file": "packages/knowledge/test/main-recovery-readonly.case.ts",
+        "scope": "Actual local SDK replies and context bindings are generated normally, normal runtime closes, a restore marker is written, and a recovery_readonly runtime/HTTP opens the same Store/root with the original mock provider. Candidate/history/frozen-source GETs succeed; business prepare/commands refuse; start throws; old queue count and provider call count remain unchanged.",
+        "sourceConfirm": "Real source prepare/confirm/audit returns not_granted/startupAvailable=false, does not create target root and does not enable recovered candidates or consume old queue.",
+        "limit": "This is a real same-root readonly transition test, not a transported second-root snapshot test."
+      },
+      {
+        "file": "packages/knowledge/test/main-consistent-source.case.ts",
+        "scope": "Actual preview reads before/after async gap observe changed decision/source digests; no SQL transaction is held over await. Artifact-byte replacement is rejected by the public artifact reader."
+      },
+      {
+        "file": "packages/knowledge/test/main-candidate-chain.case.ts",
+        "scope": "Existing real candidate GET/pointer prepare/three kinds/confirmation/rejection/receipt replay retained; replay after decision revoke is added. Its earlier second-root WAL-checkpoint plus cp fixture remains data-reader scope."
+      }
+    ],
+    "externalProbeGapResolved": "C's authored report retained an intermediate A source/dist NOT_REACHED condition. A is now clean/built at the fixed source and the full A+C eight-case probe passes; that intermediate dependency condition is not a current blocker.",
+    "remainingModuleOnly": ["selectRelevantSources/candidate batches", "projectSourceReview", "collectContextHistory HTTP replacement"],
+    "permissionScope": "No new current-main permission bypass found. Main original Scope/cutoff/published IDs/fingerprints/final guard and private completed-reply reader remain authoritative."
+  },
+  "findings": [
+    {
+      "id": "A_GENUINE_V1_NONEMPTY_BINDING_BACKUP_REJECTED",
+      "severity": "P2",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows/src/snapshot.ts",
+      "line": 220,
+      "relatedFile": "/Users/hh/Desktop/joker/superagent-agent-a/packages/storage/src/backup.ts",
+      "relatedLine": 90,
+      "condition": "Generate a genuine v1 snapshot with the existing main producer and one nonempty assistant_context_bindings row. The old digest recipe omits derived work_id; the candidate recipe includes work_id.",
+      "observed": "Old producer self-verifies ok, A verifier returns blocked. Empty v1 passes both, so an empty control would miss this regression.",
+      "cause": "The legacy branch compares historical families against the current v2 field recipe. Schema/family version labels do not preserve the old family digest algorithm.",
+      "testGap": "A snapshot-d.case.ts:458 calls copy on a newly generated v2 snapshot, relabels it to v1 and retains only its first two families. That is not a genuine old producer and omits the changed binding family.",
+      "admission": "Defer whole backup.ts evidence-recipe and snapshot.ts legacy-path replacement; retain old user backup verification until a version-specific historical digest reader is independently tested."
+    }
+  ],
+  "minimalMainSourceSlices": {
+    "A_safe": [
+      "packages/storage/src/schema-inventory.ts",
+      "packages/storage/src/target-inventory.ts: requiredSchemaObjects and TARGET_INDEX_TABLES export/helper additions only",
+      "packages/storage/src/index.ts: selective inspectSchemaInventory/SchemaInventory exports",
+      "packages/workflows/src/snapshot.ts: required-schema checks in create/verify and bounded diagnostics only, preserving current main's v1 producer/digest recipe and whole-digest verification"
+    ],
+    "A_defer": [
+      "Whole packages/storage/src/backup.ts v2/expanded-field recipe replacement",
+      "Whole packages/workflows/src/snapshot.ts v2/legacy family-comparison replacement",
+      "A synthetic v1 test as evidence of user-backup compatibility"
+    ],
+    "C_safe": [
+      "packages/proposals/src/reply-candidates.ts defensive shape/safeRead changes and selected type exports, with existing private completed-reply authority unchanged",
+      "Owned actual candidate/readonly/source-confirm consumer tests as scoped evidence; no new HTTP/provider/SQL authority"
+    ]
+  },
+  "nextOutcomePackages": {
+    "A": {
+      "outcome": "Compatible historical backup verification plus complete current readonly restoration",
+      "early": "Preserve a real old producer's nonempty v1 binding snapshot as a fixture/recipe; implement version-specific digest semantics without weakening v2 complete-family/schema checks. Keep the eight previous controls passing.",
+      "middle": "Drive the actual nonempty Work/Question/Answer/Delivery and candidate/context snapshot into a second-root recovery_readonly runtime/HTTP with a counted mock provider; prove held queues and no resend/start, not only Store/inventory continuity.",
+      "final": "Publish D/E a runnable old/current producer-verify-restore recipe and consume current main source-confirm/audit/replay. Private startup permission and target activation are independent next main inputs, not missing source-confirm blockers."
+    },
+    "C": {
+      "outcome": "One consistent second-root frozen-source/candidate readonly user flow",
+      "early": "Retain the now-passing hostile-input and actual candidate tests; replace the separate same-root readonly and live-cp fixture claims with one public consistent snapshot/copy -> second-root readonly runtime/HTTP composition using an admitted producer version.",
+      "middle": "Verify frozen body/index/digest/history and business mutation refusal together; source prepare/confirm/audit must leave candidates inert, queue rows held and counted provider calls unchanged.",
+      "final": "Cover only remaining scope/receipt/artifact drift and measured reader-cost paths, preserve main default guards and accurate module-only mappings, and provide minimal data consumers for future private permission without a second grant/LLM loop."
+    }
+  },
+  "preserved": {
+    "AWorktree": "clean",
+    "CWorktree": "original pnpm-lock.yaml diff only",
+    "userServiceGroups": 12,
+    "servicesTouched": false,
+    "ledgersTouched": false,
+    "historicalReportsOverwritten": false,
+    "repositoryOutput": "reports/releases/wave18-admission/context.json"
+  }
+}
