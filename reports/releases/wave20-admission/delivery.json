@@ -1,0 +1,206 @@
+{
+  "protocol": "wave20-delivery-admission/1",
+  "status": "B911_ORDINARY_PERSONAL_SAME_SUBJECT_ADMITTED_EE_SUCCESSOR_BYTES_AND_READONLY_FORMAT_SCOPE_PASS",
+  "sources": {
+    "main": "22088996ad4b6ffec534b07a89db4c270cec1627",
+    "mainRuntime": "98561245a0e5ff8250ca94e28bc517a3e32948d5",
+    "d": "35925ddcb28b89b2393572563b486babfa05863e",
+    "e": "acf450981c0f7e4728ead2caf59fd1fc53b425a1",
+    "eRecordedTestSource": "5264cbddf39aa7ce00bf50eb8d2a09ca26de97a4",
+    "laterMainReadBindingInput": {
+      "scope": "Main subsequently supplied actual restored-personal startup read binding through a signed private file and explicit startup flag. Parent integration reports11 new cases including a real child personal HTTP candidate/history/frozen-body/no-queue/no-provider path; source final verification was ongoing at this follow-up. This delivery audit did not rerun that suite or assign a later commit to the fixed2208899/ee input.",
+      "prepareCli": "node tools/dev/review-restored.mjs --state <restored-root> --project <historical-id> --allow-path <scope> --output <new-private-file>",
+      "startupFlag": "--review-restored-scope <new-private-file>",
+      "authority": "Read-only startup consent only; source confirmation/private startup permission/target activation remain distinct."
+    }
+  },
+  "safety": {
+    "vendorModelSends": 0,
+    "nativeTurnStarts": 0,
+    "candidateLiveResourcesStarted": 0,
+    "probeActualOsScans": 0,
+    "probeActualOsSignals": 0,
+    "liveInstallStopUpgradeCleanupMatricesRun": false,
+    "userServicesPreserved": "All twelve pairs 5180-5191 / 8796-8807",
+    "userStateProfilesTarsLedgersChanged": false,
+    "retainedBNormalDatabaseReadOnly": true,
+    "retainedBNormalDatabaseBytesUnchanged": true,
+    "dWorktreeClean": true,
+    "eUntrackedRunDirectoriesPreserved": 79,
+    "productionAndAcceptanceSourcesChanged": false,
+    "repositoryWrites": [
+      "reports/releases/wave20-admission/delivery.json",
+      "tools/bootstrap/probe-wave20-release-gate.mjs"
+    ],
+    "temporaryArtifactsRetained": "/tmp/pa-wave20-delivery-audit-d1wQii"
+  },
+  "verification": {
+    "sameSubjectAndForeignProvenance": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave20-e-persistent.json node tools/bootstrap/probe-wave20-release-gate.mjs /Users/hh/Desktop/joker/superagent-agent-e /tmp/pa-wave20-delivery-audit-d1wQii/install",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "requiredInstalledCasesAudited": 24,
+      "missingSubjects": 0,
+      "tupleMismatches": 0,
+      "helperUpgradeMatchesImmutableB911": true,
+      "helperInstanceMatchesImmutableB911": true,
+      "report": "/tmp/pa-wave20-e-persistent.json",
+      "previousObservationReport": "/tmp/pa-wave20-delivery-audit-d1wQii/e-b911-control-results.json",
+      "fieldDerivation": {
+        "requiredCases": "Imported from E actual INSTALL_CASES",
+        "comparisonFieldsAndNormalizer": "Parsed from E actual installed-subject comparison loop using TypeScript AST",
+        "releaseSourceSha256": "779d6f9e58e3a197ca4f6f4da1ef4365a5303d6ea487e5e87ff584c559f34a49",
+        "fields": ["source", "buildId", "schema", "tarSha256", "tarBytes", "abi", "platform", "arch"]
+      },
+      "scope": "E actual complete b911 installed-alpha report is the unchanged passing control. E actual INSTALL_CASES and its parsed tuple normalizer/fields determine the audit. Exactly one coherent foreign ee package provenance replaces ownership subject/helper/productSource; behavior and safety proof remain unchanged. It is rejected specifically by E5 subject_mismatch. The persistent tool reads same-b911 helper bytes directly from the verified tar and checks both foreign-ee manifests and helper bytes."
+    },
+    "newArtifactBytes": {
+      "command": "node /tmp/pa-wave20-delivery-audit-d1wQii/verify-bytes.mjs",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave20-delivery-audit-d1wQii/artifact-verified.json"
+    },
+    "newFrozenChild": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave20-d-child.json node --experimental-test-module-mocks tools/bootstrap/probe-wave18-delivery.mjs /tmp/pa-wave20-delivery-audit-d1wQii/install",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "report": "/tmp/pa-wave20-d-child.json",
+      "moduleSha256": "9f88c5ff8fb3d77f388a9725272ea05f4199db33ab2fcdda06551022d9883135",
+      "scope": "Actual immutable ee helper with complete parent/registered-child positives, missing/wrong-start/helper/recover negatives and fully mocked identity/inventory/signals. Already admitted651 child boundary is preserved."
+    },
+    "realBusinessWorkflowFormats": {
+      "command": "node /tmp/pa-wave20-delivery-audit-d1wQii/workflow-readonly.mjs",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave20-delivery-audit-d1wQii/workflow-readonly-results.json",
+      "input": "/tmp/pa-wave19-normal-FsWfko/state/state.sqlite",
+      "scope": "The new package public readWorkflowEvidence opens retained B/A normal producer data readonly. Default equals explicit1, explicit2 returns its separate recipe, invalid3 refuses before creating a file; original database SHA is unchanged. No new backup, restored workflow, native request or business reconnect is run."
+    },
+    "retainedBusinessRowCheck": {
+      "entry": "node:sqlite DatabaseSync with readOnly=true",
+      "input": "/tmp/pa-wave19-normal-FsWfko/state/state.sqlite",
+      "observed": { "works": 1, "ticket": 1, "answer_deliveries": 1, "answer_delivery_status": "native_applied" },
+      "scope": "Read-only corroboration of actual normal producer records; native_applied is the controlled B transport outcome, not a new vendor/native turn or a recovered business lifecycle."
+    }
+  },
+  "persistentProbePolicy": "probe-wave20-release-gate.mjs takes E-root and a verified ee install, requires a new absolute PA_ADMISSION_REPORT and exclusively creates a0600 report. One true full b911 report positive and one true ee provenance mutation only; no D rescan, fake NOT_TESTED, live candidate process or new negative is introduced.",
+  "currentFindings": [],
+  "currentP1InAuditedDeliveryScope": false,
+  "admission": {
+    "ordinaryPersonalB911": "ACCEPTED_ONLY_IN_EXACT_RECORDED_SUBJECT_AND_MODE_SCOPE",
+    "installedAlphaB911": "ACCEPTED_SCOPED_SAME_SUBJECT",
+    "eeSuccessor": "BYTE_CHILD_AND_READONLY_WORKFLOW_FORMAT_SCOPE_PASS_E_SAME_SUBJECT_INSTALL_NOT_REACHED",
+    "completeNativeProduct": "NOT_GRANTED",
+    "included": [
+      "Exact b9117aa/build6a45633067501dd2/schema18 on darwin-arm64/Node24.21.x/ABI137 measured host.",
+      "Recorded actual personal discussion-only/local SDK mock default-off, explicit opt-in, nonempty candidates, decision confirm/reject/replay, work required-input rejection, context/history/frozen-source/reply and no-executor behavior.",
+      "Same-package immutable helper provenance, complete resource boundary in recorded cases, present pointer and exact terminal exit evidence, and safe651 upgrade baseline with old97 only a mock failure control.",
+      "Installed fixture+recovery_readonly second-root Work/question/answer/context/candidate/source-confirmation evidence is admitted as that separate fixture mode scope.",
+      "B911 workflow evidence remains its actual v1-only installed API. Extra numeric argument2 still produces v1; this honest old-package scope does not reject or certify the newer985 dual-format API."
+    ],
+    "excluded": [
+      "No E b911 report is relabeled as ee7fbd8 independent installed acceptance.",
+      "No vendor/native execution, B independent business reconnect or physical writer barrier admission.",
+      "No restored personal historical-project/actor readonly binding result: that main entry was not in these fixed packages, and this turn did not test its forthcoming implementation.",
+      "No grant/private startup permission/target activation from source confirmation or any backup.",
+      "No claim that D retained B-normal data and its SDK/candidate state already form one combined rich personal relocation fixture.",
+      "No A new snapshot-v2 cross-version import admission, cross-platform/ABI/machine or long soak result."
+    ]
+  },
+  "eRecordedSubject": {
+    "counts": { "PASS": 192, "FAIL": 0, "NOT_TESTED": 16 },
+    "testSource": "5264cbddf39aa7ce00bf50eb8d2a09ca26de97a4",
+    "productSource": "b9117aad12797a3ee3c454172d1f918516a18f33",
+    "buildId": "6a45633067501dd2",
+    "tarSha256": "4a81380a5fd0c69aabe8d38604dd661ab3fb3f30113b4bb2d3e5156c2ff54c1a",
+    "tarBytes": 20231965,
+    "requiredInstalledCases": 24,
+    "installedAlpha": "PASS_SCOPED",
+    "helperUpgradeSha256": "9f88c5ff8fb3d77f388a9725272ea05f4199db33ab2fcdda06551022d9883135",
+    "helperInstanceSha256": "ef9eae903516d34c3000b1a0d75ce9cec93f67ca9c8d1219a77421cabc02063e",
+    "normalPersonal": "Actual same-package default-off/opt-in3-candidate/decision confirm/replay/reject and context/history/source/reply with providerRequests3, nativeSends0 and discussion_only_no_executor.",
+    "secondRoot": "Mode is explicitly fixture+recovery_readonly, personalRebinding=main_readonly_binding_entry_absent. Seed uses installed fixture App/Effects/queue, delivered Work with4 artifacts, one answered question, confirmed decision; nativeApplied=false is recorded. Original body/counts retained, business422, provider/queue unchanged.",
+    "sourceConfirmation": "Same b911 installed readonly source prepare/confirm/audit/replay/reopen, authorization not_granted/startupAvailable=false/no target. Does not confer a local project/actor or startup grant.",
+    "workflowFormat": "Recorded installed_bytes shows workflow-snapshot/1 and workflow-evidence/1, 13 families, no versioned signature, explicitV2 NOT_TESTED for b911. This accurately distinguishes the later ee985 bytes.",
+    "formatConsumerNext": "E workflowFormatsIssues currently asserts v1-only fields. When intentionally targeting ee or a later versioned package, branch assertions on the actual supported API/versioned behavior while preserving the old b911 v1 result; do not treat the new dual API as a b911 regression."
+  },
+  "newArtifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave19-target/wave19-target-ee7fbd8.tar.gz",
+    "tarSha256": "b0990149d0a8c81a130d358ea07100332bc30d509e9c7dfdf7a176e61b7f7ecc",
+    "tarBytes": 20236793,
+    "source": "ee7fbd8ab59bde8b875dcd933fda58d7bbf2fd5d",
+    "sourceDirty": false,
+    "buildId": "90e81429079a7d50",
+    "productSchemaActualExport": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeActual": "24.21.0",
+    "abiActual": "137",
+    "sqliteActual": "3.53.4",
+    "inventoryEntries": 6742,
+    "regularFilesHashAndSizeVerified": 6721,
+    "internalSymlinksVerified": 21,
+    "extractedBytes": 67523569,
+    "installManifestSha256": "216a77dea78186d39d60c0f9b5539257de91e01c211716dd08f02aaef820a730",
+    "releaseManifestSha256": "f2357c8fd93046e1c5ef607a874083f3c63fe58b25cdb842f12d5e53cf47c554",
+    "closureDigest": "cedb09e46986bbccca03b5b1854b4845578afab0db1b9ad133fda3e728409a3e",
+    "verifiedInstallRoot": "/tmp/pa-wave20-delivery-audit-d1wQii/install",
+    "modeScope": "Personal-capable runtime bytes verified, no live instance started in this audit.",
+    "runtimeScope": "Main9856124 is an ancestor; e438 valid-schema/v1 digest compatibility is retained. No launcher or portability runtime delta exists from ee7fbd8 through current D35925dd; docs-only heads do not require refreezing.",
+    "workflowEvidence": {
+      "defaultAndExplicit1": { "protocol": "workflow-evidence/1", "families": 13, "digest": "caace32a556a47a3e3c4e544845524d3b3c823de3d9bc0df8796a2fead8dffc9" },
+      "explicit2": { "protocol": "workflow-evidence/2", "familySetVersion": 2, "families": 21, "digest": "8797911788319c9d6228092708fcaf59b0de9f5ad7a55a790ba6dac87290ebf7" },
+      "invalid3RejectedWithoutFile": true,
+      "scope": "Independently rerun read summaries on normal business data, not a new workflow-snapshot/2 export/import or installed recovery exercise."
+    },
+    "personalEvidence": {
+      "protocol": "personal-evidence",
+      "observedFormatVersion": 2,
+      "outerBundleFormatVersion": 1,
+      "archiveSha256": "f7439c8ed3210d979e210a0eeb2611c1129860212f520f9a42ee47c29876b84a",
+      "evidenceSource": "D-owned actual createBundle/verifyBundle result in tools/distribution/reports/wave19/real-business-relocation.json",
+      "scope": "A separate portability protocol, not workflow-evidence/2 or A new snapshot-v2 interoperability. This audit inspected the actual producer/consumer recipe and recorded result; its removed temporary archive was not rerun. Only the observed format2 create/verify is claimed here, not an extra personal-evidence1 run."
+    },
+    "realBusinessInput": {
+      "path": "/tmp/pa-wave19-normal-FsWfko/state/state.sqlite",
+      "producer": "Retained submitted B/A normal producer state, no real vendor/native turns",
+      "rows": { "works": 1, "ticket": 1, "questions": 1, "answers": 1, "answer_deliveries": 1, "runtime_bindings": 1, "dispatch_receipts": 2, "answer_delivery_status": "native_applied" },
+      "absentRichData": "D's raw business report has decisions/proposals/contextBindings/replyResults=0 and effect_queue=0. It is real normal Q&A evidence, not the combined nonempty SDK/candidate/held-queue fixture.",
+      "restoredHttpScope": "D recorded fixture+recovery_readonly snapshot Work>=1/business422/source digest unchanged/no old queue replay/source facts not_granted. Historical Work actor access and open-question projection remain limited; no claim of restored-personal rebind or current business recovery."
+    },
+    "personalCandidateScope": "D's separately generated actual ee personal discussion-only local fake SDK state records propose_work/propose_decision, prepare/reject/decision-confirm/replay, no-executor work422 and original request context. Its relocation remains fixture+readonly with403 candidate/source reads. The result is bound to ee build, and is D-owned evidence only until E retargets."
+  },
+  "minimalMainSlice": {
+    "alreadyOnMain": "985 default workflow1/explicit2 public consumer and e438 schema/v1 guard are main-owned implemented bytes. The new ee artifact incorporates them; no need to re-import them from D.",
+    "dNewOwnedSource": "Only tools/distribution/verify-real-business-relocation.mjs is new executable D-owned source since the previous reviewed D head; it is an install-parameterized format/read-only-data/relocation recipe. Its reports/docs are evidence, not new runtime authority.",
+    "ordinaryInstallIntegration": "Main2208899 still does not track the full apps/launcher package. If integrating ordinary personal distribution, import its coherent launcher/portability dependency closure and main-owned root configuration separately, not a lone upgrade.mjs file or an entire D branch/report history.",
+    "eReviewedSource": "Target/baseline/control role separation in frozen-package.mjs, the same-subject ownership assertions and added fixture-versus-personal businessData scope labels are coherent. Preserve24 required case mapping and dynamic format support when moving to ee; no current gate P1 observed.",
+    "nextMainDependency": "Main's later actual startup read-binding consumer is now available through tools/dev/review-restored.mjs and --review-restored-scope. D/E should consume that explicit signed-private-file entry in a newly accurate runtime subject, not bypass403 with fixture mode. Neither fixed b911 nor ee bytes include the later entry; their recorded limits remain chronological scope, not regression. Source confirmation is already real data-only and is not a private grant."
+  },
+  "nextPackages": {
+    "d": [
+      "Preserve admitted b911 and current ee immutable subjects, safety651 upgrade baseline and old97 mock-only control; do not refreeze docs-only heads.",
+      "Give E exact ee tar/manifest/helper hashes and the versioned API scope; E must measure this subject rather than reuse b911 results.",
+      "Consume the now-available tools/dev/review-restored.mjs signed-file CLI and explicit --review-restored-scope startup entry, binding historical project/current principal/root without granting execution; use a fixed source containing this later runtime.",
+      "Exercise original external project Work/body/context/candidate/source reads from the same relocated personal data with explicit before/after refusal and consent, not fixture mode as a shortcut.",
+      "Combine the retained real B/A normal Q&A/answer-delivery data and SDK/context/candidate/decision or held work in one Store fixture when the actual public APIs permit it; preserve producer distinctions until then.",
+      "Verify default workflow1 and explicit2 plus precise personal-evidence protocol outputs through the new package's real consumers, with old13-family v1 compatibility retained.",
+      "Run same-data snapshot/restore/source confirmation with old queues held/no provider resend/no target, then explicit readonly binding review; private startup permission remains separate.",
+      "Continue bounded independently owned new-package cold/reuse/multistate and different-binary18/legacy16 upgrade/write-protection cases without reopening known closed child negatives.",
+      "Keep redacted/private support material and meaningful resource-return checks; short runs remain short, no new vendor/native budget.",
+      "Publish early/mid/final source and necessary successor bytes only for runtime changes, with exact ordinary-personal and recovery-mode scope to E."
+    ],
+    "e": [
+      "Preserve b911 ordinary-personal installed admission and the full-report positive/one foreign-provenance refusal; no new ee feature is a b911 regression.",
+      "Retarget all24 required case/helper subjects to ee or the next precisely frozen readonly-binding successor, keeping safe upgrade baseline and known-bad mock control separate.",
+      "Update the format consumer to assert supported default1/explicit2 behaviors from actual package outputs; retain b911's v1-only historical scope without an unconditional old-version expectation.",
+      "Independently exercise same-package personal local SDK candidates/preferences/context/history/reply and exact mode/readiness/native0, not source fixture results relabeled installed.",
+      "Consume the now-available signed-private-file CLI and --review-restored-scope personal startup binding with explicit historical-project/current-actor/root consent and before/after403 versus readable evidence; it must never resume old queues or grant startup.",
+      "Keep delivered fixture Work/Q&A and B normal native_applied producer datasets explicitly separate until a single actual combined Store fixture has been measured.",
+      "Verify nonempty second-root original bodies/source/candidates/Work/answers through actual personal readonly HTTP and source confirm/replay/reopen, with no model resends or portable permission.",
+      "Measure installed ee workflow evidence1/2, portability personal-evidence and strict malformed/future schema compatibility in their distinct protocols and recorded version roles.",
+      "Run precise new-package different-binary upgrades and bounded reload/SSE/concurrent-read/resource-return checks; B recovery/native/target/value remain separate gates.",
+      "Publish accurate early/mid/final same-subject layered verdicts, retaining all old admitted scopes, artifacts/runs/ledgers and required case failures when a dependency is not reached."
+    ]
+  }
+}
