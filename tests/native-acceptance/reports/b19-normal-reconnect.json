@@ -1,0 +1,198 @@
+{
+  "generatedAt": "2026-11-13T08:16:10.667Z",
+  "environment": {
+    "note": "wave-18 B1/B2 product vertical with B-owned local producer",
+    "modelCalls": 0,
+    "nativeTurns": 0
+  },
+  "totals": {
+    "cases": 7,
+    "PASS": 5,
+    "FAIL": 1,
+    "SKIPPED": 0,
+    "NOT_TESTED": 1
+  },
+  "scope": "controlled fake executable; native NOT_TESTED",
+  "cases": [
+    {
+      "id": "B19-PRODUCT-PREPARES",
+      "title": "policy preparation completes through the original Driver",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "exactly one begin for attempt attempt-4024d724-ad0d-4506-b30d-07cdbfcded65 at epoch 1"
+      ],
+      "evidence": [
+        {
+          "status": "recorded",
+          "attemptId": "attempt-4024d724-ad0d-4506-b30d-07cdbfcded65",
+          "factKinds": [
+            "writer.observed",
+            "policy.prepared",
+            "dispatch.observed",
+            "question.opened"
+          ],
+          "beginCount": 1,
+          "tables": {
+            "works": 1,
+            "tickets": 1,
+            "links": 1,
+            "questions": 1,
+            "deliveries": 0,
+            "facts": 4,
+            "payloads": 8,
+            "bindings": 1,
+            "dispatch": 1,
+            "events": 22
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B19-BROKER-QUESTION",
+      "title": "the producer approval becomes a real Broker question",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the Broker registered question codex-question-b49aec0c3e0e49a694fa2e7f8efecb3935c7aa9b768e5351 (permission) from the producer approval"
+      ],
+      "evidence": [
+        {
+          "questionId": "codex-question-b49aec0c3e0e49a694fa2e7f8efecb3935c7aa9b768e5351",
+          "kind": "permission",
+          "targets": 1
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B19-RECONNECT-LIVE-INSPECT",
+      "title": "a reconnected caller reaches the same live Runner",
+      "lane": "controlled_process",
+      "status": "FAIL",
+      "detail": [
+        "reconnect did not reach the live attempt: {\"candidates\":0,\"inspectError\":null}"
+      ],
+      "evidence": [
+        {
+          "candidateSockets": 0,
+          "usedSocket": null,
+          "attemptId": "attempt-4024d724-ad0d-4506-b30d-07cdbfcded65",
+          "inspectedState": null,
+          "inspectedAdmission": null,
+          "resources": 0,
+          "inspectError": null
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B19-DURABLE-ROWS",
+      "title": "facts, dispatch and the binding agree with the receiver attempt",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "durable rows agree: works=1 tickets=1 links=1 facts=4 bindings=1 dispatch=1; facts writer.observed, policy.prepared, dispatch.observed, question.opened; binding attempt matches the receiver"
+      ],
+      "evidence": [
+        {
+          "tables": {
+            "works": 1,
+            "tickets": 1,
+            "links": 1,
+            "questions": 1,
+            "deliveries": 0,
+            "facts": 4,
+            "payloads": 8,
+            "bindings": 1,
+            "dispatch": 1,
+            "events": 22
+          },
+          "bindingAttempt": "attempt-4024d724-ad0d-4506-b30d-07cdbfcded65",
+          "receiverAttempt": "attempt-4024d724-ad0d-4506-b30d-07cdbfcded65"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B19-ANSWER-DELIVERED",
+      "title": "the human answer is delivered to the live turn",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the answer reached native_applied on the live turn (1 answer frame, delivery native_applied)"
+      ],
+      "evidence": [
+        {
+          "status": "recorded",
+          "answerError": null,
+          "answerFrames": 1,
+          "tables": {
+            "works": 1,
+            "tickets": 1,
+            "links": 1,
+            "questions": 1,
+            "deliveries": 1,
+            "facts": 4,
+            "payloads": 10,
+            "bindings": 1,
+            "dispatch": 2,
+            "events": 27
+          }
+        },
+        {
+          "deliveryStatus": "native_applied"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B19-STOP-DELIVERED",
+      "title": "stop_work cancels the live turn and the Runner is told",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "stop committed a registered-owned barrier (1) and the work ended; the recovery channel is what stops the writer, not a business cancel or turn/interrupt"
+      ],
+      "evidence": [
+        {
+          "status": "recorded",
+          "stopError": null,
+          "cancelFrames": 0,
+          "producerMethods": [
+            "initialize",
+            "initialized",
+            "thread/start",
+            "turn/start"
+          ],
+          "interrupted": false,
+          "phase": "ended"
+        },
+        {
+          "barrierEvents": 1,
+          "resourcesWithoutTerminalStatus": 0,
+          "channel": "authenticated recovery cancel -> stopPhysical -> committed registered-owned barrier"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B19-SCOPE-NOT-NATIVE",
+      "title": "fake executable lane; installed Codex not executed",
+      "lane": "controlled_process",
+      "status": "NOT_TESTED",
+      "detail": [
+        "an installed Codex was not executed and no gateway was contacted"
+      ],
+      "evidence": [
+        {
+          "driver": "CodexProductDriver (unmodified)",
+          "executable": "B-owned fake app-server process",
+          "installedCodexExecuted": false
+        }
+      ],
+      "entities": []
+    }
+  ]
+}

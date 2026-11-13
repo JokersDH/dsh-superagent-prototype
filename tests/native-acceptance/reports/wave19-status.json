@@ -1,0 +1,79 @@
+{
+  "wave": "product-wave-19",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "2208899",
+  "previousCandidate": "ad222c1",
+  "packet": "agent-tasks/product-wave-19/agent-b-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0053",
+  "checkpoint": "1 of 3",
+  "scopeNote": "Zero real model and native turns. Only B-owned paths. No second ledger/coordinator/lifecycle, no shared-contract or main-product-class edit, no guard weakened. Twelve services untouched. Two historical report diffs and untracked b16-real-begin.mjs preserved. Local fake only; no real CLI or gateway fallback.",
+
+  "mainProbeRecheck": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-b-wave19-normal-start.json node tools/bootstrap/probe-wave19-runtime.mjs <B-root>",
+    "outputPathWasNew": true,
+    "classification": "B_SUBMITTED_PRODUCER_CONTROLLED_NORMAL_ONLY",
+    "producerMatchesCommit": true,
+    "mainDiagnosticProducerUsed": false,
+    "outcome": "PASS",
+    "checks": ["policyPrepared", "beginExactlyOnce", "originalQuestionIdentity", "answerExactlyOnce", "nativeApplied", "stopRecorded", "authenticatedBarrierCommitted", "originalCompleteProof", "actualChildExited", "durableRows"],
+    "tables": { "works": 1, "ticket": 1, "ticket_links": 1, "fact_receipts": 7, "dispatch_receipts": 2, "user_questions": 1, "answers": 1, "answer_deliveries": 1, "runtime_bindings": 1 },
+    "ownedRunner": { "pid": 91150, "exitCode": 0, "signalCode": null },
+    "stopObservationChannel": "Existing authenticated recovery cancel -> stopPhysical -> committed registered-owned barrier; no business cancel/turn-interrupt requirement",
+    "businessRecoveryAdmitted": false
+  },
+
+  "wave18FalseProblemWithdrawn": {
+    "claim": "stop_work does not reach the physical writer",
+    "verdict": "WITHDRAWN - it was a false problem",
+    "reason": "the product's real stop channel is the authenticated recovery cancel -> stopPhysical -> committed registered-owned barrier. I had asserted on business cancel frames and producer turn/interrupt, which that channel does not use. Main's probe and my recalibrated harness both show the barrier commits (1) and the child has exited."
+  },
+
+  "harnessCalibration": {
+    "answer": "now waits for delivery status native_applied instead of accepting pre-admission or response_written",
+    "sameAttempt": "included in the durable-rows condition (binding attempt must equal the receiver attempt)",
+    "stop": "now asserts the registered-owned barrier event plus work ended, not business cancel or turn/interrupt",
+    "result": "tests/native-acceptance/b19-normal-reconnect.mjs -> 5 PASS + 1 FAIL + 1 NOT_TESTED"
+  },
+
+  "B4_businessReconnectPort": {
+    "status": "DELIVERED AS SOURCE, NOT YET EXERCISED",
+    "file": "apps/runner/src/business-reconnect.ts",
+    "typecheck": "clean under root strict tsconfig",
+    "design": [
+      "reconnects to the SAME Runner over the existing authenticated recovery channel using the credential the Runner itself wrote",
+      "re-binds the ORIGINAL ticket, assignment, attempt, contract, runnerIdentityRef, source and fence epoch from the caller's own durable state - nothing is inferred",
+      "the product before-write guard still runs, unsuppressed, immediately before any cancel leaves",
+      "foreign identity and a non-current epoch are refused before the socket is used to write anything",
+      "an id the Runner already recorded is refused as already_recorded instead of being resent",
+      "opens no listening socket and creates no credential; it only consumes them"
+    ],
+    "honestLimit": "the recovery channel carries authenticated inspection and cancel only. Answers travel over the live attempt bridge, not this socket, so the port does not pretend to deliver answers.",
+    "blockingFinding": "in the current product lane the native attempt exposes NO Runner recovery socket: a live scan for runner.sock during the open attempt found zero candidates. So the port cannot be exercised against a live Runner here, which is the same seam that keeps businessRecoveryAdmitted false."
+  },
+
+  "notReached": {
+    "B5_sameRunnerAcrossCoordinatorInterruption": "not started; blocked on the missing recovery endpoint above",
+    "B6_beginAnswerStopCrashWindows": "not started",
+    "B7_validStaleEpoch": "not started; a valid stale-epoch proof needs current epoch >= 2 and this lane only reaches epoch 1. Epoch 0 is an invalid-input case, not a stale proof",
+    "B8_recoveredCandidateInspectionHumanAccept": "not started",
+    "B9_slots2And4AndResourceReturn": "not started",
+    "ACERecipe": "the normal producer/data recipe is available from the probe and this harness, but no stable recipe document has been published yet"
+  },
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "bConsumes": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "limitations": [
+    "the producer is a local protocol stub; installed-Codex behaviour and any gateway remain NOT_TESTED and were not contacted",
+    "the reconnect port is typechecked source with refusal paths designed, but it has not been run against a live Runner because this lane exposes no recovery socket",
+    "no coordinator-interruption window, no crash window, no valid stale epoch, no recovered delivery/candidate/accept, no 2/4 slots in this checkpoint",
+    "only one of the three required runnable checkpoints has been published"
+  ]
+}
