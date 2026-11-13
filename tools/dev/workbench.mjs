@@ -144,6 +144,7 @@ async function main() {
     root,
   )
   await waitFor(`${apiURL}/v1/health`, api)
+  const health = await (await fetch(`${apiURL}/v1/health`, { signal: AbortSignal.timeout(3000) })).json()
   const response = await fetch(`${apiURL}/v1/configuration`, {
     headers: { authorization: `Bearer ${credential('api.key')}` },
     signal: AbortSignal.timeout(3000),
@@ -189,6 +190,7 @@ async function main() {
         apiURL,
         configurationRevision: configuration.revision,
         executionAvailability: configuration.executionAvailability,
+        ...(health.restoredReviewDigest ? { restoredReviewDigest: health.restoredReviewDigest } : {}),
         mode: values.fixture ? 'fixture' : 'personal',
         access: values['require-login'] ? 'token' : 'local-development',
       },

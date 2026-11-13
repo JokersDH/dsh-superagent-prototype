@@ -7,13 +7,23 @@ import { test } from 'node:test'
 import { ProductStore } from '../../packages/storage/dist/index.js'
 import { WorkflowSnapshots } from '../../packages/workflows/dist/index.js'
 import { localCredentials } from '../../apps/coordinator/http/local-state.ts'
-import { loadRestoredReview, prepareRestoredReview } from '../../apps/coordinator/product/restored-review.ts'
+import { loadRestoredReview, prepareRestoredReview, restoredReviewIdentity } from '../../apps/coordinator/product/restored-review.ts'
 import { createProductRuntime } from '../../apps/coordinator/product/runtime.ts'
+import { createLocalHttpApp } from '../../apps/coordinator/http/app.ts'
 import { candidateModel } from './fixtures/assistant-candidate-model.mjs'
 import { availablePort, waitUntil } from './fixtures/personal-startup.mjs'
 
 const principal = { userId: 'local-demo-user', authorityRef: 'local-demo-authority' }, actor = { ...principal, source: 'local_cli' }
 const projectId = 'historical-payment-project', scope = { projectId, allowedPaths: ['src/'], excludedPaths: ['.git'], externalActions: [] }
+test('review health identity is bounded and only accepted for a restored personal process', async () => {
+  const base = { application: {}, principal, apiToken: 'a'.repeat(64), bootstrapToken: 'b'.repeat(64), mode: 'personal', allowedOrigins: [] }
+  assert.throws(() => createLocalHttpApp({ ...base, restoredReviewDigest: 'a'.repeat(64) }), /restored personal/)
+  assert.throws(() => createLocalHttpApp({ ...base, mode: 'fixture', startupMode: 'recovery_readonly', restoredReviewDigest: 'a'.repeat(64) }), /restored personal/)
+  assert.throws(() => createLocalHttpApp({ ...base, startupMode: 'recovery_readonly', restoredReviewDigest: 'private-path-or-payload' }))
+  const app = createLocalHttpApp({ ...base, startupMode: 'recovery_readonly', restoredReviewDigest: 'a'.repeat(64) })
+  assert.deepEqual(await (await app.request('http://127.0.0.1/v1/health')).json(), { status: 'ok', mode: 'personal',
+    startupMode: 'recovery_readonly', restoredReviewDigest: 'a'.repeat(64) })
+})
 function simple(t) {
   const root = mkdtempSync('/tmp/pa-restored-review-'), state = join(root, 'state')
   mkdirSync(state, { mode: 0o700 })
@@ -97,15 +107,17 @@ test('actual personal startup reviews only explicitly rebound historical data; q
   cpSync(join(snapshot.destination, 'artifacts'), join(restored, 'artifacts'), { recursive: true })
   writeFileSync(join(restored, 'restore-report.json'), JSON.stringify({ protocol: 'personal-restore/1', targetPath: restored,
     database: { integrity: 'ok', foreignKeyViolations: 0, productSchema: 18 }, evidence: { status: 'verified' } }), { mode: 0o600 })
-  const credential = localCredentials(restored), port = await availablePort(), api = `http://127.0.0.1:${port}`
+  const credential = localCredentials(restored), port = await availablePort(), consolePort = await availablePort(), api = `http://127.0.0.1:${port}`
   const headers = { authorization: `Bearer ${credential('api.key')}` }
-  const start = async file => {
-    child = spawn(process.execPath, ['apps/coordinator/product/demo.ts', '--state', restored, '--port', String(port), '--discussion-only', '--assistant',
-      ...(file ? ['--review-restored-scope', file] : [])], { cwd: resolve('.'), env: { ...process.env, PA_MODEL_CONFIG: model.file }, stdio: ['ignore', 'pipe', 'pipe'] })
+  const start = async (file, standard = false) => {
+    const args = standard ? ['tools/dev/start.mjs', '--state', restored, '--port', String(consolePort), '--api-port', String(port), '--discussion-only']
+      : ['apps/coordinator/product/demo.ts', '--state', restored, '--port', String(port), '--discussion-only', '--assistant']
+    child = spawn(process.execPath, [...args, ...(file ? ['--review-restored-scope', file] : [])],
+      { cwd: resolve('.'), env: { ...process.env, PA_MODEL_CONFIG: model.file }, stdio: ['ignore', 'pipe', 'pipe'] })
     child.stdout.on('data', bytes => { output += bytes }); child.stderr.on('data', bytes => { output += bytes })
     await waitUntil(async () => {
       if (child.exitCode !== null || child.signalCode !== null) throw new Error(output.slice(-2000))
-      try { return (await fetch(`${api}/v1/health`)).ok } catch { return false }
+      try { return (await fetch(`${api}/v1/health`)).ok && (!standard || existsSync(join(restored, 'workbench.json'))) } catch { return false }
     })
   }
   await start()
@@ -117,9 +129,25 @@ test('actual personal startup reviews only explicitly rebound historical data; q
   assert.equal(prepared.startupAvailable, false); assert.equal(existsSync(file), true)
   assert.throws(() => execFileSync(process.execPath, ['tools/dev/review-restored.mjs', '--state', restored, '--project', projectId,
     '--allow-path', 'src/', '--output', file], { stdio: 'pipe' }))
-  await start(file)
+  const differentFile = join(root, 'different-selection.json')
+  execFileSync(process.execPath, ['tools/dev/review-restored.mjs', '--state', restored, '--project', projectId,
+    '--allow-path', 'src/narrow/', '--output', differentFile], { stdio: 'pipe' })
+  await start(file, true)
   const health = await (await fetch(`${api}/v1/health`)).json()
   assert.equal(health.mode, 'personal'); assert.equal(health.startupMode, 'recovery_readonly')
+  assert.equal(health.restoredReviewDigest, restoredReviewIdentity(file))
+  const record = JSON.parse(readFileSync(join(restored, 'workbench.json'), 'utf8'))
+  assert.equal(record.restoredReviewDigest, health.restoredReviewDigest)
+  const reuseArgs = ['tools/dev/start.mjs', '--state', restored, '--discussion-only']
+  const reused = execFileSync(process.execPath, [...reuseArgs, '--review-restored-scope', file], { encoding: 'utf8', timeout: 10000 })
+  assert.match(reused, new RegExp(`127\\.0\\.0\\.1:${consolePort}`))
+  for (const extra of [[], ['--review-restored-scope', differentFile], ['--restart', '--review-restored-scope', file]])
+    assert.throws(() => execFileSync(process.execPath, [...reuseArgs, ...extra], { stdio: 'pipe', timeout: 10000 }), error => error.status === 1)
+  for (const extra of [['--port', String(await availablePort())], ['--require-login']])
+    assert.throws(() => execFileSync(process.execPath, [...reuseArgs, '--review-restored-scope', differentFile, ...extra], { stdio: 'pipe', timeout: 10000 }),
+      error => error.status === 1 && String(error.stderr).includes('只读恢复选择与本次请求不同') && !String(error.stdout).includes('Scope:'))
+  assert.equal(JSON.parse(readFileSync(join(restored, 'workbench.json'), 'utf8')).pid, record.pid)
+  assert.equal(child.exitCode, null)
   const config = await (await fetch(`${api}/v1/configuration`, { headers })).json(), selected = config.projects.find(value => value.id === projectId)
   assert.ok(selected); assert.equal(selected.dispatchAllowed, false); assert.deepEqual(selected.profileIds, []); assert.deepEqual(selected.scope, scope)
   const response = await fetch(`${api}/v1/messages/${sourceMessageId}/candidates`, { headers }), candidates = await response.json()

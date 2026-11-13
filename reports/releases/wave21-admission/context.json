@@ -1,0 +1,131 @@
+{
+  "protocol": "wave21-ac-independent-admission/1",
+  "date": "2026-11-13",
+  "mainSource": "4c938174b45c1a2177380c1d1f7eb7abb7c60f54",
+  "mainRuntimeBaseline": "773b34d restored personal read-startup plus 9856124 versioned snapshot",
+  "sources": {
+    "A": "141bbaa3fd778b189061a330ec4c4ac86b653bee",
+    "C": "a6f01721429cda898a1f387e628527a587c4a644"
+  },
+  "modelCalls": 0,
+  "vendorNativeTurns": 0,
+  "browserRuns": 0,
+  "releaseApproved": false,
+  "summary": {
+    "A": "The two prior owned strict errors are resolved. The new real personal CLI/API-child consumer runs and retains the already-passing same-Store controlled Broker/SDK/context chain.",
+    "C": "The new actual personal CLI/demo subprocess consumer passes, including unbound403 -> explicit600 selection -> bounded readonly historical review and mutation refusal. This is not only module loading or a fixture-mode replacement for personal startup.",
+    "productionFindings": "No new production safety or data-integrity defect found in this narrow changed-consumer audit. Main already contains the production entry and the reviewed snapshot source; no whole production-package import is needed."
+  },
+  "A": {
+    "strict": {
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows typecheck",
+      "exitCode": 0,
+      "log": "/tmp/pa-wave21-a-strict.log",
+      "resolved": [
+        "wave19-unified-data.case.ts uses all required AgentProfile fields rather than a partial descriptor",
+        "The optional recovery reader is narrowed with assert.ok before invocation"
+      ]
+    },
+    "build": {
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows build",
+      "exitCode": 0,
+      "log": "/tmp/pa-wave21-a-build.log"
+    },
+    "targetedConsumers": {
+      "command": "node --test packages/workflows/test/wave19-unified-data.case.ts packages/workflows/test/wave20-personal-business.case.ts",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "log": "/tmp/pa-wave21-a-personal.log",
+      "unifiedScope": "Real controlled Application/Effects/Broker -> answer/native_applied, same-Store SDK candidate/context and real source HTTP facts, default-v1 and explicit-v2 snapshots and readonly second-root data remain passing.",
+      "personalScope": "The new test restores the same real Work/Question/Answer/Delivery plus SDK/context database and artifacts to a new root, invokes tools/dev/review-restored.mjs and starts demo.ts with --discussion-only --assistant --review-restored-scope. Actual HTTP reads candidate/history/snapshot/delivery(native_applied); answer mutation422 and held queue/data survive child shutdown.",
+      "childOwnership": "Only the child spawned by this fixture is signaled and waited for; temporary roots/ports belong to the test. No existing service is stopped."
+    },
+    "scopeLimits": [
+      "This new A personal fixture starts only with a valid selection; unbound403 and the complete file/identity rejection matrix are independently covered by C and the actual main11-case suite below.",
+      "A checks candidate/history HTTP status, but does not assert nonempty candidate payload or context-source state in this personal test. The source fixture has excludedPaths=[] while the explicit review selection excludes .git; this narrower selection must not be described as proof that all original candidate/source data is still eligible.",
+      "A samples requestsBefore after the child is healthy, so its local provider comparison alone does not rule out calls during startup. C and the main process consumer compare from the pre-start count and independently cover no resend.",
+      "A's new personal child restores the default v1 snapshot. Explicit v2 is verified in the retained unified data test, but this new personal process is not run from the v2 snapshot."
+    ],
+    "packageCountScope": "The previously independently passing199 runtime tests are retained. This audit reran only the two changed-path consumers and complete package strict/build; the author's reported87+113 full-package count was not mechanically rerun."
+  },
+  "C": {
+    "strict": {
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing typecheck",
+      "exitCode": 0,
+      "log": "/tmp/pa-wave21-c-strict.log"
+    },
+    "build": {
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing build",
+      "exitCode": 0,
+      "log": "/tmp/pa-wave21-c-build.log"
+    },
+    "targetedConsumer": {
+      "command": "node --test packages/knowledge/test/main-personal-readstartup.case.ts",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "log": "/tmp/pa-wave21-c-personal.log",
+      "realProducer": "The existing controlled Application/Effects/Broker creates a real Work/Ticket/question; answer_question results in native_applied, and explicit accept_candidate produces delivered state. The same Store then uses a no-executor discussion runtime with the exact review Scope to create actual SDK candidate/context data and preserve original digest identities.",
+      "formats": "The same Store creates and verifies default v1 and explicit v2; unsupported3 fails before destination creation. The personal subprocess uses the restored v1 bytes and copied registered artifacts, not an arbitrary same-root mode switch.",
+      "beforeConsent": "Actual demo child without --review-restored-scope returns403 for candidate/history. That child stops before the CLI selection is generated.",
+      "consent": "Actual CLI writes new0600 restored-personal-review/1 data, refuses output overwrite, and the file contains neither API nor action key. Loader checks the current original source fingerprint, principal/root/key, startup window, signature/Scope edit, unsafe permission, symlink/FIFO and missing file.",
+      "personalChild": "Actual demo.ts child starts in mode=personal/startupMode=recovery_readonly with the explicit new selection. Configuration has exact requested Scope, dispatchAllowed=false and no profile IDs.",
+      "frozenReads": "Candidate GET retains original payloadDigest; history retains context message; context sources state=verified; audit bundleDigest is unchanged. Snapshot/work/delivery show original real Work delivered/native_applied; permission displays stay excluded from frozen ordinary context.",
+      "refusals": "Candidate prepare, chat, answer_question, create_work, proposal commands, context preview and original context-send token all422. Provider requests stay at the two original mock replies; after child shutdown held execute queue stays1 and Work count stays1.",
+      "sourceFacts": "Actual source prepare/confirm/audit in the personal readonly child stays not_granted/startupAvailable=false, does not create target or grant business execution. This is distinct from restored read consent."
+    },
+    "evidenceLimits": [
+      "Personal restore here uses the v1 database/artifacts copied from the verified snapshot. V2 create/verify passes, but the same child is not separately started from v2 bytes.",
+      "workbench.mjs flag forwarding is inspected source evidence; the executed process is demo.ts, not the launcher/immutable installed bundle or workbench/Vite process.",
+      "Foreign principal/root/key and expiry/unsafe-file cases run through the actual loader rather than spawning a failing demo child for every case.",
+      "The source/marker/signature mini-matrix at main-personal-readstartup.case.ts:317 mutates one drift Store cumulatively. After the first source change the token is already stale, so later marker/signature failures are not independent causal controls. The main suite below tests them separately; this is not reported as an unclosed production defect.",
+      "Host/platform/arch/uid binding is implemented in main and read in the selection; this fixture does not simulate moving the data to another machine.",
+      "No immutable installed-artifact, vendor/native, writer-quiescence, private permission or target-start admission is claimed."
+    ],
+    "packageCountScope": "The previously independently passing307 runtime tests are retained. This audit ran the new real-personal consumer plus complete four-package strict/build; the author's reported308 full-package count was not mechanically rerun."
+  },
+  "mainPersonalNegativeControls": {
+    "command": "node --test tests/integration/restored-personal-review.case.mjs",
+    "exitCode": 0,
+    "passed": 11,
+    "failed": 0,
+    "log": "/tmp/pa-wave21-main-restored.log",
+    "scope": "Actual main source/marker/signature/Scope edits are separate fresh fixture cases, unsafe file permissions/symlink/FIFO refuse, expiry/foreign principal/root/action key refuse, unknown project/unsafe path/execution claims refuse; actual personal API process proves403 before selection and review-only200 afterward with held queue and no model resend."
+  },
+  "findings": [],
+  "mainIntegration": {
+    "productionSource": "No new A/C production delta in this wave's reviewed backup.ts/snapshot.ts or main demo/restored-review consumer. Keep main773/985 implementation and existing security/Scope/readonly guards; do not merge whole older worktrees.",
+    "minimalReusableTestsAndRecipe": [
+      "A wave19-unified-data.case.ts full-profile/optional-reader strict fixes",
+      "A packages/workflows/test/wave20-personal-business.case.ts as scoped actual CLI/child Work/Q&A persistence evidence",
+      "C packages/knowledge/test/main-personal-readstartup.case.ts as the more complete same-data actual personal process consumer",
+      "Owned data recipes naming source/format/marker/read-selection/API-child identities and exact execution/installation limits"
+    ],
+    "currentUserVisibleOutcome": "An explicitly selected historical project in a restored personal state can be reviewed through the actual personal API: original candidate/history/frozen sources/Work/question-delivery data is readable, while all business mutations and old queues remain disabled. No new HTTP permission writer, migration or ledger was added by A/C.",
+    "remainingDependency": "Private startup permission, current physical writer proof and target activation remain independent main/B/D work. They do not invalidate this read-only user outcome. Installed-byte acceptance belongs to D/E and is not certified by these source process tests."
+  },
+  "nextOutcomePackages": {
+    "A": {
+      "outcome": "One parameterized recover-and-review recipe usable from the exact delivered package",
+      "early": "Preserve the now-passing strict/real business data chain; expose a bounded producer/snapshot/restore/review driver that accepts executable/package paths and selected format, records exact sources/hashes and uses public APIs rather than handwritten SQL or credentials.",
+      "middle": "Run both default v1 and explicit v2 into their own private roots with the same actual personal read CLI/API child; require exact original identity, legitimate narrowed Scope state and pre-start provider/queue baselines.",
+      "final": "Hand D/E the review-only package recipe with explicit missing/expired/wrong-root failure outcomes, old-token audit behavior and cleanup ownership. Installed release verdict and physical/private startup permission stay with their owners."
+    },
+    "C": {
+      "outcome": "Predictable personal recovery review when consent Scope or historical data changes",
+      "early": "Retain this passing real personal process as baseline. Split cumulative drift negatives into independent controls and add a newly signed legitimate narrower Scope selection, checking actual DTO states instead of treating all200 replies as sufficient.",
+      "middle": "Exercise the same frozen candidate/context/Work/Q&A data through personal API startup from both supported snapshot formats, including original-principal preservation, stale/missing artifacts and old candidate/source receipts as audit-only data.",
+      "final": "Deliver main/D/E precise source-and-installed consumer hooks, stable public partial/scope_changed/missing explanations and measured reader/provider bounds. Do not add another grant, SQL/HTTP writer, private model loop or target permission."
+    }
+  },
+  "preserved": {
+    "AWorktree": "clean",
+    "CWorktree": "original pnpm-lock.yaml diff only",
+    "userServiceGroups": 12,
+    "servicesTouched": false,
+    "ledgersTouched": false,
+    "historicalReportsOverwritten": false,
+    "repositoryOutput": "reports/releases/wave21-admission/context.json"
+  }
+}
