@@ -23,6 +23,7 @@ import {
   CommandReceiptSchema,
   ConversationPageSchema,
   IdSchema,
+  DigestSchema,
   InspectQuerySchema,
   SnapshotSchema,
   TrustedActorSchema,
@@ -169,6 +170,7 @@ export interface LocalHttpOptions {
   sessionTtlMs?: number
   mode: 'fixture' | 'product' | 'personal'
   startupMode?: 'normal' | 'recovery_readonly'
+  restoredReviewDigest?: string
   /** Explicit loopback-only fixture convenience; normal entries still require credentials. */
   localDevelopmentAccess?: boolean
   now?: () => number
@@ -223,6 +225,9 @@ export interface LocalHttpOptions {
 
 /** The HTTP module owns identity. Request bodies never contain actor or direct core/native access. */
 export function createLocalHttpApp(options: LocalHttpOptions) {
+  const restoredReviewDigest = options.restoredReviewDigest === undefined ? undefined : DigestSchema.parse(options.restoredReviewDigest)
+  if (restoredReviewDigest && (options.mode !== 'personal' || options.startupMode !== 'recovery_readonly'))
+    throw new TypeError('A review identity is valid only for a restored personal process')
   if (options.localDevelopmentAccess && !['fixture', 'personal'].includes(options.mode))
     throw new TypeError('Automatic local access is restricted to fixture/personal loopback entries')
   for (const secret of [options.bootstrapToken, options.apiToken])
@@ -297,6 +302,7 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
       status: 'ok',
       mode: options.mode,
       ...(options.startupMode === 'recovery_readonly' ? { startupMode: options.startupMode } : {}),
+      ...(restoredReviewDigest ? { restoredReviewDigest } : {}),
       ...(options.localDevelopmentAccess ? { access: 'local-development' } : {}),
     }),
   )

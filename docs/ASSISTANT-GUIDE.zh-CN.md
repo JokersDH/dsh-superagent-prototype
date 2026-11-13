@@ -113,10 +113,12 @@
 
 ```sh
 node tools/dev/review-restored.mjs --state /absolute/restored-state --project historical-project --allow-path src/ --output /absolute/new-review.json
-node tools/dev/workbench.mjs --discussion-only --state /absolute/restored-state --port 5192 --api-port 8808 --review-restored-scope /absolute/new-review.json
+pnpm start --discussion-only --state /absolute/restored-state --port 5192 --api-port 8808 --review-restored-scope /absolute/new-review.json
 ```
 
 将示例根目录、历史项目ID、路径和空闲端口换成实际输入。配置文件必须尚不存在，生成后五分钟内显式用于启动；状态变化或重开时重新准备。它只开放历史候选/使用记录/原文读取，不启用模型、旧任务、批准或目标执行；当前没有对应网页授权表单。说明见[只读启动边界](rfcs/WP-16/0054-explicit-restored-personal-review.md)。原有十二实例不需为此重启。
+
+标准启动只复用实际生效选择相同的实例。省略选择、换成另一份选择或向未绑定实例传入配置会明确拒绝，保留原进程；需要变更时先明确停止，再重新准备并启动。不要把review参数与`--restart`或`--stop`放在同一条命令。详见[启动复用规则](rfcs/WP-16/0056-standard-start-reviewed-instance-identity.md)。
 
 恢复源确认的后端现已提供只读准备和明确确认接口，供恢复开发与验收使用；当前网页尚无对应表单，旧运行实例未自动更新。它只记录本次源意图并支持核对原回执，不启动目标、不消费旧队列。恢复激活与私有本机许可仍未开放，详见[源确认检查点](rfcs/WP-16/0048-actual-source-confirmation-checkpoint.md)。
 

@@ -11,7 +11,7 @@ import { ensureScratchProject } from './scratch.ts'
 import { PrivateModelProvider } from './model-provider.ts'
 import { DISCUSSION_PROJECT, preparePersonalStartup } from './native-startup.ts'
 import { NativeProjectRegistry } from './project-registry.ts'
-import { loadRestoredReview } from './restored-review.ts'
+import { loadRestoredReviewWithIdentity } from './restored-review.ts'
 
 const { values } = parseArgs({
   options: {
@@ -36,11 +36,11 @@ const recovery = values['startup-mode'] === 'recovery_readonly' || existsSync(jo
 const credential = localCredentials(stateRoot)
 const store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
 const principal = { userId: 'local-demo-user', authorityRef: 'local-demo-authority' }
-let explicitReview: ReturnType<typeof loadRestoredReview> | undefined
+let explicitReview: ReturnType<typeof loadRestoredReviewWithIdentity> | undefined
 try {
   if (values['review-restored-scope']) {
     if (!recovery || (!values.native && !values['discussion-only'])) throw new Error('Explicit restored review requires a restored personal startup')
-    explicitReview = loadRestoredReview(values['review-restored-scope'], store, stateRoot, principal, Buffer.from(credential('action.key'), 'hex'))
+    explicitReview = loadRestoredReviewWithIdentity(values['review-restored-scope'], store, stateRoot, principal, Buffer.from(credential('action.key'), 'hex'))
   }
 } catch (error) { store.close(); throw error }
 const lock = new WriterLock(stateRoot, new InstanceRegistry(store.db))
@@ -56,7 +56,7 @@ try {
   const personalStartup = personal && !recovery ? preparePersonalStartup(stateRoot, { discussionOnly: values['discussion-only'] }) : undefined
   const native = personalStartup && 'native' in personalStartup ? personalStartup.native : undefined
   const executionUnavailable = personalStartup && 'executionUnavailable' in personalStartup ? personalStartup.executionUnavailable : undefined
-  const restoredProjects = explicitReview ?? (recovery ? new NativeProjectRegistry(stateRoot).list().map(project => ({ id: project.id,
+  const restoredProjects = explicitReview?.projects ?? (recovery ? new NativeProjectRegistry(stateRoot).list().map(project => ({ id: project.id,
     displayName: project.displayName, scope: { projectId: project.id, allowedPaths: ['.'], excludedPaths: ['.git'], externalActions: [] } })) : [])
   const activeProduct = createProductRuntime({
     store,
@@ -94,6 +94,7 @@ try {
     allowedOrigins: [`http://127.0.0.1:${port}`, values['console-origin']!],
     mode: personal ? 'personal' : 'fixture',
     startupMode: recovery ? 'recovery_readonly' : 'normal',
+    ...(explicitReview ? { restoredReviewDigest: explicitReview.identity } : {}),
     localDevelopmentAccess: values['local-access'] === true,
     read: activeProduct.read,
     operations: activeProduct.operations,
