@@ -109,6 +109,7 @@ export class WorkflowSnapshots {
     const referencedArtifacts = readRoutingArtifactRefs(databasePath)
     const missingReferences = referencedArtifacts.filter(id => !registryIds.has(id))
     const evidence = readWorkflowEvidence(databasePath)
+    const legacyEvidence = readWorkflowEvidence(databasePath, 1)
     const artifacts: SnapshotArtifact[] = []
     const missing: string[] = []
     const corrupt: string[] = []
@@ -195,6 +196,7 @@ export class WorkflowSnapshots {
     const databaseSha = sha256(bytes)
     const verified = verifyDatabase(databasePath)
     const evidence = readWorkflowEvidence(databasePath)
+    const legacyEvidence = readWorkflowEvidence(databasePath, 1)
     const artifacts = manifest.artifacts.map(item => {
       const file = join(destination, item.snapshotPath)
       if (!existsSync(file)) return { id: item.id, status: 'missing' as const }
@@ -217,21 +219,25 @@ export class WorkflowSnapshots {
         return !!recorded && recorded.count === current.count && recorded.digest === current.digest &&
           recorded.truncated === current.truncated
       })
-    const legacyFamilies = Array.isArray(manifestFamilies) && manifestFamilies.length > 0 &&
-      manifestFamilies.every(family => {
-        const current = evidence.families.find(value => value.name === family.name)
-        return !!current && current.count === family.count && current.digest === family.digest &&
-          current.truncated === family.truncated
+    const legacyFamilies = Array.isArray(manifestFamilies) &&
+      manifestFamilies.length === legacyEvidence.families.length &&
+      new Set(manifestFamilies.map(family => family.name)).size === manifestFamilies.length &&
+      legacyEvidence.families.every(recorded => {
+        const manifestFamily = manifestFamilies.find(family => family.name === recorded.name)
+        return !!manifestFamily && manifestFamily.count === recorded.count && manifestFamily.digest === recorded.digest &&
+          manifestFamily.truncated === recorded.truncated
       })
     const evidenceMatches = futureFamilySet ? false
       : manifest.protocol === 'workflow-snapshot/2'
         ? familySetVersion === EVIDENCE_FAMILY_SET_VERSION && manifest.evidence?.protocol === 'workflow-evidence/2' &&
           manifest.evidence.digest === evidence.digest && exactFamilies
         : manifest.protocol === 'workflow-snapshot/1'
-          ? familySetVersion === undefined && manifest.evidence?.protocol === 'workflow-evidence/1' && legacyFamilies
+          ? familySetVersion === undefined && manifest.evidence?.protocol === 'workflow-evidence/1' &&
+            manifest.evidence.digest === legacyEvidence.digest && legacyFamilies
           : false
     const schemaInventory = inspectSchemaInventory(databasePath, verified.productSchema)
-    const schemaOk = !schemaInventory.futureSchema && schemaInventory.missingTables.length === 0 &&
+    const schemaOk = schemaInventory.productSchema !== null && schemaInventory.productSchema >= 1 &&
+      !schemaInventory.futureSchema && schemaInventory.missingTables.length === 0 &&
       schemaInventory.missingIndexes.length === 0 && schemaInventory.unknownTables.length === 0
     const ok = manifest.complete && !manifest.incompatibleSchema && !incompatibleSchema && schemaOk &&
       evidenceMatches &&

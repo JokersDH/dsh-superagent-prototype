@@ -13,6 +13,7 @@ import { key } from '../../orchestrator-core/src/core/ids.ts'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
 import { WorkflowSnapshots } from '../src/index.ts'
+import { RecoveryIntentCommitter } from '../../../apps/coordinator/product/recovery-intents.ts'
 // @ts-expect-error main-owned plain-JS fixture without declarations
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 
@@ -55,6 +56,37 @@ test('a real candidate confirmation survives a snapshot restore at a second root
   const result = store.workflows.assistant.replyResults.forRequest(requestId)
   assert.ok(result)
 
+  const contextCommand = 'wave16-context', contextMessageId = key('message', contextCommand)
+  const contextPrepared = await request('/v1/assistant/context/prepare', { commandId: contextCommand, text: 'Read the candidate context.',
+    context: { projectId, conversationId, selections: ['conversation'], budget: { maxFiles: 24, maxBytes: 65536, maxTokens: 16384 } } })
+  assert.equal(contextPrepared.status, 200, JSON.stringify(contextPrepared.value))
+  assert.equal((await request('/v1/assistant/context/send', { commandId: contextCommand, token: contextPrepared.value.token })).status, 200)
+  await product.execution.effects.idle('application.assistant.reply')
+  const workId = 'wave16-combined-work', contract = { workId, revision: 1, digest: 'c'.repeat(64) }, ticketId = 'wave16-combined-ticket'
+  store.product.works.insert({ id: workId, projectId, conversationId, title: 'Combined candidate work', createdAt: new Date().toISOString() })
+  store.product.contracts.append({ ...contract, goal: 'Combined snapshot work', scope,
+    criteria: [{ id: 'combined-human', kind: 'human', required: true, description: 'Review' }], authorityRef: principal.authorityRef,
+    createdAt: new Date().toISOString() })
+  store.product.links.attach({ contract, ticketId, role: 'primary', authorityRef: principal.authorityRef })
+  store.authority.enable(contract)
+  const contextBinding = store.workflows.assistant.contextBindings.forMessage(contextMessageId)
+  assert.ok(contextBinding)
+  store.product.questions.insert({ id: 'wave16-combined-question', version: 1, kind: 'clarification', contract, scope,
+    prompt: 'Continue with the combined work?', nativePayloadRef: contextBinding.bundleRef, presentation: { kind: 'free_text' },
+    targets: [{ ticketId, assignmentId: 'wave16-combined-assignment', contract, attemptId: 'wave16-combined-attempt', fenceEpoch: 1,
+      id: 'wave16-combined-target', connectionEpoch: 1, nativeRequestId: { kind: 'string', value: 'wave16-combined-native' },
+      nativeMethod: 'question/ask', provenanceRef: 'wave16-combined-provenance' }], openedAt: new Date().toISOString(), validity: 'open' })
+  store.answers.record('wave16-combined-answer', { questionId: 'wave16-combined-question', expectedVersion: 1,
+    digest: 'e'.repeat(64), answer: { kind: 'free_text', text: 'yes' } })
+  store.answers.upsertDelivery('wave16-combined-answer', 'wave16-combined-target', 'local_recorded')
+  const activationIntent = { protocol: 'recovery-activation-intent/1', activationId: 'wave16-combined-activation',
+    commandId: 'wave16-combined-source-command', planId: 'wave16-combined-plan', planDigest: 'f'.repeat(64),
+    source: { stateId: 'source', stateRoot: '/tmp/source', markerDigest: 'a'.repeat(64), inspectionFingerprint: 'b'.repeat(64) },
+    target: { generationId: 'generation', stateRoot: '/tmp/target', configurationDigest: 'c'.repeat(64) },
+    principal, machineDigest: 'd'.repeat(64), resourcePolicyDigest: 'e'.repeat(64),
+    createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 300000).toISOString() }
+  const sourceCommit = new RecoveryIntentCommitter(store, store.workflows.recoveryActivations, principal, () => {})
+    .commit(activationIntent as any, { ...principal, source: 'local_ui' })
   store.queue.enqueue('application.execute', 'wave16-candidate-held', '{"held":true}', 1, 0, new Date().toISOString())
   const snapshot = join(root, 'snapshot')
   const created = await new WorkflowSnapshots(store).create({ destination: snapshot })
@@ -74,6 +106,16 @@ test('a real candidate confirmation survives a snapshot restore at a second root
     assert.equal(verification.status, 'ok', verification.message)
     assert.equal(restored.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 10)
       .some(row => row.key === 'wave16-candidate-held'), true)
+    assert.equal(restored.product.works.get(workId)?.title, 'Combined candidate work')
+    assert.equal(restored.product.contracts.getByRef(contract)?.goal, 'Combined snapshot work')
+    assert.equal(restored.product.questions.get('wave16-combined-question')?.validity, 'open')
+    assert.equal(restored.answers.get('wave16-combined-answer')?.digest, 'e'.repeat(64))
+    assert.equal(restored.answers.deliveries('wave16-combined-answer')[0]?.status, 'local_recorded')
+    assert.equal(restored.workflows.assistant.contextBindings.forMessage(contextMessageId)?.bundleRef, contextBinding.bundleRef)
+    assert.equal(restored.workflows.recoveryActivations.get('wave16-combined-activation')?.commandId, 'wave16-combined-source-command')
+    assert.equal(restored.commands.get('wave16-combined-source-command')?.payloadDigest, store.commands.get('wave16-combined-source-command')?.payloadDigest)
+    const restoredSource = restored.workflows.recoverySource.inspect({ ignoreCommitted: sourceCommit as any })
+    assert.equal(restoredSource.coverage, 'complete')
 
     // Start the actual recovery_readonly runtime/HTTP over the second-root database.
     const readonly = createProductRuntime({ store: restored, stateRoot: restoreRoot, scratchProject: projectRoot, principal,
@@ -82,10 +124,11 @@ test('a real candidate confirmation survives a snapshot restore at a second root
       const app = createLocalHttpApp({ application: readonly.application, principal, apiToken, bootstrapToken: 'b'.repeat(64),
         allowedOrigins: ['http://127.0.0.1:5173'], mode: 'personal', startupMode: 'recovery_readonly',
         read: readonly.read, operations: readonly.operations })
-      const snapshotResponse = await app.request(`http://127.0.0.1/v1/snapshot?conversationId=${encodeURIComponent(conversationId)}`, { headers })
-      assert.equal(snapshotResponse.status, 200)
-      const snapshotValue = await snapshotResponse.json() as any
-      assert.ok(snapshotValue.conversation.messages.some((message: any) => message.provenance === 'reasoner_reply' && message.text.length > 0))
+      const historyResponse = await app.request(`http://127.0.0.1/v1/context/history?projectId=${encodeURIComponent(projectId)}&conversationId=${encodeURIComponent(conversationId)}`, { headers })
+      const historyBody = await historyResponse.text()
+      assert.equal(historyResponse.status, 200, historyBody)
+      const historyValue = JSON.parse(historyBody)
+      assert.ok(historyValue.entries.some((entry: any) => entry.messageId === contextMessageId))
       const queueBefore = restored.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 10)
       const eventsBefore = restored.events.cursor()
       const rejected = await app.request('http://127.0.0.1/v1/commands', { method: 'POST', headers,
@@ -93,7 +136,7 @@ test('a real candidate confirmation survives a snapshot restore at a second root
       assert.notEqual(rejected.status, 200)
       assert.deepEqual(restored.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 10), queueBefore)
       assert.equal(restored.events.cursor(), eventsBefore)
-      assert.equal(restored.product.messages.page(conversationId).messages.filter(message => message.provenance === 'reasoner_reply').length, 1)
+      assert.equal(restored.product.messages.page(conversationId).messages.filter(message => message.provenance === 'reasoner_reply').length, 2)
     } finally { await readonly.close() }
   } finally { restored.close(); restored = undefined; rmSync(restoreRoot, { recursive: true, force: true }) }
 })

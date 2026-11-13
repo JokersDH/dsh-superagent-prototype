@@ -1,0 +1,18 @@
+{
+  "status": "PASS_LONG_DISPATCH_STATIC_ONLY",
+  "roles": 6,
+  "phases": 60,
+  "checkpoints": 30,
+  "localLinks": 119,
+  "acyclic": true,
+  "nonoverlappingOwners": true,
+  "sourceConfirmationAndSchemaInputsReady": true,
+  "mainDiagnosticNotBDelivery": true,
+  "sameFrozenArtifactRequired": true,
+  "ordinaryInstallIndependentOfActivation": true,
+  "goalDoesNotChangeBudget": true,
+  "budgetUnchanged": true,
+  "preservedServicePairs": 12,
+  "runtimeTests": 0,
+  "nativeTurnStarts": 0
+}

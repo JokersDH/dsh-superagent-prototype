@@ -1,0 +1,29 @@
+$ node --test test/*.case.ts
+✔ mutating startup profile, check or principal objects cannot expand application authority (24.221375ms)
+✔ create is one real core lifecycle, persisted product records and queued effects; reopen replays the original receipt (23.485125ms)
+✔ unauthorized actor, changed command body and unregistered machine checks cannot grant execution (16.068292ms)
+✔ last receipt failure rolls core, product index, messages, events and queued execution back together (15.189667ms)
+✔ discussion never creates work; explicit anchored supplement reaches only its original work and invalidates the candidate (24.262042ms)
+✔ stop is logical first and schedules physical reconciliation; late chat cannot resume stopped work (11.988791ms)
+✔ revision preserves work identity and old records, revokes the previous grant and shows switching while its writer is live (15.507542ms)
+✔ pause uses CAS, changes only future dispatch and rejects stale revisions (12.112083ms)
+✔ retry action token fences the current assignment and old writers; successful retry invalidates the old token (13.214ms)
+✔ only current trusted verification can complete a candidate; machine failure is not overridden by acceptance (16.242834ms)
+✔ stream exposes only public notifications, handles future cursor and closes while idle (9.945125ms)
+✔ scope expiry removes execution actions while deterministic stop remains available (10.660167ms)
+✔ catalog commands keep CAS, replay, actor and transaction boundaries across reopen (23.68275ms)
+✔ message-only legacy and mixed-project catalogs are scoped by all persisted messages (21.481375ms)
+✔ catalog paging is encrypted, query-bound, and keeps archived active work visible (26.616291ms)
+✔ placeholder title follows the first user message without overwriting an explicit rename (13.841958ms)
+✔ preflight is read-only and outside UOW; opaque command snapshots cannot be forged or moved (25.172583ms)
+✔ caller rollback includes core, queue, receipts and participant changes (21.285916ms)
+✔ commit rechecks current policy and a composer can roll back its participant on rejection (13.962667ms)
+✔ expired handles reject without effects, while committed receipt replay remains stable (12.803625ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 363.835125

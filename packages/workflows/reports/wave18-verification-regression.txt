@@ -1,0 +1,32 @@
+$ node --test test/*.case.ts
+✔ the registry is immutable per revision and refuses unregistered or invalid checks (1.238333ms)
+✔ a passing check and a failing check produce real exit results (51.121583ms)
+✔ each verification uses its prepared environment while preserving registered variable permissions (23.943167ms)
+✔ a deadline and the output budget bound a check instead of buffering without limit (179.182917ms)
+✔ a check that ignores SIGTERM is killed as a group and does not hang the runner (354.670667ms)
+✔ a missing executable is NOT_TESTED and an unregistered check refuses verification (7.321125ms)
+✔ trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results (24.819375ms)
+✔ the frozen-artifact guard is mandatory and only an explicit true passes (22.805625ms)
+✔ a verification binds the candidate, artifact and core criteria digest (26.541917ms)
+✔ the runner refuses a workspace modified after freeze (WorkspaceManager integration) (376.19825ms)
+✔ the evidence store resolves only matching candidate/artifact records, read-only (42.126084ms)
+✔ quiescence requires a trusted complete-inventory barrier, never a caller subset or plain observations (9.417834ms)
+✔ the core gate completes only a fully proven candidate (36.042792ms)
+✔ a machine FAIL cannot be overridden by human acceptance (32.801125ms)
+✔ a SKIPPED required machine check cannot be overridden by human acceptance either (9.218875ms)
+✔ an old generation or a different artifact cannot be completed (33.021959ms)
+✔ a late resource append invalidates the recorded completion evidence (32.262542ms)
+✔ acceptance and quiescence records are immutable over their full body (32.946125ms)
+✔ quiescence requires the current pointer, the barrier topic, the producer identity and a committed command result (9.125542ms)
+✔ an empty registered manifest completes only without a writer fact (8.073542ms)
+✔ moving the current pointer after recording invalidates the resolved evidence (32.340042ms)
+✔ Verification intake is strictly validated (8.009166ms)
+✔ the WP-04/WP-02 migrations are appended without rewriting v1–v5 (0.883875ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1238.133333

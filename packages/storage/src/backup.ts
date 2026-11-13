@@ -117,6 +117,22 @@ const EVIDENCE_FAMILIES: readonly EvidenceFamilySpec[] = [
       'principal_authority_ref', 'machine_digest', 'resource_policy_digest', 'created_at', 'expires_at', 'value', 'digest'],
     order: 'created_at, activation_id' },
 ]
+/** Exact family set and field list produced by the real pre-v2 (wave14) producer. */
+const LEGACY_FAMILY_NAMES = new Set([
+  'decisions', 'legacy_decisions', 'proposals', 'project_settings', 'contracts', 'verifications',
+  'acceptances', 'outcomes', 'reviews', 'recovery_intents', 'assistant_context_bindings',
+  'assistant_reply_results', 'recovery_activations',
+])
+const LEGACY_BINDING_BODY = ['message_id', 'command_id', 'request_id', 'project_id', 'conversation_id',
+  'user_text_digest', 'principal_user_id', 'principal_authority_ref', 'bundle_ref', 'bundle_digest',
+  'confirmed_at', 'expires_at', 'value', 'digest'] as const
+
+function evidenceFamilySpecs(version: 1 | 2): readonly EvidenceFamilySpec[] {
+  if (version === 2) return EVIDENCE_FAMILIES
+  return EVIDENCE_FAMILIES.filter(family => LEGACY_FAMILY_NAMES.has(family.name)).map(family =>
+    family.name === 'assistant_context_bindings' ? { ...family, body: LEGACY_BINDING_BODY } : family)
+}
+
 const EVIDENCE_LIMIT = 2000
 
 /**
@@ -125,11 +141,11 @@ const EVIDENCE_LIMIT = 2000
  * the database file bytes and manifest hash were re-recorded. It is not a second event authority
  * and does not return record bodies to callers.
  */
-export function readWorkflowEvidence(databasePath: string): WorkflowEvidenceSummary {
+export function readWorkflowEvidence(databasePath: string, version: 1 | 2 = 2): WorkflowEvidenceSummary {
   const db = new Database(databasePath, { readonly: true, fileMustExist: true })
   try {
     const families: WorkflowEvidenceFamily[] = []
-    for (const family of EVIDENCE_FAMILIES) {
+    for (const family of evidenceFamilySpecs(version)) {
       const exists = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?")
         .get(family.existsTable ?? family.table)
       if (!exists) {
@@ -156,8 +172,10 @@ export function readWorkflowEvidence(databasePath: string): WorkflowEvidenceSumm
     const digest = createHash('sha256')
       .update(families.map(family => `${family.name}:${family.count}:${family.digest}`).join('\n'))
       .digest('hex')
-    return { protocol: 'workflow-evidence/2', familySetVersion: EVIDENCE_FAMILY_SET_VERSION, families, digest,
-      complete: families.every(family => !family.truncated) }
+    return version === 2
+      ? { protocol: 'workflow-evidence/2', familySetVersion: EVIDENCE_FAMILY_SET_VERSION, families, digest,
+          complete: families.every(family => !family.truncated) }
+      : { protocol: 'workflow-evidence/1', families, digest, complete: families.every(family => !family.truncated) }
   } finally { db.close() }
 }
 

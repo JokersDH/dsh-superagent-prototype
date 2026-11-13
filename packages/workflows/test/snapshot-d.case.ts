@@ -10,7 +10,7 @@ import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import Database from 'better-sqlite3'
-import { ProductStore, PRODUCT_SCHEMA_VERSION, recoveryTargetInventory, verifyDatabase } from '@personal-agent/storage'
+import { ProductStore, PRODUCT_SCHEMA_VERSION, readWorkflowEvidence, recoveryTargetInventory, verifyDatabase } from '@personal-agent/storage'
 import { createWorkflowPorts, WorkflowSnapshots } from '../src/index.ts'
 import { CompletedAssistantReplies } from '../../../apps/coordinator/product/assistant-reply-results.ts'
 import { key } from '../../../packages/orchestrator-core/src/core/ids.ts'
@@ -456,14 +456,20 @@ test('a v2 evidence manifest requires the exact complete family set while a v1 m
     }
 
     const legacy = copy('legacy-v1')
+    const legacyEvidence = readWorkflowEvidence(join(snapshot, 'product.sqlite'), 1)
     rewrite(legacy, manifest => {
       manifest.protocol = 'workflow-snapshot/1'
-      manifest.evidence.protocol = 'workflow-evidence/1'
-      delete manifest.evidence.familySetVersion
-      manifest.evidence.families = manifest.evidence.families.slice(0, 2)
+      manifest.evidence = legacyEvidence
     })
     assert.equal(new WorkflowSnapshots(data.store).verify(legacy).status, 'ok',
-      'a v1 manifest is verified against the families it actually recorded')
+      'a genuine v1 manifest is verified with the legacy field list and complete 13-family set')
+    const legacySubset = copy('legacy-v1-subset')
+    rewrite(legacySubset, manifest => {
+      manifest.protocol = 'workflow-snapshot/1'; manifest.evidence = legacyEvidence
+      manifest.evidence.families = manifest.evidence.families.slice(0, 12)
+    })
+    assert.equal(new WorkflowSnapshots(data.store).verify(legacySubset).status, 'blocked',
+      'even a legacy v1 manifest must contain its complete known family set')
 
     for (const [name, mutate] of [
       ['missing-empty-table', (db: any) => db.exec('DROP TABLE assistant_reply_results')],

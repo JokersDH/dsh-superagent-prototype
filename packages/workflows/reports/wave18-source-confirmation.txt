@@ -1,0 +1,22 @@
+✔ actual source prepare is read-only and confirmation records one A fact/receipt with no target or business dispatch (317.029708ms)
+✔ a lost confirmation response replays its exact original receipt after expiry, source change and runtime reopen (269.454209ms)
+✔ new source confirmation refuses unlogged source row without writing an intent (159.809625ms)
+✔ new source confirmation refuses marker bytes without writing an intent (161.603666ms)
+✔ new source confirmation refuses current executor without writing an intent (259.592666ms)
+✔ new source confirmation refuses target now exists without writing an intent (265.289041ms)
+✔ new source confirmation refuses expiry without writing an intent (258.068542ms)
+✔ unexpected same-transaction source writes beyond the exact confirmation roll back fact, event, receipt and queue together (366.02875ms)
+✔ receipt-storage failure rolls back the original source fact and allows the identical still-current request (415.911792ms)
+✔ signature, server-only fields, foreign principal, unsupported media, origins and exact readonly exceptions stay enforced (177.593083ms)
+✔ normal startup refuses both source routes and historical/overlapping targets cannot be prepared (372.442291ms)
+✔ another configured root cannot substitute for the actual source database directory (201.378875ms)
+✔ actual independent-process SIGKILL before-commit preserves one original confirmation and held queue (3833.889ms)
+✔ actual independent-process SIGKILL after-commit preserves one original confirmation and held queue (1737.99025ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9168.319458
