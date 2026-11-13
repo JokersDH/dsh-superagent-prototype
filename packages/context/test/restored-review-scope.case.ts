@@ -55,3 +55,8 @@ test('unverified historical sources are partial regardless of the selection', ()
     assert.deepEqual(result.withheldSourceIds, [])
   }
 })
+
+test('unobserved readable counts stay unknown rather than becoming invented zero coverage', () => {
+  const result = explainRestoredReviewScope({ bindingScope, selection: selection(), sourcesState: 'verified', frozenSourceIds: [] })
+  assert.deepEqual(result.readable, { candidates: null, history: null, works: null, deliveries: null })
+})

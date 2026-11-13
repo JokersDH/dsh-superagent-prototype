@@ -19,10 +19,10 @@ export interface RestoredScopeReviewInput {
   readonly selection: Scope
   readonly sourcesState: 'verified' | 'scope_changed' | 'missing' | 'unverified'
   readonly frozenSourceIds: readonly string[]
-  readonly readableCandidates: number
-  readonly readableHistory: number
-  readonly readableWorks: number
-  readonly readableDeliveries: number
+  readonly readableCandidates?: number
+  readonly readableHistory?: number
+  readonly readableWorks?: number
+  readonly readableDeliveries?: number
 }
 
 export interface RestoredScopeReview {
@@ -33,10 +33,10 @@ export interface RestoredScopeReview {
   readonly reasons: readonly RestoredScopeReason[]
   readonly withheldSourceIds: readonly string[]
   readonly readable: {
-    readonly candidates: number
-    readonly history: number
-    readonly works: number
-    readonly deliveries: number
+    readonly candidates: number | null
+    readonly history: number | null
+    readonly works: number | null
+    readonly deliveries: number | null
   }
   readonly authorization: 'none'
 }
@@ -73,13 +73,13 @@ export function explainRestoredReviewScope(input: RestoredScopeReviewInput): Res
     state: input.sourcesState,
     scopeChanged,
     partial: input.sourcesState !== 'verified' || withheldSourceIds.length > 0,
-    reasons,
+    reasons: [...new Set(reasons)],
     withheldSourceIds,
     readable: {
-      candidates: input.readableCandidates,
-      history: input.readableHistory,
-      works: input.readableWorks,
-      deliveries: input.readableDeliveries,
+      candidates: input.readableCandidates ?? null,
+      history: input.readableHistory ?? null,
+      works: input.readableWorks ?? null,
+      deliveries: input.readableDeliveries ?? null,
     },
     authorization: 'none',
   }
