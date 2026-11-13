@@ -74,3 +74,13 @@ test('async guards are refused before invocation; inconsistent stored facts cann
   const broken = new RecoveryIntentCommitter(h.store, { ...port, get: () => undefined }, actor, () => {})
   assert.throws(() => broken.commit(value, actor), e => e.error.code === 'storage_unavailable')
 })
+
+test('a post-confirmation guard returning a thenable cannot commit source facts or a receipt', t => {
+  const h = fixture(t), value = intent(), port = facts(h.store)
+  const service = new RecoveryIntentCommitter(h.store, port, actor, () => {}, () => '2026-11-11T00:01:00.000Z',
+    () => Promise.reject(new Error('Post-confirmation rejection')))
+  assert.throws(() => service.commit(value, actor))
+  assert.equal(port.get(value.activationId), undefined)
+  assert.equal(h.store.commands.get(value.commandId), undefined)
+  assert.equal(h.store.events.cursor(), 0)
+})

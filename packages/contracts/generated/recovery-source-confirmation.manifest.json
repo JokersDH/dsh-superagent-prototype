@@ -1,0 +1,7 @@
+{
+  "protocol": "recovery-source-prepared/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "f2dfabfb0b715114717081c5f58cc21e5ba8de81b65923934c1d36e1bef821fd",
+  "sourceHash": "258a9b347dbf4e7569bffffd34c14b4a4aa7b3dc977a7853eb136098763f40dc"
+}

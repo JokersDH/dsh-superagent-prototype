@@ -31,13 +31,15 @@ export class RecoveryIntentCommitter {
   private readonly facts: RecoveryActivationFacts
   private readonly revalidate: (intent: RecoveryActivationIntent) => void
   private readonly now: () => string
+  private readonly validateCommitted: ((commit: RecoveryActivationCommit) => void) | undefined
   constructor(store: ProductStore, facts: RecoveryActivationFacts,
     principal: { userId: string; authorityRef: string },
     revalidate: (intent: RecoveryActivationIntent) => void,
-    now = () => new Date().toISOString()) {
+    now = () => new Date().toISOString(), validateCommitted?: (commit: RecoveryActivationCommit) => void) {
     this.principal = structuredClone(principal)
     this.store = store; this.facts = facts; this.revalidate = revalidate; this.now = now
-    if (Object.prototype.toString.call(revalidate) === '[object AsyncFunction]')
+    this.validateCommitted = validateCommitted
+    if ([revalidate, validateCommitted].some(value => Object.prototype.toString.call(value) === '[object AsyncFunction]'))
       throw new TypeError('Recovery intent revalidation must be synchronous')
   }
   commit(input: RecoveryActivationIntent, inputActor: TrustedActor): RecoveryActivationCommit {
@@ -71,8 +73,10 @@ export class RecoveryIntentCommitter {
         this.store.events.append({ topic: 'application.recovery.intent', entityRef: intent.activationId, payload: intent })
         return intent
       })
-      return RecoveryActivationCommitSchema.parse({ protocol: 'recovery-activation-commit/1', intent: receipt.result,
+      const committed = RecoveryActivationCommitSchema.parse({ protocol: 'recovery-activation-commit/1', intent: receipt.result,
         sourceReceipt: { commandId: intent.commandId, seq: receipt.seq } })
+      this.store.uow.atomic(() => this.validateCommitted?.(structuredClone(committed)))
+      return committed
     })
   }
   private requireFact(intent: RecoveryActivationIntent): void {

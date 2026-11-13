@@ -1,0 +1,159 @@
+{
+  "protocol": "wave17-ac-independent-admission/1",
+  "date": "2026-11-13",
+  "mainSource": "7a2f9e98ef8c52680e7766a25cc83aa13e3253b9",
+  "sources": {
+    "A": "58a22e26a7ea48f4c081d4d7d20d333a97a1092b",
+    "C": "f56f17cecd688348e941b9caa9e31acca4f794cb"
+  },
+  "modelCalls": 0,
+  "nativeTurnStarts": 0,
+  "browserRuns": 0,
+  "releaseApproved": false,
+  "A": {
+    "verdict": "Previous subset counterexamples close for v2; version compatibility and required-schema completeness still have bounded counterexamples. New real candidate and Q&A data-continuity tests pass.",
+    "previousSnapshotProbe": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave17-a-previous.json node tools/bootstrap/probe-wave16-storage.mjs /Users/hh/Desktop/joker/superagent-agent-a",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "familySetVersion": 2,
+      "familyCount": 21,
+      "report": "/tmp/pa-wave17-a-previous.json"
+    },
+    "regression": {
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows test",
+      "exitCode": 0,
+      "storagePassed": 87,
+      "workflowsPassed": 109,
+      "log": "/tmp/pa-wave17-a-tests.log",
+      "typecheckExitCode": 0,
+      "buildExitCode": 0
+    },
+    "realNewConsumers": [
+      {
+        "file": "packages/workflows/test/wave16-candidate-restore.case.ts",
+        "passed": 1,
+        "scope": "Main local HTTP mock through the actual SDK -> chat -> A18 result -> candidate GET/pointer prepare -> explicit decision confirmation -> WorkflowSnapshots v2 -> second-root ProductStore reads original result/artifact/proposal/decision/receipt",
+        "limit": "The second root is opened as a ProductStore and read through data APIs. It is not a recovery_readonly runtime/HTTP exercise and does not exercise work/revision candidate kinds there."
+      },
+      {
+        "file": "packages/workflows/test/wave16-question-restore.case.ts",
+        "passed": 1,
+        "scope": "Actual controlled Application/Broker/fixture Runner creates a Work/Ticket, permission question, answer and native_applied delivery; nonempty queue/runtime data survive a second-root copy of the snapshot; target inventory reports startupAvailable=false",
+        "limit": "This proves controlled product data continuity. The manually added queue row is still returned by dueRows; no restored-runtime hold/no-resend gate is driven. It is not real vendor/native process recovery."
+      }
+    ],
+    "productionBoundary": "Main source inspect/prepare is implemented and retained. Source confirm/private permission/target startup remain main-owned NOT_REACHED; these do not negate the passing independent data work."
+  },
+  "C": {
+    "verdict": "Current candidate GET/prepare/confirm consumers are real and passing. The prior null-wrapper defect remains closed; nested hostile getters still escape the defensive unknown-input helper.",
+    "previousWrapperProbe": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave17-c-previous.json node tools/bootstrap/probe-wave15-context.mjs /Users/hh/Desktop/joker/superagent-agent-c",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "report": "/tmp/pa-wave17-c-previous.json"
+    },
+    "regression": {
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/proposals --filter @personal-agent/knowledge --filter @personal-agent/routing test",
+      "exitCode": 0,
+      "contextPassed": 124,
+      "proposalsPassed": 40,
+      "knowledgePassed": 93,
+      "routingPassed": 44,
+      "log": "/tmp/pa-wave17-c-tests.log",
+      "typecheckExitCode": 0,
+      "buildExitCode": 0
+    },
+    "realNewConsumers": [
+      {
+        "file": "packages/knowledge/test/main-candidate-chain.case.ts",
+        "passed": 8,
+        "scope": "Actual main local SDK fixture, chat/A18 artifact, CompletedAssistantReplies.readVerified, candidate GET and pointer prepare, decision/work/revision confirmation inputs, rejection/receipt replay, mixed stale/reply-only data, source/pointer drift, missing artifact and eight-candidate long reply",
+        "changeFromPreviousWave": "The new path no longer substitutes a handwritten verified wrapper and generic proposal prepare for the existing production candidate pointer path."
+      },
+      {
+        "file": "packages/knowledge/test/main-context-http.case.ts",
+        "scope": "An added actual default-preview test supplies 610 excluded displays and observes the real 600-row boundary, partial state and source_unavailable omission. Existing main factory six-case evidence is retained rather than recounted."
+      }
+    ],
+    "remainingScope": [
+      "The second-root case uses wal_checkpoint plus cp of a still-open state root and then data-reader calls. This is a controlled copied-state test, not A's versioned snapshot producer or a recovery_readonly runtime/HTTP/no-resend proof.",
+      "projectSourceReview, selectRelevantSources and collectContextHistory remain module-only where stated; main's existing DTO/history implementation is not missing.",
+      "No new SSE/browser/remote-provider compatibility was tested and none is claimed.",
+      "The nested-getter issue is internal helper robustness, not a demonstrated JSON HTTP authorization bypass."
+    ]
+  },
+  "newBoundedProbe": {
+    "command": "node /tmp/pa-wave17-ac-boundaries.mjs",
+    "reproduceCommand": "PA_ADMISSION_REPORT=/tmp/pa-wave17-context-reproduce.json node tools/bootstrap/probe-wave17-context.mjs /Users/hh/Desktop/joker/superagent-agent-a /Users/hh/Desktop/joker/superagent-agent-c",
+    "exitCode": 1,
+    "report": "/tmp/pa-wave17-ac-boundaries.json",
+    "observations": [
+      { "owner": "A", "id": "NONEMPTY_V2_POSITIVE", "status": "PASS", "protocol": "workflow-snapshot/2", "evidenceProtocol": "workflow-evidence/2", "families": 21, "verified": "ok" },
+      { "owner": "A", "id": "full-v2-tampered-queue", "status": "PASS", "verified": "blocked" },
+      { "owner": "A", "id": "mixed-version-tampered-queue", "status": "FAIL", "protocol": "workflow-snapshot/1", "evidenceProtocol": "workflow-evidence/2", "familySetVersion": null, "families": 20, "verified": "ok" },
+      { "owner": "A", "id": "missing-empty-required-table", "status": "FAIL", "protocol": "workflow-snapshot/2", "evidenceProtocol": "workflow-evidence/2", "familySetVersion": 2, "families": 21, "verified": "ok" },
+      { "owner": "C", "id": "TYPED_NONEMPTY_POSITIVE", "status": "PASS", "observed": "candidates", "candidateCount": 1 },
+      { "owner": "C", "id": "OUTER_GETTER_REFUSAL_CONTROL", "status": "PASS", "observed": "invalid_body" },
+      { "owner": "C", "id": "NESTED_BODY_GETTER_REFUSAL", "status": "FAIL", "exception": "Error", "message": "nested body getter" },
+      { "owner": "C", "id": "NESTED_PRINCIPAL_GETTER_REFUSAL", "status": "FAIL", "exception": "Error", "message": "nested principal getter" }
+    ]
+  },
+  "findings": [
+    {
+      "id": "A_MIXED_SNAPSHOT_EVIDENCE_VERSION_ACCEPTS_TAMPERED_QUEUE",
+      "severity": "P2",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows/src/snapshot.ts",
+      "line": 223,
+      "condition": "Start from the passing nonempty current v2 snapshot, modify the effect value and re-record only database bytes/hash. The full v2 evidence correctly rejects it. Change the top-level protocol to workflow-snapshot/1, delete familySetVersion and omit effect_queue while leaving evidence.protocol=workflow-evidence/2.",
+      "observed": "verify returns ok for this internally inconsistent protocol/version pair and the changed queue.",
+      "requiredBoundary": "Recognize consistent historical format/family contracts explicitly; an untrusted top-level label must not select an arbitrary weaker evidence subset."
+    },
+    {
+      "id": "A_MISSING_EMPTY_REQUIRED_TABLE_EQUALS_EMPTY_FAMILY",
+      "severity": "P2",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-a/packages/storage/src/backup.ts",
+      "line": 135,
+      "relatedFile": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows/src/snapshot.ts",
+      "relatedLine": 228,
+      "condition": "The same valid schema18 snapshot is nonempty in effect_queue, while assistant_reply_results exists with zero rows. Drop that required table and re-record database bytes/hash, preserving the full v2 manifest/evidence set.",
+      "observed": "readWorkflowEvidence synthesizes the same zero-count/empty digest for a missing table as for an existing empty table. verifyDatabase only reads schema_meta/integrity/FKs, so verification still returns ok.",
+      "requiredBoundary": "Validate the required schema/table/index contract for the actual database version; legacy absent-table capability must not certify a current schema18 database with missing tables."
+    },
+    {
+      "id": "C_NESTED_GETTERS_STILL_THROW_IN_UNKNOWN_WRAPPER",
+      "severity": "P2",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-c/packages/proposals/src/reply-candidates.ts",
+      "line": 341,
+      "relatedLine": 360,
+      "condition": "A valid typed nonempty wrapper produces one candidate and an outer verifiedBy getter is refused. Put a throwing getter on nested body.replyMessageId or identity.principal instead.",
+      "observed": "The nested Error escapes before safeBody because only outer wrapper fields use safeRead.",
+      "scope": "Pure unknown-input robustness only. Actual main private completed-reader values and JSON HTTP DTOs do not acquire getter authority from this probe."
+    }
+  ],
+  "nextOutcomePackages": {
+    "A": {
+      "outcome": "Version-consistent current-schema snapshots with actual readonly product restoration",
+      "early": "Close protocol/evidence pairing and missing-empty-table negatives with the current nonempty positive; test a genuinely historical manifest generated by its historical version, not just relabeling current data.",
+      "middle": "Restore real candidate/context and question/answer/delivery datasets through the public snapshot path into a recovery_readonly runtime/HTTP root, prove old queues are held and no model/native business send occurs, retain original body/index/digest/receipt data.",
+      "final": "Deliver D/E a bounded executable producer/restore recipe and changed-path corruption/process checks; consume source confirmation only when main publishes it, keeping physical writer/startup permission separate."
+    },
+    "C": {
+      "outcome": "Reliable actual candidate/frozen-source review across restored readonly roots",
+      "early": "Close nested hostile-wrapper reads with typed nonempty and outer-getter controls; preserve the now-real candidate GET/prepare tests and existing main default factory/candidate/UI scope.",
+      "middle": "Replace the live cp restore fixture with A's consistent snapshot producer, drive existing readonly history/source/candidate HTTP entrypoints, assert origin/body identity and mutation refusal without another confirmation authority.",
+      "final": "Add only the remaining actual consumer drift cases for model/principal/project/scope/contract and response loss, instrument candidate reader cost where claimed, retain bounded source/public-projection truth and accurate module-only consumer mapping."
+    }
+  },
+  "preserved": {
+    "AWorktreeTrackedChanges": "none",
+    "CWorktreeTrackedChanges": "original pnpm-lock.yaml only",
+    "userServiceGroups": 12,
+    "servicesTouched": false,
+    "ledgersTouched": false,
+    "historicalReportsOverwritten": false,
+    "repositoryOutput": "reports/releases/wave17-admission/context.json"
+  }
+}
