@@ -582,17 +582,29 @@ export async function accountRegisteredResources({ roots, target, record, spawne
   for (const pid of treeCandidates) {
     if (pid === process.pid) continue
     const vitality = vitalityOf(pid)
-    if (vitality !== 'alive') continue
+    if (vitality === 'dead') continue
+    if (vitality === 'unknown') { mismatch(pid, 'child', 'status_unknown'); continue }
     const command = commandOf(pid)
-    if (command !== '' && commandMatchesIdentity(command, tokens)) owned.push({ pid, command })
-    else unknownLive.push({ pid, command: command === '' ? 'unknown' : command })
+    if (command === '') { mismatch(pid, 'child', 'command_unreadable'); continue }
+    // A descendant inherits the parent's private roots in its command line, so ancestry/path alone is
+    // not ownership. Its OS owner must be the same verified uid before it can be signalled.
+    const observedUid = await processUid(pid)
+    if (observedUid === null || (expectedUid !== null && Number(observedUid) !== expectedUid)) {
+      unknownLive.push({ pid, command, reason: 'uid_mismatch', observedUid })
+      continue
+    }
+    if (commandMatchesIdentity(command, tokens)) owned.push({ pid, command })
+    else unknownLive.push({ pid, command })
   }
   const unregistered = []
   for (const entry of discovered ?? []) {
     const { pid, ppid } = entry
     if (!Number.isInteger(pid) || !Number.isInteger(ppid)) continue
     if (pid === process.pid || treeCandidates.has(pid) || claimed.has(pid)) continue
-    if (vitalityOf(pid) !== 'alive') continue
+    const vitality = vitalityOf(pid)
+    if (vitality === 'dead') continue
+    // Global discovery is tri-state as well: an unreadable status is UNKNOWN, never absent.
+    if (vitality === 'unknown') { unverifiable.push({ pid, label: 'discovered', reason: 'status_unknown' }); continue }
     const command = commandOf(pid)
     if (command !== '' && commandMatchesIdentity(command, tokens)) unregistered.push({ pid, command })
   }

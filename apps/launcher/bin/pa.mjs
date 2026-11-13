@@ -471,9 +471,13 @@ async function main(argv) {
         const result = await recoverSwitch({ installRoot, roots, values })
         printResult({
           json: json ? result : null,
-          human: [`upgrade --recover: ${result.status}`, ...(result.started ? [`  pid: ${result.started.pid}`, `  api: ${result.started.apiURL}`] : []), ...(result.reason ? [`  reason: ${result.reason}`] : [])].join('\n'),
+          human: [`upgrade --recover: ${result.status}`, ...(result.code ? [`  code: ${result.code}`, `  ${result.message ?? ''}`] : []), ...(result.started ? [`  pid: ${result.started.pid}`, `  api: ${result.started.apiURL}`] : []), ...(result.reason ? [`  reason: ${result.reason}`] : [])].join('\n'),
         })
-        return result.status === 'NO_OP' || result.status === 'RECOVERED' ? EXIT.OK : EXIT.DEGRADED
+        // A settled recovery is a success, whichever terminal state it reached. Refusals are BLOCKED
+        // with exit 2 so scripts never treat an unsettled/blocked recovery as success.
+        const settled = ['NO_OP', 'RECOVERED', 'RECOVERED_PREVIOUS', 'REVERTED', 'CONFIRMED']
+        if (settled.includes(result.status)) return EXIT.OK
+        return result.status === 'BLOCKED' ? EXIT.BLOCKED : EXIT.DEGRADED
       }
       const result = await upgradeInstall({ installRoot, roots, values })
       printResult({
