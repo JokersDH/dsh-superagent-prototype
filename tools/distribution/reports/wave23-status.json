@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "ab16943",
   "mergedMain": "03f7b7e",
-  "head": "0ede11d",
+  "head": "2d3b3c4",
   "frozenSource": "0ede11d",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Real vendor/model/native turns 0; twelve user services untouched.",
@@ -643,5 +643,7 @@
     "tools/distribution/reports/wave23/*.json",
     "tools/distribution/recipes/wave23-e-acceptance.zh-CN.md",
     "docs/rfcs/WP-16/0062-wave-23-d-cleanup-and-same-store-dual.md"
-  ]
+  ],
+  "evidenceHead": "2d3b3c4",
+  "sourceClosureHead": "2d3b3c4"
 }
