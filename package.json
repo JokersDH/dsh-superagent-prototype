@@ -45,6 +45,9 @@
     "manifestVersion": 1
   },
   "scripts": {
+    "pa": "node apps/launcher/bin/pa.mjs",
+    "build:distribution": "node tools/distribution/build.mjs",
+    "check:distribution": "pnpm --dir packages/portability typecheck && pnpm --dir packages/portability build && node --test packages/portability/test/*.case.ts apps/launcher/test/*.case.mjs",
     "start": "node tools/dev/start.mjs",
     "stop": "node tools/dev/start.mjs --stop",
     "restart": "node tools/dev/start.mjs --restart",
