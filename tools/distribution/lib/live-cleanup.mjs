@@ -55,7 +55,7 @@ export function verifyBornRecord(record, { cli, install, dataRoot, operation = '
   return { owned: true, checks, operation, pids }
 }
 
-export async function cleanupBornResources({ cli, install, roots: { config, data }, records, args, env, operation = 'start', keepOnUnknown = true }) {
+export async function cleanupBornResources({ cli, install, roots: { config, data }, records, args, env, operation = 'start', keepOnUnknown = true, allowDirectSignal = true }) {
   const report = { status: 'CLEAN', stopped: [], unknown: [], retained: false }
   for (const record of records.filter(Boolean)) {
     const proof = verifyBornRecord(record, { cli, install, dataRoot: data, operation })
@@ -70,7 +70,7 @@ export async function cleanupBornResources({ cli, install, roots: { config, data
     let method = 'cli-stop'
     // The CLI may legitimately refuse a mode/record mismatch; after the complete born-identity proof
     // above, only these exact PIDs are signalled, and only then is the material considered cleanable.
-    if (!stopped && proof.owned) {
+    if (!stopped && proof.owned && allowDirectSignal) {
       method = 'proven-direct-signal'
       for (const pid of proof.pids) { try { process.kill(pid, 'SIGTERM') } catch {} }
       stopped = await waitGone(3000)

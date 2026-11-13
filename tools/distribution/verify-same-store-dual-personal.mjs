@@ -123,7 +123,8 @@ try {
     const links = works.flatMap((work) => seedStore.product.links.listByWork(work.id))
     const answers = seedStore.db.prepare('SELECT answer_id, question_id, answer_digest FROM answers ORDER BY answer_id LIMIT 50').all()
     const deliveries = seedStore.db.prepare("SELECT answer_id, status FROM answer_deliveries WHERE status = 'native_applied' ORDER BY answer_id LIMIT 50").all()
-    return { works: works.map((work) => ({ id: work.id, revision: work.revision, status: work.status ?? null })), questions: questions.map((question) => ({ id: String(question.id), workId: String(question.work_id), version: Number(question.version) })),
+    const attempts = seedStore.db.prepare('SELECT attempt_id, ticket_id FROM runtime_bindings ORDER BY attempt_id LIMIT 50').all()
+    return { attempts: attempts.map((row) => ({ attemptId: String(row.attempt_id), ticketId: String(row.ticket_id) })), works: works.map((work) => ({ id: work.id, revision: work.revision, status: work.status ?? null })), questions: questions.map((question) => ({ id: String(question.id), workId: String(question.work_id), version: Number(question.version) })),
       tickets: links.map((link) => ({ ticketId: link.ticketId ?? link.id ?? null, workId: link.workId ?? null })), answers: answers.map((row) => ({ answerId: String(row.answer_id), questionId: String(row.question_id), digest: String(row.answer_digest) })), nativeApplied: deliveries.map((row) => ({ answerId: String(row.answer_id), status: String(row.status) })) }
   })()
   if (origin.works.length < 1 || origin.questions.length < 1 || origin.answers.length < 1 || origin.nativeApplied.length < 1) throw new Error(`origin business identities incomplete: ${JSON.stringify({ works: origin.works.length, questions: origin.questions.length, answers: origin.answers.length, nativeApplied: origin.nativeApplied.length })}`)
@@ -178,6 +179,8 @@ try {
   const scopedOptIn = scoped.status === 200 && scoped.body.scopeReview?.protocol === 'context-scope-review/1'
   if (!scopedOptIn) step('scope-review-optional', 'NOT_TESTED', { status: scoped.status, reason: 'installed optional diagnostics not observed' })
   else step('scope-review-optional', 'PASS', { protocol: scoped.body.scopeReview.protocol, reasons: scoped.body.scopeReview.reasons?.length ?? 0, withheld: scoped.body.scopeReview.withheld ?? null })
+  const historyAfter = await rget(`/v1/conversations/${encodeURIComponent(conversationId)}/messages?limit=50`)
+  if (historyAfter.status !== 200) throw new Error('same-store review history not readable')
   const businessRefusal = await rpost('/v1/assistant/suggestions', { enabled: false })
   if (businessRefusal.status !== 422 || businessRefusal.body.error?.code !== 'unsupported_capability') throw new Error('reviewed business mutation not refused')
   const storage = await import(pathToFileURL(join(install, 'app/packages/storage/dist/index.js')).href)
@@ -193,21 +196,23 @@ try {
     const links = works.flatMap((work) => reviewStore.product.links.listByWork(work.id))
     const answers = reviewStore.db.prepare('SELECT answer_id, question_id, answer_digest FROM answers ORDER BY answer_id LIMIT 50').all()
     const deliveries = reviewStore.db.prepare("SELECT answer_id, status FROM answer_deliveries WHERE status = 'native_applied' ORDER BY answer_id LIMIT 50").all()
-    return { works: works.map((work) => ({ id: work.id })), questions: questions.map((question) => ({ id: String(question.id), workId: String(question.work_id) })),
+    const attempts = reviewStore.db.prepare('SELECT attempt_id, ticket_id FROM runtime_bindings ORDER BY attempt_id LIMIT 50').all()
+    return { attempts: attempts.map((row) => ({ attemptId: String(row.attempt_id), ticketId: String(row.ticket_id) })), works: works.map((work) => ({ id: work.id })), questions: questions.map((question) => ({ id: String(question.id), workId: String(question.work_id) })),
       tickets: links.map((link) => ({ ticketId: link.ticketId ?? link.id ?? null })), answers: answers.map((row) => ({ answerId: String(row.answer_id), questionId: String(row.question_id), digest: String(row.answer_digest) })), nativeApplied: deliveries.map((row) => ({ answerId: String(row.answer_id), status: String(row.status) })) }
   })()
   reviewStore.close()
   const missing = { works: origin.works.filter((item) => !restoredBusiness.works.some((value) => value.id === item.id)).map((item) => item.id),
     questions: origin.questions.filter((item) => !restoredBusiness.questions.some((value) => value.id === item.id && value.workId === item.workId)).map((item) => item.id),
     answers: origin.answers.filter((item) => !restoredBusiness.answers.some((value) => value.answerId === item.answerId && value.digest === item.digest)).map((item) => item.answerId),
-    nativeApplied: origin.nativeApplied.filter((item) => !restoredBusiness.nativeApplied.some((value) => value.answerId === item.answerId && value.status === item.status)).map((item) => item.answerId) }
+    nativeApplied: origin.nativeApplied.filter((item) => !restoredBusiness.nativeApplied.some((value) => value.answerId === item.answerId && value.status === item.status)).map((item) => item.answerId),
+    attempts: origin.attempts.filter((item) => !restoredBusiness.attempts.some((value) => value.attemptId === item.attemptId && value.ticketId === item.ticketId)).map((item) => item.attemptId) }
   if (Object.values(missing).some((list) => list.length > 0)) throw new Error(`restored original IDs/digests differ: ${JSON.stringify(missing)}`)
   if (fakeRequests.length > 1) throw new Error('reviewed startup/read called the fake model again')
   const stop = run(cli, ['stop', '--json', ...reviewArgs], [0], env)
   if (stop.json?.status !== 'STOPPED') throw new Error('review stop failed')
   reviewEvidence = null
   step('same-store-second-root-personal-review', 'PASS', { markerState: inspect.body.state, works: (snapshot.body.works ?? []).length, candidates: afterCandidates.body.candidates.length,
-    sources: 200, scopeReviewOptIn: scopedOptIn, businessRefused: true, originalWork: origin.works.length, originalQuestions: origin.questions.length, originalAnswers: origin.answers.length, nativeApplied: origin.nativeApplied.length, snapshotsV1V2: true, snapshotBytesRestored: true, originalIdsPreserved: true, workflowV1Families: v1.families.length, workflowV2Families: v2.families.length, fakeRequests: fakeRequests.length, nativeTurns: reviewHealth.nativeTurns ?? 0 })
+    sources: 200, scopeReviewOptIn: scopedOptIn, businessRefused: true, originalWork: origin.works.length, originalQuestions: origin.questions.length, originalAnswers: origin.answers.length, originalAttempts: origin.attempts.length, nativeApplied: origin.nativeApplied.length, historyAfterConsent: historyAfter.status, snapshotsV1V2: true, snapshotBytesRestored: true, originalIdsPreserved: true, workflowV1Families: v1.families.length, workflowV2Families: v2.families.length, fakeRequests: fakeRequests.length, nativeTurns: reviewHealth.nativeTurns ?? 0 })
   evidence.status = 'PASS'
   evidence.build = { buildId: manifest.buildId, commit: manifest.source.commit, schema: manifest.producer.productSchema }
 } catch (error) { evidence.status = 'FAIL'; evidence.error = String(error?.stack ?? error) }
