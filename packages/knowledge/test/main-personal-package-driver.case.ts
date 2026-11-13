@@ -45,56 +45,71 @@ test('one parameterized package driver reviews both v1 and v2 restored roots thr
       '--work', chain.workId, '--question', chain.question.id, '--candidate-message', chain.sourceMessageId,
     ], { encoding: 'utf8', timeout: 240000 })
     return JSON.parse(stdout) as {
-      protocol: string; status: string; format: string; sourceOnly: boolean; packageSubject: string | null
-      entries: Record<string, { path: string; sha256: string | null }>
+      protocol: string; status: string; verified: boolean; mode: string; dialect: string; format: string; sourceOnly: boolean; packageSubject: string | null
+      identity: { bound: boolean; childPid: number | null; recordPid: number | null; requestedDigest: string | null; actualHealthDigest: string | null }
+      cleanup: { owned: boolean; stopped: boolean; detail: string | null }
+      entries: Record<'review' | 'start' | 'identity' | 'demo', { path: string; sha256: string | null }>
       review: { file: string; sha256: string; mode: number; startupAvailable: boolean }
-      health: { mode: string; startupMode: string; restoredReviewDigest: string | null }
-      sources: { messageId: string; state: string; defaultHasScopeReview: boolean; diagnostic: { protocol: string; reasons: string[]; partial: boolean; withheldSourceCount: number; authorization: string } | null } | null
-      history: { conversationId: string | null; entries: number }
-      work: { phase: string | null } | null
-      delivery: string[] | null
-      refused: Record<string, number>
+      health: { mode: string; startupMode: string; restoredReviewDigest: string | null } | null
+      data: {
+        history: { conversationId: string | null; entries: number }
+        sources: { messageId: string; state: string; diagnostic: { protocol: string; reasons: string[]; partial: boolean; withheldSourceCount: number; authorization: string } | null } | null
+        candidate: { messageId: string; index: number; payloadDigest: string } | null
+        candidatePrepare: number | null
+        chat: number
+        work: { id: string; phase: string | null } | null
+        delivery: { question: string; statuses: string[] } | null
+      }
     }
   }
 
   const v1 = run(restoredV1, 'v1', { console: await availablePort(), api: await availablePort() })
-  assert.equal(v1.protocol, 'personal-review-driver/1')
-  assert.equal(v1.status, 'ok')
+  assert.equal(v1.protocol, 'personal-review-driver/2')
+  assert.equal(v1.status, 'verified-flow')
+  assert.equal(v1.verified, true)
+  assert.equal(v1.mode, 'strict')
+  assert.equal(v1.dialect, 'source')
   assert.equal(v1.format, 'v1')
+  assert.equal(v1.identity.bound, true)
+  assert.equal(v1.identity.recordPid, v1.identity.childPid)
+  assert.match(v1.identity.requestedDigest ?? '', /^[a-f0-9]{64}$/)
+  assert.equal(v1.identity.actualHealthDigest, v1.identity.requestedDigest)
+  assert.equal(v1.cleanup.stopped, true)
   assert.equal(v1.sourceOnly, true)
   assert.equal(v1.packageSubject, null)
   assert.equal(v1.entries.review!.sha256, entryHashes.review)
   assert.equal(v1.entries.start!.sha256, entryHashes.start)
   assert.equal(v1.entries.demo!.sha256, entryHashes.demo)
-  assert.equal(v1.entries.restoredReview!.sha256, entryHashes.restoredReview)
+  assert.equal(v1.entries.identity!.sha256, entryHashes.restoredReview)
   assert.equal(v1.review.mode, 0o600)
   assert.equal(v1.review.startupAvailable, false)
   assert.match(v1.review.sha256, /^[a-f0-9]{64}$/)
-  assert.equal(v1.health.mode, 'personal')
-  assert.equal(v1.health.startupMode, 'recovery_readonly')
-  assert.match(v1.health.restoredReviewDigest ?? '', /^[a-f0-9]{64}$/)
-  assert.ok(v1.sources)
-  assert.equal(v1.sources!.state, 'verified')
-  assert.equal(v1.sources!.defaultHasScopeReview, false)
-  assert.equal(v1.sources!.messageId, chain.contextMessageId)
-  assert.deepEqual(v1.sources!.diagnostic, { protocol: 'context-scope-review/1', reasons: [], partial: false, withheldSourceCount: 0, authorization: 'none' })
-  assert.equal(v1.history.entries, 1)
-  assert.equal(v1.work?.phase, 'delivered')
-  assert.deepEqual(v1.delivery, ['native_applied'])
-  assert.equal(v1.refused.candidates, 200)
-  assert.equal(v1.refused.candidatePrepare, 422)
-  assert.equal(v1.refused.chat, 422)
+  assert.ok(v1.health)
+  assert.equal(v1.health!.mode, 'personal')
+  assert.equal(v1.health!.startupMode, 'recovery_readonly')
+  assert.match(v1.health!.restoredReviewDigest ?? '', /^[a-f0-9]{64}$/)
+  assert.equal(v1.data.sources?.state, 'verified')
+  assert.equal(v1.data.sources?.messageId, chain.contextMessageId)
+  assert.deepEqual(v1.data.sources?.diagnostic, { protocol: 'context-scope-review/1', reasons: [], partial: false, withheldSourceCount: 0, authorization: 'none' })
+  assert.equal(v1.data.history.entries, 1)
+  assert.equal(v1.data.work?.phase, 'delivered')
+  assert.deepEqual(v1.data.delivery?.statuses, ['native_applied'])
+  assert.equal(v1.data.candidatePrepare, 422)
+  assert.equal(v1.data.chat, 422)
 
   const v2 = run(restoredV2, 'v2', { console: await availablePort(), api: await availablePort() })
   assert.equal(v2.format, 'v2')
   assert.equal(v2.entries.start!.sha256, entryHashes.start)
-  assert.equal(v2.health.mode, 'personal')
-  assert.equal(v2.health.startupMode, 'recovery_readonly')
-  assert.equal(v2.sources!.state, 'verified')
-  assert.deepEqual(v2.sources!.diagnostic, { protocol: 'context-scope-review/1', reasons: [], partial: false, withheldSourceCount: 0, authorization: 'none' })
-  assert.equal(v2.work?.phase, 'delivered')
-  assert.deepEqual(v2.delivery, ['native_applied'])
-  assert.equal(v2.refused.candidatePrepare, 422)
+  assert.ok(v2.health)
+  assert.equal(v2.health!.mode, 'personal')
+  assert.equal(v2.health!.startupMode, 'recovery_readonly')
+  assert.equal(v2.status, 'verified-flow')
+  assert.equal(v2.identity.bound, true)
+  assert.equal(v2.data.sources?.state, 'verified')
+  assert.deepEqual(v2.data.sources?.diagnostic, { protocol: 'context-scope-review/1', reasons: [], partial: false, withheldSourceCount: 0, authorization: 'none' })
+  assert.equal(v2.data.work?.phase, 'delivered')
+  assert.deepEqual(v2.data.delivery?.statuses, ['native_applied'])
+  assert.equal(v2.data.candidatePrepare, 422)
   assert.notEqual(v1.review.file, v2.review.file)
   assert.notEqual(v1.review.sha256, v2.review.sha256)
   assert.equal(chain.model.requests.length, chain.modelCalls)
