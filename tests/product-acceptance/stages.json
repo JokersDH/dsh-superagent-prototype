@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-17/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-18/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "6050b4b",
-  "checkpoint": "75630b5",
+  "base": "f875ead",
+  "checkpoint": null,
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -18,82 +18,82 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Pilot admission and fail-closed ledger",
+      "title": "Helper provenance from the same frozen package",
       "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
       "notes": [
-        "Complete cost chain: partial usage makes costOf undefined; settle charges the bound, keeps unknown and refuses further sends. Only a B-owned sender module is imported (reservation identity echoed); E never spawns a descriptor command. 66 checks, refusal sends 0."
+        "E5-D-OWNERSHIP-MOCKS extracts apps/launcher/lib/{upgrade,instance}.mjs from the frozen tar, verifies tar sha256/bytes, records helper file hashes separately from test/product source, and runs the same probe against the previous package as a failing control (2 PASS/3 FAIL vs 5/5)."
       ]
     },
     {
       "id": "E2",
-      "title": "Eight-case three-arm bounded pilot",
+      "title": "Old failure / new success calibration and cross-subject revocation",
       "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
       "notes": [
-        "Real execute chain is implemented but BLOCKED on adapter_missing; B-owned entry, no CLI fallback, no sample replacement."
+        "The wave-17 installed-alpha PASS is revoked as a cross-subject admission; prior reports/runs stay as history. The gate rejects a full original report whose helper provenance is the new 651 package while the installed subject stays 97."
       ]
     },
     {
       "id": "E3",
-      "title": "Current context use, SSE, audit and reply consumer",
+      "title": "Every required case bound to the same subject",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "Real A18 SQLite/result rows plus current HTTP/SSE/UI: selected context, audit, lost response, mobile and two tabs. Independent-process SIGKILL cases cover after-result, during-provider, after-message and corrupted artifact with zero second provider calls."
+        "All required installed/current-tuple cases including the safety helper, candidates, second root, installed source confirm and stability compare the same 8-field tuple; missing helper provenance, file hash, mixed build or module-only evidence is rejected. 80 mutation cases pass."
       ]
     },
     {
       "id": "E4",
-      "title": "Explicit baseline/target installation and upgrade",
+      "title": "651 package ordinary personal install",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Install matrix binds D wave11-target a22d3a4/schema16 with context-use: cold personal, backup/restore, tamper, requested-data-root stop, schema16→current A schema18 migration. Same-schema binary upgrade/rollback is NOT_TESTED because no second schema16 build exists; cross-schema refusal passes. Copied record in another config root still stops the original API on these bytes."
+        "Cold install/reuse/no-executor/multi-state on wave17-target 65102f7 build f55470ae14cc4985 with real health/readiness/mode/exit."
       ]
     },
     {
       "id": "E5",
-      "title": "Bounded context concurrency, recovery windows and stability",
+      "title": "Same-package non-empty candidates and context",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "E9-CONTEXT-CONCURRENCY plus 50 bounded operations; copy-record ownership uses only this process's spawned API. Generic global cleanup/recover/shared-cache ownership remains out of scope until D fixes and ships bytes."
+        "Default-off preference, explicit opt-in, non-empty candidates, work required inputs, decision confirm once + original receipt replay, rejection, context/history/sources and the original body; discussion-only keeps native 0 and dispatch paused."
       ]
     },
     {
       "id": "E6",
-      "title": "Layered conclusions and handoff",
+      "title": "Same-package source confirmation",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave12-status separates test source, main 530085c/schema18, D a22d3a4/schema16 artifact and current-main install NOT_TESTED; wave11 and older status files are frozen."
+        "Installed recovery_readonly prepare/confirm/audit: not_granted/startupAvailable false, no target, held queue, unchanged marker, original token replayed after a process reopen; queue counts and provider requests unchanged."
       ]
     },
     {
       "id": "E7",
-      "title": "Two-state stop and real process faults",
+      "title": "Second readonly root on the same non-empty data",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "E4-MULTI-STATE on D cf7a3cf bytes still claims state B and kills its API for a stop aimed at state A; launcher-dead/API-alive remains NOT_TESTED because that defect destroys the prerequisite. E4-INSTALL-HOST-GUARDS covers unknown PID refusal."
+        "Backup/verify/restore through the package launcher, startupMode recovery_readonly, candidates/decisions/held work/context/history/sources/original body readable, business POST 422, no provider resend."
       ]
     },
     {
       "id": "E8",
-      "title": "Backup, schema migration and managed upgrade",
+      "title": "Upgrade, faults and post-upgrade protection",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "E8-SCHEMA-MIGRATION takes a real schema15 DB from the frozen D install and opens it with current A: schema16, data count preserved, binding table present, reopen stable. Backup/restore, managed upgrade/rollback and cross-schema refusal run on the same tuple; PA_UPGRADE_FAULT crash windows remain NOT_TESTED."
+        "Same proven pair 97→651 schema18 with status-specific exit 0, present equal pointer, retained operation, tampered target refusal, rollback keeping post-upgrade data; cross-schema old binary refusal and 16→18 legacy migration."
       ]
     },
     {
       "id": "E9",
-      "title": "Bounded concurrency and stability",
+      "title": "Bounded stability on the second root",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "E9-CONTEXT-CONCURRENCY: four distinct selected sends + duplicate replay, one provider call per command and four bindings. Existing 30-cycle bounded stability remains; FD/child/queue baselines are observed, not a leak proof."
+        "Four concurrent readonly reads, repeated original-token confirmations and a service reopen; queue rows, row counts and provider request count return to baseline."
       ]
     },
     {
       "id": "E10",
-      "title": "Source-driven final report",
+      "title": "Final same-subject verdict and delivery",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave11-status separates test source, main source, product/artifact tuple and current-main install NOT_TESTED; old wave10/09 status files are frozen and not rewritten."
+        "wave18-status.json plus a clean recorded run; explicit cross-subject correction; product/native/pilot remain separate (pilot BLOCKED, 0 real model/native sends)."
       ]
     }
   ]

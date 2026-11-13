@@ -249,7 +249,8 @@ const CAPABILITIES = [
     id: 'reply-results',
     label: '完成回复先落盘、失败重开补齐且不重复请求',
     controlled: ['E4-COMPLETED-REPLY', 'E2-REPLY-DURABLE', 'E2-REPLY-UNKNOWN-DURABLE', 'E2-REPLY-MESSAGE-WINDOW', 'E2-REPLY-BAD-ARTIFACT'],
-    notTested: ['reply 候选仍固定 suggestions=[]，候选产品入口未独立验收；历史正文已由 E3-CONTEXT-HISTORY/SOURCES 覆盖。'],
+    installed: ['E5-INSTALLED-CANDIDATES'],
+    notTested: ['历史正文本轮由 E7-SECOND-ROOT-READONLY 在第二根重新读取；候选在安装包内 default-off→显式开启后验证非空建议与 confirm/replay/reject。'],
   },
   {
     id: 'schema-migration',
@@ -265,6 +266,7 @@ const CAPABILITIES = [
     id: 'recovery-readonly',
     label: '恢复后首次启动只读、零业务发送',
     controlled: ['E4-RECOVERY-READONLY'],
+    installed: ['E4-BACKUP-RESTORE', 'E7-SECOND-ROOT-READONLY', 'E9-INSTALLED-STABILITY'],
     notTested: ['解除隔离后的新授权/环境重绑定未实现，不在本轮声明。'],
   },
   {
@@ -333,13 +335,20 @@ const CAPABILITIES = [
   {
     id: 'recovery-preflight',
     label: '恢复只读 inspect/prepare 与重放/重启边界',
-    controlled: ['E4-RECOVERY-PREFLIGHT'],
+    controlled: ['E4-RECOVERY-PREFLIGHT', 'E4-SOURCE-CONFIRM', 'E4-SOURCE-CONFIRM-REFUSAL'],
+    installed: ['E6-INSTALLED-SOURCE-CONFIRM'],
   },
   {
     id: 'work-evidence',
     label: '工作证据与分页历史',
     controlled: ['E2-WORK-EVIDENCE', 'E2-EVIDENCE-HISTORY'],
     notTested: ['storage_cap 与并发写入窗口未单独触发；历史窗口语义按 complete/caller_limit 已验证。'],
+  },
+  {
+    id: 'd-safety-helper',
+    label: 'D 归属/safety helper 与安装 subject 同一冻结包（旧包失败对照）',
+    installed: ['E5-D-OWNERSHIP-MOCKS'],
+    notTested: ['只测 launcher helper 的 same-UID child 归属；广泛 live stop/cleanup 仍按 D 自有矩阵执行。'],
   },
   {
     id: 'recovery-activation',
@@ -442,6 +451,7 @@ const executionStatus = {
     executionStatus: join(reports, 'execution-status.json'),
     wave09Status: join(reports, 'wave09-status.json'),
     wave17Status: join(reports, 'wave17-status.json'),
+    wave18Status: join(reports, 'wave18-status.json'),
     wave08Status: join(reports, 'wave08-status.json'),
     wave07Status: join(reports, 'wave07-status.json'),
     wave06Status: join(reports, 'wave06-status.json'),
@@ -504,7 +514,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第十七轮交付交接
+const handoff = `# Agent E 第十八轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -542,7 +552,7 @@ ${rows
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 \`controlled-product-workflow\` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold personal、fixture 安装版 context、非空 context/reply 备份搬根、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=${frozenScope?.artifact?.buildId ?? '?'}/schema ${frozenScope?.artifact?.schema ?? '?'}，main schema ${frozenScope?.main?.schema ?? '?'}；current-main install=${currentMainInstall ? 'NOT_TESTED' : 'PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)'}；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=${frozenScope?.capability?.hasDiscussionReadiness ?? '?'}；D safety mocks=${byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING'}；candidate installed=${byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING'}。 |
+| 安装准入（个人 Alpha） | **${tierVerdicts['installed-alpha'].status}（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=${frozenScope?.artifact?.buildId ?? '?'}/schema ${frozenScope?.artifact?.schema ?? '?'}，main schema ${frozenScope?.main?.schema ?? '?'}；current-main install=${currentMainInstall ? 'NOT_TESTED' : 'PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)'}；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=${frozenScope?.capability?.hasDiscussionReadiness ?? '?'}；D safety mocks=${byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING'}（helper 来自同一冻结包并核对文件 hash/来源）；candidate installed=${byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING'}；second root=${byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING'}；installed source confirm=${byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING'}；installed stability=${byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING'}。 |
 
 安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId \`${artifactTuple.baseline?.buildId ?? 'unknown'}\` / schema ${artifactTuple.baseline?.productSchema ?? artifactTuple.baseline?.schema ?? '?'} / tar \`${String(artifactTuple.baseline?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.baseline?.sourceCommit ?? artifactTuple.baseline?.source ?? '').slice(0, 8)}\`；target buildId \`${artifactTuple.target?.buildId ?? 'unknown'}\` / schema ${artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? '?'} / tar \`${String(artifactTuple.target?.tarSha256 ?? '').slice(0, 8)}…\` / source \`${String(artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? '').slice(0, 8)}\`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
@@ -578,13 +588,13 @@ ${rows
 - RSS/FD/磁盘是单实例观察；端口不变不能证明无进程泄漏。
 - 截图与几何断言只证明可达/不溢出/不重叠，不评价美观。
 - 推荐/复核仍只在实验入口；advisory/controlled-review/heterogeneous tier 因生产者缺失而非零。
-- 真实 native 投递/控制证据缺失，因此 \`full-product\` 仍被 gate 拒绝；\`installed-alpha\` 与 \`local-alpha\` 只对所测 baseline→target 组合成立，且当前 D 的跨 state stop 缺陷使 installed-alpha 不能放行。
+- 真实 native 投递/控制证据缺失，因此 \`full-product\` 仍被 gate 拒绝；\`installed-alpha\` 与 \`local-alpha\` 只对所测 baseline→target 组合成立。wave-17 的 installed-alpha PASS 因 E5-D-OWNERSHIP-MOCKS 从 D checkout import helper 给旧 97 安装补证，属跨 subject 放行，已在 wave-18 明确撤销；旧 report/证据文件保留为历史，不重贴给新 tuple。
 - 试点被预检阻断，不能把 harness 或干跑当作价值已验证。
 
 ## 下一消费者
 
-1. D：99832f6/schema18 已通过 requested-root、copied-record、wrong-install、双 binary upgrade/rollback 和三个 PA_UPGRADE_FAULT 窗口；唯一剩余 required 安装项是 current-main M1（discussionReadiness=false，personal start 在无执行器探针中 BLOCKED）。下一包合并 e1e0c97/d9d347e/b2b1adb 后冻结新 tar，再关闭 E6-CURRENT-MAIN-INSTALL。
-2. main/B：发布真实恢复 activation 与 B 生产 begin/answer/stop 消费者；E 已关闭 A18 回复/SIGKILL/坏 artifact、context history/source/frozen UI 和 schema18 非空备份搬根。
+1. D：65102f7/schema18 已通过同包 helper 5/5（旧 97 同探针 2 PASS/3 FAIL 作为失败对照）、current-main personal discussion-only（context/history/source/reply/候选）、default-off→建议、第二根 readonly 与 source 确认。后续新 tar 只需保持同一 tuple 契约；旧 97 的对话数据 scope 保留，但不再向新包或新源码外借。
+2. main/B：发布真实恢复 activation（私有 host/resources/许可）与 B 生产 begin/answer/stop 消费者；E 已关闭 A18 回复/SIGKILL/坏 artifact、context history/source/frozen UI、同包 source 确认和第二根非空恢复。第二根 source 确认始终 not_granted/startupAvailable=false。
 3. main：继续交 recovery activation 与真实空目标启动；E 已独立验证 context-use/SSE/audit、单 tab 丢响应、双 tab 独立旧 selection、mobile 再选源和 reply consumer，不重复把入口未发布当阻断。
 4. B：提供绑定 commit/attempt 的原生证据（\`executed: true\` + model task 计数）；E 只消费，不重跑计费任务。旧安装结果、wave09/wave10 ledger 与报告原样保留。
 
@@ -649,7 +659,54 @@ writeFileSync(
     artifactTuple,
   }, null, 2) + '\n',
 )
-// Historical wave06-16 status files are frozen inputs; wave17 supersedes rather than rewrites them.
+writeFileSync(
+  join(reports, 'wave18-status.json'),
+  JSON.stringify({
+    ...executionStatus,
+    schema: 'product-acceptance-wave18-status/1',
+    taskPackage: 'agent-tasks/product-wave-18/README.zh-CN.md',
+    supersedes: 'wave17-status.json',
+    crossSubjectCorrection: {
+      revoked: 'wave17 installed-alpha PASS',
+      reason: 'E5-D-OWNERSHIP-MOCKS imported apps/launcher/lib/upgrade.mjs from the D checkout, so a repaired source certified the older 97cace7 install package; helper provenance was outside the subject relation.',
+      retainedHistory: ['reports/wave16-status.json', 'reports/wave17-status.json', 'all prior run directories'],
+      closure: {
+        helperFromFrozenPackage: true,
+        helperFileHashes: ['upgrade.mjs', 'instance.mjs'],
+        sameSubjectRequired: true,
+        previousPackageControl: 'old 97 package still fails the same probe (2 PASS / 3 FAIL)',
+        newPackageResult: '65102f7 helper 5/5 PASS',
+      },
+    },
+    requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
+      ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
+      installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
+      installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
+      installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
+      currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
+      upgradeFaults: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
+      upgradeRollback: byId.get('E4-UPGRADE-ROLLBACK')?.status ?? 'MISSING' } },
+    finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record',
+      exitCode: 0, source: report.source },
+    commands: stages.stages.map(stage => ({ id: stage.id, command: stage.command })),
+    ownershipMocksEvidence: byId.get('E5-D-OWNERSHIP-MOCKS')?.evidence?.ownershipMocks ? {
+      subject: byId.get('E5-D-OWNERSHIP-MOCKS').evidence.ownershipMocks.subject,
+      helper: byId.get('E5-D-OWNERSHIP-MOCKS').evidence.ownershipMocks.helper,
+      previousPackageHelper: byId.get('E5-D-OWNERSHIP-MOCKS').evidence.ownershipMocks.previousPackageHelper,
+      probeSource: byId.get('E5-D-OWNERSHIP-MOCKS').evidence.ownershipMocks.probeSource,
+    } : null,
+    secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.evidence?.secondRoot?.readOnly ?? null,
+    sourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.evidence?.installedSourceConfirm ?? null,
+    counts: report.counts,
+    testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
+    productSource: { commit: artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? null },
+    mainSource: { commit: stages.base, schema: byId.get('E6-ARTIFACT-CURRENT-SCOPE')?.evidence?.frozenScope?.main?.schema ?? null },
+    artifactTuple,
+  }, null, 2) + '\n',
+)
+// Historical wave06-16 status files are frozen inputs; wave17 is also frozen by wave18.
+
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 
 // Over-claim check: the same recorded evidence must fail the full-product tier while native and
