@@ -234,34 +234,53 @@ try {
 
   // Wave-20: main's explicit restored-personal review config. The launcher only forwards the option;
   // no file is discovered from the restore report, backup or old scope.
+  const reviewRoot = join(root, 'reviewed')
+  const reviewRoots = Object.fromEntries(['config', 'cache', 'logs', 'workspace'].map((k) => [k, join(reviewRoot, k)]))
+  for (const p of Object.values(reviewRoots)) mkdirSync(p, { recursive: true, mode: 0o700 })
+  const reviewState = join(reviewRoot, 'state')
+  const reviewArgs = ['--install', install, '--config-root', reviewRoots.config, '--data-root', reviewState, '--cache-root', reviewRoots.cache, '--logs-root', reviewRoots.logs, '--workspace-root', reviewRoots.workspace]
+  const reviewRestore = run(cli, ['restore', '--json', '--bundle', bundle, '--to', reviewState, ...argsOf])
+  if (reviewRestore.json?.status !== 'RESTORED') throw new Error('review restore failed')
+  const reviewFirst = run(cli, ['first-run', '--json', ...reviewArgs])
+  if (!['READY', 'OK'].includes(reviewFirst.json?.status)) throw new Error('review first-run failed')
   const reviewPath = join(root, 'review-restored.json')
   const storage = await import(pathToFileURL(join(install, 'app/packages/storage/dist/index.js')).href)
   const reviewModule = await import(pathToFileURL(join(install, 'app/apps/coordinator/product/restored-review.ts')).href)
-  const actionKey = readFileSync(join(restoredState, 'action.key'), 'utf8').trim()
-  const reviewStore = new storage.ProductStore({ path: join(restoredState, 'state.sqlite') })
+  const localState = await import(pathToFileURL(join(install, 'app/apps/coordinator/http/local-state.ts')).href)
+  const actionKey = localState.localCredentials(reviewState)('action.key')
+  const reviewStore = new storage.ProductStore({ path: join(reviewState, 'state.sqlite') })
   let reviewFile
   try {
-    reviewFile = reviewModule.prepareRestoredReview(reviewStore, restoredState,
+    reviewFile = reviewModule.prepareRestoredReview(reviewStore, reviewState,
       { userId: 'local-demo-user', authorityRef: 'local-demo-authority' },
-      [{ projectId: rInspect.body.projects[0].id, allowedPaths: [projectDir], excludedPaths: ['.git'] }],
+      [{ projectId: project.id, allowedPaths: ['.'], excludedPaths: ['.git'] }],
       Buffer.from(actionKey, 'hex'))
+  } catch (error) {
+    let detail = null
+    try {
+      const recoveryModule = await import(pathToFileURL(join(install, 'app/apps/coordinator/product/recovery.ts')).href)
+      const recovery = new recoveryModule.ProductRecovery(reviewStore, { stateRoot: reviewState, startupMode: 'recovery_readonly', principal: { userId: 'local-demo-user', authorityRef: 'local-demo-authority' }, projects: () => [] })
+      const inspected = recovery.inspect()
+      detail = { state: inspected.state, markerDigest: inspected.markerDigest, blockers: inspected.blockers, coverage: inspected.logicalSource?.coverage, fingerprint: inspected.logicalSource?.fingerprint, projects: inspected.projects?.map(p => p.id), reviewProject: rInspect.body.projects[0]?.id, selectedProject: project.id, hasWork: reviewStore.product.works.listByProject(project.id, { limit: 1 }).length, currentProject: !!reviewStore.workflows.projects.current(project.id) }
+    } catch (diagnostic) { detail = { diagnostic: String(diagnostic?.message ?? diagnostic) } }
+    throw new Error(`review preparation failed: ${String(error?.message)} ${JSON.stringify(detail)}`)
   } finally { reviewStore.close() }
   writeFileSync(reviewPath, JSON.stringify(reviewFile, null, 2) + '\n', { mode: 0o600 })
   const windowMs = Date.parse(reviewFile.payload.expiresAt) - Date.parse(reviewFile.payload.createdAt)
   if (windowMs <= 0 || windowMs > 300000) throw new Error('review startup window exceeds five minutes')
-  const rawStart = (extra) => spawnSync(cli, ['start', '--port', String(rConsole), '--api-port', String(rApi), ...restoredArgs, ...extra], { cwd: install, encoding: 'utf8', timeout: 90000 })
-  const noReview = rawStart(['--fixture'])
-  if (noReview.status !== 2 || !noReview.stdout.includes('review_requires_restored_personal')) throw new Error('fixture startup accepted the review option')
+  const rawStart = (extra) => spawnSync(cli, ['start', '--port', String(rConsole), '--api-port', String(rApi), ...reviewArgs, ...extra], { cwd: install, encoding: 'utf8', timeout: 90000 })
+  const noReview = rawStart(['--fixture', '--review-restored-scope', reviewPath])
+  if (noReview.status !== 2 || !(noReview.stdout + noReview.stderr).includes('review_requires_restored_personal')) throw new Error(`fixture startup accepted the review option: status=${noReview.status} stdout=${noReview.stdout.slice(0,300)} stderr=${noReview.stderr.slice(0,200)}`)
   const cloneMode = (mode) => { const p = join(root, `review-${mode}.json`); writeFileSync(p, readFileSync(reviewPath), { mode }); return p }
   for (const [mode, file] of [[0o644, cloneMode(0o644)]]) {
     const bad = rawStart(['--discussion-only', '--review-restored-scope', file])
-    if (bad.status !== 2 || !bad.stdout.includes('review_scope_invalid')) throw new Error(`review ${mode.toString(8)} was not rejected`)
+    if (bad.status !== 2 || !(bad.stdout + bad.stderr).includes('review_scope_invalid')) throw new Error(`review ${mode.toString(8)} was not rejected`)
   }
   const symlinkPath = join(root, 'review-symlink.json'); spawnSync('ln', ['-s', reviewPath, symlinkPath])
   const symlink = rawStart(['--discussion-only', '--review-restored-scope', symlinkPath])
-  if (symlink.status !== 2 || !symlink.stdout.includes('review_scope_invalid')) throw new Error('review symlink was not rejected')
+  if (symlink.status !== 2 || !(symlink.stdout + symlink.stderr).includes('review_scope_invalid')) throw new Error('review symlink was not rejected')
   const missing = rawStart(['--discussion-only', '--review-restored-scope', join(root, 'missing-review.json')])
-  if (missing.status !== 2 || !missing.stdout.includes('review_scope_missing')) throw new Error('missing review file was not rejected')
+  if (missing.status !== 2 || !(missing.stdout + missing.stderr).includes('review_scope_missing')) throw new Error('missing review file was not rejected')
   const tamperedPath = cloneMode(0o600)
   const tampered = JSON.parse(readFileSync(tamperedPath, 'utf8')); tampered.payload.projects[0].allowedPaths = [root]
   writeFileSync(tamperedPath, JSON.stringify(tampered, null, 2) + '\n', { mode: 0o600 })
@@ -269,11 +288,11 @@ try {
   if (tamperedStart.status === 0) throw new Error('tampered review config started')
   const rConsole2 = await freePort(); let rApi2 = await freePort(); if (rApi2 === rConsole2) rApi2 = await freePort()
   const rOut2 = openSync(join(root, 'review.out.log'), 'w', 0o600), rErr2 = openSync(join(root, 'review.err.log'), 'w', 0o600)
-  const reviewDaemon = spawn(cli, ['start', '--discussion-only', '--review-restored-scope', reviewPath, '--port', String(rConsole2), '--api-port', String(rApi2), ...restoredArgs], { cwd: install, stdio: ['ignore', rOut2, rErr2], detached: true })
+  const reviewDaemon = spawn(cli, ['start', '--discussion-only', '--review-restored-scope', reviewPath, '--port', String(rConsole2), '--api-port', String(rApi2), ...reviewArgs], { cwd: install, stdio: ['ignore', rOut2, rErr2], detached: true })
   reviewDaemon.unref(); closeSync(rOut2); closeSync(rErr2)
   const reviewHealth = await waitHealth(rApi2)
   if (reviewHealth === null) throw new Error(`reviewed instance not healthy: ${readFileSync(join(root, 'review.err.log'), 'utf8').slice(0, 500)}`)
-  const reviewAuth = { authorization: `Bearer ${readFileSync(join(restoredState, 'api.key'), 'utf8').trim()}` }
+  const reviewAuth = { authorization: `Bearer ${readFileSync(join(reviewState, 'api.key'), 'utf8').trim()}` }
   const rvget = async (path) => { const res = await fetch(`http://127.0.0.1:${rApi2}${path}`, { headers: reviewAuth }); return { status: res.status, body: await res.json() } }
   const rvpost = async (path, body) => { const res = await fetch(`http://127.0.0.1:${rApi2}${path}`, { method: 'POST', headers: { ...reviewAuth, 'content-type': 'application/json' }, body: JSON.stringify(body) }); return { status: res.status, body: await res.json() } }
   const inspected = await rvget('/v1/recovery/inspect')
@@ -287,7 +306,7 @@ try {
   if (businessAfter.status !== 422 || businessAfter.body.error?.code !== 'unsupported_capability') throw new Error('reviewed business mutation was not refused')
   if (fakeRequests.length !== 1) throw new Error('reviewed startup/read called the model')
   if (reviewHealth.nativeTurns > 0 || reviewHealth.vendorSends > 0) throw new Error('reviewed startup started native/vendor execution')
-  const rvStop = run(cli, ['stop', '--json', ...restoredArgs])
+  const rvStop = run(cli, ['stop', '--json', ...reviewArgs])
   if (rvStop.json?.status !== 'STOPPED') throw new Error('reviewed stop failed')
   step('explicit-reviewed-personal', 'PASS', { reviewProtocol: reviewFile.payload.protocol, windowMs, markerState: inspected.body.state, startupMode: reviewHealth.startupMode,
     candidatesBeforeConsent: 403, candidatesAfterConsent: candidatesAfter.body.candidates.length, sourcesAfterConsent: 200, historyAfterConsent: 200,
