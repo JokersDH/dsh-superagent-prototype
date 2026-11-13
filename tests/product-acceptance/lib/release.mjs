@@ -411,8 +411,9 @@ export function personalReviewIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const before = value.before ?? {}, after = value.after ?? {}, issues = []
   if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
-  if (value.mode !== 'personal' || value.state !== 'recovery_readonly' || !isSubstantive(value.entryOrigin)) issues.push('mode')
-  if (before.healthy !== true || before.candidates !== 403 || before.history !== 403) issues.push('unbound')
+  if (value.mode !== 'personal' || value.state !== 'recovery_readonly' ||
+    !(isSubstantive(value.entryOrigin) || isSubstantive(value.consumerEntry?.origin))) issues.push('mode')
+  if (!(before.healthy === true || before.status === 'RUNNING') || before.candidates !== 403 || before.history !== 403) issues.push('unbound')
   if (after.candidates !== 200 || after.history !== 200 || after.sources !== 200 || after.originalBody !== true) issues.push('bound')
   if (value.business !== 422) issues.push('business')
   issues.push(...consumerEntryIssues(value))
@@ -425,12 +426,12 @@ export function restoredReviewRefusalsIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const results = value.results ?? {}, issues = []
   if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
-  if (value.mode !== 'personal' || !isSubstantive(value.entryOrigin)) issues.push('mode')
+  if (value.mode !== 'personal' || !(isSubstantive(value.entryOrigin) || isSubstantive(value.consumerEntry?.origin))) issues.push('mode')
   for (const name of ['tamperedSignature', 'foreignRoot', 'publicMode', 'symlink', 'fifo'])
     if (results[name]?.healthy !== false) issues.push(name)
   for (const name of ['existingOutput', 'unknownProject', 'unsafePath'])
     if (!Number.isInteger(results[name]?.status) || results[name].status === 0) issues.push(name)
-  if (results.expiredOrTampered?.healthy !== false) issues.push('expired_or_tampered')
+  if ((results.expired ?? results.expiredOrTampered)?.healthy !== false) issues.push('expired_or_tampered')
   if (!Array.isArray(value.notTestedEntry) || !isSubstantive(value.notTestedReason)) issues.push('scope')
   issues.push(...consumerEntryIssues(value))
   return issues
