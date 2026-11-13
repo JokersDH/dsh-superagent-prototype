@@ -1,0 +1,190 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "8c8fdef",
+  "mergeCommit": "7ae7fe7",
+  "checkpoints": [
+    "0041d21"
+  ],
+  "testedSourceCommit": "0041d21",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "existing fact ports",
+      "evidence": [
+        "wave22-attempt-facts",
+        "wave23-process-reader"
+      ],
+      "note": "fact map from bindings/current, commands, dispatch, observations, payloads, question/answer/delivery and recoverySource; command intent/written/observed/result/unknown separated; no new ledger or synthetic target presented as business delivery"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "independent Node PID",
+      "evidence": [
+        "wave23-process-reader.txt"
+      ],
+      "note": "child PID differs from parent; reads same attempt/ticket/assignment/contract/epoch/session, current pointer, question/answer/delivery and observations via public ports; payload reads outside sync UoW; running vs exited read distinguished"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "data manifest",
+      "evidence": [
+        "wave23-data-manifest.md",
+        "WAVE23_MANIFEST"
+      ],
+      "note": "manifest binds source SHA, actual data root, format, source fingerprint, entities, payload SHA/bytes, counts and digest; single-variable mutations of payload digest/answer ID/root/source SHA/format/source fingerprint all rejected"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "delivery windows",
+      "evidence": [
+        "wave23-process-reader.txt",
+        "wave22-attempt-facts"
+      ],
+      "note": "not_sent/written/indeterminate/actual native_applied kept under original attempt; child sees written/indeterminate; receipt existence not native observation; repeated reads add no delivery/observation/queue rows; ended not writer-stop proof"
+    },
+    {
+      "phase": "A5",
+      "status": "NOT_REACHED",
+      "scope": "B business attach",
+      "detail": "No admitted same-Runner business attach; idempotent landing of a real reconnected result into the original A Store/Broker is blocked on that port; inspect/cancel is not business resume"
+    },
+    {
+      "phase": "A6",
+      "status": "PASS",
+      "scope": "same Store real data",
+      "evidence": [
+        "wave20-personal-business",
+        "wave21-personal-v2"
+      ],
+      "note": "controlled Work/Broker question/answer/native_applied plus SDK candidate/context/receipt in one Store; FROZEN source bound to original digest; provider/queue/receipt values recorded"
+    },
+    {
+      "phase": "A7",
+      "status": "PASS",
+      "scope": "two formats second root",
+      "evidence": [
+        "wave20-personal-business",
+        "wave21-personal-v2",
+        "wave23-restored-personal 12/12"
+      ],
+      "note": "default v1 and explicit v2 each verify and restore to fresh second roots; personal readonly reads candidate/history/Work/delivery/frozen body; business 422, held queue and provider unchanged; narrow signed selection uses original Scope gate"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "C/D/E data inputs",
+      "evidence": [
+        "wave23-data-manifest.md",
+        "wave23-process-reader.txt"
+      ],
+      "note": "A supplies producer, child reader, manifest example and parameter variables; C consumer driver remains C-owned and is not replaced by A; D/E can bind install root/source SHA/format/IDs/entry; source-only tests do not certify installed consumer bytes"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "strict/cost",
+      "evidence": [
+        "strict typecheck",
+        "wave23-performance.json"
+      ],
+      "note": "strict/exactOptional/build pass; manifest reads only bound attempt/question/answer and unique payloads; child has 20s timeout; no cross-await SQL transaction or migration"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "final regression",
+      "evidence": [
+        "wave23-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, personal/source/candidate/target consumers, typecheck/build and static check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "116/116",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "restoredPersonal": "12/12",
+    "recoveryCombination": "106/106",
+    "mainProductConsumers": "91/91",
+    "mainTargetConsumers": "50/50",
+    "candidateConsumers": "31/31",
+    "productExecution": "20/20",
+    "genuineV1Probe": "2/2",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "limits": {
+    "manifestPayloads": 6,
+    "manifestObservations": 6,
+    "sourceMaxRows": 20000,
+    "sourceMaxRowsPerFamily": 10000,
+    "historyPageMax": 100,
+    "replyBodyBytes": 524288
+  },
+  "failureWindows": [
+    "payload digest mutation",
+    "answer ID mutation",
+    "data root mutation",
+    "source SHA mutation",
+    "format mutation",
+    "source fingerprint mutation",
+    "unsent intent",
+    "written not observed",
+    "indeterminate unknown",
+    "missing artifact/table/index",
+    "foreign principal/root",
+    "held queue"
+  ],
+  "blockers": [
+    {
+      "owner": "B",
+      "id": "business-attach-port",
+      "detail": "No admitted same-Runner business attach; A5 idempotent recovered-result landing is NOT_REACHED."
+    },
+    {
+      "owner": "C",
+      "id": "consumer-driver",
+      "detail": "C owns the single consumer driver; A provides data/manifest only. Driver execution is not A's installed/consumer-byte evidence."
+    },
+    {
+      "owner": "main",
+      "id": "private-permission-target",
+      "detail": "Private startup permission, physical writer proof and target activation remain unimplemented."
+    }
+  ],
+  "notTested": [
+    "B recovered-result landing",
+    "C driver against installed package",
+    "private permission/target activation",
+    "physical writer proof",
+    "D installed consumer",
+    "E release acceptance",
+    "real vendor model/native"
+  ],
+  "mainNextSteps": [
+    "use wave23 manifest/reader for B attach result landing and C driver input",
+    "keep command/dispatch/observation/unknown distinct",
+    "bind D/E to exact consumer bytes; do not treat source data tests as installed acceptance"
+  ],
+  "updatedAt": "2026-11-13T22:10:00.000Z"
+}
