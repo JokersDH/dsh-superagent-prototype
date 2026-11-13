@@ -34,7 +34,7 @@ export interface WorkflowEvidenceFamily {
 export const EVIDENCE_FAMILY_SET_VERSION = 2 as const
 export interface WorkflowEvidenceSummary {
   protocol: 'workflow-evidence/1' | 'workflow-evidence/2'
-  /** Present from family-set version 2; v1 manifests have no version and are verified by their recorded families. */
+  /** V2 records its family-set version; v1 uses the exact historical family set and recipe. */
   familySetVersion?: number
   families: readonly WorkflowEvidenceFamily[]
   digest: string
@@ -141,7 +141,8 @@ const EVIDENCE_LIMIT = 2000
  * the database file bytes and manifest hash were re-recorded. It is not a second event authority
  * and does not return record bodies to callers.
  */
-export function readWorkflowEvidence(databasePath: string, version: 1 | 2 = 2): WorkflowEvidenceSummary {
+export function readWorkflowEvidence(databasePath: string, version: 1 | 2 = 1): WorkflowEvidenceSummary {
+  if (version !== 1 && version !== 2) throw new TypeError('Unsupported workflow evidence version')
   const db = new Database(databasePath, { readonly: true, fileMustExist: true })
   try {
     const families: WorkflowEvidenceFamily[] = []

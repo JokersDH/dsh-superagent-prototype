@@ -94,7 +94,9 @@ export class WorkflowSnapshots {
   private readonly store: ProductStore
   constructor(store: ProductStore) { this.store = store }
 
-  async create(input: { destination: string; createdAt?: string }): Promise<SnapshotResult> {
+  async create(input: { destination: string; createdAt?: string; formatVersion?: 1 | 2 }): Promise<SnapshotResult> {
+    const formatVersion = input.formatVersion === undefined ? 1 : input.formatVersion
+    if (formatVersion !== 1 && formatVersion !== 2) throw new SnapshotError('Unsupported snapshot format version')
     if (!input.destination.startsWith('/')) throw new SnapshotError('Snapshot destination must be absolute')
     try {
       mkdirSync(input.destination, { mode: 0o700 })
@@ -108,8 +110,7 @@ export class WorkflowSnapshots {
     const registryIds = new Set(artifactRows.map(row => row.id))
     const referencedArtifacts = readRoutingArtifactRefs(databasePath)
     const missingReferences = referencedArtifacts.filter(id => !registryIds.has(id))
-    const evidence = readWorkflowEvidence(databasePath)
-    const legacyEvidence = readWorkflowEvidence(databasePath, 1)
+    const evidence = readWorkflowEvidence(databasePath, formatVersion)
     const artifacts: SnapshotArtifact[] = []
     const missing: string[] = []
     const corrupt: string[] = []
@@ -134,12 +135,13 @@ export class WorkflowSnapshots {
     }
     const incompatibleSchema = database.productSchema > PRODUCT_SCHEMA_VERSION
     const schemaInventory = inspectSchemaInventory(databasePath, database.productSchema)
-    const schemaOk = !schemaInventory.futureSchema && schemaInventory.missingTables.length === 0 &&
+    const schemaOk = schemaInventory.productSchema !== null && Number.isSafeInteger(schemaInventory.productSchema) && schemaInventory.productSchema >= 1 &&
+      !schemaInventory.futureSchema && schemaInventory.missingTables.length === 0 &&
       schemaInventory.missingIndexes.length === 0 && schemaInventory.unknownTables.length === 0
     const complete = missing.length === 0 && corrupt.length === 0 && missingReferences.length === 0 &&
       !incompatibleSchema && schemaOk && database.integrity === 'ok' && database.foreignKeyViolations === 0
     const manifest: SnapshotManifest = {
-      protocol: 'workflow-snapshot/2',
+      protocol: formatVersion === 2 ? 'workflow-snapshot/2' : 'workflow-snapshot/1',
       createdAt: input.createdAt ?? new Date().toISOString(),
       database,
       artifacts,
@@ -147,8 +149,8 @@ export class WorkflowSnapshots {
       missingReferences,
       incompatibleSchema,
       evidence,
-      schemaInventory: { missingTables: schemaInventory.missingTables, missingIndexes: schemaInventory.missingIndexes,
-        unknownTables: schemaInventory.unknownTables },
+      ...(formatVersion === 2 ? { schemaInventory: { missingTables: schemaInventory.missingTables, missingIndexes: schemaInventory.missingIndexes,
+        unknownTables: schemaInventory.unknownTables } } : {}),
       complete,
       missing,
       corrupt,
@@ -195,8 +197,8 @@ export class WorkflowSnapshots {
     const bytes = readFileSync(databasePath)
     const databaseSha = sha256(bytes)
     const verified = verifyDatabase(databasePath)
-    const evidence = readWorkflowEvidence(databasePath)
-    const legacyEvidence = readWorkflowEvidence(databasePath, 1)
+    const formatVersion = manifest.protocol === 'workflow-snapshot/2' ? 2 : 1
+    const evidence = readWorkflowEvidence(databasePath, formatVersion)
     const artifacts = manifest.artifacts.map(item => {
       const file = join(destination, item.snapshotPath)
       if (!existsSync(file)) return { id: item.id, status: 'missing' as const }
@@ -206,8 +208,7 @@ export class WorkflowSnapshots {
     const incompatibleSchema = verified.productSchema === null || verified.productSchema > PRODUCT_SCHEMA_VERSION ||
       manifest.database.productSchema > PRODUCT_SCHEMA_VERSION
     // Family-set v2 is a complete, versioned list: creation and verification require the exact
-    // current family set and the overall digest. A v1 manifest has no familySetVersion and keeps its
-    // historical capability by checking only the families it actually recorded.
+    // current family set and overall digest. V1 uses its exact historical family set and recipe.
     const manifestFamilies = manifest.evidence?.families
     const familySetVersion = manifest.evidence?.familySetVersion
     const futureFamilySet = typeof familySetVersion === 'number' && familySetVersion > EVIDENCE_FAMILY_SET_VERSION
@@ -219,24 +220,16 @@ export class WorkflowSnapshots {
         return !!recorded && recorded.count === current.count && recorded.digest === current.digest &&
           recorded.truncated === current.truncated
       })
-    const legacyFamilies = Array.isArray(manifestFamilies) &&
-      manifestFamilies.length === legacyEvidence.families.length &&
-      new Set(manifestFamilies.map(family => family.name)).size === manifestFamilies.length &&
-      legacyEvidence.families.every(recorded => {
-        const manifestFamily = manifestFamilies.find(family => family.name === recorded.name)
-        return !!manifestFamily && manifestFamily.count === recorded.count && manifestFamily.digest === recorded.digest &&
-          manifestFamily.truncated === recorded.truncated
-      })
     const evidenceMatches = futureFamilySet ? false
       : manifest.protocol === 'workflow-snapshot/2'
         ? familySetVersion === EVIDENCE_FAMILY_SET_VERSION && manifest.evidence?.protocol === 'workflow-evidence/2' &&
           manifest.evidence.digest === evidence.digest && exactFamilies
         : manifest.protocol === 'workflow-snapshot/1'
           ? familySetVersion === undefined && manifest.evidence?.protocol === 'workflow-evidence/1' &&
-            manifest.evidence.digest === legacyEvidence.digest && legacyFamilies
+            manifest.evidence.digest === evidence.digest && exactFamilies
           : false
     const schemaInventory = inspectSchemaInventory(databasePath, verified.productSchema)
-    const schemaOk = schemaInventory.productSchema !== null && schemaInventory.productSchema >= 1 &&
+    const schemaOk = schemaInventory.productSchema !== null && Number.isSafeInteger(schemaInventory.productSchema) && schemaInventory.productSchema >= 1 &&
       !schemaInventory.futureSchema && schemaInventory.missingTables.length === 0 &&
       schemaInventory.missingIndexes.length === 0 && schemaInventory.unknownTables.length === 0
     const ok = manifest.complete && !manifest.incompatibleSchema && !incompatibleSchema && schemaOk &&
