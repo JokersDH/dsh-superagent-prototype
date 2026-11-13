@@ -1,0 +1,20 @@
+✔ review health identity is bounded and only accepted for a restored personal process (4.9705ms)
+✔ explicit startup selection binds current source, local principal and exact read-only paths without DB changes (32.058166ms)
+✔ startup refuses source changes (12.29425ms)
+✔ startup refuses marker changes (11.060041ms)
+✔ startup refuses signature changes (9.506ms)
+✔ startup refuses requested scope changes (9.666417ms)
+✔ startup refuses unsafe file permissions (12.851667ms)
+✔ startup refuses symlink input (9.836084ms)
+✔ startup refuses FIFO input (12.265625ms)
+✔ expired, foreign principal, root and current local key cannot replay startup consent (12.829125ms)
+✔ unknown projects, unsafe paths and execution claims cannot enter an explicit review selection (10.543875ms)
+✔ actual personal startup reviews only explicitly rebound historical data; queues/model/native remain disabled (9766.568833ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10254.947375

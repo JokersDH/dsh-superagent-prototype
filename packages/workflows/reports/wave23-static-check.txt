@@ -1,0 +1,21 @@
+{
+  "status": "PASS_LONG_DISPATCH_STATIC_ONLY",
+  "roles": 6,
+  "phases": 60,
+  "checkpoints": 32,
+  "localLinks": 153,
+  "acyclic": true,
+  "nonoverlappingOwners": true,
+  "ordinaryDistributionSourceIntegrated": true,
+  "bActualNewChannelSourceRecognized": true,
+  "bHandoverStillRequired": true,
+  "measured595Preserved": true,
+  "newArtifactVerdictStillRequired": true,
+  "eCompletenessGateStillRequired": true,
+  "ordinaryInstallIndependentOfActivation": true,
+  "budgetUnchanged": true,
+  "preservedServicePairs": 12,
+  "runtimeTests": 0,
+  "nativeTurnStarts": 0,
+  "releaseApproved": false
+}
