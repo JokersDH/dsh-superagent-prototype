@@ -132,6 +132,10 @@ const evidenceFor = (key) => {
         after: { candidates: 200, history: 200, sources: 200, originalBody: true },
         reviewFile: { mode: '600', access: 'historical_data_read_only', startupAvailable: false },
         business: 422, queueHeld: true, providerRequests: 2,
+        consumerEntry: { origin: 'package', package: { source: COMMIT, buildId: 'b', tarSha256: DIGEST, tarBytes: 1 },
+          files: [{ path: 'apps/launcher/lib/start.mjs', sha256: 'a'.repeat(64), bytes: 1 },
+            { path: 'apps/coordinator/product/restored-review.ts', sha256: 'b'.repeat(64), bytes: 1 },
+            { path: 'apps/coordinator/product/demo.ts', sha256: 'c'.repeat(64), bytes: 1 }] },
       }
     case 'restoredReviewRefusals':
       return {
@@ -141,6 +145,23 @@ const evidenceFor = (key) => {
           symlink: { healthy: false }, fifo: { healthy: false }, expiredOrTampered: { healthy: false },
           existingOutput: { status: 1 }, unknownProject: { status: 1 }, unsafePath: { status: 1 } },
         notTestedEntry: ['expiry with a valid signature'], notTestedReason: 'forging a signature needs the probe-owned action key',
+        consumerEntry: { origin: 'package', package: { source: COMMIT, buildId: 'b', tarSha256: DIGEST, tarBytes: 1 },
+          files: [{ path: 'apps/launcher/lib/start.mjs', sha256: 'a'.repeat(64), bytes: 1 },
+            { path: 'apps/coordinator/product/restored-review.ts', sha256: 'b'.repeat(64), bytes: 1 },
+            { path: 'apps/coordinator/product/demo.ts', sha256: 'c'.repeat(64), bytes: 1 }] },
+      }
+    case 'reviewReuse':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'personal', healthDigest: DIGEST, digestAvailable: true, firstPid: 100, unboundPid: 200, pidAfterRefusals: 100, pidAfterUnbound: 200,
+        scope: 'selection digest present',
+        consumerEntry: { origin: 'package', package: { source: COMMIT, buildId: 'b', tarSha256: DIGEST, tarBytes: 1 },
+          files: [{ path: 'apps/launcher/lib/start.mjs', sha256: 'a'.repeat(64), bytes: 1 },
+            { path: 'apps/coordinator/product/restored-review.ts', sha256: 'b'.repeat(64), bytes: 1 },
+            { path: 'apps/coordinator/product/demo.ts', sha256: 'c'.repeat(64), bytes: 1 }] },
+        outcomes: { sameFile: { status: 'RUNNING', reused: true, instance: { pid: 100 } },
+          differentFile: { status: 'BLOCKED', reused: false }, missingFile: { status: 'BLOCKED', reused: false },
+          portChange: { status: 'BLOCKED', reused: false }, unboundThenSelection: { status: 'BLOCKED', reused: false } },
       }
     case 'workflowFormats':
       return {
@@ -1286,6 +1307,35 @@ const CASES = [
         findCase(report, 'E5-RESTORED-REVIEW-REFUSALS').evidence.restoredReviewRefusals.results.fifo.healthy = true
         return report
       }, 'restoredReviewRefusals_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-CONSUMER-ENTRY-FOREIGN',
+    title: 'A source-checkout consumer cannot back an installed review claim even with the right data tuple',
+    check: ({ assert }) =>
+      rejectWith(assert, 'CONSUMER_FOREIGN', (report) => {
+        const item = findCase(report, 'E4-PERSONAL-RESTORED-REVIEW').evidence.personalReview
+        item.consumerEntry.package = { ...item.consumerEntry.package, source: 'e'.repeat(40), buildId: 'foreign-build', tarSha256: 'f'.repeat(64) }
+        item.consumerEntry.files[0].sha256 = 'f'.repeat(64)
+        return report
+      }, 'personalReview_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-CONSUMER-ENTRY-SOURCE-ORIGIN',
+    title: 'A main-checkout consumer is not an installed consumer',
+    check: ({ assert }) =>
+      rejectWith(assert, 'CONSUMER_SOURCE', (report) => {
+        findCase(report, 'E5-RESTORED-REVIEW-REFUSALS').evidence.restoredReviewRefusals.consumerEntry.origin = 'source'
+        return report
+      }, 'restoredReviewRefusals_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-REUSE-SILENT-SELECTION',
+    title: 'A different review selection that silently reuses the live instance is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'REUSE_SILENT', (report) => {
+        findCase(report, 'E5-REVIEW-REUSE-CONSISTENCY').evidence.reviewReuse.outcomes.differentFile = { status: 'RUNNING', reused: true, instance: { pid: 100 } }
+        return report
+      }, 'reviewReuse_invalid'),
   },
   {
     id: 'E1-MUTATE-SELF-CLAIM',

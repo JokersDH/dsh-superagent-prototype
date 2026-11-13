@@ -395,6 +395,18 @@ export function installedStabilityIssues(value) {
   if (value.reopened !== 'RUNNING' || value.reopenedEqual !== true) issues.push('reopen')
   return issues
 }
+function consumerEntryIssues(value) {
+  const entry = value?.consumerEntry, issues = []
+  if (!entry || entry.origin !== 'package') return ['consumer_provenance']
+  if (!entry.package || String(entry.package.source ?? '') !== String(value?.subject?.source ?? '') ||
+    String(entry.package.buildId ?? '') !== String(value?.subject?.buildId ?? '') ||
+    String(entry.package.tarSha256 ?? '') !== String(value?.subject?.tarSha256 ?? '')) issues.push('consumer_provenance')
+  const files = Array.isArray(entry.files) ? entry.files : []
+  const required = ['apps/launcher/lib/start.mjs', 'apps/coordinator/product/restored-review.ts', 'apps/coordinator/product/demo.ts']
+  if (files.length < 3 || files.some(file => !isSubstantive(file?.path) || !HEX.test(String(file?.sha256 ?? '')) || !Number.isSafeInteger(file?.bytes)) ||
+    !required.every(path => files.some(file => file.path === path))) issues.push('consumer_provenance')
+  return issues
+}
 export function personalReviewIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const before = value.before ?? {}, after = value.after ?? {}, issues = []
@@ -403,6 +415,7 @@ export function personalReviewIssues(value) {
   if (before.healthy !== true || before.candidates !== 403 || before.history !== 403) issues.push('unbound')
   if (after.candidates !== 200 || after.history !== 200 || after.sources !== 200 || after.originalBody !== true) issues.push('bound')
   if (value.business !== 422) issues.push('business')
+  issues.push(...consumerEntryIssues(value))
   if (value.queueHeld !== true) issues.push('queue')
   if (value.reviewFile?.mode !== '600' || value.reviewFile?.access !== 'historical_data_read_only' || value.reviewFile?.startupAvailable !== false) issues.push('review_file')
   if (!Number.isSafeInteger(value.providerRequests)) issues.push('provider')
@@ -419,6 +432,25 @@ export function restoredReviewRefusalsIssues(value) {
     if (!Number.isInteger(results[name]?.status) || results[name].status === 0) issues.push(name)
   if (results.expiredOrTampered?.healthy !== false) issues.push('expired_or_tampered')
   if (!Array.isArray(value.notTestedEntry) || !isSubstantive(value.notTestedReason)) issues.push('scope')
+  issues.push(...consumerEntryIssues(value))
+  return issues
+}
+export function reviewReuseIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const outcomes = value.outcomes ?? {}, issues = []
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  if (value.mode !== 'personal') issues.push('mode')
+  issues.push(...consumerEntryIssues(value))
+  const same = outcomes.sameFile ?? {}
+  if (!(same.status === 'RUNNING' && same.reused === true && same.instance?.pid === value.firstPid)) issues.push('same_selection')
+  for (const name of ['differentFile', 'missingFile', 'portChange', 'unboundThenSelection']) {
+    const item = outcomes[name] ?? {}
+    if (item.status === 'RUNNING' && item.reused === true) issues.push(name)
+  }
+  if (!Number.isSafeInteger(value.pidAfterRefusals) || value.pidAfterRefusals !== value.firstPid ||
+    !Number.isSafeInteger(value.pidAfterUnbound) || value.pidAfterUnbound !== value.unboundPid) issues.push('pid')
+  if (value.digestAvailable === true && !HEX.test(String(value.healthDigest ?? ''))) issues.push('digest')
+  if (value.digestAvailable === false && !isSubstantive(value.scope)) issues.push('digest_scope')
   return issues
 }
 export function workflowFormatsIssues(value) {
@@ -988,7 +1020,7 @@ export function evaluateRelease({
         item.evidence?.installedCandidates?.subject ?? item.evidence?.secondRoot?.subject ??
         item.evidence?.installedSourceConfirm?.subject ?? item.evidence?.installedStability?.subject ??
         item.evidence?.workflowFormats?.subject ?? item.evidence?.personalReview?.subject ??
-        item.evidence?.restoredReviewRefusals?.subject
+        item.evidence?.restoredReviewRefusals?.subject ?? item.evidence?.reviewReuse?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
@@ -1036,7 +1068,7 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
           for (const issue of fn(result.evidence?.[key]))
             failures.push(fail(key === 'ownershipMocks' ? (OWNERSHIP_ISSUE_CODES[issue] ?? 'ownershipMocks_invalid') : `${key}_invalid`, `${key} ${issue}`, entry.id))

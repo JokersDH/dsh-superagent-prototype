@@ -151,7 +151,7 @@ await collect('e4', async () => {
     import('./cases/e4-reply-durable.mjs'),
     import('./cases/e4-source-confirm.mjs'),
     import('./cases/w18-installed-recovery.mjs'),
-    import('./cases/w20-personal-review.mjs'),
+    import('./cases/w21-personal-recovery.mjs'),
   ])
   const first = await stability.runE4({
     root,
