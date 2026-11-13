@@ -49,6 +49,9 @@ export class ProductRecoverySource {
       throw new ApplicationFault('unsupported_capability', 'Source confirmation requires restored read-only startup', 'none')
     if (actor.source === 'explicit_rule' || actor.userId !== this.options.principal.userId || actor.authorityRef !== this.options.principal.authorityRef)
       throw new ApplicationFault('forbidden', 'Source confirmation requires the authenticated local user', 'none')
+    try {
+      if (dirname(realpathSync(this.store.db.name)) !== realpathSync(this.options.stateRoot)) throw new Error('Different source database root')
+    } catch { throw new ApplicationFault('forbidden', 'Source database does not belong to this configured state', 'none') }
     return actor
   }
   private signature(body: string) { return createHmac('sha256', this.secret).update(`recovery-source-confirmation/1:${body}`).digest('base64url') }

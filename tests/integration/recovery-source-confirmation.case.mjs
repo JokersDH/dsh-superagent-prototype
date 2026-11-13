@@ -24,8 +24,8 @@ function fixture(t, mode = 'recovery_readonly') {
   const store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
   store.queue.enqueue('application.execute', 'old-held-work', '{"workId":"historical"}', 1, 0, at)
   const projects = [{ id: projectId, scope: { projectId, allowedPaths: ['.'], excludedPaths: ['.git'], externalActions: [] } }]
-  const runtimes = [], make = (secret = Buffer.alloc(32, 79)) => {
-    const product = createProductRuntime({ store, stateRoot, scratchProject: project, principal, projects, actionSecret: secret,
+  const runtimes = [], make = (secret = Buffer.alloc(32, 79), runtimeRoot = stateRoot) => {
+    const product = createProductRuntime({ store, stateRoot: runtimeRoot, scratchProject: project, principal, projects, actionSecret: secret,
       startupMode: mode, now: () => at,
       ...(mode === 'normal' ? { executionUnavailable: 'operator_disabled' } : {}),
       recoveryExecutor: () => ({ id: 'read-only-fixture-executor', revision: profileRevision, executable: process.execPath, expectedVersion: process.version }) })
@@ -152,6 +152,14 @@ test('normal startup refuses both source routes and historical/overlapping targe
     const response = await h.request('prepare', { ...await h.input(), targetStateRoot })
     assert.equal(response.status, 422)
   }
+  assert.equal(h.store.events.cursor(), 0)
+})
+
+test('another configured root cannot substitute for the actual source database directory', async t => {
+  const h = fixture(t), other = join(h.root, 'different-source')
+  mkdirSync(other, { mode: 0o700 })
+  const { product } = h.make(Buffer.alloc(32, 79), other)
+  await assert.rejects(product.operations.recoverySourcePrepare(await h.input(), actor), error => error.error.code === 'forbidden')
   assert.equal(h.store.events.cursor(), 0)
 })
 
