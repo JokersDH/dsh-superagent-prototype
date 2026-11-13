@@ -185,3 +185,49 @@ test('invalid selections, missing work for artifacts and recovery read-only are 
   })
   assert.equal(response.status, 422)
 })
+
+test('the default scoped factory reports its 600-message scan boundary as partial with an issue', async (t) => {
+  const s = setup(t)
+  const longConversation = 'long-context-conversation'
+  // Older excluded displays force the factory to keep scanning until its 600-message boundary.
+  for (let index = 0; index < 610; index += 1) {
+    s.h.store.product.messages.append({
+      id: `long-display-${String(index).padStart(4, '0')}`,
+      conversationId: longConversation,
+      projectId: scope.projectId,
+      role: 'user',
+      provenance: 'question_answer_display',
+      text: `display answer ${index}`,
+      sourceRefs: [],
+      createdAt: NOW,
+    })
+  }
+  for (let index = 0; index < 5; index += 1) {
+    s.h.store.product.messages.append({
+      id: `long-visible-${index}`,
+      conversationId: longConversation,
+      projectId: scope.projectId,
+      role: 'user',
+      provenance: 'trusted_user',
+      text: `visible discussion ${index}`,
+      sourceRefs: [],
+      createdAt: NOW,
+    })
+  }
+
+  const response = await s.preview({ ...s.request, conversationId: longConversation, selections: ['conversation'] })
+  assert.equal(response.status, 200)
+  const preview = await response.json()
+  assert.equal(preview.conversationId, longConversation)
+  assert.equal(preview.status, 'partial')
+  assert.ok(preview.issues.includes('conversation_scan_incomplete'), JSON.stringify(preview.issues))
+  // The same bounded scan is also explained in the public omission list, never silently sufficient.
+  assert.ok((preview.omitted as { reason: string }[]).some((entry) => entry.reason === 'source_unavailable'), JSON.stringify(preview.omitted))
+  const text = preview.sources.map((source: { content: string }) => source.content).join('\n')
+  assert.ok(text.includes('visible discussion'))
+  assert.equal(text.includes('display answer'), false)
+  for (const source of preview.sources) {
+    assert.equal(source.path.startsWith('/'), false)
+    assert.equal(source.kind, 'conversation_message')
+  }
+})
