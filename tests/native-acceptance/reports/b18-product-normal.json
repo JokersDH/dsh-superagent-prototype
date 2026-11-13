@@ -1,0 +1,169 @@
+{
+  "generatedAt": "2026-11-13T06:23:59.461Z",
+  "environment": {
+    "note": "wave-18 B1/B2 product vertical with B-owned local producer",
+    "modelCalls": 0,
+    "nativeTurns": 0
+  },
+  "totals": {
+    "cases": 6,
+    "PASS": 4,
+    "FAIL": 1,
+    "SKIPPED": 0,
+    "NOT_TESTED": 1
+  },
+  "scope": "controlled fake executable; native NOT_TESTED",
+  "cases": [
+    {
+      "id": "B18-PRODUCT-PREPARES",
+      "title": "policy preparation completes through the original Driver",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "exactly one begin for attempt attempt-496349cb-56d6-43c0-9bd8-9217856c9b73 at epoch 1"
+      ],
+      "evidence": [
+        {
+          "status": "recorded",
+          "attemptId": "attempt-496349cb-56d6-43c0-9bd8-9217856c9b73",
+          "factKinds": [
+            "writer.observed",
+            "policy.prepared",
+            "dispatch.observed",
+            "question.opened"
+          ],
+          "beginCount": 1,
+          "tables": {
+            "works": 1,
+            "tickets": 1,
+            "links": 1,
+            "questions": 1,
+            "deliveries": 0,
+            "facts": 4,
+            "payloads": 8,
+            "bindings": 1,
+            "dispatch": 1,
+            "events": 22
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B18-BROKER-QUESTION",
+      "title": "the producer approval becomes a real Broker question",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the Broker registered question codex-question-2f43c805c12995b2d8ea84ff0499b451a87edb5848e6a4f4 (permission) from the producer approval"
+      ],
+      "evidence": [
+        {
+          "questionId": "codex-question-2f43c805c12995b2d8ea84ff0499b451a87edb5848e6a4f4",
+          "kind": "permission",
+          "targets": 1
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B18-DURABLE-ROWS",
+      "title": "facts, dispatch and the binding agree with the receiver attempt",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "durable rows agree: works=1 tickets=1 links=1 facts=4 bindings=1 dispatch=1; facts writer.observed, policy.prepared, dispatch.observed, question.opened; binding attempt matches the receiver"
+      ],
+      "evidence": [
+        {
+          "tables": {
+            "works": 1,
+            "tickets": 1,
+            "links": 1,
+            "questions": 1,
+            "deliveries": 0,
+            "facts": 4,
+            "payloads": 8,
+            "bindings": 1,
+            "dispatch": 1,
+            "events": 22
+          },
+          "bindingAttempt": "attempt-496349cb-56d6-43c0-9bd8-9217856c9b73",
+          "receiverAttempt": "attempt-496349cb-56d6-43c0-9bd8-9217856c9b73"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B18-ANSWER-DELIVERED",
+      "title": "the human answer is delivered to the live turn",
+      "lane": "controlled_process",
+      "status": "PASS",
+      "detail": [
+        "the answer was recorded and delivered to the Runner (1 answer frame)"
+      ],
+      "evidence": [
+        {
+          "status": "recorded",
+          "answerError": null,
+          "answerFrames": 1,
+          "tables": {
+            "works": 1,
+            "tickets": 1,
+            "links": 1,
+            "questions": 1,
+            "deliveries": 1,
+            "facts": 4,
+            "payloads": 11,
+            "bindings": 1,
+            "dispatch": 2,
+            "events": 27
+          }
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B18-STOP-DELIVERED",
+      "title": "stop_work cancels the live turn and the Runner is told",
+      "lane": "controlled_process",
+      "status": "FAIL",
+      "detail": [
+        "stop did not reach the writer: {\"status\":\"recorded\",\"stopError\":null,\"cancelFrames\":0,\"interrupted\":false,\"methods\":[\"initialize\",\"initialized\",\"thread/start\",\"turn/start\"],\"phase\":\"ended\"}"
+      ],
+      "evidence": [
+        {
+          "status": "recorded",
+          "stopError": null,
+          "cancelFrames": 0,
+          "producerMethods": [
+            "initialize",
+            "initialized",
+            "thread/start",
+            "turn/start"
+          ],
+          "interrupted": false,
+          "phase": "ended"
+        }
+      ],
+      "entities": []
+    },
+    {
+      "id": "B18-SCOPE-NOT-NATIVE",
+      "title": "fake executable lane; installed Codex not executed",
+      "lane": "controlled_process",
+      "status": "NOT_TESTED",
+      "detail": [
+        "an installed Codex was not executed and no gateway was contacted"
+      ],
+      "evidence": [
+        {
+          "driver": "CodexProductDriver (unmodified)",
+          "executable": "B-owned fake app-server process",
+          "installedCodexExecuted": false
+        }
+      ],
+      "entities": []
+    }
+  ]
+}

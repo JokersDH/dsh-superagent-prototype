@@ -26,7 +26,7 @@ if (process.argv.includes('--version') || process.argv.includes('-v')) {
 const server = createFakeAppServer({ approval: process.env.PA_FAKE_APPROVAL === '1' })
 const transport = server.transport()
 transport.onData(chunk => process.stdout.write(chunk))
-process.stdin.on('data', chunk => transport.send(chunk as Uint8Array))
+process.stdin.on('data', chunk => transport.send(chunk))
 process.stdin.on('end', () => { transport.close(); process.exit(0) })
 // The Driver closes the connection when the turn ends; keep the process from lingering.
 process.stdout.on('error', () => process.exit(0))

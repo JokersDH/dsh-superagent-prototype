@@ -1,0 +1,92 @@
+{
+  "wave": "product-wave-18",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "f875ead",
+  "previousCandidate": "1e1f82a",
+  "packet": "agent-tasks/product-wave-18/agent-b-runtime.zh-CN.md",
+  "sharedBoundary": "docs/rfcs/WP-16/0051",
+  "checkpoint": "1 of 3",
+  "mainDiagnostic": {
+    "command": "PA_ADMISSION_REPORT=/tmp/pa-b-wave18-goal-start.json node tools/bootstrap/diagnose-wave18-b-preparation.mjs <B-root>",
+    "outputPathWasNew": true,
+    "outcome": "PASS",
+    "classification": "MAIN_DIAGNOSTIC_NOT_B_SUBMITTED_DELIVERY",
+    "creditedToB": false,
+    "referenceOutcome": { "factKinds": ["writer.observed", "policy.prepared", "dispatch.observed", "question.opened"], "beginExactlyOnce": true, "brokerQuestion": 1, "factReceipts": 4 }
+  },
+  "scopeNote": "Zero real model and native turns. Only B-owned paths. No second ledger/coordinator/lifecycle, no shared-contract or main-product-class edit. Twelve services untouched. Two historical report diffs and untracked b16-real-begin.mjs preserved. Local fake only; no real CLI or gateway fallback.",
+
+  "B1_producerAndPreparation": {
+    "status": "PASS",
+    "defectFixed": "wave-17's fixture carried a TypeScript assertion (`chunk as Uint8Array`) inside a .mjs file, so node --check and --version both failed and the fake executable never ran at all",
+    "secondDefectFixed": "even when runnable, the wave-17 fake reused createFakeAppServer, the test-lane double for CodexNativeDriver, whose thread/start and approval shapes do not match the product Driver",
+    "delivered": "tests/native-acceptance/fixtures/fake-codex-producer.mjs - a B-owned local producer implementing the installed app-server protocol the original CodexProductDriver actually uses: --version, initialize, thread/start with the driver's cwd/approvalPolicy/sandbox, turn/start, an item/commandExecution/requestApproval server request, and turn/interrupt",
+    "guards": "CodexProductDriver and every preparation/authorization guard retained; no prepared fact fabricated; unknown methods are refused with -32601 rather than silently acknowledged",
+    "harnessBugFixed": "wave-17 also queried a non-existent fact_receipts.kind column and swallowed the error; kinds now come from store.observations.forAttempt(attemptId) and the binding from store.bindings.current(ticketId), as the packet directed",
+    "evidence": "tests/native-acceptance/b18-product-normal.mjs"
+  },
+
+  "B2_normalVertical": {
+    "status": "PASS",
+    "measured": {
+      "beginCount": 1,
+      "attemptIdMatchesBinding": true,
+      "factKinds": ["writer.observed", "policy.prepared", "dispatch.observed", "question.opened"],
+      "factReceipts": 4,
+      "brokerQuestions": 1,
+      "questionKind": "permission",
+      "dispatchReceipts": 1,
+      "answerFramesDelivered": 1,
+      "answerStatus": "recorded"
+    },
+    "businessRows": { "works": 1, "tickets": 1, "links": 1, "facts": 4, "bindings": 1, "dispatch": 1, "questions": 1 },
+    "note": "the outcome now matches main's diagnostic shape from B's own producer, but is measured by B's harness and is B's delivery, not the main diagnostic"
+  },
+
+  "B3_stopPhysicalGap": {
+    "status": "FAIL",
+    "label": "stop_work ends the work but nothing reaches the physical writer",
+    "measured": {
+      "stopWorkReceipt": "recorded",
+      "workPhaseAfterStop": "ended",
+      "runnerCancelFrames": 0,
+      "producerMethodsReceived": ["initialize", "initialized", "thread/start", "turn/start"],
+      "producerTurnInterruptReceived": false
+    },
+    "whyItMatters": "this is the architecture invariant 'core stopped does not prove a physical writer stopped' showing up on the real product path, not a fixture artefact - the producer was held live (PA_PRODUCER_HOLD=1) so a real interrupt was expected",
+    "harnessCorrectionRecorded": "the first run showed the same empty result for a different reason: the producer completed the turn immediately after the approval, so there was no live turn to stop. That was fixed with hold mode, and the gap remained, which is why it is reported as a product-path finding",
+    "notClaimed": "no physical barrier, no quiescence, no stop recovery"
+  },
+
+  "notReached": {
+    "B4_businessReconnectPort": "not started",
+    "B5_beginCrashWindows": "not started",
+    "B6_answerCancelRecovery": "not started",
+    "B7_validStaleEpoch": "not started; epoch 0 remains only an invalid-input case",
+    "B8_recoveredDeliveryInspectionAccept": "not started",
+    "B9_slots2And4AndReturn": "not started"
+  },
+
+  "regressions": {
+    "oldDriver14": "unchanged",
+    "b16_receiverHalf": "3 PASS + 1 NOT_TESTED, unchanged",
+    "normalB13": "6 PASS + 1 NOT_TESTED, unchanged"
+  },
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "bConsumes": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "limitations": [
+    "the producer is a local protocol stub; installed-Codex behaviour and any gateway remain NOT_TESTED and were not contacted",
+    "normal question/answer pass, but stop does not reach the writer, so the physical barrier claim stays open",
+    "no crash window, no epoch fence, no recovered delivery, no 2/4 slots, no resource return in this checkpoint",
+    "only one checkpoint of the three required has been published so far"
+  ]
+}
