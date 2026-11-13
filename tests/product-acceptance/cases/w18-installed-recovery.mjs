@@ -7,7 +7,8 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { runCase, LAYERS } from '../lib/status.mjs'
+import { pathToFileURL } from 'node:url'
+import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact } from '../lib/frozen-package.mjs'
@@ -197,6 +198,7 @@ async function provision(target) {
     const restore = launcher(install, ['restore', '--bundle', bundle, '--to', restoredRoot, '--json'], { timeoutMs: 90_000 })
     if (restore.status !== 0 || restore.json?.status !== 'RESTORED') throw new Error(`restore ${restore.status}: ${restore.stderr}`)
     const marker = join(restoredRoot, 'restore-report.json')
+    const format = await packagedFormatEvidence(install, restoredRoot, marker)
     const beforeDb = snapshotDb(join(restoredRoot, 'state.sqlite'))
     const [rp, rap] = [await freePort(), await freePort()]
     restoredStarted = start(install, { port: rp, apiPort: rap, env: { PA_DATA_ROOT: restoredRoot, PA_MODEL_CONFIG: mock.file } })
@@ -256,7 +258,7 @@ async function provision(target) {
       launcher(install, ['stop', '--json'], { env: { PA_DATA_ROOT: restoredRoot, PA_MODEL_CONFIG: mock.file }, timeoutMs: 25_000 })
     }
     return {
-      install, own, marker, bundle, target, state, restoredRoot,
+      install, own, marker, bundle, target, state, restoredRoot, format,
       firstRun: firstRun.json?.status ?? null, stop: stop.json?.status ?? null,
       backup: { status: backup.json?.status, counts: backup.json?.counts, sha256: backup.json?.archiveSha256, bytes: existsSync(bundle) ? readFileSync(bundle).length : 0 },
       verify: verify.json?.status ?? null, restore: restore.json?.status ?? null,
@@ -296,6 +298,38 @@ async function provision(target) {
     try { restoredStarted?.child?.kill('SIGKILL') } catch { /* gone */ }
     await mock.close().catch(() => {})
     rmSync(own, { recursive: true, force: true })
+  }
+}
+
+
+/**
+ * Reads the snapshot/evidence support of the frozen package itself. The package's own dist and
+ * source bytes decide which workflow format exists; a later main source tree cannot lend v2 to it.
+ */
+async function packagedFormatEvidence(install, restoredRoot, marker) {
+  const read = relative => readFileSync(join(install, 'app', relative), 'utf8')
+  const snapshotSource = read('packages/workflows/src/snapshot.ts')
+  const backupSource = read('packages/storage/src/backup.ts')
+  const storage = await import(pathToFileURL(join(install, 'app/packages/storage/dist/index.js')).href)
+  const dbPath = join(restoredRoot, 'state.sqlite')
+  const call = arg => {
+    try { return { ok: true, value: storage.readWorkflowEvidence(dbPath, ...(arg === undefined ? [] : [arg])) } }
+    catch (error) { return { ok: false, error: String(error?.message ?? error).slice(0, 200) } }
+  }
+  const v1 = call(undefined), v2 = call(2)
+  const restoreProtocol = existsSync(marker) ? JSON.parse(readFileSync(marker, 'utf8')).protocol ?? null : null
+  const installManifest = existsSync(join(install, 'install.json'))
+    ? JSON.parse(readFileSync(join(install, 'install.json'), 'utf8')) : null
+  const installProtocol = installManifest ? `${installManifest.format ?? 'unknown'}/${installManifest.formatVersion ?? '?'}` : null
+  return {
+    snapshotProtocols: [...new Set(snapshotSource.match(/workflow-snapshot\/\d/g) ?? [])].sort(),
+    evidenceProtocols: [...new Set(backupSource.match(/workflow-evidence\/\d/g) ?? [])].sort(),
+    hasFormatVersion: /formatVersion/u.test(snapshotSource),
+    hasFamilySetVersion: /familySetVersion/u.test(backupSource),
+    readSignature: (backupSource.match(/export function readWorkflowEvidence\([^)]*\)/) ?? [null])[0],
+    v1: v1.ok ? { protocol: v1.value.protocol, families: v1.value.families?.length ?? 0, digest: v1.value.digest, complete: v1.value.complete } : v1,
+    v2: v2.ok ? { protocol: v2.value.protocol, families: v2.value.families?.length ?? 0 } : v2,
+    portability: { installArtifact: installProtocol, restoreReport: restoreProtocol },
   }
 }
 
@@ -342,7 +376,9 @@ export async function runInstalledRecovery() {
       assert('SECOND_ROOT_DATA', beforeDb.bindings >= 1 && beforeDb.results >= 1 && afterDb.bindings === beforeDb.bindings &&
         afterDb.results === beforeDb.results && afterDb.messages === beforeDb.messages && afterDb.decisions === beforeDb.decisions,
         JSON.stringify({ before: { ...beforeDb, effectRows: beforeDb.effectRows.length }, after: { ...afterDb, effectRows: afterDb.effectRows.length } }))
-      evidence.secondRoot = { subject: frozenArtifactSubject(target), mode: 'recovery_readonly', bundle: observed.backup, verify: observed.verify, restore: observed.restore,
+      evidence.secondRoot = { subject: frozenArtifactSubject(target), mode: 'recovery_readonly',
+        probeScope: 'fixture+recovery_readonly', personalRebinding: 'main_readonly_binding_entry_absent',
+        bundle: observed.backup, verify: observed.verify, restore: observed.restore,
         before: { ...beforeDb, effectRows: beforeDb.effectRows.length }, after: { ...afterDb, effectRows: afterDb.effectRows.length }, readOnly: r,
         protocol: { producer: 'installed/1', note: 'the installed package produced and verified its own v1 bundle; A new-v2 cross-version import is a separate main/A scope' } }
     }))
@@ -366,6 +402,32 @@ export async function runInstalledRecovery() {
         replay: { status: s.replay, equal: s.replayEqual }, reopened: { status: s.reopened, replay: s.reopenedReplay, equal: s.reopenedEqual },
         providerRequests: observed.readOnly.modelRequestsAfter }
     }))
+
+  cases.push(await runCase({ ...define('E5-WORKFLOW-FORMATS', 'The frozen package itself declares which workflow snapshot/evidence format it can produce and verify'), evidence: {} },
+    async ({ assert, evidence }) => {
+      assert('FORMAT_PROVISIONED', observed?.format !== undefined, failure ?? 'no observation')
+      if (!observed?.format) return
+      const format = observed.format
+      assert('FORMAT_SNAPSHOT_V1_ONLY', JSON.stringify(format.snapshotProtocols) === JSON.stringify(['workflow-snapshot/1']), JSON.stringify(format.snapshotProtocols))
+      assert('FORMAT_EVIDENCE_V1_ONLY', JSON.stringify(format.evidenceProtocols) === JSON.stringify(['workflow-evidence/1']), JSON.stringify(format.evidenceProtocols))
+      assert('FORMAT_NO_DUAL_VERSION', format.hasFormatVersion === false && format.hasFamilySetVersion === false &&
+        !/version/iu.test(String(format.readSignature ?? '')), JSON.stringify({ formatVersion: format.hasFormatVersion, familySetVersion: format.hasFamilySetVersion, signature: format.readSignature }))
+      assert('FORMAT_V1_DATA', format.v1?.ok !== false && format.v1?.protocol === 'workflow-evidence/1' && format.v1?.families >= 13 &&
+        /^[a-f0-9]{64}$/u.test(String(format.v1?.digest ?? '')), JSON.stringify(format.v1))
+      assert('FORMAT_V2_ABSENT', format.v2?.ok !== false && format.v2?.protocol === 'workflow-evidence/1' && format.v2?.families === format.v1?.families,
+        JSON.stringify({ v2: format.v2, v1Families: format.v1?.families }))
+      assert('FORMAT_PROTOCOL_SEPARATION', format.portability?.installArtifact === 'pa-install/1' &&
+        format.portability?.restoreReport === 'personal-restore/1' &&
+        !format.snapshotProtocols.includes(format.portability.restoreReport), JSON.stringify(format.portability))
+      evidence.workflowFormats = { subject: frozenArtifactSubject(target), mode: 'installed_bytes',
+        snapshotProtocols: format.snapshotProtocols, evidenceProtocols: format.evidenceProtocols,
+        hasFormatVersion: format.hasFormatVersion, hasFamilySetVersion: format.hasFamilySetVersion, readSignature: format.readSignature,
+        v1: format.v1, v2: format.v2, portability: format.portability,
+        explicitV2: 'NOT_TESTED: this frozen package has no workflow-snapshot/2 or versioned readWorkflowEvidence code; main 985 source cannot certify it' }
+    }))
+
+  cases.push(notTested({ ...define('E4-PERSONAL-READONLY-REBIND', 'A restored personal project is read through main\'s explicit readonly rebinding entry with its original text and change refusal'), evidence: {} },
+    'NOT_TESTED: the installed restore lane starts with --fixture and main recovery_readonly; main has not published the restored-personal project readonly rebinding entry that would authorise reading a user project and refusing changes. The current 403 must not be relaxed or borrowed as an installed permission. Required: main readonly binding for a real personal project, original text readback, explicit change refusal and no inherited execution authority.'))
 
   cases.push(await runCase({ ...define('E9-INSTALLED-STABILITY', 'Bounded concurrent reads, repeated confirmation and a service reopen on the second root return every request/queue/resource to baseline'), evidence: {} },
     async ({ assert, evidence }) => {

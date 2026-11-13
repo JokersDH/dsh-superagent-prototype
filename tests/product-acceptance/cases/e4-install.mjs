@@ -39,6 +39,7 @@ const DEFAULT_DIRS = DEFAULT_FROZEN_DIRS
 const ARTIFACTS = Object.freeze({
   base: loadFrozenArtifact('baseline', DEFAULT_DIRS.baseline),
   upgrade: loadFrozenArtifact('target', DEFAULT_DIRS.target),
+  control: loadFrozenArtifact('control', DEFAULT_DIRS.control),
   cross: loadFrozenArtifact('cross', DEFAULT_DIRS.cross),
 })
 /** Reads one packaged file without extracting the whole tar, so capability is measured from bytes. */

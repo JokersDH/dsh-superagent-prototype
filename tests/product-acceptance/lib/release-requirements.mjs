@@ -153,6 +153,7 @@ export const INSTALL_CASES = [
   case_('E7-SECOND-ROOT-READONLY', { layers: [LAYERS.INSTALLED], evidence: ['secondRoot'] }),
   case_('E6-INSTALLED-SOURCE-CONFIRM', { layers: [LAYERS.INSTALLED], evidence: ['installedSourceConfirm'] }),
   case_('E9-INSTALLED-STABILITY', { layers: [LAYERS.INSTALLED], evidence: ['installedStability'] }),
+  case_('E5-WORKFLOW-FORMATS', { layers: [LAYERS.INSTALLED], evidence: ['workflowFormats'] }),
   case_('E6-INSTALLED-CONTEXT', { layers: [LAYERS.INSTALLED], evidence: ['installedContext'] }),
   case_('E3-PERSONAL-COLD-START', { layers: [LAYERS.INSTALLED], evidence: ['personalInstall'] }),
   case_('E4-INSTALL-FIRST-RUN', { layers: [LAYERS.INSTALLED], evidence: ['install'] }),

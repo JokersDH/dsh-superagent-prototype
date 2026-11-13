@@ -111,7 +111,8 @@ export async function runReplyDurability() {
       let target, previous
       try {
         target = loadFrozenArtifact('target', DEFAULT_FROZEN_DIRS.target)
-        previous = loadFrozenArtifact('baseline', DEFAULT_FROZEN_DIRS.baseline)
+        // Mock-only failing control: the old 97 package never gets a live install lane.
+        previous = loadFrozenArtifact('control', DEFAULT_FROZEN_DIRS.control)
       } catch (error) {
         assert('D_FROZEN_PACKAGE_PRESENT', false, String(error?.message ?? error).slice(0, 300))
         return

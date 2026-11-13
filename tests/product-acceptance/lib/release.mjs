@@ -395,11 +395,27 @@ export function installedStabilityIssues(value) {
   if (value.reopened !== 'RUNNING' || value.reopenedEqual !== true) issues.push('reopen')
   return issues
 }
+export function workflowFormatsIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  if (value.mode !== 'installed_bytes') issues.push('mode')
+  if (JSON.stringify(value.snapshotProtocols) !== JSON.stringify(['workflow-snapshot/1'])) issues.push('snapshot_protocol')
+  if (JSON.stringify(value.evidenceProtocols) !== JSON.stringify(['workflow-evidence/1'])) issues.push('evidence_protocol')
+  if (value.hasFormatVersion !== false || value.hasFamilySetVersion !== false) issues.push('dual_version_claim')
+  if (!value.v1 || value.v1.protocol !== 'workflow-evidence/1' || !(value.v1.families >= 13) || !HEX.test(String(value.v1.digest ?? ''))) issues.push('v1_data')
+  if (!value.v2 || value.v2.protocol !== 'workflow-evidence/1' || value.v2.families !== value.v1?.families) issues.push('v2_claim')
+  if (value.portability?.installArtifact !== 'pa-install/1' || value.portability?.restoreReport !== 'personal-restore/1' ||
+    !isSubstantive(value.explicitV2)) issues.push('protocol_separation')
+  return issues
+}
 export function secondRootIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const readOnly = value.readOnly ?? {}, before = value.before ?? {}, after = value.after ?? {}, issues = []
   if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
   if (value.mode !== 'recovery_readonly' || value.restore !== 'RESTORED' || value.verify !== 'VERIFIED') issues.push('restored')
+  if (value.probeScope !== 'fixture+recovery_readonly' && value.probeScope !== 'personal') issues.push('probe_scope')
+  if (!isSubstantive(value.personalRebinding)) issues.push('personal_scope')
   if (readOnly.originalBodyEqual !== true || !(readOnly.messages >= 3)) issues.push('original_body')
   if (readOnly.workPhase !== 'delivered' || !(readOnly.workArtifacts >= 1)) issues.push('held_work')
   if (readOnly.candidates !== 200 || readOnly.candidateStatus !== 'candidates' || !(readOnly.candidateCount >= 1)) issues.push('candidates')
@@ -976,7 +992,7 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
           for (const issue of fn(result.evidence?.[key]))
             failures.push(fail(key === 'ownershipMocks' ? (OWNERSHIP_ISSUE_CODES[issue] ?? 'ownershipMocks_invalid') : `${key}_invalid`, `${key} ${issue}`, entry.id))

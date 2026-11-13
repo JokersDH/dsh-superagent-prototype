@@ -124,6 +124,16 @@ const evidenceFor = (key) => {
       return { crashedCalls: 1, recoveredCalls: 0, replies: 1 }
     case 'replyBadArtifact':
       return { calls: 0, replies: 0, notice: '无法核对' }
+    case 'workflowFormats':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'installed_bytes', snapshotProtocols: ['workflow-snapshot/1'], evidenceProtocols: ['workflow-evidence/1'],
+        hasFormatVersion: false, hasFamilySetVersion: false, readSignature: 'export function readWorkflowEvidence(databasePath: string)',
+        v1: { protocol: 'workflow-evidence/1', families: 13, digest: DIGEST, complete: true },
+        v2: { protocol: 'workflow-evidence/1', families: 13 },
+        portability: { installArtifact: 'pa-install/1', restoreReport: 'personal-restore/1' },
+        explicitV2: 'NOT_TESTED: no v2 code in the frozen package',
+      }
     case 'installedStability':
       return {
         subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
@@ -134,6 +144,7 @@ const evidenceFor = (key) => {
       return {
         subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         mode: 'recovery_readonly', restore: 'RESTORED', verify: 'VERIFIED',
+        probeScope: 'fixture+recovery_readonly', personalRebinding: 'main_readonly_binding_entry_absent',
         before: { bindings: 1, results: 1, messages: 4, decisions: 1 }, after: { bindings: 1, results: 1, messages: 4, decisions: 1 },
         readOnly: { originalBodyEqual: true, messages: 4, workPhase: 'delivered', workArtifacts: 1, candidates: 200, candidateStatus: 'candidates', candidateCount: 1,
           audit: 200, history: 200, historyRows: 1, sources: 200, business: 422, effectRows: 0, effectRowsBefore: 0,
@@ -1216,6 +1227,26 @@ const CASES = [
         findCase(report, 'E9-INSTALLED-STABILITY').evidence.installedStability.queueReturned = false
         return report
       }, 'installedStability_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-WORKFLOW-V2-BORROWED',
+    title: 'A package without dual-version code cannot claim explicit v2 support',
+    check: ({ assert }) =>
+      rejectWith(assert, 'WORKFLOW_V2', (report) => {
+        const item = findCase(report, 'E5-WORKFLOW-FORMATS').evidence.workflowFormats
+        item.hasFormatVersion = true
+        item.snapshotProtocols = ['workflow-snapshot/1', 'workflow-snapshot/2']
+        return report
+      }, 'workflowFormats_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-SECOND-ROOT-PERSONAL-CLAIM',
+    title: 'A fixture second root cannot be presented as a personal rebinding',
+    check: ({ assert }) =>
+      rejectWith(assert, 'SECOND_ROOT_PERSONAL', (report) => {
+        delete findCase(report, 'E7-SECOND-ROOT-READONLY').evidence.secondRoot.probeScope
+        return report
+      }, 'secondRoot_invalid'),
   },
   {
     id: 'E1-MUTATE-SELF-CLAIM',
