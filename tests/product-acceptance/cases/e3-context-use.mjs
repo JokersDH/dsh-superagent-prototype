@@ -204,6 +204,37 @@ export async function runContextUse({ root, runDirectory }) {
       auditStable: true, recoveredMessageId: recovered[0].id, persistence: 'A18 SQLite replyResults rows' }
   }))
 
+  cases.push(await runCase({ ...define('E4-CANDIDATE-FLOW', 'SDK reply suggestions are inert until GET/prepare and one explicit proposal confirmation'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const { h } = await harness()
+      const commandId = 'w16-candidate-chat'
+      const messageId = h.messageId(commandId)
+      h.provider.suggestionsEnabled = true
+      h.provider.suggestions = [{ kind: 'propose_decision', content: 'W16 candidate decision', scope: scope('w11-project-a'), sourceMessageId: messageId }]
+      const receipt = await h.request('/v1/commands', { method: 'POST', body: { commandId, conversationId: 'conv-a', projectId: 'w11-project-a', kind: 'chat', text: '请给出一个决定建议。' } })
+      assert('CANDIDATE_CHAT', receipt.status === 200 && receipt.body?.status === 'recorded', JSON.stringify(receipt.body)?.slice(0, 200))
+      await h.flush()
+      const messages = await waitMessages(h.store, 'conv-a', list => list.some(item => item.provenance === 'reasoner_reply'))
+      const reply = messages.find(item => item.provenance === 'reasoner_reply')
+      assert('CANDIDATE_REPLY', !!reply, JSON.stringify(messages.map(item => item.provenance)))
+      const review = await h.request(`/v1/messages/${messageId}/candidates`)
+      assert('CANDIDATE_GET', review.status === 200 && review.body?.protocol === 'assistant-candidates/1', JSON.stringify(review.body)?.slice(0, 300))
+      assert('CANDIDATE_INERT', review.body?.status === 'candidates' && review.body?.trust === 'untrusted_data' && review.body?.authorization === 'none' && review.body?.executable === false, JSON.stringify(review.body)?.slice(0, 300))
+      const selected = review.body.candidates[0]
+      const prepared = await h.request('/v1/assistant/candidates/prepare', { method: 'POST', body: { messageId, index: selected.index, payloadDigest: selected.payloadDigest } })
+      assert('CANDIDATE_PREPARE', prepared.status === 200 && prepared.body?.record?.payloadDigest === selected.payloadDigest, JSON.stringify(prepared.body)?.slice(0, 300))
+      assert('CANDIDATE_PREVIEW_INPUTS', Array.isArray(prepared.body?.requiredInputs), JSON.stringify(prepared.body?.requiredInputs))
+      const confirmBody = { kind: 'confirm_proposal', commandId: 'w16-candidate-confirm', projectId: 'w11-project-a', conversationId: 'conv-a', token: prepared.body.token }
+      const confirmed = await h.request('/v1/proposals/commands', { method: 'POST', body: confirmBody })
+      assert('CANDIDATE_CONFIRM', confirmed.status === 200 && confirmed.body?.status === 'recorded', JSON.stringify(confirmed.body)?.slice(0, 300))
+      const replay = await h.request('/v1/proposals/commands', { method: 'POST', body: confirmBody })
+      assert('CANDIDATE_REPLAY', JSON.stringify(replay.body) === JSON.stringify(confirmed.body) && h.requests.length === 1, JSON.stringify({ requests: h.requests.length, replay: replay.body?.status }))
+      const wrong = await h.request('/v1/assistant/candidates/prepare', { method: 'POST', body: { messageId, index: selected.index, payloadDigest: 'f'.repeat(64) } })
+      assert('CANDIDATE_DIGEST_REFUSED', wrong.status === 409, String(wrong.status))
+      evidence.candidateFlow = { status: review.body.status, executable: review.body.executable, prepare: prepared.status,
+        confirm: confirmed.body?.status, replay: replay.body?.status, providerCalls: h.requests.length }
+    }))
+
   cases.push(await runCase({ ...define('E3-CONTEXT-HISTORY', 'Signed history pages retain scope, continuation and model-off readability without resend'), evidence: {} },
     async ({ assert, evidence }) => {
       const { h } = await harness()

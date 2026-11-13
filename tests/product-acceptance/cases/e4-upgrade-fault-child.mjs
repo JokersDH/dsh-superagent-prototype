@@ -70,14 +70,24 @@ try {
   const baseHealth = await health(`http://127.0.0.1:${ports[1] ?? 9211}`)
   step('baseline_start', base.value?.status === 'RUNNING' && baseHealth?.status === 'ok' ? 'PASS' : 'FAIL', JSON.stringify({ status: base.value?.status, health: baseHealth?.status }))
   step('seed', await chat(`http://127.0.0.1:${ports[1] ?? 9211}`) === 200 ? 'PASS' : 'FAIL')
+  const readJson = path => { try { return JSON.parse(readFileSync(path, 'utf8')) } catch { return null } }
+  const pointerBuild = () => readJson(join(roots.config, 'release.json'))?.buildId ?? null
+  const pointerBefore = pointerBuild()
   const fault = spawnSync(join(target, 'bin/pa'), ['upgrade', '--json', ...rootArgs, '--to', target, '--backup', join(w, 'pre.pab')], { cwd: w, env: { ...env, PA_UPGRADE_FAULT: mode }, encoding: 'utf8', timeout: 120_000 })
   const faultJson = parse(fault.stdout)
-  result.fault = { exit: fault.status, status: faultJson?.status ?? null, code: faultJson?.code ?? null, killed: fault.signal === 'SIGKILL' }
+  const journalAfterFault = readJson(join(roots.config, 'install-switch.json'))
+  result.fault = { exit: fault.status, status: faultJson?.status ?? null, code: faultJson?.code ?? null, killed: fault.signal === 'SIGKILL',
+    operationId: journalAfterFault?.operationId ?? journalAfterFault?.operation?.operationId ?? null }
+  result.pointerBefore = pointerBefore
   const killed = mode.endsWith('_kill') && fault.signal === 'SIGKILL'
   step('fault_observed', (killed || (fault.status !== 0 && ['upgrade_interrupted', 'upgrade_target_unhealthy', 'upgrade_target_stop_unproven'].includes(faultJson?.code))) ? 'PASS' : 'FAIL', JSON.stringify({ ...result.fault, signal: fault.signal }))
   const recover = spawnSync(join(target, 'bin/pa'), ['upgrade', '--recover', '--json', ...rootArgs], { cwd: w, env, encoding: 'utf8', timeout: 120_000 })
   const recoverJson = parse(recover.stdout)
+  const journalAfterRecover = readJson(join(roots.config, 'install-switch.json'))
   result.recover = { exit: recover.status, status: recoverJson?.status ?? null, code: recoverJson?.code ?? null, started: recoverJson?.started?.buildId ?? null }
+  result.pointerAfter = pointerBuild()
+  result.operation = { before: result.fault.operationId, after: journalAfterRecover?.operationId ?? journalAfterRecover?.operation?.operationId ?? null,
+    journalStatus: journalAfterRecover?.status ?? null }
   step('recover', (['RECOVERED_PREVIOUS', 'RECOVERED_TARGET', 'REVERTED', 'NO_OP'].includes(recoverJson?.status) || recover.status === 0) ? 'PASS' : 'FAIL', JSON.stringify(result.recover))
   let recoveredURL = recoverJson?.started?.apiURL
   let recoveredHealth = recoveredURL ? await health(recoveredURL) : undefined

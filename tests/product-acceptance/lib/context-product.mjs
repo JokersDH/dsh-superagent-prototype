@@ -4,6 +4,7 @@ import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { ProductStore } from '../../../packages/storage/dist/index.js'
+import { key } from '../../../packages/orchestrator-core/dist/index.js'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
 import { listenLocalHttp } from '../../../apps/coordinator/http/server.ts'
@@ -29,7 +30,8 @@ export async function startContextProduct({ stateRoot, projectPath, principal, p
   const provider = {
     status: () => ({ protocol: 'assistant-provider/1', configured: provider.configured !== false,
       baseURL: 'https://mock.invalid/v1', model: 'mock-context', models: ['mock-context'],
-      state: provider.configured === false ? 'not_configured' : 'configured', secureTransport: true }),
+      state: provider.configured === false ? 'not_configured' : 'configured', secureTransport: true,
+      suggestionsEnabled: provider.suggestionsEnabled === true }),
     selectModel: () => provider.status(),
     async reply(messages, onDelta) {
       requests.push({ at: new Date().toISOString(), messages: structuredClone(messages), clock })
@@ -37,7 +39,7 @@ export async function startContextProduct({ stateRoot, projectPath, principal, p
       if (reply?.failure) throw reply.failure
       const text = reply?.text ?? '默认上下文回复。'
       if (onDelta) for (const part of text.match(/[^。！？]{1,20}[。！？]?/g) ?? [text]) onDelta(part)
-      return { text, model: 'mock-context' }
+      return { text, model: 'mock-context', ...(provider.suggestions?.length ? { suggestions: structuredClone(provider.suggestions) } : {}) }
     },
   }
   const setup = async () => {
@@ -107,6 +109,7 @@ export async function startContextProduct({ stateRoot, projectPath, principal, p
     async cleanup() { try { await close() } catch {} rmSync(stateRoot, { recursive: true, force: true }) },
     provider,
     owner,
+    messageId: commandId => key('message', commandId),
   }
 }
 

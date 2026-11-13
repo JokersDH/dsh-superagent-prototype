@@ -112,6 +112,7 @@ export const CONTROLLED_CASES = [
   case_('E3-CONTEXT-USE', { layers: [LAYERS.CONTROLLED], evidence: ['contextUse'] }),
   case_('E3-CONTEXT-SSE', { layers: [LAYERS.CONTROLLED], evidence: ['sse'] }),
   case_('E3-CONTEXT-GUARDS', { layers: [LAYERS.CONTROLLED], evidence: ['guards'] }),
+  case_('E4-CANDIDATE-FLOW', { layers: [LAYERS.CONTROLLED], evidence: ['candidateFlow'] }),
   case_('E3-CONTEXT-HISTORY', { layers: [LAYERS.CONTROLLED], evidence: ['history'] }),
   case_('E3-CONTEXT-SOURCES', { layers: [LAYERS.CONTROLLED], evidence: ['sources'] }),
   case_('E3-CONTEXT-UI', { layers: [LAYERS.CONTROLLED], evidence: ['contextUi'] }),

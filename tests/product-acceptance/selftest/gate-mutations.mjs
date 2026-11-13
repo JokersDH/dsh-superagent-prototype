@@ -101,6 +101,8 @@ const evidenceFor = (key) => {
       return { complete: true, providerRequests: 1 }
     case 'guards':
       return { cross: 403, drift: 'conflict', expiry: 'stale_contract', offline: 'unsupported_capability', unknownProviderCalls: 1 }
+    case 'candidateFlow':
+      return { status: 'candidates', executable: false, prepare: 200, confirm: 'recorded', providerCalls: 1 }
     case 'history':
       return { first: 1, more: true, second: 1, crossConversation: 0, modelOff: 3, expiredVisible: true, providerCalls: 2 }
     case 'sources':
@@ -121,7 +123,8 @@ const evidenceFor = (key) => {
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         status: 2, code: 'requested_root_mismatch', apiAlive: true }
     case 'upgradeFaults': {
-      const probe = { fault: { code: 'upgrade_interrupted' }, recover: { status: 'RECOVERED_PREVIOUS' }, dataKept: true,
+      const probe = { fault: { code: 'upgrade_interrupted', operationId: 'operation-1' }, recover: { status: 'RECOVERED_PREVIOUS', exit: 1, code: null },
+        operation: { after: 'operation-1' }, pointerBefore: 'build-old', pointerAfter: 'build-old', dataKept: true,
         steps: [{ id: 'fault_observed', status: 'PASS' }, { id: 'recover', status: 'PASS' }, { id: 'recovered_health', status: 'PASS' }, { id: 'data_kept', status: 'PASS' }] }
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         windows: Object.fromEntries(['crash_after_stop', 'crash_after_stop_kill', 'target_unhealthy'].map(mode => [mode, { probe }])) } }
@@ -993,6 +996,40 @@ const CASES = [
         item.evidence.upgradeFaults.windows = Object.fromEntries(['crash_after_stop', 'crash_after_stop_kill', 'target_unhealthy'].map(mode => [mode, { probe: { steps } }]))
         return report
       }, 'upgrade_faults_failed'),
+  },
+  {
+    id: 'E1-MUTATE-RECOVER-BLOCKED',
+    title: 'A BLOCKED/exit2/unknown_live_resource recovery cannot satisfy the fault window',
+    check: ({ assert }) =>
+      rejectWith(assert, 'RECOVER_BLOCKED', (report) => {
+        const item = findCase(report, 'E4-UPGRADE-FAULTS')
+        const probe = item.evidence.upgradeFaults.windows.crash_after_stop.probe
+        probe.recover = { status: 'BLOCKED', exit: 2, code: 'unknown_live_resource' }
+        return report
+      }, 'upgradeFaults_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-RECOVER-EXIT1-SUCCESS',
+    title: 'The actual D success terminal status with exit1 is bound to pointer/data, not ignored',
+    check: ({ assert }) =>
+      rejectWith(assert, 'RECOVER_EXIT1', (report) => {
+        const item = findCase(report, 'E4-UPGRADE-FAULTS')
+        const probe = item.evidence.upgradeFaults.windows.crash_after_stop.probe
+        probe.recover = { status: 'RECOVERED_PREVIOUS', exit: 1, code: null }
+        probe.pointerAfter = 'build-new'
+        return report
+      }, 'upgradeFaults_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-FAULT-WRONG-OPERATION',
+    title: 'A recovery that does not retain the original operation is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FAULT_OPERATION', (report) => {
+        const item = findCase(report, 'E4-UPGRADE-FAULTS')
+        const probe = item.evidence.upgradeFaults.windows.crash_after_stop.probe
+        probe.operation.after = 'other-operation'
+        return report
+      }, 'upgradeFaults_invalid'),
   },
   {
     id: 'E1-MUTATE-FOREIGN-ABI-PLATFORM',

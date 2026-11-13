@@ -320,6 +320,10 @@ export function contextGuardIssues(value) {
   if (value.unknownProviderCalls !== 1) issues.push('unknown_no_resend')
   return issues
 }
+export function candidateFlowIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  return value.status === 'candidates' && value.executable === false && value.prepare === 200 && value.confirm === 'recorded' && value.providerCalls === 1 ? [] : ['candidate_flow']
+}
 export function contextHistoryIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -382,7 +386,11 @@ export function upgradeFaultsIssues(value) {
     if (!probe) { issues.push(mode); continue }
     if (steps.fault_observed?.status !== 'PASS' || steps.recover?.status !== 'PASS' || steps.recovered_health?.status !== 'PASS' || steps.data_kept?.status !== 'PASS') issues.push(mode)
     if (!isSubstantive(probe.fault?.code) && !probe.fault?.killed) issues.push(`${mode}_fault`)
-    if (!isSubstantive(probe.recover?.status)) issues.push(`${mode}_recover`)
+    if (!isSubstantive(probe.recover?.status) || !['RECOVERED_PREVIOUS', 'RECOVERED_TARGET', 'REVERTED', 'NO_OP'].includes(probe.recover.status)) issues.push(`${mode}_recover`)
+    if (!Number.isInteger(probe.recover?.exit) || ![0, 1].includes(probe.recover.exit)) issues.push(`${mode}_exit`)
+    if (probe.recover?.code !== null && probe.recover?.code !== undefined) issues.push(`${mode}_code`)
+    if (!isSubstantive(probe.fault?.operationId) || probe.operation?.after !== probe.fault.operationId) issues.push(`${mode}_operation`)
+    if (probe.pointerBefore === null || probe.pointerAfter !== probe.pointerBefore) issues.push(`${mode}_pointer`)
     if (probe.dataKept !== true) issues.push(`${mode}_data`)
   }
   return issues
@@ -862,7 +870,7 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
           for (const issue of fn(result.evidence?.[key])) failures.push(fail(`${key}_invalid`, `${key} ${issue}`, entry.id))
         }

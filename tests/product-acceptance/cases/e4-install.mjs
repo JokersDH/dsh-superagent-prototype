@@ -34,8 +34,8 @@ import { sha256 } from '../lib/evidence.mjs'
  */
 const here = dirname(fileURLToPath(import.meta.url))
 const DEFAULT_DIRS = Object.freeze({
-  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave13-target',
-  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave14-target',
+  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave14-target',
+  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave15-target',
   cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',
 })
 
@@ -1404,6 +1404,21 @@ export async function runInstall({ root, runDirectory, keep = false }) {
                 const history = await client.request(`/v1/context/history?projectId=${encodeURIComponent(project.id)}&conversationId=conv-current&limit=5`)
                 actions.history = history.status
                 if (user) actions.sources = (await client.request(`/v1/messages/${user.id}/context/sources`)).status
+                if (user) {
+                  const candidates = await client.request(`/v1/messages/${user.id}/candidates`)
+                  actions.candidates = candidates.status
+                  actions.candidateStatus = candidates.body?.status ?? null
+                  if (candidates.status === 200 && candidates.body?.status === 'candidates') {
+                    const selected = candidates.body.candidates[0]
+                    const preview = await client.request('/v1/assistant/candidates/prepare', { method: 'POST', body: { messageId: user.id, index: selected.index, payloadDigest: selected.payloadDigest } })
+                    actions.candidatePrepare = preview.status
+                    if (preview.status === 200) {
+                      const confirmed = await client.request('/v1/proposals/commands', { method: 'POST', body: { kind: 'confirm_proposal', commandId: 'w16-current-candidate', projectId: project.id, conversationId: 'conv-current', token: preview.body.token } })
+                      actions.candidateConfirm = confirmed.status
+                      actions.candidateConfirmStatus = confirmed.body?.status ?? null
+                    }
+                  }
+                }
               }
             }
           } catch (error) { actions.failure = String(error?.message ?? error).slice(0, 300) }
@@ -1453,6 +1468,22 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         layer: LAYERS.INSTALLED, limitations: [reason],
         evidence: { currentInstall: { ...currentProbe, result: 'not_current_m1' } },
       }) }, reason))
+    }
+
+    if (currentProbe.actions?.candidateStatus === 'candidates' && currentProbe.actions?.candidateConfirmStatus === 'recorded') {
+      await push(define('E5-INSTALLED-CANDIDATES', 'The installed package exposes an inert candidate, prepares it and confirms once through the original proposal transaction', {
+        layer: LAYERS.INSTALLED, evidence: { installedCandidates: { subject: artifactSubject(ARTIFACTS.upgrade), actions: currentProbe.actions } },
+      }), async ({ assert, evidence }) => {
+        assert('INSTALLED_CANDIDATE_GET', currentProbe.actions.candidates === 200, String(currentProbe.actions.candidates))
+        assert('INSTALLED_CANDIDATE_PREPARE', currentProbe.actions.candidatePrepare === 200, String(currentProbe.actions.candidatePrepare))
+        assert('INSTALLED_CANDIDATE_CONFIRM', currentProbe.actions.candidateConfirmStatus === 'recorded', String(currentProbe.actions.candidateConfirmStatus))
+        evidence.installedCandidates = { subject: artifactSubject(ARTIFACTS.upgrade), actions: currentProbe.actions }
+      })
+    } else {
+      cases.push(notTested({ ...define('E5-INSTALLED-CANDIDATES', 'The installed package exposes an inert candidate, prepares it and confirms once through the original proposal transaction', {
+        layer: LAYERS.INSTALLED,
+        evidence: { installedCandidates: { subject: artifactSubject(ARTIFACTS.upgrade), actions: currentProbe.actions } },
+      }) }, `NOT_TESTED: the frozen 8962d10 package reply format is pre-suggestion (candidate GET=${currentProbe.actions?.candidates ?? 'not_run'}, status=${currentProbe.actions?.candidateStatus ?? 'none'}); it cannot certify the current main suggestion/candidate UI. Main-source candidate flow is separately verified by E4-CANDIDATE-FLOW.`))
     }
 
     await push(define('E7-OWNERSHIP-COPY', 'A copied instance record in another config root cannot stop the original self-owned API', {
