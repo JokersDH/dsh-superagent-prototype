@@ -416,8 +416,13 @@ export function secondRootIssues(value) {
   if (value.mode !== 'recovery_readonly' || value.restore !== 'RESTORED' || value.verify !== 'VERIFIED') issues.push('restored')
   if (value.probeScope !== 'fixture+recovery_readonly' && value.probeScope !== 'personal') issues.push('probe_scope')
   if (!isSubstantive(value.personalRebinding)) issues.push('personal_scope')
+  const data = value.businessData
+  if (!data || !isSubstantive(data.producer) || data.workPhase !== 'delivered' || !(data.workArtifacts >= 1) ||
+    !(data.questionsAnswered >= 1) || data.candidateConfirmed !== 'recorded' || data.nativeApplied !== false ||
+    !isSubstantive(data.boundary)) issues.push('business_data')
   if (readOnly.originalBodyEqual !== true || !(readOnly.messages >= 3)) issues.push('original_body')
   if (readOnly.workPhase !== 'delivered' || !(readOnly.workArtifacts >= 1)) issues.push('held_work')
+  if (!(before.questions >= 1)) issues.push('qa')
   if (readOnly.candidates !== 200 || readOnly.candidateStatus !== 'candidates' || !(readOnly.candidateCount >= 1)) issues.push('candidates')
   if (readOnly.audit !== 200 || readOnly.history !== 200 || readOnly.sources !== 200 || !(readOnly.historyRows >= 1)) issues.push('context')
   if (readOnly.business !== 422) issues.push('business')

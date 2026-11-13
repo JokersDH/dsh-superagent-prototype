@@ -145,8 +145,10 @@ const evidenceFor = (key) => {
         subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         mode: 'recovery_readonly', restore: 'RESTORED', verify: 'VERIFIED',
         probeScope: 'fixture+recovery_readonly', personalRebinding: 'main_readonly_binding_entry_absent',
-        before: { bindings: 1, results: 1, messages: 4, decisions: 1 }, after: { bindings: 1, results: 1, messages: 4, decisions: 1 },
-        readOnly: { originalBodyEqual: true, messages: 4, workPhase: 'delivered', workArtifacts: 1, candidates: 200, candidateStatus: 'candidates', candidateCount: 1,
+        businessData: { producer: 'installed fixture executor', workPhase: 'delivered', workArtifacts: 1, questionsAnswered: 1,
+          candidateConfirmed: 'recorded', nativeApplied: false, boundary: 'fixture scope only' },
+        before: { bindings: 1, results: 1, messages: 4, decisions: 1, questions: 1 }, after: { bindings: 1, results: 1, messages: 4, decisions: 1 },
+        readOnly: { originalBodyEqual: true, messages: 4, workPhase: 'delivered', workArtifacts: 1, questionsVisible: 1, candidates: 200, candidateStatus: 'candidates', candidateCount: 1,
           audit: 200, history: 200, historyRows: 1, sources: 200, business: 422, effectRows: 0, effectRowsBefore: 0,
           modelRequestsBefore: 2, modelRequestsAfter: 2 },
       }

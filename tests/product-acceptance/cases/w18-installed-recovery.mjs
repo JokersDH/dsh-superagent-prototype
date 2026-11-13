@@ -95,7 +95,9 @@ async function seed(client, { project, projectDir, conversationId }) {
   const projectId = project.id
   const work = await client.dispatch({
     commandId: `w18-seed-work-${Date.now()}`, conversationId, kind: 'create_work', projectId,
-    profileId: project.profileIds.find(id => id.endsWith('-pass')) ?? project.defaultProfileId,
+    // The question profile exercises the real Broker question/answer path, not only a passing work.
+    profileId: project.profileIds.includes('profile-fixture-question') ? 'profile-fixture-question'
+      : (project.profileIds.find(id => id.endsWith('-pass')) ?? project.defaultProfileId),
     goal: '第十八轮安装物：生成并接受一个受控候选，作为第二根恢复的真实数据。',
     scope: project.scope, criteria: project.defaultCriteria.filter(item => item.required),
   })
@@ -211,6 +213,7 @@ async function provision(target) {
     const originalMessage = page.messages.find(item => item.role === 'user' && item.text === original.text)
     const replyMessage = page.messages.find(item => item.provenance === 'reasoner_reply')
     const work = await ro.work(original.workId)
+    const workSnapshot = await ro.snapshot({ workId: original.workId })
     const audit = originalMessage ? await ro.request(`/v1/messages/${originalMessage.id}/context`) : { status: 0, body: null }
     const history = await ro.request(`/v1/context/history?projectId=${encodeURIComponent(project.id)}&conversationId=conv-w18&limit=5`)
     const sources = originalMessage ? await ro.request(`/v1/messages/${originalMessage.id}/context/sources`) : { status: 0, body: null }
@@ -269,6 +272,7 @@ async function provision(target) {
         messages: page.messages.length,
         reply: replyMessage?.text ?? null,
         workPhase: work?.phase ?? null, workArtifacts: work?.artifactIds?.length ?? 0,
+        questionsVisible: workSnapshot?.questions?.length ?? 0,
         audit: audit.status, auditBindings: audit.body?.bindings?.length ?? null,
         history: history.status, historyRows: history.body?.entries?.length ?? history.body?.history?.length ?? null,
         sources: sources.status, sourceRows: sources.body?.sources?.length ?? null,
@@ -368,6 +372,9 @@ export async function runInstalledRecovery() {
       assert('SECOND_ROOT_READONLY', observed.startupMode === 'recovery_readonly', String(observed.startupMode))
       assert('SECOND_ROOT_ORIGINAL_BODY', r.originalBodyEqual === true && r.messages >= 3, JSON.stringify({ equal: r.originalBodyEqual, messages: r.messages }))
       assert('SECOND_ROOT_WORK_HELD', r.workPhase === 'delivered' && r.workArtifacts >= 1, JSON.stringify({ phase: r.workPhase, artifacts: r.workArtifacts }))
+      // The answered question is no longer open, so the open-question HTTP view is empty by design;
+      // the Q&A rows themselves must be present in the restored store.
+      assert('SECOND_ROOT_QA', (beforeDb.questions ?? 0) >= 1, JSON.stringify({ rows: beforeDb.questions, openVisible: r.questionsVisible }))
       assert('SECOND_ROOT_CANDIDATES', r.candidates === 200 && r.candidateStatus === 'candidates' && r.candidateCount >= 1, JSON.stringify({ status: r.candidates, value: r.candidateStatus, count: r.candidateCount }))
       assert('SECOND_ROOT_CONTEXT_READ', r.audit === 200 && r.history === 200 && r.sources === 200 && (r.historyRows ?? 0) >= 1, JSON.stringify({ audit: r.audit, history: r.history, sources: r.sources, rows: r.historyRows }))
       assert('SECOND_ROOT_BUSINESS_REJECTED', r.business === 422, JSON.stringify({ status: r.business, code: r.businessCode }))
@@ -378,6 +385,11 @@ export async function runInstalledRecovery() {
         JSON.stringify({ before: { ...beforeDb, effectRows: beforeDb.effectRows.length }, after: { ...afterDb, effectRows: afterDb.effectRows.length } }))
       evidence.secondRoot = { subject: frozenArtifactSubject(target), mode: 'recovery_readonly',
         probeScope: 'fixture+recovery_readonly', personalRebinding: 'main_readonly_binding_entry_absent',
+        businessData: { producer: 'installed fixture executor through the real App/Effects/queue',
+          workPhase: observed.readOnly.workPhase, workArtifacts: observed.readOnly.workArtifacts,
+          questionsAnswered: observed.original.answered, candidateConfirmed: observed.original.candidate?.confirm,
+          nativeApplied: false,
+          boundary: 'not B normal native producer; B normal Q&A/physical stop stays its own controlled scope' },
         bundle: observed.backup, verify: observed.verify, restore: observed.restore,
         before: { ...beforeDb, effectRows: beforeDb.effectRows.length }, after: { ...afterDb, effectRows: afterDb.effectRows.length }, readOnly: r,
         protocol: { producer: 'installed/1', note: 'the installed package produced and verified its own v1 bundle; A new-v2 cross-version import is a separate main/A scope' } }
