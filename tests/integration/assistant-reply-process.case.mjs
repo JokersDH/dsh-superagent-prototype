@@ -7,8 +7,8 @@ import { test } from 'node:test'
 import { ProductStore } from '../../packages/storage/dist/index.js'
 
 const fixture = join(dirname(fileURLToPath(import.meta.url)), 'fixtures/assistant-reply-process.mjs')
-function run(root, mode) {
-  const child = spawnSync(process.execPath, [fixture, root, mode], { encoding: 'utf8', timeout: 15000 })
+function run(root, mode, structured = false) {
+  const child = spawnSync(process.execPath, [fixture, root, mode, ...(structured ? ['suggestions'] : [])], { encoding: 'utf8', timeout: 15000 })
   assert.equal(child.error, undefined, child.error?.message)
   if (mode === 'recover') assert.equal(child.status, 0, child.stderr)
   else assert.equal(child.signal, 'SIGKILL', child.stderr)
@@ -39,6 +39,16 @@ test('SIGKILL during the provider leaves an unknown request and new processes ca
   assert.equal(recovered.modelCalls, 0); assert.equal(recovered.result, null); assert.equal(recovered.replies.length, 0)
   assert.equal(recovered.notices.length, 1); assert.match(recovered.notices[0].text, /未自动重发/)
   assert.deepEqual(run(root, 'recover').notices, recovered.notices)
+})
+test('a nonempty suggestion body survives actual product SIGKILL and is reviewed after reopen without inference', t => {
+  const root = temp(t), crashed = run(root, 'after-result', true)
+  assert.equal(crashed.modelCalls, 1); assert.equal(crashed.replies.length, 0); assert.equal(crashed.body.suggestions.length, 1)
+  const recovered = run(root, 'recover', true)
+  assert.equal(recovered.modelCalls, 0); assert.deepEqual(recovered.body, crashed.body)
+  assert.deepEqual(recovered.result, crashed.result); assert.equal(recovered.replies.length, 1)
+  assert.equal(recovered.candidateReview.status, 'candidates'); assert.equal(recovered.candidateReview.candidates.length, 1)
+  assert.equal(recovered.candidateReview.executable, false)
+  assert.deepEqual(run(root, 'recover', true).body, recovered.body)
 })
 test('SIGKILL after the message commit keeps a single reply and completed result', t => {
   const root = temp(t), crashed = run(root, 'after-message'), recovered = run(root, 'recover')

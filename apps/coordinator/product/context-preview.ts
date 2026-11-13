@@ -2,12 +2,13 @@ import { randomUUID } from 'node:crypto'
 import { ApplicationFault } from '@personal-agent/application'
 import { ContextPreviewInputSchema, ContextPreviewSchema, ScopeSchema, TrustedActorSchema } from '@personal-agent/contracts'
 import type { ApplicationService, ContextPreview, ContextPreviewInput, Scope, TrustedActor, Verification, WorkEvidence, WorkView } from '@personal-agent/contracts'
-import { ContextComposer, ContextError, DEFAULT_COMPOSED_GROUPS, StaticContextPort, sha256Text } from '@personal-agent/context'
+import { ContextComposer, ContextError, DEFAULT_COMPOSED_GROUPS, StaticContextPort, createPublishedArtifactProvider, createScopedConversationProvider, sha256Text } from '@personal-agent/context'
 import type { ContextSourceKind, StaticContextSource } from '@personal-agent/context'
 import { AssistantDecisionStore, DecisionGovernance, decisionContextProvider } from '@personal-agent/knowledge'
 import { scopeWithin } from '@personal-agent/questions'
 import { canonicalDigest } from '@personal-agent/storage'
 import type { ProductStore } from '@personal-agent/storage'
+import { key } from '@personal-agent/orchestrator-core'
 
 const digest = (value: unknown) => canonicalDigest(JSON.parse(JSON.stringify(value ?? null)))
 const kinds: Record<ContextPreviewInput['selections'][number], readonly ContextSourceKind[]> = {
@@ -102,6 +103,7 @@ export class ProductContextPreview {
     const issues: ContextPreview['issues'][number][] = []
     const messages = new Map<string, string>()
     const artifactRecords = new Map<string, string>()
+    const artifactPublications = new Map<string, string>()
     const governance = new DecisionGovernance(new AssistantDecisionStore(this.store.workflows.assistant), {
       getMessage: async id => {
         const source = this.store.workflows.index.sourceMessage(id, [project.id])
@@ -120,6 +122,25 @@ export class ProductContextPreview {
     const groups = DEFAULT_COMPOSED_GROUPS.filter(group => group.sourceKinds.some(kind => selectedKinds.includes(kind)))
       .map(group => ({ ...group, sourceKinds: group.sourceKinds.filter(kind => selectedKinds.includes(kind)) }))
     const shares = groups.reduce((sum, group) => sum + group.share, 0)
+    const conversationProvider = createScopedConversationProvider({
+      page: (id, input) => {
+        const before = options.conversationThrough === undefined ? input.before
+          : Math.min(input.before ?? Number.MAX_SAFE_INTEGER, options.conversationThrough + 1)
+        const page = this.store.product.messages.page(id, { ...input, ...(before === undefined ? {} : { before }) })
+        for (const message of page.messages) messages.set(message.id, digest(message))
+        return page
+      },
+    }, { projectId: project.id, conversationId: value.conversationId, ...(work ? { workId: work.work.id } : {}) },
+    { pageSize: 200, maxPages: 3, maxScannedMessages: 600 })
+    const artifactProvider = createPublishedArtifactProvider({ get: id => {
+      const publication = this.store.commands.get(key('product-artifact', id, work!.work.id))
+      if (!publication || publication.status !== 'recorded' || publication.payloadDigest !== digest({ id, workId: work!.work.id }) ||
+        digest(publication.result) !== digest({ id, workId: work!.work.id })) return undefined
+      artifactPublications.set(id, digest(publication))
+      const record = this.store.artifacts.get(id)
+      if (record) artifactRecords.set(id, digest(record))
+      return record
+    } }, { publishedArtifactIds: work?.artifactIds ?? [] }, { maxIds: 256 })
     const composer = new ContextComposer({ port,
       decisions: { listEffective: async (projectId, limit) => {
         const page = await effective.listEffective(projectId, limit)
@@ -129,37 +150,16 @@ export class ProductContextPreview {
         return { ...page, decisions: page.decisions.filter(decision => scopeWithin(decision.scope, project.scope)) }
       } },
       conversation: { recent: async ({ limit }) => {
-        const result = []
-        let before = options.conversationThrough === undefined ? undefined : options.conversationThrough + 1
-        for (let pageNumber = 0; pageNumber < 3; pageNumber++) {
-          const page = this.store.product.messages.page(value.conversationId, { limit: 200, ...(before ? { before } : {}) })
-          for (const message of [...page.messages].reverse()) {
-            if (message.projectId !== project.id || message.anchor?.questionId ||
-              (message.anchor?.workId && message.anchor.workId !== work?.work.id) ||
-              !((message.role === 'user' && message.provenance === 'trusted_user') ||
-                (message.role === 'assistant' && message.provenance === 'reasoner_reply'))) continue
-            messages.set(message.id, digest(message))
-            result.push({ messageId: message.id, conversationId: message.conversationId, sequence: message.sequence,
-              role: message.role, provenance: message.provenance, text: message.text, createdAt: message.createdAt })
-            if (result.length > limit) return result
-          }
-          if (!page.hasMore) return result
-          before = page.beforeCursor
-          if (pageNumber === 2) issues.push('conversation_scan_incomplete')
-        }
+        const result = await conversationProvider.recent({ projectId: project.id, conversationId: value.conversationId, limit })
+        const coverage = conversationProvider.coverage()
+        if (!coverage.complete && (coverage.returned < limit || coverage.scanned >= 600)) issues.push('conversation_scan_incomplete')
         return result
-      } },
+      }, coverage: () => conversationProvider.coverage() },
       artifacts: { recent: async ({ limit }) => {
-        const records = []
-        // Only artifact identities already published on this exact work are eligible. No file bytes.
-        for (const id of work?.artifactIds ?? []) {
-          const record = this.store.artifacts.get(id)
-          if (!record) { if (!issues.includes('artifact_source_missing')) issues.push('artifact_source_missing'); continue }
-          artifactRecords.set(id, digest(record))
-          records.push({ artifactId: record.id, digest: record.digest, bytes: record.bytes, createdAt: record.createdAt })
-        }
-        return records.sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.artifactId.localeCompare(b.artifactId)).slice(0, limit + 1)
-      } },
+        const result = await artifactProvider.recent({ projectId: project.id, limit })
+        if (artifactProvider.coverage().missing) issues.push('artifact_source_missing')
+        return result
+      }, coverage: () => artifactProvider.coverage() },
     }, { now: () => new Date(this.now()) })
     try {
       const result = await composer.compose({ requestId: `context-${randomUUID()}`, projectId: project.id,
@@ -181,7 +181,8 @@ export class ProductContextPreview {
         (verification && digest(await this.readers.verification(verification.id)) !== digest(verification)) ||
         (evidence && digest(await this.readers.workEvidence(work!.work.id)) !== digest(evidence)) ||
         [...messages].some(([id, expected]) => digest(this.store.product.messages.getById(id)) !== expected) ||
-        [...artifactRecords].some(([id, expected]) => digest(this.store.artifacts.get(id)) !== expected))
+        [...artifactRecords].some(([id, expected]) => digest(this.store.artifacts.get(id)) !== expected) ||
+        [...artifactPublications].some(([id, expected]) => digest(this.store.commands.get(key('product-artifact', id, work!.work.id))) !== expected))
         throw new ApplicationFault('conflict', 'Context source, contract or authorization changed; preview again')
       if (this.store.events.cursor() !== eventCursor)
         throw new ApplicationFault('conflict', 'Context changed during validation; preview again')
@@ -203,7 +204,8 @@ export class ProductContextPreview {
           this.store.events.cursor() !== eventCursor ||
           (work && (digest(currentContract) !== digest(work.contract) || digest(this.store.product.works.get(work.work.id)) !== digest(work.work))) ||
           [...messages].some(([id, expected]) => digest(this.store.product.messages.getById(id)) !== expected) ||
-          [...artifactRecords].some(([id, expected]) => digest(this.store.artifacts.get(id)) !== expected))
+          [...artifactRecords].some(([id, expected]) => digest(this.store.artifacts.get(id)) !== expected) ||
+          [...artifactPublications].some(([id, expected]) => digest(this.store.commands.get(key('product-artifact', id, work!.work.id))) !== expected))
           throw new ApplicationFault('conflict', 'Context source or authorization changed before use; preview again')
       }
       assertCurrent()

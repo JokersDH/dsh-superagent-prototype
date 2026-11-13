@@ -2,6 +2,6 @@
   "protocol": "assistant-records/1",
   "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
   "runtimeValidationRequired": true,
-  "schemaHash": "00e85908f67c4643294908a53f28681dac915dbf72e7135bf88475ec414356fb",
-  "sourceHash": "b7c590313fc70bb8a0962e5b862c7891a552a877db043052374ead857aa79d3f"
+  "schemaHash": "7bc0ed7aaa36d428fb75e0753f0e084b35bec2ac81cc1298d573813444633eb7",
+  "sourceHash": "1b6621d693e290eb7766c6b0ed5b3706e6f5a87847eb21df0262d86df9e4ce55"
 }

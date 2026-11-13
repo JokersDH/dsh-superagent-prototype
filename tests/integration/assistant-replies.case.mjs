@@ -330,7 +330,8 @@ test('the inference receipt binds the captured provider model and configuration 
   await h.chat('pinned-request', 'hello'); await h.effects.idle()
   assert.equal(h.calls, 1)
   assert.equal(h.store.commands.get(requestId).payloadDigest, canonicalDigest({ messageId,
-    conversationId: 'conversation-1', model: 'pinned-model', configurationDigest, messages: [{ role: 'user', content: 'hello' }] }))
+    conversationId: 'conversation-1', model: 'pinned-model', configurationDigest, replyFormat: 'plain',
+    sourceTextDigest: h.store.workflows.index.sourceMessage(messageId, ['project-1']).textDigest, messages: [{ role: 'user', content: 'hello' }] }))
   assert.equal(h.messages()[1].text, 'pinned reply')
   assert.equal([...h.records.values()][0].model, 'pinned-model')
 })

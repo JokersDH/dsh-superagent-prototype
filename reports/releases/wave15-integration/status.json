@@ -1,19 +1,22 @@
 {
   "protocol": "wave15-main-integration/1",
-  "date": "2026-11-12",
-  "source": "697efdc",
+  "date": "2026-11-13",
+  "source": "1169535ec3716d928da82b02865daebea7b06d06",
   "admittedACandidate": "3121ec46126a8579b45c7d128ee1700df4c82978",
   "implemented": [
     "Production A RecoverySourceStore/strict fact mapper minimal slice",
     "Actual runtime HTTP recovery inspect and prepare logical-source baseline",
     "Read-only same-connection snapshot and final source recheck",
-    "Incomplete sources refuse without consuming old business queues"
+    "Incomplete sources refuse without consuming old business queues",
+    "Actual default scoped C conversation/artifact factories, cutoff and publication guards",
+    "Nonempty data-only suggestions in one existing SDK response with bounded validation",
+    "Original completed-result/artifact candidate reads and pointer-only proposal preparation",
+    "Explicit candidate preview/confirm/reject UI using original business transactions and receipt replay",
+    "Private default-off preference sidecar compatible with legacy model configuration"
   ],
   "notImplemented": [
     "Public source confirmation/permission",
     "Target activation",
-    "Default C factory replacement",
-    "Nonempty assistant suggestion consumer",
     "B business recovery product integration"
   ],
   "checks": {
@@ -30,9 +33,56 @@
     "confirmation": false,
     "targetActivation": false
   },
+  "candidateCheckpoint": {
+    "backendSource": "104b7a08cccc88d6a5cc26b41ad22389fea1a36b",
+    "uiSource": "1169535ec3716d928da82b02865daebea7b06d06",
+    "backendTests": 91,
+    "consoleTests": 34,
+    "actualFactoryCases": 6,
+    "candidateBrowserCases": 8,
+    "proposalBrowserRegressionCases": 8,
+    "selectedContextBrowserRegressionCases": 9,
+    "finalLayoutFunctionalCases": 8,
+    "strict": "PASS",
+    "build": "PASS_WITH_EXISTING_CHUNK_SIZE_ADVISORY",
+    "generated": "PASS",
+    "lastFullVisualDisposition": "fix",
+    "followupLayout": "SOURCE_FIXED_FUNCTIONAL_AND_DOM_VERIFIED_NO_ADDITIONAL_SCREENSHOT_VERDICT",
+    "userGatewayToolsCompatibility": "NOT_TESTED",
+    "proposalConfirmation": true,
+    "recoverySourceConfirmation": false,
+    "targetActivation": false
+  },
+  "phaseStatus": {
+    "M1": "IMPLEMENTED_SCOPED_TESTED",
+    "M2": "IMPLEMENTED_MOCK_SDK_TESTED",
+    "M3": "IMPLEMENTED_FUNCTIONAL_TESTED_VISUAL_FINAL_APPROVAL_OPEN",
+    "M4": "NEXT_NOT_IMPLEMENTED",
+    "M5": "NOT_IMPLEMENTED",
+    "M6": "AWAITING_ADMITTED_B_BUSINESS_PORT",
+    "M7": "BLOCKED_RESOURCE_AND_AUTHORITY_GATES",
+    "M8": "CURRENT_SOURCE_AVAILABLE_INSTALL_ADMISSION_SEPARATE",
+    "M9": "PARTIAL_M1_M3_COMPOSITION_TESTED",
+    "M10": "PARTIAL_CHECKPOINT_DOCUMENTED"
+  },
   "releaseApproved": false,
   "realModelTurns": 0,
   "nativeTurnStarts": 0,
   "oldUserServicesRestarted": false,
-  "newPreviewCreated": false
+  "newPreviewCreated": true,
+  "preview": {
+    "url": "http://127.0.0.1:5191/",
+    "apiURL": "http://127.0.0.1:8807/",
+    "stateRoot": ".local-state/wave15-candidates-preview",
+    "mode": "personal",
+    "startedFrom": "104b7a0",
+    "backendUnchangedThrough": "1169535",
+    "uiSource": "1169535",
+    "executionAvailability": { "state": "available", "kind": "native" },
+    "providerConfigured": true,
+    "suggestionsEnabledAtInspection": false,
+    "automaticMessagesSent": 0,
+    "automaticWorksStarted": 0,
+    "preservedOldServicePairs": 11
+  }
 }

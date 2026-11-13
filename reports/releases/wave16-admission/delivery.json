@@ -1,0 +1,185 @@
+{
+  "protocol": "wave16-delivery-admission/1",
+  "status": "BLOCKED_BY_SCOPED_D_OWNERSHIP_FAILURES",
+  "sources": {
+    "main": "a64a127d52e04fb9eba8771ee22380db47e45baa",
+    "d": "0b9481ce83cf455a9ef41d0ccf94b5255c4d55d1",
+    "e": "ed1c8903b5f3c01077d3e441ce94ced764e6f759",
+    "eRecordedTestSource": "77d59c2ebf9ca3627ab985cc949eeec853e5efba"
+  },
+  "safety": {
+    "realModelSends": 0,
+    "nativeTurnStarts": 0,
+    "newProbeProcessesSpawned": 0,
+    "newProbeActualOsScans": 0,
+    "newProbeActualOsSignals": 0,
+    "liveInstallStopUpgradeCleanupMatricesRun": false,
+    "userServicesPreserved": "All twelve pairs 5180-5191 / 8796-8807, including 5191/8807",
+    "userStateProfilesTarsLedgersChanged": false,
+    "dWorktreeClean": true,
+    "eUntrackedRunDirectoriesPreserved": 69,
+    "productionAndAcceptanceSourcesChanged": false,
+    "repositoryWrites": [
+      "reports/releases/wave16-admission/delivery.json",
+      "tools/bootstrap/probe-wave16-delivery.mjs",
+      "tools/bootstrap/probe-wave16-release-gate.mjs"
+    ],
+    "temporaryArtifactsRetained": "/tmp/pa-wave16-delivery-audit-3yalUM"
+  },
+  "verification": {
+    "dPrevious": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave16-d-previous.json node --experimental-test-module-mocks tools/bootstrap/probe-wave15-delivery.mjs /Users/hh/Desktop/joker/superagent-agent-d /tmp/pa-wave16-delivery-audit-3yalUM/install",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "scope": "Three previous failures plus a complete positive identity. The post-signal UNKNOWN case really sends mock SIGTERM after complete identity verification; no earlier missing-identity refusal masks this path.",
+      "report": "/tmp/pa-wave16-d-previous.json"
+    },
+    "ePrevious": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave16-e-previous.json node tools/bootstrap/probe-wave15-release-gate.mjs /Users/hh/Desktop/joker/superagent-agent-e",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "scope": "Five previous behavior/mode/ABI failures and two source-subject controls reject with focal reasons on original RUNNING personal HTTP evidence.",
+      "report": "/tmp/pa-wave16-e-previous.json"
+    },
+    "dChildrenAndUnknown": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave16-d-persistent.json node --experimental-test-module-mocks tools/bootstrap/probe-wave16-delivery.mjs /Users/hh/Desktop/joker/superagent-agent-d /tmp/pa-wave16-delivery-audit-3yalUM/install",
+      "exitCode": 1,
+      "passed": 1,
+      "failed": 3,
+      "scope": "Persistent probe returns nonzero on the three safety failures. Complete parent positive succeeds; foreign child, discovered UNKNOWN and actual recovery fail their expected safety rules. Recovery also verifies that no pointer file appears while blocked.",
+      "report": "/tmp/pa-wave16-d-persistent.json",
+      "previousObservationReport": "/tmp/pa-wave16-delivery-audit-3yalUM/d-children-unknown-results.json"
+    },
+    "eCoherentControls": {
+      "command": "PA_ADMISSION_REPORT=/tmp/pa-wave16-e-persistent.json node tools/bootstrap/probe-wave16-release-gate.mjs /Users/hh/Desktop/joker/superagent-agent-e",
+      "exitCode": 1,
+      "passed": 6,
+      "failed": 1,
+      "scope": "Actual personal HTTP positive accepted; five prior focal mutations rejected. An actual recovery result mutated to BLOCKED/nonzero is still accepted. This isolates actual installed-alpha entries and does not claim an entire installed tier PASS.",
+      "report": "/tmp/pa-wave16-e-persistent.json",
+      "previousObservationReport": "/tmp/pa-wave16-delivery-audit-3yalUM/e-coherent-results.json"
+    },
+    "artifactBytes": {
+      "command": "node /tmp/pa-wave16-delivery-audit-3yalUM/verify-bytes.mjs",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave16-delivery-audit-3yalUM/artifact-verified.json"
+    }
+  },
+  "persistentProbeOutputPolicy": "Both tools require explicit PA_ADMISSION_REPORT and create a new 0600 report with exclusive creation; existing evidence is never overwritten. Candidate roots are command arguments, and D additionally requires a previously verified frozen install root.",
+  "closedScopes": [
+    "D now persists actual upgrade birth pid/start/uid/stable command/config/data/operation and passes expected operation to journal cleanup.",
+    "Missing complete journal identity refuses without signals; actual recovery remains BLOCKED.",
+    "Post-signal stat UNKNOWN stays unproven with a complete positive identity and mock SIGTERM exercised.",
+    "E BLOCKED personal, fixture mode, missing copy exit/code, step-only fault and foreign ABI/platform/arch mutations now refuse.",
+    "E foreign source relationships still refuse; a coherent actual RUNNING personal HTTP positive passes the isolated requirements.",
+    "D new artifact contains M1, runtime logical recovery inspect/prepare and existing context/history/source/reply bytes."
+  ],
+  "findings": [
+    {
+      "id": "D-CHILD-INHERITS-OWNERSHIP",
+      "priority": 1,
+      "status": "FAIL",
+      "file": "apps/launcher/lib/upgrade.mjs",
+      "lines": [504, 546, 585, 587],
+      "summary": "Verifying a parent adds every ps descendant to treeCandidates; child ownership then depends only on matching private path tokens. No child start/UID/argv/operation is verified.",
+      "observed": "A complete parent positive passes. Adding an unregistered foreign-UID child causes SIGTERM to both parent and child and proven=true. processUid is read twice for the parent and never for the child.",
+      "expected": "A child without independent resource identity remains UNKNOWN and is not signalled; an incomplete resource set cannot prove stop.",
+      "case": "FOREIGN_UID_UNREGISTERED_CHILD_INHERITS_PARENT"
+    },
+    {
+      "id": "D-DISCOVERED-UNKNOWN-EMPTY-PROOF",
+      "priority": 1,
+      "status": "FAIL",
+      "file": "apps/launcher/lib/upgrade.mjs",
+      "lines": [585, 595, 937],
+      "summary": "UNKNOWN vitality for globally discovered resources is skipped before command/root accounting. It becomes an empty proven set.",
+      "observed": "A matching-root discovered mock writer with kill(0) alive and failed stat returns scannerOk=true/proven=true. Actual recoverSwitch(target_stop_unproven) then reverts the pointer/journal while that mock writer remains alive.",
+      "expected": "Discovery with unreadable status remains UNKNOWN and blocks pointer/recovery decisions.",
+      "cases": ["DISCOVERED_STATUS_UNKNOWN_EMPTY_PROOF", "RECOVER_UNKNOWN_DISCOVERED_WRITER"]
+    },
+    {
+      "id": "E-FAULT-RECOVERY-BLOCKED-ACCEPTED",
+      "priority": 2,
+      "status": "FAIL",
+      "file": "tests/product-acceptance/lib/release.mjs",
+      "lines": [376, 385, 796],
+      "summary": "Fault evidence requires a nonempty recover status but not a successful compatible exit/status/code. A failed real recovery result can coexist with retained PASS step labels and pass the gate.",
+      "observed": "With a coherent passing actual installed evidence control, replacing crash_after_stop.probe.recover with exit=2/status=BLOCKED/code=unknown_live_resource/started=null is still accepted.",
+      "case": "ACTUAL_FAULT_RECOVER_BLOCKED_NONZERO",
+      "relatedTest": "tests/product-acceptance/cases/e4-upgrade-fault-child.mjs:81"
+    },
+    {
+      "id": "D-CLI-RECOVERED-PREVIOUS-EXIT",
+      "priority": 2,
+      "status": "SOURCE_AND_RECORDED_OUTPUT_CONFIRMED",
+      "file": "apps/launcher/bin/pa.mjs",
+      "lines": [476],
+      "summary": "The recover CLI returns OK only for NO_OP or RECOVERED, but production recovery also returns RECOVERED_PREVIOUS and REVERTED.",
+      "observed": "E's preserved actual fault windows record RECOVERED_PREVIOUS with exit=1 and mark recovery PASS through status OR exit. No new live command was run.",
+      "expected": "Define compatible successful terminal statuses and return an exit consistent with actual completed recovery; E must independently assert the full relation."
+    }
+  ],
+  "artifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave15-target/wave15-target-b1854c0-r2.tar.gz",
+    "tarSha256": "11497980a4077e854b64596c71efe45b1e68e058639838acef0b07657d61f54b",
+    "tarBytes": 20190414,
+    "source": "8962d102711e2d2f6b9bb8d5b8ed98437348f6a3",
+    "sourceDirty": false,
+    "buildId": "88df6d2eef1feeb7",
+    "productSchemaActualExport": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeActual": "24.21.0",
+    "abiActual": "137",
+    "sqliteActual": "3.53.4",
+    "inventoryEntries": 6719,
+    "regularFilesHashAndSizeVerified": 6698,
+    "internalSymlinksVerified": 21,
+    "extractedBytes": 67336231,
+    "installManifestSha256": "9ec05269c29ec91f67cc7ca14097a734ff6072f4da7385c8dfddceef3657be0c",
+    "releaseManifestSha256": "59b66a2e1920525444b005feb78de91fdcb296d0297d59f1d774b18801439e90",
+    "closureDigest": "ef9677e981e2167de0f46b18dca3f818bc701c6ea4c15b3d0f0cb42569ee0aed",
+    "verifiedInstallRoot": "/tmp/pa-wave16-delivery-audit-3yalUM/install",
+    "modeScope": "Personal-capable M1 bytes verified. No live install was started by this audit.",
+    "temporalScope": "Contains main697efdc logical recovery and M1, predates main65ac737/1169535. Frozen assistant-reply-results.ts:40 still emits suggestions=[]. Missing newer nonempty-candidate UI is a chronological scope boundary, not a regression of this older package."
+  },
+  "eRecordedScope": {
+    "counts": { "PASS": 167, "FAIL": 0, "NOT_TESTED": 16 },
+    "testSource": "77d59c2ebf9ca3627ab985cc949eeec853e5efba",
+    "productSource": "114b73c2723c3ec862f5ae199dc35e0152fbafed",
+    "buildId": "a7df2b225a8c5c42",
+    "tarSha256": "246fd80ded7b5d2445890a7854dbc6261a71c1c4456f3ee2f41404b9b6e3c785",
+    "scope": "Actual personal discussion-only mock-provider selected context/history/source/reply actions are recorded on the old exact 114b73c tuple. This is not acceptance of D8962d10 or the new main candidate UI.",
+    "installedAlpha": "FAIL",
+    "requiredBlocker": "E5-D-OWNERSHIP-MOCKS is NOT_TESTED",
+    "note": "Old recorded statements remain historical; new D child/discovery failures independently prevent broad live lifecycle admission."
+  },
+  "nextPackages": {
+    "d": [
+      "Unify complete resource identities for launcher/API/console/children; descendants cannot inherit ownership from path or ancestry alone.",
+      "Keep discovered and registered UNKNOWN states through the entire scan, preflight, signal, final remaining set and pointer decision.",
+      "Add coherent complete-parent/registered-child positives plus foreign child, unreadable status, and actual recover negatives; assert no child signal/no pointer change.",
+      "Correct recover CLI terminal-status/exit semantics and provide runnable source checkpoint before live matrices.",
+      "Only after safety passes, use newly born independently proven resources for bounded parent-death/pre-record/ACK/shared-install windows.",
+      "Integrate a fixed current main product source including the explicit preference/candidate UI; keep old scope and native budgets unchanged.",
+      "Refreeze only changed runtime bytes with exact tuple and verify M1/logical inspect/prepare/candidate capabilities separately.",
+      "Run same-subject ordinary personal mock-provider flows, nonempty backup relocation, legacy16 migration and current-schema different-binary switch.",
+      "Preserve unknown queues/restore markers/credentials and treat target activation as a separate main-owned authority.",
+      "Publish early/mid/final source and immutable artifact tuple to E on the original origin branch."
+    ],
+    "e": [
+      "Preserve the five closed focal validators with the actual RUNNING personal HTTP positive and exact original tuple.",
+      "Reject BLOCKED/nonzero/inconsistent recovery outputs even when child step labels claim PASS; test full exit/status/code/operation/health/data relationships.",
+      "Independently reproduce D parent/child/discovery UNKNOWN mocks with all identity reads injected before any broad live installation.",
+      "Keep installed-alpha nonzero until required ownership evidence is actually executed and the D safety failures close.",
+      "Consume the exact new D tar independently; do not relabel old 114b73c evidence as D8962d10 or current main.",
+      "Exercise current personal model-off/local-mock provider context/history/source/reply and the newly frozen explicit candidate preference/confirm UI with zero vendor sends.",
+      "Bind responses, request IDs, principal/scope, result artifacts, source bodies and runtime mode to one verified frozen subject.",
+      "Run nonempty relocated backups, legacy16 and same-schema binary matrices with preserved post-upgrade writes and no authorization inheritance.",
+      "Execute the bounded 50-operation sequence and report actual resource/queue/request outcomes without claiming long-duration soak.",
+      "Generate current layered verdicts from actual outputs; preserve native/activation/value NOT_TESTED/BLOCKED scopes and all historical runs."
+    ]
+  }
+}

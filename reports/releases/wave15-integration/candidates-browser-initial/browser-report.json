@@ -1,0 +1,18 @@
+{
+  "protocol": "assistant-candidates-browser/1",
+  "source": "eb96c3ee68be96883c7a027cd845ea8f9e9150b6",
+  "trackedSourceDirty": true,
+  "status": "FAIL",
+  "cases": [
+    {
+      "id": "EXPLICIT_PREFERENCE_DEFAULTS_OFF_AND_SIDECAR_PRESERVES_LEGACY_MODEL_CONFIG",
+      "status": "FAIL",
+      "message": "locator.check: Clicking the checkbox did not change its state\nCall log:\n\u001b[2m  - waiting for getByRole('checkbox', { name: '提案建议', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <input type=\"checkbox\"/>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - performing click action\u001b[22m\n\u001b[2m    - click action done\u001b[22m\n\u001b[2m    - waiting for scheduled navigations to finish\u001b[22m\n\u001b[2m    - navigations have finished\u001b[22m\n"
+    }
+  ],
+  "errors": [],
+  "mockSDKRequests": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "Actual React/HTTP/SQLite/PrivateModelProvider SDK with a private local mock; controlled local work creation/revision, not vendor/native/install/activation admission"
+}

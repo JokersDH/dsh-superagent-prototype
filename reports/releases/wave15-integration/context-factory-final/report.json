@@ -1,0 +1,55 @@
+{
+  "protocol": "context-factory-consumer/1",
+  "source": "104b7a08cccc88d6a5cc26b41ad22389fea1a36b",
+  "trackedSourceDirty": false,
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "ACTUAL_RUNTIME_HTTP_CALLS_REVIEWED_C_FACTORIES_WITHOUT_WRITES_OR_ARTIFACT_BYTES",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL_FACTORY_CUTOFF_EXCLUDES_OWN_NEW_MESSAGE_AND_LATER_HISTORY",
+      "status": "PASS"
+    },
+    {
+      "id": "PUBLICATION_RECEIPT_CHANGE_WITHOUT_EVENT_INVALIDATES_THE_SYNCHRONOUS_GUARD",
+      "status": "PASS"
+    },
+    {
+      "id": "MISSING_PUBLICATION_IS_PARTIAL_AND_UNPUBLISHED_REGISTRY_IDS_ARE_NEVER_LOOKED_UP",
+      "status": "PASS"
+    },
+    {
+      "id": "THE_C_FACTORY_FILTERS_A_CORRUPT_CROSS_CONVERSATION_PAGE",
+      "status": "PASS"
+    },
+    {
+      "id": "THE_DEFAULT_CONSUMER_STOPS_AT_600_SCANNED_MESSAGES_AND_EXPOSES_INCOMPLETE_COVERAGE",
+      "status": "PASS"
+    }
+  ],
+  "calls": {
+    "conversationFactories": 6,
+    "artifactFactories": 6,
+    "conversationReads": 4,
+    "artifactReads": 3,
+    "artifactIds": [
+      "e778b193e74a385ba11cf7e1f86990b2a087e62287d0d49c9e6835d67cd24a0f",
+      "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+      "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+      "d8f40d0b47eaa5f879f088395a189c6d154dd0ce16477ae67a7f0a23cbd445f4",
+      "e778b193e74a385ba11cf7e1f86990b2a087e62287d0d49c9e6835d67cd24a0f",
+      "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+      "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+      "d8f40d0b47eaa5f879f088395a189c6d154dd0ce16477ae67a7f0a23cbd445f4",
+      "e778b193e74a385ba11cf7e1f86990b2a087e62287d0d49c9e6835d67cd24a0f",
+      "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+      "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+      "d8f40d0b47eaa5f879f088395a189c6d154dd0ce16477ae67a7f0a23cbd445f4"
+    ]
+  },
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "Actual runtime/HTTP/SQLite/composer; spies wrap the reviewed C factories, controlled local product execution only"
+}

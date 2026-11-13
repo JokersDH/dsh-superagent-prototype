@@ -12,6 +12,9 @@ import {
   SnapshotSchema,
   VerificationSchema,
   AssistantProviderStatusSchema,
+  AssistantCandidatesSchema,
+  AssistantCandidatePrepareSchema,
+  AssistantSuggestionsSettingSchema,
   AssistantStreamUpdateSchema,
   ProjectRegistrationInputSchema,
   WorkLocationSchema,
@@ -51,6 +54,8 @@ import type {
   AgentProfile,
   ApplicationConfiguration,
   AssistantProviderStatus,
+  AssistantCandidates,
+  AssistantCandidatePrepare,
   AssistantStreamUpdate,
   Change,
   CommandReceipt,
@@ -133,6 +138,9 @@ export interface ConsoleTransport {
   assistant?(): Promise<AssistantProviderStatus | undefined>
   assistantChanges?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
   selectModel?(model: string): Promise<AssistantProviderStatus>
+  setAssistantSuggestions?(enabled: boolean): Promise<AssistantProviderStatus>
+  replyCandidates?(messageId: string): Promise<AssistantCandidates>
+  prepareReplyCandidate?(input: AssistantCandidatePrepare): Promise<ProposalPreview>
   registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
   workLocation?(workId: string): Promise<WorkLocation | undefined>
   workEnvironment?(workId: string): Promise<WorkEnvironment | undefined>
@@ -344,6 +352,24 @@ export class HttpTransport implements ConsoleTransport {
     return AssistantProviderStatusSchema.parse(
       await this.request('/v1/assistant/model', { method: 'POST', body: JSON.stringify({ model }) }),
     )
+  }
+  async setAssistantSuggestions(enabled: boolean): Promise<AssistantProviderStatus> {
+    const input = AssistantSuggestionsSettingSchema.parse({ enabled })
+    const value = AssistantProviderStatusSchema.parse(await this.request('/v1/assistant/suggestions', { method: 'POST', body: JSON.stringify(input) }))
+    if (value.suggestionsEnabled !== enabled) throw new TransportError('schema_mismatch', '提案建议设置结果尚未确认')
+    return value
+  }
+  async replyCandidates(messageId: string): Promise<AssistantCandidates> {
+    const value = AssistantCandidatesSchema.parse(await this.request(`/v1/messages/${encodeURIComponent(messageId)}/candidates`))
+    if (value.messageId !== messageId) throw new TransportError('schema_mismatch', '建议属于另一条消息')
+    return value
+  }
+  async prepareReplyCandidate(input: AssistantCandidatePrepare): Promise<ProposalPreview> {
+    const value = AssistantCandidatePrepareSchema.parse(input)
+    const preview = ProposalPreviewSchema.parse(await this.request('/v1/assistant/candidates/prepare', { method: 'POST', body: JSON.stringify(value) }))
+    if (preview.record.sourceMessageId !== value.messageId || preview.record.payloadDigest !== value.payloadDigest || preview.record.payload.kind === 'reply')
+      throw new TransportError('schema_mismatch', '建议预览与原选择不符')
+    return preview
   }
   async workVerification(workId: string): Promise<WorkVerificationStatus | undefined> {
     try {

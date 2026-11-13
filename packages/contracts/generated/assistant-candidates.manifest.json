@@ -1,0 +1,7 @@
+{
+  "protocol": "assistant-candidates/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "ca069161502b67382a5b9f8b01a482fc9f842ad27226e186ed6839716742c028",
+  "sourceHash": "ce1d4bbfca4d021339adf3faa1ef95eddc2bd9e8c01ecea6d33e64fc9311f887"
+}

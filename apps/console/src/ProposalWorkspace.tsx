@@ -6,6 +6,7 @@ import { ProposalCommandSchema, ProposalPreviewSchema } from '@personal-agent/co
 import type { ApplicationConfiguration, CommandReceipt, ConversationMessage, Criterion, ProposalCommand, ProposalPreview, Scope, WorkView } from '@personal-agent/contracts'
 import type { ConsoleTransport } from './transport.ts'
 import { blockedLabel } from './configuration-labels.ts'
+import type { CandidateDraft } from './ReplyCandidates.tsx'
 
 const storageKey = 'personal-agent:pending-proposal-command'
 const StoredSchema = z.strictObject({ version: z.literal(1), command: ProposalCommandSchema, preview: ProposalPreviewSchema })
@@ -26,24 +27,28 @@ function remembered(): { value?: Stored; damaged: boolean } {
 }
 const criteriaText = (criterion: Criterion) => `${criterion.description}${criterion.required ? '（必需）' : ''}`
 
-export function ProposalWorkspace({ transport, configuration, sources, source, works, initialProjectId, onClose, onRecorded, onOpenWork }: {
+export function ProposalWorkspace({ transport, configuration, sources, source, works, initialProjectId, initialCandidate, onClose, onRecorded, onOpenWork }: {
   transport: ConsoleTransport; configuration: ApplicationConfiguration; sources: readonly ConversationMessage[];
   source: ConversationMessage | undefined; works: readonly WorkView[]; initialProjectId: string;
+  initialCandidate?: CandidateDraft;
   onClose(): void; onRecorded(): Promise<void>; onOpenWork(workId: string): void
 }) {
   const [initial] = useState(remembered)
+  const seed = initialCandidate?.preview.record, payload = seed?.payload
+  const seededContent = payload?.kind === 'propose_work' ? payload.goal : payload?.kind === 'propose_revision' ? payload.rationale : payload?.kind === 'propose_decision' ? payload.content : undefined
   const [pending, setPending] = useState<Stored | undefined>(initial.value)
   const [damaged, setDamaged] = useState(initial.damaged)
-  const [projectId, setProjectId] = useState(initial.value?.command.projectId ?? source?.projectId ?? initialProjectId)
+  const [projectId, setProjectId] = useState(initial.value?.command.projectId ?? seed?.projectId ?? source?.projectId ?? initialProjectId)
   const candidates = sources.filter(value => value.role === 'user' && value.provenance === 'trusted_user' && value.projectId === projectId)
-  const [sourceId, setSourceId] = useState(source?.id ?? candidates.at(-1)?.id ?? '')
-  const [kind, setKind] = useState<Kind>('propose_work')
-  const [content, setContent] = useState((source ?? candidates.at(-1))?.text.slice(0, 16384) ?? '')
+  const [sourceId, setSourceId] = useState(seed?.sourceMessageId ?? source?.id ?? candidates.at(-1)?.id ?? '')
+  const [kind, setKind] = useState<Kind>(payload && payload.kind !== 'reply' ? payload.kind : 'propose_work')
+  const [content, setContent] = useState(seededContent ?? (source ?? candidates.at(-1))?.text.slice(0, 16384) ?? '')
   const project = configuration.projects.find(value => value.id === projectId)
   const [profileId, setProfileId] = useState(project?.defaultProfileId ?? '')
-  const [paths, setPaths] = useState<readonly string[]>(project?.scope.allowedPaths ?? [])
+  const [paths, setPaths] = useState<readonly string[]>(payload?.kind === 'propose_decision' ? payload.scope.allowedPaths : project?.scope.allowedPaths ?? [])
   const [criterionIds, setCriterionIds] = useState<readonly string[]>(project?.defaultCriteria.map(value => value.id) ?? [])
-  const [workId, setWorkId] = useState(works.find(value => value.work.projectId === projectId && value.work.conversationId === source?.conversationId)?.work.id ?? '')
+  const [workId, setWorkId] = useState(payload?.kind === 'propose_revision' ? payload.expected.workId : works.find(value => value.work.projectId === projectId && value.work.conversationId === source?.conversationId)?.work.id ?? '')
+  const [candidateWork, setCandidateWork] = useState<WorkView>()
   const [revisionGoal, setRevisionGoal] = useState('')
   const [preview, setPreview] = useState<ProposalPreview>()
   const [confirmation, setConfirmation] = useState<ProposalCommand>()
@@ -52,12 +57,13 @@ export function ProposalWorkspace({ transport, configuration, sources, source, w
   const [busy, setBusy] = useState(false), [error, setError] = useState<string>(), [expired, setExpired] = useState(false)
   const dialog = useRef<HTMLDialogElement>(null)
   const selected = candidates.find(value => value.id === sourceId)
-  const revisions = works.filter(value => value.work.projectId === projectId && value.work.conversationId === selected?.conversationId &&
+  const availableWorks = candidateWork ? [candidateWork, ...works.filter(value => value.work.id !== candidateWork.work.id)] : works
+  const revisions = availableWorks.filter(value => value.work.projectId === projectId && value.work.conversationId === (seed?.conversationId ?? selected?.conversationId) &&
     !['ended', 'delivered', 'stopping', 'switching'].includes(value.phase))
   const work = revisions.find(value => value.work.id === workId)
   const profiles = configuration.profiles.filter(value => value.dispatchAllowed && project?.profileIds.includes(value.id))
   const criteria = kind === 'propose_revision' ? work?.contract.criteria ?? [] : project?.defaultCriteria ?? []
-  const scope: Scope | undefined = kind === 'propose_revision' ? work?.contract.scope : project ? { ...project.scope, allowedPaths: paths } : undefined
+  const scope: Scope | undefined = payload?.kind === 'propose_decision' ? payload.scope : kind === 'propose_revision' ? work?.contract.scope : project ? { ...project.scope, allowedPaths: paths } : undefined
   const confirmedCriteria = criteria.filter(value => criterionIds.includes(value.id))
   const blocked = busy || !!pending || damaged
   const displayPreview = pending?.preview ?? preview
@@ -69,9 +75,20 @@ export function ProposalWorkspace({ transport, configuration, sources, source, w
     : pending ? '核对提案请求' : preview ? '确认提案' : '创建提案'
 
   useEffect(() => {
-    const focused = document.activeElement as HTMLElement | null
+    const focused = initialCandidate?.returnFocus ?? document.activeElement as HTMLElement | null
     dialog.current?.showModal()
-    return () => { dialog.current?.close(); focused?.focus() }
+    return () => { dialog.current?.close(); if (focused?.isConnected) focused.focus() }
+  }, [])
+  useEffect(() => {
+    if (payload?.kind !== 'propose_revision') return
+    let active = true
+    void transport.snapshot({ workId: payload.expected.workId, conversationId: seed!.conversationId }).then(snapshot => {
+      const current = snapshot.works.find(value => value.work.id === payload.expected.workId)
+      if (!current || current.work.projectId !== seed!.projectId || current.work.conversationId !== seed!.conversationId ||
+        current.contract.digest !== payload.expected.digest || current.contract.revision !== payload.expected.revision) throw new Error('Target changed')
+      if (active) { setCandidateWork(current); setCriterionIds(current.contract.criteria.map(criterion => criterion.id)) }
+    }).catch(() => { if (active) setError('目标工作已变化或无法读取，请返回重新审阅。') })
+    return () => { active = false }
   }, [])
   useEffect(() => {
     if (!preview) { setExpired(false); return }
@@ -101,20 +118,21 @@ export function ProposalWorkspace({ transport, configuration, sources, source, w
     finally { setBusy(false) }
   }
   const prepare = async () => {
-    if (!selected || !project || !scope || !content.trim() || blocked) return
+    if ((!selected && !initialCandidate) || !project || !scope || !content.trim() || blocked) return
     if (projectBlocked || (kind !== 'propose_decision' && !confirmedCriteria.some(value => value.kind === 'machine' && value.required))) return
     if (kind === 'propose_work' && !profiles.some(value => value.id === profileId)) return
     if (kind === 'propose_revision' && (!work || !revisionGoal.trim())) return
     setBusy(true); setError(undefined); setReceipt(undefined)
     try {
-      const value = await transport.prepareProposal!({ projectId, conversationId: selected.conversationId, sourceMessageId: selected.id,
-        payload: kind === 'propose_work' ? { kind, goal: content.trim(), projectId, sourceMessageId: selected.id }
-          : kind === 'propose_decision' ? { kind, content: content.trim(), scope, sourceMessageId: selected.id }
+      const value = initialCandidate ? await transport.prepareReplyCandidate!(initialCandidate.selection)
+        : await transport.prepareProposal!({ projectId, conversationId: selected!.conversationId, sourceMessageId: selected!.id,
+        payload: kind === 'propose_work' ? { kind, goal: content.trim(), projectId, sourceMessageId: selected!.id }
+          : kind === 'propose_decision' ? { kind, content: content.trim(), scope, sourceMessageId: selected!.id }
             : { kind, expected: { workId: work!.contract.workId, revision: work!.contract.revision, digest: work!.contract.digest },
-              rationale: content.trim(), sourceMessageId: selected.id } })
+              rationale: content.trim(), sourceMessageId: selected!.id } })
       setPreview(value)
       setConfirmation(ProposalCommandSchema.parse({ kind: 'confirm_proposal', commandId: `proposal-confirm-${crypto.randomUUID()}`,
-        projectId, conversationId: selected.conversationId, token: value.token,
+        projectId, conversationId: value.record.conversationId, token: value.token,
         ...(kind === 'propose_work' ? { work: { scope, criteria: confirmedCriteria, profileId } } : {}),
         ...(kind === 'propose_revision' ? { revision: { goal: revisionGoal.trim(), scope, criteria: confirmedCriteria } } : {}),
       }))
@@ -150,31 +168,31 @@ export function ProposalWorkspace({ transport, configuration, sources, source, w
         {pending && <div className="proposal-pending" role="status"><RefreshCw size={16} /><span>原请求待核对</span>
           <button type="button" disabled={busy || damaged} onClick={() => void mutate(pending.command, pending.preview)}><RefreshCw size={15} />核对原请求</button></div>}
         {!displayPreview && !damaged && <form onSubmit={event => { event.preventDefault(); void prepare() }}>
-          <fieldset disabled={blocked}>
-            <div className="proposal-modes" role="group" aria-label="提案类型">{modes.map(mode => <button key={mode.kind} type="button" aria-pressed={kind === mode.kind}
-              onClick={() => { setKind(mode.kind); setError(undefined); setCriterionIds(project?.defaultCriteria.map(item => item.id) ?? []) }}><mode.icon size={15} />{mode.label}</button>)}</div>
-            <div className="proposal-fields"><label>项目<select aria-label="提案项目" value={projectId} onChange={event => resetProject(event.target.value)}>
+          <div className="proposal-form-scroll"><fieldset disabled={blocked}>
+            {!initialCandidate && <div className="proposal-modes" role="group" aria-label="提案类型">{modes.map(mode => <button key={mode.kind} type="button" aria-pressed={kind === mode.kind}
+              onClick={() => { setKind(mode.kind); setError(undefined); setCriterionIds(project?.defaultCriteria.map(item => item.id) ?? []) }}><mode.icon size={15} />{mode.label}</button>)}</div>}
+            <div className="proposal-fields"><label>项目<select aria-label="提案项目" value={projectId} disabled={!!initialCandidate} onChange={event => resetProject(event.target.value)}>
               {configuration.projects.map(value => <option key={value.id} value={value.id}>{value.displayName}{value.dispatchAllowed ? '' : '（不可调度）'}</option>)}</select></label>
-              <label>来源消息<select aria-label="提案来源消息" required value={sourceId} onChange={event => { setSourceId(event.target.value); setContent(candidates.find(value => value.id === event.target.value)?.text.slice(0, 16384) ?? ''); setWorkId('') }}>
-                <option value="">选择用户消息</option>{candidates.map(value => <option key={value.id} value={value.id}>{value.text.slice(0, 60)}</option>)}</select></label></div>
-            {!candidates.length && <p className="proposal-empty">当前对话没有可用的用户消息</p>}
+              <label>来源消息<select aria-label="提案来源消息" required value={sourceId} disabled={!!initialCandidate} onChange={event => { setSourceId(event.target.value); setContent(candidates.find(value => value.id === event.target.value)?.text.slice(0, 16384) ?? ''); setWorkId('') }}>
+                <option value="">选择用户消息</option>{seed && !candidates.some(value => value.id === seed.sourceMessageId) && <option value={seed.sourceMessageId}>原始用户消息</option>}{candidates.map(value => <option key={value.id} value={value.id}>{value.text.slice(0, 60)}</option>)}</select></label></div>
+            {!candidates.length && !initialCandidate && <p className="proposal-empty">当前对话没有可用的用户消息</p>}
             {projectBlocked && <p className="warn-text" role="alert">{blockedLabel(project?.blockedReason)}</p>}
-            <label>{kind === 'propose_work' ? '工作目标' : kind === 'propose_revision' ? '修订说明' : '决定内容'}<textarea aria-label="提案内容" rows={4} maxLength={16384} value={content} required onChange={event => setContent(event.target.value)} /></label>
-            {kind === 'propose_revision' && <><label>当前工作<select aria-label="修订目标工作" value={workId} required onChange={event => {
+            <label>{kind === 'propose_work' ? '工作目标' : kind === 'propose_revision' ? '修订说明' : '决定内容'}<textarea aria-label="提案内容" rows={4} maxLength={16384} value={content} readOnly={!!initialCandidate} required onChange={event => setContent(event.target.value)} /></label>
+            {kind === 'propose_revision' && <><label>当前工作<select aria-label="修订目标工作" value={workId} disabled={!!initialCandidate} required onChange={event => {
               const value = revisions.find(item => item.work.id === event.target.value); setWorkId(event.target.value); setRevisionGoal(value?.contract.goal ?? ''); setCriterionIds(value?.contract.criteria.map(item => item.id) ?? [])
             }}><option value="">选择当前工作</option>{revisions.map(value => <option key={value.work.id} value={value.work.id}>{value.work.title}</option>)}</select></label>
               <label>新工作目标<textarea aria-label="修订后目标" required rows={3} maxLength={16384} value={revisionGoal} onChange={event => setRevisionGoal(event.target.value)} /></label></>}
             {kind === 'propose_work' && <label>执行器<select aria-label="提案执行器" value={profileId} required onChange={event => setProfileId(event.target.value)}>
               <option value="">选择执行器</option>{profiles.map(value => <option key={value.id} value={value.id}>{value.displayName}</option>)}</select></label>}
             {scope && <section className="proposal-scope" aria-label="提案执行范围"><h3>执行范围</h3>
-              {kind === 'propose_revision' ? <p>{scope.allowedPaths.join('、')}</p> : <div className="proposal-paths">{project?.scope.allowedPaths.map(path => <label key={path} className="settings-toggle"><input type="checkbox" checked={paths.includes(path)}
+              {kind === 'propose_revision' ? <p>{scope.allowedPaths.join('、')}</p> : <div className="proposal-paths">{project?.scope.allowedPaths.map(path => <label key={path} className="settings-toggle"><input type="checkbox" checked={paths.includes(path)} disabled={!!initialCandidate && kind === 'propose_decision'}
                 onChange={event => setPaths(event.target.checked ? [...paths, path] : paths.filter(value => value !== path))} /><code>{path}</code></label>)}</div>}
               {!!scope.excludedPaths.length && <p>排除：{scope.excludedPaths.join('、')}</p>}
               <p>外部动作：{scope.externalActions.join('、') || '无'}</p></section>}
             {kind !== 'propose_decision' && <section className="proposal-checks" aria-label="提案验收标准"><h3>验收标准</h3>{criteria.map(criterion => <label key={criterion.id} className="settings-toggle"><input type="checkbox" checked={criterionIds.includes(criterion.id)}
               onChange={event => setCriterionIds(event.target.checked ? [...criterionIds, criterion.id] : criterionIds.filter(value => value !== criterion.id))} /><span>{criteriaText(criterion)}<small>{criterion.kind === 'machine' ? '机器检查' : '人工验收'}</small></span></label>)}</section>}
-          </fieldset>
-          <footer><button type="submit" disabled={blocked || projectBlocked || !selected || !content.trim() || !scope?.allowedPaths.length ||
+          </fieldset></div>
+          <footer><button type="submit" disabled={blocked || projectBlocked || (!selected && !initialCandidate) || !content.trim() || !scope?.allowedPaths.length ||
             (kind !== 'propose_decision' && (!project?.dispatchAllowed || !confirmedCriteria.some(value => value.kind === 'machine' && value.required))) ||
             (kind === 'propose_work' && !profileId) || (kind === 'propose_revision' && (!work || !revisionGoal.trim()))}><FileCheck2 size={15} />{busy ? '正在预览' : '预览提案'}</button></footer>
         </form>}

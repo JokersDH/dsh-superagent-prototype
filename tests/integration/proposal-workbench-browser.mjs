@@ -12,10 +12,10 @@ import { createProductRuntime } from '../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../apps/coordinator/http/app.ts'
 import { listenLocalHttp } from '../../apps/coordinator/http/server.ts'
 
-const { values } = parseArgs({ options: { 'no-capture': { type: 'boolean', default: false } } })
+const { values } = parseArgs({ options: { 'no-capture': { type: 'boolean', default: false }, output: { type: 'string' } } })
 const require = createRequire(new URL('../../apps/console/package.json', import.meta.url))
 const { chromium } = require('@playwright/test'), { createServer } = await import(require.resolve('vite'))
-const output = resolve('reports/releases/wave08-proposal-workbench/browser'), captures = resolve('apps/console/.impeccable/review')
+const output = resolve(values.output ?? 'reports/releases/wave08-proposal-workbench/browser'), captures = resolve('apps/console/.impeccable/review')
 mkdirSync(output, { recursive: true }); mkdirSync(captures, { recursive: true })
 const root = mkdtempSync(join(tmpdir(), 'pa-proposal-browser-')), stateRoot = join(root, 'state'), projectRoot = join(root, 'project')
 mkdirSync(stateRoot); mkdirSync(projectRoot); mkdirSync(join(projectRoot, 'src'))

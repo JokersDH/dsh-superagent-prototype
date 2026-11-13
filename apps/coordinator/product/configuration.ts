@@ -29,6 +29,7 @@ export interface ConfigurationSource {
   assistantContextAvailable?: boolean
   contextHistoryAvailable?: boolean
   contextSourcesAvailable?: boolean
+  replyCandidatesAvailable?: boolean
   executionAvailability?: ExecutionAvailability
 }
 
@@ -81,6 +82,7 @@ export function applicationConfiguration(source: ConfigurationSource, now = Date
     ...(source.assistantContextAvailable !== undefined ? { assistantContextAvailable: source.assistantContextAvailable } : {}),
     ...(source.contextHistoryAvailable !== undefined ? { contextHistoryAvailable: source.contextHistoryAvailable } : {}),
     ...(source.contextSourcesAvailable !== undefined ? { contextSourcesAvailable: source.contextSourcesAvailable } : {}),
+    ...(source.replyCandidatesAvailable !== undefined ? { replyCandidatesAvailable: source.replyCandidatesAvailable } : {}),
     ...(source.executionAvailability ? { executionAvailability: source.executionAvailability } : {}) }
   return ApplicationConfigurationSchema.parse({ ...body, revision: canonicalDigest(JSON.parse(JSON.stringify(body))) })
 }
