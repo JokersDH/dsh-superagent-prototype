@@ -376,3 +376,82 @@ test('public unknown candidate input fails closed for getters, hostile arrays an
   }
   assert.equal(reviewVerifiedReplyCandidates(verifiedInput, { ...bindings, principal: { userId: 'user-1', authorityRef: 'authority-1' } }).status, 'invalid_body')
 })
+
+test('nested body and principal getters stay inside the bounded invalid_body boundary', () => {
+  const scopeValue: Scope = { projectId, allowedPaths: ['src'], excludedPaths: [], externalActions: [] }
+  const value = {
+    protocol: 'assistant-reply-body/1',
+    projectId,
+    conversationId,
+    sourceMessageId,
+    replyMessageId: 'reply-1',
+    model: 'mock',
+    text: 'Ordinary reply',
+    suggestions: [{ kind: 'propose_work', goal: 'Add test', projectId, sourceMessageId }],
+  }
+  const identity = {
+    requestId: 'request-1',
+    replyMessageId: 'reply-1',
+    projectId,
+    conversationId,
+    sourceMessageId,
+    model: 'mock',
+    principal: { userId: 'user-1', authorityRef: 'authority-1' },
+  }
+  const verifiedBindings = { projectId, conversationId, sourceMessageId, grantId: 'grant-1', grantScope: scopeValue, principal: identity.principal }
+
+  const typed = reviewVerifiedReplyCandidates({ verifiedBy: 'main-completed-reply', body: value, identity }, verifiedBindings)
+  assert.equal(typed.status, 'candidates')
+
+  const nestedBodyGetter = reviewVerifiedReplyCandidates(
+    {
+      verifiedBy: 'main-completed-reply',
+      body: Object.defineProperty({ ...value }, 'replyMessageId', {
+        get() {
+          throw new Error('nested body getter')
+        },
+      }),
+      identity,
+    },
+    verifiedBindings,
+  )
+  assert.equal(nestedBodyGetter.status, 'invalid_body')
+
+  const nestedPrincipalGetter = reviewVerifiedReplyCandidates(
+    {
+      verifiedBy: 'main-completed-reply',
+      body: value,
+      identity: Object.defineProperty({ ...identity }, 'principal', {
+        get() {
+          throw new Error('nested principal getter')
+        },
+      }),
+    },
+    verifiedBindings,
+  )
+  assert.equal(nestedPrincipalGetter.status, 'invalid_body')
+
+  const nestedIdentityFieldGetter = reviewVerifiedReplyCandidates(
+    {
+      verifiedBy: 'main-completed-reply',
+      body: value,
+      identity: Object.defineProperty({ ...identity }, 'projectId', {
+        get() {
+          throw new Error('nested identity field getter')
+        },
+      }),
+    },
+    verifiedBindings,
+  )
+  assert.equal(nestedIdentityFieldGetter.status, 'invalid_body')
+
+  const outerGetter = reviewVerifiedReplyCandidates(
+    Object.defineProperty({}, 'verifiedBy', {
+      get() {
+        throw new Error('outer getter')
+      },
+    }),
+    verifiedBindings,
+  )
+  assert.equal(outerGetter.status, 'invalid_body')
+})

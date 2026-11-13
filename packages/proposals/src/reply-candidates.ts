@@ -337,39 +337,42 @@ export function reviewVerifiedReplyCandidates(input: unknown, bindings: ReplyCan
   if (!isObject(body) || !isObject(identity)) {
     return refuse('incomplete_identity', 'Verified reply body or identity is missing')
   }
+  // Every nested read goes through the bounded accessor: a throwing getter is user input, not trust.
   const bodyRef = {
-    replyMessageId: body.replyMessageId,
-    sourceMessageId: body.sourceMessageId,
-    projectId: body.projectId,
-    conversationId: body.conversationId,
-    model: body.model,
+    replyMessageId: safeRead(body, 'replyMessageId'),
+    sourceMessageId: safeRead(body, 'sourceMessageId'),
+    projectId: safeRead(body, 'projectId'),
+    conversationId: safeRead(body, 'conversationId'),
+    model: safeRead(body, 'model'),
   }
   const identityRef = {
-    replyMessageId: identity.replyMessageId,
-    sourceMessageId: identity.sourceMessageId,
-    projectId: identity.projectId,
-    conversationId: identity.conversationId,
-    model: identity.model,
+    replyMessageId: safeRead(identity, 'replyMessageId'),
+    sourceMessageId: safeRead(identity, 'sourceMessageId'),
+    projectId: safeRead(identity, 'projectId'),
+    conversationId: safeRead(identity, 'conversationId'),
+    model: safeRead(identity, 'model'),
   } as { replyMessageId: string; sourceMessageId: string; projectId: string; conversationId: string; model: string }
   if (!Object.values(bodyRef).every(isNonEmptyString) || !Object.values(identityRef).every(isNonEmptyString)) {
     return refuse('incomplete_identity', 'Verified reply identity is incomplete')
   }
-  if (!isNonEmptyString(identity.requestId)) {
+  const requestId = safeRead(identity, 'requestId')
+  if (!isNonEmptyString(requestId)) {
     return refuse('incomplete_identity', 'Verified reply request identity is missing')
   }
-  if (!isObject(identity.principal) || !isNonEmptyString(identity.principal.userId) || !isNonEmptyString(identity.principal.authorityRef)) {
+  const principalValue = safeRead(identity, 'principal')
+  if (!isObject(principalValue) || !isNonEmptyString(safeRead(principalValue, 'userId')) || !isNonEmptyString(safeRead(principalValue, 'authorityRef'))) {
     return refuse('incomplete_identity', 'Verified reply principal is missing')
   }
-  const principalRef = identity.principal as { userId: string; authorityRef: string }
+  const principalRef = principalValue as { userId: string; authorityRef: string }
   // Main's completed reader also knows the original request digest and artifact tuple. When it
   // supplies any part, the whole tuple must be consistent; a partial/forged tuple is refused.
-  const tuple = [identity.requestDigest, identity.artifactRef, identity.artifactDigest]
+  const tuple = [safeRead(identity, 'requestDigest'), safeRead(identity, 'artifactRef'), safeRead(identity, 'artifactDigest')]
   const supplied = tuple.filter((value) => value !== undefined).length
   if (supplied > 0) {
     if (supplied !== 3 || !tuple.every(isNonEmptyString)) {
       return refuse('incomplete_identity', 'Verified reply artifact tuple is incomplete')
     }
-    if (identity.artifactRef !== identity.artifactDigest) {
+    if (tuple[1] !== tuple[2]) {
       return refuse('artifact_mismatch', 'Verified reply artifact reference and digest disagree')
     }
   }
@@ -398,7 +401,7 @@ export function reviewVerifiedReplyCandidates(input: unknown, bindings: ReplyCan
   }
   const review = reviewReplyCandidates(body, bindings)
   const verifiedIdentity: VerifiedReplyIdentity = {
-    requestId: identity.requestId as string,
+    requestId: requestId as string,
     replyMessageId: identityRef.replyMessageId,
     sourceMessageId: identityRef.sourceMessageId,
     projectId: identityRef.projectId,
@@ -407,9 +410,9 @@ export function reviewVerifiedReplyCandidates(input: unknown, bindings: ReplyCan
     principal: { userId: principalRef.userId, authorityRef: principalRef.authorityRef },
     ...(supplied === 3
       ? {
-          requestDigest: identity.requestDigest as string,
-          artifactRef: identity.artifactRef as string,
-          artifactDigest: identity.artifactDigest as string,
+          requestDigest: tuple[0] as string,
+          artifactRef: tuple[1] as string,
+          artifactDigest: tuple[2] as string,
         }
       : {}),
   }
