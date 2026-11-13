@@ -451,15 +451,23 @@ const evidenceFor = (key) => {
   }
 }
 
-const buildCase = (entry, overrides = {}) => ({
-  id: entry.id,
-  layer: entry.layers[0],
-  status: STATUS.PASS,
-  assertions: [{ id: 'MUTATION-CONTROL', ok: true }],
-  source: { commit: COMMIT },
-  evidence: Object.fromEntries((entry.evidence ?? []).map((key) => [key, evidenceFor(key)])),
-  ...overrides,
-})
+const buildCase = (entry, overrides = {}) => {
+  const evidence = Object.fromEntries((entry.evidence ?? []).map((key) => [key, evidenceFor(key)]))
+  const nested = ['subject', 'frozenScope', 'currentInstall', 'upgradeFaults', 'ownershipCopy', 'installedContext',
+    'backupContextReply', 'ownershipMocks', 'installedCandidates', 'secondRoot', 'installedSourceConfirm', 'installedStability']
+    .some((key) => evidence[key] !== undefined)
+  if ((entry.layers ?? []).includes(LAYERS.INSTALLED) && entry.id !== 'E4-INSTALL-ARTIFACT-IDENTITY' && !nested)
+    evidence.subject = { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' }
+  return {
+    id: entry.id,
+    layer: entry.layers[0],
+    status: STATUS.PASS,
+    assertions: [{ id: 'MUTATION-CONTROL', ok: true }],
+    source: { commit: COMMIT },
+    evidence,
+    ...overrides,
+  }
+}
 
 const fullProduct = tier('full-product')
 const heterogeneous = tier('actual-heterogeneous-review')

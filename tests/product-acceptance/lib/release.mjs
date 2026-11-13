@@ -1,4 +1,5 @@
 import { STATUS, LAYERS } from './status.mjs'
+import { INSTALL_CASES } from './release-requirements.mjs'
 import { isFresh } from './evidence.mjs'
 
 export const REPORT_SCHEMA = 'product-acceptance/1'
@@ -914,8 +915,9 @@ export function evaluateRelease({
   // Every claimed installation/current-tuple case must describe the same frozen subject.
   const canonicalTuple = byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target
   if (canonicalTuple) {
-    const subjectCases = ['E6-ARTIFACT-CURRENT-SCOPE', 'E6-CURRENT-MAIN-INSTALL', 'E6-INSTALLED-CONTEXT',
-      'E7-OWNERSHIP-COPY', 'E7-BACKUP-CONTEXT-REPLY', 'E4-UPGRADE-FAULTS', 'E5-D-OWNERSHIP-MOCKS', 'E5-INSTALLED-CANDIDATES', 'E7-SECOND-ROOT-READONLY', 'E6-INSTALLED-SOURCE-CONFIRM', 'E9-INSTALLED-STABILITY']
+    // Every required installed case, not a chosen subset, must describe the tested tuple. The
+    // canonical identity case is the reference itself.
+    const subjectCases = INSTALL_CASES.map(entry => entry.id).filter(id => id !== 'E4-INSTALL-ARTIFACT-IDENTITY')
     const normalize = (value, key) => key === 'source' ? (value?.source ?? value?.sourceCommit)
       : key === 'schema' ? (value?.schema ?? value?.productSchema) : value?.[key]
     for (const id of subjectCases) {

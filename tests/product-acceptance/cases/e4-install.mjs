@@ -464,6 +464,14 @@ export async function runInstall({ root, runDirectory, keep = false }) {
   const push = async (definition, body) => {
     clearOwnedRecord(install); clearOwnedRecord(upgradeInstall)
     const result = await runCase({ ...definition, evidence: {} }, body)
+    // Every installed case states the tuple it exercised; the canonical identity case is the
+    // reference and carries the tuple inside its own artifact evidence. Cases with a structured
+    // subject of their own keep it, so the gate reads the subject the case actually measured.
+    const nested = ['subject', 'frozenScope', 'currentInstall', 'upgradeFaults', 'ownershipCopy', 'installedContext',
+      'backupContextReply', 'ownershipMocks', 'installedCandidates', 'secondRoot', 'installedSourceConfirm', 'installedStability']
+      .some(key => result.evidence?.[key] !== undefined)
+    if (definition.layer === LAYERS.INSTALLED && result.id !== 'E4-INSTALL-ARTIFACT-IDENTITY' && !nested)
+      result.evidence.subject = artifactSubject(ARTIFACTS.upgrade)
     cases.push(result)
     return result
   }
