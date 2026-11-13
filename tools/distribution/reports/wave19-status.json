@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "9a0f1a0",
   "mergedMain": "ee2297e",
-  "head": "ee7fbd8",
+  "head": "52a9c6c",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Real vendor/model/native turns 0; twelve user services untouched.",
   "ownedPaths": [
@@ -384,5 +384,6 @@
     "tools/distribution/reports/wave19/*.json",
     "tools/distribution/recipes/wave19-e-acceptance.zh-CN.md",
     "docs/rfcs/WP-16/0054-wave-19-d-dual-format-real-business-and-successor.md"
-  ]
+  ],
+  "evidenceHead": "52a9c6c"
 }
