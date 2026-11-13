@@ -159,9 +159,24 @@ const evidenceFor = (key) => {
           files: [{ path: 'apps/launcher/lib/start.mjs', sha256: 'a'.repeat(64), bytes: 1 },
             { path: 'apps/coordinator/product/restored-review.ts', sha256: 'b'.repeat(64), bytes: 1 },
             { path: 'apps/coordinator/product/demo.ts', sha256: 'c'.repeat(64), bytes: 1 }] },
-        outcomes: { sameFile: { status: 'REUSED', instance: { pid: 100 } },
-          differentFile: { status: 'BLOCKED', reused: false }, missingFile: { status: 'BLOCKED', reused: false },
-          portChange: { status: 'BLOCKED', reused: false }, unboundThenSelection: { status: 'BLOCKED', reused: false } },
+        outcomes: { sameFile: { status: 'REUSED', instance: { pid: 100, processStart: 'start-1' } },
+          differentFile: { status: 'BLOCKED', code: 'restored_review_selection_mismatch' },
+          missingFile: { status: 'BLOCKED', code: 'restored_review_selection_mismatch' },
+          portChange: { status: 'BLOCKED', code: 'instance_conflict' },
+          unboundThenSelection: { status: 'BLOCKED', code: 'restored_review_selection_mismatch' } },
+      }
+    case 'scopeDiagnostics':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'personal',
+        consumerEntry: { origin: 'package', package: { source: COMMIT, buildId: 'b', tarSha256: DIGEST, tarBytes: 1 },
+          files: [{ path: 'apps/launcher/lib/start.mjs', sha256: 'a'.repeat(64), bytes: 1 },
+            { path: 'apps/coordinator/product/restored-review.ts', sha256: 'b'.repeat(64), bytes: 1 },
+            { path: 'apps/coordinator/product/demo.ts', sha256: 'c'.repeat(64), bytes: 1 }] },
+        plain: { plain: 200, plainHasDiagnostic: false, optIn: 200, duplicate: 400, unknown: 400,
+          diagnostic: { protocol: 'context-scope-review/1', reasons: [], partial: false, withheldSourceCount: 0, authorization: 'none' } },
+        narrow: { start: 'RUNNING', plain: 200, bodyServed: false,
+          diagnostic: { protocol: 'context-scope-review/1', reasons: ['selection_narrowed'], partial: true, withheldSourceCount: 1, authorization: 'none' } },
       }
     case 'workflowFormats':
       return {
@@ -1336,6 +1351,15 @@ const CASES = [
         findCase(report, 'E5-REVIEW-REUSE-CONSISTENCY').evidence.reviewReuse.outcomes.differentFile = { status: 'RUNNING', reused: true, instance: { pid: 100 } }
         return report
       }, 'reviewReuse_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-SCOPE-DIAGNOSTIC-LEAK',
+    title: 'Default sources response must not carry the optional scope review field',
+    check: ({ assert }) =>
+      rejectWith(assert, 'DIAGNOSTIC_LEAK', (report) => {
+        findCase(report, 'E7-SCOPE-DIAGNOSTICS').evidence.scopeDiagnostics.plain.plainHasDiagnostic = true
+        return report
+      }, 'scopeDiagnostics_invalid'),
   },
   {
     id: 'E1-MUTATE-SELF-CLAIM',

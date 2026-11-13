@@ -63,7 +63,8 @@ function startPackage(install, { state, config, reviewFile, port, apiPort, mockF
     env: { ...process.env, PA_NODE: process.execPath, PA_MODEL_CONFIG: mockFile, PA_CONFIG_ROOT: config, PA_DATA_ROOT: state },
   })
   child.stdout.on('data', () => {})
-  child.stderr.on('data', () => {})
+  let stderr = ''
+  child.stderr.on('data', chunk => { stderr += chunk })
   let buffer = ''
   const value = new Promise(resolve => {
     const timer = setTimeout(() => resolve({ status: 'TIMEOUT' }), timeoutMs)
@@ -72,10 +73,10 @@ function startPackage(install, { state, config, reviewFile, port, apiPort, mockF
       buffer += chunk
       const text = buffer.trim()
       if (!text.endsWith('}')) return
-      try { const json = JSON.parse(text); clearTimeout(timer); resolve(json) } catch { /* buffering */ }
+      try { const json = JSON.parse(text); clearTimeout(timer); resolve({ ...json, stderr: stderr.slice(-800) }) } catch { /* buffering */ }
     })
     if (!attached) attached = true
-    child.once('exit', code => { clearTimeout(timer); resolve({ status: 'EXITED', code }) })
+    child.once('exit', code => { clearTimeout(timer); resolve({ status: 'EXITED', code, stderr: stderr.slice(-800) }) })
   })
   return { child, value }
 }
@@ -358,6 +359,77 @@ export async function runPersonalReview() {
           notTestedReason: 'forging a valid signature would require the probe-owned action key; main module contract covers it, E does not re-sign' }
       } finally { rmSync(good, { force: true }); rmSync(secondRoot, { recursive: true, force: true }) }
     }))
+
+  const diagnosticsSupported = observed
+    ? /scopeReview/u.test(readFileSync(join(observed.install, 'app/apps/coordinator/http/app.ts'), 'utf8')) : false
+  if (!diagnosticsSupported)
+    cases.push(notTested({ ...define('E7-SCOPE-DIAGNOSTICS', 'Optional read-scope diagnostics explain a narrowed review without changing the body or authorization'), evidence: {} },
+      'NOT_REACHED: the frozen target package does not contain the optional ?scopeReview=1 implementation (main 712); default response shape and authorization are unchanged.'))
+  else
+    cases.push(await runCase({ ...define('E7-SCOPE-DIAGNOSTICS', 'Optional read-scope diagnostics explain a narrowed review without changing the body or authorization'), evidence: {} },
+      async ({ assert, evidence }) => {
+        assert('DIAGNOSTICS_PROVISIONED', observed !== undefined, failure ?? 'no observation')
+        if (!observed) return
+        const { install, restored, config, mock, projectId, messageId, conversationId } = observed
+        const wide = join(observed.own, 'diag-wide.json'), narrow = join(observed.own, 'diag-narrow.json')
+        const preparedWide = packagePrepare(install, { state: restored, project: projectId, allow: ['src/'], output: wide })
+        assert('DIAGNOSTICS_PREPARE', preparedWide.status === 0, preparedWide.stderr)
+        const [port, apiPort] = [await freePort(), await freePort()]
+        let outcome = {}
+        try {
+          const started = startPackage(install, { state: restored, config, reviewFile: wide, port, apiPort, mockFile: mock.file })
+          const value = await started.value
+          assert('DIAGNOSTICS_START', value.status === 'RUNNING' || value.status === 'REUSED', JSON.stringify(value).slice(0, 300))
+          const key = readFileSync(join(restored, 'api.key'), 'utf8').trim()
+          const headers = { authorization: `Bearer ${key}` }
+          const base = `http://127.0.0.1:${apiPort}`
+          const plain = await fetch(`${base}/v1/messages/${messageId}/context/sources`, { headers, signal: AbortSignal.timeout(5_000) })
+          const plainBody = await plain.json().catch(() => ({}))
+          const optIn = await fetch(`${base}/v1/messages/${messageId}/context/sources?scopeReview=1`, { headers, signal: AbortSignal.timeout(5_000) })
+          const optInBody = await optIn.json().catch(() => ({}))
+          const duplicate = await fetch(`${base}/v1/messages/${messageId}/context/sources?scopeReview=1&scopeReview=1`, { headers, signal: AbortSignal.timeout(5_000) })
+          const unknown = await fetch(`${base}/v1/messages/${messageId}/context/sources?scopeReview=0`, { headers, signal: AbortSignal.timeout(5_000) })
+          outcome = { plain: plain.status, plainHasDiagnostic: Object.prototype.hasOwnProperty.call(plainBody, 'scopeReview'),
+            optIn: optIn.status, diagnostic: optInBody.scopeReview ?? null, duplicate: duplicate.status, unknown: unknown.status }
+        } finally { await stopOwned(install, { state: restored, config, mockFile: mock.file }) }
+
+        let narrowed = {}
+        // A restart needs a fresh preparation against the current source, not the earlier file.
+        const preparedNarrow = packagePrepare(install, { state: restored, project: projectId, allow: ['src/sub/'], output: narrow })
+        assert('DIAGNOSTICS_NARROW_PREPARE', preparedNarrow.status === 0, preparedNarrow.stderr)
+        const [narrowPort, narrowApiPort] = [await freePort(), await freePort()]
+        try {
+          const started = startPackage(install, { state: restored, config, reviewFile: narrow, port: narrowPort, apiPort: narrowApiPort, mockFile: mock.file })
+          const value = await started.value
+          if (value.status === 'RUNNING' || value.status === 'REUSED') {
+            const key = readFileSync(join(restored, 'api.key'), 'utf8').trim()
+            const headers = { authorization: `Bearer ${key}` }
+            const base = `http://127.0.0.1:${narrowApiPort}`
+            const plain = await fetch(`${base}/v1/messages/${messageId}/context/sources`, { headers, signal: AbortSignal.timeout(5_000) })
+            const plainBody = await plain.json().catch(() => ({}))
+            const optIn = await fetch(`${base}/v1/messages/${messageId}/context/sources?scopeReview=1`, { headers, signal: AbortSignal.timeout(5_000) })
+            const optInBody = await optIn.json().catch(() => ({}))
+            narrowed = { start: value.status, plain: plain.status, bodyServed: Array.isArray(plainBody.sources) && plainBody.sources.length > 0,
+              optIn: optIn.status, diagnostic: optInBody.scopeReview ?? null }
+          } else narrowed = { start: value.status, code: value.code ?? null, detail: value.detail ?? null, stderr: value.stderr ?? null }
+        } finally { await stopOwned(install, { state: restored, config, mockFile: mock.file }) }
+
+        const diagnostic = outcome.diagnostic ?? {}
+        assert('DIAGNOSTICS_DEFAULT_SHAPE', outcome.plain === 200 && outcome.plainHasDiagnostic === false, JSON.stringify(outcome).slice(0, 300))
+        assert('DIAGNOSTICS_OPT_IN', outcome.optIn === 200 && diagnostic.protocol === 'context-scope-review/1' &&
+          diagnostic.authorization === 'none' && typeof diagnostic.partial === 'boolean' &&
+          (diagnostic.withheldSourceCount === null || Number.isSafeInteger(diagnostic.withheldSourceCount)) &&
+          Array.isArray(diagnostic.reasons), JSON.stringify(diagnostic).slice(0, 300))
+        assert('DIAGNOSTICS_STRICT_QUERY', [400, 422].includes(outcome.duplicate) && [400, 422].includes(outcome.unknown),
+          JSON.stringify({ duplicate: outcome.duplicate, unknown: outcome.unknown }))
+        assert('DIAGNOSTICS_NARROW', narrowed.start === 'RUNNING' || narrowed.start === 'REUSED',
+          JSON.stringify(narrowed).slice(0, 300))
+        assert('DIAGNOSTICS_NARROW_EXPLAINED', narrowed.bodyServed === false && narrowed.diagnostic?.authorization === 'none' &&
+          (narrowed.diagnostic?.partial === true || (narrowed.diagnostic?.reasons?.length ?? 0) > 0),
+          JSON.stringify(narrowed).slice(0, 400))
+        evidence.scopeDiagnostics = { subject: frozenArtifactSubject(target), mode: 'personal', consumerEntry: consumerEntry(install, target),
+          plain: outcome, narrow: narrowed }
+      }))
 
   cases.push(await runCase({ ...define('E5-REVIEW-REUSE-CONSISTENCY', 'A live review instance is reused only for the same valid selection and never silently for a different, missing or unbound request'), evidence: {} },
     async ({ assert, evidence }) => {

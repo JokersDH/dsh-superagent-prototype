@@ -384,6 +384,23 @@ const OWNERSHIP_ISSUE_CODES = Object.freeze({
   helper_build: 'helper_build', helper_tar: 'helper_tar', probe_source: 'probe_source',
   previous_control: 'previous_control', previous_control_identity: 'previous_control_identity',
 })
+export function scopeDiagnosticsIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const plain = value.plain ?? {}, narrow = value.narrow ?? {}, issues = []
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  if (value.mode !== 'personal') issues.push('mode')
+  issues.push(...consumerEntryIssues(value))
+  if (plain.plain !== 200 || plain.plainHasDiagnostic !== false) issues.push('default_shape')
+  const diagnostic = plain.diagnostic ?? {}
+  if (plain.optIn !== 200 || diagnostic.protocol !== 'context-scope-review/1' || diagnostic.authorization !== 'none' ||
+    typeof diagnostic.partial !== 'boolean' || !(diagnostic.withheldSourceCount === null || Number.isSafeInteger(diagnostic.withheldSourceCount)) ||
+    !Array.isArray(diagnostic.reasons)) issues.push('opt_in')
+  if (![400, 422].includes(plain.duplicate) || ![400, 422].includes(plain.unknown)) issues.push('strict_query')
+  if (narrow.start !== 'RUNNING' && narrow.start !== 'REUSED') issues.push('narrow_start')
+  else if (narrow.bodyServed !== false || narrow.diagnostic?.authorization !== 'none' ||
+    !(narrow.diagnostic?.partial === true || (narrow.diagnostic?.reasons?.length ?? 0) > 0)) issues.push('narrow_explained')
+  return issues
+}
 export function installedStabilityIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -438,23 +455,31 @@ export function restoredReviewRefusalsIssues(value) {
 }
 export function reviewReuseIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
-  const outcomes = value.outcomes ?? {}, issues = []
+  const outcomes = value.outcomes ?? {}, processes = value.processes, issues = []
   if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
   if (value.mode !== 'personal') issues.push('mode')
   issues.push(...consumerEntryIssues(value))
+  // The original and reused process identity is mandatory, not an optional comparison.
+  if (!processes || !isSubstantive(processes.live) || !isSubstantive(processes.reused) || processes.live !== processes.reused)
+    issues.push('process')
   const same = outcomes.sameFile ?? {}
-  // A correct same-selection reuse may report REUSED (or RUNNING on a fresh start); it must keep the
-  // original PID. Other requests must never be silently reused with that PID.
-  if (!((same.status === 'REUSED' || same.status === 'RUNNING') && (same.instance?.pid ?? null) === value.firstPid)) issues.push('same_selection')
+  if (!((same.status === 'REUSED' || same.status === 'RUNNING') && Number.isSafeInteger(same.instance?.pid) &&
+    same.instance.pid === value.firstPid)) issues.push('same_selection')
+  else if (!isSubstantive(same.instance?.processStart) || same.instance.processStart !== processes?.reused) issues.push('process')
+  // Health digest observation is mandatory when the package supports it; a declared unsupported package must
+  // say so explicitly and carry its scope, rather than silently skipping the comparison.
+  if (value.digestAvailable === true) {
+    if (!HEX.test(String(value.healthDigest ?? '')) || value.sameDigest !== value.healthDigest) issues.push('digest')
+  } else if (value.packageDigestSupported !== false || !isSubstantive(value.digestScope)) issues.push('digest')
+  // Every negative request needs a real observed refusal terminal; a RUNNING response (even without a
+  // reused boolean) or a missing observation is not a refusal.
   for (const name of ['differentFile', 'missingFile', 'portChange', 'unboundThenSelection']) {
-    const item = outcomes[name] ?? {}
-    if (item.status === 'REUSED' || (item.status === 'RUNNING' && item.reused === true)) issues.push(name)
+    const item = outcomes[name]
+    if (!item || typeof item !== 'object' || item.status !== 'BLOCKED' || !isSubstantive(item.code)) issues.push(name)
+    else if (Number.isSafeInteger(item.instance?.pid) && item.instance.pid === value.firstPid) issues.push(name)
   }
-  if (value.processes && (value.processes.live === null || value.processes.live !== value.processes.reused)) issues.push('operation')
   if (!Number.isSafeInteger(value.pidAfterRefusals) || value.pidAfterRefusals !== value.firstPid ||
     !Number.isSafeInteger(value.pidAfterUnbound) || value.pidAfterUnbound !== value.unboundPid) issues.push('pid')
-  if (value.digestAvailable === true && (!HEX.test(String(value.healthDigest ?? '')) || value.sameDigest !== value.healthDigest)) issues.push('digest')
-  if (value.digestAvailable === false && !isSubstantive(value.scope)) issues.push('digest_scope')
   return issues
 }
 export function workflowFormatsIssues(value) {
@@ -1072,7 +1097,7 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
           for (const issue of fn(result.evidence?.[key]))
             failures.push(fail(key === 'ownershipMocks' ? (OWNERSHIP_ISSUE_CODES[issue] ?? 'ownershipMocks_invalid') : `${key}_invalid`, `${key} ${issue}`, entry.id))
