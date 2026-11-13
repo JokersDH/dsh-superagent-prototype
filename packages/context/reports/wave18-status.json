@@ -1,0 +1,82 @@
+{
+  "protocol": "agent-c-wave18-status/1",
+  "wave": "product-wave-18",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "f875ead",
+    "mergeCommit": "5550417",
+    "mainRuntimeBaseline": "e438ab5",
+    "previousOwnCommit": "a07e660",
+    "chainCheckpoint": "91ef57b",
+    "rootLockDiffPreserved": true
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "chain": {
+    "location": "packages/knowledge/test/main-snapshot-second-root.case.ts",
+    "sameStoreInputs": ["sdk reply candidate", "confirmed decision", "selected-context binding/history", "permission Q&A row", "held application.execute row"],
+    "snapshot": { "protocol": "workflow-snapshot/1", "evidence": "workflow-evidence/1", "created": "ok", "verified": "ok", "artifacts": "copied", "missingReferences": 0 },
+    "secondRoot": "recovery_readonly runtime + HTTP on the verified snapshot directory",
+    "frozenReads": ["candidates with identical payloadDigest", "context history entry", "message context bundleDigest identical", "context sources", "decisions list = 1"],
+    "refused": ["candidates/prepare", "proposals commands/prepare", "context preview", "assistant context prepare/send (incl. original token)", "decisions prepare", "start()"],
+    "heldQueue": "effect rows unchanged (1)",
+    "works": 0,
+    "modelCallsAfterRestore": 0,
+    "sourceFacts": "prepare/confirm not_granted, startupAvailable=false, target not created, activation audit equals confirm",
+    "formatDiagnostics": "copied snapshot with assistant_reply_results dropped verifies as blocked"
+  },
+  "consumerMap": {
+    "actualCalls": [
+      "GET /v1/messages/:id/candidates + /v1/assistant/candidates/prepare + /v1/proposals/commands (real SDK fixture)",
+      "main context preview default C factory (600 boundary partial/issues)",
+      "recovery_readonly runtime+HTTP over a real workflow-snapshot/1 restored root",
+      "POST /v1/recovery/source/prepare|confirm + GET /v1/recovery/activations/:id",
+      "main CompletedAssistantReplies.readVerified"
+    ],
+    "moduleOnly": [
+      "selectRelevantSources / candidate batches",
+      "projectSourceReview",
+      "collectContextHistory (used directly on real A18 tables in tests; main history HTTP has its own reader)"
+    ]
+  },
+  "readonlyReplay": {
+    "reviewOnly": ["candidates", "context history", "frozen context/sources", "decisions catalog"],
+    "businessRefused": "all non-GET except source prepare/confirm return 422",
+    "oldToken": "original context send token replay -> 422",
+    "replayEvidence": ["candidate confirm receipt replays after artifact corruption with no model resend", "source confirm audit equals original record"]
+  },
+  "costEvidence": {
+    "provider": "1 call per reply; 8 candidates + 30k text still 1",
+    "snapshot": "one SQLite backup + registered artifact copies only",
+    "readonly": "no effects, no held queue consumption, no model resend",
+    "scanBoundary": "610 excluded rows -> preview partial + conversation_scan_incomplete"
+  },
+  "probes": {
+    "wave18COnlyWrapper": { "passed": 4, "failed": 0, "evidence": "packages/context/reports/wave18-c-probe.json" },
+    "wave18FullAFormat": { "status": "NOT_REACHED_FOR_A_FORMAT", "passed": 0, "failed": 2, "owner": "A", "reason": "old-producer v1 non-empty binding digest compatibility; C flow uses main admitted v1 format instead" },
+    "wave15": { "passed": 4 }, "wave14": { "passed": 6 }, "wave13": { "passed": 6 }, "wave12": { "passed": 8 }, "wave11": { "passed": 17 }
+  },
+  "ownedRegressions": {
+    "contextTests": { "passed": 124, "failed": 0 },
+    "proposalsTests": { "passed": 41, "failed": 0 },
+    "knowledgeTests": { "passed": 97, "failed": 0 },
+    "routingTests": { "passed": 44, "failed": 0 },
+    "typecheck": "pass",
+    "build": "pass"
+  },
+  "notReached": [
+    { "item": "A real old-producer v1 digest compatibility and v2 format", "owner": "A", "reason": "probe A half fails; only that format is blocked, not the main-v1 second-root flow" },
+    { "item": "real Broker question/answer recovery", "owner": "B/main", "reason": "native/model turns stay 0; permission Q&A persistence row is covered, not native Broker origin" },
+    { "item": "main private startup permission / target activation / native value", "owner": "main" },
+    { "item": "assistant SSE admission", "owner": "main", "reason": "not read by C consumers" },
+    { "item": "C module-only projections wired into main HTTP", "owner": "main" }
+  ],
+  "preserved": {
+    "userServices": "5180/8796 through 5191/8807 untouched",
+    "historicalReports": "wave01-wave17 reports unchanged",
+    "rootLock": "pnpm-lock.yaml diff preserved and not committed",
+    "eAssertions": "unchanged"
+  }
+}

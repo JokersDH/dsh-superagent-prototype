@@ -1,0 +1,26 @@
+{
+  "protocol": "wave18-c-only/1",
+  "sourceCommit": "555041774b5b5ad14eb0d18797fd4b779d9399ae",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "observations": [
+    {
+      "id": "TYPED",
+      "status": "PASS"
+    },
+    {
+      "id": "OUTER",
+      "status": "PASS"
+    },
+    {
+      "id": "NESTED_BODY",
+      "status": "PASS"
+    },
+    {
+      "id": "NESTED_PRINCIPAL",
+      "status": "PASS"
+    }
+  ],
+  "passed": 4,
+  "failed": 0
+}
