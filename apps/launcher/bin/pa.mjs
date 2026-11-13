@@ -121,7 +121,7 @@ function commandSpecs() {
       open: 'boolean',
       'no-build': 'boolean',
     },
-    'review-restored': { ...COMMON, state: 'string', project: 'string', 'allow-path': 'list', 'exclude-path': 'list', out: 'string' },
+    'review-restored': { ...COMMON, state: 'string', project: 'list', 'allow-path': 'list', 'exclude-path': 'list', out: 'string' },
     stop: { ...COMMON, timeout: 'string' },
     backup: { ...COMMON, out: 'string', label: 'string' },
     'verify-backup': { ...COMMON, bundle: 'string' },

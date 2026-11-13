@@ -57,6 +57,9 @@ try {
   const manifest = JSON.parse(readFileSync(join(install, 'install.json'), 'utf8'))
   const seedState = join(root, 'seed-state')
   cpSync(business, seedState, { recursive: true, errorOnExist: true })
+  chmodSync(seedState, 0o700)
+  const businessProjects = JSON.parse(readFileSync(join(seedState, 'native-projects.json'), 'utf8')).projects
+  const businessProjectId = businessProjects[0]?.id
   const runRoot = join(root, 'run')
   const roots = Object.fromEntries(['config', 'cache', 'logs', 'workspace'].map((k) => [k, join(runRoot, k)]))
   for (const p of Object.values(roots)) mkdirSync(p, { recursive: true, mode: 0o700 })
@@ -76,6 +79,8 @@ try {
   const seedAuth = { authorization: `Bearer ${readFileSync(join(seedState, 'api.key'), 'utf8').trim()}` }
   const sget = async (path) => { const res = await fetch(`http://127.0.0.1:${seedApi}${path}`, { headers: seedAuth }); return { status: res.status, body: await res.json() } }
   const spost = async (path, body) => { const res = await fetch(`http://127.0.0.1:${seedApi}${path}`, { method: 'POST', headers: { ...seedAuth, 'content-type': 'application/json' }, body: JSON.stringify(body) }); return { status: res.status, body: await res.json() } }
+  const suggestionsOn = await spost('/v1/assistant/suggestions', { enabled: true })
+  if (suggestionsOn.status !== 200 || suggestionsOn.body.suggestionsEnabled !== true) throw new Error('could not enable suggestions')
   const projectDir = join(root, 'project'); mkdirSync(projectDir, { mode: 0o700 })
   writeFileSync(join(projectDir, 'README.md'), '# wave22 same store\n', { mode: 0o600 })
   const git = (...args) => { const r = spawnSync('git', ['-c', 'user.email=wave22@fixture.invalid', '-c', 'user.name=wave22', ...args], { cwd: projectDir, encoding: 'utf8' }); if (r.status !== 0) throw new Error('git failed') }
@@ -117,7 +122,7 @@ try {
   const reviewFirst = run(cli, ['first-run', '--json', ...reviewArgs], [0], env)
   if (!['READY', 'OK'].includes(reviewFirst.json?.status)) throw new Error('review first-run failed')
   const reviewPath = join(root, 'review.json')
-  const preparedReview = run(cli, ['review-restored', '--json', '--state', reviewState, '--project', project.id, '--allow-path', '.', '--out', reviewPath], [0], env)
+  const preparedReview = run(cli, ['review-restored', '--json', '--state', reviewState, '--project', project.id, '--project', businessProjectId, '--allow-path', '.', '--out', reviewPath], [0], env)
   if (preparedReview.json?.status !== 'prepared') throw new Error('same-package review preparation failed')
   const rConsole = await freePort(); let rApi = await freePort(); if (rApi === rConsole) rApi = await freePort()
   const rOut = openSync(join(root, 'review.out.log'), 'w', 0o600), rErr = openSync(join(root, 'review.err.log'), 'w', 0o600)
