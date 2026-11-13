@@ -1,0 +1,194 @@
+{
+  "protocol": "wave17-b-admission/1",
+  "status": "PASS_SCOPED_B16_RECEIVER_HALF_PRODUCT_COMPOSITION_NOT_REACHED",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "source": "8d7ddce71be191cab9789c78c3592fc1c7ee1905",
+  "mainSource": "7a2f9e98ef8c52680e7766a25cc83aa13e3253b9",
+  "previousReviewedCandidate": "c7f7e77e405f33a612c59c69c8305245917a5b44",
+  "realModelTurns": 0,
+  "vendorNativeTurnStarts": 0,
+  "budgetLedgerOpened": false,
+  "productionBusinessRecoveryAdmitted": false,
+  "physicalWriterBarrierAdmitted": false,
+  "newCommittedFiles": [
+    "apps/runner/src/runner-service-entry.ts",
+    "apps/runner/src/runner-service.ts",
+    "tests/native-acceptance/b16-native-begin.mjs",
+    "tests/native-acceptance/reports/wave16-status.json"
+  ],
+  "untrackedFilesExcludedFromDelivery": [
+    {
+      "path": "tests/native-acceptance/b16-real-begin.mjs",
+      "observedStatus": "untracked",
+      "readForContext": true,
+      "executed": false,
+      "countedAsCommittedDelivery": false,
+      "scope": "Neither its intended product integration nor its claimed/partial business rows are accepted as submitted evidence."
+    }
+  ],
+  "commands": [
+    {
+      "command": "env -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN node tests/native-acceptance/b16-native-begin.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "notTested": 1,
+      "runnerPid": 77388,
+      "coordinatorPid": 77303,
+      "receiver": {
+        "begin": 1,
+        "answer": 0,
+        "cancel": 0,
+        "attemptId": "attempt-1",
+        "fenceEpoch": 1
+      },
+      "criticalFacts": ["dispatch.observed", "turn.ended"],
+      "factCount": 2,
+      "policyPreparedFact": false,
+      "questionOpenedFact": false,
+      "productDatabaseOpenedByHarness": false,
+      "factSink": "In-memory facts array; the harness returns persisted:true and seq without an A ProductStore transaction.",
+      "physicalChildWriterCreatedByScenario": false,
+      "scope": "Real RunnerLink child process and existing AttemptRunner/Driver over an explicitly selected in-process fake app-server. This is new receiver evidence, not the old inert B14 service."
+    },
+    {
+      "command": "env -u PA_RUNNER_SCENARIO -u PA_RUNNER_RECEIVER_LOG -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN node --test apps/runner/test/runner-service.test.ts apps/runner/test/native-write-admission.test.ts apps/runner/test/preparation-service.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 17,
+      "failed": 0,
+      "scope": "Existing bounded bridge/bootstrap/fact/answer/cancel, write-admission and controlled preparation/physical-process regression fixtures. These preserve existing scopes and do not supply B16 product recovery coverage."
+    },
+    {
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes --skipLibCheck --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --types node apps/runner/src/runner-service.ts apps/runner/src/runner-service-entry.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "diagnostics": 0,
+      "scope": "Both changed Runner source modules and their source import closure under strict/exactOptionalPropertyTypes."
+    },
+    {
+      "command": "NODE_OPTIONS='--import=/tmp/pa-wave15-b-source-loader.mjs' env -u PA_RUNNER_SCENARIO -u PA_RUNNER_RECEIVER_LOG -u PA_RUNNER_RECOVERY_ROOT -u PA_RUNNER_ENVIRONMENT_PLAN node tests/native-acceptance/b13-vertical-production.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 6,
+      "failed": 0,
+      "notTested": 1,
+      "normalPathRows": {
+        "works": 1,
+        "ticket": 1,
+        "ticket_links": 1,
+        "user_questions": 1,
+        "answer_deliveries": 1,
+        "fact_receipts": 7,
+        "dispatch_receipts": 2,
+        "artifacts": 20,
+        "event_log": 51
+      },
+      "scope": "Existing real normal Application/create_work/Effects/controlled Runner/Broker/answer/accept and narrowly scoped durable-question SIGKILL evidence remain intact. The temporary loader resolves contracts to candidate source; it changes no test or production assertions."
+    },
+    {
+      "command": "git ls-files --error-unmatch tests/native-acceptance/b16-real-begin.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "scope": "Confirms the separate attempted product integration is untracked and excluded from submitted delivery."
+    }
+  ],
+  "newAdmissibleSlice": {
+    "label": "Actual separate Runner receiver half",
+    "entry": "tests/native-acceptance/b16-native-begin.mjs",
+    "path": [
+      "RunnerLink.spawnAttempt",
+      "real Node child running runner-service-entry.ts",
+      "serveRunner command frame",
+      "existing AttemptRunner",
+      "existing CodexNativeDriver with explicit createFakeAppServer transport",
+      "dispatch.observed and turn.ended crossing the bridge"
+    ],
+    "receiverLogging": {
+      "file": "apps/runner/src/runner-service.ts",
+      "line": 295,
+      "scope": "The optional log observes actual received commands before admission. Its begin count alone is not an authorization/acceptance/durable-receipt proof; the independently observed critical facts establish that this test's begin also ran."
+    },
+    "scenarioSelection": {
+      "file": "apps/runner/src/runner-service-entry.ts",
+      "line": 26,
+      "scope": "PA_RUNNER_SCENARIO explicitly selects codex-fake in the submitted harness. The absent-variable argv behavior remains. No installed vendor executable is used by this test."
+    },
+    "candidateScopeHonest": true,
+    "fullWave16B1Complete": false
+  },
+  "remainingGates": [
+    {
+      "id": "PRODUCT_PERSISTENCE_AND_RECEIVER_NOT_JOINED",
+      "priority": 1,
+      "file": "tests/native-acceptance/b16-native-begin.mjs",
+      "line": 60,
+      "observation": "The submitted receiver harness builds a test AttemptSpec directly and ACKs facts into an in-memory array. It never creates Application/create_work, Effects, QuestionBroker or A ProductStore business rows. The existing B13 product path and new B16 receiver are two separately proven halves; neither proves their composition.",
+      "businessRows": "Not measured: no product database is opened in the committed receiver harness. Do not replace this with invented zero rows or the untracked product attempt's row counts."
+    },
+    {
+      "id": "QUESTION_AND_PHYSICAL_CHILD_WRITER_NOT_IN_THIS_SCENARIO",
+      "priority": 1,
+      "file": "apps/runner/src/runner-service-entry.ts",
+      "line": 43,
+      "relatedFile": "packages/drivers/codex-native/src/fake-app-server.ts",
+      "relatedLine": 82,
+      "observation": "codex-fake uses an in-process transport with approval=false. The run emits no question.opened and creates no ProcessHost-controlled child writer. The Runner's own PID is a real process identity, but is not a writer birth PID/start/UID/resource manifest or a physical barrier."
+    },
+    {
+      "id": "NO_NEW_BUSINESS_RECONNECT_PORT_OR_RECOVERED_CONTROL",
+      "priority": 1,
+      "observation": "The only production source changes are scenario selection and receiver logging. No new business reconnect API/adapter, authenticated recovered feed, Broker answer recovery, stop-ACK recovery with an actual writer, valid positive stale-epoch matrix, recovered verification/acceptance or 2/4-slot resource return is delivered."
+    }
+  ],
+  "preparationBlockerAssessment": {
+    "candidateClaim": "NativeProductAttempt waits for preparation, so the attempted product join without an environment plan never sends begin.",
+    "verifiedSourceRelationship": [
+      "apps/coordinator/product/native-attempt.ts:139 resolves its prepared promise only after an accepted policy.prepared fact and :150 waits for it before launch returns.",
+      "apps/runner/src/runner-service-entry.ts:37 sets eagerPrepare only for codex-native. Selecting codex-fake sets it false and also selects a different Driver.",
+      "packages/drivers/codex-native/src/index.ts:133 waits for begin commands and does not produce policy.prepared.",
+      "packages/drivers/codex-native/src/native.ts:219 produces policy.prepared on the real product Driver path, independently of whether the optional Runner environment-plan callback is present."
+    ],
+    "conclusion": "The chosen fake scenario cannot satisfy the existing product preparation contract: product waits for policy.prepared while this fake waits for begin and never emits that policy fact. The evidence does not establish that main lacks a preparation hook or that its guard should be weakened. Test the actual product Driver with a B-owned controlled fake executable/transport that completes its required preparation handshake; preserve the existing before-write and policy proofs.",
+    "untrackedAttemptExecuted": false
+  },
+  "preservedScopes": {
+    "B13NormalProductAndQuestionRowCrash": "Rerun passed 6 PASS + 1 NOT_TESTED on this candidate; not used as recovered-business evidence.",
+    "B14IndependentInertService": "The prior current-cancel/authenticated-service reconnect/structured-output scope remains. B14 sources are unchanged by 8d7ddce and were not rerun as an obsolete negative gate against B16.",
+    "priorHelperAdmission": "Prior old9/helper68 scopes remain; these unchanged helpers were not repeatedly retested in this targeted Runner audit.",
+    "nativeCompatibility": "NOT_TESTED: no vendor/model/native turn."
+  },
+  "wave16PacketAssessment": {
+    "B1": "PARTIAL: actual separate Runner receives one begin and produces two facts; Application/Effects/Broker and A business state not joined.",
+    "B2": "NOT_REACHED: no new persistent business reconnect port/RFC/consumer.",
+    "B3": "NOT_REACHED: no controlled child writer birth PID/start/UID/resource manifest in the submitted B16 scenario.",
+    "B4": "NOT_REACHED: no original Work/effect-driven begin send/receive/ACK/receipt crash windows.",
+    "B5": "NOT_REACHED: no recovered Broker answer to original session/request/attempt/epoch.",
+    "B6": "NOT_REACHED: no B16 real-child-writer stop and physical barrier recovery matrix.",
+    "B7": "NOT_REACHED: no schema-valid positive stale-epoch/current positive control or version/session late-ACK matrix.",
+    "B8": "NOT_REACHED: no actual recovered path through verification/current candidate/human accept.",
+    "B9": "NOT_REACHED: no linked 2/4-slot workload, backpressure or FD/child/queue return matrix.",
+    "B10": "PARTIAL: a committed wave16-status.json now truthfully records receiver half and remaining stages; no middle/final production recovery delivery."
+  },
+  "nextLargeTask": {
+    "title": "Compose the actual product Driver, persistent application state and independent Runner recovery",
+    "firstCheckpoint": "Retain the new receiver log and real RunnerLink path, but exercise CodexProductDriver/native.ts and its preparation protocol using a B-owned fake app-server executable controlled by ProcessHost. Complete the same policy.prepared/expected-settings contract instead of switching off eager preparation. Submit a committed create_work/Application/Effects/Runner/Broker scenario with actual begin, question and linked A Work/Ticket/binding/fact/dispatch rows; record real child writer PID/start/UID/root/attempt/resource identities.",
+    "middleCheckpoint": "Publish the minimal B-owned persistent business reconnect adapter/port and precise main-integration RFC. Reconnect a fresh coordinator to the same actual Runner/child using original command/session/attempt/positive epoch and current before-write authorization. Cover bounded begin, Broker answer and stop send/receive/ACK/receipt fault windows, unknown retention and full authenticated resource manifests.",
+    "finalCheckpoint": "Continue one interrupted original work to machine verification/current candidate/human accept, then bounded two/four-slot isolation, control priority/output caps and resource/queue return. Preserve normal and recovered scopes separately and use zero vendor native/model turns throughout."
+  },
+  "preservation": {
+    "candidateTrackedFilesEdited": [],
+    "untrackedB16RealBeginPreserved": true,
+    "preexistingDirtyReportsRetained": [
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json"
+    ],
+    "userServicesTouched": false,
+    "privateProfilesTouched": false,
+    "budgetLedgerTouched": false,
+    "historicalReportsOverwritten": false,
+    "vendorExecutableOrModelProtocolStarted": false,
+    "onlyMainArtifactWritten": "reports/releases/wave17-admission/runtime.json"
+  }
+}

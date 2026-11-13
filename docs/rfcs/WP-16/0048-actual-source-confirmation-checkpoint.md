@@ -2,6 +2,8 @@
 
 2026-11-13。主线在697efdc实际inspect/prepare与1169535候选工作台上补齐source确认，不把本轮A/C/D/E缺少这个入口当作整包失败。仅记录恢复源意图，始终`authorization=not_granted/startupAvailable=false`；没有target materialize、数据库创建、私有启动许可、Runner或旧queue消费。
 
+后续6050b4b额外核对当前打开数据库的真实父目录与配置source root一致，拒绝目录替代。最终新测试14项、clean恢复/候选/提案106项通过；下文13/105等早期数字保留对应e32检查点范围。新运行source为6050b4b，无需为了文档更新重启任何旧实例。
+
 ## 实际接口
 
 - `POST /v1/recovery/source/prepare`：严格JSON `{preflight:{expectedFingerprint,bindings},targetStateRoot}`。服务端重做现有只读项目/Git/当前executor/artifact预检，要求完整逻辑源、可验证marker和无材料/扫描阻断。历史资源待新核对可继续记录意图，但不会获得物理停止或启动证明。
