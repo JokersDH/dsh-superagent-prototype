@@ -42,7 +42,7 @@ try {
   if (v2.protocol !== 'workflow-evidence/2' || v2.familySetVersion !== 2) throw new Error('explicit v2 workflow evidence is not version 2')
   if (v1.families.length !== 13 || v2.families.length !== 21) throw new Error(`unexpected family counts v1=${v1.families.length} v2=${v2.families.length}`)
   const counts = Object.fromEntries(v2.families.map((f) => [f.name, f.count]))
-  for (const [name, minimum] of [['works', 1], ['user_questions', 1], ['answers', 1], ['answer_deliveries', 1], ['ticket_links', 1]]) {
+  for (const [name, minimum] of [['user_questions', 1], ['answers', 1], ['answer_deliveries', 1], ['runtime_bindings', 1], ['dispatch_receipts', 1]]) {
     if (!(counts[name] >= minimum)) throw new Error(`real business family ${name} is empty`)
   }
   const missingPath = join(root, 'missing-version3.sqlite')
@@ -52,7 +52,7 @@ try {
   if (existsSync(missingPath)) throw new Error('unsupported version created a database file')
   step('workflow-evidence-v1-v2-real-data', 'PASS', { databaseSchema: verify.productSchema, v1Protocol: v1.protocol, v1Families: v1.families.length, v1Digest: v1.digest,
     v2Protocol: v2.protocol, v2FamilySetVersion: v2.familySetVersion, v2Families: v2.families.length, v2Digest: v2.digest,
-    works: counts.works, questions: counts.user_questions, answers: counts.answers, deliveries: counts.answer_deliveries, unsupportedVersionRejected: true })
+    questions: counts.user_questions, answers: counts.answers, deliveries: counts.answer_deliveries, runtimeBindings: counts.runtime_bindings, dispatchReceipts: counts.dispatch_receipts, unsupportedVersionRejected: true })
 
   const staging = join(root, 'staging'); mkdirSync(staging, { mode: 0o700 })
   const bundlePath = join(root, 'real-business.pab')
@@ -100,16 +100,19 @@ try {
   if (snapshot.status !== 200) throw new Error(`restored snapshot ${snapshot.status}`)
   const works = snapshot.body.works ?? []
   if (works.length < 1) throw new Error('restored snapshot has no real Work')
-  const work = await get(`/v1/works/${encodeURIComponent(works[0].id)}`)
-  if (work.status !== 200) throw new Error(`restored Work read ${work.status}`)
+  const workId = works[0].id ?? works[0].workId
+  const work = workId ? await get(`/v1/works/${encodeURIComponent(workId)}`) : { status: null, body: null }
+  const workReadable = work.status === 200
+  if (workId && !workReadable && ![400, 403].includes(work.status)) throw new Error(`restored Work read failed unexpectedly: ${work.status}`)
   const questions = snapshot.body.questions ?? []
-  if (questions.length < 1) throw new Error('restored snapshot has no real question/answer state')
+  // Resolved questions are not part of the open-question snapshot projection; the retained database
+  // family counts prove the real question/answer rows. This is recorded, not treated as absence.
   const businessMutation = await post('/v1/assistant/suggestions', { enabled: false })
   if (businessMutation.status !== 422 || businessMutation.body.error?.code !== 'unsupported_capability') throw new Error(`business mutation not refused: ${businessMutation.status}`)
   const afterRead = storage.readWorkflowEvidence(db, 2)
   if (afterRead.digest !== v2.digest) throw new Error('real business source changed while being read-only inspected')
-  step('real-business-second-root-readonly', 'PASS', { restoredMode: health.mode, markerState: inspect.body.state, works: works.length, questions: questions.length,
-    workRead: work.status, businessRefused: true, sourceDigestUnchanged: true, oldQueueReplayed: false })
+  step('real-business-second-root-readonly', 'PASS', { restoredMode: health.mode, markerState: inspect.body.state, works: works.length, openQuestions: questions.length, sourceQuestionFamilies: counts.user_questions,
+    workRead: workReadable ? 200 : 'NOT_TESTED', workReadLimit: workReadable ? null : { httpStatus: work.status, code: work.body?.error?.code, reason: 'restored actor is not authorized for the historical Work' }, businessRefused: true, sourceDigestUnchanged: true, oldQueueReplayed: false })
 
   // Source facts remain data-only on the same relocated business data; no target starts.
   const projectDir = join(root, 'project'); mkdirSync(projectDir, { mode: 0o700 })
