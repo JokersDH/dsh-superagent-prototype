@@ -1,0 +1,171 @@
+{
+  "$defs": {
+    "AssistantCandidatePrepare": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "maximum": 7,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "messageId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "payloadDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "messageId",
+        "index",
+        "payloadDigest"
+      ],
+      "type": "object"
+    },
+    "AssistantCandidates": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "const": "none",
+          "type": "string"
+        },
+        "candidates": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "index": {
+                "maximum": 7,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "kind": {
+                "enum": [
+                  "propose_work",
+                  "propose_revision",
+                  "propose_decision"
+                ],
+                "type": "string"
+              },
+              "payloadDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "requiredInputs": {
+                "items": {
+                  "enum": [
+                    "work.scope",
+                    "work.criteria",
+                    "work.profileId",
+                    "revision.goal",
+                    "revision.scope",
+                    "revision.criteria"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 6,
+                "readOnly": true,
+                "type": "array"
+              },
+              "summary": {
+                "maxLength": 2000,
+                "type": "string"
+              }
+            },
+            "required": [
+              "index",
+              "kind",
+              "summary",
+              "payloadDigest",
+              "requiredInputs"
+            ],
+            "type": "object"
+          },
+          "maxItems": 8,
+          "readOnly": true,
+          "type": "array"
+        },
+        "conversationId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "executable": {
+          "const": false,
+          "type": "boolean"
+        },
+        "messageId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "assistant-candidates/1",
+          "type": "string"
+        },
+        "rejected": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "index": {
+                "maximum": 7,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "reason": {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "index",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "maxItems": 8,
+          "readOnly": true,
+          "type": "array"
+        },
+        "replyMessageId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "unavailable",
+            "none",
+            "candidates"
+          ],
+          "type": "string"
+        },
+        "trust": {
+          "const": "untrusted_data",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "messageId",
+        "replyMessageId",
+        "projectId",
+        "conversationId",
+        "status",
+        "candidates",
+        "rejected",
+        "trust",
+        "authorization",
+        "executable"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:assistant-candidates:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

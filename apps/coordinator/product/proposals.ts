@@ -3,20 +3,26 @@ import { z } from 'zod'
 import {
   CommandReceiptSchema, DigestSchema, IdSchema, PersistedProposalSchema,
   ProposalCommandSchema, ProposalPrepareSchema, ProposalPreviewSchema, ScopeSchema, TimestampSchema, TrustedActorSchema,
+  AssistantCandidatePrepareSchema, AssistantCandidatesSchema,
 } from '@personal-agent/contracts'
-import type { AppError, CommandReceipt, PersistedProposal, PreparedUserCommand, ProposalCommand, ProposalPrepare, ProposalPreview, Scope, TrustedActor } from '@personal-agent/contracts'
+import type { AppError, AssistantCandidatePrepare, AssistantCandidates, CommandReceipt, PersistedProposal, PreparedUserCommand, ProposalCommand, ProposalPrepare, ProposalPreview, Scope, TrustedActor } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import type { ProductApplication } from '@personal-agent/application'
-import { AssistantProposalService, planProposalCommand, ProposalError, proposalIntent } from '@personal-agent/proposals'
+import { AssistantProposalService, planProposalCommand, proposalDigest, ProposalError, proposalIntent, reviewReplyCandidates } from '@personal-agent/proposals'
 import type { CommandPlan, PreparedProposal } from '@personal-agent/proposals'
 import { canonicalDigest, WorkflowConflict } from '@personal-agent/storage'
 import type { ProductStore } from '@personal-agent/storage'
 import { key } from '@personal-agent/orchestrator-core'
 import type { ProductDecisions } from './decisions.ts'
+import type { CompletedAssistantReplies } from './assistant-reply-results.ts'
 
 const digest = (value: unknown) => canonicalDigest(JSON.parse(JSON.stringify(value)))
+const ReplyOriginSchema = z.strictObject({ requestId: IdSchema, replyMessageId: IdSchema, index: z.number().int().min(0).max(7),
+  payloadDigest: DigestSchema, requestDigest: DigestSchema, artifactDigest: DigestSchema, sourceTextDigest: DigestSchema })
+type ReplyOrigin = z.infer<typeof ReplyOriginSchema>
 const SignedSchema = z.strictObject({ version: z.literal(1), userId: IdSchema, authorityRef: IdSchema, grantDigest: DigestSchema,
-  record: PersistedProposalSchema.refine(value => value.state === 'pending' && value.version === 1), expiresAt: TimestampSchema })
+  record: PersistedProposalSchema.refine(value => value.state === 'pending' && value.version === 1), expiresAt: TimestampSchema,
+  replyOrigin: ReplyOriginSchema.optional() })
 type Signed = z.infer<typeof SignedSchema>
 const asPrepared = (record: PersistedProposal): PreparedProposal => ({
   proposalId: record.proposalId, projectId: record.projectId, conversationId: record.conversationId,
@@ -35,12 +41,14 @@ export class ProductProposals {
   private readonly secret: Buffer
   private readonly now: () => string
   private readonly service: AssistantProposalService
+  private readonly completed: CompletedAssistantReplies | undefined
   constructor(store: ProductStore, application: ProductApplication, decisions: ProductDecisions,
     principal: { userId: string; authorityRef: string }, projects: () => readonly { id: string; scope: Scope }[],
-    secret: Uint8Array, now = () => new Date().toISOString()) {
+    secret: Uint8Array, now = () => new Date().toISOString(), completed?: CompletedAssistantReplies) {
     if (secret.byteLength < 32) throw new TypeError('Proposal previews require a private signing key')
     this.store = store; this.application = application; this.decisions = decisions; this.principal = structuredClone(principal)
     this.projects = projects; this.secret = Buffer.from(secret); this.now = now
+    this.completed = completed
     this.service = new AssistantProposalService(store.workflows.assistant, { now: () => new Date(this.now()) })
   }
   private actor(input: TrustedActor) {
@@ -83,7 +91,63 @@ export class ProductProposals {
       return { code: 'conflict', message: 'Proposal state, input or source changed; prepare again', retry: 'user_action' }
     return undefined
   }
+  private replySource(messageId: string) {
+    const message = this.store.product.messages.getById(IdSchema.parse(messageId))
+    if (!message?.projectId || message.anchor) throw new ApplicationFault('forbidden', 'Candidate source is not an ordinary configured user message', 'none')
+    const project = this.project(message.projectId), source = this.source(message.id, project.id, message.conversationId)
+    const verified = this.completed?.readVerified(key('assistant-request', message.id))
+    return { project, source, verified }
+  }
+  replyCandidates(messageId: string): AssistantCandidates {
+    const { project, source, verified } = this.replySource(messageId)
+    const candidates: AssistantCandidates['candidates'][number][] = [], rejected: AssistantCandidates['rejected'][number][] = []
+    if (verified && verified.inference.sourceTextDigest) for (const [index, payload] of verified.body.suggestions.entries()) {
+      const target = payload.kind === 'propose_revision' ? this.store.product.works.get(payload.expected.workId) : undefined
+      const current = target && target.projectId === project.id && target.conversationId === source.conversationId &&
+        payload.kind === 'propose_revision' && this.store.authority.isCurrent(payload.expected) ? payload.expected : undefined
+      const review = reviewReplyCandidates({ ...verified.body, suggestions: [payload] }, {
+        projectId: project.id, conversationId: source.conversationId, sourceMessageId: source.id,
+        grantId: key('proposal-grant', project.id, digest(project.scope)), grantScope: project.scope,
+        ...(current ? { currentContract: current } : {}),
+      })
+      const candidate = review.candidates[0]
+      if (candidate && candidate.kind !== 'reply') candidates.push({ index, kind: candidate.kind,
+        summary: candidate.summary, payloadDigest: candidate.payloadDigest,
+        requiredInputs: candidate.plan.kind === 'needs_user_input' ? ProposalPreviewSchema.shape.requiredInputs.parse(candidate.plan.missing) : [] })
+      else if (review.rejected[0]) rejected.push({ index, reason: review.rejected[0].reason.slice(0, 100) })
+    }
+    return AssistantCandidatesSchema.parse({ protocol: 'assistant-candidates/1', messageId: source.id,
+      replyMessageId: key('assistant-reply', source.id), projectId: project.id, conversationId: source.conversationId,
+      status: !verified || !verified.inference.sourceTextDigest ? 'unavailable' : candidates.length ? 'candidates' : 'none',
+      candidates, rejected, trust: 'untrusted_data', authorization: 'none', executable: false })
+  }
+  private validateReplyOrigin(record: Pick<PersistedProposal, 'payloadDigest' | 'sourceMessageId' | 'sourceTextDigest' | 'projectId' | 'conversationId'>, origin: ReplyOrigin) {
+    const verified = this.completed?.readVerified(origin.requestId), payload = verified?.body.suggestions[origin.index]
+    if (!verified || !payload || payload.kind === 'reply' ||
+      verified.body.sourceMessageId !== record.sourceMessageId || verified.body.projectId !== record.projectId ||
+      verified.body.conversationId !== record.conversationId || verified.body.replyMessageId !== origin.replyMessageId ||
+      verified.result.requestDigest !== origin.requestDigest || verified.result.artifactDigest !== origin.artifactDigest ||
+      verified.inference.sourceTextDigest !== origin.sourceTextDigest || origin.sourceTextDigest !== record.sourceTextDigest || proposalDigest(payload) !== origin.payloadDigest ||
+      record.payloadDigest !== origin.payloadDigest)
+      throw new ApplicationFault('verification_failed', 'The original reply candidate changed or cannot be verified', 'none')
+  }
+  async prepareReplyCandidate(input: AssistantCandidatePrepare, inputActor: TrustedActor): Promise<ProposalPreview> {
+    const value = AssistantCandidatePrepareSchema.parse(input), actor = this.actor(inputActor)
+    const { project, source, verified } = this.replySource(value.messageId)
+    const candidate = this.replyCandidates(value.messageId).candidates.find(candidate => candidate.index === value.index)
+    const payload = verified?.body.suggestions[value.index]
+    if (!verified?.inference.sourceTextDigest || !candidate || !payload || payload.kind === 'reply' ||
+      candidate.payloadDigest !== value.payloadDigest || proposalDigest(payload) !== value.payloadDigest)
+      throw new ApplicationFault('conflict', 'Candidate identity or current authorization changed; review again')
+    const origin = ReplyOriginSchema.parse({ requestId: verified.result.requestId, replyMessageId: verified.body.replyMessageId,
+      index: value.index, payloadDigest: value.payloadDigest, requestDigest: verified.result.requestDigest,
+      artifactDigest: verified.result.artifactDigest, sourceTextDigest: verified.inference.sourceTextDigest })
+    return this.prepareBound({ projectId: project.id, conversationId: source.conversationId, sourceMessageId: source.id, payload }, actor, origin)
+  }
   async prepare(input: ProposalPrepare, inputActor: TrustedActor): Promise<ProposalPreview> {
+    return this.prepareBound(input, inputActor)
+  }
+  private async prepareBound(input: ProposalPrepare, inputActor: TrustedActor, replyOrigin?: ReplyOrigin): Promise<ProposalPreview> {
     const value = ProposalPrepareSchema.parse(input), actor = this.actor(inputActor)
     if (this.store.uow.nesting) throw new ApplicationFault('invalid_request', 'Proposal preparation runs outside transactions')
     const project = this.project(value.projectId), source = this.source(value.sourceMessageId, project.id, value.conversationId)
@@ -99,10 +163,11 @@ export class ProductProposals {
       throw error
     })
     this.validate(prepared)
+    if (replyOrigin) this.validateReplyOrigin(prepared, replyOrigin)
     const record = PersistedProposalSchema.parse({ ...prepared, state: 'pending', updatedAt: prepared.createdAt })
     const plan = planProposalCommand(proposalIntent(record.payload), { commandId: 'proposal-preview', conversationId: record.conversationId })
     const signed = SignedSchema.parse({ version: 1, userId: actor.userId, authorityRef: actor.authorityRef,
-      grantDigest: digest(project.scope), record, expiresAt })
+      grantDigest: digest(project.scope), record, expiresAt, ...(replyOrigin ? { replyOrigin } : {}) })
     const body = Buffer.from(JSON.stringify(signed)).toString('base64url')
     return ProposalPreviewSchema.parse({ protocol: 'proposal-preview/1', record, expiresAt,
       requiredInputs: plan.kind === 'needs_user_input' ? plan.missing : [], token: `${body}.${this.signature(body)}` })
@@ -120,6 +185,7 @@ export class ProductProposals {
       throw new ApplicationFault('forbidden', 'Proposal preview belongs to another user or scope', 'none')
     if (Date.parse(signed.expiresAt) <= Date.parse(this.now()) || signed.grantDigest !== digest(this.project(command.projectId).scope))
       throw new ApplicationFault('stale_contract', 'Proposal preview or grant expired or changed')
+    if (signed.replyOrigin) this.validateReplyOrigin(signed.record, signed.replyOrigin)
     return signed
   }
   async dispatch(input: ProposalCommand, inputActor: TrustedActor): Promise<CommandReceipt> {

@@ -75,6 +75,9 @@
             "error"
           ],
           "type": "string"
+        },
+        "suggestionsEnabled": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -151,6 +154,19 @@
         "revision",
         "phase",
         "text"
+      ],
+      "type": "object"
+    },
+    "AssistantSuggestionsSetting": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled"
       ],
       "type": "object"
     }
