@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-13T14:59:29.075Z",
+  "checkedAt": "2026-11-13T16:28:39.111Z",
   "source": {
-    "commit": "7443efd08cfba165c93624b3ab63ed4d462f5b78",
+    "commit": "3213d43fdd95e174b0a77ffff64ce7e8460badea",
     "dirty": false
   },
-  "expectedSource": "7443efd08cfba165c93624b3ab63ed4d462f5b78",
+  "expectedSource": "3213d43fdd95e174b0a77ffff64ce7e8460badea",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -736,6 +736,11 @@
       "status": "PASS"
     },
     {
+      "id": "E7-SCOPE-DIAGNOSTICS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E6-INSTALLED-CONTEXT",
       "required": true,
       "status": "PASS"
@@ -856,7 +861,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-13T14:54:30.339Z",
+    "decidedAt": "2026-11-13T16:24:46.342Z",
     "failureCodes": []
   },
   "notes": [

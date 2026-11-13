@@ -1,0 +1,2882 @@
+{
+  "schema": "product-acceptance-wave23-status/1",
+  "agent": "E",
+  "branch": "codex/g3-product-acceptance",
+  "base": "f29c9e6",
+  "checkpoint": "0f72838",
+  "head": "3213d43fdd95e174b0a77ffff64ce7e8460badea",
+  "worktreeDirtyAtRun": false,
+  "checkedAt": "2026-11-13T16:24:46.260Z",
+  "budget": {
+    "modelTasks": 0,
+    "nativeRuns": 0,
+    "unknownSends": 0,
+    "pilotGrant": "wave05-independent-review-pilot-01",
+    "pilotTurnsUsed": 0,
+    "pilotTokensUsed": 0,
+    "pilotUsd": null,
+    "note": "Research BLOCKED; no B sender. Real model sends 0; ledger keeps 0/24, 0 tokens, unknown price. Full costOf→settle chain preserves unknown and blocks; E only reserves."
+  },
+  "stages": [
+    {
+      "id": "E1",
+      "title": "Real 595 positive control and frozen scope",
+      "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
+      "notes": [
+        "The complete recorded 595 report (run 2026-11-13T14-48-56-062Z) is committed as the installed-alpha positive control, evaluated at its recorded time; the current re-check time is recorded separately. The 200 PASS/0 FAIL/15 NOT_TESTED and 161 required scope stay as measured history."
+      ],
+      "result": "PASS",
+      "counts": {
+        "PASS": 111
+      },
+      "cases": [
+        {
+          "id": "E1-GATE-CONTROL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-MISSING-CASE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-STALE-REPORT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-NO-CANDIDATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-VACUOUS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-DUPLICATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-BAD-PATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-SCHEMA",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-FIXTURE-STRICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-FIXTURE-PORTABILITY-STRICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-ADMISSION-FAIL-CLOSED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-PREFLIGHT-NO-FALLBACK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-LAYER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-DIRTY-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-MISSING-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-STALE-REPORT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CROSS-COMMIT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-UNBOUND-CASE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-EMPTY-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-MISSING-CASE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FAILED-ASSERTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-DOWNLOAD-DIGEST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PATCH-NOT-APPLIED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PATCH-DIGEST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-DUPLICATE-ID",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-UNKNOWN-STATUS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-UNKNOWN-LAYER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-NO-VERSION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-INSTALL-NOT-STAGED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NOT-TESTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-FAIL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-UNKNOWN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-REPORT-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-ARTIFACT-TUPLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-PASS-EMPTY-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-SUBJECT-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-SUBJECT-SHA-SIZE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-SUBJECT-BUILD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-MODE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-WRONG-RUN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CURRENT-BLOCKED-AS-PASS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CURRENT-FIXTURE-MODE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-OWNERSHIP-COPY-NO-EXIT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FAULT-STEP-NAMES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-RECOVER-BLOCKED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-RECOVER-EXIT1-SUCCESS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FAULT-WRONG-OPERATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NOOP-EXIT1",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-POINTER-MISSING",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-ABI-PLATFORM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HELPER-FOREIGN-PROVENANCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HELPER-WITHOUT-FILE-HASH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-OWNERSHIP-SUBJECT-FOREIGN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NO-PREVIOUS-CONTROL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-INSTALLED-CANDIDATE-NATIVE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-INSTALLED-CANDIDATE-NO-REPLAY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SECOND-ROOT-RESEND",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SOURCE-PREPARE-GRANTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-STABILITY-QUEUE-NOT-RETURNED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WORKFLOW-V2-BORROWED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SECOND-ROOT-PERSONAL-CLAIM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PERSONAL-REVIEW-UNBOUND-READ",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PERSONAL-REVIEW-FIFO-ALLOWED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CONSUMER-ENTRY-FOREIGN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CONSUMER-ENTRY-SOURCE-ORIGIN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REUSE-SILENT-SELECTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SCOPE-DIAGNOSTIC-LEAK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SELF-CLAIM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ADMISSION-PROBE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-STRUCTURE-TIER-SUPERSET",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-STRUCTURE-NO-ALLOW-GAP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ROUTE-OVERLAP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ROUTE-EXPIRED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REVIEW-DISPOSITION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-NO-VERSION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-NO-BUDGET",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PILOT-ZERO-TURNS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PILOT-NO-ORACLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E2",
+      "title": "Process identity is required",
+      "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
+      "notes": [
+        "reviewReuse now requires the observed original/reused process identity, the same process start on the REUSED instance and the original PID; deleting the observation, a null/empty/mismatched start or a different PID is rejected."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 25,
+        "NOT_TESTED": 3
+      },
+      "cases": [
+        {
+          "id": "E2-AUTH-AND-ORIGIN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONFIGURATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-DAILY-VERTICAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ARTIFACT-ROUNDTRIP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLAY-AND-CONFLICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-SESSION-ISOLATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-STALE-BUSINESS-REJECTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-MACHINE-FAIL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ONE-WRITER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONTEXT-PROPOSALS-NOT-TESTED",
+          "status": "NOT_TESTED",
+          "reason": "The legacy record_decision command returned rejected (unsupported_capability); explicit decisions use /v1/decisions (E3-DECISION-WORKFLOW), but structured proposal confirmation remains absent."
+        },
+        {
+          "id": "E2-WORK-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-EVIDENCE-HISTORY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REOPEN-PERSISTENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ASSISTANT-SDK-MOCK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONVERSATION-CATALOG",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-VERIFICATION-RECOVERY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-VERIFICATION-FINISHED-STATES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ATTENTION-SIGNAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REVIEW-TIMING",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ROUTE-FIXTURE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ATTENTION-WORKBENCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ROUTE-ADVICE",
+          "status": "NOT_TESTED",
+          "reason": "No route-advice producer or HTTP entry exists; the schema fixture and gate validators are prepared, and the default path remains closed."
+        },
+        {
+          "id": "E2-PROJECT-SETTINGS",
+          "status": "NOT_TESTED",
+          "reason": "Project settings GET returned 422 and POST returned 422 (unsupported_capability)."
+        },
+        {
+          "id": "E2-REPLY-DURABLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-UNKNOWN-DURABLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-MESSAGE-WINDOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-BAD-ARTIFACT",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E3",
+      "title": "Digest and refusal observations are required",
+      "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
+      "notes": [
+        "A digest-supporting package must expose healthDigest and an equal sameDigest; only an explicitly unsupported package can declare its scope. Every different/missing/port/unbound request needs a real BLOCKED terminal with a code, so RUNNING on the original PID without a reused flag or a missing observation is rejected. The real report is the positive; four single-observation mutations and the foreign consumer are rejected."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 27,
+        "NOT_TESTED": 6
+      },
+      "cases": [
+        {
+          "id": "E3-DESKTOP-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-NOTEBOOK-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-MOBILE-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-QUESTION-FORM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ACCEPT-AND-DOWNLOAD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-OFFLINE-AND-ERROR",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-KEYBOARD-AND-SCROLL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONVERSATION-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-VERIFICATION-RECOVERY-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-DOMAIN-ADMISSION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-END-TO-END",
+          "status": "NOT_TESTED",
+          "reason": "Explicit decisions now work over HTTP (E3-DECISION-WORKFLOW); automatic context/proposal confirmation is still absent."
+        },
+        {
+          "id": "E3-REVIEW-FIXTURES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-SEALED-COPY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-REVIEW-ACTIVITY-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-REVIEW-PIPELINE",
+          "status": "NOT_TESTED",
+          "reason": "No public entry creates a review Work/Ticket/Assignment or publishes ReviewEvidence; the independent pilot preflight is BLOCKED on pricing."
+        },
+        {
+          "id": "E3-ATTENTION-INBOX",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ATTENTION-DEADLINES",
+          "status": "NOT_TESTED",
+          "reason": "No public entry creates a question with a real decisionDeadline/expiresAt in this checkout; waiting-age and unknown-wait ordering are verified instead."
+        },
+        {
+          "id": "E3-ATTENTION-INBOX-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-DECISION-WORKFLOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-DECISION-SOURCE-STATES",
+          "status": "NOT_TESTED",
+          "reason": "No public entry deletes/changes the source message or expires the project grant; transaction-failure injection is not exposed. These remain NOT_TESTED."
+        },
+        {
+          "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: context preview now exists, but automatic proposal confirmation and grant/revocation invalidation do not. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen."
+        },
+        {
+          "id": "E3-PROPOSAL-HTTP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-GRANT-BOUNDARY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: E3-CONTEXT-PREVIEW verifies clamped budgets, omissions and basic refusals, but no public entry binds an expired grant or purpose mismatch to the read path. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed."
+        },
+        {
+          "id": "E3-PROPOSAL-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-PREVIEW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-USE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-SSE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-HISTORY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-SOURCES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-PERSONAL-COLD-START",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E4",
+      "title": "Same-package consumer bytes",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
+      "notes": [
+        "Every required installed case compares subject, consumer package source/build/tar and the four consumer file hashes. A real second package entry rejects even when the data tuple is unchanged; no checkout can supply a missing package consumer."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 21,
+        "NOT_TESTED": 3
+      },
+      "cases": [
+        {
+          "id": "E4-COMPLETED-REPLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-CANDIDATE-FLOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-BOUNDED-CYCLES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-PORTABILITY-CHECKLIST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-RECOVERY-READONLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-DISTRIBUTION-PREREQUISITES",
+          "status": "NOT_TESTED",
+          "reason": "Distribution source paths absent from this checkout: none. A frozen tar.gz is published outside Git and independently accepted by E4-INSTALL-*; source-level installation and migration remain Agent D owned and are not claimed by this case."
+        },
+        {
+          "id": "E4-REAUTHORIZATION",
+          "status": "NOT_TESTED",
+          "reason": "Read-only inspect/prepare are verified (plan authorization=not_granted, commitAvailable=false, no writes, stale/foreign/commit refused). The commit path, expiry/drift/replay/rollback of a real grant, and activation of only new work are not implemented and stay NOT_TESTED."
+        },
+        {
+          "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-FIRST-RUN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-CONFIG-ROOT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-REUSE-CONCURRENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-HOST-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-BACKUP-RESTORE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-TAMPER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-ROLLBACK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-ROLLBACK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-CROSS-SCHEMA",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-MULTI-STATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-FAULTS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-RECOVERY-PREFLIGHT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-B-PRODUCTION-RECOVERY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+        },
+        {
+          "id": "E4-SOURCE-CONFIRM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-SOURCE-CONFIRM-REFUSAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-PERSONAL-RESTORED-REVIEW",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E5",
+      "title": "Accurate a9b package",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
+      "notes": [
+        "Target is a9b155c/build9fdc283f55927f6f/tar 413dee2f…/20246850 bytes with 595 as the safety baseline; tuple, schema, ABI and consumer files are read from the extracted package before any flow."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "NOT_TESTED": 2,
+        "PASS": 5
+      },
+      "cases": [
+        {
+          "id": "E5-NATIVE-CONTROL",
+          "status": "NOT_TESTED",
+          "reason": "No executed native stop/question/recovery evidence is available in this checkout."
+        },
+        {
+          "id": "E5-INSTALLED-CANDIDATES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-RECOVERY-INTERRUPTION",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
+        },
+        {
+          "id": "E5-D-OWNERSHIP-MOCKS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-WORKFLOW-FORMATS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-RESTORED-REVIEW-REFUSALS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-REVIEW-REUSE-CONSISTENCY",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E6",
+      "title": "Same data chain and both formats",
+      "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
+      "notes": [
+        "The package produces/verifies default v1 (13 families) and explicit v2 (21 families) snapshots over the same restored store; personal review reads the original Work/Q&A/context/candidate data with the package consumer, business 422, queue held and provider unchanged. Fixture/readonly stays a separate layer."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "NOT_TESTED": 1,
+        "PASS": 4
+      },
+      "cases": [
+        {
+          "id": "E6-REVIEW-PILOT",
+          "status": "NOT_TESTED",
+          "reason": "Preflight BLOCKED: adapter_missing; 0/24 turns used."
+        },
+        {
+          "id": "E6-INSTALLED-CONTEXT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-ARTIFACT-CURRENT-SCOPE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-CURRENT-MAIN-INSTALL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-INSTALLED-SOURCE-CONFIRM",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E7",
+      "title": "Optional diagnostics with real permission guards",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
+      "notes": [
+        "a9b contains 712: default sources keep the old shape, ?scopeReview=1 returns the bounded context-scope-review/1 projection with authorization none, duplicate/unknown queries are refused, and a freshly prepared narrow restart explains the withheld body without serving it. Diagnostics never authorize."
+      ],
+      "result": "PASS",
+      "counts": {
+        "PASS": 5
+      },
+      "cases": [
+        {
+          "id": "E7-BACKUP-CONTEXT-REPLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-OWNERSHIP-COPY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-OWNERSHIP-WRONG-INSTALL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-SECOND-ROOT-READONLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-SCOPE-DIAGNOSTICS",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E8",
+      "title": "Ordinary install, reuse, upgrade and failure protection",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
+      "notes": [
+        "Cold/reuse/no-executor/multi-state, 595→a9b and 16→18, real same-file REUSED with PID/start/digest, mismatched selection/port refused without stopping the live instance, tamper refusal and post-upgrade data kept. D dangerous live cleanup scripts are not run."
+      ],
+      "result": "PASS",
+      "counts": {
+        "PASS": 2
+      },
+      "cases": [
+        {
+          "id": "E8-SCHEMA-MIGRATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E8-LEGACY16-MIGRATION",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E9",
+      "title": "Bounded usability",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
+      "notes": [
+        "Concurrent readonly reads, repeated confirmations and a reopen return queue/counts/provider to baseline; desktop/mobile remain limited to the known workbench surfaces; no long soak claim."
+      ],
+      "result": "PASS",
+      "counts": {
+        "PASS": 2
+      },
+      "cases": [
+        {
+          "id": "E9-CONTEXT-CONCURRENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E9-INSTALLED-STABILITY",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E10",
+      "title": "Layered final verdict",
+      "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
+      "notes": [
+        "wave23-status separates module/controlled/ordinary-installed/recovery/native/value and keeps the 595 measured scope, the a9b result and the old e4e failure. Required set is not relaxed; full-product stays refused for native evidence."
+      ],
+      "result": "SEE_RUN",
+      "counts": {},
+      "cases": []
+    }
+  ],
+  "release": {
+    "schema": "product-acceptance-release/1",
+    "tier": "controlled-product-workflow",
+    "status": "PASS",
+    "ok": true,
+    "checkedAt": "2026-11-13T16:24:46.342Z",
+    "source": {
+      "commit": "3213d43fdd95e174b0a77ffff64ce7e8460badea",
+      "dirty": false
+    },
+    "expectedSource": "3213d43fdd95e174b0a77ffff64ce7e8460badea",
+    "requirements": [
+      {
+        "id": "E1-GATE-CONTROL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-REPORT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-NO-CANDIDATE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-VACUOUS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-DUPLICATE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-BAD-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-SCHEMA",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-FIXTURE-STRICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-FIXTURE-PORTABILITY-STRICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-WRONG-LAYER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-DIRTY-SOURCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-SOURCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-STALE-REPORT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-CROSS-COMMIT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-UNBOUND-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-FAILED-ASSERTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-DOWNLOAD-DIGEST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-NOT-APPLIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-DIGEST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-DUPLICATE-ID",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-STATUS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-LAYER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-VERSION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-STAGED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NOT-TESTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-SELF-CLAIM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ADMISSION-PROBE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-ADMISSION-FAIL-CLOSED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-PREFLIGHT-NO-FALLBACK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-STRUCTURE-TIER-SUPERSET",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-STRUCTURE-NO-ALLOW-GAP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-OVERLAP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-EXPIRED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-DISPOSITION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-VERSION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-BUDGET",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-ZERO-TURNS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-CONFIGURATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-DAILY-VERTICAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ARTIFACT-ROUNDTRIP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-EVIDENCE-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REOPEN-PERSISTENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLAY-AND-CONFLICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SESSION-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-STALE-BUSINESS-REJECTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-MACHINE-FAIL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ONE-WRITER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-AUTH-AND-ORIGIN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ASSISTANT-SDK-MOCK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-CONVERSATION-CATALOG",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ATTENTION-SIGNAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REVIEW-TIMING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ROUTE-FIXTURE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-SEALED-COPY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-ACTIVITY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-PREVIEW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-USE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-CANDIDATE-FLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SOURCES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM-REFUSAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-COMPLETED-REPLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-UNKNOWN-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-MESSAGE-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-BAD-ARTIFACT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-SCHEMA-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-LEGACY16-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E9-CONTEXT-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONVERSATION-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-VERIFICATION-RECOVERY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-READONLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-RECOVERY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-FINISHED-STATES",
+        "required": true,
+        "status": "PASS"
+      }
+    ],
+    "failures": [],
+    "claimedBy": null,
+    "notes": [
+      "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+      "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+    ]
+  },
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z",
+  "evidence": {
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/release.json",
+    "screenshots": [
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/screenshots/context-history-mobile.png"
+    ],
+    "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
+    "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
+    "wave09Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave09-status.json",
+    "wave17Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave17-status.json",
+    "wave18Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave18-status.json",
+    "wave08Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave08-status.json",
+    "wave07Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave07-status.json",
+    "wave06Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave06-status.json",
+    "tierVerdicts": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/tier-verdicts.json"
+  },
+  "blockers": [],
+  "untested": [
+    {
+      "id": "conversation-chat",
+      "gaps": [
+        "真实模型回复与流式界面未在本轮执行；budget 0。"
+      ]
+    },
+    {
+      "id": "explicit-delegation",
+      "gaps": [
+        "真实 Codex 执行属于 B 的原生验收，E 未触发计费任务。"
+      ]
+    },
+    {
+      "id": "question-answer",
+      "gaps": [
+        "真实原生权限/审批问题未执行；B 的原生证据未作为输入提供。"
+      ]
+    },
+    {
+      "id": "verification-completion",
+      "gaps": [
+        "原生注册检查与真实 deliverable 未在本轮复验。"
+      ]
+    },
+    {
+      "id": "verification-recovery",
+      "gaps": [
+        "生产故障注入接口不存在；阻断由受控 completion port 注入，其余步骤走真实 HTTP。"
+      ]
+    },
+    {
+      "id": "accepted-outcome-evidence",
+      "gaps": [
+        "工作台内进一步的时间线展示仍单列；source_missing/not_in_window 需要旧库来源缺失场景。"
+      ]
+    },
+    {
+      "id": "stale-guards",
+      "gaps": [
+        "旧提案与决定的撤销治理（C 未交付）"
+      ]
+    },
+    {
+      "id": "isolation",
+      "gaps": [
+        "两个独立项目的隔离：受控 lane 只有一个项目。"
+      ]
+    },
+    {
+      "id": "writer-identity",
+      "gaps": [
+        "真实原生写进程停止与物理资源屏障由 B 证明。"
+      ]
+    },
+    {
+      "id": "resource-recovery",
+      "gaps": [
+        "协调器 SIGKILL 后的原生恢复与重连（B 范围）。"
+      ]
+    },
+    {
+      "id": "stability",
+      "gaps": [
+        "长时间 soak、负载与多实例并发。"
+      ]
+    },
+    {
+      "id": "install-first-run",
+      "gaps": [
+        "PA_CONFIG_ROOT 覆盖后 release.json 不随 first-run 写入（owner D，已完成最小复现）。"
+      ]
+    },
+    {
+      "id": "backup-restore",
+      "gaps": [
+        "恢复后的新授权/重绑定归 main（E4-REAUTHORIZATION NOT_TESTED）；旧项目绑定恢复仍只读。"
+      ]
+    },
+    {
+      "id": "upgrade-rollback",
+      "gaps": [
+        "真实升级需要第二个冻结 buildId；state 回滚已在同一字节上通过。"
+      ]
+    },
+    {
+      "id": "attention-signal",
+      "gaps": [
+        "真实 decisionDeadline/expiresAt 与多 tab 重叠未验证；本项目只有一个受控项目。"
+      ]
+    },
+    {
+      "id": "attention-workbench",
+      "gaps": [
+        "真实业务截止与授权过期后的问题失效仍无公开入口（E3-ATTENTION-DEADLINES、E3-DECISION-SOURCE-STATES）；deterministic_priority 排序与逐项动作已通过。"
+      ]
+    },
+    {
+      "id": "review-timing",
+      "gaps": [
+        "多 tab 重叠区间并集未直接测量；活动是可见/聚焦代理，不是人工思考时间。"
+      ]
+    },
+    {
+      "id": "route-advice",
+      "gaps": [
+        "C 的 packages/routing 与 main 的 HTTP/UI 入口未交付；0/1/多候选、身份漂移、旧政策等产品负例无法执行。"
+      ]
+    },
+    {
+      "id": "controlled-review",
+      "gaps": [
+        "无 review Work/HTTP/证据发布入口；E3-REVIEW-PIPELINE 未执行。"
+      ]
+    },
+    {
+      "id": "heterogeneous-review",
+      "gaps": [
+        "第二协议未实现，独立试点 preflight 为 BLOCKED；不能把替换模型或 fixture 当异构。"
+      ]
+    },
+    {
+      "id": "project-settings-version",
+      "gaps": [
+        "仅合同 revision 已验证；项目设置版本 API 未交付（RFC-E-001 缺口 2）。"
+      ]
+    },
+    {
+      "id": "context-proposals-decisions",
+      "gaps": [
+        "自动结构化提案确认仍未发布（owner C/main）；当前只验证显式 prepare/confirm/reject。",
+        "源消息删除/授权过期/事务失败注入缺少公开入口（E3-DECISION-SOURCE-STATES）。"
+      ]
+    },
+    {
+      "id": "context-use",
+      "gaps": [
+        "E3-CONTEXT-HISTORY/SOURCES 与 UI history tab 已覆盖签名分页、原文核对、model-off 与损坏 bundle；readonly/跨 principal 历史由各自层报告。",
+        "E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile、双 tab 与 history tab；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。"
+      ]
+    },
+    {
+      "id": "reply-results",
+      "gaps": [
+        "历史正文本轮由 E7-SECOND-ROOT-READONLY 在第二根重新读取；候选在安装包内 default-off→显式开启后验证非空建议与 confirm/replay/reject。"
+      ]
+    },
+    {
+      "id": "production-control",
+      "gaps": [
+        "E4-B-PRODUCTION-RECOVERY：main 当前产品未消费 B 新生产控制；fixture/WORK 存在不等于真实 Runner begin/answer/stop 恢复。"
+      ]
+    },
+    {
+      "id": "recovery-readonly",
+      "gaps": [
+        "解除隔离后的新授权/环境重绑定未实现，不在本轮声明。"
+      ]
+    },
+    {
+      "id": "assistant-state",
+      "gaps": [
+        "自动提案确认与撤销后上下文失效未发布。"
+      ]
+    },
+    {
+      "id": "distribution",
+      "gaps": [
+        "安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。",
+        "旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。",
+        "E6-CURRENT-MAIN-INSTALL：99832f6 实测 context/history/sources/replyResults=true，但 discussionReadiness=false；无执行器 personal 探针实际 BLOCKED，因此不是当前 M1 安装。"
+      ]
+    },
+    {
+      "id": "two-binary-upgrade",
+      "gaps": [
+        "已执行 crash_after_stop、crash_after_stop_kill、target_unhealthy 三窗口 recovering previous + data preserved；pointer/spawn/record/ACK after-switch 仍未单独注入。",
+        "升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。"
+      ]
+    },
+    {
+      "id": "install-host-guards",
+      "gaps": [
+        "E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。E5-D-OWNERSHIP-MOCKS 的 UID/argv/operation/journal/scanner/role mock 仍 NOT_TESTED。"
+      ]
+    },
+    {
+      "id": "proposal-http",
+      "gaps": [
+        "source/grant 漂移与 outer receipt 失败注入未在 HTTP 层单独执行；网页层由 E3-PROPOSAL-UI 覆盖。"
+      ]
+    },
+    {
+      "id": "context-window",
+      "gaps": [
+        "E3-CONTEXT-GRANT-BOUNDARY 仍未执行：expired grant/purpose/超预算的 HTTP 级反例缺少入口。"
+      ]
+    },
+    {
+      "id": "work-evidence",
+      "gaps": [
+        "storage_cap 与并发写入窗口未单独触发；历史窗口语义按 complete/caller_limit 已验证。"
+      ]
+    },
+    {
+      "id": "restored-personal-review",
+      "gaps": [
+        "有效签名下的过期/foreign principal/host 拒绝由 main 模块契约覆盖；E 不伪造 probe-owned key。"
+      ]
+    },
+    {
+      "id": "d-safety-helper",
+      "gaps": [
+        "只测 launcher helper 的 same-UID child 归属；广泛 live stop/cleanup 仍按 D 自有矩阵执行。"
+      ]
+    },
+    {
+      "id": "recovery-activation",
+      "gaps": [
+        "commit/activation 未发布；E5-RECOVERY-INTERRUPTION 记录四个中断窗口，prepare 不能替代授权。"
+      ]
+    },
+    {
+      "id": "native-control",
+      "gaps": [
+        "B 的当前真实控制证据未作为输入提供；E 无该预算，不能把 fixture 当原生。"
+      ]
+    },
+    {
+      "id": "review-pilot",
+      "gaps": [
+        "Preflight BLOCKED：adapter_missing（没有经准入的单一实际 adapter 及其整 turn 硬上界/隔离/session/材料/main 准入）；0/24 turn；runner 45 项 selftest 证明损坏账/伪造身份/裁小预留/缺接口 fallback 均拒绝且 fake 发送为 0，但没有准入就不发送；无价值结论。"
+      ]
+    },
+    {
+      "id": "actual-native",
+      "gaps": [
+        "B 的原生证据未作为已提交输入提供；E 未获单独预算，不触发模型任务。"
+      ]
+    }
+  ],
+  "externalBlockers": [
+    {
+      "owner": "B",
+      "code": "production_control_not_consumed",
+      "detail": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+    },
+    {
+      "owner": "main",
+      "code": "recovery_activation_missing",
+      "detail": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
+    }
+  ],
+  "next": [
+    "D: bind the single install instance record to its exact data root and make a stop aimed at another state refuse without signalling that state's launcher/API; then E can measure launcher-dead/API-alive and PID/start reuse windows.",
+    "C/main: publish automatic proposal/context confirmation, the context-use send path (explicit selection, revalidation, same-transaction binding/receipt, no auto-resend, source audit) and recovery activation; E then converts E5-CONTEXT-USE and E5-RECOVERY-INTERRUPTION from NOT_TESTED.",
+    "D: keep the target immutable; a new target needs its own explicit identity (tar/sha/source/build/schema) and a fresh E4 run, not a mapping from build f2390ffd.",
+    "B: hand off native evidence bound to commit/attempt/command with executed=true and model-task counts; only a separately granted budget lets E re-run native.",
+    "Main: treat controlled-product-workflow PASS as workflow evidence only; local-alpha and full-product remain non-zero until installation and native evidence exist."
+  ],
+  "taskPackage": "agent-tasks/product-wave-23/README.zh-CN.md",
+  "supersedes": "wave22-status.json",
+  "subject": {
+    "target": {
+      "role": "target",
+      "name": "wave22-target-a9b155c",
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave22-target/wave22-target-a9b155c.tar.gz",
+      "tarSha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+      "tarBytes": 20246850,
+      "installManifestSha256": "dbad697f3b23283738fd46a9173687960246c025e16a8754e48841613624a62f",
+      "releaseManifestSha256": "28e1af9875435967b73ebe5a418f5bc57e63e2a89dfaa856af4e4dd073b4ab48",
+      "closureDigest": "17b9d7cb37732b5da5c492fbf4903e6ffce9f6b8d3ad47352faa63b7d37cb6d2",
+      "files": 6747,
+      "buildId": "9fdc283f55927f6f",
+      "sourceCommit": "a9b155c13be197d828544a26f4827cf9d4acab68",
+      "sourceDirty": false,
+      "productSchema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "24.21.0",
+      "abi": "137"
+    },
+    "baseline": {
+      "buildId": "cc16eca05e4da244",
+      "schema": 18,
+      "tarSha256": "e875b9b90445db5826bf01d72d710fd55b208309598347ca45be618773ae026d",
+      "source": "595b3f138872f176b7c6b214b4b6b1b87c1ed017"
+    },
+    "control": {
+      "source": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+      "buildId": "8a5a0a85631f22ca",
+      "tarSha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+      "upgradeSha256": "fa4b4ed348fccbe00b22af348c8b5513a19662f3fc99ce3bc063a28b8e96742a",
+      "pass": 2,
+      "fail": 3,
+      "failures": [
+        "same_uid_child_not_owned",
+        "child_not_signalled",
+        "unknown_child_blocks_proof"
+      ],
+      "proof": {
+        "proven": true,
+        "stopped": [
+          24947,
+          24948
+        ],
+        "unknownLive": []
+      }
+    }
+  },
+  "gateControls": {
+    "real595Positive": "PASS",
+    "recordedAt": "2026-11-13T14:54:30.321Z",
+    "missingProcess": "PASS",
+    "missingDigest": "PASS",
+    "differentRunning": "PASS",
+    "missingRefusal": "PASS",
+    "foreignConsumer": "PASS",
+    "foreignConsumerPackage": {
+      "source": "a9b155c13be197d828544a26f4827cf9d4acab68",
+      "buildId": "9fdc283f55927f6f",
+      "tarSha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+      "tarBytes": 20246850
+    }
+  },
+  "layers": {
+    "source": "source-checkout results stay source-level; wave20 revoked review claims are not restored",
+    "fixture": "fixture+recovery_readonly second root remains its own layer and is not personal",
+    "ordinaryInstalled": "PASS",
+    "installedCandidates": "PASS",
+    "recoveredPersonal": "PASS",
+    "native": "NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate",
+    "value": "BLOCKED: review pilot unchanged"
+  },
+  "scopes": {
+    "workflowFormats": {
+      "status": "PASS",
+      "capability": "default1+explicit2"
+    },
+    "secondRootFixtureReadonly": {
+      "status": "PASS",
+      "probeScope": "fixture+recovery_readonly"
+    },
+    "restoredPersonalReview": {
+      "status": "PASS",
+      "consumerOrigin": "package",
+      "healthDigest": "5f81e90137f955fbadbcb0feb121079a17bf212cbb6a9462ee04669d634a313b",
+      "scopeDiagnostics": "present"
+    },
+    "restoredReviewRefusals": "PASS",
+    "reviewReuse": {
+      "status": "PASS",
+      "sameFile": "REUSED",
+      "differentFile": "BLOCKED",
+      "digestSame": true
+    },
+    "scopeDiagnostics": {
+      "status": "PASS",
+      "optInProtocol": "context-scope-review/1",
+      "narrowReasons": [
+        "selection_replaced"
+      ]
+    },
+    "installedSourceConfirm": "PASS",
+    "installedStability": "PASS",
+    "missingArtifactTerminal": "fail_closed_unclean_exit1",
+    "privatePermissionTarget": "NOT_REACHED: private startup permission and target activation remain main scope",
+    "bBusinessRecovery": "NOT_TESTED: B control source is not admitted as business resume"
+  },
+  "retainedHistory": {
+    "measured595": "200 PASS / 0 FAIL / 15 NOT_TESTED, 161 required, package consumer files matched; kept as measured scope",
+    "e4eFailure": "wave22 e4e run 2026-11-13T13-18-18-989Z kept its honest reuse FAIL",
+    "sourceOnly": "wave20 revoked source-level review PASS stays revoked"
+  },
+  "requiredGate": {
+    "installedAlphaCases": [
+      "E6-ARTIFACT-CURRENT-SCOPE",
+      "E4-INSTALL-ARTIFACT-IDENTITY",
+      "E7-BACKUP-CONTEXT-REPLY",
+      "E5-INSTALLED-CANDIDATES",
+      "E7-SECOND-ROOT-READONLY",
+      "E6-INSTALLED-SOURCE-CONFIRM",
+      "E9-INSTALLED-STABILITY",
+      "E5-WORKFLOW-FORMATS",
+      "E4-PERSONAL-RESTORED-REVIEW",
+      "E5-RESTORED-REVIEW-REFUSALS",
+      "E5-REVIEW-REUSE-CONSISTENCY",
+      "E7-SCOPE-DIAGNOSTICS",
+      "E6-INSTALLED-CONTEXT",
+      "E3-PERSONAL-COLD-START",
+      "E4-INSTALL-FIRST-RUN",
+      "E4-INSTALL-CONFIG-ROOT",
+      "E4-INSTALL-REUSE-CONCURRENCY",
+      "E4-INSTALL-HOST-GUARDS",
+      "E4-BACKUP-RESTORE",
+      "E4-INSTALL-TAMPER",
+      "E4-INSTALL-ROLLBACK",
+      "E4-UPGRADE-FAULTS",
+      "E7-OWNERSHIP-COPY",
+      "E5-D-OWNERSHIP-MOCKS",
+      "E6-CURRENT-MAIN-INSTALL",
+      "E4-UPGRADE-ROLLBACK",
+      "E4-UPGRADE-CROSS-SCHEMA",
+      "E4-MULTI-STATE"
+    ],
+    "current": {
+      "ownershipMocks": "PASS",
+      "installedCandidates": "PASS",
+      "secondRoot": "PASS",
+      "installedSourceConfirm": "PASS",
+      "installedStability": "PASS",
+      "workflowFormats": "PASS",
+      "personalReview": "PASS",
+      "reviewRefusals": "PASS",
+      "reviewReuse": "PASS",
+      "scopeDiagnostics": "PASS",
+      "currentMainInstall": "PASS",
+      "upgradeFaults": "PASS",
+      "upgradeRollback": "PASS"
+    }
+  },
+  "finalRun": {
+    "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
+    "exitCode": 0,
+    "source": {
+      "commit": "3213d43fdd95e174b0a77ffff64ce7e8460badea",
+      "dirty": false
+    }
+  },
+  "commands": [
+    {
+      "id": "E1",
+      "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest"
+    },
+    {
+      "id": "E2",
+      "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant"
+    },
+    {
+      "id": "E3",
+      "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui"
+    },
+    {
+      "id": "E4",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha"
+    },
+    {
+      "id": "E5",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability"
+    },
+    {
+      "id": "E6",
+      "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>"
+    },
+    {
+      "id": "E7",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha"
+    },
+    {
+      "id": "E8",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha"
+    },
+    {
+      "id": "E9",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability"
+    },
+    {
+      "id": "E10",
+      "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>"
+    }
+  ],
+  "personalReview": {
+    "subject": {
+      "source": "a9b155c13be197d828544a26f4827cf9d4acab68",
+      "buildId": "9fdc283f55927f6f",
+      "schema": 18,
+      "tarSha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+      "tarBytes": 20246850,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "state": "recovery_readonly",
+    "consumerEntry": {
+      "origin": "package",
+      "package": {
+        "source": "a9b155c13be197d828544a26f4827cf9d4acab68",
+        "buildId": "9fdc283f55927f6f",
+        "tarSha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+        "tarBytes": 20246850
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "493ca3f8eee1d6258c868ffd86311462c57ac8ef8e8d38bd653d0eb818c3b227",
+          "bytes": 22958
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "1ac7fafa40daf225405c739de1e12669647b1a9d1c772d1c70ac340467614f8a",
+          "bytes": 7303
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "before": {
+      "status": "RUNNING",
+      "candidates": 403,
+      "history": 403
+    },
+    "after": {
+      "candidates": 200,
+      "history": 200,
+      "sources": 200,
+      "originalBody": true
+    },
+    "reviewFile": {
+      "mode": "600",
+      "access": "historical_data_read_only",
+      "startupAvailable": false,
+      "projects": 1
+    },
+    "business": 422,
+    "queueHeld": true,
+    "providerRequests": 2,
+    "health": {
+      "status": "ok",
+      "mode": "personal",
+      "startupMode": "recovery_readonly",
+      "digest": "5f81e90137f955fbadbcb0feb121079a17bf212cbb6a9462ee04669d634a313b"
+    },
+    "healthDigest": "5f81e90137f955fbadbcb0feb121079a17bf212cbb6a9462ee04669d634a313b",
+    "scopeDiagnostics": "present",
+    "registry": {
+      "present": true,
+      "digest": "a3fa8674ea5d1a0655ec2bfddbdf26644a23d3bbe16d4e76fe7b77a9b67908a9"
+    },
+    "restore": {
+      "verify": "VERIFIED",
+      "restore": "RESTORED"
+    }
+  },
+  "reviewReuse": {
+    "subject": {
+      "source": "a9b155c13be197d828544a26f4827cf9d4acab68",
+      "buildId": "9fdc283f55927f6f",
+      "schema": 18,
+      "tarSha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+      "tarBytes": 20246850,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "consumerEntry": {
+      "origin": "package",
+      "package": {
+        "source": "a9b155c13be197d828544a26f4827cf9d4acab68",
+        "buildId": "9fdc283f55927f6f",
+        "tarSha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+        "tarBytes": 20246850
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "493ca3f8eee1d6258c868ffd86311462c57ac8ef8e8d38bd653d0eb818c3b227",
+          "bytes": 22958
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "1ac7fafa40daf225405c739de1e12669647b1a9d1c772d1c70ac340467614f8a",
+          "bytes": 7303
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "healthDigest": "05015e2ccc8fc61bce20074c4d794675755ebb2305e979e13bf80af9a2fa7e94",
+    "digestAvailable": true,
+    "sameDigest": "05015e2ccc8fc61bce20074c4d794675755ebb2305e979e13bf80af9a2fa7e94",
+    "processes": {
+      "live": "Sat Nov 14 00:24:37 2026",
+      "reused": "Sat Nov 14 00:24:37 2026"
+    },
+    "firstPid": 51972,
+    "unboundPid": 52954,
+    "pidAfterRefusals": 51972,
+    "pidAfterUnbound": 52954,
+    "outcomes": {
+      "sameFile": {
+        "status": "REUSED",
+        "instance": {
+          "protocol": "personal-product-instance/1",
+          "pid": 51972,
+          "processStart": "Sat Nov 14 00:24:37 2026",
+          "apiPid": 52085,
+          "consolePid": 51972,
+          "apiURL": "http://127.0.0.1:52908",
+          "consoleURL": "http://127.0.0.1:52907",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/install/app",
+          "buildId": "9fdc283f55927f6f",
+          "mode": "personal",
+          "access": "local-development",
+          "startupMode": "recovery_readonly",
+          "launcherArgv": [
+            "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/install/app/apps/launcher/bin/pa.mjs",
+            "start",
+            "--json",
+            "--port",
+            "52907",
+            "--api-port",
+            "52908",
+            "--discussion-only",
+            "--review-restored-scope",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/reuse-first.json"
+          ],
+          "launcherCwd": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s",
+          "apiArgv": [
+            "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/install/app/apps/coordinator/product/demo.ts",
+            "--port",
+            "52908",
+            "--state",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/restored",
+            "--console-origin",
+            "http://127.0.0.1:52907",
+            "--startup-mode",
+            "recovery_readonly",
+            "--assistant",
+            "--discussion-only",
+            "--review-restored-scope",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/reuse-first.json",
+            "--local-access"
+          ],
+          "apiProcessStart": "Sat Nov 14 00:24:38 2026",
+          "apiUid": 501,
+          "startedAt": "2026-11-13T16:24:38.976Z",
+          "configRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/config"
+        },
+        "recovery": {
+          "startupMode": "recovery_readonly",
+          "markerPresent": true,
+          "markerValid": true,
+          "warning": "恢复态只读：仅历史/诊断；重新绑定与重新验证由 main 的恢复授权完成前不会开启业务。",
+          "requiresRevalidation": [
+            "Native execution environment and policy evidence were not migrated; re-probe before dispatching.",
+            "Native authentication lives in the account home and is not part of the bundle; re-authenticate locally.",
+            "The old writer pid/nonce and runtime records are historical and never become authority on restore.",
+            "Project bindings not explicitly remapped stay pending and must be rebound to a local path."
+          ],
+          "pendingRebind": [
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/historical-project"
+          ]
+        },
+        "stderr": ""
+      },
+      "differentFile": {
+        "status": "BLOCKED",
+        "code": "restored_review_selection_mismatch",
+        "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
+        "detail": {
+          "requestedReviewIdentity": "45b044398a49d54f2390ab8c69eb4a5f62134bb514df535ed073d69706e6b9c5",
+          "liveReviewIdentity": "05015e2ccc8fc61bce20074c4d794675755ebb2305e979e13bf80af9a2fa7e94",
+          "pid": 51972
+        },
+        "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
+        "stderr": ""
+      },
+      "missingFile": {
+        "status": "BLOCKED",
+        "code": "restored_review_selection_mismatch",
+        "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
+        "detail": {
+          "requestedReviewIdentity": null,
+          "liveReviewIdentity": "05015e2ccc8fc61bce20074c4d794675755ebb2305e979e13bf80af9a2fa7e94",
+          "pid": 51972
+        },
+        "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
+        "stderr": ""
+      },
+      "missingFilePath": {
+        "status": "BLOCKED",
+        "code": "review_scope_missing",
+        "message": "显式 review 配置文件不存在",
+        "detail": {
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/reuse-gone.json"
+        },
+        "hint": "用 main 的 review-restored 命令重新生成新的私有文件。",
+        "stderr": ""
+      },
+      "portChange": {
+        "status": "BLOCKED",
+        "code": "instance_conflict",
+        "message": "已运行实例与本次请求的身份不一致；不静默复用不同 state/mode/access/build/端口",
+        "detail": {
+          "differences": [
+            {
+              "field": "consoleURL",
+              "expected": "http://127.0.0.1:52965",
+              "actual": "http://127.0.0.1:52907"
+            },
+            {
+              "field": "apiURL",
+              "expected": "http://127.0.0.1:52966",
+              "actual": "http://127.0.0.1:52908"
+            }
+          ],
+          "running": {
+            "pid": 51972,
+            "consoleURL": "http://127.0.0.1:52907",
+            "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/restored"
+          }
+        },
+        "hint": "用与运行实例相同的参数复用；要切换请先 `pa stop`，再以新参数启动。",
+        "stderr": ""
+      },
+      "unboundThenSelection": {
+        "status": "BLOCKED",
+        "code": "instance_identity_mismatch",
+        "message": "已有实例记录但真实进程身份不一致；不结束未知进程",
+        "detail": {
+          "failures": [
+            "runtime_mode"
+          ],
+          "record": {
+            "protocol": "personal-product-instance/1",
+            "pid": 52954,
+            "processStart": "Sat Nov 14 00:24:42 2026",
+            "apiPid": 53001,
+            "consolePid": 52954,
+            "apiURL": "http://127.0.0.1:52982",
+            "consoleURL": "http://127.0.0.1:52981",
+            "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/restored",
+            "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/install/app",
+            "buildId": "9fdc283f55927f6f",
+            "mode": "personal",
+            "access": "local-development",
+            "startupMode": "recovery_readonly",
+            "launcherArgv": [
+              "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+              "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/install/app/apps/launcher/bin/pa.mjs",
+              "start",
+              "--json",
+              "--port",
+              "52981",
+              "--api-port",
+              "52982",
+              "--discussion-only"
+            ],
+            "launcherCwd": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s",
+            "apiArgv": [
+              "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+              "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/install/app/apps/coordinator/product/demo.ts",
+              "--port",
+              "52982",
+              "--state",
+              "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/restored",
+              "--console-origin",
+              "http://127.0.0.1:52981",
+              "--startup-mode",
+              "recovery_readonly",
+              "--local-access"
+            ],
+            "apiProcessStart": "Sat Nov 14 00:24:43 2026",
+            "apiUid": 501,
+            "startedAt": "2026-11-13T16:24:44.014Z",
+            "configRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-pFsw4s/config"
+          }
+        },
+        "hint": "运行 `pa stop` 清理可核实实例，或 `pa doctor` 查看详情。",
+        "stderr": ""
+      }
+    },
+    "scope": "selection digest present"
+  },
+  "scopeDiagnostics": {
+    "subject": {
+      "source": "a9b155c13be197d828544a26f4827cf9d4acab68",
+      "buildId": "9fdc283f55927f6f",
+      "schema": 18,
+      "tarSha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+      "tarBytes": 20246850,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "consumerEntry": {
+      "origin": "package",
+      "package": {
+        "source": "a9b155c13be197d828544a26f4827cf9d4acab68",
+        "buildId": "9fdc283f55927f6f",
+        "tarSha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+        "tarBytes": 20246850
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "493ca3f8eee1d6258c868ffd86311462c57ac8ef8e8d38bd653d0eb818c3b227",
+          "bytes": 22958
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "1ac7fafa40daf225405c739de1e12669647b1a9d1c772d1c70ac340467614f8a",
+          "bytes": 7303
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "plain": {
+      "plain": 200,
+      "plainHasDiagnostic": false,
+      "optIn": 200,
+      "diagnostic": {
+        "protocol": "context-scope-review/1",
+        "reasons": [
+          "selection_replaced"
+        ],
+        "partial": true,
+        "withheldSourceCount": 3,
+        "authorization": "none"
+      },
+      "duplicate": 400,
+      "unknown": 400
+    },
+    "narrow": {
+      "start": "RUNNING",
+      "plain": 200,
+      "bodyServed": false,
+      "optIn": 200,
+      "diagnostic": {
+        "protocol": "context-scope-review/1",
+        "reasons": [
+          "selection_replaced"
+        ],
+        "partial": true,
+        "withheldSourceCount": 3,
+        "authorization": "none"
+      }
+    }
+  },
+  "counts": {
+    "PASS": 208,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 15,
+    "BLOCKED": 0,
+    "UNKNOWN": 0
+  },
+  "testCodeSource": {
+    "commit": "3213d43fdd95e174b0a77ffff64ce7e8460badea",
+    "dirty": false,
+    "branch": "codex/g3-product-acceptance"
+  },
+  "productSource": {
+    "commit": "a9b155c13be197d828544a26f4827cf9d4acab68",
+    "buildId": "9fdc283f55927f6f",
+    "schema": 18
+  },
+  "mainSource": {
+    "commit": "f29c9e6",
+    "schema": 18
+  },
+  "artifactTuple": {
+    "baseline": {
+      "buildId": "cc16eca05e4da244",
+      "schema": 18,
+      "tarSha256": "e875b9b90445db5826bf01d72d710fd55b208309598347ca45be618773ae026d",
+      "source": "595b3f138872f176b7c6b214b4b6b1b87c1ed017"
+    },
+    "target": {
+      "buildId": "9fdc283f55927f6f",
+      "schema": 18,
+      "tarSha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+      "source": "a9b155c13be197d828544a26f4827cf9d4acab68"
+    }
+  }
+}
