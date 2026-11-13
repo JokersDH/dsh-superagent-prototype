@@ -18,7 +18,8 @@ const evidenceFor = (key) => {
     case 'conversation':
       return { id: 'conv-1', messages: 4 }
     case 'artifact':
-      return { id: 'artifact-1', sha256: DIGEST, bytes: 24 }
+      return { id: 'artifact-1', sha256: DIGEST, bytes: 24,
+        tuple: { target: { sourceCommit: COMMIT, buildId: 'b', productSchema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' } } }
     case 'patch':
       return {
         id: 'artifact-patch',
@@ -123,8 +124,55 @@ const evidenceFor = (key) => {
       return { crashedCalls: 1, recoveredCalls: 0, replies: 1 }
     case 'replyBadArtifact':
       return { calls: 0, replies: 0, notice: '无法核对' }
+    case 'installedStability':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'recovery_readonly', concurrent: [200, 200, 200, 200], repeatedEqual: true, queueReturned: true, countsStable: true,
+        providerUnchanged: true, reopened: 'RUNNING', reopenedEqual: true,
+      }
+    case 'secondRoot':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'recovery_readonly', restore: 'RESTORED', verify: 'VERIFIED',
+        before: { bindings: 1, results: 1, messages: 4, decisions: 1 }, after: { bindings: 1, results: 1, messages: 4, decisions: 1 },
+        readOnly: { originalBodyEqual: true, messages: 4, workPhase: 'delivered', workArtifacts: 1, candidates: 200, candidateStatus: 'candidates', candidateCount: 1,
+          audit: 200, history: 200, historyRows: 1, sources: 200, business: 422, effectRows: 0, effectRowsBefore: 0,
+          modelRequestsBefore: 2, modelRequestsAfter: 2 },
+      }
+    case 'installedSourceConfirm':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'recovery_readonly', prepare: { status: 200, authorization: 'not_granted', startupAvailable: false, targetCreated: false },
+        confirm: { status: 200, activationId: 'activation-1', auditEqual: true }, queueHeld: true, markerUnchanged: true,
+        replay: { status: 200, equal: true }, reopened: { status: 'RUNNING', replay: 200, equal: true }, providerRequests: 2,
+      }
+    case 'installedCandidates':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'personal', action: 'discussion_only_default_off_then_enabled',
+        actions: { suggestionsOff: 200, suggestionsOffEnabled: false, offCandidateStatus: 'none',
+          suggestionsOn: 200, suggestionsOnEnabled: true, candidates: 200, candidateStatus: 'candidates', candidateCount: 2,
+          candidateWorkPrepare: 200, candidateWorkRequiredInputs: ['work.scope'], candidateWorkStatus: 'rejected',
+          candidatePrepare: 200, candidateConfirm: 200, candidateConfirmStatus: 'recorded',
+          candidateReplay: 200, candidateReplaySame: true, candidateRejectPrepare: 200, candidateReject: 200, candidateRejectStatus: 'recorded',
+          nativeSends: 0, dispatchPaused: 'discussion_only_no_executor' },
+      }
     case 'ownershipMocks':
-      return { steps: [{ id: 'parent_owned', status: 'PASS' }, { id: 'same_uid_child_not_owned', status: 'PASS' }, { id: 'child_not_signalled', status: 'PASS' }, { id: 'unknown_child_blocks_proof', status: 'PASS' }], proof: { proven: false } }
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        helper: {
+          upgradePath: 'install/app/apps/launcher/lib/upgrade.mjs',
+          instancePath: 'install/app/apps/launcher/lib/instance.mjs',
+          upgradeSha256: '1'.repeat(64), instanceSha256: '2'.repeat(64), upgradeBytes: 60281, instanceBytes: 20023,
+          sourceCommit: COMMIT, buildId: 'b', tarSha256: DIGEST,
+        },
+        productSource: { artifact: 'target', source: COMMIT, buildId: 'b', tarSha256: DIGEST },
+        probeSource: { path: 'tests/product-acceptance/cases/w17-d-child-gate.mjs', sha256: '3'.repeat(64) },
+        previousPackageHelper: { source: BASELINE, buildId: 'old', tarSha256: '4'.repeat(64), upgradeSha256: '5'.repeat(64),
+          pass: 2, fail: 3, failures: ['same_uid_child_not_owned', 'child_not_signalled', 'unknown_child_blocks_proof'], proof: { proven: true } },
+        steps: [{ id: 'parent_owned', status: 'PASS' }, { id: 'same_uid_child_not_owned', status: 'PASS' }, { id: 'child_not_signalled', status: 'PASS' }, { id: 'unknown_child_blocks_proof', status: 'PASS' }],
+        proof: { proven: false },
+      }
     case 'ownershipCopy':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         status: 2, code: 'requested_root_mismatch', apiAlive: true }
@@ -140,7 +188,8 @@ const evidenceFor = (key) => {
         capability: { hasContextRoute: true, hasHistoryRoute: true, hasSourcesRoute: true, hasReplyResults: true, hasDiscussionReadiness: true },
         configuration: { assistantContextAvailable: true }, actions: { send: 200, sendStatus: 'recorded', audit: 200, history: 200, sources: 200, reply: 'ok' } }
     case 'backupContextReply':
-      return { before: { bindings: 1, results: 1, messages: 2 }, after: { bindings: 1, results: 1, messages: 2 }, artifacts: 1, reply: 'ok' }
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        before: { bindings: 1, results: 1, messages: 2 }, after: { bindings: 1, results: 1, messages: 2 }, artifacts: 1, reply: 'ok' }
     case 'frozenScope':
       return { artifact: { buildId: 'b', source: 'a'.repeat(40), schema: 18, tarSha256: 'b'.repeat(64), tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         capability: { hasContextRoute: true, hasHistoryRoute: true, hasSourcesRoute: true, hasReplyResults: true }, main: { schema: 18 }, currentMainEligible: true }
@@ -1072,6 +1121,93 @@ const CASES = [
           source: COMMIT, buildId: 'build-1', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '999', platform: 'linux', arch: 'x64' } }
         return report
       }, 'subject_mismatch'),
+  },
+  {
+    id: 'E1-MUTATE-HELPER-FOREIGN-PROVENANCE',
+    title: 'A new-source safety helper cannot certify the older installed subject',
+    check: ({ assert }) =>
+      rejectWith(assert, 'HELPER_FOREIGN', (report) => {
+        // The full original report stays intact; only the helper provenance is swapped to the newer
+        // frozen package while the installed subject remains the older one.
+        const item = findCase(report, 'E5-D-OWNERSHIP-MOCKS')
+        item.evidence.ownershipMocks = { ...item.evidence.ownershipMocks,
+          helper: { ...item.evidence.ownershipMocks.helper, sourceCommit: '9'.repeat(40), buildId: 'new-build', tarSha256: '8'.repeat(64) } }
+        return report
+      }, 'helper_source'),
+  },
+  {
+    id: 'E1-MUTATE-HELPER-WITHOUT-FILE-HASH',
+    title: 'Helper provenance without the loaded file digest is not admissible',
+    check: ({ assert }) =>
+      rejectWith(assert, 'HELPER_NO_HASH', (report) => {
+        const item = findCase(report, 'E5-D-OWNERSHIP-MOCKS')
+        delete item.evidence.ownershipMocks.helper.upgradeSha256
+        return report
+      }, 'helper_provenance'),
+  },
+  {
+    id: 'E1-MUTATE-OWNERSHIP-SUBJECT-FOREIGN',
+    title: 'The safety probe subject must equal the tested install tuple',
+    check: ({ assert }) =>
+      rejectWith(assert, 'OWNERSHIP_SUBJECT', (report) => {
+        const item = findCase(report, 'E5-D-OWNERSHIP-MOCKS')
+        item.evidence.ownershipMocks.subject = { ...item.evidence.ownershipMocks.subject, source: '6'.repeat(40) }
+        return report
+      }, 'subject_mismatch'),
+  },
+  {
+    id: 'E1-MUTATE-NO-PREVIOUS-CONTROL',
+    title: 'A safety probe without the failing previous-package control is not admissible',
+    check: ({ assert }) =>
+      rejectWith(assert, 'NO_CONTROL', (report) => {
+        delete findCase(report, 'E5-D-OWNERSHIP-MOCKS').evidence.ownershipMocks.previousPackageHelper
+        return report
+      }, 'previous_control'),
+  },
+  {
+    id: 'E1-MUTATE-INSTALLED-CANDIDATE-NATIVE',
+    title: 'A candidate confirmation that records a native send is not an installed candidate proof',
+    check: ({ assert }) =>
+      rejectWith(assert, 'CANDIDATE_NATIVE', (report) => {
+        findCase(report, 'E5-INSTALLED-CANDIDATES').evidence.installedCandidates.actions.nativeSends = 1
+        return report
+      }, 'installedCandidates_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-INSTALLED-CANDIDATE-NO-REPLAY',
+    title: 'A candidate proof without the original receipt replay is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'CANDIDATE_NO_REPLAY', (report) => {
+        findCase(report, 'E5-INSTALLED-CANDIDATES').evidence.installedCandidates.actions.candidateReplaySame = false
+        return report
+      }, 'installedCandidates_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-SECOND-ROOT-RESEND',
+    title: 'A second root that issued a provider request is not a held restored snapshot',
+    check: ({ assert }) =>
+      rejectWith(assert, 'SECOND_ROOT_RESEND', (report) => {
+        findCase(report, 'E7-SECOND-ROOT-READONLY').evidence.secondRoot.readOnly.modelRequestsAfter = 3
+        return report
+      }, 'secondRoot_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-SOURCE-PREPARE-GRANTED',
+    title: 'An installed source confirmation that claims authorization is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'SOURCE_GRANTED', (report) => {
+        findCase(report, 'E6-INSTALLED-SOURCE-CONFIRM').evidence.installedSourceConfirm.prepare.authorization = 'granted'
+        return report
+      }, 'installedSourceConfirm_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-STABILITY-QUEUE-NOT-RETURNED',
+    title: 'A stability run that leaves queue rows behind is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'STABILITY_QUEUE', (report) => {
+        findCase(report, 'E9-INSTALLED-STABILITY').evidence.installedStability.queueReturned = false
+        return report
+      }, 'installedStability_invalid'),
   },
   {
     id: 'E1-MUTATE-SELF-CLAIM',

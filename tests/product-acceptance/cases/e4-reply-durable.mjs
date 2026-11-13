@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { ProductStore } from '../../../packages/storage/dist/index.js'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
+import { DEFAULT_FROZEN_DIRS, fileDigest, frozenArtifactSubject, helperPackage, loadFrozenArtifact, packagedFileDigest } from '../lib/frozen-package.mjs'
 
 const here = new URL('.', import.meta.url).pathname
 const child = join(here, 'w12-reply-process-child.mjs')
@@ -96,20 +97,70 @@ export async function runReplyDurability() {
     ...define('E4-B-PRODUCTION-RECOVERY', 'Real B production begin/answer/stop recovery through the product Store/queues/Runner', { layer: LAYERS.NOT_TESTED }),
   }, 'NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B\'s new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery.'))
 
-  cases.push(await runCase({ ...define('E5-D-OWNERSHIP-MOCKS', 'D same-UID unregistered child is UNKNOWN, not signalled, and blocks the stop proof', { layer: LAYERS.INSTALLED }), evidence: {} },
+  cases.push(await runCase({ ...define('E5-D-OWNERSHIP-MOCKS', 'D same-UID unregistered child is UNKNOWN, not signalled, and blocks the stop proof — helper loaded from the same frozen package as the installed subject', { layer: LAYERS.INSTALLED }), evidence: {} },
     async ({ assert, evidence }) => {
       const script = join(new URL('.', import.meta.url).pathname, 'w17-d-child-gate.mjs')
-      const child = spawnSync(process.execPath, [script], { encoding: 'utf8', timeout: 60_000 })
-      let probe
-      try { probe = JSON.parse(String(child.stdout).trim().split('\n').filter(Boolean).at(-1)) } catch { probe = undefined }
-      const steps = Object.fromEntries((probe?.steps ?? []).map(item => [item.id, item]))
-      assert('D_GATE_RAN', probe !== undefined, `status=${child.status} ${child.stderr.slice(-300)}`)
+      const runProbe = spec => {
+        const child = spawnSync(process.execPath, [script], {
+          encoding: 'utf8', timeout: 240_000, env: { ...process.env, PA_HELPER_PACKAGE: JSON.stringify(helperPackage(spec)) },
+        })
+        let probe
+        try { probe = JSON.parse(String(child.stdout).trim().split('\n').filter(Boolean).at(-1)) } catch { probe = undefined }
+        return { child, probe }
+      }
+      let target, previous
+      try {
+        target = loadFrozenArtifact('target', DEFAULT_FROZEN_DIRS.target)
+        previous = loadFrozenArtifact('baseline', DEFAULT_FROZEN_DIRS.baseline)
+      } catch (error) {
+        assert('D_FROZEN_PACKAGE_PRESENT', false, String(error?.message ?? error).slice(0, 300))
+        return
+      }
+      const primary = runProbe(target)
+      const steps = Object.fromEntries((primary.probe?.steps ?? []).map(item => [item.id, item]))
+      const helperUpgrade = packagedFileDigest(target, '/apps/launcher/lib/upgrade.mjs')
+      const helperInstance = packagedFileDigest(target, '/apps/launcher/lib/instance.mjs')
+      assert('D_GATE_RAN', primary.probe !== undefined, `status=${primary.child.status} ${String(primary.child.stderr).slice(-300)}`)
+      assert('D_PACKAGE_VERIFIED', steps.package_verified?.status === 'PASS', JSON.stringify(steps.package_verified ?? null))
+      assert('D_HELPER_FROM_PACKAGE',
+        primary.probe?.helper?.sourceCommit === target.sourceCommit &&
+        primary.probe?.helper?.upgradeSha256 === helperUpgrade?.sha256 &&
+        primary.probe?.helper?.instanceSha256 === helperInstance?.sha256,
+        JSON.stringify({ reported: primary.probe?.helper ?? null, tar: { upgrade: helperUpgrade?.sha256, instance: helperInstance?.sha256 } }))
       assert('D_PARENT_OWNED', steps.parent_owned?.status === 'PASS', JSON.stringify(steps.parent_owned ?? null))
       assert('D_CHILD_NOT_OWNED', steps.same_uid_child_not_owned?.status === 'PASS', JSON.stringify(steps.same_uid_child_not_owned ?? null))
       assert('D_CHILD_ALIVE', steps.child_not_signalled?.status === 'PASS', JSON.stringify(steps.child_not_signalled ?? null))
-      assert('D_PROOF_NOT_FALSE_POSITIVE', steps.unknown_child_blocks_proof?.status === 'PASS' && probe?.proof?.proven === false, JSON.stringify(probe?.proof ?? null))
-      evidence.ownershipMocks = { dRoot: probe?.dRoot, steps: probe?.steps ?? [], proof: probe?.proof ?? null,
-        accounted: { owned: probe?.accounted?.owned?.map(item => item.pid), unknownLive: probe?.accounted?.unknownLive?.map(item => item.pid) } }
+      assert('D_PROOF_NOT_FALSE_POSITIVE', steps.unknown_child_blocks_proof?.status === 'PASS' && primary.probe?.proof?.proven === false, JSON.stringify(primary.probe?.proof ?? null))
+
+      // Positive control: the previous frozen package must still fail the same probe, so a green
+      // result cannot be explained by a probe that never discriminates the defect.
+      const control = runProbe(previous)
+      const controlSteps = Object.fromEntries((control.probe?.steps ?? []).map(item => [item.id, item]))
+      const controlFailures = (control.probe?.steps ?? []).filter(item => item.status === 'FAIL').map(item => item.id)
+      assert('D_PREVIOUS_CONTROL_RAN', control.probe !== undefined, `status=${control.child.status}`)
+      assert('D_PREVIOUS_PACKAGE_UNSAFE',
+        controlSteps.same_uid_child_not_owned?.status === 'FAIL' && controlSteps.child_not_signalled?.status === 'FAIL' &&
+        control.probe?.proof?.proven === true,
+        JSON.stringify({ failures: controlFailures, proof: control.probe?.proof ?? null }))
+      assert('D_HELPER_DIFFERS_FROM_PREVIOUS',
+        control.probe?.helper?.upgradeSha256 !== primary.probe?.helper?.upgradeSha256 &&
+        control.probe?.helper?.sourceCommit !== target.sourceCommit,
+        JSON.stringify({ previous: control.probe?.helper?.upgradeSha256 ?? null, target: primary.probe?.helper?.upgradeSha256 ?? null }))
+
+      evidence.ownershipMocks = {
+        subject: frozenArtifactSubject(target),
+        helper: { ...(primary.probe?.helper ?? {}), tarPath: target.tarPath, upgradeBytesFromTar: helperUpgrade?.bytes, instanceBytesFromTar: helperInstance?.bytes },
+        productSource: { artifact: target.name, source: target.sourceCommit, buildId: target.buildId, tarSha256: target.tarSha256 },
+        probeSource: { path: 'tests/product-acceptance/cases/w17-d-child-gate.mjs', sha256: fileDigest(script) },
+        previousPackageHelper: {
+          source: previous.sourceCommit, buildId: previous.buildId, tarSha256: previous.tarSha256,
+          upgradeSha256: control.probe?.helper?.upgradeSha256 ?? null,
+          pass: (control.probe?.steps ?? []).filter(item => item.status === 'PASS').length,
+          fail: controlFailures.length, failures: controlFailures, proof: control.probe?.proof ?? null,
+        },
+        steps: primary.probe?.steps ?? [], proof: primary.probe?.proof ?? null,
+        accounted: { owned: primary.probe?.accounted?.owned?.map(item => item.pid), unknownLive: primary.probe?.accounted?.unknownLive?.map(item => item.pid) },
+      }
     }))
 
   return { cases, artifacts: {} }

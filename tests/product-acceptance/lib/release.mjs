@@ -378,6 +378,67 @@ export function replyBadArtifactIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   return value.calls === 0 && value.replies === 0 && typeof value.notice === 'string' ? [] : ['bad_artifact']
 }
+const OWNERSHIP_ISSUE_CODES = Object.freeze({
+  subject: 'ownership_subject', helper_provenance: 'helper_provenance', helper_source: 'helper_source',
+  helper_build: 'helper_build', helper_tar: 'helper_tar', probe_source: 'probe_source',
+  previous_control: 'previous_control', previous_control_identity: 'previous_control_identity',
+})
+export function installedStabilityIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  if (value.mode !== 'recovery_readonly') issues.push('mode')
+  if (!Array.isArray(value.concurrent) || value.concurrent.length !== 4 || value.concurrent.some(status => status !== 200)) issues.push('concurrent')
+  if (value.repeatedEqual !== true || value.queueReturned !== true || value.countsStable !== true) issues.push('returned')
+  if (value.providerUnchanged !== true) issues.push('resend')
+  if (value.reopened !== 'RUNNING' || value.reopenedEqual !== true) issues.push('reopen')
+  return issues
+}
+export function secondRootIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const readOnly = value.readOnly ?? {}, before = value.before ?? {}, after = value.after ?? {}, issues = []
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  if (value.mode !== 'recovery_readonly' || value.restore !== 'RESTORED' || value.verify !== 'VERIFIED') issues.push('restored')
+  if (readOnly.originalBodyEqual !== true || !(readOnly.messages >= 3)) issues.push('original_body')
+  if (readOnly.workPhase !== 'delivered' || !(readOnly.workArtifacts >= 1)) issues.push('held_work')
+  if (readOnly.candidates !== 200 || readOnly.candidateStatus !== 'candidates' || !(readOnly.candidateCount >= 1)) issues.push('candidates')
+  if (readOnly.audit !== 200 || readOnly.history !== 200 || readOnly.sources !== 200 || !(readOnly.historyRows >= 1)) issues.push('context')
+  if (readOnly.business !== 422) issues.push('business')
+  if (!Number.isSafeInteger(readOnly.effectRows) || readOnly.effectRows !== readOnly.effectRowsBefore) issues.push('queue')
+  if (!Number.isSafeInteger(readOnly.modelRequestsAfter) || readOnly.modelRequestsAfter !== readOnly.modelRequestsBefore) issues.push('resend')
+  if (!(before.bindings >= 1 && before.results >= 1 && after.bindings === before.bindings && after.results === before.results &&
+    after.messages === before.messages && after.decisions === before.decisions)) issues.push('data')
+  return issues
+}
+export function installedSourceConfirmIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const prepare = value.prepare ?? {}, confirm = value.confirm ?? {}, replay = value.replay ?? {}, reopened = value.reopened ?? {}, issues = []
+  if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
+  if (value.mode !== 'recovery_readonly') issues.push('mode')
+  if (prepare.status !== 200 || prepare.authorization !== 'not_granted' || prepare.startupAvailable !== false) issues.push('not_granted')
+  if (prepare.targetCreated !== false) issues.push('target')
+  if (confirm.status !== 200 || !isSubstantive(confirm.activationId) || confirm.auditEqual !== true) issues.push('confirm')
+  if (value.queueHeld !== true || value.markerUnchanged !== true) issues.push('held')
+  if (replay.status !== 200 || replay.equal !== true) issues.push('replay')
+  if (reopened.status !== 'RUNNING' || reopened.replay !== 200 || reopened.equal !== true) issues.push('reopen')
+  if (!Number.isSafeInteger(value.providerRequests)) issues.push('provider')
+  return issues
+}
+export function installedCandidatesIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const actions = value.actions ?? {}, issues = []
+  if (value.mode !== 'personal' || value.action !== 'discussion_only_default_off_then_enabled') issues.push('mode')
+  if (actions.suggestionsOff !== 200 || actions.suggestionsOffEnabled !== false || actions.offCandidateStatus !== 'none') issues.push('default_off')
+  if (actions.suggestionsOn !== 200 || actions.suggestionsOnEnabled !== true) issues.push('opt_in')
+  if (actions.candidates !== 200 || actions.candidateStatus !== 'candidates' || !(actions.candidateCount >= 2)) issues.push('candidates')
+  if (actions.candidateWorkPrepare !== 200 || !(actions.candidateWorkRequiredInputs?.length > 0) || actions.candidateWorkStatus !== 'rejected') issues.push('required_inputs')
+  if (actions.candidatePrepare !== 200 || actions.candidateConfirmStatus !== 'recorded') issues.push('confirm')
+  if (actions.candidateReplay !== 200 || actions.candidateReplaySame !== true) issues.push('replay')
+  if (actions.candidateRejectPrepare !== 200 || actions.candidateRejectStatus !== 'recorded') issues.push('reject')
+  if (actions.nativeSends !== 0 || actions.dispatchPaused !== 'discussion_only_no_executor') issues.push('native')
+  if (!isSubstantive(value.subject?.buildId)) issues.push('subject')
+  return issues
+}
 export function ownershipMocksIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const steps = Object.fromEntries((value.steps ?? []).map(item => [item.id, item]))
@@ -386,6 +447,29 @@ export function ownershipMocksIssues(value) {
   if (steps.same_uid_child_not_owned?.status !== 'PASS') issues.push('child_owned')
   if (steps.child_not_signalled?.status !== 'PASS') issues.push('child_signalled')
   if (steps.unknown_child_blocks_proof?.status !== 'PASS' || value.proof?.proven !== false) issues.push('proof')
+  // The safety helper must be the one shipped inside the same frozen package as the installed
+  // subject: a green probe produced from a newer source checkout cannot certify an older binary.
+  const subject = value.subject
+  if (!subject || !isSubstantive(subject.source) || !isSubstantive(subject.buildId) ||
+    !Number.isSafeInteger(subject.schema) || !HEX.test(String(subject.tarSha256 ?? '')) ||
+    !Number.isSafeInteger(subject.tarBytes)) issues.push('subject')
+  const helper = value.helper
+  if (!helper || !HEX.test(String(helper.upgradeSha256 ?? '')) || !HEX.test(String(helper.instanceSha256 ?? '')) ||
+    !Number.isSafeInteger(helper.upgradeBytes) || !Number.isSafeInteger(helper.instanceBytes)) {
+    issues.push('helper_provenance')
+  } else {
+    if (String(helper.sourceCommit ?? '') !== String(subject?.source ?? '')) issues.push('helper_source')
+    if (String(helper.buildId ?? '') !== String(subject?.buildId ?? '')) issues.push('helper_build')
+    if (String(helper.tarSha256 ?? '') !== String(subject?.tarSha256 ?? '')) issues.push('helper_tar')
+  }
+  if (!value.probeSource || !HEX.test(String(value.probeSource.sha256 ?? ''))) issues.push('probe_source')
+  // A positive control: the previous frozen package must still fail this probe. Without it a green
+  // result is compatible with a probe that never discriminates the defect.
+  const previous = value.previousPackageHelper
+  if (!previous || !isSubstantive(previous.source) || !HEX.test(String(previous.upgradeSha256 ?? '')) ||
+    !Number.isSafeInteger(previous.fail) || previous.fail < 1) issues.push('previous_control')
+  else if (String(previous.source) === String(subject?.source ?? '') ||
+    String(previous.upgradeSha256) === String(helper?.upgradeSha256 ?? '')) issues.push('previous_control_identity')
   return issues
 }
 export function ownershipCopyIssues(value) {
@@ -831,7 +915,7 @@ export function evaluateRelease({
   const canonicalTuple = byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target
   if (canonicalTuple) {
     const subjectCases = ['E6-ARTIFACT-CURRENT-SCOPE', 'E6-CURRENT-MAIN-INSTALL', 'E6-INSTALLED-CONTEXT',
-      'E7-OWNERSHIP-COPY', 'E7-BACKUP-CONTEXT-REPLY', 'E4-UPGRADE-FAULTS']
+      'E7-OWNERSHIP-COPY', 'E7-BACKUP-CONTEXT-REPLY', 'E4-UPGRADE-FAULTS', 'E5-D-OWNERSHIP-MOCKS', 'E5-INSTALLED-CANDIDATES', 'E7-SECOND-ROOT-READONLY', 'E6-INSTALLED-SOURCE-CONFIRM', 'E9-INSTALLED-STABILITY']
     const normalize = (value, key) => key === 'source' ? (value?.source ?? value?.sourceCommit)
       : key === 'schema' ? (value?.schema ?? value?.productSchema) : value?.[key]
     for (const id of subjectCases) {
@@ -840,7 +924,9 @@ export function evaluateRelease({
       const subject = item.evidence?.subject ?? item.evidence?.frozenScope?.artifact ??
         item.evidence?.currentInstall?.subject ?? item.evidence?.upgradeFaults?.subject ??
         item.evidence?.ownershipCopy?.subject ?? item.evidence?.installedContext?.subject ??
-        item.evidence?.backupContextReply?.subject
+        item.evidence?.backupContextReply?.subject ?? item.evidence?.ownershipMocks?.subject ??
+        item.evidence?.installedCandidates?.subject ?? item.evidence?.secondRoot?.subject ??
+        item.evidence?.installedSourceConfirm?.subject ?? item.evidence?.installedStability?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
@@ -888,9 +974,10 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
-          for (const issue of fn(result.evidence?.[key])) failures.push(fail(`${key}_invalid`, `${key} ${issue}`, entry.id))
+          for (const issue of fn(result.evidence?.[key]))
+            failures.push(fail(key === 'ownershipMocks' ? (OWNERSHIP_ISSUE_CODES[issue] ?? 'ownershipMocks_invalid') : `${key}_invalid`, `${key} ${issue}`, entry.id))
         }
       }
       if (entry.evidence?.includes('personalInstall')) {
