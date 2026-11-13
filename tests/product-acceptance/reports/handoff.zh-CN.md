@@ -1,6 +1,6 @@
 # Agent E 第十八轮交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `f875ead`，检查点 `null`，本次证据源 `2b128731b55dd213b8d18d25da48e0af028a3263`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `f875ead`，检查点 `null`，本次证据源 `93c56f6fac16f31dab354e94a107339f767727be`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
 
@@ -15,7 +15,7 @@
 | `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 20 + NOT_TESTED 5 |
 | `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 204 | PASS 189 + FAIL 0 + SKIPPED 0 + NOT_TESTED 15 + BLOCKED 0 + UNKNOWN 0 |
 
-本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T06-47-16-556Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T06-57-42-337Z`。
 
 ## 矩阵摘要
 
