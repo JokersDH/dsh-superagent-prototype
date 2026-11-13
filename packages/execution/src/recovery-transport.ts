@@ -32,7 +32,7 @@ export interface RecoveryRunnerPort {
    * client recover the original work without a second ledger: the frames come from the Runner's own
    * durable journal, not from the caller's memory.
    */
-  facts?(since: number): Promise<{ frames: unknown[]; next: number }>
+  facts?(since: number, maxBytes: number): Promise<{ frames: unknown[]; next: number; done: boolean }>
   /**
    * Business command intake for an attached client. The Runner applies it to the SAME attempt and
    * child; this is admission of an authenticated command, not a second execution lifecycle.
@@ -69,6 +69,10 @@ function credential(path: string): string {
 }
 function identity(context: RuntimeProducer): RuntimeProducer {
   return { attempt: AttemptRefSchema.parse(context.attempt), runnerIdentityRef: IdSchema.parse(context.runnerIdentityRef), source: IdSchema.parse(context.source) }
+}
+/** A business command must name the same attempt it claims to act for. */
+function matchesProducerAttempt(attempt: RuntimeProducer['attempt'], command: { ticketId?: unknown; fenceEpoch?: unknown }): boolean {
+  return command.ticketId === attempt.ticketId && command.fenceEpoch === attempt.fenceEpoch
 }
 function matches(a: RuntimeProducer, b: RuntimeProducer): boolean {
   const left = a.attempt, right = b.attempt
@@ -110,17 +114,33 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
     if (req.method === 'GET' && req.url === '/v1/inspection') { reply(res, 200, await inspect(await backend.inspect())); return }
     if (req.method === 'GET' && req.url?.startsWith('/v1/facts')) {
       if (!backend.facts) { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
-      const since = Number(new URL(req.url, 'http://runner').searchParams.get('since') ?? '0')
+      const query = new URL(req.url, 'http://runner').searchParams
+      const since = Number(query.get('since') ?? '0')
+      const maxBytes = Number(query.get('maxBytes') ?? '49152')
       if (!Number.isSafeInteger(since) || since < 0) { reply(res, 400, { error: 'invalid_since' }); return }
-      const replay = await backend.facts(since)
-      if (!Array.isArray(replay.frames) || !Number.isSafeInteger(replay.next) || replay.next < since) { reply(res, 503, { error: 'invalid_replay' }); return }
-      reply(res, 200, { frames: replay.frames, next: replay.next })
+      if (!Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 1_048_576) { reply(res, 400, { error: 'invalid_page_budget' }); return }
+      const replay = await backend.facts(since, maxBytes)
+      if (!Array.isArray(replay.frames) || !Number.isSafeInteger(replay.next) || replay.next < since || typeof replay.done !== 'boolean') {
+        reply(res, 503, { error: 'invalid_replay' }); return
+      }
+      // Every page carries the server's OWN registered producer identity, injected here rather than
+      // trusted from the backend, so a caller can verify the page before it exposes any frame.
+      reply(res, 200, { producer: trusted, frames: replay.frames, next: replay.next, done: replay.done })
       return
     }
     if (req.method === 'POST' && req.url === '/v1/commands') {
       if (!backend.command) { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
-      const command = RunnerCommandSchema.parse(await body(req))
-      if (!matches({ ...trusted, attempt: command }, trusted)) { reply(res, 409, { error: 'identity_mismatch' }); return }
+      const envelope = await body(req) as { producer?: unknown; command?: unknown }
+      const command = RunnerCommandSchema.parse(envelope.command)
+      // The previous check spread the trusted producer over the command, so source and identity always
+      // matched itself and a foreign producer could still mutate before the mismatch surfaced. The
+      // caller now has to state its producer and the statement is compared before any write.
+      const claimed = envelope.producer
+      if (!claimed || typeof claimed !== 'object') { reply(res, 409, { error: 'identity_mismatch' }); return }
+      let claimedProducer: RuntimeProducer
+      try { claimedProducer = identity(claimed as RuntimeProducer) } catch { reply(res, 409, { error: 'identity_mismatch' }); return }
+      if (!matches(claimedProducer, trusted)) { reply(res, 409, { error: 'identity_mismatch' }); return }
+      if (!matchesProducerAttempt(claimedProducer.attempt, command)) { reply(res, 409, { error: 'identity_mismatch' }); return }
       const content = JSON.stringify(command), existing = commands.get(command.id)
       if (existing && existing.body !== content) { reply(res, 409, { error: 'command_conflict' }); return }
       if (!existing && commands.size >= 256) { reply(res, 503, { error: 'control_capacity' }); return }
@@ -200,13 +220,20 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
   }
   return Object.freeze({ inspect: () => call('GET', '/v1/inspection'),
     cancel: (command: Extract<ReturnType<typeof RunnerCommandSchema.parse>, { kind: 'cancel' }>) => call('POST', '/v1/cancel', command),
-    facts: async (since = 0) => {
+    facts: async (since = 0, maxBytes = 49_152) => {
       if (!Number.isSafeInteger(since) || since < 0) throw new RunnerLinkError('invalid_response', 'Fact replay cursor must be a nonnegative integer')
+      if (!Number.isSafeInteger(maxBytes) || maxBytes < 1024) throw new RunnerLinkError('invalid_response', 'Fact page budget must be at least 1024 bytes')
       // Replay is not an inspection, so it is validated as its own shape rather than forced through one.
-      const { value } = await invoke('GET', `/v1/facts?since=${since}`) as { value: unknown }
-      const replay = value as { frames?: unknown; next?: unknown }
-      if (!Array.isArray(replay?.frames) || !Number.isSafeInteger(replay?.next)) throw new RunnerLinkError('invalid_response', 'Runner fact replay did not match the attach protocol')
-      return { frames: replay.frames as unknown[], next: replay.next as number }
+      const { value } = await invoke('GET', `/v1/facts?since=${since}&maxBytes=${maxBytes}`) as { value: unknown }
+      const replay = value as { producer?: unknown; frames?: unknown; next?: unknown; done?: unknown }
+      if (!Array.isArray(replay?.frames) || !Number.isSafeInteger(replay?.next) || typeof replay?.done !== 'boolean')
+        throw new RunnerLinkError('invalid_response', 'Runner fact replay did not match the attach protocol')
+      // Each page must still be the registered producer. Holding a credential, or having inspected once
+      // earlier, does not by itself authorise this page, so the producer is verified per page here
+      // before any frame is handed back to the caller.
+      const pageProducer = identity(replay.producer as RuntimeProducer)
+      if (!matches(pageProducer, trusted)) throw new RunnerLinkError('identity_mismatch', 'Fact replay page belongs to another registered attempt')
+      return { producer: pageProducer, frames: replay.frames as unknown[], next: replay.next as number, done: replay.done as boolean }
     },
-    command: (command: ReturnType<typeof RunnerCommandSchema.parse>) => call('POST', '/v1/commands', command) })
+    command: (command: ReturnType<typeof RunnerCommandSchema.parse>) => call('POST', '/v1/commands', { producer: trusted, command }) })
 }

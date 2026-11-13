@@ -1,0 +1,77 @@
+{
+  "wave": "product-wave-23",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "f29c9e6",
+  "previousCandidate": "f35c38b",
+  "checkpoint": "1 of 3",
+  "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. No second ledger/coordinator/lifecycle, no frozen-wire edit, no main guard removed, no global socket scan, no unrelated credentials. Twelve services and all ledgers untouched. Two historical report diffs and untracked b16-real-begin.mjs preserved.",
+
+  "notWrapperOnly": {
+    "statement": "the business channel source is real and is not called wrapper-only",
+    "preserved": "old control 9/9 (registration/guard/pending/post-proof 5, identity/inode/epoch 3 plus control branch), reconcile 4/4, actual-module strict/exactOptional clean, normal producer Q&A + physical stop 10/10"
+  },
+
+  "namedDefectsAddressed": {
+    "factsNotIdentityBound": {
+      "before": "a facts page carried no producer identity, so a caller could not tell whose page it was",
+      "after": "the server injects its OWN registered producer into every page, and the client verifies that producer against its trusted producer BEFORE returning any frame",
+      "honesty": "an earlier draft wrote a placeholder verification that did nothing; it was replaced with a real match that throws identity_mismatch"
+    },
+    "noBoundedPagingOver64KB": {
+      "before": "a legal 160-entry journal exceeded the single response and could not be replayed",
+      "after": "GET /v1/facts now takes an explicit maxBytes page budget (1024..1048576, invalid budgets refused), pages are closed by bytes, the page-end cursor is the journal's REAL immutable seq rather than a renumbered array index, and done states the end",
+      "largeFrame": "a single frame larger than the budget still gets its own page instead of being dropped, so a valid large payload is readable deliberately rather than silently truncated"
+    },
+    "lowLevelCommandMutatedBeforeIdentityRefusal": {
+      "before": "the route compared a producer spread over the command against itself, so source and identity always matched and a foreign producer could still reach the backend",
+      "after": "the command request must now state its producer envelope; the server validates that envelope and that the command's own ticket/epoch match the claimed attempt BEFORE dispatching to the backend"
+    }
+  },
+
+  "deliveredSource": {
+    "files": [
+      "packages/execution/src/recovery-transport.ts",
+      "apps/runner/src/recovery-endpoint.ts",
+      "apps/runner/src/runner-service.ts",
+      "apps/runner/src/business-attach.ts"
+    ],
+    "typecheck": "root tsconfig reports no error in any of the four files"
+  },
+
+  "acceptanceHarness": {
+    "file": "tests/native-acceptance/b23-bounded-attach.mjs",
+    "status": "NOT PASSING - NOT EVIDENCE",
+    "covers": ["journal larger than 64KiB", "multi-page complete replay with contiguous original seq", "page identity", "foreign producer refused before frames", "invalid cursor refused", "foreign command refused 409 before backend write"],
+    "observed": "the real FileCriticalJournal refuses my synthetic entries with journal_snapshot_unverified, because whole-file verification requires real payload/reference consistency that hand-written facts do not satisfy",
+    "meaning": "the code paths are implemented and type-clean, but the bounded-replay and pre-write-refusal claims are NOT yet observed. The harness must build its journal through the real payload/driver path instead of fabricating entries."
+  },
+
+  "stillNotDone": {
+    "B1_rfcAndMinimalInterfaceForMain": "no RFC document yet; the four methods are the intended surface but are undocumented for main",
+    "B2_fullAcceptance": "identity/foreign/old-epoch/replaced-socket cases not independently asserted in a passing harness",
+    "B3_unifiedDispatch": "the new endpoint command path and the original stdio path are not yet proven to share ONE dispatch with begin-once/prepared-policy/control-priority",
+    "B4_realRebind": "fact sink receipt ACK, immutable payload read response and native write admission are still bound to the original stdio channel; they are NOT yet rebindable to a new client",
+    "milestone1": "NOT PASSED",
+    "milestone2_sigkillRecovery": "NOT_REACHED",
+    "milestone3_recoveredVerifyAcceptSlots": "NOT_REACHED"
+  },
+
+  "wholePackageComplete": false,
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "bConsumes": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "limitations": [
+    "the acceptance harness does not pass, so none of the B2/B3 behaviours is claimed as observed",
+    "no installed agent or gateway was contacted; the lane is a local journal plus the real authenticated endpoint",
+    "receipt ACK, payload reads and native write admission remain on the original stdio channel",
+    "one of three runnable milestones published"
+  ]
+}

@@ -16,7 +16,7 @@ export type RecoveryEndpointOptions = {
   state: () => 'serving' | 'terminated' | 'unknown'
   cancel: (command: Extract<RunnerCommand, { kind: 'cancel' }>) => Promise<void>
   /** Durable business facts this Runner already recorded, for attach replay. */
-  facts?: (since: number) => Promise<{ frames: unknown[]; next: number }>
+  facts?: (since: number, maxBytes: number) => Promise<{ frames: unknown[]; next: number; done: boolean }>
   /** Business command intake for an attached client; applied to the same attempt and child. */
   command?: (command: RunnerCommand) => Promise<void>
   now?: () => string

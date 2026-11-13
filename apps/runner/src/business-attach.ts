@@ -63,7 +63,7 @@ export type BusinessAttach = {
   /** Authenticated inspection of the live Runner bound to this exact attempt. */
   inspect(): Promise<VerifiedRunnerInspection>
   /** Facts the Runner already recorded from `since`, read from its own journal. */
-  facts(since?: number): Promise<{ frames: unknown[]; next: number }>
+  facts(since?: number, maxBytes?: number): Promise<{ producer: unknown; frames: unknown[]; next: number; done: boolean }>
   /** Send one original business command, or return a refusal that wrote nothing. */
   send(command: RunnerCommand): Promise<AttachSendOutcome>
   close(): void
@@ -109,7 +109,7 @@ export async function attachBusinessRunner(options: BusinessAttachOptions): Prom
 
   return {
     inspect: () => client.inspect(),
-    facts: (since = 0) => client.facts(since),
+    facts: (since = 0, maxBytes = 49_152) => client.facts(since, maxBytes),
     async send(command) {
       const reconciliation: AttachReconciliation = options.reconcile?.(command.id) ?? { state: 'not_seen' }
       if (reconciliation.state === 'observed') {
@@ -134,7 +134,7 @@ const refusingAttach = (refusal: AttachRefusal): BusinessAttach => ({
     throw new Error(`business attach refused (${refusal.refused}): ${refusal.detail}`)
   },
   async facts() {
-    return { frames: [], next: 0 }
+    return { producer: null, frames: [], next: 0, done: true }
   },
   async send() {
     return refusal

@@ -271,13 +271,23 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               },
               // Business attach: facts come from this Runner's own durable journal, so a second client
               // recovers the original work instead of trusting its own memory or a second ledger.
-              facts: async since => {
-                const entries = journal!.entries().map((entry, index) => ({
-                  seq: index + 1,
-                  fact: entry.fact,
-                  payload: entry.payload,
-                }))
-                return { frames: entries.filter(entry => entry.seq > since), next: entries.length }
+              // Paging follows the journal's real immutable seq, never a renumbered array index, and a
+              // page is closed by a byte budget rather than by truncating or raising a global limit.
+              facts: async (since, maxBytes) => {
+                const all = journal!.entries().filter(entry => entry.seq > since)
+                const frames: unknown[] = []
+                let bytes = 0, next = since, done = true
+                for (const entry of all) {
+                  const frame = { seq: entry.seq, fact: entry.fact, payload: entry.payload }
+                  // One oversized frame still gets its own page so a valid large payload is readable
+                  // instead of being silently dropped; the caller can then fetch it deliberately.
+                  const size = Buffer.byteLength(JSON.stringify(frame))
+                  if (frames.length > 0 && bytes + size > maxBytes) { done = false; break }
+                  frames.push(frame)
+                  bytes += size
+                  next = entry.seq
+                }
+                return { frames, next, done }
               },
               // Business commands are admitted to the SAME attempt and child through the existing feed.
               command: async command => {
