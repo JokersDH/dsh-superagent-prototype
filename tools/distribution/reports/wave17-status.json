@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "baseCommit": "6f05ab5",
   "mergedMain": "45918ed",
-  "head": "65102f7",
+  "head": "e06154d",
   "status": "CANDIDATE",
   "scopeNote": "Package-scoped candidate; not main/E/release admission. Model/native turns 0; twelve user services untouched.",
   "ownedPaths": [
@@ -302,5 +302,6 @@
     "tools/distribution/reports/wave17/*.json",
     "tools/distribution/recipes/wave17-e-acceptance.zh-CN.md",
     "docs/rfcs/WP-16/0050-wave-17-d-independent-child-and-source-confirmation.md"
-  ]
+  ],
+  "evidenceHead": "e06154d"
 }
