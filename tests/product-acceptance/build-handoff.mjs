@@ -617,48 +617,14 @@ node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record
 
 writeFileSync(join(reports, 'release-matrix.json'), JSON.stringify(matrix, null, 2) + '\n')
 writeFileSync(join(reports, 'execution-status.json'), JSON.stringify(executionStatus, null, 2) + '\n')
-writeFileSync(
-  join(reports, 'wave17-status.json'),
-  JSON.stringify({
-    ...executionStatus,
-    schema: 'product-acceptance-wave17-status/1',
-    taskPackage: 'agent-tasks/product-wave-17/README.zh-CN.md',
-    supersedes: 'wave16-status.json',
-    currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.reason ?? null,
-    requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
-      E7: byId.get('E7-OWNERSHIP-COPY')?.status ?? 'MISSING',
-      upgradeFaults: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
-      currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
-      upgradeRollback: byId.get('E4-UPGRADE-ROLLBACK')?.status ?? 'MISSING' } },
-    finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record',
-      exitCode: 0, source: report.source },
-    commands: stages.stages.map(stage => ({ id: stage.id, command: stage.command })),
-    faultWindows: {
-      copiedRecordOtherConfig: { status: byId.get('E7-OWNERSHIP-COPY')?.status ?? 'MISSING',
-        observed: byId.get('E7-OWNERSHIP-COPY')?.assertions?.find(item => !item.ok)?.detail ?? null },
-      wrongInstall: { status: byId.get('E7-OWNERSHIP-WRONG-INSTALL')?.status ?? 'MISSING',
-        observed: byId.get('E7-OWNERSHIP-WRONG-INSTALL')?.assertions?.find(item => !item.ok)?.detail ?? null },
-      stopA_whenRecordB: { status: byId.get('E4-MULTI-STATE')?.status ?? 'MISSING',
-        observed: byId.get('E4-MULTI-STATE')?.assertions?.find(item => !item.ok)?.detail ?? byId.get('E4-MULTI-STATE')?.reason ?? null },
-      launcherDead_apiAlive: { status: 'NOT_TESTED',
-        reason: byId.get('E4-MULTI-STATE')?.evidence?.multiState?.deadLauncher?.prerequisite ?? 'window unavailable' },
-      unknownLivePid: { status: byId.get('E4-INSTALL-HOST-GUARDS')?.status ?? 'MISSING' },
-      upgradeCrashWindows: { status: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
-        reason: byId.get('E4-UPGRADE-FAULTS')?.reason ?? null },
-      schemaMigration: { status: byId.get('E8-SCHEMA-MIGRATION')?.status ?? 'MISSING',
-        observed: byId.get('E8-SCHEMA-MIGRATION')?.evidence?.schemaMigration ?? null },
-      legacy16Migration: { status: byId.get('E8-LEGACY16-MIGRATION')?.status ?? 'MISSING',
-        observed: byId.get('E8-LEGACY16-MIGRATION')?.evidence?.legacyMigration ?? null },
-      replyRecoveryConsumer: { status: byId.get('E2-REPLY-DURABLE')?.status ?? 'MISSING',
-        persistence: 'A18 SQLite replyResults rows in independent processes', persistenceStatus: byId.get('E2-REPLY-DURABLE')?.status ?? 'MISSING' },
-    },
-    counts: report.counts,
-    testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
-    productSource: { commit: artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? null },
-    mainSource: { commit: stages.base, schema: byId.get('E6-ARTIFACT-CURRENT-SCOPE')?.evidence?.frozenScope?.main?.schema ?? null },
-    artifactTuple,
-  }, null, 2) + '\n',
-)
+// wave17-status.json is a frozen historical input; wave-18 supersedes it and must not rewrite it.
+if (!existsSync(join(reports, 'wave17-status.json')))
+  writeFileSync(
+    join(reports, 'wave17-status.json'),
+    JSON.stringify({ ...executionStatus, schema: 'product-acceptance-wave17-status/1',
+      taskPackage: 'agent-tasks/product-wave-17/README.zh-CN.md', counts: report.counts,
+      testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch } }, null, 2) + '\n',
+  )
 writeFileSync(
   join(reports, 'wave18-status.json'),
   JSON.stringify({

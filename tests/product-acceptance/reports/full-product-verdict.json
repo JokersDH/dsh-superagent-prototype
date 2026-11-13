@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-13T03:38:57.602Z",
+  "checkedAt": "2026-11-13T06:56:36.913Z",
   "source": {
-    "commit": "4f39f582cf5aa20c7a2846073c18e2aed4d43a74",
+    "commit": "2b128731b55dd213b8d18d25da48e0af028a3263",
     "dirty": false
   },
-  "expectedSource": "4f39f582cf5aa20c7a2846073c18e2aed4d43a74",
+  "expectedSource": "2b128731b55dd213b8d18d25da48e0af028a3263",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -696,6 +696,26 @@
       "status": "PASS"
     },
     {
+      "id": "E5-INSTALLED-CANDIDATES",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E7-SECOND-ROOT-READONLY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E6-INSTALLED-SOURCE-CONFIRM",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E9-INSTALLED-STABILITY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E6-INSTALLED-CONTEXT",
       "required": true,
       "status": "PASS"
@@ -816,7 +836,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-13T03:36:33.632Z",
+    "decidedAt": "2026-11-13T06:53:05.454Z",
     "failureCodes": []
   },
   "notes": [

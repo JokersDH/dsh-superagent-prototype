@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "4f39f582cf5aa20c7a2846073c18e2aed4d43a74",
+    "commit": "2b128731b55dd213b8d18d25da48e0af028a3263",
     "dirty": false
   },
   "environment": {
@@ -11,14 +11,14 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-13T03:36:33.619Z",
+  "checkedAt": "2026-11-13T06:53:05.435Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "failureCodes": []
   },
   "counts": {
-    "PASS": 177,
+    "PASS": 189,
     "FAIL": 0,
     "SKIPPED": 0,
     "NOT_TESTED": 15,
@@ -535,17 +535,18 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
-      "installed": "NOT_TESTED",
+      "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
-        "reply 候选仍固定 suggestions=[]，候选产品入口未独立验收；历史正文已由 E3-CONTEXT-HISTORY/SOURCES 覆盖。"
+        "历史正文本轮由 E7-SECOND-ROOT-READONLY 在第二根重新读取；候选在安装包内 default-off→显式开启后验证非空建议与 confirm/replay/reject。"
       ],
       "evidence": [
         "E4-COMPLETED-REPLY",
         "E2-REPLY-DURABLE",
         "E2-REPLY-UNKNOWN-DURABLE",
         "E2-REPLY-MESSAGE-WINDOW",
-        "E2-REPLY-BAD-ARTIFACT"
+        "E2-REPLY-BAD-ARTIFACT",
+        "E5-INSTALLED-CANDIDATES"
       ]
     },
     {
@@ -581,13 +582,16 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
-      "installed": "NOT_TESTED",
+      "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [
         "解除隔离后的新授权/环境重绑定未实现，不在本轮声明。"
       ],
       "evidence": [
-        "E4-RECOVERY-READONLY"
+        "E4-RECOVERY-READONLY",
+        "E4-BACKUP-RESTORE",
+        "E7-SECOND-ROOT-READONLY",
+        "E9-INSTALLED-STABILITY"
       ]
     },
     {
@@ -718,11 +722,14 @@
       "controlledFixture": "PASS",
       "sdkMock": "NOT_TESTED",
       "readonly": "NOT_TESTED",
-      "installed": "NOT_TESTED",
+      "installed": "PASS",
       "actualNative": "NOT_TESTED",
       "gaps": [],
       "evidence": [
-        "E4-RECOVERY-PREFLIGHT"
+        "E4-RECOVERY-PREFLIGHT",
+        "E4-SOURCE-CONFIRM",
+        "E4-SOURCE-CONFIRM-REFUSAL",
+        "E6-INSTALLED-SOURCE-CONFIRM"
       ]
     },
     {
@@ -739,6 +746,21 @@
       "evidence": [
         "E2-WORK-EVIDENCE",
         "E2-EVIDENCE-HISTORY"
+      ]
+    },
+    {
+      "id": "d-safety-helper",
+      "capability": "D 归属/safety helper 与安装 subject 同一冻结包（旧包失败对照）",
+      "controlledFixture": "NOT_TESTED",
+      "sdkMock": "NOT_TESTED",
+      "readonly": "NOT_TESTED",
+      "installed": "PASS",
+      "actualNative": "NOT_TESTED",
+      "gaps": [
+        "只测 launcher helper 的 same-UID child 归属；广泛 live stop/cleanup 仍按 D 自有矩阵执行。"
+      ],
+      "evidence": [
+        "E5-D-OWNERSHIP-MOCKS"
       ]
     },
     {
