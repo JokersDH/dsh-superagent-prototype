@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "697efdc",
-  "checkpoint": "57e24da",
-  "head": "4a71624e1f7df93bc3f11228e88e0a2e6cb15cb3",
+  "base": "6050b4b",
+  "checkpoint": "75630b5",
+  "head": "4f39f582cf5aa20c7a2846073c18e2aed4d43a74",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-13T02:05:34.612Z",
+  "checkedAt": "2026-11-13T03:36:33.619Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -27,7 +27,7 @@
       ],
       "result": "PASS",
       "counts": {
-        "PASS": 92
+        "PASS": 94
       },
       "cases": [
         {
@@ -352,6 +352,16 @@
         },
         {
           "id": "E1-MUTATE-FAULT-WRONG-OPERATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NOOP-EXIT1",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-POINTER-MISSING",
           "status": "PASS",
           "reason": null
         },
@@ -836,7 +846,7 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 18,
+        "PASS": 20,
         "NOT_TESTED": 3
       },
       "cases": [
@@ -944,6 +954,16 @@
           "id": "E4-B-PRODUCTION-RECOVERY",
           "status": "NOT_TESTED",
           "reason": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+        },
+        {
+          "id": "E4-SOURCE-CONFIRM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-SOURCE-CONFIRM-REFUSAL",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -956,7 +976,8 @@
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "NOT_TESTED": 4
+        "NOT_TESTED": 2,
+        "PASS": 2
       },
       "cases": [
         {
@@ -966,8 +987,8 @@
         },
         {
           "id": "E5-INSTALLED-CANDIDATES",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: the frozen 8962d10 package reply format is pre-suggestion (candidate GET=404, status=none); it cannot certify the current main suggestion/candidate UI. Main-source candidate flow is separately verified by E4-CANDIDATE-FLOW."
+          "status": "PASS",
+          "reason": null
         },
         {
           "id": "E5-RECOVERY-INTERRUPTION",
@@ -976,8 +997,8 @@
         },
         {
           "id": "E5-D-OWNERSHIP-MOCKS",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: wave14 actual self-owned checks cover requested data root, copied record and wrong install; D's new identity UID/argv/operation, foreign journal scope, per-PID scan failure, malformed inventory and old/new install-role mocks were not independently reproduced in this checkout. Required: import the current D ownership functions with injected inventory/signals and assert UNKNOWN/refusal for each, before any broad live cleanup matrix."
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -1105,12 +1126,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-13T02:05:34.626Z",
+    "checkedAt": "2026-11-13T03:36:33.632Z",
     "source": {
-      "commit": "4a71624e1f7df93bc3f11228e88e0a2e6cb15cb3",
+      "commit": "4f39f582cf5aa20c7a2846073c18e2aed4d43a74",
       "dirty": false
     },
-    "expectedSource": "4a71624e1f7df93bc3f11228e88e0a2e6cb15cb3",
+    "expectedSource": "4f39f582cf5aa20c7a2846073c18e2aed4d43a74",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1653,6 +1674,16 @@
         "status": "PASS"
       },
       {
+        "id": "E4-SOURCE-CONFIRM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM-REFUSAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E4-COMPLETED-REPLY",
         "required": true,
         "status": "PASS"
@@ -1780,36 +1811,36 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
     "wave09Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave09-status.json",
-    "wave16Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave16-status.json",
+    "wave17Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave17-status.json",
     "wave08Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave08-status.json",
     "wave07Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave07-status.json",
     "wave06Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave06-status.json",
@@ -2050,11 +2081,6 @@
       "owner": "B",
       "code": "production_control_not_consumed",
       "detail": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
-    },
-    {
-      "owner": "D",
-      "code": "ownership_mocks_not_reproduced",
-      "detail": "NOT_TESTED: wave14 actual self-owned checks cover requested data root, copied record and wrong install; D's new identity UID/argv/operation, foreign journal scope, per-PID scan failure, malformed inventory and old/new install-role mocks were not independently reproduced in this checkout. Required: import the current D ownership functions with injected inventory/signals and assert UNKNOWN/refusal for each, before any broad live cleanup matrix."
     },
     {
       "owner": "main",

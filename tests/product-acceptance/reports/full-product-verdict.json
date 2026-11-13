@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-13T02:08:09.680Z",
+  "checkedAt": "2026-11-13T03:38:57.602Z",
   "source": {
-    "commit": "4a71624e1f7df93bc3f11228e88e0a2e6cb15cb3",
+    "commit": "4f39f582cf5aa20c7a2846073c18e2aed4d43a74",
     "dirty": false
   },
-  "expectedSource": "4a71624e1f7df93bc3f11228e88e0a2e6cb15cb3",
+  "expectedSource": "4f39f582cf5aa20c7a2846073c18e2aed4d43a74",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -551,6 +551,16 @@
       "status": "PASS"
     },
     {
+      "id": "E4-SOURCE-CONFIRM",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-SOURCE-CONFIRM-REFUSAL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E4-COMPLETED-REPLY",
       "required": true,
       "status": "PASS"
@@ -743,7 +753,7 @@
     {
       "id": "E5-D-OWNERSHIP-MOCKS",
       "required": true,
-      "status": "NOT_TESTED"
+      "status": "PASS"
     },
     {
       "id": "E6-CURRENT-MAIN-INSTALL",
@@ -778,11 +788,6 @@
   ],
   "failures": [
     {
-      "code": "case_not_pass",
-      "detail": "Required case E5-D-OWNERSHIP-MOCKS is NOT_TESTED",
-      "caseId": "E5-D-OWNERSHIP-MOCKS"
-    },
-    {
       "code": "missing_required_case",
       "detail": "Required case E5-NATIVE-DELIVERY is absent",
       "caseId": "E5-NATIVE-DELIVERY"
@@ -811,7 +816,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-13T02:05:34.626Z",
+    "decidedAt": "2026-11-13T03:36:33.632Z",
     "failureCodes": []
   },
   "notes": [

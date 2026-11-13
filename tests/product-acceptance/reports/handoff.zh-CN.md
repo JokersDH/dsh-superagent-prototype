@@ -1,6 +1,6 @@
-# Agent E 第十六轮交付交接
+# Agent E 第十七轮交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `697efdc`，检查点 `57e24da`，本次证据源 `4a71624e1f7df93bc3f11228e88e0a2e6cb15cb3`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `6050b4b`，检查点 `75630b5`，本次证据源 `4f39f582cf5aa20c7a2846073c18e2aed4d43a74`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
 
@@ -9,13 +9,13 @@
 | 真实命令 | 覆盖病例 | 结果 |
 | --- | --- | --- |
 | `node tests/product-acceptance/pilot/harness.mjs --preflight` | 冻结输入/价格/ledger | BLOCKED（adapter_missing）；runner selftest 66/17 |
-| `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | E1-* | PASS 92 |
+| `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | E1-* | PASS 94 |
 | `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | E2-* | PASS 25 + NOT_TESTED 3 |
 | `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 27 + NOT_TESTED 6 |
-| `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 18 + NOT_TESTED 5 |
-| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 188 | PASS 171 + FAIL 0 + SKIPPED 0 + NOT_TESTED 17 + BLOCKED 0 + UNKNOWN 0 |
+| `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 20 + NOT_TESTED 5 |
+| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 192 | PASS 177 + FAIL 0 + SKIPPED 0 + NOT_TESTED 15 + BLOCKED 0 + UNKNOWN 0 |
 
-本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T02-00-30-925Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T03-31-15-738Z`。
 
 ## 矩阵摘要
 
@@ -80,9 +80,9 @@
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 `controlled-product-workflow` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **FAIL（仅所测 tuple）**：cold personal、fixture 安装版 context、非空 context/reply 备份搬根、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=88df6d2eef1feeb7/schema 18，main schema 18；current-main install=PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=true；D safety mocks=NOT_TESTED（唯一 remaining required blocker）。 |
+| 安装准入（个人 Alpha） | **PASS（仅所测 tuple）**：cold personal、fixture 安装版 context、非空 context/reply 备份搬根、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY。tuple=8a5a0a85631f22ca/schema 18，main schema 18；current-main install=PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=true；D safety mocks=PASS；candidate installed=PASS。 |
 
-安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `a7df2b225a8c5c42` / schema 18 / tar `246fd80d…` / source `114b73c2`；target buildId `88df6d2eef1feeb7` / schema 18 / tar `11497980…` / source `8962d102`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
+安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `88df6d2eef1feeb7` / schema 18 / tar `11497980…` / source `8962d102`；target buildId `8a5a0a85631f22ca` / schema 18 / tar `6b6517c4…` / source `97cace73`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
 ## 独立复核价值试点
 
@@ -102,13 +102,13 @@
 | `module` | PASS |
 | `controlled-product` | PASS |
 | `actual-native-control` | FAIL（case_not_pass, layer_not_allowed） |
-| `installed-alpha` | FAIL（case_not_pass） |
+| `installed-alpha` | PASS |
 | `advisory-routing` | FAIL（case_not_pass, layer_not_allowed） |
 | `controlled-review` | FAIL（case_not_pass, layer_not_allowed, missing_required_case） |
 | `actual-heterogeneous-review` | FAIL（case_not_pass, layer_not_allowed, missing_required_case） |
 | `review-value` | FAIL（case_not_pass, layer_not_allowed） |
-| `local-alpha` | FAIL（case_not_pass） |
-| `full-product` | FAIL（case_not_pass, missing_required_case, layer_not_allowed, required_evidence_missing） |
+| `local-alpha` | PASS |
+| `full-product` | FAIL（missing_required_case, case_not_pass, layer_not_allowed, required_evidence_missing） |
 
 ## 明确未测
 
