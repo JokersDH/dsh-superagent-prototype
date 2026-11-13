@@ -96,10 +96,21 @@ export async function runReplyDurability() {
     ...define('E4-B-PRODUCTION-RECOVERY', 'Real B production begin/answer/stop recovery through the product Store/queues/Runner', { layer: LAYERS.NOT_TESTED }),
   }, 'NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B\'s new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery.'))
 
-  cases.push(notTested({
-    ...define('E5-D-OWNERSHIP-MOCKS', 'D full UID/argv/root/operation, journal scope, scanner failure and role mocks refuse', { layer: LAYERS.INSTALLED,
-    evidence: { ownershipMocks: { actualJournal: 'fault child used production journal', signalUnknown: 'NOT_TESTED', mockInventory: 'NOT_TESTED' } } }),
-  }, 'NOT_TESTED: wave14 actual self-owned checks cover requested data root, copied record and wrong install; D\'s new identity UID/argv/operation, foreign journal scope, per-PID scan failure, malformed inventory and old/new install-role mocks were not independently reproduced in this checkout. Required: import the current D ownership functions with injected inventory/signals and assert UNKNOWN/refusal for each, before any broad live cleanup matrix.'))
+  cases.push(await runCase({ ...define('E5-D-OWNERSHIP-MOCKS', 'D same-UID unregistered child is UNKNOWN, not signalled, and blocks the stop proof', { layer: LAYERS.INSTALLED }), evidence: {} },
+    async ({ assert, evidence }) => {
+      const script = join(new URL('.', import.meta.url).pathname, 'w17-d-child-gate.mjs')
+      const child = spawnSync(process.execPath, [script], { encoding: 'utf8', timeout: 60_000 })
+      let probe
+      try { probe = JSON.parse(String(child.stdout).trim().split('\n').filter(Boolean).at(-1)) } catch { probe = undefined }
+      const steps = Object.fromEntries((probe?.steps ?? []).map(item => [item.id, item]))
+      assert('D_GATE_RAN', probe !== undefined, `status=${child.status} ${child.stderr.slice(-300)}`)
+      assert('D_PARENT_OWNED', steps.parent_owned?.status === 'PASS', JSON.stringify(steps.parent_owned ?? null))
+      assert('D_CHILD_NOT_OWNED', steps.same_uid_child_not_owned?.status === 'PASS', JSON.stringify(steps.same_uid_child_not_owned ?? null))
+      assert('D_CHILD_ALIVE', steps.child_not_signalled?.status === 'PASS', JSON.stringify(steps.child_not_signalled ?? null))
+      assert('D_PROOF_NOT_FALSE_POSITIVE', steps.unknown_child_blocks_proof?.status === 'PASS' && probe?.proof?.proven === false, JSON.stringify(probe?.proof ?? null))
+      evidence.ownershipMocks = { dRoot: probe?.dRoot, steps: probe?.steps ?? [], proof: probe?.proof ?? null,
+        accounted: { owned: probe?.accounted?.owned?.map(item => item.pid), unknownLive: probe?.accounted?.unknownLive?.map(item => item.pid) } }
+    }))
 
   return { cases, artifacts: {} }
 }

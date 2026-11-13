@@ -22,6 +22,7 @@ import { fileURLToPath } from 'node:url'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { startMockModel } from '../lib/mock-model.mjs'
+import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { sha256 } from '../lib/evidence.mjs'
 
 /**
@@ -34,8 +35,8 @@ import { sha256 } from '../lib/evidence.mjs'
  */
 const here = dirname(fileURLToPath(import.meta.url))
 const DEFAULT_DIRS = Object.freeze({
-  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave14-target',
-  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave15-target',
+  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave15-target',
+  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave16-target',
   cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',
 })
 
@@ -1365,8 +1366,8 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       const ownBin = join(own, 'bin')
       mkdirSync(ownInstall, { recursive: true }); mkdirSync(ownBin, { recursive: true })
       spawnSync('ln', ['-sf', process.execPath, join(ownBin, 'node')])
-      const mock = await startMockModel({ stateRoot: join(own, 'model-state'), reply: 'W15 个人讨论回复。' })
-      const env = { PATH: `${ownBin}:/usr/bin:/bin:/usr/sbin:/sbin`, PA_MODEL_CONFIG: mock.configPath }
+      const mock = await candidateModel()
+      const env = { PATH: `${ownBin}:/usr/bin:/bin:/usr/sbin:/sbin`, PA_MODEL_CONFIG: mock.file }
       let started, client, configuration, actions = {}
       try {
         spawnSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', ownInstall, '--strip-components=1'])

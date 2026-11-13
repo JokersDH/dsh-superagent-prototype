@@ -101,6 +101,10 @@ const evidenceFor = (key) => {
       return { complete: true, providerRequests: 1 }
     case 'guards':
       return { cross: 403, drift: 'conflict', expiry: 'stale_contract', offline: 'unsupported_capability', unknownProviderCalls: 1 }
+    case 'sourceConfirm':
+      return { authorization: 'not_granted', startupAvailable: false, queueHeld: true, markerUnchanged: true, replay: true }
+    case 'sourceConfirmRefusal':
+      return { status: 409, activation: false, target: false }
     case 'candidateFlow':
       return { status: 'candidates', executable: false, prepare: 200, confirm: 'recorded', providerCalls: 1 }
     case 'history':
@@ -119,11 +123,13 @@ const evidenceFor = (key) => {
       return { crashedCalls: 1, recoveredCalls: 0, replies: 1 }
     case 'replyBadArtifact':
       return { calls: 0, replies: 0, notice: '无法核对' }
+    case 'ownershipMocks':
+      return { steps: [{ id: 'parent_owned', status: 'PASS' }, { id: 'same_uid_child_not_owned', status: 'PASS' }, { id: 'child_not_signalled', status: 'PASS' }, { id: 'unknown_child_blocks_proof', status: 'PASS' }], proof: { proven: false } }
     case 'ownershipCopy':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         status: 2, code: 'requested_root_mismatch', apiAlive: true }
     case 'upgradeFaults': {
-      const probe = { fault: { code: 'upgrade_interrupted', operationId: 'operation-1' }, recover: { status: 'RECOVERED_PREVIOUS', exit: 1, code: null },
+      const probe = { fault: { code: 'upgrade_interrupted', operationId: 'operation-1' }, recover: { status: 'RECOVERED_PREVIOUS', exit: 0, code: null },
         operation: { after: 'operation-1' }, pointerBefore: 'build-old', pointerAfter: 'build-old', dataKept: true,
         steps: [{ id: 'fault_observed', status: 'PASS' }, { id: 'recover', status: 'PASS' }, { id: 'recovered_health', status: 'PASS' }, { id: 'data_kept', status: 'PASS' }] }
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
@@ -1028,6 +1034,29 @@ const CASES = [
         const item = findCase(report, 'E4-UPGRADE-FAULTS')
         const probe = item.evidence.upgradeFaults.windows.crash_after_stop.probe
         probe.operation.after = 'other-operation'
+        return report
+      }, 'upgradeFaults_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-NOOP-EXIT1',
+    title: 'A successful NO_OP terminal with exit1 is rejected for the current CLI contract',
+    check: ({ assert }) =>
+      rejectWith(assert, 'NOOP_EXIT1', (report) => {
+        const item = findCase(report, 'E4-UPGRADE-FAULTS')
+        const probe = item.evidence.upgradeFaults.windows.target_unhealthy.probe
+        probe.recover = { status: 'NO_OP', exit: 1, code: null }
+        return report
+      }, 'upgradeFaults_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-POINTER-MISSING',
+    title: 'Missing pointerBefore/pointerAfter cannot pass by undefined equality',
+    check: ({ assert }) =>
+      rejectWith(assert, 'POINTER_MISSING', (report) => {
+        const item = findCase(report, 'E4-UPGRADE-FAULTS')
+        const probe = item.evidence.upgradeFaults.windows.crash_after_stop.probe
+        delete probe.pointerBefore
+        delete probe.pointerAfter
         return report
       }, 'upgradeFaults_invalid'),
   },
