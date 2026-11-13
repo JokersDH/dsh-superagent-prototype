@@ -1,0 +1,28 @@
+✔ product executes a real child, routes its original question and verifies a human-accepted artifact (1076.749625ms)
+✔ required machine FAIL stays visible and cannot be overridden by human acceptance (913.238584ms)
+✔ a machine-only contract completes without creating empty human acceptance (997.055542ms)
+✔ legacy acceptance without an archived profile stays delivered with a visible evidence gap (888.997833ms)
+✔ pause holds queued execution and resume launches once; effect replay cannot begin twice (856.525708ms)
+✔ pause during asynchronous host registration retains the same unfed begin until resume (940.770125ms)
+✔ stop obtains a physical barrier and an old native question cannot receive a late answer (453.44375ms)
+✔ supplement reaches the current child once and its actual read clears core unread inputs (981.567333ms)
+✔ two attempts with identical native RPC IDs retain separate original answer targets (1294.934375ms)
+✔ failed fact receipt rolls native question intake back with no phantom prompt or candidate (499.56175ms)
+✔ real coordinator SIGKILL preserves an unknown writer and never replays begin on reopen (857.832709ms)
+✔ revise waits for the old physical barrier and routes the next question only to the new attempt (891.596417ms)
+✔ artifact mutation refuses acceptance and a successful command receipt survives reopen (1077.061625ms)
+✔ committed verification intent survives reopen after the controlled host has ended (1852.409458ms)
+✔ verification infrastructure failures stop after three tries and recover through authenticated idempotent HTTP (2549.294667ms)
+✔ invalid verification blocks immediately; stale blocks and rolled-back recovery never enqueue work (854.414291ms)
+✔ changed resource proof and retired candidates cannot use a previously valid recovery action (418.189042ms)
+✔ a non-PASS machine result is immutable and cannot be converted into a recheck or acceptance (928.224125ms)
+✔ expired authorization removes recovery and refuses a schema-valid current candidate (468.988917ms)
+✔ authenticated HTTP commands drive the actual child and expose only published artifacts (1645.36875ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20681.2275

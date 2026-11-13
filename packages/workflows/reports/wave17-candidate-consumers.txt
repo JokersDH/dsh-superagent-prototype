@@ -1,0 +1,39 @@
+✔ actual SDK data is stored in the original SQLite reply artifact and only inert verified candidates are exposed (132.770583ms)
+✔ one explicit confirmation uses the existing decision/proposal transaction and its original receipt replays (83.9905ms)
+✔ explicit rejection records the existing proposal state with no business effect or model resend (75.459334ms)
+✔ work proposals require explicit scope, registered criteria and profile before creating one real Work (85.278708ms)
+✔ candidate index/digest and strict DTO refusals occur without accepting client payload or authority (76.839125ms)
+✔ an escalating decision remains an inert rejected suggestion rather than gaining current project scope (74.652208ms)
+✔ original reply source-text drift refuses a previously prepared confirmation without another request (76.570292ms)
+✔ original reply artifact drift refuses a previously prepared confirmation without another request (76.2805ms)
+✔ HTTP auth, exact origins, readonly mode and response identity are enforced for candidate operations (73.643834ms)
+✔ a persisted nonempty result survives publication failure and effects recover it without another SDK request (78.886625ms)
+✔ suggestion mode settings use authenticated strict JSON and preserve the private credential (68.787458ms)
+✔ one SDK stream returns ordinary deltas and a nonempty data-only proposal with exact request metadata (24.267ms)
+✔ tool-only valid data produces visible text once after complete validation (5.984542ms)
+✔ invalid structured data (unknown function) preserves ordinary text and never retries (4.130583ms)
+✔ invalid structured data (extra actor) preserves ordinary text and never retries (3.130916ms)
+✔ invalid structured data (foreign source) preserves ordinary text and never retries (2.905333ms)
+✔ invalid structured data (too many proposals) preserves ordinary text and never retries (3.632166ms)
+✔ invalid structured data (length finish) preserves ordinary text and never retries (2.013ms)
+✔ invalid structured data (malformed JSON) preserves ordinary text and never retries (3.308333ms)
+✔ invalid structured data (object arguments) preserves ordinary text and never retries (3.498709ms)
+✔ invalid structured data (numeric arguments) preserves ordinary text and never retries (2.990792ms)
+✔ invalid structured data (nonarray calls) preserves ordinary text and never retries (2.787375ms)
+✔ invalid structured data (null call) preserves ordinary text and never retries (2.064542ms)
+✔ invalid structured data (null delta) preserves ordinary text and never retries (1.826458ms)
+✔ invalid structured data (multiple calls) preserves ordinary text and never retries (2.243834ms)
+✔ invalid structured data (oversized arguments) preserves ordinary text and never retries (5.057958ms)
+✔ credentials in content chunks and JSON string values are removed before display or persistence (2.753584ms)
+✔ plain mode sends no tool schema and does not scan ordinary prose or Markdown for proposals (3.573416ms)
+✔ mode/config changes cannot alter a prepared one-use request (22.100459ms)
+✔ unsupported tools fail once without an automatic plain request (2.845959ms)
+✔ the preference sidecar leaves legacy strict model configuration bytes and keys compatible (31.239458ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1156.5975

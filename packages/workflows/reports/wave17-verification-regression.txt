@@ -1,27 +1,27 @@
 $ node --test test/*.case.ts
-✔ the registry is immutable per revision and refuses unregistered or invalid checks (0.807541ms)
-✔ a passing check and a failing check produce real exit results (43.678ms)
-✔ each verification uses its prepared environment while preserving registered variable permissions (20.69925ms)
-✔ a deadline and the output budget bound a check instead of buffering without limit (177.051541ms)
-✔ a check that ignores SIGTERM is killed as a group and does not hang the runner (356.416ms)
-✔ a missing executable is NOT_TESTED and an unregistered check refuses verification (11.132541ms)
-✔ trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results (29.7435ms)
-✔ the frozen-artifact guard is mandatory and only an explicit true passes (24.879542ms)
-✔ a verification binds the candidate, artifact and core criteria digest (26.716958ms)
-✔ the runner refuses a workspace modified after freeze (WorkspaceManager integration) (334.928667ms)
-✔ the evidence store resolves only matching candidate/artifact records, read-only (34.710333ms)
-✔ quiescence requires a trusted complete-inventory barrier, never a caller subset or plain observations (7.330833ms)
-✔ the core gate completes only a fully proven candidate (29.497458ms)
-✔ a machine FAIL cannot be overridden by human acceptance (28.24725ms)
-✔ a SKIPPED required machine check cannot be overridden by human acceptance either (8.701875ms)
-✔ an old generation or a different artifact cannot be completed (30.161666ms)
-✔ a late resource append invalidates the recorded completion evidence (31.923667ms)
-✔ acceptance and quiescence records are immutable over their full body (32.381167ms)
-✔ quiescence requires the current pointer, the barrier topic, the producer identity and a committed command result (9.069459ms)
-✔ an empty registered manifest completes only without a writer fact (7.543291ms)
-✔ moving the current pointer after recording invalidates the resolved evidence (32.025458ms)
-✔ Verification intake is strictly validated (7.002292ms)
-✔ the WP-04/WP-02 migrations are appended without rewriting v1–v5 (0.594333ms)
+✔ the registry is immutable per revision and refuses unregistered or invalid checks (1.0835ms)
+✔ a passing check and a failing check produce real exit results (53.533875ms)
+✔ each verification uses its prepared environment while preserving registered variable permissions (23.781042ms)
+✔ a deadline and the output budget bound a check instead of buffering without limit (232.36975ms)
+✔ a check that ignores SIGTERM is killed as a group and does not hang the runner (356.775667ms)
+✔ a missing executable is NOT_TESTED and an unregistered check refuses verification (9.776208ms)
+✔ trusted exclusions are explicit SKIPPED/NOT_APPLICABLE results (29.787917ms)
+✔ the frozen-artifact guard is mandatory and only an explicit true passes (26.234042ms)
+✔ a verification binds the candidate, artifact and core criteria digest (25.66ms)
+✔ the runner refuses a workspace modified after freeze (WorkspaceManager integration) (393.689083ms)
+✔ the evidence store resolves only matching candidate/artifact records, read-only (46.314541ms)
+✔ quiescence requires a trusted complete-inventory barrier, never a caller subset or plain observations (9.321958ms)
+✔ the core gate completes only a fully proven candidate (36.46625ms)
+✔ a machine FAIL cannot be overridden by human acceptance (30.6395ms)
+✔ a SKIPPED required machine check cannot be overridden by human acceptance either (9.099792ms)
+✔ an old generation or a different artifact cannot be completed (31.074083ms)
+✔ a late resource append invalidates the recorded completion evidence (34.554542ms)
+✔ acceptance and quiescence records are immutable over their full body (35.859333ms)
+✔ quiescence requires the current pointer, the barrier topic, the producer identity and a committed command result (57.895458ms)
+✔ an empty registered manifest completes only without a writer fact (11.448417ms)
+✔ moving the current pointer after recording invalidates the resolved evidence (48.394125ms)
+✔ Verification intake is strictly validated (10.210917ms)
+✔ the WP-04/WP-02 migrations are appended without rewriting v1–v5 (0.607167ms)
 ℹ tests 23
 ℹ suites 0
 ℹ pass 23
@@ -29,4 +29,4 @@ $ node --test test/*.case.ts
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 1149.833208
+ℹ duration_ms 1308.581125

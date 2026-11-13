@@ -1,0 +1,15 @@
+{
+  "status": "PASS_LONG_DISPATCH_STATIC_ONLY",
+  "roles": 6,
+  "phases": 60,
+  "checkpoints": 29,
+  "localLinks": 114,
+  "acyclic": true,
+  "nonoverlappingOwners": true,
+  "actualSourceConfirmationInputReady": true,
+  "ordinaryInstallIndependentOfActivation": true,
+  "budgetUnchanged": true,
+  "preservedServicePairs": 12,
+  "runtimeTests": 0,
+  "nativeTurnStarts": 0
+}

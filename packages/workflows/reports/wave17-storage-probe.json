@@ -1,0 +1,48 @@
+{
+  "protocol": "wave16-a-snapshot-admission/1",
+  "candidate": "/Users/hh/Desktop/joker/superagent-agent-a",
+  "source": "27e5ef83657cc692f87773e305093edc42e18c2f",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "observations": [
+    {
+      "id": "NONEMPTY_SNAPSHOT_POSITIVE",
+      "status": "PASS",
+      "observed": {
+        "created": "ok",
+        "verified": "ok",
+        "effectCount": 1
+      }
+    },
+    {
+      "id": "full-evidence",
+      "status": "PASS",
+      "observed": {
+        "verified": "blocked",
+        "familyCount": 21,
+        "effectFamily": true
+      }
+    },
+    {
+      "id": "removed-effect-family",
+      "status": "PASS",
+      "observed": {
+        "verified": "blocked",
+        "familyCount": 20,
+        "effectFamily": false
+      }
+    },
+    {
+      "id": "only-one-family",
+      "status": "PASS",
+      "observed": {
+        "verified": "blocked",
+        "familyCount": 1,
+        "effectFamily": false
+      }
+    }
+  ],
+  "passed": 4,
+  "failed": 0,
+  "scope": "Candidate snapshot verification only; nonempty owned temporary SQLite, no startup authority or user resources"
+}
