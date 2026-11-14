@@ -9,8 +9,8 @@ import {
   RefreshCw, Settings2, TriangleAlert,
 } from 'lucide-react'
 import type { ApplicationConfiguration, TrialNavigationAction, TrialReadiness } from '@personal-agent/contracts'
-import type { TrialInsightsView } from './insights.ts'
-import { trialInsightsCount, trialInsightsRows } from './insights.ts'
+import type { TrialInsightsLayer, TrialInsightsView } from './insights.ts'
+import { trialInsightsAdmission, trialInsightsCount } from './insights.ts'
 import type { TrialStatusValue, TrialTone } from './trial-view.ts'
 import { formatObservedAt, shortRevision, trialActions, trialHeadline, trialProjectValue, trialStrip } from './trial-view.ts'
 import './trial.css'
@@ -50,6 +50,10 @@ function StatusValue({ value }: { readonly value: TrialStatusValue }) {
 }
 
 const placeholderValue = (label: string, detail: string, tone: TrialTone): TrialStatusValue => ({ label, detail, tone })
+
+const layerLabel: Record<TrialInsightsLayer, string> = {
+  observed: '界面观察', controlled: '受控流程', native: '原生执行', operator: '人工输入', unknown: '来源未知',
+}
 
 function CapabilityRow({ label, available }: { readonly label: string; readonly available: boolean | undefined }) {
   const tone: TrialTone = available === true ? 'ok' : 'neutral'
@@ -101,7 +105,10 @@ export function TrialWorkspace({
   const phase = readiness !== undefined ? 'observed' : loading ? 'loading' : error !== undefined ? 'error' : unavailable ? 'unavailable' : 'idle'
   const observed = readiness === undefined ? undefined : formatObservedAt(readiness.observedAt)
   const capabilities = readiness?.capabilities
-  const insightRows = insights === undefined ? [] : trialInsightsRows(insights)
+  const insightAdmission = insights === undefined ? undefined : trialInsightsAdmission(insights, activeProjectId)
+  const activeProjectLabel = activeProjectId === undefined
+    ? '全部项目'
+    : configuration?.projects.find(project => project.id === activeProjectId)?.displayName ?? '当前项目（名称未读取）'
 
   return (
     <section
@@ -242,6 +249,7 @@ export function TrialWorkspace({
               {readiness?.startupMode === 'recovery_readonly' && <span className="trial-panel-meta trial-readonly-mark"><LockKeyhole size={12} aria-hidden="true" />只读</span>}
             </div>
             <dl className="trial-facts">
+              <CountRow label="当前项目" value={activeProjectLabel} />
               <CountRow label="当前对话" value={activeConversationTitle ?? '主对话'} />
               <CountRow
                 label="原生执行器"
@@ -262,28 +270,44 @@ export function TrialWorkspace({
           </section>
         </div>
 
-        {insights !== undefined && (
+        {insights !== undefined && insightAdmission !== undefined && (
           <section className="trial-insights" aria-labelledby={insightsId}>
             <div className="trial-panel-head">
               <h3 id={insightsId} className="trial-section-title"><Activity size={15} aria-hidden="true" />使用观察</h3>
               <span className="trial-panel-meta">
                 {trialInsightsCount(insights)}
-                {insights.windowLabel === undefined ? '' : ` · ${insights.windowLabel}`}
-                {insights.coverage === undefined ? '' : ` · ${insights.coverage}`}
+                {' · '}{insights.windowLabel ?? '窗口未声明'}
+                {' · '}{insights.coverage ?? '覆盖未声明'}
               </span>
             </div>
-            {insightRows.length === 0
-              ? <p className="trial-muted">
-                {insights.status === 'insufficient_data' ? '样本不足，暂不展示效率结论。'
-                  : insights.status === 'unavailable' ? '当前没有可用的观察数据。' : '没有可展示的指标。'}
-              </p>
+            <dl className="trial-insight-scope">
+              <div className="trial-fact">
+                <dt>观测范围</dt>
+                <dd>{insightAdmission.scopeLabel ?? '未声明'}</dd>
+              </div>
+              <div className="trial-fact">
+                <dt>来源与未知</dt>
+                <dd>
+                  {insights.scope?.aggregation === 'declared_multi_project' ? '声明多项目'
+                    : insights.scope?.aggregation === 'cross_project' ? '跨项目聚合'
+                      : insights.scope?.aggregation === 'single_project' ? '单项目' : '聚合未声明'}
+                  {' · '}
+                  {insights.unknownCount === undefined || insights.unknownCount === null ? '未知数未声明' : `${insights.unknownCount} 个未知`}
+                </dd>
+              </div>
+            </dl>
+            {insightAdmission.rows.length === 0
+              ? <p className="trial-muted" role="status">{insightAdmission.message ?? '暂不展示指标。'}</p>
               : (
                 <dl className="trial-insight-rows">
-                  {insightRows.map(metric => (
+                  {insightAdmission.rows.map(metric => (
                     <div key={metric.id} className="trial-insight-row">
                       <dt>{metric.label}</dt>
                       <dd className={metric.value === null ? 'trial-unknown' : undefined}>
                         {metric.value ?? '未知'}
+                        {metric.unit !== undefined && <small>{metric.unit}</small>}
+                        {metric.layer !== undefined && <small>{layerLabel[metric.layer]}</small>}
+                        {metric.sampleCount !== undefined && <small>{metric.sampleCount === null ? '样本未知' : `${metric.sampleCount} 个样本`}</small>}
                         {metric.detail !== undefined && <small>{metric.detail}</small>}
                       </dd>
                     </div>

@@ -1,0 +1,60 @@
+{
+  "protocol": "wave27-main-integration/1",
+  "date": "2026-11-14",
+  "source": "967dc0c677333ec307c215c0ed67e838b5487d92",
+  "status": "SOURCE_IMPLEMENTED_AND_TESTED_SCOPED",
+  "fCandidate": "3037cbe756795726a74bc657d6e5bab55b433788",
+  "fSourceImport": [
+    "apps/console/src/trial/TrialWorkspace.tsx",
+    "apps/console/src/trial/index.ts",
+    "apps/console/src/trial/insights.ts",
+    "apps/console/src/trial/useTrialReadiness.ts",
+    "apps/console/test/trial/trial-view.case.ts"
+  ],
+  "mainAppObservationIdentity": true,
+  "channelInterfacePublished": true,
+  "channelImplementationImplemented": false,
+  "projectRecipesImplemented": false,
+  "checks": {
+    "contractsCases": 237,
+    "channelCases": 5,
+    "trialPureCases": 11,
+    "readinessTransportCases": 2,
+    "consoleStrictExit": 0,
+    "coordinatorStrictExit": 0,
+    "consoleBuildExit": 0,
+    "generatedExit": 0,
+    "actualAppBrowserCases": 8,
+    "designDetectorAdvisories": 12
+  },
+  "browserReport": "reports/releases/wave27-integration/clean-browser/browser-report.json",
+  "initialBrowserReport": "reports/releases/wave27-integration/browser/browser-report.json",
+  "screenshotsViewed": [
+    "reports/releases/wave27-integration/browser/desktop.png",
+    "reports/releases/wave27-integration/browser/mobile.png"
+  ],
+  "screenshotCaptureScope": "Same tested runtime bytes before commit; clean-source confirmation intentionally no-capture",
+  "frozenRunnerHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "uiUpdated": true,
+  "contractsChanged": true,
+  "defaultConversationChanged": false,
+  "gMetricsEnabled": false,
+  "hToolkitImported": false,
+  "migrationsAdded": 0,
+  "newPersistentPreviewStarted": false,
+  "userServicesRestarted": false,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "frozenTarCreated": false,
+  "independentInstalledAdmission": false,
+  "releaseApproved": false,
+  "normalCadence": true,
+  "newExternalWorktreesPrepared": [
+    "I",
+    "J"
+  ],
+  "oldServicePairsPreserved": 12,
+  "buildWarnings": [
+    "Existing console bundle exceeds500KB; no new dependency or CSS"
+  ]
+}

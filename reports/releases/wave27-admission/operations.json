@@ -1,0 +1,222 @@
+{
+  "protocol": "wave27-delivery-and-operations-admission/1",
+  "date": "2026-11-14",
+  "deliveryCadence": "Normal engineering cadence; user withdrew the finish-today target. Add two constructive resources without forcing a release or documentation-only refreeze.",
+  "scope": "Fixed D/E/H source review; independent immutable package and screenshot/bundle hashes, complete real-report gates, existing raw material and7 targeted H tests. No live install/stop matrix, browser repro against user instances or40minute soak rerun.",
+  "candidates": {
+    "D": "8ed7a72a0b26ea9f8bdbb6e2be6f7845bb2b22d2",
+    "DDirty": false,
+    "E": "3ed0e9d05f2bb829a68afde983109144de0cf879",
+    "ETrackedDirty": false,
+    "ETestSourceAtFinalRun": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "EHistoricalRuns": "Preserved",
+    "H": "420cf78cec3dc0574dff785d637965c0b43890c2",
+    "HDirty": false
+  },
+  "currentMinimumCandidate": {
+    "source": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21",
+    "sourceDirty": false,
+    "buildId": "d4b1780d999a4b74",
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave26-target/wave26-target-ce64fc1.tar.gz",
+    "sha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+    "tarBytes": 20272436,
+    "installManifestSha256": "855c67caa7280b62e2609ff44fba40da05e15ca724cfcca5df99ba3a24ae1e10",
+    "releaseManifestSha256": "458bf4191596b2e623f4b69507d12e1a8a020018fcab634daceec74a33113b03",
+    "closureDigest": "f8b00750fecf3c21dcacf475e59bdb965ae162ce557f8d950b89c7548372e862",
+    "schema": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "abi": "137",
+    "sqlite": "3.53.4",
+    "verifiedEntries": 6754,
+    "verifiedRegularFiles": 6733,
+    "verifiedInternalSymlinks": 21,
+    "verifiedRegularBytes": 67669860,
+    "fileDigestMismatches": [],
+    "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave27-package-uHAeen/install",
+    "byteVerificationExitCode": 0,
+    "verification": "Expected tar SHA/size, safe member names, fresh private extraction, every manifest regular file hash/size and internal symlink realpath verified",
+    "contains": ["maina302 actual F TrialWorkspace composed in App", "four original navigation callbacks", "GET /v1/readiness", "main4b source-scope diagnostics backend/UI", "ordinary personal install/read consumers"],
+    "doesNotIncludeOrCertify": ["default G insights", "H tool integration", "new Driver/CAC/desktop", "business resume/native recovery", "private startup permission or target activation"],
+    "recommendation": "Keep these already frozen bytes as the smallest accurately measured ordinary personal trial candidate. D and E now use the same target; preserve that progress. Documentation or E test-harness repairs do not require a new runtime tar. A future runtime change must be frozen and independently verified as a successor.",
+    "releaseScope": "Ordinary personal workbench/configuration/read-only review/install only; no claim of stable full native development/recovery or full-product release"
+  },
+  "dClosureAndSource": {
+    "manifest": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave26/ordinary-source-closure.json",
+    "source": "ce64fc1",
+    "entriesChecked": 96,
+    "matches": 96,
+    "mismatches": [],
+    "minimalNewProductRuntimeImportNeeded": [],
+    "scope": "Main already implements the F App/readiness runtime included here. D's new material is accurately frozen package/evidence and dev consumers; no need for another wholesale source import or a documentation-driven refreeze."
+  },
+  "eCurrentSamePackageAcceptance": {
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/report.json",
+    "testSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "subjectSource": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21",
+    "subjectBuildId": "d4b1780d999a4b74",
+    "subjectTarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+    "counts": { "PASS": 238, "FAIL": 0, "NOT_TESTED": 16 },
+    "requiredCases": 164,
+    "ordinaryInstalled": "PASS_AT_RECORDED_SCOPE",
+    "localAlpha": "PASS_SAME_ORDINARY_SCOPE",
+    "fullProduct": "FAIL_NATIVE_DELIVERY_AND_CONTROL_UNMEASURED",
+    "trialUi": {
+      "actualBrowserInteraction": true,
+      "packagedStaticServerAndApi": true,
+      "navigation": "Conversation default retained, trial selector entered, readiness loaded on demand",
+      "actions": {
+        "model": "opened-settings",
+        "import": "opened-import-form",
+        "executor": "opened-executor",
+        "conversation": "opened-conversation-draft-kept"
+      },
+      "conditionalActions": "Unconfigured model shows configure/import/executor; configured instance shows open-conversation and keeps the original draft",
+      "negativeStates": ["network abort preserves previous valid observation", "granted malformed schema shows error without exposing grant", "legacy404 remains explicit optional absence"],
+      "writes": 0,
+      "modelCalls": 0,
+      "desktopAndMobileVisualInspection": "Existing E screenshots viewed: nonblank, readable, no obvious overlap or horizontal overflow",
+      "bundle": {
+        "entry": "install/app/apps/console/dist/assets/index-CbPEXBjB.js",
+        "sha256": "8797f9cb5f47018475c2ab1e360710e50eb5ce6fb82c2e628d3916eaf52136a8",
+        "bytes": 632332,
+        "independentActualTarFileMatch": true
+      },
+      "screenshotFiles": [
+        { "path": "tests/product-acceptance/reports/wave26/browser/desktop.png", "sha256": "59e0561d8f3850a5438dc7a094df40e643dd69c2ee77c620948f13eb10b9bda5", "bytes": 122116, "independentlyMatched": true },
+        { "path": "tests/product-acceptance/reports/wave26/browser/mobile.png", "sha256": "a722d24fda18a42b37a6018b3cbc660d058f42378853dbdd66b5eaea02244338", "bytes": 55993, "independentlyMatched": true },
+        { "path": "tests/product-acceptance/reports/wave26/browser/configured-conversation.png", "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68", "bytes": 76516, "independentlyMatched": true }
+      ]
+    },
+    "readiness": {
+      "actualHttpModes": ["normal personal", "recovery_readonly personal", "controlled fixture"],
+      "independentPublicTrialReadinessSchemaValidation": { "normal": true, "readonly": true, "fixture": true },
+      "normalExecution": "unavailable/operator_disabled",
+      "readonlyExecution": "unavailable/recovery_readonly, dispatchable0, no admitted execution, decisions/proposalsfalse",
+      "fixtureExecution": "controlled_fixture only",
+      "authorization": "none",
+      "configurationRevisionAndAuthNegativesRecorded": true
+    },
+    "stillUnmeasuredSeparately": ["source-scope audit UI interactions under this installed tier", "independent E A/C manifest-target dual-restore chain", "business resume/native control/value/private target", "cross-platform and other machines"],
+    "admission": "The newly measured installed TrialWorkspace/readiness and ordinary same-package scopes are genuine. Keep them; do not revert to saying E only tested3b/a826 or UI is static-only. E cleanup-tool safety below restricts future automated live reruns, not the existence of these complete observations or the product runtime bytes."
+  },
+  "independentReleaseControls": {
+    "commandForm": "node --input-type=module heredoc: import actual E evaluateRelease/tier/resolveFixtureDigest and main public TrialReadinessSchema; clone full realce64 report; evaluate at recorded checkedAt",
+    "exitCode": 0,
+    "cases": [
+      { "id": "full_real_ce64_164_required_positive", "expected": "PASS", "actual": "PASS" },
+      { "id": "readiness_authorization_granted", "expected": "REFUSE", "actual": "REFUSE", "reason": "readiness_invalid" },
+      { "id": "readonly_advertises_dispatchable_project", "expected": "REFUSE", "actual": "REFUSE", "reason": "readiness_invalid" },
+      { "id": "conversation_action_not_opened", "expected": "REFUSE", "actual": "REFUSE", "reason": "trialUi_invalid" },
+      { "id": "missing_packaged_ui_bundle", "expected": "REFUSE", "actual": "REFUSE", "reason": "trialUi_invalid" }
+    ],
+    "noSyntheticWholeReportPositive": true,
+    "noRecordedReportMutation": true
+  },
+  "dInstalledACProgress": {
+    "latestReport": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave26/installed-package-ac-chain.json",
+    "latestEvidenceCommit": "058b58d605be8ea063637c764157a3abdb8b4048",
+    "supersedesTheEarlierNotExecutedObservation": true,
+    "packageBuild": "d4b1780d999a4b74",
+    "packageTarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+    "aModuleHead": "06390aedd1c36e5bd8eec2cabf685e827873af28",
+    "aModuleSha256": "654f1134f2ea4ba5121794d21e5bf9eb0b346a913d906847ec8967cc7ace140a",
+    "manifestDigest": "3545f7f937ccd053d17b3c223fef4295f81d4335985d333e61704e80daf1dfc5",
+    "formats": [
+      { "restoredFormatAsReportedByProducer": 1, "driverStatus": "verified-flow", "assertions": 21, "failedAssertions": 0, "targetProof": "ok", "sourceState": "verified", "historyEntries": 1, "workPhase": "stopping", "cleanup": "pa-stop-verified" },
+      { "restoredFormatAsReportedByProducer": 2, "driverStatus": "verified-flow", "assertions": 21, "failedAssertions": 0, "targetProof": "ok", "sourceState": "verified", "historyEntries": 1, "workPhase": "stopping", "cleanup": "pa-stop-verified" }
+    ],
+    "targetOnlyLegalMessageDrift": {
+      "code": "target_subject_mismatch",
+      "relation": "forbidden-delta",
+      "family": "conversation_messages",
+      "originalRows": 6,
+      "targetRows": 7,
+      "bodyReturned": false
+    },
+    "scope": "This is new actual package consumer evidence, not only the older dev/source capability inspection. Retain the two-root/target-content/drift progress. A/C target-proof policy admission and E independent chain assertions remain separate.",
+    "metadataLimit": "The raw pkg-v2 report still says top-level format:v1 (driver default), although its state root is distinct. Validate physical snapshot format through the actual A restore report/manifest, not filenames or that display field. Do not infer two formats solely from filenames.",
+    "liveRerunDuringAudit": false
+  },
+  "hFocusedVerification": {
+    "command": "node --test tests/operational-soak/hardening.case.mjs tests/operational-soak/recovery/recovery.case.mjs",
+    "workdir": "/Users/hh/Desktop/joker/superagent-agent-h",
+    "exitCode": 0,
+    "passed": 7,
+    "failed": 0,
+    "elapsedMs": 5931,
+    "scope": "Only four new hardening cases and three recovery-support cases; no full previous suite or40minute rerun",
+    "closedOldFindings": [
+      "Integrity REFUSED executes zero package commands and optional support",
+      "Token NOFOLLOW/lstat-fstat/0600/owner/nlink guards reject symlink/hardlink/FIFO/public files",
+      "Both supported Node comparator bounds checked; unsupported grammar returns unknown",
+      "Raw checker derives wall/sample time and refuses contradictory summary/sample accounting"
+    ],
+    "versionRangeLimit": "Documented bounded >=/< comparator subset, not a claim of full npm semver grammar support",
+    "recoverySupport": {
+      "actualNormalChain": "Original ProductRuntime/QuestionBroker/A Store with a controlled fixture produces Work/attempt/question/answer/native_applied and independent reader agreement",
+      "journal": "Original FileCriticalJournal/decodeBuffer legal5-entry fixture and7 bounded negative refusals; foreign source/attempt and tampered bytes refuse",
+      "port": "Existing authenticated inspect/cancel positive plus auth/subject/socket/timeout/stale-proof negatives in private fixture",
+      "businessResume": "NOT_REACHED",
+      "notMeasured": ["actual Codex app-server protocol compatibility", "same-Runner business attach", "cross-process SIGKILL recovery", "recovered human acceptance and2/4 resources"]
+    },
+    "existingObservations": "600/1800second raw fixture runs retained unchanged; new60/30second fixture observations remain fixture-only; no explicit owned real product readonly/SSE target was supplied",
+    "newBlockingHRegressionObserved": false
+  },
+  "eNewCleanupToolFinding": {
+    "id": "E_NEW_TRIAL_UI_STOP_FALLBACK_BYPASSES_EXACT_OWNERSHIP",
+    "priority": "P1_TEST_TOOL_LIFECYCLE_ONLY",
+    "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/cases/w26-trial-ui.mjs",
+    "line": 77,
+    "summary": "After invoking package stop, the new stopOwned helper falls back to ps command substring matching, then direct TERM and500ms-later KILL without start/UID/argv/config/operation identity or fresh escalation proof; it removes the instance record regardless.",
+    "relatedStartupWindow": "observed is assigned only after awaited RUNNING at147. Timeout/early failure before that assignment can leave a started child/root outside the case's finally cleanup. Avoid broad live reruns until owned startup/failure material is handled.",
+    "independentControl": {
+      "method": "Use TypeScript AST to extract the exact stopOwned function text, then execute it in a vm with all ps/files/launcher/timers/process.kill mocked. This is a helper-only control, not a product lifecycle run.",
+      "exitCode": 0,
+      "ownCommandPositive": "TERM/KILL issued to recorded PIDs and record removed",
+      "siblingStateNegative": "A command containing /probe/state-sibling is also treated owned for requested /probe/state; same TERM/KILL sequence and record deletion",
+      "observedPsFields": ["command="],
+      "capturedSignalsForSibling": ["SIGTERM101", "SIGTERM102", "SIGTERM101", "SIGKILL101", "SIGKILL102", "SIGKILL101"],
+      "realSignals": 0
+    },
+    "next": "Reuse the exact installed product stop path with verified result; if it refuses/ownership is unknown, fail and retain private material instead of substring force-kill/delete. Track own spawned resources before waiting for RUNNING. Add pure failure/foreign/sibling/recycled/pre-record controls before more live UI matrices.",
+    "doesNotRevoke": "The actual current ce64 screenshots/readiness/complete ordinary observations remain genuine. No current public runtime stop bypass is demonstrated. Test-tool repair does not change frozen runtime bytes and does not require a documentation-only refreeze."
+  },
+  "currentDisposition": {
+    "ordinaryPersonalCandidate": "ce64 exact immutable tar is the current smallest coherent candidate with D bytes and E actual installed F App/readiness evidence on the same subject",
+    "newProductRuntimeP1FoundHere": false,
+    "immediateEngineeringBlocker": "Repair E new test-harness cleanup before automated live UI reruns; preserve current exact positive observations",
+    "separateUnfinishedCapabilities": ["independent E A/C target-content chain", "B business-session/control/recovery/full native admission", "private/target activation", "cross-machine/platform support", "review-value study"],
+    "sourceImportAdvice": "No new D runtime slice is required by main. Keep H toolkit standalone with explicit readonly inputs; its four prior findings are now closed at tested scope. E assertions remain E-owned. Use frozen ce64 for current personal trials rather than freezing identical bytes for report changes."
+  },
+  "constructiveNewResourceOptions": {
+    "I": {
+      "theme": "Stateful official-protocol native fake and legal execution scenarios for B",
+      "proposedOwnedPaths": ["tools/codex-protocol-fixtures/", "tests/codex-protocol-fixtures/"],
+      "concreteGap": "H now supplies controlled-driver normal data, journal and inspect/cancel fixtures. It does not exercise the original Codex app-server policy/turn/question/approval/response protocol that repeatedly left B's native harness invalid.",
+      "deliverables": "A zero-vendor executable simulator using the repo/official versioned schemas and existing driver interfaces; correct handshake/preparation/turn/request-answer sequence, replayable legal frames, bounded large payload/ref/chunk cases, explicit ACK/crash fault recipes and golden observations consumed by B/main.",
+      "boundary": "Test simulator only, not a new production Driver or model loop. No B source/E gate/H tree edits, real profile fallback or extra ledger/coordinator. B retains runtime implementation and actual rebind ownership."
+    },
+    "J": {
+      "theme": "Explicit project verification recipe discovery and portable project inputs",
+      "proposedOwnedPaths": ["packages/project-recipes/", "tools/project-recipes/"],
+      "evidenceOfExistingGap": "Current apps/coordinator/product/project-settings.ts and project-registry.ts expose only node_test/pnpm_test/npm_test and map them directly to Node/pnpm/npm test. There is no general structured manifest-driven project recipe selector for other stacks or portable path/tool prerequisites.",
+      "deliverables": "Pure bounded detectors for actual project manifests and existing package-manager patterns, typed argv-based test/build/prerequisite plans, scope/provenance/unknown handling, multi-root/monorepo/path-platform fixtures and a readonly preview CLI. Start by improving selection for the existing Node/pnpm/npm surface, then document concrete unsupported stack plans for main integration.",
+      "boundary": "No automatic shell/install/build execution or new authorization. Do not edit main project contracts/registry/B environment/verification runtime until a main-owned interface checkpoint. Recipe output is untrusted proposal data consumed by existing registered checks. Avoid speculative release gates or another installer."
+    },
+    "note": "These are proposed construction packages for the two new resources, not dispatched threads or permission grants. They avoid duplicating D/E/H acceptance and should be reconciled with main's final ownership plan."
+  },
+  "safety": {
+    "realVendorSends": 0,
+    "realModelTurns": 0,
+    "nativeTurnStarts": 0,
+    "realSignals": 0,
+    "liveInstallStopOrBrowserMatricesRun": 0,
+    "longSoakRunsStarted": 0,
+    "userServicesTouched": false,
+    "allUserStateProfilesTarsLedgersDirtyFilesAndERunsPreserved": true,
+    "productionOrEAssertionsEdited": false,
+    "onlyDurableNewWorkspaceArtifact": "reports/releases/wave27-admission/operations.json"
+  }
+}
