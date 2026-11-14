@@ -18,6 +18,8 @@
 | 布局 | 单包；monorepo/workspace 根需显式成员路径 | 自动成员枚举（不解析 `pnpm-workspace.yaml` 内容） |
 | 检查 | 只引用配置里已登记的 `checkDefinitionRef` | 从 `package.json` scripts 反推命令、注册新检查 |
 
+fixture 与 native 的区分由配置决定，本模块不参与判定，但保证不混淆：草稿只记录 `profileId`，不写 readiness、driver 或执行类型；fixture 配置产出 fixture profile 的草稿，native 配置不会继承 `fixture_ready` 字样，显式选择的 profile 也不会被默认值替换（`profile_not_enabled` 直接拒绝）。测试见 `packages/project-recipes/test/compatibility.case.ts`。
+
 三种配方的语义：
 
 | kind | 建议的重点 | scope | criteria |
@@ -277,12 +279,12 @@ pnpm --dir packages/contracts build
 
 # 纯库
 pnpm --dir packages/project-recipes typecheck
-pnpm --dir packages/project-recipes test          # 35 tests
+pnpm --dir packages/project-recipes test          # 41 tests
 pnpm --dir packages/project-recipes build
 
 # CLI 与读取器
 ./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json
-node --test tools/project-recipes/test/*.case.ts  # 20 tests
+node --test tools/project-recipes/test/*.case.ts  # 29 tests
 
 # 端到端样例（draft / needs_input / unsupported）
 node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/configuration.json \

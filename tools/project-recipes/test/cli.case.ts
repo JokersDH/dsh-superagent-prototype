@@ -124,3 +124,11 @@ test('reading an authorized root yields a draft and keeps script bodies and path
   assert.equal(draft.provenance.facts.source, 'authorized_metadata')
   assert.ok(!result.stdout.includes(fixture('example-project')), 'stdout must not contain the absolute root')
 })
+
+test('stale facts reach the documented needs_input exit through the CLI', () => {
+  const stale = run(['--config', fixture('configuration.json'), '--facts', fixture('facts-alpha.json'), '--now', '2026-11-20T00:00:00.000Z', '--paths', 'src'])
+  assert.equal(stale.status, 3, stale.stderr)
+  const draft = JSON.parse(stale.stdout)
+  assert.equal(draft.status, 'needs_input')
+  assert.ok(draft.needsInput.some((item: { code: string }) => item.code === 'facts_stale'))
+})

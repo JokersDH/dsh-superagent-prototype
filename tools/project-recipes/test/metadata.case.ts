@@ -226,3 +226,45 @@ const readStat = (path: string): string => {
   const stats = lstatSync(path)
   return `${stats.mtimeMs}:${stats.size}:${stats.mode}`
 }
+
+test('the JSON byte budget is inclusive, and one byte over is refused', () => {
+  withDir((dir) => {
+    const content = JSON.stringify({ name: 'x' })
+    write(dir, 'package.json', content)
+    const exact = Buffer.byteLength(content)
+    assert.doesNotThrow(() => observe(dir, { limits: { maxJsonBytes: exact } }))
+    assert.throws(() => observe(dir, { limits: { maxJsonBytes: exact - 1 } }), (error: unknown) => error instanceof MetadataRefused && error.code === 'too_large')
+  })
+})
+
+test('a directory named like a metadata file is refused, never traversed', () => {
+  withDir((dir) => {
+    mkdirSync(join(dir, 'package.json'))
+    assert.throws(() => observe(dir), (error: unknown) => error instanceof MetadataRefused && error.code === 'not_regular_file')
+  })
+})
+
+test('nested metadata is never read: only the authorized root is observed', () => {
+  withDir((dir) => {
+    mkdirSync(join(dir, 'node_modules/member'), { recursive: true })
+    writeFileSync(join(dir, 'node_modules/member/package.json'), JSON.stringify(packageJson))
+    const { facts } = observe(dir)
+    assert.equal(facts.stack.kind, 'unknown')
+    assert.ok(facts.missing.includes('packageJson'))
+    assert.deepEqual(facts.scripts, [])
+  })
+})
+
+test('refusal messages never echo file contents or secrets', () => {
+  withDir((dir) => {
+    write(dir, 'package.json', '{ "token": "SUPER_SECRET_VALUE", broken')
+    try {
+      observe(dir)
+      assert.fail('expected a refusal')
+    } catch (error) {
+      assert.ok(error instanceof MetadataRefused)
+      assert.equal(String(error.message).includes('SUPER_SECRET_VALUE'), false)
+      assert.equal(JSON.stringify({ message: error.message, target: error.target }).includes('SUPER_SECRET_VALUE'), false)
+    }
+  })
+})

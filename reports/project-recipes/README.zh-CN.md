@@ -7,6 +7,7 @@
 ## 1. 判读结论
 
 - 交付了**可编译、可测试、可复跑**的三层：纯 typed catalog、只读 facts 读取器 + CLI、草稿到 `create_work` 命令候选的接线。
+- fixture 与 native 配置明确区分：fixture 配置只产出 fixture profile，草稿不出现 native 字样；native 配置也不继承 fixture readiness；显式 profile 选择不会被替换。
 - 三配方（缺陷回归修复 / 有限范围变更 / 既有检查验证跟进）在真实配置上产出完整 `draft`，缺能力输入产出 `needs_input` 或 `unsupported`，并带 provenance、配置 revision、facts 摘要与 `authorization: "none"`。
 - 所有建议只引用**当前配置里已存在**的项目、scope 路径、profile 与已登记检查；scope 只能收窄，`externalActions` 恒为空。
 - 没有安装、运行、注册任何项目命令/检查，没有模型或原生调用，没有 SQL/账本/新执行生命周期。
@@ -18,10 +19,10 @@
 | --- | --- | --- |
 | `pnpm --dir packages/contracts build` | 0 | 复用既有依赖（未改动） |
 | `pnpm --dir packages/project-recipes typecheck` | 0 | strict / exactOptionalPropertyTypes |
-| `pnpm --dir packages/project-recipes test` | 0 | 35 tests / 35 pass / 0 fail |
+| `pnpm --dir packages/project-recipes test` | 0 | 41 tests / 41 pass / 0 fail |
 | `pnpm --dir packages/project-recipes build` | 0 | `dist/`（不提交） |
 | `./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json` | 0 | CLI/读取器/测试同等严格 |
-| `node --test tools/project-recipes/test/*.case.ts` | 0 | 24 tests / 24 pass / 0 fail |
+| `node --test tools/project-recipes/test/*.case.ts` | 0 | 29 tests / 29 pass / 0 fail |
 | `node packages/project-recipes/examples/preview-consumer.ts` | 0 | draft + needs_input + draft；生成的 `create_work` 过公开 schema |
 | `node agent-tasks/product-wave-27/verify.mjs` | 0 | `PASS_TEN_AGENT_DISPATCH_STATIC_ONLY`（静态结构/预算/所有权） |
 

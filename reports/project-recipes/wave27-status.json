@@ -49,8 +49,8 @@
         {
           "command": "pnpm --dir packages/project-recipes test",
           "exit": 0,
-          "tests": 35,
-          "pass": 35,
+          "tests": 41,
+          "pass": 41,
           "fail": 0,
           "note": "catalog+negative+preview suites landed in this source checkpoint; J12 consumes the preview layer"
         },
@@ -133,8 +133,8 @@
         {
           "command": "pnpm --dir packages/project-recipes test",
           "exit": 0,
-          "tests": 35,
-          "pass": 35,
+          "tests": 41,
+          "pass": 41,
           "fail": 0,
           "note": "includes 6 preview tests"
         },
@@ -162,15 +162,15 @@
         {
           "command": "node --test tools/project-recipes/test/*.case.ts",
           "exit": 0,
-          "tests": 24,
-          "pass": 24,
+          "tests": 29,
+          "pass": 29,
           "fail": 0
         },
         {
           "command": "pnpm --dir packages/project-recipes test",
           "exit": 0,
-          "tests": 35,
-          "pass": 35,
+          "tests": 41,
+          "pass": 41,
           "fail": 0
         }
       ],
@@ -242,7 +242,7 @@
         "packages/project-recipes/src/index.ts",
         "packages/project-recipes/test/negative.case.ts"
       ],
-      "capability": "35 package tests (catalog, negative, preview), strict typecheck and build; examples are data and carry no command."
+      "capability": "41 package tests (catalog, negative, preview, compatibility), strict typecheck and build; examples are data and carry no command."
     },
     {
       "id": "J5",
@@ -346,9 +346,10 @@
       "status": "PASS",
       "source": [
         "tools/project-recipes/test/multi-project.case.ts",
-        "packages/project-recipes/test/fixtures.ts"
+        "packages/project-recipes/test/fixtures.ts",
+        "packages/project-recipes/test/compatibility.case.ts"
       ],
-      "capability": "Two authorized roots with different manager (pnpm/npm), layout (single/monorepo), profile/check/scope; drafts are isolated by real IDs; no shared approval, conversation, task or registry write."
+      "capability": "Two authorized roots with different manager (pnpm/npm), layout (single/monorepo), profile/check/scope; drafts are isolated by real IDs; a controlled-fixture configuration yields a fixture profile with no native wording, a native configuration inherits no fixture readiness, and an explicit profile choice is honoured rather than replaced."
     },
     {
       "id": "J14",
@@ -359,7 +360,7 @@
         "tools/project-recipes/test/cli.case.ts",
         "tools/project-recipes/test/metadata.case.ts"
       ],
-      "capability": "15 single-cause negatives in the library plus boundary refusals (bad JSON, oversize, symlink, missing, budget, output exists); unknown never becomes zero/pass; errors are bounded and free of secrets, stacks and unrelated content."
+      "capability": "Single-cause negatives in the library plus boundary refusals (bad JSON, oversize, one-byte-over budget, symlink, directory-as-file, missing, nested-not-read, output exists); refusal messages never echo file contents or secrets; unknown never becomes zero/pass."
     },
     {
       "id": "J15",
@@ -367,7 +368,8 @@
       "status": "PASS",
       "source": [
         "packages/project-recipes/test/negative.case.ts",
-        "docs/project-recipes/README.zh-CN.md"
+        "docs/project-recipes/README.zh-CN.md",
+        "packages/project-recipes/test/compatibility.case.ts"
       ],
       "capability": "Supported configuration/facts/catalog versions stated; unknown configuration version is unsupported with the observed protocol recorded and revision null; catalog changes require a version bump and change the recorded digest."
     },
@@ -379,7 +381,7 @@
         "tools/project-recipes/",
         "packages/project-recipes/"
       ],
-      "capability": "24 tools tests + 35 package tests; CLI and library write no SQL/registry/environment and create no execution state or cost ledger."
+      "capability": "29 tools tests + 41 package tests; CLI and library write no SQL/registry/environment and create no execution state or cost ledger."
     },
     {
       "id": "J17",
@@ -391,7 +393,7 @@
         "tools/project-recipes/test/metadata.case.ts",
         "docs/project-recipes/README.zh-CN.md"
       ],
-      "capability": "256 KiB JSON, 4 MiB lockfile, 12 files, 8 MiB total, 60-minute facts freshness, 512 script names, schema collection caps; near-limit and over-limit inputs are refused; output carries no private material."
+      "capability": "256 KiB JSON (inclusive; one byte over refused), 4 MiB lockfile, 12 files, 8 MiB total, 60-minute facts freshness (CLI exit 3), 512 script names, schema collection caps; output carries no private material."
     },
     {
       "id": "J18",
@@ -430,15 +432,15 @@
   "evidence": {
     "package": {
       "typecheckExit": 0,
-      "tests": 35,
-      "pass": 35,
+      "tests": 41,
+      "pass": 41,
       "fail": 0,
       "buildExit": 0
     },
     "tools": {
       "typecheckExit": 0,
-      "tests": 24,
-      "pass": 24,
+      "tests": 29,
+      "pass": 29,
       "fail": 0
     },
     "exampleExit": 0,
