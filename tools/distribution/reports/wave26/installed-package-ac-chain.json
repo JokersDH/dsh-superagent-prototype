@@ -1,0 +1,62 @@
+{
+  "protocol": "wave26-installed-package-ac-chain/1",
+  "status": "PASS",
+  "package": {
+    "install": "/tmp/w26frozen/install",
+    "build": "d4b1780d999a4b74",
+    "tarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a"
+  },
+  "formats": [
+    {
+      "format": 1,
+      "status": "verified-flow",
+      "targetProof": "ok",
+      "sources": "verified",
+      "historyEntries": 1,
+      "workPhase": "stopping",
+      "manifestDigest": "3545f7f937ccd053d17b3c223fef4295f81d4335985d333e61704e80daf1dfc5",
+      "assertions": 21,
+      "cleanup": {
+        "owned": true,
+        "attempted": true,
+        "stopped": true,
+        "detail": "pa-stop-verified"
+      }
+    },
+    {
+      "format": 2,
+      "status": "verified-flow",
+      "targetProof": "ok",
+      "sources": "verified",
+      "historyEntries": 1,
+      "workPhase": "stopping",
+      "manifestDigest": "3545f7f937ccd053d17b3c223fef4295f81d4335985d333e61704e80daf1dfc5",
+      "assertions": 21,
+      "cleanup": {
+        "owned": true,
+        "attempted": true,
+        "stopped": true,
+        "detail": "pa-stop-verified"
+      }
+    }
+  ],
+  "drift": {
+    "code": "target_subject_mismatch",
+    "proofStatus": "mismatch",
+    "relation": "forbidden-delta",
+    "forbidden": [
+      {
+        "name": "conversation_messages",
+        "allowed": false,
+        "originalRows": 6,
+        "targetRows": 7
+      }
+    ],
+    "bodyReturned": false
+  },
+  "notes": [
+    "Both formats restored independently from the same A source and consumed by the installed package C driver in manifest mode.",
+    "Each verified-flow includes target proof ok, source state verified, history entry and verified cleanup.",
+    "Drift was applied to the v1 probe root after its positive evidence; the package driver rejected it as target_subject_mismatch before body content."
+  ]
+}

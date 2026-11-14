@@ -6,6 +6,8 @@
 
 必跑：本目录 `installed-trial-workbench.json`（真实安装静态 App + 真实 HTTP/SQLite，8/8：默认对话保留、四项 callback 打开既有目标且不发送、readiness 读一次、失败/404/readonly/fixture、桌面/移动无溢出）、`readiness.json`（GET 200 trial-readiness/1 auth none）、`help.json`、`personal.json`、`same-store.json`、`matrix/multi/cross/data/backup/portable`。
 
-未达：A/C target proof 只在 A 未提交源码 + C dev tool 链上通过（v1/v2 target ok、合法 drift mismatch），未由已安装包 consumer 消费；C 未内部逐字段重校 A manifest；E independent required 未执行；G/H 未导入；private/target/真实供应商未测。
+A/C：v1/v2 两个独立 A restore 均由已安装包 C driver manifest mode 返回 verified-flow（target proof ok、sources verified、history 1、cleanup verified）；v1 加入合法 target-only 消息后由同一包 driver 以 target_subject_mismatch/forbidden-delta 拒绝，未返回正文。
+
+未达：C 未内部逐字段重校 A manifest；E independent required 未执行；G/H 未导入；private/target/真实供应商未测。
 
 普通：install-smoke4 PASS、noexec4、same-schema3、managed tar upgrade7、multi8、cross3、data5、backup6、portable5、matrix19。

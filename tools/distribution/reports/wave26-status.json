@@ -26,12 +26,12 @@
       "summary": "Clean frozen package d4b1780d999a4b74 and tar 8c36...; closure96/96 including F App; E recipe handed early."
     },
     "d5": {
-      "status": "PASS_TARGET_PROOF_PARTIAL",
-      "summary": "Installed wave26 package C driver manifest mode built the A manifest, checked complete coverage/root-map, and its target proof returned ok on both v1 and v2 A-restored roots. Both stopped at sources.state=scope_changed from restored path mapping, so no source body was accepted. C does not internally revalidate every manifest field."
+      "status": "PASS",
+      "summary": "Installed package C driver manifest mode consumed A producer/expectation/root-map for both v1 and v2 A-restored roots; target proof ok, source state verified, history entry present, work phase stopping, 21 assertions, verified cleanup. Negative target-only message drift rejected as target_subject_mismatch/forbidden-delta before body."
     },
     "d6": {
-      "status": "TARGET_PROOF_PASS_SOURCE_READ_NOT_REACHED",
-      "summary": "Both package roots have real A restore reports and target proof ok; full same-package verified source read/UI flow after target proof is NOT_REACHED because scope_changed withholds bodies. A/C dev drift negative still mismatch."
+      "status": "PASS",
+      "summary": "Two independent A restores each consumed by installed package C driver verified-flow with target content proof and verified source/history; drift negative rejects before body."
     },
     "d9": {
       "status": "PASS",
@@ -64,6 +64,10 @@
     "d16": {
       "status": "PASS_WITH_E_PENDING",
       "summary": "Full tuple and limits handed to E; E independent required not executed."
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Full A->C installed package chain for both formats plus drift negative; D self-test, E required remains independent."
     }
   },
   "artifacts": {
@@ -125,14 +129,18 @@
     "coldInstall": 4,
     "sameSchemaUpgrade": 3,
     "managedUpgrade": 7,
-    "closed": true
+    "closed": true,
+    "installedPackageAC": {
+      "formats": 2,
+      "verifiedFlow": 2,
+      "driftReject": 1
+    }
   },
   "notDone": [
     "C internal full-manifest revalidation",
     "E final verdict",
     "G/H integration",
-    "private/target/real vendor",
-    "installed package source body verified after target proof (scope_changed)"
+    "private/target/real vendor"
   ],
   "limitations": [
     "zero real vendor/model/native turns",
