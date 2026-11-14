@@ -1,0 +1,9 @@
+# 重新产生同一类合法性输入（新目录；state/project 是可重建材料，未随本证据提交）
+node tests/operational-soak/recovery/produce.mjs --out <NEW-ROOT>
+node tests/operational-soak/recovery/read.mjs --run <NEW-ROOT>
+node --test tests/operational-soak/recovery/recovery.case.mjs
+
+# 本证据的 subject（每次运行 questionId 会变化；workId/factSource/attempt tuple 绑定见 normal.json）
+# journal sha256 / lastSeq / kinds 见 journal.json
+# port positive 与 faults 见 recovery-port.json
+# 明确未达：业务重连/attach、SIGKILL、原 Work 人工接受、2/4 资源 = NOT_REACHED

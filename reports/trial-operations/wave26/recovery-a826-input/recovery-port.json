@@ -1,0 +1,76 @@
+{
+  "protocol": "recovery-port-fixture/1",
+  "surface": "admitted-recovery-port (GET /v1/inspection, POST /v1/cancel)",
+  "businessSurface": "NOT_REACHED",
+  "modelCalls": 0,
+  "modelTurns": 0,
+  "executor": "none (in-process recovery backend)",
+  "endpoint": {
+    "socketPath": "<temporary-owned>/recovery.sock",
+    "credentialPath": "<temporary-owned>/recovery.key",
+    "socketIdentity": {
+      "dev": 16777233,
+      "ino": 62174932
+    }
+  },
+  "positive": {
+    "inspect": {
+      "state": "serving",
+      "admission": "closed",
+      "coverage": "complete_owned_resources",
+      "resources": 1,
+      "evidence": [
+        "fixture:inspection"
+      ]
+    },
+    "cancel": {
+      "state": "terminated",
+      "admission": "closed",
+      "evidence": [
+        "fixture:cancelled"
+      ]
+    },
+    "counts": {
+      "inspect": 1,
+      "cancel": 1
+    }
+  },
+  "faults": [
+    {
+      "id": "wrong_credential",
+      "expected": "auth_failed",
+      "actual": "auth_failed",
+      "sends": 0,
+      "executes": 0
+    },
+    {
+      "id": "foreign_subject",
+      "expected": "identity_mismatch",
+      "actual": "identity_mismatch",
+      "sends": 0,
+      "executes": 0
+    },
+    {
+      "id": "changed_socket_identity",
+      "expected": "identity_mismatch",
+      "actual": "identity_mismatch",
+      "sends": 0,
+      "executes": 0
+    },
+    {
+      "id": "inspection_timeout",
+      "expected": "timeout",
+      "actual": "timeout",
+      "sends": 0,
+      "executes": 0
+    },
+    {
+      "id": "stale_proof",
+      "expected": "stale_proof",
+      "actual": "stale_proof",
+      "sends": 0,
+      "executes": 0
+    }
+  ],
+  "faultsOk": true
+}

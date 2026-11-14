@@ -1,0 +1,113 @@
+{
+  "protocol": "recovery-journal-report/1",
+  "generatedAt": "2026-11-14T07:39:42.820Z",
+  "summary": {
+    "protocol": "recovery-journal-fixture/1",
+    "path": "journal/critical.ndjson",
+    "bytes": 3474,
+    "sha256": "3430d28c77ce189e9a2ae756a62b710150aff8554309292805a6717ab65609cd",
+    "factSource": "fixture-runner-source-wave26",
+    "attempt": {
+      "ticketId": "89e3088e337bc0ce062725d67deb035b",
+      "assignmentId": "9e850db208c1492d7e2975b72be4c4c4",
+      "attemptId": "attempt-8f0ac3ad-4e9b-49d1-85e9-f5ef7fa2fc2f",
+      "fenceEpoch": 1,
+      "contract": {
+        "workId": "94012e1a1c7265c033f285a944656a04",
+        "revision": 1,
+        "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+      }
+    },
+    "expected": {
+      "lastSeq": 5,
+      "entries": 5,
+      "kinds": [
+        "turn.ended",
+        "answer.observed",
+        "candidate.observed",
+        "runtime.exited",
+        "usage.observed"
+      ]
+    },
+    "digests": [
+      "b6213e80c1eb8c2bba55999f0079abf7fdd681d9aa3754025be782ce166a20ac",
+      "d311fd9219c2ce394e20c56808de7f3261bb61634dada4b386bade2117d10ae6",
+      "4b87ae99560006f57fb01a266b98c8835ffd9c49c2e8ae44d5732cd29c290e4c",
+      "7e764fc792f0f8f767fbbae310b3c27803433675c47b622dbb709de75c6fa109",
+      "543f796f099e182ed2af85481376609feaa8fd37ff7c65190580c5e5dec979c7"
+    ]
+  },
+  "negatives": [
+    {
+      "name": "partial_tail",
+      "input": "truncated_tail",
+      "result": "partial_tail_refused",
+      "corruptAt": null,
+      "partialTailBytes": 632,
+      "entries": 4,
+      "sends": 0,
+      "executes": 0
+    },
+    {
+      "name": "corrupt_digest",
+      "input": "digest_flip",
+      "result": "refused",
+      "corruptAt": 0,
+      "partialTailBytes": 0,
+      "entries": 0,
+      "sends": 0,
+      "executes": 0
+    },
+    {
+      "name": "sequence_gap",
+      "input": "first_record_removed",
+      "result": "refused",
+      "corruptAt": 0,
+      "entries": 0,
+      "sends": 0,
+      "executes": 0
+    },
+    {
+      "name": "oversize_length",
+      "input": "length_prefix_ffffffff",
+      "result": "refused",
+      "corruptAt": 0,
+      "entries": 0,
+      "sends": 0,
+      "executes": 0
+    },
+    {
+      "name": "payload_kind_mismatch",
+      "input": "turn_ended_with_answer_payload",
+      "result": "refused",
+      "corruptAt": 0,
+      "entries": 0,
+      "sends": 0,
+      "executes": 0
+    },
+    {
+      "name": "missing_fact_identity",
+      "input": "fact_id_removed",
+      "result": "refused",
+      "corruptAt": 0,
+      "entries": 0,
+      "sends": 0,
+      "executes": 0
+    },
+    {
+      "name": "record_size_limit",
+      "input": "maxRecordBytes_8",
+      "result": "refused",
+      "corruptAt": 0,
+      "entries": 0,
+      "sends": 0,
+      "executes": 0
+    }
+  ],
+  "negativeControls": {
+    "expectedRefusals": 7,
+    "observedRefusals": 7,
+    "sends": 0,
+    "executes": 0
+  }
+}

@@ -1,0 +1,6 @@
+# 最短复现（在 trial-kit 所在 checkout 执行；替换 <NEW-OUT> 为新目录）
+node tools/trial-kit/bin/trial-machinecheck.mjs --tar '~/Desktop/joker/pa-artifacts/wave26-target/wave26-target-ce64fc1.tar.gz' --out <NEW-OUT> --artifact '~/Desktop/joker/pa-artifacts/wave26-target/wave26-target-ce64fc1.json'
+
+# 只读复跑包内命令（同样使用本次新根，不碰个人 state）
+'<EXTRACT>/bin/pa' help
+PA_CONFIG_ROOT='<NEW-OUT>/roots/config' PA_DATA_ROOT='<NEW-OUT>/roots/data' '<EXTRACT>/bin/pa' status --json

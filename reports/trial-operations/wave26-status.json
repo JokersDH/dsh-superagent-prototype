@@ -1,0 +1,765 @@
+{
+  "protocol": "trial-operations-status/1",
+  "wave": "product-wave-26",
+  "owner": "H",
+  "branch": "codex/g4-trial-operations",
+  "mergedMain": "6787bd0",
+  "preparedFrom": "88c19dde4617cee38635866256240a1f9eac4b4e",
+  "updatedAt": "2026-11-14T07:48:26.219Z",
+  "goal": {
+    "established": true,
+    "tokenBudget": null,
+    "checkpoints": [
+      "H4",
+      "H8",
+      "H12",
+      "H16"
+    ],
+    "continueAfterCheckpoint": true
+  },
+  "ownedPaths": [
+    "tools/trial-kit/",
+    "tests/operational-soak/",
+    "docs/internal-trial/",
+    "reports/trial-operations/"
+  ],
+  "phases": {
+    "H1": {
+      "status": "COMPLETED",
+      "deliverable": "REFUSED stops before any package command/support; compatibility unknown kept separate",
+      "evidence": "tests/operational-soak/hardening.case.mjs"
+    },
+    "H2": {
+      "status": "COMPLETED",
+      "deliverable": "O_NOFOLLOW/fstat/nlink token checks; bounded semver comparators with UNKNOWN for unsupported syntax"
+    },
+    "H3": {
+      "status": "COMPLETED",
+      "deliverable": "raw checker v2 derives time from startedAt/endedAt + monotonic elapsed + sample.at and refuses contradictions"
+    },
+    "H4": {
+      "status": "COMPLETED",
+      "deliverable": "hardened readonly toolkit checkpoint",
+      "tests": "hardening 4/4"
+    },
+    "H5": {
+      "status": "COMPLETED",
+      "deliverable": "a826 and F-App successor ce64fc1 readonly preflight",
+      "evidence": "reports/trial-operations/wave26/preflight-a826/preflight-report.json"
+    },
+    "H6": {
+      "status": "COMPLETED",
+      "deliverable": "same-subject readiness consumption; package_binding stays unknown; 401/500/timeout/unknown/stale covered"
+    },
+    "H7": {
+      "status": "COMPLETED",
+      "deliverable": "sanitized diagnostics, 0600/no-overwrite, canary and partial-failure controls"
+    },
+    "H8": {
+      "status": "COMPLETED",
+      "deliverable": "package preflight+diagnostics checkpoint (a826, ce64fc1)",
+      "evidence": "reports/trial-operations/wave26/machinecheck-a826/machinecheck-report.json"
+    },
+    "H9": {
+      "status": "COMPLETED",
+      "deliverable": "legal zero-model journal fixture via original FileCriticalJournal/decodeBuffer, 7 negative controls",
+      "evidence": "reports/trial-operations/wave26/recovery-a826-input/journal.json"
+    },
+    "H10": {
+      "status": "COMPLETED",
+      "deliverable": "original ProductRuntime/QuestionBroker/A Store normal chain producing Work/attempt/question/answer/native_applied",
+      "evidence": "reports/trial-operations/wave26/recovery-a826-input/normal.json"
+    },
+    "H11": {
+      "status": "COMPLETED",
+      "deliverable": "fault recipes for journal and admitted recovery port (inspect/cancel only)",
+      "evidence": "reports/trial-operations/wave26/recovery-a826-input/recovery-port.json"
+    },
+    "H12": {
+      "status": "COMPLETED",
+      "deliverable": "runnable recovery input package for B/main; business resume NOT_REACHED",
+      "evidence": "tests/operational-soak/recovery/README.zh-CN.md"
+    },
+    "H13": {
+      "status": "COMPLETED",
+      "deliverable": "short 60s normal and 30s forced-disconnect fixture observations; product target observation NOT_REACHED",
+      "evidence": "reports/trial-operations/wave26/runs/20261114T154118-60s-mixed-normal/run.json"
+    },
+    "H14": {
+      "status": "COMPLETED",
+      "deliverable": "raw material with derived duration, sample hashes/count/cadence and E inputs"
+    },
+    "H15": {
+      "status": "COMPLETED",
+      "deliverable": "colleague guide updated for current F App four actions, readiness, diagnostics, recovery input and migration preflight"
+    },
+    "H16": {
+      "status": "COMPLETED",
+      "deliverable": "wave26 toolkit/observation/status checkpoint",
+      "evidence": "reports/trial-operations/wave26-status.json"
+    }
+  },
+  "milestones": {
+    "H4": {
+      "status": "COMPLETED"
+    },
+    "H8": {
+      "status": "COMPLETED"
+    },
+    "H12": {
+      "status": "COMPLETED"
+    },
+    "H16": {
+      "status": "COMPLETED"
+    }
+  },
+  "hardening": {
+    "refusedZeroExecution": {
+      "cases": 5,
+      "packageCommandCalls": 0,
+      "supportCollections": 0,
+      "evidence": "hardening.case.mjs"
+    },
+    "token": {
+      "checks": [
+        "O_NOFOLLOW",
+        "lstat/fstat dev+ino",
+        "regular",
+        "exactly 0600",
+        "current uid",
+        "nlink=1",
+        "size 8..4096"
+      ],
+      "refused": [
+        "symlink",
+        "hardlink",
+        "0640",
+        "FIFO",
+        "directory"
+      ]
+    },
+    "nodeRange": {
+      "supported": ">=x[.y[.z]] with optional <x[.y[.z]]",
+      "observed": [
+        [
+          "24.21.0",
+          ">=24.21.0 <25",
+          true
+        ],
+        [
+          "25.0.0",
+          ">=24.21.0 <25",
+          false
+        ],
+        [
+          "24.21.0",
+          ">=23 <24",
+          false
+        ],
+        [
+          "24.21.0",
+          "^24.21.0",
+          null
+        ]
+      ]
+    },
+    "rawChecker": {
+      "protocol": "trial-run-check/2",
+      "rejects": [
+        "zero clock claiming 600s",
+        "samples end early",
+        "reordered time",
+        "sample.at vs elapsed mismatch",
+        "failure accounting mismatch",
+        "symlink/escaping sample path"
+      ]
+    }
+  },
+  "packages": {
+    "a826": {
+      "subject": {
+        "tar": "~/Desktop/joker/pa-artifacts/wave25-target/wave25-target-a826b5e.tar.gz",
+        "tarSha256": "d3e79749426c796085895abc73d76c4b26cd48427d8e6f748155bec00a103f3c",
+        "bytes": 20251483
+      },
+      "tuple": {
+        "buildId": "fefd93219cea0d4a",
+        "schema": 18,
+        "source": "a826b5e7c8843c28a527567ac33955ff061f85dc"
+      },
+      "observed": {
+        "closureDigest": "2a3e54d6adb71d01c8e56e4d5847ad69b7e6ed755f91355dc4147eb0cf5d5eea",
+        "files": 6733,
+        "symlinks": 21
+      },
+      "preflight": {
+        "result": "DEGRADED",
+        "checks": {
+          "PASS": 32,
+          "UNKNOWN": 1
+        }
+      },
+      "machinecheck": {
+        "result": "DEGRADED",
+        "checks": {
+          "PASS": 46,
+          "UNKNOWN": 3
+        },
+        "unknowns": [
+          "host_sqlite",
+          "support"
+        ]
+      },
+      "material": [
+        {
+          "path": "reports/trial-operations/wave26/preflight-a826/preflight-report.json",
+          "bytes": 19069,
+          "sha256": "565653a1460520ea424d1045c9ade92f1e4472cbe36fae9d3b3c4ae92e7f72fd"
+        },
+        {
+          "path": "reports/trial-operations/wave26/machinecheck-a826/machinecheck-report.json",
+          "bytes": 27492,
+          "sha256": "07e8896523518ffa8e7d4688b991373ac4e406e4a883b4e2e90cc43cc871f5c2"
+        },
+        {
+          "path": "reports/trial-operations/wave26/machinecheck-a826/diagnostics-bundle.json",
+          "bytes": 24934,
+          "sha256": "2f3a8734efeb70854bc0df999e0614ecf6fc9b0bce24b36a06056b301dddb38a"
+        }
+      ]
+    },
+    "ce64fc1": {
+      "subject": {
+        "tar": "~/Desktop/joker/pa-artifacts/wave26-target/wave26-target-ce64fc1.tar.gz",
+        "tarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+        "bytes": 20272436
+      },
+      "tuple": {
+        "buildId": "d4b1780d999a4b74",
+        "schema": 18,
+        "source": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21"
+      },
+      "note": "includes F App trial navigation assets; a302ddc is an ancestor",
+      "observed": {
+        "closureDigest": "f8b00750fecf3c21dcacf475e59bdb965ae162ce557f8d950b89c7548372e862"
+      },
+      "machinecheck": {
+        "result": "DEGRADED",
+        "checks": {
+          "PASS": 46,
+          "UNKNOWN": 3
+        },
+        "unknowns": [
+          "host_sqlite",
+          "support"
+        ]
+      },
+      "material": [
+        {
+          "path": "reports/trial-operations/wave26/machinecheck-ce64fc1/machinecheck-report.json",
+          "bytes": 27516,
+          "sha256": "80540d93e91c6095255c89c3804a8e303bbc1cd6e735ad37187d0301b72868ad"
+        },
+        {
+          "path": "reports/trial-operations/wave26/machinecheck-ce64fc1/diagnostics-bundle.json",
+          "bytes": 24955,
+          "sha256": "547f36178abad34ca34498691c3ea48b381ff1ac7780f0cd80a601fbb20db0a4"
+        }
+      ]
+    }
+  },
+  "recovery": {
+    "entry": "tests/operational-soak/recovery/produce.mjs --out <new-dir>",
+    "reader": "tests/operational-soak/recovery/read.mjs --run <dir>",
+    "subject": {
+      "workId": "94012e1a1c7265c033f285a944656a04",
+      "questionId": "a4e2d78e46ab29eab0af67cd93add9ba",
+      "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+      "deliveryStatus": "native_applied",
+      "factSource": "fixture-runner-source-wave26",
+      "attempt": {
+        "ticketId": "89e3088e337bc0ce062725d67deb035b",
+        "assignmentId": "9e850db208c1492d7e2975b72be4c4c4",
+        "attemptId": "attempt-8f0ac3ad-4e9b-49d1-85e9-f5ef7fa2fc2f",
+        "fenceEpoch": 1,
+        "contract": {
+          "workId": "94012e1a1c7265c033f285a944656a04",
+          "revision": 1,
+          "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+        }
+      }
+    },
+    "journal": {
+      "verdict": "EXPECTED_REFUSALS",
+      "summary": {
+        "protocol": "recovery-journal-fixture/1",
+        "path": "journal/critical.ndjson",
+        "bytes": 3474,
+        "sha256": "3430d28c77ce189e9a2ae756a62b710150aff8554309292805a6717ab65609cd",
+        "factSource": "fixture-runner-source-wave26",
+        "attempt": {
+          "ticketId": "89e3088e337bc0ce062725d67deb035b",
+          "assignmentId": "9e850db208c1492d7e2975b72be4c4c4",
+          "attemptId": "attempt-8f0ac3ad-4e9b-49d1-85e9-f5ef7fa2fc2f",
+          "fenceEpoch": 1,
+          "contract": {
+            "workId": "94012e1a1c7265c033f285a944656a04",
+            "revision": 1,
+            "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+          }
+        },
+        "expected": {
+          "lastSeq": 5,
+          "entries": 5,
+          "kinds": [
+            "turn.ended",
+            "answer.observed",
+            "candidate.observed",
+            "runtime.exited",
+            "usage.observed"
+          ]
+        },
+        "digests": [
+          "b6213e80c1eb8c2bba55999f0079abf7fdd681d9aa3754025be782ce166a20ac",
+          "d311fd9219c2ce394e20c56808de7f3261bb61634dada4b386bade2117d10ae6",
+          "4b87ae99560006f57fb01a266b98c8835ffd9c49c2e8ae44d5732cd29c290e4c",
+          "7e764fc792f0f8f767fbbae310b3c27803433675c47b622dbb709de75c6fa109",
+          "543f796f099e182ed2af85481376609feaa8fd37ff7c65190580c5e5dec979c7"
+        ]
+      },
+      "negatives": [
+        {
+          "name": "partial_tail",
+          "input": "truncated_tail",
+          "result": "partial_tail_refused",
+          "corruptAt": null,
+          "partialTailBytes": 632,
+          "entries": 4,
+          "sends": 0,
+          "executes": 0
+        },
+        {
+          "name": "corrupt_digest",
+          "input": "digest_flip",
+          "result": "refused",
+          "corruptAt": 0,
+          "partialTailBytes": 0,
+          "entries": 0,
+          "sends": 0,
+          "executes": 0
+        },
+        {
+          "name": "sequence_gap",
+          "input": "first_record_removed",
+          "result": "refused",
+          "corruptAt": 0,
+          "entries": 0,
+          "sends": 0,
+          "executes": 0
+        },
+        {
+          "name": "oversize_length",
+          "input": "length_prefix_ffffffff",
+          "result": "refused",
+          "corruptAt": 0,
+          "entries": 0,
+          "sends": 0,
+          "executes": 0
+        },
+        {
+          "name": "payload_kind_mismatch",
+          "input": "turn_ended_with_answer_payload",
+          "result": "refused",
+          "corruptAt": 0,
+          "entries": 0,
+          "sends": 0,
+          "executes": 0
+        },
+        {
+          "name": "missing_fact_identity",
+          "input": "fact_id_removed",
+          "result": "refused",
+          "corruptAt": 0,
+          "entries": 0,
+          "sends": 0,
+          "executes": 0
+        },
+        {
+          "name": "record_size_limit",
+          "input": "maxRecordBytes_8",
+          "result": "refused",
+          "corruptAt": 0,
+          "entries": 0,
+          "sends": 0,
+          "executes": 0
+        }
+      ]
+    },
+    "recoveryPort": {
+      "positive": {
+        "inspect": {
+          "state": "serving",
+          "admission": "closed",
+          "coverage": "complete_owned_resources",
+          "resources": 1,
+          "evidence": [
+            "fixture:inspection"
+          ]
+        },
+        "cancel": {
+          "state": "terminated",
+          "admission": "closed",
+          "evidence": [
+            "fixture:cancelled"
+          ]
+        },
+        "counts": {
+          "inspect": 1,
+          "cancel": 1
+        }
+      },
+      "faults": [
+        {
+          "id": "wrong_credential",
+          "expected": "auth_failed",
+          "actual": "auth_failed",
+          "sends": 0,
+          "executes": 0
+        },
+        {
+          "id": "foreign_subject",
+          "expected": "identity_mismatch",
+          "actual": "identity_mismatch",
+          "sends": 0,
+          "executes": 0
+        },
+        {
+          "id": "changed_socket_identity",
+          "expected": "identity_mismatch",
+          "actual": "identity_mismatch",
+          "sends": 0,
+          "executes": 0
+        },
+        {
+          "id": "inspection_timeout",
+          "expected": "timeout",
+          "actual": "timeout",
+          "sends": 0,
+          "executes": 0
+        },
+        {
+          "id": "stale_proof",
+          "expected": "stale_proof",
+          "actual": "stale_proof",
+          "sends": 0,
+          "executes": 0
+        }
+      ],
+      "faultsOk": true,
+      "businessSurface": "NOT_REACHED"
+    },
+    "chainRead": true,
+    "executor": "controlled_fixture",
+    "modelCalls": 0,
+    "vendorTurns": 0,
+    "businessResume": "NOT_REACHED",
+    "notReached": [
+      "business attach/begin/deliver/answer",
+      "SIGKILL cross-process recovery",
+      "original Work human acceptance",
+      "2/4 resource completion"
+    ],
+    "material": [
+      {
+        "path": "reports/trial-operations/wave26/recovery-a826-input/report.json",
+        "bytes": 7832,
+        "sha256": "9d086017a0ed6dfd1eda83a39cf488529b296f8686a87c2303852a6cb28970a1"
+      },
+      {
+        "path": "reports/trial-operations/wave26/recovery-a826-input/normal.json",
+        "bytes": 3854,
+        "sha256": "10a7f1843c3897cdf1e82319086d671263e201a2dce6ff62a8c38ef67e422d3b"
+      },
+      {
+        "path": "reports/trial-operations/wave26/recovery-a826-input/journal/critical.ndjson",
+        "bytes": 3474,
+        "sha256": "3430d28c77ce189e9a2ae756a62b710150aff8554309292805a6717ab65609cd"
+      },
+      {
+        "path": "reports/trial-operations/wave26/recovery-a826-input/journal.json",
+        "bytes": 2928,
+        "sha256": "0a6ccf9c940f45961e28ee506e504a2e6307923ca626dc89bd932ee07425decb"
+      },
+      {
+        "path": "reports/trial-operations/wave26/recovery-a826-input/recovery-port.json",
+        "bytes": 1666,
+        "sha256": "4419069326f9ce1eaeb0fe7e7f75aefc9c7f048558a80382170455e47572623c"
+      },
+      {
+        "path": "reports/trial-operations/wave26/recovery-a826-input/read.json",
+        "bytes": 3528,
+        "sha256": "90d1548bbb04547b7ac5597da5965e958bb9bf9e57e948c7e87ef09f392eac35"
+      }
+    ]
+  },
+  "runs": {
+    "short60Normal": {
+      "material": [
+        {
+          "path": "reports/trial-operations/wave26/runs/20261114T154118-60s-mixed-normal/run.json",
+          "bytes": 3585,
+          "sha256": "8aba3c95f4f0d8682a7a23b4cb69c8ebfd5195435790f28b5bd2a70854c93e7b"
+        },
+        {
+          "path": "reports/trial-operations/wave26/runs/20261114T154118-60s-mixed-normal/samples.ndjson",
+          "bytes": 16586,
+          "sha256": "2392d2220704ec59774ecdd8b12f5a4d21b0ab3289f65ae853bd826f45322c7e"
+        }
+      ],
+      "summary": {
+        "status": "COMPLETED",
+        "startedAt": "2026-11-14T07:41:48.806Z",
+        "endedAt": "2026-11-14T07:42:48.811Z",
+        "wallElapsedSeconds": 60,
+        "requestedDurationSeconds": 60,
+        "stoppedBy": "duration",
+        "counters": {
+          "pollRequests": 61,
+          "pollOk": 61,
+          "pollFailed": 0,
+          "latencyMs": {
+            "count": 61,
+            "p50": 0.64,
+            "p95": 1.39,
+            "max": 6.34
+          },
+          "httpStatuses": {
+            "200": 61
+          },
+          "sseConnections": 2,
+          "sseEvents": 60,
+          "sseBytes": 6804,
+          "sseFailedConnections": 0,
+          "duplicates": 0,
+          "gaps": 0,
+          "reconnects": 1,
+          "reopens": 1,
+          "samples": 61,
+          "lastEventAt": "2026-11-14T07:42:48.084Z"
+        },
+        "failures": 0,
+        "failureCounts": {},
+        "cleanup": {
+          "closed": true,
+          "activeSockets": 0,
+          "activeConnections": 0
+        }
+      },
+      "check": {
+        "path": "reports/trial-operations/wave26/checks/20261114T154118-60s-mixed-normal/run-check.json",
+        "bytes": 1441,
+        "sha256": "0db624ddd92e2b0e438800b6ada00a5ff649d909d77d18223e01334a1e15f47c"
+      }
+    },
+    "short30Truncate": {
+      "material": [
+        {
+          "path": "reports/trial-operations/wave26/runs/20261114T154118-30s-mixed-truncate/run.json",
+          "bytes": 6040,
+          "sha256": "931cbac0c0b85319a9bf1b82478d7375c05c8358daa05f8d21b4dd7c3751246b"
+        },
+        {
+          "path": "reports/trial-operations/wave26/runs/20261114T154118-30s-mixed-truncate/samples.ndjson",
+          "bytes": 8447,
+          "sha256": "28007af7e8ec2844b6d4c98220049fcdc32f9f7a77819e9102f28f5fadef3dee"
+        }
+      ],
+      "summary": {
+        "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+        "startedAt": "2026-11-14T07:42:49.467Z",
+        "endedAt": "2026-11-14T07:43:19.475Z",
+        "wallElapsedSeconds": 30,
+        "requestedDurationSeconds": 30,
+        "stoppedBy": "duration",
+        "counters": {
+          "pollRequests": 62,
+          "pollOk": 62,
+          "pollFailed": 0,
+          "latencyMs": {
+            "count": 62,
+            "p50": 0.67,
+            "p95": 1.43,
+            "max": 9.96
+          },
+          "httpStatuses": {
+            "200": 62
+          },
+          "sseConnections": 27,
+          "sseEvents": 51,
+          "sseBytes": 5712,
+          "sseFailedConnections": 0,
+          "duplicates": 0,
+          "gaps": 0,
+          "reconnects": 26,
+          "reopens": 2,
+          "samples": 31,
+          "lastEventAt": "2026-11-14T07:43:19.308Z"
+        },
+        "failures": 24,
+        "failureCounts": {
+          "sse:disconnect:error": 24
+        },
+        "cleanup": {
+          "closed": true,
+          "activeSockets": 0,
+          "activeConnections": 0
+        }
+      },
+      "check": {
+        "path": "reports/trial-operations/wave26/checks/20261114T154118-30s-mixed-truncate/run-check.json",
+        "bytes": 1500,
+        "sha256": "e75b288706458d03cc78378802d8abc8d215febf7746497595e3f59a35fc3a05"
+      }
+    },
+    "preservedWave25": {
+      "note": "original raw material retained unchanged; not re-run and not relabelled as product/48h soak",
+      "baseline600": {
+        "original": "reports/trial-operations/wave25/runs/20261114T122036-600s-mixed-baseline/run.json",
+        "summary": {
+          "status": "COMPLETED",
+          "startedAt": "2026-11-14T04:20:37.000Z",
+          "endedAt": "2026-11-14T04:30:37.006Z",
+          "wallElapsedSeconds": 600,
+          "requestedDurationSeconds": 600,
+          "stoppedBy": "duration",
+          "counters": {
+            "pollRequests": 608,
+            "pollOk": 608,
+            "pollFailed": 0,
+            "latencyMs": {
+              "count": 608,
+              "p50": 1.31,
+              "p95": 2.14,
+              "max": 4.73
+            },
+            "httpStatuses": {
+              "200": 608
+            },
+            "sseConnections": 10,
+            "sseEvents": 600,
+            "sseBytes": 68220,
+            "sseFailedConnections": 0,
+            "duplicates": 0,
+            "gaps": 0,
+            "reconnects": 9,
+            "reopens": 9,
+            "samples": 301,
+            "lastEventAt": "2026-11-14T04:30:36.340Z"
+          },
+          "failures": 0,
+          "failureCounts": {},
+          "cleanup": {
+            "closed": true,
+            "activeSockets": 0,
+            "activeConnections": 0
+          }
+        },
+        "recheckV2": {
+          "path": "reports/trial-operations/wave26/checks/wave25-600-v2/run-check.json",
+          "bytes": 1459,
+          "sha256": "61f5da014e09992e855e1121289b329cfac52fb2a7ec1b787dd9f8d0c2e4fa01"
+        }
+      },
+      "churn1800": {
+        "original": "reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn/run.json",
+        "summary": {
+          "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+          "startedAt": "2026-11-14T04:31:53.552Z",
+          "endedAt": "2026-11-14T05:01:53.582Z",
+          "wallElapsedSeconds": 1800,
+          "requestedDurationSeconds": 1800,
+          "stoppedBy": "duration",
+          "counters": {
+            "pollRequests": 609,
+            "pollOk": 609,
+            "pollFailed": 0,
+            "latencyMs": {
+              "count": 609,
+              "p50": 0.78,
+              "p95": 1.87,
+              "max": 6.07
+            },
+            "httpStatuses": {
+              "200": 609
+            },
+            "sseConnections": 400,
+            "sseEvents": 800,
+            "sseBytes": 89600,
+            "sseFailedConnections": 0,
+            "duplicates": 0,
+            "gaps": 0,
+            "reconnects": 399,
+            "reopens": 9,
+            "samples": 601,
+            "lastEventAt": "2026-11-14T05:01:51.789Z"
+          },
+          "failures": 392,
+          "failureCounts": {
+            "sse:disconnect:error": 392
+          },
+          "cleanup": {
+            "closed": true,
+            "activeSockets": 0,
+            "activeConnections": 0
+          }
+        },
+        "expectedDisconnectFailures": 392,
+        "recheckV2": {
+          "path": "reports/trial-operations/wave26/checks/wave25-1800-v2/run-check.json",
+          "bytes": 1523,
+          "sha256": "1c96f805427ab14d691b34c1effd827bf5b6d6dff31a514322dbe621b971c2de"
+        }
+      }
+    },
+    "productReadonlyObservation": {
+      "status": "NOT_REACHED",
+      "reason": "no explicit independently-proven own product target supplied; H never starts/stops/migrates or reads user services/credentials"
+    }
+  },
+  "tests": {
+    "command": "node --test tests/operational-soak/*.case.mjs tests/operational-soak/recovery/*.case.mjs",
+    "total": 27,
+    "pass": 27,
+    "fail": 0,
+    "suites": {
+      "preflight": 9,
+      "machinecheck": 5,
+      "soak": 6,
+      "hardening": 4,
+      "recovery": 3
+    }
+  },
+  "budgets": {
+    "vendorModelNativeTurns": 0,
+    "newModelAllowanceCreated": 0,
+    "newDriver": false,
+    "cac": false,
+    "desktopShell": false,
+    "pilot": "BLOCKED (24 turn / 200000 token / USD5 / one-in-flight unchanged)"
+  },
+  "preserved": {
+    "userServices": "twelve instances 5180/8796 .. 5191/8807 untouched; no restart/stop/migrate",
+    "state": "no personal state/homecredential/native profile read or modified; fixture roots only",
+    "liveSignals": "none; no daemon lifecycle and no process signal",
+    "wave25Raw": "301/601 samples, 600006/1800030 ms, 392 expected disconnect observations retained"
+  },
+  "releaseAuthority": false,
+  "eAssertions": "independent; H material is raw observation only",
+  "limitations": [
+    "fixture/readonly and in-process recovery port only; business resume/SIGKILL NOT_REACHED",
+    "no real product readonly/SSE target observed this wave (NOT_REACHED), no daemon lifecycle",
+    "host SQLite version remains UNKNOWN until package native binding executes in doctor",
+    "preflight proves this-machine bytes/closure/commands only; not cross-machine support and no install/start/stop/upgrade/migrate authority",
+    "journal and recovery-port observations are data, not execution/recovery authorization"
+  ]
+}

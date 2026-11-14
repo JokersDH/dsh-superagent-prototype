@@ -1,0 +1,231 @@
+{
+  "protocol": "trial-soak/1",
+  "startedAt": "2026-11-14T07:42:49.467Z",
+  "endedAt": "2026-11-14T07:43:19.475Z",
+  "elapsedMs": 30006,
+  "wallElapsedSeconds": 30,
+  "requestedDurationSeconds": 30,
+  "stoppedBy": "duration",
+  "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+  "scenario": {
+    "scenario": "mixed",
+    "defect": "truncate",
+    "expectedDefectObservation": "sse_disconnect",
+    "defectObserved": true,
+    "config": {
+      "pollMs": 500,
+      "sseIntervalMs": 500,
+      "reconnectBackoffMs": 200,
+      "sseIdleTimeoutMs": 4000,
+      "reopenSeconds": 10,
+      "sampleMs": 1000,
+      "maxRequests": 100000,
+      "maxSseEvents": 100000,
+      "maxReconnects": 2000,
+      "maxErrors": 100000,
+      "pollTimeoutMs": 300
+    }
+  },
+  "fixture": {
+    "url": "http://127.0.0.1:57373",
+    "port": 57373,
+    "defect": "truncate",
+    "stats": {
+      "connections": 89,
+      "activeConnections": 0,
+      "maxConcurrentConnections": 2,
+      "readinessRequests": 62,
+      "readinessBytes": 36394,
+      "readinessStatuses": {
+        "200": 62
+      },
+      "sseConnections": 27,
+      "sseEvents": 75,
+      "sseBytes": 8400,
+      "sseClosed": 24
+    }
+  },
+  "counters": {
+    "pollRequests": 62,
+    "pollOk": 62,
+    "pollFailed": 0,
+    "latencyMs": {
+      "count": 62,
+      "p50": 0.67,
+      "p95": 1.43,
+      "max": 9.96
+    },
+    "httpStatuses": {
+      "200": 62
+    },
+    "sseConnections": 27,
+    "sseEvents": 51,
+    "sseBytes": 5712,
+    "sseFailedConnections": 0,
+    "duplicates": 0,
+    "gaps": 0,
+    "reconnects": 26,
+    "reopens": 2,
+    "samples": 31,
+    "lastEventAt": "2026-11-14T07:43:19.308Z"
+  },
+  "failures": {
+    "total": 24,
+    "counts": {
+      "sse:disconnect:error": 24
+    },
+    "samples": [
+      {
+        "at": "2026-11-14T07:42:50.490Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:42:51.693Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:42:52.896Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:42:54.099Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:42:55.303Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:42:56.505Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:42:57.708Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:42:58.909Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:00.681Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:01.883Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:03.087Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:04.288Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:05.493Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:06.696Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:07.899Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:09.101Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:10.684Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:11.887Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:13.090Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:14.292Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:15.493Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:16.696Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:17.901Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T07:43:19.107Z",
+        "kind": "sse:disconnect:error"
+      }
+    ]
+  },
+  "samples": {
+    "path": "samples.ndjson",
+    "count": 31,
+    "sha256": "28007af7e8ec2844b6d4c98220049fcdc32f9f7a77819e9102f28f5fadef3dee",
+    "bytes": 8447
+  },
+  "cleanup": {
+    "closed": true,
+    "activeSockets": 0,
+    "activeConnections": 0
+  },
+  "consistency": {
+    "ok": true,
+    "issues": [],
+    "lastSampleElapsedMs": 30006
+  },
+  "unknowns": [
+    "client reopen is a new HTTP/SSE connection, not daemon process recovery",
+    "provider/queue/old-request behaviour is not observable from this fixture and is not claimed",
+    "server-side handler timing is not separately instrumented; client latency is reported",
+    "resource samples cover this process and the fixture server only, never another user process"
+  ],
+  "resume": {
+    "arguments": [
+      "node tools/trial-kit/bin/trial-soak.mjs",
+      "--scenario mixed",
+      "--duration-seconds 30",
+      "--poll-ms 500",
+      "--sse-interval-ms 500",
+      "--reconnect-backoff-ms 200",
+      "--reopen-seconds 10",
+      "--sample-ms 1000",
+      "--max-errors 100000",
+      "--failure-mode truncate",
+      "--out <NEW-OUT>"
+    ],
+    "note": "replace <NEW-OUT>; the same duration and failure mode are required for comparability",
+    "line": "node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 30 --poll-ms 500 --sse-interval-ms 500 --reconnect-backoff-ms 200 --reopen-seconds 10 --sample-ms 1000 --max-errors 100000 --failure-mode truncate --out <NEW-OUT>"
+  },
+  "tool": {
+    "name": "trial-kit",
+    "version": "0.1.0",
+    "command": "soak"
+  },
+  "outputRoot": "reports/trial-operations/wave26/runs/20261114T154118-30s-mixed-truncate",
+  "measurementScope": {
+    "measured": "one finite fixture scenario of 30s (actual 30s)",
+    "notMeasured": [
+      "24h/48h soak",
+      "daemon recovery",
+      "provider/queue stability",
+      "other machines",
+      "real model/native execution"
+    ]
+  }
+}

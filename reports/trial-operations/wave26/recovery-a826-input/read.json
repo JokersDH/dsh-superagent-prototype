@@ -1,0 +1,123 @@
+{
+  "protocol": "recovery-chain-read/1",
+  "ok": true,
+  "checks": {
+    "workPresent": true,
+    "workContractMatches": true,
+    "questionPresent": true,
+    "questionAttemptMatches": true,
+    "answerRecorded": true,
+    "answerReceiptRecorded": true,
+    "deliveryNativeApplied": true,
+    "journalAccepted": true,
+    "foreignSourceRefused": true,
+    "zeroSends": true,
+    "zeroModel": true
+  },
+  "subject": {
+    "workId": "94012e1a1c7265c033f285a944656a04",
+    "projectId": "project-scratch",
+    "phase": "needs_user",
+    "contract": {
+      "workId": "94012e1a1c7265c033f285a944656a04",
+      "revision": 1,
+      "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a",
+      "goal": "Produce the controlled scratch artifact",
+      "scope": {
+        "projectId": "project-scratch",
+        "allowedPaths": [
+          "src/"
+        ],
+        "excludedPaths": [],
+        "externalActions": []
+      },
+      "criteria": [
+        {
+          "id": "criterion-output",
+          "description": "Fixed output matches",
+          "kind": "machine",
+          "required": true,
+          "checkDefinitionRef": "check-fixture-output"
+        },
+        {
+          "id": "criterion-human",
+          "description": "Review generated patch",
+          "kind": "human",
+          "required": true
+        }
+      ],
+      "authorityRef": "7d9606c1747f5b62556b743b3a239fba",
+      "createdAt": "2026-11-14T07:39:36.678Z"
+    },
+    "attempt": {
+      "ticketId": "89e3088e337bc0ce062725d67deb035b",
+      "assignmentId": "9e850db208c1492d7e2975b72be4c4c4",
+      "attemptId": "attempt-8f0ac3ad-4e9b-49d1-85e9-f5ef7fa2fc2f",
+      "fenceEpoch": 1,
+      "contract": {
+        "workId": "94012e1a1c7265c033f285a944656a04",
+        "revision": 1,
+        "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+      }
+    },
+    "questionId": "a4e2d78e46ab29eab0af67cd93add9ba",
+    "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+    "deliveryStatus": "native_applied"
+  },
+  "observed": {
+    "workPresent": true,
+    "questionVersion": 2,
+    "deliveries": [
+      {
+        "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+        "targetBindingId": "c3b89fbe37eb6200b6b48b93daa8e36f",
+        "status": "native_applied",
+        "evidenceRefs": [
+          "answer-evidence:a23914018665cf9310d431a10b2dfdb7"
+        ]
+      }
+    ],
+    "receiptStatus": "recorded",
+    "journal": {
+      "ok": true,
+      "entries": 5,
+      "lastSeq": 5,
+      "sends": 0,
+      "executes": 0,
+      "kinds": [
+        "turn.ended",
+        "answer.observed",
+        "candidate.observed",
+        "runtime.exited",
+        "usage.observed"
+      ],
+      "factIds": [
+        "fixture-fact-1",
+        "fixture-fact-2",
+        "fixture-fact-3",
+        "fixture-fact-4",
+        "fixture-fact-5"
+      ],
+      "digests": [
+        "b6213e80c1eb8c2bba55999f0079abf7fdd681d9aa3754025be782ce166a20ac",
+        "d311fd9219c2ce394e20c56808de7f3261bb61634dada4b386bade2117d10ae6",
+        "4b87ae99560006f57fb01a266b98c8835ffd9c49c2e8ae44d5732cd29c290e4c",
+        "7e764fc792f0f8f767fbbae310b3c27803433675c47b622dbb709de75c6fa109",
+        "543f796f099e182ed2af85481376609feaa8fd37ff7c65190580c5e5dec979c7"
+      ]
+    },
+    "foreign": {
+      "ok": false,
+      "code": "foreign_source",
+      "count": 5,
+      "sends": 0,
+      "executes": 0
+    },
+    "eventCount": 46,
+    "queueDue": 0
+  },
+  "mode": "owned_fixture_public_store",
+  "sends": 0,
+  "executes": 0,
+  "modelCalls": 0
+}

@@ -1,0 +1,117 @@
+{
+  "protocol": "recovery-normal-fixture/1",
+  "producedAt": "2026-11-14T07:39:42.768Z",
+  "executor": "controlled_fixture",
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "nativeProfile": null,
+  "stateRoot": "state",
+  "projectRoot": "project",
+  "factSource": "fixture-runner-source-wave26",
+  "work": {
+    "id": "94012e1a1c7265c033f285a944656a04",
+    "projectId": "project-scratch",
+    "phase": "needs_user",
+    "contract": {
+      "workId": "94012e1a1c7265c033f285a944656a04",
+      "revision": 1,
+      "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a",
+      "goal": "Produce the controlled scratch artifact",
+      "scope": {
+        "projectId": "project-scratch",
+        "allowedPaths": [
+          "src/"
+        ],
+        "excludedPaths": [],
+        "externalActions": []
+      },
+      "criteria": [
+        {
+          "id": "criterion-output",
+          "description": "Fixed output matches",
+          "kind": "machine",
+          "required": true,
+          "checkDefinitionRef": "check-fixture-output"
+        },
+        {
+          "id": "criterion-human",
+          "description": "Review generated patch",
+          "kind": "human",
+          "required": true
+        }
+      ],
+      "authorityRef": "7d9606c1747f5b62556b743b3a239fba",
+      "createdAt": "2026-11-14T07:39:36.678Z"
+    },
+    "currentAssignment": {
+      "ticketId": "89e3088e337bc0ce062725d67deb035b",
+      "assignmentId": "9e850db208c1492d7e2975b72be4c4c4",
+      "contract": {
+        "workId": "94012e1a1c7265c033f285a944656a04",
+        "revision": 1,
+        "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+      }
+    },
+    "artifactIds": [
+      "129b5acf67d2f50b72eda14f06d0e6b69ca112ba66a7ebfe816d60eef31d9a76",
+      "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+      "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+      "4d33a25b8fe7b742cc88522f5ea52e3b26ca63bcd3ffb90b685d89cac901ab05"
+    ],
+    "resourceStatus": "quiescent"
+  },
+  "attempt": {
+    "ticketId": "89e3088e337bc0ce062725d67deb035b",
+    "assignmentId": "9e850db208c1492d7e2975b72be4c4c4",
+    "attemptId": "attempt-8f0ac3ad-4e9b-49d1-85e9-f5ef7fa2fc2f",
+    "fenceEpoch": 1,
+    "contract": {
+      "workId": "94012e1a1c7265c033f285a944656a04",
+      "revision": 1,
+      "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+    }
+  },
+  "question": {
+    "id": "a4e2d78e46ab29eab0af67cd93add9ba",
+    "version": 1,
+    "phaseAtOpen": "needs_user",
+    "target": {
+      "ticketId": "89e3088e337bc0ce062725d67deb035b",
+      "assignmentId": "9e850db208c1492d7e2975b72be4c4c4",
+      "contract": {
+        "workId": "94012e1a1c7265c033f285a944656a04",
+        "revision": 1,
+        "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+      },
+      "attemptId": "attempt-8f0ac3ad-4e9b-49d1-85e9-f5ef7fa2fc2f",
+      "fenceEpoch": 1,
+      "id": "c3b89fbe37eb6200b6b48b93daa8e36f",
+      "connectionEpoch": 1,
+      "nativeRequestId": {
+        "kind": "integer",
+        "decimal": "9223372036854775807"
+      },
+      "nativeMethod": "fixture/approve",
+      "provenanceRef": "payload:8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0"
+    }
+  },
+  "answer": {
+    "commandId": "recovery-command-2",
+    "status": "recorded",
+    "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+    "targetBindingId": "c3b89fbe37eb6200b6b48b93daa8e36f",
+    "deliveryStatus": "native_applied"
+  },
+  "deliveries": [
+    {
+      "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+      "targetBindingId": "c3b89fbe37eb6200b6b48b93daa8e36f",
+      "status": "native_applied",
+      "evidenceRefs": [
+        "payload:0406b11faa36c3da6abe208992d4436e6e4a597d040e0088babe45d9993079c1"
+      ]
+    }
+  ],
+  "queueDue": 0,
+  "eventCount": 46
+}
