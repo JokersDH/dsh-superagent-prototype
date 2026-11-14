@@ -38,7 +38,7 @@ try {
   process.env.PA_RUNNER_RECOVERY_ROOT = recoveryRoot
   process.env.PA_RUNNER_RECEIVER_LOG = join(root, 'receiver.jsonl')
   const spec = makeAttemptSpec()
-  const link = new RunnerLink({ executable: process.execPath, entry: ENTRY, args: ['waiting-user'], stateRoot: join(root, 'attempt'), producer })
+  const link = new RunnerLink({ executable: process.execPath, entry: ENTRY, args: ['codex-fake-approval'], stateRoot: join(root, 'attempt'), producer })
   link.bindPayload(spec.policySnapshotRef, { kind: 'fixture-settings/1', workspacePath: process.cwd(), scope: { projectId: 'p', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }, approvalPolicy: 'on-request', timeoutMs: 600000 })
   link.bindPayload('input-chain', { inputId: 'input-chain', contract: spec.contract, text: 'serve then die', contextRefs: [], sourceMessageRefs: [], provenance: 'authorized_work_input' })
   const sinkFacts = []
@@ -101,7 +101,9 @@ try {
     boundB = second.lines.find(line => line.bound)
     if (!boundB) await new Promise(resolve => setTimeout(resolve, 25))
   }
-  await runner.command(makeCommand('deliver', { id: 'cmd-chain-deliver', inputRef: 'input-chain' })).catch(() => undefined)
+  // The approval lane keeps producing facts: after the successor holds the lease, the answer to the
+  // approval should raise more callbacks for it to serve on the SAME attempt.
+  await runner.command(makeCommand('answer', { id: 'cmd-chain-answer', nativeBindingRef: 'binding-chain', answerRef: 'answer-chain' })).catch(() => undefined)
   let servedByB = []
   for (let index = 0; index < 400 && servedByB.length === 0; index += 1) {
     servedByB = second.lines.filter(line => line.served)

@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "c3998bf",
+  "base": "fd994a1",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -140,13 +140,13 @@
       "sigkillResume": "CORE OBSERVED - real OS SIGKILL of a separate coordinator process while the Runner keeps running; a new PID resumes the same attempt and epoch with the same original fact ids; begin refused as duplicate_begin; re-fed deliver keeps its original command id",
       "epochAckResources": "OBSERVED - stale epoch refused as identity_mismatch while current epoch accepted; late receipt refused; after stop admission closed, state terminated and every tracked writer quiescent",
       "compileFaultsClose": "OBSERVED - direct strict compile of 7 modules and the attach consumer, explicit capacity backpressure, mid-callback detach fails indeterminate, idempotent close with no lease and nothing pending",
-      "B11_answerAckWindow": "OBSERVED - begin received exactly once and the answer written once and received once, counted from the receiver log and durable receipts; no resend after the receipts existed; one question, one attempt, one binding"
+      "B11_answerAckWindow": "OBSERVED - begin received exactly once and the answer written once and received once, counted from the receiver log and durable receipts; no resend after the receipts existed; one question, one attempt, one binding",
+      "B9B11_singleChain": "OBSERVED in ONE run on ONE attempt: lease bound before begin, A serves real callbacks over the channel, A is SIGKILLed, the successor lease serves a further callback raised by the answer and the Runner still reports the same attempt and epoch"
     },
     "notReached": {
       "B13_currentCandidate": "NOT_REACHED - same Work/Ticket/Assignment continuing to a registered verifier/check, artifact and current candidate after recovery",
       "B14_manualAccept": "NOT_REACHED - explicit human accept of the current candidate binding acceptanceRef/verification/candidate/artifact to the original Work; the product lane only reaches a recorded answer (b18)",
       "B15_slots": "NOT_REACHED - the 2-then-4 slot matrix with normal/waiting/handover/SIGKILL/unknown/stop/delivered mixes, per-slot isolation of identity/generation/credential/cursor/payload/receipt and the original scheduler backpressure",
-      "B9B11_singleChain": "PARTIAL - one run now binds a serving lease before begin, serves a real callback over the channel, kills the coordinator with SIGKILL and lets a successor bind the same attempt/epoch; the successor actually SERVING inside that same run is not observed because the lane emits no further facts, and the product-lane Broker question/answer is still a separate run",
       "vendorOrGateway": "not observed and not claimed anywhere",
       "B11_partialRemaining": "NOT_REACHED - the intermediate windows (write-before, after-receiver-before-ACK, before-receipt, after-receipt) are not separated into four counted points; only the closed-window result is counted"
     },
@@ -202,15 +202,15 @@
   },
   "item4_singleChainRun": {
     "harness": "tests/native-acceptance/b27-chain.mjs",
-    "result": "3 PASS / 0 FAIL / 2 NOT_TESTED",
-    "orderingRuleApplied": "the serving lease binds BEFORE begin, which is what makes the Runner route its callbacks to the channel instead of stdio",
+    "result": "4 PASS / 0 FAIL / 1 NOT_TESTED",
+    "lane": "codex-fake-approval: the driver emits an approval and keeps producing facts, so the successor has real work to answer",
     "cases": [
-      "B27-CHAIN-LEASE-BEFORE-BEGIN - coordinator A bound lease lease-chain-a before begin",
-      "B27-CHAIN-A-SERVES-CALLBACKS - A served a real callback over the channel, so the facts did not fall back to stdio",
-      "B27-CHAIN-KILL-A-MID-FLIGHT - A died by SIGKILL while the Runner kept running"
+      "B27-CHAIN-LEASE-BEFORE-BEGIN - the serving lease binds before begin",
+      "B27-CHAIN-A-SERVES-CALLBACKS - A served 2 real callbacks over the channel, so facts did not fall back to stdio",
+      "B27-CHAIN-KILL-A-MID-FLIGHT - A died by SIGKILL while the Runner kept running",
+      "B27-CHAIN-B-SUCCESSOR-SERVES-SAME-ATTEMPT - successor lease served a real callback and the Runner still reports the SAME attempt at the SAME epoch"
     ],
-    "boundary": "the successor BOUND the same attempt and epoch, but the fixture lane emitted no further facts for it to serve, so 'successor SERVING' is NOT claimed here; it is proven on the controlled handover by b27-dual-client",
-    "orderingAttempts": "two orderings were tried: feeding the command before the successor bound (dropped by the detach, by design) and after it bound (this fixture lane still emits no further facts after the first turn). Neither produces a callback for the successor, so successor SERVING is not claimed in this run"
+    "significance": "this closes the previous split: the three-callback servicing, the SIGKILL and the successor now happen in ONE run on ONE attempt, with the answer command raising the facts the successor serves"
   },
   "unblockersFound": {
     "slots": "apps/coordinator/product/execution.ts enforces the bounded execution slots itself ('The four controlled execution slots are in use') together with the earlier-begin reconciliation and the previous-writer barrier checks. The 2/4 slot matrix can therefore be driven from a test that issues product commands; it does not need a new entry or a new ledger.",
