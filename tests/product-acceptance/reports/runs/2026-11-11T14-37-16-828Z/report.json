@@ -1,0 +1,3443 @@
+{
+  "schema": "product-acceptance/1",
+  "suites": [
+    "e3"
+  ],
+  "branch": "codex/g3-product-acceptance",
+  "source": {
+    "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "dirty": true
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "os": "Darwin 25.6.0"
+  },
+  "startedAt": "2026-11-11T14:37:16.828Z",
+  "finishedAt": "2026-11-11T14:37:58.625Z",
+  "checkedAt": "2026-11-11T14:37:58.625Z",
+  "counts": {
+    "PASS": 20,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 7,
+    "BLOCKED": 0,
+    "UNKNOWN": 0
+  },
+  "artifacts": {
+    "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z",
+    "screenshots": [
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/proposal-preview-mobile.png"
+    ]
+  },
+  "cases": [
+    {
+      "id": "E3-DESKTOP-GEOMETRY",
+      "title": "Desktop: conversation-centred layout without overflow or overlap",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "SAME_ORIGIN_HTTP_TRANSPORT",
+          "ok": true
+        },
+        {
+          "id": "NAV_PRESENT",
+          "ok": true
+        },
+        {
+          "id": "WORK_CARDS",
+          "ok": true
+        },
+        {
+          "id": "QUESTION_CARD",
+          "ok": true
+        },
+        {
+          "id": "COMPOSER",
+          "ok": true
+        },
+        {
+          "id": "TOKEN_RAIL",
+          "ok": true,
+          "detail": "#272d2a"
+        },
+        {
+          "id": "TOKEN_ACCENT",
+          "ok": true,
+          "detail": "#197764"
+        },
+        {
+          "id": "TOKEN_WHITE_CONVERSATION",
+          "ok": true,
+          "detail": "rgb(255, 255, 255)"
+        },
+        {
+          "id": "DESKTOP_NO_HORIZONTAL_OVERFLOW",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "DESKTOP_RAIL_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "DESKTOP_CONVERSATION_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "DESKTOP_COMPOSER_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "DESKTOP_SIDEBAR_NO_OVERLAP",
+          "ok": true,
+          "detail": "{\"topbar\":{\"x\":0,\"y\":0,\"width\":1440,\"height\":52,\"visible\":true,\"onScreen\":true},\"rail\":{\"x\":0,\"y\":52,\"width\":56,\"height\":848,\"visible\":true,\"onScreen\":true},\"sidebar\":{\"x\":56,\"y\":52,\"width\":232,\"height\":848,\"visible\":true,\"onScreen\":true},\"conversation\":{\"x\":288,\"y\":52,\"width\":1152,\"height\":848,\"visible\":true,\"onScreen\":true},\"composer\":{\"x\":484,\"y\":730,\"width\":760,\"height\":147,\"visible\":true,\"onS"
+        },
+        {
+          "id": "DESKTOP_CONVERSATION_IS_CENTRAL",
+          "ok": true,
+          "detail": "conversation 1152 vs sidebar 232"
+        }
+      ],
+      "evidence": {
+        "layouts": {
+          "desktop": {
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "documentWidth": 1440,
+            "horizontalOverflow": false,
+            "overflowing": [],
+            "boxes": {
+              "topbar": {
+                "x": 0,
+                "y": 0,
+                "width": 1440,
+                "height": 52,
+                "visible": true,
+                "onScreen": true
+              },
+              "rail": {
+                "x": 0,
+                "y": 52,
+                "width": 56,
+                "height": 848,
+                "visible": true,
+                "onScreen": true
+              },
+              "sidebar": {
+                "x": 56,
+                "y": 52,
+                "width": 232,
+                "height": 848,
+                "visible": true,
+                "onScreen": true
+              },
+              "conversation": {
+                "x": 288,
+                "y": 52,
+                "width": 1152,
+                "height": 848,
+                "visible": true,
+                "onScreen": true
+              },
+              "composer": {
+                "x": 484,
+                "y": 730,
+                "width": 760,
+                "height": 147,
+                "visible": true,
+                "onScreen": true
+              },
+              "detail": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              }
+            }
+          }
+        },
+        "tokens": {
+          "rail": "#272d2a",
+          "accent": "#197764",
+          "panel": "#fff",
+          "body": "rgb(255, 255, 255)"
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T14:37:20.113Z",
+      "finishedAt": "2026-11-11T14:37:20.168Z",
+      "durationMs": 55,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-NOTEBOOK-GEOMETRY",
+      "title": "Notebook 1280x800 keeps the same structure without overflow",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "NOTEBOOK_NO_HORIZONTAL_OVERFLOW",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "NOTEBOOK_RAIL_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "NOTEBOOK_CONVERSATION_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "NOTEBOOK_COMPOSER_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "NOTEBOOK_SIDEBAR_NO_OVERLAP",
+          "ok": true,
+          "detail": "{\"topbar\":{\"x\":0,\"y\":0,\"width\":1280,\"height\":52,\"visible\":true,\"onScreen\":true},\"rail\":{\"x\":0,\"y\":52,\"width\":56,\"height\":748,\"visible\":true,\"onScreen\":true},\"sidebar\":{\"x\":56,\"y\":52,\"width\":232,\"height\":748,\"visible\":true,\"onScreen\":true},\"conversation\":{\"x\":288,\"y\":52,\"width\":992,\"height\":748,\"visible\":true,\"onScreen\":true},\"composer\":{\"x\":404,\"y\":630,\"width\":760,\"height\":147,\"visible\":true,\"onSc"
+        },
+        {
+          "id": "NOTEBOOK_CONVERSATION_IS_CENTRAL",
+          "ok": true,
+          "detail": "conversation 992 vs sidebar 232"
+        }
+      ],
+      "evidence": {
+        "layouts": {
+          "notebook": {
+            "viewport": {
+              "width": 1280,
+              "height": 800
+            },
+            "documentWidth": 1280,
+            "horizontalOverflow": false,
+            "overflowing": [],
+            "boxes": {
+              "topbar": {
+                "x": 0,
+                "y": 0,
+                "width": 1280,
+                "height": 52,
+                "visible": true,
+                "onScreen": true
+              },
+              "rail": {
+                "x": 0,
+                "y": 52,
+                "width": 56,
+                "height": 748,
+                "visible": true,
+                "onScreen": true
+              },
+              "sidebar": {
+                "x": 56,
+                "y": 52,
+                "width": 232,
+                "height": 748,
+                "visible": true,
+                "onScreen": true
+              },
+              "conversation": {
+                "x": 288,
+                "y": 52,
+                "width": 992,
+                "height": 748,
+                "visible": true,
+                "onScreen": true
+              },
+              "composer": {
+                "x": 404,
+                "y": 630,
+                "width": 760,
+                "height": 147,
+                "visible": true,
+                "onScreen": true
+              },
+              "detail": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              }
+            }
+          }
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T14:37:20.168Z",
+      "finishedAt": "2026-11-11T14:37:20.360Z",
+      "durationMs": 192,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-MOBILE-GEOMETRY",
+      "title": "Mobile: drawers replace columns and never overflow",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "MOBILE_NO_OVERFLOW",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "MOBILE_COMPOSER",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_SIDEBAR_HIDDEN",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_SIDEBAR_OPEN",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_SIDEBAR_NO_OVERFLOW",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_DETAIL_OPEN",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_DETAIL_NO_OVERFLOW",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_ESCAPE_CLOSES",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "layouts": {
+          "mobile": {
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "documentWidth": 390,
+            "horizontalOverflow": false,
+            "overflowing": [],
+            "boxes": {
+              "topbar": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 52,
+                "visible": true,
+                "onScreen": true
+              },
+              "rail": {
+                "x": 0,
+                "y": 788,
+                "width": 390,
+                "height": 56,
+                "visible": true,
+                "onScreen": true
+              },
+              "sidebar": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              },
+              "conversation": {
+                "x": 0,
+                "y": 52,
+                "width": 390,
+                "height": 736,
+                "visible": true,
+                "onScreen": true
+              },
+              "composer": {
+                "x": 14,
+                "y": 630,
+                "width": 362,
+                "height": 144,
+                "visible": true,
+                "onScreen": true
+              },
+              "detail": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              }
+            }
+          },
+          "mobileSidebar": {
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "documentWidth": 390,
+            "horizontalOverflow": false,
+            "overflowing": [],
+            "boxes": {
+              "topbar": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 52,
+                "visible": true,
+                "onScreen": true
+              },
+              "rail": {
+                "x": 0,
+                "y": 788,
+                "width": 390,
+                "height": 56,
+                "visible": true,
+                "onScreen": true
+              },
+              "sidebar": {
+                "x": 0,
+                "y": 52,
+                "width": 292,
+                "height": 736,
+                "visible": true,
+                "onScreen": true
+              },
+              "conversation": {
+                "x": 0,
+                "y": 52,
+                "width": 390,
+                "height": 736,
+                "visible": true,
+                "onScreen": true
+              },
+              "composer": {
+                "x": 14,
+                "y": 630,
+                "width": 362,
+                "height": 144,
+                "visible": true,
+                "onScreen": true
+              },
+              "detail": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              }
+            }
+          },
+          "mobileDetail": {
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "documentWidth": 390,
+            "horizontalOverflow": false,
+            "overflowing": [],
+            "boxes": {
+              "topbar": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 52,
+                "visible": true,
+                "onScreen": true
+              },
+              "rail": {
+                "x": 0,
+                "y": 788,
+                "width": 390,
+                "height": 56,
+                "visible": true,
+                "onScreen": true
+              },
+              "sidebar": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              },
+              "conversation": {
+                "x": 0,
+                "y": 52,
+                "width": 390,
+                "height": 736,
+                "visible": true,
+                "onScreen": true
+              },
+              "composer": {
+                "x": 14,
+                "y": 630,
+                "width": 362,
+                "height": 144,
+                "visible": true,
+                "onScreen": true
+              },
+              "detail": {
+                "x": 40,
+                "y": 52,
+                "width": 350,
+                "height": 736,
+                "visible": true,
+                "onScreen": true
+              }
+            }
+          }
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T14:37:20.361Z",
+      "finishedAt": "2026-11-11T14:37:20.906Z",
+      "durationMs": 545,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-QUESTION-FORM",
+      "title": "The attention inbox opens and answers the real question through the UI",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "ROW_IDENTITY",
+          "ok": true,
+          "detail": "cefc96743c3353ea98b014e275d8382d"
+        },
+        {
+          "id": "CARD_TARGET_DETAILS",
+          "ok": true
+        },
+        {
+          "id": "API_QUESTION_ANSWERED",
+          "ok": true
+        },
+        {
+          "id": "UI_ANSWER_PERSISTED",
+          "ok": true
+        },
+        {
+          "id": "DELIVERY_RECORDED",
+          "ok": true,
+          "detail": "[{\"answerId\":\"e0f1f3a281029c74566f6ff4c845a243\",\"targetBindingId\":\"81a589cf2574e7eb9a5d753e52367a49\",\"status\":\"native_applied\",\"evidenceRefs\":[\"payload:8eb2db94eae4336df08a5023739295d7cee40ab44df871e8fc58c5db69f51a7f\"]}]"
+        }
+      ],
+      "evidence": {
+        "question": {
+          "id": "69fc0f81117bc98939d0acda547fff99",
+          "attentionId": "cefc96743c3353ea98b014e275d8382d",
+          "option": "Allow once",
+          "autoRefreshObserved": false,
+          "deliveries": [
+            "native_applied"
+          ]
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T14:37:20.906Z",
+      "finishedAt": "2026-11-11T14:37:22.260Z",
+      "durationMs": 1354,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-ACCEPT-AND-DOWNLOAD",
+      "title": "Accept through the UI, verify the artifact bytes and a patch preview",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "VERIFICATION_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "PATCH_PREVIEW",
+          "ok": true,
+          "detail": "diff --git a/src/product-output.txt b/sr"
+        },
+        {
+          "id": "DOWNLOAD_BYTES",
+          "ok": true,
+          "detail": "approved product output\n"
+        },
+        {
+          "id": "DOWNLOAD_DIGEST",
+          "ok": true
+        },
+        {
+          "id": "DOWNLOAD_NAME",
+          "ok": true,
+          "detail": "product-output.txt"
+        },
+        {
+          "id": "API_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "REOPEN_SHOWS_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "REOPEN_ARTIFACTS",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "download": {
+          "filename": "product-output.txt",
+          "bytes": 24,
+          "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+          "verifiedSha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+          "saved": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T14-37-16-828Z/screenshots/product-output.txt"
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T14:37:22.260Z",
+      "finishedAt": "2026-11-11T14:37:23.389Z",
+      "durationMs": 1129,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-OFFLINE-AND-ERROR",
+      "title": "Offline, slow and failing responses surface honest states",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "SLOW_SHOWS_LOADING",
+          "ok": true,
+          "detail": "loading indicator was not visible during a slow snapshot"
+        },
+        {
+          "id": "ERROR_ALERT",
+          "ok": true
+        },
+        {
+          "id": "ERROR_RETRY",
+          "ok": true
+        },
+        {
+          "id": "OFFLINE_BADGE",
+          "ok": true,
+          "detail": "offline badge never appeared while the event stream was blocked"
+        },
+        {
+          "id": "RECONNECT_NOTICE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "states": {
+          "slow": true,
+          "error": true,
+          "offline": true
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T14:37:23.389Z",
+      "finishedAt": "2026-11-11T14:37:27.346Z",
+      "durationMs": 3957,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-KEYBOARD-AND-SCROLL",
+      "title": "Keyboard focus, composer and the work list stay operable",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "TAB_FOCUS",
+          "ok": true
+        },
+        {
+          "id": "FOCUS_VISIBLE",
+          "ok": true,
+          "detail": "{\"tag\":\"a\",\"label\":\"使用指南\",\"outline\":\"solid 2px\"}"
+        },
+        {
+          "id": "LONG_TEXT_NO_OVERFLOW",
+          "ok": true,
+          "detail": "overflow 0px"
+        },
+        {
+          "id": "LONG_PATH_PRESENT",
+          "ok": true
+        },
+        {
+          "id": "WORK_LIST_SCROLLABLE",
+          "ok": true,
+          "detail": "{\"scrollHeight\":741,\"clientHeight\":279,\"overflowY\":\"auto\"}"
+        },
+        {
+          "id": "WORK_LIST_OVERFLOW_AUTO",
+          "ok": true,
+          "detail": "auto"
+        },
+        {
+          "id": "WORK_LIST_SCROLLS",
+          "ok": true,
+          "detail": "0 -> 120"
+        },
+        {
+          "id": "COMPOSER_VALUE",
+          "ok": true
+        },
+        {
+          "id": "SENT_MESSAGE",
+          "ok": true
+        },
+        {
+          "id": "ALL_BUTTONS_REACHABLE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "keyboard": {
+          "focus": {
+            "tag": "a",
+            "label": "使用指南",
+            "outline": "solid 2px"
+          },
+          "messageOverflow": 0,
+          "scroll": {
+            "scrollHeight": 741,
+            "clientHeight": 279,
+            "overflowY": "auto"
+          },
+          "before": 0,
+          "after": 120
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T14:37:27.346Z",
+      "finishedAt": "2026-11-11T14:37:27.652Z",
+      "durationMs": 306,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-CONVERSATION-UI",
+      "title": "Conversation search, rename, archive, restore and draft isolation are operable",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "CREATE_RECORDED",
+          "ok": true,
+          "detail": "{\"commandId\":\"e3-conv-create\",\"seq\":307,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "DIRECTORY_LISTED",
+          "ok": true
+        },
+        {
+          "id": "BETA_LISTED",
+          "ok": true
+        },
+        {
+          "id": "SEARCH_FILTERS",
+          "ok": true
+        },
+        {
+          "id": "RENAME_PERSISTED",
+          "ok": true,
+          "detail": "{\"id\":\"conv-e3-beta\",\"title\":\"Beta 改名 UI\",\"titleRevision\":2,\"archiveRevision\":0,\"projectId\":\"project-atlas\",\"projectIds\":[\"project-atlas\"],\"createdAt\":\"2026-11-11T14:37:27.654Z\",\"updatedAt\":\"2026-11-11T14:37:28.321Z\",\"messageCount\":0,\"workCount\":0,\"attention\":false}"
+        },
+        {
+          "id": "ARCHIVED",
+          "ok": true,
+          "detail": "{\"id\":\"conv-e3-beta\",\"title\":\"Beta 改名 UI\",\"titleRevision\":2,\"archiveRevision\":1,\"projectId\":\"project-atlas\",\"projectIds\":[\"project-atlas\"],\"createdAt\":\"2026-11-11T14:37:27.654Z\",\"updatedAt\":\"2026-11-11T14:37:28.321Z\",\"archivedAt\":\"2026-11-11T14:37:28.387Z\",\"messageCount\":0,\"workCount\":0,\"attention\":false}"
+        },
+        {
+          "id": "ARCHIVED_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "RESTORED",
+          "ok": true,
+          "detail": "{\"id\":\"conv-e3-beta\",\"title\":\"Beta 改名 UI\",\"titleRevision\":2,\"archiveRevision\":2,\"projectId\":\"project-atlas\",\"projectIds\":[\"project-atlas\"],\"createdAt\":\"2026-11-11T14:37:27.654Z\",\"updatedAt\":\"2026-11-11T14:37:28.321Z\",\"messageCount\":0,\"workCount\":0,\"attention\":false}"
+        },
+        {
+          "id": "DRAFT_NOT_LEAKED",
+          "ok": true,
+          "detail": "\"\""
+        },
+        {
+          "id": "RELOAD_PERSISTS_TITLE",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_DIRECTORY",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "MOBILE_SEARCH",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "catalog": {
+          "conversations": 2,
+          "renamed": true,
+          "archivedRestored": true,
+          "draftIsolated": true,
+          "mobileOperable": true
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T14:37:27.652Z",
+      "finishedAt": "2026-11-11T14:37:30.360Z",
+      "durationMs": 2708,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-VERIFICATION-RECOVERY-UI",
+      "title": "A blocked verification exposes a working recheck and acceptance button",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "RECHECK_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "RECHECK_FINISHED",
+          "ok": true,
+          "detail": "{\"protocol\":\"work-verification/1\",\"workId\":\"19855549fe631518ba7878f7e598e5dc\",\"state\":\"finished\",\"verificationId\":\"verification:f7b281d7-a7c9-4cad-a657-1cefcdac3399\",\"retryAvailable\":false}"
+        },
+        {
+          "id": "UI_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "REOPEN_DELIVERED",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "verificationRecovery": {
+          "blockedId": "verification-block:7650e6dc-b16e-44f0-864b-22c108bf5329",
+          "verificationId": "verification:f7b281d7-a7c9-4cad-a657-1cefcdac3399",
+          "uiRecheck": true,
+          "uiAccepted": true
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T14:37:31.505Z",
+      "finishedAt": "2026-11-11T14:37:32.529Z",
+      "durationMs": 1024,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+      "title": "Persisted decision/proposal fixtures match the public contract and illegal variants are rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "DECISION_SCHEMA",
+          "ok": true
+        },
+        {
+          "id": "PROPOSAL_SCHEMA",
+          "ok": true
+        },
+        {
+          "id": "REJECT_REVOKE_WITHOUT_TIMESTAMP",
+          "ok": true
+        },
+        {
+          "id": "REJECT_CONFIRM_WITHOUT_COMMAND",
+          "ok": true
+        },
+        {
+          "id": "REJECT_GRANT_MISMATCH",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "fixture": {
+          "id": "assistant-decision",
+          "path": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/fixtures/assistant/persisted-decision.json",
+          "sha256": "25e175a673feba5645faed1a1472803b7a33d5144cdcf581e05f543e0f22642e"
+        },
+        "assistantFixtures": {
+          "decision": "25e175a673feba5645faed1a1472803b7a33d5144cdcf581e05f543e0f22642e",
+          "proposal": "55591dbc9144441d8ecacd2fc8cc95835011c35cd0152780ee9eed65b3b1a11d",
+          "invalidVariantsRejected": 3
+        }
+      },
+      "limitations": [
+        "Schema/contract fixtures only; no assistant product workflow is claimed in this checkout."
+      ],
+      "startedAt": "2026-11-11T14:37:32.550Z",
+      "finishedAt": "2026-11-11T14:37:32.552Z",
+      "durationMs": 2,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-ASSISTANT-DOMAIN-ADMISSION",
+      "title": "C domain admission probes pass",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "C_CASES_PASS",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "cProbes": [
+          {
+            "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+            "status": "PASS"
+          },
+          {
+            "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+            "status": "PASS"
+          },
+          {
+            "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+            "status": "PASS"
+          }
+        ]
+      },
+      "limitations": [
+        "Consumes main's read-only domain probe; it is not a product workflow."
+      ],
+      "startedAt": "2026-11-11T14:37:32.666Z",
+      "finishedAt": "2026-11-11T14:37:32.666Z",
+      "durationMs": 0,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-ASSISTANT-END-TO-END",
+      "title": "Explicit decision → authorised context → proposal → confirm/reject → atomic receipt → reopen",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "Explicit decisions now work over HTTP (E3-DECISION-WORKFLOW); automatic context/proposal confirmation is still absent.",
+      "assertions": [],
+      "evidence": {
+        "assistantConfigured": false,
+        "knowledgeProjection": false,
+        "recordDecision": {
+          "status": "rejected",
+          "code": "unsupported_capability"
+        },
+        "plannedNegatives": [
+          "untrusted source instruction in a repository file",
+          "other project / conversation / actor",
+          "old contract or source digest",
+          "revoked grant",
+          "over-budget proposal",
+          "crash after confirmation before command commit",
+          "transaction failure rolls back record and command",
+          "same commandId replay is idempotent, changed payload conflicts"
+        ]
+      },
+      "limitations": [
+        "Owner: main (assistant HTTP/context wiring) and C (AssistantStatePort consumer).",
+        "No decision/proposal HTTP entry exists in this checkout; no partial product claim is made."
+      ],
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-REVIEW-FIXTURES",
+      "title": "Review report/evidence fixtures match the frozen contract and illegal variants are rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REPORT_SCHEMA",
+          "ok": true
+        },
+        {
+          "id": "EVIDENCE_SCHEMA",
+          "ok": true
+        },
+        {
+          "id": "REJECT_DISPOSITION",
+          "ok": true
+        },
+        {
+          "id": "REJECT_SAME_ASSIGNMENT",
+          "ok": true
+        },
+        {
+          "id": "REJECT_NO_ISOLATION",
+          "ok": true
+        },
+        {
+          "id": "REJECT_DOUBLE_PROOF",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "fixture": {
+          "id": "review-report-fixture",
+          "path": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/fixtures/routing/review-report.json",
+          "sha256": "7b60ecd58c74ec62e8d626177c2bbbfcde1a5d3748f8b069f2e827e7d063bfd4"
+        },
+        "reviewFixtures": {
+          "report": "7b60ecd58c74ec62e8d626177c2bbbfcde1a5d3748f8b069f2e827e7d063bfd4",
+          "evidence": "f688d7210c343762a98b2ec7a0d56cadb67a1b2fd2c0952f2b7b7d0e49e6b6d6",
+          "mutantsRejected": 4
+        }
+      },
+      "limitations": [
+        "Schema fixtures only; no review pipeline is claimed."
+      ],
+      "startedAt": "2026-11-11T14:37:33.074Z",
+      "finishedAt": "2026-11-11T14:37:33.076Z",
+      "durationMs": 2,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-SEALED-COPY",
+      "title": "A sealed capsule excludes .git/dependencies, refuses links and copies by value",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "DETERMINISTIC_DIGEST",
+          "ok": true,
+          "detail": "22c0baceb70ae674abafbb5f6c72262eb142767bccd9220b78fdc59a8723cafc"
+        },
+        {
+          "id": "FILES_COPIED",
+          "ok": true
+        },
+        {
+          "id": "NO_HARD_LINK",
+          "ok": true,
+          "detail": "17754330 == 25394761"
+        },
+        {
+          "id": "NO_ORACLE_LEAK",
+          "ok": true,
+          "detail": "[\"package.json\",\"src/feature.js\",\"src/index.js\",\"task.md\",\"test/index.test.js\"]"
+        },
+        {
+          "id": "EXCLUDES_GIT_AND_DEPS",
+          "ok": true,
+          "detail": "[\"package.json\",\"src/feature.js\",\"src/index.js\",\"task.md\",\"test/index.test.js\"]"
+        },
+        {
+          "id": "REFUSES_SYMLINK",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "capsule": {
+          "digest": "22c0baceb70ae674abafbb5f6c72262eb142767bccd9220b78fdc59a8723cafc",
+          "files": 5,
+          "excludesGit": true,
+          "refusesLinks": true
+        }
+      },
+      "limitations": [
+        "Capsule building is acceptance tooling; it is not a host sandbox."
+      ],
+      "startedAt": "2026-11-11T14:37:33.076Z",
+      "finishedAt": "2026-11-11T14:37:33.084Z",
+      "durationMs": 8,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-REVIEW-ACTIVITY-UI",
+      "title": "Visible focused review activity is recorded and does not block acceptance",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "DELIVERED",
+          "ok": true,
+          "detail": "delivered"
+        },
+        {
+          "id": "ACCEPT_EVENT",
+          "ok": true,
+          "detail": "[{\"seq\":37,\"topic\":\"application.candidate.accepted\",\"payload\":{\"candidate\":{\"ticketId\":\"b77428da449b9c06b4eee1b90dcab09a\",\"assignmentId\":\"1865e361984376028ed5dd3c3534a459\",\"contract\":{\"workId\":\"8f12538dfe3e118c1afb566c46ca9015\",\"revision\":1,\"digest\":\"6f051b20c5be4828e4f6e8ef642fc413cd324b047f849101a425d365379c700a\"},\"candidateGeneration\":1},\"actorRef\":\"local-demo-authority\",\"reviewTiming\":{\"candid"
+        },
+        {
+          "id": "ACTIVITY_OBSERVED",
+          "ok": true,
+          "detail": "{\"candidateReadyAt\":\"2026-11-11T14:37:34.787Z\",\"acceptedAt\":\"2026-11-11T14:37:42.389Z\",\"readyToAcceptanceMs\":7602,\"activeReviewMs\":7039,\"activeReviewSource\":\"ui_visibility_proxy\",\"activeReviewCompleteness\":\"partial\",\"evidenceRefs\":[\"verification:79abeb2d-6562-46b9-9b37-d42a813af789\",\"review-activity:31\",\"review-activity:33\"]}"
+        },
+        {
+          "id": "ACTIVITY_SOURCE",
+          "ok": true,
+          "detail": "ui_visibility_proxy"
+        },
+        {
+          "id": "ACTIVITY_PARTIAL",
+          "ok": true,
+          "detail": "partial"
+        },
+        {
+          "id": "ACTIVITY_WITHIN_WAIT",
+          "ok": true,
+          "detail": "{\"candidateReadyAt\":\"2026-11-11T14:37:34.787Z\",\"acceptedAt\":\"2026-11-11T14:37:42.389Z\",\"readyToAcceptanceMs\":7602,\"activeReviewMs\":7039,\"activeReviewSource\":\"ui_visibility_proxy\",\"activeReviewCompleteness\":\"partial\",\"evidenceRefs\":[\"verification:79abeb2d-6562-46b9-9b37-d42a813af789\",\"review-activity:31\",\"review-activity:33\"]}"
+        }
+      ],
+      "evidence": {
+        "reviewTiming": {
+          "candidateReadyAt": "2026-11-11T14:37:34.787Z",
+          "acceptedAt": "2026-11-11T14:37:42.389Z",
+          "readyToAcceptanceMs": 7602,
+          "activeReviewMs": 7039,
+          "activeReviewSource": "ui_visibility_proxy",
+          "activeReviewCompleteness": "partial",
+          "acceptedEvents": 1,
+          "uiCollected": true
+        }
+      },
+      "limitations": [
+        "The activity value is a UI visibility proxy, not measured human thinking time.",
+        "Overlapping tabs are unioned by the product; this case does not claim exact human time."
+      ],
+      "startedAt": "2026-11-11T14:37:42.494Z",
+      "finishedAt": "2026-11-11T14:37:42.494Z",
+      "durationMs": 0,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-REVIEW-PIPELINE",
+      "title": "Author → barrier → freeze → independent review → report → human review",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "No public entry creates a review Work/Ticket/Assignment or publishes ReviewEvidence; the independent pilot preflight is BLOCKED on pricing.",
+      "assertions": [],
+      "evidence": {
+        "reviewPipeline": {
+          "unavailable": true,
+          "plannedNegatives": [
+            "bad report or no_findings cannot override machine FAIL or required human acceptance",
+            "old subject/digest or wrong profile",
+            "review attempt reusing the author assignment",
+            "missing sealed-copy isolation or input mutation",
+            "permission/auth/cancel/unknown-send cases",
+            "marker recovery cannot resume the review"
+          ]
+        }
+      },
+      "limitations": [
+        "Owner: main/B. No review HTTP/Work pipeline exists in this checkout; contract fixtures and gate validators are prepared."
+      ],
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-ATTENTION-INBOX",
+      "title": "Cross-project attention ranks real items deterministically and scopes them by project",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "PROTOCOL",
+          "ok": true
+        },
+        {
+          "id": "RANKING",
+          "ok": true,
+          "detail": "deterministic_priority"
+        },
+        {
+          "id": "ITEMS",
+          "ok": true,
+          "detail": "items 5"
+        },
+        {
+          "id": "CROSS_PROJECT",
+          "ok": true,
+          "detail": "[\"project-att-b\",\"project-att-a\"]"
+        },
+        {
+          "id": "KIND_question",
+          "ok": true,
+          "detail": "[\"blocked\",\"candidate\",\"question\"]"
+        },
+        {
+          "id": "KIND_candidate",
+          "ok": true,
+          "detail": "[\"blocked\",\"candidate\",\"question\"]"
+        },
+        {
+          "id": "KIND_blocked",
+          "ok": true,
+          "detail": "[\"blocked\",\"candidate\",\"question\"]"
+        },
+        {
+          "id": "RANKS_COVER",
+          "ok": true
+        },
+        {
+          "id": "RANKS_UNIQUE",
+          "ok": true
+        },
+        {
+          "id": "RANKS_REFER_ITEMS",
+          "ok": true
+        },
+        {
+          "id": "BLOCKED_FIRST",
+          "ok": true,
+          "detail": "[{\"id\":\"23e6d092fbeae79fcc1b0916762ab3e1\",\"reasons\":[\"machine_failed\",\"unknown_wait\"]},{\"id\":\"8a50f9df21c1f0ec443a8b10979d5cfd\",\"reasons\":[\"verification_blocked\",\"unknown_wait\"]},{\"id\":\"597f5b50d0966f77777ea8108b4a3e5b\",\"reasons\":[\"candidate_ready\",\"waiting_age\"]},{\"id\":\"ee0ea5ebc106adddf672db5e56b5b228\",\"reasons\":[\"permission_pending\",\"waiting_age\"]},{\"id\":\"42a2adae05850395927ca26c119268fe\",\"reas"
+        },
+        {
+          "id": "BLOCKED_CODE_REASON",
+          "ok": true,
+          "detail": "[{\"id\":\"23e6d092fbeae79fcc1b0916762ab3e1\",\"reasons\":[\"machine_failed\",\"unknown_wait\"]},{\"id\":\"8a50f9df21c1f0ec443a8b10979d5cfd\",\"reasons\":[\"verification_blocked\",\"unknown_wait\"]}]"
+        },
+        {
+          "id": "CANDIDATE_READY_TIME",
+          "ok": true,
+          "detail": "{\"id\":\"597f5b50d0966f77777ea8108b4a3e5b\",\"projectId\":\"project-att-a\",\"conversationId\":\"conv-project-att-a\",\"contract\":{\"workId\":\"d5e3d2405050ea622c3f9f6ebceedf0e\",\"revision\":1,\"digest\":\"c0b9c245c426afefb2ba902ad16ecd5ad82835eb794e5f50ad2ab49d1e68e861\"},\"workTitle\":\"project-att-a pass attention\",\"summary\":\"变更已验证，等待审阅。\",\"sinceAt\":\"2026-11-11T14:37:44.046Z\",\"deadlineAt\":null,\"expiresAt\":null,\"blocked"
+        },
+        {
+          "id": "CANDIDATE_REASON",
+          "ok": true
+        },
+        {
+          "id": "QUESTION_WAIT_REASONS",
+          "ok": true
+        },
+        {
+          "id": "DETERMINISTIC_ORDER",
+          "ok": true
+        },
+        {
+          "id": "PROJECT_SCOPE",
+          "ok": true,
+          "detail": "[\"project-att-a\",\"project-att-a\"]"
+        },
+        {
+          "id": "UNAUTHORIZED_PROJECT",
+          "ok": true,
+          "detail": "status 403"
+        },
+        {
+          "id": "UNAUTHORIZED_CODE",
+          "ok": true
+        },
+        {
+          "id": "PAGE1",
+          "ok": true
+        },
+        {
+          "id": "PAGE2_DISJOINT",
+          "ok": true
+        },
+        {
+          "id": "CURSOR_SCOPE_REJECTED",
+          "ok": true,
+          "detail": "status 400"
+        },
+        {
+          "id": "ANSWER_RECORDED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6att-answer-6\",\"workId\":\"fa5071f045867bd80df1ae749e46b7db\",\"entityRefs\":{\"questionId\":\"be97de20498af04d2a606170a440289f\"},\"seq\":129,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "ANSWERED_ITEM_REMOVED",
+          "ok": true
+        },
+        {
+          "id": "OTHER_QUESTION_REMAINS",
+          "ok": true
+        },
+        {
+          "id": "STALE_ANSWER_REJECTED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6att-answer-stale-7\",\"seq\":130,\"status\":\"rejected\",\"error\":{\"code\":\"stale_binding\",\"message\":\"Question version changed\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "ACCEPT_RECORDED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6att-accept-8\",\"workId\":\"d5e3d2405050ea622c3f9f6ebceedf0e\",\"seq\":135,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "CANDIDATE_ITEM_REMOVED",
+          "ok": true
+        },
+        {
+          "id": "OLD_CANDIDATE_REJECTED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6att-accept-old-9\",\"seq\":147,\"status\":\"rejected\",\"error\":{\"code\":\"stale_candidate\",\"message\":\"Candidate changed\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "OFFLINE_READABLE",
+          "ok": true,
+          "detail": "items 3"
+        },
+        {
+          "id": "FAILED_VISIBLE",
+          "ok": true,
+          "detail": "[\"verification_blocked\",\"machine_failed\"]"
+        }
+      ],
+      "evidence": {
+        "attention": {
+          "projects": 2,
+          "items": 5,
+          "groups": [
+            {
+              "projectId": "project-att-a",
+              "reason": "waiting_age"
+            },
+            {
+              "projectId": "project-att-b",
+              "reason": "machine_failed"
+            }
+          ],
+          "expiredSent": 0,
+          "batchGrantedPermissions": false,
+          "kinds": [
+            "blocked",
+            "candidate",
+            "question"
+          ],
+          "pagination": {
+            "page1": 1,
+            "page2": 1
+          }
+        }
+      },
+      "limitations": [
+        "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
+      ],
+      "startedAt": "2026-11-11T14:37:45.718Z",
+      "finishedAt": "2026-11-11T14:37:46.522Z",
+      "durationMs": 804,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-ATTENTION-DEADLINES",
+      "title": "Real business deadlines, answer expiry and near-deadline reasons",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "No public entry creates a question with a real decisionDeadline/expiresAt in this checkout; waiting-age and unknown-wait ordering are verified instead.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent.",
+        "Owner: main/B. The fixture question driver exposes neither decisionDeadline nor expiresAt, so no real deadline/expiry item can be produced.",
+        "Contract fields exist and are independently schema-checked; inventing deadlines would fabricate facts."
+      ],
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-ATTENTION-INBOX-UI",
+      "title": "Attention inbox is usable across projects, filters, per-item open and deep links",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "ROWS",
+          "ok": true,
+          "detail": "rows 4"
+        },
+        {
+          "id": "CROSS_PROJECT_ROWS",
+          "ok": true,
+          "detail": "project-att-b fail attention\n待处理\n检查未通过\nproject-att-b\n等待时间未知\n截止未知\n检查未通过 · 时间未知\nproject-att-a pass attention\n待审阅\n变更已验证，等待审阅。\nproject-att-a\n刚刚\n截止未知\n交付待审阅 · 等待时间\nproject-att-a question attention\n权限确认\nAllo"
+        },
+        {
+          "id": "PROJECT_FILTER",
+          "ok": true
+        },
+        {
+          "id": "TYPE_FILTER",
+          "ok": true,
+          "detail": "rows 2"
+        },
+        {
+          "id": "ACCEPTED_ROW_REMOVED",
+          "ok": true
+        },
+        {
+          "id": "DEEP_LINK_OPENS_WORK",
+          "ok": true,
+          "detail": "工作上下文\n工作详情\n已交付\nproject-att-a pass attention\n合同详情\n\n写者已静止\n\nproject-att-a pass attention\n\n代码位置\n原项目\n/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-fault-3vwnjJ/project\n工作区\n/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w6-att-ui-cET80z/state/workspaces/attempts/attempt-cc0b1208-dd7c-44bc-baf7-7089112f3e9f\n基线\nadbb38f795bd\n完成标准\nOutput matches the registered check\n机器检查 · 必需\n验证结果"
+        },
+        {
+          "id": "MOBILE_NO_OVERFLOW",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "MOBILE_ROWS",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "attentionUi": {
+          "rows": 4,
+          "filters": 3,
+          "acceptedRemoved": true,
+          "deepLink": true,
+          "mobile": true
+        }
+      },
+      "limitations": [
+        "Browser evidence is a controlled two-project fixture; no vendor model and no real business deadline."
+      ],
+      "startedAt": "2026-11-11T14:37:50.147Z",
+      "finishedAt": "2026-11-11T14:37:51.551Z",
+      "durationMs": 1404,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-DECISION-WORKFLOW",
+      "title": "Decision prepare is read-only; confirm and revoke are atomic and replay-safe",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "EMPTY_CATALOG",
+          "ok": true
+        },
+        {
+          "id": "PREPARE_200",
+          "ok": true,
+          "detail": "status 200"
+        },
+        {
+          "id": "PREVIEW_PROTOCOL",
+          "ok": true
+        },
+        {
+          "id": "PREVIEW_SOURCE",
+          "ok": true
+        },
+        {
+          "id": "PREVIEW_SCOPE",
+          "ok": true
+        },
+        {
+          "id": "PREVIEW_TTL_BOUNDED",
+          "ok": true,
+          "detail": "ttl 299999"
+        },
+        {
+          "id": "PREVIEW_TOKEN",
+          "ok": true
+        },
+        {
+          "id": "PREPARE_WRITES_NOTHING",
+          "ok": true
+        },
+        {
+          "id": "PREPARE_NO_EVENT",
+          "ok": true
+        },
+        {
+          "id": "PREPARE_NO_WORK",
+          "ok": true,
+          "detail": "works 0"
+        },
+        {
+          "id": "RECORD_200",
+          "ok": true,
+          "detail": "status 200"
+        },
+        {
+          "id": "RECORD_RECEIPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6dec-record-2\",\"entityRefs\":{\"decisionId\":\"decision-1ef8cf79-1a4c-48b5-88f4-48e528f637a2\"},\"seq\":4,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "CATALOG_ONE",
+          "ok": true
+        },
+        {
+          "id": "STATUS_RECORDED",
+          "ok": true,
+          "detail": "recorded"
+        },
+        {
+          "id": "SOURCE_CURRENT",
+          "ok": true,
+          "detail": "current"
+        },
+        {
+          "id": "DECISION_CONTENT",
+          "ok": true
+        },
+        {
+          "id": "ONE_EVENT",
+          "ok": true,
+          "detail": "0 -> 1"
+        },
+        {
+          "id": "RECORD_NO_EXECUTION",
+          "ok": true,
+          "detail": "works 0"
+        },
+        {
+          "id": "REPLAY_SAME_SEQ",
+          "ok": true,
+          "detail": "4 != 4"
+        },
+        {
+          "id": "REPLAY_ONE_RECORD",
+          "ok": true
+        },
+        {
+          "id": "REPLAY_NO_EVENT",
+          "ok": true
+        },
+        {
+          "id": "CHANGED_PAYLOAD_CONFLICT",
+          "ok": true,
+          "detail": "status 409"
+        },
+        {
+          "id": "CHANGED_CODE",
+          "ok": true,
+          "detail": "{\"error\":{\"code\":\"conflict\",\"message\":\"Command ID already names another request\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "TAMPERED_REJECTED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6dec-tampered-3\",\"seq\":5,\"status\":\"rejected\",\"error\":{\"code\":\"forbidden\",\"message\":\"Decision preview signature is invalid\",\"retry\":\"none\"}}"
+        },
+        {
+          "id": "TAMPERED_NO_RECORD",
+          "ok": true
+        },
+        {
+          "id": "OUTSIDE_SCOPE_FORBIDDEN",
+          "ok": true,
+          "detail": "status 403"
+        },
+        {
+          "id": "OUTSIDE_SCOPE_CODE",
+          "ok": true
+        },
+        {
+          "id": "MALFORMED_400",
+          "ok": true,
+          "detail": "status 400"
+        },
+        {
+          "id": "REVOKE_RECORDED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6dec-revoke-5\",\"entityRefs\":{\"decisionId\":\"decision-1ef8cf79-1a4c-48b5-88f4-48e528f637a2\"},\"seq\":7,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "REVOKED_STATUS",
+          "ok": true,
+          "detail": "revoked"
+        },
+        {
+          "id": "REVOKED_TIMESTAMP",
+          "ok": true
+        },
+        {
+          "id": "REVOKE_EVENT",
+          "ok": true
+        },
+        {
+          "id": "STALE_REVOKE_REJECTED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6dec-revoke-stale-6\",\"seq\":8,\"status\":\"rejected\",\"error\":{\"code\":\"conflict\",\"message\":\"Decision version or recorded body changed\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "REVOKE_REPLAY_SAME_SEQ",
+          "ok": true
+        },
+        {
+          "id": "PAGE_LIMIT",
+          "ok": true
+        },
+        {
+          "id": "PAGE2_DISJOINT",
+          "ok": true
+        },
+        {
+          "id": "CURSOR_SCOPE_REJECTED",
+          "ok": true,
+          "detail": "status 403"
+        },
+        {
+          "id": "BUSINESS_REJECTIONS",
+          "ok": true,
+          "detail": "[\"forbidden\",\"conflict\"]"
+        },
+        {
+          "id": "PARSE_REJECTION_400",
+          "ok": true,
+          "detail": "[\"invalid_request\"]"
+        }
+      ],
+      "evidence": {
+        "decisionWorkflow": {
+          "previewReadOnly": true,
+          "records": 2,
+          "revoked": true,
+          "sourceState": "current",
+          "executionEffects": 0,
+          "businessRejections": [
+            "forbidden",
+            "conflict"
+          ],
+          "parseRejections": [
+            "invalid_request"
+          ],
+          "events": 3
+        }
+      },
+      "limitations": [
+        "Controlled fixture executor with real SQLite; no vendor model and no native task."
+      ],
+      "startedAt": "2026-11-11T14:37:52.241Z",
+      "finishedAt": "2026-11-11T14:37:52.279Z",
+      "durationMs": 38,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-DECISION-SOURCE-STATES",
+      "title": "Source missing/stale, scope expiry and forced transaction rollback",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "No public entry deletes/changes the source message or expires the project grant; transaction-failure injection is not exposed. These remain NOT_TESTED.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Controlled fixture executor with real SQLite; no vendor model and no native task.",
+        "Owner: main/C. Deleting a source message, expiring a grant mid-flight and injecting a commit failure need test-only seams that are not public.",
+        "The current source remains current and the transaction is proven atomic by the receipt/event/catalog checks; absence of a fault API is not evidence of rollback."
+      ],
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
+      "title": "Proposal confirmation and context window are explicit, transactional and revocable",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main publishes no proposal confirm/reject/replay or context preview endpoint. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Owner: main (HTTP/composition) + C (rules). No proposal/context entry is published in this main yet.",
+        "Explicit decisions are verified separately by E3-DECISION-WORKFLOW; this case is the automatic proposal/context surface, not a duplicate."
+      ],
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-PROPOSAL-HTTP",
+      "title": "Proposal prepare is inert; confirm/reject are explicit, atomic and replay-safe",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "PREPARE_200",
+          "ok": true,
+          "detail": "status 200 {\"protocol\":\"proposal-preview/1\",\"record\":{\"proposalId\":\"proposal-4f41b935-6414-4b5d-921e-c7b8c2fc90c3\",\"version\":1,\"state\":\"pending\",\"projectId\":\"project-prop-a\",\"conversationId\":\"conv-prop-a\",\"sourceMessageId\":\"7e0c78fb297c8720e7a6b41a1074d79d\",\"sourceTextDigest\":\"fc9d0370cb1a704d5126d1220422d6cf998c6a3b0788590d224d90eba4aa145b\",\"actorRef\":\"wave04-recovery-authority\",\"grantId\":\"709208"
+        },
+        {
+          "id": "PREVIEW_PROTOCOL",
+          "ok": true,
+          "detail": "proposal-preview/1"
+        },
+        {
+          "id": "PREVIEW_PENDING",
+          "ok": true,
+          "detail": "{\"state\":\"pending\",\"version\":1}"
+        },
+        {
+          "id": "PREVIEW_INPUTS",
+          "ok": true,
+          "detail": "[\"work.scope\",\"work.criteria\",\"work.profileId\"]"
+        },
+        {
+          "id": "PREVIEW_SOURCE",
+          "ok": true,
+          "detail": "{\"source\":\"7e0c78fb297c8720e7a6b41a1074d79d\",\"project\":\"project-prop-a\"}"
+        },
+        {
+          "id": "PREVIEW_TTL",
+          "ok": true,
+          "detail": "ttl 299997"
+        },
+        {
+          "id": "PREPARE_NO_EFFECT",
+          "ok": true,
+          "detail": "0 -> 0"
+        },
+        {
+          "id": "CONFIRM_NEEDS_INPUT",
+          "ok": true,
+          "detail": "{\"status\":400,\"body\":{\"commandId\":\"w8prop-proposal-3\",\"seq\":5,\"status\":\"rejected\",\"error\":{\"code\":\"invalid_request\",\"message\":\"Proposal requires explicit scope, criteria, profile or revision input\",\"retry\":\"user_action\"}}}"
+        },
+        {
+          "id": "MISSING_NO_EFFECT",
+          "ok": true
+        },
+        {
+          "id": "CONFIRM_RECORDED",
+          "ok": true,
+          "detail": "{\"status\":200,\"body\":{\"commandId\":\"w8prop-proposal-4\",\"workId\":\"7d1409a2bb692476fc86971ef5e48c6a\",\"seq\":13,\"status\":\"recorded\"}}"
+        },
+        {
+          "id": "WORK_CREATED",
+          "ok": true,
+          "detail": "[\"7d1409a2bb692476fc86971ef5e48c6a\"]"
+        },
+        {
+          "id": "CONFIRM_EVENT",
+          "ok": true,
+          "detail": "[\"confirmed\"]"
+        },
+        {
+          "id": "REPLAY_RECEIPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"w8prop-proposal-4\",\"workId\":\"7d1409a2bb692476fc86971ef5e48c6a\",\"seq\":13,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "REPLAY_NO_SECOND_WORK",
+          "ok": true
+        },
+        {
+          "id": "CHANGED_PAYLOAD_CONFLICT",
+          "ok": true,
+          "detail": "status 409 {\"error\":{\"code\":\"conflict\",\"message\":\"Command ID already names another immutable request\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "TAMPERED_TOKEN",
+          "ok": true,
+          "detail": "status 403"
+        },
+        {
+          "id": "CROSS_PROJECT_REFUSED",
+          "ok": true,
+          "detail": "status 403 {\"error\":{\"code\":\"forbidden\",\"message\":\"Proposal source is not the original trusted user message\",\"retry\":\"none\"}}"
+        },
+        {
+          "id": "REJECT_PREVIEW",
+          "ok": true,
+          "detail": "status 200"
+        },
+        {
+          "id": "REJECT_RECORDED",
+          "ok": true,
+          "detail": "{\"status\":200,\"body\":{\"commandId\":\"w8prop-proposal-6\",\"seq\":16,\"status\":\"recorded\"}}"
+        },
+        {
+          "id": "REJECT_NO_WORK",
+          "ok": true
+        },
+        {
+          "id": "REJECT_EVENT",
+          "ok": true
+        },
+        {
+          "id": "B_PREPARE",
+          "ok": true,
+          "detail": "status 200"
+        },
+        {
+          "id": "B_CONFIRM",
+          "ok": true,
+          "detail": "{\"commandId\":\"w8prop-proposal-7\",\"workId\":\"483fb47e5a55733e4358d842db7b8822\",\"seq\":24,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "B_WORK_CREATED",
+          "ok": true,
+          "detail": "[\"483fb47e5a55733e4358d842db7b8822\"]"
+        },
+        {
+          "id": "PROJECT_ISOLATION",
+          "ok": true
+        },
+        {
+          "id": "DECISION_PREPARE",
+          "ok": true,
+          "detail": "status 200 {\"protocol\":\"proposal-preview/1\",\"record\":{\"proposalId\":\"proposal-a17318ff-efd3-462c-92f0-3ae4afaf3178\",\"version\":1,\"state\":\"pending\",\"projectId\":\"project-prop-a\",\"conversationId\":\"conv-prop-a\",\"sourceMessageId\":\"7e0c78fb297c8720e7a6b41a1074d79d\",\"sourceTextDigest\":\"fc9d0370cb1a704d5126d1220422d6cf998c6a3b0788590d224d90eba4aa145b\",\"actorRef\":\"wave04-recovery-authority\",\"grantId\":\"709208"
+        },
+        {
+          "id": "DECISION_CONFIRM",
+          "ok": true,
+          "detail": "{\"commandId\":\"w8prop-proposal-8\",\"entityRefs\":{\"decisionId\":\"decision-8f963d44-8254-4309-add7-0389dcb7f382\"},\"seq\":28,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "DECISION_RECORDED",
+          "ok": true,
+          "detail": "[{\"content\":\"项目 A 决定：保留受控范围，不扩大授权。\",\"status\":\"recorded\",\"source\":\"current\"}]"
+        },
+        {
+          "id": "AUTH_ANSWER_NOT_SHARED",
+          "ok": true,
+          "detail": "status 409 {\"error\":{\"code\":\"conflict\",\"message\":\"Decision source, scope or state changed; prepare again\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "NO_NATIVE_AUTHORITY",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "proposals": {
+          "preview": {
+            "protocol": "proposal-preview/1",
+            "requiredInputs": [
+              "work.scope",
+              "work.criteria",
+              "work.profileId"
+            ],
+            "ttlMs": 299997
+          },
+          "confirm": {
+            "workId": "7d1409a2bb692476fc86971ef5e48c6a",
+            "seq": 13
+          },
+          "replay": {
+            "seq": 13,
+            "works": 1
+          },
+          "refusals": {
+            "missingInput": 400,
+            "changedPayload": 409,
+            "tampered": 403,
+            "crossProject": 403
+          },
+          "reject": {
+            "recorded": true,
+            "noWork": true
+          },
+          "isolation": {
+            "projectA": 1,
+            "projectB": 1
+          },
+          "decision": {
+            "recorded": true
+          },
+          "authAnswer": 409
+        }
+      },
+      "limitations": [
+        "Controlled fixture executor with real SQLite; proposal payloads are inert data until one explicit confirmation."
+      ],
+      "startedAt": "2026-11-11T14:37:52.355Z",
+      "finishedAt": "2026-11-11T14:37:54.669Z",
+      "durationMs": 2314,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-CONTEXT-GRANT-BOUNDARY",
+      "title": "Expired, purpose-mismatched or over-budget context grants never reach a provider",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main publishes no context preview/read entry. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Controlled fixture executor with real SQLite; proposal payloads are inert data until one explicit confirmation."
+      ],
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-PROPOSAL-UI",
+      "title": "The current web entry previews, confirms and rejects proposals without side effects",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "PREVIEW_NO_WORK",
+          "ok": true,
+          "detail": "0 -> 0"
+        },
+        {
+          "id": "PREVIEW_NO_RECEIPT",
+          "ok": true,
+          "detail": "6 -> 6"
+        },
+        {
+          "id": "PREVIEW_SOURCE",
+          "ok": true,
+          "detail": "创建工作为支付接口增加幂等校验，并补齐重复请求测试。来源：支付接口新增幂等校验，确认后创建受控工作。支付接口新增幂等校验，确认后创建受控工作。原会话conv-ui-proposal来源消息d23fa39a6b18dbc6400a3d7afd063ecf允许路径src/排除路径无外部动作无执行器受控验证 · 权限提问确认期限2026/11/11 22:42:5"
+        },
+        {
+          "id": "PREVIEW_CRITERIA",
+          "ok": true,
+          "detail": "创建工作为支付接口增加幂等校验，并补齐重复请求测试。来源：支付接口新增幂等校验，确认后创建受控工作。支付接口新增幂等校验，确认后创建受控工作。原会话conv-ui-proposal来源消息d23fa39a6b18dbc6400a3d7afd063ecf允许路径src/排除路径无外部动作无执行器受控验证 · 权限提问确认期限2026/11/11 22:42:5"
+        },
+        {
+          "id": "NO_OVERFLOW_NOTEBOOK",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "NO_OVERFLOW_MOBILE",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "CONFIRM_ONE_WORK",
+          "ok": true,
+          "detail": "0 -> 1"
+        },
+        {
+          "id": "WORK_VISIBLE",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "id": "SECOND_ONE_WORK",
+          "ok": true,
+          "detail": "1 -> 2"
+        },
+        {
+          "id": "REJECT_NO_NEW_WORK",
+          "ok": true,
+          "detail": "2 -> 2"
+        }
+      ],
+      "evidence": {
+        "proposalUi": {
+          "preview": {
+            "works": 0,
+            "receipts": 6
+          },
+          "confirm": {
+            "works": 1,
+            "visibleRows": 1
+          },
+          "secondConfirm": {
+            "works": 2
+          },
+          "reject": {
+            "works": 2
+          },
+          "viewports": [
+            "desktop",
+            "notebook",
+            "mobile"
+          ],
+          "pendingSurvivedReload": true,
+          "lostResponseSettledOnce": true
+        }
+      },
+      "limitations": [
+        "Real console built from apps/console against the same fixture product; no model call.",
+        "The page is exercised at 1440×900 and 390×844; visual taste is not judged."
+      ],
+      "startedAt": "2026-11-11T14:37:55.728Z",
+      "finishedAt": "2026-11-11T14:37:57.153Z",
+      "durationMs": 1425,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E3-CONTEXT-PREVIEW",
+      "title": "Context preview is bounded, project/work bound and free of execution effects",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "PREVIEW_200",
+          "ok": true,
+          "detail": "status 200 {\"protocol\":\"context-preview/1\",\"requestId\":\"context-cf586381-b1a1-4f7c-8765-6280af1f53c1\",\"projectId\":\"project-ctx-a\",\"conversationId\":\"conv-ctx-a\",\"contract\":{\"workId\":\"382d6c40915cf820396c13ca48db533d\",\"revision\":1,\"digest\":\"a76844e2abb8a23f5ad2002fb0b4b0f1152a42b28bb13fe71c9869a9ddc85763\"},\"observedAt\":\"2026-11-11T14:37:58.596Z\",\"expiresAt\":\"2026-11-11T14:42:58.596Z\",\"status\":\"suffi"
+        },
+        {
+          "id": "PREVIEW_PROTOCOL",
+          "ok": true,
+          "detail": "context-preview/1"
+        },
+        {
+          "id": "PREVIEW_TRUST",
+          "ok": true,
+          "detail": "untrusted_data"
+        },
+        {
+          "id": "PREVIEW_BUDGET_CLAMPED",
+          "ok": true,
+          "detail": "[\"maxFiles\",\"maxBytes\",\"maxTokens\"]"
+        },
+        {
+          "id": "PREVIEW_BUDGET_WITHIN_CEILING",
+          "ok": true,
+          "detail": "{\"maxFiles\":32,\"maxBytes\":131072,\"maxTokens\":32768}"
+        },
+        {
+          "id": "PREVIEW_TOTALS",
+          "ok": true,
+          "detail": "{\"files\":7,\"bytes\":3697,\"tokens\":938}"
+        },
+        {
+          "id": "PREVIEW_TOTALS_WITHIN",
+          "ok": true,
+          "detail": "{\"totals\":{\"files\":7,\"bytes\":3697,\"tokens\":938},\"budget\":{\"maxFiles\":32,\"maxBytes\":131072,\"maxTokens\":32768}}"
+        },
+        {
+          "id": "PREVIEW_TTL",
+          "ok": true,
+          "detail": "300000"
+        },
+        {
+          "id": "PREVIEW_CONTRACT",
+          "ok": true,
+          "detail": "{\"workId\":\"382d6c40915cf820396c13ca48db533d\",\"revision\":1,\"digest\":\"a76844e2abb8a23f5ad2002fb0b4b0f1152a42b28bb13fe71c9869a9ddc85763\"}"
+        },
+        {
+          "id": "PREVIEW_WORK_SOURCES",
+          "ok": true,
+          "detail": "[\"work\",\"contract\",\"verification\",\"delivery\",\"project_metadata\",\"conversation_message\"]"
+        },
+        {
+          "id": "PREVIEW_SOURCE_BINDING",
+          "ok": true,
+          "detail": "{\"project\":\"project-ctx-a\",\"conversation\":\"conv-ctx-a\"}"
+        },
+        {
+          "id": "PREVIEW_NO_EFFECT",
+          "ok": true
+        },
+        {
+          "id": "PREVIEW_SMALL_BUDGET",
+          "ok": true,
+          "detail": "{\"status\":\"insufficient\",\"omitted\":3}"
+        },
+        {
+          "id": "PREVIEW_SMALL_OMITS",
+          "ok": true,
+          "detail": "[{\"reason\":\"budget_bytes\"},{\"reason\":\"budget_bytes\"},{\"reason\":\"budget_bytes\"}]"
+        },
+        {
+          "id": "CROSS_PROJECT_REFUSED",
+          "ok": true,
+          "detail": "status 403 {\"error\":{\"code\":\"forbidden\",\"message\":\"Context conversation is outside this project\",\"retry\":\"none\"}}"
+        },
+        {
+          "id": "FOREIGN_CONVERSATION_REFUSED",
+          "ok": true,
+          "detail": "status 403"
+        },
+        {
+          "id": "WORK_REQUIRED",
+          "ok": true,
+          "detail": "status 400"
+        },
+        {
+          "id": "INVALID_BUDGET_REFUSED",
+          "ok": true,
+          "detail": "status 400"
+        },
+        {
+          "id": "EMPTY_SELECTIONS_REFUSED",
+          "ok": true,
+          "detail": "status 400"
+        }
+      ],
+      "evidence": {
+        "contextPreview": {
+          "protocol": "context-preview/1",
+          "trust": "untrusted_data",
+          "budget": {
+            "maxFiles": 32,
+            "maxBytes": 131072,
+            "maxTokens": 32768
+          },
+          "budgetClamped": [
+            "maxFiles",
+            "maxBytes",
+            "maxTokens"
+          ],
+          "totals": {
+            "files": 7,
+            "bytes": 3697,
+            "tokens": 938
+          },
+          "sources": 7,
+          "kinds": [
+            "contract",
+            "conversation_message",
+            "delivery",
+            "project_metadata",
+            "verification",
+            "work"
+          ],
+          "issues": [],
+          "status": "sufficient",
+          "refusals": {
+            "crossProject": 403,
+            "foreignConversation": 403,
+            "missingWork": 400,
+            "invalidBudget": 400,
+            "emptySelections": 400
+          }
+        }
+      },
+      "limitations": [
+        "Controlled fixture product with real SQLite; context is untrusted data and no model is called."
+      ],
+      "startedAt": "2026-11-11T14:37:58.590Z",
+      "finishedAt": "2026-11-11T14:37:58.622Z",
+      "durationMs": 32,
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    },
+    {
+      "id": "E5-CONTEXT-USE",
+      "title": "An explicitly selected context is sent with one message and audited",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main publishes the context preview and the AssistantContextBinding contract, but no context-use HTTP or provider attachment. Required: an explicit per-message selection, revalidation of source/contract/grant immediately before send, a binding and receipt in the same transaction, no automatic resend after a lost response/unknown result, and a source audit showing what was used. A preview or the binding schema is not a send.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Controlled fixture product with real SQLite; context is untrusted data and no model is called."
+      ],
+      "source": {
+        "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52"
+      }
+    }
+  ],
+  "declaredGaps": [
+    {
+      "id": "E3-ASSISTANT-END-TO-END",
+      "status": "NOT_TESTED",
+      "reason": "Explicit decisions now work over HTTP (E3-DECISION-WORKFLOW); automatic context/proposal confirmation is still absent."
+    },
+    {
+      "id": "E3-REVIEW-PIPELINE",
+      "status": "NOT_TESTED",
+      "reason": "No public entry creates a review Work/Ticket/Assignment or publishes ReviewEvidence; the independent pilot preflight is BLOCKED on pricing."
+    },
+    {
+      "id": "E3-ATTENTION-DEADLINES",
+      "status": "NOT_TESTED",
+      "reason": "No public entry creates a question with a real decisionDeadline/expiresAt in this checkout; waiting-age and unknown-wait ordering are verified instead."
+    },
+    {
+      "id": "E3-DECISION-SOURCE-STATES",
+      "status": "NOT_TESTED",
+      "reason": "No public entry deletes/changes the source message or expires the project grant; transaction-failure injection is not exposed. These remain NOT_TESTED."
+    },
+    {
+      "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main publishes no proposal confirm/reject/replay or context preview endpoint. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen."
+    },
+    {
+      "id": "E3-CONTEXT-GRANT-BOUNDARY",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main publishes no context preview/read entry. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed."
+    },
+    {
+      "id": "E5-CONTEXT-USE",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main publishes the context preview and the AssistantContextBinding contract, but no context-use HTTP or provider attachment. Required: an explicit per-message selection, revalidation of source/contract/grant immediately before send, a binding and receipt in the same transaction, no automatic resend after a lost response/unknown result, and a source audit showing what was used. A preview or the binding schema is not a send."
+    }
+  ],
+  "release": {
+    "schema": "product-acceptance-release/1",
+    "tier": "controlled-product-workflow",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-11T14:37:58.644Z",
+    "source": {
+      "commit": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+      "dirty": true
+    },
+    "expectedSource": "81d7fa3f363f917cdd6fbda06749684ddf5dbd52",
+    "requirements": [
+      {
+        "id": "E1-GATE-CONTROL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-CASE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-REPORT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-NO-CANDIDATE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-VACUOUS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-DUPLICATE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-BAD-PATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-SCHEMA",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-FIXTURE-STRICT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-FIXTURE-PORTABILITY-STRICT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-WRONG-LAYER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-DIRTY-SOURCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-SOURCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-STALE-REPORT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-CROSS-COMMIT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-UNBOUND-CASE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-CASE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-FAILED-ASSERTION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-DOWNLOAD-DIGEST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-NOT-APPLIED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-DIGEST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-DUPLICATE-ID",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-STATUS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-LAYER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-VERSION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-STAGED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NOT-TESTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-SELF-CLAIM",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ADMISSION-PROBE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-ADMISSION-FAIL-CLOSED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-PREFLIGHT-NO-FALLBACK",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-STRUCTURE-TIER-SUPERSET",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-STRUCTURE-NO-ALLOW-GAP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-OVERLAP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-EXPIRED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-DISPOSITION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-VERSION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-BUDGET",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-ZERO-TURNS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-CONFIGURATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-DAILY-VERTICAL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ARTIFACT-ROUNDTRIP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-EVIDENCE-HISTORY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REOPEN-PERSISTENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REPLAY-AND-CONFLICT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-SESSION-ISOLATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-STALE-BUSINESS-REJECTION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-MACHINE-FAIL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ONE-WRITER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-AUTH-AND-ORIGIN",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ASSISTANT-SDK-MOCK",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-CONVERSATION-CATALOG",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ATTENTION-SIGNAL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REVIEW-TIMING",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ROUTE-FIXTURE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-REVIEW-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-SEALED-COPY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-ACTIVITY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-PREVIEW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONVERSATION-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-VERIFICATION-RECOVERY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-RECOVERY-READONLY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-VERIFICATION-RECOVERY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-VERIFICATION-FINISHED-STATES",
+        "required": true,
+        "status": "MISSING"
+      }
+    ],
+    "failures": [
+      {
+        "code": "source_dirty",
+        "detail": "Release evidence requires a clean source worktree"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-CONTROL is absent",
+        "caseId": "E1-GATE-CONTROL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-MISSING-CASE is absent",
+        "caseId": "E1-GATE-REJECT-MISSING-CASE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNKNOWN-STATUS is absent",
+        "caseId": "E1-GATE-REJECT-UNKNOWN-STATUS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNCERTAIN-ACCEPT is absent",
+        "caseId": "E1-GATE-REJECT-UNCERTAIN-ACCEPT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-STALE-REPORT is absent",
+        "caseId": "E1-GATE-REJECT-STALE-REPORT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-SOURCE-MISMATCH is absent",
+        "caseId": "E1-GATE-REJECT-SOURCE-MISMATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-NO-CANDIDATE is absent",
+        "caseId": "E1-GATE-REJECT-NO-CANDIDATE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-VACUOUS is absent",
+        "caseId": "E1-GATE-REJECT-VACUOUS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-FAILED-ASSERTION is absent",
+        "caseId": "E1-GATE-REJECT-FAILED-ASSERTION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-MISSING-EVIDENCE is absent",
+        "caseId": "E1-GATE-REJECT-MISSING-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-DUPLICATE is absent",
+        "caseId": "E1-GATE-REJECT-DUPLICATE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-BAD-PATCH is absent",
+        "caseId": "E1-GATE-REJECT-BAD-PATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNAPPLIED-PATCH is absent",
+        "caseId": "E1-GATE-REJECT-UNAPPLIED-PATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-MALFORMED-PATCH is absent",
+        "caseId": "E1-GATE-REJECT-MALFORMED-PATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNEXECUTED-NATIVE is absent",
+        "caseId": "E1-GATE-REJECT-UNEXECUTED-NATIVE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-INVALID-RESPONSE is absent",
+        "caseId": "E1-GATE-REJECT-INVALID-RESPONSE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-STALE-CASE-BINDING is absent",
+        "caseId": "E1-GATE-REJECT-STALE-CASE-BINDING"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-FIXTURE-DRIFT is absent",
+        "caseId": "E1-GATE-REJECT-FIXTURE-DRIFT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-SCHEMA is absent",
+        "caseId": "E1-GATE-REJECT-SCHEMA"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-FIXTURE-STRICT is absent",
+        "caseId": "E1-FIXTURE-STRICT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-FIXTURE-PORTABILITY-STRICT is absent",
+        "caseId": "E1-FIXTURE-PORTABILITY-STRICT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-WRONG-LAYER is absent",
+        "caseId": "E1-MUTATE-WRONG-LAYER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-DIRTY-SOURCE is absent",
+        "caseId": "E1-MUTATE-DIRTY-SOURCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-MISSING-SOURCE is absent",
+        "caseId": "E1-MUTATE-MISSING-SOURCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-STALE-REPORT is absent",
+        "caseId": "E1-MUTATE-STALE-REPORT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-CROSS-COMMIT is absent",
+        "caseId": "E1-MUTATE-CROSS-COMMIT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-UNBOUND-CASE is absent",
+        "caseId": "E1-MUTATE-UNBOUND-CASE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-EMPTY-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-EMPTY-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-EMPTY-OBJECT-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-MISSING-CASE is absent",
+        "caseId": "E1-MUTATE-MISSING-CASE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-FAILED-ASSERTION is absent",
+        "caseId": "E1-MUTATE-FAILED-ASSERTION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NO-DOWNLOAD-BYTES is absent",
+        "caseId": "E1-MUTATE-NO-DOWNLOAD-BYTES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-DOWNLOAD-DIGEST is absent",
+        "caseId": "E1-MUTATE-DOWNLOAD-DIGEST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PATCH-NOT-APPLIED is absent",
+        "caseId": "E1-MUTATE-PATCH-NOT-APPLIED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PATCH-DIGEST is absent",
+        "caseId": "E1-MUTATE-PATCH-DIGEST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-DUPLICATE-ID is absent",
+        "caseId": "E1-MUTATE-DUPLICATE-ID"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-UNKNOWN-STATUS is absent",
+        "caseId": "E1-MUTATE-UNKNOWN-STATUS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-UNKNOWN-LAYER is absent",
+        "caseId": "E1-MUTATE-UNKNOWN-LAYER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NOT-EXECUTED is absent",
+        "caseId": "E1-MUTATE-NATIVE-NOT-EXECUTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-VERSION is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-VERSION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-ATTEMPT is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-ATTEMPT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-MODEL-TASKS is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-MODEL-TASKS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-INSTALL-NOT-STAGED is absent",
+        "caseId": "E1-MUTATE-INSTALL-NOT-STAGED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-INSTALL-NOT-INDEPENDENT is absent",
+        "caseId": "E1-MUTATE-INSTALL-NOT-INDEPENDENT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NOT-TESTED is absent",
+        "caseId": "E1-MUTATE-NOT-TESTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-SELF-CLAIM is absent",
+        "caseId": "E1-MUTATE-SELF-CLAIM"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ADMISSION-PROBE is absent",
+        "caseId": "E1-MUTATE-ADMISSION-PROBE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-ADMISSION-FAIL-CLOSED is absent",
+        "caseId": "E1-ADMISSION-FAIL-CLOSED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-PREFLIGHT-NO-FALLBACK is absent",
+        "caseId": "E1-PREFLIGHT-NO-FALLBACK"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-STRUCTURE-TIER-SUPERSET is absent",
+        "caseId": "E1-STRUCTURE-TIER-SUPERSET"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-STRUCTURE-NO-ALLOW-GAP is absent",
+        "caseId": "E1-STRUCTURE-NO-ALLOW-GAP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-NO-ELIGIBLE is absent",
+        "caseId": "E1-MUTATE-ROUTE-NO-ELIGIBLE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-OVERLAP is absent",
+        "caseId": "E1-MUTATE-ROUTE-OVERLAP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-EXPIRED is absent",
+        "caseId": "E1-MUTATE-ROUTE-EXPIRED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-NO-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-ROUTE-NO-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-DEFAULT-PATH is absent",
+        "caseId": "E1-MUTATE-ROUTE-DEFAULT-PATH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-DISPOSITION is absent",
+        "caseId": "E1-MUTATE-REVIEW-DISPOSITION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-SAME-ASSIGNMENT is absent",
+        "caseId": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-NO-ISOLATION is absent",
+        "caseId": "E1-MUTATE-REVIEW-NO-ISOLATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-BAD-DIGEST is absent",
+        "caseId": "E1-MUTATE-REVIEW-BAD-DIGEST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-SAME-PROTOCOL is absent",
+        "caseId": "E1-MUTATE-HETERO-SAME-PROTOCOL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NOT-EXECUTED is absent",
+        "caseId": "E1-MUTATE-HETERO-NOT-EXECUTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-VERSION is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-VERSION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-BUDGET is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-BUDGET"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-ISOLATION is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-ISOLATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-SUBJECT is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-SUBJECT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED is absent",
+        "caseId": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-CONTROL-NO-STOP is absent",
+        "caseId": "E1-MUTATE-NATIVE-CONTROL-NO-STOP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY is absent",
+        "caseId": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-ZERO-TURNS is absent",
+        "caseId": "E1-MUTATE-PILOT-ZERO-TURNS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-UNKNOWN-USAGE is absent",
+        "caseId": "E1-MUTATE-PILOT-UNKNOWN-USAGE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-BLOCKED-PASS is absent",
+        "caseId": "E1-MUTATE-PILOT-BLOCKED-PASS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-NO-ORACLE is absent",
+        "caseId": "E1-MUTATE-PILOT-NO-ORACLE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-CONFIGURATION is absent",
+        "caseId": "E2-CONFIGURATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-DAILY-VERTICAL is absent",
+        "caseId": "E2-DAILY-VERTICAL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ARTIFACT-ROUNDTRIP is absent",
+        "caseId": "E2-ARTIFACT-ROUNDTRIP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-WORK-EVIDENCE is absent",
+        "caseId": "E2-WORK-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-EVIDENCE-HISTORY is absent",
+        "caseId": "E2-EVIDENCE-HISTORY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REOPEN-PERSISTENCE is absent",
+        "caseId": "E2-REOPEN-PERSISTENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REPLAY-AND-CONFLICT is absent",
+        "caseId": "E2-REPLAY-AND-CONFLICT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-SESSION-ISOLATION is absent",
+        "caseId": "E2-SESSION-ISOLATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-STALE-BUSINESS-REJECTION is absent",
+        "caseId": "E2-STALE-BUSINESS-REJECTION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-MACHINE-FAIL is absent",
+        "caseId": "E2-MACHINE-FAIL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ONE-WRITER is absent",
+        "caseId": "E2-ONE-WRITER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-SCOPE-AND-PROFILE-GUARDS is absent",
+        "caseId": "E2-SCOPE-AND-PROFILE-GUARDS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-AUTH-AND-ORIGIN is absent",
+        "caseId": "E2-AUTH-AND-ORIGIN"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ASSISTANT-SDK-MOCK is absent",
+        "caseId": "E2-ASSISTANT-SDK-MOCK"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-CONVERSATION-CATALOG is absent",
+        "caseId": "E2-CONVERSATION-CATALOG"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ATTENTION-SIGNAL is absent",
+        "caseId": "E2-ATTENTION-SIGNAL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REVIEW-TIMING is absent",
+        "caseId": "E2-REVIEW-TIMING"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ROUTE-FIXTURE is absent",
+        "caseId": "E2-ROUTE-FIXTURE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-BOUNDED-CYCLES is absent",
+        "caseId": "E4-BOUNDED-CYCLES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-PORTABILITY-CHECKLIST is absent",
+        "caseId": "E4-PORTABILITY-CHECKLIST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-RECOVERY-PREFLIGHT is absent",
+        "caseId": "E4-RECOVERY-PREFLIGHT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-RECOVERY-READONLY is absent",
+        "caseId": "E4-RECOVERY-READONLY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-VERIFICATION-RECOVERY is absent",
+        "caseId": "E2-VERIFICATION-RECOVERY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-VERIFICATION-FINISHED-STATES is absent",
+        "caseId": "E2-VERIFICATION-FINISHED-STATES"
+      }
+    ],
+    "claimedBy": null,
+    "notes": [
+      "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+      "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+    ]
+  },
+  "claim": {
+    "status": "FAIL",
+    "tier": "controlled-product-workflow",
+    "decidedAt": "2026-11-11T14:37:58.644Z",
+    "failureCodes": [
+      "source_dirty",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case"
+    ]
+  }
+}

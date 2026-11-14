@@ -1,0 +1,48 @@
+{
+  "control": "wrongstart",
+  "reason": "unknown_live_resource",
+  "at": "2026-11-14T11:18:46.063Z",
+  "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC",
+  "scope": {
+    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/install",
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/state",
+    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/config"
+  },
+  "record": {
+    "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/config/instance.json",
+    "sha256": "e10fbcac48bd010d2795093d8a9c03961439ee2f4763eebc731799590a4b0d3f",
+    "bytes": 539,
+    "value": {
+      "protocol": "pa-instance/1",
+      "pid": 657,
+      "processStart": "Wed Jan  1 00:00:00 2020",
+      "apiPid": 657,
+      "apiProcessStart": "Wed Jan  1 00:00:00 2020",
+      "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/state",
+      "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/install",
+      "apiURL": "http://127.0.0.1:1",
+      "consoleURL": "http://127.0.0.1:2",
+      "buildId": "probe",
+      "mode": "personal",
+      "access": "local-development",
+      "startupMode": "normal"
+    }
+  },
+  "material": {
+    "reason": "unknown_live_resource",
+    "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC",
+    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/install",
+    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/config",
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/state",
+    "record": {
+      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/config/instance.json",
+      "sha256": "e10fbcac48bd010d2795093d8a9c03961439ee2f4763eebc731799590a4b0d3f",
+      "bytes": 539,
+      "error": null
+    },
+    "files": [],
+    "retainedAt": "2026-11-14T11:18:46.063Z",
+    "deleted": false
+  },
+  "extra": {}
+}

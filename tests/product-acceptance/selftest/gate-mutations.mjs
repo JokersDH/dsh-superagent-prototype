@@ -582,6 +582,38 @@ const evidenceFor = (key) => {
       return { desktop: { horizontalOverflow: false } }
     case 'catalog':
       return { conversations: 3, archived: 1 }
+    case 'lifecycleOwn':
+      return { birth: { pid: 10, start: 'a', argvExact: true }, signals: [{ label: 'launcher', pid: 10, signalled: 'SIGTERM' }],
+        aliveAfter: [], clean: true, released: { removed: true }, rootAfter: false }
+    case 'lifecycleWrongStart':
+      return { reason: 'unknown_live_resource', gaps: [{ label: 'launcher', reason: 'start_mismatch' }], signals: [], alive: true,
+        retained: { sha256: DIGEST, reason: 'unknown_live_resource' } }
+    case 'lifecycleSibling':
+      return { reason: 'requested_root_mismatch', scope: { stateMatches: false }, signals: [], substringMatch: false, exactMatch: true, alive: { alive: true } }
+    case 'lifecycleForeignChild':
+      return { sameUid: true, foreignArgvExactForRequestedRoot: false, reason: 'fresh_identity_changed', signalled: null, foreignAlive: { alive: true } }
+    case 'lifecycleMixedUnknown':
+      return { reason: 'unknown_live_resource', gaps: [{ label: 'console', reason: 'start_missing' }], signals: [], alive: [true, true], recordPresent: true }
+    case 'lifecycleStartWindow':
+      return { status: 'TIMEOUT', birth: { pid: 10, start: 'a' }, beforeStop: { rootExists: true, record: true }, fresh: { argvExact: true },
+        clean: true, released: { removed: true } }
+    case 'lifecycleRefusedStop':
+      return { package: { status: 2, json: { status: 'BLOCKED' } }, reason: 'package_stop_refused', signals: [], alive: { alive: true },
+        retained: { sha256: DIGEST, reason: 'package_stop_refused' } }
+    case 'lifecycleIdempotent':
+      return { first: { clean: true, signals: [{ signalled: 'SIGTERM' }] }, second: { clean: true, signalled: 0 }, released: { removed: true } }
+    case 'supportMaterial':
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        bundle: { path: '/tmp/support.pab', bytes: 1024, mode: '600' }, repeated: { status: 2, result: 'exists' }, credentialLike: false,
+        installManifestMode: '644', releaseManifestMode: '644' }
+    case 'trialIdentity':
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        packagedMarker: { entry: 'index.js', hasIdentity: false }, mainSourcePresent: true, mainSourceIdentity: true }
+    case 'targetDrift':
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        appended: true, verify: { status: 'ok', verified: 'ok' }, consumerContentBinding: 'NOT_AVAILABLE_IN_MAIN', reason: 'integrity-only' }
+    case 'gSummary':
+      return { modulePresent: false, wiredToConsole: false }
     default:
       throw new Error(`No synthetic evidence for ${key}`)
   }
@@ -1716,8 +1748,10 @@ const CASES = [
     title: 'Full product includes every lower-tier required safety and workflow case',
     check: ({ assert }) => {
       const ids = new Set(fullProduct.cases.filter((item) => item.required !== false).map((item) => item.id))
-      for (const entry of [...SAFETY_CASES, ...CONTROLLED_CASES, ...INSTALL_CASES, ...NATIVE_CASES])
+      for (const entry of [...SAFETY_CASES, ...CONTROLLED_CASES, ...INSTALL_CASES, ...NATIVE_CASES]) {
+        if (entry.required === false) continue
         assert(`INCLUDES_${entry.id}`, ids.has(entry.id), `full-product omits ${entry.id}`)
+      }
       assert('SAFETY_COUNT', SAFETY_CASES.length >= 30, `${SAFETY_CASES.length} safety cases`)
     },
   },

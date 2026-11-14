@@ -1,0 +1,105 @@
+{
+  "schema": "product-acceptance-release/1",
+  "tier": "e3-browser-ui",
+  "status": "FAIL",
+  "ok": false,
+  "checkedAt": "2026-11-11T06:30:20.955Z",
+  "source": {
+    "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6",
+    "dirty": true
+  },
+  "expectedSource": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6",
+  "requirements": [
+    {
+      "id": "E3-REVIEW-FIXTURES",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-SEALED-COPY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-REVIEW-ACTIVITY-UI",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-ATTENTION-INBOX",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-ATTENTION-INBOX-UI",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-DECISION-WORKFLOW",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-DESKTOP-GEOMETRY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-NOTEBOOK-GEOMETRY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-MOBILE-GEOMETRY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-QUESTION-FORM",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-ACCEPT-AND-DOWNLOAD",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-CONVERSATION-UI",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-VERIFICATION-RECOVERY-UI",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-OFFLINE-AND-ERROR",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E3-KEYBOARD-AND-SCROLL",
+      "required": true,
+      "status": "PASS"
+    }
+  ],
+  "failures": [
+    {
+      "code": "source_dirty",
+      "detail": "Release evidence requires a clean source worktree"
+    }
+  ],
+  "claimedBy": null,
+  "notes": [
+    "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+    "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+  ]
+}

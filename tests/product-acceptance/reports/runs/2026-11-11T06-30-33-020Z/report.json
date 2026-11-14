@@ -1,0 +1,3864 @@
+{
+  "schema": "product-acceptance/1",
+  "suites": [
+    "e4"
+  ],
+  "branch": "codex/g3-product-acceptance",
+  "source": {
+    "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6",
+    "dirty": true
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "os": "Darwin 25.6.0"
+  },
+  "startedAt": "2026-11-11T06:30:33.021Z",
+  "finishedAt": "2026-11-11T06:32:07.701Z",
+  "checkedAt": "2026-11-11T06:32:07.701Z",
+  "counts": {
+    "PASS": 11,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 5,
+    "BLOCKED": 0,
+    "UNKNOWN": 0
+  },
+  "artifacts": {
+    "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T06-30-33-020Z",
+    "screenshots": []
+  },
+  "cases": [
+    {
+      "id": "E4-BOUNDED-CYCLES",
+      "title": "Bounded mixed execution cycles keep resources and writer identity stable",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "ACCEPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-accept-2\",\"workId\":\"4a3ab14376b41dd15fbaf2d11e6e2900\",\"seq\":35,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 0 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 2ea6cff48765285cfc4da466bbc55961 reused"
+        },
+        {
+          "id": "ANSWER",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-answer-4\",\"workId\":\"ebae7031275c1f45da3610ff00bcee18\",\"entityRefs\":{\"questionId\":\"0cb01877a781c4e84097c9115d2459bf\"},\"seq\":59,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 1 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 9df5ba3c1eee988a567740bba1f29462 reused"
+        },
+        {
+          "id": "MACHINE_FAIL",
+          "ok": true,
+          "detail": "[{\"criterionId\":\"fixed-output\",\"outcome\":\"FAIL\",\"evidenceRefs\":[\"check:check-fixture-output:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"]}]"
+        },
+        {
+          "id": "FAIL_NOT_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 2 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 309a5cbf89f96c4a289b51146dc6f4bf reused"
+        },
+        {
+          "id": "STOP",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-stop-8\",\"workId\":\"0e0496e6cc22cb3f0085178d070c5fd8\",\"seq\":130,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 3 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 6eaab5c2cad4443865e13f8dd55ec9c7 reused"
+        },
+        {
+          "id": "ACCEPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-accept-10\",\"workId\":\"316abc8990c8e3e3d5f56d89b74d8812\",\"seq\":171,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 4 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 27271bf375df3616f7431c697465af74 reused"
+        },
+        {
+          "id": "ANSWER",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-answer-12\",\"workId\":\"b0e0b4923b877ac6bde353c2731e23c1\",\"entityRefs\":{\"questionId\":\"aa1a127a5071005e9245537a948732fe\"},\"seq\":195,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 5 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket f0f79073ad1162258f622459fa4e7c93 reused"
+        },
+        {
+          "id": "MACHINE_FAIL",
+          "ok": true,
+          "detail": "[{\"criterionId\":\"fixed-output\",\"outcome\":\"FAIL\",\"evidenceRefs\":[\"check:check-fixture-output:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"]}]"
+        },
+        {
+          "id": "FAIL_NOT_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 6 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 3f76effda8a5e2148e42af5625c23892 reused"
+        },
+        {
+          "id": "STOP",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-stop-16\",\"workId\":\"8e9bbc3ae6d957efdb9e4bb693912e0a\",\"seq\":266,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 7 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 411d277428dfc2249f70a9592e310213 reused"
+        },
+        {
+          "id": "ACCEPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-accept-18\",\"workId\":\"08c46400e5547fedd6ced14d091843e7\",\"seq\":307,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 8 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 6856269bfe46ea69447b4d479d4fddeb reused"
+        },
+        {
+          "id": "ANSWER",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-answer-20\",\"workId\":\"bbe4a1d6d4692f8ab32c11aea068faa2\",\"entityRefs\":{\"questionId\":\"f1fc11f4a77194e1a66d3cb65aff7b7a\"},\"seq\":331,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 9 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 98c766098ac11e2e03afe8c7746a710f reused"
+        },
+        {
+          "id": "MACHINE_FAIL",
+          "ok": true,
+          "detail": "[{\"criterionId\":\"fixed-output\",\"outcome\":\"FAIL\",\"evidenceRefs\":[\"check:check-fixture-output:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"]}]"
+        },
+        {
+          "id": "FAIL_NOT_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 10 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 3065685a39745380a9853743a511646f reused"
+        },
+        {
+          "id": "STOP",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-stop-24\",\"workId\":\"ac8a6fae2825dbf0c925d94bfb5bd779\",\"seq\":402,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 11 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 04f2d838b64ae659fc6ade9e1ea13ce0 reused"
+        },
+        {
+          "id": "ACCEPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-accept-26\",\"workId\":\"5b93550d7a94cbe572f99eb0980a0d34\",\"seq\":443,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 12 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 85edbe64d2c2f57b131b690237d4e26f reused"
+        },
+        {
+          "id": "ANSWER",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-answer-28\",\"workId\":\"a99c4c97cc60cb8871c97c1299a023a8\",\"entityRefs\":{\"questionId\":\"b8c895497bf6a6be4e3e0dd150a4625f\"},\"seq\":467,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 13 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket e7bc352d46857fd331b9d6a9ccb6e450 reused"
+        },
+        {
+          "id": "MACHINE_FAIL",
+          "ok": true,
+          "detail": "[{\"criterionId\":\"fixed-output\",\"outcome\":\"FAIL\",\"evidenceRefs\":[\"check:check-fixture-output:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"]}]"
+        },
+        {
+          "id": "FAIL_NOT_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 14 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket a675cefa5b33597c98d48d2aac540e4a reused"
+        },
+        {
+          "id": "REOPEN_NO_NEW_NATIVE_WRITE",
+          "ok": true,
+          "detail": "receipts 12 -> 12 across a reopen"
+        },
+        {
+          "id": "REOPEN_NO_NEW_BEGIN",
+          "ok": true,
+          "detail": "begins 12->12, attempts 15->15"
+        },
+        {
+          "id": "STOP",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-stop-32\",\"workId\":\"e8e165a35084737379d7a925084fe3b8\",\"seq\":538,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 15 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 237540b30dcddb2b8098b792c1f75855 reused"
+        },
+        {
+          "id": "ACCEPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-accept-34\",\"workId\":\"6ee3ca68b286a40f8e7275d0566e4d5d\",\"seq\":579,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 16 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 5ce13844c4020781b5a5849d326f51a7 reused"
+        },
+        {
+          "id": "ANSWER",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-answer-36\",\"workId\":\"fbf2075a67b6813c04e6cf21b8a195fc\",\"entityRefs\":{\"questionId\":\"a0199f49cebfe7057960d06beb2fd352\"},\"seq\":603,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 17 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 109bac36822d34792879c3e975fecf6f reused"
+        },
+        {
+          "id": "MACHINE_FAIL",
+          "ok": true,
+          "detail": "[{\"criterionId\":\"fixed-output\",\"outcome\":\"FAIL\",\"evidenceRefs\":[\"check:check-fixture-output:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"]}]"
+        },
+        {
+          "id": "FAIL_NOT_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 18 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket d56651e7b6f65226a45fb19c0557d104 reused"
+        },
+        {
+          "id": "STOP",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-stop-40\",\"workId\":\"1c7653f79070bad7760261a17b777ee2\",\"seq\":674,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 19 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 14384b59a31fca2e6ae975976a456ad5 reused"
+        },
+        {
+          "id": "ACCEPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-accept-42\",\"workId\":\"1bc81e8c9dd5597a6f1acb2435c3bc65\",\"seq\":715,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 20 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 3382b55c7ee189a3d896c1f05de4d341 reused"
+        },
+        {
+          "id": "ANSWER",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-answer-44\",\"workId\":\"26cd4b57367ec93baea5b89fc6d9c72c\",\"entityRefs\":{\"questionId\":\"3cce2165300d145766b75fa4a24ba9c7\"},\"seq\":739,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 21 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 878d34d4b9e556726c2c726735b91b67 reused"
+        },
+        {
+          "id": "MACHINE_FAIL",
+          "ok": true,
+          "detail": "[{\"criterionId\":\"fixed-output\",\"outcome\":\"FAIL\",\"evidenceRefs\":[\"check:check-fixture-output:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"]}]"
+        },
+        {
+          "id": "FAIL_NOT_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 22 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket f89ab1ca6c29c5af1b0c3f9b44a48bd4 reused"
+        },
+        {
+          "id": "STOP",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-stop-48\",\"workId\":\"777f9378e97fd53f9728826de0713538\",\"seq\":810,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 23 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket a89328e0f0f267a7f2222d3928db523d reused"
+        },
+        {
+          "id": "ACCEPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-accept-50\",\"workId\":\"75e9bacc67b4626f866865ac9d47f136\",\"seq\":851,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 24 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 3ff8eef5d23a16df687dc9b9a9026454 reused"
+        },
+        {
+          "id": "ANSWER",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-answer-52\",\"workId\":\"e9d30319018eac991a08d7ca797167e0\",\"entityRefs\":{\"questionId\":\"bbd3b341670baea538ace74995a9585b\"},\"seq\":875,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 25 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 144c810bca095b13f0787d947cafcd85 reused"
+        },
+        {
+          "id": "MACHINE_FAIL",
+          "ok": true,
+          "detail": "[{\"criterionId\":\"fixed-output\",\"outcome\":\"FAIL\",\"evidenceRefs\":[\"check:check-fixture-output:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"]}]"
+        },
+        {
+          "id": "FAIL_NOT_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 26 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 5b09d1f824fdfcbc2765b77023a67509 reused"
+        },
+        {
+          "id": "STOP",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-stop-56\",\"workId\":\"e73efcd27a57cca5fc924fe35eb17eff\",\"seq\":946,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 27 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 69a055c9eefaf8b2875d5b20db4075b8 reused"
+        },
+        {
+          "id": "ACCEPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-accept-58\",\"workId\":\"716544ade033975968cbd87414f29164\",\"seq\":987,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 28 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket b20f04f1117007930863bd4c148132e9 reused"
+        },
+        {
+          "id": "ANSWER",
+          "ok": true,
+          "detail": "{\"commandId\":\"e4-answer-60\",\"workId\":\"ae05ba7507405b3ef26cfaec32ebec0f\",\"entityRefs\":{\"questionId\":\"9a03f96be1b6b7285dd20e816cc78df2\"},\"seq\":1011,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "AT_MOST_ONE_ATTEMPT_PER_CYCLE",
+          "ok": true,
+          "detail": "cycle 29 created 1 attempts"
+        },
+        {
+          "id": "UNIQUE_TICKET",
+          "ok": true,
+          "detail": "ticket 8124af348ef0f3cabccfd5739a0bc9f2 reused"
+        },
+        {
+          "id": "NO_CYCLE_FAILURE",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "ALL_CYCLES_COMPLETED",
+          "ok": true
+        },
+        {
+          "id": "ATTEMPTS_RECORDED",
+          "ok": true,
+          "detail": "no cycle produced a physical attempt"
+        },
+        {
+          "id": "ATTEMPTS_MATCH_CYCLES",
+          "ok": true,
+          "detail": "30 attempts for 30 started works"
+        },
+        {
+          "id": "BEGINS_AT_LEAST_COMPLETED",
+          "ok": true,
+          "detail": "23 begin ACKs for 23 completed attempts"
+        },
+        {
+          "id": "BEGINS_NOT_MORE_THAN_ATTEMPTS",
+          "ok": true,
+          "detail": "23 begin ACKs for 30 attempts"
+        },
+        {
+          "id": "DISPATCH_OBSERVED_AT_LEAST_ATTEMPTS",
+          "ok": true,
+          "detail": "54 dispatch facts for 30 attempts"
+        },
+        {
+          "id": "PROCESS_ALIVE",
+          "ok": true
+        },
+        {
+          "id": "CHILDREN_BOUNDED",
+          "ok": true,
+          "detail": "children 0 vs baseline 0"
+        },
+        {
+          "id": "FD_BOUNDED",
+          "ok": true,
+          "detail": "fds 0 vs baseline 0"
+        },
+        {
+          "id": "RECEIPTS_MONOTONIC",
+          "ok": true
+        },
+        {
+          "id": "STATE_PERSISTED",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "cycles": {
+          "requested": 30,
+          "completed": 30,
+          "durationMs": 20689,
+          "baseline": {
+            "pid": 54456,
+            "processStart": "Wed Nov 11 14:30:33 2026",
+            "observedAt": "2026-11-11T06:30:33.630Z",
+            "ppid": 54439,
+            "rssKb": 174320,
+            "elapsed": "00:00",
+            "state": "Ss",
+            "openFds": 0,
+            "children": []
+          },
+          "baselineReceipts": 0,
+          "baselineRuntime": {
+            "attempts": [],
+            "begins": 0,
+            "observed": 0,
+            "verifications": 0
+          },
+          "observations": [
+            {
+              "cycle": 0,
+              "mode": "pass",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-d0bee2f4-d12b-4e89-971b-e0a371e52f69",
+              "durationMs": 719,
+              "rssKb": 248320,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 1,
+              "begins": 1,
+              "dispatchObserved": 2,
+              "stateKb": 1748
+            },
+            {
+              "cycle": 1,
+              "mode": "question",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-3bb6a87e-6654-42d7-a936-db4bfc684168",
+              "durationMs": 785,
+              "rssKb": 251568,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 2,
+              "begins": 2,
+              "dispatchObserved": 5,
+              "stateKb": 4080
+            },
+            {
+              "cycle": 2,
+              "mode": "fail",
+              "phase": "needs_user",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-dd567c07-c558-4465-9989-bfa65d72b546",
+              "durationMs": 661,
+              "rssKb": 248064,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 3,
+              "begins": 3,
+              "dispatchObserved": 7,
+              "stateKb": 4152
+            },
+            {
+              "cycle": 3,
+              "mode": "slow",
+              "phase": "stopping",
+              "resourceStatus": "indeterminate",
+              "hadAttempt": true,
+              "attempt": "attempt-541da498-3b56-42af-b6de-d6eea301138a",
+              "durationMs": 242,
+              "rssKb": 248096,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 3,
+              "begins": 3,
+              "dispatchObserved": 7,
+              "stateKb": 5908
+            },
+            {
+              "cycle": 4,
+              "mode": "pass",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-909e238e-25de-4cd9-b787-4ae1d4debf6d",
+              "durationMs": 713,
+              "rssKb": 249552,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 4,
+              "begins": 4,
+              "dispatchObserved": 9,
+              "stateKb": 5964
+            },
+            {
+              "cycle": 5,
+              "mode": "question",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-e9951df9-0495-435a-8fca-1ec1e804564d",
+              "durationMs": 827,
+              "rssKb": 253920,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 5,
+              "begins": 5,
+              "dispatchObserved": 12,
+              "stateKb": 6044
+            },
+            {
+              "cycle": 6,
+              "mode": "fail",
+              "phase": "needs_user",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-fd778c16-72ef-486b-9313-44c8f64190cc",
+              "durationMs": 621,
+              "rssKb": 254544,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 6,
+              "begins": 6,
+              "dispatchObserved": 14,
+              "stateKb": 6100
+            },
+            {
+              "cycle": 7,
+              "mode": "slow",
+              "phase": "stopping",
+              "resourceStatus": "indeterminate",
+              "hadAttempt": true,
+              "attempt": "attempt-960352e6-dfb5-4d52-95b2-669e036ea5c8",
+              "durationMs": 241,
+              "rssKb": 254592,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 6,
+              "begins": 6,
+              "dispatchObserved": 14,
+              "stateKb": 6132
+            },
+            {
+              "cycle": 8,
+              "mode": "pass",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-3a29f83a-71fb-4cbe-bde2-31ec9374684f",
+              "durationMs": 673,
+              "rssKb": 255360,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 7,
+              "begins": 7,
+              "dispatchObserved": 16,
+              "stateKb": 6440
+            },
+            {
+              "cycle": 9,
+              "mode": "question",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-15de58f2-290e-4b7b-b5f8-a6145e1643a8",
+              "durationMs": 811,
+              "rssKb": 255536,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 8,
+              "begins": 8,
+              "dispatchObserved": 19,
+              "stateKb": 6516
+            },
+            {
+              "cycle": 10,
+              "mode": "fail",
+              "phase": "needs_user",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-898d9c0e-a646-4fe2-9ce2-66b0fa5f1f6d",
+              "durationMs": 631,
+              "rssKb": 256192,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 9,
+              "begins": 9,
+              "dispatchObserved": 21,
+              "stateKb": 6572
+            },
+            {
+              "cycle": 11,
+              "mode": "slow",
+              "phase": "stopping",
+              "resourceStatus": "indeterminate",
+              "hadAttempt": true,
+              "attempt": "attempt-4e95c178-f44c-47b2-8dcf-d456725fdfbe",
+              "durationMs": 256,
+              "rssKb": 263024,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 9,
+              "begins": 9,
+              "dispatchObserved": 21,
+              "stateKb": 6604
+            },
+            {
+              "cycle": 12,
+              "mode": "pass",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-34d9cfca-d196-43ea-a2ce-6fe9f32a0203",
+              "durationMs": 717,
+              "rssKb": 264672,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 10,
+              "begins": 10,
+              "dispatchObserved": 23,
+              "stateKb": 7808
+            },
+            {
+              "cycle": 13,
+              "mode": "question",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-410ab8de-499d-4ad2-bc19-724aad4a34e4",
+              "durationMs": 801,
+              "rssKb": 264784,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 11,
+              "begins": 11,
+              "dispatchObserved": 26,
+              "stateKb": 7888
+            },
+            {
+              "cycle": 14,
+              "mode": "fail",
+              "phase": "needs_user",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-15c22583-0422-40e6-b3be-f51642ccb7c5",
+              "durationMs": 636,
+              "rssKb": 264928,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 12,
+              "begins": 12,
+              "dispatchObserved": 28,
+              "stateKb": 7940
+            },
+            {
+              "cycle": 15,
+              "mode": "slow",
+              "phase": "stopping",
+              "resourceStatus": "indeterminate",
+              "hadAttempt": true,
+              "attempt": "attempt-c50a0dfe-3afe-4f53-959c-e0ef945a5892",
+              "durationMs": 202,
+              "rssKb": 184496,
+              "openFds": 0,
+              "children": 1,
+              "receipts": 12,
+              "begins": 12,
+              "dispatchObserved": 28,
+              "stateKb": 3524
+            },
+            {
+              "cycle": 16,
+              "mode": "pass",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-f8f0eb7c-2731-47c4-92ec-1c8eae799537",
+              "durationMs": 752,
+              "rssKb": 250880,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 13,
+              "begins": 13,
+              "dispatchObserved": 30,
+              "stateKb": 4684
+            },
+            {
+              "cycle": 17,
+              "mode": "question",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-3147b473-ae4c-4320-9350-7f9118ec22a5",
+              "durationMs": 811,
+              "rssKb": 254000,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 14,
+              "begins": 14,
+              "dispatchObserved": 33,
+              "stateKb": 6808
+            },
+            {
+              "cycle": 18,
+              "mode": "fail",
+              "phase": "needs_user",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-aaac0c0c-c389-4d7c-aa9a-04404c8e7d3c",
+              "durationMs": 645,
+              "rssKb": 248752,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 15,
+              "begins": 15,
+              "dispatchObserved": 35,
+              "stateKb": 7888
+            },
+            {
+              "cycle": 19,
+              "mode": "slow",
+              "phase": "stopping",
+              "resourceStatus": "indeterminate",
+              "hadAttempt": true,
+              "attempt": "attempt-48268a06-507f-4f4b-adb0-4186ffd7508e",
+              "durationMs": 243,
+              "rssKb": 248928,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 15,
+              "begins": 15,
+              "dispatchObserved": 35,
+              "stateKb": 7920
+            },
+            {
+              "cycle": 20,
+              "mode": "pass",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-06b3e51c-985b-4d40-a8b1-4dd1576a2fb9",
+              "durationMs": 704,
+              "rssKb": 249296,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 16,
+              "begins": 16,
+              "dispatchObserved": 37,
+              "stateKb": 7972
+            },
+            {
+              "cycle": 21,
+              "mode": "question",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-cd13c84a-d1ce-4bd5-b6f5-ad769b706539",
+              "durationMs": 794,
+              "rssKb": 249744,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 17,
+              "begins": 17,
+              "dispatchObserved": 40,
+              "stateKb": 8048
+            },
+            {
+              "cycle": 22,
+              "mode": "fail",
+              "phase": "needs_user",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-a838301b-d68b-4693-96e5-822720e26205",
+              "durationMs": 1633,
+              "rssKb": 186464,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 18,
+              "begins": 18,
+              "dispatchObserved": 42,
+              "stateKb": 8104
+            },
+            {
+              "cycle": 23,
+              "mode": "slow",
+              "phase": "stopping",
+              "resourceStatus": "indeterminate",
+              "hadAttempt": true,
+              "attempt": "attempt-f3bebc03-e425-46f1-a80a-334211f931ad",
+              "durationMs": 365,
+              "rssKb": 186752,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 18,
+              "begins": 18,
+              "dispatchObserved": 42,
+              "stateKb": 8136
+            },
+            {
+              "cycle": 24,
+              "mode": "pass",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-9ebf476f-a741-483d-b2f8-ded262c74d5b",
+              "durationMs": 1254,
+              "rssKb": 212672,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 19,
+              "begins": 19,
+              "dispatchObserved": 44,
+              "stateKb": 8192
+            },
+            {
+              "cycle": 25,
+              "mode": "question",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-7efff1a5-df69-4e8d-ba04-1ee283faadde",
+              "durationMs": 1029,
+              "rssKb": 213136,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 20,
+              "begins": 20,
+              "dispatchObserved": 47,
+              "stateKb": 8272
+            },
+            {
+              "cycle": 26,
+              "mode": "fail",
+              "phase": "needs_user",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-37cbefa4-c204-448e-9e3c-f8872d55e28e",
+              "durationMs": 633,
+              "rssKb": 238416,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 21,
+              "begins": 21,
+              "dispatchObserved": 49,
+              "stateKb": 8324
+            },
+            {
+              "cycle": 27,
+              "mode": "slow",
+              "phase": "stopping",
+              "resourceStatus": "indeterminate",
+              "hadAttempt": true,
+              "attempt": "attempt-e9d65f6a-e19f-4521-8fa0-be2da2344f83",
+              "durationMs": 239,
+              "rssKb": 238432,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 21,
+              "begins": 21,
+              "dispatchObserved": 49,
+              "stateKb": 8356
+            },
+            {
+              "cycle": 28,
+              "mode": "pass",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-f0192301-b679-434a-8897-65061cac9091",
+              "durationMs": 711,
+              "rssKb": 238576,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 22,
+              "begins": 22,
+              "dispatchObserved": 51,
+              "stateKb": 8408
+            },
+            {
+              "cycle": 29,
+              "mode": "question",
+              "phase": "delivered",
+              "resourceStatus": "quiescent",
+              "hadAttempt": true,
+              "attempt": "attempt-d845ce6b-9749-43e3-92fd-a74ac7e3f84f",
+              "durationMs": 879,
+              "rssKb": 244496,
+              "openFds": 0,
+              "children": 0,
+              "receipts": 23,
+              "begins": 23,
+              "dispatchObserved": 54,
+              "stateKb": 8484
+            }
+          ],
+          "failures": [],
+          "attemptCount": 30,
+          "finalReceipts": 23,
+          "finalBegins": 23,
+          "finalObserved": 54,
+          "finalStateKb": 8484
+        }
+      },
+      "limitations": [
+        "Bounded local soak: mixed controlled cycles, not a long-running production soak.",
+        "RSS/FD/disk are observations of this instance only; absence of a process leak is not proven by ports.",
+        "Physical writer proof for real vendors is B-owned evidence and is not claimed here.",
+        "cycles 30/30; latency median 711ms; receipts 0->23; rss 174320->244496 kB; fds 0->0"
+      ],
+      "startedAt": "2026-11-11T06:30:33.626Z",
+      "finishedAt": "2026-11-11T06:30:54.319Z",
+      "durationMs": 20693,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-PORTABILITY-CHECKLIST",
+      "title": "Portability checklist rules accept a complete bundle and refuse an incomplete one",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "COMPLETE_ACCEPTED",
+          "ok": true
+        },
+        {
+          "id": "ROLLBACK_REQUIRED",
+          "ok": true,
+          "detail": "rollback_unsupported"
+        },
+        {
+          "id": "SAME_SIZE_DRIFT_REJECTED",
+          "ok": true,
+          "detail": "content_drift"
+        },
+        {
+          "id": "CORRUPT_REFUSED",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "fixture": {
+          "id": "bundle-checklist",
+          "path": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/fixtures/portability/bundle-checklist.json",
+          "sha256": "5bd45965753cc2bca37927094769189e6a4f96b8a34c69b88a70bbd79c66d9bd"
+        },
+        "portability": {
+          "complete": {
+            "ok": true,
+            "reason": "satisfied"
+          },
+          "noRollback": {
+            "ok": false,
+            "reason": "rollback_unsupported"
+          },
+          "installation": {
+            "status": "absent",
+            "missing": [
+              "launcher",
+              "distribution",
+              "portability"
+            ],
+            "checkedPaths": {
+              "launcher": "apps/launcher",
+              "distribution": "tools/distribution",
+              "portability": "packages/portability"
+            }
+          }
+        }
+      },
+      "limitations": [
+        "Acceptance-side checklist only; D has not published a real bundle manifest yet.",
+        "No installation, first-run, backup or rollback was executed."
+      ],
+      "startedAt": "2026-11-11T06:30:54.354Z",
+      "finishedAt": "2026-11-11T06:30:54.356Z",
+      "durationMs": 2,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-RECOVERY-READONLY",
+      "title": "A restored state starts read-only and consumes no queued business",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "WORK_RECORDED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w4-recovery-work\",\"workId\":\"a0e913c7e5c11d6eec3ebcced037c5de\",\"seq\":6,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "ROWS_OBSERVED",
+          "ok": true,
+          "detail": "{\"effect\":1,\"event_log\":6,\"runtime_bindings\":0,\"answer_deliveries\":0,\"works\":1}"
+        },
+        {
+          "id": "RECOVERY_MODE",
+          "ok": true,
+          "detail": "{\"status\":\"ok\",\"mode\":\"personal\",\"startupMode\":\"recovery_readonly\"}"
+        },
+        {
+          "id": "QUEUES_DISABLED_LOG",
+          "ok": true
+        },
+        {
+          "id": "DISPATCH_DISABLED",
+          "ok": true,
+          "detail": "{\"protocol\":\"application-configuration/1\",\"revision\":\"09f4bfc80f9c8b4a3cea59eb29e8802bfa62b75aa0aa2238f976a31b241462af\",\"reviewActivityAvailable\":false,\"decisionsAvailable\":false,\"projects\":[{\"id\":\"project-bound\",\"displayName\":\"恢复绑定项目\",\"scope\":{\"projectId\":\"project-bound\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"profileIds\":[],\"defaultCriteria\":[{\"id\":\"fixed-output\",\"de"
+        },
+        {
+          "id": "BOUND_PROJECT_READABLE",
+          "ok": true,
+          "detail": "[\"project-bound\",\"project-atlas\"]"
+        },
+        {
+          "id": "BOUND_PROJECT_DISABLED",
+          "ok": true
+        },
+        {
+          "id": "HISTORY_READABLE",
+          "ok": true,
+          "detail": "[\"a0e913c7e5c11d6eec3ebcced037c5de\"]"
+        },
+        {
+          "id": "ACTIONS_CLEARED",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "BUSINESS_WRITES_REJECTED",
+          "ok": true,
+          "detail": "[{\"path\":\"/v1/commands\",\"status\":422,\"code\":\"unsupported_capability\"},{\"path\":\"/v1/conversations/commands\",\"status\":422,\"code\":\"unsupported_capability\"},{\"path\":\"/v1/works/a0e913c7e5c11d6eec3ebcced037c5de/verification/retry\",\"status\":422,\"code\":\"unsupported_capability\"}]"
+        },
+        {
+          "id": "UNSUPPORTED_CAPABILITY",
+          "ok": true,
+          "detail": "[{\"path\":\"/v1/commands\",\"status\":422,\"code\":\"unsupported_capability\"},{\"path\":\"/v1/conversations/commands\",\"status\":422,\"code\":\"unsupported_capability\"},{\"path\":\"/v1/works/a0e913c7e5c11d6eec3ebcced037c5de/verification/retry\",\"status\":422,\"code\":\"unsupported_capability\"}]"
+        },
+        {
+          "id": "QUEUES_UNCHANGED",
+          "ok": true,
+          "detail": "{\"effect\":1,\"event_log\":6,\"runtime_bindings\":0,\"answer_deliveries\":0,\"works\":1} -> {\"effect\":1,\"event_log\":6,\"runtime_bindings\":0,\"answer_deliveries\":0,\"works\":1}"
+        },
+        {
+          "id": "STILL_RECOVERY",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "recovery": {
+          "startupMode": "recovery_readonly",
+          "rowsBefore": {
+            "effect": 1,
+            "event_log": 6,
+            "runtime_bindings": 0,
+            "answer_deliveries": 0,
+            "works": 1
+          },
+          "rowsAfter": {
+            "effect": 1,
+            "event_log": 6,
+            "runtime_bindings": 0,
+            "answer_deliveries": 0,
+            "works": 1
+          },
+          "rejectedStatuses": [
+            422,
+            422,
+            422
+          ],
+          "markerForcesRecovery": true,
+          "restartStaysReadOnly": true,
+          "boundProjectVisible": true
+        }
+      },
+      "limitations": [
+        "Controlled fixture executor with real SQLite; no vendor agent and no model task.",
+        "rows {\"effect\":1,\"event_log\":6,\"runtime_bindings\":0,\"answer_deliveries\":0,\"works\":1} unchanged across recovery start; rejected [422,422,422]"
+      ],
+      "startedAt": "2026-11-11T06:30:54.356Z",
+      "finishedAt": "2026-11-11T06:30:57.777Z",
+      "durationMs": 3421,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-DISTRIBUTION-PREREQUISITES",
+      "title": "The launcher/portability source is not merged into main even though a frozen install exists",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "Distribution source paths absent from this checkout: launcher, distribution, portability. A frozen tar.gz is published outside Git and independently accepted by E4-INSTALL-*; source-level installation and migration remain Agent D owned and are not claimed by this case.",
+      "assertions": [],
+      "evidence": {
+        "distribution": {
+          "missing": [
+            "launcher",
+            "distribution",
+            "portability"
+          ],
+          "owner": "D",
+          "requiredInputs": [
+            "source commit and buildId",
+            "manifest digest and per-file sha256/bytes",
+            "platform, Node version, SQLite ABI and dependency closure",
+            "first-run/doctor/start/stop entry points",
+            "complete backup/restore and upgrade/rollback commands"
+          ],
+          "plannedNegatives": [
+            "fresh-directory first-run and doctor, HTTP bundle instead of fixture fallback",
+            "dependency/version/ABI/port diagnosis and missing multi-profile executables",
+            "exact instance reuse, concurrent start/stop, PID reuse and state-prefix collisions",
+            "same-size content drift detected by digest, not byte count",
+            "complete backup, new-directory read-only recovery with native project bindings, upgrade rollback",
+            "rollback with an active ProductStore/WriterLock refuses before moving any file",
+            "keys, native home, session and sockets are not copied into the bundle",
+            "corrupt, traversal, version-mismatched and failed-upgrade bundles fail explicitly",
+            "a new directory alone is not a cross-machine PASS"
+          ]
+        }
+      },
+      "limitations": [
+        "Controlled fixture executor with real SQLite; no vendor agent and no model task.",
+        "Owner: Agent D. Source stays on codex/g3-local-distribution; E verifies the frozen bytes separately in e4-install.mjs."
+      ],
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-REAUTHORIZATION",
+      "title": "Recovery re-authorization: commit a new bounded grant and activate only new work",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "Read-only inspect/prepare are verified (plan authorization=not_granted, commitAvailable=false, no writes, stale/foreign/commit refused). The commit path, expiry/drift/replay/rollback of a real grant, and activation of only new work are not implemented and stay NOT_TESTED.",
+      "assertions": [],
+      "evidence": {
+        "reauthorization": {
+          "unavailable": true,
+          "verifiedOperations": [
+            "inspect",
+            "prepare"
+          ],
+          "requiredOperations": [
+            "commit"
+          ],
+          "owner": "main",
+          "verifiedBy": "E4-RECOVERY-PREFLIGHT"
+        }
+      },
+      "limitations": [
+        "Controlled fixture executor with real SQLite; no vendor agent and no model task.",
+        "Owner: main. inspect and prepare now exist and are verified by E4-RECOVERY-PREFLIGHT, but the authorization commit is not connected.",
+        "Old queues, profiles, writers and native sessions must not become authority automatically."
+      ],
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E6-REVIEW-PILOT",
+      "title": "Eight-case three-arm independent review pilot",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "Preflight BLOCKED: adapter_missing; 0/24 turns used.",
+      "assertions": [],
+      "evidence": {
+        "pilot": {
+          "unavailable": true,
+          "status": "BLOCKED",
+          "grantId": "wave05-independent-review-pilot-01",
+          "turnsUsed": 0,
+          "tokensUsed": 0,
+          "costUSD": null,
+          "reasons": [
+            "adapter_missing"
+          ],
+          "adapter": {
+            "state": "missing",
+            "path": "/Users/hh/Desktop/joker/superagent-agent-e/tools/experiments/review-pilot-01/runtime-interface.json"
+          },
+          "admissionBlockers": [
+            {
+              "code": "adapter_missing",
+              "detail": "No admitted adapter descriptor at /Users/hh/Desktop/joker/superagent-agent-e/tools/experiments/review-pilot-01/runtime-interface.json"
+            }
+          ],
+          "ledgerState": "OK",
+          "feasibility": "blocked_on_adapter_admission",
+          "requiredInputs": [
+            "one admitted adapter: executable + version + model/provider",
+            "per-component USD price with source and observed-at",
+            "an enforced whole-turn bound (input/cache-write/cached/output/reasoning/tool rounds) proven before send",
+            "isolation, session and material evidence bound to the same adapter",
+            "an explicit main admission for this frozen protocol"
+          ]
+        }
+      },
+      "limitations": [
+        "Owner: E (grant execution) + B (bounded runtime). Protocol and cases are frozen; no turn was sent.",
+        "BLOCKED is not a value result and must not be reported as promising/no-go."
+      ],
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E5-NATIVE-CONTROL",
+      "title": "Real native stop, question and recovery control",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "No executed native stop/question/recovery evidence is available in this checkout.",
+      "assertions": [],
+      "evidence": {
+        "nativeControl": {
+          "unavailable": true,
+          "required": [
+            "executed",
+            "version",
+            "attempt",
+            "command",
+            "stop",
+            "question",
+            "recovery",
+            "budget",
+            "evidenceRefs"
+          ],
+          "owner": "B"
+        }
+      },
+      "limitations": [
+        "Owner: B. No current native control result is supplied as an input to E.",
+        "E has no budget for native tasks and will not substitute fixture processes."
+      ],
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+      "title": "The frozen install bytes match the recorded artifact identity",
+      "layer": "installed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "TAR_DIGEST_base",
+          "ok": true,
+          "detail": "8b728b610d980fa9fa4a37886ecd50a3a767098ce7f4bec5bf9b35cb552b5c5d"
+        },
+        {
+          "id": "TAR_BYTES_base",
+          "ok": true,
+          "detail": "19762074"
+        },
+        {
+          "id": "TAR_DIGEST_upgrade",
+          "ok": true,
+          "detail": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631"
+        },
+        {
+          "id": "TAR_BYTES_upgrade",
+          "ok": true,
+          "detail": "19911757"
+        },
+        {
+          "id": "INSTALL_PROTOCOL",
+          "ok": true,
+          "detail": "pa-install"
+        },
+        {
+          "id": "INSTALL_BUILD_ID",
+          "ok": true,
+          "detail": "b0f87c883aa6b206"
+        },
+        {
+          "id": "INSTALL_MANIFEST_DIGEST",
+          "ok": true,
+          "detail": "64444cb87130593d656738fd6929333533738f73b1cfec0c2858eaa4c823d5b9"
+        },
+        {
+          "id": "RELEASE_MANIFEST_DIGEST",
+          "ok": true,
+          "detail": "962c89dc85d593dd211a80108cf8f71b2fdfd72df09718e6c5e239c5625c4e7f"
+        },
+        {
+          "id": "PRODUCER_PLATFORM",
+          "ok": true,
+          "detail": "darwin/arm64"
+        },
+        {
+          "id": "PRODUCER_NODE",
+          "ok": true,
+          "detail": "24.21.0"
+        },
+        {
+          "id": "PRODUCER_ABI",
+          "ok": true,
+          "detail": "137/3.53.4"
+        },
+        {
+          "id": "SOURCE_COMMIT",
+          "ok": true,
+          "detail": "9046d4c5d3b9f583ba6384b851c32cc5703437c9"
+        },
+        {
+          "id": "DEPENDENCY_CLOSURE",
+          "ok": true,
+          "detail": "[\"@hono/node-server\",\"better-sqlite3\",\"hono\",\"node-addon-api\",\"openai\",\"semver\",\"yaml\",\"zod\"]"
+        },
+        {
+          "id": "ENTRYPOINT_pa.mjs",
+          "ok": true,
+          "detail": "app/apps/launcher/bin/pa.mjs"
+        },
+        {
+          "id": "ENTRYPOINT_demo.ts",
+          "ok": true,
+          "detail": "app/apps/coordinator/product/demo.ts"
+        },
+        {
+          "id": "ENTRYPOINT_index.html",
+          "ok": true,
+          "detail": "app/apps/console/dist/index.html"
+        },
+        {
+          "id": "ENTRYPOINT_better-sqlite3",
+          "ok": true,
+          "detail": "app/node_modules/better-sqlite3"
+        },
+        {
+          "id": "NO_CHECKOUT_REFERENCES",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "LAUNCHER_VERSION",
+          "ok": true,
+          "detail": "{\"name\":\"pa\",\"product\":\"dsh-superagent\",\"version\":\"0.1.0\",\"node\":\"24.21.0\"}"
+        },
+        {
+          "id": "UPGRADE_BUILD_ID",
+          "ok": true,
+          "detail": "7e8f6ce6fa2e2633"
+        },
+        {
+          "id": "UPGRADE_INSTALL_DIGEST",
+          "ok": true,
+          "detail": "09041204af46dca6810a070b4f2cba9895f07e2a56776ec8472af96ef785b548"
+        },
+        {
+          "id": "UPGRADE_RELEASE_DIGEST",
+          "ok": true,
+          "detail": "749ed6b304e6cfe782ae50987b94fa29cfa49c85e3d884b126485f546b8eb87e"
+        },
+        {
+          "id": "UPGRADE_SOURCE",
+          "ok": true,
+          "detail": "{\"commit\":\"e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389\",\"branch\":\"codex/g3-local-distribution\",\"dirty\":false}"
+        },
+        {
+          "id": "UPGRADE_SCHEMA",
+          "ok": true,
+          "detail": "13"
+        },
+        {
+          "id": "DISTINCT_BUILDS",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "artifact": {
+          "artifacts": [
+            {
+              "role": "base",
+              "name": "wave06-alpha-b0f87c88",
+              "buildId": "b0f87c883aa6b206",
+              "tarSha256": "8b728b610d980fa9fa4a37886ecd50a3a767098ce7f4bec5bf9b35cb552b5c5d",
+              "schema": 12,
+              "source": {
+                "commit": "9046d4c5d3b9f583ba6384b851c32cc5703437c9",
+                "branch": "codex/g3-local-distribution",
+                "dirty": true
+              }
+            },
+            {
+              "role": "upgrade",
+              "name": "wave06-alpha2-7e8f6ce6",
+              "buildId": "7e8f6ce6fa2e2633",
+              "tarSha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631",
+              "schema": 13,
+              "source": {
+                "commit": "e10bfdb7a74f40b72a5e61d0debb0ed0bdd22389",
+                "branch": "codex/g3-local-distribution",
+                "dirty": false
+              }
+            }
+          ],
+          "producer": {
+            "product": "dsh-superagent",
+            "version": "0.1.0",
+            "node": "24.21.0",
+            "pnpm": "11.7.0",
+            "sqlite": "3.53.4",
+            "productSchema": 12,
+            "platform": "darwin",
+            "arch": "arm64",
+            "abi": "137"
+          },
+          "scannedModules": 486,
+          "extractedAt": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX"
+        },
+        "installation": {
+          "status": "installed",
+          "bundleVersion": "b0f87c883aa6b206",
+          "bundleDigest": "8b728b610d980fa9fa4a37886ecd50a3a767098ce7f4bec5bf9b35cb552b5c5d",
+          "stagedPath": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base",
+          "originalCheckoutAvailable": false,
+          "independence": {
+            "scannedRuntimeModules": 486,
+            "checkoutReferences": 0,
+            "workingDirectory": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX"
+          },
+          "source": {
+            "commit": "9046d4c5d3b9f583ba6384b851c32cc5703437c9",
+            "branch": "codex/g3-local-distribution",
+            "dirty": true
+          },
+          "steps": [
+            {
+              "id": "tar_digest_and_bytes",
+              "status": "PASS"
+            },
+            {
+              "id": "extract_outside_checkout",
+              "status": "PASS"
+            },
+            {
+              "id": "install_manifest_digests",
+              "status": "PASS"
+            },
+            {
+              "id": "producer_runtime_and_abi",
+              "status": "PASS"
+            },
+            {
+              "id": "no_checkout_references",
+              "status": "PASS"
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "Same-machine staged install from D's frozen tar.gz; only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured.",
+        "No vendor model call, no personal native end-to-end; the controlled fixture executor is used inside the install."
+      ],
+      "startedAt": "2026-11-11T06:31:02.209Z",
+      "finishedAt": "2026-11-11T06:31:02.851Z",
+      "durationMs": 642,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-INSTALL-FIRST-RUN",
+      "title": "First-run, doctor, start, static workbench and stop work inside the extracted install",
+      "layer": "installed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "FIRST_RUN",
+          "ok": true,
+          "detail": "{\n  \"status\": \"OK\",\n  \"configFile\": \"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/var/config/launcher.json\",\n  \"created\": [\n    \"data\",\n    \"cache\",\n    \"logs\",\n    \"workspace\"\n  ],\n  \"roots\": {\n    \"install\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/app\",\n    \"config\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/"
+        },
+        {
+          "id": "FIRST_RUN_NO_CREDENTIALS",
+          "ok": true,
+          "detail": "[\"No credential, model key or native session is collected by first-run.\",\"darwin/arm64 is the only measured candidate.\"]"
+        },
+        {
+          "id": "DOCTOR_EXIT",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "id": "DOCTOR_RUNTIME",
+          "ok": true,
+          "detail": "{\"node_version\":\"PASS\",\"platform\":\"PASS\",\"sqlite_binding\":\"PASS\",\"release_manifest\":\"PASS\",\"console_assets\":\"PASS\",\"console_mode\":\"PASS\",\"runtime_dependencies\":\"PASS\",\"source_identity\":\"WARN\",\"runtime_abi\":\"PASS\",\"support_matrix\":\"PASS\",\"roots\":\"PASS\",\"instance\":\"WARN\",\"state\":\"WARN\",\"recovery_marker\":\"PASS\",\"ports\":\"WARN\",\"executor_codex\":\"PASS\",\"review_executor\":\"WARN\"}"
+        },
+        {
+          "id": "DOCTOR_RELEASE",
+          "ok": true,
+          "detail": "{\"node_version\":\"PASS\",\"platform\":\"PASS\",\"sqlite_binding\":\"PASS\",\"release_manifest\":\"PASS\",\"console_assets\":\"PASS\",\"console_mode\":\"PASS\",\"runtime_dependencies\":\"PASS\",\"source_identity\":\"WARN\",\"runtime_abi\":\"PASS\",\"support_matrix\":\"PASS\",\"roots\":\"PASS\",\"instance\":\"WARN\",\"state\":\"WARN\",\"recovery_marker\":\"PASS\",\"ports\":\"WARN\",\"executor_codex\":\"PASS\",\"review_executor\":\"WARN\"}"
+        },
+        {
+          "id": "START_RUNNING",
+          "ok": true,
+          "detail": "{\"status\":\"RUNNING\",\"stderr\":\"\"}"
+        },
+        {
+          "id": "START_BUILD",
+          "ok": true,
+          "detail": "b0f87c883aa6b206"
+        },
+        {
+          "id": "START_STATE_INSIDE_INSTALL",
+          "ok": true,
+          "detail": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/var/data"
+        },
+        {
+          "id": "STATIC_WORKBENCH",
+          "ok": true,
+          "detail": "<!doctype html>\n<html lang=\"zh-CN\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <m"
+        },
+        {
+          "id": "STATIC_PROXY_HEALTH",
+          "ok": true,
+          "detail": "{\"status\":\"ok\",\"mode\":\"fixture\",\"access\":\"local-development\"}"
+        },
+        {
+          "id": "DIRECT_API_HEALTH",
+          "ok": true,
+          "detail": "{\"status\":\"ok\",\"mode\":\"fixture\",\"access\":\"local-development\"}"
+        },
+        {
+          "id": "STATUS_RUNNING",
+          "ok": true,
+          "detail": "{\"status\":0,\"value\":\"RUNNING\"}"
+        },
+        {
+          "id": "STOP",
+          "ok": true,
+          "detail": "{\"ok\":true,\"status\":\"STOPPED\",\"stopped\":true,\"stillAlive\":false,\"code\":null,\"verification\":{\"ok\":true,\"checks\":[{\"id\":\"launcher_alive\",\"ok\":true},{\"id\":\"process_start\",\"ok\":true,\"detail\":\"Wed Nov 11 14:31:03 2026\"},{\"id\":\"launcher_command\",\"ok\":true,\"detail\":\"exact_argv\"},{\"id\":\"owner\",\"ok\":true},{\"id\":\"cwd\",\"ok\":true,\"detail\":\"cwd_checked\"},{\"id\":\"install_identity\",\"ok\":true},{\"id\":\"api_argv\",\"ok"
+        },
+        {
+          "id": "STATUS_STOPPED",
+          "ok": true,
+          "detail": "{\"status\":2,\"value\":\"STOPPED\"}"
+        }
+      ],
+      "evidence": {
+        "install": {
+          "firstRun": "OK",
+          "doctor": {
+            "status": "DEGRADED",
+            "checks": {
+              "node_version": "PASS",
+              "platform": "PASS",
+              "sqlite_binding": "PASS",
+              "release_manifest": "PASS",
+              "console_assets": "PASS",
+              "console_mode": "PASS",
+              "runtime_dependencies": "PASS",
+              "source_identity": "WARN",
+              "runtime_abi": "PASS",
+              "support_matrix": "PASS",
+              "roots": "PASS",
+              "instance": "WARN",
+              "state": "WARN",
+              "recovery_marker": "PASS",
+              "ports": "WARN",
+              "executor_codex": "PASS",
+              "review_executor": "WARN"
+            }
+          },
+          "instance": {
+            "pid": 61721,
+            "consoleURL": "http://127.0.0.1:59882",
+            "apiURL": "http://127.0.0.1:59883",
+            "buildId": "b0f87c883aa6b206",
+            "startupMode": "normal"
+          },
+          "health": {
+            "status": "ok",
+            "mode": "fixture",
+            "access": "local-development"
+          },
+          "staticHtmlBytes": 447
+        },
+        "findings": [
+          {
+            "id": "config_root_override_drops_release_manifest",
+            "owner": "agent-d",
+            "observed": [
+              "base:FAIL",
+              "upgrade:FAIL"
+            ],
+            "code": "No built release manifest is recorded for this install",
+            "repro": "PA_CONFIG_ROOT=<fresh dir> <install>/bin/pa first-run && PA_CONFIG_ROOT=<fresh dir> <install>/bin/pa doctor --json",
+            "impact": "A colleague who moves the config root out of either install cannot start; only the in-install var/config finds release.json."
+          }
+        ]
+      },
+      "limitations": [
+        "Same-machine staged install from D's frozen tar.gz; only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured.",
+        "No vendor model call, no personal native end-to-end; the controlled fixture executor is used inside the install."
+      ],
+      "startedAt": "2026-11-11T06:31:02.852Z",
+      "finishedAt": "2026-11-11T06:31:06.688Z",
+      "durationMs": 3836,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-INSTALL-REUSE-CONCURRENCY",
+      "title": "Instance identity is reused only for an exact match and concurrent starts do not fork",
+      "layer": "installed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "FIRST_RUNNING",
+          "ok": true,
+          "detail": "{\"status\":\"RUNNING\"}"
+        },
+        {
+          "id": "REUSE_STATUS",
+          "ok": true,
+          "detail": "{\"status\":0,\"value\":\"REUSED\"}"
+        },
+        {
+          "id": "REUSE_SAME_PID",
+          "ok": true,
+          "detail": "62169 vs 62169"
+        },
+        {
+          "id": "IDENTITY_CONFLICT",
+          "ok": true,
+          "detail": "{\"status\":2,\"code\":\"instance_conflict\"}"
+        },
+        {
+          "id": "CONFLICT_LISTS_DIFFERENCE",
+          "ok": true,
+          "detail": "{\"differences\":[{\"field\":\"consoleURL\",\"expected\":\"http://127.0.0.1:59902\",\"actual\":\"http://127.0.0.1:59900\"},{\"field\":\"apiURL\",\"expected\":\"http://127.0.0.1:59903\",\"actual\":\"http://127.0.0.1:59901\"}],\"running\":{\"pid\":62169,\"consoleURL\":\"http://127.0.0.1:59900\",\"state\":\"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/var/data\"}}"
+        },
+        {
+          "id": "CONCURRENT_SINGLE_WINNER",
+          "ok": true,
+          "detail": "[[\"RUNNING\",null],[\"BLOCKED\",\"start_in_progress\"]]"
+        },
+        {
+          "id": "CONCURRENT_ONE_RECORD",
+          "ok": true,
+          "detail": "{\"status\":0,\"pid\":62626}"
+        }
+      ],
+      "evidence": {
+        "reuse": {
+          "pid": 62169,
+          "reusedPid": 62169,
+          "conflictCode": "instance_conflict",
+          "conflictDifferences": [
+            {
+              "field": "consoleURL",
+              "expected": "http://127.0.0.1:59902",
+              "actual": "http://127.0.0.1:59900"
+            },
+            {
+              "field": "apiURL",
+              "expected": "http://127.0.0.1:59903",
+              "actual": "http://127.0.0.1:59901"
+            }
+          ],
+          "concurrent": [
+            {
+              "status": "RUNNING"
+            },
+            {
+              "status": "BLOCKED",
+              "code": "start_in_progress"
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "Same-machine staged install from D's frozen tar.gz; only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured.",
+        "No vendor model call, no personal native end-to-end; the controlled fixture executor is used inside the install."
+      ],
+      "startedAt": "2026-11-11T06:31:06.689Z",
+      "finishedAt": "2026-11-11T06:31:09.857Z",
+      "durationMs": 3168,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-BACKUP-RESTORE",
+      "title": "A full backup restores read-only into a new state with recovery authorization blocked",
+      "layer": "installed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "RUNNING",
+          "ok": true,
+          "detail": "{\"status\":\"RUNNING\"}"
+        },
+        {
+          "id": "SEEDED_WORK",
+          "ok": true,
+          "detail": "{\"workId\":\"85715232ef9fd252442de5daec879d53\",\"phase\":\"delivered\",\"artifactIds\":[\"1d2a3db6c8000d5f37ae9a7c264907982c50d9ffc6bea538504c0bb56eefb44c\",\"57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506\",\"48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b\",\"e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682\"],\"acceptedReceipt\":\"recorded\",\"answeredQuestions\":0,"
+        },
+        {
+          "id": "SEEDED_ARTIFACT",
+          "ok": true,
+          "detail": "{\"workId\":\"85715232ef9fd252442de5daec879d53\",\"phase\":\"delivered\",\"artifactIds\":[\"1d2a3db6c8000d5f37ae9a7c264907982c50d9ffc6bea538504c0bb56eefb44c\",\"57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506\",\"48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b\",\"e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682\"],\"acceptedReceipt\":\"recorded\",\"answeredQuestions\":0,"
+        },
+        {
+          "id": "SEEDED_SNAPSHOT",
+          "ok": true,
+          "detail": "[\"85715232ef9fd252442de5daec879d53\"]"
+        },
+        {
+          "id": "BACKUP",
+          "ok": true,
+          "detail": "{\n  \"ok\": true,\n  \"status\": \"CREATED\",\n  \"bundlePath\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/state.pab\",\n  \"archiveSha256\": \"8fd175c143d9eca011df0e924bd933faabf48daf47368f3a769b2a0c689f8db4\",\n  \"manifestDigest\": \"6c340ae631d57f700c7440eff81a608b91869b7d3ad89c0a49725485d0d2400e\",\n  \"bytes\": 30608,\n  \"counts\": {\n    \"entries\": 14,\n    \"artifacts\": 13,\n    \"exc"
+        },
+        {
+          "id": "BACKUP_ARTIFACT",
+          "ok": true,
+          "detail": "{\"entries\":14,\"artifacts\":13,\"excluded\":10}"
+        },
+        {
+          "id": "BACKUP_DB",
+          "ok": true,
+          "detail": "{\"integrity\":\"ok\",\"foreignKeyViolations\":0,\"eventSeq\":39}"
+        },
+        {
+          "id": "VERIFY_BACKUP",
+          "ok": true,
+          "detail": "{\n  \"ok\": true,\n  \"status\": \"VERIFIED\",\n  \"bundlePath\": \"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/state.pab\",\n  \"manifestDigest\": \"6c340ae631d57f700c7440eff81a608b91869b7d3ad89c0a49725485d0d2400e\",\n  \"archiveSha256\": \"8fd175c143d9eca011df0e924bd933faabf48daf47368f3a769b2a0c689f8db4\",\n  \"bytes\": 30608,\n  \"createdAt\": \"2026-11-11T06:31:11.798Z\",\n  \"producer\": {\n    \"produ"
+        },
+        {
+          "id": "RESTORE",
+          "ok": true,
+          "detail": "{\n  \"ok\": true,\n  \"status\": \"RESTORED\",\n  \"target\": \"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/restored-state\",\n  \"reportPath\": \"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/restored-state/restore-report.json\",\n  \"report\": {\n    \"protocol\": \"personal-restore/1\",\n    \"createdAt\": \"2026-11-11T06:31:12.097Z\",\n    \"bundle\": {\n      \"archiveSha256\": \"8"
+        },
+        {
+          "id": "RESTORE_REPORT",
+          "ok": true,
+          "detail": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/restored-state/restore-report.json"
+        },
+        {
+          "id": "RECOVERY_MARKER",
+          "ok": true,
+          "detail": "{\"protocol\":\"personal-recovery-status/1\",\"checkedAt\":\"2026-11-11T06:31:12.198Z\",\"stateName\":\"restored-state\",\"markerPresent\":true,\"markerValid\":true,\"markerPath\":\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/restored-state/restore-report.json\",\"startupMode\":\"recovery_readonly\",\"pendingRebind\":[],\"requiresRevalidation\":[\"Native execution environment and policy evidence were "
+        },
+        {
+          "id": "RECOVERY_AUTH_BLOCKED",
+          "ok": true,
+          "detail": "{\"status\":\"BLOCKED\",\"owner\":\"main\",\"interface\":\"recovery inspect/prepare/commit public interface (WP-16/0023 §6)\",\"reason\":\"This build has only the read-only startup gate. Fresh binding/verification, an explicit plan with TTL/fingerprint and transactional new-work authorization are main-owned and not published yet; D does not guess HTTP shapes or add a force switch.\",\"requiredInputs\":[\"inspect: re"
+        },
+        {
+          "id": "RESTORED_RUNNING",
+          "ok": true,
+          "detail": "{\"status\":\"RUNNING\"}"
+        },
+        {
+          "id": "RESTORED_MODE",
+          "ok": true,
+          "detail": "recovery_readonly"
+        },
+        {
+          "id": "RESTORED_HISTORY_READABLE",
+          "ok": true,
+          "detail": "[\"85715232ef9fd252442de5daec879d53\"]"
+        },
+        {
+          "id": "RESTORED_WORK_DELIVERED",
+          "ok": true,
+          "detail": "{\"phase\":\"delivered\",\"artifacts\":[\"1d2a3db6c8000d5f37ae9a7c264907982c50d9ffc6bea538504c0bb56eefb44c\",\"57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506\",\"48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b\",\"e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682\"]}"
+        },
+        {
+          "id": "RESTORED_ARTIFACT_BYTES",
+          "ok": true,
+          "detail": "[[\"1d2a3db6c8000d5f37ae9a7c264907982c50d9ffc6bea538504c0bb56eefb44c\",\"57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506\",\"48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b\",\"e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682\"]]"
+        },
+        {
+          "id": "RESTORED_BUSINESS_422",
+          "ok": true,
+          "detail": "{\"status\":422,\"body\":{\"error\":{\"code\":\"unsupported_capability\",\"message\":\"Restored state is read-only until explicit recovery and local revalidation\",\"retry\":\"none\"}}}"
+        }
+      ],
+      "evidence": {
+        "restore": {
+          "bundleSha256": "8fd175c143d9eca011df0e924bd933faabf48daf47368f3a769b2a0c689f8db4",
+          "bundleBytes": 30608,
+          "counts": {
+            "entries": 14,
+            "artifacts": 13,
+            "excluded": 10
+          },
+          "database": {
+            "integrity": "ok",
+            "foreignKeyViolations": 0,
+            "eventSeq": 39
+          },
+          "restoreReport": "recovery_readonly",
+          "authorization": {
+            "status": "BLOCKED",
+            "owner": "main",
+            "interface": "recovery inspect/prepare/commit public interface (WP-16/0023 §6)",
+            "reason": "This build has only the read-only startup gate. Fresh binding/verification, an explicit plan with TTL/fingerprint and transactional new-work authorization are main-owned and not published yet; D does not guess HTTP shapes or add a force switch.",
+            "requiredInputs": [
+              "inspect: read-only recovery state, verifiable sources and blockers; never dispatch old queue",
+              "prepare: re-verify machine/project paths/executor/environment/evidence and return a bounded plan snapshot",
+              "commit: authenticated confirmation of the exact plan/current fingerprint with idempotent receipt, drift rejection and same-transaction authorization"
+            ],
+            "forbidden": [
+              "delete restore marker",
+              "force switch",
+              "replay old queue",
+              "old writer/native session as new authority",
+              "second auth/key store"
+            ]
+          },
+          "businessStatus": 422,
+          "decisionSurface": "unavailable_404:invalid_request"
+        }
+      },
+      "limitations": [
+        "Same-machine staged install from D's frozen tar.gz; only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured.",
+        "No vendor model call, no personal native end-to-end; the controlled fixture executor is used inside the install."
+      ],
+      "startedAt": "2026-11-11T06:31:09.858Z",
+      "finishedAt": "2026-11-11T06:31:13.121Z",
+      "durationMs": 3263,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-INSTALL-TAMPER",
+      "title": "A same-size or missing artifact and a corrupt bundle are refused",
+      "layer": "installed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "TAMPER_SAME_SIZE",
+          "ok": true
+        },
+        {
+          "id": "TAMPER_START_BLOCKED",
+          "ok": true,
+          "detail": "{\"status\":2,\"code\":\"release_artifact_missing\"}"
+        },
+        {
+          "id": "TAMPER_CODE",
+          "ok": true,
+          "detail": "{\"code\":\"release_artifact_missing\",\"message\":\"构建产物与 release manifest 的内容摘要不一致\"}"
+        },
+        {
+          "id": "TAMPER_RESTORED_STARTS",
+          "ok": true,
+          "detail": "{\"status\":0}"
+        },
+        {
+          "id": "RELEASE_LISTS_ARTIFACTS",
+          "ok": true,
+          "detail": "[{\"path\":\"LICENSE\",\"bytes\":1078,\"sha256\":\"6d66f91815b720e18cfb2b3552043a0359236aec9a1a6917787900546f6ce550\",\"kind\":\"license\"},{\"path\":\"apps/console/dist/.pa-console-build.json\",\"bytes\":186,\"sha256\":\"20636816a4ffa40eda8fb76160df615375ee97b0f2f4495e1722e288fa27c793\",\"kind\":\"console\"}]"
+        },
+        {
+          "id": "MISSING_ARTIFACT_BLOCKED",
+          "ok": true,
+          "detail": "{\"status\":2,\"code\":\"release_artifact_missing\"}"
+        },
+        {
+          "id": "HAVE_BUNDLE",
+          "ok": true,
+          "detail": "{\n  \"ok\": true,\n  \"status\": \"CREATED\",\n  \"bundlePath\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/tamper-bundle.pab\",\n  \"archiveSha256\": \"892453ad7584db0a28915ee6a279c03c15f8f093734bf0b152f13e538800802f\",\n  \"manifestDigest\": \"988bb14d9abe948553b5518eed1af6c6c23a6474ec29b033aede9c4565c8dc2b\",\n  \"bytes\": 30608,\n  \"counts\": {\n    \"entries\": 14,\n    \"artifacts\": 13,\n"
+        },
+        {
+          "id": "CORRUPT_BUNDLE_REFUSED",
+          "ok": true,
+          "detail": "{\"status\":2,\"code\":\"archive_checksum_mismatch\"}"
+        }
+      ],
+      "evidence": {
+        "tamper": {
+          "sameSizeCode": "release_artifact_missing",
+          "missingCode": "release_artifact_missing",
+          "corruptBundleCode": "archive_checksum_mismatch"
+        }
+      },
+      "limitations": [
+        "Same-machine staged install from D's frozen tar.gz; only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured.",
+        "No vendor model call, no personal native end-to-end; the controlled fixture executor is used inside the install."
+      ],
+      "startedAt": "2026-11-11T06:31:13.122Z",
+      "finishedAt": "2026-11-11T06:31:56.981Z",
+      "durationMs": 43859,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-INSTALL-ROLLBACK",
+      "title": "A pre-change backup rolls the state back and the install starts again",
+      "layer": "installed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "PRE_BACKUP",
+          "ok": true,
+          "detail": "{\n  \"ok\": true,\n  \"status\": \"CREATED\",\n  \"bundlePath\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/pre-rollback.pab\",\n  \"archiveSha256\": \"6986d2cffb555946f2ba77d7df4246fb4cec3872b92f7e1c474a1f36e50748b9\",\n  \"manifestDigest\": \"c071d86771ec2e7ec8e8b17d81c81f6661d88615726e3c8af9a00e42807dacaf\",\n  \"bytes\": 30608,\n  \"counts\": {\n    \"entries\": 14,\n    \"artifacts\": 13,\n "
+        },
+        {
+          "id": "STATE_ROOT",
+          "ok": true,
+          "detail": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/var/data"
+        },
+        {
+          "id": "RUNNING",
+          "ok": true,
+          "detail": "{\"status\":\"RUNNING\"}"
+        },
+        {
+          "id": "POST_BACKUP_WRITE",
+          "ok": true,
+          "detail": "{\"commandId\":\"post-backup-1794378717957\",\"seq\":41,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "POST_BACKUP_MESSAGE",
+          "ok": true,
+          "detail": "{\"id\":\"cfd7fe20d44693aa1e948bc95fcfa54a\",\"conversationId\":\"conv-install\",\"sequence\":4,\"role\":\"user\",\"projectId\":\"project-atlas\",\"provenance\":\"trusted_user\",\"text\":\"备份之后新增的消息，回滚后必须消失。\",\"sourceRefs\":[],\"createdAt\":\"2026-11-11T06:31:57.960Z\"}"
+        },
+        {
+          "id": "ROLLBACK",
+          "ok": true,
+          "detail": "{\n  \"ok\": true,\n  \"status\": \"ROLLED_BACK\",\n  \"target\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/var/data\",\n  \"bundlePath\": \"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/pre-rollback.pab\",\n  \"failedDir\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/var/data.failed-2026-11-11T06-31-58-567Z\",\n  \"re"
+        },
+        {
+          "id": "STARTS_AFTER_ROLLBACK",
+          "ok": true,
+          "detail": "{\"status\":\"RUNNING\"}"
+        },
+        {
+          "id": "POST_BACKUP_GONE",
+          "ok": true,
+          "detail": "\"本机服务正在关闭，模型生成已停止，未自动重发。\""
+        }
+      ],
+      "evidence": {
+        "rollback": {
+          "bundleSha256": "6986d2cffb555946f2ba77d7df4246fb4cec3872b92f7e1c474a1f36e50748b9",
+          "target": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/var/data",
+          "postBackupReceipt": "recorded"
+        }
+      },
+      "limitations": [
+        "Same-machine staged install from D's frozen tar.gz; only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured.",
+        "No vendor model call, no personal native end-to-end; the controlled fixture executor is used inside the install."
+      ],
+      "startedAt": "2026-11-11T06:31:56.981Z",
+      "finishedAt": "2026-11-11T06:31:59.631Z",
+      "durationMs": 2650,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-UPGRADE-ROLLBACK",
+      "title": "A second frozen build upgrades real data; the old binary refuses the new schema and an explicit restore does not delete it",
+      "layer": "installed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "FIRST_RUN_base",
+          "ok": true,
+          "detail": "{\n  \"status\": \"OK\",\n  \"configFile\": \"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/var/config/launcher.json\",\n  \"created\": [],\n  \"roots\": {\n    \"install\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/app\",\n    \"config\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/var/config\",\n    \"data\": \"/priv"
+        },
+        {
+          "id": "FIRST_RUN_upgrade",
+          "ok": true,
+          "detail": "{\n  \"status\": \"OK\",\n  \"configFile\": \"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/upgrade/var/config/launcher.json\",\n  \"created\": [],\n  \"roots\": {\n    \"install\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/upgrade/app\",\n    \"config\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/upgrade/var/config\",\n    \"data"
+        },
+        {
+          "id": "BASE_RUNNING",
+          "ok": true,
+          "detail": "{\"status\":\"RUNNING\"}"
+        },
+        {
+          "id": "BASE_SEEDED",
+          "ok": true,
+          "detail": "{\"workId\":\"d8126c163af3265e6dc6360d35c7cef5\",\"phase\":\"delivered\",\"artifactIds\":[\"d523d9a9445a93a9b3665075b29b579dbef2f4c659f6adabaf4083f458814394\",\"57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506\",\"48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b\",\"d46c4eb88aa018ea6adefaaa2bc64811792bdee7bb6e2e332211972820bc69cc\"],\"acceptedReceipt\":\"recorded\",\"answeredQuestions\":0,"
+        },
+        {
+          "id": "BASE_SCHEMA",
+          "ok": true,
+          "detail": "12"
+        },
+        {
+          "id": "PRE_UPGRADE_BACKUP",
+          "ok": true,
+          "detail": "{\n  \"ok\": true,\n  \"status\": \"CREATED\",\n  \"bundlePath\": \"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/pre-upgrade.pab\",\n  \"archiveSha256\": \"75089327f135042a563a95c0d349bc460df8d7140ad2e3a46830ee5dc61cf698\",\n  \"manifestDigest\": \"94a607d33e093b39d880e3c7c8eaecd549206eb2264da70dfe65ae37cdf87e3f\",\n  \"bytes\": 30637,\n  \"counts\": {\n    \"entries\": 14,\n    \"artifacts\": 13,\n  "
+        },
+        {
+          "id": "UPGRADE_RUNNING",
+          "ok": true,
+          "detail": "{\"status\":\"RUNNING\",\"stderr\":\"\"}"
+        },
+        {
+          "id": "UPGRADE_BUILD_RUNNING",
+          "ok": true,
+          "detail": "7e8f6ce6fa2e2633"
+        },
+        {
+          "id": "SCHEMA_MIGRATED",
+          "ok": true,
+          "detail": "13"
+        },
+        {
+          "id": "PRE_UPGRADE_DATA_READABLE",
+          "ok": true,
+          "detail": "{\"id\":\"bb97162b1889f181c8e6d5a4a3f60df3\",\"conversationId\":\"conv-upgrade\",\"sequence\":3,\"role\":\"system\",\"projectId\":\"project-atlas\",\"provenance\":\"application_notice\",\"text\":\"本机服务正在关闭，模型生成已停止，未自动重发。\",\"sourceRefs\":[\"880138c7b2c51d935261b6732395a1e5\"],\"createdAt\":\"2026-11-11T06:32:01.692Z\"}"
+        },
+        {
+          "id": "POST_UPGRADE_WRITE",
+          "ok": true,
+          "detail": "{\"commandId\":\"post-upgrade-1794378723137\",\"seq\":41,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "POST_UPGRADE_MESSAGE",
+          "ok": true
+        },
+        {
+          "id": "MESSAGE_GROWTH",
+          "ok": true,
+          "detail": "3 -> 4"
+        },
+        {
+          "id": "WORK_INTACT",
+          "ok": true,
+          "detail": "{\"phase\":\"delivered\",\"artifacts\":[\"d523d9a9445a93a9b3665075b29b579dbef2f4c659f6adabaf4083f458814394\",\"57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506\",\"48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b\",\"d46c4eb88aa018ea6adefaaa2bc64811792bdee7bb6e2e332211972820bc69cc\"]}"
+        },
+        {
+          "id": "OLD_BINARY_REFUSED",
+          "ok": true,
+          "detail": "{\"status\":\"BLOCKED\",\"exitCode\":2,\"code\":\"daemon_start_failed\"}"
+        },
+        {
+          "id": "OLD_BINARY_MIGRATION_ERROR",
+          "ok": true,
+          "detail": "5)\n[err]     at file:///private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/base/app/apps/coordinator/product/demo.ts:34:15\n[err]     at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\n[err]     at async node:internal/modules/esm/loader:647:26\n[err]     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n[err] \n[err] Node.js v24.21.0\n"
+        },
+        {
+          "id": "DATA_NOT_DELETED",
+          "ok": true,
+          "detail": "13 messages 5 (was 4)"
+        },
+        {
+          "id": "RESTORE_EXPLICIT",
+          "ok": true,
+          "detail": "{\n  \"ok\": true,\n  \"status\": \"RESTORED\",\n  \"target\": \"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/restored-pre-upgrade\",\n  \"reportPath\": \"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-install-eIp0dX/restored-pre-upgrade/restore-report.json\",\n  \"report\": {\n    \"protocol\": \"personal-restore/1\",\n    \"createdAt\": \"2026-11-11T06:32:04.259Z\",\n    \"bundle\": {\n      \"archiv"
+        },
+        {
+          "id": "RESTORED_SCHEMA",
+          "ok": true,
+          "detail": "12"
+        },
+        {
+          "id": "RESTORED_DATA",
+          "ok": true
+        },
+        {
+          "id": "RESTORED_STARTS",
+          "ok": true,
+          "detail": "{\"status\":\"RUNNING\"}"
+        },
+        {
+          "id": "RESTORED_UPGRADED_STATE_KEPT",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "upgrade": {
+          "base": {
+            "buildId": "b0f87c883aa6b206",
+            "schema": 12,
+            "tarSha256": "8b728b610d980fa9fa4a37886ecd50a3a767098ce7f4bec5bf9b35cb552b5c5d"
+          },
+          "upgrade": {
+            "buildId": "7e8f6ce6fa2e2633",
+            "schema": 13,
+            "tarSha256": "0fe0ed53e6c4f50ff87fa9fe14518f1f45ca4bbf3c5cb9322c8babbeed1c7631"
+          },
+          "migratedSchema": 13,
+          "messages": {
+            "before": 3,
+            "after": 4
+          },
+          "preUpgradeDataReadable": true,
+          "postUpgradeMessageKept": true,
+          "oldBinary": {
+            "code": "daemon_start_failed",
+            "migrationError": true,
+            "dataUntouched": true,
+            "detail": null
+          },
+          "explicitRestore": {
+            "schema": 12,
+            "upgradedStateKept": true
+          }
+        }
+      },
+      "limitations": [
+        "Same-machine staged install from D's frozen tar.gz; only darwin/arm64 + Node 24.21.x + SQLite ABI 137 is measured.",
+        "No vendor model call, no personal native end-to-end; the controlled fixture executor is used inside the install."
+      ],
+      "startedAt": "2026-11-11T06:31:59.631Z",
+      "finishedAt": "2026-11-11T06:32:05.201Z",
+      "durationMs": 5570,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E4-RECOVERY-PREFLIGHT",
+      "title": "Read-only recovery inspect/prepare is bounded, writes nothing and grants no authority",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "INSPECT_200",
+          "ok": true,
+          "detail": "status 200 {\"protocol\":\"recovery-inspection/1\",\"state\":\"recovery_readonly\",\"observedAt\":\"2026-11-11T06:32:06.770Z\",\"inspectionFingerprint\":\"312830df26a6176b4c22e68f3b8cc3ea83d00195f059b2794029027c9a5ba948\",\"markerDigest\":\"e8f6305cf4176e3824612d1173be5ba411529666ca9c782a7598fe30c498d18d\",\"productSchema\":13,\"eventCursor\":0,\"heldQueue\":{\"waiting\":0,\"parked\":0},\"sourceWorksScanned\":0,\"sourceScanTrunca"
+        },
+        {
+          "id": "INSPECT_PROTOCOL",
+          "ok": true,
+          "detail": "recovery-inspection/1"
+        },
+        {
+          "id": "INSPECT_STATE",
+          "ok": true,
+          "detail": "recovery_readonly"
+        },
+        {
+          "id": "INSPECT_MARKER",
+          "ok": true,
+          "detail": "e8f6305cf4176e3824612d1173be5ba411529666ca9c782a7598fe30c498d18d"
+        },
+        {
+          "id": "INSPECT_NO_AUTHORITY",
+          "ok": true,
+          "detail": "[{\"code\":\"authorization_not_implemented\",\"owner\":\"main\",\"detail\":\"Recovery authorization commit is not connected; old business queues remain disabled\"}]"
+        },
+        {
+          "id": "INSPECT_PROJECTS",
+          "ok": true,
+          "detail": "[{\"id\":\"project-atlas\",\"displayName\":\"流程测试项目\"}]"
+        },
+        {
+          "id": "PREPARE_200",
+          "ok": true,
+          "detail": "status 200 {\"protocol\":\"recovery-plan/1\",\"planId\":\"recovery-plan-1c6534c9-45ce-42fb-a4cd-5e1d7ba49743\",\"inspectionFingerprint\":\"312830df26a6176b4c22e68f3b8cc3ea83d00195f059b2794029027c9a5ba948\",\"createdAt\":\"2026-11-11T06:32:06.912Z\",\"expiresAt\":\"2026-11-11T06:37:06.912Z\",\"bindings\":[{\"sourceProjectId\":\"project-atlas\",\"proposedProjectId\":\"project-5b5e57c4a7736aa41a9af63e\",\"path\":\"/private/var/folde"
+        },
+        {
+          "id": "PLAN_PROTOCOL",
+          "ok": true,
+          "detail": "recovery-plan/1"
+        },
+        {
+          "id": "PLAN_NO_AUTHORITY",
+          "ok": true,
+          "detail": "{\"authorization\":\"not_granted\",\"commitAvailable\":false}"
+        },
+        {
+          "id": "PLAN_FINGERPRINT",
+          "ok": true,
+          "detail": "312830df26a6176b4c22e68f3b8cc3ea83d00195f059b2794029027c9a5ba948"
+        },
+        {
+          "id": "PLAN_BINDING",
+          "ok": true,
+          "detail": "[{\"sourceProjectId\":\"project-atlas\",\"proposedProjectId\":\"project-5b5e57c4a7736aa41a9af63e\",\"path\":\"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-recovery-git-v2NgnP\",\"headCommit\":\"16c0dd2d06ed58e7de259a9e345b10ba8b1c0682\",\"configurationDigest\":\"ee70e8287c9c680f35052bc3567ab7992099c5853ecc157086f5121cc8e6e3af\",\"scopeDigest\":\"1cc9973fda6f2b4bd80bfd40ee23455865b20788492782d37e52fff75777"
+        },
+        {
+          "id": "PLAN_TTL_BOUNDED",
+          "ok": true,
+          "detail": "ttl 300000"
+        },
+        {
+          "id": "PLAN_BLOCKERS_NAMED",
+          "ok": true,
+          "detail": "[{\"code\":\"authorization_not_implemented\",\"owner\":\"main\",\"detail\":\"Recovery authorization commit is not connected; old business queues remain disabled\"}]"
+        },
+        {
+          "id": "PLAN_ARTIFACT_SCAN",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "id": "PREPARE_WRITES_NOTHING",
+          "ok": true,
+          "detail": "{\"event_log\":0,\"works\":0,\"command_receipts\":0,\"runtime_bindings\":0} -> {\"event_log\":0,\"works\":0,\"command_receipts\":0,\"runtime_bindings\":0}"
+        },
+        {
+          "id": "MARKER_UNCHANGED",
+          "ok": true
+        },
+        {
+          "id": "BINDINGS_UNSAVED",
+          "ok": true
+        },
+        {
+          "id": "PREPARE_REPLAY_WRITES_NOTHING",
+          "ok": true,
+          "detail": "status 200"
+        },
+        {
+          "id": "PREPARE_REPLAY_NEW_PLAN",
+          "ok": true,
+          "detail": "{\"first\":\"recovery-plan-1c6534c9-45ce-42fb-a4cd-5e1d7ba49743\",\"second\":\"recovery-plan-2b8b706f-9e31-4ee0-aa09-8e35950835d0\"}"
+        },
+        {
+          "id": "NO_PLAN_PERSISTED",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "RESTART_INSPECT",
+          "ok": true,
+          "detail": "status 200"
+        },
+        {
+          "id": "RESTART_NO_AUTHORITY",
+          "ok": true,
+          "detail": "false"
+        },
+        {
+          "id": "RESTART_DRIFT_REJECTED",
+          "ok": true,
+          "detail": "changed true status 409"
+        },
+        {
+          "id": "RESTART_PLAN_STILL_UNGRANTED",
+          "ok": true,
+          "detail": "{\"status\":200,\"authorization\":\"not_granted\"}"
+        },
+        {
+          "id": "STALE_FINGERPRINT_REFUSED",
+          "ok": true,
+          "detail": "status 409 {\"error\":{\"code\":\"conflict\",\"message\":\"Recovery inspection changed; inspect again\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "FOREIGN_PROJECT_REFUSED",
+          "ok": true,
+          "detail": "status 403 {\"error\":{\"code\":\"forbidden\",\"message\":\"Recovery binding refers to an unconfigured source project\",\"retry\":\"none\"}}"
+        },
+        {
+          "id": "COMMIT_REFUSED",
+          "ok": true,
+          "detail": "status 422 {\"error\":{\"code\":\"unsupported_capability\",\"message\":\"Restored state is read-only until explicit recovery and local revalidation\",\"retry\":\"none\"}}"
+        },
+        {
+          "id": "NORMAL_INSPECT_NOT_RESTORED",
+          "ok": true,
+          "detail": "[{\"code\":\"not_restored\",\"owner\":\"main\",\"detail\":\"This instance is not a restored read-only state\"},{\"code\":\"authorization_not_implemented\",\"owner\":\"main\",\"detail\":\"Recovery authorization commit is not connected; old business queues remain disabled\"}]"
+        },
+        {
+          "id": "NORMAL_PREPARE_REFUSED",
+          "ok": true,
+          "detail": "status 422 {\"error\":{\"code\":\"unsupported_capability\",\"message\":\"Recovery preflight requires read-only startup\",\"retry\":\"user_action\"}}"
+        }
+      ],
+      "evidence": {
+        "recoveryPreflight": {
+          "inspection": {
+            "protocol": "recovery-inspection/1",
+            "state": "recovery_readonly",
+            "markerDigest": "e8f6305cf4176e3824612d1173be5ba411529666ca9c782a7598fe30c498d18d",
+            "blockerCodes": [
+              "authorization_not_implemented"
+            ],
+            "sourceWorksScanned": 0
+          },
+          "plan": {
+            "protocol": "recovery-plan/1",
+            "authorization": "not_granted",
+            "commitAvailable": false,
+            "bindings": [
+              {
+                "sourceProjectId": "project-atlas",
+                "headCommit": "16c0dd2d06ed58e7de259a9e345b10ba8b1c0682"
+              }
+            ],
+            "artifactsChecked": 0,
+            "blockerCodes": [
+              "authorization_not_implemented"
+            ],
+            "ttlMs": 300000
+          },
+          "writes": {
+            "rowsBefore": {
+              "event_log": 0,
+              "works": 0,
+              "command_receipts": 0,
+              "runtime_bindings": 0
+            },
+            "rowsAfter": {
+              "event_log": 0,
+              "works": 0,
+              "command_receipts": 0,
+              "runtime_bindings": 0
+            },
+            "markerUnchanged": true,
+            "bindingsUnsaved": true
+          },
+          "replay": {
+            "planIdStable": false,
+            "secondPlanId": "recovery-plan-2b8b706f-9e31-4ee0-aa09-8e35950835d0",
+            "noPlanFile": true
+          },
+          "restart": {
+            "fingerprintStable": false,
+            "driftStatus": 409,
+            "authorization": "not_granted"
+          },
+          "refusals": {
+            "staleFingerprint": 409,
+            "foreignProject": 403,
+            "commit": 422,
+            "normalPrepare": 422
+          }
+        }
+      },
+      "limitations": [
+        "Controlled fixture executor with real SQLite; the recovery plan is diagnostics, not authorization.",
+        "Commit of a new authorization is still main-owned and not implemented; this case does not claim it."
+      ],
+      "startedAt": "2026-11-11T06:32:06.256Z",
+      "finishedAt": "2026-11-11T06:32:07.691Z",
+      "durationMs": 1435,
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    },
+    {
+      "id": "E5-RECOVERY-INTERRUPTION",
+      "title": "Recovery activation survives or refuses each controlled interruption window",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main has no recovery commit/activation entry. Required inputs: source-committed activation fact, prepared target identity/bytes, activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Owner: main. inspect/prepare are verified read-only by E4-RECOVERY-PREFLIGHT; commit and activation are not published.",
+        "No target state is prepared by the current build, so half-prepared targets and activation pointer switches cannot be executed without inventing a private protocol."
+      ],
+      "source": {
+        "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6"
+      }
+    }
+  ],
+  "declaredGaps": [
+    {
+      "id": "E4-DISTRIBUTION-PREREQUISITES",
+      "status": "NOT_TESTED",
+      "reason": "Distribution source paths absent from this checkout: launcher, distribution, portability. A frozen tar.gz is published outside Git and independently accepted by E4-INSTALL-*; source-level installation and migration remain Agent D owned and are not claimed by this case."
+    },
+    {
+      "id": "E4-REAUTHORIZATION",
+      "status": "NOT_TESTED",
+      "reason": "Read-only inspect/prepare are verified (plan authorization=not_granted, commitAvailable=false, no writes, stale/foreign/commit refused). The commit path, expiry/drift/replay/rollback of a real grant, and activation of only new work are not implemented and stay NOT_TESTED."
+    },
+    {
+      "id": "E6-REVIEW-PILOT",
+      "status": "NOT_TESTED",
+      "reason": "Preflight BLOCKED: adapter_missing; 0/24 turns used."
+    },
+    {
+      "id": "E5-NATIVE-CONTROL",
+      "status": "NOT_TESTED",
+      "reason": "No executed native stop/question/recovery evidence is available in this checkout."
+    },
+    {
+      "id": "E5-RECOVERY-INTERRUPTION",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main has no recovery commit/activation entry. Required inputs: source-committed activation fact, prepared target identity/bytes, activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority."
+    }
+  ],
+  "release": {
+    "schema": "product-acceptance-release/1",
+    "tier": "installed-alpha",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-11T06:32:07.715Z",
+    "source": {
+      "commit": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6",
+      "dirty": true
+    },
+    "expectedSource": "c2ae2d25f848ba595685905a8ffdc6e6e3d9f0f6",
+    "requirements": [
+      {
+        "id": "E1-GATE-CONTROL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-CASE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-REPORT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-NO-CANDIDATE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-VACUOUS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-DUPLICATE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-BAD-PATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-SCHEMA",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-FIXTURE-STRICT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-FIXTURE-PORTABILITY-STRICT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-WRONG-LAYER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-DIRTY-SOURCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-SOURCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-STALE-REPORT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-CROSS-COMMIT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-UNBOUND-CASE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-CASE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-FAILED-ASSERTION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-DOWNLOAD-DIGEST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-NOT-APPLIED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-DIGEST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-DUPLICATE-ID",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-STATUS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-LAYER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-VERSION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-STAGED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NOT-TESTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-SELF-CLAIM",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ADMISSION-PROBE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-ADMISSION-FAIL-CLOSED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-PREFLIGHT-NO-FALLBACK",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-STRUCTURE-TIER-SUPERSET",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-STRUCTURE-NO-ALLOW-GAP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-OVERLAP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-EXPIRED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-DISPOSITION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-VERSION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-BUDGET",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-ZERO-TURNS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-CONFIGURATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-DAILY-VERTICAL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ARTIFACT-ROUNDTRIP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REOPEN-PERSISTENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REPLAY-AND-CONFLICT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-SESSION-ISOLATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-STALE-BUSINESS-REJECTION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-MACHINE-FAIL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ONE-WRITER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-AUTH-AND-ORIGIN",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ASSISTANT-SDK-MOCK",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-CONVERSATION-CATALOG",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ATTENTION-SIGNAL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REVIEW-TIMING",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ROUTE-FIXTURE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-REVIEW-FIXTURES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-SEALED-COPY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-REVIEW-ACTIVITY-UI",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-CONVERSATION-UI",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-VERIFICATION-RECOVERY-UI",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-READONLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-RECOVERY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-VERIFICATION-FINISHED-STATES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-FIRST-RUN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-REUSE-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-BACKUP-RESTORE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-TAMPER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-ROLLBACK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-UPGRADE-ROLLBACK",
+        "required": true,
+        "status": "PASS"
+      }
+    ],
+    "failures": [
+      {
+        "code": "source_dirty",
+        "detail": "Release evidence requires a clean source worktree"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-CONTROL is absent",
+        "caseId": "E1-GATE-CONTROL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-MISSING-CASE is absent",
+        "caseId": "E1-GATE-REJECT-MISSING-CASE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNKNOWN-STATUS is absent",
+        "caseId": "E1-GATE-REJECT-UNKNOWN-STATUS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNCERTAIN-ACCEPT is absent",
+        "caseId": "E1-GATE-REJECT-UNCERTAIN-ACCEPT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-STALE-REPORT is absent",
+        "caseId": "E1-GATE-REJECT-STALE-REPORT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-SOURCE-MISMATCH is absent",
+        "caseId": "E1-GATE-REJECT-SOURCE-MISMATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-NO-CANDIDATE is absent",
+        "caseId": "E1-GATE-REJECT-NO-CANDIDATE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-VACUOUS is absent",
+        "caseId": "E1-GATE-REJECT-VACUOUS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-FAILED-ASSERTION is absent",
+        "caseId": "E1-GATE-REJECT-FAILED-ASSERTION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-MISSING-EVIDENCE is absent",
+        "caseId": "E1-GATE-REJECT-MISSING-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-DUPLICATE is absent",
+        "caseId": "E1-GATE-REJECT-DUPLICATE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-BAD-PATCH is absent",
+        "caseId": "E1-GATE-REJECT-BAD-PATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNAPPLIED-PATCH is absent",
+        "caseId": "E1-GATE-REJECT-UNAPPLIED-PATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-MALFORMED-PATCH is absent",
+        "caseId": "E1-GATE-REJECT-MALFORMED-PATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNEXECUTED-NATIVE is absent",
+        "caseId": "E1-GATE-REJECT-UNEXECUTED-NATIVE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-INVALID-RESPONSE is absent",
+        "caseId": "E1-GATE-REJECT-INVALID-RESPONSE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-STALE-CASE-BINDING is absent",
+        "caseId": "E1-GATE-REJECT-STALE-CASE-BINDING"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-FIXTURE-DRIFT is absent",
+        "caseId": "E1-GATE-REJECT-FIXTURE-DRIFT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-SCHEMA is absent",
+        "caseId": "E1-GATE-REJECT-SCHEMA"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-FIXTURE-STRICT is absent",
+        "caseId": "E1-FIXTURE-STRICT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-FIXTURE-PORTABILITY-STRICT is absent",
+        "caseId": "E1-FIXTURE-PORTABILITY-STRICT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-WRONG-LAYER is absent",
+        "caseId": "E1-MUTATE-WRONG-LAYER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-DIRTY-SOURCE is absent",
+        "caseId": "E1-MUTATE-DIRTY-SOURCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-MISSING-SOURCE is absent",
+        "caseId": "E1-MUTATE-MISSING-SOURCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-STALE-REPORT is absent",
+        "caseId": "E1-MUTATE-STALE-REPORT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-CROSS-COMMIT is absent",
+        "caseId": "E1-MUTATE-CROSS-COMMIT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-UNBOUND-CASE is absent",
+        "caseId": "E1-MUTATE-UNBOUND-CASE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-EMPTY-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-EMPTY-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-EMPTY-OBJECT-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-MISSING-CASE is absent",
+        "caseId": "E1-MUTATE-MISSING-CASE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-FAILED-ASSERTION is absent",
+        "caseId": "E1-MUTATE-FAILED-ASSERTION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NO-DOWNLOAD-BYTES is absent",
+        "caseId": "E1-MUTATE-NO-DOWNLOAD-BYTES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-DOWNLOAD-DIGEST is absent",
+        "caseId": "E1-MUTATE-DOWNLOAD-DIGEST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PATCH-NOT-APPLIED is absent",
+        "caseId": "E1-MUTATE-PATCH-NOT-APPLIED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PATCH-DIGEST is absent",
+        "caseId": "E1-MUTATE-PATCH-DIGEST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-DUPLICATE-ID is absent",
+        "caseId": "E1-MUTATE-DUPLICATE-ID"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-UNKNOWN-STATUS is absent",
+        "caseId": "E1-MUTATE-UNKNOWN-STATUS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-UNKNOWN-LAYER is absent",
+        "caseId": "E1-MUTATE-UNKNOWN-LAYER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NOT-EXECUTED is absent",
+        "caseId": "E1-MUTATE-NATIVE-NOT-EXECUTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-VERSION is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-VERSION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-ATTEMPT is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-ATTEMPT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-MODEL-TASKS is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-MODEL-TASKS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-INSTALL-NOT-STAGED is absent",
+        "caseId": "E1-MUTATE-INSTALL-NOT-STAGED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-INSTALL-NOT-INDEPENDENT is absent",
+        "caseId": "E1-MUTATE-INSTALL-NOT-INDEPENDENT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NOT-TESTED is absent",
+        "caseId": "E1-MUTATE-NOT-TESTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-SELF-CLAIM is absent",
+        "caseId": "E1-MUTATE-SELF-CLAIM"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ADMISSION-PROBE is absent",
+        "caseId": "E1-MUTATE-ADMISSION-PROBE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-ADMISSION-FAIL-CLOSED is absent",
+        "caseId": "E1-ADMISSION-FAIL-CLOSED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-PREFLIGHT-NO-FALLBACK is absent",
+        "caseId": "E1-PREFLIGHT-NO-FALLBACK"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-STRUCTURE-TIER-SUPERSET is absent",
+        "caseId": "E1-STRUCTURE-TIER-SUPERSET"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-STRUCTURE-NO-ALLOW-GAP is absent",
+        "caseId": "E1-STRUCTURE-NO-ALLOW-GAP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-NO-ELIGIBLE is absent",
+        "caseId": "E1-MUTATE-ROUTE-NO-ELIGIBLE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-OVERLAP is absent",
+        "caseId": "E1-MUTATE-ROUTE-OVERLAP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-EXPIRED is absent",
+        "caseId": "E1-MUTATE-ROUTE-EXPIRED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-NO-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-ROUTE-NO-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-DEFAULT-PATH is absent",
+        "caseId": "E1-MUTATE-ROUTE-DEFAULT-PATH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-DISPOSITION is absent",
+        "caseId": "E1-MUTATE-REVIEW-DISPOSITION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-SAME-ASSIGNMENT is absent",
+        "caseId": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-NO-ISOLATION is absent",
+        "caseId": "E1-MUTATE-REVIEW-NO-ISOLATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-BAD-DIGEST is absent",
+        "caseId": "E1-MUTATE-REVIEW-BAD-DIGEST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-SAME-PROTOCOL is absent",
+        "caseId": "E1-MUTATE-HETERO-SAME-PROTOCOL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NOT-EXECUTED is absent",
+        "caseId": "E1-MUTATE-HETERO-NOT-EXECUTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-VERSION is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-VERSION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-BUDGET is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-BUDGET"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-ISOLATION is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-ISOLATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-SUBJECT is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-SUBJECT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED is absent",
+        "caseId": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-CONTROL-NO-STOP is absent",
+        "caseId": "E1-MUTATE-NATIVE-CONTROL-NO-STOP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY is absent",
+        "caseId": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-ZERO-TURNS is absent",
+        "caseId": "E1-MUTATE-PILOT-ZERO-TURNS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-UNKNOWN-USAGE is absent",
+        "caseId": "E1-MUTATE-PILOT-UNKNOWN-USAGE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-BLOCKED-PASS is absent",
+        "caseId": "E1-MUTATE-PILOT-BLOCKED-PASS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-NO-ORACLE is absent",
+        "caseId": "E1-MUTATE-PILOT-NO-ORACLE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-CONFIGURATION is absent",
+        "caseId": "E2-CONFIGURATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-DAILY-VERTICAL is absent",
+        "caseId": "E2-DAILY-VERTICAL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ARTIFACT-ROUNDTRIP is absent",
+        "caseId": "E2-ARTIFACT-ROUNDTRIP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-WORK-EVIDENCE is absent",
+        "caseId": "E2-WORK-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REOPEN-PERSISTENCE is absent",
+        "caseId": "E2-REOPEN-PERSISTENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REPLAY-AND-CONFLICT is absent",
+        "caseId": "E2-REPLAY-AND-CONFLICT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-SESSION-ISOLATION is absent",
+        "caseId": "E2-SESSION-ISOLATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-STALE-BUSINESS-REJECTION is absent",
+        "caseId": "E2-STALE-BUSINESS-REJECTION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-MACHINE-FAIL is absent",
+        "caseId": "E2-MACHINE-FAIL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ONE-WRITER is absent",
+        "caseId": "E2-ONE-WRITER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-SCOPE-AND-PROFILE-GUARDS is absent",
+        "caseId": "E2-SCOPE-AND-PROFILE-GUARDS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-AUTH-AND-ORIGIN is absent",
+        "caseId": "E2-AUTH-AND-ORIGIN"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ASSISTANT-SDK-MOCK is absent",
+        "caseId": "E2-ASSISTANT-SDK-MOCK"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-CONVERSATION-CATALOG is absent",
+        "caseId": "E2-CONVERSATION-CATALOG"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ATTENTION-SIGNAL is absent",
+        "caseId": "E2-ATTENTION-SIGNAL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REVIEW-TIMING is absent",
+        "caseId": "E2-REVIEW-TIMING"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ROUTE-FIXTURE is absent",
+        "caseId": "E2-ROUTE-FIXTURE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-REVIEW-FIXTURES is absent",
+        "caseId": "E3-REVIEW-FIXTURES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-SEALED-COPY is absent",
+        "caseId": "E3-SEALED-COPY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-REVIEW-ACTIVITY-UI is absent",
+        "caseId": "E3-REVIEW-ACTIVITY-UI"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-ATTENTION-INBOX is absent",
+        "caseId": "E3-ATTENTION-INBOX"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-ATTENTION-INBOX-UI is absent",
+        "caseId": "E3-ATTENTION-INBOX-UI"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-DECISION-WORKFLOW is absent",
+        "caseId": "E3-DECISION-WORKFLOW"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-DESKTOP-GEOMETRY is absent",
+        "caseId": "E3-DESKTOP-GEOMETRY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-NOTEBOOK-GEOMETRY is absent",
+        "caseId": "E3-NOTEBOOK-GEOMETRY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-MOBILE-GEOMETRY is absent",
+        "caseId": "E3-MOBILE-GEOMETRY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-QUESTION-FORM is absent",
+        "caseId": "E3-QUESTION-FORM"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-ACCEPT-AND-DOWNLOAD is absent",
+        "caseId": "E3-ACCEPT-AND-DOWNLOAD"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-ASSISTANT-SCHEMA-FIXTURES is absent",
+        "caseId": "E3-ASSISTANT-SCHEMA-FIXTURES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-CONVERSATION-UI is absent",
+        "caseId": "E3-CONVERSATION-UI"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-VERIFICATION-RECOVERY-UI is absent",
+        "caseId": "E3-VERIFICATION-RECOVERY-UI"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-OFFLINE-AND-ERROR is absent",
+        "caseId": "E3-OFFLINE-AND-ERROR"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-KEYBOARD-AND-SCROLL is absent",
+        "caseId": "E3-KEYBOARD-AND-SCROLL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-VERIFICATION-RECOVERY is absent",
+        "caseId": "E2-VERIFICATION-RECOVERY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-VERIFICATION-FINISHED-STATES is absent",
+        "caseId": "E2-VERIFICATION-FINISHED-STATES"
+      }
+    ],
+    "claimedBy": null,
+    "notes": [
+      "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+      "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+    ]
+  },
+  "claim": {
+    "status": "FAIL",
+    "tier": "installed-alpha",
+    "decidedAt": "2026-11-11T06:32:07.715Z",
+    "failureCodes": [
+      "source_dirty",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "status": "FAIL_ADMISSION_PROBES",
+  "sourceCommit": "39d6e05863e87a2d7aad4326a765720f077f37f4",
+  "checkedAt": "2026-11-14T07:40:16.508Z",
+  "acceptanceCandidate": "39d6e05863e87a2d7aad4326a765720f077f37f4",
+  "modelCalls": 0,
+  "scope": "Read-only domain/gate probes; no service or native task",
+  "cases": [
+    {
+      "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+      "owner": "C",
+      "status": "PASS",
+      "ok": true,
+      "actual": {
+        "effective": false,
+        "listCount": 0
+      },
+      "expected": {
+        "effective": false,
+        "listCount": 0
+      }
+    },
+    {
+      "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+      "owner": "C",
+      "status": "PASS",
+      "ok": true,
+      "actual": {
+        "foreignActorRefused": true
+      },
+      "expected": {
+        "foreignActorRefused": true
+      }
+    },
+    {
+      "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+      "owner": "C",
+      "status": "PASS",
+      "ok": true,
+      "actual": {
+        "callerChangedStoredGrant": false
+      },
+      "expected": {
+        "callerChangedStoredGrant": false
+      }
+    },
+    {
+      "id": "E-FULL-PRODUCT-REQUIRES-EXECUTED-NATIVE",
+      "owner": "E",
+      "status": "ERROR",
+      "message": "Cannot read properties of undefined (reading 'filtered')"
+    }
+  ]
+}

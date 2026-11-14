@@ -162,6 +162,12 @@ export async function runLifecycle() {
       const birth = started.birth
       let fresh, freshExact, stopped, released, beforeStop
       try {
+        // Wait (bounded) for the shell's exec so the recorded identity names the exact roots.
+        for (let attempt = 0; attempt < 30; attempt += 1) {
+          const probe = liveIdentity(birth.pid)
+          if (argvHasExactPath(probe.command ?? '', root.state) || !probe.alive) break
+          await new Promise(resolvePromise => setTimeout(resolvePromise, 100))
+        }
         fresh = liveIdentity(birth.pid)
         freshExact = argvHasExactPath(fresh.command, root.install) && argvHasExactPath(fresh.command, root.state)
         writeSyntheticRecord(root, recordFor(root, { pid: birth.pid, start: fresh.start }))
@@ -170,7 +176,7 @@ export async function runLifecycle() {
         released = releaseRoot(root, stopped)
         evidence.lifecycleStartWindow = { status: value.status, birth: { pid: birth.pid, start: birth.start, uid: birth.uid, recordedAt: birth.recordedAt },
           fresh: { start: fresh.start, uid: fresh.uid, command: fresh.command, argvExact: freshExact },
-          beforeStop, reason: stopped.reason ?? null, signals: stopped.signals, released }
+          beforeStop, reason: stopped.reason ?? null, clean: stopped.clean, signals: stopped.signals, released }
       } finally { try { started.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
       assert('WINDOW_TIMEOUT', value.status === 'TIMEOUT', value.status)
       assert('WINDOW_BIRTH_NONEMPTY', Number.isSafeInteger(birth.pid) && typeof birth.start === 'string' && birth.start.length > 0, JSON.stringify(birth))

@@ -1,0 +1,3129 @@
+{
+  "status": "PASS_ADMISSION_PROBES",
+  "sourceCommit": "5264cbddf39aa7ce00bf50eb8d2a09ca26de97a4",
+  "checkedAt": "2026-11-13T08:18:52.397Z",
+  "acceptanceCandidate": "5264cbddf39aa7ce00bf50eb8d2a09ca26de97a4",
+  "modelCalls": 0,
+  "scope": "Read-only domain/gate probes; no service or native task",
+  "cases": [
+    {
+      "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+      "owner": "C",
+      "status": "PASS",
+      "ok": true,
+      "actual": {
+        "effective": false,
+        "listCount": 0
+      },
+      "expected": {
+        "effective": false,
+        "listCount": 0
+      }
+    },
+    {
+      "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+      "owner": "C",
+      "status": "PASS",
+      "ok": true,
+      "actual": {
+        "foreignActorRefused": true
+      },
+      "expected": {
+        "foreignActorRefused": true
+      }
+    },
+    {
+      "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+      "owner": "C",
+      "status": "PASS",
+      "ok": true,
+      "actual": {
+        "callerChangedStoredGrant": false
+      },
+      "expected": {
+        "callerChangedStoredGrant": false
+      }
+    },
+    {
+      "id": "E-FULL-PRODUCT-REQUIRES-EXECUTED-NATIVE",
+      "owner": "E",
+      "status": "PASS",
+      "ok": true,
+      "actual": {
+        "verdict": "FAIL",
+        "dirtySource": true,
+        "executedNative": false,
+        "layer": "controlled-fixture",
+        "failures": [
+          {
+            "code": "source_dirty",
+            "detail": "Release evidence requires a clean source worktree"
+          },
+          {
+            "code": "bad_patch",
+            "detail": "Patch digest_malformed",
+            "caseId": "E2-DAILY-VERTICAL"
+          },
+          {
+            "code": "bad_patch",
+            "detail": "Patch bytes_missing",
+            "caseId": "E2-DAILY-VERTICAL"
+          },
+          {
+            "code": "bad_patch",
+            "detail": "Patch not_applied",
+            "caseId": "E2-DAILY-VERTICAL"
+          },
+          {
+            "code": "bad_patch",
+            "detail": "Patch target_commit_missing",
+            "caseId": "E2-DAILY-VERTICAL"
+          },
+          {
+            "code": "bad_patch",
+            "detail": "Patch baseline_path_missing",
+            "caseId": "E2-DAILY-VERTICAL"
+          },
+          {
+            "code": "bad_download",
+            "detail": "Download digest_malformed",
+            "caseId": "E3-ACCEPT-AND-DOWNLOAD"
+          },
+          {
+            "code": "bad_download",
+            "detail": "Download bytes_missing",
+            "caseId": "E3-ACCEPT-AND-DOWNLOAD"
+          },
+          {
+            "code": "bad_download",
+            "detail": "Download filename_missing",
+            "caseId": "E3-ACCEPT-AND-DOWNLOAD"
+          },
+          {
+            "code": "current_install_failed",
+            "detail": "A current install PASS requires an actual RUNNING personal process",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "upgrade_faults_failed",
+            "detail": "Fault window crash_after_stop has no actual fault/recover/data result",
+            "caseId": "E4-UPGRADE-FAULTS"
+          },
+          {
+            "code": "upgrade_faults_failed",
+            "detail": "Fault window crash_after_stop_kill has no actual fault/recover/data result",
+            "caseId": "E4-UPGRADE-FAULTS"
+          },
+          {
+            "code": "upgrade_faults_failed",
+            "detail": "Fault window target_unhealthy has no actual fault/recover/data result",
+            "caseId": "E4-UPGRADE-FAULTS"
+          },
+          {
+            "code": "ownership_copy_failed",
+            "detail": "Ownership copy PASS needs exit/code from the actual stop attempt",
+            "caseId": "E7-OWNERSHIP-COPY"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-CONTROL ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-CONTROL"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-CONTROL is not bound to the report source",
+            "caseId": "E1-GATE-CONTROL"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-MISSING-CASE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-MISSING-CASE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-MISSING-CASE is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-MISSING-CASE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-UNKNOWN-STATUS ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-UNKNOWN-STATUS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-UNKNOWN-STATUS is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-UNKNOWN-STATUS"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-UNCERTAIN-ACCEPT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-UNCERTAIN-ACCEPT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-UNCERTAIN-ACCEPT is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-UNCERTAIN-ACCEPT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-STALE-REPORT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-STALE-REPORT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-STALE-REPORT is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-STALE-REPORT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-SOURCE-MISMATCH ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-SOURCE-MISMATCH"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-SOURCE-MISMATCH is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-SOURCE-MISMATCH"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-NO-CANDIDATE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-NO-CANDIDATE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-NO-CANDIDATE is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-NO-CANDIDATE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-VACUOUS ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-VACUOUS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-VACUOUS is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-VACUOUS"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-FAILED-ASSERTION ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-FAILED-ASSERTION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-FAILED-ASSERTION is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-FAILED-ASSERTION"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-MISSING-EVIDENCE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-MISSING-EVIDENCE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-MISSING-EVIDENCE is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-MISSING-EVIDENCE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-DUPLICATE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-DUPLICATE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-DUPLICATE is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-DUPLICATE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-BAD-PATCH ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-BAD-PATCH"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-BAD-PATCH is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-BAD-PATCH"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-UNAPPLIED-PATCH ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-UNAPPLIED-PATCH"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-UNAPPLIED-PATCH is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-UNAPPLIED-PATCH"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-MALFORMED-PATCH ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-MALFORMED-PATCH"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-MALFORMED-PATCH is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-MALFORMED-PATCH"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-UNEXECUTED-NATIVE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-UNEXECUTED-NATIVE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-UNEXECUTED-NATIVE is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-UNEXECUTED-NATIVE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-INVALID-RESPONSE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-INVALID-RESPONSE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-INVALID-RESPONSE is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-INVALID-RESPONSE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-STALE-CASE-BINDING ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-STALE-CASE-BINDING"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-STALE-CASE-BINDING is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-STALE-CASE-BINDING"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-FIXTURE-DRIFT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-FIXTURE-DRIFT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-FIXTURE-DRIFT is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-FIXTURE-DRIFT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-GATE-REJECT-SCHEMA ran as controlled-fixture, expected readonly",
+            "caseId": "E1-GATE-REJECT-SCHEMA"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-GATE-REJECT-SCHEMA is not bound to the report source",
+            "caseId": "E1-GATE-REJECT-SCHEMA"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-FIXTURE-STRICT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-FIXTURE-STRICT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-FIXTURE-STRICT is not bound to the report source",
+            "caseId": "E1-FIXTURE-STRICT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-FIXTURE-PORTABILITY-STRICT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-FIXTURE-PORTABILITY-STRICT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-FIXTURE-PORTABILITY-STRICT is not bound to the report source",
+            "caseId": "E1-FIXTURE-PORTABILITY-STRICT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-WRONG-LAYER ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-WRONG-LAYER"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-WRONG-LAYER is not bound to the report source",
+            "caseId": "E1-MUTATE-WRONG-LAYER"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-DIRTY-SOURCE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-DIRTY-SOURCE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-DIRTY-SOURCE is not bound to the report source",
+            "caseId": "E1-MUTATE-DIRTY-SOURCE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-MISSING-SOURCE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-MISSING-SOURCE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-MISSING-SOURCE is not bound to the report source",
+            "caseId": "E1-MUTATE-MISSING-SOURCE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-STALE-REPORT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-STALE-REPORT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-STALE-REPORT is not bound to the report source",
+            "caseId": "E1-MUTATE-STALE-REPORT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-CROSS-COMMIT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-CROSS-COMMIT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-CROSS-COMMIT is not bound to the report source",
+            "caseId": "E1-MUTATE-CROSS-COMMIT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-UNBOUND-CASE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-UNBOUND-CASE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-UNBOUND-CASE is not bound to the report source",
+            "caseId": "E1-MUTATE-UNBOUND-CASE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-EMPTY-EVIDENCE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-EMPTY-EVIDENCE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-EMPTY-EVIDENCE is not bound to the report source",
+            "caseId": "E1-MUTATE-EMPTY-EVIDENCE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-EMPTY-OBJECT-EVIDENCE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-EMPTY-OBJECT-EVIDENCE is not bound to the report source",
+            "caseId": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-MISSING-CASE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-MISSING-CASE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-MISSING-CASE is not bound to the report source",
+            "caseId": "E1-MUTATE-MISSING-CASE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-FAILED-ASSERTION ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-FAILED-ASSERTION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-FAILED-ASSERTION is not bound to the report source",
+            "caseId": "E1-MUTATE-FAILED-ASSERTION"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-NO-DOWNLOAD-BYTES ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-NO-DOWNLOAD-BYTES"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-NO-DOWNLOAD-BYTES is not bound to the report source",
+            "caseId": "E1-MUTATE-NO-DOWNLOAD-BYTES"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-DOWNLOAD-DIGEST ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-DOWNLOAD-DIGEST"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-DOWNLOAD-DIGEST is not bound to the report source",
+            "caseId": "E1-MUTATE-DOWNLOAD-DIGEST"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-PATCH-NOT-APPLIED ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-PATCH-NOT-APPLIED"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-PATCH-NOT-APPLIED is not bound to the report source",
+            "caseId": "E1-MUTATE-PATCH-NOT-APPLIED"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-PATCH-DIGEST ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-PATCH-DIGEST"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-PATCH-DIGEST is not bound to the report source",
+            "caseId": "E1-MUTATE-PATCH-DIGEST"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-DUPLICATE-ID ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-DUPLICATE-ID"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-DUPLICATE-ID is not bound to the report source",
+            "caseId": "E1-MUTATE-DUPLICATE-ID"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-UNKNOWN-STATUS ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-UNKNOWN-STATUS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-UNKNOWN-STATUS is not bound to the report source",
+            "caseId": "E1-MUTATE-UNKNOWN-STATUS"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-UNKNOWN-LAYER ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-UNKNOWN-LAYER"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-UNKNOWN-LAYER is not bound to the report source",
+            "caseId": "E1-MUTATE-UNKNOWN-LAYER"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-NATIVE-NOT-EXECUTED ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-NATIVE-NOT-EXECUTED"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-NATIVE-NOT-EXECUTED is not bound to the report source",
+            "caseId": "E1-MUTATE-NATIVE-NOT-EXECUTED"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-NATIVE-NO-VERSION ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-NATIVE-NO-VERSION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-NATIVE-NO-VERSION is not bound to the report source",
+            "caseId": "E1-MUTATE-NATIVE-NO-VERSION"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-NATIVE-NO-ATTEMPT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-NATIVE-NO-ATTEMPT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-NATIVE-NO-ATTEMPT is not bound to the report source",
+            "caseId": "E1-MUTATE-NATIVE-NO-ATTEMPT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-NATIVE-NO-EVIDENCE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-NATIVE-NO-EVIDENCE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-NATIVE-NO-EVIDENCE is not bound to the report source",
+            "caseId": "E1-MUTATE-NATIVE-NO-EVIDENCE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-NATIVE-NO-MODEL-TASKS ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-NATIVE-NO-MODEL-TASKS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-NATIVE-NO-MODEL-TASKS is not bound to the report source",
+            "caseId": "E1-MUTATE-NATIVE-NO-MODEL-TASKS"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-INSTALL-NOT-STAGED ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-INSTALL-NOT-STAGED"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-INSTALL-NOT-STAGED is not bound to the report source",
+            "caseId": "E1-MUTATE-INSTALL-NOT-STAGED"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-INSTALL-NOT-INDEPENDENT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-INSTALL-NOT-INDEPENDENT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-INSTALL-NOT-INDEPENDENT is not bound to the report source",
+            "caseId": "E1-MUTATE-INSTALL-NOT-INDEPENDENT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-NOT-TESTED ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-NOT-TESTED"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-NOT-TESTED is not bound to the report source",
+            "caseId": "E1-MUTATE-NOT-TESTED"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-SELF-CLAIM ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-SELF-CLAIM"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-SELF-CLAIM is not bound to the report source",
+            "caseId": "E1-MUTATE-SELF-CLAIM"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-ADMISSION-PROBE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-ADMISSION-PROBE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-ADMISSION-PROBE is not bound to the report source",
+            "caseId": "E1-MUTATE-ADMISSION-PROBE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-ADMISSION-FAIL-CLOSED ran as controlled-fixture, expected readonly",
+            "caseId": "E1-ADMISSION-FAIL-CLOSED"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-ADMISSION-FAIL-CLOSED is not bound to the report source",
+            "caseId": "E1-ADMISSION-FAIL-CLOSED"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-PREFLIGHT-NO-FALLBACK ran as controlled-fixture, expected readonly",
+            "caseId": "E1-PREFLIGHT-NO-FALLBACK"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-PREFLIGHT-NO-FALLBACK is not bound to the report source",
+            "caseId": "E1-PREFLIGHT-NO-FALLBACK"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-STRUCTURE-TIER-SUPERSET ran as controlled-fixture, expected readonly",
+            "caseId": "E1-STRUCTURE-TIER-SUPERSET"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-STRUCTURE-TIER-SUPERSET is not bound to the report source",
+            "caseId": "E1-STRUCTURE-TIER-SUPERSET"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-STRUCTURE-NO-ALLOW-GAP ran as controlled-fixture, expected readonly",
+            "caseId": "E1-STRUCTURE-NO-ALLOW-GAP"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-STRUCTURE-NO-ALLOW-GAP is not bound to the report source",
+            "caseId": "E1-STRUCTURE-NO-ALLOW-GAP"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-ROUTE-NO-ELIGIBLE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-ROUTE-NO-ELIGIBLE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-ROUTE-NO-ELIGIBLE is not bound to the report source",
+            "caseId": "E1-MUTATE-ROUTE-NO-ELIGIBLE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-ROUTE-OVERLAP ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-ROUTE-OVERLAP"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-ROUTE-OVERLAP is not bound to the report source",
+            "caseId": "E1-MUTATE-ROUTE-OVERLAP"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-ROUTE-EXPIRED ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-ROUTE-EXPIRED"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-ROUTE-EXPIRED is not bound to the report source",
+            "caseId": "E1-MUTATE-ROUTE-EXPIRED"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-ROUTE-NO-EVIDENCE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-ROUTE-NO-EVIDENCE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-ROUTE-NO-EVIDENCE is not bound to the report source",
+            "caseId": "E1-MUTATE-ROUTE-NO-EVIDENCE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-ROUTE-DEFAULT-PATH ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-ROUTE-DEFAULT-PATH"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-ROUTE-DEFAULT-PATH is not bound to the report source",
+            "caseId": "E1-MUTATE-ROUTE-DEFAULT-PATH"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-REVIEW-DISPOSITION ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-REVIEW-DISPOSITION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-REVIEW-DISPOSITION is not bound to the report source",
+            "caseId": "E1-MUTATE-REVIEW-DISPOSITION"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-REVIEW-SAME-ASSIGNMENT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-REVIEW-SAME-ASSIGNMENT is not bound to the report source",
+            "caseId": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-REVIEW-NO-ISOLATION ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-REVIEW-NO-ISOLATION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-REVIEW-NO-ISOLATION is not bound to the report source",
+            "caseId": "E1-MUTATE-REVIEW-NO-ISOLATION"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-REVIEW-BAD-DIGEST ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-REVIEW-BAD-DIGEST"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-REVIEW-BAD-DIGEST is not bound to the report source",
+            "caseId": "E1-MUTATE-REVIEW-BAD-DIGEST"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-HETERO-SAME-PROTOCOL ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-HETERO-SAME-PROTOCOL"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-HETERO-SAME-PROTOCOL is not bound to the report source",
+            "caseId": "E1-MUTATE-HETERO-SAME-PROTOCOL"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-HETERO-NOT-EXECUTED ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-HETERO-NOT-EXECUTED"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-HETERO-NOT-EXECUTED is not bound to the report source",
+            "caseId": "E1-MUTATE-HETERO-NOT-EXECUTED"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-HETERO-NO-VERSION ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-HETERO-NO-VERSION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-HETERO-NO-VERSION is not bound to the report source",
+            "caseId": "E1-MUTATE-HETERO-NO-VERSION"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-HETERO-NO-BUDGET ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-HETERO-NO-BUDGET"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-HETERO-NO-BUDGET is not bound to the report source",
+            "caseId": "E1-MUTATE-HETERO-NO-BUDGET"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-HETERO-NO-ISOLATION ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-HETERO-NO-ISOLATION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-HETERO-NO-ISOLATION is not bound to the report source",
+            "caseId": "E1-MUTATE-HETERO-NO-ISOLATION"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-HETERO-NO-SUBJECT ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-HETERO-NO-SUBJECT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-HETERO-NO-SUBJECT is not bound to the report source",
+            "caseId": "E1-MUTATE-HETERO-NO-SUBJECT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED is not bound to the report source",
+            "caseId": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-NATIVE-CONTROL-NO-STOP ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-NATIVE-CONTROL-NO-STOP"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-NATIVE-CONTROL-NO-STOP is not bound to the report source",
+            "caseId": "E1-MUTATE-NATIVE-CONTROL-NO-STOP"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY is not bound to the report source",
+            "caseId": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-PILOT-ZERO-TURNS ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-PILOT-ZERO-TURNS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-PILOT-ZERO-TURNS is not bound to the report source",
+            "caseId": "E1-MUTATE-PILOT-ZERO-TURNS"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-PILOT-UNKNOWN-USAGE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-PILOT-UNKNOWN-USAGE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-PILOT-UNKNOWN-USAGE is not bound to the report source",
+            "caseId": "E1-MUTATE-PILOT-UNKNOWN-USAGE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-PILOT-BLOCKED-PASS ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-PILOT-BLOCKED-PASS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-PILOT-BLOCKED-PASS is not bound to the report source",
+            "caseId": "E1-MUTATE-PILOT-BLOCKED-PASS"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E1-MUTATE-PILOT-NO-ORACLE ran as controlled-fixture, expected readonly",
+            "caseId": "E1-MUTATE-PILOT-NO-ORACLE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E1-MUTATE-PILOT-NO-ORACLE is not bound to the report source",
+            "caseId": "E1-MUTATE-PILOT-NO-ORACLE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-CONFIGURATION is not bound to the report source",
+            "caseId": "E2-CONFIGURATION"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-CONFIGURATION has no substantive evidence.configurationRevision",
+            "caseId": "E2-CONFIGURATION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-DAILY-VERTICAL is not bound to the report source",
+            "caseId": "E2-DAILY-VERTICAL"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-DAILY-VERTICAL has no substantive evidence.workId",
+            "caseId": "E2-DAILY-VERTICAL"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-DAILY-VERTICAL has no substantive evidence.verificationId",
+            "caseId": "E2-DAILY-VERTICAL"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-DAILY-VERTICAL has no substantive evidence.artifact",
+            "caseId": "E2-DAILY-VERTICAL"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-DAILY-VERTICAL has no substantive evidence.patch",
+            "caseId": "E2-DAILY-VERTICAL"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-ARTIFACT-ROUNDTRIP is not bound to the report source",
+            "caseId": "E2-ARTIFACT-ROUNDTRIP"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-ARTIFACT-ROUNDTRIP has no substantive evidence.artifact",
+            "caseId": "E2-ARTIFACT-ROUNDTRIP"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-WORK-EVIDENCE is not bound to the report source",
+            "caseId": "E2-WORK-EVIDENCE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-WORK-EVIDENCE has no substantive evidence.workEvidence",
+            "caseId": "E2-WORK-EVIDENCE"
+          },
+          {
+            "code": "work_evidence_invalid",
+            "detail": "Work evidence protocol",
+            "caseId": "E2-WORK-EVIDENCE"
+          },
+          {
+            "code": "work_evidence_invalid",
+            "detail": "Work evidence work_binding",
+            "caseId": "E2-WORK-EVIDENCE"
+          },
+          {
+            "code": "work_evidence_invalid",
+            "detail": "Work evidence projection",
+            "caseId": "E2-WORK-EVIDENCE"
+          },
+          {
+            "code": "work_evidence_invalid",
+            "detail": "Work evidence no_entries",
+            "caseId": "E2-WORK-EVIDENCE"
+          },
+          {
+            "code": "work_evidence_invalid",
+            "detail": "Work evidence outcome_count",
+            "caseId": "E2-WORK-EVIDENCE"
+          },
+          {
+            "code": "work_evidence_invalid",
+            "detail": "Work evidence truncation",
+            "caseId": "E2-WORK-EVIDENCE"
+          },
+          {
+            "code": "work_evidence_invalid",
+            "detail": "Work evidence unknown_work_not_refused",
+            "caseId": "E2-WORK-EVIDENCE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-EVIDENCE-HISTORY is not bound to the report source",
+            "caseId": "E2-EVIDENCE-HISTORY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-EVIDENCE-HISTORY has no substantive evidence.evidenceHistory",
+            "caseId": "E2-EVIDENCE-HISTORY"
+          },
+          {
+            "code": "evidence_history_invalid",
+            "detail": "Evidence history protocol",
+            "caseId": "E2-EVIDENCE-HISTORY"
+          },
+          {
+            "code": "evidence_history_invalid",
+            "detail": "Evidence history no_entries",
+            "caseId": "E2-EVIDENCE-HISTORY"
+          },
+          {
+            "code": "evidence_history_invalid",
+            "detail": "Evidence history window",
+            "caseId": "E2-EVIDENCE-HISTORY"
+          },
+          {
+            "code": "evidence_history_invalid",
+            "detail": "Evidence history pages",
+            "caseId": "E2-EVIDENCE-HISTORY"
+          },
+          {
+            "code": "evidence_history_invalid",
+            "detail": "Evidence history limit_refusal",
+            "caseId": "E2-EVIDENCE-HISTORY"
+          },
+          {
+            "code": "evidence_history_invalid",
+            "detail": "Evidence history unknown_refusal",
+            "caseId": "E2-EVIDENCE-HISTORY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-REOPEN-PERSISTENCE is not bound to the report source",
+            "caseId": "E2-REOPEN-PERSISTENCE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-REOPEN-PERSISTENCE has no substantive evidence.workId",
+            "caseId": "E2-REOPEN-PERSISTENCE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-REOPEN-PERSISTENCE has no substantive evidence.conversation",
+            "caseId": "E2-REOPEN-PERSISTENCE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-REPLAY-AND-CONFLICT is not bound to the report source",
+            "caseId": "E2-REPLAY-AND-CONFLICT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-SESSION-ISOLATION is not bound to the report source",
+            "caseId": "E2-SESSION-ISOLATION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-STALE-BUSINESS-REJECTION is not bound to the report source",
+            "caseId": "E2-STALE-BUSINESS-REJECTION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-MACHINE-FAIL is not bound to the report source",
+            "caseId": "E2-MACHINE-FAIL"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-ONE-WRITER is not bound to the report source",
+            "caseId": "E2-ONE-WRITER"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-SCOPE-AND-PROFILE-GUARDS is not bound to the report source",
+            "caseId": "E2-SCOPE-AND-PROFILE-GUARDS"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-SCOPE-AND-PROFILE-GUARDS has no substantive evidence.fixture",
+            "caseId": "E2-SCOPE-AND-PROFILE-GUARDS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-AUTH-AND-ORIGIN is not bound to the report source",
+            "caseId": "E2-AUTH-AND-ORIGIN"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E2-ASSISTANT-SDK-MOCK ran as controlled-fixture, expected sdk-mock",
+            "caseId": "E2-ASSISTANT-SDK-MOCK"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-ASSISTANT-SDK-MOCK is not bound to the report source",
+            "caseId": "E2-ASSISTANT-SDK-MOCK"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-ASSISTANT-SDK-MOCK has no substantive evidence.assistant",
+            "caseId": "E2-ASSISTANT-SDK-MOCK"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-CONVERSATION-CATALOG is not bound to the report source",
+            "caseId": "E2-CONVERSATION-CATALOG"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-CONVERSATION-CATALOG has no substantive evidence.catalog",
+            "caseId": "E2-CONVERSATION-CATALOG"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-ATTENTION-SIGNAL is not bound to the report source",
+            "caseId": "E2-ATTENTION-SIGNAL"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-ATTENTION-SIGNAL has no substantive evidence.attention",
+            "caseId": "E2-ATTENTION-SIGNAL"
+          },
+          {
+            "code": "attention_evidence_invalid",
+            "detail": "Attention no_projects",
+            "caseId": "E2-ATTENTION-SIGNAL"
+          },
+          {
+            "code": "attention_evidence_invalid",
+            "detail": "Attention no_items",
+            "caseId": "E2-ATTENTION-SIGNAL"
+          },
+          {
+            "code": "attention_evidence_invalid",
+            "detail": "Attention no_groups",
+            "caseId": "E2-ATTENTION-SIGNAL"
+          },
+          {
+            "code": "attention_evidence_invalid",
+            "detail": "Attention expired_answer_sent",
+            "caseId": "E2-ATTENTION-SIGNAL"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-REVIEW-TIMING is not bound to the report source",
+            "caseId": "E2-REVIEW-TIMING"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-REVIEW-TIMING has no substantive evidence.reviewTiming",
+            "caseId": "E2-REVIEW-TIMING"
+          },
+          {
+            "code": "review_timing_invalid",
+            "detail": "Review timing ready_at",
+            "caseId": "E2-REVIEW-TIMING"
+          },
+          {
+            "code": "review_timing_invalid",
+            "detail": "Review timing accepted_at",
+            "caseId": "E2-REVIEW-TIMING"
+          },
+          {
+            "code": "review_timing_invalid",
+            "detail": "Review timing activity_value",
+            "caseId": "E2-REVIEW-TIMING"
+          },
+          {
+            "code": "review_timing_invalid",
+            "detail": "Review timing accept_event_missing",
+            "caseId": "E2-REVIEW-TIMING"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E2-ROUTE-FIXTURE ran as controlled-fixture, expected readonly",
+            "caseId": "E2-ROUTE-FIXTURE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-ROUTE-FIXTURE is not bound to the report source",
+            "caseId": "E2-ROUTE-FIXTURE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-ROUTE-FIXTURE has no substantive evidence.fixture",
+            "caseId": "E2-ROUTE-FIXTURE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E3-REVIEW-FIXTURES ran as controlled-fixture, expected readonly",
+            "caseId": "E3-REVIEW-FIXTURES"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-REVIEW-FIXTURES is not bound to the report source",
+            "caseId": "E3-REVIEW-FIXTURES"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-REVIEW-FIXTURES has no substantive evidence.fixture",
+            "caseId": "E3-REVIEW-FIXTURES"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E3-SEALED-COPY ran as controlled-fixture, expected readonly",
+            "caseId": "E3-SEALED-COPY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-SEALED-COPY is not bound to the report source",
+            "caseId": "E3-SEALED-COPY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-REVIEW-ACTIVITY-UI is not bound to the report source",
+            "caseId": "E3-REVIEW-ACTIVITY-UI"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-REVIEW-ACTIVITY-UI has no substantive evidence.reviewTiming",
+            "caseId": "E3-REVIEW-ACTIVITY-UI"
+          },
+          {
+            "code": "review_timing_invalid",
+            "detail": "Review timing ready_at",
+            "caseId": "E3-REVIEW-ACTIVITY-UI"
+          },
+          {
+            "code": "review_timing_invalid",
+            "detail": "Review timing accepted_at",
+            "caseId": "E3-REVIEW-ACTIVITY-UI"
+          },
+          {
+            "code": "review_timing_invalid",
+            "detail": "Review timing activity_value",
+            "caseId": "E3-REVIEW-ACTIVITY-UI"
+          },
+          {
+            "code": "review_timing_invalid",
+            "detail": "Review timing accept_event_missing",
+            "caseId": "E3-REVIEW-ACTIVITY-UI"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-ATTENTION-INBOX is not bound to the report source",
+            "caseId": "E3-ATTENTION-INBOX"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-ATTENTION-INBOX has no substantive evidence.attention",
+            "caseId": "E3-ATTENTION-INBOX"
+          },
+          {
+            "code": "attention_evidence_invalid",
+            "detail": "Attention no_projects",
+            "caseId": "E3-ATTENTION-INBOX"
+          },
+          {
+            "code": "attention_evidence_invalid",
+            "detail": "Attention no_items",
+            "caseId": "E3-ATTENTION-INBOX"
+          },
+          {
+            "code": "attention_evidence_invalid",
+            "detail": "Attention no_groups",
+            "caseId": "E3-ATTENTION-INBOX"
+          },
+          {
+            "code": "attention_evidence_invalid",
+            "detail": "Attention expired_answer_sent",
+            "caseId": "E3-ATTENTION-INBOX"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-ATTENTION-INBOX-UI is not bound to the report source",
+            "caseId": "E3-ATTENTION-INBOX-UI"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-DECISION-WORKFLOW is not bound to the report source",
+            "caseId": "E3-DECISION-WORKFLOW"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-DECISION-WORKFLOW has no substantive evidence.decisionWorkflow",
+            "caseId": "E3-DECISION-WORKFLOW"
+          },
+          {
+            "code": "decision_workflow_invalid",
+            "detail": "Decision workflow prepare_not_proven_read_only",
+            "caseId": "E3-DECISION-WORKFLOW"
+          },
+          {
+            "code": "decision_workflow_invalid",
+            "detail": "Decision workflow no_records",
+            "caseId": "E3-DECISION-WORKFLOW"
+          },
+          {
+            "code": "decision_workflow_invalid",
+            "detail": "Decision workflow revoke_missing",
+            "caseId": "E3-DECISION-WORKFLOW"
+          },
+          {
+            "code": "decision_workflow_invalid",
+            "detail": "Decision workflow source_state",
+            "caseId": "E3-DECISION-WORKFLOW"
+          },
+          {
+            "code": "decision_workflow_invalid",
+            "detail": "Decision workflow execution_effect",
+            "caseId": "E3-DECISION-WORKFLOW"
+          },
+          {
+            "code": "decision_workflow_invalid",
+            "detail": "Decision workflow no_business_rejection",
+            "caseId": "E3-DECISION-WORKFLOW"
+          },
+          {
+            "code": "decision_workflow_invalid",
+            "detail": "Decision workflow events",
+            "caseId": "E3-DECISION-WORKFLOW"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-PROPOSAL-HTTP is not bound to the report source",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-PROPOSAL-HTTP has no substantive evidence.proposals",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow protocol",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow required_inputs",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow ttl",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow confirm",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow missing_input_not_refused",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow changed_payload_not_conflict",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow tampered_not_refused",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow cross_project_not_refused",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow reject_effect",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow isolation",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow decision_effect",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "proposal_flow_invalid",
+            "detail": "Proposal flow auth_answer_promoted",
+            "caseId": "E3-PROPOSAL-HTTP"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-PROPOSAL-UI is not bound to the report source",
+            "caseId": "E3-PROPOSAL-UI"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-PROPOSAL-UI has no substantive evidence.proposalUi",
+            "caseId": "E3-PROPOSAL-UI"
+          },
+          {
+            "code": "proposal_ui_invalid",
+            "detail": "Proposal UI preview_state",
+            "caseId": "E3-PROPOSAL-UI"
+          },
+          {
+            "code": "proposal_ui_invalid",
+            "detail": "Proposal UI reload_identity",
+            "caseId": "E3-PROPOSAL-UI"
+          },
+          {
+            "code": "proposal_ui_invalid",
+            "detail": "Proposal UI lost_response",
+            "caseId": "E3-PROPOSAL-UI"
+          },
+          {
+            "code": "proposal_ui_invalid",
+            "detail": "Proposal UI confirm_effect",
+            "caseId": "E3-PROPOSAL-UI"
+          },
+          {
+            "code": "proposal_ui_invalid",
+            "detail": "Proposal UI second_confirm",
+            "caseId": "E3-PROPOSAL-UI"
+          },
+          {
+            "code": "proposal_ui_invalid",
+            "detail": "Proposal UI reject_effect",
+            "caseId": "E3-PROPOSAL-UI"
+          },
+          {
+            "code": "proposal_ui_invalid",
+            "detail": "Proposal UI viewports",
+            "caseId": "E3-PROPOSAL-UI"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-CONTEXT-PREVIEW is not bound to the report source",
+            "caseId": "E3-CONTEXT-PREVIEW"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-CONTEXT-PREVIEW has no substantive evidence.contextPreview",
+            "caseId": "E3-CONTEXT-PREVIEW"
+          },
+          {
+            "code": "context_preview_invalid",
+            "detail": "Context preview protocol",
+            "caseId": "E3-CONTEXT-PREVIEW"
+          },
+          {
+            "code": "context_preview_invalid",
+            "detail": "Context preview trust",
+            "caseId": "E3-CONTEXT-PREVIEW"
+          },
+          {
+            "code": "context_preview_invalid",
+            "detail": "Context preview budget_not_clamped",
+            "caseId": "E3-CONTEXT-PREVIEW"
+          },
+          {
+            "code": "context_preview_invalid",
+            "detail": "Context preview ceiling",
+            "caseId": "E3-CONTEXT-PREVIEW"
+          },
+          {
+            "code": "context_preview_invalid",
+            "detail": "Context preview totals",
+            "caseId": "E3-CONTEXT-PREVIEW"
+          },
+          {
+            "code": "context_preview_invalid",
+            "detail": "Context preview work_sources",
+            "caseId": "E3-CONTEXT-PREVIEW"
+          },
+          {
+            "code": "context_preview_invalid",
+            "detail": "Context preview refusals",
+            "caseId": "E3-CONTEXT-PREVIEW"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-CONTEXT-USE is not bound to the report source",
+            "caseId": "E3-CONTEXT-USE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-CONTEXT-USE has no substantive evidence.contextUse",
+            "caseId": "E3-CONTEXT-USE"
+          },
+          {
+            "code": "contextUse_invalid",
+            "detail": "contextUse protocol",
+            "caseId": "E3-CONTEXT-USE"
+          },
+          {
+            "code": "contextUse_invalid",
+            "detail": "contextUse sources",
+            "caseId": "E3-CONTEXT-USE"
+          },
+          {
+            "code": "contextUse_invalid",
+            "detail": "contextUse binding",
+            "caseId": "E3-CONTEXT-USE"
+          },
+          {
+            "code": "contextUse_invalid",
+            "detail": "contextUse provider_calls",
+            "caseId": "E3-CONTEXT-USE"
+          },
+          {
+            "code": "contextUse_invalid",
+            "detail": "contextUse reopen",
+            "caseId": "E3-CONTEXT-USE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-CONTEXT-SSE is not bound to the report source",
+            "caseId": "E3-CONTEXT-SSE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-CONTEXT-SSE has no substantive evidence.sse",
+            "caseId": "E3-CONTEXT-SSE"
+          },
+          {
+            "code": "sse_invalid",
+            "detail": "sse stream_or_single_request",
+            "caseId": "E3-CONTEXT-SSE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-CONTEXT-GUARDS is not bound to the report source",
+            "caseId": "E3-CONTEXT-GUARDS"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-CONTEXT-GUARDS has no substantive evidence.guards",
+            "caseId": "E3-CONTEXT-GUARDS"
+          },
+          {
+            "code": "guards_invalid",
+            "detail": "guards cross_project",
+            "caseId": "E3-CONTEXT-GUARDS"
+          },
+          {
+            "code": "guards_invalid",
+            "detail": "guards source_drift",
+            "caseId": "E3-CONTEXT-GUARDS"
+          },
+          {
+            "code": "guards_invalid",
+            "detail": "guards expiry",
+            "caseId": "E3-CONTEXT-GUARDS"
+          },
+          {
+            "code": "guards_invalid",
+            "detail": "guards offline",
+            "caseId": "E3-CONTEXT-GUARDS"
+          },
+          {
+            "code": "guards_invalid",
+            "detail": "guards unknown_no_resend",
+            "caseId": "E3-CONTEXT-GUARDS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-CANDIDATE-FLOW is not bound to the report source",
+            "caseId": "E4-CANDIDATE-FLOW"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-CANDIDATE-FLOW has no substantive evidence.candidateFlow",
+            "caseId": "E4-CANDIDATE-FLOW"
+          },
+          {
+            "code": "candidateFlow_invalid",
+            "detail": "candidateFlow candidate_flow",
+            "caseId": "E4-CANDIDATE-FLOW"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-CONTEXT-HISTORY is not bound to the report source",
+            "caseId": "E3-CONTEXT-HISTORY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-CONTEXT-HISTORY has no substantive evidence.history",
+            "caseId": "E3-CONTEXT-HISTORY"
+          },
+          {
+            "code": "history_invalid",
+            "detail": "history page",
+            "caseId": "E3-CONTEXT-HISTORY"
+          },
+          {
+            "code": "history_invalid",
+            "detail": "history continuation",
+            "caseId": "E3-CONTEXT-HISTORY"
+          },
+          {
+            "code": "history_invalid",
+            "detail": "history scope",
+            "caseId": "E3-CONTEXT-HISTORY"
+          },
+          {
+            "code": "history_invalid",
+            "detail": "history model_off",
+            "caseId": "E3-CONTEXT-HISTORY"
+          },
+          {
+            "code": "history_invalid",
+            "detail": "history expiry",
+            "caseId": "E3-CONTEXT-HISTORY"
+          },
+          {
+            "code": "history_invalid",
+            "detail": "history resend",
+            "caseId": "E3-CONTEXT-HISTORY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-CONTEXT-SOURCES is not bound to the report source",
+            "caseId": "E3-CONTEXT-SOURCES"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-CONTEXT-SOURCES has no substantive evidence.sources",
+            "caseId": "E3-CONTEXT-SOURCES"
+          },
+          {
+            "code": "sources_invalid",
+            "detail": "sources frozen_sources",
+            "caseId": "E3-CONTEXT-SOURCES"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-CONTEXT-UI is not bound to the report source",
+            "caseId": "E3-CONTEXT-UI"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-CONTEXT-UI has no substantive evidence.contextUi",
+            "caseId": "E3-CONTEXT-UI"
+          },
+          {
+            "code": "contextUi_invalid",
+            "detail": "contextUi messages",
+            "caseId": "E3-CONTEXT-UI"
+          },
+          {
+            "code": "contextUi_invalid",
+            "detail": "contextUi multi_tab",
+            "caseId": "E3-CONTEXT-UI"
+          },
+          {
+            "code": "contextUi_invalid",
+            "detail": "contextUi history_ui",
+            "caseId": "E3-CONTEXT-UI"
+          },
+          {
+            "code": "contextUi_invalid",
+            "detail": "contextUi lost_response",
+            "caseId": "E3-CONTEXT-UI"
+          },
+          {
+            "code": "contextUi_invalid",
+            "detail": "contextUi provider_calls",
+            "caseId": "E3-CONTEXT-UI"
+          },
+          {
+            "code": "contextUi_invalid",
+            "detail": "contextUi audit",
+            "caseId": "E3-CONTEXT-UI"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-SOURCE-CONFIRM is not bound to the report source",
+            "caseId": "E4-SOURCE-CONFIRM"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-SOURCE-CONFIRM has no substantive evidence.sourceConfirm",
+            "caseId": "E4-SOURCE-CONFIRM"
+          },
+          {
+            "code": "sourceConfirm_invalid",
+            "detail": "sourceConfirm source_confirm",
+            "caseId": "E4-SOURCE-CONFIRM"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-SOURCE-CONFIRM-REFUSAL is not bound to the report source",
+            "caseId": "E4-SOURCE-CONFIRM-REFUSAL"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-SOURCE-CONFIRM-REFUSAL has no substantive evidence.sourceConfirmRefusal",
+            "caseId": "E4-SOURCE-CONFIRM-REFUSAL"
+          },
+          {
+            "code": "sourceConfirmRefusal_invalid",
+            "detail": "sourceConfirmRefusal source_refusal",
+            "caseId": "E4-SOURCE-CONFIRM-REFUSAL"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-COMPLETED-REPLY is not bound to the report source",
+            "caseId": "E4-COMPLETED-REPLY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-COMPLETED-REPLY has no substantive evidence.completedReply",
+            "caseId": "E4-COMPLETED-REPLY"
+          },
+          {
+            "code": "completedReply_invalid",
+            "detail": "completedReply provider_calls",
+            "caseId": "E4-COMPLETED-REPLY"
+          },
+          {
+            "code": "completedReply_invalid",
+            "detail": "completedReply reply_count",
+            "caseId": "E4-COMPLETED-REPLY"
+          },
+          {
+            "code": "completedReply_invalid",
+            "detail": "completedReply audit",
+            "caseId": "E4-COMPLETED-REPLY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-REPLY-DURABLE is not bound to the report source",
+            "caseId": "E2-REPLY-DURABLE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-REPLY-DURABLE has no substantive evidence.replyDurable",
+            "caseId": "E2-REPLY-DURABLE"
+          },
+          {
+            "code": "replyDurable_invalid",
+            "detail": "replyDurable durable_reply",
+            "caseId": "E2-REPLY-DURABLE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-REPLY-UNKNOWN-DURABLE is not bound to the report source",
+            "caseId": "E2-REPLY-UNKNOWN-DURABLE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-REPLY-UNKNOWN-DURABLE has no substantive evidence.replyUnknown",
+            "caseId": "E2-REPLY-UNKNOWN-DURABLE"
+          },
+          {
+            "code": "replyUnknown_invalid",
+            "detail": "replyUnknown unknown_resend",
+            "caseId": "E2-REPLY-UNKNOWN-DURABLE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-REPLY-MESSAGE-WINDOW is not bound to the report source",
+            "caseId": "E2-REPLY-MESSAGE-WINDOW"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-REPLY-MESSAGE-WINDOW has no substantive evidence.replyMessageWindow",
+            "caseId": "E2-REPLY-MESSAGE-WINDOW"
+          },
+          {
+            "code": "replyMessageWindow_invalid",
+            "detail": "replyMessageWindow message_window",
+            "caseId": "E2-REPLY-MESSAGE-WINDOW"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-REPLY-BAD-ARTIFACT is not bound to the report source",
+            "caseId": "E2-REPLY-BAD-ARTIFACT"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-REPLY-BAD-ARTIFACT has no substantive evidence.replyBadArtifact",
+            "caseId": "E2-REPLY-BAD-ARTIFACT"
+          },
+          {
+            "code": "replyBadArtifact_invalid",
+            "detail": "replyBadArtifact bad_artifact",
+            "caseId": "E2-REPLY-BAD-ARTIFACT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E8-SCHEMA-MIGRATION is not bound to the report source",
+            "caseId": "E8-SCHEMA-MIGRATION"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E8-SCHEMA-MIGRATION has no substantive evidence.schemaMigration",
+            "caseId": "E8-SCHEMA-MIGRATION"
+          },
+          {
+            "code": "schemaMigration_invalid",
+            "detail": "schemaMigration schema_order",
+            "caseId": "E8-SCHEMA-MIGRATION"
+          },
+          {
+            "code": "schemaMigration_invalid",
+            "detail": "schemaMigration binding_table",
+            "caseId": "E8-SCHEMA-MIGRATION"
+          },
+          {
+            "code": "schemaMigration_invalid",
+            "detail": "schemaMigration reopen",
+            "caseId": "E8-SCHEMA-MIGRATION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E8-LEGACY16-MIGRATION is not bound to the report source",
+            "caseId": "E8-LEGACY16-MIGRATION"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E8-LEGACY16-MIGRATION has no substantive evidence.legacyMigration",
+            "caseId": "E8-LEGACY16-MIGRATION"
+          },
+          {
+            "code": "legacyMigration_invalid",
+            "detail": "legacyMigration legacy_migration",
+            "caseId": "E8-LEGACY16-MIGRATION"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E9-CONTEXT-CONCURRENCY is not bound to the report source",
+            "caseId": "E9-CONTEXT-CONCURRENCY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E9-CONTEXT-CONCURRENCY has no substantive evidence.concurrency",
+            "caseId": "E9-CONTEXT-CONCURRENCY"
+          },
+          {
+            "code": "concurrency_invalid",
+            "detail": "concurrency bounded_concurrency",
+            "caseId": "E9-CONTEXT-CONCURRENCY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-DESKTOP-GEOMETRY is not bound to the report source",
+            "caseId": "E3-DESKTOP-GEOMETRY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-DESKTOP-GEOMETRY has no substantive evidence.layouts",
+            "caseId": "E3-DESKTOP-GEOMETRY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-NOTEBOOK-GEOMETRY is not bound to the report source",
+            "caseId": "E3-NOTEBOOK-GEOMETRY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-NOTEBOOK-GEOMETRY has no substantive evidence.layouts",
+            "caseId": "E3-NOTEBOOK-GEOMETRY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-MOBILE-GEOMETRY is not bound to the report source",
+            "caseId": "E3-MOBILE-GEOMETRY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-MOBILE-GEOMETRY has no substantive evidence.layouts",
+            "caseId": "E3-MOBILE-GEOMETRY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-QUESTION-FORM is not bound to the report source",
+            "caseId": "E3-QUESTION-FORM"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-ACCEPT-AND-DOWNLOAD is not bound to the report source",
+            "caseId": "E3-ACCEPT-AND-DOWNLOAD"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-ACCEPT-AND-DOWNLOAD has no substantive evidence.download",
+            "caseId": "E3-ACCEPT-AND-DOWNLOAD"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E3-ASSISTANT-SCHEMA-FIXTURES ran as controlled-fixture, expected readonly",
+            "caseId": "E3-ASSISTANT-SCHEMA-FIXTURES"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-ASSISTANT-SCHEMA-FIXTURES is not bound to the report source",
+            "caseId": "E3-ASSISTANT-SCHEMA-FIXTURES"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-ASSISTANT-SCHEMA-FIXTURES has no substantive evidence.fixture",
+            "caseId": "E3-ASSISTANT-SCHEMA-FIXTURES"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-CONVERSATION-UI is not bound to the report source",
+            "caseId": "E3-CONVERSATION-UI"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-CONVERSATION-UI has no substantive evidence.catalog",
+            "caseId": "E3-CONVERSATION-UI"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-VERIFICATION-RECOVERY-UI is not bound to the report source",
+            "caseId": "E3-VERIFICATION-RECOVERY-UI"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-VERIFICATION-RECOVERY-UI has no substantive evidence.verificationRecovery",
+            "caseId": "E3-VERIFICATION-RECOVERY-UI"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-OFFLINE-AND-ERROR is not bound to the report source",
+            "caseId": "E3-OFFLINE-AND-ERROR"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-KEYBOARD-AND-SCROLL is not bound to the report source",
+            "caseId": "E3-KEYBOARD-AND-SCROLL"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-BOUNDED-CYCLES is not bound to the report source",
+            "caseId": "E4-BOUNDED-CYCLES"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-BOUNDED-CYCLES has no substantive evidence.cycles",
+            "caseId": "E4-BOUNDED-CYCLES"
+          },
+          {
+            "code": "cycle_evidence_invalid",
+            "detail": "Cycle proof no_cycles",
+            "caseId": "E4-BOUNDED-CYCLES"
+          },
+          {
+            "code": "cycle_evidence_invalid",
+            "detail": "Cycle proof no_attempts",
+            "caseId": "E4-BOUNDED-CYCLES"
+          },
+          {
+            "code": "cycle_evidence_invalid",
+            "detail": "Cycle proof cycle_failure",
+            "caseId": "E4-BOUNDED-CYCLES"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-PORTABILITY-CHECKLIST ran as controlled-fixture, expected readonly",
+            "caseId": "E4-PORTABILITY-CHECKLIST"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-PORTABILITY-CHECKLIST is not bound to the report source",
+            "caseId": "E4-PORTABILITY-CHECKLIST"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-PORTABILITY-CHECKLIST has no substantive evidence.fixture",
+            "caseId": "E4-PORTABILITY-CHECKLIST"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-RECOVERY-PREFLIGHT is not bound to the report source",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-RECOVERY-PREFLIGHT has no substantive evidence.recoveryPreflight",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight inspect_protocol",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight inspect_state",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight inspect_marker",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight inspect_no_authority_blocker",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight plan_protocol",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight plan_claims_authority",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight plan_no_bindings",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight plan_ttl",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight prepare_wrote_marker",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight prepare_saved_bindings",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight stale_fingerprint_not_refused",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight foreign_project_not_refused",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight commit_not_refused",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "recovery_preflight_invalid",
+            "detail": "Recovery preflight normal_prepare_not_refused",
+            "caseId": "E4-RECOVERY-PREFLIGHT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-RECOVERY-READONLY is not bound to the report source",
+            "caseId": "E4-RECOVERY-READONLY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-RECOVERY-READONLY has no substantive evidence.recovery",
+            "caseId": "E4-RECOVERY-READONLY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-VERIFICATION-RECOVERY is not bound to the report source",
+            "caseId": "E2-VERIFICATION-RECOVERY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-VERIFICATION-RECOVERY has no substantive evidence.verificationRecovery",
+            "caseId": "E2-VERIFICATION-RECOVERY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E2-VERIFICATION-FINISHED-STATES is not bound to the report source",
+            "caseId": "E2-VERIFICATION-FINISHED-STATES"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E2-VERIFICATION-FINISHED-STATES has no substantive evidence.verificationRecovery",
+            "caseId": "E2-VERIFICATION-FINISHED-STATES"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E6-ARTIFACT-CURRENT-SCOPE ran as controlled-fixture, expected readonly",
+            "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E6-ARTIFACT-CURRENT-SCOPE is not bound to the report source",
+            "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E6-ARTIFACT-CURRENT-SCOPE has no substantive evidence.frozenScope",
+            "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+          },
+          {
+            "code": "frozenScope_invalid",
+            "detail": "frozenScope tuple",
+            "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+          },
+          {
+            "code": "frozenScope_invalid",
+            "detail": "frozenScope main_schema",
+            "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+          },
+          {
+            "code": "frozenScope_invalid",
+            "detail": "frozenScope hasContextRoute",
+            "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+          },
+          {
+            "code": "frozenScope_invalid",
+            "detail": "frozenScope hasHistoryRoute",
+            "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+          },
+          {
+            "code": "frozenScope_invalid",
+            "detail": "frozenScope hasSourcesRoute",
+            "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+          },
+          {
+            "code": "frozenScope_invalid",
+            "detail": "frozenScope hasReplyResults",
+            "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-INSTALL-ARTIFACT-IDENTITY ran as controlled-fixture, expected installed",
+            "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-INSTALL-ARTIFACT-IDENTITY is not bound to the report source",
+            "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-INSTALL-ARTIFACT-IDENTITY has no substantive evidence.artifact",
+            "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-INSTALL-ARTIFACT-IDENTITY has no substantive evidence.installation",
+            "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+          },
+          {
+            "code": "installation_evidence_invalid",
+            "detail": "Installation proof not_installed",
+            "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+          },
+          {
+            "code": "installation_evidence_invalid",
+            "detail": "Installation proof version_missing",
+            "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+          },
+          {
+            "code": "installation_evidence_invalid",
+            "detail": "Installation proof digest_missing",
+            "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+          },
+          {
+            "code": "installation_evidence_invalid",
+            "detail": "Installation proof staged_path_missing",
+            "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+          },
+          {
+            "code": "installation_evidence_invalid",
+            "detail": "Installation proof steps_missing",
+            "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E7-BACKUP-CONTEXT-REPLY ran as controlled-fixture, expected installed",
+            "caseId": "E7-BACKUP-CONTEXT-REPLY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E7-BACKUP-CONTEXT-REPLY is not bound to the report source",
+            "caseId": "E7-BACKUP-CONTEXT-REPLY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E7-BACKUP-CONTEXT-REPLY has no substantive evidence.backupContextReply",
+            "caseId": "E7-BACKUP-CONTEXT-REPLY"
+          },
+          {
+            "code": "backupContextReply_invalid",
+            "detail": "backupContextReply not_nonempty",
+            "caseId": "E7-BACKUP-CONTEXT-REPLY"
+          },
+          {
+            "code": "backupContextReply_invalid",
+            "detail": "backupContextReply artifact_missing",
+            "caseId": "E7-BACKUP-CONTEXT-REPLY"
+          },
+          {
+            "code": "backupContextReply_invalid",
+            "detail": "backupContextReply reply",
+            "caseId": "E7-BACKUP-CONTEXT-REPLY"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E5-INSTALLED-CANDIDATES ran as controlled-fixture, expected installed",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E5-INSTALLED-CANDIDATES is not bound to the report source",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E5-INSTALLED-CANDIDATES has no substantive evidence.installedCandidates",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "installedCandidates_invalid",
+            "detail": "installedCandidates mode",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "installedCandidates_invalid",
+            "detail": "installedCandidates default_off",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "installedCandidates_invalid",
+            "detail": "installedCandidates opt_in",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "installedCandidates_invalid",
+            "detail": "installedCandidates candidates",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "installedCandidates_invalid",
+            "detail": "installedCandidates required_inputs",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "installedCandidates_invalid",
+            "detail": "installedCandidates confirm",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "installedCandidates_invalid",
+            "detail": "installedCandidates replay",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "installedCandidates_invalid",
+            "detail": "installedCandidates reject",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "installedCandidates_invalid",
+            "detail": "installedCandidates native",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "installedCandidates_invalid",
+            "detail": "installedCandidates subject",
+            "caseId": "E5-INSTALLED-CANDIDATES"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E7-SECOND-ROOT-READONLY ran as controlled-fixture, expected installed",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E7-SECOND-ROOT-READONLY is not bound to the report source",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E7-SECOND-ROOT-READONLY has no substantive evidence.secondRoot",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot subject",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot restored",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot probe_scope",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot personal_scope",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot business_data",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot original_body",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot held_work",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot qa",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot candidates",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot context",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot business",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot queue",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot resend",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "secondRoot_invalid",
+            "detail": "secondRoot data",
+            "caseId": "E7-SECOND-ROOT-READONLY"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E6-INSTALLED-SOURCE-CONFIRM ran as controlled-fixture, expected installed",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E6-INSTALLED-SOURCE-CONFIRM is not bound to the report source",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E6-INSTALLED-SOURCE-CONFIRM has no substantive evidence.installedSourceConfirm",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "installedSourceConfirm_invalid",
+            "detail": "installedSourceConfirm subject",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "installedSourceConfirm_invalid",
+            "detail": "installedSourceConfirm mode",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "installedSourceConfirm_invalid",
+            "detail": "installedSourceConfirm not_granted",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "installedSourceConfirm_invalid",
+            "detail": "installedSourceConfirm target",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "installedSourceConfirm_invalid",
+            "detail": "installedSourceConfirm confirm",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "installedSourceConfirm_invalid",
+            "detail": "installedSourceConfirm held",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "installedSourceConfirm_invalid",
+            "detail": "installedSourceConfirm replay",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "installedSourceConfirm_invalid",
+            "detail": "installedSourceConfirm reopen",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "installedSourceConfirm_invalid",
+            "detail": "installedSourceConfirm provider",
+            "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E9-INSTALLED-STABILITY ran as controlled-fixture, expected installed",
+            "caseId": "E9-INSTALLED-STABILITY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E9-INSTALLED-STABILITY is not bound to the report source",
+            "caseId": "E9-INSTALLED-STABILITY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E9-INSTALLED-STABILITY has no substantive evidence.installedStability",
+            "caseId": "E9-INSTALLED-STABILITY"
+          },
+          {
+            "code": "installedStability_invalid",
+            "detail": "installedStability subject",
+            "caseId": "E9-INSTALLED-STABILITY"
+          },
+          {
+            "code": "installedStability_invalid",
+            "detail": "installedStability mode",
+            "caseId": "E9-INSTALLED-STABILITY"
+          },
+          {
+            "code": "installedStability_invalid",
+            "detail": "installedStability concurrent",
+            "caseId": "E9-INSTALLED-STABILITY"
+          },
+          {
+            "code": "installedStability_invalid",
+            "detail": "installedStability returned",
+            "caseId": "E9-INSTALLED-STABILITY"
+          },
+          {
+            "code": "installedStability_invalid",
+            "detail": "installedStability resend",
+            "caseId": "E9-INSTALLED-STABILITY"
+          },
+          {
+            "code": "installedStability_invalid",
+            "detail": "installedStability reopen",
+            "caseId": "E9-INSTALLED-STABILITY"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E5-WORKFLOW-FORMATS ran as controlled-fixture, expected installed",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E5-WORKFLOW-FORMATS is not bound to the report source",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E5-WORKFLOW-FORMATS has no substantive evidence.workflowFormats",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "workflowFormats_invalid",
+            "detail": "workflowFormats subject",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "workflowFormats_invalid",
+            "detail": "workflowFormats mode",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "workflowFormats_invalid",
+            "detail": "workflowFormats snapshot_protocol",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "workflowFormats_invalid",
+            "detail": "workflowFormats evidence_protocol",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "workflowFormats_invalid",
+            "detail": "workflowFormats dual_version_claim",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "workflowFormats_invalid",
+            "detail": "workflowFormats v1_data",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "workflowFormats_invalid",
+            "detail": "workflowFormats v2_claim",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "workflowFormats_invalid",
+            "detail": "workflowFormats protocol_separation",
+            "caseId": "E5-WORKFLOW-FORMATS"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E6-INSTALLED-CONTEXT ran as controlled-fixture, expected installed",
+            "caseId": "E6-INSTALLED-CONTEXT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E6-INSTALLED-CONTEXT is not bound to the report source",
+            "caseId": "E6-INSTALLED-CONTEXT"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E6-INSTALLED-CONTEXT has no substantive evidence.installedContext",
+            "caseId": "E6-INSTALLED-CONTEXT"
+          },
+          {
+            "code": "installedContext_invalid",
+            "detail": "installedContext mode",
+            "caseId": "E6-INSTALLED-CONTEXT"
+          },
+          {
+            "code": "installedContext_invalid",
+            "detail": "installedContext availability",
+            "caseId": "E6-INSTALLED-CONTEXT"
+          },
+          {
+            "code": "installedContext_invalid",
+            "detail": "installedContext send",
+            "caseId": "E6-INSTALLED-CONTEXT"
+          },
+          {
+            "code": "installedContext_invalid",
+            "detail": "installedContext reply_or_audit",
+            "caseId": "E6-INSTALLED-CONTEXT"
+          },
+          {
+            "code": "installedContext_invalid",
+            "detail": "installedContext provider",
+            "caseId": "E6-INSTALLED-CONTEXT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E3-PERSONAL-COLD-START ran as controlled-fixture, expected installed",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E3-PERSONAL-COLD-START is not bound to the report source",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E3-PERSONAL-COLD-START has no substantive evidence.personalInstall",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "personal_install_invalid",
+            "detail": "Personal install start",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "personal_install_invalid",
+            "detail": "Personal install health",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "personal_install_invalid",
+            "detail": "Personal install console",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "personal_install_invalid",
+            "detail": "Personal install auth",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "personal_install_invalid",
+            "detail": "Personal install schema",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "personal_install_invalid",
+            "detail": "Personal install stop",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "personal_install_invalid",
+            "detail": "Personal install model_send",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "personal_install_invalid",
+            "detail": "Personal install config_conflict",
+            "caseId": "E3-PERSONAL-COLD-START"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-INSTALL-FIRST-RUN ran as controlled-fixture, expected installed",
+            "caseId": "E4-INSTALL-FIRST-RUN"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-INSTALL-FIRST-RUN is not bound to the report source",
+            "caseId": "E4-INSTALL-FIRST-RUN"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-INSTALL-FIRST-RUN has no substantive evidence.install",
+            "caseId": "E4-INSTALL-FIRST-RUN"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-INSTALL-CONFIG-ROOT ran as controlled-fixture, expected installed",
+            "caseId": "E4-INSTALL-CONFIG-ROOT"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-INSTALL-CONFIG-ROOT is not bound to the report source",
+            "caseId": "E4-INSTALL-CONFIG-ROOT"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-INSTALL-CONFIG-ROOT has no substantive evidence.configRoot",
+            "caseId": "E4-INSTALL-CONFIG-ROOT"
+          },
+          {
+            "code": "config_root_invalid",
+            "detail": "Config root baseline_first_run",
+            "caseId": "E4-INSTALL-CONFIG-ROOT"
+          },
+          {
+            "code": "config_root_invalid",
+            "detail": "Config root baseline_seed_not_decisive",
+            "caseId": "E4-INSTALL-CONFIG-ROOT"
+          },
+          {
+            "code": "config_root_invalid",
+            "detail": "Config root target_first_run",
+            "caseId": "E4-INSTALL-CONFIG-ROOT"
+          },
+          {
+            "code": "config_root_invalid",
+            "detail": "Config root target_seed_not_decisive",
+            "caseId": "E4-INSTALL-CONFIG-ROOT"
+          },
+          {
+            "code": "config_root_invalid",
+            "detail": "Config root target_not_initialized",
+            "caseId": "E4-INSTALL-CONFIG-ROOT"
+          },
+          {
+            "code": "config_root_invalid",
+            "detail": "Config root baseline_history",
+            "caseId": "E4-INSTALL-CONFIG-ROOT"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-INSTALL-REUSE-CONCURRENCY ran as controlled-fixture, expected installed",
+            "caseId": "E4-INSTALL-REUSE-CONCURRENCY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-INSTALL-REUSE-CONCURRENCY is not bound to the report source",
+            "caseId": "E4-INSTALL-REUSE-CONCURRENCY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-INSTALL-REUSE-CONCURRENCY has no substantive evidence.reuse",
+            "caseId": "E4-INSTALL-REUSE-CONCURRENCY"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-INSTALL-HOST-GUARDS ran as controlled-fixture, expected installed",
+            "caseId": "E4-INSTALL-HOST-GUARDS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-INSTALL-HOST-GUARDS is not bound to the report source",
+            "caseId": "E4-INSTALL-HOST-GUARDS"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-INSTALL-HOST-GUARDS has no substantive evidence.hostGuards",
+            "caseId": "E4-INSTALL-HOST-GUARDS"
+          },
+          {
+            "code": "host_guard_invalid",
+            "detail": "Host guard mode_not_retained",
+            "caseId": "E4-INSTALL-HOST-GUARDS"
+          },
+          {
+            "code": "host_guard_invalid",
+            "detail": "Host guard personal_not_refused",
+            "caseId": "E4-INSTALL-HOST-GUARDS"
+          },
+          {
+            "code": "host_guard_invalid",
+            "detail": "Host guard existing_instance_changed",
+            "caseId": "E4-INSTALL-HOST-GUARDS"
+          },
+          {
+            "code": "host_guard_invalid",
+            "detail": "Host guard unknown_pid_adopted",
+            "caseId": "E4-INSTALL-HOST-GUARDS"
+          },
+          {
+            "code": "host_guard_invalid",
+            "detail": "Host guard unknown_pid_killed",
+            "caseId": "E4-INSTALL-HOST-GUARDS"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-BACKUP-RESTORE ran as controlled-fixture, expected installed",
+            "caseId": "E4-BACKUP-RESTORE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-BACKUP-RESTORE is not bound to the report source",
+            "caseId": "E4-BACKUP-RESTORE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-BACKUP-RESTORE has no substantive evidence.restore",
+            "caseId": "E4-BACKUP-RESTORE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-INSTALL-TAMPER ran as controlled-fixture, expected installed",
+            "caseId": "E4-INSTALL-TAMPER"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-INSTALL-TAMPER is not bound to the report source",
+            "caseId": "E4-INSTALL-TAMPER"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-INSTALL-TAMPER has no substantive evidence.tamper",
+            "caseId": "E4-INSTALL-TAMPER"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-INSTALL-ROLLBACK ran as controlled-fixture, expected installed",
+            "caseId": "E4-INSTALL-ROLLBACK"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-INSTALL-ROLLBACK is not bound to the report source",
+            "caseId": "E4-INSTALL-ROLLBACK"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-INSTALL-ROLLBACK has no substantive evidence.rollback",
+            "caseId": "E4-INSTALL-ROLLBACK"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-UPGRADE-FAULTS ran as controlled-fixture, expected installed",
+            "caseId": "E4-UPGRADE-FAULTS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-UPGRADE-FAULTS is not bound to the report source",
+            "caseId": "E4-UPGRADE-FAULTS"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-UPGRADE-FAULTS has no substantive evidence.upgradeFaults",
+            "caseId": "E4-UPGRADE-FAULTS"
+          },
+          {
+            "code": "upgradeFaults_invalid",
+            "detail": "upgradeFaults subject",
+            "caseId": "E4-UPGRADE-FAULTS"
+          },
+          {
+            "code": "upgradeFaults_invalid",
+            "detail": "upgradeFaults crash_after_stop",
+            "caseId": "E4-UPGRADE-FAULTS"
+          },
+          {
+            "code": "upgradeFaults_invalid",
+            "detail": "upgradeFaults crash_after_stop_kill",
+            "caseId": "E4-UPGRADE-FAULTS"
+          },
+          {
+            "code": "upgradeFaults_invalid",
+            "detail": "upgradeFaults target_unhealthy",
+            "caseId": "E4-UPGRADE-FAULTS"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E7-OWNERSHIP-COPY ran as controlled-fixture, expected installed",
+            "caseId": "E7-OWNERSHIP-COPY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E7-OWNERSHIP-COPY is not bound to the report source",
+            "caseId": "E7-OWNERSHIP-COPY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E7-OWNERSHIP-COPY has no substantive evidence.ownershipCopy",
+            "caseId": "E7-OWNERSHIP-COPY"
+          },
+          {
+            "code": "ownershipCopy_invalid",
+            "detail": "ownershipCopy subject",
+            "caseId": "E7-OWNERSHIP-COPY"
+          },
+          {
+            "code": "ownershipCopy_invalid",
+            "detail": "ownershipCopy claimed_other_state",
+            "caseId": "E7-OWNERSHIP-COPY"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E5-D-OWNERSHIP-MOCKS ran as controlled-fixture, expected installed",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E5-D-OWNERSHIP-MOCKS is not bound to the report source",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E5-D-OWNERSHIP-MOCKS has no substantive evidence.ownershipMocks",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "ownershipMocks_invalid",
+            "detail": "ownershipMocks parent",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "ownershipMocks_invalid",
+            "detail": "ownershipMocks child_owned",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "ownershipMocks_invalid",
+            "detail": "ownershipMocks child_signalled",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "ownershipMocks_invalid",
+            "detail": "ownershipMocks proof",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "ownership_subject",
+            "detail": "ownershipMocks subject",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "helper_provenance",
+            "detail": "ownershipMocks helper_provenance",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "probe_source",
+            "detail": "ownershipMocks probe_source",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "previous_control",
+            "detail": "ownershipMocks previous_control",
+            "caseId": "E5-D-OWNERSHIP-MOCKS"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E6-CURRENT-MAIN-INSTALL ran as controlled-fixture, expected installed",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E6-CURRENT-MAIN-INSTALL is not bound to the report source",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E6-CURRENT-MAIN-INSTALL has no substantive evidence.currentInstall",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "currentInstall_invalid",
+            "detail": "currentInstall subject",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "currentInstall_invalid",
+            "detail": "currentInstall not_executed",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "currentInstall_invalid",
+            "detail": "currentInstall hasContextRoute",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "currentInstall_invalid",
+            "detail": "currentInstall hasHistoryRoute",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "currentInstall_invalid",
+            "detail": "currentInstall hasSourcesRoute",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "currentInstall_invalid",
+            "detail": "currentInstall hasReplyResults",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "currentInstall_invalid",
+            "detail": "currentInstall hasDiscussionReadiness",
+            "caseId": "E6-CURRENT-MAIN-INSTALL"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-UPGRADE-ROLLBACK ran as controlled-fixture, expected installed",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-UPGRADE-ROLLBACK is not bound to the report source",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-UPGRADE-ROLLBACK has no substantive evidence.upgrade",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof distinct_builds",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof distinct_bytes",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof schema_order",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof switch_not_confirmed",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof no_preupgrade_backup",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof data_loss",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof pre_data_lost",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof post_data_lost",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof binary_rollback",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof rollback_rolled_data",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof tampered_target",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "upgrade_evidence_invalid",
+            "detail": "Upgrade proof schema_refusal",
+            "caseId": "E4-UPGRADE-ROLLBACK"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-UPGRADE-CROSS-SCHEMA ran as controlled-fixture, expected installed",
+            "caseId": "E4-UPGRADE-CROSS-SCHEMA"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-UPGRADE-CROSS-SCHEMA is not bound to the report source",
+            "caseId": "E4-UPGRADE-CROSS-SCHEMA"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-UPGRADE-CROSS-SCHEMA has no substantive evidence.crossUpgrade",
+            "caseId": "E4-UPGRADE-CROSS-SCHEMA"
+          },
+          {
+            "code": "cross_upgrade_invalid",
+            "detail": "Cross-schema upgrade baseline",
+            "caseId": "E4-UPGRADE-CROSS-SCHEMA"
+          },
+          {
+            "code": "cross_upgrade_invalid",
+            "detail": "Cross-schema upgrade schema_order",
+            "caseId": "E4-UPGRADE-CROSS-SCHEMA"
+          },
+          {
+            "code": "cross_upgrade_invalid",
+            "detail": "Cross-schema upgrade old_binary_admitted",
+            "caseId": "E4-UPGRADE-CROSS-SCHEMA"
+          },
+          {
+            "code": "cross_upgrade_invalid",
+            "detail": "Cross-schema upgrade wrong_reason",
+            "caseId": "E4-UPGRADE-CROSS-SCHEMA"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E4-MULTI-STATE ran as controlled-fixture, expected installed",
+            "caseId": "E4-MULTI-STATE"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E4-MULTI-STATE is not bound to the report source",
+            "caseId": "E4-MULTI-STATE"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E4-MULTI-STATE has no substantive evidence.multiState",
+            "caseId": "E4-MULTI-STATE"
+          },
+          {
+            "code": "multi_state_invalid",
+            "detail": "Multi-state other_state_claimed",
+            "caseId": "E4-MULTI-STATE"
+          },
+          {
+            "code": "multi_state_invalid",
+            "detail": "Multi-state dead_launcher_window",
+            "caseId": "E4-MULTI-STATE"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E5-NATIVE-DELIVERY ran as controlled-fixture, expected actual-native",
+            "caseId": "E5-NATIVE-DELIVERY"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E5-NATIVE-DELIVERY is not bound to the report source",
+            "caseId": "E5-NATIVE-DELIVERY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E5-NATIVE-DELIVERY has no substantive evidence.native",
+            "caseId": "E5-NATIVE-DELIVERY"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E5-NATIVE-DELIVERY has no substantive evidence.acceptance",
+            "caseId": "E5-NATIVE-DELIVERY"
+          },
+          {
+            "code": "native_evidence_invalid",
+            "detail": "Native proof not_executed",
+            "caseId": "E5-NATIVE-DELIVERY"
+          },
+          {
+            "code": "native_evidence_invalid",
+            "detail": "Native proof version_missing",
+            "caseId": "E5-NATIVE-DELIVERY"
+          },
+          {
+            "code": "native_evidence_invalid",
+            "detail": "Native proof identity_missing",
+            "caseId": "E5-NATIVE-DELIVERY"
+          },
+          {
+            "code": "native_evidence_invalid",
+            "detail": "Native proof evidence_refs_missing",
+            "caseId": "E5-NATIVE-DELIVERY"
+          },
+          {
+            "code": "native_evidence_invalid",
+            "detail": "Native proof model_tasks_missing",
+            "caseId": "E5-NATIVE-DELIVERY"
+          },
+          {
+            "code": "layer_not_allowed",
+            "detail": "Case E5-NATIVE-CONTROL ran as controlled-fixture, expected actual-native",
+            "caseId": "E5-NATIVE-CONTROL"
+          },
+          {
+            "code": "case_source_unbound",
+            "detail": "Case E5-NATIVE-CONTROL is not bound to the report source",
+            "caseId": "E5-NATIVE-CONTROL"
+          },
+          {
+            "code": "required_evidence_missing",
+            "detail": "Case E5-NATIVE-CONTROL has no substantive evidence.native",
+            "caseId": "E5-NATIVE-CONTROL"
+          },
+          {
+            "code": "native_evidence_invalid",
+            "detail": "Native proof not_executed",
+            "caseId": "E5-NATIVE-CONTROL"
+          },
+          {
+            "code": "native_evidence_invalid",
+            "detail": "Native proof version_missing",
+            "caseId": "E5-NATIVE-CONTROL"
+          },
+          {
+            "code": "native_evidence_invalid",
+            "detail": "Native proof identity_missing",
+            "caseId": "E5-NATIVE-CONTROL"
+          },
+          {
+            "code": "native_evidence_invalid",
+            "detail": "Native proof evidence_refs_missing",
+            "caseId": "E5-NATIVE-CONTROL"
+          },
+          {
+            "code": "native_evidence_invalid",
+            "detail": "Native proof model_tasks_missing",
+            "caseId": "E5-NATIVE-CONTROL"
+          }
+        ]
+      },
+      "expected": {
+        "verdict": "non-PASS"
+      }
+    }
+  ]
+}

@@ -24,9 +24,14 @@ const reuse = report => report.cases.find(item => item.id === 'E5-REVIEW-REUSE-C
 // control uses the recorded required scope (present in that report); current runs still use the full
 // INSTALL_CASES set, so this is a recorded-time control, not a relaxation of today's gate.
 const recordedIds = new Set(fixture.cases.map(item => item.id))
+// The recorded 595 report predates the wave-27 artifact-closure sub-fields; those exact codes are
+// waived for this recorded-time control only, never in a live requirement.
+const RECORDED_WAIVERS = { 'E5-WORKFLOW-FORMATS': { workflowFormats: ['corrupt_artifact_accepted', 'missing_artifact_accepted',
+  'unknown_table_not_bounded', 'v1_artifact_digest', 'v2_artifact_digest', 'v1_artifact_missing_match', 'v2_artifact_missing_match'] } }
 const requirement = {
   ...tier('installed-alpha'),
-  cases: INSTALL_CASES.filter(entry => recordedIds.has(entry.id)),
+  cases: INSTALL_CASES.filter(entry => recordedIds.has(entry.id)).map(entry =>
+    RECORDED_WAIVERS[entry.id] ? { ...entry, waivedEvidence: RECORDED_WAIVERS[entry.id] } : entry),
 }
 function capabilityFor(dir) {
   try {

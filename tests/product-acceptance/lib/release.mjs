@@ -1340,8 +1340,13 @@ export function evaluateRelease({
       ['lifecycleStartWindow', lifecycleStartWindowIssues], ['lifecycleRefusedStop', lifecycleRefusedStopIssues],
       ['lifecycleIdempotent', lifecycleIdempotentIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
-          for (const issue of fn(result.evidence?.[key]))
+          // `waivedEvidence` exists only for recorded-time control reports that predate a newer
+          // required sub-field; the live requirement never carries it, so nothing is relaxed.
+          const waived = new Set(entry.waivedEvidence?.[key] ?? [])
+          for (const issue of fn(result.evidence?.[key])) {
+            if (waived.has(issue)) continue
             failures.push(fail(key === 'ownershipMocks' ? (OWNERSHIP_ISSUE_CODES[issue] ?? 'ownershipMocks_invalid') : `${key}_invalid`, `${key} ${issue}`, entry.id))
+          }
         }
       }
       if (entry.evidence?.includes('personalInstall')) {

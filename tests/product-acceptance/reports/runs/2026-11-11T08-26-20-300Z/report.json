@@ -1,0 +1,1440 @@
+{
+  "schema": "product-acceptance/1",
+  "suites": [
+    "e4"
+  ],
+  "branch": "codex/g3-product-acceptance",
+  "source": {
+    "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce",
+    "dirty": true
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "os": "Darwin 25.6.0"
+  },
+  "startedAt": "2026-11-11T08:26:20.301Z",
+  "finishedAt": "2026-11-11T08:28:01.503Z",
+  "checkedAt": "2026-11-11T08:28:01.503Z",
+  "counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0,
+    "BLOCKED": 1,
+    "UNKNOWN": 0
+  },
+  "artifacts": {
+    "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-26-20-300Z",
+    "screenshots": []
+  },
+  "cases": [
+    {
+      "id": "SUITE-E4-LOAD",
+      "title": "Suite e4 failed to load",
+      "layer": "readonly",
+      "status": "BLOCKED",
+      "reason": "sixth is not defined",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [],
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    }
+  ],
+  "declaredGaps": [
+    {
+      "id": "SUITE-E4-LOAD",
+      "status": "BLOCKED",
+      "reason": "sixth is not defined"
+    }
+  ],
+  "release": {
+    "schema": "product-acceptance-release/1",
+    "tier": "installed-alpha",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-11T08:28:01.535Z",
+    "source": {
+      "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce",
+      "dirty": true
+    },
+    "expectedSource": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce",
+    "requirements": [
+      {
+        "id": "E1-GATE-CONTROL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-CASE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-REPORT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-NO-CANDIDATE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-VACUOUS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-DUPLICATE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-BAD-PATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-GATE-REJECT-SCHEMA",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-FIXTURE-STRICT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-FIXTURE-PORTABILITY-STRICT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-WRONG-LAYER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-DIRTY-SOURCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-SOURCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-STALE-REPORT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-CROSS-COMMIT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-UNBOUND-CASE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-CASE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-FAILED-ASSERTION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-DOWNLOAD-DIGEST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-NOT-APPLIED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-DIGEST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-DUPLICATE-ID",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-STATUS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-LAYER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-VERSION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-STAGED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NOT-TESTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-SELF-CLAIM",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ADMISSION-PROBE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-ADMISSION-FAIL-CLOSED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-PREFLIGHT-NO-FALLBACK",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-STRUCTURE-TIER-SUPERSET",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-STRUCTURE-NO-ALLOW-GAP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-OVERLAP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-EXPIRED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-DISPOSITION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-VERSION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-BUDGET",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-ZERO-TURNS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-CONFIGURATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-DAILY-VERTICAL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ARTIFACT-ROUNDTRIP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REOPEN-PERSISTENCE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REPLAY-AND-CONFLICT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-SESSION-ISOLATION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-STALE-BUSINESS-REJECTION",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-MACHINE-FAIL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ONE-WRITER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-AUTH-AND-ORIGIN",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ASSISTANT-SDK-MOCK",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-CONVERSATION-CATALOG",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ATTENTION-SIGNAL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-REVIEW-TIMING",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-ROUTE-FIXTURE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-REVIEW-FIXTURES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-SEALED-COPY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-REVIEW-ACTIVITY-UI",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-CONVERSATION-UI",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-VERIFICATION-RECOVERY-UI",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-RECOVERY-READONLY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-VERIFICATION-RECOVERY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E2-VERIFICATION-FINISHED-STATES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-INSTALL-FIRST-RUN",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-INSTALL-CONFIG-ROOT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-INSTALL-REUSE-CONCURRENCY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-INSTALL-HOST-GUARDS",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-BACKUP-RESTORE",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-INSTALL-TAMPER",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-INSTALL-ROLLBACK",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-UPGRADE-ROLLBACK",
+        "required": true,
+        "status": "MISSING"
+      }
+    ],
+    "failures": [
+      {
+        "code": "source_dirty",
+        "detail": "Release evidence requires a clean source worktree"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-CONTROL is absent",
+        "caseId": "E1-GATE-CONTROL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-MISSING-CASE is absent",
+        "caseId": "E1-GATE-REJECT-MISSING-CASE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNKNOWN-STATUS is absent",
+        "caseId": "E1-GATE-REJECT-UNKNOWN-STATUS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNCERTAIN-ACCEPT is absent",
+        "caseId": "E1-GATE-REJECT-UNCERTAIN-ACCEPT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-STALE-REPORT is absent",
+        "caseId": "E1-GATE-REJECT-STALE-REPORT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-SOURCE-MISMATCH is absent",
+        "caseId": "E1-GATE-REJECT-SOURCE-MISMATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-NO-CANDIDATE is absent",
+        "caseId": "E1-GATE-REJECT-NO-CANDIDATE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-VACUOUS is absent",
+        "caseId": "E1-GATE-REJECT-VACUOUS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-FAILED-ASSERTION is absent",
+        "caseId": "E1-GATE-REJECT-FAILED-ASSERTION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-MISSING-EVIDENCE is absent",
+        "caseId": "E1-GATE-REJECT-MISSING-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-DUPLICATE is absent",
+        "caseId": "E1-GATE-REJECT-DUPLICATE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-BAD-PATCH is absent",
+        "caseId": "E1-GATE-REJECT-BAD-PATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNAPPLIED-PATCH is absent",
+        "caseId": "E1-GATE-REJECT-UNAPPLIED-PATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-MALFORMED-PATCH is absent",
+        "caseId": "E1-GATE-REJECT-MALFORMED-PATCH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-UNEXECUTED-NATIVE is absent",
+        "caseId": "E1-GATE-REJECT-UNEXECUTED-NATIVE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-INVALID-RESPONSE is absent",
+        "caseId": "E1-GATE-REJECT-INVALID-RESPONSE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-STALE-CASE-BINDING is absent",
+        "caseId": "E1-GATE-REJECT-STALE-CASE-BINDING"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-FIXTURE-DRIFT is absent",
+        "caseId": "E1-GATE-REJECT-FIXTURE-DRIFT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-GATE-REJECT-SCHEMA is absent",
+        "caseId": "E1-GATE-REJECT-SCHEMA"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-FIXTURE-STRICT is absent",
+        "caseId": "E1-FIXTURE-STRICT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-FIXTURE-PORTABILITY-STRICT is absent",
+        "caseId": "E1-FIXTURE-PORTABILITY-STRICT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-WRONG-LAYER is absent",
+        "caseId": "E1-MUTATE-WRONG-LAYER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-DIRTY-SOURCE is absent",
+        "caseId": "E1-MUTATE-DIRTY-SOURCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-MISSING-SOURCE is absent",
+        "caseId": "E1-MUTATE-MISSING-SOURCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-STALE-REPORT is absent",
+        "caseId": "E1-MUTATE-STALE-REPORT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-CROSS-COMMIT is absent",
+        "caseId": "E1-MUTATE-CROSS-COMMIT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-UNBOUND-CASE is absent",
+        "caseId": "E1-MUTATE-UNBOUND-CASE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-EMPTY-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-EMPTY-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-EMPTY-OBJECT-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-MISSING-CASE is absent",
+        "caseId": "E1-MUTATE-MISSING-CASE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-FAILED-ASSERTION is absent",
+        "caseId": "E1-MUTATE-FAILED-ASSERTION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NO-DOWNLOAD-BYTES is absent",
+        "caseId": "E1-MUTATE-NO-DOWNLOAD-BYTES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-DOWNLOAD-DIGEST is absent",
+        "caseId": "E1-MUTATE-DOWNLOAD-DIGEST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PATCH-NOT-APPLIED is absent",
+        "caseId": "E1-MUTATE-PATCH-NOT-APPLIED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PATCH-DIGEST is absent",
+        "caseId": "E1-MUTATE-PATCH-DIGEST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-DUPLICATE-ID is absent",
+        "caseId": "E1-MUTATE-DUPLICATE-ID"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-UNKNOWN-STATUS is absent",
+        "caseId": "E1-MUTATE-UNKNOWN-STATUS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-UNKNOWN-LAYER is absent",
+        "caseId": "E1-MUTATE-UNKNOWN-LAYER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NOT-EXECUTED is absent",
+        "caseId": "E1-MUTATE-NATIVE-NOT-EXECUTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-VERSION is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-VERSION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-ATTEMPT is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-ATTEMPT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-NO-MODEL-TASKS is absent",
+        "caseId": "E1-MUTATE-NATIVE-NO-MODEL-TASKS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-INSTALL-NOT-STAGED is absent",
+        "caseId": "E1-MUTATE-INSTALL-NOT-STAGED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-INSTALL-NOT-INDEPENDENT is absent",
+        "caseId": "E1-MUTATE-INSTALL-NOT-INDEPENDENT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NOT-TESTED is absent",
+        "caseId": "E1-MUTATE-NOT-TESTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-SELF-CLAIM is absent",
+        "caseId": "E1-MUTATE-SELF-CLAIM"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ADMISSION-PROBE is absent",
+        "caseId": "E1-MUTATE-ADMISSION-PROBE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-ADMISSION-FAIL-CLOSED is absent",
+        "caseId": "E1-ADMISSION-FAIL-CLOSED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-PREFLIGHT-NO-FALLBACK is absent",
+        "caseId": "E1-PREFLIGHT-NO-FALLBACK"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-STRUCTURE-TIER-SUPERSET is absent",
+        "caseId": "E1-STRUCTURE-TIER-SUPERSET"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-STRUCTURE-NO-ALLOW-GAP is absent",
+        "caseId": "E1-STRUCTURE-NO-ALLOW-GAP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-NO-ELIGIBLE is absent",
+        "caseId": "E1-MUTATE-ROUTE-NO-ELIGIBLE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-OVERLAP is absent",
+        "caseId": "E1-MUTATE-ROUTE-OVERLAP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-EXPIRED is absent",
+        "caseId": "E1-MUTATE-ROUTE-EXPIRED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-NO-EVIDENCE is absent",
+        "caseId": "E1-MUTATE-ROUTE-NO-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-ROUTE-DEFAULT-PATH is absent",
+        "caseId": "E1-MUTATE-ROUTE-DEFAULT-PATH"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-DISPOSITION is absent",
+        "caseId": "E1-MUTATE-REVIEW-DISPOSITION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-SAME-ASSIGNMENT is absent",
+        "caseId": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-NO-ISOLATION is absent",
+        "caseId": "E1-MUTATE-REVIEW-NO-ISOLATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-REVIEW-BAD-DIGEST is absent",
+        "caseId": "E1-MUTATE-REVIEW-BAD-DIGEST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-SAME-PROTOCOL is absent",
+        "caseId": "E1-MUTATE-HETERO-SAME-PROTOCOL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NOT-EXECUTED is absent",
+        "caseId": "E1-MUTATE-HETERO-NOT-EXECUTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-VERSION is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-VERSION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-BUDGET is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-BUDGET"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-ISOLATION is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-ISOLATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-HETERO-NO-SUBJECT is absent",
+        "caseId": "E1-MUTATE-HETERO-NO-SUBJECT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED is absent",
+        "caseId": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-CONTROL-NO-STOP is absent",
+        "caseId": "E1-MUTATE-NATIVE-CONTROL-NO-STOP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY is absent",
+        "caseId": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-ZERO-TURNS is absent",
+        "caseId": "E1-MUTATE-PILOT-ZERO-TURNS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-UNKNOWN-USAGE is absent",
+        "caseId": "E1-MUTATE-PILOT-UNKNOWN-USAGE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-BLOCKED-PASS is absent",
+        "caseId": "E1-MUTATE-PILOT-BLOCKED-PASS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E1-MUTATE-PILOT-NO-ORACLE is absent",
+        "caseId": "E1-MUTATE-PILOT-NO-ORACLE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-CONFIGURATION is absent",
+        "caseId": "E2-CONFIGURATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-DAILY-VERTICAL is absent",
+        "caseId": "E2-DAILY-VERTICAL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ARTIFACT-ROUNDTRIP is absent",
+        "caseId": "E2-ARTIFACT-ROUNDTRIP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-WORK-EVIDENCE is absent",
+        "caseId": "E2-WORK-EVIDENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REOPEN-PERSISTENCE is absent",
+        "caseId": "E2-REOPEN-PERSISTENCE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REPLAY-AND-CONFLICT is absent",
+        "caseId": "E2-REPLAY-AND-CONFLICT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-SESSION-ISOLATION is absent",
+        "caseId": "E2-SESSION-ISOLATION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-STALE-BUSINESS-REJECTION is absent",
+        "caseId": "E2-STALE-BUSINESS-REJECTION"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-MACHINE-FAIL is absent",
+        "caseId": "E2-MACHINE-FAIL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ONE-WRITER is absent",
+        "caseId": "E2-ONE-WRITER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-SCOPE-AND-PROFILE-GUARDS is absent",
+        "caseId": "E2-SCOPE-AND-PROFILE-GUARDS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-AUTH-AND-ORIGIN is absent",
+        "caseId": "E2-AUTH-AND-ORIGIN"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ASSISTANT-SDK-MOCK is absent",
+        "caseId": "E2-ASSISTANT-SDK-MOCK"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-CONVERSATION-CATALOG is absent",
+        "caseId": "E2-CONVERSATION-CATALOG"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ATTENTION-SIGNAL is absent",
+        "caseId": "E2-ATTENTION-SIGNAL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-REVIEW-TIMING is absent",
+        "caseId": "E2-REVIEW-TIMING"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-ROUTE-FIXTURE is absent",
+        "caseId": "E2-ROUTE-FIXTURE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-REVIEW-FIXTURES is absent",
+        "caseId": "E3-REVIEW-FIXTURES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-SEALED-COPY is absent",
+        "caseId": "E3-SEALED-COPY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-REVIEW-ACTIVITY-UI is absent",
+        "caseId": "E3-REVIEW-ACTIVITY-UI"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-ATTENTION-INBOX is absent",
+        "caseId": "E3-ATTENTION-INBOX"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-ATTENTION-INBOX-UI is absent",
+        "caseId": "E3-ATTENTION-INBOX-UI"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-DECISION-WORKFLOW is absent",
+        "caseId": "E3-DECISION-WORKFLOW"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-PROPOSAL-HTTP is absent",
+        "caseId": "E3-PROPOSAL-HTTP"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-DESKTOP-GEOMETRY is absent",
+        "caseId": "E3-DESKTOP-GEOMETRY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-NOTEBOOK-GEOMETRY is absent",
+        "caseId": "E3-NOTEBOOK-GEOMETRY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-MOBILE-GEOMETRY is absent",
+        "caseId": "E3-MOBILE-GEOMETRY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-QUESTION-FORM is absent",
+        "caseId": "E3-QUESTION-FORM"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-ACCEPT-AND-DOWNLOAD is absent",
+        "caseId": "E3-ACCEPT-AND-DOWNLOAD"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-ASSISTANT-SCHEMA-FIXTURES is absent",
+        "caseId": "E3-ASSISTANT-SCHEMA-FIXTURES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-CONVERSATION-UI is absent",
+        "caseId": "E3-CONVERSATION-UI"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-VERIFICATION-RECOVERY-UI is absent",
+        "caseId": "E3-VERIFICATION-RECOVERY-UI"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-OFFLINE-AND-ERROR is absent",
+        "caseId": "E3-OFFLINE-AND-ERROR"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E3-KEYBOARD-AND-SCROLL is absent",
+        "caseId": "E3-KEYBOARD-AND-SCROLL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-BOUNDED-CYCLES is absent",
+        "caseId": "E4-BOUNDED-CYCLES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-PORTABILITY-CHECKLIST is absent",
+        "caseId": "E4-PORTABILITY-CHECKLIST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-RECOVERY-PREFLIGHT is absent",
+        "caseId": "E4-RECOVERY-PREFLIGHT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-RECOVERY-READONLY is absent",
+        "caseId": "E4-RECOVERY-READONLY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-VERIFICATION-RECOVERY is absent",
+        "caseId": "E2-VERIFICATION-RECOVERY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E2-VERIFICATION-FINISHED-STATES is absent",
+        "caseId": "E2-VERIFICATION-FINISHED-STATES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-INSTALL-ARTIFACT-IDENTITY is absent",
+        "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-INSTALL-FIRST-RUN is absent",
+        "caseId": "E4-INSTALL-FIRST-RUN"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-INSTALL-CONFIG-ROOT is absent",
+        "caseId": "E4-INSTALL-CONFIG-ROOT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-INSTALL-REUSE-CONCURRENCY is absent",
+        "caseId": "E4-INSTALL-REUSE-CONCURRENCY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-INSTALL-HOST-GUARDS is absent",
+        "caseId": "E4-INSTALL-HOST-GUARDS"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-BACKUP-RESTORE is absent",
+        "caseId": "E4-BACKUP-RESTORE"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-INSTALL-TAMPER is absent",
+        "caseId": "E4-INSTALL-TAMPER"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-INSTALL-ROLLBACK is absent",
+        "caseId": "E4-INSTALL-ROLLBACK"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-UPGRADE-ROLLBACK is absent",
+        "caseId": "E4-UPGRADE-ROLLBACK"
+      }
+    ],
+    "claimedBy": null,
+    "notes": [
+      "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+      "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+    ]
+  },
+  "claim": {
+    "status": "FAIL",
+    "tier": "installed-alpha",
+    "decidedAt": "2026-11-11T08:28:01.535Z",
+    "failureCodes": [
+      "source_dirty",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case"
+    ]
+  }
+}

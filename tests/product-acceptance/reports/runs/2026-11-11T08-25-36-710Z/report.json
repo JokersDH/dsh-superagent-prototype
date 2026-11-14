@@ -1,0 +1,2109 @@
+{
+  "schema": "product-acceptance/1",
+  "suites": [
+    "e3"
+  ],
+  "branch": "codex/g3-product-acceptance",
+  "source": {
+    "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce",
+    "dirty": true
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "os": "Darwin 25.6.0"
+  },
+  "startedAt": "2026-11-11T08:25:36.711Z",
+  "finishedAt": "2026-11-11T08:26:10.130Z",
+  "checkedAt": "2026-11-11T08:26:10.130Z",
+  "counts": {
+    "PASS": 18,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 7,
+    "BLOCKED": 0,
+    "UNKNOWN": 0
+  },
+  "artifacts": {
+    "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z",
+    "screenshots": [
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/mobile-attention-inbox.png"
+    ]
+  },
+  "cases": [
+    {
+      "id": "E3-DESKTOP-GEOMETRY",
+      "title": "Desktop: conversation-centred layout without overflow or overlap",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "SAME_ORIGIN_HTTP_TRANSPORT",
+          "ok": true
+        },
+        {
+          "id": "NAV_PRESENT",
+          "ok": true
+        },
+        {
+          "id": "WORK_CARDS",
+          "ok": true
+        },
+        {
+          "id": "QUESTION_CARD",
+          "ok": true
+        },
+        {
+          "id": "COMPOSER",
+          "ok": true
+        },
+        {
+          "id": "TOKEN_RAIL",
+          "ok": true,
+          "detail": "#272d2a"
+        },
+        {
+          "id": "TOKEN_ACCENT",
+          "ok": true,
+          "detail": "#197764"
+        },
+        {
+          "id": "TOKEN_WHITE_CONVERSATION",
+          "ok": true,
+          "detail": "rgb(255, 255, 255)"
+        },
+        {
+          "id": "DESKTOP_NO_HORIZONTAL_OVERFLOW",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "DESKTOP_RAIL_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "DESKTOP_CONVERSATION_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "DESKTOP_COMPOSER_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "DESKTOP_SIDEBAR_NO_OVERLAP",
+          "ok": true,
+          "detail": "{\"topbar\":{\"x\":0,\"y\":0,\"width\":1440,\"height\":52,\"visible\":true,\"onScreen\":true},\"rail\":{\"x\":0,\"y\":52,\"width\":56,\"height\":848,\"visible\":true,\"onScreen\":true},\"sidebar\":{\"x\":56,\"y\":52,\"width\":232,\"height\":848,\"visible\":true,\"onScreen\":true},\"conversation\":{\"x\":288,\"y\":52,\"width\":1152,\"height\":848,\"visible\":true,\"onScreen\":true},\"composer\":{\"x\":484,\"y\":730,\"width\":760,\"height\":147,\"visible\":true,\"onS"
+        },
+        {
+          "id": "DESKTOP_CONVERSATION_IS_CENTRAL",
+          "ok": true,
+          "detail": "conversation 1152 vs sidebar 232"
+        }
+      ],
+      "evidence": {
+        "layouts": {
+          "desktop": {
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "documentWidth": 1440,
+            "horizontalOverflow": false,
+            "overflowing": [],
+            "boxes": {
+              "topbar": {
+                "x": 0,
+                "y": 0,
+                "width": 1440,
+                "height": 52,
+                "visible": true,
+                "onScreen": true
+              },
+              "rail": {
+                "x": 0,
+                "y": 52,
+                "width": 56,
+                "height": 848,
+                "visible": true,
+                "onScreen": true
+              },
+              "sidebar": {
+                "x": 56,
+                "y": 52,
+                "width": 232,
+                "height": 848,
+                "visible": true,
+                "onScreen": true
+              },
+              "conversation": {
+                "x": 288,
+                "y": 52,
+                "width": 1152,
+                "height": 848,
+                "visible": true,
+                "onScreen": true
+              },
+              "composer": {
+                "x": 484,
+                "y": 730,
+                "width": 760,
+                "height": 147,
+                "visible": true,
+                "onScreen": true
+              },
+              "detail": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              }
+            }
+          }
+        },
+        "tokens": {
+          "rail": "#272d2a",
+          "accent": "#197764",
+          "panel": "#fff",
+          "body": "rgb(255, 255, 255)"
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T08:25:39.684Z",
+      "finishedAt": "2026-11-11T08:25:39.725Z",
+      "durationMs": 41,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-NOTEBOOK-GEOMETRY",
+      "title": "Notebook 1280x800 keeps the same structure without overflow",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "NOTEBOOK_NO_HORIZONTAL_OVERFLOW",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "NOTEBOOK_RAIL_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "NOTEBOOK_CONVERSATION_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "NOTEBOOK_COMPOSER_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "NOTEBOOK_SIDEBAR_NO_OVERLAP",
+          "ok": true,
+          "detail": "{\"topbar\":{\"x\":0,\"y\":0,\"width\":1280,\"height\":52,\"visible\":true,\"onScreen\":true},\"rail\":{\"x\":0,\"y\":52,\"width\":56,\"height\":748,\"visible\":true,\"onScreen\":true},\"sidebar\":{\"x\":56,\"y\":52,\"width\":232,\"height\":748,\"visible\":true,\"onScreen\":true},\"conversation\":{\"x\":288,\"y\":52,\"width\":992,\"height\":748,\"visible\":true,\"onScreen\":true},\"composer\":{\"x\":404,\"y\":630,\"width\":760,\"height\":147,\"visible\":true,\"onSc"
+        },
+        {
+          "id": "NOTEBOOK_CONVERSATION_IS_CENTRAL",
+          "ok": true,
+          "detail": "conversation 992 vs sidebar 232"
+        }
+      ],
+      "evidence": {
+        "layouts": {
+          "notebook": {
+            "viewport": {
+              "width": 1280,
+              "height": 800
+            },
+            "documentWidth": 1280,
+            "horizontalOverflow": false,
+            "overflowing": [],
+            "boxes": {
+              "topbar": {
+                "x": 0,
+                "y": 0,
+                "width": 1280,
+                "height": 52,
+                "visible": true,
+                "onScreen": true
+              },
+              "rail": {
+                "x": 0,
+                "y": 52,
+                "width": 56,
+                "height": 748,
+                "visible": true,
+                "onScreen": true
+              },
+              "sidebar": {
+                "x": 56,
+                "y": 52,
+                "width": 232,
+                "height": 748,
+                "visible": true,
+                "onScreen": true
+              },
+              "conversation": {
+                "x": 288,
+                "y": 52,
+                "width": 992,
+                "height": 748,
+                "visible": true,
+                "onScreen": true
+              },
+              "composer": {
+                "x": 404,
+                "y": 630,
+                "width": 760,
+                "height": 147,
+                "visible": true,
+                "onScreen": true
+              },
+              "detail": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              }
+            }
+          }
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T08:25:39.725Z",
+      "finishedAt": "2026-11-11T08:25:39.907Z",
+      "durationMs": 182,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-MOBILE-GEOMETRY",
+      "title": "Mobile: drawers replace columns and never overflow",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "MOBILE_NO_OVERFLOW",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "MOBILE_COMPOSER",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_SIDEBAR_HIDDEN",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_SIDEBAR_OPEN",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_SIDEBAR_NO_OVERFLOW",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_DETAIL_OPEN",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_DETAIL_NO_OVERFLOW",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_ESCAPE_CLOSES",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "layouts": {
+          "mobile": {
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "documentWidth": 390,
+            "horizontalOverflow": false,
+            "overflowing": [],
+            "boxes": {
+              "topbar": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 52,
+                "visible": true,
+                "onScreen": true
+              },
+              "rail": {
+                "x": 0,
+                "y": 788,
+                "width": 390,
+                "height": 56,
+                "visible": true,
+                "onScreen": true
+              },
+              "sidebar": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              },
+              "conversation": {
+                "x": 0,
+                "y": 52,
+                "width": 390,
+                "height": 736,
+                "visible": true,
+                "onScreen": true
+              },
+              "composer": {
+                "x": 14,
+                "y": 630,
+                "width": 362,
+                "height": 144,
+                "visible": true,
+                "onScreen": true
+              },
+              "detail": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              }
+            }
+          },
+          "mobileSidebar": {
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "documentWidth": 390,
+            "horizontalOverflow": false,
+            "overflowing": [],
+            "boxes": {
+              "topbar": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 52,
+                "visible": true,
+                "onScreen": true
+              },
+              "rail": {
+                "x": 0,
+                "y": 788,
+                "width": 390,
+                "height": 56,
+                "visible": true,
+                "onScreen": true
+              },
+              "sidebar": {
+                "x": 0,
+                "y": 52,
+                "width": 292,
+                "height": 736,
+                "visible": true,
+                "onScreen": true
+              },
+              "conversation": {
+                "x": 0,
+                "y": 52,
+                "width": 390,
+                "height": 736,
+                "visible": true,
+                "onScreen": true
+              },
+              "composer": {
+                "x": 14,
+                "y": 630,
+                "width": 362,
+                "height": 144,
+                "visible": true,
+                "onScreen": true
+              },
+              "detail": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              }
+            }
+          },
+          "mobileDetail": {
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "documentWidth": 390,
+            "horizontalOverflow": false,
+            "overflowing": [],
+            "boxes": {
+              "topbar": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 52,
+                "visible": true,
+                "onScreen": true
+              },
+              "rail": {
+                "x": 0,
+                "y": 788,
+                "width": 390,
+                "height": 56,
+                "visible": true,
+                "onScreen": true
+              },
+              "sidebar": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "visible": false,
+                "onScreen": false
+              },
+              "conversation": {
+                "x": 0,
+                "y": 52,
+                "width": 390,
+                "height": 736,
+                "visible": true,
+                "onScreen": true
+              },
+              "composer": {
+                "x": 14,
+                "y": 630,
+                "width": 362,
+                "height": 144,
+                "visible": true,
+                "onScreen": true
+              },
+              "detail": {
+                "x": 40,
+                "y": 52,
+                "width": 350,
+                "height": 736,
+                "visible": true,
+                "onScreen": true
+              }
+            }
+          }
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T08:25:39.907Z",
+      "finishedAt": "2026-11-11T08:25:40.468Z",
+      "durationMs": 561,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-QUESTION-FORM",
+      "title": "The attention inbox opens and answers the real question through the UI",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "ROW_IDENTITY",
+          "ok": true,
+          "detail": "480e20d19f66b5f82955a4c8e2677129"
+        },
+        {
+          "id": "CARD_TARGET_DETAILS",
+          "ok": true
+        },
+        {
+          "id": "API_QUESTION_ANSWERED",
+          "ok": true
+        },
+        {
+          "id": "UI_ANSWER_PERSISTED",
+          "ok": true
+        },
+        {
+          "id": "DELIVERY_RECORDED",
+          "ok": true,
+          "detail": "[{\"answerId\":\"e18b52b6e5abf250ef72a61ebb3bb41f\",\"targetBindingId\":\"97c930c76c9818a4782251bff8b5d229\",\"status\":\"native_applied\",\"evidenceRefs\":[\"payload:760e83a3647e15aecb2cdc66da6ada3b7b2d689b0189b74ee8a1537452df67a8\"]}]"
+        }
+      ],
+      "evidence": {
+        "question": {
+          "id": "455b6bd4d7e8e7f80b671b70fc6035d9",
+          "attentionId": "480e20d19f66b5f82955a4c8e2677129",
+          "option": "Allow once",
+          "autoRefreshObserved": false,
+          "deliveries": [
+            "native_applied"
+          ]
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T08:25:40.468Z",
+      "finishedAt": "2026-11-11T08:25:41.625Z",
+      "durationMs": 1157,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-ACCEPT-AND-DOWNLOAD",
+      "title": "Accept through the UI, verify the artifact bytes and a patch preview",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "VERIFICATION_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "PATCH_PREVIEW",
+          "ok": true,
+          "detail": "diff --git a/src/product-output.txt b/sr"
+        },
+        {
+          "id": "DOWNLOAD_BYTES",
+          "ok": true,
+          "detail": "approved product output\n"
+        },
+        {
+          "id": "DOWNLOAD_DIGEST",
+          "ok": true
+        },
+        {
+          "id": "DOWNLOAD_NAME",
+          "ok": true,
+          "detail": "product-output.txt"
+        },
+        {
+          "id": "API_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "REOPEN_SHOWS_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "REOPEN_ARTIFACTS",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "download": {
+          "filename": "product-output.txt",
+          "bytes": 24,
+          "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+          "verifiedSha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+          "saved": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-11T08-25-36-710Z/screenshots/product-output.txt"
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T08:25:41.625Z",
+      "finishedAt": "2026-11-11T08:25:42.630Z",
+      "durationMs": 1005,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-OFFLINE-AND-ERROR",
+      "title": "Offline, slow and failing responses surface honest states",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "SLOW_SHOWS_LOADING",
+          "ok": true,
+          "detail": "loading indicator was not visible during a slow snapshot"
+        },
+        {
+          "id": "ERROR_ALERT",
+          "ok": true
+        },
+        {
+          "id": "ERROR_RETRY",
+          "ok": true
+        },
+        {
+          "id": "OFFLINE_BADGE",
+          "ok": true,
+          "detail": "offline badge never appeared while the event stream was blocked"
+        },
+        {
+          "id": "RECONNECT_NOTICE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "states": {
+          "slow": true,
+          "error": true,
+          "offline": true
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T08:25:42.630Z",
+      "finishedAt": "2026-11-11T08:25:46.575Z",
+      "durationMs": 3945,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-KEYBOARD-AND-SCROLL",
+      "title": "Keyboard focus, composer and the work list stay operable",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "TAB_FOCUS",
+          "ok": true
+        },
+        {
+          "id": "FOCUS_VISIBLE",
+          "ok": true,
+          "detail": "{\"tag\":\"a\",\"label\":\"使用指南\",\"outline\":\"solid 2px\"}"
+        },
+        {
+          "id": "LONG_TEXT_NO_OVERFLOW",
+          "ok": true,
+          "detail": "overflow 0px"
+        },
+        {
+          "id": "LONG_PATH_PRESENT",
+          "ok": true
+        },
+        {
+          "id": "WORK_LIST_SCROLLABLE",
+          "ok": true,
+          "detail": "{\"scrollHeight\":741,\"clientHeight\":279,\"overflowY\":\"auto\"}"
+        },
+        {
+          "id": "WORK_LIST_OVERFLOW_AUTO",
+          "ok": true,
+          "detail": "auto"
+        },
+        {
+          "id": "WORK_LIST_SCROLLS",
+          "ok": true,
+          "detail": "0 -> 120"
+        },
+        {
+          "id": "COMPOSER_VALUE",
+          "ok": true
+        },
+        {
+          "id": "SENT_MESSAGE",
+          "ok": true
+        },
+        {
+          "id": "ALL_BUTTONS_REACHABLE",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "keyboard": {
+          "focus": {
+            "tag": "a",
+            "label": "使用指南",
+            "outline": "solid 2px"
+          },
+          "messageOverflow": 0,
+          "scroll": {
+            "scrollHeight": 741,
+            "clientHeight": 279,
+            "overflowY": "auto"
+          },
+          "before": 0,
+          "after": 120
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T08:25:46.575Z",
+      "finishedAt": "2026-11-11T08:25:46.859Z",
+      "durationMs": 284,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-CONVERSATION-UI",
+      "title": "Conversation search, rename, archive, restore and draft isolation are operable",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "CREATE_RECORDED",
+          "ok": true,
+          "detail": "{\"commandId\":\"e3-conv-create\",\"seq\":307,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "DIRECTORY_LISTED",
+          "ok": true
+        },
+        {
+          "id": "BETA_LISTED",
+          "ok": true
+        },
+        {
+          "id": "SEARCH_FILTERS",
+          "ok": true
+        },
+        {
+          "id": "RENAME_PERSISTED",
+          "ok": true,
+          "detail": "{\"id\":\"conv-e3-beta\",\"title\":\"Beta 改名 UI\",\"titleRevision\":2,\"archiveRevision\":0,\"projectId\":\"project-atlas\",\"projectIds\":[\"project-atlas\"],\"createdAt\":\"2026-11-11T08:25:46.862Z\",\"updatedAt\":\"2026-11-11T08:25:47.532Z\",\"messageCount\":0,\"workCount\":0,\"attention\":false}"
+        },
+        {
+          "id": "ARCHIVED",
+          "ok": true,
+          "detail": "{\"id\":\"conv-e3-beta\",\"title\":\"Beta 改名 UI\",\"titleRevision\":2,\"archiveRevision\":1,\"projectId\":\"project-atlas\",\"projectIds\":[\"project-atlas\"],\"createdAt\":\"2026-11-11T08:25:46.862Z\",\"updatedAt\":\"2026-11-11T08:25:47.532Z\",\"archivedAt\":\"2026-11-11T08:25:47.598Z\",\"messageCount\":0,\"workCount\":0,\"attention\":false}"
+        },
+        {
+          "id": "ARCHIVED_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "RESTORED",
+          "ok": true,
+          "detail": "{\"id\":\"conv-e3-beta\",\"title\":\"Beta 改名 UI\",\"titleRevision\":2,\"archiveRevision\":2,\"projectId\":\"project-atlas\",\"projectIds\":[\"project-atlas\"],\"createdAt\":\"2026-11-11T08:25:46.862Z\",\"updatedAt\":\"2026-11-11T08:25:47.532Z\",\"messageCount\":0,\"workCount\":0,\"attention\":false}"
+        },
+        {
+          "id": "DRAFT_NOT_LEAKED",
+          "ok": true,
+          "detail": "\"\""
+        },
+        {
+          "id": "RELOAD_PERSISTS_TITLE",
+          "ok": true
+        },
+        {
+          "id": "MOBILE_DIRECTORY",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "MOBILE_SEARCH",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "catalog": {
+          "conversations": 2,
+          "renamed": true,
+          "archivedRestored": true,
+          "draftIsolated": true,
+          "mobileOperable": true
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T08:25:46.859Z",
+      "finishedAt": "2026-11-11T08:25:49.418Z",
+      "durationMs": 2559,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-VERIFICATION-RECOVERY-UI",
+      "title": "A blocked verification exposes a working recheck and acceptance button",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "RECHECK_VISIBLE",
+          "ok": true
+        },
+        {
+          "id": "RECHECK_FINISHED",
+          "ok": true,
+          "detail": "{\"protocol\":\"work-verification/1\",\"workId\":\"19855549fe631518ba7878f7e598e5dc\",\"state\":\"finished\",\"verificationId\":\"verification:1e225b2b-3a40-4805-be0a-08b5e7d10343\",\"retryAvailable\":false}"
+        },
+        {
+          "id": "UI_DELIVERED",
+          "ok": true
+        },
+        {
+          "id": "REOPEN_DELIVERED",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "verificationRecovery": {
+          "blockedId": "verification-block:16488a5a-905c-4f5d-9ced-8e078655f001",
+          "verificationId": "verification:1e225b2b-3a40-4805-be0a-08b5e7d10343",
+          "uiRecheck": true,
+          "uiAccepted": true
+        }
+      },
+      "limitations": [
+        "Browser acceptance against the packaged fixture workbench; no vendor model or native agent.",
+        "Layout checks assert geometry/overflow/reachability, not aesthetic quality."
+      ],
+      "startedAt": "2026-11-11T08:25:50.450Z",
+      "finishedAt": "2026-11-11T08:25:51.396Z",
+      "durationMs": 946,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+      "title": "Persisted decision/proposal fixtures match the public contract and illegal variants are rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "DECISION_SCHEMA",
+          "ok": true
+        },
+        {
+          "id": "PROPOSAL_SCHEMA",
+          "ok": true
+        },
+        {
+          "id": "REJECT_REVOKE_WITHOUT_TIMESTAMP",
+          "ok": true
+        },
+        {
+          "id": "REJECT_CONFIRM_WITHOUT_COMMAND",
+          "ok": true
+        },
+        {
+          "id": "REJECT_GRANT_MISMATCH",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "fixture": {
+          "id": "assistant-decision",
+          "path": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/fixtures/assistant/persisted-decision.json",
+          "sha256": "25e175a673feba5645faed1a1472803b7a33d5144cdcf581e05f543e0f22642e"
+        },
+        "assistantFixtures": {
+          "decision": "25e175a673feba5645faed1a1472803b7a33d5144cdcf581e05f543e0f22642e",
+          "proposal": "55591dbc9144441d8ecacd2fc8cc95835011c35cd0152780ee9eed65b3b1a11d",
+          "invalidVariantsRejected": 3
+        }
+      },
+      "limitations": [
+        "Schema/contract fixtures only; no assistant product workflow is claimed in this checkout."
+      ],
+      "startedAt": "2026-11-11T08:25:51.415Z",
+      "finishedAt": "2026-11-11T08:25:51.417Z",
+      "durationMs": 2,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-ASSISTANT-DOMAIN-ADMISSION",
+      "title": "C domain admission probes pass",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "C_CASES_PASS",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "cProbes": [
+          {
+            "id": "C-MISSING-SOURCE-EFFECTIVENESS",
+            "status": "PASS"
+          },
+          {
+            "id": "C-CONFIRMED-REPLAY-STILL-AUTHENTICATES",
+            "status": "PASS"
+          },
+          {
+            "id": "C-PROPOSAL-SNAPSHOTS-GRANT",
+            "status": "PASS"
+          }
+        ]
+      },
+      "limitations": [
+        "Consumes main's read-only domain probe; it is not a product workflow."
+      ],
+      "startedAt": "2026-11-11T08:25:51.520Z",
+      "finishedAt": "2026-11-11T08:25:51.520Z",
+      "durationMs": 0,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-ASSISTANT-END-TO-END",
+      "title": "Explicit decision → authorised context → proposal → confirm/reject → atomic receipt → reopen",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "Explicit decisions now work over HTTP (E3-DECISION-WORKFLOW); automatic context/proposal confirmation is still absent.",
+      "assertions": [],
+      "evidence": {
+        "assistantConfigured": false,
+        "knowledgeProjection": false,
+        "recordDecision": {
+          "status": "rejected",
+          "code": "unsupported_capability"
+        },
+        "plannedNegatives": [
+          "untrusted source instruction in a repository file",
+          "other project / conversation / actor",
+          "old contract or source digest",
+          "revoked grant",
+          "over-budget proposal",
+          "crash after confirmation before command commit",
+          "transaction failure rolls back record and command",
+          "same commandId replay is idempotent, changed payload conflicts"
+        ]
+      },
+      "limitations": [
+        "Owner: main (assistant HTTP/context wiring) and C (AssistantStatePort consumer).",
+        "No decision/proposal HTTP entry exists in this checkout; no partial product claim is made."
+      ],
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-REVIEW-FIXTURES",
+      "title": "Review report/evidence fixtures match the frozen contract and illegal variants are rejected",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "REPORT_SCHEMA",
+          "ok": true
+        },
+        {
+          "id": "EVIDENCE_SCHEMA",
+          "ok": true
+        },
+        {
+          "id": "REJECT_DISPOSITION",
+          "ok": true
+        },
+        {
+          "id": "REJECT_SAME_ASSIGNMENT",
+          "ok": true
+        },
+        {
+          "id": "REJECT_NO_ISOLATION",
+          "ok": true
+        },
+        {
+          "id": "REJECT_DOUBLE_PROOF",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "fixture": {
+          "id": "review-report-fixture",
+          "path": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/fixtures/routing/review-report.json",
+          "sha256": "7b60ecd58c74ec62e8d626177c2bbbfcde1a5d3748f8b069f2e827e7d063bfd4"
+        },
+        "reviewFixtures": {
+          "report": "7b60ecd58c74ec62e8d626177c2bbbfcde1a5d3748f8b069f2e827e7d063bfd4",
+          "evidence": "f688d7210c343762a98b2ec7a0d56cadb67a1b2fd2c0952f2b7b7d0e49e6b6d6",
+          "mutantsRejected": 4
+        }
+      },
+      "limitations": [
+        "Schema fixtures only; no review pipeline is claimed."
+      ],
+      "startedAt": "2026-11-11T08:25:51.917Z",
+      "finishedAt": "2026-11-11T08:25:51.918Z",
+      "durationMs": 1,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-SEALED-COPY",
+      "title": "A sealed capsule excludes .git/dependencies, refuses links and copies by value",
+      "layer": "readonly",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "DETERMINISTIC_DIGEST",
+          "ok": true,
+          "detail": "22c0baceb70ae674abafbb5f6c72262eb142767bccd9220b78fdc59a8723cafc"
+        },
+        {
+          "id": "FILES_COPIED",
+          "ok": true
+        },
+        {
+          "id": "NO_HARD_LINK",
+          "ok": true,
+          "detail": "17754330 == 20663314"
+        },
+        {
+          "id": "NO_ORACLE_LEAK",
+          "ok": true,
+          "detail": "[\"package.json\",\"src/feature.js\",\"src/index.js\",\"task.md\",\"test/index.test.js\"]"
+        },
+        {
+          "id": "EXCLUDES_GIT_AND_DEPS",
+          "ok": true,
+          "detail": "[\"package.json\",\"src/feature.js\",\"src/index.js\",\"task.md\",\"test/index.test.js\"]"
+        },
+        {
+          "id": "REFUSES_SYMLINK",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "capsule": {
+          "digest": "22c0baceb70ae674abafbb5f6c72262eb142767bccd9220b78fdc59a8723cafc",
+          "files": 5,
+          "excludesGit": true,
+          "refusesLinks": true
+        }
+      },
+      "limitations": [
+        "Capsule building is acceptance tooling; it is not a host sandbox."
+      ],
+      "startedAt": "2026-11-11T08:25:51.918Z",
+      "finishedAt": "2026-11-11T08:25:51.926Z",
+      "durationMs": 8,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-REVIEW-ACTIVITY-UI",
+      "title": "Visible focused review activity is recorded and does not block acceptance",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "DELIVERED",
+          "ok": true,
+          "detail": "delivered"
+        },
+        {
+          "id": "ACCEPT_EVENT",
+          "ok": true,
+          "detail": "[{\"seq\":37,\"topic\":\"application.candidate.accepted\",\"payload\":{\"candidate\":{\"ticketId\":\"01ebff3ad54d01258913de195fe5acf7\",\"assignmentId\":\"4390fcf8ea527b24e54fa88105fcfad0\",\"contract\":{\"workId\":\"8f12538dfe3e118c1afb566c46ca9015\",\"revision\":1,\"digest\":\"6f051b20c5be4828e4f6e8ef642fc413cd324b047f849101a425d365379c700a\"},\"candidateGeneration\":1},\"actorRef\":\"local-demo-authority\",\"reviewTiming\":{\"candid"
+        },
+        {
+          "id": "ACTIVITY_OBSERVED",
+          "ok": true,
+          "detail": "{\"candidateReadyAt\":\"2026-11-11T08:25:53.114Z\",\"acceptedAt\":\"2026-11-11T08:26:00.559Z\",\"readyToAcceptanceMs\":7445,\"activeReviewMs\":7042,\"activeReviewSource\":\"ui_visibility_proxy\",\"activeReviewCompleteness\":\"partial\",\"evidenceRefs\":[\"verification:420afc37-8683-41eb-96d0-6bea0bb2af7b\",\"review-activity:31\",\"review-activity:33\"]}"
+        },
+        {
+          "id": "ACTIVITY_SOURCE",
+          "ok": true,
+          "detail": "ui_visibility_proxy"
+        },
+        {
+          "id": "ACTIVITY_PARTIAL",
+          "ok": true,
+          "detail": "partial"
+        },
+        {
+          "id": "ACTIVITY_WITHIN_WAIT",
+          "ok": true,
+          "detail": "{\"candidateReadyAt\":\"2026-11-11T08:25:53.114Z\",\"acceptedAt\":\"2026-11-11T08:26:00.559Z\",\"readyToAcceptanceMs\":7445,\"activeReviewMs\":7042,\"activeReviewSource\":\"ui_visibility_proxy\",\"activeReviewCompleteness\":\"partial\",\"evidenceRefs\":[\"verification:420afc37-8683-41eb-96d0-6bea0bb2af7b\",\"review-activity:31\",\"review-activity:33\"]}"
+        }
+      ],
+      "evidence": {
+        "reviewTiming": {
+          "candidateReadyAt": "2026-11-11T08:25:53.114Z",
+          "acceptedAt": "2026-11-11T08:26:00.559Z",
+          "readyToAcceptanceMs": 7445,
+          "activeReviewMs": 7042,
+          "activeReviewSource": "ui_visibility_proxy",
+          "activeReviewCompleteness": "partial",
+          "acceptedEvents": 1,
+          "uiCollected": true
+        }
+      },
+      "limitations": [
+        "The activity value is a UI visibility proxy, not measured human thinking time.",
+        "Overlapping tabs are unioned by the product; this case does not claim exact human time."
+      ],
+      "startedAt": "2026-11-11T08:26:00.668Z",
+      "finishedAt": "2026-11-11T08:26:00.668Z",
+      "durationMs": 0,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-REVIEW-PIPELINE",
+      "title": "Author → barrier → freeze → independent review → report → human review",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "No public entry creates a review Work/Ticket/Assignment or publishes ReviewEvidence; the independent pilot preflight is BLOCKED on pricing.",
+      "assertions": [],
+      "evidence": {
+        "reviewPipeline": {
+          "unavailable": true,
+          "plannedNegatives": [
+            "bad report or no_findings cannot override machine FAIL or required human acceptance",
+            "old subject/digest or wrong profile",
+            "review attempt reusing the author assignment",
+            "missing sealed-copy isolation or input mutation",
+            "permission/auth/cancel/unknown-send cases",
+            "marker recovery cannot resume the review"
+          ]
+        }
+      },
+      "limitations": [
+        "Owner: main/B. No review HTTP/Work pipeline exists in this checkout; contract fixtures and gate validators are prepared."
+      ],
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-ATTENTION-INBOX",
+      "title": "Cross-project attention ranks real items deterministically and scopes them by project",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "PROTOCOL",
+          "ok": true
+        },
+        {
+          "id": "RANKING",
+          "ok": true,
+          "detail": "deterministic_priority"
+        },
+        {
+          "id": "ITEMS",
+          "ok": true,
+          "detail": "items 5"
+        },
+        {
+          "id": "CROSS_PROJECT",
+          "ok": true,
+          "detail": "[\"project-att-b\",\"project-att-a\"]"
+        },
+        {
+          "id": "KIND_question",
+          "ok": true,
+          "detail": "[\"blocked\",\"candidate\",\"question\"]"
+        },
+        {
+          "id": "KIND_candidate",
+          "ok": true,
+          "detail": "[\"blocked\",\"candidate\",\"question\"]"
+        },
+        {
+          "id": "KIND_blocked",
+          "ok": true,
+          "detail": "[\"blocked\",\"candidate\",\"question\"]"
+        },
+        {
+          "id": "RANKS_COVER",
+          "ok": true
+        },
+        {
+          "id": "RANKS_UNIQUE",
+          "ok": true
+        },
+        {
+          "id": "RANKS_REFER_ITEMS",
+          "ok": true
+        },
+        {
+          "id": "BLOCKED_FIRST",
+          "ok": true,
+          "detail": "[{\"id\":\"23e6d092fbeae79fcc1b0916762ab3e1\",\"reasons\":[\"machine_failed\",\"unknown_wait\"]},{\"id\":\"8a50f9df21c1f0ec443a8b10979d5cfd\",\"reasons\":[\"verification_blocked\",\"unknown_wait\"]},{\"id\":\"fef5a64e7f716845f614e52427fad3e6\",\"reasons\":[\"candidate_ready\",\"waiting_age\"]},{\"id\":\"16adc682976412fb81ce2041c239d3e6\",\"reasons\":[\"permission_pending\",\"waiting_age\"]},{\"id\":\"2a02c32eae8e320c10ef9f19ef540bc0\",\"reas"
+        },
+        {
+          "id": "BLOCKED_CODE_REASON",
+          "ok": true,
+          "detail": "[{\"id\":\"23e6d092fbeae79fcc1b0916762ab3e1\",\"reasons\":[\"machine_failed\",\"unknown_wait\"]},{\"id\":\"8a50f9df21c1f0ec443a8b10979d5cfd\",\"reasons\":[\"verification_blocked\",\"unknown_wait\"]}]"
+        },
+        {
+          "id": "CANDIDATE_READY_TIME",
+          "ok": true,
+          "detail": "{\"id\":\"fef5a64e7f716845f614e52427fad3e6\",\"projectId\":\"project-att-a\",\"conversationId\":\"conv-project-att-a\",\"contract\":{\"workId\":\"d5e3d2405050ea622c3f9f6ebceedf0e\",\"revision\":1,\"digest\":\"c0b9c245c426afefb2ba902ad16ecd5ad82835eb794e5f50ad2ab49d1e68e861\"},\"workTitle\":\"project-att-a pass attention\",\"summary\":\"变更已验证，等待审阅。\",\"sinceAt\":\"2026-11-11T08:26:02.057Z\",\"deadlineAt\":null,\"expiresAt\":null,\"blocked"
+        },
+        {
+          "id": "CANDIDATE_REASON",
+          "ok": true
+        },
+        {
+          "id": "QUESTION_WAIT_REASONS",
+          "ok": true
+        },
+        {
+          "id": "DETERMINISTIC_ORDER",
+          "ok": true
+        },
+        {
+          "id": "PROJECT_SCOPE",
+          "ok": true,
+          "detail": "[\"project-att-a\",\"project-att-a\"]"
+        },
+        {
+          "id": "UNAUTHORIZED_PROJECT",
+          "ok": true,
+          "detail": "status 403"
+        },
+        {
+          "id": "UNAUTHORIZED_CODE",
+          "ok": true
+        },
+        {
+          "id": "PAGE1",
+          "ok": true
+        },
+        {
+          "id": "PAGE2_DISJOINT",
+          "ok": true
+        },
+        {
+          "id": "CURSOR_SCOPE_REJECTED",
+          "ok": true,
+          "detail": "status 400"
+        },
+        {
+          "id": "ANSWER_RECORDED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6att-answer-6\",\"workId\":\"fa5071f045867bd80df1ae749e46b7db\",\"entityRefs\":{\"questionId\":\"df6b6fd90b94bc5dcd71f4614a9ae191\"},\"seq\":129,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "ANSWERED_ITEM_REMOVED",
+          "ok": true
+        },
+        {
+          "id": "OTHER_QUESTION_REMAINS",
+          "ok": true
+        },
+        {
+          "id": "STALE_ANSWER_REJECTED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6att-answer-stale-7\",\"seq\":130,\"status\":\"rejected\",\"error\":{\"code\":\"stale_binding\",\"message\":\"Question version changed\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "ACCEPT_RECORDED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6att-accept-8\",\"workId\":\"d5e3d2405050ea622c3f9f6ebceedf0e\",\"seq\":135,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "CANDIDATE_ITEM_REMOVED",
+          "ok": true
+        },
+        {
+          "id": "OLD_CANDIDATE_REJECTED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6att-accept-old-9\",\"seq\":147,\"status\":\"rejected\",\"error\":{\"code\":\"stale_candidate\",\"message\":\"Candidate changed\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "OFFLINE_READABLE",
+          "ok": true,
+          "detail": "items 3"
+        },
+        {
+          "id": "FAILED_VISIBLE",
+          "ok": true,
+          "detail": "[\"verification_blocked\",\"machine_failed\"]"
+        }
+      ],
+      "evidence": {
+        "attention": {
+          "projects": 2,
+          "items": 5,
+          "groups": [
+            {
+              "projectId": "project-att-a",
+              "reason": "waiting_age"
+            },
+            {
+              "projectId": "project-att-b",
+              "reason": "machine_failed"
+            }
+          ],
+          "expiredSent": 0,
+          "batchGrantedPermissions": false,
+          "kinds": [
+            "blocked",
+            "candidate",
+            "question"
+          ],
+          "pagination": {
+            "page1": 1,
+            "page2": 1
+          }
+        }
+      },
+      "limitations": [
+        "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent."
+      ],
+      "startedAt": "2026-11-11T08:26:03.163Z",
+      "finishedAt": "2026-11-11T08:26:03.700Z",
+      "durationMs": 537,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-ATTENTION-DEADLINES",
+      "title": "Real business deadlines, answer expiry and near-deadline reasons",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "No public entry creates a question with a real decisionDeadline/expiresAt in this checkout; waiting-age and unknown-wait ordering are verified instead.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Controlled fixture executor with real SQLite and a real scratch subprocess; no vendor agent.",
+        "Owner: main/B. The fixture question driver exposes neither decisionDeadline nor expiresAt, so no real deadline/expiry item can be produced.",
+        "Contract fields exist and are independently schema-checked; inventing deadlines would fabricate facts."
+      ],
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-ATTENTION-INBOX-UI",
+      "title": "Attention inbox is usable across projects, filters, per-item open and deep links",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "ROWS",
+          "ok": true,
+          "detail": "rows 4"
+        },
+        {
+          "id": "CROSS_PROJECT_ROWS",
+          "ok": true,
+          "detail": "project-att-b fail attention\n待处理\n检查未通过\nproject-att-b\n等待时间未知\n截止未知\n检查未通过 · 时间未知\nproject-att-a pass attention\n待审阅\n变更已验证，等待审阅。\nproject-att-a\n刚刚\n截止未知\n交付待审阅 · 等待时间\nproject-att-a question attention\n权限确认\nAllo"
+        },
+        {
+          "id": "PROJECT_FILTER",
+          "ok": true
+        },
+        {
+          "id": "TYPE_FILTER",
+          "ok": true,
+          "detail": "rows 2"
+        },
+        {
+          "id": "ACCEPTED_ROW_REMOVED",
+          "ok": true
+        },
+        {
+          "id": "DEEP_LINK_OPENS_WORK",
+          "ok": true,
+          "detail": "工作上下文\n工作详情\n已交付\nproject-att-a pass attention\n合同详情\n\n写者已静止\n\nproject-att-a pass attention\n\n代码位置\n原项目\n/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-fault-o8YsVe/project\n工作区\n/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w6-att-ui-JhjVbc/state/workspaces/attempts/attempt-a218af5b-9858-4bb3-acf4-93bd0607bf66\n基线\n3771435df4e5\n完成标准\nOutput matches the registered check\n机器检查 · 必需\n验证结果"
+        },
+        {
+          "id": "MOBILE_NO_OVERFLOW",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "id": "MOBILE_ROWS",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "attentionUi": {
+          "rows": 4,
+          "filters": 3,
+          "acceptedRemoved": true,
+          "deepLink": true,
+          "mobile": true
+        }
+      },
+      "limitations": [
+        "Browser evidence is a controlled two-project fixture; no vendor model and no real business deadline."
+      ],
+      "startedAt": "2026-11-11T08:26:06.319Z",
+      "finishedAt": "2026-11-11T08:26:07.688Z",
+      "durationMs": 1369,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-DECISION-WORKFLOW",
+      "title": "Decision prepare is read-only; confirm and revoke are atomic and replay-safe",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "EMPTY_CATALOG",
+          "ok": true
+        },
+        {
+          "id": "PREPARE_200",
+          "ok": true,
+          "detail": "status 200"
+        },
+        {
+          "id": "PREVIEW_PROTOCOL",
+          "ok": true
+        },
+        {
+          "id": "PREVIEW_SOURCE",
+          "ok": true
+        },
+        {
+          "id": "PREVIEW_SCOPE",
+          "ok": true
+        },
+        {
+          "id": "PREVIEW_TTL_BOUNDED",
+          "ok": true,
+          "detail": "ttl 299999"
+        },
+        {
+          "id": "PREVIEW_TOKEN",
+          "ok": true
+        },
+        {
+          "id": "PREPARE_WRITES_NOTHING",
+          "ok": true
+        },
+        {
+          "id": "PREPARE_NO_EVENT",
+          "ok": true
+        },
+        {
+          "id": "PREPARE_NO_WORK",
+          "ok": true,
+          "detail": "works 0"
+        },
+        {
+          "id": "RECORD_200",
+          "ok": true,
+          "detail": "status 200"
+        },
+        {
+          "id": "RECORD_RECEIPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6dec-record-2\",\"entityRefs\":{\"decisionId\":\"decision-7521ad74-65ec-4653-a861-b4a2d7a6d016\"},\"seq\":4,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "CATALOG_ONE",
+          "ok": true
+        },
+        {
+          "id": "STATUS_RECORDED",
+          "ok": true,
+          "detail": "recorded"
+        },
+        {
+          "id": "SOURCE_CURRENT",
+          "ok": true,
+          "detail": "current"
+        },
+        {
+          "id": "DECISION_CONTENT",
+          "ok": true
+        },
+        {
+          "id": "ONE_EVENT",
+          "ok": true,
+          "detail": "0 -> 1"
+        },
+        {
+          "id": "RECORD_NO_EXECUTION",
+          "ok": true,
+          "detail": "works 0"
+        },
+        {
+          "id": "REPLAY_SAME_SEQ",
+          "ok": true,
+          "detail": "4 != 4"
+        },
+        {
+          "id": "REPLAY_ONE_RECORD",
+          "ok": true
+        },
+        {
+          "id": "REPLAY_NO_EVENT",
+          "ok": true
+        },
+        {
+          "id": "CHANGED_PAYLOAD_CONFLICT",
+          "ok": true,
+          "detail": "status 409"
+        },
+        {
+          "id": "CHANGED_CODE",
+          "ok": true,
+          "detail": "{\"error\":{\"code\":\"conflict\",\"message\":\"Command ID already names another request\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "TAMPERED_REJECTED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6dec-tampered-3\",\"seq\":5,\"status\":\"rejected\",\"error\":{\"code\":\"forbidden\",\"message\":\"Decision preview signature is invalid\",\"retry\":\"none\"}}"
+        },
+        {
+          "id": "TAMPERED_NO_RECORD",
+          "ok": true
+        },
+        {
+          "id": "OUTSIDE_SCOPE_FORBIDDEN",
+          "ok": true,
+          "detail": "status 403"
+        },
+        {
+          "id": "OUTSIDE_SCOPE_CODE",
+          "ok": true
+        },
+        {
+          "id": "MALFORMED_400",
+          "ok": true,
+          "detail": "status 400"
+        },
+        {
+          "id": "REVOKE_RECORDED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6dec-revoke-5\",\"entityRefs\":{\"decisionId\":\"decision-7521ad74-65ec-4653-a861-b4a2d7a6d016\"},\"seq\":7,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "REVOKED_STATUS",
+          "ok": true,
+          "detail": "revoked"
+        },
+        {
+          "id": "REVOKED_TIMESTAMP",
+          "ok": true
+        },
+        {
+          "id": "REVOKE_EVENT",
+          "ok": true
+        },
+        {
+          "id": "STALE_REVOKE_REJECTED",
+          "ok": true,
+          "detail": "{\"commandId\":\"w6dec-revoke-stale-6\",\"seq\":8,\"status\":\"rejected\",\"error\":{\"code\":\"conflict\",\"message\":\"Decision version or recorded body changed\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "REVOKE_REPLAY_SAME_SEQ",
+          "ok": true
+        },
+        {
+          "id": "PAGE_LIMIT",
+          "ok": true
+        },
+        {
+          "id": "PAGE2_DISJOINT",
+          "ok": true
+        },
+        {
+          "id": "CURSOR_SCOPE_REJECTED",
+          "ok": true,
+          "detail": "status 403"
+        },
+        {
+          "id": "BUSINESS_REJECTIONS",
+          "ok": true,
+          "detail": "[\"forbidden\",\"conflict\"]"
+        },
+        {
+          "id": "PARSE_REJECTION_400",
+          "ok": true,
+          "detail": "[\"invalid_request\"]"
+        }
+      ],
+      "evidence": {
+        "decisionWorkflow": {
+          "previewReadOnly": true,
+          "records": 2,
+          "revoked": true,
+          "sourceState": "current",
+          "executionEffects": 0,
+          "businessRejections": [
+            "forbidden",
+            "conflict"
+          ],
+          "parseRejections": [
+            "invalid_request"
+          ],
+          "events": 3
+        }
+      },
+      "limitations": [
+        "Controlled fixture executor with real SQLite; no vendor model and no native task."
+      ],
+      "startedAt": "2026-11-11T08:26:08.157Z",
+      "finishedAt": "2026-11-11T08:26:08.189Z",
+      "durationMs": 32,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-DECISION-SOURCE-STATES",
+      "title": "Source missing/stale, scope expiry and forced transaction rollback",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "No public entry deletes/changes the source message or expires the project grant; transaction-failure injection is not exposed. These remain NOT_TESTED.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Controlled fixture executor with real SQLite; no vendor model and no native task.",
+        "Owner: main/C. Deleting a source message, expiring a grant mid-flight and injecting a commit failure need test-only seams that are not public.",
+        "The current source remains current and the transaction is proven atomic by the receipt/event/catalog checks; absence of a fault API is not evidence of rollback."
+      ],
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
+      "title": "Proposal confirmation and context window are explicit, transactional and revocable",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main publishes no proposal confirm/reject/replay or context preview endpoint. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Owner: main (HTTP/composition) + C (rules). No proposal/context entry is published in this main yet.",
+        "Explicit decisions are verified separately by E3-DECISION-WORKFLOW; this case is the automatic proposal/context surface, not a duplicate."
+      ],
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-PROPOSAL-HTTP",
+      "title": "Proposal prepare is inert; confirm/reject are explicit, atomic and replay-safe",
+      "layer": "controlled-fixture",
+      "status": "PASS",
+      "assertions": [
+        {
+          "id": "PREPARE_200",
+          "ok": true,
+          "detail": "status 200 {\"protocol\":\"proposal-preview/1\",\"record\":{\"proposalId\":\"proposal-ec041c25-5b47-46ae-a00a-2fbfd7e912ec\",\"version\":1,\"state\":\"pending\",\"projectId\":\"project-prop-a\",\"conversationId\":\"conv-prop-a\",\"sourceMessageId\":\"7e0c78fb297c8720e7a6b41a1074d79d\",\"sourceTextDigest\":\"fc9d0370cb1a704d5126d1220422d6cf998c6a3b0788590d224d90eba4aa145b\",\"actorRef\":\"wave04-recovery-authority\",\"grantId\":\"709208"
+        },
+        {
+          "id": "PREVIEW_PROTOCOL",
+          "ok": true,
+          "detail": "proposal-preview/1"
+        },
+        {
+          "id": "PREVIEW_PENDING",
+          "ok": true,
+          "detail": "{\"state\":\"pending\",\"version\":1}"
+        },
+        {
+          "id": "PREVIEW_INPUTS",
+          "ok": true,
+          "detail": "[\"work.scope\",\"work.criteria\",\"work.profileId\"]"
+        },
+        {
+          "id": "PREVIEW_SOURCE",
+          "ok": true,
+          "detail": "{\"source\":\"7e0c78fb297c8720e7a6b41a1074d79d\",\"project\":\"project-prop-a\"}"
+        },
+        {
+          "id": "PREVIEW_TTL",
+          "ok": true,
+          "detail": "ttl 299999"
+        },
+        {
+          "id": "PREPARE_NO_EFFECT",
+          "ok": true,
+          "detail": "0 -> 0"
+        },
+        {
+          "id": "CONFIRM_NEEDS_INPUT",
+          "ok": true,
+          "detail": "{\"status\":400,\"body\":{\"commandId\":\"w8prop-proposal-3\",\"seq\":5,\"status\":\"rejected\",\"error\":{\"code\":\"invalid_request\",\"message\":\"Proposal requires explicit scope, criteria, profile or revision input\",\"retry\":\"user_action\"}}}"
+        },
+        {
+          "id": "MISSING_NO_EFFECT",
+          "ok": true
+        },
+        {
+          "id": "CONFIRM_RECORDED",
+          "ok": true,
+          "detail": "{\"status\":200,\"body\":{\"commandId\":\"w8prop-proposal-4\",\"workId\":\"7d1409a2bb692476fc86971ef5e48c6a\",\"seq\":13,\"status\":\"recorded\"}}"
+        },
+        {
+          "id": "WORK_CREATED",
+          "ok": true,
+          "detail": "[\"7d1409a2bb692476fc86971ef5e48c6a\"]"
+        },
+        {
+          "id": "CONFIRM_EVENT",
+          "ok": true,
+          "detail": "[\"confirmed\"]"
+        },
+        {
+          "id": "REPLAY_RECEIPT",
+          "ok": true,
+          "detail": "{\"commandId\":\"w8prop-proposal-4\",\"workId\":\"7d1409a2bb692476fc86971ef5e48c6a\",\"seq\":13,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "REPLAY_NO_SECOND_WORK",
+          "ok": true
+        },
+        {
+          "id": "CHANGED_PAYLOAD_CONFLICT",
+          "ok": true,
+          "detail": "status 409 {\"error\":{\"code\":\"conflict\",\"message\":\"Command ID already names another immutable request\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "TAMPERED_TOKEN",
+          "ok": true,
+          "detail": "status 403"
+        },
+        {
+          "id": "CROSS_PROJECT_REFUSED",
+          "ok": true,
+          "detail": "status 403 {\"error\":{\"code\":\"forbidden\",\"message\":\"Proposal source is not the original trusted user message\",\"retry\":\"none\"}}"
+        },
+        {
+          "id": "REJECT_PREVIEW",
+          "ok": true,
+          "detail": "status 200"
+        },
+        {
+          "id": "REJECT_RECORDED",
+          "ok": true,
+          "detail": "{\"status\":200,\"body\":{\"commandId\":\"w8prop-proposal-6\",\"seq\":16,\"status\":\"recorded\"}}"
+        },
+        {
+          "id": "REJECT_NO_WORK",
+          "ok": true
+        },
+        {
+          "id": "REJECT_EVENT",
+          "ok": true
+        },
+        {
+          "id": "B_PREPARE",
+          "ok": true,
+          "detail": "status 200"
+        },
+        {
+          "id": "B_CONFIRM",
+          "ok": true,
+          "detail": "{\"commandId\":\"w8prop-proposal-7\",\"workId\":\"483fb47e5a55733e4358d842db7b8822\",\"seq\":24,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "B_WORK_CREATED",
+          "ok": true,
+          "detail": "[\"483fb47e5a55733e4358d842db7b8822\"]"
+        },
+        {
+          "id": "PROJECT_ISOLATION",
+          "ok": true
+        },
+        {
+          "id": "DECISION_PREPARE",
+          "ok": true,
+          "detail": "status 200 {\"protocol\":\"proposal-preview/1\",\"record\":{\"proposalId\":\"proposal-a51ae062-65a0-4566-bb25-a3612775d7a0\",\"version\":1,\"state\":\"pending\",\"projectId\":\"project-prop-a\",\"conversationId\":\"conv-prop-a\",\"sourceMessageId\":\"7e0c78fb297c8720e7a6b41a1074d79d\",\"sourceTextDigest\":\"fc9d0370cb1a704d5126d1220422d6cf998c6a3b0788590d224d90eba4aa145b\",\"actorRef\":\"wave04-recovery-authority\",\"grantId\":\"709208"
+        },
+        {
+          "id": "DECISION_CONFIRM",
+          "ok": true,
+          "detail": "{\"commandId\":\"w8prop-proposal-8\",\"entityRefs\":{\"decisionId\":\"decision-d56795cc-7300-4e28-9dca-31c0c79109eb\"},\"seq\":28,\"status\":\"recorded\"}"
+        },
+        {
+          "id": "DECISION_RECORDED",
+          "ok": true,
+          "detail": "[{\"content\":\"项目 A 决定：保留受控范围，不扩大授权。\",\"status\":\"recorded\",\"source\":\"current\"}]"
+        },
+        {
+          "id": "AUTH_ANSWER_NOT_SHARED",
+          "ok": true,
+          "detail": "status 409 {\"error\":{\"code\":\"conflict\",\"message\":\"Decision source, scope or state changed; prepare again\",\"retry\":\"user_action\"}}"
+        },
+        {
+          "id": "NO_NATIVE_AUTHORITY",
+          "ok": true
+        }
+      ],
+      "evidence": {
+        "proposals": {
+          "preview": {
+            "protocol": "proposal-preview/1",
+            "requiredInputs": [
+              "work.scope",
+              "work.criteria",
+              "work.profileId"
+            ],
+            "ttlMs": 299999
+          },
+          "confirm": {
+            "workId": "7d1409a2bb692476fc86971ef5e48c6a",
+            "seq": 13
+          },
+          "replay": {
+            "seq": 13,
+            "works": 1
+          },
+          "refusals": {
+            "missingInput": 400,
+            "changedPayload": 409,
+            "tampered": 403,
+            "crossProject": 403
+          },
+          "reject": {
+            "recorded": true,
+            "noWork": true
+          },
+          "isolation": {
+            "projectA": 1,
+            "projectB": 1
+          },
+          "decision": {
+            "recorded": true
+          },
+          "authAnswer": 409
+        }
+      },
+      "limitations": [
+        "Controlled fixture executor with real SQLite; proposal payloads are inert data until one explicit confirmation."
+      ],
+      "startedAt": "2026-11-11T08:26:08.261Z",
+      "finishedAt": "2026-11-11T08:26:10.009Z",
+      "durationMs": 1748,
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-PROPOSAL-UI",
+      "title": "Proposal confirmation and context are usable in the web entry",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: the console has no proposal or context entry in this source (only the HTTP backend is published). Required: a page that shows the pending proposal, its source message, required inputs and expiry, and an explicit confirm/reject; a context preview bound to project/conversation/work with source and freshness. Until then this is a main blocker, not a library-level pass.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Controlled fixture executor with real SQLite; proposal payloads are inert data until one explicit confirmation."
+      ],
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    },
+    {
+      "id": "E3-CONTEXT-GRANT-BOUNDARY",
+      "title": "Expired, purpose-mismatched or over-budget context grants never reach a provider",
+      "layer": "not-tested",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main publishes no context preview/read entry. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed.",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [
+        "Controlled fixture executor with real SQLite; proposal payloads are inert data until one explicit confirmation."
+      ],
+      "source": {
+        "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce"
+      }
+    }
+  ],
+  "declaredGaps": [
+    {
+      "id": "E3-ASSISTANT-END-TO-END",
+      "status": "NOT_TESTED",
+      "reason": "Explicit decisions now work over HTTP (E3-DECISION-WORKFLOW); automatic context/proposal confirmation is still absent."
+    },
+    {
+      "id": "E3-REVIEW-PIPELINE",
+      "status": "NOT_TESTED",
+      "reason": "No public entry creates a review Work/Ticket/Assignment or publishes ReviewEvidence; the independent pilot preflight is BLOCKED on pricing."
+    },
+    {
+      "id": "E3-ATTENTION-DEADLINES",
+      "status": "NOT_TESTED",
+      "reason": "No public entry creates a question with a real decisionDeadline/expiresAt in this checkout; waiting-age and unknown-wait ordering are verified instead."
+    },
+    {
+      "id": "E3-DECISION-SOURCE-STATES",
+      "status": "NOT_TESTED",
+      "reason": "No public entry deletes/changes the source message or expires the project grant; transaction-failure injection is not exposed. These remain NOT_TESTED."
+    },
+    {
+      "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main publishes no proposal confirm/reject/replay or context preview endpoint. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen."
+    },
+    {
+      "id": "E3-PROPOSAL-UI",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: the console has no proposal or context entry in this source (only the HTTP backend is published). Required: a page that shows the pending proposal, its source message, required inputs and expiry, and an explicit confirm/reject; a context preview bound to project/conversation/work with source and freshness. Until then this is a main blocker, not a library-level pass."
+    },
+    {
+      "id": "E3-CONTEXT-GRANT-BOUNDARY",
+      "status": "NOT_TESTED",
+      "reason": "NOT_TESTED: main publishes no context preview/read entry. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed."
+    }
+  ],
+  "release": {
+    "schema": "product-acceptance-release/1",
+    "tier": "e3-browser-ui",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-11T08:26:10.156Z",
+    "source": {
+      "commit": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce",
+      "dirty": true
+    },
+    "expectedSource": "614192d4ef7df2f78e0fde5ebb762c7682a6b4ce",
+    "requirements": [
+      {
+        "id": "E3-REVIEW-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-SEALED-COPY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-ACTIVITY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONVERSATION-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-VERIFICATION-RECOVERY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "PASS"
+      }
+    ],
+    "failures": [
+      {
+        "code": "source_dirty",
+        "detail": "Release evidence requires a clean source worktree"
+      }
+    ],
+    "claimedBy": null,
+    "notes": [
+      "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+      "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+    ]
+  },
+  "claim": {
+    "status": "FAIL",
+    "tier": "e3-browser-ui",
+    "decidedAt": "2026-11-11T08:26:10.156Z",
+    "failureCodes": [
+      "source_dirty"
+    ]
+  }
+}

@@ -1,0 +1,380 @@
+{
+  "schema": "product-acceptance-release/1",
+  "tier": "harness-only",
+  "status": "PASS",
+  "ok": true,
+  "checkedAt": "2026-11-11T06:11:12.960Z",
+  "source": {
+    "commit": "ddac2b6194bf0596591547ade01cee85a21f4810",
+    "dirty": true
+  },
+  "expectedSource": "ddac2b6194bf0596591547ade01cee85a21f4810",
+  "requirements": [
+    {
+      "id": "E1-GATE-CONTROL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-MISSING-CASE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-STALE-REPORT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-NO-CANDIDATE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-VACUOUS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-DUPLICATE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-BAD-PATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-SCHEMA",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-FIXTURE-STRICT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-FIXTURE-PORTABILITY-STRICT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-WRONG-LAYER",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-DIRTY-SOURCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-MISSING-SOURCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-STALE-REPORT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-CROSS-COMMIT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-UNBOUND-CASE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-EMPTY-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-MISSING-CASE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-FAILED-ASSERTION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-DOWNLOAD-DIGEST",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PATCH-NOT-APPLIED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PATCH-DIGEST",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-DUPLICATE-ID",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-UNKNOWN-STATUS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-UNKNOWN-LAYER",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-NO-VERSION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-INSTALL-NOT-STAGED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NOT-TESTED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-SELF-CLAIM",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ADMISSION-PROBE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-STRUCTURE-TIER-SUPERSET",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-STRUCTURE-NO-ALLOW-GAP",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-OVERLAP",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-EXPIRED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-DISPOSITION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-VERSION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-BUDGET",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PILOT-ZERO-TURNS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PILOT-NO-ORACLE",
+      "required": true,
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "claimedBy": null,
+  "notes": [
+    "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+    "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+  ]
+}

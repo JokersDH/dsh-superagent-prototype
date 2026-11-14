@@ -1,0 +1,991 @@
+{
+  "schema": "product-acceptance-release/1",
+  "tier": "controlled-product-workflow",
+  "status": "FAIL",
+  "ok": false,
+  "checkedAt": "2026-11-13T14:26:38.934Z",
+  "source": {
+    "commit": "d35c1bec96dbc5b4b8a725c1247ce218201dcbf4",
+    "dirty": false
+  },
+  "expectedSource": "d35c1bec96dbc5b4b8a725c1247ce218201dcbf4",
+  "requirements": [
+    {
+      "id": "E1-GATE-CONTROL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-MISSING-CASE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-STALE-REPORT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-NO-CANDIDATE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-VACUOUS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-DUPLICATE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-BAD-PATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-GATE-REJECT-SCHEMA",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-FIXTURE-STRICT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-FIXTURE-PORTABILITY-STRICT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-WRONG-LAYER",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-DIRTY-SOURCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-MISSING-SOURCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-STALE-REPORT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-CROSS-COMMIT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-UNBOUND-CASE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-EMPTY-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-MISSING-CASE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-FAILED-ASSERTION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-DOWNLOAD-DIGEST",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PATCH-NOT-APPLIED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PATCH-DIGEST",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-DUPLICATE-ID",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-UNKNOWN-STATUS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-UNKNOWN-LAYER",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-NO-VERSION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-INSTALL-NOT-STAGED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NOT-TESTED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-SELF-CLAIM",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ADMISSION-PROBE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-ADMISSION-FAIL-CLOSED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-PREFLIGHT-NO-FALLBACK",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-STRUCTURE-TIER-SUPERSET",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-STRUCTURE-NO-ALLOW-GAP",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-OVERLAP",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-EXPIRED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-DISPOSITION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-VERSION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-BUDGET",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PILOT-ZERO-TURNS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-MUTATE-PILOT-NO-ORACLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E2-CONFIGURATION",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-DAILY-VERTICAL",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-ARTIFACT-ROUNDTRIP",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-WORK-EVIDENCE",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-EVIDENCE-HISTORY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-REOPEN-PERSISTENCE",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-REPLAY-AND-CONFLICT",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-SESSION-ISOLATION",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-STALE-BUSINESS-REJECTION",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-MACHINE-FAIL",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-ONE-WRITER",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-AUTH-AND-ORIGIN",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-ASSISTANT-SDK-MOCK",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-CONVERSATION-CATALOG",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-ATTENTION-SIGNAL",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-REVIEW-TIMING",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-ROUTE-FIXTURE",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-REVIEW-FIXTURES",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-SEALED-COPY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-REVIEW-ACTIVITY-UI",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-ATTENTION-INBOX",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-ATTENTION-INBOX-UI",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-DECISION-WORKFLOW",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-PROPOSAL-HTTP",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-PROPOSAL-UI",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-CONTEXT-PREVIEW",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-CONTEXT-USE",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-CONTEXT-SSE",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-CONTEXT-GUARDS",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E4-CANDIDATE-FLOW",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-CONTEXT-HISTORY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-CONTEXT-SOURCES",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-CONTEXT-UI",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E4-SOURCE-CONFIRM",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E4-SOURCE-CONFIRM-REFUSAL",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E4-COMPLETED-REPLY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-REPLY-DURABLE",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-REPLY-UNKNOWN-DURABLE",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-REPLY-MESSAGE-WINDOW",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-REPLY-BAD-ARTIFACT",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E8-SCHEMA-MIGRATION",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E8-LEGACY16-MIGRATION",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E9-CONTEXT-CONCURRENCY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-DESKTOP-GEOMETRY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-NOTEBOOK-GEOMETRY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-MOBILE-GEOMETRY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-QUESTION-FORM",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-ACCEPT-AND-DOWNLOAD",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-CONVERSATION-UI",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-VERIFICATION-RECOVERY-UI",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-OFFLINE-AND-ERROR",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E3-KEYBOARD-AND-SCROLL",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E4-BOUNDED-CYCLES",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E4-PORTABILITY-CHECKLIST",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E4-RECOVERY-PREFLIGHT",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E4-RECOVERY-READONLY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-VERIFICATION-RECOVERY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E2-VERIFICATION-FINISHED-STATES",
+      "required": true,
+      "status": "MISSING"
+    }
+  ],
+  "failures": [
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-CONFIGURATION is absent",
+      "caseId": "E2-CONFIGURATION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-DAILY-VERTICAL is absent",
+      "caseId": "E2-DAILY-VERTICAL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-ARTIFACT-ROUNDTRIP is absent",
+      "caseId": "E2-ARTIFACT-ROUNDTRIP"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-WORK-EVIDENCE is absent",
+      "caseId": "E2-WORK-EVIDENCE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-EVIDENCE-HISTORY is absent",
+      "caseId": "E2-EVIDENCE-HISTORY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REOPEN-PERSISTENCE is absent",
+      "caseId": "E2-REOPEN-PERSISTENCE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REPLAY-AND-CONFLICT is absent",
+      "caseId": "E2-REPLAY-AND-CONFLICT"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-SESSION-ISOLATION is absent",
+      "caseId": "E2-SESSION-ISOLATION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-STALE-BUSINESS-REJECTION is absent",
+      "caseId": "E2-STALE-BUSINESS-REJECTION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-MACHINE-FAIL is absent",
+      "caseId": "E2-MACHINE-FAIL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-ONE-WRITER is absent",
+      "caseId": "E2-ONE-WRITER"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-SCOPE-AND-PROFILE-GUARDS is absent",
+      "caseId": "E2-SCOPE-AND-PROFILE-GUARDS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-AUTH-AND-ORIGIN is absent",
+      "caseId": "E2-AUTH-AND-ORIGIN"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-ASSISTANT-SDK-MOCK is absent",
+      "caseId": "E2-ASSISTANT-SDK-MOCK"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-CONVERSATION-CATALOG is absent",
+      "caseId": "E2-CONVERSATION-CATALOG"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-ATTENTION-SIGNAL is absent",
+      "caseId": "E2-ATTENTION-SIGNAL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REVIEW-TIMING is absent",
+      "caseId": "E2-REVIEW-TIMING"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-ROUTE-FIXTURE is absent",
+      "caseId": "E2-ROUTE-FIXTURE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-REVIEW-FIXTURES is absent",
+      "caseId": "E3-REVIEW-FIXTURES"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-SEALED-COPY is absent",
+      "caseId": "E3-SEALED-COPY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-REVIEW-ACTIVITY-UI is absent",
+      "caseId": "E3-REVIEW-ACTIVITY-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-ATTENTION-INBOX is absent",
+      "caseId": "E3-ATTENTION-INBOX"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-ATTENTION-INBOX-UI is absent",
+      "caseId": "E3-ATTENTION-INBOX-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-DECISION-WORKFLOW is absent",
+      "caseId": "E3-DECISION-WORKFLOW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-PROPOSAL-HTTP is absent",
+      "caseId": "E3-PROPOSAL-HTTP"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-PROPOSAL-UI is absent",
+      "caseId": "E3-PROPOSAL-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-PREVIEW is absent",
+      "caseId": "E3-CONTEXT-PREVIEW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-USE is absent",
+      "caseId": "E3-CONTEXT-USE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-SSE is absent",
+      "caseId": "E3-CONTEXT-SSE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-GUARDS is absent",
+      "caseId": "E3-CONTEXT-GUARDS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-CANDIDATE-FLOW is absent",
+      "caseId": "E4-CANDIDATE-FLOW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-HISTORY is absent",
+      "caseId": "E3-CONTEXT-HISTORY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-SOURCES is absent",
+      "caseId": "E3-CONTEXT-SOURCES"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-UI is absent",
+      "caseId": "E3-CONTEXT-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-SOURCE-CONFIRM is absent",
+      "caseId": "E4-SOURCE-CONFIRM"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-SOURCE-CONFIRM-REFUSAL is absent",
+      "caseId": "E4-SOURCE-CONFIRM-REFUSAL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-COMPLETED-REPLY is absent",
+      "caseId": "E4-COMPLETED-REPLY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REPLY-DURABLE is absent",
+      "caseId": "E2-REPLY-DURABLE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REPLY-UNKNOWN-DURABLE is absent",
+      "caseId": "E2-REPLY-UNKNOWN-DURABLE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REPLY-MESSAGE-WINDOW is absent",
+      "caseId": "E2-REPLY-MESSAGE-WINDOW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REPLY-BAD-ARTIFACT is absent",
+      "caseId": "E2-REPLY-BAD-ARTIFACT"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E8-SCHEMA-MIGRATION is absent",
+      "caseId": "E8-SCHEMA-MIGRATION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E8-LEGACY16-MIGRATION is absent",
+      "caseId": "E8-LEGACY16-MIGRATION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E9-CONTEXT-CONCURRENCY is absent",
+      "caseId": "E9-CONTEXT-CONCURRENCY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-DESKTOP-GEOMETRY is absent",
+      "caseId": "E3-DESKTOP-GEOMETRY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-NOTEBOOK-GEOMETRY is absent",
+      "caseId": "E3-NOTEBOOK-GEOMETRY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-MOBILE-GEOMETRY is absent",
+      "caseId": "E3-MOBILE-GEOMETRY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-QUESTION-FORM is absent",
+      "caseId": "E3-QUESTION-FORM"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-ACCEPT-AND-DOWNLOAD is absent",
+      "caseId": "E3-ACCEPT-AND-DOWNLOAD"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-ASSISTANT-SCHEMA-FIXTURES is absent",
+      "caseId": "E3-ASSISTANT-SCHEMA-FIXTURES"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONVERSATION-UI is absent",
+      "caseId": "E3-CONVERSATION-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-VERIFICATION-RECOVERY-UI is absent",
+      "caseId": "E3-VERIFICATION-RECOVERY-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-OFFLINE-AND-ERROR is absent",
+      "caseId": "E3-OFFLINE-AND-ERROR"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-KEYBOARD-AND-SCROLL is absent",
+      "caseId": "E3-KEYBOARD-AND-SCROLL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-BOUNDED-CYCLES is absent",
+      "caseId": "E4-BOUNDED-CYCLES"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-PORTABILITY-CHECKLIST is absent",
+      "caseId": "E4-PORTABILITY-CHECKLIST"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-RECOVERY-PREFLIGHT is absent",
+      "caseId": "E4-RECOVERY-PREFLIGHT"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-RECOVERY-READONLY is absent",
+      "caseId": "E4-RECOVERY-READONLY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-VERIFICATION-RECOVERY is absent",
+      "caseId": "E2-VERIFICATION-RECOVERY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-VERIFICATION-FINISHED-STATES is absent",
+      "caseId": "E2-VERIFICATION-FINISHED-STATES"
+    }
+  ],
+  "claimedBy": null,
+  "notes": [
+    "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+    "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+  ]
+}

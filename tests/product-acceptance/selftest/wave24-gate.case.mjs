@@ -14,8 +14,14 @@ const copy = () => JSON.parse(JSON.stringify(fixture))
 // The recorded run predates wave-26 required cases; this control keeps the exact set that run
 // contained. New required cases are exercised by the live mutation controls instead.
 const recordedIds = new Set(fixture.cases.map(item => item.id))
+// The recorded report predates the wave-27 artifact-closure sub-fields; those exact codes are waived
+// for this recorded-time control only. The live requirement never carries a waiver, so the run itself
+// still enforces every new required sub-field.
+const RECORDED_WAIVERS = { 'E5-WORKFLOW-FORMATS': { workflowFormats: ['corrupt_artifact_accepted', 'missing_artifact_accepted',
+  'unknown_table_not_bounded', 'v1_artifact_digest', 'v2_artifact_digest', 'v1_artifact_missing_match', 'v2_artifact_missing_match'] } }
 const recordedRequirement = (() => { const base = tier('installed-alpha')
-  return { ...base, cases: base.cases.filter(item => recordedIds.has(item.id)) } })()
+  return { ...base, cases: base.cases.filter(item => recordedIds.has(item.id)).map(item =>
+    RECORDED_WAIVERS[item.id] ? { ...item, waivedEvidence: RECORDED_WAIVERS[item.id] } : item) } })()
 const evaluate = report => evaluateRelease({ report, requirement: recordedRequirement, expectedSource: fixture.source.commit,
   now: recordedNow, resolveFixture: resolveFixtureDigest })
 const codes = result => new Set(result.failures.map(item => item.code))
