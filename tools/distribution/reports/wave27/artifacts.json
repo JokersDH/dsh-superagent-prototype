@@ -1,0 +1,37 @@
+{
+  "protocol": "wave27-artifacts/1",
+  "successor": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave27-target/wave27-target-1cdab25.tar.gz",
+    "sha256": "dcfda014ce0ac04ff4a78ebcf27cea9c3659e12bc3156583c985b869401fa86e",
+    "tarBytes": 20283738,
+    "buildId": "ecffaa6d3f784426",
+    "source": {
+      "commit": "1cdab25a76748edad5054ce1a5150a69d5ad9361",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "files": 6759,
+    "bytes": 67721476,
+    "productSchema": 18,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "baseline": {
+    "source": "ce64fc1",
+    "build": "d4b1780d999a4b74",
+    "tarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a"
+  },
+  "changes": "main967dc0c F identity/readiness hardening successor; first/second exact content controls still run on ce64 baseline",
+  "limits": [
+    "A/C FTS/event exception gaps remain",
+    "v2 default metadata label remains v1 unless --format v2",
+    "E final required verdict pending",
+    "zero real vendor/model/native turns"
+  ]
+}

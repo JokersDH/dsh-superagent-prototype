@@ -1,0 +1,76 @@
+{
+  "protocol": "wave12-schema18-data/1",
+  "status": "PASS",
+  "startedAt": "2026-11-14T09:21:29.795Z",
+  "steps": [
+    {
+      "id": "install-identity",
+      "status": "PASS",
+      "detail": {
+        "buildId": "ecffaa6d3f784426",
+        "commit": "1cdab25a76748edad5054ce1a5150a69d5ad9361",
+        "dirty": false,
+        "schema": 18,
+        "aSchema": 18
+      }
+    },
+    {
+      "id": "nonempty-product-data",
+      "status": "PASS",
+      "detail": {
+        "requestId": "be5cb0087c3e1d92b2e892344432e7d3",
+        "messageId": "0d6954d8c89d4049630a46ceb704f3be",
+        "replyMessageId": "1eabab29ead7293f18eb2cbac32a1e24",
+        "historyEntries": 1,
+        "sources": 2,
+        "families": {
+          "assistant_context_bindings": 1,
+          "assistant_reply_results": 1
+        },
+        "replyDurableAfterReopen": true
+      }
+    },
+    {
+      "id": "snapshot-new-root-restore",
+      "status": "PASS",
+      "detail": {
+        "backupBytes": 651264,
+        "restoredReply": true,
+        "restoredBinding": true,
+        "restoredHistory": 1,
+        "restoredSources": 2,
+        "evidenceDigest": "298e8b69a9f7b846a3dd96582305792cba045505be0455da6b1cef4f17089f0f",
+        "startupAvailable": false,
+        "noInstanceRecord": true
+      }
+    },
+    {
+      "id": "future-schema-refused",
+      "status": "PASS",
+      "detail": {
+        "code": "state_schema_newer_than_binary"
+      }
+    },
+    {
+      "id": "schema16-to-current",
+      "status": "PASS",
+      "detail": {
+        "before": 16,
+        "after": 18,
+        "migratedBy": "A ProductStore public open"
+      }
+    }
+  ],
+  "limitations": [
+    "Data is created through main product operations with a bounded fixture provider; no model/native request is sent.",
+    "A owns the snapshot/migrations; D only calls public Store/backup/reader entrypoints and writes no SQL."
+  ],
+  "artifact": {
+    "install": "/tmp/w27frozen/install",
+    "buildId": "ecffaa6d3f784426",
+    "commit": "1cdab25a76748edad5054ce1a5150a69d5ad9361",
+    "schema": 18,
+    "dirty": false
+  },
+  "finishedAt": "2026-11-14T09:21:35.332Z"
+}

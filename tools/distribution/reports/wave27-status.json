@@ -1,15 +1,164 @@
 {
-  "protocol":"wave27-status/1","owner":"agent-d","branch":"codex/g3-local-distribution","base":"8ed7a72","mergedMain":"a62e62f","fixedCandidate":{"source":"ce64fc1","build":"d4b1780d999a4b74","tarSha256":"8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a","bytes":20272436,"entries":6754,"closure":"96/96"},"status":"CANDIDATE","frozen":true,
-  "phases":{
-    "d1":{"status":"PASS","summary":"Fixed ce64 candidate and listed A/C proof input table; A/C source worktrees recorded separately from the frozen package."},
-    "d2":{"status":"PASS_WITH_EXCEPTION_LIMIT","summary":"Artifact bytes/missing controls reject as artifact_bytes/artifact_missing. FTS foreign row and event_log foreign row are still accepted by A/C whole-family exception; exact allowlist not achieved."},
-    "d3":{"status":"NOT_ACHIEVED_EXCEPTION","summary":"C target proof allows entire event_log and A ignores conversation_search*; independent foreign rows leave target proof ok. D records exact minimal reproduction; fix belongs to A/C."},
-    "d4":{"status":"PARTIAL","summary":"Artifact positive/negative and dual-format controls delivered; FTS/event precise exceptions not independently acceptable. E should not treat this as exact content proof."},
-    "d5":{"status":"PASS_WITH_FORMAT_FIX","summary":"Same package v1/v2 A restores: v1 verified-flow default v1; v2 with explicit --format v2 verified-flow and restore-report workflow-snapshot/2. Default v1 label on v2 remains a C metadata gap."},
-    "d6":{"status":"PASS","summary":"Both roots target proof ok, source verified, history entry, verified stop; drift mismatch prior evidence retained."},
-    "d7":{"status":"PARTIAL","summary":"Artifact/FTS/event controls, not full UI/body negative matrix."},
-    "d8":{"status":"PARTIAL","summary":"Two-format same-package chain works with explicit format; precise exception proof remains blocked."}
+  "protocol": "wave27-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "base": "8ed7a72",
+  "mergedMain": "a62e62f",
+  "fixedCandidate": {
+    "source": "ce64fc1",
+    "build": "d4b1780d999a4b74",
+    "tarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+    "bytes": 20272436,
+    "entries": 6754,
+    "closure": "96/96"
   },
-  "evidence":["tools/distribution/reports/wave27/content-exception-controls.json","tools/distribution/reports/wave27/v1-verified-flow.json","tools/distribution/reports/wave27/v2-explicit-format.json","tools/distribution/reports/wave27/v2-default-format.json","tools/distribution/reports/wave27/artifact-byte-mutation.json","tools/distribution/reports/wave27/artifact-missing.json","tools/distribution/reports/wave27/fts-foreign-row.json","tools/distribution/reports/wave27/event-foreign-row.json"],
-  "notDone":["A/C precise FTS/event allowlist (foreign rows accepted)","C default v2 metadata label v1","E independent exact-content verdict","ordinary wave27 re-freeze (no runtime changes)","B/private/target"],"limits":["No runtime refreeze: docs/tools only","Zero real vendor/model/native turns","Historical tars/state/profile/ledger preserved"]
+  "status": "CANDIDATE_SUCCESSOR",
+  "frozen": true,
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Fixed ce64 candidate and listed A/C proof input table; A/C source worktrees recorded separately from the frozen package."
+    },
+    "d2": {
+      "status": "PASS_WITH_EXCEPTION_LIMIT",
+      "summary": "Artifact bytes/missing controls reject as artifact_bytes/artifact_missing. FTS foreign row and event_log foreign row are still accepted by A/C whole-family exception; exact allowlist not achieved."
+    },
+    "d3": {
+      "status": "NOT_ACHIEVED_EXCEPTION",
+      "summary": "C target proof allows entire event_log and A ignores conversation_search*; independent foreign rows leave target proof ok. D records exact minimal reproduction; fix belongs to A/C."
+    },
+    "d4": {
+      "status": "PARTIAL",
+      "summary": "Artifact positive/negative and dual-format controls delivered; FTS/event precise exceptions not independently acceptable. E should not treat this as exact content proof."
+    },
+    "d5": {
+      "status": "PASS_WITH_FORMAT_FIX",
+      "summary": "Same package v1/v2 A restores: v1 verified-flow default v1; v2 with explicit --format v2 verified-flow and restore-report workflow-snapshot/2. Default v1 label on v2 remains a C metadata gap."
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "Both roots target proof ok, source verified, history entry, verified stop; drift mismatch prior evidence retained."
+    },
+    "d7": {
+      "status": "PARTIAL",
+      "summary": "Artifact/FTS/event controls, not full UI/body negative matrix."
+    },
+    "d8": {
+      "status": "PARTIAL",
+      "summary": "Two-format same-package chain works with explicit format; precise exception proof remains blocked."
+    },
+    "d9": {
+      "status": "PASS",
+      "summary": "Built and froze successor 1cdab25/ecffaa6d3f784426 after main967 F identity/readiness runtime change; ce64 baseline retained."
+    },
+    "d10": {
+      "status": "PASS",
+      "summary": "Installed F workbench 8/8, readiness200 auth none, personal7, same-store4, matrix19, multi8."
+    },
+    "d11": {
+      "status": "PASS",
+      "summary": "No-executor4, same-schema3, managed upgrade7, data5, backup6, portable5 on successor."
+    },
+    "d12": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Stable successor tuple and E recipe handed; E independent required pending."
+    },
+    "d13": {
+      "status": "PASS",
+      "summary": "Reopen/reuse and data protection from same-store/upgrade/browser evidence."
+    },
+    "d14": {
+      "status": "PASS",
+      "summary": "Freeze repeatable; old ce64 and historical tars preserved."
+    },
+    "d15": {
+      "status": "PASS",
+      "summary": "Closure96/96 for successor, hashes 0 mismatch."
+    },
+    "d16": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Full tuple/limits handed to E; E verdict independent."
+    },
+    "d17": {
+      "status": "PASS_WITH_EXCEPTION_LIMIT",
+      "summary": "Artifact mutation/missing reject; FTS/event foreign rows accepted (A/C-owned gap)."
+    },
+    "d18": {
+      "status": "PASS_WITH_FORMAT_LIMIT",
+      "summary": "v1 default and v2 explicit --format v2 verified-flow; default v2 label v1 remains C gap."
+    },
+    "d19": {
+      "status": "PARTIAL",
+      "summary": "Support/user recipe drafted; H tools not substituted for lifecycle."
+    },
+    "d20": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Successor candidate and evidence set published; E required remains independent."
+    }
+  },
+  "evidence": [
+    "tools/distribution/reports/wave27/content-exception-controls.json",
+    "tools/distribution/reports/wave27/v1-verified-flow.json",
+    "tools/distribution/reports/wave27/v2-explicit-format.json",
+    "tools/distribution/reports/wave27/v2-default-format.json",
+    "tools/distribution/reports/wave27/artifact-byte-mutation.json",
+    "tools/distribution/reports/wave27/artifact-missing.json",
+    "tools/distribution/reports/wave27/fts-foreign-row.json",
+    "tools/distribution/reports/wave27/event-foreign-row.json"
+  ],
+  "notDone": [
+    "A/C precise FTS/event allowlist (foreign rows accepted)",
+    "C default v2 metadata label v1",
+    "E independent exact-content verdict",
+    "B/private/target",
+    "E successor required verdict",
+    "H support UI recipe",
+    "B/private/target"
+  ],
+  "limits": [
+    "No runtime refreeze: docs/tools only",
+    "Zero real vendor/model/native turns",
+    "Historical tars/state/profile/ledger preserved"
+  ],
+  "successor": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave27-target/wave27-target-1cdab25.tar.gz",
+    "sha256": "dcfda014ce0ac04ff4a78ebcf27cea9c3659e12bc3156583c985b869401fa86e",
+    "tarBytes": 20283738,
+    "buildId": "ecffaa6d3f784426",
+    "source": {
+      "commit": "1cdab25a76748edad5054ce1a5150a69d5ad9361",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "files": 6759,
+    "bytes": 67721476,
+    "productSchema": 18,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "baseline": {
+    "source": "ce64fc1",
+    "build": "d4b1780d999a4b74",
+    "tarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a"
+  },
+  "testLayers": {
+    "browser": 8,
+    "readiness": 1,
+    "personal": 7,
+    "sameStore": 4,
+    "matrix": 19,
+    "multi": 8,
+    "noexec": 4,
+    "samebase": 3,
+    "upgrade": 7,
+    "data": 5,
+    "backup": 6,
+    "portable": 5
+  }
 }
