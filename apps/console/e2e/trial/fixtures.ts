@@ -92,6 +92,7 @@ const unknownConfiguration = configuration({
   projects: [blockedProject('project-atlas', '流程测试项目', 'unsupported_capability'), discussionProject('project-notes', '需求讨论')],
   profiles: [unadmittedNativeProfile],
 })
+const emptyConfiguration = configuration({ projects: [], profiles: [unadmittedNativeProfile] })
 
 const longProjects = [
   dispatchableProject('project-quartz', 'Quartz 结算网关迁移：把多币种对账任务拆成可审阅的小批交付，并保留原有导出格式', ['profile-codex-local']),
@@ -117,7 +118,7 @@ const longInsights: TrialInsightsView = {
 }
 
 export const trialStates = [
-  'configured', 'unconfigured', 'blocked', 'needs-project', 'fixture', 'unknown', 'readonly',
+  'configured', 'unconfigured', 'blocked', 'needs-project', 'no-projects', 'fixture', 'unknown', 'readonly',
   'noreadiness', 'loading', 'unavailable', 'error', 'long', 'insights-empty',
 ] as const
 export type TrialHarnessState = (typeof trialStates)[number]
@@ -144,6 +145,10 @@ export function trialHarnessProps(state: TrialHarnessState): TrialHarnessProps {
     case 'needs-project': return {
       readiness: readiness({ development: 'needs_project', execution: { state: 'available', kind: 'native' }, profiles: { native: 1, controlled: 0, admittedNative: 0, admittedControlled: 0 }, projects: { development: 1, discussion: 1, dispatchable: 0 } }),
       configuration: unadmittedConfiguration,
+    }
+    case 'no-projects': return {
+      readiness: readiness({ development: 'needs_project', execution: { state: 'available', kind: 'native' }, profiles: { native: 1, controlled: 0, admittedNative: 0, admittedControlled: 0 }, projects: { development: 0, discussion: 0, dispatchable: 0 } }),
+      configuration: emptyConfiguration,
     }
     case 'fixture': return {
       readiness: readiness({ mode: 'fixture', development: 'fixture_only', execution: { state: 'available', kind: 'controlled_fixture' }, profiles: { native: 0, controlled: 4, admittedNative: 0, admittedControlled: 4 }, projects: { development: 1, discussion: 0, dispatchable: 1 } }),

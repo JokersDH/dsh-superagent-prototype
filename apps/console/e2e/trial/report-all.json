@@ -1,0 +1,63 @@
+{
+  "subject": "trial experience suites (controlled fixtures / isolated services; not a release verdict)",
+  "generatedAt": "2026-11-14T04:13:20.037Z",
+  "results": [
+    {
+      "id": "unit-mapping",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node --test test/trial/trial-view.case.ts",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 120000,
+      "ms": 120
+    },
+    {
+      "id": "typecheck-app",
+      "command": "npx tsc -p tsconfig.json --noEmit",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 240000,
+      "ms": 1687
+    },
+    {
+      "id": "typecheck-e2e",
+      "command": "npx tsc -p e2e/trial/tsconfig.json --noEmit",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 240000,
+      "ms": 1472
+    },
+    {
+      "id": "build",
+      "command": "npx vite build",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 240000,
+      "ms": 377
+    },
+    {
+      "id": "browser-states",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node e2e/trial/trial-states.mjs",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 420000,
+      "ms": 23606
+    },
+    {
+      "id": "http-journey",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node e2e/trial/trial-http.mjs",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 420000,
+      "ms": 3239
+    },
+    {
+      "id": "app-targets",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node e2e/trial/app-targets.mjs",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 420000,
+      "ms": 5809
+    }
+  ],
+  "failed": []
+}

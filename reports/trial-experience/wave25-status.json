@@ -6,12 +6,14 @@
   "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
   "branch": "codex/g4-trial-experience",
   "baseMain": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
-  "state": "IN_PROGRESS",
+  "checkpointCommit": "8ffa083",
+  "finalSourceCommit": null,
+  "state": "DELIVERED_WITH_MAIN_MOUNT_PENDING",
   "milestones": {
     "F4": "DELIVERED_SOURCE",
-    "F8": "PENDING",
-    "F12": "PENDING",
-    "F16": "PENDING"
+    "F8": "DELIVERED_REAL_HTTP_AND_APP_TARGETS_APP_MOUNT_PENDING_MAIN",
+    "F12": "DELIVERED_BROWSER_EVIDENCE",
+    "F16": "DELIVERED_DOCS_AND_STATUS"
   },
   "ownedPaths": [
     "apps/console/src/trial/",
@@ -26,16 +28,84 @@
     "apps/console/src/main.tsx",
     "apps/console/src/*.css (root/global)",
     "packages/contracts/",
-    "apps/coordinator/http/ or provider/",
+    "apps/coordinator/http/ or product/ provider sources",
     "root package.json / pnpm-lock.yaml"
   ],
+  "deliverables": {
+    "component": "apps/console/src/trial/TrialWorkspace.tsx",
+    "styles": "apps/console/src/trial/trial.css (trial-* only, imports existing tokens)",
+    "hook": "apps/console/src/trial/useTrialReadiness.ts (ConsoleTransport.readiness, bounded, stale-safe)",
+    "mapping": "apps/console/src/trial/trial-view.ts (pure states/actions, no network)",
+    "optionalInsights": "apps/console/src/trial/insights.ts (presentation input; null stays unknown)",
+    "unitTests": "apps/console/test/trial/trial-view.case.ts (10 assertions)",
+    "browserSuite": "apps/console/e2e/trial/trial-states.mjs (22 assertions)",
+    "httpSuite": "apps/console/e2e/trial/trial-http.mjs (6 assertions)",
+    "appTargetsSuite": "apps/console/e2e/trial/app-targets.mjs (6 assertions)",
+    "harness": "apps/console/e2e/trial/harness.html + harness.tsx + fixtures.ts (controlled data, banner-marked)",
+    "integrationExample": "apps/console/e2e/trial/integration-example.tsx (compile-time, exhaustive callbacks)",
+    "runner": "apps/console/e2e/trial/run-all.mjs",
+    "userGuide": [
+      "docs/user-guide/README.zh-CN.md",
+      "docs/user-guide/01-start-and-configure.zh-CN.md",
+      "docs/user-guide/02-projects-and-conversation.zh-CN.md",
+      "docs/user-guide/03-trial-readiness.zh-CN.md",
+      "docs/user-guide/04-troubleshooting.zh-CN.md",
+      "docs/user-guide/05-review-and-handoff.zh-CN.md"
+    ],
+    "reports": [
+      "reports/trial-experience/design-brief.zh-CN.md",
+      "reports/trial-experience/main-integration.zh-CN.md",
+      "reports/trial-experience/wave25-final.zh-CN.md",
+      "reports/trial-experience/wave25-status.json"
+    ]
+  },
   "realInputs": {
-    "http": "GET /v1/readiness",
-    "contracts": "packages/contracts/src/trial-readiness.ts (TrialReadiness, TrialNavigationAction)",
+    "endpoints": ["GET /v1/readiness", "GET /v1/configuration", "POST /v1/session"],
+    "contracts": "packages/contracts/src/trial-readiness.ts (TrialReadiness, TrialNavigationAction, authorization none)",
     "transport": "apps/console/src/transport.ts ConsoleTransport.readiness",
     "configuration": "ApplicationConfigurationSchema public read model"
   },
+  "callbacks": ["configure_model", "import_project", "inspect_executor", "open_conversation"],
+  "authority": "display-only; configuration observations; no execution authorization; no command/model/native invocation",
+  "viewports": ["1440x900", "390x844"],
+  "browser": "Chromium via Playwright 1.65 (single browser class tested)",
+  "commands": [
+    { "command": "node --test test/trial/trial-view.case.ts", "exit": 0, "result": "10 PASS" },
+    { "command": "npx tsc -p tsconfig.json --noEmit", "exit": 0 },
+    { "command": "npx tsc -p e2e/trial/tsconfig.json --noEmit", "exit": 0 },
+    { "command": "npx vite build", "exit": 0 },
+    { "command": "node e2e/trial/trial-states.mjs", "exit": 0, "result": "22/22 PASS" },
+    { "command": "node e2e/trial/trial-http.mjs", "exit": 0, "result": "6/6 PASS" },
+    { "command": "node e2e/trial/app-targets.mjs", "exit": 0, "result": "6/6 PASS" },
+    { "command": "node e2e/trial/run-all.mjs", "exit": 0, "result": "7/7 suites PASS" }
+  ],
+  "httpObservation": {
+    "mode": "fixture",
+    "startupMode": "normal",
+    "development": "fixture_only",
+    "discussion": "unknown",
+    "projects": { "development": 1, "discussion": 0, "dispatchable": 1 },
+    "profiles": { "native": 0, "controlled": 4, "admittedNative": 0, "admittedControlled": 4 },
+    "authorization": "none",
+    "configurationRevision": "1c957869",
+    "requestBudget": { "session": 1, "readiness": 1, "configuration": 1, "actionRequests": 0, "reloadAddsReadiness": 1 }
+  },
+  "visualGate": "programmatic browser audit: overlap, text clipping, horizontal overflow, control size, radius/shadow/transform, font size/tracking, 6 contrast pairs >= 4.5, semantic dot token colours; 17 element screenshots committed for independent human/E review; this session could not consume images",
+  "screenshots": "apps/console/e2e/trial/screenshots/ (13 state + 4 mobile + 1 real-HTTP page context + 1 app shell)",
   "modelNativeTurns": 0,
-  "appWiring": "NOT_WIRED_BY_MAIN",
-  "notes": "Early checkpoint published; subsequent stages continue. No new authority, no second DTO, no model or command invocation from the component."
+  "preservedServices": "5180-5191 / 8796-8807 and all state/profile/tar/ledger untouched; probes used 5178, 5789, 5292/8898, one-off 5791 (stopped and verified)",
+  "pending": [
+    "main mounts TrialWorkspace in App.tsx and adds the trial rail entry (M5)",
+    "G provides a trusted usage summary; main maps it into TrialInsightsView",
+    "E independently judges acceptance; H observations remain separate raw input",
+    "installed distribution/package acceptance not performed by F"
+  ],
+  "notTested": [
+    "real Codex/native execution or vendor model calls (0 turns)",
+    "App shell with TrialWorkspace mounted (main owns App.tsx)",
+    "non-Chromium browsers, manual screen-reader walkthrough, 200% zoom, forced colors, dark theme",
+    "real network latency/offline beyond controlled delayed responses",
+    "more than 5 configured projects or extreme long unbroken identifiers beyond the tested fixture"
+  ],
+  "notes": "Early checkpoint 8ffa083 was pushed to origin. The final source commit is recorded after the delivery commit; documentation-only changes do not refreeze runtime bytes."
 }

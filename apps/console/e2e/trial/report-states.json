@@ -5,36 +5,42 @@
     "1440x900",
     "390x844"
   ],
-  "generatedAt": "2026-11-14T03:55:12.057Z",
+  "generatedAt": "2026-11-14T04:13:10.973Z",
   "results": [
     {
       "id": "CONFIGURED",
       "status": "PASS",
-      "ms": 759,
+      "ms": 728,
       "detail": "configured state shows facts only and one navigation action"
     },
     {
       "id": "UNCONFIGURED",
       "status": "PASS",
-      "ms": 636,
+      "ms": 681,
       "detail": "missing model configuration is separated from execution readiness"
     },
     {
       "id": "BLOCKED",
       "status": "PASS",
-      "ms": 624,
+      "ms": 649,
       "detail": "execution blockage names the reason instead of a bare red error"
     },
     {
       "id": "NEEDS-PROJECT",
       "status": "PASS",
-      "ms": 622,
+      "ms": 646,
       "detail": "a missing project is actionable and does not claim readiness"
+    },
+    {
+      "id": "NO-PROJECTS",
+      "status": "PASS",
+      "ms": 646,
+      "detail": "an empty project set is an actionable state, not a blank panel"
     },
     {
       "id": "FIXTURE",
       "status": "PASS",
-      "ms": 625,
+      "ms": 646,
       "detail": "controlled fixture path is never mistaken for native readiness"
     },
     {
@@ -46,85 +52,85 @@
     {
       "id": "READONLY",
       "status": "PASS",
-      "ms": 666,
+      "ms": 628,
       "detail": "recovery read-only keeps readable navigation and hides approval/write entries"
     },
     {
       "id": "NOREDINESS",
       "status": "PASS",
-      "ms": 646,
+      "ms": 647,
       "detail": "an unread readiness is not guessed from other data"
     },
     {
       "id": "LOADING",
       "status": "PASS",
-      "ms": 647,
+      "ms": 649,
       "detail": "first load announces progress and blocks no navigation"
     },
     {
       "id": "UNAVAILABLE",
       "status": "PASS",
-      "ms": 647,
+      "ms": 648,
       "detail": "an old backend degrades explicitly"
     },
     {
       "id": "ERROR-AND-RETRY",
       "status": "PASS",
-      "ms": 859,
+      "ms": 858,
       "detail": "retry re-reads status without clearing valid data or sending a command"
     },
     {
       "id": "LONG-CONTENT",
       "status": "PASS",
-      "ms": 652,
+      "ms": 654,
       "detail": "long Chinese/English content wraps without horizontal overflow"
     },
     {
       "id": "VISUAL-AUDIT",
       "status": "PASS",
-      "ms": 2327,
+      "ms": 2295,
       "detail": "geometry, overflow, contrast, radii, shadows and semantic dot colours are verified programmatically"
     },
     {
       "id": "INSIGHTS-EMPTY",
       "status": "PASS",
-      "ms": 651,
+      "ms": 650,
       "detail": "optional insights cannot invent efficiency numbers"
     },
     {
       "id": "NAVIGATION-CALLBACKS",
       "status": "PASS",
-      "ms": 2776,
+      "ms": 2754,
       "detail": "each of the four navigation names is reachable and recorded once"
     },
     {
       "id": "DOUBLE-CLICK-GUARD",
       "status": "PASS",
-      "ms": 1300,
+      "ms": 1298,
       "detail": "rapid duplicate activation does not duplicate navigation"
     },
     {
       "id": "KEYBOARD",
       "status": "PASS",
-      "ms": 688,
+      "ms": 1414,
       "detail": "the main journey is operable by keyboard with visible focus and names"
     },
     {
       "id": "MOBILE",
       "status": "PASS",
-      "ms": 2715,
+      "ms": 4026,
       "detail": "narrow viewport keeps every action reachable without horizontal overflow"
     },
     {
       "id": "STALE-RESPONSE",
       "status": "PASS",
-      "ms": 914,
+      "ms": 936,
       "detail": "out-of-order responses keep the newest identity"
     },
     {
       "id": "UNMOUNT-IN-FLIGHT",
       "status": "PASS",
-      "ms": 905,
+      "ms": 906,
       "detail": "a response after unmount updates no state"
     },
     {

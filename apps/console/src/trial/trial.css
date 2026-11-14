@@ -152,6 +152,11 @@
   max-width: 360px;
 }
 
+.trial-view button[aria-disabled='true'] {
+  opacity: .45;
+  cursor: progress;
+}
+
 .trial-actions button {
   display: inline-flex;
   align-items: center;

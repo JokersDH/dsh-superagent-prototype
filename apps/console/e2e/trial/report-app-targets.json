@@ -1,0 +1,49 @@
+{
+  "subject": "real App shell navigation targets (fixture workbench; TrialWorkspace not mounted by main yet)",
+  "ports": {
+    "console": 5292,
+    "api": 8898
+  },
+  "viewport": "1440x900",
+  "stateRootKind": "private temporary root (not committed)",
+  "generatedAt": "2026-11-14T04:13:20.013Z",
+  "results": [
+    {
+      "id": "SHELL",
+      "status": "PASS",
+      "ms": 35,
+      "detail": "chat, works, decisions, executors, model settings and import entries all exist"
+    },
+    {
+      "id": "TARGET-INSPECT-EXECUTOR",
+      "status": "PASS",
+      "ms": 43,
+      "detail": "inspect_executor opens the real executor directory"
+    },
+    {
+      "id": "TARGET-IMPORT-PROJECT",
+      "status": "PASS",
+      "ms": 59,
+      "detail": "import_project opens and dismisses the real project import form"
+    },
+    {
+      "id": "TARGET-CONFIGURE-MODEL",
+      "status": "PASS",
+      "ms": 193,
+      "detail": "configure_model opens the real model settings panel"
+    },
+    {
+      "id": "TARGET-CONVERSATION",
+      "status": "PASS",
+      "ms": 56,
+      "detail": "open_conversation returns to the real main conversation"
+    },
+    {
+      "id": "BROWSER-ERRORS",
+      "status": "PASS",
+      "ms": 0,
+      "detail": "the real shell journey produces no page or console error"
+    }
+  ],
+  "failures": []
+}

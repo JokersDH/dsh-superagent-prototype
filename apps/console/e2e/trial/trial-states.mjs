@@ -130,7 +130,7 @@ try {
     assert(cells[2].includes('配置事实，非连接验证'), 'configuration is not a connection proof')
     assert((await labels()).join('|') === '打开主对话', 'only the conversation entry is offered')
     assert(await page.getByText('当前', { exact: true }).count() === 1, 'active project marker')
-    assert((await page.locator('.trial-boundary').innerText()).includes('授权 none'), 'authorization none is explicit')
+    assert((await page.locator('.trial-boundary').innerText()).includes('未授予执行权限'), 'the absence of execution authority is explicit')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'configured.png') })
   }, 'configured state shows facts only and one navigation action')
 
@@ -160,6 +160,14 @@ try {
     assert((await labels()).includes('检查执行器'), 'inspection is secondary')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'needs-project.png') })
   }, 'a missing project is actionable and does not claim readiness')
+
+  await step('NO-PROJECTS', async () => {
+    await open('state=no-projects')
+    assert((await page.locator('.trial-panel').first().innerText()).includes('开发 0 · 讨论 0 · 可派工 0'), 'zero counts are real zero, not unknown')
+    assert((await page.locator('.trial-panel').first().innerText()).includes('还没有项目'), 'empty project list is explained')
+    assert((await labels())[0] === '导入项目', 'import is the primary action')
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'no-projects.png') })
+  }, 'an empty project set is an actionable state, not a blank panel')
 
   await step('FIXTURE', async () => {
     await open('state=fixture')
@@ -318,6 +326,13 @@ try {
     await page.keyboard.press('Enter')
     await page.waitForTimeout(80)
     assert((await actions()).length === 1, 'keyboard activation calls the callback once')
+    await open('state=configured')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(120)
+    const afterReload = await page.evaluate(() => ({ label: document.activeElement?.getAttribute('aria-label'), reloads: window.__TRIAL_RELOADS__ }))
+    assert(afterReload.label === '重新读取试用状态', `reload keeps keyboard focus: ${JSON.stringify(afterReload)}`)
+    assert(afterReload.reloads === 1, 'keyboard reload re-reads exactly once')
     const structure = await page.evaluate(() => {
       const view = document.querySelector('.trial-view')
       const buttons = [...view.querySelectorAll('button')]
@@ -340,7 +355,7 @@ try {
     const mobilePage = await mobile.newPage()
     const mobileErrors = []
     mobilePage.on('pageerror', error => mobileErrors.push(error.message))
-    for (const state of ['configured', 'blocked', 'readonly', 'long']) {
+    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long']) {
       await mobilePage.goto(`${base}/e2e/trial/harness.html?state=${state}`, { waitUntil: 'networkidle' })
       await mobilePage.waitForSelector('.trial-view')
       const overflow = await mobilePage.evaluate(() => ({ page: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }))

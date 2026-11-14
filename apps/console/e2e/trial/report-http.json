@@ -1,0 +1,85 @@
+{
+  "subject": "trial workspace against an isolated product demo (fixture profiles; not a native or release verdict)",
+  "endpoints": [
+    "GET /v1/readiness",
+    "GET /v1/configuration",
+    "POST /v1/session"
+  ],
+  "apiObservation": {
+    "mode": "fixture",
+    "startupMode": "normal",
+    "development": "fixture_only",
+    "discussion": "unknown",
+    "projects": {
+      "development": 1,
+      "discussion": 0,
+      "dispatchable": 1
+    },
+    "profiles": {
+      "native": 0,
+      "controlled": 4,
+      "admittedNative": 0,
+      "admittedControlled": 4
+    },
+    "capabilities": {
+      "contextHistory": true,
+      "contextSources": true,
+      "decisions": true,
+      "proposals": true
+    },
+    "authorization": "none",
+    "configurationRevision": "1c957869",
+    "configuredProjects": [
+      {
+        "id": "project-atlas",
+        "displayName": "流程测试项目",
+        "dispatchAllowed": true
+      }
+    ]
+  },
+  "viewports": [
+    "1440x900",
+    "390x844"
+  ],
+  "generatedAt": "2026-11-14T04:13:14.209Z",
+  "stateRootKind": "private temporary root (not committed)",
+  "results": [
+    {
+      "id": "HTTP-READINESS-RENDER",
+      "status": "PASS",
+      "ms": 791,
+      "detail": "real HTTP readiness and configuration render the same facts as the API"
+    },
+    {
+      "id": "HTTP-REQUEST-BUDGET",
+      "status": "PASS",
+      "ms": 2,
+      "detail": "the page performs only bootstrap, readiness and configuration reads"
+    },
+    {
+      "id": "HTTP-ACTION-NO-REQUEST",
+      "status": "PASS",
+      "ms": 242,
+      "detail": "navigation is a callback, not a command or a read"
+    },
+    {
+      "id": "HTTP-RELOAD-ONE-READ",
+      "status": "PASS",
+      "ms": 355,
+      "detail": "reload is one bounded re-read with no command"
+    },
+    {
+      "id": "HTTP-MOBILE",
+      "status": "PASS",
+      "ms": 764,
+      "detail": "the real HTTP state is usable at 390px"
+    },
+    {
+      "id": "HTTP-UNMOUNT",
+      "status": "PASS",
+      "ms": 23,
+      "detail": "unmounting the real-HTTP view leaves no page or console error"
+    }
+  ],
+  "failures": []
+}

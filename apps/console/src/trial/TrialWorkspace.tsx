@@ -124,8 +124,8 @@ export function TrialWorkspace({
               className="icon-button"
               title="重新读取试用状态"
               aria-label="重新读取试用状态"
-              disabled={loading}
-              onClick={onReload}
+              aria-disabled={loading || undefined}
+              onClick={() => { if (!loading) onReload() }}
             >
               <RefreshCw size={16} aria-hidden="true" />
             </button>
@@ -142,7 +142,7 @@ export function TrialWorkspace({
               <span>{error}{observed === undefined ? '' : ` 以下仍是上次读取结果（${observed}）。`}</span>
             </p>
             {onReload !== undefined && (
-              <button type="button" className="quiet" onClick={onReload} disabled={loading}>重试</button>
+              <button type="button" className="quiet" aria-disabled={loading || undefined} onClick={() => { if (!loading) onReload() }}>重试</button>
             )}
           </div>
         )}
@@ -300,7 +300,7 @@ export function TrialWorkspace({
 
         <footer className="trial-boundary">
           <span>只读配置观察</span>
-          <span>授权 none</span>
+          <span>未授予执行权限</span>
           <span>不含项目路径、凭据或模型端点</span>
           {readiness !== undefined && <span className="trial-mono">配置 {shortRevision(readiness.configurationRevision)}</span>}
         </footer>
