@@ -4,12 +4,12 @@
     "tier": "module",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T08:06:18.373Z",
+    "checkedAt": "2026-11-14T11:42:10.922Z",
     "source": {
-      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
       "dirty": false
     },
-    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -378,6 +378,46 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
         "required": true,
         "status": "PASS"
       },
@@ -406,7 +446,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T08:04:47.699Z",
+      "decidedAt": "2026-11-14T11:40:36.929Z",
       "failureCodes": []
     },
     "notes": [
@@ -419,12 +459,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T08:06:18.375Z",
+    "checkedAt": "2026-11-14T11:42:10.924Z",
     "source": {
-      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
       "dirty": false
     },
-    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -793,6 +833,46 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
         "required": true,
         "status": "PASS"
       },
@@ -1101,7 +1181,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T08:04:47.699Z",
+      "decidedAt": "2026-11-14T11:40:36.929Z",
       "failureCodes": []
     },
     "notes": [
@@ -1114,12 +1194,12 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T08:06:18.377Z",
+    "checkedAt": "2026-11-14T11:42:10.925Z",
     "source": {
-      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
       "dirty": false
     },
-    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1488,6 +1568,46 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
         "required": true,
         "status": "PASS"
       },
@@ -1817,7 +1937,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T08:04:47.699Z",
+      "decidedAt": "2026-11-14T11:40:36.929Z",
       "failureCodes": []
     },
     "notes": [
@@ -1830,12 +1950,12 @@
     "tier": "installed-alpha",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T08:06:18.380Z",
+    "checkedAt": "2026-11-14T11:42:10.926Z",
     "source": {
-      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
       "dirty": false
     },
-    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2204,6 +2324,46 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
         "required": true,
         "status": "PASS"
       },
@@ -2573,6 +2733,36 @@
         "status": "PASS"
       },
       {
+        "id": "E8-PACKAGED-STOP-CONSISTENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E6-TARGET-CONTENT-DRIFT",
+        "required": false,
+        "status": "NOT_TESTED"
+      },
+      {
+        "id": "E9-COORDINATOR-CHANNEL-CONTRACT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E17-SUPPORT-MATERIAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E11-TRIAL-IDENTITY-FIELDS",
+        "required": false,
+        "status": "NOT_TESTED"
+      },
+      {
+        "id": "E13-G-SCOPED-SUMMARY",
+        "required": false,
+        "status": "NOT_TESTED"
+      },
+      {
         "id": "E3-TRIAL-WORKBENCH-UI",
         "required": true,
         "status": "PASS"
@@ -2662,7 +2852,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T08:04:47.699Z",
+      "decidedAt": "2026-11-14T11:40:36.929Z",
       "failureCodes": []
     },
     "notes": [
@@ -2675,12 +2865,12 @@
     "tier": "advisory-routing",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T08:06:18.382Z",
+    "checkedAt": "2026-11-14T11:42:10.927Z",
     "source": {
-      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
       "dirty": false
     },
-    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3049,6 +3239,46 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
         "required": true,
         "status": "PASS"
       },
@@ -3383,7 +3613,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T08:04:47.699Z",
+      "decidedAt": "2026-11-14T11:40:36.929Z",
       "failureCodes": []
     },
     "notes": [
@@ -3396,12 +3626,12 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T08:06:18.382Z",
+    "checkedAt": "2026-11-14T11:42:10.928Z",
     "source": {
-      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
       "dirty": false
     },
-    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3770,6 +4000,46 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
         "required": true,
         "status": "PASS"
       },
@@ -4124,7 +4394,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T08:04:47.699Z",
+      "decidedAt": "2026-11-14T11:40:36.929Z",
       "failureCodes": []
     },
     "notes": [
@@ -4137,12 +4407,12 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T08:06:18.383Z",
+    "checkedAt": "2026-11-14T11:42:10.928Z",
     "source": {
-      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
       "dirty": false
     },
-    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4511,6 +4781,46 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
         "required": true,
         "status": "PASS"
       },
@@ -4875,7 +5185,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T08:04:47.699Z",
+      "decidedAt": "2026-11-14T11:40:36.929Z",
       "failureCodes": []
     },
     "notes": [
@@ -4888,12 +5198,12 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T08:06:18.384Z",
+    "checkedAt": "2026-11-14T11:42:10.930Z",
     "source": {
-      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
       "dirty": false
     },
-    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5262,6 +5572,46 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
         "required": true,
         "status": "PASS"
       },
@@ -5591,7 +5941,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T08:04:47.699Z",
+      "decidedAt": "2026-11-14T11:40:36.929Z",
       "failureCodes": []
     },
     "notes": [
@@ -5604,12 +5954,12 @@
     "tier": "local-alpha",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T08:06:18.385Z",
+    "checkedAt": "2026-11-14T11:42:10.930Z",
     "source": {
-      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
       "dirty": false
     },
-    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5982,6 +6332,46 @@
         "status": "PASS"
       },
       {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-CONFIGURATION",
         "required": true,
         "status": "PASS"
@@ -6345,6 +6735,36 @@
         "id": "E7-READINESS",
         "required": true,
         "status": "PASS"
+      },
+      {
+        "id": "E8-PACKAGED-STOP-CONSISTENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E6-TARGET-CONTENT-DRIFT",
+        "required": false,
+        "status": "NOT_TESTED"
+      },
+      {
+        "id": "E9-COORDINATOR-CHANNEL-CONTRACT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E17-SUPPORT-MATERIAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E11-TRIAL-IDENTITY-FIELDS",
+        "required": false,
+        "status": "NOT_TESTED"
+      },
+      {
+        "id": "E13-G-SCOPED-SUMMARY",
+        "required": false,
+        "status": "NOT_TESTED"
       },
       {
         "id": "E3-TRIAL-WORKBENCH-UI",
@@ -6436,7 +6856,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T08:04:47.699Z",
+      "decidedAt": "2026-11-14T11:40:36.929Z",
       "failureCodes": []
     },
     "notes": [
@@ -6449,12 +6869,12 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T08:06:18.388Z",
+    "checkedAt": "2026-11-14T11:42:10.931Z",
     "source": {
-      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
       "dirty": false
     },
-    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
+    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -6827,6 +7247,46 @@
         "status": "PASS"
       },
       {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E2-CONFIGURATION",
         "required": true,
         "status": "PASS"
@@ -7190,6 +7650,36 @@
         "id": "E7-READINESS",
         "required": true,
         "status": "PASS"
+      },
+      {
+        "id": "E8-PACKAGED-STOP-CONSISTENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E6-TARGET-CONTENT-DRIFT",
+        "required": false,
+        "status": "NOT_TESTED"
+      },
+      {
+        "id": "E9-COORDINATOR-CHANNEL-CONTRACT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E17-SUPPORT-MATERIAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E11-TRIAL-IDENTITY-FIELDS",
+        "required": false,
+        "status": "NOT_TESTED"
+      },
+      {
+        "id": "E13-G-SCOPED-SUMMARY",
+        "required": false,
+        "status": "NOT_TESTED"
       },
       {
         "id": "E3-TRIAL-WORKBENCH-UI",
@@ -7317,7 +7807,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T08:04:47.699Z",
+      "decidedAt": "2026-11-14T11:40:36.929Z",
       "failureCodes": []
     },
     "notes": [

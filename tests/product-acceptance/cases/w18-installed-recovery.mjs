@@ -431,10 +431,13 @@ async function packagedFormatEvidence(install, restoredRoot, marker, workRoot, t
       if (appended) {
         const targetWorkflows = new workflows.WorkflowSnapshots(targetStore)
         const targetSnapshot = await targetWorkflows.create({ destination: join(work, 'target-snapshot'), formatVersion: 2 }).catch(error => ({ status: 'THREW', error: String(error?.message ?? error).slice(0, 200) }))
-        targetVerify = { status: targetSnapshot.status, verified: targetSnapshot.status === 'ok' ? targetWorkflows.verify(join(work, 'target-snapshot')).status : null }
+        targetVerify = { status: targetSnapshot.status, error: targetSnapshot.error ?? null,
+          verified: targetSnapshot.status === 'ok' ? targetWorkflows.verify(join(work, 'target-snapshot')).status : null }
       }
       format.targetDrift = { appended, verify: targetVerify, consumerContentBinding: 'NOT_AVAILABLE_IN_MAIN',
-        reason: 'the packaged producer verify checks database integrity, schema and artifact digests; it does not compare restored content against the source subject, so a legal target-only append is accepted' }
+        reason: targetVerify?.status === 'ok'
+          ? 'the packaged producer accepted a snapshot of the drifted target: its verify covers database integrity, schema and artifact digests, not source-content equality'
+          : 'the packaged producer could not produce a verified snapshot of the drifted target in this run; no content-binding consumer exists in main either way' }
     } finally { store.close() }
   } finally { rmSync(work, { recursive: true, force: true }) }
   const restoreProtocol = existsSync(marker) ? JSON.parse(readFileSync(marker, 'utf8')).protocol ?? null : null
@@ -585,7 +588,7 @@ export async function runInstalledRecovery() {
         consumerContentBinding: drift.consumerContentBinding ?? null, reason: drift.reason ?? null } } },
       drift.appended !== true
         ? 'NOT_REACHED: the probe could not append a legal target message in this run.'
-        : 'NOT_REACHED: the frozen package has no content-binding consumer in main; the packaged producer verify checks database integrity, schema and artifact digests only, so a legal target-only append stays verified. This is a recorded product gap for the C/A owners, not an acceptance pass.'))
+        : `NOT_REACHED: the frozen package has no content-binding consumer in main; the producer-side drifted snapshot result was ${drift.verify?.status ?? 'absent'}${drift.verify?.error ? ` (${drift.verify.error})` : ''}. A target-only append cannot be refused by content because no consumer compares restored content with the source subject. This is a recorded product gap for the C/A owners, not an acceptance pass.`))
   }
 
   cases.push(await runCase({ ...define('E9-INSTALLED-STABILITY', 'Bounded concurrent reads, repeated confirmation and a service reopen on the second root return every request/queue/resource to baseline'), evidence: {} },
