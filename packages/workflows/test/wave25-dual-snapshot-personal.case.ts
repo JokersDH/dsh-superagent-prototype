@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { execFileSync, spawn } from 'node:child_process'
 import { once } from 'node:events'
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { appendFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -113,6 +113,15 @@ test('the same real Store restores v1 and v2 separately through actual personal 
     if (firstArtifact) { const tampered = Buffer.from(readFileSync(join(wrongArtifactSource, firstArtifact.snapshotPath))); tampered[0] = (tampered[0] ?? 0) ^ 0xff; writeFileSync(join(wrongArtifactSource, firstArtifact.snapshotPath), tampered) }
     const refusedArtifact = await restoreWorkflowSnapshot({ snapshotDirectory: wrongArtifactSource, targetStateDir: join(root, `bad-artifact-${format}`) })
     assert.equal(refusedArtifact.status, 'blocked'); assert.match(refusedArtifact.message ?? '', /digest mismatch/)
+    assert.equal(existsSync(join(root, `bad-artifact-${format}`, 'state.sqlite')), false)
+    assert.equal(existsSync(join(root, `bad-artifact-${format}`, 'restore-report.json')), false)
+    if (format === 1) {
+      const oversized = join(root, 'oversized-manifest')
+      cpSync(snapshot.destination, oversized, { recursive: true })
+      appendFileSync(join(oversized, 'snapshot.json'), ' '.repeat(8 * 1024 * 1024))
+      const refusedOversized = await restoreWorkflowSnapshot({ snapshotDirectory: oversized, targetStateDir: join(root, 'bad-size') })
+      assert.equal(refusedOversized.status, 'blocked'); assert.match(refusedOversized.message ?? '', /too large/)
+    }
     const restored = await restoreWorkflowSnapshot({ snapshotDirectory: snapshot.destination, targetStateDir: restoreRoot, sourceStateRoot: source,
       expected: { protocol: snapshot.manifest.protocol, snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), databaseSha256: snapshot.manifest.database.sha256,
         evidenceDigest: snapshot.manifest.evidence.digest } })
@@ -122,6 +131,7 @@ test('the same real Store restores v1 and v2 separately through actual personal 
     assert.equal(restored.report?.evidence.digest, snapshot.manifest.evidence.digest)
     assert.equal(restored.report?.rootMapping.from, source)
     assert.equal(verifyRestoredSnapshot(restoreRoot).status, 'ok')
+    assert.equal((await restoreWorkflowSnapshot({ snapshotDirectory: snapshot.destination, targetStateDir: restoreRoot })).status, 'blocked')
     const credential = localCredentials(restoreRoot), reviewFile = join(root, `review-${format}.json`)
     const reviewStore = new ProductStore({ path: join(restoreRoot, 'state.sqlite') })
     try {

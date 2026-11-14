@@ -53,15 +53,16 @@ Schema stays 18; this wave adds no migration and no new table/ledger.
 
 ## Evidence
 
-- `wave25-workflow-tests.txt` — 119/119 pass.
+- `wave25-workflow-tests.txt` — 120/120 pass.
 - `wave25-storage-tests.txt` — 87/87 pass.
 - `wave25-dual.txt` — one real Store, default v1 and explicit v2: verified restore, same-package
   personal readonly reads (candidates/history/Work/Q&A/delivery/sources), C driver build+verify per
   format, and a different-Node-PID manifest readback of each restored root.
+- `wave25-input-guards.txt` — 13 malformed/incomplete expectation variants refused by the runtime parser.
 - `wave25-original-result.txt` — original tuple duplicate, unknown preservation, later observed result,
   eight foreign-tuple refusals, and a new-PID readback after close.
 - `wave25-reader.txt` — independent-Node reader plus C driver build/verify (
-  manifest `b2fc8d0c…`, reader PID 90802).
+  manifest `fe655219…`, reader PID 99070).
 - `wave25-c-driver.txt` — earlier A→C driver invocation retained for reference.
 
 ## Not reached
