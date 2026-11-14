@@ -1,0 +1,80 @@
+{
+  "protocol": "wave10-personal-install/1",
+  "status": "PASS",
+  "startedAt": "2026-11-14T03:26:49.511Z",
+  "steps": [
+    {
+      "id": "source-identity",
+      "status": "PASS",
+      "detail": {
+        "buildId": "fefd93219cea0d4a",
+        "commit": "a826b5e7c8843c28a527567ac33955ff061f85dc",
+        "schema": 18,
+        "dirty": false
+      }
+    },
+    {
+      "id": "cold-first-run",
+      "status": "PASS",
+      "detail": {
+        "status": "OK"
+      }
+    },
+    {
+      "id": "doctor-gates",
+      "status": "PASS",
+      "detail": {
+        "doctor": "DEGRADED",
+        "review_executor": "WARN"
+      }
+    },
+    {
+      "id": "personal-start-zero-turn",
+      "status": "PASS",
+      "detail": {
+        "mode": "personal",
+        "access": "local-development",
+        "buildId": "fefd93219cea0d4a",
+        "startupMode": "normal"
+      }
+    },
+    {
+      "id": "backup",
+      "status": "PASS",
+      "detail": {
+        "sha256": "3e5846fa0b1315b7eeba1a7c1e4b4faecb5fb2d1d625d6248df024dd8ef40a6c",
+        "evidenceDigest": "57d707180f08cfa390264d90638b4ea64337fb1dec98190e5496171ddc375892"
+      }
+    },
+    {
+      "id": "restore-readonly-fresh-root",
+      "status": "PASS",
+      "detail": {
+        "backupEvidence": "57d707180f08cfa390264d90638b4ea64337fb1dec98190e5496171ddc375892",
+        "restoredEvidence": "57d707180f08cfa390264d90638b4ea64337fb1dec98190e5496171ddc375892",
+        "target": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-personal-install-YDvLoC/restored-state"
+      }
+    },
+    {
+      "id": "relocated-install",
+      "status": "PASS",
+      "detail": {
+        "doctor": "DEGRADED",
+        "health": "ok",
+        "mode": "fixture"
+      }
+    }
+  ],
+  "limitations": [
+    "Zero model turns: personal mode is started but no work is dispatched.",
+    "Cross-schema refusal and same-schema rollback are measured by the managed matrix, not duplicated here."
+  ],
+  "artifact": {
+    "install": "/tmp/w25frozen/install",
+    "buildId": "fefd93219cea0d4a",
+    "commit": "a826b5e7c8843c28a527567ac33955ff061f85dc",
+    "schema": 18,
+    "dirty": false
+  },
+  "finishedAt": "2026-11-14T03:26:56.663Z"
+}

@@ -1,0 +1,17 @@
+{
+  "protocol": "wave24-installed-ui/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "installed-opt-in-ui-and-backend",
+      "status": "PASS",
+      "detail": {
+        "assets": 1,
+        "optInQuery": true,
+        "withheldSourceCount": true,
+        "reasons": true,
+        "backendProtocol": true
+      }
+    }
+  ]
+}

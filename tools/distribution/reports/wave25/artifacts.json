@@ -1,0 +1,32 @@
+{
+  "protocol": "wave25-artifacts/1",
+  "target": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave25-target/wave25-target-a826b5e.tar.gz",
+    "sha256": "d3e79749426c796085895abc73d76c4b26cd48427d8e6f748155bec00a103f3c",
+    "tarBytes": 20251483,
+    "buildId": "fefd93219cea0d4a",
+    "source": {
+      "commit": "a826b5e7c8843c28a527567ac33955ff061f85dc",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "files": 6754,
+    "bytes": 67594376,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "mainSource": "fdb3f16 readiness + 4b42a90 UI",
+  "limits": [
+    "C direct consumption of A manifest object NOT_TESTED",
+    "F trial package not merged in this branch",
+    "E final verdict pending",
+    "zero real vendor/native turns"
+  ]
+}

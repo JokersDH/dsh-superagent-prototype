@@ -1,0 +1,74 @@
+{
+  "protocol": "wave11-portable-closure/1",
+  "status": "PASS",
+  "startedAt": "2026-11-14T03:32:02.831Z",
+  "steps": [
+    {
+      "id": "relocated-copy",
+      "status": "PASS",
+      "detail": {
+        "install": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-portable-SYtx7X/隔离 空格 dir/relocated-install",
+        "buildId": "fefd93219cea0d4a",
+        "schema": 18,
+        "dirty": false,
+        "bytes": null,
+        "files": null
+      }
+    },
+    {
+      "id": "isolated-doctor",
+      "status": "PASS",
+      "detail": {
+        "doctor": "DEGRADED",
+        "checks": 19,
+        "home": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-portable-SYtx7X/隔离 空格 dir/empty-home"
+      }
+    },
+    {
+      "id": "isolated-start-stop-support",
+      "status": "PASS",
+      "detail": {
+        "health": "ok",
+        "mode": "fixture",
+        "supportDigest": "c7025ad9f769",
+        "stopped": "STOPPED"
+      }
+    },
+    {
+      "id": "unsafe-permissions-explicit",
+      "status": "PASS",
+      "detail": {
+        "doctorRoots": "FAIL",
+        "startCode": "first_run_required"
+      }
+    },
+    {
+      "id": "missing-runtime-explicit",
+      "status": "PASS",
+      "detail": {
+        "exit": 127,
+        "error": null,
+        "diagnostic": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-portable-SYtx7X/隔离 空格 dir/relocated-install/bin/pa: line 3: dirname:"
+      }
+    },
+    {
+      "id": "other-platform-abi",
+      "status": "NOT_TESTED",
+      "detail": {
+        "reason": "Only darwin/arm64 + current Node/SQLite ABI measured; no cross-platform claim."
+      }
+    }
+  ],
+  "limitations": [
+    "darwin/arm64 with the current Node/SQLite ABI only; other platforms/ABIs are NOT_TESTED.",
+    "The closure is the declared staged install (including its bundled node_modules); the author checkout is not read."
+  ],
+  "artifact": {
+    "install": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-portable-SYtx7X/隔离 空格 dir/relocated-install",
+    "buildId": "fefd93219cea0d4a",
+    "commit": "a826b5e7c8843c28a527567ac33955ff061f85dc",
+    "schema": 18,
+    "dirty": false
+  },
+  "finishedAt": "2026-11-14T03:32:06.242Z"
+}

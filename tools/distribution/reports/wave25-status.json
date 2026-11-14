@@ -5,105 +5,138 @@
   "base": "bcd4d4c",
   "mergedMain": "d3a0faa",
   "mainSource": "fdb3f16 readiness + 4b42a90 UI",
-  "head": "a685e07",
-  "status": "CANDIDATE_MILESTONE_2",
-  "scopeNote": "Wave-25 D four milestones. Milestone 1 is the safety tool and full resource list; later milestones add A→C same-manifest consumption, readiness/F package and ordinary/reopen/support. E remains independent; zero real vendor/model/native turns.",
-  "ownedPaths": [
-    "apps/launcher/",
-    "packages/portability/",
-    "tools/distribution/"
-  ],
-  "resourceSet": {
-    "roles": [
-      "launcher",
-      "api",
-      "console"
-    ],
-    "perResourceFields": [
-      "pid",
-      "processStart",
-      "uid",
-      "role",
-      "entry",
-      "capturedTokens",
-      "root",
-      "config",
-      "operation"
-    ],
-    "unknownPolicy": "mixed [valid,null] keeps null as record_missing_in_mixed_set; unknown retains private state; group signal only for spawn-before-record after fresh launcher proof",
-    "signalPolicy": "each TERM and each KILL re-reads target identity; identity change/missing/unreadable stops that signal; no stale proof reuse"
-  },
+  "head": "a826b5e",
+  "frozenSource": "a826b5e",
+  "status": "CANDIDATE",
   "phases": {
     "d1": {
       "status": "PASS",
-      "summary": "Fixed baseline and listed every live role/field. Old prerecord/childstart/sibling/null results retained; new child config/captured argv/entry/operation and mixed-null gaps are explicitly closed by controls, not by a single local PASS."
+      "summary": "Baseline/resource list; old fixes retained."
     },
     "d2": {
       "status": "PASS",
-      "summary": "TERM wait then KILL no longer reuses targets/proof: every signal re-reads only its target (launcher or one child) and records fresh evidence. Identity change, missing target or failed read stops that signal and keeps UNKNOWN."
+      "summary": "Every TERM/KILL re-reads its own target; no stale targets/proof."
     },
     "d3": {
       "status": "PASS",
-      "summary": "Child identity binds actual config, captured full argv, entry, role and startup operation; captured tokens must equal current tokens; sibling roots and wrong entries refuse. Mixed [valid,null] preserves the unknown member."
+      "summary": "Child config/captured argv/entry/role/operation bound; mixed valid/null keeps unknown."
     },
     "d4": {
       "status": "PASS",
-      "summary": "14 pure controls pass (own positive, child start/config/entry, sibling, wrong operation, PID reuse, missing, cleanup failure, repeated finally, stop timeout, mixed null, empty). Two bounded live faults: before-record UNKNOWN retained with fresh group signal; after-seed CLEAN. Normal same-store/nonempty/real still pass.",
-      "evidence": [
-        "controls.json",
-        "fault-before-record.json",
-        "fault-after-seed.json"
-      ]
+      "summary": "14 pure controls; before-record UNKNOWN retained, after-seed CLEAN; same/nonempty/real pass."
     },
     "d5": {
-      "status": "PASS_WITH_DIRECT_BINDING_LIMIT",
-      "summary": "A producer + separate-PID reader verified complete original subject on the kept same-Store root; a tampered manifest was rejected before body read. C package driver verified-flow on the same exact Store. LIMIT: C did not consume the A manifest as an input object; that direct binding remains NOT_TESTED."
+      "status": "PASS_WITH_LIMIT",
+      "summary": "A producer+separate-PID reader complete on kept Store; tampered manifest rejected; C verified-flow same Store. C direct A-manifest object binding NOT_TESTED."
     },
     "d6": {
       "status": "PASS",
-      "summary": "From the same original Store create/verify workflow-snapshot/1 and /2; each format separately materialized, independently bundled and restored to its own new root. Each restored root was then consumed by the C unique driver and returned verified-flow with bound requested/live digest. Each DB sha equals its snapshot manifest; original Work/question/answer IDs preserved. Bad manifest is rejected by the A reader."
+      "summary": "snapshot/1 and /2 each independently materialized/bundled/restored to own root then consumed by C verified-flow; DB sha/original IDs preserved."
+    },
+    "d7": {
+      "status": "PASS_WITH_F_LIMIT",
+      "summary": "Installed UI static consumer, CLI help and same-Store review/reopen pass; F trial package not merged."
+    },
+    "d8": {
+      "status": "PASS_WITH_LIMIT",
+      "summary": "Same Store -> two restored roots -> C verified-flow; A output direct input to C NOT_TESTED."
+    },
+    "d9": {
+      "status": "PASS",
+      "summary": "Installed GET /v1/readiness 200 protocol trial-readiness/1 authorization none; observed fixture/configuration/counts; no private grant."
+    },
+    "d10": {
+      "status": "PASS",
+      "summary": "Clean frozen a826b5e source with readiness+UI same package; old tars preserved."
+    },
+    "d11": {
+      "status": "PASS",
+      "summary": "Cold7, matrix19, multi8, cross3, data5, backup6, portable5; 97 mock-only."
+    },
+    "d12": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Installable frozen candidate; E recipe/tuple handed; D self-test not release."
+    },
+    "d13": {
+      "status": "PASS",
+      "summary": "Reopen new PID after re-prepare; data readable; old request not resent."
+    },
+    "d14": {
+      "status": "PASS",
+      "summary": "Support/material no-overwrite 0600 and resource return covered."
+    },
+    "d15": {
+      "status": "PASS",
+      "summary": "Closure and consumer hashes refreshed; docs-only no refreeze."
+    },
+    "d16": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Tuple/limitations handed to E; E verdict independent."
     }
+  },
+  "artifacts": {
+    "protocol": "wave25-artifacts/1",
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave25-target/wave25-target-a826b5e.tar.gz",
+      "sha256": "d3e79749426c796085895abc73d76c4b26cd48427d8e6f748155bec00a103f3c",
+      "tarBytes": 20251483,
+      "buildId": "fefd93219cea0d4a",
+      "source": {
+        "commit": "a826b5e7c8843c28a527567ac33955ff061f85dc",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "productSchema": 18,
+      "files": 6754,
+      "bytes": 67594376,
+      "environment": {
+        "node": "24.21.0",
+        "pnpm": "11.7.0",
+        "sqlite": "3.53.4",
+        "abi": "137",
+        "platform": "darwin",
+        "arch": "arm64"
+      }
+    },
+    "mainSource": "fdb3f16 readiness + 4b42a90 UI",
+    "limits": [
+      "C direct consumption of A manifest object NOT_TESTED",
+      "F trial package not merged in this branch",
+      "E final verdict pending",
+      "zero real vendor/native turns"
+    ]
   },
   "testLayers": {
-    "controls": {
-      "steps": 14,
-      "status": "PASS"
-    },
-    "sameStore": {
-      "steps": 4,
-      "status": "PASS"
-    },
-    "nonempty": {
-      "steps": 11,
-      "status": "PASS"
-    },
-    "real": {
-      "steps": 4,
-      "status": "PASS"
-    },
-    "faultBeforeRecord": {
-      "status": "FAIL_EXPECTED_UNKNOWN_RETAINED"
-    },
-    "faultAfterSeed": {
-      "status": "FAIL_EXPECTED_CLEAN"
-    },
-    "dualSnapshotC": {
-      "steps": 4,
-      "status": "PASS"
-    }
+    "controls": 14,
+    "sameStore": 4,
+    "nonempty": 11,
+    "real": 4,
+    "dualSnapshotC": 4,
+    "ui": 1,
+    "help": 1,
+    "readiness": 1,
+    "personal": 7,
+    "matrix": 19,
+    "multi": 8,
+    "cross": 3,
+    "data": 5,
+    "backup": 6,
+    "portable": 5
   },
   "notDone": [
-    "readiness/F package freeze",
-    "ordinary cold/upgrade/reopen/support for wave25 package",
-    "E independent verdict",
-    "C directly consuming A manifest object"
+    "C direct consumption of A manifest object",
+    "F trial package merge",
+    "E final verdict",
+    "private permission/target",
+    "real vendor/native"
   ],
   "limitations": [
-    "No real vendor/model/native turns",
-    "No private permission/target/native claim",
-    "Old 3b package is a positive control only; it cannot certify wave25 readiness/F bytes"
+    "zero real vendor/model/native turns",
+    "old 3b package cannot certify wave25 bytes",
+    "no browser interaction inferred from static UI markers"
   ],
   "evidence": [
-    "tools/distribution/reports/wave25/*.json"
+    "tools/distribution/reports/wave25/*.json",
+    "tools/distribution/recipes/wave25-e-acceptance.zh-CN.md"
   ]
 }
