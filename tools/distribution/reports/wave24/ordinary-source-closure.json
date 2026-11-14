@@ -1,8 +1,8 @@
 {
   "protocol": "wave24-ordinary-source-closure/1",
-  "frozenRuntimeSource": "0ede11d",
-  "sourceCommit": "3b2ff68",
-  "generatedAt": "2026-11-14T01:50:33.808Z",
+  "frozenRuntimeSource": "3b2ff68",
+  "sourceCommit": "9bd484f",
+  "generatedAt": "2026-11-14T02:01:28.229Z",
   "purpose": "Coherent ordinary personal distribution source/deploy closure with actual cleanup/fault, CLI help and same-Store validation tools; frozen runtime target remains 3b2ff68 with main UI; excludes historical reports.",
   "groups": {
     "mainUi": [
@@ -391,6 +391,11 @@
         "path": "tools/distribution/verify-cli-help.mjs",
         "bytes": 2075,
         "sha256": "73a8d5243d1a072e8427de68dae03aeaec1bae78d9021770207c0e7e8cea3840"
+      },
+      {
+        "path": "tools/distribution/verify-independent-snapshot-restores.mjs",
+        "bytes": 6998,
+        "sha256": "172e21c6e6c5485be03dc7a1e81c655fda70e319124afe00f47e2b1137d31be9"
       },
       {
         "path": "tools/distribution/verify-installed-ui.mjs",
