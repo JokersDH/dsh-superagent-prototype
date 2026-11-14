@@ -34,6 +34,13 @@ node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 600 
 
 退出码：`0` 完整通过/场景按预期结束，`1` DEGRADED（未测量的兼容性、未绑定或场景内失败），`2` REFUSED（输入/完整性/凭据/参数拒绝），`3` INTERNAL。
 
+## wave-26 硬化行为
+
+- **REFUSED 零执行**：预检只要出现完整性 `FAIL`（错 hash/file/manifest/expectation），machinecheck 不再执行包内 `help/status/doctor`，也不采集 support；报告写 `package_cli.skipped`。只有 `DEGRADED`（兼容性/未绑定 unknown）才可能进入三条 allowlist 命令。
+- **token 描述符校验**：显式 token 文件必须用 `O_NOFOLLOW` 打开，`lstat/fstat` dev+ino 一致，regular、恰好 0600、当前 uid、`nlink===1`；symlink、hardlink、FIFO、目录、替换、宽松权限全部拒绝，值不入日志/报告。
+- **有界 Node range**：只接受 `>=x[.y[.z]]` 与可选 `<x[.y[.z]]` 比较器（`<25` 按 semver partial = `<25.0.0`）。`^`/`~`/`||`/通配/空 range 返回 `UNKNOWN`，不会把较高 major 自动判通过；`>=23 <24` 对 24.21 记为 WARN。
+- **raw checker v2**：持续时间从 `startedAt/endedAt`、单调 `elapsedMs` 与每条 `sample.at` 独立推导，并与摘要交叉核对；样本早停、时间乱序、`at` 与 elapsed 不符、计数/cadence 矛盾、失败合计不符、状态与 stoppedBy 矛盾、symlink/越界样本路径都拒绝。
+
 ## 预检实际核对什么
 
 - tar/安装目录中的 `install.json`（`pa-install/1`）与 `var/config/release.json`（`pa-release/1`）作为唯一身份来源；目录名、tag 和“看起来相近”的版本都不算身份；
@@ -61,12 +68,10 @@ node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 600 
 ## 测试
 
 ```bash
-node --test tests/operational-soak/preflight.case.mjs
-node --test tests/operational-soak/machinecheck.case.mjs
-node --test tests/operational-soak/soak.case.mjs
+node --test tests/operational-soak/*.case.mjs tests/operational-soak/recovery/*.case.mjs
 ```
 
-覆盖：完整 tiny fixture 正负、错 hash/缺文件/多余文件/外部 symlink/坏 JSON/缺依赖/错 console stamp、绝对与 `..` 成员、截断 tar、ABI 不一致的 DEGRADED、输入与 home 无副作用、输出 0600/0700 与拒绝覆盖、含空格/中文路径、readiness 401/500/坏 JSON/超大/未知字段/过期/跨 subject/deadline、token 权限、support 白名单与空根采集、soak 正向/仅 HTTP/仅 SSE/七类有界缺陷/中断/参数与覆盖拒绝。
+覆盖（27/27）：完整 tiny fixture 正负、错 hash/缺文件/多余文件/外部 symlink/坏 JSON/缺依赖/错 console stamp、绝对与 `..` 成员、截断 tar、ABI 不一致的 DEGRADED、输入与 home 无副作用、输出 0600/0700 与拒绝覆盖、含空格/中文路径、readiness 401/500/坏 JSON/超大/未知字段/过期/跨 subject/deadline、token 权限、support 白名单与空根采集、soak 正向/通道隔离/七类缺陷/中断/参数拒绝、REFUSED 零执行、token symlink/hardlink/FIFO、semver 上下界、checker 时间矛盾，以及合法零模型恢复包/foreign source/reader 复核。恢复输入工具在 `tests/operational-soak/recovery/`，不在 trial-kit 内。
 
 ## 明确不声称
 

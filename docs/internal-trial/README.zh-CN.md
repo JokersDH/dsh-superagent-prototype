@@ -37,6 +37,11 @@ node tools/trial-kit/bin/trial-preflight.mjs \
 
 ## 3. 机器检查与 readiness
 
+当前 main 工作台（a302ddc）已在默认主对话旁提供“试用准备”导航：只有认证 ready 且你打开该视图时才读取一次 readiness，四个按钮分别打开原模型设置、原项目导入、原执行器目录和原主对话。它们不是新的派工/授权入口；配置、派工、问题和接受仍走原命令。
+
+readiness 只报告配置事实；缺包身份时报告 `package_binding: unknown`。包内命令只在完整性通过后执行；`REFUSED` 不会运行 `help/status/doctor`。
+
+
 ```bash
 node tools/trial-kit/bin/trial-machinecheck.mjs \
   --tar <你的包.tar.gz> --artifact <install-artifact.json> \
@@ -66,6 +71,10 @@ readiness 只代表配置事实：它不含包身份（报告会写 `package_bin
 - 把 `diagnostics-bundle.json`、`reproduce.txt` 和**原始命令/exit code**一起发给维护者；
 - 不要手工粘贴 token、对话正文、个人绝对路径；诊断包已脱敏，仍请快速扫一眼；
 - `pa support` 不会自动运行，因为它会在有数据库时以可写 pragma 打开数据库。请在自己的副本上运行后，用 `--support <file>` 引用；或让工具在“空的自有新根”上采集。
+
+## 4b. 合法恢复输入（给 B/main）
+
+`tests/operational-soak/recovery/` 提供合法零模型输入包：真实 Work/Attempt/Question/Answer/native_applied、原 producer 生成的 journal、原公共 reader 和已准入 recovery port 的正例/故障。它**不包含**业务 attach/begin/deliver/answer 与 SIGKILL 恢复，`businessResume` 明确 `NOT_REACHED`。详见该目录 `README.zh-CN.md`。
 
 ## 5. 有限运行观察
 

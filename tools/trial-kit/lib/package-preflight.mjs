@@ -175,20 +175,48 @@ function closureDigestOf(files) {
   return sha256(lines.join('\n'))
 }
 
-function parseNodeRange(range) {
-  const match = /^>=(\d+)\.(\d+)\.(\d+)\s+<(\d+)(?:\.(\d+))?(?:\.(\d+))?$/.exec(String(range ?? '').trim())
-  if (!match) return null
-  return { min: [Number(match[1]), Number(match[2]), Number(match[3])], maxMajor: Number(match[4]) }
+function parseVersion(text) {
+  const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(String(text ?? ''))
+  return match === null ? null : [Number(match[1]), Number(match[2]), Number(match[3])]
 }
 
-function satisfiesNode(version, parsed) {
-  const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(version)
-  if (!match) return null
-  const current = [Number(match[1]), Number(match[2]), Number(match[3])]
+function compareVersion(left, right) {
   for (let index = 0; index < 3; index += 1) {
-    if (current[index] !== parsed.min[index]) return current[index] > parsed.min[index]
+    if (left[index] !== right[index]) return left[index] < right[index] ? -1 : 1
   }
-  return current[0] < parsed.maxMajor
+  return 0
+}
+
+/**
+ * Evaluate the bounded comparator set this tool actually supports: one or more `>=x[.y[.z]]` plus
+ * optional `<x[.y[.z]]` comparators. Missing `<` parts follow semver partial semantics (`<25` means
+ * `<25.0.0`). Any other syntax (`^`, `~`, `||`, wildcards, prereleases) returns null — the caller
+ * reports UNKNOWN instead of inventing a loose range.
+ */
+export function parseNodeRange(range) {
+  const parts = String(range ?? '').trim().split(/\s+/).filter((part) => part.length > 0)
+  if (parts.length === 0 || parts.length > 8) return null
+  const lowers = []
+  const uppers = []
+  for (const part of parts) {
+    const match = /^(>=|<)(\d+)(?:\.(\d+))?(?:\.(\d+))?$/.exec(part)
+    if (match === null) return null
+    const version = [Number(match[2]), Number(match[3] ?? 0), Number(match[4] ?? 0)]
+    if (match[1] === '>=') lowers.push(version)
+    else uppers.push(version)
+  }
+  if (lowers.length === 0) return null
+  return { lowers, uppers }
+}
+
+/** True/false for a supported range, null when the version or range syntax is not understood. */
+export function evaluateNodeRange(version, range) {
+  const parsedVersion = parseVersion(version)
+  const parsedRange = parseNodeRange(range)
+  if (parsedVersion === null || parsedRange === null) return null
+  if (!parsedRange.lowers.every((min) => compareVersion(parsedVersion, min) >= 0)) return false
+  if (!parsedRange.uppers.every((max) => compareVersion(parsedVersion, max) < 0)) return false
+  return true
 }
 
 function compareFileToRecord(absolute, record) {
@@ -583,9 +611,12 @@ async function verifyTree({ install, release, installRoot, record, observed, unk
   const host = { platform: process.platform, arch: process.arch, node: process.versions.node, abi: process.versions.modules, sqlite: null }
   const platformOk = install.producer.platform === host.platform && install.producer.arch === host.arch
   record(platformOk ? 'PASS' : 'WARN', 'host_platform', { observed: { platform: host.platform, arch: host.arch }, producer: { platform: install.producer.platform, arch: install.producer.arch } })
-  const parsedRange = parseNodeRange(install.supportMatrix?.node)
-  const nodeOk = parsedRange === null ? null : satisfiesNode(host.node, parsedRange)
-  record(nodeOk === true ? 'PASS' : nodeOk === false ? 'WARN' : 'UNKNOWN', 'host_node', { observed: host.node, supportMatrix: install.supportMatrix?.node ?? null })
+  const nodeOk = evaluateNodeRange(host.node, install.supportMatrix?.node)
+  record(nodeOk === true ? 'PASS' : nodeOk === false ? 'WARN' : 'UNKNOWN', 'host_node', {
+    observed: host.node,
+    supportMatrix: install.supportMatrix?.node ?? null,
+    ...(nodeOk === null ? { reason: parseNodeRange(install.supportMatrix?.node) === null ? 'unsupported_range_syntax' : 'unparsable_host_version' } : {}),
+  })
   if (nodeOk === null) unknowns.push('host_node')
   const abiOk = String(install.producer.abi) === String(host.abi)
   record(abiOk ? 'PASS' : 'WARN', 'host_abi', { observed: host.abi, producer: install.producer.abi, supportMatrix: install.supportMatrix?.abi ?? null })

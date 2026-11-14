@@ -13,7 +13,7 @@
  *   - readiness carries no package identity, so package↔readiness binding is reported as `unknown`
  *     unless the caller asserts a configuration revision and observation age.
  */
-import { readFileSync, statSync } from 'node:fs'
+import { closeSync, constants, fstatSync, lstatSync, openSync, readFileSync } from 'node:fs'
 import { request } from 'node:http'
 import { request as secureRequest } from 'node:https'
 import { TrialKitError, fail, pass, unknown } from './output.mjs'
@@ -31,16 +31,41 @@ export function assertLoopbackUrl(raw) {
   return url
 }
 
-/** Read one explicit private token file. Refuses non-regular or group/other-accessible files. */
+/**
+ * Read one explicit private token file with descriptor-level checks:
+ *   - O_NOFOLLOW: a symlink is refused instead of followed;
+ *   - lstat/fstat dev+ino equality: a path swapped between check and open is refused;
+ *   - regular file, exactly 0600, owned by this uid, single link (nlink === 1): hardlinks, FIFOs,
+ *     sockets and devices are refused;
+ *   - a hard size bound before reading.
+ * The value is returned to the caller only and is never logged by this module.
+ */
 export function readTokenFile(path) {
-  let info
-  try { info = statSync(path) } catch { throw new TrialKitError('token_unavailable', 'Token file does not exist', { path }) }
-  if (!info.isFile() || info.isSymbolicLink()) throw new TrialKitError('token_unavailable', 'Token file must be a regular file, not a symlink', { path })
-  if ((info.mode & 0o077) !== 0) throw new TrialKitError('token_permissions', 'Token file must be private (0600)', { path, mode: (info.mode & 0o777).toString(8) })
-  if (info.size === 0 || info.size > 4096) throw new TrialKitError('token_invalid', 'Token file size is outside the accepted range', { bytes: info.size })
-  const token = readFileSync(path, 'utf8').trim()
-  if (token.length < 8) throw new TrialKitError('token_invalid', 'Token is too short to be a real credential')
-  return token
+  let before
+  try { before = lstatSync(path) } catch { throw new TrialKitError('token_unavailable', 'Token file does not exist', { path }) }
+  if (before.isSymbolicLink()) throw new TrialKitError('token_symlink', 'Token file must not be a symlink', { path })
+  if (!before.isFile()) throw new TrialKitError('token_not_regular', 'Token file must be a regular file', { path })
+  let fd
+  try {
+    fd = openSync(path, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0) | (constants.O_NONBLOCK ?? 0))
+  } catch (error) {
+    const code = String(error?.code ?? 'open_failed')
+    throw new TrialKitError(code === 'ELOOP' ? 'token_symlink' : 'token_unavailable', 'Token file cannot be opened safely', { code })
+  }
+  try {
+    const info = fstatSync(fd)
+    if (info.dev !== before.dev || info.ino !== before.ino) throw new TrialKitError('token_replaced', 'Token file identity changed between check and open')
+    if (!info.isFile()) throw new TrialKitError('token_not_regular', 'Token file descriptor is not a regular file')
+    if ((info.mode & 0o777) !== 0o600) throw new TrialKitError('token_permissions', 'Token file must be exactly 0600', { mode: (info.mode & 0o777).toString(8) })
+    if (typeof process.getuid === 'function' && info.uid !== process.getuid()) throw new TrialKitError('token_owner', 'Token file must be owned by the current user')
+    if (info.nlink !== 1) throw new TrialKitError('token_hardlink', 'Token file must not have other hardlinks', { nlink: info.nlink })
+    if (info.size < 8 || info.size > 4096) throw new TrialKitError('token_invalid', 'Token file size is outside the accepted range', { bytes: info.size })
+    const token = readFileSync(fd, 'utf8').trim()
+    if (token.length < 8) throw new TrialKitError('token_invalid', 'Token is too short to be a real credential')
+    return token
+  } finally {
+    closeSync(fd)
+  }
 }
 
 function fetchOnce(url, { token, timeoutMs, maxBytes }) {

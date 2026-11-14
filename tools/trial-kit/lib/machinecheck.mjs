@@ -70,9 +70,16 @@ export async function machinecheck({ preflightInput, readinessResult = null, sup
   const installRoot = preflightInput.kind === 'tar'
     ? join(preflightInput.out, 'extract', report.method?.extraction?.prefix ?? '')
     : resolve(preflightInput.installPath)
-  const cliAvailable = withPackageCli && existsSync(join(installRoot, 'bin/pa'))
+  // S1: an integrity refusal must stop before any package code runs. Compatibility unknowns
+  // (DEGRADED) stay separate and may still use the checked command allowlist.
+  const integrityRefused = report.result === 'REFUSED'
+  const cliAvailable = withPackageCli && !integrityRefused && existsSync(join(installRoot, 'bin/pa'))
 
   let packageCli = null
+  if (withPackageCli && integrityRefused) {
+    checks.push(unknown('package_cli.skipped', { reason: 'preflight_refused', note: 'no package command is executed after an integrity refusal' }))
+    unknowns.push('package_cli_skipped')
+  }
   if (cliAvailable) {
     packageCli = runPackageCommands({ installRoot, out: preflightInput.out })
     checks.push(packageCli.help.exit === 0 ? pass('package_cli.help', { exit: 0, firstLine: packageCli.help.firstLine }) : fail('package_cli.help', { exit: packageCli.help.exit }))

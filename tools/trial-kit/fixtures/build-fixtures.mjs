@@ -60,6 +60,7 @@ export function buildTinyInstall(root, { prefix = 'install' } = {}) {
   writeFile(installRoot, 'bin/pa', [
     '#!/bin/sh',
     'set -eu',
+    'if [ -n "${TRIAL_PA_CALL_LOG:-}" ]; then printf "%s\\n" "$*" >> "$TRIAL_PA_CALL_LOG"; fi',
     'command="${1:-help}"',
     'case "$command" in',
     '  help) printf "%s\\n" "pa fixture help (read-only)"; exit 0 ;;',

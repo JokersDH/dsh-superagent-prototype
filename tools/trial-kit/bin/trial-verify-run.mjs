@@ -39,7 +39,7 @@ async function main() {
     else {
       printHuman([
         `verify-run: ${report.consistency.ok ? 'CONSISTENT' : 'INCONSISTENT'}`,
-        `  run: ${report.run.status} ${report.run.startedAt} .. ${report.run.endedAt} actual=${report.run.wallElapsedSeconds}s requested=${report.run.requestedDurationSeconds ?? 'n/a'}s`,
+        `  run: ${report.run.status} ${report.run.startedAt} .. ${report.run.endedAt} derived=${report.run.derivedWallSeconds}s summary=${report.run.summaryWallElapsedSeconds ?? 'n/a'}s requested=${report.run.requestedDurationSeconds ?? 'n/a'}s`,
         `  samples: lines=${report.samples.lines} lastElapsedMs=${report.samples.lastElapsedMs} sha256=${report.samples.sha256.slice(0, 16)}...`,
         `  issues: ${report.consistency.issues.length === 0 ? 'none' : report.consistency.issues.join(', ')}`,
       ])

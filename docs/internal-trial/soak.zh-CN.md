@@ -2,6 +2,10 @@
 
 `trial-soak` 运行**一次有限 fixture 场景**：本进程 loopback fixture 提供 readiness 与 SSE，客户端做轮询、SSE 订阅/重连、受控“客户端重开”和资源采样。它不是 daemon，不碰个人 state，不调用模型/原生 CLI，也不从网页重开推断 daemon 恢复。
 
+## wave-26 补充
+
+既有 600/1800 秒原始运行保留，不因 parser/报告修补重跑 40 分钟。wave-26 只增加两个短的有界复验：60 秒 mixed normal 与 30 秒 mixed truncate（主动断流），用于 HTTP 失败/重连/资源归还的新风险；两者 `run-check` 均 `CONSISTENT`。没有显式自有产品目标时，真实产品 readonly/SSE 观察标 `NOT_REACHED`，不读取用户十二服务补样。
+
 ## 两个实际场景
 
 | 场景 | 时长 | 负载 | 断流策略 |

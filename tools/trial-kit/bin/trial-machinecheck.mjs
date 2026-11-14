@@ -166,7 +166,10 @@ async function main() {
 
     // Optional, explicitly guarded support collection: only against an empty own data root.
     let supportRun = null
-    if (values['run-support'] === true) {
+    if (values['run-support'] === true && result.result === 'REFUSED') {
+      supportRun = { ok: false, reason: 'preflight_refused', note: 'no package command or support collection after an integrity refusal' }
+      result.checks.push({ id: 'support.collected', status: 'UNKNOWN', detail: supportRun })
+    } else if (values['run-support'] === true) {
       const dataRoot = join(out, 'roots', 'data')
       if (existsSync(join(dataRoot, 'state.sqlite'))) {
         supportRun = { ok: false, reason: 'own_data_root_has_database', note: 'pa support opens the database with write pragmas; run it yourself on a copy' }
