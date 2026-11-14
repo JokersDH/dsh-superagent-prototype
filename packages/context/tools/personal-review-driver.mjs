@@ -43,6 +43,8 @@ const { values } = parseArgs({ args, options: {
   'a-worktree': { type: 'string' }, 'a-module': { type: 'string' }, 'manifest-db': { type: 'string' },
   'manifest-expectation': { type: 'string' }, 'manifest-output': { type: 'string' }, 'root-map': { type: 'string' },
   'replay-context-token': { type: 'string' }, 'replay-confirm-token': { type: 'string' }, 'expect-readiness': { type: 'string' },
+  'target-protocol': { type: 'string' }, 'target-snapshot-digest': { type: 'string' }, 'target-content-digest': { type: 'string' },
+  'target-artifacts': { type: 'string' }, 'target-source-root': { type: 'string' },
 } })
 
 const startedAt = new Date().toISOString()
@@ -216,20 +218,24 @@ async function main() {
       coverage: manifest.coverage, aModuleSha256: invocation.aModuleSha256, aHead: invocation.aHead,
       subject: manifest.subject, question: manifest.question, answer: manifest.answer, counts: manifest.counts,
       roots: { from: realpathSync(fromRoot), to: identity.stateRoot }, output }
-    // P2 proof: the restored target must still carry exactly the original subject, not merely a matching path.
-    const proofTool = join(import.meta.dirname, 'wave26-target-proof.mjs')
+    // A's official content/restore proof with independent expectations; no family-name exemptions.
+    if (!values['target-protocol'] || !values['target-snapshot-digest'] || !values['target-content-digest'])
+      throw new DriverError('target_proof_input', 'Manifest mode needs --target-protocol, --target-snapshot-digest and --target-content-digest')
+    const proofTool = join(import.meta.dirname, 'wave27-target-proof.mjs')
     const proof = spawnSync(process.execPath, ['--experimental-strip-types', '--no-warnings', proofTool,
-      '--a-worktree', aWorktree, '--a-module', aModule, '--db', join(identity.stateRoot, 'state.sqlite'),
-      '--expectation', expectation, '--manifest', output, '--report', join(identity.stateRoot, 'restore-report.json'),
+      '--a-worktree', aWorktree, '--a-module', aModule, '--target-state', identity.stateRoot,
+      '--expectation', expectation, '--manifest', output, '--source-state-root', values['target-source-root'] ? absolute('target-source-root', values['target-source-root']) : realpathSync(fromRoot),
+      '--protocol', values['target-protocol'], '--snapshot-digest', values['target-snapshot-digest'],
+      '--content-digest', values['target-content-digest'],
+      ...(values['target-artifacts'] ? ['--artifacts', absolute('target-artifacts', values['target-artifacts'])] : []),
       '--a-head', aHead ?? ''], { encoding: 'utf8', timeout: Math.max(100, Math.min(60000, workingDeadlineAt - Date.now())) })
     let proofResult = null
     try { proofResult = JSON.parse(String(proof.stdout).trim().split('\n').at(-1)) } catch { proofResult = null }
     if (!proofResult) throw new DriverError('target_subject_mismatch', 'The target proof did not return JSON')
-    if (proof.status !== 0) throw new DriverError('target_subject_mismatch', 'The target root does not match the original A subject', {
-      status: proof.status, stderr: String(proof.stderr ?? '').slice(-1000), proof: proofResult,
-    })
-    if (proofResult.status !== 'ok' || proofResult.subjectMatches !== true)
-      throw new DriverError('target_subject_mismatch', 'The target content differs from the original subject', proofResult)
+    if (proof.status !== 0 || proofResult.status !== 'ok' || proofResult.subjectMatches !== true)
+      throw new DriverError('target_subject_mismatch', 'The target root does not match the original A subject', {
+        status: proof.status, stderr: String(proof.stderr ?? '').slice(-1000), proof: proofResult,
+      })
     data.targetProof = proofResult
   }
 
