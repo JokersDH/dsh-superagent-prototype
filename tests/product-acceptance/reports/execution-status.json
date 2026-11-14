@@ -3,10 +3,10 @@
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
   "base": "ca01e17",
-  "checkpoint": "26b9904",
-  "head": "626be2659a532ba5e63e95cec267d5713da57112",
+  "checkpoint": "626be26",
+  "head": "373c195ecbb8709f74763ee437d427dca904a791",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-14T11:40:36.916Z",
+  "checkedAt": "2026-11-14T12:00:52.578Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -1218,7 +1218,7 @@
         {
           "id": "E6-TARGET-CONTENT-DRIFT",
           "status": "NOT_TESTED",
-          "reason": "NOT_REACHED: the frozen package has no content-binding consumer in main; the packaged producer verify checks database integrity, schema and artifact digests only, so a legal target-only append stays verified. This is a recorded product gap for the C/A owners, not an acceptance pass."
+          "reason": "NOT_REACHED: the frozen package has no content-binding consumer in main; the producer-side drifted snapshot result was ok. A target-only append cannot be refused by content because no consumer compares restored content with the source subject. This is a recorded product gap for the C/A owners, not an acceptance pass."
         },
         {
           "id": "E6-SOURCE-UI",
@@ -1480,12 +1480,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T11:40:36.929Z",
+    "checkedAt": "2026-11-14T12:00:52.590Z",
     "source": {
-      "commit": "626be2659a532ba5e63e95cec267d5713da57112",
+      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
       "dirty": false
     },
-    "expectedSource": "626be2659a532ba5e63e95cec267d5713da57112",
+    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2205,31 +2205,31 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-34-49-812Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
