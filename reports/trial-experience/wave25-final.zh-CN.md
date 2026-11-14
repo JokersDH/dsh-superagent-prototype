@@ -4,7 +4,7 @@
 
 ## 结果
 
-四个可运行结果均已交付（F4 源码检查点 `8ffa083` 已推送，后续文档/测试合并入最终提交）：
+四个可运行结果均已交付（F4 源码检查点 `8ffa083`、最终源码提交 `2684773`，均已推送 `origin/codex/g4-trial-experience`）：
 
 1. **F4 早期组件**：`TrialWorkspace` 可直接被 main 接入，typed props 消费真实 `TrialReadiness` 与现有 `ApplicationConfiguration`，四个 `onAction` 导航回调，严格编译通过；状态矩阵、响应式、键盘、错误与测试装置同批交付。
 2. **F8 真实输入**：组件经真实 `ConsoleTransport.readiness` 读取隔离产品演示的 `GET /v1/readiness`，页面值与直接鉴权 API 读取逐项一致；四个回调目标在**真实 App shell** 中被验证可达（模型设置、项目导入、执行器目录、主对话）。

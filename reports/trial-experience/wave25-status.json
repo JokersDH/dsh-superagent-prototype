@@ -7,7 +7,7 @@
   "branch": "codex/g4-trial-experience",
   "baseMain": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
   "checkpointCommit": "8ffa083",
-  "finalSourceCommit": null,
+  "finalSourceCommit": "2684773",
   "state": "DELIVERED_WITH_MAIN_MOUNT_PENDING",
   "milestones": {
     "F4": "DELIVERED_SOURCE",
