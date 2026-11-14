@@ -1,0 +1,91 @@
+{
+  "protocol": "agent-c-wave26-status/1",
+  "wave": "product-wave-26",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "6787bd0",
+    "mainFAppIntegration": "a302ddc",
+    "mergeCommit": "4f8e2cd",
+    "rootLockDiffPreserved": true
+  },
+  "milestones": { "targetProofDriver": "3d628f4", "driftAndA826Tests": "3fe5719", "docsAndUiInput": "c594738", "finalStatus": "this commit" },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "retained": ["complete PID/API-start identity gate", "same-execution A manifest driver", "exact 0ede v1/v2 bundle restore with package prepare/start/read/stop", "full package stop verified"],
+  "targetProof": {
+    "tool": "packages/context/tools/wave26-target-proof.mjs",
+    "protocol": "wave26-target-subject-proof/1",
+    "beforeConsumer": true,
+    "checks": ["A manifest rebuilt on target with only dataRoot changed", "subject/IDs/commands/dispatch/observations/deliveries/requirements/coverage/limits/counts", "logical source families", "artifact set and per-file SHA-256/bytes", "personal-restore/1 report when present"],
+    "allowed": ["subject.dataRoot", "event_log", "coordinator_instances", "writer_claim"],
+    "rejected": ["extra legal user message (conversation_messages)", "same-length artifact byte replacement", "business family change", "foreign root map"],
+    "outputs": ["subjectMatches", "fingerprintMatches", "fingerprintRelation exact|allowed-operational-delta|forbidden-delta", "allowed/forbidden family changes", "artifact totals"],
+    "aSource": { "head": "06390aedd1c36e5bd8eec2cabf685e827873af28", "moduleSha256": "f568580a39c07f7c77c102a27596f81f53b061870bcd16fe126addd9e4ebf7e2" }
+  },
+  "driver": {
+    "protocol": "personal-review-driver/2",
+    "manifestMode": ["A producer before start", "coverage complete", "root-map original=target", "target content proof", "HTTP IDs/deliveries match manifest", "receipt replay 422"],
+    "newInputs": ["--a-worktree", "--a-module", "--manifest-db", "--manifest-expectation", "--manifest-output", "--root-map", "--replay-context-token", "--replay-confirm-token", "--expect-readiness"],
+    "readiness": "present requires authorization none, recovery_readonly, development readonly, dispatchable 0, admitted 0, decisions/proposals false; absent/any explicit",
+    "statuses": { "verified-flow": 0, "reused": 0, "refused-verified": 0, "observed": 0, "NOT_REACHED": 4, "failed": 1, "usage": 2 }
+  },
+  "currentPackage": {
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave25-target/wave25-target-a826b5e.tar.gz",
+    "tarSha256": "d3e79749426c796085895abc73d76c4b26cd48427d8e6f748155bec00a103f3c",
+    "source": "a826b5e7c8843c28a527567ac33955ff061f85dc",
+    "buildId": "fefd93219cea0d4a",
+    "schema": 18,
+    "runtime": "Node 24.21.0 / darwin-arm64 / ABI137",
+    "flows": ["v1 and v2 real bundle restores", "manifest-driven package prepare/start/read/stop", "target proof", "readiness actual"],
+    "readinessSample": { "authorization": "none", "startupMode": "recovery_readonly", "development": "readonly", "discussion": "unknown", "execution": "unavailable", "dispatchable": 0, "admittedNative": 0, "admittedControlled": 0, "decisions": false, "proposals": false },
+    "fApp": "NOT_REACHED: package source a826 predates main a302 FTrialWorkspace; only old 4b source UI bytes",
+    "installed": "not claimed; E must bind tar/source/build/schema and entries"
+  },
+  "oldPackageRetained": {
+    "tarSha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+    "source": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+    "scope": "v1/v2 dual restore, complete identity, narrow scope, receipt replay, STOPPED positive retained"
+  },
+  "failureMatrix": {
+    "targetOnly": ["extra legal user message", "artifact bytes replacement"],
+    "selection": ["narrow scope_changed with empty body", "different/missing selection refused", "foreign root refused"],
+    "replay": ["context token 422", "confirm token 422"],
+    "cleanup": ["owned stop verified", "stop failure downgrade to failed with materials", "reuse/keep not stopped"],
+    "deadline": ["prepare/identity/manifest/start/HTTP/status/stop in one budget", "silent peer/half JSON/early exit/readiness timeout", "bounded logs"],
+    "environmentWorkaround": "test children use NODE_OPTIONS=--no-network-family-autoselection for local undici setTypeOfService EINVAL; not a product claim"
+  },
+  "uiInput": {
+    "file": "packages/context/reports/wave26-ui-input.json",
+    "consumers": ["main 6787bd0 source diagnostic UI + FTrialWorkspace", "F trial subtree consumes data only"],
+    "samples": ["verified+validity", "narrow scope_changed", "missing", "unverified", "a826 readiness"],
+    "forbidden": ["readable counts", "raw paths", "principal/tokens", "authorization none as approval"]
+  },
+  "tests": { "context": 129, "proposals": 41, "knowledge": 116, "routing": 44, "total": 330, "result": "all PASS" },
+  "strict": { "tscNoEmit": "four owned packages PASS", "workspaceBuild": "pnpm -r build -> 0" },
+  "layers": {
+    "source": "verified-flow/reuse/refusals retained",
+    "package": "exact 0ede dual and exact a826 dual with target proof",
+    "installed": "not claimed",
+    "fApp": "NOT_REACHED for a826; main a302 source exists but not in package bytes",
+    "normal": "no target/private permission/queue consumption",
+    "recovered": "read-only snapshot restore; no B business attach",
+    "vendorNative": 0
+  },
+  "limitations": [
+    "a826 package does not contain the later F App integration; not claimed",
+    "restore is portability bundle wrapping verified snapshots, not launcher upgrade/rollback",
+    "long-term revocation, concurrent writers, 48h soak unmeasured",
+    "G insights not integrated; observations are not quality or authorization",
+    "F/G/H display success is not E release acceptance"
+  ],
+  "evidence": [
+    "packages/context/docs/WAVE26-RECIPE.md",
+    "packages/context/reports/wave26-ui-input.json",
+    "packages/context/reports/wave26-package-target-proof.tap",
+    "packages/context/reports/wave26-current-package.tap",
+    "packages/context/reports/wave26-knowledge-suite.tap",
+    "packages/context/reports/wave26-suites.json"
+  ]
+}
