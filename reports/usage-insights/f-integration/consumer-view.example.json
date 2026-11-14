@@ -1,25 +1,25 @@
 {
   "status": "ready",
-  "windowLabel": "2026/11/08 00:00 – 2026/11/09 00:00（UTC）",
-  "sampleCount": 3,
+  "windowLabel": "2026/11/14 06:42 – 2026/11/14 09:42（UTC）",
+  "sampleCount": 2,
   "coverage": "完整",
   "metrics": [
     {
       "id": "execution.durationMs@controlled",
       "label": "执行耗时（系统记录）",
-      "value": "140000 ms",
-      "detail": "样本 2，未知 1，覆盖 完整，层级 controlled"
+      "value": null,
+      "detail": "样本 0，未知 2，覆盖 完整，层级 controlled"
     },
     {
       "id": "interventions.acceptances@product",
       "label": "接受事实",
-      "value": "0",
+      "value": "2",
       "detail": "样本 2，未知 0，覆盖 完整"
     },
     {
       "id": "interventions.answers@product",
       "label": "明确回答",
-      "value": "0",
+      "value": "2",
       "detail": "样本 2，未知 0，覆盖 完整"
     },
     {
@@ -31,61 +31,56 @@
     {
       "id": "interventions.total@product",
       "label": "人工介入事实",
-      "value": "2",
+      "value": "6",
       "detail": "样本 2，未知 0，覆盖 完整"
     },
     {
       "id": "outcomes.accepted@controlled",
       "label": "已接受交付",
-      "value": "0",
-      "detail": "样本 3，未知 0，覆盖 完整，层级 controlled"
+      "value": "2",
+      "detail": "样本 2，未知 0，覆盖 完整，层级 controlled"
     },
     {
       "id": "outcomes.count@controlled",
       "label": "已观察执行次数",
-      "value": "3",
-      "detail": "样本 3，未知 0，覆盖 完整，层级 controlled"
+      "value": "2",
+      "detail": "样本 2，未知 0，覆盖 完整，层级 controlled"
     },
     {
       "id": "queue.waitMs@controlled",
       "label": "排队耗时（显式端点）",
       "value": null,
-      "detail": "样本 0，未知 3，覆盖 完整，层级 controlled"
+      "detail": "样本 0，未知 2，覆盖 完整，层级 controlled"
     },
     {
       "id": "review.activeMs@controlled",
       "label": "界面可见审阅时长（部分代理）",
-      "value": null,
-      "detail": "样本 0，未知 3，覆盖 完整，层级 controlled"
+      "value": "700 ms",
+      "detail": "样本 2，未知 0，覆盖 部分，层级 controlled"
     },
     {
       "id": "review.readyToAcceptanceMs@controlled",
       "label": "候选就绪到接受",
-      "value": null,
-      "detail": "样本 0，未知 3，覆盖 完整，层级 controlled"
-    },
-    {
-      "id": "usage.cost@controlled@USD",
-      "label": "记录成本（已知）",
-      "value": "0.42 USD",
-      "detail": "样本 1，未知 0，覆盖 完整，层级 controlled"
+      "value": "799 ms",
+      "detail": "样本 2，未知 0，覆盖 完整，层级 controlled"
     },
     {
       "id": "usage.inputTokens@controlled",
       "label": "输入 token（已知）",
-      "value": "12500 tokens",
-      "detail": "样本 1，未知 2，覆盖 完整，层级 controlled"
+      "value": null,
+      "detail": "样本 0，未知 2，覆盖 完整，层级 controlled"
     },
     {
       "id": "usage.outputTokens@controlled",
       "label": "输出 token（已知）",
-      "value": "3100 tokens",
-      "detail": "样本 1，未知 2，覆盖 完整，层级 controlled"
+      "value": null,
+      "detail": "样本 0，未知 2，覆盖 完整，层级 controlled"
     }
   ],
   "limitations": [
     "Read-only observation of recorded facts. It is not acceptance, routing, budget, publication or execution authority.",
-    "Costs are grouped per recorded currency. Unknown usage and missing cost stay unknown; prices were not looked up.",
+    "review.activeMs is an observed UI-visibility proxy. It is not human working time, attention quality or a productivity score.",
     "Queue waiting requires explicit queued-at and dispatched-at endpoints bound to the same attempt; the collected product surface did not provide them."
-  ]
+  ],
+  "partial": false
 }

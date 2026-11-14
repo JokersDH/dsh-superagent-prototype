@@ -232,3 +232,32 @@ test('verify reports losses, the stop reason and the applied bounds', () => {
   assert.equal(typeof report.losses, 'object')
   assert.equal(report.losses.workEvidence.outOfScope !== undefined, true)
 })
+
+test('an uncollected source is insufficient data rather than a partial success', () => {
+  const directory = workspace()
+  const body = JSON.parse(readFileSync(complete, 'utf8'))
+  body.declaredCoverage = { outcomes: 'not_collected', workEvidence: 'not_collected', attention: 'not_collected' }
+  body.outcomes = []
+  body.workEvidence = []
+  const target = join(directory, 'uncollected.json')
+  writeFileSync(target, JSON.stringify(body))
+  const result = run(['analyze', '--input', target])
+  assert.equal(result.status, 4)
+  assert.ok(result.stderr.includes('status=insufficient_data'))
+})
+
+test('a pinned digest refuses a changed bundle and accepts the original', () => {
+  const directory = workspace()
+  const copy = join(directory, 'copy.json')
+  copyFileSync(complete, copy)
+  const first = run(['verify', '--input', copy])
+  const digest = JSON.parse(first.stdout).digest
+  assert.equal(run(['verify', '--input', copy, '--expect-digest', digest]).status, 0)
+  const body = JSON.parse(readFileSync(copy, 'utf8'))
+  body.inputId = 'changed-bundle'
+  writeFileSync(copy, JSON.stringify(body))
+  const refused = run(['verify', '--input', copy, '--expect-digest', digest])
+  assert.equal(refused.status, 5)
+  assert.ok(refused.stderr.includes('pinned digest'))
+  assert.equal(run(['verify', '--input', copy, '--expect-digest', 'not-a-digest']).status, 2)
+})

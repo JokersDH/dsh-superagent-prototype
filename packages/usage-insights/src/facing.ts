@@ -23,7 +23,7 @@ export interface InsightConsumerMetric {
   readonly detail?: string
 }
 
-/** Mirrors `apps/console/src/trial/insights.ts` `TrialInsightsView`. */
+/** Mirrors `apps/console/src/trial/insights.ts` `TrialInsightsView`, plus an explicit partial flag. */
 export interface InsightConsumerView {
   readonly status: 'ready' | 'insufficient_data' | 'unavailable'
   readonly windowLabel?: string
@@ -31,6 +31,12 @@ export interface InsightConsumerView {
   readonly coverage?: string
   readonly metrics: readonly InsightConsumerMetric[]
   readonly limitations: readonly string[]
+  /**
+   * True when the observation is usable but not complete: bounded sources, a partial proxy metric, a
+   * stale/absent snapshot or quarantined records. A consumer must show this instead of a
+   * "complete" badge, and must not present any number as a measured total.
+   */
+  readonly partial: boolean
 }
 
 const LABELS: Record<string, string> = {
@@ -106,17 +112,19 @@ export interface ConsumerViewOptions {
 }
 
 export function toInsightConsumerView(summary: UsageInsightsSummary, options: ConsumerViewOptions = {}): InsightConsumerView {
-  // "Ready" means something was actually observed in the window. A complete but empty window is a
-  // measured zero, which the consumer should present as "no data yet", not as measurements.
+  const quarantined = summary.quarantine.total
+  const partial = summary.coverage.overall !== 'complete' || quarantined > 0
+  // "Ready" means something was actually observed *and* nothing was rejected: a quarantined record
+  // means part of the source is unknown, so its numbers cannot be presented as a complete result.
   const observed = summary.metrics.some(row => row.layer !== null && row.value !== null && row.sampleCount > 0) ||
     summary.attention.items > 0
   const status: InsightConsumerView['status'] =
     summary.coverage.overall === 'source_missing' || summary.coverage.overall === 'not_collected' ? 'unavailable'
-      : observed ? 'ready' : 'insufficient_data'
+      : observed && quarantined === 0 ? 'ready' : 'insufficient_data'
 
   const ordered = [...summary.metrics].sort((a, b) => a.metricId.localeCompare(b.metricId) ||
     (a.layer ?? '').localeCompare(b.layer ?? '') || (a.currency ?? '').localeCompare(b.currency ?? ''))
-  const rows = status === 'ready' ? ordered.filter(row => row.value !== null || row.unknownCount > 0) : []
+  const rows = status === 'unavailable' ? [] : ordered.filter(row => row.value !== null || row.unknownCount > 0)
   const limited = options.maxMetrics ? rows.slice(0, options.maxMetrics) : rows
 
   const metrics: InsightConsumerMetric[] = limited.map(row => ({
@@ -129,12 +137,17 @@ export function toInsightConsumerView(summary: UsageInsightsSummary, options: Co
   const limitations = options.maxLimitations ? summary.limitations.slice(0, options.maxLimitations) : summary.limitations
   const sampleCount = observedOutcomeCount(summary)
 
+  const coverageLabel = quarantined > 0
+    ? `${coverageText(summary.coverage.overall)}（${quarantined} 条记录被隔离）`
+    : coverageText(summary.coverage.overall)
+
   return {
     status,
     windowLabel: windowLabel(summary),
     sampleCount,
-    coverage: coverageText(summary.coverage.overall),
+    coverage: coverageLabel,
     metrics,
     limitations,
+    partial,
   }
 }

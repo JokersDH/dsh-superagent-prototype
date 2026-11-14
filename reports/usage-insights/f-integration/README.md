@@ -23,6 +23,7 @@ interface TrialInsightsView {
   readonly coverage?: string
   readonly metrics: readonly { readonly id: string; readonly label: string; readonly value: string | null; readonly detail?: string }[]
   readonly limitations: readonly string[]
+  readonly partial: boolean   // 新增：true 表示可用但不完整（有界来源/隔离记录/代理指标）
 }
 ```
 
@@ -33,7 +34,8 @@ G 的 `test/consumer.case.ts` 里保留该形状的本地副本并有编译期�
 
 | 字段 | 规则 |
 | --- | --- |
-| `status` | `unavailable`：来源缺失/未采集；`insufficient_data`：窗口完整但没有任何可测样本；`ready`：至少一个 outcome 指标有真实值 |
+| `status` | `unavailable`：来源缺失/未采集；`insufficient_data`：没有任何可测样本，**或**有记录被隔离（部分未知，不展示为完整）；`ready`：有真实样本且无隔离 |
+| `partial` | `true` 表示可用但不完整：有界来源、代理指标、陈旧/缺失快照或有隔离记录。**F 必须显示这个标记，不能给"完整"徽章** |
 | `value` | 已格式化字符串；**未知保持 `null`**，不写 `0`、不写 `''`、不补默认值 |
 | `sampleCount` | 实际观察到的 outcome 数；来源缺失时为 `null`；完整空窗口为 `0` |
 | `coverage` | 整体覆盖的展示文本（完整/部分/来源缺失/未采集/不支持） |
@@ -46,9 +48,9 @@ F 只能用 `status === 'ready'` 显示 `trialInsightsRows(view)`；`insufficien
 ## 样例
 
 - [`consumer-view.example.json`](consumer-view.example.json)：由
-  [`probe/two-project-20261108T120000Z.bundle.json`](../probe/two-project-20261108T120000Z.bundle.json)
+  [`probe/two-project-20261114T074222.bundle.json`](../probe/two-project-20261114T074222.bundle.json)
   经 `analyzeUsageInsights` + `toInsightConsumerView` 生成，含已知值、`null` 未知项与限制文本。
-- 该样例的数据层是 `controlled`（经产品公开 routing-evidence 端口写入的受控记录），
+- 该样例的数据层是 `controlled`：来自受控产品运行时真实的 create/question/answer/verify/accept 链，
   **不是** `actual_native`；样例中没有原生执行，报告与 summary 都保持 `NOT_TESTED`。
 
 ## 复现
@@ -57,7 +59,7 @@ F 只能用 `status === 'ready'` 显示 `trialInsightsRows(view)`；`insufficien
 pnpm --dir packages/usage-insights build
 node -e "import('./packages/usage-insights/dist/index.js').then(async m => {
   const { readFileSync } = await import('node:fs')
-  const bundle = JSON.parse(readFileSync('reports/usage-insights/probe/two-project-20261108T120000Z.bundle.json','utf8'))
+  const bundle = JSON.parse(readFileSync('reports/usage-insights/probe/two-project-20261114T074222.bundle.json','utf8'))
   console.log(JSON.stringify(m.toInsightConsumerView(m.analyzeUsageInsights(bundle).summary), null, 2))
 })"
 ```

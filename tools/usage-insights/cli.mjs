@@ -44,7 +44,13 @@ Common options
   --from <UTC ISO> --to <UTC ISO>   Override the observation window
   --timezone <IANA>           Override the declared time zone
   --baseline <file>           Operator baseline JSON (operator-baseline/1)
-  --max-input-bytes <n>       Refuse larger input files (default ${DEFAULT_MAX_INPUT_BYTES})
+  --max-input-bytes <n>       Refuse larger input files before reading (default ${DEFAULT_MAX_INPUT_BYTES})
+  --max-records <n>           Analysis bound on presented records; applied before parsing
+  --max-works <n>             Analysis bound on attributable works
+  --max-pages <n>             Analysis bound on history/attention pages
+
+verify only
+  --expect-digest <sha256>    Refuse when the bundle bytes do not match the pinned digest
 
 collect options
   --base-url <http://127.0.0.1:PORT>   Explicit loopback origin (required)

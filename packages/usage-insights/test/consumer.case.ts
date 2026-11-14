@@ -56,8 +56,8 @@ test('status separates ready, insufficient data and unavailable sources', () => 
   const empty = { ...bundle, outcomes: [], workEvidence: [] } as UsageInsightsInput
   const emptyAnalysis = analyzeUsageInsights(empty)
   const emptyView = toInsightConsumerView(emptyAnalysis.summary)
-  assert.equal(emptyView.status, 'insufficient_data')
-  assert.deepEqual(emptyView.metrics, [])
+  assert.equal(emptyView.status, 'insufficient_data', 'nothing was observed, so nothing is presented as ready')
+  assert.equal(emptyView.partial, false, 'the observation itself is complete, only empty')
   assert.equal(emptyView.sampleCount, 0, 'a complete empty window is a measured zero sample count')
 
   const unavailable = analyzeUsageInsights({
@@ -69,6 +69,7 @@ test('status separates ready, insufficient data and unavailable sources', () => 
   const unavailableView = toInsightConsumerView(unavailable.summary)
   assert.equal(unavailableView.status, 'unavailable')
   assert.equal(unavailableView.sampleCount, null, 'an unavailable source is an unknown count, not zero')
+  assert.deepEqual(unavailableView.metrics, [], 'an unavailable source exposes no metric rows')
 })
 
 test('unknown metrics stay visible with an explicit detail instead of disappearing', () => {
@@ -163,4 +164,41 @@ test('an unrequested attention source does not downgrade a complete outcome wind
   const view = toInsightConsumerView(analysis.summary)
   assert.equal(view.status, 'ready')
   assert.equal(analysis.summary.metrics.find(row => row.metricId === 'outcomes.count')?.value, 2)
+})
+
+test('quarantined records are never presented as a ready complete summary', () => {
+  const bundle = completeBundle()
+  const dirty = { ...bundle, outcomes: [...bundle.outcomes, { protocol: 'execution-outcome/1', id: 'broken' }] } as UsageInsightsInput
+  const view = toInsightConsumerView(analyzeUsageInsights(dirty).summary)
+  assert.equal(view.status, 'insufficient_data', 'a rejected record means the source is partly unknown')
+  assert.equal(view.partial, true)
+  assert.match(view.coverage ?? '', /被隔离/)
+  assert.ok(view.limitations.some(text => text.includes('Rejected, conflicting or unparsed')))
+})
+
+test('a bounded but legal observation is partial, and keeps its numbers visible for inspection', () => {
+  const analysis = analyzeUsageInsights({
+    ...completeBundle(),
+    declaredCoverage: { outcomes: 'caller_limit', workEvidence: 'complete', attention: 'complete' },
+  } as UsageInsightsInput)
+  const view = toInsightConsumerView(analysis.summary)
+  assert.equal(view.status, 'ready', 'bounded but not rejected: the numbers are usable with a partial marker')
+  assert.equal(view.partial, true)
+  assert.equal(view.coverage, '部分')
+  assert.ok(view.metrics.length > 0)
+})
+
+test('a stale attention snapshot makes the consumer partial without hiding outcome metrics', () => {
+  const bundle = completeBundle()
+  const stale = {
+    ...bundle,
+    attentionPages: [{
+      protocol: 'attention-inbox/1', observedAt: '2026-11-13T06:00:00.000Z', items: [], ranks: [],
+      ranking: 'waiting_order', scannedWorks: 0, questionCoverage: 'complete', hasMore: false,
+    }],
+  } as UsageInsightsInput
+  const view = toInsightConsumerView(analyzeUsageInsights(stale).summary)
+  assert.equal(view.partial, true)
+  assert.equal(view.coverage, '部分')
+  assert.ok(view.metrics.some(metric => metric.id.startsWith('outcomes.count')))
 })
