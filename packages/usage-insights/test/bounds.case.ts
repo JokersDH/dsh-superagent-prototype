@@ -151,3 +151,56 @@ test('many attention pages are bounded and never read as complete', () => {
   assert.equal(analysis.summary.limits.stoppedBy, 'pages')
   assert.notEqual(analysis.summary.attention.coverage, 'complete')
 })
+
+test('nested caps and the mapping tombstone interact without regressing either rule', () => {
+  const works = []
+  const index = [
+    { workId: 'work-tomb', projectId: 'project-atlas' },
+    { workId: 'work-tomb', projectId: 'project-orbit' },
+    { workId: 'work-tomb', projectId: 'project-atlas' },
+  ]
+  for (let number = 0; number < 20; number++) {
+    const workId = `work-mix-${number}`
+    index.push({ workId, projectId: 'project-atlas' })
+    works.push(makeWorkEvidence(workId, [{ kind: 'question.opened', sourceRef: `q-${number}` }], {
+      outcomes: Array.from({ length: 3 }, (_, inner) => makeOutcome({
+        seed: `mix-${number}-${inner}`, acceptance: 'unknown',
+        contract: { workId, revision: 1, digest: 'a'.repeat(64) },
+      })),
+    }))
+  }
+  works.push(makeWorkEvidence('work-tomb', [{ kind: 'question.opened', sourceRef: 'q-tomb' }], {
+    outcomes: [makeOutcome({ seed: 'tomb-1', acceptance: 'unknown', contract: { workId: 'work-tomb', revision: 1, digest: 'e'.repeat(64) } })],
+  }))
+  const analysis = analyzeUsageInsights(bundle({ workEvidence: works, workIndex: index, limits: { maxRecords: 45 } }))
+  // Each mixed container costs 1 + 1 entry + 3 outcomes = 5 units; 45 units admit nine of them.
+  assert.equal(analysis.summary.limits.stoppedBy === 'records' || analysis.summary.limits.stoppedBy === 'none', true)
+  assert.equal(analysis.summary.quarantine.byCode.find(entry => entry.code === 'identity_conflict')?.records, 1)
+  assert.ok((analysis.summary.metrics.find(row => row.metricId === 'interventions.questions')?.unknownCount ?? 0) > 0)
+  // No metric may claim a complete source while the bound and the tombstone both removed records.
+  assert.notEqual(analysis.summary.coverage.workEvidence, 'complete')
+  assert.equal(analysis.summary.metrics.every(row => row.value === null || Number.isFinite(row.value)), true)
+})
+
+test('a large nested input stays bounded and exact at the cap boundary', () => {
+  const works = Array.from({ length: 100 }, (_, number) => {
+    const workId = `work-scale-${number}`
+    return makeWorkEvidence(workId, [{ kind: 'question.opened', sourceRef: `q-${number}` }], {
+      outcomes: [makeOutcome({ seed: `scale-${number}`, acceptance: 'unknown', contract: { workId, revision: 1, digest: 'a'.repeat(64) } })],
+    })
+  })
+  const index = works.map((_, number) => ({ workId: `work-scale-${number}`, projectId: 'project-atlas' }))
+  // Each container costs three units, so 300 units is an exact fit for all 100.
+  const started = Date.now()
+  const exact = analyzeUsageInsights(bundle({ workEvidence: works, workIndex: index, limits: { maxRecords: 300 } }))
+  const elapsed = Date.now() - started
+  assert.equal(exact.summary.limits.recordsSeen, 300)
+  assert.equal(exact.summary.limits.recordsAdmitted, 300)
+  assert.equal(exact.summary.limits.recordsNotParsed, 0)
+  assert.equal(exact.summary.metrics.find(row => row.metricId === 'outcomes.count')?.value, 100)
+  assert.ok(elapsed < 5_000, `analysis of 300 units took ${elapsed}ms`)
+
+  const short = analyzeUsageInsights(bundle({ workEvidence: works, workIndex: index, limits: { maxRecords: 299 } }))
+  assert.equal(short.summary.limits.recordsNotParsed, 3, 'the last container does not fit and is skipped whole')
+  assert.equal(short.summary.metrics.find(row => row.metricId === 'outcomes.count')?.value, 99)
+})

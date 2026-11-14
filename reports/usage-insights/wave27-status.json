@@ -1,0 +1,615 @@
+{
+  "protocol": "wave27-usage-insights-status/1",
+  "agent": "G",
+  "branch": "codex/g4-usage-insights",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+  "origin": "https://github.com/JokersDH/dsh-superagent-prototype.git",
+  "fixedStart": "2adeeff67363d3e13ca6c4e623034c54a14c1e01",
+  "syncedMain": "ca01e17",
+  "generatedAt": "2026-11-14T09:52:05Z",
+  "goal": {
+    "statement": "A trustworthy read-only efficiency observation tool: every record constrained by project/window, nested records counted by a real total bound, contradictory mappings permanently isolated, an authorized Node composition main can call, a browser-safe projection aligned to the trial workspace, and usable CLI/privacy/report handoff.",
+    "tokenBudget": "none",
+    "vendorModelNativeTurns": 0,
+    "blockedPilot": "E original 24turn/200000token/USD5 single-in-flight pilot remains BLOCKED; G did not reset, top up, refund, replace samples or research new pricing/recipes.",
+    "defaultUiAdmission": "Not granted. main owns root/API/App wiring; G supplies the Node composition, the browser-safe projection and the measured admission behaviour. F can run without metrics."
+  },
+  "ownedPaths": [
+    "packages/usage-insights/",
+    "tools/usage-insights/",
+    "reports/usage-insights/"
+  ],
+  "checkpointCommits": [
+    "bc8d025",
+    "7ffbe45",
+    "ab83a36",
+    "c01f879"
+  ],
+  "finalCommit": "the commit that introduces this file",
+  "closedWave26Findings": [
+    "a WorkEvidence could hide embedded outcomes behind a one-record maxRecords bound",
+    "workIndex A→B→A could revive a contradictory mapping depending on order",
+    "the compact projection did not declare scope/aggregation/window/coverage for F's admission"
+  ],
+  "phases": [
+    {
+      "id": "G1",
+      "status": "done",
+      "result": "maxRecords counts record units (outcome, container, entry, page item); containers are admitted atomically with all derived records; maxPages counts page documents while their contents still count against maxRecords; exact fit is complete",
+      "evidence": [
+        "packages/usage-insights/src/analyze.ts",
+        "packages/usage-insights/test/nested.case.ts"
+      ]
+    },
+    {
+      "id": "G2",
+      "status": "done",
+      "result": "a workIndex mapping one work to two projects tombstones that work for the whole input; reordered or repeated entries cannot revive it; its entries and outcomes are excluded and its counts stay unknown",
+      "evidence": [
+        "packages/usage-insights/src/analyze.ts",
+        "packages/usage-insights/test/nested.case.ts"
+      ]
+    },
+    {
+      "id": "G3",
+      "status": "done",
+      "result": "the compact projection declares scope {projectIds, aggregation}, windowLabel, coverage/coverageState and per-row unit/layer/sampleCount; cross-project aggregates are labelled; unknownCount stays null; consumerAdmission mirrors F",
+      "evidence": [
+        "packages/usage-insights/src/facing.ts",
+        "packages/usage-insights/test/consumer.case.ts"
+      ]
+    },
+    {
+      "id": "G4",
+      "status": "done",
+      "result": "first runnable result: analyze → compact projection → consumer admission over the same data, plus the Node/browser entry split",
+      "evidence": [
+        "reports/usage-insights/f-integration/"
+      ]
+    },
+    {
+      "id": "G5",
+      "status": "done",
+      "result": "composeUsageInsightsInput reads an already-authorized port (work list, evidence, history, attention), validates with the shared schemas, charges the same units and preserves every work→project pair; no HTTP server, SQL or credential",
+      "evidence": [
+        "packages/usage-insights/src/node-composition.ts",
+        "packages/usage-insights/test/composition.case.ts"
+      ]
+    },
+    {
+      "id": "G6",
+      "status": "done",
+      "result": "the real product surface is consumed through the existing schemas; unread works become truthful source_missing projections so they stay unknown; the probe emits a per-metric availability block",
+      "evidence": [
+        "tools/usage-insights/probe/observe-two-projects.mjs",
+        "tools/usage-insights/README.md"
+      ]
+    },
+    {
+      "id": "G7",
+      "status": "done",
+      "result": "explicit loopback GET collection with streaming budgets and the verified-file replay are retained; changed bytes are refused against a pinned digest",
+      "evidence": [
+        "tools/usage-insights/lib/http.mjs",
+        "tools/usage-insights/test/http-adapter.case.mjs"
+      ]
+    },
+    {
+      "id": "G8",
+      "status": "done",
+      "result": "second runnable result: the Node composition and the CLI produce identical metrics for the same two-project subject and window",
+      "evidence": [
+        "tools/usage-insights/probe/observe-two-projects.mjs"
+      ]
+    },
+    {
+      "id": "G9",
+      "status": "done",
+      "result": "two-project observation plus a single-project collection from the same instance: only the selected project is counted, no subject leaks, and the scope reports single_project; earlier windows report a known zero",
+      "evidence": [
+        "tools/usage-insights/probe/observe-two-projects.mjs",
+        "packages/usage-insights/test/scope.case.ts"
+      ]
+    },
+    {
+      "id": "G10",
+      "status": "done",
+      "result": "finite metric groups documented for the UI (observed outcomes, interaction facts, candidate wait, partial review proxy, known usage) with meaning and non-claims; nothing else enters the view",
+      "evidence": [
+        "reports/usage-insights/f-integration/README.md"
+      ]
+    },
+    {
+      "id": "G11",
+      "status": "done",
+      "result": "layers and currencies stay separate rows in the projection; a partial proxy row never inherits a complete badge; unknown values stay null",
+      "evidence": [
+        "packages/usage-insights/test/consumer.case.ts",
+        "packages/usage-insights/test/analyze.case.ts"
+      ]
+    },
+    {
+      "id": "G12",
+      "status": "done",
+      "result": "third runnable result: two-project data → trusted presentation types with failure paths",
+      "evidence": [
+        "reports/usage-insights/f-integration/consumer-view.example.json"
+      ]
+    },
+    {
+      "id": "G13",
+      "status": "done",
+      "result": "CLI usability: repeated observation of the same window does not double count, reports are exclusive, and the CLI now refuses to run a stale dist over newer sources",
+      "evidence": [
+        "tools/usage-insights/lib/module-entry.mjs",
+        "tools/usage-insights/test/module-entry.case.mjs"
+      ]
+    },
+    {
+      "id": "G14",
+      "status": "done",
+      "result": "privacy: reports never republish collection diagnostics or embedded secrets; hostile text stays escaped; 0600 exclusive output with no temporary leftovers",
+      "evidence": [
+        "tools/usage-insights/test/cli.case.mjs",
+        "tools/usage-insights/lib/output.mjs"
+      ]
+    },
+    {
+      "id": "G15",
+      "status": "done",
+      "result": "baseline boundaries: contradictions are refused by the envelope, a different currency/unit/aggregation is not comparable rather than converted, and comparisons stay observational",
+      "evidence": [
+        "packages/usage-insights/test/analyze.case.ts"
+      ]
+    },
+    {
+      "id": "G16",
+      "status": "done",
+      "result": "fourth runnable result: daily CLI, privacy output and interpretation boundaries",
+      "evidence": [
+        "tools/usage-insights/README.md"
+      ]
+    },
+    {
+      "id": "G17",
+      "status": "done",
+      "result": "fault/bounds regression: 300-unit exact nested fit and a 299-unit short bound, nested cap interacting with the tombstone, 4500 outcomes, 200 works, 40 pages, 1000 quarantined records, 30 currencies, 16 HTTP adapter negatives",
+      "evidence": [
+        "packages/usage-insights/test/bounds.case.ts",
+        "packages/usage-insights/test/nested.case.ts"
+      ]
+    },
+    {
+      "id": "G18",
+      "status": "done",
+      "result": "package compatibility: the declared exports include Node and ./browser; the built Node entry and the sources agree; the built browser entry loads without exposing the analysis or composition",
+      "evidence": [
+        "packages/usage-insights/test/package-consumer.case.ts",
+        "packages/usage-insights/test/browser-entry.case.ts"
+      ]
+    },
+    {
+      "id": "G19",
+      "status": "done",
+      "result": "documentation covers the input protocol, commands, count units, scope/window/current-attention, partial proxy/usage and baseline limits, nested cap, tombstone, streaming budget and the F scope adapter",
+      "evidence": [
+        "packages/usage-insights/README.md",
+        "tools/usage-insights/README.md",
+        "reports/usage-insights/README.md",
+        "reports/usage-insights/f-integration/README.md"
+      ]
+    },
+    {
+      "id": "G20",
+      "status": "done",
+      "result": "this status file: five results, exact source/build/consumer/digests, measured values, coverage/losses, limits and unreached items",
+      "evidence": [
+        "reports/usage-insights/wave27-status.json"
+      ]
+    }
+  ],
+  "results": [
+    {
+      "id": "G1-G4",
+      "title": "Full input constraints, permanent mapping and F-aligned projection",
+      "publishedCommit": "bc8d025",
+      "runnable": true,
+      "commands": [
+        "node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json --max-records 9",
+        "node -e \"import('./packages/usage-insights/dist/browser.js').then(m => console.log(JSON.stringify(m.toInsightConsumerView(require('./summary.json')))))\""
+      ],
+      "tests": {
+        "package": 78,
+        "tool": 34,
+        "result": "pass"
+      }
+    },
+    {
+      "id": "G5-G8",
+      "title": "Authorized Node read composition and same-subject reproduction",
+      "publishedCommit": "7ffbe45",
+      "runnable": true,
+      "commands": [
+        "node tools/usage-insights/probe/observe-two-projects.mjs",
+        "node -e \"import('./packages/usage-insights/dist/index.js').then(m => m.composeUsageInsightsInput({ port, request }).then(r => console.log(r.stats)))\""
+      ],
+      "tests": {
+        "package": 78,
+        "tool": 34,
+        "probe": "pass",
+        "result": "pass"
+      }
+    },
+    {
+      "id": "G9-G12",
+      "title": "Two-project isolation and trustworthy presentation",
+      "publishedCommit": "ab83a36",
+      "runnable": true,
+      "commands": [
+        "node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> --token-file /abs/token --from <utc> --to <utc> --project <id> --out /abs/bundle.json",
+        "node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json"
+      ],
+      "tests": {
+        "package": 80,
+        "tool": 34,
+        "result": "pass"
+      }
+    },
+    {
+      "id": "G13-G16",
+      "title": "CLI usability, privacy and interpretation boundaries",
+      "publishedCommit": "c01f879",
+      "runnable": true,
+      "commands": [
+        "node tools/usage-insights/cli.mjs verify --input /abs/bundle.json --expect-digest <sha256>",
+        "node tools/usage-insights/cli.mjs report --input /abs/bundle.json --out /abs/new-report.md"
+      ],
+      "tests": {
+        "package": 81,
+        "tool": 40,
+        "result": "pass"
+      }
+    },
+    {
+      "id": "G17-G20",
+      "title": "Fault/bounds regression, packaged consumer and final handoff",
+      "publishedCommit": "branch head (this commit)",
+      "runnable": true,
+      "commands": [
+        "node --test packages/usage-insights/test/*.case.ts",
+        "node --test tools/usage-insights/test/*.case.mjs",
+        "node tools/usage-insights/probe/observe-two-projects.mjs"
+      ],
+      "tests": {
+        "package": 86,
+        "tool": 40,
+        "probe": "pass",
+        "result": "pass"
+      }
+    }
+  ],
+  "exitCodes": {
+    "0": "complete observation (declared sources fully enumerated, no quarantine)",
+    "3": "partial: bounded/truncated source, quarantined records or a declared analysis bound",
+    "4": "insufficient data: source missing or not collected",
+    "5": "source unavailable, digest/pin mismatch, redirect refusal, streaming budget exceeded or output not writable",
+    "2": "invalid arguments or input format",
+    "1": "internal failure"
+  },
+  "measured": {
+    "observation": {
+      "source": "real controlled product runtime (two projects) read through the real HTTP surface and through the authorized Node composition",
+      "bundle": "reports/usage-insights/probe/two-project-20261114T074222.bundle.json",
+      "report": "reports/usage-insights/probe/two-project-20261114T074222.report.md",
+      "inputDigest": "95400df5276e0ac5daf896e75a5650e4bc3b9b3efef48a3f1a37d9bfb5ebe766",
+      "summaryId": "aa7636b2c9ec4643045845925aae9cffbd48b0fd7ebc53e7a61faf551b2bd045",
+      "window": {
+        "from": "2026-11-14T06:42:18.655Z",
+        "to": "2026-11-14T09:42:18.656Z",
+        "timezone": "UTC"
+      },
+      "projects": [
+        {
+          "projectId": "project-arcade",
+          "works": 1,
+          "outcomes": 1,
+          "accepted": 1
+        },
+        {
+          "projectId": "project-beacon",
+          "works": 1,
+          "outcomes": 1,
+          "accepted": 1
+        }
+      ],
+      "recordedFacts": {
+        "questions": 2,
+        "answers": 2,
+        "acceptances": 2,
+        "reviewSpans": 2,
+        "verifications": 2
+      },
+      "coverage": {
+        "outcomes": "complete",
+        "workEvidence": "complete",
+        "attention": "complete",
+        "overall": "complete"
+      },
+      "limits": {
+        "recordUnit": "outcome+container+entry+page+item",
+        "recordsSeen": 64,
+        "recordsAdmitted": 64,
+        "recordsNotParsed": 0,
+        "recordsAccepted": 2,
+        "worksSeen": 2,
+        "pagesSeen": 4,
+        "stoppedBy": "none"
+      },
+      "losses": {
+        "outcomes": {
+          "seen": 2,
+          "accepted": 2,
+          "notParsed": 0,
+          "invalid": 0,
+          "conflicted": 0,
+          "outOfScope": 0,
+          "outsideWindow": 0,
+          "unmapped": 0
+        },
+        "workEvidence": {
+          "seen": 4,
+          "accepted": 2,
+          "notParsed": 0,
+          "invalid": 0,
+          "conflicted": 0,
+          "outOfScope": 0,
+          "outsideWindow": 0,
+          "unmapped": 0
+        },
+        "attention": {
+          "seen": 2,
+          "accepted": 0,
+          "notParsed": 0,
+          "invalid": 0,
+          "conflicted": 0,
+          "outOfScope": 0,
+          "outsideWindow": 0,
+          "unmapped": 0
+        }
+      },
+      "quarantine": 0,
+      "metrics": [
+        {
+          "metricId": "outcomes.count",
+          "layer": "controlled",
+          "value": 2,
+          "sampleCount": 2,
+          "unknownCount": 0
+        },
+        {
+          "metricId": "outcomes.accepted",
+          "layer": "controlled",
+          "value": 2,
+          "sampleCount": 2,
+          "unknownCount": 0
+        },
+        {
+          "metricId": "execution.durationMs",
+          "layer": "controlled",
+          "value": null,
+          "nullReason": "timing_missing",
+          "unknownCount": 2
+        },
+        {
+          "metricId": "queue.waitMs",
+          "layer": "controlled",
+          "value": null,
+          "nullReason": "endpoint_missing",
+          "unknownCount": 2
+        },
+        {
+          "metricId": "review.readyToAcceptanceMs",
+          "layer": "controlled",
+          "value": 799,
+          "sampleCount": 2,
+          "coverage": "complete"
+        },
+        {
+          "metricId": "review.activeMs",
+          "layer": "controlled",
+          "value": 700,
+          "sampleCount": 2,
+          "coverage": "partial"
+        },
+        {
+          "metricId": "usage.inputTokens",
+          "layer": "controlled",
+          "value": null,
+          "nullReason": "insufficient_data",
+          "unknownCount": 2
+        },
+        {
+          "metricId": "usage.outputTokens",
+          "layer": "controlled",
+          "value": null,
+          "nullReason": "insufficient_data",
+          "unknownCount": 2
+        },
+        {
+          "metricId": "interventions.questions",
+          "layer": null,
+          "value": 2,
+          "sampleCount": 2,
+          "unknownCount": 0
+        },
+        {
+          "metricId": "interventions.answers",
+          "layer": null,
+          "value": 2,
+          "sampleCount": 2,
+          "unknownCount": 0
+        },
+        {
+          "metricId": "interventions.acceptances",
+          "layer": null,
+          "value": 2,
+          "sampleCount": 2,
+          "unknownCount": 0
+        },
+        {
+          "metricId": "interventions.total",
+          "layer": null,
+          "value": 6,
+          "sampleCount": 2,
+          "unknownCount": 0
+        }
+      ],
+      "attention": {
+        "items": 0,
+        "stale": false,
+        "coverage": "complete",
+        "meaning": "current pending snapshot after both works were accepted"
+      },
+      "usageCompleteness": {
+        "outcomeRecords": 2,
+        "recordsWithKnownTokens": 0,
+        "recordsWithUnknownUsage": 2,
+        "recordsWithKnownCost": 0,
+        "recordsWithoutCost": 2,
+        "tokensCompleteness": "source_missing",
+        "costCompleteness": "source_missing"
+      },
+      "compositionAgreesWithCli": true,
+      "singleProjectIsolation": true,
+      "dailyRepeatNoDoubleCount": true,
+      "earlierWindowReportsKnownZero": true,
+      "readOnlyCollection": true,
+      "collectionMs": 137,
+      "analysisMs": 93
+    },
+    "negatives": {
+      "nested": [
+        "maxRecords 1 cannot admit a container hiding two outcomes",
+        "a container just over the bound is skipped whole",
+        "a small container after a rejected one is still admitted",
+        "an attention page is charged with its items",
+        "exact nested fit is complete"
+      ],
+      "tombstone": [
+        "A→B→A never revives",
+        "reversed order gives the same analysis",
+        "a clean work coexists with a tombstoned one",
+        "the tombstoned work's outcomes are excluded"
+      ],
+      "scope": [
+        "narrowed project counts one question",
+        "entry before the window is not counted",
+        "unmapped work isolated",
+        "foreign attention excluded",
+        "future/stale snapshot refused/partial",
+        "index/outcome project conflict quarantined"
+      ],
+      "limits": [
+        "maxRecords=1 accepts one record",
+        "records past the bound are never validated",
+        "maxPages bounds documents",
+        "maxWorks leaves the remainder unknown",
+        "collector truncation is stoppedBy=source"
+      ],
+      "streaming": [
+        "unknown-length 131072 bytes aborts mid-stream under 1024",
+        "declared oversized length refused before reading",
+        "short-framed body refused",
+        "trickling stream times out with progress",
+        "large error body discarded within 16KB"
+      ],
+      "privacy": [
+        "hostile operator text escaped",
+        "collection diagnostics and embedded secrets never reach a report",
+        "existing/symlink/unwritable output refused without leftovers"
+      ]
+    },
+    "bounds": {
+      "exactNestedUnits": 300,
+      "shortNestedUnits": 299,
+      "nestedContainers": 20,
+      "multiLayerOutcomes": 4500,
+      "worksUnderMaxWorks": 200,
+      "pagesUnderMaxPages": 40,
+      "quarantinedRecords": 1000,
+      "currencies": 30,
+      "httpAdapterNegatives": 16
+    }
+  },
+  "consumer": {
+    "nodeEntry": "import { analyzeUsageInsights, composeUsageInsightsInput } from '@personal-agent/usage-insights'",
+    "browserEntry": "import { toInsightConsumerView, consumerAdmission } from '@personal-agent/usage-insights/browser'",
+    "projection": "InsightConsumerView mirrors apps/console/src/trial/insights.ts TrialInsightsView (scope/aggregation/windowLabel/coverage/coverageState/unknownCount/unit/layer/sampleCount/partial)",
+    "sample": "reports/usage-insights/f-integration/consumer-view.example.json",
+    "contract": "reports/usage-insights/f-integration/README.md",
+    "browserGraph": "no node: builtin, no analysis, no composition, no filesystem (guarded by packages/usage-insights/test/browser-entry.case.ts)",
+    "mainIntegrationNeeded": [
+      "root workspace dependency registration",
+      "root import/export wiring for the Node composition",
+      "render of the partial flag and the scope/aggregation label in the trial UI"
+    ]
+  },
+  "notReached": [
+    "actual_native execution data: NOT_TESTED — the probe runs the controlled fixture driver; no vendor model or native turn was performed",
+    "operator production instance: NOT_ATTEMPTED — no operator credential was available; both the CLI and the composition support it once main authorizes",
+    "real operator baseline: none supplied; the example baseline is illustrative only",
+    "queue.waitMs / execution.durationMs: the product surface exposes no queued/dispatched pair and the controlled driver records no duration",
+    "known token/cost usage: the controlled execution records none, so usage is unknown rather than zero",
+    "main's HTTP route wiring for the composition: not delivered by G; main owns the route and the authorization",
+    "long-running stability and cross-machine performance: out of scope"
+  ],
+  "limitations": [
+    "All numbers are observations of recorded facts. Nothing here proves saved hours, efficiency gains, causality or quality.",
+    "review.activeMs is a partial UI-visibility proxy clipped by the real ready→accepted interval; it is never human working time.",
+    "Interaction metrics are product-record counts and carry no evidence layer.",
+    "Unknown usage and cost stay unknown; currencies are never combined and prices are not looked up.",
+    "A bundle keeps product record detail and diagnostic text and is a private 0600 input; only reports are sanitized.",
+    "Scope labels describe what the numbers cover: a two-project observation is a cross-project aggregate, not one project's total."
+  ],
+  "boundaries": {
+    "noSqlOrPrivateDb": true,
+    "noRuntimeHttpUiChanges": true,
+    "noSecondLedger": true,
+    "noModelOrNativeCalls": true,
+    "noRootLockOrContractsChanges": true,
+    "noEAssertionsChanged": true,
+    "noBrowserNodeImports": true,
+    "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger left untouched",
+    "evidenceLayers": [
+      "controlled",
+      "operator_note",
+      "synthetic_fixture"
+    ],
+    "nativeLayerPresent": false
+  },
+  "verification": {
+    "commands": [
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.build.json",
+      "node --test packages/usage-insights/test/*.case.ts",
+      "node --test tools/usage-insights/test/*.case.mjs",
+      "node tools/usage-insights/probe/observe-two-projects.mjs"
+    ],
+    "results": {
+      "typecheck": "pass",
+      "build": "pass",
+      "packageTests": {
+        "total": 86,
+        "pass": 86,
+        "fail": 0
+      },
+      "toolTests": {
+        "total": 40,
+        "pass": 40,
+        "fail": 0
+      },
+      "probe": "pass (all assertions, exit 0)"
+    },
+    "staticChecksConfer": "no runtime, native or release admission"
+  }
+}

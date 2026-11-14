@@ -9,7 +9,8 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 | [`probe/two-project-20261114T074222.report.md`](probe/two-project-20261114T074222.report.md) | 同一 bundle 的可读报告：指标定义、逐指标来源 id、观察 subject、限制 |
 | [`f-integration/consumer-view.example.json`](f-integration/consumer-view.example.json) | 给 F 的稳定投影样例（`TrialInsightsView` 形状） |
 | [`f-integration/README.md`](f-integration/README.md) | F 接入契约与语义规则 |
-| [`wave25-status.json`](wave25-status.json) | G1–G16、四个结果、命令、退出码、实测值与未达项 |
+| [`wave26-status.json`](wave26-status.json) | 第二轮（G1–G16）范围/未知/硬界/流式预算的交付与实测值 |
+| [`wave27-status.json`](wave27-status.json) | 本轮（G1–G20）嵌套计数、永久冲突、Node composition、F scope 对齐与五个结果 |
 
 ## 这批证据说明了什么
 
@@ -19,7 +20,10 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 - 采集走真实 HTTP 读面（鉴权、项目隔离、分页游标、attention 快照、timeline 投影）；重复采集同一窗口
   的历史事实完全一致（`observedAt` 读时间是唯一例外），采集不产生产品事件，两个 **同名 goal** 的 work
   仍按 identity 分开计数。
-- `workIndex` 由 collector 从产品自身 snapshot/work 视图写入，未映射 work 会被隔离而非猜测归属。
+- `workIndex` 由 collector 从产品自身 snapshot/work 视图写入，未映射 work 会被隔离而非猜测归属；
+  同一 work 出现两个项目会被**永久 tombstone**，重排/重复条目都不能复活它。
+- 记录上限按**单位**计费（outcome／容器／entry／page item），容器与派生记录一起原子准入，父记录不能替
+  子记录挡上限。
 - 数据层只有 `controlled`：执行记录经产品公开 routing-evidence 端口写入。**没有原生执行**，
   `actual_native` 保持 `NOT_TESTED`，任何报告都没有把它写成原生样本。
 - `review.readyToAcceptanceMs` 与 `review.activeMs` 来自真实接受记录（后者是 700ms 的 UI 可见性
