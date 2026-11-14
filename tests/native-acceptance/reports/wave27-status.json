@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "c653e10",
+  "base": "62eed14",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -220,5 +220,19 @@
     "drive 2 then 4 execution slots through product commands and assert the fifth is refused as Later, with per-slot identity/credential/cursor isolation and the resource return after each stop",
     "produce a candidate through the B-owned artifact manifest from a really registered artifact, then accept it explicitly by candidateRef on the original Work",
     "keep successor-serving in the same run NOT_TESTED until a lane emits continuous facts"
-  ]
+  ],
+  "item5_slots": {
+    "harness": "tests/native-acceptance/b27-slots.mjs",
+    "result": "3 PASS / 0 FAIL / 1 NOT_TESTED",
+    "measured": [
+      "two works occupy two slots with distinct attempt ids and two questions",
+      "five works are recorded but only FOUR attempts are held: the bound is enforced on attempts, not on work records, and no fifth attempt is created",
+      "the four held attempt ids are pairwise distinct, so no slot reuses another slot's attempt identity"
+    ],
+    "notObserved": [
+      "the 'four controlled execution slots are in use' message did not surface synchronously on the work command in this lane; the bound was observed as 'no fifth attempt created' instead",
+      "slot RELEASE: stop_work returned recorded but the work projection did not report an ended phase inside the window, so release is not claimed here (the live-lane resource turnaround is b27-epoch-ack)",
+      "per-slot credential/cursor/payload isolation is not asserted; only attempt-identity distinctness is"
+    ]
+  }
 }
