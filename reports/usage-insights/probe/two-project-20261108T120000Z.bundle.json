@@ -1,0 +1,475 @@
+{
+  "protocol": "usage-insights-input/1",
+  "inputId": "probe-two-projects",
+  "capturedAt": "2026-11-08T12:00:00Z",
+  "timezone": "UTC",
+  "window": {
+    "from": "2026-11-08T00:00:00.000Z",
+    "to": "2026-11-09T00:00:00.000Z"
+  },
+  "projects": [
+    {
+      "projectId": "project-atlas"
+    },
+    {
+      "projectId": "project-other"
+    }
+  ],
+  "source": {
+    "kind": "http_read",
+    "descriptor": "loopback 127.0.0.1:64178 read-only",
+    "digest": null,
+    "layerAssertion": "recorded_by_producer",
+    "capturedAt": "2026-11-08T12:00:00Z"
+  },
+  "declaredCoverage": {
+    "outcomes": "complete",
+    "workEvidence": "complete",
+    "attention": "complete"
+  },
+  "limits": {
+    "maxRecords": 50000,
+    "maxWorks": 50,
+    "maxPages": 7,
+    "requestTimeoutMs": 5000,
+    "deadlineMs": 60000
+  },
+  "outcomes": [],
+  "attentionPages": [
+    {
+      "protocol": "attention-inbox/1",
+      "observedAt": "2026-11-08T10:00:00.000Z",
+      "items": [
+        {
+          "id": "28a0470c2c083184ed0f59b600d8185d",
+          "projectId": "project-atlas",
+          "conversationId": "conversation-atlas-report",
+          "contract": {
+            "workId": "925149c14fd7b70c0f00917f866a8232",
+            "revision": 1,
+            "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+          },
+          "workTitle": "Work atlas-report",
+          "summary": "Question question-atlas-1",
+          "sinceAt": "2026-11-08T09:00:00.000Z",
+          "deadlineAt": null,
+          "expiresAt": null,
+          "blockedWorkIds": [],
+          "kind": "question",
+          "questionId": "question-atlas-1",
+          "questionVersion": 1,
+          "questionKind": "clarification"
+        }
+      ],
+      "ranks": [
+        {
+          "id": "28a0470c2c083184ed0f59b600d8185d",
+          "reasons": [
+            "waiting_age"
+          ]
+        }
+      ],
+      "ranking": "waiting_order",
+      "scannedWorks": 1,
+      "questionCoverage": "complete",
+      "hasMore": false
+    },
+    {
+      "protocol": "attention-inbox/1",
+      "observedAt": "2026-11-08T10:00:00.000Z",
+      "items": [
+        {
+          "id": "b78d10c047f93eefc5eba4df215cfb62",
+          "projectId": "project-other",
+          "conversationId": "conversation-orbit-report",
+          "contract": {
+            "workId": "860c3fcc50b9631e1773212a34dc074a",
+            "revision": 1,
+            "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f"
+          },
+          "workTitle": "Work orbit-report",
+          "summary": "Question question-orbit-1",
+          "sinceAt": "2026-11-08T09:30:00.000Z",
+          "deadlineAt": null,
+          "expiresAt": null,
+          "blockedWorkIds": [],
+          "kind": "question",
+          "questionId": "question-orbit-1",
+          "questionVersion": 1,
+          "questionKind": "clarification"
+        }
+      ],
+      "ranks": [
+        {
+          "id": "b78d10c047f93eefc5eba4df215cfb62",
+          "reasons": [
+            "waiting_age"
+          ]
+        }
+      ],
+      "ranking": "waiting_order",
+      "scannedWorks": 1,
+      "questionCoverage": "complete",
+      "hasMore": false
+    }
+  ],
+  "workEvidence": [
+    {
+      "protocol": "work-evidence/1",
+      "workId": "925149c14fd7b70c0f00917f866a8232",
+      "projection": "recorded",
+      "entries": [
+        {
+          "at": "2026-11-08T10:06:00.000Z",
+          "kind": "execution.outcome",
+          "sourceRef": "outcome-atlas-2",
+          "detail": {
+            "acceptance": "unknown",
+            "layer": "controlled"
+          }
+        },
+        {
+          "at": "2026-11-08T10:05:00.000Z",
+          "kind": "execution.outcome",
+          "sourceRef": "outcome-atlas-1",
+          "detail": {
+            "acceptance": "unknown",
+            "layer": "controlled"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "contract.revision",
+          "sourceRef": "925149c14fd7b70c0f00917f866a8232@1/a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2",
+          "detail": {
+            "revision": 1,
+            "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "ticket.link",
+          "sourceRef": "2bda24515c3a1341f050e0aa1c13ced9",
+          "detail": {
+            "revision": 1,
+            "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2",
+            "role": "primary"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "work.created",
+          "sourceRef": "925149c14fd7b70c0f00917f866a8232",
+          "detail": {
+            "title": "Work atlas-report"
+          }
+        },
+        {
+          "at": "2026-11-08T09:00:00.000Z",
+          "kind": "question.opened",
+          "sourceRef": "question-atlas-1",
+          "detail": {
+            "version": 1,
+            "validity": "open"
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "protocol": "execution-outcome/1",
+          "id": "outcome-atlas-2",
+          "projectId": "project-atlas",
+          "attempt": {
+            "ticketId": "2bda24515c3a1341f050e0aa1c13ced9",
+            "assignmentId": "1dddc69f1d372a04feba2ad71997ebc3",
+            "contract": {
+              "workId": "925149c14fd7b70c0f00917f866a8232",
+              "revision": 1,
+              "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+            },
+            "attemptId": "attempt-atlas-2",
+            "fenceEpoch": 1
+          },
+          "profileRef": {
+            "profileId": "profile-fixture-controlled",
+            "revision": 1,
+            "identityDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "acceptance": "unknown",
+          "evidenceRefs": [
+            "evidence-atlas-2"
+          ],
+          "layer": "controlled",
+          "usage": {
+            "completeness": "unknown",
+            "evidenceRefs": [
+              "usage-atlas-2"
+            ]
+          },
+          "durationMs": 96000,
+          "observedAt": "2026-11-08T10:06:00.000Z"
+        },
+        {
+          "protocol": "execution-outcome/1",
+          "id": "outcome-atlas-1",
+          "projectId": "project-atlas",
+          "attempt": {
+            "ticketId": "2bda24515c3a1341f050e0aa1c13ced9",
+            "assignmentId": "1dddc69f1d372a04feba2ad71997ebc3",
+            "contract": {
+              "workId": "925149c14fd7b70c0f00917f866a8232",
+              "revision": 1,
+              "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+            },
+            "attemptId": "attempt-atlas-1",
+            "fenceEpoch": 1
+          },
+          "profileRef": {
+            "profileId": "profile-fixture-controlled",
+            "revision": 1,
+            "identityDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "acceptance": "unknown",
+          "evidenceRefs": [
+            "evidence-atlas-1"
+          ],
+          "layer": "controlled",
+          "usage": {
+            "completeness": "observed",
+            "inputTokens": 12500,
+            "outputTokens": 3100,
+            "cost": {
+              "currency": "USD",
+              "amount": 0.42
+            },
+            "evidenceRefs": [
+              "usage-atlas-1"
+            ]
+          },
+          "durationMs": 184000,
+          "observedAt": "2026-11-08T10:05:00.000Z"
+        }
+      ],
+      "truncated": false
+    },
+    {
+      "protocol": "work-evidence/1",
+      "workId": "860c3fcc50b9631e1773212a34dc074a",
+      "projection": "recorded",
+      "entries": [
+        {
+          "at": "2026-11-08T10:07:00.000Z",
+          "kind": "execution.outcome",
+          "sourceRef": "outcome-orbit-1",
+          "detail": {
+            "acceptance": "unknown",
+            "layer": "controlled"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "contract.revision",
+          "sourceRef": "860c3fcc50b9631e1773212a34dc074a@1/8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f",
+          "detail": {
+            "revision": 1,
+            "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "ticket.link",
+          "sourceRef": "922459e289b5b78221af7bb61788c4f4",
+          "detail": {
+            "revision": 1,
+            "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f",
+            "role": "primary"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "work.created",
+          "sourceRef": "860c3fcc50b9631e1773212a34dc074a",
+          "detail": {
+            "title": "Work orbit-report"
+          }
+        },
+        {
+          "at": "2026-11-08T09:30:00.000Z",
+          "kind": "question.opened",
+          "sourceRef": "question-orbit-1",
+          "detail": {
+            "version": 1,
+            "validity": "open"
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "protocol": "execution-outcome/1",
+          "id": "outcome-orbit-1",
+          "projectId": "project-other",
+          "attempt": {
+            "ticketId": "922459e289b5b78221af7bb61788c4f4",
+            "assignmentId": "0f2b4dabc81f318c02d6c7d93eb4b68d",
+            "contract": {
+              "workId": "860c3fcc50b9631e1773212a34dc074a",
+              "revision": 1,
+              "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f"
+            },
+            "attemptId": "attempt-orbit-1",
+            "fenceEpoch": 1
+          },
+          "profileRef": {
+            "profileId": "profile-fixture-controlled",
+            "revision": 1,
+            "identityDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "acceptance": "unknown",
+          "evidenceRefs": [
+            "evidence-orbit-1"
+          ],
+          "layer": "controlled",
+          "usage": {
+            "completeness": "unknown",
+            "evidenceRefs": [
+              "usage-orbit-1"
+            ]
+          },
+          "observedAt": "2026-11-08T10:07:00.000Z"
+        }
+      ],
+      "truncated": false
+    }
+  ],
+  "workHistories": [
+    {
+      "protocol": "work-evidence-history/1",
+      "workId": "925149c14fd7b70c0f00917f866a8232",
+      "contract": {
+        "workId": "925149c14fd7b70c0f00917f866a8232",
+        "revision": 1,
+        "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+      },
+      "observedAt": "2026-11-08T10:00:00.000Z",
+      "entries": [
+        {
+          "at": "2026-11-08T10:06:00.000Z",
+          "kind": "execution.outcome",
+          "sourceRef": "outcome-atlas-2",
+          "detail": {
+            "acceptance": "unknown",
+            "layer": "controlled"
+          }
+        },
+        {
+          "at": "2026-11-08T10:05:00.000Z",
+          "kind": "execution.outcome",
+          "sourceRef": "outcome-atlas-1",
+          "detail": {
+            "acceptance": "unknown",
+            "layer": "controlled"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "contract.revision",
+          "sourceRef": "925149c14fd7b70c0f00917f866a8232@1/a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2",
+          "detail": {
+            "revision": 1,
+            "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "ticket.link",
+          "sourceRef": "2bda24515c3a1341f050e0aa1c13ced9",
+          "detail": {
+            "revision": 1,
+            "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2",
+            "role": "primary"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "work.created",
+          "sourceRef": "925149c14fd7b70c0f00917f866a8232",
+          "detail": {
+            "title": "Work atlas-report"
+          }
+        },
+        {
+          "at": "2026-11-08T09:00:00.000Z",
+          "kind": "question.opened",
+          "sourceRef": "question-atlas-1",
+          "detail": {
+            "version": 1,
+            "validity": "open"
+          }
+        }
+      ],
+      "hasMore": false,
+      "window": "complete",
+      "sourcesCapped": []
+    },
+    {
+      "protocol": "work-evidence-history/1",
+      "workId": "860c3fcc50b9631e1773212a34dc074a",
+      "contract": {
+        "workId": "860c3fcc50b9631e1773212a34dc074a",
+        "revision": 1,
+        "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f"
+      },
+      "observedAt": "2026-11-08T10:00:00.000Z",
+      "entries": [
+        {
+          "at": "2026-11-08T10:07:00.000Z",
+          "kind": "execution.outcome",
+          "sourceRef": "outcome-orbit-1",
+          "detail": {
+            "acceptance": "unknown",
+            "layer": "controlled"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "contract.revision",
+          "sourceRef": "860c3fcc50b9631e1773212a34dc074a@1/8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f",
+          "detail": {
+            "revision": 1,
+            "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "ticket.link",
+          "sourceRef": "922459e289b5b78221af7bb61788c4f4",
+          "detail": {
+            "revision": 1,
+            "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f",
+            "role": "primary"
+          }
+        },
+        {
+          "at": "2026-11-08T10:00:00.000Z",
+          "kind": "work.created",
+          "sourceRef": "860c3fcc50b9631e1773212a34dc074a",
+          "detail": {
+            "title": "Work orbit-report"
+          }
+        },
+        {
+          "at": "2026-11-08T09:30:00.000Z",
+          "kind": "question.opened",
+          "sourceRef": "question-orbit-1",
+          "detail": {
+            "version": 1,
+            "validity": "open"
+          }
+        }
+      ],
+      "hasMore": false,
+      "window": "complete",
+      "sourcesCapped": []
+    }
+  ]
+}
