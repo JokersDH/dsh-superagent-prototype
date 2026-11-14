@@ -76,13 +76,14 @@ export class ProductUsageObservation {
       let timer: ReturnType<typeof setTimeout> | undefined
       let value: WorkEvidence
       try {
-        value = await Promise.race([this.readers.workEvidence(workId), new Promise<never>((_, reject) => {
+        value = await Promise.race([Promise.resolve().then(() => this.readers.workEvidence(workId)), new Promise<never>((_, reject) => {
           timer = setTimeout(() => reject(new Error('observation_deadline')), remaining)
         })])
       } catch (error) {
         if (error instanceof ApplicationFault && error.error.code === 'forbidden') throw error
         missing = true; continue
       } finally { clearTimeout(timer) }
+      if (performance.now() >= deadline) { bounded = true; break }
       // Bound all children independently of G's generic API, before its schema/analysis runs.
       if (!value || !Array.isArray(value.entries) || !Array.isArray(value.outcomes)) { missing = true; continue }
       const size = 1 + value.entries.length + value.outcomes.length
@@ -112,7 +113,7 @@ export class ProductUsageObservation {
       limits: { maxRecords: MAX_RECORDS, maxWorks: MAX_WORKS, maxPages: 1 },
     })
     if (analysis.summary.quarantine.total) return unavailable('本次来源核对未通过，暂不提供统计。')
-    return this.project(base, analysis.summary, missing || bounded || changed)
+    return this.project(base, analysis.summary, missing || bounded || changed || performance.now() >= deadline)
   }
 
   private project(base: Omit<UsageObservation, 'status' | 'summaryId' | 'coverage' | 'coverageState' | 'sampleCount' | 'metrics' | 'limitations'>,
@@ -128,7 +129,7 @@ export class ProductUsageObservation {
     }))
     return UsageObservationSchema.parse({ ...base, status: observed ? 'ready' : 'insufficient_data', summaryId: summary.summaryId,
       coverage: partial ? '部分覆盖' : '完整覆盖', coverageState: partial ? 'partial' : 'complete',
-      sampleCount: summary.coverage.workEvidence === 'complete' ? summary.limits.worksSeen : null,
+      sampleCount: !bounded && summary.coverage.workEvidence === 'complete' ? summary.limits.worksSeen : null,
       metrics, limitations: [
         ...(bounded ? ['本次读取存在上限、变化或缺失，数值仅代表已观察部分。'] : []),
         '仅统计现有工作证据；未记录的执行耗时、排队、用量与成本保持未知。',

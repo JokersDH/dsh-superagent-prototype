@@ -70,6 +70,15 @@ test('an older installed closure without the optional G package returns unavaila
   const view = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', timeout: 5000 }))
   assert.equal(view.status, 'unavailable'); assert.equal(view.sampleCount, null); assert.equal(view.authorization, 'none')
 })
+test('a synchronous reader that returns after the deadline cannot create a complete observation', async () => {
+  const slow = make({ listWorks: () => ({ works: [{ id: 'w', projectId: 'one' }], hasMore: false }), workEvidence: async id => {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2100)
+    return evidence(id, [entry(id)])
+  } })
+  const value = await slow.read({})
+  assert.equal(value.coverageState, 'partial'); assert.equal(value.sampleCount, null)
+  assert.equal(value.status, 'insufficient_data')
+})
 
 const token = 'a'.repeat(64), principal = { userId: 'usage-reader', authorityRef: 'usage-reader-authority' }
 const http = (reader = make(), overrides = {}) => createLocalHttpApp({ application: {}, principal, apiToken: token,

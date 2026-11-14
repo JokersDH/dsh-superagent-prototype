@@ -16,7 +16,7 @@ main 按 G `2adeeff67363d3e13ca6c4e623034c54a14c1e01` 原字节引入 usage-insi
 
 原work列表hasMore、evidence.truncated、缺失来源或采集期间event cursor变化均传播partial/unknown。时间窗口外的合法历史记录在采集边界排除，不把正常窗口选择误判成来源冲突。完整枚举窗口里的真实空集合可以为零，缺失或截断不能补成完整零。恢复只读仍可读取，但响应authorization始终none，不产生新执行或迁移许可。
 
-采集只调用当前scope已授权原reader，配置在采集中改变即拒绝。单个读取超时不伪造成功，整体缺失保持partial。原reader本身是只读操作；deadline只停止等待，不能被当成物理进程取消或写停止证明。
+采集只调用当前scope已授权原reader，配置在采集中改变即拒绝。两秒是采集结果的接受预算，不是可抢占同步JavaScript或分析CPU的硬响应SLA：timer在调用reader前建立，读取后/接受前和分析后复核deadline，超时结果只能partial/unknown。单个读取超时不伪造成功，整体缺失保持partial。原reader本身是只读操作；deadline只停止等待，不能被当成物理进程取消或写停止证明。
 
 ## 展示语义与体验
 
@@ -36,6 +36,6 @@ F/G继续自己的原wave27长包：G交修复后最小source和稳定Node消费
 
 ## 验证范围
 
-contracts239/239，生成一致性/frozen hash，console/coordinator strict、G build、console build通过；15条trial/传输测试通过。主线新增7条实际模块/HTTP/原Product-Broker-SQLite两项目提问→回答→检查→人工接受/重复读取与缺模块闭包测试通过，既有readiness6条一并回归通过。受控执行没有真实vendor/model/native发送；未知用量与原证据层保持。
+contracts239/239，生成一致性/frozen hash，console/coordinator strict、G build、console build通过；15条trial/传输测试通过。主线新增8条实际模块/HTTP/原Product-Broker-SQLite两项目提问→回答→检查→人工接受/重复读取与缺模块闭包测试，另含独立审查发现的同步慢reader反例；既有readiness6条一并回归通过。受控执行没有真实vendor/model/native发送；未知用量与原证据层保持。
 
 实际App浏览器第一轮6项覆盖默认按需、两项目、旧响应晚到、脱敏失败/上次观察、legacy缺失和desktop/mobile；POST/event增量0，pageerrors0。源码提交后以准确干净source做一次最终截图/流程确认，报告独立保存。记录与限制见 [本次主线交付](../../../reports/releases/wave27-insights/README.zh-CN.md)。这些是source/controlled实际数据与UI范围，不是installed/native/recovery/value/target准入，也不按测试数调整完成度。

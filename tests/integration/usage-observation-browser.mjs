@@ -107,7 +107,7 @@ try {
         element.getBoundingClientRect().height <= Number.parseFloat(getComputedStyle(element).lineHeight) + 2), true)
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
       assert.equal(await trial.evaluate(element => element.scrollWidth > element.clientWidth + 1), false)
-      await page.screenshot({ path: join(output, `${name}.png`), fullPage: true, animations: 'disabled' })
+      if (!process.argv.includes('--no-capture')) await page.screenshot({ path: join(output, `${name}.png`), fullPage: true, animations: 'disabled' })
     }
     assert.equal(posts, 0); assert.equal(store.events.cursor(), before); assert.deepEqual(errors, [])
   })
