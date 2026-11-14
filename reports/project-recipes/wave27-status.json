@@ -87,9 +87,10 @@
         {
           "command": "node --test tools/project-recipes/test/*.case.ts",
           "exit": 0,
-          "tests": 20,
-          "pass": 20,
-          "fail": 0
+          "tests": 29,
+          "pass": 29,
+          "fail": 0,
+          "note": "20 at this checkpoint; the suite grew to 29 with multi-project and boundary additions"
         },
         {
           "command": "node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/configuration.json --facts tools/project-recipes/fixtures/facts-alpha.json --now 2026-11-14T12:00:00.000Z --paths src/parser.ts",
