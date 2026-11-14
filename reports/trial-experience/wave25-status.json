@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "owner": "F",
+  "wave": "product-wave-25",
+  "goal": "trial workspace component, daily user journeys, responsive/accessible states and a real user guide",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "baseMain": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+  "state": "IN_PROGRESS",
+  "milestones": {
+    "F4": "DELIVERED_SOURCE",
+    "F8": "PENDING",
+    "F12": "PENDING",
+    "F16": "PENDING"
+  },
+  "ownedPaths": [
+    "apps/console/src/trial/",
+    "apps/console/test/trial/",
+    "apps/console/e2e/trial/",
+    "docs/user-guide/",
+    "reports/trial-experience/"
+  ],
+  "excludedOwnership": [
+    "apps/console/src/App.tsx",
+    "apps/console/src/transport.ts",
+    "apps/console/src/main.tsx",
+    "apps/console/src/*.css (root/global)",
+    "packages/contracts/",
+    "apps/coordinator/http/ or provider/",
+    "root package.json / pnpm-lock.yaml"
+  ],
+  "realInputs": {
+    "http": "GET /v1/readiness",
+    "contracts": "packages/contracts/src/trial-readiness.ts (TrialReadiness, TrialNavigationAction)",
+    "transport": "apps/console/src/transport.ts ConsoleTransport.readiness",
+    "configuration": "ApplicationConfigurationSchema public read model"
+  },
+  "modelNativeTurns": 0,
+  "appWiring": "NOT_WIRED_BY_MAIN",
+  "notes": "Early checkpoint published; subsequent stages continue. No new authority, no second DTO, no model or command invocation from the component."
+}

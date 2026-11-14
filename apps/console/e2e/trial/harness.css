@@ -1,0 +1,50 @@
+/* Test-harness chrome only. It is never imported by the application or by src/trial. */
+.harness-app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: #fff;
+}
+
+.harness-banner {
+  flex: 0 0 auto;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--warn-soft);
+  color: var(--warn);
+  font: 500 11px/1.5 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+}
+
+.harness-column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: #fff;
+}
+
+.harness-column > .trial-view {
+  flex: 1;
+}
+
+.harness-controls {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--line);
+  background: #f5f7f5;
+  font-size: 12px;
+}
+
+.harness-log {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 6px 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font: 400 11px/1.6 'SFMono-Regular', Consolas, monospace;
+  overflow-wrap: anywhere;
+}

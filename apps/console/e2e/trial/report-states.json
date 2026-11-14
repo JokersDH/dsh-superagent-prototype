@@ -1,0 +1,139 @@
+{
+  "subject": "trial workspace, controlled fixtures (not a product/native/release verdict)",
+  "base": "http://127.0.0.1:5178",
+  "viewports": [
+    "1440x900",
+    "390x844"
+  ],
+  "generatedAt": "2026-11-14T03:55:12.057Z",
+  "results": [
+    {
+      "id": "CONFIGURED",
+      "status": "PASS",
+      "ms": 759,
+      "detail": "configured state shows facts only and one navigation action"
+    },
+    {
+      "id": "UNCONFIGURED",
+      "status": "PASS",
+      "ms": 636,
+      "detail": "missing model configuration is separated from execution readiness"
+    },
+    {
+      "id": "BLOCKED",
+      "status": "PASS",
+      "ms": 624,
+      "detail": "execution blockage names the reason instead of a bare red error"
+    },
+    {
+      "id": "NEEDS-PROJECT",
+      "status": "PASS",
+      "ms": 622,
+      "detail": "a missing project is actionable and does not claim readiness"
+    },
+    {
+      "id": "FIXTURE",
+      "status": "PASS",
+      "ms": 625,
+      "detail": "controlled fixture path is never mistaken for native readiness"
+    },
+    {
+      "id": "UNKNOWN",
+      "status": "PASS",
+      "ms": 646,
+      "detail": "unknown stays unknown and never turns green"
+    },
+    {
+      "id": "READONLY",
+      "status": "PASS",
+      "ms": 666,
+      "detail": "recovery read-only keeps readable navigation and hides approval/write entries"
+    },
+    {
+      "id": "NOREDINESS",
+      "status": "PASS",
+      "ms": 646,
+      "detail": "an unread readiness is not guessed from other data"
+    },
+    {
+      "id": "LOADING",
+      "status": "PASS",
+      "ms": 647,
+      "detail": "first load announces progress and blocks no navigation"
+    },
+    {
+      "id": "UNAVAILABLE",
+      "status": "PASS",
+      "ms": 647,
+      "detail": "an old backend degrades explicitly"
+    },
+    {
+      "id": "ERROR-AND-RETRY",
+      "status": "PASS",
+      "ms": 859,
+      "detail": "retry re-reads status without clearing valid data or sending a command"
+    },
+    {
+      "id": "LONG-CONTENT",
+      "status": "PASS",
+      "ms": 652,
+      "detail": "long Chinese/English content wraps without horizontal overflow"
+    },
+    {
+      "id": "VISUAL-AUDIT",
+      "status": "PASS",
+      "ms": 2327,
+      "detail": "geometry, overflow, contrast, radii, shadows and semantic dot colours are verified programmatically"
+    },
+    {
+      "id": "INSIGHTS-EMPTY",
+      "status": "PASS",
+      "ms": 651,
+      "detail": "optional insights cannot invent efficiency numbers"
+    },
+    {
+      "id": "NAVIGATION-CALLBACKS",
+      "status": "PASS",
+      "ms": 2776,
+      "detail": "each of the four navigation names is reachable and recorded once"
+    },
+    {
+      "id": "DOUBLE-CLICK-GUARD",
+      "status": "PASS",
+      "ms": 1300,
+      "detail": "rapid duplicate activation does not duplicate navigation"
+    },
+    {
+      "id": "KEYBOARD",
+      "status": "PASS",
+      "ms": 688,
+      "detail": "the main journey is operable by keyboard with visible focus and names"
+    },
+    {
+      "id": "MOBILE",
+      "status": "PASS",
+      "ms": 2715,
+      "detail": "narrow viewport keeps every action reachable without horizontal overflow"
+    },
+    {
+      "id": "STALE-RESPONSE",
+      "status": "PASS",
+      "ms": 914,
+      "detail": "out-of-order responses keep the newest identity"
+    },
+    {
+      "id": "UNMOUNT-IN-FLIGHT",
+      "status": "PASS",
+      "ms": 905,
+      "detail": "a response after unmount updates no state"
+    },
+    {
+      "id": "BROWSER-ERRORS",
+      "status": "PASS",
+      "ms": 0,
+      "detail": "no page or console errors across the suite"
+    }
+  ],
+  "failures": [],
+  "screenshots": "/Users/hh/Desktop/joker/superagent-agent-f/apps/console/e2e/trial/screenshots"
+}
