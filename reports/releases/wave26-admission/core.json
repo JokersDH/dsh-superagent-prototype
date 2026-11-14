@@ -1,0 +1,183 @@
+{
+  "protocol": "wave26-core-admission/1",
+  "date": "2026-11-14",
+  "status": "PARTIAL_REAL_MANIFEST_PACKAGE_DUAL_RESTORE_PASSED_NEW_RUNTIME_AND_RESTORE_GATES_REMAIN",
+  "mainBaseline": "11002b888b91156d1b4cc0712eed224f5a437442",
+  "fixedSources": {
+    "A": "219a61d33ed6af42f3f28f9acac1e11aeaa7c254",
+    "B": "9fdfdd58da4777cd12bf363361d428600a51a796",
+    "C": "a534ae256d3b38c55f3226c15d605affc67d9108"
+  },
+  "dirtyBeforeAndAfter": {
+    "A": [],
+    "B": ["reports/releases/wave11-admission/runtime.json", "reports/releases/wave12-admission/runtime.json", "tests/native-acceptance/b16-real-begin.mjs (untracked)"],
+    "C": ["pnpm-lock.yaml"]
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "node --test packages/workflows/test/wave25-input-guards.case.ts packages/workflows/test/wave25-original-result.case.ts packages/workflows/test/wave25-dual-snapshot-personal.case.ts",
+      "exitCode": 1,
+      "passed": 2,
+      "failed": 1,
+      "scope": "Strict independent expectation parser13 refusals and actual original-result data sink/readback pass. New dual test cannot be loaded by supported Node24 because existsSync is imported twice; no dual runtime was executed through this command."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm --filter @personal-agent/workflows typecheck",
+      "exitCode": 2,
+      "observed": ["wave25-dual-snapshot-personal.case.ts:5/15 TS2300 duplicate existsSync", "wave25-input-guards.case.ts:35 TS2345 undefined is not AssertPredicate"],
+      "scope": "Actual package strict test/consumer surface, distinct from production build"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm --filter @personal-agent/workflows build",
+      "exitCode": 0,
+      "scope": "Production source build passes; this does not erase the strict/test failures"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "command": "node /tmp/pa-wave25-b-audit.mjs",
+      "exitCode": 1,
+      "passed": 9,
+      "failed": 2,
+      "scope": "Actual new Runner service/FileCriticalJournal/recovery server/client, exact command and valid assignment/attempt/contract refusals, page clamp, large first fact reference discovery, foreign source payload refusal. No Driver/native child/product DB/model. New legal first/intermediate chunk refuses with unknown_outcome.",
+      "probeOutputHistoricalSourceLabel": "4af2a3eb6cb84195a8f7f774b0c836f2cfc4b1ee",
+      "actualImportedCandidateSource": "9fdfdd58da4777cd12bf363361d428600a51a796",
+      "cases": [
+        { "id": "exact-complete-command-positive", "status": "PASS" },
+        { "id": "complete-command-assignmentId-refuses-before-write", "status": "PASS" },
+        { "id": "complete-command-attemptId-refuses-before-write", "status": "PASS" },
+        { "id": "complete-command-contract-refuses-before-write", "status": "PASS" },
+        { "id": "actual-service-requested-131072-page-now-readable", "status": "PASS" },
+        { "id": "large-schema-valid-journal-input-positive", "status": "PASS" },
+        { "id": "known-large-payload-ref-chunks-reassemble-exact-digest", "status": "FAIL", "code": "unknown_outcome" },
+        { "id": "large-fact-page-exposes-bounded-reference-with-progress", "status": "PASS" },
+        { "id": "foreign-source-payload-refuses-before-exposure", "status": "PASS" },
+        { "id": "payload-chunk-length-matches-decoded-request-byte-unit", "status": "FAIL", "code": "unknown_outcome" },
+        { "id": "invalid-payload-chunk-size-refused-boundedly", "status": "PASS" }
+      ],
+      "actualObservations": { "exactBackendWrites": 1, "largePayloadBytes": 135540, "clampedRequestedBytes": 131072, "returnedSmallFrames": 51, "returnedFrameBytes": 49136, "largeDescriptorNext": 1 }
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes --skipLibCheck --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --types node apps/runner/src/business-attach.ts apps/runner/src/runner-service.ts",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test --test-name-pattern='package identity requires' packages/knowledge/test/wave23-driver-lib.case.ts",
+      "exitCode": 0,
+      "passed": 1,
+      "scope": "Complete package identity positive and required PID/APIstart/check omissions or foreign values refuse through the validator actually invoked by the driver"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/knowledge typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave26-core-audit-nqeJhx/probe-ac-package.ts",
+      "exitCode": 0,
+      "positiveFlows": 2,
+      "acceptedNegativeMutations": 2,
+      "report": "/tmp/pa-wave26-core-audit-nqeJhx/ac-package/result.json",
+      "scope": "Exact immutable0ede package. Same real controlled Store with Broker/SDK/candidates/context, two independent v1/v2 snapshot->bundle->restore roots, current C single driver actually invokes current A manifest and consumes original Work/question/delivery IDs through actual package HTTP. Each real package start ends independently STOPPED; provider2->2. Target-only logical source drift is still accepted by C's root-map claim; A create restore succeeds but its reverify also accepts target-only DB content drift."
+    }
+  ],
+  "actualSamePackageDataCheckpoint": {
+    "source": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave23-target/wave23-target-0ede11d.tar.gz",
+    "sha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+    "buildId": "1eb8733c8b1729bc",
+    "schema": 18,
+    "currentASourceInvoked": "219a61d33ed6af42f3f28f9acac1e11aeaa7c254",
+    "currentCDriverSource": "a534ae256d3b38c55f3226c15d605affc67d9108",
+    "formats": [
+      { "format": 1, "driverStatus": "verified-flow", "exitCode": 0, "manifestDigest": "d1324f2f131a9debb2be907dbc2009cc4824f9cdb9a7811dc3ec565340b4f08e", "packageStatusAfter": "STOPPED" },
+      { "format": 2, "driverStatus": "verified-flow", "exitCode": 0, "manifestDigest": "b0dc973ad8edb1d8878657be8f62cfc0740b1c6b2e4a3c330c0bddf27cc8b692", "packageStatusAfter": "STOPPED" }
+    ],
+    "actualSingleDriverConsumesAManifest": true,
+    "twoActualIndependentBundleRestores": true,
+    "providerCallsBefore": 2,
+    "providerCallsAfter": 2,
+    "eIndependentCurrentMainInstalledAdmission": false,
+    "notClaimed": ["later main/F/readiness UI bytes in0ede", "B business reconnect", "private permission/target", "vendor native compatibility", "upgrade/rollback/long soak", "general root provenance despite data drift"]
+  },
+  "findings": [
+    {
+      "id": "B26-LEGAL-INTERMEDIATE-PAYLOAD-CHUNK-REFUSED",
+      "priority": "P1_NEW_BUSINESS_CHANNEL_ADMISSION",
+      "file": "packages/execution/src/recovery-transport.ts",
+      "line": 180,
+      "problem": "The new check rejects any ordinary non-final chunk: for a135540-byte payload, offset0 and length32768 satisfy chunkBytes.length!==total-offset AND offset+chunkBytes.length<total, so the server returns503 invalid_payload. Actual known-reference five-chunk reassembly and1024-byte slice now fail unknown_outcome. The condition also does not express requested range/decoded length validation for overruns.",
+      "scopeLimit": "Regression in B's unadmitted candidate channel, not an admitted main personal-product permission failure. Preserve the newly passing descriptor discovery and foreign-source refusal.",
+      "requiredOutcome": "Validate total/offset/requested length and decoded bytes with expectedLength=min(requestedLength,total-offset), require progress and stable ref/digest, reject overrun and malformed base64, then prove descriptor discovery through all consecutive chunks to final digest and fact receipt."
+    },
+    {
+      "id": "A26-NEW-TESTS-FAIL-SUPPORTED-NODE-AND-STRICT",
+      "priority": "P2_SOURCE_CONSUMER_ADMISSION",
+      "file": "packages/workflows/test/wave25-dual-snapshot-personal.case.ts",
+      "line": 15,
+      "related": "packages/workflows/test/wave25-input-guards.case.ts:35",
+      "problem": "existsSync is imported at both lines5 and15; supported Node24 refuses the entire new dual module with SyntaxError and the package strict check reports TS2300 twice. assert.throws(...,undefined,name) also fails current @types/node AssertPredicate typing. Production build passes, while full strict/typechecked consumer surface and standard Node test entry do not.",
+      "requiredOutcome": "Fix only the duplicate import and typed assertion invocation, run the package's actual declared strict/Node entries, and preserve separately the already-proven production and independent package positives. npx tsx results cannot replace supported Node consumer compatibility."
+    },
+    {
+      "id": "A26-RESTORE-REVERIFY-DOES-NOT-BIND-CONTENT",
+      "priority": "P2_DATA_INTEGRITY_HELPER",
+      "file": "packages/workflows/src/restore.ts",
+      "line": 200,
+      "problem": "verifyRestoredSnapshot checks the report protocol/target, SQLite integrity/foreign keys and product schema only; it never compares current database/evidence/artifacts to the stored snapshot report. After a valid create-restore positive, appending a legitimate target-only user message via A's existing Store changes logical source fingerprint but reverify still returns ok. Its status therefore does not prove the restored rows still match the claimed snapshot.",
+      "scopeLimit": "New A data helper, not current main execution authority. The independent creation path verifies initial snapshot/database/artifact bytes and can remain a separate positive. A report's logicalSource.digest is currently assigned the workflow evidence digest, so that field must not be confused with the existing recoverySource fingerprint.",
+      "requiredOutcome": "Precisely define the expected restore subject and reverify the corresponding original database/evidence/artifact/root mapping facts against independent expectations; otherwise explicitly label the result as schema/health-only instead of content re-verification."
+    },
+    {
+      "id": "C26-ROOT-MAP-IS-DECLARATION-NOT-RESTORE-PROOF",
+      "priority": "P2_CONSUMER_PROVENANCE",
+      "file": "packages/context/tools/personal-review-driver.mjs",
+      "line": 209,
+      "problem": "Manifest mode compares declared from/to paths and selected HTTP IDs/deliveries, but does not consume actual restore evidence or compare the target's logical source/snapshot subject to the original manifest. In the same exact package positive, one additional legitimate target-only user message changes the restored logical source while original-source manifest stays unchanged; the driver still returns verified-flow/verified:true with the same manifest digest. This proves selected data reads, not the claimed complete source-to-restored-root provenance.",
+      "scopeLimit": "No body/authorization bypass is asserted: the main package correctly signs the target's current explicit read selection and refuses business work. Preserve the real same-manifest two-format package positive while limiting provenance claims.",
+      "requiredOutcome": "Bind the driver to actual snapshot/restore report and independent original-to-target expectation or clearly mark root-map as operator-declared. Validate the target bytes/logical subject needed by the claimed scope, retaining legitimate lifecycle metadata changes without inventing a second signing or recovery authority."
+    }
+  ],
+  "closedPriorScopes": [
+    { "id": "C-MISSING-PID-API-START", "scope": "Complete required package validator now refuses omissions and failed/missing status checks; actual current driver calls it. Real exact-package positive passes." },
+    { "id": "AC-ONLY-SEPARATE-MANIFEST-RESTORE-CONSUMER-CHAINS", "scope": "Current C driver actually invokes A producer before HTTP and uses returned original IDs/coverage; independent review ran both formats via the same exact0ede package." },
+    { "id": "B-LARGE-FIRST-FACT-NO-REFERENCE", "scope": "Actual Runner journal replay now exposes a bounded descriptor with original payload ref and next1; no longer inline-only discovery failure." },
+    { "id": "B-FOREIGN-SOURCE-PAYLOAD-READ", "scope": "Actual server now requires matching producer header before payload backend read; foreign-source same pinned endpoint/credential is refused." },
+    { "id": "B-RFC-EXACTLY-ONCE-OVERCLAIM", "scope": "Unsupported feed/transaction guarantees removed and not-claimed section accurately lists unimplemented rebind/dispatch. RFC remains design input, not admission." }
+  ],
+  "wholePackageMilestones": {
+    "A": "New strict parser/source restore and original-result data sink are real; supported test/strict failures plus content reverify and B-dependent landing remain. A accurately limits its own consumer evidence to source-only; the independent C exact package run supplies a distinct scoped positive.",
+    "B": "Submitted status wholePackageComplete=false is accurate. Diff is four files/95added10removed lines; three-channel fact receipt/payload/native-admission rebind, unified dispatch, actual sameRunner dual-client, independent coordinator SIGKILL, original-question answering, recovered verification/acceptance and2/4slots remain NOT_REACHED. No completed first whole runnable milestone is admitted.",
+    "C": "Complete identity and real A-manifest same-package dual-format consumer are achieved in measured scope; root-map/restore provenance still needs a complete contract. Later UI/current-main release and business recovery remain distinct."
+  },
+  "minimalMainIntegration": {
+    "requiredForExistingTrialUi": [],
+    "A": "Manifest runtime input parser and data-only APIs can be considered as narrow source slices after exact main consumer compile; production build0 is available. Do not wholesale import failed test/strict status or use verifyRestoredSnapshot as a trusted content/activation gate. New original-result sink is data-only and requires an actually observed result; no admitted B transport consumer exists yet.",
+    "B": "Do not integrate the new business channel. Exact source RFC/port remain input for a future real consumer; chunk regression and absent first milestone still block default use. Existing main registered control path remains independent.",
+    "C": "Current development driver/required-identity validator can be used for accurately scoped data/package testing, with root-map explicitly limited until provenance fixes. No new production UI/HTTP source is required from C."
+  },
+  "nextWholePackages": {
+    "A": "Close strict/Node consumer compatibility, formalize initial restore and subsequent content re-verification/mapping with independent expected snapshot data, and expose the exact data API for the now-real single C consumer. Then original-ID result landing only after B/main's actual attach admission, without new ledger or grant.",
+    "B": "First finish one coherent descriptor->all chunks->receipt path with complete producer/ref/range and true decoded units, then unified dispatch and three actual rebind channels, actual sameRunner dual clients and early callable port/RFC. Continue original-ID SIGKILL/answer/verification/acceptance/resources only once the first runnable result is real.",
+    "C": "Keep complete identity and actual dual-format package consumer; bind single-driver root mapping to the formal actual restore subject and target integrity, cover independent drift/refusal/cleanup deadlines, and consume a correctly frozen successor only for later main UI/readiness features."
+  },
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "nativeTurnStarts": 0,
+    "userServiceActions": 0,
+    "globalSocketDiscovery": false,
+    "foreignCredentialsRead": false,
+    "candidateOrMainProductionSourceEdited": false,
+    "eAcceptanceAssertionsEdited": false,
+    "allPrivateExecSessionsCompleted": true,
+    "exactPackagePrivateStatusesAfter": ["STOPPED", "STOPPED", "STOPPED"],
+    "privateEvidenceRoot": "/tmp/pa-wave26-core-audit-nqeJhx",
+    "budgetsAndLedgersUnchanged": true,
+    "releaseApproved": false
+  }
+}
