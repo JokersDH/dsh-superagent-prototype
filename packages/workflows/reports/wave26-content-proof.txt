@@ -1,0 +1,10 @@
+WAVE26_CONTENT_PROOF {"baseDigest":"363c8d7c2935f2e6b325d38138b0a97f6ee115f9d7ca30ac5fd08a987657d7f9","omitted":["coordinator_instances","writer_claim"],"rows":2,"capped":"table alpha exceeds the row limit","missing":"database is not readable: SqliteError: unable to open database file"}
+✔ content proof changes with durable rows, ignores root-local runtime tables and stops at its limits (8.624333ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 81.5345

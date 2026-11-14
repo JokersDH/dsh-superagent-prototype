@@ -16,7 +16,7 @@
     {"command": "npx tsc -p packages/storage/tsconfig.build.json", "exit": 0, "result": "build ok", "evidence": "wave26-build-storage.txt"},
     {"command": "npx tsc -p packages/workflows/tsconfig.build.json", "exit": 0, "result": "build ok", "evidence": "wave26-build-workflows.txt"},
     {"command": "npx tsx --test packages/workflows/test/*.case.ts", "exit": 0, "result": "120 pass / 0 fail", "evidence": "wave26-workflow-tests.txt"},
-    {"command": "npx tsx --test packages/storage/test/*.case.ts", "exit": 0, "result": "87 pass / 0 fail", "evidence": "wave26-storage-tests.txt"}
+    {"command": "npx tsx --test packages/storage/test/*.case.ts", "exit": 0, "result": "88 pass / 0 fail", "evidence": "wave26-storage-tests.txt"}
   ],
   "phases": [
     {"phase": "A1", "status": "PASS", "scope": "actual Node entry and strict blockers",
@@ -59,7 +59,7 @@
       "evidence": ["packages/storage/src/content-proof.ts", "packages/workflows/src/index.ts", "wave26-data-api.md"],
       "note": "content proof, expectation/manifest build/verify, restore/reverify and original-result sink are public typed APIs; health, content identity, source scope, incomplete evidence and report-only versus independent basis are separate outcomes; schema 18 and old v1/v2 recipes are unchanged."},
     {"phase": "A14", "status": "PASS", "scope": "cost and abnormal input",
-      "evidence": ["wave26-dual.txt", "wave26-input-guards.txt", "wave26-data-api.md"],
+      "evidence": ["wave26-dual.txt", "wave26-input-guards.txt", "wave26-content-proof.txt", "wave26-data-api.md"],
       "note": "content proof enforces table/row/canonical-byte limits (tested with maxRows=1 -> incomplete/null digest); restore enforces manifest/database/artifact bounds; wrong format/digest, equal-length artifact change, missing artifact, non-empty target, repeat restore and 13 malformed expectation variants all fail finitely; unknown is null/indeterminate, never zero."},
     {"phase": "A15", "status": "PASS_SOURCE_EVIDENCE", "scope": "independent acceptance inputs",
       "evidence": ["wave26-data-api.md", "wave26-status.json", "wave26-dual.txt"],

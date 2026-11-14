@@ -81,7 +81,9 @@ after the HTTP startup and stop.
 - `wave26-strict-storage.txt`, `wave26-strict-workflows.txt` — strict exit 0.
 - `wave26-build-storage.txt`, `wave26-build-workflows.txt` — build exit 0.
 - `wave26-workflow-tests.txt` — 120/120 via the existing tsx runner.
-- `wave26-storage-tests.txt` — 87/87.
+- `wave26-storage-tests.txt` — 88/88.
+- `wave26-content-proof.txt` — durable-row change/add-table changes the digest; writer_claim and
+  coordinator_instances changes do not; maxRows and a missing database return incomplete/null.
 - `wave26-dual.txt` — same Store v1/v2:
   source manifest `00191204…`; content digest `9c108e07…` (138 rows, 56328 bytes) equals the
   source content proof; database SHA `e6740cf6…`; 17 artifacts; C target proof `ok` and added-message
