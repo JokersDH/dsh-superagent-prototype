@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-23/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-24/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "f29c9e6",
-  "checkpoint": "0f72838",
+  "base": "4e805de",
+  "checkpoint": "b0da93c",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -18,74 +18,74 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Real 595 positive control and frozen scope",
+      "title": "Fixed positives and layered scope",
       "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
       "notes": [
-        "The complete recorded 595 report (run 2026-11-13T14-48-56-062Z) is committed as the installed-alpha positive control, evaluated at its recorded time; the current re-check time is recorded separately. The 200 PASS/0 FAIL/15 NOT_TESTED and 161 required scope stay as measured history."
+        "The recorded 595 report and the measured a9b 208/0/15 (162 required) stay as historical scopes evaluated at their recorded sets; the current 0ede run is the new positive. Module/controlled/ordinary-installed/recovered/native/value stay separate."
       ]
     },
     {
       "id": "E2",
-      "title": "Process identity is required",
+      "title": "Capability bound to immutable bytes",
       "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
       "notes": [
-        "reviewReuse now requires the observed original/reused process identity, the same process start on the REUSED instance and the original PID; deleting the observation, a null/empty/mismatched start or a different PID is rejected."
+        "The format case derives digest support from the frozen package start/demo bytes; review reuse must agree with that same subject/capability. A self-reported unsupported flag or deleted digest observation on a supporting package is rejected; an unsupported historical package needs its own identity and scope."
       ]
     },
     {
       "id": "E3",
-      "title": "Digest and refusal observations are required",
+      "title": "Public bounded scope schema",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "A digest-supporting package must expose healthDigest and an equal sameDigest; only an explicitly unsupported package can declare its scope. Every different/missing/port/unbound request needs a real BLOCKED terminal with a code, so RUNNING on the original PID without a reused flag or a missing observation is rejected. The real report is the positive; four single-observation mutations and the foreign consumer are rejected."
+        "scopeReview is checked against the public semantics: protocol, authorization none, partial consistent with state, withheld count non-negative/safe/within 64 and equal to the binding source count on scope_changed, at most seven distinct known reasons. Negative/overflow counts, duplicate/unknown reasons, wrong authorization and missing fields are rejected."
       ]
     },
     {
       "id": "E4",
-      "title": "Same-package consumer bytes",
+      "title": "Accurate 0ede package and consumer bytes",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Every required installed case compares subject, consumer package source/build/tar and the four consumer file hashes. A real second package entry rejects even when the data tuple is unchanged; no checkout can supply a missing package consumer."
+        "Target is 0ede11d/build1eb8733c8b1729bc/tar d0398897…/20247278 bytes with a9b as the safety baseline; every required case binds subject, consumer package and four consumer file hashes read from the package."
       ]
     },
     {
       "id": "E5",
-      "title": "Accurate a9b package",
+      "title": "Independent resource gate",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "Target is a9b155c/build9fdc283f55927f6f/tar 413dee2f…/20246850 bytes with 595 as the safety baseline; tuple, schema, ABI and consumer files are read from the extracted package before any flow."
+        "D live cleanup scripts are not run while its pre-registration/child-identity/root-boundary gate is not independently passed; safe byte/gate/UI-preparation lanes continue and only probe-owned resources are ever signalled."
       ]
     },
     {
       "id": "E6",
-      "title": "Same data chain and both formats",
+      "title": "Latest UI and CLI",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "The package produces/verifies default v1 (13 families) and explicit v2 (21 families) snapshots over the same restored store; personal review reads the original Work/Q&A/context/candidate data with the package consumer, business 422, queue held and provider unchanged. Fixture/readonly stays a separate layer."
+        "0ede console bytes preserve the backend opt-in but do not contain the 0062 scope-review UI marker, so packaged UI interaction is NOT_REACHED; backend four-state projection, explicit opt-in and narrowed restart are measured on the same bytes. CLI review-restored help is exercised by the package."
       ]
     },
     {
       "id": "E7",
-      "title": "Optional diagnostics with real permission guards",
+      "title": "Two independent snapshot restores",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "a9b contains 712: default sources keep the old shape, ?scopeReview=1 returns the bounded context-scope-review/1 projection with authorization none, duplicate/unknown queries are refused, and a freshly prepared narrow restart explains the withheld body without serving it. Diagnostics never authorize."
+        "Default v1 and explicit v2 snapshots are created/verified over the same restored store and the package personal consumer reads the original Work/Q&A/context/candidate data; the full A-producer plus C-single-driver two-root chain remains a separate NOT_REACHED while those ports are unadmitted. Business writes 422, queues held, provider unchanged."
       ]
     },
     {
       "id": "E8",
-      "title": "Ordinary install, reuse, upgrade and failure protection",
+      "title": "Ordinary install, reuse and upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Cold/reuse/no-executor/multi-state, 595→a9b and 16→18, real same-file REUSED with PID/start/digest, mismatched selection/port refused without stopping the live instance, tamper refusal and post-upgrade data kept. D dangerous live cleanup scripts are not run."
+        "Cold/reuse/no-executor/multi-state, a9b→0ede and 16→18, same-file REUSED with PID/start/digest, different/missing/port/unbound refusals with a BLOCKED code and unchanged PID, tamper refusal and post-upgrade data kept."
       ]
     },
     {
       "id": "E9",
-      "title": "Bounded usability",
+      "title": "Bounded usability and resource return",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "Concurrent readonly reads, repeated confirmations and a reopen return queue/counts/provider to baseline; desktop/mobile remain limited to the known workbench surfaces; no long soak claim."
+        "Limited SSE/read/reopen/concurrent readonly sequences return provider/queue/count baselines; no long soak, cross-machine or cross-ABI claim, and no global socket scans."
       ]
     },
     {
@@ -93,7 +93,7 @@
       "title": "Layered final verdict",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave23-status separates module/controlled/ordinary-installed/recovery/native/value and keeps the 595 measured scope, the a9b result and the old e4e failure. Required set is not relaxed; full-product stays refused for native evidence."
+        "wave24-status records the 0ede subject/consumer, the capability and scope-schema controls, the measured 595/a9b history, the UI NOT_REACHED and the separate native/private/target/value blockers. Required set is never relaxed for release claims."
       ]
     }
   ]
