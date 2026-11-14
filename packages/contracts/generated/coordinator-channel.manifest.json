@@ -1,0 +1,7 @@
+{
+  "protocol": "coordinator-channel-local/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "de007a2544aea86e01063c81bc0813bf553fb3122840a7a801cb817c8e57f7c8",
+  "sourceHash": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1"
+}

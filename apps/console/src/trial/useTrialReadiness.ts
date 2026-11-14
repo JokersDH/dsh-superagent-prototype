@@ -1,11 +1,27 @@
 /**
  * Bounded readonly probe for GET /v1/readiness through the existing ConsoleTransport. It performs one
  * attempt per load/reload, keeps the last valid observation while refreshing, discards late responses
- * from an older attempt and never retries, sends a command or starts an agent on its own.
+ * from an older attempt or an older transport identity, and never retries, sends a command or starts
+ * an agent on its own.
+ *
+ * Identity contract: the hook cannot see which backend a transport instance talks to. A caller that
+ * may swap transports passes a stable `identity` (for example an auth-session generation or the API
+ * base). When it changes, prior data is hidden immediately, the old request is cancelled and the new
+ * backend is read once. Without an identity the transport must stay stable for the mounted lifetime;
+ * replacing it requires a remount (React key) so state cannot be attributed to the wrong service.
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { TrialReadiness } from '@personal-agent/contracts'
 import type { ConsoleTransport } from '../transport.ts'
+
+/** Stable, comparable identity of the backend/session behind the transport. */
+export type TrialReadinessIdentity = string | number
+
+export interface TrialReadinessOptions {
+  readonly enabled?: boolean
+  /** Stable identity; a change hides prior observations and re-reads the new service once. */
+  readonly identity?: TrialReadinessIdentity | undefined
+}
 
 export interface TrialReadinessProbe {
   readonly readiness?: TrialReadiness
@@ -29,49 +45,75 @@ export function trialProbeError(cause: unknown): string {
   }
 }
 
-export function useTrialReadiness(transport: Pick<ConsoleTransport, 'readiness'> | undefined, enabled = true): TrialReadinessProbe {
-  const [readiness, setReadiness] = useState<TrialReadiness>()
+interface Observation {
+  readonly identity: TrialReadinessIdentity | undefined
+  readonly readiness?: TrialReadiness | undefined
+  readonly error?: string | undefined
+  readonly unavailable: boolean
+}
+
+const normalize = (options: boolean | TrialReadinessOptions): { enabled: boolean; identity: TrialReadinessIdentity | undefined } =>
+  typeof options === 'boolean'
+    ? { enabled: options, identity: undefined }
+    : { enabled: options.enabled ?? true, identity: options.identity }
+
+export function useTrialReadiness(
+  transport: Pick<ConsoleTransport, 'readiness'> | undefined,
+  options: boolean | TrialReadinessOptions = true,
+): TrialReadinessProbe {
+  const { enabled, identity } = normalize(options)
+  const [observation, setObservation] = useState<Observation>({ identity, unavailable: false })
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>()
-  const [unavailable, setUnavailable] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const reload = useCallback(() => setAttempt(value => value + 1), [])
   // A stable capability flag keeps an inline prop object from re-triggering the probe every render.
   const available = transport?.readiness !== undefined
   const current = useRef(transport)
   current.current = transport
+  // Only the observation that belongs to the current identity may be shown.
+  const visible: Observation = observation.identity === identity ? observation : { identity, unavailable: false }
 
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled) {
+      // A disabled view must not keep a permanent loading state from a cancelled attempt.
+      setLoading(false)
+      return
+    }
     const client = current.current
     const read = client?.readiness
     if (!read) {
       setLoading(false)
-      setUnavailable(true)
+      // A transport that no longer exposes readiness cannot keep another service's observation.
+      setObservation({ identity, unavailable: true })
       return
     }
     let cancelled = false
     setLoading(true)
-    setError(undefined)
+    setObservation(previous => previous.identity === identity
+      ? { ...previous, error: undefined }
+      : { identity, unavailable: false })
     void read.call(client).then(value => {
       if (cancelled) return
-      setReadiness(value)
-      setUnavailable(value === undefined)
+      setObservation(value === undefined
+        ? { identity, unavailable: true }
+        : { identity, readiness: value, unavailable: false })
     }).catch((cause: unknown) => {
       if (cancelled) return
-      setError(trialProbeError(cause))
+      setObservation(previous => previous.identity === identity
+        ? { ...previous, error: trialProbeError(cause), unavailable: false }
+        : { identity, error: trialProbeError(cause), unavailable: false })
     }).finally(() => {
       if (!cancelled) setLoading(false)
     })
-    // Cleanup runs on reload and unmount, so a late response from this attempt is ignored.
+    // Cleanup runs on reload, identity change, disable and unmount: a late response is ignored.
     return () => { cancelled = true }
-  }, [enabled, attempt, available])
+  }, [enabled, attempt, available, identity])
 
   return {
     loading,
     reload,
-    ...(readiness === undefined ? {} : { readiness }),
-    ...(error === undefined ? {} : { error }),
-    ...(unavailable ? { unavailable: true } : {}),
+    ...(visible.readiness === undefined ? {} : { readiness: visible.readiness }),
+    ...(visible.error === undefined ? {} : { error: visible.error }),
+    ...(visible.unavailable ? { unavailable: true } : {}),
   }
 }
