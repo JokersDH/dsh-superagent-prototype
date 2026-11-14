@@ -3,11 +3,10 @@ import { test } from 'node:test'
 import { execFileSync, spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs'
-import { createBundle, restoreBundle } from '../../../packages/portability/src/index.ts'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { ProductStore } from '@personal-agent/storage'
-import { buildPersonalChain, projectId } from './helpers/personal-chain.ts'
+import { buildPersonalChain, projectId, restoreSnapshotWithA } from './helpers/personal-chain.ts'
 
 import { fileURLToPath } from 'node:url'
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url))
@@ -45,25 +44,17 @@ test('the exact frozen package truly starts, reuses and stops through the single
   const root = mkdtempSync(join(tmpdir(), 'pa-wave24-package-'))
   const install = join(root, 'install')
   const chain = await buildPersonalChain(root)
-  const staging = join(root, 'staging')
-  const restoreViaBundle = async (snapshot: { destination: string }, target: string) => {
-    mkdirSync(staging, { recursive: true, mode: 0o700 })
-    const stage = join(root, `stage-${target.split('/').at(-1)}`)
-    mkdirSync(stage, { recursive: true, mode: 0o700 })
-    copyFileSync(join(snapshot.destination, 'product.sqlite'), join(stage, 'state.sqlite'))
-    execFileSync('chmod', ['600', join(stage, 'state.sqlite')])
-    cpSync(join(snapshot.destination, 'artifacts'), join(stage, 'artifacts'), { recursive: true })
-    const bundle = join(root, `${target.split('/').at(-1)}.pa-backup`)
-    await createBundle({ stateDir: stage, outputPath: bundle, stagingRoot: staging })
-    return restoreBundle({ bundlePath: bundle, targetStateDir: target, stagingRoot: staging })
-  }
-  const restored = join(root, 'restored')
-  await restoreViaBundle(chain.v1, restored)
-  const restoredV2 = join(root, 'restored-v2')
-  await restoreViaBundle(chain.v2, restoredV2)
   const aWorktree = process.env.PA_AGENT_A ?? '/Users/hh/Desktop/joker/superagent-agent-a'
   const aModule = join(aWorktree, 'packages/workflows/src/data-manifest.ts')
   const aHead = execFileSync('git', ['-C', aWorktree, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+  const restored = join(root, 'restored')
+  const restoreV1 = await restoreSnapshotWithA(aWorktree, chain.v1.destination, restored, chain.source)
+  const restoredV2 = join(root, 'restored-v2')
+  const restoreV2 = await restoreSnapshotWithA(aWorktree, chain.v2.destination, restoredV2, chain.source)
+  const targetArgsV1 = ['--target-protocol', restoreV1.protocol, '--target-snapshot-digest', restoreV1.snapshotDigest,
+    '--target-content-digest', restoreV1.contentDigest, '--target-artifacts', writeArtifacts(root, 'artifacts-v1.json', restoreV1.artifacts), '--target-source-root', chain.source]
+  const targetArgsV2 = ['--target-protocol', restoreV2.protocol, '--target-snapshot-digest', restoreV2.snapshotDigest,
+    '--target-content-digest', restoreV2.contentDigest, '--target-artifacts', writeArtifacts(root, 'artifacts-v2.json', restoreV2.artifacts), '--target-source-root', chain.source]
   const expectation = join(root, 'expectation.json')
   writeFileSync(expectation, JSON.stringify({ sourceSha: aHead, snapshotFormat: 1, dataRoot: chain.source,
     ticketId: chain.ticketId, assignmentId: chain.assignmentId, attemptId: chain.attemptId, fenceEpoch: chain.fenceEpoch,
@@ -113,7 +104,7 @@ test('the exact frozen package truly starts, reuses and stops through the single
   assert.equal(paCall(['status', '--json']).status, 'STOPPED')
 
   const driver = new URL('../../context/tools/personal-review-driver.mjs', import.meta.url).pathname
-  const driverCall = (extra: string[], ports: { console: number; api: number }, stateRoot = restored, format = 'v1', manifestExpectation = expectation) => {
+  const driverCall = (extra: string[], ports: { console: number; api: number }, stateRoot = restored, format = 'v1', manifestExpectation = expectation, targetArgs = targetArgsV1) => {
     const stdout = execFileSync(process.execPath, [driver,
       '--dialect', 'package', '--pa-entry', pa, '--install', app, '--state', stateRoot, '--project', projectId,
       '--allow-path', 'src/', '--console-port', String(ports.console), '--api-port', String(ports.api),
@@ -122,6 +113,7 @@ test('the exact frozen package truly starts, reuses and stops through the single
       '--work', chain.workId, '--question', chain.question.id, '--candidate-message', chain.sourceMessageId,
       '--format', format, '--a-worktree', aWorktree, '--a-module', aModule, '--manifest-db', join(chain.source, 'state.sqlite'),
       '--manifest-expectation', manifestExpectation, '--manifest-output', manifestOutput, '--root-map', `${chain.source}=${stateRoot}`,
+      ...targetArgs,
       '--replay-context-token', chain.contextToken, '--replay-confirm-token', chain.confirmToken,
       ...extra], { encoding: 'utf8', timeout: 300000 })
     return JSON.parse(stdout.trim().split('\n').at(-1)!) as Record<string, any>
@@ -157,15 +149,18 @@ test('the exact frozen package truly starts, reuses and stops through the single
   assert.equal(first.data.manifest?.roots.to, realpathSync(restored))
   assert.equal(first.data.work?.id, chain.workId)
   assert.equal(first.data.targetProof?.subjectMatches, true)
-  assert.equal(first.data.targetProof?.fingerprintRelation, 'exact')
-  assert.equal(first.data.targetProof?.artifacts?.total > 0, true)
+  assert.equal(first.data.targetProof?.verification?.basis, 'independent')
+  assert.equal(first.data.targetProof?.verification?.artifactCoverage, 'independent')
+  assert.equal(first.data.targetProof?.verification?.content?.complete, true)
+  assert.deepEqual(first.data.targetProof?.allowed, ['subject.dataRoot'])
+  assert.equal((first.data.targetProof?.verification?.report?.artifacts ?? 0) > 0, true)
   assert.equal(first.cleanup.owned, true)
   assert.equal(first.cleanup.stopped, true)
   assert.equal(first.cleanup.detail, 'pa-stop-verified')
   assert.equal(paCall(['status', '--json']).status, 'STOPPED')
   // The same exact package consumes the second real restore of the explicit v2 snapshot.
   const v2Ports = { console: await availablePort(), api: await availablePort() }
-  const v2 = driverCall([], v2Ports, restoredV2, 'v2', expectationV2)
+  const v2 = driverCall([], v2Ports, restoredV2, 'v2', expectationV2, targetArgsV2)
   assert.equal(v2.status, 'verified-flow', JSON.stringify(v2.failure))
   assert.equal(v2.verified, true)
   assert.equal(v2.identity.bound, true)
@@ -198,7 +193,7 @@ test('the exact frozen package truly starts, reuses and stops through the single
   const driftRoot = join(root, 'restored-drift')
   mkdirSync(driftRoot, { recursive: true, mode: 0o700 })
   cpSync(restored, driftRoot, { recursive: true })
-  writeFileSync(join(driftRoot, 'restore-report.json'), JSON.stringify({ ...JSON.parse(readFileSync(join(driftRoot, 'restore-report.json'), 'utf8')), targetPath: driftRoot }), { mode: 0o600 })
+  writeFileSync(join(driftRoot, 'restore-report.json'), JSON.stringify({ ...JSON.parse(readFileSync(join(driftRoot, 'restore-report.json'), 'utf8')), targetPath: driftRoot, rootMapping: { ...JSON.parse(readFileSync(join(driftRoot, 'restore-report.json'), 'utf8')).rootMapping, to: driftRoot } }), { mode: 0o600 })
   const driftStore = new ProductStore({ path: join(driftRoot, 'state.sqlite') })
   try {
     driftStore.product.messages.append({ id: 'drift-user-message', projectId, conversationId: 'wave22-conversation', role: 'user',
@@ -211,7 +206,7 @@ test('the exact frozen package truly starts, reuses and stops through the single
         '--model-config', chain.model.file,
         '--a-worktree', aWorktree, '--a-module', aModule, '--manifest-db', join(chain.source, 'state.sqlite'),
         '--manifest-expectation', expectation, '--manifest-output', join(root, 'drift-manifest.json'),
-        '--root-map', `${chain.source}=${stateRoot}`], { encoding: 'utf8', timeout: 120000 })
+        '--root-map', `${chain.source}=${stateRoot}`, ...targetArgsV1], { encoding: 'utf8', timeout: 120000 })
       return null
     } catch (error) {
       const stdout = String((error as { stdout?: string }).stdout ?? '').trim().split('\n').at(-1)
@@ -223,11 +218,24 @@ test('the exact frozen package truly starts, reuses and stops through the single
   assert.equal(messageDrift?.status, 'failed')
   assert.equal(messageDrift?.failure?.code, 'target_subject_mismatch', JSON.stringify(messageDrift?.failure))
 
+  // 1b) a real business event appended to the target is not an operational startup transform.
+  const eventRoot = join(root, 'restored-event-drift')
+  mkdirSync(eventRoot, { recursive: true, mode: 0o700 })
+  cpSync(restored, eventRoot, { recursive: true })
+  writeFileSync(join(eventRoot, 'restore-report.json'), JSON.stringify({ ...JSON.parse(readFileSync(join(eventRoot, 'restore-report.json'), 'utf8')), targetPath: eventRoot, rootMapping: { ...JSON.parse(readFileSync(join(eventRoot, 'restore-report.json'), 'utf8')).rootMapping, to: eventRoot } }), { mode: 0o600 })
+  const eventStore = new ProductStore({ path: join(eventRoot, 'state.sqlite') })
+  try {
+    eventStore.events.append({ topic: 'work.accepted', entityRef: chain.workId, payload: { workId: chain.workId, accepted: true } })
+  } finally { eventStore.close() }
+  const eventDrift = await driftDriver(eventRoot)
+  assert.equal(eventDrift?.status, 'failed', JSON.stringify(eventDrift?.failure))
+  assert.equal(eventDrift?.failure?.code, 'target_subject_mismatch')
+
   // 2) same metadata but replaced artifact bytes
   const artifactRoot = join(root, 'restored-artifact-drift')
   mkdirSync(artifactRoot, { recursive: true, mode: 0o700 })
   cpSync(restored, artifactRoot, { recursive: true })
-  writeFileSync(join(artifactRoot, 'restore-report.json'), JSON.stringify({ ...JSON.parse(readFileSync(join(artifactRoot, 'restore-report.json'), 'utf8')), targetPath: artifactRoot }), { mode: 0o600 })
+  writeFileSync(join(artifactRoot, 'restore-report.json'), JSON.stringify({ ...JSON.parse(readFileSync(join(artifactRoot, 'restore-report.json'), 'utf8')), targetPath: artifactRoot, rootMapping: { ...JSON.parse(readFileSync(join(artifactRoot, 'restore-report.json'), 'utf8')).rootMapping, to: artifactRoot } }), { mode: 0o600 })
   const artifactFile = join(artifactRoot, 'artifacts', chain.frozenDigest)
   const artifactBytes = readFileSync(artifactFile)
   artifactBytes[0] = artifactBytes[0]! ^ 0xff
@@ -294,3 +302,9 @@ test('the exact frozen package truly starts, reuses and stops through the single
   assert.equal(paCall(['status', '--json']).status, 'STOPPED')
   assert.equal(chain.model.requests.length, chain.modelCalls)
 })
+
+function writeArtifacts(root: string, name: string, artifacts: unknown) {
+  const path = join(root, name)
+  writeFileSync(path, JSON.stringify(artifacts), { mode: 0o600 })
+  return path
+}

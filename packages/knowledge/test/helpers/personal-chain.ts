@@ -1,4 +1,6 @@
 import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { pathToFileURL } from 'node:url'
 import { copyFileSync, cpSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ProductStore } from '@personal-agent/storage'
@@ -173,4 +175,25 @@ export function restoreSnapshot(snapshot: { destination: string; manifest: { dat
   cpSync(join(snapshot.destination, 'artifacts'), join(target, 'artifacts'), { recursive: true })
   writeFileSync(join(target, 'restore-report.json'), JSON.stringify({ protocol: 'personal-restore/1', targetPath: target,
     database: { ...snapshot.manifest.database }, evidence: { status: 'verified' } }), { mode: 0o600 })
+}
+
+
+/**
+ * Restore a workflow snapshot with A's official restore path. Independent expectations are derived
+ * before the restore: snapshot digest, source content digest and the manifest artifact inventory.
+ */
+export async function restoreSnapshotWithA(aWorktree: string, snapshotDirectory: string, target: string, sourceRoot: string) {
+  const restoreModule = await import(pathToFileURL(`${aWorktree}/packages/workflows/src/restore.ts`).href)
+  const storageModule = await import(pathToFileURL(`${aWorktree}/packages/storage/dist/index.js`).href)
+  const manifestPath = join(snapshotDirectory, 'snapshot.json')
+  const manifest = JSON.parse((await import('node:fs')).readFileSync(manifestPath, 'utf8'))
+  const snapshotDigest = createHash('sha256').update((await import('node:fs')).readFileSync(manifestPath)).digest('hex')
+  const content = storageModule.readWorkflowContent(join(sourceRoot, 'state.sqlite'))
+  if (content.complete !== true || typeof content.digest !== 'string') throw new Error('source content proof is incomplete')
+  const artifacts = manifest.artifacts.map(({ id, digest, bytes }: { id: string; digest: string; bytes: number }) => ({ id, digest, bytes }))
+  const result = await restoreModule.restoreWorkflowSnapshot({ snapshotDirectory, targetStateDir: target, sourceStateRoot: sourceRoot,
+    expected: { protocol: manifest.protocol, snapshotDigest, contentDigest: content.digest, artifacts } })
+  if (result.status !== 'ok') throw new Error(`A restore failed: ${result.message ?? JSON.stringify(result)}`)
+  return { protocol: manifest.protocol as 'workflow-snapshot/1' | 'workflow-snapshot/2', snapshotDigest,
+    contentDigest: content.digest as string, artifacts, report: result.report, reportPath: result.reportPath }
 }
