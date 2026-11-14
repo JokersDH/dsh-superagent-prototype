@@ -49,6 +49,7 @@ import {
   ContextHistoryQuerySchema,
   ContextHistorySchema,
   ContextSourcesSchema,
+  TrialReadinessSchema,
 } from '@personal-agent/contracts'
 import type {
   AgentProfile,
@@ -97,6 +98,7 @@ import type {
   ContextHistoryQuery,
   ContextHistory,
   ContextSources,
+  TrialReadiness,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -165,6 +167,7 @@ export interface ConsoleTransport {
   assistantContext?(messageId: string): Promise<AssistantContextBinding | undefined>
   contextHistory?(query: ContextHistoryQuery): Promise<ContextHistory>
   contextSources?(messageId: string, options?: { scopeReview: true }): Promise<ContextSources | undefined>
+  readiness?(): Promise<TrialReadiness | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -519,6 +522,15 @@ export class HttpTransport implements ConsoleTransport {
       const value = ContextSourcesSchema.parse(body)
       if (value.binding.messageId !== messageId) throw new TransportError('schema_mismatch', '来源正文属于另一条消息')
       return value
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async readiness(): Promise<TrialReadiness | undefined> {
+    try {
+      const value = await this.request('/v1/readiness', { signal: AbortSignal.timeout(10000) }, 'json404')
+      return value === missingOptionalResource ? undefined : TrialReadinessSchema.parse(value)
     } catch (error) {
       if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
       throw error

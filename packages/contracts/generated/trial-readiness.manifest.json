@@ -1,0 +1,7 @@
+{
+  "protocol": "trial-readiness/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "a7caed86a8522f453be2fbc9e353086981abcf4e9cfe8e2547503c22bc7ddff0",
+  "sourceHash": "42b80d275d7bb88edcb8bf2cc21b7054153811d7d05e0295bacca6f2bcc9d589"
+}

@@ -1,0 +1,85 @@
+{
+  "protocol": "wave25-main-readiness-and-eight-agent-inputs/1",
+  "dispatchVerification": {
+    "status": "PASS_EIGHT_AGENT_DISPATCH_STATIC_ONLY",
+    "externalAgents": 8,
+    "ownersIncludingMain": 9,
+    "phases": 144,
+    "milestonesPerOwner": 4,
+    "dependencyNodes": 48,
+    "localLinks": 175,
+    "acyclic": true,
+    "explicitTrialOwnershipExclusionsVerified": true,
+    "confersRuntimeOrReleaseAdmission": false
+  },
+  "date": "2026-11-14",
+  "source": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+  "implemented": [
+    "Authenticated configuration-only readiness HTTP route and bounded shared schema",
+    "Reused recovery-readonly configuration projection, no probes or commands",
+    "Typed optional console transport and four navigation-only callback types",
+    "F/G/H isolated Git worktrees and fixed branches prepared"
+  ],
+  "notImplemented": [
+    "F trial UI component and main App composition",
+    "G usage insights package and report/summary consumers",
+    "H trial preflight/diagnostic/operational harness",
+    "A manifest directly consumed by single C package driver",
+    "Admitted B rebind/dual-client/coordinator recovery",
+    "D live cleanup full per-signal admission",
+    "Private startup permit and target activation",
+    "E final exact current main or F/G/H artifact admission"
+  ],
+  "checks": {
+    "newContractCases": 2,
+    "newTransportCases": 2,
+    "newReadinessHttpCases": 6,
+    "cleanCombinedCases": 28,
+    "contractsPackageCases": 232,
+    "productStrict": "PASS",
+    "httpStrict": "PASS",
+    "consoleStrict": "PASS",
+    "generated": "PASS",
+    "actualNodeHttpWithProductionStore": "PASS",
+    "readTriggeredModelCalls": 0,
+    "eventDelta": 0,
+    "independentNarrowCases": 3,
+    "independentNarrowReview": "NO_SUBSTANTIVE_FINDINGS",
+    "command": "node --test tests/integration/application-http.case.mjs tests/integration/recovery-startup.case.mjs tests/integration/trial-readiness.case.mjs packages/contracts/test/trial-readiness.case.ts apps/console/test/trial-readiness-transport.case.ts",
+    "sourceCodeCommittedAtCleanCombination": true
+  },
+  "readinessAuthorization": "none",
+  "configurationOnly": true,
+  "newUiImplemented": false,
+  "productSchema": 18,
+  "migrationsAdded": 0,
+  "wireHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "userServicesRestarted": false,
+  "preservedServicePairs": 12,
+  "newPersonalPreviewStarted": false,
+  "newAgentWorktrees": [
+    {
+      "role": "F",
+      "path": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb"
+    },
+    {
+      "role": "G",
+      "path": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb"
+    },
+    {
+      "role": "H",
+      "path": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb"
+    }
+  ],
+  "frozenTarCreated": false,
+  "independentInstalledAdmission": false,
+  "releaseApproved": false
+}
