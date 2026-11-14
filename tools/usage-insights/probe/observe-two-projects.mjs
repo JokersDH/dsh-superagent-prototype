@@ -152,7 +152,9 @@ async function main() {
   const attention = new ProductAttention(h.store, h.app, completion, {
     projectIds: () => projects,
     verification: work => ({ protocol: 'work-verification/1', workId: work.work.id, state: 'not_ready', retryAvailable: false }),
-    now: () => FIXTURE_NOW,
+    // The snapshot must be observed at capture time; a page older than the freshness window is
+    // reported as stale rather than as the current inbox.
+    now: () => CAPTURED_AT,
   })
   const history = new ProductEvidenceHistory(h.store, h.app, () => projects, Buffer.alloc(32, 7), () => FIXTURE_NOW)
 
@@ -223,6 +225,9 @@ async function main() {
   assert.ok(bundle.workEvidence.length >= 2, 'both works must be collected through HTTP')
   assert.ok(bundle.attentionPages.length >= 1, 'the attention snapshot must be collected through HTTP')
   assert.equal(bundle.declaredCoverage.workEvidence, 'complete')
+  assert.ok(Array.isArray(bundle.workIndex) && bundle.workIndex.length === 2,
+    'every collected work carries its project identity from the product')
+  assert.deepEqual(bundle.workIndex.map(entry => entry.projectId).sort(), [...PROJECT_IDS].sort())
 
   // Replaying the same window and capture time must produce identical bytes: no new counts.
   const first = readFileSyncUtf8(bundlePath)
@@ -256,6 +261,9 @@ async function main() {
   assert.equal(metric('interventions.questions').value, 2, 'both opened questions were counted once')
   assert.equal(metric('interventions.total').value, 2)
   assert.equal(summary.attention.items, 2)
+  assert.equal(summary.attention.stale, false, 'the snapshot was observed at capture time')
+  assert.equal(summary.losses.workEvidence.unmapped, 0)
+  assert.equal(summary.losses.workEvidence.outOfScope, 0)
   assert.ok(summary.attention.waitingAgeMs > 0)
   assert.equal(summary.limits.stoppedBy, 'none')
   assert.equal(h.store.events.cursor(), cursorBefore, 'read-only collection and analysis must not create product events')

@@ -50,6 +50,7 @@ export const NULL_REASONS = [
   'conflicted',
   'layer_missing',
   'insufficient_data',
+  'unmapped_work',
 ] as const
 export const NullReasonSchema = z.enum(NULL_REASONS)
 export type NullReason = z.infer<typeof NullReasonSchema>
@@ -188,10 +189,16 @@ export const AppliedLimitsSchema = z.strictObject({
   maxPages: z.number().int().min(1),
   recordsSeen: count,
   recordsAccepted: count,
+  recordsNotParsed: count,
   worksSeen: count,
+  worksNotProcessed: count,
   pagesSeen: count,
+  pagesNotParsed: count,
   bytesSeen: count,
-  stoppedBy: z.enum(['records', 'works', 'pages', 'bytes', 'deadline', 'none']),
+  bytesLimit: z.number().int().min(1).nullable(),
+  limitsAppliedBeforeParsing: z.literal(true),
+  /** `source` means the collector already bounded the source; the other values are this analysis. */
+  stoppedBy: z.enum(['records', 'works', 'pages', 'bytes', 'deadline', 'source', 'none']),
 })
 export type AppliedLimits = z.infer<typeof AppliedLimitsSchema>
 
@@ -221,6 +228,34 @@ export type DeclaredCoverage = z.infer<typeof DeclaredCoverageSchema>
 
 export const ProjectScopeSchema = z.strictObject({ projectId: IdSchema })
 export type ProjectScope = z.infer<typeof ProjectScopeSchema>
+
+/**
+ * Verifiable work-to-project mapping produced by the collector from the product's own work records.
+ * A work that appears in `WorkEvidence` without an entry here (and without its own outcome) is
+ * unmapped: it is isolated instead of being attributed by guesswork.
+ */
+export const WorkIndexEntrySchema = z.strictObject({ workId: IdSchema, projectId: IdSchema })
+export type WorkIndexEntry = z.infer<typeof WorkIndexEntrySchema>
+
+/** Per-source record accounting. `seen` is what the input presented; everything else explains it. */
+export const SourceLossSchema = z.strictObject({
+  seen: count,
+  accepted: count,
+  notParsed: count,
+  invalid: count,
+  conflicted: count,
+  outOfScope: count,
+  outsideWindow: count,
+  unmapped: count,
+})
+export type SourceLoss = z.infer<typeof SourceLossSchema>
+
+export const SourceLossesSchema = z.strictObject({
+  outcomes: SourceLossSchema,
+  workEvidence: SourceLossSchema,
+  attention: SourceLossSchema,
+})
+export type SourceLosses = z.infer<typeof SourceLossesSchema>
 
 /** Explicit queued/dispatched pair. Only a producer that records both endpoints may supply it. */
 export const QueueFactSchema = z.strictObject({
@@ -282,6 +317,8 @@ export const UsageInsightsInputSchema = z.strictObject({
   source: SourceDeclarationSchema,
   declaredCoverage: DeclaredCoverageSchema,
   limits: InsightLimitsSchema.optional(),
+  /** Collector-provided work→project mapping; the only accepted non-outcome project source. */
+  workIndex: z.array(WorkIndexEntrySchema).max(50_000).readonly().optional(),
   outcomes: z.array(z.unknown()).max(50_000).readonly(),
   attentionPages: z.array(z.unknown()).max(1_024).readonly(),
   workEvidence: z.array(z.unknown()).max(50_000).readonly(),
@@ -323,6 +360,8 @@ export const AttentionSummarySchema = z.strictObject({
   waitingAgeMs: finite.nullable(),
   hasMore: z.boolean(),
   questionCoverage: z.enum(['complete', 'bounded']).nullable(),
+  /** True when the snapshot is older than the freshness window relative to the capture time. */
+  stale: z.boolean(),
   coverage: MetricCoverageSchema,
   projectCounts: z.array(z.strictObject({ projectId: IdSchema, items: count })).max(32).readonly(),
   byKind: z.array(z.strictObject({ kind: z.enum(['question', 'candidate', 'blocked']), items: count })).max(3).readonly(),
@@ -383,6 +422,7 @@ export const UsageInsightsSummarySchema = z.strictObject({
   usageCompleteness: UsageCompletenessSchema,
   coverage: CoverageBlockSchema,
   limits: AppliedLimitsSchema,
+  losses: SourceLossesSchema,
   quarantine: QuarantineDigestSchema,
   configuration: z.strictObject({
     observed: z.boolean(),

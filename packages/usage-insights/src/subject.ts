@@ -1,22 +1,25 @@
 /**
- * Identity, de-duplication and quarantine for the observation inputs.
+ * Identity, de-duplication, scope and quarantine for the observation inputs.
  *
- * A record is joined to a subject only through the exact contract/attempt/profile identities the
- * product already records. Similar titles, close timestamps or matching text are never used to
- * build a join, and a repeated fact is counted once even when it arrives from several pages or
- * files.
+ * Every record class — outcomes, work evidence, work history and attention — is constrained the same
+ * way: by the declared project set, by the requested observation window, and by an exact identity the
+ * product already records. Nothing is joined by similar titles, close timestamps or matching text.
+ *
+ * A work whose project cannot be resolved from the collector's work index or from its own outcome is
+ * *unmapped*. It is isolated and counted as unknown, never as "one observed problem" and never as a
+ * proven zero.
  */
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
 import {
   AttentionPageSchema,
+  ExecutionOutcomeSchema,
   WorkEvidenceHistorySchema,
   WorkEvidenceSchema,
   type ExecutionOutcome,
   type Json,
   type Timestamp,
 } from '@personal-agent/contracts'
-import { ExecutionOutcomeSchema } from '@personal-agent/contracts'
-import type { QuarantineEntry, QuarantineCode } from './protocol.ts'
+import type { QuarantineEntry, QuarantineCode, SourceLoss } from './protocol.ts'
 
 export interface SubjectIdentity {
   subjectKey: string
@@ -64,23 +67,34 @@ export function outcomeSubject(outcome: ExecutionOutcome): SubjectIdentity {
   }
 }
 
+export const emptyLoss = (): SourceLoss => ({
+  seen: 0, accepted: 0, notParsed: 0, invalid: 0, conflicted: 0, outOfScope: 0, outsideWindow: 0, unmapped: 0,
+})
+
+export const lossTotal = (loss: SourceLoss): number =>
+  loss.invalid + loss.conflicted + loss.notParsed + loss.unmapped
+
 export interface DedupeResult<T> {
   records: T[]
   replayed: number
   quarantined: QuarantineEntry[]
   invalid: QuarantineEntry[]
+  loss: SourceLoss
 }
 
 interface LedgerEntry<T> {
   record: T
   digest: string
-  ref: string
+}
+
+function invalidEntry(recordClass: QuarantineEntry['recordClass'], ref: string, reason: string): QuarantineEntry {
+  return { code: 'invalid_record', recordClass, ref, reason }
 }
 
 /**
- * Keep only unambiguous identities. A repeat with identical content was already counted once; a
- * repeat whose body differs removes *every* occurrence of that identity, because the module has no
- * authority to decide which version is the real fact.
+ * Keep only unambiguous identities. A repeat with identical content counts once; a repeat whose body
+ * differs removes *every* occurrence, because the module has no authority to decide which version is
+ * the real fact.
  */
 function settle<T>(entries: Map<string, LedgerEntry<T>>, conflicted: Set<string>, refOf: (record: T) => string,
   recordClass: QuarantineEntry['recordClass']): { records: T[]; quarantined: QuarantineEntry[] } {
@@ -94,31 +108,31 @@ function settle<T>(entries: Map<string, LedgerEntry<T>>, conflicted: Set<string>
   return { records, quarantined }
 }
 
-function invalidEntry(recordClass: QuarantineEntry['recordClass'], ref: string, reason: string): QuarantineEntry {
-  return { code: 'invalid_record', recordClass, ref, reason }
-}
-
 /** Parse outcomes individually so one malformed row cannot void the whole observation. */
 export function parseOutcomes(items: readonly unknown[]): DedupeResult<ExecutionOutcome> {
   const entries = new Map<string, LedgerEntry<ExecutionOutcome>>()
   const conflicted = new Set<string>()
   const invalid: QuarantineEntry[] = []
+  const loss = { ...emptyLoss(), seen: items.length }
   let replayed = 0
   for (const [index, item] of items.entries()) {
     const parsed = ExecutionOutcomeSchema.safeParse(item)
     if (!parsed.success) {
+      loss.invalid++
       invalid.push(invalidEntry('outcome', `outcomes[${index}]`, firstIssue(parsed.error)))
       continue
     }
     const record = parsed.data
     const digest = subjectDigest(record as unknown as Json)
     const existing = entries.get(record.id)
-    if (!existing) entries.set(record.id, { record, digest, ref: record.id })
+    if (!existing) entries.set(record.id, { record, digest })
     else if (existing.digest === digest) replayed++
     else conflicted.add(record.id)
   }
   const settled = settle(entries, conflicted, record => record.id, 'outcome')
-  return { records: settled.records, replayed, quarantined: [...invalid, ...settled.quarantined], invalid }
+  loss.conflicted = conflicted.size
+  loss.accepted = settled.records.length
+  return { records: settled.records, replayed, quarantined: [...invalid, ...settled.quarantined], invalid, loss }
 }
 
 export interface WorkEntry {
@@ -129,58 +143,85 @@ export interface WorkEntry {
   detail: unknown
 }
 
+export type WorkMapping = 'index' | 'outcome' | 'unmapped' | 'conflict'
+
 export interface WorkRecord {
   workId: string
+  /** Resolved only from the collector's work index or from the work's own outcome. */
+  projectId: string | null
+  mapping: WorkMapping
+  /** De-duplicated, unambiguous entries that fall inside the requested window. */
   entries: WorkEntry[]
-  coverage: 'complete' | 'caller_limit' | 'storage_cap' | 'source_missing' | 'unsupported'
-  outcomes: ExecutionOutcome[]
+  entriesOutsideWindow: number
+  coverage: IngestWorkCoverage
   sourceRef: string
 }
+
+export type IngestWorkCoverage = 'complete' | 'caller_limit' | 'storage_cap' | 'source_missing' | 'unsupported'
 
 export interface ParsedWorkEvidence {
   works: WorkRecord[]
   outcomes: ExecutionOutcome[]
   quarantined: QuarantineEntry[]
   invalid: QuarantineEntry[]
+  loss: SourceLoss
+  /** Works presented but excluded by project or mapping; they stay unknown, never zero. */
+  unattributableWorks: number
 }
 
-const severity: Record<WorkRecord['coverage'], number> = {
-  complete: 0,
-  caller_limit: 1,
-  storage_cap: 2,
-  source_missing: 3,
-  unsupported: 4,
+const severity: Record<IngestWorkCoverage, number> = {
+  complete: 0, caller_limit: 1, storage_cap: 2, source_missing: 3, unsupported: 4,
 }
 
-const worst = (a: WorkRecord['coverage'], b: WorkRecord['coverage']) => (severity[b] > severity[a] ? b : a)
+const worst = (a: IngestWorkCoverage, b: IngestWorkCoverage) => (severity[b] > severity[a] ? b : a)
 
-function coverageOfEvidence(projection: string): WorkRecord['coverage'] {
+function coverageOfEvidence(projection: string): IngestWorkCoverage {
   if (projection === 'source_missing') return 'source_missing'
   return 'complete'
 }
 
+export interface WorkScopeOptions {
+  projectIds: ReadonlySet<string>
+  workIndex: ReadonlyMap<string, string>
+  window: { from: Timestamp; to: Timestamp }
+}
+
+interface WorkSeed {
+  workId: string
+  coverage: IngestWorkCoverage
+  sourceRef: string
+  outcomeProjects: Set<string>
+}
+
 /**
- * Parse `WorkEvidence` and `WorkEvidenceHistory` bodies. Entries are de-duplicated on
- * (workId, kind, sourceRef); the same fact reached through two files therefore counts once, while a
- * changed body for one identity is quarantined.
+ * Parse `WorkEvidence` and `WorkEvidenceHistory` bodies under the declared scope.
+ *
+ * Entries de-duplicate on (workId, kind, sourceRef) and are then filtered by `entry.at` against the
+ * requested window: a question answered before the window is a reference, not a counted interaction.
  */
-export function parseWorkRecords(evidenceItems: readonly unknown[], historyItems: readonly unknown[]): ParsedWorkEvidence {
+export function parseWorkRecords(evidenceItems: readonly unknown[], historyItems: readonly unknown[],
+  options: WorkScopeOptions): ParsedWorkEvidence {
   const entries = new Map<string, LedgerEntry<WorkEntry>>()
   const conflicted = new Set<string>()
   const invalid: QuarantineEntry[] = []
-  const works = new Map<string, { entries: Set<string>; coverage: WorkRecord['coverage']; sourceRef: string }>()
-  const outcomes: ExecutionOutcome[] = []
   const quarantined: QuarantineEntry[] = []
+  const seeds = new Map<string, WorkSeed>()
+  const outcomes: ExecutionOutcome[] = []
+  const loss = { ...emptyLoss(), seen: evidenceItems.length + historyItems.length }
+  let unattributableWorks = 0
+
+  const entryKey = (workId: string, kind: string, sourceRef: string) => `${workId}\u0000${kind}\u0000${sourceRef}`
 
   const addEntry = (workId: string, entry: WorkEntry, recordClass: QuarantineEntry['recordClass']) => {
-    const key = `${workId}\u0000${entry.kind}\u0000${entry.sourceRef}`
+    const key = entryKey(workId, entry.kind, entry.sourceRef)
     const digest = subjectDigest({ at: entry.at, kind: entry.kind, sourceRef: entry.sourceRef, detail: entry.detail } as Json)
     const existing = entries.get(key)
     if (!existing) {
-      entries.set(key, { record: entry, digest, ref: key })
+      entries.set(key, { record: entry, digest })
       return
     }
     if (existing.digest === digest) return
+    if (conflicted.has(key)) return
     conflicted.add(key)
     quarantined.push({
       code: 'identity_conflict', recordClass, ref: `${entry.kind}:${entry.sourceRef}`,
@@ -188,56 +229,130 @@ export function parseWorkRecords(evidenceItems: readonly unknown[], historyItems
     })
   }
 
-  const noteWork = (workId: string, coverage: WorkRecord['coverage'], sourceRef: string, entryKeys: string[]) => {
-    const existing = works.get(workId)
-    if (!existing) works.set(workId, { entries: new Set(entryKeys), coverage, sourceRef })
-    else {
-      existing.coverage = worst(existing.coverage, coverage)
-      for (const key of entryKeys) existing.entries.add(key)
+  const noteWork = (workId: string, coverage: IngestWorkCoverage, sourceRef: string, outcomeProjectIds: readonly string[]) => {
+    const existing = seeds.get(workId)
+    if (!existing) {
+      seeds.set(workId, { workId, coverage, sourceRef, outcomeProjects: new Set(outcomeProjectIds) })
+      return
     }
+    existing.coverage = worst(existing.coverage, coverage)
+    for (const projectId of outcomeProjectIds) existing.outcomeProjects.add(projectId)
   }
 
   for (const [index, item] of evidenceItems.entries()) {
     const parsed = WorkEvidenceSchema.safeParse(item)
-    if (!parsed.success) { invalid.push(invalidEntry('work_evidence', `workEvidence[${index}]`, firstIssue(parsed.error))); continue }
+    if (!parsed.success) {
+      loss.invalid++
+      invalid.push(invalidEntry('work_evidence', `workEvidence[${index}]`, firstIssue(parsed.error)))
+      continue
+    }
     const record = parsed.data
     const coverage = worst(coverageOfEvidence(record.projection), record.truncated ? 'storage_cap' : 'complete')
-    const keys: string[] = []
-    for (const entry of record.entries) {
+    for (const entry of record.entries)
       addEntry(record.workId, { workId: record.workId, at: entry.at, kind: entry.kind, sourceRef: entry.sourceRef, detail: entry.detail }, 'work_evidence')
-      keys.push(`${record.workId}\u0000${entry.kind}\u0000${entry.sourceRef}`)
-    }
-    noteWork(record.workId, coverage, `work-evidence:${record.workId}`, keys)
+    noteWork(record.workId, coverage, `work-evidence:${record.workId}`, record.outcomes.map(outcome => outcome.projectId))
     outcomes.push(...record.outcomes)
   }
 
   for (const [index, item] of historyItems.entries()) {
     const parsed = WorkEvidenceHistorySchema.safeParse(item)
-    if (!parsed.success) { invalid.push(invalidEntry('work_history', `workHistories[${index}]`, firstIssue(parsed.error))); continue }
-    const record = parsed.data
-    const coverage = record.window === 'caller_limit' ? 'caller_limit' : record.window === 'storage_cap' ? 'storage_cap' : 'complete'
-    const keys: string[] = []
-    for (const entry of record.entries) {
-      addEntry(record.workId, { workId: record.workId, at: entry.at, kind: entry.kind, sourceRef: entry.sourceRef, detail: entry.detail }, 'work_history')
-      keys.push(`${record.workId}\u0000${entry.kind}\u0000${entry.sourceRef}`)
+    if (!parsed.success) {
+      loss.invalid++
+      invalid.push(invalidEntry('work_history', `workHistories[${index}]`, firstIssue(parsed.error)))
+      continue
     }
-    noteWork(record.workId, coverage, `work-history:${record.workId}`, keys)
+    const record = parsed.data
+    const coverage: IngestWorkCoverage =
+      record.window === 'caller_limit' ? 'caller_limit' : record.window === 'storage_cap' ? 'storage_cap' : 'complete'
+    for (const entry of record.entries)
+      addEntry(record.workId, { workId: record.workId, at: entry.at, kind: entry.kind, sourceRef: entry.sourceRef, detail: entry.detail }, 'work_history')
+    noteWork(record.workId, coverage, `work-history:${record.workId}`, [])
   }
 
-  const acceptedEntries = [...entries.values()]
-    .filter(entry => !conflicted.has(`${entry.record.workId}\u0000${entry.record.kind}\u0000${entry.record.sourceRef}`))
-    .map(entry => entry.record)
-  const results: WorkRecord[] = []
-  for (const [workId, value] of works) {
-    results.push({
-      workId,
-      entries: acceptedEntries.filter(entry => entry.workId === workId),
-      coverage: value.coverage,
-      outcomes: [],
-      sourceRef: value.sourceRef,
+  const works: WorkRecord[] = []
+  for (const seed of [...seeds.values()].sort((a, b) => a.workId.localeCompare(b.workId))) {
+    const indexed = options.workIndex.get(seed.workId)
+    const outcomeProjects = [...seed.outcomeProjects]
+    let projectId: string | null = null
+    let mapping: WorkMapping = 'unmapped'
+
+    if (indexed !== undefined) {
+      // The collector's index and the work's own outcome must agree; a disagreement is not narrowed
+      // by preference, because either side could be the stale one.
+      if (outcomeProjects.some(project => project !== indexed)) {
+        mapping = 'conflict'
+        quarantined.push({
+          code: 'subject_mismatch', recordClass: 'work_evidence', ref: seed.workId,
+          reason: 'The work index and the work outcome name different projects; the work is excluded',
+        })
+        loss.conflicted++
+        unattributableWorks++
+        works.push({ workId: seed.workId, projectId: null, mapping, entries: [], entriesOutsideWindow: 0, coverage: seed.coverage, sourceRef: seed.sourceRef })
+        continue
+      }
+      projectId = indexed
+      mapping = 'index'
+    } else if (outcomeProjects.length === 1) {
+      projectId = outcomeProjects[0]!
+      mapping = 'outcome'
+    } else if (outcomeProjects.length > 1) {
+      mapping = 'conflict'
+      quarantined.push({
+        code: 'subject_mismatch', recordClass: 'work_evidence', ref: seed.workId,
+        reason: 'The work carries outcomes from more than one project; the work is excluded',
+      })
+      loss.conflicted++
+      unattributableWorks++
+      works.push({ workId: seed.workId, projectId: null, mapping, entries: [], entriesOutsideWindow: 0, coverage: seed.coverage, sourceRef: seed.sourceRef })
+      continue
+    }
+
+    if (projectId !== null && !options.projectIds.has(projectId)) {
+      quarantined.push({
+        code: 'out_of_scope_project', recordClass: 'work_evidence', ref: seed.workId,
+        reason: 'The work belongs to a project outside the declared scope; isolated rather than counted',
+      })
+      loss.outOfScope++
+      unattributableWorks++
+      works.push({ workId: seed.workId, projectId, mapping, entries: [], entriesOutsideWindow: 0, coverage: seed.coverage, sourceRef: seed.sourceRef })
+      continue
+    }
+    if (projectId === null) {
+      quarantined.push({
+        code: 'project_unknown', recordClass: 'work_evidence', ref: seed.workId,
+        reason: 'No verifiable project mapping exists for this work; it cannot be attributed or counted',
+      })
+      loss.unmapped++
+      unattributableWorks++
+      works.push({ workId: seed.workId, projectId: null, mapping, entries: [], entriesOutsideWindow: 0, coverage: seed.coverage, sourceRef: seed.sourceRef })
+      continue
+    }
+
+    const from = Date.parse(options.window.from)
+    const to = Date.parse(options.window.to)
+    const inWindow: WorkEntry[] = []
+    let outside = 0
+    for (const entry of entries.values()) {
+      if (conflicted.has(entryKey(entry.record.workId, entry.record.kind, entry.record.sourceRef))) continue
+      if (entry.record.workId !== seed.workId) continue
+      const at = Date.parse(entry.record.at)
+      if (at >= from && at < to) inWindow.push(entry.record)
+      else outside++
+    }
+    loss.outsideWindow += outside
+    works.push({
+      workId: seed.workId,
+      projectId,
+      mapping,
+      entries: inWindow.sort((a, b) => a.at.localeCompare(b.at) || a.kind.localeCompare(b.kind) || a.sourceRef.localeCompare(b.sourceRef)),
+      entriesOutsideWindow: outside,
+      coverage: seed.coverage,
+      sourceRef: seed.sourceRef,
     })
   }
-  return { works: results, outcomes, quarantined: [...quarantined, ...invalid], invalid }
+
+  loss.accepted = works.filter(work => work.projectId !== null && work.mapping !== 'conflict').length
+  return { works, outcomes, quarantined: [...quarantined, ...invalid], invalid, loss, unattributableWorks }
 }
 
 export interface AttentionItemRecord {
@@ -256,33 +371,69 @@ export interface ParsedAttention {
   hasMore: boolean
   questionCoverage: 'complete' | 'bounded' | null
   coverage: 'complete' | 'caller_limit' | 'source_missing' | 'unsupported'
+  stale: boolean
   quarantined: QuarantineEntry[]
   invalid: QuarantineEntry[]
+  loss: SourceLoss
 }
 
-/** Attention is a current snapshot, so overlapping pages merge by item id instead of accumulating. */
-export function parseAttentionPages(items: readonly unknown[]): ParsedAttention {
+/** A snapshot older than this relative to the capture time cannot claim to be the current inbox. */
+export const ATTENTION_FRESH_MS = 3_600_000
+
+/**
+ * Attention is a *current snapshot*. Items are kept only for declared projects, pages observed after
+ * the capture time are refused, and a stale page can never report `complete` coverage.
+ */
+export function parseAttentionPages(items: readonly unknown[], options: {
+  projectIds: ReadonlySet<string>
+  capturedAt: string
+}): ParsedAttention {
   const records = new Map<string, AttentionItemRecord>()
   const conflicted = new Set<string>()
   const invalid: QuarantineEntry[] = []
   const quarantined: QuarantineEntry[] = []
+  const loss = { ...emptyLoss(), seen: items.length }
   let observedAt: string | null = null
   let hasMore = false
   let questionCoverage: 'complete' | 'bounded' | null = null
-  // Zero pages is an *unobserved* page set, not a missing source; the declared coverage decides
-  // whether it was a complete empty window or simply not collected.
   let coverage: ParsedAttention['coverage'] = 'complete'
+  let stale = false
+  const captured = Date.parse(options.capturedAt)
 
   for (const [index, item] of items.entries()) {
     const parsed = AttentionPageSchema.safeParse(item)
-    if (!parsed.success) { invalid.push(invalidEntry('attention_page', `attentionPages[${index}]`, firstIssue(parsed.error))); continue }
+    if (!parsed.success) {
+      loss.invalid++
+      invalid.push(invalidEntry('attention_page', `attentionPages[${index}]`, firstIssue(parsed.error)))
+      continue
+    }
     const page = parsed.data
-    observedAt = observedAt === null || Date.parse(page.observedAt) > Date.parse(observedAt) ? page.observedAt : observedAt
+    const observed = Date.parse(page.observedAt)
+    if (!Number.isFinite(observed) || observed > captured) {
+      // A snapshot from the future cannot describe this observation.
+      loss.invalid++
+      invalid.push({
+        code: 'time_inconsistent', recordClass: 'attention_page', ref: `attentionPages[${index}]`,
+        reason: 'The snapshot was observed after the capture time; it is excluded',
+      })
+      continue
+    }
+    if (captured - observed > ATTENTION_FRESH_MS) stale = true
+    observedAt = observedAt === null || observed > Date.parse(observedAt) ? page.observedAt : observedAt
     hasMore = hasMore || page.hasMore
     questionCoverage = questionCoverage === 'bounded' || page.questionCoverage === 'bounded' ? 'bounded' : 'complete'
-    if (page.hasMore) coverage = coverage === 'complete' ? 'caller_limit' : coverage
+    if (page.hasMore) coverage = 'caller_limit'
+
     const ranks = new Map(page.ranks.map(rank => [rank.id, rank.reasons]))
     for (const entry of page.items) {
+      if (!options.projectIds.has(entry.projectId)) {
+        loss.outOfScope++
+        quarantined.push({
+          code: 'out_of_scope_project', recordClass: 'attention_page', ref: entry.id,
+          reason: 'The pending item belongs to a project outside the declared scope; excluded from the current total',
+        })
+        continue
+      }
       const record: AttentionItemRecord = {
         id: entry.id,
         kind: entry.kind,
@@ -304,14 +455,22 @@ export function parseAttentionPages(items: readonly unknown[]): ParsedAttention 
       }
     }
   }
+
+  const kept = [...records.values()].filter(record => !conflicted.has(record.id))
+  loss.conflicted = conflicted.size
+  loss.accepted = kept.length
+  // A refused or conflicting page means the snapshot is not fully enumerable; it cannot stay complete.
+  if ((stale || loss.invalid > 0 || loss.conflicted > 0) && coverage === 'complete') coverage = 'caller_limit'
   return {
-    items: [...records.values()].filter(record => !conflicted.has(record.id)),
+    items: kept,
     observedAt,
     hasMore,
     questionCoverage,
     coverage,
+    stale,
     quarantined: [...quarantined, ...invalid],
     invalid,
+    loss,
   }
 }
 

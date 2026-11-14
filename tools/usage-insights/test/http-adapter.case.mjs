@@ -179,7 +179,7 @@ test('the bearer token is sent but never persisted in the bundle or the report',
     if (url.pathname === '/v1/works/work-a/evidence/history') return json(response, history('work-a'))
     if (url.pathname === '/v1/attention') {
       return json(response, {
-        protocol: 'attention-inbox/1', observedAt: '2026-11-08T10:00:00.000Z', items: [], ranks: [],
+        protocol: 'attention-inbox/1', observedAt: '2026-11-08T12:00:00.000Z', items: [], ranks: [],
         ranking: 'waiting_order', scannedWorks: 0, questionCoverage: 'complete', hasMore: false,
       })
     }
@@ -287,3 +287,108 @@ test('a work bound stops collection and says which bound stopped it', async (t) 
 function directoryTemp() {
   return tmpdir()
 }
+
+// ---- streaming budget (G4) -------------------------------------------------------------------
+
+test('positive: a small chunked response without Content-Length is accepted', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'usage-adapter-'))
+  const token = withToken(directory)
+  const server = await stub(t, (request, response) => {
+    const url = new URL(request.url, 'http://127.0.0.1')
+    const body = JSON.stringify(url.pathname === '/v1/snapshot' ? snapshot : {})
+    // No content-length: the response is chunked.
+    response.writeHead(200, { 'content-type': 'application/json' })
+    response.end(body)
+  })
+  const bundlePath = join(directory, 'bundle.json')
+  const result = await run(['collect', '--base-url', server.base, '--token-file', token, '--project', 'project-atlas',
+    '--work', 'work-a', '--max-bytes', '4096', ...WINDOW, '--out', bundlePath])
+  assert.ok([0, 3].includes(result.status), `unexpected status ${result.status}: ${result.stderr}`)
+  assert.equal(result.stderr.includes('limits'), false)
+})
+
+test('negative: an unknown-length 131072-byte body stops mid-stream under a 1024-byte budget', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'usage-adapter-'))
+  const token = withToken(directory)
+  const server = await stub(t, async (_request, response) => {
+    response.writeHead(200, { 'content-type': 'application/json' })
+    const chunk = Buffer.alloc(16 * 1024, 0x20)
+    let written = 0
+    while (written < 131_072) {
+      if (!response.write(chunk)) await new Promise(resolve => response.once('drain', resolve))
+      written += chunk.byteLength
+    }
+    response.end()
+  })
+  const result = await run(['collect', '--base-url', server.base, '--token-file', token, '--project', 'project-atlas',
+    '--max-bytes', '1024', ...WINDOW, '--out', join(directory, 'bundle.json')])
+  assert.equal(result.status, 5)
+  assert.ok(result.stderr.includes('limits'), result.stderr)
+  const match = /bytesReceived=(\d+)/.exec(result.stderr)
+  assert.ok(match, `the failure must report how far the body got: ${result.stderr}`)
+  const received = Number(match[1])
+  assert.ok(received > 1024, 'it stopped only after the budget was crossed')
+  assert.ok(received < 131_072, 'the whole body was never accumulated')
+  assert.equal(existsSync(join(directory, 'bundle.json')), false)
+})
+
+test('negative: a declared oversized Content-Length is refused before reading the body', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'usage-adapter-'))
+  const token = withToken(directory)
+  const server = await stub(t, (_request, response) => {
+    response.writeHead(200, { 'content-type': 'application/json', 'content-length': '131072' })
+    response.write('{"works":')
+  })
+  const result = await run(['collect', '--base-url', server.base, '--token-file', token, '--project', 'project-atlas',
+    '--max-bytes', '1024', ...WINDOW, '--out', join(directory, 'bundle.json')])
+  assert.equal(result.status, 5)
+  assert.ok(result.stderr.includes('declaredLength=131072'), result.stderr)
+})
+
+test('negative: a body framed shorter than the JSON it claims is refused, not partially accepted', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'usage-adapter-'))
+  const token = withToken(directory)
+  const server = await stub(t, (_request, response) => {
+    // The frame ends before the JSON does; the client must reject rather than accept a fragment.
+    response.writeHead(200, { 'content-type': 'application/json', 'content-length': '10' })
+    response.end('{"works":[')
+  })
+  const result = await run(['collect', '--base-url', server.base, '--token-file', token, '--project', 'project-atlas',
+    '--max-bytes', '1024', ...WINDOW, '--out', join(directory, 'bundle.json')])
+  assert.equal(result.status, 5)
+  assert.ok(result.stderr.includes('bad_schema'), result.stderr)
+  assert.ok(/bytesReceived=\d+/.test(result.stderr), result.stderr)
+  assert.equal(existsSync(join(directory, 'bundle.json')), false)
+})
+
+test('negative: a trickling stream is bounded by the request timeout and reports progress', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'usage-adapter-'))
+  const token = withToken(directory)
+  const server = await stub(t, async (_request, response) => {
+    response.writeHead(200, { 'content-type': 'application/json' })
+    response.write('{"works":')
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    response.end('[]}')
+  })
+  const result = await run(['collect', '--base-url', server.base, '--token-file', token, '--request-timeout-ms', '120',
+    '--project', 'project-atlas', ...WINDOW, '--out', join(directory, 'bundle.json')])
+  assert.equal(result.status, 5)
+  assert.ok(result.stderr.includes('timeout'), result.stderr)
+  assert.ok(/bytesReceived=\d+/.test(result.stderr), result.stderr)
+})
+
+test('negative: a large error body is discarded within a fixed cap', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'usage-adapter-'))
+  const token = withToken(directory)
+  const server = await stub(t, (_request, response) => {
+    response.writeHead(500, { 'content-type': 'application/json' })
+    const chunk = Buffer.alloc(16 * 1024, 0x20)
+    for (let index = 0; index < 8; index++) response.write(chunk)
+    response.end()
+  })
+  const result = await run(['collect', '--base-url', server.base, '--token-file', token, '--project', 'project-atlas',
+    '--max-bytes', '1024', ...WINDOW, '--out', join(directory, 'bundle.json')])
+  assert.equal(result.status, 5)
+  assert.ok(result.stderr.includes('server_error'), result.stderr)
+  assert.ok(/errorBodyLimit=16384/.test(result.stderr), result.stderr)
+})

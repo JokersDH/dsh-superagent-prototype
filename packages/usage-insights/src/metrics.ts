@@ -239,20 +239,25 @@ export interface InterventionAggregate {
   rows: MetricRow[]
   worksObserved: number
   worksUnknown: number
+  /** True only when the work source was proven completely enumerated and genuinely contained no work. */
+  measuredEmpty: boolean
 }
 
 /**
- * Aggregate interaction counts across observed works. Works that the attention snapshot proves
- * exist but whose evidence was not collected stay in `unknownCount` instead of becoming zero.
+ * Aggregate interaction counts across attributable works.
+ *
+ * `unknownWorks` covers every work the observation could not attribute or did not collect: unmapped
+ * works, foreign works, works visible only through attention and works dropped by a declared bound.
+ * A zero total is produced only when nothing is unknown and the source was proven complete — an
+ * excluded or rejected set is never "a measured zero".
  */
 export function interventionMetrics(facts: readonly WorkInterventionFacts[], unseenWorks: number,
-  workCoverage: MetricCoverage): InterventionAggregate {
+  workCoverage: MetricCoverage, unmappedReason: NullReason = 'source_missing'): InterventionAggregate {
   const observed = facts.filter(fact => fact.observed)
   const partial = observed.some(fact => fact.partial)
   const coverage: MetricCoverage = observed.length === 0 ? (workCoverage === 'complete' ? 'source_missing' : workCoverage) : partial ? 'partial' : workCoverage
   const worksUnknown = unseenWorks + seenCount(facts)
-  // A complete window that contains no work at all is a measured zero, not an unknown value.
-  const emptyComplete = facts.length === 0 && unseenWorks === 0 && workCoverage === 'complete'
+  const emptyComplete = facts.length === 0 && worksUnknown === 0 && workCoverage === 'complete'
   const build = (metricId: MetricId, pick: (fact: WorkInterventionFacts) => number, refs: string[]) => {
     const value = emptyComplete ? 0 : observed.length === 0 ? null : observed.reduce((total, fact) => total + pick(fact), 0)
     return metricRow({
@@ -261,7 +266,7 @@ export function interventionMetrics(facts: readonly WorkInterventionFacts[], uns
       unknownCount: worksUnknown,
       excludedCount: 0,
       coverage: emptyComplete ? 'complete' : coverage,
-      nullReason: value === null ? (workCoverage === 'complete' ? 'source_missing' : workCoverage === 'unsupported' ? 'unsupported' : 'not_collected') : null,
+      nullReason: value === null ? unmappedReason : null,
       provenanceRefs: refs,
     })
   }
@@ -274,6 +279,7 @@ export function interventionMetrics(facts: readonly WorkInterventionFacts[], uns
     ],
     worksObserved: observed.length,
     worksUnknown,
+    measuredEmpty: emptyComplete,
   }
 }
 

@@ -47,6 +47,7 @@ export function attentionSummary(parsed: ParsedAttention, capturedAt: string, de
     waitingAgeMs: median(ages),
     hasMore: parsed.hasMore,
     questionCoverage: parsed.questionCoverage,
+    stale: parsed.stale,
     coverage,
     projectCounts: [...projectCounts.entries()].map(([projectId, items]) => ({ projectId, items })).sort((a, b) => a.projectId.localeCompare(b.projectId)),
     byKind: [...byKind.entries()].filter(([, items]) => items > 0).map(([kind, items]) => ({ kind, items })).sort((a, b) => a.kind.localeCompare(b.kind)),

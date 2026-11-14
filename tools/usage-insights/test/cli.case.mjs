@@ -191,3 +191,44 @@ test('hostile operator notes are escaped in the report', () => {
   assert.ok(noteLine.includes('\\<img'), 'the hostile tag is present but escaped')
   assert.ok(content.includes('observational only') || content.includes('observational'))
 })
+
+// ---- declared bounds and pre-read sizing (G3) ------------------------------------------------
+
+test('an oversized input file is refused before it is parsed', () => {
+  const directory = workspace()
+  // Invalid JSON on purpose: if the file were read and parsed first, the error would be about JSON.
+  const oversized = join(directory, 'oversized.json')
+  writeFileSync(oversized, `{"protocol": "${'x'.repeat(4096)}"}`)
+  const result = run(['analyze', '--input', oversized, '--max-input-bytes', '1024'])
+  assert.equal(result.status, 2)
+  assert.ok(/refusing before reading|above the 1024-byte budget/.test(result.stderr), result.stderr)
+  assert.equal(result.stderr.includes('not valid JSON'), false)
+})
+
+test('the CLI applies an explicit record bound and reports partial status', () => {
+  // The shipped example presents three top-level records: two outcomes and one work record.
+  const exact = run(['analyze', '--input', complete, '--max-records', '3', '--format', 'json'])
+  assert.equal(exact.status, 0, 'an exact bound enumerates everything')
+  assert.equal(JSON.parse(exact.stdout).summary.limits.stoppedBy, 'none')
+
+  const bounded = run(['analyze', '--input', complete, '--max-records', '1', '--format', 'json'])
+  assert.equal(bounded.status, 3, 'a truncated observation is partial')
+  const summary = JSON.parse(bounded.stdout).summary
+  assert.equal(summary.limits.maxRecords, 1)
+  assert.equal(summary.limits.limitsAppliedBeforeParsing, true)
+  assert.equal(summary.limits.recordsNotParsed, 2)
+  assert.equal(summary.limits.stoppedBy, 'records')
+  for (const flag of ['--max-records', '--max-works', '--max-pages']) {
+    assert.equal(run(['analyze', '--input', complete, flag, '0']).status, 2, `${flag} 0 must be refused`)
+    assert.equal(run(['analyze', '--input', complete, flag, 'abc']).status, 2)
+  }
+})
+
+test('verify reports losses, the stop reason and the applied bounds', () => {
+  const result = run(['verify', '--input', partial])
+  assert.equal(result.status, 3)
+  const report = JSON.parse(result.stdout)
+  assert.equal(report.stoppedBy, 'source')
+  assert.equal(typeof report.losses, 'object')
+  assert.equal(report.losses.workEvidence.outOfScope !== undefined, true)
+})

@@ -10,10 +10,12 @@ import { lstatSync, readFileSync } from 'node:fs'
 import { isAbsolute } from 'node:path'
 
 export class CollectorError extends Error {
-  constructor(code, message) {
+  constructor(code, message, detail = {}) {
     super(message)
     this.name = 'CollectorError'
     this.code = code
+    /** Bounded, secret-free facts about where collection stopped. */
+    this.detail = detail
   }
 }
 
@@ -49,6 +51,60 @@ export function readTokenFile(path) {
   if (value.length < 16 || value.length > 1024 || /\s/.test(value))
     throw new CollectorError('invalid_argument', 'The credential file must contain one token without whitespace')
   return value
+}
+
+const ERROR_BODY_LIMIT = 16 * 1024
+
+/** Read and discard at most `limit` body bytes (used for error and redirect responses). */
+async function discard(response, limit, signal) {
+  try {
+    const result = await readBounded(response, limit, signal ?? null, { tolerateOverflow: true })
+    return { bytes: result.bytes }
+  } catch {
+    // A diagnostic body is best effort: the status code is the useful fact.
+    try { await response.body?.cancel() } catch { /* already closed */ }
+    return { bytes: 0 }
+  }
+}
+
+/**
+ * Read a response body while counting bytes against a budget. On overflow the stream is cancelled and
+ * the error carries how many bytes had arrived, so a caller can see *where* it stopped rather than
+ * only that something failed.
+ */
+async function readBounded(response, limit, signal, options = {}) {
+  const body = response.body
+  if (!body) return { buffer: Buffer.alloc(0), bytes: 0 }
+  const reader = body.getReader()
+  const chunks = []
+  let bytes = 0
+  const abandon = async () => {
+    try { await reader.cancel() } catch { /* the stream may already be closed */ }
+  }
+  try {
+    for (;;) {
+      if (signal?.aborted) {
+        await abandon()
+        throw new CollectorError('timeout', 'The response was aborted by its timeout or deadline', { bytesReceived: bytes })
+      }
+      const { done, value } = await reader.read()
+      if (done) break
+      bytes += value.byteLength
+      if (bytes > limit) {
+        await abandon()
+        if (options.tolerateOverflow) return { buffer: Buffer.alloc(0), bytes: Math.min(bytes, limit) }
+        throw new CollectorError('limits', `The response exceeded its byte budget after ${bytes} of ${limit} allowed bytes`,
+          { bytesReceived: bytes, allowed: limit })
+      }
+      chunks.push(Buffer.from(value))
+    }
+  } catch (error) {
+    await abandon()
+    if (error instanceof CollectorError) throw error
+    if (signal?.aborted) throw new CollectorError('timeout', 'The response was aborted by its timeout or deadline', { bytesReceived: bytes })
+    throw new CollectorError('transport', 'The response stream ended unexpectedly', { bytesReceived: bytes })
+  }
+  return { buffer: Buffer.concat(chunks), bytes }
 }
 
 const AUTH_STATUSES = new Set([401, 403])
@@ -97,26 +153,45 @@ export class LoopbackClient {
       })
     } catch (error) {
       if (this.deadlineSignal.aborted) throw new CollectorError('deadline', 'The collection deadline expired')
-      if (error?.name === 'TimeoutError' || error?.name === 'AbortError') throw new CollectorError('timeout', 'The request exceeded its timeout')
+      if (error?.name === 'TimeoutError' || error?.name === 'AbortError')
+        throw new CollectorError('timeout', 'The request exceeded its timeout', { bytesReceived: 0 })
       throw new CollectorError('transport', 'The local service could not be reached')
     }
     this.requests++
-    if (response.status >= 300 && response.status < 400)
-      throw new CollectorError('redirect_refused', `Refusing to follow a redirect (${response.status}) from the local service`)
-    if (!response.ok) {
-      await response.arrayBuffer().catch(() => undefined)
-      throw new CollectorError(statusCode(response.status), `The local service answered ${response.status}`)
+    if (response.status >= 300 && response.status < 400) {
+      // Never follow: drop the body (bounded) and report the refusal. A hanging body must not turn a
+      // redirect into a timeout, so draining is best-effort.
+      const discarded = await discard(response, ERROR_BODY_LIMIT, signal)
+      throw new CollectorError('redirect_refused', `Refusing to follow a redirect (${response.status}) from the local service`,
+        { bytesReceived: discarded.bytes, locationRefused: true })
     }
+    if (!response.ok) {
+      // An error body is bounded too: a large diagnostic response must not exhaust the budget.
+      const discarded = await discard(response, ERROR_BODY_LIMIT, signal)
+      throw new CollectorError(statusCode(response.status), `The local service answered ${response.status}`,
+        { bytesReceived: discarded.bytes, errorBodyLimit: ERROR_BODY_LIMIT })
+    }
+
+    const remaining = this.maxBytes - this.bytes
+    if (remaining <= 0)
+      throw new CollectorError('limits', 'The collection budget is exhausted before this response', { bytesReceived: 0, allowed: this.maxBytes })
     const declaredLength = response.headers.get('content-length')
-    if (declaredLength && Number(declaredLength) > this.maxBytes - this.bytes)
-      throw new CollectorError('limits', 'The response declares more bytes than the collection budget allows')
-    const buffer = Buffer.from(await response.arrayBuffer())
-    this.bytes += buffer.byteLength
-    if (this.bytes > this.maxBytes) throw new CollectorError('limits', 'The collection exceeded its byte budget')
+    if (declaredLength !== null && Number(declaredLength) > remaining) {
+      // Refuse on the declared size without reading a byte: cancelling is enough, and waiting for a
+      // body that may never finish would turn a bound into a timeout.
+      try { await response.body?.cancel() } catch { /* already closed */ }
+      throw new CollectorError('limits', 'The response declares more bytes than the remaining collection budget',
+        { declaredLength: Number(declaredLength), allowed: remaining, bytesReceived: 0 })
+    }
+
+    // The body is consumed as a stream against the remaining budget: an unknown or understated
+    // Content-Length can never lead to a full allocation first.
+    const { buffer, bytes } = await readBounded(response, remaining, signal)
+    this.bytes += bytes
     try {
-      return { value: JSON.parse(buffer.toString('utf8')), bytes: buffer.byteLength }
+      return { value: JSON.parse(buffer.toString('utf8')), bytes }
     } catch {
-      throw new CollectorError('bad_schema', 'The local service returned a body that is not JSON')
+      throw new CollectorError('bad_schema', 'The local service returned a body that is not JSON', { bytesReceived: bytes })
     }
   }
 }

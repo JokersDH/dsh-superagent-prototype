@@ -93,8 +93,19 @@ test('the declared input caps are enforced rather than silently truncated', () =
 test('work evidence with many entries per work stays bounded per metric', () => {
   const entries = Array.from({ length: 500 }, (_, index) => ({ kind: 'question.opened', sourceRef: `question-${index}` }))
   const work = makeWorkEvidence('work-atlas-1', entries)
-  const analysis = analyzeUsageInsights(bundle({ workEvidence: [work] }))
-  const questions = analysis.summary.metrics.find(row => row.metricId === 'interventions.questions')
+  // A work with no outcome needs the collector's index; without it the work is unmapped and its
+  // interaction total is unknown rather than a measured 500.
+  const unmapped = analyzeUsageInsights(bundle({ workEvidence: [work] }))
+  const unknownQuestions = unmapped.summary.metrics.find(row => row.metricId === 'interventions.questions')
+  assert.equal(unknownQuestions?.value, null)
+  assert.equal(unknownQuestions?.nullReason, 'unmapped_work')
+  assert.equal(unmapped.summary.losses.workEvidence.unmapped, 1)
+
+  const mapped = analyzeUsageInsights(bundle({
+    workEvidence: [work],
+    workIndex: [{ workId: 'work-atlas-1', projectId: 'project-atlas' }],
+  }))
+  const questions = mapped.summary.metrics.find(row => row.metricId === 'interventions.questions')
   assert.equal(questions?.value, 500)
   assert.ok((questions?.provenanceRefs.length ?? 0) <= 256, 'provenance references are capped')
 })

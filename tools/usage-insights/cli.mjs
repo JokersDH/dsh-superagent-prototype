@@ -7,7 +7,7 @@
  * reads a database or a credential on its own.
  */
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import { basename, isAbsolute, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArguments, positiveInteger, requiredString, timestamp, UsageError } from './lib/args.mjs'
@@ -86,12 +86,14 @@ const SPECS = {
   analyze: {
     input: flag(), out: flag(), format: flag(), project: flag('list'), from: flag(), to: flag(),
     timezone: flag(), baseline: flag(), 'max-input-bytes': flag(),
+    'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
   },
   report: {
     input: flag(), out: flag(), format: flag(), project: flag('list'), from: flag(), to: flag(),
     timezone: flag(), baseline: flag(), 'max-input-bytes': flag(),
+    'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
   },
-  verify: { input: flag(), 'max-input-bytes': flag() },
+  verify: { input: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(), 'max-pages': flag() },
   catalogue: {},
   help: {},
 }
@@ -102,8 +104,18 @@ function parseUtc(raw, name) {
 
 function readBundle(path, maxBytes) {
   if (!isAbsolute(path)) throw new UsageError('--input must be an absolute path')
+  // Validate type and size *before* reading: an oversized file is refused without being loaded.
+  let stat
+  try {
+    stat = statSync(path)
+  } catch {
+    throw new UsageError('Input file does not exist or is not readable')
+  }
+  if (!stat.isFile()) throw new UsageError('Input must be a regular file')
+  if (stat.size > maxBytes)
+    throw new UsageError(`Input file is ${stat.size} bytes, above the ${maxBytes}-byte budget; refusing before reading`)
   const bytes = readFileSync(path)
-  if (bytes.byteLength > maxBytes) throw new UsageError('Input file exceeds the configured byte budget')
+  if (bytes.byteLength > maxBytes) throw new UsageError('Input file grew past the configured byte budget while reading')
   const digest = createHash('sha256').update(bytes).digest('hex')
   let value
   try {
@@ -129,6 +141,12 @@ function applyOverrides(bundle, options, digest) {
   }
   if (options.timezone) copy.timezone = options.timezone
   if (options.project?.length) copy.projects = options.project.map(projectId => ({ projectId }))
+  const limits = { ...(copy.limits ?? {}) }
+  for (const [flagName, field] of [['max-records', 'maxRecords'], ['max-works', 'maxWorks'], ['max-pages', 'maxPages']]) {
+    if (options[flagName] === undefined) continue
+    limits[field] = positiveInteger(options[flagName], flagName, 1)
+  }
+  if (Object.keys(limits).length) copy.limits = limits
   return copy
 }
 
@@ -222,7 +240,10 @@ async function commandVerify(options, io) {
     bytes: bundle.bytes,
     records: analysis.summary.limits.recordsSeen,
     accepted: analysis.summary.limits.recordsAccepted,
+    notParsed: analysis.summary.limits.recordsNotParsed,
+    stoppedBy: analysis.summary.limits.stoppedBy,
     works: analysis.summary.limits.worksSeen,
+    losses: analysis.summary.losses,
     quarantine: analysis.summary.quarantine.total,
     coverage: analysis.summary.coverage,
     status,
@@ -275,12 +296,32 @@ async function commandCollect(options, io) {
   try {
     let workIds = options.work ?? []
     let projects = options.project ?? []
+    // workId → projectId, taken only from the product's own records. This is the mapping the analysis
+    // needs; it is never guessed from a work id or a title.
+    const workIndex = new Map()
     if (workIds.length === 0) {
       const snapshot = await client.getJson(`/v1/snapshot?limit=${snapshotLimit}`)
       pagesSeen++
       const works = worksFromSnapshot(snapshot.value)
+      for (const work of works) workIndex.set(work.id, work.projectId)
       if (projects.length === 0) projects = [...new Set(works.map(work => work.projectId))].sort()
       workIds = works.filter(work => projects.length === 0 || projects.includes(work.projectId)).map(work => work.id)
+    } else {
+      // An explicit work list still needs its project identity from the product, not from the caller.
+      for (const workId of workIds) {
+        if (workIndex.has(workId)) continue
+        try {
+          const view = await client.getJson(`/v1/works/${encodeURIComponent(workId)}`)
+          pagesSeen++
+          const projectId = helpers.asString(view.value?.work?.projectId)
+          if (!projectId) throw new UsageInsightsError('bad_schema', 'Work view has no project identity')
+          workIndex.set(workId, projectId)
+          if (projects.length === 0) projects = [projectId]
+        } catch (error) {
+          issues.push({ ref: workId, code: error.code ?? 'error', message: bounded(error.message) })
+          workCoverage = worstCoverage(workCoverage, 'source_missing')
+        }
+      }
     }
     if (projects.length === 0) throw new UsageInsightsError('source_unavailable', 'No project scope could be determined; pass --project or --work')
     if (workIds.length === 0) {
@@ -394,6 +435,7 @@ async function commandCollect(options, io) {
       outcomes: [],
       attentionPages: attentionPagesSeen,
       workEvidence,
+      ...(workIndex.size ? { workIndex: [...workIndex.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([workId, projectId]) => ({ workId, projectId })) } : {}),
       ...(workHistories.length ? { workHistories } : {}),
       ...(configSnapshot ? { configSnapshot } : {}),
       ...(issues.length ? { collectionIssues: issues.slice(0, 512) } : {}),
@@ -475,7 +517,12 @@ try {
     process.stderr.write(`invalid_argument: ${error.message}\n`)
     process.exitCode = EXIT.usage
   } else if (error instanceof CollectorError) {
-    process.stderr.write(`${error.code}: ${error.message}\n`)
+    const detail = error.detail && typeof error.detail === 'object'
+      ? Object.entries(error.detail)
+        .filter(([, value]) => typeof value === 'number' && Number.isFinite(value))
+        .map(([key, value]) => `${key}=${value}`).join(' ')
+      : ''
+    process.stderr.write(`${error.code}: ${error.message}${detail ? ` (${detail})` : ''}\n`)
     process.exitCode = error.code === 'invalid_argument' ? EXIT.usage : EXIT.unavailable
   } else if (error?.code === 'source_unavailable') {
     process.stderr.write(`source_unavailable: ${error.message}\n`)

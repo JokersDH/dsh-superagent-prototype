@@ -64,7 +64,8 @@ test('a complete bundle derives per-layer metrics without double counting embedd
   assert.equal(metric(analysis, 'interventions.acceptances')?.value, 1)
   // Interaction metrics describe product records, not an evidence layer.
   assert.equal(metric(analysis, 'interventions.total')?.layer, null)
-  assert.equal(summary.limits.recordsSeen, 4, 'two explicit plus two embedded outcomes were seen')
+  assert.equal(summary.limits.recordsSeen, 3, 'the record budget governs the three top-level records presented')
+  assert.equal(summary.losses.outcomes.seen, 4, 'every outcome presented, including embedded ones, is accounted for')
   assert.equal(summary.limits.recordsAccepted, 2, 'the embedded copies are replays of the same identities')
 })
 
@@ -133,7 +134,8 @@ test('an out-of-scope project is refused rather than mixed into the observation'
   const bundle = multiProjectBundle()
   const scoped = { ...bundle, projects: [{ projectId: 'project-atlas' }] } as UsageInsightsInput
   const analysis = analyzeUsageInsights(scoped)
-  assert.equal(analysis.summary.quarantine.byCode.find(entry => entry.code === 'out_of_scope_project')?.records, 1)
+  assert.equal(analysis.summary.quarantine.byCode.find(entry => entry.code === 'out_of_scope_project')?.records, 2,
+    'the foreign work and its outcome are both isolated')
   assert.equal(metric(analysis, 'outcomes.count', 'controlled')?.value, 1)
   assert.equal(metric(analysis, 'outcomes.count', 'actual_native')?.value, 1)
   assert.deepEqual(analysis.summary.projects.map(project => project.projectId), ['project-atlas'])
