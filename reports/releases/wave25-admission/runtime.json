@@ -1,0 +1,137 @@
+{
+  "protocol": "wave25-runtime-admission/1",
+  "date": "2026-11-14",
+  "status": "PARTIAL_COMPLETE_COMMAND_AND_KNOWN_REFERENCE_CHUNKS_PASSED_HANDOVER_NOT_ADMITTED",
+  "candidateRoot": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "candidateBranch": "codex/g1-runtime",
+  "candidateSource": "4af2a3eb6cb84195a8f7f774b0c836f2cfc4b1ee",
+  "previousSource": "3a40d00054bf90023f4805c77eed7881fcebccf9",
+  "mainBaseline": "4e805dedadb1163f488df8888f610d41d444c8bd",
+  "dirtyPreserved": [
+    "reports/releases/wave11-admission/runtime.json",
+    "reports/releases/wave12-admission/runtime.json",
+    "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+  ],
+  "deliveredSource": {
+    "businessChannelIsRealSource": true,
+    "completeCommandTuple": true,
+    "serverInlineBudgetClamp": true,
+    "actualPayloadChunkServerAndClient": true,
+    "rfcPublished": "docs/rfcs/WP-03/0001-b-runner-business-attach.md",
+    "rfcIsAdmissionAuthority": false,
+    "actualLargeFrameReferenceDescriptor": false,
+    "attachFacadeExposesPayloadMethod": false,
+    "unifiedDispatchImplemented": false,
+    "receiptPayloadNativeAdmissionRebindingImplemented": false,
+    "sameRunnerTwoClientPassed": false,
+    "coordinatorSigkillSameStoreRecoveryPassed": false,
+    "recoveredVerificationAcceptanceSlotsPassed": false,
+    "wholePackageComplete": false,
+    "submittedStatusAccuratelyMarksPartial": true
+  },
+  "verification": [
+    {
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes --skipLibCheck --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --types node apps/runner/src/business-attach.ts apps/runner/src/runner-service.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "scope": "Direct actual module/import compilation; root tsconfig alone does not cover these sources."
+    },
+    {
+      "command": "node /tmp/pa-wave25-b-audit.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "passed": 8,
+      "failed": 3,
+      "scope": "Actual in-process serveRunner and real FileCriticalJournal/recovery endpoint/client. No copied pager. Independent private backend only counts command dispatch. No Driver/native child/product DB/model. All private services were shut down and only independently created private material removed.",
+      "evidence": {
+        "controlledCommandWrites": 1,
+        "commandWriteInterpretation": "Only the original exact-command positive writes; all three complete valid-schema assignment/attempt/contract mutations refuse before dispatch.",
+        "largePageRequest": { "requestedMaxBytes": 131072, "returnedFrames": 51, "next": 51, "done": false, "framesJsonBytes": 49136 },
+        "largePayloadBytes": 135540,
+        "knownReferenceChunkRead": { "chunks": 5, "decodedBytes": 135540, "originalBytesEqual": true, "sha256Matched": true }
+      },
+      "cases": [
+        { "id": "exact-complete-command-positive", "status": "PASS" },
+        { "id": "complete-command-assignmentId-refuses-before-write", "status": "PASS" },
+        { "id": "complete-command-attemptId-refuses-before-write", "status": "PASS" },
+        { "id": "complete-command-contract-refuses-before-write", "status": "PASS" },
+        { "id": "actual-service-requested-131072-page-now-readable", "status": "PASS" },
+        { "id": "large-schema-valid-journal-input-positive", "status": "PASS" },
+        { "id": "known-large-payload-ref-chunks-reassemble-exact-digest", "status": "PASS" },
+        { "id": "large-fact-page-exposes-bounded-reference-with-progress", "status": "FAIL", "observed": "Same schema-valid large writer.observed fact still returns unknown_outcome through facts; pager never replaces its inline payload with a bounded reference descriptor." },
+        { "id": "foreign-source-payload-refuses-before-exposure", "status": "FAIL", "observed": "Client bound to a foreign expected producer source still receives original payload bytes with the same pinned endpoint and credential." },
+        { "id": "payload-chunk-length-matches-decoded-request-byte-unit", "status": "FAIL", "observed": "A requested 1024-byte chunk returns response.length=1368, the base64 character count; decoded payload length is 1024." },
+        { "id": "invalid-payload-chunk-size-refused-boundedly", "status": "PASS" }
+      ]
+    }
+  ],
+  "closedPriorScopes": [
+    {
+      "id": "B24-INCOMPLETE-COMMAND-ATTEMPT-BINDING",
+      "status": "CLOSED_FOR_MEASURED_VALID_SCHEMA_MUTATIONS",
+      "evidence": "Exact command reaches backend once; independent foreign assignmentId, attemptId and contract digest commands all refuse with identity_mismatch before backend write. Do not keep reporting ticket/epoch-only validation."
+    },
+    {
+      "id": "B24-PAGE-BUDGET-TRANSPORT-MISMATCH",
+      "status": "PARTIALLY_CLOSED_ACCEPTED_LARGE_REQUEST_CLAMP",
+      "evidence": "Actual server clamps requested131072 to its inline ceiling, returns51 original records/49136 frame bytes with next51/donefalse instead of tripping the cap. One oversized record still cannot be discovered through fact pages."
+    },
+    {
+      "id": "B25-KNOWN-REFERENCE-CHUNK-TRANSFER",
+      "status": "NEW_SCOPED_PASS",
+      "evidence": "Given a known original payloadRef, actual server/client transfer a valid135540-byte original payload in5 bounded chunks; independent caller reassembly equals original bytes and verifies SHA256. The client helper itself does not implement full reassembly or final digest verification."
+    }
+  ],
+  "findings": [
+    {
+      "id": "B25-LARGE-FACT-NO-REFERENCE-PROJECTION",
+      "priority": "P1_BUSINESS_RECOVERY_ADMISSION",
+      "file": "apps/runner/src/runner-service.ts",
+      "line": 282,
+      "problem": "The pager still inlines the entire first frame even when it exceeds the byte budget. The new payload route is not connected to any reference descriptor in facts, so a new recovery client cannot discover/advance through a large original fact: facts(0,1024) over a legitimate135540-byte payload still returns unknown_outcome at the unchanged global response cap.",
+      "scopeLimit": "Known-reference chunk transfer passes independently; this is the missing discovery/projection/consumer composition, not absence of payload reader source or evidence of a current main product regression.",
+      "requiredOutcome": "Return a bounded immutable fact-plus-payload-reference descriptor with original seq/fact identity/ref/length/digest, expose the chunk reader through the actual attach consumer, verify the complete payload and only then record/advance the original fact receipt. Keep strict total response bounds without truncating data or changing identity."
+    },
+    {
+      "id": "B25-PAYLOAD-RESPONSE-NOT-BOUND-TO-PRODUCER",
+      "priority": "P1_NEW_PAYLOAD_CHANNEL_ADMISSION",
+      "file": "packages/execution/src/recovery-transport.ts",
+      "line": 283,
+      "relatedLine": 172,
+      "problem": "The new payload response omits a registered producer envelope and connectRunnerRecovery.payload does not compare the response to its expected producer/attempt/source. A foreign-source client rejected by the fact-page contract can still expose original payload chunks through this new read method.",
+      "scopeLimit": "Private candidate API boundary with the same owned pinned endpoint and credential. This new payload route is not integrated on main; no current public-product data leak is asserted. Preserve the previously admitted page identity checks.",
+      "requiredOutcome": "Bind every chunk to the exact registered producer, original fact/payload descriptor and requested reference/range before exposing bytes. Validate range/total/digest/chunk consistency and use independent foreign source/attempt/contract and mismatched descriptor negatives with the actual intended consumer."
+    },
+    {
+      "id": "B25-CHUNK-LENGTH-UNIT",
+      "priority": "P2_CHUNK_CONSUMER_CONTRACT",
+      "file": "packages/execution/src/recovery-transport.ts",
+      "line": 172,
+      "problem": "Request offset/length and total use decoded bytes, while returned length is base64.length. A1024-byte slice reports1368; a consumer advancing offset by returned length skips original bytes. The current helper returns these inconsistent fields without validation.",
+      "requiredOutcome": "Define decoded offset/returnedLength/nextOffset explicitly, return correct byte counts and validate decoded length/range. If encoded length is needed give it a distinct field. Prove consecutive ranges and the final short chunk with digest verification."
+    },
+    {
+      "id": "B25-RFC-GUARANTEES-AHEAD-OF-SOURCE",
+      "priority": "P2_INTERFACE_DOCUMENTATION",
+      "file": "docs/rfcs/WP-03/0001-b-runner-business-attach.md",
+      "line": 47,
+      "problem": "RFC says calling the same feed preserves begin-once/prepared-policy/receiver rules and promises pending intent exactly-once. Its own not-claimed section correctly states unified dispatch/rebinding are not delivered, while source still has separate endpoint feed and stdio service dispatch; state-aware caller reconciliation plus an in-memory command replay map is not durable exactly-once proof.",
+      "requiredOutcome": "Keep the useful candidate surface/RFC but distinguish measured guarantees, prerequisites and pending protocol work. Remove or implement the unsupported claims; early RFC publication alone does not admit the first runnable business milestone."
+    }
+  ],
+  "milestoneAssessment": {
+    "firstWholeRunnableResult": "NOT_ADMITTED: large descriptor/chunk identity and actual unified dispatch/fact-receipt ACK/payload/native-write-admission rebinding remain missing; attach.close remains a no-op; no passing same-Runner/same-child dual-client consumer.",
+    "secondWholeRunnableResult": "NOT_REACHED: no original coordinator SIGKILL/new independent process over same A registration/current binding/original native question and answer IDs, no complete ACK/receipt unknown-window proof.",
+    "thirdWholeRunnableResult": "NOT_REACHED: no recovered original Work verification/current candidate/manual acceptance/valid epoch/lateACK/2-and-4-slot resource closure.",
+    "existingHarnesses": "B22 and B23 source is byte-unchanged from the prior audited candidate and this status still explicitly marks them failing. They were not rerun this time; historical failures are not represented as fresh executions.",
+    "oldPageIdentitySmallReplayControlScope": "Preserved, not fully rerun; relevant new actual modules compile under strict/exactOptional."
+  },
+  "integrationRecommendation": {
+    "newBusinessChannelMainAdmission": false,
+    "minimalCurrentArtifact": "Candidate exact-SHA RFC and real transport API can be used as design input; do not wholesale import into main while first milestone remains unimplemented. Main's existing control, Broker, source-scope UI and ordinary distribution remain independent.",
+    "nextRuntimeResult": "B owns one coherent runtime result: descriptor-to-chunk identity/range contract, unified dispatch, real fact receipt/payload/native-write-admission rebind and sameRunner/sameChild lifecycle, with early callable port and truthful RFC. Then original-ID crash recovery, then recovered acceptance/resources.",
+    "additionalAgentBoundary": "If new F/G/H capacity helps, main can assign one distinct consumer/fault-acceptance directory outside B source and E assertions after publishing ownership. A consumer agent should use B's real public port and original A/Broker facts, provide bounded repros and exact identities, and never concurrently edit B runtime or invent another ledger/coordinator."
+  },
+  "budget": { "realVendorModelTurns": 0, "nativeTurnStarts": 0, "oldBCap4Remainder": "UNKNOWN_NOT_SPENDABLE", "ePilot": "UNCHANGED_BLOCKED" },
+  "preservation": { "candidateSourceFilesChanged": false, "candidateDirtyStateUnchanged": true, "userServiceOperations": 0, "globalSocketDiscovery": false, "unrelatedCredentialsRead": false, "allHistoricalLedgersPreserved": true, "allOwnExecSessionsCompleted": true }
+}
