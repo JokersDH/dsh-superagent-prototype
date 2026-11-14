@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: A real producer builds and verifies the original subject, and rejects every unique drift
+ok 1 - A real producer builds and verifies the original subject, and rejects every unique drift
+  ---
+  duration_ms: 3862.784916
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4158.528042

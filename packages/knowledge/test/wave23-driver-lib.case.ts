@@ -3,7 +3,7 @@ import { test } from 'node:test'
 import { spawn } from 'node:child_process'
 import { createServer } from 'node:net'
 // @ts-expect-error - the driver primitive module is plain JavaScript.
-import { DriverError, httpJson, logSink, remaining, stopChild, waitUntil } from '../../context/tools/driver-lib.mjs'
+import { DriverError, applyCleanupOutcome, httpJson, logSink, remaining, stopChild, waitUntil } from '../../context/tools/driver-lib.mjs'
 
 const sleep = (ms: number) => new Promise((done) => setTimeout(done, ms))
 
@@ -81,4 +81,20 @@ test('an HTTP error status is returned for the caller to assert instead of being
   const error = new DriverError('usage', 'x') as { code?: string }
   assert.equal(error.code, 'usage')
   await sleep(1)
+})
+
+test('an owned stop failure downgrades verified success while reuse and keep stay explicit', () => {
+  const verified = { status: 'verified-flow', verified: true, cleanup: { attempted: true, owned: true, stopped: true, detail: 'pa-stop-verified' } }
+  assert.equal(applyCleanupOutcome(verified).status, 'verified-flow')
+  const failedStop = applyCleanupOutcome({ status: 'verified-flow', verified: true,
+    cleanup: { attempted: true, owned: true, stopped: false, detail: 'pa-stop-unverified', error: { code: 'cleanup_failed' } } })
+  assert.equal(failedStop.status, 'failed')
+  assert.equal(failedStop.verified, false)
+  assert.equal(failedStop.failure.code, 'cleanup_failed')
+  const reused = applyCleanupOutcome({ status: 'reused', verified: true, cleanup: { attempted: true, owned: false, stopped: false, detail: 'reused-left-running' } })
+  assert.equal(reused.status, 'reused')
+  const kept = applyCleanupOutcome({ status: 'verified-flow', verified: true, cleanup: { attempted: true, owned: true, stopped: false, detail: 'kept-running' } })
+  assert.equal(kept.status, 'verified-flow')
+  const noCleanup = applyCleanupOutcome({ status: 'observed', verified: false, cleanup: { attempted: true, owned: true, stopped: false, detail: 'x' } })
+  assert.equal(noCleanup.status, 'observed')
 })

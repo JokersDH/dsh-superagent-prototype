@@ -36,6 +36,14 @@ export interface PersonalChain {
   readonly v2: { destination: string; manifest: { protocol: string; database: { integrity: string; foreignKeyViolations: number; productSchema: number }; evidence: { protocol: string; familySetVersion?: number } } }
   readonly workId: string
   readonly question: { id: string; version: number }
+  readonly ticketId: string
+  readonly assignmentId: string
+  readonly attemptId: string
+  readonly fenceEpoch: number
+  readonly contract: { workId: string; revision: number; digest: string }
+  readonly deliveryTargetId: string
+  readonly answerId: string
+  readonly dispatchWindows: { written: { commandId: string; target: string }; unknown: { commandId: string; target: string } }
   readonly sourceMessageId: string
   readonly contextMessageId: string
   readonly reviewedCandidate: { index: number; payloadDigest: string }
@@ -79,6 +87,7 @@ export async function buildPersonalChain(root: string, options: { expiresAt?: st
     } as never, actor)
     const workId = (created as { workId: string }).workId
     const question = (await until(() => controlled.application.inspect({ workId }), (value) => value.questions.length >= 1)).questions[0]!
+    const target = question.targets[0] as { id: string; ticketId: string; assignmentId: string; fenceEpoch: number; contract: PersonalChain['contract'] }
     await controlled.application.dispatch({
       commandId: 'w22-answer', conversationId, kind: 'answer_question',
       questionId: question.id, expectedVersion: question.version, answer: { kind: 'choices', optionIds: ['allow'] },
@@ -88,6 +97,12 @@ export async function buildPersonalChain(root: string, options: { expiresAt?: st
       (value) => value !== undefined && value.actions.available.includes('accept_candidate'),
     )
     if (controlled.application.questions.currentDeliveries(question.id)[0]?.status !== 'native_applied') throw new Error('Delivery is not native_applied')
+    const attemptId = original.bindings.current<{ attemptId: string }>(target.ticketId)!.attemptId
+    original.dispatch.beginSend('w24-written', 'w24-target')
+    original.dispatch.markWritten('w24-written', 'w24-target')
+    original.dispatch.beginSend('w24-unknown', 'w24-target')
+    original.dispatch.markIndeterminate('w24-unknown', 'w24-target', 'transport unknown')
+    const answerId = (original.db.prepare('SELECT answer_id FROM answers WHERE question_id = ?').get(question.id) as { answer_id: string }).answer_id
     await controlled.application.dispatch({ commandId: 'w22-accept', conversationId, kind: 'accept_candidate', candidate: ready!.actions.currentCandidate } as never, actor)
     await controlled.close()
 
@@ -137,7 +152,11 @@ export async function buildPersonalChain(root: string, options: { expiresAt?: st
       if (v1.status !== 'ok' || v2.status !== 'ok') throw new Error('Snapshot creation failed')
       return {
         model: { file: model.file, requests: model.requests, close: () => model.close() },
-        source, scratch, v1: v1 as never, v2: v2 as never, workId, question, sourceMessageId, contextMessageId,
+        source, scratch, v1: v1 as never, v2: v2 as never, workId, question, ticketId: target.ticketId,
+        assignmentId: target.assignmentId, attemptId, fenceEpoch: target.fenceEpoch, contract: target.contract,
+        deliveryTargetId: target.id, answerId,
+        dispatchWindows: { written: { commandId: 'w24-written', target: 'w24-target' }, unknown: { commandId: 'w24-unknown', target: 'w24-target' } },
+        sourceMessageId, contextMessageId,
         reviewedCandidate, contextToken: preparedContext.token, confirmToken, frozenDigest, bindingScope, frozenSourceIds, modelCalls,
       }
     } finally {

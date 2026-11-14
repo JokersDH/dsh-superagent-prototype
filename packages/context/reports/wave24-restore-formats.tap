@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: default v1 and explicit v2 snapshots are each restored through the real bundle path and reviewed
+ok 1 - default v1 and explicit v2 snapshots are each restored through the real bundle path and reviewed
+  ---
+  duration_ms: 22961.339792
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23485.570166

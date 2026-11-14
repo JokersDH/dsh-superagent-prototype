@@ -202,6 +202,7 @@ test('the driver asserts a real user flow, binds the actual consumer and rejects
 
   // 6. Package dialect: the package review entry is actually used; a missing release is NOT_REACHED, never a checkout fallback.
   const pkg = run(restoredV1, await ports(), ['--dialect', 'package', '--pa-entry', paEntry, '--allow-not-reached'])
+  console.error('W24_PKG', JSON.stringify({code:pkg.code,status:pkg.json.status,failure:pkg.json.failure,cleanup:pkg.json.cleanup}))
   assert.equal(pkg.code, 4)
   assert.equal(pkg.json.status, 'NOT_REACHED')
   assert.equal(pkg.json.verified, false)
@@ -226,7 +227,18 @@ test('the driver asserts a real user flow, binds the actual consumer and rejects
   assert.equal(corrupt.json.data.sources?.diagnostic?.partial, true)
   assert.equal(corrupt.json.data.sources?.diagnostic?.withheldSourceCount, 0)
 
-  // 8. A readiness hang ends at the bounded deadline and stops the owned child.
+  // 8. Contradictory entry overrides are usage errors, never a hidden second consumer.
+  for (const [label, extra] of [
+    ['source with pa-entry', ['--pa-entry', join(repoRoot, 'apps/launcher/bin/pa.mjs')]],
+    ['package with start-entry', ['--dialect', 'package', '--start-entry', join(repoRoot, 'tools/dev/start.mjs')]],
+  ] as const) {
+    const result = run(restoredV1, await ports(), [...extra])
+    assert.equal(result.code, 2, label)
+    assert.equal(result.json.status, 'failed', label)
+    assert.equal(result.json.failure?.code, 'usage', label)
+  }
+
+  // 9. A readiness hang ends at the bounded deadline and stops the owned child.
   const hang = join(root, 'hang.mjs')
   writeFileSync(hang, 'setInterval(()=>{},1000)\n')
   const hangRun = run(restoredV1, await ports(), ['--start-entry', hang, '--readiness-ms', '500', '--deadline-ms', '3000'])
