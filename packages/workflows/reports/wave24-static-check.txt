@@ -1,0 +1,20 @@
+{
+  "status": "PASS_LONG_DISPATCH_STATIC_ONLY",
+  "roles": 6,
+  "phases": 60,
+  "checkpoints": 33,
+  "localLinks": 164,
+  "acyclic": true,
+  "nonoverlappingOwners": true,
+  "actualScopeUiAdmitted": true,
+  "oldClosedFindingsPreserved": true,
+  "originalSubjectAndBusinessClosureRequired": true,
+  "measuredA9bPreserved": true,
+  "newUiArtifactVerdictStillRequired": true,
+  "ordinaryInstallIndependentOfActivation": true,
+  "budgetUnchanged": true,
+  "preservedServicePairs": 12,
+  "runtimeTests": 0,
+  "nativeTurnStarts": 0,
+  "releaseApproved": false
+}

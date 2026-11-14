@@ -1,0 +1,106 @@
+{
+  "protocol": "wave11-storage-benchmark/1",
+  "sourceCommit": "78ca006d667aa4fd3f20b26a85166d45c5fe68e3",
+  "modelCalls": 0,
+  "nativeTurns": 0,
+  "cases": [
+    {
+      "case": "100-works",
+      "rows": 100,
+      "insertMs": 3.3
+    },
+    {
+      "case": "1000-works",
+      "rows": 1000,
+      "insertMs": 18.7
+    },
+    {
+      "case": "long-conversation",
+      "rows": 2000,
+      "insertMs": 285.5
+    },
+    {
+      "case": "10000-context-bindings",
+      "rows": 10000,
+      "insertMs": 1319.6
+    },
+    {
+      "case": "history-first-page",
+      "rows": 100,
+      "hasMore": true,
+      "ms": 2.5
+    },
+    {
+      "case": "history-query-plan",
+      "plan": [
+        "SEARCH assistant_context_bindings USING INDEX assistant_context_history_scope (project_id=?)"
+      ]
+    },
+    {
+      "case": "bundle-lookup",
+      "present": true,
+      "digestMatches": true,
+      "bytes": 16,
+      "ms": 0.3
+    },
+    {
+      "case": "recovery-source-20000-row-window",
+      "coverage": "complete",
+      "families": 47,
+      "rows": 13105,
+      "ms": 73.2
+    },
+    {
+      "case": "recovery-source-bounded",
+      "coverage": "bounded",
+      "fingerprint": null,
+      "families": 28,
+      "rows": 1000,
+      "ms": 2.3
+    },
+    {
+      "case": "max-reply-bundle-artifact",
+      "rows": 1,
+      "bytes": 524288,
+      "id": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+    },
+    {
+      "case": "snapshot-v1-create",
+      "status": "ok",
+      "protocol": "workflow-snapshot/1",
+      "databaseBytes": 28688384,
+      "artifacts": 2,
+      "evidenceFamilies": 13,
+      "ms": 413.8
+    },
+    {
+      "case": "snapshot-v1-verify",
+      "status": "ok",
+      "ms": 94.3
+    },
+    {
+      "case": "snapshot-v2-create",
+      "status": "ok",
+      "protocol": "workflow-snapshot/2",
+      "databaseBytes": 28688384,
+      "artifacts": 2,
+      "evidenceFamilies": 21,
+      "ms": 164.7
+    },
+    {
+      "case": "snapshot-v2-verify",
+      "status": "ok",
+      "ms": 83.3
+    }
+  ],
+  "limits": {
+    "maxRows": 20000,
+    "maxHistoryPage": 100,
+    "maxReplyBodyBytes": 524288,
+    "maxBindingsTested": 10000
+  },
+  "limitations": [
+    "Temporary database and content-addressed artifact only; no user state, model/native send or cleanup-policy test.",
+    "Timings are single-process wall clock on this host, not a service SLO."
+  ]
+}

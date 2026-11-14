@@ -11,7 +11,7 @@ import { test } from 'node:test'
 import { ProductStore } from '@personal-agent/storage'
 import { canonicalJson } from '@personal-agent/contracts/canonical'
 import { createControlledProduct, FIXTURE_CHECK } from '../../../apps/coordinator/product/runtime.ts'
-import { buildDataManifest, verifyDataManifest, type DataManifest } from '../src/index.ts'
+import { buildDataManifest, verifyDataManifest, type DataManifest, type DataSubjectExpectation } from '../src/index.ts'
 
 const principal = { userId: 'wave23-reader-user', authorityRef: 'wave23-reader-authority' }
 const actor = { ...principal, source: 'local_cli' as const }
@@ -36,14 +36,14 @@ test('a different Node PID reads the original attempt and the manifest rejects s
   git(['init', '-q']); git(['add', 'src/.gitkeep']); git(['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '-qm', 'reader fixture'])
   const store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
   const product = createControlledProduct({ store, principal, projects: [{ id: projectId, scope }], actionSecret: Buffer.alloc(32, 97), stateRoot, scratchProject: project })
-  let attemptId = '', ticketId = '', questionId = '', answerId = '', contract: any
+  let attemptId = '', ticketId = '', questionId = '', answerId = '', contract: any, assignmentId = '', fenceEpoch = 0, deliveryTargetId = ''
   try {
     product.start(); let seq = 0
     const command = (value: any) => product.application.dispatch({ commandId: `wave23-reader-${++seq}`, conversationId, ...value }, actor)
     const created = await command({ kind: 'create_work', projectId, goal: 'Wave-23 process reader', profileId: 'profile-fixture-question', scope, criteria })
     assert.equal(created.status, 'recorded')
     const view = await until(async () => product.application.inspect({}), value => value.questions.length === 1)
-    const question = view.questions[0]!; questionId = question.id; ticketId = question.targets[0]!.ticketId; contract = question.targets[0]!.contract
+    const question = view.questions[0]!, target = question.targets[0]!; questionId = question.id; ticketId = target.ticketId; assignmentId = target.assignmentId; fenceEpoch = target.fenceEpoch; contract = target.contract; deliveryTargetId = target.id
     await until(async () => store.bindings.current(ticketId), value => !!value)
     attemptId = store.bindings.current<any>(ticketId)!.attemptId
     // Intent / written / unknown windows on the same real attempt identity, with no fabrication as observed.
@@ -58,24 +58,30 @@ test('a different Node PID reads the original attempt and the manifest rejects s
     answerId = (store.db.prepare('SELECT answer_id FROM answers WHERE question_id = ?').get(questionId) as { answer_id: string }).answer_id
   } finally { await product.close() }
   const sourceSha = 'a'.repeat(40)
-  const manifest = await buildDataManifest(store, { sourceSha, snapshotFormat: 1, ticketId, attemptId, questionId, answerId,
-    commandIds: ['wave23-reader-1', 'wave23-reader-2'],
-    dispatch: [{ commandId: 'wave23-window', target: 'wave23-target' }, { commandId: 'wave23-unknown', target: 'wave23-target' }] })
+  const expectation: DataSubjectExpectation = {
+    sourceSha, snapshotFormat: 1, ticketId, assignmentId, attemptId, fenceEpoch, contract,
+    questionId, answerId,
+    requiredCommandIds: ['wave23-reader-1', 'wave23-reader-2'],
+    requiredDispatch: [{ commandId: 'wave23-window', target: 'wave23-target' }, { commandId: 'wave23-unknown', target: 'wave23-target' }],
+    requiredDeliveryTargets: [deliveryTargetId],
+  }
+  const manifest = await buildDataManifest(store, expectation)
   console.log('WAVE23_MANIFEST', JSON.stringify(manifest))
-  const manifestPath = join(root, 'manifest.json')
+  const manifestPath = join(root, 'manifest.json'), expectationPath = join(root, 'expectation.json')
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
+  writeFileSync(expectationPath, JSON.stringify(expectation, null, 2))
   const before = { deliveries: manifest.counts.deliveries, dispatch: manifest.counts.dispatch, observations: manifest.counts.observations,
     queue: store.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 100).length }
   const reader = join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'wave23-reader.mjs')
-  const child = spawnSync(process.execPath, [reader, join(stateRoot, 'state.sqlite'), manifestPath, sourceSha], { encoding: 'utf8', timeout: 20000 })
+  const child = spawnSync(process.execPath, [reader, join(stateRoot, 'state.sqlite'), manifestPath, expectationPath], { encoding: 'utf8', timeout: 20000 })
   assert.equal(child.status, 0, child.stderr)
   const observed = JSON.parse(child.stdout)
   assert.notEqual(observed.pid, process.pid)
-  assert.deepEqual(observed.verification, { ok: true })
+  assert.equal(observed.verification.ok, true, JSON.stringify(observed.verification))
   assert.equal(observed.binding.attemptId, attemptId); assert.equal(observed.binding.ticketId, ticketId)
-  assert.equal(observed.binding.assignmentId, manifest.binding.assignmentId)
+  assert.equal(observed.binding.assignmentId, assignmentId)
   assert.deepEqual(observed.binding.contract, contract)
-  assert.equal(observed.binding.fenceEpoch, manifest.binding.fenceEpoch)
+  assert.equal(observed.binding.fenceEpoch, fenceEpoch)
   assert.equal(observed.currentAttemptId, attemptId)
   assert.equal(observed.question.id, questionId); assert.equal(observed.question.validity, 'answered')
   assert.equal(observed.answer.id, answerId); assert.equal(observed.answer.digest, manifest.answer.digest)
@@ -92,16 +98,21 @@ test('a different Node PID reads the original attempt and the manifest rejects s
   const mutations: [string, (value: DataManifest) => void][] = [
     ['payload digest', value => { value.observations[0]!.payloadSha256 = 'f'.repeat(64) }],
     ['answer id', value => { value.answer.id = 'other-answer' }],
-    ['data root', value => { value.dataRoot = '/tmp/other-root' }],
-    ['source sha', value => { value.sourceSha = 'b'.repeat(40) }],
-    ['snapshot format', value => { value.snapshotFormat = 2 }],
+    ['data root', value => { value.subject.dataRoot = '/tmp/other-root' }],
+    ['source sha', value => { value.subject.sourceSha = 'b'.repeat(40) }],
+    ['snapshot format', value => { value.subject.snapshotFormat = 2 }],
     ['source fingerprint', value => { value.sourceFingerprint = 'c'.repeat(64) }],
+    ['delete all commands', value => { value.commands = []; value.requirements.commandIds = [] }],
+    ['delete one requirement', value => { value.requirements.commandIds = value.requirements.commandIds.slice(1) }],
+    ['empty dispatch', value => { value.dispatch = []; value.requirements.dispatch = [] }],
+    ['foreign command', value => { value.commands.push({ id: 'foreign-command', status: 'recorded', payloadDigest: 'd'.repeat(64), seq: 999, resultDigest: null }) }],
+    ['duplicate command', value => { value.commands.push({ ...value.commands[0]! }) }],
   ]
   const rejected: string[] = []
   for (const [name, mutate] of mutations) {
     const copy = structuredClone(manifest); mutate(copy)
     ;(copy as any).digest = digest((({ digest: _digest, ...rest }) => rest)(copy))
-    const result = await verifyDataManifest(store, copy, { sourceSha, snapshotFormat: 1 })
+    const result = await verifyDataManifest(store, copy, expectation)
     assert.equal(result.ok, false, name)
     rejected.push(name)
   }

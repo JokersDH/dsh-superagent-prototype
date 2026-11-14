@@ -14,4 +14,4 @@ export {
   WorkflowSnapshots, SnapshotError, readSnapshotManifest, snapshotFileBytes,
   type SnapshotArtifact, type SnapshotManifest, type SnapshotResult, type SnapshotVerification,
 } from './snapshot.ts'
-export { buildDataManifest, verifyDataManifest, type DataManifest, type DataManifestInput } from './data-manifest.ts'
+export { buildDataManifest, verifyDataManifest, DEFAULT_DATA_MANIFEST_LIMITS, type DataManifest, type DataManifestLimits, type DataSubjectExpectation, type DispatchExpectation } from './data-manifest.ts'

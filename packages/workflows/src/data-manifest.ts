@@ -1,26 +1,46 @@
-/** Wave-23 A: bounded data manifest and cross-process reader input. Data only; no grant/ledger. */
+/** Wave-24 A: complete original subject, independent expected sets and UoW/payload guards. */
 import { createHash } from 'node:crypto'
 import { dirname } from 'node:path'
 import { JsonSchema, type Json } from '@personal-agent/contracts'
 import { canonicalJson } from '@personal-agent/contracts/canonical'
 import type { ProductStore } from '@personal-agent/storage'
 
-export interface DataManifestInput {
+export interface DispatchExpectation { commandId: string; target: string }
+export interface DataManifestLimits {
+  maxCommands: number; maxDispatch: number; maxObservations: number; maxPayloads: number
+  maxPayloadBytes: number; maxTotalPayloadBytes: number
+}
+export interface DataSubjectExpectation {
   sourceSha: string
   snapshotFormat: 1 | 2
+  /** Expected actual state root; omitted means use the opened store root. */
+  dataRoot?: string
   ticketId: string
+  assignmentId: string
   attemptId: string
+  fenceEpoch: number
+  contract: { workId: string; revision: number; digest: string }
   questionId: string
   answerId: string
-  commandIds: readonly string[]
-  dispatch: readonly { commandId: string; target: string }[]
+  requiredCommandIds: string[]
+  requiredDispatch: DispatchExpectation[]
+  requiredDeliveryTargets: string[]
+  requiredObservationFactIds?: string[]
+  limits?: Partial<DataManifestLimits>
 }
 
+export const DEFAULT_DATA_MANIFEST_LIMITS: DataManifestLimits = Object.freeze({
+  maxCommands: 64, maxDispatch: 64, maxObservations: 256, maxPayloads: 128,
+  maxPayloadBytes: 1024 * 1024, maxTotalPayloadBytes: 4 * 1024 * 1024,
+})
+
 export interface DataManifest {
-  protocol: 'wave23-data-manifest/1'
-  sourceSha: string
-  dataRoot: string
-  snapshotFormat: 1 | 2
+  protocol: 'wave24-data-manifest/1'
+  subject: {
+    sourceSha: string; dataRoot: string; snapshotFormat: 1 | 2
+    ticketId: string; assignmentId: string; attemptId: string; fenceEpoch: number
+    contract: { workId: string; revision: number; digest: string }
+  }
   sourceFingerprint: string | null
   binding: {
     attemptId: string; ticketId: string; assignmentId: string; fenceEpoch: number
@@ -29,91 +49,194 @@ export interface DataManifest {
     resources: { ref: string; ownership: string }[]
   }
   currentAttemptId: string | null
-  question: { id: string; version: number; validity: string }
+  question: { id: string; version: number; validity: string; targetIds: string[] }
   answer: { id: string; questionId: string; expectedVersion: number; digest: string }
   deliveries: { targetBindingId: string; status: string }[]
   commands: { id: string; status: string; payloadDigest: string; seq: number; resultDigest: string | null }[]
   dispatch: { commandId: string; target: string; delivery: string; nativeRef: string | null; error: string | null }[]
   observations: { factId: string; kind: string; disposition: string; payloadRef: string; payloadSha256: string; bytes: number }[]
-  counts: { commands: number; dispatch: number; observations: number; deliveries: number; payloads: number }
+  requirements: {
+    commandIds: string[]; dispatch: DispatchExpectation[]; deliveryTargets: string[]; observationFactIds: string[]
+  }
+  coverage: { commands: 'complete'; dispatch: 'complete'; observations: 'complete'; deliveries: 'complete'; payloads: 'complete' }
+  limits: DataManifestLimits
+  counts: { commands: number; dispatch: number; observations: number; deliveries: number; payloads: number; payloadBytes: number }
   digest: string
 }
-
-const sha = (value: Json): string => createHash('sha256').update(canonicalJson(value)).digest('hex')
 type ManifestBody = Omit<DataManifest, 'digest'>
 
-/** Builds a manifest only from public store reads and actual payload bytes. */
-export async function buildDataManifest(store: ProductStore, input: DataManifestInput): Promise<DataManifest> {
-  const binding = store.bindings.binding<any>(input.attemptId)
-  if (!binding) throw new Error(`Unknown attempt ${input.attemptId}`)
-  if (binding.ticketId !== input.ticketId) throw new Error('Attempt and ticket identities disagree')
-  const current = store.bindings.current<any>(input.ticketId)
-  const question = store.product.questions.get(input.questionId)
-  const answer = store.answers.get(input.answerId)
-  if (!question || !answer || answer.questionId !== input.questionId) throw new Error('Question/answer identities are missing or disagree')
-  const deliveries = store.answers.deliveries(input.answerId).map(value => ({ targetBindingId: value.targetBindingId, status: value.status }))
-  const commands = input.commandIds.map(id => {
-    const receipt = store.commands.get(id)
-    if (!receipt) throw new Error(`Unknown command receipt ${id}`)
-    return { id, status: receipt.status, payloadDigest: receipt.payloadDigest, seq: receipt.seq,
-      resultDigest: receipt.result === null || receipt.result === undefined ? null : sha(JsonSchema.parse(receipt.result) as Json) }
+const sha = (value: Json): string => createHash('sha256').update(canonicalJson(value)).digest('hex')
+const unique = (values: string[], name: string): void => {
+  if (new Set(values).size !== values.length) throw new Error(`${name} contains duplicate IDs`)
+}
+const sortedUnique = (values: readonly string[], name: string): string[] => {
+  if (values.length === 0) throw new Error(`${name} must contain at least one required item`)
+  unique([...values], name)
+  return [...values].sort()
+}
+function limitsFor(input?: Partial<DataManifestLimits>): DataManifestLimits {
+  const limits = { ...DEFAULT_DATA_MANIFEST_LIMITS, ...input }
+  for (const [name, value] of Object.entries(limits)) {
+    if (!Number.isSafeInteger(value) || value < 1) throw new Error(`Invalid manifest limit ${name}`)
+  }
+  return limits as DataManifestLimits
+}
+
+interface SyncSnapshot {
+  binding: any; currentAttemptId: string | null; question: any; answer: any; deliveries: { targetBindingId: string; status: string }[]
+  commands: DataManifest['commands']; dispatch: DataManifest['dispatch']; observations: DataManifest['observations']
+  sourceFingerprint: string | null
+}
+
+/** Reads related indexes in one synchronous UoW and verifies the complete subject before any payload await. */
+function readSubject(store: ProductStore, expected: DataSubjectExpectation, limits: DataManifestLimits): SyncSnapshot {
+  return store.uow.atomic(() => {
+    const binding = store.bindings.binding<any>(expected.attemptId)
+    if (!binding) throw new Error(`Unknown attempt ${expected.attemptId}`)
+    if (binding.ticketId !== expected.ticketId || binding.assignmentId !== expected.assignmentId ||
+      binding.fenceEpoch !== expected.fenceEpoch ||
+      canonicalJson(binding.contract as Json) !== canonicalJson(expected.contract as Json))
+      throw new Error('Attempt/ticket/assignment/contract/epoch does not match the expected original subject')
+    const current = store.bindings.current<any>(expected.ticketId)
+    const question = store.product.questions.get(expected.questionId)
+    if (!question) throw new Error(`Unknown question ${expected.questionId}`)
+    if (question.validity !== 'answered') throw new Error('Question is not answered')
+    const target = question.targets.find((value: any) => value.id !== undefined &&
+      value.attemptId === expected.attemptId && value.ticketId === expected.ticketId &&
+      value.assignmentId === expected.assignmentId && value.fenceEpoch === expected.fenceEpoch &&
+      canonicalJson(value.contract as Json) === canonicalJson(expected.contract as Json))
+    if (!target) throw new Error('Question targets do not belong to the expected attempt/contract/epoch')
+    const answer = store.answers.get(expected.answerId)
+    if (!answer || answer.questionId !== question.id) throw new Error('Answer does not belong to the expected question')
+    if (answer.expectedVersion > question.version) throw new Error('Answer expectedVersion is newer than the question')
+    const deliveries = store.answers.deliveries(expected.answerId).map(value => ({ targetBindingId: value.targetBindingId, status: value.status }))
+    unique(expected.requiredDeliveryTargets, 'requiredDeliveryTargets')
+    const targetIds = question.targets.map((value: any) => String(value.id))
+    for (const required of expected.requiredDeliveryTargets) {
+      if (!targetIds.includes(required)) throw new Error(`Required delivery target ${required} is foreign to the question`)
+      if (!deliveries.some(value => value.targetBindingId === required)) throw new Error(`Required delivery ${required} is missing`)
+    }
+    const commands = sortedUnique(expected.requiredCommandIds, 'requiredCommandIds').map(id => {
+      const receipt = store.commands.get(id)
+      if (!receipt) throw new Error(`Required command receipt ${id} is missing`)
+      return { id, status: receipt.status, payloadDigest: receipt.payloadDigest, seq: receipt.seq,
+        resultDigest: receipt.result === null || receipt.result === undefined ? null : sha(JsonSchema.parse(receipt.result) as Json) }
+    })
+    if (commands.length > limits.maxCommands) throw new Error('Command count exceeds manifest limit')
+    unique(expected.requiredDispatch.map(value => `${value.commandId}\u0000${value.target}`), 'requiredDispatch')
+    if (expected.requiredDispatch.length === 0) throw new Error('requiredDispatch must contain at least one item')
+    if (expected.requiredDispatch.length > limits.maxDispatch) throw new Error('Dispatch count exceeds manifest limit')
+    const dispatch = expected.requiredDispatch.map(({ commandId, target }) => {
+      const value = store.dispatch.get(commandId, target)
+      if (!value) throw new Error(`Required dispatch ${commandId}/${target} is missing`)
+      return { commandId, target, delivery: value.delivery, nativeRef: value.nativeRef ?? null, error: value.error ?? null }
+    }).sort((left, right) => `${left.commandId}\u0000${left.target}`.localeCompare(`${right.commandId}\u0000${right.target}`))
+    const observations = store.observations.forAttempt(expected.attemptId).map(row => ({
+      factId: row.factId, kind: row.kind, disposition: row.disposition, payloadRef: row.payloadRef,
+      payloadSha256: row.payloadSha256, bytes: 0,
+    })).sort((left, right) => left.factId.localeCompare(right.factId))
+    if (observations.length === 0) throw new Error('Attempt has no observed facts')
+    if (observations.length > limits.maxObservations) throw new Error('Observation count exceeds manifest limit')
+    const requiredFacts = expected.requiredObservationFactIds
+      ? sortedUnique(expected.requiredObservationFactIds, 'requiredObservationFactIds') : observations.map(value => value.factId)
+    for (const factId of requiredFacts) if (!observations.some(value => value.factId === factId))
+      throw new Error(`Required observation ${factId} is missing`)
+    const source = store.workflows.recoverySource.inspect()
+    if (source.coverage !== 'complete' || !source.sourceFingerprint) throw new Error('Logical source is not complete')
+    return { binding, currentAttemptId: current?.attemptId ?? null, question, answer, deliveries, commands, dispatch,
+      observations, sourceFingerprint: source.sourceFingerprint }
   })
-  const dispatch = input.dispatch.map(({ commandId, target }) => {
-    const value = store.dispatch.get(commandId, target)
-    if (!value) throw new Error(`Unknown dispatch ${commandId}/${target}`)
-    return { commandId, target, delivery: value.delivery, nativeRef: value.nativeRef ?? null, error: value.error ?? null }
-  })
-  const observations = store.observations.forAttempt(input.attemptId).map(row => ({
-    factId: row.factId, kind: row.kind, disposition: row.disposition, payloadRef: row.payloadRef,
-    payloadSha256: row.payloadSha256, bytes: 0,
-  }))
+}
+
+function stableSubject(snapshot: SyncSnapshot, expected: DataSubjectExpectation): Json {
+  return {
+    binding: { attemptId: snapshot.binding.attemptId, ticketId: snapshot.binding.ticketId,
+      assignmentId: snapshot.binding.assignmentId, fenceEpoch: snapshot.binding.fenceEpoch,
+      contract: snapshot.binding.contract, runnerIdentityRef: snapshot.binding.runnerIdentityRef,
+      sessionSource: snapshot.binding.source,
+      resources: snapshot.binding.resources.map((resource: any) => ({ ref: resource.ref, ownership: resource.ownership })) },
+    currentAttemptId: snapshot.currentAttemptId,
+    question: { id: snapshot.question.id, version: snapshot.question.version, validity: snapshot.question.validity,
+      targetIds: snapshot.question.targets.map((value: any) => String(value.id)) },
+    answer: { id: expected.answerId, questionId: snapshot.answer.questionId,
+      expectedVersion: snapshot.answer.expectedVersion, digest: snapshot.answer.digest },
+    deliveries: snapshot.deliveries,
+    commands: snapshot.commands,
+    dispatch: snapshot.dispatch,
+    observations: snapshot.observations.map(value => ({ ...value, bytes: 0 })),
+    requirements: { commandIds: [...expected.requiredCommandIds].sort(),
+      dispatch: [...expected.requiredDispatch].sort((left, right) => `${left.commandId}\u0000${left.target}`.localeCompare(`${right.commandId}\u0000${right.target}`)),
+      deliveryTargets: [...expected.requiredDeliveryTargets].sort(),
+      observationFactIds: expected.requiredObservationFactIds ? [...expected.requiredObservationFactIds].sort() : snapshot.observations.map(value => value.factId) },
+    sourceFingerprint: snapshot.sourceFingerprint,
+  } as unknown as Json
+}
+
+export async function buildDataManifest(store: ProductStore, expected: DataSubjectExpectation): Promise<DataManifest> {
+  const limits = limitsFor(expected.limits)
+  const dataRoot = dirname(store.database.path)
+  if (expected.dataRoot && expected.dataRoot !== dataRoot) throw new Error('Expected data root does not match the opened store')
+  const before = readSubject(store, expected, limits)
   const payloads = new Map<string, number>()
-  for (const observation of observations) {
+  let totalPayloadBytes = 0
+  for (const observation of before.observations) {
     if (payloads.has(observation.payloadRef)) { observation.bytes = payloads.get(observation.payloadRef)!; continue }
+    if (payloads.size >= limits.maxPayloads) throw new Error('Payload count exceeds manifest limit')
     const payload = await store.payloads.read(observation.payloadRef)
     if (payload.sha256 !== observation.payloadSha256) throw new Error(`Payload ${observation.payloadRef} digest differs from observation`)
     const bytes = new TextEncoder().encode(canonicalJson(JsonSchema.parse(payload.value) as Json)).byteLength
-    payloads.set(observation.payloadRef, bytes)
-    observation.bytes = bytes
+    if (bytes > limits.maxPayloadBytes) throw new Error(`Payload ${observation.payloadRef} exceeds byte limit`)
+    totalPayloadBytes += bytes
+    if (totalPayloadBytes > limits.maxTotalPayloadBytes) throw new Error('Total payload bytes exceed manifest limit')
+    payloads.set(observation.payloadRef, bytes); observation.bytes = bytes
   }
-  const source = store.workflows.recoverySource.inspect()
+  const after = readSubject(store, expected, limits)
+  if (canonicalJson(stableSubject(before, expected)) !== canonicalJson(stableSubject(after, expected)))
+    throw new Error('Original subject or source changed while payload bytes were read')
+  for (const observation of after.observations) observation.bytes = payloads.get(observation.payloadRef) ?? 0
   const body: ManifestBody = {
-    protocol: 'wave23-data-manifest/1', sourceSha: input.sourceSha,
-    dataRoot: dirname(store.database.path), snapshotFormat: input.snapshotFormat,
-    sourceFingerprint: source.sourceFingerprint,
-    binding: { attemptId: binding.attemptId, ticketId: binding.ticketId, assignmentId: binding.assignmentId,
-      fenceEpoch: binding.fenceEpoch, contract: binding.contract, state: binding.state,
-      runnerIdentityRef: binding.runnerIdentityRef, sessionSource: binding.source,
-      resources: binding.resources.map((resource: any) => ({ ref: resource.ref, ownership: resource.ownership })) },
-    currentAttemptId: current?.attemptId ?? null,
-    question: { id: question.id, version: question.version, validity: question.validity },
-    answer: { id: input.answerId, questionId: answer.questionId, expectedVersion: answer.expectedVersion, digest: answer.digest },
-    deliveries,
-    commands: [...commands].sort((left, right) => left.id.localeCompare(right.id)),
-    dispatch: [...dispatch].sort((left, right) => `${left.commandId}:${left.target}`.localeCompare(`${right.commandId}:${right.target}`)),
-    observations: [...observations].sort((left, right) => left.factId.localeCompare(right.factId)),
-    counts: { commands: commands.length, dispatch: dispatch.length, observations: observations.length,
-      deliveries: deliveries.length, payloads: payloads.size },
+    protocol: 'wave24-data-manifest/1',
+    subject: { sourceSha: expected.sourceSha, dataRoot, snapshotFormat: expected.snapshotFormat,
+      ticketId: expected.ticketId, assignmentId: expected.assignmentId, attemptId: expected.attemptId,
+      fenceEpoch: expected.fenceEpoch, contract: expected.contract },
+    sourceFingerprint: after.sourceFingerprint,
+    binding: { attemptId: after.binding.attemptId, ticketId: after.binding.ticketId,
+      assignmentId: after.binding.assignmentId, fenceEpoch: after.binding.fenceEpoch,
+      contract: after.binding.contract, state: after.binding.state, runnerIdentityRef: after.binding.runnerIdentityRef,
+      sessionSource: after.binding.source,
+      resources: after.binding.resources.map((resource: any) => ({ ref: resource.ref, ownership: resource.ownership })) },
+    currentAttemptId: after.currentAttemptId,
+    question: { id: after.question.id, version: after.question.version, validity: after.question.validity,
+      targetIds: after.question.targets.map((value: any) => String(value.id)) },
+    answer: { id: expected.answerId, questionId: after.answer.questionId,
+      expectedVersion: after.answer.expectedVersion, digest: after.answer.digest },
+    deliveries: after.deliveries,
+    commands: after.commands,
+    dispatch: after.dispatch,
+    observations: after.observations,
+    requirements: { commandIds: [...expected.requiredCommandIds].sort(),
+      dispatch: [...expected.requiredDispatch].sort((left, right) => `${left.commandId}\u0000${left.target}`.localeCompare(`${right.commandId}\u0000${right.target}`)),
+      deliveryTargets: [...expected.requiredDeliveryTargets].sort(),
+      observationFactIds: expected.requiredObservationFactIds ? [...expected.requiredObservationFactIds].sort() : after.observations.map(value => value.factId) },
+    coverage: { commands: 'complete', dispatch: 'complete', observations: 'complete', deliveries: 'complete', payloads: 'complete' },
+    limits,
+    counts: { commands: after.commands.length, dispatch: after.dispatch.length, observations: after.observations.length,
+      deliveries: after.deliveries.length, payloads: payloads.size, payloadBytes: totalPayloadBytes },
   }
-  return { ...body, digest: sha(body as Json) }
+  return { ...body, digest: sha(body as unknown as Json) }
 }
 
-/** Rebuilds from live public reads and rejects any ID/digest/root/format/source drift. */
 export async function verifyDataManifest(store: ProductStore, manifest: DataManifest,
-  expected: { sourceSha?: string; snapshotFormat?: 1 | 2 } = {}): Promise<{ ok: true } | { ok: false; reason: string }> {
-  if (manifest.protocol !== 'wave23-data-manifest/1') return { ok: false, reason: 'unsupported manifest protocol' }
-  if (expected.sourceSha && manifest.sourceSha !== expected.sourceSha) return { ok: false, reason: 'source SHA differs' }
-  if (expected.snapshotFormat && manifest.snapshotFormat !== expected.snapshotFormat) return { ok: false, reason: 'snapshot format differs' }
+  expected: DataSubjectExpectation): Promise<{ ok: true; coverage: DataManifest['coverage'] } | { ok: false; reason: string }> {
+  if (manifest.protocol !== 'wave24-data-manifest/1') return { ok: false, reason: 'unsupported manifest protocol' }
+  if (manifest.subject.sourceSha !== expected.sourceSha) return { ok: false, reason: 'source SHA differs from expectation' }
+  if (manifest.subject.snapshotFormat !== expected.snapshotFormat) return { ok: false, reason: 'snapshot format differs from expectation' }
   const { digest, ...body } = manifest
-  if (digest !== sha(body)) return { ok: false, reason: 'manifest digest is inconsistent' }
+  if (digest !== sha(body as unknown as Json)) return { ok: false, reason: 'manifest digest is inconsistent' }
   let rebuilt: DataManifest
-  try {
-    rebuilt = await buildDataManifest(store, { sourceSha: manifest.sourceSha, snapshotFormat: manifest.snapshotFormat,
-      ticketId: manifest.binding.ticketId, attemptId: manifest.binding.attemptId, questionId: manifest.question.id,
-      answerId: manifest.answer.id, commandIds: manifest.commands.map(value => value.id),
-      dispatch: manifest.dispatch.map(value => ({ commandId: value.commandId, target: value.target })) })
-  } catch (error) { return { ok: false, reason: `manifest input is no longer readable: ${String(error)}` } }
+  try { rebuilt = await buildDataManifest(store, expected) }
+  catch (error) { return { ok: false, reason: `expected subject is no longer readable: ${String(error)}` } }
   const rebuiltBody = (({ digest: _digest, ...rest }) => rest)(rebuilt)
-  if (canonicalJson(rebuiltBody) !== canonicalJson(body)) return { ok: false, reason: 'live data differs from manifest' }
-  return { ok: true }
+  if (canonicalJson(rebuiltBody as unknown as Json) !== canonicalJson(body as unknown as Json)) return { ok: false, reason: 'manifest differs from the expected complete subject' }
+  return { ok: true, coverage: rebuilt.coverage }
 }
