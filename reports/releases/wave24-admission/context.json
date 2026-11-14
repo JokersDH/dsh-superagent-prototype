@@ -1,0 +1,192 @@
+{
+  "protocol": "wave24-ac-admission/1",
+  "date": "2026-11-14",
+  "status": "PASS_SCOPED_NEW_PROCESS_AND_SOURCE_DRIVER_PACKAGE_MANIFEST_NOT_ADMITTED",
+  "fixedSources": {
+    "mainDispatch": "f29c9e62fb8298d652dc8f98ba05b0caa04a1381",
+    "A": "1b2ef61cdc9c10d75c677a6823c3314aa70f610b",
+    "C": "a97fbd251d96e023697fc1233ed5e17dd2e6781c"
+  },
+  "worktrees": {
+    "A": "/Users/hh/Desktop/joker/superagent-agent-a",
+    "C": "/Users/hh/Desktop/joker/superagent-agent-c",
+    "dirtyBeforeAndAfter": { "A": [], "C": ["pnpm-lock.yaml"] },
+    "sourceFilesEditedByReview": false
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "node --test packages/workflows/test/wave23-process-reader.case.ts",
+      "exitCode": 0,
+      "tests": 1,
+      "passed": 1,
+      "scope": "Actual different Node PID reads original attempt/question/answer/native_applied facts, payload manifest and synthetic written/unknown targets; six submitted single-field mutations rejected; source SHA in this fixture is a declared a*40 test value"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test packages/knowledge/test/wave23-driver-lib.case.ts packages/knowledge/test/main-personal-driver-strict.case.ts packages/knowledge/test/main-personal-package-driver.case.ts",
+      "exitCode": 0,
+      "tests": 8,
+      "passed": 8,
+      "durationMs": 68705,
+      "scope": "Actual source-dialect v1/v2 restored personal standard starts, expected-result failures, observation-only output, valid same-selection reuse/different-selection refusal, unverified frozen body and bounded source-child failure; six HTTP/log/readiness/cleanup helper cases. Package review actually reaches CLI; package start remains NOT_REACHED, not installed admission."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm --filter @personal-agent/workflows typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/knowledge typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave24-ac-audit-ALqjCC/probe-a-manifest.ts",
+      "exitCode": 0,
+      "positiveCases": 1,
+      "negativeMutations": 2,
+      "correctNegativeRefusals": 0,
+      "report": "/tmp/pa-wave24-ac-audit-ALqjCC/a-manifest-results.json",
+      "scope": "Two actual controlled Work/Broker/native_applied attempts in one private Store, real candidate source SHA. Selected attempt1 plus question/answer/commands2 is accepted. Removing original commands and recomputing the data digest is accepted. No real vendor/native send."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node /tmp/pa-wave24-ac-audit-ALqjCC/probe-c-package.mjs",
+      "exitCode": 0,
+      "positiveCases": 1,
+      "negativeMutations": 2,
+      "correctNegativeRefusals": 0,
+      "report": "/tmp/pa-wave24-ac-audit-ALqjCC/c-package-results.json",
+      "scope": "Owned private package protocol, no actual installed lifecycle. Exact custom --pa-entry executes but default entry hash is reported; unique stop1 and missing PID mutations still return verified-flow/verified true."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node /tmp/pa-wave24-ac-audit-ALqjCC/probe-c-deadline.mjs",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave24-ac-audit-ALqjCC/c-deadline-results.json",
+      "scope": "Owned private slow review child and exact spawned no-op start child; declared overall deadline1000ms but review preparation completes after1800ms and total1936ms before failure; owned child stopped. No HTTP service started or reached."
+    }
+  ],
+  "previousFindingsClosed": [
+    {
+      "id": "A-NEW-PROCESS-READBACK-NOT-YET-PROVEN",
+      "closedScope": "A now has an actual different Node reader PID and original persistent identity checks. This is not coordinator crash/resume, UoW under concurrent mutation or physical writer-stop proof."
+    },
+    {
+      "id": "C-DRIVER-FAILED-EXPECTED-OUTCOME-STILL-OK",
+      "closedScope": "Source driver now uses verified-flow versus observed, strict HTTP/outcome assertions and precise failures; actual source expected-result negatives pass."
+    },
+    {
+      "id": "C-DRIVER-READY-SERVICE-NOT-BOUND-TO-STARTED-CONSUMER",
+      "closedScope": "Source startup now requires spawned PID/current record/review digest and health; early-exit foreign ready control refused; actual lawful source reuse with matching digest and stable original PID passed. Package branch remains separate below."
+    },
+    {
+      "id": "C-DRIVER-REQUEST-DEADLINE-NOT-ENFORCED",
+      "closedScope": "HTTP requests now use AbortSignal capped by remaining budget; silent peer/readiness fault tests pass. Preparation/identity child stages still have independent fixed timeouts instead of the declared total budget."
+    }
+  ],
+  "admittedScopes": {
+    "AIndependentNodeReadback": true,
+    "AOriginalActualFactPositive": true,
+    "ADataManifestExpectedSubjectIntegrity": false,
+    "AConcurrentUowConsistencyProven": false,
+    "AActualProducerToCInstalledConsumer": false,
+    "CSourceStrictAssertions": true,
+    "CSourceActualConsumerReviewIdentity": true,
+    "CSourceLawfulReuseAndMismatchRefusal": true,
+    "CHttpAbortBounds": true,
+    "CSourceDualSnapshotSecondRoots": true,
+    "CPackageReviewCliReached": true,
+    "CPackageActualStartReached": false,
+    "CPackageConsumerVerified": false,
+    "InstalledRelease": false,
+    "BusinessRecovery": false,
+    "PrivatePermissionOrTarget": false
+  },
+  "findings": [
+    {
+      "id": "A-MANIFEST-QUESTION-ANSWER-NOT-BOUND-TO-ATTEMPT",
+      "priority": "P2",
+      "file": "packages/workflows/src/data-manifest.ts",
+      "line": 53,
+      "detail": "buildDataManifest checks attempt-to-ticket and answer-to-question separately, but never checks question target/answer delivery/command relationship to the selected attempt/assignment/contract/epoch. With two real controlled Work attempts in the same private Store, selecting attempt1 and the real question/answer/commands of attempt2 produces a manifest that verifyDataManifest accepts with ok:true. The resulting summary joins two different original business subjects.",
+      "scope": "New exported A data-only module, not integrated main authorization or a demonstrated product permission bypass.",
+      "next": "Validate the complete target/attempt/assignment/contract/epoch/question/answer relationship through existing ports, and take the expected subject from a trusted producer recipe rather than the supplied manifest alone. Add an actual valid two-attempt positive and unique foreign-subject negative."
+    },
+    {
+      "id": "C-PACKAGE-ENTRY-HASH-IGNORES-ACTUAL-PA-OVERRIDE",
+      "priority": "P2",
+      "file": "packages/context/tools/personal-review-driver.mjs",
+      "line": 354,
+      "detail": "Package execution uses the --pa-entry path at lines131/161, but collectEntries reports --review-entry/--start-entry or the default apps/launcher/bin/pa.mjs. A private protocol positive executed install/actual-pa.mjs while the output reported a distinct default pa.mjs file and hash that was never executed. Consumers cannot bind output provenance to the actual requested package command from those fields.",
+      "next": "Resolve one immutable dialect command descriptor and use its exact paths and byte identities for execution, cleanup and output. Reject conflicting entry overrides; verify the actual package path and hash independently before claiming installed consumer scope."
+    },
+    {
+      "id": "C-PACKAGE-MISSING-PROCESS-IDENTITY-ACCEPTED",
+      "priority": "P2",
+      "file": "packages/context/tools/personal-review-driver.mjs",
+      "line": 178,
+      "detail": "The package branch copies instance.pid but its identity.bound predicate checks only state, startupMode and digest, and never requires a live PID/start/config/operation serving identity. A unique missing-PID mutation of an otherwise accepted private package protocol returns verified-flow, verified:true, identity.recordPid:null, identity.bound:true. Actual installed start has not been measured by C, so source identity passes must not be generalized to this branch.",
+      "next": "Bind package start/reuse to the package's actual complete instance/process/root/config identity and current health, with valid full positive plus independent omitted/different PID/start/root/config negatives. Avoid deriving stop ownership merely from a RUNNING string."
+    },
+    {
+      "id": "C-CLEANUP-FAILURE-DOES-NOT-FAIL-FLOW",
+      "priority": "P2",
+      "file": "packages/context/tools/personal-review-driver.mjs",
+      "line": 394,
+      "detail": "finalizeCleanup records a failed stop or catches an error but final status/verified/exitCode remain successful. Changing only the private package stop command from exit0 to exit1 retains verified-flow/exit0 with cleanup.owned:true, cleanup.stopped:false. The source catch path likewise stores cleanup failure without changing a successful main result. Reused or explicitly kept instances are a distinct lawful case and must remain untouched.",
+      "next": "An owned resource required to stop must produce an explicit cleanup failure and nonzero flow result if it remains live/unknown. Preserve its state and ownership facts; independently verify exact instance exit rather than only CLI exit0."
+    },
+    {
+      "id": "C-OVERALL-DEADLINE-EXCLUDES-PREPARATION-CHILD",
+      "priority": "P2",
+      "file": "packages/context/tools/personal-review-driver.mjs",
+      "line": 96,
+      "detail": "prepareReview uses a fixed30000ms spawnSync timeout and restoredReviewIdentity uses a fixed10000ms helper timeout, independent of the declared overall deadline. With --deadline-ms1000 and an owned1800ms review fixture, the driver finishes at1936ms, failing only in readiness; this excludes any cleanup grace. HTTP abort repair remains valid.",
+      "next": "Cap every preparation/identity/start child operation by the same remaining overall budget; describe cleanup grace separately and retain bounded process/pipe output."
+    }
+  ],
+  "remainingDeliveryGaps": [
+    {
+      "id": "A-MANIFEST-EXPECTED-REQUIRED-SET-UNBOUND",
+      "detail": "The verifier rebuilds commands/dispatch from the supplied manifest's own lists. Removing all original commands, changing counts and recomputing the ordinary digest still verifies. If selected-subset output is intentional, it must say so; this does not prove a complete expected original command/unknown set. Use an independently bound producer specification or explicit coverage, not self-selected empty lists."
+    },
+    {
+      "id": "A-UOW-COST-AND-PRODUCER-SCOPE",
+      "detail": "The exported manifest builder performs sequential public reads and awaits payload reads without a synchronous UoW snapshot or pre/post fingerprint guard. No explicit command/observation/payload count/bytes limits are implemented. The positive test stops the controlled product but leaves the Store open; it is not a concurrent-writer, crash or coherent-UoW proof. Synthetic window targets remain separate from the actual native send."
+    },
+    {
+      "id": "AC-SHARED-REAL-PRODUCER-NOT-YET-CONSUMED",
+      "detail": "A has an actual new-process fixture/manifest API and C retains its own same-Store personal-chain producer. A's new manifest is not yet consumed by C's actual driver. Both still accurately mark installed and B recovered-result landing as unmeasured; completing those needs actual admitted inputs, not another handwritten combined report."
+    },
+    {
+      "id": "C-PACKAGE-START-NOT-REACHED",
+      "detail": "Submitted actual tests use package review-restored and observe package start NOT_REACHED for missing release/first-run. This is correct finite evidence, not a package-start implementation absence in main or installed acceptance. Test the exact available frozen artifact after the package driver boundaries are fixed."
+    }
+  ],
+  "minimalMainIntegration": {
+    "productionSourceRequiredNow": [],
+    "ADataManifestIntegration": "Do not use the new exported manifest as a trusted original-subject/coverage gate before binding, UoW and bounds are repaired. Existing A production stores already available remain admitted in their prior scopes.",
+    "CDriverIntegration": "Source positive/strict/identity/HTTP repairs can be reused as development tooling only; package identity/provenance/cleanup needs repair before independently verified package use.",
+    "usefulUiInput": "packages/context/reports/wave23-ui-contract.json",
+    "uiInputScope": "Four source states, seven bounded diagnostic reasons and actual samples; authorization none, unknown readable counts unexposed; main remains the UI/HTTP/authority owner.",
+    "ordinaryInstallIndependent": true
+  },
+  "nextWholePackages": {
+    "A": "Original-subject-bound and explicitly covered/bounded manifest; synchronous index snapshot plus async bytes and pre/post guard; actual different-process producer/reader with immutable expectations; then feed the single C consumer and original B result landing only after main admission.",
+    "C": "Complete the package dialect using one actual command descriptor, exact live instance identity, truthful owned cleanup and total-budget propagation; independently consume A's real producer/manifest, then run one exact frozen package through both snapshot versions and read-only source flows without checkout fallback."
+  },
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "nativeTurnStarts": 0,
+    "userServicesRestarted": false,
+    "globalSocketDiscovery": false,
+    "foreignCredentialsRead": false,
+    "mutatedAgentSource": false,
+    "privateProbeResourcesStopped": true,
+    "privateEvidenceRoot": "/tmp/pa-wave24-ac-audit-ALqjCC",
+    "releaseApproved": false
+  }
+}

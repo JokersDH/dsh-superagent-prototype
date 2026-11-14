@@ -56,6 +56,11 @@ const HELP = `pa — 本机个人 Agent 助理启动器
   import-bundle          校验并登记已有 bundle 到本机托管备份目录
   restore                恢复 bundle 到新的私有目录（不覆盖活跃 state，不自动启动）
   rollback               用升级前快照回滚（失败保留现场并回到可启动状态）
+  review-restored        由本包 main signer 生成新的 0600 只读审阅选择（不覆盖；不是执行授权）
+
+审阅启动:
+  pa start --discussion-only --review-restored-scope <file> ...
+  同一已验证文件复用为 REUSED；不同/缺失/未绑定/端口或登录变化拒绝且不动旧 PID。
 
 全局选项:
   --json                 机器可读输出
@@ -136,8 +141,18 @@ function commandSpecs() {
   }
 }
 
+const COMMAND_HELP = {
+  'review-restored': `review-restored — 生成包内只读审阅选择\n\n用法: pa review-restored --state <restored-state> --project <id> [--project <id> ...] --allow-path <relative> [--exclude-path <glob> ...] --out <new-0600-file>\n\n由同一安装包内 main prepareRestoredReview/localCredentials 签发；输出只用于显式 start，不是授权。\n文件必须不存在（不覆盖），需当前用户 private 0600。\n\n随后: pa start --discussion-only --review-restored-scope <out> ...`,
+  start: `start — 启动或复用实例\n\n常用: pa start --discussion-only --port <n> --api-port <n>\n只读审阅: pa start --discussion-only --review-restored-scope <file> ...\n同文件复用 = REUSED；不匹配/未绑定/无选择/端口或登录变化 = 拒绝，不改旧 PID。`,
+  help: HELP,
+}
+
 async function main(argv) {
   const [command = 'help', ...rest] = argv
+  if (command === '--help' || command === '-h') {
+    printResult({ human: HELP })
+    return EXIT.OK
+  }
   const spec = commandSpecs()[command]
   if (spec === undefined) {
     process.stderr.write(`未知命令 ${command}\n\n${HELP}`)
@@ -145,12 +160,12 @@ async function main(argv) {
   }
   const { values } = parseArgs(rest, spec)
   if (values.help === true) {
-    printResult({ human: HELP })
+    printResult({ human: command === 'help' ? HELP : COMMAND_HELP[command] ?? HELP })
     return EXIT.OK
   }
   const json = values.json === true
   if (command === 'help') {
-    printResult({ human: HELP })
+    printResult({ human: COMMAND_HELP[rest[0]] ?? HELP })
     return EXIT.OK
   }
   if (command === 'version') {

@@ -1,0 +1,67 @@
+{
+  "status": "PASS_CONTEXT_HISTORY_WORKBENCH",
+  "sourceCommit": "f29c9e62fb8298d652dc8f98ba05b0caa04a1381",
+  "sourceWorktreeClean": false,
+  "checkedAt": "2026-11-14T00:37:55.153Z",
+  "cases": [
+    {
+      "id": "ACTUAL-A18-HISTORY-PAGES-AND-DOES-NOT-SEND",
+      "status": "PASS"
+    },
+    {
+      "id": "ORIGINAL-SOURCE-IS-READABLE-AND-UNAFFECTED-BY-CURRENT-CHANGES",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-MOBILE-SOURCE-READER-AND-BACK-NAVIGATION-FIT",
+      "status": "PASS"
+    },
+    {
+      "id": "PROJECT-SWITCH-EMPTY-AND-RETRY-KEEP-RECORDS-SCOPED",
+      "status": "PASS"
+    },
+    {
+      "id": "EXPIRED-CURSOR-RELOADS-HISTORY-WITHOUT-REPLAYING-A-MODEL-REQUEST",
+      "status": "PASS"
+    },
+    {
+      "id": "MODEL-OFF-DOES-NOT-HIDE-MESSAGE-SOURCE-AUDIT",
+      "status": "PASS"
+    },
+    {
+      "id": "HISTORY-NAVIGATES-TO-THE-ORIGINAL-CONVERSATION",
+      "status": "PASS"
+    },
+    {
+      "id": "READONLY-CAPABILITY-AND-TAB-KEYBOARD-STATE-ARE-ACCURATE",
+      "status": "PASS"
+    },
+    {
+      "id": "SCOPE-EXPLANATION-IS-EXPLICIT-READ-ONLY-AND-RETRIABLE",
+      "status": "PASS"
+    },
+    {
+      "id": "MISSING-OPTIONAL-DIAGNOSTICS-AND-BAD-IDENTITY-DO-NOT-REPLACE-THE-BODY",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL-STATE-AND-SCOPE-DIAGNOSTICS-HIDE-UNVERIFIED-BODIES",
+      "status": "PASS"
+    },
+    {
+      "id": "DIAGNOSTIC-DESKTOP-MOBILE-KEYBOARD-AND-LAYOUT",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "seededMockReplies": 25,
+  "readTriggeredMockReplies": 0,
+  "productSchema": 18,
+  "ports": "production A SQLite contextBindings/contextHistory/replyResults",
+  "limitations": [
+    "Actual HTTP/SQLite/React/SSE with local mock provider; not native or installed acceptance",
+    "Readonly UI capability is projected by the fixture; backend readonly authorization is tested separately"
+  ]
+}
