@@ -196,6 +196,14 @@ test('the same real Store restores v1 and v2 separately through actual personal 
       const missingArtifact = verifyRestoredSnapshot(artifactRootCopy, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), artifacts: expectedArtifacts })
       assert.equal(missingArtifact.status, 'blocked')
     }
+    const foreignArtifactRoot = join(root, `foreign-artifact-${format}`)
+    cpSync(restoreRoot, foreignArtifactRoot, { recursive: true })
+    const foreignArtifactReport = JSON.parse(readFileSync(join(foreignArtifactRoot, 'restore-report.json'), 'utf8'))
+    foreignArtifactReport.targetPath = foreignArtifactRoot; foreignArtifactReport.rootMapping.to = foreignArtifactRoot
+    writeFileSync(join(foreignArtifactRoot, 'restore-report.json'), JSON.stringify(foreignArtifactReport, null, 2))
+    writeFileSync(join(foreignArtifactRoot, 'artifacts', 'foreign-file'), 'not-in-inventory')
+    const foreignArtifact = verifyRestoredSnapshot(foreignArtifactRoot, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), artifacts: expectedArtifacts })
+    assert.equal(foreignArtifact.status, 'blocked'); assert.match(foreignArtifact.message ?? '', /foreign artifact/)
     const emptiedRoot = join(root, `emptied-inventory-${format}`)
     cpSync(restoreRoot, emptiedRoot, { recursive: true })
     const emptiedReport = JSON.parse(readFileSync(join(emptiedRoot, 'restore-report.json'), 'utf8'))

@@ -58,8 +58,8 @@ inventory is non-empty. C's wave-27 target proof receives the same inventory and
 - `wave27-node.txt` — actual Node24 entry: 5/5.
 - `wave27-workflow-tests.txt` 120/120, `wave27-storage-tests.txt` 88/88.
 - `wave27-strict-*.txt`, `wave27-build-*.txt`, `wave27-product-strict.txt` — exit 0.
-- `wave27-dual.txt` — source manifest `75327321…`; content `e1377a84…` (workflow-content/2, 138 rows,
-  56328 bytes, 17 artifacts), v1/v2 source snapshots `2304fb52…`/`2a1865fe…`; C wave-27 proof
+- `wave27-dual.txt` — source manifest `e0acaae2…`; content `c341e3d0…` (workflow-content/2, 138 rows,
+  56328 bytes, 17 artifacts), v1/v2 source snapshots `885eef82…`/`6adab7ad…`; C wave-27 proof
   independent/independent `ok` for both, added-message and emptied-inventory copies `mismatch`.
 - `wave27-content-proof.txt` — real FTS derived rows ignored, ordinary same-prefix table included;
   runtime tables omitted; maxRows/missing DB incomplete.
