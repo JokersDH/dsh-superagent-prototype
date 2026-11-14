@@ -1,0 +1,101 @@
+{
+  "protocol": "wave26-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "base": "4aaf074",
+  "mergedMain": "ce64fc1",
+  "mainSource": "a302ddc F App + fdb3f16 readiness",
+  "head": "PENDING",
+  "frozenSource": "ce64fc1",
+  "status": "CANDIDATE_MILESTONE_1",
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Fixed ce64fc1, a826 historical tuple and actual F App/readiness input table; G/H not integrated."
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "Actual installed F Trial App served from package dist: all 8 browser cases pass; four callbacks open original settings/import/executor/conversation, modelCalls0, POST0, eventDelta0, readiness reads14."
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Installed GET /v1/readiness 200 trial-readiness/1 authorization none; same package contains contracts/console/API."
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "Clean frozen package d4b1780d999a4b74 and tar 8c36...; closure96/96 including F App; E recipe handed early."
+    }
+  },
+  "artifacts": {
+    "protocol": "wave26-artifacts/1",
+    "target": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave26-target/wave26-target-ce64fc1.tar.gz",
+      "sha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+      "tarBytes": 20272436,
+      "installManifestSha256": "855c67caa7280b62e2609ff44fba40da05e15ca724cfcca5df99ba3a24ae1e10",
+      "releaseManifestSha256": "458bf4191596b2e623f4b69507d12e1a8a020018fcab634daceec74a33113b03",
+      "closureDigest": "f8b00750fecf3c21dcacf475e59bdb965ae162ce557f8d950b89c7548372e862",
+      "buildId": "d4b1780d999a4b74",
+      "source": {
+        "commit": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21",
+        "branch": "codex/g3-local-distribution",
+        "dirty": false
+      },
+      "files": 6754,
+      "bytes": 67669860,
+      "productSchema": 18,
+      "environment": {
+        "node": "24.21.0",
+        "pnpm": "11.7.0",
+        "sqlite": "3.53.4",
+        "abi": "137",
+        "platform": "darwin",
+        "arch": "arm64"
+      }
+    },
+    "integrations": {
+      "fApp": "actual TrialWorkspace/F App composed in apps/console/src/App.tsx; six trial source files; installed browser 8/8",
+      "readiness": "actual GET /v1/readiness in package",
+      "gInsights": "NOT_IMPORTED",
+      "hTools": "NOT_IMPORTED",
+      "bBusiness": "not part of ordinary admission"
+    },
+    "limits": [
+      "C full manifest object internal revalidation NOT_TESTED",
+      "A target-content/fingerprint proof still uncommitted in A; D2 second result NOT_REACHED",
+      "G/H not imported",
+      "E final verdict pending",
+      "zero real vendor/model/native turns"
+    ]
+  },
+  "testLayers": {
+    "installedTrialBrowser": 8,
+    "readiness": 1,
+    "help": 1,
+    "ui": 1,
+    "personal": 7,
+    "sameStore": 4,
+    "matrix": 19,
+    "multi": 8,
+    "cross": 3,
+    "data": 5,
+    "backup": 6,
+    "portable": 5
+  },
+  "notDone": [
+    "A target-content/fingerprint trusted proof (A uncommitted; D2 NOT_REACHED)",
+    "C internal full-manifest revalidation",
+    "E final verdict",
+    "G/H integration",
+    "private/target/real vendor"
+  ],
+  "limitations": [
+    "zero real vendor/model/native turns",
+    "installed browser uses no-send local provider stub and unstarted execution",
+    "old a826/3b evidence cannot certify this package"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave26/*",
+    "tools/distribution/recipes/wave26-e-acceptance.zh-CN.md"
+  ]
+}

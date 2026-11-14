@@ -1,0 +1,93 @@
+{
+  "protocol": "wave11-backup-schema16/1",
+  "status": "PASS",
+  "startedAt": "2026-11-14T07:16:44.799Z",
+  "steps": [
+    {
+      "id": "install-identity",
+      "status": "PASS",
+      "detail": {
+        "buildId": "d4b1780d999a4b74",
+        "commit": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21",
+        "dirty": false,
+        "schema": 18,
+        "aSchema": 18
+      }
+    },
+    {
+      "id": "schema16-and-a-families",
+      "status": "PASS",
+      "detail": {
+        "productSchema": 18,
+        "families": [
+          "decisions",
+          "legacy_decisions",
+          "proposals",
+          "project_settings",
+          "contracts",
+          "verifications",
+          "acceptances",
+          "outcomes",
+          "reviews",
+          "recovery_intents",
+          "assistant_context_bindings",
+          "assistant_reply_results",
+          "recovery_activations"
+        ],
+        "contextBindingCount": 0,
+        "evidenceDigest": "ab3c4f3050ccdc550e0edc531babd2dc918673275711342c5ca412c947e941ba"
+      }
+    },
+    {
+      "id": "backup-restore-schema16",
+      "status": "PASS",
+      "detail": {
+        "archiveSha256": "61980bd76f0b15d3782561650b83af6a100f841aed14c97d12d9e5de5c08da02",
+        "restoredSchema": 18,
+        "evidenceDigest": "ab3c4f3050ccdc550e0edc531babd2dc918673275711342c5ca412c947e941ba",
+        "familiesEqual": true,
+        "readonlyMarker": true
+      }
+    },
+    {
+      "id": "corrupt-bundle-refused",
+      "status": "PASS",
+      "detail": {
+        "code": "archive_invalid",
+        "targetUsable": false
+      }
+    },
+    {
+      "id": "future-schema-refused",
+      "status": "PASS",
+      "detail": {
+        "code": "state_schema_newer_than_binary",
+        "doctor": "DEGRADED",
+        "schemaCheck": null
+      }
+    },
+    {
+      "id": "legacy-schema13-restore",
+      "status": "PASS",
+      "detail": {
+        "legacySchema": 13,
+        "beforeMigrationSchema": 13,
+        "migratedSchema": 18,
+        "integrity": "ok",
+        "migratedBy": "A ProductStore public open"
+      }
+    }
+  ],
+  "limitations": [
+    "Uses isolated temporary states and the frozen/staged install; never the live user state.",
+    "Future-schema fixture is produced through A applyMigrations with a caller-supplied registry (no SQL written by D)."
+  ],
+  "artifact": {
+    "install": "/tmp/w26frozen/install",
+    "buildId": "d4b1780d999a4b74",
+    "commit": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21",
+    "schema": 18,
+    "dirty": false
+  },
+  "finishedAt": "2026-11-14T07:16:50.918Z"
+}

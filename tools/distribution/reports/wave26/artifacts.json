@@ -1,0 +1,42 @@
+{
+  "protocol": "wave26-artifacts/1",
+  "target": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave26-target/wave26-target-ce64fc1.tar.gz",
+    "sha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+    "tarBytes": 20272436,
+    "installManifestSha256": "855c67caa7280b62e2609ff44fba40da05e15ca724cfcca5df99ba3a24ae1e10",
+    "releaseManifestSha256": "458bf4191596b2e623f4b69507d12e1a8a020018fcab634daceec74a33113b03",
+    "closureDigest": "f8b00750fecf3c21dcacf475e59bdb965ae162ce557f8d950b89c7548372e862",
+    "buildId": "d4b1780d999a4b74",
+    "source": {
+      "commit": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "files": 6754,
+    "bytes": 67669860,
+    "productSchema": 18,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "integrations": {
+    "fApp": "actual TrialWorkspace/F App composed in apps/console/src/App.tsx; six trial source files; installed browser 8/8",
+    "readiness": "actual GET /v1/readiness in package",
+    "gInsights": "NOT_IMPORTED",
+    "hTools": "NOT_IMPORTED",
+    "bBusiness": "not part of ordinary admission"
+  },
+  "limits": [
+    "C full manifest object internal revalidation NOT_TESTED",
+    "A target-content/fingerprint proof still uncommitted in A; D2 second result NOT_REACHED",
+    "G/H not imported",
+    "E final verdict pending",
+    "zero real vendor/model/native turns"
+  ]
+}

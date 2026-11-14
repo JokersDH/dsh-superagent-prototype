@@ -1,0 +1,54 @@
+{
+  "protocol": "wave26-readiness-get/1",
+  "status": 200,
+  "body": {
+    "protocol": "trial-readiness/1",
+    "observedAt": "2026-11-14T07:13:04.146Z",
+    "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
+    "mode": "fixture",
+    "startupMode": "normal",
+    "discussion": "configuration_present",
+    "execution": {
+      "state": "available",
+      "kind": "controlled_fixture"
+    },
+    "development": "fixture_only",
+    "projects": {
+      "development": 1,
+      "discussion": 0,
+      "dispatchable": 1
+    },
+    "profiles": {
+      "native": 0,
+      "controlled": 4,
+      "admittedNative": 0,
+      "admittedControlled": 4
+    },
+    "capabilities": {
+      "contextHistory": true,
+      "contextSources": true,
+      "decisions": true,
+      "proposals": true
+    },
+    "authorization": "none"
+  },
+  "keys": [
+    "protocol",
+    "observedAt",
+    "configurationRevision",
+    "mode",
+    "startupMode",
+    "discussion",
+    "execution",
+    "development",
+    "projects",
+    "profiles",
+    "capabilities",
+    "authorization"
+  ],
+  "authorization": "none",
+  "forbidden": [
+    "projects"
+  ],
+  "ok": true
+}
