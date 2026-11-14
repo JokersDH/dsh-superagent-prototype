@@ -1261,7 +1261,9 @@ export function evaluateRelease({
   if (canonicalTuple) {
     // Every required installed case, not a chosen subset, must describe the tested tuple. The
     // canonical identity case is the reference itself.
-    const subjectCases = INSTALL_CASES.map(entry => entry.id).filter(id => id !== 'E4-INSTALL-ARTIFACT-IDENTITY')
+    // Optional tracking entries and source-level contract checks carry no package tuple.
+    const noSubject = new Set(['E4-INSTALL-ARTIFACT-IDENTITY', 'E9-COORDINATOR-CHANNEL-CONTRACT'])
+    const subjectCases = INSTALL_CASES.filter(entry => entry.required !== false && !noSubject.has(entry.id)).map(entry => entry.id)
     const normalize = (value, key) => key === 'source' ? (value?.source ?? value?.sourceCommit)
       : key === 'schema' ? (value?.schema ?? value?.productSchema) : value?.[key]
     for (const id of subjectCases) {
@@ -1275,7 +1277,8 @@ export function evaluateRelease({
         item.evidence?.installedSourceConfirm?.subject ?? item.evidence?.installedStability?.subject ??
         item.evidence?.workflowFormats?.subject ?? item.evidence?.personalReview?.subject ??
         item.evidence?.restoredReviewRefusals?.subject ?? item.evidence?.reviewReuse?.subject ??
-        item.evidence?.scopeDiagnostics?.subject ?? item.evidence?.readiness?.subject ?? item.evidence?.trialUi?.subject
+        item.evidence?.scopeDiagnostics?.subject ?? item.evidence?.readiness?.subject ?? item.evidence?.trialUi?.subject ??
+        item.evidence?.supportMaterial?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
