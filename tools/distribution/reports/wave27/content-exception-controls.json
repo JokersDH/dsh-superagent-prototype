@@ -1,0 +1,48 @@
+{
+  "protocol": "wave27-content-exception-controls/1",
+  "package": {
+    "source": "ce64fc1",
+    "build": "d4b1780d999a4b74",
+    "tarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a"
+  },
+  "tools": {
+    "aContentProof": "b3185adccac8c6fdeae9d2e4de6218112457ac8c592e745b6770fa330e80050e",
+    "cTargetProof": "2fcc8cb01af2eda48f54c339d1ec405b14c7e5d7358ed5bbd10e45254ef203d1",
+    "aHead": "0aaa791"
+  },
+  "cases": {
+    "baseline": {
+      "status": "ok"
+    },
+    "artifactByteMutation": {
+      "status": "mismatch",
+      "mismatches": [
+        "artifact_bytes:df45b645261594fe82199b4052fc476da2c473095f7e74a032bad4e24bebfec1"
+      ]
+    },
+    "artifactMissing": {
+      "status": "mismatch",
+      "mismatches": [
+        "artifact_missing:df45b645261594fe82199b4052fc476da2c473095f7e74a032bad4e24bebfec1"
+      ]
+    },
+    "ftsForeignRow": {
+      "status": "ok_uncovered",
+      "detail": "foreign row in conversation_search_content ignored by A fingerprint/FTS exception; target proof remains ok"
+    },
+    "eventForeignRow": {
+      "status": "ok_uncovered",
+      "detail": "foreign event_log row allowed as whole-family operational delta; target proof remains ok"
+    },
+    "dualFormat": {
+      "v1": "verified-flow default format v1",
+      "v2Default": "driver label v1 while restore report format workflow-snapshot/2",
+      "v2Explicit": "verified-flow with --format v2 and report workflow-snapshot/2"
+    }
+  },
+  "limits": [
+    "D does not modify A/C exception logic",
+    "FTS/event precise allowlist remains owned by A/C",
+    "artifact positive/negative controls are dev-tool level, not E verdict"
+  ]
+}

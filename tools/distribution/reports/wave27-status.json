@@ -1,0 +1,15 @@
+{
+  "protocol":"wave27-status/1","owner":"agent-d","branch":"codex/g3-local-distribution","base":"8ed7a72","mergedMain":"a62e62f","fixedCandidate":{"source":"ce64fc1","build":"d4b1780d999a4b74","tarSha256":"8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a","bytes":20272436,"entries":6754,"closure":"96/96"},"status":"CANDIDATE","frozen":true,
+  "phases":{
+    "d1":{"status":"PASS","summary":"Fixed ce64 candidate and listed A/C proof input table; A/C source worktrees recorded separately from the frozen package."},
+    "d2":{"status":"PASS_WITH_EXCEPTION_LIMIT","summary":"Artifact bytes/missing controls reject as artifact_bytes/artifact_missing. FTS foreign row and event_log foreign row are still accepted by A/C whole-family exception; exact allowlist not achieved."},
+    "d3":{"status":"NOT_ACHIEVED_EXCEPTION","summary":"C target proof allows entire event_log and A ignores conversation_search*; independent foreign rows leave target proof ok. D records exact minimal reproduction; fix belongs to A/C."},
+    "d4":{"status":"PARTIAL","summary":"Artifact positive/negative and dual-format controls delivered; FTS/event precise exceptions not independently acceptable. E should not treat this as exact content proof."},
+    "d5":{"status":"PASS_WITH_FORMAT_FIX","summary":"Same package v1/v2 A restores: v1 verified-flow default v1; v2 with explicit --format v2 verified-flow and restore-report workflow-snapshot/2. Default v1 label on v2 remains a C metadata gap."},
+    "d6":{"status":"PASS","summary":"Both roots target proof ok, source verified, history entry, verified stop; drift mismatch prior evidence retained."},
+    "d7":{"status":"PARTIAL","summary":"Artifact/FTS/event controls, not full UI/body negative matrix."},
+    "d8":{"status":"PARTIAL","summary":"Two-format same-package chain works with explicit format; precise exception proof remains blocked."}
+  },
+  "evidence":["tools/distribution/reports/wave27/content-exception-controls.json","tools/distribution/reports/wave27/v1-verified-flow.json","tools/distribution/reports/wave27/v2-explicit-format.json","tools/distribution/reports/wave27/v2-default-format.json","tools/distribution/reports/wave27/artifact-byte-mutation.json","tools/distribution/reports/wave27/artifact-missing.json","tools/distribution/reports/wave27/fts-foreign-row.json","tools/distribution/reports/wave27/event-foreign-row.json"],
+  "notDone":["A/C precise FTS/event allowlist (foreign rows accepted)","C default v2 metadata label v1","E independent exact-content verdict","ordinary wave27 re-freeze (no runtime changes)","B/private/target"],"limits":["No runtime refreeze: docs/tools only","Zero real vendor/model/native turns","Historical tars/state/profile/ledger preserved"]
+}
