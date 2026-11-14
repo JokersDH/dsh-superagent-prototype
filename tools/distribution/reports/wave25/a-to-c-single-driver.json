@@ -1,0 +1,72 @@
+{
+  "protocol": "wave25-a-to-c-single-driver/1",
+  "status": "PASS_WITH_LIMIT",
+  "steps": [
+    {
+      "id": "a-producer-manifest",
+      "status": "PASS",
+      "detail": {
+        "manifestDigest": "5d316d49612db0702268f40a73e1768296b0d1f6cb03c105d4e86087ca71b41d",
+        "attemptId": "attempt-7ff22d69-7274-40c4-a3f5-ee91737e5e7b",
+        "questionId": "codex-question-d72a004f5f5583c4a92853eeab93fa775ff002655130ad9d",
+        "answerId": "db4be89e34a893a388ee1a9e8f15e205",
+        "coverage": {
+          "commands": "complete",
+          "dispatch": "complete",
+          "observations": "complete",
+          "deliveries": "complete",
+          "payloads": "complete"
+        }
+      }
+    },
+    {
+      "id": "a-tamper-before-c-start",
+      "status": "PASS",
+      "detail": {
+        "rejected": true
+      }
+    },
+    {
+      "id": "c-consumes-a-subject",
+      "status": "PASS",
+      "detail": {
+        "subjectEcho": "5d316d49612db0702268f40a73e1768296b0d1f6cb03c105d4e86087ca71b41d",
+        "cStatus": "verified-flow",
+        "bound": true,
+        "requestedDigest": "ad8e77a990c5a506fb2ad821673d2c3b2a72e1abdbde7aef5d04f166a5ee36e7",
+        "actualHealthDigest": "ad8e77a990c5a506fb2ad821673d2c3b2a72e1abdbde7aef5d04f166a5ee36e7",
+        "assertions": 16,
+        "cleanup": {
+          "owned": true,
+          "attempted": true,
+          "stopped": true,
+          "detail": "pa-stop-verified"
+        },
+        "sourceMessage": null
+      }
+    }
+  ],
+  "cDriver": {
+    "status": "verified-flow",
+    "packageSubject": "5d316d49612db0702268f40a73e1768296b0d1f6cb03c105d4e86087ca71b41d",
+    "identity": {
+      "requestedFile": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-personal-driver-dUom5Q/review-46378.json",
+      "requestedDigest": "ad8e77a990c5a506fb2ad821673d2c3b2a72e1abdbde7aef5d04f166a5ee36e7",
+      "actualHealthDigest": "ad8e77a990c5a506fb2ad821673d2c3b2a72e1abdbde7aef5d04f166a5ee36e7",
+      "recordPid": 46382,
+      "childPid": null,
+      "stateRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-g1fuEH/reviewed/state",
+      "bound": true,
+      "instanceProcessStart": "Sat Nov 14 11:37:44 2026",
+      "instanceApiPid": 46442,
+      "instanceApiProcessStart": "Sat Nov 14 11:37:45 2026"
+    },
+    "cleanup": {
+      "owned": true,
+      "attempted": true,
+      "stopped": true,
+      "detail": "pa-stop-verified"
+    }
+  },
+  "limit": "C receives the A manifest digest as package subject and must echo it; C does not consume the full A manifest object internally. A identity/coverage and tamper rejection are checked by the driving process before C starts."
+}

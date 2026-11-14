@@ -5,7 +5,7 @@
   "base": "bcd4d4c",
   "mergedMain": "d3a0faa",
   "mainSource": "fdb3f16 readiness + 4b42a90 UI",
-  "head": "a826b5e",
+  "head": "PENDING",
   "frozenSource": "a826b5e",
   "status": "CANDIDATE",
   "phases": {
@@ -27,7 +27,7 @@
     },
     "d5": {
       "status": "PASS_WITH_LIMIT",
-      "summary": "A producer+separate-PID reader complete on kept Store; tampered manifest rejected; C verified-flow same Store. C direct A-manifest object binding NOT_TESTED."
+      "summary": "One D driver validated A producer/manifest coverage and rejected a tampered manifest before C start, then passed the A manifest digest as C package-subject. C returned verified-flow with packageSubject equal to the A digest, bound requested/live health digest and cleanup verified. Same original Store kept. LIMIT: C receives the A digest subject, not the full manifest object internally."
     },
     "d6": {
       "status": "PASS",
@@ -39,7 +39,7 @@
     },
     "d8": {
       "status": "PASS_WITH_LIMIT",
-      "summary": "Same Store -> two restored roots -> C verified-flow; A output direct input to C NOT_TESTED."
+      "summary": "Single-driver A->C chain plus two independent snapshot material/bundle/restore roots each consumed by C verified-flow. C full-manifest object consumption remains NOT_TESTED."
     },
     "d9": {
       "status": "PASS",
@@ -121,14 +121,18 @@
     "cross": 3,
     "data": 5,
     "backup": 6,
-    "portable": 5
+    "portable": 5,
+    "aToC": {
+      "steps": 3,
+      "status": "PASS_WITH_LIMIT"
+    }
   },
   "notDone": [
-    "C direct consumption of A manifest object",
     "F trial package merge",
     "E final verdict",
     "private permission/target",
-    "real vendor/native"
+    "real vendor/native",
+    "C full manifest object consumption (digest subject only)"
   ],
   "limitations": [
     "zero real vendor/model/native turns",
