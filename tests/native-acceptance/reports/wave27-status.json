@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "db039fb",
+  "base": "c653e10",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -211,5 +211,14 @@
     ],
     "boundary": "the successor BOUND the same attempt and epoch, but the fixture lane emitted no further facts for it to serve, so 'successor SERVING' is NOT claimed here; it is proven on the controlled handover by b27-dual-client",
     "orderingAttempts": "two orderings were tried: feeding the command before the successor bound (dropped by the detach, by design) and after it bound (this fixture lane still emits no further facts after the first turn). Neither produces a callback for the successor, so successor SERVING is not claimed in this run"
-  }
+  },
+  "unblockersFound": {
+    "slots": "apps/coordinator/product/execution.ts enforces the bounded execution slots itself ('The four controlled execution slots are in use') together with the earlier-begin reconciliation and the previous-writer barrier checks. The 2/4 slot matrix can therefore be driven from a test that issues product commands; it does not need a new entry or a new ledger.",
+    "candidate": "apps/runner/src/artifact-manifest.ts is B-owned and already enforces that a candidate references at least one real produced artifact ('candidate_without_artifacts'), and runner-service instantiates AttemptArtifactManifest and accepts artifact registration over the bridge. A candidate is therefore obtainable from a real artifact path rather than fabricated - but only if a driver actually registers an artifact and the candidate fact is emitted through the existing factSink."
+  },
+  "nextSteps": [
+    "drive 2 then 4 execution slots through product commands and assert the fifth is refused as Later, with per-slot identity/credential/cursor isolation and the resource return after each stop",
+    "produce a candidate through the B-owned artifact manifest from a really registered artifact, then accept it explicitly by candidateRef on the original Work",
+    "keep successor-serving in the same run NOT_TESTED until a lane emits continuous facts"
+  ]
 }
