@@ -175,13 +175,14 @@
   },
   "item4_B11_ackPoints": {
     "harness": "tests/native-acceptance/b27-ack-points.mjs",
-    "result": "4 PASS / 0 FAIL / 1 NOT_TESTED",
+    "result": "5 PASS / 0 FAIL / 1 NOT_TESTED",
     "method": "four real points per command - write, receiver-log entry, returned ack, durable receipt - plus a bounded window after persistence where a resend would show",
     "cases": [
       "B27-POINTS-BEGIN-WINDOWS - begin counted at write, receive, ack and persistence",
       "B27-POINTS-NO-RESEND-AFTER-PERSISTENCE - exactly one begin reception inside the bounded window",
       "B27-POINTS-SECOND-COMMAND-WINDOWS - a second business command counted at the same four points with exactly one reception",
-      "B27-POINTS-NO-RESEND-SECOND-COMMAND - exactly one reception of the second command in its bounded window"
+      "B27-POINTS-NO-RESEND-SECOND-COMMAND - exactly one reception of the second command in its bounded window",
+      "B27-POINTS-RESOLVE-IS-NOT-RECEIPT - every resolved command has exactly one real reception, so a resolved call can never stand in for a receipt (regression guard for the short-lived-lane finding)"
     ],
     "finding": "on the short-lived codex-fake lane the second command resolved as successful while the receiver log recorded ZERO receptions: a resolved bridge call is not proof of reception. The measurement was moved to the long-lived lane, where the same command is received exactly once. This is the invariant 'sent is not received' caught by the harness itself.",
     "labelling": "the second command is a deliver, which uses the SAME admission and receipt path as the answer; it is not relabelled as an answer. The answer is counted separately on the product lane by b27-ack-windows."

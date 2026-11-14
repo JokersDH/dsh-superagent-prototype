@@ -91,7 +91,21 @@ try {
   if (beforeWindow === 1 && afterWindow2 === 1) log.pass('the bounded window after the second command shows exactly one reception')
   else log.fail(`the second command was resent: ${JSON.stringify({ beforeWindow, afterWindow2 })}`)
 
-  log.begin('B27-SCOPE-NOT-NATIVE', 'codex-fake lane; installed Codex not executed', 'controlled_process')
+  log.begin('B27-POINTS-RESOLVE-IS-NOT-RECEIPT', 'every resolved command has a real reception', 'controlled_process')
+  // Regression guard for the finding on the short-lived lane: a resolved bridge call proved nothing there
+  // and the receiver log showed zero receptions. Here every command that resolved must have exactly one
+  // receiver entry, so "resolved" can never quietly stand in for "received".
+  const sent = [
+    { kind: 'begin', id: 'cmd-points-begin', resolved: true },
+    { kind: 'deliver', id: 'cmd-points-deliver', resolved: delivered === true },
+  ]
+  const counts = { begin: readReceipts().filter(frame => frame.kind === 'begin').length, deliver: readReceipts().filter(frame => frame.kind === 'deliver').length }
+  const unproven = sent.filter(frame => frame.resolved && counts[frame.kind] !== 1)
+  log.evidence({ sent, counts, unproven })
+  if (unproven.length === 0) log.pass('both resolved commands have exactly one real reception, so a resolved call is never counted as a receipt')
+  else log.fail(`a resolved command has no real reception: ${JSON.stringify(unproven)}`)
+
+  log.begin('B27-SCOPE-NOT-NATIVE', 'fixture lane; installed Codex not executed', 'controlled_process')
   log.notTested('no installed agent executed and no gateway contacted')
 } finally {
   try { await runner?.close() } catch {}
