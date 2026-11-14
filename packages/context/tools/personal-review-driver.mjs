@@ -42,7 +42,7 @@ const { values } = parseArgs({ args, options: {
   'expect-entry-refusal': { type: 'string' }, 'allow-not-reached': { type: 'boolean' },
   'a-worktree': { type: 'string' }, 'a-module': { type: 'string' }, 'manifest-db': { type: 'string' },
   'manifest-expectation': { type: 'string' }, 'manifest-output': { type: 'string' }, 'root-map': { type: 'string' },
-  'replay-context-token': { type: 'string' }, 'replay-confirm-token': { type: 'string' },
+  'replay-context-token': { type: 'string' }, 'replay-confirm-token': { type: 'string' }, 'expect-readiness': { type: 'string' },
 } })
 
 const startedAt = new Date().toISOString()
@@ -216,6 +216,21 @@ async function main() {
       coverage: manifest.coverage, aModuleSha256: invocation.aModuleSha256, aHead: invocation.aHead,
       subject: manifest.subject, question: manifest.question, answer: manifest.answer, counts: manifest.counts,
       roots: { from: realpathSync(fromRoot), to: identity.stateRoot }, output }
+    // P2 proof: the restored target must still carry exactly the original subject, not merely a matching path.
+    const proofTool = join(import.meta.dirname, 'wave26-target-proof.mjs')
+    const proof = spawnSync(process.execPath, ['--experimental-strip-types', '--no-warnings', proofTool,
+      '--a-worktree', aWorktree, '--a-module', aModule, '--db', join(identity.stateRoot, 'state.sqlite'),
+      '--expectation', expectation, '--manifest', output, '--report', join(identity.stateRoot, 'restore-report.json'),
+      '--a-head', aHead ?? ''], { encoding: 'utf8', timeout: Math.max(100, Math.min(60000, workingDeadlineAt - Date.now())) })
+    let proofResult = null
+    try { proofResult = JSON.parse(String(proof.stdout).trim().split('\n').at(-1)) } catch { proofResult = null }
+    if (!proofResult) throw new DriverError('target_subject_mismatch', 'The target proof did not return JSON')
+    if (proof.status !== 0) throw new DriverError('target_subject_mismatch', 'The target root does not match the original A subject', {
+      status: proof.status, stderr: String(proof.stderr ?? '').slice(-1000), proof: proofResult,
+    })
+    if (proofResult.status !== 'ok' || proofResult.subjectMatches !== true)
+      throw new DriverError('target_subject_mismatch', 'The target content differs from the original subject', proofResult)
+    data.targetProof = proofResult
   }
 
   if (values['expect-entry-refusal']) {
@@ -386,6 +401,26 @@ async function main() {
   const health = { mode: liveHealth.mode ?? null, startupMode: liveHealth.startupMode ?? null, restoredReviewDigest: liveHealth.restoredReviewDigest ?? null }
   const headers = { authorization: `Bearer ${readKey(state)}`, 'content-type': 'application/json' }
   const call = (path, options = {}) => httpJson(`${api}${path}`, { headers, ...options }, { perRequestMs, deadlineAt: workingDeadlineAt })
+  const readinessExpectation = values['expect-readiness'] ?? 'any'
+  const readiness = await call('/v1/readiness')
+  if (readinessExpectation === 'present') {
+    assertHttp('readiness', 200, readiness)
+    assertResult('readiness.authorization', 'none', readiness.json.authorization)
+    assertResult('readiness.startupMode', 'recovery_readonly', readiness.json.startupMode ?? null)
+    assertResult('readiness.development', 'readonly', readiness.json.development ?? null)
+    assertResult('readiness.dispatchable', 0, readiness.json.projects?.dispatchable ?? null)
+    assertResult('readiness.admittedNative', 0, readiness.json.profiles?.admittedNative ?? null)
+    assertResult('readiness.admittedControlled', 0, readiness.json.profiles?.admittedControlled ?? null)
+    assertResult('readiness.decisions', false, readiness.json.capabilities?.decisions)
+    assertResult('readiness.proposals', false, readiness.json.capabilities?.proposals)
+    data.readiness = { protocol: readiness.json.protocol, authorization: readiness.json.authorization,
+      mode: readiness.json.mode, startupMode: readiness.json.startupMode, development: readiness.json.development,
+      discussion: readiness.json.discussion, execution: readiness.json.execution?.state ?? 'unknown' }
+  } else if (readinessExpectation === 'absent') {
+    if (readiness.status === 200) throw new DriverError('readiness_unexpected', 'This package unexpectedly exposes readiness')
+  } else if (readiness.status === 200) {
+    data.readiness = { protocol: readiness.json.protocol, authorization: readiness.json.authorization, startupMode: readiness.json.startupMode }
+  }
   const history = await call(`/v1/context/history?projectId=${encodeURIComponent(project)}`)
   assertHttp('history', 200, history)
   const historyEntries = Array.isArray(history.json.entries) ? history.json.entries : null
