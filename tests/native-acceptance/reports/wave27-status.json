@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "62eed14",
+  "base": "c3998bf",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -234,5 +234,13 @@
       "slot RELEASE: stop_work returned recorded but the work projection did not report an ended phase inside the window, so release is not claimed here (the live-lane resource turnaround is b27-epoch-ack)",
       "per-slot credential/cursor/payload isolation is not asserted; only attempt-identity distinctness is"
     ]
+  },
+  "candidateProducerAbsent": {
+    "evidence": [
+      "no candidate creation site exists in apps/coordinator/product/*.ts (grep for candidate row creation returns nothing)",
+      "storage has NO candidates table: grepping the storage migrations/schema for a candidate table returns 0",
+      "the product-lane probe showed SELECT COUNT(*) FROM candidates throwing (table absent) and observation kinds limited to writer.observed, policy.prepared, dispatch.observed, question.opened"
+    ],
+    "conclusion": "B13 current candidate and B14 explicit accept CANNOT be produced in this checkout by B: there is no candidate producer and no candidate table. Creating one would need a new migration (A-owned) or a new ledger, both explicitly forbidden for B. The harness keeps them NOT_REACHED instead of writing an accepted field."
   }
 }
