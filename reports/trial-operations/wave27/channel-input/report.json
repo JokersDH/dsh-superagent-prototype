@@ -1,0 +1,791 @@
+{
+  "protocol": "channel-consumer-report/1",
+  "generatedAt": "2026-11-14T09:28:12.516Z",
+  "source": "tests/operational-soak/channel/produce.mjs",
+  "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave27/channel-input",
+  "surfaces": {
+    "actual": "B runner-service original stdio bridge v1: fact ACK sink, payload reader, native-write guard",
+    "contractOnly": "CoordinatorChannel requests/replies and limits (shared contracts)",
+    "notReached": [
+      "I attach-channel module (apps/runner/src/attach-channel/) absent from this checkout",
+      "generation/CAS binding, stale-lease isolation, late reply, close race and capacity enforcement",
+      "same-Runner dual client and business reconnect",
+      "SIGKILL cross-process recovery / original Work acceptance"
+    ]
+  },
+  "frames": {
+    "positives": [
+      {
+        "name": "fact",
+        "type": "fact",
+        "ok": true
+      },
+      {
+        "name": "payload",
+        "type": "payload-read",
+        "ok": true
+      },
+      {
+        "name": "write",
+        "type": "native-write-intent",
+        "ok": true
+      },
+      {
+        "name": "receipt",
+        "type": "receipt",
+        "ok": true
+      },
+      {
+        "name": "ackFailed",
+        "type": "ack-failed",
+        "ok": true
+      },
+      {
+        "name": "payload",
+        "type": "payload",
+        "ok": true
+      },
+      {
+        "name": "admission",
+        "type": "write-admission",
+        "ok": true
+      }
+    ],
+    "negatives": [
+      {
+        "name": "wrong_source",
+        "expected": "identity_mismatch",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "fact",
+          "id": "fact-turn.ended",
+          "fact": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "factId": "fact-turn.ended",
+            "source": "foreign-source",
+            "kind": "turn.ended",
+            "payloadRef": "payload-1"
+          }
+        },
+        "producer": {
+          "attempt": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "runnerIdentityRef": "fixture-runner-identity-wave27",
+          "source": "fixture-channel-source-wave27"
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "wrong_attempt",
+        "expected": "identity_mismatch",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "native-write-intent",
+          "id": "cmd-answer",
+          "command": {
+            "id": "cmd-answer",
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-foreign",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "kind": "answer",
+            "nativeBindingRef": "binding-1",
+            "answerRef": "answer-1"
+          }
+        },
+        "producer": {
+          "attempt": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "runnerIdentityRef": "fixture-runner-identity-wave27",
+          "source": "fixture-channel-source-wave27"
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "fact_correlation_mismatch",
+        "expected": "protocol_error",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "fact",
+          "id": "other-id",
+          "fact": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "factId": "fact-turn.ended",
+            "source": "fixture-channel-source-wave27",
+            "kind": "turn.ended",
+            "payloadRef": "payload-1"
+          }
+        },
+        "producer": {
+          "attempt": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "runnerIdentityRef": "fixture-runner-identity-wave27",
+          "source": "fixture-channel-source-wave27"
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "payload_correlation_mismatch",
+        "expected": "protocol_error",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "payload-read",
+          "id": "other-id",
+          "requestId": "payload-request-1",
+          "reference": "payload-ref-1"
+        },
+        "producer": {
+          "attempt": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "runnerIdentityRef": "fixture-runner-identity-wave27",
+          "source": "fixture-channel-source-wave27"
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "wrong_protocol",
+        "expected": "protocol_error",
+        "refused": true,
+        "value": {
+          "v": 2,
+          "type": "fact",
+          "id": "fact-turn.ended",
+          "fact": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "factId": "fact-turn.ended",
+            "source": "fixture-channel-source-wave27",
+            "kind": "turn.ended",
+            "payloadRef": "payload-1"
+          }
+        },
+        "producer": {
+          "attempt": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "runnerIdentityRef": "fixture-runner-identity-wave27",
+          "source": "fixture-channel-source-wave27"
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "missing_id",
+        "expected": "protocol_error",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "fact",
+          "fact": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "factId": "fact-turn.ended",
+            "source": "fixture-channel-source-wave27",
+            "kind": "turn.ended",
+            "payloadRef": "payload-1"
+          }
+        },
+        "producer": {
+          "attempt": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "runnerIdentityRef": "fixture-runner-identity-wave27",
+          "source": "fixture-channel-source-wave27"
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "extra_field",
+        "expected": "protocol_error",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "fact",
+          "id": "fact-turn.ended",
+          "fact": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "factId": "fact-turn.ended",
+            "source": "fixture-channel-source-wave27",
+            "kind": "turn.ended",
+            "payloadRef": "payload-1"
+          },
+          "extra": true
+        },
+        "producer": {
+          "attempt": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "runnerIdentityRef": "fixture-runner-identity-wave27",
+          "source": "fixture-channel-source-wave27"
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "begin_write_intent",
+        "expected": "protocol_error",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "native-write-intent",
+          "id": "cmd-begin",
+          "command": {
+            "id": "cmd-begin",
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "kind": "begin",
+            "inputRef": "input-1",
+            "preparedPolicyRef": "prepared-1"
+          }
+        },
+        "producer": {
+          "attempt": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "runnerIdentityRef": "fixture-runner-identity-wave27",
+          "source": "fixture-channel-source-wave27"
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "foreign_producer",
+        "expected": "identity_mismatch",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "fact",
+          "id": "fact-turn.ended",
+          "fact": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "factId": "fact-turn.ended",
+            "source": "fixture-channel-source-wave27",
+            "kind": "turn.ended",
+            "payloadRef": "payload-1"
+          }
+        },
+        "producer": {
+          "attempt": {
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-foreign",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "runnerIdentityRef": "fixture-runner-identity-wave27",
+          "source": "fixture-channel-source-wave27"
+        },
+        "sends": 0,
+        "executes": 0
+      }
+    ],
+    "replyNegatives": [
+      {
+        "name": "reply_fact_mismatch",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "receipt",
+          "id": "other-id",
+          "factId": "other-id",
+          "receipt": {
+            "factId": "fact-turn.ended",
+            "persisted": true,
+            "seq": 1
+          }
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "receipt_fact_mismatch",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "receipt",
+          "id": "fact-turn.ended",
+          "factId": "fact-turn.ended",
+          "receipt": {
+            "factId": "other-fact",
+            "persisted": true,
+            "seq": 1
+          }
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "receipt_not_persisted",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "receipt",
+          "id": "fact-turn.ended",
+          "factId": "fact-turn.ended",
+          "receipt": {
+            "factId": "fact-turn.ended",
+            "persisted": false,
+            "seq": 1
+          }
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "payload_correlation_mismatch",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "payload",
+          "id": "other",
+          "requestId": "payload-request-1",
+          "value": {
+            "kind": "fixture-payload",
+            "nested": {
+              "ok": true
+            }
+          }
+        },
+        "sends": 0,
+        "executes": 0
+      },
+      {
+        "name": "ack_mismatch",
+        "refused": true,
+        "value": {
+          "v": 1,
+          "type": "ack-failed",
+          "id": "other-request",
+          "factId": "other-fact",
+          "reason": "fixture_refused"
+        },
+        "sends": 0,
+        "executes": 0
+      }
+    ],
+    "contractScenarios": [
+      {
+        "id": "first_bind",
+        "expectedGeneration": 0,
+        "resultGeneration": 1,
+        "outcome": "bound"
+      },
+      {
+        "id": "second_bind",
+        "expectedGeneration": 1,
+        "resultGeneration": 2,
+        "outcome": "bound"
+      },
+      {
+        "id": "cas_conflict",
+        "expectedGeneration": 0,
+        "currentGeneration": 2,
+        "outcome": "stale_connection"
+      },
+      {
+        "id": "negative_generation",
+        "expectedGeneration": -1,
+        "outcome": "protocol_error"
+      },
+      {
+        "id": "unsafe_generation",
+        "expectedGeneration": 9007199254740992,
+        "outcome": "protocol_error"
+      },
+      {
+        "id": "old_lease_reply",
+        "connection": "A",
+        "replyTo": "B",
+        "outcome": false
+      },
+      {
+        "id": "old_lease_close",
+        "connection": "A",
+        "outcome": "new_connection_and_attempt_remain_open"
+      },
+      {
+        "id": "late_reply",
+        "deliveredAfter": "timeout",
+        "outcome": "timeout"
+      },
+      {
+        "id": "capacity_facts",
+        "limit": "maxPendingFacts",
+        "outcome": "capacity"
+      },
+      {
+        "id": "capacity_bytes",
+        "limit": "maxPendingBytes",
+        "outcome": "capacity"
+      },
+      {
+        "id": "close_pending",
+        "outcome": "closed"
+      },
+      {
+        "id": "indeterminate_write",
+        "outcome": "indeterminate"
+      }
+    ]
+  },
+  "consumers": {
+    "allow": {
+      "protocol": "channel-service-consumer/1",
+      "surface": "original stdio bridge v1 (B runner-service + payload/fact/write ports)",
+      "executor": "deterministic fixture driver",
+      "modelCalls": 0,
+      "vendorTurns": 0,
+      "signalsSent": 0,
+      "admission": "allow",
+      "counts": {
+        "factFrames": 3,
+        "payloadReadFrames": 4,
+        "writeIntentFrames": 1,
+        "receiptsSent": 2,
+        "ackFailedSent": 1,
+        "factCallbacksResolved": 2,
+        "factCallbackFailuresCaught": 1,
+        "payloadReadsResolved": 1,
+        "payloadReadFailures": 0,
+        "writeAdmissions": 1,
+        "writeDenied": 0
+      },
+      "observed": {
+        "payload": {
+          "kind": "coordinator-payload/1",
+          "items": [
+            1,
+            2,
+            3
+          ],
+          "nested": {
+            "ok": true
+          }
+        },
+        "receipts": [
+          {
+            "factId": "fact-duplicate-wave27",
+            "persisted": true,
+            "seq": 1
+          },
+          {
+            "factId": "fact-duplicate-wave27",
+            "persisted": true,
+            "seq": 1
+          }
+        ],
+        "duplicateReceiptSameSeq": true,
+        "ackFailure": "ingress refused fact fact-ack-failed-wave27: fixture_receiver_refused",
+        "admittedWrite": true,
+        "writeDeniedReason": null
+      },
+      "frames": [
+        {
+          "type": "ready"
+        },
+        {
+          "type": "payload-read"
+        },
+        {
+          "type": "payload-read"
+        },
+        {
+          "type": "fact",
+          "factId": "fact-duplicate-wave27"
+        },
+        {
+          "type": "receipt"
+        },
+        {
+          "type": "payload-read"
+        },
+        {
+          "type": "fact",
+          "factId": "fact-duplicate-wave27"
+        },
+        {
+          "type": "receipt"
+        },
+        {
+          "type": "payload-read"
+        },
+        {
+          "type": "fact",
+          "factId": "fact-ack-failed-wave27"
+        },
+        {
+          "type": "progress"
+        },
+        {
+          "type": "native-write-intent",
+          "commandId": "cmd-answer"
+        },
+        {
+          "type": "exited"
+        }
+      ],
+      "exit": {
+        "reason": "terminal"
+      }
+    },
+    "deny": {
+      "protocol": "channel-service-consumer/1",
+      "surface": "original stdio bridge v1 (B runner-service + payload/fact/write ports)",
+      "executor": "deterministic fixture driver",
+      "modelCalls": 0,
+      "vendorTurns": 0,
+      "signalsSent": 0,
+      "admission": "deny",
+      "counts": {
+        "factFrames": 3,
+        "payloadReadFrames": 4,
+        "writeIntentFrames": 1,
+        "receiptsSent": 2,
+        "ackFailedSent": 1,
+        "factCallbacksResolved": 2,
+        "factCallbackFailuresCaught": 1,
+        "payloadReadsResolved": 1,
+        "payloadReadFailures": 0,
+        "writeAdmissions": 1,
+        "writeDenied": 1
+      },
+      "observed": {
+        "payload": {
+          "kind": "coordinator-payload/1",
+          "items": [
+            1,
+            2,
+            3
+          ],
+          "nested": {
+            "ok": true
+          }
+        },
+        "receipts": [
+          {
+            "factId": "fact-duplicate-wave27",
+            "persisted": true,
+            "seq": 1
+          },
+          {
+            "factId": "fact-duplicate-wave27",
+            "persisted": true,
+            "seq": 1
+          }
+        ],
+        "duplicateReceiptSameSeq": true,
+        "ackFailure": "ingress refused fact fact-ack-failed-wave27: fixture_receiver_refused",
+        "admittedWrite": false,
+        "writeDeniedReason": "Coordinator refused native write"
+      },
+      "frames": [
+        {
+          "type": "ready"
+        },
+        {
+          "type": "payload-read"
+        },
+        {
+          "type": "payload-read"
+        },
+        {
+          "type": "fact",
+          "factId": "fact-duplicate-wave27"
+        },
+        {
+          "type": "receipt"
+        },
+        {
+          "type": "payload-read"
+        },
+        {
+          "type": "fact",
+          "factId": "fact-duplicate-wave27"
+        },
+        {
+          "type": "receipt"
+        },
+        {
+          "type": "payload-read"
+        },
+        {
+          "type": "fact",
+          "factId": "fact-ack-failed-wave27"
+        },
+        {
+          "type": "progress"
+        },
+        {
+          "type": "native-write-intent",
+          "commandId": "cmd-answer"
+        },
+        {
+          "type": "exited"
+        }
+      ],
+      "exit": {
+        "reason": "terminal"
+      }
+    }
+  },
+  "checks": {
+    "legalFramesAccepted": true,
+    "legalReplyFramesAccepted": true,
+    "negativesRefused": true,
+    "factCallbackActual": true,
+    "duplicateFactDeduplicated": true,
+    "payloadReaderActual": true,
+    "writeGuardAllowActual": true,
+    "writeGuardDenyActual": true,
+    "zeroModel": true,
+    "zeroSignals": true
+  },
+  "ok": true,
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "signalsSent": 0,
+  "limits": [
+    "fixture driver only; no model/vendor/native/profile/credential",
+    "no coordinator, ledger, database writer or second execution lifecycle is created",
+    "in-process runner service only; no SIGKILL and no global process/socket discovery"
+  ]
+}

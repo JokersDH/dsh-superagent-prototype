@@ -1,0 +1,63 @@
+{
+  "protocol": "trial-run-check/2",
+  "checkedAt": "2026-11-14T09:30:08.741Z",
+  "runDirectory": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave27/runs/20261114T172938-30s-mixed-server-error",
+  "run": {
+    "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+    "startedAt": "2026-11-14T09:29:38.175Z",
+    "endedAt": "2026-11-14T09:30:08.180Z",
+    "derivedWallSeconds": 30.005,
+    "summaryWallElapsedSeconds": 30,
+    "requestedDurationSeconds": 30,
+    "stoppedBy": "duration"
+  },
+  "samples": {
+    "path": "samples.ndjson",
+    "lines": 31,
+    "declaredCount": 31,
+    "bytes": 8482,
+    "sha256": "746c57531ce9101ffd9041f1da085be7a0f17e600e32c929455e79fde9dd48d0",
+    "firstElapsedMs": 3,
+    "lastElapsedMs": 30004,
+    "sampleSpanMs": 30001,
+    "medianIntervalMs": 1001
+  },
+  "counters": {
+    "pollRequests": 62,
+    "pollOk": 0,
+    "pollFailed": 62,
+    "latencyMs": {
+      "count": 62,
+      "p50": 0.63,
+      "p95": 1.64,
+      "max": 6.95
+    },
+    "httpStatuses": {
+      "500": 211
+    },
+    "sseConnections": 149,
+    "sseEvents": 0,
+    "sseBytes": 0,
+    "sseFailedConnections": 149,
+    "duplicates": 0,
+    "gaps": 0,
+    "reconnects": 149,
+    "reopens": 2,
+    "samples": 31,
+    "lastEventAt": null
+  },
+  "failures": 211,
+  "failureCounts": {
+    "poll:http_500": 62,
+    "sse:disconnect:http_status": 149
+  },
+  "cleanup": {
+    "closed": true,
+    "activeSockets": 0,
+    "activeConnections": 0
+  },
+  "consistency": {
+    "ok": true,
+    "issues": []
+  }
+}

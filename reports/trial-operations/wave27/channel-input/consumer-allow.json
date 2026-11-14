@@ -1,0 +1,99 @@
+{
+  "protocol": "channel-service-consumer/1",
+  "surface": "original stdio bridge v1 (B runner-service + payload/fact/write ports)",
+  "executor": "deterministic fixture driver",
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "signalsSent": 0,
+  "admission": "allow",
+  "counts": {
+    "factFrames": 3,
+    "payloadReadFrames": 4,
+    "writeIntentFrames": 1,
+    "receiptsSent": 2,
+    "ackFailedSent": 1,
+    "factCallbacksResolved": 2,
+    "factCallbackFailuresCaught": 1,
+    "payloadReadsResolved": 1,
+    "payloadReadFailures": 0,
+    "writeAdmissions": 1,
+    "writeDenied": 0
+  },
+  "observed": {
+    "payload": {
+      "kind": "coordinator-payload/1",
+      "items": [
+        1,
+        2,
+        3
+      ],
+      "nested": {
+        "ok": true
+      }
+    },
+    "receipts": [
+      {
+        "factId": "fact-duplicate-wave27",
+        "persisted": true,
+        "seq": 1
+      },
+      {
+        "factId": "fact-duplicate-wave27",
+        "persisted": true,
+        "seq": 1
+      }
+    ],
+    "duplicateReceiptSameSeq": true,
+    "ackFailure": "ingress refused fact fact-ack-failed-wave27: fixture_receiver_refused",
+    "admittedWrite": true,
+    "writeDeniedReason": null
+  },
+  "frames": [
+    {
+      "type": "ready"
+    },
+    {
+      "type": "payload-read"
+    },
+    {
+      "type": "payload-read"
+    },
+    {
+      "type": "fact",
+      "factId": "fact-duplicate-wave27"
+    },
+    {
+      "type": "receipt"
+    },
+    {
+      "type": "payload-read"
+    },
+    {
+      "type": "fact",
+      "factId": "fact-duplicate-wave27"
+    },
+    {
+      "type": "receipt"
+    },
+    {
+      "type": "payload-read"
+    },
+    {
+      "type": "fact",
+      "factId": "fact-ack-failed-wave27"
+    },
+    {
+      "type": "progress"
+    },
+    {
+      "type": "native-write-intent",
+      "commandId": "cmd-answer"
+    },
+    {
+      "type": "exited"
+    }
+  ],
+  "exit": {
+    "reason": "terminal"
+  }
+}

@@ -1,0 +1,936 @@
+{
+  "protocol": "trial-soak/1",
+  "startedAt": "2026-11-14T09:29:38.175Z",
+  "endedAt": "2026-11-14T09:30:08.180Z",
+  "elapsedMs": 30004,
+  "wallElapsedSeconds": 30,
+  "requestedDurationSeconds": 30,
+  "stoppedBy": "duration",
+  "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+  "scenario": {
+    "scenario": "mixed",
+    "defect": "server_error",
+    "expectedDefectObservation": "http_5xx",
+    "defectObserved": true,
+    "config": {
+      "pollMs": 500,
+      "sseIntervalMs": 500,
+      "reconnectBackoffMs": 200,
+      "sseIdleTimeoutMs": 4000,
+      "reopenSeconds": 10,
+      "sampleMs": 1000,
+      "maxRequests": 100000,
+      "maxSseEvents": 100000,
+      "maxReconnects": 2000,
+      "maxErrors": 100000,
+      "pollTimeoutMs": 300
+    }
+  },
+  "fixture": {
+    "url": "http://127.0.0.1:60800",
+    "port": 60800,
+    "defect": "server_error",
+    "stats": {
+      "connections": 211,
+      "activeConnections": 0,
+      "maxConcurrentConnections": 1,
+      "readinessRequests": 62,
+      "readinessBytes": 2480,
+      "readinessStatuses": {
+        "500": 211
+      },
+      "sseConnections": 0,
+      "sseEvents": 0,
+      "sseBytes": 0,
+      "sseClosed": 0
+    }
+  },
+  "counters": {
+    "pollRequests": 62,
+    "pollOk": 0,
+    "pollFailed": 62,
+    "latencyMs": {
+      "count": 62,
+      "p50": 0.63,
+      "p95": 1.64,
+      "max": 6.95
+    },
+    "httpStatuses": {
+      "500": 211
+    },
+    "sseConnections": 149,
+    "sseEvents": 0,
+    "sseBytes": 0,
+    "sseFailedConnections": 149,
+    "duplicates": 0,
+    "gaps": 0,
+    "reconnects": 149,
+    "reopens": 2,
+    "samples": 31,
+    "lastEventAt": null
+  },
+  "failures": {
+    "total": 211,
+    "counts": {
+      "poll:http_500": 62,
+      "sse:disconnect:http_status": 149
+    },
+    "samples": [
+      {
+        "at": "2026-11-14T09:29:38.186Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:38.187Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:38.386Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:38.588Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:38.689Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:38.791Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:38.993Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:39.191Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:39.194Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:39.396Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:39.596Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:39.692Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:39.799Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:39.999Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:40.194Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:40.201Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:40.402Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:40.603Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:40.697Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:40.805Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:41.008Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:41.199Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:41.209Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:41.410Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:41.612Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:41.701Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:41.813Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:42.016Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:42.203Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:42.217Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:42.418Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:42.619Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:42.705Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:42.820Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:43.027Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:43.207Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:43.228Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:43.429Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:43.630Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:43.709Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:43.833Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:44.035Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:44.210Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:44.236Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:44.438Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:44.639Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:44.711Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:44.839Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:45.041Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:45.211Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:45.242Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:45.444Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:45.646Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:45.711Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:45.849Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:46.050Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:46.213Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:46.251Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:46.452Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:46.654Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:46.714Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:46.855Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:47.058Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:47.216Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:47.258Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:47.459Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:47.661Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:47.718Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:47.863Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:48.066Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:48.182Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:48.218Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:48.266Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:48.468Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:48.670Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:48.720Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:48.870Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:49.072Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:49.222Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:49.273Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:49.474Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:49.676Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:49.724Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:49.876Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:50.077Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:50.225Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:50.278Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:50.478Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:50.680Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:50.726Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:50.881Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:51.082Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:51.227Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:51.284Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:51.486Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:51.687Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:51.729Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:51.888Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:52.090Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:52.229Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:52.291Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:52.493Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:52.695Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:52.731Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:52.896Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:53.098Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:53.232Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:53.299Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:53.500Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:53.702Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:53.734Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:53.903Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:54.103Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:54.236Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:54.305Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:54.507Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:54.708Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:54.737Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:54.910Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:55.110Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:55.241Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:55.311Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:55.513Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:55.716Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:55.743Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:55.917Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:56.120Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:56.244Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:56.322Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:56.523Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:56.723Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:56.744Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:56.925Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:57.128Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:57.245Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:57.328Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:57.529Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:57.730Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:57.745Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:57.930Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:58.132Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:58.185Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:58.248Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:58.334Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:58.536Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:58.737Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:58.749Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:58.940Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:59.141Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:59.249Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:59.343Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:59.544Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:59.745Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:29:59.751Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:29:59.946Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:00.148Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:00.252Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:00.350Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:00.551Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:00.753Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:00.753Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:00.955Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:01.156Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:01.255Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:01.359Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:01.560Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:01.757Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:01.760Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:01.961Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:02.163Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:02.259Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:02.363Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:02.565Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:02.760Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:02.767Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:02.968Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:03.170Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:03.261Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:03.371Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:03.574Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:03.762Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:03.775Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:03.977Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:04.179Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:04.264Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:04.381Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:04.583Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:04.767Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:04.784Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:04.986Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:05.187Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:05.267Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:05.389Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:05.591Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:05.769Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:05.791Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:05.993Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:06.195Z",
+        "kind": "sse:disconnect:http_status"
+      },
+      {
+        "at": "2026-11-14T09:30:06.269Z",
+        "kind": "poll:http_500"
+      },
+      {
+        "at": "2026-11-14T09:30:06.395Z",
+        "kind": "sse:disconnect:http_status"
+      }
+    ]
+  },
+  "samples": {
+    "path": "samples.ndjson",
+    "count": 31,
+    "sha256": "746c57531ce9101ffd9041f1da085be7a0f17e600e32c929455e79fde9dd48d0",
+    "bytes": 8482
+  },
+  "cleanup": {
+    "closed": true,
+    "activeSockets": 0,
+    "activeConnections": 0
+  },
+  "consistency": {
+    "ok": true,
+    "issues": [],
+    "lastSampleElapsedMs": 30004
+  },
+  "unknowns": [
+    "client reopen is a new HTTP/SSE connection, not daemon process recovery",
+    "provider/queue/old-request behaviour is not observable from this fixture and is not claimed",
+    "server-side handler timing is not separately instrumented; client latency is reported",
+    "resource samples cover this process and the fixture server only, never another user process"
+  ],
+  "resume": {
+    "arguments": [
+      "node tools/trial-kit/bin/trial-soak.mjs",
+      "--scenario mixed",
+      "--duration-seconds 30",
+      "--poll-ms 500",
+      "--sse-interval-ms 500",
+      "--reconnect-backoff-ms 200",
+      "--reopen-seconds 10",
+      "--sample-ms 1000",
+      "--max-errors 100000",
+      "--failure-mode server_error",
+      "--out <NEW-OUT>"
+    ],
+    "note": "replace <NEW-OUT>; the same duration and failure mode are required for comparability",
+    "line": "node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 30 --poll-ms 500 --sse-interval-ms 500 --reconnect-backoff-ms 200 --reopen-seconds 10 --sample-ms 1000 --max-errors 100000 --failure-mode server_error --out <NEW-OUT>"
+  },
+  "tool": {
+    "name": "trial-kit",
+    "version": "0.1.0",
+    "command": "soak"
+  },
+  "outputRoot": "reports/trial-operations/wave27/runs/20261114T172938-30s-mixed-server-error",
+  "measurementScope": {
+    "measured": "one finite fixture scenario of 30s (actual 30s)",
+    "notMeasured": [
+      "24h/48h soak",
+      "daemon recovery",
+      "provider/queue stability",
+      "other machines",
+      "real model/native execution"
+    ]
+  }
+}

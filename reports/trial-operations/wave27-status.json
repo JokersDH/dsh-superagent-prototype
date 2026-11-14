@@ -1,0 +1,578 @@
+{
+  "protocol": "trial-operations-status/1",
+  "wave": "product-wave-27",
+  "owner": "H",
+  "branch": "codex/g4-trial-operations",
+  "mergedMain": "ca01e17",
+  "preparedFrom": "420cf78",
+  "updatedAt": "2026-11-14T09:33:42.346Z",
+  "goal": {
+    "established": true,
+    "tokenBudget": null,
+    "checkpoints": [
+      "H4",
+      "H8",
+      "H12",
+      "H16",
+      "H20"
+    ],
+    "continueAfterCheckpoint": true
+  },
+  "ownedPaths": [
+    "tools/trial-kit/",
+    "tests/operational-soak/",
+    "docs/internal-trial/",
+    "reports/trial-operations/"
+  ],
+  "phases": {
+    "H1": {
+      "status": "COMPLETED",
+      "deliverable": "original ProductRuntime/Broker/A Store + B stdio and I contract surfaces recorded; I module absent"
+    },
+    "H2": {
+      "status": "COMPLETED",
+      "deliverable": "legal frames and producer/generation/limits fixtures; negatives refused with zero send/execute"
+    },
+    "H3": {
+      "status": "COMPLETED",
+      "deliverable": "actual fact ACK sink, payload reader and native-write guard called through the real runner service"
+    },
+    "H4": {
+      "status": "COMPLETED",
+      "deliverable": "legal three-consumer input package checkpoint"
+    },
+    "H5": {
+      "status": "COMPLETED",
+      "deliverable": "receipt/duplicate/ack-failed windows measured on the real bridge and A durable receipts"
+    },
+    "H6": {
+      "status": "COMPLETED",
+      "deliverable": "payload read and write guard allow/deny measured; unknown/late contract scenarios listed"
+    },
+    "H7": {
+      "status": "COMPLETED",
+      "deliverable": "I attach-channel adapter contract scenarios recorded; no source modification or second coordinator"
+    },
+    "H8": {
+      "status": "COMPLETED",
+      "deliverable": "private protocol checkpoint with frames, callbacks and refusals"
+    },
+    "H9": {
+      "status": "COMPLETED",
+      "deliverable": "same-Runner dual client NOT_REACHED (I module absent)"
+    },
+    "H10": {
+      "status": "COMPLETED",
+      "deliverable": "bounded fault inputs provided; SIGKILL NOT_REACHED with no signal and no fake recovery"
+    },
+    "H11": {
+      "status": "COMPLETED",
+      "deliverable": "original question/answer/native_applied support retained from recovery fixtures; business resume NOT_REACHED"
+    },
+    "H12": {
+      "status": "COMPLETED",
+      "deliverable": "same-Runner support scope and honest recovery range checkpoint"
+    },
+    "H13": {
+      "status": "COMPLETED",
+      "deliverable": "product readonly target NOT_REACHED (no explicit independently proven own target)"
+    },
+    "H14": {
+      "status": "COMPLETED",
+      "deliverable": "new-risk 30s HTTP/SSE failure observation with derived time and clean resource return"
+    },
+    "H15": {
+      "status": "COMPLETED",
+      "deliverable": "raw material, hashes, redaction and checker contradictions retained"
+    },
+    "H16": {
+      "status": "COMPLETED",
+      "deliverable": "readonly/diagnostic short observation checkpoint"
+    },
+    "H17": {
+      "status": "COMPLETED",
+      "deliverable": "REFUSED zero-exec, token fd checks, bounded semver and raw boundaries retained (27/27 previous suite)"
+    },
+    "H18": {
+      "status": "COMPLETED",
+      "deliverable": "colleague guide updated for channel consumers, recovery scope and current package choice"
+    },
+    "H19": {
+      "status": "COMPLETED",
+      "deliverable": "I/B/F/G/E handoff inputs documented; no source takeover and no E assertion change"
+    },
+    "H20": {
+      "status": "COMPLETED",
+      "deliverable": "five checkpoints, status and sustained operations handoff"
+    }
+  },
+  "milestones": {
+    "H4": {
+      "status": "COMPLETED"
+    },
+    "H8": {
+      "status": "COMPLETED"
+    },
+    "H12": {
+      "status": "COMPLETED"
+    },
+    "H16": {
+      "status": "COMPLETED"
+    },
+    "H20": {
+      "status": "COMPLETED"
+    }
+  },
+  "surfaces": {
+    "actual": "B runner-service original stdio bridge v1: fact ACK sink, payload reader, native-write guard",
+    "contractOnly": "CoordinatorChannel shared requests/replies/limits and generation/CAS expectations",
+    "notReached": [
+      "I attach-channel module (absent from this checkout)",
+      "generation/CAS binding, stale lease isolation, late reply, close race, capacity enforcement",
+      "same-Runner dual client rebind",
+      "SIGKILL cross-process recovery / original Work acceptance / 2 or 4 resources",
+      "real product readonly/SSE target observation"
+    ]
+  },
+  "frames": {
+    "legalRequests": [
+      "fact",
+      "payload",
+      "write"
+    ],
+    "legalReplies": [
+      "receipt",
+      "ackFailed",
+      "payload",
+      "admission"
+    ],
+    "requestNegatives": 9,
+    "replyNegatives": 5,
+    "allNegativeRefused": true,
+    "contractScenarios": [
+      "first_bind",
+      "second_bind",
+      "cas_conflict",
+      "negative_generation",
+      "unsafe_generation",
+      "old_lease_reply",
+      "old_lease_close",
+      "late_reply",
+      "capacity_facts",
+      "capacity_bytes",
+      "close_pending",
+      "indeterminate_write"
+    ],
+    "sends": 0,
+    "executes": 0,
+    "material": [
+      {
+        "path": "reports/trial-operations/wave27/channel-input/frames.json",
+        "bytes": 17530,
+        "sha256": "2f4b2a84380d4c0dd83cf13ff241c13416f2b609172af0091a08f4dbdc498896"
+      }
+    ]
+  },
+  "consumers": {
+    "allow": {
+      "counts": {
+        "factFrames": 3,
+        "payloadReadFrames": 4,
+        "writeIntentFrames": 1,
+        "receiptsSent": 2,
+        "ackFailedSent": 1,
+        "factCallbacksResolved": 2,
+        "factCallbackFailuresCaught": 1,
+        "payloadReadsResolved": 1,
+        "payloadReadFailures": 0,
+        "writeAdmissions": 1,
+        "writeDenied": 0
+      },
+      "observed": {
+        "payload": {
+          "kind": "coordinator-payload/1",
+          "items": [
+            1,
+            2,
+            3
+          ],
+          "nested": {
+            "ok": true
+          }
+        },
+        "receipts": [
+          {
+            "factId": "fact-duplicate-wave27",
+            "persisted": true,
+            "seq": 1
+          },
+          {
+            "factId": "fact-duplicate-wave27",
+            "persisted": true,
+            "seq": 1
+          }
+        ],
+        "duplicateReceiptSameSeq": true,
+        "ackFailure": "ingress refused fact fact-ack-failed-wave27: fixture_receiver_refused",
+        "admittedWrite": true,
+        "writeDeniedReason": null
+      }
+    },
+    "deny": {
+      "counts": {
+        "factFrames": 3,
+        "payloadReadFrames": 4,
+        "writeIntentFrames": 1,
+        "receiptsSent": 2,
+        "ackFailedSent": 1,
+        "factCallbacksResolved": 2,
+        "factCallbackFailuresCaught": 1,
+        "payloadReadsResolved": 1,
+        "payloadReadFailures": 0,
+        "writeAdmissions": 1,
+        "writeDenied": 1
+      },
+      "observed": {
+        "payload": {
+          "kind": "coordinator-payload/1",
+          "items": [
+            1,
+            2,
+            3
+          ],
+          "nested": {
+            "ok": true
+          }
+        },
+        "receipts": [
+          {
+            "factId": "fact-duplicate-wave27",
+            "persisted": true,
+            "seq": 1
+          },
+          {
+            "factId": "fact-duplicate-wave27",
+            "persisted": true,
+            "seq": 1
+          }
+        ],
+        "duplicateReceiptSameSeq": true,
+        "ackFailure": "ingress refused fact fact-ack-failed-wave27: fixture_receiver_refused",
+        "admittedWrite": false,
+        "writeDeniedReason": "Coordinator refused native write"
+      }
+    },
+    "zeroModel": true,
+    "zeroSignals": true,
+    "material": [
+      {
+        "path": "reports/trial-operations/wave27/channel-input/consumer-allow.json",
+        "bytes": 1906,
+        "sha256": "e402d2560757755a906027c543fba3da8ab9de861d7ea10afd28a1d0a3c657c4"
+      },
+      {
+        "path": "reports/trial-operations/wave27/channel-input/consumer-deny.json",
+        "bytes": 1936,
+        "sha256": "f355fa4a1aa16406295c56a82bfd2c33b9c96193072c64dcc56e4b976290f971"
+      },
+      {
+        "path": "reports/trial-operations/wave27/channel-input/report.json",
+        "bytes": 21834,
+        "sha256": "5a5becb23ed11cdac8586546b97918bb2af87a2307ce7f82e9aa5f474fe212be"
+      }
+    ]
+  },
+  "recoveryReuse": {
+    "note": "wave26 legal zero-model normal/journal/port package retained; not re-run or relabelled as business recovery",
+    "subject": {
+      "workId": "94012e1a1c7265c033f285a944656a04",
+      "questionId": "a4e2d78e46ab29eab0af67cd93add9ba",
+      "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+      "deliveryStatus": "native_applied"
+    },
+    "journalEntries": 5,
+    "journalNegatives": 7,
+    "portFaults": 5,
+    "businessResume": "NOT_REACHED",
+    "material": "reports/trial-operations/wave26/recovery-a826-input/report.json"
+  },
+  "runs": {
+    "short30ServerError": {
+      "material": [
+        {
+          "path": "reports/trial-operations/wave27/runs/20261114T172938-30s-mixed-server-error/run.json",
+          "bytes": 23744,
+          "sha256": "6a4be7f4b9520294be16cd0c8bdc28db041806a72d68a59430809fe6a2d68220"
+        },
+        {
+          "path": "reports/trial-operations/wave27/runs/20261114T172938-30s-mixed-server-error/samples.ndjson",
+          "bytes": 8482,
+          "sha256": "746c57531ce9101ffd9041f1da085be7a0f17e600e32c929455e79fde9dd48d0"
+        }
+      ],
+      "summary": {
+        "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+        "startedAt": "2026-11-14T09:29:38.175Z",
+        "endedAt": "2026-11-14T09:30:08.180Z",
+        "wallElapsedSeconds": 30,
+        "requestedDurationSeconds": 30,
+        "stoppedBy": "duration",
+        "counters": {
+          "pollRequests": 62,
+          "pollOk": 0,
+          "pollFailed": 62,
+          "latencyMs": {
+            "count": 62,
+            "p50": 0.63,
+            "p95": 1.64,
+            "max": 6.95
+          },
+          "httpStatuses": {
+            "500": 211
+          },
+          "sseConnections": 149,
+          "sseEvents": 0,
+          "sseBytes": 0,
+          "sseFailedConnections": 149,
+          "duplicates": 0,
+          "gaps": 0,
+          "reconnects": 149,
+          "reopens": 2,
+          "samples": 31,
+          "lastEventAt": null
+        },
+        "failures": 211,
+        "failureCounts": {
+          "poll:http_500": 62,
+          "sse:disconnect:http_status": 149
+        },
+        "cleanup": {
+          "closed": true,
+          "activeSockets": 0,
+          "activeConnections": 0
+        }
+      },
+      "check": {
+        "path": "reports/trial-operations/wave27/checks/20261114T172938-30s-mixed-server-error/run-check.json",
+        "bytes": 1508,
+        "sha256": "f487041f5c4e57344eb2ad821eafa6262bf5e41b9c52d422ec14bc862212d8bd"
+      }
+    },
+    "preserved": {
+      "note": "old raw samples retained; not re-run and not relabelled",
+      "wave26Short60": {
+        "original": "reports/trial-operations/wave26/runs/20261114T154118-60s-mixed-normal/run.json",
+        "summary": {
+          "status": "COMPLETED",
+          "startedAt": "2026-11-14T07:41:48.806Z",
+          "endedAt": "2026-11-14T07:42:48.811Z",
+          "wallElapsedSeconds": 60,
+          "requestedDurationSeconds": 60,
+          "stoppedBy": "duration",
+          "counters": {
+            "pollRequests": 61,
+            "pollOk": 61,
+            "pollFailed": 0,
+            "latencyMs": {
+              "count": 61,
+              "p50": 0.64,
+              "p95": 1.39,
+              "max": 6.34
+            },
+            "httpStatuses": {
+              "200": 61
+            },
+            "sseConnections": 2,
+            "sseEvents": 60,
+            "sseBytes": 6804,
+            "sseFailedConnections": 0,
+            "duplicates": 0,
+            "gaps": 0,
+            "reconnects": 1,
+            "reopens": 1,
+            "samples": 61,
+            "lastEventAt": "2026-11-14T07:42:48.084Z"
+          },
+          "failures": 0,
+          "failureCounts": {},
+          "cleanup": {
+            "closed": true,
+            "activeSockets": 0,
+            "activeConnections": 0
+          }
+        }
+      },
+      "wave26Short30": {
+        "original": "reports/trial-operations/wave26/runs/20261114T154118-30s-mixed-truncate/run.json",
+        "summary": {
+          "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+          "startedAt": "2026-11-14T07:42:49.467Z",
+          "endedAt": "2026-11-14T07:43:19.475Z",
+          "wallElapsedSeconds": 30,
+          "requestedDurationSeconds": 30,
+          "stoppedBy": "duration",
+          "counters": {
+            "pollRequests": 62,
+            "pollOk": 62,
+            "pollFailed": 0,
+            "latencyMs": {
+              "count": 62,
+              "p50": 0.67,
+              "p95": 1.43,
+              "max": 9.96
+            },
+            "httpStatuses": {
+              "200": 62
+            },
+            "sseConnections": 27,
+            "sseEvents": 51,
+            "sseBytes": 5712,
+            "sseFailedConnections": 0,
+            "duplicates": 0,
+            "gaps": 0,
+            "reconnects": 26,
+            "reopens": 2,
+            "samples": 31,
+            "lastEventAt": "2026-11-14T07:43:19.308Z"
+          },
+          "failures": 24,
+          "failureCounts": {
+            "sse:disconnect:error": 24
+          },
+          "cleanup": {
+            "closed": true,
+            "activeSockets": 0,
+            "activeConnections": 0
+          }
+        }
+      },
+      "wave25Baseline600": {
+        "original": "reports/trial-operations/wave25/runs/20261114T122036-600s-mixed-baseline/run.json",
+        "summary": {
+          "status": "COMPLETED",
+          "startedAt": "2026-11-14T04:20:37.000Z",
+          "endedAt": "2026-11-14T04:30:37.006Z",
+          "wallElapsedSeconds": 600,
+          "requestedDurationSeconds": 600,
+          "stoppedBy": "duration",
+          "counters": {
+            "pollRequests": 608,
+            "pollOk": 608,
+            "pollFailed": 0,
+            "latencyMs": {
+              "count": 608,
+              "p50": 1.31,
+              "p95": 2.14,
+              "max": 4.73
+            },
+            "httpStatuses": {
+              "200": 608
+            },
+            "sseConnections": 10,
+            "sseEvents": 600,
+            "sseBytes": 68220,
+            "sseFailedConnections": 0,
+            "duplicates": 0,
+            "gaps": 0,
+            "reconnects": 9,
+            "reopens": 9,
+            "samples": 301,
+            "lastEventAt": "2026-11-14T04:30:36.340Z"
+          },
+          "failures": 0,
+          "failureCounts": {},
+          "cleanup": {
+            "closed": true,
+            "activeSockets": 0,
+            "activeConnections": 0
+          }
+        }
+      },
+      "wave25Churn1800": {
+        "original": "reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn/run.json",
+        "summary": {
+          "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+          "startedAt": "2026-11-14T04:31:53.552Z",
+          "endedAt": "2026-11-14T05:01:53.582Z",
+          "wallElapsedSeconds": 1800,
+          "requestedDurationSeconds": 1800,
+          "stoppedBy": "duration",
+          "counters": {
+            "pollRequests": 609,
+            "pollOk": 609,
+            "pollFailed": 0,
+            "latencyMs": {
+              "count": 609,
+              "p50": 0.78,
+              "p95": 1.87,
+              "max": 6.07
+            },
+            "httpStatuses": {
+              "200": 609
+            },
+            "sseConnections": 400,
+            "sseEvents": 800,
+            "sseBytes": 89600,
+            "sseFailedConnections": 0,
+            "duplicates": 0,
+            "gaps": 0,
+            "reconnects": 399,
+            "reopens": 9,
+            "samples": 601,
+            "lastEventAt": "2026-11-14T05:01:51.789Z"
+          },
+          "failures": 392,
+          "failureCounts": {
+            "sse:disconnect:error": 392
+          },
+          "cleanup": {
+            "closed": true,
+            "activeSockets": 0,
+            "activeConnections": 0
+          }
+        },
+        "expectedDisconnectFailures": 392
+      }
+    },
+    "productReadonlyObservation": {
+      "status": "NOT_REACHED",
+      "reason": "no explicit independently-proven own product target supplied; no user service/credential sampling"
+    }
+  },
+  "tests": {
+    "command": "node --test tests/operational-soak/*.case.mjs tests/operational-soak/recovery/*.case.mjs tests/operational-soak/channel/*.case.mjs",
+    "total": 30,
+    "pass": 30,
+    "fail": 0,
+    "suites": {
+      "preflight": 9,
+      "machinecheck": 5,
+      "soak": 6,
+      "hardening": 4,
+      "recovery": 3,
+      "channel": 3
+    }
+  },
+  "budgets": {
+    "vendorModelNativeTurns": 0,
+    "newModelAllowanceCreated": 0,
+    "newDriver": false,
+    "cac": false,
+    "desktopShell": false,
+    "pilot": "BLOCKED (24 turn / 200000 token / USD5 / one-in-flight unchanged)"
+  },
+  "preserved": {
+    "userServices": "twelve instances 5180/8796 .. 5191/8807 untouched; no restart/stop/migrate",
+    "state": "no personal state/homecredential/native profile read or modified; fixture roots only",
+    "liveSignals": "none; in-process service only, no SIGKILL and no global discovery",
+    "oldEvidence": "wave25/26 raw runs, hashes and expected disconnect observations retained"
+  },
+  "releaseAuthority": false,
+  "eAssertions": "independent; H material is raw observation only",
+  "limitations": [
+    "original stdio bridge v1 and in-process fixture only; I attach-channel and same-Runner are NOT_REACHED",
+    "no SIGKILL/business resume; receipt/payload/guard observations grant no execution or recovery authority",
+    "no real product readonly/SSE target this wave (NOT_REACHED)",
+    "no model/vendor/native/CLI/profile/credential; no second coordinator, ledger or gate"
+  ]
+}
