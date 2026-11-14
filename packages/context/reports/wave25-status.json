@@ -1,0 +1,88 @@
+{
+  "protocol": "agent-c-wave25-status/1",
+  "wave": "product-wave-25",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "11002b8",
+    "mainTrialReadiness": "fdb3f16",
+    "mergeCommit": "f72cf95",
+    "rootLockDiffPreserved": true
+  },
+  "milestones": {
+    "completeIdentityGate": "a951f63",
+    "requiredIdentityTests": "4ee384a",
+    "toolApiUiInput": "2b97c14",
+    "finalStatus": "this commit"
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "identityGate": {
+    "validator": "packages/context/tools/driver-lib.mjs validatePackageIdentity",
+    "requiredFields": ["pid", "processStart", "apiPid", "apiProcessStart", "state", "install", "configRoot", "mode personal", "startupMode recovery_readonly", "apiURL port", "apiArgv --review-restored-scope", "launcherArgv start"],
+    "requiredChecks": ["launcher_alive", "process_start", "launcher_command", "owner", "cwd", "install_identity", "api_argv", "api_process_start", "api_owner", "api_parent", "api_cwd", "listeners", "health", "runtime_mode", "startup_mode"],
+    "negatives": ["missing pid", "missing apiPid", "missing processStart", "missing apiProcessStart", "empty checks", "missing single check", "failed api_process_start", "changed processStart/apiProcessStart", "changed state/install/configRoot", "missing review argv"],
+    "result": "missing or foreign identity can never be bound=true; real 0ede package positive remains"
+  },
+  "descriptorAndCleanup": {
+    "descriptor": "one --pa-entry plus rootArgs/cwd for review/start/status/stop; output hash must equal executed bytes; contradictory overrides exit 2",
+    "cleanup": "owned fresh stop verifies CLI STOPPED + status STOPPED + record pid gone + supervisor exit; failure downgrades verified-flow to failed exit 1 with materials preserved",
+    "modes": "reused-left-running and kept-running are explicit and never reported stopped"
+  },
+  "deadlineAndFaults": {
+    "coverage": ["prepare", "identity", "start readiness", "HTTP", "status", "stop"],
+    "reserve": "cleanupReserveMs",
+    "faults": ["silent connection timeout", "half JSON", "entry early exit", "readiness timeout", "stop failure downgrade", "per-request/bounded logs"],
+    "environment": "test children set NODE_OPTIONS=--no-network-family-autoselection to avoid local Node/undici setTypeOfService EINVAL; not a product guarantee"
+  },
+  "manifestDrivenFlow": {
+    "sameExecution": "driver itself builds A manifest before starting the consumer; no second manifest wrapper test",
+    "inputs": ["--a-worktree", "--a-module", "--manifest-db", "--manifest-expectation", "--manifest-output", "--root-map", "--replay-context-token", "--replay-confirm-token"],
+    "checks": ["wave24-data-manifest/1", "coverage all complete", "subject.dataRoot equals manifest DB root and root-map from", "root-map to equals reviewed state", "HTTP Work/question ids equal manifest", "HTTP deliveries equal manifest target:status", "receipt replay 422"],
+    "aSource": { "head": "662843e281fe55e59572fdf05f501dd9999531af", "moduleSha256": "f568580a39c07f7c77c102a27596f81f53b061870bcd16fe126addd9e4ebf7e2", "producer": "A packages/workflows/src/data-manifest.ts with A storage on the same Store" },
+    "rejected": ["manifest missing/incomplete", "wrong dataRoot", "wrong root map", "foreign Work/question", "deliveries mismatch"]
+  },
+  "packageDualFormat": {
+    "package": { "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave23-target/wave23-target-0ede11d.tar.gz", "tarSha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21", "source": "0ede11d0a46f377e90657c78b001357c98d4f5e7", "buildId": "1eb8733c8b1729bc", "schema": 18, "runtime": "Node 24.21.0 / darwin-arm64 / ABI137" },
+    "formats": ["default workflow-snapshot/1 verified", "explicit workflow-snapshot/2 verified"],
+    "restore": "each snapshot database/artifacts -> portability createBundle -> restoreBundle to its own new root with real personal-restore/1 report; no hand-written marker",
+    "actual": ["v1 and v2 each run the package prepare/start/read/stop", "manifest format expectation 1/2 respectively", "Work delivered, delivery native_applied, sources verified, candidate digest, business 422", "narrow selection sources scope_changed and candidate unavailable", "original context/confirm tokens replay 422", "held queue 1 and provider unchanged"],
+    "subjectsSeparate": "source, exact package, later main/F UI bytes and installed verdict remain separate"
+  },
+  "toolApi": {
+    "protocol": "personal-review-driver/2",
+    "statuses": { "verified-flow": "exit 0", "reused": "exit 0", "refused-verified": "exit 0", "observed": "exit 0, verified false, never acceptance", "NOT_REACHED": "exit 4, no checkout fallback", "failed": "exit 1, usage 2" },
+    "outputFields": ["descriptor", "entries SHA", "review", "health", "identity", "budgets", "data.manifest/roots", "cleanup materials", "failure code/detail"]
+  },
+  "uiInput": {
+    "file": "packages/context/reports/wave25-ui-input.json",
+    "consumers": ["main 4b42a90 existing source diagnostic UI", "F apps/console/src/trial subtree displays data; C does not edit console"],
+    "samples": ["verified+validity", "narrow scope_changed", "missing", "unverified", "exact package verified/narrow"],
+    "forbidden": ["readable counts", "raw paths", "principal/tokens", "authorization none as approval"]
+  },
+  "tests": { "context": 129, "proposals": 41, "knowledge": 115, "routing": 44, "total": 329, "result": "all PASS" },
+  "strict": { "tscNoEmit": "four owned packages PASS", "workspaceBuild": "pnpm -r build -> 0" },
+  "layers": {
+    "source": "verified flow/reuse/refusals retained",
+    "package": "exact 0ede manifest-driven dual-root flow",
+    "installed": "not claimed; E must bind tar/subject",
+    "normal": "no target/private permission/queue consumption",
+    "recovered": "read-only snapshot restore; no B business attach",
+    "vendorNative": 0
+  },
+  "limitations": [
+    "package measured on exact 0ede stage only; later bytes need their own freeze",
+    "restore uses portability bundles wrapping each verified snapshot, not a launcher upgrade/rollback matrix",
+    "long-term revocation, concurrent writers and 48h soak unmeasured",
+    "F/G/H success display is not authorization; C does not edit their code"
+  ],
+  "evidence": [
+    "packages/context/docs/WAVE25-RECIPE.md",
+    "packages/context/reports/wave25-ui-input.json",
+    "packages/context/reports/wave25-driver-lib.tap",
+    "packages/context/reports/wave25-driver-strict.tap",
+    "packages/context/reports/wave25-package-manifest.tap",
+    "packages/context/reports/wave25-suites.json"
+  ]
+}
