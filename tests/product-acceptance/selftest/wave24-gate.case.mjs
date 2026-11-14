@@ -56,6 +56,14 @@ export async function wave24GateCases() {
       value.digestScope = 'package_lacks_identity'
       delete value.healthDigest; delete value.sameDigest
     }, 'capability_mismatch')))
+  cases.push(await runCase({ ...define('W24-DIAG-OPTIN-500', 'A failed opt-in HTTP response cannot be replaced by a schema-valid payload') },
+    async ({ assert }) => reject(assert, 'OPTIN_500', report => { diag(report).plain.optIn = 500 })))
+  cases.push(await runCase({ ...define('W24-DIAG-OPTIN-MISSING', 'A missing opt-in HTTP status is rejected') },
+    async ({ assert }) => reject(assert, 'OPTIN_MISSING', report => { delete diag(report).plain.optIn })))
+  cases.push(await runCase({ ...define('W24-DIAG-OPTIN-NON200', 'A non-200 success status for the opt-in is rejected') },
+    async ({ assert }) => reject(assert, 'OPTIN_NON200', report => { diag(report).plain.optIn = 201 })))
+  cases.push(await runCase({ ...define('W24-DIAG-NARROW-500', 'A failed narrow opt-in response is rejected even with a diagnostic') },
+    async ({ assert }) => reject(assert, 'NARROW_500', report => { diag(report).narrow.optIn = 500 })))
   cases.push(await runCase({ ...define('W24-MISSING-DIGEST', 'Deleting the digest observations on a supporting package is rejected') },
     async ({ assert }) => reject(assert, 'MISSING_DIGEST', report => {
       const value = reuse(report); delete value.digestAvailable; delete value.healthDigest; delete value.sameDigest

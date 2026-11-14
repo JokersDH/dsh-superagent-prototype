@@ -510,10 +510,27 @@ export async function runPersonalReview() {
     }))
 
   if (observed) {
+    const appSource = readFileSync(join(observed.install, 'app/apps/coordinator/http/app.ts'), 'utf8')
+    if (!/v1\/readiness/u.test(appSource))
+      cases.push(notTested({ ...define('E7-READINESS', 'The packaged product exposes GET /v1/readiness with the public schema and truthful unknown states'), evidence: {} },
+        'NOT_REACHED: the frozen target package HTTP entry does not contain GET /v1/readiness (main 0064); it predates the readiness source. The default configuration/health endpoints are unchanged, and a package frozen with that API is required.'))
+    else
+      cases.push(notTested({ ...define('E7-READINESS', 'The packaged product exposes GET /v1/readiness with the public schema and truthful unknown states'), evidence: {} },
+        'NOT_REACHED: GET /v1/readiness is present in the package source, but this run has not recorded its authenticated response against a bound review instance yet.'))
+  }
+
+  if (observed) {
     const consoleDir = join(observed.install, 'app/apps/console/dist')
-    const marker = existsSync(consoleDir)
-      ? execFileSync('sh', ['-c', `grep -rl "范围说明\|scope-review" ${JSON.stringify(consoleDir)} 2>/dev/null | head -1`], { encoding: 'utf8' }).trim()
-      : ''
+    const marker = (() => {
+      try {
+        for (const name of readdirSync(join(consoleDir, 'assets'))) {
+          if (!name.endsWith('.js')) continue
+          const text = readFileSync(join(consoleDir, 'assets', name), 'utf8')
+          if (text.includes('查看范围说明')) return name
+        }
+      } catch { /* absent */ }
+      return ''
+    })()
     cases.push(notTested({ ...define('E6-SOURCE-UI', 'The installed console shows source scope states and the explicit scope-review action on the packaged UI bytes'), evidence: {} },
       marker
         ? 'NOT_REACHED: a console marker exists in this package, but the independent browser interaction against these exact packaged bytes has not been recorded yet.'

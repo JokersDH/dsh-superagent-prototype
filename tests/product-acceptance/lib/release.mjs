@@ -407,11 +407,16 @@ export function scopeDiagnosticsIssues(value) {
     }
   }
   if (plain.plain !== 200 || plain.plainHasDiagnostic !== false) issues.push('default_shape')
+  // The opt-in diagnostic must be the payload of a real HTTP 200 response in this run; a schema-valid
+  // object with a failed/missing status is not an observation.
+  if (plain.optIn !== 200) issues.push('opt_in_http')
+  if (plain.diagnostic && plain.optIn !== 200) issues.push('opt_in_stale')
   check(plain.diagnostic, plain.state, plain.bindingSourceCount, 'opt_in')
   if (![400, 422].includes(plain.duplicate) || ![400, 422].includes(plain.unknown)) issues.push('strict_query')
   if (narrow.start !== 'RUNNING' && narrow.start !== 'REUSED') issues.push('narrow_start')
   else {
     if (narrow.bodyServed !== false) issues.push('narrow_body')
+    if (narrow.optIn !== 200) issues.push('narrow_http')
     check(narrow.diagnostic, narrow.state, narrow.bindingSourceCount, 'narrow')
     if (narrow.state === 'verified') issues.push('narrow_state')
   }
