@@ -2,10 +2,9 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "eba7ffb",
-  "checkpoint": "3 of 5",
+  "base": "62eccd4",
+  "checkpoint": "4 of 5",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
-
   "item3_dual_client": {
     "status": "CORE OBSERVED on the real authenticated transport; not yet against a spawned Runner/child process",
     "delivered": {
@@ -28,28 +27,45 @@
     },
     "bug_found_by_harness": "waiters created before the first bind belong to generation 0 and no lease owns them, so a client must bind before the callbacks are created; the first run hung for exactly that reason and the harness now binds first"
   },
-
   "regressions": {
+    "b27-dual-client": "5 PASS / 0 FAIL",
     "b27-channel": "5 PASS / 0 FAIL",
     "b27-dispatch": "5 PASS / 0 FAIL",
     "b27-small-pages": "2 PASS / 0 FAIL",
     "b26-ref-payload": "4 PASS / 0 FAIL",
-    "b18-product-normal": "4 PASS / 1 FAIL / 1 NOT_TESTED - unchanged; the FAIL is the known-stale business-cancel stop assertion",
-    "typecheck": "root tsconfig clean for runner-service, business-channel, recovery-endpoint, recovery-transport"
+    "b18-product-normal": "4 PASS / 1 FAIL / 1 NOT_TESTED - unchanged; FAIL is the known-stale business-cancel stop assertion",
+    "typecheck": "root tsconfig clean"
   },
-
   "stillNotDone": {
-    "realChild": "the handover runs on the real transport and channel but with a controlled endpoint, not a spawned Runner/child; wiring it to the product lane Runner is next",
-    "iModule": "I's attach-channel module is still absent from this worktree, so only the 0068 contract is consumed",
+    "livePendingWrite": "the pending-native-write-indeterminate proof is on the real transport with a controlled endpoint (b27-dual-client), not yet on the spawned child, because the fixture lane does not reach the answer write path",
+    "realChildFull": "the product-lane Runner (NativeProductAttempt) keeps its recovery root private, so this uses the ordinary runner-service process spawned through RunnerLink instead",
+    "iModule": "I's attach-channel module is still absent from this worktree; only the 0068 contract is consumed",
     "item4_sigkillRecovery": "NOT_REACHED",
-    "item5_recoveredAcceptSlots": "NOT_REACHED",
-    "item2_residual": "PREPARED-fact re-preparation across a recovered attempt is not re-proven here"
+    "item5_recoveredAcceptSlots": "NOT_REACHED"
   },
-
   "wholePackageComplete": false,
-  "budget": { "modelCallsThisWave": 0, "nativeTurnsThisWave": 0, "cap4": "UNKNOWN unspendable" },
+  "budget": {
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0,
+    "cap4": "UNKNOWN unspendable"
+  },
   "limitations": [
     "all positives are controlled-transport evidence; no installed agent, gateway or native turn",
     "checkpoint 3 of 5"
-  ]
+  ],
+  "item3_live": {
+    "status": "OBSERVED ON A REAL SPAWNED RUNNER/CHILD",
+    "harness": "tests/native-acceptance/b27-dual-live.mjs",
+    "result": "6 PASS / 0 FAIL / 1 NOT_TESTED",
+    "lane": "the ordinary runner-service process spawned through RunnerLink with the codex-fake in-process app-server: the real CodexNativeDriver against a fake app-server, no installed CLI and no gateway",
+    "cases": [
+      "B27-LIVE-RUNNER-PUBLISHES-ENDPOINT - the spawned Runner child published its authenticated endpoint with pinned dev/ino",
+      "B27-LIVE-REAL-JOURNAL-FACTS - the Runner recorded 2 real business facts of its own (dispatch.observed, turn.ended)",
+      "B27-LIVE-A-READS-ORIGINAL-IDS - client A read both facts by their original ids from the live Runner journal",
+      "B27-LIVE-B-REPLAYS-SAME-IDS-AFTER-A-LEAVES - client B replayed the same two original fact ids from the SAME process after A left",
+      "B27-LIVE-OLD-CLIENT-REFUSED - a reply from the previous lease was refused on the live Runner",
+      "B27-LIVE-INSPECT-STILL-AUTHENTICATED - inspection returned the same attempt for the live Runner"
+    ],
+    "firstAttemptWasWeak": "an earlier run used the 'happy' fixture and only recorded one runtime.error fact; that is why the lane was switched to codex-fake, which records dispatch.observed and turn.ended"
+  }
 }
