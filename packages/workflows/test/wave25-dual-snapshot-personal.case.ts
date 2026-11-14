@@ -145,10 +145,11 @@ test('the same real Store restores v1 and v2 separately through actual personal 
     assert.ok(restored.report?.content.digest)
     assert.equal(restored.report?.database.sha256, sha256(readFileSync(join(snapshot.destination, 'product.sqlite'))))
     assert.equal(restored.report?.artifacts.length, snapshot.manifest.artifacts.length)
+    assert.equal(verifyRestoredSnapshot(restoreRoot).basis, 'report_only')
     const reverified = verifyRestoredSnapshot(restoreRoot, { protocol: snapshot.manifest.protocol,
       snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), databaseSha256: snapshot.manifest.database.sha256,
       evidenceDigest: snapshot.manifest.evidence.digest, contentDigest: sourceContent.digest!, sourceStateRoot: source })
-    assert.equal(reverified.status, 'ok', reverified.message)
+    assert.equal(reverified.status, 'ok', reverified.message); assert.equal(reverified.basis, 'independent')
     assert.equal(reverified.content?.digest, restored.report!.content.digest)
     assert.equal(restored.report!.content.digest, sourceContent.digest)
     assert.equal(verifyRestoredSnapshot(restoreRoot, { snapshotDigest: '0'.repeat(64) }).status, 'blocked')

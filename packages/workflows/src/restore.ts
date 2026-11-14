@@ -218,6 +218,8 @@ export interface VerifyRestoredExpectation extends RestoreExpectation {
 
 export interface RestoreVerification {
   readonly status: 'ok' | 'blocked'
+  /** `independent` requires at least one caller-supplied snapshot/database/evidence/content expectation. */
+  readonly basis: 'independent' | 'report_only' | null
   readonly report: RestoreSnapshotReport | null
   readonly content: WorkflowContentSummary | null
   readonly message?: string
@@ -254,8 +256,9 @@ export function verifyRestoredSnapshot(targetStateDir: string, expected: VerifyR
       const bytes = readFileSync(path)
       if (bytes.byteLength !== artifact.bytes || sha256(bytes) !== artifact.digest) throw new RestoreError(`restored artifact ${artifact.id} differs from the snapshot`)
     }
-    return { status: 'ok', report, content }
+    const independent = Boolean(expected.snapshotDigest || expected.databaseSha256 || expected.evidenceDigest || expected.contentDigest)
+    return { status: 'ok', basis: independent ? 'independent' : 'report_only', report, content }
   } catch (error) {
-    return { status: 'blocked', report: null, content: null, message: error instanceof Error ? error.message : String(error) }
+    return { status: 'blocked', basis: null, report: null, content: null, message: error instanceof Error ? error.message : String(error) }
   }
 }

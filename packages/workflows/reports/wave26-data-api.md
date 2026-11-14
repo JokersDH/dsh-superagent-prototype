@@ -55,6 +55,10 @@ reverification uses logical content plus artifact bytes and the independent snap
 4. `readWorkflowContent` must be complete and its digest must equal the report;
 5. every report artifact must exist as a regular file with its recorded bytes/digest.
 
+The result reports `basis: independent` only when the caller supplied at least one of the independent
+snapshot/database/evidence/content expectations; without one it is `report_only` and must not be read
+as proof against the producer subject.
+
 An added legitimate conversation message changes the row-content digest and is refused. A replaced
 or missing artifact, a rewritten root mapping, a different expected snapshot digest, an incomplete
 content proof or a target from another report is refused. A read-only service startup does not
@@ -78,8 +82,8 @@ after the HTTP startup and stop.
 - `wave26-workflow-tests.txt` — 120/120 via the existing tsx runner.
 - `wave26-storage-tests.txt` — 87/87.
 - `wave26-dual.txt` — same Store v1/v2:
-  source manifest `253398cb…`; content digest `4c3f0f04…` (138 rows, 56328 bytes) equals the
-  source content proof; database SHA `92976563…`; 17 artifacts; C target proof `ok` and added-message
+  source manifest `33e5d0b1…`; content digest `98e66398…` (138 rows, 56328 bytes) equals the
+  source content proof; database SHA `d540e221…`; 17 artifacts; C target proof `ok` and added-message
   target proof `mismatch` for both formats.
 - `wave26-original-result.txt` — duplicate/unknown/observed and eight foreign-tuple refusals,
   plus new-PID readback after close.
