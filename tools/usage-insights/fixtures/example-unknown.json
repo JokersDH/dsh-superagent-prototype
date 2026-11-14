@@ -1,0 +1,114 @@
+{
+  "protocol": "usage-insights-input/1",
+  "inputId": "fixture-bundle",
+  "capturedAt": "2026-11-13T12:00:00.000Z",
+  "timezone": "UTC",
+  "window": {
+    "from": "2026-11-13T00:00:00.000Z",
+    "to": "2026-11-14T00:00:00.000Z"
+  },
+  "projects": [
+    {
+      "projectId": "project-atlas"
+    }
+  ],
+  "source": {
+    "kind": "synthetic_fixture",
+    "descriptor": "usage-insights test fixture",
+    "digest": null,
+    "layerAssertion": "recorded_by_producer",
+    "capturedAt": "2026-11-13T12:00:00.000Z"
+  },
+  "declaredCoverage": {
+    "outcomes": "complete",
+    "workEvidence": "complete",
+    "attention": "complete"
+  },
+  "outcomes": [
+    {
+      "protocol": "execution-outcome/1",
+      "id": "f-outcome-u1",
+      "projectId": "project-atlas",
+      "attempt": {
+        "ticketId": "f-ticket-u1",
+        "assignmentId": "f-assignment-u1",
+        "contract": {
+          "workId": "work-atlas-1",
+          "revision": 1,
+          "digest": "7730330ea25921f59f6f942f532ebe7eb21676c24c09549b2f81c346d8de89d5"
+        },
+        "attemptId": "f-attempt-u1",
+        "fenceEpoch": 1
+      },
+      "profileRef": {
+        "profileId": "profile-codex",
+        "revision": 1,
+        "identityDigest": "120ba6a78034cd29df6c560a78490a3c70db2d453eb608868f13b5d4bbb0ef1f"
+      },
+      "acceptance": "unknown",
+      "evidenceRefs": [
+        "f-outcome-evidence-u1"
+      ],
+      "layer": "controlled",
+      "usage": {
+        "completeness": "unknown",
+        "evidenceRefs": [
+          "f-usage-evidence-u1"
+        ]
+      },
+      "observedAt": "2026-11-13T10:00:01.000Z"
+    }
+  ],
+  "attentionPages": [],
+  "workEvidence": [
+    {
+      "protocol": "work-evidence/1",
+      "workId": "work-atlas-1",
+      "projection": "recorded",
+      "entries": [
+        {
+          "at": "2026-11-13T09:00:00.000Z",
+          "kind": "work.created",
+          "sourceRef": "work-atlas-1",
+          "detail": {}
+        }
+      ],
+      "outcomes": [
+        {
+          "protocol": "execution-outcome/1",
+          "id": "f-outcome-u1",
+          "projectId": "project-atlas",
+          "attempt": {
+            "ticketId": "f-ticket-u1",
+            "assignmentId": "f-assignment-u1",
+            "contract": {
+              "workId": "work-atlas-1",
+              "revision": 1,
+              "digest": "7730330ea25921f59f6f942f532ebe7eb21676c24c09549b2f81c346d8de89d5"
+            },
+            "attemptId": "f-attempt-u1",
+            "fenceEpoch": 1
+          },
+          "profileRef": {
+            "profileId": "profile-codex",
+            "revision": 1,
+            "identityDigest": "120ba6a78034cd29df6c560a78490a3c70db2d453eb608868f13b5d4bbb0ef1f"
+          },
+          "acceptance": "unknown",
+          "evidenceRefs": [
+            "f-outcome-evidence-u1"
+          ],
+          "layer": "controlled",
+          "usage": {
+            "completeness": "unknown",
+            "evidenceRefs": [
+              "f-usage-evidence-u1"
+            ]
+          },
+          "observedAt": "2026-11-13T10:00:01.000Z"
+        }
+      ],
+      "truncated": false
+    }
+  ]
+}
