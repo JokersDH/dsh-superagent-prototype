@@ -75,13 +75,14 @@ async function collect(suite, loader) {
 }
 
 await collect('selftest', async () => {
-  const [base, mutations, wave23, wave24] = await Promise.all([
+  const [base, mutations, wave23, wave24, lifecycle] = await Promise.all([
     import('./selftest/gate.mjs'),
     import('./selftest/gate-mutations.mjs'),
     import('./selftest/wave23-gate.case.mjs'),
     import('./selftest/wave24-gate.case.mjs'),
+    import('./cases/w27-lifecycle.mjs'),
   ])
-  return [...(await base.gateSelftestCases()), ...(await mutations.gateMutationCases()), ...(await wave23.wave23GateCases()), ...(await wave24.wave24GateCases())]
+  return [...(await base.gateSelftestCases()), ...(await mutations.gateMutationCases()), ...(await wave23.wave23GateCases()), ...(await wave24.wave24GateCases()), ...(await lifecycle.runLifecycle()).cases]
 })
 await collect('e2', async () => {
   const [daily, wave04, wave05] = await Promise.all([
@@ -144,7 +145,7 @@ await collect('e3', async () => {
   }
 })
 await collect('e4', async () => {
-  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview, trialUi] = await Promise.all([
+  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview, trialUi, inputs] = await Promise.all([
     import('./cases/e4-stability.mjs'),
     import('./cases/e4-wave04.mjs'),
     import('./cases/e5-release.mjs'),
@@ -155,6 +156,7 @@ await collect('e4', async () => {
     import('./cases/w18-installed-recovery.mjs'),
     import('./cases/w21-personal-recovery.mjs'),
     import('./cases/w26-trial-ui.mjs'),
+    import('./cases/w27-inputs.mjs'),
   ])
   const first = await stability.runE4({
     root,
@@ -171,8 +173,9 @@ await collect('e4', async () => {
   const eighth = await installedRecovery.runInstalledRecovery({ root, runDirectory: run.directory })
   const ninth = await personalReview.runPersonalReview({ root, runDirectory: run.directory })
   const eleventh = await trialUi.runTrialUi({ root, runDirectory: run.directory })
+  const twelfth = await inputs.runInputs({ root, runDirectory: run.directory })
   return {
-    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...eleventh.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...eleventh.cases, ...twelfth.cases],
     artifacts: {
       screenshots: [
         ...(first.artifacts?.screenshots ?? []),

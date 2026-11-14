@@ -1,101 +1,28 @@
-import { execFileSync, spawn, spawnSync } from 'node:child_process'
-import { createHash } from 'node:crypto'
-import { createServer } from 'node:net'
-import { createRequire } from 'node:module'
-import {
-  existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync,
-} from 'node:fs'
-import { tmpdir } from 'node:os'
+import { spawnSync } from 'node:child_process'
+import { mkdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { runCase, notTested, LAYERS } from '../lib/status.mjs'
+import { runCase, LAYERS } from '../lib/status.mjs'
 import { openBrowser, VIEWPORTS } from '../lib/browser.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact, packagedFile } from '../lib/frozen-package.mjs'
+import {
+  extractFrozen, freePort, launcher, liveIdentity, privateRoot, releaseRoot, retainMaterial, sha256, startOwned,
+  stopOwned,
+} from '../lib/packaged-instance.mjs'
 
 /**
- * Wave-26 installed trial workbench.
+ * Wave-27 installed trial workbench on exact packaged bytes.
  *
- * The packaged console bytes are served by the packaged static server and proxy, and the browser
- * drives the same navigation callbacks the product exposes. Selector names are user-visible labels
- * cross-checked against the packaged bundle; the screenshot is taken from these exact bytes.
+ * The packaged console is served by the packaged static server and proxy; Playwright drives the same
+ * navigation callbacks the product exposes. Lifecycle is owned by `lib/packaged-instance.mjs`: the
+ * packaged `pa stop` runs first, and a refusal or timeout retains the private root instead of
+ * force-killing by path similarity or deleting the record. Screenshots come from these exact bytes.
  */
-const sha = value => createHash('sha256').update(value).digest('hex')
-const mark = message => { if (process.env.PA_E_TRACE) process.stderr.write(`[w26ui] ${message}\n`) }
-const SHOTS = resolve('tests/product-acceptance/reports/wave26/browser')
-
-function freePort() {
-  return new Promise(resolvePort => {
-    const server = createServer()
-    server.listen(0, '127.0.0.1', () => { const { port } = server.address(); server.close(() => resolvePort(port)) })
-  })
-}
-
-function parseJson(text) {
-  const value = String(text ?? '').trim()
-  try { return JSON.parse(value) } catch {
-    try { return JSON.parse(value.split('\n').filter(Boolean).at(-1)) } catch { return undefined }
-  }
-}
-
-function launcher(install, args, { env = {}, timeoutMs = 90_000 } = {}) {
-  const result = spawnSync(join(install, 'bin/pa'), args, {
-    cwd: join(install, '..'), encoding: 'utf8', timeout: timeoutMs,
-    env: { ...process.env, PA_NODE: process.execPath, ...env },
-  })
-  return { status: result.status, json: parseJson(result.stdout), stderr: String(result.stderr).slice(-500) }
-}
-
-function startPackage(install, { state, config, mockFile, consolePort, apiPort, timeoutMs = 90_000 }) {
-  const record = join(config, 'instance.json')
-  if (existsSync(record)) {
-    let value
-    try { value = JSON.parse(readFileSync(record, 'utf8')) } catch { rmSync(record, { force: true }) }
-    if (value && (!Number.isSafeInteger(value.pid) || (() => { try { process.kill(value.pid, 0); return false } catch { return true } })()))
-      rmSync(record, { force: true })
-  }
-  const child = spawn(join(install, 'bin/pa'), ['start', '--json', '--discussion-only', '--port', String(consolePort), '--api-port', String(apiPort)], {
-    cwd: join(install, '..'), stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, PA_NODE: process.execPath, ...(mockFile ? { PA_MODEL_CONFIG: mockFile } : {}), PA_CONFIG_ROOT: config, PA_DATA_ROOT: state },
-  })
-  child.stdout.on('data', () => {})
-  let stderr = ''
-  child.stderr.on('data', chunk => { stderr += chunk })
-  let buffer = ''
-  const value = new Promise(resolvePromise => {
-    const timer = setTimeout(() => resolvePromise({ status: 'TIMEOUT' }), timeoutMs)
-    child.stdout.on('data', chunk => {
-      buffer += chunk
-      const text = buffer.trim()
-      if (!text.endsWith('}')) return
-      try { const json = JSON.parse(text); clearTimeout(timer); resolvePromise({ ...json, stderr: stderr.slice(-800) }) } catch { /* buffering */ }
-    })
-    child.once('exit', code => { clearTimeout(timer); resolvePromise({ status: 'EXITED', code, stderr: stderr.slice(-800) }) })
-  })
-  return { child, value }
-}
-
-async function stopOwned(install, { state, config, mockFile }) {
-  launcher(install, ['stop', '--json'], { env: { ...(mockFile ? { PA_MODEL_CONFIG: mockFile } : {}), PA_CONFIG_ROOT: config, PA_DATA_ROOT: state } })
-  const recordPath = join(config, 'instance.json')
-  if (!existsSync(recordPath)) return
-  let record
-  try { record = JSON.parse(readFileSync(recordPath, 'utf8')) } catch { rmSync(recordPath, { force: true }); return }
-  const alive = pid => { try { process.kill(pid, 0); return true } catch { return false } }
-  const owned = []
-  for (const pid of [record.pid, record.apiPid, record.consolePid]) {
-    if (!Number.isSafeInteger(pid)) continue
-    try {
-      const command = String(execFileSync('ps', ['-o', 'command=', '-p', String(pid)], { encoding: 'utf8' }))
-      if (command.includes(install) && command.includes(state)) owned.push(pid)
-    } catch { /* gone */ }
-  }
-  for (const pid of owned) { try { process.kill(pid, 'SIGTERM') } catch { /* gone */ } }
-  await new Promise(resolvePromise => setTimeout(resolvePromise, 500))
-  for (const pid of owned) if (alive(pid)) { try { process.kill(pid, 'SIGKILL') } catch { /* gone */ } }
-  rmSync(recordPath, { force: true })
-}
+const mark = message => { if (process.env.PA_E_TRACE) process.stderr.write(`[w27ui] ${message}\n`) }
+const SHOTS = resolve('tests/product-acceptance/reports/wave27/browser')
 
 const navButtons = ['主对话视图', '试用准备']
+
 async function navOverlap(page) {
   const boxes = await page.evaluate(names => names.map(name => {
     const element = [...document.querySelectorAll('button')].find(item => item.getAttribute('aria-label') === name || item.textContent?.trim() === name)
@@ -117,72 +44,74 @@ export async function runTrialUi() {
   const cases = []
   const target = loadFrozenArtifact('target', DEFAULT_FROZEN_DIRS.target)
   const bundleMarker = (() => {
-    const listing = spawnSync('tar', ['-tzf', target.tarPath], { encoding: 'utf8', timeout: 60_000 })
-    for (const entry of String(listing.stdout).split('\n').filter(line => /apps\/console\/dist\/assets\/index-.*\.js$/u.test(line))) {
+    for (const entry of packagedAssetEntries(target)) {
       const text = packagedFile(target, entry)
       if (typeof text === 'string' && text.includes('试用准备')) {
         const bytes = Buffer.from(text)
-        return { entry, sha256: sha(bytes), bytes: bytes.byteLength }
+        return { entry, sha256: sha256(bytes), bytes: bytes.byteLength }
       }
     }
     return null
   })()
-  let observed, failure
-  try {
-    const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w26-ui-')))
-    const install = join(own, 'install'), config = join(own, 'config'), state = join(own, 'state')
-    mkdirSync(install, { recursive: true })
-    const bytes = readFileSync(target.tarPath)
-    if (sha(bytes) !== target.tarSha256 || bytes.byteLength !== target.tarBytes) throw new Error('frozen tar identity mismatch')
-    const extracted = spawnSync('tar', ['-xzf', target.tarPath, '-C', install, '--strip-components=1'])
-    if (extracted.status !== 0) throw new Error('tar extract failed')
-    const modelPath = join(own, 'model', 'absent.json')
-    const first = launcher(install, ['first-run', '--json'], { env: { PA_CONFIG_ROOT: config, PA_DATA_ROOT: state, PA_MODEL_CONFIG: modelPath } })
-    if (first.status !== 0) throw new Error(`first-run ${first.status}: ${first.stderr}`)
-    const consolePort = await freePort(), apiPort = await freePort()
-    const started = startPackage(install, { state, config, mockFile: modelPath, consolePort, apiPort })
-    const value = await started.value
-    mark(`start ${value.status}`)
-    if (value.status !== 'RUNNING' || !value.instance?.consoleURL) throw new Error(`start ${value.status}/${value.code ?? 'none'}: ${value.stderr ?? ''}`)
-    observed = { own, install, config, state, modelPath, value, started, target, consoleURL: value.instance.consoleURL }
-  } catch (error) { failure = String(error?.message ?? error).slice(0, 500) }
+  const ui = { subject: frozenArtifactSubject(target), mode: null, selector: null, bundle: bundleMarker,
+    actions: {}, negatives: {}, layout: {}, screenshots: [], problems: [], readinessReads: 0, writes: 0,
+    providerBefore: 0, providerAfter: 0, lifecycle: { stages: [] } }
 
-  const ui = { subject: frozenArtifactSubject(target), mode: null, selector: null, bundle: null, actions: {}, negatives: {},
-    layout: {}, screenshots: [], problems: [], readinessReads: 0, writes: 0, providerBefore: 0, providerAfter: 0 }
   cases.push(await runCase({ id: 'E3-TRIAL-WORKBENCH-UI', title: 'The packaged console exposes the trial preparation navigation, reads readiness only on demand and keeps the four original callbacks and the original draft',
     layer: LAYERS.INSTALLED, evidence: { trialUi: ui }, limitations: [
       'Loopback packaged console and proxy; the browser driver is the repository Playwright 1.65.0, while every served UI/API byte belongs to the frozen package.',
       'Only the normal personal surface is driven here; the readonly/fixture readiness facts are asserted over HTTP in E7-READINESS.',
+      'Cleanup prefers the packaged `pa stop`; a refusal or timeout retains the private root and is reported, never force-killed by path similarity.',
     ] }, async ({ assert, evidence }) => {
-    assert('UI_PROVISIONED', observed !== undefined, failure ?? 'no observation')
-    if (!observed) return
-    ui.bundle = bundleMarker ? { entry: bundleMarker.entry, sha256: bundleMarker.sha256, bytes: bundleMarker.bytes } : null
-    const browser = await openBrowser({ root: resolve('.') })
-    const { page, problems } = browser
-    page.setDefaultTimeout(12_000)
-    page.on('request', request => {
-      const path = new URL(request.url()).pathname
-      if (path === '/v1/readiness') ui.readinessReads += 1
-      if (path.startsWith('/v1/') && request.method() === 'POST') ui.writes += 1
-    })
-    const trial = page.getByRole('region', { name: '试用准备', exact: true })
-    const openTrial = async () => {
-      await page.getByRole('button', { name: '试用准备', exact: true }).click()
-      await trial.waitFor()
-      await trial.getByText('个人模式', { exact: true }).waitFor()
-    }
+    const root = privateRoot('pa-e-w27-ui-')
+    const modelPath = join(root.own, 'model', 'absent.json')
+    ui.lifecycle.root = root.own
+    let browser, stopped, released, unknown
     try {
-      await page.goto(observed.consoleURL, { waitUntil: 'domcontentloaded' })
+      ui.bundle = bundleMarker
+      assert('UI_FROZEN_BYTES', bundleMarker !== null && /^[a-f0-9]{64}$/u.test(bundleMarker.sha256), JSON.stringify(bundleMarker))
+      extractFrozen(target, root.install)
+      const first = launcher(root.install, ['first-run', '--json'], {
+        env: { PA_CONFIG_ROOT: root.config, PA_DATA_ROOT: root.state, PA_MODEL_CONFIG: modelPath } })
+      assert('UI_FIRST_RUN', first.status === 0, JSON.stringify(first).slice(0, 400))
+
+      // Phase A: unconfigured personal instance. The packaged action row renders at most three
+      // entries, so configure/import/executor are driven here and the conversation callback in B.
+      const portsA = [await freePort(), await freePort()]
+      const startedA = startOwned(root, { ports: portsA, mockFile: modelPath, timeoutMs: 90_000 })
+      const valueA = await startedA.value
+      ui.lifecycle.startA = { status: valueA.status, code: valueA.code ?? null, birth: startedA.birth,
+        instance: valueA.instance ? { mode: valueA.instance.mode ?? null, processStart: valueA.instance.processStart ?? null } : null }
+      mark(`phase A start ${valueA.status}`)
+      assert('UI_PHASE_A_RUNNING', valueA.status === 'RUNNING' && !!valueA.instance?.consoleURL,
+        `${valueA.status}/${valueA.code ?? 'none'}: ${valueA.stderr ?? ''}`)
+
+      browser = await openBrowser({ root: resolve('.') })
+      const { page, problems } = browser
+      page.setDefaultTimeout(12_000)
+      page.on('request', request => {
+        const path = new URL(request.url()).pathname
+        if (path === '/v1/readiness') ui.readinessReads += 1
+        if (path.startsWith('/v1/') && request.method() === 'POST') ui.writes += 1
+      })
+      const trial = page.getByRole('region', { name: '试用准备', exact: true })
+      const openTrial = async () => {
+        await page.getByRole('button', { name: '试用准备', exact: true }).click()
+        await trial.waitFor()
+        await trial.getByText('个人模式', { exact: true }).waitFor()
+      }
+      await page.goto(valueA.instance.consoleURL, { waitUntil: 'domcontentloaded' })
       await page.getByRole('button', { name: '主对话视图', exact: true }).waitFor()
       ui.selector = { navigations: navButtons, trialRegion: '试用准备', draft: '.composer textarea' }
       assert('UI_DEFAULT_CONVERSATION', await page.getByRole('button', { name: '主对话视图', exact: true }).getAttribute('aria-current') === 'page', 'default view is not the conversation')
       assert('UI_NO_EAGER_READINESS', ui.readinessReads === 0, String(ui.readinessReads))
-      ui.providerBefore = 0
       await openTrial()
       ui.mode = 'personal'
       assert('UI_TRIAL_REACHABLE', await page.getByRole('button', { name: '试用准备', exact: true }).getAttribute('aria-current') === 'page', 'trial navigation is not current')
       assert('UI_READINESS_ON_DEMAND', ui.readinessReads === 1, String(ui.readinessReads))
-      const step = async (name, action) => { try { return await action() } catch (error) { ui.actions[`${name}Error`] = String(error?.message ?? error).slice(0, 300); throw error } }
+      const step = async (name, action) => {
+        try { return await action() } catch (error) { ui.actions[`${name}Error`] = String(error?.message ?? error).slice(0, 300); throw error }
+      }
       ui.actions.model = await step('model', async () => {
         await trial.getByRole('button', { name: '配置对话模型', exact: true }).click()
         await page.getByRole('region', { name: '模型设置', exact: true }).waitFor()
@@ -208,6 +137,7 @@ export async function runTrialUi() {
       assert('UI_THREE_CALLBACKS_UNCONFIGURED', ui.actions.model === 'opened-settings' && ui.actions.import === 'opened-import-form' &&
         ui.actions.executor === 'opened-executor', JSON.stringify(ui.actions))
       assert('UI_NO_WRITES', ui.writes === 0, String(ui.writes))
+
       await openTrial()
       let readinessFault = null
       await page.route('**/v1/readiness', async route => {
@@ -237,8 +167,7 @@ export async function runTrialUi() {
       await trial.getByRole('alert').waitFor({ state: 'hidden' })
       readinessFault = 'missing'
       await trial.getByRole('button', { name: '重新读取试用状态', exact: true }).click()
-      const legacy = trial.getByRole('status').filter({ hasText: '当前服务未提供试用状态接口' })
-      await legacy.waitFor()
+      await trial.getByRole('status').filter({ hasText: '当前服务未提供试用状态接口' }).waitFor()
       ui.negatives.legacy = { absentInterfaceStated: true }
       assert('UI_LEGACY_ABSENCE', ui.negatives.legacy.absentInterfaceStated === true, JSON.stringify(ui.negatives.legacy))
       readinessFault = null
@@ -265,43 +194,49 @@ export async function runTrialUi() {
         JSON.stringify(ui.layout.mobile))
       for (const path of [desktop, mobile]) {
         const bytes = readFileSync(path)
-        ui.screenshots.push({ path: path.replace(`${resolve('.')}/`, ''), sha256: sha(bytes), bytes: bytes.byteLength, size: statSync(path).size })
+        ui.screenshots.push({ path: path.replace(`${resolve('.')}/`, ''), sha256: sha256(bytes), bytes: bytes.byteLength, size: statSync(path).size })
       }
       await browser.resize(VIEWPORTS.desktop)
 
-      mkdirSync(SHOTS, { recursive: true })
-      ui.configuredMode = { actions: {} }
-      // The packaged action row renders at most three entries: with an unconfigured model only
-      // configure/import/executor are visible, so the conversation callback is driven in the
-      // configured state on a second packaged instance over the same probe-owned state.
-      await stopOwned(observed.install, { state: observed.state, config: observed.config, mockFile: observed.modelPath })
+      // Phase B: configured personal instance over the same probe-owned data root. The packaged stop
+      // must report a clean result before the second start; otherwise the root is retained as unknown.
+      stopped = await stopOwned(root, { mockFile: modelPath, birth: startedA.birth, equivalentProof: true })
+      ui.lifecycle.stageAStop = { clean: stopped.clean, reason: stopped.reason ?? null,
+        package: stopped.packageStop?.json?.status ?? null, refusal: stopped.packageRefusal ?? null,
+        recordRemoved: stopped.recordRemoved ?? null, signals: stopped.signals }
+      assert('UI_STAGE_A_STOPPED', stopped.clean === true, JSON.stringify({ reason: stopped.reason, package: stopped.packageStop?.json ?? null }))
+
       const mock = await candidateModel()
-      const secondPorts = [await freePort(), await freePort()]
-      const configuredStart = startPackage(observed.install, { state: observed.state, config: observed.config,
-        mockFile: mock.file, consolePort: secondPorts[0], apiPort: secondPorts[1] })
-      let configured
-      try { configured = await configuredStart.value } catch (error) { ui.configuredMode.error = String(error?.message ?? error).slice(0, 300) }
-      ui.configuredMode.status = configured?.status ?? 'NO_START'
-      ui.configuredMode.mode = configured?.instance?.mode ?? null
-      if (configured?.status === 'RUNNING' && configured.instance?.consoleURL) {
-        await page.goto(configured.instance.consoleURL, { waitUntil: 'domcontentloaded' })
-        await page.getByRole('button', { name: '主对话视图', exact: true }).waitFor()
-        await page.locator('.composer textarea').fill('尚未发送的原始草稿')
-        await openTrial()
-        ui.configuredMode.actions.configureVisible = await trial.getByRole('button', { name: '配置对话模型', exact: true }).count()
-        ui.configuredMode.actions.openConversationVisible = await trial.getByRole('button', { name: '打开主对话', exact: true }).count()
-        await trial.getByRole('button', { name: '打开主对话', exact: true }).click()
-        const draft = await page.locator('.composer textarea').inputValue()
-        ui.actions.conversation = draft === '尚未发送的原始草稿' ? 'opened-conversation-draft-kept' : `draft:${draft}`
-        ui.configuredMode.actions.draft = draft
-        const shot = join(SHOTS, 'configured-conversation.png')
-        await page.screenshot({ path: shot })
-        const bytes = readFileSync(shot)
-        ui.screenshots.push({ path: shot.replace(`${resolve('.')}/`, ''), sha256: sha(bytes), bytes: bytes.byteLength, size: bytes.byteLength })
-      }
+      const portsB = [await freePort(), await freePort()]
+      const startedB = startOwned(root, { ports: portsB, mockFile: mock.file, timeoutMs: 90_000 })
+      const valueB = await startedB.value
+      ui.lifecycle.startB = { status: valueB.status, code: valueB.code ?? null, birth: startedB.birth,
+        instance: valueB.instance ? { mode: valueB.instance.mode ?? null, processStart: valueB.instance.processStart ?? null } : null }
+      ui.configuredMode = { actions: {}, status: valueB.status, mode: valueB.instance?.mode ?? null }
+      mark(`phase B start ${valueB.status}`)
+      assert('UI_PHASE_B_RUNNING', valueB.status === 'RUNNING' && !!valueB.instance?.consoleURL,
+        `${valueB.status}/${valueB.code ?? 'none'}: ${valueB.stderr ?? ''}`)
+      await page.goto(valueB.instance.consoleURL, { waitUntil: 'domcontentloaded' })
+      await page.getByRole('button', { name: '主对话视图', exact: true }).waitFor()
+      await page.locator('.composer textarea').fill('尚未发送的原始草稿')
+      await openTrial()
+      ui.configuredMode.actions.configureVisible = await trial.getByRole('button', { name: '配置对话模型', exact: true }).count()
+      ui.configuredMode.actions.openConversationVisible = await trial.getByRole('button', { name: '打开主对话', exact: true }).count()
+      await trial.getByRole('button', { name: '打开主对话', exact: true }).click()
+      const draft = await page.locator('.composer textarea').inputValue()
+      ui.actions.conversation = draft === '尚未发送的原始草稿' ? 'opened-conversation-draft-kept' : `draft:${draft}`
+      ui.configuredMode.actions.draft = draft
+      const shot = join(SHOTS, 'configured-conversation.png')
+      await page.screenshot({ path: shot })
+      const shotBytes = readFileSync(shot)
+      ui.screenshots.push({ path: shot.replace(`${resolve('.')}/`, ''), sha256: sha256(shotBytes), bytes: shotBytes.byteLength, size: shotBytes.byteLength })
       ui.providerAfter = mock.requests.length
-      await stopOwned(observed.install, { state: observed.state, config: observed.config, mockFile: mock.file })
+      const stopB = await stopOwned(root, { mockFile: mock.file, birth: startedB.birth, equivalentProof: true })
+      ui.lifecycle.stageBStop = { clean: stopB.clean, reason: stopB.reason ?? null,
+        package: stopB.packageStop?.json?.status ?? null, refusal: stopB.packageRefusal ?? null,
+        recordRemoved: stopB.recordRemoved ?? null, signals: stopB.signals }
       await mock.close().catch(() => {})
+      assert('UI_STAGE_B_STOPPED', stopB.clean === true, JSON.stringify({ reason: stopB.reason, package: stopB.packageStop?.json ?? null }))
       assert('UI_FOUR_CALLBACKS', ['model', 'import', 'executor', 'conversation'].every(key => String(ui.actions[key] ?? '').startsWith('opened')),
         JSON.stringify(ui.actions))
       assert('UI_DRAFT_KEPT', ui.actions.conversation === 'opened-conversation-draft-kept', JSON.stringify(ui.actions))
@@ -309,22 +244,39 @@ export async function runTrialUi() {
         JSON.stringify(ui.configuredMode.actions))
       assert('UI_NO_MODEL', ui.providerAfter === ui.providerBefore, JSON.stringify({ before: ui.providerBefore, after: ui.providerAfter }))
 
-      ui.problems = [...problems].slice(0, 10)
+      ui.problems = [...problems].slice(0, 20)
       const pageErrors = ui.problems.filter(item => !/Failed to load resource/u.test(item))
       ui.pageErrors = pageErrors
       ui.problems.filtered = { total: ui.problems.length, injectedResourceFailures: ui.problems.length - pageErrors.length }
       assert('UI_NO_PAGE_ERRORS', pageErrors.length === 0, JSON.stringify(pageErrors))
-      assert('UI_BUNDLE_FROM_TARGET', ui.bundle !== null && /^[a-f0-9]{64}$/u.test(ui.bundle.sha256) && ui.bundle.bytes > 0,
-        JSON.stringify(ui.bundle))
+      released = releaseRoot(root, stopB)
     } catch (error) {
-      ui.caseError = String(error?.message ?? error).slice(0, 500)
+      ui.caseError = String(error?.message ?? error).slice(0, 600)
+      if (!stopped) {
+        const salvage = await stopOwned(root, { mockFile: modelPath }).catch(cause => ({ clean: false, reason: String(cause?.message ?? cause) }))
+        ui.lifecycle.failureStop = { clean: salvage.clean ?? false, reason: salvage.reason ?? null,
+          package: salvage.packageStop?.json?.status ?? null, signals: salvage.signals ?? [] }
+        unknown = salvage.clean === true ? null : salvage.reason ?? 'unknown'
+      } else if (stopped.clean !== true) unknown = stopped.reason ?? 'unknown'
       throw error
     } finally {
-      try { await browser.close() } catch { /* gone */ }
-      await stopOwned(observed.install, { state: observed.state, config: observed.config, mockFile: observed.modelPath })
-      if (!process.env.PA_E_KEEP) { try { rmSync(observed.own, { recursive: true, force: true }) } catch { /* best effort */ } }
+      if (browser) { try { await browser.close() } catch { /* gone */ } }
+      if (unknown) {
+        const retained = retainMaterial(root, unknown)
+        ui.lifecycle.retained = { reason: retained.reason, root: retained.root, record: retained.record, at: retained.retainedAt }
+      } else if (!released) {
+        released = releaseRoot(root, { clean: true })
+      }
+      ui.lifecycle.released = released ?? null
+      ui.lifecycle.unknown = unknown ?? null
     }
   }))
 
   return { cases, artifacts: {} }
+}
+
+/** Packaged console asset entries, read from the frozen tar (never from a checkout). */
+function packagedAssetEntries(target) {
+  const listing = spawnSync('tar', ['-tzf', target.tarPath], { encoding: 'utf8', timeout: 60_000 })
+  return String(listing.stdout).split('\n').filter(line => /apps\/console\/dist\/assets\/index-.*\.js$/u.test(line))
 }

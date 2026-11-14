@@ -80,6 +80,22 @@ export const SAFETY_CASES = [
   'E1-MUTATE-PILOT-NO-ORACLE',
 ].map((id) => case_(id, { layers: [LAYERS.READONLY] }))
 
+/**
+ * The probe-owned lifecycle tool must prove its own refusals before any live lane relies on it:
+ * own positive, wrong start, sibling root, foreign same-uid child, mixed known/unknown, the start
+ * window, a refused packaged stop, and idempotent repeat.
+ */
+SAFETY_CASES.push(
+  case_('E1-LIFECYCLE-OWN', { layers: [LAYERS.READONLY], evidence: ['lifecycleOwn'] }),
+  case_('E1-LIFECYCLE-WRONG-START', { layers: [LAYERS.READONLY], evidence: ['lifecycleWrongStart'] }),
+  case_('E1-LIFECYCLE-SIBLING', { layers: [LAYERS.READONLY], evidence: ['lifecycleSibling'] }),
+  case_('E1-LIFECYCLE-FOREIGN-CHILD', { layers: [LAYERS.READONLY], evidence: ['lifecycleForeignChild'] }),
+  case_('E1-LIFECYCLE-MIXED-UNKNOWN', { layers: [LAYERS.READONLY], evidence: ['lifecycleMixedUnknown'] }),
+  case_('E1-LIFECYCLE-START-WINDOW', { layers: [LAYERS.READONLY], evidence: ['lifecycleStartWindow'] }),
+  case_('E1-LIFECYCLE-REFUSED-STOP', { layers: [LAYERS.READONLY], evidence: ['lifecycleRefusedStop'] }),
+  case_('E1-LIFECYCLE-IDEMPOTENT', { layers: [LAYERS.READONLY], evidence: ['lifecycleIdempotent'] }),
+)
+
 /** Product workflow evidence from the controlled lane. */
 export const CONTROLLED_CASES = [
   case_('E2-CONFIGURATION', { layers: [LAYERS.CONTROLLED], evidence: ['configurationRevision'] }),
@@ -159,6 +175,14 @@ export const INSTALL_CASES = [
   case_('E5-REVIEW-REUSE-CONSISTENCY', { layers: [LAYERS.INSTALLED], evidence: ['reviewReuse'] }),
   case_('E7-SCOPE-DIAGNOSTICS', { layers: [LAYERS.INSTALLED], evidence: ['scopeDiagnostics'] }),
   case_('E7-READINESS', { layers: [LAYERS.INSTALLED], evidence: ['readiness'] }),
+  case_('E8-PACKAGED-STOP-CONSISTENCY', { layers: [LAYERS.INSTALLED], evidence: ['packagedStop'] }),
+  // Tracked gap, not a gate: the frozen package has no content-binding consumer in main.
+  { id: 'E6-TARGET-CONTENT-DRIFT', required: false, layers: [LAYERS.INSTALLED], evidence: ['targetDrift'] },
+  case_('E9-COORDINATOR-CHANNEL-CONTRACT', { layers: [LAYERS.READONLY] }),
+  case_('E17-SUPPORT-MATERIAL', { layers: [LAYERS.INSTALLED], evidence: ['supportMaterial'] }),
+  // Tracked gaps: installed F identity fields and a wired G summary need successor frozen bytes.
+  { id: 'E11-TRIAL-IDENTITY-FIELDS', required: false, layers: [LAYERS.INSTALLED], evidence: ['trialIdentity'] },
+  { id: 'E13-G-SCOPED-SUMMARY', required: false, layers: [LAYERS.INSTALLED], evidence: ['gSummary'] },
   case_('E3-TRIAL-WORKBENCH-UI', { layers: [LAYERS.INSTALLED], evidence: ['trialUi'] }),
   case_('E6-INSTALLED-CONTEXT', { layers: [LAYERS.INSTALLED], evidence: ['installedContext'] }),
   case_('E3-PERSONAL-COLD-START', { layers: [LAYERS.INSTALLED], evidence: ['personalInstall'] }),

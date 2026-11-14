@@ -179,6 +179,14 @@ const evidenceFor = (key) => {
         narrow: { start: 'RUNNING', plain: 200, bodyServed: false, state: 'scope_changed', bindingSourceCount: 1,
           diagnostic: { protocol: 'context-scope-review/1', reasons: ['selection_narrowed'], partial: true, withheldSourceCount: 1, authorization: 'none' } },
       }
+    case 'packagedStop':
+      return { status: 'RUNNING', healthMode: 'fixture', healthStartupMode: 'recovery_readonly', recordMode: 'personal',
+        stopStatus: 'BLOCKED', stopCode: 'instance_identity_mismatch',
+        finding: { owner: 'main/D packaged launcher', code: 'instance_identity_mismatch', failures: ['runtime_mode'],
+          expected: 'personal', observed: 'fixture', argv: ['pa', 'start'], healthMode: 'fixture', healthStartupMode: 'recovery_readonly',
+          recordMode: 'personal', command: 'pa start --discussion-only then pa stop --json', exit: 1, reproducible: true },
+        cleaned: { clean: true, package: 'BLOCKED', refusal: { code: 'instance_identity_mismatch', failures: ['runtime_mode'] },
+          recordRemoved: true, signals: [{ label: 'launcher', pid: 1, ok: true, signalled: 'SIGTERM' }, { label: 'api', pid: 2, ok: true, signalled: 'SIGTERM' }] } }
     case 'trialUi':
       return {
         subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
@@ -192,6 +200,8 @@ const evidenceFor = (key) => {
         screenshots: [{ path: 'a.png', sha256: DIGEST, bytes: 2048 }, { path: 'b.png', sha256: 'c'.repeat(64), bytes: 2048 }],
         problems: ['console: Failed to load resource: net::ERR_FAILED', 'console: Failed to load resource: the server responded with a status of 404 (Not Found)', 'console: Failed to load resource: net::ERR_EMPTY_RESPONSE'],
         pageErrors: [], problemsFiltered: { total: 3, injectedResourceFailures: 3 },
+        lifecycle: { stages: [], stageAStop: { clean: true, package: 'STOPPED', refusal: null, signals: [] }, stageBStop: { clean: true, package: 'STOPPED', refusal: null, signals: [] },
+          unknown: null, retained: null, released: { removed: true } },
       }
     case 'readiness':
       return {
@@ -238,6 +248,11 @@ const evidenceFor = (key) => {
         v1: { protocol: 'workflow-snapshot/1', evidenceProtocol: 'workflow-evidence/1', families: 13, familySetVersion: null, status: 'ok', verified: 'ok', digest: DIGEST },
         v2: { protocol: 'workflow-snapshot/2', evidenceProtocol: 'workflow-evidence/2', families: 21, familySetVersion: 2, status: 'ok', verified: 'ok', digest: 'c'.repeat(64) },
         invalid3: { rejected: true, destinationCreated: false }, dbUnchanged: true, dbBytes: 679936,
+        artifactClosure: { v1: { copied: 2, allMatch: true, digests: [{ id: 'a', match: true }, { id: 'b', match: true }] },
+          v2: { copied: 2, allMatch: true, digests: [{ id: 'a', match: true }, { id: 'b', match: true }] },
+          corruptDetected: true, missingDetected: true },
+        derived: { table: 'conversation_search_probe_unknown', status: 'ok', complete: false, refused: true },
+        targetDrift: { appended: true, verify: { status: 'ok', verified: 'ok' }, consumerContentBinding: 'NOT_AVAILABLE_IN_MAIN' },
         portability: { installArtifact: 'pa-install/1', restoreReport: 'personal-restore/1' },
         packageCapabilities: { source: COMMIT, buildId: 'b', tarSha256: DIGEST, digestSupported: true },
         explicitV2: 'verified: workflow-snapshot/2 with 21 families and familySetVersion 2',
@@ -1497,6 +1512,105 @@ const CASES = [
         findCase(report, 'E3-TRIAL-WORKBENCH-UI').evidence.trialUi.screenshots = []
         return report
       }, 'trialUi_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-FORMAT-CORRUPT-ACCEPTED',
+    title: 'A format claim that accepted a corrupted artifact is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FORMAT_CORRUPT', (report) => {
+        findCase(report, 'E5-WORKFLOW-FORMATS').evidence.workflowFormats.artifactClosure.corruptDetected = false
+        return report
+      }, 'workflowFormats_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-FORMAT-UNKNOWN-TABLE',
+    title: 'An unknown persisted table reported as a complete set is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FORMAT_UNKNOWN_TABLE', (report) => {
+        findCase(report, 'E5-WORKFLOW-FORMATS').evidence.workflowFormats.derived.refused = false
+        return report
+      }, 'workflowFormats_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-FORMAT-ARTIFACT-MISMATCH',
+    title: 'An artifact whose bytes do not match the registry digest is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FORMAT_ARTIFACT', (report) => {
+        findCase(report, 'E5-WORKFLOW-FORMATS').evidence.workflowFormats.artifactClosure.v1.digests[0].match = false
+        return report
+      }, 'workflowFormats_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-STOP-FINDING-LOST',
+    title: 'A refused packaged stop without its exact finding is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'STOP_FINDING', (report) => {
+        findCase(report, 'E8-PACKAGED-STOP-CONSISTENCY').evidence.packagedStop.finding.failures = []
+        return report
+      }, 'packagedStop_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-STOP-PROOF-MISSING',
+    title: 'A refused packaged stop cleaned without per-pid proof is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'STOP_PROOF', (report) => {
+        findCase(report, 'E8-PACKAGED-STOP-CONSISTENCY').evidence.packagedStop.cleaned.signals = []
+        return report
+      }, 'packagedStop_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-UI-UNCLEAN-STOP',
+    title: 'An installed UI case whose packaged stop was unclean cannot pass',
+    check: ({ assert }) =>
+      rejectWith(assert, 'UI_UNCLEAN', (report) => {
+        findCase(report, 'E3-TRIAL-WORKBENCH-UI').evidence.trialUi.lifecycle.stageAStop.clean = false
+        return report
+      }, 'trialUi_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-UI-UNKNOWN-RETAINED',
+    title: 'A successful UI case that retained an unknown resource is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'UI_UNKNOWN', (report) => {
+        findCase(report, 'E3-TRIAL-WORKBENCH-UI').evidence.trialUi.lifecycle.unknown = 'unknown_live_resource'
+        return report
+      }, 'trialUi_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-LIFECYCLE-FORCE-KILL',
+    title: 'A lifecycle control that claims a SIGKILL for an own positive is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'LIFECYCLE_KILL', (report) => {
+        findCase(report, 'E1-LIFECYCLE-OWN').evidence.lifecycleOwn.signals[0].signalled = 'SIGKILL'
+        return report
+      }, 'lifecycleOwn_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-LIFECYCLE-RECORD-DELETED',
+    title: 'A mixed-unknown control that deleted the record is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'LIFECYCLE_RECORD', (report) => {
+        findCase(report, 'E1-LIFECYCLE-MIXED-UNKNOWN').evidence.lifecycleMixedUnknown.recordPresent = false
+        return report
+      }, 'lifecycleMixedUnknown_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-LIFECYCLE-SIBLING-ACCEPTED',
+    title: 'A sibling path accepted as an exact argv match is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'LIFECYCLE_SIBLING', (report) => {
+        findCase(report, 'E1-LIFECYCLE-SIBLING').evidence.lifecycleSibling.substringMatch = true
+        return report
+      }, 'lifecycleSibling_invalid'),
+  },
+  {
+    id: 'E27-MUTATE-LIFECYCLE-FALLBACK-KILL',
+    title: 'A refused packaged stop followed by a fallback signal is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'LIFECYCLE_FALLBACK', (report) => {
+        findCase(report, 'E1-LIFECYCLE-REFUSED-STOP').evidence.lifecycleRefusedStop.signals = [{ pid: 1, signalled: 'SIGTERM' }]
+        return report
+      }, 'lifecycleRefusedStop_invalid'),
   },
   {
     id: 'E26-MUTATE-READINESS-SELF-AUTHORIZATION',

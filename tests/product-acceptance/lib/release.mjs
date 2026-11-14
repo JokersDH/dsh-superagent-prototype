@@ -448,9 +448,126 @@ export function trialUiIssues(value) {
   if (!Array.isArray(value.screenshots) || value.screenshots.length < 2 ||
     value.screenshots.some(item => !HEX64(String(item.sha256 ?? '')) || !(item.bytes > 1000))) issues.push('screenshots')
   if (!Array.isArray(value.problems) || !Array.isArray(value.pageErrors) || value.pageErrors.length > 0) issues.push('page_errors')
+  const lifecycle = value.lifecycle ?? {}
+  for (const stage of ['stageAStop', 'stageBStop']) {
+    const stop = lifecycle[stage] ?? {}
+    if (stop.clean !== true) issues.push(`${stage}_unclean`)
+    const packaged = stop.package === 'STOPPED' || stop.package === 'STOPPED_ORPHAN'
+    if (packaged) continue
+    // A packaged refusal is admitted only as an explicit product finding with an equivalent-proof
+    // cleanup: exact code/failures, per-pid proof signals, and the record removed after proof.
+    if (!isSubstantive(stop.refusal?.code) || !Array.isArray(stop.refusal?.failures) || stop.refusal.failures.length === 0) { issues.push(`${stage}_package`); continue }
+    if (!Array.isArray(stop.signals) || stop.signals.length === 0 || stop.signals.some(item => item.ok !== true || item.signalled !== 'SIGTERM')) issues.push(`${stage}_proof`)
+    if (stop.recordRemoved !== true) issues.push(`${stage}_record`)
+  }
+  if (lifecycle.unknown !== null && lifecycle.unknown !== undefined) issues.push('unknown_resource')
+  if (lifecycle.retained) issues.push('retained_after_success')
+  if (lifecycle.released?.removed !== true) issues.push('not_released')
   const injected = value.problems?.filtered?.injectedResourceFailures ?? value.problemsFiltered?.injectedResourceFailures ??
     ((value.problems?.length ?? 0) - (value.pageErrors?.length ?? 0))
   if (!(injected >= 3)) issues.push('injected_failures_unrecorded')
+  return issues
+}
+/**
+ * Probe-owned lifecycle controls. Each validator checks the recorded decisions of the pure control,
+ * so a tool that silently force-killed, deleted a record or trusted a substring cannot pass.
+ */
+/** A packaged stop either succeeds or is reported as an exact, reproducible product finding. */
+export function packagedStopIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.status !== 'RUNNING') issues.push('not_started')
+  if (value.stopStatus === 'STOPPED' || value.stopStatus === 'STOPPED_ORPHAN') {
+    if (value.finding !== null) issues.push('finding_without_refusal')
+  } else if (value.stopStatus === 'BLOCKED') {
+    const finding = value.finding ?? {}
+    if (finding.code !== 'instance_identity_mismatch' || !Array.isArray(finding.failures) || finding.failures.length === 0) issues.push('finding')
+    if (finding.expected === finding.observed) issues.push('finding_contradiction')
+    if (!isSubstantive(finding.command) || !Number.isSafeInteger(finding.exit)) issues.push('finding_command')
+  } else issues.push('stop_status')
+  const cleaned = value.cleaned ?? {}
+  if (cleaned.clean !== true) issues.push('not_cleaned')
+  if (value.stopStatus === 'BLOCKED' && (cleaned.recordRemoved !== true ||
+    !Array.isArray(cleaned.signals) || cleaned.signals.length === 0 || cleaned.signals.some(item => item.ok !== true))) issues.push('proof_cleanup')
+  return issues
+}
+export function lifecycleOwnIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.birth?.argvExact !== true || !Number.isSafeInteger(value.birth?.pid)) issues.push('birth')
+  if (!Array.isArray(value.signals) || value.signals.length === 0) issues.push('no_signal')
+  else if (value.signals.some(item => item.signalled !== 'SIGTERM')) issues.push('unexpected_signal')
+  if (!Array.isArray(value.aliveAfter) || value.aliveAfter.length !== 0) issues.push('survivors')
+  if (value.clean !== true || value.released?.removed !== true || value.rootAfter !== false) issues.push('not_released')
+  return issues
+}
+export function lifecycleWrongStartIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.reason !== 'unknown_live_resource') issues.push('reason')
+  if (!Array.isArray(value.gaps) || value.gaps.length === 0) issues.push('no_gap')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (value.alive !== true) issues.push('killed')
+  if (!HEX64(String(value.retained?.sha256 ?? '')) || value.retained?.reason !== 'unknown_live_resource') issues.push('retained')
+  return issues
+}
+export function lifecycleSiblingIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.reason !== 'requested_root_mismatch') issues.push('reason')
+  if (value.scope?.stateMatches !== false) issues.push('scope')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (value.substringMatch !== false) issues.push('substring_accepted')
+  if (value.exactMatch !== true) issues.push('exact_lost')
+  if (value.alive?.alive !== true) issues.push('killed')
+  return issues
+}
+export function lifecycleForeignChildIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.sameUid !== true) issues.push('not_same_uid_control')
+  if (value.foreignArgvExactForRequestedRoot !== false) issues.push('argv_match')
+  if (value.reason !== 'fresh_identity_changed') issues.push('reason')
+  if (value.signalled !== null && value.signalled !== false) issues.push('signalled')
+  if (value.foreignAlive?.alive !== true) issues.push('killed')
+  return issues
+}
+export function lifecycleMixedUnknownIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.reason !== 'unknown_live_resource') issues.push('reason')
+  if (!Array.isArray(value.gaps) || !value.gaps.some(item => item.label === 'console')) issues.push('console_gap')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (!Array.isArray(value.alive) || value.alive.length !== 2 || !value.alive.every(Boolean)) issues.push('killed')
+  if (value.recordPresent !== true) issues.push('record_deleted')
+  return issues
+}
+export function lifecycleStartWindowIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.status !== 'TIMEOUT') issues.push('status')
+  if (!Number.isSafeInteger(value.birth?.pid) || !isSubstantive(value.birth?.start)) issues.push('birth')
+  if (value.beforeStop?.rootExists !== true || value.beforeStop?.record !== true) issues.push('not_retained_before_proof')
+  if (value.fresh?.argvExact !== true) issues.push('fresh_argv')
+  if (value.clean !== true || value.released?.removed !== true) issues.push('not_cleaned')
+  return issues
+}
+export function lifecycleRefusedStopIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.package?.json?.status !== 'BLOCKED' || value.package?.status === 0) issues.push('package_status')
+  if (value.reason !== 'package_stop_refused') issues.push('reason')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('fallback_signal')
+  if (value.alive?.alive !== true) issues.push('killed')
+  if (!HEX64(String(value.retained?.sha256 ?? '')) || value.retained?.reason !== 'package_stop_refused') issues.push('retained')
+  return issues
+}
+export function lifecycleIdempotentIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.first?.clean !== true || !Array.isArray(value.first?.signals) || value.first.signals.length === 0) issues.push('first')
+  if (value.second?.clean !== true || value.second?.signalled !== 0) issues.push('second')
+  if (value.released?.removed !== true) issues.push('release')
   return issues
 }
 export function readinessIssues(value) {
@@ -594,6 +711,18 @@ export function workflowFormatsIssues(value) {
       value.v2.familySetVersion !== 2 || value.v2.verified !== 'ok' || !HEX.test(String(value.v2.digest ?? ''))) issues.push('v2')
     else if (value.v2.digest === value.v1.digest) issues.push('v2_recipe')
     if (!value.invalid3 || value.invalid3.rejected !== true || value.invalid3.destinationCreated !== false) issues.push('invalid_version')
+  // Wave-27: artifact bytes must be closed over the registry digests, and corruption/missing files must
+  // be refused by the same packaged verifier; an unknown persisted table cannot be a complete set.
+  const closure = value.artifactClosure ?? {}
+  for (const key of ['v1', 'v2']) {
+    const entry = closure[key]
+    if (!entry) continue
+    if (!(entry.copied >= 1) || !Array.isArray(entry.digests) || !entry.digests.every(item => item.match === true)) issues.push(`${key}_artifact_digest`)
+    if (!entry.allMatch) issues.push(`${key}_artifact_missing_match`)
+  }
+  if (closure.corruptDetected !== true) issues.push('corrupt_artifact_accepted')
+  if (closure.missingDetected !== true) issues.push('missing_artifact_accepted')
+  if (value.derived?.refused !== true) issues.push('unknown_table_not_bounded')
     if (value.dbUnchanged !== true) issues.push('source_db')
     if (!value.snapshotProtocols?.includes('workflow-snapshot/2') || !value.evidenceProtocols?.includes('workflow-evidence/2')) issues.push('protocol_pair')
   } else if (scope === 'v1-only') {
@@ -1205,7 +1334,11 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues],
+      ['packagedStop', packagedStopIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleWrongStart', lifecycleWrongStartIssues], ['lifecycleSibling', lifecycleSiblingIssues],
+      ['lifecycleForeignChild', lifecycleForeignChildIssues], ['lifecycleMixedUnknown', lifecycleMixedUnknownIssues],
+      ['lifecycleStartWindow', lifecycleStartWindowIssues], ['lifecycleRefusedStop', lifecycleRefusedStopIssues],
+      ['lifecycleIdempotent', lifecycleIdempotentIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
           for (const issue of fn(result.evidence?.[key]))
             failures.push(fail(key === 'ownershipMocks' ? (OWNERSHIP_ISSUE_CODES[issue] ?? 'ownershipMocks_invalid') : `${key}_invalid`, `${key} ${issue}`, entry.id))

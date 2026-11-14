@@ -6,11 +6,12 @@ import {
   chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact } from '../lib/frozen-package.mjs'
+import { stopOwned as stopOwnedInstance } from '../lib/packaged-instance.mjs'
 
 /**
  * Wave-21 explicit restored-personal review with the *package's own* prepare and startup consumer.
@@ -44,14 +45,18 @@ function launcher(install, args, { env = {}, timeoutMs = 90_000 } = {}) {
   return { status: result.status, json: parseJson(result.stdout), stderr: String(result.stderr).slice(-500), stdout: String(result.stdout).slice(-500) }
 }
 
-/** Removes only a dead instance record in this probe-owned config root (never signals a process). */
+/**
+ * Removes a record only when *every* recorded pid is provably dead, so a live api/console child can
+ * never lose its record. An unreadable record is retained, not deleted.
+ */
 function clearDeadRecord(config) {
   const path = join(config, 'instance.json')
   if (!existsSync(path)) return
   let record
-  try { record = JSON.parse(readFileSync(path, 'utf8')) } catch { rmSync(path, { force: true }); return }
-  const alive = pid => { try { process.kill(pid, 0); return true } catch { return false } }
-  if (!Number.isSafeInteger(record.pid) || !alive(record.pid)) rmSync(path, { force: true })
+  try { record = JSON.parse(readFileSync(path, 'utf8')) } catch { return }
+  const alive = pid => { if (!Number.isSafeInteger(pid)) return false; try { process.kill(pid, 0); return true } catch { return false } }
+  const pids = [record.pid, record.apiPid, record.consolePid].filter(Number.isSafeInteger)
+  if (pids.length > 0 && pids.every(pid => !alive(pid))) rmSync(path, { force: true })
 }
 
 function startPackage(install, { state, config, reviewFile, port, apiPort, mockFile, fixture = false, timeoutMs = 90_000 }) {
@@ -89,26 +94,12 @@ function stopPackage(install, { state, config, mockFile, timeoutMs = 30_000 }) {
   })
 }
 
-/** Stops only processes recorded in this probe-owned config root whose argv proves our install/state. */
-async function stopOwned(install, { state, config, mockFile }) {
-  try { stopPackage(install, { state, config, mockFile }) } catch { /* best effort */ }
-  const recordPath = join(config, 'instance.json')
-  if (!existsSync(recordPath)) return
-  let record
-  try { record = JSON.parse(readFileSync(recordPath, 'utf8')) } catch { rmSync(recordPath, { force: true }); return }
-  const alive = pid => { try { process.kill(pid, 0); return true } catch { return false } }
-  const owned = []
-  for (const pid of [record.pid, record.apiPid, record.consolePid]) {
-    if (!Number.isSafeInteger(pid)) continue
-    try {
-      const command = String(execFileSync('ps', ['-o', 'command=', '-p', String(pid)], { encoding: 'utf8' }))
-      if (command.includes(install) && command.includes(state)) owned.push(pid)
-    } catch { /* gone */ }
-  }
-  for (const pid of owned) { try { process.kill(pid, 'SIGTERM') } catch { /* gone */ } }
-  await new Promise(resolve => setTimeout(resolve, 500))
-  for (const pid of owned) if (alive(pid)) { try { process.kill(pid, 'SIGKILL') } catch { /* gone */ } }
-  rmSync(recordPath, { force: true })
+/**
+ * Stops this probe-owned instance through the packaged `pa stop` boundary. A refusal or timeout keeps
+ * the record and the process; nothing is force-killed by path similarity and no record is deleted.
+ */
+async function stopOwned(install, { state, config, mockFile, birth = null }) {
+  return stopOwnedInstance({ install, config, state, own: dirname(install) }, { mockFile, birth, equivalentProof: true })
 }
 
 function messageFacts(state) {
@@ -346,6 +337,9 @@ async function readinessProbe(observed, { reviewFile = null, fixture = false, mu
   }
   return own
 }
+
+const isSubstantiveFinding = finding => finding !== null && typeof finding.code === 'string' && finding.code.length > 0 &&
+  Array.isArray(finding.failures) && finding.failures.length > 0 && typeof finding.expected === 'string' && typeof finding.observed === 'string' && finding.expected !== finding.observed
 
 const define = (id, title) => ({ id, title, layer: LAYERS.INSTALLED, limitations: [
   'The review file is produced by the frozen package internal prepare code and startup uses its bin/pa; no checkout CLI/demo is used for this installed claim.',
@@ -692,6 +686,46 @@ export async function runPersonalReview() {
         assert('READINESS_NO_SEND', observed.mock.requests.length === observed.modelRequests,
           JSON.stringify({ before: observed.modelRequests, after: observed.mock.requests.length }))
       }))
+  }
+
+  if (observed) {
+    cases.push(await runCase({ ...define('E8-PACKAGED-STOP-CONSISTENCY', 'The packaged launcher can stop the restored discussion-only instance it recorded, and a refusal is a recorded product finding'),
+      evidence: {} }, async ({ assert, evidence }) => {
+      const { install, restored, config, mock } = observed
+      const [port, apiPort] = [await freePort(), await freePort()]
+      const started = startPackage(install, { state: restored, config, port, apiPort, mockFile: mock.file })
+      const value = await started.value
+      const health = value.status === 'RUNNING' && value.instance?.apiURL
+        ? await fetch(`${value.instance.apiURL}/v1/health`, { signal: AbortSignal.timeout(5_000) }).then(r => r.json()).catch(() => null) : null
+      const record = (() => { try { return JSON.parse(readFileSync(join(config, 'instance.json'), 'utf8')) } catch { return null } })()
+      const direct = value.status === 'RUNNING'
+        ? spawnSync(join(install, 'bin/pa'), ['stop', '--json'], { cwd: join(install, '..'), encoding: 'utf8', timeout: 40_000,
+          env: { ...process.env, PA_NODE: process.execPath, PA_CONFIG_ROOT: config, PA_DATA_ROOT: restored } })
+        : null
+      const stopJson = parseJson(direct?.stdout) ?? null
+      const cleaned = await stopOwned(install, { state: restored, config, mockFile: mock.file })
+      const finding = stopJson?.status === 'BLOCKED' ? { owner: 'main/D packaged launcher', code: stopJson.code,
+        failures: stopJson.detail?.failures ?? [], expected: stopJson.detail?.checks?.find(c => c.id === 'runtime_mode')?.detail?.expected ?? record?.mode ?? null,
+        observed: stopJson.detail?.checks?.find(c => c.id === 'runtime_mode')?.detail?.observed ?? health?.mode ?? null,
+        argv: record?.launcherArgv ?? null, healthMode: health?.mode ?? null, healthStartupMode: health?.startupMode ?? null,
+        recordMode: record?.mode ?? null, command: 'pa start --discussion-only (restored state, no review file) then pa stop --json',
+        exit: direct?.status ?? null, reproducible: true } : null
+      evidence.packagedStop = { status: value.status, healthMode: health?.mode ?? null, healthStartupMode: health?.startupMode ?? null,
+        recordMode: record?.mode ?? null, stopStatus: stopJson?.status ?? null, stopCode: stopJson?.code ?? null,
+        finding, cleaned: { clean: cleaned.clean, package: cleaned.packageStop?.json?.status ?? null, refusal: cleaned.packageRefusal ?? null,
+          recordRemoved: cleaned.recordRemoved ?? null, signals: cleaned.signals, reason: cleaned.reason ?? null } }
+      assert('STOP_CASE_STARTED', value.status === 'RUNNING' && record !== null, JSON.stringify(value).slice(0, 300))
+      assert('STOP_REPORTED', direct !== null && (stopJson?.status === 'STOPPED' || stopJson?.status === 'STOPPED_ORPHAN' || stopJson?.status === 'BLOCKED'),
+        JSON.stringify({ stop: stopJson, stderr: String(direct?.stderr ?? '').slice(-300) }))
+      assert('STOP_OUTCOME_RECORDED', stopJson?.status !== 'BLOCKED' || finding?.code === 'instance_identity_mismatch',
+        JSON.stringify(stopJson))
+      assert('STOP_CLEANED_WITH_PROOF', cleaned.clean === true, JSON.stringify({ reason: cleaned.reason, refusal: cleaned.packageRefusal }))
+      if (stopJson?.status === 'BLOCKED') {
+        assert('STOP_FINDING_FIELDS', isSubstantiveFinding(finding), JSON.stringify(finding))
+        assert('STOP_FINDING_PROVEN_CLEANUP', (cleaned.signals ?? []).length > 0 && cleaned.signals.every(item => item.ok === true) &&
+          cleaned.recordRemoved === true, JSON.stringify(cleaned.signals))
+      }
+    }))
   }
 
   if (observed) {

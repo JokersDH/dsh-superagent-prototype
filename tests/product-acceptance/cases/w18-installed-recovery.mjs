@@ -75,19 +75,19 @@ function start(install, { port, apiPort, env = {} }) {
   return { child, attempt, stderr: () => stderr }
 }
 
-function killOwned(install) {
-  const recordPath = join(install, 'var/config/instance.json')
-  if (!existsSync(recordPath)) return
-  try {
-    const record = JSON.parse(readFileSync(recordPath, 'utf8'))
-    for (const pid of [record.pid, record.apiPid]) {
-      if (!Number.isSafeInteger(pid)) continue
-      try {
-        const command = execFileSync('ps', ['-o', 'command=', '-p', String(pid)], { encoding: 'utf8' }).trim()
-        if (command.includes(install)) process.kill(pid, 'SIGKILL')
-      } catch { /* gone */ }
-    }
-  } catch { /* no record */ }
+/**
+ * Stops the packaged instance through its own `pa stop` boundary. A refusal or timeout keeps the
+ * record and the process; there is no substring SIGKILL fallback here.
+ */
+async function killOwned(install) {
+  const env = { PA_CONFIG_ROOT: undefined, PA_DATA_ROOT: undefined }
+  const stopped = spawnSync(join(install, 'bin/pa'), ['stop', '--json'], {
+    cwd: join(install, '..'), encoding: 'utf8', timeout: 30_000,
+    env: stripUndefined({ ...process.env, PA_NODE: process.execPath, ...env }),
+  })
+  let json
+  try { json = JSON.parse(String(stopped.stdout).trim().split('\n').filter(Boolean).at(-1)) } catch { json = undefined }
+  return { status: stopped.status, result: json?.status ?? null, code: json?.code ?? null }
 }
 
 /** Seeds ordinary chat, a delivered Work with an answered question, context, and one confirmed decision candidate. */
@@ -295,7 +295,7 @@ async function provision(target) {
       modelRequests: mock.requests.length,
     }
   } finally {
-    try { killOwned(install) } catch { /* best effort */ }
+    try { await killOwned(install) } catch { /* best effort */ }
     try { if (firstStarted) launcher(install, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }
     try { if (restoredStarted) launcher(install, ['stop', '--json'], { env: { PA_DATA_ROOT: join(own, 'restored-root') }, timeoutMs: 20_000 }) } catch { /* best effort */ }
     try { firstStarted?.child?.kill('SIGKILL') } catch { /* gone */ }
@@ -326,6 +326,19 @@ async function packagedFormatEvidence(install, restoredRoot, marker, workRoot, t
   const dbBefore = sha(readFileSync(dbPath))
   const supportsV2 = /formatVersion/u.test(snapshotSource) && /familySetVersion/u.test(backupSource)
   const format = { work }
+  // Wave-27: independent artifact closure and derived-table boundary, on the same packaged producer.
+  const artifactClosure = (manifest, destination) => {
+    const copied = (manifest.artifacts ?? []).filter(item => item.status === 'copied')
+    const digests = copied.map(item => {
+      const path = join(destination, item.snapshotPath ?? `artifacts/${item.id}`)
+      const present = existsSync(path)
+      const digest = present ? sha(readFileSync(path)) : null
+      return { id: item.id, present, digest, registryDigest: item.digest ?? null, match: present && digest === (item.digest ?? null), bytes: present ? statSync(path).size : 0 }
+    })
+    return { copied: copied.length, digests, allMatch: digests.length > 0 && digests.every(item => item.match) }
+  }
+  const unknownTableName = 'conversation_search_probe_unknown'
+  format.derived = { table: unknownTableName }
   try {
     const store = new storage.ProductStore({ path: dbPath })
     try {
@@ -335,8 +348,10 @@ async function packagedFormatEvidence(install, restoredRoot, marker, workRoot, t
       format.v1 = { status: v1.status, protocol: v1.manifest.protocol, evidenceProtocol: v1.manifest.evidence.protocol,
         families: v1.manifest.evidence.families.length, familySetVersion: v1.manifest.evidence.familySetVersion ?? null,
         verified: v1Verify.status, digest: v1.manifest.evidence.digest }
+      let v2Manifest = null
       if (supportsV2) {
         const v2 = await snaps.create({ destination: join(work, 'v2'), formatVersion: 2 })
+        v2Manifest = v2.manifest
         const v2Verify = snaps.verify(join(work, 'v2'))
         format.v2 = { status: v2.status, protocol: v2.manifest.protocol, evidenceProtocol: v2.manifest.evidence.protocol,
           families: v2.manifest.evidence.families.length, familySetVersion: v2.manifest.evidence.familySetVersion ?? null,
@@ -345,12 +360,81 @@ async function packagedFormatEvidence(install, restoredRoot, marker, workRoot, t
         const legacy = storage.readWorkflowEvidence(dbPath, 2)
         format.v2 = { unsupported: true, protocol: legacy.protocol, families: legacy.families?.length ?? 0 }
       }
+      const v1Closure = artifactClosure(v1.manifest, join(work, 'v1'))
+      const v2Closure = v2Manifest ? artifactClosure(v2Manifest, join(work, 'v2')) : null
+      // Corrupt one copied artifact and confirm the packaged verify refuses; restore the bytes after.
+      let corruptDetected = null, corruptDetail = null
+      if (v1Closure.digests.length > 0) {
+        const victim = v1Closure.digests[0]
+        const path = join(work, 'v1', `artifacts/${victim.id}`)
+        const original = readFileSync(path)
+        writeFileSync(path, Buffer.concat([original, Buffer.from('\nprobe-corruption\n')]))
+        const corruptVerify = snaps.verify(join(work, 'v1'))
+        corruptDetected = corruptVerify.status !== 'ok' || (corruptVerify.artifacts ?? []).some(item => item.status !== 'ok')
+        corruptDetail = { status: corruptVerify.status, artifacts: corruptVerify.artifacts ?? [] }
+        writeFileSync(path, original)
+      }
+      let missingDetected = null
+      if (v1Closure.digests.length > 0) {
+        const victim = v1Closure.digests[0]
+        const path = join(work, 'v1', `artifacts/${victim.id}`)
+        const original = readFileSync(path)
+        rmSync(path, { force: true })
+        const missingVerify = snaps.verify(join(work, 'v1'))
+        missingDetected = missingVerify.status !== 'ok' || (missingVerify.artifacts ?? []).some(item => item.status !== 'ok')
+        writeFileSync(path, original)
+      }
+      format.artifactClosure = { v1: v1Closure, v2: v2Closure, corruptDetected, corruptDetail, missingDetected }
+      // An unknown persisted table must not be reported as a complete data set (A P2 boundary).
+      const unknownDb = join(work, 'unknown.sqlite')
+      copyFileSync(dbPath, unknownDb)
+      let unknownSnapshot
+      try {
+        // A derived-looking table is created deliberately as a fixture negative, not as expected data.
+        const raw = new DatabaseSync(unknownDb)
+        try { raw.exec(`CREATE TABLE IF NOT EXISTS ${unknownTableName} (id TEXT PRIMARY KEY, value TEXT)`) } finally { raw.close() }
+        const unknownStore = new storage.ProductStore({ path: unknownDb })
+        const unknownWorkflows = new workflows.WorkflowSnapshots(unknownStore)
+        unknownSnapshot = await unknownWorkflows.create({ destination: join(work, 'unknown-snapshot'), formatVersion: 2 })
+        try { unknownStore.close() } catch { /* closed */ }
+      } catch (error) { unknownSnapshot = { status: 'THREW', error: String(error?.message ?? error).slice(0, 200) } }
+      const unknownTables = unknownSnapshot?.manifest?.schemaInventory?.unknownTables ?? null
+      format.derived = { table: unknownTableName, status: unknownSnapshot?.status ?? null, complete: unknownSnapshot?.manifest?.complete ?? null,
+        unknownTables, refused: unknownSnapshot?.status === 'blocked' || unknownSnapshot?.manifest?.complete === false || (Array.isArray(unknownTables) && unknownTables.includes(unknownTableName)) }
       let invalidError = null
       const invalidDir = join(work, 'invalid-3')
       try { await snaps.create({ destination: invalidDir, formatVersion: 3 }) } catch (error) { invalidError = String(error?.message ?? error).slice(0, 200) }
       format.invalid3 = { rejected: invalidError !== null, destinationCreated: existsSync(invalidDir), error: invalidError }
       format.dbUnchanged = sha(readFileSync(dbPath)) === dbBefore
       format.dbBytes = statSync(dbPath).size
+      // Target-only legal data change: append one user message in a *target* copy and verify whether the
+      // packaged content check refuses it. The producer verify is DB-integrity/schema-only, so an
+      // accepted append is recorded as a precise content-binding gap, never as a passing check.
+      const targetDb = join(work, 'target.sqlite')
+      copyFileSync(dbPath, targetDb)
+      const targetStore = new storage.ProductStore({ path: targetDb })
+      let appended = false
+      try {
+        const db = new DatabaseSync(targetDb)
+        try {
+          const row = db.prepare('SELECT conversation_id AS cid, MAX(sequence) AS seq FROM conversation_messages GROUP BY conversation_id LIMIT 1').get()
+          if (row?.cid) {
+            db.prepare('INSERT INTO conversation_messages (conversation_id, sequence, id, value, created_at) VALUES (?, ?, ?, ?, ?)')
+              .run(row.cid, Number(row.seq ?? 0) + 1, `probe-drift-${Date.now()}`,
+                JSON.stringify({ role: 'user', text: '目标根合法新增消息（漂移探针）' }), new Date().toISOString())
+            appended = true
+          }
+        } finally { db.close() }
+      } catch (error) { format.targetDriftError = String(error?.message ?? error).slice(0, 200) }
+      finally { try { targetStore.close() } catch { /* closed */ } }
+      let targetVerify = null
+      if (appended) {
+        const targetWorkflows = new workflows.WorkflowSnapshots(targetStore)
+        const targetSnapshot = await targetWorkflows.create({ destination: join(work, 'target-snapshot'), formatVersion: 2 }).catch(error => ({ status: 'THREW', error: String(error?.message ?? error).slice(0, 200) }))
+        targetVerify = { status: targetSnapshot.status, verified: targetSnapshot.status === 'ok' ? targetWorkflows.verify(join(work, 'target-snapshot')).status : null }
+      }
+      format.targetDrift = { appended, verify: targetVerify, consumerContentBinding: 'NOT_AVAILABLE_IN_MAIN',
+        reason: 'the packaged producer verify checks database integrity, schema and artifact digests; it does not compare restored content against the source subject, so a legal target-only append is accepted' }
     } finally { store.close() }
   } finally { rmSync(work, { recursive: true, force: true }) }
   const restoreProtocol = existsSync(marker) ? JSON.parse(readFileSync(marker, 'utf8')).protocol ?? null : null
@@ -472,6 +556,14 @@ export async function runInstalledRecovery() {
         assert('FORMAT_V1_ONLY_OLD_SCOPE', format.v2?.unsupported === true && format.v2?.families === 13 &&
           !format.snapshotProtocols.includes('workflow-snapshot/2'), JSON.stringify(format.v2))
       }
+      assert('FORMAT_ARTIFACT_CLOSURE', format.artifactClosure?.v1?.allMatch === true &&
+        (format.artifactClosure?.v2 === null || format.artifactClosure?.v2?.allMatch === true),
+        JSON.stringify({ v1: format.artifactClosure?.v1?.digests, v2: format.artifactClosure?.v2?.digests }).slice(0, 400))
+      assert('FORMAT_CORRUPT_ARTIFACT_REFUSED', format.artifactClosure?.corruptDetected === true, JSON.stringify(format.artifactClosure?.corruptDetail))
+      assert('FORMAT_MISSING_ARTIFACT_REFUSED', format.artifactClosure?.missingDetected === true, 'a missing artifact file was accepted')
+      assert('FORMAT_UNKNOWN_TABLE_BOUNDED', format.derived?.refused === true && Array.isArray(format.derived?.unknownTables) &&
+        format.derived.unknownTables.includes(format.derived.table) && format.derived.complete === false,
+        JSON.stringify({ status: format.derived?.status, complete: format.derived?.complete, unknown: format.derived?.unknownTables }).slice(0, 400))
       assert('FORMAT_PROTOCOL_SEPARATION', format.portability?.installArtifact === 'pa-install/1' &&
         format.portability?.restoreReport === 'personal-restore/1' &&
         !format.snapshotProtocols.includes(format.portability.restoreReport), JSON.stringify(format.portability))
@@ -480,10 +572,21 @@ export async function runInstalledRecovery() {
         snapshotProtocols: format.snapshotProtocols, evidenceProtocols: format.evidenceProtocols,
         hasFormatVersion: format.hasFormatVersion, hasFamilySetVersion: format.hasFamilySetVersion, readSignature: format.readSignature,
         v1: format.v1, v2: format.v2, invalid3: format.invalid3 ?? null, dbUnchanged: format.dbUnchanged ?? null, dbBytes: format.dbBytes ?? null,
+        artifactClosure: format.artifactClosure ?? null, derived: format.derived ?? null, targetDrift: format.targetDrift ?? null,
         portability: format.portability, packageCapabilities: format.packageCapabilities ?? null,
         explicitV2: format.supportsV2 ? 'verified: workflow-snapshot/2 with 21 families and familySetVersion 2'
           : 'NOT_REACHED for this frozen package: no versioned snapshot code, v1-only scope kept' }
     }))
+
+  if (observed?.format) {
+    const drift = observed.format.targetDrift ?? {}
+    cases.push(notTested({ ...define('E6-TARGET-CONTENT-DRIFT', 'A target root with one legal appended message is not silently accepted as the original content'),
+      evidence: { targetDrift: { subject: frozenArtifactSubject(target), appended: drift.appended === true, verify: drift.verify ?? null,
+        consumerContentBinding: drift.consumerContentBinding ?? null, reason: drift.reason ?? null } } },
+      drift.appended !== true
+        ? 'NOT_REACHED: the probe could not append a legal target message in this run.'
+        : 'NOT_REACHED: the frozen package has no content-binding consumer in main; the packaged producer verify checks database integrity, schema and artifact digests only, so a legal target-only append stays verified. This is a recorded product gap for the C/A owners, not an acceptance pass.'))
+  }
 
   cases.push(await runCase({ ...define('E9-INSTALLED-STABILITY', 'Bounded concurrent reads, repeated confirmation and a service reopen on the second root return every request/queue/resource to baseline'), evidence: {} },
     async ({ assert, evidence }) => {

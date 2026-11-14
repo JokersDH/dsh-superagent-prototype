@@ -520,7 +520,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第二十六轮交付交接
+const handoff = `# Agent E 第二十七轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -1007,6 +1007,12 @@ if (!existsSync(join(reports, 'wave23-status.json')))
     reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse ?? null,
     scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics ?? null,
     readiness: byId.get('E7-READINESS')?.evidence?.readiness ?? null,
+    packagedStop: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.evidence?.packagedStop ?? null,
+    lifecycle: ['E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+      'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
+      .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+    channel: byId.get('E9-COORDINATOR-CHANNEL-CONTRACT')?.evidence?.channelContract ?? null,
+    supportMaterial: byId.get('E17-SUPPORT-MATERIAL')?.evidence?.supportMaterial ?? null,
     trialUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi ?? null,
     counts: report.counts,
     testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
@@ -1109,6 +1115,12 @@ if (!existsSync(join(reports, 'wave24-status.json')))
     reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse ?? null,
     scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics ?? null,
     readiness: byId.get('E7-READINESS')?.evidence?.readiness ?? null,
+    packagedStop: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.evidence?.packagedStop ?? null,
+    lifecycle: ['E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+      'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
+      .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+    channel: byId.get('E9-COORDINATOR-CHANNEL-CONTRACT')?.evidence?.channelContract ?? null,
+    supportMaterial: byId.get('E17-SUPPORT-MATERIAL')?.evidence?.supportMaterial ?? null,
     trialUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi ?? null,
     counts: report.counts,
     testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
@@ -1118,12 +1130,12 @@ if (!existsSync(join(reports, 'wave24-status.json')))
   }, null, 2) + '\n',
 )
 writeFileSync(
-  join(reports, 'wave26-status.json'),
+  join(reports, 'wave27-status.json'),
   JSON.stringify({
     ...executionStatus,
-    schema: 'product-acceptance-wave26-status/1',
-    taskPackage: 'agent-tasks/product-wave-26/README.zh-CN.md',
-    supersedes: 'wave25-status.json',
+    schema: 'product-acceptance-wave27-status/1',
+    taskPackage: 'agent-tasks/product-wave-27/README.zh-CN.md',
+    supersedes: 'wave26-status.json',
     subject: { target: byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target ?? null,
       baseline: byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade?.baseline ?? null,
       control: byId.get('E5-D-OWNERSHIP-MOCKS')?.evidence?.ownershipMocks?.previousPackageHelper ?? null },
@@ -1146,6 +1158,9 @@ writeFileSync(
       sourceUi: byId.get('E6-SOURCE-UI')?.status ?? 'MISSING',
       readiness: byId.get('E7-READINESS')?.status ?? 'MISSING',
       trialWorkbenchUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.status ?? 'MISSING',
+      lifecycleControls: ['E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+        'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
+        .map(id => `${id}:${byId.get(id)?.status ?? 'MISSING'}`),
       native: 'NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate',
       value: 'BLOCKED: review pilot unchanged',
     },
@@ -1175,7 +1190,15 @@ writeFileSync(
         actions: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi?.actions ?? null,
         screenshots: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi?.screenshots ?? null,
         bundle: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi?.bundle ?? null },
-      twoSnapshotSameChain: 'NOT_REACHED: the A producer manifest and C single package driver are not admitted',
+      twoSnapshotSameChain: { formats: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
+        artifactClosure: byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.artifactClosure ?? null,
+        derived: byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.derived ?? null,
+        targetDrift: byId.get('E6-TARGET-CONTENT-DRIFT')?.evidence?.targetDrift ?? null },
+      channel: { status: byId.get('E9-COORDINATOR-CHANNEL-CONTRACT')?.status ?? 'MISSING',
+        consumer: byId.get('E9-COORDINATOR-CHANNEL-CONTRACT')?.evidence?.channelContract?.consumer ?? null },
+      supportMaterial: byId.get('E17-SUPPORT-MATERIAL')?.status ?? 'MISSING',
+      trialIdentity: byId.get('E11-TRIAL-IDENTITY-FIELDS')?.status ?? 'MISSING',
+      gSummary: byId.get('E13-G-SCOPED-SUMMARY')?.status ?? 'MISSING',
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
       missingArtifactTerminal: byId.get('E4-INSTALL-TAMPER')?.evidence?.tamperTerminal ?? null,
@@ -1190,6 +1213,8 @@ writeFileSync(
     retainedHistory: {
       measured0ede: '223 PASS / 0 FAIL / 16 NOT_TESTED at the recorded 162-required scope',
       measured3b: '227 PASS / 0 FAIL / 17 NOT_TESTED at the recorded 162-required scope (wave25 target, preserved)',
+      measuredCe64: 'wave-26 ce64 164-required ordinary installed scope preserved (238 PASS / 0 FAIL / 16 NOT_TESTED)',
+      p1Tool: 'the wave-26 browser stopOwned substring/unproven-signal/unconditional-record-deletion P1 is closed by lib/packaged-instance.mjs and its pure controls',
       measuredA826: 'a826 readiness/UI absent from the frozen package; its exact bytes stay a separate scope and are not relabeled',
       measured595: '200 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 161-required scope',
       measuredA9b: '208 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 162-required scope',
@@ -1219,6 +1244,12 @@ writeFileSync(
     reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse ?? null,
     scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics ?? null,
     readiness: byId.get('E7-READINESS')?.evidence?.readiness ?? null,
+    packagedStop: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.evidence?.packagedStop ?? null,
+    lifecycle: ['E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+      'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
+      .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+    channel: byId.get('E9-COORDINATOR-CHANNEL-CONTRACT')?.evidence?.channelContract ?? null,
+    supportMaterial: byId.get('E17-SUPPORT-MATERIAL')?.evidence?.supportMaterial ?? null,
     trialUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi ?? null,
     counts: report.counts,
     testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
@@ -1227,7 +1258,7 @@ writeFileSync(
     artifactTuple,
   }, null, 2) + '\n',
 )
-// Historical wave06-25 status files are frozen inputs; wave26 supersedes them.
+// Historical wave06-26 status files are frozen inputs; wave27 supersedes them.
 
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 
