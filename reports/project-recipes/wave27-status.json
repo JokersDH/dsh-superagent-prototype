@@ -1,0 +1,508 @@
+{
+  "protocol": "project-recipes-wave27-status/1",
+  "owner": "J",
+  "date": "2026-11-14",
+  "branch": "codex/g5-project-recipes",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-j",
+  "baseCommit": "ca01e17",
+  "mergedOriginMain": "already_up_to_date",
+  "packet": "agent-tasks/product-wave-27/agent-j-project-recipes.zh-CN.md",
+  "goal": "whole-result package, normal cadence, no token budget, no same-day scope reduction",
+  "catalog": {
+    "id": "project-recipes",
+    "version": 1,
+    "digest": "f3e05709ee223e2d659b454a88a1c8029f41c7cb9750112a4148b313b2a7c573",
+    "kinds": [
+      "regression_fix",
+      "scoped_change",
+      "verification_followup"
+    ]
+  },
+  "protocols": {
+    "configuration": "application-configuration/1",
+    "facts": "project-facts/1",
+    "draft": "project-recipe-draft/1",
+    "createWorkFields": "project-recipe-create-work-fields/1"
+  },
+  "results": [
+    {
+      "checkpoint": 1,
+      "stage": "J4",
+      "name": "typed pure catalog",
+      "status": "PASS",
+      "source": [
+        "packages/project-recipes/package.json",
+        "packages/project-recipes/src/facts.ts",
+        "packages/project-recipes/src/catalog.ts",
+        "packages/project-recipes/src/draft.ts",
+        "packages/project-recipes/src/match.ts",
+        "packages/project-recipes/src/index.ts",
+        "packages/project-recipes/test/fixtures.ts",
+        "packages/project-recipes/test/catalog.case.ts",
+        "packages/project-recipes/test/negative.case.ts"
+      ],
+      "checks": [
+        {
+          "command": "pnpm --dir packages/project-recipes typecheck",
+          "exit": 0
+        },
+        {
+          "command": "pnpm --dir packages/project-recipes test",
+          "exit": 0,
+          "tests": 35,
+          "pass": 35,
+          "fail": 0,
+          "note": "catalog+negative+preview suites landed in this source checkpoint; J12 consumes the preview layer"
+        },
+        {
+          "command": "pnpm --dir packages/project-recipes build",
+          "exit": 0
+        }
+      ],
+      "capability": "Pure deterministic match over project-facts/1 + public ApplicationConfiguration + kind + explicit selection, producing draft/needs_input/unsupported with provenance, configuration revision, facts digest, authorization none and content-addressed revision. The preview layer (CreateWorkFields/toCreateWorkCommand) landed in the same source checkpoint so main/F can consume it immediately.",
+      "handoff": "main/F can import Draft types and consume matches today; no root deps/lock change is required to read the source."
+    },
+    {
+      "checkpoint": 2,
+      "stage": "J8",
+      "name": "read-only facts CLI",
+      "status": "PASS",
+      "source": [
+        "tools/project-recipes/metadata.ts",
+        "tools/project-recipes/cli.ts",
+        "tools/project-recipes/tsconfig.json",
+        "tools/project-recipes/fixtures/configuration.json",
+        "tools/project-recipes/fixtures/facts-alpha.json",
+        "tools/project-recipes/fixtures/example-project/package.json",
+        "tools/project-recipes/fixtures/example-project/pnpm-lock.yaml",
+        "tools/project-recipes/test/cli.case.ts",
+        "tools/project-recipes/test/metadata.case.ts",
+        "tools/project-recipes/test/paths.ts"
+      ],
+      "checks": [
+        {
+          "command": "./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json",
+          "exit": 0
+        },
+        {
+          "command": "node --test tools/project-recipes/test/*.case.ts",
+          "exit": 0,
+          "tests": 20,
+          "pass": 20,
+          "fail": 0
+        },
+        {
+          "command": "node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/configuration.json --facts tools/project-recipes/fixtures/facts-alpha.json --now 2026-11-14T12:00:00.000Z --paths src/parser.ts",
+          "exit": 0,
+          "observed": "status=draft"
+        },
+        {
+          "command": "… --kind scoped_change",
+          "exit": 3,
+          "observed": "needs_input scope_paths_required"
+        },
+        {
+          "command": "… --facts <ghost-project>",
+          "exit": 4,
+          "observed": "unsupported project_unknown"
+        },
+        {
+          "command": "node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/configuration.json",
+          "exit": 2
+        },
+        {
+          "command": "… --facts /tmp/nope.json",
+          "exit": 5,
+          "observed": "refused [unreadable]"
+        }
+      ],
+      "capability": "Explicit authorized root only; allow-listed names; O_NOFOLLOW + fstat; file/size/total budgets; JSON only for package.json; lockfiles hashed as opaque bytes; script names only. Documented exits 0/2/3/4/5 and new-file-only --output."
+    },
+    {
+      "checkpoint": 3,
+      "stage": "J12",
+      "name": "usable preview draft",
+      "status": "PASS_WITH_SCOPE_NOTE",
+      "source": [
+        "packages/project-recipes/src/preview.ts",
+        "packages/project-recipes/test/preview.case.ts",
+        "packages/project-recipes/examples/preview-consumer.ts",
+        "docs/project-recipes/main-integration.zh-CN.md"
+      ],
+      "checks": [
+        {
+          "command": "pnpm --dir packages/project-recipes test",
+          "exit": 0,
+          "tests": 35,
+          "pass": 35,
+          "fail": 0,
+          "note": "includes 6 preview tests"
+        },
+        {
+          "command": "node packages/project-recipes/examples/preview-consumer.ts",
+          "exit": 0,
+          "observed": "draft + needs_input + draft, create_work command validated by UserCommandSchema"
+        }
+      ],
+      "capability": "draft → CreateWorkFields → create_work command candidate (validated by the public UserCommandSchema), plus assertDraftCurrent/previewInputs refusing a draft whose configuration revision or facts digest changed.",
+      "notReached": [
+        "main has not wired an HTTP/App route; F has not rendered the form. Delivered is the typed consumer and runnable example, not a UI."
+      ]
+    },
+    {
+      "checkpoint": 4,
+      "stage": "J16",
+      "name": "multi-project tool",
+      "status": "PASS",
+      "source": [
+        "tools/project-recipes/test/multi-project.case.ts",
+        "packages/project-recipes/test/negative.case.ts"
+      ],
+      "checks": [
+        {
+          "command": "node --test tools/project-recipes/test/*.case.ts",
+          "exit": 0,
+          "tests": 24,
+          "pass": 24,
+          "fail": 0
+        },
+        {
+          "command": "pnpm --dir packages/project-recipes test",
+          "exit": 0,
+          "tests": 35,
+          "pass": 35,
+          "fail": 0
+        }
+      ],
+      "capability": "Two independently authorized roots (pnpm single package, npm monorepo) through the actual CLI: isolated drafts, different profile/check/scope per project, monorepo root requires explicit paths, byte-identical repeat observation, refused cross-config reuse."
+    },
+    {
+      "checkpoint": 5,
+      "stage": "J20",
+      "name": "docs and final handoff",
+      "status": "PASS",
+      "source": [
+        "packages/project-recipes/README.md",
+        "docs/project-recipes/README.zh-CN.md",
+        "docs/project-recipes/main-integration.zh-CN.md",
+        "reports/project-recipes/wave27-status.json"
+      ],
+      "checks": [
+        {
+          "command": "node agent-tasks/product-wave-27/verify.mjs",
+          "exit": 0,
+          "observed": "PASS_TEN_AGENT_DISPATCH_STATIC_ONLY"
+        }
+      ],
+      "capability": "Support matrix, facts contract, CLI contract and exit codes, result code table, failure matrix, cost/privacy budgets, compatibility and the concrete main/F wiring (including the exact pnpm-lock importer main must add)."
+    }
+  ],
+  "stages": [
+    {
+      "id": "J1",
+      "title": "understand existing checks and draft boundaries",
+      "status": "PASS",
+      "source": [
+        "docs/rfcs/WP-16/0068-coordinator-channel-and-project-recipe-inputs.md",
+        "packages/contracts/src/configuration.ts",
+        "packages/contracts/src/schemas.ts",
+        "packages/verification/src/checks.ts",
+        "packages/contracts/src/proposal-commands.ts",
+        "docs/project-recipes/README.zh-CN.md"
+      ],
+      "capability": "Reused ApplicationConfiguration (projects/profiles/checks), ScopeSchema, CriterionSchema/RequiredCriteriaSchema, CheckRegistry public views, ProjectRegistrationInputSchema check enum, and the create_work command shape. No new authority: no runner, verifier, installer, ledger or execution state.",
+      "note": "The repository has no WorkDraft type; the existing confirmation input is the create_work user command, which preview.ts targets instead of inventing a parallel draft contract."
+    },
+    {
+      "id": "J2",
+      "title": "stable typed recipe output",
+      "status": "PASS",
+      "source": [
+        "packages/project-recipes/src/draft.ts",
+        "packages/project-recipes/src/facts.ts"
+      ],
+      "capability": "Closed statuses and closed issue-code vocabulary; provenance carries catalog/configuration/facts/selection/input digests; authorization is the literal 'none'; no executable/argv/command/token field exists in the schema."
+    },
+    {
+      "id": "J3",
+      "title": "deterministic catalog",
+      "status": "PASS",
+      "source": [
+        "packages/project-recipes/src/catalog.ts",
+        "packages/project-recipes/src/match.ts",
+        "packages/project-recipes/test/catalog.case.ts"
+      ],
+      "capability": "Three practical kinds; identical input yields identical bytes and revision; scope only narrows; criteria/profile come from configuration; missing capabilities become needs_input/unsupported, never a fixture or another agent."
+    },
+    {
+      "id": "J4",
+      "title": "first complete result: typed pure catalog",
+      "status": "PASS",
+      "source": [
+        "packages/project-recipes/src/index.ts",
+        "packages/project-recipes/test/negative.case.ts"
+      ],
+      "capability": "35 package tests (catalog, negative, preview), strict typecheck and build; examples are data and carry no command."
+    },
+    {
+      "id": "J5",
+      "title": "injectable public project facts",
+      "status": "PASS",
+      "source": [
+        "packages/project-recipes/src/facts.ts",
+        "packages/project-recipes/test/negative.case.ts"
+      ],
+      "capability": "Facts accept injection with provenance/observedAt/scope/support flags/missing; stale and future observations become needs_input facts_stale; gaps are never filled by guessing paths or running version commands."
+    },
+    {
+      "id": "J6",
+      "title": "explicitly authorized metadata read",
+      "status": "PASS",
+      "source": [
+        "tools/project-recipes/metadata.ts",
+        "tools/project-recipes/test/metadata.case.ts"
+      ],
+      "capability": "Allow-listed names under one absolute authorized root; O_NOFOLLOW+fstat; symlink/non-regular/oversize/out-of-root refused; no home/env/.npmrc/credential/script body read; observation is read-only (mtime/size/mode asserted unchanged)."
+    },
+    {
+      "id": "J7",
+      "title": "package metadata and unknown capabilities",
+      "status": "PASS",
+      "source": [
+        "tools/project-recipes/metadata.ts",
+        "tools/project-recipes/test/metadata.case.ts"
+      ],
+      "capability": "Only name/packageManager/engines/workspace declaration/script names/lockfile names+digests; script values never read; yarn/bun unsupported; unknown manager needs_input; Node is never assumed for a non-Node root."
+    },
+    {
+      "id": "J8",
+      "title": "second complete result: read-only facts CLI",
+      "status": "PASS",
+      "source": [
+        "tools/project-recipes/cli.ts",
+        "tools/project-recipes/test/cli.case.ts"
+      ],
+      "capability": "Real CLI with --help, injected facts or authorized root, documented exits, stdout JSON plus stderr notes, new-file-only output, no model/agent/install and no project write."
+    },
+    {
+      "id": "J9",
+      "title": "current config and scope matching",
+      "status": "PASS",
+      "source": [
+        "packages/project-recipes/src/match.ts",
+        "packages/project-recipes/test/negative.case.ts",
+        "tools/project-recipes/test/multi-project.case.ts"
+      ],
+      "capability": "Scope may only narrow (pathWithin boundary aware), exclusions only grow, externalActions always empty; discussion-only/unavailable/blocked projects are explained; a draft from an older configuration revision or older facts is refused by assertDraftCurrent."
+    },
+    {
+      "id": "J10",
+      "title": "registered check reference and policy reuse",
+      "status": "PASS",
+      "source": [
+        "packages/project-recipes/src/match.ts",
+        "packages/project-recipes/test/catalog.case.ts"
+      ],
+      "capability": "Only criteria already present in defaultCriteria and checkDefinitionRef already listed in configuration.checks; a selection without a required registered machine check becomes needs_input criteria_machine_required; an unregistered ref would be unsupported (defensive)."
+    },
+    {
+      "id": "J11",
+      "title": "preview draft main/F can consume",
+      "status": "PASS_WITH_SCOPE_NOTE",
+      "source": [
+        "packages/project-recipes/src/preview.ts",
+        "packages/project-recipes/examples/preview-consumer.ts"
+      ],
+      "capability": "Stable CreateWorkFields plus toCreateWorkCommand (public schema validated); commandId/conversationId/actor/token stay with the application.",
+      "notReached": [
+        "no App/transport/UI change and no new endpoint: J owns none of those paths"
+      ]
+    },
+    {
+      "id": "J12",
+      "title": "third complete result: usable preview draft",
+      "status": "PASS_WITH_SCOPE_NOTE",
+      "source": [
+        "packages/project-recipes/test/preview.case.ts",
+        "docs/project-recipes/main-integration.zh-CN.md"
+      ],
+      "capability": "catalog → facts → config/policy → confirmable fields chain verified in-process; the final action remains the original user confirmation.",
+      "notReached": [
+        "main/F visual/HTTP integration is not implemented in this worktree"
+      ],
+      "checks": [
+        {
+          "command": "pnpm --dir packages/project-recipes test",
+          "exit": 0,
+          "tests": 35,
+          "pass": 35,
+          "fail": 0
+        }
+      ]
+    },
+    {
+      "id": "J13",
+      "title": "real multi-project and task kinds",
+      "status": "PASS",
+      "source": [
+        "tools/project-recipes/test/multi-project.case.ts",
+        "packages/project-recipes/test/fixtures.ts"
+      ],
+      "capability": "Two authorized roots with different manager (pnpm/npm), layout (single/monorepo), profile/check/scope; drafts are isolated by real IDs; no shared approval, conversation, task or registry write."
+    },
+    {
+      "id": "J14",
+      "title": "failure and abnormal input",
+      "status": "PASS",
+      "source": [
+        "packages/project-recipes/test/negative.case.ts",
+        "tools/project-recipes/test/cli.case.ts",
+        "tools/project-recipes/test/metadata.case.ts"
+      ],
+      "capability": "15 single-cause negatives in the library plus boundary refusals (bad JSON, oversize, symlink, missing, budget, output exists); unknown never becomes zero/pass; errors are bounded and free of secrets, stacks and unrelated content."
+    },
+    {
+      "id": "J15",
+      "title": "compatibility, version and scope",
+      "status": "PASS",
+      "source": [
+        "packages/project-recipes/test/negative.case.ts",
+        "docs/project-recipes/README.zh-CN.md"
+      ],
+      "capability": "Supported configuration/facts/catalog versions stated; unknown configuration version is unsupported with the observed protocol recorded and revision null; catalog changes require a version bump and change the recorded digest."
+    },
+    {
+      "id": "J16",
+      "title": "fourth complete result: multi-project reusable tool",
+      "status": "PASS",
+      "source": [
+        "tools/project-recipes/",
+        "packages/project-recipes/"
+      ],
+      "capability": "24 tools tests + 35 package tests; CLI and library write no SQL/registry/environment and create no execution state or cost ledger."
+    },
+    {
+      "id": "J17",
+      "title": "cost and privacy boundaries",
+      "status": "PASS",
+      "source": [
+        "tools/project-recipes/metadata.ts",
+        "packages/project-recipes/src/match.ts",
+        "tools/project-recipes/test/metadata.case.ts",
+        "docs/project-recipes/README.zh-CN.md"
+      ],
+      "capability": "256 KiB JSON, 4 MiB lockfile, 12 files, 8 MiB total, 60-minute facts freshness, 512 script names, schema collection caps; near-limit and over-limit inputs are refused; output carries no private material."
+    },
+    {
+      "id": "J18",
+      "title": "complete usage and development documentation",
+      "status": "PASS",
+      "source": [
+        "docs/project-recipes/README.zh-CN.md",
+        "docs/project-recipes/main-integration.zh-CN.md",
+        "packages/project-recipes/README.md"
+      ],
+      "capability": "Independent developer can reproduce the three recipes, the failure handling and the wiring from committed commands and fixtures; unsupported stacks, unregistered checks and real execution admission are stated explicitly."
+    },
+    {
+      "id": "J19",
+      "title": "real consumer and independent acceptance input",
+      "status": "PASS_WITH_SCOPE_NOTE",
+      "source": [
+        "packages/project-recipes/examples/preview-consumer.ts",
+        "packages/project-recipes/src/preview.ts"
+      ],
+      "capability": "Stable source, typed consumer and a runnable example are available for main/F/E; the public create_work schema still validates the produced command.",
+      "notReached": [
+        "E independent product-acceptance assertions were not added or modified (E owns them); no installed/native verdict is claimed"
+      ]
+    },
+    {
+      "id": "J20",
+      "title": "fifth complete result and final handoff",
+      "status": "PASS",
+      "source": [
+        "reports/project-recipes/wave27-status.json"
+      ],
+      "capability": "This status lists source, commands/exits, provenance and actual capability per stage; explicitly names what is not built."
+    }
+  ],
+  "evidence": {
+    "package": {
+      "typecheckExit": 0,
+      "tests": 35,
+      "pass": 35,
+      "fail": 0,
+      "buildExit": 0
+    },
+    "tools": {
+      "typecheckExit": 0,
+      "tests": 24,
+      "pass": 24,
+      "fail": 0
+    },
+    "exampleExit": 0,
+    "wave27VerifierExit": 0,
+    "contractsBuildExit": 0,
+    "contractsTestsRun": 0,
+    "note": "contracts is a pre-existing workspace dependency; J only built it locally, it did not change it"
+  },
+  "limits": {
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "vendorCalls": 0,
+    "dependencyInstalls": 0,
+    "executedProjectCommands": 0,
+    "checkRegistrations": 0,
+    "sqlWrites": 0,
+    "executionLifecycles": 0,
+    "userServicesTouched": 0,
+    "newWorktreesCreated": 0
+  },
+  "handoff": {
+    "mainMustAddLockImporter": "packages/project-recipes (see docs/project-recipes/main-integration.zh-CN.md section 1)",
+    "mainConsumes": [
+      "matchRecipe",
+      "parseProjectRecipeDraft",
+      "previewInputs",
+      "toCreateWorkCommand"
+    ],
+    "fConsumes": [
+      "CreateWorkFields"
+    ],
+    "eCanConsume": [
+      "draft/needs_input/unsupported fixtures",
+      "documented failure matrix"
+    ],
+    "reproduce": [
+      "pnpm --dir packages/contracts build",
+      "pnpm --dir packages/project-recipes typecheck && pnpm --dir packages/project-recipes test && pnpm --dir packages/project-recipes build",
+      "./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json",
+      "node --test tools/project-recipes/test/*.case.ts",
+      "node packages/project-recipes/examples/preview-consumer.ts"
+    ]
+  },
+  "notReached": [
+    "main's actual HTTP/App composition of these drafts (main owns root/contracts/HTTP/App)",
+    "F's actual form rendering and keyboard/mobile checks",
+    "E independent product-acceptance assertions",
+    "monorepo member enumeration (pnpm-workspace.yaml content is never parsed)",
+    "package-manager version probing (no --version execution by design)",
+    "any installed/native/runtime admission: a draft is not execution"
+  ],
+  "ownership": {
+    "owned": [
+      "packages/project-recipes/",
+      "tools/project-recipes/",
+      "docs/project-recipes/",
+      "reports/project-recipes/"
+    ],
+    "untouchedByDesign": [
+      "pnpm-lock.yaml",
+      "root package.json",
+      "packages/contracts/",
+      "apps/",
+      "A/B/C/D/E/F/G/H/I paths"
+    ]
+  }
+}

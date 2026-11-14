@@ -73,6 +73,7 @@ pnpm --dir packages/contracts build          # workspace dependency used for typ
 pnpm --dir packages/project-recipes typecheck
 pnpm --dir packages/project-recipes test
 pnpm --dir packages/project-recipes build
+pnpm --dir packages/project-recipes example    # in-memory consumer sample, exit 0
 ```
 
 The package is private and ships from `src/`; `dist/` is not tracked.

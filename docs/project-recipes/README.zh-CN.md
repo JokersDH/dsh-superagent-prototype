@@ -105,7 +105,8 @@ node tools/project-recipes/cli.ts … --output /tmp/recipe-draft.json
 | `--root <dir>` | 与 `--facts` 二选一。明确授权的绝对项目根。 |
 | `--project <id>` | 省略时取 `--facts` 的 `projectId`；若用 `--root` 则要求配置里只有唯一项目。两者不一致直接拒绝（exit 2）。 |
 | `--kind <kind>` | 默认 `regression_fix`。 |
-| `--paths a,b` / `--exclude c` / `--criteria x,y` / `--profile <id>` | 显式选择；只可在配置允许集合内收窄。 |
+| `--paths a,b` / `--exclude c` / `--criteria x,y` / `--profile <id>` | 显式选择；只可在配置允许集合内收窄。给空值（如 `--paths ""`）是用法错误（exit 2）。 |
+| 省略 `--paths` | 表示「没有额外收窄」：`verification_followup` 用项目 scope；两个需要边界的配方则返回 `needs_input: scope_paths_required`。 |
 | `--now <ISO>` | 决定 facts 新鲜度；省略用当前时间（测试与复跑请显式给出）。 |
 | `--max-facts-age-ms <n>` | 覆盖默认 60 分钟上限。 |
 | `--output <新文件>` | 仅在文件不存在时写入（`O_EXCL`），同时仍把 JSON 打到 stdout。 |
@@ -288,6 +289,9 @@ node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/config
   --facts tools/project-recipes/fixtures/facts-alpha.json --now 2026-11-14T12:00:00.000Z --paths src
 node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/configuration.json \
   --facts tools/project-recipes/fixtures/facts-alpha.json --now 2026-11-14T12:00:00.000Z --kind scoped_change
+
+# 消费者样例（内存内自检，不写文件）
+node packages/project-recipes/examples/preview-consumer.ts
 ```
 
 ## 11. 维护

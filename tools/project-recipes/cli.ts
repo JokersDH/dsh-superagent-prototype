@@ -144,6 +144,8 @@ export function main(argv: readonly string[], io: { stdout: (text: string) => vo
   try {
     if (parsed.config === undefined) throw new UsageError('--config is required')
     if ((parsed.facts === undefined) === (parsed.root === undefined)) throw new UsageError('provide exactly one of --facts or --root')
+    for (const [flag, value] of [['--paths', parsed.paths], ['--exclude', parsed.exclude], ['--criteria', parsed.criteria]] as const)
+      if (value !== undefined && value.length === 0) throw new UsageError(`${flag} needs at least one value`)
     if (!contractsBuilt()) throw new MetadataRefused('unreadable', 'packages/contracts/dist', '缺少已构建的 contracts 依赖：请先运行 pnpm --dir packages/contracts build')
     const configuration = readJsonFile(parsed.config)
     const now = parsed.now ?? new Date().toISOString()
