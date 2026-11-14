@@ -1,0 +1,156 @@
+{
+  "protocol": "wave27-experience-insights-admission/1",
+  "date": "2026-11-14",
+  "status": "F_IDENTITY_SLICE_ADMITTED_G_PRIOR_FINDINGS_CLOSED_WITH_NARROW_INPUT_BOUNDARIES",
+  "planningNote": "User withdrew the same-day completion target. No admission threshold or task scope was reduced; new I/J capacity should build product capabilities without overlapping F/G ownership or adding another gate.",
+  "mainReviewedBaseline": "6787bd09c83916a1a3551908598344f36194653e",
+  "candidates": {
+    "F": { "root": "/Users/hh/Desktop/joker/superagent-agent-f", "branch": "codex/g4-trial-experience", "head": "3037cbe756795726a74bc657d6e5bab55b433788", "actualSource": "dac5577aae0e862aac37fa96096ae1e2faa3b0a2", "dirty": [] },
+    "G": { "root": "/Users/hh/Desktop/joker/superagent-agent-g", "branch": "codex/g4-usage-insights", "head": "2adeeff67363d3e13ca6c4e623034c54a14c1e01", "dirty": [] }
+  },
+  "checks": [
+    {
+      "command": "node --test apps/console/test/trial/trial-view.case.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "exitCode": 0, "passed": 11, "failed": 0,
+      "scope": "Actual F mapping, four navigation actions, readonly/unknown, scoped-insights declarations and bounded error copy."
+    },
+    {
+      "command": "pnpm --dir apps/console exec tsc -p tsconfig.json --noEmit",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f", "exitCode": 0,
+      "scope": "Actual console strict consumer compilation with candidate source."
+    },
+    {
+      "command": "node /tmp/pa-wave27-trial-hook-audit.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "exitCode": 0, "passed": 6, "failed": 0,
+      "scope": "Actual React hook/component in Chromium against an in-process private ephemeral Vite. Controlled transports only, no product data or API sends. No candidate report/screenshot files were written; browser and Vite were closed.",
+      "cases": [
+        "identity-change-reads-B-once-and-ignores-late-A",
+        "switch-back-hides-old-B-before-new-A-result",
+        "inline-wrapper-re-renders-do-not-loop",
+        "disable-mid-flight-cancels-result-and-loading",
+        "auth-failure-retains-dated-data-and-sanitizes-raw-error",
+        "all-controlled-hook-paths-have-no-api-send-or-page-error"
+      ]
+    },
+    {
+      "command": "node --test packages/usage-insights/test/*.case.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "exitCode": 0, "passed": 57, "failed": 0,
+      "scope": "Actual candidate pure analysis, scopes, limits, bounds and consumer tests."
+    },
+    {
+      "command": "node --test tools/usage-insights/test/http-adapter.case.mjs tools/usage-insights/test/cli.case.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "exitCode": 0, "passed": 34, "failed": 0,
+      "scope": "Actual private loopback streaming/error/time/credential and CLI/file/output behavior; finite suite."
+    },
+    {
+      "command": "pnpm --dir packages/usage-insights typecheck",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g", "exitCode": 0
+    },
+    {
+      "command": "node /tmp/pa-wave26-insights-audit.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "exitCode": 1, "passed": 10, "failed": 2,
+      "scope": "Original independent complete positive and seven prior negative vectors rerun on fixed2adeeff, plus two new nested-bound/index-conflict cases; exact private HTTP/output positives retained. The temporary tool's source metadata was updated to the actual newly tested HEAD; historical results were not reused as current evidence.",
+      "oldSevenNegatives": "ALL_PASS",
+      "newFailures": [
+        { "id": "nested-work-outcomes-obey-declared-record-limit", "observed": "One accepted WorkEvidence wrapper with2 embedded outcomes, top-level outcomes empty, maxRecords1: recordsSeen1/recordsAccepted2/recordsNotParsed0/stoppedBynone/coveragecomplete." },
+        { "id": "conflicting-work-index-cannot-be-revived-by-third-entry", "observed": "workIndex maps one work A→foreign B→A; the conflicting index is quarantined once but the third mapping revives it and produces one observed question/unknown0/complete row." }
+      ]
+    },
+    {
+      "command": "node tools/usage-insights/probe/observe-two-projects.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g", "exitCode": 0,
+      "scope": "Actual private controlled ProductStore/Application/Broker/verification/acceptance/ReviewTiming and authenticated HTTP read collector. No --keep, so no candidate report files were published. Controlled fixture execution is not installed native or real human review time.",
+      "projects": ["project-arcade", "project-beacon"],
+      "observed": {
+        "questions": 2, "answers": 2, "acceptances": 2, "reviewSpans": 2,
+        "outcomes": 2, "layer": "controlled", "coverage": "complete", "quarantine": 0,
+        "readyToAcceptanceMeanMs": 823.5,
+        "activeReviewMeanMs": 700, "activeReviewMeaning": "partial UI-visibility proxy from explicit controlled UI activity records, not human work time",
+        "usage": "unknown", "queueWaiting": "endpoint not exposed", "executionDuration": "not recorded",
+        "collectionMs": 157, "analysisMs": 100,
+        "summaryId": "96ad1ad3d61f188312d09dc09ec9a0b64b5e30be193a01a8c6f298d4ab24178e",
+        "inputDigest": "21d31e75c17b30c82ddc312ec0f2c992c674f50807a5571f79baee44d0fe5890",
+        "repeatedHistoricalCollectionIdentical": true,
+        "readOnlyCollection": true
+      }
+    }
+  ],
+  "closedPriorFindings": [
+    { "id": "F26-TRANSPORT-IDENTITY-RESIDUAL", "status": "CLOSED_WITH_EXPLICIT_IDENTITY_CONTRACT", "evidence": "Actual identity A→B→A test passes, old observation hidden immediately, late request ignored, current client read once. Optional {enabled,identity} options retain the prior boolean API. Stable transport without an identity is documented; replacement then requires caller remount." },
+    { "id": "G26-WORK-ATTENTION-SCOPE-WINDOW", "status": "CLOSED_FOR_PREVIOUS_FOUR_VALID_DATA_NEGATIVES", "evidence": "Project narrowing counts1 instead of2; old-window question/answer count0; unmapped foreign work remains unknown; foreign attention is excluded. Actual current product-backed workIndex and two-project flow pass." },
+    { "id": "G26-INVALID-WORK-BECOMES-COMPLETE-ZERO", "status": "CLOSED_FOR_PREVIOUS_INVALID_AND_MIXED_SOURCE_CASES", "evidence": "Invalid work becomes null/unknown1/partial; valid portion remains known with explicit losses; genuine complete empty set remains a measured zero." },
+    { "id": "G26-NONSTREAMING-RESPONSE-BYTE-BOUND", "status": "CLOSED_FOR_MEASURED_STREAMING_PATHS", "evidence": "Original finite unknown-length overflow vector passes; actual module now reads/cancels streams before whole-body concatenation and tests cover false length, error body and trickling deadline." },
+    { "id": "G26-DECLARED-LIMITS-ARE-OBSERVATIONAL-ONLY", "status": "CLOSED_FOR_TOPLEVEL_RECORD_PAGE_WORK_VECTORS_WITH_NESTED_RESIDUAL", "evidence": "Old maxRecords1/two top-level outcomes now accepts1/partial, exact fit stays complete, unparsed invalid record is not validated. Separate embedded-outcome residual is below; do not keep reporting the old top-level failure." }
+  ],
+  "findings": [
+    {
+      "id": "G27-EMBEDDED-OUTCOME-BUDGET",
+      "priority": "P2_ANALYSIS_BOUND_CONTRACT",
+      "file": "packages/usage-insights/src/analyze.ts", "line": 180,
+      "problem": "The record budget is applied to top-level outcome/work wrapper counts, but every accepted WorkEvidence is fully schema-parsed and all embedded outcomes enter parseOutcomes without the remaining budget. maxRecords1 therefore accepts2 outcomes from one wrapper and reports complete/stoppedBynone. Large nested collections can exceed the declared analysis work substantially even while container-level bounds pass.",
+      "requiredOutcome": "Define and enforce counts for all derived outcome/event records before costly nested processing, or explicitly reject unsupported nested bounds. Any truncated child collection must propagate partial/unknown and correct accepted/notParsed counts. Add a legitimate work-only embedded positive and bound negative; keep existing top-level controls.",
+      "currentUseBoundary": "This is a residual of the generic pure API/CLI bound contract. A main-owned consumer of already authorized public DTOs can independently bound total nested outcomes/events and avoid custom lower caps until repaired; it is not a model/runtime permission bypass."
+    },
+    {
+      "id": "G27-CONFLICTING-INDEX-RESURRECTION",
+      "priority": "P2_SOURCE_CONFLICT_HANDLING",
+      "file": "packages/usage-insights/src/analyze.ts", "line": 168,
+      "problem": "On conflicting workIndex entries the code deletes the map entry, but stores no permanent conflict tombstone. A third mapping for the same work is accepted again, and the work contributes a known complete intervention row despite its project mapping having been contradicted.",
+      "requiredOutcome": "Keep the work identity permanently conflicted for the input; subsequent repetitions cannot restore the map. Carry the conflict into the work's unknown/coverage/metrics, not only the top-level quarantine. Test A→B→A and reordered triples with a full unique-map positive.",
+      "currentUseBoundary": "The compact G consumer currently sees quarantine1 and returns insufficient_data, and F hides non-ready measurements. The raw analysis/report row is still incorrect; this is not a demonstrated current default-UI false complete result. Main should reject conflicting source maps before analysis."
+    }
+  ],
+  "fSourceAdmission": {
+    "scope": "Actual identity/readiness component update, not a new whole-product/native/installed release verdict",
+    "readyForMinimalMainIntegration": true,
+    "sourceFiles": [
+      "apps/console/src/trial/TrialWorkspace.tsx",
+      "apps/console/src/trial/index.ts",
+      "apps/console/src/trial/insights.ts",
+      "apps/console/src/trial/useTrialReadiness.ts",
+      "apps/console/test/trial/trial-view.case.ts"
+    ],
+    "unchangedFilesNotRequiredAgain": ["apps/console/src/trial/trial-view.ts", "apps/console/src/trial/trial.css"],
+    "dependencies": "Existing React/lucide/contracts/console transport and labels; no new external dependency or global CSS needed.",
+    "consumerContract": "Old useTrialReadiness(transport,boolean) still works for stable main transport. For backend/auth-session replacement, main passes a stable explicit identity or remount key. Four navigation-only callbacks remain unchanged; no model/command/probe authority.",
+    "newInsightsInput": "F now requires a nonempty scope.projectIds plus aggregation declaration, windowLabel and coverage before displaying ready metrics, and checks that an active project belongs to that declared scope. The UI gate is only presentation validation, not source/native/release authority.",
+    "browserScope": "New independent6-hook cases pass. Maina302's existing actualApp8 remains its historical admission; candidate F's full new two-project screenshots/reports were read but not rerun or relabeled as a current main installed verdict."
+  },
+  "gIntegrationScope": {
+    "canProgressivelyIntegrateMeasuredReadOnlyUse": true,
+    "genericUntrustedInputWholePackageAdmission": false,
+    "completeNodeSourceClosure": [
+      "packages/usage-insights/package.json",
+      "packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/tsconfig.build.json",
+      "packages/usage-insights/src/index.ts",
+      "packages/usage-insights/src/protocol.ts",
+      "packages/usage-insights/src/subject.ts",
+      "packages/usage-insights/src/metrics.ts",
+      "packages/usage-insights/src/attention.ts",
+      "packages/usage-insights/src/baseline.ts",
+      "packages/usage-insights/src/analyze.ts",
+      "packages/usage-insights/src/facing.ts",
+      "packages/usage-insights/src/report.ts"
+    ],
+    "dependencies": "Existing contracts workspace and zod4.4.3; root workspace/importer/lock/build composition remains main-owned.",
+    "architecture": "analyzeUsageInsights imports Node canonical/crypto helpers. Compose it on coordinator/Node from existing authorized read DTOs. Do not import the root analysis/collector into the browser or expose local credentials there; the browser receives only a validated derived DTO.",
+    "minimalSafeConsumer": "Use main-authenticated project/work reads and a unique verified work→project map, independently cap total nested outcome/event/page/byte counts, preserve exact requested project/window, reject quarantine/conflicting maps and validate the resulting summary. If a source was not collected keep its metrics unavailable. Keep layer/currency/unknown and per-row ReviewTiming proxy/partial visible; configuration readiness is not a sample.",
+    "fAdapterRequired": "G toInsightConsumerView currently does not populate F's new scope declaration/coverageState/unknownCount/row metadata. Main must explicitly map admitted scope and rows, or F/G publish a compatible projection. Passing the current compact G object directly to F correctly hides rows due to undeclared scope; structural assignability alone is not a working insight integration.",
+    "limits": "Controlled product-backed read/analysis is actually verified. Actual operator production/native execution, real cost/queue endpoints and causal efficiency benefit remain unmeasured; no deadline-driven scope inflation is permitted."
+  },
+  "nextWholePackages": {
+    "F": "Consume the actual main identity/insights adapter and real user journeys; preserve four navigation targets/drafts/readonly, complete scope/window/partial/layer display and updated user/installed handoff. Do not reimplement a standalone workspace or wait on G to use the core product.",
+    "G": "Close nested-derived bounds and permanent conflicting-map quarantine within the existing module, align the actual F projection, then deliver the Node-side public-read composition/CLI and repeated two-project consumer behavior with complete/partial/unknown provenance. Preserve the now-closed old seven cases and real Q/A/acceptance chain; no new benchmark/price/model recipe or ledger."
+  },
+  "additionalResourceSuggestions": {
+    "I": "A dedicated new session-channel subtree can implement connection/three callback transport pieces if main assigns it explicitly. B must remain the only lifecycle/service dispatch/physical resource owner; consume a real port and leave independent consumer/fault observations to H where appropriate, rather than creating another coordinator or gate.",
+    "J": "Existing project-registry already exposes node_test/pnpm_test/npm_test, and packages/verification/src/checks.ts plus runner.ts already own immutable CheckRegistry revisions and execution. Environment preparation also has recipes. A useful nonduplicate J result is reusable task/check declaration presets with readonly matching and explicit preview/confirmation into existing ProjectRegistration/criteria/prepared commands; do not create another verifier, install recipe engine or execution authority."
+  },
+  "preservation": { "candidateFWorktreeClean": true, "candidateGWorktreeClean": true, "candidateProductionEdits": false, "realVendorModelTurns": 0, "nativeTurnStarts": 0, "oldBCap4": "UNKNOWN_NOT_SPENDABLE", "ePilot": "UNCHANGED_BLOCKED", "allTwelveUserInstancesAndDataPreserved": true, "allOwnExecSessionsCompleted": true, "globalDiscovery": false, "unrelatedCredentialsRead": false }
+}
