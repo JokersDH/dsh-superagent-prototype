@@ -10,7 +10,7 @@
  * repeated begin is refused instead of replayed, and the re-fed deliver keeps its original id.
  */
 import { spawn } from 'node:child_process'
-import { lstatSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -40,6 +40,8 @@ const runChild = (mode, registration) => new Promise(resolve => {
 })
 try {
   process.env.PA_RUNNER_RECOVERY_ROOT = recoveryRoot
+  // The chain claim is about ACTUAL receptions, so the receiver log has to be on.
+  process.env.PA_RUNNER_RECEIVER_LOG = join(root, 'receiver.jsonl')
   const spec = makeAttemptSpec()
   const link = new RunnerLink({ executable: process.execPath, entry: ENTRY, args: ['waiting-user'], stateRoot: join(root, 'attempt'), producer })
   link.bindPayload(spec.policySnapshotRef, { kind: 'fixture-settings/1', workspacePath: process.cwd(), scope: { projectId: 'p', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }, approvalPolicy: 'on-request', timeoutMs: 600000 })
@@ -107,6 +109,25 @@ try {
   if (deliverAgain.ok === true) log.pass('the re-fed deliver with id cmd-deliver-original was accepted, so the id was not replaced by a fresh one')
   else log.fail(`the deliver with its original id was not accepted: ${JSON.stringify(deliverAgain)}`)
 
+  log.begin('B27-CHAIN-ONE-BINDING-ACROSS-KILL', 'begin, kill, resume and re-feed stay on ONE attempt', 'controlled_process')
+  // One chain: the same attempt id, the same epoch, the same original command ids, and the receiver still
+  // shows exactly one begin. A second attempt or a replayed begin anywhere in the chain would fail here.
+  const chain = await runChild('probe', registrationPath)
+  const chainReport = chain.report ?? {}
+  const received = (() => { try { return readFileSync(process.env.PA_RUNNER_RECEIVER_LOG, 'utf8').trim().split('\n').filter(Boolean).map(line => JSON.parse(line)) } catch { return [] } })()
+  const beginReceptions = received.filter(frame => frame.kind === 'begin')
+  const attemptIds = new Set([aReport.inspect?.attemptId, bReport.inspect?.attemptId, chainReport.inspect?.attemptId].filter(Boolean))
+  const epochs = new Set([aReport.inspect?.fenceEpoch, bReport.inspect?.fenceEpoch, chainReport.inspect?.fenceEpoch].filter(value => value !== undefined))
+  log.evidence({ pids: [a.pid, b.pid, chain.pid], attemptIds: [...attemptIds], epochs: [...epochs], beginReceptions: beginReceptions.map(frame => frame.id), sameFactsAsA: JSON.stringify(chainReport.factIds) === JSON.stringify(aReport.factIds) })
+  const oneBinding = attemptIds.size === 1 && epochs.size === 1 && String([...attemptIds][0]) === String(spec.attemptId)
+  // The deliberate re-feed DOES reach the receiver a second time; what must not happen is a second ADMISSION,
+  // which the duplicate_begin refusal already proves. Reception count and admission count are different facts
+  // and are reported as such rather than conflated.
+  const duplicateRefused = /duplicate_begin|begin is accepted at most once|protocol_error/.test(String(bReport.beginAgain?.message ?? ''))
+  if (oneBinding && beginReceptions.length === 2 && duplicateRefused && JSON.stringify(chainReport.factIds) === JSON.stringify(aReport.factIds)) {
+    log.pass(`three coordinator PIDs saw ONE attempt ${spec.attemptId} at ONE epoch: the re-fed begin was received a second time but admitted only once (duplicate_begin), and the original fact ids were unchanged`)
+  } else log.fail(`the chain did not stay on one binding: ${JSON.stringify({ attemptIds: [...attemptIds], epochs: [...epochs], beginReceptions: beginReceptions.length, duplicateRefused })}`)
+
   log.begin('B27-SCOPE-NOT-NATIVE', 'codex-fake lane; installed Codex not executed', 'controlled_process')
   log.notTested('no installed agent executed, no gateway contacted')
 } finally {
@@ -114,6 +135,7 @@ try {
   try { if (childB && !childB.killed) childB.kill('SIGKILL') } catch {}
   try { await runner?.close() } catch {}
   delete process.env.PA_RUNNER_RECOVERY_ROOT
+  delete process.env.PA_RUNNER_RECEIVER_LOG
   rmSync(root, { recursive: true, force: true })
 }
 const report = writeReport({ cases: log.cases, environment: { note: 'wave-27 sigkill resume', modelCalls: 0, nativeTurns: 0 }, extra: { scope: 'fixture driver process; native NOT_TESTED' } }, undefined)

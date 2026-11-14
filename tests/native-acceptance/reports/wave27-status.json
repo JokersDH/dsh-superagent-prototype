@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "a1b313a",
+  "base": "4a7bdcc",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -146,7 +146,7 @@
       "B13_currentCandidate": "NOT_REACHED - same Work/Ticket/Assignment continuing to a registered verifier/check, artifact and current candidate after recovery",
       "B14_manualAccept": "NOT_REACHED - explicit human accept of the current candidate binding acceptanceRef/verification/candidate/artifact to the original Work; the product lane only reaches a recorded answer (b18)",
       "B15_slots": "NOT_REACHED - the 2-then-4 slot matrix with normal/waiting/handover/SIGKILL/unknown/stop/delivered mixes, per-slot isolation of identity/generation/credential/cursor/payload/receipt and the original scheduler backpressure",
-      "B9B11_singleChain": "NOT_REACHED as one chain - the pieces above are separate observations, and the packet requires the old coordinator's confirmed exit, the new process's original native question and answer, the three callbacks and the ACK/unknown semantics to close on ONE original business chain",
+      "B9B11_singleChain": "PARTIAL - one attempt/one epoch/one admission across a SIGKILL is now observed on the live lane with begin and a business command; the product-lane Broker question/answer and the three-callback servicing are not yet in the SAME chain run",
       "vendorOrGateway": "not observed and not claimed anywhere",
       "B11_partialRemaining": "NOT_REACHED - the intermediate windows (write-before, after-receiver-before-ACK, before-receipt, after-receipt) are not separated into four counted points; only the closed-window result is counted"
     },
@@ -188,5 +188,11 @@
     ],
     "finding": "on the short-lived codex-fake lane the second command resolved as successful while the receiver log recorded ZERO receptions: a resolved bridge call is not proof of reception. The measurement was moved to the long-lived lane, where the same command is received exactly once. This is the invariant 'sent is not received' caught by the harness itself.",
     "labelling": "the second command is a deliver, which uses the SAME admission and receipt path as the answer; it is not relabelled as an answer. The answer is counted separately on the product lane by b27-ack-windows."
+  },
+  "item4_singleChain": {
+    "harness": "tests/native-acceptance/b27-sigkill.mjs",
+    "result": "7 PASS / 0 FAIL / 1 NOT_TESTED",
+    "case": "B27-CHAIN-ONE-BINDING-ACROSS-KILL - three coordinator PIDs, one deliberate SIGKILL in the middle, saw ONE attempt at ONE epoch with the same original fact ids; the re-fed begin was RECEIVED a second time but ADMITTED only once (duplicate_begin)",
+    "distinction": "reception count and admission count are different facts and are reported separately instead of conflated: the frame reaching the receiver is not the same as the command being executed twice"
   }
 }
