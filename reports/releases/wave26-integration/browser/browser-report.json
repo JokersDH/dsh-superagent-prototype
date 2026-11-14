@@ -1,0 +1,52 @@
+{
+  "status": "PASS_ACTUAL_TRIAL_WORKBENCH",
+  "sourceCommit": "11002b888b91156d1b4cc0712eed224f5a437442",
+  "sourceWorktreeClean": false,
+  "checkedAt": "2026-11-14T06:28:10.399Z",
+  "cases": [
+    {
+      "id": "ACTUAL-APP-KEEPS-CONVERSATION-DEFAULT-AND-READS-ON-TRIAL-ENTRY",
+      "status": "PASS"
+    },
+    {
+      "id": "MODEL-CALLBACK-OPENS-EXISTING-SETTINGS-WITHOUT-SENDING",
+      "status": "PASS"
+    },
+    {
+      "id": "IMPORT-CALLBACK-OPENS-THE-EXISTING-FORM-WITHOUT-CREATING-A-PROJECT",
+      "status": "PASS"
+    },
+    {
+      "id": "EXECUTOR-AND-CONVERSATION-CALLBACKS-KEEP-THE-ORIGINAL-DRAFT",
+      "status": "PASS"
+    },
+    {
+      "id": "FAILED-OR-INVALID-READINESS-PRESERVES-VALID-OBSERVATIONS-AND-RETRIES",
+      "status": "PASS"
+    },
+    {
+      "id": "LEGACY-OPTIONAL-ABSENCE-IS-UNKNOWN-AND-DOES-NOT-DISABLE-OLD-VIEWS",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL-READONLY-AND-FIXTURE-HTTP-MODES-NEVER-OFFER-NATIVE-DISPATCH",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-MOBILE-NAVIGATION-FOCUS-AND-TEXT-FIT",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "readinessReads": 14,
+  "postRequests": 0,
+  "modelCalls": 0,
+  "eventDelta": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "limitations": [
+    "Actual App/React/readiness HTTP/SQLite with unstarted execution and a no-send local provider stub",
+    "Readonly/fixture cases switch real HTTP guards over the private normal Store; this is not snapshot/daemon recovery",
+    "No G summary, H toolkit, native profile or installed release admission"
+  ]
+}
