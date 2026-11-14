@@ -30,7 +30,20 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 
 ## 复现
 
+在一个新 checkout 上先准备 workspace（不修改根 lock；`--lockfile=false` 只链接本地依赖）：
+
+```sh
+pnpm install --lockfile=false --ignore-scripts
+pnpm -r --filter "./packages/**" build
+pnpm --dir packages/usage-insights build
+```
+
+然后：
+
 ```sh
 node tools/usage-insights/probe/observe-two-projects.mjs            # 不写仓库，仅打印检查结果
 node tools/usage-insights/probe/observe-two-projects.mjs --keep     # 额外发布到本目录（独占创建，不覆盖）
+node --test tools/usage-insights/test/*.case.mjs
 ```
+
+探针在进程内起真实产品 HTTP 服务并异步调用 CLI，因此必须用 `spawn` 而不是阻塞式执行。

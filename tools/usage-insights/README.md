@@ -131,9 +131,18 @@ targetLayer、sampleCount、value、coverage；手填工时/预期节省写在 `
 ## 测试
 
 ```sh
-pnpm --dir packages/usage-insights typecheck && pnpm --dir packages/usage-insights build && pnpm --dir packages/usage-insights test
+# 新 checkout 先链接 workspace 依赖并构建（不改根 lock）
+pnpm install --lockfile=false --ignore-scripts
+pnpm -r --filter "./packages/**" build
+pnpm --dir packages/usage-insights build
+
+pnpm --dir packages/usage-insights typecheck
+pnpm --dir packages/usage-insights test
 node --test tools/usage-insights/test/*.case.mjs
 node tools/usage-insights/probe/observe-two-projects.mjs          # 真实产品 HTTP 两项目观测
 ```
+
+CLI 优先加载 `packages/usage-insights/dist`；未构建时回退到 `src/index.ts`（Node 类型剥离），
+但 `@personal-agent/contracts` 仍需 workspace 链接。
 
 fixtures 在 `tools/usage-insights/fixtures/`，全部为合成数据并标注来源；它们不是原生执行证据。
