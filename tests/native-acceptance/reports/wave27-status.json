@@ -2,8 +2,8 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "549112c",
-  "checkpoint": "5 of 5 (item 5 boundary slice)",
+  "base": "1c6cb4a",
+  "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
     "status": "CORE OBSERVED on the real authenticated transport; not yet against a spawned Runner/child process",
@@ -109,5 +109,26 @@
     "interfaceConsumerCompileCompat": "not done",
     "faultBackpressureClose": "not done",
     "normalRecoveredNativeDocs": "not done"
-  }
+  },
+  "item5_compile_faults": {
+    "harness": "tests/native-acceptance/b27-faults.mjs",
+    "result": "4 PASS / 0 FAIL / 1 NOT_TESTED",
+    "cases": [
+      "B27-COMPILE-MODULES-AND-CONSUMER - 7 modules including the attach consumer compile with strict + exactOptionalPropertyTypes directly, not through the root tsconfig exclusion",
+      "B27-BACKPRESSURE-CAPACITY - the dispatch refuses with capacity at its bounded pending-fact limit, so backpressure is explicit rather than silent",
+      "B27-FAULT-DETACH-MID-CALLBACK - an in-flight callback fails as write_indeterminate_after_detach and nothing stays pending",
+      "B27-CLOSE-IDEMPOTENT - a detached channel closes twice without error, holds no lease, queues no outbound work and has nothing pending"
+    ],
+    "correction": "the first close assertion demanded that a closed channel refuse every new registration; that is wrong, because a callback created without a lease is the stdio fallback's business. The claim was narrowed to the lease and the outbound queue"
+  },
+  "docs": {
+    "rfc": "docs/rfcs/WP-03/0001-b-runner-business-attach.md",
+    "added": "wave-27 section on whole-page budgeting, producer-bound payload, the single dispatch and channel, handover and crash recovery, refusal semantics, and an explicit normal/recovered/native scope statement"
+  },
+  "item5_stillNotReached": [
+    "answer acknowledgement window with the original question/answer on the product lane",
+    "same-Work current-candidate comparison",
+    "2/4 slot accounting and its aggregate resource return",
+    "any installed-Codex or gateway behaviour"
+  ]
 }
