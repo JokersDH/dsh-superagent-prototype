@@ -1,0 +1,182 @@
+{
+  "protocol": "wave24-delivery-admission/1",
+  "date": "2026-11-14",
+  "scope": "Independent readonly package/closure/provenance checks, pure mocked ownership controls and actual release-gate controls; package help only, no live installation/stop matrix",
+  "candidates": {
+    "D": "27675c46e23d62875406939163cef77712bf56d6",
+    "DDirty": false,
+    "E": "8a753f61bed8d592d89fac0eb390fe40001a87bd",
+    "ETestSourceAtFinalRun": "3213d43fdd95e174b0a77ffff64ce7e8460badea",
+    "EDirty": "Preserved historical untracked report runs only"
+  },
+  "newDArtifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave23-target/wave23-target-0ede11d.tar.gz",
+    "source": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+    "sourceDirty": false,
+    "buildId": "1eb8733c8b1729bc",
+    "sha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+    "tarBytes": 20247278,
+    "schema": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "abi": "137",
+    "sqlite": "3.53.4",
+    "verifiedEntries": 6747,
+    "verifiedRegularFiles": 6726,
+    "verifiedInternalSymlinks": 21,
+    "verifiedRegularBytes": 67559948,
+    "fileDigestMismatches": [],
+    "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave24-package-K0QA6i/install",
+    "verification": "Read expected tar SHA and size; validate archive member paths; extract into fresh private root; verify every regular file size/hash and every symlink realpath remains internal. No product startup.",
+    "byteVerificationExit": 0,
+    "eFinalInstalledVerdictForThisArtifact": "NOT_REACHED"
+  },
+  "dClosureAndMinimalIntegration": {
+    "manifest": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave23/ordinary-source-closure.json",
+    "manifestSource": "24a5386",
+    "entriesChecked": 78,
+    "matches": 78,
+    "mismatches": [],
+    "oldChangedProbeHashIssue": "CLOSED",
+    "mainAlreadyIntegratedBaseline": "8c8fdefa12ff04d524eec8424efe3a90bc09a6fd",
+    "minimalNewProductSource": ["apps/launcher/bin/pa.mjs"],
+    "sourceRecommendation": "Use the exact0ede11d or reviewed27675c46 CLI-help slice; all other ordinary launcher/portability/build source remains the already integrated baseline. recovery.mjs diff is only the existing trailing-space normalization.",
+    "changes": "Top-level --help/-h, help review-restored and review-restored --help expose the package-local readonly review operation and repeated --project.",
+    "independentPackageHelp": {
+      "commands": ["bin/pa --help", "bin/pa help review-restored", "bin/pa review-restored --help"],
+      "exitCodes": [0, 0, 0],
+      "privateConfigDataCacheLogsWorkspaceRootsUncreated": true,
+      "usesExtracted0edePackage": true,
+      "launcherDaemonStarted": false
+    },
+    "doNotImport": "Historical reports, live verification scripts and new live-cleanup helper are not admitted main runtime. CLI help can integrate independently of those probe defects or E final package result."
+  },
+  "eActualRecordedResult": {
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-13T16-18-07-742Z/report.json",
+    "testSource": "3213d43fdd95e174b0a77ffff64ce7e8460badea",
+    "counts": { "PASS": 208, "FAIL": 0, "NOT_TESTED": 15 },
+    "subjectSource": "a9b155c13be197d828544a26f4827cf9d4acab68",
+    "subjectBuildId": "9fdc283f55927f6f",
+    "subjectTarSha256": "413dee2fb2692334a519899fc9298fd0771b5c865a34a595d1efc3b4b3b1d650",
+    "subjectTarBytes": 20246850,
+    "installedAlpha": "PASS_162_REQUIRED",
+    "localAlpha": "PASS_SAME_ORDINARY_INSTALLED_SCOPE",
+    "fullProduct": "FAIL_NATIVE_DELIVERY_AND_CONTROL_NOT_MEASURED",
+    "samePackageConsumerFileHashes": { "verified": 4, "matched": 4 },
+    "consumerFiles": [
+      "apps/launcher/lib/start.mjs",
+      "apps/launcher/lib/daemon.mjs",
+      "apps/coordinator/product/restored-review.ts",
+      "apps/coordinator/product/demo.ts"
+    ],
+    "actualForeign0edeConsumerRefused": true,
+    "scopeDiagnostics": "Measured actual opt-in protocol, default-shape preservation, strict query refusal and independently prepared narrow selection body withheld",
+    "preserved595HistoricalPositive": "Full161 required recorded scope passes, excluding only the subsequently added E7-SCOPE-DIAGNOSTICS case",
+    "admission": "Admit the genuine complete recorded a9b ordinary personal/review/install scope and retain595 history. Do not transfer this to0ede or upcoming main UI bytes, business resume, native or target activation."
+  },
+  "eIndependentGateControls": {
+    "commandForm": "node --input-type=module heredoc in E checkout; import actual evaluateRelease/tier/resolveFixtureDigest, clone recorded full reports, use each recorded checkedAt to isolate evidence semantics",
+    "exitCode": 0,
+    "cases": [
+      { "id": "complete_actual_a9b_162_required_positive", "expected": "PASS", "actual": "PASS" },
+      { "id": "complete_real595_161_required_recorded_positive", "expected": "PASS", "actual": "PASS" },
+      { "id": "missing_process_observations", "expected": "REFUSE", "actual": "REFUSE", "reason": "reviewReuse_invalid process" },
+      { "id": "missing_digest_observations", "expected": "REFUSE", "actual": "REFUSE", "reason": "reviewReuse_invalid digest" },
+      { "id": "different_selection_RUNNING_same_pid_without_reused_flag", "expected": "REFUSE", "actual": "REFUSE", "reason": "reviewReuse_invalid differentFile" },
+      { "id": "missing_different_selection_refusal", "expected": "REFUSE", "actual": "REFUSE", "reason": "reviewReuse_invalid differentFile" },
+      { "id": "missing_diagnostic_consumer_provenance", "expected": "REFUSE", "actual": "REFUSE", "reason": "scopeDiagnostics_invalid consumer_provenance" },
+      { "id": "actual_foreign0ede_tuple_and_packaged_consumer_hashes_on_a9b_data", "expected": "REFUSE", "actual": "REFUSE", "reason": "reviewReuse_invalid consumer_provenance" },
+      { "id": "self_declared_unsupported_digest_on_known_supported_a9b", "expected": "REFUSE", "actual": "PASS" },
+      { "id": "negative_withheldSourceCount", "expected": "REFUSE", "actual": "PASS" }
+    ],
+    "oldFourOmissionContradictionCases": "CLOSED_4_OF_4",
+    "newResidualScope": "Two pure acceptance-validator gaps; actual recorded a9b observations are complete and valid, no product authorization bypass demonstrated"
+  },
+  "dSameStoreMeasuredProgress": {
+    "report": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave23/same-store-dual.json",
+    "originalWorkQuestionAnswerAttemptNativeAppliedIdsAsserted": true,
+    "actualWorkflowSnapshotCreateAndVerify": [1, 2],
+    "restorePathActuallyUsed": "One portability bundle restore to the reviewed second root",
+    "restoredDatabaseShaComparedToBothSnapshotDatabases": true,
+    "actualSeparateWorkflowSnapshotRestoreConsumers": false,
+    "scope": "Now proves original data identity preservation through one bundle restore, with both workflow snapshot producers verified and byte-equivalent. It does not run two independent format-specific snapshot restore paths.",
+    "driverDependency": "Still separate D script using package/main HTTP and readonly SQL assertions; A/C shared parameterized producer/consumer is not composed by this script. Avoid requiring development-only drivers to be shipped as runtime just to declare them present.",
+    "diagnosticLimit": "The script still records .withheld rather than actual .withheldSourceCount and primarily checks the protocol; E has stronger actual diagnostic assertions."
+  },
+  "dOwnershipPureControls": {
+    "commandForm": "node --experimental-test-module-mocks --input-type=module heredoc; mock node:child_process.spawnSync ps observations before importing actual D tools/distribution/lib/live-cleanup.mjs",
+    "exitCode": 0,
+    "realPsCalls": 0,
+    "realSignals": 0,
+    "cases": [
+      { "id": "complete_own_launcher_and_api_positive", "actualOwned": true, "expectedOwned": true },
+      { "id": "api_actual_start_conflicts_with_recorded_apiProcessStart", "actualOwned": true, "expectedOwned": false },
+      { "id": "actual_sibling_data_and_config_paths_share_requested_prefix", "actualOwned": true, "expectedOwned": false },
+      { "id": "cleanup_with_unknown_null_record", "actual": "CLEAN_EMPTY_NOT_RETAINED", "expected": "UNKNOWN_RETAINED" }
+    ],
+    "safety": "No user or probe process was signalled; observations are fully injected private protocol fixtures"
+  },
+  "findings": [
+    {
+      "id": "D_PRE_RECORD_STARTUP_FAILURE_STILL_DELETES_ROOT",
+      "priority": "P1_PROBE_SAFETY_ONLY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-same-store-dual-personal.mjs",
+      "line": 79,
+      "summary": "The new finally handles failures after a healthy start, but spawn is not registered until after waitHealth. A health timeout throws with seedEvidence/reviewEvidence still null, so finally sees an empty resource list and deletes the root while an unrecorded process may remain.",
+      "evidence": "seed spawn79, health failure82, evidence assignment83; review spawn160/failure163/assignment164; reopen spawn222/failure225/assignment227. finally245 filters null evidence and removes root255 when no retained entry exists. nonempty spawn76/failure79/cleanup registration80 and real-business health-null born assignment94 have the same window.",
+      "next": "Register exact probe-born process handle/start/root/config/operation before readiness waits, retain UNKNOWN resources/material through missing instance-record windows, and inject independent health/pre-record failures before any broad live rerun."
+    },
+    {
+      "id": "D_CLEANUP_OWNERSHIP_NOT_EXACT_OR_FRESH",
+      "priority": "P1_PROBE_SAFETY_ONLY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/lib/live-cleanup.mjs",
+      "line": 45,
+      "summary": "Child ownership compares every process to the launcher's start within2seconds and ignores recorded apiProcessStart; substring argv checks accept sibling data/config paths. Complete proof is then reused after a CLI stop and waits before direct signals.",
+      "evidence": "Pure mocked positive passes; wrong recorded child start and actual sibling data/config paths are both owned=true. records.filter(Boolean) also maps an unknown null entry to CLEAN empty output. Lines73-77 signal the old PID set without re-reading independent identities immediately before each signal.",
+      "next": "Bind each child to independently captured exact start/UID/argv/root/config/operation; parse command arguments or trusted structured identity rather than substring matching. Revalidate before signals, keep unknowns nonempty, and prove full own positive plus stale child/sibling/recycled/pre-record negatives. No global scans."
+    },
+    {
+      "id": "E_UNSUPPORTED_DIGEST_DECLARATION_IS_SELF_AUTHORIZED",
+      "priority": "P2_ACCEPTANCE_TOOL_SCOPE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "line": 473,
+      "summary": "For the known digest-supporting a9b subject, deleting digest observations and setting packageDigestSupported=false plus any digestScope still passes full installed-alpha.",
+      "next": "Resolve support from immutable package capability/evidence for the exact subject; an evidence object's self-declaration cannot downgrade the required observation. Keep genuinely unsupported historical package scope explicit."
+    },
+    {
+      "id": "E_DIAGNOSTIC_COUNT_MISSING_LOWER_BOUND",
+      "priority": "P2_ACCEPTANCE_TOOL_SCOPE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "line": 396,
+      "summary": "scopeDiagnosticsIssues accepts negative safe-integer withheldSourceCount; mutating the actual complete a9b report to-1 still passes full installed-alpha.",
+      "next": "Validate the actual shared bounded diagnostic schema, including nonnegative/bounded count and valid distinct reasons, while preserving null for unknown. No production permission bypass is inferred."
+    }
+  ],
+  "nextLargePackages": {
+    "D": [
+      "Close the actual pre-record startup window and exact/fresh child identity before rerunning live probes",
+      "Consume A independent producer and C single bounded/identity-bound driver; preserve original business IDs through both actual snapshot consumer paths or name the single-bundle equivalence scope precisely",
+      "Keep CLI help discoverability and current complete source closure; main can admit the one-file help slice independently",
+      "Keep0ede immutable and hand accurate bytes to E; consume upcoming main diagnostic UI source only after its actual checkpoint, then freeze only changed runtime bytes",
+      "Deliver exact same-package reopen/upgrade/support results with private retained failure material and no user-resource cleanup"
+    ],
+    "E": [
+      "Preserve measured a9b162-required and595161-required ordinary scopes and keep the four old omission fixes closed",
+      "Bind unsupported-capability exceptions to the immutable subject and validate the bounded diagnostic schema",
+      "Independently consume accurate0ede or a necessary later main UI package; never relabel a9b evidence as new bytes",
+      "Use the shared producer/consumer recipe for original Broker/SDK data and actual dual-format restore, with exact installed consumer provenance",
+      "Measure only new UI/ordinary restore/install boundaries and finite stability; native/business resume/private target/value stay separate"
+    ]
+  },
+  "safety": {
+    "realModelTurns": 0,
+    "nativeTurnStarts": 0,
+    "vendorSends": 0,
+    "liveInstallationOrStopMatricesRun": 0,
+    "userServicesRestartedOrStopped": false,
+    "oldStatesProfilesTarsLedgersAndERunsPreserved": true,
+    "candidateSourceOrAcceptanceAssertionsEdited": false,
+    "packageOnlyCommands": "Three help invocations; no launcher daemon startup"
+  }
+}
