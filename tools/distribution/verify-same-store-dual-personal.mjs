@@ -15,7 +15,7 @@ import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
 import { cleanupBornResources, registerSpawn, supplementBornRecord } from './lib/live-cleanup.mjs'
 
-const { values } = parseArgs({ options: { install: { type: 'string' }, business: { type: 'string' }, fault: { type: 'string' }, json: { type: 'boolean', default: false } } })
+const { values } = parseArgs({ options: { install: { type: 'string' }, business: { type: 'string' }, fault: { type: 'string' }, keep: { type: 'boolean', default: false }, json: { type: 'boolean', default: false } } })
 const root = mkdtempSync(join(tmpdir(), 'pa-same-store-'))
 chmodSync(root, 0o700)
 const evidence = { protocol: 'wave22-same-store-dual/1', status: 'FAIL', steps: [], nativeTurns: 0, vendorSends: 0,
@@ -273,6 +273,7 @@ finally {
   evidence.cleanup = cleanups
   const retained = cleanups.some((item) => item.retained)
   if (retained) evidence.retainedRoot = root
+  else if (values.keep) { evidence.keptRoot = root; evidence.keptReviewState = join(root, 'reviewed', 'state') }
   else rmSync(root, { recursive: true, force: true })
 }
 process.stdout.write(`${JSON.stringify(evidence, null, 2)}\n`)

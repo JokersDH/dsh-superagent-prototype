@@ -43,7 +43,7 @@ node tools/distribution/smoke.mjs --keep-root <new>
 - 安装 UI 字节包含 `?scopeReview=1`、`withheldSourceCount`、原因列表和 `context-scope-review/1`；同 Store 实际 `scopeReview=1` 返回真实字段。
 - 同 Store 原 Work/question/answer/attempt/native_applied + SDK candidates、双 snapshot create/verify、原 ID 保留。
 - 独立恢复：`snapshot/1` 与 `/2` 各自 materialize→独立 bundle→包内 `pa restore` 到不同 root；各自恢复 DB sha 等于对应 snapshot manifest DB sha，原 Work/question/answer ID 保留。bundle evidence format 仍为2（routing tables 存在），这与 snapshot protocol 不同，不得混称。
-- A/C 独立 driver 不在包内；当前 main HTTP consumer 只能作普通同包证据，NOT_TESTED。
+- C 唯一 driver 已在 exact frozen install + kept same-Store review root 上 verified-flow（health/digest/history/source/scopeReview）；A 独立 reader 入口不在当前分支，A+C 组合仍 NOT_TESTED。
 - 真实 vendor/native 0；私有 permission/target、跨平台/ABI、真实计费未测。
 
 ## 4) 限制
