@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-24/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-25/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "4e805de",
-  "checkpoint": "b0da93c",
+  "base": "11002b8",
+  "checkpoint": "4a1fd7d",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -18,82 +18,130 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Fixed positives and layered scope",
+      "title": "Fixed positives and original scopes",
       "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
       "notes": [
-        "The recorded 595 report and the measured a9b 208/0/15 (162 required) stay as historical scopes evaluated at their recorded sets; the current 0ede run is the new positive. Module/controlled/ordinary-installed/recovered/native/value stay separate."
+        "The complete 0ede report and historical 595/a9b reports stay as measured positives; module/controlled/ordinary-installed/UI/recovery/native/value remain separate."
       ]
     },
     {
       "id": "E2",
-      "title": "Capability bound to immutable bytes",
+      "title": "Real opt-in HTTP success",
       "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
       "notes": [
-        "The format case derives digest support from the frozen package start/demo bytes; review reuse must agree with that same subject/capability. A self-reported unsupported flag or deleted digest observation on a supporting package is rejected; an unsupported historical package needs its own identity and scope."
+        "Both plain and narrow scope diagnostics require an actual HTTP 200 together with the bounded payload; 500/missing/201 or a stale payload is rejected on the recorded positive."
       ]
     },
     {
       "id": "E3",
-      "title": "Public bounded scope schema",
+      "title": "Tuple, capability and consumer provenance",
       "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
       "notes": [
-        "scopeReview is checked against the public semantics: protocol, authorization none, partial consistent with state, withheld count non-negative/safe/within 64 and equal to the binding source count on scope_changed, at most seven distinct known reasons. Negative/overflow counts, duplicate/unknown reasons, wrong authorization and missing fields are rejected."
+        "Every required installed case binds subject and consumer package/file hashes read from the tar; capability facts come from package bytes and must agree across cases."
       ]
     },
     {
       "id": "E4",
-      "title": "Accurate 0ede package and consumer bytes",
+      "title": "First milestone complete gate",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Target is 0ede11d/build1eb8733c8b1729bc/tar d0398897…/20247278 bytes with a9b as the safety baseline; every required case binds subject, consumer package and four consumer file hashes read from the package."
+        "The real 0ede positive, HTTP/status omissions and capability/schema/tuple/consumer controls are in the recorded set with exact codes and case attribution."
       ]
     },
     {
       "id": "E5",
-      "title": "Independent resource gate",
+      "title": "Accurate 3b package",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "D live cleanup scripts are not run while its pre-registration/child-identity/root-boundary gate is not independently passed; safe byte/gate/UI-preparation lanes continue and only probe-owned resources are ever signalled."
+        "Target is 3b2ff68/build470738fd33b22ff4/tar f04abb1b… with 0ede as the safety baseline; tuple, consumer files, schema/ABI and mode/operation come from the extracted package."
       ]
     },
     {
       "id": "E6",
-      "title": "Latest UI and CLI",
+      "title": "D resource gate isolated",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "0ede console bytes preserve the backend opt-in but do not contain the 0062 scope-review UI marker, so packaged UI interaction is NOT_REACHED; backend four-state projection, explicit opt-in and narrowed restart are measured on the same bytes. CLI review-restored help is exercised by the package."
+        "D live cleanup scripts are not run until its fresh pre-signal/child identity/root gate is independently passed; only probe-owned resources are signalled."
       ]
     },
     {
       "id": "E7",
-      "title": "Two independent snapshot restores",
+      "title": "UI and readiness",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Default v1 and explicit v2 snapshots are created/verified over the same restored store and the package personal consumer reads the original Work/Q&A/context/candidate data; the full A-producer plus C-single-driver two-root chain remains a separate NOT_REACHED while those ports are unadmitted. Business writes 422, queues held, provider unchanged."
+        "3b contains the 4b console marker but the package entry predates GET /v1/readiness; both are recorded as NOT_REACHED rather than inferred."
       ]
     },
     {
       "id": "E8",
-      "title": "Ordinary install, reuse and upgrade",
+      "title": "Second milestone user closure",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
       "notes": [
-        "Cold/reuse/no-executor/multi-state, a9b→0ede and 16→18, same-file REUSED with PID/start/digest, different/missing/port/unbound refusals with a BLOCKED code and unchanged PID, tamper refusal and post-upgrade data kept."
+        "The package-consumer review flow is exercised end to end for reachable surfaces; unrecorded UI/readiness stay NOT_REACHED."
       ]
     },
     {
       "id": "E9",
-      "title": "Bounded usability and resource return",
+      "title": "A to C data driver",
       "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
       "notes": [
-        "Limited SSE/read/reopen/concurrent readonly sequences return provider/queue/count baselines; no long soak, cross-machine or cross-ABI claim, and no global socket scans."
+        "The A producer manifest and C single driver are not admitted; the A→C two-snapshot chain stays NOT_REACHED while the package chain is measured."
       ]
     },
     {
       "id": "E10",
-      "title": "Layered final verdict",
+      "title": "Two snapshot restores",
       "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
       "notes": [
-        "wave24-status records the 0ede subject/consumer, the capability and scope-schema controls, the measured 595/a9b history, the UI NOT_REACHED and the separate native/private/target/value blockers. Required set is never relaxed for release claims."
+        "Default v1 and explicit v2 are created/verified over the same store and read by the package consumer; independent A→C restores stay NOT_REACHED."
+      ]
+    },
+    {
+      "id": "E11",
+      "title": "Install, reuse and upgrade",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E11",
+      "notes": [
+        "Cold/reuse/no-executor/multi-state, 0ede→3b and 16→18, same-file REUSED, refusals with BLOCKED codes and unchanged PID, tamper and post-upgrade data."
+      ]
+    },
+    {
+      "id": "E12",
+      "title": "Third milestone required result",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E12",
+      "notes": [
+        "The non-native ordinary/UI/readiness/recovery/install result is reported against the exact 3b tuple; full-product/native/value stay refused."
+      ]
+    },
+    {
+      "id": "E13",
+      "title": "Bounded stability",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E13",
+      "notes": [
+        "Limited SSE/reconnect/reopen/concurrent readonly sequences return provider/queue/count baselines; no soak or global socket scans."
+      ]
+    },
+    {
+      "id": "E14",
+      "title": "H original observations",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E14",
+      "notes": [
+        "H operational samples are inputs only; E validates source/tar/root/duration/redaction and rejects missing fields or cross-package samples."
+      ]
+    },
+    {
+      "id": "E15",
+      "title": "Trial materials and ownership",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E15",
+      "notes": [
+        "Support material privacy and readiness wording are checked separately; defects go to owners without changing the required set."
+      ]
+    },
+    {
+      "id": "E16",
+      "title": "Fourth milestone final verdict",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E16",
+      "notes": [
+        "wave25-status records the exact subject/consumer, the HTTP gate, the reachable user flow and explicit NOT_REACHED scopes."
       ]
     }
   ]

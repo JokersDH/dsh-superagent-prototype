@@ -520,7 +520,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第二十四轮交付交接
+const handoff = `# Agent E 第二十五轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -1011,8 +1011,10 @@ if (!existsSync(join(reports, 'wave23-status.json')))
     artifactTuple,
   }, null, 2) + '\n',
 )
-writeFileSync(
-  join(reports, 'wave24-status.json'),
+// wave24-status.json is a frozen historical input; wave-25 supersedes it and must not rewrite it.
+if (!existsSync(join(reports, 'wave24-status.json')))
+  writeFileSync(
+    join(reports, 'wave24-status.json'),
   JSON.stringify({
     ...executionStatus,
     schema: 'product-acceptance-wave24-status/1',
@@ -1107,7 +1109,98 @@ writeFileSync(
     artifactTuple,
   }, null, 2) + '\n',
 )
-// Historical wave06-23 status files are frozen inputs; wave24 supersedes them.
+writeFileSync(
+  join(reports, 'wave25-status.json'),
+  JSON.stringify({
+    ...executionStatus,
+    schema: 'product-acceptance-wave25-status/1',
+    taskPackage: 'agent-tasks/product-wave-25/README.zh-CN.md',
+    supersedes: 'wave24-status.json',
+    subject: { target: byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target ?? null,
+      baseline: byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade?.baseline ?? null,
+      control: byId.get('E5-D-OWNERSHIP-MOCKS')?.evidence?.ownershipMocks?.previousPackageHelper ?? null },
+    gateControls: {
+      recorded0edePositive: byId.get('W24-REAL-0EDE-POSITIVE')?.status ?? 'MISSING',
+      optInHttp: ['W24-DIAG-OPTIN-500', 'W24-DIAG-OPTIN-MISSING', 'W24-DIAG-OPTIN-NON200', 'W24-DIAG-NARROW-500']
+        .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+      recorded595Positive: byId.get('W23-REAL-595-POSITIVE')?.status ?? 'MISSING',
+      capabilityAndSchema: ['W24-CAPABILITY-SELF-DOWNGRADE', 'W24-MISSING-DIGEST', 'W24-DIAG-WITHHELD-NEGATIVE',
+        'W24-DIAG-WITHHELD-OVERFLOW', 'W24-DIAG-DUPLICATE-REASON', 'W24-DIAG-INVALID-REASON', 'W24-DIAG-AUTHORIZATION',
+        'W24-DIAG-MISSING-FIELD', 'W24-DIAG-WITHHELD-MISMATCH'].map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+      foreignConsumer: byId.get('W23-REAL-FOREIGN-CONSUMER')?.status ?? 'MISSING',
+    },
+    layers: {
+      source: 'source-checkout results stay source-level and never back an installed claim',
+      fixture: 'fixture+recovery_readonly second root is its own layer, not personal',
+      ordinaryInstalled: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
+      installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      recoveredPersonal: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
+      sourceUi: byId.get('E6-SOURCE-UI')?.status ?? 'MISSING',
+      readiness: byId.get('E7-READINESS')?.status ?? 'MISSING',
+      native: 'NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate',
+      value: 'BLOCKED: review pilot unchanged',
+    },
+    scopes: {
+      workflowFormats: { status: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
+        capability: byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.capability ?? null,
+        packageCapabilities: byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.packageCapabilities ?? null },
+      secondRootFixtureReadonly: { status: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING', probeScope: 'fixture+recovery_readonly' },
+      restoredPersonalReview: { status: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
+        consumerOrigin: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview?.consumerEntry?.origin ?? null,
+        healthDigest: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview?.healthDigest ?? null },
+      restoredReviewRefusals: byId.get('E5-RESTORED-REVIEW-REFUSALS')?.status ?? 'MISSING',
+      reviewReuse: { status: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.status ?? 'MISSING',
+        sameFile: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.outcomes?.sameFile?.status ?? null,
+        differentFile: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.outcomes?.differentFile?.status ?? null,
+        digestSame: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.sameDigest === byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse?.healthDigest },
+      scopeDiagnostics: { status: byId.get('E7-SCOPE-DIAGNOSTICS')?.status ?? 'MISSING',
+        plainHttp: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics?.plain?.optIn ?? null,
+        narrowHttp: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics?.narrow?.optIn ?? null,
+        optInProtocol: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics?.plain?.diagnostic?.protocol ?? null },
+      sourceUi: byId.get('E6-SOURCE-UI')?.status ?? 'MISSING',
+      readiness: byId.get('E7-READINESS')?.status ?? 'MISSING',
+      twoSnapshotSameChain: 'NOT_REACHED: the A producer manifest and C single package driver are not admitted',
+      installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
+      installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
+      missingArtifactTerminal: byId.get('E4-INSTALL-TAMPER')?.evidence?.tamperTerminal ?? null,
+      privatePermissionTarget: 'NOT_REACHED: private startup permission and target activation remain main scope',
+      bBusinessRecovery: 'NOT_TESTED: B control source is not admitted as business resume',
+    },
+    retainedHistory: {
+      measured0ede: '223 PASS / 0 FAIL / 16 NOT_TESTED at the recorded 162-required scope',
+      measured595: '200 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 161-required scope',
+      measuredA9b: '208 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 162-required scope',
+      e4eFailure: 'wave22 e4e run kept its honest reuse FAIL',
+      sourceOnly: 'wave20 revoked source-level review PASS stays revoked',
+    },
+    requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
+      ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
+      installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
+      installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
+      installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
+      workflowFormats: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
+      personalReview: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
+      reviewRefusals: byId.get('E5-RESTORED-REVIEW-REFUSALS')?.status ?? 'MISSING',
+      reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.status ?? 'MISSING',
+      scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.status ?? 'MISSING',
+      currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
+      upgradeFaults: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
+      upgradeRollback: byId.get('E4-UPGRADE-ROLLBACK')?.status ?? 'MISSING' } },
+    finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record',
+      exitCode: 0, source: report.source },
+    commands: stages.stages.map(stage => ({ id: stage.id, command: stage.command })),
+    personalReview: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview ?? null,
+    reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse ?? null,
+    scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics ?? null,
+    counts: report.counts,
+    testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
+    productSource: { commit: artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? null },
+    mainSource: { commit: stages.base, schema: byId.get('E6-ARTIFACT-CURRENT-SCOPE')?.evidence?.frozenScope?.main?.schema ?? null },
+    artifactTuple,
+  }, null, 2) + '\n',
+)
+// Historical wave06-24 status files are frozen inputs; wave25 supersedes them.
 
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 
