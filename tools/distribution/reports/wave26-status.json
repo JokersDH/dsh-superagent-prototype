@@ -27,7 +27,7 @@
     },
     "d5": {
       "status": "PASS_DEV_CHAIN",
-      "summary": "A uncommitted content-proof implementation and C wave26-target-proof dev tool ran on v1/v2 separate restore roots: target proof ok, legal target-only message drift mismatch for both formats, original A reader verifies. LIMIT: C target-proof is not installed package consumer; A changes uncommitted/unbuilt."
+      "summary": "A uncommitted content-proof implementation and C wave26-target-proof dev tool ran on v1/v2 separate restore roots: target proof ok, legal target-only message drift mismatch for both formats, original A reader verifies. LIMIT: C target-proof is not installed package consumer; A changes uncommitted/unbuilt. C package driver now exposes manifest mode (--manifest-db/--manifest-expectation/--a-module/--root-map) and target proof; source capability observed but not executed this round."
     },
     "d6": {
       "status": "NOT_REACHED_PACKAGE_CONSUMER",

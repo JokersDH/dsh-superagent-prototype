@@ -1,0 +1,21 @@
+{
+  "protocol": "wave26-c-package-manifest-mode/1",
+  "status": "SOURCE_CAPABILITY_OBSERVED_NOT_EXECUTED",
+  "cDriver": "/Users/hh/Desktop/joker/superagent-agent-c/packages/context/tools/personal-review-driver.mjs",
+  "cDriverSha256": "2723f10719fa53b1480bbd9c78e5d998096e8cf8db2097d65589c8fc7338cb88",
+  "cDriverHead": "4f8e2cd",
+  "observed": [
+    "--manifest-db",
+    "--manifest-expectation",
+    "--a-worktree",
+    "--a-module",
+    "--root-map",
+    "--manifest-output",
+    "target proof via wave26-target-proof.mjs before content return",
+    "manifest coverage complete/root mapping checks"
+  ],
+  "notRun": [
+    "no restored root carrying A restore-report was produced this round",
+    "installed package C driver manifest-mode invocation not executed"
+  ]
+}
