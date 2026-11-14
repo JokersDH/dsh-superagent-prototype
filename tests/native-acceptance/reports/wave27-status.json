@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "de74e66",
+  "base": "c18759d",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -165,5 +165,12 @@
       "B27-ACK-SAME-QUESTION-AND-ATTEMPT - the same question, attempt and binding carry the answer, with no second question created"
     ],
     "correction": "the first assertion expected the answered question to remain in the pending projection; it empties after answering, so the durable user_questions row is what proves the chain stayed on one question"
+  },
+  "item5_candidateProbe": {
+    "harness": "tests/native-acceptance/b27-ack-windows.mjs",
+    "result": "5 PASS / 0 FAIL / 2 NOT_TESTED",
+    "finding": "the fake-executable product lane reaches one Work, one attempt, a Broker question and the recorded answer, but produces only writer.observed, policy.prepared, dispatch.observed and question.opened facts: there is NO candidate.observed fact and NO candidates row, so no current candidate exists to accept",
+    "consequence": "B13 current candidate and B14 explicit accept stay NOT_REACHED on this lane; the harness names the missing producer instead of fabricating a candidate or writing an accepted field",
+    "whatWouldUnblock": "a lane whose registered verifier/check actually runs and produces candidate.observed for the recovered attempt"
   }
 }

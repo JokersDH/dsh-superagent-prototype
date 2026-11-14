@@ -185,6 +185,31 @@ try {
     log.pass(`the same question ${question.id} and attempt ${attemptId} carry the answer and the binding, with no second question created`)
   } else log.fail(`the chain split: ${JSON.stringify({ attemptId, binding: binding?.attemptId ?? null, durable, pendingCount })}`)
 
+  log.begin('B27-CANDIDATE-AND-ACCEPT', 'a current candidate exists before any accept is attempted', 'controlled_process')
+  const kinds = attemptId ? store.observations.forAttempt(String(attemptId)).map(row => String(row.kind)) : []
+  const candidateRows = (() => { try { return store.db.prepare('SELECT COUNT(*) AS n FROM candidates').get().n } catch { return null } })()
+  let accepted = null, acceptError = null
+  const candidateRef = (() => {
+    try {
+      const row = store.db.prepare('SELECT id FROM candidates LIMIT 1').get()
+      return row ? { candidateId: String(row.id), workId: String(created.workId) } : null
+    } catch { return null }
+  })()
+  if (candidateRef) {
+    try { accepted = await command({ kind: 'accept_candidate', candidate: { kind: 'candidate', ...candidateRef } }) }
+    catch (error) { acceptError = String(error?.message ?? error).slice(0, 220) }
+  }
+  log.evidence({ observationKinds: kinds, candidateRows, candidateRef, accepted: accepted?.status ?? null, acceptError })
+  if (candidateRef && accepted?.status === 'recorded') {
+    log.pass(`the current candidate ${candidateRef.candidateId} was explicitly accepted on work ${created.workId}`)
+  } else if (!candidateRef) {
+    // Honest boundary: no candidate producer ran on this lane, so an accept cannot be observed and none was
+    // fabricated. The missing producer fact is named instead.
+    log.notTested(`no candidate row was produced on this lane (observation kinds: ${[...new Set(kinds)].join(', ') || 'none'}), so B14 explicit accept and B13 current candidate stay NOT_REACHED here`)
+  } else {
+    log.fail(`a candidate existed but the accept was not recorded: ${JSON.stringify({ accepted: accepted?.status ?? null, acceptError })}`)
+  }
+
   log.begin('B27-SCOPE-NOT-NATIVE', 'fake executable lane; installed Codex not executed', 'controlled_process')
   log.evidence({ driver: 'CodexProductDriver (unmodified)', executable: 'B-owned fake app-server process', installedCodexExecuted: false })
   log.notTested('an installed Codex was not executed and no gateway was contacted')
