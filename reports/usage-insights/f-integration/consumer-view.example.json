@@ -26,7 +26,7 @@
     {
       "id": "interventions.acceptances@product",
       "label": "接受事实",
-      "value": "2 count",
+      "value": "2",
       "detail": "样本 2，未知 0，覆盖 完整",
       "unit": "count",
       "layer": "observed",
@@ -35,7 +35,7 @@
     {
       "id": "interventions.answers@product",
       "label": "明确回答",
-      "value": "2 count",
+      "value": "2",
       "detail": "样本 2，未知 0，覆盖 完整",
       "unit": "count",
       "layer": "observed",
@@ -44,7 +44,7 @@
     {
       "id": "interventions.questions@product",
       "label": "提出问题",
-      "value": "2 count",
+      "value": "2",
       "detail": "样本 2，未知 0，覆盖 完整",
       "unit": "count",
       "layer": "observed",
@@ -53,7 +53,7 @@
     {
       "id": "interventions.total@product",
       "label": "人工介入事实",
-      "value": "6 count",
+      "value": "6",
       "detail": "样本 2，未知 0，覆盖 完整",
       "unit": "count",
       "layer": "observed",
@@ -62,7 +62,7 @@
     {
       "id": "outcomes.accepted@controlled",
       "label": "已接受交付",
-      "value": "2 count",
+      "value": "2",
       "detail": "样本 2，未知 0，覆盖 完整，层级 controlled",
       "unit": "count",
       "layer": "controlled",
@@ -71,7 +71,7 @@
     {
       "id": "outcomes.count@controlled",
       "label": "已观察执行次数",
-      "value": "2 count",
+      "value": "2",
       "detail": "样本 2，未知 0，覆盖 完整，层级 controlled",
       "unit": "count",
       "layer": "controlled",

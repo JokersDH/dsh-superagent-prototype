@@ -99,7 +99,9 @@ const unitLabel = (row: MetricRow): string => {
 const formatValue = (row: MetricRow): string | null => {
   if (row.value === null) return null
   const value = Number.isInteger(row.value) ? String(row.value) : String(Math.round(row.value * 1000) / 1000)
-  return `${value} ${unitLabel(row)}`
+  // A count is rendered as a bare number: the row label already names what is counted, and the unit
+  // field carries the machine-readable unit. Durations, tokens and money keep their unit.
+  return row.unit === 'count' ? value : `${value} ${unitLabel(row)}`
 }
 
 const coverageText = (coverage: string): string =>
