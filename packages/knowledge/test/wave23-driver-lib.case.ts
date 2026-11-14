@@ -3,7 +3,7 @@ import { test } from 'node:test'
 import { spawn } from 'node:child_process'
 import { createServer } from 'node:net'
 // @ts-expect-error - the driver primitive module is plain JavaScript.
-import { DriverError, applyCleanupOutcome, httpJson, logSink, remaining, stopChild, waitUntil } from '../../context/tools/driver-lib.mjs'
+import { DriverError, REQUIRED_PACKAGE_CHECKS, applyCleanupOutcome, httpJson, logSink, remaining, stopChild, validatePackageIdentity, waitUntil } from '../../context/tools/driver-lib.mjs'
 
 const sleep = (ms: number) => new Promise((done) => setTimeout(done, ms))
 
@@ -97,4 +97,46 @@ test('an owned stop failure downgrades verified success while reuse and keep sta
   assert.equal(kept.status, 'verified-flow')
   const noCleanup = applyCleanupOutcome({ status: 'observed', verified: false, cleanup: { attempted: true, owned: true, stopped: false, detail: 'x' } })
   assert.equal(noCleanup.status, 'observed')
+})
+
+test('package identity requires every launcher/API field and check with no optional shortcut', () => {
+  const checks = REQUIRED_PACKAGE_CHECKS.map((id: string) => ({ id, ok: true }))
+  const instance = { pid: 10, processStart: 'start', apiPid: 11, apiProcessStart: 'api-start', state: '/state', install: '/install',
+    configRoot: '/config', mode: 'personal', startupMode: 'recovery_readonly', apiURL: 'http://127.0.0.1:5000',
+    apiArgv: ['node', 'pa.mjs', 'start', '--review-restored-scope', '/review.json'],
+    launcherArgv: ['node', 'pa.mjs', 'start'] }
+  const expected = { instance, checks, expectedState: '/state', expectedInstall: '/install', expectedConfigRoot: '/config',
+    expectedReview: '/review.json', expectedApiPort: 5000 }
+  assert.deepEqual(validatePackageIdentity(expected), { ok: true, missing: [], mismatches: [] })
+  for (const field of ['pid', 'apiPid', 'processStart', 'apiProcessStart']) {
+    const copy = structuredClone(instance) as Record<string, unknown>; delete copy[field]
+    const result = validatePackageIdentity({ ...expected, instance: copy })
+    assert.equal(result.ok, false, field)
+    assert.ok(result.missing.includes(field), field)
+  }
+  const noChecks = validatePackageIdentity({ ...expected, checks: [] })
+  assert.equal(noChecks.ok, false)
+  assert.ok(noChecks.missing.includes('check:launcher_alive'))
+  const partialChecks = validatePackageIdentity({ ...expected, checks: checks.filter((check: { id: string }) => check.id !== 'api_process_start') })
+  assert.equal(partialChecks.ok, false)
+  assert.ok(partialChecks.missing.includes('check:api_process_start'))
+  for (const [label, patch, key] of [
+    ['processStart', { processStart: 'other' }, 'check:process_start'],
+    ['apiProcessStart', { apiProcessStart: 'other' }, 'check:api_process_start'],
+    ['state', { state: '/other-state' }, 'state'],
+    ['install', { install: '/other-install' }, 'install'],
+    ['configRoot', { configRoot: '/other-config' }, 'configRoot'],
+    ['argv', { apiArgv: ['node', 'pa.mjs', 'start'], launcherArgv: ['node', 'pa.mjs', 'start'] }, 'reviewArgv'],
+  ] as const) {
+    const copy = { ...instance, ...patch }
+    const mutatedChecks = checks.map((check: { id: string; ok: boolean }) =>
+      (label === 'processStart' && check.id === 'process_start') || (label === 'apiProcessStart' && check.id === 'api_process_start')
+        ? { ...check, ok: false } : check)
+    const result = validatePackageIdentity({ ...expected, instance: copy, checks: mutatedChecks })
+    assert.equal(result.ok, false, label)
+    assert.ok(result.missing.includes(key) || result.mismatches.includes(key), label)
+  }
+  const wrongStart = validatePackageIdentity({ ...expected, checks: checks.map((check: { id: string; ok: boolean }) => check.id === 'api_process_start' ? { ...check, ok: false } : check) })
+  assert.equal(wrongStart.ok, false)
+  assert.ok(wrongStart.mismatches.includes('check:api_process_start'))
 })

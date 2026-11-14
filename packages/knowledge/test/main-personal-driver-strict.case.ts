@@ -202,7 +202,6 @@ test('the driver asserts a real user flow, binds the actual consumer and rejects
 
   // 6. Package dialect: the package review entry is actually used; a missing release is NOT_REACHED, never a checkout fallback.
   const pkg = run(restoredV1, await ports(), ['--dialect', 'package', '--pa-entry', paEntry, '--allow-not-reached'])
-  console.error('W24_PKG', JSON.stringify({code:pkg.code,status:pkg.json.status,failure:pkg.json.failure,cleanup:pkg.json.cleanup}))
   assert.equal(pkg.code, 4)
   assert.equal(pkg.json.status, 'NOT_REACHED')
   assert.equal(pkg.json.verified, false)

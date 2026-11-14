@@ -1,0 +1,17 @@
+TAP version 13
+W23_REUSED {"code":0,"status":"reused","record":{"protocol":"personal-workbench/1","pid":66653,"processStart":"Sat Nov 14 11:42:12 2026","apiPid":66654,"consolePid":66655,"consoleURL":"http://127.0.0.1:57633","apiURL":"http://127.0.0.1:57634","configurationRevision":"252e2ffad1960f2c9c13b5ee8319b8e515855c51e62762b79e0df32217607983","executionAvailability":{"state":"unavailable","reason":"recovery_readonly"},"restoredReviewDigest":"61cf760e2313aba3c51d1b10be37bcfb564ebb46cbe2ccf3cfb4b3152887ebc6","mode":"personal","access":"local-development"},"reusePorts":{"console":57633,"api":57634},"identity":{"requestedFile":"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave23-strict-91tpBZ/kept-selection.json","requestedDigest":"61cf760e2313aba3c51d1b10be37bcfb564ebb46cbe2ccf3cfb4b3152887ebc6","actualHealthDigest":"61cf760e2313aba3c51d1b10be37bcfb564ebb46cbe2ccf3cfb4b3152887ebc6","recordPid":66653,"childPid":66666,"stateRoot":"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave23-strict-91tpBZ/restored-v1","bound":true,"instanceProcessStart":null,"instanceApiPid":null,"instanceApiProcessStart":null},"cleanup":{"owned":false,"attempted":true,"stopped":false,"detail":"reused-left-running"}}
+# Subtest: the driver asserts a real user flow, binds the actual consumer and rejects every requested mismatch
+ok 1 - the driver asserts a real user flow, binds the actual consumer and rejects every requested mismatch
+  ---
+  duration_ms: 61749.950084
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 62032.913375

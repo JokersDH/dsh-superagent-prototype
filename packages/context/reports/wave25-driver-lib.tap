@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: a connected but silent peer is cancelled by the per-request budget
+ok 1 - a connected but silent peer is cancelled by the per-request budget
+  ---
+  duration_ms: 207.082792
+  type: 'test'
+  ...
+# Subtest: a half JSON body is an invalid response, not an empty success
+ok 2 - a half JSON body is an invalid response, not an empty success
+  ---
+  duration_ms: 4.921333
+  type: 'test'
+  ...
+# Subtest: readiness fails immediately on an entry that already exited and on deadline
+ok 3 - readiness fails immediately on an entry that already exited and on deadline
+  ---
+  duration_ms: 406.416125
+  type: 'test'
+  ...
+# Subtest: bounded logs keep only the tail and an elapsed deadline is rejected
+ok 4 - bounded logs keep only the tail and an elapsed deadline is rejected
+  ---
+  duration_ms: 0.160458
+  type: 'test'
+  ...
+# Subtest: cleanup escalates exactly once and leaves no owned child behind
+ok 5 - cleanup escalates exactly once and leaves no owned child behind
+  ---
+  duration_ms: 327.26075
+  type: 'test'
+  ...
+# Subtest: an HTTP error status is returned for the caller to assert instead of being treated as data
+ok 6 - an HTTP error status is returned for the caller to assert instead of being treated as data
+  ---
+  duration_ms: 2.912875
+  type: 'test'
+  ...
+# Subtest: an owned stop failure downgrades verified success while reuse and keep stay explicit
+ok 7 - an owned stop failure downgrades verified success while reuse and keep stay explicit
+  ---
+  duration_ms: 0.089375
+  type: 'test'
+  ...
+# Subtest: package identity requires every launcher/API field and check with no optional shortcut
+ok 8 - package identity requires every launcher/API field and check with no optional shortcut
+  ---
+  duration_ms: 0.351083
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 973.810375

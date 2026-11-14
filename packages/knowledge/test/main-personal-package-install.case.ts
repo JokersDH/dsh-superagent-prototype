@@ -2,10 +2,11 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { execFileSync, spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs'
+import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { createBundle, restoreBundle } from '../../../packages/portability/src/index.ts'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { buildPersonalChain, projectId, restoreSnapshot } from './helpers/personal-chain.ts'
+import { buildPersonalChain, projectId } from './helpers/personal-chain.ts'
 
 const packageTar = process.env.PA_WAVE24_PACKAGE ??
   '/Users/hh/Desktop/joker/pa-artifacts/wave23-target/wave23-target-0ede11d.tar.gz'
@@ -41,8 +42,34 @@ test('the exact frozen package truly starts, reuses and stops through the single
   const root = mkdtempSync(join(tmpdir(), 'pa-wave24-package-'))
   const install = join(root, 'install')
   const chain = await buildPersonalChain(root)
+  const staging = join(root, 'staging')
+  const restoreViaBundle = async (snapshot: { destination: string }, target: string) => {
+    mkdirSync(staging, { recursive: true, mode: 0o700 })
+    const stage = join(root, `stage-${target.split('/').at(-1)}`)
+    mkdirSync(stage, { recursive: true, mode: 0o700 })
+    copyFileSync(join(snapshot.destination, 'product.sqlite'), join(stage, 'state.sqlite'))
+    execFileSync('chmod', ['600', join(stage, 'state.sqlite')])
+    cpSync(join(snapshot.destination, 'artifacts'), join(stage, 'artifacts'), { recursive: true })
+    const bundle = join(root, `${target.split('/').at(-1)}.pa-backup`)
+    await createBundle({ stateDir: stage, outputPath: bundle, stagingRoot: staging })
+    return restoreBundle({ bundlePath: bundle, targetStateDir: target, stagingRoot: staging })
+  }
   const restored = join(root, 'restored')
-  restoreSnapshot(chain.v1, restored)
+  await restoreViaBundle(chain.v1, restored)
+  const restoredV2 = join(root, 'restored-v2')
+  await restoreViaBundle(chain.v2, restoredV2)
+  const aWorktree = process.env.PA_AGENT_A ?? '/Users/hh/Desktop/joker/superagent-agent-a'
+  const aModule = join(aWorktree, 'packages/workflows/src/data-manifest.ts')
+  const aHead = execFileSync('git', ['-C', aWorktree, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+  const expectation = join(root, 'expectation.json')
+  writeFileSync(expectation, JSON.stringify({ sourceSha: aHead, snapshotFormat: 1, dataRoot: chain.source,
+    ticketId: chain.ticketId, assignmentId: chain.assignmentId, attemptId: chain.attemptId, fenceEpoch: chain.fenceEpoch,
+    contract: chain.contract, questionId: chain.question.id, answerId: chain.answerId,
+    requiredCommandIds: ['w22-work', 'w22-answer'], requiredDispatch: [chain.dispatchWindows.written, chain.dispatchWindows.unknown],
+    requiredDeliveryTargets: [chain.deliveryTargetId] }, null, 2))
+  const expectationV2 = join(root, 'expectation-v2.json')
+  writeFileSync(expectationV2, JSON.stringify({ ...JSON.parse(readFileSync(expectation, 'utf8')), snapshotFormat: 2 }, null, 2))
+  const manifestOutput = join(root, 'manifest.json')
   t.after(async () => { await chain.model.close(); rmSync(root, { recursive: true, force: true }) })
   execFileSync('mkdir', ['-p', install])
   execFileSync('tar', ['-xzf', packageTar, '-C', install])
@@ -83,13 +110,16 @@ test('the exact frozen package truly starts, reuses and stops through the single
   assert.equal(paCall(['status', '--json']).status, 'STOPPED')
 
   const driver = new URL('../../context/tools/personal-review-driver.mjs', import.meta.url).pathname
-  const driverCall = (extra: string[], ports: { console: number; api: number }) => {
+  const driverCall = (extra: string[], ports: { console: number; api: number }, stateRoot = restored, format = 'v1', manifestExpectation = expectation) => {
     const stdout = execFileSync(process.execPath, [driver,
-      '--dialect', 'package', '--pa-entry', pa, '--install', app, '--state', restored, '--project', projectId,
+      '--dialect', 'package', '--pa-entry', pa, '--install', app, '--state', stateRoot, '--project', projectId,
       '--allow-path', 'src/', '--console-port', String(ports.console), '--api-port', String(ports.api),
       '--model-config', chain.model.file, '--config-root', roots.config,
       '--cache-root', roots.cache, '--logs-root', roots.logs, '--workspace-root', roots.workspace,
       '--work', chain.workId, '--question', chain.question.id, '--candidate-message', chain.sourceMessageId,
+      '--format', format, '--a-worktree', aWorktree, '--a-module', aModule, '--manifest-db', join(chain.source, 'state.sqlite'),
+      '--manifest-expectation', manifestExpectation, '--manifest-output', manifestOutput, '--root-map', `${chain.source}=${stateRoot}`,
+      '--replay-context-token', chain.contextToken, '--replay-confirm-token', chain.confirmToken,
       ...extra], { encoding: 'utf8', timeout: 300000 })
     return JSON.parse(stdout.trim().split('\n').at(-1)!) as Record<string, any>
   }
@@ -113,10 +143,51 @@ test('the exact frozen package truly starts, reuses and stops through the single
   assert.deepEqual(first.data.delivery?.statuses, ['native_applied'])
   assert.equal(first.data.chat, 422)
   assert.equal(first.data.candidatePrepare, 422)
+  assert.equal(first.data.replay?.contextToken, 422)
+  assert.equal(first.data.replay?.confirmToken, 422)
+  assert.equal(first.data.manifest?.protocol, 'wave24-data-manifest/1')
+  assert.equal(first.data.manifest?.subject.contract.workId, chain.workId)
+  assert.equal(first.data.manifest?.question.id, chain.question.id)
+  assert.equal(first.data.manifest?.answer.id, chain.answerId)
+  assert.deepEqual(first.data.manifest?.coverage, { commands: 'complete', dispatch: 'complete', observations: 'complete', deliveries: 'complete', payloads: 'complete' })
+  assert.equal(first.data.manifest?.roots.from, realpathSync(chain.source))
+  assert.equal(first.data.manifest?.roots.to, realpathSync(restored))
+  assert.equal(first.data.work?.id, chain.workId)
   assert.equal(first.cleanup.owned, true)
   assert.equal(first.cleanup.stopped, true)
   assert.equal(first.cleanup.detail, 'pa-stop-verified')
   assert.equal(paCall(['status', '--json']).status, 'STOPPED')
+  // The same exact package consumes the second real restore of the explicit v2 snapshot.
+  const v2Ports = { console: await availablePort(), api: await availablePort() }
+  const v2 = driverCall([], v2Ports, restoredV2, 'v2', expectationV2)
+  assert.equal(v2.status, 'verified-flow', JSON.stringify(v2.failure))
+  assert.equal(v2.verified, true)
+  assert.equal(v2.identity.bound, true)
+  assert.equal(v2.data.manifest?.roots.to, realpathSync(restoredV2))
+  assert.equal(v2.data.manifest?.subject.snapshotFormat, 2)
+  assert.equal(v2.data.sources?.state, 'verified')
+  assert.equal(v2.data.work?.phase, 'delivered')
+  assert.deepEqual(v2.data.delivery?.statuses, ['native_applied'])
+  assert.equal(v2.data.replay?.contextToken, 422)
+  assert.equal(paCall(['status', '--json', '--state', restoredV2]).status, 'STOPPED')
+
+  // A legal narrow selection on the same package keeps the original body gate and explains withholding.
+  const narrowFile = join(root, 'package-narrow.json')
+  paCall(['review-restored', '--json', '--state', restored, '--project', projectId, '--allow-path', 'src/narrow/', '--out', narrowFile])
+  const narrow = driverCall(['--review-file', narrowFile, '--expect-source-state', 'scope_changed', '--expect-candidates', 'none',
+    '--expect-reason', 'selection_narrowed'], { console: await availablePort(), api: await availablePort() })
+  assert.equal(narrow.status, 'verified-flow', JSON.stringify(narrow.failure))
+  assert.equal(narrow.verified, true)
+  assert.equal(narrow.data.sources?.state, 'scope_changed')
+  assert.equal(narrow.data.sources?.diagnostic?.partial, true)
+  assert.ok((narrow.data.sources?.diagnostic?.withheldSourceCount ?? 0) > 0)
+  assert.ok((narrow.data.sources?.diagnostic?.withheldSourceCount ?? 0) <= 64)
+  assert.ok((narrow.data.sources?.diagnostic?.reasons ?? []).includes('selection_narrowed'))
+  assert.equal(narrow.data.candidatePrepare, undefined)
+  assert.equal(narrow.data.chat, 422)
+  assert.equal(narrow.data.replay?.contextToken, 422)
+  assert.equal(paCall(['status', '--json', '--state', restored]).status, 'STOPPED')
+
   // A legitimate same-selection reuse keeps the original launcher and read selection.
   const reuseFile = join(root, 'reuse-selection.json')
   paCall(['review-restored', '--json', '--state', restored, '--project', projectId, '--allow-path', 'src/', '--out', reuseFile])
