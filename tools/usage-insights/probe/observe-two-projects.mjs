@@ -312,6 +312,25 @@ async function main() {
   assert.equal(consumerAdmission(composedView).admitted, true)
   assert.equal(composedView.scope?.aggregation, 'cross_project')
 
+  // ---- single-project isolation from the same product (G9) ------------------------------------
+  const singleBundlePath = join(directory, 'bundle-single.json')
+  const single = await run(['collect', '--base-url', `http://127.0.0.1:${port}`, '--token-file', tokenFile,
+    ...WINDOW, '--project', PROJECT_A, '--snapshot-limit', '20', '--history-pages', '5', '--history-limit', '100',
+    '--input-id', 'probe-single-project', '--out', singleBundlePath])
+  assert.equal(single.status, 0, single.stderr)
+  const singleSummary = JSON.parse((await run(['analyze', '--input', singleBundlePath])).stdout).summary
+  const singleMetric = id => singleSummary.metrics.find(row => row.metricId === id)
+  assert.equal(singleMetric('interventions.questions')?.value, 1, 'only the selected project is counted')
+  assert.equal(singleMetric('interventions.answers')?.value, 1)
+  assert.equal(singleMetric('outcomes.count')?.value, 1)
+  assert.deepEqual(singleSummary.projects.map(project => project.projectId), [PROJECT_A])
+  const singleAnalysis = JSON.parse((await run(['analyze', '--input', singleBundlePath])).stdout)
+  assert.equal(singleAnalysis.subjects.every(subject => subject.projectId === PROJECT_A), true,
+    'no subject from the other project leaks into a single-project observation')
+  const singleView = toInsightConsumerView(singleSummary)
+  assert.equal(singleView.scope?.aggregation, 'single_project')
+  assert.deepEqual(singleView.scope?.projectIds, [PROJECT_A])
+
   // ---- daily workflow: repeat observation without double counting (G13) -----------------------
   // A second observation of the same window must not accumulate the first round's facts.
   const secondAnalysis = JSON.parse((await run(['analyze', '--input', bundlePath2])).stdout)

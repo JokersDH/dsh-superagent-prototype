@@ -279,3 +279,34 @@ test('a stale attention snapshot makes the consumer partial without hiding outco
   assert.equal(view.coverage, '部分')
   assert.ok(view.metrics.some(metric => metric.id.startsWith('outcomes.count')))
 })
+
+test('layers and currencies stay separate rows in the consumer projection', () => {
+  const bundle = completeBundle()
+  const controlled = makeOutcome({ seed: 'layer-controlled', layer: 'controlled', cost: { currency: 'USD', amount: 1 }, inputTokens: 10, acceptance: 'unknown' })
+  const native = makeOutcome({ seed: 'layer-native', layer: 'actual_native', cost: { currency: 'EUR', amount: 2 }, inputTokens: 20, acceptance: 'unknown' })
+  const mixed = analyzeUsageInsights({
+    ...bundle,
+    outcomes: [controlled, native],
+    workEvidence: [],
+  } as UsageInsightsInput)
+  const view = toInsightConsumerView(mixed.summary)
+  const rows = view.metrics
+  const usd = rows.find(row => row.id.includes('usage.cost') && row.value?.includes('USD'))
+  const eur = rows.find(row => row.id.includes('usage.cost') && row.value?.includes('EUR'))
+  assert.ok(usd && eur, 'one row per currency')
+  assert.notEqual(usd.id, eur.id)
+  assert.equal(usd.layer, 'controlled')
+  assert.equal(eur.layer, 'native', 'a recorded actual_native label maps to the native vocabulary, not to controlled')
+  const tokens = rows.filter(row => row.id.startsWith('usage.inputTokens'))
+  assert.equal(tokens.length, 2, 'token rows are per layer and never merged')
+  assert.equal(view.metrics.some(row => row.id.includes('@') === false), false)
+})
+
+test('a partial proxy row never inherits a complete badge from overall coverage', () => {
+  const analysis = analyzeUsageInsights(completeBundle())
+  const view = toInsightConsumerView(analysis.summary)
+  const active = view.metrics.find(metric => metric.id.startsWith('review.activeMs'))
+  assert.ok(active)
+  assert.match(active.detail ?? '', /覆盖 部分/)
+  assert.equal(view.coverageState, 'complete', 'the source is complete while the proxy row is partial')
+})

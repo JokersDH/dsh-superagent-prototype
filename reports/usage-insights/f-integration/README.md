@@ -72,6 +72,21 @@ G 的 `test/consumer.case.ts` 里保留该形状的本地副本并有编译期�
 F 只能用 `status === 'ready'` 显示 `trialInsightsRows(view)`；`insufficient_data`/`unavailable`
 不显示数字。G 不产生"提升百分比""节省工时"字段，F 也不应自行计算。
 
+## UI 可展示的有限指标
+
+只有下列分组进入 compact 视图；每组都带样本/未知/覆盖，且**不合并**层或币种：
+
+| 分组 | 行 id 前缀 | 可展示内容 | 必须说明 |
+| --- | --- | --- | --- |
+| 已观察执行与接受 | `outcomes.count` / `outcomes.accepted` | 分层的执行次数与已接受数 | 只说明"被观察到"，不是成功率或质量 |
+| 人工交互事实 | `interventions.*` | 提出问题/明确回答/接受事实的独立计数 | 是可追溯的产品事实，不是"沟通成本" |
+| 候选等待 | `review.readyToAcceptanceMs` | 候选就绪到接受的平均间隔（样本数） | 只是等待时长，不含任务复杂度 |
+| 审阅代理 | `review.activeMs` | UI 可见性跨度的平均值 | **部分可见代理**，`partial`，不是人类工时/专注时间 |
+| 已知 usage | `usage.inputTokens` / `outputTokens` / `cost` | 已记录 token 与逐币种成本 | 未知单列；不补价、不合并币种、不假设订阅免费 |
+
+不进入视图的：`queue.waitMs` 与 `execution.durationMs` 在没有真实端点/记录时为 `null`（仍保留行与原因）；
+`actual_native` 在本工具的真实数据里始终未测，不会因为受控数据可运行就升级。
+
 ## 准入
 
 `consumerAdmission(view, activeProjectId?)` 与工作台 `trialInsightsAdmission` 规则一致：
