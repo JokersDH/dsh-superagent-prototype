@@ -1,0 +1,101 @@
+{
+  "protocol": "wave22-same-store-dual/1",
+  "status": "FAIL",
+  "steps": [],
+  "nativeTurns": 0,
+  "vendorSends": 0,
+  "limitations": [
+    "Controlled local fake endpoint only; no real vendor/model/native turn.",
+    "The retained B state is copied before mutation; the original evidence state is not modified."
+  ],
+  "error": "Error: injected_fault:before-record\n    at fault (file:///Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-same-store-dual-personal.mjs:29:60)\n    at file:///Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-same-store-dual-personal.mjs:83:3\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "cleanup": [
+    {
+      "status": "UNKNOWN",
+      "stopped": [
+        {
+          "pid": 81312,
+          "pids": [
+            81312
+          ],
+          "operation": "start",
+          "method": "proven-spawn-group-signal"
+        }
+      ],
+      "unknown": [
+        {
+          "pid": 81312,
+          "reason": "instance_record_missing"
+        }
+      ],
+      "retained": true,
+      "signals": [
+        {
+          "pid": -81312,
+          "signal": "SIGTERM",
+          "ok": true,
+          "fresh": {
+            "owned": true,
+            "checks": [
+              {
+                "owned": true,
+                "reason": "exact_identity",
+                "evidence": {
+                  "pid": 81312,
+                  "role": "launcher",
+                  "startOk": true,
+                  "uidOk": true,
+                  "roleOk": true,
+                  "operationOk": true,
+                  "tokenInstall": true,
+                  "tokenData": true,
+                  "tokenConfig": true,
+                  "argvExact": true,
+                  "operationCurrent": true,
+                  "entryOk": true,
+                  "argvOk": true,
+                  "actual": {
+                    "pid": 81312,
+                    "ppid": 81294,
+                    "stat": "Ss",
+                    "live": true,
+                    "startText": "Sat Nov 14 11:21:14 2026",
+                    "startMs": 1794626474000,
+                    "uid": 501,
+                    "command": "node /tmp/w24frozen/install/app/apps/launcher/bin/pa.mjs start --discussion-only --port 64673 --api-port 64674 --install /tmp/w24frozen/install --config-root /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE/run/config --data-root /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE/seed-state --cache-root /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE/run/cache --logs-root /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE/run/logs --workspace-root /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE/run/workspace",
+                    "tokens": [
+                      "node",
+                      "/tmp/w24frozen/install/app/apps/launcher/bin/pa.mjs",
+                      "start",
+                      "--discussion-only",
+                      "--port",
+                      "64673",
+                      "--api-port",
+                      "64674",
+                      "--install",
+                      "/tmp/w24frozen/install",
+                      "--config-root",
+                      "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE/run/config",
+                      "--data-root",
+                      "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE/seed-state",
+                      "--cache-root",
+                      "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE/run/cache",
+                      "--logs-root",
+                      "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE/run/logs",
+                      "--workspace-root",
+                      "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE/run/workspace"
+                    ]
+                  }
+                }
+              }
+            ],
+            "pids": [
+              81312
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "retainedRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-J7jwxE"
+}
