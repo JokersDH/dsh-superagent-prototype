@@ -22,6 +22,7 @@ node tools/distribution/verify-live-cleanup-controls.mjs --json   # 10控制
 node tools/distribution/verify-installed-ui.mjs --install <target> --json
 node tools/distribution/verify-cli-help.mjs --install <target> --json
 node tools/distribution/verify-same-store-dual-personal.mjs --install <target> --business <readonly-B-state> --json
+node tools/distribution/verify-independent-snapshot-restores.mjs --install <target> --business <readonly-B-state> --json
 ... --fault before-record|after-record-before-health|after-seed-start|after-review-start|after-review-record-before-health|candidate-read-fail|assert-fail|before-reopen-record|after-reopen-record-before-health
 node tools/distribution/verify-nonempty-personal-http.mjs --install <target> --json
 node tools/distribution/verify-real-business-relocation.mjs --install <target> --business <B-state> --json
@@ -40,7 +41,8 @@ node tools/distribution/smoke.mjs --keep-root <new>
 - 每个 launcher/API/child 有独立 start/UID/role/argv/root/config/operation；child-start 不符、sibling root、wrong operation、PID复用、缺记录均拒绝；每次直接信号前 fresh 全身份重读；未知保留 material。
 - 九故障窗口：before-record、record-before-health、seed/review 启动、review record-before-health、候选读取、断言、reopen record-before-health；`after-record`/健康成功的失败应 CLEAN，`before-record` 应 UNKNOWN retained。
 - 安装 UI 字节包含 `?scopeReview=1`、`withheldSourceCount`、原因列表和 `context-scope-review/1`；同 Store 实际 `scopeReview=1` 返回真实字段。
-- 同 Store 原 Work/question/answer/attempt/native_applied + SDK candidates、双 snapshot create/verify、原 ID 保留。**限制**：两种 snapshot 的独立 bundle restore consumer 尚未实现，当前只有单 bundle 恢复加两快照 DB 字节等价，E 不得把它认证为双恢复。
+- 同 Store 原 Work/question/answer/attempt/native_applied + SDK candidates、双 snapshot create/verify、原 ID 保留。
+- 独立恢复：`snapshot/1` 与 `/2` 各自 materialize→独立 bundle→包内 `pa restore` 到不同 root；各自恢复 DB sha 等于对应 snapshot manifest DB sha，原 Work/question/answer ID 保留。bundle evidence format 仍为2（routing tables 存在），这与 snapshot protocol 不同，不得混称。
 - A/C 独立 driver 不在包内；当前 main HTTP consumer 只能作普通同包证据，NOT_TESTED。
 - 真实 vendor/native 0；私有 permission/target、跨平台/ABI、真实计费未测。
 

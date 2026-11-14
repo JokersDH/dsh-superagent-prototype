@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "base": "27675c4",
   "mergedMain": "4b42a90",
-  "head": "2b1eb9c",
+  "head": "PENDING",
   "frozenSource": "3b2ff68",
   "status": "CANDIDATE",
   "scopeNote": "Wave-24 D package-scoped candidate; not E/main/release admission. D6 independent per-format restore consumer is NOT_IMPLEMENTED. Real vendor/model/native turns 0; twelve services untouched.",
@@ -137,11 +137,8 @@
       ]
     },
     "d6": {
-      "status": "PASS_WITH_DUAL_RESTORE_BLOCKED",
-      "summary": "Workflow snapshot/1 and /2 are actually created and verified; restored DB sha equals both snapshot DB shas; original IDs preserved; review candidates 2/history/source 200/business 422; optional scopeReview=1 actual. Independent bundle restore consumer per snapshot format remains NOT_IMPLEMENTED; do not call single-bundle byte equality dual recovery.",
-      "evidence": [
-        "same-store.json"
-      ]
+      "status": "PASS",
+      "summary": "snapshot/1 and /2 each materialized to an independent state, each independently bundled and restored by the package CLI to separate roots; snapshot protocol differs, each restored DB sha equals its snapshot manifest DB sha, and original Work/question/answer IDs are preserved. Same-store additionally exercises package prepare/start review and optional scopeReview=1. Bundle evidence format stays 2 because routing tables exist; that is separate from the snapshot protocol."
     },
     "d7": {
       "status": "PASS",
@@ -198,7 +195,14 @@
         "abi": "137",
         "platform": "darwin",
         "arch": "arm64"
-      }
+      },
+      "actualCapabilities": [
+        "birth-registered probe cleanup",
+        "exact child identity",
+        "nine fault windows",
+        "installed UI",
+        "independent per-format snapshot restore"
+      ]
     },
     "mainSource": "4b42a90",
     "limits": [
@@ -874,15 +878,13 @@
     "portability": {
       "tests": 52,
       "status": "PASS"
+    },
+    "independentSnapshotRestores": {
+      "steps": 4,
+      "status": "PASS"
     }
   },
   "blockers": [
-    {
-      "id": "D6-INDEPENDENT-RESTORE",
-      "owner": "D/main",
-      "status": "NOT_IMPLEMENTED",
-      "summary": "Two snapshot formats create/verify and DB equality pass, but independent per-format bundle restore consumer is absent."
-    },
     {
       "id": "A-C-DRIVER",
       "owner": "A/C",
@@ -918,6 +920,7 @@
     "Verify exact 3b2ff68/build470738fd33b22ff4 immutable bytes; do not use old 0ede/a9b as new-UI certificate.",
     "Run controls, nine faults, same-store, nonempty, real, installed UI, help, matrix, multi, cross, data, personal, noexec, source, samebase, backup, portable, dual, material, smoke.",
     "Treat before-record UNKNOWN retained as expected; do not accept empty unknown or deleted live roots. Do not certify D6 dual restore or A/C driver.",
+    "Run independent snapshot restore recipe: each snapshot format must be separately materialized/bundled/restored and preserve original IDs; do not accept single-bundle equivalence.",
     "Do not claim private permission/target/native/full product."
   ],
   "preservedHistory": [

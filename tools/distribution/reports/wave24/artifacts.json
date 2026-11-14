@@ -20,12 +20,18 @@
       "abi": "137",
       "platform": "darwin",
       "arch": "arm64"
-    }
+    },
+    "actualCapabilities": [
+      "birth-registered probe cleanup",
+      "exact child identity",
+      "nine fault windows",
+      "installed UI",
+      "independent per-format snapshot restore"
+    ]
   },
   "mainSource": "4b42a90",
   "limits": [
     "A/C independent driver absent",
-    "two snapshot formats created/verified with DB byte equality; independent per-format bundle restore consumer not implemented",
     "zero real vendor/native turns",
     "private permission/target unimplemented"
   ]

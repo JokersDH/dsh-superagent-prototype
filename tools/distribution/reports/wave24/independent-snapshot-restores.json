@@ -1,0 +1,50 @@
+{
+  "protocol": "wave24-independent-snapshot-restores/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "snapshot-v1-materialized",
+      "status": "PASS",
+      "detail": {
+        "snapshotProtocol": "workflow-snapshot/1",
+        "snapshotDbSha": "e8d6f8a8ee24bb4e4d7da78a4d5dee0fa32945c947c57d9a36c492f21e6a24a6",
+        "bundleEvidenceFormat": 2
+      }
+    },
+    {
+      "id": "snapshot-v1-independent-restore",
+      "status": "PASS",
+      "detail": {
+        "formatVersion": 1,
+        "restoredDbSha": "e8d6f8a8ee24bb4e",
+        "snapshotDbSha": "e8d6f8a8ee24bb4e",
+        "works": 1,
+        "questions": 1,
+        "answers": 1,
+        "bundleIndependent": true
+      }
+    },
+    {
+      "id": "snapshot-v2-materialized",
+      "status": "PASS",
+      "detail": {
+        "snapshotProtocol": "workflow-snapshot/2",
+        "snapshotDbSha": "e8d6f8a8ee24bb4e4d7da78a4d5dee0fa32945c947c57d9a36c492f21e6a24a6",
+        "bundleEvidenceFormat": 2
+      }
+    },
+    {
+      "id": "snapshot-v2-independent-restore",
+      "status": "PASS",
+      "detail": {
+        "formatVersion": 2,
+        "restoredDbSha": "e8d6f8a8ee24bb4e",
+        "snapshotDbSha": "e8d6f8a8ee24bb4e",
+        "works": 1,
+        "questions": 1,
+        "answers": 1,
+        "bundleIndependent": true
+      }
+    }
+  ]
+}
