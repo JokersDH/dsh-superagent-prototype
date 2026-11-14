@@ -7,5 +7,7 @@ export {
   trialHeadline, trialModeValue, trialProjectValue, trialStrip,
 } from './trial-view.ts'
 export type { TrialAction, TrialActionsInput, TrialProjectValue, TrialStatusStrip, TrialStatusValue, TrialTone } from './trial-view.ts'
-export { trialInsightsCount, trialInsightsRows } from './insights.ts'
-export type { TrialInsightsMetric, TrialInsightsView } from './insights.ts'
+export { trialInsightsAdmission, trialInsightsCount, trialInsightsScopeLabel } from './insights.ts'
+export type {
+  TrialInsightsAdmission, TrialInsightsLayer, TrialInsightsMetric, TrialInsightsScope, TrialInsightsView,
+} from './insights.ts'
