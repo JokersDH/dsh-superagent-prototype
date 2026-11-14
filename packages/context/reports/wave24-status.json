@@ -1,0 +1,104 @@
+{
+  "protocol": "agent-c-wave24-status/1",
+  "wave": "product-wave-24",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "4e805de",
+    "mainScopeUi": "4b42a90",
+    "mergeCommit": "233a13f",
+    "rootLockDiffPreserved": true
+  },
+  "sourceCommits": { "driver": "82b74b7", "testsAndEvidence": "abbde47" },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "singleDescriptor": {
+    "package": "one --pa-entry path for review/start/status/stop and output; rc/argv/cwd recorded",
+    "hash": "descriptor.sha256 equals the executed file bytes and entries.review.sha256; mismatch throws descriptor_mismatch",
+    "overrides": "source with --pa-entry or package with --start-entry/--review-entry exits 2 usage; no silent consumer",
+    "defaultNotExecuted": "a default file that was not executed is never reported as the consumer"
+  },
+  "packageIdentity": {
+    "requiredFields": ["launcher pid", "processStart", "apiPid", "apiProcessStart", "state", "install", "mode personal", "startupMode recovery_readonly", "apiURL port", "apiArgv --review-restored-scope path", "status checks all ok", "health review digest"],
+    "reviewBinding": "package restoredReviewIdentity(file) equals health.restoredReviewDigest and instance apiArgv path",
+    "missingOrForeign": "missing pid/start, changed state/install, wrong review argv/digest or foreign ready port leaves bound=false and fails",
+    "reuse": "live same-file REUSED keeps original pid/start/digest, cleanup owned=false/reused-left-running",
+    "positive": "exact 0ede stage: fresh verified-flow bound=true, cleanup pa-stop-verified; reuse reused; narrow/missing selection BLOCKED with original pid unchanged"
+  },
+  "cleanup": {
+    "ownedFresh": "pa stop on the same descriptor/rootArgs, then status STOPPED, record pid gone and supervisor exited before stopped=true",
+    "failure": "stop failure/timeout/unknown or live pid becomes status failed/verified=false exit 1 via applyCleanupOutcome, with review/state preserved",
+    "distinctModes": "reused-left-running and kept-running are not reported as stopped",
+    "tests": "real package stop verified plus unit cases for stop success/failure/reuse/keep/observed"
+  },
+  "deadline": {
+    "totals": ["deadlineMs default 180000", "per-request 5000", "readiness 150000", "cleanupReserve min(stopGrace+2000, deadline/4)"],
+    "coverage": ["prepare subprocess", "identity subprocess", "start readiness", "HTTP", "status", "stop"],
+    "failures": ["request_timeout", "readiness_timeout", "deadline_exceeded", "cleanup_failed", "entry_exited"],
+    "logs": "64KiB tail only"
+  },
+  "exactPackage": {
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave23-target/wave23-target-0ede11d.tar.gz",
+    "tarSha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+    "source": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+    "buildId": "1eb8733c8b1729bc",
+    "schema": 18,
+    "runtime": "Node 24.21.0 / darwin-arm64 / ABI 137",
+    "flow": "first-run -> pa review-restored -> pa start (foreground supervisor) -> health/sources/Work/delivery -> pa stop",
+    "business": "chat/candidate prepare 422; provider request count unchanged",
+    "installedClaim": "not claimed; E must bind the reported entry hashes to this tar subject"
+  },
+  "aManifest": {
+    "producer": "packages/context/tools/wave24-a-manifest.mjs importing A source packages/workflows/src/data-manifest.ts",
+    "aWorktreeHead": "e60e130029f377edb3b02a2c8762c3d990016004",
+    "aModuleSha256": "46fd1302d61329f21da3abeb327eb1b8ed0bfe897c6037e1294df9503ab0ce7e",
+    "reader": "A independent reader fixture in a separate Node PID verified the same manifest",
+    "subject": "one real Store: Work/Ticket/attempt/contract/epoch, Broker question/answer/native_applied, SDK candidate, confirmed receipt, context binding/frozen body, written/indeterminate dispatch",
+    "rejected": ["foreign attempt/ticket/contract", "empty commands", "empty dispatch", "foreign delivery target", "duplicate command", "deleted commands with recomputed digest", "wrong sourceSha/snapshotFormat"],
+    "scope": "real A source and A storage on the same Store; no second producer, SQL writer or execution lifecycle"
+  },
+  "dualFormatRestore": {
+    "formats": ["default workflow-snapshot/1 verified", "explicit workflow-snapshot/2 verified"],
+    "restore": "each snapshot's database/artifacts staged -> portability createBundle (pa-backup) -> restoreBundle to its own new root with real personal-restore/1 report",
+    "notHandWritten": "no hand-written restore marker and no format relabeling; restored logical source fingerprint equals the verified snapshot",
+    "review": "each root gets a new 600 selection and a source driver verified-flow: candidate digest, history, sources verified, Work delivered, native_applied, business 422, held queue 1, provider unchanged",
+    "independence": "separate bundle, target root, consent and driver run per format; same data subject but different consumer/restore paths"
+  },
+  "uiInput": {
+    "file": "packages/context/reports/wave24-ui-input.json",
+    "publishedConsumer": "main 4b42a90 already consumes four states, seven reasons and withheld count; C does not claim the UI is missing and does not edit it",
+    "samples": ["verified+validity", "narrow scope_changed withheld 2", "missing", "unverified"],
+    "forbidden": ["readable counts", "raw paths", "principal/tokens", "authorization none as approval"]
+  },
+  "invalidations": {
+    "retained": ["fresh independent positive control per signature/source/marker/artifact/root/scope/exclusion/expiry", "narrow selection hides frozen body as scope_changed", "missing artifact -> missing", "damaged same-length artifact -> unverified", "original receipt replay 422"],
+    "unmeasured": ["long-term timed revocation", "concurrent writer races"]
+  },
+  "tests": { "context": 129, "proposals": 41, "knowledge": 114, "routing": 44, "total": 328, "result": "all PASS" },
+  "strict": { "tscNoEmit": "four owned packages PASS", "workspaceBuild": "pnpm -r build -> 0" },
+  "layers": {
+    "source": "verified-flow, reuse and refusals",
+    "package": "exact 0ede start/status/stop/reuse verified",
+    "installed": "not claimed",
+    "normal": "no target/private permission/queue consumption",
+    "recovered": "read-only snapshot restore only; no B business attach",
+    "vendorNative": 0
+  },
+  "limitations": [
+    "package measured on the exact 0ede stage; later bytes need their own freeze and E binding",
+    "restore uses portability bundle wrapping each verified snapshot; it is not a launcher upgrade/rollback matrix",
+    "long-term revocation and concurrent writers unmeasured",
+    "no private permission, target startup, queue consumption or vendor native turn"
+  ],
+  "evidence": [
+    "packages/context/docs/WAVE24-RECIPE.md",
+    "packages/context/reports/wave24-ui-input.json",
+    "packages/context/reports/wave24-driver-lib.tap",
+    "packages/context/reports/wave24-driver-strict.tap",
+    "packages/context/reports/wave24-package-install.tap",
+    "packages/context/reports/wave24-a-manifest.tap",
+    "packages/context/reports/wave24-restore-formats.tap",
+    "packages/context/reports/wave24-suites.json"
+  ]
+}

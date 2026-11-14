@@ -1,0 +1,48 @@
+{
+  "protocol": "restored-scope-ui-input/2",
+  "publishedConsumer": {
+    "owner": "main",
+    "sourceCommit": "4b42a9001c4040aa6c87c1c6056056d04ea1e9af",
+    "state": "the React source panel already consumes the four states, seven reasons and withheld count; C does not claim the page is missing this entry and does not edit it"
+  },
+  "backendInput": {
+    "endpoint": "GET /v1/messages/:id/context/sources",
+    "optIn": "append exactly ?scopeReview=1 by explicit user action",
+    "defaultResponse": "unchanged old shape without scopeReview",
+    "inputs": ["messageId from GET /v1/context/history", "explicit operator opt-in"],
+    "forbiddenInputs": ["principal", "scope/grant", "project override", "authorization claim"],
+    "notes": ["presentation only", "authorization is always none", "compare all fields except observedAt"]
+  },
+  "states": {
+    "verified": { "title": "已核对冻结原文", "copy": "以下内容与当时发送时一致。", "badge": null },
+    "scope_changed": { "title": "当前只读选择与冻结时不同", "copy": "冻结原文未展示；历史记录、工作与回答仍可查看。", "badge": "只读选择已变化" },
+    "missing": { "title": "冻结原文文件缺失", "copy": "无法读取当时的原文，也不会用当前来源替代。", "badge": "原文缺失" },
+    "unverified": { "title": "无法核对冻结原文", "copy": "原文或回执校验未通过，未核对内容不会展示。", "badge": "校验失败" }
+  },
+  "reasons": {
+    "project_changed": "所属项目与冻结时不同",
+    "selection_narrowed": "当前允许路径比冻结时更窄",
+    "selection_broadened": "当前允许路径比冻结时更宽",
+    "selection_replaced": "允许路径已变化",
+    "exclusion_added": "新增了排除路径",
+    "exclusion_removed": "移除了排除路径",
+    "selection_validity_changed": "选择有效期与冻结时不同"
+  },
+  "actualSamples": {
+    "verifiedValidity": { "state": "verified", "scopeReview": { "protocol": "context-scope-review/1", "reasons": ["selection_validity_changed"], "partial": false, "withheldSourceCount": 0, "authorization": "none" } },
+    "scopeChangedNarrow": { "state": "scope_changed", "scopeReview": { "protocol": "context-scope-review/1", "reasons": ["selection_narrowed", "selection_validity_changed"], "partial": true, "withheldSourceCount": 2, "authorization": "none" } },
+    "missing": { "state": "missing", "scopeReview": { "protocol": "context-scope-review/1", "reasons": ["selection_validity_changed"], "partial": true, "withheldSourceCount": 0, "authorization": "none" } },
+    "unverified": { "state": "unverified", "scopeReview": { "protocol": "context-scope-review/1", "reasons": [], "partial": true, "withheldSourceCount": 0, "authorization": "none" } }
+  },
+  "sampleProvenance": {
+    "verified/narrow/missing": "packages/knowledge/test/main-personal-scope-review.case.ts actual personal processes (also re-exercised by wave24 package/source flows)",
+    "unverified": "packages/knowledge/test/main-personal-driver-strict.case.ts corrupted same-length frozen artifact",
+    "package": "packages/knowledge/test/main-personal-package-install.case.ts reads the same opt-in endpoint from the exact 0ede package"
+  },
+  "render": {
+    "withheldSourceCount": "另有 N 条冻结来源未展示；N 最大 64",
+    "partialBadge": "仅 scopeReview.partial 为 true 时显示只读提示",
+    "authorization": "不渲染为权限、允许执行或重试许可"
+  },
+  "doNotRender": ["readable counts", "raw allowed/excluded paths", "principal, tokens or key material", "authorization none as approval"]
+}
