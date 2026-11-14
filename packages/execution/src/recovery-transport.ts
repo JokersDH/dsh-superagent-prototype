@@ -153,9 +153,30 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       if (!Array.isArray(replay.frames) || !Number.isSafeInteger(replay.next) || replay.next < since || typeof replay.done !== 'boolean') {
         reply(res, 503, { error: 'invalid_replay' }); return
       }
+      // Budget the WHOLE ENCODED PAGE, not just the sum of frame bodies: the producer envelope and wrapper
+      // are part of the response, and a page that overran the cap used to fail as a 500 (unknown_outcome)
+      // even though every frame was legal. A page that would overrun is trimmed and reported as not done,
+      // so the caller continues from a real cursor instead of losing the replay.
+      let frames = replay.frames
+      let next = replay.next
+      let done = replay.done
+      const encode = (pageFrames: unknown[], pageNext: number, pageDone: boolean) => JSON.stringify({
+        producer: trusted, frames: pageFrames, next: pageNext, done: pageDone,
+        requestedMaxBytes: maxBytes, budget: inlineBudget, inlineLimit: INLINE_PAGE_BYTES,
+      })
+      let encoded = encode(frames, next, done)
+      while (Buffer.byteLength(encoded) > MAX_BYTES && frames.length > 1) {
+        frames = frames.slice(0, -1)
+        const last = frames[frames.length - 1] as { seq?: unknown } | undefined
+        if (last && Number.isSafeInteger(last.seq)) next = last.seq as number
+        done = false
+        encoded = encode(frames, next, done)
+      }
+      if (Buffer.byteLength(encoded) > MAX_BYTES) { reply(res, 503, { error: 'page_exceeds_cap' }); return }
       // Every page carries the server's OWN registered producer identity, injected here rather than
       // trusted from the backend, so a caller can verify the page before it exposes any frame.
-      reply(res, 200, { producer: trusted, frames: replay.frames, next: replay.next, done: replay.done, requestedMaxBytes: maxBytes, budget: inlineBudget, inlineLimit: INLINE_PAGE_BYTES })
+      res.writeHead(200, { 'content-type': 'application/json' })
+      res.end(encoded)
       return
     }
     if (req.method === 'GET' && req.url?.startsWith('/v1/payload')) {

@@ -1,0 +1,58 @@
+{
+  "wave": "product-wave-27",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "36c0e60",
+  "checkpoint": "1 of 5",
+  "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths (apps/runner src, packages/execution, tests/native-acceptance, docs/rfcs/WP-03). I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Original main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
+
+  "defectFixed": {
+    "cumulativeSmallPageBudgetRegression": {
+      "before": "the page budget counted only the sum of frame bodies, so the assembled response (producer envelope plus wrapper) overran the transport cap and surfaced as unknown_outcome for legal records; the independent 10/11 run saw 160 valid records fail",
+      "after": "the WHOLE ENCODED PAGE is budgeted. A page that would overrun is trimmed from the tail and reported with done=false and a real cursor, so the caller continues instead of losing the replay. A page that cannot fit even one frame is refused explicitly as page_exceeds_cap rather than as a generic 500",
+      "whyNotJustRaiseTheCap": "the transport cap is unchanged at 64KiB; the fix is correct accounting plus trim-and-continue, not a wider cap"
+    }
+  },
+
+  "observedPositives": {
+    "b27": {
+      "harness": "tests/native-acceptance/b27-small-pages.mjs",
+      "result": "2 PASS / 0 FAIL / 1 NOT_TESTED",
+      "cases": [
+        "B27-160-SMALL-FACTS-FULL-REPLAY - all 160 facts replayed over 4 pages (largest 40 frames), contiguous seq, real end",
+        "B27-TINY-BUDGET-STILL-COMPLETES - a 2KiB budget still returned all 160 facts over 32 pages"
+      ]
+    },
+    "b26Regression": {
+      "harness": "tests/native-acceptance/b26-ref-payload.mjs",
+      "result": "4 PASS / 0 FAIL / 1 NOT_TESTED - unchanged",
+      "covers": "inline page, reference descriptor for the 135586-byte frame, five-chunk payload read including middle and last, full digest match, foreign producer refused"
+    }
+  },
+
+  "strict": "direct strict + exactOptionalPropertyTypes compile of recovery-transport.ts exits 0",
+
+  "notDone": {
+    "consume0068AndI": "NOT DONE. packages/contracts/src/coordinator-channel.ts (0058/0068) and I's attach-channel module were not consumed this checkpoint, so the three waiter maps (fact, payload, native-write) are still present and the original dispatch is not unified",
+    "unifiedDispatch": "endpoint command path and original stdio path still not proven to share ONE dispatch with begin-once, prepared-policy and control priority",
+    "threeCallbackRebind": "fact receipt ACK, payload read and native-write-admission are still bound to the stdio channel",
+    "sameRunnerDualClient": "no passing A-disconnect/B-takeover proof against a real Runner/child; facts-by-original-ID ACK and payload reread by original ref are not observed",
+    "pendingWriteOnDetach": "a pending native write on detach is not yet rejected as indeterminate",
+    "result2_sigkillRecovery": "NOT_REACHED",
+    "result3_recoveredAcceptSlots": "NOT_REACHED",
+    "result4_interfaceCompatFaults": "NOT_REACHED",
+    "result5_docsAndScope": "NOT_REACHED"
+  },
+
+  "wholePackageComplete": false,
+  "budget": {
+    "grants": [{ "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false }],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+  "limitations": [
+    "both harnesses run against a controlled endpoint whose facts backend is fixture-shaped, not the full product journal",
+    "the I module and the coordinator-channel contract are not consumed yet, so no channel generation/CAS/lease behaviour is claimed",
+    "one of five runnable checkpoints published"
+  ]
+}
