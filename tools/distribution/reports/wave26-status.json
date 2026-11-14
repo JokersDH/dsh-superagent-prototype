@@ -5,9 +5,9 @@
   "base": "4aaf074",
   "mergedMain": "ce64fc1",
   "mainSource": "a302ddc F App + fdb3f16 readiness",
-  "head": "50292fe",
+  "head": "058b58d",
   "frozenSource": "ce64fc1",
-  "status": "CANDIDATE_MILESTONE_1",
+  "status": "CANDIDATE",
   "phases": {
     "d1": {
       "status": "PASS",
@@ -151,7 +151,7 @@
     "tools/distribution/reports/wave26/*",
     "tools/distribution/recipes/wave26-e-acceptance.zh-CN.md"
   ],
-  "evidenceHead": "50292fe",
+  "evidenceHead": "058b58d",
   "closureSource": "ce64fc1",
-  "finalNote": "Runtime frozen at ce64fc1/d4b1780d999a4b74; later heads docs/tools only. A/C target proof dev chain only; installed package consumer NOT_REACHED."
+  "finalNote": "Runtime frozen at ce64fc1/d4b1780d999a4b74; later heads are tools/reports/docs only. Installed package A/C dual-format verified-flow and drift reject recorded; E required independent."
 }
