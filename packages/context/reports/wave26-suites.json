@@ -1,0 +1,11 @@
+{
+  "protocol": "agent-c-wave26-suites/1",
+  "context": 129,
+  "proposals": 41,
+  "knowledge": 116,
+  "routing": 44,
+  "total": 330,
+  "result": "all PASS, 0 FAIL",
+  "strict": "tsc -p each owned package PASS",
+  "build": "pnpm -r --workspace-concurrency=4 run build -> 0"
+}

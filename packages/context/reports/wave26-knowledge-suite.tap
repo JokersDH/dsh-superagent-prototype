@@ -1,0 +1,707 @@
+TAP version 13
+# Subtest: the persisted decision adapter writes source identity and history through the shared port
+ok 1 - the persisted decision adapter writes source identity and history through the shared port
+  ---
+  duration_ms: 16.793958
+  type: 'test'
+  ...
+# Subtest: revocation appends a persisted revision and removes effective knowledge
+ok 2 - revocation appends a persisted revision and removes effective knowledge
+  ---
+  duration_ms: 5.683959
+  type: 'test'
+  ...
+# Subtest: a new governance/store over the same port sees the decision after state reload
+ok 3 - a new governance/store over the same port sees the decision after state reload
+  ---
+  duration_ms: 1.408958
+  type: 'test'
+  ...
+# Subtest: missing or stale sources invalidate persisted decisions while history remains
+ok 4 - missing or stale sources invalidate persisted decisions while history remains
+  ---
+  duration_ms: 0.93525
+  type: 'test'
+  ...
+# Subtest: supersession and project-scoped pagination work over the persisted adapter
+ok 5 - supersession and project-scoped pagination work over the persisted adapter
+  ---
+  duration_ms: 9.526959
+  type: 'test'
+  ...
+# Subtest: the persisted adapter rejects stale versions and changed bodies
+ok 6 - the persisted adapter rejects stale versions and changed bodies
+  ---
+  duration_ms: 0.337708
+  type: 'test'
+  ...
+# Subtest: offline assistant loop: context -> mock reasoner -> proposal -> confirmation -> decision -> context -> revoke
+ok 7 - offline assistant loop: context -> mock reasoner -> proposal -> confirmation -> decision -> context -> revoke
+  ---
+  duration_ms: 260.396958
+  type: 'test'
+  ...
+# Subtest: a rejected proposal never records a decision
+ok 8 - a rejected proposal never records a decision
+  ---
+  duration_ms: 0.655667
+  type: 'test'
+  ...
+# Subtest: only effective decisions reach the composer provider
+ok 9 - only effective decisions reach the composer provider
+  ---
+  duration_ms: 2.104875
+  type: 'test'
+  ...
+# Subtest: the provider reports the caller cap instead of pretending completeness
+ok 10 - the provider reports the caller cap instead of pretending completeness
+  ---
+  duration_ms: 1.097292
+  type: 'test'
+  ...
+# Subtest: an incomplete effectiveness scan fails composition instead of leaking stale knowledge
+ok 11 - an incomplete effectiveness scan fails composition instead of leaking stale knowledge
+  ---
+  duration_ms: 2.757042
+  type: 'test'
+  ...
+# Subtest: a revoked or replaced decision never becomes effective again after reopen
+ok 12 - a revoked or replaced decision never becomes effective again after reopen
+  ---
+  duration_ms: 1.852833
+  type: 'test'
+  ...
+# Subtest: prepare is read-only and commit/replay are synchronous and stable across time
+ok 13 - prepare is read-only and commit/replay are synchronous and stable across time
+  ---
+  duration_ms: 1.377458
+  type: 'test'
+  ...
+# Subtest: commit re-checks actor, grant, source digest/conversation and barrier
+ok 14 - commit re-checks actor, grant, source digest/conversation and barrier
+  ---
+  duration_ms: 0.555791
+  type: 'test'
+  ...
+# Subtest: prepare refuses non-explicit, cross-project, escalated, expired and inactive supersession inputs
+ok 15 - prepare refuses non-explicit, cross-project, escalated, expired and inactive supersession inputs
+  ---
+  duration_ms: 0.851666
+  type: 'test'
+  ...
+# Subtest: revocation and old replays never resurrect a revoked decision
+ok 16 - revocation and old replays never resurrect a revoked decision
+  ---
+  duration_ms: 0.298791
+  type: 'test'
+  ...
+# Subtest: same id with changed body, source or actor conflicts instead of overwriting
+ok 17 - same id with changed body, source or actor conflicts instead of overwriting
+  ---
+  duration_ms: 0.313708
+  type: 'test'
+  ...
+# Subtest: supersession is recorded and the old decision becomes ineffective
+ok 18 - supersession is recorded and the old decision becomes ineffective
+  ---
+  duration_ms: 0.32525
+  type: 'test'
+  ...
+# Subtest: bounded context preview -> structured proposal -> confirmation -> existing business command
+ok 19 - bounded context preview -> structured proposal -> confirmation -> existing business command
+  ---
+  duration_ms: 41.259708
+  type: 'test'
+  ...
+# Subtest: unconfirmed or drifted confirmation yields no decision, receipt or event
+ok 20 - unconfirmed or drifted confirmation yields no decision, receipt or event
+  ---
+  duration_ms: 23.322542
+  type: 'test'
+  ...
+# Subtest: duplicate confirmation and duplicate command produce exactly one effect
+ok 21 - duplicate confirmation and duplicate command produce exactly one effect
+  ---
+  duration_ms: 25.870958
+  type: 'test'
+  ...
+# Subtest: receipt failure rolls back the whole transaction including the decision and event
+ok 22 - receipt failure rolls back the whole transaction including the decision and event
+  ---
+  duration_ms: 18.687125
+  type: 'test'
+  ...
+# Subtest: reopen keeps the decision effective; revoke and supersession never resurrect old versions
+ok 23 - reopen keeps the decision effective; revoke and supersession never resurrect old versions
+  ---
+  duration_ms: 32.2905
+  type: 'test'
+  ...
+# Subtest: source loss invalidates effectiveness while the audit record stays readable
+ok 24 - source loss invalidates effectiveness while the audit record stays readable
+  ---
+  duration_ms: 17.5655
+  type: 'test'
+  ...
+# Subtest: a changed decision body under the same id conflicts instead of creating a second version
+ok 25 - a changed decision body under the same id conflicts instead of creating a second version
+  ---
+  duration_ms: 18.92425
+  type: 'test'
+  ...
+# Subtest: records an explicit user decision with source provenance and a queryable page
+ok 26 - records an explicit user decision with source provenance and a queryable page
+  ---
+  duration_ms: 0.751208
+  type: 'test'
+  ...
+# Subtest: only an explicit trusted user message can become reusable knowledge
+ok 27 - only an explicit trusted user message can become reusable knowledge
+  ---
+  duration_ms: 0.378334
+  type: 'test'
+  ...
+# Subtest: cross-project and scope-escalating decisions are refused
+ok 28 - cross-project and scope-escalating decisions are refused
+  ---
+  duration_ms: 0.144833
+  type: 'test'
+  ...
+# Subtest: revocation is versioned, idempotent and removes the decision from new knowledge
+ok 29 - revocation is versioned, idempotent and removes the decision from new knowledge
+  ---
+  duration_ms: 0.221
+  type: 'test'
+  ...
+# Subtest: a new decision supersedes an older one in the same project only
+ok 30 - a new decision supersedes an older one in the same project only
+  ---
+  duration_ms: 0.229792
+  type: 'test'
+  ...
+# Subtest: expired decisions never enter new knowledge and cannot be recorded already-expired
+ok 31 - expired decisions never enter new knowledge and cannot be recorded already-expired
+  ---
+  duration_ms: 0.2285
+  type: 'test'
+  ...
+# Subtest: a revoked decision can be reopened as a new explicit decision
+ok 32 - a revoked decision can be reopened as a new explicit decision
+  ---
+  duration_ms: 0.128042
+  type: 'test'
+  ...
+# Subtest: a disappeared source is excluded from effective knowledge while the audit record remains
+ok 33 - a disappeared source is excluded from effective knowledge while the audit record remains
+  ---
+  duration_ms: 0.071167
+  type: 'test'
+  ...
+# Subtest: a source whose digest or conversation changed invalidates effectiveness
+ok 34 - a source whose digest or conversation changed invalidates effectiveness
+  ---
+  duration_ms: 0.097917
+  type: 'test'
+  ...
+# Subtest: stored decisions and returned records are independent immutable snapshots
+ok 35 - stored decisions and returned records are independent immutable snapshots
+  ---
+  duration_ms: 0.085666
+  type: 'test'
+  ...
+# Subtest: keyset pagination is bounded and does not duplicate decisions
+ok 36 - keyset pagination is bounded and does not duplicate decisions
+  ---
+  duration_ms: 0.369333
+  type: 'test'
+  ...
+# Subtest: old-version replay is idempotent and a changed payload or stale version conflicts
+ok 37 - old-version replay is idempotent and a changed payload or stale version conflicts
+  ---
+  duration_ms: 0.143667
+  type: 'test'
+  ...
+# Subtest: automatic promotion stays closed and classifies one-off corrections
+ok 38 - automatic promotion stays closed and classifies one-off corrections
+  ---
+  duration_ms: 0.07725
+  type: 'test'
+  ...
+# Subtest: knowledge is project-scoped and revoked content is not returned to another project
+ok 39 - knowledge is project-scoped and revoked content is not returned to another project
+  ---
+  duration_ms: 0.070292
+  type: 'test'
+  ...
+# Subtest: real SQLite: reject is a distinct terminal state, not a revocation
+ok 40 - real SQLite: reject is a distinct terminal state, not a revocation
+  ---
+  duration_ms: 17.445084
+  type: 'test'
+  ...
+# Subtest: real SQLite: revoke keeps audit history but removes the decision from effective knowledge
+ok 41 - real SQLite: revoke keeps audit history but removes the decision from effective knowledge
+  ---
+  duration_ms: 15.896291
+  type: 'test'
+  ...
+# Subtest: real SQLite: a source digest change invalidates commit and leaves no decision row
+ok 42 - real SQLite: a source digest change invalidates commit and leaves no decision row
+  ---
+  duration_ms: 14.641459
+  type: 'test'
+  ...
+# Subtest: real SQLite: a failure after proposal confirmation rolls the whole transaction back
+ok 43 - real SQLite: a failure after proposal confirmation rolls the whole transaction back
+  ---
+  duration_ms: 19.011834
+  type: 'test'
+  ...
+# Subtest: real SQLite: supersede then revoke the replacement never reactivates the original
+ok 44 - real SQLite: supersede then revoke the replacement never reactivates the original
+  ---
+  duration_ms: 20.149083
+  type: 'test'
+  ...
+# Subtest: one snapshot carries real Work/Ticket/Broker Q&A into the second-root readonly flow
+ok 45 - one snapshot carries real Work/Ticket/Broker Q&A into the second-root readonly flow
+  ---
+  duration_ms: 3735.003792
+  type: 'test'
+  ...
+# Subtest: the real local SDK result reaches candidate GET and pointer prepare without inventing a wrapper
+ok 46 - the real local SDK result reaches candidate GET and pointer prepare without inventing a wrapper
+  ---
+  duration_ms: 121.850708
+  type: 'test'
+  ...
+# Subtest: decision confirm, artifact corruption replay, and rejection keep one original transaction
+ok 47 - decision confirm, artifact corruption replay, and rejection keep one original transaction
+  ---
+  duration_ms: 173.925667
+  type: 'test'
+  ...
+# Subtest: work candidates keep required inputs, refuse confirmation without them, and create one Work only when confirmed
+ok 48 - work candidates keep required inputs, refuse confirmation without them, and create one Work only when confirmed
+  ---
+  duration_ms: 115.981334
+  type: 'test'
+  ...
+# Subtest: a revision candidate targets the current contract and requires the complete revision input
+ok 49 - a revision candidate targets the current contract and requires the complete revision input
+  ---
+  duration_ms: 369.277334
+  type: 'test'
+  ...
+# Subtest: mixed valid and stale candidates are separated, and a reply-only body exposes no candidates
+ok 50 - mixed valid and stale candidates are separated, and a reply-only body exposes no candidates
+  ---
+  duration_ms: 149.211708
+  type: 'test'
+  ...
+# Subtest: source drift and candidate pointer drift refuse confirmation without a second business effect
+ok 51 - source drift and candidate pointer drift refuse confirmation without a second business effect
+  ---
+  duration_ms: 147.937917
+  type: 'test'
+  ...
+# Subtest: a second-root snapshot reads frozen history and refuses a missing completed artifact
+ok 52 - a second-root snapshot reads frozen history and refuses a missing completed artifact
+  ---
+  duration_ms: 191.26075
+  type: 'test'
+  ...
+# Subtest: eight candidates with a long reply stay bounded to one reader call, and a missing artifact is refused
+ok 53 - eight candidates with a long reply stay bounded to one reader call, and a missing artifact is refused
+  ---
+  duration_ms: 144.160416
+  type: 'test'
+  ...
+# Subtest: an async gap between two current-source reads is detected and never merged into one manifest
+ok 54 - an async gap between two current-source reads is detected and never merged into one manifest
+  ---
+  duration_ms: 29.449958
+  type: 'test'
+  ...
+# Subtest: a frozen reply artifact is re-read from bytes, so an async replacement cannot be merged into the old result
+ok 55 - a frozen reply artifact is re-read from bytes, so an async replacement cannot be merged into the old result
+  ---
+  duration_ms: 28.843875
+  type: 'test'
+  ...
+# Subtest: main-consumable chain over real A ports: compose -> preview -> proposal -> command -> decision
+ok 56 - main-consumable chain over real A ports: compose -> preview -> proposal -> command -> decision
+  ---
+  duration_ms: 18.389458
+  type: 'test'
+  ...
+# Subtest: a caller budget cut is visible in the composition preview, not silently accepted
+ok 57 - a caller budget cut is visible in the composition preview, not silently accepted
+  ---
+  duration_ms: 14.874208
+  type: 'test'
+  ...
+# Subtest: a real-port context consumer produces manifest, preview and budget facts
+ok 58 - a real-port context consumer produces manifest, preview and budget facts
+  ---
+  duration_ms: 37.314167
+  type: 'test'
+  ...
+# Subtest: the same consumer refuses expired, wrong-purpose and executor grants before reading
+ok 59 - the same consumer refuses expired, wrong-purpose and executor grants before reading
+  ---
+  duration_ms: 0.655416
+  type: 'test'
+  ...
+# Subtest: main context preview serves scoped sources with dual digests and no foreign material
+ok 60 - main context preview serves scoped sources with dual digests and no foreign material
+  ---
+  duration_ms: 18.6455
+  type: 'test'
+  ...
+# Subtest: a revoked decision disappears on the next preview, and a decision source change forces a re-preview
+ok 61 - a revoked decision disappears on the next preview, and a decision source change forces a re-preview
+  ---
+  duration_ms: 23.251167
+  type: 'test'
+  ...
+# Subtest: the preview clamps an oversized caller budget and reports it
+ok 62 - the preview clamps an oversized caller budget and reports it
+  ---
+  duration_ms: 12.324083
+  type: 'test'
+  ...
+# Subtest: invalid selections, missing work for artifacts and recovery read-only are refused
+ok 63 - invalid selections, missing work for artifacts and recovery read-only are refused
+  ---
+  duration_ms: 13.150292
+  type: 'test'
+  ...
+# Subtest: the default scoped factory reports its 600-message scan boundary as partial with an issue
+ok 64 - the default scoped factory reports its 600-message scan boundary as partial with an issue
+  ---
+  duration_ms: 197.146958
+  type: 'test'
+  ...
+# Subtest: the mock provider receives the frozen selected context as untrusted data and the audit keeps its identity
+ok 65 - the mock provider receives the frozen selected context as untrusted data and the audit keeps its identity
+  ---
+  duration_ms: 104.718333
+  type: 'test'
+  ...
+# Subtest: a message appended after preparation stays out of the frozen bundle while a new prepare sees it
+ok 66 - a message appended after preparation stays out of the frozen bundle while a new prepare sees it
+  ---
+  duration_ms: 76.130708
+  type: 'test'
+  ...
+# Subtest: revocation after a completed send keeps the original receipt/audit while a new prepare excludes the decision
+ok 67 - revocation after a completed send keeps the original receipt/audit while a new prepare excludes the decision
+  ---
+  duration_ms: 97.916833
+  type: 'test'
+  ...
+# Subtest: natural expiry and an offline provider settle a rejection before any model request
+ok 68 - natural expiry and an offline provider settle a rejection before any model request
+  ---
+  duration_ms: 38.5075
+  type: 'test'
+  ...
+# Subtest: the real A18 history and completed reply are consumed through the durable store ports
+ok 69 - the real A18 history and completed reply are consumed through the durable store ports
+  ---
+  duration_ms: 60.2595
+  type: 'test'
+  ...
+# Subtest: the verified completed reply feeds the candidate reviewer without minting a new authority
+ok 70 - the verified completed reply feeds the candidate reviewer without minting a new authority
+  ---
+  duration_ms: 59.000792
+  type: 'test'
+  ...
+# Subtest: history keeps the frozen body after the live source text changes
+ok 71 - history keeps the frozen body after the live source text changes
+  ---
+  duration_ms: 68.217875
+  type: 'test'
+  ...
+# Subtest: a non-empty verified candidate joins the original proposal service over real A state
+ok 72 - a non-empty verified candidate joins the original proposal service over real A state
+  ---
+  duration_ms: 13.992292
+  type: 'test'
+  ...
+# Subtest: a verified decision candidate flows through main ProductProposals confirm/reject data
+ok 73 - a verified decision candidate flows through main ProductProposals confirm/reject data
+  ---
+  duration_ms: 21.112167
+  type: 'test'
+  ...
+# Subtest: A real producer builds and verifies the original subject, and rejects every unique drift
+ok 74 - A real producer builds and verifies the original subject, and rejects every unique drift
+  ---
+  duration_ms: 6028.643084
+  type: 'test'
+  ...
+W23_REUSED {"code":0,"status":"reused","record":{"protocol":"personal-workbench/1","pid":56445,"processStart":"Sat Nov 14 15:29:17 2026","apiPid":56446,"consolePid":56622,"consoleURL":"http://127.0.0.1:52260","apiURL":"http://127.0.0.1:52261","configurationRevision":"252e2ffad1960f2c9c13b5ee8319b8e515855c51e62762b79e0df32217607983","executionAvailability":{"state":"unavailable","reason":"recovery_readonly"},"restoredReviewDigest":"43c80013ae93249599ffe73d92fc4de50ae98bbf074fd16b564f804ae75bd1f1","mode":"personal","access":"local-development"},"reusePorts":{"console":52260,"api":52261},"identity":{"requestedFile":"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave23-strict-A5XOob/kept-selection.json","requestedDigest":"43c80013ae93249599ffe73d92fc4de50ae98bbf074fd16b564f804ae75bd1f1","actualHealthDigest":"43c80013ae93249599ffe73d92fc4de50ae98bbf074fd16b564f804ae75bd1f1","recordPid":56445,"childPid":56633,"stateRoot":"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave23-strict-A5XOob/restored-v1","bound":true,"instanceProcessStart":null,"instanceApiPid":null,"instanceApiProcessStart":null},"cleanup":{"owned":false,"attempted":true,"stopped":false,"detail":"reused-left-running"}}
+# Subtest: the driver asserts a real user flow, binds the actual consumer and rejects every requested mismatch
+ok 75 - the driver asserts a real user flow, binds the actual consumer and rejects every requested mismatch
+  ---
+  duration_ms: 139651.5675
+  type: 'test'
+  ...
+# Subtest: v1 and v2 snapshots both reach actual personal review, with a legal narrow scope and explicit refusal causes
+ok 76 - v1 and v2 snapshots both reach actual personal review, with a legal narrow scope and explicit refusal causes
+  ---
+  duration_ms: 13464.635667
+  type: 'test'
+  ...
+# Subtest: each rejection starts from its own valid signed selection and maps to exactly one changed binding
+ok 77 - each rejection starts from its own valid signed selection and maps to exactly one changed binding
+  ---
+  duration_ms: 192.231125
+  type: 'test'
+  ...
+# Subtest: the current a826 package runs readiness plus manifest-driven v1/v2 restored data read-only
+ok 78 - the current a826 package runs readiness plus manifest-driven v1/v2 restored data read-only
+  ---
+  duration_ms: 13072.120083
+  type: 'test'
+  ...
+# Subtest: one parameterized package driver reviews both v1 and v2 restored roots through the standard entry
+ok 79 - one parameterized package driver reviews both v1 and v2 restored roots through the standard entry
+  ---
+  duration_ms: 18883.079875
+  type: 'test'
+  ...
+# Subtest: the exact frozen package truly starts, reuses and stops through the single descriptor
+ok 80 - the exact frozen package truly starts, reuses and stops through the single descriptor
+  ---
+  duration_ms: 24609.581209
+  type: 'test'
+  ...
+# Subtest: the actual personal read-startup reviews real historical Work/Q&A and candidate data without execution
+ok 81 - the actual personal read-startup reviews real historical Work/Q&A and candidate data without execution
+  ---
+  duration_ms: 2565.972166
+  type: 'test'
+  ...
+# Subtest: default v1 and explicit v2 snapshots are each restored through the real bundle path and reviewed
+ok 82 - default v1 and explicit v2 snapshots are each restored through the real bundle path and reviewed
+  ---
+  duration_ms: 13940.497833
+  type: 'test'
+  ...
+# Subtest: actual personal scope diagnostics explain narrow, exclusion, validity and missing frozen sources without widening
+ok 83 - actual personal scope diagnostics explain narrow, exclusion, validity and missing frozen sources without widening
+  ---
+  duration_ms: 3072.939333
+  type: 'test'
+  ...
+# Subtest: a decision proposal confirms into the decision transaction and replays once
+ok 84 - a decision proposal confirms into the decision transaction and replays once
+  ---
+  duration_ms: 13.263833
+  type: 'test'
+  ...
+# Subtest: reject is terminal, audited and never produces an effect receipt
+ok 85 - reject is terminal, audited and never produces an effect receipt
+  ---
+  duration_ms: 10.624125
+  type: 'test'
+  ...
+# Subtest: an expired preview and a changed grant are rejected without any confirmed state
+ok 86 - an expired preview and a changed grant are rejected without any confirmed state
+  ---
+  duration_ms: 8.547958
+  type: 'test'
+  ...
+# Subtest: a work proposal without user inputs stays inert; a revision without a current work is refused at prepare
+ok 87 - a work proposal without user inputs stays inert; a revision without a current work is refused at prepare
+  ---
+  duration_ms: 8.7205
+  type: 'test'
+  ...
+# Subtest: the main receipt replays only the identical command body
+ok 88 - the main receipt replays only the identical command body
+  ---
+  duration_ms: 9.880542
+  type: 'test'
+  ...
+# Subtest: a receipt failure rolls back the confirmed proposal and the effect
+ok 89 - a receipt failure rolls back the confirmed proposal and the effect
+  ---
+  duration_ms: 11.936417
+  type: 'test'
+  ...
+# Subtest: main proposal HTTP drives the C confirmation rules end to end
+ok 90 - main proposal HTTP drives the C confirmation rules end to end
+  ---
+  duration_ms: 13.642916
+  type: 'test'
+  ...
+# Subtest: main proposal HTTP rejection is terminal and writes no business effect
+ok 91 - main proposal HTTP rejection is terminal and writes no business effect
+  ---
+  duration_ms: 10.479708
+  type: 'test'
+  ...
+# Subtest: a real recovery_readonly root reviews candidates and history but refuses business mutation
+ok 92 - a real recovery_readonly root reviews candidates and history but refuses business mutation
+  ---
+  duration_ms: 349.027833
+  type: 'test'
+  ...
+# Subtest: one verified snapshot serves the second-root readonly user flow with no business or model resend
+ok 93 - one verified snapshot serves the second-root readonly user flow with no business or model resend
+  ---
+  duration_ms: 360.0365
+  type: 'test'
+  ...
+# Subtest: real SQLite: prepare is read-only, commit is atomic and replay is stable at two times
+ok 94 - real SQLite: prepare is read-only, commit is atomic and replay is stable at two times
+  ---
+  duration_ms: 10.47875
+  type: 'test'
+  ...
+# Subtest: real SQLite: revoke persists a revision and old replay does not resurrect it
+ok 95 - real SQLite: revoke persists a revision and old replay does not resurrect it
+  ---
+  duration_ms: 9.57775
+  type: 'test'
+  ...
+# Subtest: real SQLite: receipt failure rolls back the decision and source invalidation blocks commit
+ok 96 - real SQLite: receipt failure rolls back the decision and source invalidation blocks commit
+  ---
+  duration_ms: 8.116333
+  type: 'test'
+  ...
+# Subtest: a scan that cannot complete refuses instead of reporting partial effectiveness
+ok 97 - a scan that cannot complete refuses instead of reporting partial effectiveness
+  ---
+  duration_ms: 0.42425
+  type: 'test'
+  ...
+# Subtest: a superseded decision beyond one page boundary is still detected with default limits
+ok 98 - a superseded decision beyond one page boundary is still detected with default limits
+  ---
+  duration_ms: 6.161125
+  type: 'test'
+  ...
+# Subtest: effective knowledge never includes a decision superseded across a page boundary
+ok 99 - effective knowledge never includes a decision superseded across a page boundary
+  ---
+  duration_ms: 0.386083
+  type: 'test'
+  ...
+# Subtest: an explicit caller cap is reported, not confused with a complete scan
+ok 100 - an explicit caller cap is reported, not confused with a complete scan
+  ---
+  duration_ms: 0.179916
+  type: 'test'
+  ...
+# Subtest: real SQLite: cross-page supersession is correct and page history is preserved
+ok 101 - real SQLite: cross-page supersession is correct and page history is preserved
+  ---
+  duration_ms: 8.199083
+  type: 'test'
+  ...
+# Subtest: zero-model vertical: context -> mock proposal -> pending -> confirm -> receipt -> decision -> restart -> revoke
+ok 102 - zero-model vertical: context -> mock proposal -> pending -> confirm -> receipt -> decision -> restart -> revoke
+  ---
+  duration_ms: 3.401708
+  type: 'test'
+  ...
+# Subtest: commit failures leave the pending proposal and produce no receipt
+ok 103 - commit failures leave the pending proposal and produce no receipt
+  ---
+  duration_ms: 0.214958
+  type: 'test'
+  ...
+# Subtest: duplicate confirmation, same-id payload changes, foreign actors and cross-project input are refused
+ok 104 - duplicate confirmation, same-id payload changes, foreign actors and cross-project input are refused
+  ---
+  duration_ms: 0.340875
+  type: 'test'
+  ...
+# Subtest: supersession and source disappearance govern later decision reads
+ok 105 - supersession and source disappearance govern later decision reads
+  ---
+  duration_ms: 0.176375
+  type: 'test'
+  ...
+# Subtest: a connected but silent peer is cancelled by the per-request budget
+ok 106 - a connected but silent peer is cancelled by the per-request budget
+  ---
+  duration_ms: 201.122791
+  type: 'test'
+  ...
+# Subtest: a half JSON body is an invalid response, not an empty success
+ok 107 - a half JSON body is an invalid response, not an empty success
+  ---
+  duration_ms: 1.874042
+  type: 'test'
+  ...
+# Subtest: readiness fails immediately on an entry that already exited and on deadline
+ok 108 - readiness fails immediately on an entry that already exited and on deadline
+  ---
+  duration_ms: 404.685333
+  type: 'test'
+  ...
+# Subtest: bounded logs keep only the tail and an elapsed deadline is rejected
+ok 109 - bounded logs keep only the tail and an elapsed deadline is rejected
+  ---
+  duration_ms: 0.155959
+  type: 'test'
+  ...
+# Subtest: cleanup escalates exactly once and leaves no owned child behind
+ok 110 - cleanup escalates exactly once and leaves no owned child behind
+  ---
+  duration_ms: 332.811916
+  type: 'test'
+  ...
+# Subtest: an HTTP error status is returned for the caller to assert instead of being treated as data
+ok 111 - an HTTP error status is returned for the caller to assert instead of being treated as data
+  ---
+  duration_ms: 2.37525
+  type: 'test'
+  ...
+# Subtest: an owned stop failure downgrades verified success while reuse and keep stay explicit
+ok 112 - an owned stop failure downgrades verified success while reuse and keep stay explicit
+  ---
+  duration_ms: 0.2165
+  type: 'test'
+  ...
+# Subtest: package identity requires every launcher/API field and check with no optional shortcut
+ok 113 - package identity requires every launcher/API field and check with no optional shortcut
+  ---
+  duration_ms: 0.504291
+  type: 'test'
+  ...
+# Subtest: web flow: context preview, proposal confirm, decision record/revoke and old replay
+ok 114 - web flow: context preview, proposal confirm, decision record/revoke and old replay
+  ---
+  duration_ms: 2.139083
+  type: 'test'
+  ...
+# Subtest: proposal rejection, foreign actor, changed payload, failed current checks and source loss
+ok 115 - proposal rejection, foreign actor, changed payload, failed current checks and source loss
+  ---
+  duration_ms: 0.461
+  type: 'test'
+  ...
+# Subtest: stale/foreign/expired/old-version inputs are refused without effects
+ok 116 - stale/foreign/expired/old-version inputs are refused without effects
+  ---
+  duration_ms: 0.262583
+  type: 'test'
+  ...
+1..116
+# tests 116
+# suites 0
+# pass 116
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 247713.75625

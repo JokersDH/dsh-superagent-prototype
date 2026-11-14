@@ -6,8 +6,11 @@ import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync,
 import { createBundle, restoreBundle } from '../../../packages/portability/src/index.ts'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { ProductStore } from '@personal-agent/storage'
 import { buildPersonalChain, projectId } from './helpers/personal-chain.ts'
 
+import { fileURLToPath } from 'node:url'
+const repoRoot = fileURLToPath(new URL('../../../', import.meta.url))
 const packageTar = process.env.PA_WAVE24_PACKAGE ??
   '/Users/hh/Desktop/joker/pa-artifacts/wave23-target/wave23-target-0ede11d.tar.gz'
 const expectedTarSha = 'd039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21'
@@ -153,6 +156,9 @@ test('the exact frozen package truly starts, reuses and stops through the single
   assert.equal(first.data.manifest?.roots.from, realpathSync(chain.source))
   assert.equal(first.data.manifest?.roots.to, realpathSync(restored))
   assert.equal(first.data.work?.id, chain.workId)
+  assert.equal(first.data.targetProof?.subjectMatches, true)
+  assert.equal(first.data.targetProof?.fingerprintRelation, 'exact')
+  assert.equal(first.data.targetProof?.artifacts?.total > 0, true)
   assert.equal(first.cleanup.owned, true)
   assert.equal(first.cleanup.stopped, true)
   assert.equal(first.cleanup.detail, 'pa-stop-verified')
@@ -187,6 +193,48 @@ test('the exact frozen package truly starts, reuses and stops through the single
   assert.equal(narrow.data.chat, 422)
   assert.equal(narrow.data.replay?.contextToken, 422)
   assert.equal(paCall(['status', '--json', '--state', restored]).status, 'STOPPED')
+
+  // A target-only legal user message changes the subject even though the root path mapping matches.
+  const driftRoot = join(root, 'restored-drift')
+  mkdirSync(driftRoot, { recursive: true, mode: 0o700 })
+  cpSync(restored, driftRoot, { recursive: true })
+  writeFileSync(join(driftRoot, 'restore-report.json'), JSON.stringify({ ...JSON.parse(readFileSync(join(driftRoot, 'restore-report.json'), 'utf8')), targetPath: driftRoot }), { mode: 0o600 })
+  const driftStore = new ProductStore({ path: join(driftRoot, 'state.sqlite') })
+  try {
+    driftStore.product.messages.append({ id: 'drift-user-message', projectId, conversationId: 'wave22-conversation', role: 'user',
+      provenance: 'trusted_user', text: '合法但不在原 subject 中的消息', sourceRefs: [], createdAt: new Date().toISOString() })
+  } finally { driftStore.close() }
+  const driftDriver = async (stateRoot: string) => {
+    try {
+      execFileSync(process.execPath, [driver, '--dialect', 'source', '--install', repoRoot, '--state', stateRoot, '--project', projectId,
+        '--allow-path', 'src/', '--console-port', String(await availablePort()), '--api-port', String(await availablePort()),
+        '--model-config', chain.model.file,
+        '--a-worktree', aWorktree, '--a-module', aModule, '--manifest-db', join(chain.source, 'state.sqlite'),
+        '--manifest-expectation', expectation, '--manifest-output', join(root, 'drift-manifest.json'),
+        '--root-map', `${chain.source}=${stateRoot}`], { encoding: 'utf8', timeout: 120000 })
+      return null
+    } catch (error) {
+      const stdout = String((error as { stdout?: string }).stdout ?? '').trim().split('\n').at(-1)
+      return JSON.parse(stdout ?? '{}')
+    }
+  }
+  // 1) extra legal message
+  const messageDrift = await driftDriver(driftRoot)
+  assert.equal(messageDrift?.status, 'failed')
+  assert.equal(messageDrift?.failure?.code, 'target_subject_mismatch', JSON.stringify(messageDrift?.failure))
+
+  // 2) same metadata but replaced artifact bytes
+  const artifactRoot = join(root, 'restored-artifact-drift')
+  mkdirSync(artifactRoot, { recursive: true, mode: 0o700 })
+  cpSync(restored, artifactRoot, { recursive: true })
+  writeFileSync(join(artifactRoot, 'restore-report.json'), JSON.stringify({ ...JSON.parse(readFileSync(join(artifactRoot, 'restore-report.json'), 'utf8')), targetPath: artifactRoot }), { mode: 0o600 })
+  const artifactFile = join(artifactRoot, 'artifacts', chain.frozenDigest)
+  const artifactBytes = readFileSync(artifactFile)
+  artifactBytes[0] = artifactBytes[0]! ^ 0xff
+  writeFileSync(artifactFile, artifactBytes, { mode: statSync(artifactFile).mode & 0o777 })
+  const artifactDrift = await driftDriver(artifactRoot)
+  assert.equal(artifactDrift?.status, 'failed')
+  assert.equal(artifactDrift?.failure?.code, 'target_subject_mismatch')
 
   // A legitimate same-selection reuse keeps the original launcher and read selection.
   const reuseFile = join(root, 'reuse-selection.json')
