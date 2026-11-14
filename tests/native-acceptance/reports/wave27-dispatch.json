@@ -1,0 +1,45 @@
+{
+  "wave": "product-wave-27",
+  "role": "B",
+  "stage": "2 of 5",
+  "base": "f3ca2eb",
+  "consumes": "packages/contracts/src/coordinator-channel.ts (WP-16/0068 contract types only)",
+  "iModuleConsumed": false,
+  "iModuleReason": "I's apps/runner/src/attach-channel/ implementation is not present in this worktree; only the shared 0068 contract is available, so this stage consumes the contract and implements the dispatch in B-owned apps/runner/src/business-dispatch.ts without touching I's reserved paths",
+  "delivered": {
+    "file": "apps/runner/src/business-dispatch.ts",
+    "unifies": "fact ACK, payload read and native-write admission now go through ONE generation-scoped dispatch instead of three independent waiter maps",
+    "invariants": [
+      "producer comes from the original trusted registration and is compared by the contract's sameCoordinatorChannelProducer",
+      "generation starts 0, first CAS bind returns 1, monotonic and never reused; rebinding the same lease keeps the generation",
+      "replies are served only for the current generation, and a settled request id cannot be served again",
+      "detach rejects every pending native write as indeterminate and grants nothing",
+      "no automatic business-command replay and no permission migration between leases"
+    ]
+  },
+  "observed": {
+    "harness": "tests/native-acceptance/b27-dispatch.mjs",
+    "result": "4 PASS / 1 FAIL / 1 NOT_TESTED",
+    "passing": [
+      "B27-DISPATCH-GENERATION-CAS - generation 0 -> 1, rebind keeps 1",
+      "B27-FACT-ORIGINAL-ID-ACK - fact acknowledged against its original id",
+      "B27-PAYLOAD-ORIGINAL-REF-REREAD - payload reread by its original reference",
+      "B27-STALE-LEASE-NOT-SERVED - after detach nothing is served (not_bound)"
+    ],
+    "failing": {
+      "case": "B27-PENDING-WRITE-INDETERMINATE-ON-DETACH",
+      "observed": "the write request never registered, so detach had nothing to reject",
+      "cause": "the harness's answer command does not match the strict RunnerCommand 'answer' shape, so the request was rejected at schema parse before reaching the pending map",
+      "meaning": "the indeterminate-on-detach behaviour is implemented but NOT yet observed; the harness must build its command through the real answer shape"
+    }
+  },
+  "strict": "direct strict + exactOptionalPropertyTypes compile of business-dispatch.ts exits 0",
+  "notDone": {
+    "threeWaiterMapRemovalInRunnerService": "the runner service still routes its command intake through the old path; wiring it to this dispatch is not done",
+    "stdioEndpointSingleDispatch": "not proven that the endpoint route and the stdio handler enter this one dispatch",
+    "sameRunnerDualClient": "NOT_REACHED",
+    "result2To5": "NOT_REACHED"
+  },
+  "wholePackageComplete": false,
+  "budget": { "modelCallsThisWave": 0, "nativeTurnsThisWave": 0, "cap4": "UNKNOWN unspendable" }
+}
