@@ -1,0 +1,51 @@
+{
+  "protocol": "restored-scope-ui-input/5",
+  "consumers": {
+    "main": { "sourceCommit": "ca01e17", "role": "source diagnostic UI, FTrialWorkspace and channel/readiness inputs already present" },
+    "F": { "path": "apps/console/src/trial/", "role": "trial experience consumes data only; C does not edit it" }
+  },
+  "backend": {
+    "sources": "GET /v1/messages/:id/context/sources?scopeReview=1",
+    "readiness": "GET /v1/readiness (authenticated)",
+    "targetProof": "driver output data.targetProof (A restore verification, not an HTTP endpoint)"
+  },
+  "states": {
+    "verified": "已核对冻结原文",
+    "scope_changed": "当前只读选择与冻结时不同；原文未展示",
+    "missing": "冻结原文文件缺失",
+    "unverified": "无法核对冻结原文"
+  },
+  "reasons": {
+    "project_changed": "所属项目与冻结时不同",
+    "selection_narrowed": "当前允许路径比冻结时更窄",
+    "selection_broadened": "当前允许路径比冻结时更宽",
+    "selection_replaced": "允许路径已变化",
+    "exclusion_added": "新增了排除路径",
+    "exclusion_removed": "移除了排除路径",
+    "selection_validity_changed": "选择有效期与冻结时不同"
+  },
+  "samples": {
+    "verifiedValidity": { "state": "verified", "reasons": ["selection_validity_changed"], "partial": false, "withheldSourceCount": 0, "authorization": "none" },
+    "scopeChangedNarrow": { "state": "scope_changed", "reasons": ["selection_narrowed", "selection_validity_changed"], "partial": true, "withheldSourceCount": 2, "authorization": "none" },
+    "missing": { "state": "missing", "partial": true, "withheldSourceCount": 0, "authorization": "none" },
+    "unverified": { "state": "unverified", "partial": true, "withheldSourceCount": 0, "authorization": "none" }
+  },
+  "readinessSample": {
+    "package": "ce64fc1 / d4b1780d",
+    "authorization": "none",
+    "startupMode": "recovery_readonly",
+    "development": "readonly",
+    "execution": "unavailable",
+    "discussion": "unknown",
+    "projects": { "dispatchable": 0 },
+    "profiles": { "admittedNative": 0, "admittedControlled": 0 },
+    "capabilities": { "decisions": false, "proposals": false }
+  },
+  "targetProof": {
+    "meaning": "A content/restore identity, not execution or release permission",
+    "allowed": ["subject.dataRoot"],
+    "rejected": ["appended work.accepted business event", "legal extra user message", "replaced artifact bytes", "wrong snapshot/content digest", "foreign source root"]
+  },
+  "forbidden": ["readable counts", "raw paths", "principal/tokens", "authorization none as approval", "displaying proof as native/execution readiness"],
+  "provenance": ["packages/knowledge/test/main-personal-package-install.case.ts", "packages/knowledge/test/main-personal-package-current.case.ts", "packages/knowledge/test/main-personal-restore-formats.case.ts"]
+}
