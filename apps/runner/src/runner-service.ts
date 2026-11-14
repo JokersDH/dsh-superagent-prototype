@@ -24,6 +24,7 @@ import { join } from 'node:path'
 import type { AgentDriverV1, AttemptIO } from '../../../packages/contracts/src/ports.ts'
 import type { AttemptSpec, CriticalFact, DurableReceipt, Json, RunnerCommand } from '../../../packages/contracts/src/types.ts'
 import { JsonLineDecoder, encodeFrame } from '../../../packages/driver-kit/src/index.ts'
+import { createHash } from 'node:crypto'
 import { FileCriticalJournal } from './file-journal.ts'
 import { AttemptArtifactManifest } from './artifact-manifest.ts'
 import { serveRecoveryEndpoint, endpointDirectory, type RecoveryEndpoint } from './recovery-endpoint.ts'
@@ -288,6 +289,16 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                   next = entry.seq
                 }
                 return { frames, next, done }
+              },
+              // A frame too large to inline is delivered by reference and read in bounded chunks here,
+              // so a legitimate large payload stays readable without widening the transport cap.
+              payload: async (ref, offset, length) => {
+                const entry = journal!.entries().find(candidate => candidate.fact.payloadRef === ref)
+                if (!entry) throw new Error('Unknown payload reference')
+                const bytes = Buffer.from(JSON.stringify(entry.payload), 'utf8')
+                const digest = createHash('sha256').update(bytes).digest('hex')
+                const slice = bytes.subarray(offset, offset + length)
+                return { total: bytes.length, digest, base64: slice.toString('base64') }
               },
               // Business commands are admitted to the SAME attempt and child through the existing feed.
               command: async command => {

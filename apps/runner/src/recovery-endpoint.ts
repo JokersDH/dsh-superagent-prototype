@@ -17,6 +17,7 @@ export type RecoveryEndpointOptions = {
   cancel: (command: Extract<RunnerCommand, { kind: 'cancel' }>) => Promise<void>
   /** Durable business facts this Runner already recorded, for attach replay. */
   facts?: (since: number, maxBytes: number) => Promise<{ frames: unknown[]; next: number; done: boolean }>
+  payload?: (ref: string, offset: number, length: number) => Promise<{ total: number; digest: string; base64: string }>
   /** Business command intake for an attached client; applied to the same attempt and child. */
   command?: (command: RunnerCommand) => Promise<void>
   now?: () => string
@@ -67,6 +68,7 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
       return state()
     },
     ...(options.facts ? { facts: options.facts } : {}),
+    ...(options.payload ? { payload: options.payload } : {}),
     ...(options.command ? { command: async (command) => { await options.command!(command); return state() } } : {}),
   })
   return {

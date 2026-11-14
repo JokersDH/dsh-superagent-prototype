@@ -9,6 +9,10 @@ import { AttemptRefSchema, IdSchema, RunnerCommandSchema, TimestampSchema } from
 import type { RuntimeProducer } from './contracts.ts'
 
 const MAX_BYTES = 64 * 1024
+/** Inline page ceiling; a bigger frame is delivered by reference instead of widening this cap. */
+const INLINE_PAGE_BYTES = 48 * 1024
+/** Largest single payload chunk a caller may request. */
+const PAYLOAD_CHUNK_BYTES = 32 * 1024
 const ResourceStateSchema = z.strictObject({
   ref: IdSchema, ownership: z.enum(['spawned_process', 'shared_service_session']),
   writer: z.enum(['active', 'quiescent', 'indeterminate']), evidence: z.array(z.string().min(1).max(1024)).max(32),
@@ -33,6 +37,12 @@ export interface RecoveryRunnerPort {
    * durable journal, not from the caller's memory.
    */
   facts?(since: number, maxBytes: number): Promise<{ frames: unknown[]; next: number; done: boolean }>
+  /**
+   * One bounded chunk of an immutable payload. A payload larger than the response cap is transferred by
+   * reference and read in chunks here, so a legitimate large frame stays readable without raising the
+   * global cap or truncating the payload.
+   */
+  payload?(ref: string, offset: number, length: number): Promise<{ total: number; digest: string; base64: string }>
   /**
    * Business command intake for an attached client. The Runner applies it to the SAME attempt and
    * child; this is admission of an authenticated command, not a second execution lifecycle.
@@ -70,9 +80,26 @@ function credential(path: string): string {
 function identity(context: RuntimeProducer): RuntimeProducer {
   return { attempt: AttemptRefSchema.parse(context.attempt), runnerIdentityRef: IdSchema.parse(context.runnerIdentityRef), source: IdSchema.parse(context.source) }
 }
-/** A business command must name the same attempt it claims to act for. */
-function matchesProducerAttempt(attempt: RuntimeProducer['attempt'], command: { ticketId?: unknown; fenceEpoch?: unknown }): boolean {
-  return command.ticketId === attempt.ticketId && command.fenceEpoch === attempt.fenceEpoch
+/**
+ * A business command must name the SAME attempt it claims to act for: ticket, epoch, attempt id and the
+ * full contract. Comparing only ticket and epoch accepted a command carrying a foreign assignment,
+ * attempt or contract, which is why the whole tuple is required here.
+ */
+function matchesCommandIdentity(attempt: RuntimeProducer['attempt'], command: {
+  ticketId?: unknown
+  fenceEpoch?: unknown
+  attemptId?: unknown
+  assignmentId?: unknown
+  contract?: { workId?: unknown; revision?: unknown; digest?: unknown } | undefined
+}): boolean {
+  return command.ticketId === attempt.ticketId
+    && command.fenceEpoch === attempt.fenceEpoch
+    && command.attemptId === attempt.attemptId
+    && (command.assignmentId === undefined || command.assignmentId === attempt.assignmentId)
+    && (command.contract === undefined
+      || (command.contract.workId === attempt.contract.workId
+        && command.contract.revision === attempt.contract.revision
+        && command.contract.digest === attempt.contract.digest))
 }
 function matches(a: RuntimeProducer, b: RuntimeProducer): boolean {
   const left = a.attempt, right = b.attempt
@@ -119,13 +146,30 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       const maxBytes = Number(query.get('maxBytes') ?? '49152')
       if (!Number.isSafeInteger(since) || since < 0) { reply(res, 400, { error: 'invalid_since' }); return }
       if (!Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 1_048_576) { reply(res, 400, { error: 'invalid_page_budget' }); return }
-      const replay = await backend.facts(since, maxBytes)
+      // The response cap is not raised. A page budget above it is honoured only up to the inline limit
+      // and the effective budget is reported, so a caller can never be handed a silently truncated page.
+      const inlineBudget = Math.min(maxBytes, INLINE_PAGE_BYTES)
+      const replay = await backend.facts(since, inlineBudget)
       if (!Array.isArray(replay.frames) || !Number.isSafeInteger(replay.next) || replay.next < since || typeof replay.done !== 'boolean') {
         reply(res, 503, { error: 'invalid_replay' }); return
       }
       // Every page carries the server's OWN registered producer identity, injected here rather than
       // trusted from the backend, so a caller can verify the page before it exposes any frame.
-      reply(res, 200, { producer: trusted, frames: replay.frames, next: replay.next, done: replay.done })
+      reply(res, 200, { producer: trusted, frames: replay.frames, next: replay.next, done: replay.done, requestedMaxBytes: maxBytes, budget: inlineBudget, inlineLimit: INLINE_PAGE_BYTES })
+      return
+    }
+    if (req.method === 'GET' && req.url?.startsWith('/v1/payload')) {
+      if (!backend.payload) { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
+      const query = new URL(req.url, 'http://runner').searchParams
+      const ref = query.get('ref'), offset = Number(query.get('offset') ?? '0'), length = Number(query.get('length') ?? String(PAYLOAD_CHUNK_BYTES))
+      if (!ref || ref.length > 512) { reply(res, 400, { error: 'invalid_ref' }); return }
+      if (!Number.isSafeInteger(offset) || offset < 0) { reply(res, 400, { error: 'invalid_offset' }); return }
+      if (!Number.isSafeInteger(length) || length < 1 || length > PAYLOAD_CHUNK_BYTES) { reply(res, 400, { error: 'invalid_chunk_length' }); return }
+      const chunk = await backend.payload(ref, offset, length)
+      if (!chunk || typeof chunk.total !== 'number' || typeof chunk.digest !== 'string' || typeof chunk.base64 !== 'string') {
+        reply(res, 503, { error: 'invalid_payload' }); return
+      }
+      reply(res, 200, { ref, offset, length: chunk.base64.length, total: chunk.total, digest: chunk.digest, base64: chunk.base64 })
       return
     }
     if (req.method === 'POST' && req.url === '/v1/commands') {
@@ -140,7 +184,7 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       let claimedProducer: RuntimeProducer
       try { claimedProducer = identity(claimed as RuntimeProducer) } catch { reply(res, 409, { error: 'identity_mismatch' }); return }
       if (!matches(claimedProducer, trusted)) { reply(res, 409, { error: 'identity_mismatch' }); return }
-      if (!matchesProducerAttempt(claimedProducer.attempt, command)) { reply(res, 409, { error: 'identity_mismatch' }); return }
+      if (!matchesCommandIdentity(claimedProducer.attempt, command as unknown as Record<string, unknown>)) { reply(res, 409, { error: 'identity_mismatch' }); return }
       const content = JSON.stringify(command), existing = commands.get(command.id)
       if (existing && existing.body !== content) { reply(res, 409, { error: 'command_conflict' }); return }
       if (!existing && commands.size >= 256) { reply(res, 503, { error: 'control_capacity' }); return }
@@ -235,5 +279,12 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
       if (!matches(pageProducer, trusted)) throw new RunnerLinkError('identity_mismatch', 'Fact replay page belongs to another registered attempt')
       return { producer: pageProducer, frames: replay.frames as unknown[], next: replay.next as number, done: replay.done as boolean }
     },
-    command: (command: ReturnType<typeof RunnerCommandSchema.parse>) => call('POST', '/v1/commands', { producer: trusted, command }) })
+    command: (command: ReturnType<typeof RunnerCommandSchema.parse>) => call('POST', '/v1/commands', { producer: trusted, command }),
+    payload: async (ref: string, offset = 0, length = 32_768) => {
+      const { value } = await invoke('GET', `/v1/payload?ref=${encodeURIComponent(ref)}&offset=${offset}&length=${length}`) as { value: unknown }
+      const chunk = value as { total?: unknown; digest?: unknown; base64?: unknown; offset?: unknown; length?: unknown }
+      if (typeof chunk?.base64 !== 'string' || typeof chunk?.digest !== 'string' || !Number.isSafeInteger(chunk?.total))
+        throw new RunnerLinkError('invalid_response', 'Runner payload chunk did not match the attach protocol')
+      return { total: chunk.total as number, digest: chunk.digest as string, base64: chunk.base64 as string, offset: chunk.offset as number, length: chunk.length as number }
+    } })
 }

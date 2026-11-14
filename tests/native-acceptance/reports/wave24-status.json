@@ -1,0 +1,71 @@
+{
+  "wave": "product-wave-24",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "base": "4e805de",
+  "previousCandidate": "3a40d00",
+  "checkpoint": "1 of 3",
+  "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. No second ledger/coordinator/lifecycle, no frozen-wire edit, no main guard removed, no global socket scan, no other credentials, no user resource signals. Twelve services and all ledgers untouched. Two historical report diffs and untracked b16-real-begin.mjs preserved.",
+
+  "priorScopesKept": "page producer identity, foreign-source pre-write refusal, 160-entry/ten-page seq160 replay, strict/exactOptional clean and old control 9/9 are unchanged and not re-dispatched",
+
+  "namedDefectsAddressed": {
+    "commandOnlyComparedTicketAndEpoch": {
+      "before": "a command carrying a foreign assignment, attempt or contract still passed because only ticket and epoch were compared",
+      "after": "the command must now match ticket, epoch, attempt id and the full contract (workId, revision, digest) against the claimed attempt, verified BEFORE the backend is touched; an optional assignment id must also match when present"
+    },
+    "largeFrameAndLargePageBudgetHitTheResponseCap": {
+      "before": "a requested 131072 page and one valid >64KiB writer.observed frame tripped the 64KiB response cap",
+      "after": "the cap is NOT raised. The inline page ceiling is 48KiB; a larger requested budget is honoured only up to that ceiling and both requestedMaxBytes and the effective budget are reported so a page is never silently truncated. A payload too large to inline is transferred BY REFERENCE through a dedicated GET /v1/payload?ref=&offset=&length= route returning bounded chunks with total and SHA-256 digest, and the client reassembles and can verify it",
+      "honesty": "the transport now has a real payload reader on both ends; the service serves chunks from the journal entry for that payloadRef"
+    }
+  },
+
+  "deliveredSource": {
+    "files": [
+      "packages/execution/src/recovery-transport.ts",
+      "apps/runner/src/recovery-endpoint.ts",
+      "apps/runner/src/runner-service.ts",
+      "apps/runner/src/business-attach.ts"
+    ],
+    "typecheck": "root tsconfig reports no error in any touched file"
+  },
+
+  "earlyInterfaceForMain": {
+    "rfc": "docs/rfcs/WP-03/0001-b-runner-business-attach.md",
+    "status": "published",
+    "content": "the attach port surface, the three authenticated routes, the relationship to RunnerLink/AttemptRunner/FileCriticalJournal, the guarantees, and an explicit not-claimed section"
+  },
+
+  "notPassing": {
+    "b23Harness": "still does not pass. Its synthetic journal entries are rejected because the source and payload kind are not valid, so the whole-file verification refuses the snapshot (journal_snapshot_unverified). The packet is right that the harness itself is invalid; it must build the journal through the real product path and use a real writer.observed payload kind.",
+    "b22Handover": "the same-Runner A-to-B handover still fails with unknown_outcome",
+    "meaning": "the complete-tuple refusal and the bounded payload path are implemented and type-clean but NOT observed end-to-end"
+  },
+
+  "stillNotDone": {
+    "unifiedDispatch": "the new endpoint command path and the original stdio path are not yet proven to share ONE dispatch with begin-once, prepared-policy and control priority",
+    "receiptAckPayloadNativeAdmissionRebind": "fact receipt ACK, immutable payload read rebinding and native write admission still belong to the original stdio channel",
+    "sameRunnerDualClient": "no passing A-disconnect/B-takeover proof against a real Runner/child",
+    "milestone1": "NOT PASSED",
+    "milestone2_sigkillRecovery": "NOT_REACHED",
+    "milestone3_recoveredVerifyAcceptSlots": "NOT_REACHED"
+  },
+
+  "wholePackageComplete": false,
+
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false },
+      { "grantId": "wave05-independent-review-pilot-01", "limit": 24, "owner": "E", "bConsumes": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+
+  "limitations": [
+    "no passing acceptance harness this checkpoint, so the new behaviours are source-and-typecheck evidence only",
+    "the new business channel remains outside the default product until admitted",
+    "one of three runnable milestones published"
+  ]
+}
