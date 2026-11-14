@@ -92,9 +92,16 @@ try {
   log.begin('B27-CHAIN-B-SUCCESSOR-SERVES-SAME-ATTEMPT', 'a successor lease finishes the same attempt', 'controlled_process')
   const successorRegistration = join(root, 'registration-b.json')
   writeFileSync(successorRegistration, JSON.stringify({ ...JSON.parse(readFileSync(registration, 'utf8')), leaseId: 'lease-chain-b' }), { mode: 0o600 })
-  await runner.command(makeCommand('deliver', { id: 'cmd-chain-deliver', inputRef: 'input-chain' })).catch(() => undefined)
   const second = await serve(successorRegistration)
-  // Give the successor a real window: it must actually serve at least one callback on the same attempt.
+  // ORDER MATTERS: the successor must hold the lease BEFORE the facts are raised. A command fed while the
+  // dead coordinator still owned the lease would be dropped by the detach, which is the intended behaviour
+  // and must not be replayed into the new lease.
+  let boundB = null
+  for (let index = 0; index < 200 && !boundB; index += 1) {
+    boundB = second.lines.find(line => line.bound)
+    if (!boundB) await new Promise(resolve => setTimeout(resolve, 25))
+  }
+  await runner.command(makeCommand('deliver', { id: 'cmd-chain-deliver', inputRef: 'input-chain' })).catch(() => undefined)
   let servedByB = []
   for (let index = 0; index < 400 && servedByB.length === 0; index += 1) {
     servedByB = second.lines.filter(line => line.served)
@@ -105,7 +112,7 @@ try {
     const client = connectRunnerRecovery(registered, { attempt: JSON.parse(readFileSync(registration, 'utf8')).attempt, ...producer }, 3000)
     return client.inspect().then(value => value.inspection).catch(() => null)
   })()
-  log.evidence({ pidB: second.pid, servedByB: servedByB.map(line => line.id), attemptId: inspection?.attempt?.attemptId ?? null, fenceEpoch: inspection?.attempt?.fenceEpoch ?? null })
+  log.evidence({ pidB: second.pid, boundBeforeDelivery: Boolean(boundB), servedByB: servedByB.map(line => line.id), attemptId: inspection?.attempt?.attemptId ?? null, fenceEpoch: inspection?.attempt?.fenceEpoch ?? null })
   const sameAttempt = inspection?.attempt?.attemptId === spec.attemptId && inspection?.attempt?.fenceEpoch === spec.fenceEpoch
   if (sameAttempt && servedByB.length >= 1) {
     log.pass(`successor lease ${second.pid} served ${servedByB.length} callback(s) and the Runner still reports attempt ${spec.attemptId} at epoch ${spec.fenceEpoch}`)
