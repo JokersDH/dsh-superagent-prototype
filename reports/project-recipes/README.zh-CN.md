@@ -22,7 +22,7 @@
 | `pnpm --dir packages/project-recipes test` | 0 | 42 tests / 42 pass / 0 fail |
 | `pnpm --dir packages/project-recipes build` | 0 | `dist/`（不提交） |
 | `./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json` | 0 | CLI/读取器/测试同等严格 |
-| `node --test tools/project-recipes/test/*.case.ts` | 0 | 29 tests / 29 pass / 0 fail |
+| `node --test tools/project-recipes/test/*.case.ts` | 0 | 30 tests / 30 pass / 0 fail |
 | `node packages/project-recipes/examples/preview-consumer.ts` | 0 | draft + needs_input + draft；生成的 `create_work` 过公开 schema |
 | `node agent-tasks/product-wave-27/verify.mjs` | 0 | `PASS_TEN_AGENT_DISPATCH_STATIC_ONLY`（静态结构/预算/所有权） |
 

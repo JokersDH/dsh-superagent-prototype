@@ -112,7 +112,7 @@ node tools/project-recipes/cli.ts … --output /tmp/recipe-draft.json
 | `--now <ISO>` | 决定 facts 新鲜度；省略用当前时间（测试与复跑请显式给出）。 |
 | `--max-facts-age-ms <n>` | 覆盖默认 60 分钟上限。 |
 | `--output <新文件>` | 仅在文件不存在时写入（`O_EXCL`），同时仍把 JSON 打到 stdout。 |
-| `--help` / `-h` | 不读取任何文件。 |
+| `--help` / `-h` | 不读取任何文件，也不加载库（workspace 依赖未构建时仍可用）。 |
 
 退出码：
 
@@ -125,6 +125,8 @@ node tools/project-recipes/cli.ts … --output /tmp/recipe-draft.json
 | `5` | 输入被拒绝（坏 JSON、缺失文件、符号链接、超限、输出文件已存在、facts 不合法） |
 
 `--root` 观察到的 `note:` 走 stderr；stdout 只有一个 JSON 结果。stdout 不含绝对路径、脚本正文或环境材料。
+
+若 workspace 依赖尚未构建，CLI 在加载失败时给一条可执行的拒绝（`refused [unreadable] packages/contracts/dist: …请先运行 pnpm --dir packages/contracts build`，exit 5），不会抛出模块栈。
 
 ---
 
@@ -286,7 +288,7 @@ pnpm --dir packages/project-recipes build
 
 # CLI 与读取器
 ./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json
-node --test tools/project-recipes/test/*.case.ts  # 29 tests
+node --test tools/project-recipes/test/*.case.ts  # 30 tests
 
 # 端到端样例（draft / needs_input / unsupported）
 node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/configuration.json \

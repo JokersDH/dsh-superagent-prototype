@@ -16,10 +16,16 @@ import { createHash } from 'node:crypto'
 import { homedir } from 'node:os'
 import { basename, dirname, isAbsolute, join, sep } from 'node:path'
 import type { ProjectFacts } from '../../packages/project-recipes/src/index.ts'
-import { FOREIGN_STACK_MARKERS, KNOWN_LOCKFILES } from '../../packages/project-recipes/src/index.ts'
+
+/**
+ * Closed name lists kept local so this reader has no runtime dependency on the library build; a test
+ * asserts they match the package's exported constants.
+ */
+export const KNOWN_LOCKFILE_NAMES = ['package-lock.json', 'pnpm-lock.yaml', 'npm-shrinkwrap.json', 'yarn.lock', 'bun.lockb'] as const
+export const FOREIGN_MARKER_NAMES = ['pyproject.toml', 'go.mod', 'Cargo.toml', 'pom.xml', 'build.gradle'] as const
 
 /** Names this reader may open. Anything else is never touched. */
-export const METADATA_NAMES = ['package.json', 'tsconfig.json', 'pnpm-workspace.yaml', ...KNOWN_LOCKFILES, ...FOREIGN_STACK_MARKERS] as const
+export const METADATA_NAMES = ['package.json', 'tsconfig.json', 'pnpm-workspace.yaml', ...KNOWN_LOCKFILE_NAMES, ...FOREIGN_MARKER_NAMES] as const
 export type MetadataName = (typeof METADATA_NAMES)[number]
 
 export interface MetadataLimits {
@@ -208,8 +214,8 @@ export function observeProjectMetadata(input: {
 
   const has = (name: MetadataName): boolean => probe(root, name) === 'file'
 
-  const locks: { name: (typeof KNOWN_LOCKFILES)[number]; digest?: string }[] = []
-  for (const name of KNOWN_LOCKFILES) {
+  const locks: { name: (typeof KNOWN_LOCKFILE_NAMES)[number]; digest?: string }[] = []
+  for (const name of KNOWN_LOCKFILE_NAMES) {
     if (!has(name)) continue
     const stats = lstatSync(join(root, name))
     if (stats.size > limits.maxLockfileBytes) {
@@ -224,7 +230,7 @@ export function observeProjectMetadata(input: {
   }
   if (locks.length === 0) missing.add('lockfile')
 
-  const foreignMarkers = FOREIGN_STACK_MARKERS.filter((marker) => has(marker))
+  const foreignMarkers = FOREIGN_MARKER_NAMES.filter((marker) => has(marker))
   const hasPackageJson = has('package.json')
   const hasTsconfig = has('tsconfig.json')
   const hasPnpmWorkspace = has('pnpm-workspace.yaml')
@@ -304,7 +310,7 @@ export function observeProjectMetadata(input: {
     },
     stack,
     manager,
-    locks: locks.slice(0, KNOWN_LOCKFILES.length),
+    locks: locks.slice(0, KNOWN_LOCKFILE_NAMES.length),
     workspace: { declaration: workspaceDeclaration },
     scripts,
     languages: hasPackageJson ? (hasTsconfig ? ['node', 'typescript'] : ['node']) : [],

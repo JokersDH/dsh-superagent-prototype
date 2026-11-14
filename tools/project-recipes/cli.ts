@@ -10,19 +10,36 @@
  * The CLI never installs, runs or registers anything, never starts a model/agent, never writes to a
  * project, and never prints script bodies or environment material. `--help` touches no file.
  */
-import { existsSync, writeFileSync } from 'node:fs'
-import { fileURLToPath, pathToFileURL } from 'node:url'
-import { dirname, resolve } from 'node:path'
-import { matchRecipe, RecipeInputError, RECIPE_KINDS, type RecipeSelection } from '../../packages/project-recipes/src/index.ts'
+import { writeFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
+import { resolve } from 'node:path'
 import { MetadataRefused, observeProjectMetadata, readJsonFile } from './metadata.ts'
+import type { RecipeSelection } from '../../packages/project-recipes/src/index.ts'
 
 export const EXIT = Object.freeze({ draft: 0, usage: 2, needsInput: 3, unsupported: 4, refused: 5 })
+
+/** Mirrors the catalog for `--help`; a test asserts it matches the package's exported kinds. */
+export const HELP_KINDS = ['regression_fix', 'scoped_change', 'verification_followup'] as const
+
+type Library = typeof import('../../packages/project-recipes/src/index.ts')
+
+/**
+ * The library is loaded lazily so a missing workspace build produces one actionable refusal instead
+ * of a raw module-resolution stack before the CLI can explain itself.
+ */
+const loadLibrary = async (): Promise<Library> => {
+  try {
+    return await import('../../packages/project-recipes/src/index.ts')
+  } catch {
+    throw new MetadataRefused('unreadable', 'packages/contracts/dist', '缺少已构建的 workspace 依赖：请先运行 pnpm --dir packages/contracts build 后重试')
+  }
+}
 
 const HELP = `project-recipes — 只读的项目任务/检查声明建议（不含执行）
 
 用法：
   node tools/project-recipes/cli.ts --config <config.json> (--facts <facts.json> | --root <项目根>)
-      [--project <id>] [--kind <${RECIPE_KINDS.join('|')}>] [--paths <a,b>] [--exclude <a,b>]
+      [--project <id>] [--kind <${HELP_KINDS.join('|')}>] [--paths <a,b>] [--exclude <a,b>]
       [--criteria <x,y>] [--profile <id>] [--now <ISO>] [--max-facts-age-ms <n>] [--output <新文件>]
 
 输入：
@@ -106,11 +123,6 @@ export function parseArgs(argv: readonly string[]): Parsed {
   return parsed
 }
 
-const contractsBuilt = (): boolean => {
-  const here = dirname(fileURLToPath(import.meta.url))
-  return existsSync(resolve(here, '../../packages/contracts/dist/index.js'))
-}
-
 const projectIdFrom = (config: unknown, explicit: string | undefined): string => {
   if (explicit !== undefined) return explicit
   const projects = (config as { projects?: unknown })?.projects
@@ -129,7 +141,7 @@ const selectionFrom = (parsed: Parsed): RecipeSelection => ({
 })
 
 /** Runs one invocation; returns the process exit code. Exported for tests. */
-export function main(argv: readonly string[], io: { stdout: (text: string) => void; stderr: (text: string) => void } = { stdout: (text) => process.stdout.write(text), stderr: (text) => process.stderr.write(text) }): number {
+export async function main(argv: readonly string[], io: { stdout: (text: string) => void; stderr: (text: string) => void } = { stdout: (text) => process.stdout.write(text), stderr: (text) => process.stderr.write(text) }): Promise<number> {
   let parsed: Parsed
   try {
     parsed = parseArgs(argv)
@@ -141,12 +153,13 @@ export function main(argv: readonly string[], io: { stdout: (text: string) => vo
     io.stdout(HELP)
     return EXIT.draft
   }
+  let library: Library | undefined
   try {
     if (parsed.config === undefined) throw new UsageError('--config is required')
     if ((parsed.facts === undefined) === (parsed.root === undefined)) throw new UsageError('provide exactly one of --facts or --root')
     for (const [flag, value] of [['--paths', parsed.paths], ['--exclude', parsed.exclude], ['--criteria', parsed.criteria]] as const)
       if (value !== undefined && value.length === 0) throw new UsageError(`${flag} needs at least one value`)
-    if (!contractsBuilt()) throw new MetadataRefused('unreadable', 'packages/contracts/dist', '缺少已构建的 contracts 依赖：请先运行 pnpm --dir packages/contracts build')
+    library = await loadLibrary()
     const configuration = readJsonFile(parsed.config)
     const now = parsed.now ?? new Date().toISOString()
     if (!Number.isFinite(Date.parse(now))) throw new UsageError('--now must be an ISO timestamp')
@@ -169,7 +182,7 @@ export function main(argv: readonly string[], io: { stdout: (text: string) => vo
       notes.push(...observation.notes)
     }
     const kind = parsed.kind ?? 'regression_fix'
-    const result = matchRecipe({
+    const result = library.matchRecipe({
       facts,
       configuration,
       kind,
@@ -209,7 +222,7 @@ export function main(argv: readonly string[], io: { stdout: (text: string) => vo
       io.stderr(`refused [${error.code}] ${error.target}: ${error.message}\n`)
       return EXIT.refused
     }
-    if (error instanceof RecipeInputError) {
+    if (library !== undefined && error instanceof library.RecipeInputError) {
       io.stderr(`refused [${error.code}] ${error.message}\n`)
       return error.code === 'unknown_kind' ? EXIT.usage : EXIT.refused
     }
@@ -220,5 +233,5 @@ export function main(argv: readonly string[], io: { stdout: (text: string) => vo
 
 const entry = process.argv[1]
 if (entry !== undefined && import.meta.url === pathToFileURL(resolve(entry)).href) {
-  process.exitCode = main(process.argv.slice(2))
+  process.exitCode = await main(process.argv.slice(2))
 }

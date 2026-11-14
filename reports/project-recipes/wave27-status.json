@@ -87,8 +87,8 @@
         {
           "command": "node --test tools/project-recipes/test/*.case.ts",
           "exit": 0,
-          "tests": 29,
-          "pass": 29,
+          "tests": 30,
+          "pass": 30,
           "fail": 0,
           "note": "20 at this checkpoint; the suite grew to 29 with multi-project and boundary additions"
         },
@@ -163,8 +163,8 @@
         {
           "command": "node --test tools/project-recipes/test/*.case.ts",
           "exit": 0,
-          "tests": 29,
-          "pass": 29,
+          "tests": 30,
+          "pass": 30,
           "fail": 0
         },
         {
@@ -283,7 +283,7 @@
         "tools/project-recipes/cli.ts",
         "tools/project-recipes/test/cli.case.ts"
       ],
-      "capability": "Real CLI with --help, injected facts or authorized root, documented exits, stdout JSON plus stderr notes, new-file-only output, no model/agent/install and no project write."
+      "capability": "Real CLI with --help (works without a library build), injected facts or authorized root, documented exits, stdout JSON plus stderr notes, new-file-only output, lazy library load with an actionable refusal when the workspace dependency is unbuilt, no model/agent/install and no project write."
     },
     {
       "id": "J9",
@@ -382,7 +382,7 @@
         "tools/project-recipes/",
         "packages/project-recipes/"
       ],
-      "capability": "29 tools tests + 41 package tests; CLI and library write no SQL/registry/environment and create no execution state or cost ledger."
+      "capability": "30 tools tests + 42 package tests; CLI and library write no SQL/registry/environment and create no execution state or cost ledger."
     },
     {
       "id": "J17",
@@ -440,8 +440,8 @@
     },
     "tools": {
       "typecheckExit": 0,
-      "tests": 29,
-      "pass": 29,
+      "tests": 30,
+      "pass": 30,
       "fail": 0
     },
     "exampleExit": 0,

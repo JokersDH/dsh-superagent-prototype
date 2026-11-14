@@ -8,7 +8,8 @@ import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { matchRecipe } from '../../../packages/project-recipes/src/index.ts'
-import { MetadataRefused, observeProjectMetadata } from '../metadata.ts'
+import { FOREIGN_MARKER_NAMES, KNOWN_LOCKFILE_NAMES, MetadataRefused, observeProjectMetadata } from '../metadata.ts'
+import { HELP_KINDS } from '../cli.ts'
 import { fixture } from './paths.ts'
 
 const NOW = '2026-11-14T12:00:00.000Z'
@@ -267,4 +268,11 @@ test('refusal messages never echo file contents or secrets', () => {
       assert.equal(JSON.stringify({ message: error.message, target: error.target }).includes('SUPER_SECRET_VALUE'), false)
     }
   })
+})
+
+test('the reader name lists match the package constants they mirror', async () => {
+  const pkg = await import('../../../packages/project-recipes/src/index.ts')
+  assert.deepEqual([...KNOWN_LOCKFILE_NAMES], [...pkg.KNOWN_LOCKFILES])
+  assert.deepEqual([...FOREIGN_MARKER_NAMES], [...pkg.FOREIGN_STACK_MARKERS])
+  assert.deepEqual([...HELP_KINDS], [...pkg.RECIPE_KINDS])
 })
