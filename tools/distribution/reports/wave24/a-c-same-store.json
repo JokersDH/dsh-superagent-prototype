@@ -1,0 +1,78 @@
+{
+  "protocol": "wave24-a-c-same-store/1",
+  "status": "PASS_WITH_DIRECT_CONSUMPTION_LIMIT",
+  "stateRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-same-store-g1fuEH/reviewed/state",
+  "stateSha256": "d13af03e98f05d01c407453e9e21b2fe3799cb9811f2068f7d52ad6d1cb1bab1",
+  "aReader": {
+    "producerPid": 52538,
+    "readerPid": 52539,
+    "separateProcess": true,
+    "verification": {
+      "ok": true,
+      "coverage": {
+        "commands": "complete",
+        "dispatch": "complete",
+        "observations": "complete",
+        "deliveries": "complete",
+        "payloads": "complete"
+      }
+    },
+    "original": {
+      "binding": {
+        "attemptId": "attempt-7ff22d69-7274-40c4-a3f5-ee91737e5e7b",
+        "ticketId": "ad9e66aa770b076a02faf78b4a6c0b0f",
+        "assignmentId": "2531fd25b4bc242cd76347386da7a204",
+        "fenceEpoch": 1,
+        "contract": {
+          "workId": "276cc06c228825748795e0923d16ed40",
+          "revision": 1,
+          "digest": "1d4a02f812aac4ee7365a269bf2d2bfd75162e5c6685317322fb7a503ea053db"
+        },
+        "runnerIdentityRef": "eee4f36652a88b3cbc9ef7978e1771ba"
+      },
+      "question": {
+        "id": "codex-question-d72a004f5f5583c4a92853eeab93fa775ff002655130ad9d",
+        "version": 2,
+        "validity": "answered"
+      },
+      "answer": {
+        "id": "db4be89e34a893a388ee1a9e8f15e205",
+        "questionId": "codex-question-d72a004f5f5583c4a92853eeab93fa775ff002655130ad9d",
+        "digest": "ad9fed5544dec8d3e236eca6f9ec55c21e2a9a260415fe9e5c9823e40f677f9b"
+      },
+      "deliveries": [
+        {
+          "targetBindingId": "codex-target-d72a004f5f5583c4a92853eeab93fa775ff002655130ad9d",
+          "status": "native_applied"
+        }
+      ],
+      "observations": 7
+    },
+    "readerEntry": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows/test/fixtures/wave23-reader.mjs",
+    "producerEntry": "packages/workflows/dist/data-manifest.js"
+  },
+  "cDriver": {
+    "status": "verified-flow",
+    "verified": true,
+    "mode": "strict",
+    "dialect": "package",
+    "identity": {
+      "bound": true,
+      "requestedDigest": "7cb087959fed1b576d0e0b3c0e0066674a1442cb016c7a53a2654a7b3ad902b7",
+      "actualHealthDigest": "7cb087959fed1b576d0e0b3c0e0066674a1442cb016c7a53a2654a7b3ad902b7"
+    },
+    "packageSubject": null,
+    "assertions": 22,
+    "cleanup": {
+      "owned": true,
+      "attempted": true,
+      "stopped": true,
+      "detail": "pa-stop-verified"
+    },
+    "entry": "/tmp/w24frozen/install/app/apps/launcher/bin/pa.mjs",
+    "sha256": "5e17dbc6c17d7490fefaaa9469aa50fe6f73a3bd205b63d083646a95b0620112"
+  },
+  "limit": "A reader and C package driver ran against the same exact Store and original IDs; C did not directly consume the A manifest in this run. Direct A-output-to-C-consumer binding remains NOT_TESTED.",
+  "nativeTurns": 0,
+  "vendorSends": 0
+}
