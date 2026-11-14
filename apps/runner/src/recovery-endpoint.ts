@@ -92,14 +92,16 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
       closed = true
       admission = 'closed'
       await server.close()
-      if (shortDirectories.delete(options.directory)) {
-        try {
-          unlinkSync(credentialPath)
-          rmdirSync(options.directory)
-        } catch (error) {
-          if (!['ENOENT', 'ENOTEMPTY'].includes((error as NodeJS.ErrnoException).code ?? '')) throw error
-        }
+      // A closed endpoint returns EVERY resource it created. The socket file and the credential used to
+      // survive a normal close, so a stopped Runner left both behind; only the short-path case cleaned up.
+      const ignoreMissing = (error: unknown): void => {
+        const code = (error as NodeJS.ErrnoException).code ?? ''
+        if (!['ENOENT', 'ENOTEMPTY'].includes(code)) throw error
       }
+      shortDirectories.delete(options.directory)
+      try { unlinkSync(socketPath) } catch (error) { ignoreMissing(error) }
+      try { unlinkSync(credentialPath) } catch (error) { ignoreMissing(error) }
+      try { rmdirSync(options.directory) } catch (error) { ignoreMissing(error) }
     },
   }
 }

@@ -279,7 +279,14 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
   chmodSync(endpoint.socketPath, 0o600)
   const stat = lstatSync(endpoint.socketPath)
   return { endpoint: { ...endpoint, socketIdentity: { dev: stat.dev, ino: stat.ino } } satisfies RunnerEndpoint,
-    close: () => new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())) }
+    // server.close() waits for open connections, so a caller that still holds one would keep the socket
+    // and credential alive and the endpoint would never report its resources returned. Closing stops
+    // accepting and drops the idle connections that remain.
+    close: () => new Promise<void>((resolve, reject) => {
+      const done = server.close(error => error ? reject(error) : resolve())
+      server.closeAllConnections?.()
+      void done
+    }) }
 }
 
 export type VerifiedRunnerInspection = Readonly<{ inspection: RunnerInspection }>

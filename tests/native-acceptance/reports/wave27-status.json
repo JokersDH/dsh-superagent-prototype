@@ -2,8 +2,8 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "2d48612",
-  "checkpoint": "5 of 5",
+  "base": "549112c",
+  "checkpoint": "5 of 5 (item 5 boundary slice)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
     "status": "CORE OBSERVED on the real authenticated transport; not yet against a spawned Runner/child process",
@@ -28,13 +28,14 @@
     "bug_found_by_harness": "waiters created before the first bind belong to generation 0 and no lease owns them, so a client must bind before the callbacks are created; the first run hung for exactly that reason and the harness now binds first"
   },
   "regressions": {
+    "b27-sigkill": "6 PASS / 0 FAIL",
     "b27-dual-live": "6 PASS / 0 FAIL",
     "b27-dual-client": "5 PASS / 0 FAIL",
     "b27-channel": "5 PASS / 0 FAIL",
     "b27-dispatch": "5 PASS / 0 FAIL",
     "b27-small-pages": "2 PASS / 0 FAIL",
     "b26-ref-payload": "4 PASS / 0 FAIL",
-    "b18-product-normal": "4 PASS / 1 FAIL / 1 NOT_TESTED - unchanged; FAIL is the known-stale business-cancel stop assertion",
+    "b18-product-normal": "4 PASS / 1 FAIL / 1 NOT_TESTED - unchanged; known-stale business-cancel stop assertion",
     "typecheck": "root tsconfig clean"
   },
   "stillNotDone": {
@@ -85,5 +86,28 @@
     "defectFixed": {
       "genericRefusalMessage": "the transport collapsed every non-200 into 'Runner recovery request was refused or indeterminate', so a duplicate_begin refusal was indistinguishable from an unknown outcome. The transport now carries the server's own error code, and the command route returns the admission's code/reason as a structured 409 instead of letting a rejection become a generic failure"
     }
+  },
+  "item5_boundary": {
+    "status": "BOUNDARY SLICE OBSERVED; the same-Work human-accept product path is observed by b18, the candidate/slot parts are not",
+    "harness": "tests/native-acceptance/b27-epoch-ack.mjs",
+    "result": "4 PASS / 0 FAIL / 1 NOT_TESTED",
+    "cases": [
+      "B27-EPOCH-STALE-REFUSED - a well-formed command at epoch 2 was refused as identity_mismatch while the attempt is at epoch 1",
+      "B27-EPOCH-CURRENT-ACCEPTED - the same deliver at the current epoch was accepted, so the refusal is about the epoch and not the command",
+      "B27-ACK-LATE-REFUSED - a receipt arriving after its lease ended was refused instead of accepted",
+      "B27-RESOURCES-RETURNED - admission closed, state terminated, and every tracked resource is quiescent"
+    ],
+    "fixesFound": {
+      "endpointCleanup": "a closed endpoint only removed the socket and credential in the short-path case, so a normal close left both behind; close now removes the socket, the credential and the directory it created",
+      "closeHungOnOpenConnections": "server.close() waited for a connection the caller still held, so the endpoint never reported closed; close now drops the remaining connections",
+      "refusalSemantics": "returning a resource means every tracked writer is quiescent, not that the inventory is empty: the Runner keeps the record of what it started. One entry honestly carries sigterm-failed together with group-quiescent, which is recorded rather than smoothed over"
+    }
+  },
+  "item5_notReached": {
+    "sameWorkCheckCurrentCandidate": "the Runner boundary does not own the Work/candidate decision; b18-product-normal observes one work, a human criterion, the Broker question and a recorded answer on the real product chain, but a current-candidate comparison is not asserted",
+    "slots24": "the 2/4 slot accounting and its full resource return are not asserted; only a single attempt's quiescence is observed",
+    "interfaceConsumerCompileCompat": "not done",
+    "faultBackpressureClose": "not done",
+    "normalRecoveredNativeDocs": "not done"
   }
 }
