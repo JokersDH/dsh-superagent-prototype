@@ -262,3 +262,17 @@ test('a pinned digest refuses a changed bundle and accepts the original', () => 
   assert.ok(refused.stderr.includes('pinned digest'))
   assert.equal(run(['verify', '--input', copy, '--expect-digest', 'not-a-digest']).status, 2)
 })
+
+test('a report never republishes collection diagnostics or a secret from a bundle', () => {
+  const directory = workspace()
+  const body = JSON.parse(readFileSync(complete, 'utf8'))
+  body.collectionIssues = [{ ref: 'work-1', code: 'port_error', message: 'reader failed with token=SUPER-SECRET-TOKEN-VALUE', stage: 'evidence' }]
+  const input = join(directory, 'with-issues.json')
+  writeFileSync(input, JSON.stringify(body))
+  const target = join(directory, 'report.md')
+  const result = run(['report', '--input', input, '--out', target])
+  assert.equal(result.status, 0, result.stderr)
+  const content = readFileSync(target, 'utf8')
+  assert.equal(content.includes('SUPER-SECRET-TOKEN-VALUE'), false, 'diagnostic text stays out of the shared report')
+  assert.equal(content.includes('collectionIssues'), false)
+})

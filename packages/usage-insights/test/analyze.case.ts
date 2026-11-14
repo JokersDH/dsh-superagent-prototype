@@ -285,3 +285,24 @@ test('an empty but complete window is complete, not missing', () => {
   }
   assert.equal(analysis.summary.usageCompleteness.tokensCompleteness, 'not_collected')
 })
+
+test('a baseline in another currency, unit or aggregation is refused rather than converted', () => {
+  const currency = analyzeUsageInsights(withBaseline(completeBundle(), {
+    metricId: 'usage.cost', unit: 'currency', aggregation: 'sum', currency: 'EUR',
+    targetLayer: 'controlled', value: 5, sampleCount: 2, coverage: 'complete',
+  }))
+  assert.equal(currency.summary.baseline.status, 'not_comparable')
+  assert.ok(currency.summary.baseline.reasons.includes('measured_layer_or_currency_mismatch'))
+  assert.equal(currency.summary.baseline.ratio, null, 'no unit or currency conversion is invented')
+
+  // The envelope refuses a baseline whose unit or aggregation contradicts the metric definition.
+  const mismatches: Partial<OperatorBaseline>[] = [
+    { unit: 'count' as const },
+    { aggregation: 'sum' as const },
+    { unit: 'currency' as const, currency: null },
+  ]
+  for (const bad of mismatches) {
+    assert.throws(() => analyzeUsageInsights(withBaseline(completeBundle(), bad)),
+      error => (error as { name?: string }).name === 'UsageInsightsFault', JSON.stringify(bad))
+  }
+})

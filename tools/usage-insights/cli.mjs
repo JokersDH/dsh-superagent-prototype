@@ -8,6 +8,7 @@
  */
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, statSync } from 'node:fs'
+import { chooseModuleEntry } from './lib/module-entry.mjs'
 import { basename, isAbsolute, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArguments, positiveInteger, requiredString, timestamp, UsageError } from './lib/args.mjs'
@@ -18,12 +19,20 @@ const EXIT = { ok: 0, internal: 1, usage: 2, partial: 3, insufficient: 4, unavai
 const DEFAULT_MAX_INPUT_BYTES = 64 * 1024 * 1024
 
 const PACKAGE_ROOT = new URL('../../packages/usage-insights/', import.meta.url)
+/**
+ * Load the package the CLI is *actually* part of: a stale build must never shadow newer sources, so
+ * the choice is made by modification time and reported when the sources win.
+ */
 async function loadModule() {
-  const dist = fileURLToPath(new URL('dist/index.js', PACKAGE_ROOT))
-  const source = fileURLToPath(new URL('src/index.ts', PACKAGE_ROOT))
-  const entry = existsSync(dist) ? dist : source
-  if (!existsSync(entry)) throw new Error('usage-insights package is not built and its source is missing')
-  return import(new URL(`file://${entry}`).href)
+  const choice = chooseModuleEntry({
+    distEntry: fileURLToPath(new URL('dist/index.js', PACKAGE_ROOT)),
+    sourceEntry: fileURLToPath(new URL('src/index.ts', PACKAGE_ROOT)),
+    sourceDir: fileURLToPath(new URL('src', PACKAGE_ROOT)),
+  })
+  if (choice.entry === null) throw new Error('usage-insights package is not built and its source is missing')
+  if (choice.stale)
+    process.stderr.write('stale_dist: dist/ is older than src/; running the TypeScript sources\n')
+  return import(new URL(`file://${choice.entry}`).href)
 }
 
 const HELP = `usage-insights — read-only efficiency observation
