@@ -26,12 +26,12 @@
       "summary": "Clean frozen package d4b1780d999a4b74 and tar 8c36...; closure96/96 including F App; E recipe handed early."
     },
     "d5": {
-      "status": "PASS_DEV_CHAIN",
-      "summary": "A uncommitted content-proof implementation and C wave26-target-proof dev tool ran on v1/v2 separate restore roots: target proof ok, legal target-only message drift mismatch for both formats, original A reader verifies. LIMIT: C target-proof is not installed package consumer; A changes uncommitted/unbuilt. C package driver now exposes manifest mode (--manifest-db/--manifest-expectation/--a-module/--root-map) and target proof; source capability observed but not executed this round."
+      "status": "PASS_TARGET_PROOF_PARTIAL",
+      "summary": "Installed wave26 package C driver manifest mode built the A manifest, checked complete coverage/root-map, and its target proof returned ok on both v1 and v2 A-restored roots. Both stopped at sources.state=scope_changed from restored path mapping, so no source body was accepted. C does not internally revalidate every manifest field."
     },
     "d6": {
-      "status": "NOT_REACHED_PACKAGE_CONSUMER",
-      "summary": "A/C target content/fingerprint proof works as dev chain, but the C unique installed package driver does not consume the target proof; full same-package prepare/start UI chain not reached."
+      "status": "TARGET_PROOF_PASS_SOURCE_READ_NOT_REACHED",
+      "summary": "Both package roots have real A restore reports and target proof ok; full same-package verified source read/UI flow after target proof is NOT_REACHED because scope_changed withholds bodies. A/C dev drift negative still mismatch."
     },
     "d9": {
       "status": "PASS",
@@ -132,8 +132,7 @@
     "E final verdict",
     "G/H integration",
     "private/target/real vendor",
-    "C target-proof consumed by installed package driver (dev chain only)",
-    "A/C target proof consumed by installed package driver (dev chain only)"
+    "installed package source body verified after target proof (scope_changed)"
   ],
   "limitations": [
     "zero real vendor/model/native turns",

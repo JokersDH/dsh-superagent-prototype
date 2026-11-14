@@ -1,0 +1,143 @@
+{
+  "protocol": "wave26-installed-package-target-proof/1",
+  "status": "TARGET_PROOF_PASS_SOURCE_READ_PARTIAL",
+  "package": {
+    "install": "/tmp/w26frozen/install",
+    "build": "d4b1780d999a4b74",
+    "tarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a"
+  },
+  "cDriver": {
+    "path": "/Users/hh/Desktop/joker/superagent-agent-c/packages/context/tools/personal-review-driver.mjs",
+    "sha256": "2723f10719fa53b1480bbd9c78e5d998096e8cf8db2097d65589c8fc7338cb88"
+  },
+  "rows": [
+    {
+      "format": 1,
+      "status": "failed",
+      "failure": "assertion_failed",
+      "targetProof": {
+        "protocol": "wave26-target-subject-proof/1",
+        "status": "ok",
+        "subjectMatches": true,
+        "pid": 25960,
+        "aModuleSha256": "654f1134f2ea4ba5121794d21e5bf9eb0b346a913d906847ec8967cc7ace140a",
+        "aHead": "06390aedd1c36e5bd8eec2cabf685e827873af28",
+        "database": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/wave26-keep-1-8PeIVa/state/state.sqlite",
+        "targetRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/wave26-keep-1-8PeIVa/state",
+        "originalRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/wave25-dual-personal-nyhBHx/source",
+        "originalManifest": "/tmp/w26pkg1/manifest.json",
+        "allowed": [
+          "subject.dataRoot",
+          "event_log",
+          "coordinator_instances",
+          "writer_claim"
+        ],
+        "sourceFingerprint": "84706511db7c42367a8689f56bf96db2c5cbcbf2fefe0668a153df316431e736",
+        "originalFingerprint": "07e763d3dd5a143888929da5a24a67e226ff1d2eed57069633296b35ab278ac5",
+        "fingerprintMatches": false,
+        "fingerprintRelation": "allowed-operational-delta",
+        "allowedFamilyChanges": [
+          {
+            "name": "coordinator_instances",
+            "allowed": true,
+            "originalRows": 0,
+            "targetRows": 2
+          }
+        ],
+        "forbiddenFamilyChanges": [],
+        "counts": {
+          "commands": 2,
+          "dispatch": 1,
+          "observations": 6,
+          "deliveries": 1,
+          "payloads": 6,
+          "payloadBytes": 2430
+        },
+        "artifacts": {
+          "total": 17,
+          "bytesVerified": 17
+        },
+        "mismatches": [],
+        "report": {
+          "protocol": "personal-restore/1",
+          "ok": true,
+          "createdAt": "2026-11-14T07:32:25.827Z"
+        }
+      },
+      "manifestDigest": "3545f7f937ccd053d17b3c223fef4295f81d4335985d333e61704e80daf1dfc5",
+      "cleanup": {
+        "owned": true,
+        "attempted": true,
+        "stopped": true,
+        "detail": "pa-stop-verified"
+      }
+    },
+    {
+      "format": 2,
+      "status": "failed",
+      "failure": "assertion_failed",
+      "targetProof": {
+        "protocol": "wave26-target-subject-proof/1",
+        "status": "ok",
+        "subjectMatches": true,
+        "pid": 26331,
+        "aModuleSha256": "654f1134f2ea4ba5121794d21e5bf9eb0b346a913d906847ec8967cc7ace140a",
+        "aHead": "06390aedd1c36e5bd8eec2cabf685e827873af28",
+        "database": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/wave26-keep-2-Aez602/state/state.sqlite",
+        "targetRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/wave26-keep-2-Aez602/state",
+        "originalRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/wave25-dual-personal-nyhBHx/source",
+        "originalManifest": "/tmp/w26pkg2/manifest.json",
+        "allowed": [
+          "subject.dataRoot",
+          "event_log",
+          "coordinator_instances",
+          "writer_claim"
+        ],
+        "sourceFingerprint": "034c463f61983b16ba3aa863ae8ecbd91f03eb21183e0788c832fc45f372d6fa",
+        "originalFingerprint": "07e763d3dd5a143888929da5a24a67e226ff1d2eed57069633296b35ab278ac5",
+        "fingerprintMatches": false,
+        "fingerprintRelation": "allowed-operational-delta",
+        "allowedFamilyChanges": [
+          {
+            "name": "coordinator_instances",
+            "allowed": true,
+            "originalRows": 0,
+            "targetRows": 2
+          }
+        ],
+        "forbiddenFamilyChanges": [],
+        "counts": {
+          "commands": 2,
+          "dispatch": 1,
+          "observations": 6,
+          "deliveries": 1,
+          "payloads": 6,
+          "payloadBytes": 2430
+        },
+        "artifacts": {
+          "total": 17,
+          "bytesVerified": 17
+        },
+        "mismatches": [],
+        "report": {
+          "protocol": "personal-restore/1",
+          "ok": true,
+          "createdAt": "2026-11-14T07:32:27.030Z"
+        }
+      },
+      "manifestDigest": "3545f7f937ccd053d17b3c223fef4295f81d4335985d333e61704e80daf1dfc5",
+      "cleanup": {
+        "owned": true,
+        "attempted": true,
+        "stopped": true,
+        "detail": "pa-stop-verified"
+      }
+    }
+  ],
+  "note": "Installed package C driver manifest mode built A manifest, checked complete coverage/root map, and target proof returned ok for v1 and v2 restored roots. Both then stopped at sources.state=scope_changed because restore path mapping leaves the original project scope changed; no body was accepted. This is target-content proof consumed by installed package driver, not a full verified source read.",
+  "notDone": [
+    "source scope verified after target proof",
+    "UI/body read on both package roots",
+    "drift negative through installed package driver (A/C dev drift proof already mismatch)"
+  ]
+}
