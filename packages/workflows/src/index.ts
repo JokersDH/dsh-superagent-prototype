@@ -17,6 +17,6 @@ export {
 export { applyOriginalResult, OriginalResultError, type OriginalResultInput, type OriginalResultOutcome } from './original-result.ts'
 export {
   restoreWorkflowSnapshot, verifyRestoredSnapshot, RestoreError, RESTORE_LIMITS,
-  type RestoreSnapshotOptions, type RestoreSnapshotReport, type RestoreSnapshotResult,
+  type RestoreSnapshotOptions, type RestoreSnapshotReport, type RestoreSnapshotResult, type RestoreExpectation, type VerifyRestoredExpectation, type RestoreVerification,
 } from './restore.ts'
 export { buildDataManifest, verifyDataManifest, parseDataSubjectExpectation, DEFAULT_DATA_MANIFEST_LIMITS, type DataManifest, type DataManifestLimits, type DataSubjectExpectation, type DispatchExpectation } from './data-manifest.ts'

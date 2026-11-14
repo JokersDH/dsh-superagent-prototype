@@ -32,7 +32,7 @@ test('an independent expectation is parsed strictly and every incomplete or fore
     ['not an object', 'expectation'],
   ]
   for (const [name, value] of invalid) {
-    assert.throws(() => parseDataSubjectExpectation(value), undefined, name)
+    assert.throws(() => parseDataSubjectExpectation(value), Error, name)
   }
   console.log('WAVE25_EXPECTATION_REFUSALS', JSON.stringify({ accepted: 'strict', refused: invalid.map(([name]) => name) }))
 })

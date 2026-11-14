@@ -1,0 +1,14 @@
+WAVE26_SOURCE_MANIFEST {"digest":"253398cb21d039ba7039176e7b16ece7d3411974c3d4abff6d6f6389531ed43b","counts":{"commands":2,"dispatch":1,"observations":6,"deliveries":1,"payloads":6,"payloadBytes":2430},"answers":"234786f1e124e619bcd2172b39965f90"}
+WAVE26_CONTENT {"format":1,"snapshotDigest":"1d69b53bb515838694a98b5fcf88f65d20fe89c89de4d6c65af6cf57671fb386","databaseSha256":"92976563f51d627d9cdba2da762c09458713676f3d1fae6db3beb382c17d9359","contentDigest":"4c3f0f042f6b9db37bfca40bb7c8243bc8cfffbaa041281bdbb2a64274ebd0d3","contentRows":138,"contentBytes":56328,"artifacts":17}
+WAVE25_DUAL_C_DRIVER {"format":1,"pid":79411,"manifestDigest":"12ac103967f30d3101dadf6e6bb605261035668c7d9a8bcb61badbd6b8f8f2bf","aHead":"ab33f6cd99abc3d2e0fab101fb67ca4c29687e6e","targetProof":"ok","driftProof":"mismatch"}
+WAVE26_CONTENT {"format":2,"snapshotDigest":"42fb33e7de07f442622e6c2e7fd035c599da90db8505a0f9372e62f338c9f758","databaseSha256":"92976563f51d627d9cdba2da762c09458713676f3d1fae6db3beb382c17d9359","contentDigest":"4c3f0f042f6b9db37bfca40bb7c8243bc8cfffbaa041281bdbb2a64274ebd0d3","contentRows":138,"contentBytes":56328,"artifacts":17}
+WAVE25_DUAL_C_DRIVER {"format":2,"pid":79920,"manifestDigest":"5b8efb57b77f121602963d4dd2d3af5ebdab5da646241c8937c11b0bcf81af33","aHead":"ab33f6cd99abc3d2e0fab101fb67ca4c29687e6e","targetProof":"ok","driftProof":"mismatch"}
+✔ the same real Store restores v1 and v2 separately through actual personal readonly (4000.143958ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4266.991625

@@ -1,0 +1,10 @@
+WAVE25_EXPECTATION_REFUSALS {"accepted":"strict","refused":["unknown top-level field","unknown contract field","snapshot format three","bad source sha","bad ticket id","zero epoch","bad contract digest","empty commands","empty delivery targets","empty dispatch","dispatch unknown field","unknown limit","not an object"]}
+✔ an independent expectation is parsed strictly and every incomplete or foreign variant is refused (1.314208ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 150.465792

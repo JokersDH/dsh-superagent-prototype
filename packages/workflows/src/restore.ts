@@ -13,7 +13,7 @@ import { createHash } from 'node:crypto'
 import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import Database from 'better-sqlite3'
-import { PRODUCT_SCHEMA_VERSION, readWorkflowEvidence, verifyDatabase, type WorkflowEvidenceSummary } from '@personal-agent/storage'
+import { PRODUCT_SCHEMA_VERSION, readWorkflowContent, readWorkflowEvidence, verifyDatabase, type ContentCollection, type WorkflowContentSummary, type WorkflowEvidenceSummary } from '@personal-agent/storage'
 import type { SnapshotManifest } from './snapshot.ts'
 
 export class RestoreError extends Error {}
@@ -26,12 +26,7 @@ export interface RestoreSnapshotOptions {
   /** The state root the snapshot was produced from; recorded as a root mapping, never rewritten. */
   readonly sourceStateRoot?: string
   /** Optional independent expectations. A mismatch refuses before any target byte is written. */
-  readonly expected?: {
-    readonly protocol?: 'workflow-snapshot/1' | 'workflow-snapshot/2'
-    readonly snapshotDigest?: string
-    readonly databaseSha256?: string
-    readonly evidenceDigest?: string
-  }
+  readonly expected?: RestoreExpectation
   readonly now?: Date
 }
 
@@ -47,13 +42,27 @@ export interface RestoreSnapshotReport {
     readonly artifacts: number
   }
   readonly targetPath: string
-  readonly database: { readonly integrity: 'ok' | string; readonly foreignKeyViolations: number; readonly productSchema: number | null; readonly eventSeq: number | null }
+  readonly database: { readonly integrity: 'ok' | string; readonly foreignKeyViolations: number; readonly productSchema: number | null; readonly eventSeq: number | null; readonly sha256: string }
   readonly evidence: { readonly status: 'verified' | 'unknown'; readonly digest: string | null; readonly protocol: string | null; readonly families: number }
+  /** Logical row content, independent of integrity/schema and of SQLite file rewriting. */
+  readonly content: {
+    readonly protocol: string; readonly digest: string | null; readonly productSchema: number | null; readonly complete: boolean
+    readonly collections: readonly ContentCollection[]; readonly omittedTables: readonly string[]; readonly reason: string | null
+    readonly rows: number; readonly bytes: number
+  }
+  readonly artifacts: readonly { readonly id: string; readonly digest: string; readonly bytes: number }[]
   readonly logicalSource: { readonly digest: string | null; readonly coverage: 'complete' | 'unknown' }
   readonly rootMapping: { readonly from: string | null; readonly to: string }
   readonly pathMappings: { readonly applied: readonly string[]; readonly pendingRebind: readonly string[] }
   readonly requiresRevalidation: readonly string[]
   readonly limitations: readonly string[]
+}
+
+export interface RestoreExpectation {
+  readonly protocol?: 'workflow-snapshot/1' | 'workflow-snapshot/2'
+  readonly snapshotDigest?: string
+  readonly databaseSha256?: string
+  readonly evidenceDigest?: string
 }
 
 export interface RestoreSnapshotResult {
@@ -118,7 +127,7 @@ const eventSeq = (path: string): number | null => {
   try {
     // Read-only; a missing table is unknown, not zero.
     const database = new Database(path, { readonly: true })
-    try { const row = database.prepare('SELECT COALESCE(MAX(seq), 0) AS seq FROM events').get() as { seq: number }; return Number.isSafeInteger(row.seq) ? row.seq : null } finally { database.close() }
+    try { const row = database.prepare('SELECT COALESCE(MAX(seq), 0) AS seq FROM event_log').get() as { seq: number }; return Number.isSafeInteger(row.seq) ? row.seq : null } finally { database.close() }
   } catch { return null }
 }
 
@@ -166,6 +175,8 @@ export async function restoreWorkflowSnapshot(options: RestoreSnapshotOptions): 
           family.truncated === manifest.evidence.families[index]?.truncated)
       if (evidence.protocol !== manifest.evidence.protocol || evidence.digest !== manifest.evidence.digest || !evidence.complete || !exactFamilies)
         throw new RestoreError('restored evidence summary does not match the snapshot recipe/digest')
+      const content: WorkflowContentSummary = readWorkflowContent(restoredDatabase)
+      const databaseBytes = readFileSync(restoredDatabase)
 
       const report: RestoreSnapshotReport = {
         protocol: 'personal-restore/1',
@@ -174,8 +185,11 @@ export async function restoreWorkflowSnapshot(options: RestoreSnapshotOptions): 
           databaseBytes: manifest.database.bytes, artifacts: manifest.artifacts.length },
         targetPath: target,
         database: { integrity: verified.integrity, foreignKeyViolations: verified.foreignKeyViolations,
-          productSchema: verified.productSchema, eventSeq: eventSeq(restoredDatabase) },
+          productSchema: verified.productSchema, eventSeq: eventSeq(restoredDatabase), sha256: sha256(databaseBytes) },
         evidence: { status: 'verified', digest: evidence.digest, protocol: evidence.protocol, families: evidence.families.length },
+        content: { protocol: content.protocol, digest: content.digest, productSchema: content.productSchema, complete: content.complete,
+          collections: content.collections, omittedTables: content.omittedTables, reason: content.reason, rows: content.rows, bytes: content.bytes },
+        artifacts: manifest.artifacts.map(artifact => ({ id: artifact.id, digest: artifact.digest, bytes: artifact.bytes })),
         logicalSource: { digest: evidence.digest, coverage: 'complete' },
         rootMapping: { from: options.sourceStateRoot ? resolve(options.sourceStateRoot) : null, to: target },
         pathMappings: { applied: [], pendingRebind: ['project bindings are not carried by a workflow snapshot'] },
@@ -196,19 +210,52 @@ export async function restoreWorkflowSnapshot(options: RestoreSnapshotOptions): 
   }
 }
 
-/** Read-only re-verification of an existing restored root against its own report. */
-export function verifyRestoredSnapshot(targetStateDir: string): { status: 'ok' | 'blocked'; report: RestoreSnapshotReport | null; message?: string } {
+/** Read-only re-verification of an existing restored root against its report and content, not just SQLite health. */
+export interface VerifyRestoredExpectation extends RestoreExpectation {
+  readonly contentDigest?: string
+  readonly sourceStateRoot?: string
+}
+
+export interface RestoreVerification {
+  readonly status: 'ok' | 'blocked'
+  readonly report: RestoreSnapshotReport | null
+  readonly content: WorkflowContentSummary | null
+  readonly message?: string
+}
+
+export function verifyRestoredSnapshot(targetStateDir: string, expected: VerifyRestoredExpectation = {}): RestoreVerification {
   try {
     const target = resolve(targetStateDir)
     const report = JSON.parse(readFileSync(join(target, 'restore-report.json'), 'utf8')) as RestoreSnapshotReport
     if (report.protocol !== 'personal-restore/1') throw new RestoreError('restore report protocol is invalid')
     if (realpathSync(report.targetPath) !== realpathSync(target)) throw new RestoreError('restore report belongs to another state root')
+    if (report.rootMapping?.to && realpathSync(report.rootMapping.to) !== realpathSync(target)) throw new RestoreError('restore root mapping does not point at this target')
+    if (expected.sourceStateRoot && (report.rootMapping?.from === null || report.rootMapping?.from === undefined ||
+      resolve(report.rootMapping.from) !== resolve(expected.sourceStateRoot))) throw new RestoreError('restore source root mapping differs from the independent expectation')
+    if (expected.protocol && report.snapshot.format !== expected.protocol) throw new RestoreError('restore snapshot format differs from the independent expectation')
+    if (expected.snapshotDigest && report.snapshot.digest !== expected.snapshotDigest) throw new RestoreError('restore snapshot digest differs from the independent expectation')
+    if (expected.databaseSha256 && report.database.sha256 !== expected.databaseSha256) throw new RestoreError('restore database digest differs from the independent expectation')
+    if (expected.evidenceDigest && report.evidence.digest !== expected.evidenceDigest) throw new RestoreError('restore evidence digest differs from the independent expectation')
+    if (expected.contentDigest && report.content.digest !== expected.contentDigest) throw new RestoreError('restore content digest differs from the independent expectation')
     const database = join(target, 'state.sqlite')
     const verified = verifyDatabase(database)
     if (verified.integrity !== 'ok' || verified.foreignKeyViolations !== 0) throw new RestoreError('restored database failed re-verification')
     if (verified.productSchema !== report.database.productSchema) throw new RestoreError('restored database schema changed after restore')
-    return { status: 'ok', report }
+    const content = readWorkflowContent(database)
+    if (!content.complete || content.digest === null) throw new RestoreError(`restored content proof is incomplete: ${content.reason ?? 'unknown'}`)
+    if (content.productSchema !== report.content.productSchema) throw new RestoreError('restored content schema differs from the report')
+    if (report.content.digest === null || content.digest !== report.content.digest) throw new RestoreError('restored row content differs from the restore report')
+    if (!Array.isArray(report.artifacts)) throw new RestoreError('restore report has no artifact inventory')
+    for (const artifact of report.artifacts) {
+      if (!artifact || typeof artifact.id !== 'string' || !Number.isSafeInteger(artifact.bytes) || artifact.bytes < 0 || !/^[a-f0-9]{64}$/.test(artifact.digest)) throw new RestoreError('restore artifact inventory is invalid')
+      const path = join(target, 'artifacts', artifact.id)
+      const stat = lstatSync(path)
+      if (!stat.isFile() || stat.isSymbolicLink()) throw new RestoreError(`restored artifact ${artifact.id} is not a regular file`)
+      const bytes = readFileSync(path)
+      if (bytes.byteLength !== artifact.bytes || sha256(bytes) !== artifact.digest) throw new RestoreError(`restored artifact ${artifact.id} differs from the snapshot`)
+    }
+    return { status: 'ok', report, content }
   } catch (error) {
-    return { status: 'blocked', report: null, message: error instanceof Error ? error.message : String(error) }
+    return { status: 'blocked', report: null, content: null, message: error instanceof Error ? error.message : String(error) }
   }
 }

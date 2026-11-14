@@ -169,3 +169,5 @@ export {
   type Migration, type MigrationRecord, type ApplyMigrationsOptions,
   UnknownDatabaseError, UpstreamApplicationDatabaseError, MigrationIntegrityError,
 } from './migrations.ts'
+
+export { readWorkflowContent, CONTENT_PROOF_PROTOCOL, CONTENT_OMITTED_TABLES, DEFAULT_CONTENT_PROOF_LIMITS, type ContentCollection, type ContentProofLimits, type WorkflowContentSummary } from './content-proof.ts'

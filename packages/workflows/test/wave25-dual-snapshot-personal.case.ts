@@ -1,18 +1,16 @@
 /** Wave-25: one real Store restored twice (default v1 and explicit v2) into the same package's consumers. */
 import assert from 'node:assert/strict'
-import { execFileSync, spawn } from 'node:child_process'
+import { execFileSync, spawn, spawnSync } from 'node:child_process'
 import { once } from 'node:events'
 import { appendFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { ProductStore } from '@personal-agent/storage'
+import { ProductStore, readWorkflowContent } from '@personal-agent/storage'
 import { buildDataManifest, verifyDataManifest, type DataSubjectExpectation } from '../src/index.ts'
 import { key } from '../../orchestrator-core/src/core/ids.ts'
 import { restoreWorkflowSnapshot, verifyRestoredSnapshot, WorkflowSnapshots } from '../src/index.ts'
-import { spawnSync } from 'node:child_process'
-import { existsSync } from 'node:fs'
 import { localCredentials } from '../../../apps/coordinator/http/local-state.ts'
 import { prepareRestoredReview } from '../../../apps/coordinator/product/restored-review.ts'
 import { createControlledProduct, createProductRuntime, FIXTURE_CHECK } from '../../../apps/coordinator/product/runtime.ts'
@@ -92,6 +90,17 @@ test('the same real Store restores v1 and v2 separately through actual personal 
   assistantMessageId = store.product.messages.page(conversationId).messages.filter(value => value.role === 'assistant').at(-1)!.id
   await runtime.close(); runtime = undefined
   store.queue.enqueue('application.execute', 'held-personal', '{}', 1, 0, new Date().toISOString())
+  const subject = { sourceSha: 'a'.repeat(40), ticketId, assignmentId, attemptId, fenceEpoch, contract: contract!,
+    questionId: businessQuestionId, answerId: businessAnswerId,
+    requiredCommandIds: ['wave20-business-create', 'wave20-business-answer'],
+    requiredDispatch: [{ commandId: 'wave20-business-answer', target: targetId }], requiredDeliveryTargets: [targetId] }
+  const sourceExpectation: DataSubjectExpectation = { ...subject, snapshotFormat: 1, dataRoot: source }
+  const sourceManifest = await buildDataManifest(store, sourceExpectation)
+  const sourceContent = readWorkflowContent(join(source, 'state.sqlite'))
+  assert.equal(sourceContent.complete, true); assert.ok(sourceContent.digest)
+  const sourceExpectationPath = join(root, 'source-expectation.json'), sourceManifestPath = join(root, 'source-manifest.json')
+  writeFileSync(sourceExpectationPath, JSON.stringify(sourceExpectation, null, 2)); writeFileSync(sourceManifestPath, JSON.stringify(sourceManifest, null, 2))
+  console.log('WAVE26_SOURCE_MANIFEST', JSON.stringify({ digest: sourceManifest.digest, counts: sourceManifest.counts, answers: sourceManifest.answer.id }))
   for (const format of [1, 2] as const) {
     const snapshotDir = join(root, `snapshot-${format}`)
     const snapshot = await new WorkflowSnapshots(store).create({ destination: snapshotDir, ...(format === 2 ? { formatVersion: 2 } : {}) })
@@ -130,7 +139,56 @@ test('the same real Store restores v1 and v2 separately through actual personal 
     assert.equal(restored.report?.snapshot.digest, sha256(readFileSync(snapshot.manifestPath)))
     assert.equal(restored.report?.evidence.digest, snapshot.manifest.evidence.digest)
     assert.equal(restored.report?.rootMapping.from, source)
-    assert.equal(verifyRestoredSnapshot(restoreRoot).status, 'ok')
+    assert.equal(restored.report?.content.complete, true)
+    console.log('WAVE26_CONTENT', JSON.stringify({ format, snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), databaseSha256: snapshot.manifest.database.sha256,
+      contentDigest: restored.report?.content.digest, contentRows: restored.report?.content.rows, contentBytes: restored.report?.content.bytes, artifacts: restored.report?.artifacts.length }))
+    assert.ok(restored.report?.content.digest)
+    assert.equal(restored.report?.database.sha256, sha256(readFileSync(join(snapshot.destination, 'product.sqlite'))))
+    assert.equal(restored.report?.artifacts.length, snapshot.manifest.artifacts.length)
+    const reverified = verifyRestoredSnapshot(restoreRoot, { protocol: snapshot.manifest.protocol,
+      snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), databaseSha256: snapshot.manifest.database.sha256,
+      evidenceDigest: snapshot.manifest.evidence.digest, contentDigest: sourceContent.digest!, sourceStateRoot: source })
+    assert.equal(reverified.status, 'ok', reverified.message)
+    assert.equal(reverified.content?.digest, restored.report!.content.digest)
+    assert.equal(restored.report!.content.digest, sourceContent.digest)
+    assert.equal(verifyRestoredSnapshot(restoreRoot, { snapshotDigest: '0'.repeat(64) }).status, 'blocked')
+    const capped = readWorkflowContent(join(restoreRoot, 'state.sqlite'), { limits: { maxRows: 1 } })
+    assert.equal(capped.complete, false); assert.equal(capped.digest, null); assert.ok(capped.reason)
+    const driftRoot = join(root, `drift-${format}`)
+    cpSync(restoreRoot, driftRoot, { recursive: true })
+    const driftReport = JSON.parse(readFileSync(join(driftRoot, 'restore-report.json'), 'utf8'))
+    driftReport.targetPath = driftRoot; driftReport.rootMapping.to = driftRoot
+    writeFileSync(join(driftRoot, 'restore-report.json'), JSON.stringify(driftReport, null, 2))
+    const driftStore = new ProductStore({ path: join(driftRoot, 'state.sqlite') })
+    try {
+      const last = driftStore.db.prepare('SELECT conversation_id, MAX(sequence) AS sequence, value, created_at FROM conversation_messages GROUP BY conversation_id').get() as any
+      driftStore.db.prepare('INSERT INTO conversation_messages (conversation_id, sequence, id, value, created_at) VALUES (?, ?, ?, ?, ?)')
+        .run(last.conversation_id, last.sequence + 1, 'wave26-extra-message', last.value, last.created_at)
+    } finally { driftStore.close() }
+    const drift = verifyRestoredSnapshot(driftRoot, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), sourceStateRoot: source })
+    assert.equal(drift.status, 'blocked'); assert.match(drift.message ?? '', /content differs/)
+    const artifactRootCopy = join(root, `artifact-drift-${format}`)
+    cpSync(restoreRoot, artifactRootCopy, { recursive: true })
+    const artifactReport = JSON.parse(readFileSync(join(artifactRootCopy, 'restore-report.json'), 'utf8'))
+    artifactReport.targetPath = artifactRootCopy; artifactReport.rootMapping.to = artifactRootCopy
+    writeFileSync(join(artifactRootCopy, 'restore-report.json'), JSON.stringify(artifactReport, null, 2))
+    const artifactId = restored.report!.artifacts[0]?.id
+    if (artifactId) {
+      const artifactPath = join(artifactRootCopy, 'artifacts', artifactId), bytes = Buffer.from(readFileSync(artifactPath))
+      bytes[0] = (bytes[0] ?? 0) ^ 0xff; writeFileSync(artifactPath, bytes)
+      const artifactDrift = verifyRestoredSnapshot(artifactRootCopy, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)) })
+      assert.equal(artifactDrift.status, 'blocked'); assert.match(artifactDrift.message ?? '', /artifact/)
+      rmSync(artifactPath)
+      const missingArtifact = verifyRestoredSnapshot(artifactRootCopy, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)) })
+      assert.equal(missingArtifact.status, 'blocked')
+    }
+    const mappingRoot = join(root, `mapping-drift-${format}`)
+    cpSync(restoreRoot, mappingRoot, { recursive: true })
+    const mappingReport = JSON.parse(readFileSync(join(mappingRoot, 'restore-report.json'), 'utf8'))
+    mappingReport.targetPath = mappingRoot; mappingReport.rootMapping.to = source
+    writeFileSync(join(mappingRoot, 'restore-report.json'), JSON.stringify(mappingReport, null, 2))
+    const mappingDrift = verifyRestoredSnapshot(mappingRoot, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)) })
+    assert.equal(mappingDrift.status, 'blocked'); assert.match(mappingDrift.message ?? '', /root mapping/)
     assert.equal((await restoreWorkflowSnapshot({ snapshotDirectory: snapshot.destination, targetStateDir: restoreRoot })).status, 'blocked')
     const credential = localCredentials(restoreRoot), reviewFile = join(root, `review-${format}.json`)
     const reviewStore = new ProductStore({ path: join(restoreRoot, 'state.sqlite') })
@@ -172,10 +230,7 @@ test('the same real Store restores v1 and v2 separately through actual personal 
     assert.equal(refusal.status, 422)
     assert.equal(model.requests.length, requestsBefore)
     await stop()
-    const expected: DataSubjectExpectation = { sourceSha: 'a'.repeat(40), snapshotFormat: format, dataRoot: restoreRoot,
-      ticketId, assignmentId, attemptId, fenceEpoch, contract: contract!, questionId: businessQuestionId, answerId: businessAnswerId,
-      requiredCommandIds: ['wave20-business-create', 'wave20-business-answer'],
-      requiredDispatch: [{ commandId: 'wave20-business-answer', target: targetId }], requiredDeliveryTargets: [targetId] }
+    const expected: DataSubjectExpectation = { ...subject, snapshotFormat: format, dataRoot: restoreRoot }
     const restoredStore = new ProductStore({ path: join(restoreRoot, 'state.sqlite') })
     const manifest = await buildDataManifest(restoredStore, expected)
     assert.equal(manifest.subject.snapshotFormat, format); assert.equal(manifest.subject.dataRoot, restoreRoot)
@@ -195,7 +250,19 @@ test('the same real Store restores v1 and v2 separately through actual personal 
       const cVerify = spawnSync(process.execPath, [cDriver, '--a-module', aModule, '--a-worktree', repoRoot, '--db', join(restoreRoot, 'state.sqlite'),
         '--expectation', expectationPath, '--manifest', cOutput, '--mode', 'verify', '--a-head', aHead], { encoding: 'utf8', timeout: 20000 })
       assert.equal(cVerify.status, 0, cVerify.stderr); assert.equal(JSON.parse(cVerify.stdout).verification.ok, true)
-      console.log('WAVE25_DUAL_C_DRIVER', JSON.stringify({ format, pid: built.pid, manifestDigest: built.manifest.digest, aHead }))
+      const cProof = join(process.env.PA_C_WORKTREE ?? '/Users/hh/Desktop/joker/superagent-agent-c', 'packages/context/tools/wave26-target-proof.mjs')
+      if (existsSync(cProof)) {
+        const proof = spawnSync(process.execPath, [cProof, '--a-worktree', repoRoot, '--a-module', aModule, '--db', join(restoreRoot, 'state.sqlite'),
+          '--expectation', sourceExpectationPath, '--manifest', sourceManifestPath, '--report', restored.reportPath, '--a-head', aHead], { encoding: 'utf8', timeout: 20000 })
+        assert.equal(proof.status, 0, `${proof.stderr}\n${proof.stdout}`)
+        assert.equal(JSON.parse(proof.stdout).status, 'ok')
+        const driftProof = spawnSync(process.execPath, [cProof, '--a-worktree', repoRoot, '--a-module', aModule, '--db', join(driftRoot, 'state.sqlite'),
+          '--expectation', sourceExpectationPath, '--manifest', sourceManifestPath, '--a-head', aHead], { encoding: 'utf8', timeout: 20000 })
+        assert.ok(driftProof.status === 0 || driftProof.status === 1, driftProof.stderr)
+        assert.equal(JSON.parse(driftProof.stdout).status, 'mismatch')
+        console.log('WAVE25_DUAL_C_DRIVER', JSON.stringify({ format, pid: built.pid, manifestDigest: built.manifest.digest, aHead,
+          targetProof: 'ok', driftProof: 'mismatch' }))
+      } else console.log(`WAVE25_DUAL_C_DRIVER format=${format} driver=${built.pid} targetProof=NOT_REACHED`)
     } else console.log(`WAVE25_DUAL_C_DRIVER_NOT_REACHED format=${format}`)
     const reader = spawnSync(process.execPath, [join(import.meta.dirname, 'fixtures', 'wave23-reader.mjs'), join(restoreRoot, 'state.sqlite'), manifestPath, expectationPath],
       { encoding: 'utf8', timeout: 20000 })
