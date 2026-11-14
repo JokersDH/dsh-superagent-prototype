@@ -4,7 +4,7 @@
   "branch": "codex/g3-local-distribution",
   "base": "27675c4",
   "mergedMain": "4b42a90",
-  "head": "dfa8efc",
+  "head": "a08e4ee",
   "frozenSource": "3b2ff68",
   "status": "CANDIDATE",
   "scopeNote": "Wave-24 D package-scoped candidate; not E/main/release admission. D6 independent per-format restore consumer is NOT_IMPLEMENTED. Real vendor/model/native turns 0; twelve services untouched.",
@@ -944,5 +944,5 @@
     "docs/rfcs/WP-16/0064-wave-24-probe-birth-and-installed-ui.md"
   ],
   "evidenceHead": "dfa8efc",
-  "closureSource": "9bd484f"
+  "closureSource": "a08e4ee"
 }

@@ -1,8 +1,8 @@
 {
   "protocol": "wave24-ordinary-source-closure/1",
   "frozenRuntimeSource": "3b2ff68",
-  "sourceCommit": "9bd484f",
-  "generatedAt": "2026-11-14T02:01:28.229Z",
+  "sourceCommit": "a08e4ee",
+  "generatedAt": "2026-11-14T02:27:38.622Z",
   "purpose": "Coherent ordinary personal distribution source/deploy closure with actual cleanup/fault, CLI help and same-Store validation tools; frozen runtime target remains 3b2ff68 with main UI; excludes historical reports.",
   "groups": {
     "mainUi": [
@@ -419,8 +419,8 @@
       },
       {
         "path": "tools/distribution/verify-same-store-dual-personal.mjs",
-        "bytes": 29451,
-        "sha256": "26c264555adb66d905697db04b0e2a8f95b7329704a93c80852488a8522059ee"
+        "bytes": 29607,
+        "sha256": "f0f1f2076a1bdc60d31a536e5c300cbe1d3052219c1903b425af08488693f222"
       }
     ],
     "root": [
