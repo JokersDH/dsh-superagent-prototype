@@ -398,6 +398,7 @@ export async function runPersonalReview() {
           const duplicate = await fetch(`${base}/v1/messages/${messageId}/context/sources?scopeReview=1&scopeReview=1`, { headers, signal: AbortSignal.timeout(5_000) })
           const unknown = await fetch(`${base}/v1/messages/${messageId}/context/sources?scopeReview=0`, { headers, signal: AbortSignal.timeout(5_000) })
           outcome = { plain: plain.status, plainHasDiagnostic: Object.prototype.hasOwnProperty.call(plainBody, 'scopeReview'),
+            state: plainBody.state ?? null, bindingSourceCount: Array.isArray(plainBody.binding?.sources) ? plainBody.binding.sources.length : 0,
             optIn: optIn.status, diagnostic: optInBody.scopeReview ?? null, duplicate: duplicate.status, unknown: unknown.status }
         } finally { await stopOwned(install, { state: restored, config, mockFile: mock.file }) }
 

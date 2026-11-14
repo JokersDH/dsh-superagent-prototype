@@ -75,12 +75,13 @@ async function collect(suite, loader) {
 }
 
 await collect('selftest', async () => {
-  const [base, mutations, wave23] = await Promise.all([
+  const [base, mutations, wave23, wave24] = await Promise.all([
     import('./selftest/gate.mjs'),
     import('./selftest/gate-mutations.mjs'),
     import('./selftest/wave23-gate.case.mjs'),
+    import('./selftest/wave24-gate.case.mjs'),
   ])
-  return [...(await base.gateSelftestCases()), ...(await mutations.gateMutationCases()), ...(await wave23.wave23GateCases())]
+  return [...(await base.gateSelftestCases()), ...(await mutations.gateMutationCases()), ...(await wave23.wave23GateCases()), ...(await wave24.wave24GateCases())]
 })
 await collect('e2', async () => {
   const [daily, wave04, wave05] = await Promise.all([

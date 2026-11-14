@@ -1032,6 +1032,12 @@ writeFileSync(
       scopeSchemaMutations: [byId.get('E1-MUTATE-SCOPE-WITHHELD-NEGATIVE')?.status,
         byId.get('E1-MUTATE-SCOPE-WITHHELD-OVERFLOW')?.status, byId.get('E1-MUTATE-SCOPE-DUPLICATE-REASON')?.status,
         byId.get('E1-MUTATE-SCOPE-AUTHORIZATION')?.status],
+      recorded0edePositive: byId.get('W24-REAL-0EDE-POSITIVE')?.status ?? 'MISSING',
+      realScopeMutations: ['W24-DIAG-WITHHELD-NEGATIVE', 'W24-DIAG-WITHHELD-OVERFLOW', 'W24-DIAG-DUPLICATE-REASON',
+        'W24-DIAG-INVALID-REASON', 'W24-DIAG-AUTHORIZATION', 'W24-DIAG-MISSING-FIELD', 'W24-DIAG-WITHHELD-MISMATCH']
+        .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+      realCapabilityMutations: ['W24-CAPABILITY-SELF-DOWNGRADE', 'W24-MISSING-DIGEST']
+        .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
     },
     layers: {
       source: 'source-checkout results stay source-level; they never back an installed claim',

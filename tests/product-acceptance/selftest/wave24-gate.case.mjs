@@ -46,8 +46,8 @@ export async function wave24GateCases() {
     async ({ assert }) => reject(assert, 'DIAG_AUTH', report => { diag(report).plain.diagnostic.authorization = 'granted' })))
   cases.push(await runCase({ ...define('W24-DIAG-MISSING-FIELD', 'A diagnostic without the withheld observation is rejected') },
     async ({ assert }) => reject(assert, 'DIAG_MISSING', report => { delete diag(report).narrow.diagnostic.withheldSourceCount })))
-  cases.push(await runCase({ ...define('W24-PARTIAL-STATE-MISMATCH', 'A partial flag that contradicts the verified state is rejected') },
-    async ({ assert }) => reject(assert, 'PARTIAL_STATE', report => { diag(report).plain.diagnostic.partial = true })))
+  cases.push(await runCase({ ...define('W24-DIAG-WITHHELD-MISMATCH', 'A withheld count that disagrees with the binding source count is rejected') },
+    async ({ assert }) => reject(assert, 'WITHHELD_MISMATCH', report => { diag(report).narrow.diagnostic.withheldSourceCount = 2 })))
   cases.push(await runCase({ ...define('W24-CAPABILITY-SELF-DOWNGRADE', 'A review evidence cannot downgrade the package capability fact alone') },
     async ({ assert }) => reject(assert, 'CAPABILITY_DOWNGRADE', report => {
       const value = reuse(report)
