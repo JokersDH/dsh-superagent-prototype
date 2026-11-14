@@ -38,7 +38,8 @@ it is not evidence for the Node test entry.
 - BLOB/BigInt values are canonicalized (`blob:<base64>`, `bigint:<decimal>`); generated columns and
   generated-column values are read from the actual schema.
 
-`restoreWorkflowSnapshot` records `database.sha256`, `content.{protocol,digest,productSchema,
+`restoreWorkflowSnapshot` accepts an optional independent `contentDigest`; a restored logical
+content mismatch refuses before the report/rename. It records `database.sha256`, `content.{protocol,digest,productSchema,
 complete,collections,omittedTables,reason,rows,bytes}` and the exact artifact inventory
 (`id,digest,bytes`) in `restore-report.json`. The database byte digest remains an observation;
 reverification uses logical content plus artifact bytes and the independent snapshot expectation.
@@ -82,8 +83,8 @@ after the HTTP startup and stop.
 - `wave26-workflow-tests.txt` — 120/120 via the existing tsx runner.
 - `wave26-storage-tests.txt` — 87/87.
 - `wave26-dual.txt` — same Store v1/v2:
-  source manifest `33e5d0b1…`; content digest `98e66398…` (138 rows, 56328 bytes) equals the
-  source content proof; database SHA `d540e221…`; 17 artifacts; C target proof `ok` and added-message
+  source manifest `00191204…`; content digest `9c108e07…` (138 rows, 56328 bytes) equals the
+  source content proof; database SHA `e6740cf6…`; 17 artifacts; C target proof `ok` and added-message
   target proof `mismatch` for both formats.
 - `wave26-original-result.txt` — duplicate/unknown/observed and eight foreign-tuple refusals,
   plus new-PID readback after close.

@@ -1,9 +1,9 @@
-WAVE26_SOURCE_MANIFEST {"digest":"33e5d0b1a6af28611d69f400661a66370cccbfe59dcaf00eee2471c09782727b","counts":{"commands":2,"dispatch":1,"observations":6,"deliveries":1,"payloads":6,"payloadBytes":2430},"answers":"234786f1e124e619bcd2172b39965f90"}
-WAVE26_CONTENT {"format":1,"snapshotDigest":"aa45f378cca907bcbef15a1e448719e3b4004f66473856106e8d3f3b005171ea","databaseSha256":"d540e2211223c491c6577ea9db71a9df49179e9551133107bc32a965722e9280","contentDigest":"98e6639827c969af40bf79032b0d010a541d8def9983b39c5cd3d2f49bacb916","contentRows":138,"contentBytes":56328,"artifacts":17}
-WAVE25_DUAL_C_DRIVER {"format":1,"pid":51489,"manifestDigest":"fd39db77244d89df0b12feefbf17c1d95598a7672d828d4503822f360d4e9859","aHead":"a23565c67db0ada64915df65ab631bacf47c5ea1","targetProof":"ok","driftProof":"mismatch"}
-WAVE26_CONTENT {"format":2,"snapshotDigest":"c85a7d8d020c063f548641f7af5d53ff5d11360383caffb9f1bc6a72ebe322c1","databaseSha256":"d540e2211223c491c6577ea9db71a9df49179e9551133107bc32a965722e9280","contentDigest":"98e6639827c969af40bf79032b0d010a541d8def9983b39c5cd3d2f49bacb916","contentRows":138,"contentBytes":56328,"artifacts":17}
-WAVE25_DUAL_C_DRIVER {"format":2,"pid":51599,"manifestDigest":"304bb121c5198fa1be2a2b82a6149f46618dc1bf21cbae72d1810a76135c9bf6","aHead":"a23565c67db0ada64915df65ab631bacf47c5ea1","targetProof":"ok","driftProof":"mismatch"}
-✔ the same real Store restores v1 and v2 separately through actual personal readonly (8103.823292ms)
+WAVE26_SOURCE_MANIFEST {"digest":"001912043e802306af8356d401fec5a3a6da28defe045205b935151d73225c97","counts":{"commands":2,"dispatch":1,"observations":6,"deliveries":1,"payloads":6,"payloadBytes":2430},"answers":"234786f1e124e619bcd2172b39965f90"}
+WAVE26_CONTENT {"format":1,"snapshotDigest":"95c638cb19f2f7b0fa1b633241b0d2f35505ee5160f506f585ccc635eb952e56","databaseSha256":"e6740cf674f618223dd5f6d7197365215d78edd4141841c04d8eb8cb1d7f6317","contentDigest":"9c108e07cbe02f891155ca6803e14aa75b93f488672c3a8d7e6733d1493342eb","contentRows":138,"contentBytes":56328,"artifacts":17}
+WAVE25_DUAL_C_DRIVER {"format":1,"pid":71341,"manifestDigest":"96c09de9da49f56e86db258c483495e8fac2c3d251fbe0643dad43c7648dbf8d","aHead":"bfd6b7bdd398b9827c7dbc306d4b81bca1cfaced","targetProof":"ok","driftProof":"mismatch"}
+WAVE26_CONTENT {"format":2,"snapshotDigest":"0bd552198d269ec007ca65821947274edacdac839adac807f5b8b6cfae1f763a","databaseSha256":"e6740cf674f618223dd5f6d7197365215d78edd4141841c04d8eb8cb1d7f6317","contentDigest":"9c108e07cbe02f891155ca6803e14aa75b93f488672c3a8d7e6733d1493342eb","contentRows":138,"contentBytes":56328,"artifacts":17}
+WAVE25_DUAL_C_DRIVER {"format":2,"pid":71355,"manifestDigest":"9801e9187d57aadd8c5982f7eb68f0509b390e501b9ca4cee73494dd9685e8bf","aHead":"bfd6b7bdd398b9827c7dbc306d4b81bca1cfaced","targetProof":"ok","driftProof":"mismatch"}
+✔ the same real Store restores v1 and v2 separately through actual personal readonly (3085.465125ms)
 ℹ tests 1
 ℹ suites 0
 ℹ pass 1
@@ -11,4 +11,4 @@ WAVE25_DUAL_C_DRIVER {"format":2,"pid":51599,"manifestDigest":"304bb121c5198fa1b
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 8611.169667
+ℹ duration_ms 3318.615667

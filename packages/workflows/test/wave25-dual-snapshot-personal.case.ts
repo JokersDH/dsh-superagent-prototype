@@ -133,7 +133,7 @@ test('the same real Store restores v1 and v2 separately through actual personal 
     }
     const restored = await restoreWorkflowSnapshot({ snapshotDirectory: snapshot.destination, targetStateDir: restoreRoot, sourceStateRoot: source,
       expected: { protocol: snapshot.manifest.protocol, snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), databaseSha256: snapshot.manifest.database.sha256,
-        evidenceDigest: snapshot.manifest.evidence.digest } })
+        evidenceDigest: snapshot.manifest.evidence.digest, contentDigest: sourceContent.digest! } })
     assert.equal(restored.status, 'ok', restored.message)
     assert.equal(restored.report?.snapshot.format, snapshot.manifest.protocol)
     assert.equal(restored.report?.snapshot.digest, sha256(readFileSync(snapshot.manifestPath)))

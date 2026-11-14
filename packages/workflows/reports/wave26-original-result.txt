@@ -1,6 +1,6 @@
-WAVE25_ORIGINAL_RESULT {"answerId":"760767aad402ce5c62f6c746438f9163","targetId":"d4553ca48312342bca58128043f0f48b","duplicate":"duplicate","unknown":"indeterminate","observed":"native_applied","refusals":["ticket","assignment","attempt","epoch","contract","answer","question","target"]}
-WAVE25_ORIGINAL_RESULT_READBACK {"pid":51932,"first":[{"targetBindingId":"d4553ca48312342bca58128043f0f48b","status":"native_applied"}],"second":[{"targetBindingId":"d4553ca48312342bca58128043f0f48b","status":"native_applied"}]}
-✔ the original IDs land the observed result once, keep unknown unknown and refuse a foreign tuple (1301.381583ms)
+WAVE25_ORIGINAL_RESULT {"answerId":"760767aad402ce5c62f6c746438f9163","targetId":"2ab122d255dab46bb29286416b0a6555","duplicate":"duplicate","unknown":"indeterminate","observed":"native_applied","refusals":["ticket","assignment","attempt","epoch","contract","answer","question","target"]}
+WAVE25_ORIGINAL_RESULT_READBACK {"pid":71469,"first":[{"targetBindingId":"2ab122d255dab46bb29286416b0a6555","status":"native_applied"}],"second":[{"targetBindingId":"2ab122d255dab46bb29286416b0a6555","status":"native_applied"}]}
+✔ the original IDs land the observed result once, keep unknown unknown and refuse a foreign tuple (616.82325ms)
 ℹ tests 1
 ℹ suites 0
 ℹ pass 1
@@ -8,4 +8,4 @@ WAVE25_ORIGINAL_RESULT_READBACK {"pid":51932,"first":[{"targetBindingId":"d4553c
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 2119.257042
+ℹ duration_ms 844.959458

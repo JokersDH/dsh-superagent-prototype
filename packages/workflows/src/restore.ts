@@ -63,6 +63,8 @@ export interface RestoreExpectation {
   readonly snapshotDigest?: string
   readonly databaseSha256?: string
   readonly evidenceDigest?: string
+  /** Content proof computed independently from the source database before snapshotting. */
+  readonly contentDigest?: string
 }
 
 export interface RestoreSnapshotResult {
@@ -176,6 +178,8 @@ export async function restoreWorkflowSnapshot(options: RestoreSnapshotOptions): 
       if (evidence.protocol !== manifest.evidence.protocol || evidence.digest !== manifest.evidence.digest || !evidence.complete || !exactFamilies)
         throw new RestoreError('restored evidence summary does not match the snapshot recipe/digest')
       const content: WorkflowContentSummary = readWorkflowContent(restoredDatabase)
+      if (expected.contentDigest !== undefined && (content.digest === null || content.digest !== expected.contentDigest))
+        throw new RestoreError('restored logical content does not match the independent source content expectation')
       const databaseBytes = readFileSync(restoredDatabase)
 
       const report: RestoreSnapshotReport = {
