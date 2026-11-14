@@ -1,0 +1,171 @@
+{
+  "protocol": "wave26-experience-insights-admission/1",
+  "date": "2026-11-14",
+  "status": "F_COMPONENT_SCOPE_READY_FOR_MAIN_COMPOSITION_G_DEFAULT_METRICS_BLOCKED",
+  "candidates": {
+    "F": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "head": "fad070fb1d0a7586ac1059dd7aacba0d869e9658",
+      "actualFinalSource": "2684773843b9332df548121d2c64762f6814672b",
+      "dirty": [],
+      "sourceNote": "Later HEAD commits record final source and screenshot counts only."
+    },
+    "G": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "head": "96a9b2678beca2c902a0ccbc410c1aee39fa8f42",
+      "dirty": []
+    }
+  },
+  "verification": [
+    {
+      "command": "node --test apps/console/test/trial/trial-view.case.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "exitCode": 0,
+      "passed": 10,
+      "failed": 0,
+      "scope": "Actual pure F state/action/unknown/readonly/project/optional-insights mapping; no browser or product execution."
+    },
+    {
+      "command": "pnpm --dir apps/console exec tsc -p tsconfig.json --noEmit",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "exitCode": 0,
+      "scope": "Actual console and new trial component strict consumer compilation."
+    },
+    {
+      "command": "node --test packages/usage-insights/test/analyze.case.ts packages/usage-insights/test/bounds.case.ts packages/usage-insights/test/consumer.case.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "exitCode": 0,
+      "passed": 33,
+      "failed": 0,
+      "scope": "Submitted pure API, bounds and F structural consumer cases; this does not cover the independent failures below."
+    },
+    {
+      "command": "node --test tools/usage-insights/test/http-adapter.case.mjs tools/usage-insights/test/cli.case.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "exitCode": 0,
+      "passed": 23,
+      "failed": 0,
+      "scope": "Submitted bounded private HTTP/CLI/output tests only; no long two-project product harness was rerun."
+    },
+    {
+      "command": "pnpm --dir packages/usage-insights typecheck",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "exitCode": 0,
+      "scope": "Actual G package strict typecheck."
+    },
+    {
+      "command": "node /tmp/pa-wave26-insights-audit.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "exitCode": 1,
+      "passed": 3,
+      "failed": 7,
+      "scope": "Actual G pure analysis plus finite131072-byte private loopback response and exclusive private output tests. No model/native/product process or private DB. All server connections closed and exact probe-owned material removed.",
+      "cases": [
+        { "id": "exact-complete-fixture-original-metrics-positive", "status": "PASS", "observed": "Original fixture has one question, one answer, one acceptance; observed review time remains a partial proxy." },
+        { "id": "narrowed-project-excludes-foreign-work-interventions", "status": "FAIL", "observed": "Restricting multiProjectBundle to project-atlas removes the foreign outcome but still reports2 questions with complete coverage and provenance containing work-orbit-1; expected1." },
+        { "id": "narrowed-window-excludes-old-work-events", "status": "FAIL", "observed": "Window starts09:30, yet09:00 question and09:05 answer are still counted as1 each with complete coverage; expected0 for those event classes." },
+        { "id": "unmapped-foreign-work-is-not-counted-as-in-scope", "status": "FAIL", "observed": "Adding unmapped-foreign-work evidence with no project identity adds a second question, complete coverage and no quarantine." },
+        { "id": "attention-items-respect-declared-project-scope", "status": "FAIL", "observed": "Declared project-atlas bundle includes project-foreign attention item as1 pending item/project count with complete coverage." },
+        { "id": "invalid-work-source-never-becomes-complete-zero", "status": "FAIL", "observed": "workEvidence=[{}] is quarantined, yet interventions.total becomes value0/sample0/unknown0/coveragecomplete/nullReasonnull; workEvidence coverage is complete while only outcomes coverage becomes partial." },
+        { "id": "declared-record-limit-is-enforced-or-marks-partial", "status": "FAIL", "observed": "maxRecords1 accepts2 outcomes, stoppedByrecords, while all coverage fields and overall stay complete." },
+        { "id": "exclusive-private-report-positive-and-nooverwrite", "status": "PASS", "observed": "0600 exclusive output is created; second write refuses and original bytes remain unchanged." },
+        { "id": "private-loopback-small-body-positive", "status": "PASS" },
+        { "id": "unknown-length-response-stops-before-full-oversized-buffer", "status": "FAIL", "observed": "maxBytes1024 receives and buffers the entire131072-byte response before reporting limits; client.bytes=131072." }
+      ]
+    }
+  ],
+  "fAssessment": {
+    "readyForMainSourceComposition": true,
+    "newP1Found": false,
+    "minimalCompleteSource": [
+      "apps/console/src/trial/index.ts",
+      "apps/console/src/trial/TrialWorkspace.tsx",
+      "apps/console/src/trial/useTrialReadiness.ts",
+      "apps/console/src/trial/trial-view.ts",
+      "apps/console/src/trial/insights.ts",
+      "apps/console/src/trial/trial.css"
+    ],
+    "dependencies": [
+      "Existing React/lucide-react/@personal-agent/contracts",
+      "Existing ../configuration-labels.ts and type-only ../transport.ts",
+      "TrialWorkspace.tsx imports its local trial.css; no root/global CSS or package version change needed"
+    ],
+    "props": ["readiness", "loading", "error", "unavailable", "configuration", "activeProjectId", "activeConversationTitle", "insights", "onAction", "onReload", "headingLevel", "className"],
+    "callbacks": ["configure_model", "import_project", "inspect_executor", "open_conversation"],
+    "sourceReview": "Component is display-only; actions invoke only the four navigation names. No network/model/native/command starts in TrialWorkspace. Unknown/fixture/readonly and configuration-only wording remain distinct; raw readiness counts do not become execution grants. Project rows do not become selectors or new authority. React text rendering and trialProbeError mapping avoid raw error stack/credential output in the standard hook path. CSS stays in trial-* subtree and uses existing tokens.",
+    "hookScope": "Reload/unmount/disable effect cleanup ignores prior requests and prior valid observation is kept during refresh/error. Transport is normally one stable main instance. The hook depends on capability presence rather than transport identity; replacing an enabled transport instance with another instance having readiness requires explicit reload/remount. This replacement scenario was not executed in this review and is a consumer precondition/residual coverage boundary, not a claimed current-main bypass.",
+    "independentBrowserScope": "No candidate browser suite was rerun. Candidate22 state/6HTTP/6app-target records and screenshots retain their submitted measured scope; they do not substitute for main's actual App composition/browser acceptance.",
+    "requiredMainComposition": "Main owns App/transport/route/four navigation target mapping and must validate the actual mounted experience, keyboard/desktop/mobile and zero-send behavior. Do not import F test harness or controlled fixtures into runtime."
+  },
+  "gAssessment": {
+    "actualUsableSourceExists": true,
+    "purePackageTestsPassed": 33,
+    "toolTestsPassed": 23,
+    "readyForDefaultUnrestrictedSummary": false,
+    "completeSourceClosure": [
+      "packages/usage-insights/package.json",
+      "packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/tsconfig.build.json",
+      "packages/usage-insights/src/index.ts",
+      "packages/usage-insights/src/protocol.ts",
+      "packages/usage-insights/src/subject.ts",
+      "packages/usage-insights/src/metrics.ts",
+      "packages/usage-insights/src/attention.ts",
+      "packages/usage-insights/src/baseline.ts",
+      "packages/usage-insights/src/analyze.ts",
+      "packages/usage-insights/src/facing.ts",
+      "packages/usage-insights/src/report.ts"
+    ],
+    "dependencies": ["Existing @personal-agent/contracts workspace", "Existing zod4.4.3", "Root workspace/lock registration remains main-owned"],
+    "consumerSurface": "analyzeUsageInsights(input).summary, toInsightConsumerView(summary), UsageInsightsInputSchema/UsageInsightsSummarySchema; the resulting compact type structurally matches F TrialInsightsView. Exports target dist, so package build/importer registration is needed for normal workspace consumption.",
+    "preservedGoodScope": "Schema reuse, deterministic summary, outcome-id replay/conflict handling, exact outcome project/window exclusion, per-layer/per-currency rows, partial UI-review proxy, explicit known/unknown values, operator baseline separation, loopback-only explicit credential/redirect refusal, request timeout and exclusive0600 output all have useful source/tests. No new price/model/SQL/runtime authority is present.",
+    "integrationRecommendation": "F can be integrated independently with insights omitted/unavailable. G types/source may be staged in a nondispatching optional package, but unrestricted real-data complete summaries/intervention/attention reports should remain outside the default UI until scope/coverage/bounds findings close. A narrowly composed main consumer must independently scope and validate every admitted source and preserve unavailable intervention/attention states; do not merely rely on G's current complete badge."
+  },
+  "findings": [
+    {
+      "id": "G26-WORK-ATTENTION-SCOPE-WINDOW",
+      "priority": "P1_USER_FACING_METRIC_ADMISSION",
+      "file": "packages/usage-insights/src/analyze.ts",
+      "line": 179,
+      "relatedLine": 169,
+      "problem": "Only outcomes and queue facts are project/window filtered. Every parsed WorkEvidence entry is passed to workInterventions regardless of event.at or proven project mapping, and all attention items enter attentionSummary without declared-project filtering. CLI project/window overrides therefore do not scope all metrics. Four independent valid-data negatives demonstrate foreign project, old event, unmapped work and foreign attention contamination.",
+      "requiredOutcome": "Create one validated project/work/contract source map and enforce declared scope on all record classes; unmapped work cannot become an observed in-scope zero/count. Apply the requested event-time window to historical intervention facts; attention remains a separately declared current snapshot but must obey project scope and explicit observation freshness. Preserve exact outcome/layer/currency handling and original provenance."
+    },
+    {
+      "id": "G26-INVALID-WORK-BECOMES-COMPLETE-ZERO",
+      "priority": "P1_UNKNOWN_COVERAGE_ADMISSION",
+      "file": "packages/usage-insights/src/analyze.ts",
+      "line": 165,
+      "problem": "workParsed invalid/quarantined signal downgrades outcomes but not workCoverage. After every work record is invalid, interventionMetrics sees an empty complete set and emits a measured0 with unknown0 and complete coverage. This contradicts the module's null/unknown promise and can produce false efficiency conclusions even though global quarantine is nonzero.",
+      "requiredOutcome": "Propagate invalid/conflicted/missing sources into the appropriate per-source and per-metric coverage/unknown counts. Keep genuine complete empty windows as zero only when emptiness is positively established, not when records were rejected. Test all-invalid and mixed valid/invalid work and attention sources."
+    },
+    {
+      "id": "G26-NONSTREAMING-RESPONSE-BYTE-BOUND",
+      "priority": "P1_COLLECTOR_RESOURCE_ADMISSION",
+      "file": "tools/usage-insights/lib/http.mjs",
+      "line": 113,
+      "problem": "Unknown-length successful bodies are fully arrayBuffer'ed before byte accounting/refusal; error bodies are also fully drained without a byte bound. A maxBytes1024 client buffers all131072 bytes in a finite private response before failing. Content-Length checks cover only cooperative declared lengths, not the resource bound advertised by the collector.",
+      "requiredOutcome": "Read/cancel body streams under a remaining-byte budget before full allocation; apply bounded handling to non2xx and redirect bodies too. Keep per-request/overall deadlines, explicit origin/token/redirect constraints, and test absent/false Content-Length with an original small positive."
+    },
+    {
+      "id": "G26-DECLARED-LIMITS-ARE-OBSERVATIONAL-ONLY",
+      "priority": "P2_LIMIT_AND_COVERAGE_CONTRACT",
+      "file": "packages/usage-insights/src/analyze.ts",
+      "line": 290,
+      "problem": "appliedLimits reports stoppedBy based on counts after analysis but does not enforce declared limits or downgrade coverage. maxRecords1 still accepts2 and reports complete. Configured maxWorks/maxPages/bytes similarly need an enforceable meaning or explicit declaration that they are collector observations, not applied bounds.",
+      "requiredOutcome": "Validate/enforce supported limits before expensive parsing/aggregation or reject inputs exceeding them. Partial processing must deterministically mark affected coverage and counts; exact-bound completion must not be mislabeled stopped. Keep schema-level hard caps as a separate guarantee."
+    }
+  ],
+  "nextWholePackages": {
+    "F": "Continue from the admitted component into actual main composition and everyday project/conversation/settings/executor journeys, transport replacement/failure behavior, responsive keyboard use and current user guide; keep four navigation actions and no execution authority. G unavailable must not block the core workspace.",
+    "G": "Deliver one complete trustworthy observation result: exact work/project/contract/time mapping and invalid-source coverage, streaming/file/input limits, truthful null/partial provenance; then real same-subject HTTP/file roundtrip, F stable consumer and two-project bounded usage. Preserve good pure API/CLI/source rather than replacing it with another benchmark or private ledger."
+  },
+  "scopeLimits": [
+    "Candidate local tests and this narrow audit are not main App runtime/native or full-product release admission.",
+    "No actual operator production instance, native/model, fee/recipe research or real-value experiment was run.",
+    "F/G worktrees remain clean; only the assigned main report and independently owned temporary probe were created."
+  ],
+  "preservation": { "realVendorModelTurns": 0, "nativeTurnStarts": 0, "userServicesChanged": 0, "globalDiscovery": false, "unrelatedCredentialsRead": false, "candidateProductionEdits": false, "allOwnExecSessionsCompleted": true, "allTwelveUserInstancesAndStatePreserved": true }
+}
