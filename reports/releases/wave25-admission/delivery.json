@@ -1,0 +1,216 @@
+{
+  "protocol": "wave25-delivery-admission/1",
+  "date": "2026-11-14",
+  "scope": "Independent package bytes and provenance, injected ownership/signal controls, complete real-report release controls, one isolated CLI-help test and static packaged UI presence; no live install/stop matrix",
+  "candidates": {
+    "D": "bcd4d4c4f1a06ee78ddb4a7eaad7f3ff4273f6fd",
+    "DDirty": false,
+    "E": "6c44c3f81f25df7fcf2a6c027b9a9d3d6fc859fb",
+    "ETestSourceAtFinalRun": "5276f5ceabc9406405fc2162dcab1c70ae1300a9",
+    "EDirty": "Preserved historical untracked report runs only"
+  },
+  "newDArtifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave24-target/wave24-target-3b2ff68.tar.gz",
+    "source": "3b2ff68b4785e79757fc1dcd14b17f5dd84d0c62",
+    "sourceDirty": false,
+    "buildId": "470738fd33b22ff4",
+    "sha256": "f04abb1b4c4ae47a52f6bc1aa172d70c4a113219f443f354aee0ebffc8a00494",
+    "tarBytes": 20248077,
+    "schema": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "abi": "137",
+    "sqlite": "3.53.4",
+    "verifiedEntries": 6748,
+    "verifiedRegularFiles": 6727,
+    "verifiedInternalSymlinks": 21,
+    "verifiedRegularBytes": 67572368,
+    "fileDigestMismatches": [],
+    "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave25-package-qiRBMR/install",
+    "verification": "Expected tar SHA/size, safe member names, extraction to fresh private root, every manifest regular file hash/size and realpath-bounded internal link checked",
+    "byteVerificationExitCode": 0,
+    "containsMain4bDiagnosticsUi": "STATIC_PRESENCE_VERIFIED",
+    "staticUiCommand": "node tools/distribution/verify-installed-ui.mjs --install <verifiedInstall> --json",
+    "staticUiCommandExitCode": 0,
+    "uiScope": "One installed JS asset contains actual opt-in/withheldSourceCount/reasons UI markers and packaged backend contains context-scope-review/1; not browser interaction or E installed UI admission",
+    "eFinalVerdictForThisArtifact": "NOT_REACHED"
+  },
+  "dClosureAndMinimalSource": {
+    "manifest": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave24/ordinary-source-closure.json",
+    "source": "a08e4ee",
+    "entriesChecked": 87,
+    "matches": 87,
+    "mismatches": [],
+    "newProductionRuntimeSliceNeededByMain": [],
+    "reason": "Main4b already contains actual diagnostics UI and CLI-help runtime. D's new launcher-owned delta is a CLI-help test only; live tools remain outside main runtime.",
+    "optionalNarrowTestSlice": ["apps/launcher/test/cli-help.case.mjs"],
+    "independentTest": {
+      "command": "node --test apps/launcher/test/cli-help.case.mjs",
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "exitCode": 0,
+      "pass": 1,
+      "fail": 0,
+      "privateRootsUncreated": true,
+      "executorCalls": 0
+    }
+  },
+  "eMeasuredResult": {
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T02-14-52-788Z/report.json",
+    "testSource": "5276f5ceabc9406405fc2162dcab1c70ae1300a9",
+    "counts": { "PASS": 223, "FAIL": 0, "NOT_TESTED": 16 },
+    "subjectSource": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+    "subjectBuildId": "1eb8733c8b1729bc",
+    "subjectTarSha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+    "subjectTarBytes": 20247278,
+    "installedAlpha": "PASS_162_REQUIRED_RECORDED_SCOPE",
+    "localAlpha": "PASS_SAME_ORDINARY_INSTALLED_SCOPE",
+    "fullProduct": "FAIL_NATIVE_DELIVERY_AND_CONTROL_UNMEASURED",
+    "packageUi": "NOT_TESTED_0EDE_PREDATES_MAIN4B_UI",
+    "aProducerToCSameChainTwoSnapshots": "NOT_REACHED_AS_REPORTED",
+    "actualConsumerFilesVerified": 4,
+    "actualConsumerFilesMatched": 4,
+    "actualForeign3bConsumerRefused": true,
+    "admission": "Retain genuine complete0ede ordinary personal/backend-review/install observations, along with a9b162-required and595161-required historical scopes. These do not certify new3b UI, composed A-to-C flow, business resume, native or target."
+  },
+  "eIndependentReleaseControls": {
+    "commandForm": "node --input-type=module heredoc in E checkout importing actual evaluateRelease/tier/resolveFixtureDigest; clone the full real0ede report and evaluate at its recorded checkedAt",
+    "exitCode": 0,
+    "requiredCases": 162,
+    "cases": [
+      { "id": "complete_real0ede_positive", "expected": "PASS", "actual": "PASS" },
+      { "id": "self_unsupported_digest_downgrade_against_package_fact", "expected": "REFUSE", "actual": "REFUSE", "reason": "capability_mismatch" },
+      { "id": "negative_withheldSourceCount", "expected": "REFUSE", "actual": "REFUSE" },
+      { "id": "withheldSourceCount_over64", "expected": "REFUSE", "actual": "REFUSE" },
+      { "id": "unknown_scope_reason", "expected": "REFUSE", "actual": "REFUSE" },
+      { "id": "missing_diagnostic_consumer", "expected": "REFUSE", "actual": "REFUSE" },
+      { "id": "real_new3b_consumer_tuple_and_packaged_hashes_on0ede_data", "expected": "REFUSE", "actual": "REFUSE", "reason": "reviewReuse_invalid consumer_provenance" },
+      { "id": "plain_optIn_http500", "expected": "REFUSE", "actual": "PASS" },
+      { "id": "missing_plain_optIn_http_observation", "expected": "REFUSE", "actual": "PASS" }
+    ],
+    "oldCapabilityAndBoundedSchemaGaps": "CLOSED_AT_MEASURED_SCOPE",
+    "newGap": "Public-schema refactoring dropped the actual plain.optIn===200 evidence requirement; actual complete recorded0ede observations still have200 and remain valid"
+  },
+  "dRegistrationAndOwnershipControls": {
+    "scope": "Read the actual immediate registerSpawn calls and use mocked ps/stop/timers plus captured process.kill; no real signals or ps requests",
+    "commandForm": "node --experimental-test-module-mocks --input-type=module heredoc; mock node:child_process before importing D actual tools/distribution/lib/live-cleanup.mjs",
+    "exitCodes": [0, 0],
+    "immediateRegistration": "Now present before waitHealth in same-store seed/review/reopen, nonempty starts and real-relocation; missing record material is retained. Prior omission is no longer reported absent.",
+    "cases": [
+      { "id": "complete_own_positive", "expectedOwned": true, "actualOwned": true },
+      { "id": "recorded_child_start_mismatch", "expectedOwned": false, "actualOwned": false },
+      { "id": "actual_sibling_data_config_paths", "expectedOwned": false, "actualOwned": false },
+      { "id": "only_null_unknown_record", "expected": "UNKNOWN", "actual": "UNKNOWN" },
+      { "id": "child_config_root_mismatch", "expectedOwned": false, "actualOwned": true },
+      { "id": "captured_child_argv_replaced_by_foreign_entry_same_roots", "expectedOwned": false, "actualOwned": true },
+      { "id": "pid_start_changes_after_SIGTERM_before_SIGKILL", "expected": "REFUSE_KILL_NEW_IDENTITY", "actual": "SIGKILL_CAPTURED_FOR_RECYCLED_IDENTITY" },
+      { "id": "valid_record_plus_null_unknown", "expected": "UNKNOWN_RETAINED", "actual": "CLEAN_EMPTY_UNKNOWN_NOT_RETAINED" }
+    ],
+    "capturedSignalSequence": [
+      { "pid": 101, "signal": "SIGTERM", "observedIdentity": "original" },
+      { "pid": 101, "signal": "SIGKILL", "observedIdentity": "recycled" }
+    ],
+    "realSignalsSent": 0,
+    "admission": "Old prerecord/child-start/sibling/empty-unknown fixes are real in their scoped cases. Current helper still lacks complete per-signal identity and child configuration/argv completeness, so broad live probe admission remains blocked. This is not an observed public product bypass."
+  },
+  "dComposedDataAndRestoreScope": {
+    "sameStoreACReport": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave24/a-c-same-store.json",
+    "aReaderUsesIndependentProcess": true,
+    "aOriginalBindingQuestionAnswerDeliveryFieldsRecorded": true,
+    "cPackageDriverOnSameExactStore": "verified-flow22 assertions, requested/live digest match, owned stop reported",
+    "cDirectlyConsumesAManifestOutput": false,
+    "directBindingLimitExplicitlyRetainedByD": true,
+    "independentSnapshotReport": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave24/independent-snapshot-restores.json",
+    "paths": [
+      "snapshot1 create/verify -> material-v1 -> separate bundle -> package restore -> restored-v1-state",
+      "snapshot2 create/verify -> material-v2 -> separate bundle -> package restore -> restored-v2-state"
+    ],
+    "actualSeparateMaterializationAndPackageRestore": true,
+    "workQuestionAnswerIdsAndDatabaseDigestsAsserted": true,
+    "bundleEvidenceFormat": 2,
+    "scope": "Genuine progress beyond the previous single-bundle equivalence: each snapshot's bytes now goes through its own material/bundle/restore target. This is distinct from a composed A manifest -> C package UI flow for both roots; native_applied and browser UI are not independently asserted in this particular two-format tool.",
+    "sourceInputLimit": "The tool copies --business then unconditionally removes WAL/SHM before its baseline read. Treat measured retained/quiescent input scope accurately; it is not a general online SQLite backup proof. Prefer the A producer's verified backup/reader input when composing the final chain.",
+    "liveRerunDuringThisAudit": false
+  },
+  "findings": [
+    {
+      "id": "D_KILL_ESCALATION_USES_STALE_IDENTITY",
+      "priority": "P1_PROBE_SAFETY_ONLY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/lib/live-cleanup.mjs",
+      "line": 149,
+      "summary": "A freshProof is taken once before SIGTERM, then SIGKILL reuses the targets after a5second wait without rechecking current identities. A pure control changes PID start after TERM; KILL is still issued to the recycled identity.",
+      "next": "Revalidate full per-resource identity immediately before every individual signal and escalation, not only once per stop sequence. Treat disappeared/replaced/unknown identities as non-signalable and preserve unknown material."
+    },
+    {
+      "id": "D_CHILD_CONFIGURATION_AND_CAPTURED_ARGV_NOT_BOUND",
+      "priority": "P1_PROBE_SAFETY_ONLY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/lib/live-cleanup.mjs",
+      "line": 99,
+      "summary": "Non-launcher tokenConfig is always true and snapshotTokens are captured but never compared. An API child with sibling config or changed executable under the same install/state is accepted owned. Resource role comparison uses the child's own role as the expected role.",
+      "next": "Bind observed child role/entry/fullargv/config and operation to independent birth facts; keep exact start/UID checks already fixed. Do not broaden live matrices or signal groups with unknown child identities."
+    },
+    {
+      "id": "D_MIXED_NULL_UNKNOWN_RECORD_DISCARDED",
+      "priority": "P2_PROBE_SET_COMPLETENESS",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/lib/live-cleanup.mjs",
+      "line": 131,
+      "summary": "The empty-list check fixes records=[null], but filter(Boolean) still drops a null beside a valid record. A pure own-stop positive plus an additional null returns CLEAN with no retained material.",
+      "next": "Preserve an explicit unknown entry for each missing member in a nonempty resource set; test mixed known/unknown as well as entirely empty records."
+    },
+    {
+      "id": "E_OPT_IN_HTTP_SUCCESS_NOT_REQUIRED",
+      "priority": "P2_ACCEPTANCE_TOOL_SCOPE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "line": 410,
+      "summary": "scopeDiagnosticsIssues validates the diagnostic shape but no longer requires plain.optIn===200. Changing the actual complete0ede report's opt-in status to500, or deleting it, still passes all162 installed-alpha required cases.",
+      "next": "Require the actual successful HTTP observation plus valid authoritative source state; retain strict DTO validation and the newly closed capability/count controls. Keep genuine original0ede observations, which contain200, separate from this validator omission."
+    }
+  ],
+  "nextLargePackages": {
+    "D": [
+      "Finish per-individual-signal/TERM-to-KILL fresh identity, bound child config/fullargv/role and mixed unknown resource-set controls before live matrices",
+      "Compose A output directly into the unique C driver on the same Store and each independent format target; use verified stable SQLite input rather than deleting WAL to imply quiescence",
+      "Keep3b2ff68 immutable and give E its exact main4b UI bytes now; no documentation-only refreeze",
+      "Verify package-local current UI/CLI, ordinary install/reuse/reopen/support with bounded exact-owned probes after admission",
+      "Deliver accurate new source closure and same-subject handoff; B/private/native/target remain separate"
+    ],
+    "E": [
+      "Preserve0ede223/0/16 ordinary measured scope and all closed old gate fixes; restore actual opt-in HTTP success as a required observation",
+      "Retarget exact3b2ff68 immutable bytes for actual main4b UI interaction, screenshot/accessibility and same-consumer dual-format recovery",
+      "Independently admit D's complete fresh signal/child/set controls before consuming live probes",
+      "Compose A manifest -> C single consumer -> installed package on both roots with original binding/Q&A/native_applied fields",
+      "Publish layered ordinary/UI/recovery/native/value conclusions without relabeling old artifacts or widening budgets"
+    ]
+  },
+  "additionalAgentSuggestions": {
+    "F": {
+      "theme": "Independent internal-user journeys",
+      "suggestedOwnedPaths": ["tools/trial-journeys/", "reports/trial-journeys/"],
+      "outcomes": "Immutable package input -> fresh private startup/onboarding -> project/dialogue -> explicit historical review -> UI diagnostics/reopen, with actual desktop/mobile observations and finite failures",
+      "boundary": "No E required-gate edits or release authority, no D lifecycle implementation or existing user-instance operations. E consumes the raw evidence independently."
+    },
+    "G": {
+      "theme": "Read-only operational observations and bounded stability analysis",
+      "suggestedOwnedPaths": ["tools/trial-observations/", "reports/trial-observations/"],
+      "outcomes": "Source/artifact/run identity-normalized observations, bounded SSE/reconnect/latency/FD/queue baselines and reproducible regression reports; no test-count-based completion score",
+      "boundary": "Consume public diagnostics and explicitly owned probe observations; no new product ledger, shared root instrumentation, global process scans, cleanup or E assertions."
+    },
+    "H": {
+      "theme": "Migration preflight and colleague trial assistance",
+      "suggestedOwnedPaths": ["tools/trial-migration-preflight/", "docs/internal-trial/"],
+      "outcomes": "Read-only platform/ABI/disk/path/backup compatibility preflight, explicit artifact/source-bound onboarding recipes, preserved-data support and migration gap reports",
+      "boundary": "No A schema writers, D install/stop/rollback implementation, credential copying or automatic migration/activation. Actual mutations continue through admitted D/main entries."
+    }
+  },
+  "safety": {
+    "realVendorSends": 0,
+    "realModelTurns": 0,
+    "nativeTurnStarts": 0,
+    "realProcessSignals": 0,
+    "liveInstallOrStopMatricesRun": 0,
+    "userServicesTouched": false,
+    "oldDataProfilesTarsLedgersAndERunsPreserved": true,
+    "candidateProductionAndEAssertionsEdited": false,
+    "filesystemWrites": "New private package extraction, CLI-help test-owned transient roots, and this report only"
+  }
+}
