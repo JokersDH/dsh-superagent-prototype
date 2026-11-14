@@ -1,0 +1,13 @@
+{
+  "protocol": "project-facts/1",
+  "projectId": "project-alpha",
+  "observedAt": "2026-11-14T11:55:00.000Z",
+  "provenance": { "source": "injected", "provider": "fixture/1", "authority": "none", "scope": "package", "inputs": [] },
+  "stack": { "kind": "node", "packageManagerField": "pnpm@11.7.0", "enginesNode": ">=24" },
+  "manager": { "kind": "pnpm", "declaredVersion": "11.7.0" },
+  "locks": [{ "name": "pnpm-lock.yaml", "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" }],
+  "workspace": { "declaration": "none" },
+  "scripts": ["build", "test"],
+  "languages": ["node", "typescript"],
+  "missing": []
+}

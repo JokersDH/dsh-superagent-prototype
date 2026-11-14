@@ -1,0 +1,38 @@
+{
+  "protocol": "application-configuration/1",
+  "revision": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "proposalsAvailable": true,
+  "executionAvailability": { "state": "available", "kind": "native" },
+  "projects": [
+    {
+      "id": "project-alpha",
+      "displayName": "Alpha 服务",
+      "scope": { "projectId": "project-alpha", "allowedPaths": ["src", "test"], "excludedPaths": ["src/generated"], "externalActions": [] },
+      "profileIds": ["profile-native"],
+      "defaultProfileId": "profile-native",
+      "defaultCriteria": [
+        { "id": "tests", "description": "Registered project tests pass.", "kind": "machine", "required": true, "checkDefinitionRef": "check-node-test" },
+        { "id": "review", "description": "User reviews the delivery.", "kind": "human", "required": true }
+      ],
+      "dispatchAllowed": true
+    },
+    {
+      "id": "project-beta",
+      "displayName": "Beta 工具",
+      "scope": { "projectId": "project-beta", "allowedPaths": ["packages/core/src"], "excludedPaths": [], "externalActions": [] },
+      "profileIds": ["profile-native"],
+      "defaultProfileId": "profile-native",
+      "defaultCriteria": [
+        { "id": "beta-tests", "description": "Beta package tests pass.", "kind": "machine", "required": true, "checkDefinitionRef": "check-npm-test" }
+      ],
+      "dispatchAllowed": true
+    }
+  ],
+  "profiles": [
+    { "id": "profile-native", "revision": 1, "displayName": "Native profile", "driverId": "codex", "kind": "native", "readiness": "native_test_passed", "dispatchAllowed": true }
+  ],
+  "checks": [
+    { "id": "check-node-test", "revision": 4, "displayName": "node --test" },
+    { "id": "check-npm-test", "revision": 2, "displayName": "npm test" }
+  ]
+}
