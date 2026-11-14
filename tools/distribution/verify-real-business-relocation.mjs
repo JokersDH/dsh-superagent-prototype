@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
-import { cleanupBornResources, waitBornRecord } from './lib/live-cleanup.mjs'
+import { cleanupBornResources, registerSpawn, supplementBornRecord } from './lib/live-cleanup.mjs'
 
 const { values } = parseArgs({ options: { install: { type: 'string' }, business: { type: 'string' }, fault: { type: 'string' }, json: { type: 'boolean', default: false } } })
 const root = mkdtempSync(join(tmpdir(), 'pa-real-business-'))
@@ -90,8 +90,11 @@ try {
   // No --fixture: the restore marker forces recovery_readonly while the requested mode stays personal.
   const daemon = spawn(cli, ['start', '--port', String(consolePort), '--api-port', String(apiPort), ...restoredArgs], { cwd: install, stdio: ['ignore', outFd, errFd], detached: true })
   daemon.unref(); closeSync(outFd); closeSync(errFd)
+  const daemonSpawn = registerSpawn({ pid: daemon.pid, install, config: restoredRoots.config, data: restoredState, operation: 'start' })
+  born = { record: daemonSpawn, args: restoredArgs }
+  if (values.fault === 'before-record') throw new Error('injected_fault:before-record')
   const health = await waitHealth(apiPort)
-  born = health === null ? null : { record: await waitBornRecord(restoredRoots.config), args: restoredArgs }
+  if (health !== null) born = { record: await supplementBornRecord(daemonSpawn, restoredRoots.config, 3000), args: restoredArgs }
   if (values.fault === 'after-start') throw new Error('injected_fault:after-start')
   if (health === null) throw new Error(`restored instance not healthy: ${readFileSync(join(root, 'restored.err.log'), 'utf8').slice(0, 400)}`)
   const token = readFileSync(join(restoredState, 'api.key'), 'utf8').trim()
@@ -149,7 +152,7 @@ finally {
   if (evidence.status !== 'PASS' && born) {
     if (!born.record) { evidence.cleanup = [{ status: 'UNKNOWN', unknown: [{ reason: 'record_never_observed' }], retained: true }]; retained = true }
     else {
-      const report = await cleanupBornResources({ cli: join(values.install, 'bin/pa'), install: resolve(values.install), roots: { config: born.record.configRoot, data: born.record.state }, records: [born.record], args: born.args, env: process.env })
+      const report = await cleanupBornResources({ cli: join(values.install, 'bin/pa'), install: resolve(values.install), roots: { config: born.record.configRoot ?? born.record.config, data: born.record.state ?? born.record.data }, records: [born.record], args: born.args, env: process.env })
       evidence.cleanup = [report]; retained = report.retained
     }
     if (retained) evidence.retainedRoot = root

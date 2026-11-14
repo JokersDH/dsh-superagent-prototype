@@ -15,7 +15,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
-import { cleanupBornResources, waitBornRecord } from './lib/live-cleanup.mjs'
+import { cleanupBornResources, registerSpawn, supplementBornRecord } from './lib/live-cleanup.mjs'
 
 const { values } = parseArgs({ options: { install: { type: 'string' }, fault: { type: 'string' }, json: { type: 'boolean', default: false } } })
 const root = mkdtempSync(join(tmpdir(), 'pa-nonempty-personal-'))
@@ -75,9 +75,12 @@ try {
   const outFd = openSync(join(root, 'start.out.log'), 'w', 0o600), errFd = openSync(join(root, 'start.err.log'), 'w', 0o600)
   const daemon = spawn(cli, ['start', '--discussion-only', '--port', String(consolePort), '--api-port', String(apiPort), ...argsOf], { cwd: install, env, stdio: ['ignore', outFd, errFd], detached: true })
   daemon.unref(); closeSync(outFd); closeSync(errFd)
+  const personalSpawn = registerSpawn({ pid: daemon.pid, install, config: roots.config, data: roots.state, operation: 'start' })
+  cleanup.set(roots.config, { record: personalSpawn, args: argsOf })
+  if (values.fault === 'before-record') throw new Error('injected_fault:before-record')
   const health = await waitHealth(apiPort)
   if (health === null) throw new Error(`instance not healthy: ${readFileSync(join(root, 'start.err.log'), 'utf8').slice(0, 400)}`)
-  cleanup.set(roots.config, { record: await waitBornRecord(roots.config), args: argsOf })
+  cleanup.set(roots.config, { record: await supplementBornRecord(personalSpawn, roots.config, 3000), args: argsOf })
   if (values.fault === 'after-personal-start') throw new Error('injected_fault:after-personal-start')
   const token = readFileSync(join(roots.state, 'api.key'), 'utf8').trim()
   const auth = { authorization: `Bearer ${token}` }
@@ -195,8 +198,10 @@ try {
   const rOut = openSync(join(root, 'restored.out.log'), 'w', 0o600), rErr = openSync(join(root, 'restored.err.log'), 'w', 0o600)
   const restoredDaemon = spawn(cli, ['start', '--fixture', '--port', String(rConsole), '--api-port', String(rApi), ...restoredArgs], { cwd: install, stdio: ['ignore', rOut, rErr], detached: true })
   restoredDaemon.unref(); closeSync(rOut); closeSync(rErr)
+  const restoredSpawn = registerSpawn({ pid: restoredDaemon.pid, install, config: restoredRoots.config, data: restoredState, operation: 'start' })
+  cleanup.set(restoredRoots.config, { record: restoredSpawn, args: restoredArgs })
   const rHealth = await waitHealth(rApi)
-  cleanup.set(restoredRoots.config, { record: await waitBornRecord(restoredRoots.config), args: restoredArgs })
+  cleanup.set(restoredRoots.config, { record: await supplementBornRecord(restoredSpawn, restoredRoots.config, 3000), args: restoredArgs })
   if (rHealth === null) throw new Error(`restored instance not healthy: ${readFileSync(join(root, 'restored.err.log'), 'utf8').slice(0, 300)}`)
   const rToken = readFileSync(join(restoredState, 'api.key'), 'utf8').trim()
   const rAuth = { authorization: `Bearer ${rToken}` }
@@ -258,8 +263,10 @@ try {
   const uOut = openSync(join(root, 'unbound.out.log'), 'w', 0o600), uErr = openSync(join(root, 'unbound.err.log'), 'w', 0o600)
   const unboundDaemon = spawn(cli, ['start', '--fixture', '--port', String(uConsole), '--api-port', String(uApi), ...reviewArgs], { cwd: install, stdio: ['ignore', uOut, uErr], detached: true })
   unboundDaemon.unref(); closeSync(uOut); closeSync(uErr)
+  const unboundSpawn = registerSpawn({ pid: unboundDaemon.pid, install, config: reviewRoots.config, data: reviewState, operation: 'start' })
+  cleanup.set(reviewRoots.config, { record: unboundSpawn, args: reviewArgs })
   if (await waitHealth(uApi) === null) throw new Error('unbound fixture did not start')
-  cleanup.set(reviewRoots.config, { record: await waitBornRecord(reviewRoots.config), args: reviewArgs })
+  cleanup.set(reviewRoots.config, { record: await supplementBornRecord(unboundSpawn, reviewRoots.config, 3000), args: reviewArgs })
   const unboundPid = livePid()
   const unboundReview = run(cli, ['start', '--json', '--discussion-only', '--review-restored-scope', reviewPath, '--port', String(uConsole), '--api-port', String(uApi), ...reviewArgs], [2])
   if (unboundReview.json?.code !== 'restored_review_selection_mismatch') throw new Error(`unbound daemon accepted review selection: ${JSON.stringify(unboundReview.json).slice(0, 300)}`)
@@ -296,8 +303,10 @@ try {
   const rOut2 = openSync(join(root, 'review.out.log'), 'w', 0o600), rErr2 = openSync(join(root, 'review.err.log'), 'w', 0o600)
   const reviewDaemon = spawn(cli, ['start', '--discussion-only', '--review-restored-scope', reviewPath, '--port', String(rConsole2), '--api-port', String(rApi2), ...reviewArgs], { cwd: install, stdio: ['ignore', rOut2, rErr2], detached: true })
   reviewDaemon.unref(); closeSync(rOut2); closeSync(rErr2)
+  const reviewSpawn = registerSpawn({ pid: reviewDaemon.pid, install, config: reviewRoots.config, data: reviewState, operation: 'start' })
+  cleanup.set(reviewRoots.config, { record: reviewSpawn, args: reviewArgs })
   const reviewHealth = await waitHealth(rApi2)
-  cleanup.set(reviewRoots.config, { record: await waitBornRecord(reviewRoots.config), args: reviewArgs })
+  cleanup.set(reviewRoots.config, { record: await supplementBornRecord(reviewSpawn, reviewRoots.config, 3000), args: reviewArgs })
   if (reviewHealth === null) throw new Error(`reviewed instance not healthy: ${readFileSync(join(root, 'review.err.log'), 'utf8').slice(0, 500)}`)
   const reviewAuth = { authorization: `Bearer ${readFileSync(join(reviewState, 'api.key'), 'utf8').trim()}` }
   const rvget = async (path) => { const res = await fetch(`http://127.0.0.1:${rApi2}${path}`, { headers: reviewAuth }); return { status: res.status, body: await res.json() } }
@@ -343,7 +352,7 @@ finally {
     const reports = []
     for (const entry of cleanup.values()) {
       if (!entry.record) { reports.push({ status: 'UNKNOWN', unknown: [{ reason: 'record_never_observed' }], retained: true }); retained = true; continue }
-      const report = await cleanupBornResources({ cli: join(resolve(values.install), 'bin/pa'), install: resolve(values.install), roots: { config: entry.record.configRoot, data: entry.record.state }, records: [entry.record], args: entry.args, env: process.env })
+      const report = await cleanupBornResources({ cli: join(resolve(values.install), 'bin/pa'), install: resolve(values.install), roots: { config: entry.record.configRoot ?? entry.record.config, data: entry.record.state ?? entry.record.data }, records: [entry.record], args: entry.args, env: process.env })
       reports.push(report); if (report.retained) retained = true
     }
     evidence.cleanup = reports; if (retained) evidence.retainedRoot = root

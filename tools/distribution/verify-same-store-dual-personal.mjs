@@ -13,7 +13,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
-import { cleanupBornResources, waitBornRecord } from './lib/live-cleanup.mjs'
+import { cleanupBornResources, registerSpawn, supplementBornRecord } from './lib/live-cleanup.mjs'
 
 const { values } = parseArgs({ options: { install: { type: 'string' }, business: { type: 'string' }, fault: { type: 'string' }, json: { type: 'boolean', default: false } } })
 const root = mkdtempSync(join(tmpdir(), 'pa-same-store-'))
@@ -78,9 +78,16 @@ try {
   const seedOut = openSync(join(root, 'seed.out.log'), 'w', 0o600), seedErr = openSync(join(root, 'seed.err.log'), 'w', 0o600)
   const seedDaemon = spawn(cli, ['start', '--discussion-only', '--port', String(seedConsole), '--api-port', String(seedApi), ...seedArgs], { cwd: install, env, stdio: ['ignore', seedOut, seedErr], detached: true })
   seedDaemon.unref(); closeSync(seedOut); closeSync(seedErr)
+  const seedSpawn = registerSpawn({ pid: seedDaemon.pid, install, config: roots.config, data: seedState, operation: 'start' })
+  seedEvidence = { record: seedSpawn, args: seedArgs }
+  fault('before-record')
+  if (values.fault === 'after-record-before-health') {
+    seedEvidence = { record: await supplementBornRecord(seedSpawn, roots.config, 5000), args: seedArgs }
+    throw new Error('injected_fault:after-record-before-health')
+  }
   const seedHealth = await waitHealth(seedApi)
   if (seedHealth === null) throw new Error(`seed personal not healthy: ${readFileSync(join(root, 'seed.err.log'), 'utf8').slice(0, 500)}`)
-  seedEvidence = { record: await waitBornRecord(roots.config), args: seedArgs }
+  seedEvidence = { record: await supplementBornRecord(seedSpawn, roots.config, 3000), args: seedArgs }
   fault('after-seed-start')
   const seedAuth = { authorization: `Bearer ${readFileSync(join(seedState, 'api.key'), 'utf8').trim()}` }
   const sget = async (path) => { const res = await fetch(`http://127.0.0.1:${seedApi}${path}`, { headers: seedAuth }); return { status: res.status, body: await res.json() } }
@@ -159,9 +166,16 @@ try {
   const rOut = openSync(join(root, 'review.out.log'), 'w', 0o600), rErr = openSync(join(root, 'review.err.log'), 'w', 0o600)
   const reviewDaemon = spawn(cli, ['start', '--discussion-only', '--review-restored-scope', reviewPath, '--port', String(rConsole), '--api-port', String(rApi), ...reviewArgs], { cwd: install, env, stdio: ['ignore', rOut, rErr], detached: true })
   reviewDaemon.unref(); closeSync(rOut); closeSync(rErr)
+  const reviewSpawn = registerSpawn({ pid: reviewDaemon.pid, install, config: reviewRoots.config, data: reviewState, operation: 'start' })
+  reviewEvidence = { record: reviewSpawn, args: reviewArgs }
+  fault('before-review-record')
+  if (values.fault === 'after-review-record-before-health') {
+    reviewEvidence = { record: await supplementBornRecord(reviewSpawn, reviewRoots.config, 5000), args: reviewArgs }
+    throw new Error('injected_fault:after-review-record-before-health')
+  }
   const reviewHealth = await waitHealth(rApi)
   if (reviewHealth === null) throw new Error(`review not healthy: ${readFileSync(join(root, 'review.err.log'), 'utf8').slice(0, 500)}`)
-  reviewEvidence = { record: await waitBornRecord(reviewRoots.config), args: reviewArgs }
+  reviewEvidence = { record: await supplementBornRecord(reviewSpawn, reviewRoots.config, 3000), args: reviewArgs }
   fault('after-review-start')
   const rAuth = { authorization: `Bearer ${readFileSync(join(reviewState, 'api.key'), 'utf8').trim()}` }
   const rget = async (path) => { const res = await fetch(`http://127.0.0.1:${rApi}${path}`, { headers: rAuth }); return { status: res.status, body: await res.json() } }
@@ -221,9 +235,16 @@ try {
   const reopenOut = openSync(join(root, 'reopen.out.log'), 'w', 0o600), reopenErr = openSync(join(root, 'reopen.err.log'), 'w', 0o600)
   const reopenDaemon = spawn(cli, ['start', '--discussion-only', '--review-restored-scope', reopenPath, '--port', String(reopenConsole), '--api-port', String(reopenApi), ...reviewArgs], { cwd: install, env, stdio: ['ignore', reopenOut, reopenErr], detached: true })
   reopenDaemon.unref(); closeSync(reopenOut); closeSync(reopenErr)
+  const reopenSpawn = registerSpawn({ pid: reopenDaemon.pid, install, config: reviewRoots.config, data: reviewState, operation: 'start' })
+  reviewEvidence = { record: reopenSpawn, args: reviewArgs }
+  fault('before-reopen-record')
+  if (values.fault === 'after-reopen-record-before-health') {
+    reviewEvidence = { record: await supplementBornRecord(reopenSpawn, reviewRoots.config, 5000), args: reviewArgs }
+    throw new Error('injected_fault:after-reopen-record-before-health')
+  }
   const reopenHealth = await waitHealth(reopenApi)
   if (reopenHealth === null) throw new Error(`review reopen not healthy: ${readFileSync(join(root, 'reopen.err.log'), 'utf8').slice(0, 500)}`)
-  const reopenRecord = await waitBornRecord(reviewRoots.config)
+  const reopenRecord = await supplementBornRecord(reopenSpawn, reviewRoots.config, 3000)
   reviewEvidence = { record: reopenRecord, args: reviewArgs }
   if (typeof reopenHealth.restoredReviewDigest !== 'string' || reopenHealth.restoredReviewDigest.length !== 64) throw new Error('review reopen health did not carry a selection digest')
   if (firstReviewRecord && reopenRecord && firstReviewRecord.pid === reopenRecord.pid) throw new Error('review reopen reused the stopped PID')
@@ -247,7 +268,7 @@ finally {
   const cleanups = []
   for (const entry of [reviewEvidence, seedEvidence].filter(Boolean)) {
     if (!entry.record) { cleanups.push({ status: 'UNKNOWN', unknown: [{ reason: 'record_never_observed' }], retained: true }); continue }
-    cleanups.push(await cleanupBornResources({ cli: join(values.install, 'bin/pa'), install: resolve(values.install), roots: { config: entry.record.configRoot, data: entry.record.state }, records: [entry.record], args: entry.args, env: process.env }))
+    cleanups.push(await cleanupBornResources({ cli: join(values.install, 'bin/pa'), install: resolve(values.install), roots: { config: entry.record.configRoot ?? entry.record.config, data: entry.record.state ?? entry.record.data }, records: [entry.record], args: entry.args, env: process.env }))
   }
   evidence.cleanup = cleanups
   const retained = cleanups.some((item) => item.retained)
