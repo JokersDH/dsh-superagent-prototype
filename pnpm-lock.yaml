@@ -199,6 +199,9 @@ importers:
       '@personal-agent/storage':
         specifier: workspace:*
         version: link:../../packages/storage
+      '@personal-agent/usage-insights':
+        specifier: workspace:*
+        version: link:../../packages/usage-insights
       '@personal-agent/verification':
         specifier: workspace:*
         version: link:../../packages/verification
@@ -548,6 +551,22 @@ importers:
       '@personal-agent/execution':
         specifier: workspace:*
         version: link:../execution
+
+  packages/usage-insights:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/node':
+        specifier: 24.10.0
+        version: 24.10.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   packages/verification:
     dependencies:
