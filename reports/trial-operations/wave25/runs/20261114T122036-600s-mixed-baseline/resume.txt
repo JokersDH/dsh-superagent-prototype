@@ -1,0 +1,1 @@
+node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 600 --poll-ms 1000 --sse-interval-ms 1000 --reconnect-backoff-ms 250 --reopen-seconds 60 --sample-ms 2000 --max-errors 50 --failure-mode none --out <NEW-OUT>

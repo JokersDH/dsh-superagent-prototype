@@ -1,0 +1,2 @@
+#!/bin/sh
+printf "codex 0.0.0-trial-fixture\n"

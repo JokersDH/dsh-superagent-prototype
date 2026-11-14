@@ -1,0 +1,753 @@
+{
+  "protocol": "trial-preflight/1",
+  "tool": {
+    "name": "trial-kit",
+    "version": "0.1.0",
+    "command": "preflight"
+  },
+  "observedAt": "2026-11-14T04:23:21.659Z",
+  "subject": {
+    "kind": "tar",
+    "path": "~/Desktop/joker/pa-artifacts/wave23-target/wave23-target-0ede11d.tar.gz",
+    "archive": {
+      "sha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+      "bytes": 20247278
+    }
+  },
+  "manifest": {
+    "buildId": "1eb8733c8b1729bc",
+    "source": {
+      "commit": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+      "dirty": false
+    },
+    "producer": {
+      "product": "dsh-superagent",
+      "version": "0.1.0",
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "productSchema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "supportMatrix": {
+      "measured": [
+        "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+      ],
+      "node": ">=24.21.0 <25",
+      "abi": "137",
+      "sqlite": ">=3.53.4",
+      "notTested": [
+        "linux",
+        "win32",
+        "darwin-x64",
+        "other Node ABIs",
+        "other machines",
+        "personal native execution"
+      ]
+    },
+    "dependencies": [
+      {
+        "name": "@hono/node-server",
+        "version": "2.1.6",
+        "digest": "7b3e6fe2788990a5429445d18a4bd6004026de0dfc17b966a0b99de5399efe36"
+      },
+      {
+        "name": "better-sqlite3",
+        "version": "13.0.3",
+        "digest": "dbd29487bbb8240a462174e84c2f90f4957aae33effcd64e6ce64a6a9569c4bd"
+      },
+      {
+        "name": "hono",
+        "version": "4.13.17",
+        "digest": "f24eb4b092c6a551b310bf3058058de83d70c2195ae5b39e06a13dc21de4b7ca"
+      },
+      {
+        "name": "node-addon-api",
+        "version": "8.9.2",
+        "digest": "b7f1ddbc660da84defd8872584bb6798c9a73889c5f7c707c7ffdabe0fe5fdd9"
+      },
+      {
+        "name": "openai",
+        "version": "7.53.0",
+        "digest": "0dab139b8bdae6597686f017e599d98fec8ab000f3a438564ca103e72938270e"
+      },
+      {
+        "name": "semver",
+        "version": "7.8.5",
+        "digest": "1da6acb3d51bee5c5f4e47332d62a9d66ab6dfdb7e2cc57a73f2b2db076a3dec"
+      },
+      {
+        "name": "yaml",
+        "version": "2.9.1",
+        "digest": "aaece76a1bebfd7d83bd1d5414fca5f2ca07ff962250cb097746f5683a38c911"
+      },
+      {
+        "name": "zod",
+        "version": "4.4.3",
+        "digest": "4323cf2a4d58d6e9468892ff49f8105ef1f9a905f8b2f7f9345c23938236e2c7"
+      }
+    ],
+    "workspacePackages": [
+      {
+        "name": "@personal-agent/application",
+        "path": "app/packages/application"
+      },
+      {
+        "name": "@personal-agent/catalog",
+        "path": "app/packages/catalog"
+      },
+      {
+        "name": "@personal-agent/context",
+        "path": "app/packages/context"
+      },
+      {
+        "name": "@personal-agent/contracts",
+        "path": "app/packages/contracts"
+      },
+      {
+        "name": "@personal-agent/driver-kit",
+        "path": "app/packages/driver-kit"
+      },
+      {
+        "name": "@personal-agent/drivers-codex-native",
+        "path": "app/packages/drivers/codex-native"
+      },
+      {
+        "name": "@personal-agent/effects",
+        "path": "app/packages/effects"
+      },
+      {
+        "name": "@personal-agent/environment-preparation",
+        "path": "app/packages/environment-preparation"
+      },
+      {
+        "name": "@personal-agent/execution",
+        "path": "app/packages/execution"
+      },
+      {
+        "name": "@personal-agent/knowledge",
+        "path": "app/packages/knowledge"
+      },
+      {
+        "name": "@personal-agent/orchestrator-core",
+        "path": "app/packages/orchestrator-core"
+      },
+      {
+        "name": "@personal-agent/policy-preparation",
+        "path": "app/packages/policy-preparation"
+      },
+      {
+        "name": "@personal-agent/portability",
+        "path": "app/packages/portability"
+      },
+      {
+        "name": "@personal-agent/proposals",
+        "path": "app/packages/proposals"
+      },
+      {
+        "name": "@personal-agent/questions",
+        "path": "app/packages/questions"
+      },
+      {
+        "name": "@personal-agent/routing",
+        "path": "app/packages/routing"
+      },
+      {
+        "name": "@personal-agent/storage",
+        "path": "app/packages/storage"
+      },
+      {
+        "name": "@personal-agent/testing",
+        "path": "app/packages/testing"
+      },
+      {
+        "name": "@personal-agent/verification",
+        "path": "app/packages/verification"
+      },
+      {
+        "name": "@personal-agent/workflows",
+        "path": "app/packages/workflows"
+      },
+      {
+        "name": "@personal-agent/workspaces",
+        "path": "app/packages/workspaces"
+      }
+    ]
+  },
+  "observed": {
+    "archiveBytes": 20247278,
+    "archiveSha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+    "installManifestSha256": "e3d99cdd18e5a6089440def6de880deb6c4ebaa5877f336765dc36c383a99781",
+    "releaseManifestSha256": "ab45bf2393222a1463741613ee7b899ca1ba26b02fd01ca398065b7ba9145ebe",
+    "closureDigest": "d400dea3319d8f37db9c957f1bba345cb5accb6994112fc790c235ff5d9b9d69",
+    "fileCounts": {
+      "declared": 6747,
+      "files": 6726,
+      "symlinks": 21,
+      "directories": 548
+    },
+    "verifiedFileBytes": 67559948,
+    "maxPathLength": 118,
+    "buildId": "1eb8733c8b1729bc",
+    "sourceCommit": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+    "sourceDirty": false,
+    "productSchema": 18,
+    "producer": {
+      "product": "dsh-superagent",
+      "version": "0.1.0",
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "productSchema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "supportMatrix": {
+      "measured": [
+        "darwin/arm64 + Node 24.21.x + SQLite ABI 137"
+      ],
+      "node": ">=24.21.0 <25",
+      "abi": "137",
+      "sqlite": ">=3.53.4",
+      "notTested": [
+        "linux",
+        "win32",
+        "darwin-x64",
+        "other Node ABIs",
+        "other machines",
+        "personal native execution"
+      ]
+    },
+    "dependencies": [
+      {
+        "name": "@hono/node-server",
+        "version": "2.1.6",
+        "digest": "7b3e6fe2788990a5429445d18a4bd6004026de0dfc17b966a0b99de5399efe36"
+      },
+      {
+        "name": "better-sqlite3",
+        "version": "13.0.3",
+        "digest": "dbd29487bbb8240a462174e84c2f90f4957aae33effcd64e6ce64a6a9569c4bd"
+      },
+      {
+        "name": "hono",
+        "version": "4.13.17",
+        "digest": "f24eb4b092c6a551b310bf3058058de83d70c2195ae5b39e06a13dc21de4b7ca"
+      },
+      {
+        "name": "node-addon-api",
+        "version": "8.9.2",
+        "digest": "b7f1ddbc660da84defd8872584bb6798c9a73889c5f7c707c7ffdabe0fe5fdd9"
+      },
+      {
+        "name": "openai",
+        "version": "7.53.0",
+        "digest": "0dab139b8bdae6597686f017e599d98fec8ab000f3a438564ca103e72938270e"
+      },
+      {
+        "name": "semver",
+        "version": "7.8.5",
+        "digest": "1da6acb3d51bee5c5f4e47332d62a9d66ab6dfdb7e2cc57a73f2b2db076a3dec"
+      },
+      {
+        "name": "yaml",
+        "version": "2.9.1",
+        "digest": "aaece76a1bebfd7d83bd1d5414fca5f2ca07ff962250cb097746f5683a38c911"
+      },
+      {
+        "name": "zod",
+        "version": "4.4.3",
+        "digest": "4323cf2a4d58d6e9468892ff49f8105ef1f9a905f8b2f7f9345c23938236e2c7"
+      }
+    ],
+    "workspacePackages": [
+      {
+        "name": "@personal-agent/application",
+        "path": "app/packages/application"
+      },
+      {
+        "name": "@personal-agent/catalog",
+        "path": "app/packages/catalog"
+      },
+      {
+        "name": "@personal-agent/context",
+        "path": "app/packages/context"
+      },
+      {
+        "name": "@personal-agent/contracts",
+        "path": "app/packages/contracts"
+      },
+      {
+        "name": "@personal-agent/driver-kit",
+        "path": "app/packages/driver-kit"
+      },
+      {
+        "name": "@personal-agent/drivers-codex-native",
+        "path": "app/packages/drivers/codex-native"
+      },
+      {
+        "name": "@personal-agent/effects",
+        "path": "app/packages/effects"
+      },
+      {
+        "name": "@personal-agent/environment-preparation",
+        "path": "app/packages/environment-preparation"
+      },
+      {
+        "name": "@personal-agent/execution",
+        "path": "app/packages/execution"
+      },
+      {
+        "name": "@personal-agent/knowledge",
+        "path": "app/packages/knowledge"
+      },
+      {
+        "name": "@personal-agent/orchestrator-core",
+        "path": "app/packages/orchestrator-core"
+      },
+      {
+        "name": "@personal-agent/policy-preparation",
+        "path": "app/packages/policy-preparation"
+      },
+      {
+        "name": "@personal-agent/portability",
+        "path": "app/packages/portability"
+      },
+      {
+        "name": "@personal-agent/proposals",
+        "path": "app/packages/proposals"
+      },
+      {
+        "name": "@personal-agent/questions",
+        "path": "app/packages/questions"
+      },
+      {
+        "name": "@personal-agent/routing",
+        "path": "app/packages/routing"
+      },
+      {
+        "name": "@personal-agent/storage",
+        "path": "app/packages/storage"
+      },
+      {
+        "name": "@personal-agent/testing",
+        "path": "app/packages/testing"
+      },
+      {
+        "name": "@personal-agent/verification",
+        "path": "app/packages/verification"
+      },
+      {
+        "name": "@personal-agent/workflows",
+        "path": "app/packages/workflows"
+      },
+      {
+        "name": "@personal-agent/workspaces",
+        "path": "app/packages/workspaces"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "input_readable",
+      "status": "PASS",
+      "detail": {
+        "kind": "tar",
+        "bytes": 20247278
+      }
+    },
+    {
+      "id": "archive_listing",
+      "status": "PASS",
+      "detail": {
+        "members": 7297,
+        "directories": 549
+      }
+    },
+    {
+      "id": "archive_paths",
+      "status": "PASS",
+      "detail": {
+        "checked": 7297
+      }
+    },
+    {
+      "id": "archive_limits",
+      "status": "PASS",
+      "detail": {
+        "members": 7297,
+        "maxEntries": 100000,
+        "bytes": 20247278
+      }
+    },
+    {
+      "id": "install_manifest_present",
+      "status": "PASS",
+      "detail": {
+        "path": "install/install.json"
+      }
+    },
+    {
+      "id": "install_manifest_format",
+      "status": "PASS",
+      "detail": {
+        "format": "pa-install",
+        "formatVersion": 1
+      }
+    },
+    {
+      "id": "release_manifest_format",
+      "status": "PASS",
+      "detail": {
+        "format": "pa-release",
+        "formatVersion": 1
+      }
+    },
+    {
+      "id": "archive_extract",
+      "status": "PASS",
+      "detail": {
+        "prefix": "install",
+        "retained": false
+      }
+    },
+    {
+      "id": "manifest_file_kinds",
+      "status": "PASS",
+      "detail": {
+        "files": 6726,
+        "symlinks": 21
+      }
+    },
+    {
+      "id": "manifest_paths",
+      "status": "PASS",
+      "detail": {
+        "checked": 6747
+      }
+    },
+    {
+      "id": "forbidden_material",
+      "status": "PASS",
+      "detail": {
+        "checked": 6747
+      }
+    },
+    {
+      "id": "unlisted_entries",
+      "status": "PASS",
+      "detail": {
+        "count": 0,
+        "sample": []
+      }
+    },
+    {
+      "id": "file_digests",
+      "status": "PASS",
+      "detail": {
+        "verified": 6726,
+        "mismatches": [],
+        "mismatchCount": 0
+      }
+    },
+    {
+      "id": "symlink_closure",
+      "status": "PASS",
+      "detail": {
+        "verified": 21,
+        "failures": [],
+        "failureCount": 0
+      }
+    },
+    {
+      "id": "closure_digest",
+      "status": "PASS",
+      "detail": {
+        "computed": "d400dea3319d8f37db9c957f1bba345cb5accb6994112fc790c235ff5d9b9d69"
+      }
+    },
+    {
+      "id": "entrypoints",
+      "status": "PASS",
+      "detail": {
+        "checked": 5
+      }
+    },
+    {
+      "id": "launcher",
+      "status": "PASS",
+      "detail": {
+        "entry": "bin/pa",
+        "executable": true
+      }
+    },
+    {
+      "id": "external_dependencies",
+      "status": "PASS",
+      "detail": {
+        "checked": 8,
+        "failures": []
+      }
+    },
+    {
+      "id": "workspace_packages",
+      "status": "PASS",
+      "detail": {
+        "checked": 21,
+        "failures": []
+      }
+    },
+    {
+      "id": "release_identity",
+      "status": "PASS",
+      "detail": {
+        "mismatches": []
+      }
+    },
+    {
+      "id": "console_stamp",
+      "status": "PASS",
+      "detail": {
+        "protocol": "personal-console-build/1",
+        "mode": "http",
+        "digestMatches": true
+      }
+    },
+    {
+      "id": "release_artifacts",
+      "status": "PASS",
+      "detail": {
+        "checked": 904,
+        "failures": [],
+        "failureCount": 0
+      }
+    },
+    {
+      "id": "host_platform",
+      "status": "PASS",
+      "detail": {
+        "observed": {
+          "platform": "darwin",
+          "arch": "arm64"
+        },
+        "producer": {
+          "platform": "darwin",
+          "arch": "arm64"
+        }
+      }
+    },
+    {
+      "id": "host_node",
+      "status": "PASS",
+      "detail": {
+        "observed": "24.21.0",
+        "supportMatrix": ">=24.21.0 <25"
+      }
+    },
+    {
+      "id": "host_abi",
+      "status": "PASS",
+      "detail": {
+        "observed": "137",
+        "producer": "137",
+        "supportMatrix": "137"
+      }
+    },
+    {
+      "id": "host_sqlite",
+      "status": "UNKNOWN",
+      "detail": {
+        "reason": "requires_executing_native_binding",
+        "owner": "package doctor verifies SQLite at runtime"
+      }
+    },
+    {
+      "id": "path_lengths",
+      "status": "PASS",
+      "detail": {
+        "maxMemberPath": 118,
+        "limit": 900
+      }
+    },
+    {
+      "id": "disk_space",
+      "status": "PASS",
+      "detail": {
+        "freeBytes": 579131072512,
+        "neededBytes": 148180802
+      }
+    },
+    {
+      "id": "input_immutability",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "bytes": 20247278,
+          "sha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21"
+        },
+        "after": {
+          "bytes": 20247278,
+          "sha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21"
+        }
+      }
+    },
+    {
+      "id": "expected_tuple",
+      "status": "PASS",
+      "detail": {
+        "comparisons": [
+          {
+            "field": "sha256",
+            "expected": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+            "actual": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+            "ok": true
+          },
+          {
+            "field": "schema",
+            "expected": 18,
+            "actual": 18,
+            "ok": true
+          },
+          {
+            "field": "build",
+            "expected": "1eb8733c8b1729bc",
+            "actual": "1eb8733c8b1729bc",
+            "ok": true
+          },
+          {
+            "field": "source",
+            "expected": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+            "actual": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+            "ok": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "extraction_cleanup",
+      "status": "PASS",
+      "detail": {
+        "removed": "extract"
+      }
+    },
+    {
+      "id": "artifact_manifest",
+      "status": "PASS",
+      "detail": {
+        "comparisons": [
+          {
+            "field": "tarSha256",
+            "expected": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+            "observed": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+            "ok": true
+          },
+          {
+            "field": "tarBytes",
+            "expected": 20247278,
+            "observed": 20247278,
+            "ok": true
+          },
+          {
+            "field": "closureDigest",
+            "expected": "d400dea3319d8f37db9c957f1bba345cb5accb6994112fc790c235ff5d9b9d69",
+            "observed": "d400dea3319d8f37db9c957f1bba345cb5accb6994112fc790c235ff5d9b9d69",
+            "ok": true
+          },
+          {
+            "field": "installManifestSha256",
+            "expected": "e3d99cdd18e5a6089440def6de880deb6c4ebaa5877f336765dc36c383a99781",
+            "observed": "e3d99cdd18e5a6089440def6de880deb6c4ebaa5877f336765dc36c383a99781",
+            "ok": true
+          },
+          {
+            "field": "releaseManifestSha256",
+            "expected": "ab45bf2393222a1463741613ee7b899ca1ba26b02fd01ca398065b7ba9145ebe",
+            "observed": "ab45bf2393222a1463741613ee7b899ca1ba26b02fd01ca398065b7ba9145ebe",
+            "ok": true
+          },
+          {
+            "field": "buildId",
+            "expected": "1eb8733c8b1729bc",
+            "observed": "1eb8733c8b1729bc",
+            "ok": true
+          },
+          {
+            "field": "schema",
+            "expected": 18,
+            "observed": 18,
+            "ok": true
+          },
+          {
+            "field": "source.commit",
+            "expected": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+            "observed": "0ede11d0a46f377e90657c78b001357c98d4f5e7",
+            "ok": true
+          }
+        ]
+      }
+    }
+  ],
+  "refused": [],
+  "unknowns": [
+    "host_sqlite"
+  ],
+  "method": {
+    "commands": [
+      {
+        "command": "tar",
+        "arguments": [
+          "-tzf",
+          "<input>"
+        ],
+        "exit": 0
+      },
+      {
+        "command": "tar",
+        "arguments": [
+          "-xzf",
+          "<input>",
+          "-C",
+          "<out>/extract"
+        ],
+        "exit": 0
+      }
+    ],
+    "limits": {
+      "maxArchiveBytes": 2147483648,
+      "maxEntries": 100000,
+      "maxListingBytes": 33554432,
+      "maxManifestBytes": 8388608,
+      "maxPathLength": 900,
+      "maxPathComponent": 255,
+      "maxFilesVerified": 100000,
+      "maxTotalVerifiedBytes": 2147483648,
+      "commandTimeoutMs": 300000,
+      "diskHeadroomBytes": 67108864,
+      "minFreeBytes": 268435456,
+      "maxReportBytes": 8388608,
+      "maxResponseBytes": 262144,
+      "maxDiagnosticOutputBytes": 524288,
+      "networkTimeoutMs": 5000,
+      "maxSoakDurationSeconds": 7200,
+      "maxSoakRequests": 100000,
+      "maxSoakEvents": 100000,
+      "maxSoakSamples": 50000
+    },
+    "extraction": {
+      "root": "extract",
+      "prefix": "install",
+      "retained": false
+    }
+  },
+  "result": "DEGRADED",
+  "exitCode": 1,
+  "redaction": {
+    "home": "~",
+    "secretValues": 0,
+    "note": "absolute operator home paths are shown as ~; no credential is read"
+  },
+  "outputRoot": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave25/preflight-0ede"
+}

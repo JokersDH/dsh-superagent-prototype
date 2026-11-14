@@ -1,0 +1,401 @@
+{
+  "protocol": "trial-operations-status/1",
+  "wave": "product-wave-25",
+  "owner": "H",
+  "branch": "codex/g4-trial-operations",
+  "baseMain": "11002b8",
+  "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+  "updatedAt": "2026-11-14T05:05:30.894Z",
+  "goal": {
+    "established": true,
+    "tokenBudget": null,
+    "checkpoints": [
+      "H4",
+      "H8",
+      "H12",
+      "H16"
+    ],
+    "continueAfterCheckpoint": true
+  },
+  "ownedPaths": [
+    "tools/trial-kit/",
+    "tests/operational-soak/",
+    "docs/internal-trial/",
+    "reports/trial-operations/"
+  ],
+  "phases": {
+    "H1": {
+      "status": "COMPLETED",
+      "deliverable": "explicit-input readonly CLI boundary and private output root"
+    },
+    "H2": {
+      "status": "COMPLETED",
+      "deliverable": "package identity/environment preflight with archive/path/entry bounds"
+    },
+    "H3": {
+      "status": "COMPLETED",
+      "deliverable": "full tiny fixtures, positive/negative controls, side-effect proof"
+    },
+    "H4": {
+      "status": "COMPLETED",
+      "deliverable": "runnable readonly preflight CLI + README + tests",
+      "artifact": "tools/trial-kit/bin/trial-preflight.mjs"
+    },
+    "H5": {
+      "status": "COMPLETED",
+      "deliverable": "current immutable package machinechecks via package help/status/doctor",
+      "artifact": "tools/trial-kit/bin/trial-machinecheck.mjs"
+    },
+    "H6": {
+      "status": "COMPLETED",
+      "deliverable": "bounded GET /v1/readiness consumer with strict schema and explicit loopback/auth",
+      "artifact": "tools/trial-kit/lib/readiness.mjs"
+    },
+    "H7": {
+      "status": "COMPLETED",
+      "deliverable": "sanitized diagnostics bundle and reproduction material; support not auto-run over a database"
+    },
+    "H8": {
+      "status": "COMPLETED",
+      "deliverable": "machinecheck + readiness + diagnostics checkpoint"
+    },
+    "H9": {
+      "status": "COMPLETED",
+      "deliverable": "bounded HTTP/SSE reconnect/client-reopen harness",
+      "artifact": "tests/operational-soak/soak.case.mjs"
+    },
+    "H10": {
+      "status": "COMPLETED",
+      "deliverable": "own-resource-only sampling with explicit unknowns; no global scan/signal"
+    },
+    "H11": {
+      "status": "COMPLETED",
+      "deliverable": "finite scenario config, deadlines, bounded retries, deterministic cleanup"
+    },
+    "H12": {
+      "status": "COMPLETED",
+      "deliverable": "runnable operational harness + verify-run raw material checker",
+      "artifact": "tools/trial-kit/bin/trial-soak.mjs"
+    },
+    "H13": {
+      "status": "COMPLETED",
+      "deliverable": "actual 600s baseline scenario",
+      "evidence": "reports/trial-operations/wave25/runs/20261114T122036-600s-mixed-baseline/run.json"
+    },
+    "H14": {
+      "status": "COMPLETED",
+      "deliverable": "actual 1800s churn scenario",
+      "evidence": "reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn/run.json"
+    },
+    "H15": {
+      "status": "COMPLETED",
+      "deliverable": "colleague guide and migration preflight handoff",
+      "artifact": "docs/internal-trial/README.zh-CN.md"
+    },
+    "H16": {
+      "status": "COMPLETED",
+      "deliverable": "complete internal-trial toolkit, raw sample index and resume commands",
+      "artifact": "reports/trial-operations/README.zh-CN.md"
+    }
+  },
+  "milestones": {
+    "H4": {
+      "status": "COMPLETED",
+      "tests": "preflight 9/9",
+      "evidence": "reports/trial-operations/wave25/preflight-0ede/preflight-report.json"
+    },
+    "H8": {
+      "status": "COMPLETED",
+      "tests": "machinecheck 5/5",
+      "evidence": "reports/trial-operations/wave25/machinecheck-3b/machinecheck-report.json"
+    },
+    "H12": {
+      "status": "COMPLETED",
+      "tests": "soak 6/6",
+      "evidence": "tools/trial-kit/bin/trial-soak.mjs"
+    },
+    "H16": {
+      "status": "COMPLETED",
+      "tests": "all 20/20",
+      "evidence": "reports/trial-operations/README.zh-CN.md"
+    }
+  },
+  "packages": {
+    "3b": {
+      "subject": {
+        "tar": "~/Desktop/joker/pa-artifacts/wave24-target/wave24-target-3b2ff68.tar.gz",
+        "tarSha256": "f04abb1b4c4ae47a52f6bc1aa172d70c4a113219f443f354aee0ebffc8a00494",
+        "bytes": 20248077
+      },
+      "tuple": {
+        "buildId": "470738fd33b22ff4",
+        "schema": 18,
+        "source": "3b2ff68b4785e79757fc1dcd14b17f5dd84d0c62"
+      },
+      "observed": {
+        "closureDigest": "25947d8284877ffbc4271599b5e93d2c699e912b18cb27dc7e088b61aeb42569",
+        "files": 6727,
+        "symlinks": 21
+      },
+      "machinecheck": {
+        "result": "DEGRADED",
+        "checks": {
+          "PASS": 45,
+          "UNKNOWN": 3
+        },
+        "unknowns": [
+          "host_sqlite",
+          "support"
+        ]
+      },
+      "material": [
+        {
+          "path": "reports/trial-operations/wave25/machinecheck-3b/machinecheck-report.json",
+          "bytes": 27305,
+          "sha256": "6d4755f0f6f460414b077d4daa45fc6632152ef398fdc64792393d122bdf19f6"
+        },
+        {
+          "path": "reports/trial-operations/wave25/machinecheck-3b/diagnostics-bundle.json",
+          "bytes": 24733,
+          "sha256": "7d6de40f93e41a2b86be7d6aa318cb29875c6386e0c712469102af6d47618484"
+        },
+        {
+          "path": "reports/trial-operations/wave25/machinecheck-3b/reproduce.txt",
+          "bytes": 523,
+          "sha256": "92b27af2c9594412a57ea6d17d6d98820a2c613282fa5d8b4d1488248137532e"
+        }
+      ]
+    },
+    "0ede": {
+      "subject": {
+        "tar": "~/Desktop/joker/pa-artifacts/wave23-target/wave23-target-0ede11d.tar.gz",
+        "tarSha256": "d039889767cb63902ed5e00d02547c441aa2313ce79555d90747e9a0b1fabf21",
+        "bytes": 20247278
+      },
+      "tuple": {
+        "buildId": "1eb8733c8b1729bc",
+        "schema": 18,
+        "source": "0ede11d0a46f377e90657c78b001357c98d4f5e7"
+      },
+      "observed": {
+        "closureDigest": "d400dea3319d8f37db9c957f1bba345cb5accb6994112fc790c235ff5d9b9d69",
+        "files": 6726,
+        "symlinks": 21
+      },
+      "preflight": {
+        "result": "DEGRADED",
+        "checks": {
+          "PASS": 31,
+          "UNKNOWN": 1
+        },
+        "unknowns": [
+          "host_sqlite"
+        ]
+      },
+      "material": [
+        {
+          "path": "reports/trial-operations/wave25/preflight-0ede/preflight-report.json",
+          "bytes": 18898,
+          "sha256": "593876e4240d31f9ea8dbfde963e85a809dac5245e618ec0310fdfb31395f709"
+        }
+      ]
+    }
+  },
+  "runs": {
+    "baseline600": {
+      "material": [
+        {
+          "path": "reports/trial-operations/wave25/runs/20261114T122036-600s-mixed-baseline/run.json",
+          "bytes": 3520,
+          "sha256": "f2f20b6531219fb904ab20b10ab884ffef45af10e1a80d232187e016124cb3fb"
+        },
+        {
+          "path": "reports/trial-operations/wave25/runs/20261114T122036-600s-mixed-baseline/samples.ndjson",
+          "bytes": 82669,
+          "sha256": "80d5b0f5181c8c0b70047916f317a625ac747dc1f5d4df9f55b7ae93a0095957"
+        },
+        {
+          "path": "reports/trial-operations/wave25/runs/20261114T122036-600s-mixed-baseline/resume.txt",
+          "bytes": 234,
+          "sha256": "892ba03ff551e903efb32434bc8c9dacf0ee7fda1f7e23ab86de59a8991c3701"
+        }
+      ],
+      "summary": {
+        "status": "COMPLETED",
+        "startedAt": "2026-11-14T04:20:37.000Z",
+        "endedAt": "2026-11-14T04:30:37.006Z",
+        "wallElapsedSeconds": 600,
+        "requestedDurationSeconds": 600,
+        "stoppedBy": "duration",
+        "config": {
+          "pollMs": 1000,
+          "sseIntervalMs": 1000,
+          "reconnectBackoffMs": 250,
+          "sseIdleTimeoutMs": 5000,
+          "reopenSeconds": 60,
+          "sampleMs": 2000,
+          "maxRequests": 100000,
+          "maxSseEvents": 100000,
+          "maxReconnects": 2000,
+          "maxErrors": 50,
+          "pollTimeoutMs": 500
+        },
+        "defect": "none",
+        "counters": {
+          "pollRequests": 608,
+          "pollOk": 608,
+          "pollFailed": 0,
+          "latencyMs": {
+            "count": 608,
+            "p50": 1.31,
+            "p95": 2.14,
+            "max": 4.73
+          },
+          "httpStatuses": {
+            "200": 608
+          },
+          "sseConnections": 10,
+          "sseEvents": 600,
+          "sseBytes": 68220,
+          "sseFailedConnections": 0,
+          "duplicates": 0,
+          "gaps": 0,
+          "reconnects": 9,
+          "reopens": 9,
+          "samples": 301,
+          "lastEventAt": "2026-11-14T04:30:36.340Z"
+        },
+        "failures": 0,
+        "failureCounts": {},
+        "cleanup": {
+          "closed": true,
+          "activeSockets": 0,
+          "activeConnections": 0
+        },
+        "unknowns": 4
+      },
+      "check": {
+        "ok": true,
+        "issues": []
+      },
+      "checkMaterial": {
+        "path": "reports/trial-operations/wave25/checks/600s-baseline/run-check.json",
+        "bytes": 1268,
+        "sha256": "58b63864004fd30381872edd68adb61ef113fa01c410d359c1369cd82526b80d"
+      }
+    },
+    "churn1800": {
+      "material": [
+        {
+          "path": "reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn/run.json",
+          "bytes": 23245,
+          "sha256": "e2dfc1e633a525359ff5079c91cde1dbc6e47baf94a48522e75804a2aae2f82d"
+        },
+        {
+          "path": "reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn/samples.ndjson",
+          "bytes": 167476,
+          "sha256": "ca89577009a34897d0f7134838d4417c05f65007d822ea0ee778cebe5cefb95c"
+        },
+        {
+          "path": "reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn/resume.txt",
+          "bytes": 244,
+          "sha256": "1e9f751ddb400974062db546b6632915019631d1958581d5b919237d9ddfb839"
+        }
+      ],
+      "summary": {
+        "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+        "startedAt": "2026-11-14T04:31:53.552Z",
+        "endedAt": "2026-11-14T05:01:53.582Z",
+        "wallElapsedSeconds": 1800,
+        "requestedDurationSeconds": 1800,
+        "stoppedBy": "duration",
+        "config": {
+          "pollMs": 3000,
+          "sseIntervalMs": 2000,
+          "reconnectBackoffMs": 500,
+          "sseIdleTimeoutMs": 8000,
+          "reopenSeconds": 180,
+          "sampleMs": 3000,
+          "maxRequests": 100000,
+          "maxSseEvents": 100000,
+          "maxReconnects": 2000,
+          "maxErrors": 100000,
+          "pollTimeoutMs": 1000
+        },
+        "defect": "truncate",
+        "counters": {
+          "pollRequests": 609,
+          "pollOk": 609,
+          "pollFailed": 0,
+          "latencyMs": {
+            "count": 609,
+            "p50": 0.78,
+            "p95": 1.87,
+            "max": 6.07
+          },
+          "httpStatuses": {
+            "200": 609
+          },
+          "sseConnections": 400,
+          "sseEvents": 800,
+          "sseBytes": 89600,
+          "sseFailedConnections": 0,
+          "duplicates": 0,
+          "gaps": 0,
+          "reconnects": 399,
+          "reopens": 9,
+          "samples": 601,
+          "lastEventAt": "2026-11-14T05:01:51.789Z"
+        },
+        "failures": 392,
+        "failureCounts": {
+          "sse:disconnect:error": 392
+        },
+        "cleanup": {
+          "closed": true,
+          "activeSockets": 0,
+          "activeConnections": 0
+        },
+        "unknowns": 4
+      },
+      "check": {
+        "ok": true,
+        "issues": []
+      },
+      "checkMaterial": {
+        "path": "reports/trial-operations/wave25/checks/1800s-churn/run-check.json",
+        "bytes": 1296,
+        "sha256": "6dce3ffd73e619c442dd34ed68db796eb69fa6c42058358b48db6778db823d49"
+      }
+    }
+  },
+  "tests": {
+    "command": "node --test tests/operational-soak/*.case.mjs",
+    "total": 20,
+    "pass": 20,
+    "fail": 0
+  },
+  "budgets": {
+    "vendorModelNativeTurns": 0,
+    "newModelAllowanceCreated": 0,
+    "newDriver": false,
+    "cac": false,
+    "desktopShell": false,
+    "pilot": "BLOCKED (24 turn / 200000 token / USD5 / one-in-flight unchanged; no reset/top-up/refund/replacement)"
+  },
+  "preserved": {
+    "userServices": "twelve instances 5180/8796 .. 5191/8807 untouched; no restart/stop/migrate",
+    "state": "no personal state read or modified; only explicit tar/install plus new private output roots",
+    "liveSignals": "none; no daemon start/stop and no process signal to any product instance"
+  },
+  "releaseAuthority": false,
+  "eAssertions": "independent; H material is raw observation only",
+  "limitations": [
+    "finite fixture scenarios; not a 24h/48h soak, not long-term stability or leak proof",
+    "client reopen is a new HTTP/SSE connection, not daemon process recovery",
+    "provider/queue/old-completed-request behaviour is not observable and not claimed",
+    "readiness carries no package identity; package_binding stays unknown",
+    "host SQLite version remains unknown until the package native binding is executed by doctor",
+    "preflight proves this-machine package bytes/closure/commands only; not cross-machine support and no install/start/stop/upgrade/migrate authority"
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "protocol": "trial-soak/1",
+  "startedAt": "2026-11-14T04:20:37.000Z",
+  "endedAt": "2026-11-14T04:30:37.006Z",
+  "elapsedMs": 600006,
+  "wallElapsedSeconds": 600,
+  "requestedDurationSeconds": 600,
+  "stoppedBy": "duration",
+  "status": "COMPLETED",
+  "scenario": {
+    "scenario": "mixed",
+    "defect": "none",
+    "expectedDefectObservation": null,
+    "defectObserved": null,
+    "config": {
+      "pollMs": 1000,
+      "sseIntervalMs": 1000,
+      "reconnectBackoffMs": 250,
+      "sseIdleTimeoutMs": 5000,
+      "reopenSeconds": 60,
+      "sampleMs": 2000,
+      "maxRequests": 100000,
+      "maxSseEvents": 100000,
+      "maxReconnects": 2000,
+      "maxErrors": 50,
+      "pollTimeoutMs": 500
+    }
+  },
+  "fixture": {
+    "url": "http://127.0.0.1:63007",
+    "port": 63007,
+    "defect": "none",
+    "stats": {
+      "connections": 618,
+      "activeConnections": 0,
+      "maxConcurrentConnections": 2,
+      "readinessRequests": 608,
+      "readinessBytes": 356896,
+      "readinessStatuses": {
+        "200": 608
+      },
+      "sseConnections": 10,
+      "sseEvents": 600,
+      "sseBytes": 68220,
+      "sseClosed": 0
+    }
+  },
+  "counters": {
+    "pollRequests": 608,
+    "pollOk": 608,
+    "pollFailed": 0,
+    "latencyMs": {
+      "count": 608,
+      "p50": 1.31,
+      "p95": 2.14,
+      "max": 4.73
+    },
+    "httpStatuses": {
+      "200": 608
+    },
+    "sseConnections": 10,
+    "sseEvents": 600,
+    "sseBytes": 68220,
+    "sseFailedConnections": 0,
+    "duplicates": 0,
+    "gaps": 0,
+    "reconnects": 9,
+    "reopens": 9,
+    "samples": 301,
+    "lastEventAt": "2026-11-14T04:30:36.340Z"
+  },
+  "failures": {
+    "total": 0,
+    "counts": {},
+    "samples": []
+  },
+  "samples": {
+    "path": "samples.ndjson",
+    "count": 301,
+    "sha256": "80d5b0f5181c8c0b70047916f317a625ac747dc1f5d4df9f55b7ae93a0095957",
+    "bytes": 82669
+  },
+  "cleanup": {
+    "closed": true,
+    "activeSockets": 0,
+    "activeConnections": 0
+  },
+  "unknowns": [
+    "client reopen is a new HTTP/SSE connection, not daemon process recovery",
+    "provider/queue/old-request behaviour is not observable from this fixture and is not claimed",
+    "server-side handler timing is not separately instrumented; client latency is reported",
+    "resource samples cover this process and the fixture server only, never another user process"
+  ],
+  "resume": {
+    "arguments": [
+      "node tools/trial-kit/bin/trial-soak.mjs",
+      "--scenario mixed",
+      "--duration-seconds 600",
+      "--poll-ms 1000",
+      "--sse-interval-ms 1000",
+      "--reconnect-backoff-ms 250",
+      "--reopen-seconds 60",
+      "--sample-ms 2000",
+      "--max-errors 50",
+      "--failure-mode none",
+      "--out <NEW-OUT>"
+    ],
+    "note": "replace <NEW-OUT>; the same duration and failure mode are required for comparability",
+    "line": "node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 600 --poll-ms 1000 --sse-interval-ms 1000 --reconnect-backoff-ms 250 --reopen-seconds 60 --sample-ms 2000 --max-errors 50 --failure-mode none --out <NEW-OUT>"
+  },
+  "tool": {
+    "name": "trial-kit",
+    "version": "0.1.0",
+    "command": "soak"
+  },
+  "outputRoot": "reports/trial-operations/wave25/runs/20261114T122036-600s-mixed-baseline",
+  "measurementScope": {
+    "measured": "one finite fixture scenario of 600s (actual 600s)",
+    "notMeasured": [
+      "24h/48h soak",
+      "daemon recovery",
+      "provider/queue stability",
+      "other machines",
+      "real model/native execution"
+    ]
+  }
+}

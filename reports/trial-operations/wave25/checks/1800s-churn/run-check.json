@@ -1,0 +1,55 @@
+{
+  "protocol": "trial-run-check/1",
+  "checkedAt": "2026-11-14T05:03:10.755Z",
+  "runDirectory": "reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn",
+  "run": {
+    "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+    "startedAt": "2026-11-14T04:31:53.552Z",
+    "endedAt": "2026-11-14T05:01:53.582Z",
+    "wallElapsedSeconds": 1800,
+    "requestedDurationSeconds": 1800,
+    "stoppedBy": "duration"
+  },
+  "samples": {
+    "path": "samples.ndjson",
+    "lines": 601,
+    "declaredCount": 601,
+    "bytes": 167476,
+    "sha256": "ca89577009a34897d0f7134838d4417c05f65007d822ea0ee778cebe5cefb95c",
+    "lastElapsedMs": 1800009
+  },
+  "counters": {
+    "pollRequests": 609,
+    "pollOk": 609,
+    "pollFailed": 0,
+    "latencyMs": {
+      "count": 609,
+      "p50": 0.78,
+      "p95": 1.87,
+      "max": 6.07
+    },
+    "httpStatuses": {
+      "200": 609
+    },
+    "sseConnections": 400,
+    "sseEvents": 800,
+    "sseBytes": 89600,
+    "sseFailedConnections": 0,
+    "duplicates": 0,
+    "gaps": 0,
+    "reconnects": 399,
+    "reopens": 9,
+    "samples": 601,
+    "lastEventAt": "2026-11-14T05:01:51.789Z"
+  },
+  "failures": 392,
+  "cleanup": {
+    "closed": true,
+    "activeSockets": 0,
+    "activeConnections": 0
+  },
+  "consistency": {
+    "ok": true,
+    "issues": []
+  }
+}

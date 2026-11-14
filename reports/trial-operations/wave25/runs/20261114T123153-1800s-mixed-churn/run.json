@@ -1,0 +1,930 @@
+{
+  "protocol": "trial-soak/1",
+  "startedAt": "2026-11-14T04:31:53.552Z",
+  "endedAt": "2026-11-14T05:01:53.582Z",
+  "elapsedMs": 1800010,
+  "wallElapsedSeconds": 1800,
+  "requestedDurationSeconds": 1800,
+  "stoppedBy": "duration",
+  "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+  "scenario": {
+    "scenario": "mixed",
+    "defect": "truncate",
+    "expectedDefectObservation": "sse_disconnect",
+    "defectObserved": true,
+    "config": {
+      "pollMs": 3000,
+      "sseIntervalMs": 2000,
+      "reconnectBackoffMs": 500,
+      "sseIdleTimeoutMs": 8000,
+      "reopenSeconds": 180,
+      "sampleMs": 3000,
+      "maxRequests": 100000,
+      "maxSseEvents": 100000,
+      "maxReconnects": 2000,
+      "maxErrors": 100000,
+      "pollTimeoutMs": 1000
+    }
+  },
+  "fixture": {
+    "url": "http://127.0.0.1:64188",
+    "port": 64188,
+    "defect": "truncate",
+    "stats": {
+      "connections": 1009,
+      "activeConnections": 0,
+      "maxConcurrentConnections": 2,
+      "readinessRequests": 609,
+      "readinessBytes": 357483,
+      "readinessStatuses": {
+        "200": 609
+      },
+      "sseConnections": 400,
+      "sseEvents": 1192,
+      "sseBytes": 133504,
+      "sseClosed": 392
+    }
+  },
+  "counters": {
+    "pollRequests": 609,
+    "pollOk": 609,
+    "pollFailed": 0,
+    "latencyMs": {
+      "count": 609,
+      "p50": 0.78,
+      "p95": 1.87,
+      "max": 6.07
+    },
+    "httpStatuses": {
+      "200": 609
+    },
+    "sseConnections": 400,
+    "sseEvents": 800,
+    "sseBytes": 89600,
+    "sseFailedConnections": 0,
+    "duplicates": 0,
+    "gaps": 0,
+    "reconnects": 399,
+    "reopens": 9,
+    "samples": 601,
+    "lastEventAt": "2026-11-14T05:01:51.789Z"
+  },
+  "failures": {
+    "total": 392,
+    "counts": {
+      "sse:disconnect:error": 392
+    },
+    "samples": [
+      {
+        "at": "2026-11-14T04:31:57.565Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:02.072Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:06.578Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:11.082Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:15.588Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:20.092Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:24.597Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:29.102Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:33.605Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:38.110Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:42.615Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:47.118Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:51.625Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:32:56.133Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:00.637Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:05.144Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:09.650Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:14.155Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:18.663Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:23.166Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:27.671Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:32.176Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:36.681Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:41.185Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:45.694Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:50.201Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:54.707Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:33:59.212Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:03.716Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:08.221Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:12.726Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:17.233Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:21.741Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:26.248Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:30.754Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:35.261Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:39.766Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:44.271Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:48.774Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:53.276Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:34:57.779Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:02.286Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:06.793Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:11.297Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:15.801Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:20.304Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:24.810Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:29.320Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:33.830Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:38.340Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:42.847Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:47.355Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:51.862Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:35:56.370Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:00.877Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:05.382Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:09.887Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:14.392Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:18.896Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:23.402Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:27.909Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:32.412Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:36.927Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:41.430Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:45.932Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:50.435Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:54.937Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:36:59.442Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:03.947Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:08.451Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:12.954Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:17.459Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:21.962Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:26.464Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:30.967Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:35.470Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:39.972Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:44.476Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:48.980Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:53.483Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:37:57.986Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:02.489Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:06.992Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:11.496Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:16.000Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:20.503Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:25.007Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:29.511Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:34.012Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:38.516Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:43.020Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:47.521Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:52.025Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:38:56.529Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:01.031Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:05.532Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:10.034Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:14.535Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:19.043Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:23.546Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:28.051Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:32.554Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:37.056Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:41.558Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:46.060Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:50.562Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:55.067Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:39:59.570Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:04.074Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:08.576Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:13.083Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:17.586Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:22.088Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:26.592Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:31.097Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:35.601Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:40.104Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:44.606Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:49.109Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:40:58.092Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:02.593Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:07.096Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:11.598Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:16.102Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:20.607Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:25.111Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:29.616Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:34.119Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:38.622Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:43.125Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:47.627Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:52.130Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:41:56.633Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:01.136Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:05.641Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:10.144Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:14.646Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:19.149Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:23.652Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:28.154Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:32.656Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:37.159Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:41.661Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:46.164Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:50.667Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:55.170Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:42:59.673Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:04.177Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:08.679Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:13.182Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:17.693Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:22.195Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:26.699Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:31.202Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:35.707Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:40.210Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:44.714Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:49.216Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:43:58.095Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:02.598Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:07.102Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:11.605Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:16.108Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:20.612Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:25.115Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:29.618Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:34.121Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:38.626Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:43.131Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:47.636Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:52.140Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:44:56.645Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:01.150Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:05.656Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:10.161Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:14.665Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:19.173Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:23.676Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:28.183Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:32.687Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:37.193Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:41.699Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:46.205Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:50.709Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:55.213Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:45:59.714Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:04.219Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:08.723Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:13.229Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:17.731Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:22.238Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:26.745Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:31.250Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:35.755Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:40.256Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:44.761Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:49.265Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:46:58.098Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:47:02.603Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-14T04:47:07.107Z",
+        "kind": "sse:disconnect:error"
+      }
+    ]
+  },
+  "samples": {
+    "path": "samples.ndjson",
+    "count": 601,
+    "sha256": "ca89577009a34897d0f7134838d4417c05f65007d822ea0ee778cebe5cefb95c",
+    "bytes": 167476
+  },
+  "cleanup": {
+    "closed": true,
+    "activeSockets": 0,
+    "activeConnections": 0
+  },
+  "unknowns": [
+    "client reopen is a new HTTP/SSE connection, not daemon process recovery",
+    "provider/queue/old-request behaviour is not observable from this fixture and is not claimed",
+    "server-side handler timing is not separately instrumented; client latency is reported",
+    "resource samples cover this process and the fixture server only, never another user process"
+  ],
+  "resume": {
+    "arguments": [
+      "node tools/trial-kit/bin/trial-soak.mjs",
+      "--scenario mixed",
+      "--duration-seconds 1800",
+      "--poll-ms 3000",
+      "--sse-interval-ms 2000",
+      "--reconnect-backoff-ms 500",
+      "--reopen-seconds 180",
+      "--sample-ms 3000",
+      "--max-errors 100000",
+      "--failure-mode truncate",
+      "--out <NEW-OUT>"
+    ],
+    "note": "replace <NEW-OUT>; the same duration and failure mode are required for comparability",
+    "line": "node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 1800 --poll-ms 3000 --sse-interval-ms 2000 --reconnect-backoff-ms 500 --reopen-seconds 180 --sample-ms 3000 --max-errors 100000 --failure-mode truncate --out <NEW-OUT>"
+  },
+  "tool": {
+    "name": "trial-kit",
+    "version": "0.1.0",
+    "command": "soak"
+  },
+  "outputRoot": "reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn",
+  "measurementScope": {
+    "measured": "one finite fixture scenario of 1800s (actual 1800s)",
+    "notMeasured": [
+      "24h/48h soak",
+      "daemon recovery",
+      "provider/queue stability",
+      "other machines",
+      "real model/native execution"
+    ]
+  }
+}
