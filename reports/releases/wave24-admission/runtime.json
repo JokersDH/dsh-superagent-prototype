@@ -1,0 +1,164 @@
+{
+  "protocol": "wave24-runtime-admission/1",
+  "date": "2026-11-14",
+  "status": "PARTIAL_SOURCE_IDENTITY_AND_SMALL_PAGES_ADMITTED_BUSINESS_HANDOVER_NOT_ADMITTED",
+  "candidateRoot": "/Users/hh/Desktop/joker/superagent-agent-b",
+  "candidateBranch": "codex/g1-runtime",
+  "candidateSource": "3a40d00054bf90023f4805c77eed7881fcebccf9",
+  "previousSource": "f35c38ba167c81feb4031b5b31ee09c7e4747401",
+  "mainBaseline": "f29c9e62fb8298d652dc8f98ba05b0caa04a1381",
+  "dirtyPreserved": [
+    "reports/releases/wave11-admission/runtime.json",
+    "reports/releases/wave12-admission/runtime.json",
+    "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+  ],
+  "newSource": {
+    "businessChannelExists": true,
+    "wrapperOnly": false,
+    "changedProductionFiles": [
+      "packages/execution/src/recovery-transport.ts",
+      "apps/runner/src/recovery-endpoint.ts",
+      "apps/runner/src/runner-service.ts",
+      "apps/runner/src/business-attach.ts"
+    ],
+    "actualPageProducerEnvelope": true,
+    "actualSmallBytePageLoop": true,
+    "actualCommandProducerEnvelope": true,
+    "rfcPublished": false,
+    "unifiedDispatchImplemented": false,
+    "receiptPayloadNativeAdmissionRebindingImplemented": false,
+    "actualTwoClientLifecyclePassed": false,
+    "coordinatorSigkillSameStoreRecoveryPassed": false,
+    "recoveredDeliveryAndSlotsPassed": false,
+    "wholePackageComplete": false,
+    "submittedStatusAccuratelyMarksPartial": true
+  },
+  "checks": [
+    {
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes --skipLibCheck --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --types node apps/runner/src/business-attach.ts apps/runner/src/runner-service.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "scope": "Direct actual module compilation, including imports; the root tsconfig alone does not include these files. pnpm checked existing workspace dependencies; tracked source/lock dirty state is unchanged."
+    },
+    {
+      "command": "node --test apps/runner/test/recovery-endpoint.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 9,
+      "failed": 0,
+      "scope": "Existing optional-backend control endpoint scope. These tests do not enable the new business command/fact backends."
+    },
+    {
+      "command": "node tests/native-acceptance/b23-bounded-attach.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "error": "DriverError state_indeterminate/journal_snapshot_unverified at FileCriticalJournal.entries, before endpoint creation",
+      "scope": "Original submitted harness. Facts omit required source and use an unrelated b23 payload kind. This is fixture/schema invalidity, not proof that legal manually constructed facts cannot enter the journal or that a production storage API is absent. No localhost fetch in the later unreachable command case was executed."
+    },
+    {
+      "command": "node tests/native-acceptance/b22-business-attach.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "error": "RunnerLinkError unknown_outcome at recovery-transport.ts:199",
+      "scope": "Original submitted private Runner handover harness remains unchanged; it uses the fixed /usr/bin/false fixture profile and is not a successful normal business producer. Cleanup ran through its own spawned Runner handle. No installed vendor/native or model turn."
+    },
+    {
+      "command": "node /tmp/pa-wave24-b-audit.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 1,
+      "passed": 10,
+      "failed": 5,
+      "scope": "Actual in-process serveRunner over private bootstrap/shutdown streams, actual FileCriticalJournal, actual authenticated endpoint/client/attach facade. No copied production paging algorithm. Separate private controlled backend counts command dispatch only. No Driver launch, native child, product DB or model call.",
+      "replayEvidence": { "pages": 10, "cursor": 160, "done": true, "frames": 160, "maxFramesJsonBytes": 16396, "requestedFrameBudget": 16384 },
+      "controlledBackendCommandWrites": 4,
+      "writeInterpretation": "One exact original command positive and three deliberately failing foreign assignment/attempt/contract negatives. No native/product write.",
+      "cases": [
+        { "id": "actual-service-original-inspection-positive", "status": "PASS" },
+        { "id": "actual-service-valid-journal-over64k-positive", "status": "PASS" },
+        { "id": "actual-service-bounded-multipage-replay", "status": "PASS", "scope": "160 valid runtime.error records, original seq/factId order and server producer preserved across 10 small pages; frame-array serialization can exceed the requested frame budget by separators." },
+        { "id": "actual-service-foreign-source-facts-refused", "status": "PASS" },
+        { "id": "actual-attach-foreign-source-facts-refused", "status": "PASS" },
+        { "id": "actual-service-negative-cursor-refused", "status": "PASS" },
+        { "id": "accepted-larger-page-budget-still-readable", "status": "FAIL", "observed": "Requesting the server-accepted 131072-byte budget for the same valid journal returns unknown_outcome due to the unchanged 64KB global response cap." },
+        { "id": "exact-context-command-positive", "status": "PASS" },
+        { "id": "foreign-source-command-refuses-before-write", "status": "PASS" },
+        { "id": "foreign-command-assignmentId-refuses-before-write", "status": "FAIL", "observed": "Valid producer envelope plus foreign command.assignmentId is dispatched to backend and returns success." },
+        { "id": "foreign-command-attemptId-refuses-before-write", "status": "FAIL", "observed": "Valid producer envelope plus foreign command.attemptId is dispatched to backend and returns success." },
+        { "id": "foreign-command-contract-refuses-before-write", "status": "FAIL", "observed": "Valid producer envelope plus foreign command.contract.digest is dispatched to backend and returns success." },
+        { "id": "preserved-attach-beforewrite-guard-no-write", "status": "PASS" },
+        { "id": "single-large-schema-valid-journal-record-positive", "status": "PASS", "scope": "One real schema-valid writer.observed record with 600 bounded resource observations reads through FileCriticalJournal and exceeds 64KB." },
+        { "id": "single-large-valid-record-readable-with-explicit-small-page", "status": "FAIL", "observed": "Actual service returns the whole large record despite a 1024-byte request, then unchanged transport cap refuses it as unknown_outcome. No bounded payload path is implemented." }
+      ]
+    }
+  ],
+  "closedPriorScopes": [
+    {
+      "id": "B23-FACTS-CONTEXT-IDENTITY",
+      "status": "CLOSED_FOR_MEASURED_PAGE_CONTEXT",
+      "evidence": "Each actual page now injects the registered producer and the client compares it before returning frames; foreign source is refused in both transport and attach facade. No current main new-channel admission is implied."
+    },
+    {
+      "id": "B23-UNBOUNDED-FACT-PAGE",
+      "status": "PARTIALLY_CLOSED_SMALL_PAGES",
+      "evidence": "Actual production pager replays a valid 160-record journal over 10 pages without skipping/renumbering/duplicate factIds. Accepted larger budgets and one large valid record remain blocked by the global transport cap; do not continue saying no paging source exists."
+    },
+    {
+      "id": "B23-LOWLEVEL-COMMAND-PREFLIGHT",
+      "status": "CLOSED_FOR_FOREIGN_PRODUCER_SOURCE_ONLY",
+      "evidence": "Actual producer envelope now prevents a foreign source command before backend dispatch. New command's own complete attempt/contract identity regression is recorded separately."
+    }
+  ],
+  "findings": [
+    {
+      "id": "B24-INCOMPLETE-COMMAND-ATTEMPT-BINDING",
+      "priority": "P1_NEW_TRANSPORT_ADMISSION",
+      "file": "packages/execution/src/recovery-transport.ts",
+      "line": 74,
+      "problem": "matchesProducerAttempt compares only ticketId and fenceEpoch. A correctly registered producer envelope can carry a command for another assignment, attempt or contract, and the route invokes backend.command before any full tuple validation. Three independent valid-schema command mutations all advance the controlled backend counter and return success.",
+      "scopeLimit": "New candidate business transport is not integrated on main. Actual launched AttemptRunner.feed also defends its own identity, and the main guard remains authoritative; this test is a regression of the reusable new transport's promised pre-dispatch boundary, not evidence of a current main native write bypass.",
+      "requiredOutcome": "Validate the complete command assignment/attempt/contract identity against the immutable registered producer before dispatch. Keep the newly passing foreign source refusal and original exact-command positive."
+    },
+    {
+      "id": "B24-PAGE-BUDGET-TRANSPORT-MISMATCH",
+      "priority": "P1_BUSINESS_RECOVERY_ADMISSION",
+      "file": "apps/runner/src/runner-service.ts",
+      "line": 282,
+      "relatedFile": "packages/execution/src/recovery-transport.ts",
+      "relatedLine": 121,
+      "problem": "Server accepts page budgets up to 1MiB and emits an oversized first frame regardless of the requested budget, but reply/client caps remain 64KiB. Valid 128KiB page requests fail; a single valid writer.observed record with 600 resources also fails even with an explicit 1KiB request. The comment that the caller can deliberately fetch it is not implemented by any bounded payload route.",
+      "requiredOutcome": "Define one consistent total serialized-envelope byte budget below the transport cap, count separators/envelope, and implement explicit bounded payload-reference/chunk transfer for a record that cannot fit. Reject unsupported budgets before journal/backend reads. Preserve complete small-page replay, stable seq and unknown outcomes without dropping/truncating data or globally lifting caps."
+    },
+    {
+      "id": "B24-SUBMITTED-HARNESS-NOT-VALID-EVIDENCE",
+      "priority": "P2_FIXTURE_AND_ACCEPTANCE",
+      "file": "tests/native-acceptance/b23-bounded-attach.mjs",
+      "line": 30,
+      "problem": "The submitted harness fails before endpoint creation because its facts omit source and its payload kind is b23, unrelated to the fact kind. Later source also references nonexistent endpoint.endpoint, constructs an incomplete-schema foreign command and counts an array that is never connected to backend.command. It calls an unrelated localhost URL without a deadline if that code becomes reachable.",
+      "requiredOutcome": "Use existing schema-valid fixture/runtime payload builders and the actual returned endpoint fields. Remove unrelated network calls, count the real controlled backend/receiver, use complete valid identity variants and fail by bounded deadlines. A legal real-journal producer is already demonstrated independently; no new SQL API/model budget is needed."
+    }
+  ],
+  "businessMilestones": {
+    "milestone1": "NOT_ADMITTED: no passing submitted two-client lifecycle, no RFC or actual receipt/payload/native-write-admission rebind, new transport still has the two admission findings above.",
+    "milestone2": "NOT_REACHED: no original coordinator SIGKILL/new independent process using same A Store and original command/question/answer/native session identities, no complete ACK/receipt unknown window evidence.",
+    "milestone3": "NOT_REACHED: no recovered registered verification/current candidate/manual acceptance or real valid old-epoch/late-ACK/2-and-4-slot resource closure.",
+    "unchangedArchitectureGaps": [
+      "Original fact receipt ACK, payload-read responses and native-write-admission waiters remain bound to original stdio.",
+      "Business endpoint still invokes runner.feed separately from original stdio begin-once/launch/receiver observation dispatch.",
+      "attach.close remains a no-op; no real replacement-client/session ownership handover is delivered."
+    ]
+  },
+  "integrationRecommendation": {
+    "readyMainPortRfc": false,
+    "newBusinessChannelAdmitted": false,
+    "minimalMerge": "No new business source should be wholesale integrated before the full first runnable milestone. Retain existing main control and Broker. Preserve and consume the measured page-producer/source-prewrite/small-page progress when B publishes the complete real attach/receipt/payload/admission port and its RFC.",
+    "normalControlHistoricalScopesPreserved": true,
+    "ordinaryInstallAndDiagnosticUiIndependent": true
+  },
+  "nextLargePackage": [
+    "First deliver the whole first result: full tuple pre-dispatch boundary, transport-consistent byte pages and large payload transfer, single dispatch path, actual fact receipt/payload/native-write-admission rebind and same-Runner/same-child two-client lifecycle with passing owned harness and early real port/RFC.",
+    "Then demonstrate independent coordinator SIGKILL/reopen over same A registration and original identities, original Broker question/answer/native_applied or preserved unknown, bounded begin/answer/ACK/receipt windows without new-ID resends.",
+    "Continue to recovered verification/candidate/manual acceptance, valid stale epoch/late ACK/control interruption and 2/4-slot complete resource return. Checkpoints do not complete the whole goal or create model budget."
+  ],
+  "budget": { "realVendorModelTurns": 0, "nativeTurnStarts": 0, "oldBCap4Remainder": "UNKNOWN_NOT_SPENDABLE", "ePilot": "UNCHANGED_BLOCKED" },
+  "preservation": { "candidateProductionFilesChanged": false, "candidateDirtyStateUnchanged": true, "oldUserServiceOperations": 0, "globalSocketDiscovery": false, "unrelatedCredentialsRead": false, "allHistoricalLedgersPreserved": true }
+}

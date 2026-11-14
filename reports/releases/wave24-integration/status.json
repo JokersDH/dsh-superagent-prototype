@@ -1,0 +1,81 @@
+{
+  "protocol": "wave24-main-source-scope-ui/1",
+  "dispatchVerification": {
+    "status": "PASS_LONG_DISPATCH_STATIC_ONLY",
+    "rolesIncludingMain": 6,
+    "phases": 60,
+    "dependencyNodes": 33,
+    "localLinks": 164,
+    "acyclic": true,
+    "nonoverlappingOwners": true,
+    "confersRuntimeOrReleaseAdmission": false
+  },
+  "existingPreviewReadonlyCheck": {
+    "url": "http://127.0.0.1:5191/",
+    "rootStatus": 200,
+    "currentContextSourceModuleStatus": 200,
+    "currentContextSourceModuleContainsNewAction": true,
+    "backendOrInstalledAdmissionInferred": false,
+    "restartedOrReconfigured": false
+  },
+  "date": "2026-11-14",
+  "source": "4b42a9001c4040aa6c87c1c6056056d04ea1e9af",
+  "implemented": [
+    "Explicit opt-in source diagnostics in actual message audit and context history",
+    "Authoritative four states, seven bounded reasons and positive withheld source counts",
+    "Failed/unavailable/foreign diagnostic keeps already-read content; valid new state retains original body guard",
+    "Identity-keyed component and effect-sequence protection, keyboard focus and polite results",
+    "Exact D CLI help slice; no private roots initialized by help"
+  ],
+  "notImplemented": [
+    "New manifest trusted subject/coverage admission",
+    "B business attach and coordinator crash resume",
+    "C package-driver verified admission",
+    "D live-cleanup tool admission",
+    "Private startup permission and target activation",
+    "E final independently accepted main UI install artifact"
+  ],
+  "checks": {
+    "transportTests": 4,
+    "cliHelpTests": 1,
+    "consoleStrict": "PASS",
+    "consoleBuild": "PASS",
+    "finalCleanBrowserCases": 13,
+    "browserErrors": 0,
+    "readTriggeredMockReplies": 0,
+    "seededLocalMockReplies": 25,
+    "sourceWorktreeClean": true,
+    "delayedResponseSwitchCase": "PASS",
+    "keyboardFocusCase": "PASS",
+    "desktopViewport": [
+      1440,
+      900
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "screenshotsVisuallyReviewed": true,
+    "visualRounds": 2,
+    "independentNarrowReview": "NO_SUBSTANTIVE_FINDINGS",
+    "realScreenReader": "NOT_TESTED"
+  },
+  "browserReport": "reports/releases/wave24-integration/browser-final/browser-report.json",
+  "initialDirtyBrowserReport": "reports/releases/wave24-integration/browser/browser-report.json",
+  "cliSourceOrigin": "27675c46e23d62875406939163cef77712bf56d6",
+  "productSchema": 18,
+  "migrationsAdded": 0,
+  "wireHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "uiUpdated": true,
+  "scopeDiagnosticOptInOnly": true,
+  "scopeDiagnosticGrantsAuthority": false,
+  "newProviderReads": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "preservedServicePairs": 12,
+  "userServicesRestarted": false,
+  "newPersistentPreviewStarted": false,
+  "frozenTarCreated": false,
+  "independentInstalledAdmission": false,
+  "releaseApproved": false
+}

@@ -1,0 +1,71 @@
+{
+  "status": "PASS_CONTEXT_HISTORY_WORKBENCH",
+  "sourceCommit": "4b42a9001c4040aa6c87c1c6056056d04ea1e9af",
+  "sourceWorktreeClean": true,
+  "checkedAt": "2026-11-14T00:43:44.209Z",
+  "cases": [
+    {
+      "id": "ACTUAL-A18-HISTORY-PAGES-AND-DOES-NOT-SEND",
+      "status": "PASS"
+    },
+    {
+      "id": "ORIGINAL-SOURCE-IS-READABLE-AND-UNAFFECTED-BY-CURRENT-CHANGES",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-MOBILE-SOURCE-READER-AND-BACK-NAVIGATION-FIT",
+      "status": "PASS"
+    },
+    {
+      "id": "PROJECT-SWITCH-EMPTY-AND-RETRY-KEEP-RECORDS-SCOPED",
+      "status": "PASS"
+    },
+    {
+      "id": "EXPIRED-CURSOR-RELOADS-HISTORY-WITHOUT-REPLAYING-A-MODEL-REQUEST",
+      "status": "PASS"
+    },
+    {
+      "id": "MODEL-OFF-DOES-NOT-HIDE-MESSAGE-SOURCE-AUDIT",
+      "status": "PASS"
+    },
+    {
+      "id": "HISTORY-NAVIGATES-TO-THE-ORIGINAL-CONVERSATION",
+      "status": "PASS"
+    },
+    {
+      "id": "READONLY-CAPABILITY-AND-TAB-KEYBOARD-STATE-ARE-ACCURATE",
+      "status": "PASS"
+    },
+    {
+      "id": "SCOPE-EXPLANATION-IS-EXPLICIT-READ-ONLY-AND-RETRIABLE",
+      "status": "PASS"
+    },
+    {
+      "id": "MISSING-OPTIONAL-DIAGNOSTICS-AND-BAD-IDENTITY-DO-NOT-REPLACE-THE-BODY",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL-STATE-AND-SCOPE-DIAGNOSTICS-HIDE-UNVERIFIED-BODIES",
+      "status": "PASS"
+    },
+    {
+      "id": "DIAGNOSTIC-DESKTOP-MOBILE-KEYBOARD-AND-LAYOUT",
+      "status": "PASS"
+    },
+    {
+      "id": "DELAYED-DIAGNOSTIC-CANNOT-REPLACE-A-NEWLY-SELECTED-RECORD",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "seededMockReplies": 25,
+  "readTriggeredMockReplies": 0,
+  "productSchema": 18,
+  "ports": "production A SQLite contextBindings/contextHistory/replyResults",
+  "limitations": [
+    "Actual HTTP/SQLite/React/SSE with local mock provider; not native or installed acceptance",
+    "Readonly UI capability is projected by the fixture; backend readonly authorization is tested separately"
+  ]
+}
