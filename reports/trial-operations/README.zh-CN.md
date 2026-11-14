@@ -17,10 +17,10 @@ H 不是第二 registry、ledger、健康权威或发布 gate。原始观察交�
 
 ```text
 node --test tests/operational-soak/*.case.mjs
-tests 19 / pass 19 / fail 0
+tests 20 / pass 20 / fail 0
 ```
 
-预检 9 项、机器检查 5 项、soak 5 项；覆盖完整 tiny fixture 正负、错 hash/缺文件/多余文件/外部 symlink/坏 JSON/缺依赖/错 console stamp/绝对与 `..` 成员/截断 tar、ABI 不一致 DEGRADED、输入与 home 无副作用、0600/0700 与拒绝覆盖、空格/中文路径、readiness 401/500/坏 JSON/超大/未知字段/过期/跨 subject/deadline、token 权限、support 白名单与空根采集、soak 正向/通道隔离/七类缺陷/中断/参数拒绝。
+预检 9 项、机器检查 5 项、soak 6 项；覆盖完整 tiny fixture 正负、错 hash/缺文件/多余文件/外部 symlink/坏 JSON/缺依赖/错 console stamp/绝对与 `..` 成员/截断 tar、ABI 不一致 DEGRADED、输入与 home 无副作用、0600/0700 与拒绝覆盖、空格/中文路径、readiness 401/500/坏 JSON/超大/未知字段/过期/跨 subject/deadline、token 权限、support 白名单与空根采集、soak 正向/通道隔离/七类缺陷/中断/参数拒绝。
 
 ## 不可变包只读预检证据
 
