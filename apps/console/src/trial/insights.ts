@@ -17,6 +17,7 @@ export interface TrialInsightsMetric {
   readonly detail?: string
   /** Optional unit/currency: rows are never summed across different units or currencies. */
   readonly unit?: string
+  readonly currency?: string
   readonly layer?: TrialInsightsLayer
   /** null/absent means unknown, not zero. */
   readonly sampleCount?: number | null
@@ -37,6 +38,10 @@ export interface TrialInsightsView {
   readonly coverage?: string
   readonly coverageState?: 'complete' | 'partial' | 'unknown'
   readonly scope?: TrialInsightsScope
+  /** The producer declares the window was cut short; a "complete" view must not be shown then. */
+  readonly truncated?: boolean
+  /** Known/unknown source counts; null means that count is not established. */
+  readonly sources?: { readonly known: number | null; readonly unknown: number | null }
   /** null means the sample count is unknown, not zero. */
   readonly sampleCount: number | null
   /** null/absent means the unknown count is not established, not zero. */
@@ -82,6 +87,8 @@ export function trialInsightsAdmission(value: TrialInsightsView, activeProjectId
     return { admitted: false, rows: [], scopeLabel, message: '缺少观察窗口，暂不展示指标。' }
   if (value.coverage === undefined || value.coverage.trim().length === 0)
     return { admitted: false, rows: [], scopeLabel, message: '缺少覆盖说明，暂不展示指标。' }
+  if (value.truncated === true && (value.coverageState === undefined || value.coverageState === 'complete'))
+    return { admitted: false, rows: [], scopeLabel, message: '数据被截断，暂不展示完整指标。' }
   if (value.metrics.length === 0)
     return { admitted: false, rows: [], scopeLabel, message: '没有可展示的指标。' }
   return { admitted: true, rows: value.metrics, scopeLabel }

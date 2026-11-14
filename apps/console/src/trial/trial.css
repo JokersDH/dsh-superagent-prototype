@@ -391,6 +391,107 @@
   color: var(--danger);
 }
 
+.trial-recipes {
+  padding: 18px 0 6px;
+  border-top: 1px solid var(--line);
+}
+
+.trial-recipe-list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trial-recipe {
+  padding: 12px 0 13px;
+  border-top: 1px solid var(--line);
+}
+
+.trial-recipe:first-child {
+  border-top: 0;
+}
+
+.trial-recipe-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.trial-recipe-title {
+  min-width: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.trial-recipe-status {
+  flex: 0 0 auto;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--badge, #edf1ed);
+  color: var(--badge-ink, #5a695e);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.trial-recipe-status.status-draft {
+  background: #edf3f8;
+  color: #456d8b;
+}
+
+.trial-recipe-status.status-needs_input {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.trial-recipe-status.status-unsupported {
+  background: #f2f3f2;
+  color: var(--muted);
+}
+
+.trial-recipe-goal {
+  margin-top: 5px;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.trial-recipe-meta {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.trial-recipe-reasons {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--warn);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.trial-recipe-reasons li {
+  overflow-wrap: anywhere;
+}
+
+.trial-recipe-reasons li::before {
+  content: '· ';
+}
+
+.trial-recipe-prepare {
+  margin-top: 8px;
+  min-height: 34px;
+  padding: 6px 11px;
+  font-size: 12px;
+}
+
 .trial-insights {
   padding: 18px 0 6px;
   border-top: 1px solid var(--line);

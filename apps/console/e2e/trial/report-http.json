@@ -41,43 +41,43 @@
     "1440x900",
     "390x844"
   ],
-  "generatedAt": "2026-11-14T07:33:42.468Z",
+  "generatedAt": "2026-11-14T09:32:42.118Z",
   "stateRootKind": "private temporary root (not committed)",
   "results": [
     {
       "id": "HTTP-READINESS-RENDER",
       "status": "PASS",
-      "ms": 775,
+      "ms": 812,
       "detail": "real HTTP readiness and configuration render the same facts as the API"
     },
     {
       "id": "HTTP-REQUEST-BUDGET",
       "status": "PASS",
-      "ms": 1,
+      "ms": 2,
       "detail": "the page performs only bootstrap, readiness and configuration reads"
     },
     {
       "id": "HTTP-ACTION-NO-REQUEST",
       "status": "PASS",
-      "ms": 242,
+      "ms": 241,
       "detail": "navigation is a callback, not a command or a read"
     },
     {
       "id": "HTTP-RELOAD-ONE-READ",
       "status": "PASS",
-      "ms": 315,
+      "ms": 349,
       "detail": "reload is one bounded re-read with no command"
     },
     {
       "id": "HTTP-MOBILE",
       "status": "PASS",
-      "ms": 750,
+      "ms": 791,
       "detail": "the real HTTP state is usable at 390px"
     },
     {
       "id": "HTTP-UNMOUNT",
       "status": "PASS",
-      "ms": 14,
+      "ms": 19,
       "detail": "unmounting the real-HTTP view leaves no page or console error"
     }
   ],

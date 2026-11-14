@@ -5,12 +5,14 @@
  */
 import { useId, useRef } from 'react'
 import {
-  Activity, ArrowUpRight, Bot, FolderCheck, FolderPlus, Gauge, Info, LockKeyhole, MessageSquare,
+  Activity, ArrowUpRight, Bot, ClipboardList, FolderCheck, FolderPlus, Gauge, Info, LockKeyhole, MessageSquare,
   RefreshCw, Settings2, TriangleAlert,
 } from 'lucide-react'
 import type { ApplicationConfiguration, TrialNavigationAction, TrialReadiness } from '@personal-agent/contracts'
 import type { TrialInsightsLayer, TrialInsightsView } from './insights.ts'
 import { trialInsightsAdmission, trialInsightsCount } from './insights.ts'
+import type { TrialRecipeSuggestion } from './recipes.ts'
+import { trialRecipeContext, trialRecipeOutcome, trialRecipeSuggestionsForProject } from './recipes.ts'
 import type { TrialStatusValue, TrialTone } from './trial-view.ts'
 import { formatObservedAt, shortRevision, trialActions, trialHeadline, trialProjectValue, trialStrip } from './trial-view.ts'
 import './trial.css'
@@ -24,6 +26,10 @@ export interface TrialWorkspaceProps {
   readonly activeProjectId?: string | undefined
   readonly activeConversationTitle?: string | undefined
   readonly insights?: TrialInsightsView | undefined
+  readonly recipes?: readonly TrialRecipeSuggestion[] | undefined
+  readonly recipesLoading?: boolean | undefined
+  readonly recipesError?: string | undefined
+  readonly onPrepareRecipe?: ((suggestion: TrialRecipeSuggestion) => void) | undefined
   readonly onAction: (action: TrialNavigationAction) => void
   readonly onReload?: (() => void) | undefined
   readonly headingLevel?: 2 | 3 | undefined
@@ -79,7 +85,8 @@ function CountRow({ label, value, detail }: { readonly label: string; readonly v
 
 export function TrialWorkspace({
   readiness, loading = false, error, unavailable = false, configuration, activeProjectId,
-  activeConversationTitle, insights, onAction, onReload, headingLevel = 2, className,
+  activeConversationTitle, insights, recipes, recipesLoading = false, recipesError, onPrepareRecipe,
+  onAction, onReload, headingLevel = 2, className,
 }: TrialWorkspaceProps) {
   const base = useId()
   const titleId = `${base}-title`
@@ -87,6 +94,7 @@ export function TrialWorkspace({
   const projectsId = `${base}-projects`
   const executorsId = `${base}-executors`
   const insightsId = `${base}-insights`
+  const recipesId = `${base}-recipes`
   const Heading = headingLevel === 3 ? 'h3' : 'h2'
   const strip = readiness === undefined ? undefined : trialStrip(readiness)
   const actions = trialActions({
@@ -109,6 +117,17 @@ export function TrialWorkspace({
   const activeProjectLabel = activeProjectId === undefined
     ? '全部项目'
     : configuration?.projects.find(project => project.id === activeProjectId)?.displayName ?? '当前项目（名称未读取）'
+  const recipeList = recipes === undefined ? undefined : trialRecipeSuggestionsForProject(recipes, activeProjectId)
+  const recipeContext = trialRecipeContext(configuration, activeProjectId)
+  const recipeRows = recipeList?.slice(0, 6).map(suggestion => ({ suggestion, outcome: trialRecipeOutcome(suggestion, recipeContext) }))
+  const lastRecipe = useRef<{ id: string; at: number } | undefined>(undefined)
+  const prepareRecipe = (suggestion: TrialRecipeSuggestion) => {
+    if (onPrepareRecipe === undefined) return
+    const now = Date.now()
+    if (lastRecipe.current !== undefined && lastRecipe.current.id === suggestion.id && now - lastRecipe.current.at < 300) return
+    lastRecipe.current = { id: suggestion.id, at: now }
+    onPrepareRecipe(suggestion)
+  }
 
   return (
     <section
@@ -270,6 +289,54 @@ export function TrialWorkspace({
           </section>
         </div>
 
+        {(recipes !== undefined || recipesLoading || recipesError !== undefined) && (
+          <section className="trial-recipes" aria-labelledby={recipesId}>
+            <div className="trial-panel-head">
+              <h3 id={recipesId} className="trial-section-title"><ClipboardList size={15} aria-hidden="true" />配方草案</h3>
+              <span className="trial-panel-meta">只读声明 · 不执行</span>
+            </div>
+            {recipesError !== undefined && <p className="trial-muted" role="alert">配方草案暂时无法读取；原委托表单仍可使用。</p>}
+            {recipesLoading && <p className="trial-muted" role="status">正在读取项目声明…</p>}
+            {!recipesLoading && recipesError === undefined && recipeList !== undefined && recipeList.length === 0 && (
+              <p className="trial-muted">该项目没有可用的声明草案。</p>
+            )}
+            {recipeRows !== undefined && recipeRows.length > 0 && (
+              <ul className="trial-recipe-list" aria-label="项目声明草案">
+                {recipeRows.map(({ suggestion, outcome }) => (
+                  <li key={suggestion.id} className="trial-recipe">
+                    <div className="trial-recipe-head">
+                      <strong className="trial-recipe-title">{suggestion.title}</strong>
+                      <span className={`trial-recipe-status status-${suggestion.status}`}>{outcome.statusLabel}</span>
+                    </div>
+                    {outcome.goalPreview.length > 0 && <p className="trial-recipe-goal">{outcome.goalPreview}</p>}
+                    <p className="trial-recipe-meta">
+                      {suggestion.projectId === null ? '项目未声明' : '项目已声明'}
+                      {' · '}检查 {outcome.checks.filter(check => check.state === 'available').length}/{outcome.checks.length}
+                      {' · '}执行器 {outcome.profiles.filter(profile => profile.state === 'available').length}/{outcome.profiles.length}
+                      {suggestion.scopeNote === null ? '' : ` · ${suggestion.scopeNote}`}
+                    </p>
+                    {outcome.reasons.length > 0 && (
+                      <ul className="trial-recipe-reasons">
+                        {outcome.reasons.map(reason => <li key={reason}>{reason}</li>)}
+                      </ul>
+                    )}
+                    {onPrepareRecipe !== undefined && (
+                      <button type="button" className="quiet trial-recipe-prepare" disabled={!outcome.applicable}
+                        onClick={() => { if (outcome.applicable) prepareRecipe(suggestion) }}>
+                        准备草案
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {recipeList !== undefined && recipeList.length > 6 && (
+              <p className="trial-note">另有 {recipeList.length - 6} 条草案未显示。</p>
+            )}
+            <p className="trial-note">选择只会把草案数据交回原委托表单；创建、检查与执行仍由你在原确认页决定。</p>
+          </section>
+        )}
+
         {insights !== undefined && insightAdmission !== undefined && (
           <section className="trial-insights" aria-labelledby={insightsId}>
             <div className="trial-panel-head">
@@ -292,7 +359,9 @@ export function TrialWorkspace({
                     : insights.scope?.aggregation === 'cross_project' ? '跨项目聚合'
                       : insights.scope?.aggregation === 'single_project' ? '单项目' : '聚合未声明'}
                   {' · '}
-                  {insights.unknownCount === undefined || insights.unknownCount === null ? '未知数未声明' : `${insights.unknownCount} 个未知`}
+                  {insights.sources !== undefined
+                    ? `来源已知 ${insights.sources.known ?? '未知'} · 未知 ${insights.sources.unknown ?? '未知'}`
+                    : insights.unknownCount === undefined || insights.unknownCount === null ? '未知数未声明' : `${insights.unknownCount} 个未知`}
                 </dd>
               </div>
             </dl>
@@ -306,6 +375,7 @@ export function TrialWorkspace({
                       <dd className={metric.value === null ? 'trial-unknown' : undefined}>
                         {metric.value ?? '未知'}
                         {metric.unit !== undefined && <small>{metric.unit}</small>}
+                        {metric.currency !== undefined && <small>{metric.currency}</small>}
                         {metric.layer !== undefined && <small>{layerLabel[metric.layer]}</small>}
                         {metric.sampleCount !== undefined && <small>{metric.sampleCount === null ? '样本未知' : `${metric.sampleCount} 个样本`}</small>}
                         {metric.detail !== undefined && <small>{metric.detail}</small>}

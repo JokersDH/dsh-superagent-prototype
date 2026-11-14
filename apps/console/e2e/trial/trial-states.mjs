@@ -79,7 +79,7 @@ try {
         if (overlap(rect(cells[i]), rect(cells[j]))) violations.push('strip cells overlap')
     const heading = document.querySelector('.trial-heading'), meta = document.querySelector('.trial-header-meta')
     if (heading && meta && overlap(rect(heading), rect(meta))) violations.push('header overlaps meta')
-    for (const element of document.querySelectorAll('.trial-project-name, .trial-value-text strong, .trial-value-text small, .trial-sentence, .trial-fact dd, .trial-panel-meta')) {
+    for (const element of document.querySelectorAll('.trial-project-name, .trial-value-text strong, .trial-value-text small, .trial-sentence, .trial-fact dd, .trial-panel-meta, .trial-recipe-title, .trial-recipe-goal, .trial-recipe-meta')) {
       const style = getComputedStyle(element)
       if (element.scrollWidth > element.clientWidth + 1 && style.textOverflow !== 'ellipsis') violations.push(`text clips horizontally: ${element.className}`)
       if (element.scrollHeight > element.clientHeight + 1 && style.overflow !== 'visible' && style.overflowY !== 'visible') violations.push(`text clips vertically: ${element.className}`)
@@ -253,7 +253,7 @@ try {
     assert(insights.includes('未知'), 'unknown insight value stays unknown')
     assert(insights.includes('可见性代理'), 'limitations are published')
     assert(insights.includes('本项目群 5 个项目'), 'the declared scope is named')
-    assert(insights.includes('2 个未知'), 'the unknown count is declared')
+    assert(insights.includes('来源已知 3 · 未知 2'), 'the source counts are declared')
     assert(insights.includes('美元') === false && insights.includes('USD'), 'currency stays on its own row')
     assert(insights.includes('原生执行') && insights.includes('受控流程'), 'layers stay labelled')
     assert(await page.locator('.trial-insight-row').count() === 3, 'each metric keeps its own row')
@@ -305,6 +305,55 @@ try {
     assert((await page.locator('.trial-fact').filter({ hasText: '当前项目' }).innerText()).includes('流程测试项目'), 'the current project identity is still visible')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'insights-wrong-project.png') })
   }, 'a summary for another project cannot be read as the current project result')
+
+  await step('INSIGHTS-TRUNCATED-AND-PARTIAL', async () => {
+    await open('state=insights-truncated')
+    assert((await page.locator('.trial-insights').innerText()).includes('数据被截断'), 'a truncated complete view is refused')
+    assert(await page.locator('.trial-insight-row').count() === 0, 'no complete row is shown when truncated')
+    await open('state=insights-partial')
+    assert((await page.locator('.trial-insights').innerText()).includes('partial'), 'declared partial coverage is shown')
+    assert(await page.locator('.trial-insight-row').count() === 1, 'partial rows are shown with their declaration')
+    assert((await page.locator('.trial-insight-row').innerText()).includes('未知'), 'a null metric stays unknown')
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'insights-partial.png') })
+  }, 'truncated complete metrics are refused while declared partial metrics remain visible')
+
+  await step('RECIPES-PREVIEW', async () => {
+    await open('state=recipes')
+    assert(await page.locator('.trial-recipe').count() === 4, 'only current/undeclared projects are presented')
+    assert(await page.locator('.trial-recipe-title').filter({ hasText: '属于其他项目的草案' }).count() === 0, 'a foreign project draft is not displayed')
+    const valid = page.locator('.trial-recipe').filter({ hasText: '补充单元检查声明' })
+    await valid.getByRole('button', { name: '准备草案', exact: true }).waitFor()
+    assert(await valid.getByRole('button', { name: '准备草案', exact: true }).isEnabled(), 'a valid draft can be prepared')
+    const needs = page.locator('.trial-recipe').filter({ hasText: '缺少项目信息' })
+    assert(await needs.getByRole('button', { name: '准备草案', exact: true }).isDisabled(), 'missing input blocks preparation')
+    assert((await needs.innerText()).includes('缺少：项目根目录'), 'the missing input is named')
+    const unsupported = page.locator('.trial-recipe').filter({ hasText: '未知的 monorepo 布局' })
+    assert(await unsupported.getByRole('button', { name: '准备草案', exact: true }).isDisabled(), 'unsupported declaration is blocked')
+    assert((await unsupported.innerText()).includes('不受支持'), 'the unsupported reason is shown')
+    const violations = await layoutAudit(page)
+    assert(violations.length === 0, `recipe layout violations: ${violations.join('; ')}`)
+    await valid.getByRole('button', { name: '准备草案', exact: true }).focus()
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(80)
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(80)
+    const prepared = await page.evaluate(() => window.__TRIAL_RECIPES__ ?? [])
+    assert(prepared.length === 1 && prepared[0] === 'recipe-valid', `one preparation per activation: ${JSON.stringify(prepared)}`)
+    assert(await page.locator('.trial-recipe').filter({ hasText: '补充单元检查声明' }).getByRole('button', { name: '准备草案' }).evaluate(element => element === document.activeElement), 'focus stays on the prepared draft')
+    assert((await requests()).length === 0, 'preparing a draft performs no transport request')
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'recipes.png') })
+  }, 'recipe drafts show applicability/missing inputs and prepare only through an explicit callback')
+
+  await step('RECIPES-LOADING-AND-ERROR', async () => {
+    await open('state=recipes-loading')
+    assert((await page.locator('.trial-recipes').innerText()).includes('正在读取项目声明'), 'recipe loading is announced')
+    assert((await labels())[0] === '打开主对话', 'core actions remain available while recipes load')
+    await open('state=recipes-error')
+    assert(await page.locator('.trial-recipes [role=alert]').count() === 1, 'recipe failure is an explicit alert')
+    assert((await page.locator('.trial-recipes').innerText()).includes('原委托表单仍可使用'), 'the failure names the fallback')
+    assert(await page.locator('.trial-recipe').count() === 0, 'no stale recipe rows are shown after failure')
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'recipes-error.png') })
+  }, 'recipe loading/failure keep the workspace usable and show no stale rows')
 
   await step('NAVIGATION-CALLBACKS', async () => {
     for (const [state, expected] of [['blocked', 'inspect_executor'], ['needs-project', 'import_project'], ['unconfigured', 'configure_model'], ['configured', 'open_conversation']]) {
@@ -377,7 +426,7 @@ try {
     const mobilePage = await mobile.newPage()
     const mobileErrors = []
     mobilePage.on('pageerror', error => mobileErrors.push(error.message))
-    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long', 'insights-unscoped', 'insights-wrong-project']) {
+    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long', 'insights-unscoped', 'insights-wrong-project', 'insights-partial', 'recipes', 'recipes-error']) {
       await mobilePage.goto(`${base}/e2e/trial/harness.html?state=${state}`, { waitUntil: 'networkidle' })
       await mobilePage.waitForSelector('.trial-view')
       const overflow = await mobilePage.evaluate(() => ({ page: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }))

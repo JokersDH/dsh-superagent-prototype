@@ -94,6 +94,23 @@ try {
     assert(await reads('__TRIAL_B_READS__') === 2, 'B is not read again')
   }, 'switching identity hides the old service observation instead of relabelling it')
 
+  await step('SAME-TRANSPORT-IDENTITY-CHANGE', async () => {
+    await open('identity-same')
+    assert(await page.locator('[data-harness-identity]').innerText() === 'a', 'starts on identity A')
+    assert(await page.locator('[data-harness-same-reads]').innerText() === '1', 'one read for A')
+    await page.locator('[data-harness="switch-b"]').click()
+    await page.waitForTimeout(100)
+    assert((await discussion()).includes('未观察'), 'the previous observation is hidden immediately')
+    assert(await page.locator('[data-harness-same-reads]').innerText() === '2', 'the same transport is read once for the new identity')
+    await page.locator('[data-harness="resolve-first"]').click()
+    await page.waitForTimeout(120)
+    assert((await discussion()).includes('未观察'), 'the first identity response cannot populate the second')
+    await page.locator('[data-harness="resolve-second"]').click()
+    await page.waitForFunction(() => document.querySelector('.trial-cell:nth-child(2) .trial-value-text strong')?.textContent === '已配置')
+    assert((await discussion()).includes('已配置'), 'the second identity observation renders')
+    assert(await page.locator('[data-harness-same-reads]').innerText() === '2', 'no extra read was triggered')
+  }, 'an opaque identity change isolates results even when the transport object is unchanged')
+
   await step('INLINE-PROPS-NO-LOOP', async () => {
     await open('inline')
     await page.waitForFunction(() => (window.__TRIAL_INLINE_READS__ ?? 0) === 1)

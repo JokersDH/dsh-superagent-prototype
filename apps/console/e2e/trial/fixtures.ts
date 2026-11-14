@@ -6,6 +6,7 @@
 import { ApplicationConfigurationSchema, TrialReadinessSchema } from '@personal-agent/contracts'
 import type { ApplicationConfiguration, TrialReadiness } from '@personal-agent/contracts'
 import type { TrialInsightsView } from '../../src/trial/insights.ts'
+import type { TrialRecipeSuggestion } from '../../src/trial/recipes.ts'
 
 const revision = (character: string) => character.repeat(64)
 const observedAt = '2026-11-14T04:00:00.000Z'
@@ -108,14 +109,32 @@ const longReadiness = readiness({
   projects: { development: 3, discussion: 2, dispatchable: 3 },
 })
 const longConversationTitle = '把本机执行器的连接状态、项目导入和对话入口整理成一次可审阅的试用准备检查，并保留原始授权边界'
+const baseRecipe = {
+  version: '1', source: 'project-recipes' as const, projectId: 'project-atlas', scopeNote: 'src/ · 现有检查',
+  status: 'draft' as const, missingInputs: [], checks: [{ id: 'check-unit', required: true, declared: true }],
+  profiles: [{ id: 'profile-codex-local', required: true }],
+  provenance: { manifest: 'package.json', declaredRoot: '.', note: '只读项目声明' },
+  limitations: [], authority: 'none' as const,
+}
+const recipes: readonly TrialRecipeSuggestion[] = [
+  { ...baseRecipe, id: 'recipe-valid', title: '补充单元检查声明', goalPreview: '在现有单元检查上补充一个可审阅的说明字段，不改变执行命令。' },
+  { ...baseRecipe, id: 'recipe-needs-input', status: 'needs_input', title: '缺少项目信息', goalPreview: '需要先确认项目根目录。',
+    missingInputs: [{ field: 'project', label: '项目根目录' }] },
+  { ...baseRecipe, id: 'recipe-unsupported', status: 'unsupported', title: '未知的 monorepo 布局', goalPreview: '该布局尚未支持。' },
+  { ...baseRecipe, id: 'recipe-wrong-project', projectId: 'project-notes', title: '属于其他项目的草案', goalPreview: '不应出现在当前项目。' },
+  { ...baseRecipe, id: 'recipe-long', title: '一个非常长的草案标题用于检查中文与 English mixed identifiers 在没有空格时也不会溢出容器或覆盖相邻状态标签',
+    goalPreview: '在已有 Node 检查上补充声明，并保持原始命令与授权范围不变。'.repeat(12),
+    scopeNote: '根目录/一个没有空格的很长路径/another-long-segment-without-spaces/package.json' },
+]
+
 const longInsights: TrialInsightsView = {
   status: 'ready', windowLabel: '11月1日–11月14日', coverage: 'partial：3/5 来源可读', coverageState: 'partial',
   scope: { projectIds: ['project-quartz', 'project-atlas', 'project-harbor', 'project-requirements', 'project-notes'], aggregation: 'declared_multi_project', label: '本项目群 5 个项目' },
-  sampleCount: 12, unknownCount: 2,
+  sampleCount: 12, unknownCount: 2, sources: { known: 3, unknown: 2 },
   metrics: [
     { id: 'wait', label: '交付到接受的等待', value: '3.2 小时', unit: '小时', layer: 'controlled', sampleCount: 5, detail: '5 个工作' },
     { id: 'timing', label: '审阅计时覆盖', value: null, layer: 'observed', sampleCount: null, detail: '样本不足，未知' },
-    { id: 'usage', label: '已知 usage', value: '1.20', unit: 'USD', layer: 'native', sampleCount: 2 },
+    { id: 'usage', label: '已知 usage', value: '1.20', currency: 'USD', layer: 'native', sampleCount: 2 },
   ],
   limitations: ['界面活动只是可见性代理，不是完整人力工时。', '受控流程与真实执行器分开统计。'],
 }
@@ -123,6 +142,16 @@ const unscopedInsights: TrialInsightsView = {
   status: 'ready', windowLabel: '11月1日–11月14日', coverage: 'partial', sampleCount: 3,
   metrics: [{ id: 'wait', label: '交付到接受的等待', value: '1.5 小时' }],
   limitations: ['缺少项目范围声明，不应作为默认指标展示。'],
+}
+const truncatedInsights: TrialInsightsView = {
+  status: 'ready', windowLabel: '11月1日–11月14日', coverage: 'complete', coverageState: 'complete',
+  scope: { projectIds: ['project-atlas'], aggregation: 'single_project' }, truncated: true, sampleCount: 9,
+  metrics: [{ id: 'wait', label: '交付到接受的等待', value: '2 小时' }], limitations: [],
+}
+const partialInsights: TrialInsightsView = {
+  status: 'ready', windowLabel: '11月1日–11月14日', coverage: 'partial：读取上限截断', coverageState: 'partial',
+  scope: { projectIds: ['project-atlas'], aggregation: 'single_project' }, truncated: true, sampleCount: 4, unknownCount: 1,
+  metrics: [{ id: 'wait', label: '交付到接受的等待', value: null, layer: 'controlled', sampleCount: null }], limitations: ['只读到部分工作。'],
 }
 const wrongProjectInsights: TrialInsightsView = {
   status: 'ready', windowLabel: '11月1日–11月14日', coverage: 'complete', sampleCount: 4,
@@ -134,6 +163,7 @@ const wrongProjectInsights: TrialInsightsView = {
 export const trialStates = [
   'configured', 'unconfigured', 'blocked', 'needs-project', 'no-projects', 'fixture', 'unknown', 'readonly',
   'noreadiness', 'loading', 'unavailable', 'error', 'long', 'insights-empty', 'insights-unscoped', 'insights-wrong-project',
+  'insights-truncated', 'insights-partial', 'recipes', 'recipes-loading', 'recipes-error',
 ] as const
 export type TrialHarnessState = (typeof trialStates)[number]
 
@@ -146,6 +176,9 @@ export interface TrialHarnessProps {
   readonly activeProjectId?: string | undefined
   readonly activeConversationTitle?: string | undefined
   readonly insights?: TrialInsightsView | undefined
+  readonly recipes?: readonly TrialRecipeSuggestion[] | undefined
+  readonly recipesLoading?: boolean | undefined
+  readonly recipesError?: string | undefined
 }
 
 export function trialHarnessProps(state: TrialHarnessState): TrialHarnessProps {
@@ -192,6 +225,22 @@ export function trialHarnessProps(state: TrialHarnessState): TrialHarnessProps {
     }
     case 'insights-wrong-project': return {
       readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', insights: wrongProjectInsights,
+    }
+    case 'insights-truncated': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', insights: truncatedInsights,
+    }
+    case 'insights-partial': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', insights: partialInsights,
+    }
+    case 'recipes': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', recipes,
+    }
+    case 'recipes-loading': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', recipesLoading: true,
+    }
+    case 'recipes-error': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
+      recipesError: '项目声明暂时无法读取；原委托表单仍可使用。',
     }
   }
 }

@@ -29,6 +29,8 @@ declare global {
     __TRIAL_INLINE_READS__?: number
     __TRIAL_DISABLED_READS__?: number
     __TRIAL_AUTH_READS__?: number
+    __TRIAL_RECIPES__?: string[]
+    __TRIAL_SAME_READS__?: number
   }
 }
 
@@ -41,6 +43,7 @@ window.__TRIAL_A_READS__ = 0
 window.__TRIAL_B_READS__ = 0
 window.__TRIAL_INLINE_READS__ = 0
 window.__TRIAL_DISABLED_READS__ = 0
+window.__TRIAL_RECIPES__ = []
 const nativeFetch = window.fetch.bind(window)
 window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
   requests.push(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url)
@@ -82,6 +85,13 @@ function PropsHarness({ state }: { readonly state: TrialHarnessState }) {
         activeProjectId={props.activeProjectId}
         activeConversationTitle={props.activeConversationTitle}
         insights={props.insights}
+        recipes={props.recipes}
+        recipesLoading={props.recipesLoading}
+        recipesError={props.recipesError}
+        onPrepareRecipe={suggestion => {
+          window.__TRIAL_RECIPES__?.push(suggestion.id)
+          writeLog(`recipe: ${suggestion.id}`)
+        }}
         onAction={record}
         onReload={() => {
           const next = reloads + 1
@@ -239,6 +249,41 @@ function IdentityHarness() {
   )
 }
 
+function SameTransportIdentityHarness() {
+  const pair = useMemo(() => trialProbePair(), [])
+  const pending = useRef<((value: TrialReadiness | undefined) => void)[]>([])
+  const calls = useRef(0)
+  const transport = useMemo(() => ({
+    readiness: () => {
+      calls.current += 1
+      window.__TRIAL_SAME_READS__ = calls.current
+      return new Promise<TrialReadiness | undefined>(resolve => { pending.current.push(resolve) })
+    },
+  }), [])
+  const [identity, setIdentity] = useState<'a' | 'b'>('a')
+  const probe = useTrialReadiness(transport, { identity })
+  return (
+    <HarnessFrame controls={(
+      <>
+        <span data-harness-identity>{identity}</span>
+        <button type="button" data-harness="switch-b" onClick={() => setIdentity('b')}>切换身份</button>
+        <button type="button" data-harness="resolve-first" onClick={() => {
+          const resolve = pending.current.shift()
+          if (resolve) resolve(pair.first)
+        }}>完成第一次</button>
+        <button type="button" data-harness="resolve-second" onClick={() => {
+          const resolve = pending.current.shift()
+          if (resolve) resolve(pair.second)
+        }}>完成第二次</button>
+        <span data-harness-same-reads>{calls.current}</span>
+      </>
+    )}>
+      <TrialWorkspace readiness={probe.readiness} loading={probe.loading} error={probe.error}
+        configuration={pair.configuration} onAction={record} onReload={probe.reload} />
+    </HarnessFrame>
+  )
+}
+
 function InlineHarness() {
   const pair = useMemo(() => trialProbePair(), [])
   const [tick, setTick] = useState(0)
@@ -328,6 +373,7 @@ function App() {
   if (mode === 'unmount') return <UnmountHarness />
   if (mode === 'identity') return <IdentityHarness />
   if (mode === 'inline') return <InlineHarness />
+  if (mode === 'identity-same') return <SameTransportIdentityHarness />
   if (mode === 'disabled') return <DisabledHarness />
   if (mode === 'auth-expiry') return <AuthExpiryHarness />
   return <PropsHarness state={state} />

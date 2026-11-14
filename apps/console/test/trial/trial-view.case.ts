@@ -195,6 +195,14 @@ test('optional insights only show measurements after scope, window and coverage 
   const multi = { ...scoped, scope: { projectIds: ['project-atlas', 'project-harbor'], aggregation: 'declared_multi_project' as const } }
   assert.equal(trialInsightsAdmission(multi, 'project-harbor').admitted, true)
 
+  const truncatedComplete = { ...scoped, truncated: true, coverageState: 'complete' as const }
+  assert.equal(trialInsightsAdmission(truncatedComplete, 'project-atlas').admitted, false)
+  assert.match(trialInsightsAdmission(truncatedComplete, 'project-atlas').message ?? '', /截断/)
+  const truncatedPartial = { ...scoped, truncated: true, coverageState: 'partial' as const }
+  assert.equal(trialInsightsAdmission(truncatedPartial, 'project-atlas').admitted, true)
+  const sources = { ...scoped, sources: { known: 3, unknown: 2 } }
+  assert.equal(trialInsightsAdmission(sources, 'project-atlas').admitted, true)
+
   const unknownMetric = { ...scoped, metrics: [{ id: 'x', label: '审阅计时覆盖', value: null }], sampleCount: null }
   const admitted = trialInsightsAdmission(unknownMetric, 'project-atlas')
   assert.equal(admitted.admitted, true)

@@ -1,0 +1,63 @@
+{
+  "subject": "real App two-project daily flow with controlled fixture execution (no vendor model/native)",
+  "viewport": "1440x900",
+  "projects": [
+    "项目 Alpha",
+    "项目 Beta"
+  ],
+  "conversations": [
+    "conv-alpha-daily",
+    "conv-beta-daily"
+  ],
+  "profileUsed": [
+    "profile-fixture-question",
+    "profile-fixture-pass"
+  ],
+  "posts": [
+    "/v1/commands",
+    "/v1/commands",
+    "/v1/works/2739ab69482a38cf3bb3c447a5c7cf51/review-activity",
+    "/v1/commands",
+    "/v1/works/2739ab69482a38cf3bb3c447a5c7cf51/review-activity",
+    "/v1/commands",
+    "/v1/works/beb5f301832264a77ffcbe455bf0d89d/review-activity",
+    "/v1/commands",
+    "/v1/works/beb5f301832264a77ffcbe455bf0d89d/review-activity"
+  ],
+  "modelCalls": 0,
+  "reviewActivityConflicts": 2,
+  "generatedAt": "2026-11-14T09:33:02.943Z",
+  "results": [
+    {
+      "id": "ALPHA-QUESTION-VERIFY-EVIDENCE-ACCEPT",
+      "status": "PASS",
+      "ms": 2491,
+      "detail": "Alpha delegation, native question, answer, PASS verification, evidence and acceptance"
+    },
+    {
+      "id": "ALPHA-TRIAL-IDENTITY",
+      "status": "PASS",
+      "ms": 116,
+      "detail": "the trial view shows the Alpha project, conversation and fixture execution honestly"
+    },
+    {
+      "id": "BETA-DRAFT-AND-DELIVERY",
+      "status": "PASS",
+      "ms": 2160,
+      "detail": "Beta delegation runs the pass fixture through verification and acceptance"
+    },
+    {
+      "id": "BETA-TRIAL-AND-DRAFT-PRESERVED",
+      "status": "PASS",
+      "ms": 117,
+      "detail": "the second project keeps its own conversation, draft and delivery"
+    },
+    {
+      "id": "NO-MODEL-NO-UNEXPECTED-POSTS",
+      "status": "PASS",
+      "ms": 0,
+      "detail": "only explicit product commands were sent; no model or hidden write occurred"
+    }
+  ],
+  "failures": []
+}

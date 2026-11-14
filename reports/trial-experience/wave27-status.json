@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 3,
+  "owner": "F",
+  "wave": "product-wave-27",
+  "goal": "identity-stable real App daily experience, two-project delivery flow, J recipe preview, trusted G scope/coverage, complete handoff",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "baseMain": "6787bd0",
+  "mergedMain": "ca01e17",
+  "mergeCommit": "db1b96c",
+  "fixedCandidate": "3037cbe756795726a74bc657d6e5bab55b433788",
+  "mainAppSource": "967dc0c677333ec307c215c0ed67e838b5487d92",
+  "importedSources": [
+    "apps/console/src/trial/TrialWorkspace.tsx",
+    "apps/console/src/trial/index.ts",
+    "apps/console/src/trial/insights.ts",
+    "apps/console/src/trial/useTrialReadiness.ts",
+    "apps/console/test/trial/trial-view.case.ts"
+  ],
+  "finalSourceCommit": null,
+  "state": "DELIVERED_WITH_DECLARED_DEPENDENCIES",
+  "fiveResults": {
+    "R1_F4": "identity-stable actual App entry: same-transport identity change, auth failure, late response, disabled mid-flight",
+    "R2_F8": "two-project real App daily closure: delegation, native question, answer, PASS verification, evidence, acceptance in both projects",
+    "R3_F12": "J recipe read-only preview: applicability, missing inputs, registered checks/profiles, prepare callback, no runner",
+    "R4_F16": "G scope/window/coverage gate with truncated/sources/partial/unknown; mobile/keyboard/long/late/error",
+    "R5_F20": "current user guide, package handoff and wave27 status/report"
+  },
+  "phases": {
+    "F1": "DELIVERED main 967dc0c identity wiring audited and compatible",
+    "F2": "DELIVERED opaque identity isolation incl. same transport; disabled/late/error",
+    "F3": "DELIVERED hooks/props are main-consumable; no F src edits by main needed",
+    "F4": "DELIVERED first result and main App 8/8 regression",
+    "F5": "DELIVERED two real fixture projects in the real App",
+    "F6": "DELIVERED drafts per conversation and across settings/trial/executor round trips",
+    "F7": "DELIVERED readonly/unknown/error remain understandable; no new authority",
+    "F8": "DELIVERED second result: two-project delegation/Q&A/evidence/acceptance",
+    "F9": "DELIVERED J suggestions as untrusted data with candidates",
+    "F10": "DELIVERED only fills original draft via optional callback; no command",
+    "F11": "DELIVERED recipe failure/loading/foreign-project/missing-input handling",
+    "F12": "DELIVERED third result with 4+screenshot and tests",
+    "F13": "DELIVERED G scope/window/coverage/truncated/sources admission",
+    "F14": "DELIVERED layer/currency/unknown presentation without aggregation",
+    "F15": "DELIVERED mobile/keyboard/long/layout audit for recipe and summary sections",
+    "F16": "DELIVERED fourth result",
+    "F17": "DELIVERED late/error/identity completeness on new read paths",
+    "F18": "DELIVERED seven-file package handoff and must-not-package list",
+    "F19": "DELIVERED updated user guide with recipes/insights/daily flow",
+    "F20": "DELIVERED fifth result and status"
+  },
+  "realInputs": {
+    "endpoints": ["GET /v1/readiness", "GET /v1/configuration", "POST /v1/session", "POST /v1/projects", "POST /v1/conversations/commands", "POST /v1/commands"],
+    "contracts": "packages/contracts/src/trial-readiness.ts (TrialReadiness, TrialNavigationAction, authorization none)",
+    "transport": "ConsoleTransport.readiness with { enabled, identity } (main trialIdentity)",
+    "recipeInput": "TrialRecipeSuggestion[] (presentation input; J/module mapping by main)",
+    "insightsInput": "TrialInsightsView with scope/window/coverage/coverageState/truncated/sources/metrics/layers/currency"
+  },
+  "recipes": {
+    "status": "TYPED_CONSUMER_AND_FIXTURES_ONLY_MAIN_NOT_WIRED",
+    "applicableRule": "status=draft, authority=none, matching current project, no missing input, all checks registered, all profiles admitted",
+    "callback": "onPrepareRecipe(suggestion) is data-only; no HTTP/model/command; one call per 300ms",
+    "foreignProject": "filtered out of the current project view"
+  },
+  "insights": {
+    "status": "GATE_READY_MAIN_NOT_PASSING_METRICS",
+    "required": ["scope.projectIds", "windowLabel", "coverage"],
+    "refusals": ["missing/empty scope", "scope excludes current project", "missing window", "missing coverage", "truncated with complete claim", "insufficient/unavailable"],
+    "unknown": "null stays unknown; sources known/unknown shown; layers and currencies stay separate"
+  },
+  "evidence": {
+    "runner": "node e2e/trial/run-all.mjs",
+    "suites": [
+      { "id": "unit", "exit": 0, "result": "16 PASS (11 state + 5 recipe)" },
+      { "id": "typecheck-app", "exit": 0 },
+      { "id": "typecheck-e2e", "exit": 0 },
+      { "id": "build", "exit": 0 },
+      { "id": "hook-async", "exit": 0, "result": "7/7" },
+      { "id": "browser-states", "exit": 0, "result": "27/27" },
+      { "id": "http-journey", "exit": 0, "result": "6/6" },
+      { "id": "app-targets", "exit": 0, "result": "6/6" },
+      { "id": "app-two-projects", "exit": 0, "result": "8/8" },
+      { "id": "app-daily-flow", "exit": 0, "result": "5/5" }
+    ],
+    "runAll": "10/10 suites exit 0",
+    "mainApp": "tests/integration/trial-workbench-browser.mjs 8/8 PASS; pageerrors0, readinessReads14, POST0, model0, eventDelta0",
+    "dailyFlow": {
+      "projects": ["项目 Alpha", "项目 Beta"],
+      "profiles": ["profile-fixture-question", "profile-fixture-pass"],
+      "conversations": ["conv-alpha-daily", "conv-beta-daily"],
+      "posts": 9,
+      "reviewActivityConflicts": 2,
+      "modelCalls": 0,
+      "acceptedWorks": 2,
+      "draftPreserved": true
+    },
+    "viewports": ["1440x900", "390x844"],
+    "browser": "Chromium (Playwright 1.65)",
+    "screenshots": "apps/console/e2e/trial/screenshots/ (state/mobile/recipes/insights/daily-flow)",
+    "visualGate": "programmatic overlap/clip/overflow/control-size/radius/shadow/font/contrast audit; session cannot consume images, so no F pixel verdict"
+  },
+  "handoff": {
+    "runtimeSources": [
+      "apps/console/src/trial/index.ts",
+      "apps/console/src/trial/TrialWorkspace.tsx",
+      "apps/console/src/trial/useTrialReadiness.ts",
+      "apps/console/src/trial/trial-view.ts",
+      "apps/console/src/trial/insights.ts",
+      "apps/console/src/trial/recipes.ts",
+      "apps/console/src/trial/trial.css"
+    ],
+    "mustNotPackage": ["apps/console/e2e/trial/**", "apps/console/test/trial/**", "harness", "fixtures", "screenshots", "temporary state"],
+    "dependencies": "existing React 18, lucide-react, @personal-agent/contracts; type-only ../transport.ts and ../configuration-labels.ts; no dependency/lock change; CSS imported by component",
+    "docs": ["reports/trial-experience/main-integration.zh-CN.md", "docs/user-guide/"]
+  },
+  "modelNativeTurns": 0,
+  "preserved": {
+    "userServicesChanged": 0,
+    "stateProfileTarLedgerTouched": false,
+    "privateTempRoots": "created under /tmp and removed",
+    "unrelatedCredentialsRead": false
+  },
+  "notTested": [
+    "real vendor model or native Codex execution (0 turns)",
+    "J project-recipes module integration in the default product",
+    "G trusted complete summary / Node-side adapter in main",
+    "installed distribution artifact acceptance (E/D scope)",
+    "manual screen-reader walkthrough, non-Chromium browsers, 200% zoom, forced colors",
+    "real server-side mid-session auth expiry (mapped copy tested via controlled rejection)"
+  ],
+  "dependencies": [
+    "main may pass recipes/insights; F gates them and hides when missing or unqualified",
+    "J owns project-recipes data; F only previews and hands draft data to the original form",
+    "G must fix nested bounds/conflict quarantine before main maps real metrics",
+    "E independently verifies the same artifact"
+  ],
+  "notes": "Historical wave25/wave26 statuses retained. No root/App/transport/CSS/contracts edits. Two review-activity 409 telemetry conflicts in the controlled daily flow are main-owned review timing behavior, recorded but not an F UI failure."
+}

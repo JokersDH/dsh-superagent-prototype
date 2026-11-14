@@ -23,20 +23,21 @@
 | 问题 | 归属 |
 | --- | --- |
 | 主对话、模型设置、项目导入、执行器目录、工作/问题/候选/来源审阅 | main（工作台组合与现有产品流程） |
-| 试用准备的状态文字、动作派生、观察区准入、本指南 | F（`apps/console/src/trial/`、`docs/user-guide/`） |
+| 试用准备的状态文字、动作派生、配方草案预览、观察区准入、本指南 | F（`apps/console/src/trial/`、`docs/user-guide/`） |
 | 安装/升级/停止/迁移与包内诊断 | D 的分发指南；H 的独立只读 preflight（若交付包含） |
 | 独立验收结论/失败断言 | E（product-acceptance） |
 | 原生执行器、业务恢复、协调器恢复 | B 的范围；未准入时不要用固定流程替代 |
 | 数据恢复/迁移内容核验 | A/C 的范围 |
+| 项目任务/检查声明与只读草案数据 | J（`packages/project-recipes/`）；F 只做预览 |
 
 F 不处理：安装命令、原生 profile 配置、数据库修复、恢复授权、真实模型计费、第二套设置页。
 
 ## 试用交班清单
 
 - 分支：`codex/g4-trial-experience`；自有路径：`apps/console/src/trial/`、`test/trial/`、`e2e/trial/`、`docs/user-guide/`、`reports/trial-experience/`。
-- 源码与范围：`reports/trial-experience/wave26-status.json`。
-- 当前 App 接线：main `a302ddc`；F 的六源原字节导入，入口为导航“试用准备”。
+- 源码与范围：`reports/trial-experience/wave27-status.json`。
+- 当前 App 接线：main `967dc0c`；F 的身份修复与四源原字节导入，入口为导航“试用准备”。
 - 证据：`apps/console/e2e/trial/report-all.json` 及各 `report-*.json`、`screenshots/`。
-- 未达依赖：G 指标未准入（观察区不显示）、原生/安装包/E 最终验收不在 F 范围。
+- 未达依赖：J 草案与 G 指标尚未接入默认产品（对应段落不显示）、原生/安装包/E 最终验收不在 F 范围。
 
 交接时只交源代码、文档和可复现证据，不交任何状态目录、凭据或用户数据。

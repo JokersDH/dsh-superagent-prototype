@@ -6,36 +6,36 @@
   },
   "viewport": "1440x900",
   "stateRootKind": "private temporary root (not committed)",
-  "generatedAt": "2026-11-14T07:33:51.221Z",
+  "generatedAt": "2026-11-14T09:32:53.206Z",
   "results": [
     {
       "id": "SHELL",
       "status": "PASS",
-      "ms": 30,
+      "ms": 39,
       "detail": "chat, works, decisions, executors, model settings and import entries all exist"
     },
     {
       "id": "TARGET-INSPECT-EXECUTOR",
       "status": "PASS",
-      "ms": 50,
+      "ms": 57,
       "detail": "inspect_executor opens the real executor directory"
     },
     {
       "id": "TARGET-IMPORT-PROJECT",
       "status": "PASS",
-      "ms": 74,
+      "ms": 60,
       "detail": "import_project opens and dismisses the real project import form"
     },
     {
       "id": "TARGET-CONFIGURE-MODEL",
       "status": "PASS",
-      "ms": 203,
+      "ms": 195,
       "detail": "configure_model opens the real model settings panel"
     },
     {
       "id": "TARGET-CONVERSATION",
       "status": "PASS",
-      "ms": 35,
+      "ms": 44,
       "detail": "open_conversation returns to the real main conversation"
     },
     {
