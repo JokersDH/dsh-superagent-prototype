@@ -51,3 +51,23 @@ test('source transport preserves optional absence but never hides authentication
     await assert.rejects(new HttpTransport().contextSources('message'), error => error instanceof TransportError && error.code === code)
   }
 })
+test('source diagnostics require explicit opt-in and retain the authoritative source schema', async t => {
+  const original = globalThis.fetch
+  t.after(() => { globalThis.fetch = original })
+  const plain = { protocol: 'context-sources/1', observedAt: at, binding, state: 'scope_changed', sources: [], omitted: [], injectionFlags: [] }
+  const scopeReview = { protocol: 'context-scope-review/1', reasons: ['selection_narrowed'], partial: true, withheldSourceCount: 1, authorization: 'none' }
+  const requests: string[] = []
+  globalThis.fetch = async (url, options) => {
+    requests.push(String(url)); assert.equal(options?.method, undefined); assert.ok(options?.signal)
+    return new Response(JSON.stringify(String(url).includes('?') ? { ...plain, scopeReview } : plain))
+  }
+  const client = new HttpTransport()
+  assert.deepEqual(await client.contextSources('message'), plain)
+  assert.equal(new URL(requests[0]!, 'http://127.0.0.1').search, '')
+  assert.deepEqual((await client.contextSources('message', { scopeReview: true }))?.scopeReview, scopeReview)
+  assert.equal(new URL(requests[1]!, 'http://127.0.0.1').search, '?scopeReview=1')
+  for (const changed of [{ withheldSourceCount: -1 }, { withheldSourceCount: 0 }, { authorization: 'granted' }, { reasons: ['unknown'] }, { partial: false }]) {
+    globalThis.fetch = async () => new Response(JSON.stringify({ ...plain, scopeReview: { ...scopeReview, ...changed } }))
+    await assert.rejects(client.contextSources('message', { scopeReview: true }))
+  }
+})

@@ -8,6 +8,7 @@ import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { ProductStore } from '../../packages/storage/dist/index.js'
 import { createProductRuntime } from '../../apps/coordinator/product/runtime.ts'
+import { ProductContextRecords } from '../../apps/coordinator/product/context-records.ts'
 import { createLocalHttpApp } from '../../apps/coordinator/http/app.ts'
 import { listenLocalHttp } from '../../apps/coordinator/http/server.ts'
 
@@ -67,12 +68,24 @@ product.start(); await product.execution.effects.idle()
 store.db.prepare('UPDATE conversation_messages SET value = ? WHERE id = ?').run(JSON.stringify({ ...store.product.messages.getById('history-frozen-source'),
   text: 'CURRENT-SOURCE-CHANGED：这是后来变化的来源，不应替换历史正文。' }), 'history-frozen-source')
 const baselineCalls = modelCalls, baselineEvents = store.events.cursor()
+let sourceScope = 'normal', sourceFault = 'none'
+const originalArtifactGet = store.artifacts.get.bind(store.artifacts)
+store.artifacts.get = id => {
+  const result = originalArtifactGet(id)
+  return sourceFault === 'missing' ? undefined : sourceFault === 'unverified' && result ? { ...result, digest: '0'.repeat(64) } : result
+}
+const records = new ProductContextRecords({ store, principal, bindings: store.workflows.assistant.contextBindings,
+  history: store.workflows.assistant.contextHistory, secret: Buffer.alloc(32, 49), now: () => now,
+  projects: () => [{ id: projectId, scope: sourceScope === 'narrow' ? { ...scope, allowedPaths: ['src/narrow/'], excludedPaths: ['src/private/'] } : scope },
+    { id: 'docs-project', scope: { ...scope, projectId: 'docs-project' } }] })
 const socket = portProbe(); socket.listen(0, '127.0.0.1'); await once(socket, 'listening')
 const port = socket.address().port; await new Promise(resolve => socket.close(resolve))
 const origin = `http://127.0.0.1:${port}`
 const api = listenLocalHttp(createLocalHttpApp({ application: product.application, principal, bootstrapToken: 'b'.repeat(64), apiToken: 'a'.repeat(64),
   mode: 'fixture', localDevelopmentAccess: true, allowedOrigins: [origin], operations: product.operations, read: {
-    ...product.read, configuration: async () => { const value = await product.read.configuration(); return readonly
+    ...product.read, contextSources: async (id, options) => sourceScope === 'normal' && sourceFault === 'none'
+      ? product.read.contextSources(id, options) : records.sources(id, options),
+    configuration: async () => { const value = await product.read.configuration(); return readonly
       ? { ...value, contextPreviewAvailable: false, assistantContextAvailable: false } : value },
   } }), 0)
 await once(api, 'listening')
@@ -192,10 +205,118 @@ try {
     assert.equal(await historyTab.getAttribute('aria-selected'), 'true')
     assert.deepEqual(errors, []); assert.equal(modelCalls, baselineCalls)
   })
+  await check('SCOPE-EXPLANATION-IS-EXPLICIT-READ-ONLY-AND-RETRIABLE', async () => {
+    await page.goto(`${origin}/?conversation=${conversationId}`); await openHistory()
+    await dialog.getByRole('button', { name: `查看使用记录：${targetText}`, exact: true }).click()
+    const sources = dialog.getByRole('region', { name: '原始上下文内容', exact: true })
+    await sources.getByRole('button', { name: '查看范围说明', exact: true }).waitFor()
+    let reads = 0
+    const count = request => { if (new URL(request.url()).searchParams.get('scopeReview') === '1') reads++ }
+    page.on('request', count)
+    assert.equal(reads, 0)
+    await sources.getByRole('button', { name: '查看范围说明', exact: true }).click()
+    await sources.getByRole('region', { name: '来源范围说明', exact: true }).waitFor()
+    assert.equal(reads, 1)
+    assert.match(await sources.textContent(), /PAYMENT-HISTORY/)
+    await sources.getByRole('button', { name: '重新读取来源正文', exact: true }).click()
+    await sources.getByRole('button', { name: '查看范围说明', exact: true }).waitFor()
+    await page.route('**/context/sources?scopeReview=1', route => route.abort())
+    await sources.getByRole('button', { name: '查看范围说明', exact: true }).click()
+    await sources.getByRole('alert').filter({ hasText: '范围说明暂时无法读取' }).waitFor()
+    assert.match(await sources.textContent(), /PAYMENT-HISTORY/)
+    await page.unroute('**/context/sources?scopeReview=1')
+    await sources.getByRole('button', { name: '重试范围说明', exact: true }).click()
+    await sources.getByRole('region', { name: '来源范围说明', exact: true }).waitFor()
+    page.off('request', count)
+    assert.equal(modelCalls, baselineCalls); assert.equal(store.events.cursor(), baselineEvents)
+  })
+  await check('MISSING-OPTIONAL-DIAGNOSTICS-AND-BAD-IDENTITY-DO-NOT-REPLACE-THE-BODY', async () => {
+    const sources = dialog.getByRole('region', { name: '原始上下文内容', exact: true })
+    const refresh = async () => { await sources.getByRole('button', { name: '重新读取来源正文', exact: true }).click(); await sources.getByRole('button', { name: '查看范围说明', exact: true }).waitFor() }
+    await refresh()
+    await page.route('**/context/sources?scopeReview=1', async route => {
+      const response = await route.fetch(), value = await response.json(); delete value.scopeReview
+      await route.fulfill({ response, json: value })
+    })
+    await sources.getByRole('button', { name: '查看范围说明', exact: true }).click()
+    await sources.getByRole('status').filter({ hasText: '范围说明暂不可用' }).waitFor()
+    assert.match(await sources.textContent(), /PAYMENT-HISTORY/)
+    await page.unroute('**/context/sources?scopeReview=1'); await refresh()
+    await page.route('**/context/sources?scopeReview=1', async route => {
+      const response = await route.fetch(), value = await response.json(); value.binding.messageId = 'foreign-message'
+      await route.fulfill({ response, json: value })
+    })
+    await sources.getByRole('button', { name: '查看范围说明', exact: true }).click()
+    await sources.getByRole('alert').filter({ hasText: '范围说明暂时无法读取' }).waitFor()
+    assert.match(await sources.textContent(), /PAYMENT-HISTORY/)
+    await page.unroute('**/context/sources?scopeReview=1')
+  })
+  await check('ACTUAL-STATE-AND-SCOPE-DIAGNOSTICS-HIDE-UNVERIFIED-BODIES', async () => {
+    const sources = dialog.getByRole('region', { name: '原始上下文内容', exact: true })
+    for (const [selection, fault, title] of [['narrow', 'none', '当前只读选择与冻结时不同'], ['normal', 'missing', '冻结原文文件缺失'], ['normal', 'unverified', '无法核对冻结原文']]) {
+      sourceScope = selection; sourceFault = fault
+      await sources.getByRole('button', { name: '重新读取来源正文', exact: true }).click()
+      await sources.getByText(title, { exact: true }).waitFor()
+      await sources.getByRole('button', { name: '查看范围说明', exact: true }).click()
+      const explanation = sources.getByRole('region', { name: '来源范围说明', exact: true }); await explanation.waitFor()
+      assert.equal(await sources.locator('.context-source').count(), 0)
+      assert.doesNotMatch(await sources.textContent(), /PAYMENT-HISTORY/)
+      assert.doesNotMatch(await explanation.textContent(), /src\/private|authority|granted|允许执行/)
+      if (selection === 'narrow') {
+        assert.match(await explanation.textContent(), /当前允许路径比冻结时更窄/)
+        assert.match(await explanation.textContent(), /新增了排除路径/)
+        assert.match(await explanation.textContent(), /另有 \d+ 条冻结来源未展示/)
+      } else assert.doesNotMatch(await explanation.textContent(), /另有 0|未发现范围变化/)
+    }
+    assert.equal(modelCalls, baselineCalls); assert.equal(store.events.cursor(), baselineEvents)
+  })
+  await check('DIAGNOSTIC-DESKTOP-MOBILE-KEYBOARD-AND-LAYOUT', async () => {
+    sourceScope = 'narrow'; sourceFault = 'none'
+    const sources = dialog.getByRole('region', { name: '原始上下文内容', exact: true })
+    await sources.getByRole('button', { name: '重新读取来源正文', exact: true }).click()
+    const button = sources.getByRole('button', { name: '查看范围说明', exact: true })
+    await button.focus(); await page.keyboard.press('Enter')
+    await sources.getByRole('region', { name: '来源范围说明', exact: true }).waitFor()
+    assert.equal(await page.evaluate(() => document.activeElement?.textContent?.trim()), '刷新范围说明')
+    for (const [name, width, height] of [['scope-desktop', 1440, 900], ['scope-mobile', 390, 844]]) {
+      await page.setViewportSize({ width, height }); await page.evaluate(() => document.fonts.ready)
+      await dialog.evaluate(element => { element.scrollTop = 0 })
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
+      assert.equal(await dialog.evaluate(element => element.scrollWidth > element.clientWidth + 1), false)
+      const boxes = await sources.locator('.context-record-heading, .context-scope-review').evaluateAll(elements => elements.map(element => {
+        const rect = element.getBoundingClientRect(); return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom }
+      }))
+      assert.equal(boxes.length, 2); assert.ok(boxes[1].top >= boxes[0].bottom)
+      if (!values['no-capture']) await page.screenshot({ path: join(output, `${name}.png`), fullPage: true, animations: 'disabled' })
+    }
+    assert.deepEqual(errors, []); assert.equal(modelCalls, baselineCalls); assert.equal(store.events.cursor(), baselineEvents)
+  })
+  await check('DELAYED-DIAGNOSTIC-CANNOT-REPLACE-A-NEWLY-SELECTED-RECORD', async () => {
+    await page.setViewportSize({ width: 1440, height: 900 }); sourceScope = 'normal'; sourceFault = 'none'
+    const sources = dialog.getByRole('region', { name: '原始上下文内容', exact: true })
+    await sources.getByRole('button', { name: '重新读取来源正文', exact: true }).click()
+    await sources.getByRole('button', { name: '查看范围说明', exact: true }).waitFor()
+    let markIntercepted, release
+    const intercepted = new Promise(resolve => { markIntercepted = resolve }), gate = new Promise(resolve => { release = resolve })
+    await page.route('**/context/sources?scopeReview=1', async route => {
+      const response = await route.fetch(), value = await response.json(); markIntercepted(); await gate
+      await route.fulfill({ response, json: value })
+    })
+    try {
+      await sources.getByRole('button', { name: '查看范围说明', exact: true }).click(); await intercepted
+      await dialog.getByRole('button', { name: /^查看使用记录：历史需求/ }).first().click()
+      await sources.getByRole('button', { name: '查看范围说明', exact: true }).waitFor()
+      const delivered = page.waitForResponse(response => new URL(response.url()).searchParams.get('scopeReview') === '1')
+      release(); await delivered
+      assert.equal(await sources.getByRole('region', { name: '来源范围说明', exact: true }).count(), 0)
+      assert.match(await sources.locator('.context-record-summary').textContent(), /^1 条原始来源/)
+      assert.equal(modelCalls, baselineCalls); assert.equal(store.events.cursor(), baselineEvents)
+    } finally { release(); await page.unroute('**/context/sources?scopeReview=1') }
+  })
 } finally {
   await browser?.close(); await vite.close(); api.closeAllConnections(); await new Promise(resolve => api.close(resolve))
   await product.close(); store.close(); rmSync(root, { recursive: true, force: true })
-  const report = { status: cases.length === 8 && cases.every(value => value.status === 'PASS') ? 'PASS_CONTEXT_HISTORY_WORKBENCH' : 'FAIL',
+  const report = { status: cases.length === 13 && cases.every(value => value.status === 'PASS') ? 'PASS_CONTEXT_HISTORY_WORKBENCH' : 'FAIL',
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'tests/integration/context-history-browser.mjs'], { encoding: 'utf8' }).trim() === '',
     checkedAt: new Date().toISOString(), cases, errors, realModelTurns: 0, nativeTurnStarts: 0,
