@@ -1,0 +1,76 @@
+{
+  "protocol": "wave24-independent-snapshot-restores/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "snapshot-v1-materialized",
+      "status": "PASS",
+      "detail": {
+        "snapshotProtocol": "workflow-snapshot/1",
+        "snapshotDbSha": "d13af03e98f05d01c407453e9e21b2fe3799cb9811f2068f7d52ad6d1cb1bab1",
+        "bundleEvidenceFormat": 2
+      }
+    },
+    {
+      "id": "snapshot-v1-independent-restore",
+      "status": "PASS",
+      "detail": {
+        "formatVersion": 1,
+        "restoredDbSha": "d13af03e98f05d01",
+        "snapshotDbSha": "d13af03e98f05d01",
+        "works": 1,
+        "questions": 1,
+        "answers": 1,
+        "bundleIndependent": true,
+        "cDriver": {
+          "status": "verified-flow",
+          "bound": true,
+          "requestedDigest": "c8f3a4216382bad758448453ba3abc621c3baf5b1ce0beef55728152023c6e6a",
+          "actualHealthDigest": "c8f3a4216382bad758448453ba3abc621c3baf5b1ce0beef55728152023c6e6a",
+          "assertions": 16,
+          "cleanup": {
+            "owned": true,
+            "attempted": true,
+            "stopped": true,
+            "detail": "pa-stop-verified"
+          }
+        }
+      }
+    },
+    {
+      "id": "snapshot-v2-materialized",
+      "status": "PASS",
+      "detail": {
+        "snapshotProtocol": "workflow-snapshot/2",
+        "snapshotDbSha": "d13af03e98f05d01c407453e9e21b2fe3799cb9811f2068f7d52ad6d1cb1bab1",
+        "bundleEvidenceFormat": 2
+      }
+    },
+    {
+      "id": "snapshot-v2-independent-restore",
+      "status": "PASS",
+      "detail": {
+        "formatVersion": 2,
+        "restoredDbSha": "d13af03e98f05d01",
+        "snapshotDbSha": "d13af03e98f05d01",
+        "works": 1,
+        "questions": 1,
+        "answers": 1,
+        "bundleIndependent": true,
+        "cDriver": {
+          "status": "verified-flow",
+          "bound": true,
+          "requestedDigest": "235b2ef2314f5365323d01eb8c49c7767a93c4ef02e32263a6fbbebeb2412db6",
+          "actualHealthDigest": "235b2ef2314f5365323d01eb8c49c7767a93c4ef02e32263a6fbbebeb2412db6",
+          "assertions": 16,
+          "cleanup": {
+            "owned": true,
+            "attempted": true,
+            "stopped": true,
+            "detail": "pa-stop-verified"
+          }
+        }
+      }
+    }
+  ]
+}

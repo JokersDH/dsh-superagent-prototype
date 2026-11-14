@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /** Each snapshot format is materialized independently, bundled independently and restored by the package CLI. */
 import { spawnSync } from 'node:child_process'
-import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync } from 'node:fs'
+import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
 import { createHash } from 'node:crypto'
 
-const { values } = parseArgs({ options: { install: { type: 'string' }, business: { type: 'string' }, json: { type: 'boolean', default: false } } })
+const { values } = parseArgs({ options: { install: { type: 'string' }, business: { type: 'string' }, message: { type: 'string' }, project: { type: 'string', default: 'project-personal-dialogue' }, json: { type: 'boolean', default: false } } })
 const root = mkdtempSync(join(tmpdir(), 'pa-snapshot-restores-')); chmodSync(root, 0o700)
 const result = { protocol: 'wave24-independent-snapshot-restores/1', status: 'FAIL', steps: [] }
 const step = (id, status, detail) => result.steps.push({ id, status, detail })
@@ -52,11 +52,26 @@ try {
     const db = join(restoredState, 'state.sqlite')
     const restoredDbSha = sha(db), snapshotDbSha = created.manifest.database.sha256
     if (restoredDbSha !== snapshotDbSha) throw new Error(`v${version} restored DB sha differs from snapshot DB sha`)
+    let cDriver = null
+    if (values.message) {
+      const appCfg = join(root, `c-v${version}-config`), appCache = join(root, `c-v${version}-cache`), appLogs = join(root, `c-v${version}-logs`), appWs = join(root, `c-v${version}-ws`)
+      for (const p of [appCfg, appCache, appLogs, appWs]) { mkdirSync(p, { mode: 0o700 }); chmodSync(p, 0o700) }
+      try { rmSync(join(restoredState, 'instance.json')) } catch {}
+      const appInstall = join(install, 'app'), paEntry = join(appInstall, 'apps/launcher/bin/pa.mjs')
+      const firstApp = run(process.execPath, [paEntry, 'first-run', '--json', '--install', appInstall, '--config-root', appCfg, '--data-root', restoredState, '--cache-root', appCache, '--logs-root', appLogs, '--workspace-root', appWs])
+      if (firstApp.status !== 0) throw new Error(`v${version} app first-run failed`)
+      const model = join(root, `c-v${version}-model.json`); writeFileSync(model, JSON.stringify({ baseURL: 'http://127.0.0.1:59999/v1', apiKey: 'wave24-driver-key', model: 'fixture-model', allowedModels: ['fixture-model'], allowInsecureHttp: true }), { mode: 0o600 })
+      const driver = '/Users/hh/Desktop/joker/superagent-agent-c/packages/context/tools/personal-review-driver.mjs'
+      const out = run(process.execPath, [driver, '--dialect', 'package', '--install', appInstall, '--state', restoredState, '--data-root', restoredState, '--config-root', appCfg, '--cache-root', appCache, '--logs-root', appLogs, '--workspace-root', appWs, '--project', values.project, '--allow-path', '.', '--message', values.message, '--console-port', String(57200 + version), '--api-port', String(57210 + version), '--model-config', model, '--pa-entry', paEntry, '--identity-module', join(appInstall, 'apps/coordinator/product/restored-review.ts'), '--deadline-ms', '180000', '--readiness-ms', '60000'])
+      let parsed = null; try { parsed = JSON.parse(out.stdout) } catch {}
+      if (out.status !== 0 || parsed?.status !== 'verified-flow') throw new Error(`v${version} C driver failed: ${out.status} code=${parsed?.code ?? parsed?.failure?.code ?? '?'} message=${parsed?.message ?? parsed?.failure?.message ?? '?'} assertions=${JSON.stringify(parsed?.assertions?.filter((a) => !a.ok) ?? []).slice(0,400)} stderr=${String(out.stderr).slice(0,300)}`)
+      cDriver = { status: parsed.status, bound: parsed.identity?.bound, requestedDigest: parsed.identity?.requestedDigest, actualHealthDigest: parsed.identity?.actualHealthDigest, assertions: parsed.assertions?.length ?? 0, cleanup: parsed.cleanup }
+    }
     const store = new storage.ProductStore({ path: db })
     const got = { works: store.db.prepare('SELECT id FROM works ORDER BY id').all().map((r) => String(r.id)), questions: store.db.prepare('SELECT id FROM user_questions ORDER BY id').all().map((r) => String(r.id)), answers: store.db.prepare('SELECT answer_id FROM answers ORDER BY answer_id').all().map((r) => String(r.answer_id)) }
     store.close()
     if (JSON.stringify(got.works) !== JSON.stringify(original.works.map((r) => r.id)) || JSON.stringify(got.questions) !== JSON.stringify(original.questions.map((r) => r.id)) || JSON.stringify(got.answers) !== JSON.stringify(original.answers.map((r) => r.id))) throw new Error(`v${version} original IDs not preserved`)
-    step(`snapshot-v${version}-independent-restore`, 'PASS', { formatVersion: version, restoredDbSha: restoredDbSha.slice(0, 16), snapshotDbSha: snapshotDbSha.slice(0, 16), works: got.works.length, questions: got.questions.length, answers: got.answers.length, bundleIndependent: true })
+    step(`snapshot-v${version}-independent-restore`, 'PASS', { formatVersion: version, restoredDbSha: restoredDbSha.slice(0, 16), snapshotDbSha: snapshotDbSha.slice(0, 16), works: got.works.length, questions: got.questions.length, answers: got.answers.length, bundleIndependent: true, cDriver })
   }
   result.status = result.steps.every((s) => s.status === 'PASS') ? 'PASS' : 'FAIL'
 } catch (error) { result.error = String(error?.stack ?? error) }

@@ -5,24 +5,105 @@
   "base": "bcd4d4c",
   "mergedMain": "d3a0faa",
   "mainSource": "fdb3f16 readiness + 4b42a90 UI",
-  "head": "PENDING",
-  "status": "CANDIDATE_MILESTONE_1",
+  "head": "a685e07",
+  "status": "CANDIDATE_MILESTONE_2",
   "scopeNote": "Wave-25 D four milestones. Milestone 1 is the safety tool and full resource list; later milestones add A→C same-manifest consumption, readiness/F package and ordinary/reopen/support. E remains independent; zero real vendor/model/native turns.",
-  "ownedPaths": ["apps/launcher/", "packages/portability/", "tools/distribution/"],
+  "ownedPaths": [
+    "apps/launcher/",
+    "packages/portability/",
+    "tools/distribution/"
+  ],
   "resourceSet": {
-    "roles": ["launcher", "api", "console"],
-    "perResourceFields": ["pid", "processStart", "uid", "role", "entry", "capturedTokens", "root", "config", "operation"],
+    "roles": [
+      "launcher",
+      "api",
+      "console"
+    ],
+    "perResourceFields": [
+      "pid",
+      "processStart",
+      "uid",
+      "role",
+      "entry",
+      "capturedTokens",
+      "root",
+      "config",
+      "operation"
+    ],
     "unknownPolicy": "mixed [valid,null] keeps null as record_missing_in_mixed_set; unknown retains private state; group signal only for spawn-before-record after fresh launcher proof",
     "signalPolicy": "each TERM and each KILL re-reads target identity; identity change/missing/unreadable stops that signal; no stale proof reuse"
   },
   "phases": {
-    "d1": {"status": "PASS", "summary": "Fixed baseline and listed every live role/field. Old prerecord/childstart/sibling/null results retained; new child config/captured argv/entry/operation and mixed-null gaps are explicitly closed by controls, not by a single local PASS."},
-    "d2": {"status": "PASS", "summary": "TERM wait then KILL no longer reuses targets/proof: every signal re-reads only its target (launcher or one child) and records fresh evidence. Identity change, missing target or failed read stops that signal and keeps UNKNOWN."},
-    "d3": {"status": "PASS", "summary": "Child identity binds actual config, captured full argv, entry, role and startup operation; captured tokens must equal current tokens; sibling roots and wrong entries refuse. Mixed [valid,null] preserves the unknown member."},
-    "d4": {"status": "PASS", "summary": "14 pure controls pass (own positive, child start/config/entry, sibling, wrong operation, PID reuse, missing, cleanup failure, repeated finally, stop timeout, mixed null, empty). Two bounded live faults: before-record UNKNOWN retained with fresh group signal; after-seed CLEAN. Normal same-store/nonempty/real still pass.", "evidence": ["controls.json", "fault-before-record.json", "fault-after-seed.json"]}
+    "d1": {
+      "status": "PASS",
+      "summary": "Fixed baseline and listed every live role/field. Old prerecord/childstart/sibling/null results retained; new child config/captured argv/entry/operation and mixed-null gaps are explicitly closed by controls, not by a single local PASS."
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "TERM wait then KILL no longer reuses targets/proof: every signal re-reads only its target (launcher or one child) and records fresh evidence. Identity change, missing target or failed read stops that signal and keeps UNKNOWN."
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Child identity binds actual config, captured full argv, entry, role and startup operation; captured tokens must equal current tokens; sibling roots and wrong entries refuse. Mixed [valid,null] preserves the unknown member."
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "14 pure controls pass (own positive, child start/config/entry, sibling, wrong operation, PID reuse, missing, cleanup failure, repeated finally, stop timeout, mixed null, empty). Two bounded live faults: before-record UNKNOWN retained with fresh group signal; after-seed CLEAN. Normal same-store/nonempty/real still pass.",
+      "evidence": [
+        "controls.json",
+        "fault-before-record.json",
+        "fault-after-seed.json"
+      ]
+    },
+    "d5": {
+      "status": "PASS_WITH_DIRECT_BINDING_LIMIT",
+      "summary": "A producer + separate-PID reader verified complete original subject on the kept same-Store root; a tampered manifest was rejected before body read. C package driver verified-flow on the same exact Store. LIMIT: C did not consume the A manifest as an input object; that direct binding remains NOT_TESTED."
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "From the same original Store create/verify workflow-snapshot/1 and /2; each format separately materialized, independently bundled and restored to its own new root. Each restored root was then consumed by the C unique driver and returned verified-flow with bound requested/live digest. Each DB sha equals its snapshot manifest; original Work/question/answer IDs preserved. Bad manifest is rejected by the A reader."
+    }
   },
-  "testLayers": {"controls": {"steps": 14, "status": "PASS"}, "sameStore": {"steps": 4, "status": "PASS"}, "nonempty": {"steps": 11, "status": "PASS"}, "real": {"steps": 4, "status": "PASS"}, "faultBeforeRecord": {"status": "FAIL_EXPECTED_UNKNOWN_RETAINED"}, "faultAfterSeed": {"status": "FAIL_EXPECTED_CLEAN"}},
-  "notDone": ["A→C same-manifest consumption", "readiness/F package freeze", "two snapshot package consumers via single C driver", "ordinary cold/upgrade/reopen/support for wave25 package", "E independent verdict"],
-  "limitations": ["No real vendor/model/native turns", "No private permission/target/native claim", "Old 3b package is a positive control only; it cannot certify wave25 readiness/F bytes"],
-  "evidence": ["tools/distribution/reports/wave25/*.json"]
+  "testLayers": {
+    "controls": {
+      "steps": 14,
+      "status": "PASS"
+    },
+    "sameStore": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "nonempty": {
+      "steps": 11,
+      "status": "PASS"
+    },
+    "real": {
+      "steps": 4,
+      "status": "PASS"
+    },
+    "faultBeforeRecord": {
+      "status": "FAIL_EXPECTED_UNKNOWN_RETAINED"
+    },
+    "faultAfterSeed": {
+      "status": "FAIL_EXPECTED_CLEAN"
+    },
+    "dualSnapshotC": {
+      "steps": 4,
+      "status": "PASS"
+    }
+  },
+  "notDone": [
+    "readiness/F package freeze",
+    "ordinary cold/upgrade/reopen/support for wave25 package",
+    "E independent verdict",
+    "C directly consuming A manifest object"
+  ],
+  "limitations": [
+    "No real vendor/model/native turns",
+    "No private permission/target/native claim",
+    "Old 3b package is a positive control only; it cannot certify wave25 readiness/F bytes"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave25/*.json"
+  ]
 }
