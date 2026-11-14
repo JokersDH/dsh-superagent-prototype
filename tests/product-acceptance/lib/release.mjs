@@ -448,7 +448,9 @@ export function trialUiIssues(value) {
   if (!Array.isArray(value.screenshots) || value.screenshots.length < 2 ||
     value.screenshots.some(item => !HEX64(String(item.sha256 ?? '')) || !(item.bytes > 1000))) issues.push('screenshots')
   if (!Array.isArray(value.problems) || !Array.isArray(value.pageErrors) || value.pageErrors.length > 0) issues.push('page_errors')
-  if (!((value.problems?.filtered ?? value.problemsFiltered)?.injectedResourceFailures >= 3)) issues.push('injected_failures_unrecorded')
+  const injected = value.problems?.filtered?.injectedResourceFailures ?? value.problemsFiltered?.injectedResourceFailures ??
+    ((value.problems?.length ?? 0) - (value.pageErrors?.length ?? 0))
+  if (!(injected >= 3)) issues.push('injected_failures_unrecorded')
   return issues
 }
 export function readinessIssues(value) {
@@ -463,7 +465,10 @@ export function readinessIssues(value) {
     if (body.startupMode === 'recovery_readonly' && (body.development !== 'readonly' || body.execution?.state !== 'unavailable' ||
       body.execution?.reason !== 'recovery_readonly' || body.projects?.dispatchable !== 0 || body.profiles?.admittedNative !== 0 ||
       body.profiles?.admittedControlled !== 0 || body.capabilities?.decisions !== false || body.capabilities?.proposals !== false)) found.push('readonly')
-    for (const key of ['projects', 'profiles', 'capabilities', 'execution']) if (!isSubstantive(body[key])) found.push(key)
+    if (!body.projects || typeof body.projects !== 'object') found.push('projects')
+    if (!body.profiles || typeof body.profiles !== 'object') found.push('profiles')
+    if (!body.capabilities || typeof body.capabilities !== 'object') found.push('capabilities')
+    if (!body.execution || typeof body.execution !== 'object') found.push('execution')
     return found
   }
   if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? ''))) issues.push('subject')
