@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "fe6c5e6",
+  "base": "de74e66",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -139,16 +139,31 @@
       "handover": "OBSERVED - controlled endpoint 5/0 and a real spawned Runner child 6/0: A serves all three callbacks, leaves with a pending native write, B takes the lease, the write becomes indeterminate, A's reply is refused, B replays the same original ids",
       "sigkillResume": "CORE OBSERVED - real OS SIGKILL of a separate coordinator process while the Runner keeps running; a new PID resumes the same attempt and epoch with the same original fact ids; begin refused as duplicate_begin; re-fed deliver keeps its original command id",
       "epochAckResources": "OBSERVED - stale epoch refused as identity_mismatch while current epoch accepted; late receipt refused; after stop admission closed, state terminated and every tracked writer quiescent",
-      "compileFaultsClose": "OBSERVED - direct strict compile of 7 modules and the attach consumer, explicit capacity backpressure, mid-callback detach fails indeterminate, idempotent close with no lease and nothing pending"
+      "compileFaultsClose": "OBSERVED - direct strict compile of 7 modules and the attach consumer, explicit capacity backpressure, mid-callback detach fails indeterminate, idempotent close with no lease and nothing pending",
+      "B11_answerAckWindow": "OBSERVED - begin received exactly once and the answer written once and received once, counted from the receiver log and durable receipts; no resend after the receipts existed; one question, one attempt, one binding"
     },
     "notReached": {
-      "B11_answerAckWindow": "NOT_REACHED - the begin window is closed on the live lane, but the windows that need the original Broker question/answer (write-before, after-receiver-before-ACK, before-receipt, after-receipt) are not counted",
       "B13_currentCandidate": "NOT_REACHED - same Work/Ticket/Assignment continuing to a registered verifier/check, artifact and current candidate after recovery",
       "B14_manualAccept": "NOT_REACHED - explicit human accept of the current candidate binding acceptanceRef/verification/candidate/artifact to the original Work; the product lane only reaches a recorded answer (b18)",
       "B15_slots": "NOT_REACHED - the 2-then-4 slot matrix with normal/waiting/handover/SIGKILL/unknown/stop/delivered mixes, per-slot isolation of identity/generation/credential/cursor/payload/receipt and the original scheduler backpressure",
       "B9B11_singleChain": "NOT_REACHED as one chain - the pieces above are separate observations, and the packet requires the old coordinator's confirmed exit, the new process's original native question and answer, the three callbacks and the ACK/unknown semantics to close on ONE original business chain",
-      "vendorOrGateway": "not observed and not claimed anywhere"
+      "vendorOrGateway": "not observed and not claimed anywhere",
+      "B11_partialRemaining": "NOT_REACHED - the intermediate windows (write-before, after-receiver-before-ACK, before-receipt, after-receipt) are not separated into four counted points; only the closed-window result is counted"
     },
     "nextStep": "drive B11-B15 on the product lane: reach the Broker question/answer through the fake-executable product runtime, count the four ACK windows instead of trusting own send marks, then the recovered verifier/current candidate, explicit human accept, and finally the 2/4 slot matrix with per-slot isolation"
+  },
+  "item5_answerAckWindow": {
+    "status": "OBSERVED on the real product lane",
+    "harness": "tests/native-acceptance/b27-ack-windows.mjs",
+    "result": "5 PASS / 0 FAIL / 1 NOT_TESTED",
+    "method": "counted from the receiver log and the durable rows, not from the caller's own send marks",
+    "cases": [
+      "B27-ACK-SAME-WORK-AND-QUESTION - one Work reached one attempt with a real Broker question",
+      "B27-ACK-BEGIN-RECEIVED-ONCE - the receiver log records exactly one begin at epoch 1",
+      "B27-ACK-ANSWER-WINDOW - the answer was recorded and the writer received it exactly once, with durable fact receipts present",
+      "B27-ACK-NO-RESEND-AFTER-RECEIPT - after the receipts existed the receiver still shows exactly one begin and one answer, so nothing was resent in the bounded window",
+      "B27-ACK-SAME-QUESTION-AND-ATTEMPT - the same question, attempt and binding carry the answer, with no second question created"
+    ],
+    "correction": "the first assertion expected the answered question to remain in the pending projection; it empties after answering, so the durable user_questions row is what proves the chain stayed on one question"
   }
 }
