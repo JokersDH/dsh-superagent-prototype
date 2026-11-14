@@ -11,7 +11,7 @@
   "importedComponentSource": "fad070fb1d0a7586ac1059dd7aacba0d869e9658",
   "previousActualSource": "2684773843b9332df548121d2c64762f6814672b",
   "mergeCommit": "797dd82",
-  "finalSourceCommit": null,
+  "finalSourceCommit": "dac5577",
   "state": "DELIVERED_WITH_DECLARED_DEPENDENCIES",
   "ownedPaths": [
     "apps/console/src/trial/",

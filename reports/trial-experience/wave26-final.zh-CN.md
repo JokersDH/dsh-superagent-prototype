@@ -1,6 +1,6 @@
 # F 包 wave-26 最终报告：真实试用工作台与日常流程
 
-日期：2026-11-14 · 分支 `codex/g4-trial-experience` · 基线 main `6787bd0`（已合并），真实 App 接线 `a302ddc`，本包最终源码提交在 `wave26-status.json` 记录。
+日期：2026-11-14 · 分支 `codex/g4-trial-experience` · 基线 main `6787bd0`（已合并），真实 App 接线 `a302ddc`，本包最终源码提交 `dac5577`（之后仅有文档/状态更新）。
 
 ## 结果概要
 
