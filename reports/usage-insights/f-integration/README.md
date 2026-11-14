@@ -5,13 +5,23 @@ unknown/coverage/限制。main 负责在根 workspace 注册 `@personal-agent/us
 
 ## 契约
 
-```ts
-import { analyzeUsageInsights, toInsightConsumerView } from '@personal-agent/usage-insights'
-import type { UsageInsightsSummary } from '@personal-agent/usage-insights'
+浏览器只消费已验证的 summary，**不要** import 包根（分析依赖 Node `crypto`）：
 
-const summary: UsageInsightsSummary = /* 由 CLI collect+analyze 生成的 bundle 分析结果，或 main 注入的稳定 JSON */
+```ts
+// 浏览器 / UI bundle
+import { toInsightConsumerView, consumerAdmission } from '@personal-agent/usage-insights/browser'
+import type { UsageInsightsSummary } from '@personal-agent/usage-insights/browser'
+
+const summary: UsageInsightsSummary = /* main 的授权 Node 读取产出的稳定 JSON */
 const view = toInsightConsumerView(summary)
+const admission = consumerAdmission(view, activeProjectId)
+
+// Node / coordinator
+import { analyzeUsageInsights, composeUsageInsightsInput } from '@personal-agent/usage-insights'
 ```
+
+包 `exports` 已分离：`.` 是 Node 分析入口（含 composition、crypto、采集），`./browser` 只含
+协议类型、投影与 admission 镜像，不触及 `node:` 内置模块（有 import-graph 测试守住）。
 
 `view` 与 `apps/console/src/trial/insights.ts` 的 `TrialInsightsView` **结构完全一致**，可直接赋值：
 
@@ -19,11 +29,23 @@ const view = toInsightConsumerView(summary)
 interface TrialInsightsView {
   readonly status: 'ready' | 'insufficient_data' | 'unavailable'
   readonly windowLabel?: string
-  readonly sampleCount: number | null
   readonly coverage?: string
-  readonly metrics: readonly { readonly id: string; readonly label: string; readonly value: string | null; readonly detail?: string }[]
+  readonly coverageState?: 'complete' | 'partial' | 'unknown'
+  readonly scope?: {
+    readonly projectIds: readonly string[]
+    readonly aggregation: 'single_project' | 'declared_multi_project' | 'cross_project'
+    readonly label?: string
+  }
+  readonly sampleCount: number | null
+  readonly unknownCount?: number | null
+  readonly metrics: readonly {
+    readonly id: string; readonly label: string; readonly value: string | null
+    readonly detail?: string; readonly unit?: string
+    readonly layer?: 'observed' | 'controlled' | 'native' | 'operator' | 'unknown'
+    readonly sampleCount?: number | null
+  }[]
   readonly limitations: readonly string[]
-  readonly partial: boolean   // 新增：true 表示可用但不完整（有界来源/隔离记录/代理指标）
+  readonly partial: boolean
 }
 ```
 
@@ -35,6 +57,11 @@ G 的 `test/consumer.case.ts` 里保留该形状的本地副本并有编译期�
 | 字段 | 规则 |
 | --- | --- |
 | `status` | `unavailable`：来源缺失/未采集；`insufficient_data`：没有任何可测样本，**或**有记录被隔离（部分未知，不展示为完整）；`ready`：有真实样本且无隔离 |
+| `scope` | 指标覆盖的项目与聚合类型。`projectIds` 非空才是声明范围；**两个及以上项目是 `cross_project`**，标签写明"跨项目（N 个项目）"，不会被画成当前单项目总计 |
+| `coverageState` | `complete`/`partial`/`unknown`，与 `coverage` 文本同源 |
+| `unknownCount` | 固定为 `null`：各行统计不同对象（outcome/介入/币种），相加会编造总数 |
+| `metrics[].layer` | `observed`（产品交互记录）/`controlled`/`native`/`operator`/`unknown`，由记录层映射而来，不升级 |
+| `metrics[].sampleCount` | 不可用行为 `null`，不是 0 |
 | `partial` | `true` 表示可用但不完整：有界来源、代理指标、陈旧/缺失快照或有隔离记录。**F 必须显示这个标记，不能给"完整"徽章** |
 | `value` | 已格式化字符串；**未知保持 `null`**，不写 `0`、不写 `''`、不补默认值 |
 | `sampleCount` | 实际观察到的 outcome 数；来源缺失时为 `null`；完整空窗口为 `0` |
@@ -44,6 +71,12 @@ G 的 `test/consumer.case.ts` 里保留该形状的本地副本并有编译期�
 
 F 只能用 `status === 'ready'` 显示 `trialInsightsRows(view)`；`insufficient_data`/`unavailable`
 不显示数字。G 不产生"提升百分比""节省工时"字段，F 也不应自行计算。
+
+## 准入
+
+`consumerAdmission(view, activeProjectId?)` 与工作台 `trialInsightsAdmission` 规则一致：
+`ready`、非空 `scope.projectIds`、当前项目在范围内、`windowLabel`、`coverage`、非空指标，缺一即拒绝并给出原因。
+F 自己仍会再校验一次；Node 侧提前判可以避免生成会被 UI 静默隐藏的视图。
 
 ## 样例
 

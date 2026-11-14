@@ -1,28 +1,42 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { analyzeUsageInsights } from '../src/analyze.ts'
-import { toInsightConsumerView, observedOutcomeCount, metricRowKey } from '../src/facing.ts'
+import { consumerAdmission, consumerLayer, consumerScope, metricRowKey, observedOutcomeCount, toInsightConsumerView } from '../src/facing.ts'
 import { USAGE_INSIGHTS_COMPATIBILITY, type UsageInsightsInput } from '../src/protocol.ts'
 import { renderMarkdown } from '../src/report.ts'
 import { CONTRACT_ATLAS, CONTRACT_ORBIT, completeBundle, makeOutcome, makeWorkEvidence, unknownBundle } from './fixtures.ts'
 
 /**
- * Local copy of the trial workspace consumer type (`apps/console/src/trial/insights.ts`).
- * Keeping a copy here turns any drift on either side into a compile error instead of a runtime guess.
+ * Local copy of the trial workspace consumer contract (`apps/console/src/trial/insights.ts` at
+ * main 967dc0c). Keeping a copy here turns any drift on either side into a compile error instead of a
+ * runtime guess.
  */
+type TrialInsightsLayer = 'observed' | 'controlled' | 'native' | 'operator' | 'unknown'
 interface TrialInsightsMetric {
   readonly id: string
   readonly label: string
   readonly value: string | null
   readonly detail?: string
+  readonly unit?: string
+  readonly layer?: TrialInsightsLayer
+  readonly sampleCount?: number | null
+}
+interface TrialInsightsScope {
+  readonly projectIds: readonly string[]
+  readonly aggregation: 'single_project' | 'declared_multi_project' | 'cross_project'
+  readonly label?: string
 }
 interface TrialInsightsView {
   readonly status: 'ready' | 'insufficient_data' | 'unavailable'
   readonly windowLabel?: string
-  readonly sampleCount: number | null
   readonly coverage?: string
+  readonly coverageState?: 'complete' | 'partial' | 'unknown'
+  readonly scope?: TrialInsightsScope
+  readonly sampleCount: number | null
+  readonly unknownCount?: number | null
   readonly metrics: readonly TrialInsightsMetric[]
   readonly limitations: readonly string[]
+  readonly partial: boolean
 }
 
 test('the consumer view is structurally assignable to the trial workspace type', () => {
@@ -35,8 +49,71 @@ test('the consumer view is structurally assignable to the trial workspace type',
     assert.equal(typeof metric.id, 'string')
     assert.equal(typeof metric.label, 'string')
     assert.ok(metric.value === null || typeof metric.value === 'string')
+    assert.equal(typeof metric.unit, 'string')
   }
   assert.match(view.windowLabel ?? '', /UTC/)
+  assert.deepEqual(view.scope, { projectIds: ['project-atlas'], aggregation: 'single_project', label: 'project-atlas' })
+  assert.equal(view.coverageState, 'complete')
+  assert.equal(view.unknownCount, null, 'row unknowns count different things and are never summed')
+})
+
+test('the declared scope distinguishes one project from a cross-project aggregate', () => {
+  const single = toInsightConsumerView(analyzeUsageInsights(completeBundle()).summary)
+  assert.equal(single.scope?.aggregation, 'single_project')
+
+  const bundle = completeBundle()
+  const cross = analyzeUsageInsights({
+    ...bundle,
+    projects: [{ projectId: 'project-atlas' }, { projectId: 'project-orbit' }],
+  } as UsageInsightsInput).summary
+  const view = toInsightConsumerView(cross)
+  assert.equal(view.scope?.aggregation, 'cross_project')
+  assert.deepEqual(view.scope?.projectIds, ['project-atlas', 'project-orbit'])
+  assert.match(view.scope?.label ?? '', /跨项目/)
+  assert.ok(view.limitations.some(text => text.includes('aggregate 2 projects')))
+})
+
+test('metric rows carry their unit, evidence layer and a truthful sample count', () => {
+  const analysis = analyzeUsageInsights(completeBundle())
+  const view = toInsightConsumerView(analysis.summary)
+  const duration = view.metrics.find(metric => metric.id.startsWith('execution.durationMs'))
+  assert.equal(duration?.unit, 'ms')
+  assert.equal(duration?.layer, 'controlled')
+  assert.equal(duration?.sampleCount, 2)
+  const interventions = view.metrics.find(metric => metric.id.startsWith('interventions.total'))
+  assert.equal(interventions?.layer, 'observed', 'product interaction records are observed, not an evidence layer')
+  const queue = view.metrics.find(metric => metric.id.startsWith('queue.waitMs'))
+  assert.equal(queue?.value, null)
+  assert.equal(queue?.sampleCount, null, 'an unavailable row has no sample count, not zero')
+  assert.equal(consumerLayer('actual_native'), 'native')
+  assert.equal(consumerLayer('operator_note'), 'operator')
+  assert.equal(consumerLayer('schema'), 'unknown')
+})
+
+test('the Node admission mirror refuses the same views the workspace would hide', () => {
+  const ready = toInsightConsumerView(analyzeUsageInsights(completeBundle()).summary)
+  assert.deepEqual(consumerAdmission(ready), { admitted: true })
+  assert.deepEqual(consumerAdmission(ready, 'project-atlas'), { admitted: true })
+  assert.deepEqual(consumerAdmission(ready, 'project-orbit'), { admitted: false, reason: 'active_project_out_of_scope' })
+
+  const empty = toInsightConsumerView(analyzeUsageInsights({
+    ...completeBundle(), outcomes: [], workEvidence: [],
+  } as UsageInsightsInput).summary)
+  assert.deepEqual(consumerAdmission(empty), { admitted: false, reason: 'insufficient_data' })
+
+  const unavailable = toInsightConsumerView(analyzeUsageInsights({
+    ...completeBundle(), outcomes: [], workEvidence: [],
+    declaredCoverage: { outcomes: 'source_missing', workEvidence: 'source_missing', attention: 'source_missing' },
+  } as UsageInsightsInput).summary)
+  assert.deepEqual(consumerAdmission(unavailable), { admitted: false, reason: 'unavailable' })
+
+  const noScope = toInsightConsumerView(analyzeUsageInsights(completeBundle()).summary)
+  const { scope: _scope, ...withoutScope } = noScope
+  assert.deepEqual(consumerAdmission(withoutScope), { admitted: false, reason: 'scope_missing' })
+  assert.deepEqual(consumerAdmission({ ...noScope, windowLabel: '' }), { admitted: false, reason: 'window_missing' })
+  assert.deepEqual(consumerAdmission({ ...noScope, coverage: '' }), { admitted: false, reason: 'coverage_missing' })
+  assert.deepEqual(consumerAdmission({ ...noScope, metrics: [] }), { admitted: false, reason: 'no_metrics' })
+  assert.deepEqual(consumerScope(analyzeUsageInsights(completeBundle()).summary).projectIds, ['project-atlas'])
 })
 
 test('a null value reaches the consumer as null, never as zero or an empty string', () => {

@@ -114,25 +114,82 @@ function collector(): QuarantineCollector {
 interface Budget {
   remaining: number
   notParsed: number
+  admitted: number
 }
 
 /**
- * Take at most `remaining` records. When the declared bound is larger than what the input holds,
- * nothing is truncated — an exact fit is a complete enumeration, not a cut.
+ * Cost of one presented item in budget units. A container is charged for itself *and* every derived
+ * record it carries, so a wrapper cannot hide its children behind the parent's single unit.
  */
-function takeBudget<T>(items: readonly T[], budget: Budget): T[] {
-  if (budget.remaining <= 0) {
-    budget.notParsed += items.length
-    return []
+export function recordUnits(item: unknown): number {
+  if (!item || typeof item !== 'object') return 1
+  const record = item as { entries?: unknown; outcomes?: unknown; items?: unknown }
+  const length = (value: unknown) => (Array.isArray(value) ? value.length : 0)
+  return 1 + length(record.entries) + length(record.outcomes) + length(record.items)
+}
+
+/** Page documents are counted by `maxPages`; their contents are still charged to `maxRecords`. */
+function admitPages<T>(items: readonly T[], pages: { remaining: number }, records: Budget,
+  stop: { pages: number; records: number }): Admission<T> {
+  const admitted: T[] = []
+  const notParsed: T[] = []
+  let seenUnits = 0
+  let notParsedUnits = 0
+  let notParsedNative = 0
+  for (const item of items) {
+    const cost = recordUnits(item)
+    seenUnits += cost
+    if (pages.remaining <= 0 || cost > records.remaining) {
+      notParsedUnits += cost
+      notParsedNative += 1
+      notParsed.push(item)
+      // The reason matters for the reported stop: a page-count bound is not a record-size bound.
+      if (pages.remaining <= 0) stop.pages += cost
+      else stop.records += cost
+      continue
+    }
+    pages.remaining -= 1
+    records.remaining -= cost
+    records.admitted += cost
+    admitted.push(item)
   }
-  if (items.length <= budget.remaining) {
-    budget.remaining -= items.length
-    return [...items]
+  return { admitted, notParsed, seenUnits, notParsedUnits, notParsedNative, seenNative: items.length }
+}
+
+interface Admission<T> {
+  admitted: T[]
+  notParsed: T[]
+  seenUnits: number
+  notParsedUnits: number
+  notParsedNative: number
+  seenNative: number
+}
+
+/**
+ * Atomic admission: an item is admitted only if it and all of its derived records fit the remaining
+ * budget. A container that does not fit is skipped whole, so no part of it can be silently counted.
+ * Scanning continues for later items that do fit; the decision is deterministic for a given input.
+ */
+function admit<T>(items: readonly T[], budget: Budget, nativeUnit: (item: T) => number = () => 1): Admission<T> {
+  const admitted: T[] = []
+  const notParsed: T[] = []
+  let seenUnits = 0
+  let notParsedUnits = 0
+  let notParsedNative = 0
+  for (const item of items) {
+    const cost = recordUnits(item)
+    seenUnits += cost
+    if (cost > budget.remaining) {
+      notParsedUnits += cost
+      notParsedNative += nativeUnit(item)
+      notParsed.push(item)
+      continue
+    }
+    budget.remaining -= cost
+    budget.admitted += cost
+    admitted.push(item)
   }
-  const taken = items.slice(0, budget.remaining)
-  budget.notParsed += items.length - taken.length
-  budget.remaining = 0
-  return taken
+  return { admitted, notParsed, seenUnits, notParsedUnits, notParsedNative, seenNative: items.length }
 }
 
 export function analyzeUsageInsights(raw: unknown): UsageInsightsAnalysis {
@@ -151,31 +208,51 @@ export function analyzeUsageInsights(raw: unknown): UsageInsightsAnalysis {
   const maxRecords = input.limits?.maxRecords ?? SCHEMA_RECORD_CAP
   const maxWorks = input.limits?.maxWorks ?? SCHEMA_RECORD_CAP
   const maxPages = input.limits?.maxPages ?? SCHEMA_PAGE_CAP
-  const recordBudget: Budget = { remaining: maxRecords, notParsed: 0 }
-  const pageBudget: Budget = { remaining: maxPages, notParsed: 0 }
+  const recordBudget: Budget = { remaining: maxRecords, notParsed: 0, admitted: 0 }
+  const pageBudget = { remaining: maxPages }
+  const pageStop = { pages: 0, records: 0 }
 
-  const outcomeItems = takeBudget(input.outcomes, recordBudget)
-  const workItems = takeBudget(input.workEvidence, recordBudget)
-  const historyItems = takeBudget(input.workHistories ?? [], pageBudget)
-  const attentionItems = takeBudget(input.attentionPages, pageBudget)
-  const queueItems = takeBudget(input.queueFacts ?? [], recordBudget)
+  const outcomeAdmission = admit(input.outcomes, recordBudget)
+  const workAdmission = admit(input.workEvidence, recordBudget)
+  // `maxPages` bounds the number of page *documents*; the records inside a page are still charged to
+  // `maxRecords`, so a page cannot smuggle its items past the size bound either.
+  const historyAdmission = admitPages(input.workHistories ?? [], pageBudget, recordBudget, pageStop)
+  const attentionAdmission = admitPages(input.attentionPages, pageBudget, recordBudget, pageStop)
+  const queueAdmission = admit(input.queueFacts ?? [], recordBudget)
+  const outcomeItems = outcomeAdmission.admitted
+  const workItems = workAdmission.admitted
+  const historyItems = historyAdmission.admitted
+  const attentionItems = attentionAdmission.admitted
+  const queueItems = queueAdmission.admitted
+  // Outcomes hidden inside a container that the bound rejected are unknown for the outcome source too.
+  const embeddedOutcomesOf = (items: readonly unknown[]): number => items.reduce<number>((total, item) => {
+    const outcomes = (item as { outcomes?: unknown } | null)?.outcomes
+    return total + (Array.isArray(outcomes) ? outcomes.length : 0)
+  }, 0)
+  const skippedEmbeddedOutcomes = embeddedOutcomesOf(workAdmission.notParsed) + embeddedOutcomesOf(historyAdmission.notParsed)
 
   // ---- work index: the only accepted non-outcome project mapping ------------------------------
   const workIndex = new Map<string, string>()
+  // A contradiction permanently tombstones the work for this input. A later or reordered entry — even
+  // one repeating an earlier project — cannot revive a mapping we already know to be contradictory.
+  const conflictedWorkIds = new Set<string>()
   for (const entry of input.workIndex ?? []) {
+    if (conflictedWorkIds.has(entry.workId)) continue
     const existing = workIndex.get(entry.workId)
     if (existing !== undefined && existing !== entry.projectId) {
       workIndex.delete(entry.workId)
+      conflictedWorkIds.add(entry.workId)
       quarantine.add({
         code: 'identity_conflict', recordClass: 'work_evidence', ref: entry.workId,
-        reason: 'The work index maps one work to two projects; both mappings are dropped',
+        reason: 'The work index maps one work to more than one project; the work stays isolated for this input',
       })
       continue
     }
     workIndex.set(entry.workId, entry.projectId)
   }
 
-  const workParsed = parseWorkRecords(workItems, historyItems, { projectIds: projectSet, workIndex, window: input.window })
+  const workParsed = parseWorkRecords(workItems, historyItems,
+    { projectIds: projectSet, workIndex, conflictedWorkIds, window: input.window })
   for (const entry of workParsed.quarantined) quarantine.add(entry)
   const outcomeParsed = parseOutcomes([...outcomeItems, ...workParsed.outcomes])
   for (const entry of outcomeParsed.quarantined) quarantine.add(entry)
@@ -193,9 +270,16 @@ export function analyzeUsageInsights(raw: unknown): UsageInsightsAnalysis {
     outOfScope: 0,
     outsideWindow: 0,
     unmapped: 0,
-    notParsed: recordBudget.notParsed,
+    notParsed: skippedEmbeddedOutcomes,
   }
   for (const outcome of outcomeParsed.records) {
+    if (conflictedWorkIds.has(outcome.attempt.contract.workId)) {
+      // The work's project attribution is contradictory, so an outcome it carries cannot be placed.
+      outcomeLoss.conflicted++
+      quarantine.add({ code: 'subject_mismatch', recordClass: 'outcome', ref: outcome.id,
+        reason: 'The outcome belongs to a work whose project mapping is contradictory; it is excluded' })
+      continue
+    }
     if (!projectSet.has(outcome.projectId)) {
       outcomeLoss.outOfScope++
       quarantine.add({ code: 'out_of_scope_project', recordClass: 'outcome', ref: outcome.id,
@@ -248,10 +332,19 @@ export function analyzeUsageInsights(raw: unknown): UsageInsightsAnalysis {
   const worksNotProcessed = attributable.length - processedWorks.length
 
   // ---- per-source coverage from observed loss -------------------------------------------------
+  // Units skipped by the record budget and by the page budget are tracked separately so the stop
+  // reason names the bound that actually stopped collection.
+  const recordNotParsedUnits = outcomeAdmission.notParsedUnits + workAdmission.notParsedUnits + queueAdmission.notParsedUnits +
+    pageStop.records
+  const pageNotParsedUnits = pageStop.pages
+  const recordsNotParsed = recordNotParsedUnits + pageNotParsedUnits
+  const pagesNotParsed = historyAdmission.notParsedNative + attentionAdmission.notParsedNative
+  const workNotParsedUnits = workAdmission.notParsedUnits + historyAdmission.notParsedUnits
   const outcomesCoverage = worstIngest(input.declaredCoverage.outcomes,
-    lossTotal({ ...emptyLoss(), ...outcomeLoss }) > 0 || recordBudget.notParsed > 0 ? 'caller_limit' : 'complete')
+    lossTotal({ ...emptyLoss(), ...outcomeLoss }) > 0 || outcomeAdmission.notParsedUnits > 0 || skippedEmbeddedOutcomes > 0
+      ? 'caller_limit' : 'complete')
   const derivedWork = workParsed.works.reduce<IngestCoverage>((worst, work) => worstIngest(worst, work.coverage), 'complete')
-  const workLossTotal = lossTotal(workParsed.loss) + recordBudget.notParsed + pageBudget.notParsed + worksNotProcessed
+  const workLossTotal = lossTotal(workParsed.loss) + workNotParsedUnits + worksNotProcessed
   const workCoverage = worstIngest(worstIngest(input.declaredCoverage.workEvidence, derivedWork),
     workLossTotal > 0 ? 'caller_limit' : 'complete')
   const attentionBlock = attentionSummary(attentionParsed, input.capturedAt, input.declaredCoverage.attention)
@@ -273,7 +366,10 @@ export function analyzeUsageInsights(raw: unknown): UsageInsightsAnalysis {
   const unseenWorks = [...attentionWorks].filter(workId => !evidenceWorks.has(workId)).length
   // A rejected work record still proves that at least one work existed, so it is unknown rather than
   // absent: `unknownCount` must never report a clean zero after a rejection.
-  const unknownWorks = unseenWorks + workParsed.unattributableWorks + workParsed.loss.invalid + worksNotProcessed
+  // A work container the bound rejected is also an unknown work: it was presented, so its absence
+  // from the counts cannot be read as "no work".
+  const unknownWorks = unseenWorks + workParsed.unattributableWorks + workParsed.loss.invalid + worksNotProcessed +
+    workAdmission.notParsedNative + historyAdmission.notParsedNative
   const interventionReason: NullReason =
     workCoverage === 'unsupported' ? 'unsupported'
       : input.declaredCoverage.workEvidence === 'not_collected' ? 'not_collected'
@@ -291,9 +387,10 @@ export function analyzeUsageInsights(raw: unknown): UsageInsightsAnalysis {
   const baseline = compareBaseline({ baseline: input.baseline ?? null, measured: metrics, projectIds, window: input.window })
   const limits = appliedLimits({
     maxRecords, maxWorks, maxPages,
-    recordBudget, pageBudget,
-    recordsSeen: input.outcomes.length + input.workEvidence.length + (input.workHistories?.length ?? 0) +
-      input.attentionPages.length + (input.queueFacts?.length ?? 0),
+    recordsNotParsed, pagesNotParsed, recordNotParsedUnits, pageNotParsedUnits,
+    recordsSeen: outcomeAdmission.seenUnits + workAdmission.seenUnits + historyAdmission.seenUnits +
+      attentionAdmission.seenUnits + queueAdmission.seenUnits,
+    recordsAdmitted: recordBudget.admitted,
     recordsAccepted: inWindow.length,
     worksSeen: workParsed.works.length,
     worksNotProcessed,
@@ -321,7 +418,7 @@ export function analyzeUsageInsights(raw: unknown): UsageInsightsAnalysis {
     unseenWorks: unknownWorks,
     conflicts: quarantine.counts.get('identity_conflict') ?? 0,
     collectionIssues: input.collectionIssues?.length ?? 0,
-    notParsed: recordBudget.notParsed + pageBudget.notParsed,
+    notParsed: recordsNotParsed,
   })
 
   const body = {
@@ -412,9 +509,12 @@ interface AppliedLimitsInput {
   maxRecords: number
   maxWorks: number
   maxPages: number
-  recordBudget: Budget
-  pageBudget: Budget
+  recordsNotParsed: number
+  pagesNotParsed: number
+  recordNotParsedUnits: number
+  pageNotParsedUnits: number
   recordsSeen: number
+  recordsAdmitted: number
   recordsAccepted: number
   worksSeen: number
   worksNotProcessed: number
@@ -427,8 +527,8 @@ function appliedLimits(input: AppliedLimitsInput): AppliedLimits {
   const declaredBounded = [input.declaredCoverage.outcomes, input.declaredCoverage.workEvidence, input.declaredCoverage.attention]
     .some(coverage => coverage === 'caller_limit' || coverage === 'storage_cap')
   const stoppedBy: AppliedLimits['stoppedBy'] =
-    input.recordBudget.notParsed > 0 ? 'records'
-      : input.pageBudget.notParsed > 0 ? 'pages'
+    input.recordNotParsedUnits > 0 ? 'records'
+      : input.pageNotParsedUnits > 0 ? 'pages'
         : input.worksNotProcessed > 0 ? 'works'
           : declaredBounded ? 'source'
             : 'none'
@@ -436,13 +536,15 @@ function appliedLimits(input: AppliedLimitsInput): AppliedLimits {
     maxRecords: input.maxRecords,
     maxWorks: input.maxWorks,
     maxPages: input.maxPages,
+    recordUnit: 'outcome+container+entry+page+item',
     recordsSeen: input.recordsSeen,
+    recordsAdmitted: input.recordsAdmitted,
     recordsAccepted: input.recordsAccepted,
-    recordsNotParsed: input.recordBudget.notParsed,
+    recordsNotParsed: input.recordsNotParsed,
     worksSeen: input.worksSeen,
     worksNotProcessed: input.worksNotProcessed,
     pagesSeen: input.pagesSeen,
-    pagesNotParsed: input.pageBudget.notParsed,
+    pagesNotParsed: input.pagesNotParsed,
     bytesSeen: 0,
     bytesLimit: input.limits?.maxBytes ?? null,
     limitsAppliedBeforeParsing: true,

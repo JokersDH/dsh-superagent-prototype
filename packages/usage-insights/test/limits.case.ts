@@ -81,6 +81,7 @@ test('negative: maxPages bounds history pages and marks the work source partial'
       makeHistory(CONTRACT_ATLAS.workId, CONTRACT_ATLAS, [{ kind: 'question.opened', sourceRef: 'history-question-1' }]),
       makeHistory(CONTRACT_ATLAS.workId, CONTRACT_ATLAS, [{ kind: 'question.opened', sourceRef: 'history-question-2' }]),
     ],
+    // `maxPages` bounds page documents; the first page is admitted and the second is not.
     limits: { maxPages: 1 },
   }))
   assert.equal(analysis.summary.limits.pagesSeen, 2)

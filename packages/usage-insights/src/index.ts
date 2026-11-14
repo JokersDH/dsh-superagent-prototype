@@ -71,11 +71,19 @@ export type {
   UsageInsightsInput,
   UsageInsightsSummary,
 } from './protocol.ts'
-export { analyzeUsageInsights, summarize, UsageInsightsFault } from './analyze.ts'
+export { analyzeUsageInsights, recordUnits, summarize, UsageInsightsFault } from './analyze.ts'
+export { composeUsageInsightsInput, CompositionFault } from './node-composition.ts'
+export type {
+  AuthorizedReadsPort,
+  AuthorizedWorkRef,
+  ComposedInsightInput,
+  CompositionIssue,
+  CompositionRequest,
+} from './node-composition.ts'
 export { compareBaseline } from './baseline.ts'
 export { attentionSummary } from './attention.ts'
 export { interventionMetrics, metricRow, outcomeMetrics, workInterventions } from './metrics.ts'
 export { outcomeSubject, parseAttentionPages, parseOutcomes, parseWorkRecords } from './subject.ts'
 export { renderMarkdown, renderTerminal, safeText } from './report.ts'
-export { metricRowKey, observedOutcomeCount, toInsightConsumerView } from './facing.ts'
-export type { ConsumerViewOptions, InsightConsumerMetric, InsightConsumerView } from './facing.ts'
+export { consumerAdmission, consumerLayer, consumerScope, metricRowKey, observedOutcomeCount, toInsightConsumerView } from './facing.ts'
+export type { ConsumerViewOptions, InsightConsumerLayer, InsightConsumerMetric, InsightConsumerScope, InsightConsumerView } from './facing.ts'

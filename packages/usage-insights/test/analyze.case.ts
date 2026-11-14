@@ -64,7 +64,9 @@ test('a complete bundle derives per-layer metrics without double counting embedd
   assert.equal(metric(analysis, 'interventions.acceptances')?.value, 1)
   // Interaction metrics describe product records, not an evidence layer.
   assert.equal(metric(analysis, 'interventions.total')?.layer, null)
-  assert.equal(summary.limits.recordsSeen, 3, 'the record budget governs the three top-level records presented')
+  assert.equal(summary.limits.recordsSeen, 9,
+    'units: two outcomes plus one work container with four entries and two embedded outcomes')
+  assert.equal(summary.limits.recordsAdmitted, 9, 'nothing is truncated without a declared bound')
   assert.equal(summary.losses.outcomes.seen, 4, 'every outcome presented, including embedded ones, is accounted for')
   assert.equal(summary.limits.recordsAccepted, 2, 'the embedded copies are replays of the same identities')
 })

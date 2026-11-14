@@ -97,7 +97,16 @@ node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
 
 `maxRecords`/`maxWorks`/`maxPages` **在解析之前**执行：超出预算的记录根本不会被解析（因此也不会产生
 `invalid_record`），只在 `losses.<source>.notParsed` 与 `limits` 中计数，`stoppedBy` 记录是哪一类上限先到。
-刚好等于上限**不是**截断（完整枚举，`notParsed=0`）。采集端已截断则显示 `stoppedBy=source`。
+
+计数口径（`limits.recordUnit`）：
+
+- 一条 outcome、一个 work/history 容器、一条 timeline entry、一个 attention item 各算 **1 个单位**；
+- 容器与它派生出的记录一起计费，**原子准入**：装不下的容器整条不解析，不会只算父记录一次；
+- `maxPages` 只数页面文档（history/attention 页），页内条目仍计入 `maxRecords`；
+- 刚好等于上限**不是**截断（完整枚举，`notParsed=0`）；采集端已截断则显示 `stoppedBy=source`。
+
+例：`maxRecords=1` 时，一个内含 2 条 outcome 的 WorkEvidence 成本为 3，整条被拒绝 —— 不会出现
+accepted2/complete。
 
 ### 损失如何传播
 

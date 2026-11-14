@@ -41,9 +41,14 @@ Invariants enforced by the schema and the analyser:
    `entry.at`, and a work's project comes only from the collector's `workIndex` or the work's own
    outcome. An unmapped work is isolated and counted as unknown — never as one observed problem and
    never as a proven zero.
-7b. Declared `maxRecords`/`maxWorks`/`maxPages` are applied *before* parsing, so a truncated
-   observation reports `recordsNotParsed`/`worksNotProcessed`/`pagesNotParsed`, partial coverage and
-   `stoppedBy`; an exact fit is not truncation.
+7b. Declared bounds are applied *before* parsing. `maxRecords` counts **units**: an outcome, a
+   work/history container, a timeline entry and an attention item each cost one, and a container is
+   charged with all of its derived records. Admission is atomic, so a container that does not fit is
+   skipped whole — a wrapper can never hide its children behind one unit. `maxPages` counts page
+   documents while their contents are still charged to `maxRecords`. An exact fit is a complete
+   enumeration; `stoppedBy` names the bound that actually stopped collection.
+7c. A work index that maps one work to two projects permanently tombstones that work for the whole
+   input: no later or reordered entry can revive it, and its entries and outcomes are excluded.
 8. Operator baselines stay an explicit `operator_note` input. A comparison is
    `observation: 'observational_only'` and produces no percentage saving, saved hours or causality.
 9. A readiness/configuration snapshot may be attached for context; it contributes no metric, sample
@@ -57,13 +62,20 @@ Invariants enforced by the schema and the analyser:
 - Operator baseline: `operator-baseline/1` (`OperatorBaselineSchema`)
 
 ```ts
-import { analyzeUsageInsights, renderMarkdown } from '@personal-agent/usage-insights'
-import type { UsageInsightsInput, UsageInsightsSummary } from '@personal-agent/usage-insights'
+// Node: analysis, composition and reports (needs node:crypto for canonical digests)
+import { analyzeUsageInsights, composeUsageInsightsInput, renderMarkdown } from '@personal-agent/usage-insights'
+// Browser: types, compact projection and admission mirror only — no node: builtins
+import { toInsightConsumerView, consumerAdmission } from '@personal-agent/usage-insights/browser'
 
 const analysis = analyzeUsageInsights(bundle)      // pure: same input ⇒ same summaryId
 const summary: UsageInsightsSummary = analysis.summary
 const markdown = renderMarkdown(analysis)
+const view = toInsightConsumerView(summary)        // declares scope/coverage/window for the UI
 ```
+
+`composeUsageInsightsInput` turns an **already-authorized** read port into a bounded bundle. It adds
+no authority: main authenticates and authorizes, and this module only reads the facts that decision
+already covers. It creates no HTTP server and no SQL.
 
 `analyzeUsageInsights` reads no clock, no filesystem and no network. `capturedAt` comes from the
 bundle, so a stored bundle always reproduces its summary.

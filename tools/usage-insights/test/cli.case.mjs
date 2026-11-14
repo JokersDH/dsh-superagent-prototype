@@ -206,8 +206,9 @@ test('an oversized input file is refused before it is parsed', () => {
 })
 
 test('the CLI applies an explicit record bound and reports partial status', () => {
-  // The shipped example presents three top-level records: two outcomes and one work record.
-  const exact = run(['analyze', '--input', complete, '--max-records', '3', '--format', 'json'])
+  // The shipped example costs nine units: two outcomes, one work container, four entries and two
+  // embedded outcomes.
+  const exact = run(['analyze', '--input', complete, '--max-records', '9', '--format', 'json'])
   assert.equal(exact.status, 0, 'an exact bound enumerates everything')
   assert.equal(JSON.parse(exact.stdout).summary.limits.stoppedBy, 'none')
 
@@ -216,7 +217,7 @@ test('the CLI applies an explicit record bound and reports partial status', () =
   const summary = JSON.parse(bounded.stdout).summary
   assert.equal(summary.limits.maxRecords, 1)
   assert.equal(summary.limits.limitsAppliedBeforeParsing, true)
-  assert.equal(summary.limits.recordsNotParsed, 2)
+  assert.equal(summary.limits.recordsNotParsed, 8)
   assert.equal(summary.limits.stoppedBy, 'records')
   for (const flag of ['--max-records', '--max-works', '--max-pages']) {
     assert.equal(run(['analyze', '--input', complete, flag, '0']).status, 2, `${flag} 0 must be refused`)

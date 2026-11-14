@@ -187,7 +187,10 @@ export const AppliedLimitsSchema = z.strictObject({
   maxRecords: z.number().int().min(1),
   maxWorks: z.number().int().min(1),
   maxPages: z.number().int().min(1),
+  /** Unit of the record budget: an outcome, a work/history container, a timeline entry or an attention item. */
+  recordUnit: z.literal('outcome+container+entry+page+item'),
   recordsSeen: count,
+  recordsAdmitted: count,
   recordsAccepted: count,
   recordsNotParsed: count,
   worksSeen: count,
@@ -202,7 +205,7 @@ export const AppliedLimitsSchema = z.strictObject({
 })
 export type AppliedLimits = z.infer<typeof AppliedLimitsSchema>
 
-export const SOURCE_KINDS = ['http_read', 'verified_file', 'operator_file', 'synthetic_fixture'] as const
+export const SOURCE_KINDS = ['http_read', 'authorized_read', 'verified_file', 'operator_file', 'synthetic_fixture'] as const
 export const SourceKindSchema = z.enum(SOURCE_KINDS)
 export type SourceKind = z.infer<typeof SourceKindSchema>
 
@@ -332,6 +335,8 @@ export const UsageInsightsInputSchema = z.strictObject({
     ref: z.string().min(1).max(256),
     code: z.string().min(1).max(64),
     message: z.string().min(1).max(512),
+    /** Which read stage reported the problem, for diagnosis only. */
+    stage: z.enum(['works', 'evidence', 'history', 'attention', 'readiness']).optional(),
   })).max(512).readonly().optional(),
 })
 export type UsageInsightsInput = z.infer<typeof UsageInsightsInputSchema>
