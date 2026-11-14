@@ -1,0 +1,182 @@
+{
+  "role": "A",
+  "package": [
+    "packages/storage",
+    "packages/workflows"
+  ],
+  "branch": "codex/g2-workspaces-verification",
+  "mainBaseCommit": "4b42a90",
+  "mergeCommit": "7ae7fe7",
+  "checkpoints": [
+    "921e290"
+  ],
+  "testedSourceCommit": "921e290",
+  "migrations": [
+    "v17 assistant-context-history-index (existing)",
+    "v18 assistant-reply-results (existing)"
+  ],
+  "newMigrationThisWave": null,
+  "productSchema": 18,
+  "phases": [
+    {
+      "phase": "A1",
+      "status": "PASS",
+      "scope": "complete subject",
+      "evidence": [
+        "wave24-subject-consistency",
+        "wave23-process-reader"
+      ],
+      "note": "independent expectation binds attempt/ticket/assignment/contract/epoch/question targets/answer/delivery/commands; two real Works mixed question/answer or ticket/assignment rejected; selected attempt1 cannot borrow question/answer2"
+    },
+    {
+      "phase": "A2",
+      "status": "PASS",
+      "scope": "required sets/coverage",
+      "evidence": [
+        "wave24-subject-consistency",
+        "wave23-process-reader"
+      ],
+      "note": "required command/dispatch/delivery/observation sets come from expected subject; missing, foreign, duplicate or deleted sets rejected even with recomputed digest; no empty success or partial mislabeled complete"
+    },
+    {
+      "phase": "A3",
+      "status": "PASS",
+      "scope": "UoW and payload guard",
+      "evidence": [
+        "wave24-subject-consistency async mutation"
+      ],
+      "note": "indexes read in one synchronous uow.atomic; payload bytes read outside; binding/current/contract/epoch/resources/question/answer/delivery/commands/dispatch/observation/source fingerprint rechecked before return; injected work change rejects"
+    },
+    {
+      "phase": "A4",
+      "status": "PASS",
+      "scope": "bounded reader",
+      "evidence": [
+        "wave24-subject-consistency limits"
+      ],
+      "note": "explicit command/dispatch/observation/payload counts, per-payload and total byte limits; over-limit and bad refs/digests reject; child reader has 20s deadline; actual manifest counts/bytes recorded"
+    },
+    {
+      "phase": "A5",
+      "status": "PASS",
+      "scope": "real producer/reader",
+      "evidence": [
+        "wave23-process-reader.txt",
+        "wave24-subject-consistency"
+      ],
+      "note": "real controlled Application/Broker Work/question/answer/native_applied plus SDK/context data producer; different Node PID verifies independent expectation; repeated read adds no delivery/observation/queue rows"
+    },
+    {
+      "phase": "A6",
+      "status": "NOT_REACHED",
+      "scope": "C driver integration",
+      "detail": "A provides producer/reader/manifest/expectation; C's single consumer driver was not available as an admitted consumer in this checkout. No second driver was created."
+    },
+    {
+      "phase": "A7",
+      "status": "NOT_REACHED",
+      "scope": "B recovered result landing",
+      "detail": "No admitted same-Runner business attach; idempotent native_applied/unknown landing into original A Store remains blocked on B/main admission; inspect/cancel is not business resume"
+    },
+    {
+      "phase": "A8",
+      "status": "PASS",
+      "scope": "two independent snapshots",
+      "evidence": [
+        "wave20-personal-business",
+        "wave21-personal-v2"
+      ],
+      "note": "same real Store data creates/verifies/restores default v1 and explicit v2 separately to fresh roots; personal readonly reads Work/question/answer/delivery/candidate/history/frozen body; business 422, queue held, provider unchanged"
+    },
+    {
+      "phase": "A9",
+      "status": "PASS",
+      "scope": "D/E inputs",
+      "evidence": [
+        "wave24-complete-subject-manifest.md"
+      ],
+      "note": "producer, child reader, expectation/manifest, IDs/formats/source SHA/data root and parameterized install/review/start commands; D/E must bind package consumer bytes; source-only is not installed proof"
+    },
+    {
+      "phase": "A10",
+      "status": "PASS",
+      "scope": "final regression",
+      "evidence": [
+        "wave24-*.txt"
+      ],
+      "note": "storage/workflows/application/verification, personal/source/main/candidate/target consumers, strict/build and static check"
+    }
+  ],
+  "results": {
+    "storageTests": "87/87",
+    "workflowTests": "117/117",
+    "applicationRegression": "20/20",
+    "verificationRegression": "23/23",
+    "restoredPersonal": "12/12",
+    "recoveryCombination": "106/106",
+    "mainProductConsumers": "91/91",
+    "mainTargetConsumers": "50/50",
+    "candidateConsumers": "31/31",
+    "productExecution": "20/20",
+    "genuineV1Probe": "2/2",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "coordinatorProductStrict": "PASS",
+    "packetStaticCheck": "PASS",
+    "modelTasks": 0,
+    "nativeTurnStarts": 0
+  },
+  "limits": {
+    "maxCommands": 64,
+    "maxDispatch": 64,
+    "maxObservations": 256,
+    "maxPayloads": 128,
+    "maxPayloadBytes": 1048576,
+    "maxTotalPayloadBytes": 4194304,
+    "readerTimeoutMs": 20000
+  },
+  "failureWindows": [
+    "two-Work question/answer mix",
+    "two-Work ticket/assignment mix",
+    "deleted/empty command set",
+    "foreign command",
+    "duplicate command",
+    "empty dispatch",
+    "payload digest mutation",
+    "answer ID/root/source SHA/format/fingerprint mutation",
+    "async payload-window work change",
+    "observation/payload/command byte limits"
+  ],
+  "blockers": [
+    {
+      "owner": "C",
+      "id": "consumer-driver",
+      "detail": "C owns the one consumer driver; no admitted driver run consumed A output in this checkout. A did not create a second driver."
+    },
+    {
+      "owner": "B/main",
+      "id": "business-attach",
+      "detail": "No admitted same-Runner business attach; idempotent recovered-result landing is NOT_REACHED."
+    },
+    {
+      "owner": "main",
+      "id": "private-permission-target",
+      "detail": "Private startup permission, physical writer proof and target activation remain unimplemented."
+    }
+  ],
+  "notTested": [
+    "C consumer driver execution",
+    "B recovered-result landing",
+    "D installed consumer bytes",
+    "E independent release acceptance",
+    "private permission/target",
+    "physical writer proof",
+    "real vendor model/native"
+  ],
+  "mainNextSteps": [
+    "use expectation+manifest for B result landing and C driver input",
+    "keep complete subject validation separate from subset diagnostics",
+    "bind D/E to exact package consumer bytes"
+  ],
+  "updatedAt": "2026-11-14T02:30:00.000Z"
+}
