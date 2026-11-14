@@ -69,12 +69,16 @@ CLI (read-only): see `tools/project-recipes/cli.ts` and `docs/project-recipes/RE
 ## Development
 
 ```sh
-pnpm --dir packages/contracts build          # workspace dependency used for types and schemas
-pnpm --dir packages/project-recipes typecheck
-pnpm --dir packages/project-recipes test
-pnpm --dir packages/project-recipes build
-pnpm --dir packages/project-recipes example    # in-memory consumer sample, exit 0
+pnpm --dir packages/contracts build              # workspace dependency used for types and schemas
+./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json
+node --test packages/project-recipes/test/*.case.ts
+./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json
+node packages/project-recipes/examples/preview-consumer.ts   # in-memory sample, exit 0
 ```
+
+`pnpm --dir packages/project-recipes <script>` also works once main adds the package's
+`pnpm-lock.yaml` importer; before that it rewrites the root lock, so the direct commands above are
+the non-mutating form.
 
 The package is private and ships from `src/`; `dist/` is not tracked.
 

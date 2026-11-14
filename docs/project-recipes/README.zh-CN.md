@@ -277,13 +277,20 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })  // �
 
 ## 10. 复跑
 
+在 main 把 `packages/project-recipes` importer 写进根 `pnpm-lock.yaml` 之前（见 [main-integration](main-integration.zh-CN.md) 第 1 节），直接运行 `pnpm --dir …` 会让 pnpm 顺手改写根 lock。此阶段用下面的直接命令复跑，不触碰 lock：
+
 ```sh
-# 依赖（workspace 内部包，不含任何安装/执行）
+# 依赖（workspace 内部包；只构建 contracts，不安装项目依赖）
 pnpm --dir packages/contracts build
 
 # 纯库
+./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json
+node --test packages/project-recipes/test/*.case.ts     # 42 tests
+./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json
+
+# 等价的 pnpm 形式（main 合入 importer 后使用）
 pnpm --dir packages/project-recipes typecheck
-pnpm --dir packages/project-recipes test          # 41 tests
+pnpm --dir packages/project-recipes test
 pnpm --dir packages/project-recipes build
 
 # CLI 与读取器
