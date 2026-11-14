@@ -2,8 +2,8 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "62eccd4",
-  "checkpoint": "4 of 5",
+  "base": "2d48612",
+  "checkpoint": "5 of 5",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
     "status": "CORE OBSERVED on the real authenticated transport; not yet against a spawned Runner/child process",
@@ -28,6 +28,7 @@
     "bug_found_by_harness": "waiters created before the first bind belong to generation 0 and no lease owns them, so a client must bind before the callbacks are created; the first run hung for exactly that reason and the harness now binds first"
   },
   "regressions": {
+    "b27-dual-live": "6 PASS / 0 FAIL",
     "b27-dual-client": "5 PASS / 0 FAIL",
     "b27-channel": "5 PASS / 0 FAIL",
     "b27-dispatch": "5 PASS / 0 FAIL",
@@ -37,11 +38,11 @@
     "typecheck": "root tsconfig clean"
   },
   "stillNotDone": {
-    "livePendingWrite": "the pending-native-write-indeterminate proof is on the real transport with a controlled endpoint (b27-dual-client), not yet on the spawned child, because the fixture lane does not reach the answer write path",
-    "realChildFull": "the product-lane Runner (NativeProductAttempt) keeps its recovery root private, so this uses the ordinary runner-service process spawned through RunnerLink instead",
+    "answerAckWindow": "the begin window is observed closed on the live lane, but the ANSWER ack window with the original question/answer ids on the product lane is not yet observed; the fixture lane has no approval question",
+    "recoveredCandidateAccept": "item 5 is NOT_REACHED: same-Work check, current candidate, explicit human accept, stale epoch and late ACK refusal, 2/4 slots and full resource return",
+    "interfaceCompatDocs": "item 5 also covers interface/consumer compile compatibility, fault/backpressure/close and the accurate normal/recovered/native scope documentation; not done",
     "iModule": "I's attach-channel module is still absent from this worktree; only the 0068 contract is consumed",
-    "item4_sigkillRecovery": "NOT_REACHED",
-    "item5_recoveredAcceptSlots": "NOT_REACHED"
+    "livePendingWrite": "pending-native-write-indeterminate stays observed on the real transport with a controlled endpoint, not on the live child"
   },
   "wholePackageComplete": false,
   "budget": {
@@ -67,5 +68,22 @@
       "B27-LIVE-INSPECT-STILL-AUTHENTICATED - inspection returned the same attempt for the live Runner"
     ],
     "firstAttemptWasWeak": "an earlier run used the 'happy' fixture and only recorded one runtime.error fact; that is why the lane was switched to codex-fake, which records dispatch.observed and turn.ended"
+  },
+  "item4_sigkill": {
+    "status": "CORE OBSERVED on a real spawned Runner with a real OS-level SIGKILL",
+    "harness": "tests/native-acceptance/b27-sigkill.mjs (drives tests/native-acceptance/b27-coordinator-child.mjs as the coordinator process)",
+    "result": "6 PASS / 0 FAIL / 1 NOT_TESTED",
+    "design": "the Runner is spawned once and publishes its own endpoint; coordinator A is a separate OS process that reads the original attempt and leaves a registration; A is killed with SIGKILL; coordinator B is a different PID that reads only that registration and resumes",
+    "cases": [
+      "B27-SIGKILL-RUNNER-REGISTERED - the Runner published a pinned endpoint that outlives its coordinators",
+      "B27-SIGKILL-COORDINATOR-A-OBSERVES - coordinator A read the original attempt and epoch with the original fact ids",
+      "B27-SIGKILL-COORDINATOR-A-DIED - coordinator A died by SIGKILL while the Runner kept running",
+      "B27-SIGKILL-NEW-PID-RESUMES-SAME-REGISTRATION - a new PID resumed the same attempt and epoch and re-read the same original fact ids",
+      "B27-SIGKILL-BEGIN-WINDOW-NOT-REPLAYED - re-feeding begin with its original id was refused as duplicate_begin instead of replayed",
+      "B27-SIGKILL-DELIVER-KEEPS-ORIGINAL-ID - re-feeding deliver with its original id was accepted, so the id was not replaced by a fresh one"
+    ],
+    "defectFixed": {
+      "genericRefusalMessage": "the transport collapsed every non-200 into 'Runner recovery request was refused or indeterminate', so a duplicate_begin refusal was indistinguishable from an unknown outcome. The transport now carries the server's own error code, and the command route returns the admission's code/reason as a structured 409 instead of letting a rejection become a generic failure"
+    }
   }
 }

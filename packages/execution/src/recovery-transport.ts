@@ -248,7 +248,18 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       if (!existing && commands.size >= 256) { reply(res, 503, { error: 'control_capacity' }); return }
       const result = existing?.result ?? Promise.resolve().then(() => backend.command!(command)).then(inspect)
       if (!existing) { commands.set(command.id, { body: content, result }); void result.catch(() => undefined) }
-      reply(res, 200, await result)
+      try {
+        reply(res, 200, await result)
+      } catch (error) {
+        // An admission refusal is a REFUSAL with its own reason, not an unknown outcome. The caller has to
+        // be able to tell duplicate_begin or admission_closed apart from a transport failure.
+        const refusal = error as { code?: unknown; reason?: unknown; message?: unknown }
+        reply(res, 409, {
+          error: typeof refusal.code === 'string' ? refusal.code : 'unknown_outcome',
+          ...(typeof refusal.reason === 'string' ? { reason: refusal.reason } : {}),
+          message: String(refusal.message ?? '').slice(0, 200),
+        })
+      }
       return
     }
     if (req.method !== 'POST' || req.url !== '/v1/cancel') { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
@@ -298,7 +309,16 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
         const chunks: Buffer[] = []; let size = 0
         res.on('data', (chunk: Buffer) => { size += chunk.length; if (size > MAX_BYTES) req.destroy(new RunnerLinkError('invalid_response', 'Runner response exceeds the limit')); else chunks.push(chunk) })
         res.once('end', () => {
-          if (res.statusCode !== 200) { reject(new RunnerLinkError(res.statusCode === 401 ? 'auth_failed' : res.statusCode === 409 ? 'identity_mismatch' : 'unknown_outcome', 'Runner recovery request was refused or indeterminate')); return }
+          if (res.statusCode !== 200) {
+            // Keep the server's own refusal reason: a generic message hides whether the begin window was
+            // closed, the identity was foreign or the admission was closed.
+            let refused: { error?: unknown; reason?: unknown } = {}
+            try { refused = JSON.parse(Buffer.concat(chunks).toString('utf8')) as typeof refused } catch {}
+            const serverError = typeof refused.error === 'string' ? refused.error : null
+            const code = res.statusCode === 401 ? 'auth_failed' : res.statusCode === 409 ? 'identity_mismatch' : 'unknown_outcome'
+            reject(Object.assign(new RunnerLinkError(code, `Runner recovery request was refused (${serverError ?? `status_${res.statusCode}`})`), { serverError, status: res.statusCode }))
+            return
+          }
           try { resolve(JSON.parse(Buffer.concat(chunks).toString('utf8'))) } catch { reject(new RunnerLinkError('invalid_response', 'Invalid runner response')) }
         })
         res.once('error', () => reject(new RunnerLinkError('unavailable', 'Runner response was interrupted')))
