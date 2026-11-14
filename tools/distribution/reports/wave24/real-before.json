@@ -1,0 +1,77 @@
+{
+  "protocol": "wave19-real-business-relocation/1",
+  "status": "FAIL",
+  "steps": [
+    {
+      "id": "workflow-evidence-v1-v2-real-data",
+      "status": "PASS",
+      "detail": {
+        "databaseSchema": 18,
+        "v1Protocol": "workflow-evidence/1",
+        "v1Families": 13,
+        "v1Digest": "caace32a556a47a3e3c4e544845524d3b3c823de3d9bc0df8796a2fead8dffc9",
+        "v2Protocol": "workflow-evidence/2",
+        "v2FamilySetVersion": 2,
+        "v2Families": 21,
+        "v2Digest": "8797911788319c9d6228092708fcaf59b0de9f5ad7a55a790ba6dac87290ebf7",
+        "questions": 1,
+        "answers": 1,
+        "deliveries": 1,
+        "runtimeBindings": 1,
+        "dispatchReceipts": 2,
+        "unsupportedVersionRejected": true
+      }
+    },
+    {
+      "id": "personal-evidence-bundle-real-data",
+      "status": "PASS",
+      "detail": {
+        "bundle": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-real-business-zErsBT/real-business.pab",
+        "archiveSha256": "dcef55ed9a83939b9cb20c792846427687ee5eae9843fa6320e52a9e30666c17",
+        "entries": 18,
+        "evidenceProtocol": "personal-evidence",
+        "evidenceFormatVersion": 2,
+        "bundleFormatVersion": 1,
+        "databaseSchema": 18,
+        "manifestDigest": "b75acb8584795629b090c1f5194d06358ccbc8abad46e1881b01ced2784347de"
+      }
+    }
+  ],
+  "nativeTurns": 0,
+  "vendorSends": 0,
+  "limitations": [
+    "Business data is the retained B submitted normal-producer state (zero real vendor/native turns); D only reads it.",
+    "Restored nonempty candidates/historical source reads still require main restored-personal project rebinding; they are not claimed here."
+  ],
+  "error": "Error: injected_fault:before-record\n    at file:///Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-real-business-relocation.mjs:95:47\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "cleanup": [
+    {
+      "status": "UNKNOWN",
+      "stopped": [
+        {
+          "pid": 34152,
+          "pids": [
+            34152
+          ],
+          "operation": "start",
+          "method": "proven-spawn-group-signal"
+        }
+      ],
+      "unknown": [
+        {
+          "pid": 34152,
+          "reason": "instance_record_missing"
+        }
+      ],
+      "retained": true,
+      "signals": [
+        {
+          "pid": -34152,
+          "signal": "SIGTERM",
+          "ok": true
+        }
+      ]
+    }
+  ],
+  "retainedRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-real-business-zErsBT"
+}

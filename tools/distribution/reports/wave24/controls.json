@@ -1,0 +1,499 @@
+{
+  "protocol": "wave24-cleanup-controls/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "positive-complete-own",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": true,
+          "checks": [
+            {
+              "owned": true,
+              "reason": "exact_identity",
+              "evidence": {
+                "pid": 10353,
+                "role": "launcher",
+                "startOk": true,
+                "uidOk": true,
+                "roleOk": true,
+                "operationOk": true,
+                "tokenInstall": true,
+                "tokenData": true,
+                "tokenConfig": true,
+                "argvOk": true,
+                "actual": {
+                  "pid": 10353,
+                  "ppid": 10183,
+                  "stat": "S",
+                  "live": true,
+                  "startText": "Sat Nov 14 09:37:07 2026",
+                  "startMs": 1794620227000,
+                  "uid": 501,
+                  "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'api',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state",
+                  "tokens": [
+                    "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                    "-e",
+                    "const",
+                    "{spawn}=require('child_process');const",
+                    "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'api',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                    "start",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state"
+                  ]
+                }
+              }
+            },
+            {
+              "owned": true,
+              "reason": "exact_identity",
+              "evidence": {
+                "pid": 10494,
+                "role": "api",
+                "startOk": true,
+                "uidOk": true,
+                "roleOk": true,
+                "operationOk": true,
+                "tokenInstall": true,
+                "tokenData": true,
+                "tokenConfig": true,
+                "argvOk": true,
+                "actual": {
+                  "pid": 10494,
+                  "ppid": 10353,
+                  "stat": "R",
+                  "live": true,
+                  "startText": "Sat Nov 14 09:37:07 2026",
+                  "startMs": 1794620227000,
+                  "uid": 501,
+                  "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) api /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state",
+                  "tokens": [
+                    "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                    "-e",
+                    "setTimeout(()",
+                    "=>",
+                    "{},",
+                    "60000)",
+                    "api",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state"
+                  ]
+                }
+              }
+            }
+          ],
+          "pids": [
+            10353,
+            10494
+          ]
+        }
+      }
+    },
+    {
+      "id": "child-start-mismatch-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "exact_identity",
+          "evidence": {
+            "pid": 10494,
+            "role": "api",
+            "startOk": false,
+            "uidOk": true,
+            "roleOk": true,
+            "operationOk": true,
+            "tokenInstall": true,
+            "tokenData": true,
+            "tokenConfig": true,
+            "argvOk": true,
+            "actual": {
+              "pid": 10494,
+              "ppid": 10353,
+              "stat": "R",
+              "live": true,
+              "startText": "Sat Nov 14 09:37:07 2026",
+              "startMs": 1794620227000,
+              "uid": 501,
+              "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) api /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state",
+              "tokens": [
+                "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                "-e",
+                "setTimeout(()",
+                "=>",
+                "{},",
+                "60000)",
+                "api",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "sibling-root-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "root_mismatch",
+          "recorded": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state-sibling",
+          "requested": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state"
+        }
+      }
+    },
+    {
+      "id": "wrong-operation-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "exact_identity",
+          "evidence": {
+            "pid": 10353,
+            "role": "launcher",
+            "startOk": true,
+            "uidOk": true,
+            "roleOk": true,
+            "operationOk": false,
+            "tokenInstall": true,
+            "tokenData": true,
+            "tokenConfig": true,
+            "argvOk": true,
+            "actual": {
+              "pid": 10353,
+              "ppid": 10183,
+              "stat": "S",
+              "live": true,
+              "startText": "Sat Nov 14 09:37:07 2026",
+              "startMs": 1794620227000,
+              "uid": 501,
+              "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'api',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state",
+              "tokens": [
+                "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                "-e",
+                "const",
+                "{spawn}=require('child_process');const",
+                "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'api',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                "start",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "pid-reuse-start-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "exact_identity",
+          "evidence": {
+            "pid": 10353,
+            "role": "launcher",
+            "startOk": false,
+            "uidOk": true,
+            "roleOk": true,
+            "operationOk": true,
+            "tokenInstall": true,
+            "tokenData": true,
+            "tokenConfig": true,
+            "argvOk": true,
+            "actual": {
+              "pid": 10353,
+              "ppid": 10183,
+              "stat": "S",
+              "live": true,
+              "startText": "Sat Nov 14 09:37:07 2026",
+              "startMs": 1794620227000,
+              "uid": 501,
+              "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'api',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state",
+              "tokens": [
+                "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                "-e",
+                "const",
+                "{spawn}=require('child_process');const",
+                "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'api',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                "start",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-record-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "record_missing"
+        }
+      }
+    },
+    {
+      "id": "cleanup-failure-retains-material",
+      "status": "PASS",
+      "detail": {
+        "first": {
+          "status": "UNKNOWN",
+          "stopped": [],
+          "unknown": [
+            {
+              "pid": 10353,
+              "reason": "stop_unconfirmed",
+              "stdout": "",
+              "proof": {
+                "owned": true,
+                "checks": [
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 10353,
+                      "role": "launcher",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 10353,
+                        "ppid": 10183,
+                        "stat": "S",
+                        "live": true,
+                        "startText": "Sat Nov 14 09:37:07 2026",
+                        "startMs": 1794620227000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'api',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "const",
+                          "{spawn}=require('child_process');const",
+                          "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'api',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                          "start",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 10494,
+                      "role": "api",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 10494,
+                        "ppid": 10353,
+                        "stat": "R",
+                        "live": true,
+                        "startText": "Sat Nov 14 09:37:07 2026",
+                        "startMs": 1794620227000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) api /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "setTimeout(()",
+                          "=>",
+                          "{},",
+                          "60000)",
+                          "api",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "pids": [
+                  10353,
+                  10494
+                ]
+              }
+            }
+          ],
+          "retained": true,
+          "signals": []
+        }
+      }
+    },
+    {
+      "id": "repeated-finally-still-unknown",
+      "status": "PASS",
+      "detail": {
+        "second": {
+          "status": "UNKNOWN",
+          "stopped": [],
+          "unknown": [
+            {
+              "pid": 10353,
+              "reason": "stop_unconfirmed",
+              "stdout": "",
+              "proof": {
+                "owned": true,
+                "checks": [
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 10353,
+                      "role": "launcher",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 10353,
+                        "ppid": 10183,
+                        "stat": "S",
+                        "live": true,
+                        "startText": "Sat Nov 14 09:37:07 2026",
+                        "startMs": 1794620227000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'api',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "const",
+                          "{spawn}=require('child_process');const",
+                          "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'api',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                          "start",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 10494,
+                      "role": "api",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 10494,
+                        "ppid": 10353,
+                        "stat": "S",
+                        "live": true,
+                        "startText": "Sat Nov 14 09:37:07 2026",
+                        "startMs": 1794620227000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) api /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "setTimeout(()",
+                          "=>",
+                          "{},",
+                          "60000)",
+                          "api",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/config",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-UtN2ZZ/state"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "pids": [
+                  10353,
+                  10494
+                ]
+              }
+            }
+          ],
+          "retained": true,
+          "signals": []
+        }
+      }
+    },
+    {
+      "id": "stop-timeout-clean-through-fresh-proof",
+      "status": "PASS",
+      "detail": {
+        "timeoutClean": {
+          "status": "CLEAN",
+          "stopped": [
+            {
+              "pid": 21492,
+              "pids": [
+                21492
+              ],
+              "operation": "start",
+              "method": "proven-direct-signal"
+            }
+          ],
+          "unknown": [],
+          "retained": false,
+          "signals": [
+            {
+              "pid": 21492,
+              "signal": "SIGTERM",
+              "ok": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "empty-record-is-unknown",
+      "status": "PASS",
+      "detail": {
+        "empty": {
+          "status": "UNKNOWN",
+          "stopped": [],
+          "unknown": [
+            {
+              "reason": "no_probe_record"
+            }
+          ],
+          "retained": true,
+          "signals": []
+        }
+      }
+    }
+  ]
+}

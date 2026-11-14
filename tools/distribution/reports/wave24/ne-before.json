@@ -1,0 +1,41 @@
+{
+  "protocol": "wave18-nonempty-personal-http/1",
+  "status": "FAIL",
+  "steps": [],
+  "nativeTurns": 0,
+  "vendorSends": 0,
+  "limitations": [
+    "The model endpoint is a local fake; no vendor request or native executor exists in discussion-only mode."
+  ],
+  "error": "Error: injected_fault:before-record\n    at file:///Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-nonempty-personal-http.mjs:80:47\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "cleanup": [
+    {
+      "status": "UNKNOWN",
+      "stopped": [
+        {
+          "pid": 33562,
+          "pids": [
+            33562
+          ],
+          "operation": "start",
+          "method": "proven-spawn-group-signal"
+        }
+      ],
+      "unknown": [
+        {
+          "pid": 33562,
+          "reason": "instance_record_missing"
+        }
+      ],
+      "retained": true,
+      "signals": [
+        {
+          "pid": -33562,
+          "signal": "SIGTERM",
+          "ok": true
+        }
+      ]
+    }
+  ],
+  "retainedRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-nonempty-personal-ABE4Wv"
+}

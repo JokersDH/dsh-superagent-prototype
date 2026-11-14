@@ -1,0 +1,32 @@
+{
+  "protocol": "wave24-artifacts/1",
+  "target": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave24-target/wave24-target-3b2ff68.tar.gz",
+    "sha256": "f04abb1b4c4ae47a52f6bc1aa172d70c4a113219f443f354aee0ebffc8a00494",
+    "tarBytes": 20248077,
+    "buildId": "470738fd33b22ff4",
+    "source": {
+      "commit": "3b2ff68b4785e79757fc1dcd14b17f5dd84d0c62",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "productSchema": 18,
+    "files": 6748,
+    "extractedBytes": 67572368,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "mainSource": "4b42a90",
+  "limits": [
+    "A/C independent driver absent",
+    "two snapshot formats created/verified with DB byte equality; independent per-format bundle restore consumer not implemented",
+    "zero real vendor/native turns",
+    "private permission/target unimplemented"
+  ]
+}

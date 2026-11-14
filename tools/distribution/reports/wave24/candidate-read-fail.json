@@ -1,0 +1,92 @@
+{
+  "protocol": "wave22-same-store-dual/1",
+  "status": "FAIL",
+  "steps": [
+    {
+      "id": "same-store-seed",
+      "status": "PASS",
+      "detail": {
+        "projectId": "project-personal-dialogue",
+        "sourceMessageId": "b9428dd4a5bf99d861f6eb63770215f8",
+        "candidates": 2,
+        "fakeRequests": 1,
+        "nativeTurns": 0,
+        "vendorSends": 0,
+        "origin": {
+          "attempts": [
+            {
+              "attemptId": "attempt-7ff22d69-7274-40c4-a3f5-ee91737e5e7b",
+              "ticketId": "ad9e66aa770b076a02faf78b4a6c0b0f"
+            }
+          ],
+          "works": [
+            {
+              "id": "276cc06c228825748795e0923d16ed40",
+              "status": null
+            }
+          ],
+          "questions": [
+            {
+              "id": "codex-question-d72a004f5f5583c4a92853eeab93fa775ff002655130ad9d",
+              "workId": "276cc06c228825748795e0923d16ed40",
+              "version": 2
+            }
+          ],
+          "tickets": [
+            {
+              "ticketId": "ad9e66aa770b076a02faf78b4a6c0b0f",
+              "workId": null
+            }
+          ],
+          "answers": [
+            {
+              "answerId": "db4be89e34a893a388ee1a9e8f15e205",
+              "questionId": "codex-question-d72a004f5f5583c4a92853eeab93fa775ff002655130ad9d",
+              "digest": "ad9fed5544dec8d3e236eca6f9ec55c21e2a9a260415fe9e5c9823e40f677f9b"
+            }
+          ],
+          "nativeApplied": [
+            {
+              "answerId": "db4be89e34a893a388ee1a9e8f15e205",
+              "status": "native_applied"
+            }
+          ]
+        },
+        "snapshots": {
+          "v1": "workflow-snapshot/1",
+          "v1Families": 13,
+          "v1Digest": "4a67a140456569a25b6488b6e7812e5c1245ed6e4430a593440efc826ea9de1f",
+          "v2": "workflow-snapshot/2",
+          "v2Families": 21,
+          "v2Digest": "0f2190b8b01f5f52fb15f1514931c9fde6b3428550117b9e853d661f6cfa16d3"
+        }
+      }
+    }
+  ],
+  "nativeTurns": 0,
+  "vendorSends": 0,
+  "limitations": [
+    "Controlled local fake endpoint only; no real vendor/model/native turn.",
+    "The retained B state is copied before mutation; the original evidence state is not modified."
+  ],
+  "error": "Error: injected_fault:candidate-read-fail\n    at fault (file:///Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-same-store-dual-personal.mjs:29:60)\n    at file:///Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-same-store-dual-personal.mjs:187:3\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "cleanup": [
+    {
+      "status": "CLEAN",
+      "stopped": [
+        {
+          "pid": 30574,
+          "pids": [
+            30574,
+            30594
+          ],
+          "operation": "start",
+          "method": "cli-stop"
+        }
+      ],
+      "unknown": [],
+      "retained": false,
+      "signals": []
+    }
+  ]
+}

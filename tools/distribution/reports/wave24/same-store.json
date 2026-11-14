@@ -1,0 +1,124 @@
+{
+  "protocol": "wave22-same-store-dual/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "same-store-seed",
+      "status": "PASS",
+      "detail": {
+        "projectId": "project-personal-dialogue",
+        "sourceMessageId": "b9428dd4a5bf99d861f6eb63770215f8",
+        "candidates": 2,
+        "fakeRequests": 1,
+        "nativeTurns": 0,
+        "vendorSends": 0,
+        "origin": {
+          "attempts": [
+            {
+              "attemptId": "attempt-7ff22d69-7274-40c4-a3f5-ee91737e5e7b",
+              "ticketId": "ad9e66aa770b076a02faf78b4a6c0b0f"
+            }
+          ],
+          "works": [
+            {
+              "id": "276cc06c228825748795e0923d16ed40",
+              "status": null
+            }
+          ],
+          "questions": [
+            {
+              "id": "codex-question-d72a004f5f5583c4a92853eeab93fa775ff002655130ad9d",
+              "workId": "276cc06c228825748795e0923d16ed40",
+              "version": 2
+            }
+          ],
+          "tickets": [
+            {
+              "ticketId": "ad9e66aa770b076a02faf78b4a6c0b0f",
+              "workId": null
+            }
+          ],
+          "answers": [
+            {
+              "answerId": "db4be89e34a893a388ee1a9e8f15e205",
+              "questionId": "codex-question-d72a004f5f5583c4a92853eeab93fa775ff002655130ad9d",
+              "digest": "ad9fed5544dec8d3e236eca6f9ec55c21e2a9a260415fe9e5c9823e40f677f9b"
+            }
+          ],
+          "nativeApplied": [
+            {
+              "answerId": "db4be89e34a893a388ee1a9e8f15e205",
+              "status": "native_applied"
+            }
+          ]
+        },
+        "snapshots": {
+          "v1": "workflow-snapshot/1",
+          "v1Families": 13,
+          "v1Digest": "cd96d839c1ac327a560a0b3ea4d65885ce3f579fc9e9842abbac595586732af0",
+          "v2": "workflow-snapshot/2",
+          "v2Families": 21,
+          "v2Digest": "321dce2eee9e7858886e36a49ef6398cd7778d1224fa562e1b0750830e565bab"
+        }
+      }
+    },
+    {
+      "id": "scope-review-optional",
+      "status": "PASS",
+      "detail": {
+        "protocol": "context-scope-review/1",
+        "reasons": 0,
+        "withheld": null
+      }
+    },
+    {
+      "id": "same-store-review-reopen",
+      "status": "PASS",
+      "detail": {
+        "pidChanged": true,
+        "reprepared": true,
+        "digestObserved": true,
+        "candidates": 2,
+        "history": 200,
+        "noResend": true
+      }
+    },
+    {
+      "id": "same-store-second-root-personal-review",
+      "status": "PASS",
+      "detail": {
+        "markerState": "recovery_readonly",
+        "works": 1,
+        "candidates": 2,
+        "sources": 200,
+        "scopeReviewOptIn": true,
+        "businessRefused": true,
+        "originalWork": 1,
+        "originalQuestions": 1,
+        "originalAnswers": 1,
+        "originalAttempts": 1,
+        "nativeApplied": 1,
+        "historyAfterConsent": 200,
+        "snapshotsV1V2": true,
+        "snapshotBytesRestored": true,
+        "originalIdsPreserved": true,
+        "workflowV1Families": 13,
+        "workflowV2Families": 21,
+        "fakeRequests": 1,
+        "nativeTurns": 0
+      }
+    }
+  ],
+  "nativeTurns": 0,
+  "vendorSends": 0,
+  "limitations": [
+    "Controlled local fake endpoint only; no real vendor/model/native turn.",
+    "The retained B state is copied before mutation; the original evidence state is not modified."
+  ],
+  "build": {
+    "buildId": "470738fd33b22ff4",
+    "commit": "3b2ff68b4785e79757fc1dcd14b17f5dd84d0c62",
+    "schema": 18
+  },
+  "cleanup": []
+}

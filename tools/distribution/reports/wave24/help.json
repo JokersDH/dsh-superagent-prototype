@@ -1,0 +1,16 @@
+{
+  "protocol": "wave23-cli-help/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "help-discoverability",
+      "status": "PASS",
+      "detail": {
+        "top": true,
+        "sub": true,
+        "commandHelp": true,
+        "noStateCreated": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "protocol": "wave18-nonempty-personal-http/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "discussion-only-personal",
+      "status": "PASS",
+      "detail": {
+        "mode": "personal",
+        "personalMode": true,
+        "executionUnavailable": true
+      }
+    },
+    {
+      "id": "original-request-and-fake-sdk",
+      "status": "PASS",
+      "detail": {
+        "sourceMessageId": "3098fa36370fccfcb8db6b6f4091a8e1",
+        "projectId": "project-personal-dialogue",
+        "fakeRequests": 1,
+        "vendorSends": 0
+      }
+    },
+    {
+      "id": "nonempty-candidates",
+      "status": "PASS",
+      "detail": {
+        "status": "candidates",
+        "count": 2,
+        "kinds": [
+          "propose_work",
+          "propose_decision"
+        ],
+        "trust": "untrusted_data",
+        "executable": false
+      }
+    },
+    {
+      "id": "candidate-prepare",
+      "status": "PASS",
+      "detail": {
+        "index": 0,
+        "kind": "propose_work",
+        "requiredInputs": [
+          "work.scope",
+          "work.criteria",
+          "work.profileId"
+        ],
+        "tokenChars": 2171,
+        "state": "pending"
+      }
+    },
+    {
+      "id": "explicit-reject",
+      "status": "PASS",
+      "detail": {
+        "status": "recorded",
+        "commandId": "wave18-reject-1",
+        "result": null
+      }
+    },
+    {
+      "id": "explicit-decision-confirm-and-replay",
+      "status": "PASS",
+      "detail": {
+        "status": "recorded",
+        "receiptDigest": null,
+        "replaySameCommand": true,
+        "result": null
+      }
+    },
+    {
+      "id": "work-confirm-refused-without-executor",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 422,
+        "code": "unsupported_capability"
+      }
+    },
+    {
+      "id": "native-zero",
+      "status": "PASS",
+      "detail": {
+        "nativeTurns": 0,
+        "vendorSends": 0,
+        "discussionOnly": true
+      }
+    },
+    {
+      "id": "config-files",
+      "status": "PASS",
+      "detail": {
+        "files": [
+          "launcher.json",
+          "model.json",
+          "model.json.assistant-settings.json",
+          "release.json"
+        ]
+      }
+    },
+    {
+      "id": "same-data-relocation-readonly",
+      "status": "PASS_WITH_FIXTURE_LIMIT",
+      "detail": {
+        "restoredState": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-nonempty-personal-sheuPd/restored/state",
+        "restoredMode": "fixture",
+        "markerState": "recovery_readonly",
+        "candidates": "NOT_TESTED",
+        "restoredCandidateError": {
+          "httpStatus": 403,
+          "code": "forbidden",
+          "reason": "main restored-project rebind is not implemented"
+        },
+        "originalSources": "NOT_TESTED",
+        "restoredOriginalSourceError": {
+          "httpStatus": 403,
+          "code": "forbidden",
+          "reason": "main restored-project rebind is not implemented"
+        },
+        "originalText": true,
+        "businessRefused": true,
+        "modelRequestsDuringRestore": 0
+      }
+    },
+    {
+      "id": "same-data-source-confirm",
+      "status": "PASS",
+      "detail": {
+        "activationId": "recovery-activation-3113e066-d3c9-4bb6-9736-c19d62acbe4f",
+        "authorization": "not_granted",
+        "startupAvailable": false,
+        "audit": "not_granted",
+        "notAGrant": true
+      }
+    },
+    {
+      "id": "explicit-reviewed-personal",
+      "status": "PASS",
+      "detail": {
+        "reviewProtocol": "restored-personal-review/1",
+        "windowMs": 300000,
+        "markerState": "recovery_readonly",
+        "startupMode": "recovery_readonly",
+        "candidatesBeforeConsent": 403,
+        "candidatesAfterConsent": 2,
+        "sourcesAfterConsent": 200,
+        "historyAfterConsent": 200,
+        "businessRefused": true,
+        "modelRequests": 0,
+        "nativeTurns": 0,
+        "fixtureRejected": true,
+        "invalidFileRejected": true,
+        "tamperedRejected": true,
+        "startupAvailable": false,
+        "unboundSelectionRefused": true,
+        "sameSelectionReused": true,
+        "differentSelectionRefused": true,
+        "noSelectionRefused": true,
+        "changedPortRefused": true,
+        "pidStable": true
+      }
+    }
+  ],
+  "nativeTurns": 0,
+  "vendorSends": 0,
+  "limitations": [
+    "The model endpoint is a local fake; no vendor request or native executor exists in discussion-only mode."
+  ],
+  "build": {
+    "buildId": "470738fd33b22ff4",
+    "commit": "3b2ff68b4785e79757fc1dcd14b17f5dd84d0c62",
+    "schema": 18
+  }
+}
