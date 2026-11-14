@@ -39,6 +39,7 @@
     "@personal-agent/orchestrator-core": "workspace:*",
     "@personal-agent/questions": "workspace:*",
     "@personal-agent/storage": "workspace:*",
+    "@personal-agent/usage-insights": "workspace:*",
     "@personal-agent/verification": "workspace:*",
     "@personal-agent/workspaces": "workspace:*",
     "hono": "4.13.17",
