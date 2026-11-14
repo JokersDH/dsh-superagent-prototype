@@ -130,6 +130,7 @@ import type {
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
+import { projectTrialReadiness } from '../product/readiness.ts'
 
 const COOKIE = 'pa_local_session'
 const sameSecret = (input: string | undefined, expected: string): boolean =>
@@ -414,17 +415,26 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (result.activationId !== input.activationId) throw new ApplicationFault('storage_unavailable', 'Target preparation identity mismatch', 'none')
     return c.json(result)
   })
-  app.get('/v1/configuration', async (c) => {
-    if (Object.keys(c.req.query()).length)
-      throw new ApplicationFault('invalid_request', 'Configuration does not accept query parameters')
+  const readConfiguration = async () => {
     if (!options.read?.configuration)
       throw new ApplicationFault('unsupported_capability', 'Configuration read port is not connected')
     const value = ApplicationConfigurationSchema.parse(await options.read.configuration())
-    return c.json(options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false, decisionsAvailable: false, proposalsAvailable: false, contextPreviewAvailable: false, assistantContextAvailable: false,
+    return options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false, decisionsAvailable: false, proposalsAvailable: false, contextPreviewAvailable: false, assistantContextAvailable: false,
       executionAvailability: { state: 'unavailable', reason: 'recovery_readonly' },
       profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate' })),
       projects: value.projects.map(project => { const { defaultProfileId: _, ...rest } = project; return { ...rest, profileIds: [], dispatchAllowed: false, blockedReason: 'writer_indeterminate' } }),
-    }) : value)
+    }) : value
+  }
+  app.get('/v1/configuration', async (c) => {
+    if (Object.keys(c.req.query()).length)
+      throw new ApplicationFault('invalid_request', 'Configuration does not accept query parameters')
+    return c.json(await readConfiguration())
+  })
+  app.get('/v1/readiness', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Readiness does not accept query parameters')
+    const configuration = await readConfiguration(), provider = await options.read?.assistant?.()
+    return c.json(projectTrialReadiness(configuration, provider, { mode: options.mode,
+      startupMode: options.startupMode ?? 'normal', observedAt: new Date(now()).toISOString() }))
   })
   app.post('/v1/context/preview', async (c) => {
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Context preview requires JSON')

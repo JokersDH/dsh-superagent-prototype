@@ -26,6 +26,7 @@ import { AssistantInferenceRecordSchema, AssistantReplyBodySchema, AssistantRepl
 import { RecoverySourceCheckpointQuerySchema, RecoverySourceCheckpointSchema } from '../src/recovery-source.ts';
 import { RecoverySourcePrepareSchema, RecoverySourcePreparedSchema, RecoverySourceConfirmSchema } from '../src/recovery-source-confirmation.ts';
 import { ContextHistoryQuerySchema, ContextHistoryEntrySchema, ContextHistorySchema, ContextSourcesSchema } from '../src/context-records.ts';
+import { TrialReadinessSchema } from '../src/trial-readiness.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -110,6 +111,7 @@ const assistantContextCommandsText = canonical({ $schema: 'https://json-schema.o
 outputs.set('generated/assistant-context-commands.schema.json', assistantContextCommandsText);
 outputs.set('generated/assistant-context-commands.manifest.json', canonical({ protocol: 'assistant-context-command/1', schemaHash: digest(assistantContextCommandsText), sourceHash: digest(readFileSync(resolve(root, 'src/assistant-context.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [name, protocol, source, schemas] of [
+  ['trial-readiness', 'trial-readiness/1', 'trial-readiness.ts', { TrialReadiness: TrialReadinessSchema }],
   ['assistant-candidates', 'assistant-candidates/1', 'assistant-candidates.ts', { AssistantCandidatePrepare: AssistantCandidatePrepareSchema, AssistantCandidates: AssistantCandidatesSchema }],
   ['assistant-records', 'assistant-records/1', 'assistant-records.ts', { AssistantInferenceRecord: AssistantInferenceRecordSchema, AssistantReplyBody: AssistantReplyBodySchema, AssistantReplyResult: AssistantReplyResultSchema, AssistantContextHistoryQuery: AssistantContextHistoryQuerySchema, AssistantContextHistoryPage: AssistantContextHistoryPageSchema }],
   ['recovery-source', 'recovery-source-checkpoint/1', 'recovery-source.ts', { RecoverySourceCheckpointQuery: RecoverySourceCheckpointQuerySchema, RecoverySourceCheckpoint: RecoverySourceCheckpointSchema }],

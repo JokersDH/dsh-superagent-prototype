@@ -1,0 +1,81 @@
+{
+  "protocol": "parallel-development-workspaces/1",
+  "date": "2026-11-14",
+  "repository": "https://github.com/JokersDH/dsh-superagent-prototype",
+  "mainRuntimeSource": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+  "externalAgentCount": 8,
+  "mainOwnsIntegration": true,
+  "createdUserThreads": false,
+  "externalPromptsSent": false,
+  "nativeModelAllowanceAdded": 0,
+  "sourceControl": "git-worktree",
+  "newRootsCopyUntrackedOrUserState": false,
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "packet": "agent-tasks/product-wave-25/agent-a-data.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Fetch and merge origin/main, then read AGENTS.md, START-HERE.zh-CN.md, product-spec/README.md and assigned packet. Preserve existing edits; never reset."
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "packet": "agent-tasks/product-wave-25/agent-b-runtime.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Fetch and merge origin/main, then read AGENTS.md, START-HERE.zh-CN.md, product-spec/README.md and assigned packet. Preserve existing edits; never reset."
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "packet": "agent-tasks/product-wave-25/agent-c-context.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Fetch and merge origin/main, then read AGENTS.md, START-HERE.zh-CN.md, product-spec/README.md and assigned packet. Preserve existing edits; never reset."
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "packet": "agent-tasks/product-wave-25/agent-d-delivery.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Fetch and merge origin/main, then read AGENTS.md, START-HERE.zh-CN.md, product-spec/README.md and assigned packet. Preserve existing edits; never reset."
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "packet": "agent-tasks/product-wave-25/agent-e-acceptance.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Fetch and merge origin/main, then read AGENTS.md, START-HERE.zh-CN.md, product-spec/README.md and assigned packet. Preserve existing edits; never reset."
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-25/main.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Fetch and merge origin/main, then read AGENTS.md, START-HERE.zh-CN.md, product-spec/README.md and assigned packet. Preserve existing edits; never reset."
+    },
+    "F": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "packet": "agent-tasks/product-wave-25/agent-f-experience.zh-CN.md",
+      "newlyPrepared": true,
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "startup": "Fetch and merge origin/main, then read AGENTS.md, START-HERE.zh-CN.md, product-spec/README.md and assigned packet. Preserve existing edits; never reset."
+    },
+    "G": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "packet": "agent-tasks/product-wave-25/agent-g-insights.zh-CN.md",
+      "newlyPrepared": true,
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "startup": "Fetch and merge origin/main, then read AGENTS.md, START-HERE.zh-CN.md, product-spec/README.md and assigned packet. Preserve existing edits; never reset."
+    },
+    "H": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "packet": "agent-tasks/product-wave-25/agent-h-trial-operations.zh-CN.md",
+      "newlyPrepared": true,
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "startup": "Fetch and merge origin/main, then read AGENTS.md, START-HERE.zh-CN.md, product-spec/README.md and assigned packet. Preserve existing edits; never reset."
+    }
+  }
+}
