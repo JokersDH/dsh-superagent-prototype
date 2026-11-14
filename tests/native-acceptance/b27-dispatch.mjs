@@ -35,7 +35,7 @@ try {
   else log.fail(`payload reread failed: ${JSON.stringify(payload)}`)
 
   log.begin('B27-PENDING-WRITE-INDETERMINATE-ON-DETACH', 'a pending native write is indeterminate after detach', 'controlled_process')
-  const writeCommand = { id: 'cmd-d-1', kind: 'answer', ticketId: attempt.ticketId, fenceEpoch: 3, attemptId: attempt.attemptId, contract: attempt.contract, questionId: 'q-d-1', answer: 'hello' }
+  const writeCommand = { id: 'cmd-d-1', kind: 'answer', ticketId: attempt.ticketId, assignmentId: attempt.assignmentId, attemptId: attempt.attemptId, fenceEpoch: 3, contract: attempt.contract, nativeBindingRef: 'binding-d-1', answerRef: 'answer-d-1' }
   const pendingWrite = dispatch.request(producer, { v: 1, type: 'native-write-intent', id: 'write-d-1', command: writeCommand }).catch(error => error)
   await new Promise(resolve => setTimeout(resolve, 20))
   const pendingBefore = dispatch.pending()

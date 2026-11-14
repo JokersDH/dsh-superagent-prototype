@@ -28,6 +28,7 @@ import { createHash } from 'node:crypto'
 import { FileCriticalJournal } from './file-journal.ts'
 import { AttemptArtifactManifest } from './artifact-manifest.ts'
 import { serveRecoveryEndpoint, endpointDirectory, type RecoveryEndpoint } from './recovery-endpoint.ts'
+import { createBusinessChannel } from './business-channel.ts'
 import { ProcessHost } from './process-host.ts'
 import { RunnerPayloadStore, LocalPayloadMissing } from './payload-store.ts'
 import { AttemptRunner } from './runner.ts'
@@ -130,10 +131,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   const closeAdmission = () => {
     preparation.abort()
     businessClosed = true; processHost.closeAdmission(); runner?.closeAdmission()
-    for (const waiters of [factWaiters, payloadWaiters, writeWaiters]) {
-      for (const waiter of waiters.values()) waiter.reject(new Error('Attempt admission is closed'))
-      waiters.clear()
-    }
+    // One channel owns every pending waiter, so closing admission cannot leave a stale map behind.
+    channel.detach({ reason: 'Attempt admission is closed' })
   }
   const stopPhysical = async () => {
     closeAdmission()
@@ -141,20 +140,57 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     physicallyStopped = stopped?.quiescence === 'confirmed' && processHost.inventory().every(item => item.writer === 'quiescent')
   }
   const receipts = new Map<string, DurableReceipt>()
-  /** Facts awaiting the coordinator's authoritative receipt. */
-  const factWaiters = new Map<string, { resolve: (value: DurableReceipt) => void; reject: (error: Error) => void }>()
+  // Single generation-scoped store for fact receipts, payload reads and native-write admission.
+  const channel = createBusinessChannel()
   const readLocal = async (reference: string): Promise<Json> => {
     if (!localPayloads) throw new LocalPayloadMissing('Payload store is not ready')
     return localPayloads.read(reference)
   }
-  /** Outstanding payload reads the coordinator owes us, keyed by request id. */
-  const payloadWaiters = new Map<string, { resolve: (value: Json) => void; reject: (error: Error) => void }>()
-  const writeWaiters = new Map<string, { resolve: () => void; reject: (error: Error) => void }>()
-  const hooks = { beforeNativeWrite: (command: RunnerCommand) => new Promise<void>((resolve, reject) => {
-    if (businessClosed || command.kind !== 'answer') { reject(new Error('Native write admission is closed')); return }
-    writeWaiters.set(command.id, { resolve, reject })
+  /**
+   * The single business-command admission. Both the stdio handler and the authenticated endpoint call
+   * this, so begin-once, the prepared policy, admission state and the receiver log cannot be bypassed by
+   * whichever channel a caller happens to use.
+   */
+  const admitCommand = async (command: RunnerCommand, id: string): Promise<{ code: string; reason: string; message: string } | null> => {
+    if (!spec || !runner) return { code: 'state_indeterminate', reason: 'not_bootstrapped', message: 'Commands require a bootstrap first' }
+    // Optional receiver log (wave-16 B1). Off by default and inert when unset; when a path is supplied,
+    // every command the Runner ACTUALLY received is appended before any admission check. This is the
+    // only honest source for "receiver begin count": the caller's own bookkeeping cannot prove arrival.
+    if (process.env.PA_RUNNER_RECEIVER_LOG) {
+      await appendFile(
+        process.env.PA_RUNNER_RECEIVER_LOG,
+        `${JSON.stringify({ kind: command.kind, id: command.id, attemptId: command.attemptId, fenceEpoch: command.fenceEpoch, at: new Date().toISOString() })}\n`,
+      ).catch(() => undefined)
+    }
+    if (businessClosed) return { code: 'state_indeterminate', reason: 'admission_closed', message: 'Attempt admission is closed' }
+    if (command.kind === 'begin') {
+      if (began) return { code: 'protocol_error', reason: 'duplicate_begin', message: 'begin is accepted at most once per attempt' }
+      began = true
+      // Queue begin *before* launching: launch() takes ownership of the command queue, and feeding
+      // afterwards races the runner's single-attempt guard.
+      try {
+        runner.feed(command)
+      } catch (error) {
+        return toBridgeFailure(error)
+      }
+      if (!running) launch()
+      return null
+    }
+    try {
+      runner.feed(command)
+      return null
+    } catch (error) {
+      return toBridgeFailure(error)
+    }
+    void id
+  }
+
+  const hooks = { beforeNativeWrite: (command: RunnerCommand) => {
+    if (businessClosed || command.kind !== 'answer') return Promise.reject(new Error('Native write admission is closed'))
+    const admission = channel.awaitWrite(command.id)
     write({ type: 'native-write-intent', id: command.id, command })
-  }) }
+    return admission
+  } }
   let payloadSeq = 0
 
   const finish = (): void => {
@@ -227,10 +263,9 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 return readLocal(reference).catch((error) => {
                   if (!(error instanceof LocalPayloadMissing)) throw error
                   const requestId = `payload-${++payloadSeq}`
-                  return new Promise((resolve, reject) => {
-                    payloadWaiters.set(requestId, { resolve, reject })
-                    write({ type: 'payload-read', id: requestId, requestId, reference } as never)
-                  })
+                  const pending = channel.awaitPayload(requestId)
+                  write({ type: 'payload-read', id: requestId, requestId, reference } as never)
+                  return pending
                 })
               },
               // The Runner keeps a bounded local payload area next to its journal so a fact can be
@@ -245,10 +280,11 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 if (businessClosed) throw new Error('Attempt fact channel is closed')
                 const receipt = options.sink
                   ? await options.sink.record(fact)
-                  : await new Promise<DurableReceipt>((resolve, reject) => {
-                      factWaiters.set(fact.factId, { resolve, reject })
+                  : await (async () => {
+                      const pending = channel.awaitFact(fact.factId)
                       write({ type: 'fact', id: fact.factId, fact } as never)
-                    })
+                      return pending
+                    })()
                 receipts.set(fact.factId, receipt)
                 write({ type: 'receipt', id: fact.factId, factId: fact.factId, receipt })
                 return receipt
@@ -316,9 +352,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               },
               // Business commands are admitted to the SAME attempt and child through the existing feed.
               command: async command => {
-                if (!runner) throw new Error('Runner business channel is not bootstrapped')
-                if (businessClosed || physicallyStopped) throw new Error('Runner business admission is closed')
-                await runner.feed(command)
+                const refusal = await admitCommand(command, command.id)
+                if (refusal) throw Object.assign(new Error(refusal.message), { code: refusal.code, reason: refusal.reason })
               },
             })
           }
@@ -339,86 +374,39 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
         }
 
         case 'command': {
-          if (!spec || !runner) {
-            write({ type: 'error', id: frame.id, code: 'state_indeterminate', reason: 'not_bootstrapped', message: 'Commands require a bootstrap first' })
-            break
-          }
           const command: RunnerCommand = frame.command
-          // Optional receiver log (wave-16 B1). Off by default and inert when unset; when a path is
-          // supplied, every command the Runner ACTUALLY received is appended before any admission
-          // check. This is the only honest source for "receiver begin count": the caller's own
-          // bookkeeping cannot prove the frame arrived at the writer's process.
-          if (process.env.PA_RUNNER_RECEIVER_LOG) {
-            await appendFile(
-              process.env.PA_RUNNER_RECEIVER_LOG,
-              `${JSON.stringify({ kind: command.kind, id: command.id, attemptId: command.attemptId, fenceEpoch: command.fenceEpoch, at: new Date().toISOString() })}\n`,
-            ).catch(() => undefined)
-          }
-          if (businessClosed) {
-            write({ type: 'error', id: frame.id, code: 'state_indeterminate', reason: 'admission_closed', message: 'Attempt admission is closed' })
-            break
-          }
-          if (command.kind === 'begin') {
-            if (began) {
-              write({ type: 'error', id: frame.id, code: 'protocol_error', reason: 'duplicate_begin', message: 'begin is accepted at most once per attempt' })
-              break
-            }
-            began = true
-            // Queue begin *before* launching: launch() takes ownership of the command queue, and
-            // feeding afterwards races the runner's single-attempt guard.
-            try {
-              runner.feed(command)
-            } catch (error) {
-              write({ type: 'error', id: frame.id, ...toBridgeFailure(error) })
-              break
-            }
-            if (!running) launch()
-            break
-          }
-          try {
-            runner.feed(command)
-          } catch (error) {
-            write({ type: 'error', id: frame.id, ...toBridgeFailure(error) })
+          const refusal = await admitCommand(command, frame.id)
+          if (refusal) {
+            write({ type: 'error', id: frame.id, ...refusal })
           }
           break
         }
 
         case 'receipt': {
-          const waiter = factWaiters.get(frame.factId)
-          if (waiter) {
-            factWaiters.delete(frame.factId)
-            waiter.resolve(frame.receipt)
-          }
+          channel.resolveReceipt(frame.factId, frame.receipt)
           break
         }
 
         case 'payload': {
-          const waiter = payloadWaiters.get(frame.requestId)
-          if (waiter) {
-            payloadWaiters.delete(frame.requestId)
-            waiter.resolve(frame.value as Json)
-          }
+          channel.resolvePayload(frame.requestId, frame.value as Json)
           break
         }
         case 'write-admission': {
-          const waiter = writeWaiters.get(frame.id)
-          if (waiter) { writeWaiters.delete(frame.id); if (frame.allowed && !businessClosed) waiter.resolve(); else waiter.reject(new Error('Coordinator refused native write')) }
+          // Grant only while admission is still open; otherwise the waiter learns it is closed.
+          channel.resolveWrite(frame.id, frame.allowed && !businessClosed)
           break
         }
 
         case 'ack-failed': {
           // The coordinator could not persist the fact: keep it spooled and fail the in-flight
           // acknowledge so the Driver sees a real error instead of waiting forever.
-          const waiter = factWaiters.get(frame.factId)
-          if (waiter) {
-            factWaiters.delete(frame.factId)
-            waiter.reject(
-              Object.assign(new Error(`ingress refused fact ${frame.factId}: ${frame.reason}`), {
-                code: 'state_indeterminate',
-                reason: 'ingress_unavailable',
-              }),
-            )
-          }
+          channel.rejectReceipt(
+            frame.factId,
+            Object.assign(new Error(`ingress refused fact ${frame.factId}: ${frame.reason}`), {
+              code: 'state_indeterminate',
+              reason: 'ingress_unavailable',
+            }),
+          )
           write({ type: 'progress', id: frame.id, text: `ack failed for ${frame.factId}: ${frame.reason}`, observedAt: new Date().toISOString() })
           break
         }

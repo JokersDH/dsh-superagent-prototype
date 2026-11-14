@@ -2,57 +2,51 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "36c0e60",
-  "checkpoint": "1 of 5",
-  "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths (apps/runner src, packages/execution, tests/native-acceptance, docs/rfcs/WP-03). I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Original main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
+  "base": "d2e5f8e",
+  "checkpoint": "2 of 5",
+  "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
 
-  "defectFixed": {
-    "cumulativeSmallPageBudgetRegression": {
-      "before": "the page budget counted only the sum of frame bodies, so the assembled response (producer envelope plus wrapper) overran the transport cap and surfaced as unknown_outcome for legal records; the independent 10/11 run saw 160 valid records fail",
-      "after": "the WHOLE ENCODED PAGE is budgeted. A page that would overrun is trimmed from the tail and reported with done=false and a real cursor, so the caller continues instead of losing the replay. A page that cannot fit even one frame is refused explicitly as page_exceeds_cap rather than as a generic 500",
-      "whyNotJustRaiseTheCap": "the transport cap is unchanged at 64KiB; the fix is correct accounting plus trim-and-continue, not a wider cap"
-    }
+  "item1_complete": {
+    "pageBudgetRegression": "closed earlier in this goal: the whole encoded page is budgeted, overrun pages are trimmed with done=false and a real cursor, the 64KiB cap is unchanged",
+    "indeterminateOnDetachObserved": "NOW OBSERVED. The earlier failure was my harness, not the implementation: the answer command did not match the strict RunnerCommand shape (id/ticketId/assignmentId/attemptId/fenceEpoch/contract/nativeBindingRef/answerRef). With the real shape, 'B27-PENDING-WRITE-INDETERMINATE-ON-DETACH' passes: the pending native write is rejected as indeterminate and nothing is granted.",
+    "harness": "tests/native-acceptance/b27-dispatch.mjs -> 5 PASS / 0 FAIL / 1 NOT_TESTED"
   },
 
-  "observedPositives": {
-    "b27": {
-      "harness": "tests/native-acceptance/b27-small-pages.mjs",
-      "result": "2 PASS / 0 FAIL / 1 NOT_TESTED",
-      "cases": [
-        "B27-160-SMALL-FACTS-FULL-REPLAY - all 160 facts replayed over 4 pages (largest 40 frames), contiguous seq, real end",
-        "B27-TINY-BUDGET-STILL-COMPLETES - a 2KiB budget still returned all 160 facts over 32 pages"
-      ]
+  "item2_progress": {
+    "threeWaiterMapsRemoved": {
+      "before": "apps/runner/src/runner-service.ts held factWaiters, payloadWaiters and writeWaiters as three independent maps",
+      "after": "ZERO references remain. They are replaced by one generation-scoped store in the new B-owned apps/runner/src/business-channel.ts, which also rejects a previous lease's waiters when the lease changes instead of leaving them countable"
     },
-    "b26Regression": {
-      "harness": "tests/native-acceptance/b26-ref-payload.mjs",
-      "result": "4 PASS / 0 FAIL / 1 NOT_TESTED - unchanged",
-      "covers": "inline page, reference descriptor for the 135586-byte frame, five-chunk payload read including middle and last, full digest match, foreign producer refused"
-    }
+    "singleAdmissionForBothChannels": {
+      "before": "the stdio 'command' handler enforced not-bootstrapped, receiver log, admission-closed and begin-once, while the authenticated endpoint route called runner.feed directly and bypassed all of it",
+      "after": "one admitCommand() is the only business-command admission; the stdio handler and the endpoint route both call it, so begin-once, prepared policy, admission state and the receiver log cannot be bypassed by choosing a channel"
+    },
+    "observed": {
+      "b27-channel": "5 PASS / 0 FAIL - generation starts 0 and the first CAS bind returns 1 with no reuse; a receipt settles only its own lease; a stale write reply cannot cross leases and the older waiter is settled as write_indeterminate_after_detach; detach makes a pending native write state_indeterminate; a fact waiter is rejected as channel_detached instead of hanging",
+      "b18-product-normal": "4 PASS / 1 FAIL / 1 NOT_TESTED - unchanged: exactly one begin, Broker question from the producer approval, durable rows (facts 4, dispatch 1, question.opened), answer delivered. The FAIL is the known-stale B18-STOP-DELIVERED assertion (real stop uses the authenticated recovery cancel, not business cancel frames)",
+      "b26-ref-payload": "4 PASS / 0 FAIL - inline, reference descriptor, five-chunk payload, digest, foreign refusal",
+      "b27-small-pages": "2 PASS / 0 FAIL - 160 facts over 4 pages, and over 32 pages under a 2KiB budget"
+    },
+    "foundByMyOwnHarness": [
+      "generation started at 2 instead of 1 because the counter was pre-incremented",
+      "a replaced lease left its waiters in the store, so a later pending count included them; bind now settles the previous lease"
+    ]
   },
 
-  "strict": "direct strict + exactOptionalPropertyTypes compile of recovery-transport.ts exits 0",
-
-  "notDone": {
-    "consume0068AndI": "NOT DONE. packages/contracts/src/coordinator-channel.ts (0058/0068) and I's attach-channel module were not consumed this checkpoint, so the three waiter maps (fact, payload, native-write) are still present and the original dispatch is not unified",
-    "unifiedDispatch": "endpoint command path and original stdio path still not proven to share ONE dispatch with begin-once, prepared-policy and control priority",
-    "threeCallbackRebind": "fact receipt ACK, payload read and native-write-admission are still bound to the stdio channel",
-    "sameRunnerDualClient": "no passing A-disconnect/B-takeover proof against a real Runner/child; facts-by-original-ID ACK and payload reread by original ref are not observed",
-    "pendingWriteOnDetach": "a pending native write on detach is not yet rejected as indeterminate",
-    "result2_sigkillRecovery": "NOT_REACHED",
-    "result3_recoveredAcceptSlots": "NOT_REACHED",
-    "result4_interfaceCompatFaults": "NOT_REACHED",
-    "result5_docsAndScope": "NOT_REACHED"
+  "stillNotDone": {
+    "iModule": "I's apps/runner/src/attach-channel implementation is still not present in this worktree, so only the 0068 contract is consumed",
+    "crossLeaseProductObservation": "fact ACK by original id and payload reread by original ref are observed in-process, not yet across a real client handover on a live Runner",
+    "item3_dualClient": "NOT_REACHED - no A-disconnect/B-takeover against a real Runner/child",
+    "item4_sigkillRecovery": "NOT_REACHED",
+    "item5_recoveredAcceptSlots": "NOT_REACHED",
+    "resultCompleteness": "items 1 and 2 are partial; the package is not complete"
   },
 
   "wholePackageComplete": false,
-  "budget": {
-    "grants": [{ "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false }],
-    "modelCallsThisWave": 0,
-    "nativeTurnsThisWave": 0
-  },
+  "budget": { "modelCallsThisWave": 0, "nativeTurnsThisWave": 0, "cap4": "UNKNOWN unspendable" },
   "limitations": [
-    "both harnesses run against a controlled endpoint whose facts backend is fixture-shaped, not the full product journal",
-    "the I module and the coordinator-channel contract are not consumed yet, so no channel generation/CAS/lease behaviour is claimed",
-    "one of five runnable checkpoints published"
+    "all positives are controlled in-process or local-fixture evidence; no installed agent, gateway or native turn",
+    "b18's stop assertion is the known-stale business-cancel expectation, not a regression from this change",
+    "checkpoint 2 of 5"
   ]
 }
