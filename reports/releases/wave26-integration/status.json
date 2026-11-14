@@ -1,0 +1,101 @@
+{
+  "protocol": "wave26-main-actual-trial-workbench/1",
+  "dispatchVerification": {
+    "status": "PASS_EIGHT_AGENT_DISPATCH_STATIC_ONLY",
+    "externalAgents": 8,
+    "ownersIncludingMain": 9,
+    "phases": 144,
+    "milestonesPerOwner": 4,
+    "dependencyNodes": 46,
+    "localLinks": 184,
+    "localWorkspacesChecked": 9,
+    "acyclic": true,
+    "explicitTrialOwnershipExclusionsVerified": true,
+    "confersRuntimeOrReleaseAdmission": false
+  },
+  "existingPreviewReadonlyCheck": {
+    "url": "http://127.0.0.1:5191/",
+    "rootStatus": 200,
+    "currentAppModuleStatus": 200,
+    "currentAppModuleContainsTrialEntry": true,
+    "readinessStatus": 404,
+    "backendWasRestartedOrUpgraded": false,
+    "note": "Existing preview still has the old backend; full new readiness data is verified on an isolated actual backend, not silently deployed here."
+  },
+  "date": "2026-11-14",
+  "source": "a302ddc1963e9d20ada2cbba4f5cf317f041e78f",
+  "fComponentSource": "fad070fb1d0a7586ac1059dd7aacba0d869e9658",
+  "fSourceImport": [
+    "apps/console/src/trial/index.ts",
+    "apps/console/src/trial/TrialWorkspace.tsx",
+    "apps/console/src/trial/useTrialReadiness.ts",
+    "apps/console/src/trial/trial-view.ts",
+    "apps/console/src/trial/insights.ts",
+    "apps/console/src/trial/trial.css",
+    "apps/console/test/trial/trial-view.case.ts"
+  ],
+  "implemented": [
+    "Actual App trial navigation with authenticated-visible-only readiness reads",
+    "Original four navigation targets with correctly ordered project import and readonly/optional guard",
+    "Default conversation and original draft preserved",
+    "F six source modules and one mapping test imported without changing their bytes or adding dependencies"
+  ],
+  "notImplemented": [
+    "Default G insights summary or collector admission",
+    "Default H preflight/diagnostic/soak toolkit admission",
+    "B business rebind/coordinator resume",
+    "A/C target content reverify admission",
+    "Private startup permission or target activation",
+    "E final current F App artifact verdict"
+  ],
+  "checks": {
+    "fPureCases": 10,
+    "readinessTransportCases": 2,
+    "consoleStrict": "PASS",
+    "consoleBuild": "PASS",
+    "actualAppCleanBrowserCases": 8,
+    "actualAppWorktreeClean": true,
+    "browserPageErrors": 0,
+    "postRequests": 0,
+    "modelCalls": 0,
+    "eventDelta": 0,
+    "readinessReads": 14,
+    "desktop": [
+      1440,
+      900
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "screenshotsVisuallyReviewed": true,
+    "mainNavigationIcons": 5,
+    "independentNarrowReview": "NO_SUBSTANTIVE_FINDINGS",
+    "mechanicalDetector": {
+      "runs": 1,
+      "blocking": 0,
+      "advisories": 13,
+      "scope": "Existing compact font steps and local neutral/risk-line colors",
+      "oldDesignSidecarRegenerated": false
+    },
+    "command": "node tests/integration/trial-workbench-browser.mjs --output reports/releases/wave26-integration/browser-final --no-capture"
+  },
+  "browserReport": "reports/releases/wave26-integration/browser-final/browser-report.json",
+  "screenshotReport": "reports/releases/wave26-integration/browser/browser-report.json",
+  "uiUpdated": true,
+  "defaultConversationChanged": false,
+  "gMetricsEnabled": false,
+  "hToolkitImported": false,
+  "contractsChanged": false,
+  "dependencyVersionsChanged": false,
+  "productSchema": 18,
+  "migrationsAdded": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "preservedServicePairs": 12,
+  "userServicesRestarted": false,
+  "newPersistentPreviewStarted": false,
+  "frozenTarCreated": false,
+  "independentInstalledAdmission": false,
+  "releaseApproved": false
+}
