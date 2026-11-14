@@ -520,7 +520,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第二十五轮交付交接
+const handoff = `# Agent E 第二十六轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -995,6 +995,8 @@ if (!existsSync(join(reports, 'wave23-status.json')))
       reviewRefusals: byId.get('E5-RESTORED-REVIEW-REFUSALS')?.status ?? 'MISSING',
       reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.status ?? 'MISSING',
       scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.status ?? 'MISSING',
+      readiness: byId.get('E7-READINESS')?.status ?? 'MISSING',
+      trialWorkbenchUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.status ?? 'MISSING',
       currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
       upgradeFaults: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
       upgradeRollback: byId.get('E4-UPGRADE-ROLLBACK')?.status ?? 'MISSING' } },
@@ -1004,6 +1006,8 @@ if (!existsSync(join(reports, 'wave23-status.json')))
     personalReview: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview ?? null,
     reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse ?? null,
     scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics ?? null,
+    readiness: byId.get('E7-READINESS')?.evidence?.readiness ?? null,
+    trialUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi ?? null,
     counts: report.counts,
     testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
     productSource: { commit: artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? null },
@@ -1093,6 +1097,8 @@ if (!existsSync(join(reports, 'wave24-status.json')))
       reviewRefusals: byId.get('E5-RESTORED-REVIEW-REFUSALS')?.status ?? 'MISSING',
       reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.status ?? 'MISSING',
       scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.status ?? 'MISSING',
+      readiness: byId.get('E7-READINESS')?.status ?? 'MISSING',
+      trialWorkbenchUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.status ?? 'MISSING',
       currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
       upgradeFaults: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
       upgradeRollback: byId.get('E4-UPGRADE-ROLLBACK')?.status ?? 'MISSING' } },
@@ -1102,6 +1108,8 @@ if (!existsSync(join(reports, 'wave24-status.json')))
     personalReview: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview ?? null,
     reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse ?? null,
     scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics ?? null,
+    readiness: byId.get('E7-READINESS')?.evidence?.readiness ?? null,
+    trialUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi ?? null,
     counts: report.counts,
     testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
     productSource: { commit: artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? null },
@@ -1110,12 +1118,12 @@ if (!existsSync(join(reports, 'wave24-status.json')))
   }, null, 2) + '\n',
 )
 writeFileSync(
-  join(reports, 'wave25-status.json'),
+  join(reports, 'wave26-status.json'),
   JSON.stringify({
     ...executionStatus,
-    schema: 'product-acceptance-wave25-status/1',
-    taskPackage: 'agent-tasks/product-wave-25/README.zh-CN.md',
-    supersedes: 'wave24-status.json',
+    schema: 'product-acceptance-wave26-status/1',
+    taskPackage: 'agent-tasks/product-wave-26/README.zh-CN.md',
+    supersedes: 'wave25-status.json',
     subject: { target: byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target ?? null,
       baseline: byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade?.baseline ?? null,
       control: byId.get('E5-D-OWNERSHIP-MOCKS')?.evidence?.ownershipMocks?.previousPackageHelper ?? null },
@@ -1137,6 +1145,7 @@ writeFileSync(
       recoveredPersonal: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
       sourceUi: byId.get('E6-SOURCE-UI')?.status ?? 'MISSING',
       readiness: byId.get('E7-READINESS')?.status ?? 'MISSING',
+      trialWorkbenchUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.status ?? 'MISSING',
       native: 'NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate',
       value: 'BLOCKED: review pilot unchanged',
     },
@@ -1158,7 +1167,14 @@ writeFileSync(
         narrowHttp: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics?.narrow?.optIn ?? null,
         optInProtocol: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics?.plain?.diagnostic?.protocol ?? null },
       sourceUi: byId.get('E6-SOURCE-UI')?.status ?? 'MISSING',
-      readiness: byId.get('E7-READINESS')?.status ?? 'MISSING',
+      readiness: { status: byId.get('E7-READINESS')?.status ?? 'MISSING',
+        normal: byId.get('E7-READINESS')?.evidence?.readiness?.normal?.readiness?.body ?? null,
+        readonly: byId.get('E7-READINESS')?.evidence?.readiness?.readonly?.readiness?.body ?? null,
+        fixture: byId.get('E7-READINESS')?.evidence?.readiness?.fixture?.readiness?.body ?? null },
+      trialWorkbenchUi: { status: byId.get('E3-TRIAL-WORKBENCH-UI')?.status ?? 'MISSING',
+        actions: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi?.actions ?? null,
+        screenshots: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi?.screenshots ?? null,
+        bundle: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi?.bundle ?? null },
       twoSnapshotSameChain: 'NOT_REACHED: the A producer manifest and C single package driver are not admitted',
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
@@ -1166,8 +1182,15 @@ writeFileSync(
       privatePermissionTarget: 'NOT_REACHED: private startup permission and target activation remain main scope',
       bBusinessRecovery: 'NOT_TESTED: B control source is not admitted as business resume',
     },
+    externalSummaries: {
+      g: 'INPUT_NOT_AUTHORITY: wrong-scope metrics and complete summaries over bad work do not become acceptance evidence',
+      h: 'INPUT_NOT_AUTHORITY: a preflight-refused tool that still executed and unverified checkers do not certify product or native',
+      f: 'INPUT_ONLY: the F trial sources are read from the packaged console bytes; E drives and asserts the installed UI itself',
+    },
     retainedHistory: {
       measured0ede: '223 PASS / 0 FAIL / 16 NOT_TESTED at the recorded 162-required scope',
+      measured3b: '227 PASS / 0 FAIL / 17 NOT_TESTED at the recorded 162-required scope (wave25 target, preserved)',
+      measuredA826: 'a826 readiness/UI absent from the frozen package; its exact bytes stay a separate scope and are not relabeled',
       measured595: '200 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 161-required scope',
       measuredA9b: '208 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 162-required scope',
       e4eFailure: 'wave22 e4e run kept its honest reuse FAIL',
@@ -1184,6 +1207,8 @@ writeFileSync(
       reviewRefusals: byId.get('E5-RESTORED-REVIEW-REFUSALS')?.status ?? 'MISSING',
       reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.status ?? 'MISSING',
       scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.status ?? 'MISSING',
+      readiness: byId.get('E7-READINESS')?.status ?? 'MISSING',
+      trialWorkbenchUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.status ?? 'MISSING',
       currentMainInstall: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
       upgradeFaults: byId.get('E4-UPGRADE-FAULTS')?.status ?? 'MISSING',
       upgradeRollback: byId.get('E4-UPGRADE-ROLLBACK')?.status ?? 'MISSING' } },
@@ -1193,6 +1218,8 @@ writeFileSync(
     personalReview: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.evidence?.personalReview ?? null,
     reviewReuse: byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse ?? null,
     scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics ?? null,
+    readiness: byId.get('E7-READINESS')?.evidence?.readiness ?? null,
+    trialUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.evidence?.trialUi ?? null,
     counts: report.counts,
     testCodeSource: { commit: report.source.commit, dirty: report.source.dirty, branch: stages.branch },
     productSource: { commit: artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? null },
@@ -1200,7 +1227,7 @@ writeFileSync(
     artifactTuple,
   }, null, 2) + '\n',
 )
-// Historical wave06-24 status files are frozen inputs; wave25 supersedes them.
+// Historical wave06-25 status files are frozen inputs; wave26 supersedes them.
 
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 

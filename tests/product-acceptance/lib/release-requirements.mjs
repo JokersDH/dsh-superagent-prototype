@@ -158,6 +158,8 @@ export const INSTALL_CASES = [
   case_('E5-RESTORED-REVIEW-REFUSALS', { layers: [LAYERS.INSTALLED], evidence: ['restoredReviewRefusals'] }),
   case_('E5-REVIEW-REUSE-CONSISTENCY', { layers: [LAYERS.INSTALLED], evidence: ['reviewReuse'] }),
   case_('E7-SCOPE-DIAGNOSTICS', { layers: [LAYERS.INSTALLED], evidence: ['scopeDiagnostics'] }),
+  case_('E7-READINESS', { layers: [LAYERS.INSTALLED], evidence: ['readiness'] }),
+  case_('E3-TRIAL-WORKBENCH-UI', { layers: [LAYERS.INSTALLED], evidence: ['trialUi'] }),
   case_('E6-INSTALLED-CONTEXT', { layers: [LAYERS.INSTALLED], evidence: ['installedContext'] }),
   case_('E3-PERSONAL-COLD-START', { layers: [LAYERS.INSTALLED], evidence: ['personalInstall'] }),
   case_('E4-INSTALL-FIRST-RUN', { layers: [LAYERS.INSTALLED], evidence: ['install'] }),

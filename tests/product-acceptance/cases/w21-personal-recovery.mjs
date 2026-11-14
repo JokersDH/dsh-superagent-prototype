@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { createServer } from 'node:net'
 import { DatabaseSync } from 'node:sqlite'
 import {
-  chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync,
+  chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -54,9 +54,10 @@ function clearDeadRecord(config) {
   if (!Number.isSafeInteger(record.pid) || !alive(record.pid)) rmSync(path, { force: true })
 }
 
-function startPackage(install, { state, config, reviewFile, port, apiPort, mockFile, timeoutMs = 90_000 }) {
+function startPackage(install, { state, config, reviewFile, port, apiPort, mockFile, fixture = false, timeoutMs = 90_000 }) {
   clearDeadRecord(config)
   const args = ['start', '--json', '--port', String(port), '--api-port', String(apiPort), '--discussion-only']
+  if (fixture) args.push('--fixture')
   if (reviewFile) args.push('--review-restored-scope', reviewFile)
   const child = spawn(join(install, 'bin/pa'), args, {
     cwd: join(install, '..'), stdio: ['ignore', 'pipe', 'pipe'],
@@ -225,6 +226,125 @@ async function provision(target) {
   } finally {
     try { await stopOwned(install, { state: seedState, config, mockFile: mock.file }) } catch { /* best effort */ }
   }
+}
+
+
+/** Public readiness schema keys, mirrored from the packaged contracts and validated independently. */
+const READINESS_KEYS = ['protocol', 'observedAt', 'configurationRevision', 'mode', 'startupMode', 'discussion',
+  'execution', 'development', 'projects', 'profiles', 'capabilities', 'authorization']
+const READINESS_ENUM = {
+  mode: ['fixture', 'product', 'personal'],
+  startupMode: ['normal', 'recovery_readonly'],
+  discussion: ['configuration_present', 'not_configured', 'provider_error', 'unknown'],
+  development: ['configuration_present', 'needs_project', 'blocked', 'fixture_only', 'readonly', 'unknown'],
+}
+const countOk = value => Number.isSafeInteger(value) && value >= 0 && value <= 128
+/** Independent structural and semantic check of GET /v1/readiness, not a reuse of the package parser. */
+function readinessBodyIssues(body) {
+  const issues = []
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) return ['body_not_object']
+  const keys = Object.keys(body).sort()
+  if (JSON.stringify(keys) !== JSON.stringify([...READINESS_KEYS].sort())) issues.push(`keys:${keys.join(',')}`)
+  if (body.protocol !== 'trial-readiness/1') issues.push('protocol')
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/u.test(String(body.observedAt ?? ''))) issues.push('observedAt')
+  if (!/^[a-f0-9]{64}$/u.test(String(body.configurationRevision ?? ''))) issues.push('revision')
+  for (const key of ['mode', 'startupMode', 'discussion', 'development'])
+    if (!READINESS_ENUM[key].includes(body[key])) issues.push(key)
+  const execution = body.execution
+  const executionOk = execution?.state === 'unknown'
+    ? Object.keys(execution).length === 1
+    : execution?.state === 'unavailable' && typeof execution.reason === 'string' && execution.reason.length > 0
+    || execution?.state === 'available' && ['native', 'controlled_fixture'].includes(execution.kind)
+  if (!executionOk) issues.push('execution')
+  for (const group of ['projects', 'profiles', 'capabilities']) {
+    if (body[group] === null || typeof body[group] !== 'object') { issues.push(group); continue }
+  }
+  for (const key of ['development', 'discussion', 'dispatchable']) if (!countOk(body.projects?.[key])) issues.push(`projects.${key}`)
+  for (const key of ['native', 'controlled', 'admittedNative', 'admittedControlled']) if (!countOk(body.profiles?.[key])) issues.push(`profiles.${key}`)
+  for (const key of ['contextHistory', 'contextSources', 'decisions', 'proposals']) if (typeof body.capabilities?.[key] !== 'boolean') issues.push(`capabilities.${key}`)
+  if (body.authorization !== 'none') issues.push('authorization')
+  if (!issues.length) {
+    if (body.profiles.admittedNative > body.profiles.native || body.profiles.admittedControlled > body.profiles.controlled) issues.push('admitted_over_total')
+    if (body.projects.development + body.projects.discussion > 128 || body.projects.dispatchable > body.projects.development) issues.push('project_counts')
+    if (body.startupMode === 'recovery_readonly' && (body.development !== 'readonly' || body.execution.state !== 'unavailable' ||
+      body.execution.reason !== 'recovery_readonly' || body.projects.dispatchable !== 0 || body.profiles.admittedNative !== 0 ||
+      body.profiles.admittedControlled !== 0 || body.capabilities.decisions || body.capabilities.proposals)) issues.push('readonly_invariants')
+    if (body.development === 'configuration_present' && (body.mode === 'fixture' || body.startupMode !== 'normal' ||
+      body.execution.state !== 'available' || body.execution.kind !== 'native' || !body.profiles.admittedNative || !body.projects.dispatchable)) issues.push('configuration_present_invariants')
+  }
+  return issues
+}
+
+async function fetchJson(url, { headers = {}, method = 'GET', body } = {}) {
+  const response = await fetch(url, { headers, method, body, signal: AbortSignal.timeout(8_000) })
+  let parsed = null
+  try { parsed = await response.json() } catch { /* empty */ }
+  return { status: response.status, body: parsed }
+}
+
+function gitProject(own, name) {
+  const dir = join(own, name)
+  mkdirSync(join(dir, 'src'), { recursive: true })
+  writeFileSync(join(dir, 'index.mjs'), 'export const ready = true\n')
+  const git = args => execFileSync('git', args, { cwd: dir, stdio: 'pipe' })
+  git(['init', '-q']); git(['add', 'index.mjs'])
+  git(['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', '-c', 'user.name=Fixture',
+    '-c', 'user.email=fixture@localhost', 'commit', '-qm', 'W26 readiness project'])
+  return dir
+}
+
+/** Starts one packaged instance, reads readiness with the real bearer and returns its observations. */
+async function readinessProbe(observed, { reviewFile = null, fixture = false, mutate = false, fresh = false } = {}) {
+  const { install, mock } = observed
+  let config = observed.config, restored = observed.restored
+  if (fresh) {
+    config = join(observed.own, `w26-${fixture ? 'fixture' : 'personal'}-config`)
+    restored = join(observed.own, `w26-${fixture ? 'fixture' : 'personal'}-state`)
+    const first = launcher(install, ['first-run', '--json'], { env: { PA_CONFIG_ROOT: config, PA_DATA_ROOT: restored, PA_MODEL_CONFIG: mock.file } })
+    if (first.status !== 0) return { status: 'FIRST_RUN_FAILED', firstRun: first.status, stderr: first.stderr }
+  }
+  const own = { status: null, mode: null, startupMode: null, readiness: null, configuration: null, negatives: {}, health: null }
+  const [consolePort, apiPort] = [await freePort(), await freePort()]
+  const started = startPackage(install, { state: restored, config, reviewFile, fixture, port: consolePort, apiPort, mockFile: mock.file })
+  const value = await started.value
+  own.status = value.status; own.code = value.code ?? null
+  own.mode = value.instance?.mode ?? null; own.startupMode = value.instance?.startupMode ?? null
+  if (value.status !== 'RUNNING' || !value.instance?.apiURL) return own
+  const key = readFileSync(join(restored, 'api.key'), 'utf8').trim()
+  const base = `http://127.0.0.1:${apiPort}`
+  const auth = { authorization: `Bearer ${key}` }
+  try {
+    own.readiness = await fetchJson(`${base}/v1/readiness`, { headers: auth })
+    own.issues = own.readiness.status === 200 ? readinessBodyIssues(own.readiness.body) : []
+    const configuration = await fetchJson(`${base}/v1/configuration`, { headers: auth })
+    own.configuration = configuration.status === 200 ? {
+      revision: configuration.body.revision,
+      projects: (configuration.body.projects ?? []).map(project => ({ discussionOnly: project.discussionOnly === true, dispatchAllowed: project.dispatchAllowed === true })),
+      profiles: (configuration.body.profiles ?? []).map(profile => ({ kind: profile.kind, dispatchAllowed: profile.dispatchAllowed === true })),
+      contextHistoryAvailable: configuration.body.contextHistoryAvailable === true,
+      contextSourcesAvailable: configuration.body.contextSourcesAvailable === true,
+      decisionsAvailable: configuration.body.decisionsAvailable === true,
+      proposalsAvailable: configuration.body.proposalsAvailable === true,
+    } : { status: configuration.status }
+    own.health = (await fetchJson(`${base}/v1/health`)).body
+    own.negatives.invalidBearer = (await fetchJson(`${base}/v1/readiness`, { headers: { authorization: 'Bearer 0'.repeat(32) } })).status
+    own.negatives.noBearer = (await fetchJson(`${base}/v1/readiness`)).status
+    const badQuery = await fetchJson(`${base}/v1/readiness?scope=1`, { headers: auth })
+    own.negatives.badQuery = badQuery.status
+    own.negatives.badQueryCode = badQuery.body?.error?.code ?? badQuery.body?.code ?? null
+    const missingRoute = await fetchJson(`${base}/v1/readiness-not-a-route`, { headers: auth })
+    own.negatives.missingRoute = missingRoute.status
+    if (mutate) {
+      const project = gitProject(observed.own, `w26-ready-${process.pid}-${Date.now()}`)
+      const registered = await fetchJson(`${base}/v1/projects`, { method: 'POST', headers: { ...auth, 'content-type': 'application/json' },
+        body: JSON.stringify({ path: project, displayName: 'W26 readiness project', check: 'node_test' }) })
+      own.registration = registered.status
+      own.after = await fetchJson(`${base}/v1/readiness`, { headers: auth })
+    }
+  } finally {
+    await stopOwned(install, { state: restored, config, mockFile: mock.file })
+  }
+  return own
 }
 
 const define = (id, title) => ({ id, title, layer: LAYERS.INSTALLED, limitations: [
@@ -510,13 +630,68 @@ export async function runPersonalReview() {
     }))
 
   if (observed) {
-    const appSource = readFileSync(join(observed.install, 'app/apps/coordinator/http/app.ts'), 'utf8')
-    if (!/v1\/readiness/u.test(appSource))
-      cases.push(notTested({ ...define('E7-READINESS', 'The packaged product exposes GET /v1/readiness with the public schema and truthful unknown states'), evidence: {} },
-        'NOT_REACHED: the frozen target package HTTP entry does not contain GET /v1/readiness (main 0064); it predates the readiness source. The default configuration/health endpoints are unchanged, and a package frozen with that API is required.'))
-    else
-      cases.push(notTested({ ...define('E7-READINESS', 'The packaged product exposes GET /v1/readiness with the public schema and truthful unknown states'), evidence: {} },
-        'NOT_REACHED: GET /v1/readiness is present in the package source, but this run has not recorded its authenticated response against a bound review instance yet.'))
+    cases.push(await runCase({ ...define('E7-READINESS', 'The packaged product serves GET /v1/readiness with its public schema, truthful normal/readonly/fixture facts and accurate refusals'), evidence: {} },
+      async ({ assert, evidence }) => {
+        const appSource = readFileSync(join(observed.install, 'app/apps/coordinator/http/app.ts'), 'utf8')
+        assert('READINESS_ROUTE_PACKAGED', /app\.get\('\/v1\/readiness'/u.test(appSource), 'the packaged HTTP entry has no readiness route')
+        const reviewFile = join(observed.own, 'w26-readiness-review.json')
+        const prepared = packagePrepare(observed.install, { state: observed.restored, project: observed.projectId, allow: ['src/'], output: reviewFile })
+        assert('READINESS_REVIEW_PREPARED', prepared.status === 0 && prepared.json?.status === 'prepared', JSON.stringify(prepared).slice(0, 300))
+        const normal = await readinessProbe(observed, { fresh: true, mutate: true })
+        const readonly = reviewFile && existsSync(reviewFile) ? await readinessProbe(observed, { reviewFile }) : { status: 'SKIPPED' }
+        const fixture = await readinessProbe(observed, { fixture: true, fresh: true })
+        evidence.readiness = { subject: frozenArtifactSubject(target), mode: 'personal', normal, readonly, fixture,
+          mockRequests: observed.mock.requests.length, providerBefore: observed.modelRequests,
+          consumer: consumerEntry(observed.install, target), packageCapability: packageCapability(observed.install, target) }
+
+        assert('READINESS_NORMAL_START', normal.status === 'RUNNING' && normal.mode === 'personal' && normal.startupMode === 'normal', JSON.stringify({ status: normal.status, mode: normal.mode, startupMode: normal.startupMode }))
+        assert('READINESS_AUTH_200', normal.readiness?.status === 200, JSON.stringify(normal.readiness).slice(0, 300))
+        assert('READINESS_SCHEMA_VALID', normal.issues?.length === 0, JSON.stringify(normal.issues ?? normal.readiness).slice(0, 400))
+        assert('READINESS_AUTHORIZATION_NONE', normal.readiness?.body?.authorization === 'none', String(normal.readiness?.body?.authorization))
+        assert('READINESS_REVISION_BOUND', normal.readiness?.body?.configurationRevision === normal.configuration?.revision,
+          JSON.stringify({ readiness: normal.readiness?.body?.configurationRevision, configuration: normal.configuration?.revision }))
+        if (normal.configuration?.projects) {
+          const projects = normal.configuration.projects
+          const development = projects.filter(project => !project.discussionOnly).length
+          const discussion = projects.length - development
+          const profiles = normal.configuration.profiles
+          const body = normal.readiness.body
+          assert('READINESS_PROJECT_COUNTS', body.projects.development === development && body.projects.discussion === discussion,
+            JSON.stringify({ expected: { development, discussion }, actual: body.projects }))
+          assert('READINESS_PROFILE_COUNTS', body.profiles.native === profiles.filter(item => item.kind === 'native').length &&
+            body.profiles.controlled === profiles.filter(item => item.kind === 'controlled_fixture').length &&
+            body.profiles.admittedNative === profiles.filter(item => item.kind === 'native' && item.dispatchAllowed).length,
+            JSON.stringify({ actual: body.profiles, profiles }))
+          assert('READINESS_CAPABILITIES_BOUND', body.capabilities.contextHistory === normal.configuration.contextHistoryAvailable &&
+            body.capabilities.contextSources === normal.configuration.contextSourcesAvailable &&
+            body.capabilities.decisions === normal.configuration.decisionsAvailable &&
+            body.capabilities.proposals === normal.configuration.proposalsAvailable, JSON.stringify({ body: body.capabilities, configuration: normal.configuration }))
+        }
+        assert('READINESS_AUTH_REFUSED', normal.negatives.invalidBearer === 401, String(normal.negatives.invalidBearer))
+        assert('READINESS_QUERY_REFUSED', normal.negatives.badQuery === 400 && normal.negatives.badQueryCode === 'invalid_request',
+          JSON.stringify({ status: normal.negatives.badQuery, code: normal.negatives.badQueryCode }))
+        assert('READINESS_UNKNOWN_ROUTE_REFUSED', normal.negatives.missingRoute === 404, String(normal.negatives.missingRoute))
+        assert('READINESS_NO_STALE_REVISION', normal.registration === 200 && normal.after?.status === 200 &&
+          normal.after.body.configurationRevision !== normal.readiness.body.configurationRevision &&
+          normal.after.body.projects.development === normal.readiness.body.projects.development + 1 &&
+          Date.parse(normal.after.body.observedAt) > Date.parse(normal.readiness.body.observedAt),
+          JSON.stringify({ registration: normal.registration, before: normal.readiness?.body, after: normal.after?.body }).slice(0, 500))
+        assert('READINESS_READONLY_FACTS', readonly.status === 'RUNNING' && readonly.startupMode === 'recovery_readonly' &&
+          readonly.readiness?.status === 200 && readonly.issues?.length === 0 &&
+          readonly.readiness.body.mode === 'personal' && readonly.readiness.body.development === 'readonly' &&
+          readonly.readiness.body.execution?.state === 'unavailable' && readonly.readiness.body.execution?.reason === 'recovery_readonly' &&
+          readonly.readiness.body.projects.dispatchable === 0 && readonly.readiness.body.profiles.admittedNative === 0 &&
+          readonly.readiness.body.profiles.admittedControlled === 0 && readonly.readiness.body.capabilities.decisions === false &&
+          readonly.readiness.body.capabilities.proposals === false,
+          JSON.stringify({ status: readonly.status, body: readonly.readiness?.body, issues: readonly.issues }).slice(0, 500))
+        assert('READINESS_FIXTURE_FACTS', fixture.status === 'RUNNING' && fixture.mode === 'fixture' &&
+          fixture.readiness?.status === 200 && fixture.issues?.length === 0 &&
+          fixture.readiness.body.mode === 'fixture' && fixture.readiness.body.development === 'fixture_only' &&
+          fixture.readiness.body.authorization === 'none',
+          JSON.stringify({ status: fixture.status, body: fixture.readiness?.body, issues: fixture.issues }).slice(0, 500))
+        assert('READINESS_NO_SEND', observed.mock.requests.length === observed.modelRequests,
+          JSON.stringify({ before: observed.modelRequests, after: observed.mock.requests.length }))
+      }))
   }
 
   if (observed) {
@@ -528,12 +703,12 @@ export async function runPersonalReview() {
           const text = readFileSync(join(consoleDir, 'assets', name), 'utf8')
           if (text.includes('查看范围说明')) return name
         }
-      } catch { /* absent */ }
+      } catch (error) { mark(`marker probe failed: ${error?.message}`) }
       return ''
     })()
     cases.push(notTested({ ...define('E6-SOURCE-UI', 'The installed console shows source scope states and the explicit scope-review action on the packaged UI bytes'), evidence: {} },
       marker
-        ? 'NOT_REACHED: a console marker exists in this package, but the independent browser interaction against these exact packaged bytes has not been recorded yet.'
+        ? 'NOT_REACHED: the scope-review marker exists in this package and its backend ?scopeReview=1 plain/narrow responses are measured, but the independent browser expansion of a restored message scope has not been recorded. Navigation and the trial workbench are separately browser-verified in E3-TRIAL-WORKBENCH-UI.'
         : 'NOT_REACHED: the frozen target package console does not contain the 0062 scope-review UI marker (main 4b); only the backend ?scopeReview=1 projection is present and tested. A package frozen with that UI is required for the user-facing assertion.'))
   }
 

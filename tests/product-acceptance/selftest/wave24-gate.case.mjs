@@ -11,7 +11,12 @@ import { resolveFixtureDigest } from '../lib/fixtures.mjs'
 const fixture = JSON.parse(readFileSync(new URL('../fixtures/wave24-0ede-report.json', import.meta.url), 'utf8'))
 const recordedNow = Date.parse(fixture.checkedAt) + 1_000
 const copy = () => JSON.parse(JSON.stringify(fixture))
-const evaluate = report => evaluateRelease({ report, requirement: tier('installed-alpha'), expectedSource: fixture.source.commit,
+// The recorded run predates wave-26 required cases; this control keeps the exact set that run
+// contained. New required cases are exercised by the live mutation controls instead.
+const recordedIds = new Set(fixture.cases.map(item => item.id))
+const recordedRequirement = (() => { const base = tier('installed-alpha')
+  return { ...base, cases: base.cases.filter(item => recordedIds.has(item.id)) } })()
+const evaluate = report => evaluateRelease({ report, requirement: recordedRequirement, expectedSource: fixture.source.commit,
   now: recordedNow, resolveFixture: resolveFixtureDigest })
 const codes = result => new Set(result.failures.map(item => item.code))
 const diag = report => report.cases.find(item => item.id === 'E7-SCOPE-DIAGNOSTICS').evidence.scopeDiagnostics

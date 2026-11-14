@@ -179,6 +179,56 @@ const evidenceFor = (key) => {
         narrow: { start: 'RUNNING', plain: 200, bodyServed: false, state: 'scope_changed', bindingSourceCount: 1,
           diagnostic: { protocol: 'context-scope-review/1', reasons: ['selection_narrowed'], partial: true, withheldSourceCount: 1, authorization: 'none' } },
       }
+    case 'trialUi':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'personal', selector: { navigations: ['主对话视图', '试用准备'], trialRegion: '试用准备', draft: '.composer textarea' },
+        bundle: { entry: 'app/apps/console/dist/assets/index-1.js', sha256: DIGEST, bytes: 10 },
+        actions: { model: 'opened-settings', import: 'opened-import-form', executor: 'opened-executor', conversation: 'opened-conversation-draft-kept' },
+        negatives: { abort: { preservesPrior: true }, badSchema: { alertShown: true, leaksGranted: false, keepsPersonal: true }, legacy: { absentInterfaceStated: true } },
+        readinessReads: 1, writes: 0, providerBefore: 2, providerAfter: 2,
+        layout: { desktop: { overlaps: [], overflow: { scrollWidth: 1440, innerWidth: 1440 } },
+          mobile: { overlaps: [], overflow: { scrollWidth: 390, innerWidth: 390 } } },
+        screenshots: [{ path: 'a.png', sha256: DIGEST, bytes: 2048 }, { path: 'b.png', sha256: 'c'.repeat(64), bytes: 2048 }],
+        problems: ['console: Failed to load resource: net::ERR_FAILED', 'console: Failed to load resource: the server responded with a status of 404 (Not Found)', 'console: Failed to load resource: net::ERR_EMPTY_RESPONSE'],
+        pageErrors: [], problemsFiltered: { total: 3, injectedResourceFailures: 3 },
+      }
+    case 'readiness':
+      return {
+        subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        mode: 'personal', mockRequests: 2, providerBefore: 2,
+        normal: {
+          status: 'RUNNING', mode: 'personal', startupMode: 'normal',
+          readiness: { status: 200, body: { protocol: 'trial-readiness/1', observedAt: '2026-11-14T00:00:00.000Z', configurationRevision: DIGEST,
+            mode: 'personal', startupMode: 'normal', discussion: 'not_configured',
+            execution: { state: 'unknown' }, development: 'needs_project',
+            projects: { development: 0, discussion: 1, dispatchable: 0 },
+            profiles: { native: 0, controlled: 1, admittedNative: 0, admittedControlled: 0 },
+            capabilities: { contextHistory: true, contextSources: true, decisions: false, proposals: false }, authorization: 'none' } },
+          configuration: { revision: DIGEST },
+          negatives: { invalidBearer: 401, noBearer: 401, badQuery: 400, badQueryCode: 'invalid_request', missingRoute: 404 },
+          registration: 200, after: { status: 200, body: { observedAt: '2026-11-14T00:00:05.000Z', configurationRevision: 'c'.repeat(64),
+            projects: { development: 1, discussion: 1, dispatchable: 0 } } },
+        },
+        readonly: {
+          status: 'RUNNING', startupMode: 'recovery_readonly',
+          readiness: { status: 200, body: { protocol: 'trial-readiness/1', observedAt: '2026-11-14T00:00:00.000Z', configurationRevision: DIGEST,
+            mode: 'personal', startupMode: 'recovery_readonly', discussion: 'not_configured',
+            execution: { state: 'unavailable', reason: 'recovery_readonly' }, development: 'readonly',
+            projects: { development: 1, discussion: 1, dispatchable: 0 },
+            profiles: { native: 1, controlled: 1, admittedNative: 0, admittedControlled: 0 },
+            capabilities: { contextHistory: true, contextSources: true, decisions: false, proposals: false }, authorization: 'none' } },
+        },
+        fixture: {
+          status: 'RUNNING', mode: 'fixture',
+          readiness: { status: 200, body: { protocol: 'trial-readiness/1', observedAt: '2026-11-14T00:00:00.000Z', configurationRevision: DIGEST,
+            mode: 'fixture', startupMode: 'normal', discussion: 'not_configured',
+            execution: { state: 'available', kind: 'controlled_fixture' }, development: 'fixture_only',
+            projects: { development: 0, discussion: 1, dispatchable: 0 },
+            profiles: { native: 0, controlled: 1, admittedNative: 0, admittedControlled: 0 },
+            capabilities: { contextHistory: true, contextSources: true, decisions: false, proposals: false }, authorization: 'none' } },
+        },
+      }
     case 'workflowFormats':
       return {
         subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
@@ -1402,6 +1452,89 @@ const CASES = [
         value.plain.diagnostic.authorization = 'granted'
         return report
       }, 'scopeDiagnostics_invalid'),
+  },
+  {
+    id: 'E26-MUTATE-TRIAL-UI-EAGER-READINESS',
+    title: 'An installation that reads readiness before the trial view is opened is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'UI_EAGER', (report) => {
+        findCase(report, 'E3-TRIAL-WORKBENCH-UI').evidence.trialUi.readinessReads = 0
+        return report
+      }, 'trialUi_invalid'),
+  },
+  {
+    id: 'E26-MUTATE-TRIAL-UI-GRANTED-LEAK',
+    title: 'A bad readiness schema that displays the granted claim is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'UI_LEAK', (report) => {
+        findCase(report, 'E3-TRIAL-WORKBENCH-UI').evidence.trialUi.negatives.badSchema.leaksGranted = true
+        return report
+      }, 'trialUi_invalid'),
+  },
+  {
+    id: 'E26-MUTATE-TRIAL-UI-DRAFT-LOST',
+    title: 'A navigation callback that loses the original draft is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'UI_DRAFT', (report) => {
+        findCase(report, 'E3-TRIAL-WORKBENCH-UI').evidence.trialUi.actions.conversation = 'draft:'
+        return report
+      }, 'trialUi_invalid'),
+  },
+  {
+    id: 'E26-MUTATE-TRIAL-UI-MOBILE-OVERFLOW',
+    title: 'A mobile layout that overflows horizontally is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'UI_OVERFLOW', (report) => {
+        findCase(report, 'E3-TRIAL-WORKBENCH-UI').evidence.trialUi.layout.mobile.overflow.scrollWidth = 420
+        return report
+      }, 'trialUi_invalid'),
+  },
+  {
+    id: 'E26-MUTATE-TRIAL-UI-NO-SCREENSHOT',
+    title: 'A UI claim without a screenshot from the packaged bytes is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'UI_NO_SHOT', (report) => {
+        findCase(report, 'E3-TRIAL-WORKBENCH-UI').evidence.trialUi.screenshots = []
+        return report
+      }, 'trialUi_invalid'),
+  },
+  {
+    id: 'E26-MUTATE-READINESS-SELF-AUTHORIZATION',
+    title: 'Readiness cannot claim authorization instead of none',
+    check: ({ assert }) =>
+      rejectWith(assert, 'READINESS_AUTH', (report) => {
+        findCase(report, 'E7-READINESS').evidence.readiness.normal.readiness.body.authorization = 'granted'
+        return report
+      }, 'readiness_invalid'),
+  },
+  {
+    id: 'E26-MUTATE-READINESS-READONLY-DISPATCH',
+    title: 'A recovery-readonly readiness body cannot advertise a dispatchable project',
+    check: ({ assert }) =>
+      rejectWith(assert, 'READINESS_READONLY', (report) => {
+        const body = findCase(report, 'E7-READINESS').evidence.readiness.readonly.readiness.body
+        body.projects.dispatchable = 1
+        return report
+      }, 'readiness_invalid'),
+  },
+  {
+    id: 'E26-MUTATE-READINESS-AUTH-ACCEPTED',
+    title: 'An invalid bearer accepted with 200 is not a valid auth refusal',
+    check: ({ assert }) =>
+      rejectWith(assert, 'READINESS_401', (report) => {
+        findCase(report, 'E7-READINESS').evidence.readiness.normal.negatives.invalidBearer = 200
+        return report
+      }, 'readiness_invalid'),
+  },
+  {
+    id: 'E26-MUTATE-READINESS-STALE-REVISION',
+    title: 'A stale readiness revision after a configuration change is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'READINESS_STALE', (report) => {
+        const value = findCase(report, 'E7-READINESS').evidence.readiness.normal
+        value.after.body.configurationRevision = value.readiness.body.configurationRevision
+        return report
+      }, 'readiness_invalid'),
   },
   {
     id: 'E1-MUTATE-CAPABILITY-SELF-DOWNGRADE',

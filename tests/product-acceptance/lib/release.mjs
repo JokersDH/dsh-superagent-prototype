@@ -422,6 +422,70 @@ export function scopeDiagnosticsIssues(value) {
   }
   return issues
 }
+/** GET /v1/readiness must be independently shaped, configuration-bound and truthful in every mode. */
+/** The packaged trial workbench must be navigated in a browser, not inferred from a marker or an API. */
+export function trialUiIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? ''))) issues.push('subject')
+  if (value.mode !== 'personal') issues.push('mode')
+  if (!value.bundle || !HEX64(String(value.bundle.sha256 ?? '')) || !(value.bundle.bytes > 0)) issues.push('bundle')
+  if (!Array.isArray(value.selector?.navigations) || !value.selector.navigations.includes('试用准备')) issues.push('selector')
+  for (const key of ['model', 'import', 'executor', 'conversation'])
+    if (!String(value.actions?.[key] ?? '').startsWith('opened')) issues.push(`action_${key}`)
+  if (!(value.readinessReads >= 1)) issues.push('no_readiness_read')
+  if (value.writes !== 0) issues.push('writes')
+  if (value.providerBefore !== value.providerAfter) issues.push('provider_calls')
+  if (value.negatives?.abort?.preservesPrior !== true) issues.push('abort_prior')
+  if (value.negatives?.badSchema?.alertShown !== true || value.negatives?.badSchema?.leaksGranted !== false ||
+    value.negatives?.badSchema?.keepsPersonal !== true) issues.push('bad_schema')
+  if (value.negatives?.legacy?.absentInterfaceStated !== true) issues.push('legacy')
+  for (const viewport of ['desktop', 'mobile']) {
+    const layout = value.layout?.[viewport]
+    if (!layout || !Array.isArray(layout.overlaps) || layout.overlaps.length > 0) issues.push(`${viewport}_overlap`)
+    if (!layout || !(layout.overflow?.scrollWidth <= layout.overflow?.innerWidth + 1)) issues.push(`${viewport}_overflow`)
+  }
+  if (!Array.isArray(value.screenshots) || value.screenshots.length < 2 ||
+    value.screenshots.some(item => !HEX64(String(item.sha256 ?? '')) || !(item.bytes > 1000))) issues.push('screenshots')
+  if (!Array.isArray(value.problems) || !Array.isArray(value.pageErrors) || value.pageErrors.length > 0) issues.push('page_errors')
+  if (!((value.problems?.filtered ?? value.problemsFiltered)?.injectedResourceFailures >= 3)) issues.push('injected_failures_unrecorded')
+  return issues
+}
+export function readinessIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  const shape = body => {
+    if (!body || typeof body !== 'object') return ['missing']
+    const found = []
+    if (body.protocol !== 'trial-readiness/1') found.push('protocol')
+    if (!HEX64(String(body.configurationRevision ?? ''))) found.push('revision')
+    if (body.authorization !== 'none') found.push('authorization')
+    if (body.startupMode === 'recovery_readonly' && (body.development !== 'readonly' || body.execution?.state !== 'unavailable' ||
+      body.execution?.reason !== 'recovery_readonly' || body.projects?.dispatchable !== 0 || body.profiles?.admittedNative !== 0 ||
+      body.profiles?.admittedControlled !== 0 || body.capabilities?.decisions !== false || body.capabilities?.proposals !== false)) found.push('readonly')
+    for (const key of ['projects', 'profiles', 'capabilities', 'execution']) if (!isSubstantive(body[key])) found.push(key)
+    return found
+  }
+  if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? ''))) issues.push('subject')
+  if (value.mode !== 'personal') issues.push('mode')
+  const normal = value.normal ?? {}, readonly = value.readonly ?? {}, fixture = value.fixture ?? {}
+  if (normal.status !== 'RUNNING' || normal.mode !== 'personal' || normal.startupMode !== 'normal') issues.push('normal_start')
+  if (normal.readiness?.status !== 200) issues.push('normal_http')
+  else issues.push(...shape(normal.readiness.body).map(item => `normal_${item}`))
+  if (normal.readiness?.body?.configurationRevision !== normal.configuration?.revision) issues.push('normal_revision')
+  if (normal.negatives?.invalidBearer !== 401 || normal.negatives?.badQuery !== 400 || normal.negatives?.badQueryCode !== 'invalid_request' ||
+    normal.negatives?.missingRoute !== 404) issues.push('normal_negatives')
+  if (normal.registration !== 200 || normal.after?.status !== 200 ||
+    normal.after?.body?.configurationRevision === normal.readiness?.body?.configurationRevision ||
+    normal.after?.body?.projects?.development !== (normal.readiness?.body?.projects?.development ?? -1) + 1) issues.push('normal_stale')
+  if (readonly.status !== 'RUNNING' || readonly.startupMode !== 'recovery_readonly' || readonly.readiness?.status !== 200) issues.push('readonly_start')
+  else issues.push(...shape(readonly.readiness.body).map(item => `readonly_${item}`))
+  if (fixture.status !== 'RUNNING' || fixture.mode !== 'fixture' || fixture.readiness?.status !== 200 ||
+    fixture.readiness?.body?.mode !== 'fixture' || fixture.readiness?.body?.development !== 'fixture_only') issues.push('fixture_facts')
+  else issues.push(...shape(fixture.readiness.body).map(item => `fixture_${item}`))
+  if (value.mockRequests !== value.providerBefore) issues.push('provider_calls')
+  return issues
+}
 export function installedStabilityIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -1077,7 +1141,7 @@ export function evaluateRelease({
         item.evidence?.installedSourceConfirm?.subject ?? item.evidence?.installedStability?.subject ??
         item.evidence?.workflowFormats?.subject ?? item.evidence?.personalReview?.subject ??
         item.evidence?.restoredReviewRefusals?.subject ?? item.evidence?.reviewReuse?.subject ??
-        item.evidence?.scopeDiagnostics?.subject
+        item.evidence?.scopeDiagnostics?.subject ?? item.evidence?.readiness?.subject ?? item.evidence?.trialUi?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
@@ -1136,7 +1200,7 @@ export function evaluateRelease({
         for (const issue of evidenceHistoryIssues(result.evidence?.evidenceHistory))
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
-      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
+      for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
         if (entry.evidence?.includes(key)) {
           for (const issue of fn(result.evidence?.[key]))
             failures.push(fail(key === 'ownershipMocks' ? (OWNERSHIP_ISSUE_CODES[issue] ?? 'ownershipMocks_invalid') : `${key}_invalid`, `${key} ${issue}`, entry.id))
