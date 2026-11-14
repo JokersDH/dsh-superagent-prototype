@@ -164,7 +164,7 @@ export interface ConsoleTransport {
   sendAssistantContext?(input: AssistantContextSend): Promise<CommandReceipt>
   assistantContext?(messageId: string): Promise<AssistantContextBinding | undefined>
   contextHistory?(query: ContextHistoryQuery): Promise<ContextHistory>
-  contextSources?(messageId: string): Promise<ContextSources | undefined>
+  contextSources?(messageId: string, options?: { scopeReview: true }): Promise<ContextSources | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -511,9 +511,10 @@ export class HttpTransport implements ConsoleTransport {
       page.entries.length > (query.limit ?? 20)) throw new TransportError('schema_mismatch', '使用记录与所选项目、会话或工作不匹配')
     return page
   }
-  async contextSources(messageId: string): Promise<ContextSources | undefined> {
+  async contextSources(messageId: string, options?: { scopeReview: true }): Promise<ContextSources | undefined> {
     try {
-      const body = await this.request(`/v1/messages/${encodeURIComponent(messageId)}/context/sources`, { signal: AbortSignal.timeout(10000) }, 'json404')
+      const suffix = options?.scopeReview === true ? '?scopeReview=1' : ''
+      const body = await this.request(`/v1/messages/${encodeURIComponent(messageId)}/context/sources${suffix}`, { signal: AbortSignal.timeout(10000) }, 'json404')
       if (body === missingOptionalResource) return undefined
       const value = ContextSourcesSchema.parse(body)
       if (value.binding.messageId !== messageId) throw new TransportError('schema_mismatch', '来源正文属于另一条消息')

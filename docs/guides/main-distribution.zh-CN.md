@@ -10,7 +10,7 @@ pnpm check:distribution
 pnpm build:distribution --config-root /absolute/new-private-config --output /absolute/new-install --json
 ```
 
-构建输出目录使用全新绝对路径，不能填写已有个人state、profile或旧安装。构建只生成静态资源和安装闭包，不启动服务，不调用模型。`pnpm pa help`列出现有命令；当前全局`--help`尚未兼容。
+构建输出目录使用全新绝对路径，不能填写已有个人state、profile或旧安装。构建只生成静态资源和安装闭包，不启动服务，不调用模型。`pnpm pa --help`列出现有命令；`pnpm pa help review-restored`与`pnpm pa review-restored --help`提供只读恢复审阅的具体参数，不创建私有状态或执行任务。
 
 `apps/launcher/bin/pa.mjs` 是实际CLI，`apps/launcher/lib/` 是进程/实例/安装编排，`packages/portability/` 是备份、校验、恢复与平台根目录。`tools/distribution/build.mjs` 构建所有运行包和静态网页，`stage.mjs` 将其与完整外部依赖复制成同机器安装闭包，`freeze-install.mjs` 将安装目录冻结为可交给E的tar及摘要。
 
