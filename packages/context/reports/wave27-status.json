@@ -1,0 +1,83 @@
+{
+  "protocol": "agent-c-wave27-status/1",
+  "wave": "product-wave-27",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "ca01e17",
+    "mainChannelDocs": "0068",
+    "mergeCommit": "b9b7340",
+    "previousC": "2296c38",
+    "rootLockDiffPreserved": true
+  },
+  "checkpoints": {
+    "targetProofPolicy": "07c4484",
+    "A_restoreAndEventDriftTests": "6d3e016",
+    "ce64AndUiInput": "8bd225a",
+    "driverApi": "b736293",
+    "finalStatus": "this commit"
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "eventPolicyFix": {
+    "removed": "blanket event_log family exemption in wave26 target proof",
+    "replacement": ["A restoreWorkflowSnapshot (real workflow v1/v2)", "A verifyRestoredSnapshot with independent source/protocol/snapshot/content/artifact expectations", "A workflow-content/2 (only versioned root-local/FTS omissions)"],
+    "allowed": ["subject.dataRoot"],
+    "rejected": ["appended work.accepted business event", "legal extra user message", "replaced artifact bytes", "changed snapshot/content digest", "foreign source root"],
+    "positive": "correct v1/v2 restores and read-only startup/stop keep a successful independent content proof"
+  },
+  "aProofSource": {
+    "head": "aeeced18907a548e0f21263f99ec826d55402aef",
+    "dataManifestSha256": "f568580a39c07f7c77c102a27596f81f53b061870bcd16fe126addd9e4ebf7e2",
+    "contentProofSha256": "b3185adccac8c6fdeae9d2e4de6218112457ac8c592e745b6770fa330e80050e",
+    "apis": ["restoreWorkflowSnapshot", "verifyRestoredSnapshot", "readWorkflowContent", "buildDataManifest"]
+  },
+  "driver": {
+    "protocol": "personal-review-driver/2",
+    "manifestMode": ["A producer manifest", "A target content/restore proof", "complete package identity", "HTTP IDs/deliveries", "receipt replay 422"],
+    "newInputs": ["--target-protocol", "--target-snapshot-digest", "--target-content-digest", "--target-artifacts", "--target-source-root"],
+    "statuses": { "verified-flow": 0, "reused": 0, "refused-verified": 0, "observed": 0, "NOT_REACHED": 4, "failed": 1, "usage": 2 },
+    "apiDoc": "packages/context/reports/wave27-driver-api.json"
+  },
+  "packages": {
+    "ce64": { "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave26-target/wave26-target-ce64fc1.tar.gz", "tarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a", "source": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21", "buildId": "d4b1780d999a4b74", "schema": 18, "runtime": "Node 24.21.0 / darwin-arm64 / ABI137", "flow": "v1/v2 A restores, manifest+target proof, package prepare/start/read/stop, readiness actual" },
+    "a826Retained": { "tarSha256": "d3e79749426c796085895abc73d76c4b26cd48427d8e6f748155bec00a103f3c", "source": "a826b5e7c8843c28a527567ac33955ff061f85dc", "scope": "previous current-package positive retained; no later F App claim" },
+    "readiness": { "authorization": "none", "startupMode": "recovery_readonly", "development": "readonly", "execution": "unavailable", "dispatchable": 0, "admittedNative": 0, "admittedControlled": 0, "decisions": false, "proposals": false },
+    "fUi": "not claimed by C; main/F own UI and E owns installed/release verdict"
+  },
+  "failureMatrix": {
+    "content": ["work.accepted event appended", "legal user message", "artifact bytes replaced"],
+    "identity": ["missing launcher/API pid or start", "foreign state/install/config/review"],
+    "selection": ["narrow scope_changed", "different/missing selection refused", "foreign root"],
+    "replay": ["context token 422", "confirm token 422"],
+    "cleanup": ["owned stop verified", "stop failure downgraded failed with materials", "reuse/keep untouched"],
+    "deadline": ["one total budget across prepare/identity/manifest/proof/start/HTTP/status/stop", "silent peer/half JSON/early exit/readiness timeout", "bounded logs/responses"]
+  },
+  "uiInput": "packages/context/reports/wave27-ui-input.json",
+  "tests": { "context": 129, "proposals": 41, "knowledge": 116, "routing": 44, "total": 330, "result": "all PASS" },
+  "strict": { "tscNoEmit": "four owned packages PASS", "workspaceBuild": "pnpm -r build -> 0" },
+  "layers": {
+    "source": "retained strict/reuse/refusal",
+    "package": "ce64 and a826 separate exact bytes; ce64 v1/v2 content-proof chain",
+    "installed": "not claimed",
+    "normal": "no target/private permission/queue consumption",
+    "recovered": "read-only A workflow restore; no B business attach",
+    "vendorNative": 0
+  },
+  "limitations": [
+    "F/G/H/I/J inputs are consumed only by their owners; C does not claim UI/release",
+    "long-term revocation, concurrent writers, 48h soak unmeasured",
+    "B business attach, private permission, target activation and native remain out of scope",
+    "a826 does not contain later F App; ce64 UI capability is an E/main conclusion, not C"
+  ],
+  "evidence": [
+    "packages/context/docs/WAVE27-RECIPE.md",
+    "packages/context/reports/wave27-ui-input.json",
+    "packages/context/reports/wave27-driver-api.json",
+    "packages/context/reports/wave27-package-event-proof.tap",
+    "packages/context/reports/wave27-current-ce64.tap",
+    "packages/context/reports/wave27-knowledge-suite.tap",
+    "packages/context/reports/wave27-suites.json"
+  ]
+}
