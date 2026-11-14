@@ -23,9 +23,12 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ProductStore } from '../../../packages/storage/dist/index.js'
+import { composeUsageInsightsInput } from '../../../packages/usage-insights/src/node-composition.ts'
 import { createControlledProduct, FIXTURE_CHECK } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
 import { listenLocalHttp } from '../../../apps/coordinator/http/server.ts'
+import { analyzeUsageInsights } from '../../../packages/usage-insights/src/analyze.ts'
+import { consumerAdmission, toInsightConsumerView } from '../../../packages/usage-insights/src/facing.ts'
 
 const CLI = fileURLToPath(new URL('../cli.mjs', import.meta.url))
 const principal = { userId: 'local-insights-probe', authorityRef: 'local-insights-authority' }
@@ -269,6 +272,46 @@ async function main() {
   assert.equal(summary.attention.stale, false)
   assert.equal(summary.attention.coverage, 'complete')
 
+  // ---- authorized Node composition over the same product reads (G5-G8) ------------------------
+  // The port is exactly what main would hand over after authorizing a principal: a work list with its
+  // project identity plus the existing readers. No HTTP, no SQL, no credential is created here.
+  const authorizedPort = {
+    async listWorks({ projectIds, limit }) {
+      const snapshot = await product.application.inspect({ limit: Math.min(limit, 2) })
+      const works = snapshot.works
+        .map(view => ({ workId: view.work.id, projectId: view.work.projectId }))
+        .filter(work => projectIds.includes(work.projectId))
+      return { works, hasMore: false }
+    },
+    async workEvidence(workId) { return product.read.workEvidence(workId) },
+    async workHistory(workId, query) { return product.read.workEvidenceHistory(workId, query) },
+    async attention(query) { return product.read.attention(query) },
+  }
+  const composed = await composeUsageInsightsInput({
+    port: authorizedPort,
+    request: {
+      principalRef: 'probe-principal',
+      projectIds: PROJECTS,
+      window: { from: WINDOW_START, to: WINDOW_END },
+      timezone: 'UTC',
+      inputId: 'probe-authorized-composition',
+      includeAttention: true,
+      limits: { maxRecords: 50_000, maxWorks: 20, maxPages: 50 },
+    },
+  })
+  assert.equal(composed.issues.length, 0, JSON.stringify(composed.issues))
+  assert.equal(composed.bundle.source.kind, 'authorized_read')
+  assert.equal(composed.stats.worksRead, 2)
+  assert.equal(composed.bundle.workIndex?.length, 2)
+  const composedAnalysis = analyzeUsageInsights(composed.bundle)
+  const composedSummary = composedAnalysis.summary
+  // Same subject, window and projects through a different entry point must produce the same numbers.
+  assert.deepEqual(composedSummary.metrics, summary.metrics, `composition metrics differ; declared=${JSON.stringify(composed.bundle.declaredCoverage)} coverage=${JSON.stringify(composedSummary.coverage)} losses=${JSON.stringify(composedSummary.losses)} stopped=${composed.stats.stoppedBy} issues=${JSON.stringify(composed.issues)}`)
+  assert.equal(composedSummary.coverage.overall, summary.coverage.overall)
+  const composedView = toInsightConsumerView(composedSummary)
+  assert.equal(consumerAdmission(composedView).admitted, true)
+  assert.equal(composedView.scope?.aggregation, 'cross_project')
+
   // ---- daily workflow: repeat observation without double counting (G13) -----------------------
   // A second observation of the same window must not accumulate the first round's facts.
   const secondAnalysis = JSON.parse((await run(['analyze', '--input', bundlePath2])).stdout)
@@ -340,6 +383,13 @@ async function main() {
     metrics: summary.metrics.map(row => ({ metricId: row.metricId, layer: row.layer, currency: row.currency,
       value: row.value, sampleCount: row.sampleCount, unknownCount: row.unknownCount, nullReason: row.nullReason })),
     summaryId: summary.summaryId,
+    composedSummaryId: composedSummary.summaryId,
+    // What the product surface actually made available for this observation.
+    availability: Object.fromEntries(summary.metrics.map(row => [row.metricId, row.value === null
+      ? { state: 'unknown', reason: row.nullReason }
+      : { state: row.coverage === 'partial' ? 'partial' : 'known', samples: row.sampleCount,
+          ...(row.currency ? { currency: row.currency } : {}), layer: row.layer }])),
+    compositionAgreesWithCli: true,
     digest: verified.digest,
     repeatedCollectionIdentical: true,
     readOnlyCollection: true,

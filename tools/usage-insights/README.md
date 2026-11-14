@@ -138,6 +138,25 @@ outsideWindow/unmapped`；`invalid/conflicted/notParsed/unmapped` 会把对应�
 5. 完整空窗口是"完整 + 0 样本"，与"未采集/来源缺失"区分。
 6. 生产方自写的 `actual_native` 标签只记为"来源记录"，不升级为原生证据。
 
+## 当前产品的字段可用性（给 main）
+
+这一轮在真实受控两项目链上逐项核对。缺字段不解名、不补零：
+
+| 指标 | 状态 | 来源 / 缺失原因 |
+| --- | --- | --- |
+| `outcomes.count` / `outcomes.accepted` | 已知 | 原 `ExecutionOutcome.acceptance` |
+| `review.readyToAcceptanceMs` | 已知 | 接受记录里的 `ReviewTiming.readyToAcceptanceMs`（并用两个时间戳复核） |
+| `review.activeMs` | **部分** | 工作台 `review-activity` 记录的 UI 可见性跨度；受真实 ready→accepted 区间裁剪，`partial`，不是人类工时 |
+| `interventions.questions` / `answers` / `acceptances` | 已知 | `question.opened` / `runtime.answer.observed` / `acceptance.recorded`，按 `entry.at` 限定窗口 |
+| `queue.waitMs` | 未暴露 | 产品读面没有 queued/dispatched 端点对；不用 duration 或 attention age 改名 |
+| `execution.durationMs` | 未暴露 | 受控执行没有在 outcome 上记录 durationMs |
+| `usage.inputTokens` / `outputTokens` | 未暴露 | 受控执行不产生 token usage；未知单列，不补 0 |
+| `usage.cost` | 未暴露 | 没有记录币种/金额；不查价格、不把订阅当免费 |
+| 当前 attention | 快照 | 与历史窗口分开；`observedAt` 晚于捕获、或超过 1 小时新鲜度都会降级 |
+
+`probe` 输出里的 `availability` 块按本次观察逐项给出 `known/partial/unknown` 与原因，可直接作为
+main 的接线依据；`actual_native`、真实 vendor 与 operator baseline 仍分别未测。
+
 ## baseline（`operator-baseline/1`）
 
 必须显式给出 source、definition、项目、窗口、时区、metricId、unit、aggregation、currency、

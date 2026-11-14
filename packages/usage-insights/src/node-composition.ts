@@ -125,7 +125,6 @@ export async function composeUsageInsightsInput(input: {
   const maxPages = request.limits?.maxPages ?? 200
   const deadlineMs = request.limits?.deadlineMs ?? 60_000
   const deadline = Date.now() + deadlineMs
-  const capturedAt = request.capturedAt ?? new Date().toISOString()
   const projectIds = [...request.projectIds].sort()
 
   const issues: CompositionIssue[] = []
@@ -286,6 +285,9 @@ export async function composeUsageInsightsInput(input: {
     if (workSource === 'complete') workSource = 'caller_limit'
   }
 
+  // The capture time is stamped after the reads, so a snapshot can never be observed after the
+  // observation it belongs to. An explicit caller timestamp is honoured as given.
+  const capturedAt = request.capturedAt ?? new Date().toISOString()
   const bundle = UsageInsightsInputSchema.parse({
     protocol: 'usage-insights-input/1',
     inputId: request.inputId ?? `composed-${capturedAt.replace(/[-:]/g, '').replace(/\..*$/, '')}`,
