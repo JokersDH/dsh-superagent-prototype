@@ -23,7 +23,7 @@ let runner
 try {
   process.env.PA_RUNNER_RECEIVER_LOG = receiverLog
   const spec = makeAttemptSpec()
-  const link = new RunnerLink({ executable: process.execPath, entry: ENTRY, args: ['codex-fake'], stateRoot: join(root, 'attempt'), producer: { source: 'codex-fake', runnerIdentityRef: 'b27-points' } })
+  const link = new RunnerLink({ executable: process.execPath, entry: ENTRY, args: ['waiting-user'], stateRoot: join(root, 'attempt'), producer: { source: 'fixture', runnerIdentityRef: 'b27-points' } })
   link.bindPayload(spec.policySnapshotRef, { kind: 'fixture-settings/1', workspacePath: process.cwd(), scope: { projectId: 'p', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }, approvalPolicy: 'on-request', timeoutMs: 600000 })
   link.bindPayload('input-points', { inputId: 'input-points', contract: spec.contract, text: 'ack points', contextRefs: [], sourceMessageRefs: [], provenance: 'authorized_work_input' })
   const sinkPoints = []
@@ -57,6 +57,39 @@ try {
   log.evidence({ afterPersist, afterWindow })
   if (afterPersist === 1 && afterWindow === 1) log.pass('the bounded window after persistence shows exactly one begin reception, so nothing was resent')
   else log.fail(`a begin was resent inside the bounded window: ${JSON.stringify({ afterPersist, afterWindow })}`)
+
+  log.begin('B27-POINTS-SECOND-COMMAND-WINDOWS', 'the second business command is counted at the same four points', 'controlled_process')
+  // The answer needs a Broker question binding, which this fixture lane does not produce; the second
+  // command measured here is a deliver, which travels the SAME admission and receipt path. The ANSWER is
+  // counted separately on the product lane by b27-ack-windows, and this file does not relabel a deliver
+  // as an answer to look complete.
+  const sinkBefore = sinkPoints.length
+  const receivedBefore = readReceipts().filter(frame => frame.kind === 'deliver').length
+  const tWrite2 = Date.now()
+  const delivered = await runner.command(makeCommand('deliver', { id: 'cmd-points-deliver', inputRef: 'input-points' })).then(() => true).catch(error => ({ error: String(error?.message ?? error).slice(0, 120) }))
+  const tAck2 = Date.now()
+  let tReceived2 = null
+  for (let index = 0; index < 200 && tReceived2 === null; index += 1) {
+    const line = readReceipts().find(frame => frame.kind === 'deliver')
+    if (line) tReceived2 = line.at
+    else await new Promise(resolve => setTimeout(resolve, 10))
+  }
+  const deadline2 = Date.now() + 15_000
+  while (Date.now() < deadline2 && sinkPoints.length === sinkBefore) await new Promise(resolve => setTimeout(resolve, 20))
+  const receivedAfter = readReceipts().filter(frame => frame.kind === 'deliver').length
+  const deltas = { sinkCalls: sinkPoints.length - sinkBefore, received: receivedAfter - receivedBefore }
+  log.evidence({ delivered, tWrite2, tReceived2, tAck2, sinkDelta: deltas.sinkCalls, receivedDelta: deltas.received })
+  if (delivered === true && deltas.received === 1 && tReceived2 && Date.parse(tReceived2) <= tAck2) {
+    log.pass(`the second command was counted at write, receive (${tReceived2}), ack and persistence with exactly one reception`)
+  } else log.fail(`the second command windows are not counted: ${JSON.stringify({ delivered, deltas, tReceived2, tAck2 })}`)
+
+  log.begin('B27-POINTS-NO-RESEND-SECOND-COMMAND', 'the second command is not received again in its window', 'controlled_process')
+  const beforeWindow = readReceipts().filter(frame => frame.kind === 'deliver').length
+  await new Promise(resolve => setTimeout(resolve, 700))
+  const afterWindow2 = readReceipts().filter(frame => frame.kind === 'deliver').length
+  log.evidence({ beforeWindow, afterWindow2 })
+  if (beforeWindow === 1 && afterWindow2 === 1) log.pass('the bounded window after the second command shows exactly one reception')
+  else log.fail(`the second command was resent: ${JSON.stringify({ beforeWindow, afterWindow2 })}`)
 
   log.begin('B27-SCOPE-NOT-NATIVE', 'codex-fake lane; installed Codex not executed', 'controlled_process')
   log.notTested('no installed agent executed and no gateway contacted')
