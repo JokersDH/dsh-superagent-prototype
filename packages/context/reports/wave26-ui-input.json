@@ -1,0 +1,57 @@
+{
+  "protocol": "restored-scope-ui-input/4",
+  "publishedConsumers": {
+    "main": { "sourceCommit": "6787bd0", "role": "source diagnostic UI, FTrialWorkspace navigation and four original actions already implemented; C does not edit App" },
+    "F": { "path": "apps/console/src/trial/", "role": "trial experience displays the same backend data; C supplies inputs only" }
+  },
+  "backend": {
+    "sources": "GET /v1/messages/:id/context/sources?scopeReview=1",
+    "readiness": "GET /v1/readiness (authenticated)",
+    "sourcesDefault": "unchanged without scopeReview",
+    "forbidden": ["principal", "scope/grant", "tokens/keys", "readable counts", "raw paths", "authorization none as approval"]
+  },
+  "sourcesStates": {
+    "verified": "已核对冻结原文",
+    "scope_changed": "当前只读选择与冻结时不同；原文未展示",
+    "missing": "冻结原文文件缺失",
+    "unverified": "无法核对冻结原文"
+  },
+  "reasons": {
+    "project_changed": "所属项目与冻结时不同",
+    "selection_narrowed": "当前允许路径比冻结时更窄",
+    "selection_broadened": "当前允许路径比冻结时更宽",
+    "selection_replaced": "允许路径已变化",
+    "exclusion_added": "新增了排除路径",
+    "exclusion_removed": "移除了排除路径",
+    "selection_validity_changed": "选择有效期与冻结时不同"
+  },
+  "actualSourcesSamples": {
+    "verifiedValidity": { "state": "verified", "reasons": ["selection_validity_changed"], "partial": false, "withheldSourceCount": 0, "authorization": "none" },
+    "scopeChangedNarrow": { "state": "scope_changed", "reasons": ["selection_narrowed", "selection_validity_changed"], "partial": true, "withheldSourceCount": 2, "authorization": "none" },
+    "missing": { "state": "missing", "reasons": ["selection_validity_changed"], "partial": true, "withheldSourceCount": 0, "authorization": "none" },
+    "unverified": { "state": "unverified", "reasons": [], "partial": true, "withheldSourceCount": 0, "authorization": "none" }
+  },
+  "actualReadinessSample": {
+    "wrapper": "exact a826 package, recovery_readonly personal review",
+    "authorization": "none",
+    "startupMode": "recovery_readonly",
+    "development": "readonly",
+    "discussion": "unknown",
+    "execution": "unavailable",
+    "projects": { "dispatchable": 0 },
+    "profiles": { "admittedNative": 0, "admittedControlled": 0 },
+    "capabilities": { "decisions": false, "proposals": false }
+  },
+  "targetProof": {
+    "meaning": "verified content identity, not execution permission",
+    "allowed": ["subject.dataRoot", "event_log", "coordinator_instances", "writer_claim"],
+    "rejected": ["extra legal user message", "artifact byte replacement", "changed business family", "foreign root map"]
+  },
+  "newPackageBoundary": {
+    "package": "a826b5e / fefd932 / tar d3e797…",
+    "readiness": "present and actual",
+    "fApp": "NOT_REACHED: package predates main a302 F App integration; old 4b UI bytes only",
+    "claim": "C does not claim F App or installed release"
+  },
+  "sampleProvenance": ["packages/knowledge/test/main-personal-package-install.case.ts", "packages/knowledge/test/main-personal-package-current.case.ts", "packages/knowledge/test/main-personal-scope-review.case.ts"]
+}
