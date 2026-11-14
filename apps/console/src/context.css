@@ -77,6 +77,18 @@
 .context-source-record > pre { margin: 8px 0 0; }
 .context-record-status { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 12px 0; font-size: 12px; line-height: 1.7; }
 .context-record-summary { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; color: var(--muted); font-size: 12px; }
+.context-record-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; margin: 14px 0 4px; font-size: 12px; font-weight: 550; }
+.context-record-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.context-scope-action { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; min-width: 132px; max-width: 100%; font-size: 12px; }
+.context-scope-action[aria-disabled=true] { opacity: .65; cursor: wait; }
+.context-scope-review { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.context-scope-review > header { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.context-scope-review h4 { margin: 0; color: var(--ink); font-size: 12px; font-weight: 550; letter-spacing: 0; }
+.context-scope-review > header > span { margin-left: auto; color: var(--warn); }
+.context-scope-review > ul { display: grid; gap: 5px; margin: 10px 0 0; padding-left: 18px; list-style: disc; }
+.context-scope-review > ul > li, .message-context-audit .context-scope-review > ul > li { display: list-item; }
+.context-scope-review > p { margin: 10px 0 0; }
+.context-scope-withheld { color: var(--warn); }
 .message-context-audit .context-readable li { display: list-item; }
 .message-context-audit .context-source code { max-width: none; }
 .message-context-audit .context-frozen-sources { min-width: 0; }
