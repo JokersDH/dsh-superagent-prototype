@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 2,
+  "owner": "F",
+  "wave": "product-wave-26",
+  "goal": "real trial workbench and complete daily flow: hook identity, two-project journey, scoped optional insights, current user guide",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "baseMain": "11002b8",
+  "mergedMain": "6787bd0",
+  "mainAppSource": "a302ddc1963e9d20ada2cbba4f5cf317f041e78f",
+  "importedComponentSource": "fad070fb1d0a7586ac1059dd7aacba0d869e9658",
+  "previousActualSource": "2684773843b9332df548121d2c64762f6814672b",
+  "mergeCommit": "797dd82",
+  "finalSourceCommit": null,
+  "state": "DELIVERED_WITH_DECLARED_DEPENDENCIES",
+  "ownedPaths": [
+    "apps/console/src/trial/",
+    "apps/console/test/trial/",
+    "apps/console/e2e/trial/",
+    "docs/user-guide/",
+    "reports/trial-experience/"
+  ],
+  "appMount": {
+    "status": "ACTUAL_MAIN_APP_IMPORTED_AND_VERIFIED",
+    "entry": "rail '试用准备'",
+    "readTiming": "authenticated ready AND view visible",
+    "callbacks": ["configure_model", "import_project", "inspect_executor", "open_conversation"],
+    "mainTest": "tests/integration/trial-workbench-browser.mjs",
+    "mainTestResult": "8/8 PASS after wave-26 component changes; pageerrors 0, POST 0, model 0, event delta 0",
+    "defaultConversationPreserved": true
+  },
+  "phases": {
+    "F1": "DELIVERED actual-App audit with line-level sources and correction list",
+    "F2": "DELIVERED identity contract, disabled-loading fix, stale/error semantics",
+    "F3": "DELIVERED readonly/unknown/zero/copy negatives",
+    "F4": "DELIVERED first runnable result (component + main App regression)",
+    "F5": "DELIVERED two real projects, two real conversations, draft/identity preservation",
+    "F6": "DELIVERED config/import/executor round trips with draft preserved",
+    "F7": "DELIVERED readonly/unknown keeps readable navigation; review UI stays main-owned",
+    "F8": "DELIVERED second runnable result (real App two-project daily journey)",
+    "F9": "DELIVERED safe unavailable/empty insights; core flow independent",
+    "F10": "DELIVERED scoped-summary admission gate",
+    "F11": "DELIVERED readable/privacy-bounded observation rows",
+    "F12": "DELIVERED third runnable result (optional insights safe integration)",
+    "F13": "DELIVERED current-version user guide and help handoff",
+    "F14": "DELIVERED desktop/mobile/keyboard/long/error verification for new UI",
+    "F15": "DELIVERED error boundaries and package consumer handoff",
+    "F16": "DELIVERED fourth result and accurate status"
+  },
+  "fourResults": {
+    "R1": "Actual readiness entry with identity-safe hook and unknown/readonly/error copy; main App regression passes",
+    "R2": "Two real imported projects + two real conversations + drafts + delegation draft, no sends",
+    "R3": "Optional insights admission gate with scoped/partial/unknown rows and wrong-project refusal; mobile/keyboard/long/error verified",
+    "R4": "Current user guide, help handoff, accessibility and same-source package handoff"
+  },
+  "hook": {
+    "api": "useTrialReadiness(transport, boolean | { enabled?, identity? })",
+    "identity": "string | number; change hides prior data, cancels prior request, reads new service once",
+    "noIdentityContract": "transport instance stable for the mounted lifetime; replacement requires remount (key)",
+    "fixed": "disabled mid-flight no longer leaves loading=true; late response after disable/unmount/identity change is ignored",
+    "requests": "one explicit read per enable/open/reload; no polling"
+  },
+  "realInputs": {
+    "endpoints": ["GET /v1/readiness", "GET /v1/configuration", "POST /v1/session", "POST /v1/projects", "POST /v1/conversations/commands"],
+    "contracts": "packages/contracts/src/trial-readiness.ts (TrialReadiness, TrialNavigationAction, authorization none)",
+    "transport": "apps/console/src/transport.ts ConsoleTransport.readiness",
+    "configuration": "ApplicationConfigurationSchema public read model"
+  },
+  "insightsAdmission": {
+    "required": ["scope.projectIds non-empty", "windowLabel", "coverage", "metrics"],
+    "refusals": ["missing scope", "empty scope", "scope excludes active project", "missing window", "missing coverage", "insufficient/unavailable"],
+    "unknown": "null value/count stays unknown; no zero fill, no cross-currency or cross-layer merge",
+    "currentDefault": "main passes no insights; section absent"
+  },
+  "evidence": {
+    "runner": "node e2e/trial/run-all.mjs",
+    "suites": [
+      { "id": "unit-mapping", "exit": 0, "result": "11 PASS" },
+      { "id": "typecheck-app", "exit": 0 },
+      { "id": "typecheck-e2e", "exit": 0 },
+      { "id": "build", "exit": 0 },
+      { "id": "hook-async", "exit": 0, "result": "6/6" },
+      { "id": "browser-states", "exit": 0, "result": "24/24" },
+      { "id": "http-journey", "exit": 0, "result": "6/6" },
+      { "id": "app-targets", "exit": 0, "result": "6/6" },
+      { "id": "app-two-projects", "exit": 0, "result": "8/8" }
+    ],
+    "runAll": "9/9 suites exit 0",
+    "viewports": ["1440x900", "390x844"],
+    "browser": "Chromium (Playwright 1.65)",
+    "twoProjectFacts": {
+      "projects": ["项目 Alpha", "项目 Beta 每日协作"],
+      "secondProjectVia": "POST /v1/projects through the real import form",
+      "conversations": ["conv-alpha-daily", "conv-beta-daily"],
+      "readinessReads": 4,
+      "pagePosts": ["/v1/projects"],
+      "modelCalls": 0,
+      "draftPreserved": true,
+      "delegationSubmitted": false
+    },
+    "visualGate": "programmatic layout/contrast/radius/token audit + screenshots; session cannot consume images, so no claim of a pixel review by F",
+    "screenshots": "apps/console/e2e/trial/screenshots/ (state/mobile/real-HTTP/two-project/auth-expiry)"
+  },
+  "handoff": {
+    "runtimeSources": [
+      "apps/console/src/trial/index.ts",
+      "apps/console/src/trial/TrialWorkspace.tsx",
+      "apps/console/src/trial/useTrialReadiness.ts",
+      "apps/console/src/trial/trial-view.ts",
+      "apps/console/src/trial/insights.ts",
+      "apps/console/src/trial/trial.css"
+    ],
+    "mustNotPackage": ["apps/console/e2e/trial/**", "apps/console/test/trial/**", "harness", "fixtures", "screenshots", "temporary state"],
+    "dependencies": "existing React 18, lucide-react, @personal-agent/contracts, type-only ../transport.ts and ../configuration-labels.ts; no new package/lock change; CSS imported by the component",
+    "docs": ["reports/trial-experience/main-integration.zh-CN.md", "docs/user-guide/"]
+  },
+  "modelNativeTurns": 0,
+  "preserved": {
+    "userServicesChanged": 0,
+    "stateProfileTarLedgerTouched": false,
+    "privateTempRoots": "created under /tmp and removed; credentials never committed",
+    "unrelatedCredentialsRead": false
+  },
+  "notTested": [
+    "real vendor model or native Codex execution (0 turns)",
+    "G trusted complete summary (not admitted; gate only)",
+    "installed distribution artifact acceptance (E/D scope)",
+    "manual screen-reader walkthrough, non-Chromium browsers, 200% zoom, forced colors",
+    "mid-session auth expiry against a real server (mapped copy tested with controlled rejection)"
+  ],
+  "dependencies": [
+    "G must fix scope/window/coverage/bounds before a real summary can be passed",
+    "main may pass a stable identity on transport replacement; current stable-instance wiring works unchanged",
+    "E independently verifies the same artifact; F does not self-admit release"
+  ],
+  "notes": "Historical wave-25 status/report retained. No root/App/transport/CSS/contracts edits. Docs-only follow-ups do not refreeze runtime bytes."
+}

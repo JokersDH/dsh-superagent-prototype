@@ -1,106 +1,75 @@
-# TrialWorkspace：main 接入说明（最小接线）
+# TrialWorkspace：main 接入与包内交接（wave-26）
 
-组件只消费公开数据并把四个导航动作交回 main。它不创建 transport、不发命令、不读写配置或项目。
+本文件描述当前真实挂载（main `a302ddc`）与 wave-26 增量。F 不修改 `App.tsx`、transport、根 CSS、contracts、HTTP 或授权。
 
-## 1. 导入
+## 1. 当前挂载状态（已实现，不是待接）
 
-```tsx
-import { TrialWorkspace, useTrialReadiness } from './trial/index.ts'
+main 已导入 F 六源原字节（`fad070f`）并在 App 中接线：
+
+- 导航“试用准备”（`App.tsx` rail）；
+- 仅在认证 ready 且视图可见时 `useTrialReadiness(transport, boolean)`；
+- props：`readiness/loading/error/unavailable/configuration/activeProjectId/activeConversationTitle`；
+- 四个回调：模型设置、项目导入（先 `openView('conversation')` 再打开表单/工作列表）、执行器目录、主对话；
+- `onReload`：`trial.reload()` + `refreshConfiguration()`。
+
+本包不要求 main 重写这些；只提供以下增量。
+
+## 2. Hook 增量：稳定 identity
+
+```ts
+import { useTrialReadiness } from './trial/index.ts'
+
+const trial = useTrialReadiness(transport, {
+  enabled: auth === 'ready' && workspaceView === 'trial',
+  identity: sessionGeneration, // 稳定 string | number，例如认证会话代次或 API 基址
+})
 ```
 
-`TrialWorkspace.tsx` 自身 import `./trial.css`，样式随组件进入 bundle，**不需要修改 `main.tsx` 或根 CSS**。
+- `identity` 变化：立即隐藏旧观察、取消旧请求、只读取新服务一次；旧响应晚到不会覆盖。
+- 不传 `identity`：沿用现有 `useTrialReadiness(transport, boolean)`，约定同一活期内 transport 实例稳定；替换实例必须 remount（React key）或传 identity。
+- inline 对象 props 不会造成请求循环（以 capability 布尔 + identity 依赖，transport 用 ref）。
+- `enabled` 在请求途中变 false：loading 立即结束，迟到响应忽略，重新启用只发一次新请求。
 
-## 2. 视图与状态
+**只读语义**：仍只经 `ConsoleTransport.readiness`，一次加载/刷新一请求；不发命令、不调用模型、不消费队列。
 
-```tsx
-const [workspaceView, setWorkspaceView] = useState<
-  'conversation' | 'works' | 'decisions' | 'executors' | 'trial'
->('conversation')
+## 3. 组件增量（无需 main 改动）
 
-// 仅在视图可见时读取，避免应用启动多一次请求；已有有效值在刷新时保留。
-const trial = useTrialReadiness(transport, workspaceView === 'trial')
+- 新增“当前项目”事实行：有筛选显示项目名，无筛选显示“全部项目”，名称未读取时明确提示。
+- 观察区增加准入校验：必须声明 `scope.projectIds`、`windowLabel`、`coverage`；范围不含当前项目时拒绝展示。当前 main 不传 `insights`，因此默认不显示。
+- 观察行支持 `unit`、`layer`、`sampleCount`、`null`（未知）；不合并币种/层。
+
+## 4. 建议（不阻塞）
+
+- 导航后焦点：`openView` 后可把焦点移到目标视图标题（`tabIndex=-1`）或保留触发按钮；当前实现焦点落回文档。
+- 若将来支持同一页面切换后端/认证会话，请传 `identity`，否则依赖 remount。
+
+## 5. 包内交接（D/E，不把测试装置带入产品）
+
+产品运行需要的自有源码（六文件，全部在 `apps/console/src/trial/`）：
+
+```
+index.ts  TrialWorkspace.tsx  useTrialReadiness.ts  trial-view.ts  insights.ts  trial.css
 ```
 
-## 3. 导航按钮
+- 运行时依赖：现有 React 18 / lucide-react / `@personal-agent/contracts`、类型引用 `../transport.ts` 与 `../configuration-labels.ts`；无新增依赖、无根 lock 改动。
+- `TrialWorkspace.tsx` 自行 import `trial.css`（Vite 打进 console bundle）；不需要改 `main.tsx` 或根 CSS。
+- **不要打包**：`apps/console/e2e/trial/**`、`apps/console/test/trial/**`、任何 harness/fixtures、截图或临时状态。
+- 安装包中出现体验的唯一判据是真实 console bundle 与 App 导航，而不是测试文件或截图；最终同包验收由 E 对同一 artifact 独立执行。
 
-在 `App.tsx` 的 `workspace-rail` 中，于“执行器连接”之后加入一个按钮（建议图标 `ClipboardCheck` 或 `ListChecks`，`lucide-react` 已在用）：
-
-```tsx
-<button
-  type="button"
-  className={`rail-button${workspaceView === 'trial' ? ' active' : ''}`}
-  aria-current={workspaceView === 'trial' ? 'page' : undefined}
-  title="试用准备"
-  aria-label="试用准备"
-  onClick={() => openView('trial')}
->
-  <ClipboardCheck size={19} />
-</button>
-```
-
-`openView` 已负责关闭抽屉与模型面板；无需新增行为。
-
-## 4. 视图渲染
-
-放在与 `executors` 视图同级的位置（`App.tsx` 的 `<section className="conversation">` 内）：
-
-```tsx
-{workspaceView === 'trial' && (
-  <TrialWorkspace
-    readiness={trial.readiness}
-    loading={trial.loading}
-    error={trial.error}
-    unavailable={trial.unavailable}
-    configuration={configuration}
-    activeProjectId={projectFilter ?? undefined}
-    activeConversationTitle={conversationTitle}
-    onReload={trial.reload}
-    onAction={action => {
-      if (action === 'configure_model') {
-        setWorkspaceOpen(false)
-        setModelPanelOpen(true)
-      } else if (action === 'import_project') {
-        setProjectImportOpen(true)
-        setWorkspaceOpen(true)
-        openView('works')
-      } else if (action === 'inspect_executor') {
-        openView('executors')
-      } else {
-        openView('conversation')
-      }
-    }}
-  />
-)}
-```
-
-四个动作就是 `packages/contracts/src/trial-readiness.ts` 的 `TrialNavigationAction` 全集；分支是穷尽的，没有默认字符串入口。若 main 选择把 `import_project` 指向 `works` 视图之外的原入口，回调内容可改，但**不得**新增动作名或在此处写项目/配置。
-
-## 5. 数据语义（不要在 App 里二次推断）
-
-- `readiness` 缺失（`undefined`）表示“尚未读取/接口暂不可用”，不是“未配置”。组件会显示“未观察”。
-- `development: 'configuration_present'` 是配置事实，组件固定加注“配置事实，非连接验证”。不要把它渲染成“已连接/已测/可授权”。
-- `fixture_only`、`unknown`、`readonly` 分别呈现固定流程、未知、只读；`authorization` 恒为 `none`，组件只把它作为页脚事实。
-- `loading` 为 true 且已有 `readiness` 时是刷新态：旧值保留，header 显示“正在刷新…”。
-- `error` 不清空旧值；`onReload` 只允许 main 重新读取 readiness（以及 main 自己决定是否重读 configuration），不得触发模型、命令、agent 或旧队列。
-- `configuration` 只用于项目/执行器/能力明细；缺失时显示“未读取”，不填 0。
-
-## 6. 可选观察数据（G）
-
-G 的 summary 由 main 映射成 `TrialInsightsView` 后传入 `insights`；组件不计算花费、节省时间、质量或审批效率。未传时整段不渲染。`status` 不是 `ready` 时不展示任何指标；`value: null` 显示“未知”，不填 0。
-
-## 7. 验证
+## 6. 验证命令（本包实际运行）
 
 ```sh
 cd apps/console
-node --test test/trial/*.case.ts        # 纯映射/动作矩阵（9 项）
+node --test test/trial/trial-view.case.ts        # 11 项纯映射/准入/文案
 npx tsc -p tsconfig.json --noEmit
 npx tsc -p e2e/trial/tsconfig.json --noEmit
-node e2e/trial/trial-states.mjs         # 真实浏览器状态/键盘/响应式/视觉审计（21 项）
-node e2e/trial/trial-http.mjs           # 真实 HTTP readiness journey（隔离端口/状态）
+node e2e/trial/run-all.mjs                       # 9 套件：hook async/状态/HTTP/app 目标/两项目
 ```
 
-## 8. 当前未达
+main 自有真实 App 浏览器测试（`tests/integration/trial-workbench-browser.mjs`）已在本包改动后重新运行并通过。
 
-- `App.tsx` 尚未接线（main 拥有）；在此之前 `trial-http.mjs` 通过 `e2e/trial/harness.html` 使用真实 `HttpTransport`，不是 app shell。
-- G 的 `TrialInsightsView` 仅是展示输入需求，实际映射由 main 完成。
-- 组件不提供项目选择、会话创建、批准、恢复授权或自动接受入口；这些仍属 main 既有流程。
+## 7. 明确未达
+
+- G 的完整指标未准入；观察区只在有合格 scope/window/coverage 时显示。
+- 真实登录中途过期、native 执行、安装包独立 E 验收、屏幕阅读器人工走查、非 Chromium 浏览器不在本包范围。
+- 两项目 journey 使用私有真实 runtime（真实导入/会话/草稿），execution unavailable，模型是 no-send stub；不是 vendor/native 证明。

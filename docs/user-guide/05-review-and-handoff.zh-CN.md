@@ -27,9 +27,9 @@
 交接的是**范围与证据**，不是账号或数据：
 
 - 仓库与分支：`codex/g4-trial-experience`（F 自有路径）。
-- 状态记录：`reports/trial-experience/wave25-status.json`（source、endpoints、视口、命令、未测范围）。
+- 状态记录：`reports/trial-experience/wave26-status.json`（source、endpoints、视口、命令、未测范围）。
 - 集成说明：`reports/trial-experience/main-integration.zh-CN.md`（main 接线与 props 语义）。
-- 证据：`apps/console/e2e/trial/report-states.json`、`report-http.json` 与 `screenshots/`。
+- 证据：`apps/console/e2e/trial/report-*.json` 与 `screenshots/`；真实两项目旅程见 `report-two-projects.json`。
 - 用户文档：本目录。
 
 不要交接：`bootstrap.key`、`api.key`、模型 key、`model.json`、`.assistant-settings.json`、SQLite、原生 profile、`.local-state` 副本。
@@ -48,11 +48,12 @@ pnpm start                  # 记录终端打印的地址
 2. 打开“执行器连接”，记录真实状态与原因。
 3. 导入一个测试项目，确认项目筛选与新建委托草稿。
 4. 若执行器可用，完成一个最小委托并审阅；若不可用，明确记录“未达”，不要改用固定流程冒充原生。
-5. main 接线后，再打开“试用准备”核对状态条与四类动作。
+5. 打开“试用准备”，核对当前项目/会话、状态条与四类动作；来回后确认草稿仍在。
 
 ## 6. 证据的边界
 
 - 受控固定流程、浏览器 UI、真实 HTTP readiness 的通过，**都不能**单独证明：
   原生执行器已连接、真实模型质量、完整产品发布、费用/预算收益、恢复授权。
 - 任何“全产品 PASS”的结论只由独立验收（E）给出；本目录与 F 的报告不替代它。
+- 跨 transport/后端身份切换需要调用方传入稳定 identity 或重挂组件；未传时同一活期内应保持 transport 实例稳定。
 - 运行字节改变后需要重新冻结并由 E 重新验收；仅文档变化不重新冻结。

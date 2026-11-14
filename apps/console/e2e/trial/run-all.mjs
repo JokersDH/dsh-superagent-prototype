@@ -16,9 +16,11 @@ const suites = [
   { id: 'typecheck-app', command: 'npx', args: ['tsc', '-p', 'tsconfig.json', '--noEmit'], timeout: 240000 },
   { id: 'typecheck-e2e', command: 'npx', args: ['tsc', '-p', 'e2e/trial/tsconfig.json', '--noEmit'], timeout: 240000 },
   { id: 'build', command: 'npx', args: ['vite', 'build'], timeout: 240000 },
+  { id: 'hook-async', command: process.execPath, args: ['e2e/trial/trial-async.mjs'], timeout: 420000 },
   { id: 'browser-states', command: process.execPath, args: ['e2e/trial/trial-states.mjs'], timeout: 420000 },
   { id: 'http-journey', command: process.execPath, args: ['e2e/trial/trial-http.mjs'], timeout: 420000 },
   { id: 'app-targets', command: process.execPath, args: ['e2e/trial/app-targets.mjs'], timeout: 420000 },
+  { id: 'app-two-projects', command: process.execPath, args: ['e2e/trial/app-two-projects.mjs'], timeout: 420000 },
 ]
 const results = []
 for (const suite of suites) {

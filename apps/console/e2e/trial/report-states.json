@@ -5,132 +5,144 @@
     "1440x900",
     "390x844"
   ],
-  "generatedAt": "2026-11-14T04:13:10.973Z",
+  "generatedAt": "2026-11-14T07:33:39.248Z",
   "results": [
     {
       "id": "CONFIGURED",
       "status": "PASS",
-      "ms": 728,
+      "ms": 743,
       "detail": "configured state shows facts only and one navigation action"
     },
     {
       "id": "UNCONFIGURED",
       "status": "PASS",
-      "ms": 681,
+      "ms": 644,
       "detail": "missing model configuration is separated from execution readiness"
     },
     {
       "id": "BLOCKED",
       "status": "PASS",
-      "ms": 649,
+      "ms": 640,
       "detail": "execution blockage names the reason instead of a bare red error"
     },
     {
       "id": "NEEDS-PROJECT",
       "status": "PASS",
-      "ms": 646,
+      "ms": 627,
       "detail": "a missing project is actionable and does not claim readiness"
     },
     {
       "id": "NO-PROJECTS",
       "status": "PASS",
-      "ms": 646,
+      "ms": 623,
       "detail": "an empty project set is an actionable state, not a blank panel"
     },
     {
       "id": "FIXTURE",
       "status": "PASS",
-      "ms": 646,
+      "ms": 624,
       "detail": "controlled fixture path is never mistaken for native readiness"
     },
     {
       "id": "UNKNOWN",
       "status": "PASS",
-      "ms": 646,
+      "ms": 628,
       "detail": "unknown stays unknown and never turns green"
     },
     {
       "id": "READONLY",
       "status": "PASS",
-      "ms": 628,
+      "ms": 625,
       "detail": "recovery read-only keeps readable navigation and hides approval/write entries"
     },
     {
       "id": "NOREDINESS",
       "status": "PASS",
-      "ms": 647,
+      "ms": 623,
       "detail": "an unread readiness is not guessed from other data"
     },
     {
       "id": "LOADING",
       "status": "PASS",
-      "ms": 649,
+      "ms": 626,
       "detail": "first load announces progress and blocks no navigation"
     },
     {
       "id": "UNAVAILABLE",
       "status": "PASS",
-      "ms": 648,
+      "ms": 624,
       "detail": "an old backend degrades explicitly"
     },
     {
       "id": "ERROR-AND-RETRY",
       "status": "PASS",
-      "ms": 858,
+      "ms": 825,
       "detail": "retry re-reads status without clearing valid data or sending a command"
     },
     {
       "id": "LONG-CONTENT",
       "status": "PASS",
-      "ms": 654,
+      "ms": 628,
       "detail": "long Chinese/English content wraps without horizontal overflow"
     },
     {
       "id": "VISUAL-AUDIT",
       "status": "PASS",
-      "ms": 2295,
+      "ms": 2260,
       "detail": "geometry, overflow, contrast, radii, shadows and semantic dot colours are verified programmatically"
     },
     {
       "id": "INSIGHTS-EMPTY",
       "status": "PASS",
-      "ms": 650,
+      "ms": 623,
       "detail": "optional insights cannot invent efficiency numbers"
+    },
+    {
+      "id": "INSIGHTS-UNSCOPED",
+      "status": "PASS",
+      "ms": 622,
+      "detail": "ready-looking metrics without a declared scope are not shown"
+    },
+    {
+      "id": "INSIGHTS-WRONG-PROJECT",
+      "status": "PASS",
+      "ms": 625,
+      "detail": "a summary for another project cannot be read as the current project result"
     },
     {
       "id": "NAVIGATION-CALLBACKS",
       "status": "PASS",
-      "ms": 2754,
+      "ms": 2643,
       "detail": "each of the four navigation names is reachable and recorded once"
     },
     {
       "id": "DOUBLE-CLICK-GUARD",
       "status": "PASS",
-      "ms": 1298,
+      "ms": 1259,
       "detail": "rapid duplicate activation does not duplicate navigation"
     },
     {
       "id": "KEYBOARD",
       "status": "PASS",
-      "ms": 1414,
+      "ms": 1332,
       "detail": "the main journey is operable by keyboard with visible focus and names"
     },
     {
       "id": "MOBILE",
       "status": "PASS",
-      "ms": 4026,
+      "ms": 5095,
       "detail": "narrow viewport keeps every action reachable without horizontal overflow"
     },
     {
       "id": "STALE-RESPONSE",
       "status": "PASS",
-      "ms": 936,
+      "ms": 919,
       "detail": "out-of-order responses keep the newest identity"
     },
     {
       "id": "UNMOUNT-IN-FLIGHT",
       "status": "PASS",
-      "ms": 906,
+      "ms": 860,
       "detail": "a response after unmount updates no state"
     },
     {

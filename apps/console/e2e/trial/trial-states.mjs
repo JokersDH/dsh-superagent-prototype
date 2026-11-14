@@ -130,6 +130,7 @@ try {
     assert(cells[2].includes('配置事实，非连接验证'), 'configuration is not a connection proof')
     assert((await labels()).join('|') === '打开主对话', 'only the conversation entry is offered')
     assert(await page.getByText('当前', { exact: true }).count() === 1, 'active project marker')
+    assert((await page.locator('.trial-fact').filter({ hasText: '当前项目' }).innerText()).includes('流程测试项目'), 'the current project is named explicitly')
     assert((await page.locator('.trial-boundary').innerText()).includes('未授予执行权限'), 'the absence of execution authority is explicit')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'configured.png') })
   }, 'configured state shows facts only and one navigation action')
@@ -240,7 +241,7 @@ try {
   await step('LONG-CONTENT', async () => {
     await open('state=long')
     assert(await page.locator('.trial-project').count() === 5, 'five projects render')
-    assert((await page.locator('.trial-fact').first().innerText()).includes('把本机执行器'), 'long conversation title renders')
+    assert((await page.locator('.trial-fact').filter({ hasText: '当前对话' }).innerText()).includes('把本机执行器'), 'long conversation title renders')
     const overflow = await page.evaluate(() => {
       const root = document.querySelector('.trial-view')
       return { page: document.documentElement.scrollWidth, client: document.documentElement.clientWidth,
@@ -251,6 +252,11 @@ try {
     const insights = await page.locator('.trial-insights').innerText()
     assert(insights.includes('未知'), 'unknown insight value stays unknown')
     assert(insights.includes('可见性代理'), 'limitations are published')
+    assert(insights.includes('本项目群 5 个项目'), 'the declared scope is named')
+    assert(insights.includes('2 个未知'), 'the unknown count is declared')
+    assert(insights.includes('美元') === false && insights.includes('USD'), 'currency stays on its own row')
+    assert(insights.includes('原生执行') && insights.includes('受控流程'), 'layers stay labelled')
+    assert(await page.locator('.trial-insight-row').count() === 3, 'each metric keeps its own row')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'long.png') })
   }, 'long Chinese/English content wraps without horizontal overflow')
 
@@ -283,6 +289,22 @@ try {
     assert(await page.locator('.trial-insight-rows').count() === 0, 'no measurements are fabricated')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'insights-empty.png') })
   }, 'optional insights cannot invent efficiency numbers')
+
+  await step('INSIGHTS-UNSCOPED', async () => {
+    await open('state=insights-unscoped')
+    assert((await page.locator('.trial-insights').innerText()).includes('缺少观测范围说明'), 'an undeclared scope blocks measurements')
+    assert(await page.locator('.trial-insight-row').count() === 0, 'no metric row is shown without scope')
+    assert((await labels())[0] === '打开主对话', 'core readiness actions stay available')
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'insights-unscoped.png') })
+  }, 'ready-looking metrics without a declared scope are not shown')
+
+  await step('INSIGHTS-WRONG-PROJECT', async () => {
+    await open('state=insights-wrong-project')
+    assert((await page.locator('.trial-insights').innerText()).includes('不包含当前项目'), 'foreign-project summary is refused')
+    assert(await page.locator('.trial-insight-row').count() === 0, 'no foreign metric row is shown')
+    assert((await page.locator('.trial-fact').filter({ hasText: '当前项目' }).innerText()).includes('流程测试项目'), 'the current project identity is still visible')
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'insights-wrong-project.png') })
+  }, 'a summary for another project cannot be read as the current project result')
 
   await step('NAVIGATION-CALLBACKS', async () => {
     for (const [state, expected] of [['blocked', 'inspect_executor'], ['needs-project', 'import_project'], ['unconfigured', 'configure_model'], ['configured', 'open_conversation']]) {
@@ -355,7 +377,7 @@ try {
     const mobilePage = await mobile.newPage()
     const mobileErrors = []
     mobilePage.on('pageerror', error => mobileErrors.push(error.message))
-    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long']) {
+    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long', 'insights-unscoped', 'insights-wrong-project']) {
       await mobilePage.goto(`${base}/e2e/trial/harness.html?state=${state}`, { waitUntil: 'networkidle' })
       await mobilePage.waitForSelector('.trial-view')
       const overflow = await mobilePage.evaluate(() => ({ page: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }))

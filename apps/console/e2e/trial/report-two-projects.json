@@ -1,0 +1,75 @@
+{
+  "subject": "real App two-project daily journey (execution unavailable, configured model stub, no sends)",
+  "viewport": "1440x900",
+  "projects": [
+    {
+      "id": "project-41a49bb11371b8f6e1cb9311",
+      "displayName": "项目 Alpha"
+    },
+    {
+      "displayName": "项目 Beta 每日协作",
+      "importedVia": "POST /v1/projects"
+    }
+  ],
+  "conversations": [
+    "conv-alpha-daily",
+    "conv-beta-daily"
+  ],
+  "readinessReads": 4,
+  "pagePosts": [
+    "/v1/projects"
+  ],
+  "modelCalls": 0,
+  "generatedAt": "2026-11-14T07:33:53.953Z",
+  "results": [
+    {
+      "id": "DEFAULT-CONVERSATION-AND-NO-EAGER-READ",
+      "status": "PASS",
+      "ms": 2,
+      "detail": "the real app keeps the main conversation default and reads readiness only on demand"
+    },
+    {
+      "id": "TWO-REAL-CONVERSATIONS-SWITCH",
+      "status": "PASS",
+      "ms": 200,
+      "detail": "two real conversations keep separate drafts keyed by conversation identity"
+    },
+    {
+      "id": "TRIAL-SHOWS-CURRENT-CONVERSATION-AND-PRESERVES-DRAFT",
+      "status": "PASS",
+      "ms": 163,
+      "detail": "trial round trips preserve draft, project and conversation identity with one read per open"
+    },
+    {
+      "id": "IMPORT-SECOND-PROJECT-THROUGH-THE-REAL-FORM",
+      "status": "PASS",
+      "ms": 148,
+      "detail": "the real import form adds the second project and keeps the unsent draft"
+    },
+    {
+      "id": "TRIAL-TWO-PROJECT-IDENTITY",
+      "status": "PASS",
+      "ms": 168,
+      "detail": "the trial view names the imported project and marks it current without inventing readiness"
+    },
+    {
+      "id": "DELEGATION-DRAFT-NOT-SUBMITTED",
+      "status": "PASS",
+      "ms": 69,
+      "detail": "the delegation draft is inspectable, disabled without an admitted executor, and never submitted"
+    },
+    {
+      "id": "EXECUTOR-ROUND-TRIP-KEEPS-IDENTITY",
+      "status": "PASS",
+      "ms": 132,
+      "detail": "executor check and return keep the same project, conversation and draft"
+    },
+    {
+      "id": "NO-MODEL-NO-COMMAND-AND-NO-ERROR",
+      "status": "PASS",
+      "ms": 1,
+      "detail": "the journey sends no command, calls no model and logs no browser error"
+    }
+  ],
+  "failures": []
+}

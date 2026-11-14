@@ -1,6 +1,6 @@
 {
   "subject": "trial experience suites (controlled fixtures / isolated services; not a release verdict)",
-  "generatedAt": "2026-11-14T04:13:20.037Z",
+  "generatedAt": "2026-11-14T07:33:54.020Z",
   "results": [
     {
       "id": "unit-mapping",
@@ -8,7 +8,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 120000,
-      "ms": 120
+      "ms": 152
     },
     {
       "id": "typecheck-app",
@@ -16,7 +16,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 1687
+      "ms": 2087
     },
     {
       "id": "typecheck-e2e",
@@ -24,7 +24,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 1472
+      "ms": 1982
     },
     {
       "id": "build",
@@ -32,7 +32,15 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 377
+      "ms": 477
+    },
+    {
+      "id": "hook-async",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node e2e/trial/trial-async.mjs",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 420000,
+      "ms": 4941
     },
     {
       "id": "browser-states",
@@ -40,7 +48,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 23606
+      "ms": 25313
     },
     {
       "id": "http-journey",
@@ -48,7 +56,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 3239
+      "ms": 3230
     },
     {
       "id": "app-targets",
@@ -56,7 +64,15 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 5809
+      "ms": 8753
+    },
+    {
+      "id": "app-two-projects",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node e2e/trial/app-two-projects.mjs",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 420000,
+      "ms": 2771
     }
   ],
   "failed": []

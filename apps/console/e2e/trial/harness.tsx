@@ -24,6 +24,11 @@ declare global {
     __TRIAL_REQUESTS__?: string[]
     __TRIAL_BOOTSTRAP__?: string
     __TRIAL_BOOTSTRAP_ERROR__?: string
+    __TRIAL_A_READS__?: number
+    __TRIAL_B_READS__?: number
+    __TRIAL_INLINE_READS__?: number
+    __TRIAL_DISABLED_READS__?: number
+    __TRIAL_AUTH_READS__?: number
   }
 }
 
@@ -32,6 +37,10 @@ const requests: string[] = []
 window.__TRIAL_ACTIONS__ = actions
 window.__TRIAL_RELOADS__ = 0
 window.__TRIAL_REQUESTS__ = requests
+window.__TRIAL_A_READS__ = 0
+window.__TRIAL_B_READS__ = 0
+window.__TRIAL_INLINE_READS__ = 0
+window.__TRIAL_DISABLED_READS__ = 0
 const nativeFetch = window.fetch.bind(window)
 window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
   requests.push(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url)
@@ -193,6 +202,122 @@ function UnmountHarness() {
   )
 }
 
+function IdentityHarness() {
+  const pair = useMemo(() => trialProbePair(), [])
+  const pendingA = useRef<((value: TrialReadiness | undefined) => void)[]>([])
+  const transportA = useMemo(() => ({
+    readiness: () => {
+      window.__TRIAL_A_READS__ = (window.__TRIAL_A_READS__ ?? 0) + 1
+      return new Promise<TrialReadiness | undefined>(resolve => { pendingA.current.push(resolve) })
+    },
+  }), [])
+  const transportB = useMemo(() => ({
+    readiness: () => {
+      window.__TRIAL_B_READS__ = (window.__TRIAL_B_READS__ ?? 0) + 1
+      return Promise.resolve(pair.second)
+    },
+  }), [pair])
+  const [identity, setIdentity] = useState<'a' | 'b'>('a')
+  const probe = useTrialReadiness(identity === 'a' ? transportA : transportB, { identity })
+  return (
+    <HarnessFrame controls={(
+      <>
+        <span data-harness-identity>{identity}</span>
+        <button type="button" data-harness="switch-b" onClick={() => setIdentity('b')}>切换到 B</button>
+        <button type="button" data-harness="switch-a" onClick={() => setIdentity('a')}>切换到 A</button>
+        <button type="button" data-harness="resolve-a" onClick={() => {
+          for (const resolve of pendingA.current.splice(0)) resolve(pair.first)
+        }}>让 A 晚到</button>
+        <button type="button" data-harness="reload" onClick={probe.reload}>重新读取</button>
+        <span data-harness-reads-a>{window.__TRIAL_A_READS__ ?? 0}</span>
+        <span data-harness-reads-b>{window.__TRIAL_B_READS__ ?? 0}</span>
+      </>
+    )}>
+      <TrialWorkspace readiness={probe.readiness} loading={probe.loading} error={probe.error} unavailable={probe.unavailable}
+        configuration={pair.configuration} onAction={record} onReload={probe.reload} />
+    </HarnessFrame>
+  )
+}
+
+function InlineHarness() {
+  const pair = useMemo(() => trialProbePair(), [])
+  const [tick, setTick] = useState(0)
+  // Deliberately a fresh object every render; identity is omitted so the hook must not loop.
+  const transport = {
+    readiness: () => {
+      window.__TRIAL_INLINE_READS__ = (window.__TRIAL_INLINE_READS__ ?? 0) + 1
+      return Promise.resolve(pair.second)
+    },
+  }
+  const probe = useTrialReadiness(transport, true)
+  return (
+    <HarnessFrame controls={(
+      <>
+        <button type="button" data-harness="rerender" onClick={() => setTick(value => value + 1)}>重新渲染</button>
+        <span data-harness-tick>{tick}</span>
+        <span data-harness-inline-reads>{window.__TRIAL_INLINE_READS__ ?? 0}</span>
+      </>
+    )}>
+      <TrialWorkspace readiness={probe.readiness} loading={probe.loading} error={probe.error}
+        configuration={pair.configuration} onAction={record} onReload={probe.reload} />
+    </HarnessFrame>
+  )
+}
+
+function DisabledHarness() {
+  const pair = useMemo(() => trialProbePair(), [])
+  const pending = useRef<((value: TrialReadiness | undefined) => void)[]>([])
+  const transport = useMemo(() => ({
+    readiness: () => {
+      window.__TRIAL_DISABLED_READS__ = (window.__TRIAL_DISABLED_READS__ ?? 0) + 1
+      return new Promise<TrialReadiness | undefined>(resolve => { pending.current.push(resolve) })
+    },
+  }), [])
+  const [enabled, setEnabled] = useState(false)
+  const probe = useTrialReadiness(transport, { enabled })
+  return (
+    <HarnessFrame controls={(
+      <>
+        <span data-harness-enabled>{String(enabled)}</span>
+        <button type="button" data-harness="enable" onClick={() => setEnabled(true)}>启用</button>
+        <button type="button" data-harness="disable" onClick={() => setEnabled(false)}>禁用</button>
+        <button type="button" data-harness="resolve" onClick={() => {
+          for (const resolve of pending.current.splice(0)) resolve(pair.second)
+        }}>完成读取</button>
+        <span data-harness-disabled-reads>{window.__TRIAL_DISABLED_READS__ ?? 0}</span>
+      </>
+    )}>
+      <TrialWorkspace readiness={probe.readiness} loading={probe.loading} error={probe.error}
+        configuration={pair.configuration} onAction={record} onReload={probe.reload} />
+    </HarnessFrame>
+  )
+}
+
+function AuthExpiryHarness() {
+  const pair = useMemo(() => trialProbePair(), [])
+  const calls = useRef(0)
+  const transport = useMemo(() => ({
+    readiness: () => {
+      calls.current += 1
+      window.__TRIAL_AUTH_READS__ = calls.current
+      if (calls.current === 1) return Promise.resolve(pair.second)
+      return Promise.reject(Object.assign(new Error('raw /Users/secret token=abc'), { code: 'auth_required' }))
+    },
+  }), [pair])
+  const probe = useTrialReadiness(transport, { identity: 'auth-session' })
+  return (
+    <HarnessFrame controls={(
+      <>
+        <button type="button" data-harness="reload" onClick={probe.reload}>重新读取</button>
+        <span data-harness-auth-reads>{calls.current}</span>
+      </>
+    )}>
+      <TrialWorkspace readiness={probe.readiness} loading={probe.loading} error={probe.error}
+        configuration={pair.configuration} onAction={record} onReload={probe.reload} />
+    </HarnessFrame>
+  )
+}
+
 function App() {
   const params = new URLSearchParams(window.location.search)
   const mode = params.get('mode') ?? 'props'
@@ -201,6 +326,10 @@ function App() {
   if (mode === 'http') return <HttpHarness />
   if (mode === 'stale') return <StaleHarness />
   if (mode === 'unmount') return <UnmountHarness />
+  if (mode === 'identity') return <IdentityHarness />
+  if (mode === 'inline') return <InlineHarness />
+  if (mode === 'disabled') return <DisabledHarness />
+  if (mode === 'auth-expiry') return <AuthExpiryHarness />
   return <PropsHarness state={state} />
 }
 

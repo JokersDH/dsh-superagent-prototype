@@ -109,17 +109,31 @@ const longReadiness = readiness({
 })
 const longConversationTitle = '把本机执行器的连接状态、项目导入和对话入口整理成一次可审阅的试用准备检查，并保留原始授权边界'
 const longInsights: TrialInsightsView = {
-  status: 'ready', windowLabel: '11月1日–11月14日', sampleCount: 12, coverage: '仅界面可见区间（partial）',
+  status: 'ready', windowLabel: '11月1日–11月14日', coverage: 'partial：3/5 来源可读', coverageState: 'partial',
+  scope: { projectIds: ['project-quartz', 'project-atlas', 'project-harbor', 'project-requirements', 'project-notes'], aggregation: 'declared_multi_project', label: '本项目群 5 个项目' },
+  sampleCount: 12, unknownCount: 2,
   metrics: [
-    { id: 'wait', label: '交付到接受的等待', value: '3.2 小时', detail: '5 个工作' },
-    { id: 'timing', label: '审阅计时覆盖', value: null, detail: '样本不足，未知' },
+    { id: 'wait', label: '交付到接受的等待', value: '3.2 小时', unit: '小时', layer: 'controlled', sampleCount: 5, detail: '5 个工作' },
+    { id: 'timing', label: '审阅计时覆盖', value: null, layer: 'observed', sampleCount: null, detail: '样本不足，未知' },
+    { id: 'usage', label: '已知 usage', value: '1.20', unit: 'USD', layer: 'native', sampleCount: 2 },
   ],
   limitations: ['界面活动只是可见性代理，不是完整人力工时。', '受控流程与真实执行器分开统计。'],
+}
+const unscopedInsights: TrialInsightsView = {
+  status: 'ready', windowLabel: '11月1日–11月14日', coverage: 'partial', sampleCount: 3,
+  metrics: [{ id: 'wait', label: '交付到接受的等待', value: '1.5 小时' }],
+  limitations: ['缺少项目范围声明，不应作为默认指标展示。'],
+}
+const wrongProjectInsights: TrialInsightsView = {
+  status: 'ready', windowLabel: '11月1日–11月14日', coverage: 'complete', sampleCount: 4,
+  scope: { projectIds: ['project-notes'], aggregation: 'single_project' },
+  metrics: [{ id: 'wait', label: '交付到接受的等待', value: '2 小时' }],
+  limitations: [],
 }
 
 export const trialStates = [
   'configured', 'unconfigured', 'blocked', 'needs-project', 'no-projects', 'fixture', 'unknown', 'readonly',
-  'noreadiness', 'loading', 'unavailable', 'error', 'long', 'insights-empty',
+  'noreadiness', 'loading', 'unavailable', 'error', 'long', 'insights-empty', 'insights-unscoped', 'insights-wrong-project',
 ] as const
 export type TrialHarnessState = (typeof trialStates)[number]
 
@@ -172,6 +186,12 @@ export function trialHarnessProps(state: TrialHarnessState): TrialHarnessProps {
     case 'insights-empty': return {
       readiness: readiness(), configuration: configured,
       insights: { status: 'insufficient_data', sampleCount: null, metrics: [], limitations: ['样本不足，未计算节省时间或质量结论。'] },
+    }
+    case 'insights-unscoped': return {
+      readiness: readiness(), configuration: configured, insights: unscopedInsights,
+    }
+    case 'insights-wrong-project': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', insights: wrongProjectInsights,
     }
   }
 }
