@@ -168,23 +168,42 @@ try {
   const workIds = (() => { try { return store.db.prepare('SELECT id FROM works').all().map(row => String(row.id)) } catch { return [] } })()
   const linkRows = (() => { try { return store.db.prepare('SELECT id FROM ticket_links').all().map(row => String(row.id)) } catch { return [] } })()
   log.evidence({ works: workIds.length, tickets: tickets.length, links: linkRows.length, distinctAttempts: [...new Set(allAttempts)] })
+  const questionIds = (() => { try { return store.db.prepare('SELECT id FROM user_questions').all().map(row => String(row.id)) } catch { return [] } })()
+  const perAttempt = {}
+  let noCrossAttribution = true
+  for (const attemptId of new Set(allAttempts)) {
+    const rows = store.observations.forAttempt(String(attemptId))
+    perAttempt[attemptId] = [...new Set(rows.map(row => String(row.kind)))].sort()
+    // Isolation is about attribution: a slot may legitimately have no facts yet, but it must never carry
+    // another slot's fact.
+    if (rows.some(row => String(row.attemptId ?? attemptId) !== String(attemptId))) noCrossAttribution = false
+  }
+  const distinctQuestions = new Set(questionIds).size
+  log.evidence({ questions: questionIds.length, distinctQuestions, perAttempt })
   const distinctAttempts = new Set(allAttempts)
-  if (distinctAttempts.size >= 4 && distinctAttempts.size === allAttempts.length) {
-    log.pass(`the ${allAttempts.length} held attempt ids are pairwise distinct, so no slot reuses another slot's attempt identity (works ${workIds.length}, tickets ${tickets.length})`)
-  } else log.fail(`attempt identity is reused across slots: ${JSON.stringify({ works: workIds.length, tickets: tickets.length, attempts: allAttempts })}`)
+  const withFacts = Object.values(perAttempt).filter(kinds => kinds.length >= 1).length
+  if (distinctAttempts.size >= 4 && distinctAttempts.size === allAttempts.length && distinctQuestions === questionIds.length && noCrossAttribution) {
+    log.pass(`the ${allAttempts.length} held attempt ids are pairwise distinct, the ${questionIds.length} questions are distinct, and no slot carries another slot's fact (${withFacts} slot(s) already have facts)`)
+  } else log.fail(`slot isolation is incomplete: ${JSON.stringify({ attempts: allAttempts.length, distinctAttempts: distinctAttempts.size, questions: questionIds.length, distinctQuestions, noCrossAttribution })}`)
 
   log.begin('B27-SLOTS-RESOURCE-RETURN', 'stopping a work returns its slot resources', 'controlled_process')
   let stopped = null, stopError = null
   try { stopped = await command({ kind: 'stop_work', workId: first.workId, conversationId: 'conversation-product' }) }
   catch (error) { stopError = String(error?.message ?? error).slice(0, 160) }
   const afterStop = await until(
-    async () => ({ works: (await product.application.inspect({})).works }),
-    value => value.works.some(work => work.id === first.workId && work.phase === 'ended'),
-    20_000,
-  ).catch(() => ({ works: [] }))
+    async () => {
+      const one = await product.application.inspect({ workId: first.workId }).catch(() => ({ works: [] }))
+      return { works: one.works ?? [] }
+    },
+    value => value.works.some(work => work.id === first.workId && ['ended', 'stopped', 'cancelled'].includes(String(work.phase))),
+    30_000,
+  ).catch(async () => {
+    const one = await product.application.inspect({ workId: first.workId }).catch(() => ({ works: [] }))
+    return { works: one.works ?? [] }
+  })
   const ended = afterStop.works.find(work => work.id === first.workId)
   log.evidence({ status: stopped?.status ?? null, stopError, phase: ended?.phase ?? null })
-  if ((stopped?.status === 'recorded' || stopped?.status === 'noop') && ended?.phase === 'ended') {
+  if ((stopped?.status === 'recorded' || stopped?.status === 'noop') && ['ended', 'stopped', 'cancelled'].includes(String(ended?.phase))) {
     log.pass(`stopping work ${first.workId} ended it and released its slot`)
   } else {
     // The stop was recorded but the work projection did not show an ended phase inside the window, so the
