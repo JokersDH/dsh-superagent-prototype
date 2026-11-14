@@ -1,0 +1,34 @@
+{
+  "protocol": "personal-review-driver-api/2",
+  "entry": "packages/context/tools/personal-review-driver.mjs",
+  "toolVersion": "wave27",
+  "dialects": ["source", "package"],
+  "required": ["--install", "--state", "--project", "--allow-path", "--console-port", "--api-port", "--model-config"],
+  "packageOnly": ["--pa-entry", "--config-root", "--cache-root", "--logs-root", "--workspace-root"],
+  "sourceOnly": ["--start-entry", "--review-entry"],
+  "manifestMode": {
+    "required": ["--a-worktree", "--a-module", "--manifest-db", "--manifest-expectation", "--root-map", "--target-protocol", "--target-snapshot-digest", "--target-content-digest"],
+    "optional": ["--manifest-output", "--target-artifacts", "--target-source-root"],
+    "order": ["A producer manifest", "A restore/content proof against independent expectations", "consumer start", "HTTP IDs/deliveries match manifest"]
+  },
+  "expectations": ["--expect-chat", "--expect-candidate-prepare", "--expect-candidates", "--expect-reject-reason", "--expect-candidate-digest", "--expect-work-phase", "--expect-delivery", "--expect-source-state", "--expect-scope-review", "--expect-reason", "--expect-readiness"],
+  "replay": ["--replay-context-token", "--replay-confirm-token"],
+  "budgets": ["--per-request-ms", "--deadline-ms", "--readiness-ms", "--stop-grace-ms"],
+  "status": {
+    "verified-flow": { "exit": 0, "verified": true },
+    "reused": { "exit": 0, "verified": true },
+    "refused-verified": { "exit": 0, "verified": true },
+    "observed": { "exit": 0, "verified": false, "note": "never acceptance" },
+    "NOT_REACHED": { "exit": 4, "verified": false },
+    "failed": { "exit": 1, "verified": false },
+    "usage": { "exit": 2, "verified": false }
+  },
+  "output": {
+    "required": ["protocol", "status", "verified", "mode", "dialect", "descriptor", "entries", "review", "health", "identity", "budgets", "data", "cleanup"],
+    "targetProof": ["protocol", "status", "subjectMatches", "verification.status", "verification.basis", "verification.artifactCoverage", "verification.content", "verification.report", "expected", "allowed", "mismatches"],
+    "manifest": ["protocol", "digest", "sourceFingerprint", "coverage", "subject", "question", "answer", "counts", "roots"],
+    "identity": ["requestedDigest", "actualHealthDigest", "recordPid", "childPid", "instanceProcessStart", "instanceApiPid", "instanceApiProcessStart", "stateRoot", "bound"],
+    "cleanup": ["owned", "attempted", "stopped", "detail", "error", "materials"]
+  },
+  "noAuthority": ["verified-flow is not an execution/release verdict", "packageSubject is not installed proof", "target proof is content identity only", "readiness authorization none is not native readiness"]
+}
